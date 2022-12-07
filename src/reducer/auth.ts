@@ -1,12 +1,10 @@
-import { createAction, createReducer } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 const authenticated = (authInfo: any) =>
   authInfo && authInfo.isAnonymous === false;
 
-// ================ Action types ================ //
-
-const AUTH_INFO_REQUEST = 'app/Auth/AUTH_INFO_REQUEST';
-const AUTH_INFO_SUCCESS = 'app/Auth/AUTH_INFO_SUCCESS';
+// ================ Thunk types ================ //
+const AUTH_INFO = 'app/Auth/AUTH_INFO';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -34,46 +32,42 @@ interface AuthState {
   confirmInProgress: boolean;
 }
 
-const initialState = {
+const initialState: AuthState = {
   isAuthenticated: false,
-
-  // scopes associated with current token
   authScopes: [],
-
-  // auth info
   authInfoLoaded: false,
-
-  // login
   loginError: null,
   loginInProgress: false,
-
-  // logout
   logoutError: null,
   logoutInProgress: false,
-
-  // signup
   signupError: null,
   signupInProgress: false,
-
-  // confirm (create use with idp)
   confirmError: null,
   confirmInProgress: false,
-} as AuthState;
+};
 
-const authInfoRequest = createAction(AUTH_INFO_REQUEST);
-const authInfoSuccess = createAction<any>(AUTH_INFO_SUCCESS);
+const authInfo = createAsyncThunk(
+  AUTH_INFO,
+  async ({}, { dispatch, getState }) => {},
+);
 
-const authReducer = createReducer(initialState, builder => {
-  builder
-    .addCase(authInfoRequest, (state, action) => state)
-    .addCase(authInfoSuccess, (state, { payload }) => {
-      return {
-        ...state,
-        authInfoLoaded: true,
-        isAuthenticated: authenticated(payload),
-        authScopes: payload.scopes,
-      };
-    });
+const authSlice = createSlice({
+  name: 'auth',
+  initialState,
+  reducers: {},
+  extraReducers: builder => {
+    builder
+      .addCase(authInfo.pending, (state, action) => state)
+      .addCase(authInfo.fulfilled, (state, { payload }: any) => {
+        return {
+          ...state,
+          authInfoLoaded: true,
+          isAuthenticated: authenticated(payload),
+          authScopes: payload.scopes,
+        };
+      });
+  },
 });
 
-export default authReducer;
+export const {} = authSlice.actions;
+export default authSlice.reducer;
