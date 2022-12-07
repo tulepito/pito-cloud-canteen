@@ -1,12 +1,12 @@
-import { createAction, createReducer } from "@reduxjs/toolkit";
+import { createAction, createReducer } from '@reduxjs/toolkit';
 
 const authenticated = (authInfo: any) =>
   authInfo && authInfo.isAnonymous === false;
 
 // ================ Action types ================ //
 
-const AUTH_INFO_REQUEST = "app/Auth/AUTH_INFO_REQUEST";
-const AUTH_INFO_SUCCESS = "app/Auth/AUTH_INFO_SUCCESS";
+const AUTH_INFO_REQUEST = 'app/Auth/AUTH_INFO_REQUEST';
+const AUTH_INFO_SUCCESS = 'app/Auth/AUTH_INFO_SUCCESS';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -63,7 +63,7 @@ const initialState = {
 const authInfoRequest = createAction(AUTH_INFO_REQUEST);
 const authInfoSuccess = createAction<any>(AUTH_INFO_SUCCESS);
 
-const authReducer = createReducer(initialState, (builder) => {
+const authReducer = createReducer(initialState, builder => {
   builder
     .addCase(authInfoRequest, (state, action) => state)
     .addCase(authInfoSuccess, (state, { payload }) => {

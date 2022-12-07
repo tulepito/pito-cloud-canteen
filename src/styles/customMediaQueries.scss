@@ -1,0 +1,50 @@
+/* Breakpoint mixins */
+$xs: 375px;
+$s: 450px;
+$m: 768px;
+$l: 1024px;
+$lWithPaddings: 1128px;
+$sl: 1440px;
+$xl: 1921px;
+
+@mixin viewportXSmall {
+  @media (min-width: #{$xs}) {
+    @content;
+  }
+}
+
+@mixin viewportSmall {
+  @media (min-width: #{$s}) {
+    @content;
+  }
+}
+
+@mixin viewportMedium {
+  @media (min-width: #{$m}) {
+    @content;
+  }
+}
+
+@mixin viewportLarge {
+  @media (min-width: #{$l}) {
+    @content;
+  }
+}
+
+@mixin viewportLargeWithPaddings {
+  @media (min-width: #{$lWithPaddings}) {
+    @content;
+  }
+}
+
+@mixin viewportSLarge {
+  @media (min-width: #{$sl}) {
+    @content;
+  }
+}
+
+@mixin viewportXLarge {
+  @media (min-width: #{$xl}) {
+    @content;
+  }
+}
