@@ -1,0 +1,32 @@
+$marketplaceColor: #c0392b;
+$marketplaceColorLight: #ff4c38;
+$marketplaceColorDark: #8c291e;
+
+$successColor: #2ecc71;
+$successColorDark: #239954;
+$successColorLight: #f0fff6;
+$failColor: #ff0000;
+$failColorLight: #fff0f0;
+$attentionColor: #ffaa00;
+$attentionColorLight: #fff7f0;
+$bannedColorLight: $marketplaceColorLight;
+$bannedColorDark: $marketplaceColor;
+
+$matterColorDark: #000000;
+$matterColor: #4a4a4a;
+$matterColorAnti: #b2b2b2;
+$matterColorNegative: #e7e7e7;
+$matterColorBright: #fcfcfc;
+$matterColorLight: #ffffff;
+
+$matterColorLightTransparent: rgba(255, 255, 255, 0.65);
+
+/* ================ Font ================ */
+$fontFamily: "poppins", Helvetica, Arial, sans-serif;
+
+$fontWeightRegular: 400;
+$fontWeightMedium: 500;
+$fontWeightSemiBold: 600;
+$fontWeightBold: 700;
+
+$fontWeightHighlightEmail: $fontWeightBold;
