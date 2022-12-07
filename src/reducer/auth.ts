@@ -48,16 +48,17 @@ const initialState: AuthState = {
 
 const authInfo = createAsyncThunk(
   AUTH_INFO,
-  async ({}, { dispatch, getState }) => {},
+  // async ({}, { dispatch, getState }) => {},
+  async () => {},
 );
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {},
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(authInfo.pending, (state, action) => state)
+      .addCase(authInfo.pending, (state) => state)
       .addCase(authInfo.fulfilled, (state, { payload }: any) => {
         return {
           ...state,
@@ -69,5 +70,5 @@ const authSlice = createSlice({
   },
 });
 
-export const {} = authSlice.actions;
+// export const {} = authSlice.actions;
 export default authSlice.reducer;

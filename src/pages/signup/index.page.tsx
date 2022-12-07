@@ -1,3 +1,5 @@
+import SignupScreen from './Signup';
+
 export default function Signup() {
-  return <div>Sign up</div>;
+  return <SignupScreen />;
 }
