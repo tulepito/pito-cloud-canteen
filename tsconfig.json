@@ -25,7 +25,8 @@
       "@utils/*": ["src/utils/*"],
       "@styles/*": ["src/styles/*"],
       "@redux/*": ["src/redux/*"],
-      "@sharetribe/*": ["src/sharetribe/*"]
+      "@sharetribe/*": ["src/sharetribe/*"],
+      "@translations/*": ["src/translations/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

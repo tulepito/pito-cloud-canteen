@@ -1,22 +1,22 @@
 import '../styles/globals.scss';
 
+import viMessage from '@translations/vi.json';
 import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { Provider } from 'react-redux';
 
-import viMessage from '../../content/locale/vi.json';
 import reduxStore from '../redux/store';
 
-const DEFAULT_LOCALE = 'vi';
+const DEFAULT_LOCALE = 'vi-VN';
 
 export default function App({ Component, pageProps }: AppProps) {
   const { locale, defaultLocale } = useRouter();
-  const appLocal = locale || DEFAULT_LOCALE;
+  const appLocale = locale || DEFAULT_LOCALE;
   let message;
 
-  switch (locale) {
+  switch (appLocale) {
     case 'vi':
       message = viMessage;
       break;
@@ -27,7 +27,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <IntlProvider
-      locale={appLocal}
+      locale={appLocale}
       defaultLocale={defaultLocale}
       messages={message}>
       <Provider store={reduxStore}>
