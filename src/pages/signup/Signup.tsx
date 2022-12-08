@@ -1,2 +1,4 @@
-const SignupScreen = () => <div>Signup</div>;
-export default SignupScreen;
+const SignUpScreen = () => {
+  return <div>SignUp</div>;
+};
+export default SignUpScreen;

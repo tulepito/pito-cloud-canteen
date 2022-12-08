@@ -1,5 +1,5 @@
-import SignupScreen from './Signup';
+import SignUpScreen from './Signup';
 
 export default function Signup() {
-  return <SignupScreen />;
+  return <SignUpScreen />;
 }

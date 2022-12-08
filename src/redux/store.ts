@@ -1,7 +1,8 @@
 import type { Action, ThunkAction } from '@reduxjs/toolkit';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
-import * as globalReducers from './reducer';
+import { sdk } from '../sharetribe/sdk';
+import * as globalReducers from './slices';
 
 const rootReducer = combineReducers({
   ...globalReducers,
@@ -9,6 +10,10 @@ const rootReducer = combineReducers({
 
 const store = configureStore({
   reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      thunk: { extraArgument: sdk },
+    }),
 });
 
 export type AppDispatch = typeof store.dispatch;
@@ -19,3 +24,5 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   unknown,
   Action<string>
 >;
+
+export default store;

@@ -8,25 +8,19 @@ const AUTH_INFO = 'app/Auth/AUTH_INFO';
 
 interface AuthState {
   isAuthenticated: boolean;
-
   // scopes associated with current token
   authScopes: [];
-
   // auth info
   authInfoLoaded: boolean;
-
   // login
   loginError: any;
   loginInProgress: boolean;
-
   // logout
   logoutError: any;
   logoutInProgress: boolean;
-
   // signup
   signupError: any;
   signupInProgress: boolean;
-
   // confirm (create use with idp)
   confirmError: any;
   confirmInProgress: boolean;
@@ -45,12 +39,46 @@ const initialState: AuthState = {
   confirmError: null,
   confirmInProgress: false,
 };
+type ThunkAPI = {
+  dispatch?: any;
+  getState?: any;
+  extra: any;
+};
 
 const authInfo = createAsyncThunk(
   AUTH_INFO,
-  // async ({}, { dispatch, getState }) => {},
-  async () => {},
+  async (_, { extra: sdk }: ThunkAPI) => {
+    const res = await sdk.currentUser.create(
+      {
+        email: 'joe.dunphy@example.com',
+        password: 'secret-pass',
+        firstName: 'Joe',
+        lastName: 'Dunphy',
+        displayName: 'Dunphy Co.',
+        bio: 'Hello, I am Joe.',
+        publicData: {
+          age: 27,
+        },
+        protectedData: {
+          phoneNumber: '+1-202-555-5555',
+        },
+        privateData: {
+          discoveredServiceVia: 'Twitter',
+        },
+      },
+      {
+        expand: true,
+      },
+    );
+
+    console.log(res);
+    return '';
+  },
 );
+
+export const authThunks = {
+  authInfo,
+};
 
 const authSlice = createSlice({
   name: 'auth',
@@ -70,5 +98,4 @@ const authSlice = createSlice({
   },
 });
 
-// export const {} = authSlice.actions;
 export default authSlice.reducer;
