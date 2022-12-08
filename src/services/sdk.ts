@@ -23,8 +23,8 @@ const typeHandlers = [
   },
 ];
 
-const baseUrlMaybe = process.env.REACT_APP_SHARETRIBE_SDK_BASE_URL
-  ? { baseUrl: process.env.REACT_APP_SHARETRIBE_SDK_BASE_URL }
+const baseUrlMaybe = process.env.NEXT_PUBLIC_SHARETRIBE_SDK_BASE_URL
+  ? { baseUrl: process.env.NEXT_PUBLIC_SHARETRIBE_SDK_BASE_URL }
   : null;
 const httpAgent = new http.Agent({ keepAlive: true });
 const httpsAgent = new https.Agent({ keepAlive: true });
