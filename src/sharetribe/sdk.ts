@@ -1,6 +1,6 @@
 import { createInstance } from 'sharetribe-flex-sdk';
 
-import config from '../config';
+import config from '../configs';
 
 const baseUrl = config.sdk.baseUrl ? { baseUrl: config.sdk.baseUrl } : {};
 
