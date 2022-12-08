@@ -7,6 +7,7 @@ const nextConfig = {
   i18n: {
     locales: ['vi', 'en'],
     defaultLocale: 'vi',
+    localeDetection: false,
   },
   pageExtensions: ['page.tsx', 'page.jsx', 'api.ts', 'api.js'],
 };
