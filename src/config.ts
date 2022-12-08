@@ -35,6 +35,9 @@ const sdkTransitVerbose =
 // Canonical root url is needed in social media sharing and SEO optimization purposes.
 const canonicalRootURL = process.env.NEXT_PUBLIC_CANONICAL_ROOT_URL;
 
+// If webapp is using SSL (i.e. it's behind 'https' protocol)
+const usingSSL = process.env.REACT_APP_SHARETRIBE_USING_SSL === 'true';
+
 // Site title is needed in meta tags (bots and social media sharing reads those)
 const siteTitle = 'PITO';
 
@@ -74,6 +77,7 @@ const config = {
   siteInstagramPage,
   siteTwitterHandle,
   facebookAppId,
+  usingSSL,
 };
 
 export default config;
