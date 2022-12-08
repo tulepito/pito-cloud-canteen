@@ -25,10 +25,10 @@ const i18n = {
 // script, react-scripts (and the sharetribe-scripts fork of
 // react-scripts) require using the NEXT_PUBLIC_ prefix to avoid
 // exposing server secrets to the client side.
-const sdkClientId = process.env.NEXT_PUBLIC_SHARETRIBE_SDK_CLIENT_ID;
-const sdkBaseUrl = process.env.NEXT_PUBLIC_SHARETRIBE_SDK_BASE_URL;
+const sdkClientId = process.env.NEXT_PUBLIC_SHARETRIBE_SDK_CLIENT_ID || '';
+const sdkBaseUrl = process.env.NEXT_PUBLIC_SHARETRIBE_SDK_BASE_URL || '';
 const sdkAssetCdnBaseUrl =
-  process.env.NEXT_PUBLIC_SHARETRIBE_SDK_ASSET_CDN_BASE_URL;
+  process.env.NEXT_PUBLIC_SHARETRIBE_SDK_ASSET_CDN_BASE_URL || '';
 const sdkTransitVerbose =
   process.env.NEXT_PUBLIC_SHARETRIBE_SDK_TRANSIT_VERBOSE === 'true';
 
