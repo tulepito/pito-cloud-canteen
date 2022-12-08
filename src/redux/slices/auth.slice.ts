@@ -48,7 +48,7 @@ type ThunkAPI = {
 const authInfo = createAsyncThunk(
   AUTH_INFO,
   async (_, { extra: sdk }: ThunkAPI) => {
-    const res = await sdk.currentUser.create(
+    await sdk.currentUser.create(
       {
         email: 'joe.dunphy@example.com',
         password: 'secret-pass',
@@ -71,7 +71,6 @@ const authInfo = createAsyncThunk(
       },
     );
 
-    console.log(res);
     return '';
   },
 );

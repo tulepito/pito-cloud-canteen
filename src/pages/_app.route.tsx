@@ -3,7 +3,6 @@ import '../styles/globals.scss';
 import viMessage from '@translations/vi.json';
 import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
-import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { Provider } from 'react-redux';
 

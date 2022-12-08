@@ -9,7 +9,7 @@ const nextConfig = {
     defaultLocale: 'vi',
     localeDetection: false,
   },
-  pageExtensions: ['page.tsx', 'page.jsx', 'api.ts', 'api.js'],
+  pageExtensions: ['route.tsx', 'route.jsx', 'api.ts', 'api.js'],
 };
 
 module.exports = nextConfig;
