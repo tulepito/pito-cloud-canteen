@@ -1,5 +1,5 @@
-import SignUpScreen from './SignUp.page';
+import SignUpPage from './components/SignUp.page';
 
 export default function SignUpRoute() {
-  return <SignUpScreen />;
+  return <SignUpPage />;
 }

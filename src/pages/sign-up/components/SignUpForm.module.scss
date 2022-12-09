@@ -1,0 +1,68 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  padding: 0 8px;
+  width: 100%;
+
+  @include viewportMedium {
+  }
+
+  @include viewportLarge {
+    width: min(400px, calc(100% / 3));
+  }
+}
+
+.formContainer {
+  margin: 0 auto;
+  width: fit-content;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  row-gap: 16px;
+
+  @include viewportMedium {
+    padding: 24px;
+  }
+
+  @include viewportLarge {
+    padding: 24px 32px;
+  }
+
+  & input {
+    width: 100%;
+  }
+}
+
+.formTitle {
+  text-align: center;
+  color: $matterColorDark;
+  font-size: 24px;
+
+  @include viewportMedium {
+    font-size: 32px;
+  }
+}
+
+.privacyPolicyText {
+  cursor: pointer;
+}
+
+.haveAccountContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.submitButton {
+  background-color: $marketplaceColorLight;
+  color: $successColorLight;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.toSignIn {
+  color: $marketplaceColorLight;
+}
