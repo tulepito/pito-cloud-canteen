@@ -1,4 +1,4 @@
-import { createInstance } from 'sharetribe-flex-sdk';
+import { createInstance, transit, types, util } from 'sharetribe-flex-sdk';
 
 import config from '../configs';
 
@@ -10,3 +10,5 @@ export const sdk = createInstance({
   secure: config.usingSSL,
   ...baseUrl,
 });
+
+export { transit, types, util };
