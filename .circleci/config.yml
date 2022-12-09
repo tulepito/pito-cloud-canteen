@@ -28,6 +28,9 @@ jobs:
       - run:
           name: Build the project
           command: yarn build
+      - run:
+          name: Run deploy script
+          command: ./scripts/deploy.sh
 
 workflows:
   version: 2
