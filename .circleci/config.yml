@@ -25,9 +25,6 @@ jobs:
           name: Copy Environment File
           command: ./scripts/ci_encode_environments.sh
       - run:
-          name: Build the project
-          command: yarn build
-      - run:
           name: Run deploy script
           command: ./scripts/deploy.sh
 

@@ -1,10 +1,8 @@
 FROM node:16.16.0
 
-RUN mkdir -p /usr/src/app
+ADD ./ ./
 
-WORKDIR /usr/src/app
-
-ADD ./ /usr/src/app
+ENV NODE_ENV "production"
 
 RUN yarn && yarn build
 
