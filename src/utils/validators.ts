@@ -1,0 +1,138 @@
+import toPairs from 'lodash/toPairs';
+
+/**
+ * Validator functions and helpers for Final Forms
+ */
+
+// Final Form expects and undefined value for a successful validation
+const VALID = undefined;
+
+const isNonEmptyString = (val: string) => {
+  return typeof val === 'string' && val.trim().length > 0;
+};
+
+export const required = (message: string) => (value: string) => {
+  if (typeof value === 'undefined' || value === null) {
+    // undefined or null values are invalid
+    return message;
+  }
+  if (typeof value === 'string') {
+    // string must be nonempty when trimmed
+    return isNonEmptyString(value) ? VALID : message;
+  }
+  return VALID;
+};
+
+export const requiredStringNoTrim = (message: string) => (value: string) => {
+  return typeof value === 'string' && value.length > 0 ? VALID : message;
+};
+
+export const requiredFieldArrayCheckbox =
+  (message: string) => (value: string) => {
+    if (!value) {
+      return message;
+    }
+
+    const entries = toPairs(value);
+    const hasSelectedValues = entries.filter((e) => !!e[1]).length > 0;
+    return hasSelectedValues ? VALID : message;
+  };
+
+export const minLength =
+  (message: string, minimumLength: number) => (value: string) => {
+    const hasLength = value && typeof value.length === 'number';
+    return hasLength && value.length >= minimumLength ? VALID : message;
+  };
+
+export const maxLength =
+  (message: string, maximumLength: number) => (value: string) => {
+    if (!value) {
+      return VALID;
+    }
+    const hasLength = value && typeof value.length === 'number';
+    return hasLength && value.length <= maximumLength ? VALID : message;
+  };
+
+export const nonEmptyArray = (message: string) => (value: string) => {
+  return value && Array.isArray(value) && value.length > 0 ? VALID : message;
+};
+
+export const autocompleteSearchRequired = (message: string) => (value: any) => {
+  return value && value.search ? VALID : message;
+};
+
+// Source: http://www.regular-expressions.info/email.html
+// See the link above for an explanation of the tradeoffs.
+const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+export const emailFormatValid = (message: string) => (value: string) => {
+  return value && EMAIL_RE.test(value) ? VALID : message;
+};
+
+export const parseNum = (str: string) => {
+  const num = Number.parseInt(str, 10);
+  return Number.isNaN(num) ? null : num;
+};
+
+export const validBusinessURL = (message: string) => (value: string) => {
+  if (typeof value === 'undefined' || value === null) {
+    return message;
+  }
+
+  const disallowedChars = /[^-A-Za-z0-9+&@#/%?=~_|!:,.;()]/;
+  const protocolTokens = value.split(':');
+  const includesProtocol = protocolTokens.length > 1;
+  const usesHttpProtocol =
+    includesProtocol && !!protocolTokens[0].match(/^(https?)/);
+
+  const invalidCharacters = !!value.match(disallowedChars);
+  const invalidProtocol = !(usesHttpProtocol || !includesProtocol);
+  // Stripe checks against example.com
+  const isExampleDotCom = !!value.match(
+    /^(https?:\/\/example\.com|example\.com)/,
+  );
+  const isLocalhost = !!value.match(
+    /^(https?:\/\/localhost($|:|\/)|localhost($|:|\/))/,
+  );
+  return invalidCharacters || invalidProtocol || isExampleDotCom || isLocalhost
+    ? message
+    : VALID;
+};
+
+export const isInt = (message: string) => (value: any) => {
+  return value === parseInt(value, 10) ? VALID : message;
+};
+
+export const numberMaxLength =
+  (message: string, maximumLength: number) => (value: number) => {
+    const parsedValue = Number(value);
+    if (!parsedValue) {
+      return VALID;
+    }
+    const isNumber = typeof parsedValue === 'number';
+    return isNumber && parsedValue <= maximumLength ? VALID : message;
+  };
+
+export const numberMinLength =
+  (message: string, minimumLength: number) => (value: number) => {
+    const parsedValue = Number(value);
+    const isNumber = typeof parsedValue === 'number';
+    return isNumber && parsedValue >= minimumLength ? VALID : message;
+  };
+
+export const composeValidatorsWithAllValues =
+  (...validators: any) =>
+  (value: any, allValues: any, fieldState: any) =>
+    validators.reduce(
+      (error: any, validator: any) =>
+        error || validator(value, allValues, fieldState),
+      VALID,
+    );
+
+export const composeValidators =
+  (...validators: any) =>
+  (value: any) =>
+    validators.reduce(
+      (error: any, validator: any) => error || validator(value),
+      VALID,
+    );
