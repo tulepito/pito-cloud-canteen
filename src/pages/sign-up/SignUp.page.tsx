@@ -1,11 +1,10 @@
-import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-const SignUpScreen = () => {
+const SignUpPage = () => {
   return (
     <div>
       <FormattedMessage id="SignUpPage.Title" />
     </div>
   );
 };
-export default SignUpScreen;
+export default SignUpPage;
