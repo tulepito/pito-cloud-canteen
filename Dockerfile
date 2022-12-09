@@ -1,10 +1,12 @@
 FROM node:16.16.0
 
-COPY ./ ./
+RUN mkdir -p /usr/src/app
 
-ENV NODE_ENV "production"
+WORKDIR /usr/src/app
 
-RUN yarn add && yarn build
+ADD ./ /usr/src/app
+
+RUN yarn && yarn build
 
 EXPOSE 3000 443
 
