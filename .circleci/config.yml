@@ -3,7 +3,6 @@ jobs:
   build:
     docker:
       - image: cimg/node:16.16.0
-    working_directory: /tmp/pito-cloud-canteen
     steps:
       - checkout
       - restore_cache:
@@ -24,7 +23,7 @@ jobs:
           command: sudo apt-get install jq
       - run:
           name: Copy Environment File
-          command: chmod +x ./scripts/ci_encode_environments.sh && ./scripts/ci_encode_environments.sh
+          command: ./scripts/ci_encode_environments.sh
       - run:
           name: Build the project
           command: yarn build
