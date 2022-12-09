@@ -5,11 +5,11 @@ const https = require('https');
 const Decimal = require('decimal.js');
 const sharetribeSdk = require('sharetribe-flex-sdk');
 
-const CLIENT_ID = process.env.NEXT_APP_SHARETRIBE_SDK_CLIENT_ID;
+const CLIENT_ID = process.env.NEXT_PUBLIC_SHARETRIBE_SDK_CLIENT_ID;
 const CLIENT_SECRET = process.env.SHARETRIBE_SDK_CLIENT_SECRET;
-const USING_SSL = process.env.NEXT_APP_SHARETRIBE_USING_SSL === 'true';
+const USING_SSL = process.env.NEXT_PUBLIC_SHARETRIBE_USING_SSL === 'true';
 const TRANSIT_VERBOSE =
-  process.env.NEXT_APP_SHARETRIBE_SDK_TRANSIT_VERBOSE === 'true';
+  process.env.NEXT_PUBLIC_SHARETRIBE_SDK_TRANSIT_VERBOSE === 'true';
 // Application type handlers for JS SDK.
 //
 // NOTE: keep in sync with `typeHandlers` in `src/util/api.js`
