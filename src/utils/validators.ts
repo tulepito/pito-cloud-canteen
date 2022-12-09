@@ -34,7 +34,7 @@ export const requiredFieldArrayCheckbox =
     }
 
     const entries = toPairs(value);
-    const hasSelectedValues = entries.filter((e) => !!e[1]).length > 0;
+    const hasSelectedValues = entries.filter((e: any) => !!e[1]).length > 0;
     return hasSelectedValues ? VALID : message;
   };
 
