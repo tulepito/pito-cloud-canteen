@@ -21,7 +21,12 @@ $matterColorNegative: #e7e7e7;
 $matterColorBright: #fcfcfc;
 $matterColorLight: #ffffff;
 
-$matterColorLightTransparent: rgba(255, 255, 255, 0.65);
+// Form colors
+$formFieldBorderColor: #ced4da;
+$formFieldBorderColorFocus: #86b7fe;
+$formFieldColor: #212529;
+
+$matterColorLightTransparent: rgba(35, 28, 28, 0.65);
 
 /* ================ Font ================ */
 $fontFamily: 'poppins', Helvetica, Arial, sans-serif;
@@ -32,3 +37,6 @@ $fontWeightSemiBold: 600;
 $fontWeightBold: 700;
 
 $fontWeightHighlightEmail: $fontWeightBold;
+
+// Box shadow
+$shadowInput: 0 0 0 0.25rem rgb(13 110 253 / 25%);
