@@ -33,5 +33,13 @@
   "SignInForm.facebookLoginText": "Đăng nhập với Facebook",
   "SignInForm.googleLoginText": "Đăng nhập với Google",
   "SignInForm.doNotHaveAnAccount": "Bạn chưa có tài khoản?",
-  "SignInForm.toSignUp": "Đăng ký"
+  "SignInForm.toSignUp": "Đăng ký",
+  "RecoverPasswordForm.title": "Quên mật khẩu",
+  "RecoverPasswordForm.description": "Vui lòng nhập email khách hàng dùng để đăng kí tài khoản PITO",
+  "RecoverPasswordForm.email.placeholder": "Địa chỉ Email",
+  "RecoverPasswordForm.email.required": "Vui lòng nhập Địa chỉ Email",
+  "RecoverPasswordForm.email.invalid": "Vui lòng nhập đúng địa chỉ Email",
+  "RecoverPasswordForm.submitButtonText": "Gửi",
+  "RecoverPasswordForm.goBack": "Quay lại ",
+  "RecoverPasswordForm.toSignIn": "Đăng nhập"
 }
