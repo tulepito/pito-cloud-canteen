@@ -4,7 +4,7 @@ ADD ./ ./
 
 ENV NODE_ENV "production"
 
-RUN yarn add && yarn build
+RUN yarn && yarn build
 
 EXPOSE 3000 443
 
