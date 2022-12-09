@@ -10,31 +10,23 @@ import { useIntl } from 'react-intl';
 
 import css from './AdminSidebar.module.scss';
 
-type TSidebarChildrenEntity = {
-  id: string | number;
-  label: string;
-  childrenEntities?: TSidebarChildrenEntity[];
-  nameLink?: string;
-  Icon?: React.FC<TIconProps>;
-};
-
 type TSidebarEntity = {
   id: string | number;
   label: string;
-  childrenEntities?: TSidebarChildrenEntity[];
-  nameLink?: string;
   Icon?: React.FC<TIconProps>;
+  childrenMenus?: TSidebarEntity[];
+  nameLink?: string;
 };
 
-type TListMenuProps = {
-  entity: TSidebarEntity;
+type TSubMenuProps = {
+  menu: TSidebarEntity;
 };
 
-type TListSubMenuProps = {
-  entities: TSidebarChildrenEntity[];
+type TMenuProps = {
+  menus: TSidebarEntity[];
 };
 
-const SIDEBAR_ENTITIES = [
+const SIDEBAR_MENUS: TSidebarEntity[] = [
   {
     id: 'home',
     label: 'AdminSidebar.homeLabel',
@@ -45,7 +37,7 @@ const SIDEBAR_ENTITIES = [
     id: 'user',
     label: 'AdminSidebar.userLabel',
     Icon: IconUserManagement,
-    childrenEntities: [
+    childrenMenus: [
       {
         id: 'company',
         label: 'AdminSidebar.companyLabel',
@@ -59,11 +51,11 @@ const SIDEBAR_ENTITIES = [
       {
         id: 'custom',
         label: 'AdminSidebar.customLabel',
-        childrenEntities: [
+        childrenMenus: [
           {
             id: 'custom1',
             label: 'AdminSidebar.customLabel',
-            childrenEntities: [
+            childrenMenus: [
               {
                 id: 'custom11',
                 label: 'AdminSidebar.customLabel',
@@ -87,27 +79,15 @@ const SIDEBAR_ENTITIES = [
   },
 ];
 
-const SubMenu = (props: TListSubMenuProps) => {
-  const { entities } = props;
-  return (
-    <div className={css.subEntities}>
-      {entities.map((entity: TSidebarChildrenEntity) => {
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        return <ListMenu key={entity.id} entity={entity} />;
-      })}
-    </div>
-  );
-};
-
-const ListMenu = (props: TListMenuProps) => {
-  const { entity } = props;
+const SubMenu: React.FC<TSubMenuProps> = (props) => {
+  const { menu } = props;
   const intl = useIntl();
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
-  const { Icon, label, childrenEntities, nameLink } = entity;
+  const { Icon, label, childrenMenus, nameLink } = menu;
 
-  const hasChildrenEntities = childrenEntities && childrenEntities.length > 0;
+  const hasChildrenMenus = childrenMenus && childrenMenus.length > 0;
 
   const handleMenuClick = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
@@ -128,7 +108,7 @@ const ListMenu = (props: TListMenuProps) => {
             })}
           </p>
         </div>
-        {hasChildrenEntities && (
+        {hasChildrenMenus && (
           <IconMenuArrow
             className={classNames(css.menuArrowIcon, {
               [css.menuArrowOpen]: isOpen,
@@ -136,17 +116,21 @@ const ListMenu = (props: TListMenuProps) => {
           />
         )}
       </div>
-      {isOpen && hasChildrenEntities && <SubMenu entities={childrenEntities} />}
+      {/* render children menu */}
+      {isOpen && hasChildrenMenus && (
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        <Menu menus={childrenMenus} />
+      )}
     </div>
   );
 };
 
-const MutilLevelMenu = (props: any) => {
-  const { entities } = props;
+const Menu: React.FC<TMenuProps> = (props) => {
+  const { menus } = props;
   return (
-    <div className={css.listEntities}>
-      {entities.map((entity: TSidebarEntity) => {
-        return <ListMenu entity={entity} key={entity.id} />;
+    <div className={css.subEntities}>
+      {menus.map((menu: TSidebarEntity) => {
+        return <SubMenu key={menu.id} menu={menu} />;
       })}
     </div>
   );
@@ -159,7 +143,9 @@ const AdminSidebar = () => {
         <PitoLogo />
       </div>
       <div className={css.center}>
-        <MutilLevelMenu entities={SIDEBAR_ENTITIES} />
+        <div className={css.listEntities}>
+          <Menu menus={SIDEBAR_MENUS} />
+        </div>
       </div>
     </div>
   );
