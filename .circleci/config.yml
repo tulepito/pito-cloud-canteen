@@ -1,0 +1,44 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: cimg/node:16.16.0
+    working_directory: /tmp/pito-cloud-canteen
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore yarn Package Cache
+          keys:
+            - yarn-packages-{{ .Branch }}-{{ checksum "package.json" }}
+            - yarn-packages-{{ .Branch }}
+            - yarn-packages-master
+            - yarn-packages-
+      - run:
+          name: Install Dependencies
+          command: yarn install
+      - run:
+          name: Install AWS CLI
+          command: curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install -i /usr/local/aws-cli -b /usr/local/bin
+      - run:
+          name: Install jq
+          command: sudo apt-get install jq
+      - run:
+          name: Copy Environment File
+          command: chmod +x ./scripts/ci_encode_environments.sh && ./scripts/ci_encode_environments.sh
+      - run:
+          name: Build the project
+          command: yarn build
+      - run:
+          name: Run deploy script
+          command: ./scripts/deploy.sh
+
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                - main
+                - production
