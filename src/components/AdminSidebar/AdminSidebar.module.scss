@@ -13,4 +13,46 @@
     align-items: center;
     justify-content: center;
   }
+  .center {
+    padding: 10px;
+    .listEntities {
+      padding: 0;
+      .entityRoot {
+        cursor: pointer;
+        list-style: none;
+        .entityWrapper {
+          display: flex;
+          align-items: center;
+          .entity {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            .label {
+              &.labelOpen {
+                color: red;
+              }
+            }
+            .entityIcon {
+              margin-right: 10px;
+            }
+          }
+          .menuArrowIcon {
+            float: right;
+            transform: rotate(-90deg);
+            &.menuArrowOpen {
+              transform: rotate(0deg);
+            }
+          }
+        }
+        .subEntities {
+          margin-left: 40px;
+          .subEntity {
+            height: 50px;
+            display: flex;
+            align-items: center;
+          }
+        }
+      }
+    }
+  }
 }

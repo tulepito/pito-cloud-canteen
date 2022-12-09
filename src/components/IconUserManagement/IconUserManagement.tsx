@@ -1,4 +1,4 @@
-import type { TIconProps } from '@components/AdminSidebar/types';
+import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 

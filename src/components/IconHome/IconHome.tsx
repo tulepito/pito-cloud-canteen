@@ -1,10 +1,10 @@
-import type { TIconProps } from '@components/AdminSidebar/types';
+import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 
 import css from './IconHome.module.scss';
 
-const IconHome = (props: TIconProps) => {
+const IconHome: React.FC<TIconProps> = (props) => {
   const { className } = props;
   const classes = classNames(css.root, className);
   return (

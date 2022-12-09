@@ -1,5 +1,10 @@
 {
   "SignUpPage.Title": "Đăng ký",
   "AdminDashboard.title": "Bảng điều khiển",
-  "AdminDashboard.description": "Bảng điều khiển"
+  "AdminDashboard.description": "Bảng điều khiển",
+  "AdminSidebar.homeLabel": "Trang chủ",
+  "AdminSidebar.userLabel": "Quản lý nguời dùng",
+  "AdminSidebar.companyLabel": "Khách hàng",
+  "AdminSidebar.partnerLabel": "Đối tác",
+  "AdminSidebar.customLabel": "Tùy chỉnh"
 }
