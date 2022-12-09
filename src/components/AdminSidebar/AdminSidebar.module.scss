@@ -1,0 +1,16 @@
+@import '../../styles/vars.scss';
+
+.root {
+  flex: 1;
+  border-right: 0.5px solid rgb(230, 227, 227);
+  min-height: 100vh;
+  background-color: white;
+  max-width: 300px;
+  box-shadow: $boxShadow;
+  .top {
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
