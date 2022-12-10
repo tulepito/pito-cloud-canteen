@@ -98,7 +98,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
       }
       return setIsOpen(!isOpen);
     },
-    [nameLink, hasChildrenMenus, setIsOpen, router],
+    [nameLink, hasChildrenMenus, setIsOpen, router, isOpen],
   );
 
   return (
