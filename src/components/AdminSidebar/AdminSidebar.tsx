@@ -5,7 +5,7 @@ import PitoLogo from '@components/PitoLogo/PitoLogo';
 import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './AdminSidebar.module.scss';
@@ -81,21 +81,25 @@ const SIDEBAR_MENUS: TSidebarEntity[] = [
 
 const SubMenu: React.FC<TSubMenuProps> = (props) => {
   const { menu } = props;
+
   const intl = useIntl();
   const router = useRouter();
-
   const [isOpen, setIsOpen] = useState(false);
+
   const { Icon, label, childrenMenus, nameLink } = menu;
 
   const hasChildrenMenus = childrenMenus && childrenMenus.length > 0;
 
-  const handleMenuClick = (e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation();
-    if (nameLink) {
-      return router.push(nameLink);
-    }
-    return setIsOpen(!isOpen);
-  };
+  const handleMenuClick = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      e.stopPropagation();
+      if (nameLink && !hasChildrenMenus) {
+        return router.push(nameLink);
+      }
+      return setIsOpen(!isOpen);
+    },
+    [nameLink, hasChildrenMenus, setIsOpen, router],
+  );
 
   return (
     <div onClick={handleMenuClick} className={css.entityRoot}>
