@@ -1,5 +1,5 @@
-import LoginPage from './Login.page';
+import SignInPage from './components/SignIn.page';
 
-export default function LoginRoute() {
-  return <LoginPage />;
+export default function SignInRoute() {
+  return <SignInPage />;
 }
