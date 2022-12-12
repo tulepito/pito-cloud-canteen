@@ -64,10 +64,9 @@ export const autocompleteSearchRequired = (message: string) => (value: any) => {
 // Source: http://www.regular-expressions.info/email.html
 // See the link above for an explanation of the tradeoffs.
 const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-const PHONE_NUMBER_RE =
-  /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/i;
+const PHONE_NUMBER_RE = /^(0[3|5|7|8|9])+([0-9]{8})$/;
 const PWD_RE =
-  /^^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,16}$$/i;
+  /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,16}$/;
 
 export const emailFormatValid = (message: string) => (value: string) => {
   return value && EMAIL_RE.test(value) ? VALID : message;
@@ -80,6 +79,16 @@ export const passwordFormatValid = (message: string) => (value: string) => {
 export const phoneNumberFormatValid = (message: string) => (value: string) => {
   return value && PHONE_NUMBER_RE.test(value) ? VALID : message;
 };
+
+export const passwordMatchConfirmPassword =
+  (message: string) =>
+  (confirmPassword: string, allValues: Record<string, any>) => {
+    return allValues &&
+      allValues?.password &&
+      allValues?.password === confirmPassword
+      ? VALID
+      : message;
+  };
 
 export const parseNum = (str: string) => {
   const num = Number.parseInt(str, 10);
