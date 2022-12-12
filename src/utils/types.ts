@@ -49,6 +49,7 @@ export type TApiError = {
 };
 
 export type ReverseMap<T> = T[keyof T];
+export type TReverseMapFromEnum<T> = T[keyof T];
 
 export type TReverseMapFromEnum<T> = T[keyof T];
 
