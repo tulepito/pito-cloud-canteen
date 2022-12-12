@@ -5,7 +5,7 @@
   "SignUpForm.name.required": "Vui lòng nhập họ và tên",
   "SignUpForm.email.placeholder": "Email",
   "SignUpForm.email.required": "Vui lòng nhập Email",
-  "SignUpForm.email.inValid": "Vui lòng nhập đúng định dạng Email",
+  "SignUpForm.email.invalid": "Vui lòng nhập đúng định dạng Email",
   "SignUpForm.password.placeholder": "Mật khẩu",
   "SignUpForm.password.required": "Vui lòng nhập Mật Khẩu.",
   "SignUpForm.password.invalid": "Mật Khẩu phải từ 8-16 kí tự, bao gồm chữ cái in hoa, chữ cái in thường và con số.",
