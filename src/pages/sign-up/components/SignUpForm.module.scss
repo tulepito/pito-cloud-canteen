@@ -4,13 +4,6 @@
 .root {
   padding: 0 8px;
   width: 100%;
-
-  @include viewportMedium {
-  }
-
-  @include viewportLarge {
-    width: min(400px, calc(100% / 3));
-  }
 }
 
 .formContainer {
@@ -21,6 +14,7 @@
   justify-content: center;
   flex-direction: column;
   row-gap: 16px;
+  width: 80%;
 
   @include viewportMedium {
     padding: 24px;
@@ -28,6 +22,7 @@
 
   @include viewportLarge {
     padding: 24px 32px;
+    width: min(400px, calc(100% / 3));
   }
 
   & input {
