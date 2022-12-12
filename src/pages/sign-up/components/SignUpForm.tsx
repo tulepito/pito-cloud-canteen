@@ -1,5 +1,14 @@
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import {
+  composeValidators,
+  composeValidatorsWithAllValues,
+  emailFormatValid,
+  passwordFormatValid,
+  passwordMatchConfirmPassword,
+  phoneNumberFormatValid,
+  required,
+} from '@utils/validators';
 import classNames from 'classnames';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -46,12 +55,45 @@ const SignUpForm = (props: any) => {
   const toSignIn = intl.formatMessage({
     id: 'SignUpForm.toSignIn',
   });
+
+  const nameValidators = composeValidators(
+    required(intl.formatMessage({ id: 'SignUpForm.name.required' })),
+  );
+  const emailValidators = composeValidators(
+    required(intl.formatMessage({ id: 'SignUpForm.email.required' })),
+    emailFormatValid(intl.formatMessage({ id: 'SignUpForm.email.invalid' })),
+  );
+  const passwordValidators = composeValidators(
+    required(intl.formatMessage({ id: 'SignUpForm.password.required' })),
+    passwordFormatValid(
+      intl.formatMessage({ id: 'SignUpForm.password.invalid' }),
+    ),
+  );
+  const confirmPasswordValidators = composeValidatorsWithAllValues(
+    required(intl.formatMessage({ id: 'SignUpForm.confirmPassword.required' })),
+    passwordFormatValid(
+      intl.formatMessage({ id: 'SignUpForm.confirmPassword.invalid' }),
+    ),
+    passwordMatchConfirmPassword(
+      intl.formatMessage({
+        id: 'SignUpForm.confirmPasswordMatchPassword.invalid',
+      }),
+    ),
+  );
+  const phoneNumberValidators = composeValidators(
+    required(intl.formatMessage({ id: 'SignUpForm.phoneNumber.required' })),
+    phoneNumberFormatValid(
+      intl.formatMessage({ id: 'SignUpForm.phoneNumber.invalid' }),
+    ),
+  );
+
   return (
     <FinalForm
       {...props}
       render={(formRenderProps: any) => {
-        const { rootClassName, className, formId, handleSubmit } =
+        const { rootClassName, className, formId, handleSubmit, invalid } =
           formRenderProps;
+        const submitDisable = invalid;
 
         const classes = classNames(rootClassName || css.root, className);
 
@@ -64,32 +106,40 @@ const SignUpForm = (props: any) => {
                 id={formId ? `${formId}.name` : 'name'}
                 name="name"
                 placeholder={namePlaceholder}
+                validate={nameValidators}
               />
               <FieldTextInput
                 id={formId ? `${formId}.email` : 'email'}
                 name="email"
                 placeholder={emailPlaceholder}
+                validate={emailValidators}
               />
               <FieldTextInput
                 id={formId ? `${formId}.password` : 'password'}
                 name="password"
                 placeholder={passwordPlaceholder}
+                validate={passwordValidators}
               />
               <FieldTextInput
                 id={formId ? `${formId}.confirmPassword` : 'confirmPassword'}
                 name="confirmPassword"
                 placeholder={confirmPasswordPlaceholder}
+                validate={confirmPasswordValidators}
               />
               <FieldTextInput
                 id={formId ? `${formId}.phoneNumber` : 'phoneNumber'}
                 name="phoneNumber"
                 placeholder={phoneNumberPlaceholder}
+                validate={phoneNumberValidators}
               />
               <div>
                 {privacyPolicyPartA}
                 <u className={css.privacyPolicyText}>{privacyPolicyPartB}</u>
               </div>
-              <button className={css.submitButton} type="button">
+              <button
+                className={css.submitButton}
+                type="button"
+                disabled={submitDisable}>
                 {submitButtonText}
               </button>
             </div>
