@@ -13,7 +13,7 @@ import type {
   ETxTransitionActors,
 } from './enums';
 
-export type ReverseMap<T> = T[keyof T];
+export type TReverseMapFromEnum<T> = T[keyof T];
 
 export type TIconProps = {
   className?: string;
@@ -27,7 +27,7 @@ export type TImageVariantAttributes = {
   url: string;
 };
 
-export type TImageVariant = ReverseMap<typeof EImageVariants>;
+export type TImageVariant = TReverseMapFromEnum<typeof EImageVariants>;
 
 export type TImageAttributes = {
   variants: Record<EImageVariants, TImageVariantAttributes>;
@@ -107,7 +107,7 @@ export type TUser = {
   profileImage: TImage;
 };
 
-export type TListingState = ReverseMap<typeof EListingStates>;
+export type TListingState = TReverseMapFromEnum<typeof EListingStates>;
 
 export type TListingAttributes = {
   title: string;
@@ -119,7 +119,7 @@ export type TListingAttributes = {
   publicData?: object;
 };
 
-export type TDayOfWeek = ReverseMap<typeof EDayOfWeek>;
+export type TDayOfWeek = TReverseMapFromEnum<typeof EDayOfWeek>;
 
 export type TAvailabilityPlanEntries = {
   dayOfWeek: TDayOfWeek;
@@ -128,7 +128,7 @@ export type TAvailabilityPlanEntries = {
   end?: string;
 };
 
-export type TAvailabilityPlanType = ReverseMap<typeof EDayOfWeek>;
+export type TAvailabilityPlanType = TReverseMapFromEnum<typeof EDayOfWeek>;
 
 export type TAvailabilityPlan = {
   type: TAvailabilityPlanType;
@@ -169,7 +169,7 @@ export type TOwnListing = {
   images?: TImage[];
 };
 
-export type TBookingState = ReverseMap<typeof EBookingStates>;
+export type TBookingState = TReverseMapFromEnum<typeof EBookingStates>;
 
 export type TBookingAttributes = {
   end: Date;
@@ -185,7 +185,7 @@ export type TBooking = {
   attributes: TBookingAttributes;
 };
 
-export type TTimeSlotType = ReverseMap<typeof ETimeSlots>;
+export type TTimeSlotType = TReverseMapFromEnum<typeof ETimeSlots>;
 
 export type TTimeSlotAttributes = {
   type: TTimeSlotType;
@@ -211,7 +211,9 @@ export type TAvailabilityException = {
   attributes: TAvailabilityExceptionAttributes;
 };
 
-export type TTxTransitionActors = ReverseMap<typeof ETxTransitionActors>;
+export type TTxTransitionActors = TReverseMapFromEnum<
+  typeof ETxTransitionActors
+>;
 
 export type TTransition = {
   createdAt: Date;
@@ -220,8 +222,8 @@ export type TTransition = {
   transition: string[];
 };
 
-export type TReviewRating = ReverseMap<typeof EReviewRatings>;
-export type TReviewType = ReverseMap<typeof EReviewTypes>;
+export type TReviewRating = TReverseMapFromEnum<typeof EReviewRatings>;
+export type TReviewType = TReverseMapFromEnum<typeof EReviewTypes>;
 
 export type TReviewAttributes = {
   createdAt: Date;
@@ -240,7 +242,7 @@ export type TReview = {
 
 export type TLineItemCode = `line-item/${string}`;
 
-export type TTransactionRole = ReverseMap<typeof ETransactionRoles>;
+export type TTransactionRole = TReverseMapFromEnum<typeof ETransactionRoles>;
 
 export type TLineItem = {
   code: TLineItemCode;
@@ -297,7 +299,7 @@ export type TPagination = {
   totalPages: number;
 };
 
-export type TErrorCode = ReverseMap<typeof EErrorCode>;
+export type TErrorCode = TReverseMapFromEnum<typeof EErrorCode>;
 
 // API error
 // TODO this is likely to change soonish

@@ -7,7 +7,10 @@ const AdminHeader = () => {
   return (
     <div className={css.root}>
       <div className={css.headerLeft}>
-        <IconBell />
+        <IconBell className={css.iconBell} />
+        <div className={css.avatar}>
+          <span>A</span>
+        </div>
       </div>
     </div>
   );

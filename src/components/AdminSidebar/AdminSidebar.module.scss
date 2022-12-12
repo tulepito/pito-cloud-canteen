@@ -1,10 +1,10 @@
-@import '../../styles/vars.scss';
+@use '/src/styles/vars.scss' as *;
 
 .root {
   flex: 1;
   border-right: 0.5px solid rgb(230, 227, 227);
   min-height: 100vh;
-  background-color: white;
+  background-color: $matterColorLight;
   max-width: 300px;
   box-shadow: $boxShadow;
   .top {
