@@ -52,7 +52,7 @@ const initialState: IAuthState = {
 
 // ================ Selectors ================ //
 export const authenticationInProgress = (state: any) => {
-  const { loginInProgress, logoutInProgress, signupInProgress } = state.Auth;
+  const { loginInProgress, logoutInProgress, signupInProgress } = state.auth;
   return loginInProgress || logoutInProgress || signupInProgress;
 };
 
