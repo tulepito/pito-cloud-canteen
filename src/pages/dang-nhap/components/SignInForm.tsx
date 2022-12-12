@@ -79,7 +79,7 @@ const SignInForm: React.FC<TSignInFormProps> = (props) => {
       render={(formRenderProps: any) => {
         const { rootClassName, className, formId, handleSubmit, invalid } =
           formRenderProps;
-        const submitDisable = invalid;
+        const submitDisable = invalid || inProgress;
 
         const classes = classNames(rootClassName || css.root, className);
 

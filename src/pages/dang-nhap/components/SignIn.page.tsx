@@ -1,5 +1,7 @@
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
 import type { AppDispatch, RootState } from '@redux/store';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -8,8 +10,11 @@ import SignInForm from './SignInForm';
 const SignInPage = () => {
   const appState = useSelector((state: RootState) => state);
   const authInprogress = authenticationInProgress(appState);
-  const { loginError } = useSelector((state: RootState) => state.auth);
+  const { loginError, isAuthenticated } = useSelector(
+    (state: RootState) => state.auth,
+  );
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
 
   const signInErrorMessage = loginError ? (
     <>
@@ -26,7 +31,17 @@ const SignInPage = () => {
     const { email, password } = values;
 
     dispatch(authThunks.login({ email, password }));
+
+    if (isAuthenticated) {
+      router.push('/');
+    }
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/');
+    }
+  }, []);
 
   return (
     <div>
