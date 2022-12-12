@@ -64,9 +64,15 @@ export const autocompleteSearchRequired = (message: string) => (value: any) => {
 // Source: http://www.regular-expressions.info/email.html
 // See the link above for an explanation of the tradeoffs.
 const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+const PWD_RE =
+  /^^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,16}$$/i;
 
 export const emailFormatValid = (message: string) => (value: string) => {
   return value && EMAIL_RE.test(value) ? VALID : message;
+};
+
+export const passwordFormatValid = (message: string) => (value: string) => {
+  return value && PWD_RE.test(value) ? VALID : message;
 };
 
 export const parseNum = (str: string) => {
