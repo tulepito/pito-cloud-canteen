@@ -19,6 +19,7 @@ interface InputComponentProps extends FieldRenderProps<string, any> {
   input: any;
   meta: any;
   inputRef: any;
+  fullWidth: boolean;
 }
 
 const FieldTextInputComponent: React.FC<InputComponentProps> = (
@@ -34,6 +35,7 @@ const FieldTextInputComponent: React.FC<InputComponentProps> = (
     labelClassName,
     customErrorText,
     isUncontrolled = false,
+    fullWidth = true,
     input,
     meta,
     inputRef,
@@ -66,6 +68,7 @@ const FieldTextInputComponent: React.FC<InputComponentProps> = (
       [css.inputSuccess]: valid,
       [css.inputError]: hasError,
       [css.inputDisabled]: disabled,
+      [css.inputFullWidth]: fullWidth,
     });
 
   const inputProps = isUncontrolled
