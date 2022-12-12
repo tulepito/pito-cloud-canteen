@@ -50,6 +50,14 @@
   align-items: center;
 }
 
+.errorSignUp {
+  margin-top: 35px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: left;
+  color: $failColor;
+}
+
 .submitButton {
   background-color: $marketplaceColorLight;
   color: $successColorLight;

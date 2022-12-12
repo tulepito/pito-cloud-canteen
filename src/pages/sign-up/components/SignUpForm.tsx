@@ -10,12 +10,21 @@ import {
   required,
 } from '@utils/validators';
 import classNames from 'classnames';
+import type { ReactNode } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
 import css from './SignUpForm.module.scss';
 
-const SignUpForm = (props: any) => {
+type TSignUpFormProps = {
+  onSubmit: (values: Record<string, any>) => void;
+  inProgress: Boolean;
+  errorMessage?: ReactNode;
+};
+
+const SignUpForm: React.FC<TSignUpFormProps> = (props) => {
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  const { inProgress, errorMessage, ...restProps } = props;
   const intl = useIntl();
 
   const formTitle = intl.formatMessage({
@@ -89,7 +98,7 @@ const SignUpForm = (props: any) => {
 
   return (
     <FinalForm
-      {...props}
+      {...restProps}
       render={(formRenderProps: any) => {
         const { rootClassName, className, formId, handleSubmit, invalid } =
           formRenderProps;
@@ -136,9 +145,12 @@ const SignUpForm = (props: any) => {
                 {privacyPolicyPartA}
                 <u className={css.privacyPolicyText}>{privacyPolicyPartB}</u>
               </div>
+              {errorMessage && (
+                <div className={css.errorSignUp}>{errorMessage}</div>
+              )}
               <button
                 className={css.submitButton}
-                type="button"
+                type="submit"
                 disabled={submitDisable}>
                 {submitButtonText}
               </button>
