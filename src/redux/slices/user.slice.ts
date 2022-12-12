@@ -75,7 +75,6 @@ const fetchCurrentUser = createAsyncThunk(
       fulfillWithValue,
     }: ThunkAPI,
   ) => {
-    dispatch(fetchCurrentUser.pending);
     const { isAuthenticated } = getState().Auth;
 
     if (!isAuthenticated) {

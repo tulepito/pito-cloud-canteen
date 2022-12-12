@@ -1,3 +1,9 @@
+import type { NextPage } from 'next';
+
+export type NextApplicationPage<P = any, IP = P> = NextPage<P, IP> & {
+  requireAuth?: boolean;
+};
+
 export enum ErrorCodes {
   ERROR_CODE_TRANSACTION_LISTING_NOT_FOUND = 'transaction-listing-not-found',
   ERROR_CODE_TRANSACTION_INVALID_TRANSITION = 'transaction-invalid-transition',
