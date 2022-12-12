@@ -11,7 +11,7 @@
   "SignUpForm.password.invalid": "Mật Khẩu phải từ 8-16 kí tự, bao gồm chữ cái in hoa, chữ cái in thường và con số.",
   "SignUpForm.confirmPassword.placeholder": "Xác nhận mật khẩu",
   "SignUpForm.confirmPassword.required": "Vui lòng nhập xác nhận mật Khẩu.",
-  "SignUpForm.confirmPassword.inValid": "Mật Khẩu phải từ 8-16 kí tự, bao gồm chữ cái in hoa, chữ cái in thường và con số.",
+  "SignUpForm.confirmPassword.invalid": "Mật Khẩu phải từ 8-16 kí tự, bao gồm chữ cái in hoa, chữ cái in thường và con số.",
   "SignUpForm.phoneNumber.placeholder": "Số điện thoại",
   "SignUpForm.phoneNumber.required": "Vui lòng nhập Số điện thoại.",
   "SignUpForm.phoneNumber.invalid": "Vui lòng nhập đúng Số điện thoại.",
