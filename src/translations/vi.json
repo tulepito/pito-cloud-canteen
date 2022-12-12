@@ -23,6 +23,8 @@
   "SignUpForm.haveAnAccount": "Bạn đã có tài khoản?",
   "SignUpForm.submitButtonText": "Đăng ký",
   "SignUpForm.toSignIn": "Đăng nhập",
+  "SignInPage.loginFailedText1": "Có lỗi xãy ra!",
+  "SignInPage.loginFailedText2": "Kiểm tra thông tin đăng nhập và thử lại!",
   "SignInForm.title": "Đăng nhập",
   "SignInForm.email.placeholder": "Địa chỉ email",
   "SignInForm.email.required": "Vui lòng nhập Địa chỉ email.",
