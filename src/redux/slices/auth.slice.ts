@@ -74,12 +74,8 @@ const login = createAsyncThunk(
   LOGIN,
   async (
     params: { email: string; password: string },
-    { getState, dispatch, extra: sdk, rejectWithValue }: ThunkAPI,
+    { dispatch, extra: sdk, rejectWithValue }: ThunkAPI,
   ) => {
-    if (authenticationInProgress(getState())) {
-      return rejectWithValue(new Error('Login or logout already in progress'));
-    }
-
     try {
       const { email: username, password } = params;
       await sdk.login({ username, password });
@@ -93,11 +89,7 @@ const login = createAsyncThunk(
 
 const logout = createAsyncThunk(
   LOGOUT,
-  async (_, { getState, dispatch, extra: sdk, rejectWithValue }: ThunkAPI) => {
-    if (authenticationInProgress(getState())) {
-      return rejectWithValue(new Error('Login or logout already in progress'));
-    }
-
+  async (_, { dispatch, extra: sdk, rejectWithValue }: ThunkAPI) => {
     try {
       await sdk.logout();
       dispatch(userActions.clearCurrentUser());
@@ -111,12 +103,8 @@ const signUp = createAsyncThunk(
   SIGN_UP,
   async (
     params: Record<string, any>,
-    { getState, dispatch, extra: sdk, rejectWithValue }: ThunkAPI,
+    { dispatch, extra: sdk, rejectWithValue }: ThunkAPI,
   ) => {
-    if (authenticationInProgress(getState())) {
-      return rejectWithValue(new Error('Login or logout already in progress'));
-    }
-
     try {
       const { email, password, firstName, lastName, ...rest } = params;
       const createUserParams = isEmpty(rest)
