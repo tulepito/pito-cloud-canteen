@@ -8,24 +8,24 @@ import { useIntl } from 'react-intl';
 
 import css from './MultiLevelSidebar.module.scss';
 
-export type TSidebarEntity = {
+export type TSidebarMenu = {
   id: string | number;
   label: string;
   Icon?: React.FC<TIconProps>;
-  childrenMenus?: TSidebarEntity[];
+  childrenMenus?: TSidebarMenu[];
   nameLink?: string;
 };
 
 type TSubMenuProps = {
-  menu: TSidebarEntity;
+  menu: TSidebarMenu;
 };
 
 type TMenuProps = {
-  menus: TSidebarEntity[];
+  menus: TSidebarMenu[];
 };
 
 type TMultiLevelSidebar = {
-  menus: TSidebarEntity[];
+  menus: TSidebarMenu[];
 };
 
 const SubMenu: React.FC<TSubMenuProps> = (props) => {
@@ -82,7 +82,7 @@ const Menu: React.FC<TMenuProps> = (props) => {
   const { menus } = props;
   return (
     <div className={css.subEntities}>
-      {menus.map((menu: TSidebarEntity) => {
+      {menus.map((menu: TSidebarMenu) => {
         return <SubMenu key={menu.id} menu={menu} />;
       })}
     </div>

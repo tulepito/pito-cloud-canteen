@@ -2,14 +2,14 @@ import AdminHeader from '@components/AdminHeader/AdminHeader';
 import IconHome from '@components/IconHome/IconHome';
 import IconUserManagement from '@components/IconUserManagement/IconUserManagement';
 import Meta from '@components/Layout/Meta';
-import type { TSidebarEntity } from '@components/MultiLevelSidebar/MultiLevelSidebar';
+import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './AdminDashboard.module.scss';
 
-const SIDEBAR_MENUS: TSidebarEntity[] = [
+const SIDEBAR_MENUS: TSidebarMenu[] = [
   {
     id: 'home',
     label: 'AdminSidebar.homeLabel',
