@@ -20,11 +20,13 @@ const AuthGuard: React.FC<PropsWithChildren<TAuthGuard>> = (props) => {
   const { children, isRequiredAuth } = props;
 
   useEffect(() => {
-    if (!authInfoLoaded) {
-      dispatch(authThunks.authInfo());
-    }
+    if (isRequiredAuth) {
+      if (!authInfoLoaded) {
+        dispatch(authThunks.authInfo());
+      }
 
-    dispatch(userThunks.fetchCurrentUser(undefined));
+      dispatch(userThunks.fetchCurrentUser(undefined));
+    }
   }, [isRequiredAuth]);
 
   useEffect(() => {
