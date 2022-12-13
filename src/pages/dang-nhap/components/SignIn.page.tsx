@@ -31,17 +31,13 @@ const SignInPage = () => {
     const { email, password } = values;
 
     dispatch(authThunks.login({ email, password }));
-
-    if (isAuthenticated) {
-      router.push('/');
-    }
   };
 
   useEffect(() => {
     if (isAuthenticated) {
       router.push('/');
     }
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <div>

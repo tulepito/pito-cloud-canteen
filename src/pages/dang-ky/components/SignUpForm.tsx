@@ -10,6 +10,7 @@ import {
   required,
 } from '@utils/validators';
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -23,9 +24,9 @@ type TSignUpFormProps = {
 };
 
 const SignUpForm: React.FC<TSignUpFormProps> = (props) => {
-  // eslint-disable-next-line unused-imports/no-unused-vars
   const { inProgress, errorMessage, ...restProps } = props;
   const intl = useIntl();
+  const router = useRouter();
 
   const formTitle = intl.formatMessage({
     id: 'SignUpForm.title',
@@ -96,13 +97,17 @@ const SignUpForm: React.FC<TSignUpFormProps> = (props) => {
     ),
   );
 
+  const navigateToSignInPage = () => {
+    router.push('/dang-nhap');
+  };
+
   return (
     <FinalForm
       {...restProps}
       render={(formRenderProps: any) => {
         const { rootClassName, className, formId, handleSubmit, invalid } =
           formRenderProps;
-        const submitDisable = invalid;
+        const submitDisable = invalid || inProgress;
 
         const classes = classNames(rootClassName || css.root, className);
 
@@ -158,7 +163,10 @@ const SignUpForm: React.FC<TSignUpFormProps> = (props) => {
             <div className={css.haveAccountContainer}>
               <div>
                 {haveAnAccountText}{' '}
-                <span className={css.toSignIn}> {toSignIn}</span>
+                <span className={css.toSignIn} onClick={navigateToSignInPage}>
+                  {' '}
+                  {toSignIn}
+                </span>
               </div>
             </div>
           </Form>

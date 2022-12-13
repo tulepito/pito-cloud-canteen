@@ -29,7 +29,7 @@ const AuthGuard: React.FC<PropsWithChildren<TAuthGuard>> = (props) => {
 
   useEffect(() => {
     if (authInfoLoaded && !isAuthenticated && isRequiredAuth) {
-      router.push('/dang-ky');
+      router.push('/dang-nhap');
     }
   }, [isRequiredAuth]);
 

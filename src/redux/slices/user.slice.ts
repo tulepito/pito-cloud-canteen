@@ -67,48 +67,35 @@ const fetchCurrentUser = createAsyncThunk(
   FETCH_CURRENT_USER,
   async (
     params: any,
-    {
-      dispatch,
-      getState,
-      extra: sdk,
-      rejectWithValue,
-      fulfillWithValue,
-    }: ThunkAPI,
+    { dispatch, extra: sdk, rejectWithValue, fulfillWithValue }: ThunkAPI,
   ) => {
-    const { isAuthenticated } = getState().Auth;
-
-    if (!isAuthenticated) {
-      // Make sure current user is null
-      return fulfillWithValue(null);
-    }
-
-    const parameters = params || {
-      include: ['profileImage'],
-      'fields.image': [
-        'variants.square-small',
-        'variants.square-small2x',
-        'variants.square-xsmall',
-        'variants.square-xsmall2x',
-      ],
-      'imageVariant.square-xsmall': sdkUtil.objectQueryString({
-        w: 40,
-        h: 40,
-        fit: 'crop',
-      }),
-      'imageVariant.square-xsmall2x': sdkUtil.objectQueryString({
-        w: 80,
-        h: 80,
-        fit: 'crop',
-      }),
-    };
-
     try {
-      const response = await sdk.currentUser.show(parameters);
+      const parameters = params || {
+        include: ['profileImage'],
+        'fields.image': [
+          'variants.square-small',
+          'variants.square-small2x',
+          'variants.square-xsmall',
+          'variants.square-xsmall2x',
+        ],
+        'imageVariant.square-xsmall': sdkUtil.objectQueryString({
+          w: 40,
+          h: 40,
+          fit: 'crop',
+        }),
+        'imageVariant.square-xsmall2x': sdkUtil.objectQueryString({
+          w: 80,
+          h: 80,
+          fit: 'crop',
+        }),
+      };
 
+      const response = await sdk.currentUser.show(parameters);
       const entities = denormalisedResponseEntities(response);
+
       if (entities.length !== 1) {
-        throw new Error(
-          'Expected a resource in the sdk.currentUser.show response',
+        return rejectWithValue(
+          new Error('Expected a resource in the sdk.currentUser.show response'),
         );
       }
       const currentUser = entities[0];
@@ -174,8 +161,8 @@ const userSlice = createSlice({
           currentUser: mergeCurrentUser(state.currentUser, payload),
         };
       })
-      .addCase(fetchCurrentUser.rejected, (state, { payload }) => {
-        return { ...state, currentUserShowError: payload };
+      .addCase(fetchCurrentUser.rejected, (state, action) => {
+        return { ...state, currentUserShowError: action?.error?.message };
       })
 
       .addCase(sendVerificationEmail.pending, (state) => {
@@ -190,11 +177,11 @@ const userSlice = createSlice({
           sendVerificationEmailInProgress: false,
         };
       })
-      .addCase(sendVerificationEmail.rejected, (state, { payload }: any) => {
+      .addCase(sendVerificationEmail.rejected, (state, action) => {
         return {
           ...state,
           sendVerificationEmailInProgress: false,
-          sendVerificationEmailError: payload,
+          sendVerificationEmailError: action?.error?.message,
         };
       });
   },

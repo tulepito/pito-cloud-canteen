@@ -7,8 +7,9 @@ import isEmpty from 'lodash/isEmpty';
 
 import { userActions, userThunks } from './user.slice';
 
-const authenticated = (authInfo: any) =>
-  authInfo && authInfo.isAnonymous === false;
+const authenticated = (authInfo: Record<string, any>) => {
+  return authInfo && authInfo.isAnonymous === false;
+};
 
 // ================ Thunk types ================ //
 const AUTH_INFO = 'app/Auth/AUTH_INFO';
@@ -135,7 +136,7 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(authInfo.pending, (state) => state)
-      .addCase(authInfo.fulfilled, (state, { payload }: any) => {
+      .addCase(authInfo.fulfilled, (state, { payload }) => {
         return {
           ...state,
           authInfoLoaded: true,
@@ -155,8 +156,12 @@ const authSlice = createSlice({
       .addCase(signUp.fulfilled, (state) => {
         return { ...state, signupInProgress: false };
       })
-      .addCase(signUp.rejected, (state, { payload }: any) => {
-        return { ...state, signupInProgress: false, signupError: payload };
+      .addCase(signUp.rejected, (state, action) => {
+        return {
+          ...state,
+          signupInProgress: false,
+          signupError: action.error.message,
+        };
       })
 
       .addCase(login.pending, (state) => {
@@ -171,8 +176,12 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state) => {
         return { ...state, loginInProgress: false, isAuthenticated: true };
       })
-      .addCase(login.rejected, (state, { payload }: any) => {
-        return { ...state, loginInProgress: false, loginError: payload };
+      .addCase(login.rejected, (state, action) => {
+        return {
+          ...state,
+          loginInProgress: false,
+          loginError: action.error.message,
+        };
       })
 
       .addCase(logout.pending, (state) => {
@@ -191,8 +200,12 @@ const authSlice = createSlice({
           authScopes: [],
         };
       })
-      .addCase(logout.rejected, (state, { payload }: any) => {
-        return { ...state, logoutInProgress: false, logoutError: payload };
+      .addCase(logout.rejected, (state, action) => {
+        return {
+          ...state,
+          logoutInProgress: false,
+          logoutError: action.error.message,
+        };
       });
   },
 });

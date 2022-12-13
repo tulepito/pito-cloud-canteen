@@ -9,6 +9,7 @@ import {
   required,
 } from '@utils/validators';
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -22,9 +23,9 @@ type TSignInFormProps = {
 };
 
 const SignInForm: React.FC<TSignInFormProps> = (props) => {
-  // eslint-disable-next-line unused-imports/no-unused-vars
   const { inProgress, errorMessage, ...restProps } = props;
   const intl = useIntl();
+  const router = useRouter();
 
   const formTitle = intl.formatMessage({
     id: 'SignInForm.title',
@@ -73,6 +74,14 @@ const SignInForm: React.FC<TSignInFormProps> = (props) => {
     ),
   );
 
+  const navigateToSignUpPage = () => {
+    router.push('/dang-ky');
+  };
+
+  const navigateToPasswordRecoverPage = () => {
+    router.push('/quen-mat-khau');
+  };
+
   return (
     <FinalForm
       {...restProps}
@@ -100,7 +109,11 @@ const SignInForm: React.FC<TSignInFormProps> = (props) => {
                 placeholder={passwordPlaceholder}
                 validate={passwordValidators}
               />
-              <div className={css.forgotPassword}>{forgotPasswordText}</div>
+              <div
+                className={css.forgotPassword}
+                onClick={navigateToPasswordRecoverPage}>
+                {forgotPasswordText}
+              </div>
 
               {errorMessage && (
                 <div className={css.errorSignIn}>{errorMessage}</div>
@@ -120,14 +133,16 @@ const SignInForm: React.FC<TSignInFormProps> = (props) => {
               </button>
               <button className={css.googleLoginButton} type="button">
                 <GoogleIcon className={css.googleIcon} />
-
                 <span>{googleLoginText}</span>
               </button>
             </div>
             <div className={css.doNotHaveAnAccount}>
               <div>
                 {doNotHaveAnAccountText}{' '}
-                <span className={css.toSignUp}> {toSignUp}</span>
+                <span className={css.toSignUp} onClick={navigateToSignUpPage}>
+                  {' '}
+                  {toSignUp}
+                </span>
               </div>
             </div>
           </Form>
