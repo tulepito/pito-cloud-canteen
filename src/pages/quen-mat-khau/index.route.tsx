@@ -1,5 +1,7 @@
-const PasswordRecoverRoute = () => {
-  return <div>PasswordRecoverRoute</div>;
+import PasswordRecoveryPage from './components/PasswordRecovery.page';
+
+const PasswordRecoveryRoute = () => {
+  return <PasswordRecoveryPage />;
 };
 
-export default PasswordRecoverRoute;
+export default PasswordRecoveryRoute;
