@@ -1,5 +1,3 @@
-@use './customMediaQueries';
-
 $marketplaceColor: #c0392b;
 $marketplaceColorLight: #ff4c38;
 $marketplaceColorDark: #8c291e;
@@ -124,5 +122,20 @@ $fontWeightBold: 700;
 
 $fontWeightHighlightEmail: $fontWeightBold;
 
-// Box shadow
+/* ================ Box shadow ================*/
 $shadowInput: 0 0 0 0.25rem rgb(13 110 253 / 25%);
+$boxShadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+$boxShadowPopup: 0 8px 16px 0 rgba(0, 0, 0, 0.3);
+
+/* ================ Z-index base levels ================ */
+
+$zIndexPopup: 50;
+
+/* ================ Transition styles ================ */
+
+$transitionStyleButton: ease-in-out 0.1s;
+
+$adminTopbarHeight: 70px;
+$adminTopbarzIndex: 49;
+$adminSidebarzIndex: 50;
+$adminSidebarWidth: 300px;

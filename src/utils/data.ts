@@ -1,6 +1,15 @@
 import { sanitizeEntity } from '@utils/sanitize';
 import reduce from 'lodash/reduce';
 
+import type {
+  TAvailabilityException,
+  TAvailabilityPlan,
+  TCurrentUser,
+  TLineItemCode,
+  TTimeSlot,
+  TUser,
+} from './types';
+
 /**
  * Combine the given relationships objects
  *
@@ -225,7 +234,7 @@ export const ensureOwnListing = (listing: any) => {
  *
  * @param {Object} user entity object, which is to be ensured against null values
  */
-export const ensureUser = (user: any) => {
+export const ensureUser = (user: TUser) => {
   const empty = { id: null, type: 'user', attributes: { profile: {} } };
   return { ...empty, ...user };
 };
@@ -235,7 +244,7 @@ export const ensureUser = (user: any) => {
  *
  * @param {Object} current user entity object, which is to be ensured against null values
  */
-export const ensureCurrentUser = (user: any) => {
+export const ensureCurrentUser = (user: TCurrentUser) => {
   const empty = {
     id: null,
     type: 'currentUser',
@@ -250,7 +259,7 @@ export const ensureCurrentUser = (user: any) => {
  *
  * @param {Object} time slot entity object, which is to be ensured against null values
  */
-export const ensureTimeSlot = (timeSlot: any) => {
+export const ensureTimeSlot = (timeSlot: TTimeSlot) => {
   const empty = { id: null, type: 'timeSlot', attributes: {} };
   return { ...empty, ...timeSlot };
 };
@@ -260,7 +269,9 @@ export const ensureTimeSlot = (timeSlot: any) => {
  *
  * @param {Object} availability exception entity object, which is to be ensured against null values
  */
-export const ensureDayAvailabilityPlan = (availabilityPlan: any) => {
+export const ensureDayAvailabilityPlan = (
+  availabilityPlan: TAvailabilityPlan,
+) => {
   const empty = { type: 'availability-plan/day', entries: [] };
   return { ...empty, ...availabilityPlan };
 };
@@ -270,7 +281,9 @@ export const ensureDayAvailabilityPlan = (availabilityPlan: any) => {
  *
  * @param {Object} availability exception entity object, which is to be ensured against null values
  */
-export const ensureAvailabilityException = (availabilityException: any) => {
+export const ensureAvailabilityException = (
+  availabilityException: TAvailabilityException,
+) => {
   const empty = { id: null, type: 'availabilityException', attributes: {} };
   return { ...empty, ...availabilityException };
 };
@@ -288,7 +301,7 @@ export const ensureAvailabilityException = (availabilityException: any) => {
  * @return {String} display name that can be rendered in the UI
  */
 export const userDisplayNameAsString = (
-  user: any,
+  user: TCurrentUser | TUser,
   defaultUserDisplayName: string,
 ) => {
   const hasAttributes = user && user.attributes;
@@ -315,7 +328,7 @@ export const userDisplayNameAsString = (
  * (e.g. in Avatar initials)
  */
 export const userAbbreviatedName = (
-  user: any,
+  user: TCurrentUser | TUser,
   defaultUserAbbreviatedName: string,
 ) => {
   const hasAttributes = user && user.attributes;
@@ -337,7 +350,7 @@ export const userAbbreviatedName = (
  *
  * @return {string} returns the line item code humanized
  */
-export const humanizeLineItemCode = (code: any) => {
+export const humanizeLineItemCode = (code: TLineItemCode) => {
   if (!/^line-item\/.+/.test(code)) {
     throw new Error(`Invalid line item code: ${code}`);
   }

@@ -1,0 +1,9 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.logo {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
