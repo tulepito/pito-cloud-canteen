@@ -1,0 +1,73 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  box-shadow: $boxShadow;
+  .table {
+    border-collapse: collapse;
+    width: 100%;
+    padding: 10px;
+    display: block;
+    @include viewportLarge {
+      display: table;
+    }
+    thead {
+      background-color: $marketplaceColorLight;
+      display: none;
+      @include viewportLarge {
+        display: table-header-group;
+      }
+      tr {
+        td {
+          padding: 10px;
+          text-align: left;
+          color: #616161;
+          background-color: #fff0eb;
+        }
+      }
+    }
+
+    tbody {
+      display: block;
+      width: 100%;
+      @include viewportLarge {
+        display: table-row-group;
+      }
+      tr {
+        display: block;
+        width: 100%;
+        margin-bottom: 40px;
+        box-shadow: $boxShadow;
+        @include viewportLarge {
+          display: table-row;
+        }
+        td {
+          display: block;
+          width: 100%;
+          text-align: right;
+          padding: 20px 10px;
+          color: #616161;
+          border-bottom: 1px solid $matterColorNegative;
+          position: relative;
+          font-size: 14px;
+          &:before {
+            content: attr(data-label);
+            position: absolute;
+            left: 0;
+            width: 50%;
+            padding-left: 15px;
+            text-align: left;
+            @include viewportLarge {
+              display: none;
+            }
+          }
+          @include viewportLarge {
+            display: table-cell;
+            width: unset;
+            text-align: left;
+          }
+        }
+      }
+    }
+  }
+}

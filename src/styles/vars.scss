@@ -34,3 +34,17 @@ $fontWeightHighlightEmail: $fontWeightBold;
 /* ================ Box shadow ================*/
 
 $boxShadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+$boxShadowPopup: 0 8px 16px 0 rgba(0, 0, 0, 0.3);
+
+/* ================ Z-index base levels ================ */
+
+$zIndexPopup: 50;
+
+/* ================ Transition styles ================ */
+
+$transitionStyleButton: ease-in-out 0.1s;
+
+$adminTopbarHeight: 70px;
+$adminTopbarzIndex: 49;
+$adminSidebarzIndex: 50;
+$adminSidebarWidth: 300px;
