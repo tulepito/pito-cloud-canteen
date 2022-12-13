@@ -1,3 +1,4 @@
+import PaginationLinks from '@components/PaginationLinks/PaginationLinks';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';
 import React from 'react';
@@ -26,6 +27,11 @@ type TTable = {
   tableBodyClassName?: string;
   tableBodyRowClassName?: string;
   tableBodyCellClassName?: string;
+  paginationLinksClassName?: string;
+  paginationLinksRootClassName?: string;
+  paginationPath?: string;
+  pagePathParams?: any;
+  pageSearchParams?: any;
 };
 
 const Table = (props: TTable) => {
@@ -40,6 +46,11 @@ const Table = (props: TTable) => {
     tableBodyClassName,
     tableBodyRowClassName,
     tableBodyCellClassName,
+    paginationLinksClassName,
+    paginationLinksRootClassName,
+    paginationPath,
+    pagePathParams,
+    pageSearchParams,
   } = props;
   const rootClasses = classNames(css.root, rootClassName);
   const tableClasses = classNames(css.table, tableClassName);
@@ -70,6 +81,14 @@ const Table = (props: TTable) => {
           ))}
         </tbody>
       </table>
+      <PaginationLinks
+        className={paginationLinksClassName}
+        rootClassName={paginationLinksRootClassName}
+        path={paginationPath}
+        pagePathParams={pagePathParams}
+        pageSearchParams={pageSearchParams}
+        pagination={{ page: 3, perPage: 10, totalPages: 1000 }}
+      />
     </div>
   );
 };

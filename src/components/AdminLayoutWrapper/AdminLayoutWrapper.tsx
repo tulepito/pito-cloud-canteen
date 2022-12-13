@@ -20,7 +20,7 @@ const prepareChildren = (children: any) => {
   }
 
   const childrenMap = {} as any;
-  console.log({ children });
+
   React.Children.forEach(children, (child) => {
     if (child.type === AdminLayoutTopbar) {
       childrenMap.layoutWrapperTopbar = child;

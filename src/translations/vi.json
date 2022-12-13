@@ -6,5 +6,9 @@
   "AdminSidebar.userLabel": "Quản lý nguời dùng",
   "AdminSidebar.companyLabel": "Khách hàng",
   "AdminSidebar.partnerLabel": "Đối tác",
-  "AdminSidebar.customLabel": "Tùy chỉnh"
+  "AdminSidebar.customLabel": "Tùy chỉnh",
+  "AdminDashboard.add": "Thêm",
+  "PaginationLinks.next": "Next page",
+  "PaginationLinks.previous": "Previous page",
+  "PaginationLinks.toPage": "Go to page {page}"
 }

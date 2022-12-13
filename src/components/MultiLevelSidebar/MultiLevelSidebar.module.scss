@@ -18,12 +18,15 @@
         align-items: center;
         width: 100%;
         .label {
+          font-size: 14px;
+          color: $matterColor;
           &.labelOpen {
             color: red;
           }
         }
         .entityIcon {
           margin-right: 10px;
+          width: 20px;
         }
       }
       .menuArrowIcon {

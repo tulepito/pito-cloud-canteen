@@ -2,8 +2,8 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  box-shadow: $boxShadow;
   .table {
+    margin-bottom: 20px;
     border-collapse: collapse;
     width: 100%;
     padding: 10px;
