@@ -1,64 +1,127 @@
-import AdminHeader from '@components/AdminHeader/AdminHeader';
-import IconHome from '@components/IconHome/IconHome';
-import IconUserManagement from '@components/IconUserManagement/IconUserManagement';
 import Meta from '@components/Layout/Meta';
-import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
-import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
+import type { TColumn, TRowData } from '@components/Table/Table';
+import Table from '@components/Table/Table';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import css from './AdminDashboard.module.scss';
-
-const SIDEBAR_MENUS: TSidebarMenu[] = [
+const TABLE_COLUMN: TColumn[] = [
   {
-    id: 'home',
-    label: 'AdminSidebar.homeLabel',
-    nameLink: 'Home',
-    Icon: IconHome,
+    key: 'id',
+    label: 'id',
+    render: (data: any) => {
+      return <span>{data.id}</span>;
+    },
   },
   {
-    id: 'user',
-    label: 'AdminSidebar.userLabel',
-    Icon: IconUserManagement,
-    childrenMenus: [
-      {
-        id: 'company',
-        label: 'AdminSidebar.companyLabel',
-        nameLink: 'Company',
-      },
-      {
-        id: 'partner',
-        label: 'AdminSidebar.partnerLabel',
-        nameLink: 'Partner',
-      },
-      {
-        id: 'custom',
-        label: 'AdminSidebar.customLabel',
-        childrenMenus: [
-          {
-            id: 'custom1',
-            label: 'AdminSidebar.customLabel',
-            childrenMenus: [
-              {
-                id: 'custom11',
-                label: 'AdminSidebar.customLabel',
-                nameLink: 'Custom11',
-              },
-              {
-                id: 'custom22',
-                label: 'AdminSidebar.customLabel',
-                nameLink: 'Custom22',
-              },
-            ],
-          },
-          {
-            id: 'custom2',
-            label: 'AdminSidebar.customLabel',
-            nameLink: 'Custom2',
-          },
-        ],
-      },
-    ],
+    key: 'name',
+    label: 'Ho va Ten',
+    render: (data: any) => {
+      return <span>{data.name}</span>;
+    },
+  },
+  {
+    key: 'phone',
+    label: 'So dien thoai',
+    render: (data: any) => {
+      return <span>{data.phone}</span>;
+    },
+  },
+  {
+    key: 'email',
+    label: 'Email',
+    render: (data: any) => {
+      return <span>{data.email}</span>;
+    },
+  },
+  {
+    key: 'companyName',
+    label: 'Ten cong ty',
+    render: (data: any) => {
+      return <span>{data.companyName}</span>;
+    },
+  },
+  {
+    key: 'status',
+    label: 'Trang thai',
+    render: (data: any) => {
+      return <span>{data.status}</span>;
+    },
+  },
+  {
+    key: 'action',
+    label: '',
+    render: () => {
+      return <button>Hello</button>;
+    },
+  },
+];
+
+const TABLE_DATA: TRowData[] = [
+  {
+    key: '1',
+    data: {
+      id: 1,
+      name: 'Minh',
+      phone: '094213213',
+      email: 'minttran.9002@gmail.com',
+      companyName: 'Journey Horizon',
+      status: 'active',
+    },
+  },
+  {
+    key: '1',
+    data: {
+      id: 1,
+      name: 'Minh',
+      phone: '094213213',
+      email: 'minttran.9002@gmail.com',
+      companyName: 'Journey Horizon',
+      status: 'active',
+    },
+  },
+  {
+    key: '1',
+    data: {
+      id: 1,
+      name: 'Minh',
+      phone: '094213213',
+      email: 'minttran.9002@gmail.com',
+      companyName: 'Journey Horizon',
+      status: 'active',
+    },
+  },
+  {
+    key: '1',
+    data: {
+      id: 1,
+      name: 'Minh',
+      phone: '094213213',
+      email: 'minttran.9002@gmail.com',
+      companyName: 'Journey Horizon',
+      status: 'active',
+    },
+  },
+  {
+    key: '1',
+    data: {
+      id: 1,
+      name: 'Minh',
+      phone: '094213213',
+      email: 'minttran.9002@gmail.com',
+      companyName: 'Journey Horizon',
+      status: 'active',
+    },
+  },
+  {
+    key: '1',
+    data: {
+      id: 1,
+      name: 'Minh',
+      phone: '094213213',
+      email: 'minttran.9002@gmail.com',
+      companyName: 'Journey Horizon',
+      status: 'active',
+    },
   },
 ];
 
@@ -75,10 +138,7 @@ const AdminDashboard = () => {
   return (
     <>
       <Meta title={title} description={description} />
-      <div className={css.page}>
-        <MultiLevelSidebar menus={SIDEBAR_MENUS} />
-        <AdminHeader />
-      </div>
+      <Table columns={TABLE_COLUMN} rowDatas={TABLE_DATA} />
     </>
   );
 };

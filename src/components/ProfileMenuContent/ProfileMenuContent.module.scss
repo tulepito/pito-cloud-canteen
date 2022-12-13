@@ -1,0 +1,54 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  position: absolute;
+  z-index: $zIndexPopup;
+
+  background-color: $matterColorLight;
+  border-top: 1px solid $matterColorNegative;
+  box-shadow: $boxShadowPopup;
+  border-radius: 0 0 2px 2px;
+  transition: $transitionStyleButton;
+}
+
+.isClosed {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.isOpen {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+/* Styles for arrow (if arrowPosition is defined) */
+.arrowTop,
+.arrowBelow {
+  content: ' ';
+  position: absolute;
+  bottom: 100%;
+  height: 0;
+  width: 0;
+  border: solid transparent;
+  pointer-events: none;
+}
+
+.arrowTop {
+  border-bottom-color: $matterColorLight;
+  border-width: 7px;
+  margin-left: -7px;
+}
+
+.arrowBelow {
+  border-bottom-color: $matterColorNegative;
+  border-width: 9px;
+  margin-left: -9px;
+}
