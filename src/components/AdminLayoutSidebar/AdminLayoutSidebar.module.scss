@@ -1,0 +1,10 @@
+@use '/src/styles//vars.scss' as *;
+
+.root {
+  flex: 1;
+  min-width: $adminSidebarWidth;
+  z-index: $adminSidebarzIndex;
+  background-color: $matterColorLight;
+  box-shadow: $boxShadow;
+  position: fixed;
+}

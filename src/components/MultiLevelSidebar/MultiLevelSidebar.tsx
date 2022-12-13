@@ -1,5 +1,4 @@
 import IconMenuArrow from '@components/IconMenuArrow/IconMenuArrow';
-import PitoLogo from '@components/PitoLogo/PitoLogo';
 import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -16,20 +15,32 @@ export type TSidebarMenu = {
   nameLink?: string;
 };
 
+type TMenuWithClasses = {
+  menuWrapperClassName?: string;
+  subMenuWrapperClassName?: string;
+  subMenuLayoutClassName?: string;
+};
+
 type TSubMenuProps = {
   menu: TSidebarMenu;
-};
+} & TMenuWithClasses;
 
 type TMenuProps = {
   menus: TSidebarMenu[];
-};
+} & TMenuWithClasses;
 
 type TMultiLevelSidebar = {
   menus: TSidebarMenu[];
-};
+  rootClassName?: string;
+} & TMenuWithClasses;
 
 const SubMenu: React.FC<TSubMenuProps> = (props) => {
-  const { menu } = props;
+  const {
+    menu,
+    subMenuWrapperClassName,
+    subMenuLayoutClassName,
+    menuWrapperClassName,
+  } = props;
 
   const intl = useIntl();
   const router = useRouter();
@@ -50,10 +61,20 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     [nameLink, hasChildrenMenus, setIsOpen, router, isOpen],
   );
 
+  const subMenuWrapperClasses = classNames(
+    css.subMenu,
+    subMenuWrapperClassName,
+  );
+
+  const subMenuLayoutClasses = classNames(
+    css.subMenuLayout,
+    subMenuLayoutClassName,
+  );
+
   return (
-    <div onClick={handleMenuClick} className={css.entityRoot}>
-      <div className={css.entityWrapper}>
-        <div className={css.entity}>
+    <div onClick={handleMenuClick} className={subMenuWrapperClasses}>
+      <div className={subMenuLayoutClasses}>
+        <div className={css.subMenuItem}>
           {Icon && <Icon className={css.entityIcon} />}
           <p className={classNames(css.label, { [css.labelOpen]: isOpen })}>
             {intl.formatMessage({
@@ -72,35 +93,61 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
       {/* render children menu */}
       {isOpen && hasChildrenMenus && (
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        <Menu menus={childrenMenus} />
+        <Menu
+          menus={childrenMenus}
+          subMenuWrapperClassName={subMenuWrapperClassName}
+          subMenuLayoutClassName={subMenuLayoutClassName}
+          menuWrapperClassName={menuWrapperClassName}
+        />
       )}
     </div>
   );
 };
 
 const Menu: React.FC<TMenuProps> = (props) => {
-  const { menus } = props;
+  const {
+    menus,
+    menuWrapperClassName,
+    subMenuWrapperClassName,
+    subMenuLayoutClassName,
+  } = props;
+
+  const menuWrapperClasses = classNames(css.menuWrapper, menuWrapperClassName);
+
   return (
-    <div className={css.subEntities}>
+    <div className={menuWrapperClasses}>
       {menus.map((menu: TSidebarMenu) => {
-        return <SubMenu key={menu.id} menu={menu} />;
+        return (
+          <SubMenu
+            key={menu.id}
+            menu={menu}
+            menuWrapperClassName={menuWrapperClassName}
+            subMenuWrapperClassName={subMenuWrapperClassName}
+            subMenuLayoutClassName={subMenuLayoutClassName}
+          />
+        );
       })}
     </div>
   );
 };
 
 const MultiLevelSidebar = (props: TMultiLevelSidebar) => {
-  const { menus } = props;
+  const {
+    menus,
+    rootClassName,
+    menuWrapperClassName,
+    subMenuWrapperClassName,
+    subMenuLayoutClassName,
+  } = props;
+  const rootClasses = classNames(css.root, rootClassName);
   return (
-    <div className={css.root}>
-      <div className={css.top}>
-        <PitoLogo />
-      </div>
-      <div className={css.center}>
-        <div className={css.listEntities}>
-          <Menu menus={menus} />
-        </div>
-      </div>
+    <div className={rootClasses}>
+      <Menu
+        menus={menus}
+        menuWrapperClassName={menuWrapperClassName}
+        subMenuWrapperClassName={subMenuWrapperClassName}
+        subMenuLayoutClassName={subMenuLayoutClassName}
+      />
     </div>
   );
 };

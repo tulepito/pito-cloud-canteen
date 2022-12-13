@@ -1,0 +1,7 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  margin-top: $adminTopbarHeight;
+  padding: 40px;
+  margin-left: $adminSidebarWidth;
+}

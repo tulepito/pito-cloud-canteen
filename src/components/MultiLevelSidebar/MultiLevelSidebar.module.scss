@@ -2,57 +2,41 @@
 
 .root {
   flex: 1;
-  border-right: 0.5px solid rgb(230, 227, 227);
   min-height: 100vh;
   background-color: $matterColorLight;
-  max-width: 300px;
-  box-shadow: $boxShadow;
-  .top {
-    padding: 10px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .center {
-    padding: 10px;
-    .listEntities {
-      padding: 0;
-      .entityRoot {
-        cursor: pointer;
-        list-style: none;
-        .entityWrapper {
-          display: flex;
-          align-items: center;
-          .entity {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            .label {
-              &.labelOpen {
-                color: red;
-              }
-            }
-            .entityIcon {
-              margin-right: 10px;
-            }
-          }
-          .menuArrowIcon {
-            float: right;
-            transform: rotate(-90deg);
-            &.menuArrowOpen {
-              transform: rotate(0deg);
-            }
+  min-width: 100%;
+  padding: 10px;
+
+  .subMenu {
+    cursor: pointer;
+    list-style: none;
+    .subMenuLayout {
+      display: flex;
+      align-items: center;
+      .subMenuItem {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        .label {
+          &.labelOpen {
+            color: red;
           }
         }
-        .subEntities {
-          margin-left: 40px;
-          .subEntity {
-            height: 50px;
-            display: flex;
-            align-items: center;
-          }
+        .entityIcon {
+          margin-right: 10px;
         }
       }
+      .menuArrowIcon {
+        float: right;
+        transform: rotate(-90deg);
+        &.menuArrowOpen {
+          transform: rotate(0deg);
+        }
+      }
+    }
+    .menuWrapper {
+      margin-left: 40px;
+      padding-bottom: 0;
     }
   }
 }
