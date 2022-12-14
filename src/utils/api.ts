@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const apiBaseUrl = () => {
-  const port = process.env.PORT || 3000;
+  const port = process.env.NEXT_PORT || 3000;
   const useDevApiServer =
     process.env.NEXT_PUBLIC_ENV === 'development' && !!port;
 
