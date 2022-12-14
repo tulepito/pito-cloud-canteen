@@ -66,6 +66,8 @@ export type TReverseMapFromEnum<T> = T[keyof T];
 
 export type TIconProps = {
   className?: string;
+  rootClassName?: string;
+  onClick?: () => void;
 };
 
 // Sharetribe Flex Entity Types
