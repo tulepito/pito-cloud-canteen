@@ -21,7 +21,7 @@ const initialState: TPasswordRecoverySliceInitialState = {
   passwordRequested: false,
 };
 
-export const recoverPassword = createAsyncThunk(
+const recoverPassword = createAsyncThunk(
   AUTH_INFO,
   async (
     params: Record<string, any>,
@@ -37,6 +37,10 @@ export const recoverPassword = createAsyncThunk(
     }
   },
 );
+
+export const recoverPasswordThunks = {
+  recoverPassword,
+};
 
 const passwordRecoverySlice = createSlice({
   name: 'PasswordRecovery',
@@ -84,4 +88,5 @@ const passwordRecoverySlice = createSlice({
   },
 });
 
+export const passwordRecoveryActions = passwordRecoverySlice.actions;
 export default passwordRecoverySlice.reducer;
