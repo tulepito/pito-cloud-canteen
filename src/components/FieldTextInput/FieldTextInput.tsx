@@ -15,11 +15,11 @@ interface InputComponentProps extends FieldRenderProps<string, any> {
   disabled?: boolean;
   labelClassName?: string;
   customErrorText?: string;
-  isUncontrolled: boolean;
+  isUncontrolled?: boolean;
   input: any;
   meta: any;
   inputRef: any;
-  fullWidth: boolean;
+  fullWidth?: boolean;
 }
 
 const FieldTextInputComponent: React.FC<InputComponentProps> = (

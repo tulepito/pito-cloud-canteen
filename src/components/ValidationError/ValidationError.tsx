@@ -4,11 +4,15 @@ import React from 'react';
 
 import css from './ValidationError.module.scss';
 
-interface ValidationErrorProps {
+type TFieldMeta = {
+  touched?: boolean;
+  error?: boolean;
+};
+type ValidationErrorProps = {
   rootClassName?: string;
   className?: string;
-  fieldMeta: any;
-}
+  fieldMeta: TFieldMeta;
+};
 
 /**
  * This component can be used to show validation errors next to form

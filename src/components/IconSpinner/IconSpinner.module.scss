@@ -1,0 +1,10 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  width: 28px;
+  height: 28px;
+
+  stroke: var(--matterColorAnti);
+
+  stroke-width: 3px;
+}

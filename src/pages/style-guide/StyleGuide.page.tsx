@@ -1,10 +1,11 @@
+import Button from '@components/Button/Button';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import { required } from '@utils/validators';
 import { Form as FinalForm } from 'react-final-form';
 
 const StyleGuidePage = (props: any) => {
-  const onSubmitHandler = (values: any) => {
+  const onSubmitHandler = (values: object) => {
     console.log({ values });
   };
   return (
@@ -13,24 +14,26 @@ const StyleGuidePage = (props: any) => {
       onSubmit={onSubmitHandler}
       render={(fieldRenderProps) => {
         const { handleSubmit } = fieldRenderProps;
-        const requiredMessage = required('This field is required');
+        const requiredMessage = required('Vui lòng nhập trường dữ liệu');
 
         return (
           <Form onSubmit={handleSubmit}>
             <FieldTextInput
               id={`username`}
-              label="Username"
               name="username"
               validate={requiredMessage}
+              fullWidth={false}
             />
             <FieldTextInput
               id={`email`}
-              label="Email"
               name="email"
               validate={requiredMessage}
+              placeholder="hello"
+              fullWidth={false}
             />
-
-            <button type="submit">Submit</button>
+            <Button type="submit" buttonSize="large">
+              Submit
+            </Button>
           </Form>
         );
       }}
