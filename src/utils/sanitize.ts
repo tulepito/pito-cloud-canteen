@@ -45,8 +45,14 @@ const sanitizeText = (str: any) =>
 export const sanitizeUser = (entity: Record<string, any>) => {
   const { attributes, ...restEntity } = entity || {};
   const { profile, ...restAttributes } = attributes || {};
-  const { bio, displayName, abbreviatedName, publicData, metadata } =
-    profile || {};
+  const {
+    bio,
+    displayName,
+    abbreviatedName,
+    publicData,
+    metadata,
+    privateData,
+  } = profile || {};
 
   // TODO: If you add public data, you should probably sanitize it here.
   const sanitizedPublicData = publicData ? { publicData } : {};
@@ -56,6 +62,8 @@ export const sanitizeUser = (entity: Record<string, any>) => {
     // you should probably sanitize it here.
     metadata ? { metadata } : {};
 
+  const sanitizedPrivateData = privateData ? { privateData } : {};
+
   const profileMaybe = profile
     ? {
         profile: {
@@ -64,6 +72,7 @@ export const sanitizeUser = (entity: Record<string, any>) => {
           bio: sanitizeText(bio),
           ...sanitizedPublicData,
           ...sanitizedMetadata,
+          ...sanitizedPrivateData,
         },
       }
     : {};

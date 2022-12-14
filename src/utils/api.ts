@@ -30,8 +30,12 @@ export const deleteMethod = (path: string, body: any) => {
   return axios.delete(`${apiBaseUrl()}${path}`, body);
 };
 
-export const getCompaniesApi = () => get('/api/users');
+export const getCompaniesApi = () => get('/api/users/company');
 
-export const updateCompany = (body: any) => put('/api/users/update', body);
+export const updateCompanyApi = (body: any) =>
+  put('/api/users/company/update', body);
 
-export const createCompany = (body: any) => post('/api/users/create', body);
+export const createCompanyApi = (body: any) =>
+  post('/api/users/company/create', body);
+
+export const showCompanyApi = (id: string) => get(`/api/users/company/${id}`);

@@ -1,5 +1,5 @@
-import CompanyManagement from './pages/CompanyManagement/CompanyManagement.page';
+import ManageCompanies from './ManageCompanies.page';
 
-export default function CompanyRoute() {
-  return <CompanyManagement />;
+export default function CreateCompanyRoute() {
+  return <ManageCompanies />;
 }

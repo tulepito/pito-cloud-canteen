@@ -1,0 +1,39 @@
+@use '/src/styles/vars.scss' as *;
+
+.top {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.button {
+  background-color: $marketplaceColor;
+  color: white;
+  outline: none;
+  border: none;
+  padding: 5px 20px;
+  cursor: pointer;
+}
+
+.active {
+  color: $matterColorLight;
+  padding: 10px;
+  text-align: center;
+  display: inline;
+  background-color: $successColor;
+}
+
+.inActive {
+  color: $matterColorLight;
+  padding: 10px;
+  display: inline;
+  text-align: center;
+  background-color: $marketplaceColor;
+}
+
+.searchInput {
+  padding: 10px;
+  width: 400px;
+  margin-right: 10px;
+  margin-bottom: 20px;
+}

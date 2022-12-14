@@ -90,6 +90,10 @@ export type TProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
+  protectedData?: any;
+  metadata?: any;
+  publicData?: any;
+  privateData?: any;
 };
 
 export type TCurrentUserAttributes = {
@@ -112,11 +116,16 @@ export type TUserProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
+  protectedData?: any;
+  metadata?: any;
+  publicData?: any;
+  privateData?: any;
 };
 
 export type TUserAttributes = {
   banned: boolean;
   deleted: boolean;
+  email: string;
   profile: TUserProfile;
 };
 
@@ -128,6 +137,10 @@ export type TAuthorProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
+  protectedData?: any;
+  metadata?: any;
+  publicData?: any;
+  privateData?: any;
 };
 
 export type TAuthorAttributes = {
@@ -339,7 +352,7 @@ export type TMessage = {
 export type TPagination = {
   page: number;
   perPage: number;
-  paginationUnsupported: boolean;
+  paginationUnsupported?: boolean;
   totalItems: number;
   totalPages: number;
 };
