@@ -1,0 +1,22 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  /* Position and dimensions */
+  display: display-inline;
+  margin: 0;
+  padding: 0;
+
+  /* Borders */
+  border: none;
+
+  /* Colors */
+  color: $matterColor;
+
+  /* Text size should be inherited */
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}

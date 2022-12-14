@@ -6,6 +6,7 @@
   margin-bottom: 12px;
   color: $failColor;
   overflow: hidden;
+  font-size: 0.875rem;
 
   @include viewportMedium {
     margin-top: 6px;

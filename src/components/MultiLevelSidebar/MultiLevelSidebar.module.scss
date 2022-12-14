@@ -1,0 +1,45 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  flex: 1;
+  min-height: 100vh;
+  background-color: $matterColorLight;
+  min-width: 100%;
+  padding: 10px;
+
+  .subMenu {
+    cursor: pointer;
+    list-style: none;
+    .subMenuLayout {
+      display: flex;
+      align-items: center;
+      .subMenuItem {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        .label {
+          font-size: 14px;
+          color: $matterColor;
+          &.labelOpen {
+            color: red;
+          }
+        }
+        .entityIcon {
+          margin-right: 10px;
+          width: 20px;
+        }
+      }
+      .menuArrowIcon {
+        float: right;
+        transform: rotate(-90deg);
+        &.menuArrowOpen {
+          transform: rotate(0deg);
+        }
+      }
+    }
+    .menuWrapper {
+      margin-left: 40px;
+      padding-bottom: 0;
+    }
+  }
+}

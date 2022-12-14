@@ -1,0 +1,9 @@
+.root {
+  /* Expand to the full remaining width of the viewport */
+  display: flex;
+  width: 100%;
+}
+
+.main {
+  flex: 1;
+}

@@ -1,0 +1,6 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  stroke: $matterColor;
+  fill: $matterColor;
+}

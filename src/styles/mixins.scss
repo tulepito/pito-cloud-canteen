@@ -1,0 +1,68 @@
+@use '/src/styles/vars.scss' as *;
+
+$transitionStyleButton: ease-in-out 0.1s;
+$buttonBorderRadius: 8px;
+
+@mixin buttonFont {
+  font-weight: $fontWeightBold;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.2px;
+}
+
+/* Button text styles */
+/* Default button text is centered without decorations */
+@mixin buttonText {
+  text-align: center;
+  text-decoration: none;
+}
+
+@mixin buttonBorders {
+  border: none;
+  border-radius: $buttonBorderRadius;
+}
+
+@mixin button {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+
+  /* Padding is only for <a> elements where button styles are applied,
+  buttons elements should have zero padding */
+  padding: 12px 20px;
+
+  transition: all $transitionStyleButton;
+  cursor: pointer;
+
+  @media (--viewportMedium) {
+    padding: 20px 0 20px 0;
+    min-height: 65px;
+  }
+
+  &:focus,
+  &:hover {
+    outline: none;
+  }
+
+  &:disabled {
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+}
+
+@mixin buttonColorPrimary {
+  background: $primaryPri5;
+  color: $neutralGray1;
+
+  &:focus,
+  &:hover {
+    background: $primaryPri4;
+  }
+
+  &:disabled {
+    color: $neutralGray6;
+    background: $neutralGray5;
+    border: 1px solid $neutralGray3;
+  }
+}

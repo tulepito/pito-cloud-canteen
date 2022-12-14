@@ -1,5 +1,3 @@
-@use './customMediaQueries';
-
 $marketplaceColor: #c0392b;
 $marketplaceColorLight: #ff4c38;
 $marketplaceColorDark: #8c291e;
@@ -111,9 +109,10 @@ $facebookBackground: #39579a;
 $googleBackground: #dc4e41;
 
 // Form colors
-$formFieldBorderColor: #ced4da;
-$formFieldBorderColorFocus: #86b7fe;
-$formFieldColor: #212529;
+$formFieldBorderColor: #dee2e6;
+$formFieldBorderColorFocus: #5e72e4;
+$formFieldColor: #242424;
+$formFieldPlaceholderColor: #adb5bd;
 
 $matterColorLightTransparent: rgba(35, 28, 28, 0.65);
 
@@ -127,5 +126,22 @@ $fontWeightBold: 700;
 
 $fontWeightHighlightEmail: $fontWeightBold;
 
-// Box shadow
-$shadowInput: 0 0 0 0.25rem rgb(13 110 253 / 25%);
+/* ================ Box shadow ================*/
+$boxShadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+$boxShadowPopup: 0 8px 16px 0 rgba(0, 0, 0, 0.3);
+$shadowInput: 0 3px 2px rgb(233 236 239 / 5%);
+$boxShadowInputFocus: 0 3px 9px rgb(50 50 9 / 0%),
+  3px 4px 8px rgb(94 114 228 / 10%);
+
+/* ================ Z-index base levels ================ */
+
+$zIndexPopup: 50;
+
+/* ================ Transition styles ================ */
+
+$transitionStyleButton: ease-in-out 0.1s;
+
+$adminTopbarHeight: 70px;
+$adminTopbarzIndex: 49;
+$adminSidebarzIndex: 50;
+$adminSidebarWidth: 300px;
