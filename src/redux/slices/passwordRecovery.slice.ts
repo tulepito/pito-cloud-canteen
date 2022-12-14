@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
 
 // ================ Thunk types ================ //
-const AUTH_INFO = 'app/PasswordRecovery';
+const PASSWORD_RECOVERY = 'app/PasswordRecovery';
 
 type TPasswordRecoverySliceInitialState = {
   initialEmail: string | null;
@@ -22,7 +22,7 @@ const initialState: TPasswordRecoverySliceInitialState = {
 };
 
 const recoverPassword = createAsyncThunk(
-  AUTH_INFO,
+  PASSWORD_RECOVERY,
   async (
     params: Record<string, any>,
     { extra: sdk, fulfillWithValue, rejectWithValue }: ThunkAPI,
