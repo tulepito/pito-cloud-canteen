@@ -19,7 +19,6 @@ type TPasswordRecoveryFormProps = {
   className?: string;
   formId?: string;
   onSubmit: (values: Record<string, any>) => void;
-  onChange: Function;
   inProgress: Boolean;
   recoveryError?: ReactNode;
 };
@@ -60,7 +59,7 @@ const PasswordRecoveryForm: React.FC<TPasswordRecoveryFormProps> = (props) => {
   );
 
   const navigateToSignInPage = () => {
-    router.push('/dang-ky');
+    router.push('/dang-nhap');
   };
 
   return (

@@ -1,6 +1,5 @@
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
-import FacebookIcon from '@components/Icons/FacebookIcon';
 import GoogleIcon from '@components/Icons/GoogleIcon';
 import {
   composeValidators,
@@ -49,9 +48,6 @@ const SignInForm: React.FC<TSignInFormProps> = (props) => {
     id: 'SignInForm.orText',
   });
 
-  const facebookLoginText = intl.formatMessage({
-    id: 'SignInForm.facebookLoginText',
-  });
   const googleLoginText = intl.formatMessage({
     id: 'SignInForm.googleLoginText',
   });
@@ -127,10 +123,7 @@ const SignInForm: React.FC<TSignInFormProps> = (props) => {
               <div className={css.orText}>
                 <span>{orText}</span>
               </div>
-              <button className={css.facebookLoginButton} type="button">
-                <FacebookIcon className={css.facebookIcon} />
-                <span>{facebookLoginText}</span>
-              </button>
+
               <button className={css.googleLoginButton} type="button">
                 <GoogleIcon className={css.googleIcon} />
                 <span>{googleLoginText}</span>

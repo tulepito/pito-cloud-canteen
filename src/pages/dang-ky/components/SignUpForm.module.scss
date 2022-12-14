@@ -2,19 +2,25 @@
 @use '/src/styles/vars.scss' as *;
 
 .root {
-  padding: 0 8px;
+  padding: 32px 8px 0;
   width: 100%;
+
+  @include viewportLarge {
+    padding-top: 48px;
+  }
 }
 
 .formContainer {
   margin: 0 auto;
   width: fit-content;
-  padding: 16px;
+  padding: 24px 16px;
   display: flex;
   justify-content: center;
   flex-direction: column;
   row-gap: 16px;
-  width: 80%;
+  width: 90%;
+  background-color: $neutralGray1;
+  border-radius: 16px 16px 0 0;
 
   @include viewportMedium {
     padding: 24px;
@@ -22,7 +28,7 @@
 
   @include viewportLarge {
     padding: 24px 32px;
-    width: min(400px, calc(100% / 3));
+    width: min(450px, calc(150% / 2));
   }
 
   & input {
@@ -48,6 +54,19 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 0 auto;
+  width: 90%;
+  background: $neutralGray4;
+  padding: 16px;
+
+  @include viewportMedium {
+    padding: 16px 24px;
+  }
+
+  @include viewportLarge {
+    padding: 24px 32px;
+    width: min(450px, calc(150% / 2));
+  }
 }
 
 .errorSignUp {
@@ -64,6 +83,7 @@
   font-size: 16px;
   cursor: pointer;
   padding: 8px 0;
+  border-radius: 4px;
 }
 
 .toSignIn {
