@@ -1,0 +1,9 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  color: $failColor;
+  font-size: 0.75rem;
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-weight: $fontWeightRegular;
+}

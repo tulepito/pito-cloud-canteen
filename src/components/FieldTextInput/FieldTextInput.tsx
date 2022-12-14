@@ -1,4 +1,5 @@
 import ValidationError from '@components/ValidationError/ValidationError';
+import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 import type { FieldRenderProps } from 'react-final-form';
@@ -6,6 +7,7 @@ import { Field } from 'react-final-form';
 
 import css from './FieldTextInput.module.scss';
 
+type TIconComponent = React.ReactElement<TIconProps>;
 interface InputComponentProps extends FieldRenderProps<string, any> {
   id: string;
   label?: string;
@@ -15,16 +17,16 @@ interface InputComponentProps extends FieldRenderProps<string, any> {
   disabled?: boolean;
   labelClassName?: string;
   customErrorText?: string;
-  isUncontrolled: boolean;
+  isUncontrolled?: boolean;
   input: any;
   meta: any;
   inputRef: any;
-  fullWidth: boolean;
+  fullWidth?: boolean;
+  leftIcon?: TIconComponent;
+  rightIcon?: TIconComponent;
 }
 
-const FieldTextInputComponent: React.FC<InputComponentProps> = (
-  props: InputComponentProps,
-) => {
+const FieldTextInputComponent = (props: InputComponentProps) => {
   const {
     label,
     id,
@@ -39,6 +41,8 @@ const FieldTextInputComponent: React.FC<InputComponentProps> = (
     input,
     meta,
     inputRef,
+    leftIcon,
+    rightIcon,
     ...rest
   } = props;
 
@@ -62,6 +66,19 @@ const FieldTextInputComponent: React.FC<InputComponentProps> = (
   // Use inputRef if it is passed as prop.
   const refMaybe = inputRef ? { ref: inputRef } : {};
 
+  // Handle Icon
+  const leftIconElement = leftIcon
+    ? React.cloneElement(leftIcon, {
+        rootClassName: css.leftIcon,
+      })
+    : undefined;
+  const rightIconElement = rightIcon
+    ? React.cloneElement(rightIcon, {
+        rootClassName: css.rightIcon,
+      })
+    : undefined;
+
+  // Classes
   const inputClasses =
     inputRootClass ||
     classNames(css.input, {
@@ -69,6 +86,8 @@ const FieldTextInputComponent: React.FC<InputComponentProps> = (
       [css.inputError]: hasError,
       [css.inputDisabled]: disabled,
       [css.inputFullWidth]: fullWidth,
+      [css.inputWithPaddingLeft]: !!leftIcon,
+      [css.inputWithPaddingRight]: !!rightIcon,
     });
 
   const inputProps = isUncontrolled
@@ -93,6 +112,7 @@ const FieldTextInputComponent: React.FC<InputComponentProps> = (
       };
 
   const classes = classNames(rootClassName || css.root, className);
+  const inputContainerClasses = classNames(css.inputContainer);
   return (
     <div className={classes}>
       {label && (
@@ -100,8 +120,10 @@ const FieldTextInputComponent: React.FC<InputComponentProps> = (
           {label}
         </label>
       )}
-      <div className={css.inputContainer}>
+      <div className={inputContainerClasses}>
+        <div className={css.leftIconContainer}>{leftIconElement}</div>
         <input {...inputProps} />
+        <div className={css.rightIconContainer}>{rightIconElement}</div>
       </div>
       <ValidationError fieldMeta={fieldMeta} />
     </div>
