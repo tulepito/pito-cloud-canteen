@@ -160,7 +160,7 @@ const authSlice = createSlice({
         return {
           ...state,
           signupInProgress: false,
-          signupError: action.error.message,
+          signupError: action.payload,
         };
       })
 
@@ -180,7 +180,7 @@ const authSlice = createSlice({
         return {
           ...state,
           loginInProgress: false,
-          loginError: action.error.message,
+          loginError: action.payload,
         };
       })
 
@@ -204,7 +204,7 @@ const authSlice = createSlice({
         return {
           ...state,
           logoutInProgress: false,
-          logoutError: action.error.message,
+          logoutError: action.payload,
         };
       });
   },

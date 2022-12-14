@@ -113,7 +113,7 @@ const fetchCurrentUser = createAsyncThunk(
 
 const sendVerificationEmail = createAsyncThunk(
   SEND_VERIFICATION_EMAIL,
-  async (_, { getState, dispatch, extra: sdk, rejectWithValue }: ThunkAPI) => {
+  async (_, { getState, extra: sdk, rejectWithValue }: ThunkAPI) => {
     if (verificationSendingInProgress(getState())) {
       return rejectWithValue(
         new Error('Verification email sending already in progress'),
@@ -162,7 +162,7 @@ const userSlice = createSlice({
         };
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
-        return { ...state, currentUserShowError: action?.error?.message };
+        return { ...state, currentUserShowError: action.payload };
       })
 
       .addCase(sendVerificationEmail.pending, (state) => {
@@ -181,7 +181,7 @@ const userSlice = createSlice({
         return {
           ...state,
           sendVerificationEmailInProgress: false,
-          sendVerificationEmailError: action?.error?.message,
+          sendVerificationEmailError: action.payload,
         };
       });
   },
