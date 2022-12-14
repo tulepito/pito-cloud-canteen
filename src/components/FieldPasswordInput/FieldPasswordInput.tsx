@@ -1,11 +1,14 @@
+import IconHidePassword from '@components/IconHidePassword/IconHidePassword';
+import IconShowPassword from '@components/IconShowPassword/IconShowPassword';
 import ValidationError from '@components/ValidationError/ValidationError';
+import useBoolean from '@hooks/useBoolean';
 import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 import type { FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 
-import css from './FieldTextInput.module.scss';
+import css from './FieldPasswordInput.module.scss';
 
 type TIconComponent = React.ReactElement<TIconProps>;
 interface InputComponentProps extends FieldRenderProps<string, any> {
@@ -21,13 +24,13 @@ interface InputComponentProps extends FieldRenderProps<string, any> {
   input: any;
   meta: any;
   inputRef: any;
+  leftIcon: TIconComponent;
   fullWidth?: boolean;
-  leftIcon?: TIconComponent;
-  rightIcon?: TIconComponent;
   required?: boolean;
 }
 
-const FieldTextInputComponent = (props: InputComponentProps) => {
+const FieldPasswordInputComponent = (props: InputComponentProps) => {
+  const showPasswordControl = useBoolean(false);
   const {
     label,
     id,
@@ -43,7 +46,6 @@ const FieldTextInputComponent = (props: InputComponentProps) => {
     meta,
     inputRef,
     leftIcon,
-    rightIcon,
     required = false,
     ...rest
   } = props;
@@ -60,8 +62,6 @@ const FieldTextInputComponent = (props: InputComponentProps) => {
   const hasError = !!customErrorText || !!(touched && invalid && error);
   const fieldMeta = { touched: hasError, error: errorText };
 
-  const { type } = input;
-
   // Uncontrolled input uses defaultValue instead of value.
   const { value: defaultValue, ...inputWithoutValue } = input;
 
@@ -74,29 +74,35 @@ const FieldTextInputComponent = (props: InputComponentProps) => {
         rootClassName: css.leftIcon,
       })
     : undefined;
-  const rightIconElement = rightIcon
-    ? React.cloneElement(rightIcon, {
-        rootClassName: css.rightIcon,
-      })
-    : undefined;
+  const rightIconElement = showPasswordControl.value ? (
+    <IconHidePassword
+      rootClassName={css.rightIcon}
+      onClick={showPasswordControl.toggle}
+    />
+  ) : (
+    <IconShowPassword
+      rootClassName={css.rightIcon}
+      onClick={showPasswordControl.toggle}
+    />
+  );
 
   // Classes
   const inputClasses =
     inputRootClass ||
-    classNames(css.input, {
+    classNames(css.input, css.inputWithPaddingRight, {
       [css.inputSuccess]: valid,
       [css.inputError]: hasError,
       [css.inputDisabled]: disabled,
       [css.inputFullWidth]: fullWidth,
       [css.inputWithPaddingLeft]: !!leftIcon,
-      [css.inputWithPaddingRight]: !!rightIcon,
     });
 
+  const fieldInputType = showPasswordControl.value ? 'text' : 'password';
   const inputProps = isUncontrolled
     ? {
         className: inputClasses,
         id,
-        type,
+        type: fieldInputType,
         defaultValue,
         ...refMaybe,
         ...inputWithoutValue,
@@ -106,7 +112,7 @@ const FieldTextInputComponent = (props: InputComponentProps) => {
     : {
         className: inputClasses,
         id,
-        type,
+        type: fieldInputType,
         ...refMaybe,
         ...input,
         ...rest,
@@ -136,8 +142,8 @@ const FieldTextInputComponent = (props: InputComponentProps) => {
   );
 };
 
-const FieldTextInput = (props: any) => {
-  return <Field component={FieldTextInputComponent} {...props} />;
+const FieldPasswordInput = (props: any) => {
+  return <Field component={FieldPasswordInputComponent} {...props} />;
 };
 
-export default FieldTextInput;
+export default FieldPasswordInput;

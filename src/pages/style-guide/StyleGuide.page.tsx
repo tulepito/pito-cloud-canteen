@@ -1,4 +1,5 @@
 import Button from '@components/Button/Button';
+import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import type { TIconProps } from '@utils/types';
@@ -89,6 +90,8 @@ const StyleGuidePage = (props: any) => {
               name="username"
               validate={requiredMessage}
               leftIcon={<IconVoucher />}
+              label="Username"
+              required
             />
             <FieldTextInput
               id={`email`}
@@ -96,8 +99,24 @@ const StyleGuidePage = (props: any) => {
               validate={requiredMessage}
               placeholder="hello"
               rightIcon={<IconVoucher />}
+              label="Email"
             />
-            <Button type="submit">Submit</Button>
+            <FieldPasswordInput
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              label="Password"
+            />
+            <FieldPasswordInput
+              id="confirm-password"
+              name="confirm-password"
+              placeholder="Enter your password"
+              label="Confirm password"
+            />
+
+            <Button type="submit" fullWidth>
+              Submit
+            </Button>
           </Form>
         );
       }}
