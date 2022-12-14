@@ -1,6 +1,7 @@
 import '../styles/globals.scss';
 
 import AuthGuard from '@components/AuthGuard/AuthGuard';
+import Layout from '@components/Layout/Layout';
 import viMessage from '@translations/vi.json';
 import type { NextApplicationPage } from '@utils/types';
 import { useRouter } from 'next/router';
@@ -40,7 +41,9 @@ export default function App({
       messages={message}>
       <Provider store={reduxStore}>
         <AuthGuard isRequiredAuth={isRequiredAuth}>
-          <Component {...pageProps} />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
         </AuthGuard>
       </Provider>
     </IntlProvider>
