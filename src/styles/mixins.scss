@@ -1,7 +1,27 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 $transitionStyleButton: ease-in-out 0.1s;
 $buttonBorderRadius: 8px;
+
+@mixin formContainer {
+  padding: 24px 16px;
+  background-color: $neutralGray1;
+  border-radius: 16px 16px 0 0;
+
+  @include viewportMedium {
+    padding: 24px;
+  }
+
+  @include viewportLarge {
+    padding: 24px 32px;
+    width: min(450px, calc(150% / 2));
+  }
+
+  & input {
+    width: 100%;
+  }
+}
 
 @mixin buttonFont {
   font-weight: $fontWeightBold;
