@@ -19,7 +19,7 @@ type TPasswordRecoveryFormProps = {
   className?: string;
   formId?: string;
   onSubmit: (values: Record<string, any>) => void;
-  inProgress: Boolean;
+  inProgress: boolean;
   recoveryError?: ReactNode;
 };
 

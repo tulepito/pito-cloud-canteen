@@ -1,3 +1,4 @@
+import Button from '@components/Button/Button';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import {
@@ -19,7 +20,7 @@ import css from './SignUpForm.module.scss';
 
 type TSignUpFormProps = {
   onSubmit: (values: Record<string, any>) => void;
-  inProgress: Boolean;
+  inProgress: boolean;
   errorMessage?: ReactNode;
 };
 
@@ -153,12 +154,13 @@ const SignUpForm: React.FC<TSignUpFormProps> = (props) => {
               {errorMessage && (
                 <div className={css.errorSignUp}>{errorMessage}</div>
               )}
-              <button
+              <Button
+                // inProgress={inProgress}
                 className={css.submitButton}
                 type="submit"
                 disabled={submitDisable}>
                 {submitButtonText}
-              </button>
+              </Button>
             </div>
             <div className={css.haveAccountContainer}>
               <div>

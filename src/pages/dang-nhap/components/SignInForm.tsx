@@ -17,7 +17,7 @@ import css from './SignInForm.module.scss';
 
 type TSignInFormProps = {
   onSubmit: (values: Record<string, any>) => void;
-  inProgress: Boolean;
+  inProgress: boolean;
   errorMessage?: ReactNode;
 };
 

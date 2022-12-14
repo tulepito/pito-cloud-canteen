@@ -35,7 +35,7 @@ const SEND_VERIFICATION_EMAIL = 'app/user/SEND_VERIFICATION_EMAIL';
 interface IUserState {
   currentUser: any;
   currentUserShowError: any;
-  sendVerificationEmailInProgress: Boolean;
+  sendVerificationEmailInProgress: boolean;
   sendVerificationEmailError: any;
 }
 

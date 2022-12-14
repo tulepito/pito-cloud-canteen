@@ -9,8 +9,8 @@ type TPasswordRecoverySliceInitialState = {
   initialEmail: string | null;
   submittedEmail: string | null;
   recoveryError: any;
-  recoveryInProgress: Boolean;
-  passwordRequested: Boolean;
+  recoveryInProgress: boolean;
+  passwordRequested: boolean;
 };
 
 const initialState: TPasswordRecoverySliceInitialState = {

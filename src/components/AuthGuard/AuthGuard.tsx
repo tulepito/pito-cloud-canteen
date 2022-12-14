@@ -7,7 +7,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 type TAuthGuard = {
-  isRequiredAuth: Boolean;
+  isRequiredAuth: boolean;
 };
 
 const AuthGuard: React.FC<PropsWithChildren<TAuthGuard>> = (props) => {
