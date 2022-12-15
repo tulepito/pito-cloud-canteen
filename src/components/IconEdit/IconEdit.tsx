@@ -5,7 +5,7 @@ import React from 'react';
 import css from './IconEdit.module.scss';
 
 const IconEdit: React.FC<TIconProps> = (props) => {
-  const { className } = props;
+  const { className, onClick } = props;
   const classes = classNames(css.root, className);
   return (
     <svg
@@ -14,7 +14,8 @@ const IconEdit: React.FC<TIconProps> = (props) => {
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={classes}>
+      className={classes}
+      onClick={onClick}>
       <path
         fillRule="evenodd"
         clipRule="evenodd"

@@ -13,9 +13,10 @@ const formatCellValue = (value: any) => {
 
 type TableBodyProps = {
   data: any[];
+  editItem: (itemId: string) => () => void;
 };
 const TableBody: React.FC<TableBodyProps> = (props) => {
-  const { data } = props;
+  const { data, editItem } = props;
   return (
     <tbody className={css.tableBody}>
       {data.map((item: any, index: number) => (
@@ -30,7 +31,7 @@ const TableBody: React.FC<TableBodyProps> = (props) => {
                 ),
             )}
             <td>
-              <IconEdit className={css.editBtn} />
+              <IconEdit className={css.editBtn} onClick={editItem(item.id)} />
               <IconDelete className={css.deleteBtn} />
             </td>
           </>
