@@ -1,6 +1,7 @@
 import { userThunks } from '@redux/slices/user.slice';
 import type { AppDispatch } from '@redux/store';
 import { isTooManyEmailVerificationRequestsError } from '@utils/errors';
+import Link from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import { useDispatch } from 'react-redux';
 
@@ -25,6 +26,12 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
     <span onClick={handleResendEmail} className={css.resendEmailLink}>
       <FormattedMessage id="EmailVerification.resendEmailLinkText" />
     </span>
+  );
+
+  const toHomePageLink = (
+    <Link href="/" className={css.toHomePageLink}>
+      <FormattedMessage id="EmailVerification.toHomePageLinkText" />
+    </Link>
   );
 
   const resendErrorTranslationId = isTooManyEmailVerificationRequestsError(
@@ -61,10 +68,16 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
           {inProgress ? (
             <FormattedMessage id="EmailVerification.sendingEmail" />
           ) : (
-            <FormattedMessage
-              id="EmailVerification.resendEmail"
-              values={{ resendEmailLink }}
-            />
+            <div className={css.actions}>
+              <div>
+                <FormattedMessage
+                  id="EmailVerification.resendEmail"
+                  values={{ resendEmailLink }}
+                />
+              </div>
+
+              {toHomePageLink}
+            </div>
           )}
         </p>
       </div>
