@@ -1,0 +1,17 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  padding: 6px 16px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  height: 32px;
+
+  @include viewportLarge {
+    height: 48px;
+  }
+}

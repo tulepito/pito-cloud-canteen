@@ -1,9 +1,9 @@
 // Options for showing just date or date and time on BookingTimeInfo and BookingBreakdown
 // export const DATE_TYPE_DATE = 'date';
 // export const DATE_TYPE_DATETIME = 'datetime';
-
 // propTypes.dateType = oneOf([DATE_TYPE_DATE, DATE_TYPE_DATETIME]);
 import type Decimal from 'decimal.js';
+import type { NextPage } from 'next';
 
 import type {
   EBookingStates,
@@ -17,6 +17,10 @@ import type {
   ETransactionRoles,
   ETxTransitionActors,
 } from './enums';
+
+export type NextApplicationPage<P = any, IP = P> = NextPage<P, IP> & {
+  requireAuth?: boolean;
+};
 
 export enum ErrorCodes {
   ERROR_CODE_TRANSACTION_LISTING_NOT_FOUND = 'transaction-listing-not-found',

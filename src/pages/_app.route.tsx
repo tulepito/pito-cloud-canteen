@@ -1,8 +1,11 @@
 import '../styles/globals.scss';
 
 import AdminLayout from '@components/AdminLayout/AdminLayout';
+import AuthGuard from '@components/AuthGuard/AuthGuard';
+import Layout from '@components/Layout/Layout';
 import viMessage from '@translations/vi.json';
-import type { AppProps } from 'next/app';
+import type { NextApplicationPage } from '@utils/types';
+import type { Router } from 'next/router';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { IntlProvider } from 'react-intl';
@@ -11,9 +14,20 @@ import { Provider } from 'react-redux';
 import reduxStore from '../redux/store';
 
 const DEFAULT_LOCALE = 'vi-VN';
+const AuthenticationRoutes = ['/dang-nhap', '/dang-ky', '/quen-mat-khau'];
 
-export default function App({ Component, pageProps, router }: AppProps) {
+export default function App({
+  Component,
+  pageProps,
+  router,
+}: {
+  Component: NextApplicationPage;
+  pageProps: Record<string, any>;
+  router: Router;
+}) {
   const { locale, defaultLocale } = useRouter();
+  const isRequiredAuth = Component.requireAuth === true;
+
   const appLocale = locale || DEFAULT_LOCALE;
   let message;
 
@@ -27,9 +41,10 @@ export default function App({ Component, pageProps, router }: AppProps) {
   }
 
   const isAdminRoute = !!router.route.startsWith('/admin');
+  const isAuthenticationRoute = AuthenticationRoutes.includes(router.route);
   const getLayout = isAdminRoute
     ? (page: ReactNode) => <AdminLayout>{page}</AdminLayout>
-    : (page: ReactNode) => <>{page}</>;
+    : (page: ReactNode) => <Layout>{page}</Layout>;
 
   return (
     <IntlProvider
@@ -37,7 +52,11 @@ export default function App({ Component, pageProps, router }: AppProps) {
       defaultLocale={defaultLocale}
       messages={message}>
       <Provider store={reduxStore}>
-        {getLayout(<Component {...pageProps} />)}
+        <AuthGuard
+          isRequiredAuth={isRequiredAuth}
+          isAuthenticationRoute={isAuthenticationRoute}>
+          {getLayout(<Component {...pageProps} />)}
+        </AuthGuard>
       </Provider>
     </IntlProvider>
   );
