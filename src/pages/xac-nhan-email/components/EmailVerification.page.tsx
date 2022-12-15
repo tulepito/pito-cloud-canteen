@@ -1,7 +1,6 @@
 import { emailVerificationThunks } from '@redux/slices/emailVerification.slice';
 import type { AppDispatch, RootState } from '@redux/store';
 import { ensureCurrentUser } from '@utils/data';
-import { parse } from '@utils/urlHelpers';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -10,20 +9,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import css from './EmailVerification.module.scss';
 import EmailVerificationForm from './EmailVerificationForm';
 
-const parseVerificationToken = (search: any) => {
-  const urlParams = parse(search);
-  const verificationToken = urlParams.t;
-
-  if (verificationToken) {
-    return `${verificationToken}`;
-  }
-
-  return null;
-};
-
 const EmailVerificationPage = () => {
   const router = useRouter();
-  const { query, isReady } = router;
+  const { query } = router;
+  const { t: verificationToken } = query;
   const { currentUser } = useSelector((state: RootState) => state.user);
 
   const { verificationInProgress, verificationError } = useSelector(
@@ -32,18 +21,16 @@ const EmailVerificationPage = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const initialValues = {
-    verificationToken: parseVerificationToken(isReady ? query : null),
+    verificationToken: verificationToken || null,
   };
   const user = ensureCurrentUser(currentUser);
 
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   const submitVerification = ({ verificationToken }: Record<string, any>) => {
     dispatch(emailVerificationThunks.verify({ verificationToken }));
   };
 
   useEffect(() => {
-    const verificationToken = parseVerificationToken(isReady ? query : null);
-    console.log(verificationToken);
-
     dispatch(emailVerificationThunks.verify({ verificationToken }));
   }, []);
 

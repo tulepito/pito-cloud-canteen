@@ -91,9 +91,11 @@ const EmailVerificationForm: React.FC<TEmailVerificationFormProps> = (
             </div>
 
             <div className={css.bottomWrapper}>
-              <Link className={css.submitButton} href="/">
-                <FormattedMessage id="EmailVerificationForm.successButtonText" />
-              </Link>
+              <Button>
+                <Link className={css.submitButton} href="/">
+                  <FormattedMessage id="EmailVerificationForm.successButtonText" />
+                </Link>
+              </Button>
             </div>
           </div>
         );
@@ -102,12 +104,12 @@ const EmailVerificationForm: React.FC<TEmailVerificationFormProps> = (
         const alreadyVerifiedButErrorReturned = (
           <div className={css.root}>
             <div>
-              <h1 className={css.modalTitle}>
+              <h2 className={css.modalTitle}>
                 <FormattedMessage
                   id="EmailVerificationForm.noPendingTitle"
                   values={{ name }}
                 />
-              </h1>
+              </h2>
 
               <p className={css.modalMessage}>
                 <FormattedMessage
@@ -118,9 +120,11 @@ const EmailVerificationForm: React.FC<TEmailVerificationFormProps> = (
             </div>
 
             <div className={css.bottomWrapper}>
-              <Link className={css.submitButton} href="/">
-                <FormattedMessage id="EmailVerificationForm.successButtonText" />
-              </Link>
+              <Button>
+                <Link className={css.submitButton} href="/">
+                  <FormattedMessage id="EmailVerificationForm.successButtonText" />
+                </Link>
+              </Button>
             </div>
           </div>
         );
