@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 type TAuthGuard = {
   isRequiredAuth: boolean;
+  isAuthenticationRoute: boolean;
 };
 
 const AuthGuard: React.FC<PropsWithChildren<TAuthGuard>> = (props) => {
@@ -17,14 +18,14 @@ const AuthGuard: React.FC<PropsWithChildren<TAuthGuard>> = (props) => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  const { children, isRequiredAuth } = props;
+  const { children, isRequiredAuth, isAuthenticationRoute } = props;
 
   useEffect(() => {
-    if (isRequiredAuth) {
-      if (!authInfoLoaded) {
-        dispatch(authThunks.authInfo());
-      }
+    if (!authInfoLoaded) {
+      dispatch(authThunks.authInfo());
+    }
 
+    if (isRequiredAuth) {
       dispatch(userThunks.fetchCurrentUser(undefined));
     }
   }, [isRequiredAuth]);
@@ -33,7 +34,11 @@ const AuthGuard: React.FC<PropsWithChildren<TAuthGuard>> = (props) => {
     if (authInfoLoaded && !isAuthenticated && isRequiredAuth) {
       router.push('/dang-nhap');
     }
-  }, [isRequiredAuth]);
+
+    if (isAuthenticationRoute && authInfoLoaded && isAuthenticated) {
+      router.push('/');
+    }
+  }, [authInfoLoaded]);
 
   return <>{children}</>;
 };

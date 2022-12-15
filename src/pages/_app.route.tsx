@@ -14,6 +14,7 @@ import { Provider } from 'react-redux';
 import reduxStore from '../redux/store';
 
 const DEFAULT_LOCALE = 'vi-VN';
+const AuthenticationRoutes = ['/dang-nhap', '/dang-ky', '/quen-mat-khau'];
 
 export default function App({
   Component,
@@ -40,6 +41,7 @@ export default function App({
   }
 
   const isAdminRoute = !!router.route.startsWith('/admin');
+  const isAuthenticationRoute = AuthenticationRoutes.includes(router.route);
   const getLayout = isAdminRoute
     ? (page: ReactNode) => <AdminLayout>{page}</AdminLayout>
     : (page: ReactNode) => <Layout>{page}</Layout>;
@@ -50,7 +52,9 @@ export default function App({
       defaultLocale={defaultLocale}
       messages={message}>
       <Provider store={reduxStore}>
-        <AuthGuard isRequiredAuth={isRequiredAuth}>
+        <AuthGuard
+          isRequiredAuth={isRequiredAuth}
+          isAuthenticationRoute={isAuthenticationRoute}>
           {getLayout(<Component {...pageProps} />)}
         </AuthGuard>
       </Provider>
