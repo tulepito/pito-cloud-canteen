@@ -1,3 +1,4 @@
+import Button from '@components/Button/Button';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import {
@@ -90,12 +91,13 @@ const PasswordRecoveryForm: React.FC<TPasswordRecoveryFormProps> = (props) => {
               {recoveryError && (
                 <div className={css.error}>{recoveryError}</div>
               )}
-              <button
+              <Button
+                inProgress={inProgress}
                 className={css.submitButton}
                 type="submit"
                 disabled={submitDisable}>
                 {submitButtonText}
-              </button>
+              </Button>
             </div>
             <div className={css.toSignIn}>
               <div>

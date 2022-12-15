@@ -76,5 +76,18 @@
   "SignUpForm.toSignIn": "Đăng nhập",
   "SignUpPage.signupFailed": "Lỗi đăng ký. Vui lòng kiểm tra thông tin đăng ký và thử lại!",
   "SignUpPage.signupFailedEmailAlreadyTaken": "Email đã được sử dụng cho tài khoản khác. Thử lại hoặc thử đăng nhập!",
-  "SignUpPage.Title": "Đăng ký"
+  "SignUpPage.Title": "Đăng ký",
+  "ResetPasswordForm.password.placeholder": "Nhập mật khẩu",
+  "ResetPasswordForm.password.required": "Vui lòng nhập mật khẩu",
+  "ResetPasswordForm.password.invalid": "Mật khẩu phải từ 8-16 kí tự, bao gồm chữ cái in hoa, chữ cái in thường và con số.",
+  "ResetPasswordForm.submitButtonText": "Đổi mật khẩu",
+  "ResetPasswordPage.helpText": "Vui lòng nhập mật khẩu mới",
+  "ResetPasswordPage.invalidUrlParams": "Có vẻ như liên kêt đã bị hỏng hoặc hết hạn. Thử truy cập đường link được gửi đến trong email của bạn, hoặc yêu câu một đường link mới tại {recoveryLink}.",
+  "ResetPasswordPage.loginButtonText": "Đăng nhập lại",
+  "ResetPasswordPage.mainHeading": "Reset mật khẩu",
+  "ResetPasswordPage.passwordChangedHeading": "Mật khẩu đã được thay đổi",
+  "ResetPasswordPage.passwordChangedHelpText": "Đổi mật khẩu mới thành công",
+  "ResetPasswordPage.recoveryLinkText": "quên mật khẩu",
+  "ResetPasswordPage.resetFailed": "Reset lỗi, vui lòng thử lại!",
+  "ResetPasswordPage.title": "Reset mật khẩu"
 }

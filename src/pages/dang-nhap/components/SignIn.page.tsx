@@ -40,13 +40,11 @@ const SignInPage = () => {
   }, [isAuthenticated]);
 
   return (
-    <div>
-      <SignInForm
-        onSubmit={handleSubmitSignUp}
-        errorMessage={signInErrorMessage}
-        inProgress={authInprogress}
-      />
-    </div>
+    <SignInForm
+      onSubmit={handleSubmitSignUp}
+      errorMessage={signInErrorMessage}
+      inProgress={authInprogress}
+    />
   );
 };
 export default SignInPage;

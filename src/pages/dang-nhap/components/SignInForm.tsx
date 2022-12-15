@@ -1,3 +1,5 @@
+import Button from '@components/Button/Button';
+import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import GoogleIcon from '@components/Icons/GoogleIcon';
@@ -99,12 +101,14 @@ const SignInForm: React.FC<TSignInFormProps> = (props) => {
                 placeholder={emailPlaceholder}
                 validate={emailValidators}
               />
-              <FieldTextInput
+
+              <FieldPasswordInput
                 id={formId ? `${formId}.password` : 'password'}
                 name="password"
                 placeholder={passwordPlaceholder}
                 validate={passwordValidators}
               />
+
               <div className={css.forgotPassword}>
                 <span onClick={navigateToPasswordRecoverPage}>
                   {forgotPasswordText}
@@ -114,20 +118,21 @@ const SignInForm: React.FC<TSignInFormProps> = (props) => {
               {errorMessage && (
                 <div className={css.errorSignIn}>{errorMessage}</div>
               )}
-              <button
+              <Button
                 className={css.submitButton}
                 type="submit"
-                disabled={submitDisable}>
+                disabled={submitDisable}
+                inProgress={inProgress}>
                 {submitButtonText}
-              </button>
+              </Button>
               <div className={css.orText}>
                 <span>{orText}</span>
               </div>
 
-              <button className={css.googleLoginButton} type="button">
+              <Button className={css.googleLoginButton} type="button" disabled>
                 <GoogleIcon className={css.googleIcon} />
                 <span>{googleLoginText}</span>
-              </button>
+              </Button>
             </div>
             <div className={css.doNotHaveAnAccount}>
               <div>

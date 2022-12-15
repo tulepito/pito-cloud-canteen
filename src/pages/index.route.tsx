@@ -27,7 +27,9 @@ export default function Home() {
   return (
     <div className={css.root}>
       <h1>Trang chủ</h1>
-      <Button onClick={handleLogout}>Đăng xuất</Button>
+      <Button onClick={handleLogout} inProgress={logoutInProgress}>
+        Đăng xuất
+      </Button>
     </div>
   );
 }

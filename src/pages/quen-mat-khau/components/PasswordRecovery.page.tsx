@@ -1,4 +1,4 @@
-import { recoverPasswordThunks } from '@redux/slices/passwordRecovery.slice';
+import { passwordThunks } from '@redux/slices/password.slice';
 import type { AppDispatch, RootState } from '@redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -6,12 +6,12 @@ import PasswordRecoveryForm from './PasswordRecoveryForm';
 
 const PasswordRecoverPage = () => {
   const { initialEmail, recoveryInProgress } = useSelector(
-    (state: RootState) => state.passwordRecovery,
+    (state: RootState) => state.password,
   );
   const dispatch = useDispatch<AppDispatch>();
 
   const handleSubmitRecoverPasswordForm = (values: Record<string, any>) => {
-    dispatch(recoverPasswordThunks.recoverPassword(values));
+    dispatch(passwordThunks.recoverPassword(values));
   };
 
   return (
