@@ -90,5 +90,8 @@
   "ResetPasswordPage.recoveryLinkText": "quên mật khẩu",
   "ResetPasswordPage.resetFailed": "Reset lỗi, vui lòng thử lại!",
   "ResetPasswordPage.title": "Reset mật khẩu",
-  "Modal.closeModal": "Đóng"
+  "Modal.closeModal": "Đóng",
+  "CompanySidebar.members": "Thành viên",
+  "CompanySidebar.memberList": "Danh sách nhân viên",
+  "CompanySidebar.groupList": "Danh sách nhóm"
 }
