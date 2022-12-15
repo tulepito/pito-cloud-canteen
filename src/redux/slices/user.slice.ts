@@ -3,7 +3,6 @@
 /* eslint-disable import/no-cycle */
 import type { ThunkAPI } from '@redux/store';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { util as sdkUtil } from '@sharetribe/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import { storableError } from '@utils/errors';
 
@@ -70,25 +69,17 @@ const fetchCurrentUser = createAsyncThunk(
     { dispatch, extra: sdk, rejectWithValue, fulfillWithValue }: ThunkAPI,
   ) => {
     try {
-      const parameters = params || {
-        include: ['profileImage'],
-        'fields.image': [
-          'variants.square-small',
-          'variants.square-small2x',
-          'variants.square-xsmall',
-          'variants.square-xsmall2x',
-        ],
-        'imageVariant.square-xsmall': sdkUtil.objectQueryString({
-          w: 40,
-          h: 40,
-          fit: 'crop',
-        }),
-        'imageVariant.square-xsmall2x': sdkUtil.objectQueryString({
-          w: 80,
-          h: 80,
-          fit: 'crop',
-        }),
-      };
+      const parameters =
+        params ||
+        {
+          // include: ['profileImage'],
+          // 'fields.image': [
+          //   'variants.square-small',
+          //   'variants.square-small2x',
+          //   'variants.square-xsmall',
+          //   'variants.square-xsmall2x',
+          // ],
+        };
 
       const response = await sdk.currentUser.show(parameters);
       const entities = denormalisedResponseEntities(response);
