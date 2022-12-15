@@ -3,7 +3,7 @@ import IconAdd from '@components/IconAdd/IconAdd';
 import IconEdit from '@components/IconEdit/IconEdit';
 import IconEye from '@components/IconEye/IconEye';
 import IconMagnifier from '@components/IconMagnifier/IconMagnifier';
-import IconSpinner from '@components/IconSpinner/IconSprinner';
+import IconSpinner from '@components/IconSpinner/IconSpinner';
 import Meta from '@components/Layout/Meta';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
