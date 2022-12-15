@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React from 'react';
 
-import css from './IconCheckMark.module.scss';
+import css from './IconCheckmark.module.scss';
 
 enum Size {
   SMALL = 'small',
