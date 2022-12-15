@@ -40,14 +40,31 @@
     margin: 0;
   }
 
-  @include viewportLarge {
-    padding: 32px 24px;
+  @include viewportMedium {
     width: min(450px, calc(150% / 2));
   }
+
+  @include viewportLarge {
+    padding: 32px 24px;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
 .resendEmailLink {
   color: $secondaryBlue6;
+  font-weight: $fontWeightBold;
+  cursor: pointer;
+}
+
+.toHomePageLink {
+  columns: $labelBlue;
   font-weight: $fontWeightBold;
   cursor: pointer;
 }

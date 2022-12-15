@@ -35,8 +35,11 @@
 
 .forgotPassword {
   text-align: right;
-  cursor: pointer;
   color: $neutralGray8;
+
+  & > span {
+    cursor: pointer;
+  }
 }
 
 .errorSignIn {
@@ -120,11 +123,11 @@
 
   @include viewportMedium {
     padding: 16px 24px;
+    width: min(450px, calc(150% / 2));
   }
 
   @include viewportLarge {
     padding: 24px 32px;
-    width: min(450px, calc(150% / 2));
   }
 }
 

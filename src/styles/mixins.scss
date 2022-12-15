@@ -11,11 +11,11 @@ $buttonBorderRadius: 8px;
 
   @include viewportMedium {
     padding: 24px;
+    width: min(450px, calc(150% / 2));
   }
 
   @include viewportLarge {
     padding: 24px 32px;
-    width: min(450px, calc(150% / 2));
   }
 
   & input {
