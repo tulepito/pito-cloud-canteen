@@ -19,10 +19,10 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (!logoutInProgress && !isAuthenticated) {
+    if (!isAuthenticated) {
       router.push('/dang-nhap');
     }
-  }, [logoutInProgress, isAuthenticated]);
+  }, [isAuthenticated]);
 
   return (
     <div className={css.root}>

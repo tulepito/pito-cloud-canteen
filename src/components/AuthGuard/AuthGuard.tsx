@@ -21,24 +21,24 @@ const AuthGuard: React.FC<PropsWithChildren<TAuthGuard>> = (props) => {
   const { children, isRequiredAuth, isAuthenticationRoute } = props;
 
   useEffect(() => {
-    if (!authInfoLoaded) {
-      dispatch(authThunks.authInfo());
-    }
+    dispatch(authThunks.authInfo());
 
-    if (isRequiredAuth) {
+    if (isAuthenticated) {
       dispatch(userThunks.fetchCurrentUser(undefined));
     }
-  }, [isRequiredAuth]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    if (authInfoLoaded && !isAuthenticated && isRequiredAuth) {
-      router.push('/dang-nhap');
-    }
+    if (authInfoLoaded) {
+      if (isAuthenticationRoute && isAuthenticated) {
+        router.push('/');
+      }
 
-    if (isAuthenticationRoute && authInfoLoaded && isAuthenticated) {
-      router.push('/');
+      if (isRequiredAuth) {
+        if (!isAuthenticated) router.push('/dang-nhap');
+      }
     }
-  }, [authInfoLoaded]);
+  }, [authInfoLoaded, isAuthenticated]);
 
   return <>{children}</>;
 };
