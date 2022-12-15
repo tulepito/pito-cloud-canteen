@@ -19,7 +19,7 @@ export type TRowData = {
 
 type TTable = {
   columns: TColumn[];
-  rowDatas: TRowData[];
+  data: TRowData[];
   rootClassName?: string;
   tableClassName?: string;
   tableHeadClassName?: string;
@@ -39,7 +39,7 @@ type TTable = {
 const Table = (props: TTable) => {
   const {
     columns = [],
-    rowDatas = [],
+    data = [],
     rootClassName,
     tableClassName,
     tableHeadClassName,
@@ -70,9 +70,9 @@ const Table = (props: TTable) => {
           </tr>
         </thead>
         <tbody className={tableBodyClassName}>
-          {rowDatas.map((row: TRowData, index: number) => (
+          {data.map((row: TRowData) => (
             <tr className={tableBodyRowClassName} key={row.key}>
-              {columns.map((col: TColumn) => (
+              {columns.map((col: TColumn, index: number) => (
                 <td
                   className={tableBodyCellClassName}
                   data-label={col.label}
