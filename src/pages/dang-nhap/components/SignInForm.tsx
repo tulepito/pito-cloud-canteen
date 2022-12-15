@@ -105,10 +105,10 @@ const SignInForm: React.FC<TSignInFormProps> = (props) => {
                 placeholder={passwordPlaceholder}
                 validate={passwordValidators}
               />
-              <div
-                className={css.forgotPassword}
-                onClick={navigateToPasswordRecoverPage}>
-                {forgotPasswordText}
+              <div className={css.forgotPassword}>
+                <span onClick={navigateToPasswordRecoverPage}>
+                  {forgotPasswordText}
+                </span>
               </div>
 
               {errorMessage && (
