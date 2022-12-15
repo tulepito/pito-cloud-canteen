@@ -1,4 +1,5 @@
 import Button from '@components/Button/Button';
+import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
@@ -112,6 +113,18 @@ const StyleGuidePage = (props: any) => {
               name="confirm-password"
               placeholder="Enter your password"
               label="Confirm password"
+            />
+            <FieldCheckbox
+              id="checkbox-group-1"
+              name="favorites"
+              value="meet"
+              label="Favorites"
+            />
+            <FieldCheckbox
+              id="checkbox-group-2"
+              name="favorites"
+              value="saladF"
+              label="Favorites"
             />
 
             <Button type="submit" fullWidth>
