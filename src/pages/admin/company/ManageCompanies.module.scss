@@ -1,0 +1,93 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+}
+
+.top {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.addButton {
+  width: 40px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  .addIcon {
+    fill: $matterColorLight;
+  }
+}
+
+.searchWrapper {
+  align-items: center;
+  display: flex;
+  margin-bottom: 20px;
+  .searchButton {
+    max-height: 30px;
+    width: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .iconSearch {
+      width: 30px;
+      fill: $matterColorLight;
+    }
+  }
+}
+.active,
+.inActive {
+  max-width: 100px;
+}
+
+.active {
+  color: $matterColorLight;
+  padding: 10px;
+  text-align: center;
+  display: inline;
+  border-radius: 5px;
+  background-color: $successColor;
+}
+
+.inActive {
+  color: $matterColorLight;
+  padding: 10px;
+  display: inline;
+  text-align: center;
+  border-radius: 5px;
+  background-color: $marketplaceColor;
+}
+
+.searchInput {
+  padding: 10px;
+  width: 400px;
+  margin-right: 10px;
+}
+
+.spinner {
+  stroke: $marketplaceColorLight;
+}
+
+.tableActions {
+  display: flex;
+  align-items: center;
+
+  column-gap: 10px;
+  .actionButton {
+    display: flex;
+    align-items: center;
+    width: 40px;
+    min-height: 40px;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: transparent;
+
+    &:hover {
+      background-color: $neutralGray5;
+    }
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}

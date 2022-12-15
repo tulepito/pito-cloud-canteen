@@ -1,3 +1,4 @@
+import Button from '@components/Button/Button';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import classNames from 'classnames';
@@ -207,11 +208,11 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
               {createError && (
                 <p className={css.error}>{createError.message}</p>
               )}
-              <button className={css.button}>
+              <Button className={css.button}>
                 {intl.formatMessage({
                   id: 'EditCompanyForm.add',
                 })}
-              </button>
+              </Button>
             </div>
           </Form>
         );

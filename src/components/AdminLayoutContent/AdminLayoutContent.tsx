@@ -12,7 +12,7 @@ const AdminLayoutContent = (props: any) => {
 
   return (
     <div className={classes} role="main">
-      {children}
+      <div className={css.container}>{children}</div>
     </div>
   );
 };

@@ -9,7 +9,7 @@ import css from './Table.module.scss';
 export type TColumn = {
   key: string | number;
   label: string;
-  render: (e: any) => ReactNode;
+  render: (data: any, index: number) => ReactNode;
 };
 
 export type TRowData = {
@@ -70,14 +70,14 @@ const Table = (props: TTable) => {
           </tr>
         </thead>
         <tbody className={tableBodyClassName}>
-          {rowDatas.map((row: TRowData) => (
+          {rowDatas.map((row: TRowData, index: number) => (
             <tr className={tableBodyRowClassName} key={row.key}>
               {columns.map((col: TColumn) => (
                 <td
                   className={tableBodyCellClassName}
                   data-label={col.label}
                   key={col.key}>
-                  {col.render(row.data)}
+                  {col.render(row.data, index)}
                 </td>
               ))}
             </tr>

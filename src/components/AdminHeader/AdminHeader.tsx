@@ -1,4 +1,5 @@
 import IconBell from '@components/IconBell/IconBell';
+import NamedLink from '@components/NamedLink/NamedLink';
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
@@ -21,14 +22,14 @@ const AdminHeader = () => {
           </ProfileMenuLabel>
           <ProfileMenuContent className={css.profileMenuContent}>
             <ProfileMenuItem key="AccountSettingsPage">
-              <button>
+              <NamedLink>
                 <p>Dang xuat</p>
-              </button>
+              </NamedLink>
             </ProfileMenuItem>
             <ProfileMenuItem key="ABC">
-              <button>
+              <NamedLink>
                 <p>Dang xuat</p>
-              </button>
+              </NamedLink>
             </ProfileMenuItem>
           </ProfileMenuContent>
         </ProfileMenu>

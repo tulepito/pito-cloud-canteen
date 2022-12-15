@@ -1,13 +1,15 @@
+import IconSpinner from '@components/IconSpinner/IconSprinner';
 import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
 import { updateCompanyPageThunks } from '@redux/slices/EditCompanyPage.slice';
 import { getMarketplaceEntities } from '@utils/data';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
 
-import type { TEditCompanyFormValues } from '../components/EditCompanyForm/EditCompanyForm';
-import EditCompanyForm from '../components/EditCompanyForm/EditCompanyForm';
+import type { TEditCompanyFormValues } from '../../components/EditCompanyForm/EditCompanyForm';
+import EditCompanyForm from '../../components/EditCompanyForm/EditCompanyForm';
+import css from './EditCompany.module.scss';
 
-export default function CompanyDetailsPage() {
+export default function EditCompanyPage() {
   const router = useRouter();
   const { query } = router;
   const { companyId } = query;
@@ -83,12 +85,18 @@ export default function CompanyDetailsPage() {
   };
 
   return (
-    <EditCompanyForm
-      onSubmit={onSubmit}
-      initialValues={initialValues}
-      inProgress={showCompanyInProgress}
-      createError={showCompanyError}
-      isEditting={true}
-    />
+    <div className={css.root}>
+      {showCompanyInProgress ? (
+        <IconSpinner className={css.spinner} />
+      ) : (
+        <EditCompanyForm
+          onSubmit={onSubmit}
+          initialValues={initialValues}
+          inProgress={showCompanyInProgress}
+          createError={showCompanyError}
+          isEditting={true}
+        />
+      )}
+    </div>
   );
 }

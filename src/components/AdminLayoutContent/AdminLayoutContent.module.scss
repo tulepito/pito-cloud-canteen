@@ -4,4 +4,12 @@
   margin-top: $adminTopbarHeight;
   padding: 40px;
   margin-left: $adminSidebarWidth;
+  background-color: $neutralGray2;
+  min-height: 100vh;
+}
+
+.container {
+  background-color: $matterColorLight;
+  padding: 50px;
+  box-shadow: $boxShadowPopup;
 }

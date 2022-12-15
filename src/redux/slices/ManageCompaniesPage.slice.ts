@@ -2,7 +2,7 @@
 
 import type { ThunkAPI } from '@redux/store';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getCompaniesApi } from '@utils/api';
+import { getCompaniesApi, updateCompanyStatusApi } from '@utils/api';
 import { entityRefs } from '@utils/data';
 import { storableError } from '@utils/errors';
 import type { TPagination } from '@utils/types';
@@ -16,9 +16,12 @@ interface ManageCompanyState {
   queryCompaniesInProgress: boolean;
   queryCompaniesError: any;
   pagination: TPagination;
+  updateStatusInProgress: boolean;
+  updateStatusError: any;
 }
 
 const QUERY_COMPANIES = 'app/ManageCompanies/QUERY_COMPANIES';
+const UPDATE_COMPANY_STATUS = 'app/ManageCompanies/UPDATE_COMPANY_STATUS';
 
 const queryCompanies = createAsyncThunk(
   QUERY_COMPANIES,
@@ -31,6 +34,24 @@ const queryCompanies = createAsyncThunk(
       dispatch(addMarketplaceEntities(data));
       return fulfillWithValue({ data, page });
     } catch (error) {
+      console.error('Query company error : ', error);
+      return rejectWithValue(storableError(error));
+    }
+  },
+);
+
+const updateCompanyStatus = createAsyncThunk(
+  UPDATE_COMPANY_STATUS,
+  async (
+    updateData: any,
+    { dispatch, fulfillWithValue, rejectWithValue }: ThunkAPI,
+  ) => {
+    try {
+      const { data } = await updateCompanyStatusApi(updateData);
+      dispatch(addMarketplaceEntities(data));
+      return fulfillWithValue(data);
+    } catch (error) {
+      console.error('Update company status error : ', error);
       return rejectWithValue(storableError(error));
     }
   },
@@ -38,12 +59,15 @@ const queryCompanies = createAsyncThunk(
 
 export const manageCompaniesThunks = {
   queryCompanies,
+  updateCompanyStatus,
 };
 
 const initialState: ManageCompanyState = {
   companyRefs: [],
   queryCompaniesInProgress: false,
   queryCompaniesError: true,
+  updateStatusInProgress: false,
+  updateStatusError: null,
   pagination: {
     totalItems: 0,
     totalPages: 0,
@@ -92,6 +116,16 @@ export const manageCompaniesSlice = createSlice({
         ...state,
         queryCompaniesError: action.error.message,
         queryCompaniesInProgress: false,
+      }))
+      .addCase(updateCompanyStatus.pending, (state) => ({
+        ...state,
+        updateStatusInProgress: true,
+        updateStatusError: null,
+      }))
+      .addCase(updateCompanyStatus.rejected, (state, action) => ({
+        ...state,
+        updateStatusInProgress: false,
+        updateStatusError: action.error.message,
       }));
   },
 });

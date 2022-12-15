@@ -3,6 +3,7 @@ import { createCompanyPageThunks } from '@redux/slices/CreateCompanyPage.slice';
 
 import type { TEditCompanyFormValues } from '../components/EditCompanyForm/EditCompanyForm';
 import EditCompanyForm from '../components/EditCompanyForm/EditCompanyForm';
+import css from './CreateCompany.module.scss';
 
 export default function CreateCompanyPage() {
   const dispatch = useAppDispatch();
@@ -38,10 +39,12 @@ export default function CreateCompanyPage() {
     );
   };
   return (
-    <EditCompanyForm
-      onSubmit={onSubmit}
-      inProgress={createCompanyInProgress}
-      createError={createCompanyError}
-    />
+    <div className={css.root}>
+      <EditCompanyForm
+        onSubmit={onSubmit}
+        inProgress={createCompanyInProgress}
+        createError={createCompanyError}
+      />
+    </div>
   );
 }

@@ -1,30 +1,48 @@
+import Button from '@components/Button/Button';
+import IconAdd from '@components/IconAdd/IconAdd';
+import IconEdit from '@components/IconEdit/IconEdit';
+import IconEye from '@components/IconEye/IconEye';
+import IconMagnifier from '@components/IconMagnifier/IconMagnifier';
+import IconSpinner from '@components/IconSpinner/IconSprinner';
 import Meta from '@components/Layout/Meta';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
+import ToggleButton from '@components/ToggleButton/ToggleButton';
 import useBoolean from '@hooks/useBoolean';
-import { useAppDispatch } from '@redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
 import {
   manageCompaniesThunks,
   paginateCompanies,
 } from '@redux/slices/ManageCompaniesPage.slice';
 import type { RootState } from '@redux/store';
 import { getMarketplaceEntities } from '@utils/data';
-import type { TPagination, TUser } from '@utils/types';
+import { ECompanyStatus } from '@utils/enums';
+import type { TPagination, TReverseMapFromEnum, TUser } from '@utils/types';
+import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 
 import css from './ManageCompanies.module.scss';
+
+type TUpdateStatus = {
+  id: string;
+  status: TReverseMapFromEnum<ECompanyStatus>;
+};
+
+type TExtraDataMapToCompanyTable = {
+  updateStatus: (e: TUpdateStatus) => void;
+};
 
 const TABLE_COLUMN: TColumn[] = [
   {
     key: 'id',
     label: '#',
-    render: (data: any) => {
-      return <span>{data.id}</span>;
+    render: (_: any, index: number) => {
+      return <span>{index + 1}</span>;
     },
   },
   {
@@ -59,10 +77,21 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'status',
     label: 'Trang thai',
     render: (data: any) => {
-      return data.status ? (
-        <p className={css.active}>Active</p>
-      ) : (
-        <p className={css.inActive}>Inactive</p>
+      const onClick = (checked: boolean) => {
+        const status = checked
+          ? ECompanyStatus.active
+          : ECompanyStatus.unactive;
+        const updateData = {
+          id: data.id,
+          status,
+        };
+        data.updateStatus(updateData);
+      };
+      return (
+        <ToggleButton
+          onClick={onClick}
+          defaultValue={data.status === ECompanyStatus.active}
+        />
       );
     },
   },
@@ -71,15 +100,27 @@ const TABLE_COLUMN: TColumn[] = [
     label: '',
     render: (data: any) => {
       return (
-        <Link href={`/admin/companies/${data.id}`}>
-          <FormattedMessage id="ManageCompanies.details" />
-        </Link>
+        <div className={css.tableActions}>
+          <Link href={`/admin/company/${data.id}/edit`}>
+            <Button className={classNames(css.actionButton, css.editButton)}>
+              <IconEdit />
+            </Button>
+          </Link>
+          <Link href={`/admin/company/${data.id}`}>
+            <Button className={classNames(css.actionButton, css.editButton)}>
+              <IconEye />
+            </Button>
+          </Link>
+        </div>
       );
     },
   },
 ];
 
-const parseEntitiesToTableData = (companies: TUser[]) => {
+const parseEntitiesToTableData = (
+  companies: TUser[],
+  extraData: TExtraDataMapToCompanyTable,
+) => {
   return companies.map((company) => ({
     key: company.id.uuid,
     data: {
@@ -88,7 +129,9 @@ const parseEntitiesToTableData = (companies: TUser[]) => {
       phone: company.attributes.profile.publicData?.phoneNumber,
       email: company.attributes.email,
       companyName: company.attributes.profile.displayName,
-      status: true,
+      status:
+        company.attributes.profile.metadata.status || ECompanyStatus.unactive,
+      ...extraData,
     },
   }));
 };
@@ -136,16 +179,14 @@ export default function ManageCompanies() {
     id: 'ManageCompanies.description',
   });
 
-  const addMessage = intl.formatMessage({
-    id: 'ManageCompanies.add',
-  });
-
   const {
     companyRefs,
     queryCompaniesInProgress,
     queryCompaniesError,
     pagination,
-  } = useSelector((state: RootState) => state.ManageCompaniesPage);
+  } = useAppSelector((state) => state.ManageCompaniesPage);
+
+  const dispatch = useAppDispatch();
 
   const marketplaceData = useSelector(
     (state: RootState) => state?.marketplaceData,
@@ -165,12 +206,19 @@ export default function ManageCompanies() {
     [companyRefs, pagination, keywordAsString],
   ) as TUser[];
 
-  const companiesTableData = useMemo(
-    () => parseEntitiesToTableData(companies),
-    [companies],
-  );
+  const updateStatus = (updateData: TUpdateStatus) => {
+    dispatch(
+      manageCompaniesThunks.updateCompanyStatus({ dataParams: updateData }),
+    );
+  };
 
-  const dispatch = useAppDispatch();
+  const companiesTableData = useMemo(
+    () =>
+      parseEntitiesToTableData(companies, {
+        updateStatus,
+      }),
+    [companies, updateStatus],
+  );
 
   useEffect(() => {
     if ((!page && companyRefs.length === 0) || mounted) return;
@@ -199,27 +247,29 @@ export default function ManageCompanies() {
   };
 
   return (
-    <>
+    <div className={css.root}>
       <Meta title={title} description={description} />
       <div className={css.top}>
-        <p className={css.title}>{title}</p>
+        <h1 className={css.title}>{title}</h1>
         <Link href={`${pathname}/create`}>
-          <button className={css.button}>{addMessage}</button>
+          <Button className={css.addButton}>
+            <IconAdd className={css.addIcon} />
+          </Button>
         </Link>
       </div>
-      <div>
+      <div className={css.searchWrapper}>
         <input
           name="keyword"
           id="keyword"
           onChange={onKeywordInputChange}
           className={css.searchInput}
         />
-        <button className={css.button} onClick={onSearchKeyword}>
-          {intl.formatMessage({ id: 'ManageCompanies.search' })}
-        </button>
+        <Button className={css.searchButton} onClick={onSearchKeyword}>
+          <IconMagnifier className={css.iconSearch} />
+        </Button>
       </div>
       {queryCompaniesInProgress ? (
-        <p>Loading</p>
+        <IconSpinner className={css.spinner} />
       ) : (
         <Table
           columns={TABLE_COLUMN}
@@ -229,6 +279,6 @@ export default function ManageCompanies() {
         />
       )}
       {queryCompaniesError && <p>{queryCompaniesError.message}</p>}
-    </>
+    </div>
   );
 }

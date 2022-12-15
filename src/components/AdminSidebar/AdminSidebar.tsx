@@ -22,12 +22,12 @@ const SIDEBAR_MENUS: TSidebarMenu[] = [
       {
         id: 'company',
         label: 'AdminSidebar.companyLabel',
-        nameLink: 'Company',
+        nameLink: '/admin/company',
       },
       {
         id: 'partner',
         label: 'AdminSidebar.partnerLabel',
-        nameLink: 'Partner',
+        nameLink: '/admin/partner',
       },
       {
         id: 'custom',

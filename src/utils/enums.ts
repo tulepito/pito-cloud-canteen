@@ -94,3 +94,8 @@ export enum EErrorCode {
   forbidden = 'forbidden',
   missingStripeAccount = 'transaction-missing-stripe-account',
 }
+
+export enum ECompanyStatus {
+  active = 'active',
+  unactive = 'unactive',
+}

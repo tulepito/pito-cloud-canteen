@@ -39,3 +39,6 @@ export const createCompanyApi = (body: any) =>
   post('/api/users/company/create', body);
 
 export const showCompanyApi = (id: string) => get(`/api/users/company/${id}`);
+
+export const updateCompanyStatusApi = (data: any) =>
+  put(`/api/users/company/status`, data);
