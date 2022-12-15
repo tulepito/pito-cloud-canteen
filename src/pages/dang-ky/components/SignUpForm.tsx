@@ -1,4 +1,6 @@
 import Button from '@components/Button/Button';
+import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
+import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import {
@@ -103,12 +105,18 @@ const SignUpForm: React.FC<TSignUpFormProps> = (props) => {
     <FinalForm
       {...restProps}
       render={(formRenderProps: any) => {
-        const { rootClassName, className, formId, handleSubmit, invalid } =
-          formRenderProps;
-
-        const submitDisable = invalid || inProgress;
-
+        const {
+          rootClassName,
+          className,
+          formId,
+          handleSubmit,
+          invalid,
+          values,
+        } = formRenderProps;
         const classes = classNames(rootClassName || css.root, className);
+        const { privacyAndPolicy } = values;
+        const haveAgreed = privacyAndPolicy === true;
+        const submitDisable = !haveAgreed || invalid || inProgress;
 
         return (
           <Form className={classes} onSubmit={handleSubmit}>
@@ -121,34 +129,48 @@ const SignUpForm: React.FC<TSignUpFormProps> = (props) => {
                 placeholder={namePlaceholder}
                 validate={nameValidators}
               />
+
               <FieldTextInput
                 id={formId ? `${formId}.email` : 'email'}
                 name="email"
                 placeholder={emailPlaceholder}
                 validate={emailValidators}
               />
-              <FieldTextInput
+
+              <FieldPasswordInput
                 id={formId ? `${formId}.password` : 'password'}
                 name="password"
                 placeholder={passwordPlaceholder}
                 validate={passwordValidators}
               />
-              <FieldTextInput
+
+              <FieldPasswordInput
                 id={formId ? `${formId}.confirmPassword` : 'confirmPassword'}
                 name="confirmPassword"
                 placeholder={confirmPasswordPlaceholder}
                 validate={confirmPasswordValidators}
               />
+
               <FieldTextInput
                 id={formId ? `${formId}.phoneNumber` : 'phoneNumber'}
                 name="phoneNumber"
                 placeholder={phoneNumberPlaceholder}
                 validate={phoneNumberValidators}
               />
-              <div>
-                {privacyPolicyPartA}
-                <u className={css.privacyPolicyText}>{privacyPolicyPartB}</u>
-              </div>
+
+              <FieldCheckbox
+                id={formId ? `${formId}.privacyAndPolicy` : 'privacyAndPolicy'}
+                name="privacyAndPolicy"
+                label={
+                  <div>
+                    {privacyPolicyPartA}
+                    <u className={css.privacyPolicyText}>
+                      {privacyPolicyPartB}
+                    </u>
+                  </div>
+                }
+              />
+
               {errorMessage && (
                 <div className={css.errorSignUp}>{errorMessage}</div>
               )}
