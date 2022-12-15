@@ -76,8 +76,12 @@ export const passwordFormatValid = (message: string) => (value: string) => {
   return value && PWD_RE.test(value) ? VALID : message;
 };
 
-export const phoneNumberFormatValid = (message: string) => (value: string) => {
-  return value && PHONE_NUMBER_RE.test(value) ? VALID : message;
+export const phoneNumberFormatValid = (message: string) => (value?: string) => {
+  const hasValue = !!value || value === '';
+
+  if (!hasValue) return VALID;
+
+  return PHONE_NUMBER_RE.test(value) ? VALID : message;
 };
 
 export const passwordMatchConfirmPassword =
