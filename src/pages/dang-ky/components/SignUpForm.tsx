@@ -91,11 +91,8 @@ const SignUpForm: React.FC<TSignUpFormProps> = (props) => {
       }),
     ),
   );
-  const phoneNumberValidators = composeValidators(
-    required(intl.formatMessage({ id: 'SignUpForm.phoneNumber.required' })),
-    phoneNumberFormatValid(
-      intl.formatMessage({ id: 'SignUpForm.phoneNumber.invalid' }),
-    ),
+  const phoneNumberValidators = phoneNumberFormatValid(
+    intl.formatMessage({ id: 'SignUpForm.phoneNumber.invalid' }),
   );
 
   const navigateToSignInPage = () => {
@@ -108,6 +105,7 @@ const SignUpForm: React.FC<TSignUpFormProps> = (props) => {
       render={(formRenderProps: any) => {
         const { rootClassName, className, formId, handleSubmit, invalid } =
           formRenderProps;
+
         const submitDisable = invalid || inProgress;
 
         const classes = classNames(rootClassName || css.root, className);
