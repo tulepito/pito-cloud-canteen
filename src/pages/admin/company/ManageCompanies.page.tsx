@@ -47,14 +47,14 @@ const TABLE_COLUMN: TColumn[] = [
   },
   {
     key: 'name',
-    label: 'Ho va Ten',
+    label: 'Họ và tên',
     render: (data: any) => {
       return <span>{data.name}</span>;
     },
   },
   {
     key: 'phone',
-    label: 'So dien thoai',
+    label: 'Số điện thoại',
     render: (data: any) => {
       return <span>{data.phone}</span>;
     },
@@ -68,14 +68,14 @@ const TABLE_COLUMN: TColumn[] = [
   },
   {
     key: 'companyName',
-    label: 'Ten cong ty',
+    label: 'Tên công ty',
     render: (data: any) => {
       return <span>{data.companyName}</span>;
     },
   },
   {
     key: 'status',
-    label: 'Trang thai',
+    label: 'Trạng thái',
     render: (data: any) => {
       const onClick = (checked: boolean) => {
         const status = checked
@@ -273,7 +273,7 @@ export default function ManageCompanies() {
       ) : (
         <Table
           columns={TABLE_COLUMN}
-          rowDatas={companiesTableData}
+          data={companiesTableData}
           pagination={pagination}
           paginationPath="/admin/companies"
         />
