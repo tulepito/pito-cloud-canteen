@@ -67,7 +67,7 @@ const IconVoucher = (props: TIconProps) => {
 
 const StyleGuidePage = (props: any) => {
   const onSubmitHandler = (values: object) => {
-    console.log({ values });
+    console.log('Values:', { values });
   };
   return (
     <FinalForm
