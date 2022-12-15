@@ -1,3 +1,5 @@
+import Button from '@components/Button/Button';
+import ButtonIcon from '@components/ButtonIcon/ButtonIcon';
 import Meta from '@components/Layout/Meta';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
@@ -52,7 +54,7 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'action',
     label: '',
     render: () => {
-      return <button>Hello</button>;
+      return <ButtonIcon>+</ButtonIcon>;
     },
   },
 ];
@@ -144,9 +146,9 @@ export default function CompanyManagementPage() {
       <Meta title={title} description={description} />
       <div className={css.top}>
         <p className={css.title}>{title}</p>
-        <button className={css.button}>{addMessage}</button>
+        <Button>{addMessage}</Button>
       </div>
-      <Table columns={TABLE_COLUMN} rowDatas={TABLE_DATA} />
+      <Table columns={TABLE_COLUMN} data={TABLE_DATA} />
     </>
   );
 }

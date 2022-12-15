@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect, useState } from 'react';
 
-import css from './Button.module.scss';
+import css from './ButtonIcon.module.scss';
 
 type TButtonSize = 'large' | 'medium' | 'small';
 
@@ -17,7 +17,6 @@ type TButton = {
   disabled?: boolean;
   checkmarkClassName?: string;
   size?: TButtonSize;
-  fullWidth?: boolean;
 } & React.ComponentProps<'button'>;
 
 const getButtonSizeClassName = (size: string) => {
@@ -33,7 +32,7 @@ const getButtonSizeClassName = (size: string) => {
   }
 };
 
-const Button = (props: PropsWithChildren<TButton>) => {
+const ButtonIcon = (props: PropsWithChildren<TButton>) => {
   const [mounted, setMounted] = useState(false);
   const {
     rootClassName,
@@ -44,8 +43,7 @@ const Button = (props: PropsWithChildren<TButton>) => {
     disabled = false,
     children,
     checkmarkClassName,
-    size = 'small',
-    fullWidth = false,
+    size = 'medium',
     ...rest
   } = props;
 
@@ -71,7 +69,6 @@ const Button = (props: PropsWithChildren<TButton>) => {
     {
       [css.ready]: ready,
       [css.inProgress]: inProgress,
-      [css.buttonFullWidth]: fullWidth,
     },
   );
 
@@ -87,4 +84,4 @@ const Button = (props: PropsWithChildren<TButton>) => {
   );
 };
 
-export default Button;
+export default ButtonIcon;

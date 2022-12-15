@@ -24,8 +24,8 @@ $buttonBorderRadius: 8px;
 }
 
 @mixin buttonFont {
-  font-weight: $fontWeightBold;
-  font-size: 16px;
+  font-weight: $fontWeightSemiBold;
+  font-size: 14px;
   line-height: 24px;
   letter-spacing: 0.2px;
 }
@@ -35,6 +35,11 @@ $buttonBorderRadius: 8px;
 @mixin buttonText {
   text-align: center;
   text-decoration: none;
+
+  &:focus,
+  &:hover {
+    text-decoration: none;
+  }
 }
 
 @mixin buttonBorders {
@@ -44,21 +49,14 @@ $buttonBorderRadius: 8px;
 
 @mixin button {
   display: block;
-  width: 100%;
-  min-height: 48px;
+  width: auto;
   margin: 0;
-
   /* Padding is only for <a> elements where button styles are applied,
   buttons elements should have zero padding */
-  padding: 12px 20px;
+  padding: 8px 16px;
 
   transition: all $transitionStyleButton;
   cursor: pointer;
-
-  @media (--viewportMedium) {
-    padding: 20px 0 20px 0;
-    min-height: 65px;
-  }
 
   &:focus,
   &:hover {

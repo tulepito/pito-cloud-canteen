@@ -1,4 +1,6 @@
 import Button from '@components/Button/Button';
+import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
+import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import type { TIconProps } from '@utils/types';
@@ -65,7 +67,7 @@ const IconVoucher = (props: TIconProps) => {
 
 const StyleGuidePage = (props: any) => {
   const onSubmitHandler = (values: object) => {
-    console.log({ values });
+    console.log('Values:', { values });
   };
   return (
     <FinalForm
@@ -89,6 +91,8 @@ const StyleGuidePage = (props: any) => {
               name="username"
               validate={requiredMessage}
               leftIcon={<IconVoucher />}
+              label="Username"
+              required
             />
             <FieldTextInput
               id={`email`}
@@ -96,8 +100,36 @@ const StyleGuidePage = (props: any) => {
               validate={requiredMessage}
               placeholder="hello"
               rightIcon={<IconVoucher />}
+              label="Email"
             />
-            <Button type="submit">Submit</Button>
+            <FieldPasswordInput
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              label="Password"
+            />
+            <FieldPasswordInput
+              id="confirm-password"
+              name="confirm-password"
+              placeholder="Enter your password"
+              label="Confirm password"
+            />
+            <FieldCheckbox
+              id="checkbox-group-1"
+              name="favorites"
+              value="meet"
+              label="Favorites"
+            />
+            <FieldCheckbox
+              id="checkbox-group-2"
+              name="favorites"
+              value="saladF"
+              label="Favorites"
+            />
+
+            <Button type="submit" fullWidth>
+              Submit
+            </Button>
           </Form>
         );
       }}

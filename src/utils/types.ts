@@ -351,3 +351,9 @@ export type TPagination = {
 };
 
 export type TErrorCode = TReverseMapFromEnum<typeof EErrorCode>;
+
+export type TFormEvent = React.FormEvent<HTMLInputElement>;
+export type TInputAttributes = React.HTMLAttributes<HTMLInputElement>;
+export type TFormLabel =
+  | React.ReactElement<React.ComponentProps<'label'>>
+  | string;
