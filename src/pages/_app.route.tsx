@@ -1,10 +1,12 @@
 import '../styles/globals.scss';
 
 import AdminLayout from '@components/AdminLayout/AdminLayout';
+import CompanyLayout from '@components/CompanyLayout/CompanyLayout';
 import viMessage from '@translations/vi.json';
 import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
+import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { Provider } from 'react-redux';
 
@@ -27,10 +29,20 @@ export default function App({ Component, pageProps, router }: AppProps) {
   }
 
   const isAdminRoute = !!router.route.startsWith('/admin');
-  const getLayout = isAdminRoute
-    ? (page: ReactNode) => <AdminLayout>{page}</AdminLayout>
-    : (page: ReactNode) => <>{page}</>;
+  const isCompanyRoute = !!router.route.startsWith('/company');
+  // const getLayout = isAdminRoute
+  //   ? (page: ReactNode) => <AdminLayout>{page}</AdminLayout>
+  //   : (page: ReactNode) => <>{page}</>;
 
+  const getLayout = (page: ReactNode) => {
+    if (isAdminRoute) {
+      return <AdminLayout>{page}</AdminLayout>;
+    }
+    if (isCompanyRoute) {
+      return <CompanyLayout>{page}</CompanyLayout>;
+    }
+    return <>{page}</>;
+  };
   return (
     <IntlProvider
       locale={appLocale}
