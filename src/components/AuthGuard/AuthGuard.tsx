@@ -1,10 +1,9 @@
+import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
 import { userThunks } from '@redux/slices/user.slice';
-import type { AppDispatch, RootState } from '@redux/store';
 import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 
 type TAuthGuard = {
   isRequiredAuth: boolean;
@@ -12,10 +11,10 @@ type TAuthGuard = {
 };
 
 const AuthGuard: React.FC<PropsWithChildren<TAuthGuard>> = (props) => {
-  const { authInfoLoaded, isAuthenticated } = useSelector(
-    (state: RootState) => state.auth,
+  const { authInfoLoaded, isAuthenticated } = useAppSelector(
+    (state) => state.auth,
   );
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
   const { children, isRequiredAuth, isAuthenticationRoute } = props;

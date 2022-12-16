@@ -1,12 +1,13 @@
+import { useAppSelector } from '@redux/reduxHooks';
 import { passwordThunks } from '@redux/slices/password.slice';
-import type { AppDispatch, RootState } from '@redux/store';
-import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch } from '@redux/store';
+import { useDispatch } from 'react-redux';
 
 import PasswordRecoveryForm from './PasswordRecoveryForm';
 
 const PasswordRecoverPage = () => {
-  const { initialEmail, recoveryInProgress } = useSelector(
-    (state: RootState) => state.password,
+  const { initialEmail, recoveryInProgress } = useAppSelector(
+    (state) => state.password,
   );
   const dispatch = useDispatch<AppDispatch>();
 

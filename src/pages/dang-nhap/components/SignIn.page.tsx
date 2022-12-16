@@ -1,19 +1,15 @@
+import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
-import type { AppDispatch, RootState } from '@redux/store';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
 
 import SignInForm from './SignInForm';
 
 const SignInPage = () => {
-  const appState = useSelector((state: RootState) => state);
-  const authInprogress = authenticationInProgress(appState);
-  const { loginError, isAuthenticated } = useSelector(
-    (state: RootState) => state.auth,
-  );
-  const dispatch = useDispatch<AppDispatch>();
+  const authInprogress = useAppSelector(authenticationInProgress);
+  const { loginError, isAuthenticated } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
   const signInErrorMessage = loginError ? (
