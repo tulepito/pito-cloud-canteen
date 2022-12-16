@@ -1,11 +1,12 @@
+import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
-import permissionChecker from '@services/permissionChecker';
-import { getIntegrationSdk, getSdk } from '@services/sdk';
+import companyChecker from '@services/permissionChecker/company';
+import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import { randomUUID } from 'crypto';
 import difference from 'lodash/difference';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-const UUID = require('sharetribe-flex-sdk').types;
+const { UUID } = require('sharetribe-flex-sdk').types;
 
 type TMemberApi = {
   id: string;
@@ -26,10 +27,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     case 'GET':
       break;
     case 'POST':
-      {
+      try {
         const { groups = [], members = {} } =
           companyAccount.attributes.profile.metadata;
-
         const newGroupId = randomUUID();
         const newGroup = {
           id: newGroupId,
@@ -37,13 +37,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           members: [...groupMembers],
         };
 
-        groupMembers.forEach((member: any) => {
-          members[member.email] = {
-            ...members[member.email],
-            groups: members[member.email].groups.concat(newGroupId),
+        groupMembers.forEach(({ email }: TMemberApi) => {
+          members[email] = {
+            ...members[email],
+            groups: members[email].groups.concat(newGroupId),
           };
         });
-
+        console.log('=== UPDATE COMPANY ACCOUNT STEP ===');
         const updatedCompanyAccountResponse =
           await integrationSdk.users.updateProfile(
             {
@@ -59,6 +59,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const [updatedCompanyAccount] = denormalisedResponseEntities(
           updatedCompanyAccountResponse,
         );
+
+        console.log('=== UPDATE MEMBER ACCOUNTS STEP ===');
         await Promise.all(
           groupMembers.map(async ({ id }: TMemberApi) => {
             const memberResponse = await integrationSdk.users.show({
@@ -76,6 +78,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           }),
         );
         res.status(200).json(updatedCompanyAccount);
+      } catch (error) {
+        handleError(res, error);
       }
       break;
     case 'PUT':
@@ -206,4 +210,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   }
 }
 
-export default permissionChecker(handler);
+export default cookies(companyChecker(handler));

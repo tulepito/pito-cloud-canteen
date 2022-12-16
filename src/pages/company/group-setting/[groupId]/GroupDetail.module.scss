@@ -1,0 +1,35 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  padding: 24px;
+}
+
+.header {
+  @include flexAlign(flex-end, space-between);
+  padding: 24px;
+  border-bottom: 1px solid $neutralGray5;
+
+  .titleWrapper {
+    flex-basis: 60%;
+  }
+}
+
+.backBtn {
+  @include flexAlign(center);
+  display: inline-flex;
+  cursor: pointer;
+  &:hover {
+    border-bottom: 1px solid $neutralGray5;
+  }
+}
+
+.actionBtns {
+  @include flexAlign(center);
+  div {
+    cursor: pointer;
+    &:first-child {
+      margin-right: 16px;
+    }
+  }
+}

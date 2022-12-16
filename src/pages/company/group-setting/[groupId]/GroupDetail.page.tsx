@@ -1,3 +1,4 @@
+import IconArrow from '@components/IconArrow/IconArrow';
 import IconEdit from '@components/IconEdit/IconEdit';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
@@ -66,7 +67,9 @@ const GroupDetailPage = () => {
     (state) => state.company.groupMembers,
     shallowEqual,
   );
-
+  const fetchGroupDetailInProgress = useAppSelector(
+    (state) => state.company.fetchGroupDetailInProgress,
+  );
   const getGroupNames = (groupIds: string[]) => {
     return filter(groupList, (group: any) => groupIds.includes(group.id))
       .map((group: any) => group.name)
@@ -106,11 +109,34 @@ const GroupDetailPage = () => {
     );
   }, [groupId]);
   return (
-    <>
-      <div className={css.container}>
-        <Table columns={TABLE_COLUMN} data={formattedGroupMembers} />
+    <div className={css.container}>
+      <div className={css.backBtn}>
+        <IconArrow direction="left" />
+        Quay lai
       </div>
-    </>
+      <div className={css.header}>
+        <div className={css.titleWrapper}>
+          <h2>Cai dat nhom</h2>
+          <p>
+            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aliquid,
+            accusantium! Iure porro veritatis, laboriosam non suscipit libero
+            sint nesciunt numquam modi. Quam architecto in amet eius, esse vitae
+            nemo saepe?
+          </p>
+        </div>
+        <div className={css.actionBtns}>
+          <div>Doi ten</div>
+          <div>Xoa nhom</div>
+        </div>
+      </div>
+      <div className={css.container}>
+        <Table
+          columns={TABLE_COLUMN}
+          data={formattedGroupMembers}
+          isLoading={fetchGroupDetailInProgress}
+        />
+      </div>
+    </div>
   );
 };
 

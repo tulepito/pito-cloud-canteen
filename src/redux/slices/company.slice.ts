@@ -12,12 +12,21 @@ type TGroupInfo = {
 interface CompanyState {
   groupList: any;
   fetchGroupListInProgress: boolean;
+  companyMembers: any[];
   groupMembers: any[];
   groupInfo: TGroupInfo;
   workspaceCompanyId: string;
+  fetchGroupDetailInProgress: boolean;
+  fetchCompanyInfoInProgress: boolean;
+  createGroupInProgress: boolean;
+  createGroupError: any;
+
+  deleteGroupInProgress: boolean;
+  deleteGroupError: any;
 }
 
 // ================ Thunk types ================ //
+const COMPANY_INFO = 'app/Company/COMPANY_INFO';
 const GROUP_INFO = 'app/Company/GROUP_INFO';
 const GROUP_DETAIL_INFO = 'app/Company/GROUP_DETAIL_INFO';
 const CREATE_GROUP = 'app/Company/CREATE_GROUP';
@@ -30,7 +39,36 @@ const initialState: CompanyState = {
   groupMembers: [],
   workspaceCompanyId: '639a9857-879a-4090-97a0-032fa3851542',
   groupInfo: {} as TGroupInfo,
+  fetchGroupDetailInProgress: false,
+  companyMembers: [],
+  fetchCompanyInfoInProgress: false,
+  createGroupInProgress: false,
+  createGroupError: null,
+
+  deleteGroupInProgress: false,
+  deleteGroupError: null,
 };
+
+export const companyInfo = createAsyncThunk(
+  COMPANY_INFO,
+  async (_, { getState, extra: sdk }: ThunkAPI) => {
+    const { workspaceCompanyId } = getState().company;
+    const companyAccountResponse = await sdk.users.show({
+      id: workspaceCompanyId,
+    });
+    const [companyAccount] = denormalisedResponseEntities(
+      companyAccountResponse,
+    );
+    const { data: allEmployeesData } = await axios.get(
+      `/api/company/all-employees?companyId=${workspaceCompanyId}`,
+    );
+    const { groups = [] } = companyAccount.attributes.profile.metadata;
+    return {
+      groupList: groups,
+      companyMembers: [...allEmployeesData.data.data],
+    };
+  },
+);
 
 export const groupInfo = createAsyncThunk(
   GROUP_INFO,
@@ -77,15 +115,14 @@ export const groupDetailInfo = createAsyncThunk(
 
 export const createGroup = createAsyncThunk(
   CREATE_GROUP,
-  async (params: any) => {
-    try {
-      const { data } = await axios.post('/api/company/group', {
-        ...params,
-      });
-      return data;
-    } catch (error) {
-      //
-    }
+  async (params: any, { getState }: ThunkAPI) => {
+    const { workspaceCompanyId } = getState().company;
+    const { data: newCompanyAccount } = await axios.post('/api/company/group', {
+      ...params,
+      companyId: workspaceCompanyId,
+    });
+    const { groups } = newCompanyAccount.attributes.profile.metadata;
+    return groups;
   },
 );
 
@@ -132,6 +169,21 @@ export const companySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(companyInfo.pending, (state) => {
+        return {
+          ...state,
+          fetchCompanyInfoInProgress: true,
+        };
+      })
+      .addCase(companyInfo.fulfilled, (state, { payload }) => {
+        const { groupList, companyMembers } = payload;
+        return {
+          ...state,
+          groupList,
+          companyMembers,
+          fetchCompanyInfoInProgress: false,
+        };
+      })
       .addCase(groupInfo.pending, (state) => {
         return {
           ...state,
@@ -145,11 +197,62 @@ export const companySlice = createSlice({
           fetchGroupListInProgress: false,
         };
       })
+      .addCase(groupDetailInfo.pending, (state) => {
+        return {
+          ...state,
+          fetchGroupDetailInProgress: true,
+        };
+      })
       .addCase(groupDetailInfo.fulfilled, (state, { payload }) => {
         return {
           ...state,
           groupInfo: payload?.groupInfo,
           groupMembers: payload?.groupMembers,
+          fetchGroupDetailInProgress: false,
+        };
+      })
+      .addCase(createGroup.pending, (state) => {
+        return {
+          ...state,
+          createGroupInProgress: true,
+          createGroupError: null,
+        };
+      })
+      .addCase(createGroup.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          createGroupInProgress: false,
+          createGroupError: null,
+          groupList: payload,
+        };
+      })
+      .addCase(createGroup.rejected, (state, { payload }) => {
+        return {
+          ...state,
+          createGroupInProgress: false,
+          createGroupError: payload,
+        };
+      })
+      .addCase(deleteGroup.pending, (state) => {
+        return {
+          ...state,
+          deleteGroupInProgress: true,
+          deleteGroupError: null,
+        };
+      })
+      .addCase(deleteGroup.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          deleteGroupInProgress: false,
+          deleteGroupError: null,
+          groupList: payload,
+        };
+      })
+      .addCase(deleteGroup.rejected, (state, { payload }) => {
+        return {
+          ...state,
+          deleteGroupInProgress: false,
+          deleteGroupError: payload,
         };
       });
   },
