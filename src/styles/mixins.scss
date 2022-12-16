@@ -72,3 +72,20 @@ $buttonBorderRadius: 8px;
   align-items: center;
   justify-content: center;
 }
+
+@mixin flexAlign($align, $content: flex-start) {
+  display: flex;
+  align-items: $align;
+  justify-content: $content;
+}
+
+/* css for text
+  $size: font-size
+  $lh: line-height
+  $ls: letter-spacing
+*/
+@mixin text($size, $lh: 1, $ls: 0px) {
+  font-size: $size;
+  line-height: $lh;
+  letter-spacing: $ls;
+}

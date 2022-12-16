@@ -32,6 +32,7 @@ type TTable = {
   paginationPath?: string;
   pagePathParams?: any;
   pageSearchParams?: any;
+  isLoading?: boolean;
 };
 
 const Table = (props: TTable) => {
@@ -51,6 +52,7 @@ const Table = (props: TTable) => {
     paginationPath,
     pagePathParams,
     pageSearchParams,
+    isLoading,
   } = props;
   const rootClasses = classNames(css.root, rootClassName);
   const tableClasses = classNames(css.table, tableClassName);
@@ -66,20 +68,28 @@ const Table = (props: TTable) => {
             ))}
           </tr>
         </thead>
-        <tbody className={tableBodyClassName}>
-          {data.map((row: TRowData) => (
-            <tr className={tableBodyRowClassName} key={row.key}>
-              {columns.map((col: TColumn) => (
-                <td
-                  className={tableBodyCellClassName}
-                  data-label={col.label}
-                  key={col.key}>
-                  {col.render(row.data)}
-                </td>
-              ))}
+        {isLoading ? (
+          <tbody>
+            <tr>
+              <td>Loading...</td>
             </tr>
-          ))}
-        </tbody>
+          </tbody>
+        ) : (
+          <tbody className={tableBodyClassName}>
+            {data.map((row: TRowData) => (
+              <tr className={tableBodyRowClassName} key={row.key}>
+                {columns.map((col: TColumn) => (
+                  <td
+                    className={tableBodyCellClassName}
+                    data-label={col.label}
+                    key={col.key}>
+                    {col.render(row.data)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        )}
       </table>
       <PaginationLinks
         className={paginationLinksClassName}

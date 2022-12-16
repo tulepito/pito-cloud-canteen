@@ -1,12 +1,11 @@
+import { denormalisedResponseEntities } from '@services/data';
+import { getSdk } from '@services/sdk';
 import { UserPermission } from '@src/types/UserPermission';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
-import { denormalisedResponseEntities } from './data';
-import { getSdk } from './sdk';
-
 const needCheckingRequestBodyMethod = ['POST', 'PUT'];
 
-const permissionChecker =
+const companyChecker =
   (handler: NextApiHandler) =>
   async (req: NextApiRequest, res: NextApiResponse) => {
     const apiMethod = req.method as string;
@@ -19,10 +18,9 @@ const permissionChecker =
         message: 'Missing required key',
       });
     }
-    const { company = {}, isPITOAdmin = false } =
+    const { company = {}, isPITOAdmin = true } =
       currentUser.attributes.profile.metadata;
     const userPermission = company[companyId]?.permission;
-
     if (
       !userPermission ||
       userPermission !== UserPermission.BOOKER ||
@@ -35,4 +33,4 @@ const permissionChecker =
     return handler(req, res);
   };
 
-export default permissionChecker;
+export default companyChecker;
