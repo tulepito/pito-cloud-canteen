@@ -1,6 +1,14 @@
 import Button from '@components/Button/Button';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import {
+  composeValidators,
+  composeValidatorsWithAllValues,
+  confirmPassword,
+  emailFormatValid,
+  required,
+} from '@utils/validators';
 import classNames from 'classnames';
 import React from 'react';
 import { Form as FinalForm } from 'react-final-form';
@@ -27,7 +35,7 @@ type TEditCompanyForm = {
   onSubmit: (e: TEditCompanyFormValues) => void;
   initialValues?: TEditCompanyFormValues;
   inProgress: boolean;
-  createError: any;
+  formErrorMessage?: string | null;
   isEditting?: boolean;
 };
 
@@ -39,8 +47,9 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
       render={(fieldRenderProps: any) => {
         const {
           handleSubmit,
-          createError,
+          formErrorMessage,
           isEditting = false,
+          inProgress,
         } = fieldRenderProps;
         return (
           <Form onSubmit={handleSubmit} className={css.form}>
@@ -51,15 +60,20 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
             </h3>
             <div className={css.fields}>
               <FieldTextInput
-                id="firstNname"
+                id="firstName"
                 className={css.field}
-                name="firstNname"
+                name="firstName"
                 label={intl.formatMessage({
                   id: 'EditCompanyForm.firstNameLabel',
                 })}
                 placeholder={intl.formatMessage({
                   id: 'EditCompanyForm.firstNamePlaceholder',
                 })}
+                validate={required(
+                  intl.formatMessage({
+                    id: 'EditCompanyForm.firstNameRequired',
+                  }),
+                )}
               />
               <FieldTextInput
                 id="lastName"
@@ -71,6 +85,11 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                 placeholder={intl.formatMessage({
                   id: 'EditCompanyForm.lastNamePlaceholder',
                 })}
+                validate={required(
+                  intl.formatMessage({
+                    id: 'EditCompanyForm.lastNameRequired',
+                  }),
+                )}
               />
             </div>
             {!isEditting && (
@@ -85,6 +104,18 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                   placeholder={intl.formatMessage({
                     id: 'EditCompanyForm.emailPlaceholder',
                   })}
+                  validate={composeValidators(
+                    required(
+                      intl.formatMessage({
+                        id: 'EditCompanyForm.emailRequired',
+                      }),
+                    ),
+                    emailFormatValid(
+                      intl.formatMessage({
+                        id: 'EditCompanyForm.emailInvalid',
+                      }),
+                    ),
+                  )}
                 />
               </div>
             )}
@@ -99,6 +130,11 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                 placeholder={intl.formatMessage({
                   id: 'EditCompanyForm.phonePlaceholder',
                 })}
+                validate={required(
+                  intl.formatMessage({
+                    id: 'EditCompanyForm.phoneRequired',
+                  }),
+                )}
               />
               <FieldTextInput
                 id="address"
@@ -125,6 +161,11 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                   placeholder={intl.formatMessage({
                     id: 'EditCompanyForm.passwordPlaceholder',
                   })}
+                  validate={required(
+                    intl.formatMessage({
+                      id: 'EditCompanyForm.passwordRequired',
+                    }),
+                  )}
                 />
                 <FieldTextInput
                   id="confirmPassword"
@@ -137,6 +178,19 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                   placeholder={intl.formatMessage({
                     id: 'EditCompanyForm.confirmPasswordPlaceholder',
                   })}
+                  validate={composeValidatorsWithAllValues(
+                    required(
+                      intl.formatMessage({
+                        id: 'EditCompanyForm.confirmPasswordRequired',
+                      }),
+                    ),
+                    confirmPassword(
+                      intl.formatMessage({
+                        id: 'EditCompanyForm.confirmPasswordInvalid',
+                      }),
+                      'password',
+                    ),
+                  )}
                 />
               </div>
             )}
@@ -205,10 +259,11 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
               />
             </div>
             <div className={css.buttonWrapper}>
-              {createError && (
-                <p className={css.error}>{createError.message}</p>
-              )}
-              <Button className={css.button}>
+              {formErrorMessage && <ErrorMessage message={formErrorMessage} />}
+              <Button
+                inProgress={inProgress}
+                disabled={inProgress}
+                className={css.button}>
                 {intl.formatMessage({
                   id: 'EditCompanyForm.add',
                 })}

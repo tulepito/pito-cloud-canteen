@@ -1,10 +1,11 @@
 import Button from '@components/Button/Button';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconAdd from '@components/IconAdd/IconAdd';
 import IconEdit from '@components/IconEdit/IconEdit';
 import IconEye from '@components/IconEye/IconEye';
-import IconMagnifier from '@components/IconMagnifier/IconMagnifier';
 import IconSpinner from '@components/IconSpinner/IconSpinner';
 import Meta from '@components/Layout/Meta';
+import SelectSingleFilterPopup from '@components/SelectSingleFilterPopup/SelectSingleFilterPopup';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
@@ -21,11 +22,12 @@ import type { TPagination, TReverseMapFromEnum, TUser } from '@utils/types';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import type { ChangeEvent } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 
+import type { TKeywordSearchFormValues } from './components/KeywordSearchForm/KeywordSearchForm';
+import KeywordSearchForm from './components/KeywordSearchForm/KeywordSearchForm';
 import css from './ManageCompanies.module.scss';
 
 type TUpdateStatus = {
@@ -41,8 +43,8 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'id',
     label: '#',
-    render: (_: any, index: number) => {
-      return <span>{index + 1}</span>;
+    render: (data: any) => {
+      return <span>{data.index + 1}</span>;
     },
   },
   {
@@ -89,6 +91,8 @@ const TABLE_COLUMN: TColumn[] = [
       };
       return (
         <ToggleButton
+          name={data.id}
+          id={data.id}
           onClick={onClick}
           defaultValue={data.status === ECompanyStatus.active}
         />
@@ -121,9 +125,10 @@ const parseEntitiesToTableData = (
   companies: TUser[],
   extraData: TExtraDataMapToCompanyTable,
 ) => {
-  return companies.map((company) => ({
+  return companies.map((company, index) => ({
     key: company.id.uuid,
     data: {
+      index,
       id: company.id.uuid,
       name: company.attributes.profile.displayName,
       phone: company.attributes.profile.publicData?.phoneNumber,
@@ -147,16 +152,39 @@ const sliceCompanies = (
   );
 };
 
-const filterCompanies = (companies: TUser[], keyword: string) => {
-  if (!keyword) return companies;
+const filterCompanies = (companies: TUser[], filterValues: any) => {
+  const { keyword, status } = filterValues;
+  if (!keyword && !status) return companies;
+  if (!keyword && status) {
+    return companies.filter(
+      (company) =>
+        Number(status) === company.attributes.profile.metadata.status,
+    );
+  }
+  if (keyword && !status) {
+    return companies.filter(
+      (company) =>
+        company.id.uuid.toLowerCase().includes(keyword) ||
+        company.attributes.profile.displayName
+          .toLowerCase()
+          .includes(keyword) ||
+        company.attributes.profile.privateData?.phoneNumber
+          ?.toLowerCase()
+          .includes(keyword) ||
+        company.attributes.email.toLowerCase().includes(keyword),
+    );
+  }
   return companies.filter((company) => {
     if (
-      company.id.uuid.toLowerCase().includes(keyword) ||
-      company.attributes.profile.displayName.toLowerCase().includes(keyword) ||
-      company.attributes.profile.privateData?.phoneNumber
-        ?.toLowerCase()
-        .includes(keyword) ||
-      company.attributes.email.toLowerCase().includes(keyword)
+      status === company.attributes.profile.metadata.status &&
+      (company.id.uuid.toLowerCase().includes(keyword) ||
+        company.attributes.profile.displayName
+          .toLowerCase()
+          .includes(keyword) ||
+        company.attributes.profile.privateData?.phoneNumber
+          ?.toLowerCase()
+          .includes(keyword) ||
+        company.attributes.email.toLowerCase().includes(keyword))
     ) {
       return true;
     }
@@ -164,13 +192,23 @@ const filterCompanies = (companies: TUser[], keyword: string) => {
   });
 };
 
+const companyStatusOptions = [
+  {
+    key: String(ECompanyStatus.active),
+    label: 'Active',
+  },
+  {
+    key: String(ECompanyStatus.unactive),
+    label: 'Unactive',
+  },
+];
+
 export default function ManageCompanies() {
   const intl = useIntl();
   const { value: mounted, setValue: setMounted } = useBoolean(false);
-  const [keywordValue, setKeyWordValue] = useState<string>('');
   const router = useRouter();
   const { query, pathname } = router;
-  const { page = 1, keyword = '' } = query;
+  const { page = 1, keyword = '', status } = query;
   const title = intl.formatMessage({
     id: 'ManageCompanies.title',
   });
@@ -201,14 +239,20 @@ export default function ManageCompanies() {
           getMarketplaceEntities({ marketplaceData }, companyRefs),
           pagination,
         ),
-        keywordAsString.toLowerCase(),
+        {
+          status,
+          keyword: keywordAsString,
+        },
       ),
-    [companyRefs, pagination, keywordAsString],
+    [companyRefs, pagination, keywordAsString, status, marketplaceData],
   ) as TUser[];
 
   const updateStatus = (updateData: TUpdateStatus) => {
     dispatch(
-      manageCompaniesThunks.updateCompanyStatus({ dataParams: updateData }),
+      manageCompaniesThunks.updateCompanyStatus({
+        dataParams: updateData,
+        queryParams: { expand: true },
+      }),
     );
   };
 
@@ -233,18 +277,32 @@ export default function ManageCompanies() {
     dispatch(paginateCompanies(parseInt(page as string, 10)));
   }, [page]);
 
-  const onKeywordInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setKeyWordValue(e.target.value);
-  };
-
-  const onSearchKeyword = () => {
+  const onSearchKeyword = (values: TKeywordSearchFormValues) => {
     router.push({
       pathname,
       query: {
-        keyword: keywordValue,
+        ...query,
+        keyword: values.keyword,
       },
     });
   };
+
+  const onSelectFilter = (values: any) => {
+    router.push({
+      pathname,
+      query: {
+        ...query,
+        ...values,
+      },
+    });
+  };
+
+  const singleFilterInitialValues = useMemo(() => ({ status }), [status]);
+
+  const keywordSearchInitialValues = useMemo(
+    () => ({ keyword: keywordAsString }),
+    [keywordAsString],
+  );
 
   return (
     <div className={css.root}>
@@ -257,28 +315,34 @@ export default function ManageCompanies() {
           </Button>
         </Link>
       </div>
-      <div className={css.searchWrapper}>
-        <input
-          name="keyword"
-          id="keyword"
-          onChange={onKeywordInputChange}
-          className={css.searchInput}
+      <div className={css.filterWrapper}>
+        <KeywordSearchForm
+          initialValues={keywordSearchInitialValues}
+          onSubmit={onSearchKeyword}
         />
-        <Button className={css.searchButton} onClick={onSearchKeyword}>
-          <IconMagnifier className={css.iconSearch} />
-        </Button>
+        <SelectSingleFilterPopup
+          options={companyStatusOptions}
+          label={intl.formatMessage({ id: 'ManageCompanies.status' })}
+          queryParamNames="status"
+          onSelect={onSelectFilter}
+          initialValues={singleFilterInitialValues}
+        />
       </div>
       {queryCompaniesInProgress ? (
-        <IconSpinner className={css.spinner} />
+        <div className={css.loadingContainer}>
+          <IconSpinner className={css.spinner} />
+        </div>
       ) : (
         <Table
           columns={TABLE_COLUMN}
           data={companiesTableData}
           pagination={pagination}
-          paginationPath="/admin/companies"
+          paginationPath="/admin/company"
         />
       )}
-      {queryCompaniesError && <p>{queryCompaniesError.message}</p>}
+      {queryCompaniesError && (
+        <ErrorMessage message={queryCompaniesError.message} />
+      )}
     </div>
   );
 }

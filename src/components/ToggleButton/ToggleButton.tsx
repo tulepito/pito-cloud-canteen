@@ -5,6 +5,8 @@ import React from 'react';
 import css from './ToggleButton.module.scss';
 
 type TToggleButtonProps = {
+  name: string;
+  id: string;
   defaultValue?: boolean;
   className?: string;
   onClick: (e: boolean) => void;
@@ -12,7 +14,7 @@ type TToggleButtonProps = {
 };
 
 const ToggleButton: React.FC<TToggleButtonProps> = (props) => {
-  const { defaultValue, className, onClick, disabled } = props;
+  const { defaultValue, className, onClick, disabled, name, id } = props;
 
   const { value, toggle } = useBoolean(defaultValue);
 
@@ -31,12 +33,12 @@ const ToggleButton: React.FC<TToggleButtonProps> = (props) => {
       <input
         type="checkbox"
         checked={value}
-        name="toggle"
-        id="toggle"
+        name={name}
+        id={id}
         onChange={onClickToggleButton}
         disabled={disabled}
       />
-      <label htmlFor="toggle" className={css.slider}></label>
+      <label htmlFor={id} className={css.slider}></label>
     </div>
   );
 };

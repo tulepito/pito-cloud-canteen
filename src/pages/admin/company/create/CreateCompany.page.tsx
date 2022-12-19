@@ -1,5 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
 import { createCompanyPageThunks } from '@redux/slices/CreateCompanyPage.slice';
+import { isSignupEmailTakenError } from '@utils/errors';
+import { useIntl } from 'react-intl';
 
 import type { TEditCompanyFormValues } from '../components/EditCompanyForm/EditCompanyForm';
 import EditCompanyForm from '../components/EditCompanyForm/EditCompanyForm';
@@ -7,7 +9,7 @@ import css from './CreateCompany.module.scss';
 
 export default function CreateCompanyPage() {
   const dispatch = useAppDispatch();
-
+  const intl = useIntl();
   const { createCompanyInProgress, createCompanyError } = useAppSelector(
     (state) => state.CreateCompanyPage,
   );
@@ -38,12 +40,21 @@ export default function CreateCompanyPage() {
       }),
     );
   };
+
+  const formErrorMessage = isSignupEmailTakenError(createCompanyError)
+    ? intl.formatMessage({
+        id: 'CreateCompanyPage.createCompanyEmailAlreadyTaken',
+      })
+    : intl.formatMessage({
+        id: 'CreateCompanyPage.createCompanyFailed',
+      });
+
   return (
     <div className={css.root}>
       <EditCompanyForm
         onSubmit={onSubmit}
         inProgress={createCompanyInProgress}
-        createError={createCompanyError}
+        formErrorMessage={createCompanyError ? formErrorMessage : null}
       />
     </div>
   );

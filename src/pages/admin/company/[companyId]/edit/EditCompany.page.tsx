@@ -1,23 +1,31 @@
-import IconSpinner from '@components/IconSpinner/IconSprinner';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
+import IconSpinner from '@components/IconSpinner/IconSpinner';
 import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
 import { updateCompanyPageThunks } from '@redux/slices/EditCompanyPage.slice';
 import { getMarketplaceEntities } from '@utils/data';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
+import { useIntl } from 'react-intl';
 
 import type { TEditCompanyFormValues } from '../../components/EditCompanyForm/EditCompanyForm';
 import EditCompanyForm from '../../components/EditCompanyForm/EditCompanyForm';
 import css from './EditCompany.module.scss';
 
 export default function EditCompanyPage() {
+  const intl = useIntl();
   const router = useRouter();
   const { query } = router;
   const { companyId } = query;
 
   const dispatch = useAppDispatch();
 
-  const { showCompanyInProgress, showCompanyError, companyRef } =
-    useAppSelector((state) => state.EditCompanyPage);
+  const {
+    showCompanyInProgress,
+    companyRef,
+    updateCompanyInProgress,
+    updateCompanyError,
+    showCompanyError,
+  } = useAppSelector((state) => state.EditCompanyPage);
 
   const marketplaceData = useAppSelector((state) => state.marketplaceData);
 
@@ -84,19 +92,26 @@ export default function EditCompanyPage() {
     );
   };
 
+  const formErrorMessage = updateCompanyError
+    ? intl.formatMessage({ id: 'EditCompanyPage.updateCompanyFailed' })
+    : null;
+
   return (
     <div className={css.root}>
       {showCompanyInProgress ? (
-        <IconSpinner className={css.spinner} />
+        <div className={css.loadingContainer}>
+          <IconSpinner className={css.spinner} />
+        </div>
       ) : (
         <EditCompanyForm
           onSubmit={onSubmit}
           initialValues={initialValues}
-          inProgress={showCompanyInProgress}
-          createError={showCompanyError}
+          inProgress={updateCompanyInProgress}
+          formErrorMessage={formErrorMessage}
           isEditting={true}
         />
       )}
+      {showCompanyError && <ErrorMessage message={showCompanyError.message} />}
     </div>
   );
 }

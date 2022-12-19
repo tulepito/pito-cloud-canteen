@@ -21,8 +21,9 @@ const creatCompany = createAsyncThunk(
       const { data } = await createCompanyApi(userData);
       dispatch(addMarketplaceEntities(data));
       return fulfillWithValue(data);
-    } catch (error) {
-      return rejectWithValue(storableError(error));
+    } catch (error: any) {
+      console.log(error);
+      return rejectWithValue(storableError(error.response.data));
     }
   },
 );
@@ -54,7 +55,7 @@ export const editCompanySlice = createSlice({
       .addCase(creatCompany.rejected, (state, action) => ({
         ...state,
         createCompanyInProgress: false,
-        createCompanyError: action.error.message,
+        createCompanyError: action.payload,
       }));
   },
 });
