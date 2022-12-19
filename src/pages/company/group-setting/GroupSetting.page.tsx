@@ -1,13 +1,17 @@
+import Button from '@components/Button/Button';
+import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import CreateGroupModal from '@components/CreateGroupModal/CreateGroupModal';
 import IconDelete from '@components/IconDelete/IconDelete';
 import IconEdit from '@components/IconEdit/IconEdit';
+import IconOutlinePlus from '@components/IconOutlinePlus/IconOutlinePlus';
+import IconSpinner from '@components/IconSpinner/IconSprinner';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import useBoolean from '@hooks/useBoolean';
 import { useAppDispatch, useAppSelector } from '@src/redux/reduxHooks';
-import { companyInfo } from '@src/redux/slices/company.slice';
+import { companyInfo, deleteGroup } from '@src/redux/slices/company.slice';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import css from './GroupSetting.module.scss';
@@ -25,12 +29,27 @@ const GroupSettingPage = () => {
     setFalse: onClose,
     setTrue: openCreateGroupModal,
   } = useBoolean();
+
+  const {
+    value: isDeleteGroupConfirmationModalOpen,
+    setFalse: onDeleteGroupConfirmationModalClose,
+    setTrue: openDeleteGroupConfirmationModal,
+  } = useBoolean();
+
+  const [selectingDeleteGroupId, setSelectingDeleteGroupId] =
+    useState<string>('');
   const groupList =
     useAppSelector((state) => state.company.groupList, shallowEqual) || [];
   const companyMembers =
     useAppSelector((state) => state.company.companyMembers, shallowEqual) || [];
   const fetchCompanyInfoInProgress = useAppSelector(
     (state) => state.company.fetchCompanyInfoInProgress,
+  );
+  const deleteGroupInProgress = useAppSelector(
+    (state) => state.company.deleteGroupInProgress,
+  );
+  const deletingGroupId = useAppSelector(
+    (state) => state.company.deletingGroupId,
   );
   const formattedGroupList = useMemo<TRowData[]>(
     () =>
@@ -70,19 +89,33 @@ const GroupSettingPage = () => {
       key: 'actions',
       label: '',
       render: ({ id }: TGroupItem) => {
+        const showLoadingIcon = deleteGroupInProgress && id === deletingGroupId;
         const onEditGroup = () => {
           router.push(`/company/group-setting/${id}`);
+        };
+        const onDeleteGroup = () => {
+          setSelectingDeleteGroupId(id);
+          openDeleteGroupConfirmationModal();
         };
         return (
           <>
             <IconEdit className={css.editBtn} onClick={onEditGroup} />
-            <IconDelete className={css.deleteBtn} />
+            {showLoadingIcon ? (
+              <IconSpinner className={css.loading} />
+            ) : (
+              <IconDelete className={css.deleteBtn} onClick={onDeleteGroup} />
+            )}
           </>
         );
       },
     },
   ];
 
+  const onConfirmDeleteGroup = () => {
+    dispatch(deleteGroup(selectingDeleteGroupId)).then(() =>
+      onDeleteGroupConfirmationModalClose(),
+    );
+  };
   useEffect(() => {
     dispatch(companyInfo());
   }, []);
@@ -98,9 +131,10 @@ const GroupSettingPage = () => {
             nemo saepe?
           </p>
         </div>
-        <div className={css.addGroupBtn} onClick={openCreateGroupModal}>
-          Add
-        </div>
+        <Button className={css.createGroupBtn} onClick={openCreateGroupModal}>
+          <IconOutlinePlus />
+          Them nhom
+        </Button>
       </div>
       <div className={css.tableContainer}>
         <Table
@@ -113,6 +147,17 @@ const GroupSettingPage = () => {
         isOpen={isOpenCreateGroupModal}
         onClose={onClose}
         companyMembers={companyMembers}
+      />
+      <ConfirmationModal
+        id="DeleteGroupModal"
+        isOpen={isDeleteGroupConfirmationModalOpen}
+        onClose={onDeleteGroupConfirmationModalClose}
+        confirmText="Dong y"
+        cancelText="Bo qua"
+        title={`Ban co muon xoa khong?`}
+        isConfirmButtonLoading={deleteGroupInProgress}
+        onConfirm={onConfirmDeleteGroup}
+        onCancel={onDeleteGroupConfirmationModalClose}
       />
     </div>
   );

@@ -1,18 +1,20 @@
 import Button from '@components/Button/Button';
-import CreateGroupForm from '@components/CreateGroupForm/CreateGroupForm';
 import IconModalClose from '@components/IconModalClose/IconModalClose';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import classNames from 'classnames';
 
-import css from './CreateGroupModal.module.scss';
+import AddNewMembersForm from '../AddNewMembersForm/AddNewMembersForm';
+import css from './AddNewMembersModal.module.scss';
 
-type CreateGroupModalProps = {
+type AddNewMembersModalProps = {
   isOpen: boolean;
   companyMembers: any[];
+  groupMembers: any[];
+  groupId: string;
   onClose: () => void;
 };
-const CreateGroupModal: React.FC<CreateGroupModalProps> = (props) => {
-  const { isOpen, onClose, companyMembers } = props;
+const AddNewMembersModal: React.FC<AddNewMembersModalProps> = (props) => {
+  const { isOpen, onClose, companyMembers, groupMembers, groupId } = props;
   const modalClasses = classNames(css.modal, {
     [css.open]: isOpen,
   });
@@ -25,11 +27,15 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = (props) => {
         <OutsideClickHandler onOutsideClick={onClose}>
           <div className={css.modalContainer}>
             <div className={css.modalHeader}>
-              <span className={css.modalTitle}>Tao nhom moi</span>
+              <span className={css.modalTitle}>Them thanh vien</span>
               <IconModalClose onClick={onClose} />
             </div>
             <div className={css.modalContent}>
-              <CreateGroupForm companyMembers={companyMembers} />
+              <AddNewMembersForm
+                companyMembers={companyMembers}
+                groupMembers={groupMembers}
+                groupId={groupId}
+              />
             </div>
             <div className={css.modalFooter}>
               <Button className={css.cancelBtn} onClick={onClose}>
@@ -43,4 +49,4 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = (props) => {
   );
 };
 
-export default CreateGroupModal;
+export default AddNewMembersModal;

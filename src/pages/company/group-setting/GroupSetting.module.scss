@@ -12,6 +12,13 @@
   .titleWrapper {
     flex-basis: 60%;
   }
+
+  .createGroupBtn {
+    @include flexAlign(center, space-between);
+    width: 164px;
+    height: 48px;
+    font-size: 16px;
+  }
 }
 
 .tableContainer {
@@ -26,4 +33,13 @@
 
 .deleteBtn {
   cursor: pointer;
+}
+
+.loading {
+  width: 24px;
+  height: 24px;
+
+  circle {
+    stroke: $matterColorDark;
+  }
 }

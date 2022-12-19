@@ -12,6 +12,7 @@
 
   .titleWrapper {
     flex-basis: 60%;
+    height: 108px;
   }
 }
 
@@ -26,10 +27,17 @@
 
 .actionBtns {
   @include flexAlign(center);
-  div {
-    cursor: pointer;
-    &:first-child {
-      margin-right: 16px;
-    }
+  .changeNameBtn {
+    margin-right: 16px;
   }
+}
+
+.addMemberBtn {
+  @include flexAlign(center);
+  @include buttonTextColor;
+  font-size: 16px;
+}
+
+.deleteBtn {
+  cursor: pointer;
 }

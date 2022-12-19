@@ -1,11 +1,24 @@
-const IconModalClose = () => {
+import classNames from 'classnames';
+
+import css from './IconModalClose.module.scss';
+
+type IconModalCloseProps = {
+  onClick: () => void;
+  className?: string;
+};
+const IconModalClose: React.FC<IconModalCloseProps> = ({
+  onClick,
+  className,
+}) => {
   return (
     <svg
+      className={classNames(css.root, className)}
       width="24"
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg">
+      xmlns="http://www.w3.org/2000/svg"
+      onClick={onClick}>
       <path
         fillRule="evenodd"
         clipRule="evenodd"

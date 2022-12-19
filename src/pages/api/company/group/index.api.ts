@@ -4,6 +4,7 @@ import companyChecker from '@services/permissionChecker/company';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import { randomUUID } from 'crypto';
 import difference from 'lodash/difference';
+import differenceBy from 'lodash/differenceBy';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const { UUID } = require('sharetribe-flex-sdk').types;
@@ -90,10 +91,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const currentGroupIndex = groups.findIndex(
           (_group: any) => _group.id === groupId,
         );
+        const newGroupMembers = [
+          ...differenceBy(
+            groups[currentGroupIndex].members,
+            deletedMembers,
+            'id',
+          ),
+          ...addedMembers,
+        ];
         groups[currentGroupIndex] = {
           ...groups[currentGroupIndex],
           ...(groupInfo || {}),
-          members: groupMembers || groups[currentGroupIndex].members,
+          members: newGroupMembers,
         };
 
         addedMembers.forEach(({ email }: TMemberApi) => {
@@ -105,7 +114,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             (_groupId: string) => _groupId !== groupId,
           );
         });
-
+        console.log('=== UPDATE COMPANY ACCOUNT STEP ===');
         const updatedCompanyAccountResponse =
           await integrationSdk.users.updateProfile(
             {
@@ -120,6 +129,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const [updatedCompanyAccount] = denormalisedResponseEntities(
           updatedCompanyAccountResponse,
         );
+        console.log('=== UPDATE ADD MEMBER ACCOUNTS STEP ===');
         await Promise.all(
           addedMembers.map(async ({ id }: TMemberApi) => {
             const memberResponse = await integrationSdk.users.show({
@@ -136,7 +146,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             });
           }),
         );
-
+        console.log('=== UPDATE DELETE MEMBER ACCOUNTS STEP ===');
         await Promise.all(
           deletedMembers.map(async ({ id }: TMemberApi) => {
             const memberResponse = await integrationSdk.users.show({
@@ -158,7 +168,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       }
       break;
     case 'DELETE':
-      {
+      try {
         const { groups = [], members = {} } =
           companyAccount.attributes.profile.metadata;
 
@@ -178,15 +188,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const updatedGroups = groups.filter(
           (_group: any) => _group.id !== groupId,
         );
-
-        await integrationSdk.users.updateProfile({
-          id: new UUID(companyId),
-          metadata: {
-            members,
-            groups: updatedGroups,
-          },
-        });
-
+        console.log('=== UPDATE COMPANY ACCOUNT STEP ===');
+        const updatedCompanyAccountResponse =
+          await integrationSdk.users.updateProfile(
+            {
+              id: new UUID(companyId),
+              metadata: {
+                members,
+                groups: updatedGroups,
+              },
+            },
+            { expand: true },
+          );
+        const [updatedCompanyAccount] = denormalisedResponseEntities(
+          updatedCompanyAccountResponse,
+        );
+        console.log('=== UPDATE MEMBER ACCOUNTS STEP ===');
         await Promise.all(
           onDeletingGroup.members.map(async ({ id }: TMemberApi) => {
             const memberResponse = await integrationSdk.users.show({
@@ -203,6 +220,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             });
           }),
         );
+        res.status(200).json(updatedCompanyAccount);
+      } catch (error) {
+        handleError(res, error);
       }
       break;
     default:
