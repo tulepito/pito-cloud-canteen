@@ -3,28 +3,34 @@ import '../styles/globals.scss';
 import AdminLayout from '@components/AdminLayout/AdminLayout';
 import AuthGuard from '@components/AuthGuard/AuthGuard';
 import Layout from '@components/Layout/Layout';
+import { authThunks } from '@redux/slices/auth.slice';
+import { userThunks } from '@redux/slices/user.slice';
+import wrapper from '@redux/store';
 import viMessage from '@translations/vi.json';
 import type { NextApplicationPage } from '@utils/types';
-import type { Router } from 'next/router';
+import type { AppContext, AppInitialProps, AppProps } from 'next/app';
+import App from 'next/app';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { IntlProvider } from 'react-intl';
 import { Provider } from 'react-redux';
 
-import reduxStore from '../redux/store';
-
 const DEFAULT_LOCALE = 'vi-VN';
 const AuthenticationRoutes = ['/dang-nhap', '/dang-ky', '/quen-mat-khau'];
 
-export default function App({
+type AppCustomProps = {
+  isAuthenticated: boolean;
+  Component?: NextApplicationPage;
+};
+
+const MyApp = ({
   Component,
-  pageProps,
   router,
-}: {
-  Component: NextApplicationPage;
-  pageProps: Record<string, any>;
-  router: Router;
-}) {
+  isAuthenticated,
+  ...restProps
+}: AppProps & AppCustomProps) => {
+  const { store, props } = wrapper.useWrappedStore(restProps);
+
   const { locale, defaultLocale } = useRouter();
   const isRequiredAuth = Component.requireAuth === true;
 
@@ -51,13 +57,37 @@ export default function App({
       locale={appLocale}
       defaultLocale={defaultLocale}
       messages={message}>
-      <Provider store={reduxStore}>
+      <Provider store={store}>
         <AuthGuard
-          isRequiredAuth={isRequiredAuth}
-          isAuthenticationRoute={isAuthenticationRoute}>
-          {getLayout(<Component {...pageProps} />)}
+          isAuthenticated={isAuthenticated}
+          isAuthenticationRoute={isAuthenticationRoute}
+          isRequiredAuth={isRequiredAuth}>
+          {getLayout(<Component {...props.pageProps} />)}
         </AuthGuard>
       </Provider>
     </IntlProvider>
   );
-}
+};
+
+MyApp.getInitialProps = wrapper.getInitialAppProps(
+  (store) =>
+    async (_context: AppContext): Promise<AppInitialProps & AppCustomProps> => {
+      // we can set the initial state from here
+      // we are setting to false but you can run your custom logic here
+      store.dispatch(authThunks.authInfo());
+      const { isAuthenticated } = store.getState().auth;
+
+      if (isAuthenticated) {
+        store.dispatch(userThunks.fetchCurrentUser(undefined));
+      }
+
+      const ctx = await App.getInitialProps(_context);
+
+      return {
+        ...ctx,
+        isAuthenticated,
+      };
+    },
+);
+
+export default MyApp;
