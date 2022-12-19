@@ -10,5 +10,6 @@
   "AdminDashboard.add": "Thêm",
   "PaginationLinks.next": "Next page",
   "PaginationLinks.previous": "Previous page",
-  "PaginationLinks.toPage": "Go to page {page}"
+  "PaginationLinks.toPage": "Go to page {page}",
+  "Modal.closeModal": "Đóng"
 }

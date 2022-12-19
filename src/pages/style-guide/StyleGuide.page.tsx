@@ -3,6 +3,8 @@ import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import Modal from '@components/Modal/Modal';
+import useBoolean from '@hooks/useBoolean';
 import type { TIconProps } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
@@ -66,6 +68,7 @@ const IconVoucher = (props: TIconProps) => {
 };
 
 const StyleGuidePage = (props: any) => {
+  const modalControl = useBoolean(false);
   const onSubmitHandler = (values: object) => {
     console.log({ values });
   };
@@ -92,7 +95,6 @@ const StyleGuidePage = (props: any) => {
               validate={requiredMessage}
               leftIcon={<IconVoucher />}
               label="Username"
-              required
             />
             <FieldTextInput
               id={`email`}
@@ -127,9 +129,61 @@ const StyleGuidePage = (props: any) => {
               label="Favorites"
             />
 
-            <Button type="submit" fullWidth>
+            <Button
+              type="submit"
+              fullWidth
+              inProgress={true}
+              style={{ margin: '8px 0' }}>
+              Loading button
+            </Button>
+            <Button type="submit" fullWidth style={{ margin: '8px 0' }}>
               Submit
             </Button>
+            <Button type="submit" fullWidth disabled>
+              Submit
+            </Button>
+            <Button style={{ margin: '8px 0' }} onClick={modalControl.toggle}>
+              Open modal
+            </Button>
+            <Modal
+              isOpen={modalControl.value}
+              handleClose={modalControl.toggle}
+              title="Thêm đối tác">
+              <FieldPasswordInput
+                id="confirm-password"
+                name="confirm-password"
+                placeholder="Enter your password"
+                label="Confirm password"
+              />
+              <FieldTextInput
+                id={`email`}
+                name="email"
+                validate={requiredMessage}
+                placeholder="hello"
+                rightIcon={<IconVoucher />}
+                label="Email"
+              />
+              <FieldPasswordInput
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                label="Password"
+              />
+              <FieldPasswordInput
+                id="confirm-password"
+                name="confirm-password"
+                placeholder="Enter your password"
+                label="Confirm password"
+              />
+              <FieldTextInput
+                id={`email`}
+                name="email"
+                validate={requiredMessage}
+                placeholder="hello"
+                rightIcon={<IconVoucher />}
+                label="Email"
+              />
+            </Modal>
           </Form>
         );
       }}

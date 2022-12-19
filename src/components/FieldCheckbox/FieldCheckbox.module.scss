@@ -14,27 +14,27 @@
   &:hover + label .box,
   &:focus + label .box,
   &:checked + label .box {
-    stroke: $primaryPri5;
+    stroke: $neutralGray10;
   }
 
   /* successColor version */
   &:hover + label .boxSuccess,
   &:focus + label .boxSuccess,
   &:checked + label .boxSuccess {
-    stroke: $primaryPri5;
+    stroke: $neutralGray10;
   }
 
   /* Display the "check" when checked */
   &:checked + label .checked {
     display: inline;
-    stroke: $primaryPri5;
+    stroke: $neutralGray10;
     stroke-width: 1px;
   }
 
   /* Display the "check" when checked */
   &:checked + label .checkedSuccess {
     display: inline;
-    stroke: $primaryPri5;
+    stroke: $neutralGray10;
     stroke-width: 1px;
   }
 
@@ -66,16 +66,16 @@
 
 .checked {
   display: none;
-  fill: $primaryPri5;
+  fill: $neutralGray10;
 }
 .checkedSuccess {
   display: none;
-  fill: $primaryPri5;
+  fill: $neutralGray10;
 }
 
 .boxSuccess,
 .box {
-  stroke: $primaryPri5;
+  stroke: $neutralGray10;
 }
 
 .text {

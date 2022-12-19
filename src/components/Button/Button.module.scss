@@ -11,11 +11,11 @@
 
 .smallButton {
   font-size: 12px;
-  min-height: 20px;
+  height: 20px;
 }
 .mediumButton {
   font-size: 14px;
-  min-height: 44px;
+  height: 44px;
 }
 .largeButton {
   min-height: 48px;
@@ -23,8 +23,8 @@
 }
 
 .spinner {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   stroke: $neutralGray1;
   stroke-width: 3px;
 }
