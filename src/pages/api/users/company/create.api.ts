@@ -31,15 +31,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const intergrationSdk = getIntegrationSdk();
 
-    // Create master account
-    const masterResponse = await sdk.currentUser.create(dataParams);
+    // Create company account
+    const companyResponse = await sdk.currentUser.create(dataParams);
 
-    const [masterAccount] = denormalisedResponseEntities(masterResponse);
+    const [companyAccount] = denormalisedResponseEntities(companyResponse);
 
     // Create sub master account
     const splittedEmail = dataParams.email.split('@');
     const subResponse = await sdk.currentUser.create({
-      firstName: `Sub account for ${masterAccount.id.uuid}`,
+      firstName: `Sub account for ${companyAccount.id.uuid}`,
       lastName: ' ',
       email: `${splittedEmail[0]}+sub-user@${splittedEmail[1]}`,
     });
@@ -50,7 +50,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const masterAccountAfterUpdateResponse =
       await intergrationSdk.users.updateProfile(
         {
-          id: masterAccount.id,
+          id: companyAccount.id,
           privateData: {
             subAccountId: subAccount.id.uuid,
           },
@@ -61,7 +61,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         queryParams,
       );
 
-    // Update sub master account user type and password
+    // Update sub master account password
     await intergrationSdk.users.updateProfile({
       id: subAccount.id,
       privateData: {
