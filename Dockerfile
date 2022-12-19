@@ -1,4 +1,4 @@
-FROM node:16.15.1 as BASE
+FROM node:16.16.0 as BASE
 
 WORKDIR /app
 COPY package.json yarn.lock ./
@@ -6,16 +6,15 @@ RUN yarn install --frozen-lockfile \
     && yarn cache clean
 
 # Build Image
-FROM node:16.15.1 as BUILD
+FROM node:16.16.0 as BUILD
 
 WORKDIR /app
 COPY --from=BASE /app/node_modules ./node_modules
 COPY . .
-RUN yarn build \
-    && rm -rf node_modules \
-    && yarn install --production --frozen-lockfile --ignore-scripts --prefer-offline
+RUN yarn install --production --frozen-lockfile --ignore-scripts --prefer-offline \
+    && yarn build
 
-FROM node:16.15.1 as PRODUCTION
+FROM node:16.16.0 as PRODUCTION
 WORKDIR /app
 
 COPY --from=BUILD /app/package.json /app/yarn.lock ./
