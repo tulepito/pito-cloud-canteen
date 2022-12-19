@@ -1,24 +1,55 @@
-import type { Action, ThunkAction } from '@reduxjs/toolkit';
+import type {
+  Action,
+  AnyAction,
+  Store,
+  ThunkAction,
+  ThunkDispatch,
+} from '@reduxjs/toolkit';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import { getSdk } from '@services/sdk';
+import { createWrapper, HYDRATE } from 'next-redux-wrapper';
 
-import { sdk } from '../sharetribe/sdk';
+import { createSdkInstance } from '../sharetribe/sdk';
 import * as globalReducers from './slices';
 
-const rootReducer = combineReducers({
+const combinedReducer = combineReducers({
   ...globalReducers,
 });
 
-export const store = configureStore({
-  reducer: rootReducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false,
-      thunk: { extraArgument: sdk },
-    }),
-});
+const rootReducer = (state: RootState, action: AnyAction) => {
+  if (action.type === HYDRATE) {
+    const nextState = {
+      ...state,
+      ...action.payload,
+    };
+    return nextState;
+  }
+  return combinedReducer(state, action);
+};
 
-export type AppDispatch = typeof store.dispatch;
-export type RootState = ReturnType<typeof store.getState>;
+export const makeStore = (context: any) => {
+  let sdk = createSdkInstance();
+
+  if (context?.ctx) {
+    const { ctx } = context;
+    const { req, res } = ctx;
+    sdk = getSdk(req, res);
+  }
+
+  return configureStore({
+    reducer: rootReducer,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: false,
+        thunk: { extraArgument: sdk },
+      }),
+  });
+};
+
+export type AppStore = ReturnType<typeof makeStore>;
+export type AppDispatch = Store['dispatch'] &
+  ThunkDispatch<RootState, null, AnyAction>;
+export type RootState = ReturnType<Store['getState']>;
 export type AppThunk<ReturnType = void> = ThunkAction<
   ReturnType,
   RootState,
@@ -32,4 +63,6 @@ export type ThunkAPI = {
   rejectWithValue?: any;
   fulfillWithValue?: any;
 };
-export default store;
+
+const wrapper = createWrapper<AppStore>(makeStore, { debug: false });
+export default wrapper;

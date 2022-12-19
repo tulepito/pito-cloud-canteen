@@ -141,7 +141,7 @@ const authSlice = createSlice({
           ...state,
           authInfoLoaded: true,
           isAuthenticated: authenticated(payload),
-          authScopes: payload.scopes,
+          authScopes: payload.scopes || [],
         };
       })
 
