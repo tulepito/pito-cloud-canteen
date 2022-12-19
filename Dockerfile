@@ -25,6 +25,6 @@ COPY --from=BUILD /app/public ./public
 COPY --from=BUILD /app/startServer.js ./startServer.js
 COPY --from=BUILD /app/.env ./.env
 
-EXPOSE 3000 3000
+EXPOSE 3000 443
 
 CMD ["yarn", "start"]
