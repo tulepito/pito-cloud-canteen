@@ -14,7 +14,7 @@ export default function Home() {
 
   const handleLogout = async () => {
     await dispatch(authThunks.logout());
-    router.push('/');
+    router.replace('/');
   };
 
   return (
