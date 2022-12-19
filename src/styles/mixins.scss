@@ -86,6 +86,38 @@ $buttonBorderRadius: 8px;
   }
 }
 
+@mixin buttonColorSecondary {
+  background: transparent;
+  color: $neutralGray10;
+  border: 1px solid $neutralGray10;
+  &:focus,
+  &:hover {
+    border-color: $primaryPri5;
+    color: $primaryPri5;
+  }
+
+  &:disabled {
+    color: $neutralGray6;
+    border: 1px solid $neutralGray3;
+  }
+}
+
+@mixin buttonTextColor {
+  background: transparent;
+  color: $primaryPri5;
+  border: none;
+  &:focus,
+  &:hover {
+    background: transparent;
+    border: 1px solid $primaryPri5;
+  }
+
+  &:disabled {
+    color: $neutralGray6;
+    border: 1px solid $neutralGray3;
+  }
+}
+
 // Layout mixins
 
 @mixin flexCenter {

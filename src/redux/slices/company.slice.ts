@@ -23,6 +23,10 @@ interface CompanyState {
 
   deleteGroupInProgress: boolean;
   deleteGroupError: any;
+  deletingGroupId: string;
+
+  updateGroupInProgress: boolean;
+  updateGroupError: any;
 }
 
 // ================ Thunk types ================ //
@@ -47,6 +51,10 @@ const initialState: CompanyState = {
 
   deleteGroupInProgress: false,
   deleteGroupError: null,
+  deletingGroupId: '',
+
+  updateGroupInProgress: false,
+  updateGroupError: null,
 };
 
 export const companyInfo = createAsyncThunk(
@@ -128,31 +136,37 @@ export const createGroup = createAsyncThunk(
 
 export const updateGroup = createAsyncThunk(
   UPDATE_GROUP,
-  async (params: any) => {
-    try {
-      const { data } = await axios.put('/api/company/group', {
-        ...params,
-      });
-      return data;
-    } catch (error) {
-      //
-    }
+  async (
+    { groupId, groupInfo: groupInfoParams, addedMembers, deletedMembers }: any,
+    { getState, dispatch }: ThunkAPI,
+  ) => {
+    const { workspaceCompanyId } = getState().company;
+    await axios.put('/api/company/group', {
+      addedMembers,
+      deletedMembers,
+      groupId,
+      groupInfo: groupInfoParams,
+      companyId: workspaceCompanyId,
+    });
+    return [dispatch(groupDetailInfo({ groupId })), dispatch(groupInfo())];
   },
 );
 
 export const deleteGroup = createAsyncThunk(
   DELETE_GROUP,
-  async (groupId: string) => {
-    try {
-      const { data } = await axios.delete('/api/company/group', {
+  async (groupId: string, { getState }: ThunkAPI) => {
+    const { workspaceCompanyId } = getState().company;
+    const { data: newCompanyAccount } = await axios.delete(
+      '/api/company/group',
+      {
         data: {
           groupId,
+          companyId: workspaceCompanyId,
         },
-      });
-      return data;
-    } catch (error) {
-      //
-    }
+      },
+    );
+    const { groups } = newCompanyAccount.attributes.profile.metadata;
+    return groups;
   },
 );
 
@@ -226,18 +240,20 @@ export const companySlice = createSlice({
           groupList: payload,
         };
       })
-      .addCase(createGroup.rejected, (state, { payload }) => {
+      .addCase(createGroup.rejected, (state, { error }) => {
         return {
           ...state,
           createGroupInProgress: false,
-          createGroupError: payload,
+          createGroupError: error.message,
         };
       })
-      .addCase(deleteGroup.pending, (state) => {
+      .addCase(deleteGroup.pending, (state, { meta }) => {
+        const { arg } = meta;
         return {
           ...state,
           deleteGroupInProgress: true,
           deleteGroupError: null,
+          deletingGroupId: arg,
         };
       })
       .addCase(deleteGroup.fulfilled, (state, { payload }) => {
@@ -246,13 +262,35 @@ export const companySlice = createSlice({
           deleteGroupInProgress: false,
           deleteGroupError: null,
           groupList: payload,
+          deletingGroupId: '',
         };
       })
-      .addCase(deleteGroup.rejected, (state, { payload }) => {
+      .addCase(deleteGroup.rejected, (state, { error }) => {
         return {
           ...state,
           deleteGroupInProgress: false,
-          deleteGroupError: payload,
+          deleteGroupError: error.message,
+          deletingGroupId: '',
+        };
+      })
+      .addCase(updateGroup.pending, (state) => {
+        return {
+          ...state,
+          updateGroupInProgress: true,
+          updateGroupError: null,
+        };
+      })
+      .addCase(updateGroup.fulfilled, (state) => {
+        return {
+          ...state,
+          updateGroupInProgress: false,
+        };
+      })
+      .addCase(updateGroup.rejected, (state, { error }) => {
+        return {
+          ...state,
+          updateGroupInProgress: false,
+          updateGroupError: error.message,
         };
       });
   },
