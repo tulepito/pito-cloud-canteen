@@ -20,6 +20,7 @@ const AuthenticationRoutes = ['/dang-nhap', '/dang-ky', '/quen-mat-khau'];
 
 type AppCustomProps = {
   isAuthenticated: boolean;
+  authInfoLoaded: boolean;
   Component?: NextApplicationPage;
 };
 
@@ -27,6 +28,7 @@ const MyApp = ({
   Component,
   router,
   isAuthenticated,
+  authInfoLoaded,
   ...restProps
 }: AppProps & AppCustomProps) => {
   const { store, props } = wrapper.useWrappedStore(restProps);
@@ -59,10 +61,11 @@ const MyApp = ({
       messages={message}>
       <Provider store={store}>
         <AuthGuard
+          authInfoLoaded={authInfoLoaded}
           isAuthenticated={isAuthenticated}
           isAuthenticationRoute={isAuthenticationRoute}
           isRequiredAuth={isRequiredAuth}>
-          {getLayout(<Component {...props.pageProps} />)}
+          {getLayout(<Component {...props.pageProps} key={router.asPath} />)}
         </AuthGuard>
       </Provider>
     </IntlProvider>
@@ -72,13 +75,11 @@ const MyApp = ({
 MyApp.getInitialProps = wrapper.getInitialAppProps(
   (store) =>
     async (_context: AppContext): Promise<AppInitialProps & AppCustomProps> => {
-      // we can set the initial state from here
-      // we are setting to false but you can run your custom logic here
-      store.dispatch(authThunks.authInfo());
-      const { isAuthenticated } = store.getState().auth;
+      await store.dispatch(authThunks.authInfo());
+      const { isAuthenticated, authInfoLoaded } = store.getState().auth;
 
       if (isAuthenticated) {
-        store.dispatch(userThunks.fetchCurrentUser(undefined));
+        await store.dispatch(userThunks.fetchCurrentUser(undefined));
       }
 
       const ctx = await App.getInitialProps(_context);
@@ -86,6 +87,7 @@ MyApp.getInitialProps = wrapper.getInitialAppProps(
       return {
         ...ctx,
         isAuthenticated,
+        authInfoLoaded,
       };
     },
 );

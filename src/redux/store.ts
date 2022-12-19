@@ -6,7 +6,7 @@ import type {
   ThunkDispatch,
 } from '@reduxjs/toolkit';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import type { Context } from 'next-redux-wrapper';
+import { getSdk } from '@services/sdk';
 import { createWrapper, HYDRATE } from 'next-redux-wrapper';
 
 import { createSdkInstance } from '../sharetribe/sdk';
@@ -27,8 +27,14 @@ const rootReducer = (state: RootState, action: AnyAction) => {
   return combinedReducer(state, action);
 };
 
-export const makeStore = (_context: Context) => {
-  const sdk = createSdkInstance();
+export const makeStore = (context: any) => {
+  let sdk = createSdkInstance();
+
+  if (context?.ctx) {
+    const { ctx } = context;
+    const { req, res } = ctx;
+    sdk = getSdk(req, res);
+  }
 
   return configureStore({
     reducer: rootReducer,
@@ -58,5 +64,5 @@ export type ThunkAPI = {
   fulfillWithValue?: any;
 };
 
-const wrapper = createWrapper<AppStore>(makeStore, { debug: true });
+const wrapper = createWrapper<AppStore>(makeStore, { debug: false });
 export default wrapper;

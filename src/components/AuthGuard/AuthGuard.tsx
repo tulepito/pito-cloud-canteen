@@ -6,23 +6,31 @@ type TAuthGuard = {
   isRequiredAuth: boolean;
   isAuthenticationRoute: boolean;
   isAuthenticated: boolean;
+  authInfoLoaded: boolean;
 };
 
 const AuthGuard: React.FC<PropsWithChildren<TAuthGuard>> = (props) => {
   const router = useRouter();
 
-  const { children, isRequiredAuth, isAuthenticationRoute, isAuthenticated } =
-    props;
+  const {
+    children,
+    isRequiredAuth,
+    isAuthenticationRoute,
+    isAuthenticated,
+    authInfoLoaded,
+  } = props;
 
   useEffect(() => {
-    if (isAuthenticationRoute && isAuthenticated) {
-      router.push('/');
-    }
+    if (authInfoLoaded) {
+      if (isAuthenticationRoute && isAuthenticated) {
+        router.push('/');
+      }
 
-    if (isRequiredAuth) {
-      if (!isAuthenticated) router.push('/dang-nhap');
+      if (isRequiredAuth) {
+        if (!isAuthenticated) router.push('/dang-nhap');
+      }
     }
-  }, [isAuthenticated]);
+  }, [authInfoLoaded, isAuthenticated]);
 
   return <>{children}</>;
 };
