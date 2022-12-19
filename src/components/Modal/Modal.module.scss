@@ -1,0 +1,124 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+.isOpen {
+  width: 100%;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 1;
+
+  & .scrollLayer {
+    flex-grow: 1;
+    display: flex;
+
+    /* Add default background color to avoid bouncing scroll showing the
+   page contents from behind the modal. */
+    background-color: $matterColorLight;
+
+    /* Additional styles for the modal window, dimming the background and positioning the modal */
+    min-height: 100vh;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+
+    @include viewportMedium {
+      justify-content: center;
+      align-items: flex-start;
+      padding: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      background-image: none;
+    }
+  }
+
+  & .container {
+    flex-grow: 1;
+
+    /* Create context so the close button can be positioned within it */
+    position: relative;
+
+    /* Display and dimensions */
+    display: flex;
+    flex-direction: column;
+    padding: 0 24px 24px;
+
+    background-color: $matterColorLight;
+    border-radius: 20px;
+    border: none;
+
+    height: 100vh;
+
+    @include viewportMedium {
+      flex-basis: 600px;
+      flex-grow: 0;
+      min-height: auto;
+      height: auto;
+      top: 72px;
+      padding: 0 36px 36px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @include viewportLarge {
+      flex-basis: 900px;
+    }
+  }
+}
+
+.isClosed {
+  display: none;
+  will-change: opacity;
+  opacity: 0;
+  transition: all 500ms;
+
+  & .container {
+    @include viewportMedium {
+      transform: translateY(-40%);
+      transition: all 500ms;
+      opacity: 0;
+    }
+  }
+}
+
+.close {
+  z-index: calc($zIndexModal + 1);
+
+  /* Safari didn't know how to baseline-align svg icon and text */
+  display: flex;
+  align-items: center;
+  width: auto;
+
+  /* Sizing (touch area) */
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.modalHeader {
+  background-color: transparent;
+  z-index: calc($zIndexModal + 1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 24px;
+  margin-bottom: 8px;
+}
+.title {
+  & span {
+    font-weight: $fontWeightBold;
+    font-size: 20px;
+    line-height: 32px;
+  }
+}
+
+.closeIcon {
+  width: 12px;
+  height: 12px;
+}
+.content {
+}

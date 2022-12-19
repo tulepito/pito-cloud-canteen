@@ -41,7 +41,6 @@
 }
 
 .inputError {
-  border-bottom-color: $failColor;
 }
 
 .inputFullWidth {
@@ -105,4 +104,5 @@
 .labelRequiredRedStar {
   color: $failColor;
   font-weight: $fontWeightSemiBold;
+  margin-left: 2px;
 }

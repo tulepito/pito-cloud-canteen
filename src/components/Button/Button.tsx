@@ -44,7 +44,7 @@ const Button = (props: PropsWithChildren<TButton>) => {
     disabled = false,
     children,
     checkmarkClassName,
-    size = 'small',
+    size = 'large',
     fullWidth = false,
     ...rest
   } = props;
