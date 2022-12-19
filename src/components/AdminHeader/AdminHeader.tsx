@@ -1,3 +1,4 @@
+import HamburgerMenuButton from '@components/HamburgerMenuButton/HamburgerMenuButton';
 import IconBell from '@components/IconBell/IconBell';
 import NamedLink from '@components/NamedLink/NamedLink';
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
@@ -8,9 +9,17 @@ import React from 'react';
 
 import css from './AdminHeader.module.scss';
 
-const AdminHeader = () => {
+type TAdminHeader = {
+  onMenuClick: () => void;
+};
+
+const AdminHeader: React.FC<TAdminHeader> = (props) => {
+  const { onMenuClick } = props;
   return (
     <div className={css.root}>
+      <div className={css.headerRight}>
+        <HamburgerMenuButton onClick={onMenuClick} />
+      </div>
       <div className={css.headerLeft}>
         <IconBell className={css.iconBell} />
         <ProfileMenu>

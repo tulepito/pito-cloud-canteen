@@ -1,3 +1,4 @@
+import HamburgerMenuButton from '@components/HamburgerMenuButton/HamburgerMenuButton';
 import IconHome from '@components/IconHome/IconHome';
 import IconUserManagement from '@components/IconUserManagement/IconUserManagement';
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
@@ -60,11 +61,20 @@ const SIDEBAR_MENUS: TSidebarMenu[] = [
   },
 ];
 
-const AdminSidebar = () => {
+type TAdminSidebar = {
+  onMenuClick: () => void;
+};
+
+const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
+  const { onMenuClick } = props;
   return (
     <div className={css.root}>
       <div className={css.logo}>
         <PitoLogo />
+        <HamburgerMenuButton
+          onClick={onMenuClick}
+          className={css.hamburgerMenu}
+        />
       </div>
       <MultiLevelSidebar menus={SIDEBAR_MENUS} />
     </div>

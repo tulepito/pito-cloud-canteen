@@ -1,0 +1,15 @@
+@use '/src/styles/vars.scss' as *;
+
+.hamburgerMenu {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  justify-content: space-between;
+  div {
+    margin: 3px 0;
+    width: 30px;
+    height: 3px;
+    border-radius: 10px;
+    background-color: $matterColor;
+  }
+}

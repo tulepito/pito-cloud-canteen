@@ -25,7 +25,7 @@ const sortEntries =
     return defaultCompareReturn;
   };
 
-const findEntryFn = (entry) => (e) =>
+const findEntryFn = (entry: any) => (e: any) =>
   e.startTime === entry.startTime && e.endTime === entry.endTime;
 
 const filterStartHours = (
@@ -114,8 +114,8 @@ const getEntryBoundaries =
         const endHour = Number.parseInt(endTime.split(':')[0], 10);
         const hoursBetween = Array(endHour - startHour)
           .fill()
-          .map((v: any, i: any) =>
-            printHourStrings(startHour + i + boundaryDiff),
+          .map((v: any, newI: any) =>
+            printHourStrings(startHour + newI + boundaryDiff),
           );
 
         return allHours.concat(hoursBetween);
@@ -136,7 +136,7 @@ const DailyPlan: React.FC<any> = (props) => {
   const endTimePlaceholder = intl.formatMessage({
     id: 'FieldAvailability.endTimePlaceholder',
   });
-  console.log(values);
+
   return (
     <div className={css.dailyPlan}>
       <div className={css.dayOfWeek}>

@@ -1,12 +1,16 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
   margin-top: $adminTopbarHeight;
-  margin-left: $adminSidebarWidth;
-  background-color: $neutralGray2;
+  background-color: $secondaryBlue1;
   min-height: 100vh;
   border-radius: 3px;
   padding: 30px;
+  transition: all 0.5s;
+  @include viewportLarge {
+    margin-left: $adminSidebarWidth;
+  }
 }
 
 .container {
