@@ -1,0 +1,29 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  flex: 0.5;
+}
+
+.dayButton {
+  border: 1px solid $matterGreyd9;
+  padding: 7px 16px;
+  margin-right: 4px;
+  font-size: 15px;
+  color: $matterGrey8f;
+  border-radius: 20px;
+}
+
+.listDayLabel {
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.dayPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.wrapper {
+  padding: 0 10px;
+}

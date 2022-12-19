@@ -1,0 +1,32 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+}
+
+.select {
+  color: $matterColorAnti;
+  border-bottom-color: $attentionColor;
+  padding-right: 20px;
+
+  & > option {
+    color: $matterColor;
+  }
+  & > option:disabled {
+    color: $matterColorAnti;
+  }
+
+  &:disabled {
+    border-bottom-color: $matterColorNegative;
+    color: $matterColorNegative;
+    cursor: default;
+  }
+}
+
+.selectSuccess {
+  color: $matterColor;
+  border-bottom-color: $marketplaceColor;
+}
+
+.selectError {
+  border-bottom-color: $failColor;
+}

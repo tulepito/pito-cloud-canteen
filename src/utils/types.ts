@@ -6,6 +6,7 @@
 import type Decimal from 'decimal.js';
 
 import type {
+  EAvailabilityPlans,
   EBookingStates,
   EDayOfWeek,
   EErrorCode,
@@ -188,12 +189,14 @@ export type TAvailabilityPlanEntries = {
   end?: string;
 };
 
-export type TAvailabilityPlanType = TReverseMapFromEnum<typeof EDayOfWeek>;
+export type TAvailabilityPlanType = TReverseMapFromEnum<
+  typeof EAvailabilityPlans
+>;
 
 export type TAvailabilityPlan = {
   type: TAvailabilityPlanType;
   timezone: string;
-  entries: TAvailabilityPlanEntries;
+  entries: TAvailabilityPlanEntries[];
 };
 
 export type TOwnListingAttributes = {

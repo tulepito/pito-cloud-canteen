@@ -96,6 +96,11 @@ export enum EErrorCode {
 }
 
 export enum ECompanyStatus {
-  active = 'active',
-  unactive = 'unactive',
+  active = 1,
+  unactive = 0,
+}
+
+export enum EListingType {
+  partner = 'partner',
+  transactionListing = 'transactionListing',
 }

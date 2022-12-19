@@ -33,9 +33,9 @@ const queryCompanies = createAsyncThunk(
       const { data } = await getCompaniesApi();
       dispatch(addMarketplaceEntities(data));
       return fulfillWithValue({ data, page });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Query company error : ', error);
-      return rejectWithValue(storableError(error));
+      return rejectWithValue(storableError(error.response.data));
     }
   },
 );
@@ -50,9 +50,9 @@ const updateCompanyStatus = createAsyncThunk(
       const { data } = await updateCompanyStatusApi(updateData);
       dispatch(addMarketplaceEntities(data));
       return fulfillWithValue(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Update company status error : ', error);
-      return rejectWithValue(storableError(error));
+      return rejectWithValue(storableError(error.response.data));
     }
   },
 );
@@ -114,7 +114,7 @@ export const manageCompaniesSlice = createSlice({
       })
       .addCase(queryCompanies.rejected, (state, action) => ({
         ...state,
-        queryCompaniesError: action.error.message,
+        queryCompaniesError: action.payload,
         queryCompaniesInProgress: false,
       }))
       .addCase(updateCompanyStatus.pending, (state) => ({
@@ -125,7 +125,7 @@ export const manageCompaniesSlice = createSlice({
       .addCase(updateCompanyStatus.rejected, (state, action) => ({
         ...state,
         updateStatusInProgress: false,
-        updateStatusError: action.error.message,
+        updateStatusError: action.payload,
       }));
   },
 });

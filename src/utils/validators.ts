@@ -120,6 +120,12 @@ export const numberMinLength =
     return isNumber && parsedValue >= minimumLength ? VALID : message;
   };
 
+export const confirmPassword =
+  (message: string, fieldNameToCompare: string) =>
+  (value: string, allValues: any) => {
+    return allValues[fieldNameToCompare] === value ? VALID : message;
+  };
+
 export const composeValidatorsWithAllValues =
   (...validators: any) =>
   (value: any, allValues: any, fieldState: any) =>
