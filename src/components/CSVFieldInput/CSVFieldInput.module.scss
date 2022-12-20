@@ -1,0 +1,21 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.label {
+  width: 92px;
+  height: 24px;
+  border: 1px solid $textGray;
+  border-radius: 100px;
+  @include flexAlign(center, center);
+  font-size: 12px;
+  font-weight: $fontWeightBold;
+}
+
+.input {
+  display: none;
+}
+
+.downloadIcon {
+  width: 20px;
+  height: 20px;
+}

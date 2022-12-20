@@ -1,22 +1,34 @@
 import Button from '@components/Button/Button';
+import CSVFieldInput from '@components/CSVFieldInput/CSVFieldInput';
 import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import { useAppDispatch, useAppSelector } from '@src/redux/reduxHooks';
-import { createGroup } from '@src/redux/slices/company.slice';
+import { BookerManageCompany } from '@src/redux/slices/company.slice';
 import { required } from '@utils/validators';
+import { useMemo, useState } from 'react';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 
 import css from './CreateGroupForm.module.scss';
+import LoadedMembers from './LoadedMembers';
 
 type CreateGroupFormProps = {
   companyMembers: any[];
+  originCompanyMembers: any;
+};
+
+const filterCompanyMembers = (companyMember: any[], loadedMembers: any[]) => {
+  return loadedMembers.map((member) =>
+    companyMember[member.email] ? companyMember[member.email] : member,
+  );
 };
 const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
   companyMembers,
+  originCompanyMembers,
 }) => {
   const dispatch = useAppDispatch();
+  const [loadedMembers, setLoadedMemebers] = useState<any[]>([]);
   const createGroupInProgress = useAppSelector(
     (state) => state.company.createGroupInProgress,
   );
@@ -29,7 +41,7 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
         email: member.attributes.email,
       }));
     dispatch(
-      createGroup({
+      BookerManageCompany.createGroup({
         groupInfo: {
           name: groupName,
         },
@@ -37,6 +49,10 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
       }),
     );
   };
+  const formattedLoadedMembers = useMemo(
+    () => filterCompanyMembers(originCompanyMembers, loadedMembers),
+    [originCompanyMembers, loadedMembers],
+  );
   return (
     <FinalForm
       onSubmit={onSubmit}
@@ -52,7 +68,11 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
               rootClassName={css.fieldInput}
               validate={groupNameRequireMessage}
             />
-
+            <CSVFieldInput setData={setLoadedMemebers} />
+            <LoadedMembers
+              formattedLoadedMembers={formattedLoadedMembers}
+              companyMembers={companyMembers}
+            />
             <div className={css.fieldInput}>
               {companyMembers.map((member) => {
                 return (

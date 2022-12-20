@@ -9,7 +9,7 @@ import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import useBoolean from '@hooks/useBoolean';
 import { useAppDispatch, useAppSelector } from '@src/redux/reduxHooks';
-import { companyInfo, deleteGroup } from '@src/redux/slices/company.slice';
+import { BookerManageCompany } from '@src/redux/slices/company.slice';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
@@ -50,6 +50,10 @@ const GroupSettingPage = () => {
   );
   const deletingGroupId = useAppSelector(
     (state) => state.company.deletingGroupId,
+  );
+  const originCompanyMembers = useAppSelector(
+    (state) => state.company.originCompanyMembers,
+    shallowEqual,
   );
   const formattedGroupList = useMemo<TRowData[]>(
     () =>
@@ -112,12 +116,12 @@ const GroupSettingPage = () => {
   ];
 
   const onConfirmDeleteGroup = () => {
-    dispatch(deleteGroup(selectingDeleteGroupId)).then(() =>
+    dispatch(BookerManageCompany.deleteGroup(selectingDeleteGroupId)).then(() =>
       onDeleteGroupConfirmationModalClose(),
     );
   };
   useEffect(() => {
-    dispatch(companyInfo());
+    dispatch(BookerManageCompany.companyInfo());
   }, []);
   return (
     <div className={css.container}>
@@ -147,6 +151,7 @@ const GroupSettingPage = () => {
         isOpen={isOpenCreateGroupModal}
         onClose={onClose}
         companyMembers={companyMembers}
+        originCompanyMembers={originCompanyMembers}
       />
       <ConfirmationModal
         id="DeleteGroupModal"
