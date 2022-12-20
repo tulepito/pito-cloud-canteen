@@ -2,6 +2,7 @@ import '../styles/globals.scss';
 
 import AdminLayout from '@components/AdminLayout/AdminLayout';
 import AuthGuard from '@components/AuthGuard/AuthGuard';
+import CompanyLayout from '@components/CompanyLayout/CompanyLayout';
 import Layout from '@components/Layout/Layout';
 import { authThunks } from '@redux/slices/auth.slice';
 import { userThunks } from '@redux/slices/user.slice';
@@ -12,6 +13,7 @@ import type { AppContext, AppInitialProps, AppProps } from 'next/app';
 import App from 'next/app';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
+import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { Provider } from 'react-redux';
 
@@ -50,10 +52,20 @@ const MyApp = ({
 
   const isAdminRoute = !!router.route.startsWith('/admin');
   const isAuthenticationRoute = AuthenticationRoutes.includes(router.route);
-  const getLayout = isAdminRoute
-    ? (page: ReactNode) => <AdminLayout>{page}</AdminLayout>
-    : (page: ReactNode) => <Layout>{page}</Layout>;
+  const isCompanyRoute = !!router.route.startsWith('/company');
+  // const getLayout = isAdminRoute
+  //   ? (page: ReactNode) => <AdminLayout>{page}</AdminLayout>
+  //   : (page: ReactNode) => <>{page}</>;
 
+  const getLayout = (page: ReactNode) => {
+    if (isAdminRoute) {
+      return <AdminLayout>{page}</AdminLayout>;
+    }
+    if (isCompanyRoute) {
+      return <CompanyLayout>{page}</CompanyLayout>;
+    }
+    return <Layout>{page}</Layout>;
+  };
   return (
     <IntlProvider
       locale={appLocale}

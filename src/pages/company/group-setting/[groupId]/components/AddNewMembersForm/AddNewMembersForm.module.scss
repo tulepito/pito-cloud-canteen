@@ -1,0 +1,16 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+.fieldInput {
+  margin-top: 24px;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.submitBtn {
+  margin: 40px auto 0;
+  width: 400px;
+  height: 48px;
+  @include text(16px);
+}

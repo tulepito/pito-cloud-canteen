@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextRequest } from 'next/server';
 
-const http = require('http');
-const https = require('https');
 const Decimal = require('decimal.js');
 const sharetribeSdk = require('sharetribe-flex-sdk');
 
@@ -26,8 +25,6 @@ const typeHandlers = [
 const baseUrlMaybe = process.env.NEXT_PUBLIC_SHARETRIBE_SDK_BASE_URL
   ? { baseUrl: process.env.NEXT_PUBLIC_SHARETRIBE_SDK_BASE_URL }
   : null;
-const httpAgent = new http.Agent({ keepAlive: true });
-const httpsAgent = new https.Agent({ keepAlive: true });
 
 const memoryStore = (token: string) => {
   const store = sharetribeSdk.tokenStore.memoryStore();
@@ -72,12 +69,10 @@ export const deserialize = (str: string) => {
   return sharetribeSdk.transit.read(str, { typeHandlers });
 };
 
-export const getSdk = (req: NextApiRequest, res: any) => {
+export const getSdk = (req: NextApiRequest | NextRequest, res: any) => {
   return sharetribeSdk.createInstance({
     transitVerbose: TRANSIT_VERBOSE,
     clientId: CLIENT_ID,
-    httpAgent,
-    httpsAgent,
     tokenStore: sharetribeSdk.tokenStore.expressCookieStore({
       clientId: CLIENT_ID,
       req,
@@ -97,8 +92,6 @@ export const getTrustedSdk = (req: NextApiRequest) => {
     transitVerbose: TRANSIT_VERBOSE,
     clientId: CLIENT_ID,
     clientSecret: CLIENT_SECRET,
-    httpAgent,
-    httpsAgent,
     tokenStore: memoryStore(userToken),
     typeHandlers,
     ...baseUrlMaybe,
@@ -119,8 +112,6 @@ export const getTrustedSdk = (req: NextApiRequest) => {
       // instead so that we don't leak the token back to browser client.
       tokenStore: memoryStore(trustedToken),
 
-      httpAgent,
-      httpsAgent,
       typeHandlers,
       ...baseUrlMaybe,
     });

@@ -2,7 +2,7 @@ import ValidationError from '@components/ValidationError/ValidationError';
 import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
-import type { FieldRenderProps } from 'react-final-form';
+import type { FieldProps, FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 
 import css from './FieldTextInput.module.scss';
@@ -137,7 +137,7 @@ const FieldTextInputComponent = (props: InputComponentProps) => {
   );
 };
 
-const FieldTextInput = (props: any) => {
+const FieldTextInput = (props: FieldProps<string, any>) => {
   return <Field component={FieldTextInputComponent} {...props} />;
 };
 
