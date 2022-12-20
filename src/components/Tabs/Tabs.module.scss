@@ -1,18 +1,49 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
 .tabHeaders {
-  display: flex;
-  align-items: center;
+  display: -webkit-inline-box;
   overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
   gap: 32px;
-  margin-bottom: 24px;
+  margin-bottom: 6px;
+  padding-bottom: 10px;
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: none;
+  }
+
+  @include viewportMedium {
+    display: -webkit-inline-box;
+  }
 }
 
 .tabHeaderItem {
-  border-bottom: 1px solid transparent;
-  padding: 4px 0;
+  position: relative;
+  padding: 4px 0 8px;
+  -webkit-tap-highlight-color: transparent;
   cursor: pointer;
-  &.tabActive {
-    border-bottom: 1px solid $primaryPri5;
+  &::after {
+    position: absolute;
+    content: '';
+    height: 1px;
+    width: 0;
+    left: 0;
+    bottom: 0;
+    background-color: $primaryPri5;
+  }
+
+  &.tabActive::after {
+    position: absolute;
+    content: '';
+    height: 1px;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    transition: width 0.3s;
+    background-color: $primaryPri5;
   }
 }
 .tabItemContent {
@@ -23,5 +54,39 @@
 
   &.tabActive {
     color: $neutralGray10;
+    transition: color 0.3s;
   }
+}
+.tabPanel {
+  margin: 0;
+}
+
+.animate {
+  -webkit-animation-duration: 300ms;
+  animation-duration: 300ms;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+.fadeIn {
+  -webkit-animation-name: fadeIn;
+  animation-name: fadeIn;
 }

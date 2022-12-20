@@ -13,6 +13,7 @@ type TTabsItem = {
 interface ITabsProps {
   defaultActiveKey?: string;
   items: TTabsItem[];
+  onChange?: () => void;
 }
 
 const Tabs = (props: ITabsProps) => {
@@ -46,11 +47,15 @@ const Tabs = (props: ITabsProps) => {
     );
   });
 
-  const tabContentIdx = items[+activeTabKey - 1].children;
+  const tabContent = items[+activeTabKey - 1]?.children || '';
+
+  // classes setup
+  const headerClassName = classNames(css.tabHeaders);
+  const contentClassName = classNames(css.tabPanel);
   return (
     <div>
-      <div className={css.tabHeaders}>{tabHeader}</div>
-      <div className={css.tabPanel}>{tabContentIdx}</div>
+      <div className={headerClassName}>{tabHeader}</div>
+      <div className={contentClassName}>{tabContent}</div>
     </div>
   );
 };
