@@ -5,11 +5,76 @@ import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import Layout from '@components/Layout/Layout';
 import Modal from '@components/Modal/Modal';
+import Tabs from '@components/Tabs/Tabs';
 import useBoolean from '@hooks/useBoolean';
 import type { TIconProps } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import { Form as FinalForm } from 'react-final-form';
+
+import css from './StyleGuide.module.scss';
+
+const tabItems = [
+  {
+    label: `Đơn hàng mới`,
+    key: 'don-hang-moi',
+    children: `Content of Tab Pane 1`,
+  },
+  {
+    label: `Đang chờ xác nhận`,
+    key: 'cho-xac-nhan',
+    children: (
+      <div>
+        <h4>Comon let go</h4>
+      </div>
+    ),
+  },
+  {
+    label: `Đã xác nhận`,
+    key: 'da-xac-nhan',
+    children: (
+      <div>
+        <h2>Hello babe</h2>
+      </div>
+    ),
+  },
+  {
+    label: 'Thất bại',
+    key: 'that-bai',
+    children: (
+      <div>
+        <h3>Hello babe</h3>
+      </div>
+    ),
+  },
+  {
+    label: 'Đánh giá',
+    key: 'danh-gia',
+    children: (
+      <div>
+        <h1>Hello babe</h1>
+      </div>
+    ),
+  },
+  {
+    label: 'Trả hàng',
+    key: 'tra-hang',
+    children: (
+      <div>
+        <h1>Hello babe</h1>
+      </div>
+    ),
+  },
+  {
+    label: 'Tổng đơn hàng',
+    key: 'tong-don-hang',
+    children: (
+      <div>
+        <h1>Hello babe</h1>
+      </div>
+    ),
+  },
+];
 
 const IconVoucher = (props: TIconProps) => {
   const { rootClassName, className, ...rest } = props;
@@ -75,89 +140,22 @@ const StyleGuidePage = (props: any) => {
   };
   return (
     <Layout>
-      <FinalForm
-        {...props}
-        onSubmit={onSubmitHandler}
-        render={(fieldRenderProps) => {
-          const { handleSubmit } = fieldRenderProps;
-          const requiredMessage = required('Vui lòng nhập trường dữ liệu');
+      <div className={css.styleGuideContainer}>
+        <FinalForm
+          {...props}
+          onSubmit={onSubmitHandler}
+          render={(fieldRenderProps) => {
+            const { handleSubmit } = fieldRenderProps;
+            const requiredMessage = required('Vui lòng nhập trường dữ liệu');
 
-          return (
-            <Form
-              onSubmit={handleSubmit}
-              style={{
-                width: '640px',
-                padding: '40px',
-                boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.1)',
-                borderRadius: '16px',
-                background: '#ffffff',
-                margin: 'auto',
-              }}>
-              <FieldTextInput
-                id={`username`}
-                name="username"
-                validate={requiredMessage}
-                leftIcon={<IconVoucher />}
-                label="Username"
-              />
-              <FieldTextInput
-                id={`email`}
-                name="email"
-                validate={requiredMessage}
-                placeholder="hello"
-                rightIcon={<IconVoucher />}
-                label="Email"
-              />
-              <FieldPasswordInput
-                id="password"
-                name="password"
-                placeholder="Enter your password"
-                label="Password"
-              />
-              <FieldPasswordInput
-                id="confirm-password"
-                name="confirm-password"
-                placeholder="Enter your password"
-                label="Confirm password"
-              />
-              <FieldCheckbox
-                id="checkbox-group-1"
-                name="favorites"
-                value="meet"
-                label="Favorites"
-              />
-              <FieldCheckbox
-                id="checkbox-group-2"
-                name="favorites"
-                value="saladF"
-                label="Favorites"
-              />
-
-              <Button
-                type="submit"
-                fullWidth
-                inProgress={true}
-                style={{ margin: '8px 0' }}>
-                Loading button
-              </Button>
-              <Button type="submit" fullWidth style={{ margin: '8px 0' }}>
-                Submit
-              </Button>
-              <Button type="submit" fullWidth disabled>
-                Submit
-              </Button>
-              <Button style={{ margin: '8px 0' }} onClick={modalControl.toggle}>
-                Open modal
-              </Button>
-              <Modal
-                isOpen={modalControl.value}
-                handleClose={modalControl.toggle}
-                title="Thêm đối tác">
-                <FieldPasswordInput
-                  id="confirm-password"
-                  name="confirm-password"
-                  placeholder="Enter your password"
-                  label="Confirm password"
+            return (
+              <Form onSubmit={handleSubmit}>
+                <FieldTextInput
+                  id={`username`}
+                  name="username"
+                  validate={requiredMessage}
+                  leftIcon={<IconVoucher />}
+                  label="Username"
                 />
                 <FieldTextInput
                   id={`email`}
@@ -179,19 +177,111 @@ const StyleGuidePage = (props: any) => {
                   placeholder="Enter your password"
                   label="Confirm password"
                 />
-                <FieldTextInput
-                  id={`email`}
-                  name="email"
-                  validate={requiredMessage}
-                  placeholder="hello"
-                  rightIcon={<IconVoucher />}
-                  label="Email"
+                <FieldCheckbox
+                  id="checkbox-group-1"
+                  name="favorites"
+                  value="meet"
+                  label="Favorites"
                 />
-              </Modal>
-            </Form>
-          );
-        }}
-      />
+                <FieldCheckbox
+                  id="checkbox-group-2"
+                  name="favorites"
+                  value="saladF"
+                  label="Favorites"
+                />
+
+                <Button
+                  type="submit"
+                  fullWidth
+                  inProgress={true}
+                  style={{ margin: '8px 0' }}>
+                  Loading button
+                </Button>
+                <Button type="submit" fullWidth style={{ margin: '8px 0' }}>
+                  Submit
+                </Button>
+                <Button type="submit" fullWidth disabled>
+                  Submit
+                </Button>
+                <Button
+                  style={{ margin: '8px 0' }}
+                  onClick={modalControl.toggle}>
+                  Open modal
+                </Button>
+                <Modal
+                  isOpen={modalControl.value}
+                  handleClose={modalControl.toggle}
+                  title="Thêm đối tác">
+                  <FieldPasswordInput
+                    id="confirm-password"
+                    name="confirm-password"
+                    placeholder="Enter your password"
+                    label="Confirm password"
+                  />
+                  <FieldTextInput
+                    id={`email`}
+                    name="email"
+                    validate={requiredMessage}
+                    placeholder="hello"
+                    rightIcon={<IconVoucher />}
+                    label="Email"
+                  />
+                  <FieldPasswordInput
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    label="Password"
+                  />
+                  <FieldPasswordInput
+                    id="confirm-password"
+                    name="confirm-password"
+                    placeholder="Enter your password"
+                    label="Confirm password"
+                  />
+                  <FieldPasswordInput
+                    id="confirm-password"
+                    name="confirm-password"
+                    placeholder="Enter your password"
+                    label="Confirm password"
+                  />
+                  <FieldPasswordInput
+                    id="confirm-password"
+                    name="confirm-password"
+                    placeholder="Enter your password"
+                    label="Confirm password"
+                  />
+                  <FieldPasswordInput
+                    id="confirm-password"
+                    name="confirm-password"
+                    placeholder="Enter your password"
+                    label="Confirm password"
+                  />
+                  <FieldPasswordInput
+                    id="confirm-password"
+                    name="confirm-password"
+                    placeholder="Enter your password"
+                    label="Confirm password"
+                  />
+                  <FieldTextInput
+                    id={`email`}
+                    name="email"
+                    validate={requiredMessage}
+                    placeholder="hello"
+                    rightIcon={<IconVoucher />}
+                    label="Email"
+                  />
+                </Modal>
+              </Form>
+            );
+          }}
+        />
+        <div
+          style={{
+            margin: '36px 0',
+          }}>
+          <Tabs items={tabItems} defaultActiveKey="1" />
+        </div>
+      </div>
     </Layout>
   );
 };

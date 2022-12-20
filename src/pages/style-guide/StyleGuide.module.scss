@@ -1,0 +1,16 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.styleGuideContainer {
+  width: 100%;
+  padding: 40px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 0;
+  background: #ffffff;
+  margin: auto;
+
+  @include viewportMedium {
+    width: 640px;
+    border-radius: 16px;
+  }
+}
