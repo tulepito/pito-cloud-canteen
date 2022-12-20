@@ -2,7 +2,6 @@
 FROM node:16.16.0 as BUILD
 
 WORKDIR /app
-COPY --from=BASE /app/node_modules ./node_modules
 COPY . .
 RUN yarn install --production --frozen-lockfile --ignore-scripts --prefer-offline \
     && yarn build && yarn cache clean
