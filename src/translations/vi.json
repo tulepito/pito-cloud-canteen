@@ -93,5 +93,6 @@
   "Modal.closeModal": "Đóng",
   "CompanySidebar.members": "Thành viên",
   "CompanySidebar.memberList": "Danh sách nhân viên",
-  "CompanySidebar.groupList": "Danh sách nhóm"
+  "CompanySidebar.groupList": "Danh sách nhóm",
+  "CompanySidebar.companySetting": "Logo công ty"
 }

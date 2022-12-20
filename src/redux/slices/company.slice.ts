@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
+import type { TUser } from '@utils/types';
 import axios from 'axios';
 
 import type { ThunkAPI } from './types';
@@ -10,6 +11,11 @@ type TGroupInfo = {
   id: string;
   name: string;
   description: string;
+};
+
+export type TCompanyImageActionPayload = {
+  id: string;
+  file: any;
 };
 interface CompanyState {
   groupList: any;
@@ -31,6 +37,13 @@ interface CompanyState {
   updateGroupInProgress: boolean;
   updateGroupError: any;
   originCompanyMembers: Record<string, any>;
+
+  company: TUser | null;
+  companyImage: any;
+  uploadCompanyImageInProgress: boolean;
+  uploadCompanyImageError: any;
+  updateCompanyInProgress: boolean;
+  updateCompanyError: any;
 }
 
 // ================ Thunk types ================ //
@@ -40,6 +53,8 @@ const GROUP_DETAIL_INFO = 'app/Company/GROUP_DETAIL_INFO';
 const CREATE_GROUP = 'app/Company/CREATE_GROUP';
 const UPDATE_GROUP = 'app/Company/UPDATE_GROUP';
 const DELETE_GROUP = 'app/Company/DELETE_GROUP';
+const UPLOAD_COMPANY_IMAGE = 'app/Company/UPLOAD_COMPANY_IMAGE';
+const UPDATE_COMPANY_ACCOUNT = 'app/Company/UPDATE_COMPANY_ACCOUNT';
 
 const initialState: CompanyState = {
   groupList: [],
@@ -61,6 +76,13 @@ const initialState: CompanyState = {
   updateGroupInProgress: false,
   updateGroupError: null,
   originCompanyMembers: {},
+
+  company: null,
+  companyImage: null,
+  uploadCompanyImageInProgress: false,
+  uploadCompanyImageError: null,
+  updateCompanyInProgress: false,
+  updateCompanyError: null,
 };
 
 const companyInfo = createAsyncThunk(
@@ -69,6 +91,8 @@ const companyInfo = createAsyncThunk(
     const { workspaceCompanyId } = getState().company;
     const companyAccountResponse = await sdk.users.show({
       id: workspaceCompanyId,
+      include: ['profileImage'],
+      'fields.image': ['variants.square-small', 'variants.square-small2x'],
     });
     const [companyAccount] = denormalisedResponseEntities(
       companyAccountResponse,
@@ -76,9 +100,14 @@ const companyInfo = createAsyncThunk(
     const { data: allEmployeesData } = await axios.get(
       `/api/company/all-employees?companyId=${workspaceCompanyId}`,
     );
+    const companyImageId = companyAccount.profileImage?.id;
     const { groups = [], members = {} } =
       companyAccount.attributes.profile.metadata;
     return {
+      companyImage: {
+        imageId: companyImageId || null,
+      },
+      company: companyAccount,
       groupList: groups,
       originCompanyMembers: members,
       companyMembers: [...allEmployeesData.data.data],
@@ -176,6 +205,47 @@ const deleteGroup = createAsyncThunk(
   },
 );
 
+const uploadCompanyImage = createAsyncThunk(
+  UPLOAD_COMPANY_IMAGE,
+  async (
+    actionPayload: TCompanyImageActionPayload,
+    { extra: sdk }: ThunkAPI,
+  ) => {
+    const { id, file } = actionPayload;
+    const bodyParams = {
+      image: file,
+    };
+    const queryParams = {
+      expand: true,
+      'fields.image': ['variants.square-small', 'variants.square-small2x'],
+    };
+    const uploadImageResponse = await sdk.images.upload(
+      bodyParams,
+      queryParams,
+    );
+    const uploadedImage = uploadImageResponse.data.data;
+    return {
+      id,
+      uploadedImage,
+    };
+  },
+);
+
+const updateCompanyAccount = createAsyncThunk(
+  UPDATE_COMPANY_ACCOUNT,
+  async ({ companyName }: any, { getState }: ThunkAPI) => {
+    const { companyImage, workspaceCompanyId } = getState().company;
+    const { imageId, file } = companyImage || {};
+    const { data: companyAccount } = await axios.put('/api/company', {
+      companyName,
+      ...(imageId && file ? { companyImageId: imageId.uuid } : {}),
+      companyId: workspaceCompanyId,
+    });
+    return {
+      company: companyAccount,
+    };
+  },
+);
 export const BookerManageCompany = {
   companyInfo,
   groupInfo,
@@ -183,6 +253,8 @@ export const BookerManageCompany = {
   createGroup,
   updateGroup,
   deleteGroup,
+  uploadCompanyImage,
+  updateCompanyAccount,
 };
 
 export const companySlice = createSlice({
@@ -205,11 +277,12 @@ export const companySlice = createSlice({
         };
       })
       .addCase(companyInfo.fulfilled, (state, { payload }) => {
-        const { groupList, companyMembers } = payload;
+        const { groupList, companyMembers, company } = payload;
         return {
           ...state,
           groupList,
           companyMembers,
+          company,
           fetchCompanyInfoInProgress: false,
         };
       })
@@ -304,6 +377,59 @@ export const companySlice = createSlice({
           ...state,
           updateGroupInProgress: false,
           updateGroupError: error.message,
+        };
+      })
+      .addCase(uploadCompanyImage.pending, (state, { meta }) => {
+        const { arg } = meta;
+        return {
+          ...state,
+          uploadCompanyImageInProgress: true,
+          uploadCompanyImageError: null,
+          companyImage: { ...arg },
+        };
+      })
+      .addCase(uploadCompanyImage.fulfilled, (state, { payload }) => {
+        const { id, uploadedImage } = payload;
+        const { file } = state.companyImage || {};
+        const companyImage = {
+          id,
+          imageId: uploadedImage.id,
+          file,
+          uploadedImage,
+        };
+        return {
+          ...state,
+          uploadCompanyImageInProgress: false,
+          companyImage,
+        };
+      })
+      .addCase(uploadCompanyImage.rejected, (state, { error }) => {
+        return {
+          ...state,
+          uploadCompanyImageInProgress: false,
+          companyImage: null,
+          uploadCompanyImageError: error.message,
+        };
+      })
+      .addCase(updateCompanyAccount.pending, (state) => {
+        return {
+          ...state,
+          updateCompanyInProgress: false,
+        };
+      })
+      .addCase(updateCompanyAccount.fulfilled, (state, { payload }) => {
+        const { company } = payload;
+        return {
+          ...state,
+          updateCompanyInProgress: false,
+          company,
+        };
+      })
+      .addCase(updateCompanyAccount.rejected, (state, { error }) => {
+        return {
+          ...state,
+          updateCompanyInProgress: false,
+          updateCompanyError: error.message,
         };
       });
   },

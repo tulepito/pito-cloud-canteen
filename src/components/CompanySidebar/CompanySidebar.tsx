@@ -26,6 +26,11 @@ const SIDEBAR_MENUS: TSidebarMenu[] = [
       },
     ],
   },
+  {
+    id: 'companySetting',
+    label: 'CompanySidebar.companySetting',
+    nameLink: 'company-setting',
+  },
 ];
 
 const CompanySidebar = () => {
