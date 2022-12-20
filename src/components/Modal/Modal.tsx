@@ -1,5 +1,6 @@
 import Button from '@components/Button/Button';
 import IconClose from '@components/IconClose/IconClose';
+import useLockBodyScroll from '@hooks/useDisableBodyScroll';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';
 import React from 'react';
@@ -39,6 +40,8 @@ const Modal = (props: TModal) => {
   const scrollLayerClasses = scrollLayerClassName || css.scrollLayer;
   const hasTitle = title && title.length > 0;
   const closeModalMessage = intl.formatMessage({ id: 'Modal.closeModal' });
+
+  useLockBodyScroll({ isOpen });
 
   const closeBtn =
     !shouldHideIconClose && isOpen ? (
