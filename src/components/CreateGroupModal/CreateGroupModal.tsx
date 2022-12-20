@@ -9,10 +9,11 @@ import css from './CreateGroupModal.module.scss';
 type CreateGroupModalProps = {
   isOpen: boolean;
   companyMembers: any[];
+  originCompanyMembers: any;
   onClose: () => void;
 };
 const CreateGroupModal: React.FC<CreateGroupModalProps> = (props) => {
-  const { isOpen, onClose, companyMembers } = props;
+  const { isOpen, onClose, companyMembers, originCompanyMembers } = props;
   const modalClasses = classNames(css.modal, {
     [css.open]: isOpen,
   });
@@ -29,7 +30,10 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = (props) => {
               <IconModalClose onClick={onClose} />
             </div>
             <div className={css.modalContent}>
-              <CreateGroupForm companyMembers={companyMembers} />
+              <CreateGroupForm
+                companyMembers={companyMembers}
+                originCompanyMembers={originCompanyMembers}
+              />
             </div>
             <div className={css.modalFooter}>
               <Button className={css.cancelBtn} onClick={onClose}>

@@ -2,7 +2,7 @@ import Button from '@components/Button/Button';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
-import { updateGroup } from '@redux/slices/company.slice';
+import { BookerManageCompany } from '@redux/slices/company.slice';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 
@@ -21,7 +21,7 @@ const GroupInfoForm: React.FC<GroupInfoFormProps> = (props) => {
   );
   const onSubmit = (values: any) => {
     dispatch(
-      updateGroup({
+      BookerManageCompany.updateGroup({
         groupInfo: {
           ...values,
         },

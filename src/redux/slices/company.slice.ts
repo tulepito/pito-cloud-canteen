@@ -4,6 +4,8 @@ import axios from 'axios';
 
 import type { ThunkAPI } from './types';
 
+const MEMBER_PER_PAGE = 10;
+
 type TGroupInfo = {
   id: string;
   name: string;
@@ -14,6 +16,7 @@ interface CompanyState {
   fetchGroupListInProgress: boolean;
   companyMembers: any[];
   groupMembers: any[];
+  groupMembersPagination: any;
   groupInfo: TGroupInfo;
   workspaceCompanyId: string;
   fetchGroupDetailInProgress: boolean;
@@ -27,6 +30,7 @@ interface CompanyState {
 
   updateGroupInProgress: boolean;
   updateGroupError: any;
+  originCompanyMembers: Record<string, any>;
 }
 
 // ================ Thunk types ================ //
@@ -45,6 +49,7 @@ const initialState: CompanyState = {
   groupInfo: {} as TGroupInfo,
   fetchGroupDetailInProgress: false,
   companyMembers: [],
+  groupMembersPagination: null,
   fetchCompanyInfoInProgress: false,
   createGroupInProgress: false,
   createGroupError: null,
@@ -55,9 +60,10 @@ const initialState: CompanyState = {
 
   updateGroupInProgress: false,
   updateGroupError: null,
+  originCompanyMembers: {},
 };
 
-export const companyInfo = createAsyncThunk(
+const companyInfo = createAsyncThunk(
   COMPANY_INFO,
   async (_, { getState, extra: sdk }: ThunkAPI) => {
     const { workspaceCompanyId } = getState().company;
@@ -70,15 +76,17 @@ export const companyInfo = createAsyncThunk(
     const { data: allEmployeesData } = await axios.get(
       `/api/company/all-employees?companyId=${workspaceCompanyId}`,
     );
-    const { groups = [] } = companyAccount.attributes.profile.metadata;
+    const { groups = [], members = {} } =
+      companyAccount.attributes.profile.metadata;
     return {
       groupList: groups,
+      originCompanyMembers: members,
       companyMembers: [...allEmployeesData.data.data],
     };
   },
 );
 
-export const groupInfo = createAsyncThunk(
+const groupInfo = createAsyncThunk(
   GROUP_INFO,
   async (_, { getState, extra: sdk }: ThunkAPI) => {
     const { workspaceCompanyId } = getState().company;
@@ -89,12 +97,9 @@ export const groupInfo = createAsyncThunk(
   },
 );
 
-export const groupDetailInfo = createAsyncThunk(
+const groupDetailInfo = createAsyncThunk(
   GROUP_DETAIL_INFO,
-  async (
-    { groupId }: { groupId: string },
-    { extra: sdk, getState }: ThunkAPI,
-  ) => {
+  async ({ groupId, page = 1 }: any, { extra: sdk, getState }: ThunkAPI) => {
     const { workspaceCompanyId } = getState().company;
     const companyAccountResponse = await sdk.users.show({
       id: workspaceCompanyId,
@@ -107,7 +112,7 @@ export const groupDetailInfo = createAsyncThunk(
       (_group: any) => _group.id === groupId,
     );
     const { data: allMembersData } = await axios.get(
-      `/api/company/group/all-member?groupId=${groupId}`,
+      `/api/company/group/all-member?groupId=${groupId}&perPage=${MEMBER_PER_PAGE}&page=${page}`,
     );
     const groupInfoState: TGroupInfo = {
       id,
@@ -117,11 +122,12 @@ export const groupDetailInfo = createAsyncThunk(
     return {
       groupInfo: groupInfoState,
       groupMembers: [...allMembersData.data.data],
+      groupMembersPagination: allMembersData.data.meta,
     };
   },
 );
 
-export const createGroup = createAsyncThunk(
+const createGroup = createAsyncThunk(
   CREATE_GROUP,
   async (params: any, { getState }: ThunkAPI) => {
     const { workspaceCompanyId } = getState().company;
@@ -134,7 +140,7 @@ export const createGroup = createAsyncThunk(
   },
 );
 
-export const updateGroup = createAsyncThunk(
+const updateGroup = createAsyncThunk(
   UPDATE_GROUP,
   async (
     { groupId, groupInfo: groupInfoParams, addedMembers, deletedMembers }: any,
@@ -152,7 +158,7 @@ export const updateGroup = createAsyncThunk(
   },
 );
 
-export const deleteGroup = createAsyncThunk(
+const deleteGroup = createAsyncThunk(
   DELETE_GROUP,
   async (groupId: string, { getState }: ThunkAPI) => {
     const { workspaceCompanyId } = getState().company;
@@ -169,6 +175,15 @@ export const deleteGroup = createAsyncThunk(
     return groups;
   },
 );
+
+export const BookerManageCompany = {
+  companyInfo,
+  groupInfo,
+  groupDetailInfo,
+  createGroup,
+  updateGroup,
+  deleteGroup,
+};
 
 export const companySlice = createSlice({
   name: 'company',
@@ -204,13 +219,11 @@ export const companySlice = createSlice({
           fetchGroupListInProgress: true,
         };
       })
-      .addCase(groupInfo.fulfilled, (state, { payload }) => {
-        return {
-          ...state,
-          groupList: payload,
-          fetchGroupListInProgress: false,
-        };
-      })
+      .addCase(groupInfo.fulfilled, (state, { payload }) => ({
+        ...state,
+        groupList: payload,
+        fetchGroupListInProgress: false,
+      }))
       .addCase(groupDetailInfo.pending, (state) => {
         return {
           ...state,

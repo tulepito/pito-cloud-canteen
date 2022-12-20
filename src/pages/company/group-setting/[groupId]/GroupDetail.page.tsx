@@ -7,13 +7,7 @@ import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import useBoolean from '@hooks/useBoolean';
 import { useAppDispatch, useAppSelector } from '@src/redux/reduxHooks';
-import {
-  companyInfo,
-  deleteGroup,
-  groupDetailInfo,
-  groupInfo,
-  updateGroup,
-} from '@src/redux/slices/company.slice';
+import { BookerManageCompany } from '@src/redux/slices/company.slice';
 import filter from 'lodash/filter';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -166,10 +160,10 @@ const GroupDetailPage = () => {
   ];
   const { groupId = '' } = router.query;
   useEffect(() => {
-    dispatch(companyInfo());
-    dispatch(groupInfo());
+    dispatch(BookerManageCompany.companyInfo());
+    dispatch(BookerManageCompany.groupInfo());
     dispatch(
-      groupDetailInfo({
+      BookerManageCompany.groupDetailInfo({
         groupId: groupId as string,
       }),
     );
@@ -185,7 +179,7 @@ const GroupDetailPage = () => {
 
   const onConfirmDeleteMember = () => {
     dispatch(
-      updateGroup({
+      BookerManageCompany.updateGroup({
         groupId,
         deletedMembers: [deletingMemberInfo],
       }),
@@ -197,9 +191,11 @@ const GroupDetailPage = () => {
   };
 
   const onConfirmDeleteGroup = () => {
-    dispatch(deleteGroup(groupId as string)).then(({ error }: any) => {
-      if (!error) onDeleteGroupConfirmationModalClose();
-    });
+    dispatch(BookerManageCompany.deleteGroup(groupId as string)).then(
+      ({ error }: any) => {
+        if (!error) onDeleteGroupConfirmationModalClose();
+      },
+    );
   };
 
   return (
