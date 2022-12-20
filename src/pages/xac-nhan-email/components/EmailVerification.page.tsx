@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { emailVerificationThunks } from '@redux/slices/emailVerification.slice';
-import { ensureCurrentUser } from '@utils/data';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -14,14 +14,13 @@ const EmailVerificationPage = () => {
   const { t: verificationTokenFromQuery } = query;
   const {
     emailVerification: { verificationInProgress, verificationError },
-    user: { currentUser },
   } = useAppSelector((state) => state);
+  const user = useAppSelector(currentUserSelector);
   const dispatch = useAppDispatch();
 
   const initialValues = {
     verificationToken: verificationTokenFromQuery || null,
   };
-  const user = ensureCurrentUser(currentUser);
 
   const submitVerification = ({ verificationToken }: Record<string, any>) => {
     dispatch(
