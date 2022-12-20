@@ -12,21 +12,67 @@ import { required } from '@utils/validators';
 import classNames from 'classnames';
 import { Form as FinalForm } from 'react-final-form';
 
+import css from './StyleGuide.module.scss';
+
 const tabItems = [
   {
-    label: `Tab 1`,
-    key: '1',
+    label: `Đơn hàng mới`,
+    key: 'don-hang-moi',
     children: `Content of Tab Pane 1`,
   },
   {
-    label: `Tab 2`,
-    key: '2',
-    children: `Content of Tab Pane 2`,
+    label: `Đang chờ xác nhận`,
+    key: 'cho-xac-nhan',
+    children: (
+      <div>
+        <h4>Comon let go</h4>
+      </div>
+    ),
   },
   {
-    label: `Tab 3`,
-    key: '3',
-    children: `Content of Tab Pane 3`,
+    label: `Đã xác nhận`,
+    key: 'da-xac-nhan',
+    children: (
+      <div>
+        <h2>Hello babe</h2>
+      </div>
+    ),
+  },
+  {
+    label: 'Thất bại',
+    key: 'that-bai',
+    children: (
+      <div>
+        <h3>Hello babe</h3>
+      </div>
+    ),
+  },
+  {
+    label: 'Đánh giá',
+    key: 'danh-gia',
+    children: (
+      <div>
+        <h1>Hello babe</h1>
+      </div>
+    ),
+  },
+  {
+    label: 'Trả hàng',
+    key: 'tra-hang',
+    children: (
+      <div>
+        <h1>Hello babe</h1>
+      </div>
+    ),
+  },
+  {
+    label: 'Tổng đơn hàng',
+    key: 'tong-don-hang',
+    children: (
+      <div>
+        <h1>Hello babe</h1>
+      </div>
+    ),
   },
 ];
 
@@ -94,15 +140,7 @@ const StyleGuidePage = (props: any) => {
   };
   return (
     <Layout>
-      <div
-        style={{
-          width: '640px',
-          padding: '40px',
-          boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.1)',
-          borderRadius: '16px',
-          background: '#ffffff',
-          margin: 'auto',
-        }}>
+      <div className={css.styleGuideContainer}>
         <FinalForm
           {...props}
           onSubmit={onSubmitHandler}
@@ -200,6 +238,30 @@ const StyleGuidePage = (props: any) => {
                     placeholder="Enter your password"
                     label="Confirm password"
                   />
+                  <FieldPasswordInput
+                    id="confirm-password"
+                    name="confirm-password"
+                    placeholder="Enter your password"
+                    label="Confirm password"
+                  />
+                  <FieldPasswordInput
+                    id="confirm-password"
+                    name="confirm-password"
+                    placeholder="Enter your password"
+                    label="Confirm password"
+                  />
+                  <FieldPasswordInput
+                    id="confirm-password"
+                    name="confirm-password"
+                    placeholder="Enter your password"
+                    label="Confirm password"
+                  />
+                  <FieldPasswordInput
+                    id="confirm-password"
+                    name="confirm-password"
+                    placeholder="Enter your password"
+                    label="Confirm password"
+                  />
                   <FieldTextInput
                     id={`email`}
                     name="email"
@@ -215,9 +277,9 @@ const StyleGuidePage = (props: any) => {
         />
         <div
           style={{
-            margin: '24px 0',
+            margin: '36px 0',
           }}>
-          <Tabs items={tabItems} defaultActiveKey="3" />
+          <Tabs items={tabItems} defaultActiveKey="1" />
         </div>
       </div>
     </Layout>
