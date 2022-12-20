@@ -1,32 +1,57 @@
+@use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/vars.scss' as *;
 
 .root {
 }
+.labelRoot {
+  font-size: 14px;
+  line-height: 24px;
+  color: $neutralGray10;
+  margin-bottom: 8px;
+  display: inline-block;
+  display: flex;
+}
+.labelRequiredRedStar {
+  color: $failColor;
+  font-weight: $fontWeightSemiBold;
+  margin-left: 2px;
+}
 
 .select {
-  color: $matterColorAnti;
-  border-bottom-color: $attentionColor;
-  padding-right: 20px;
+  padding: 10px 16px;
+  border: 1px solid $neutralGray5;
+  border-radius: 8px;
+  transition: all 0.3s;
+  color: $neutralGray6;
+  font-size: 16px;
+  line-height: 24px;
+  outline: none;
 
-  & > option {
-    color: $matterColor;
+  &:hover {
+    border-color: $primaryPri5;
+    outline: none;
   }
-  & > option:disabled {
-    color: $matterColorAnti;
-  }
-
-  &:disabled {
-    border-bottom-color: $matterColorNegative;
-    color: $matterColorNegative;
-    cursor: default;
-  }
+}
+.selectedColor {
+  color: $neutralGray10;
 }
 
 .selectSuccess {
-  color: $matterColor;
-  border-bottom-color: $marketplaceColor;
+}
+.selectError {
+  color: $neutralGray6;
 }
 
-.selectError {
-  border-bottom-color: $failColor;
+.leftIcon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+.selectContainer {
+  position: relative;
+}
+.paddingWithLeftIcon {
+  padding-left: 52px;
 }

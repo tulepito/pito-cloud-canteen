@@ -1,9 +1,16 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
+  margin-top: 6px;
+  margin-bottom: 12px;
   color: $failColor;
+  overflow: hidden;
   font-size: 0.75rem;
-  margin-top: 8px;
-  margin-bottom: 0;
   font-weight: $fontWeightRegular;
+
+  @include viewportMedium {
+    margin-top: 6px;
+    margin-bottom: 10px;
+  }
 }

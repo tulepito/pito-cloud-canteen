@@ -108,6 +108,9 @@ $matterColorLight: #ffffff;
 $matterGrey8f: #8f8f8f;
 $matterGreyd9: #d9d9d9;
 
+$facebookBackground: #39579a;
+$googleBackground: #dc4e41;
+
 // Form colors
 $formFieldBorderColor: #dee2e6;
 $formFieldBorderColorFocus: #5e72e4;
@@ -136,6 +139,7 @@ $boxShadowInputFocus: 0 3px 9px rgb(50 50 9 / 0%),
 /* ================ Z-index base levels ================ */
 
 $zIndexPopup: 50;
+$zIndexModal: 100;
 
 /* ================ Transition styles ================ */
 

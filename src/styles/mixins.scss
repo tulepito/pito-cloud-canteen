@@ -1,7 +1,27 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 $transitionStyleButton: ease-in-out 0.1s;
 $buttonBorderRadius: 8px;
+
+@mixin formContainer {
+  padding: 24px 16px;
+  background-color: $neutralGray1;
+  border-radius: 16px 16px 0 0;
+
+  @include viewportMedium {
+    padding: 24px;
+    width: min(450px, calc(150% / 2));
+  }
+
+  @include viewportLarge {
+    padding: 24px 32px;
+  }
+
+  & input {
+    width: 100%;
+  }
+}
 
 @mixin buttonFont {
   font-weight: $fontWeightSemiBold;
@@ -34,6 +54,7 @@ $buttonBorderRadius: 8px;
   /* Padding is only for <a> elements where button styles are applied,
   buttons elements should have zero padding */
   padding: 8px 16px;
+  @include flexCenter;
 
   transition: all $transitionStyleButton;
   cursor: pointer;

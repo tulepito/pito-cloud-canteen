@@ -1,100 +1,198 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@redux/redux.helper';
+import type { RootState } from '@redux/store';
+import { createSlice } from '@reduxjs/toolkit';
+import { storableError } from '@utils/errors';
+import isEmpty from 'lodash/isEmpty';
 
-const authenticated = (authInfo: any) =>
-  authInfo && authInfo.isAnonymous === false;
+// eslint-disable-next-line import/no-cycle
+import { userActions } from './user.slice';
 
-// ================ Thunk types ================ //
-const AUTH_INFO = 'app/Auth/AUTH_INFO';
+const authenticated = (authInfo: Record<string, any>) => {
+  return authInfo && authInfo.isAnonymous === false;
+};
 
-interface AuthState {
+enum EAuthState {
+  idle = 'idle',
+  isSigningIn = 'isSigningIn',
+  isLoggingOut = 'isLoggingOut',
+  isSigningUp = 'isSigningUp',
+}
+
+interface IAuthState {
   isAuthenticated: boolean;
   // scopes associated with current token
   authScopes: [];
   // auth info
   authInfoLoaded: boolean;
+  // auth Status
+  authStatus: EAuthState;
   // login
-  loginError: any;
-  loginInProgress: boolean;
+  signInError: any;
   // logout
   logoutError: any;
-  logoutInProgress: boolean;
   // signup
   signupError: any;
-  signupInProgress: boolean;
-  // confirm (create use with idp)
-  confirmError: any;
-  confirmInProgress: boolean;
 }
 
-const initialState: AuthState = {
+const initialState: IAuthState = {
   isAuthenticated: false,
   authScopes: [],
   authInfoLoaded: false,
-  loginError: null,
-  loginInProgress: false,
+  authStatus: EAuthState.idle,
+  signInError: null,
   logoutError: null,
-  logoutInProgress: false,
   signupError: null,
-  signupInProgress: false,
-  confirmError: null,
-  confirmInProgress: false,
 };
-type ThunkAPI = {
-  dispatch?: any;
-  getState?: any;
-  extra: any;
-};
+
+// ================ Thunk types ================ //
+const AUTH_INFO = 'app/Auth/AUTH_INFO';
+const SIGN_UP = 'app/Auth/SIGN_UP';
+const LOGIN = 'app/Auth/LOGIN';
+const LOGOUT = 'app/Auth/LOGOUT';
 
 const authInfo = createAsyncThunk(
   AUTH_INFO,
-  async (_, { extra: sdk }: ThunkAPI) => {
-    await sdk.currentUser.create(
-      {
-        email: 'joe.dunphy@example.com',
-        password: 'secret-pass',
-        firstName: 'Joe',
-        lastName: 'Dunphy',
-        displayName: 'Dunphy Co.',
-        bio: 'Hello, I am Joe.',
-        publicData: {
-          age: 27,
-        },
-        protectedData: {
-          phoneNumber: '+1-202-555-5555',
-        },
-        privateData: {
-          discoveredServiceVia: 'Twitter',
-        },
-      },
-      {
-        expand: true,
-      },
-    );
+  async (_, { extra: sdk, fulfillWithValue }) => {
+    try {
+      const info = await sdk.authInfo();
+      return fulfillWithValue(info);
+    } catch (error) {
+      return fulfillWithValue(null);
+    }
+  },
+);
 
-    return '';
+const login = createAsyncThunk(
+  LOGIN,
+  async (params: { email: string; password: string }, { extra: sdk }) => {
+    const { email: username, password } = params;
+    await sdk.login({ username, password });
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
+const logout = createAsyncThunk(
+  LOGOUT,
+  async (_, { dispatch, extra: sdk }) => {
+    await sdk.logout();
+    dispatch(userActions.clearCurrentUser());
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
+const signUp = createAsyncThunk(
+  SIGN_UP,
+  async (params: Record<string, any>, { dispatch, extra: sdk }) => {
+    const { email, password, firstName, lastName, ...rest } = params;
+    const createUserParams = isEmpty(rest)
+      ? { email, password, firstName, lastName }
+      : { email, password, firstName, lastName, protectedData: { ...rest } };
+
+    // We must login the user if signup succeeds since the API doesn't
+    // do that automatically.
+    await sdk.currentUser.create(createUserParams);
+    dispatch(login({ email, password }));
+  },
+  {
+    serializeError: storableError,
   },
 );
 
 export const authThunks = {
   authInfo,
+  signUp,
+  login,
+  logout,
 };
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: 'Auth',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(authInfo.pending, (state) => state)
-      .addCase(authInfo.fulfilled, (state, { payload }: any) => {
+      .addCase(authInfo.fulfilled, (state, { payload }) => {
         return {
           ...state,
           authInfoLoaded: true,
           isAuthenticated: authenticated(payload),
-          authScopes: payload.scopes,
+          authScopes: payload.scopes || [],
+        };
+      })
+
+      .addCase(signUp.pending, (state) => {
+        return {
+          ...state,
+          authStatus: EAuthState.isSigningUp,
+          signInError: null,
+          signupError: null,
+        };
+      })
+      .addCase(signUp.fulfilled, (state) => {
+        return { ...state, authStatus: EAuthState.idle };
+      })
+      .addCase(signUp.rejected, (state, action) => {
+        return {
+          ...state,
+          authStatus: EAuthState.idle,
+          signupError: action.payload,
+        };
+      })
+
+      .addCase(login.pending, (state) => {
+        return {
+          ...state,
+          authStatus: EAuthState.isSigningIn,
+          signInError: null,
+          logoutError: null,
+          signupError: null,
+        };
+      })
+      .addCase(login.fulfilled, (state) => {
+        return { ...state, authStatus: EAuthState.idle, isAuthenticated: true };
+      })
+      .addCase(login.rejected, (state, action) => {
+        return {
+          ...state,
+          authStatus: EAuthState.idle,
+          signInError: action.payload,
+        };
+      })
+
+      .addCase(logout.pending, (state) => {
+        return {
+          ...state,
+          authStatus: EAuthState.isLoggingOut,
+          signInError: null,
+          logoutError: null,
+        };
+      })
+      .addCase(logout.fulfilled, (state) => {
+        return {
+          ...state,
+          authStatus: EAuthState.idle,
+          isAuthenticated: false,
+          authScopes: [],
+        };
+      })
+      .addCase(logout.rejected, (state, action) => {
+        return {
+          ...state,
+          authStatus: EAuthState.idle,
+          logoutError: action.payload,
         };
       });
   },
 });
 
 export default authSlice.reducer;
+
+// ================ Selectors ================ //
+export const authenticationInProgress = (state: RootState) => {
+  return state.auth.authStatus !== EAuthState.idle;
+};

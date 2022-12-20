@@ -1,0 +1,10 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.content {
+  padding-top: 56px;
+
+  @include viewportLarge {
+    padding-top: 108px;
+  }
+}

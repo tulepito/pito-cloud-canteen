@@ -1,13 +1,29 @@
 import ValidationError from '@components/ValidationError/ValidationError';
+import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
+import type { ReactNode } from 'react';
 import React from 'react';
+import type { FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 
 import css from './FieldSelect.module.scss';
 
+interface IFieldSelect extends FieldRenderProps<string, any> {
+  rootClassName?: string;
+  className?: string;
+  id?: string;
+  label?: string | ReactNode;
+  labelClassName?: string;
+  selectClassName?: string;
+  input: any;
+  meta: any;
+  children: ReactNode;
+  onChange: () => void;
+  leftIcon: React.ReactElement<TIconProps>;
+}
+
 const handleChange =
-  (propsOnChange: (e: any) => void, inputOnChange: (e: any) => void) =>
-  (event: any) => {
+  (propsOnChange: any, inputOnChange: any) => (event: any) => {
     // If "onChange" callback is passed through the props,
     // it can notify the parent when the content of the input has changed.
     if (propsOnChange) {
@@ -21,7 +37,7 @@ const handleChange =
     inputOnChange(event);
   };
 
-const FieldSelectComponent: React.FC<any> = (props) => {
+const FieldSelectComponent = (props: IFieldSelect) => {
   const {
     rootClassName,
     className,
@@ -32,6 +48,8 @@ const FieldSelectComponent: React.FC<any> = (props) => {
     meta,
     children,
     onChange,
+    labelClassName,
+    leftIcon,
     ...rest
   } = props;
 
@@ -48,6 +66,8 @@ const FieldSelectComponent: React.FC<any> = (props) => {
   const selectClasses = classNames(selectClassName, css.select, {
     [css.selectSuccess]: input.value && valid,
     [css.selectError]: hasError,
+    [css.paddingWithLeftIcon]: !!leftIcon,
+    [css.selectedColor]: !!input.value,
   });
 
   const { onChange: inputOnChange, ...restOfInput } = input;
@@ -59,18 +79,35 @@ const FieldSelectComponent: React.FC<any> = (props) => {
     ...rest,
   };
 
+  const leftIconElement = leftIcon
+    ? React.cloneElement(leftIcon, {
+        rootClassName: css.leftIcon,
+      })
+    : undefined;
+
   const classes = classNames(rootClassName || css.root, className);
+  const labelClasses = classNames(css.labelRoot, labelClassName);
+  const labelRequiredRedStar = meta.error ? css.labelRequiredRedStar : '';
+
   return (
     <div className={classes}>
-      {label ? <label htmlFor={id}>{label}</label> : null}
-      <select {...selectProps}>{children}</select>
+      {label ? (
+        <label htmlFor={id} className={labelClasses}>
+          {label}
+          {meta.error && <span className={labelRequiredRedStar}>*</span>}
+        </label>
+      ) : null}
+      <div className={css.selectContainer}>
+        {leftIconElement}
+        <select {...selectProps}>{children}</select>
+      </div>
+
       <ValidationError fieldMeta={meta} />
     </div>
   );
 };
 
-const FieldSelect: React.FC<any> = (props) => {
+const FieldSelect = (props: any) => {
   return <Field component={FieldSelectComponent} {...props} />;
 };
-
 export default FieldSelect;

@@ -1,37 +1,42 @@
+import { createDeepEqualSelector } from '@redux/redux.helper';
+import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
-import { updatedEntities } from '@utils/data';
+import { denormalisedEntities, updatedEntities } from '@utils/data';
 
-interface MarketplaceDataState {
-  entities?: any;
-}
-
-const merge = (state: MarketplaceDataState, sdkResponse: any) => {
-  const apiResponse = sdkResponse.data;
-  return {
-    ...state,
-    entities: updatedEntities(state.entities, apiResponse),
-  };
-};
-
-const initialState: MarketplaceDataState = {
-  // Database of all the fetched entities.
+const initialState = {
   entities: {},
 };
 
-export const marketplaceDataSlice = createSlice({
+const merge = (entities: Record<string, any>, sdkResponse: any) => {
+  const apiResponse = sdkResponse.data;
+  return updatedEntities(entities, apiResponse);
+};
+
+const marketplaceDataSlice = createSlice({
   name: 'marketplaceData',
   initialState,
   reducers: {
-    addMarketplaceEntities: (state, action) => {
-      const data = action.payload;
-      // Something went wrong with this. Fix later
-      const newState = merge(state, data);
-      return newState;
+    addMarketplaceEntities(state, action) {
+      state.entities = merge(state.entities, action.payload);
     },
   },
-  extraReducers: () => {},
 });
 
-export const { addMarketplaceEntities } = marketplaceDataSlice.actions;
+// export const {} = marketplaceDataSlice.actions;
 
 export default marketplaceDataSlice.reducer;
+
+export const getMarketplaceEntitiesSelector = createDeepEqualSelector(
+  (state: RootState) => state.marketplaceData.entities,
+  (_: any, refs: Array<any>) => refs,
+  (entities: any, refs: any) => denormalisedEntities(entities, refs, false),
+);
+
+export const getMarketplaceEntitySelector = createDeepEqualSelector(
+  (state: RootState) => state.marketplaceData.entities,
+  (_: any, ref: any) => ref,
+  (entities: any, ref: any) => {
+    const [entity] = denormalisedEntities(entities, [ref], false);
+    return entity;
+  },
+);

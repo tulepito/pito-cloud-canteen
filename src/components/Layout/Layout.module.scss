@@ -1,0 +1,6 @@
+@use '/src/styles/vars.scss' as *;
+
+.main {
+  min-height: 100vh;
+  background-color: $neutralGray5;
+}
