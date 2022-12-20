@@ -1,5 +1,5 @@
-import type { ThunkAPI } from '@redux/store';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
 
 import { userThunks } from './user.slice';
@@ -31,16 +31,15 @@ const verify = createAsyncThunk(
   VERIFICATION,
   async (
     params: Record<string, any>,
-    { dispatch, extra: sdk, fulfillWithValue, rejectWithValue }: ThunkAPI,
+    { dispatch, extra: sdk, fulfillWithValue },
   ) => {
-    try {
-      const { verificationToken } = params;
-      await sdk.currentUser.verifyEmail({ verificationToken });
-      fulfillWithValue(undefined);
-      dispatch(userThunks.fetchCurrentUser(undefined));
-    } catch (error) {
-      return rejectWithValue(storableError(error));
-    }
+    const { verificationToken } = params;
+    await sdk.currentUser.verifyEmail({ verificationToken });
+    fulfillWithValue(undefined);
+    dispatch(userThunks.fetchCurrentUser(undefined));
+  },
+  {
+    serializeError: storableError,
   },
 );
 

@@ -1,10 +1,3 @@
-import type {
-  Action,
-  AnyAction,
-  Store,
-  ThunkAction,
-  ThunkDispatch,
-} from '@reduxjs/toolkit';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { getSdk } from '@services/sdk';
 import { createWrapper, HYDRATE } from 'next-redux-wrapper';
@@ -16,7 +9,7 @@ const combinedReducer = combineReducers({
   ...globalReducers,
 });
 
-const rootReducer = (state: RootState, action: AnyAction) => {
+const rootReducer: typeof combinedReducer = (state, action) => {
   if (action.type === HYDRATE) {
     const nextState = {
       ...state,
@@ -47,22 +40,8 @@ export const makeStore = (context: any) => {
 };
 
 export type AppStore = ReturnType<typeof makeStore>;
-export type AppDispatch = Store['dispatch'] &
-  ThunkDispatch<RootState, null, AnyAction>;
-export type RootState = ReturnType<Store['getState']>;
-export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  RootState,
-  unknown,
-  Action<string>
->;
-export type ThunkAPI = {
-  dispatch?: any;
-  getState?: any;
-  extra: any;
-  rejectWithValue?: any;
-  fulfillWithValue?: any;
-};
+export type AppDispatch = AppStore['dispatch'];
+export type RootState = ReturnType<typeof rootReducer>;
 
 const wrapper = createWrapper<AppStore>(makeStore, { debug: false });
 export default wrapper;
