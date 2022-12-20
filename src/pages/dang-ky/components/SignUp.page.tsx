@@ -1,4 +1,4 @@
-import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
 import { ensureCurrentUser } from '@utils/data';
 import { isSignupEmailTakenError } from '@utils/errors';
