@@ -1,5 +1,5 @@
 import Button from '@components/Button/Button';
-import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { passwordThunks } from '@redux/slices/password.slice';
 import Link from 'next/link';
 import { useRouter } from 'next/router';

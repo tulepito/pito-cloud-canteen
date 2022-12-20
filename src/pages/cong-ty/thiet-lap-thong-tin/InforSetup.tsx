@@ -1,5 +1,5 @@
+import { useAppDispatch } from '@hooks/reduxHooks';
 import { addCompanyName } from '@reducer/company';
-import { useAppDispatch } from '@src/reduxHooks';
 import type { FormRenderProps } from 'react-final-form';
 import { Field, Form as FinalForm } from 'react-final-form';
 

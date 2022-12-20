@@ -1,4 +1,4 @@
-import { useAppSelector } from '@redux/reduxHooks';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { passwordThunks } from '@redux/slices/password.slice';
 import type { AppDispatch } from '@redux/store';
 import { useDispatch } from 'react-redux';

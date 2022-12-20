@@ -1,10 +1,6 @@
-import type { ThunkAPI } from '@redux/store';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
-
-// ================ Thunk types ================ //
-const PASSWORD_RECOVERY = 'app/Password/Recovery';
-const PASSWORD_RESET = 'app/Password/Reset';
 
 type TPasswordSliceInitialState = {
   initialEmail: string | null;
@@ -26,11 +22,15 @@ const initialState: TPasswordSliceInitialState = {
   resetPasswordError: null,
 };
 
+// ================ Thunk ================ //
+const PASSWORD_RECOVERY = 'app/Password/Recovery';
+const PASSWORD_RESET = 'app/Password/Reset';
+
 const recoverPassword = createAsyncThunk(
   PASSWORD_RECOVERY,
   async (
     params: Record<string, any>,
-    { extra: sdk, fulfillWithValue, rejectWithValue }: ThunkAPI,
+    { extra: sdk, fulfillWithValue, rejectWithValue },
   ) => {
     const { email } = params;
 
@@ -45,19 +45,14 @@ const recoverPassword = createAsyncThunk(
 
 const resetPassword = createAsyncThunk(
   PASSWORD_RESET,
-  async (
-    params: Record<string, any>,
-    { extra: sdk, fulfillWithValue, rejectWithValue }: ThunkAPI,
-  ) => {
+  async (params: Record<string, any>, { extra: sdk }) => {
     const { email, passwordResetToken, newPassword } = params;
     const requestParams = { email, passwordResetToken, newPassword };
 
-    try {
-      await sdk.passwordReset.reset(requestParams);
-      return fulfillWithValue();
-    } catch (error) {
-      return rejectWithValue(storableError(error));
-    }
+    await sdk.passwordReset.reset(requestParams);
+  },
+  {
+    serializeError: storableError,
   },
 );
 
@@ -79,7 +74,7 @@ const passwordSlice = createSlice({
       };
     },
     clearPasswordRecoveryError: (state) => {
-      return { ...state, recoveryError: null };
+      state.recoveryError = null;
     },
   },
   extraReducers: (builder) => {

@@ -3,6 +3,7 @@ import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInpu
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import GoogleIcon from '@components/Icons/GoogleIcon';
+import paths from '@src/paths';
 import {
   composeValidators,
   emailFormatValid,
@@ -73,11 +74,11 @@ const SignInForm: React.FC<TSignInFormProps> = (props) => {
   );
 
   const navigateToSignUpPage = () => {
-    router.push('/dang-ky');
+    router.push(paths.SignUp);
   };
 
   const navigateToPasswordRecoverPage = () => {
-    router.push('/quen-mat-khau');
+    router.push(paths.RecoveryPassword);
   };
 
   return (

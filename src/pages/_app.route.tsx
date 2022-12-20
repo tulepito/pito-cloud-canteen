@@ -6,17 +6,12 @@ import Layout from '@components/Layout/Layout';
 import { authThunks } from '@redux/slices/auth.slice';
 import { userThunks } from '@redux/slices/user.slice';
 import wrapper from '@redux/store';
-import viMessage from '@translations/vi.json';
+import { AuthenticationRoutes } from '@src/paths';
+import TranslationProvider from '@translations/TranslationProvider';
 import type { NextApplicationPage } from '@utils/types';
 import type { AppContext, AppInitialProps, AppProps } from 'next/app';
 import App from 'next/app';
-import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
-import { IntlProvider } from 'react-intl';
 import { Provider } from 'react-redux';
-
-const DEFAULT_LOCALE = 'vi-VN';
-const AuthenticationRoutes = ['/dang-nhap', '/dang-ky', '/quen-mat-khau'];
 
 type AppCustomProps = {
   isAuthenticated: boolean;
@@ -27,68 +22,43 @@ type AppCustomProps = {
 const MyApp = ({
   Component,
   router,
-  isAuthenticated,
-  authInfoLoaded,
   ...restProps
 }: AppProps & AppCustomProps) => {
   const { store, props } = wrapper.useWrappedStore(restProps);
 
-  const { locale, defaultLocale } = useRouter();
   const isRequiredAuth = Component.requireAuth === true;
-
-  const appLocale = locale || DEFAULT_LOCALE;
-  let message;
-
-  switch (appLocale) {
-    case 'vi':
-      message = viMessage;
-      break;
-    default:
-      message = viMessage;
-      break;
-  }
 
   const isAdminRoute = !!router.route.startsWith('/admin');
   const isAuthenticationRoute = AuthenticationRoutes.includes(router.route);
-  const getLayout = isAdminRoute
-    ? (page: ReactNode) => <AdminLayout>{page}</AdminLayout>
-    : (page: ReactNode) => <Layout>{page}</Layout>;
+  const LayoutComponent = isAdminRoute ? AdminLayout : Layout;
 
   return (
-    <IntlProvider
-      locale={appLocale}
-      defaultLocale={defaultLocale}
-      messages={message}>
+    <TranslationProvider>
       <Provider store={store}>
         <AuthGuard
-          authInfoLoaded={authInfoLoaded}
-          isAuthenticated={isAuthenticated}
           isAuthenticationRoute={isAuthenticationRoute}
           isRequiredAuth={isRequiredAuth}>
-          {getLayout(<Component {...props.pageProps} key={router.asPath} />)}
+          <LayoutComponent>
+            <Component {...props.pageProps} key={router.asPath} />
+          </LayoutComponent>
         </AuthGuard>
       </Provider>
-    </IntlProvider>
+    </TranslationProvider>
   );
 };
 
 MyApp.getInitialProps = wrapper.getInitialAppProps(
   (store) =>
-    async (_context: AppContext): Promise<AppInitialProps & AppCustomProps> => {
+    async (_context: AppContext): Promise<AppInitialProps> => {
       await store.dispatch(authThunks.authInfo());
-      const { isAuthenticated, authInfoLoaded } = store.getState().auth;
+      const {
+        auth: { isAuthenticated },
+      } = store.getState();
 
-      if (isAuthenticated) {
+      if (isAuthenticated)
         await store.dispatch(userThunks.fetchCurrentUser(undefined));
-      }
 
-      const ctx = await App.getInitialProps(_context);
-
-      return {
-        ...ctx,
-        isAuthenticated,
-        authInfoLoaded,
-      };
+      return App.getInitialProps(_context);
     },
 );
 

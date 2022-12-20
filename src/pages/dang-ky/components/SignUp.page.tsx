@@ -1,6 +1,6 @@
-import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
-import { ensureCurrentUser } from '@utils/data';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { isSignupEmailTakenError } from '@utils/errors';
 import { splitNameFormFullName } from '@utils/string';
 import { FormattedMessage } from 'react-intl';
@@ -10,17 +10,13 @@ import SignUpForm from './SignUpForm';
 
 const SignUpPage = () => {
   const {
-    user: {
-      currentUser,
-      sendVerificationEmailError,
-      sendVerificationEmailInProgress,
-    },
+    user: { sendVerificationEmailError, sendVerificationEmailInProgress },
     auth: { signupError },
   } = useAppSelector((state) => state);
+  const user = useAppSelector(currentUserSelector);
   const authInprogress = useAppSelector(authenticationInProgress);
   const dispatch = useAppDispatch();
 
-  const user = ensureCurrentUser(currentUser);
   const currentUserLoaded = !!user.id;
   const name = user?.attributes?.profile?.firstName;
   const { email } = user.attributes;
