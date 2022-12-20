@@ -4,7 +4,7 @@ import CreateGroupModal from '@components/CreateGroupModal/CreateGroupModal';
 import IconDelete from '@components/IconDelete/IconDelete';
 import IconEdit from '@components/IconEdit/IconEdit';
 import IconOutlinePlus from '@components/IconOutlinePlus/IconOutlinePlus';
-import IconSpinner from '@components/IconSpinner/IconSprinner';
+import IconSpinner from '@components/IconSpinner/IconSpinner';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import useBoolean from '@hooks/useBoolean';

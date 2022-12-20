@@ -2,7 +2,7 @@ import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import IconArrow from '@components/IconArrow/IconArrow';
 import IconDelete from '@components/IconDelete/IconDelete';
-import IconSpinner from '@components/IconSpinner/IconSprinner';
+import IconSpinner from '@components/IconSpinner/IconSpinner';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import useBoolean from '@hooks/useBoolean';

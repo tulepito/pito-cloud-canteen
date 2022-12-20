@@ -1,7 +1,8 @@
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
+import { getIntegrationSdk } from '@services/integrationSdk';
 import companyChecker from '@services/permissionChecker/company';
-import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
+import { getSdk, handleError } from '@services/sdk';
 import { randomUUID } from 'crypto';
 import difference from 'lodash/difference';
 import differenceBy from 'lodash/differenceBy';
