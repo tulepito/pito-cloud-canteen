@@ -35,6 +35,7 @@
   "PasswordRecoveryForm.email.required": "Vui lòng nhập Địa chỉ Email",
   "PasswordRecoveryForm.goBack": "Quay lại ",
   "PasswordRecoveryForm.submitButtonText": "Gửi",
+  "PasswordRecoveryForm.submitButtonLoadingText": "Gửi lại sau 00:0",
   "PasswordRecoveryForm.title": "Quên mật khẩu",
   "PasswordRecoveryForm.toSignInText": "Đăng nhập",
   "SignInForm.doNotHaveAnAccount": "Bạn chưa có tài khoản?",

@@ -45,6 +45,9 @@ const PasswordRecoveryForm: React.FC<TPasswordRecoveryFormProps> = (props) => {
   const submitButtonText = intl.formatMessage({
     id: 'PasswordRecoveryForm.submitButtonText',
   });
+  const submitButtonLoadingText = intl.formatMessage({
+    id: 'PasswordRecoveryForm.submitButtonLoadingText',
+  });
 
   const goBackText = intl.formatMessage({
     id: 'PasswordRecoveryForm.goBack',
@@ -68,8 +71,14 @@ const PasswordRecoveryForm: React.FC<TPasswordRecoveryFormProps> = (props) => {
     <FinalForm
       {...restProps}
       render={(formRenderProps: any) => {
-        const { rootClassName, className, formId, handleSubmit, invalid } =
-          formRenderProps;
+        const {
+          rootClassName,
+          className,
+          formId,
+          handleSubmit,
+          invalid,
+          values,
+        } = formRenderProps;
         const submitDisable = invalid || inProgress;
 
         const classes = classNames(rootClassName || css.root, className);
@@ -93,11 +102,17 @@ const PasswordRecoveryForm: React.FC<TPasswordRecoveryFormProps> = (props) => {
                 <div className={css.error}>{recoveryError}</div>
               )}
               <Button
-                inProgress={inProgress}
                 className={css.submitButton}
                 type="submit"
                 disabled={submitDisable}>
-                {submitButtonText}
+                {inProgress ? (
+                  <>
+                    {submitButtonLoadingText}
+                    {values.timeLeft}
+                  </>
+                ) : (
+                  <> {submitButtonText}</>
+                )}
               </Button>
             </div>
             <div className={css.toSignIn}>
