@@ -1,3 +1,4 @@
+import IconClose from '@components/IconClose/IconClose';
 import IconSpinner from '@components/IconSpinner/IconSpinner';
 import IconUpload from '@components/IconUpload/IconUpload';
 import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
@@ -63,7 +64,7 @@ const PhotoWithOverlay = (props: any) => {
         type="button"
         className={css.removeButton}
         onClick={handleRemoveClick}>
-        X
+        <IconClose size="small" />
       </button>
     </div>
   );
