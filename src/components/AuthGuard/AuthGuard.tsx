@@ -1,4 +1,4 @@
-import { useAppSelector } from '@redux/reduxHooks';
+import { useAppSelector } from '@hooks/reduxHooks';
 import paths from '@src/paths';
 import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
@@ -11,8 +11,9 @@ type TAuthGuard = {
 
 const AuthGuard: React.FC<PropsWithChildren<TAuthGuard>> = (props) => {
   const router = useRouter();
-  const authInfoLoaded = useAppSelector((state) => state.auth.authInfoLoaded);
-  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const { isAuthenticated, authInfoLoaded } = useAppSelector(
+    (state) => state.auth,
+  );
 
   const { children, isRequiredAuth, isAuthenticationRoute } = props;
 

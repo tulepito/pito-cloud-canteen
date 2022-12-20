@@ -1,4 +1,4 @@
-import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
 import paths from '@src/paths';
 import { useRouter } from 'next/router';
@@ -9,11 +9,13 @@ import SignInForm from './SignInForm';
 
 const SignInPage = () => {
   const authInprogress = useAppSelector(authenticationInProgress);
-  const { loginError, isAuthenticated } = useAppSelector((state) => state.auth);
+  const { signInError, isAuthenticated } = useAppSelector(
+    (state) => state.auth,
+  );
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const signInErrorMessage = loginError ? (
+  const signInErrorMessage = signInError ? (
     <>
       <div>
         <FormattedMessage id="SignInPage.loginFailedText1" />
@@ -34,7 +36,7 @@ const SignInPage = () => {
     if (isAuthenticated) {
       router.push(paths.HomePage);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, router]);
 
   return (
     <SignInForm

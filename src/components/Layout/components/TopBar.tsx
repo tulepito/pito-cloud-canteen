@@ -1,5 +1,5 @@
 import PitoLogo from '@components/PitoLogo/PitoLogo';
-import { useAppSelector } from '@redux/reduxHooks';
+import { useAppSelector } from '@hooks/reduxHooks';
 import get from 'lodash/get';
 import Link from 'next/link';
 
