@@ -4,6 +4,7 @@ import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInpu
 import FieldSelect from '@components/FieldSelect/FieldSelect';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import IconCalendar from '@components/IconCalender/IconCalender';
 import Layout from '@components/Layout/Layout';
 import Modal from '@components/Modal/Modal';
 import Tabs from '@components/Tabs/Tabs';
@@ -166,8 +167,21 @@ const StyleGuidePage = (props: any) => {
                 <FieldSelect
                   id="select1"
                   name="select1"
-                  label="Choose an option:">
-                  <option value="">Pick something...</option>
+                  label="Choose an option"
+                  leftIcon={<IconCalendar />}>
+                  <option value="" disabled>
+                    Select with icon
+                  </option>
+                  <option value="first">First option</option>
+                  <option value="second">Second option</option>
+                </FieldSelect>
+                <FieldSelect
+                  id="select1"
+                  name="select1"
+                  label="Choose an option">
+                  <option value="" disabled>
+                    Select without icon
+                  </option>
                   <option value="first">First option</option>
                   <option value="second">Second option</option>
                 </FieldSelect>

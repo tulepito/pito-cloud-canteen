@@ -66,6 +66,8 @@ const FieldSelectComponent = (props: IFieldSelect) => {
   const selectClasses = classNames(selectClassName, css.select, {
     [css.selectSuccess]: input.value && valid,
     [css.selectError]: hasError,
+    [css.paddingWithLeftIcon]: !!leftIcon,
+    [css.selectedColor]: !!input.value,
   });
 
   const { onChange: inputOnChange, ...restOfInput } = input;
