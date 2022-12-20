@@ -1,6 +1,7 @@
 import Button from '@components/Button/Button';
 import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
+import FieldSelect from '@components/FieldSelect/FieldSelect';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import Layout from '@components/Layout/Layout';
@@ -44,33 +45,6 @@ const tabItems = [
     children: (
       <div>
         <h3>Hello babe</h3>
-      </div>
-    ),
-  },
-  {
-    label: 'Đánh giá',
-    key: 'danh-gia',
-    children: (
-      <div>
-        <h1>Hello babe</h1>
-      </div>
-    ),
-  },
-  {
-    label: 'Trả hàng',
-    key: 'tra-hang',
-    children: (
-      <div>
-        <h1>Hello babe</h1>
-      </div>
-    ),
-  },
-  {
-    label: 'Tổng đơn hàng',
-    key: 'tong-don-hang',
-    children: (
-      <div>
-        <h1>Hello babe</h1>
       </div>
     ),
   },
@@ -189,6 +163,14 @@ const StyleGuidePage = (props: any) => {
                   value="saladF"
                   label="Favorites"
                 />
+                <FieldSelect
+                  id="select1"
+                  name="select1"
+                  label="Choose an option:">
+                  <option value="">Pick something...</option>
+                  <option value="first">First option</option>
+                  <option value="second">Second option</option>
+                </FieldSelect>
 
                 <Button
                   type="submit"
