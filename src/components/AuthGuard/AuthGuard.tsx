@@ -1,3 +1,5 @@
+import { useAppSelector } from '@redux/reduxHooks';
+import paths from '@src/paths';
 import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect } from 'react';
@@ -5,32 +7,32 @@ import React, { useEffect } from 'react';
 type TAuthGuard = {
   isRequiredAuth: boolean;
   isAuthenticationRoute: boolean;
-  isAuthenticated: boolean;
-  authInfoLoaded: boolean;
 };
 
 const AuthGuard: React.FC<PropsWithChildren<TAuthGuard>> = (props) => {
   const router = useRouter();
+  const authInfoLoaded = useAppSelector((state) => state.auth.authInfoLoaded);
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
-  const {
-    children,
-    isRequiredAuth,
-    isAuthenticationRoute,
-    isAuthenticated,
-    authInfoLoaded,
-  } = props;
+  const { children, isRequiredAuth, isAuthenticationRoute } = props;
 
   useEffect(() => {
     if (authInfoLoaded) {
       if (isAuthenticationRoute && isAuthenticated) {
-        router.push('/');
+        router.push(paths.HomePage);
       }
 
-      if (isRequiredAuth) {
-        if (!isAuthenticated) router.push('/dang-nhap');
+      if (isRequiredAuth && !isAuthenticated) {
+        router.push(paths.SignIn);
       }
     }
-  }, [authInfoLoaded, isAuthenticated]);
+  }, [
+    authInfoLoaded,
+    isAuthenticated,
+    isAuthenticationRoute,
+    isRequiredAuth,
+    router,
+  ]);
 
   return <>{children}</>;
 };
