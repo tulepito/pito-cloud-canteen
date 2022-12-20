@@ -22,7 +22,7 @@ const EmailVerificationForm: React.FC<TEmailVerificationFormProps> = (
   const { email, emailVerified, pendingEmail, profile } =
     currentUser.attributes;
   const emailToVerify = <strong>{pendingEmail || email}</strong>;
-  const name = profile.firstName;
+  const name = profile.lastName;
 
   return (
     <FinalForm
