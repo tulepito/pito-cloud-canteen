@@ -6,4 +6,10 @@ const paths = {
   HomePage: '/',
 };
 
+export const AuthenticationRoutes = [
+  paths.RecoveryPassword,
+  paths.SignIn,
+  paths.SignUp,
+];
+
 export default paths;
