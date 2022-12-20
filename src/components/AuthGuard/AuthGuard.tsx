@@ -1,10 +1,8 @@
-import { authThunks } from '@redux/slices/auth.slice';
-import { userThunks } from '@redux/slices/user.slice';
-import type { AppDispatch, RootState } from '@redux/store';
+import { useAppSelector } from '@hooks/reduxHooks';
+import paths from '@src/paths';
 import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 
 type TAuthGuard = {
   isRequiredAuth: boolean;
@@ -12,33 +10,30 @@ type TAuthGuard = {
 };
 
 const AuthGuard: React.FC<PropsWithChildren<TAuthGuard>> = (props) => {
-  const { authInfoLoaded, isAuthenticated } = useSelector(
-    (state: RootState) => state.auth,
-  );
-  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+  const { isAuthenticated, authInfoLoaded } = useAppSelector(
+    (state) => state.auth,
+  );
 
   const { children, isRequiredAuth, isAuthenticationRoute } = props;
 
   useEffect(() => {
-    dispatch(authThunks.authInfo());
-
-    if (isAuthenticated) {
-      dispatch(userThunks.fetchCurrentUser(undefined));
-    }
-  }, [isAuthenticated]);
-
-  useEffect(() => {
     if (authInfoLoaded) {
       if (isAuthenticationRoute && isAuthenticated) {
-        router.push('/');
+        router.push(paths.HomePage);
       }
 
-      if (isRequiredAuth) {
-        if (!isAuthenticated) router.push('/dang-nhap');
+      if (isRequiredAuth && !isAuthenticated) {
+        router.push(paths.SignIn);
       }
     }
-  }, [authInfoLoaded, isAuthenticated]);
+  }, [
+    authInfoLoaded,
+    isAuthenticated,
+    isAuthenticationRoute,
+    isRequiredAuth,
+    router,
+  ]);
 
   return <>{children}</>;
 };

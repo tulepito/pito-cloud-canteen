@@ -1,10 +1,9 @@
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { emailVerificationThunks } from '@redux/slices/emailVerification.slice';
-import type { AppDispatch, RootState } from '@redux/store';
-import { ensureCurrentUser } from '@utils/data';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
 
 import css from './EmailVerification.module.scss';
 import EmailVerificationForm from './EmailVerificationForm';
@@ -12,27 +11,32 @@ import EmailVerificationForm from './EmailVerificationForm';
 const EmailVerificationPage = () => {
   const router = useRouter();
   const { query } = router;
-  const { t: verificationToken } = query;
-  const { currentUser } = useSelector((state: RootState) => state.user);
-
-  const { verificationInProgress, verificationError } = useSelector(
-    (state: RootState) => state.emailVerification,
-  );
-  const dispatch = useDispatch<AppDispatch>();
+  const { t: verificationTokenFromQuery } = query;
+  const {
+    emailVerification: { verificationInProgress, verificationError },
+  } = useAppSelector((state) => state);
+  const user = useAppSelector(currentUserSelector);
+  const dispatch = useAppDispatch();
 
   const initialValues = {
-    verificationToken: verificationToken || null,
+    verificationToken: verificationTokenFromQuery || null,
   };
-  const user = ensureCurrentUser(currentUser);
 
-  // eslint-disable-next-line @typescript-eslint/no-shadow
   const submitVerification = ({ verificationToken }: Record<string, any>) => {
-    dispatch(emailVerificationThunks.verify({ verificationToken }));
+    dispatch(
+      emailVerificationThunks.verify({
+        verificationToken,
+      }),
+    );
   };
 
   useEffect(() => {
-    dispatch(emailVerificationThunks.verify({ verificationToken }));
-  }, []);
+    dispatch(
+      emailVerificationThunks.verify({
+        verificationToken: verificationTokenFromQuery,
+      }),
+    );
+  }, [dispatch, verificationTokenFromQuery]);
 
   return (
     <div className={css.root}>

@@ -54,6 +54,7 @@ $buttonBorderRadius: 8px;
   /* Padding is only for <a> elements where button styles are applied,
   buttons elements should have zero padding */
   padding: 8px 16px;
+  @include flexCenter;
 
   transition: all $transitionStyleButton;
   cursor: pointer;

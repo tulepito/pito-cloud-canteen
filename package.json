@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node startServer.js",
     "lint": "next lint",
     "check-types": "tsc --pretty --noEmit",
     "check-format": "prettier --check .",
@@ -19,6 +19,7 @@
     "classnames": "^2.3.2",
     "cookie": "^0.5.0",
     "decimal.js": "^10.4.3",
+    "dotenv": "^16.0.3",
     "final-form": "^4.20.7",
     "lodash": "^4.17.21",
     "next": "13.0.6",
@@ -32,7 +33,9 @@
     "react-final-form-arrays": "^3.1.4",
     "react-intl": "^6.2.5",
     "react-redux": "^8.0.5",
-    "sharetribe-flex-sdk": "^1.17.0"
+    "reselect": "^4.1.7",
+    "sharetribe-flex-sdk": "^1.17.0",
+    "shelljs": "^0.8.5"
   },
   "devDependencies": {
     "@types/cookie": "^0.5.1",

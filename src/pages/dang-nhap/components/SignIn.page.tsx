@@ -1,22 +1,21 @@
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
-import type { AppDispatch, RootState } from '@redux/store';
+import paths from '@src/paths';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
 
 import SignInForm from './SignInForm';
 
 const SignInPage = () => {
-  const appState = useSelector((state: RootState) => state);
-  const authInprogress = authenticationInProgress(appState);
-  const { loginError, isAuthenticated } = useSelector(
-    (state: RootState) => state.auth,
+  const authInprogress = useAppSelector(authenticationInProgress);
+  const { signInError, isAuthenticated } = useAppSelector(
+    (state) => state.auth,
   );
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const signInErrorMessage = loginError ? (
+  const signInErrorMessage = signInError ? (
     <>
       <div>
         <FormattedMessage id="SignInPage.loginFailedText1" />
@@ -35,9 +34,9 @@ const SignInPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/');
+      router.push(paths.HomePage);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, router]);
 
   return (
     <SignInForm

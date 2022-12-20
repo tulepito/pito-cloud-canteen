@@ -1,11 +1,10 @@
 import Button from '@components/Button/Button';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { passwordThunks } from '@redux/slices/password.slice';
-import type { AppDispatch, RootState } from '@redux/store';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
 
 import css from './ResetPassword.module.scss';
 import ResetPasswordForm from './ResetPasswordForm';
@@ -14,10 +13,10 @@ const ResetPasswordPage = () => {
   const router = useRouter();
   const { t: token, e: email } = router.query;
   const paramsValid = !!(token && email);
-  const { resetPasswordInProgress, resetPasswordError } = useSelector(
-    (state: RootState) => state.password,
+  const { resetPasswordInProgress, resetPasswordError } = useAppSelector(
+    (state) => state.password,
   );
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   const [newPasswordSubmitted, setNewPswSubmitted] = useState(false);
 

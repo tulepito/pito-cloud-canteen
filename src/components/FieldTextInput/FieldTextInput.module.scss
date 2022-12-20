@@ -41,7 +41,6 @@
 }
 
 .inputError {
-  border-bottom-color: $failColor;
 }
 
 .inputFullWidth {
@@ -97,7 +96,8 @@
 
 .labelRoot {
   font-size: 14px;
-  color: $formLabelColor;
+  line-height: 24px;
+  color: $neutralGray10;
   margin-bottom: 8px;
   display: inline-block;
   display: flex;
@@ -105,4 +105,5 @@
 .labelRequiredRedStar {
   color: $failColor;
   font-weight: $fontWeightSemiBold;
+  margin-left: 2px;
 }

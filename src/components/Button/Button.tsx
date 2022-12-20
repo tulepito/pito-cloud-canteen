@@ -1,5 +1,5 @@
 import IconCheckmark from '@components/IconCheckmark/IconCheckmark';
-import IconSpinner from '@components/IconSpinner/IconSprinner';
+import IconSpinner from '@components/IconSpinner/IconSpinner';
 import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect, useState } from 'react';
@@ -44,7 +44,7 @@ const Button = (props: PropsWithChildren<TButton>) => {
     disabled = false,
     children,
     checkmarkClassName,
-    size = 'small',
+    size = 'large',
     fullWidth = false,
     ...rest
   } = props;

@@ -1,33 +1,29 @@
 import Button from '@components/Button/Button';
-import { authThunks } from '@redux/slices/auth.slice';
-import type { AppDispatch, RootState } from '@redux/store';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 
 import css from './index.module.scss';
 
 export default function Home() {
-  const { logoutInProgress, isAuthenticated } = useSelector(
-    (state: RootState) => state.auth,
-  );
-  const dispatch = useDispatch<AppDispatch>();
+  const inProgress = useAppSelector(authenticationInProgress);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
-  const handleLogout = () => {
-    dispatch(authThunks.logout());
+  const handleLogout = async () => {
+    await dispatch(authThunks.logout());
+    router.replace('/');
   };
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/dang-nhap');
-    }
-  }, [isAuthenticated]);
 
   return (
     <div className={css.root}>
       <h1>Trang chủ</h1>
-      <Button onClick={handleLogout} inProgress={logoutInProgress}>
+      <Button
+        onClick={handleLogout}
+        inProgress={inProgress}
+        disabled={inProgress || !isAuthenticated}>
         Đăng xuất
       </Button>
     </div>
