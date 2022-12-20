@@ -6,7 +6,11 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
-    "consistent-return": "off"
+    "consistent-return": "off",
+    "no-param-reassign": [
+      "warn",
+      { "props": true, "ignorePropertyModificationsFor": ["state"] }
+    ]
   },
   "overrides": [
     // Configuration for TypeScript files
