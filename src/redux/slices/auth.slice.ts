@@ -4,6 +4,9 @@ import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
 import isEmpty from 'lodash/isEmpty';
 
+// eslint-disable-next-line import/no-cycle
+import { userActions } from './user.slice';
+
 const authenticated = (authInfo: Record<string, any>) => {
   return authInfo && authInfo.isAnonymous === false;
 };
@@ -64,7 +67,6 @@ const login = createAsyncThunk(
   async (params: { email: string; password: string }, { extra: sdk }) => {
     const { email: username, password } = params;
     await sdk.login({ username, password });
-    // dispatch(userThunks.fetchCurrentUser(undefined));
   },
   {
     serializeError: storableError,
@@ -73,9 +75,9 @@ const login = createAsyncThunk(
 
 const logout = createAsyncThunk(
   LOGOUT,
-  async (_, { extra: sdk }) => {
+  async (_, { dispatch, extra: sdk }) => {
     await sdk.logout();
-    // dispatch(userActions.clearCurrentUser());
+    dispatch(userActions.clearCurrentUser());
   },
   {
     serializeError: storableError,
