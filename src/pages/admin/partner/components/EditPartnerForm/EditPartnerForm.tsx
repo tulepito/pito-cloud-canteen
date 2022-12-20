@@ -67,7 +67,7 @@ const EditPartnerForm: React.FC<TEditPartnerForm> = (props) => {
       { dayOfWeek: 'sat', startTime: '09:00', endTime: '17:00', seats: 1 },
       { dayOfWeek: 'sun', startTime: '09:00', endTime: '17:00', seats: 1 },
     ],
-  } as TAvailabilityPlan;
+  } as any;
   const availabilityPlan = defaultAvailabilityPlan;
   const initialValues = useMemo(
     () => ({

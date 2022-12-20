@@ -51,7 +51,6 @@ const PhotoWithOverlay = (props: any) => {
         <div className={css.threeToTwoWrapper}>
           <div className={css.aspectWrapper}>
             <ResponsiveImage
-              id={image.imageId}
               rootClassName={css.rootForImage}
               image={image}
               alt={savedImageAltText}

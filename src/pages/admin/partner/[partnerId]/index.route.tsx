@@ -1,5 +1,3 @@
-import ManagePartnersPage from './ManagePartners.page';
-
 export default function PartnerRoute() {
-  return <ManagePartnersPage />;
+  return <>Hello world</>;
 }

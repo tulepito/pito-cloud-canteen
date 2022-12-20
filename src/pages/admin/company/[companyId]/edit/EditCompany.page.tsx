@@ -2,7 +2,6 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconSpinner from '@components/IconSpinner/IconSpinner';
 import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
 import { updateCompanyPageThunks } from '@redux/slices/EditCompanyPage.slice';
-import { getMarketplaceEntities } from '@utils/data';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
@@ -21,17 +20,11 @@ export default function EditCompanyPage() {
 
   const {
     showCompanyInProgress,
-    companyRef,
+    companyRef: company,
     updateCompanyInProgress,
     updateCompanyError,
     showCompanyError,
   } = useAppSelector((state) => state.EditCompanyPage);
-
-  const marketplaceData = useAppSelector((state) => state.marketplaceData);
-
-  const [company] = companyRef
-    ? getMarketplaceEntities({ marketplaceData }, companyRef)
-    : [null];
 
   useEffect(() => {
     if (!companyId) return;

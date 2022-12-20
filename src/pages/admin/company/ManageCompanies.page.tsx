@@ -15,8 +15,6 @@ import {
   manageCompaniesThunks,
   paginateCompanies,
 } from '@redux/slices/ManageCompaniesPage.slice';
-import type { RootState } from '@redux/store';
-import { getMarketplaceEntities } from '@utils/data';
 import { ECompanyStatus } from '@utils/enums';
 import type {
   TCompany,
@@ -29,7 +27,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { useSelector } from 'react-redux';
 
 import type { TKeywordSearchFormValues } from './components/KeywordSearchForm/KeywordSearchForm';
 import KeywordSearchForm from './components/KeywordSearchForm/KeywordSearchForm';
@@ -147,7 +144,7 @@ const parseEntitiesToTableData = (
 };
 
 const sliceCompanies = (
-  companies: TUser[],
+  companies: TCompany[],
   pagination?: TPagination | null,
 ) => {
   if (!pagination) return companies;
@@ -158,43 +155,46 @@ const sliceCompanies = (
 };
 
 const filterCompanies = (companies: TCompany[], filterValues: any) => {
-  const { keyword, status } = filterValues;
-  if (!keyword && !status) return companies;
-  if (!keyword && status) {
+  const { keyword = '', status } = filterValues;
+  const keywordAsLowerCase = keyword.toLowerCase();
+  if (!keywordAsLowerCase && !status) return companies;
+  if (!keywordAsLowerCase && status) {
     return companies.filter(
-      (company) =>
+      (company: TCompany) =>
         Number(status) === company.attributes.profile.metadata.status,
     );
   }
-  if (keyword && !status) {
+  if (keywordAsLowerCase && !status) {
     return companies.filter(
       (company) =>
-        company.id.uuid.toLowerCase().includes(keyword) ||
+        company.id.uuid.toLowerCase().includes(keywordAsLowerCase) ||
         company.attributes.profile.displayName
           .toLowerCase()
+          .includes(keywordAsLowerCase) ||
+        company.attributes.profile.publicData?.companyName
+          .toLowerCase(keywordAsLowerCase)
           .includes(keyword) ||
-        company.attributes.profile.privateData?.phoneNumber
+        company.attributes.profile.publicData?.phoneNumber
           ?.toLowerCase()
-          .includes(keyword) ||
-        company.attributes.email.toLowerCase().includes(keyword),
+          .includes(keywordAsLowerCase) ||
+        company.attributes.email.toLowerCase().includes(keywordAsLowerCase),
     );
   }
-  return companies.filter((company) => {
-    if (
-      status === company.attributes.profile.metadata.status &&
-      (company.id.uuid.toLowerCase().includes(keyword) ||
+  return companies.filter(
+    (company) =>
+      Number(status) === company.attributes.profile.metadata.status &&
+      (company.id.uuid.toLowerCase().includes(keywordAsLowerCase) ||
         company.attributes.profile.displayName
           .toLowerCase()
-          .includes(keyword) ||
-        company.attributes.profile.privateData?.phoneNumber
+          .includes(keywordAsLowerCase) ||
+        company.attributes.profile.publicData?.companyName
+          .toLowerCase()
+          .includes(keywordAsLowerCase) ||
+        company.attributes.profile.publicData?.phoneNumber
           ?.toLowerCase()
-          .includes(keyword) ||
-        company.attributes.email.toLowerCase().includes(keyword))
-    ) {
-      return true;
-    }
-    return false;
-  });
+          .includes(keywordAsLowerCase) ||
+        company.attributes.email.toLowerCase().includes(keywordAsLowerCase)),
+  );
 };
 
 const companyStatusOptions = [
@@ -231,25 +231,15 @@ export default function ManageCompanies() {
 
   const dispatch = useAppDispatch();
 
-  const marketplaceData = useSelector(
-    (state: RootState) => state?.marketplaceData,
-  );
-
   const keywordAsString = keyword as string;
 
   const companies = useMemo(
     () =>
-      filterCompanies(
-        sliceCompanies(
-          getMarketplaceEntities({ marketplaceData }, companyRefs),
-          pagination,
-        ),
-        {
-          status,
-          keyword: keywordAsString,
-        },
-      ),
-    [companyRefs, pagination, keywordAsString, status, marketplaceData],
+      filterCompanies(sliceCompanies(companyRefs, pagination), {
+        status,
+        keyword: keywordAsString,
+      }),
+    [companyRefs, pagination, keywordAsString, status],
   ) as TUser[];
 
   const updateStatus = (updateData: TUpdateStatus) => {

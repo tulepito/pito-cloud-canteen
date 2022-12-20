@@ -19,17 +19,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     }
   }
 
-  const { dataParams } = req.body;
+  const { dataParams, queryParams = {} } = req.body;
 
   const { id, status } = dataParams;
 
   const intergrationSdk = getIntegrationSdk();
-  const response = await intergrationSdk.users.updateProfile({
-    id,
-    metadata: {
-      status,
+  const response = await intergrationSdk.users.updateProfile(
+    {
+      id,
+      metadata: {
+        status,
+      },
     },
-  });
+    queryParams,
+  );
   res.json(response);
 }
 

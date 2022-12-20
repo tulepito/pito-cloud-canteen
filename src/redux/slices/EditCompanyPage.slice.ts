@@ -1,10 +1,8 @@
 import type { ThunkAPI } from '@redux/store';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { showCompanyApi, updateCompanyApi } from '@utils/api';
-import { entityRefs } from '@utils/data';
+import { denormalisedResponseEntities } from '@utils/data';
 import { storableError } from '@utils/errors';
-
-import { addMarketplaceEntities } from './marketplaceData.slice';
 
 interface EditCompanyState {
   companyRef: any;
@@ -19,14 +17,11 @@ const SHOW_COMPANY = 'app/UpdateCompanyPage/SHOW_COMPANY';
 
 const updateCompany = createAsyncThunk(
   UPDATE_COMPANY,
-  async (
-    userData: any,
-    { dispatch, fulfillWithValue, rejectWithValue }: ThunkAPi,
-  ) => {
+  async (userData: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
     try {
       const { data } = await updateCompanyApi(userData);
-      dispatch(addMarketplaceEntities(data));
-      return fulfillWithValue(data);
+      const [company] = denormalisedResponseEntities(data);
+      return fulfillWithValue(company);
     } catch (error: any) {
       console.error('update company error', error);
       return rejectWithValue(storableError(error.response.data));
@@ -36,14 +31,11 @@ const updateCompany = createAsyncThunk(
 
 const showCompany = createAsyncThunk(
   SHOW_COMPANY,
-  async (
-    id: string,
-    { dispatch, fulfillWithValue, rejectWithValue }: ThunkAPI,
-  ) => {
+  async (id: string, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
     try {
       const { data } = await showCompanyApi(id);
-      dispatch(addMarketplaceEntities(data));
-      return fulfillWithValue(data);
+      const [company] = denormalisedResponseEntities(data);
+      return fulfillWithValue(company);
     } catch (error: any) {
       console.error('show company error', error);
       return rejectWithValue(storableError(error.response.data));
@@ -75,9 +67,10 @@ export const editCompanySlice = createSlice({
         updateCompanyInProgress: true,
         updateCompanyError: null,
       }))
-      .addCase(updateCompany.fulfilled, (state) => ({
+      .addCase(updateCompany.fulfilled, (state, action) => ({
         ...state,
         updateCompanyInProgress: false,
+        companyRef: action.payload,
       }))
       .addCase(updateCompany.rejected, (state, action) => ({
         ...state,
@@ -94,7 +87,7 @@ export const editCompanySlice = createSlice({
       .addCase(showCompany.fulfilled, (state, action) => {
         return {
           ...state,
-          companyRef: entityRefs([action.payload.data.data]),
+          companyRef: action.payload,
           showCompanyInProgress: false,
         };
       })

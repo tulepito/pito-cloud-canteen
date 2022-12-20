@@ -133,6 +133,8 @@ export type TUserAttributes = {
 
 export type TCompanyProfile = {
   displayName: string;
+  firstName: string;
+  lastName: string;
   abbreviatedName: string;
   bio?: string;
   protectedData?: any;

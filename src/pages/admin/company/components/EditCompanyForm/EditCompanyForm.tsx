@@ -10,6 +10,7 @@ import {
   required,
 } from '@utils/validators';
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -41,9 +42,15 @@ type TEditCompanyForm = {
 
 const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
   const intl = useIntl();
+  const router = useRouter();
+  const onSubmitHandler = async (values: TEditCompanyFormValues) => {
+    await props.onSubmit(values);
+    router.push('/admin/company');
+  };
   return (
     <FinalForm
       {...props}
+      onSubmit={onSubmitHandler}
       render={(fieldRenderProps: any) => {
         const {
           handleSubmit,
@@ -277,9 +284,13 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                 inProgress={inProgress}
                 disabled={inProgress}
                 className={css.button}>
-                {intl.formatMessage({
-                  id: 'EditCompanyForm.add',
-                })}
+                {isEditting
+                  ? intl.formatMessage({
+                      id: 'EditCompanyForm.update',
+                    })
+                  : intl.formatMessage({
+                      id: 'EditCompanyForm.add',
+                    })}
               </Button>
             </div>
           </Form>

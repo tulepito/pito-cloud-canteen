@@ -1,3 +1,4 @@
+import type { ThunkAPI } from '@redux/store';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { createCompanyApi } from '@utils/api';
 import { storableError } from '@utils/errors';

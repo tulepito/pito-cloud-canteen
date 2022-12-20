@@ -3,11 +3,9 @@
 import type { ThunkAPI } from '@redux/store';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getCompaniesApi, updateCompanyStatusApi } from '@utils/api';
-import { entityRefs } from '@utils/data';
+import { denormalisedResponseEntities } from '@utils/data';
 import { storableError } from '@utils/errors';
-import type { TPagination } from '@utils/types';
-
-import { addMarketplaceEntities } from './marketplaceData.slice';
+import type { TCompany, TPagination } from '@utils/types';
 
 const RESULT_PAGE_SIZE = 10;
 
@@ -25,14 +23,11 @@ const UPDATE_COMPANY_STATUS = 'app/ManageCompanies/UPDATE_COMPANY_STATUS';
 
 const queryCompanies = createAsyncThunk(
   QUERY_COMPANIES,
-  async (
-    page: number,
-    { dispatch, fulfillWithValue, rejectWithValue }: ThunkAPI,
-  ) => {
+  async (page: number, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
     try {
       const { data } = await getCompaniesApi();
-      dispatch(addMarketplaceEntities(data));
-      return fulfillWithValue({ data, page });
+      const companies = denormalisedResponseEntities(data);
+      return fulfillWithValue({ companies, page, data });
     } catch (error: any) {
       console.error('Query company error : ', error);
       return rejectWithValue(storableError(error.response.data));
@@ -42,14 +37,11 @@ const queryCompanies = createAsyncThunk(
 
 const updateCompanyStatus = createAsyncThunk(
   UPDATE_COMPANY_STATUS,
-  async (
-    updateData: any,
-    { dispatch, fulfillWithValue, rejectWithValue }: ThunkAPI,
-  ) => {
+  async (updateData: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
     try {
       const { data } = await updateCompanyStatusApi(updateData);
-      dispatch(addMarketplaceEntities(data));
-      return fulfillWithValue(data);
+      const [company] = denormalisedResponseEntities(data);
+      return fulfillWithValue(company);
     } catch (error: any) {
       console.error('Update company status error : ', error);
       return rejectWithValue(storableError(error.response.data));
@@ -81,6 +73,7 @@ export const manageCompaniesSlice = createSlice({
   initialState,
   reducers: {
     paginateCompanies: (state, action) => {
+      console.log(state);
       return {
         ...state,
         pagination: {
@@ -92,19 +85,18 @@ export const manageCompaniesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(queryCompanies.pending, (state) => {
-        return {
-          ...state,
-          queryCompaniesInProgress: true,
-          queryCompaniesError: null,
-        };
-      })
+      .addCase(queryCompanies.pending, (state) => ({
+        ...state,
+        queryCompaniesInProgress: true,
+        queryCompaniesError: null,
+      }))
       .addCase(queryCompanies.fulfilled, (state, action) => {
-        const { data, page } = action.payload;
+        const { companies, page, data } = action.payload;
         const { totalItems } = data.data.meta;
+
         return {
           ...state,
-          companyRefs: entityRefs(data.data.data),
+          companyRefs: companies,
           queryCompaniesInProgress: false,
           pagination: {
             totalItems,
@@ -114,18 +106,30 @@ export const manageCompaniesSlice = createSlice({
           },
         };
       })
-      .addCase(queryCompanies.rejected, (state, action) => {
-        return {
-          ...state,
-          queryCompaniesError: action.payload,
-          queryCompaniesInProgress: false,
-        };
-      })
+      .addCase(queryCompanies.rejected, (state, action) => ({
+        ...state,
+        queryCompaniesError: action.payload,
+        queryCompaniesInProgress: false,
+      }))
       .addCase(updateCompanyStatus.pending, (state) => ({
         ...state,
         updateStatusInProgress: true,
         updateStatusError: null,
       }))
+      .addCase(updateCompanyStatus.fulfilled, (state, action) => {
+        const { companyRefs } = state;
+        const companies = [...companyRefs];
+        const newCompany = action.payload;
+        const index = companyRefs.findIndex((company: TCompany) => {
+          return company.id.uuid === newCompany.id.uuid;
+        });
+        companies[index] = newCompany;
+        return {
+          ...state,
+          companyRefs: companies,
+          updateStatusInProgress: false,
+        };
+      })
       .addCase(updateCompanyStatus.rejected, (state, action) => ({
         ...state,
         updateStatusInProgress: false,

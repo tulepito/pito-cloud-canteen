@@ -1,8 +1,7 @@
+import type { ThunkAPI } from '@redux/store';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { createCompanyApi } from '@utils/api';
 import { storableError } from '@utils/errors';
-
-import { addMarketplaceEntities } from './marketplaceData.slice';
 
 interface CreateCompanyState {
   createCompanyInProgress: boolean;
@@ -13,13 +12,9 @@ const CREATE_COMPANY = 'app/CreateCompanyPage/CREATE_COMPANY';
 
 const creatCompany = createAsyncThunk(
   CREATE_COMPANY,
-  async (
-    userData: any,
-    { dispatch, fulfillWithValue, rejectWithValue }: ThunkAPI,
-  ) => {
+  async (userData: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
     try {
       const { data } = await createCompanyApi(userData);
-      dispatch(addMarketplaceEntities(data));
       return fulfillWithValue(data);
     } catch (error: any) {
       console.log(error);

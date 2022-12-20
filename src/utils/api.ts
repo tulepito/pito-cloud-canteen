@@ -40,5 +40,5 @@ export const createCompanyApi = (body: any) =>
 
 export const showCompanyApi = (id: string) => get(`/api/users/company/${id}`);
 
-export const updateCompanyStatusApi = (data: any) =>
-  put(`/api/users/company/status`, data);
+export const updateCompanyStatusApi = (body: any) =>
+  put(`/api/users/company/status`, body);

@@ -96,5 +96,6 @@
   "EditCompanyForm.formHeader": "Tạo khách hàng",
   "FieldAvailability.dayOfWeek": "Ngày hoạt động",
   "FieldAvailability.from": "Từ",
-  "FieldAvailability.to": "Đến"
+  "FieldAvailability.to": "Đến",
+  "EditCompanyForm.update": "Cập nhật"
 }

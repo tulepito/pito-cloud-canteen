@@ -1,28 +1,32 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { updatedEntities } from '@utils/data';
 
-interface CompanyState {
+interface MarketplaceDataState {
   entities?: any;
 }
 
-const merge = (state: CompanyState, sdkResponse: any) => {
+const merge = (state: MarketplaceDataState, sdkResponse: any) => {
   const apiResponse = sdkResponse.data;
   return {
     ...state,
-    entities: updatedEntities({ ...state.entities }, apiResponse),
+    entities: updatedEntities(state.entities, apiResponse),
   };
 };
 
-const initialState: CompanyState = {
+const initialState: MarketplaceDataState = {
   // Database of all the fetched entities.
   entities: {},
 };
+
 export const marketplaceDataSlice = createSlice({
   name: 'marketplaceData',
   initialState,
   reducers: {
     addMarketplaceEntities: (state, action) => {
-      return merge(state, action.payload);
+      const data = action.payload;
+      // Something went wrong with this. Fix later
+      const newState = merge(state, data);
+      return newState;
     },
   },
   extraReducers: () => {},
