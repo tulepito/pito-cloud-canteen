@@ -1,7 +1,10 @@
 import { InlineTextButton } from '@components/Button/Button';
 import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
 import FieldSelect from '@components/FieldSelect/FieldSelect';
+import IconAdd from '@components/IconAdd/IconAdd';
+import IconClose from '@components/IconClose/IconClose';
 import { EDayOfWeek } from '@utils/enums';
+import classNames from 'classnames';
 import React from 'react';
 import { FieldArray } from 'react-final-form-arrays';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -10,7 +13,7 @@ import css from './FieldAvailability.module.scss';
 
 const printHourStrings = (h: any) => (h > 9 ? `${h}:00` : `0${h}:00`);
 
-const HOURS = Array(24).fill();
+const HOURS = Array(24).fill(1);
 const ALL_START_HOURS = [...HOURS].map((v, i) => printHourStrings(i));
 const ALL_END_HOURS = [...HOURS].map((v, i) => printHourStrings(i + 1));
 
@@ -31,10 +34,11 @@ const findEntryFn = (entry: any) => (e: any) =>
 const filterStartHours = (
   availableStartHours: any,
   values: any,
+  name: string,
   dayOfWeek: any,
   index: any,
 ) => {
-  const entries = values[dayOfWeek];
+  const entries = values[name][dayOfWeek];
   const currentEntry = entries[index];
 
   // If there is no end time selected, return all the available start times
@@ -67,10 +71,11 @@ const filterStartHours = (
 const filterEndHours = (
   availableEndHours: any,
   values: any,
+  name: string,
   dayOfWeek: any,
   index: any,
 ) => {
-  const entries = values[dayOfWeek];
+  const entries = values[name][dayOfWeek];
   const currentEntry = entries[index];
 
   // If there is no start time selected, return an empty array;
@@ -101,9 +106,9 @@ const filterEndHours = (
 };
 
 const getEntryBoundaries =
-  (values: any, dayOfWeek: any, intl: any, findStartHours: any) =>
+  (values: any, name: string, dayOfWeek: any, intl: any, findStartHours: any) =>
   (index: any) => {
-    const entries = values[dayOfWeek];
+    const entries = values[name][dayOfWeek];
     const boundaryDiff = findStartHours ? 0 : 1;
 
     return entries.reduce((allHours: any, entry: any, i: any) => {
@@ -113,7 +118,7 @@ const getEntryBoundaries =
         const startHour = Number.parseInt(startTime.split(':')[0], 10);
         const endHour = Number.parseInt(endTime.split(':')[0], 10);
         const hoursBetween = Array(endHour - startHour)
-          .fill()
+          .fill(1)
           .map((v: any, newI: any) =>
             printHourStrings(startHour + newI + boundaryDiff),
           );
@@ -126,9 +131,21 @@ const getEntryBoundaries =
   };
 
 const DailyPlan: React.FC<any> = (props) => {
-  const { dayOfWeek, values, intl } = props;
-  const getEntryStartTimes = getEntryBoundaries(values, dayOfWeek, intl, true);
-  const getEntryEndTimes = getEntryBoundaries(values, dayOfWeek, intl, false);
+  const { dayOfWeek, values, intl, name: fieldName } = props;
+  const getEntryStartTimes = getEntryBoundaries(
+    values,
+    fieldName,
+    dayOfWeek,
+    intl,
+    true,
+  );
+  const getEntryEndTimes = getEntryBoundaries(
+    values,
+    fieldName,
+    dayOfWeek,
+    intl,
+    false,
+  );
 
   const startTimePlaceholder = intl.formatMessage({
     id: 'FieldAvailability.startTimePlaceholder',
@@ -138,82 +155,108 @@ const DailyPlan: React.FC<any> = (props) => {
   });
 
   return (
-    <div className={css.dailyPlan}>
-      <div className={css.dayOfWeek}>
-        <FormattedMessage id={`FieldAvailability.${dayOfWeek}Label`} />
-      </div>
-      <FieldArray name={dayOfWeek}>
-        {({ fields }) => (
-          <div className={css.dailyPlanWrapper}>
-            {fields.map((name: any, index: any) => {
-              console.log(name);
-              // Pick available start hours
-              const pickUnreservedStartHours = (h: any) =>
-                !getEntryStartTimes(index).includes(h);
-              const availableStartHours = ALL_START_HOURS.filter(
-                pickUnreservedStartHours,
-              );
+    <FieldArray name={`${fieldName}.${dayOfWeek}`}>
+      {({ fields }) => {
+        return fields.map((name: any, index: any) => {
+          // Pick available start hours
+          const pickUnreservedStartHours = (h: any) =>
+            !getEntryStartTimes(index).includes(h);
+          const availableStartHours = ALL_START_HOURS.filter(
+            pickUnreservedStartHours,
+          );
+          // Pick available end hours
+          const pickUnreservedEndHours = (h: any) =>
+            !getEntryEndTimes(index).includes(h);
+          const availableEndHours = ALL_END_HOURS.filter(
+            pickUnreservedEndHours,
+          );
 
-              // Pick available end hours
-              const pickUnreservedEndHours = (h: any) =>
-                !getEntryEndTimes(index).includes(h);
-              const availableEndHours = ALL_END_HOURS.filter(
-                pickUnreservedEndHours,
-              );
-              return (
-                <div key={name} className={css.fieldArray}>
-                  <div className={css.field}>
-                    <FieldSelect
-                      id={`${name}.startTime`}
-                      name={`${name}.startTime`}
-                      selectClassName={css.fieldSelect}>
-                      <option disabled value="">
-                        {startTimePlaceholder}
-                      </option>
-                      {filterStartHours(
-                        availableStartHours,
-                        values,
-                        dayOfWeek,
-                        index,
-                      ).map((s) => (
-                        <option value={s} key={s}>
-                          {s}
-                        </option>
-                      ))}
-                    </FieldSelect>
+          return (
+            <tr key={`$_index`} className={css.dailyPlanWrapper}>
+              {index === 0 && (
+                <td rowSpan={fields.length}>
+                  <div className={css.dayOfWeek}>
+                    <FormattedMessage
+                      id={`FieldAvailability.${dayOfWeek}Label`}
+                    />
                   </div>
-                  <div className={css.field}>
-                    <FieldSelect
-                      id={`${name}.endTime`}
-                      name={`${name}.endTime`}
-                      selectClassName={css.fieldSelect}>
-                      <option disabled value="">
-                        {endTimePlaceholder}
-                      </option>
-                      {filterEndHours(
-                        availableEndHours,
-                        values,
-                        dayOfWeek,
-                        index,
-                      ).map((s) => (
-                        <option value={s} key={s}>
-                          {s}
-                        </option>
-                      ))}
-                    </FieldSelect>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </FieldArray>
-    </div>
+                </td>
+              )}
+              <td>
+                <FieldSelect
+                  id={`${name}.startTime`}
+                  name={`${name}.startTime`}
+                  selectClassName={css.fieldSelect}>
+                  <option disabled value="">
+                    {startTimePlaceholder}
+                  </option>
+                  {filterStartHours(
+                    availableStartHours,
+                    values,
+                    fieldName,
+                    dayOfWeek,
+                    index,
+                  ).map((s: any) => (
+                    <option value={s} key={s}>
+                      {s}
+                    </option>
+                  ))}
+                </FieldSelect>
+              </td>
+              <td>
+                <FieldSelect
+                  key={name}
+                  id={`${name}.endTime`}
+                  name={`${name}.endTime`}
+                  selectClassName={css.fieldSelect}>
+                  <option disabled value="">
+                    {endTimePlaceholder}
+                  </option>
+                  {filterEndHours(
+                    availableEndHours,
+                    values,
+                    fieldName,
+                    dayOfWeek,
+                    index,
+                  ).map((s: any) => (
+                    <option value={s} key={s}>
+                      {s}
+                    </option>
+                  ))}
+                </FieldSelect>
+              </td>
+              <td
+                className={classNames(css.tableActions, {
+                  [css.tableActionsFlexEnd]:
+                    fields && fields.length && fields.length > 0,
+                })}>
+                {index > 0 && (
+                  <InlineTextButton
+                    key={name}
+                    onClick={() => fields.remove(index)}
+                    className={css.addButton}>
+                    <IconClose size="small" />
+                  </InlineTextButton>
+                )}
+                <InlineTextButton
+                  key={name}
+                  onClick={() =>
+                    fields.push({ startTime: null, endTime: null })
+                  }
+                  className={css.addButton}>
+                  <IconAdd />
+                </InlineTextButton>
+              </td>
+            </tr>
+          );
+        });
+      }}
+    </FieldArray>
   );
 };
 
 const FieldAvailability = (props: any) => {
-  const { values } = props;
+  const { values, name } = props;
   const intl = useIntl();
   return (
     <div className={css.root}>
@@ -249,16 +292,41 @@ const FieldAvailability = (props: any) => {
               })}
             />
             <div className={css.week}>
-              {Object.keys(EDayOfWeek).map((w) => {
-                return (
-                  <DailyPlan
-                    dayOfWeek={w}
-                    key={w}
-                    values={values}
-                    intl={intl}
-                  />
-                );
-              })}
+              <table className={css.availabilityTable}>
+                <thead>
+                  <tr>
+                    <td className={css.dayOfWeekLabel}>
+                      {intl.formatMessage({
+                        id: 'FieldAvailability.dayOfWeek',
+                      })}
+                    </td>
+                    <td>
+                      {intl.formatMessage({
+                        id: 'FieldAvailability.from',
+                      })}
+                    </td>
+                    <td>
+                      {intl.formatMessage({
+                        id: 'FieldAvailability.to',
+                      })}
+                    </td>
+                    <td></td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.keys(EDayOfWeek).map((w) => {
+                    return (
+                      <DailyPlan
+                        name={name}
+                        dayOfWeek={w}
+                        key={w}
+                        values={values}
+                        intl={intl}
+                      />
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
             <FieldRadioButton
               name="singleDayApply"

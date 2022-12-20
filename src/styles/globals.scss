@@ -1,3 +1,5 @@
+@use '/src/styles/vars.scss' as *;
+
 html,
 body {
   padding: 0;
@@ -80,4 +82,32 @@ textarea,
 
 [aria-disabled] {
   cursor: default;
+}
+
+select {
+  /* Dimensions */
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 5px 0 5px 0;
+
+  /* Unset user agent styles */
+  appearance: none;
+
+  /* Borders */
+  border: none;
+
+  /* Effects */
+
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    border-bottom-color: $matterColor;
+    outline: none;
+  }
+
+  @media (--viewportMedium) {
+    padding: 4px 0 2px 0;
+  }
 }

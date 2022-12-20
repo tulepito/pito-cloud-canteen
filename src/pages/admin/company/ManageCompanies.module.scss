@@ -1,16 +1,22 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
 }
 
+.title {
+  font-weight: $fontWeightRegular;
+  font-size: 20px;
+}
+
 .top {
-  margin-bottom: 10px;
+  margin: 20px 0 10px 0;
   display: flex;
+  align-items: center;
   justify-content: space-between;
 }
 
 .addButton {
-  width: 40px;
   padding: 10px;
   display: flex;
   align-items: center;
@@ -73,9 +79,16 @@
 }
 
 .filterWrapper {
-  display: flex;
   align-items: center;
-  column-gap: 20px;
   margin-bottom: 20px;
+  row-gap: 40px;
   justify-content: space-between;
+  @include viewportLarge {
+    display: flex;
+    flex-direction: row;
+    column-gap: 20px;
+  }
+  .singleFilter {
+    margin-top: 10px;
+  }
 }

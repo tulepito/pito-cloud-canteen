@@ -32,8 +32,14 @@
 
 .buttonWrapper {
   width: 100%;
+  min-height: 50px;
 }
 
 .button {
   float: right;
+}
+
+.formHeader {
+  text-align: center;
+  border-bottom: 1px solid $neutralGray5;
 }

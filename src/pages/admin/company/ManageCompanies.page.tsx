@@ -18,7 +18,12 @@ import {
 import type { RootState } from '@redux/store';
 import { getMarketplaceEntities } from '@utils/data';
 import { ECompanyStatus } from '@utils/enums';
-import type { TPagination, TReverseMapFromEnum, TUser } from '@utils/types';
+import type {
+  TCompany,
+  TPagination,
+  TReverseMapFromEnum,
+  TUser,
+} from '@utils/types';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -152,7 +157,7 @@ const sliceCompanies = (
   );
 };
 
-const filterCompanies = (companies: TUser[], filterValues: any) => {
+const filterCompanies = (companies: TCompany[], filterValues: any) => {
   const { keyword, status } = filterValues;
   if (!keyword && !status) return companies;
   if (!keyword && status) {
@@ -270,7 +275,7 @@ export default function ManageCompanies() {
       manageCompaniesThunks.queryCompanies(parseInt(page as string, 10)),
     );
     setMounted(true);
-  }, [page, mounted, companyRefs]);
+  }, [page]);
 
   useEffect(() => {
     if (!page) return;
@@ -321,6 +326,7 @@ export default function ManageCompanies() {
           onSubmit={onSearchKeyword}
         />
         <SelectSingleFilterPopup
+          className={css.singleFilter}
           options={companyStatusOptions}
           label={intl.formatMessage({ id: 'ManageCompanies.status' })}
           queryParamNames="status"

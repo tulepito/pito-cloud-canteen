@@ -6,7 +6,6 @@
     margin-bottom: 20px;
     border-collapse: collapse;
     width: 100%;
-    padding: 10px;
     display: block;
     @include viewportLarge {
       display: table;
@@ -21,7 +20,7 @@
         td {
           padding: 10px;
           text-align: left;
-          color: #616161;
+          color: $neutralGray8;
           background-color: #fff0eb;
         }
       }

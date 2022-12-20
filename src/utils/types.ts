@@ -122,7 +122,6 @@ export type TUserProfile = {
   protectedData?: any;
   metadata?: any;
   publicData?: any;
-  privateData?: any;
 };
 
 export type TUserAttributes = {
@@ -130,6 +129,23 @@ export type TUserAttributes = {
   deleted: boolean;
   email: string;
   profile: TUserProfile;
+};
+
+export type TCompanyProfile = {
+  displayName: string;
+  abbreviatedName: string;
+  bio?: string;
+  protectedData?: any;
+  metadata?: any;
+  publicData?: any;
+  privateData?: any;
+};
+
+export type TCompanyAttributes = {
+  banned: boolean;
+  deleted: boolean;
+  email: string;
+  profile: TCompanyProfile;
 };
 
 // Listing queries can include author.
@@ -165,6 +181,16 @@ export type TUser = {
     TBannedUserAttributes &
     TDeletedUserAttributes &
     TUserAttributes;
+  profileImage: TImage;
+};
+
+export type TCompany = {
+  id: any;
+  type: 'user';
+  attributes: TAuthorAttributes &
+    TBannedUserAttributes &
+    TDeletedUserAttributes &
+    TCompanyAttributes;
   profileImage: TImage;
 };
 

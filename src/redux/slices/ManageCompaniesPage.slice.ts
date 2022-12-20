@@ -92,11 +92,13 @@ export const manageCompaniesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(queryCompanies.pending, (state) => ({
-        ...state,
-        queryCompaniesInProgress: true,
-        queryCompaniesError: null,
-      }))
+      .addCase(queryCompanies.pending, (state) => {
+        return {
+          ...state,
+          queryCompaniesInProgress: true,
+          queryCompaniesError: null,
+        };
+      })
       .addCase(queryCompanies.fulfilled, (state, action) => {
         const { data, page } = action.payload;
         const { totalItems } = data.data.meta;
@@ -112,11 +114,13 @@ export const manageCompaniesSlice = createSlice({
           },
         };
       })
-      .addCase(queryCompanies.rejected, (state, action) => ({
-        ...state,
-        queryCompaniesError: action.payload,
-        queryCompaniesInProgress: false,
-      }))
+      .addCase(queryCompanies.rejected, (state, action) => {
+        return {
+          ...state,
+          queryCompaniesError: action.payload,
+          queryCompaniesInProgress: false,
+        };
+      })
       .addCase(updateCompanyStatus.pending, (state) => ({
         ...state,
         updateStatusInProgress: true,

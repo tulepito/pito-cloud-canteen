@@ -26,4 +26,12 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   Action<string>
 >;
 
+export type ThunkAPI = {
+  dispatch?: any;
+  getState?: any;
+  extra: any;
+  rejectWithValue?: any;
+  fulfillWithValue?: any;
+};
+
 export default store;

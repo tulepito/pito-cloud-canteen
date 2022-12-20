@@ -53,11 +53,18 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
         } = fieldRenderProps;
         return (
           <Form onSubmit={handleSubmit} className={css.form}>
-            <h3 className={css.formTitle}>
+            <div className={css.formHeader}>
+              <p>
+                {intl.formatMessage({
+                  id: 'EditCompanyForm.formHeader',
+                })}
+              </p>
+            </div>
+            <p className={css.formTitle}>
               {intl.formatMessage({
                 id: 'EditCompanyForm.personalInformation',
               })}
-            </h3>
+            </p>
             <div className={css.fields}>
               <FieldTextInput
                 id="firstName"
@@ -74,6 +81,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                     id: 'EditCompanyForm.firstNameRequired',
                   }),
                 )}
+                required
               />
               <FieldTextInput
                 id="lastName"
@@ -90,6 +98,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                     id: 'EditCompanyForm.lastNameRequired',
                   }),
                 )}
+                required
               />
             </div>
             {!isEditting && (
@@ -116,6 +125,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                       }),
                     ),
                   )}
+                  required
                 />
               </div>
             )}
@@ -135,6 +145,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                     id: 'EditCompanyForm.phoneRequired',
                   }),
                 )}
+                required
               />
               <FieldTextInput
                 id="address"
@@ -166,6 +177,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                       id: 'EditCompanyForm.passwordRequired',
                     }),
                   )}
+                  required
                 />
                 <FieldTextInput
                   id="confirmPassword"
@@ -191,6 +203,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                       'password',
                     ),
                   )}
+                  required
                 />
               </div>
             )}

@@ -1,6 +1,6 @@
 {
   "SignUpPage.Title": "Đăng ký",
-  "ManageCompanies.title": "Công ty",
+  "ManageCompanies.title": "Bảng khách hàng",
   "ManageCompanies.description": "Quản lý công ty",
   "AdminSidebar.homeLabel": "Trang chủ",
   "AdminSidebar.userLabel": "Quản lý nguời dùng",
@@ -92,5 +92,9 @@
   "FieldAvailability.allWeekApply": "Áp dụng cho cả tuần",
   "FieldAvailability.startTimePlaceholder": "Thời gian bắt đầu",
   "FieldAvailability.endTimePlaceholder": "Thời gian kết thúc",
-  "FieldAvailability.singleDayApply": "Tùy chọn theo từng ngày"
+  "FieldAvailability.singleDayApply": "Tùy chọn theo từng ngày",
+  "EditCompanyForm.formHeader": "Tạo khách hàng",
+  "FieldAvailability.dayOfWeek": "Ngày hoạt động",
+  "FieldAvailability.from": "Từ",
+  "FieldAvailability.to": "Đến"
 }

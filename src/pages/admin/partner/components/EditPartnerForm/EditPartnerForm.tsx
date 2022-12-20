@@ -5,7 +5,7 @@ import Form from '@components/Form/Form';
 import { getDefaultTimeZoneOnBrowser } from '@utils/dates';
 import type { TAvailabilityPlan } from '@utils/types';
 import arrayMutators from 'final-form-arrays';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -69,7 +69,14 @@ const EditPartnerForm: React.FC<TEditPartnerForm> = (props) => {
     ],
   } as TAvailabilityPlan;
   const availabilityPlan = defaultAvailabilityPlan;
-  const initialValues = createInitialValues(availabilityPlan);
+  const initialValues = useMemo(
+    () => ({
+      availabilityPlan: createInitialValues(availabilityPlan),
+      allWeekApply: true,
+      singleDayApply: true,
+    }),
+    [availabilityPlan],
+  );
 
   return (
     <FinalForm
@@ -248,7 +255,11 @@ const EditPartnerForm: React.FC<TEditPartnerForm> = (props) => {
               />
             </div>
             <div className={css.fields}>
-              <FieldAvailability values={values} />
+              <FieldAvailability
+                values={values}
+                id="availabilityPlan"
+                name="availabilityPlan"
+              />
             </div>
           </Form>
         );

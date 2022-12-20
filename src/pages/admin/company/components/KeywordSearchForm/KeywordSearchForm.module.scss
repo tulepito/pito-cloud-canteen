@@ -1,10 +1,14 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
   align-items: center;
   display: flex;
   .searchInput {
-    width: 400px;
+    width: 100%;
+    @include viewportLarge {
+      width: 400px;
+    }
     margin-right: 10px;
   }
   .searchButton {
