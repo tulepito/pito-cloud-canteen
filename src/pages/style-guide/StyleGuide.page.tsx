@@ -1,3 +1,4 @@
+import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
@@ -7,6 +8,7 @@ import Form from '@components/Form/Form';
 import IconCalendar from '@components/IconCalender/IconCalender';
 import Layout from '@components/Layout/Layout';
 import Modal from '@components/Modal/Modal';
+import Progress from '@components/Progress/Progress';
 import Tabs from '@components/Tabs/Tabs';
 import Toggle from '@components/Toggle/Toggle';
 import useBoolean from '@hooks/useBoolean';
@@ -191,6 +193,70 @@ const StyleGuidePage = (props: any) => {
                     onClick={onSingleToggle}
                     label="Receive notification"
                   />
+                  <Toggle
+                    status="off"
+                    onClick={onSingleToggle}
+                    disabled
+                    label="Disable toggle off status"
+                  />
+                  <Toggle
+                    status="on"
+                    onClick={onSingleToggle}
+                    disabled
+                    label="Disable toggle on status"
+                  />
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  <Badge label="Label" hasCloseIcon hasDotIcon />
+                  <Badge label="Label" hasCloseIcon type="warning" hasDotIcon />
+                  <Badge
+                    label="Đang xác nhận"
+                    hasDotIcon
+                    type="processing"
+                    hasCloseIcon
+                  />
+                  <Badge
+                    label="Thành công"
+                    hasDotIcon
+                    type="success"
+                    hasCloseIcon
+                  />
+                  <Badge
+                    label="Thanh toán thất bại"
+                    type="error"
+                    hasCloseIcon
+                    hasDotIcon
+                  />
+                  <Badge label="Label" hasDotIcon />
+                  <Badge label="Label" type="warning" hasDotIcon />
+                  <Badge label="Đang xác nhận" hasDotIcon type="processing" />
+                  <Badge label="Thành công" hasDotIcon type="success" />
+                  <Badge label="Thanh toán thất bại" type="error" hasDotIcon />
+                </div>
+
+                <div
+                  style={{
+                    marginTop: '16px',
+                    display: 'flex',
+                    gap: '6px',
+                    flexDirection: 'column',
+                  }}>
+                  <Progress percent={30} />
+                  <Progress percent={95.6} />
+                  <Progress percent={100} />
+                  <Progress percent={60} />
+                  <Progress percent={0} showInfo={false} />
+                </div>
+                <div
+                  style={{
+                    marginTop: '16px',
+                    display: 'flex',
+                    gap: '6px',
+                  }}>
+                  <Progress percent={30} type="circle" animate />
+                  <Progress percent={90} type="circle" />
+                  <Progress percent={100} type="circle" />
+                  <Progress percent={0} type="circle" />
                 </div>
                 <FieldSelect
                   id="select1"
