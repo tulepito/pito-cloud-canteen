@@ -8,6 +8,7 @@ import IconCalendar from '@components/IconCalender/IconCalender';
 import Layout from '@components/Layout/Layout';
 import Modal from '@components/Modal/Modal';
 import Tabs from '@components/Tabs/Tabs';
+import Toggle from '@components/Toggle/Toggle';
 import useBoolean from '@hooks/useBoolean';
 import type { TIconProps } from '@utils/types';
 import { required } from '@utils/validators';
@@ -113,6 +114,10 @@ const StyleGuidePage = (props: any) => {
   const onSubmitHandler = (values: object) => {
     console.log('Values:', { values });
   };
+
+  const onSingleToggle = (value: boolean) => {
+    console.log('Single toggle:', value);
+  };
   return (
     <Layout>
       <div className={css.styleGuideContainer}>
@@ -161,7 +166,7 @@ const StyleGuidePage = (props: any) => {
                 <FieldCheckbox
                   id="checkbox-group-2"
                   name="favorites"
-                  value="saladF"
+                  value="salad"
                   label="Favorites"
                 />
                 <FieldSelect
@@ -175,6 +180,9 @@ const StyleGuidePage = (props: any) => {
                   <option value="first">First option</option>
                   <option value="second">Second option</option>
                 </FieldSelect>
+                <div style={{ margin: '16px 0' }}>
+                  <Toggle status="off" onClick={onSingleToggle} disabled />
+                </div>
                 <FieldSelect
                   id="select1"
                   name="select1"
@@ -228,24 +236,7 @@ const StyleGuidePage = (props: any) => {
                     placeholder="Enter your password"
                     label="Password"
                   />
-                  <FieldPasswordInput
-                    id="confirm-password"
-                    name="confirm-password"
-                    placeholder="Enter your password"
-                    label="Confirm password"
-                  />
-                  <FieldPasswordInput
-                    id="confirm-password"
-                    name="confirm-password"
-                    placeholder="Enter your password"
-                    label="Confirm password"
-                  />
-                  <FieldPasswordInput
-                    id="confirm-password"
-                    name="confirm-password"
-                    placeholder="Enter your password"
-                    label="Confirm password"
-                  />
+
                   <FieldPasswordInput
                     id="confirm-password"
                     name="confirm-password"
