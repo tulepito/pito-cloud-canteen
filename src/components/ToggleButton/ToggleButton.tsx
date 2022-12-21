@@ -25,7 +25,9 @@ const ToggleButton: React.FC<TToggleButtonProps> = (props) => {
 
   const onClickToggleButton = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = e.target;
-    onClick && onClick(checked);
+    if (onClick) {
+      onClick(checked);
+    }
     toggle();
   };
 

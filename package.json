@@ -75,7 +75,7 @@
     "stylelint-processor-styled-components": "^1.10.0",
     "typescript": "4.9.3"
   },
-   "browser": {
+  "browser": {
     "fs": false
-    }
+  }
 }

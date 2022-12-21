@@ -6,13 +6,11 @@ import Table from '@components/Table/Table';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { managePartnerThunks } from '@redux/slices/ManagePartnersPage.slice';
-import { RootState } from '@redux/store';
 import { getMarketplaceEntities } from '@utils/data';
 import { ECompanyStatus } from '@utils/enums';
 import classNames from 'classnames';
 import Link from 'next/link';
 import React, { useEffect, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
 import css from './ManagePartners.module.scss';
 

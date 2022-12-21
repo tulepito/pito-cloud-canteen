@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-named-as-default
 import Avatar from '@components/Avatar/Avatar';
 import HamburgerMenuButton from '@components/HamburgerMenuButton/HamburgerMenuButton';
 import IconBell from '@components/IconBell/IconBell';
@@ -7,7 +8,6 @@ import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuConten
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import { useAppSelector } from '@hooks/reduxHooks';
-import { TCurrentUser } from '@utils/types';
 import React from 'react';
 
 import css from './AdminHeader.module.scss';
