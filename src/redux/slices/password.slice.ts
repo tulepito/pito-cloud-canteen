@@ -119,7 +119,7 @@ const passwordSlice = createSlice({
         return {
           ...state,
           resetPasswordInProgress: false,
-          resetPasswordError: action.payload,
+          resetPasswordError: action.error,
         };
       });
   },

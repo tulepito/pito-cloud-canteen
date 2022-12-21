@@ -66,7 +66,7 @@ const emailVerificationSlice = createSlice({
       return {
         ...state,
         verificationInProgress: false,
-        verificationError: action.payload,
+        verificationError: action.error,
       };
     });
   },

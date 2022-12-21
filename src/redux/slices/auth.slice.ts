@@ -140,7 +140,7 @@ const authSlice = createSlice({
         return {
           ...state,
           authStatus: EAuthState.idle,
-          signupError: action.payload,
+          signupError: action.error,
         };
       })
 
@@ -160,7 +160,7 @@ const authSlice = createSlice({
         return {
           ...state,
           authStatus: EAuthState.idle,
-          signInError: action.payload,
+          signInError: action.error,
         };
       })
 
@@ -184,7 +184,7 @@ const authSlice = createSlice({
         return {
           ...state,
           authStatus: EAuthState.idle,
-          logoutError: action.payload,
+          logoutError: action.error,
         };
       });
   },
