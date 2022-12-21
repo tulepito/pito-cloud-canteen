@@ -7,6 +7,7 @@ import differenceBy from 'lodash/differenceBy';
 import { useMemo } from 'react';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
 
 import css from './AddNewMembersForm.module.scss';
 
@@ -20,6 +21,7 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
   groupMembers,
   groupId,
 }) => {
+  const intl = useIntl();
   const dispatch = useAppDispatch();
   const updateGroupInProgress = useAppSelector(
     (state) => state.company.updateGroupInProgress,
@@ -69,7 +71,7 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
               className={css.submitBtn}
               disabled={pristine || updateGroupInProgress}
               inProgress={updateGroupInProgress}>
-              Them thanh vien
+              {intl.formatMessage({ id: 'AddNewMembersForm.submit' })}
             </Button>
           </Form>
         );

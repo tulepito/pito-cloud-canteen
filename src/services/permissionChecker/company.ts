@@ -1,6 +1,6 @@
-import { denormalisedResponseEntities } from '@services/data';
 import { getSdk, handleError } from '@services/sdk';
 import { UserPermission } from '@src/types/UserPermission';
+import { denormalisedResponseEntities } from '@utils/data';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 const needCheckingRequestBodyMethod = ['POST', 'PUT', 'DELETE'];

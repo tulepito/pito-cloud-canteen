@@ -22,3 +22,12 @@
   margin-top: 16px;
   @include flexAlign(center);
 }
+
+.buttonsWrapper {
+  @include flexAlign(center);
+
+  .cancelBtn {
+    margin-right: 16px;
+    @include buttonColorSecondary;
+  }
+}

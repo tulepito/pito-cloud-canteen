@@ -1,5 +1,6 @@
 import { DownloadInvoice } from '@components/Icons/Icons';
 import Papa from 'papaparse';
+import { useIntl } from 'react-intl';
 
 import css from './CSVFieldInput.module.scss';
 
@@ -8,6 +9,7 @@ type CSVFieldInputProps = {
 };
 
 const CSVFieldInput: React.FC<CSVFieldInputProps> = ({ setData }) => {
+  const intl = useIntl();
   const onHandleChange = (event: any) => {
     Papa.parse(event.target.files[0], {
       header: true,
@@ -21,7 +23,7 @@ const CSVFieldInput: React.FC<CSVFieldInputProps> = ({ setData }) => {
     <div>
       <label className={css.label} htmlFor="csvReaderField">
         <DownloadInvoice className={css.downloadIcon} />
-        Tai len
+        {intl.formatMessage({ id: 'CSVFieldInput.upload' })}
       </label>
       <input
         id="csvReaderField"

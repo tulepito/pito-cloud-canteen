@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
 import { BookerManageCompany } from '@redux/slices/company.slice';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
 
 import css from './GroupInfoForm.module.scss';
 
@@ -14,6 +15,7 @@ type GroupInfoFormProps = {
   onCallback: () => void;
 };
 const GroupInfoForm: React.FC<GroupInfoFormProps> = (props) => {
+  const intl = useIntl();
   const { initialValues, onCallback, groupId } = props;
   const dispatch = useAppDispatch();
   const updateGroupInProgress = useAppSelector(
@@ -41,24 +43,32 @@ const GroupInfoForm: React.FC<GroupInfoFormProps> = (props) => {
               <FieldTextInput
                 id="GroupInfo-GroupName"
                 name="name"
-                label="Ten nhom"
+                label={intl.formatMessage({ id: 'GroupInfoForm.name' })}
                 labelClassName={css.label}
                 className={css.groupNameField}
               />
               <FieldTextInput
                 id="GroupInfo-GroupDescription"
                 name="description"
-                label="Mo ta"
+                label={intl.formatMessage({ id: 'GroupInfoForm.description' })}
                 labelClassName={css.label}
                 className={css.descriptionField}
               />
             </div>
-            <Button
-              disabled={pristine}
-              type="submit"
-              inProgress={updateGroupInProgress}>
-              Luu thay doi
-            </Button>
+            <div className={css.buttonsWrapper}>
+              <Button
+                className={css.cancelBtn}
+                type="button"
+                onClick={onCallback}>
+                {intl.formatMessage({ id: 'GroupInfoForm.cancel' })}
+              </Button>
+              <Button
+                disabled={pristine}
+                type="submit"
+                inProgress={updateGroupInProgress}>
+                {intl.formatMessage({ id: 'GroupInfoForm.saveChange' })}
+              </Button>
+            </div>
           </Form>
         );
       }}

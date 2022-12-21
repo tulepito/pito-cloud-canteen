@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from '@src/redux/reduxHooks';
 import { BookerManageCompany } from '@src/redux/slices/company.slice';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import css from './GroupSetting.module.scss';
@@ -22,6 +23,7 @@ type TGroupItem = {
   memberNumber: string;
 };
 const GroupSettingPage = () => {
+  const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const {
@@ -77,14 +79,16 @@ const GroupSettingPage = () => {
   const TABLE_COLUMN: TColumn[] = [
     {
       key: 'groupName',
-      label: 'Ten nhom',
+      label: intl.formatMessage({ id: 'GroupSetting.columnLabel.groupName' }),
       render: (data: any) => {
         return <span>{data.groupName}</span>;
       },
     },
     {
       key: 'memberNumber',
-      label: 'So thanh vien',
+      label: intl.formatMessage({
+        id: 'GroupSetting.columnLabel.memberNumber',
+      }),
       render: (data: any) => {
         return <span>{data.memberNumber}</span>;
       },
@@ -127,7 +131,7 @@ const GroupSettingPage = () => {
     <div className={css.container}>
       <div className={css.header}>
         <div className={css.titleWrapper}>
-          <h2>Cai dat nhom</h2>
+          <h2>{intl.formatMessage({ id: 'GroupSetting.pageTitle' })}</h2>
           <p>
             Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aliquid,
             accusantium! Iure porro veritatis, laboriosam non suscipit libero
@@ -137,7 +141,7 @@ const GroupSettingPage = () => {
         </div>
         <Button className={css.createGroupBtn} onClick={openCreateGroupModal}>
           <IconOutlinePlus />
-          Them nhom
+          {intl.formatMessage({ id: 'GroupSetting.addGroup' })}
         </Button>
       </div>
       <div className={css.tableContainer}>
@@ -157,9 +161,9 @@ const GroupSettingPage = () => {
         id="DeleteGroupModal"
         isOpen={isDeleteGroupConfirmationModalOpen}
         onClose={onDeleteGroupConfirmationModalClose}
-        confirmText="Dong y"
-        cancelText="Bo qua"
-        title={`Ban co muon xoa khong?`}
+        confirmText={intl.formatMessage({ id: 'GroupSetting.confirmText' })}
+        cancelText={intl.formatMessage({ id: 'GroupSetting.cancelText' })}
+        title={intl.formatMessage({ id: 'GroupSetting.deleteGroupModalTitle' })}
         isConfirmButtonLoading={deleteGroupInProgress}
         onConfirm={onConfirmDeleteGroup}
         onCancel={onDeleteGroupConfirmationModalClose}

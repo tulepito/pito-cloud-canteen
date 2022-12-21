@@ -1,0 +1,46 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  max-height: 380px;
+  overflow-y: auto;
+  margin-top: 16px;
+
+  @include flexAlign(center);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.memberItem {
+  width: 308px;
+  @include flexAlign(center, space-between);
+
+  .memberWrapper {
+    @include flexAlign(center);
+
+    .grayCircle {
+      width: 28px;
+      height: 28px;
+      background-color: $neutralGray11;
+      border-radius: 50%;
+      flex-basis: 28px;
+      margin-right: 12px;
+    }
+
+    .fullRowEmail {
+      @include text(14px);
+      color: $matterColorDark;
+      word-break: break-all;
+      width: 200px;
+    }
+
+    .email {
+      @include text(12px);
+      color: $neutralGray8;
+    }
+  }
+
+  .actionsWrapper {
+    @include flexAlign(center);
+  }
+}

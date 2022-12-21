@@ -2,13 +2,9 @@ import CompanySidebar from '@components/CompanySidebar/CompanySidebar';
 import GeneralHeader from '@components/GeneralHeader/GeneralHeader';
 import GeneralLayoutContent from '@components/GeneralLayoutContent/GeneralLayoutContent';
 import GeneralMainContent from '@components/GeneralMainContent/GeneralMainContent';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 
-type TCompanyLayout = {
-  children: ReactNode;
-};
-
-const CompanyLayout = (props: TCompanyLayout) => {
+const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
   return (
     <>

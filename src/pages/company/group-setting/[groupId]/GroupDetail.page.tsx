@@ -11,6 +11,7 @@ import { BookerManageCompany } from '@src/redux/slices/company.slice';
 import filter from 'lodash/filter';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import AddNewMembersModal from './components/AddNewMembersModal/AddNewMembersModal';
@@ -18,6 +19,7 @@ import GroupInfoForm from './components/GroupInfoForm/GroupInfoForm';
 import css from './GroupDetail.module.scss';
 
 const GroupDetailPage = () => {
+  const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const {
@@ -109,35 +111,35 @@ const GroupDetailPage = () => {
   const TABLE_COLUMN: TColumn[] = [
     {
       key: 'name',
-      label: 'Ten',
+      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.name' }),
       render: (data: any) => {
         return <span>{data.name}</span>;
       },
     },
     {
       key: 'email',
-      label: 'So thanh vien',
+      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.email' }),
       render: (data: any) => {
         return <span>{data.email}</span>;
       },
     },
     {
       key: 'group',
-      label: 'Nhom',
+      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.group' }),
       render: (data: any) => {
         return <span>{data.group}</span>;
       },
     },
     {
       key: 'allergy',
-      label: 'Di ung',
+      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.allergy' }),
       render: (data: any) => {
         return <span>{data.allergy}</span>;
       },
     },
     {
       key: 'nutrition',
-      label: 'Che do dinh duong',
+      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.nutrition' }),
       render: (data: any) => {
         return <span>{data.nutrition}</span>;
       },
@@ -198,11 +200,15 @@ const GroupDetailPage = () => {
     );
   };
 
+  const handleGoBack = () => {
+    router.back();
+  };
+
   return (
     <div className={css.container}>
-      <div className={css.backBtn}>
+      <div className={css.backBtn} onClick={handleGoBack}>
         <IconArrow direction="left" />
-        Quay lai
+        {intl.formatMessage({ id: 'GroupDetail.backButton' })}
       </div>
       <div className={css.header}>
         {isEditing ? (
@@ -219,12 +225,12 @@ const GroupDetailPage = () => {
             </div>
             <div className={css.actionBtns}>
               <Button onClick={onEditing} className={css.changeNameBtn}>
-                Doi ten
+                {intl.formatMessage({ id: 'GroupDetail.changeGroupName' })}
               </Button>
               <Button
                 onClick={openDeleteGroupConfirmationModal}
                 className={css.deleteGroupBtn}>
-                Xoa nhom
+                {intl.formatMessage({ id: 'GroupDetail.deleteGroup' })}
               </Button>
             </div>
           </>
@@ -237,7 +243,7 @@ const GroupDetailPage = () => {
           isLoading={fetchGroupDetailInProgress}
         />
         <Button className={css.addMemberBtn} onClick={openAddNewMembersModal}>
-          + &nbsp;Them thanh vien nhom
+          {intl.formatMessage({ id: 'GroupDetail.addGroupMember' })}
         </Button>
       </div>
       <AddNewMembersModal
@@ -251,9 +257,15 @@ const GroupDetailPage = () => {
         id="DeleteMemberModal"
         isOpen={isDeleteMemberConfirmationModalOpen}
         onClose={closeDeleteMemberConfirmationModal}
-        confirmText="Dong y"
-        cancelText="Bo qua"
-        title={`Ban co muon xoa khong?`}
+        confirmText={intl.formatMessage({
+          id: 'GroupDetail.confirmDeleteMemberText',
+        })}
+        cancelText={intl.formatMessage({
+          id: 'GroupDetail.cancelDeleteMemberText',
+        })}
+        title={intl.formatMessage({
+          id: 'GroupDetail.deleteMemberModalTitle',
+        })}
         isConfirmButtonLoading={updateGroupInProgress}
         onConfirm={onConfirmDeleteMember}
         onCancel={closeDeleteMemberConfirmationModal}
@@ -263,9 +275,15 @@ const GroupDetailPage = () => {
         id="DeleteGroupModal"
         isOpen={isDeleteGroupConfirmationModalOpen}
         onClose={onDeleteGroupConfirmationModalClose}
-        confirmText="Dong y"
-        cancelText="Bo qua"
-        title={`Ban co muon xoa nhom khong?`}
+        confirmText={intl.formatMessage({
+          id: 'GroupDetail.confirmDeleteGroupText',
+        })}
+        cancelText={intl.formatMessage({
+          id: 'GroupDetail.cancelDeleteGroupText',
+        })}
+        title={intl.formatMessage({
+          id: 'GroupDetail.deleteGroupModalTitle',
+        })}
         isConfirmButtonLoading={deleteGroupInProgress}
         onConfirm={onConfirmDeleteGroup}
         onCancel={onDeleteGroupConfirmationModalClose}

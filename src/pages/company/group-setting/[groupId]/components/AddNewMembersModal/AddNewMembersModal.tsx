@@ -2,6 +2,7 @@ import Button from '@components/Button/Button';
 import IconModalClose from '@components/IconModalClose/IconModalClose';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import classNames from 'classnames';
+import { useIntl } from 'react-intl';
 
 import AddNewMembersForm from '../AddNewMembersForm/AddNewMembersForm';
 import css from './AddNewMembersModal.module.scss';
@@ -14,6 +15,7 @@ type AddNewMembersModalProps = {
   onClose: () => void;
 };
 const AddNewMembersModal: React.FC<AddNewMembersModalProps> = (props) => {
+  const intl = useIntl();
   const { isOpen, onClose, companyMembers, groupMembers, groupId } = props;
   const modalClasses = classNames(css.modal, {
     [css.open]: isOpen,
@@ -27,7 +29,9 @@ const AddNewMembersModal: React.FC<AddNewMembersModalProps> = (props) => {
         <OutsideClickHandler onOutsideClick={onClose}>
           <div className={css.modalContainer}>
             <div className={css.modalHeader}>
-              <span className={css.modalTitle}>Them thanh vien</span>
+              <span className={css.modalTitle}>
+                {intl.formatMessage({ id: 'AddNewMembersModal.modalTitle' })}
+              </span>
               <IconModalClose onClick={onClose} />
             </div>
             <div className={css.modalContent}>
@@ -39,7 +43,7 @@ const AddNewMembersModal: React.FC<AddNewMembersModalProps> = (props) => {
             </div>
             <div className={css.modalFooter}>
               <Button className={css.cancelBtn} onClick={onClose}>
-                Huy
+                {intl.formatMessage({ id: 'AddNewMembersModal.cancel' })}
               </Button>
             </div>
           </div>
