@@ -231,11 +231,11 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                 />
               </div>
             )}
-            <h3 className={css.formTitle}>
+            <p className={css.formTitle}>
               {intl.formatMessage({
                 id: 'EditCompanyForm.companyInformation',
               })}
-            </h3>
+            </p>
             <div className={css.fields}>
               <FieldTextInput
                 id="companyName"
