@@ -176,7 +176,7 @@ const SignUpForm: React.FC<TSignUpFormProps> = (props) => {
                 <div className={css.errorSignUp}>{errorMessage}</div>
               )}
               <Button
-                // inProgress={inProgress}
+                inProgress={inProgress}
                 className={css.submitButton}
                 type="submit"
                 disabled={submitDisable}>
