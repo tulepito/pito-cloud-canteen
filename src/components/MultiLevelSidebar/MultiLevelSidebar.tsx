@@ -2,7 +2,7 @@ import IconMenuArrow from '@components/IconMenuArrow/IconMenuArrow';
 import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './MultiLevelSidebar.module.scss';
@@ -13,6 +13,7 @@ export type TSidebarMenu = {
   Icon?: React.FC<TIconProps>;
   childrenMenus?: TSidebarMenu[];
   nameLink?: string;
+  level?: number;
 };
 
 type TMenuWithClasses = {
@@ -47,7 +48,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
   const { pathname } = router;
   const [isOpen, setIsOpen] = useState(false);
 
-  const { Icon, label, childrenMenus, nameLink } = menu;
+  const { Icon, label, childrenMenus, nameLink, level } = menu;
 
   const hasChildrenMenus = childrenMenus && childrenMenus.length > 0;
 
@@ -62,26 +63,33 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     [nameLink, hasChildrenMenus, setIsOpen, router, isOpen],
   );
 
+  const childIsActive = useMemo(
+    () => childrenMenus?.some((value) => value.nameLink === pathname),
+    [pathname, childrenMenus],
+  ) as boolean;
+
   useEffect(() => {
-    const childIsActive = childrenMenus?.some(
-      (value) => value.nameLink === pathname,
-    ) as boolean;
     if (childIsActive) {
       setIsOpen(true);
     }
-  }, [pathname]);
+  }, [childIsActive]);
 
   const subMenuWrapperClasses = classNames(
     css.subMenu,
     subMenuWrapperClassName,
   );
 
+  const isActive = pathname === nameLink;
+  const firstLevel = level === 1;
   const subMenuLayoutClasses = classNames(
     css.subMenuLayout,
     subMenuLayoutClassName,
+    {
+      [css.isOpen]:
+        firstLevel &&
+        ((isOpen && childIsActive) || (!hasChildrenMenus && isActive)),
+    },
   );
-
-  const isActive = pathname === nameLink;
 
   return (
     <div onClick={handleMenuClick} className={subMenuWrapperClasses}>

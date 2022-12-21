@@ -12,13 +12,15 @@ const SIDEBAR_MENUS: TSidebarMenu[] = [
   {
     id: 'home',
     label: 'AdminSidebar.homeLabel',
-    nameLink: 'Home',
+    nameLink: '/admin',
     Icon: IconHome,
+    level: 1,
   },
   {
     id: 'user',
     label: 'AdminSidebar.userLabel',
     Icon: IconUserManagement,
+    level: 1,
     childrenMenus: [
       {
         id: 'company',
