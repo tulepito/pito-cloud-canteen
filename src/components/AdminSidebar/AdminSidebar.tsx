@@ -32,33 +32,6 @@ const SIDEBAR_MENUS: TSidebarMenu[] = [
         label: 'AdminSidebar.partnerLabel',
         nameLink: '/admin/partner',
       },
-      {
-        id: 'custom',
-        label: 'AdminSidebar.customLabel',
-        childrenMenus: [
-          {
-            id: 'custom1',
-            label: 'AdminSidebar.customLabel',
-            childrenMenus: [
-              {
-                id: 'custom11',
-                label: 'AdminSidebar.customLabel',
-                nameLink: 'Custom11',
-              },
-              {
-                id: 'custom22',
-                label: 'AdminSidebar.customLabel',
-                nameLink: 'Custom22',
-              },
-            ],
-          },
-          {
-            id: 'custom2',
-            label: 'AdminSidebar.customLabel',
-            nameLink: 'Custom2',
-          },
-        ],
-      },
     ],
   },
 ];
