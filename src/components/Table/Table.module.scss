@@ -42,17 +42,21 @@
           display: table-row;
         }
         td {
-          display: block;
+          display: flex;
+          justify-content: space-between;
           width: 100%;
+          align-items: center;
           text-align: right;
           padding: 10px;
           color: #616161;
           border-bottom: 1px solid $matterColorNegative;
           position: relative;
           font-size: 14px;
+          span {
+            word-break: break-all;
+          }
           &:before {
             content: attr(data-label);
-            position: absolute;
             left: 0;
             width: 50%;
             padding-left: 15px;

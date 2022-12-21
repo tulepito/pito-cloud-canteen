@@ -2,7 +2,7 @@ import IconMenuArrow from '@components/IconMenuArrow/IconMenuArrow';
 import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './MultiLevelSidebar.module.scss';
@@ -44,6 +44,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
 
   const intl = useIntl();
   const router = useRouter();
+  const { pathname } = router;
   const [isOpen, setIsOpen] = useState(false);
 
   const { Icon, label, childrenMenus, nameLink } = menu;
@@ -61,6 +62,15 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     [nameLink, hasChildrenMenus, setIsOpen, router, isOpen],
   );
 
+  useEffect(() => {
+    const childIsActive = childrenMenus?.some(
+      (value) => value.nameLink === pathname,
+    ) as boolean;
+    if (childIsActive) {
+      setIsOpen(true);
+    }
+  }, [pathname]);
+
   const subMenuWrapperClasses = classNames(
     css.subMenu,
     subMenuWrapperClassName,
@@ -71,7 +81,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     subMenuLayoutClassName,
   );
 
-  const isActive = router.pathname === nameLink;
+  const isActive = pathname === nameLink;
 
   return (
     <div onClick={handleMenuClick} className={subMenuWrapperClasses}>
