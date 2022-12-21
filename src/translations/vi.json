@@ -189,5 +189,7 @@
   "EditPartnerForm.plasticBox": "Hộp nhựa",
   "EditPartnerForm.bagasseBox": "Hộp bã mía",
   "EditPartnerForm.reusedBox": "Hộp ăn tái sử dụng",
-  "EditPartnerForm.other": "Khác"
+  "EditPartnerForm.other": "Khác",
+  "Avatar.deletedUserDisplayName": "Deleted user",
+  "Avatar.bannedUserDisplayName": "Banned user"
 }

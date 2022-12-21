@@ -91,3 +91,10 @@
     margin-top: 10px;
   }
 }
+
+.toggleButton {
+  justify-content: flex-end;
+  @include viewportLarge {
+    justify-content: flex-start;
+  }
+}

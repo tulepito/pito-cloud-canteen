@@ -14,7 +14,7 @@ export default function CreateCompanyPage() {
     (state) => state.CreateCompanyPage,
   );
 
-  const onSubmit = (values: TEditCompanyFormValues) => {
+  const onSubmit = async (values: TEditCompanyFormValues) => {
     const companyData = {
       email: values.email,
       password: values.password,
@@ -33,7 +33,7 @@ export default function CreateCompanyPage() {
         tax: values.tax,
       },
     };
-    dispatch(
+    await dispatch(
       createCompanyPageThunks.creatCompany({
         dataParams: companyData,
         queryParams: { expand: true },
