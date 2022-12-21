@@ -9,41 +9,45 @@ type TToggle = {
   status: 'on' | 'off';
   onClick: (value: boolean) => void;
   className?: string;
+  label?: string;
 };
 
 const Toggle = (props: TToggle) => {
-  const { disabled = false, status, onClick, className } = props;
+  const { disabled = false, status, onClick, className, label } = props;
 
   const switchControl = useBoolean(status === 'on');
-
   const onFieldSwitchChange = () => {
     if (disabled) {
       return;
     }
+    onClick(!switchControl.value);
     switchControl.toggle();
-    onClick(switchControl.value);
   };
 
-  const switchClasses = classNames(css.switchInput);
-  const labelClasses = classNames(css.switch, {
+  const inputClasses = classNames(css.switchInput);
+  const toggleClasses = classNames(css.switch, {
     [css.disabled]: disabled,
   });
   const classes = classNames(css.root, className);
   return (
     <div className={classes}>
-      <input
-        type="checkbox"
-        className={switchClasses}
-        id="toggle"
-        name="toggle"
-        disabled={disabled}
-        checked={switchControl.value}
-      />
-      <label
-        htmlFor="switch"
-        className={labelClasses}
-        onClick={onFieldSwitchChange}
-      />
+      {label && <div className={css.toggleLabel}>{label}</div>}
+      <div className={css.toggleContainer}>
+        <input
+          type="checkbox"
+          className={inputClasses}
+          id="toggle"
+          name="toggle"
+          disabled={disabled}
+          checked={switchControl.value}
+          defaultChecked={status === 'on'}
+        />
+        <label
+          htmlFor="switch"
+          className={toggleClasses}
+          onClick={onFieldSwitchChange}
+        />
+      </div>
     </div>
   );
 };

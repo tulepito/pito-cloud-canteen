@@ -1,7 +1,9 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 .root {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 .switch {
   position: relative;
@@ -53,4 +55,11 @@
     background: $neutralGray4;
     cursor: not-allowed;
   }
+}
+
+.toggleLabel {
+  font-size: 14px;
+  font-weight: $fontWeightMedium;
+  line-height: 24px;
+  color: $neutralGray10;
 }

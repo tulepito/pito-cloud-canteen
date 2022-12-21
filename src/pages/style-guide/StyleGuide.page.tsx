@@ -181,7 +181,16 @@ const StyleGuidePage = (props: any) => {
                   <option value="second">Second option</option>
                 </FieldSelect>
                 <div style={{ margin: '16px 0' }}>
-                  <Toggle status="off" onClick={onSingleToggle} disabled />
+                  <Toggle
+                    status="on"
+                    onClick={onSingleToggle}
+                    label="Shipping"
+                  />
+                  <Toggle
+                    status="off"
+                    onClick={onSingleToggle}
+                    label="Receive notification"
+                  />
                 </div>
                 <FieldSelect
                   id="select1"
