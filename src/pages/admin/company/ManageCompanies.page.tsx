@@ -264,16 +264,17 @@ export default function ManageCompanies() {
   );
 
   useEffect(() => {
-    if (page && !mounted) {
+    if (!!page && !mounted) {
       dispatch(
         manageCompaniesThunks.queryCompanies(parseInt(page as string, 10)),
       );
+      setMounted(true);
     }
-    setMounted(true);
   }, [page, mounted]);
 
   useEffect(() => {
     if (!page) return;
+    // set pagination for first render
     dispatch(paginateCompanies(parseInt(page as string, 10)));
   }, [page]);
 
@@ -311,7 +312,7 @@ export default function ManageCompanies() {
     () => ({ keyword: keywordAsString }),
     [keywordAsString],
   );
-
+  console.log(queryCompaniesInProgress);
   return (
     <div className={css.root}>
       <Meta title={title} description={description} />

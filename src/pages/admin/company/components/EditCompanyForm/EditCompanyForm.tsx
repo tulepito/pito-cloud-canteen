@@ -7,6 +7,7 @@ import {
   composeValidatorsWithAllValues,
   confirmPassword,
   emailFormatValid,
+  passwordFormatValid,
   required,
 } from '@utils/validators';
 import classNames from 'classnames';
@@ -188,10 +189,17 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                   placeholder={intl.formatMessage({
                     id: 'EditCompanyForm.passwordPlaceholder',
                   })}
-                  validate={required(
-                    intl.formatMessage({
-                      id: 'EditCompanyForm.passwordRequired',
-                    }),
+                  validate={composeValidators(
+                    required(
+                      intl.formatMessage({
+                        id: 'EditCompanyForm.passwordRequired',
+                      }),
+                    ),
+                    passwordFormatValid(
+                      intl.formatMessage({
+                        id: 'EditCompanyForm.passwordInvalid',
+                      }),
+                    ),
                   )}
                   required
                 />
