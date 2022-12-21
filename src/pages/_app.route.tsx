@@ -1,4 +1,5 @@
-import '../styles/globals.scss';
+import '@src/styles/globals.scss';
+import '@src/styles/nprogress.scss';
 
 import AdminLayout from '@components/AdminLayout/AdminLayout';
 import AuthGuard from '@components/AuthGuard/AuthGuard';
@@ -12,7 +13,13 @@ import TranslationProvider from '@translations/TranslationProvider';
 import type { NextApplicationPage } from '@utils/types';
 import type { AppContext, AppInitialProps, AppProps } from 'next/app';
 import App from 'next/app';
+import { Router } from 'next/router';
+import nProgress from 'nprogress';
 import { Provider } from 'react-redux';
+
+Router.events.on('routeChangeStart', nProgress.start);
+Router.events.on('routeChangeError', nProgress.done);
+Router.events.on('routeChangeComplete', nProgress.done);
 
 type AppCustomProps = {
   isAuthenticated: boolean;
