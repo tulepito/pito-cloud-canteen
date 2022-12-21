@@ -22,7 +22,7 @@ const marketplaceDataSlice = createSlice({
   },
 });
 
-// export const {} = marketplaceDataSlice.actions;
+export const { addMarketplaceEntities } = marketplaceDataSlice.actions;
 
 export default marketplaceDataSlice.reducer;
 

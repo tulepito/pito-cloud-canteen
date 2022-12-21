@@ -1,4 +1,5 @@
 import { InlineTextButton } from '@components/Button/Button';
+import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
 import FieldSelect from '@components/FieldSelect/FieldSelect';
 import IconAdd from '@components/IconAdd/IconAdd';
@@ -11,11 +12,16 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './FieldAvailability.module.scss';
 
-const printHourStrings = (h: any) => (h > 9 ? `${h}:00` : `0${h}:00`);
+const printHourStrings = (h: any) => {
+  return h > 9 ? `${h}:00` : `0${h}:00`;
+};
 
 const HOURS = Array(24).fill(1);
 const ALL_START_HOURS = [...HOURS].map((v, i) => printHourStrings(i));
 const ALL_END_HOURS = [...HOURS].map((v, i) => printHourStrings(i + 1));
+
+export const ALL_WEEK_APPLY = 'allWeekApply';
+export const SINGLE_DAY_APPLY = 'singleDayApply';
 
 const sortEntries =
   (defaultCompareReturn = 0) =>
@@ -110,10 +116,8 @@ const getEntryBoundaries =
   (index: any) => {
     const entries = values[name][dayOfWeek];
     const boundaryDiff = findStartHours ? 0 : 1;
-
     return entries.reduce((allHours: any, entry: any, i: any) => {
       const { startTime, endTime } = entry || {};
-
       if (i !== index && startTime && endTime) {
         const startHour = Number.parseInt(startTime.split(':')[0], 10);
         const endHour = Number.parseInt(endTime.split(':')[0], 10);
@@ -131,7 +135,7 @@ const getEntryBoundaries =
   };
 
 const DailyPlan: React.FC<any> = (props) => {
-  const { dayOfWeek, values, intl, name: fieldName } = props;
+  const { dayOfWeek, values, intl, name: fieldName, type } = props;
   const getEntryStartTimes = getEntryBoundaries(
     values,
     fieldName,
@@ -173,7 +177,7 @@ const DailyPlan: React.FC<any> = (props) => {
 
           return (
             <tr key={`$_index`} className={css.dailyPlanWrapper}>
-              {index === 0 && (
+              {type !== ALL_WEEK_APPLY && index === 0 && (
                 <td rowSpan={fields.length}>
                   <div className={css.dayOfWeek}>
                     <FormattedMessage
@@ -235,7 +239,7 @@ const DailyPlan: React.FC<any> = (props) => {
                     key={name}
                     onClick={() => fields.remove(index)}
                     className={css.addButton}>
-                    <IconClose size="small" />
+                    <IconClose className={css.iconClose} />
                   </InlineTextButton>
                 )}
                 <InlineTextButton
@@ -256,10 +260,14 @@ const DailyPlan: React.FC<any> = (props) => {
 };
 
 const FieldAvailability = (props: any) => {
-  const { values, name } = props;
+  const { values, name, className } = props;
   const intl = useIntl();
+  const daysOfWeek = Object.keys(EDayOfWeek);
+  const isAllWeek = values.daysToApply?.includes('allWeek');
+  const dayToApplys = isAllWeek ? daysOfWeek : values.daysToApply;
+
   return (
-    <div className={css.root}>
+    <div className={classNames(css.root, className)}>
       <p>{intl.formatMessage({ id: 'FieldAvailability.label' })}</p>
       <div className={css.wrapper}>
         <div className={css.listDay}>
@@ -267,16 +275,43 @@ const FieldAvailability = (props: any) => {
             {intl.formatMessage({ id: 'FieldAvailability.dateLabel' })}
           </p>
           <div className={css.dayPicker}>
-            {Object.keys(EDayOfWeek).map((day: string) => {
+            {daysOfWeek.map((day: string) => {
               return (
-                <InlineTextButton className={css.dayButton} key={day}>
-                  {intl.formatMessage({ id: `FieldAvailability.${day}Label` })}
-                </InlineTextButton>
+                <div
+                  key={day}
+                  className={classNames(css.dayButton, {
+                    [css.active]: values.daysToApply?.includes(day),
+                  })}>
+                  <FieldCheckbox
+                    className={css.checkbox}
+                    id={`daysToApply.${day}`}
+                    name={'daysToApply'}
+                    value={day}
+                  />
+                  <label htmlFor={`daysToApply.${day}`} key={day}>
+                    {intl.formatMessage({
+                      id: `FieldAvailability.${day}Label`,
+                    })}
+                  </label>
+                </div>
               );
             })}
-            <InlineTextButton className={css.dayButton}>
-              {intl.formatMessage({ id: `FieldAvailability.allWeek` })}
-            </InlineTextButton>
+            <div
+              className={classNames(css.dayButton, {
+                [css.active]: isAllWeek,
+              })}>
+              <FieldCheckbox
+                className={css.checkbox}
+                id={`daysToApply.allWeek`}
+                name={`daysToApply`}
+                value={'allWeek'}
+              />
+              <label htmlFor={`daysToApply.allWeek`}>
+                {intl.formatMessage({
+                  id: `FieldAvailability.allWeek`,
+                })}
+              </label>
+            </div>
           </div>
         </div>
         <div className={css.dailyPlanWrapper}>
@@ -285,56 +320,95 @@ const FieldAvailability = (props: any) => {
           </p>
           <div className={css.dailyPlanOptionsWrapper}>
             <FieldRadioButton
-              name="allWeekApply"
-              id="allWeekApply"
+              name="applyType"
+              id={ALL_WEEK_APPLY}
+              value={ALL_WEEK_APPLY}
               label={intl.formatMessage({
                 id: 'FieldAvailability.allWeekApply',
               })}
             />
-            <div className={css.week}>
-              <table className={css.availabilityTable}>
-                <thead>
-                  <tr>
-                    <td className={css.dayOfWeekLabel}>
-                      {intl.formatMessage({
-                        id: 'FieldAvailability.dayOfWeek',
-                      })}
-                    </td>
-                    <td>
-                      {intl.formatMessage({
-                        id: 'FieldAvailability.from',
-                      })}
-                    </td>
-                    <td>
-                      {intl.formatMessage({
-                        id: 'FieldAvailability.to',
-                      })}
-                    </td>
-                    <td></td>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.keys(EDayOfWeek).map((w) => {
-                    return (
-                      <DailyPlan
-                        name={name}
-                        dayOfWeek={w}
-                        key={w}
-                        values={values}
-                        intl={intl}
-                      />
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            {values.applyType === ALL_WEEK_APPLY && (
+              <div className={css.week}>
+                <table className={css.availabilityTable}>
+                  <thead>
+                    <tr>
+                      <td>
+                        {intl.formatMessage({
+                          id: 'FieldAvailability.from',
+                        })}
+                      </td>
+                      <td>
+                        {intl.formatMessage({
+                          id: 'FieldAvailability.to',
+                        })}
+                      </td>
+                      <td></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {daysOfWeek.slice(0, 1).map((w) => {
+                      return (
+                        <DailyPlan
+                          name={name}
+                          type={ALL_WEEK_APPLY}
+                          dayOfWeek={w}
+                          key={w}
+                          values={values}
+                          intl={intl}
+                        />
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
             <FieldRadioButton
-              name="singleDayApply"
-              id="singleDayApply"
+              name="applyType"
+              id={SINGLE_DAY_APPLY}
+              value={SINGLE_DAY_APPLY}
               label={intl.formatMessage({
                 id: 'FieldAvailability.singleDayApply',
               })}
             />
+            {values.applyType === SINGLE_DAY_APPLY && (
+              <div className={css.week}>
+                <table className={css.availabilityTable}>
+                  <thead>
+                    <tr>
+                      <td className={css.dayOfWeekLabel}>
+                        {intl.formatMessage({
+                          id: 'FieldAvailability.dayOfWeek',
+                        })}
+                      </td>
+                      <td>
+                        {intl.formatMessage({
+                          id: 'FieldAvailability.from',
+                        })}
+                      </td>
+                      <td>
+                        {intl.formatMessage({
+                          id: 'FieldAvailability.to',
+                        })}
+                      </td>
+                      <td></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dayToApplys.map((w: string) => {
+                      return (
+                        <DailyPlan
+                          name={name}
+                          dayOfWeek={w}
+                          key={w}
+                          values={values}
+                          intl={intl}
+                        />
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -10,11 +10,12 @@ import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import useBoolean from '@hooks/useBoolean';
-import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   manageCompaniesThunks,
   paginateCompanies,
 } from '@redux/slices/ManageCompaniesPage.slice';
+import { RootState } from '@redux/store';
 import { ECompanyStatus } from '@utils/enums';
 import type {
   TCompany,
@@ -25,8 +26,9 @@ import type {
 import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import { useSelector } from 'react-redux';
 
 import type { TKeywordSearchFormValues } from './components/KeywordSearchForm/KeywordSearchForm';
 import KeywordSearchForm from './components/KeywordSearchForm/KeywordSearchForm';
@@ -242,14 +244,17 @@ export default function ManageCompanies() {
     [companyRefs, pagination, keywordAsString, status],
   ) as TUser[];
 
-  const updateStatus = (updateData: TUpdateStatus) => {
-    dispatch(
-      manageCompaniesThunks.updateCompanyStatus({
-        dataParams: updateData,
-        queryParams: { expand: true },
-      }),
-    );
-  };
+  const updateStatus = useCallback(
+    (updateData: TUpdateStatus) => {
+      dispatch(
+        manageCompaniesThunks.updateCompanyStatus({
+          dataParams: updateData,
+          queryParams: { expand: true },
+        }),
+      );
+    },
+    [dispatch, manageCompaniesThunks],
+  );
 
   const companiesTableData = useMemo(
     () =>

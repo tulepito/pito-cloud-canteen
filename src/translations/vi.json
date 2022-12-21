@@ -181,5 +181,13 @@
   "ResetPasswordPage.recoveryLinkText": "quên mật khẩu",
   "ResetPasswordPage.resetFailed": "Reset lỗi, vui lòng thử lại!",
   "ResetPasswordPage.title": "Reset mật khẩu",
-  "Modal.closeModal": "Đóng"
+  "Modal.closeModal": "Đóng",
+  "EditPartnerForm.retaurantConfigLabel": "Cài đặt nhà hàng",
+  "EditPartnerForm.exportVat": "Xuất hóa đơn VAT",
+  "EditPartnerForm.minPrice": "Giá trị tối thiểu",
+  "EditPartnerForm.catonBox": "Hộp giấy",
+  "EditPartnerForm.plasticBox": "Hộp nhựa",
+  "EditPartnerForm.bagasseBox": "Hộp bã mía",
+  "EditPartnerForm.reusedBox": "Hộp ăn tái sử dụng",
+  "EditPartnerForm.other": "Khác"
 }

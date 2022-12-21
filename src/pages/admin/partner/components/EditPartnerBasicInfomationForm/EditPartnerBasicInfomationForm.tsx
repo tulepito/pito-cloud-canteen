@@ -1,7 +1,9 @@
 import FieldAvailability from '@components/FieldAvailability/FieldAvailability';
+import FieldCheckboxGroup from '@components/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldPhotoUpload from '@components/FieldPhotoUpload/FieldPhotoUpload';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { getDefaultTimeZoneOnBrowser } from '@utils/dates';
 import type { TAvailabilityPlan } from '@utils/types';
 import arrayMutators from 'final-form-arrays';
@@ -9,16 +11,16 @@ import React, { useMemo } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import css from './EditPartnerForm.module.scss';
+import css from './EditPartnerBasicInfomationForm.module.scss';
 
 const defaultTimeZone = () =>
   typeof window !== 'undefined' ? getDefaultTimeZoneOnBrowser() : 'Etc/UTC';
 
-type TEditPartnerFormValues = {};
+type TEditPartnerBasicInfomationFormValues = {};
 
-type TEditPartnerForm = {
-  initialValues?: TEditPartnerFormValues;
-  onSubmit: (e: TEditPartnerFormValues) => void;
+type TEditPartnerBasicInfomationForm = {
+  initialValues?: TEditPartnerBasicInfomationFormValues;
+  onSubmit: (e: TEditPartnerBasicInfomationFormValues) => void;
   onAvatarUpload: (e: any) => void;
   images: any;
   onRemoveAvatar: (e: any) => void;
@@ -51,9 +53,34 @@ const createInitialValues = (availabilityPlan: TAvailabilityPlan) => {
   };
 };
 
+const PACKAGING_OPTIONS = [
+  {
+    key: 'hop-giay',
+    label: <FormattedMessage id="EditPartnerForm.catonBox" />,
+  },
+  {
+    key: 'hop-nhua',
+    label: <FormattedMessage id="EditPartnerForm.plasticBox" />,
+  },
+  {
+    key: 'hop-ba-mia',
+    label: <FormattedMessage id="EditPartnerForm.bagasseBox" />,
+  },
+  {
+    key: 'hop-an-tai-su-dung',
+    label: <FormattedMessage id="EditPartnerForm.reusedBox" />,
+  },
+  {
+    key: 'khac',
+    label: <FormattedMessage id="EditPartnerForm.other" />,
+  },
+];
+
 const ACCEPT_IMAGES = 'image/png, image/gif, image/jpeg';
 
-const EditPartnerForm: React.FC<TEditPartnerForm> = (props) => {
+const EditPartnerBasicInfomationForm: React.FC<
+  TEditPartnerBasicInfomationForm
+> = (props) => {
   const intl = useIntl();
   const defaultAvailabilityPlan = {
     type: 'availability-plan/time',
@@ -72,8 +99,8 @@ const EditPartnerForm: React.FC<TEditPartnerForm> = (props) => {
   const initialValues = useMemo(
     () => ({
       availabilityPlan: createInitialValues(availabilityPlan),
-      allWeekApply: true,
-      singleDayApply: true,
+      applyType: 'allWeekApply',
+      daysToApply: [],
     }),
     [availabilityPlan],
   );
@@ -91,6 +118,7 @@ const EditPartnerForm: React.FC<TEditPartnerForm> = (props) => {
           onRemoveAvatar,
           uploadAvatarError,
           values,
+          form,
         } = fieldRenderProps;
         return (
           <Form onSubmit={handleSubmit}>
@@ -257,9 +285,42 @@ const EditPartnerForm: React.FC<TEditPartnerForm> = (props) => {
             <div className={css.fields}>
               <FieldAvailability
                 values={values}
+                className={css.field}
                 id="availabilityPlan"
+                form={form}
                 name="availabilityPlan"
               />
+              <div className={css.field}>
+                <p>
+                  {intl.formatMessage({
+                    id: 'EditPartnerForm.retaurantConfigLabel',
+                  })}
+                </p>
+                <div className={css.retaurantConfigFields}>
+                  <ToggleButton
+                    className={css.vatButton}
+                    id="vat"
+                    name="vat"
+                    label={intl.formatMessage({
+                      id: 'EditPartnerForm.exportVat',
+                    })}
+                  />
+                  <FieldTextInput
+                    name="minPrice"
+                    type="number"
+                    className={css.minPrice}
+                    id="minPrice"
+                    label={intl.formatMessage({
+                      id: 'EditPartnerForm.minPrice',
+                    })}
+                  />
+                  <FieldCheckboxGroup
+                    id="packaging"
+                    name="packaging"
+                    options={PACKAGING_OPTIONS}
+                  />
+                </div>
+              </div>
             </div>
           </Form>
         );
@@ -268,4 +329,4 @@ const EditPartnerForm: React.FC<TEditPartnerForm> = (props) => {
   );
 };
 
-export default EditPartnerForm;
+export default EditPartnerBasicInfomationForm;

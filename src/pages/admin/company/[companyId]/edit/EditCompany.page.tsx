@@ -1,6 +1,6 @@
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconSpinner from '@components/IconSpinner/IconSpinner';
-import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { updateCompanyPageThunks } from '@redux/slices/EditCompanyPage.slice';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';

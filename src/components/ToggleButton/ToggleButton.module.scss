@@ -1,29 +1,35 @@
 @use '/src/styles/vars.scss' as *;
 
 .root {
-  position: relative;
-  display: inline-block;
-  min-width: 40px;
-  width: 40px;
-  height: 24px;
-  -webkit-tap-highlight-color: transparent;
-  & input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
+  .toggle {
+    position: relative;
+    display: inline-flex;
+    min-width: 40px;
+    width: 40px;
+    height: 24px;
+    -webkit-tap-highlight-color: transparent;
+    & input {
+      opacity: 0;
+      display: none;
+      width: 0;
+      height: 0;
 
-    &:checked + .slider {
-      background-color: $marketplaceColor;
-    }
+      &:checked + .slider {
+        background-color: $marketplaceColor;
+      }
 
-    &:focus + .slider {
-      box-shadow: 0 0 1px $marketplaceColor;
-    }
+      &:focus + .slider {
+        box-shadow: 0 0 1px $marketplaceColor;
+      }
 
-    &:checked + .slider:before {
-      -webkit-transform: translateX(16px);
-      -ms-transform: translateX(16px);
-      transform: translateX(16px);
+      &:checked + .slider:before {
+        -webkit-transform: translateX(16px);
+        -ms-transform: translateX(16px);
+        transform: translateX(16px);
+      }
     }
   }
 }

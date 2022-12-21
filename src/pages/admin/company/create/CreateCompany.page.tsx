@@ -1,8 +1,7 @@
-import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
 import { createCompanyPageThunks } from '@redux/slices/CreateCompanyPage.slice';
 import { isSignupEmailTakenError } from '@utils/errors';
 import { useIntl } from 'react-intl';
-
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TEditCompanyFormValues } from '../components/EditCompanyForm/EditCompanyForm';
 import EditCompanyForm from '../components/EditCompanyForm/EditCompanyForm';
 import css from './CreateCompany.module.scss';

@@ -62,7 +62,6 @@ const FieldCheckbox = (props: any) => {
     customOnChange,
     ...rest
   } = props;
-
   const classes = classNames(rootClassName || css.root, className);
 
   // This is a workaround for a bug in Firefox & React Final Form.
@@ -89,7 +88,6 @@ const FieldCheckbox = (props: any) => {
       <Field type="checkbox" {...rest}>
         {(formRenderProps) => {
           const { input } = formRenderProps;
-
           return (
             <input
               id={id}

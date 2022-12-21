@@ -9,12 +9,13 @@ type TToggleButtonProps = {
   id: string;
   defaultValue?: boolean;
   className?: string;
-  onClick: (e: boolean) => void;
+  onClick?: (e: boolean) => void;
   disabled?: boolean;
+  label?: string;
 };
 
 const ToggleButton: React.FC<TToggleButtonProps> = (props) => {
-  const { defaultValue, className, onClick, disabled, name, id } = props;
+  const { defaultValue, className, onClick, disabled, name, id, label } = props;
 
   const { value, toggle } = useBoolean(defaultValue);
 
@@ -24,21 +25,24 @@ const ToggleButton: React.FC<TToggleButtonProps> = (props) => {
 
   const onClickToggleButton = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = e.target;
-    onClick(checked);
+    onClick && onClick(checked);
     toggle();
   };
 
   return (
     <div className={toggleClasses}>
-      <input
-        type="checkbox"
-        checked={value}
-        name={name}
-        id={id}
-        onChange={onClickToggleButton}
-        disabled={disabled}
-      />
-      <label htmlFor={id} className={css.slider}></label>
+      <div className={css.toggle}>
+        <input
+          type="checkbox"
+          checked={value}
+          name={name}
+          id={id}
+          onChange={onClickToggleButton}
+          disabled={disabled}
+        />
+        <label htmlFor={id} className={css.slider}></label>
+      </div>
+      {label && <label>{label}</label>}
     </div>
   );
 };
