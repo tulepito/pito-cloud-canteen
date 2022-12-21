@@ -15,6 +15,7 @@ import useBoolean from '@hooks/useBoolean';
 import type { TIconProps } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
+import type { PropsWithChildren } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 
 import css from './StyleGuide.module.scss';
@@ -40,15 +41,6 @@ const tabItems = [
     children: (
       <div>
         <h2>Hello babe</h2>
-      </div>
-    ),
-  },
-  {
-    label: 'Thất bại',
-    key: 'that-bai',
-    children: (
-      <div>
-        <h3>Hello babe</h3>
       </div>
     ),
   },
@@ -111,6 +103,9 @@ const IconVoucher = (props: TIconProps) => {
   );
 };
 
+const StyleGuideCard = (props: PropsWithChildren) => {
+  return <div className={css.styleGuideCard}>{props.children}</div>;
+};
 const StyleGuidePage = (props: any) => {
   const modalControl = useBoolean(false);
   const onSubmitHandler = (values: object) => {
@@ -123,179 +118,24 @@ const StyleGuidePage = (props: any) => {
   return (
     <Layout>
       <div className={css.styleGuideContainer}>
-        <FinalForm
-          {...props}
-          onSubmit={onSubmitHandler}
-          render={(fieldRenderProps) => {
-            const { handleSubmit } = fieldRenderProps;
-            const requiredMessage = required('Vui lòng nhập trường dữ liệu');
+        <StyleGuideCard>
+          <FinalForm
+            {...props}
+            onSubmit={onSubmitHandler}
+            render={(fieldRenderProps) => {
+              const { handleSubmit } = fieldRenderProps;
+              const requiredMessage = required('Vui lòng nhập trường dữ liệu');
 
-            return (
-              <Form onSubmit={handleSubmit}>
-                <FieldTextInput
-                  id={`username`}
-                  name="username"
-                  validate={requiredMessage}
-                  leftIcon={<IconVoucher />}
-                  label="Username"
-                />
-                <FieldTextInput
-                  id={`email`}
-                  name="email"
-                  validate={requiredMessage}
-                  placeholder="hello"
-                  rightIcon={<IconVoucher />}
-                  label="Email"
-                />
-                <FieldPasswordInput
-                  id="password"
-                  name="password"
-                  placeholder="Enter your password"
-                  label="Password"
-                />
-                <FieldPasswordInput
-                  id="confirm-password"
-                  name="confirm-password"
-                  placeholder="Enter your password"
-                  label="Confirm password"
-                />
-                <FieldCheckbox
-                  id="checkbox-group-1"
-                  name="favorites"
-                  value="meet"
-                  label="Favorites"
-                />
-                <FieldCheckbox
-                  id="checkbox-group-2"
-                  name="favorites"
-                  value="salad"
-                  label="Favorites"
-                />
-                <FieldSelect
-                  id="select1"
-                  name="select1"
-                  label="Choose an option"
-                  leftIcon={<IconCalendar />}>
-                  <option value="" disabled>
-                    Select with icon
-                  </option>
-                  <option value="first">First option</option>
-                  <option value="second">Second option</option>
-                </FieldSelect>
-                <div style={{ margin: '16px 0' }}>
-                  <Toggle
-                    status="on"
-                    onClick={onSingleToggle}
-                    label="Shipping"
-                  />
-                  <Toggle
-                    status="off"
-                    onClick={onSingleToggle}
-                    label="Receive notification"
-                  />
-                  <Toggle
-                    status="off"
-                    onClick={onSingleToggle}
-                    disabled
-                    label="Disable toggle off status"
-                  />
-                  <Toggle
-                    status="on"
-                    onClick={onSingleToggle}
-                    disabled
-                    label="Disable toggle on status"
-                  />
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                  <Badge label="Label" hasCloseIcon hasDotIcon />
-                  <Badge label="Label" hasCloseIcon type="warning" hasDotIcon />
-                  <Badge
-                    label="Đang xác nhận"
-                    hasDotIcon
-                    type="processing"
-                    hasCloseIcon
-                  />
-                  <Badge
-                    label="Thành công"
-                    hasDotIcon
-                    type="success"
-                    hasCloseIcon
-                  />
-                  <Badge
-                    label="Thanh toán thất bại"
-                    type="error"
-                    hasCloseIcon
-                    hasDotIcon
-                  />
-                  <Badge label="Label" hasDotIcon />
-                  <Badge label="Label" type="warning" hasDotIcon />
-                  <Badge label="Đang xác nhận" hasDotIcon type="processing" />
-                  <Badge label="Thành công" hasDotIcon type="success" />
-                  <Badge label="Thanh toán thất bại" type="error" hasDotIcon />
-                </div>
+              return (
+                <Form onSubmit={handleSubmit}>
+                  <p className={css.title}>Form fields</p>
 
-                <div
-                  style={{
-                    marginTop: '16px',
-                    display: 'flex',
-                    gap: '6px',
-                    flexDirection: 'column',
-                  }}>
-                  <Progress percent={30} />
-                  <Progress percent={95.6} />
-                  <Progress percent={100} />
-                  <Progress percent={60} />
-                  <Progress percent={0} showInfo={false} />
-                </div>
-                <div
-                  style={{
-                    marginTop: '16px',
-                    display: 'flex',
-                    gap: '6px',
-                  }}>
-                  <Progress percent={30} type="circle" animate />
-                  <Progress percent={90} type="circle" />
-                  <Progress percent={100} type="circle" />
-                  <Progress percent={0} type="circle" />
-                </div>
-                <FieldSelect
-                  id="select1"
-                  name="select1"
-                  label="Choose an option">
-                  <option value="" disabled>
-                    Select without icon
-                  </option>
-                  <option value="first">First option</option>
-                  <option value="second">Second option</option>
-                </FieldSelect>
-
-                <Button
-                  type="submit"
-                  fullWidth
-                  inProgress={true}
-                  style={{ margin: '8px 0' }}>
-                  Loading button
-                </Button>
-                <Button type="submit" fullWidth style={{ margin: '8px 0' }}>
-                  Submit
-                </Button>
-                <Button type="submit" fullWidth disabled>
-                  Submit
-                </Button>
-                <Button
-                  style={{ margin: '8px 0' }}
-                  onClick={modalControl.toggle}>
-                  Open modal
-                </Button>
-                <Modal
-                  isOpen={modalControl.value}
-                  handleClose={modalControl.toggle}
-                  title="Thêm đối tác">
-                  <FieldPasswordInput
-                    id="confirm-password"
-                    name="confirm-password"
-                    placeholder="Enter your password"
-                    label="Confirm password"
+                  <FieldTextInput
+                    id={`username`}
+                    name="username"
+                    validate={requiredMessage}
+                    leftIcon={<IconVoucher />}
+                    label="Username"
                   />
                   <FieldTextInput
                     id={`email`}
@@ -311,38 +151,200 @@ const StyleGuidePage = (props: any) => {
                     placeholder="Enter your password"
                     label="Password"
                   />
+                  <FieldPasswordInput
+                    id="confirm-password"
+                    name="confirm-password"
+                    placeholder="Enter your password"
+                    label="Confirm password"
+                  />
+                  <FieldCheckbox
+                    id="checkbox-group-1"
+                    name="favorites"
+                    value="meet"
+                    label="Favorites"
+                  />
+                  <FieldCheckbox
+                    id="checkbox-group-2"
+                    name="favorites"
+                    value="salad"
+                    label="Favorites"
+                  />
+                  <FieldSelect
+                    id="select1"
+                    name="select1"
+                    label="Choose an option"
+                    leftIcon={<IconCalendar />}>
+                    <option value="" disabled>
+                      Select with icon
+                    </option>
+                    <option value="first">First option</option>
+                    <option value="second">Second option</option>
+                  </FieldSelect>
 
-                  <FieldPasswordInput
-                    id="confirm-password"
-                    name="confirm-password"
-                    placeholder="Enter your password"
-                    label="Confirm password"
-                  />
-                  <FieldPasswordInput
-                    id="confirm-password"
-                    name="confirm-password"
-                    placeholder="Enter your password"
-                    label="Confirm password"
-                  />
-                  <FieldTextInput
-                    id={`email`}
-                    name="email"
-                    validate={requiredMessage}
-                    placeholder="hello"
-                    rightIcon={<IconVoucher />}
-                    label="Email"
-                  />
-                </Modal>
-              </Form>
-            );
-          }}
-        />
-        <div
-          style={{
-            margin: '36px 0',
-          }}>
+                  <FieldSelect
+                    id="select1"
+                    name="select1"
+                    label="Choose an option">
+                    <option value="" disabled>
+                      Select without icon
+                    </option>
+                    <option value="first">First option</option>
+                    <option value="second">Second option</option>
+                  </FieldSelect>
+
+                  <Button
+                    type="submit"
+                    fullWidth
+                    inProgress={true}
+                    style={{ margin: '8px 0' }}>
+                    Loading button
+                  </Button>
+                  <Modal
+                    isOpen={modalControl.value}
+                    handleClose={modalControl.toggle}
+                    title="Thêm đối tác">
+                    <FieldPasswordInput
+                      id="confirm-password"
+                      name="confirm-password"
+                      placeholder="Enter your password"
+                      label="Confirm password"
+                    />
+                    <FieldTextInput
+                      id={`email`}
+                      name="email"
+                      validate={requiredMessage}
+                      placeholder="hello"
+                      rightIcon={<IconVoucher />}
+                      label="Email"
+                    />
+                    <FieldPasswordInput
+                      id="password"
+                      name="password"
+                      placeholder="Enter your password"
+                      label="Password"
+                    />
+
+                    <FieldPasswordInput
+                      id="confirm-password"
+                      name="confirm-password"
+                      placeholder="Enter your password"
+                      label="Confirm password"
+                    />
+                    <FieldPasswordInput
+                      id="confirm-password"
+                      name="confirm-password"
+                      placeholder="Enter your password"
+                      label="Confirm password"
+                    />
+                    <FieldTextInput
+                      id={`email`}
+                      name="email"
+                      validate={requiredMessage}
+                      placeholder="hello"
+                      rightIcon={<IconVoucher />}
+                      label="Email"
+                    />
+                  </Modal>
+                </Form>
+              );
+            }}
+          />
+        </StyleGuideCard>
+
+        <StyleGuideCard>
+          <p className={css.title}>Progress bar</p>
+          <Progress percent={30} />
+          <Progress percent={95.6} />
+          <Progress percent={100} />
+          <Progress percent={60} />
+          <Progress percent={0} showInfo={false} />
+          <p className={css.title}>Progress circle</p>
+          <Progress percent={30} type="circle" animate />
+          <Progress percent={90} type="circle" />
+          <Progress percent={100} type="circle" />
+          <Progress percent={0} type="circle" />
+          <Progress percent={50} type="circle" />
+        </StyleGuideCard>
+        <StyleGuideCard>
+          <Toggle status="on" onClick={onSingleToggle} label="Shipping" />
+          <Toggle
+            status="off"
+            onClick={onSingleToggle}
+            label="Receive notification"
+          />
+          <Toggle
+            status="off"
+            onClick={onSingleToggle}
+            disabled
+            label="Disable toggle off status"
+          />
+          <Toggle
+            status="on"
+            onClick={onSingleToggle}
+            disabled
+            label="Disable toggle on status"
+          />
+          <Button
+            type="submit"
+            fullWidth
+            inProgress={true}
+            style={{ margin: '8px 0' }}>
+            Loading button
+          </Button>
+          <Button type="submit" fullWidth style={{ margin: '8px 0' }}>
+            Submit
+          </Button>
+          <Button type="submit" fullWidth disabled>
+            Submit
+          </Button>
+          <Button style={{ margin: '8px 0' }} onClick={modalControl.toggle}>
+            Open modal
+          </Button>
+        </StyleGuideCard>
+
+        <StyleGuideCard>
+          <p className={css.title}>Single label</p>
+          <div className={css.badgeContainer}>
+            <Badge label="Label" />
+            <Badge label="Label" type="warning" />
+            <Badge label="Đang xác nhận" type="processing" />
+            <Badge label="Thành công" type="success" />
+            <Badge label="Thanh toán thất bại" type="error" />
+          </div>
+
+          <p className={css.title}>Single label with dot status</p>
+          <div className={css.badgeContainer}>
+            <Badge label="Label" hasDotIcon />
+            <Badge label="Label" type="warning" hasDotIcon />
+            <Badge label="Đang xác nhận" hasDotIcon type="processing" />
+            <Badge label="Thành công" hasDotIcon type="success" />
+            <Badge label="Thanh toán thất bại" type="error" hasDotIcon />
+          </div>
+          <p className={css.title}>
+            Single label with dot status and icon close
+          </p>
+          <div className={css.badgeContainer}>
+            <Badge label="Label" hasDotIcon hasCloseIcon />
+            <Badge label="Label" type="warning" hasDotIcon hasCloseIcon />
+            <Badge
+              label="Đang xác nhận"
+              hasDotIcon
+              type="processing"
+              hasCloseIcon
+            />
+            <Badge label="Thành công" hasDotIcon type="success" hasCloseIcon />
+            <Badge
+              label="Thanh toán thất bại"
+              type="error"
+              hasDotIcon
+              hasCloseIcon
+            />
+          </div>
+        </StyleGuideCard>
+        <StyleGuideCard>
+          <p className={css.title}>Tabs</p>
           <Tabs items={tabItems} defaultActiveKey="1" />
-        </div>
+        </StyleGuideCard>
       </div>
     </Layout>
   );
