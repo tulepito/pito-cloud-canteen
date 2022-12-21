@@ -5,7 +5,7 @@ import { storableError } from '@utils/errors';
 import isEmpty from 'lodash/isEmpty';
 
 // eslint-disable-next-line import/no-cycle
-import { userActions } from './user.slice';
+import { userActions, userThunks } from './user.slice';
 
 const authenticated = (authInfo: Record<string, any>) => {
   return authInfo && authInfo.isAnonymous === false;
@@ -64,9 +64,13 @@ const authInfo = createAsyncThunk(
 
 const login = createAsyncThunk(
   LOGIN,
-  async (params: { email: string; password: string }, { extra: sdk }) => {
+  async (
+    params: { email: string; password: string },
+    { dispatch, extra: sdk },
+  ) => {
     const { email: username, password } = params;
     await sdk.login({ username, password });
+    await dispatch(userThunks.fetchCurrentUser(undefined));
   },
   {
     serializeError: storableError,
@@ -154,7 +158,7 @@ const authSlice = createSlice({
         };
       })
       .addCase(login.fulfilled, (state) => {
-        return { ...state, authStatus: EAuthState.idle, isAuthenticated: true };
+        return { ...state, authStatus: EAuthState.idle };
       })
       .addCase(login.rejected, (state, action) => {
         return {

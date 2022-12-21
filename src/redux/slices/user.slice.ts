@@ -6,6 +6,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities, ensureCurrentUser } from '@utils/data';
 import { storableError } from '@utils/errors';
 
+// eslint-disable-next-line import/no-cycle
 import { authThunks } from './auth.slice';
 
 const mergeCurrentUser = (oldCurrentUser: any, newCurrentUser: any) => {
