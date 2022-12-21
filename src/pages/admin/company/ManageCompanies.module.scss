@@ -1,0 +1,93 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+}
+
+.title {
+  font-weight: $fontWeightRegular;
+  font-size: 20px;
+}
+
+.top {
+  margin: 20px 0 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  .addIcon {
+    fill: $matterColorLight;
+  }
+}
+.active,
+.inActive {
+  max-width: 100px;
+}
+
+.active {
+  color: $matterColorLight;
+  padding: 10px;
+  text-align: center;
+  display: inline;
+  border-radius: 5px;
+  background-color: $successColor;
+}
+
+.inActive {
+  color: $matterColorLight;
+  padding: 10px;
+  display: inline;
+  text-align: center;
+  border-radius: 5px;
+  background-color: $marketplaceColor;
+}
+
+.spinner {
+  stroke: $marketplaceColorLight;
+}
+
+.tableActions {
+  display: flex;
+  align-items: center;
+
+  column-gap: 10px;
+  .actionButton {
+    display: flex;
+    align-items: center;
+    width: 50px;
+    min-height: 50px;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: transparent;
+
+    &:hover {
+      background-color: $neutralGray5;
+    }
+  }
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.filterWrapper {
+  align-items: center;
+  margin-bottom: 20px;
+  row-gap: 40px;
+  justify-content: space-between;
+  @include viewportLarge {
+    display: flex;
+    flex-direction: row;
+    column-gap: 20px;
+  }
+  .singleFilter {
+    margin-top: 10px;
+  }
+}

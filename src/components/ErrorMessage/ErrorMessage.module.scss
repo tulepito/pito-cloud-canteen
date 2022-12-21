@@ -1,0 +1,6 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  font-size: 15px;
+  color: $failColor;
+}

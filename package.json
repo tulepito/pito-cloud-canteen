@@ -16,11 +16,14 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.1",
+    "axios": "^1.2.1",
     "classnames": "^2.3.2",
     "cookie": "^0.5.0",
     "decimal.js": "^10.4.3",
     "dotenv": "^16.0.3",
     "final-form": "^4.20.7",
+    "final-form-arrays": "^3.0.2",
+    "jstimezonedetect": "^1.0.7",
     "lodash": "^4.17.21",
     "next": "13.0.6",
     "next-redux-wrapper": "^8.0.0",
@@ -34,6 +37,7 @@
     "react-intl": "^6.2.5",
     "react-redux": "^8.0.5",
     "reselect": "^4.1.7",
+    "sharetribe-flex-integration-sdk": "^1.8.0",
     "sharetribe-flex-sdk": "^1.17.0",
     "shelljs": "^0.8.5"
   },
@@ -70,5 +74,8 @@
     "stylelint-prettier": "^2.0.0",
     "stylelint-processor-styled-components": "^1.10.0",
     "typescript": "4.9.3"
+  },
+  "browser": {
+    "fs": false
   }
 }

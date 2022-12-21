@@ -1,0 +1,52 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.fieldAvatar {
+  width: 118px;
+  height: 118px;
+  margin-top: -30px;
+  background-color: $matterColorLight;
+}
+
+.fieldCover {
+  width: 100%;
+  height: 181px;
+}
+
+.mediaFields {
+  display: flex;
+  flex-direction: column;
+  padding: 0 40px;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.mediaTitle {
+  margin-bottom: 40px;
+}
+
+.fields {
+  display: flex;
+  column-gap: 10px;
+  margin-bottom: 20px;
+  width: 100%;
+  flex: 1;
+  flex-direction: column;
+  @include viewportLarge {
+    flex-direction: row;
+  }
+  .field {
+    @include viewportLarge {
+      flex: 0.5;
+    }
+  }
+}
+
+.vatButton,
+.minPrice {
+  margin-bottom: 20px;
+}
+
+.retaurantConfigFields {
+  padding-left: 10px;
+}

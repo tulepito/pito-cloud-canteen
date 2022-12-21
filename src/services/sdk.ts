@@ -4,6 +4,7 @@ const http = require('http');
 const https = require('https');
 const Decimal = require('decimal.js');
 const sharetribeSdk = require('sharetribe-flex-sdk');
+const flexIntegrationSdk = require('sharetribe-flex-integration-sdk');
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_SHARETRIBE_SDK_CLIENT_ID;
 const CLIENT_SECRET = process.env.SHARETRIBE_SDK_CLIENT_SECRET;
@@ -124,5 +125,12 @@ export const getTrustedSdk = (req: NextApiRequest) => {
       typeHandlers,
       ...baseUrlMaybe,
     });
+  });
+};
+
+export const getIntegrationSdk = () => {
+  return flexIntegrationSdk.createInstance({
+    clientId: process.env.FLEX_INTEGRATION_CLIENT_ID,
+    clientSecret: process.env.FLEX_INTEGRATION_CLIENT_SECRET,
   });
 };
