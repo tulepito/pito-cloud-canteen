@@ -170,14 +170,14 @@ const filterCompanies = (companies: TCompany[], filterValues: any) => {
       (company) =>
         company.id.uuid.toLowerCase().includes(keywordAsLowerCase) ||
         company.attributes.profile.displayName
-          .toLowerCase()
-          .includes(keywordAsLowerCase) ||
+          ?.toLowerCase()
+          ?.includes(keywordAsLowerCase) ||
         company.attributes.profile.publicData?.companyName
-          .toLowerCase(keywordAsLowerCase)
-          .includes(keyword) ||
+          ?.toLowerCase(keywordAsLowerCase)
+          ?.includes(keyword) ||
         company.attributes.profile.publicData?.phoneNumber
           ?.toLowerCase()
-          .includes(keywordAsLowerCase) ||
+          ?.includes(keywordAsLowerCase) ||
         company.attributes.email.toLowerCase().includes(keywordAsLowerCase),
     );
   }
@@ -186,14 +186,14 @@ const filterCompanies = (companies: TCompany[], filterValues: any) => {
       Number(status) === company.attributes.profile.metadata.status &&
       (company.id.uuid.toLowerCase().includes(keywordAsLowerCase) ||
         company.attributes.profile.displayName
-          .toLowerCase()
-          .includes(keywordAsLowerCase) ||
+          ?.toLowerCase()
+          ?.includes(keywordAsLowerCase) ||
         company.attributes.profile.publicData?.companyName
-          .toLowerCase()
-          .includes(keywordAsLowerCase) ||
+          ?.toLowerCase()
+          ?.includes(keywordAsLowerCase) ||
         company.attributes.profile.publicData?.phoneNumber
           ?.toLowerCase()
-          .includes(keywordAsLowerCase) ||
+          ?.includes(keywordAsLowerCase) ||
         company.attributes.email.toLowerCase().includes(keywordAsLowerCase)),
   );
 };
