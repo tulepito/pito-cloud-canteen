@@ -3,8 +3,8 @@ WORKDIR /app
 
 COPY package.json yarn.lock ./
 COPY . .
-RUN yarn install --production --frozen-lockfile --ignore-scripts --prefer-offline \
-    && yarn build
+RUN yarn install --production --frozen-lockfile \
+    && yarn build && yarn cache clean
 
 EXPOSE 3000 443
 
