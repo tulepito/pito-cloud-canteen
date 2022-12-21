@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 // This function can be marked `async` if using `await` inside
 export function middleware(req: NextRequest) {
-  const dev = process.env.NODE_ENV === 'development';
+  const dev = process.env.NEXT_PUBLIC_ENV === 'development';
 
   if (!dev) {
     const USERNAME = process.env.BASIC_AUTH_USERNAME;
