@@ -1,3 +1,4 @@
+import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
@@ -7,7 +8,9 @@ import Form from '@components/Form/Form';
 import IconCalendar from '@components/IconCalender/IconCalender';
 import Layout from '@components/Layout/Layout';
 import Modal from '@components/Modal/Modal';
+import Progress from '@components/Progress/Progress';
 import Tabs from '@components/Tabs/Tabs';
+import Toggle from '@components/Toggle/Toggle';
 import useBoolean from '@hooks/useBoolean';
 import type { TIconProps } from '@utils/types';
 import { required } from '@utils/validators';
@@ -113,6 +116,10 @@ const StyleGuidePage = (props: any) => {
   const onSubmitHandler = (values: object) => {
     console.log('Values:', { values });
   };
+
+  const onSingleToggle = (value: boolean) => {
+    console.log('Single toggle:', value);
+  };
   return (
     <Layout>
       <div className={css.styleGuideContainer}>
@@ -161,7 +168,7 @@ const StyleGuidePage = (props: any) => {
                 <FieldCheckbox
                   id="checkbox-group-2"
                   name="favorites"
-                  value="saladF"
+                  value="salad"
                   label="Favorites"
                 />
                 <FieldSelect
@@ -175,6 +182,82 @@ const StyleGuidePage = (props: any) => {
                   <option value="first">First option</option>
                   <option value="second">Second option</option>
                 </FieldSelect>
+                <div style={{ margin: '16px 0' }}>
+                  <Toggle
+                    status="on"
+                    onClick={onSingleToggle}
+                    label="Shipping"
+                  />
+                  <Toggle
+                    status="off"
+                    onClick={onSingleToggle}
+                    label="Receive notification"
+                  />
+                  <Toggle
+                    status="off"
+                    onClick={onSingleToggle}
+                    disabled
+                    label="Disable toggle off status"
+                  />
+                  <Toggle
+                    status="on"
+                    onClick={onSingleToggle}
+                    disabled
+                    label="Disable toggle on status"
+                  />
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  <Badge label="Label" hasCloseIcon hasDotIcon />
+                  <Badge label="Label" hasCloseIcon type="warning" hasDotIcon />
+                  <Badge
+                    label="Đang xác nhận"
+                    hasDotIcon
+                    type="processing"
+                    hasCloseIcon
+                  />
+                  <Badge
+                    label="Thành công"
+                    hasDotIcon
+                    type="success"
+                    hasCloseIcon
+                  />
+                  <Badge
+                    label="Thanh toán thất bại"
+                    type="error"
+                    hasCloseIcon
+                    hasDotIcon
+                  />
+                  <Badge label="Label" hasDotIcon />
+                  <Badge label="Label" type="warning" hasDotIcon />
+                  <Badge label="Đang xác nhận" hasDotIcon type="processing" />
+                  <Badge label="Thành công" hasDotIcon type="success" />
+                  <Badge label="Thanh toán thất bại" type="error" hasDotIcon />
+                </div>
+
+                <div
+                  style={{
+                    marginTop: '16px',
+                    display: 'flex',
+                    gap: '6px',
+                    flexDirection: 'column',
+                  }}>
+                  <Progress percent={30} />
+                  <Progress percent={95.6} />
+                  <Progress percent={100} />
+                  <Progress percent={60} />
+                  <Progress percent={0} showInfo={false} />
+                </div>
+                <div
+                  style={{
+                    marginTop: '16px',
+                    display: 'flex',
+                    gap: '6px',
+                  }}>
+                  <Progress percent={30} type="circle" animate />
+                  <Progress percent={90} type="circle" />
+                  <Progress percent={100} type="circle" />
+                  <Progress percent={0} type="circle" />
+                </div>
                 <FieldSelect
                   id="select1"
                   name="select1"
@@ -228,24 +311,7 @@ const StyleGuidePage = (props: any) => {
                     placeholder="Enter your password"
                     label="Password"
                   />
-                  <FieldPasswordInput
-                    id="confirm-password"
-                    name="confirm-password"
-                    placeholder="Enter your password"
-                    label="Confirm password"
-                  />
-                  <FieldPasswordInput
-                    id="confirm-password"
-                    name="confirm-password"
-                    placeholder="Enter your password"
-                    label="Confirm password"
-                  />
-                  <FieldPasswordInput
-                    id="confirm-password"
-                    name="confirm-password"
-                    placeholder="Enter your password"
-                    label="Confirm password"
-                  />
+
                   <FieldPasswordInput
                     id="confirm-password"
                     name="confirm-password"
