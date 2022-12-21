@@ -13,7 +13,7 @@
 export const urlSerialize = (obj: Record<any, string> = {}) => {
   const str: Array<string> = [];
   Object.keys(obj).forEach((p: any) => {
-    str.push(`${encodeURIComponent(obj[p])}=${encodeURIComponent(obj[p])}`);
+    str.push(`${encodeURIComponent(p)}=${encodeURIComponent(obj[p])}`);
   });
 
   return str.join('&');

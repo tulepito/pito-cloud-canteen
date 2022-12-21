@@ -4,6 +4,7 @@ import AdminLayoutSidebar from '@components/AdminLayoutSidebar/AdminLayoutSideba
 import AdminLayoutTopbar from '@components/AdminLayoutTopbar/AdminLayoutTopbar';
 import AdminLayoutWrapper from '@components/AdminLayoutWrapper/AdminLayoutWrapper';
 import AdminSidebar from '@components/AdminSidebar/AdminSidebar';
+import useBoolean from '@hooks/useBoolean';
 import type { ReactNode } from 'react';
 
 type TAdminLayout = {
@@ -12,15 +13,18 @@ type TAdminLayout = {
 
 const AdminLayout = (props: TAdminLayout) => {
   const { children } = props;
+  const { value: isMenuOpen, toggle: toggleMenuOpen } = useBoolean(false);
   return (
     <AdminLayoutWrapper>
       <AdminLayoutTopbar>
-        <AdminHeader />
+        <AdminHeader onMenuClick={toggleMenuOpen} />
       </AdminLayoutTopbar>
-      <AdminLayoutSidebar>
-        <AdminSidebar />
+      <AdminLayoutSidebar isMenuOpen={isMenuOpen}>
+        <AdminSidebar onMenuClick={toggleMenuOpen} />
       </AdminLayoutSidebar>
-      <AdminLayoutContent>{children}</AdminLayoutContent>
+      <AdminLayoutContent isMenuOpen={isMenuOpen}>
+        {children}
+      </AdminLayoutContent>
     </AdminLayoutWrapper>
   );
 };

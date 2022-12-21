@@ -49,6 +49,7 @@ type TResponsiveImageProps = {
   noImageMessage?: string;
   image: TImage;
   variants: TImageVariant[];
+  sizes?: string;
 };
 
 const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {

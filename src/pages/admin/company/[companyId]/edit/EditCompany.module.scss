@@ -1,0 +1,16 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  margin: auto;
+}
+
+.spinner {
+  stroke: $marketplaceColorLight;
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}

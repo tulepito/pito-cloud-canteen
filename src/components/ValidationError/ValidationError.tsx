@@ -24,6 +24,7 @@ const ValidationError: FC<ValidationErrorProps> = (props) => {
   const { rootClassName, className, fieldMeta } = props;
   const { touched, error } = fieldMeta;
   const classes = classNames(rootClassName || css.root, className);
+
   return touched && error ? <div className={classes}>{error}</div> : null;
 };
 

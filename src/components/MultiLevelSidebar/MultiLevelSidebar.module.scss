@@ -20,8 +20,11 @@
         .label {
           font-size: 14px;
           color: $matterColor;
-          &.labelOpen {
-            color: red;
+          padding-bottom: 5px;
+          &.active {
+            color: $marketplaceColor;
+            font-weight: $fontWeightBold;
+            border-bottom: 2px solid $marketplaceColor;
           }
         }
         .entityIcon {

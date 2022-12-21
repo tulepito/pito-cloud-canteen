@@ -71,12 +71,19 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     subMenuLayoutClassName,
   );
 
+  const isActive = router.pathname === nameLink;
+
   return (
     <div onClick={handleMenuClick} className={subMenuWrapperClasses}>
       <div className={subMenuLayoutClasses}>
         <div className={css.subMenuItem}>
           {Icon && <Icon className={css.entityIcon} />}
-          <p className={classNames(css.label, { [css.labelOpen]: isOpen })}>
+          <p
+            className={classNames(
+              css.label,
+              { [css.labelOpen]: isOpen },
+              { [css.active]: isActive },
+            )}>
             {intl.formatMessage({
               id: label,
             })}

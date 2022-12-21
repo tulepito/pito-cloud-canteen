@@ -6,6 +6,7 @@ import type Decimal from 'decimal.js';
 import type { NextPage } from 'next';
 
 import type {
+  EAvailabilityPlans,
   EBookingStates,
   EDayOfWeek,
   EErrorCode,
@@ -96,6 +97,10 @@ export type TProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
+  protectedData?: any;
+  metadata?: any;
+  publicData?: any;
+  privateData?: any;
 };
 
 export type TCurrentUserAttributes = {
@@ -118,12 +123,35 @@ export type TUserProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
+  protectedData?: any;
+  metadata?: any;
+  publicData?: any;
 };
 
 export type TUserAttributes = {
   banned: boolean;
   deleted: boolean;
+  email: string;
   profile: TUserProfile;
+};
+
+export type TCompanyProfile = {
+  displayName: string;
+  firstName: string;
+  lastName: string;
+  abbreviatedName: string;
+  bio?: string;
+  protectedData?: any;
+  metadata?: any;
+  publicData?: any;
+  privateData?: any;
+};
+
+export type TCompanyAttributes = {
+  banned: boolean;
+  deleted: boolean;
+  email: string;
+  profile: TCompanyProfile;
 };
 
 // Listing queries can include author.
@@ -134,6 +162,10 @@ export type TAuthorProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
+  protectedData?: any;
+  metadata?: any;
+  publicData?: any;
+  privateData?: any;
 };
 
 export type TAuthorAttributes = {
@@ -158,6 +190,16 @@ export type TUser = {
   profileImage: TImage;
 };
 
+export type TCompany = {
+  id: any;
+  type: 'user';
+  attributes: TAuthorAttributes &
+    TBannedUserAttributes &
+    TDeletedUserAttributes &
+    TCompanyAttributes;
+  profileImage: TImage;
+};
+
 export type TListingState = TReverseMapFromEnum<typeof EListingStates>;
 
 export type TListingAttributes = {
@@ -179,12 +221,14 @@ export type TAvailabilityPlanEntries = {
   end?: string;
 };
 
-export type TAvailabilityPlanType = TReverseMapFromEnum<typeof EDayOfWeek>;
+export type TAvailabilityPlanType = TReverseMapFromEnum<
+  typeof EAvailabilityPlans
+>;
 
 export type TAvailabilityPlan = {
   type: TAvailabilityPlanType;
   timezone: string;
-  entries: TAvailabilityPlanEntries;
+  entries: TAvailabilityPlanEntries[];
 };
 
 export type TOwnListingAttributes = {
@@ -345,7 +389,7 @@ export type TMessage = {
 export type TPagination = {
   page: number;
   perPage: number;
-  paginationUnsupported: boolean;
+  paginationUnsupported?: boolean;
   totalItems: number;
   totalPages: number;
 };

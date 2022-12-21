@@ -1,5 +1,5 @@
-import IconBannedUser from '@components/IconBannedUser';
-import ResponsiveImage from '@components/ResponsiveImage';
+import IconBannedUser from '@components/IconBannedUser/IconBannedUser';
+import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import {
   ensureCurrentUser,
   ensureUser,

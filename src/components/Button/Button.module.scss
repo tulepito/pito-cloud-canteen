@@ -58,3 +58,24 @@
 .buttonFullWidth {
   width: 100%;
 }
+
+.inlineTextButtonRoot {
+  /* Position and dimensions */
+  display: inline;
+  margin: 0;
+  padding: 0;
+
+  /* Borders */
+  border: none;
+
+  /* Colors */
+  color: $marketplaceColor;
+  background-color: transparent;
+
+  /* Text size should be inherited */
+  text-decoration: none;
+
+  &:hover {
+    cursor: pointer;
+  }
+}

@@ -358,3 +358,44 @@ export const humanizeLineItemCode = (code: TLineItemCode) => {
 
   return lowercase.charAt(0).toUpperCase() + lowercase.slice(1);
 };
+
+// ================ Selectors ================ //
+
+/**
+ * Get the denormalised listing entities with the given IDs
+ *
+ * @param {Object} state the full Redux store
+ * @param {Array<UUID>} listingIds listing IDs to select from the store
+ */
+export const getListingsById = (state: any, listingIds: any[]) => {
+  const { entities } = state.marketplaceData;
+  const resources = listingIds.map((id) => ({
+    id,
+    type: 'listing',
+  }));
+  const throwIfNotFound = false;
+  return denormalisedEntities(entities, resources, throwIfNotFound);
+};
+
+/**
+ * Get the denormalised entities from the given entity references.
+ *
+ * @param {Object} state the full Redux store
+ *
+ * @param {Array<{ id, type }} entityRefs References to entities that
+ * we want to query from the data. Currently we expect that all the
+ * entities have the same type.
+ *
+ * @return {Array<Object>} denormalised entities
+ */
+export const getMarketplaceEntities = (state: any, entityRefs: any[]) => {
+  const { entities } = state.marketplaceData;
+  const throwIfNotFound = false;
+  return denormalisedEntities(entities, entityRefs, throwIfNotFound);
+};
+
+export const entityRefs = (entities: any) =>
+  entities.map((entity: any) => ({
+    id: entity.id,
+    type: entity.type,
+  }));
