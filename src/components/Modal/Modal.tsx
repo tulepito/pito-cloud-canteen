@@ -1,5 +1,6 @@
 import Button from '@components/Button/Button';
 import IconClose from '@components/IconClose/IconClose';
+import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import useLockBodyScroll from '@hooks/useDisableBodyScroll';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';
@@ -54,23 +55,25 @@ const Modal = (props: TModal) => {
     ) : null;
 
   return (
-    <div className={classes}>
-      <div className={scrollLayerClasses}>
-        <div className={containerClasses}>
-          <div className={css.modalHeader}>
-            {hasTitle && (
-              <div className={css.title}>
-                <span>{title}</span>
-              </div>
-            )}
-            {closeBtn}
-          </div>
-          <div className={classNames(contentClassName || css.content)}>
-            {children}
+    <OutsideClickHandler onOutsideClick={handleClose}>
+      <div className={classes}>
+        <div className={scrollLayerClasses}>
+          <div className={containerClasses}>
+            <div className={css.modalHeader}>
+              {hasTitle && (
+                <div className={css.title}>
+                  <span>{title}</span>
+                </div>
+              )}
+              {closeBtn}
+            </div>
+            <div className={classNames(contentClassName || css.content)}>
+              {children}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </OutsideClickHandler>
   );
 };
 
