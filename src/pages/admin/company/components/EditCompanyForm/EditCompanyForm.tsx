@@ -10,8 +10,8 @@ import {
   required,
 } from '@utils/validators';
 import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import React from 'react';
+import isEqual from 'lodash/isEqual';
+import React, { useState } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
@@ -42,22 +42,31 @@ type TEditCompanyForm = {
 
 const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
   const intl = useIntl();
-  const router = useRouter();
-  const onSubmitHandler = async (values: TEditCompanyFormValues) => {
-    await props.onSubmit(values);
-    router.push('/admin/company');
+  const { onSubmit, ...rest } = props;
+  const [submitedValues, setSubmittedValues] =
+    useState<TEditCompanyFormValues>();
+
+  const submitHandler = async (values: TEditCompanyFormValues) => {
+    try {
+      await onSubmit(values);
+      setSubmittedValues(values);
+    } catch (error) {
+      // don't do any thing
+    }
   };
   return (
     <FinalForm
-      {...props}
-      onSubmit={onSubmitHandler}
+      {...rest}
+      onSubmit={submitHandler}
       render={(fieldRenderProps: any) => {
         const {
           handleSubmit,
           formErrorMessage,
           isEditting = false,
           inProgress,
+          values,
         } = fieldRenderProps;
+        const ready = !formErrorMessage && isEqual(submitedValues, values);
         return (
           <Form onSubmit={handleSubmit} className={css.form}>
             <div className={css.formHeader}>
@@ -283,6 +292,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
               <Button
                 inProgress={inProgress}
                 disabled={inProgress}
+                ready={ready}
                 className={css.button}>
                 {isEditting
                   ? intl.formatMessage({

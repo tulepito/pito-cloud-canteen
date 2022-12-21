@@ -73,7 +73,6 @@ export const manageCompaniesSlice = createSlice({
   initialState,
   reducers: {
     paginateCompanies: (state, action) => {
-      console.log(state);
       return {
         ...state,
         pagination: {

@@ -21,7 +21,8 @@
           padding: 10px;
           text-align: left;
           color: $neutralGray8;
-          background-color: #fff0eb;
+          background-color: $neutralGray3;
+          font-size: 14px;
         }
       }
     }
@@ -44,7 +45,7 @@
           display: block;
           width: 100%;
           text-align: right;
-          padding: 20px 10px;
+          padding: 10px;
           color: #616161;
           border-bottom: 1px solid $matterColorNegative;
           position: relative;

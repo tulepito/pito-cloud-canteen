@@ -94,6 +94,7 @@ const TABLE_COLUMN: TColumn[] = [
       return (
         <ToggleButton
           name={data.id}
+          className={css.toggleButton}
           id={data.id}
           onClick={onClick}
           defaultValue={data.status === ECompanyStatus.active}
@@ -263,12 +264,13 @@ export default function ManageCompanies() {
   );
 
   useEffect(() => {
-    if ((!page && companyRefs.length === 0) || mounted) return;
-    dispatch(
-      manageCompaniesThunks.queryCompanies(parseInt(page as string, 10)),
-    );
+    if (page && !mounted) {
+      dispatch(
+        manageCompaniesThunks.queryCompanies(parseInt(page as string, 10)),
+      );
+    }
     setMounted(true);
-  }, [page]);
+  }, [page, mounted]);
 
   useEffect(() => {
     if (!page) return;
@@ -276,23 +278,31 @@ export default function ManageCompanies() {
   }, [page]);
 
   const onSearchKeyword = (values: TKeywordSearchFormValues) => {
-    router.push({
-      pathname,
-      query: {
-        ...query,
-        keyword: values.keyword,
+    router.push(
+      {
+        pathname,
+        query: {
+          ...query,
+          keyword: values.keyword,
+        },
       },
-    });
+      undefined,
+      { shallow: true },
+    );
   };
 
   const onSelectFilter = (values: any) => {
-    router.push({
-      pathname,
-      query: {
-        ...query,
-        ...values,
+    router.push(
+      {
+        pathname,
+        query: {
+          ...query,
+          ...values,
+        },
       },
-    });
+      undefined,
+      { shallow: true },
+    );
   };
 
   const singleFilterInitialValues = useMemo(() => ({ status }), [status]);

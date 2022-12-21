@@ -42,6 +42,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       firstName: `Sub account for ${companyAccount.id.uuid}`,
       lastName: ' ',
       email: `${splittedEmail[0]}+sub-user@${splittedEmail[1]}`,
+      password: dataParams.password,
     });
 
     const [subAccount] = denormalisedResponseEntities(subResponse);
@@ -71,6 +72,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     res.json(masterAccountAfterUpdateResponse);
   } catch (error) {
+    console.error(error);
     handleError(res, error);
   }
 }
