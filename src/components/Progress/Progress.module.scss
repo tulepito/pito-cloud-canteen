@@ -36,7 +36,11 @@
 }
 
 .progressCircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
+
   .info {
     position: absolute;
     content: '';
