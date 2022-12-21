@@ -4,6 +4,7 @@ import AdminLayout from '@components/AdminLayout/AdminLayout';
 import AuthGuard from '@components/AuthGuard/AuthGuard';
 import Layout from '@components/Layout/Layout';
 import { authThunks } from '@redux/slices/auth.slice';
+import { emailVerificationActions } from '@redux/slices/emailVerification.slice';
 import { userThunks } from '@redux/slices/user.slice';
 import wrapper from '@redux/store';
 import { AuthenticationRoutes } from '@src/paths';
@@ -36,6 +37,7 @@ const MyApp = ({
     <TranslationProvider>
       <Provider store={store}>
         <AuthGuard
+          pathName={router.route}
           isAuthenticationRoute={isAuthenticationRoute}
           isRequiredAuth={isRequiredAuth}>
           <LayoutComponent>
@@ -55,8 +57,17 @@ MyApp.getInitialProps = wrapper.getInitialAppProps(
         auth: { isAuthenticated },
       } = store.getState();
 
-      if (isAuthenticated)
+      if (isAuthenticated) {
         await store.dispatch(userThunks.fetchCurrentUser(undefined));
+        const {
+          user: { currentUser },
+        } = store.getState();
+        const isVerified = currentUser?.attributes?.emailVerified;
+
+        await store.dispatch(
+          emailVerificationActions.updateVerificationState(isVerified),
+        );
+      }
 
       return App.getInitialProps(_context);
     },

@@ -55,16 +55,16 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
             values={{ name: <span className={css.name}>{name}</span> }}
           />
         </h2>
-        <p className={css.modalMessage}>
+        <div className={css.modalMessage}>
           <FormattedMessage
             id="EmailVerification.verifyEmailText"
             values={{ email }}
           />
-        </p>
+        </div>
         {resendErrorMessage}
       </div>
       <div className={css.bottomWrapper}>
-        <p className={css.modalHelperText}>
+        <div className={css.modalHelperText}>
           {inProgress ? (
             <FormattedMessage id="EmailVerification.sendingEmail" />
           ) : (
@@ -79,7 +79,7 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
               {toHomePageLink}
             </div>
           )}
-        </p>
+        </div>
       </div>
     </div>
   );

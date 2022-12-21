@@ -50,7 +50,11 @@ export const emailVerificationThunks = {
 const emailVerificationSlice = createSlice({
   name: 'EmailVerification',
   initialState,
-  reducers: {},
+  reducers: {
+    updateVerificationState(state, { payload }) {
+      state.isVerified = payload;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(verify.pending, (state) => {
       return {
@@ -62,14 +66,15 @@ const emailVerificationSlice = createSlice({
     builder.addCase(verify.fulfilled, (state) => {
       return { ...state, verificationInProgress: false, isVerified: true };
     });
-    builder.addCase(verify.rejected, (state, action) => {
+    builder.addCase(verify.rejected, (state, { error }) => {
       return {
         ...state,
         verificationInProgress: false,
-        verificationError: action.error,
+        verificationError: error,
       };
     });
   },
 });
 
+export const emailVerificationActions = emailVerificationSlice.actions;
 export default emailVerificationSlice.reducer;
