@@ -1,5 +1,4 @@
 /* eslint-disable unused-imports/no-unused-vars */
-/* eslint-disable no-nested-ternary */
 import { createAsyncThunk, createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';

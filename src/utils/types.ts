@@ -2,6 +2,7 @@
 // export const DATE_TYPE_DATE = 'date';
 // export const DATE_TYPE_DATETIME = 'datetime';
 // propTypes.dateType = oneOf([DATE_TYPE_DATE, DATE_TYPE_DATETIME]);
+import { types as sdkLoader } from '@sharetribe/sdk';
 import type Decimal from 'decimal.js';
 import type { NextPage } from 'next';
 
@@ -18,6 +19,8 @@ import type {
   ETransactionRoles,
   ETxTransitionActors,
 } from './enums';
+
+const { UUID, LatLng, Money } = sdkLoader;
 
 export type NextApplicationPage<P = any, IP = P> = NextPage<P, IP> & {
   requireAuth?: boolean;
@@ -46,20 +49,20 @@ export enum ErrorCodes {
 // API error
 // TODO this is likely to change soonish
 export type TApiError = {
-  id: String;
-  status: Number;
+  id: typeof UUID;
+  status: number;
   code: ErrorCodes;
-  title: String;
+  title: string;
   meta: Record<string, unknown>;
 };
 
 // Storable error prop type. (Error object should not be stored as it is.)
 export type TError = {
   type: 'error';
-  name: String;
-  message?: String;
-  status?: Number;
-  statusText: String;
+  name: string;
+  message?: string;
+  status?: number;
+  statusText: string;
   apiErrors: TApiError[];
 };
 
@@ -86,7 +89,7 @@ export type TImageAttributes = {
 };
 
 export type TImage = {
-  id: any;
+  id: typeof UUID;
   type: 'image';
   attributes: TImageAttributes;
 };
@@ -97,10 +100,10 @@ export type TProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
-  protectedData?: any;
-  metadata?: any;
-  publicData?: any;
-  privateData?: any;
+  protectedData?: Record<string, any>;
+  metadata?: Record<string, any>;
+  publicData?: Record<string, any>;
+  privateData?: Record<string, any>;
 };
 
 export type TCurrentUserAttributes = {
@@ -113,7 +116,7 @@ export type TCurrentUserAttributes = {
 };
 
 export type TCurrentUser = {
-  id: any;
+  id: typeof UUID;
   type: 'currentUser';
   attributes: TCurrentUserAttributes;
   profileImage: TImage;
@@ -123,9 +126,9 @@ export type TUserProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
-  protectedData?: any;
-  metadata?: any;
-  publicData?: any;
+  protectedData?: Record<string, any>;
+  metadata?: Record<string, any>;
+  publicData?: Record<string, any>;
 };
 
 export type TUserAttributes = {
@@ -141,10 +144,10 @@ export type TCompanyProfile = {
   lastName: string;
   abbreviatedName: string;
   bio?: string;
-  protectedData?: any;
-  metadata?: any;
-  publicData?: any;
-  privateData?: any;
+  protectedData?: Record<string, any>;
+  metadata?: Record<string, any>;
+  publicData?: Record<string, any>;
+  privateData?: Record<string, any>;
 };
 
 export type TCompanyAttributes = {
@@ -162,10 +165,10 @@ export type TAuthorProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
-  protectedData?: any;
-  metadata?: any;
-  publicData?: any;
-  privateData?: any;
+  protectedData?: Record<string, any>;
+  metadata?: Record<string, any>;
+  publicData?: Record<string, any>;
+  privateData?: Record<string, any>;
 };
 
 export type TAuthorAttributes = {
@@ -181,7 +184,7 @@ export type TBannedUserAttributes = {
 };
 
 export type TUser = {
-  id: any;
+  id: typeof UUID;
   type: 'user';
   attributes: TAuthorAttributes &
     TBannedUserAttributes &
@@ -191,7 +194,7 @@ export type TUser = {
 };
 
 export type TCompany = {
-  id: any;
+  id: typeof UUID;
   type: 'user';
   attributes: TAuthorAttributes &
     TBannedUserAttributes &
@@ -205,11 +208,11 @@ export type TListingState = TReverseMapFromEnum<typeof EListingStates>;
 export type TListingAttributes = {
   title: string;
   description?: string;
-  geolocation?: any;
+  geolocation?: typeof LatLng;
   deleted?: boolean;
   state?: TListingState;
-  price?: any;
-  publicData?: object;
+  price?: typeof Money;
+  publicData?: Record<string, any>;
 };
 
 export type TDayOfWeek = TReverseMapFromEnum<typeof EDayOfWeek>;
@@ -235,11 +238,11 @@ export type TOwnListingAttributes = {
   title: string;
   deleted: boolean;
   state: TListingState;
-  price?: any;
-  publicData: object;
+  price?: typeof Money;
+  publicData: Record<string, any>;
   availabilityPlan?: TAvailabilityPlan;
   description?: string;
-  geolocation?: any;
+  geolocation?: typeof LatLng;
 };
 
 export type TDeletedListingAttributes = {
@@ -248,7 +251,7 @@ export type TDeletedListingAttributes = {
 
 // Denormalised listing object
 export type TListing = {
-  id: any;
+  id: typeof UUID;
   type: 'listing';
   attributes: TListingAttributes & TDeletedListingAttributes;
   author?: TUser;
@@ -257,7 +260,7 @@ export type TListing = {
 
 // Denormalised ownListing object
 export type TOwnListing = {
-  id: any;
+  id: typeof UUID;
   type: 'ownListing';
   attributes: TOwnListingAttributes & TDeletedListingAttributes;
   author?: TUser;
@@ -275,7 +278,7 @@ export type TBookingAttributes = {
 };
 
 export type TBooking = {
-  id: any;
+  id: typeof UUID;
   type: 'booking';
   attributes: TBookingAttributes;
 };
@@ -289,7 +292,7 @@ export type TTimeSlotAttributes = {
 };
 
 export type TTimeSlot = {
-  id: any;
+  id: typeof UUID;
   type: 'timeSlot';
   attributes: TTimeSlotAttributes;
 };
@@ -301,7 +304,7 @@ export type TAvailabilityExceptionAttributes = {
 };
 
 export type TAvailabilityException = {
-  id: any;
+  id: typeof UUID;
   type: 'availabilityException';
   attributes: TAvailabilityExceptionAttributes;
 };
@@ -329,7 +332,7 @@ export type TReviewAttributes = {
 };
 
 export type TReview = {
-  id: any;
+  id: typeof UUID;
   attributes: TReviewAttributes;
   author: TUser;
   subject: TUser;
@@ -343,8 +346,8 @@ export type TLineItem = {
   code: TLineItemCode;
   includeFor: TTransactionRole;
   quantity?: Decimal;
-  unitPrice: any;
-  lineTotal: any;
+  unitPrice: typeof Money;
+  lineTotal: typeof Money;
   reversal: boolean;
 };
 
@@ -355,14 +358,14 @@ export type TTransactionAttributes = {
 
   // An enquiry won't need a total sum nor a booking so these are
   // optional.
-  payinTotal?: any;
-  payoutTotal?: any;
+  payinTotal?: typeof Money;
+  payoutTotal?: typeof Money;
   lineItems: TLineItem[];
   transitions: TTransition[];
 };
 
 export type TTransaction = {
-  id: any;
+  id: typeof UUID;
   type: 'transaction';
   attributes: TTransactionAttributes;
   booking: TBooking;
@@ -379,7 +382,7 @@ export type TMessageAttributes = {
 
 // Denormalised transaction message
 export type TMessage = {
-  id: any;
+  id: typeof UUID;
   type: 'message';
   attributes: TMessageAttributes;
   sender: TUser;

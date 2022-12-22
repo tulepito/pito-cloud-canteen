@@ -249,7 +249,7 @@ export const isStripeError = (error: TError) => {
   });
 };
 
-export const storableError = (error: any) => {
+export const storableError = (error: any): TError => {
   const err = error || {};
   const { name, message, status, statusText } = err;
   // Status, statusText, and data.errors are (possibly) added to the error object by SDK
@@ -266,7 +266,7 @@ export const storableError = (error: any) => {
   };
 };
 
-export const responseApiErrorInfo = (error: any) =>
+export const responseApiErrorInfo = (error: TError) =>
   responseAPIErrors(error).map((e: any) => ({
     status: e.status,
     code: e.code,

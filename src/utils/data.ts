@@ -234,8 +234,12 @@ export const ensureOwnListing = (listing: any) => {
  *
  * @param {Object} user entity object, which is to be ensured against null values
  */
-export const ensureUser = (user: TUser) => {
-  const empty = { id: null, type: 'user', attributes: { profile: {} } };
+export const ensureUser = (user: TUser | null) => {
+  const empty = {
+    id: null,
+    type: 'user',
+    attributes: { profile: {} },
+  };
   return { ...empty, ...user };
 };
 
@@ -244,11 +248,16 @@ export const ensureUser = (user: TUser) => {
  *
  * @param {Object} current user entity object, which is to be ensured against null values
  */
-export const ensureCurrentUser = (user: TCurrentUser) => {
+export const ensureCurrentUser = (user: any) => {
   const empty = {
     id: null,
     type: 'currentUser',
-    attributes: { profile: {} },
+    attributes: {
+      profile: {},
+      emailVerified: false,
+      banned: false,
+      deleted: false,
+    },
     profileImage: {},
   };
   return { ...empty, ...user };
