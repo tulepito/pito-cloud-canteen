@@ -33,7 +33,8 @@ const PasswordRecoverPage = () => {
 
   return (
     <PasswordRecoveryForm
-      initialValues={{ email: initialEmail, timeLeft }}
+      initialValues={{ email: initialEmail as string }}
+      timeLeft={timeLeft}
       onSubmit={handleSubmitRecoverPasswordForm}
       inProgress={isLoading}
     />

@@ -31,11 +31,9 @@ type TExtraProps = {
   className?: string;
   inProgress?: boolean;
 };
-
-type TSignInFormProps = FormProps<TSignInFormValues> & TExtraProps;
-
 type TSignInFormComponentProps = FormRenderProps<TSignInFormValues> &
   TExtraProps;
+type TSignInFormProps = FormProps<TSignInFormValues> & TExtraProps;
 
 const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
   const intl = useIntl();
@@ -52,7 +50,6 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
   } = props;
   const submitDisable = invalid || inProgress || submitting;
   const submitInprogress = inProgress || submitting;
-
   const classes = classNames(rootClassName || css.root, className);
 
   const formTitle = intl.formatMessage({
