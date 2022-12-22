@@ -24,7 +24,7 @@ export default function CreateCompanyPage() {
       password: values.password,
       firstName: values.firstName,
       lastName: values.lastName,
-      displayName: `${values.firstName} ${values.lastName}`,
+      displayName: `${values.lastName} ${values.firstName}`,
       publicData: {
         address: values.address,
         companyAddress: values.companyAddress,
@@ -59,7 +59,7 @@ export default function CreateCompanyPage() {
       dispatch(clearError());
     };
   }, [clearError, dispatch]);
-
+  console.log(createCompanyError);
   return (
     <div className={css.root}>
       <EditCompanyForm
