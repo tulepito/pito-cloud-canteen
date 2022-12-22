@@ -8,6 +8,7 @@ import {
   confirmPassword,
   emailFormatValid,
   passwordFormatValid,
+  phoneNumberFormatValid,
   required,
 } from '@utils/validators';
 import classNames from 'classnames';
@@ -157,10 +158,17 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                 placeholder={intl.formatMessage({
                   id: 'EditCompanyForm.phonePlaceholder',
                 })}
-                validate={required(
-                  intl.formatMessage({
-                    id: 'EditCompanyForm.phoneRequired',
-                  }),
+                validate={composeValidators(
+                  required(
+                    intl.formatMessage({
+                      id: 'EditCompanyForm.phoneRequired',
+                    }),
+                  ),
+                  phoneNumberFormatValid(
+                    intl.formatMessage({
+                      id: 'EditCompanyForm.phoneInValid',
+                    }),
+                  ),
                 )}
                 required
               />
