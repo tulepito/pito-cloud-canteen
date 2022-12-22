@@ -24,6 +24,7 @@
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
     -webkit-box-shadow 0.15s ease-in-out;
+  min-height: 158px;
   outline: none;
 
   &:hover {
@@ -38,7 +39,7 @@
 
   &::placeholder {
     font-weight: $fontWeightRegular;
-    font-size: 16px;
+    font-size: 14px;
     color: $neutralGray6;
   }
 }
@@ -58,43 +59,6 @@
 }
 
 .inputContainer {
-  position: relative;
-}
-.inputWithPaddingLeft {
-  padding-left: 40px;
-}
-.inputWithPaddingRight {
-  padding-right: 40px;
-}
-.leftIconContainer {
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
-  @include flexCenter;
-}
-.rightIconContainer {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 24x;
-  @include flexCenter;
-}
-
-.rightIcon {
-  & path {
-    fill: $neutralGray6;
-  }
-}
-
-.leftIcon {
-  & path {
-    fill: $neutralGray6;
-  }
 }
 
 .labelRoot {
@@ -107,7 +71,6 @@
 }
 .labelRequiredRedStar {
   color: $failColor;
-  margin-left: 2px;
   font-weight: $fontWeightSemiBold;
   margin-left: 2px;
 }
