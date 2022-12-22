@@ -30,10 +30,6 @@ export default function EditCompanyPage() {
   } = useAppSelector((state) => state.EditCompanyPage);
 
   useEffect(() => {
-    dispatch(clearError());
-  }, [clearError, dispatch]);
-
-  useEffect(() => {
     if (!companyId) return;
     dispatch(updateCompanyPageThunks.showCompany(companyId as string));
   }, [companyId]);
@@ -95,6 +91,13 @@ export default function EditCompanyPage() {
   const formErrorMessage = updateCompanyError
     ? intl.formatMessage({ id: 'EditCompanyPage.updateCompanyFailed' })
     : null;
+
+  useEffect(() => {
+    dispatch(clearError());
+    return () => {
+      dispatch(clearError());
+    };
+  }, [clearError, dispatch]);
 
   return (
     <div className={css.root}>
