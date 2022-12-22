@@ -165,20 +165,21 @@ const filterCompanies = (companies: TCompany[], filterValues: any) => {
   }
 
   if (keywordAsLowerCase && !status) {
-    return companies.filter(
-      (company) =>
-        company.id.uuid.toLowerCase().includes(keywordAsLowerCase) ||
+    return companies.filter((company) => {
+      return (
+        company.id.uuid.toLowerCase() === keywordAsLowerCase ||
         company.attributes.profile.displayName
           ?.toLowerCase()
           ?.includes(keywordAsLowerCase) ||
         company.attributes.profile.publicData?.companyName
-          ?.toLowerCase(keywordAsLowerCase)
-          ?.includes(keyword) ||
+          ?.toLowerCase()
+          ?.includes(keywordAsLowerCase) ||
         company.attributes.profile.publicData?.phoneNumber
           ?.toLowerCase()
           ?.includes(keywordAsLowerCase) ||
-        company.attributes.email.toLowerCase().includes(keywordAsLowerCase),
-    );
+        company.attributes.email.toLowerCase().includes(keywordAsLowerCase)
+      );
+    });
   }
   return companies.filter(
     (company) =>
