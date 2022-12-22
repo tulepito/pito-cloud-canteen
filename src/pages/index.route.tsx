@@ -1,6 +1,7 @@
 import Button from '@components/Button/Button';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
+import paths from '@src/paths';
 import { useRouter } from 'next/router';
 
 import css from './index.module.scss';
@@ -14,7 +15,7 @@ export default function Home() {
 
   const handleLogout = async () => {
     await dispatch(authThunks.logout());
-    router.replace('/');
+    router.replace(paths.HomePage);
   };
 
   return (
