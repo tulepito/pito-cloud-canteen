@@ -13,21 +13,47 @@ import {
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
 import css from './SignInForm.module.scss';
 
-type TSignInFormProps = {
-  onSubmit: (values: Record<string, any>) => void;
-  inProgress: boolean;
-  errorMessage?: ReactNode;
+export type TSignInFormValues = {
+  email: string;
+  password: string;
 };
 
-const SignInForm: React.FC<TSignInFormProps> = (props) => {
-  const { inProgress, errorMessage, ...restProps } = props;
+type TExtraProps = {
+  formId?: string;
+  errorMessage?: ReactNode;
+  rootClassName?: string;
+  className?: string;
+  inProgress?: boolean;
+};
+
+type TSignInFormProps = FormProps<TSignInFormValues> & TExtraProps;
+
+type TSignInFormComponentProps = FormRenderProps<TSignInFormValues> &
+  TExtraProps;
+
+const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
   const intl = useIntl();
   const router = useRouter();
+  const {
+    rootClassName,
+    className,
+    errorMessage,
+    formId,
+    handleSubmit,
+    invalid,
+    submitting,
+    inProgress,
+  } = props;
+  const submitDisable = invalid || inProgress || submitting;
+  const submitInprogress = inProgress || submitting;
+
+  const classes = classNames(rootClassName || css.root, className);
 
   const formTitle = intl.formatMessage({
     id: 'SignInForm.title',
@@ -82,73 +108,61 @@ const SignInForm: React.FC<TSignInFormProps> = (props) => {
   };
 
   return (
-    <FinalForm
-      {...restProps}
-      render={(formRenderProps: any) => {
-        const { rootClassName, className, formId, handleSubmit, invalid } =
-          formRenderProps;
-        const submitDisable = invalid || inProgress;
+    <Form className={classes} onSubmit={handleSubmit}>
+      <div className={css.formContainer}>
+        <h2 className={css.formTitle}>{formTitle}</h2>
 
-        const classes = classNames(rootClassName || css.root, className);
+        <FieldTextInput
+          id={formId ? `${formId}.email` : 'email'}
+          name="email"
+          placeholder={emailPlaceholder}
+          validate={emailValidators}
+        />
 
-        return (
-          <Form className={classes} onSubmit={handleSubmit}>
-            <div className={css.formContainer}>
-              <h2 className={css.formTitle}>{formTitle}</h2>
+        <FieldPasswordInput
+          id={formId ? `${formId}.password` : 'password'}
+          name="password"
+          placeholder={passwordPlaceholder}
+          validate={passwordValidators}
+        />
 
-              <FieldTextInput
-                id={formId ? `${formId}.email` : 'email'}
-                name="email"
-                placeholder={emailPlaceholder}
-                validate={emailValidators}
-              />
+        <div className={css.forgotPassword}>
+          <span onClick={navigateToPasswordRecoverPage}>
+            {forgotPasswordText}
+          </span>
+        </div>
 
-              <FieldPasswordInput
-                id={formId ? `${formId}.password` : 'password'}
-                name="password"
-                placeholder={passwordPlaceholder}
-                validate={passwordValidators}
-              />
-
-              <div className={css.forgotPassword}>
-                <span onClick={navigateToPasswordRecoverPage}>
-                  {forgotPasswordText}
-                </span>
-              </div>
-
-              {errorMessage && (
-                <div className={css.errorSignIn}>{errorMessage}</div>
-              )}
-              <Button
-                className={css.submitButton}
-                type="submit"
-                disabled={submitDisable}
-                inProgress={inProgress}>
-                {submitButtonText}
-              </Button>
-              <div className={css.orText}>
-                <span>{orText}</span>
-              </div>
-
-              <Button className={css.googleLoginButton} type="button" disabled>
-                <GoogleIcon className={css.googleIcon} />
-                <span>{googleLoginText}</span>
-              </Button>
-            </div>
-            <div className={css.doNotHaveAnAccount}>
-              <div>
-                {doNotHaveAnAccountText}{' '}
-                <span className={css.toSignUp} onClick={navigateToSignUpPage}>
-                  {' '}
-                  {toSignUp}
-                </span>
-              </div>
-            </div>
-          </Form>
-        );
-      }}
-    />
+        {errorMessage && <div className={css.errorSignIn}>{errorMessage}</div>}
+        <Button
+          className={css.submitButton}
+          type="submit"
+          disabled={submitDisable}
+          inProgress={submitInprogress}>
+          {submitButtonText}
+        </Button>
+        <div className={css.orText}>
+          <span>{orText}</span>
+        </div>
+        <Button className={css.googleLoginButton} type="button" disabled>
+          <GoogleIcon className={css.googleIcon} />
+          <span>{googleLoginText}</span>
+        </Button>
+      </div>
+      <div className={css.doNotHaveAnAccount}>
+        <div>
+          {doNotHaveAnAccountText}{' '}
+          <span className={css.toSignUp} onClick={navigateToSignUpPage}>
+            {' '}
+            {toSignUp}
+          </span>
+        </div>
+      </div>
+    </Form>
   );
+};
+
+const SignInForm: React.FC<TSignInFormProps> = (props) => {
+  return <FinalForm {...props} component={SignInFormComponent} />;
 };
 
 export default SignInForm;

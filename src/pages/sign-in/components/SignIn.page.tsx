@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import type { TSignInFormValues } from './SignInForm';
 import SignInForm from './SignInForm';
 
 const SignInPage = () => {
@@ -24,12 +25,10 @@ const SignInPage = () => {
         <FormattedMessage id="SignInPage.loginFailedText2" />
       </div>
     </>
-  ) : undefined;
+  ) : null;
 
-  const handleSubmitSignUp = (values: Record<string, any>) => {
-    const { email, password } = values;
-
-    dispatch(authThunks.login({ email, password }));
+  const handleSubmitSignUp = async (values: TSignInFormValues) => {
+    await dispatch(authThunks.login(values));
   };
 
   useEffect(() => {
