@@ -45,10 +45,10 @@ const initialState: IAuthState = {
 };
 
 // ================ Thunk types ================ //
-const AUTH_INFO = 'app/Auth/AUTH_INFO';
-const SIGN_UP = 'app/Auth/SIGN_UP';
-const LOGIN = 'app/Auth/LOGIN';
-const LOGOUT = 'app/Auth/LOGOUT';
+const AUTH_INFO = 'app/auth/AUTH_INFO';
+const SIGN_UP = 'app/auth/SIGN_UP';
+const LOGIN = 'app/auth/LOGIN';
+const LOGOUT = 'app/auth/LOGOUT';
 
 const authInfo = createAsyncThunk(
   AUTH_INFO,
@@ -70,7 +70,7 @@ const login = createAsyncThunk(
   ) => {
     const { email: username, password } = params;
     await sdk.login({ username, password });
-    await dispatch(userThunks.fetchCurrentUser(undefined));
+    dispatch(userThunks.fetchCurrentUser(undefined));
   },
   {
     serializeError: storableError,
@@ -114,7 +114,7 @@ export const authThunks = {
 };
 
 const authSlice = createSlice({
-  name: 'Auth',
+  name: 'auth',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
