@@ -4,6 +4,7 @@ import Button from '@components/Button/Button';
 import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
 import FieldSelect from '@components/FieldSelect/FieldSelect';
+import FieldTextArea from '@components/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import IconCalendar from '@components/IconCalender/IconCalender';
@@ -170,24 +171,28 @@ const StyleGuidePage = (props: any) => {
                     placeholder="Enter your password"
                     label="Password"
                   />
-                  <FieldPasswordInput
-                    id="confirm-password"
-                    name="confirm-password"
-                    placeholder="Enter your password"
-                    label="Confirm password"
-                  />
-                  <FieldCheckbox
-                    id="checkbox-group-1"
-                    name="favorites"
-                    value="meet"
-                    label="Favorites"
-                  />
-                  <FieldCheckbox
-                    id="checkbox-group-2"
-                    name="favorites"
-                    value="salad"
-                    label="Favorites"
-                  />
+                  <div
+                    style={{ display: 'flex', gap: '16px', margin: '16px 0' }}>
+                    <FieldCheckbox
+                      id="checkbox-group-1"
+                      name="favorites"
+                      value="meet"
+                      label="Meet"
+                    />
+                    <FieldCheckbox
+                      id="checkbox-group-2"
+                      name="favorites"
+                      value="beef"
+                      label="Beef"
+                    />
+                    <FieldCheckbox
+                      id="checkbox-group-3"
+                      name="favorites"
+                      value="salad"
+                      label="Salad"
+                    />
+                  </div>
+
                   <FieldSelect
                     id="select1"
                     name="select1"
@@ -210,6 +215,12 @@ const StyleGuidePage = (props: any) => {
                     <option value="first">First option</option>
                     <option value="second">Second option</option>
                   </FieldSelect>
+                  <FieldTextArea
+                    name="content"
+                    id="content"
+                    label="Field text area"
+                    placeholder="Input Content"
+                  />
 
                   <Button
                     type="submit"
