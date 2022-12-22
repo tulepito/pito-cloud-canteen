@@ -1,7 +1,10 @@
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconSpinner from '@components/IconSpinner/IconSpinner';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { updateCompanyPageThunks } from '@redux/slices/EditCompanyPage.slice';
+import {
+  clearError,
+  updateCompanyPageThunks,
+} from '@redux/slices/EditCompanyPage.slice';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
@@ -25,6 +28,10 @@ export default function EditCompanyPage() {
     updateCompanyError,
     showCompanyError,
   } = useAppSelector((state) => state.EditCompanyPage);
+
+  useEffect(() => {
+    dispatch(clearError());
+  }, [clearError, dispatch]);
 
   useEffect(() => {
     if (!companyId) return;

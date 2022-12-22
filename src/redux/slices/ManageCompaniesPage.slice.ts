@@ -7,13 +7,13 @@ import { denormalisedResponseEntities } from '@utils/data';
 import { storableError } from '@utils/errors';
 import type { TCompany, TPagination } from '@utils/types';
 
-const RESULT_PAGE_SIZE = 10;
+export const RESULT_PAGE_SIZE = 10;
 
 interface ManageCompanyState {
   companyRefs: any[];
   queryCompaniesInProgress: boolean;
   queryCompaniesError: any;
-  pagination: TPagination;
+  pagination?: TPagination | null;
   updateStatusInProgress: boolean;
   updateStatusError: any;
 }
@@ -60,12 +60,7 @@ const initialState: ManageCompanyState = {
   queryCompaniesError: true,
   updateStatusInProgress: false,
   updateStatusError: null,
-  pagination: {
-    totalItems: 0,
-    totalPages: 0,
-    page: 0,
-    perPage: 0,
-  },
+  pagination: null,
 };
 
 export const manageCompaniesSlice = createSlice({
@@ -73,11 +68,14 @@ export const manageCompaniesSlice = createSlice({
   initialState,
   reducers: {
     paginateCompanies: (state, action) => {
+      const { page, totalItems } = action.payload;
       return {
         ...state,
         pagination: {
-          ...state.pagination,
-          page: action.payload,
+          totalItems,
+          totalPages: Math.ceil(totalItems / RESULT_PAGE_SIZE),
+          perPage: RESULT_PAGE_SIZE,
+          page,
         },
       };
     },
@@ -90,19 +88,12 @@ export const manageCompaniesSlice = createSlice({
         queryCompaniesError: null,
       }))
       .addCase(queryCompanies.fulfilled, (state, action) => {
-        const { companies, page, data } = action.payload;
-        const { totalItems } = data.data.meta;
-
+        const { companies } = action.payload;
         return {
           ...state,
           companyRefs: companies,
           queryCompaniesInProgress: false,
-          pagination: {
-            totalItems,
-            totalPages: Math.ceil(totalItems / RESULT_PAGE_SIZE),
-            page,
-            perPage: RESULT_PAGE_SIZE,
-          },
+          pagination: null,
         };
       })
       .addCase(queryCompanies.rejected, (state, action) => ({
