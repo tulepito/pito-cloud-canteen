@@ -46,35 +46,35 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'id',
     label: '#',
     render: (data: any) => {
-      return <span>{data.index + 1}</span>;
+      return <span className={css.rowText}>{data.index + 1}</span>;
     },
   },
   {
     key: 'name',
     label: 'Họ và tên',
     render: (data: any) => {
-      return <span>{data.name}</span>;
+      return <span className={css.rowText}>{data.name}</span>;
     },
   },
   {
     key: 'phone',
     label: 'Số điện thoại',
     render: (data: any) => {
-      return <span>{data.phone}</span>;
+      return <span className={css.rowText}>{data.phone}</span>;
     },
   },
   {
     key: 'email',
     label: 'Email',
     render: (data: any) => {
-      return <span>{data.email}</span>;
+      return <span className={css.rowText}>{data.email}</span>;
     },
   },
   {
     key: 'companyName',
     label: 'Tên công ty',
     render: (data: any) => {
-      return <span>{data.companyName}</span>;
+      return <span className={css.rowText}>{data.companyName}</span>;
     },
   },
   {
@@ -136,7 +136,7 @@ const parseEntitiesToTableData = (
       name: company.attributes.profile.displayName,
       phone: company.attributes.profile.publicData?.phoneNumber,
       email: company.attributes.email,
-      companyName: company.attributes.profile.displayName,
+      companyName: company.attributes.profile.publicData?.companyName,
       status:
         company.attributes.profile.metadata.status || ECompanyStatus.unactive,
       ...extraData,

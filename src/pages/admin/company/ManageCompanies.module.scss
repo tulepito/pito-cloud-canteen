@@ -98,3 +98,12 @@
     justify-content: flex-start;
   }
 }
+
+.rowText {
+  max-width: 200px;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* number of lines to show */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
