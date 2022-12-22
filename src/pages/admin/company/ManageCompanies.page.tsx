@@ -91,6 +91,7 @@ const TABLE_COLUMN: TColumn[] = [
         };
         data.updateStatus(updateData);
       };
+
       return (
         <ToggleButton
           name={data.id}
@@ -127,20 +128,31 @@ const parseEntitiesToTableData = (
   companies: TUser[],
   extraData: TExtraDataMapToCompanyTable,
 ) => {
-  return companies.map((company, index) => ({
-    key: company.id.uuid,
-    data: {
-      index,
-      id: company.id.uuid,
-      name: company.attributes.profile.displayName,
-      phone: company.attributes.profile.publicData?.phoneNumber,
-      email: company.attributes.email,
-      companyName: company.attributes.profile.displayName,
-      status:
-        company.attributes.profile.metadata.status || ECompanyStatus.unactive,
-      ...extraData,
-    },
-  }));
+  return companies.map((company, index) => {
+    const companyId = company.id.uuid;
+    const {
+      profile: {
+        displayName,
+        publicData: { phoneNumber, companyName } = {},
+        metadata: { status } = {},
+      },
+      email,
+    } = company.attributes;
+
+    return {
+      key: companyId,
+      data: {
+        index,
+        id: companyId,
+        name: displayName,
+        phone: phoneNumber,
+        email,
+        companyName,
+        status: status || ECompanyStatus.unactive,
+        ...extraData,
+      },
+    };
+  });
 };
 
 const sliceCompanies = (
@@ -161,40 +173,40 @@ const filterCompanies = (companies: TCompany[], filterValues: any) => {
   if (!keywordAsLowerCase && status) {
     return companies.filter(
       (company: TCompany) =>
-        Number(status) === company.attributes.profile.metadata.status,
+        Number(status) === company.attributes.profile.metadata?.status,
     );
   }
   if (keywordAsLowerCase && !status) {
-    return companies.filter(
-      (company) =>
+    return companies.filter((company) => {
+      const {
+        profile: { displayName, publicData: { companyName, phoneNumber } = {} },
+        email,
+      } = company.attributes;
+
+      return (
         company.id.uuid.toLowerCase().includes(keywordAsLowerCase) ||
-        company.attributes.profile.displayName
-          .toLowerCase()
-          .includes(keywordAsLowerCase) ||
-        company.attributes.profile.publicData?.companyName
-          .toLowerCase(keywordAsLowerCase)
-          .includes(keyword) ||
-        company.attributes.profile.publicData?.phoneNumber
-          ?.toLowerCase()
-          .includes(keywordAsLowerCase) ||
-        company.attributes.email.toLowerCase().includes(keywordAsLowerCase),
-    );
+        displayName.toLowerCase().includes(keywordAsLowerCase) ||
+        companyName.toLowerCase(keywordAsLowerCase).includes(keyword) ||
+        phoneNumber?.toLowerCase().includes(keywordAsLowerCase) ||
+        email.toLowerCase().includes(keywordAsLowerCase)
+      );
+    });
   }
-  return companies.filter(
-    (company) =>
-      Number(status) === company.attributes.profile.metadata.status &&
+  return companies.filter((company) => {
+    const {
+      profile: { displayName, publicData: { companyName, phoneNumber } = {} },
+      email,
+    } = company.attributes;
+
+    return (
+      Number(status) === company.attributes.profile.metadata?.status &&
       (company.id.uuid.toLowerCase().includes(keywordAsLowerCase) ||
-        company.attributes.profile.displayName
-          .toLowerCase()
-          .includes(keywordAsLowerCase) ||
-        company.attributes.profile.publicData?.companyName
-          .toLowerCase()
-          .includes(keywordAsLowerCase) ||
-        company.attributes.profile.publicData?.phoneNumber
-          ?.toLowerCase()
-          .includes(keywordAsLowerCase) ||
-        company.attributes.email.toLowerCase().includes(keywordAsLowerCase)),
-  );
+        displayName.toLowerCase().includes(keywordAsLowerCase) ||
+        companyName.toLowerCase().includes(keywordAsLowerCase) ||
+        phoneNumber?.toLowerCase().includes(keywordAsLowerCase) ||
+        email.toLowerCase().includes(keywordAsLowerCase))
+    );
+  });
 };
 
 const companyStatusOptions = [
