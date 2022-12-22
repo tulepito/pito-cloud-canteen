@@ -26,7 +26,7 @@ const ProgressBar = (props: TProgress) => {
     format ? (
       <span className={css.info}>{format}</span>
     ) : (
-      <span className={css.info}>{percent} %</span>
+      <span className={css.info}>{percent}%</span>
     )
   ) : null;
   const roundedWidth = Math.round(percent) === 100 ? 100 : Math.round(percent);

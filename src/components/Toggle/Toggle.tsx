@@ -39,8 +39,7 @@ const Toggle = (props: TToggle) => {
           id="toggle"
           name="toggle"
           disabled={disabled}
-          checked={switchControl.value}
-          defaultChecked={status === 'on'}
+          defaultChecked={switchControl.value}
         />
         <label
           htmlFor="switch"

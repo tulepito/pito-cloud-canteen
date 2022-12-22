@@ -132,6 +132,7 @@ const StyleGuidePage = (props: any) => {
                     label="Username"
                     disabled
                     defaultValue="Input disabled"
+                    className={css.fieldItem}
                   />
                   <FieldTextInput
                     id={`email`}
@@ -140,12 +141,14 @@ const StyleGuidePage = (props: any) => {
                     placeholder="hello"
                     rightIcon={<IconVoucher />}
                     label="Email"
+                    className={css.fieldItem}
                   />
                   <FieldPasswordInput
                     id="password"
                     name="password"
                     placeholder="Enter your password"
                     label="Password"
+                    className={css.fieldItem}
                   />
                   <div
                     style={{ display: 'flex', gap: '16px', margin: '16px 0' }}>
@@ -173,7 +176,8 @@ const StyleGuidePage = (props: any) => {
                     id="select1"
                     name="select1"
                     label="Choose an option"
-                    leftIcon={<IconCalendar />}>
+                    leftIcon={<IconCalendar />}
+                    className={css.fieldItem}>
                     <option value="" disabled>
                       Select with icon
                     </option>
@@ -184,7 +188,8 @@ const StyleGuidePage = (props: any) => {
                   <FieldSelect
                     id="select1"
                     name="select1"
-                    label="Choose an option">
+                    label="Choose an option"
+                    className={css.fieldItem}>
                     <option value="" disabled>
                       Select without icon
                     </option>
@@ -210,6 +215,7 @@ const StyleGuidePage = (props: any) => {
                       name="confirm-password"
                       placeholder="Enter your password"
                       label="Confirm password"
+                      className={css.fieldItem}
                     />
                     <FieldTextInput
                       id={`email`}
@@ -218,25 +224,28 @@ const StyleGuidePage = (props: any) => {
                       placeholder="hello"
                       rightIcon={<IconVoucher />}
                       label="Email"
+                      className={css.fieldItem}
                     />
                     <FieldPasswordInput
                       id="password"
                       name="password"
                       placeholder="Enter your password"
                       label="Password"
-                    />
-
-                    <FieldPasswordInput
-                      id="confirm-password"
-                      name="confirm-password"
-                      placeholder="Enter your password"
-                      label="Confirm password"
+                      className={css.fieldItem}
                     />
                     <FieldPasswordInput
                       id="confirm-password"
                       name="confirm-password"
                       placeholder="Enter your password"
                       label="Confirm password"
+                      className={css.fieldItem}
+                    />
+                    <FieldPasswordInput
+                      id="confirm-password"
+                      name="confirm-password"
+                      placeholder="Enter your password"
+                      label="Confirm password"
+                      className={css.fieldItem}
                     />
                     <FieldTextInput
                       id={`email`}
@@ -255,42 +264,64 @@ const StyleGuidePage = (props: any) => {
 
         <StyleGuideCard>
           <p className={css.title}>Progress bar</p>
-          <Progress percent={0} />
-          <Progress percent={30} />
-          <Progress percent={50} />
-          <Progress percent={60} />
-          <Progress percent={95} />
-          <Progress percent={100} />
-          <p className={css.title}>Progress circle</p>
-          <Progress percent={0} type="circle" />
-          <Progress percent={25} type="circle" animate />
-          <Progress percent={30} type="circle" />
-          <Progress percent={60} type="circle" />
-          <Progress percent={75} type="circle" />
-          <Progress percent={90} type="circle" />
-          <Progress percent={99} type="circle" />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flexWrap: 'wrap',
+              gap: '16px',
+            }}>
+            <Progress percent={0} />
+            <Progress percent={30} />
+            <Progress percent={50} />
+            <Progress percent={60} />
+            <Progress percent={95} />
+            <Progress percent={100} />
+          </div>
 
-          <Progress percent={100} type="circle" />
+          <p className={css.title}>Progress circle</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
+            <Progress percent={0} type="circle" />
+            <Progress percent={25} type="circle" animate />
+            <Progress percent={30} type="circle" />
+            <Progress percent={60} type="circle" />
+            <Progress percent={75} type="circle" />
+            <Progress percent={90} type="circle" />
+            <Progress percent={99} type="circle" />
+            <Progress percent={100} type="circle" />
+          </div>
         </StyleGuideCard>
         <StyleGuideCard>
-          <Toggle status="on" onClick={onSingleToggle} label="Shipping" />
-          <Toggle
-            status="off"
-            onClick={onSingleToggle}
-            label="Receive notification"
-          />
-          <Toggle
-            status="off"
-            onClick={onSingleToggle}
-            disabled
-            label="Disable toggle off status"
-          />
-          <Toggle
-            status="on"
-            onClick={onSingleToggle}
-            disabled
-            label="Disable toggle on status"
-          />
+          <p className={css.title}>Toggle component</p>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flexWrap: 'wrap',
+              gap: '24px',
+              marginTop: '24px',
+            }}>
+            <Toggle
+              status="on"
+              onClick={onSingleToggle}
+              disabled
+              label=" Toggle on , disabled status "
+            />
+            <Toggle
+              status="on"
+              onClick={onSingleToggle}
+              label="Toggle on status"
+            />
+            <Toggle status="off" onClick={onSingleToggle} label="Toggle off" />
+            <Toggle
+              status="off"
+              onClick={onSingleToggle}
+              disabled
+              label="Toggle off, disable status"
+            />
+          </div>
+        </StyleGuideCard>
+        <StyleGuideCard>
           <Button
             type="submit"
             fullWidth
@@ -350,9 +381,17 @@ const StyleGuidePage = (props: any) => {
         </StyleGuideCard>
         <StyleGuideCard>
           <p className={css.title}>Tabs</p>
-          <Tabs items={tabItems} defaultActiveKey="1" />
-          <Tabs items={tabItems} defaultActiveKey="2" />
-          <Tabs items={tabItems} defaultActiveKey="3" />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flexWrap: 'wrap',
+              gap: '24px',
+            }}>
+            <Tabs items={tabItems} defaultActiveKey="1" />
+            <Tabs items={tabItems} defaultActiveKey="2" />
+            <Tabs items={tabItems} defaultActiveKey="3" />
+          </div>
         </StyleGuideCard>
         <StyleGuideCard>
           <p className={css.title}>Accordion component</p>
