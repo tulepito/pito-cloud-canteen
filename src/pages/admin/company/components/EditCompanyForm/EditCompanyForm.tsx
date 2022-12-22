@@ -85,23 +85,6 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
             </p>
             <div className={css.fields}>
               <FieldTextInput
-                id="firstName"
-                className={css.field}
-                name="firstName"
-                label={intl.formatMessage({
-                  id: 'EditCompanyForm.firstNameLabel',
-                })}
-                placeholder={intl.formatMessage({
-                  id: 'EditCompanyForm.firstNamePlaceholder',
-                })}
-                validate={required(
-                  intl.formatMessage({
-                    id: 'EditCompanyForm.firstNameRequired',
-                  }),
-                )}
-                required
-              />
-              <FieldTextInput
                 id="lastName"
                 className={css.field}
                 name="lastName"
@@ -114,6 +97,23 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                 validate={required(
                   intl.formatMessage({
                     id: 'EditCompanyForm.lastNameRequired',
+                  }),
+                )}
+                required
+              />
+              <FieldTextInput
+                id="firstName"
+                className={css.field}
+                name="firstName"
+                label={intl.formatMessage({
+                  id: 'EditCompanyForm.firstNameLabel',
+                })}
+                placeholder={intl.formatMessage({
+                  id: 'EditCompanyForm.firstNamePlaceholder',
+                })}
+                validate={required(
+                  intl.formatMessage({
+                    id: 'EditCompanyForm.firstNameRequired',
                   }),
                 )}
                 required
@@ -304,7 +304,11 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
               />
             </div>
             <div className={css.buttonWrapper}>
-              {formErrorMessage && <ErrorMessage message={formErrorMessage} />}
+              <div>
+                {formErrorMessage && (
+                  <ErrorMessage message={formErrorMessage} />
+                )}
+              </div>
               <Button
                 inProgress={inProgress}
                 disabled={inProgress}

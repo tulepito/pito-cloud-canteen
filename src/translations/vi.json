@@ -193,5 +193,20 @@
   "Avatar.deletedUserDisplayName": "Deleted user",
   "Avatar.bannedUserDisplayName": "Banned user",
   "EditCompanyForm.passwordInvalid": "Mật khẩu phải từ 8-16 kí tự, bao gồm chữ cái in hoa, chữ cái in thường, ký tự đặc biệt và chữ số.",
-  "Pagination.info": "{from} - {to} trong số {total} kết quả"
+  "Pagination.info": "{from} - {to} trong số {total} kết quả",
+  "EditPartnerWizard.tabLabelBasicInformation": "Thông tin nhà hàng",
+  "EditPartnerWizard.tabLabelLicense": "Giấy phép",
+  "EditPartnerWizard.tabLabelPreview": "Hoàn tất",
+  "EditPartnerWizard.tabLabelMenu": "Thực đơn",
+  "FieldBusinessLicensePhoto.label": "Giấy phép kinh doanh",
+  "EditPartnerLicenseForm.businessLicenseLabel": "Giấy phép kinh doanh",
+  "EditPartnerLicenseForm.businessLicenseYes": "Có ",
+  "EditPartnerLicenseForm.businessLicenseNo": "Chưa có",
+  "EditPartnerLicenseForm.businessLicenseRegistering": "Đang đăng ký",
+  "EditPartnerLicenseForm.businessLicenseYesDescription": "(Vui lòng scan hoặc chụp hình giấy phép kinh doanh của bạn và upload file.)",
+  "EditPartnerLicenseForm.foodCertificateLabel": "Giấy Phép Vệ Sinh An Toàn Thực Phẩm",
+  "EditPartnerLicenseForm.foodCertificateYes": "Có ",
+  "EditPartnerLicenseForm.foodCertificateYesDescription": "(Vui lòng scan hoặc chụp hình giấy phép kinh doanh của bạn và upload file.)",
+  "EditPartnerLicenseForm.foodCertificateDescription": "Giấy vệ sinh an toàn thực phẩm là một trong những yêu cầu bắt buộc để trở thành đối tác của PITO. Nếu chưa có hoặc đang tiến hành đăng ký, PITO sẽ đến trực tiếp để khảo sát quy trình, chất lượng bếp tiệc. Chúng tôi cam kết tất cả những đối tác tham gia PITO đều đảm bảo chất lượng và vệ sinh, an toàn. Điều này nhằm đảm bảo sức khoẻ cho khách hàng.",
+  "EditCompanyForm.phoneInValid": "Số điện thoại không hợp lệ"
 }

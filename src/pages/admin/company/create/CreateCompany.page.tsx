@@ -1,6 +1,10 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { createCompanyPageThunks } from '@redux/slices/CreateCompanyPage.slice';
+import {
+  clearError,
+  createCompanyPageThunks,
+} from '@redux/slices/CreateCompanyPage.slice';
 import { isSignupEmailTakenError } from '@utils/errors';
+import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
 import type { TEditCompanyFormValues } from '../components/EditCompanyForm/EditCompanyForm';
@@ -20,7 +24,7 @@ export default function CreateCompanyPage() {
       password: values.password,
       firstName: values.firstName,
       lastName: values.lastName,
-      displayName: `${values.firstName} ${values.lastName}`,
+      displayName: `${values.lastName} ${values.firstName}`,
       publicData: {
         address: values.address,
         companyAddress: values.companyAddress,
@@ -34,7 +38,7 @@ export default function CreateCompanyPage() {
       },
     };
     await dispatch(
-      createCompanyPageThunks.creatCompany({
+      createCompanyPageThunks.createCompany({
         dataParams: companyData,
         queryParams: { expand: true },
       }),
@@ -49,6 +53,13 @@ export default function CreateCompanyPage() {
         id: 'CreateCompanyPage.createCompanyFailed',
       });
 
+  useEffect(() => {
+    dispatch(clearError());
+    return () => {
+      dispatch(clearError());
+    };
+  }, [clearError, dispatch]);
+  console.log(createCompanyError);
   return (
     <div className={css.root}>
       <EditCompanyForm

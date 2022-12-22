@@ -16,6 +16,10 @@
 .container {
   background-color: $matterColorLight;
   border-radius: 6px;
-  padding: 10px 50px;
   box-shadow: $boxShadow;
+  padding: 10px 20px;
+
+  @include viewportMedium {
+    padding: 10px 50px;
+  }
 }

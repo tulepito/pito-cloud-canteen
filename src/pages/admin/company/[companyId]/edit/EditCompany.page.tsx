@@ -1,7 +1,10 @@
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconSpinner from '@components/IconSpinner/IconSpinner';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { updateCompanyPageThunks } from '@redux/slices/EditCompanyPage.slice';
+import {
+  clearError,
+  updateCompanyPageThunks,
+} from '@redux/slices/EditCompanyPage.slice';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
@@ -64,7 +67,7 @@ export default function EditCompanyPage() {
       id: company.id.uuid,
       firstName: values.firstName,
       lastName: values.lastName,
-      displayName: `${values.firstName} ${values.lastName}`,
+      displayName: `${values.lastName} ${values.firstName}`,
       publicData: {
         address: values.address,
         companyAddress: values.companyAddress,
@@ -88,6 +91,13 @@ export default function EditCompanyPage() {
   const formErrorMessage = updateCompanyError
     ? intl.formatMessage({ id: 'EditCompanyPage.updateCompanyFailed' })
     : null;
+
+  useEffect(() => {
+    dispatch(clearError());
+    return () => {
+      dispatch(clearError());
+    };
+  }, [clearError, dispatch]);
 
   return (
     <div className={css.root}>
