@@ -31,7 +31,7 @@ interface IAuthState {
   // logout
   logoutError: any;
   // signup
-  signupError: any;
+  signUpError: any;
 }
 
 const initialState: IAuthState = {
@@ -41,7 +41,7 @@ const initialState: IAuthState = {
   authStatus: EAuthState.idle,
   signInError: null,
   logoutError: null,
-  signupError: null,
+  signUpError: null,
 };
 
 // ================ Thunk types ================ //
@@ -134,7 +134,7 @@ const authSlice = createSlice({
           ...state,
           authStatus: EAuthState.isSigningUp,
           signInError: null,
-          signupError: null,
+          signUpError: null,
         };
       })
       .addCase(signUp.fulfilled, (state) => {
@@ -144,7 +144,7 @@ const authSlice = createSlice({
         return {
           ...state,
           authStatus: EAuthState.idle,
-          signupError: action.error,
+          signUpError: action.error,
         };
       })
 
@@ -154,7 +154,7 @@ const authSlice = createSlice({
           authStatus: EAuthState.isSigningIn,
           signInError: null,
           logoutError: null,
-          signupError: null,
+          signUpError: null,
         };
       })
       .addCase(login.fulfilled, (state) => {

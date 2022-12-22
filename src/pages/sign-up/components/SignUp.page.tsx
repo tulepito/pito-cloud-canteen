@@ -1,17 +1,18 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { isSignupEmailTakenError } from '@utils/errors';
+import { isSignUpEmailTakenError } from '@utils/errors';
 import { splitNameFormFullName } from '@utils/string';
 import { FormattedMessage } from 'react-intl';
 
 import EmailVerification from './EmailVerification';
+import type { TSignUpFormValues } from './SignUpForm';
 import SignUpForm from './SignUpForm';
 
 const SignUpPage = () => {
   const {
     user: { sendVerificationEmailError, sendVerificationEmailInProgress },
-    auth: { signupError },
+    auth: { signUpError },
   } = useAppSelector((state) => state);
   const user = useAppSelector(currentUserSelector);
   const authInprogress = useAppSelector(authenticationInProgress);
@@ -23,13 +24,13 @@ const SignUpPage = () => {
   const showEmailVerification =
     currentUserLoaded && !user.attributes.emailVerified;
 
-  const signupErrorMessage = isSignupEmailTakenError(signupError) ? (
-    <FormattedMessage id="SignUpPage.signupFailedEmailAlreadyTaken" />
+  const signUpErrorMessage = isSignUpEmailTakenError(signUpError) ? (
+    <FormattedMessage id="SignUpPage.signUpFailedEmailAlreadyTaken" />
   ) : (
-    <FormattedMessage id="SignUpPage.signupFailed" />
+    <FormattedMessage id="SignUpPage.signUpFailed" />
   );
 
-  const handleSubmitSignUp = (values: Record<string, any>) => {
+  const handleSubmitSignUp = (values: TSignUpFormValues) => {
     // eslint-disable-next-line unused-imports/no-unused-vars
     const { name: submittedName, confirmPassword, ...rest } = values;
     const splitName = splitNameFormFullName(submittedName);
@@ -51,7 +52,7 @@ const SignUpPage = () => {
         <SignUpForm
           onSubmit={handleSubmitSignUp}
           inProgress={authInprogress}
-          errorMessage={signupError ? signupErrorMessage : undefined}
+          errorMessage={signUpError ? signUpErrorMessage : undefined}
         />
       )}
     </div>

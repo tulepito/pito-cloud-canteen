@@ -33,7 +33,7 @@ const responseAPIErrors = (error: any) => {
  * Check if the given API error (from `sdk.currentuser.create()`) is
  * due to the email address already being in use.
  */
-export const isSignupEmailTakenError = (error: TError) =>
+export const isSignUpEmailTakenError = (error: TError) =>
   hasErrorWithCode(error, ErrorCodes.ERROR_CODE_EMAIL_TAKEN);
 
 /**

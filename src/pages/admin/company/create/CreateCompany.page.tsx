@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { createCompanyPageThunks } from '@redux/slices/CreateCompanyPage.slice';
-import { isSignupEmailTakenError } from '@utils/errors';
+import { isSignUpEmailTakenError } from '@utils/errors';
 import { useIntl } from 'react-intl';
 
 import type { TEditCompanyFormValues } from '../components/EditCompanyForm/EditCompanyForm';
@@ -41,7 +41,7 @@ export default function CreateCompanyPage() {
     );
   };
 
-  const formErrorMessage = isSignupEmailTakenError(createCompanyError)
+  const formErrorMessage = isSignUpEmailTakenError(createCompanyError)
     ? intl.formatMessage({
         id: 'CreateCompanyPage.createCompanyEmailAlreadyTaken',
       })

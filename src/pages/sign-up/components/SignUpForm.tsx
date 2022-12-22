@@ -16,21 +16,48 @@ import {
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
 import css from './SignUpForm.module.scss';
 
-type TSignUpFormProps = {
-  onSubmit: (values: Record<string, any>) => void;
-  inProgress: boolean;
-  errorMessage?: ReactNode;
+export type TSignUpFormValues = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  phoneNumber?: string;
+  privacyAndPolicy: boolean;
 };
+type TExtraProps = {
+  formId?: string;
+  errorMessage?: ReactNode;
+  rootClassName?: string;
+  className?: string;
+  inProgress?: boolean;
+};
+type TSignUpFormProps = FormProps<TSignUpFormValues> & TExtraProps;
+type TSignUpFormComponentProps = FormRenderProps<TSignUpFormValues> &
+  TExtraProps;
 
-const SignUpForm: React.FC<TSignUpFormProps> = (props) => {
-  const { inProgress, errorMessage, ...restProps } = props;
+const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
   const intl = useIntl();
   const router = useRouter();
+  const {
+    inProgress,
+    errorMessage,
+    rootClassName,
+    className,
+    formId,
+    handleSubmit,
+    invalid,
+    values,
+  } = props;
+  const classes = classNames(rootClassName || css.root, className);
+  const { privacyAndPolicy } = values;
+  const haveAgreed = privacyAndPolicy === true;
+  const submitDisable = !haveAgreed || invalid || inProgress;
 
   const formTitle = intl.formatMessage({
     id: 'SignUpForm.title',
@@ -103,100 +130,80 @@ const SignUpForm: React.FC<TSignUpFormProps> = (props) => {
   };
 
   return (
-    <FinalForm
-      {...restProps}
-      render={(formRenderProps: any) => {
-        const {
-          rootClassName,
-          className,
-          formId,
-          handleSubmit,
-          invalid,
-          values,
-        } = formRenderProps;
-        const classes = classNames(rootClassName || css.root, className);
-        const { privacyAndPolicy } = values;
-        const haveAgreed = privacyAndPolicy === true;
-        const submitDisable = !haveAgreed || invalid || inProgress;
+    <Form className={classes} onSubmit={handleSubmit}>
+      <div className={css.formContainer}>
+        <h2 className={css.formTitle}>{formTitle}</h2>
 
-        return (
-          <Form className={classes} onSubmit={handleSubmit}>
-            <div className={css.formContainer}>
-              <h2 className={css.formTitle}>{formTitle}</h2>
+        <FieldTextInput
+          id={formId ? `${formId}.name` : 'name'}
+          name="name"
+          placeholder={namePlaceholder}
+          validate={nameValidators}
+        />
 
-              <FieldTextInput
-                id={formId ? `${formId}.name` : 'name'}
-                name="name"
-                placeholder={namePlaceholder}
-                validate={nameValidators}
-              />
+        <FieldTextInput
+          id={formId ? `${formId}.email` : 'email'}
+          name="email"
+          placeholder={emailPlaceholder}
+          validate={emailValidators}
+        />
 
-              <FieldTextInput
-                id={formId ? `${formId}.email` : 'email'}
-                name="email"
-                placeholder={emailPlaceholder}
-                validate={emailValidators}
-              />
+        <FieldPasswordInput
+          id={formId ? `${formId}.password` : 'password'}
+          name="password"
+          placeholder={passwordPlaceholder}
+          validate={passwordValidators}
+        />
 
-              <FieldPasswordInput
-                id={formId ? `${formId}.password` : 'password'}
-                name="password"
-                placeholder={passwordPlaceholder}
-                validate={passwordValidators}
-              />
+        <FieldPasswordInput
+          id={formId ? `${formId}.confirmPassword` : 'confirmPassword'}
+          name="confirmPassword"
+          placeholder={confirmPasswordPlaceholder}
+          validate={confirmPasswordValidators}
+        />
 
-              <FieldPasswordInput
-                id={formId ? `${formId}.confirmPassword` : 'confirmPassword'}
-                name="confirmPassword"
-                placeholder={confirmPasswordPlaceholder}
-                validate={confirmPasswordValidators}
-              />
+        <FieldTextInput
+          id={formId ? `${formId}.phoneNumber` : 'phoneNumber'}
+          name="phoneNumber"
+          placeholder={phoneNumberPlaceholder}
+          validate={phoneNumberValidators}
+        />
 
-              <FieldTextInput
-                id={formId ? `${formId}.phoneNumber` : 'phoneNumber'}
-                name="phoneNumber"
-                placeholder={phoneNumberPlaceholder}
-                validate={phoneNumberValidators}
-              />
-
-              <FieldCheckbox
-                id={formId ? `${formId}.privacyAndPolicy` : 'privacyAndPolicy'}
-                name="privacyAndPolicy"
-                label={
-                  <div>
-                    {privacyPolicyPartA}
-                    <u className={css.privacyPolicyText}>
-                      {privacyPolicyPartB}
-                    </u>
-                  </div>
-                }
-              />
-
-              {errorMessage && (
-                <div className={css.errorSignUp}>{errorMessage}</div>
-              )}
-              <Button
-                inProgress={inProgress}
-                className={css.submitButton}
-                type="submit"
-                disabled={submitDisable}>
-                {submitButtonText}
-              </Button>
+        <FieldCheckbox
+          id={formId ? `${formId}.privacyAndPolicy` : 'privacyAndPolicy'}
+          name="privacyAndPolicy"
+          label={
+            <div>
+              {privacyPolicyPartA}
+              <u className={css.privacyPolicyText}>{privacyPolicyPartB}</u>
             </div>
-            <div className={css.haveAccountContainer}>
-              <div>
-                {haveAnAccountText}{' '}
-                <span className={css.toSignIn} onClick={navigateToSignInPage}>
-                  {' '}
-                  {toSignIn}
-                </span>
-              </div>
-            </div>
-          </Form>
-        );
-      }}
-    />
+          }
+        />
+
+        {errorMessage && <div className={css.errorSignUp}>{errorMessage}</div>}
+        <Button
+          inProgress={inProgress}
+          className={css.submitButton}
+          type="submit"
+          disabled={submitDisable}>
+          {submitButtonText}
+        </Button>
+      </div>
+      <div className={css.haveAccountContainer}>
+        <div>
+          {haveAnAccountText}{' '}
+          <span className={css.toSignIn} onClick={navigateToSignInPage}>
+            {' '}
+            {toSignIn}
+          </span>
+        </div>
+      </div>
+    </Form>
   );
+};
+
+const SignUpForm: React.FC<TSignUpFormProps> = (props) => {
+  return <FinalForm {...props} component={SignUpFormComponent} />;
 };
 
 export default SignUpForm;
