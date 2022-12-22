@@ -59,7 +59,7 @@ export default function CreateCompanyPage() {
       dispatch(clearError());
     };
   }, [clearError, dispatch]);
-  console.log(createCompanyError);
+
   return (
     <div className={css.root}>
       <EditCompanyForm
