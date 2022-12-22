@@ -1,6 +1,10 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { createCompanyPageThunks } from '@redux/slices/CreateCompanyPage.slice';
+import {
+  clearError,
+  createCompanyPageThunks,
+} from '@redux/slices/CreateCompanyPage.slice';
 import { isSignupEmailTakenError } from '@utils/errors';
+import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
 import type { TEditCompanyFormValues } from '../components/EditCompanyForm/EditCompanyForm';
@@ -34,7 +38,7 @@ export default function CreateCompanyPage() {
       },
     };
     await dispatch(
-      createCompanyPageThunks.creatCompany({
+      createCompanyPageThunks.createCompany({
         dataParams: companyData,
         queryParams: { expand: true },
       }),
@@ -48,6 +52,10 @@ export default function CreateCompanyPage() {
     : intl.formatMessage({
         id: 'CreateCompanyPage.createCompanyFailed',
       });
+
+  useEffect(() => {
+    dispatch(clearError());
+  }, [clearError, dispatch]);
 
   return (
     <div className={css.root}>

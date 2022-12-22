@@ -59,7 +59,13 @@ const initialState: EditCompanyState = {
 export const editCompanySlice = createSlice({
   name: 'EditCompanyPage',
   initialState,
-  reducers: {},
+  reducers: {
+    clearError: (state) => ({
+      ...state,
+      updateCompanyError: null,
+      showCompanyError: null,
+    }),
+  },
   extraReducers: (builder) => {
     builder
       .addCase(updateCompany.pending, (state) => ({
@@ -100,5 +106,7 @@ export const editCompanySlice = createSlice({
       });
   },
 });
+
+export const { clearError } = editCompanySlice.actions;
 
 export default editCompanySlice.reducer;

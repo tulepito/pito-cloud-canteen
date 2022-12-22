@@ -13,15 +13,10 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
   manageCompaniesThunks,
-  paginateCompanies,
+  RESULT_PAGE_SIZE,
 } from '@redux/slices/ManageCompaniesPage.slice';
 import { ECompanyStatus } from '@utils/enums';
-import type {
-  TCompany,
-  TPagination,
-  TReverseMapFromEnum,
-  TUser,
-} from '@utils/types';
+import type { TCompany, TReverseMapFromEnum, TUser } from '@utils/types';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -46,7 +41,7 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'id',
     label: '#',
     render: (data: any) => {
-      return <span className={css.rowText}>{data.index + 1}</span>;
+      return <span className={css.rowText}>{data.order}</span>;
     },
   },
   {
@@ -128,10 +123,10 @@ const parseEntitiesToTableData = (
   companies: TUser[],
   extraData: TExtraDataMapToCompanyTable,
 ) => {
-  return companies.map((company, index) => ({
+  return companies.map((company: any) => ({
     key: company.id.uuid,
     data: {
-      index,
+      order: company.order,
       id: company.id.uuid,
       name: company.attributes.profile.displayName,
       phone: company.attributes.profile.publicData?.phoneNumber,
@@ -144,14 +139,17 @@ const parseEntitiesToTableData = (
   }));
 };
 
-const sliceCompanies = (
-  companies: TCompany[],
-  pagination?: TPagination | null,
-) => {
-  if (!pagination) return companies;
-  return companies.slice(
-    (pagination.page - 1) * pagination.perPage,
-    pagination.page * pagination.perPage,
+const sliceCompanies = (companies: TCompany[], page: any) => {
+  const parsedCompanies = companies.map((item: TCompany, index: number) => ({
+    ...item,
+    order: index + 1,
+  }));
+  const pageAsNum = Number(page);
+  console.log(companies, pageAsNum);
+
+  return parsedCompanies.slice(
+    (pageAsNum - 1) * RESULT_PAGE_SIZE,
+    pageAsNum * RESULT_PAGE_SIZE,
   );
 };
 
@@ -159,12 +157,14 @@ const filterCompanies = (companies: TCompany[], filterValues: any) => {
   const { keyword = '', status } = filterValues;
   const keywordAsLowerCase = keyword.toLowerCase();
   if (!keywordAsLowerCase && !status) return companies;
+
   if (!keywordAsLowerCase && status) {
     return companies.filter(
       (company: TCompany) =>
         Number(status) === company.attributes.profile.metadata.status,
     );
   }
+
   if (keywordAsLowerCase && !status) {
     return companies.filter(
       (company) =>
@@ -223,25 +223,33 @@ export default function ManageCompanies() {
     id: 'ManageCompanies.description',
   });
 
-  const {
-    companyRefs,
-    queryCompaniesInProgress,
-    queryCompaniesError,
-    pagination,
-  } = useAppSelector((state) => state.ManageCompaniesPage);
+  const { companyRefs, queryCompaniesInProgress, queryCompaniesError } =
+    useAppSelector((state) => state.ManageCompaniesPage);
 
   const dispatch = useAppDispatch();
 
   const keywordAsString = keyword as string;
 
-  const companies = useMemo(
+  const filteredCompanies = useMemo(
     () =>
-      filterCompanies(sliceCompanies(companyRefs, pagination), {
+      filterCompanies(companyRefs, {
         status,
         keyword: keywordAsString,
       }),
-    [companyRefs, pagination, keywordAsString, status],
-  ) as TUser[];
+    [keywordAsString, companyRefs, status],
+  );
+
+  const slicesCompanies = useMemo(
+    () => sliceCompanies(filteredCompanies, page),
+    [filterCompanies],
+  );
+
+  const pagination = {
+    page: Number(page),
+    perPage: RESULT_PAGE_SIZE,
+    totalPages: Math.ceil(filteredCompanies.length / RESULT_PAGE_SIZE),
+    totalItems: filteredCompanies.length,
+  };
 
   const updateStatus = useCallback(
     (updateData: TUpdateStatus) => {
@@ -257,10 +265,10 @@ export default function ManageCompanies() {
 
   const companiesTableData = useMemo(
     () =>
-      parseEntitiesToTableData(companies, {
+      parseEntitiesToTableData(slicesCompanies, {
         updateStatus,
       }),
-    [companies, updateStatus],
+    [slicesCompanies, updateStatus],
   );
 
   useEffect(() => {
@@ -272,38 +280,23 @@ export default function ManageCompanies() {
     }
   }, [page, mounted]);
 
-  useEffect(() => {
-    if (!page) return;
-    // set pagination for first render
-    dispatch(paginateCompanies(parseInt(page as string, 10)));
-  }, [page]);
-
   const onSearchKeyword = (values: TKeywordSearchFormValues) => {
-    router.push(
-      {
-        pathname,
-        query: {
-          ...query,
-          keyword: values.keyword,
-        },
+    router.replace({
+      pathname,
+      query: {
+        ...values,
       },
-      undefined,
-      { shallow: true },
-    );
+    });
   };
 
   const onSelectFilter = (values: any) => {
-    router.push(
-      {
-        pathname,
-        query: {
-          ...query,
-          ...values,
-        },
+    router.replace({
+      pathname,
+      query: {
+        ...values,
+        ...query,
       },
-      undefined,
-      { shallow: true },
-    );
+    });
   };
 
   const singleFilterInitialValues = useMemo(() => ({ status }), [status]);
@@ -312,7 +305,7 @@ export default function ManageCompanies() {
     () => ({ keyword: keywordAsString }),
     [keywordAsString],
   );
-  console.log(queryCompaniesInProgress);
+
   return (
     <div className={css.root}>
       <Meta title={title} description={description} />
@@ -347,6 +340,7 @@ export default function ManageCompanies() {
           columns={TABLE_COLUMN}
           data={companiesTableData}
           pagination={pagination}
+          pageSearchParams={query}
           paginationPath="/admin/company"
         />
       )}
