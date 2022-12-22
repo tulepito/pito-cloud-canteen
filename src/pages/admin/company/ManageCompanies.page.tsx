@@ -145,7 +145,6 @@ const sliceCompanies = (companies: TCompany[], page: any) => {
     order: index + 1,
   }));
   const pageAsNum = Number(page);
-  console.log(companies, pageAsNum);
 
   return parsedCompanies.slice(
     (pageAsNum - 1) * RESULT_PAGE_SIZE,
@@ -241,7 +240,7 @@ export default function ManageCompanies() {
 
   const slicesCompanies = useMemo(
     () => sliceCompanies(filteredCompanies, page),
-    [filterCompanies],
+    [filteredCompanies, page],
   );
 
   const pagination = {
