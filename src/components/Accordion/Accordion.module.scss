@@ -1,0 +1,66 @@
+@use '/src/styles/vars.scss' as *;
+.root {
+  border-bottom: 1px solid $primaryPri5;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.title {
+  font-weight: $fontWeightMedium;
+  font-size: 16px;
+  line-height: 150%;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  width: calc(100% - 27px);
+  padding: 15px;
+  color: $neutralGray10;
+}
+
+.showTitle {
+  color: $primaryPri5;
+}
+
+.content {
+  display: none;
+  font-size: 14px;
+  line-height: 150%;
+  color: $neutralGray10;
+  padding: 15px;
+  cursor: default;
+  white-space: pre-line;
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-60px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.show {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid $primaryPri5;
+  animation: slideDown;
+  animation-duration: 0.5s;
+}
+
+.iconArrow {
+  stroke: $neutralGray10;
+  fill: $neutralGray10;
+  width: 13px;
+  height: 7px;
+  margin-left: 14px;
+}
+
+.mainSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

@@ -1,3 +1,4 @@
+import Accordion from '@components/Accordion/Accordion';
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
@@ -43,6 +44,24 @@ const tabItems = [
         <h2>Hello babe</h2>
       </div>
     ),
+  },
+];
+
+const accordionData = [
+  {
+    title: 'Label 1',
+    content:
+      'Lorem Ipsum has been the industry standard dummy text ever since the 1500s ',
+  },
+  {
+    title: 'Label 2',
+    content:
+      'Lorem Ipsum has been the industry standard dummy text ever since the 1500s ',
+  },
+  {
+    title: 'Label 3',
+    content:
+      'Lorem Ipsum has been the industry standard dummy text ever since the 1500s ',
   },
 ];
 
@@ -349,6 +368,15 @@ const StyleGuidePage = (props: any) => {
         <StyleGuideCard>
           <p className={css.title}>Tabs</p>
           <Tabs items={tabItems} defaultActiveKey="1" />
+        </StyleGuideCard>
+        <StyleGuideCard>
+          {accordionData.map((item: any) => (
+            <Accordion
+              key={item.title}
+              title={item.title}
+              content={item.content}
+            />
+          ))}
         </StyleGuideCard>
       </div>
     </Layout>
