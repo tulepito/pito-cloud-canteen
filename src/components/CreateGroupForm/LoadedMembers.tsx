@@ -33,7 +33,9 @@ const LoadedItem = ({ item, companyMembers, onDelete }: any) => {
         <div className={css.grayCircle} />
         {id ? (
           <div>
-            <div>{getMemberDisplayName(companyMembers, id)}</div>
+            <div className={css.name}>
+              {getMemberDisplayName(companyMembers, id)}
+            </div>
             <div className={css.email}>{email}</div>
           </div>
         ) : (

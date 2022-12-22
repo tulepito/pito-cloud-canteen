@@ -9,6 +9,7 @@
   @include flexAlign(center, center);
   font-size: 12px;
   font-weight: $fontWeightBold;
+  cursor: pointer;
 }
 
 .input {

@@ -205,11 +205,12 @@ export const companySlice = createSlice({
         };
       })
       .addCase(companyInfo.fulfilled, (state, { payload }) => {
-        const { groupList, companyMembers } = payload;
+        const { groupList, companyMembers, originCompanyMembers } = payload;
         return {
           ...state,
           groupList,
           companyMembers,
+          originCompanyMembers,
           fetchCompanyInfoInProgress: false,
         };
       })

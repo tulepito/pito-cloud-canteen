@@ -101,6 +101,8 @@
   "GroupSetting.deleteGroupModalTitle": "Bạn có muốn xoá không?",
   "GroupSetting.columnLabel.groupName": "Tên nhóm",
   "GroupSetting.columnLabel.memberNumber": "Số thành viên",
+  "CreateGroupModal.modalTitle": "Tạo nhóm mới",
+  "CreateGroupModal.cancel": "Huỷ",
   "GroupDetail.backButton": "Quay lại",
   "GroupDetail.changeGroupName": "Đổi tên",
   "GroupDetail.deleteGroup": "Xoá nhóm",

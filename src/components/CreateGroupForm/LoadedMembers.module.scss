@@ -38,6 +38,11 @@
       @include text(12px);
       color: $neutralGray8;
     }
+
+    .name {
+      @include text(14px);
+      color: $matterColorDark;
+    }
   }
 
   .actionsWrapper {
