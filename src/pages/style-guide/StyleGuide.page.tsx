@@ -156,6 +156,8 @@ const StyleGuidePage = (props: any) => {
                     validate={requiredMessage}
                     leftIcon={<IconVoucher />}
                     label="Username"
+                    disabled
+                    defaultValue="Input disabled"
                   />
                   <FieldTextInput
                     id={`email`}
@@ -222,12 +224,8 @@ const StyleGuidePage = (props: any) => {
                     placeholder="Input Content"
                   />
 
-                  <Button
-                    type="submit"
-                    fullWidth
-                    inProgress={true}
-                    style={{ margin: '8px 0' }}>
-                    Loading button
+                  <Button type="submit" fullWidth style={{ margin: '16px 0' }}>
+                    Submit
                   </Button>
                   <Modal
                     isOpen={modalControl.value}
