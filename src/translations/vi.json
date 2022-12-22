@@ -192,5 +192,6 @@
   "EditPartnerForm.other": "Khác",
   "Avatar.deletedUserDisplayName": "Deleted user",
   "Avatar.bannedUserDisplayName": "Banned user",
-  "EditCompanyForm.passwordInvalid": "Mật khẩu phải từ 8-16 kí tự, bao gồm chữ cái in hoa, chữ cái in thường, ký tự đặc biệt và chữ số."
+  "EditCompanyForm.passwordInvalid": "Mật khẩu phải từ 8-16 kí tự, bao gồm chữ cái in hoa, chữ cái in thường, ký tự đặc biệt và chữ số.",
+  "Pagination.info": "{from} - {to} trong số {total} kết quả"
 }
