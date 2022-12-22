@@ -55,6 +55,9 @@ export default function CreateCompanyPage() {
 
   useEffect(() => {
     dispatch(clearError());
+    return () => {
+      dispatch(clearError());
+    };
   }, [clearError, dispatch]);
 
   return (
