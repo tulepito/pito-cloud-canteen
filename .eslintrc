@@ -10,7 +10,8 @@
     "no-param-reassign": [
       "warn",
       { "props": true, "ignorePropertyModificationsFor": ["state"] }
-    ]
+    ],
+    "no-nested-ternary": "off"
   },
   "overrides": [
     // Configuration for TypeScript files
