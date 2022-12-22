@@ -10,6 +10,7 @@ import Form from '@components/Form/Form';
 import IconCalendar from '@components/IconCalender/IconCalender';
 import Layout from '@components/Layout/Layout';
 import Modal from '@components/Modal/Modal';
+import Pagination from '@components/Pagination/Pagination';
 import Progress from '@components/Progress/Progress';
 import Tabs from '@components/Tabs/Tabs';
 import Toggle from '@components/Toggle/Toggle';
@@ -18,6 +19,7 @@ import type { TIconProps } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';
+import { useState } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 
 import css from './StyleGuide.module.scss';
@@ -102,6 +104,11 @@ const StyleGuideCard = (props: PropsWithChildren) => {
 };
 const StyleGuidePage = (props: any) => {
   const modalControl = useBoolean(false);
+  const [pageCurrent, setPageCurrent] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const onShowSizeChange = (current: number, _pageSize: number) => {
+    setPageSize(_pageSize);
+  };
   const onSubmitHandler = (values: object) => {
     console.log('Values:', { values });
   };
@@ -109,6 +116,7 @@ const StyleGuidePage = (props: any) => {
   const onSingleToggle = (value: boolean) => {
     console.log('Single toggle:', value);
   };
+  const onSetPageCurrent = (value: number) => setPageCurrent(value);
   return (
     <Layout>
       <div className={css.styleGuideContainer}>
@@ -417,6 +425,42 @@ const StyleGuidePage = (props: any) => {
               ever since the 1500s.
             </p>
           </Accordion>
+        </StyleGuideCard>
+        <StyleGuideCard>
+          <Pagination
+            total={50}
+            current={pageCurrent}
+            onChange={onSetPageCurrent}
+            showSizeChanger={true}
+            pageSizeOptions={['10', '20', '50', '100']}
+            pageSize={pageSize}
+            onShowSizeChange={onShowSizeChange}
+            style={{ marginBottom: '24px' }}
+          />
+          <Pagination
+            total={102}
+            current={pageCurrent}
+            onChange={onSetPageCurrent}
+            showSizeChanger={true}
+            pageSizeOptions={['10', '20', '50', '100']}
+            pageSize={pageSize}
+            onShowSizeChange={onShowSizeChange}
+            style={{ marginBottom: '24px' }}
+          />
+          <Pagination
+            total={1234}
+            current={pageCurrent}
+            onChange={onSetPageCurrent}
+            showPrevNextJumpers
+            style={{ marginBottom: '24px' }}
+          />
+          <Pagination
+            total={415}
+            current={pageCurrent}
+            onChange={onSetPageCurrent}
+            showPrevNextJumpers
+            disabled
+          />
         </StyleGuideCard>
       </div>
     </Layout>

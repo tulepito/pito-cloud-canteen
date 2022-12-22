@@ -1,4 +1,5 @@
 import '../styles/globals.scss';
+import '../styles/rc-select.scss';
 
 import AdminLayout from '@components/AdminLayout/AdminLayout';
 import AuthGuard from '@components/AuthGuard/AuthGuard';
