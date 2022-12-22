@@ -253,17 +253,22 @@ const StyleGuidePage = (props: any) => {
 
         <StyleGuideCard>
           <p className={css.title}>Progress bar</p>
+          <Progress percent={0} />
           <Progress percent={30} />
-          <Progress percent={95.6} />
-          <Progress percent={100} />
+          <Progress percent={50} />
           <Progress percent={60} />
-          <Progress percent={0} showInfo={false} />
+          <Progress percent={95} />
+          <Progress percent={100} />
           <p className={css.title}>Progress circle</p>
-          <Progress percent={30} type="circle" animate />
-          <Progress percent={90} type="circle" />
-          <Progress percent={100} type="circle" />
           <Progress percent={0} type="circle" />
-          <Progress percent={50} type="circle" />
+          <Progress percent={25} type="circle" animate />
+          <Progress percent={30} type="circle" />
+          <Progress percent={60} type="circle" />
+          <Progress percent={75} type="circle" />
+          <Progress percent={90} type="circle" />
+          <Progress percent={99} type="circle" />
+
+          <Progress percent={100} type="circle" />
         </StyleGuideCard>
         <StyleGuideCard>
           <Toggle status="on" onClick={onSingleToggle} label="Shipping" />
