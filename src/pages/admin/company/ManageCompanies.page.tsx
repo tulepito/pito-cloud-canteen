@@ -292,8 +292,8 @@ export default function ManageCompanies() {
     router.replace({
       pathname,
       query: {
-        ...values,
         ...query,
+        ...values,
       },
     });
   };
