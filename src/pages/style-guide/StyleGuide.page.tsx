@@ -31,38 +31,12 @@ const tabItems = [
   {
     label: `Đang chờ xác nhận`,
     key: 'cho-xac-nhan',
-    children: (
-      <div>
-        <h4>Comon let go</h4>
-      </div>
-    ),
+    children: `Content of Tab Pane 2`,
   },
   {
     label: `Đã xác nhận`,
     key: 'da-xac-nhan',
-    children: (
-      <div>
-        <h2>Hello babe</h2>
-      </div>
-    ),
-  },
-];
-
-const accordionData = [
-  {
-    title: 'Label 1',
-    content:
-      'Lorem Ipsum has been the industry standard dummy text ever since the 1500s ',
-  },
-  {
-    title: 'Label 2',
-    content:
-      'Lorem Ipsum has been the industry standard dummy text ever since the 1500s ',
-  },
-  {
-    title: 'Label 3',
-    content:
-      'Lorem Ipsum has been the industry standard dummy text ever since the 1500s ',
+    children: `Content of Tab Pane 3`,
   },
 ];
 
@@ -377,15 +351,33 @@ const StyleGuidePage = (props: any) => {
         <StyleGuideCard>
           <p className={css.title}>Tabs</p>
           <Tabs items={tabItems} defaultActiveKey="1" />
+          <Tabs items={tabItems} defaultActiveKey="2" />
+          <Tabs items={tabItems} defaultActiveKey="3" />
         </StyleGuideCard>
         <StyleGuideCard>
-          {accordionData.map((item: any) => (
-            <Accordion
-              key={item.title}
-              title={item.title}
-              content={item.content}
-            />
-          ))}
+          <p className={css.title}>Accordion component</p>
+
+          <Accordion title="Loại menu">
+            <p>
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry standard dummy text
+              ever since the 1500s.
+            </p>
+          </Accordion>
+          <Accordion title="Nhà hàng">
+            <p>
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry standard dummy text
+              ever since the 1500s.
+            </p>
+          </Accordion>
+          <Accordion title="Loại ẩm thực">
+            <p>
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry standard dummy text
+              ever since the 1500s.
+            </p>
+          </Accordion>
         </StyleGuideCard>
       </div>
     </Layout>

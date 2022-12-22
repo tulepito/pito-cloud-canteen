@@ -1,38 +1,39 @@
 import IconArrowHead from '@components/IconArrowHead/IconArrowHead';
-import classNames from 'classnames';
-import type { ReactNode } from 'react';
-import React from 'react';
+import useBoolean from '@hooks/useBoolean';
+import type { PropsWithChildren } from 'react';
+import React, { useRef } from 'react';
 
 import css from './Accordion.module.scss';
 
 type TAccordion = {
   title: string;
-  content: string | ReactNode;
-  rootClassName?: string;
-  className?: string;
-  isActive?: boolean;
-  onClick?: () => {};
+  isOpen?: boolean;
 };
 
-const Accordion = (props: TAccordion) => {
-  const { title, content, className, rootClassName, isActive, onClick } = props;
-  const classes = classNames(rootClassName || css.root, className);
-  const contentClasses = classNames(css.content, { [css.show]: isActive });
-  const titleClasses = classNames(css.title, {
-    [css.showTitle]: isActive,
-  });
-
+const Accordion = (props: PropsWithChildren<TAccordion>) => {
+  const { title = 'Accordion label', children, isOpen = true } = props;
+  const { value: isActive, toggle } = useBoolean(isOpen);
+  const accordionContentRef = useRef<HTMLDivElement | null>(null);
+  const innerStyle = {
+    height: `${isActive ? accordionContentRef.current?.scrollHeight : 0}px`,
+  };
   return (
-    <div className={classes} onClick={onClick}>
-      <div className={css.mainSection}>
-        <h5 className={titleClasses}>{title}</h5>
+    <div className={css.root}>
+      <div
+        className={css.accordionHeader}
+        onClick={() => {
+          toggle();
+        }}>
+        <span className={css.title}>{title}</span>
         <IconArrowHead
-          direction={isActive ? 'up' : 'down'}
-          className={css.iconArrow}
+          className={isActive ? css.iconArrowUp : css.iconArrowDown}
         />
       </div>
-      <div className={contentClasses} onClick={(e) => e.stopPropagation()}>
-        {content}
+      <div
+        className={css.accordionContent}
+        ref={accordionContentRef}
+        style={innerStyle}>
+        {children}
       </div>
     </div>
   );
