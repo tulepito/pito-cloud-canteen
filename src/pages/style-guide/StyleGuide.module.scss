@@ -2,12 +2,16 @@
 @use '/src/styles/vars.scss' as *;
 
 .styleGuideContainer {
-  padding: 64px 80px;
+  padding: 40px 24px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
   grid-auto-rows: auto auto;
   gap: 1rem;
   justify-content: center;
+
+  @include viewportMedium {
+    padding: 64px 80px;
+  }
 }
 
 .styleGuideCard {
@@ -34,4 +38,8 @@
   font-size: 20px;
   margin-bottom: 10px;
   font-weight: $fontWeightBold;
+}
+
+.fieldItem {
+  margin-bottom: 10px;
 }
