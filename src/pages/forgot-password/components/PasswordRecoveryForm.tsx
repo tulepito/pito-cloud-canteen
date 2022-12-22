@@ -29,7 +29,7 @@ type TExtraProps = {
   recoveryError?: ReactNode;
 };
 type TPasswordRecoveryFormComponentProps =
-  FormRenderProps<TPasswordRecoveryFormValues> & TExtraProps;
+  FormRenderProps<TPasswordRecoveryFormValues> & Partial<TExtraProps>;
 type TPasswordRecoveryFormProps = FormProps<TPasswordRecoveryFormValues> &
   TExtraProps;
 

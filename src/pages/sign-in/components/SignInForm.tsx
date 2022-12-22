@@ -29,10 +29,10 @@ type TExtraProps = {
   errorMessage?: ReactNode;
   rootClassName?: string;
   className?: string;
-  inProgress?: boolean;
+  inProgress: boolean;
 };
 type TSignInFormComponentProps = FormRenderProps<TSignInFormValues> &
-  TExtraProps;
+  Partial<TExtraProps>;
 type TSignInFormProps = FormProps<TSignInFormValues> & TExtraProps;
 
 const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
