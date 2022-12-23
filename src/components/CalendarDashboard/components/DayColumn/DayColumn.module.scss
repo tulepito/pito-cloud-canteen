@@ -1,0 +1,57 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  border-right: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray4;
+
+  &:last-child {
+    border-right: 0px solid transparent;
+  }
+}
+
+.dayHeader {
+  @include mediumText;
+  background-color: $neutralGray3;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid $neutralGray4;
+
+  &:last-of-type {
+    border-right: 0px solid transparent;
+  }
+}
+
+.dayContent {
+  flex-grow: 1;
+  padding: 8px;
+}
+
+.dayFooter {
+  height: 40px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.dayFooterIndex {
+  @include mediumText;
+  margin-left: auto;
+}
+
+.activeDayFooterIndex {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: $primaryPri5;
+  color: $neutralGray1;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -1,0 +1,30 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  height: 100%;
+}
+
+.root :global(.rbc-toolbar) {
+  margin-bottom: 20px;
+}
+
+.root :global(.rbc-calendar) {
+}
+
+.root :global(.rbc-toolbar-label) {
+  order: 1;
+  text-align: left;
+}
+
+.root :global(.rbc-btn-group) {
+  order: 2;
+}
+
+.root :global(.rbc-toolbar-label ~ .rbc-btn-group) {
+  margin-left: 20px;
+}
+
+.calendarTitle {
+  font-weight: $fontWeightMedium;
+}
