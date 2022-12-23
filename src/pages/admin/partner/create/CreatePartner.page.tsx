@@ -5,7 +5,7 @@ import {
 } from '@redux/slices/CreatePartnerPage.slice';
 import React from 'react';
 
-import EditPartnerBasicInfomationForm from '../components/EditPartnerBasicInfomationForm/EditPartnerBasicInfomationForm';
+import EditPartnerBasicInformationForm from '../components/EditPartnerBasicInformationForm/EditPartnerBasicInformationForm';
 
 const CreatePartnerPage: React.FC<any> = () => {
   const { uploadedAvatars, uploadAvatarError } = useAppSelector(
@@ -21,7 +21,7 @@ const CreatePartnerPage: React.FC<any> = () => {
   };
 
   return (
-    <EditPartnerBasicInfomationForm
+    <EditPartnerBasicInformationForm
       onSubmit={() => {}}
       images={uploadedAvatars}
       onAvatarUpload={onAvatarUpload}

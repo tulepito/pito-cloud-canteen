@@ -11,16 +11,16 @@ import React, { useMemo } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import css from './EditPartnerBasicInfomationForm.module.scss';
+import css from './EditPartnerBasicInformationForm.module.scss';
 
 const defaultTimeZone = () =>
   typeof window !== 'undefined' ? getDefaultTimeZoneOnBrowser() : 'Etc/UTC';
 
-type TEditPartnerBasicInfomationFormValues = {};
+type TEditPartnerBasicInformationFormValues = {};
 
-type TEditPartnerBasicInfomationForm = {
-  initialValues?: TEditPartnerBasicInfomationFormValues;
-  onSubmit: (e: TEditPartnerBasicInfomationFormValues) => void;
+type TEditPartnerBasicInformationForm = {
+  initialValues?: TEditPartnerBasicInformationFormValues;
+  onSubmit: (e: TEditPartnerBasicInformationFormValues) => void;
   onAvatarUpload: (e: any) => void;
   images: any;
   onRemoveAvatar: (e: any) => void;
@@ -78,8 +78,8 @@ const PACKAGING_OPTIONS = [
 
 const ACCEPT_IMAGES = 'image/png, image/gif, image/jpeg';
 
-const EditPartnerBasicInfomationForm: React.FC<
-  TEditPartnerBasicInfomationForm
+const EditPartnerBasicInformationForm: React.FC<
+  TEditPartnerBasicInformationForm
 > = (props) => {
   const intl = useIntl();
   const defaultAvailabilityPlan = {
@@ -329,4 +329,4 @@ const EditPartnerBasicInfomationForm: React.FC<
   );
 };
 
-export default EditPartnerBasicInfomationForm;
+export default EditPartnerBasicInformationForm;
