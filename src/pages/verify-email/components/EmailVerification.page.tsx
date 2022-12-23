@@ -19,7 +19,7 @@ const EmailVerificationPage = () => {
   const dispatch = useAppDispatch();
 
   const initialValues = {
-    verificationToken: verificationTokenFromQuery || null,
+    verificationToken: (verificationTokenFromQuery as string) || null,
   };
 
   const submitVerification = ({ verificationToken }: Record<string, any>) => {
