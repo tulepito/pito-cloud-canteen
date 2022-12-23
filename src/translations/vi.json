@@ -189,5 +189,15 @@
   "EditPartnerForm.plasticBox": "Hộp nhựa",
   "EditPartnerForm.bagasseBox": "Hộp bã mía",
   "EditPartnerForm.reusedBox": "Hộp ăn tái sử dụng",
-  "EditPartnerForm.other": "Khác"
+  "EditPartnerForm.other": "Khác",
+  "Calendar.week.dayHeader.1": "Thứ hai, {date}/{month}",
+  "Calendar.week.dayHeader.2": "Thứ ba, {date}/{month}",
+  "Calendar.week.dayHeader.3": "Thứ tư, {date}/{month}",
+  "Calendar.week.dayHeader.4": "Thứ năm, {date}/{month}",
+  "Calendar.week.dayHeader.5": "Thứ sáu, {date}/{month}",
+  "Calendar.week.dayHeader.6": "Thứ bảy, {date}/{month}",
+  "Calendar.week.dayHeader.0": "Chủ nhật, {date}/{month}",
+  "Calendar.Week.title": "{start} - {end}, Tháng {month}, {year}",
+  "Calendar.Week.title.diffMonth": "{start} - {end}, {year}",
+  "Calendar.Week.title.diffYear": "{start} - {end}"
 }

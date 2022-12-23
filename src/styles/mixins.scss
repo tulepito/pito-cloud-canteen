@@ -93,3 +93,24 @@ $buttonBorderRadius: 8px;
   align-items: center;
   justify-content: center;
 }
+
+// Typography
+@mixin textTemplate($size: 12px, $weight: 400, $height: 16px, $family) {
+  @if $family == '' {
+    font-family: 'Manrope', Helvetica, Arial, sans-serif;
+  } @else {
+    font-family: $family;
+  }
+
+  font-size: $size;
+  font-weight: $weight;
+  line-height: $height;
+}
+
+@mixin defaultText {
+  @include textTemplate(12px, 400, 16px, '');
+}
+
+@mixin mediumText {
+  @include textTemplate(12px, 500, 16px, '');
+}
