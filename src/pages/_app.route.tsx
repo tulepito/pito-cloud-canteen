@@ -1,8 +1,10 @@
+/* eslint-disable no-nested-ternary */
 import '@src/styles/globals.scss';
 import '@src/styles/nprogress.scss';
 
 import AdminLayout from '@components/AdminLayout/AdminLayout';
 import AuthGuard from '@components/AuthGuard/AuthGuard';
+import CompanyLayout from '@components/CompanyLayout/CompanyLayout';
 import Layout from '@components/Layout/Layout';
 import { authThunks } from '@redux/slices/auth.slice';
 import { emailVerificationActions } from '@redux/slices/emailVerification.slice';
@@ -15,6 +17,7 @@ import type { AppContext, AppInitialProps, AppProps } from 'next/app';
 import App from 'next/app';
 import { Router } from 'next/router';
 import nProgress from 'nprogress';
+import React from 'react';
 import { Provider } from 'react-redux';
 
 Router.events.on('routeChangeStart', nProgress.start);
@@ -38,7 +41,12 @@ const MyApp = ({
 
   const isAdminRoute = !!router.route.startsWith('/admin');
   const isAuthenticationRoute = AuthenticationRoutes.includes(router.route);
-  const LayoutComponent = isAdminRoute ? AdminLayout : Layout;
+  const isCompanyRoute = !!router.route.startsWith('/company');
+  const LayoutComponent = isAdminRoute
+    ? AdminLayout
+    : isCompanyRoute
+    ? CompanyLayout
+    : Layout;
 
   return (
     <TranslationProvider>
