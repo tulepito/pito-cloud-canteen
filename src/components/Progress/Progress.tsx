@@ -26,7 +26,7 @@ const ProgressBar = (props: TProgress) => {
     format ? (
       <span className={css.info}>{format}</span>
     ) : (
-      <span className={css.info}>{percent} %</span>
+      <span className={css.info}>{percent}%</span>
     )
   ) : null;
   const roundedWidth = Math.round(percent) === 100 ? 100 : Math.round(percent);
@@ -45,7 +45,7 @@ const ProgressBar = (props: TProgress) => {
 };
 
 const diameter = (radius: number) => Math.round(Math.PI * radius * 2);
-const getOffset = (val = 0, radius = 36) => {
+const getOffset = (val: number, radius: number) => {
   return Math.round(((100 - Math.min(val, 100)) / 100) * diameter(radius));
 };
 
@@ -63,7 +63,7 @@ const ProgressCircle = (props: TProgress) => {
     onAnimationEnd,
   } = props;
 
-  const strokeDashoffset = getOffset(percent, Math.floor(size / 2));
+  const strokeDashoffset = getOffset(percent, 175);
   const transition = animate
     ? `stroke-dashoffset ${animationDuration} ease-out`
     : undefined;
@@ -71,8 +71,12 @@ const ProgressCircle = (props: TProgress) => {
   const infoSymbol = showInfoSymbol && '%';
 
   return (
-    <span className={css.progressCircle}>
-      <svg width={size} height={size} viewBox="-25 -25 400 400">
+    <div className={css.progressCircle}>
+      <svg
+        className={css.progressCircleSVG}
+        width={size}
+        height={size}
+        viewBox="-25 -25 400 400">
         <circle
           stroke={bgColor}
           cx="175"
@@ -102,7 +106,7 @@ const ProgressCircle = (props: TProgress) => {
           {infoSymbol}
         </span>
       )}
-    </span>
+    </div>
   );
 };
 

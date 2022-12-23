@@ -7,11 +7,13 @@ import {
   composeValidatorsWithAllValues,
   confirmPassword,
   emailFormatValid,
+  passwordFormatValid,
+  phoneNumberFormatValid,
   required,
 } from '@utils/validators';
 import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import React from 'react';
+import isEqual from 'lodash/isEqual';
+import React, { useState } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
@@ -42,22 +44,31 @@ type TEditCompanyForm = {
 
 const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
   const intl = useIntl();
-  const router = useRouter();
-  const onSubmitHandler = async (values: TEditCompanyFormValues) => {
-    await props.onSubmit(values);
-    router.push('/admin/company');
+  const { onSubmit, ...rest } = props;
+  const [submitedValues, setSubmittedValues] =
+    useState<TEditCompanyFormValues>();
+
+  const submitHandler = async (values: TEditCompanyFormValues) => {
+    try {
+      await onSubmit(values);
+      setSubmittedValues(values);
+    } catch (error) {
+      // don't do any thing
+    }
   };
   return (
     <FinalForm
-      {...props}
-      onSubmit={onSubmitHandler}
+      {...rest}
+      onSubmit={submitHandler}
       render={(fieldRenderProps: any) => {
         const {
           handleSubmit,
           formErrorMessage,
           isEditting = false,
           inProgress,
+          values,
         } = fieldRenderProps;
+        const ready = !formErrorMessage && isEqual(submitedValues, values);
         return (
           <Form onSubmit={handleSubmit} className={css.form}>
             <div className={css.formHeader}>
@@ -74,23 +85,6 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
             </p>
             <div className={css.fields}>
               <FieldTextInput
-                id="firstName"
-                className={css.field}
-                name="firstName"
-                label={intl.formatMessage({
-                  id: 'EditCompanyForm.firstNameLabel',
-                })}
-                placeholder={intl.formatMessage({
-                  id: 'EditCompanyForm.firstNamePlaceholder',
-                })}
-                validate={required(
-                  intl.formatMessage({
-                    id: 'EditCompanyForm.firstNameRequired',
-                  }),
-                )}
-                required
-              />
-              <FieldTextInput
                 id="lastName"
                 className={css.field}
                 name="lastName"
@@ -103,6 +97,23 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                 validate={required(
                   intl.formatMessage({
                     id: 'EditCompanyForm.lastNameRequired',
+                  }),
+                )}
+                required
+              />
+              <FieldTextInput
+                id="firstName"
+                className={css.field}
+                name="firstName"
+                label={intl.formatMessage({
+                  id: 'EditCompanyForm.firstNameLabel',
+                })}
+                placeholder={intl.formatMessage({
+                  id: 'EditCompanyForm.firstNamePlaceholder',
+                })}
+                validate={required(
+                  intl.formatMessage({
+                    id: 'EditCompanyForm.firstNameRequired',
                   }),
                 )}
                 required
@@ -147,10 +158,17 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                 placeholder={intl.formatMessage({
                   id: 'EditCompanyForm.phonePlaceholder',
                 })}
-                validate={required(
-                  intl.formatMessage({
-                    id: 'EditCompanyForm.phoneRequired',
-                  }),
+                validate={composeValidators(
+                  required(
+                    intl.formatMessage({
+                      id: 'EditCompanyForm.phoneRequired',
+                    }),
+                  ),
+                  phoneNumberFormatValid(
+                    intl.formatMessage({
+                      id: 'EditCompanyForm.phoneInValid',
+                    }),
+                  ),
                 )}
                 required
               />
@@ -179,10 +197,17 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                   placeholder={intl.formatMessage({
                     id: 'EditCompanyForm.passwordPlaceholder',
                   })}
-                  validate={required(
-                    intl.formatMessage({
-                      id: 'EditCompanyForm.passwordRequired',
-                    }),
+                  validate={composeValidators(
+                    required(
+                      intl.formatMessage({
+                        id: 'EditCompanyForm.passwordRequired',
+                      }),
+                    ),
+                    passwordFormatValid(
+                      intl.formatMessage({
+                        id: 'EditCompanyForm.passwordInvalid',
+                      }),
+                    ),
                   )}
                   required
                 />
@@ -214,11 +239,11 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                 />
               </div>
             )}
-            <h3 className={css.formTitle}>
+            <p className={css.formTitle}>
               {intl.formatMessage({
                 id: 'EditCompanyForm.companyInformation',
               })}
-            </h3>
+            </p>
             <div className={css.fields}>
               <FieldTextInput
                 id="companyName"
@@ -279,10 +304,15 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
               />
             </div>
             <div className={css.buttonWrapper}>
-              {formErrorMessage && <ErrorMessage message={formErrorMessage} />}
+              <div>
+                {formErrorMessage && (
+                  <ErrorMessage message={formErrorMessage} />
+                )}
+              </div>
               <Button
                 inProgress={inProgress}
                 disabled={inProgress}
+                ready={ready}
                 className={css.button}>
                 {isEditting
                   ? intl.formatMessage({

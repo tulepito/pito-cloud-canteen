@@ -13,15 +13,10 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
   manageCompaniesThunks,
-  paginateCompanies,
+  RESULT_PAGE_SIZE,
 } from '@redux/slices/ManageCompaniesPage.slice';
 import { ECompanyStatus } from '@utils/enums';
-import type {
-  TCompany,
-  TPagination,
-  TReverseMapFromEnum,
-  TUser,
-} from '@utils/types';
+import type { TCompany, TReverseMapFromEnum, TUser } from '@utils/types';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -46,35 +41,35 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'id',
     label: '#',
     render: (data: any) => {
-      return <span>{data.index + 1}</span>;
+      return <span className={css.rowText}>{data.order}</span>;
     },
   },
   {
     key: 'name',
     label: 'Họ và tên',
     render: (data: any) => {
-      return <span>{data.name}</span>;
+      return <span className={css.rowText}>{data.name}</span>;
     },
   },
   {
     key: 'phone',
     label: 'Số điện thoại',
     render: (data: any) => {
-      return <span>{data.phone}</span>;
+      return <span className={css.rowText}>{data.phone}</span>;
     },
   },
   {
     key: 'email',
     label: 'Email',
     render: (data: any) => {
-      return <span>{data.email}</span>;
+      return <span className={css.rowText}>{data.email}</span>;
     },
   },
   {
     key: 'companyName',
     label: 'Tên công ty',
     render: (data: any) => {
-      return <span>{data.companyName}</span>;
+      return <span className={css.rowText}>{data.companyName}</span>;
     },
   },
   {
@@ -95,6 +90,7 @@ const TABLE_COLUMN: TColumn[] = [
       return (
         <ToggleButton
           name={data.id}
+          className={css.toggleButton}
           id={data.id}
           onClick={onClick}
           defaultValue={data.status === ECompanyStatus.active}
@@ -125,11 +121,11 @@ const TABLE_COLUMN: TColumn[] = [
 ];
 
 const parseEntitiesToTableData = (
-  companies: TUser[],
+  companies: Array<TUser & { order: number }>,
   extraData: TExtraDataMapToCompanyTable,
 ) => {
-  return companies.map((company, index) => {
-    const companyId = company.id.uuid;
+  return companies.map((company) => {
+    const companyId = company.id?.uuid;
     const {
       profile: {
         displayName,
@@ -142,7 +138,7 @@ const parseEntitiesToTableData = (
     return {
       key: companyId,
       data: {
-        index,
+        order: company.order,
         id: companyId,
         name: displayName,
         phone: phoneNumber,
@@ -155,14 +151,16 @@ const parseEntitiesToTableData = (
   });
 };
 
-const sliceCompanies = (
-  companies: TCompany[],
-  pagination?: TPagination | null,
-) => {
-  if (!pagination) return companies;
-  return companies.slice(
-    (pagination.page - 1) * pagination.perPage,
-    pagination.page * pagination.perPage,
+const sliceCompanies = (companies: TCompany[], page: any) => {
+  const parsedCompanies = companies.map((item: TCompany, index: number) => ({
+    ...item,
+    order: index + 1,
+  }));
+  const pageAsNum = Number(page);
+
+  return parsedCompanies.slice(
+    (pageAsNum - 1) * RESULT_PAGE_SIZE,
+    pageAsNum * RESULT_PAGE_SIZE,
   );
 };
 
@@ -170,29 +168,34 @@ const filterCompanies = (companies: TCompany[], filterValues: any) => {
   const { keyword = '', status } = filterValues;
   const keywordAsLowerCase = keyword.toLowerCase();
   if (!keywordAsLowerCase && !status) return companies;
+
   if (!keywordAsLowerCase && status) {
     return companies.filter(
       (company: TCompany) =>
         Number(status) === company.attributes.profile.metadata?.status,
     );
   }
+
   if (keywordAsLowerCase && !status) {
     return companies.filter((company) => {
+      const companyId = company.id?.uuid;
       const {
         profile: { displayName, publicData: { companyName, phoneNumber } = {} },
         email,
       } = company.attributes;
 
       return (
-        company.id.uuid.toLowerCase().includes(keywordAsLowerCase) ||
-        displayName.toLowerCase().includes(keywordAsLowerCase) ||
-        companyName.toLowerCase(keywordAsLowerCase).includes(keyword) ||
-        phoneNumber?.toLowerCase().includes(keywordAsLowerCase) ||
-        email.toLowerCase().includes(keywordAsLowerCase)
+        companyId?.toLowerCase() === keywordAsLowerCase ||
+        displayName?.toLowerCase()?.includes(keywordAsLowerCase) ||
+        companyName?.toLowerCase()?.includes(keywordAsLowerCase) ||
+        phoneNumber?.toLowerCase()?.includes(keywordAsLowerCase) ||
+        email?.toLowerCase()?.includes(keywordAsLowerCase)
       );
     });
   }
   return companies.filter((company) => {
+    const companyId = company.id?.uuid;
+
     const {
       profile: { displayName, publicData: { companyName, phoneNumber } = {} },
       email,
@@ -200,11 +203,11 @@ const filterCompanies = (companies: TCompany[], filterValues: any) => {
 
     return (
       Number(status) === company.attributes.profile.metadata?.status &&
-      (company.id.uuid.toLowerCase().includes(keywordAsLowerCase) ||
-        displayName.toLowerCase().includes(keywordAsLowerCase) ||
-        companyName.toLowerCase().includes(keywordAsLowerCase) ||
-        phoneNumber?.toLowerCase().includes(keywordAsLowerCase) ||
-        email.toLowerCase().includes(keywordAsLowerCase))
+      (companyId?.toLowerCase() === keywordAsLowerCase ||
+        displayName?.toLowerCase()?.includes(keywordAsLowerCase) ||
+        companyName?.toLowerCase()?.includes(keywordAsLowerCase) ||
+        phoneNumber?.toLowerCase()?.includes(keywordAsLowerCase) ||
+        email?.toLowerCase()?.includes(keywordAsLowerCase))
     );
   });
 };
@@ -234,25 +237,33 @@ export default function ManageCompanies() {
     id: 'ManageCompanies.description',
   });
 
-  const {
-    companyRefs,
-    queryCompaniesInProgress,
-    queryCompaniesError,
-    pagination,
-  } = useAppSelector((state) => state.ManageCompaniesPage);
+  const { companyRefs, queryCompaniesInProgress, queryCompaniesError } =
+    useAppSelector((state) => state.ManageCompaniesPage);
 
   const dispatch = useAppDispatch();
 
   const keywordAsString = keyword as string;
 
-  const companies = useMemo(
+  const filteredCompanies = useMemo(
     () =>
-      filterCompanies(sliceCompanies(companyRefs, pagination), {
+      filterCompanies(companyRefs, {
         status,
         keyword: keywordAsString,
       }),
-    [companyRefs, pagination, keywordAsString, status],
-  ) as TUser[];
+    [keywordAsString, companyRefs, status],
+  );
+
+  const slicesCompanies = useMemo(
+    () => sliceCompanies(filteredCompanies, page),
+    [filteredCompanies, page],
+  );
+
+  const pagination = {
+    page: Number(page),
+    perPage: RESULT_PAGE_SIZE,
+    totalPages: Math.ceil(filteredCompanies.length / RESULT_PAGE_SIZE),
+    totalItems: filteredCompanies.length,
+  };
 
   const updateStatus = useCallback(
     (updateData: TUpdateStatus) => {
@@ -268,37 +279,32 @@ export default function ManageCompanies() {
 
   const companiesTableData = useMemo(
     () =>
-      parseEntitiesToTableData(companies, {
+      parseEntitiesToTableData(slicesCompanies, {
         updateStatus,
       }),
-    [companies, updateStatus],
+    [slicesCompanies, updateStatus],
   );
 
   useEffect(() => {
-    if ((!page && companyRefs.length === 0) || mounted) return;
-    dispatch(
-      manageCompaniesThunks.queryCompanies(parseInt(page as string, 10)),
-    );
-    setMounted(true);
-  }, [page]);
-
-  useEffect(() => {
-    if (!page) return;
-    dispatch(paginateCompanies(parseInt(page as string, 10)));
-  }, [page]);
+    if (!!page && !mounted) {
+      dispatch(
+        manageCompaniesThunks.queryCompanies(parseInt(page as string, 10)),
+      );
+      setMounted(true);
+    }
+  }, [page, mounted]);
 
   const onSearchKeyword = (values: TKeywordSearchFormValues) => {
-    router.push({
+    router.replace({
       pathname,
       query: {
-        ...query,
-        keyword: values.keyword,
+        ...values,
       },
     });
   };
 
   const onSelectFilter = (values: any) => {
-    router.push({
+    router.replace({
       pathname,
       query: {
         ...query,
@@ -348,6 +354,7 @@ export default function ManageCompanies() {
           columns={TABLE_COLUMN}
           data={companiesTableData}
           pagination={pagination}
+          pageSearchParams={query}
           paginationPath="/admin/company"
         />
       )}

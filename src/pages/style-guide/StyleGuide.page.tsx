@@ -1,13 +1,16 @@
+import Accordion from '@components/Accordion/Accordion';
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
 import FieldSelect from '@components/FieldSelect/FieldSelect';
+import FieldTextArea from '@components/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import IconCalendar from '@components/IconCalender/IconCalender';
 import Layout from '@components/Layout/Layout';
 import Modal from '@components/Modal/Modal';
+import Pagination from '@components/Pagination/Pagination';
 import Progress from '@components/Progress/Progress';
 import Tabs from '@components/Tabs/Tabs';
 import Toggle from '@components/Toggle/Toggle';
@@ -15,6 +18,8 @@ import useBoolean from '@hooks/useBoolean';
 import type { TIconProps } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
+import type { PropsWithChildren } from 'react';
+import { useState } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 
 import css from './StyleGuide.module.scss';
@@ -28,29 +33,12 @@ const tabItems = [
   {
     label: `Đang chờ xác nhận`,
     key: 'cho-xac-nhan',
-    children: (
-      <div>
-        <h4>Comon let go</h4>
-      </div>
-    ),
+    children: `Content of Tab Pane 2`,
   },
   {
     label: `Đã xác nhận`,
     key: 'da-xac-nhan',
-    children: (
-      <div>
-        <h2>Hello babe</h2>
-      </div>
-    ),
-  },
-  {
-    label: 'Thất bại',
-    key: 'that-bai',
-    children: (
-      <div>
-        <h3>Hello babe</h3>
-      </div>
-    ),
+    children: `Content of Tab Pane 3`,
   },
 ];
 
@@ -111,8 +99,16 @@ const IconVoucher = (props: TIconProps) => {
   );
 };
 
+const StyleGuideCard = (props: PropsWithChildren) => {
+  return <div className={css.styleGuideCard}>{props.children}</div>;
+};
 const StyleGuidePage = (props: any) => {
   const modalControl = useBoolean(false);
+  const [pageCurrent, setPageCurrent] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const onShowSizeChange = (current: number, _pageSize: number) => {
+    setPageSize(_pageSize);
+  };
   const onSubmitHandler = (values: object) => {
     console.log('Values:', { values });
   };
@@ -120,182 +116,31 @@ const StyleGuidePage = (props: any) => {
   const onSingleToggle = (value: boolean) => {
     console.log('Single toggle:', value);
   };
+  const onSetPageCurrent = (value: number) => setPageCurrent(value);
   return (
     <Layout>
       <div className={css.styleGuideContainer}>
-        <FinalForm
-          {...props}
-          onSubmit={onSubmitHandler}
-          render={(fieldRenderProps) => {
-            const { handleSubmit } = fieldRenderProps;
-            const requiredMessage = required('Vui lòng nhập trường dữ liệu');
+        <StyleGuideCard>
+          <FinalForm
+            {...props}
+            onSubmit={onSubmitHandler}
+            render={(fieldRenderProps) => {
+              const { handleSubmit } = fieldRenderProps;
+              const requiredMessage = required('Vui lòng nhập trường dữ liệu');
 
-            return (
-              <Form onSubmit={handleSubmit}>
-                <FieldTextInput
-                  id={`username`}
-                  name="username"
-                  validate={requiredMessage}
-                  leftIcon={<IconVoucher />}
-                  label="Username"
-                />
-                <FieldTextInput
-                  id={`email`}
-                  name="email"
-                  validate={requiredMessage}
-                  placeholder="hello"
-                  rightIcon={<IconVoucher />}
-                  label="Email"
-                />
-                <FieldPasswordInput
-                  id="password"
-                  name="password"
-                  placeholder="Enter your password"
-                  label="Password"
-                />
-                <FieldPasswordInput
-                  id="confirm-password"
-                  name="confirm-password"
-                  placeholder="Enter your password"
-                  label="Confirm password"
-                />
-                <FieldCheckbox
-                  id="checkbox-group-1"
-                  name="favorites"
-                  value="meet"
-                  label="Favorites"
-                />
-                <FieldCheckbox
-                  id="checkbox-group-2"
-                  name="favorites"
-                  value="salad"
-                  label="Favorites"
-                />
-                <FieldSelect
-                  id="select1"
-                  name="select1"
-                  label="Choose an option"
-                  leftIcon={<IconCalendar />}>
-                  <option value="" disabled>
-                    Select with icon
-                  </option>
-                  <option value="first">First option</option>
-                  <option value="second">Second option</option>
-                </FieldSelect>
-                <div style={{ margin: '16px 0' }}>
-                  <Toggle
-                    status="on"
-                    onClick={onSingleToggle}
-                    label="Shipping"
-                  />
-                  <Toggle
-                    status="off"
-                    onClick={onSingleToggle}
-                    label="Receive notification"
-                  />
-                  <Toggle
-                    status="off"
-                    onClick={onSingleToggle}
+              return (
+                <Form onSubmit={handleSubmit}>
+                  <p className={css.title}>Form fields</p>
+
+                  <FieldTextInput
+                    id={`username`}
+                    name="username"
+                    validate={requiredMessage}
+                    leftIcon={<IconVoucher />}
+                    label="Username"
                     disabled
-                    label="Disable toggle off status"
-                  />
-                  <Toggle
-                    status="on"
-                    onClick={onSingleToggle}
-                    disabled
-                    label="Disable toggle on status"
-                  />
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                  <Badge label="Label" hasCloseIcon hasDotIcon />
-                  <Badge label="Label" hasCloseIcon type="warning" hasDotIcon />
-                  <Badge
-                    label="Đang xác nhận"
-                    hasDotIcon
-                    type="processing"
-                    hasCloseIcon
-                  />
-                  <Badge
-                    label="Thành công"
-                    hasDotIcon
-                    type="success"
-                    hasCloseIcon
-                  />
-                  <Badge
-                    label="Thanh toán thất bại"
-                    type="error"
-                    hasCloseIcon
-                    hasDotIcon
-                  />
-                  <Badge label="Label" hasDotIcon />
-                  <Badge label="Label" type="warning" hasDotIcon />
-                  <Badge label="Đang xác nhận" hasDotIcon type="processing" />
-                  <Badge label="Thành công" hasDotIcon type="success" />
-                  <Badge label="Thanh toán thất bại" type="error" hasDotIcon />
-                </div>
-
-                <div
-                  style={{
-                    marginTop: '16px',
-                    display: 'flex',
-                    gap: '6px',
-                    flexDirection: 'column',
-                  }}>
-                  <Progress percent={30} />
-                  <Progress percent={95.6} />
-                  <Progress percent={100} />
-                  <Progress percent={60} />
-                  <Progress percent={0} showInfo={false} />
-                </div>
-                <div
-                  style={{
-                    marginTop: '16px',
-                    display: 'flex',
-                    gap: '6px',
-                  }}>
-                  <Progress percent={30} type="circle" animate />
-                  <Progress percent={90} type="circle" />
-                  <Progress percent={100} type="circle" />
-                  <Progress percent={0} type="circle" />
-                </div>
-                <FieldSelect
-                  id="select1"
-                  name="select1"
-                  label="Choose an option">
-                  <option value="" disabled>
-                    Select without icon
-                  </option>
-                  <option value="first">First option</option>
-                  <option value="second">Second option</option>
-                </FieldSelect>
-
-                <Button
-                  type="submit"
-                  fullWidth
-                  inProgress={true}
-                  style={{ margin: '8px 0' }}>
-                  Loading button
-                </Button>
-                <Button type="submit" fullWidth style={{ margin: '8px 0' }}>
-                  Submit
-                </Button>
-                <Button type="submit" fullWidth disabled>
-                  Submit
-                </Button>
-                <Button
-                  style={{ margin: '8px 0' }}
-                  onClick={modalControl.toggle}>
-                  Open modal
-                </Button>
-                <Modal
-                  isOpen={modalControl.value}
-                  handleClose={modalControl.toggle}
-                  title="Thêm đối tác">
-                  <FieldPasswordInput
-                    id="confirm-password"
-                    name="confirm-password"
-                    placeholder="Enter your password"
-                    label="Confirm password"
+                    defaultValue="Input disabled"
+                    className={css.fieldItem}
                   />
                   <FieldTextInput
                     id={`email`}
@@ -304,45 +149,319 @@ const StyleGuidePage = (props: any) => {
                     placeholder="hello"
                     rightIcon={<IconVoucher />}
                     label="Email"
+                    className={css.fieldItem}
                   />
                   <FieldPasswordInput
                     id="password"
                     name="password"
                     placeholder="Enter your password"
                     label="Password"
+                    className={css.fieldItem}
+                  />
+                  <div
+                    style={{ display: 'flex', gap: '16px', margin: '16px 0' }}>
+                    <FieldCheckbox
+                      id="checkbox-group-1"
+                      name="favorites"
+                      value="meet"
+                      label="Meet"
+                    />
+                    <FieldCheckbox
+                      id="checkbox-group-2"
+                      name="favorites"
+                      value="beef"
+                      label="Beef"
+                    />
+                    <FieldCheckbox
+                      id="checkbox-group-3"
+                      name="favorites"
+                      value="salad"
+                      label="Salad"
+                    />
+                  </div>
+
+                  <FieldSelect
+                    id="select1"
+                    name="select1"
+                    label="Choose an option"
+                    leftIcon={<IconCalendar />}
+                    className={css.fieldItem}>
+                    <option value="" disabled>
+                      Select with icon
+                    </option>
+                    <option value="first">First option</option>
+                    <option value="second">Second option</option>
+                  </FieldSelect>
+
+                  <FieldSelect
+                    id="select1"
+                    name="select1"
+                    label="Choose an option"
+                    className={css.fieldItem}>
+                    <option value="" disabled>
+                      Select without icon
+                    </option>
+                    <option value="first">First option</option>
+                    <option value="second">Second option</option>
+                  </FieldSelect>
+                  <FieldTextArea
+                    name="content"
+                    id="content"
+                    label="Field text area"
+                    placeholder="Input Content"
                   />
 
-                  <FieldPasswordInput
-                    id="confirm-password"
-                    name="confirm-password"
-                    placeholder="Enter your password"
-                    label="Confirm password"
-                  />
-                  <FieldPasswordInput
-                    id="confirm-password"
-                    name="confirm-password"
-                    placeholder="Enter your password"
-                    label="Confirm password"
-                  />
-                  <FieldTextInput
-                    id={`email`}
-                    name="email"
-                    validate={requiredMessage}
-                    placeholder="hello"
-                    rightIcon={<IconVoucher />}
-                    label="Email"
-                  />
-                </Modal>
-              </Form>
-            );
-          }}
-        />
-        <div
-          style={{
-            margin: '36px 0',
-          }}>
-          <Tabs items={tabItems} defaultActiveKey="1" />
-        </div>
+                  <Button type="submit" fullWidth style={{ margin: '16px 0' }}>
+                    Submit
+                  </Button>
+                  <Modal
+                    isOpen={modalControl.value}
+                    handleClose={modalControl.toggle}
+                    title="Thêm đối tác">
+                    <FieldPasswordInput
+                      id="confirm-password"
+                      name="confirm-password"
+                      placeholder="Enter your password"
+                      label="Confirm password"
+                      className={css.fieldItem}
+                    />
+                    <FieldTextInput
+                      id={`email`}
+                      name="email"
+                      validate={requiredMessage}
+                      placeholder="hello"
+                      rightIcon={<IconVoucher />}
+                      label="Email"
+                      className={css.fieldItem}
+                    />
+                    <FieldPasswordInput
+                      id="password"
+                      name="password"
+                      placeholder="Enter your password"
+                      label="Password"
+                      className={css.fieldItem}
+                    />
+                    <FieldPasswordInput
+                      id="confirm-password"
+                      name="confirm-password"
+                      placeholder="Enter your password"
+                      label="Confirm password"
+                      className={css.fieldItem}
+                    />
+                    <FieldPasswordInput
+                      id="confirm-password"
+                      name="confirm-password"
+                      placeholder="Enter your password"
+                      label="Confirm password"
+                      className={css.fieldItem}
+                    />
+                    <FieldTextInput
+                      id={`email`}
+                      name="email"
+                      validate={requiredMessage}
+                      placeholder="hello"
+                      rightIcon={<IconVoucher />}
+                      label="Email"
+                    />
+                  </Modal>
+                </Form>
+              );
+            }}
+          />
+        </StyleGuideCard>
+
+        <StyleGuideCard>
+          <p className={css.title}>Progress bar</p>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flexWrap: 'wrap',
+              gap: '16px',
+            }}>
+            <Progress percent={0} />
+            <Progress percent={30} />
+            <Progress percent={50} />
+            <Progress percent={60} />
+            <Progress percent={95} />
+            <Progress percent={100} />
+          </div>
+
+          <p className={css.title}>Progress circle</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
+            <Progress percent={0} type="circle" />
+            <Progress percent={25} type="circle" animate />
+            <Progress percent={30} type="circle" />
+            <Progress percent={60} type="circle" />
+            <Progress percent={75} type="circle" />
+            <Progress percent={90} type="circle" />
+            <Progress percent={99} type="circle" />
+            <Progress percent={100} type="circle" />
+          </div>
+        </StyleGuideCard>
+        <StyleGuideCard>
+          <p className={css.title}>Toggle component</p>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flexWrap: 'wrap',
+              gap: '24px',
+              marginTop: '24px',
+            }}>
+            <Toggle
+              status="on"
+              onClick={onSingleToggle}
+              disabled
+              label=" Toggle on , disabled status "
+            />
+            <Toggle
+              status="on"
+              onClick={onSingleToggle}
+              label="Toggle on status"
+            />
+            <Toggle status="off" onClick={onSingleToggle} label="Toggle off" />
+            <Toggle
+              status="off"
+              onClick={onSingleToggle}
+              disabled
+              label="Toggle off, disable status"
+            />
+          </div>
+        </StyleGuideCard>
+        <StyleGuideCard>
+          <Button
+            type="submit"
+            fullWidth
+            inProgress={true}
+            style={{ margin: '8px 0' }}>
+            Loading button
+          </Button>
+          <Button type="submit" fullWidth style={{ margin: '8px 0' }}>
+            Submit
+          </Button>
+          <Button type="submit" fullWidth disabled>
+            Submit
+          </Button>
+          <Button style={{ margin: '8px 0' }} onClick={modalControl.toggle}>
+            Open modal
+          </Button>
+        </StyleGuideCard>
+
+        <StyleGuideCard>
+          <p className={css.title}>Single label</p>
+          <div className={css.badgeContainer}>
+            <Badge label="Label" />
+            <Badge label="Label" type="warning" />
+            <Badge label="Đang xác nhận" type="processing" />
+            <Badge label="Thành công" type="success" />
+            <Badge label="Thanh toán thất bại" type="error" />
+          </div>
+
+          <p className={css.title}>Single label with dot status</p>
+          <div className={css.badgeContainer}>
+            <Badge label="Label" hasDotIcon />
+            <Badge label="Label" type="warning" hasDotIcon />
+            <Badge label="Đang xác nhận" hasDotIcon type="processing" />
+            <Badge label="Thành công" hasDotIcon type="success" />
+            <Badge label="Thanh toán thất bại" type="error" hasDotIcon />
+          </div>
+          <p className={css.title}>
+            Single label with dot status and icon close
+          </p>
+          <div className={css.badgeContainer}>
+            <Badge label="Label" hasDotIcon hasCloseIcon />
+            <Badge label="Label" type="warning" hasDotIcon hasCloseIcon />
+            <Badge
+              label="Đang xác nhận"
+              hasDotIcon
+              type="processing"
+              hasCloseIcon
+            />
+            <Badge label="Thành công" hasDotIcon type="success" hasCloseIcon />
+            <Badge
+              label="Thanh toán thất bại"
+              type="error"
+              hasDotIcon
+              hasCloseIcon
+            />
+          </div>
+        </StyleGuideCard>
+        <StyleGuideCard>
+          <p className={css.title}>Tabs</p>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flexWrap: 'wrap',
+              gap: '24px',
+            }}>
+            <Tabs items={tabItems} defaultActiveKey="1" />
+            <Tabs items={tabItems} defaultActiveKey="2" />
+            <Tabs items={tabItems} defaultActiveKey="3" />
+          </div>
+        </StyleGuideCard>
+        <StyleGuideCard>
+          <p className={css.title}>Accordion component</p>
+
+          <Accordion title="Loại menu">
+            <p>
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry standard dummy text
+              ever since the 1500s.
+            </p>
+          </Accordion>
+          <Accordion title="Nhà hàng">
+            <p>
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry standard dummy text
+              ever since the 1500s.
+            </p>
+          </Accordion>
+          <Accordion title="Loại ẩm thực">
+            <p>
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry standard dummy text
+              ever since the 1500s.
+            </p>
+          </Accordion>
+        </StyleGuideCard>
+        <StyleGuideCard>
+          <Pagination
+            total={50}
+            current={pageCurrent}
+            onChange={onSetPageCurrent}
+            showSizeChanger={true}
+            pageSizeOptions={['10', '20', '50', '100']}
+            pageSize={pageSize}
+            onShowSizeChange={onShowSizeChange}
+            style={{ marginBottom: '24px' }}
+          />
+          <Pagination
+            total={102}
+            current={pageCurrent}
+            onChange={onSetPageCurrent}
+            showSizeChanger={true}
+            pageSizeOptions={['10', '20', '50', '100']}
+            pageSize={pageSize}
+            onShowSizeChange={onShowSizeChange}
+            style={{ marginBottom: '24px' }}
+          />
+          <Pagination
+            total={1234}
+            current={pageCurrent}
+            onChange={onSetPageCurrent}
+            showPrevNextJumpers
+            style={{ marginBottom: '24px' }}
+          />
+          <Pagination
+            total={415}
+            current={pageCurrent}
+            onChange={onSetPageCurrent}
+            showPrevNextJumpers
+            disabled
+          />
+        </StyleGuideCard>
       </div>
     </Layout>
   );

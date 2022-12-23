@@ -1,13 +1,11 @@
 import ValidationError from '@components/ValidationError/ValidationError';
-import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 import type { FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 
-import css from './FieldTextInput.module.scss';
+import css from './FieldTextArea.module.scss';
 
-type TIconComponent = React.ReactElement<TIconProps>;
 interface InputComponentProps extends FieldRenderProps<string, any> {
   id: string;
   label?: string;
@@ -22,11 +20,10 @@ interface InputComponentProps extends FieldRenderProps<string, any> {
   meta: any;
   inputRef: any;
   fullWidth?: boolean;
-  leftIcon?: TIconComponent;
-  rightIcon?: TIconComponent;
 }
+const CONTENT_MAX_LENGTH = 5000;
 
-const FieldTextInputComponent = (props: InputComponentProps) => {
+const FieldTextAreaComponent = (props: InputComponentProps) => {
   const {
     label,
     id,
@@ -36,16 +33,12 @@ const FieldTextInputComponent = (props: InputComponentProps) => {
     disabled,
     labelClassName,
     customErrorText,
-    isUncontrolled = false,
     fullWidth = true,
     input,
     meta,
     inputRef,
-    leftIcon,
-    rightIcon,
     ...rest
   } = props;
-
   if (label && !id) {
     throw Error('id required when a label is given');
   }
@@ -58,26 +51,14 @@ const FieldTextInputComponent = (props: InputComponentProps) => {
   const hasError = !!customErrorText || !!(touched && invalid && error);
   const fieldMeta = { touched: hasError, error: errorText };
 
-  const { type } = input;
-
-  // Uncontrolled input uses defaultValue instead of value.
-  const { value: defaultValue, ...inputWithoutValue } = input;
+  // Textarea doesn't need type.
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  const { type, ...inputWithoutType } = input;
 
   // Use inputRef if it is passed as prop.
   const refMaybe = inputRef ? { ref: inputRef } : {};
 
-  // Handle Icon
-  const leftIconElement = leftIcon
-    ? React.cloneElement(leftIcon, {
-        rootClassName: css.leftIcon,
-      })
-    : undefined;
-  const rightIconElement = rightIcon
-    ? React.cloneElement(rightIcon, {
-        rootClassName: css.rightIcon,
-      })
-    : undefined;
-
+  const maxLength = CONTENT_MAX_LENGTH;
   // Classes
   const inputClasses =
     inputRootClass ||
@@ -86,36 +67,23 @@ const FieldTextInputComponent = (props: InputComponentProps) => {
       [css.inputError]: hasError,
       [css.inputDisabled]: disabled,
       [css.inputFullWidth]: fullWidth,
-      [css.inputWithPaddingLeft]: !!leftIcon,
-      [css.inputWithPaddingRight]: !!rightIcon,
     });
 
-  const inputProps = isUncontrolled
-    ? {
-        className: inputClasses,
-        id,
-        type,
-        defaultValue,
-        ...refMaybe,
-        ...inputWithoutValue,
-        ...rest,
-        ...(disabled ? { disabled } : ''),
-      }
-    : {
-        className: inputClasses,
-        id,
-        type,
-        ...refMaybe,
-        ...input,
-        ...rest,
-        ...(disabled ? { disabled } : ''),
-      };
-
+  const inputProps = {
+    className: inputClasses,
+    id,
+    rows: 1,
+    maxLength,
+    ...refMaybe,
+    ...inputWithoutType,
+    ...rest,
+    ...(disabled ? { disabled } : ''),
+  };
   const classes = classNames(rootClassName || css.root, className);
   const inputContainerClasses = classNames(css.inputContainer);
+
   const labelClasses = classNames(css.labelRoot, labelClassName);
   const labelRequiredRedStar = fieldMeta.error ? css.labelRequiredRedStar : '';
-
   return (
     <div className={classes}>
       {label && (
@@ -125,19 +93,15 @@ const FieldTextInputComponent = (props: InputComponentProps) => {
         </label>
       )}
       <div className={inputContainerClasses}>
-        {!!leftIcon && (
-          <div className={css.leftIconContainer}>{leftIconElement}</div>
-        )}
-        <input {...inputProps} />
-        <div className={css.rightIconContainer}>{rightIconElement}</div>
+        <textarea {...inputProps} />
       </div>
       <ValidationError fieldMeta={fieldMeta} />
     </div>
   );
 };
 
-const FieldTextInput = (props: any) => {
-  return <Field component={FieldTextInputComponent} {...props} />;
+const FieldTextArea = (props: any) => {
+  return <Field component={FieldTextAreaComponent} {...props} />;
 };
 
-export default FieldTextInput;
+export default FieldTextArea;
