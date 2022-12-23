@@ -1,3 +1,4 @@
+import { InlineTextButton } from '@components/Button/Button';
 import IconClose from '@components/IconClose/IconClose';
 import IconSpinner from '@components/IconSpinner/IconSpinner';
 import IconUpload from '@components/IconUpload/IconUpload';
@@ -10,8 +11,6 @@ import { Field } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 
 import css from './FieldPhotoUpload.module.scss';
-
-const SESSION_PHOTO_VARIANTS = ['square-small', 'square-small2x'];
 
 const PhotoWithOverlay = (props: any) => {
   const {
@@ -60,12 +59,12 @@ const PhotoWithOverlay = (props: any) => {
           </div>
         </div>
       </div>
-      <button
+      <InlineTextButton
         type="button"
         className={css.removeButton}
         onClick={handleRemoveClick}>
         <IconClose />
-      </button>
+      </InlineTextButton>
     </div>
   );
 };
@@ -79,9 +78,10 @@ const FieldPhotoUpload: React.FC<any> = (props) => {
           input,
           disabled: fieldDisabled,
           onImageUpload,
-          name,
           image,
           className,
+          onRemoveImage,
+          variants,
         } = fieldRenderProps;
         const onChange = async (e: ChangeEvent<HTMLInputElement>) => {
           const { files } = e.target;
@@ -114,8 +114,9 @@ const FieldPhotoUpload: React.FC<any> = (props) => {
                 id={image.imageId}
                 rootClassName={css.rootForImage}
                 image={image}
-                savedImageAltText={`${name} asset`}
-                variants={SESSION_PHOTO_VARIANTS}
+                savedImageAltText={`${input.name} asset`}
+                variants={variants}
+                onRemoveImage={onRemoveImage}
               />
             ) : (
               <label htmlFor={input.name} className={css.label}>

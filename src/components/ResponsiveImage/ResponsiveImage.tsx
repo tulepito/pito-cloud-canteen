@@ -102,6 +102,11 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
   const imgProps = {
     className: classes,
     src: srcSet,
+    fill: true,
+    style: {
+      objectFit: 'cover',
+    },
+    loading: 'lazy',
     ...rest,
   };
 

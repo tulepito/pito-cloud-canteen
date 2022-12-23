@@ -1,5 +1,6 @@
 import Promised from '@components/Promised/Promised';
 import classNames from 'classnames';
+import Image from 'next/image';
 import type { ReactNode } from 'react';
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -43,7 +44,6 @@ const ImageFromFile: React.FC<TImageFromFile> = (props) => {
   useEffect(() => {
     setPromisedImage(readImage(file));
   }, []);
-
   const classes = classNames(rootClassName || css.root, className);
   const aspectRatioClasses = aspectRatioClassName || css.aspectWrapper;
   return (
@@ -55,8 +55,9 @@ const ImageFromFile: React.FC<TImageFromFile> = (props) => {
           <div className={classes}>
             <div className={css.threeToTwoWrapper}>
               <div className={aspectRatioClasses}>
-                <img
+                <Image
                   src={dataURL}
+                  fill={true}
                   alt={file.name}
                   className={css.rootForImage}
                 />
