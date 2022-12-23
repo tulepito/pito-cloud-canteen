@@ -53,15 +53,7 @@ export type TApiError = {
   meta: Record<string, unknown>;
 };
 
-// Storable error prop type. (Error object should not be stored as it is.)
-export type TError = {
-  type: 'error';
-  name: String;
-  message?: String;
-  status?: Number;
-  statusText: String;
-  apiErrors: TApiError[];
-};
+export type ReverseMap<T> = T[keyof T];
 
 export type TReverseMapFromEnum<T> = T[keyof T];
 
@@ -401,3 +393,22 @@ export type TInputAttributes = React.HTMLAttributes<HTMLInputElement>;
 export type TFormLabel =
   | React.ReactElement<React.ComponentProps<'label'>>
   | string;
+
+// API error
+// TODO this is likely to change soonish
+export type TSharetribeFlexSdkApiError = {
+  id: any;
+  status: number;
+  code: TErrorCode;
+  title: string;
+  meta?: object;
+};
+
+export type TError = {
+  type: 'error';
+  name: string;
+  message?: string;
+  status?: number;
+  statusText: string;
+  apiErrors: TSharetribeFlexSdkApiError[];
+};

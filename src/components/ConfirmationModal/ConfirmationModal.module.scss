@@ -1,0 +1,59 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.modal.open {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+
+  &.open {
+    .overlay {
+      background-color: rgba($neutralGray6, 0.5);
+
+      width: 100%;
+      height: 100vh;
+    }
+  }
+
+  .modalContainer {
+    width: 700px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: $neutralGray1;
+    border-radius: 20px;
+    padding: 24px 36px;
+
+    .modalHeader {
+      @include flexAlign(center, space-between);
+
+      .modalTitle {
+        @include text(20px, 32px);
+        font-weight: 700;
+      }
+    }
+
+    .modalContent {
+      margin-top: 24px;
+    }
+
+    .modalFooter {
+      @include flexAlign(center, flex-end);
+
+      .cancelBtn {
+        margin-right: 16px;
+        @include buttonColorSecondary;
+      }
+    }
+  }
+}
+
+.error {
+  color: $primaryPri5;
+}
