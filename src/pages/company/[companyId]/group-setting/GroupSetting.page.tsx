@@ -9,7 +9,10 @@ import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { BookerManageCompany } from '@src/redux/slices/company.slice';
+import {
+  addWorkspaceCompanyId,
+  BookerManageCompany,
+} from '@src/redux/slices/company.slice';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -25,6 +28,7 @@ type TGroupItem = {
 const GroupSettingPage = () => {
   const intl = useIntl();
   const router = useRouter();
+  const { companyId = '' } = router.query;
   const dispatch = useAppDispatch();
   const {
     value: isOpenCreateGroupModal,
@@ -129,8 +133,13 @@ const GroupSettingPage = () => {
     );
   };
   useEffect(() => {
-    dispatch(BookerManageCompany.companyInfo());
-  }, [dispatch]);
+    const fetchData = async () => {
+      console.log('run useeffect');
+      dispatch(addWorkspaceCompanyId(companyId));
+      await dispatch(BookerManageCompany.companyInfo());
+    };
+    fetchData();
+  }, [companyId, dispatch, router]);
   return (
     <div className={css.container}>
       <div className={css.header}>
