@@ -6,6 +6,14 @@
 .root {
   width: 100%;
   height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.previewImage {
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 .label {
@@ -58,4 +66,32 @@
   .uploadImageLabel {
     font-size: 10px;
   }
+}
+
+.removeButton {
+  right: 7px;
+  top: 7px;
+  min-height: unset;
+  position: absolute;
+  width: 30px;
+  display: flex;
+  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+  background-color: $neutralGray4;
+  svg {
+    width: 15px;
+  }
+}
+
+.thumbnailLoading {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(211, 211, 211, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

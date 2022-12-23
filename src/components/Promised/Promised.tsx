@@ -24,6 +24,7 @@ const Promised: React.FC<TPromised | any> = (props) => {
 
   useEffect(() => {
     setMounted(true);
+    if (!promise) return;
     promise
       .then((e: any) => {
         if (mounted) {
@@ -36,7 +37,7 @@ const Promised: React.FC<TPromised | any> = (props) => {
         }
       });
     return () => setMounted(false);
-  }, []);
+  }, [promise]);
 
   return error ? renderRejected(error) : renderFulfilled(value);
 };

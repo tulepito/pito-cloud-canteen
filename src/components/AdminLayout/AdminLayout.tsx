@@ -13,14 +13,19 @@ type TAdminLayout = {
 
 const AdminLayout = (props: TAdminLayout) => {
   const { children } = props;
-  const { value: isMenuOpen, toggle: toggleMenuOpen } = useBoolean(false);
+  const {
+    value: isMenuOpen,
+    setFalse: onCloseMenu,
+    toggle: toggleMenuOpen,
+  } = useBoolean(false);
+
   return (
     <AdminLayoutWrapper>
       <AdminLayoutTopbar>
         <AdminHeader onMenuClick={toggleMenuOpen} />
       </AdminLayoutTopbar>
       <AdminLayoutSidebar isMenuOpen={isMenuOpen}>
-        <AdminSidebar onMenuClick={toggleMenuOpen} />
+        <AdminSidebar onCloseMenu={onCloseMenu} onMenuClick={toggleMenuOpen} />
       </AdminLayoutSidebar>
       <AdminLayoutContent isMenuOpen={isMenuOpen}>
         {children}
