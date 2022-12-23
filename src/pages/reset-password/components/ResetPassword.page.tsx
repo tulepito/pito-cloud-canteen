@@ -1,12 +1,14 @@
 import Button from '@components/Button/Button';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { passwordThunks } from '@redux/slices/password.slice';
+import paths from '@src/paths';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import css from './ResetPassword.module.scss';
+import type { TResetPasswordFormValues } from './ResetPasswordForm';
 import ResetPasswordForm from './ResetPasswordForm';
 
 const ResetPasswordPage = () => {
@@ -20,8 +22,7 @@ const ResetPasswordPage = () => {
 
   const [newPasswordSubmitted, setNewPswSubmitted] = useState(false);
 
-  const handleSubmit = (values: Record<string, any>) => {
-    const { password } = values;
+  const handleSubmit = async ({ password }: TResetPasswordFormValues) => {
     setNewPswSubmitted(false);
     dispatch(
       passwordThunks.resetPassword({
@@ -30,12 +31,11 @@ const ResetPasswordPage = () => {
         newPassword: password,
       }),
     );
-
     setNewPswSubmitted(true);
   };
 
   const recoveryLink = (
-    <Link href="/quen-mat-khau">
+    <Link href={paths.RecoveryPassword}>
       <u>
         <FormattedMessage id="ResetPasswordPage.recoveryLinkText" />
       </u>

@@ -30,6 +30,7 @@ export type TSignUpFormValues = {
   phoneNumber?: string;
   privacyAndPolicy: boolean;
 };
+
 type TExtraProps = {
   formId?: string;
   errorMessage?: ReactNode;
@@ -37,7 +38,7 @@ type TExtraProps = {
   className?: string;
   inProgress?: boolean;
 };
-type TSignUpFormProps = FormProps<TSignUpFormValues> & TExtraProps;
+type TSignUpFormProps = FormProps<TSignUpFormValues> & Partial<TExtraProps>;
 type TSignUpFormComponentProps = FormRenderProps<TSignUpFormValues> &
   TExtraProps;
 
@@ -52,10 +53,9 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
     formId,
     handleSubmit,
     invalid,
-    values,
+    values: { privacyAndPolicy },
   } = props;
   const classes = classNames(rootClassName || css.root, className);
-  const { privacyAndPolicy } = values;
   const haveAgreed = privacyAndPolicy === true;
   const submitDisable = !haveAgreed || invalid || inProgress;
 
