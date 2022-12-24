@@ -2,6 +2,7 @@ import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import {
   composeValidators,
   composeValidatorsWithAllValues,
@@ -24,7 +25,7 @@ export type TEditCompanyFormValues = {
   lastName: string;
   email: string;
   phone: string;
-  address: string;
+  location?: any;
   password: string;
   confirmPassword: string;
   companyName: string;
@@ -172,10 +173,10 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                 )}
                 required
               />
-              <FieldTextInput
-                id="address"
-                name="address"
-                className={css.field}
+              <LocationAutocompleteInputField
+                id="location"
+                name="location"
+                rootClassName={css.field}
                 label={intl.formatMessage({
                   id: 'EditCompanyForm.addressLabel',
                 })}
