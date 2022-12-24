@@ -5,13 +5,9 @@ import AdminLayoutTopbar from '@components/AdminLayoutTopbar/AdminLayoutTopbar';
 import AdminLayoutWrapper from '@components/AdminLayoutWrapper/AdminLayoutWrapper';
 import AdminSidebar from '@components/AdminSidebar/AdminSidebar';
 import useBoolean from '@hooks/useBoolean';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 
-type TAdminLayout = {
-  children: ReactNode;
-};
-
-const AdminLayout = (props: TAdminLayout) => {
+const AdminLayout: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
   const { value: isMenuOpen, toggle: toggleMenuOpen } = useBoolean(false);
   return (
