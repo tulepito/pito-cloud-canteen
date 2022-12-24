@@ -25,6 +25,7 @@
     "final-form-arrays": "^3.0.2",
     "jstimezonedetect": "^1.0.7",
     "lodash": "^4.17.21",
+    "memoize": "^0.1.1",
     "next": "13.0.6",
     "next-redux-wrapper": "^8.0.0",
     "next-seo": "^5.15.0",
@@ -37,6 +38,7 @@
     "react-intl": "^6.2.5",
     "react-redux": "^8.0.5",
     "reselect": "^4.1.7",
+    "seedrandom": "^3.0.5",
     "sharetribe-flex-integration-sdk": "^1.8.0",
     "sharetribe-flex-sdk": "^1.17.0",
     "shelljs": "^0.8.5"

@@ -11,6 +11,7 @@ import TranslationProvider from '@translations/TranslationProvider';
 import type { NextApplicationPage } from '@utils/types';
 import type { AppContext, AppInitialProps, AppProps } from 'next/app';
 import App from 'next/app';
+import Script from 'next/script';
 import { Provider } from 'react-redux';
 
 type AppCustomProps = {
@@ -34,6 +35,9 @@ const MyApp = ({
 
   return (
     <TranslationProvider>
+      <Script
+        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
+      />
       <Provider store={store}>
         <AuthGuard
           isAuthenticationRoute={isAuthenticationRoute}
