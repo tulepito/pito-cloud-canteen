@@ -39,6 +39,7 @@ type TTable = {
   pagination?: TPagination | null;
   onSubmit: (e: any) => void;
   initialValues?: any;
+  showFilterFrom?: boolean;
 };
 
 const Table = (props: TTable) => {
@@ -61,6 +62,7 @@ const Table = (props: TTable) => {
     pagination,
     onSubmit,
     initialValues,
+    showFilterFrom,
   } = props;
   const rootClasses = classNames(css.root, rootClassName);
   const tableClasses = classNames(css.table, tableClassName);
@@ -88,16 +90,18 @@ const Table = (props: TTable) => {
                 </tr>
               </thead>
               <tbody className={tableBodyClassName}>
-                <tr className={css.formHeadRow}>
-                  {columns.map(
-                    (col: TColumn) =>
-                      col.renderSearch && (
-                        <td key={col.key} className={css.formHeadCell}>
-                          {col.label}
-                        </td>
-                      ),
-                  )}
-                </tr>
+                {showFilterFrom && (
+                  <tr className={css.formHeadRow}>
+                    {columns.map(
+                      (col: TColumn) =>
+                        col.renderSearch && (
+                          <td key={col.key} className={css.formHeadCell}>
+                            {col.label}
+                          </td>
+                        ),
+                    )}
+                  </tr>
+                )}
                 <tr className={css.formRow}>
                   {columns.map(
                     (col: TColumn) =>
