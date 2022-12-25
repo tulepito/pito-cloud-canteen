@@ -386,6 +386,7 @@ export default function ManageCompanies() {
           pagination={pagination}
           pageSearchParams={query}
           paginationPath="/admin/company"
+          showFilterFrom
         />
       )}
       {queryCompaniesError && (

@@ -40,6 +40,7 @@ type TTable = {
   isLoading?: boolean;
   onSubmit?: (e: any) => void;
   initialValues?: any;
+  showFilterFrom?: boolean;
 };
 
 const Table = (props: TTable) => {
@@ -63,6 +64,7 @@ const Table = (props: TTable) => {
     isLoading,
     onSubmit,
     initialValues,
+    showFilterFrom,
   } = props;
   const rootClasses = classNames(css.root, rootClassName);
   const tableClasses = classNames(css.table, tableClassName);
@@ -97,26 +99,30 @@ const Table = (props: TTable) => {
                 </tbody>
               ) : (
                 <tbody className={tableBodyClassName}>
-                  <tr className={css.formHeadRow}>
-                    {columns.map(
-                      (col: TColumn) =>
-                        col.renderSearch && (
-                          <td key={col.key} className={css.formHeadCell}>
-                            {col.label}
-                          </td>
-                        ),
-                    )}
-                  </tr>
-                  <tr className={css.formRow}>
-                    {columns.map(
-                      (col: TColumn) =>
-                        col.renderSearch && (
-                          <td key={col.key} className={css.formCell}>
-                            {col.renderSearch()}
-                          </td>
-                        ),
-                    )}
-                  </tr>
+                  {showFilterFrom && (
+                    <>
+                      <tr className={css.formHeadRow}>
+                        {columns.map(
+                          (col: TColumn) =>
+                            col.renderSearch && (
+                              <td key={col.key} className={css.formHeadCell}>
+                                {col.label}
+                              </td>
+                            ),
+                        )}
+                      </tr>
+                      <tr className={css.formRow}>
+                        {columns.map(
+                          (col: TColumn) =>
+                            col.renderSearch && (
+                              <td key={col.key} className={css.formCell}>
+                                {col.renderSearch()}
+                              </td>
+                            ),
+                        )}
+                      </tr>
+                    </>
+                  )}
 
                   {data.map((row: TRowData) => (
                     <tr
