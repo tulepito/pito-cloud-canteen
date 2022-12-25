@@ -1,3 +1,5 @@
+import defaultLocationSearches from '@helpers/defaultLocationSearches';
+
 const env = process.env.NEXT_PUBLIC_ENV;
 const dev = process.env.NEXT_PUBLIC_ENV === 'development';
 
@@ -59,6 +61,86 @@ const facebookAppId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
 
 // NOTE: only expose configuration that should be visible in the
 // client side, don't add any server secrets in this file.
+
+const maps = {
+  // mapboxAccessToken: process.env.REACT_APP_MAPBOX_ACCESS_TOKEN,
+  googleMapsAPIKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+
+  // The location search input can be configured to show default
+  // searches when the user focuses on the input and hasn't yet typed
+  // anything. This reduces typing and avoids too many Geolocation API
+  // calls for common searches.
+  search: {
+    // When enabled, the first suggestion is "Current location" that
+    // uses the browser Geolocation API to query the user's current
+    // location.
+    suggestCurrentLocation:
+      process.env.REACT_APP_DEFAULT_SEARCHES_ENABLED === 'true',
+
+    // Distance in meters for calculating the bounding box around the
+    // current location.
+    currentLocationBoundsDistance: 1000,
+
+    // Example location can be edited in the
+    // `default-location-searches.js` file.
+    defaults:
+      process.env.REACT_APP_DEFAULT_SEARCHES_ENABLED === 'true'
+        ? defaultLocationSearches
+        : [],
+
+    // Limit location autocomplete to a one or more countries
+    // using ISO 3166 alpha 2 country codes separated by commas.
+    // If you want to limit the autocomplete, uncomment this value:
+    countryLimit: ['VN'],
+  },
+
+  // When fuzzy locations are enabled, coordinates on maps are
+  // obfuscated randomly around the actual location.
+  //
+  // NOTE: This only hides the locations in the UI level, the actual
+  // coordinates are still accessible in the HTTP requests and the
+  // Redux store.
+  fuzzy: {
+    enabled: false,
+
+    // Amount of maximum offset in meters that is applied to obfuscate
+    // the original coordinates. The actual value is random, but the
+    // obfuscated coordinates are withing a circle that has the same
+    // radius as the offset.
+    offset: 500,
+
+    // Default zoom level when showing a single circle on a Map. Should
+    // be small enough so the whole circle fits in.
+    defaultZoomLevel: 13,
+
+    // Color of the circle on the Map component.
+    circleColor: '#c0392b',
+  },
+
+  // Custom marker image to use in the Map component.
+  //
+  // NOTE: Not used if fuzzy locations are enabled.
+  customMarker: {
+    enabled: false,
+
+    // Publicly accessible URL for the custom marker image.
+    //
+    // The easiest place is /public/static/icons/ folder, but then the
+    // marker image is not available while developing through
+    // localhost.
+    url: encodeURI(`${canonicalRootURL}/static/icons/map-marker-32x32.png`),
+
+    // Dimensions of the marker image.
+    width: 32,
+    height: 32,
+
+    // Position to anchor the image in relation to the coordinates,
+    // ignored when using Mapbox.
+    anchorX: 16,
+    anchorY: 32,
+  },
+};
+
 const config = {
   env,
   dev,
@@ -78,6 +160,7 @@ const config = {
   siteTwitterHandle,
   facebookAppId,
   usingSSL,
+  maps,
 };
 
 export default config;

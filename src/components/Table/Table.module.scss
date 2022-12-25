@@ -16,8 +16,8 @@
       @include viewportLarge {
         display: table-header-group;
       }
-      tr {
-        td {
+      .headRow {
+        .headCell {
           padding: 10px;
           text-align: left;
           color: $neutralGray8;
@@ -28,12 +28,34 @@
     }
 
     tbody {
+      .formHeadRow {
+        @include viewportLarge {
+          display: none;
+        }
+        .formHeadCell {
+          padding: 10px;
+          margin-bottom: 10px;
+          text-align: center;
+          color: $neutralGray8;
+          background-color: $neutralGray3;
+          font-size: 14px;
+        }
+      }
+
+      .formRow {
+        margin: 10px;
+        .formCell {
+          width: 200px;
+        }
+      }
+
       display: block;
       width: 100%;
       @include viewportLarge {
         display: table-row-group;
       }
-      tr {
+
+      .bodyRow {
         display: block;
         width: 100%;
         margin-bottom: 40px;
@@ -41,7 +63,7 @@
         @include viewportLarge {
           display: table-row;
         }
-        td {
+        .bodyCell {
           display: flex;
           justify-content: space-between;
           width: 100%;

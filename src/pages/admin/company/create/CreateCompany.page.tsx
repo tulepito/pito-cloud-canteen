@@ -19,6 +19,10 @@ export default function CreateCompanyPage() {
   );
 
   const onSubmit = async (values: TEditCompanyFormValues) => {
+    const { location } = values;
+    const {
+      selectedPlace: { address, origin },
+    } = location || {};
     const companyData = {
       email: values.email,
       password: values.password,
@@ -26,12 +30,18 @@ export default function CreateCompanyPage() {
       lastName: values.lastName,
       displayName: `${values.lastName} ${values.firstName}`,
       publicData: {
-        address: values.address,
         companyAddress: values.companyAddress,
         companyName: values.companyName,
         companyEmail: values.companyEmail,
         phoneNumber: values.phone,
         note: values.note,
+        location: {
+          address,
+          origin: {
+            lat: origin.lat,
+            lng: origin.lng,
+          },
+        },
       },
       privateData: {
         tax: values.tax,
