@@ -51,9 +51,13 @@ const companyStatusOptions = [
 const TABLE_COLUMN: TColumn[] = [
   {
     key: 'id',
-    label: '#',
+    label: 'ID',
     render: (data: any) => {
-      return <span className={css.rowText}>{data.order}</span>;
+      return (
+        <span title={data.id} className={classNames(css.rowText, css.rowId)}>
+          {data.id}
+        </span>
+      );
     },
     renderSearch: () => {
       return (
@@ -207,7 +211,6 @@ const parseEntitiesToTableData = (
   return companies.map((company: any) => ({
     key: company.id.uuid,
     data: {
-      order: company.order,
       id: company.id.uuid,
       name: company.attributes.profile.displayName,
       phone: company.attributes.profile.publicData?.phoneNumber,
@@ -243,11 +246,7 @@ const filterCompanies = (companies: TCompany[], filterValues: any) => {
   return companies.filter((company: any) => {
     return (
       // eslint-disable-next-line no-nested-ternary
-      (searchId
-        ? company.order === Number(searchId)
-          ? company.order === Number(searchId)
-          : company.id.uuid === searchId
-        : true) &&
+      (searchId ? company.id.uuid.includes(searchId) : true) &&
       (searchDisplayName
         ? company.attributes.profile?.displayName
             .toLowerCase()
@@ -294,16 +293,9 @@ export default function ManageCompanies() {
 
   const dispatch = useAppDispatch();
 
-  const companiesWithOrder = companyRefs.map(
-    (item: TCompany, index: number) => ({
-      ...item,
-      order: index + 1,
-    }),
-  );
-
   const filteredCompanies = useMemo(
-    () => filterCompanies(companiesWithOrder, queryParams),
-    [queryParams, companiesWithOrder],
+    () => filterCompanies(companyRefs, queryParams),
+    [queryParams, companyRefs],
   );
 
   const slicesCompanies = useMemo(
