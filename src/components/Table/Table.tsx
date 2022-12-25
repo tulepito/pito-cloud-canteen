@@ -37,7 +37,7 @@ type TTable = {
   pagePathParams?: any;
   pageSearchParams?: any;
   pagination?: TPagination | null;
-  onSubmit: (e: any) => void;
+  onSubmit?: (e: any) => void;
   initialValues?: any;
   showFilterFrom?: boolean;
 };
