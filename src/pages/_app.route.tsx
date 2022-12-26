@@ -4,6 +4,7 @@ import '../styles/rc-select.scss';
 import AdminLayout from '@components/AdminLayout/AdminLayout';
 import AuthGuard from '@components/AuthGuard/AuthGuard';
 import Layout from '@components/Layout/Layout';
+import { Open_Sans } from '@next/font/google';
 import { authThunks } from '@redux/slices/auth.slice';
 import { userThunks } from '@redux/slices/user.slice';
 import wrapper from '@redux/store';
@@ -24,6 +25,11 @@ type AppCustomProps = {
   authInfoLoaded: boolean;
   Component?: NextApplicationPage;
 };
+
+const openSans = Open_Sans({
+  subsets: ['vietnamese', 'latin'],
+  weight: ['400', '500', '700'],
+});
 
 const MyApp = ({
   Component,
@@ -56,20 +62,22 @@ const MyApp = ({
     : (page: ReactNode) => <Layout>{page}</Layout>;
 
   return (
-    <IntlProvider
-      locale={appLocale}
-      defaultLocale={defaultLocale}
-      messages={message}>
-      <Provider store={store}>
-        <AuthGuard
-          authInfoLoaded={authInfoLoaded}
-          isAuthenticated={isAuthenticated}
-          isAuthenticationRoute={isAuthenticationRoute}
-          isRequiredAuth={isRequiredAuth}>
-          {getLayout(<Component {...props.pageProps} key={router.asPath} />)}
-        </AuthGuard>
-      </Provider>
-    </IntlProvider>
+    <main className={openSans.className}>
+      <IntlProvider
+        locale={appLocale}
+        defaultLocale={defaultLocale}
+        messages={message}>
+        <Provider store={store}>
+          <AuthGuard
+            authInfoLoaded={authInfoLoaded}
+            isAuthenticated={isAuthenticated}
+            isAuthenticationRoute={isAuthenticationRoute}
+            isRequiredAuth={isRequiredAuth}>
+            {getLayout(<Component {...props.pageProps} key={router.asPath} />)}
+          </AuthGuard>
+        </Provider>
+      </IntlProvider>
+    </main>
   );
 };
 
