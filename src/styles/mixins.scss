@@ -24,7 +24,7 @@ $buttonBorderRadius: 8px;
 }
 
 @mixin buttonFont {
-  font-weight: $fontWeightSemiBold;
+  font-weight: $fontWeightBold;
   font-size: 14px;
   line-height: 24px;
   letter-spacing: 0.2px;
@@ -81,8 +81,8 @@ $buttonBorderRadius: 8px;
 
   &:disabled {
     color: $neutralGray6;
-    background: $neutralGray5;
-    border: 1px solid $neutralGray3;
+    background: $neutralGray3;
+    border: 1px solid $neutralGray5;
   }
 }
 

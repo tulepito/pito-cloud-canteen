@@ -13,7 +13,7 @@
   cursor: pointer;
   &.active {
     border: 2px solid $matterColorDark;
-    font-weight: $fontWeightSemiBold;
+    font-weight: $fontWeightBold;
     color: $matterColorDark;
   }
   * {

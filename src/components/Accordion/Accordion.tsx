@@ -1,26 +1,45 @@
 import IconArrowHead from '@components/IconArrowHead/IconArrowHead';
 import useBoolean from '@hooks/useBoolean';
+import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import css from './Accordion.module.scss';
 
 type TAccordion = {
   title: string;
   isOpen?: boolean;
+  headerClassName?: string;
+  contentClassName?: string;
 };
 
 const Accordion = (props: PropsWithChildren<TAccordion>) => {
-  const { title = 'Accordion label', children, isOpen = true } = props;
+  const {
+    title = 'Accordion label',
+    children,
+    isOpen = true,
+    headerClassName,
+    contentClassName,
+  } = props;
+  const [contentHeight, setContentHeight] = useState<number>(0);
   const { value: isActive, toggle } = useBoolean(isOpen);
   const accordionContentRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const activeHeight = accordionContentRef.current?.scrollHeight || 0;
+    setContentHeight(activeHeight);
+  }, [isActive]);
+
   const innerStyle = {
-    height: `${isActive ? accordionContentRef.current?.scrollHeight : 0}px`,
+    height: `${isActive ? contentHeight : 0}px`,
   };
+  const headerClasses = classNames(headerClassName || css.accordionHeader);
+  const contentClasses = classNames(css.accordionContent, contentClassName);
+
   return (
     <div className={css.root}>
       <div
-        className={css.accordionHeader}
+        className={headerClasses}
         onClick={() => {
           toggle();
         }}>
@@ -30,7 +49,7 @@ const Accordion = (props: PropsWithChildren<TAccordion>) => {
         />
       </div>
       <div
-        className={css.accordionContent}
+        className={contentClasses}
         ref={accordionContentRef}
         style={innerStyle}>
         {children}
