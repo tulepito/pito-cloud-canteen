@@ -1,8 +1,10 @@
 import HamburgerMenuButton from '@components/HamburgerMenuButton/HamburgerMenuButton';
 import IconHome from '@components/IconHome/IconHome';
+import IconOrderManagement from '@components/IconOrderManagement/IconOrderManagement';
 import IconUserManagement from '@components/IconUserManagement/IconUserManagement';
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
+import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import React from 'react';
 
@@ -34,25 +36,46 @@ const SIDEBAR_MENUS: TSidebarMenu[] = [
       },
     ],
   },
+  {
+    id: 'order',
+    label: 'AdminSidebar.orderLabel',
+    Icon: IconOrderManagement,
+    level: 1,
+    childrenMenus: [
+      {
+        id: 'createOrder',
+        label: 'AdminSidebar.createOrder',
+        nameLink: '/order',
+      },
+    ],
+  },
 ];
 
 type TAdminSidebar = {
   onMenuClick: () => void;
+  onCloseMenu: () => void;
 };
 
 const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
-  const { onMenuClick } = props;
+  const { onMenuClick, onCloseMenu } = props;
+
+  const onOutsideClick = () => {
+    onCloseMenu();
+  };
+
   return (
-    <div className={css.root}>
-      <div className={css.logo}>
-        <PitoLogo />
-        <HamburgerMenuButton
-          onClick={onMenuClick}
-          className={css.hamburgerMenu}
-        />
+    <OutsideClickHandler onOutsideClick={onOutsideClick}>
+      <div className={css.root}>
+        <div className={css.logo}>
+          <PitoLogo />
+          <HamburgerMenuButton
+            onClick={onMenuClick}
+            className={css.hamburgerMenu}
+          />
+        </div>
+        <MultiLevelSidebar menus={SIDEBAR_MENUS} />
       </div>
-      <MultiLevelSidebar menus={SIDEBAR_MENUS} />
-    </div>
+    </OutsideClickHandler>
   );
 };
 

@@ -108,3 +108,19 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.rowId {
+  -webkit-line-clamp: 1; /* number of lines to show */
+}
+
+.keywordInput {
+  width: 100%;
+}
+
+.searchButton {
+  width: 100%;
+  svg {
+    width: 20px;
+    fill: $matterColorLight;
+  }
+}

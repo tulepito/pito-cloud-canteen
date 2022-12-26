@@ -19,6 +19,9 @@ const nextConfig = {
     ];
   },
   pageExtensions: ['route.tsx', 'route.jsx', 'api.ts', 'api.js'],
+  images: {
+    domains: ['sharetribe.imgix.net'],
+  },
 };
 
 module.exports = nextConfig;

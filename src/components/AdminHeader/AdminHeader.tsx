@@ -29,17 +29,12 @@ const AdminHeader: React.FC<TAdminHeader> = (props) => {
         <ProfileMenu>
           <ProfileMenuLabel className={css.profileMenuWrapper}>
             <div className={css.avatar}>
-              <Avatar user={currentUser} />
+              <Avatar disableProfileLink user={currentUser} />
             </div>
             <p>{currentUser?.attributes?.profile?.displayName}</p>
           </ProfileMenuLabel>
           <ProfileMenuContent className={css.profileMenuContent}>
             <ProfileMenuItem key="AccountSettingsPage">
-              <NamedLink>
-                <p>Dang xuat</p>
-              </NamedLink>
-            </ProfileMenuItem>
-            <ProfileMenuItem key="ABC">
               <NamedLink>
                 <p>Dang xuat</p>
               </NamedLink>
