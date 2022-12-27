@@ -6,6 +6,7 @@ import type { Event, ViewsProps } from 'react-big-calendar';
 import { Calendar, luxonLocalizer, Views } from 'react-big-calendar';
 
 import css from './CalendarDashboard.module.scss';
+import MonthView from './components/MonthView/MonthView';
 import WeekView from './components/WeekView/WeekView';
 
 type TCalendarDashboard = {
@@ -24,7 +25,7 @@ const CalendarDashboard: React.FC<TCalendarDashboard> = ({
       defaultDate:
         propsDefaultDate || DateTime.now().startOf('week').toJSDate(),
       views: {
-        month: true,
+        month: MonthView as any,
         week: WeekView as any,
       } as ViewsProps,
     }),

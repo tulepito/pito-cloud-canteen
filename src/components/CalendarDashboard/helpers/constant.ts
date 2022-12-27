@@ -1,4 +1,4 @@
-import type { TDaySession } from './types';
+import type { TDayInWeek, TDaySession } from './types';
 
 export const MORNING_SESSION = 'MORNING_SESSION';
 export const AFTERNOON_SESSION = 'AFTERNOON_SESSION';
@@ -19,3 +19,13 @@ export const EVENT_STATUS = {
   NOT_JOINED_STATUS,
   EXPIRED_STATUS,
 };
+
+export const DAY_IN_WEEK: TDayInWeek[] = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+];

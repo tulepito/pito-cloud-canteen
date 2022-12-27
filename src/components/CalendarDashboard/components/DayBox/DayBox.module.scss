@@ -1,0 +1,73 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  flex-basis: calc(100% / 7);
+  background-color: $neutralGray1;
+  border-bottom: 1px solid $neutralGray5;
+  border-right: 1px solid $neutralGray5;
+  min-height: 200px;
+
+  &:nth-child(7n + 1) {
+    border-left: 1px solid $neutralGray5;
+  }
+}
+
+.dayHeader {
+  @include mediumText;
+  height: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.activeHeader {
+  background-color: $primaryPri1;
+  border-bottom: 1px solid $primaryPri3;
+}
+
+.dateNumber {
+  @include textTemplate(18px, 700, 28px, '');
+}
+
+.dayText {
+  @include textTemplate(12px, 400, 20px, '');
+}
+
+.activeHeader .dateNumber,
+.activeHeader .dayText {
+  color: $primaryPri5;
+}
+
+.dayContent {
+  flex-grow: 1;
+  padding: 12px 8px;
+}
+
+.dayFooter {
+  height: 40px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.dayFooterIndex {
+  @include mediumText;
+  margin-left: auto;
+}
+
+.activeDayFooterIndex {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: $primaryPri5;
+  color: $neutralGray1;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

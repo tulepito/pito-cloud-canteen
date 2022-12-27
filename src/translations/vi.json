@@ -209,5 +209,12 @@
   "DayColumn.Status.expired": "Hết hạn",
   "EventTile.mealType.dailyMeal": "Bữa ăn hằng ngày",
   "EventTile.deliveryAddress": "{address}, P/X. {ward}, quận/huyện {district}, tỉnh/thành phố {city}",
-  "EventTile.remainTime": "Còn {hour}h {minute}p để chọn"
+  "EventTile.remainTime": "Còn {hour}h {minute}p để chọn",
+  "MonthView.dayInWeekHeader.monday": "Thứ hai",
+  "MonthView.dayInWeekHeader.tuesday": "Thứ ba",
+  "MonthView.dayInWeekHeader.wednesday": "Thứ tư",
+  "MonthView.dayInWeekHeader.thursday": "Thứ năm",
+  "MonthView.dayInWeekHeader.friday": "Thứ sáu",
+  "MonthView.dayInWeekHeader.saturday": "Thứ bảy",
+  "MonthView.dayInWeekHeader.sunday": "Chủ nhật"
 }
