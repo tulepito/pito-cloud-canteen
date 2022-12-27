@@ -15,7 +15,7 @@ const DayColumn: React.FC<TDayColumnProps> = ({ date, events = [] }) => {
   const isCurrentDay = currentDay === date.getDay();
 
   return (
-    <div className={css.root}>
+    <div className={css.root} id={`dayHeader-${date.getDay()}`}>
       <DayColumnHeader date={date} isCurrentDay={isCurrentDay} />
       <DayColumnContent events={events} />
       <DayColumnFooter date={date} isCurrentDay={isCurrentDay} />

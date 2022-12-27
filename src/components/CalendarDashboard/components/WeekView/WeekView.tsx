@@ -1,8 +1,9 @@
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
+import { useViewport } from '@hooks/useViewport';
 import { DateTime } from 'luxon';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
 import { Navigate } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
@@ -23,6 +24,7 @@ type TWeekViewObject = {
   range: any;
   navigate: any;
   title: any;
+  dayInWeek: number;
 };
 
 function WeekView({
@@ -30,20 +32,37 @@ function WeekView({
   localizer,
   events = [],
 }: TWeekViewProps & TWeekViewObject) {
+  const {
+    viewport: { width },
+  } = useViewport();
   const currRange = useMemo(
     () => WeekView.range(date, { localizer }),
     [date, localizer],
   );
 
+  useEffect(() => {
+    if (width < 768) {
+      document
+        .querySelector(`#weekView`)
+        ?.scrollTo({ left: date.getDay() * (width - 66) });
+    } else if (width >= 768 && width < 1128) {
+      document
+        .querySelector(`#weekView`)
+        ?.scrollTo({ left: date.getDay() * (1440 / 7) });
+    }
+  }, [date, width]);
+
   return (
-    <div className={css.root}>
-      {currRange.map((item) => (
-        <DayColumn
-          date={item}
-          key={item.getTime()}
-          events={getEventsInDate(item, events)}
-        />
-      ))}
+    <div className={css.root} id={`weekView`}>
+      <div className={css.scrollContainer}>
+        {currRange.map((item) => (
+          <DayColumn
+            date={item}
+            key={item.getTime()}
+            events={getEventsInDate(item, events)}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -81,7 +100,9 @@ WeekView.navigate = (
 };
 
 WeekView.title = (date: Date, { localizer }: { localizer: any }) => {
-  const [start, end] = WeekView.range(date, { localizer });
+  const [start, end] = WeekView.range(date, {
+    localizer,
+  });
   const isSameMonth = start.getMonth() === end.getMonth();
   const isSameYear = start.getFullYear() === end.getFullYear();
   if (isSameMonth) {

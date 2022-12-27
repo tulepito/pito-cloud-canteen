@@ -1,7 +1,12 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
   min-height: 80vh;
-  padding: 50px;
+  padding: 50px 24px;
+
+  @include viewportLargeWithPaddings {
+    padding: 50px;
+  }
 }

@@ -41,22 +41,24 @@ function MonthView({
 
   return (
     <div className={css.root}>
-      {DAY_IN_WEEK.map((item, index) => (
-        <div
-          key={item}
-          className={classNames(css.dayInWeekHeader, {
-            [css.activeDayHeader]: currentDay === index + 1,
-          })}>
-          <FormattedMessage id={`MonthView.dayInWeekHeader.${item}`} />
-        </div>
-      ))}
-      {currRange.map((item) => (
-        <DayBox
-          date={item}
-          key={item.getTime()}
-          events={getEventsInDate(item, events)}
-        />
-      ))}
+      <div className={css.scrollContainer}>
+        {DAY_IN_WEEK.map((item, index) => (
+          <div
+            key={item}
+            className={classNames(css.dayInWeekHeader, {
+              [css.activeDayHeader]: currentDay === index + 1,
+            })}>
+            <FormattedMessage id={`MonthView.dayInWeekHeader.${item}`} />
+          </div>
+        ))}
+        {currRange.map((item) => (
+          <DayBox
+            date={item}
+            key={item.getTime()}
+            events={getEventsInDate(item, events)}
+          />
+        ))}
+      </div>
     </div>
   );
 }
