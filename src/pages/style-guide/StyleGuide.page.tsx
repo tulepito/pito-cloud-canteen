@@ -228,6 +228,7 @@ const StyleGuidePage = (props: any) => {
                   <Button type="submit" fullWidth style={{ margin: '16px 0' }}>
                     Submit
                   </Button>
+                  <p className={css.title}>Modal component</p>
                   <Modal
                     isOpen={modalControl.value}
                     handleClose={modalControl.toggle}
