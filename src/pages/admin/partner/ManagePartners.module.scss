@@ -1,0 +1,81 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+}
+
+.rowText {
+  min-width: 50px;
+  max-width: 200px;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* number of lines to show */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.rowId {
+  -webkit-line-clamp: 1; /* number of lines to show */
+}
+
+.tableActions {
+  display: flex;
+  align-items: center;
+
+  column-gap: 10px;
+  .actionButton {
+    display: flex;
+    align-items: center;
+    width: 50px;
+    min-height: 50px;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: transparent;
+    svg {
+      width: 20px;
+    }
+    &:hover {
+      background-color: $neutralGray5;
+    }
+  }
+}
+
+.filterWrapper {
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  display: flex;
+}
+
+.title {
+  font-weight: $fontWeightRegular;
+  font-size: 20px;
+}
+
+.top {
+  margin: 20px 0 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  .addIcon {
+    fill: $matterColorLight;
+  }
+}
+
+.rowTitle {
+  min-width: 100px;
+}
+
+.draftBox {
+  padding: 3px 5px;
+  display: inline-flex;
+  background-color: $warningOrange1;
+  color: $warningOrange6;
+  font-size: 12px;
+  border-radius: 4px;
+  margin-left: 5px;
+}
