@@ -22,7 +22,7 @@
 }
 
 .formTitle {
-  margin: 30px 0;
+  margin: 40px 0 40px 0;
   text-transform: uppercase;
 }
 
@@ -32,6 +32,8 @@
 
 .buttonWrapper {
   width: 100%;
+  display: flex;
+  justify-content: space-between;
   min-height: 50px;
 }
 

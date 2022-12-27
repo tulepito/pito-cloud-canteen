@@ -1,0 +1,18 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  min-width: 360px;
+  position: fixed;
+  height: calc(100vh - 72px);
+  z-index: 1;
+  background-color: $neutralGray1;
+  border-right: 1px solid $neutralGray5;
+}
+
+.logo {
+  padding: 40px 20px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

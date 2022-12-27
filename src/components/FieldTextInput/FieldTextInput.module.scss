@@ -2,13 +2,13 @@
 @use '/src/styles/mixins.scss' as *;
 
 .input {
-  border: 1px solid $formFieldBorderColor;
-  color: $formFieldColor;
+  border: 1px solid $neutralGray5;
+  color: $neutralGray10;
   background: transparent;
   display: block;
   width: auto;
   padding: 10px 12px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
   background-color: $matterColorLight;
@@ -26,21 +26,21 @@
     -webkit-box-shadow 0.15s ease-in-out;
   outline: none;
 
-  &:focus {
-    border-color: $formFieldBorderColorFocus;
+  &:hover {
+    border-color: $primaryPri4;
     outline: 0;
-    -webkit-box-shadow: $boxShadowInputFocus;
-    box-shadow: $boxShadowInputFocus;
+  }
+
+  &:focus {
+    border-color: $primaryPri5;
+    box-shadow: 0px 0px 0px 2px rgba(239, 61, 42, 0.2);
   }
 
   &::placeholder {
     font-weight: $fontWeightRegular;
-    font-size: 14px;
-    color: $formFieldPlaceholderColor;
+    font-size: 16px;
+    color: $neutralGray6;
   }
-}
-
-.inputError {
 }
 
 .inputFullWidth {
@@ -50,8 +50,14 @@
 .inputSuccess {
 }
 .inputError {
+  border-color: $primaryPri5;
+  box-shadow: 0px 0px 0px 2px rgba(239, 61, 42, 0.2);
 }
 .inputDisabled {
+  background-color: $neutralGray3;
+  border-color: $neutralGray5;
+  color: $neutralGray6;
+  cursor: not-allowed;
 }
 
 .inputContainer {
@@ -104,7 +110,6 @@
 }
 .labelRequiredRedStar {
   color: $failColor;
-  margin-left: 2px;
-  font-weight: $fontWeightSemiBold;
+  font-weight: $fontWeightBold;
   margin-left: 2px;
 }

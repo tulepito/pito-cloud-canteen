@@ -1,0 +1,33 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.formContainer {
+  width: 100%;
+  @include flexAlign(flex-end, space-between);
+  height: 108px;
+}
+
+.label {
+  font-weight: 700;
+  width: 100px;
+  font-size: 16px;
+  margin: 0;
+}
+
+.groupNameField {
+  @include flexAlign(center);
+}
+
+.descriptionField {
+  margin-top: 16px;
+  @include flexAlign(center);
+}
+
+.buttonsWrapper {
+  @include flexAlign(center);
+
+  .cancelBtn {
+    margin-right: 16px;
+    @include buttonColorSecondary;
+  }
+}

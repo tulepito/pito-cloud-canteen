@@ -91,3 +91,36 @@
     margin-top: 10px;
   }
 }
+
+.toggleButton {
+  justify-content: flex-end;
+  @include viewportLarge {
+    justify-content: flex-start;
+  }
+}
+
+.rowText {
+  min-width: 50px;
+  max-width: 200px;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* number of lines to show */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.rowId {
+  -webkit-line-clamp: 1; /* number of lines to show */
+}
+
+.keywordInput {
+  width: 100%;
+}
+
+.searchButton {
+  width: 100%;
+  svg {
+    width: 20px;
+    fill: $matterColorLight;
+  }
+}

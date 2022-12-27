@@ -13,7 +13,6 @@ const cookie = (
 ) => {
   const stringValue =
     typeof value === 'object' ? `j:${JSON.stringify(value)}` : String(value);
-
   res.setHeader('Set-Cookie', serialize(name, String(stringValue), options));
 };
 

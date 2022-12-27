@@ -1,6 +1,10 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { createCompanyPageThunks } from '@redux/slices/CreateCompanyPage.slice';
+import {
+  clearError,
+  createCompanyPageThunks,
+} from '@redux/slices/CreateCompanyPage.slice';
 import { isSignupEmailTakenError } from '@utils/errors';
+import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
 import type { TEditCompanyFormValues } from '../components/EditCompanyForm/EditCompanyForm';
@@ -14,27 +18,37 @@ export default function CreateCompanyPage() {
     (state) => state.CreateCompanyPage,
   );
 
-  const onSubmit = (values: TEditCompanyFormValues) => {
+  const onSubmit = async (values: TEditCompanyFormValues) => {
+    const { location } = values;
+    const {
+      selectedPlace: { address, origin },
+    } = location || {};
     const companyData = {
       email: values.email,
       password: values.password,
       firstName: values.firstName,
       lastName: values.lastName,
-      displayName: `${values.firstName} ${values.lastName}`,
+      displayName: `${values.lastName} ${values.firstName}`,
       publicData: {
-        address: values.address,
         companyAddress: values.companyAddress,
         companyName: values.companyName,
         companyEmail: values.companyEmail,
         phoneNumber: values.phone,
         note: values.note,
+        location: {
+          address,
+          origin: {
+            lat: origin.lat,
+            lng: origin.lng,
+          },
+        },
       },
       privateData: {
         tax: values.tax,
       },
     };
-    dispatch(
-      createCompanyPageThunks.creatCompany({
+    await dispatch(
+      createCompanyPageThunks.createCompany({
         dataParams: companyData,
         queryParams: { expand: true },
       }),
@@ -48,6 +62,13 @@ export default function CreateCompanyPage() {
     : intl.formatMessage({
         id: 'CreateCompanyPage.createCompanyFailed',
       });
+
+  useEffect(() => {
+    dispatch(clearError());
+    return () => {
+      dispatch(clearError());
+    };
+  }, [clearError, dispatch]);
 
   return (
     <div className={css.root}>

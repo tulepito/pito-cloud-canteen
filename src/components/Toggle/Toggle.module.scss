@@ -1,0 +1,65 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+.root {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.switch {
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  width: 36px;
+  height: 18px;
+  display: block;
+  margin: 0 auto;
+  overflow: hidden;
+  background: $neutralGray6;
+  border-radius: 9px;
+  transition: background-color 0.25s linear;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 14px;
+    background-color: #fff;
+    top: 2px;
+    left: 2px;
+    transition: background-color 0.25s linear, transform 0.25s linear;
+  }
+  &:hover {
+    box-shadow: 0px 0px 0px 2px rgba(239, 61, 42, 0.2);
+  }
+}
+
+.switchInput {
+  display: none;
+
+  &:checked + .switch {
+    background-color: $primaryPri5;
+  }
+
+  &:checked + .switch::after {
+    transform: translateX(18px);
+    background-color: white;
+  }
+
+  &:checked + .disabled {
+    background: $primaryPri4;
+    cursor: not-allowed;
+  }
+
+  & + .disabled {
+    background: $neutralGray4;
+    cursor: not-allowed;
+  }
+}
+
+.toggleLabel {
+  font-size: 14px;
+  font-weight: $fontWeightMedium;
+  line-height: 24px;
+  color: $neutralGray10;
+}

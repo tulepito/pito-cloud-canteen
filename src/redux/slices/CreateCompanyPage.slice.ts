@@ -10,7 +10,7 @@ interface CreateCompanyState {
 
 const CREATE_COMPANY = 'app/CreateCompanyPage/CREATE_COMPANY';
 
-const creatCompany = createAsyncThunk(
+const createCompany = createAsyncThunk(
   CREATE_COMPANY,
   async (userData: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
     try {
@@ -24,7 +24,7 @@ const creatCompany = createAsyncThunk(
 );
 
 export const createCompanyPageThunks = {
-  creatCompany,
+  createCompany,
 };
 
 const initialState: CreateCompanyState = {
@@ -32,22 +32,27 @@ const initialState: CreateCompanyState = {
   createCompanyError: null,
 };
 
-export const editCompanySlice = createSlice({
+export const createCompanySlice = createSlice({
   name: 'CreateCompanyPage',
   initialState,
-  reducers: {},
+  reducers: {
+    clearError: (state) => ({
+      ...state,
+      createCompanyError: null,
+    }),
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(creatCompany.pending, (state) => ({
+      .addCase(createCompany.pending, (state) => ({
         ...state,
         createCompanyInProgress: true,
         createCompanyError: null,
       }))
-      .addCase(creatCompany.fulfilled, (state) => ({
+      .addCase(createCompany.fulfilled, (state) => ({
         ...state,
         createCompanyInProgress: false,
       }))
-      .addCase(creatCompany.rejected, (state, action) => ({
+      .addCase(createCompany.rejected, (state, action) => ({
         ...state,
         createCompanyInProgress: false,
         createCompanyError: action.payload,
@@ -55,4 +60,6 @@ export const editCompanySlice = createSlice({
   },
 });
 
-export default editCompanySlice.reducer;
+export const { clearError } = createCompanySlice.actions;
+
+export default createCompanySlice.reducer;

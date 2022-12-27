@@ -1,0 +1,296 @@
+import Button from '@components/Button/Button';
+import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
+import IconArrow from '@components/IconArrow/IconArrow';
+import IconDelete from '@components/IconDelete/IconDelete';
+import IconSpinner from '@components/IconSpinner/IconSpinner';
+import type { TColumn, TRowData } from '@components/Table/Table';
+import Table from '@components/Table/Table';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
+import { BookerManageCompany } from '@src/redux/slices/company.slice';
+import filter from 'lodash/filter';
+import { useRouter } from 'next/router';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+
+import AddNewMembersModal from './components/AddNewMembersModal/AddNewMembersModal';
+import GroupInfoForm from './components/GroupInfoForm/GroupInfoForm';
+import css from './GroupDetail.module.scss';
+
+const GroupDetailPage = () => {
+  const intl = useIntl();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const {
+    value: isEditing,
+    setTrue: onEditing,
+    setFalse: closeEditing,
+  } = useBoolean();
+  const {
+    value: isAddNewMembersModalOpen,
+    setTrue: openAddNewMembersModal,
+    setFalse: closeAddNewMembersModal,
+  } = useBoolean();
+  const {
+    value: isDeleteMemberConfirmationModalOpen,
+    setTrue: openDeleteMemberConfirmationModal,
+    setFalse: closeDeleteMemberConfirmationModal,
+  } = useBoolean();
+  const {
+    value: isDeleteGroupConfirmationModalOpen,
+    setFalse: onDeleteGroupConfirmationModalClose,
+    setTrue: openDeleteGroupConfirmationModal,
+  } = useBoolean();
+
+  const [deletingMemberInfo, setDeletingMemberInfo] =
+    useState<Record<string, any>>();
+
+  const { name, description } = useAppSelector(
+    (state) => state.company.groupInfo,
+    shallowEqual,
+  );
+  const groupList = useAppSelector(
+    (state) => state.company.groupList,
+    shallowEqual,
+  );
+  const groupMembers = useAppSelector(
+    (state) => state.company.groupMembers,
+    shallowEqual,
+  );
+  const fetchGroupDetailInProgress = useAppSelector(
+    (state) => state.company.fetchGroupDetailInProgress,
+  );
+  const companyMembers = useAppSelector(
+    (state) => state.company.companyMembers,
+    shallowEqual,
+  );
+  const updateGroupInProgress = useAppSelector(
+    (state) => state.company.updateGroupInProgress,
+  );
+  const deleteGroupInProgress = useAppSelector(
+    (state) => state.company.deleteGroupInProgress,
+  );
+
+  const deleteGroupError = useAppSelector(
+    (state) => state.company.deleteGroupError,
+  );
+
+  const updateGroupError = useAppSelector(
+    (state) => state.company.updateGroupError,
+  );
+  const getGroupNames = (groupIds: string[]) => {
+    return filter(groupList, (group: any) => groupIds.includes(group.id))
+      .map((group: any) => group.name)
+      .join(', ');
+  };
+  const formattedGroupMembers = useMemo<TRowData[]>(
+    () =>
+      groupMembers.reduce(
+        (result: any, member: any) => [
+          ...result,
+          {
+            key: member.id.uuid,
+            data: {
+              id: member.id.uuid,
+              name: member.attributes.profile.displayName,
+              email: member.attributes.email,
+              group: getGroupNames(
+                member.attributes.profile.metadata.groupList,
+              ),
+              allergy: [],
+              nutrition: [],
+            },
+          },
+        ],
+        [],
+      ),
+    [groupMembers],
+  );
+
+  const TABLE_COLUMN: TColumn[] = [
+    {
+      key: 'name',
+      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.name' }),
+      render: (data: any) => {
+        return <span>{data.name}</span>;
+      },
+    },
+    {
+      key: 'email',
+      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.email' }),
+      render: (data: any) => {
+        return <span>{data.email}</span>;
+      },
+    },
+    {
+      key: 'group',
+      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.group' }),
+      render: (data: any) => {
+        return <span>{data.group}</span>;
+      },
+    },
+    {
+      key: 'allergy',
+      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.allergy' }),
+      render: (data: any) => {
+        return <span>{data.allergy}</span>;
+      },
+    },
+    {
+      key: 'nutrition',
+      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.nutrition' }),
+      render: (data: any) => {
+        return <span>{data.nutrition}</span>;
+      },
+    },
+    {
+      key: 'action',
+      label: '',
+      render: ({ id, email }: any) => {
+        const onDeleteMember = () => {
+          setDeletingMemberInfo({ id, email });
+          openDeleteMemberConfirmationModal();
+        };
+        return updateGroupInProgress ? (
+          <IconSpinner className={css.loading} />
+        ) : (
+          <IconDelete className={css.deleteBtn} onClick={onDeleteMember} />
+        );
+      },
+    },
+  ];
+  const { groupId = '' } = router.query;
+  useEffect(() => {
+    dispatch(BookerManageCompany.companyInfo());
+    dispatch(BookerManageCompany.groupInfo());
+    dispatch(
+      BookerManageCompany.groupDetailInfo({
+        groupId: groupId as string,
+      }),
+    );
+  }, [groupId]);
+
+  const groupInfoFormInitialValues = useMemo(
+    () => ({
+      name,
+      description,
+    }),
+    [name, description],
+  );
+
+  const onConfirmDeleteMember = () => {
+    dispatch(
+      BookerManageCompany.updateGroup({
+        groupId,
+        deletedMembers: [deletingMemberInfo],
+      }),
+    ).then(({ error }: any) => {
+      if (!error) {
+        closeDeleteMemberConfirmationModal();
+      }
+    });
+  };
+
+  const onConfirmDeleteGroup = () => {
+    dispatch(BookerManageCompany.deleteGroup(groupId as string)).then(
+      ({ error }: any) => {
+        if (!error) onDeleteGroupConfirmationModalClose();
+      },
+    );
+  };
+
+  const handleGoBack = () => {
+    router.back();
+  };
+
+  return (
+    <div className={css.container}>
+      <div className={css.backBtn} onClick={handleGoBack}>
+        <IconArrow direction="left" />
+        {intl.formatMessage({ id: 'GroupDetail.backButton' })}
+      </div>
+      <div className={css.header}>
+        {isEditing ? (
+          <GroupInfoForm
+            groupId={groupId as string}
+            onCallback={closeEditing}
+            initialValues={groupInfoFormInitialValues}
+          />
+        ) : (
+          <>
+            <div className={css.titleWrapper}>
+              <h2>{name || '---'}</h2>
+              <p>{description || '---'}</p>
+            </div>
+            <div className={css.actionBtns}>
+              <Button onClick={onEditing} className={css.changeNameBtn}>
+                {intl.formatMessage({ id: 'GroupDetail.changeGroupName' })}
+              </Button>
+              <Button
+                onClick={openDeleteGroupConfirmationModal}
+                className={css.deleteGroupBtn}>
+                {intl.formatMessage({ id: 'GroupDetail.deleteGroup' })}
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+      <div className={css.container}>
+        <Table
+          columns={TABLE_COLUMN}
+          data={formattedGroupMembers}
+          isLoading={fetchGroupDetailInProgress}
+        />
+        <Button className={css.addMemberBtn} onClick={openAddNewMembersModal}>
+          {intl.formatMessage({ id: 'GroupDetail.addGroupMember' })}
+        </Button>
+      </div>
+      <AddNewMembersModal
+        isOpen={isAddNewMembersModalOpen}
+        onClose={closeAddNewMembersModal}
+        companyMembers={companyMembers}
+        groupMembers={groupMembers}
+        groupId={groupId as string}
+      />
+      <ConfirmationModal
+        id="DeleteMemberModal"
+        isOpen={isDeleteMemberConfirmationModalOpen}
+        onClose={closeDeleteMemberConfirmationModal}
+        confirmText={intl.formatMessage({
+          id: 'GroupDetail.confirmDeleteMemberText',
+        })}
+        cancelText={intl.formatMessage({
+          id: 'GroupDetail.cancelDeleteMemberText',
+        })}
+        title={intl.formatMessage({
+          id: 'GroupDetail.deleteMemberModalTitle',
+        })}
+        isConfirmButtonLoading={updateGroupInProgress}
+        onConfirm={onConfirmDeleteMember}
+        onCancel={closeDeleteMemberConfirmationModal}
+        hasError={updateGroupError}
+      />
+      <ConfirmationModal
+        id="DeleteGroupModal"
+        isOpen={isDeleteGroupConfirmationModalOpen}
+        onClose={onDeleteGroupConfirmationModalClose}
+        confirmText={intl.formatMessage({
+          id: 'GroupDetail.confirmDeleteGroupText',
+        })}
+        cancelText={intl.formatMessage({
+          id: 'GroupDetail.cancelDeleteGroupText',
+        })}
+        title={intl.formatMessage({
+          id: 'GroupDetail.deleteGroupModalTitle',
+        })}
+        isConfirmButtonLoading={deleteGroupInProgress}
+        onConfirm={onConfirmDeleteGroup}
+        onCancel={onDeleteGroupConfirmationModalClose}
+        hasError={deleteGroupError}
+      />
+    </div>
+  );
+};
+
+export default GroupDetailPage;

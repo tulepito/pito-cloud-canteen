@@ -99,9 +99,15 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
     .filter((v) => v != null)
     .join(', ');
 
+  const style = {
+    objectFit: 'cover',
+  } as React.CSSProperties;
+
   const imgProps = {
     className: classes,
     src: srcSet,
+    fill: true,
+    style,
     ...rest,
   };
 

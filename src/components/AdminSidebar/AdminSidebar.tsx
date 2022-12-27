@@ -1,8 +1,10 @@
 import HamburgerMenuButton from '@components/HamburgerMenuButton/HamburgerMenuButton';
 import IconHome from '@components/IconHome/IconHome';
+import IconOrderManagement from '@components/IconOrderManagement/IconOrderManagement';
 import IconUserManagement from '@components/IconUserManagement/IconUserManagement';
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
+import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import React from 'react';
 
@@ -12,13 +14,15 @@ const SIDEBAR_MENUS: TSidebarMenu[] = [
   {
     id: 'home',
     label: 'AdminSidebar.homeLabel',
-    nameLink: 'Home',
+    nameLink: '/admin',
     Icon: IconHome,
+    level: 1,
   },
   {
     id: 'user',
     label: 'AdminSidebar.userLabel',
     Icon: IconUserManagement,
+    level: 1,
     childrenMenus: [
       {
         id: 'company',
@@ -30,32 +34,18 @@ const SIDEBAR_MENUS: TSidebarMenu[] = [
         label: 'AdminSidebar.partnerLabel',
         nameLink: '/admin/partner',
       },
+    ],
+  },
+  {
+    id: 'order',
+    label: 'AdminSidebar.orderLabel',
+    Icon: IconOrderManagement,
+    level: 1,
+    childrenMenus: [
       {
-        id: 'custom',
-        label: 'AdminSidebar.customLabel',
-        childrenMenus: [
-          {
-            id: 'custom1',
-            label: 'AdminSidebar.customLabel',
-            childrenMenus: [
-              {
-                id: 'custom11',
-                label: 'AdminSidebar.customLabel',
-                nameLink: 'Custom11',
-              },
-              {
-                id: 'custom22',
-                label: 'AdminSidebar.customLabel',
-                nameLink: 'Custom22',
-              },
-            ],
-          },
-          {
-            id: 'custom2',
-            label: 'AdminSidebar.customLabel',
-            nameLink: 'Custom2',
-          },
-        ],
+        id: 'createOrder',
+        label: 'AdminSidebar.createOrder',
+        nameLink: '/order',
       },
     ],
   },
@@ -63,21 +53,29 @@ const SIDEBAR_MENUS: TSidebarMenu[] = [
 
 type TAdminSidebar = {
   onMenuClick: () => void;
+  onCloseMenu: () => void;
 };
 
 const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
-  const { onMenuClick } = props;
+  const { onMenuClick, onCloseMenu } = props;
+
+  const onOutsideClick = () => {
+    onCloseMenu();
+  };
+
   return (
-    <div className={css.root}>
-      <div className={css.logo}>
-        <PitoLogo />
-        <HamburgerMenuButton
-          onClick={onMenuClick}
-          className={css.hamburgerMenu}
-        />
+    <OutsideClickHandler onOutsideClick={onOutsideClick}>
+      <div className={css.root}>
+        <div className={css.logo}>
+          <PitoLogo />
+          <HamburgerMenuButton
+            onClick={onMenuClick}
+            className={css.hamburgerMenu}
+          />
+        </div>
+        <MultiLevelSidebar menus={SIDEBAR_MENUS} />
       </div>
-      <MultiLevelSidebar menus={SIDEBAR_MENUS} />
-    </div>
+    </OutsideClickHandler>
   );
 };
 

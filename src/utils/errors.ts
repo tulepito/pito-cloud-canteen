@@ -9,7 +9,7 @@
  * name and the docstring of the function to ensure correct usage.
  */
 
-import type { TApiError, TError } from './types';
+import type { TError, TSharetribeFlexSdkApiError } from './types';
 import { ErrorCodes } from './types';
 
 const errorAPIErrors = (error: TError) => {
@@ -17,7 +17,7 @@ const errorAPIErrors = (error: TError) => {
 };
 
 const hasErrorWithCode = (error: TError, code: string) => {
-  return errorAPIErrors(error).some((apiError: TApiError) => {
+  return errorAPIErrors(error).some((apiError: TSharetribeFlexSdkApiError) => {
     return apiError.code === code;
   });
 };
@@ -107,84 +107,6 @@ export const isTransactionZeroPaymentError = (error: TError) =>
   hasErrorWithCode(error, ErrorCodes.ERROR_CODE_CHARGE_ZERO_PAYIN);
 
 /**
- * Check if the given API error (from `sdk.transaction.initiate()`) is
- * due to the transaction total amount being too low for Stripe.
- */
-export const isTransactionInitiateAmountTooLowError = (error: TError) => {
-  const isZeroPayment = isTransactionZeroPaymentError(error);
-
-  const tooLowAmount = errorAPIErrors(error).some((apiError: TApiError) => {
-    const isPaymentFailedError =
-      apiError.status === 402 &&
-      apiError.code === ErrorCodes.ERROR_CODE_PAYMENT_FAILED;
-    let isAmountTooLow = false;
-
-    try {
-      // TODO: This is a temporary solution until a proper error code
-      // for this specific error is received in the response.
-      const msg = apiError.meta.stripeMessage as string;
-      isAmountTooLow =
-        msg.startsWith('Amount must be at least') ||
-        msg.startsWith('Amount must convert to at least');
-    } catch (e) {
-      // Ignore
-    }
-
-    return isPaymentFailedError && isAmountTooLow;
-  });
-
-  return isZeroPayment || tooLowAmount;
-};
-
-/**
- * Check if the given API error (from `sdk.transaction.initiate()`) is
- * due to the transaction charge creation disabled by Stripe.
- */
-export const isTransactionChargeDisabledError = (error: TError) => {
-  const chargeCreationDisabled = errorAPIErrors(error).some((apiError) => {
-    const isPaymentFailedError =
-      apiError.status === 402 &&
-      apiError.code === ErrorCodes.ERROR_CODE_PAYMENT_FAILED;
-
-    let isChargeCreationDisabled = false;
-    try {
-      const msg = apiError.meta.stripeMessage as string;
-      isChargeCreationDisabled =
-        msg.startsWith('Your account cannot currently make charges.') ||
-        msg.match(/verification.disabled_reason/) !== null;
-    } catch (e) {
-      // Ignore
-    }
-
-    return isPaymentFailedError && isChargeCreationDisabled;
-  });
-
-  return chargeCreationDisabled;
-};
-
-/**
- * Check if the given API error (from `sdk.transaction.initiate()`) is
- * due to other error in Stripe.
- */
-export const transactionInitiateOrderStripeErrors = (error: TError) => {
-  if (error) {
-    return errorAPIErrors(error).reduce((messages, apiError) => {
-      const isPaymentFailedError =
-        apiError.status === 402 &&
-        apiError.code === ErrorCodes.ERROR_CODE_PAYMENT_FAILED;
-      const hasStripeError =
-        apiError && apiError.meta && apiError.meta.stripeMessage;
-      const stripeMessageMaybe =
-        isPaymentFailedError && hasStripeError
-          ? [apiError.meta.stripeMessage as string]
-          : [];
-      return [...messages, ...stripeMessageMaybe];
-    }, [] as string[]);
-  }
-  return null;
-};
-
-/**
  * Check if the given API error (from `sdk.transactions.transition(id, transition, params)`)
  * is due to invalid transition attempt.
  */
@@ -222,32 +144,6 @@ export const isChangeEmailWrongPassword = (error: TError) =>
  */
 export const isChangePasswordWrongPassword = (error: TError) =>
   error && error.status === 403;
-
-/**
- * Check if the given API error (from
- * 'sdk.stripeAccount.create(payoutDetails)') is due to
- * invalid postal code in the given country.
- */
-export const isStripeInvalidPostalCode = (error: TError) => {
-  const msgRe = /^Invalid [A-Z]{2} postal code$/;
-  return errorAPIErrors(error).some((apiError) => {
-    // Stripe doesn't seem to give an error code for this specific
-    // case, so we have to recognize it from the message.
-    const msg =
-      apiError.meta && apiError.meta.stripeMessage
-        ? apiError.meta.stripeMessage
-        : '';
-    return msgRe.test(msg as string);
-  });
-};
-
-export const isStripeError = (error: TError) => {
-  return errorAPIErrors(error).some((apiError) => {
-    // Stripe doesn't seem to give an error code for this specific
-    // case, so we have to recognize it from the message.
-    return !!(apiError.meta && apiError.meta.stripeMessage);
-  });
-};
 
 export const storableError = (error: any) => {
   const err = error || {};
