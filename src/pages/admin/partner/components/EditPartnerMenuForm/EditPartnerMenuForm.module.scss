@@ -1,0 +1,30 @@
+@use '/src/styles/vars.scss' as *;
+
+.fieldLabel {
+  font-weight: $fontWeightSemiBold;
+}
+
+.fieldDescription {
+  color: $neutralGray7;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.categoryFields {
+  width: 100%;
+}
+
+.categoryList {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.fields {
+  margin-bottom: 30px;
+}
+
+.btnWrapper {
+  display: flex;
+  margin: 40px 0;
+  justify-content: space-between;
+}

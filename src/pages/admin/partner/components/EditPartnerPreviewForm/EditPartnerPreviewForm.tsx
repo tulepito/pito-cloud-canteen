@@ -1,0 +1,474 @@
+import Button from '@components/Button/Button';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
+import FieldCheckboxGroup from '@components/FieldCheckboxGroup/FieldCheckboxGroup';
+import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
+import Form from '@components/Form/Form';
+import IconEdit from '@components/IconEdit/IconEdit';
+import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import ToggleButton from '@components/ToggleButton/ToggleButton';
+import {
+  CATEGORY_OPTIONS,
+  EImageVariants,
+  EXTRA_SERVICE_OPTIONS,
+  LIST_BANKS,
+  MEAL_OPTIONS,
+  PACKAGING_OPTIONS,
+} from '@utils/enums';
+import classNames from 'classnames';
+import arrayMutators from 'final-form-arrays';
+import React from 'react';
+import { Field, Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+
+import { createAvailabilityPlanInitialValues } from '../EditPartnerWizardTab/utils';
+import css from './EditPartnerPreviewForm.module.scss';
+
+const getLabelByKey = (list: any[], key: any) => {
+  const item = list.find((l: any) => l.key === key);
+  return item && item.label ? item.label : key;
+};
+
+const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
+  const intl = useIntl();
+  return (
+    <FinalForm
+      {...props}
+      mutators={{ ...arrayMutators }}
+      render={(fieldRenderProps: any) => {
+        const {
+          handleSubmit,
+          values,
+          form,
+          formError,
+          inProgress,
+          onDiscard,
+          isDraftFlow,
+        } = fieldRenderProps;
+        const {
+          cover,
+          title,
+          avatar,
+          companyName,
+          contactorName,
+          email,
+          phoneNumber,
+          address,
+          description,
+          website,
+          facebookLink,
+          availabilityPlan,
+          businessLicenseStatus,
+          businessLicenseImage,
+          footCertificateStatus,
+          footCertificateImage,
+          partyInsuranceStatus,
+          partyInsuranceImage,
+          meals = [],
+          categories = [],
+          hasOutsideMenuAndService,
+          extraServices = [],
+          bankAccounts = [],
+        } = values;
+
+        const entries = createAvailabilityPlanInitialValues(availabilityPlan);
+        return (
+          <Form onSubmit={handleSubmit}>
+            {isDraftFlow && (
+              <div className={css.buttonWrapper}>
+                <Button
+                  onClick={onDiscard}
+                  inProgress={inProgress}
+                  disabled={inProgress}
+                  type="button"
+                  className={css.button}>
+                  {intl.formatMessage({ id: 'EditPartnerPreviewForm.discard' })}
+                </Button>
+                <Button
+                  inProgress={inProgress}
+                  disabled={inProgress}
+                  className={css.button}>
+                  {intl.formatMessage({ id: 'EditPartnerPreviewForm.publish' })}
+                </Button>
+              </div>
+            )}
+            {formError && <ErrorMessage message={formError.message} />}
+            <div
+              className={classNames(css.basicInformationSection, css.section)}>
+              <p className={css.sectionLabel}>
+                {intl.formatMessage({
+                  id: 'EditPartnerForm.basicInformationLabel',
+                })}
+                <IconEdit className={css.editIcon} />
+              </p>
+              <div className={css.mediaWrapper}>
+                <div className={css.previewCover}>
+                  <ResponsiveImage
+                    variants={[EImageVariants.scaledLarge]}
+                    alt={title}
+                    image={cover}
+                  />
+                </div>
+                <div className={css.previewAvatar}>
+                  <ResponsiveImage
+                    variants={[EImageVariants.scaledSmall]}
+                    alt={title}
+                    image={avatar}
+                  />
+                </div>
+              </div>
+              <div className={css.basicInforWrapper}>
+                <div className={css.field}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerPreviewForm.title',
+                    })}
+                  </p>
+                  <p className={css.content}>{title}</p>
+                </div>
+                <div className={css.field}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerPreviewForm.companyName',
+                    })}
+                  </p>
+                  <p className={css.content}>{companyName}</p>
+                </div>
+                <div className={css.field}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerPreviewForm.contactorName',
+                    })}
+                  </p>
+                  <p className={css.content}>{contactorName}</p>
+                </div>
+                <div className={css.field}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerPreviewForm.contactorName',
+                    })}
+                  </p>
+                  <p className={css.content}>{contactorName}</p>
+                </div>
+                <div className={css.field}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerPreviewForm.email',
+                    })}
+                  </p>
+                  <p className={css.content}>{email}</p>
+                </div>
+                <div className={css.field}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerPreviewForm.phone',
+                    })}
+                  </p>
+                  <p className={css.content}>{phoneNumber}</p>
+                </div>
+                <div className={css.field}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerPreviewForm.location',
+                    })}
+                  </p>
+                  <p className={css.content}>{address}</p>
+                </div>
+                <div className={css.field}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerPreviewForm.website',
+                    })}
+                  </p>
+                  <p className={css.content}>{website}</p>
+                </div>
+                <div className={css.field}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerPreviewForm.facebookLink',
+                    })}
+                  </p>
+                  <p className={css.content}>{facebookLink}</p>
+                </div>
+                <div className={css.field}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerPreviewForm.description',
+                    })}
+                  </p>
+                  <p className={css.content}>{description}</p>
+                </div>
+              </div>
+              <div className={css.configFields}>
+                <p className={css.label}>
+                  {intl.formatMessage({
+                    id: 'EditPartnerPreviewForm.availablePlan',
+                  })}
+                </p>
+                <div className={css.configField}>
+                  <table
+                    className={classNames(css.field, css.availabilityTable)}>
+                    <thead>
+                      <tr>
+                        <th>NGÀY</th>
+                        <th>THỜI GIAN</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.keys(entries).map((day: any) => {
+                        const isEntries = Array.isArray(entries[day]);
+                        return isEntries ? (
+                          entries[day]?.map((e: any, eIndx: number) => (
+                            <tr key={`${e.startTime}.${eIndx}`}>
+                              {eIndx === 0 && (
+                                <td rowSpan={entries[day].length}>
+                                  {intl.formatMessage({
+                                    id: `FieldAvailability.${day}Label`,
+                                  })}
+                                </td>
+                              )}
+                              <td>
+                                {e.startTime} : {e.endTime}
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <></>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  <div className={classNames(css.field, css.restaurantConfig)}>
+                    <Field name="vat" id="vat">
+                      {(vatFieldProps: any) => {
+                        const { input } = vatFieldProps;
+                        return (
+                          <ToggleButton
+                            disabled
+                            className={css.vatButton}
+                            id={input.name}
+                            name={input.name}
+                            label={intl.formatMessage({
+                              id: 'EditPartnerForm.exportVat',
+                            })}
+                            onClick={(e: any) => form.change('vat', e)}
+                            defaultValue={input.value}
+                          />
+                        );
+                      }}
+                    </Field>
+                    <FieldTextInput
+                      disabled
+                      name="minPrice"
+                      type="number"
+                      className={css.minPrice}
+                      id="minPrice"
+                      label={intl.formatMessage({
+                        id: 'EditPartnerForm.minPrice',
+                      })}
+                    />
+                    <FieldCheckboxGroup
+                      id="packaging"
+                      name="packaging"
+                      disabled
+                      options={PACKAGING_OPTIONS}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={classNames(css.licenseSection, css.section)}>
+              <p className={css.sectionLabel}>
+                {intl.formatMessage({
+                  id: 'EditPartnerForm.licenseLabel',
+                })}
+                <IconEdit className={css.editIcon} />
+              </p>
+              <div className={css.licenseWrapper}>
+                <div className={css.box}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerForm.businessLicense',
+                    })}
+                  </p>
+                  <p>
+                    {intl.formatMessage({
+                      id: `EditPartnerForm.${businessLicenseStatus}`,
+                    })}
+                  </p>
+                  {businessLicenseImage && (
+                    <div className={css.licenseImage}>
+                      <ResponsiveImage
+                        variants={[EImageVariants.scaledLarge]}
+                        alt={title}
+                        image={businessLicenseImage}
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className={css.box}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerForm.foodCertificate',
+                    })}
+                  </p>
+                  <p>
+                    {intl.formatMessage({
+                      id: `EditPartnerForm.${footCertificateStatus}`,
+                    })}
+                  </p>
+                  {footCertificateImage && (
+                    <div className={css.licenseImage}>
+                      <ResponsiveImage
+                        variants={[EImageVariants.scaledLarge]}
+                        alt={title}
+                        image={footCertificateImage}
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className={css.box}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerForm.partyInsurance',
+                    })}
+                  </p>
+                  <p>
+                    {intl.formatMessage({
+                      id: `EditPartnerForm.${partyInsuranceStatus}`,
+                    })}
+                  </p>
+                  {partyInsuranceImage && (
+                    <div className={css.licenseImage}>
+                      <ResponsiveImage
+                        variants={[EImageVariants.scaledLarge]}
+                        alt={title}
+                        image={partyInsuranceImage}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className={classNames(css.section, css.licenseSection)}>
+              <p className={css.sectionLabel}>
+                {intl.formatMessage({
+                  id: 'EditPartnerForm.menuLabel',
+                })}
+                <IconEdit className={css.editIcon} />
+              </p>
+              <div className={css.licenseWrapper}>
+                <div className={css.box}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: `EditPartnerPreviewForm.meals`,
+                    })}
+                  </p>
+                  <div className={css.content}>
+                    {meals.map((meal: string) => (
+                      <div key={meal} className={css.mealBox}>
+                        {getLabelByKey(MEAL_OPTIONS, meal)}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className={css.box}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: `EditPartnerPreviewForm.hasOutsideMenuAndService`,
+                    })}
+                  </p>
+                  <p>
+                    {intl.formatMessage({
+                      id: `EditPartnerPreviewForm.hasOutsideMenuAndService.${hasOutsideMenuAndService}`,
+                    })}
+                  </p>
+                </div>
+                <div className={css.box}>
+                  <p className={css.label}>
+                    {intl.formatMessage({
+                      id: `EditPartnerPreviewForm.categoryLabel`,
+                    })}
+                  </p>
+                  <div className={css.content}>
+                    {categories.map((category: string) => (
+                      <div key={category} className={css.categoryBox}>
+                        {getLabelByKey(CATEGORY_OPTIONS, category)}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={classNames(css.section, css.licenseSection)}>
+              <p className={css.sectionLabel}>
+                {intl.formatMessage({
+                  id: 'EditPartnerPreviewForm.serviceLabel',
+                })}
+                <IconEdit className={css.editIcon} />
+              </p>
+              <div className={css.licenseWrapper}>
+                <ul className={css.services}>
+                  {extraServices.map((s: string) => (
+                    <li key={s}>{getLabelByKey(EXTRA_SERVICE_OPTIONS, s)}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className={classNames(css.section, css.bankAccountSection)}>
+              <p className={css.sectionLabel}>
+                {intl.formatMessage({
+                  id: 'EditPartnerPreviewForm.bankAccountLabel',
+                })}
+                <IconEdit className={css.editIcon} />
+              </p>
+              <div className={css.licenseWrapper}>
+                <div className={css.bankAccounts}>
+                  {bankAccounts.map((bank: any) => {
+                    return (
+                      <div key={bank.bankId} className={css.bankItem}>
+                        <div className={css.right}>
+                          <p className={css.label}>
+                            {intl.formatMessage({
+                              id: 'EditPartnerPreviewForm.bankAccount.bankOwnerName',
+                            })}
+                          </p>
+                          <p className={css.content}>{bank.bankOwnerName}</p>
+                          <p className={css.label}>
+                            {intl.formatMessage({
+                              id: 'EditPartnerPreviewForm.bankAccount.bankName',
+                            })}
+                          </p>
+                          <p className={css.content}>
+                            {getLabelByKey(LIST_BANKS, bank.bankId)}
+                          </p>
+                        </div>
+                        <div className={css.left}>
+                          <p className={css.label}>
+                            {intl.formatMessage({
+                              id: 'EditPartnerPreviewForm.bankAccount.bankAgency',
+                            })}
+                          </p>
+                          <p className={css.content}>{bank.bankAgency}</p>
+                          <p className={css.label}>
+                            {intl.formatMessage({
+                              id: 'EditPartnerPreviewForm.bankAccount.bankAccountNumber',
+                            })}
+                          </p>
+                          <p className={css.content}>
+                            {bank.bankAccountNumber}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </Form>
+        );
+      }}
+    />
+  );
+};
+
+export default EditPartnerPreviewForm;

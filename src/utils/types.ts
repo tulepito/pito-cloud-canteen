@@ -209,7 +209,7 @@ export type TListingAttributes = {
   deleted?: boolean;
   state?: TListingState;
   price?: any;
-  publicData?: object;
+  publicData?: any;
 };
 
 export type TDayOfWeek = TReverseMapFromEnum<typeof EDayOfWeek>;
