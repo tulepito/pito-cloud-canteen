@@ -12,10 +12,22 @@ type TFormTab = {
   selected?: boolean;
   linkProps: any;
   isLight?: boolean;
+  order: number;
+  isLast: boolean;
 };
 
 const FormTab: React.FC<TFormTab> = (props) => {
-  const { className, id, disabled, text, selected, linkProps, isLight } = props;
+  const {
+    isLast,
+    order,
+    className,
+    id,
+    disabled,
+    text,
+    selected,
+    linkProps,
+    isLight,
+  } = props;
   const linkClasses = classNames(css.link, {
     [css.selectedLink]: selected,
     [css.disabled]: disabled,
@@ -23,11 +35,15 @@ const FormTab: React.FC<TFormTab> = (props) => {
   });
 
   return (
-    <div id={id} className={className}>
-      <NamedLink className={linkClasses} {...linkProps}>
-        {text}
-      </NamedLink>
-    </div>
+    <>
+      <div id={id} className={className}>
+        <NamedLink className={linkClasses} {...linkProps}>
+          <div className={css.order}>{order}</div>
+          <span className={css.linkText}>{text}</span>
+        </NamedLink>
+      </div>
+      {!isLast && <div className={css.line}></div>}
+    </>
   );
 };
 
@@ -46,7 +62,16 @@ const FormTabNav: React.FC<TTabNav> = (props) => {
     <nav className={classes}>
       {tabs.map((tab, index) => {
         const id = typeof tab.id === 'string' ? tab.id : `${index}`;
-        return <FormTab key={id} id={id} className={tabClasses} {...tab} />;
+        return (
+          <FormTab
+            order={index + 1}
+            key={id}
+            id={id}
+            className={tabClasses}
+            isLast={index + 1 === tabs.length}
+            {...tab}
+          />
+        );
       })}
     </nav>
   );
