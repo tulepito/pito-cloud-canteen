@@ -30,15 +30,34 @@ export const deleteMethod = (path: string, body: any) => {
   return axios.delete(`${apiBaseUrl()}${path}`, body);
 };
 
-export const getCompaniesApi = () => get('/api/users/company');
+export const getCompaniesApi = () => get('/api/admin/users/company');
 
 export const updateCompanyApi = (body: any) =>
-  put('/api/users/company/update', body);
+  put('/api/admin/users/company/update', body);
 
 export const createCompanyApi = (body: any) =>
-  post('/api/users/company/create', body);
+  post('/api/admin/users/company/create', body);
 
-export const showCompanyApi = (id: string) => get(`/api/users/company/${id}`);
+export const showCompanyApi = (id: string) =>
+  get(`/api/admin/users/company/${id}`);
 
 export const updateCompanyStatusApi = (body: any) =>
-  put(`/api/users/company/status`, body);
+  put(`/api/admin/users/company/status`, body);
+
+export const createDraftPartnerApi = (body: any) =>
+  post('/api/admin/users/partner/create-draft', body);
+
+export const updateRestaurantApi = (body: any) =>
+  post('/api/admin/listings/restaurant/update', body);
+
+export const publishDraftPartnerApi = (body: any) =>
+  post('/api/admin/users/partner/publish-draft', body);
+
+export const deletePartnerApi = (body: any) =>
+  post('/api/admin/users/partner/delete', body);
+
+export const showRestaurantApi = ({ id, ...rest }: any) =>
+  post(`/api/admin/listings/restaurant/${id}`, rest);
+
+export const queryRestaurantListingsApi = (body: any) =>
+  post('/api/admin/listings/restaurant/query', body);

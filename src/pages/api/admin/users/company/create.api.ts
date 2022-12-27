@@ -8,7 +8,14 @@ import {
   handleError,
 } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
+import { ECompanyStatus } from '@utils/enums';
+import bcrypt from 'bcryptjs';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+// SALT should be created ONE TIME upon sign up
+const salt = bcrypt.genSaltSync(10);
+// console.log(salt);
+// example =>  $2a$10$CwTycUXWue0Thq9StjUM0u => to be added always to the password hash
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -42,6 +49,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       firstName: `Sub account for ${companyAccount.id.uuid}`,
       lastName: ' ',
       email: `${splittedEmail[0]}+sub-user@${splittedEmail[1]}`,
+      password: dataParams.password,
     });
 
     const [subAccount] = denormalisedResponseEntities(subResponse);
@@ -56,21 +64,25 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
           metadata: {
             isCompanyAccount: true,
+            status: ECompanyStatus.unactive,
           },
         },
         queryParams,
       );
 
+    const hashedPassword = bcrypt.hashSync(dataParams.password, salt); // hash created previously created upon sign up
+
     // Update sub master account password
     await intergrationSdk.users.updateProfile({
       id: subAccount.id,
       privateData: {
-        accountPassword: dataParams.password,
+        accountPassword: hashedPassword,
       },
     });
 
     res.json(masterAccountAfterUpdateResponse);
   } catch (error) {
+    console.error(error);
     handleError(res, error);
   }
 }
