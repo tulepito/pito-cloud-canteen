@@ -141,6 +141,8 @@ $buttonBorderRadius: 8px;
   font-size: $size;
   line-height: $lh;
   letter-spacing: $ls;
+}
+
 // Typography
 @mixin textTemplate($size: 12px, $weight: 400, $height: 16px, $family) {
   @if $family == '' {
