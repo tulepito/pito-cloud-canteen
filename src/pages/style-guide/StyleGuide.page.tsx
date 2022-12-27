@@ -228,7 +228,6 @@ const StyleGuidePage = (props: any) => {
                   <Button type="submit" fullWidth style={{ margin: '16px 0' }}>
                     Submit
                   </Button>
-                  <p className={css.title}>Modal component</p>
                   <Modal
                     isOpen={modalControl.value}
                     handleClose={modalControl.toggle}
@@ -343,6 +342,11 @@ const StyleGuidePage = (props: any) => {
               label="Toggle off, disable status"
             />
           </div>
+
+          <p className={css.title}>Modal component</p>
+          <Button style={{ margin: '8px 0' }} onClick={modalControl.toggle}>
+            Open modal
+          </Button>
         </StyleGuideCard>
         <StyleGuideCard>
           <p className={css.title}>Button component</p>
@@ -358,9 +362,6 @@ const StyleGuidePage = (props: any) => {
           </Button>
           <Button type="submit" fullWidth disabled>
             Submit
-          </Button>
-          <Button style={{ margin: '8px 0' }} onClick={modalControl.toggle}>
-            Open modal
           </Button>
         </StyleGuideCard>
 
