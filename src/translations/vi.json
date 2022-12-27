@@ -299,5 +299,15 @@
   "EditPartnerMenuForm.extraServiceCheckboxLabel": "Dịch vụ thêm",
   "EditPartnerBasicInfomationForm.createBtn": "Thêm",
   "LocationAutocompleteInput.currentLocation": "Địa chỉ hiện tại",
-  "ManageCompanies.searchStatusLabel": "Chọn trạng thái"
+  "ManageCompanies.searchStatusLabel": "Chọn trạng thái",
+  "Calendar.week.dayHeader.1": "Thứ hai, {date}/{month}",
+  "Calendar.week.dayHeader.2": "Thứ ba, {date}/{month}",
+  "Calendar.week.dayHeader.3": "Thứ tư, {date}/{month}",
+  "Calendar.week.dayHeader.4": "Thứ năm, {date}/{month}",
+  "Calendar.week.dayHeader.5": "Thứ sáu, {date}/{month}",
+  "Calendar.week.dayHeader.6": "Thứ bảy, {date}/{month}",
+  "Calendar.week.dayHeader.0": "Chủ nhật, {date}/{month}",
+  "Calendar.Week.title": "{start} - {end}, Tháng {month}, {year}",
+  "Calendar.Week.title.diffMonth": "{start} - {end}, {year}",
+  "Calendar.Week.title.diffYear": "{start} - {end}"
 }

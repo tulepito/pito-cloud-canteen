@@ -49,6 +49,7 @@ const MyApp = ({
   const isAdminRoute = !!router.route.startsWith('/admin');
   const isAuthenticationRoute = AuthenticationRoutes.includes(router.route);
   const isCompanyRoute = !!router.route.startsWith('/company');
+
   const LayoutComponent = isAdminRoute
     ? AdminLayout
     : isCompanyRoute
