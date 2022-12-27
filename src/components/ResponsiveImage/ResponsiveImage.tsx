@@ -36,6 +36,7 @@
 import type { TImage, TImageVariant } from '@utils/types';
 import classNames from 'classnames';
 import Image from 'next/image';
+import type { CSSProperties } from 'react';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -99,14 +100,15 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
     .filter((v) => v != null)
     .join(', ');
 
+  const style = {
+    objectFit: 'cover',
+  } as CSSProperties;
+
   const imgProps = {
     className: classes,
     src: srcSet,
     fill: true,
-    style: {
-      objectFit: 'cover',
-    },
-    loading: 'lazy',
+    style,
     ...rest,
   };
 
