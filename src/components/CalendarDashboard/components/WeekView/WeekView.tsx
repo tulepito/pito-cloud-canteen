@@ -1,5 +1,6 @@
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
+import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
 import { DateTime } from 'luxon';
 import { useMemo } from 'react';
 import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
@@ -28,32 +29,20 @@ function WeekView({
   date,
   localizer,
   events = [],
-  accessors,
 }: TWeekViewProps & TWeekViewObject) {
-  const res = events.filter((event) => {
-    console.log('accessors?.start(event)', accessors?.start(event));
-    console.log('accessors?.end(event)', accessors?.end(event));
-    return localizer.inRange(
-      date,
-      accessors?.start(event),
-      accessors?.end(event),
-      'day',
-    );
-  });
-
-  console.log('res', res);
-
   const currRange = useMemo(
     () => WeekView.range(date, { localizer }),
     [date, localizer],
   );
 
-  console.log('currRange', currRange);
-
   return (
     <div className={css.root}>
       {currRange.map((item) => (
-        <DayColumn date={item} key={item.getTime()} />
+        <DayColumn
+          date={item}
+          key={item.getTime()}
+          events={getEventsInDate(item, events)}
+        />
       ))}
     </div>
   );

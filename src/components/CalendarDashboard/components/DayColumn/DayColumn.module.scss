@@ -5,31 +5,49 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  border-right: 1px solid $neutralGray4;
-  border-bottom: 1px solid $neutralGray4;
+  border-top: 1px solid $neutralGray5;
+  border-bottom: 1px solid $neutralGray5;
+  border-right: 1px solid $neutralGray5;
 
-  &:last-child {
-    border-right: 0px solid transparent;
+  &:first-child {
+    border-left: 1px solid $neutralGray5;
   }
 }
 
 .dayHeader {
   @include mediumText;
-  background-color: $neutralGray3;
-  height: 32px;
+  background-color: $neutralGray1;
+  height: 54px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
+  padding: 4px;
+}
 
-  &:last-of-type {
-    border-right: 0px solid transparent;
-  }
+.activeHeader {
+  background-color: $primaryPri1;
+  border-bottom: 1px solid $primaryPri3;
+}
+
+.dateNumber {
+  @include textTemplate(18px, 700, 28px, '');
+}
+
+.dayText {
+  @include textTemplate(12px, 400, 20px, '');
+}
+
+.activeHeader .dateNumber,
+.activeHeader .dayText {
+  color: $primaryPri5;
 }
 
 .dayContent {
   flex-grow: 1;
-  padding: 8px;
+  padding: 12px 8px;
+  background-color: $neutralGray2;
 }
 
 .dayFooter {
@@ -37,6 +55,7 @@
   padding: 12px;
   display: flex;
   align-items: center;
+  background-color: $neutralGray2;
 }
 
 .dayFooterIndex {

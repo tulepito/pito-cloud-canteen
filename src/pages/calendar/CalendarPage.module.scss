@@ -2,6 +2,6 @@
 @use '/src/styles/mixins.scss' as *;
 
 .root {
-  height: 80vh;
+  min-height: 80vh;
   padding: 50px;
 }
