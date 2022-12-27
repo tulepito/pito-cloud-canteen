@@ -38,8 +38,8 @@ const MyApp = ({
   return (
     <TranslationProvider>
       <Provider store={store}>
-        <AuthGuard router={router} isRequiredAuth={isRequiredAuth}>
-          <PermissionGuard router={router}>
+        <AuthGuard isRequiredAuth={isRequiredAuth}>
+          <PermissionGuard>
             <Component {...props.pageProps} key={router.asPath} />
           </PermissionGuard>
         </AuthGuard>

@@ -4,6 +4,7 @@ const paths = {
   RecoveryPassword: '/quen-mat-khau',
   ResetPassword: '/dat-lai-mat-khau',
   HomePage: '/',
+  test: '/test/[id]',
 };
 
 export const AuthenticationRoutes = [

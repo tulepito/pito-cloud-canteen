@@ -1,32 +1,29 @@
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import paths, { AuthenticationRoutes } from '@src/paths';
-import type { Router } from 'next/router';
+import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect } from 'react';
 
 type TAuthGuardProps = PropsWithChildren<{
-  router: Router;
   isRequiredAuth: boolean;
 }>;
 
 const AuthGuard: React.FC<TAuthGuardProps> = (props) => {
-  const { children, isRequiredAuth, router } = props;
+  const router = useRouter();
+  const { children, isRequiredAuth } = props;
   const { isAuthenticated, authInfoLoaded } = useAppSelector(
     (state) => state.auth,
   );
   const user = useAppSelector(currentUserSelector);
+  const pathName = router.pathname;
 
-  const pathName = router.route;
   const isAuthenticationRoute = AuthenticationRoutes.includes(pathName);
   const isSignUpPath = pathName.includes(paths.SignUp);
-  const currentUserLoaded = !!user.id;
-  const showEmailVerification =
-    currentUserLoaded && !user.attributes.emailVerified;
+  const showEmailVerification = !!user.id && !user.attributes.emailVerified;
   const shouldNavigateIfInSignUpFlow = isSignUpPath && !showEmailVerification;
 
   const homePageNavigateCondition =
-    // eslint-disable-next-line no-unneeded-ternary
     isAuthenticated &&
     isAuthenticationRoute &&
     (!isSignUpPath || shouldNavigateIfInSignUpFlow);
