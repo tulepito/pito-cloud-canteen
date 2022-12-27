@@ -9,6 +9,7 @@ import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import IconCalendar from '@components/IconCalender/IconCalender';
 import Layout from '@components/Layout/Layout';
+import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import Modal from '@components/Modal/Modal';
 import Pagination from '@components/Pagination/Pagination';
 import Progress from '@components/Progress/Progress';
@@ -134,29 +135,41 @@ const StyleGuidePage = (props: any) => {
                   <p className={css.title}>Form fields</p>
 
                   <FieldTextInput
-                    id={`username`}
-                    name="username"
+                    id={`leftIcon`}
+                    name="leftIcon"
                     validate={requiredMessage}
                     leftIcon={<IconVoucher />}
-                    label="Username"
-                    disabled
-                    defaultValue="Input disabled"
+                    label="Field with left icon"
                     className={css.fieldItem}
                   />
                   <FieldTextInput
-                    id={`email`}
-                    name="email"
+                    id={`rightIcon`}
+                    name="rightIcon"
                     validate={requiredMessage}
-                    placeholder="hello"
                     rightIcon={<IconVoucher />}
-                    label="Email"
+                    label="Field with right icon"
                     className={css.fieldItem}
+                  />
+                  <FieldTextInput
+                    id={`disabledField`}
+                    name="disabledField"
+                    validate={requiredMessage}
+                    label="Field disabled"
+                    className={css.fieldItem}
+                    disabled
+                  />
+                  <LocationAutocompleteInputField
+                    id="location"
+                    name="location"
+                    rootClassName={css.fieldItem}
+                    label="Field location autocomplete"
+                    placeholder="Enter you location"
                   />
                   <FieldPasswordInput
                     id="password"
                     name="password"
                     placeholder="Enter your password"
-                    label="Password"
+                    label="Field password"
                     className={css.fieldItem}
                   />
                   <div
