@@ -2,6 +2,7 @@ import getAdminAccount from '@services/getAdminAccount';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import subAccountLogin from '@services/subAccountLogin';
+import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { TOrder, TPlan } from '@utils/orderTypes';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -52,6 +53,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             id: draftedOrderListing.id.uuid,
             metadata: {
               companyId,
+              listingType: ListingTypes.ORDER,
               generalInfo: {
                 ...rest,
               },

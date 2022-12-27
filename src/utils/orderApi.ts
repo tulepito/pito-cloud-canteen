@@ -7,9 +7,9 @@ type CreateOrderApiBody = {
   endDate: Date;
   deliveryHour: string;
   period: number;
-  selectedGroups: any[];
+  selectedGroups: string[];
   packagePerMember: number;
-  groups: string[];
+  orderDeadline?: string;
 };
 export const createOrderApi = (body: CreateOrderApiBody) =>
   post('/api/order', body);
