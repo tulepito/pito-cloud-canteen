@@ -1,0 +1,21 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  width: 100%;
+  height: 100%;
+  overflow-x: scroll;
+}
+
+.scrollContainer {
+  display: flex;
+  width: calc((100vw - 66px) * 7);
+  height: 100%;
+
+  @include viewportMedium {
+    width: 1440px;
+  }
+
+  @include viewportLargeWithPaddings {
+    width: 100%;
+  }
+}
