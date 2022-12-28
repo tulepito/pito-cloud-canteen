@@ -4,7 +4,9 @@ import { createAsyncThunk, createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities, ensureCurrentUser } from '@utils/data';
+import { EUserPermission } from '@utils/enums';
 import { storableError } from '@utils/errors';
+import get from 'lodash/get';
 
 // eslint-disable-next-line import/no-cycle
 import { authThunks } from './auth.slice';
@@ -31,6 +33,7 @@ const mergeCurrentUser = (oldCurrentUser: any, newCurrentUser: any) => {
 type TUserState = {
   currentUser: any;
   currentUserShowError: any;
+  userPermission: EUserPermission;
   sendVerificationEmailInProgress: boolean;
   sendVerificationEmailError: any;
 };
@@ -38,6 +41,7 @@ type TUserState = {
 const initialState: TUserState = {
   currentUser: null,
   currentUserShowError: null,
+  userPermission: EUserPermission.normal,
   sendVerificationEmailInProgress: false,
   sendVerificationEmailError: null,
 };
@@ -63,6 +67,7 @@ const fetchCurrentUser = createAsyncThunk(
         );
       }
       const currentUser = entities[0];
+
       // Make sure auth info is up to date
       dispatch(authThunks.authInfo());
 
@@ -99,12 +104,9 @@ const userSlice = createSlice({
         ...state,
         currentUser: null,
         currentUserShowError: null,
-        currentUserHasListings: false,
-        currentUserHasListingsError: null,
-        currentUserNotificationCount: 0,
-        currentUserNotificationCountError: null,
-        currentUserListing: null,
-        currentUserListingFetched: false,
+        userPermission: EUserPermission.normal,
+        sendVerificationEmailInProgress: false,
+        sendVerificationEmailError: null,
       };
     },
   },
@@ -114,7 +116,17 @@ const userSlice = createSlice({
         state.currentUserShowError = null;
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
-        state.currentUser = mergeCurrentUser(state.currentUser, action.payload);
+        const currentUser = action.payload;
+        const { isCompany, isAdmin } = get(
+          currentUser,
+          'attributes.profile.metadata',
+        );
+        state.currentUser = mergeCurrentUser(state.currentUser, currentUser);
+        state.userPermission = isAdmin
+          ? EUserPermission.admin
+          : isCompany
+          ? EUserPermission.company
+          : EUserPermission.normal;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
         state.currentUserShowError = action.payload;

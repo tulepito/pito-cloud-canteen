@@ -1,53 +1,47 @@
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import paths from '@src/paths';
+import { generalPaths, NonRequireAuthenticationRoutes } from '@src/paths';
 import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect } from 'react';
 
-type TAuthGuard = {
-  pathName: string;
-  isRequiredAuth: boolean;
-  isAuthenticationRoute: boolean;
-};
+type TAuthGuardProps = PropsWithChildren<{}>;
 
-const AuthGuard: React.FC<PropsWithChildren<TAuthGuard>> = (props) => {
-  const { children, isRequiredAuth, isAuthenticationRoute, pathName } = props;
+const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   const router = useRouter();
   const { isAuthenticated, authInfoLoaded } = useAppSelector(
     (state) => state.auth,
   );
   const user = useAppSelector(currentUserSelector);
 
-  const currentUserLoaded = !!user.id;
-  const showEmailVerification =
-    currentUserLoaded && !user.attributes.emailVerified;
-  const isSignUpPath = pathName.includes(paths.SignUp);
+  const pathName = router.pathname;
+  const isNonRequireAuthenticationRoute =
+    NonRequireAuthenticationRoutes.includes(pathName);
+  const isSignUpPath = pathName === generalPaths.SignUp;
+  const showEmailVerification = !!user.id && !user.attributes.emailVerified;
   const shouldNavigateIfInSignUpFlow = isSignUpPath && !showEmailVerification;
 
   const homePageNavigateCondition =
-    // eslint-disable-next-line no-unneeded-ternary
     isAuthenticated &&
-    isAuthenticationRoute &&
+    isNonRequireAuthenticationRoute &&
     (!isSignUpPath || shouldNavigateIfInSignUpFlow);
 
   useEffect(() => {
     if (authInfoLoaded) {
-      if (homePageNavigateCondition) {
-        router.push(paths.HomePage);
-      }
-
-      if (isRequiredAuth && !isAuthenticated) {
-        router.push(paths.SignIn);
+      if (isNonRequireAuthenticationRoute) {
+        if (homePageNavigateCondition) {
+          router.push(generalPaths.Home);
+        }
+      } else if (!isAuthenticated) {
+        router.push(generalPaths.SignIn);
       }
     }
   }, [
     authInfoLoaded,
-    isAuthenticationRoute,
     isAuthenticated,
-    isRequiredAuth,
     router,
     homePageNavigateCondition,
+    isNonRequireAuthenticationRoute,
   ]);
 
   return <>{children}</>;
