@@ -4,16 +4,16 @@ import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
 import { EVENT_STATUS } from '../../helpers/constant';
-import css from './EventTile.module.scss';
-import EventTileContentItem from './EventTileContentItem';
-import EventTileStatus from './EventTileStatus';
+import css from './EventCard.module.scss';
+import EventCardContentItem from './EventCardContentItem';
+import EventCardStatus from './EventCardStatus';
 
-export type TEventTileProps = {
+export type TEventCardProps = {
   event: Event;
   index: number;
 };
 
-const EventTile: React.FC<TEventTileProps> = ({ event, index }) => {
+const EventCard: React.FC<TEventCardProps> = ({ event, index }) => {
   const status = event.resource?.status;
   const mealType = event.resource?.type;
   const startTime = event.start
@@ -37,33 +37,33 @@ const EventTile: React.FC<TEventTileProps> = ({ event, index }) => {
         [css.rootBlue]: !isExpired && index % 2 === 1,
         [css.rootOrange]: !isExpired && index % 2 === 0,
       })}>
-      <div className={css.eventTileHeader}>
-        <div className={css.eventTileTitleWrapper}>
+      <div className={css.eventCardHeader}>
+        <div className={css.eventCardTitleWrapper}>
           <div className={css.eventTitle}>#{event.title}</div>
           <div className={css.eventTime}>{startTime}</div>
         </div>
         <div className={css.mealType}>
-          <FormattedMessage id={`EventTile.mealType.${mealType}`} />
+          <FormattedMessage id={`EventCard.mealType.${mealType}`} />
         </div>
       </div>
-      <div className={css.eventTileContentWrapper}>
-        <EventTileStatus
+      <div className={css.eventCardContentWrapper}>
+        <EventCardStatus
           status={isExpired ? EVENT_STATUS.EXPIRED_STATUS : status}
         />
         {!isExpired && (
-          <EventTileContentItem>
+          <EventCardContentItem>
             <FormattedMessage
-              id="EventTile.remainTime"
+              id="EventCard.remainTime"
               values={{
                 hour: Math.abs(remainHours),
                 minute: Math.abs(remainMinutes),
               }}
             />
-          </EventTileContentItem>
+          </EventCardContentItem>
         )}
-        <EventTileContentItem>
+        <EventCardContentItem>
           <FormattedMessage
-            id="EventTile.deliveryAddress"
+            id="EventCard.deliveryAddress"
             values={{
               address: deliAddressObj.address,
               ward: deliAddressObj.ward,
@@ -71,11 +71,11 @@ const EventTile: React.FC<TEventTileProps> = ({ event, index }) => {
               city: deliAddressObj.city,
             }}
           />
-        </EventTileContentItem>
-        <EventTileContentItem>{restaurantObj.name}</EventTileContentItem>
+        </EventCardContentItem>
+        <EventCardContentItem>{restaurantObj.name}</EventCardContentItem>
       </div>
     </div>
   );
 };
 
-export default EventTile;
+export default EventCard;

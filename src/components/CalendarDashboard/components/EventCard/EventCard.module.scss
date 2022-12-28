@@ -38,25 +38,25 @@
   }
 }
 
-.eventTileHeader {
+.eventCardHeader {
   padding: 4px 8px;
   border-radius: 4px;
   color: $neutralGray1;
 }
 
-.rootBlue .eventTileHeader {
+.rootBlue .eventCardHeader {
   background-color: $secondaryBlue6;
 }
 
-.rootOrange .eventTileHeader {
+.rootOrange .eventCardHeader {
   background-color: $warningOrange7;
 }
 
-.rootExpired .eventTileHeader {
+.rootExpired .eventCardHeader {
   background-color: $neutralGray6;
 }
 
-.eventTileTitleWrapper {
+.eventCardTitleWrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -74,7 +74,7 @@
   @include textTemplate(12px, 400, 20px, '');
 }
 
-.eventTileContentWrapper {
+.eventCardContentWrapper {
   padding: 8px;
 }
 

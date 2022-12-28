@@ -1,12 +1,12 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 
-import css from './EventTile.module.scss';
+import css from './EventCard.module.scss';
 
-type TEventTileContentItemProps = PropsWithChildren<{
+type TEventCardContentItemProps = PropsWithChildren<{
   icon?: ReactNode;
 }>;
 
-const EventTileContentItem: React.FC<TEventTileContentItemProps> = ({
+const EventCardContentItem: React.FC<TEventCardContentItemProps> = ({
   icon,
   children,
 }) => {
@@ -18,4 +18,4 @@ const EventTileContentItem: React.FC<TEventTileContentItemProps> = ({
   );
 };
 
-export default EventTileContentItem;
+export default EventCardContentItem;
