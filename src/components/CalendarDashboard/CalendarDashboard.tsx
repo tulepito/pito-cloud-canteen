@@ -1,6 +1,7 @@
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { DateTime } from 'luxon';
+import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import type { Event, ViewsProps } from 'react-big-calendar';
 import { Calendar, luxonLocalizer, Views } from 'react-big-calendar';
@@ -8,18 +9,21 @@ import { Calendar, luxonLocalizer, Views } from 'react-big-calendar';
 import css from './CalendarDashboard.module.scss';
 import EventCard from './components/EventCard/EventCard';
 import createMonthViewWrapper from './components/MonthView/withMonthViewWrapper';
+import Toolbar from './components/Toolbar/Toolbar';
 import withWeekViewWrapper from './components/WeekView/withWeekViewWrapper';
 
 type TCalendarDashboard = {
   defaultDate?: Date;
   events?: Event[] | undefined;
   renderEvent?: React.FC<any>;
+  companyLogo?: ReactNode;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboard> = ({
   defaultDate: propsDefaultDate,
   events = [],
   renderEvent = EventCard,
+  companyLogo,
 }) => {
   const localizer = luxonLocalizer(DateTime);
 
@@ -49,6 +53,11 @@ const CalendarDashboard: React.FC<TCalendarDashboard> = ({
         localizer={localizer}
         events={events}
         views={views}
+        components={{
+          toolbar: (props: any) => (
+            <Toolbar {...props} companyLogo={companyLogo} />
+          ),
+        }}
       />
     </div>
   );

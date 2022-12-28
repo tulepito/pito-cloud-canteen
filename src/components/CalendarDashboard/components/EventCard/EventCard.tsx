@@ -1,3 +1,6 @@
+import IconClock from '@components/Icons/IconClock';
+import IconLocation from '@components/Icons/IconLocation';
+import IconShop from '@components/Icons/IconShop';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
@@ -51,7 +54,7 @@ const EventCard: React.FC<TEventCardProps> = ({ event, index }) => {
           status={isExpired ? EVENT_STATUS.EXPIRED_STATUS : status}
         />
         {!isExpired && (
-          <EventCardContentItem>
+          <EventCardContentItem icon={<IconClock />}>
             <FormattedMessage
               id="EventCard.remainTime"
               values={{
@@ -61,7 +64,7 @@ const EventCard: React.FC<TEventCardProps> = ({ event, index }) => {
             />
           </EventCardContentItem>
         )}
-        <EventCardContentItem>
+        <EventCardContentItem icon={<IconLocation />}>
           <FormattedMessage
             id="EventCard.deliveryAddress"
             values={{
@@ -72,7 +75,9 @@ const EventCard: React.FC<TEventCardProps> = ({ event, index }) => {
             }}
           />
         </EventCardContentItem>
-        <EventCardContentItem>{restaurantObj.name}</EventCardContentItem>
+        <EventCardContentItem icon={<IconShop />}>
+          {restaurantObj.name}
+        </EventCardContentItem>
       </div>
     </div>
   );

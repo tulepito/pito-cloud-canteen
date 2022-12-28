@@ -9,7 +9,11 @@ import css from './CalendarPage.module.scss';
 function CalendarPage() {
   return (
     <div className={css.root}>
-      <CalendarDashboard events={EVENTS_MOCKUP} renderEvent={EventCard} />
+      <CalendarDashboard
+        events={EVENTS_MOCKUP}
+        renderEvent={EventCard}
+        companyLogo="Chu"
+      />
     </div>
   );
 }

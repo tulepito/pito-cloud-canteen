@@ -29,3 +29,15 @@ export const DAY_IN_WEEK: TDayInWeek[] = [
   'saturday',
   'sunday',
 ];
+
+export const NAVIGATE: Record<string, string> = {
+  PREVIOUS: 'PREV',
+  NEXT: 'NEXT',
+  TODAY: 'TODAY',
+  DATE: 'DATE',
+};
+
+export const views: Record<string, string> = {
+  MONTH: 'month',
+  WEEK: 'week',
+};

@@ -103,9 +103,11 @@ WeekView.navigate = (
 };
 
 WeekView.title = (date: Date, { localizer }: { localizer: any }) => {
-  const [start, end] = WeekView.range(date, {
+  const [start, ...rest] = WeekView.range(date, {
     localizer,
   });
+  const end = rest[rest.length - 1];
+
   const isSameMonth = start.getMonth() === end.getMonth();
   const isSameYear = start.getFullYear() === end.getFullYear();
   if (isSameMonth) {
@@ -130,7 +132,7 @@ WeekView.title = (date: Date, { localizer }: { localizer: any }) => {
           id="Calendar.Week.title.diffMonth"
           values={{
             start: `${start.getDate()} Tháng ${start.getMonth() + 1}`,
-            end: `${end.getDate()} Tháng ${start.getMonth() + 1}`,
+            end: `${end.getDate()} Tháng ${end.getMonth() + 1}`,
             year: start.getFullYear(),
           }}
         />
@@ -146,8 +148,8 @@ WeekView.title = (date: Date, { localizer }: { localizer: any }) => {
             start.getMonth() + 1
           }, ${start.getFullYear()}`,
           end: `${end.getDate()} Tháng ${
-            start.getMonth() + 1
-          }, ${start.getFullYear()}`,
+            end.getMonth() + 1
+          }, ${end.getFullYear()}`,
         }}
       />
     </span>
