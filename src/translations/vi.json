@@ -99,7 +99,7 @@
   "EditCompanyForm.update": "Cập nhật",
   "AdminSidebar.homeLabel": "Trang chủ",
   "AdminSidebar.partnerLabel": "Đối tác",
-  "AdminSidebar.userLabel": "Quản lý nguời dùng",
+  "AdminSidebar.userLabel": "Quản lý người dùng",
   "EmailVerification.resendEmail": "Không nhận được email? {resendEmailLink}",
   "EmailVerification.resendEmailLinkText": "Gửi lại",
   "EmailVerification.toHomePageLinkText": "Về trang chủ",
