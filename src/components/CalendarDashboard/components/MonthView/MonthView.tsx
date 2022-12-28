@@ -1,62 +1,58 @@
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
+import { DAY_IN_WEEK } from '@components/CalendarDashboard/helpers/constant';
 import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
-import { useViewport } from '@hooks/useViewport';
+import classNames from 'classnames';
 import { DateTime } from 'luxon';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
 import { Navigate } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
-import DayColumn from '../DayColumn/DayColumn';
-import css from './WeekView.module.scss';
+import DayBox from '../DayBox/DayBox';
+import css from './MonthView.module.scss';
 
-const WEEK_DAYS_NUMBER = 7;
+const MONTH_DAY_NUMBER = 30;
 
-type TWeekViewProps = {
+type TMonthViewProps = {
   date: Date;
   localizer: any;
   range: any;
   accessors: any;
 } & TimeGridProps;
 
-type TWeekViewObject = {
+type TMonthViewObject = {
   range: any;
   navigate: any;
   title: any;
-  dayInWeek: number;
 };
 
-function WeekView({
+function MonthView({
   date,
   localizer,
   events = [],
-}: TWeekViewProps & TWeekViewObject) {
-  const {
-    viewport: { width },
-  } = useViewport();
+}: TMonthViewProps & TMonthViewObject) {
   const currRange = useMemo(
-    () => WeekView.range(date, { localizer }),
+    () => MonthView.range(date, { localizer }),
     [date, localizer],
   );
 
-  useEffect(() => {
-    if (width < 768) {
-      document
-        .querySelector(`#weekView`)
-        ?.scrollTo({ left: date.getDay() * (width - 66) });
-    } else if (width >= 768 && width < 1128) {
-      document
-        .querySelector(`#weekView`)
-        ?.scrollTo({ left: date.getDay() * (1440 / 7) });
-    }
-  }, [date, width]);
+  const currentDay = new Date().getDay();
 
   return (
-    <div className={css.root} id={`weekView`}>
+    <div className={css.root}>
       <div className={css.scrollContainer}>
+        {DAY_IN_WEEK.map((item, index) => (
+          <div
+            key={item}
+            className={classNames(css.dayInWeekHeader, {
+              [css.activeDayHeader]: currentDay === index + 1,
+            })}>
+            <FormattedMessage id={`MonthView.dayInWeekHeader.${item}`} />
+          </div>
+        ))}
         {currRange.map((item) => (
-          <DayColumn
+          <DayBox
             date={item}
             key={item.getTime()}
             events={getEventsInDate(item, events)}
@@ -67,9 +63,9 @@ function WeekView({
   );
 }
 
-WeekView.range = (date: Date, { localizer }: { localizer: any }) => {
+MonthView.range = (date: Date, { localizer }: { localizer: any }) => {
   const start = DateTime.fromJSDate(date).startOf('week').toJSDate();
-  const end = localizer.add(start, WEEK_DAYS_NUMBER - 1, 'day');
+  const end = localizer.add(start, MONTH_DAY_NUMBER - 1, 'day');
 
   let current = start;
   const range = [];
@@ -82,27 +78,25 @@ WeekView.range = (date: Date, { localizer }: { localizer: any }) => {
   return range;
 };
 
-WeekView.navigate = (
+MonthView.navigate = (
   date: Date,
   action: NavigateAction,
   { localizer }: { localizer: any },
 ) => {
   switch (action) {
     case Navigate.PREVIOUS:
-      return localizer.add(date, -WEEK_DAYS_NUMBER, 'day');
+      return localizer.add(date, -MONTH_DAY_NUMBER, 'day');
 
     case Navigate.NEXT:
-      return localizer.add(date, WEEK_DAYS_NUMBER, 'day');
+      return localizer.add(date, MONTH_DAY_NUMBER, 'day');
 
     default:
       return date;
   }
 };
 
-WeekView.title = (date: Date, { localizer }: { localizer: any }) => {
-  const [start, end] = WeekView.range(date, {
-    localizer,
-  });
+MonthView.title = (date: Date, { localizer }: { localizer: any }) => {
+  const [start, end] = MonthView.range(date, { localizer });
   const isSameMonth = start.getMonth() === end.getMonth();
   const isSameYear = start.getFullYear() === end.getFullYear();
   if (isSameMonth) {
@@ -151,4 +145,4 @@ WeekView.title = (date: Date, { localizer }: { localizer: any }) => {
   );
 };
 
-export default WeekView;
+export default MonthView;
