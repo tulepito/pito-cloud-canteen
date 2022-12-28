@@ -9,13 +9,8 @@ import {
 } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import { ECompanyStatus } from '@utils/enums';
-import bcrypt from 'bcryptjs';
+import CryptoJS from 'crypto-js';
 import type { NextApiRequest, NextApiResponse } from 'next';
-
-// SALT should be created ONE TIME upon sign up
-const salt = bcrypt.genSaltSync(10);
-// console.log(salt);
-// example =>  $2a$10$CwTycUXWue0Thq9StjUM0u => to be added always to the password hash
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -70,13 +65,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         queryParams,
       );
 
-    const hashedPassword = bcrypt.hashSync(dataParams.password, salt); // hash created previously created upon sign up
+    const encryptedPasswrod = CryptoJS.AES.encrypt(
+      dataParams.password,
+      process.env.ENCRYPT_PASSWORD_SECRET_KEY,
+    ).toString();
 
     // Update sub master account password
     await intergrationSdk.users.updateProfile({
       id: subAccount.id,
       privateData: {
-        accountPassword: hashedPassword,
+        accountPassword: encryptedPasswrod,
       },
     });
 

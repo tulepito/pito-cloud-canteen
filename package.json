@@ -20,6 +20,7 @@
     "bcryptjs": "^2.4.3",
     "classnames": "^2.3.2",
     "cookie": "^0.5.0",
+    "crypto-js": "^4.1.1",
     "decimal.js": "^10.4.3",
     "dotenv": "^16.0.3",
     "final-form": "^4.20.7",
