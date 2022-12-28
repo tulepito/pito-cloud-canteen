@@ -11,7 +11,7 @@ import Form from '@components/Form/Form';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useViewport } from '@hooks/useViewport';
-import { EImageVariants, PACKAGING_OPTIONS } from '@utils/enums';
+import { EImageVariants, OTHER_OPTION, PACKAGING_OPTIONS } from '@utils/enums';
 import type { TImage } from '@utils/types';
 import {
   autocompletePlaceSelected,
@@ -149,7 +149,7 @@ const EditPartnerBasicInfomationForm: React.FC<
       website,
       facebookLink,
       description,
-      packaging,
+      packaging: [...packaging, ...(packagingOther ? [OTHER_OPTION] : [])],
       minPrice,
       bankAccounts: bankAccounts || defaultBankAccounts,
       packagingOther,

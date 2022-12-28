@@ -4,6 +4,7 @@ import {
   createCompanyPageThunks,
 } from '@redux/slices/CreateCompanyPage.slice';
 import { isSignupEmailTakenError } from '@utils/errors';
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -17,7 +18,7 @@ export default function CreateCompanyPage() {
   const { createCompanyInProgress, createCompanyError } = useAppSelector(
     (state) => state.CreateCompanyPage,
   );
-
+  const router = useRouter();
   const onSubmit = async (values: TEditCompanyFormValues) => {
     const { location } = values;
     const {
@@ -47,12 +48,15 @@ export default function CreateCompanyPage() {
         tax: values.tax,
       },
     };
-    await dispatch(
+    const response = (await dispatch(
       createCompanyPageThunks.createCompany({
         dataParams: companyData,
         queryParams: { expand: true },
       }),
-    );
+    )) as any;
+    if (!response?.error) {
+      router.push('/admin/company');
+    }
   };
 
   const formErrorMessage = isSignupEmailTakenError(createCompanyError)

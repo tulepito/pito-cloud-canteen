@@ -209,8 +209,16 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                     className={classNames(css.field, css.availabilityTable)}>
                     <thead>
                       <tr>
-                        <th>NGÀY</th>
-                        <th>THỜI GIAN</th>
+                        <th>
+                          {intl.formatMessage({
+                            id: 'EditPartnerPreviewForm.day',
+                          })}
+                        </th>
+                        <th>
+                          {intl.formatMessage({
+                            id: 'EditPartnerPreviewForm.time',
+                          })}
+                        </th>
                       </tr>
                     </thead>
                     <tbody>

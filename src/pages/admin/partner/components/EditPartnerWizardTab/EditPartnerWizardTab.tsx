@@ -220,8 +220,11 @@ const EditPartnerWizardTab = (props: any) => {
       const initialValues = useMemo(() => {
         return {
           meals: meals || [],
-          categories: categories || [],
-          extraServices: extraServices || [],
+          categories:
+            [...categories, ...(categoriesOther ? [OTHER_OPTION] : [])] || [],
+          extraServices:
+            [...extraServices, ...(extraServicesOther ? [OTHER_OPTION] : [])] ||
+            [],
           hasOutsideMenuAndService: hasOutsideMenuAndService || 'yes',
           categoriesOther,
           extraServicesOther,

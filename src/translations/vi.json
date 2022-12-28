@@ -38,6 +38,8 @@
   "EditCompanyForm.companyAddressPlaceholder": "Nhập địa chỉ công ty",
   "EditCompanyForm.taxLabel": "Tax",
   "EditCompanyForm.taxPlaceholder": "Mã số thuế",
+  "EditCompanyForm.locationRequried": "Vui lòng nhập địa chỉ",
+  "EditCompanyForm.validLocation": "Địa chỉ không hợp lệ",
   "CreateCompanyPage.createCompanyEmailAlreadyTaken": "Email đã tồn tại",
   "CreateCompanyPage.createCompanyFailed": "Tạo tài khoản lỗi. Xin vui lòng thử lại.",
   "EditCompanyPage.updateCompanyFailed": "Cập nhật tài khoản lỗi. Xin vui lòng thử lại.",
@@ -259,7 +261,7 @@
   "EditPartnerMenuForm.extraServiceCheckboxLabel": "Dịch vụ thêm",
   "EditPartnerBasicInfomationForm.createBtn": "Thêm",
   "LocationAutocompleteInput.currentLocation": "Địa chỉ hiện tại",
-  "ManageCompanies.searchStatusLabel": "Chọn trạng thái",
+  "ManageCompanies.searchStatusLabel": "Trạng thái",
   "EditPartnerBasicInfomationForm.updateBtn": "Cập nhật",
   "EditPartnerLicenseForm.updateBtn": "Cập nhật",
   "EditPartnerLicenseForm.createBtn": "Thêm",
@@ -368,5 +370,7 @@
   "FieldBankAccounts.bankIdRequired": "Vui lòng chọn ngân hàng",
   "FieldBankAccounts.bankAgencyRequired": "Vui lòng nhập chi nhánh",
   "FieldBankAccounts.bankAccountNumberRequired": "Vui lòng nhập số tài khoản",
-  "FieldBankAccounts.bankOwnerNameRequired": "Vui lòng nhập tên tài khoản"
+  "FieldBankAccounts.bankOwnerNameRequired": "Vui lòng nhập tên tài khoản",
+  "EditPartnerPreviewForm.day": "Ngày",
+  "EditPartnerPreviewForm.time": "Thời gian"
 }

@@ -4,6 +4,8 @@ import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import {
+  autocompletePlaceSelected,
+  autocompleteSearchRequired,
   composeValidators,
   composeValidatorsWithAllValues,
   confirmPassword,
@@ -183,6 +185,18 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                 placeholder={intl.formatMessage({
                   id: 'EditCompanyForm.addressPlaceholder',
                 })}
+                validate={composeValidators(
+                  autocompleteSearchRequired(
+                    intl.formatMessage({
+                      id: 'EditCompanyForm.locationRequried',
+                    }),
+                  ),
+                  autocompletePlaceSelected(
+                    intl.formatMessage({
+                      id: 'EditCompanyForm.validLocation',
+                    }),
+                  ),
+                )}
               />
             </div>
             {!isEditting && (
