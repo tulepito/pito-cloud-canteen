@@ -8,7 +8,7 @@ import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
 import { Navigate } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
-import DayColumn from '../DayColumn/DayColumn';
+import WDayItem from '../DayItem/WDayItem';
 import css from './WeekView.module.scss';
 
 const WEEK_DAYS_NUMBER = 7;
@@ -18,6 +18,7 @@ type TWeekViewProps = {
   localizer: any;
   range: any;
   accessors: any;
+  renderEvent?: React.FC<any>;
 } & TimeGridProps;
 
 type TWeekViewObject = {
@@ -31,6 +32,7 @@ function WeekView({
   date,
   localizer,
   events = [],
+  renderEvent,
 }: TWeekViewProps & TWeekViewObject) {
   const {
     viewport: { width },
@@ -56,10 +58,11 @@ function WeekView({
     <div className={css.root} id={`weekView`}>
       <div className={css.scrollContainer}>
         {currRange.map((item) => (
-          <DayColumn
+          <WDayItem
             date={item}
             key={item.getTime()}
             events={getEventsInDate(item, events)}
+            renderEvent={renderEvent}
           />
         ))}
       </div>
@@ -100,9 +103,11 @@ WeekView.navigate = (
 };
 
 WeekView.title = (date: Date, { localizer }: { localizer: any }) => {
-  const [start, end] = WeekView.range(date, {
+  const [start, ...rest] = WeekView.range(date, {
     localizer,
   });
+  const end = rest[rest.length - 1];
+
   const isSameMonth = start.getMonth() === end.getMonth();
   const isSameYear = start.getFullYear() === end.getFullYear();
   if (isSameMonth) {
@@ -127,7 +132,7 @@ WeekView.title = (date: Date, { localizer }: { localizer: any }) => {
           id="Calendar.Week.title.diffMonth"
           values={{
             start: `${start.getDate()} Tháng ${start.getMonth() + 1}`,
-            end: `${end.getDate()} Tháng ${start.getMonth() + 1}`,
+            end: `${end.getDate()} Tháng ${end.getMonth() + 1}`,
             year: start.getFullYear(),
           }}
         />
@@ -143,8 +148,8 @@ WeekView.title = (date: Date, { localizer }: { localizer: any }) => {
             start.getMonth() + 1
           }, ${start.getFullYear()}`,
           end: `${end.getDate()} Tháng ${
-            start.getMonth() + 1
-          }, ${start.getFullYear()}`,
+            end.getMonth() + 1
+          }, ${end.getFullYear()}`,
         }}
       />
     </span>

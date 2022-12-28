@@ -4,13 +4,13 @@ import { FormattedMessage } from 'react-intl';
 
 import { EVENT_STATUS } from '../../helpers/constant';
 import type { TEventStatus } from '../../helpers/types';
-import css from './EventTile.module.scss';
+import css from './EventCard.module.scss';
 
-type TEventTileStatusProps = {
+type TEventCardStatusProps = {
   status: TEventStatus;
 };
 
-const EventTileStatus: React.FC<TEventTileStatusProps> = ({ status }) => {
+const EventCardStatus: React.FC<TEventCardStatusProps> = ({ status }) => {
   return (
     <div
       className={classNames(css.status, {
@@ -24,4 +24,4 @@ const EventTileStatus: React.FC<TEventTileStatusProps> = ({ status }) => {
   );
 };
 
-export default EventTileStatus;
+export default EventCardStatus;

@@ -60,6 +60,8 @@ export type TReverseMapFromEnum<T> = T[keyof T];
 export type TIconProps = {
   className?: string;
   rootClassName?: string;
+  width?: number;
+  height?: number;
   onClick?: () => void;
 };
 
