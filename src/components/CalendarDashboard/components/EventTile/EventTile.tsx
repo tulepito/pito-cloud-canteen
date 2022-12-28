@@ -8,7 +8,7 @@ import css from './EventTile.module.scss';
 import EventTileContentItem from './EventTileContentItem';
 import EventTileStatus from './EventTileStatus';
 
-type TEventTileProps = {
+export type TEventTileProps = {
   event: Event;
   index: number;
 };

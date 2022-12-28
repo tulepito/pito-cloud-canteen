@@ -7,15 +7,16 @@ import DayBoxFooter from './DayBoxFooter';
 type TDayBoxProps = {
   date: Date;
   events?: Event[];
+  renderEvent?: React.FC<any>;
 };
 
-const DayBox: React.FC<TDayBoxProps> = ({ date, events = [] }) => {
+const DayBox: React.FC<TDayBoxProps> = ({ date, events = [], renderEvent }) => {
   const currentDay = new Date().getDate();
   const isCurrentDay = currentDay === date.getDate();
 
   return (
     <div className={css.root}>
-      <DayBoxContent events={events} />
+      <DayBoxContent events={events} renderEvent={renderEvent} />
       <DayBoxFooter date={date} isCurrentDay={isCurrentDay} />
     </div>
   );

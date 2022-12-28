@@ -19,6 +19,7 @@ type TMonthViewProps = {
   localizer: any;
   range: any;
   accessors: any;
+  renderEvent?: React.FC<any>;
 } & TimeGridProps;
 
 type TMonthViewObject = {
@@ -31,6 +32,7 @@ function MonthView({
   date,
   localizer,
   events = [],
+  renderEvent,
 }: TMonthViewProps & TMonthViewObject) {
   const currRange = useMemo(
     () => MonthView.range(date, { localizer }),
@@ -56,6 +58,7 @@ function MonthView({
             date={item}
             key={item.getTime()}
             events={getEventsInDate(item, events)}
+            renderEvent={renderEvent}
           />
         ))}
       </div>

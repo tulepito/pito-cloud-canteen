@@ -1,29 +1,22 @@
 import type { Event } from 'react-big-calendar';
 
-import EventTile from '../EventTile/EventTile';
 import css from './DayBox.module.scss';
 
 type TDayBoxContentProps = {
   events: Event[];
+  renderEvent?: React.FC<any>;
 };
 
-const DayBoxContent: React.FC<TDayBoxContentProps> = ({ events }) => {
-  // const groupEvents = getEventsInPeriod({ events });
-
+const DayBoxContent: React.FC<TDayBoxContentProps> = ({
+  events,
+  renderEvent: EventRender,
+}) => {
   return (
     <div className={css.dayContent}>
-      {/* {DAY_SESSIONS.filter((session) => groupEvents[session]?.length > 0).map(
-        (session) => (
-          <DaySession
-            key={session}
-            session={session}
-            groupEvents={groupEvents[session]}
-          />
-        ),
-      )} */}
-      {events.map((event, index) => (
-        <EventTile key={event.resource?.id} event={event} index={index} />
-      ))}
+      {EventRender &&
+        events.map((event, index) => (
+          <EventRender key={event.resource?.id} event={event} index={index} />
+        ))}
     </div>
   );
 };

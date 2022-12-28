@@ -6,27 +6,33 @@ import type { Event, ViewsProps } from 'react-big-calendar';
 import { Calendar, luxonLocalizer, Views } from 'react-big-calendar';
 
 import css from './CalendarDashboard.module.scss';
-import MonthView from './components/MonthView/MonthView';
-import WeekView from './components/WeekView/WeekView';
+import EventTile from './components/EventTile/EventTile';
+import createMonthViewWrapper from './components/MonthView/withMonthViewWrapper';
+import withWeekViewWrapper from './components/WeekView/withWeekViewWrapper';
 
 type TCalendarDashboard = {
   defaultDate?: Date;
   events?: Event[] | undefined;
+  renderEvent?: React.FC<any>;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboard> = ({
   defaultDate: propsDefaultDate,
   events = [],
+  renderEvent = EventTile,
 }) => {
   const localizer = luxonLocalizer(DateTime);
+
+  const MonthViewWrapper = createMonthViewWrapper(renderEvent);
+  const WeekViewWrapper = withWeekViewWrapper(renderEvent);
 
   const { defaultDate, views } = useMemo(
     () => ({
       defaultDate:
         propsDefaultDate || DateTime.now().startOf('week').toJSDate(),
       views: {
-        month: MonthView as any,
-        week: WeekView as any,
+        month: MonthViewWrapper as any,
+        week: WeekViewWrapper as any,
       } as ViewsProps,
     }),
     // If you guys want to update defaultDate for calendar when props.propsDefaultDate

@@ -18,6 +18,7 @@ type TWeekViewProps = {
   localizer: any;
   range: any;
   accessors: any;
+  renderEvent?: React.FC<any>;
 } & TimeGridProps;
 
 type TWeekViewObject = {
@@ -31,6 +32,7 @@ function WeekView({
   date,
   localizer,
   events = [],
+  renderEvent,
 }: TWeekViewProps & TWeekViewObject) {
   const {
     viewport: { width },
@@ -60,6 +62,7 @@ function WeekView({
             date={item}
             key={item.getTime()}
             events={getEventsInDate(item, events)}
+            renderEvent={renderEvent}
           />
         ))}
       </div>
