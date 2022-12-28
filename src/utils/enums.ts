@@ -114,5 +114,4 @@ export enum EUserPermission {
 export const startRouteBaseOnPermission = {
   [EUserPermission.company]: '/company',
   [EUserPermission.admin]: '/admin',
-  [EUserPermission.normal]: '',
 };

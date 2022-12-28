@@ -1,8 +1,7 @@
 import { types as sdkTypes } from '@sharetribe/sdk';
 import queryString from 'query-string';
 
-import type { EUserPermission } from './enums';
-import { startRouteBaseOnPermission } from './enums';
+import { EUserPermission, startRouteBaseOnPermission } from './enums';
 
 const { LatLng, LatLngBounds } = sdkTypes;
 
@@ -239,8 +238,16 @@ export const isPathMatchedPermission = (
   pathName: string,
   permission: EUserPermission,
 ) => {
-  const startPath = startRouteBaseOnPermission[permission];
-  const isMatched = pathName.startsWith(startPath);
+  let isMatched;
+
+  if (permission !== EUserPermission.normal) {
+    const startPath = startRouteBaseOnPermission[permission];
+    isMatched = pathName.startsWith(startPath);
+  } else {
+    isMatched = Object.values(startRouteBaseOnPermission).every((item) => {
+      return !pathName.startsWith(item);
+    });
+  }
 
   return isMatched;
 };
