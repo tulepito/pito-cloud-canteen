@@ -1,4 +1,5 @@
 import getAdminAccount from '@services/getAdminAccount';
+import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import subAccountLogin from '@services/subAccountLogin';
@@ -9,6 +10,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HTTP_METHODS } from '../helpers/constants';
 
+const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
   const integrationSdk = getIntegrationSdk();
@@ -20,27 +22,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       try {
         const { companyId, ...rest } = req.body;
         const adminAccount = await getAdminAccount();
-
-        const { sequenceId } = adminAccount.attributes.profile.metadata;
-        const companyAccountResponse = await integrationSdk.users.show(
-          { id: companyId },
-          { expand: true },
-        );
-        const companyAccount = denormalisedResponseEntities(
-          companyAccountResponse,
-        )[0];
+        const { currentOrderNumber } = adminAccount.attributes.profile.metadata;
+        await integrationSdk.users.updateProfile({
+          id: ADMIN_ID,
+          metadata: {
+            currentOrderNumber: currentOrderNumber + 1,
+          },
+        });
+        const companyAccount = await fetchUser(companyId);
         const { subAccountId } = companyAccount.attributes.profile.privateData;
-
-        const subCompanyAccountResponse = await integrationSdk.users.show(
-          { id: subAccountId },
-          { expand: true },
-        );
-        const subCompanyAccount = denormalisedResponseEntities(
-          subCompanyAccountResponse,
-        )[0];
+        const subCompanyAccount = await fetchUser(subAccountId);
         const loggedinSubAccount = await subAccountLogin(subCompanyAccount);
-
-        const generatedOrderId = `PT${(sequenceId + 1)
+        const generatedOrderId = `PT${(currentOrderNumber + 1)
           .toString()
           .padStart(5, '0')}`;
         const draftedOrderListinResponse =
@@ -50,8 +43,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const draftedOrderListing = denormalisedResponseEntities(
           draftedOrderListinResponse,
         )[0];
-        const updatedDraftOrderListingResponse = integrationSdk.listings.update(
-          {
+        const updatedDraftOrderListingResponse =
+          await integrationSdk.listings.update({
             id: draftedOrderListing.id.uuid,
             metadata: {
               companyId,
@@ -60,8 +53,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 ...rest,
               },
             },
-          },
-        );
+          });
         const updatedDraftOrderListing = denormalisedResponseEntities(
           updatedDraftOrderListingResponse,
         )[0];
