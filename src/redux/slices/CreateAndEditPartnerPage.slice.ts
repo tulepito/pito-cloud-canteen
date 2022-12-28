@@ -281,6 +281,7 @@ const createDraftPartner = createAsyncThunk(
       const { listing, user } = data;
       return fulfillWithValue({ listing, user });
     } catch (error: any) {
+      console.error(error);
       return rejectWithValue(storableError(error.response.data));
     }
   },
@@ -339,7 +340,8 @@ const updatePartnerRestaurantListing = createAsyncThunk(
           expand: true,
         },
       });
-      return fulfillWithValue(data);
+      const [partnerListingRef] = denormalisedResponseEntities(data);
+      return fulfillWithValue(partnerListingRef);
     } catch (error) {
       console.error(error);
       return rejectWithValue(storableError(error));
@@ -616,10 +618,11 @@ export const createAndEditPartnerSlice = createSlice({
           createDraftPartnerError: null,
         };
       })
-      .addCase(createDraftPartner.fulfilled, (state) => {
+      .addCase(createDraftPartner.fulfilled, (state, action) => {
         return {
           ...state,
           createDraftPartnerInProgress: false,
+          partnerListingRef: action.payload.listing,
         };
       })
       .addCase(createDraftPartner.rejected, (state, action) => {
@@ -657,10 +660,11 @@ export const createAndEditPartnerSlice = createSlice({
           updatePartnerListingError: null,
         };
       })
-      .addCase(updatePartnerRestaurantListing.fulfilled, (state) => {
+      .addCase(updatePartnerRestaurantListing.fulfilled, (state, action) => {
         return {
           ...state,
           updatePartnerListingInProgress: false,
+          partnerListingRef: action.payload,
         };
       })
       .addCase(updatePartnerRestaurantListing.rejected, (state, action) => {

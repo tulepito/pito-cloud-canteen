@@ -108,7 +108,7 @@ const EditPartnerBasicInfomationForm: React.FC<
     companyName,
     contactorName,
     website,
-    packaging,
+    packaging = [],
     availabilityApplyType,
     facebookLink,
     minPrice,

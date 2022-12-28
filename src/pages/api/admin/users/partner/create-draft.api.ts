@@ -9,6 +9,11 @@ import {
   handleError,
 } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
+import {
+  EListingStates,
+  EListingType,
+  ERestaurantListingStatus,
+} from '@utils/enums';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -26,11 +31,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         return;
       }
     }
+
     const { userParams = {}, listingParams = {} } = req.body;
 
     const { userDataParams, userQueryParams } = userParams;
     const { listingDataParams, listingQueryParams } = listingParams;
-
     const sdk = getSdk(req, res);
     const integrationSdk = getIntegrationSdk();
     // Create company account
@@ -46,8 +51,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         authorId: createdPartner?.id?.uuid,
         state: 'published',
         metadata: {
-          listingState: 'draft',
-          listingType: 'restaurant',
+          listingState: EListingStates.draft,
+          listingType: EListingType.restaurant,
+          status: ERestaurantListingStatus.new,
         },
       },
       listingQueryParams,

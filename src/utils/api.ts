@@ -54,10 +54,13 @@ export const publishDraftPartnerApi = (body: any) =>
   post('/api/admin/users/partner/publish-draft', body);
 
 export const deletePartnerApi = (body: any) =>
-  post('/api/admin/users/partner/delete', body);
+  post('/api/admin/users/partner/delete-partner', body);
 
 export const showRestaurantApi = ({ id, ...rest }: any) =>
   post(`/api/admin/listings/restaurant/${id}`, rest);
 
 export const queryRestaurantListingsApi = (body: any) =>
   post('/api/admin/listings/restaurant/query', body);
+
+export const updateRestaurantStatusApi = (body: any) =>
+  post('/api/admin/listings/restaurant/status', body);

@@ -13,30 +13,70 @@
   overflow: hidden;
 }
 
+.badge {
+  max-width: 100px;
+  padding: 5px 5px;
+  border-radius: 5px;
+  font-size: 12px;
+  text-align: center;
+  font-weight: $fontWeightSemiBold;
+}
+
+.unsatisfactoryBox {
+  background-color: $secondaryBlue1;
+  color: $secondaryBlue6;
+}
+
+.newBox {
+  background-color: $warningOrange1;
+  color: $warningOrange5;
+}
+
+.authorizedBox {
+  background-color: $successScreen3;
+  color: $successScreen8;
+}
+
 .rowId {
+  max-width: 100px;
   -webkit-line-clamp: 1; /* number of lines to show */
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  width: 50px;
+  min-height: 50px;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: transparent;
+  svg {
+    width: 20px;
+  }
+  &:hover {
+    background-color: $neutralGray5;
+  }
 }
 
 .tableActions {
   display: flex;
   align-items: center;
+  flex-direction: column;
+  row-gap: 5px;
+}
 
-  column-gap: 10px;
-  .actionButton {
-    display: flex;
-    align-items: center;
-    width: 50px;
-    min-height: 50px;
-    justify-content: center;
-    border-radius: 50%;
-    background-color: transparent;
-    svg {
-      width: 20px;
-    }
-    &:hover {
-      background-color: $neutralGray5;
-    }
+.actionBtn {
+  min-height: unset;
+  font-size: 12px;
+  color: $warningOrange8;
+  margin: 0;
+  &:hover {
+    color: $matterColorDark;
   }
+}
+
+.loadingIcon {
+  stroke: $matterColor;
 }
 
 .filterWrapper {

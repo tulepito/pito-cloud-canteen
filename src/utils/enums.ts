@@ -111,6 +111,12 @@ export enum ERestaurantListingState {
   deleted = 'deleted',
 }
 
+export enum ERestaurantListingStatus {
+  new = 'new',
+  authorized = 'authorized',
+  unsatisfactory = 'unsatisfactory',
+}
+
 export const OTHER_OPTION = 'other';
 
 export const LIST_BANKS = [

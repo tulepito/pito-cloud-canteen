@@ -372,5 +372,11 @@
   "FieldBankAccounts.bankAccountNumberRequired": "Vui lòng nhập số tài khoản",
   "FieldBankAccounts.bankOwnerNameRequired": "Vui lòng nhập tên tài khoản",
   "EditPartnerPreviewForm.day": "Ngày",
-  "EditPartnerPreviewForm.time": "Thời gian"
+  "EditPartnerPreviewForm.time": "Thời gian",
+  "ManagePartnersPage.newStatus": "Mới",
+  "ManagePartnersPage.authorizedStatus": "Đã xác thực",
+  "ManagePartnersPage.unsatisfactoryStatus": "Không đạt yêu cầu",
+  "ManagePartners.authorizeBtn": "Xác thực",
+  "ManagePartners.unsatisfactoryBtn": "Không đạt yêu cầu",
+  "ManagePartners.deleteBtn": "Xóa đối tác"
 }

@@ -47,15 +47,17 @@ const CreatePartnerPage: React.FC<any> = () => {
 
   const intl = useIntl();
 
-  const formError = {
-    message: isSignupEmailTakenError(createDraftPartnerError)
-      ? intl.formatMessage({
-          id: 'CreateCompanyPage.createCompanyEmailAlreadyTaken',
-        })
-      : intl.formatMessage({
-          id: 'CreateCompanyPage.createCompanyFailed',
-        }),
-  };
+  const formError = createDraftPartnerError
+    ? {
+        message: isSignupEmailTakenError(createDraftPartnerError)
+          ? intl.formatMessage({
+              id: 'CreateCompanyPage.createCompanyEmailAlreadyTaken',
+            })
+          : intl.formatMessage({
+              id: 'CreateCompanyPage.createCompanyFailed',
+            }),
+      }
+    : null;
 
   return (
     <EditPartnerWizard

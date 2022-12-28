@@ -1,7 +1,7 @@
 import { ALL_WEEK_APPLY } from '@components/FieldAvailability/FieldAvailability';
 import { getDefaultTimeZoneOnBrowser } from '@utils/dates';
-import { EDayOfWeek } from '@utils/enums';
-import type { TAvailabilityPlan } from '@utils/types';
+import { EDayOfWeek, OTHER_OPTION } from '@utils/enums';
+import type { TAvailabilityPlan, TOwnListing } from '@utils/types';
 
 export const defaultTimeZone = () =>
   typeof window !== 'undefined' ? getDefaultTimeZoneOnBrowser() : 'Etc/UTC';
@@ -17,7 +17,7 @@ const getUniqueImages = (images: any[]) => {
   return resArr;
 };
 
-const getRemovedOtherField = (arr: string[]) =>
+const getDataWithRemovedOtherField = (arr: string[]) =>
   arr.filter((item: string) => item !== 'other');
 
 // Create entries from submit values
@@ -85,13 +85,52 @@ const createAvailabilityPlanFromAllWeekEntries = (
   return createAvailabilityPlan(availabilityPlan);
 };
 
-export const createSubmitUpdatePartnerValues = (values: any) => {
+const getListWithNewOtherValues = (
+  newOtherValue: string,
+  oldOtherValue: string,
+  list: string[],
+  hasOtherValueInList: boolean,
+) => {
+  const newList = [...list];
+
+  const oldOtherItemIndex = newList.indexOf(oldOtherValue);
+  if (!hasOtherValueInList && oldOtherItemIndex >= 0) {
+    newList.splice(oldOtherItemIndex, 1);
+    return newList;
+  }
+
+  const otherValueIndex = newList.findIndex(
+    (str: string) => str === newOtherValue,
+  );
+
+  const notChange = newOtherValue === oldOtherValue;
+  // otherValueIndex >= 0 is value not change => don't need to update
+  //! otherValue is other is null => don't need to add
+
+  if (otherValueIndex >= 0 || !newOtherValue || notChange) {
+    return newList;
+  }
+
+  // replace old other value to new other value
+
+  if (oldOtherItemIndex >= 0) {
+    newList[oldOtherItemIndex] = newOtherValue;
+  } else {
+    newList.push(newOtherValue);
+  }
+  return newList;
+};
+
+export const createSubmitUpdatePartnerValues = (
+  values: any,
+  partnerListingRef: TOwnListing,
+) => {
   const {
     id,
     title,
     location,
     availabilityPlan,
-    packaging,
+    packaging = [],
     website,
     description,
     contactorName,
@@ -110,9 +149,14 @@ export const createSubmitUpdatePartnerValues = (values: any) => {
     packagingOther,
   } = values;
 
+  const oldPackagingOtherValue =
+    partnerListingRef?.attributes?.publicData?.packagingOther;
+
   const {
     selectedPlace: { address, origin },
   } = location || {};
+
+  const packagingHasOtherValue = packaging.includes(OTHER_OPTION);
 
   const submittedValues = {
     id,
@@ -134,8 +178,17 @@ export const createSubmitUpdatePartnerValues = (values: any) => {
     publicData: {
       location: { address },
       minPrice,
-      packaging: getRemovedOtherField([...packaging, packagingOther]),
-      packagingOther,
+      packaging: getDataWithRemovedOtherField(
+        getListWithNewOtherValues(
+          packagingOther,
+          oldPackagingOtherValue,
+          packaging,
+          packagingHasOtherValue,
+        ),
+      ),
+      ...(packagingHasOtherValue
+        ? { packagingOther }
+        : { packagingOther: null }),
       website,
       facebookLink,
       contactorName,
@@ -161,7 +214,7 @@ export const createSubmitCreatePartnerValues = (values: any) => {
     password,
     location,
     availabilityPlan,
-    packaging,
+    packaging = [],
     website,
     description,
     contactorName,
@@ -207,7 +260,11 @@ export const createSubmitCreatePartnerValues = (values: any) => {
     publicData: {
       location: { address },
       minPrice,
-      packaging: getRemovedOtherField([...packaging, packagingOther]),
+      packaging: getDataWithRemovedOtherField([
+        ...packaging,
+        ...(packagingOther ? [packagingOther] : []),
+      ]),
+      ...(packagingOther ? { packagingOther } : { packagingOther: null }),
       website,
       facebookLink,
       contactorName,
@@ -264,28 +321,53 @@ export const createSubmitLicenseTabValues = (values: any) => {
   return submitValues;
 };
 
-export const createSubmitMenuTabValues = (values: any) => {
+export const createSubmitMenuTabValues = (
+  values: any,
+  partnerListingRef: TOwnListing,
+) => {
   const {
     id,
     meals,
-    categories,
+    categories = [],
     categoriesOther,
-    extraServices,
+    extraServices = [],
     extraServicesOther,
     hasOutsideMenuAndService,
   } = values;
+  const oldCategoriesOtherValue =
+    partnerListingRef?.attributes?.publicData?.categoriesOther;
+  const oldExtraServicesOtherValue =
+    partnerListingRef?.attributes?.publicData?.extraServicesOther;
+
+  const categoriesHasOtherValue = categories.includes(OTHER_OPTION);
+  const extraServicesHasOtherValue = extraServices.includes(OTHER_OPTION);
 
   const submitValues = {
     id,
     publicData: {
       meals,
-      categories: getRemovedOtherField([...categories, categoriesOther]),
-      extraServices: getRemovedOtherField([
-        ...extraServices,
-        extraServicesOther,
-      ]),
-      extraServicesOther,
-      categoriesOther,
+      categories: getDataWithRemovedOtherField(
+        getListWithNewOtherValues(
+          categoriesOther,
+          oldCategoriesOtherValue,
+          categories,
+          categoriesHasOtherValue,
+        ),
+      ),
+      extraServices: getDataWithRemovedOtherField(
+        getListWithNewOtherValues(
+          extraServicesOther,
+          oldExtraServicesOtherValue,
+          extraServices,
+          extraServicesHasOtherValue,
+        ),
+      ),
+      ...(extraServicesHasOtherValue
+        ? { extraServicesOther }
+        : { extraServicesOther: null }),
+      ...(categoriesHasOtherValue
+        ? { categoriesOther }
+        : { categoriesOther: null }),
       hasOutsideMenuAndService,
     },
   };

@@ -3,7 +3,6 @@
 import cookies from '@services/cookie';
 import adminChecker from '@services/permissionChecker/admin';
 import { deserialize, getIntegrationSdk, handleError } from '@services/sdk';
-import { denormalisedResponseEntities } from '@utils/data';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -21,47 +20,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         return;
       }
     }
-    const { id } = req.body;
-    const integrationSdk = getIntegrationSdk();
-    // Create company account
-
-    const updatedPartnerResponse = await integrationSdk.users.updateProfile(
+    const { dataParams, queryParams = {} } = req.body;
+    const { id, status } = dataParams;
+    const intergrationSdk = getIntegrationSdk();
+    const response = await intergrationSdk.listings.update(
       {
         id,
         metadata: {
-          userState: 'deleted',
+          status,
         },
       },
-      {
-        expand: true,
-      },
+      queryParams,
     );
-
-    const [updatedPartner] = denormalisedResponseEntities(
-      updatedPartnerResponse,
-    );
-
-    const listingId =
-      updatedPartner?.attributes?.profile?.metadata?.restaurantListingId;
-
-    let restaurantListingResponse = null;
-    if (listingId) {
-      restaurantListingResponse = await integrationSdk.listings.update(
-        {
-          id: listingId,
-          metadata: {
-            listingState: 'deleted',
-          },
-        },
-        { expand: true },
-      );
-    }
-
-    res.json({
-      user: updatedPartnerResponse,
-      listing: restaurantListingResponse,
-    });
+    res.json(response);
   } catch (error) {
+    console.log(error);
     handleError(res, error);
   }
 }

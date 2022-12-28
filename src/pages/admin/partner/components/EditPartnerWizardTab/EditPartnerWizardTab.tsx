@@ -83,7 +83,7 @@ const EditPartnerWizardTab = (props: any) => {
         // if has fet listing ref => update() nor create()
         const { payload } = partnerListingRef
           ? await onUpdatePartnerListing(
-              createSubmitUpdatePartnerValues(submitValues),
+              createSubmitUpdatePartnerValues(submitValues, partnerListingRef),
             )
           : await onCreateDraftPartner(
               createSubmitCreatePartnerValues(submitValues),
@@ -192,10 +192,13 @@ const EditPartnerWizardTab = (props: any) => {
     case MENU_TAB: {
       const handleSubmitMenuTabValues = async (values: any) => {
         await onUpdatePartnerListing(
-          createSubmitMenuTabValues({
-            ...values,
-            id: partnerListingRef?.id?.uuid,
-          }),
+          createSubmitMenuTabValues(
+            {
+              ...values,
+              id: partnerListingRef?.id?.uuid,
+            },
+            partnerListingRef,
+          ),
         );
         if (partnerListingRef && isDraftFlow) {
           return redirectAfterDraftUpdate(
@@ -220,11 +223,12 @@ const EditPartnerWizardTab = (props: any) => {
       const initialValues = useMemo(() => {
         return {
           meals: meals || [],
-          categories:
-            [...categories, ...(categoriesOther ? [OTHER_OPTION] : [])] || [],
-          extraServices:
-            [...extraServices, ...(extraServicesOther ? [OTHER_OPTION] : [])] ||
-            [],
+          categories: categories
+            ? [...categories, ...(categoriesOther ? [OTHER_OPTION] : [])]
+            : [],
+          extraServices: extraServices
+            ? [...extraServices, ...(extraServicesOther ? [OTHER_OPTION] : [])]
+            : [],
           hasOutsideMenuAndService: hasOutsideMenuAndService || 'yes',
           categoriesOther,
           extraServicesOther,
@@ -301,19 +305,18 @@ const EditPartnerWizardTab = (props: any) => {
         };
       }, []);
 
-      const handleSubmitPreviewForm = async () => {
+      const handleSubmitPreviewForm = () => {
         const params = {
           id: partnerListingRef?.author?.id?.uuid,
         };
-        await onPublishDraftPartner(params);
+        return onPublishDraftPartner(params);
       };
 
-      const handleDiscardDraftPartner = async () => {
+      const handleDiscardDraftPartner = () => {
         const params = {
           id: partnerListingRef?.author?.id?.uuid,
         };
-        await onPublishDraftPartner(params);
-        onDiscardDraftPartner(params);
+        return onDiscardDraftPartner(params);
       };
       return (
         <EditPartnerPreviewForm

@@ -2,7 +2,7 @@ import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconAdd from '@components/IconAdd/IconAdd';
 import IconEdit from '@components/IconEdit/IconEdit';
-import IconEye from '@components/IconEye/IconEye';
+import IconSpinner from '@components/IconSpinner/IconSpinner';
 import Meta from '@components/Layout/Meta';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import SelectSingleFilterPopup from '@components/SelectSingleFilterPopup/SelectSingleFilterPopup';
@@ -10,14 +10,13 @@ import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { managePartnerThunks } from '@redux/slices/ManagePartnersPage.slice';
-import { EListingStates, ERestaurantListingState } from '@utils/enums';
+import { EListingStates, ERestaurantListingStatus } from '@utils/enums';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { PREVIEW_TAB } from './components/EditPartnerWizard/EditPartnerWizard';
 import KeywordSearchForm from './components/KeywordSearchForm/KeywordSearchForm';
 import css from './ManagePartners.module.scss';
 
@@ -73,32 +72,112 @@ const TABLE_COLUMN: TColumn[] = [
     },
   },
   {
-    key: 'action',
+    key: 'status',
+    label: 'Trạng thái',
+    render: (data: any) => {
+      const isUnsatisfactory =
+        data.status === ERestaurantListingStatus.unsatisfactory;
+      const isAuthorized = data.status === ERestaurantListingStatus.authorized;
+      const isNew =
+        !data.status || data.status === ERestaurantListingStatus.new;
+
+      const classses = classNames(css.rowText, css.badge, {
+        [css.unsatisfactoryBox]: isUnsatisfactory,
+        [css.authorizedBox]: isAuthorized,
+        [css.newBox]: isNew,
+      });
+      return (
+        <div className={classses}>
+          <FormattedMessage
+            id={`ManagePartnersPage.${
+              data.status || ERestaurantListingStatus.new
+            }Status`}
+          />
+        </div>
+      );
+    },
+  },
+  {
+    key: 'view',
     label: '',
     render: (data: any) => {
       return (
+        <Link href={`/admin/partner/${data.id}/edit`}>
+          <InlineTextButton
+            className={classNames(css.actionButton, css.editButton)}>
+            <IconEdit />
+          </InlineTextButton>
+        </Link>
+      );
+    },
+  },
+  {
+    key: 'action',
+    label: '',
+    render: (data: any) => {
+      const setAuthorizeHandle = () => {
+        data.onSetAuthorized(data.id);
+      };
+
+      const setUnsatisfactoryHandle = () => {
+        data.onSetUnsatisfactory(data.id);
+      };
+
+      const deleteHandle = () => {
+        data.onDeleteRestaurant({
+          partnerId: data.authorId,
+          restaurantId: data.id,
+        });
+      };
+
+      const isUnsatisfactory =
+        data.status === ERestaurantListingStatus.unsatisfactory;
+      const isAuthorized = data.status === ERestaurantListingStatus.authorized;
+      const isNew =
+        !data.status || data.status === ERestaurantListingStatus.new;
+
+      return (
         <div className={css.tableActions}>
-          <Link href={`/admin/partner/${data.id}/edit`}>
-            <InlineTextButton
-              className={classNames(css.actionButton, css.editButton)}>
-              <IconEdit />
-            </InlineTextButton>
-          </Link>
-          <Link href={`/admin/partner/${data.id}/edit?tab=${PREVIEW_TAB}`}>
-            <InlineTextButton
-              className={classNames(css.actionButton, css.editButton)}>
-              <IconEye />
-            </InlineTextButton>
-          </Link>
+          {data.isLoading ? (
+            <IconSpinner className={css.loadingIcon} />
+          ) : (
+            <>
+              {(isNew || isUnsatisfactory) && (
+                <InlineTextButton
+                  type="button"
+                  onClick={setAuthorizeHandle}
+                  className={css.actionBtn}>
+                  <FormattedMessage id="ManagePartners.authorizeBtn" />
+                </InlineTextButton>
+              )}
+              {(isNew || isAuthorized) && (
+                <InlineTextButton
+                  type="button"
+                  onClick={setUnsatisfactoryHandle}
+                  className={css.actionBtn}>
+                  <FormattedMessage id="ManagePartners.unsatisfactoryBtn" />
+                </InlineTextButton>
+              )}
+              {!isAuthorized && (
+                <InlineTextButton
+                  type="button"
+                  onClick={deleteHandle}
+                  className={css.actionBtn}>
+                  <FormattedMessage id="ManagePartners.deleteBtn" />
+                </InlineTextButton>
+              )}
+            </>
+          )}
         </div>
       );
     },
   },
 ];
 
-const parseEntitiesToTableData = (entityRefs: any[]) => {
+const parseEntitiesToTableData = (entityRefs: any[], extraData: any = {}) => {
   if (entityRefs.length === 0) return [];
   return entityRefs.map((entity: any) => {
+    const isLoading = entity.id.uuid === extraData.loadingId;
     return {
       key: entity.id.uuid,
       data: {
@@ -109,17 +188,20 @@ const parseEntitiesToTableData = (entityRefs: any[]) => {
         phoneNumber: entity.attributes.publicData.phoneNumber,
         email: entity.author.attributes.email,
         address: entity.attributes.publicData.location.address,
-        status: entity.attributes.metadata.listingState,
+        status: entity.attributes.metadata.status,
+        authorId: entity.author.id.uuid,
+        ...extraData,
+        isLoading,
       },
     };
   });
 };
 
-const PARTNER_LISTING_STATUS = Object.keys(ERestaurantListingState).map(
+const PARTNER_LISTING_STATUS = Object.keys(ERestaurantListingStatus).map(
   (key: string) => {
     return {
       key,
-      label: `ManagePartnersPage.${key}`,
+      label: <FormattedMessage id={`ManagePartnersPage.${key}Status`} />,
     };
   },
 );
@@ -130,21 +212,69 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
     pagination,
     queryRestaurantsInProgress,
     queryRestaurantsError,
+    restaurantTableActionInProgress,
   } = useAppSelector((state) => state.ManageParnersPage);
   const router = useRouter();
   const { query, pathname } = router;
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { page = 1, keywords = '', meta_listingState = '' } = query;
+  const { page = 1, keywords = '', meta_status = '' } = query;
   const intl = useIntl();
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    dispatch(managePartnerThunks.queryRestaurants({ page, keywords }));
-  }, [page]);
+  const onSetAuthorized = async (id: string) => {
+    const params = {
+      id,
+      status: ERestaurantListingStatus.authorized,
+    };
+    const response = (await dispatch(
+      managePartnerThunks.setRestaurantStatus(params),
+    )) as any;
+    if (!response?.error) {
+      dispatch(managePartnerThunks.queryRestaurants({ page, keywords }));
+    }
+  };
 
+  const onSetUnsatisfactory = async (id: string) => {
+    const params = {
+      id,
+      status: ERestaurantListingStatus.unsatisfactory,
+    };
+    const response = (await dispatch(
+      managePartnerThunks.setRestaurantStatus(params),
+    )) as any;
+    if (!response?.error) {
+      dispatch(managePartnerThunks.queryRestaurants({ page, keywords }));
+    }
+  };
+
+  const onDeleteRestaurant = async ({ partnerId, restaurantId }: any) => {
+    const response = (await dispatch(
+      managePartnerThunks.deleteRestaurant({ partnerId, restaurantId }),
+    )) as any;
+    if (!response?.error) {
+      dispatch(managePartnerThunks.queryRestaurants({ page, keywords }));
+    }
+  };
+
+  useEffect(() => {
+    dispatch(
+      managePartnerThunks.queryRestaurants({
+        page,
+        keywords,
+        ...(meta_status ? { meta_status } : {}),
+      }),
+    );
+  }, [page, keywords, meta_status]);
+  console.log(restaurantTableActionInProgress);
   const dataTable = useMemo(
-    () => parseEntitiesToTableData(restaurantRefs),
-    [restaurantRefs],
+    () =>
+      parseEntitiesToTableData(restaurantRefs, {
+        onSetUnsatisfactory,
+        onSetAuthorized,
+        loadingId: restaurantTableActionInProgress,
+        onDeleteRestaurant,
+      }),
+    [restaurantRefs, restaurantTableActionInProgress],
   );
 
   const onSubmit = (values: any) => {
@@ -209,10 +339,10 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
           className={css.singleFilter}
           options={PARTNER_LISTING_STATUS}
           label={intl.formatMessage({ id: 'ManageCompanies.status' })}
-          queryParamNames="meta_listingState"
+          queryParamNames="meta_status"
           onSelect={onSubmit}
           initialValues={{
-            meta_listingState: meta_listingState as string,
+            meta_status: meta_status as string,
           }}
         />
       </div>
