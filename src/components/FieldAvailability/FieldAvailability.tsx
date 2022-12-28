@@ -67,7 +67,7 @@ const getUniqueItemsByProperties = (items: any[], propNames: string[]) => {
 };
 
 const uniqueStringEntries = (array: string[]) => {
-  return array.filter(function (item, pos) {
+  return array.filter((item, pos) => {
     return array.indexOf(item) === pos;
   });
 };
@@ -276,6 +276,122 @@ const getEntryWeeklyBoundaries =
     }, []);
   };
 
+const handleDayToApplyChange = ({
+  checked,
+  dayToApplyValue,
+  availabilityPlan,
+  daysToApplyName,
+  values,
+  availabilityName,
+}: any) => {
+  const allValues = { ...values };
+  let newDayToApplyValues = [];
+  let newAvailabilityPlan = {};
+  const valueIsAllWeek = dayToApplyValue === ALL_WEEK_APPLY;
+  if (checked) {
+    if (valueIsAllWeek) {
+      newDayToApplyValues = [ALL_WEEK_APPLY];
+      const remainDays = [] as string[];
+      Object.keys(EDayOfWeek).forEach((d: string) => {
+        if (!availabilityPlan[d]) {
+          remainDays.push(d);
+        }
+      });
+      const remainAvailability = remainDays.reduce((prev, cur) => {
+        return {
+          ...prev,
+          [cur]: [
+            {
+              dayOfWeek: cur,
+              startTime: '00:00',
+              endTime: '23:00',
+              seats: 1,
+            },
+          ],
+        };
+      }, {});
+      newAvailabilityPlan = {
+        ...availabilityPlan,
+        ...remainAvailability,
+      };
+    } else {
+      const remainDays = [] as string[];
+      Object.keys(EDayOfWeek).forEach((d: string) => {
+        if (!availabilityPlan[d]) {
+          remainDays.push(d);
+        }
+      });
+      newDayToApplyValues = uniqueStringEntries([
+        ...allValues[daysToApplyName],
+        dayToApplyValue,
+      ]);
+      newAvailabilityPlan = {
+        ...availabilityPlan,
+        [dayToApplyValue]: getUniqueItemsByProperties(
+          [
+            ...(allValues[availabilityName][dayToApplyValue]
+              ? values[availabilityName][dayToApplyValue]
+              : []),
+            {
+              dayOfWeek: dayToApplyValue,
+              startTime: '00:00',
+              endTime: '23:00',
+              seats: 1,
+            },
+          ],
+          ['dayOfWeek'],
+        ),
+      };
+    }
+  } else if (valueIsAllWeek) {
+    newDayToApplyValues = [...allValues[daysToApplyName]].filter(
+      (i: string) => i !== dayToApplyValue,
+    );
+
+    Object.keys(EDayOfWeek).forEach((k: any) => {
+      delete allValues[availabilityName][k];
+    });
+
+    newAvailabilityPlan = allValues[availabilityName];
+  } else {
+    newDayToApplyValues = [...allValues[daysToApplyName]].filter(
+      (i: string) => i !== dayToApplyValue,
+    );
+    if (allValues[availabilityName][dayToApplyValue]) {
+      delete allValues[availabilityName][dayToApplyValue];
+    }
+    newAvailabilityPlan = allValues[availabilityName];
+  }
+
+  const filteredTargetValue = newDayToApplyValues.filter(
+    (d: string) => d !== ALL_WEEK_APPLY,
+  );
+  const shouldClearAllWeeKApply =
+    filteredTargetValue.length !== Object.keys(EDayOfWeek).length;
+
+  if (shouldClearAllWeeKApply && dayToApplyValue !== ALL_WEEK_APPLY) {
+    newDayToApplyValues = filteredTargetValue;
+    let availabilityWithClearedAllWeekApply = {};
+    newDayToApplyValues.forEach((d: string) => {
+      availabilityWithClearedAllWeekApply = {
+        ...availabilityWithClearedAllWeekApply,
+        [d]: [
+          {
+            dayOfWeek: dayToApplyValue,
+            startTime: '00:00',
+            endTime: '23:00',
+            seats: 1,
+          },
+        ],
+      };
+    });
+    newAvailabilityPlan = availabilityWithClearedAllWeekApply;
+  } else {
+    newDayToApplyValues = [ALL_WEEK_APPLY];
+  }
+  return { newAvailabilityPlan, newDayToApplyValues };
+};
+
 const HourlyPlan: React.FC<any> = (props) => {
   const { values, intl, name: fieldName } = props;
   const startTimePlaceholder = intl.formatMessage({
@@ -364,12 +480,14 @@ const HourlyPlan: React.FC<any> = (props) => {
                 })}>
                 {index > 0 && (
                   <InlineTextButton
+                    type="button"
                     onClick={() => fields.remove(index)}
                     className={css.addButton}>
                     <IconClose className={css.iconClose} />
                   </InlineTextButton>
                 )}
                 <InlineTextButton
+                  type="button"
                   onClick={() =>
                     fields.push({
                       startTime: null,
@@ -525,108 +643,18 @@ const FieldAvailability = (props: any) => {
   const availabilityPlan = values[name];
 
   const handleOnCheckDay = (e: any) => {
-    const { name: targetName, value, checked } = e.target;
-    let newTargetValues = [];
-    let newAvailabilityPlan = {};
-    const valueIsAllWeek = value === ALL_WEEK_APPLY;
-    if (checked) {
-      if (valueIsAllWeek) {
-        newTargetValues = [ALL_WEEK_APPLY];
-        const remainDays = [] as string[];
-        Object.keys(EDayOfWeek).forEach((d: string) => {
-          if (!availabilityPlan[d]) {
-            remainDays.push(d);
-          }
-        });
-        const remainAvailability = remainDays.reduce((prev, cur) => {
-          return {
-            ...prev,
-            [cur]: [
-              {
-                dayOfWeek: cur,
-                startTime: '00:00',
-                endTime: '23:00',
-                seats: 1,
-              },
-            ],
-          };
-        }, {});
-        newAvailabilityPlan = {
-          ...availabilityPlan,
-          ...remainAvailability,
-        };
-      } else {
-        const remainDays = [] as string[];
-        Object.keys(EDayOfWeek).forEach((d: string) => {
-          if (!availabilityPlan[d]) {
-            remainDays.push(d);
-          }
-        });
-        newTargetValues = uniqueStringEntries([...values[targetName], value]);
-        newAvailabilityPlan = {
-          ...availabilityPlan,
-          [value]: getUniqueItemsByProperties(
-            [
-              ...(values[name][value] ? values[name][value] : []),
-              {
-                dayOfWeek: value,
-                startTime: '00:00',
-                endTime: '23:00',
-                seats: 1,
-              },
-            ],
-            ['dayOfWeek'],
-          ),
-        };
-      }
-    } else if (valueIsAllWeek) {
-      newTargetValues = [...values[targetName]].filter(
-        (i: string) => i !== value,
-      );
-
-      Object.keys(EDayOfWeek).forEach((k: any) => {
-        delete values[name][k];
-      });
-
-      newAvailabilityPlan = values[name];
-    } else {
-      newTargetValues = [...values[targetName]].filter(
-        (i: string) => i !== value,
-      );
-
-      if (values[name][value]) {
-        delete values[name][value];
-      }
-      newAvailabilityPlan = values[name];
-    }
-
-    const filteredTargetValue = newTargetValues.filter(
-      (d: string) => d !== ALL_WEEK_APPLY,
+    const { name: daysToApplyName, value: dayToApplyValue, checked } = e.target;
+    const { newAvailabilityPlan, newDayToApplyValues } = handleDayToApplyChange(
+      {
+        values,
+        daysToApplyName,
+        dayToApplyValue,
+        availabilityPlan,
+        checked,
+        availabilityName: name,
+      },
     );
-    const shouldClearAllWeeKApply =
-      filteredTargetValue.length !== Object.keys(EDayOfWeek).length;
-
-    if (shouldClearAllWeeKApply && value !== ALL_WEEK_APPLY) {
-      newTargetValues = filteredTargetValue;
-      let availabilityWithClearedAllWeekApply = {};
-      newTargetValues.forEach((d: string) => {
-        availabilityWithClearedAllWeekApply = {
-          ...availabilityWithClearedAllWeekApply,
-          [d]: [
-            {
-              dayOfWeek: value,
-              startTime: '00:00',
-              endTime: '23:00',
-              seats: 1,
-            },
-          ],
-        };
-      });
-      newAvailabilityPlan = availabilityWithClearedAllWeekApply;
-    } else {
-      newTargetValues = [ALL_WEEK_APPLY];
-    }
-    form.change(targetName, newTargetValues);
+    form.change(daysToApplyName, newDayToApplyValues);
     form.change(name, newAvailabilityPlan);
   };
 
