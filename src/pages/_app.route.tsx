@@ -33,12 +33,11 @@ const MyApp = ({
   ...restProps
 }: AppProps & AppCustomProps) => {
   const { store, props } = wrapper.useWrappedStore(restProps);
-  const isRequiredAuth = Component.requireAuth === true;
 
   return (
     <TranslationProvider>
       <Provider store={store}>
-        <AuthGuard isRequiredAuth={isRequiredAuth}>
+        <AuthGuard>
           <PermissionGuard>
             <Component {...props.pageProps} key={router.asPath} />
           </PermissionGuard>
