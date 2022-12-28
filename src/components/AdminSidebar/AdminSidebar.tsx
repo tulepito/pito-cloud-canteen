@@ -45,7 +45,7 @@ const SIDEBAR_MENUS: TSidebarMenu[] = [
       {
         id: 'createOrder',
         label: 'AdminSidebar.createOrder',
-        nameLink: '/order',
+        nameLink: '/admin/order/create',
       },
     ],
   },

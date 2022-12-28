@@ -18,10 +18,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const { meal, orderDetail } = rest;
 
         const orderListing = await fetchListing(orderId);
-        const orderTitle = orderListing.title;
+        const orderTitle = orderListing.attributes.title;
         const { metadata }: { metadata: TOrder } = orderListing.attributes;
 
-        const { companyId, plans } = metadata;
+        const { companyId, plans = [] } = metadata;
         const companyAccount = await fetchUser(companyId);
 
         const { subAccountId } = companyAccount.attributes.profile.privateData;
@@ -34,8 +34,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         const planListing =
           denormalisedResponseEntities(planListingResponse)[0];
-
-        await integrationSdk.listings.upadte({
+        await integrationSdk.listings.update({
           id: planListing.id.uuid,
           metadata: {
             meal,
@@ -46,7 +45,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         });
 
         await integrationSdk.listings.update({
-          id: orderId.id.uuid,
+          id: orderListing.id.uuid,
           metadata: {
             ...metadata,
             plans: plans.concat(planListing.id.uuid),
