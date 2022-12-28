@@ -9,7 +9,7 @@ import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
 import { Navigate } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
-import DayBox from '../DayBox/DayBox';
+import MDayItem from '../DayItem/MDayItem';
 import css from './MonthView.module.scss';
 
 const MONTH_DAY_NUMBER = 30;
@@ -54,7 +54,7 @@ function MonthView({
           </div>
         ))}
         {currRange.map((item) => (
-          <DayBox
+          <MDayItem
             date={item}
             key={item.getTime()}
             events={getEventsInDate(item, events)}

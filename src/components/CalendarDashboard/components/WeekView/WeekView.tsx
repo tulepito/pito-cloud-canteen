@@ -8,7 +8,7 @@ import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
 import { Navigate } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
-import DayColumn from '../DayColumn/DayColumn';
+import WDayItem from '../DayItem/WDayItem';
 import css from './WeekView.module.scss';
 
 const WEEK_DAYS_NUMBER = 7;
@@ -58,7 +58,7 @@ function WeekView({
     <div className={css.root} id={`weekView`}>
       <div className={css.scrollContainer}>
         {currRange.map((item) => (
-          <DayColumn
+          <WDayItem
             date={item}
             key={item.getTime()}
             events={getEventsInDate(item, events)}

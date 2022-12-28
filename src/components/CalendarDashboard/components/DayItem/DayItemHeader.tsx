@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import { FormattedMessage } from 'react-intl';
 
-import css from './DayColumn.module.scss';
+import css from './DayItem.module.scss';
 
 type TDayColumnHeaderProps = {
   isCurrentDay: boolean;

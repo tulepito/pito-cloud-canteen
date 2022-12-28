@@ -1,13 +1,13 @@
 import type { Event } from 'react-big-calendar';
 
-import css from './DayBox.module.scss';
+import css from './DayItem.module.scss';
 
-type TDayBoxContentProps = {
+type TDayColumnContentProps = {
   events: Event[];
   renderEvent?: React.FC<any>;
 };
 
-const DayBoxContent: React.FC<TDayBoxContentProps> = ({
+const DayColumnContent: React.FC<TDayColumnContentProps> = ({
   events,
   renderEvent: EventRender,
 }) => {
@@ -21,4 +21,4 @@ const DayBoxContent: React.FC<TDayBoxContentProps> = ({
   );
 };
 
-export default DayBoxContent;
+export default DayColumnContent;

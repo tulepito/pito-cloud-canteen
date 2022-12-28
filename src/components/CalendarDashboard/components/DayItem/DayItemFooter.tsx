@@ -1,13 +1,16 @@
 import classNames from 'classnames';
 
-import css from './DayBox.module.scss';
+import css from './DayItem.module.scss';
 
-type TDayBoxFooterProps = {
+type TDayItemFooterProps = {
   isCurrentDay: boolean;
   date: Date;
 };
 
-const DayBoxFooter: React.FC<TDayBoxFooterProps> = ({ isCurrentDay, date }) => {
+const DayItemFooter: React.FC<TDayItemFooterProps> = ({
+  isCurrentDay,
+  date,
+}) => {
   return (
     <div className={css.dayFooter}>
       <div
@@ -20,4 +23,4 @@ const DayBoxFooter: React.FC<TDayBoxFooterProps> = ({ isCurrentDay, date }) => {
   );
 };
 
-export default DayBoxFooter;
+export default DayItemFooter;
