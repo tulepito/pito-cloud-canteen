@@ -1,8 +1,8 @@
-import OrderManagement from './OrderManagement';
+import Order from './Order';
 
-const OrderManagementRoute = () => {
-  return <OrderManagement />;
+const OrderRoute = () => {
+  return <Order />;
 };
 
-OrderManagementRoute.requireAuth = true;
-export default OrderManagementRoute;
+OrderRoute.requireAuth = true;
+export default OrderRoute;

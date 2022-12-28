@@ -42,3 +42,7 @@ export const showCompanyApi = (id: string) => get(`/api/users/company/${id}`);
 
 export const updateCompanyStatusApi = (body: any) =>
   put(`/api/users/company/status`, body);
+
+export const loadOrderDataApi = (orderId: string) => {
+  get(`/api/order/${orderId}`);
+};
