@@ -30,6 +30,28 @@ const mergeCurrentUser = (oldCurrentUser: any, newCurrentUser: any) => {
     : { id, type, attributes, ...oldRelationships, ...relationships };
 };
 
+const detectUserPermission = (currentUser: any) => {
+  const { isCompany, isAdmin, company } = get(
+    currentUser,
+    'attributes.profile.metadata',
+  );
+
+  let isBooker;
+
+  if (!company) {
+    isBooker = false;
+  } else {
+    isBooker = Object.values(company).some(({ permission }: any) => {
+      return permission === 'booker';
+    });
+  }
+
+  if (isAdmin) return EUserPermission.admin;
+  if (isCompany || isBooker) return EUserPermission.company;
+
+  return EUserPermission.normal;
+};
+
 type TUserState = {
   currentUser: any;
   currentUserShowError: any;
@@ -117,16 +139,9 @@ const userSlice = createSlice({
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         const currentUser = action.payload;
-        const { isCompany, isAdmin } = get(
-          currentUser,
-          'attributes.profile.metadata',
-        );
+
         state.currentUser = mergeCurrentUser(state.currentUser, currentUser);
-        state.userPermission = isAdmin
-          ? EUserPermission.admin
-          : isCompany
-          ? EUserPermission.company
-          : EUserPermission.normal;
+        state.userPermission = detectUserPermission(currentUser);
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
         state.currentUserShowError = action.payload;
