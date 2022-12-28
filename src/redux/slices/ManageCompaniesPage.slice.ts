@@ -25,9 +25,8 @@ const queryCompanies = createAsyncThunk(
   QUERY_COMPANIES,
   async (page: number, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
     try {
-      const { data } = await getCompaniesApi();
-      const companies = denormalisedResponseEntities(data);
-      return fulfillWithValue({ companies, page, data });
+      const { data: companies } = await getCompaniesApi();
+      return fulfillWithValue({ companies, page });
     } catch (error: any) {
       console.error('Query company error : ', error);
       return rejectWithValue(storableError(error.response.data));
