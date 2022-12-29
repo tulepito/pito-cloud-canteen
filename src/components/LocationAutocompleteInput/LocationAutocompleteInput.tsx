@@ -9,7 +9,7 @@ import LocationAutocompleteInputImpl from './LocationAutocompleteInputImpl.tsx';
 
 const LocationAutocompleteInputComponent: React.FC<any> = (props) => {
   /* eslint-disable no-unused-vars */
-  const { rootClassName, labelClassName, ...restProps } = props;
+  const { rootClassName, labelClassName, required, ...restProps } = props;
   const { input, label, meta, valueFromForm, ...otherProps } = restProps;
   /* eslint-enable no-unused-vars */
 
@@ -30,9 +30,12 @@ const LocationAutocompleteInputComponent: React.FC<any> = (props) => {
     </label>
   ) : null;
 
+  const labelRequiredRedStar = required ? css.labelRequiredRedStar : '';
+
   return (
     <div className={rootClassName}>
       {labelInfo}
+      {required && <span className={labelRequiredRedStar}>*</span>}
       <LocationAutocompleteInputImpl {...locationAutocompleteProps} />
       <ValidationError fieldMeta={meta} />
     </div>
