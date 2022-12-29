@@ -220,6 +220,7 @@ export const companySlice = createSlice({
           companyMembers,
           company,
           originCompanyMembers,
+          isCompanyNotFound: false,
           fetchCompanyInfoInProgress: false,
         };
       })
