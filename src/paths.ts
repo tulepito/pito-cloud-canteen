@@ -21,4 +21,6 @@ export const adminPaths = {
 
 export const companyPaths = {
   Home: '/company',
+  Detail: '/company/[companyId]',
+  GroupSetting: '/company/[companyId]/group-setting',
 };

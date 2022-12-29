@@ -45,7 +45,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
 
   const intl = useIntl();
   const router = useRouter();
-  const { pathname } = router;
+  const { pathname, query } = router;
   const [isOpen, setIsOpen] = useState(false);
 
   const { Icon, label, childrenMenus, nameLink, level } = menu;
@@ -56,7 +56,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     (e: React.MouseEvent<HTMLElement>) => {
       e.stopPropagation();
       if (nameLink && !hasChildrenMenus) {
-        return router.push(nameLink);
+        return router.push({ pathname: `${nameLink}`, query });
       }
       return setIsOpen(!isOpen);
     },
