@@ -45,6 +45,15 @@ export const minLength =
   };
 
 export const taxLengthRequired = (message: string) => (value: string) => {
+  const numberWithoutDash = value.split('-').join('');
+  const hasOneDashNumber = value.length - numberWithoutDash.length;
+  const hasInvalidChac =
+    (value.includes('-') && Number.isNaN(Number(numberWithoutDash))) ||
+    (!value.includes('-') && Number.isNaN(Number(value))) ||
+    hasOneDashNumber > 1;
+  if (hasInvalidChac) {
+    return message;
+  }
   const hasLength = value && typeof value.length === 'number';
   return hasLength && (value.length === 13 || value.length === 10)
     ? VALID

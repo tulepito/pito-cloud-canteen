@@ -43,6 +43,7 @@ const FieldTextInputComponent = (props: InputComponentProps) => {
     inputRef,
     leftIcon,
     rightIcon,
+    required,
     ...rest
   } = props;
 
@@ -114,14 +115,14 @@ const FieldTextInputComponent = (props: InputComponentProps) => {
   const classes = classNames(rootClassName || css.root, className);
   const inputContainerClasses = classNames(css.inputContainer);
   const labelClasses = classNames(css.labelRoot, labelClassName);
-  const labelRequiredRedStar = fieldMeta.error ? css.labelRequiredRedStar : '';
+  const labelRequiredRedStar = required ? css.labelRequiredRedStar : '';
 
   return (
     <div className={classes}>
       {label && (
         <label className={labelClasses} htmlFor={id}>
           {label}
-          {fieldMeta.error && <span className={labelRequiredRedStar}>*</span>}
+          {required && <span className={labelRequiredRedStar}>*</span>}
         </label>
       )}
       <div className={inputContainerClasses}>

@@ -161,6 +161,13 @@ bottom of the container.
   line-height: 24px;
   color: $neutralGray10;
   margin-bottom: 8px;
-  display: inline-block;
-  display: flex;
+  display: inline-flex;
+}
+
+.labelRequiredRedStar {
+  color: $failColor;
+  margin-left: 2px;
+  font-weight: $fontWeightBold;
+  margin-left: 2px;
+  display: inline-flex;
 }

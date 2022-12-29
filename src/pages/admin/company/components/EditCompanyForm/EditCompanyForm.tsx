@@ -114,6 +114,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                     id: 'EditCompanyForm.lastNameRequired',
                   }),
                 )}
+                required
               />
               <FieldTextInput
                 id="firstName"
@@ -130,6 +131,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                     id: 'EditCompanyForm.firstNameRequired',
                   }),
                 )}
+                required
               />
             </div>
             {!isEditting && (
@@ -156,6 +158,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                       }),
                     ),
                   )}
+                  required
                 />
               </div>
             )}
@@ -182,6 +185,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                     }),
                   ),
                 )}
+                required
               />
               <LocationAutocompleteInputField
                 id="location"
@@ -205,6 +209,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                     }),
                   ),
                 )}
+                required
               />
             </div>
             {!isEditting && (
@@ -232,6 +237,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                       }),
                     ),
                   )}
+                  required
                 />
                 <FieldTextInput
                   id="confirmPassword"
@@ -257,6 +263,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                       'password',
                     ),
                   )}
+                  required
                 />
               </div>
             )}
@@ -281,6 +288,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                     id: 'EditCompanyForm.companyNameLabelRequired',
                   }),
                 )}
+                required
               />
               <FieldTextInput
                 id="companyEmail"
@@ -304,6 +312,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                     }),
                   ),
                 )}
+                required
               />
             </div>
             <div className={css.fields}>
@@ -329,11 +338,11 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                     }),
                   ),
                 )}
+                required
               />
               <FieldTextInput
                 id="tax"
                 name="tax"
-                type="number"
                 className={css.field}
                 label={intl.formatMessage({
                   id: 'EditCompanyForm.taxLabel',
@@ -353,6 +362,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                     }),
                   ),
                 )}
+                required
               />
             </div>
             <div className={css.fields}>
