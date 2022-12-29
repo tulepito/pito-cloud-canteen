@@ -17,6 +17,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 29, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3040',
     start: new Date(2022, 11, 29, 16, 0, 0),
@@ -40,6 +47,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 29, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3041',
     start: new Date(2022, 11, 29, 16, 0, 0),
@@ -64,6 +78,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 30, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT30402',
     start: new Date(2022, 11, 30, 16, 0, 0),
@@ -88,6 +109,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 30, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3043',
     start: new Date(2022, 11, 30, 16, 0, 0),
@@ -112,6 +140,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 30, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3044',
     start: new Date(2022, 11, 30, 16, 0, 0),
@@ -135,6 +170,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 29, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3045',
     start: new Date(2022, 11, 29, 16, 0, 0),
@@ -159,6 +201,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 27, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3046',
     start: new Date(2022, 11, 27, 16, 0, 0),
@@ -183,6 +232,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 27, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3039',
     start: new Date(2022, 11, 27, 16, 0, 0),
@@ -207,6 +263,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 27, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3047',
     start: new Date(2022, 11, 27, 16, 0, 0),
@@ -230,6 +293,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 27, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3048',
     start: new Date(2022, 11, 27, 16, 0, 0),
@@ -254,6 +324,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 28, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3049',
     start: new Date(2022, 11, 28, 16, 0, 0),
@@ -277,6 +354,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 28, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3050',
     start: new Date(2023, 11, 28, 7, 0, 0),
@@ -300,6 +384,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 28, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3051',
     start: new Date(2023, 11, 28, 7, 0, 0),
@@ -323,6 +414,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 29, 7, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3052',
     start: new Date(2022, 11, 29, 7, 0, 0),
@@ -346,6 +444,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 29, 7, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3053',
     start: new Date(2022, 11, 29, 7, 0, 0),
@@ -369,6 +474,13 @@ export const EVENTS_MOCKUP = [
         name: 'Vua Hải Sản',
       },
       expiredTime: new Date(2022, 11, 30, 7, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
     },
     title: 'PT3054',
     start: new Date(2022, 11, 30, 7, 0, 0),
