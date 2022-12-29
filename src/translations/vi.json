@@ -299,5 +299,6 @@
   "EditPartnerMenuForm.extraServiceCheckboxLabel": "Dịch vụ thêm",
   "EditPartnerBasicInfomationForm.createBtn": "Thêm",
   "LocationAutocompleteInput.currentLocation": "Địa chỉ hiện tại",
-  "ManageCompanies.searchStatusLabel": "Chọn trạng thái"
+  "ManageCompanies.searchStatusLabel": "Chọn trạng thái",
+  "AdminSidebar.createOrderLabel": "Tạo đơn hàng"
 }

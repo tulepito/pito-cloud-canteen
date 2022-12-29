@@ -6,7 +6,7 @@ import AdminLayout from '@components/AdminLayout/AdminLayout';
 import AuthGuard from '@components/AuthGuard/AuthGuard';
 import CompanyLayout from '@components/CompanyLayout/CompanyLayout';
 import Layout from '@components/Layout/Layout';
-import { Open_Sans } from '@next/font/google';
+import { Manrope } from '@next/font/google';
 import { authThunks } from '@redux/slices/auth.slice';
 import { emailVerificationActions } from '@redux/slices/emailVerification.slice';
 import { userThunks } from '@redux/slices/user.slice';
@@ -32,7 +32,7 @@ type AppCustomProps = {
   Component?: NextApplicationPage;
 };
 
-const openSans = Open_Sans({
+const font = Manrope({
   subsets: ['vietnamese', 'latin'],
   weight: ['400', '500', '700'],
 });
@@ -56,7 +56,7 @@ const MyApp = ({
     : Layout;
 
   return (
-    <main className={openSans.className}>
+    <main className={font.className}>
       <TranslationProvider>
         <Script
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}

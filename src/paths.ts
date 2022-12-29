@@ -6,6 +6,19 @@ const paths = {
   HomePage: '/',
 };
 
+export const adminPaths = {
+  Dashboard: '/',
+  ManageUsers: '/admin/user',
+  ManageCompanies: '/admin/company',
+  EditCompany: '/admin/company/[companyId]/edit',
+  CreateCompany: '/admin/company/create',
+  ManagePartners: '/admin/partner',
+  CreatePartner: '/admin/partner/create',
+  EditPartner: '/admin/partner/[partnerId]/edit',
+  ManageOrders: '/admin/order',
+  CreateOrder: '/admin/order/create',
+};
+
 export const AuthenticationRoutes = [
   paths.RecoveryPassword,
   paths.SignIn,

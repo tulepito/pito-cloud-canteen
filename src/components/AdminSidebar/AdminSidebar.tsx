@@ -1,53 +1,81 @@
-import HamburgerMenuButton from '@components/HamburgerMenuButton/HamburgerMenuButton';
+import IconAnalysis from '@components/IconAnalysis/IconAnalysis';
 import IconHome from '@components/IconHome/IconHome';
 import IconOrderManagement from '@components/IconOrderManagement/IconOrderManagement';
+import IconPhone from '@components/IconPhone/IconPhone';
+import IconSetting from '@components/IconSetting/IconSetting';
 import IconUserManagement from '@components/IconUserManagement/IconUserManagement';
-import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
+import IconWallet from '@components/IconWallet/IconWallet';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
+import NamedLink from '@components/NamedLink/NamedLink';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
-import PitoLogo from '@components/PitoLogo/PitoLogo';
-import React from 'react';
+import { adminPaths } from '@src/paths';
+import { useRouter } from 'next/router';
+import React, { useMemo } from 'react';
+import { useIntl } from 'react-intl';
 
 import css from './AdminSidebar.module.scss';
 
-const SIDEBAR_MENUS: TSidebarMenu[] = [
+const LIST_SIDEBAR_MENU = [
   {
-    id: 'home',
-    label: 'AdminSidebar.homeLabel',
-    nameLink: '/admin',
+    id: 'dashboard',
     Icon: IconHome,
-    level: 1,
+    nameLink: adminPaths.Dashboard,
+    label: 'Trang chủ',
   },
   {
-    id: 'user',
-    label: 'AdminSidebar.userLabel',
-    Icon: IconUserManagement,
-    level: 1,
+    id: 'order',
+    Icon: IconOrderManagement,
+    nameLink: adminPaths.CreateOrder,
+    label: 'AdminSidebar.orderLabel',
     childrenMenus: [
       {
-        id: 'company',
-        label: 'AdminSidebar.companyLabel',
-        nameLink: '/admin/company',
+        id: 'createOrder',
+        label: 'AdminSidebar.createOrderLabel',
+        nameLink: '/admin/order/create',
       },
       {
         id: 'partner',
         label: 'AdminSidebar.partnerLabel',
         nameLink: '/admin/partner',
+        childrenMenus: [
+          {
+            id: 'company',
+            label: 'AdminSidebar.companyLabel',
+            nameLink: '/admin/company',
+          },
+          {
+            id: 'partner',
+            label: 'AdminSidebar.partnerLabel',
+            nameLink: '/admin/partner',
+          },
+        ],
       },
     ],
   },
   {
-    id: 'order',
-    label: 'AdminSidebar.orderLabel',
-    Icon: IconOrderManagement,
-    level: 1,
-    childrenMenus: [
-      {
-        id: 'createOrder',
-        label: 'AdminSidebar.createOrder',
-        nameLink: '/order',
-      },
-    ],
+    id: 'user',
+    Icon: IconUserManagement,
+    nameLink: adminPaths.ManageUsers,
+  },
+  {
+    id: 'analysis',
+    Icon: IconAnalysis,
+    nameLink: adminPaths.Dashboard,
+  },
+  {
+    id: 'wallet',
+    Icon: IconWallet,
+    nameLink: adminPaths.Dashboard,
+  },
+  {
+    id: 'phone',
+    Icon: IconPhone,
+    nameLink: adminPaths.Dashboard,
+  },
+  {
+    id: 'setting',
+    Icon: IconSetting,
+    nameLink: adminPaths.Dashboard,
   },
 ];
 
@@ -56,24 +84,59 @@ type TAdminSidebar = {
   onCloseMenu: () => void;
 };
 
+const getNestedPath = (arr: any[], pathName: string) => {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const item of arr) {
+    if (item.nameLink === pathName) return item;
+    if (item.childrenMenus) {
+      const child = getNestedPath(item.childrenMenus, pathName);
+      if (child) return item;
+    }
+  }
+};
+
 const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
-  const { onMenuClick, onCloseMenu } = props;
+  const { onCloseMenu } = props;
+  const intl = useIntl();
 
   const onOutsideClick = () => {
     onCloseMenu();
   };
 
+  const router = useRouter();
+
+  const { pathname } = router;
+
+  const activeMenu = useMemo(
+    () => getNestedPath(LIST_SIDEBAR_MENU, pathname),
+    [LIST_SIDEBAR_MENU, pathname],
+  );
+
   return (
     <OutsideClickHandler onOutsideClick={onOutsideClick}>
       <div className={css.root}>
-        <div className={css.logo}>
-          <PitoLogo />
-          <HamburgerMenuButton
-            onClick={onMenuClick}
-            className={css.hamburgerMenu}
-          />
+        <div className={css.leftSide}>
+          {LIST_SIDEBAR_MENU.map((item: any) => {
+            const { Icon, id, nameLink } = item;
+            return (
+              <NamedLink path={nameLink} key={id} className={css.sidebarButton}>
+                <Icon className={css.sidebarIcon} />
+              </NamedLink>
+            );
+          })}
         </div>
-        <MultiLevelSidebar menus={SIDEBAR_MENUS} />
+        {activeMenu && (
+          <div className={css.rightSide}>
+            <h1 className={css.menuLabel}>
+              {intl.formatMessage({ id: activeMenu.label })}
+            </h1>
+            <MultiLevelSidebar
+              rootClassName={css.multiLevelMenu}
+              subMenuLayoutClassName={css.subMenuLayout}
+              menus={activeMenu.childrenMenus || []}
+            />
+          </div>
+        )}
       </div>
     </OutsideClickHandler>
   );
