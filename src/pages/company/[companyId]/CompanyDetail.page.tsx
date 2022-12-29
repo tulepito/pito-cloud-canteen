@@ -13,14 +13,14 @@ const CompanyDetailPage = () => {
     (state) => state.company.isCompanyNotFound,
   );
   const { companyId } = router.query;
+  const { isReady } = router;
   useEffect(() => {
-    dispatch(addWorkspaceCompanyId(companyId));
-  }, [companyId, dispatch]);
+    if (isReady) dispatch(addWorkspaceCompanyId(companyId));
+  }, [companyId, dispatch, isReady]);
 
   useEffect(() => {
-    dispatch(BookerManageCompany.companyInfo());
-  }, []);
-
+    if (isReady) dispatch(BookerManageCompany.companyInfo());
+  }, [isReady]);
   if (isCompanyNotFound) {
     return <div>Khong tim thay cong ty nay, xin vui long thu lai.</div>;
   }

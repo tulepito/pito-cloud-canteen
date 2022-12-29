@@ -107,7 +107,10 @@ const GroupSettingPage = () => {
       render: ({ id }: TGroupItem) => {
         const showLoadingIcon = deleteGroupInProgress && id === deletingGroupId;
         const onEditGroup = () => {
-          router.push(`/company/group-setting/${id}`);
+          router.push({
+            pathname: `/company/[companyId]/group-setting/${id}`,
+            query: router.query,
+          });
         };
         const onDeleteGroup = () => {
           setSelectingDeleteGroupId(id);
@@ -132,6 +135,11 @@ const GroupSettingPage = () => {
       onDeleteGroupConfirmationModalClose(),
     );
   };
+
+  useEffect(() => {
+    dispatch(addWorkspaceCompanyId(companyId));
+  }, [companyId, dispatch]);
+
   useEffect(() => {
     const fetchData = async () => {
       console.log('run useeffect');
