@@ -2,7 +2,6 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { DAY_IN_WEEK } from '@components/CalendarDashboard/helpers/constant';
 import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
-import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import { useMemo } from 'react';
 import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
@@ -42,17 +41,11 @@ function MonthView({
     [date, localizer],
   );
 
-  const currentDay = new Date().getDay();
-
   return (
     <div className={css.root}>
       <div className={css.scrollContainer}>
-        {DAY_IN_WEEK.map((item, index) => (
-          <div
-            key={item}
-            className={classNames(css.dayInWeekHeader, {
-              [css.activeDayHeader]: currentDay === index + 1,
-            })}>
+        {DAY_IN_WEEK.map((item) => (
+          <div key={item} className={css.dayInWeekHeader}>
             <FormattedMessage id={`MonthView.dayInWeekHeader.${item}`} />
           </div>
         ))}
@@ -71,7 +64,7 @@ function MonthView({
 }
 
 MonthView.range = (date: Date, { localizer }: { localizer: any }) => {
-  const start = DateTime.fromJSDate(date).startOf('week').toJSDate();
+  const start = DateTime.fromJSDate(date).startOf('month').toJSDate();
   const end = localizer.add(start, MONTH_DAY_NUMBER - 1, 'day');
 
   let current = start;

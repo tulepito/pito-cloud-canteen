@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
 
 import type { TCalendarItemCardComponents } from '../../helpers/types';
@@ -18,8 +19,12 @@ const WDayItem: React.FC<TWDayItemProps> = ({
   renderEvent,
   components,
 }) => {
-  const currentDay = new Date().getDay();
-  const isCurrentDay = currentDay === date.getDay();
+  const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
+  const isCurrentDay =
+    DateTime.fromJSDate(date)
+      .startOf('day')
+      .diff(currentDate, ['day', 'hour'])
+      .get('day') === 0;
 
   return (
     <div className={css.weekDay} id={`dayHeader-${date.getDay()}`}>

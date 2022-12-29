@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
 
 import type { TCalendarItemCardComponents } from '../../helpers/types';
@@ -18,8 +19,12 @@ const MDayItem: React.FC<TMDayItemProps> = ({
   renderEvent,
   components,
 }) => {
-  const currentDay = new Date().getDate();
-  const isCurrentDay = currentDay === date.getDate();
+  const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
+  const isCurrentDay =
+    DateTime.fromJSDate(date)
+      .startOf('day')
+      .diff(currentDate, ['day', 'hour'])
+      .get('day') === 0;
 
   return (
     <div className={css.monthDay}>
