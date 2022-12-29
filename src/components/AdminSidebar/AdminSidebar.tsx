@@ -1,9 +1,11 @@
 import IconHome from '@components/IconHome/IconHome';
 import IconOrderManagement from '@components/IconOrderManagement/IconOrderManagement';
+import IconUserManagement from '@components/IconUserManagement/IconUserManagement';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import NamedLink from '@components/NamedLink/NamedLink';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import { adminPaths } from '@src/paths';
+import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
 import { useIntl } from 'react-intl';
@@ -29,34 +31,33 @@ const LIST_SIDEBAR_MENU = [
         nameLink: '/admin/order/create',
       },
       {
-        id: 'partner',
-        label: 'AdminSidebar.partnerLabel',
-        nameLink: '/admin/partner',
-        childrenMenus: [
-          {
-            id: 'company',
-            label: 'AdminSidebar.companyLabel',
-            nameLink: '/admin/company',
-          },
-          {
-            id: 'partner',
-            label: 'AdminSidebar.partnerLabel',
-            nameLink: '/admin/partner',
-          },
-        ],
+        id: 'manageOrders',
+        label: 'AdminSidebar.manageOrderLabel',
+        nameLink: '/admin/order',
       },
     ],
   },
   {
-    id: 'order',
-    label: 'AdminSidebar.orderLabel',
-    Icon: IconOrderManagement,
+    id: 'user',
+    label: 'AdminSidebar.userLabel',
+    Icon: IconUserManagement,
     level: 1,
+    nameLink: adminPaths.ManageCompanies,
     childrenMenus: [
       {
-        id: 'createOrder',
-        label: 'AdminSidebar.createOrder',
-        nameLink: '/admin/order/create',
+        id: 'company',
+        label: 'AdminSidebar.companyLabel',
+        nameLink: '/admin/company',
+        subNameLinks: [
+          '/admin/company/create',
+          '/admin/company/[companyId]/edit',
+        ],
+      },
+      {
+        id: 'partner',
+        label: 'AdminSidebar.partnerLabel',
+        nameLink: '/admin/partner',
+        subNameLinks: ['/admin/partner', '/admin/partner/[partnerId]/edit'],
       },
     ],
   },
@@ -70,6 +71,7 @@ type TAdminSidebar = {
 const getNestedPath = (arr: any[], pathName: string) => {
   // eslint-disable-next-line no-restricted-syntax
   for (const item of arr) {
+    if (item.subNameLinks?.includes(pathName)) return item;
     if (item.nameLink === pathName) return item;
     if (item.childrenMenus) {
       const child = getNestedPath(item.childrenMenus, pathName);
@@ -92,7 +94,7 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
 
   const activeMenu = useMemo(
     () => getNestedPath(LIST_SIDEBAR_MENU, pathname),
-    [LIST_SIDEBAR_MENU, pathname],
+    [pathname],
   );
 
   return (
@@ -100,10 +102,16 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
       <div className={css.root}>
         <div className={css.leftSide}>
           {LIST_SIDEBAR_MENU.map((item: any) => {
-            const { Icon, id, nameLink } = item;
+            const { Icon, id, nameLink, subNameLinks } = item;
+            const activeWithSubNameLinks = subNameLinks?.includes(pathname);
+            const isActive = activeWithSubNameLinks || pathname === nameLink;
             return (
               <NamedLink path={nameLink} key={id} className={css.sidebarButton}>
-                <Icon className={css.sidebarIcon} />
+                <Icon
+                  className={classNames(css.sidebarIcon, {
+                    [css.active]: isActive,
+                  })}
+                />
               </NamedLink>
             );
           })}

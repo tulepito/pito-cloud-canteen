@@ -4,10 +4,11 @@ import React, { useState } from 'react';
 
 import css from './Tabs.module.scss';
 
-type TTabsItem = {
+export type TTabsItem = {
   label: string;
   key: string;
-  children: ReactNode | string | number;
+  children: (props: any) => ReactNode | ReactNode | string | number;
+  childrenProps: any;
 };
 
 interface ITabsProps {
@@ -47,6 +48,8 @@ const Tabs = (props: ITabsProps) => {
     );
   });
 
+  const childrenProps = items[+activeTabKey - 1]?.childrenProps;
+
   const tabContent = items[+activeTabKey - 1]?.children || '';
 
   // classes setup
@@ -55,7 +58,9 @@ const Tabs = (props: ITabsProps) => {
   return (
     <div>
       <div className={headerClassName}>{tabHeader}</div>
-      <div className={contentClassName}>{tabContent}</div>
+      <div className={contentClassName}>
+        {childrenProps ? tabContent(childrenProps) : tabContent}
+      </div>
     </div>
   );
 };

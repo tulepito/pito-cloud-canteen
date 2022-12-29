@@ -48,7 +48,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
   const { pathname, query } = router;
   const [isOpen, setIsOpen] = useState(false);
 
-  const { Icon, label, childrenMenus, nameLink, level } = menu;
+  const { Icon, label, childrenMenus, nameLink, level, subNameLinks } = menu;
 
   const hasChildrenMenus = childrenMenus && childrenMenus.length > 0;
 
@@ -79,7 +79,10 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     subMenuWrapperClassName,
   );
 
-  const isActive = pathname === nameLink;
+  const activeWithSubNameLinks = subNameLinks?.includes(pathname);
+
+  const isActive = activeWithSubNameLinks || pathname === nameLink;
+
   const firstLevel = level === 1;
   const subMenuLayoutClasses = classNames(
     css.subMenuLayout,

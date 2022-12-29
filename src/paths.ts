@@ -7,8 +7,8 @@ const paths = {
 };
 
 export const adminPaths = {
-  Dashboard: '/',
-  ManageUsers: '/admin/user',
+  Dashboard: '/admin',
+  ManageUsers: '/admin/users',
   ManageCompanies: '/admin/company',
   EditCompany: '/admin/company/[companyId]/edit',
   CreateCompany: '/admin/company/create',

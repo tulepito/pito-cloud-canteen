@@ -6,6 +6,7 @@ import css from './IconUserManagement.module.scss';
 
 const IconUserManagement = (props: TIconProps) => {
   const { className } = props;
+
   const classes = classNames(css.root, className);
   return (
     <svg

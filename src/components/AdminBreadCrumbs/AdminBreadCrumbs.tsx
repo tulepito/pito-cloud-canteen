@@ -10,6 +10,11 @@ const Route2LabelMap = {
   '/admin': 'Trang chủ',
   '/admin/order': 'Quản lý đơn hàng',
   '/admin/order/create': 'Tạo đơn hàng',
+  '/admin/company': 'Quản lý khách hàng',
+  '/admin/company/create': 'Tạo khách hàng',
+  '/admin/company/[companyId]': 'Chi tiết khách hàng',
+  '/admin/company/[companyId]/edit': 'Sửa',
+  '/admin/partner': 'Quản lý đối tác',
 } as any;
 
 const CombineAccumulatively = (segments: any[], isAdminRoute: boolean) => {

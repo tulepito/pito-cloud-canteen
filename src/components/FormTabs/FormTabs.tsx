@@ -10,6 +10,7 @@ type TFormTabs = {
   rootClassName?: string;
   navRootClassName?: string;
   tabRootClassName?: string;
+  formTabNavClassName?: string;
 };
 
 const FormTabs: React.FC<PropsWithChildren<TFormTabs>> = (props) => {
@@ -19,6 +20,7 @@ const FormTabs: React.FC<PropsWithChildren<TFormTabs>> = (props) => {
     rootClassName,
     navRootClassName,
     tabRootClassName,
+    formTabNavClassName,
   } = props;
   const rootClasses = rootClassName || css.root;
   const classes = classNames(rootClasses, className);
@@ -59,6 +61,7 @@ const FormTabs: React.FC<PropsWithChildren<TFormTabs>> = (props) => {
         rootClassName={navRootClassName}
         tabs={tabNavTabs || []}
         tabRootClassName={tabRootClassName}
+        className={formTabNavClassName}
       />
       {selectedTabPanel}
     </div>

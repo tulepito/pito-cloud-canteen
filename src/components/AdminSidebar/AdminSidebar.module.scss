@@ -4,14 +4,18 @@
 .root {
   display: flex;
   height: 100vh;
-  border-right: 1px solid #d9d9d9;
-
+  &:hover {
+    .rightSide {
+      display: unset;
+    }
+  }
   .leftSide {
     display: flex;
     width: 60px;
     align-items: center;
     flex-direction: column;
     padding: 32px 0 0 0;
+    z-index: 1;
     background-color: $neutralGray2;
     border-right: 1px solid #f0f0f0;
     .sidebarButton {
@@ -24,6 +28,12 @@
       .sidebarIcon {
         width: 20px;
         height: 20px;
+
+        &.active {
+          path {
+            fill: $marketplaceColorDark;
+          }
+        }
       }
     }
   }
@@ -31,6 +41,16 @@
   .rightSide {
     padding: 32px 16px 0 16px;
     width: 220px;
+    position: absolute;
+    background-color: $matterColorLight;
+    z-index: -1;
+    display: none;
+    border-right: 1px solid #d9d9d9;
+    left: $adminSidebarLeftPartWidth;
+
+    @include viewportLarge {
+      display: initial;
+    }
     .menuLabel {
       font-size: 18px;
       line-height: 24px;

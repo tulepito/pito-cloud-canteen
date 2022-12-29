@@ -343,5 +343,15 @@
   "OrderSettingModal.field.employeeAmount": "Số lượng nhân viên",
   "OrderSettingModal.field.specialDemand": "Yêu cầu đặc biệt",
   "OrderSettingModal.field.accessSetting": "Cài đặt truy cập",
-  "OrderSettingModal.field.perPack": "Ngân sách 1 người"
+  "OrderSettingModal.field.perPack": "Ngân sách 1 người",
+  "CreateOrderWizard.clientSelectLabel": "Chọn khách hàng",
+  "CreateOrderWizard.mealPlanSetupLabel": "Thiết lập kế hoạch bữa ăn",
+  "CreateOrderWizard.createMealPlanLabel": "Tạo kế hoạch bữa ăn",
+  "CreateOrderWizard.serviceFeeAndNoteLabel": "Phí dịch vụ và dặn dò",
+  "CreateOrderWizard.reviewLabel": "Review và tạo đơn",
+  "CreateOrderPage.title": "Tạo đơn hàng",
+  "AdminSidebar.manageOrderLabel": "Danh sách đơn hàng",
+  "ReviewOrder.title": "Xem lại thông tin đặt hàng và tạo đơn",
+  "AdminSidebar.companyCreateLabel": "Tạo khách hàng",
+  "AdminSidebar.companyEditLabel": "Chỉnh sửa khách hàng"
 }
