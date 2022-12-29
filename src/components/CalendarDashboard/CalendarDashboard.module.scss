@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
   height: 100%;
@@ -10,6 +11,7 @@
 }
 
 .root :global(.rbc-calendar) {
+  min-height: 80vh;
 }
 
 .root :global(.rbc-toolbar-label) {
