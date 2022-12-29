@@ -163,3 +163,9 @@ $buttonBorderRadius: 8px;
 @mixin mediumText {
   @include textTemplate(12px, 500, 16px, '');
 }
+
+@mixin fullWidthDivider($color, $size) {
+  width: 100%;
+  height: $size;
+  background-color: $color;
+}
