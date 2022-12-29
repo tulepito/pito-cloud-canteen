@@ -21,8 +21,6 @@ import Script from 'next/script';
 import nProgress from 'nprogress';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { persistStore } from 'redux-persist';
-import { PersistGate } from 'redux-persist/integration/react';
 
 Router.events.on('routeChangeStart', nProgress.start);
 Router.events.on('routeChangeError', nProgress.done);
@@ -56,7 +54,6 @@ const MyApp = ({
     : isCompanyRoute
     ? CompanyLayout
     : Layout;
-  const persistor = persistStore(store);
   return (
     <main className={openSans.className}>
       <TranslationProvider>
@@ -64,16 +61,14 @@ const MyApp = ({
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
         />
         <Provider store={store}>
-          <PersistGate loading={null} persistor={persistor}>
-            <AuthGuard
-              pathName={router.route}
-              isAuthenticationRoute={isAuthenticationRoute}
-              isRequiredAuth={isRequiredAuth}>
-              <LayoutComponent>
-                <Component {...props.pageProps} key={router.asPath} />
-              </LayoutComponent>
-            </AuthGuard>
-          </PersistGate>
+          <AuthGuard
+            pathName={router.route}
+            isAuthenticationRoute={isAuthenticationRoute}
+            isRequiredAuth={isRequiredAuth}>
+            <LayoutComponent>
+              <Component {...props.pageProps} key={router.asPath} />
+            </LayoutComponent>
+          </AuthGuard>
         </Provider>
       </TranslationProvider>
     </main>

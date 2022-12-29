@@ -7,13 +7,13 @@ const DeliveryAddressField = () => {
   const intl = useIntl();
   return (
     <div className={css.container}>
+      <div className={css.fieldTitle}>
+        {intl.formatMessage({ id: 'DeliveryAddressField.title' })}
+      </div>
       <LocationAutocompleteInputField
-        id="location"
-        name="location"
+        id="deliveryAddress"
+        name="deliveryAddress"
         rootClassName={css.field}
-        label={intl.formatMessage({
-          id: 'EditCompanyForm.addressLabel',
-        })}
         placeholder={intl.formatMessage({
           id: 'EditCompanyForm.addressPlaceholder',
         })}

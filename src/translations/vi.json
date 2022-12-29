@@ -342,5 +342,11 @@
   "OrderSettingModal.field.employeeAmount": "Số lượng nhân viên",
   "OrderSettingModal.field.specialDemand": "Yêu cầu đặc biệt",
   "OrderSettingModal.field.accessSetting": "Cài đặt truy cập",
-  "OrderSettingModal.field.perPack": "Ngân sách 1 người"
+  "OrderSettingModal.field.perPack": "Ngân sách 1 người",
+  "DeliveryAddressField.title": "Chọn địa điểm",
+  "PerPackageField.title": "Thiết lập ngân sách 1 người",
+  "PerPackageField.label": "Ngân sách tối đa cho 1 người/Bữa ăn",
+  "PerPackageField.placeholder": "100.000",
+  "PerPackageField.vat": "Tính thuế VAT",
+  "NutritionField.title": "Chế độ dinh dưỡng"
 }
