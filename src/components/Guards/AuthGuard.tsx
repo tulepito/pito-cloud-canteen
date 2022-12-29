@@ -27,13 +27,15 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     (!isSignUpPath || shouldNavigateIfInSignUpFlow);
 
   useEffect(() => {
-    if (authInfoLoaded) {
-      if (isNonRequireAuthenticationRoute) {
-        if (homePageNavigateCondition) {
-          router.push(generalPaths.Home);
+    if (pathName !== generalPaths.StyleGuide) {
+      if (authInfoLoaded) {
+        if (isNonRequireAuthenticationRoute) {
+          if (homePageNavigateCondition) {
+            router.push(generalPaths.Home);
+          }
+        } else if (!isAuthenticated) {
+          router.push(generalPaths.SignIn);
         }
-      } else if (!isAuthenticated) {
-        router.push(generalPaths.SignIn);
       }
     }
   }, [
