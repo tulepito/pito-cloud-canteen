@@ -9,6 +9,7 @@ import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
 import { Navigate } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
+import type { TCalendarItemCardComponents } from '../../helpers/types';
 import MDayItem from '../DayItem/MDayItem';
 import css from './MonthView.module.scss';
 
@@ -20,6 +21,7 @@ type TMonthViewProps = {
   range: any;
   accessors: any;
   renderEvent?: React.FC<any>;
+  customComponents?: TCalendarItemCardComponents;
 } & TimeGridProps;
 
 type TMonthViewObject = {
@@ -33,6 +35,7 @@ function MonthView({
   localizer,
   events = [],
   renderEvent,
+  customComponents,
 }: TMonthViewProps & TMonthViewObject) {
   const currRange = useMemo(
     () => MonthView.range(date, { localizer }),
@@ -59,6 +62,7 @@ function MonthView({
             key={item.getTime()}
             events={getEventsInDate(item, events)}
             renderEvent={renderEvent}
+            components={customComponents}
           />
         ))}
       </div>

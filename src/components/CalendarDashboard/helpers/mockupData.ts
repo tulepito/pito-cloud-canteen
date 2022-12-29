@@ -487,3 +487,37 @@ export const EVENTS_MOCKUP = [
     end: new Date(2023, 11, 30, 2, 0, 0),
   },
 ];
+
+export const MEAL_PLANS_MOCKUP = [
+  {
+    resource: {
+      id: '1',
+      daySession: 'MORNING_SESSION',
+      suitableAmount: 10,
+      status: 'notJoined',
+      type: 'dailyMeal',
+      deliveryAddress: {
+        address: '133 Duong Ba Trac',
+        ward: '1',
+        district: '8',
+        city: 'Ho Chi Minh',
+        country: 'Vietnam',
+      },
+      restaurant: {
+        id: '12',
+        name: 'Vua Hải Sản',
+      },
+      expiredTime: new Date(2022, 11, 29, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
+    },
+    title: 'PT3040',
+    start: new Date(2022, 11, 29, 16, 0, 0),
+    end: new Date(2022, 11, 29, 20, 0, 0),
+  },
+];
