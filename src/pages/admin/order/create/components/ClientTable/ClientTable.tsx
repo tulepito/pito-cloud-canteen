@@ -1,18 +1,17 @@
 import Pagination from '@components/Pagination/Pagination';
-import type { TPagination } from '@utils/types';
 import classNames from 'classnames';
 
 import css from './ClientTable.module.scss';
 
 type ClientTableProps = {
   data: any[];
-  pagination?: TPagination | null;
+  totalItems: number;
+  page: number;
   onPageChange: (value: number) => void;
 };
 
 const ClientTable: React.FC<ClientTableProps> = (props) => {
-  const { data, pagination, onPageChange } = props;
-  const { page, totalItems } = pagination || {};
+  const { data, totalItems, onPageChange, page } = props;
   return (
     <div className={css.container}>
       <div className={css.table}>
@@ -38,7 +37,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
           ))}
         </div>
       </div>
-      {pagination && (
+      {page && (
         <Pagination
           total={totalItems}
           pageSize={10}
