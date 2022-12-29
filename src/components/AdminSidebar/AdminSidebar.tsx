@@ -1,10 +1,5 @@
-import IconAnalysis from '@components/IconAnalysis/IconAnalysis';
 import IconHome from '@components/IconHome/IconHome';
 import IconOrderManagement from '@components/IconOrderManagement/IconOrderManagement';
-import IconPhone from '@components/IconPhone/IconPhone';
-import IconSetting from '@components/IconSetting/IconSetting';
-import IconUserManagement from '@components/IconUserManagement/IconUserManagement';
-import IconWallet from '@components/IconWallet/IconWallet';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import NamedLink from '@components/NamedLink/NamedLink';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
@@ -53,29 +48,17 @@ const LIST_SIDEBAR_MENU = [
     ],
   },
   {
-    id: 'user',
-    Icon: IconUserManagement,
-    nameLink: adminPaths.ManageUsers,
-  },
-  {
-    id: 'analysis',
-    Icon: IconAnalysis,
-    nameLink: adminPaths.Dashboard,
-  },
-  {
-    id: 'wallet',
-    Icon: IconWallet,
-    nameLink: adminPaths.Dashboard,
-  },
-  {
-    id: 'phone',
-    Icon: IconPhone,
-    nameLink: adminPaths.Dashboard,
-  },
-  {
-    id: 'setting',
-    Icon: IconSetting,
-    nameLink: adminPaths.Dashboard,
+    id: 'order',
+    label: 'AdminSidebar.orderLabel',
+    Icon: IconOrderManagement,
+    level: 1,
+    childrenMenus: [
+      {
+        id: 'createOrder',
+        label: 'AdminSidebar.createOrder',
+        nameLink: '/admin/order/create',
+      },
+    ],
   },
 ];
 

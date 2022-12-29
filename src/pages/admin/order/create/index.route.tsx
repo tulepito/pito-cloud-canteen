@@ -1,13 +1,13 @@
 import React from 'react';
 
 import CreateOrderWizard from './components/CreateOrderWizard/CreateOrderWizard';
+import CreateOrderPage from './CreateOrder.page';
 
-const CreateOrderRoute = () => {
+export default function CreateOrderRoute() {
   return (
     <>
       <CreateOrderWizard />
+      <CreateOrderPage />
     </>
   );
-};
-
-export default CreateOrderRoute;
+}

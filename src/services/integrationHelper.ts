@@ -15,7 +15,7 @@ export const fetchListing = async (listingId: string) => {
 
 export const fetchUser = async (userId: string) => {
   const integrationSdk = getIntegrationSdk();
-  const response = await integrationSdk.user.show(
+  const response = await integrationSdk.users.show(
     {
       id: userId,
     },
