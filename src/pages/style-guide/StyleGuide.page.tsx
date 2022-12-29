@@ -14,6 +14,7 @@ import Pagination from '@components/Pagination/Pagination';
 import Progress from '@components/Progress/Progress';
 import Tabs from '@components/Tabs/Tabs';
 import Toggle from '@components/Toggle/Toggle';
+import Tooltip from '@components/Tooltip/Tooltip';
 import useBoolean from '@hooks/useBoolean';
 import type { TIconProps } from '@utils/types';
 import { required } from '@utils/validators';
@@ -330,6 +331,7 @@ const StyleGuidePage = (props: any) => {
           </div>
         </StyleGuideCard>
         <StyleGuideCard>
+          <p className={css.title}>Button component</p>
           <Button
             type="submit"
             fullWidth
@@ -427,6 +429,7 @@ const StyleGuidePage = (props: any) => {
           </Accordion>
         </StyleGuideCard>
         <StyleGuideCard>
+          <p className={css.title}>Pagination component</p>
           <Pagination
             total={50}
             current={pageCurrent}
@@ -461,6 +464,71 @@ const StyleGuidePage = (props: any) => {
             showPrevNextJumpers
             disabled
           />
+        </StyleGuideCard>
+        <StyleGuideCard>
+          <p className={css.title}>Tooltip component</p>
+          <div className={css.tooltipWrapper}>
+            <Tooltip
+              tooltipContent={<span>This is a tooltip</span>}
+              placement="left">
+              <span className={css.tooltipContainer}>Left tooltip</span>
+            </Tooltip>
+            <Tooltip
+              tooltipContent={<span>This is a tooltip</span>}
+              placement="right">
+              <span className={css.tooltipContainer}>Right tooltip</span>
+            </Tooltip>
+            <Tooltip
+              tooltipContent={<span>This is a tooltip</span>}
+              placement="top">
+              <span className={css.tooltipContainer}>Top tooltip</span>
+            </Tooltip>
+            <Tooltip
+              tooltipContent={<span>This is a tooltip</span>}
+              placement="bottom">
+              <span className={css.tooltipContainer}>Bottom tooltip</span>
+            </Tooltip>
+            <Tooltip
+              tooltipContent={<span>This is a tooltip</span>}
+              placement="topLeft">
+              <span className={css.tooltipContainer}>Top left tooltip</span>
+            </Tooltip>
+            <Tooltip
+              tooltipContent={<span>This is a tooltip</span>}
+              placement="topRight">
+              <span className={css.tooltipContainer}>Top right tooltip</span>
+            </Tooltip>
+            <Tooltip
+              tooltipContent={<span>This is a tooltip</span>}
+              placement="bottomLeft">
+              <span className={css.tooltipContainer}>Bottom left tooltip</span>
+            </Tooltip>
+            <Tooltip
+              tooltipContent={<span>This is a tooltip</span>}
+              placement="bottomRight">
+              <span className={css.tooltipContainer}>Bottom right tooltip</span>
+            </Tooltip>
+            <Tooltip
+              tooltipContent={<span>This is a tooltip</span>}
+              placement="rightTop">
+              <span className={css.tooltipContainer}>Right top tooltip</span>
+            </Tooltip>
+            <Tooltip
+              tooltipContent={<span>This is a tooltip</span>}
+              placement="rightBottom">
+              <span className={css.tooltipContainer}>Right bottom tooltip</span>
+            </Tooltip>
+            <Tooltip
+              tooltipContent={<span>This is a tooltip</span>}
+              placement="leftTop">
+              <span className={css.tooltipContainer}>Left top tooltip</span>
+            </Tooltip>
+            <Tooltip
+              tooltipContent={<span>This is a tooltip</span>}
+              placement="leftBottom">
+              <span className={css.tooltipContainer}>Left bottom tooltip</span>
+            </Tooltip>
+          </div>
         </StyleGuideCard>
       </div>
     </Layout>

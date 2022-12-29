@@ -10,25 +10,25 @@ import {
   parseEntitiesToTableData,
   sliceCompanies,
 } from '@src/pages/admin/company/helpers';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 
+import ClientTable from '../../create/components/ClientTable/ClientTable';
 import css from './ClientSelector.module.scss';
-import ClientTable from './ClientTable';
 
 const ClientSelector = () => {
-  const router = useRouter();
-  const { page = 1, ...queryParams } = router.query;
+  const [queryParams, setQueryParams] = useState({});
+  const [page, setPage] = useState<number>(1);
   const dispatch = useAppDispatch();
-  const { companyRefs, pagination } = useAppSelector(
+  const { companyRefs, totalItems } = useAppSelector(
     (state) => state.ManageCompaniesPage,
     shallowEqual,
   );
   useEffect(() => {
-    dispatch(
-      manageCompaniesThunks.queryCompanies(parseInt(page as string, 10)),
-    );
+    dispatch(manageCompaniesThunks.queryCompanies());
+  }, []);
+
+  useEffect(() => {
     dispatch(paginateCompanies({ page }));
   }, [dispatch, page]);
 
@@ -60,7 +60,7 @@ const ClientSelector = () => {
   );
 
   const onPageChange = (value: number) => {
-    router.push(`${router.pathname}?page=${value}`);
+    setPage(value);
   };
   return (
     <div>
@@ -69,12 +69,17 @@ const ClientSelector = () => {
         <div className={css.amount}>1212</div>
       </div>
       <div className={css.searchInput}>
-        <KeywordSearchForm onSubmit={() => {}} />
+        <KeywordSearchForm
+          onSubmit={(values: any) => {
+            setQueryParams(values);
+          }}
+        />
       </div>
       <div className={css.clientTable}>
         <ClientTable
           data={companiesTableData}
-          pagination={pagination}
+          page={page}
+          totalItems={totalItems}
           onPageChange={onPageChange}
         />
       </div>

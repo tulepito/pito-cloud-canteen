@@ -36,10 +36,22 @@
 
 .title {
   font-size: 20px;
-  margin-bottom: 10px;
+  margin-bottom: 24px;
   font-weight: $fontWeightBold;
 }
 
 .fieldItem {
   margin-bottom: 10px;
+}
+.tooltipContainer {
+  padding: 6px 8px;
+  text-align: center;
+  background-color: $primaryPri3;
+  border-radius: 8px;
+  color: $matterColorLight;
+}
+.tooltipWrapper {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
