@@ -27,12 +27,12 @@ export type TEditCompanyFormValues = {
   lastName: string;
   email: string;
   phone: string;
-  location?: any;
+  location: any;
   password: string;
   confirmPassword: string;
   companyName: string;
   companyEmail: string;
-  companyAddress: string;
+  companyLocation: any;
   tax: string;
   note?: string;
 };
@@ -50,11 +50,19 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
   const { onSubmit, ...rest } = props;
   const [submitedValues, setSubmittedValues] =
     useState<TEditCompanyFormValues>();
+  const [success, setSuccess] = useState<boolean>(false);
 
   const submitHandler = async (values: TEditCompanyFormValues) => {
     try {
-      await onSubmit(values);
-      setSubmittedValues(values);
+      const response = (await onSubmit(values)) as any;
+      if (!response.error) {
+        setSuccess(true);
+        const i = setTimeout(() => {
+          setSubmittedValues(values);
+          setSuccess(false);
+          clearTimeout(i);
+        }, 5000);
+      }
     } catch (error) {
       // don't do any thing
     }
@@ -71,7 +79,10 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
           inProgress,
           values,
         } = fieldRenderProps;
-        const ready = !formErrorMessage && isEqual(submitedValues, values);
+
+        const ready =
+          (!formErrorMessage && isEqual(submitedValues, values)) || success;
+
         return (
           <Form onSubmit={handleSubmit} className={css.form}>
             <div className={css.formHeader}>
@@ -102,7 +113,6 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                     id: 'EditCompanyForm.lastNameRequired',
                   }),
                 )}
-                required
               />
               <FieldTextInput
                 id="firstName"
@@ -119,7 +129,6 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                     id: 'EditCompanyForm.firstNameRequired',
                   }),
                 )}
-                required
               />
             </div>
             {!isEditting && (
@@ -146,7 +155,6 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                       }),
                     ),
                   )}
-                  required
                 />
               </div>
             )}
@@ -173,7 +181,6 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                     }),
                   ),
                 )}
-                required
               />
               <LocationAutocompleteInputField
                 id="location"
@@ -224,7 +231,6 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                       }),
                     ),
                   )}
-                  required
                 />
                 <FieldTextInput
                   id="confirmPassword"
@@ -250,7 +256,6 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                       'password',
                     ),
                   )}
-                  required
                 />
               </div>
             )}
@@ -270,6 +275,11 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                   id: 'EditCompanyForm.companyNamePlaceholder',
                 })}
                 className={css.field}
+                validate={required(
+                  intl.formatMessage({
+                    id: 'EditCompanyForm.companyNameLabelRequired',
+                  }),
+                )}
               />
               <FieldTextInput
                 id="companyEmail"
@@ -281,19 +291,43 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                 placeholder={intl.formatMessage({
                   id: 'EditCompanyForm.companyEmailPlaceholder',
                 })}
+                validate={composeValidators(
+                  required(
+                    intl.formatMessage({
+                      id: 'EditCompanyForm.companyEmailRequired',
+                    }),
+                  ),
+                  emailFormatValid(
+                    intl.formatMessage({
+                      id: 'EditCompanyForm.companyEmailInvalid',
+                    }),
+                  ),
+                )}
               />
             </div>
             <div className={css.fields}>
-              <FieldTextInput
-                id="companyAddress"
-                className={css.field}
-                name="companyAddress"
+              <LocationAutocompleteInputField
+                id="companyLocation"
+                name="companyLocation"
+                rootClassName={css.field}
                 label={intl.formatMessage({
-                  id: 'EditCompanyForm.companyAddressLabel',
+                  id: 'EditCompanyForm.addressLabel',
                 })}
                 placeholder={intl.formatMessage({
-                  id: 'EditCompanyForm.companyAddressPlaceholder',
+                  id: 'EditCompanyForm.addressPlaceholder',
                 })}
+                validate={composeValidators(
+                  autocompleteSearchRequired(
+                    intl.formatMessage({
+                      id: 'EditCompanyForm.locationRequried',
+                    }),
+                  ),
+                  autocompletePlaceSelected(
+                    intl.formatMessage({
+                      id: 'EditCompanyForm.validLocation',
+                    }),
+                  ),
+                )}
               />
               <FieldTextInput
                 id="tax"
@@ -305,6 +339,11 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                 placeholder={intl.formatMessage({
                   id: 'EditCompanyForm.taxPlaceholder',
                 })}
+                validate={required(
+                  intl.formatMessage({
+                    id: 'EditCompanyForm.taxRequired',
+                  }),
+                )}
               />
             </div>
             <div className={css.fields}>
@@ -320,6 +359,17 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
             </div>
             <div className={css.buttonWrapper}>
               <div>
+                {ready && (
+                  <span className={css.successMessage}>
+                    {isEditting
+                      ? intl.formatMessage({
+                          id: 'EditCompanyForm.updateSuccess',
+                        })
+                      : intl.formatMessage({
+                          id: 'EditCompanyForm.createSuccess',
+                        })}
+                  </span>
+                )}
                 {formErrorMessage && (
                   <ErrorMessage message={formErrorMessage} />
                 )}

@@ -45,3 +45,8 @@
   text-align: center;
   border-bottom: 1px solid $neutralGray5;
 }
+
+.successMessage {
+  color: $successColor;
+  font-weight: $fontWeightSemiBold;
+}

@@ -1,7 +1,7 @@
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldAvailability, {
-  ALL_WEEK_APPLY,
+  SINGLE_DAY_APPLY,
 } from '@components/FieldAvailability/FieldAvailability';
 import FieldCheckboxGroup from '@components/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
@@ -81,13 +81,7 @@ const EditPartnerBasicInfomationForm: React.FC<
     type: 'availability-plan/time',
     timezone: defaultTimeZone(),
     entries: [
-      // { dayOfWeek: 'mon', startTime: '09:00', endTime: '17:00', seats: 1 },
-      // { dayOfWeek: 'tue', startTime: '09:00', endTime: '17:00', seats: 1 },
-      // { dayOfWeek: 'wed', startTime: '09:00', endTime: '17:00', seats: 1 },
-      // { dayOfWeek: 'thu', startTime: '09:00', endTime: '17:00', seats: 1 },
-      // { dayOfWeek: 'fri', startTime: '09:00', endTime: '17:00', seats: 1 },
-      // { dayOfWeek: 'sat', startTime: '09:00', endTime: '17:00', seats: 1 },
-      // { dayOfWeek: 'sun', startTime: '09:00', endTime: '17:00', seats: 1 },
+      { dayOfWeek: 'mon', startTime: '07:00', endTime: '23:00', seats: 1 },
     ],
   } as any;
 
@@ -136,7 +130,7 @@ const EditPartnerBasicInfomationForm: React.FC<
         },
       ],
       availabilityPlan: createAvailabilityPlanInitialValues(availabilityPlan),
-      availabilityApplyType: availabilityApplyType || ALL_WEEK_APPLY,
+      availabilityApplyType: availabilityApplyType || SINGLE_DAY_APPLY,
       daysToApply: createDayToApplyInitialValues(availabilityPlan),
       vat,
       title,
@@ -473,6 +467,11 @@ const EditPartnerBasicInfomationForm: React.FC<
                     label={intl.formatMessage({
                       id: 'EditPartnerForm.minPrice',
                     })}
+                    validate={required(
+                      intl.formatMessage({
+                        id: 'EditPartnerBasicInformationForm.minPriceRequired',
+                      }),
+                    )}
                   />
                   <FieldCheckboxGroup
                     id="packaging"

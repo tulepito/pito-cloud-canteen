@@ -1,3 +1,4 @@
+@use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/vars.scss' as *;
 
 .fieldLabel {
@@ -16,7 +17,11 @@
 
 .categoryList {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 20px;
+  @include viewportLarge {
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
 
 .fields {

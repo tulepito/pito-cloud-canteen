@@ -379,5 +379,12 @@
   "ManagePartners.authorizeBtn": "Xác thực",
   "ManagePartners.unsatisfactoryBtn": "Không đạt yêu cầu",
   "ManagePartners.deleteBtn": "Xóa đối tác",
-  "ResponsiveImage.noImage": "Không có hình ảnh"
+  "ResponsiveImage.noImage": "Không có hình ảnh",
+  "EditCompanyForm.companyNameLabelRequired": "Vui lòng nhập công ty",
+  "EditCompanyForm.companyEmailRequired": "Vui lòng nhập email công ty",
+  "EditCompanyForm.companyEmailInvalid": "Email không hợp lệ",
+  "EditCompanyForm.taxRequired": "Vui lòng nhập mã số thuế",
+  "EditCompanyForm.createSuccess": "Tạo thành công",
+  "EditCompanyForm.updateSuccess": "Cập nhật thành công",
+  "EditPartnerBasicInformationForm.minPriceRequired": "Vui lòng nhập giá trị tối thiểu"
 }
