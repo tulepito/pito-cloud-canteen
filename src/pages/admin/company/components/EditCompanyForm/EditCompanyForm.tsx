@@ -333,7 +333,6 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
               <FieldTextInput
                 id="tax"
                 name="tax"
-                type="number"
                 className={css.field}
                 label={intl.formatMessage({
                   id: 'EditCompanyForm.taxLabel',
