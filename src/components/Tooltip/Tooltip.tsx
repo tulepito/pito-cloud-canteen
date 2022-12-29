@@ -25,6 +25,7 @@ type TTooltip = {
   tooltipContent?: any;
   trigger?: string;
   showArrow?: boolean;
+  overlayInnerStyle?: React.CSSProperties;
 };
 
 const Tooltip = (props: PropsWithChildren<TTooltip>) => {
@@ -35,6 +36,7 @@ const Tooltip = (props: PropsWithChildren<TTooltip>) => {
     trigger = 'hover',
     children,
     showArrow = true,
+    overlayInnerStyle,
   } = props;
   const overlayClasses = classNames(css.overlayClassName, overlayClassName);
 
@@ -43,6 +45,7 @@ const Tooltip = (props: PropsWithChildren<TTooltip>) => {
     trigger: [trigger],
     overlay: tooltipContent,
     overlayClassName: overlayClasses,
+    overlayInnerStyle,
     destroyTooltipOnHide: true,
     showArrow,
   };
