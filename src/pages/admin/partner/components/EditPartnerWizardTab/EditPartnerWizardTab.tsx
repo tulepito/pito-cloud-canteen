@@ -310,16 +310,16 @@ const EditPartnerWizardTab = (props: any) => {
         const params = {
           id: partnerListingRef?.author?.id?.uuid,
         };
-        await onPublishDraftPartner(params);
-        router.push('/admin/partner');
+        const response = await onPublishDraftPartner(params);
+        if (!response.error) router.push('/admin/partner');
       };
 
       const handleDiscardDraftPartner = async () => {
         const params = {
           id: partnerListingRef?.author?.id?.uuid,
         };
-        await onDiscardDraftPartner(params);
-        router.push('/admin/partner');
+        const response = await onDiscardDraftPartner(params);
+        if (!response.error) router.push('/admin/partner');
       };
       return (
         <EditPartnerPreviewForm
