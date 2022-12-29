@@ -44,6 +44,13 @@ export const minLength =
     return hasLength && value.length >= minimumLength ? VALID : message;
   };
 
+export const taxLengthRequired = (message: string) => (value: string) => {
+  const hasLength = value && typeof value.length === 'number';
+  return hasLength && (value.length === 13 || value.length === 10)
+    ? VALID
+    : message;
+};
+
 export const maxLength =
   (message: string, maximumLength: number) => (value: string) => {
     if (!value) {

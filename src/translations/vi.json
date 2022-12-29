@@ -456,6 +456,7 @@
   "EditCompanyForm.companyEmailRequired": "Vui lòng nhập email công ty",
   "EditCompanyForm.companyEmailInvalid": "Email không hợp lệ",
   "EditCompanyForm.taxRequired": "Vui lòng nhập mã số thuế",
+  "EditCompanyForm.taxValid": "Mã số thuế phải là số có 13 chữ số hoặc 10 chữ số.",
   "EditCompanyForm.createSuccess": "Tạo thành công",
   "EditCompanyForm.updateSuccess": "Cập nhật thành công",
   "EditPartnerBasicInformationForm.minPriceRequired": "Vui lòng nhập giá trị tối thiểu"
