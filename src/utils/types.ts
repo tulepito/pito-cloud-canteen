@@ -19,9 +19,7 @@ import type {
   ETxTransitionActors,
 } from './enums';
 
-export type NextApplicationPage<P = any, IP = P> = NextPage<P, IP> & {
-  requireAuth?: boolean;
-};
+export type NextApplicationPage<P = any, IP = P> = NextPage<P, IP> & {};
 
 export enum ErrorCodes {
   ERROR_CODE_TRANSACTION_LISTING_NOT_FOUND = 'transaction-listing-not-found',

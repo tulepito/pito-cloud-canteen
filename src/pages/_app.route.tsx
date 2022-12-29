@@ -2,16 +2,13 @@
 import '@src/styles/globals.scss';
 import '@src/styles/nprogress.scss';
 
-import AdminLayout from '@components/AdminLayout/AdminLayout';
-import AuthGuard from '@components/AuthGuard/AuthGuard';
-import CompanyLayout from '@components/CompanyLayout/CompanyLayout';
-import Layout from '@components/Layout/Layout';
+import AuthGuard from '@components/Guards/AuthGuard';
+import PermissionGuard from '@components/Guards/PermissionGuard';
 import { Manrope } from '@next/font/google';
 import { authThunks } from '@redux/slices/auth.slice';
 import { emailVerificationActions } from '@redux/slices/emailVerification.slice';
 import { userThunks } from '@redux/slices/user.slice';
 import wrapper from '@redux/store';
-import { AuthenticationRoutes } from '@src/paths';
 import TranslationProvider from '@translations/TranslationProvider';
 import type { NextApplicationPage } from '@utils/types';
 import type { AppContext, AppInitialProps, AppProps } from 'next/app';
@@ -44,18 +41,6 @@ const MyApp = ({
 }: AppProps & AppCustomProps) => {
   const { store, props } = wrapper.useWrappedStore(restProps);
 
-  const isRequiredAuth = Component.requireAuth === true;
-
-  const isAdminRoute = !!router.route.startsWith('/admin');
-  const isAuthenticationRoute = AuthenticationRoutes.includes(router.route);
-  const isCompanyRoute = !!router.route.startsWith('/company');
-
-  const LayoutComponent = isAdminRoute
-    ? AdminLayout
-    : isCompanyRoute
-    ? CompanyLayout
-    : Layout;
-
   return (
     <main className={font.className}>
       <TranslationProvider>
@@ -63,13 +48,10 @@ const MyApp = ({
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
         />
         <Provider store={store}>
-          <AuthGuard
-            pathName={router.route}
-            isAuthenticationRoute={isAuthenticationRoute}
-            isRequiredAuth={isRequiredAuth}>
-            <LayoutComponent>
+          <AuthGuard>
+            <PermissionGuard>
               <Component {...props.pageProps} key={router.asPath} />
-            </LayoutComponent>
+            </PermissionGuard>
           </AuthGuard>
         </Provider>
       </TranslationProvider>
