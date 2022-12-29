@@ -13,7 +13,6 @@ import {
   passwordFormatValid,
   phoneNumberFormatValid,
   required,
-  taxLengthRequired,
 } from '@utils/validators';
 import classNames from 'classnames';
 import isEqual from 'lodash/isEqual';
@@ -350,17 +349,10 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
                 placeholder={intl.formatMessage({
                   id: 'EditCompanyForm.taxPlaceholder',
                 })}
-                validate={composeValidators(
-                  required(
-                    intl.formatMessage({
-                      id: 'EditCompanyForm.taxRequired',
-                    }),
-                  ),
-                  taxLengthRequired(
-                    intl.formatMessage({
-                      id: 'EditCompanyForm.taxValid',
-                    }),
-                  ),
+                validate={required(
+                  intl.formatMessage({
+                    id: 'EditCompanyForm.taxRequired',
+                  }),
                 )}
                 required
               />
