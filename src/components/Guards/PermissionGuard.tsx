@@ -41,7 +41,7 @@ const PermissionGuard: React.FC<TPermissionGuardGuard> = (props) => {
     if (!isMatchedPermission) {
       router.push(homePageRoute);
     }
-  }, [isMatchedPermission, router, userPermission]);
+  }, [isMatchedPermission]);
 
   return ComponentToRender;
 };
