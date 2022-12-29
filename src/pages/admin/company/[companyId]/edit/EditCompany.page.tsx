@@ -5,7 +5,6 @@ import {
   clearError,
   updateCompanyPageThunks,
 } from '@redux/slices/EditCompanyPage.slice';
-import type { TCompany } from '@utils/types';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
@@ -14,21 +13,16 @@ import type { TEditCompanyFormValues } from '../../components/EditCompanyForm/Ed
 import EditCompanyForm from '../../components/EditCompanyForm/EditCompanyForm';
 import css from './EditCompany.module.scss';
 
-const getInitialLocationValues = (company: TCompany) => {
-  const { publicData = {} } = company.attributes.profile || {};
-
+const getInitialLocationValues = (location: any) => {
   // Only render current search if full place object is available in the URL params
   // TODO bounds are missing - those need to be queried directly from Google Places
-  const locationFieldsPresent =
-    publicData &&
-    publicData.location &&
-    publicData.location.address &&
-    publicData.location.origin;
+  const locationFieldsPresent = location && location.address && location.origin;
 
-  const { address, origin } = publicData.location || {};
+  const { address, origin } = location || {};
 
   return locationFieldsPresent
     ? {
+        predictions: [],
         search: address,
         selectedPlace: { address, origin },
       }
@@ -61,8 +55,14 @@ export default function EditCompanyPage() {
       return {};
     }
     const { profile, email } = company.attributes;
-    const { companyName, companyEmail, companyAddress, phoneNumber, note } =
-      profile.publicData;
+    const {
+      companyName,
+      companyEmail,
+      companyLocation,
+      phoneNumber,
+      note,
+      location,
+    } = profile.publicData;
     const { tax } = profile.privateData;
     return {
       firstName: profile.firstName,
@@ -71,25 +71,36 @@ export default function EditCompanyPage() {
       phone: phoneNumber,
       companyName,
       companyEmail,
-      companyAddress,
+      companyLocation: getInitialLocationValues(companyLocation),
       tax,
       note,
-      location: { ...getInitialLocationValues(company) },
+      location: getInitialLocationValues(location),
     };
   }, [company]) as TEditCompanyFormValues;
 
   const onSubmit = (values: TEditCompanyFormValues) => {
-    const { location } = values;
+    const { location, companyLocation } = values;
     const {
       selectedPlace: { address, origin },
     } = location || {};
+
+    const {
+      selectedPlace: { address: companyAddress, origin: companyOrigin },
+    } = companyLocation || {};
+
     const companyData = {
       id: company.id.uuid,
       firstName: values.firstName,
       lastName: values.lastName,
       displayName: `${values.lastName} ${values.firstName}`,
       publicData: {
-        companyAddress: values.companyAddress,
+        companyLocation: {
+          address: companyAddress,
+          origin: {
+            lat: companyOrigin.lat,
+            lng: companyOrigin.lng,
+          },
+        },
         companyName: values.companyName,
         companyEmail: values.companyEmail,
         phoneNumber: values.phone,

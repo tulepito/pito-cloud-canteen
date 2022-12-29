@@ -61,6 +61,12 @@ export const autocompleteSearchRequired = (message: string) => (value: any) => {
   return value && value.search ? VALID : message;
 };
 
+export const autocompletePlaceSelected = (message: string) => (value: any) => {
+  const selectedPlaceIsValid =
+    value && value.selectedPlace && value.selectedPlace.address;
+  return selectedPlaceIsValid ? VALID : message;
+};
+
 // Source: http://www.regular-expressions.info/email.html
 // See the link above for an explanation of the tradeoffs.
 const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -150,6 +156,10 @@ export const confirmPassword =
   (value: string, allValues: any) => {
     return allValues[fieldNameToCompare] === value ? VALID : message;
   };
+
+export const nonEmptyImage = (message: string) => (value: any) => {
+  return value && (value.id || value.imageId) ? VALID : message;
+};
 
 export const composeValidatorsWithAllValues =
   (...validators: any) =>

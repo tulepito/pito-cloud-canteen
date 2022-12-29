@@ -92,7 +92,10 @@ export const InlineTextButton = (props: TButton) => {
     props.rootClassName || css.inlineTextButtonRoot,
     css.inlineTextButton,
   );
-  return <Button {...props} rootClassName={classes} />;
+
+  const { type = 'button', ...rest } = props;
+
+  return <Button {...rest} type={type} rootClassName={classes} />;
 };
 InlineTextButton.displayName = 'InlineTextButton';
 
