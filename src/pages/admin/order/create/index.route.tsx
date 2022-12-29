@@ -1,5 +1,7 @@
-import CreateOrderPage from './CreateOrder.page';
+import CreateOrderPage from './components/CreateOrder.page';
 
-export default function Admin() {
+const CreateOrderRoute = () => {
   return <CreateOrderPage />;
-}
+};
+
+export default CreateOrderRoute;

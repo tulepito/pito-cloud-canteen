@@ -1,0 +1,11 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.titleContainer {
+  @include flexAlign(center, flex-start);
+  gap: 16px;
+
+  h1 {
+    @include textTemplate(18px, 700, 23px, null);
+  }
+}
