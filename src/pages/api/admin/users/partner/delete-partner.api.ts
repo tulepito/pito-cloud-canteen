@@ -44,7 +44,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     );
 
     const listingId =
-      updatedPartner?.attributes?.profile?.metadata?.restaurantListing;
+      updatedPartner?.attributes?.profile?.metadata?.restaurantListingId;
 
     let restaurantListingResponse = null;
     if (listingId) {

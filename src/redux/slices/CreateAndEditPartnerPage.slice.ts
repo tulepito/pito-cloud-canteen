@@ -340,8 +340,7 @@ const updatePartnerRestaurantListing = createAsyncThunk(
           expand: true,
         },
       });
-      const [partnerListingRef] = denormalisedResponseEntities(data);
-      return fulfillWithValue(partnerListingRef);
+      return fulfillWithValue(data);
     } catch (error) {
       console.error(error);
       return rejectWithValue(storableError(error));
@@ -664,7 +663,7 @@ export const createAndEditPartnerSlice = createSlice({
         return {
           ...state,
           updatePartnerListingInProgress: false,
-          partnerListingRef: action.payload,
+          partnerListingRef: denormalisedResponseEntities(action.payload),
         };
       })
       .addCase(updatePartnerRestaurantListing.rejected, (state, action) => {

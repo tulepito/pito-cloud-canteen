@@ -39,7 +39,7 @@ export const pickRenderableImagesByProperty = (
   removedImageIds: any[] = [],
   property = '',
 ) => {
-  const savedImageId = currentListing.attributes.publicData[property];
+  const savedImageId = currentListing?.attributes?.publicData[property];
 
   // Images are passed to EditListingForm so that it can generate thumbnails out of them
   const currentListingImages =
@@ -79,7 +79,8 @@ export const pickRenderableLicenseImagesByProperty = (
   removedImageIds: any[] = [],
   property = '',
 ) => {
-  const savedImageId = currentListing.attributes.publicData[property]?.imageId;
+  const savedImageId =
+    currentListing?.attributes?.publicData[property]?.imageId;
 
   // Images are passed to EditListingForm so that it can generate thumbnails out of them
   const currentListingImages =

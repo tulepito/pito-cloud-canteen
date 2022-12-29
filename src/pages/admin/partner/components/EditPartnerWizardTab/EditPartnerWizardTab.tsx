@@ -254,7 +254,7 @@ const EditPartnerWizardTab = (props: any) => {
         companyName,
         contactorName,
         vat,
-        packaging,
+        packaging = [],
         packagingOther,
         minPrice,
         phoneNumber,
@@ -266,9 +266,10 @@ const EditPartnerWizardTab = (props: any) => {
         partyInsurance,
         meals,
         hasOutsideMenuAndService,
-        categories,
+        categories = [],
         extraServices,
       } = partnerListingRef?.attributes?.publicData || {};
+
       const { bankAccounts = [] } =
         partnerListingRef?.attributes?.privateData || {};
       const { address } = location || {};
@@ -305,18 +306,20 @@ const EditPartnerWizardTab = (props: any) => {
         };
       }, []);
 
-      const handleSubmitPreviewForm = () => {
+      const handleSubmitPreviewForm = async () => {
         const params = {
           id: partnerListingRef?.author?.id?.uuid,
         };
-        return onPublishDraftPartner(params);
+        await onPublishDraftPartner(params);
+        router.push('/admin/partner');
       };
 
-      const handleDiscardDraftPartner = () => {
+      const handleDiscardDraftPartner = async () => {
         const params = {
           id: partnerListingRef?.author?.id?.uuid,
         };
-        return onDiscardDraftPartner(params);
+        await onDiscardDraftPartner(params);
+        router.push('/admin/partner');
       };
       return (
         <EditPartnerPreviewForm

@@ -8,6 +8,7 @@ const adminChecker =
   async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       const sdk = getSdk(req, res);
+
       const currentUserResponse = await sdk.currentUser.show();
       const [currentUser] = denormalisedResponseEntities(currentUserResponse);
 
@@ -20,6 +21,7 @@ const adminChecker =
       }
       return handler(req, res);
     } catch (error) {
+      console.log('error', error);
       handleError(res, error);
     }
   };

@@ -378,5 +378,6 @@
   "ManagePartnersPage.unsatisfactoryStatus": "Không đạt yêu cầu",
   "ManagePartners.authorizeBtn": "Xác thực",
   "ManagePartners.unsatisfactoryBtn": "Không đạt yêu cầu",
-  "ManagePartners.deleteBtn": "Xóa đối tác"
+  "ManagePartners.deleteBtn": "Xóa đối tác",
+  "ResponsiveImage.noImage": "Không có hình ảnh"
 }
