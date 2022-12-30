@@ -2,13 +2,13 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { DAY_IN_WEEK } from '@components/CalendarDashboard/helpers/constant';
 import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
-import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import { useMemo } from 'react';
 import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
 import { Navigate } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
+import type { TCalendarItemCardComponents } from '../../helpers/types';
 import MDayItem from '../DayItem/MDayItem';
 import css from './MonthView.module.scss';
 
@@ -20,6 +20,7 @@ type TMonthViewProps = {
   range: any;
   accessors: any;
   renderEvent?: React.FC<any>;
+  customComponents?: TCalendarItemCardComponents;
 } & TimeGridProps;
 
 type TMonthViewObject = {
@@ -33,23 +34,18 @@ function MonthView({
   localizer,
   events = [],
   renderEvent,
+  customComponents,
 }: TMonthViewProps & TMonthViewObject) {
   const currRange = useMemo(
     () => MonthView.range(date, { localizer }),
     [date, localizer],
   );
 
-  const currentDay = new Date().getDay();
-
   return (
     <div className={css.root}>
       <div className={css.scrollContainer}>
-        {DAY_IN_WEEK.map((item, index) => (
-          <div
-            key={item}
-            className={classNames(css.dayInWeekHeader, {
-              [css.activeDayHeader]: currentDay === index + 1,
-            })}>
+        {DAY_IN_WEEK.map((item) => (
+          <div key={item} className={css.dayInWeekHeader}>
             <FormattedMessage id={`MonthView.dayInWeekHeader.${item}`} />
           </div>
         ))}
@@ -59,6 +55,7 @@ function MonthView({
             key={item.getTime()}
             events={getEventsInDate(item, events)}
             renderEvent={renderEvent}
+            components={customComponents}
           />
         ))}
       </div>
@@ -67,7 +64,7 @@ function MonthView({
 }
 
 MonthView.range = (date: Date, { localizer }: { localizer: any }) => {
-  const start = DateTime.fromJSDate(date).startOf('week').toJSDate();
+  const start = DateTime.fromJSDate(date).startOf('month').toJSDate();
   const end = localizer.add(start, MONTH_DAY_NUMBER - 1, 'day');
 
   let current = start;

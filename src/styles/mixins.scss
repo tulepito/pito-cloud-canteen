@@ -169,3 +169,9 @@ $buttonBorderRadius: 8px;
   height: $size;
   background-color: $color;
 }
+
+@mixin verticalDivider($color, $width, $height) {
+  width: $width;
+  height: $height;
+  background-color: $color;
+}
