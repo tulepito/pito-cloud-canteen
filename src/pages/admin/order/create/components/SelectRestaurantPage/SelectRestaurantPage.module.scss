@@ -9,3 +9,8 @@
     @include textTemplate(18px, 700, 23px, null);
   }
 }
+
+.paginationContainer {
+  margin: 32px 0;
+  @include flexAlign(center, flex-end);
+}

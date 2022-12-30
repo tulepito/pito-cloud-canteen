@@ -1,20 +1,44 @@
 import Badge from '@components/Badge/Badge';
 import Pagination from '@components/Pagination/Pagination';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { useEffect } from 'react';
 
 import RestaurantTable from '../RestaurantTable/RestaurantTable';
 import SearchRestaurantForm from '../SearchRestaurantForm/SearchRestaurantForm';
+import SelectFoodModal from '../SelectFoodModal/SelectFoodModal';
 import css from './SelectRestaurantPage.module.scss';
 
 const SelectRestaurantPage = () => {
+  const { value: isModalOpen, setValue: setModalOpen } = useBoolean();
   const dispatch = useAppDispatch();
-  const { restaurants } = useAppSelector((state) => state.SelectRestaurantPage);
+  const { restaurants, pagination, foodList, fetchFoodPending } =
+    useAppSelector((state) => state.SelectRestaurantPage);
+
+  const {
+    totalItems: total,
+    page: current,
+    perPage: pageSize = 100,
+  } = pagination || {};
+  const paginationProps = { total, defaultCurrent: current, pageSize };
+
+  const handlePageChange = (page: number) => {
+    const params = {
+      page,
+    };
+    dispatch(selectRestaurantPageThunks.getRestaurants(params));
+  };
 
   useEffect(() => {
     dispatch(selectRestaurantPageThunks.getRestaurants());
   }, [dispatch]);
+
+  const handleRestaurantClick = (restaurantId: string) => () => {
+    setModalOpen(true);
+
+    dispatch(selectRestaurantPageThunks.getRestaurantFood(restaurantId));
+  };
 
   return (
     <section>
@@ -26,10 +50,19 @@ const SelectRestaurantPage = () => {
           }
         />
       </div>
-
       <SearchRestaurantForm onSubmit={() => {}} />
-      <RestaurantTable restaurants={restaurants} />
-      <Pagination />
+      <RestaurantTable
+        restaurants={restaurants}
+        onItemClick={handleRestaurantClick}
+      />
+      <div className={css.paginationContainer}>
+        <Pagination {...paginationProps} onChange={handlePageChange} />
+      </div>
+      <SelectFoodModal
+        items={foodList}
+        isOpen={isModalOpen && !fetchFoodPending}
+        handleClose={() => setModalOpen(false)}
+      />
     </section>
   );
 };

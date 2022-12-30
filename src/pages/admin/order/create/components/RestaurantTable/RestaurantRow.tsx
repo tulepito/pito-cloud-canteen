@@ -9,6 +9,7 @@ type TRestaurantRowProps = {
   rootClassName?: string;
   className?: string;
   restaurant: any;
+  onItemClick: () => void;
 };
 
 const prepareDataForRestaurant = (restaurant: any) => {
@@ -18,7 +19,7 @@ const prepareDataForRestaurant = (restaurant: any) => {
 };
 
 const RestaurantRow: React.FC<TRestaurantRowProps> = (props) => {
-  const { rootClassName, className, restaurant } = props;
+  const { rootClassName, className, restaurant, onItemClick } = props;
   const itemClasses = classNames(rootClassName || css.item, className);
   const { title, categories } = prepareDataForRestaurant(restaurant);
   const categoriesContent = categories ? categories.join(', ') : [];
@@ -36,7 +37,7 @@ const RestaurantRow: React.FC<TRestaurantRowProps> = (props) => {
         <div>{categoriesContent}</div>
         <div></div>
         <div></div>
-        <InlineTextButton className={css.seeMenuButton}>
+        <InlineTextButton className={css.seeMenuButton} onClick={onItemClick}>
           Xem menu
         </InlineTextButton>
       </div>
