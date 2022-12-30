@@ -1,6 +1,7 @@
 import Accordion from '@components/Accordion/Accordion';
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
+import CountdownTimer from '@components/CountdownTimer/CountdownTimer';
 import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
 import FieldSelect from '@components/FieldSelect/FieldSelect';
@@ -19,6 +20,7 @@ import useBoolean from '@hooks/useBoolean';
 import type { TIconProps } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
+import { DateTime } from 'luxon';
 import type { PropsWithChildren } from 'react';
 import { useState } from 'react';
 import { Form as FinalForm } from 'react-final-form';
@@ -529,6 +531,14 @@ const StyleGuidePage = (props: any) => {
               <span className={css.tooltipContainer}>Left bottom tooltip</span>
             </Tooltip>
           </div>
+        </StyleGuideCard>
+        <StyleGuideCard>
+          <CountdownTimer
+            deadline={DateTime.fromJSDate(new Date())
+              .plus({ day: 20, hour: 6, minute: 14 })
+              .toJSDate()
+              .getTime()}
+          />
         </StyleGuideCard>
       </div>
     </Layout>

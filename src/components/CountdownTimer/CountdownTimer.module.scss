@@ -1,0 +1,35 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 300px;
+}
+
+.boxItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: calc((100% - 12px) / 4);
+  height: 68px;
+  border-radius: 12px;
+  background-color: $secondaryBlue1;
+  padding: 10px;
+
+  @include viewportMedium {
+    width: 68px;
+    height: 68px;
+  }
+}
+
+.value {
+  @include textTemplate(20px, 700, 32px, '');
+}
+
+.label {
+  @include textTemplate(12px, 400, 20px, '');
+}
