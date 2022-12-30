@@ -3,6 +3,7 @@
 
 .formContainer {
   @include flexAlign(center, space-between);
+  padding-bottom: 32px;
 
   .searchInputContainer {
     width: 320px;

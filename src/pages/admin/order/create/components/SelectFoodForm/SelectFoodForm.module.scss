@@ -1,0 +1,41 @@
+@use '/src/styles/vars.scss' as *;
+
+.searchInputContainer {
+  width: 360px;
+
+  ::placeholder {
+    color: $neutralGray5;
+  }
+}
+
+.contentContainer {
+  display: grid;
+  grid-template-columns: auto 360px;
+
+  .leftPart {
+    padding: 16px;
+  }
+
+  .rightPart {
+    padding: 16px 16px 0 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+
+    ::before {
+      position: absolute;
+      left: 0;
+      top: 0;
+      content: '';
+      height: 100%;
+      width: 1px;
+      background-color: $neutralGray3;
+    }
+
+    .actionContainer {
+      width: calc(100% - 16px * 2);
+    }
+  }
+}
