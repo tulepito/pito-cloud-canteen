@@ -177,3 +177,9 @@ $buttonBorderRadius: 8px;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+@mixin verticalDivider($color, $width, $height) {
+  width: $width;
+  height: $height;
+  background-color: $color;
+}
