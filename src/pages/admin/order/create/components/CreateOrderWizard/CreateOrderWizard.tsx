@@ -1,6 +1,5 @@
 import FormWizard from '@components/FormWizard/FormWizard';
-import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import ClientSelector from '../../../StepScreen/ClientSelector/ClientSelector';
@@ -24,7 +23,7 @@ export const TABS = [
 ];
 
 const CreateOrderTab: React.FC<any> = (props) => {
-  const { tab } = props;
+  const { tab, goBack } = props;
   switch (tab) {
     case CLIENT_SELECT_TAB:
       return <ClientSelector />;
@@ -35,44 +34,48 @@ const CreateOrderTab: React.FC<any> = (props) => {
     case SERVICE_FEE_AND_NOTE_TAB:
       return <div>Service fee and note</div>;
     case REVIEW_TAB:
-      return <ReviewOrder />;
+      return <ReviewOrder goBack={goBack} />;
     default:
       return <></>;
   }
 };
 
 const CreateOrderWizard = () => {
-  const router = useRouter();
   const intl = useIntl();
+  const [currentStep, setCurrentStep] = useState<string>(CLIENT_SELECT_TAB);
 
-  const { step } = router.query;
-  const selectedTab = step || CLIENT_SELECT_TAB;
+  const onClick = (tab: string) => () => {
+    setCurrentStep(tab);
+  };
 
-  const tabLink = (tab: string) => {
-    return {
-      path: `/admin/order/create`,
-      to: { search: `step=${tab}` },
-      replace: true,
-    };
+  const goBack = (tab: string) => () => {
+    const tabIndex = TABS.indexOf(tab);
+    if (tabIndex > 0) {
+      const backTab = TABS[tabIndex - 1];
+      setCurrentStep(backTab);
+    }
   };
 
   return (
-    <FormWizard formTabNavClassName={css.formTabNav}>
-      {TABS.map((tab: string) => {
-        return (
-          <CreateOrderTab
-            key={tab}
-            tabId={tab}
-            selected={selectedTab === tab}
-            tabLabel={intl.formatMessage({
-              id: `CreateOrderWizard.${tab}Label`,
-            })}
-            tabLinkProps={tabLink(tab)}
-            tab={selectedTab}
-          />
-        );
-      })}
-    </FormWizard>
+    <>
+      <FormWizard formTabNavClassName={css.formTabNav}>
+        {TABS.map((tab: string) => {
+          return (
+            <CreateOrderTab
+              key={tab}
+              tabId={tab}
+              selected={currentStep === tab}
+              tabLabel={intl.formatMessage({
+                id: `CreateOrderWizard.${tab}Label`,
+              })}
+              onClick={onClick(tab)}
+              tab={tab}
+              goBack={goBack(tab)}
+            />
+          );
+        })}
+      </FormWizard>
+    </>
   );
 };
 

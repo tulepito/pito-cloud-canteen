@@ -26,15 +26,14 @@ const FormTabs: React.FC<PropsWithChildren<TFormTabs>> = (props) => {
   const classes = classNames(rootClasses, className);
 
   const tabNavTabs = React.Children.map(children, (child: any) => {
-    const { tabId, tabLabel, tabLinkProps } = child.props;
+    const { tabId, tabLabel } = child.props;
 
     // Child components need to have TabNav props included
-    if (!tabId || !tabLabel || !tabLinkProps) {
+    if (!tabId || !tabLabel) {
       throw new Error(
         `Tabs component: a child component is missing required props.
         tabId: (${tabId})
-        tabLabel: (${tabLabel})
-        tabLinkProps: (${tabLinkProps})`,
+        tabLabel: (${tabLabel})`,
       );
     }
 
@@ -44,6 +43,7 @@ const FormTabs: React.FC<PropsWithChildren<TFormTabs>> = (props) => {
       linkProps: child.props.tabLinkProps,
       disabled: child.props.disabled,
       selected: child.props.selected,
+      onClick: child.props.onClick,
     };
   });
 
