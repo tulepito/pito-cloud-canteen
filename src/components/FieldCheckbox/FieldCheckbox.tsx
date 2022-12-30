@@ -13,8 +13,9 @@ interface IconCheckboxProps extends TIconProps {
   boxClassName?: string;
 }
 
-const IconCheckbox = (props: IconCheckboxProps) => {
+export const IconCheckbox = (props: IconCheckboxProps) => {
   const { className, checkedClassName, boxClassName } = props;
+
   return (
     <svg
       className={className}

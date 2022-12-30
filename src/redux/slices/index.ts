@@ -10,4 +10,5 @@ export { default as marketplaceData } from './marketplaceData.slice';
 export { default as Order } from './Order.slice';
 export { default as password } from './password.slice';
 export { default as RestaurantSearch } from './RestaurantSearch.slice';
+export { default as SelectRestaurantPage } from './SelectRestaurantPage.slice';
 export { default as user } from './user.slice';

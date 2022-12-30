@@ -9,7 +9,7 @@ import IconMagnifier from '@components/IconMagnifier/IconMagnifier';
 import Meta from '@components/Layout/Meta';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import type { TColumn } from '@components/Table/Table';
-import Table from '@components/Table/Table';
+import { TableForm } from '@components/Table/Table';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -293,7 +293,7 @@ export default function ManageCompanies() {
       {queryCompaniesInProgress ? (
         <LoadingContainer />
       ) : (
-        <Table
+        <TableForm
           initialValues={initialValues}
           onSubmit={onSearchKeyword}
           columns={TABLE_COLUMN}

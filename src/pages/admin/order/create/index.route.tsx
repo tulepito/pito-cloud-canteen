@@ -1,5 +1,11 @@
+import React from 'react';
+
 import CreateOrderPage from './CreateOrder.page';
 
-export default function Admin() {
-  return <CreateOrderPage />;
+export default function CreateOrderRoute() {
+  return (
+    <>
+      <CreateOrderPage />
+    </>
+  );
 }

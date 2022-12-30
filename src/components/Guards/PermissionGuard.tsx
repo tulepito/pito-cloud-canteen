@@ -28,7 +28,7 @@ const PermissionGuard: React.FC<TPermissionGuardGuard> = (props) => {
 
     switch (userPermission) {
       case EUserPermission.admin:
-        homePageRoute = adminPaths.Home;
+        homePageRoute = adminPaths.Dashboard;
         break;
       case EUserPermission.company:
         homePageRoute = companyPaths.Home;

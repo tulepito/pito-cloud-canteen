@@ -8,15 +8,17 @@ import { denormalisedResponseEntities } from '@utils/data';
 import type { TOrder, TPlan } from '@utils/orderTypes';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { HTTP_METHODS } from '../helpers/constants';
+
 const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
   const integrationSdk = getIntegrationSdk();
 
   switch (apiMethod) {
-    case 'GET':
+    case HTTP_METHODS.GET:
       break;
-    case 'POST':
+    case HTTP_METHODS.POST:
       try {
         const { companyId, ...rest } = req.body;
         const adminAccount = await getAdminAccount();
@@ -60,7 +62,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         handleError(res, error);
       }
       break;
-    case 'PUT':
+    case HTTP_METHODS.PUT:
       try {
         const { orderId, planId } = req.body;
         const orderListingResponse = await integrationSdk.listings.show({
@@ -123,7 +125,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         handleError(res, error);
       }
       break;
-    case 'DELETE':
+    case HTTP_METHODS.DELETE:
       break;
 
     default:
