@@ -1,5 +1,6 @@
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Toggle from '@components/Toggle/Toggle';
+import { required } from '@utils/validators';
 import { Field } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
@@ -7,6 +8,9 @@ import css from './PerPackageField.module.scss';
 
 const PerPackageField = () => {
   const intl = useIntl();
+  const perPackRequiredMessage = intl.formatMessage({
+    id: 'PerPackageField.perPackRequired',
+  });
   return (
     <div className={css.container}>
       <div className={css.fieldTitle}>
@@ -25,6 +29,7 @@ const PerPackageField = () => {
           type="number"
           className={css.numberInput}
           rightIcon={<div className={css.vndIcon}>đ</div>}
+          validate={required(perPackRequiredMessage)}
         />
 
         <Field id="vatAllow" name="vatAllow">

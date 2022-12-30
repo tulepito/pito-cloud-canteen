@@ -1,0 +1,26 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.fieldSection {
+  padding-bottom: 32px;
+  padding-top: 32px;
+  border-bottom: 1px solid $neutralGray5;
+}
+
+.verticalSpace {
+  margin-top: 32px;
+}
+
+.buttonsWrapper {
+  @include flexAlign(center, space-between);
+  margin-top: 32px;
+
+  .backBtn {
+    @include buttonColorSecondary;
+  }
+
+  .submitBtn {
+    width: 252px;
+  }
+}
