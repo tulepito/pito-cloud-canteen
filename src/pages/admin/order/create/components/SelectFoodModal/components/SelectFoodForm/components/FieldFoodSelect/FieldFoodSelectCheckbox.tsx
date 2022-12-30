@@ -29,35 +29,37 @@ const FieldFoodSelectCheckbox = (props: any) => {
     onBlur(event);
   };
 
-  const successColorVariantMaybe = useSuccessColor
-    ? {
-        checkedClassName: css.checkedSuccess,
-        boxClassName: css.boxSuccess,
-      }
-    : {};
+  const boxClasses = classNames(css.box, {
+    [css.boxSuccess]: useSuccessColor,
+  });
+
+  const checkClasses = classNames(css.checked, {
+    [css.checkedSuccess]: useSuccessColor,
+  });
 
   return (
     <div className={classes}>
-      <Field type="checkbox" {...rest}>
-        {(formRenderProps) => {
-          const { input } = formRenderProps;
-          return (
-            <input
-              id={id}
-              className={css.input}
-              {...input}
-              onChange={(event: TFormEvent) => handleOnChange(input, event)}
-            />
-          );
-        }}
-      </Field>
       <div className={css.row}>
+        <Field type="checkbox" {...rest}>
+          {(formRenderProps) => {
+            const { input } = formRenderProps;
+
+            return (
+              <input
+                id={id}
+                className={css.input}
+                {...input}
+                onChange={(event: TFormEvent) => handleOnChange(input, event)}
+              />
+            );
+          }}
+        </Field>
         <label htmlFor={id} className={css.label}>
           <span className={css.checkboxWrapper}>
             <IconCheckbox
-              boxClassName={css.checkboxBox}
               className={svgClassName}
-              {...successColorVariantMaybe}
+              checkedClassName={checkClasses}
+              boxClassName={boxClasses}
             />
           </span>
         </label>

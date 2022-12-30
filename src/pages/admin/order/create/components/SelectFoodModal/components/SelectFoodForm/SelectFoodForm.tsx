@@ -8,10 +8,13 @@ import type { ReactNode } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 
-import FoodTable from './FoodTable';
+import FieldFoodSelectCheckboxGroup from './components/FieldFoodSelect/FieldFoodSelectCheckboxGroup';
+import FieldFoodSelectAll from './components/FieldFoodSelectAll/FieldFoodSelectAll';
 import css from './SelectFoodForm.module.scss';
 
-export type TSelectFoodFormValues = {};
+export type TSelectFoodFormValues = {
+  food: string[];
+};
 
 type TExtraProps = {
   formId?: string;
@@ -28,7 +31,13 @@ type TSelectFoodFormComponentProps = FormRenderProps<TSelectFoodFormValues> &
 const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, items } = props;
+  const { handleSubmit, items = [], values } = props;
+  const options = items.map((item) => {
+    const { id, attributes } = item || {};
+    const { title, price } = attributes;
+    return { key: id?.uuid, value: id?.uuid, title, price };
+  });
+  console.log(values);
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -42,7 +51,14 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
         </div>
         <div className={css.contentContainer}>
           <div className={css.leftPart}>
-            <FoodTable items={items || []} />
+            <div>
+              <FieldFoodSelectAll id="food.checkAll" name="checkAll" />
+              <FieldFoodSelectCheckboxGroup
+                id="food"
+                name="food"
+                options={options}
+              />
+            </div>{' '}
           </div>
           <div className={css.rightPart}>
             <EmptyIcon />

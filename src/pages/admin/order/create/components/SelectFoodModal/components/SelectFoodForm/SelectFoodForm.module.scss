@@ -1,4 +1,5 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .searchInputContainer {
   width: 360px;
@@ -14,6 +15,9 @@
 
   .leftPart {
     padding: 16px;
+    padding-top: 0;
+    max-height: calc(70vh);
+    overflow: hidden auto;
   }
 
   .rightPart {
@@ -38,4 +42,29 @@
       width: calc(100% - 16px * 2);
     }
   }
+}
+
+.checkAllLabel {
+  display: flex;
+
+  .label {
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    @include textTemplate(12px, 400, 16px, '');
+    color: $neutralGray5;
+
+    :nth-child(2) {
+      flex-basis: 50px;
+    }
+  }
+}
+.checkAllCheckbox {
+  // display: none;
+  .checkboxWrapper {
+    margin: 0;
+  }
+}
+
+.checkboxSvg {
 }

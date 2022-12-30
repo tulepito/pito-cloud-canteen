@@ -31,8 +31,15 @@ type TFieldFoodSelectCheckboxGroupRendererProps = {
 const FieldFoodSelectCheckboxGroupRenderer: React.FC<
   TFieldFoodSelectCheckboxGroupRendererProps
 > = (props) => {
-  const { className, rootClassName, twoColumns, id, name, options, meta } =
-    props;
+  const {
+    className,
+    rootClassName,
+    twoColumns,
+    id,
+    fields: { name },
+    options,
+    meta,
+  } = props;
 
   const classes = classNames(rootClassName || css.root, className);
   const listClasses = twoColumns
@@ -44,6 +51,7 @@ const FieldFoodSelectCheckboxGroupRenderer: React.FC<
       <ul className={listClasses}>
         {options.map((option: any) => {
           const fieldId = `${id}.${option.key}`;
+
           return (
             <li key={fieldId} className={css.foodItem}>
               <FieldFoodSelectCheckbox

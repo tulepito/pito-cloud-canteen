@@ -1,7 +1,7 @@
 import Badge from '@components/Badge/Badge';
 import Modal from '@components/Modal/Modal';
 
-import SelectFoodForm from '../SelectFoodForm/SelectFoodForm';
+import SelectFoodForm from './components/SelectFoodForm/SelectFoodForm';
 import css from './SelectFoodModal.module.scss';
 
 type TSelectFoodModalProps = {

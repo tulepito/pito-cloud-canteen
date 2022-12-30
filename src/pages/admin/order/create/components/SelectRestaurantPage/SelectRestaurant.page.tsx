@@ -5,9 +5,9 @@ import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { useEffect } from 'react';
 
-import RestaurantTable from '../RestaurantTable/RestaurantTable';
-import SearchRestaurantForm from '../SearchRestaurantForm/SearchRestaurantForm';
 import SelectFoodModal from '../SelectFoodModal/SelectFoodModal';
+import RestaurantTable from './components/RestaurantTable/RestaurantTable';
+import SearchRestaurantForm from './components/SearchRestaurantForm/SearchRestaurantForm';
 import css from './SelectRestaurantPage.module.scss';
 
 const SelectRestaurantPage = () => {
