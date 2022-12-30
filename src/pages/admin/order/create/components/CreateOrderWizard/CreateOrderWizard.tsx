@@ -18,7 +18,6 @@ export const TABS = [
   CLIENT_SELECT_TAB,
   MEAL_PLAN_SETUP,
   CREATE_MEAL_PLAN_TAB,
-  SERVICE_FEE_AND_NOTE_TAB,
   REVIEW_TAB,
 ];
 
@@ -31,8 +30,6 @@ const CreateOrderTab: React.FC<any> = (props) => {
       return <MealPlanSetup />;
     case CREATE_MEAL_PLAN_TAB:
       return <MealPlanCreator />;
-    case SERVICE_FEE_AND_NOTE_TAB:
-      return <div>Service fee and note</div>;
     case REVIEW_TAB:
       return <ReviewOrder goBack={goBack} />;
     default:

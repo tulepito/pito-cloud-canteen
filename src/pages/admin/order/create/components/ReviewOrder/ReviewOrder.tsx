@@ -2,11 +2,11 @@ import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
-import type { TTabFieldItem } from '@components/Tabs/Tabs';
 import { TabFields } from '@components/Tabs/Tabs';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
-import React from 'react';
+import { DateTime } from 'luxon';
+import React, { useMemo } from 'react';
 import { Field, Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 
@@ -61,7 +61,7 @@ const TABLE_COLUMN: TColumn[] = [
 ];
 
 const ReviewContent: React.FC<any> = (props) => {
-  const { name, id } = props;
+  const { name, id, ...rest } = props;
   const data = [
     {
       key: 1,
@@ -84,7 +84,6 @@ const ReviewContent: React.FC<any> = (props) => {
     <div>
       <Field name={name} id={id}>
         {(field) => {
-          console.log(field);
           return (
             <div className={css.content}>
               <div className={css.generalInfo}>
@@ -151,39 +150,29 @@ type TReviewOrder = {
   goBack: () => void;
 };
 
+const parseDataToReviewTab = (values: any) => {
+  const { orderDetails } = values || {};
+  const items = Object.keys(orderDetails).map((key: any) => {
+    return {
+      key,
+      label: DateTime.fromMillis(Number(key)).toFormat('MM-dd-yyyy'),
+      children: (childProps: any) => <ReviewContent {...childProps} />,
+      childrenProps: orderDetails[key],
+    };
+  });
+  return items;
+};
+
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
-  const mockDates: TTabFieldItem[] = [
-    {
-      key: '23/32/2022',
-      label: '23/32/2022',
-      children: (childProps: any) => <ReviewContent {...childProps} />,
-      childrenProps: { a: 'A' },
-    },
-    {
-      key: '23/32/2022',
-      label: '23/32/2022',
-      children: (childProps: any) => <ReviewContent {...childProps} />,
-      childrenProps: { a: 'B' },
-    },
-    {
-      key: '23/32/2022',
-      label: '23/32/2022',
-      children: (childProps: any) => <ReviewContent {...childProps} />,
-      childrenProps: { a: 'C' },
-    },
-    {
-      key: '23/32/2022',
-      label: '23/32/2022',
-      children: (childProps: any) => <ReviewContent {...childProps} />,
-      childrenProps: { a: 'D' },
-    },
-    {
-      key: '23/32/2022',
-      label: '23/32/2022',
-      children: (childProps: any) => <ReviewContent {...childProps} />,
-      childrenProps: { a: 'E' },
-    },
-  ];
+  const initialValues = useMemo(() => {
+    const windowVariable = window as any;
+    const order = JSON.parse(
+      windowVariable?.localStorage.getItem('draftOrder'),
+    );
+    return {
+      orderDetails: parseDataToReviewTab(order),
+    };
+  }, []);
 
   const onSubmit = () => {};
 
@@ -194,7 +183,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       </h1>
       <FinalForm
         mutators={{ ...arrayMutators }}
-        initialValues={{ orderDetails: mockDates }}
+        initialValues={initialValues}
         {...props}
         onSubmit={onSubmit}
         render={(fieldRenderProps: any) => {
@@ -204,7 +193,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
               <TabFields
                 name="orderDetails"
                 id="orderDetails"
-                items={mockDates}
+                items={initialValues.orderDetails as any}
               />
               <NavigateButtons goBack={goBack} />
             </Form>
