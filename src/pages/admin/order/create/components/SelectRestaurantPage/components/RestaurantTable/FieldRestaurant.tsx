@@ -5,7 +5,7 @@ import get from 'lodash/get';
 
 import css from './RestaurantTable.module.scss';
 
-type TRestaurantRowProps = {
+type TFieldRestaurantProps = {
   rootClassName?: string;
   className?: string;
   restaurant: any;
@@ -13,20 +13,24 @@ type TRestaurantRowProps = {
 };
 
 const prepareDataForRestaurant = (restaurant: any) => {
+  const restaurantId = restaurant?.id?.uuid;
   const { title, publicData } = get(restaurant, 'attributes', {});
   const { categories = [] } = publicData;
-  return { title, categories };
+  return { restaurantId, title, categories };
 };
 
-const RestaurantRow: React.FC<TRestaurantRowProps> = (props) => {
+const FieldRestaurant: React.FC<TFieldRestaurantProps> = (props) => {
   const { rootClassName, className, restaurant, onItemClick } = props;
   const itemClasses = classNames(rootClassName || css.item, className);
-  const { title, categories } = prepareDataForRestaurant(restaurant);
+  const { restaurantId, title, categories } =
+    prepareDataForRestaurant(restaurant);
   const categoriesContent = categories ? categories.join(', ') : [];
 
   return (
     <div className={css.row}>
       <FieldRadioButton
+        id={restaurantId as string}
+        value={restaurantId as string}
         svgClassName={css.radioSvg}
         radioLabelClassName={css.radioLabel}
         radioButtonWrapperClassName={css.radioButtonWrapper}
@@ -45,4 +49,4 @@ const RestaurantRow: React.FC<TRestaurantRowProps> = (props) => {
   );
 };
 
-export default RestaurantRow;
+export default FieldRestaurant;

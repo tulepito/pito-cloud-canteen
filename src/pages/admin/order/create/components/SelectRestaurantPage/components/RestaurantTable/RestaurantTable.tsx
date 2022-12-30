@@ -1,35 +1,50 @@
-import RestaurantRow from './RestaurantRow';
+import type { FormState } from 'final-form';
+
+import FieldRestaurant from './FieldRestaurant';
 import RestaurantTableHead from './RestaurantTableHead';
+import type { TSelectRestaurantFormValues } from './SelectRestaurantForm';
 import SelectRestaurantForm from './SelectRestaurantForm';
 
 type TRestaurantTableProps = {
   restaurants: any;
+  currentRestaurant: any;
+  isSelectedRestaurant: boolean;
   onItemClick: (id: string) => () => void;
+  onFormChange: (
+    form: FormState<
+      TSelectRestaurantFormValues,
+      Partial<TSelectRestaurantFormValues>
+    >,
+  ) => void;
 };
 
 const RestaurantTable: React.FC<TRestaurantTableProps> = ({
   restaurants,
   onItemClick,
+  isSelectedRestaurant,
+  currentRestaurant,
+  onFormChange,
 }) => {
-  const items =
-    restaurants?.length > 0
-      ? restaurants.map((restaurant: any, index: any) => {
-          const restaurantId = restaurant?.id?.uuid;
-
-          return (
-            <RestaurantRow
-              key={index}
-              restaurant={restaurant}
-              onItemClick={onItemClick(restaurantId)}
-            />
-          );
-        })
-      : null;
-
   return (
     <>
       <RestaurantTableHead />
-      <SelectRestaurantForm onSubmit={() => {}} items={items} />
+      <SelectRestaurantForm
+        onSubmit={() => {}}
+        currentRestaurant={currentRestaurant}
+        isSelectedRestaurant={isSelectedRestaurant}
+        onFormChange={onFormChange}>
+        <>
+          {restaurants?.length > 0
+            ? restaurants.map((restaurant: any, index: any) => (
+                <FieldRestaurant
+                  key={index}
+                  restaurant={restaurant}
+                  onItemClick={onItemClick(restaurant)}
+                />
+              ))
+            : null}
+        </>
+      </SelectRestaurantForm>
     </>
   );
 };

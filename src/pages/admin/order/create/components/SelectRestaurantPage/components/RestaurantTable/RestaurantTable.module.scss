@@ -29,6 +29,8 @@
   flex-grow: 1;
   flex-direction: row;
   flex-wrap: wrap;
+  column-gap: 16px;
+
   @include textTemplate(14px, 400, 20px, null);
 
   :nth-child(1),
@@ -36,6 +38,8 @@
   :nth-child(3),
   :nth-child(4) {
     flex-basis: 200px;
+    word-break: break-all;
+    @include lineClamp(4);
   }
 
   :nth-child(5) {

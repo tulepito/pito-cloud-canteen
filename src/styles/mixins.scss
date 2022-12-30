@@ -169,3 +169,11 @@ $buttonBorderRadius: 8px;
   height: $size;
   background-color: $color;
 }
+
+@mixin lineClamp($numberOfLines: 4) {
+  display: -webkit-box;
+  line-clamp: $numberOfLines;
+  -webkit-line-clamp: $numberOfLines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

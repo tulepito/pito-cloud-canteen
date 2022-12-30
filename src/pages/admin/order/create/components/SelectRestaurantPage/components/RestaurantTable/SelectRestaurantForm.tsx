@@ -1,19 +1,49 @@
 import Form from '@components/Form/Form';
-import type { ReactNode } from 'react';
+import type { FormState } from 'final-form';
+import type { PropsWithChildren } from 'react';
+import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
+import { Form as FinalForm, FormSpy } from 'react-final-form';
 
-export type TSelectRestaurantFormValues = {};
-type TExtraProps = { items: ReactNode };
+export type TSelectRestaurantFormValues = { restaurant: any };
+type TExtraProps = {
+  currentRestaurant: any;
+  isSelectedRestaurant: boolean;
+  onFormChange: (
+    form: FormState<
+      TSelectRestaurantFormValues,
+      Partial<TSelectRestaurantFormValues>
+    >,
+  ) => void;
+};
 type TSelectRestaurantFormComponentProps =
   FormRenderProps<TSelectRestaurantFormValues> & Partial<TExtraProps>;
-type TSelectRestaurantFormProps = FormProps<TSelectRestaurantFormValues> &
-  TExtraProps;
+type TSelectRestaurantFormProps = PropsWithChildren<
+  FormProps<TSelectRestaurantFormValues> & TExtraProps
+>;
 
 const SelectRestaurantFormComponent: React.FC<
   TSelectRestaurantFormComponentProps
-> = ({ handleSubmit, items }) => {
-  return <Form onSubmit={handleSubmit}>{items}</Form>;
+> = ({
+  handleSubmit,
+  children,
+  form,
+  currentRestaurant,
+  isSelectedRestaurant,
+  onFormChange,
+}) => {
+  useEffect(() => {
+    if (!!currentRestaurant && isSelectedRestaurant) {
+      form.change('restaurant', currentRestaurant?.id?.uuid);
+    }
+  }, [currentRestaurant, isSelectedRestaurant]);
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <FormSpy onChange={onFormChange} />
+      <>{children}</>
+    </Form>
+  );
 };
 
 const SelectRestaurantForm: React.FC<TSelectRestaurantFormProps> = (props) => {

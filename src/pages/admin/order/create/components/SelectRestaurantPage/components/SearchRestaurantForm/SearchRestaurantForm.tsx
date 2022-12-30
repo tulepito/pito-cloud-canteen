@@ -18,6 +18,8 @@ type TExtraProps = {
   rootClassName?: string;
   className?: string;
   inProgress?: boolean;
+  selectRestaurantDisable: boolean;
+  onSelectRestaurant: () => void;
 };
 type TSearchRestaurantFormProps = FormProps<TSearchRestaurantFormValues> &
   TExtraProps;
@@ -27,7 +29,7 @@ type TSearchRestaurantFormComponentProps =
 const SearchRestaurantFormComponent: React.FC<
   TSearchRestaurantFormComponentProps
 > = (props) => {
-  const { handleSubmit } = props;
+  const { handleSubmit, onSelectRestaurant, selectRestaurantDisable } = props;
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -39,7 +41,12 @@ const SearchRestaurantFormComponent: React.FC<
             placeholder="Tìm tên nhà hàng"
           />
         </div>
-        <Button>{'Chọn nhà hàng này'}</Button>
+        <Button
+          type="button"
+          disabled={selectRestaurantDisable}
+          onClick={onSelectRestaurant}>
+          {'Chọn nhà hàng này'}
+        </Button>
       </div>
     </Form>
   );
