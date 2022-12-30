@@ -62,6 +62,7 @@ const TABLE_COLUMN: TColumn[] = [
 
 const ReviewContent: React.FC<any> = (props) => {
   const { name, id, ...rest } = props;
+  console.log(rest);
   const data = [
     {
       key: 1,
@@ -84,6 +85,7 @@ const ReviewContent: React.FC<any> = (props) => {
     <div>
       <Field name={name} id={id}>
         {(field) => {
+          console.log(field);
           return (
             <div className={css.content}>
               <div className={css.generalInfo}>
