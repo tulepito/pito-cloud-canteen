@@ -14,6 +14,7 @@ export type TSidebarMenu = {
   childrenMenus?: TSidebarMenu[];
   nameLink?: string;
   level?: number;
+  subNameLinks?: any[];
 };
 
 type TMenuWithClasses = {

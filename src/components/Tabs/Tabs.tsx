@@ -8,10 +8,8 @@ import css from './Tabs.module.scss';
 export type TTabsItem = {
   label: string;
   key: string;
-  children?: (props: any) => ReactNode | ReactNode | string | number;
-  childrenProps?: any;
+  children: ReactNode | string | number;
 };
-
 interface ITabsProps {
   defaultActiveKey?: string;
   items: TTabsItem[];
@@ -49,8 +47,6 @@ const Tabs = (props: ITabsProps) => {
     );
   });
 
-  const childrenProps = items[+activeTabKey - 1]?.childrenProps;
-
   const tabContent = items[+activeTabKey - 1]?.children || '';
 
   // classes setup
@@ -59,19 +55,27 @@ const Tabs = (props: ITabsProps) => {
   return (
     <div>
       <div className={headerClassName}>{tabHeader}</div>
-      <div className={contentClassName}>
-        {tabContent ? tabContent(childrenProps) : tabContent}
-      </div>
+      <div className={contentClassName}>{tabContent}</div>
     </div>
   );
 };
 
-type TTabFieldsProp = {
+export type TTabFieldItem = {
+  label: string;
+  key: string;
+  children: (e: any) => ReactNode;
+  childrenProps: any;
+};
+
+export type TTabFieldProps = {
+  defaultActiveKey?: string;
+  items: TTabFieldItem[];
   name: string;
   id?: string;
-} & ITabsProps;
+  onChange?: () => void;
+};
 
-export const TabFields = (props: TTabFieldsProp) => {
+export const TabFields = (props: TTabFieldProps) => {
   const { defaultActiveKey, name, items, id } = props;
   const [activeTabKey, setActiveTabKey] = useState(defaultActiveKey || 1);
 
@@ -118,9 +122,7 @@ export const TabFields = (props: TTabFieldsProp) => {
             return (
               index === +activeTabKey - 1 && (
                 <div key={name} className={contentClassName}>
-                  {tabContent
-                    ? tabContent({ ...childrenProps, name: fieldName })
-                    : tabContent}
+                  {tabContent({ ...childrenProps, name: fieldName })}
                 </div>
               )
             );

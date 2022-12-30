@@ -1,7 +1,8 @@
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
-import type { TTabsItem } from '@components/Tabs/Tabs';
+import type { TTabFieldItem } from '@components/Tabs/Tabs';
 import { TabFields } from '@components/Tabs/Tabs';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
@@ -83,6 +84,7 @@ const ReviewContent: React.FC<any> = (props) => {
     <div>
       <Field name={name} id={id}>
         {(field) => {
+          console.log(field);
           return (
             <div className={css.content}>
               <div className={css.generalInfo}>
@@ -150,7 +152,7 @@ type TReviewOrder = {
 };
 
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
-  const mockDates: TTabsItem[] = [
+  const mockDates: TTabFieldItem[] = [
     {
       key: '23/32/2022',
       label: '23/32/2022',

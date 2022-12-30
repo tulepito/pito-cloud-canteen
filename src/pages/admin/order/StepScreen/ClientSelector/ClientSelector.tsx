@@ -24,9 +24,6 @@ const ClientSelector = () => {
     (state) => state.ManageCompaniesPage,
     shallowEqual,
   );
-  useEffect(() => {
-    dispatch(manageCompaniesThunks.queryCompanies());
-  }, []);
 
   useEffect(() => {
     dispatch(paginateCompanies({ page }));
