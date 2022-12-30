@@ -1,11 +1,11 @@
 import FormWizard from '@components/FormWizard/FormWizard';
+import CalendarPage from '@src/pages/calendar/CalendarPage.page';
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import ClientSelector from '../../../StepScreen/ClientSelector/ClientSelector';
 import MealPlanSetup from '../../../StepScreen/MealPlanSetup/MealPlanSetup';
 import ReviewOrder from '../ReviewOrder/ReviewOrder';
-import SelectRestaurantPage from '../SelectRestaurantPage/SelectRestaurant.page';
 import css from './CreateOrderWizard.module.scss';
 
 export const CLIENT_SELECT_TAB = 'clientSelect';
@@ -29,7 +29,7 @@ const CreateOrderTab: React.FC<any> = (props) => {
     case MEAL_PLAN_SETUP:
       return <MealPlanSetup />;
     case CREATE_MEAL_PLAN_TAB:
-      return <SelectRestaurantPage />;
+      return <CalendarPage />;
     case REVIEW_TAB:
       return <ReviewOrder goBack={goBack} />;
     default:
