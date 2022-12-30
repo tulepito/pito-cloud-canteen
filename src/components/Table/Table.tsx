@@ -11,7 +11,7 @@ import css from './Table.module.scss';
 export type TColumn = {
   key: string | number;
   label: string;
-  render: (data: any) => ReactNode;
+  render: (data: any, index: number) => ReactNode;
   renderSearch?: () => ReactNode;
 };
 
@@ -124,7 +124,7 @@ const Table = (props: TTable) => {
                     </>
                   )}
 
-                  {data.map((row: TRowData) => (
+                  {data.map((row: TRowData, index: number) => (
                     <tr
                       className={classNames(tableBodyRowClassName, css.bodyRow)}
                       key={row.key}>
@@ -136,7 +136,7 @@ const Table = (props: TTable) => {
                           )}
                           data-label={col.label}
                           key={col.key}>
-                          {col.render(row.data)}
+                          {col.render(row.data, index)}
                         </td>
                       ))}
                     </tr>

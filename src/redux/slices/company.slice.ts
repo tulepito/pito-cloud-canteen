@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
+import type { TUser } from '@utils/types';
 import axios from 'axios';
 
 import type { ThunkAPI } from './types';
@@ -28,9 +29,11 @@ interface CompanyState {
   deleteGroupError: any;
   deletingGroupId: string;
 
+  company: TUser | null;
   updateGroupInProgress: boolean;
   updateGroupError: any;
   originCompanyMembers: Record<string, any>;
+  isCompanyNotFound: boolean;
 }
 
 // ================ Thunk types ================ //
@@ -58,9 +61,11 @@ const initialState: CompanyState = {
   deleteGroupError: null,
   deletingGroupId: '',
 
+  company: null,
   updateGroupInProgress: false,
   updateGroupError: null,
   originCompanyMembers: {},
+  isCompanyNotFound: false,
 };
 
 const companyInfo = createAsyncThunk(
@@ -80,6 +85,7 @@ const companyInfo = createAsyncThunk(
       companyAccount.attributes.profile.metadata;
     return {
       groupList: groups,
+      company: companyAccount,
       originCompanyMembers: members,
       companyMembers: [...allEmployeesData.data.data],
     };
@@ -202,16 +208,27 @@ export const companySlice = createSlice({
         return {
           ...state,
           fetchCompanyInfoInProgress: true,
+          isCompanyNotFound: false,
         };
       })
       .addCase(companyInfo.fulfilled, (state, { payload }) => {
-        const { groupList, companyMembers, originCompanyMembers } = payload;
+        const { groupList, companyMembers, originCompanyMembers, company } =
+          payload;
         return {
           ...state,
           groupList,
           companyMembers,
+          company,
           originCompanyMembers,
+          isCompanyNotFound: false,
           fetchCompanyInfoInProgress: false,
+        };
+      })
+      .addCase(companyInfo.rejected, (state) => {
+        return {
+          ...state,
+          fetchCompanyInfoInProgress: false,
+          isCompanyNotFound: true,
         };
       })
       .addCase(groupInfo.pending, (state) => {

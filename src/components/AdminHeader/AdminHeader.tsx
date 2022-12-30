@@ -1,13 +1,15 @@
 // eslint-disable-next-line import/no-named-as-default
 import Avatar from '@components/Avatar/Avatar';
+import { InlineTextButton } from '@components/Button/Button';
 import HamburgerMenuButton from '@components/HamburgerMenuButton/HamburgerMenuButton';
 import IconBell from '@components/IconBell/IconBell';
-import NamedLink from '@components/NamedLink/NamedLink';
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { authThunks } from '@redux/slices/auth.slice';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 import css from './AdminHeader.module.scss';
@@ -19,6 +21,13 @@ type TAdminHeader = {
 const AdminHeader: React.FC<TAdminHeader> = (props) => {
   const { onMenuClick } = props;
   const { currentUser } = useAppSelector((state) => state.user);
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+
+  const onLogout = async () => {
+    await dispatch(authThunks.logout());
+    router.push('/');
+  };
   return (
     <div className={css.root}>
       <div className={css.headerRight}>
@@ -35,9 +44,9 @@ const AdminHeader: React.FC<TAdminHeader> = (props) => {
           </ProfileMenuLabel>
           <ProfileMenuContent className={css.profileMenuContent}>
             <ProfileMenuItem key="AccountSettingsPage">
-              <NamedLink>
-                <p>Dang xuat</p>
-              </NamedLink>
+              <InlineTextButton type="button" onClick={onLogout}>
+                <p>Đăng xuất</p>
+              </InlineTextButton>
             </ProfileMenuItem>
           </ProfileMenuContent>
         </ProfileMenu>

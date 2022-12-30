@@ -1,0 +1,75 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 40px 0;
+  border-bottom: 1px solid $neutralGray4;
+  margin-bottom: 50px;
+}
+
+.link {
+  align-items: center;
+  display: flex;
+  column-gap: 20px;
+  font-size: 14px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  justify-content: center;
+}
+
+.line {
+  max-width: 50px;
+  margin: 0 10px;
+  width: 100%;
+  height: 1px;
+  background-color: $neutralGray5;
+  display: none;
+  @include viewportLarge {
+    display: block;
+  }
+}
+
+.order {
+  min-width: 25px;
+  border-radius: 50%;
+  min-height: 25px;
+  display: flex;
+  font-size: 10px;
+  align-items: center;
+  justify-content: center;
+  color: $neutralGray10;
+  background-color: $neutralGray3;
+}
+
+.selectedLink {
+  .linkText {
+    display: flex;
+  }
+}
+
+.linkText {
+  display: none;
+  @include viewportLarge {
+    display: flex;
+  }
+  color: $neutralGray7;
+  font-weight: $fontWeightMedium;
+}
+
+.selectedLink {
+  .order {
+    color: $matterColorLight;
+    background-color: $marketplaceColor;
+  }
+  .linkText {
+    color: $neutralGray9;
+  }
+}

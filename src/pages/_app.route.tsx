@@ -2,20 +2,13 @@
 import '@src/styles/globals.scss';
 import '@src/styles/nprogress.scss';
 
-import AdminLayout from '@components/AdminLayout/AdminLayout';
-import AuthGuard from '@components/AuthGuard/AuthGuard';
-import CompanyLayout from '@components/CompanyLayout/CompanyLayout';
-import Layout from '@components/Layout/Layout';
-import { Open_Sans } from '@next/font/google';
-import { authThunks } from '@redux/slices/auth.slice';
-import { emailVerificationActions } from '@redux/slices/emailVerification.slice';
-import { userThunks } from '@redux/slices/user.slice';
+import AuthGuard from '@components/Guards/AuthGuard';
+import PermissionGuard from '@components/Guards/PermissionGuard';
+import { Manrope } from '@next/font/google';
 import wrapper from '@redux/store';
-import { AuthenticationRoutes } from '@src/paths';
 import TranslationProvider from '@translations/TranslationProvider';
 import type { NextApplicationPage } from '@utils/types';
-import type { AppContext, AppInitialProps, AppProps } from 'next/app';
-import App from 'next/app';
+import type { AppProps } from 'next/app';
 import { Router } from 'next/router';
 import Script from 'next/script';
 import nProgress from 'nprogress';
@@ -32,7 +25,7 @@ type AppCustomProps = {
   Component?: NextApplicationPage;
 };
 
-const openSans = Open_Sans({
+const font = Manrope({
   subsets: ['vietnamese', 'latin'],
   weight: ['400', '500', '700'],
 });
@@ -49,59 +42,22 @@ const MyApp = ({
       JSON.stringify(store.getState().Order),
     );
 
-  const isRequiredAuth = Component.requireAuth === true;
-
-  const isAdminRoute = !!router.route.startsWith('/admin');
-  const isAuthenticationRoute = AuthenticationRoutes.includes(router.route);
-  const isCompanyRoute = !!router.route.startsWith('/company');
-  const LayoutComponent = isAdminRoute
-    ? AdminLayout
-    : isCompanyRoute
-    ? CompanyLayout
-    : Layout;
   return (
-    <main className={openSans.className}>
+    <main className={font.className}>
       <TranslationProvider>
         <Script
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
         />
         <Provider store={store}>
-          <AuthGuard
-            pathName={router.route}
-            isAuthenticationRoute={isAuthenticationRoute}
-            isRequiredAuth={isRequiredAuth}>
-            <LayoutComponent>
+          <AuthGuard>
+            <PermissionGuard>
               <Component {...props.pageProps} key={router.asPath} />
-            </LayoutComponent>
+            </PermissionGuard>
           </AuthGuard>
         </Provider>
       </TranslationProvider>
     </main>
   );
 };
-
-MyApp.getInitialProps = wrapper.getInitialAppProps(
-  (store) =>
-    async (_context: AppContext): Promise<AppInitialProps> => {
-      await store.dispatch(authThunks.authInfo());
-      const {
-        auth: { isAuthenticated },
-      } = store.getState();
-
-      if (isAuthenticated) {
-        await store.dispatch(userThunks.fetchCurrentUser(undefined));
-        const {
-          user: { currentUser },
-        } = store.getState();
-        const isVerified = currentUser?.attributes?.emailVerified;
-
-        await store.dispatch(
-          emailVerificationActions.updateVerificationState(isVerified),
-        );
-      }
-
-      return App.getInitialProps(_context);
-    },
-);
 
 export default MyApp;

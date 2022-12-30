@@ -44,6 +44,22 @@ export const minLength =
     return hasLength && value.length >= minimumLength ? VALID : message;
   };
 
+export const taxLengthRequired = (message: string) => (value: string) => {
+  const numberWithoutDash = value.split('-').join('');
+  const hasOneDashNumber = value.length - numberWithoutDash.length;
+  const hasInvalidChac =
+    (value.includes('-') && Number.isNaN(Number(numberWithoutDash))) ||
+    (!value.includes('-') && Number.isNaN(Number(value))) ||
+    hasOneDashNumber > 1;
+  if (hasInvalidChac) {
+    return message;
+  }
+  const hasLength = value && typeof value.length === 'number';
+  return hasLength && (value.length === 13 || value.length === 10)
+    ? VALID
+    : message;
+};
+
 export const maxLength =
   (message: string, maximumLength: number) => (value: string) => {
     if (!value) {
@@ -59,6 +75,12 @@ export const nonEmptyArray = (message: string) => (value: string) => {
 
 export const autocompleteSearchRequired = (message: string) => (value: any) => {
   return value && value.search ? VALID : message;
+};
+
+export const autocompletePlaceSelected = (message: string) => (value: any) => {
+  const selectedPlaceIsValid =
+    value && value.selectedPlace && value.selectedPlace.address;
+  return selectedPlaceIsValid ? VALID : message;
 };
 
 // Source: http://www.regular-expressions.info/email.html
@@ -150,6 +172,10 @@ export const confirmPassword =
   (value: string, allValues: any) => {
     return allValues[fieldNameToCompare] === value ? VALID : message;
   };
+
+export const nonEmptyImage = (message: string) => (value: any) => {
+  return value && (value.id || value.imageId) ? VALID : message;
+};
 
 export const composeValidatorsWithAllValues =
   (...validators: any) =>

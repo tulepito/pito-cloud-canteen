@@ -9,7 +9,7 @@ import { useIntl } from 'react-intl';
 import css from './KeywordSearchForm.module.scss';
 
 export type TKeywordSearchFormValues = {
-  keyword?: string;
+  keywords?: string;
 };
 
 type TKeywordSearchForm = {

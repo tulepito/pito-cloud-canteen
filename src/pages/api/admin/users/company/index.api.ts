@@ -1,7 +1,8 @@
 /* eslint-disable no-console */
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { queryAllUsers } from '@helpers/apiHelpers';
 import cookies from '@services/cookie';
-import { deserialize, getIntegrationSdk } from '@services/sdk';
+import { deserialize, handleError } from '@services/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -18,11 +19,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       return;
     }
   }
-  const intergrationSdk = getIntegrationSdk();
-  const response = await intergrationSdk.users.query({
-    meta_isCompanyAccount: true,
-  });
-  res.json(response);
+  try {
+    const response = await queryAllUsers({
+      query: {
+        meta_isCompanyAccount: true,
+      },
+    });
+    res.json(response);
+  } catch (error) {
+    console.error(error);
+    handleError(res, error);
+  }
 }
 
 export default cookies(handler);

@@ -4,13 +4,13 @@ import {
   paginateCompanies,
 } from '@redux/slices/ManageCompaniesPage.slice';
 import { addCompanyClient } from '@redux/slices/Order.slice';
-import KeywordSearchForm from '@src/pages/admin/company/components/KeywordSearchForm/KeywordSearchForm';
 import type { TUpdateStatus } from '@src/pages/admin/company/helpers';
 import {
   filterCompanies,
   parseEntitiesToTableData,
   sliceCompanies,
 } from '@src/pages/admin/company/helpers';
+import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import isEmpty from 'lodash/isEmpty';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
