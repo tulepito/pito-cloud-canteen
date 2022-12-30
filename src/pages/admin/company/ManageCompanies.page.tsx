@@ -9,7 +9,7 @@ import IconMagnifier from '@components/IconMagnifier/IconMagnifier';
 import IconSpinner from '@components/IconSpinner/IconSpinner';
 import Meta from '@components/Layout/Meta';
 import type { TColumn } from '@components/Table/Table';
-import Table from '@components/Table/Table';
+import { TableForm } from '@components/Table/Table';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -296,7 +296,7 @@ export default function ManageCompanies() {
           <IconSpinner className={css.spinner} />
         </div>
       ) : (
-        <Table
+        <TableForm
           initialValues={initialValues}
           onSubmit={onSearchKeyword}
           columns={TABLE_COLUMN}

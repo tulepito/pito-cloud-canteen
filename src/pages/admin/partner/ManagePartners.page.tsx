@@ -2,7 +2,7 @@ import Button from '@components/Button/Button';
 import IconEdit from '@components/IconEdit/IconEdit';
 import IconEye from '@components/IconEye/IconEye';
 import type { TColumn } from '@components/Table/Table';
-import Table from '@components/Table/Table';
+import { TableForm } from '@components/Table/Table';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { managePartnerThunks } from '@redux/slices/ManagePartnersPage.slice';
@@ -112,7 +112,7 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
 
   return (
     <div className={css.root}>
-      <Table
+      <TableForm
         columns={TABLE_COLUMN}
         data={[]}
         pagination={{ page: 1, perPage: 10, totalItems: 100, totalPages: 10 }}

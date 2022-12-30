@@ -57,7 +57,11 @@ const LIST_SIDEBAR_MENU = [
         id: 'partner',
         label: 'AdminSidebar.partnerLabel',
         nameLink: '/admin/partner',
-        subNameLinks: ['/admin/partner', '/admin/partner/[partnerId]/edit'],
+        subNameLinks: [
+          '/admin/partner',
+          '/admin/partner/create',
+          '/admin/partner/[partnerId]/edit',
+        ],
       },
     ],
   },
@@ -68,13 +72,13 @@ type TAdminSidebar = {
   onCloseMenu: () => void;
 };
 
-const getNestedPath = (arr: any[], pathName: string) => {
+const checkNestedPathActive = (arr: any[], pathName: string) => {
   // eslint-disable-next-line no-restricted-syntax
   for (const item of arr) {
     if (item.subNameLinks?.includes(pathName)) return item;
     if (item.nameLink === pathName) return item;
     if (item.childrenMenus) {
-      const child = getNestedPath(item.childrenMenus, pathName);
+      const child = checkNestedPathActive(item.childrenMenus, pathName);
       if (child) return item;
     }
   }
@@ -93,7 +97,7 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
   const { pathname } = router;
 
   const activeMenu = useMemo(
-    () => getNestedPath(LIST_SIDEBAR_MENU, pathname),
+    () => checkNestedPathActive(LIST_SIDEBAR_MENU, pathname),
     [pathname],
   );
 
