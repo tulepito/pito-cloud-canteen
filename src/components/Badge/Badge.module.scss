@@ -26,86 +26,87 @@
   &.warning {
     background-color: $warningOrange1;
   }
-}
 
-.label {
-  font-size: 12px;
-  font-weight: $fontWeightRegular;
-  line-height: 17px;
-  &.default {
-    color: $neutralGray10;
-  }
-  &.processing {
-    color: $secondaryBlue6;
-  }
-  &.error {
-    color: $errorRed6;
-  }
-  &.success {
-    color: $successScreen6;
-  }
-  &.warning {
-    color: $warningOrange6;
-  }
-}
-.badgeClose {
-  @include flexCenter;
-  height: 12px;
-  width: 12px;
-  margin-left: 8px;
-  cursor: pointer;
-  & .default {
-    path {
-      fill: $neutralGray6;
+  .label {
+    font-size: 12px;
+    font-weight: $fontWeightRegular;
+    line-height: 17px;
+    &.default {
+      color: $neutralGray10;
+    }
+    &.processing {
+      color: $secondaryBlue6;
+    }
+    &.error {
+      color: $errorRed6;
+    }
+    &.success {
+      color: $successScreen6;
+    }
+    &.warning {
+      color: $warningOrange6;
     }
   }
-  & .processing {
-    path {
-      fill: $secondaryBlue3;
-    }
-  }
-  & .error {
-    path {
-      fill: $errorRed3;
-    }
-  }
-  & .success {
-    path {
-      fill: $successScreen3;
-    }
-  }
-  & .warning {
-    path {
-      fill: $warningOrange3;
-    }
-  }
-}
 
-.badgeDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 6px;
-  display: inline-block;
-  margin-right: 8px;
+  .badgeClose {
+    @include flexCenter;
+    height: 12px;
+    width: 12px;
+    margin-left: 8px;
+    cursor: pointer;
+    & .default {
+      path {
+        fill: $neutralGray6;
+      }
+    }
+    & .processing {
+      path {
+        fill: $secondaryBlue3;
+      }
+    }
+    & .error {
+      path {
+        fill: $errorRed3;
+      }
+    }
+    & .success {
+      path {
+        fill: $successScreen3;
+      }
+    }
+    & .warning {
+      path {
+        fill: $warningOrange3;
+      }
+    }
+  }
 
-  &.default {
-    background: $neutralGray7;
-  }
-  &.processing {
-    background: $secondaryBlue6;
-  }
-  &.error {
-    background: $errorRed6;
-  }
-  &.success {
-    background: $successScreen6;
-  }
-  &.warning {
-    background: $warningOrange6;
-  }
-}
+  .badgeDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-right: 8px;
 
-.badgeContent {
-  display: flex;
-  align-items: center;
+    &.default {
+      background: $neutralGray7;
+    }
+    &.processing {
+      background: $secondaryBlue6;
+    }
+    &.error {
+      background: $errorRed6;
+    }
+    &.success {
+      background: $successScreen6;
+    }
+    &.warning {
+      background: $warningOrange6;
+    }
+  }
+
+  .badgeContent {
+    display: flex;
+    align-items: center;
+  }
 }

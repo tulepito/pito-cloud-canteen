@@ -11,7 +11,7 @@ import css from './Modal.module.scss';
 type TModal = {
   children?: ReactNode;
   isOpen: boolean;
-  title?: string;
+  title?: ReactNode | string;
   shouldHideIconClose?: boolean;
   containerClassName?: string;
   className?: string;
@@ -38,7 +38,7 @@ const Modal = (props: TModal) => {
   const classes = classNames(isOpenClass, className);
   const containerClasses = containerClassName || css.container;
   const scrollLayerClasses = scrollLayerClassName || css.scrollLayer;
-  const hasTitle = title && title.length > 0;
+  const hasTitle = !!title;
   const closeModalMessage = intl.formatMessage({ id: 'Modal.closeModal' });
 
   useLockBodyScroll({ isOpen });

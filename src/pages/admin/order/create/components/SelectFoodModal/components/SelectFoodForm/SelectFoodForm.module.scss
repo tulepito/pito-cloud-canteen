@@ -1,0 +1,128 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.searchInputContainer {
+  width: 360px;
+
+  ::placeholder {
+    color: $neutralGray5;
+  }
+}
+
+.contentContainer {
+  display: grid;
+  grid-template-columns: auto 360px;
+
+  .leftPart {
+    padding: 16px;
+    padding-top: 0;
+    max-height: calc(70vh);
+    overflow: hidden auto;
+  }
+
+  .rightPart {
+    padding: 16px 24px 0 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+
+    &::before {
+      position: absolute;
+      left: 0;
+      top: 0;
+      content: '';
+      height: 100%;
+      width: 1px;
+      background-color: $neutralGray3;
+    }
+
+    .emptyIconContainer {
+      margin: 72px auto;
+    }
+
+    .partTitle {
+      @include textTemplate(16px, 700, 24px, '');
+      color: $neutralGray9;
+    }
+
+    .divider {
+      height: 1px;
+      width: 37px;
+      background-color: $red2;
+      margin-top: 8px;
+    }
+
+    .selectFoodItem {
+      margin-top: 10px;
+      display: flex;
+      align-items: flex-start;
+
+      &:first-of-type {
+        margin-top: 14px;
+      }
+
+      .deleteIconBox {
+        padding: 8px 10px 8px 0;
+        cursor: pointer;
+
+        .deleteIcon {
+          width: 12px;
+          height: 12px;
+
+          & > path {
+            fill: $neutralGray5;
+          }
+        }
+      }
+
+      .titleContainer {
+        display: flex;
+        flex-grow: 1;
+        justify-content: space-between;
+        padding-top: 8px;
+
+        & > .title {
+          flex-basis: calc(100% - 80px);
+          word-wrap: break-all;
+          word-break: break-all;
+          text-align: left;
+        }
+        &:nth-child(2) {
+          flex-basis: 80px;
+          text-align: right;
+        }
+      }
+    }
+
+    .actionContainer {
+      width: calc(100% - 16px * 2);
+      margin: 32px auto 0 auto;
+    }
+  }
+}
+
+.checkAllLabel {
+  display: flex;
+
+  .label {
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    @include textTemplate(12px, 400, 16px, '');
+    color: $neutralGray5;
+
+    :nth-child(2) {
+      flex-basis: 50px;
+    }
+  }
+}
+.checkAllCheckbox {
+  // display: none;
+  .checkboxWrapper {
+    margin: 0;
+  }
+}
+
+.checkboxSvg {
+}

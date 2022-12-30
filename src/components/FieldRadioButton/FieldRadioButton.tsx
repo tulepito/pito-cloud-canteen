@@ -10,14 +10,15 @@ type TIconRadioButton = {
   showAsRequired?: boolean;
 };
 
-const IconRadioButton: React.FC<TIconRadioButton> = (props) => {
+export const IconRadioButton: React.FC<TIconRadioButton> = (props) => {
   const { checkedClassName, className } = props;
   return (
     <div>
       <svg
-        className={className}
+        preserveAspectRatio="none"
         width="14"
         height="14"
+        className={className}
         xmlns="http://www.w3.org/2000/svg">
         <circle
           className={props.showAsRequired ? css.required : css.notChecked}
@@ -55,10 +56,17 @@ const FieldRadioButton = (props: any) => {
     id,
     label,
     showAsRequired,
+    radioButtonWrapperClassName,
+    radioLabelClassName,
     ...rest
   } = props;
 
   const classes = classNames(rootClassName || css.root, className);
+  const labelClasses = classNames(css.label, radioLabelClassName);
+  const radioButtonWrapperClasses = classNames(
+    css.radioButtonWrapper,
+    radioButtonWrapperClassName,
+  );
   const radioButtonProps = {
     id,
     className: css.input,
@@ -70,8 +78,8 @@ const FieldRadioButton = (props: any) => {
   return (
     <span className={classes}>
       <Field {...radioButtonProps} />
-      <label htmlFor={id} className={css.label}>
-        <span className={css.radioButtonWrapper}>
+      <label htmlFor={id} className={labelClasses}>
+        <span className={radioButtonWrapperClasses}>
           <IconRadioButton
             className={svgClassName}
             checkedClassName={checkedClassName}
