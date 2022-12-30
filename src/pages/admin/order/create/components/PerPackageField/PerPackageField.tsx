@@ -28,7 +28,7 @@ const PerPackageField = () => {
           })}
           type="number"
           className={css.numberInput}
-          rightIcon={<div className={css.vndIcon}>đ</div>}
+          // rightIcon={<div className={css.vndIcon}>đ</div>}
           validate={required(perPackRequiredMessage)}
         />
 

@@ -31,7 +31,10 @@ const MealPlanDateField = () => {
     id: 'MealPlanDateField.startDateRequired',
   });
   const endDateRequiredMessage = intl.formatMessage({
-    id: 'MealPlanDateField.startDateRequired',
+    id: 'MealPlanDateField.endDateRequired',
+  });
+  const deliveryHourRequiredMessage = intl.formatMessage({
+    id: 'MealPlanDateField.deliveryHourRequired',
   });
   return (
     <div className={css.container}>
@@ -67,7 +70,8 @@ const MealPlanDateField = () => {
           label={intl.formatMessage({
             id: 'MealPlanDateField.deliveryHourLabel',
           })}
-          className={css.fieldSelect}>
+          className={css.fieldSelect}
+          validate={required(deliveryHourRequiredMessage)}>
           {TIME_OPTIONS.map((option) => (
             <option key={option}>{option}</option>
           ))}
