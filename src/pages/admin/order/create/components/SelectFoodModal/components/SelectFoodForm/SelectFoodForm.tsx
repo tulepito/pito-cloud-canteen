@@ -5,6 +5,7 @@ import EmptyIcon from '@components/Icons/EmptyIcon';
 import SearchIcon from '@components/Icons/SearchIcon';
 import arrayMutators from 'final-form-arrays';
 import type { ReactNode } from 'react';
+import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 
@@ -14,6 +15,7 @@ import css from './SelectFoodForm.module.scss';
 
 export type TSelectFoodFormValues = {
   food: string[];
+  checkAll: boolean;
 };
 
 type TExtraProps = {
@@ -31,13 +33,28 @@ type TSelectFoodFormComponentProps = FormRenderProps<TSelectFoodFormValues> &
 const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, items = [], values } = props;
+  const {
+    handleSubmit,
+    items = [],
+    values: { checkAll },
+    form,
+  } = props;
   const options = items.map((item) => {
     const { id, attributes } = item || {};
     const { title, price } = attributes;
     return { key: id?.uuid, value: id?.uuid, title, price };
   });
-  console.log(values);
+
+  useEffect(() => {
+    if (checkAll) {
+      form.change(
+        'food',
+        options.map((o) => o.key),
+      );
+    } else {
+      form.change('food', []);
+    }
+  }, [checkAll]);
 
   return (
     <Form onSubmit={handleSubmit}>

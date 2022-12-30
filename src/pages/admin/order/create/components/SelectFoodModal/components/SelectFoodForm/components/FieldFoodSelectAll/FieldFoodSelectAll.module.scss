@@ -19,29 +19,32 @@
     }
     /* Highlight the borders if the checkbox is hovered, focused or checked */
     &:hover + label .box,
-    &:focus + label .box,
-    &:checked + label .box {
+    &:focus + label .box {
       stroke: $neutralGray4;
+    }
+
+    &:checked + label .box {
+      stroke: $neutralGray10;
     }
 
     /* successColor version */
     &:hover + label .boxSuccess,
     &:focus + label .boxSuccess,
     &:checked + label .boxSuccess {
-      stroke: $neutralGray4;
+      stroke: $neutralGray10;
     }
 
     /* Display the "check" when checked */
     &:checked + label .checked {
       display: inline;
-      stroke: $neutralGray4;
+      stroke: $neutralGray10;
       stroke-width: 1px;
     }
 
     /* Display the "check" when checked */
     &:checked + label .checkedSuccess {
       display: inline;
-      stroke: $neutralGray4;
+      stroke: $neutralGray10;
       stroke-width: 1px;
     }
   }
@@ -65,11 +68,11 @@
 
   .checked {
     display: none;
-    fill: $neutralGray4;
+    fill: $neutralGray10;
   }
   .checkedSuccess {
     display: none;
-    fill: $neutralGray4;
+    fill: $neutralGray10;
   }
 
   .boxSuccess,
