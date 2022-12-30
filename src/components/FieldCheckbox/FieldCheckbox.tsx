@@ -10,7 +10,7 @@ interface IconCheckboxProps extends TIconProps {
   boxClassName?: string;
 }
 
-const IconCheckbox = (props: IconCheckboxProps) => {
+export const IconCheckbox = (props: IconCheckboxProps) => {
   const { className, checkedClassName, boxClassName } = props;
   return (
     <svg
@@ -58,6 +58,7 @@ const FieldCheckbox = (props: any) => {
     textClassName,
     id,
     label,
+    showLabel = true,
     useSuccessColor,
     customOnChange,
     ...rest
@@ -98,7 +99,7 @@ const FieldCheckbox = (props: any) => {
           );
         }}
       </Field>
-      {label && (
+      {(label || label === '') && (
         <label htmlFor={id} className={css.label}>
           <span className={css.checkboxWrapper}>
             <IconCheckbox
@@ -107,7 +108,7 @@ const FieldCheckbox = (props: any) => {
             />
           </span>
           <span className={classNames(css.text, textClassName || css.textRoot)}>
-            {label}
+            {showLabel && label}
           </span>
         </label>
       )}
