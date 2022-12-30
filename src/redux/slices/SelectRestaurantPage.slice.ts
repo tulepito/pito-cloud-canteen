@@ -2,21 +2,30 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { TPagination } from '@utils/types';
+import get from 'lodash/get';
 
 type TSelectRestaurantPageSliceInitialState = {
   restaurants: any[] | null;
   pagination: TPagination | null;
   selectRestaurantPageError: any;
+
+  foodList: any[];
+  fetchFoodPending: boolean;
+  fetchFoodError: any;
 };
 
 const initialState: TSelectRestaurantPageSliceInitialState = {
   restaurants: null,
   pagination: null,
   selectRestaurantPageError: null,
+  foodList: [],
+  fetchFoodPending: false,
+  fetchFoodError: null,
 };
 
 // ================ Thunk types ================ //
 const QUERY_RESTAURANTS = 'app/SelectRestaurantPage/QUERY_RESTAURANTS';
+const QUERY_RESTAURANT_FOOD = 'app/SelectRestaurantPage/QUERY_RESTAURANT_FOOD';
 
 // ================ Thunks ================ //
 const getRestaurants = createAsyncThunk(
@@ -33,8 +42,27 @@ const getRestaurants = createAsyncThunk(
   },
 );
 
+const getRestaurantFood = createAsyncThunk(
+  QUERY_RESTAURANT_FOOD,
+  async (restaurantId: string, { extra: sdk, getState }) => {
+    const restaurant = getState().SelectRestaurantPage.restaurants?.find(
+      (rest) => rest?.id?.uuid === restaurantId,
+    );
+    const foodIds = get(restaurant, 'attributes.metadata.foods', []);
+    const promises = foodIds.map(async (foodId: string) => {
+      const response = await sdk.listings.show({ id: foodId });
+      const [food] = denormalisedResponseEntities(response);
+      return food;
+    });
+    const result = await Promise.all(promises);
+
+    return result;
+  },
+);
+
 export const selectRestaurantPageThunks = {
   getRestaurants,
+  getRestaurantFood,
 };
 
 const SelectRestaurantPageSlice = createSlice({
@@ -53,6 +81,19 @@ const SelectRestaurantPageSlice = createSlice({
       })
       .addCase(getRestaurants.rejected, (state, { error }) => {
         return { ...state, selectRestaurantPageError: error };
+      })
+
+      .addCase(getRestaurantFood.pending, (state) => {
+        state.fetchFoodPending = true;
+        state.fetchFoodError = null;
+      })
+      .addCase(getRestaurantFood.fulfilled, (state, { payload }) => {
+        state.fetchFoodPending = false;
+        state.foodList = payload;
+      })
+      .addCase(getRestaurantFood.rejected, (state, { error }) => {
+        state.fetchFoodPending = false;
+        state.fetchFoodError = error;
       });
   },
 });
