@@ -1,5 +1,7 @@
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { updateDraftMealPlan } from '@redux/slices/Order.slice';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -13,11 +15,26 @@ import PerPackageField from '../../create/components/PerPackageField/PerPackageF
 import css from './MealPlanSetup.module.scss';
 
 type MealPlanSetupProps = {};
-
 const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
   const intl = useIntl();
+  const dispatch = useAppDispatch();
+  // const {
+  //   draftOrder: { clientId },
+  // } = getPersistState('Order');
   const onSubmit = (values: any) => {
-    console.log('values: ', values);
+    const { deliveryAddress, perPack, ...rest } = values;
+    const {
+      selectedPlace: { address, origin },
+    } = deliveryAddress;
+    const createOrderValue = {
+      deliveryAddress: {
+        address,
+        origin,
+      },
+      packagePerMember: perPack,
+      ...rest,
+    };
+    dispatch(updateDraftMealPlan(createOrderValue));
   };
   const initialValues = {
     dayInWeek: [],

@@ -3,6 +3,7 @@ import {
   manageCompaniesThunks,
   paginateCompanies,
 } from '@redux/slices/ManageCompaniesPage.slice';
+import { addCompanyClient } from '@redux/slices/Order.slice';
 import KeywordSearchForm from '@src/pages/admin/company/components/KeywordSearchForm/KeywordSearchForm';
 import type { TUpdateStatus } from '@src/pages/admin/company/helpers';
 import {
@@ -10,13 +11,16 @@ import {
   parseEntitiesToTableData,
   sliceCompanies,
 } from '@src/pages/admin/company/helpers';
+import isEmpty from 'lodash/isEmpty';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import ClientTable from '../../create/components/ClientTable/ClientTable';
 import css from './ClientSelector.module.scss';
 
 const ClientSelector = () => {
+  const intl = useIntl();
   const [queryParams, setQueryParams] = useState({});
   const [page, setPage] = useState<number>(1);
   const dispatch = useAppDispatch();
@@ -24,7 +28,8 @@ const ClientSelector = () => {
     (state) => state.ManageCompaniesPage,
     shallowEqual,
   );
-
+  const [totalItemsPagination, setTotalItemsPagination] =
+    useState<number>(totalItems);
   useEffect(() => {
     dispatch(paginateCompanies({ page }));
   }, [dispatch, page]);
@@ -56,17 +61,30 @@ const ClientSelector = () => {
     [slicesCompanies, updateStatus],
   );
 
+  useEffect(() => {
+    if (!isEmpty(queryParams)) {
+      setTotalItemsPagination(filteredCompanies.length);
+    } else {
+      setTotalItemsPagination(totalItems);
+    }
+  }, [filteredCompanies.length, queryParams, totalItems]);
   const onPageChange = (value: number) => {
     setPage(value);
+  };
+  const onItemClick = (id: string) => () => {
+    dispatch(addCompanyClient(id));
   };
   return (
     <div>
       <div className={css.header}>
-        <div className={css.title}>Chon khach hang</div>
-        <div className={css.amount}>1212</div>
+        <div className={css.title}>
+          {intl.formatMessage({ id: 'ClientSelector.title' })}
+        </div>
+        <div className={css.amount}>{totalItemsPagination}</div>
       </div>
       <div className={css.searchInput}>
         <KeywordSearchForm
+          searchValue="searchCompanyName"
           onSubmit={(values: any) => {
             setQueryParams(values);
           }}
@@ -76,8 +94,9 @@ const ClientSelector = () => {
         <ClientTable
           data={companiesTableData}
           page={page}
-          totalItems={totalItems}
+          totalItems={totalItemsPagination}
           onPageChange={onPageChange}
+          onItemClick={onItemClick}
         />
       </div>
     </div>

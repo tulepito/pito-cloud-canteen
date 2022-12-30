@@ -334,6 +334,7 @@
   "EditPartnerBasicInfomationForm.createBtn": "Thêm",
   "LocationAutocompleteInput.currentLocation": "Địa chỉ hiện tại",
   "ManageCompanies.searchStatusLabel": "Chọn trạng thái",
+  "ClientSelector.title": "Chọn khách hàng",
   "OrderSettingModal.title": "Cài đặt đơn hàng",
   "OrderSettingModal.field.company": "Công ty",
   "OrderSettingModal.field.deliveryAddress": "Địa điểm",
@@ -370,5 +371,9 @@
   "ParticipantSetupField.title": "Cài đặt truy cập",
   "ParticipantSetupField.allMembers": "Tất cả thành viên",
   "MealPlanSetup.back": "Trở về",
-  "MealPlanSetup.submit": "Tiếp theo"
+  "MealPlanSetup.submit": "Tiếp theo",
+  "ClientTable.id": "ID",
+  "ClientTable.companyName": "Họ và tên",
+  "ClientTable.contact": "Liên hệ",
+  "ClientTable.address": "Địa chỉ"
 }

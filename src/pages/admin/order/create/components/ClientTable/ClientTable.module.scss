@@ -10,8 +10,11 @@
   width: 100%;
   .header {
     width: 100%;
+    padding-left: 12px;
     span {
       display: inline-block;
+      @include text(12px, 16px);
+      color: $neutralGray7;
     }
     span:nth-child(1) {
       width: 5%;
@@ -45,6 +48,7 @@
       height: 52px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.3);
       cursor: pointer;
+      padding-left: 12px;
 
       &:hover {
         box-shadow: 0px 8px 8px -4px rgba(16, 24, 40, 0.04),
