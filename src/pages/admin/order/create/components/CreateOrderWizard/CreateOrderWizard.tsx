@@ -1,4 +1,5 @@
 import FormWizard from '@components/FormWizard/FormWizard';
+import { getItem } from '@utils/localStorageHelpers';
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -21,15 +22,17 @@ export const TABS = [
   REVIEW_TAB,
 ];
 
+export const DRAFT_ORDER_LOCAL_STORAGE_NAME = 'draftOrder';
+
 const CreateOrderTab: React.FC<any> = (props) => {
   const { tab, goBack } = props;
   switch (tab) {
     case CLIENT_SELECT_TAB:
       return <ClientSelector />;
     case MEAL_PLAN_SETUP:
-      return <MealPlanSetup />;
+      return <MealPlanSetup goBack={goBack} />;
     case CREATE_MEAL_PLAN_TAB:
-      return <SelectRestaurantPage />;
+      return <SelectRestaurantPage goBack={goBack} />;
     case REVIEW_TAB:
       return <ReviewOrder goBack={goBack} />;
     default:
@@ -53,6 +56,8 @@ const CreateOrderWizard = () => {
     }
   };
 
+  const draftOrder = getItem(DRAFT_ORDER_LOCAL_STORAGE_NAME);
+
   return (
     <>
       <FormWizard formTabNavClassName={css.formTabNav}>
@@ -68,6 +73,7 @@ const CreateOrderWizard = () => {
               onClick={onClick(tab)}
               tab={tab}
               goBack={goBack(tab)}
+              draftOrder={draftOrder}
             />
           );
         })}

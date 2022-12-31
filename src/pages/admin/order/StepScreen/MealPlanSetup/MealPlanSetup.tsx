@@ -1,21 +1,22 @@
-import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import DayInWeekField from '../../create/components/DayInWeekField/DayInWeekField';
 import DeliveryAddressField from '../../create/components/DeliveryAddressField/DeliveryAddressField';
 import FoodPickingField from '../../create/components/FoodPickingField/FoodPickingField';
 import MealPlanDateField from '../../create/components/MealPlanDateField/MealPlanDateField';
+import NavigateButtons from '../../create/components/NavigateButtons/NavigateButtons';
 import ParticipantSetupField from '../../create/components/ParticipantSetupField/ParticipantSetupField';
 import PerPackageField from '../../create/components/PerPackageField/PerPackageField';
 import css from './MealPlanSetup.module.scss';
 
-type MealPlanSetupProps = {};
+type MealPlanSetupProps = {
+  goBack: () => void;
+};
 
-const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
-  const intl = useIntl();
+const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
+  const { goBack } = props;
   const onSubmit = (values: any) => {
     console.log('values: ', values);
   };
@@ -54,14 +55,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
               </div>
             </div>
 
-            <div className={css.buttonsWrapper}>
-              <Button type="button" className={css.backBtn}>
-                {intl.formatMessage({ id: 'MealPlanSetup.back' })}
-              </Button>
-              <Button type="submit" className={css.submitBtn}>
-                {intl.formatMessage({ id: 'MealPlanSetup.submit' })}
-              </Button>
-            </div>
+            <NavigateButtons goBack={goBack} />
           </Form>
         );
       }}

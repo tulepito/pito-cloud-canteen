@@ -6,6 +6,7 @@ import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.s
 import type { FormState } from 'final-form';
 import { useEffect, useState } from 'react';
 
+import NavigateButtons from '../NavigateButtons/NavigateButtons';
 import type { TSelectFoodFormValues } from '../SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
 import SelectFoodModal from '../SelectFoodModal/SelectFoodModal';
 import RestaurantTable from './components/RestaurantTable/RestaurantTable';
@@ -13,7 +14,12 @@ import type { TSelectRestaurantFormValues } from './components/RestaurantTable/S
 import SearchRestaurantForm from './components/SearchRestaurantForm/SearchRestaurantForm';
 import css from './SelectRestaurantPage.module.scss';
 
-const SelectRestaurantPage = () => {
+type TSelectRestaurantPage = {
+  goBack: () => void;
+};
+
+const SelectRestaurantPage = (props) => {
+  const { goBack } = props;
   const [currentRestaurant, setCurrentRestaurant] = useState<any>();
   const [isSelectedRestaurant, setIsSelectedRestaurant] = useState(false);
   const [currentFoodList, setCurrentFoodList] = useState<string[]>([]);
@@ -126,6 +132,7 @@ const SelectRestaurantPage = () => {
       <div className={css.paginationContainer}>
         <Pagination {...paginationProps} onChange={handlePageChange} />
       </div>
+      <NavigateButtons goBack={goBack} />
       <SelectFoodModal
         restaurant={currentRestaurant}
         items={foodList}
