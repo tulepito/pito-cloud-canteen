@@ -8,6 +8,8 @@ import {
   handleError,
 } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
+import { ECompanyStatus } from '@utils/enums';
+import CryptoJS from 'crypto-js';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -42,6 +44,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       firstName: `Sub account for ${companyAccount.id.uuid}`,
       lastName: ' ',
       email: `${splittedEmail[0]}+sub-user@${splittedEmail[1]}`,
+      password: dataParams.password,
     });
 
     const [subAccount] = denormalisedResponseEntities(subResponse);
@@ -56,21 +59,28 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
           metadata: {
             isCompanyAccount: true,
+            status: ECompanyStatus.unactive,
           },
         },
         queryParams,
       );
 
+    const encryptedPasswrod = CryptoJS.AES.encrypt(
+      dataParams.password,
+      process.env.ENCRYPT_PASSWORD_SECRET_KEY,
+    ).toString();
+
     // Update sub master account password
     await intergrationSdk.users.updateProfile({
       id: subAccount.id,
       privateData: {
-        accountPassword: dataParams.password,
+        accountPassword: encryptedPasswrod,
       },
     });
 
     res.json(masterAccountAfterUpdateResponse);
   } catch (error) {
+    console.error(error);
     handleError(res, error);
   }
 }

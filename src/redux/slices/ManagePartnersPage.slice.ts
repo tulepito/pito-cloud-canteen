@@ -2,34 +2,73 @@
 
 import type { ThunkAPI } from '@redux/store';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { entityRefs } from '@utils/data';
-import { EListingType } from '@utils/enums';
+import {
+  deletePartnerApi,
+  queryRestaurantListingsApi,
+  updateRestaurantStatusApi,
+} from '@utils/api';
+import { denormalisedResponseEntities } from '@utils/data';
+import { EListingType, ERestaurantListingState } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TPagination } from '@utils/types';
-
-import { addMarketplaceEntities } from './marketplaceData.slice';
 
 const RESULT_PAGE_SIZE = 10;
 
 interface ManageParnersState {
-  partnerRefs: any[];
-  queryPartnersInProgress: boolean;
-  queryPartnersError: any;
+  restaurantRefs: any[];
+  queryRestaurantsInProgress: boolean;
+  queryRestaurantsError: any;
   pagination: TPagination;
+  restaurantTableActionInProgress: any;
+  restaurantTableActionError: any;
 }
 
-const QUERY_PARTNERS = 'app/ManagePartnersPage/QUERY_PARTNERS';
+const QUERY_RESTAURANTS = 'app/ManagePartnersPage/QUERY_RESTAURANTS';
 
-const queryPartners = createAsyncThunk(
-  QUERY_PARTNERS,
-  async (
-    params: any,
-    { dispatch, extra: sdk, fulfillWithValue, rejectWithValue }: ThunkAPI,
-  ) => {
+const SET_RESTAURANT_STATUS = 'app/ManagePartnersPage/SET_RESTAURANT_STATUS';
+
+const DELETE_RESTAURANT = 'app/ManagePartnersPage/DELETE_RESTAURANT';
+
+const setRestaurantStatus = createAsyncThunk(
+  SET_RESTAURANT_STATUS,
+  async (params: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
     try {
-      const searchParams = {
+      const response = await updateRestaurantStatusApi({
+        dataParams: params,
+      });
+      return fulfillWithValue(response);
+    } catch (error: any) {
+      console.error('Query company error : ', error);
+      return rejectWithValue(storableError(error.response.data));
+    }
+  },
+);
+
+const deleteRestaurant = createAsyncThunk(
+  DELETE_RESTAURANT,
+  async (params: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+    try {
+      const { partnerId: id } = params;
+      const { data } = await deletePartnerApi({ id });
+      return fulfillWithValue(data);
+    } catch (error) {
+      console.log('error', error);
+      return rejectWithValue(storableError(error));
+    }
+  },
+);
+
+const queryRestaurants = createAsyncThunk(
+  QUERY_RESTAURANTS,
+  async (params: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+    try {
+      const dataParams = {
         ...params,
-        meta_listingType: EListingType.partner,
+        meta_listingState: [
+          ERestaurantListingState.draft,
+          ERestaurantListingState.published,
+        ],
+        meta_listingType: EListingType.restaurant,
         perPage: RESULT_PAGE_SIZE,
         include: ['author'],
         'fields.listing': [
@@ -39,11 +78,13 @@ const queryPartners = createAsyncThunk(
           'publicData',
           'metadata',
         ],
-        'fields.user': ['profile.displayName', 'profile.abbreviatedName'],
       };
-      const response = await sdk.listings.query(searchParams);
-      dispatch(addMarketplaceEntities(response));
-      return fulfillWithValue(response);
+      const { data } = await queryRestaurantListingsApi({
+        dataParams,
+        queryParams: { expand: true },
+      });
+      const restaurantRefs = denormalisedResponseEntities(data);
+      return fulfillWithValue({ restaurantRefs, response: data });
     } catch (error: any) {
       console.error('Query company error : ', error);
       return rejectWithValue(storableError(error.response.data));
@@ -52,19 +93,23 @@ const queryPartners = createAsyncThunk(
 );
 
 export const managePartnerThunks = {
-  queryPartners,
+  queryRestaurants,
+  setRestaurantStatus,
+  deleteRestaurant,
 };
 
 const initialState: ManageParnersState = {
-  partnerRefs: [],
-  queryPartnersInProgress: false,
-  queryPartnersError: true,
+  restaurantRefs: [],
+  queryRestaurantsInProgress: false,
+  queryRestaurantsError: null,
   pagination: {
     totalItems: 0,
     totalPages: 0,
     page: 0,
     perPage: 0,
   },
+  restaurantTableActionInProgress: null,
+  restaurantTableActionError: null,
 };
 
 export const managePartnersSlice = createSlice({
@@ -73,24 +118,56 @@ export const managePartnersSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(queryPartners.pending, (state) => ({
+      .addCase(queryRestaurants.pending, (state) => ({
         ...state,
-        queryPartnersError: null,
-        queryPartnersInProgress: true,
+        queryRestaurantsError: null,
+        queryRestaurantsInProgress: true,
       }))
-      .addCase(queryPartners.fulfilled, (state, action) => {
-        const response = action.payload;
+      .addCase(queryRestaurants.fulfilled, (state, action) => {
+        const { restaurantRefs, response } = action.payload || {};
         return {
           ...state,
-          partnerRefs: entityRefs(response.data.data),
-          queryPartnersInProgress: false,
+          restaurantRefs,
+          queryRestaurantsInProgress: false,
           pagination: response.data.meta,
         };
       })
-      .addCase(queryPartners.rejected, (state, action) => ({
+      .addCase(queryRestaurants.rejected, (state, action) => ({
         ...state,
-        queryPartnersError: action.payload,
-        queryPartnersInProgress: false,
+        queryRestaurantsError: action.payload,
+        queryRestaurantsInProgress: false,
+      }))
+      .addCase(setRestaurantStatus.pending, (state, action) => {
+        return {
+          ...state,
+          restaurantTableActionInProgress: action.meta.arg.id,
+          restaurantTableActionError: null,
+        };
+      })
+      .addCase(setRestaurantStatus.fulfilled, (state) => ({
+        ...state,
+        restaurantTableActionInProgress: null,
+      }))
+      .addCase(setRestaurantStatus.rejected, (state, action) => ({
+        ...state,
+        restaurantTableActionInProgress: null,
+        restaurantTableActionError: action.payload,
+      }))
+      .addCase(deleteRestaurant.pending, (state, action) => {
+        return {
+          ...state,
+          restaurantTableActionInProgress: action.meta.arg.restaurantId,
+          restaurantTableActionError: null,
+        };
+      })
+      .addCase(deleteRestaurant.fulfilled, (state) => ({
+        ...state,
+        restaurantTableActionInProgress: null,
+      }))
+      .addCase(deleteRestaurant.rejected, (state, action) => ({
+        ...state,
+        restaurantTableActionInProgress: null,
+        restaurantTableActionError: action.payload,
       }));
   },
 });

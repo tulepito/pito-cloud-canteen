@@ -9,12 +9,13 @@ import { useIntl } from 'react-intl';
 import css from './KeywordSearchForm.module.scss';
 
 export type TKeywordSearchFormValues = {
-  keyword?: string;
+  keywords?: string;
 };
 
 type TKeywordSearchForm = {
   onSubmit: (e: TKeywordSearchFormValues) => void;
   initialValues?: TKeywordSearchFormValues;
+  searchValue?: string;
 };
 
 const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
@@ -30,8 +31,8 @@ const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
               placeholder={intl.formatMessage({
                 id: 'KeywordSearchForm.keywordPlaceholder',
               })}
-              name="keyword"
-              id="keyword"
+              name={props?.searchValue || 'keyword'}
+              id={props?.searchValue || 'keyword'}
               className={css.searchInput}
             />
             <Button className={css.searchButton} onClick={handleSubmit}>

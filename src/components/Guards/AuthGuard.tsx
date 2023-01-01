@@ -2,62 +2,60 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
 import { emailVerificationActions } from '@redux/slices/emailVerification.slice';
 import { currentUserSelector, userThunks } from '@redux/slices/user.slice';
-import paths from '@src/paths';
+import { generalPaths, NonRequireAuthenticationRoutes } from '@src/paths';
 import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect } from 'react';
 
-type TAuthGuard = {
-  pathName: string;
-  isRequiredAuth: boolean;
-  isAuthenticationRoute: boolean;
-};
+type TAuthGuardProps = PropsWithChildren<{}>;
 
-const AuthGuard: React.FC<PropsWithChildren<TAuthGuard>> = (props) => {
-  const { children, isRequiredAuth, isAuthenticationRoute, pathName } = props;
+const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const { isAuthenticated, authInfoLoaded } = useAppSelector(
     (state) => state.auth,
   );
   const user = useAppSelector(currentUserSelector);
-  const dispatch = useAppDispatch();
-
+  const pathName = router.pathname;
+  const isNonRequireAuthenticationRoute =
+    NonRequireAuthenticationRoutes.includes(pathName);
+  const isSignUpPath = pathName === generalPaths.SignUp;
   const showEmailVerification = !!user.id && !user.attributes.emailVerified;
-  const isSignUpPath = pathName.includes(paths.SignUp);
   const shouldNavigateIfInSignUpFlow = isSignUpPath && !showEmailVerification;
 
   const homePageNavigateCondition =
     isAuthenticated &&
-    isAuthenticationRoute &&
+    isNonRequireAuthenticationRoute &&
     (!isSignUpPath || shouldNavigateIfInSignUpFlow);
 
   useEffect(() => {
     dispatch(authThunks.authInfo());
+  }, [pathName]);
 
+  useEffect(() => {
     if (isAuthenticated) {
       dispatch(userThunks.fetchCurrentUser(undefined));
       const isVerified = user?.attributes?.emailVerified;
       dispatch(emailVerificationActions.updateVerificationState(isVerified));
     }
-  }, [dispatch, isAuthenticated, user?.attributes?.emailVerified]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    if (authInfoLoaded) {
-      if (homePageNavigateCondition) {
-        router.push(paths.HomePage);
-      }
-
-      if (isRequiredAuth && !isAuthenticated) {
-        router.push(paths.SignIn);
+    if (pathName !== generalPaths.StyleGuide) {
+      if (authInfoLoaded) {
+        if (isNonRequireAuthenticationRoute) {
+          if (homePageNavigateCondition) {
+            router.push(generalPaths.Home);
+          }
+        }
       }
     }
   }, [
     authInfoLoaded,
-    isAuthenticationRoute,
     isAuthenticated,
-    isRequiredAuth,
     router,
     homePageNavigateCondition,
+    isNonRequireAuthenticationRoute,
   ]);
 
   return <>{children}</>;

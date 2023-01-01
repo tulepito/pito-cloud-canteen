@@ -7,7 +7,10 @@ import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { BookerManageCompany } from '@src/redux/slices/company.slice';
+import {
+  addWorkspaceCompanyId,
+  BookerManageCompany,
+} from '@src/redux/slices/company.slice';
 import filter from 'lodash/filter';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -160,7 +163,10 @@ const GroupDetailPage = () => {
       },
     },
   ];
-  const { groupId = '' } = router.query;
+  const { groupId = '', companyId = '' } = router.query;
+  useEffect(() => {
+    dispatch(addWorkspaceCompanyId(companyId));
+  }, [companyId, dispatch]);
   useEffect(() => {
     dispatch(BookerManageCompany.companyInfo());
     dispatch(BookerManageCompany.groupInfo());

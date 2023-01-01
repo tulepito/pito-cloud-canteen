@@ -6,8 +6,8 @@ import IconAdd from '@components/IconAdd/IconAdd';
 import IconEdit from '@components/IconEdit/IconEdit';
 import IconEye from '@components/IconEye/IconEye';
 import IconMagnifier from '@components/IconMagnifier/IconMagnifier';
-import IconSpinner from '@components/IconSpinner/IconSpinner';
 import Meta from '@components/Layout/Meta';
+import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
@@ -24,7 +24,6 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { TKeywordSearchFormValues } from './components/KeywordSearchForm/KeywordSearchForm';
 import type { TUpdateStatus } from './helpers';
 import {
   filterCompanies,
@@ -265,7 +264,7 @@ export default function ManageCompanies() {
     }
   }, [page, mounted]);
 
-  const onSearchKeyword = (values: TKeywordSearchFormValues) => {
+  const onSearchKeyword = (values: any) => {
     router.replace({
       pathname,
       query: {
@@ -292,9 +291,7 @@ export default function ManageCompanies() {
         </Link>
       </div>
       {queryCompaniesInProgress ? (
-        <div className={css.loadingContainer}>
-          <IconSpinner className={css.spinner} />
-        </div>
+        <LoadingContainer />
       ) : (
         <TableForm
           initialValues={initialValues}

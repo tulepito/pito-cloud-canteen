@@ -1,0 +1,40 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.field {
+  margin-bottom: 20px;
+}
+
+.root {
+  display: grid;
+  gap: 20px;
+
+  @include viewportMedium {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .bankItem {
+    width: 100%;
+    margin-bottom: 40px;
+    min-height: 300px;
+    .bankWidgets {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .deleteButton {
+        width: 40px;
+        min-height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &:hover {
+          background-color: $neutralGray3;
+        }
+        .deleteIcon {
+          width: 17px;
+        }
+      }
+    }
+  }
+}

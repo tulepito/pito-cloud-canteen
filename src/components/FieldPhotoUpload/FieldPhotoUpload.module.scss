@@ -27,6 +27,11 @@
   cursor: pointer;
 }
 
+.error {
+  border-color: $failColor;
+  border-width: 2px;
+}
+
 .sessionPhoto {
   width: 100%;
   height: 100%;

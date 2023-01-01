@@ -19,9 +19,7 @@ import type {
   ETxTransitionActors,
 } from './enums';
 
-export type NextApplicationPage<P = any, IP = P> = NextPage<P, IP> & {
-  requireAuth?: boolean;
-};
+export type NextApplicationPage<P = any, IP = P> = NextPage<P, IP> & {};
 
 export enum ErrorCodes {
   ERROR_CODE_TRANSACTION_LISTING_NOT_FOUND = 'transaction-listing-not-found',
@@ -203,7 +201,7 @@ export type TListingAttributes = {
   deleted?: boolean;
   state?: TListingState;
   price?: any;
-  publicData?: object;
+  publicData?: any;
 };
 
 export type TDayOfWeek = TReverseMapFromEnum<typeof EDayOfWeek>;
@@ -230,7 +228,7 @@ export type TOwnListingAttributes = {
   deleted: boolean;
   state: TListingState;
   price?: any;
-  publicData: object;
+  publicData: any;
   availabilityPlan?: TAvailabilityPlan;
   description?: string;
   geolocation?: any;
