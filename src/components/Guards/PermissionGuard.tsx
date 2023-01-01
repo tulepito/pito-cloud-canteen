@@ -11,12 +11,12 @@ type TPermissionGuardGuard = PropsWithChildren<{}>;
 
 const PermissionGuard: React.FC<TPermissionGuardGuard> = (props) => {
   const router = useRouter();
-  const { userPermission } = useAppSelector((state) => state.user);
+  const { userPermission, currentUser } = useAppSelector((state) => state.user);
   const { children } = props;
-  const isMatchedPermission = isPathMatchedPermission(
-    router.route,
-    userPermission,
-  );
+  const isMatchedPermission =
+    currentUser !== null
+      ? isPathMatchedPermission(router.route, userPermission)
+      : true;
 
   const LayoutWrapper = getLayout(userPermission);
   const ComponentToRender = isMatchedPermission ? (
@@ -41,7 +41,7 @@ const PermissionGuard: React.FC<TPermissionGuardGuard> = (props) => {
     if (!isMatchedPermission) {
       router.push(homePageRoute);
     }
-  }, [isMatchedPermission, router, userPermission]);
+  }, [isMatchedPermission]);
 
   return ComponentToRender;
 };
