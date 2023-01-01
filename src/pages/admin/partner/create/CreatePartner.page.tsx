@@ -6,6 +6,7 @@ import {
 } from '@redux/slices/CreateAndEditPartnerPage.slice';
 import { isSignUpEmailTakenError } from '@utils/errors';
 import { pickRenderableImages } from '@utils/images';
+import type { TObject } from '@utils/types';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
@@ -26,14 +27,14 @@ const CreatePartnerPage: React.FC<any> = () => {
   } = useAppSelector((state) => state.CreateAndEditPartnerPage);
   const dispatch = useAppDispatch();
 
-  const onAvatarUpload = (params: any) => {
+  const onAvatarUpload = (params: TObject) => {
     return dispatch(createAndEditPartnerPageThunks.requestAvatarUpload(params));
   };
   const onRemoveAvatar = (id: any) => {
     return dispatch(removeAvatar(id));
   };
 
-  const onCoverUpload = (params: any) => {
+  const onCoverUpload = (params: TObject) => {
     return dispatch(createAndEditPartnerPageThunks.requestCoverUpload(params));
   };
 
@@ -41,7 +42,7 @@ const CreatePartnerPage: React.FC<any> = () => {
     return dispatch(removeCover(id));
   };
 
-  const onCreateDraftPartner = (body: any) =>
+  const onCreateDraftPartner = (body: TObject) =>
     dispatch(createAndEditPartnerPageThunks.createDraftPartner(body));
 
   const intl = useIntl();

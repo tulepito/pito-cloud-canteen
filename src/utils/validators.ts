@@ -1,5 +1,7 @@
 import toPairs from 'lodash/toPairs';
 
+import type { TObject } from './types';
+
 /**
  * Validator functions and helpers for Final Forms
  */
@@ -107,8 +109,7 @@ export const phoneNumberFormatValid = (message: string) => (value?: string) => {
 };
 
 export const passwordMatchConfirmPassword =
-  (message: string) =>
-  (confirmPassword: string, allValues: Record<string, any>) => {
+  (message: string) => (confirmPassword: string, allValues: TObject) => {
     return allValues &&
       allValues?.password &&
       allValues?.password === confirmPassword

@@ -2,12 +2,10 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
+import type { TObject } from '@utils/types';
 import isEmpty from 'lodash/isEmpty';
 
-// eslint-disable-next-line import/no-cycle
-import { userActions, userThunks } from './user.slice';
-
-const authenticated = (authInfo: Record<string, any>) => {
+const authenticated = (authInfo: TObject) => {
   return authInfo && authInfo.isAnonymous === false;
 };
 
@@ -50,27 +48,20 @@ const SIGN_UP = 'app/auth/SIGN_UP';
 const LOGIN = 'app/auth/LOGIN';
 const LOGOUT = 'app/auth/LOGOUT';
 
-const authInfo = createAsyncThunk(
-  AUTH_INFO,
-  async (_, { extra: sdk, fulfillWithValue }) => {
-    try {
-      const info = await sdk.authInfo();
-      return fulfillWithValue(info);
-    } catch (error) {
-      return fulfillWithValue(null);
-    }
-  },
-);
+const authInfo = createAsyncThunk(AUTH_INFO, async (_, { extra: sdk }) => {
+  try {
+    const info = await sdk.authInfo();
+    return info;
+  } catch (error) {
+    return null;
+  }
+});
 
 const login = createAsyncThunk(
   LOGIN,
-  async (
-    params: { email: string; password: string },
-    { dispatch, extra: sdk },
-  ) => {
+  async (params: { email: string; password: string }, { extra: sdk }) => {
     const { email: username, password } = params;
     await sdk.login({ username, password });
-    dispatch(userThunks.fetchCurrentUser(undefined));
   },
   {
     serializeError: storableError,
@@ -79,9 +70,8 @@ const login = createAsyncThunk(
 
 const logout = createAsyncThunk(
   LOGOUT,
-  async (_, { dispatch, extra: sdk }) => {
+  async (_, { extra: sdk }) => {
     await sdk.logout();
-    dispatch(userActions.clearCurrentUser());
   },
   {
     serializeError: storableError,
@@ -90,7 +80,7 @@ const logout = createAsyncThunk(
 
 const signUp = createAsyncThunk(
   SIGN_UP,
-  async (params: Record<string, any>, { dispatch, extra: sdk }) => {
+  async (params: TObject, { dispatch, extra: sdk }) => {
     const { email, password, firstName, lastName, ...rest } = params;
     const createUserParams = isEmpty(rest)
       ? { email, password, firstName, lastName }
@@ -99,7 +89,7 @@ const signUp = createAsyncThunk(
     // We must login the user if signup succeeds since the API doesn't
     // do that automatically.
     await sdk.currentUser.create(createUserParams);
-    dispatch(login({ email, password }));
+    await dispatch(login({ email, password }));
   },
   {
     serializeError: storableError,

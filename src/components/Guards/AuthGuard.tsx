@@ -30,11 +30,11 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
 
   useEffect(() => {
     dispatch(authThunks.authInfo());
-  }, [pathName]);
+  }, [dispatch, pathName]);
 
   useEffect(() => {
     if (isAuthenticated) {
-      dispatch(userThunks.fetchCurrentUser(undefined));
+      dispatch(userThunks.fetchCurrentUser());
       const isVerified = user?.attributes?.emailVerified;
       dispatch(emailVerificationActions.updateVerificationState(isVerified));
     }
@@ -56,6 +56,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     router,
     homePageNavigateCondition,
     isNonRequireAuthenticationRoute,
+    pathName,
   ]);
 
   return <>{children}</>;

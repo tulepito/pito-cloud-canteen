@@ -1,6 +1,7 @@
 import Button from '@components/Button/Button';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
+import { userActions } from '@redux/slices/user.slice';
 import { generalPaths } from '@src/paths';
 import { useRouter } from 'next/router';
 
@@ -15,6 +16,7 @@ export default function Home() {
 
   const handleLogout = async () => {
     await dispatch(authThunks.logout());
+    await dispatch(userActions.clearCurrentUser());
     router.replace(generalPaths.Home);
   };
 

@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { emailVerificationThunks } from '@redux/slices/emailVerification.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
+import type { TObject } from '@utils/types';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -22,7 +23,7 @@ const EmailVerificationPage = () => {
     verificationToken: (verificationTokenFromQuery as string) || null,
   };
 
-  const submitVerification = ({ verificationToken }: Record<string, any>) => {
+  const submitVerification = ({ verificationToken }: TObject) => {
     dispatch(
       emailVerificationThunks.verify({
         verificationToken,

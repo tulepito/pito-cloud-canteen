@@ -5,10 +5,8 @@ import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities, ensureCurrentUser } from '@utils/data';
 import { EUserPermission } from '@utils/enums';
 import { storableError } from '@utils/errors';
+import type { TObject } from '@utils/types';
 import get from 'lodash/get';
-
-// eslint-disable-next-line import/no-cycle
-import { authThunks } from './auth.slice';
 
 const mergeCurrentUser = (oldCurrentUser: any, newCurrentUser: any) => {
   const {
@@ -73,31 +71,15 @@ const SEND_VERIFICATION_EMAIL = 'app/user/SEND_VERIFICATION_EMAIL';
 
 const fetchCurrentUser = createAsyncThunk(
   FETCH_CURRENT_USER,
-  async (
-    params: any | undefined,
-    { dispatch, extra: sdk, rejectWithValue, fulfillWithValue },
-  ) => {
-    try {
-      const parameters = params || {};
-      const response = await sdk.currentUser.show(parameters);
-      const entities = denormalisedResponseEntities(response);
-
-      if (entities.length !== 1) {
-        return rejectWithValue(
-          new Error('Expected a resource in the sdk.currentUser.show response'),
-        );
-      }
-      const currentUser = entities[0];
-
-      // Make sure auth info is up to date
-      dispatch(authThunks.authInfo());
-
-      return fulfillWithValue(currentUser);
-    } catch (error) {
-      // Make sure auth info is up to date
-      dispatch(authThunks.authInfo());
-      return rejectWithValue(storableError(error));
-    }
+  async (params: TObject | undefined, { extra: sdk, fulfillWithValue }) => {
+    const parameters = params || {};
+    const response = await sdk.currentUser.show(parameters);
+    const entities = denormalisedResponseEntities(response);
+    const currentUser = entities[0];
+    return fulfillWithValue(currentUser);
+  },
+  {
+    serializeError: storableError,
   },
 );
 

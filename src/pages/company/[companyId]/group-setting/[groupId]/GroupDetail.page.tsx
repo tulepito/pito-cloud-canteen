@@ -11,6 +11,7 @@ import {
   addWorkspaceCompanyId,
   BookerManageCompany,
 } from '@src/redux/slices/company.slice';
+import type { TObject } from '@utils/types';
 import filter from 'lodash/filter';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -46,8 +47,7 @@ const GroupDetailPage = () => {
     setTrue: openDeleteGroupConfirmationModal,
   } = useBoolean();
 
-  const [deletingMemberInfo, setDeletingMemberInfo] =
-    useState<Record<string, any>>();
+  const [deletingMemberInfo, setDeletingMemberInfo] = useState<TObject>();
 
   const { name, description } = useAppSelector(
     (state) => state.company.groupInfo,

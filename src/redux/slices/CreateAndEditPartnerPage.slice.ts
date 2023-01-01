@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import type { ThunkAPI } from '@redux/store';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 import {
   createDraftPartnerApi,
   deletePartnerApi,
@@ -11,6 +11,7 @@ import {
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import { storableError } from '@utils/errors';
+import type { TObject } from '@utils/types';
 import omit from 'lodash/omit';
 
 interface CreateAndEditPartnerState {
@@ -93,8 +94,8 @@ const DISCARD_DRAFT_PARTNER =
 const requestAvatarUpload = createAsyncThunk(
   REQUEST_AVATAR_UPLOAD,
   async (
-    payload: any,
-    { extra: sdk, fulfillWithValue, rejectWithValue }: ThunkAPI,
+    payload: TObject,
+    { extra: sdk, fulfillWithValue, rejectWithValue },
   ) => {
     const { file, id } = payload || {};
     try {
@@ -117,8 +118,8 @@ const requestAvatarUpload = createAsyncThunk(
 const requestCoverUpload = createAsyncThunk(
   REQUEST_COVER_UPLOAD,
   async (
-    payload: any,
-    { extra: sdk, fulfillWithValue, rejectWithValue }: ThunkAPI,
+    payload: TObject,
+    { extra: sdk, fulfillWithValue, rejectWithValue },
   ) => {
     const { file, id } = payload || {};
     try {
@@ -144,10 +145,7 @@ const requestCoverUpload = createAsyncThunk(
 
 const requestBusinessLicenseUpload = createAsyncThunk(
   REQUEST_BUSINESS_LICENSE_UPLOAD,
-  async (
-    payload: any,
-    { extra: sdk, fulfillWithValue, rejectWithValue }: ThunkAPI,
-  ) => {
+  async (payload: any, { extra: sdk, fulfillWithValue, rejectWithValue }) => {
     const { file, id } = payload || {};
     try {
       const response = await sdk.images.upload(
@@ -172,10 +170,7 @@ const requestBusinessLicenseUpload = createAsyncThunk(
 
 const requestFoodCertificateUpload = createAsyncThunk(
   REQUEST_FOOR_CERTIFICATE_UPLOAD,
-  async (
-    payload: any,
-    { extra: sdk, fulfillWithValue, rejectWithValue }: ThunkAPI,
-  ) => {
+  async (payload: any, { extra: sdk, fulfillWithValue, rejectWithValue }) => {
     const { file, id } = payload || {};
     try {
       const response = await sdk.images.upload(
@@ -200,10 +195,7 @@ const requestFoodCertificateUpload = createAsyncThunk(
 
 const requestPartyInsuranceUpload = createAsyncThunk(
   REQUEST_PARTY_INSURANCE_UPLOAD,
-  async (
-    payload: any,
-    { extra: sdk, fulfillWithValue, rejectWithValue }: ThunkAPI,
-  ) => {
+  async (payload: any, { extra: sdk, fulfillWithValue, rejectWithValue }) => {
     const { file, id } = payload || {};
     try {
       const response = await sdk.images.upload(
@@ -228,7 +220,7 @@ const requestPartyInsuranceUpload = createAsyncThunk(
 
 const publishDraftPartner = createAsyncThunk(
   PUBLISH_PARTNER,
-  async (values: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (values: any, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { data } = await publishDraftPartnerApi(values);
       const { user, listing } = data;
@@ -244,7 +236,7 @@ const publishDraftPartner = createAsyncThunk(
 
 const discardDraftPartner = createAsyncThunk(
   DISCARD_DRAFT_PARTNER,
-  async (values: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (values: any, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { data } = await deletePartnerApi(values);
       const { user, listing } = data;
@@ -260,7 +252,7 @@ const discardDraftPartner = createAsyncThunk(
 
 const createDraftPartner = createAsyncThunk(
   CREATE_DRAFT_PARTNER,
-  async (values: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (values: TObject, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { userData, listingData } = values;
       const submitValues = {
@@ -289,7 +281,7 @@ const createDraftPartner = createAsyncThunk(
 
 const showPartnerRestaurantListing = createAsyncThunk(
   SHOW_PARTNER_RESTAURANT_LISTING,
-  async (id: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (id: any, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { data } = await showRestaurantApi({
         id,
@@ -332,7 +324,7 @@ const showPartnerRestaurantListing = createAsyncThunk(
 
 const updatePartnerRestaurantListing = createAsyncThunk(
   UPDATE_PARTNER_RESTAURANT_LISTING,
-  async (values: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (values: any, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { data } = await updateRestaurantApi({
         dataParams: values,

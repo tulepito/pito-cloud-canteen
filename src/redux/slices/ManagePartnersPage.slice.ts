@@ -1,7 +1,5 @@
-/* eslint-disable import/no-cycle */
-
-import type { ThunkAPI } from '@redux/store';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 import {
   deletePartnerApi,
   queryRestaurantListingsApi,
@@ -10,7 +8,7 @@ import {
 import { denormalisedResponseEntities } from '@utils/data';
 import { EListingType, ERestaurantListingState } from '@utils/enums';
 import { storableError } from '@utils/errors';
-import type { TPagination } from '@utils/types';
+import type { TObject, TPagination } from '@utils/types';
 
 const RESULT_PAGE_SIZE = 10;
 
@@ -31,7 +29,7 @@ const DELETE_RESTAURANT = 'app/ManagePartnersPage/DELETE_RESTAURANT';
 
 const setRestaurantStatus = createAsyncThunk(
   SET_RESTAURANT_STATUS,
-  async (params: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (params: TObject, { fulfillWithValue, rejectWithValue }) => {
     try {
       const response = await updateRestaurantStatusApi({
         dataParams: params,
@@ -46,7 +44,7 @@ const setRestaurantStatus = createAsyncThunk(
 
 const deleteRestaurant = createAsyncThunk(
   DELETE_RESTAURANT,
-  async (params: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (params: TObject, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { partnerId: id } = params;
       const { data } = await deletePartnerApi({ id });
@@ -60,7 +58,7 @@ const deleteRestaurant = createAsyncThunk(
 
 const queryRestaurants = createAsyncThunk(
   QUERY_RESTAURANTS,
-  async (params: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (params: TObject, { fulfillWithValue, rejectWithValue }) => {
     try {
       const dataParams = {
         ...params,

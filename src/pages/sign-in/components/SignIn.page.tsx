@@ -1,5 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
+import { userThunks } from '@redux/slices/user.slice';
 import { generalPaths } from '@src/paths';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -29,6 +30,8 @@ const SignInPage = () => {
 
   const handleSubmitSignUp = async (values: TSignInFormValues) => {
     await dispatch(authThunks.login(values));
+    await dispatch(userThunks.fetchCurrentUser());
+    await dispatch(authThunks.authInfo());
   };
 
   useEffect(() => {

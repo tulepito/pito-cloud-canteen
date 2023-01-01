@@ -1,7 +1,5 @@
-/* eslint-disable import/no-cycle */
-
-import type { ThunkAPI } from '@redux/store';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 import { getCompaniesApi, updateCompanyStatusApi } from '@utils/api';
 import { denormalisedResponseEntities } from '@utils/data';
 import { storableError } from '@utils/errors';
@@ -23,7 +21,7 @@ const UPDATE_COMPANY_STATUS = 'app/ManageCompanies/UPDATE_COMPANY_STATUS';
 
 const queryCompanies = createAsyncThunk(
   QUERY_COMPANIES,
-  async (page: number, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (page: number, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { data: companies } = await getCompaniesApi();
       return fulfillWithValue({ companies, page });
@@ -36,7 +34,7 @@ const queryCompanies = createAsyncThunk(
 
 const updateCompanyStatus = createAsyncThunk(
   UPDATE_COMPANY_STATUS,
-  async (updateData: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (updateData: any, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { data } = await updateCompanyStatusApi(updateData);
       const [company] = denormalisedResponseEntities(data);

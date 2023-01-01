@@ -43,13 +43,5 @@ export type AppStore = ReturnType<typeof makeStore>;
 export type AppDispatch = AppStore['dispatch'];
 export type RootState = ReturnType<typeof rootReducer>;
 
-export type ThunkAPI = {
-  dispatch?: any;
-  getState?: any;
-  extra: any;
-  rejectWithValue?: any;
-  fulfillWithValue?: any;
-};
-
 const wrapper = createWrapper<AppStore>(makeStore, { debug: false });
 export default wrapper;

@@ -1,5 +1,5 @@
-import type { ThunkAPI } from '@redux/store';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 import { createCompanyApi } from '@utils/api';
 import { storableError } from '@utils/errors';
 
@@ -12,7 +12,7 @@ const CREATE_COMPANY = 'app/CreateCompanyPage/CREATE_COMPANY';
 
 const createCompany = createAsyncThunk(
   CREATE_COMPANY,
-  async (userData: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (userData: any, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { data } = await createCompanyApi(userData);
       return fulfillWithValue(data);

@@ -1,9 +1,8 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
-import type { TUser } from '@utils/types';
+import type { TObject, TUser } from '@utils/types';
 import axios from 'axios';
-
-import type { ThunkAPI } from './types';
 
 const MEMBER_PER_PAGE = 10;
 
@@ -32,7 +31,7 @@ interface CompanyState {
   company: TUser | null;
   updateGroupInProgress: boolean;
   updateGroupError: any;
-  originCompanyMembers: Record<string, any>;
+  originCompanyMembers: TObject;
   isCompanyNotFound: boolean;
 }
 
@@ -70,7 +69,7 @@ const initialState: CompanyState = {
 
 const companyInfo = createAsyncThunk(
   COMPANY_INFO,
-  async (_, { getState, extra: sdk }: ThunkAPI) => {
+  async (_, { getState, extra: sdk }) => {
     const { workspaceCompanyId } = getState().company;
     const companyAccountResponse = await sdk.users.show({
       id: workspaceCompanyId,
@@ -94,7 +93,7 @@ const companyInfo = createAsyncThunk(
 
 const groupInfo = createAsyncThunk(
   GROUP_INFO,
-  async (_, { getState, extra: sdk }: ThunkAPI) => {
+  async (_, { getState, extra: sdk }) => {
     const { workspaceCompanyId } = getState().company;
     const response = await sdk.users.show({ id: workspaceCompanyId });
     const groupsResponse =
@@ -105,7 +104,7 @@ const groupInfo = createAsyncThunk(
 
 const groupDetailInfo = createAsyncThunk(
   GROUP_DETAIL_INFO,
-  async ({ groupId, page = 1 }: any, { extra: sdk, getState }: ThunkAPI) => {
+  async ({ groupId, page = 1 }: any, { extra: sdk, getState }) => {
     const { workspaceCompanyId } = getState().company;
     const companyAccountResponse = await sdk.users.show({
       id: workspaceCompanyId,
@@ -135,7 +134,7 @@ const groupDetailInfo = createAsyncThunk(
 
 const createGroup = createAsyncThunk(
   CREATE_GROUP,
-  async (params: any, { getState }: ThunkAPI) => {
+  async (params: TObject, { getState }) => {
     const { workspaceCompanyId } = getState().company;
     const { data: newCompanyAccount } = await axios.post('/api/company/group', {
       ...params,
@@ -150,7 +149,7 @@ const updateGroup = createAsyncThunk(
   UPDATE_GROUP,
   async (
     { groupId, groupInfo: groupInfoParams, addedMembers, deletedMembers }: any,
-    { getState, dispatch }: ThunkAPI,
+    { getState, dispatch },
   ) => {
     const { workspaceCompanyId } = getState().company;
     await axios.put('/api/company/group', {
@@ -166,7 +165,7 @@ const updateGroup = createAsyncThunk(
 
 const deleteGroup = createAsyncThunk(
   DELETE_GROUP,
-  async (groupId: string, { getState }: ThunkAPI) => {
+  async (groupId: string, { getState }) => {
     const { workspaceCompanyId } = getState().company;
     const { data: newCompanyAccount } = await axios.delete(
       '/api/company/group',

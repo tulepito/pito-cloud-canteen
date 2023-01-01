@@ -6,6 +6,7 @@ import type {
   TAvailabilityPlan,
   TCurrentUser,
   TLineItemCode,
+  TObject,
   TTimeSlot,
   TUser,
 } from './types';
@@ -55,14 +56,11 @@ export const combinedResourceObjects = (oldRes: any, newRes: any) => {
  * Combine the resource objects form the given api response to the
  * existing entities.
  */
-export const updatedEntities = (
-  oldEntities: Record<string, any>,
-  apiResponse: any,
-) => {
+export const updatedEntities = (oldEntities: TObject, apiResponse: any) => {
   const { data, included = [] } = apiResponse;
   const objects = (Array.isArray(data) ? data : [data]).concat(included);
 
-  const newEntities = objects.reduce((entities: Record<string, any>, curr) => {
+  const newEntities = objects.reduce((entities: TObject, curr) => {
     const { id, type } = curr;
 
     // Some entities (e.g. listing and user) might include extended data,

@@ -9,6 +9,7 @@ import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
+import { userActions } from '@redux/slices/user.slice';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -26,6 +27,8 @@ const AdminHeader: React.FC<TAdminHeader> = (props) => {
 
   const onLogout = async () => {
     await dispatch(authThunks.logout());
+    await dispatch(userActions.clearCurrentUser());
+
     router.push('/');
   };
   return (

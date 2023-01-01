@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
-import { currentUserSelector } from '@redux/slices/user.slice';
+import { currentUserSelector, userThunks } from '@redux/slices/user.slice';
 import { isSignUpEmailTakenError } from '@utils/errors';
 import { splitNameFormFullName } from '@utils/string';
 import { FormattedMessage } from 'react-intl';
@@ -30,13 +30,15 @@ const SignUpPage = () => {
     <FormattedMessage id="SignUpPage.signUpFailed" />
   );
 
-  const handleSubmitSignUp = (values: TSignUpFormValues) => {
+  const handleSubmitSignUp = async (values: TSignUpFormValues) => {
     // eslint-disable-next-line unused-imports/no-unused-vars
     const { name: submittedName, confirmPassword, ...rest } = values;
     const splitName = splitNameFormFullName(submittedName);
     const signUpParams = { ...rest, ...splitName };
 
-    dispatch(authThunks.signUp(signUpParams));
+    await dispatch(authThunks.signUp(signUpParams));
+    await dispatch(userThunks.fetchCurrentUser());
+    await dispatch(authThunks.authInfo());
   };
 
   return (

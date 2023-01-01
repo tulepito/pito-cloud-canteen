@@ -17,6 +17,8 @@ import type {
 } from './enums';
 
 const { UUID, LatLng, Money } = sdkLoader;
+
+export type TObject = Record<string, any>;
 export type ReverseMap<T> = T[keyof T];
 export type TReverseMapFromEnum<T> = T[keyof T];
 export type NextApplicationPage<P = any, IP = P> = NextPage<P, IP> & {
@@ -31,7 +33,7 @@ export type TSharetribeFlexSdkApiError = {
   status: number;
   code: TErrorCode;
   title: string;
-  meta: Record<string, any>;
+  meta: TObject;
 };
 export type TError = {
   type: 'error';
@@ -74,10 +76,10 @@ export type TProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
-  protectedData?: Record<string, any>;
-  metadata?: Record<string, any>;
-  publicData?: Record<string, any>;
-  privateData?: Record<string, any>;
+  protectedData?: TObject;
+  metadata?: TObject;
+  publicData?: TObject;
+  privateData?: TObject;
 };
 
 export type TCurrentUserAttributes = {
@@ -100,9 +102,9 @@ export type TUserProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
-  protectedData?: Record<string, any>;
-  metadata?: Record<string, any>;
-  publicData?: Record<string, any>;
+  protectedData?: TObject;
+  metadata?: TObject;
+  publicData?: TObject;
 };
 
 export type TUserAttributes = {
@@ -118,10 +120,10 @@ export type TCompanyProfile = {
   lastName: string;
   abbreviatedName: string;
   bio?: string;
-  protectedData?: Record<string, any>;
-  metadata?: Record<string, any>;
-  publicData?: Record<string, any>;
-  privateData?: Record<string, any>;
+  protectedData?: TObject;
+  metadata?: TObject;
+  publicData?: TObject;
+  privateData?: TObject;
 };
 
 export type TCompanyAttributes = {
@@ -139,10 +141,10 @@ export type TAuthorProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
-  protectedData?: Record<string, any>;
-  metadata?: Record<string, any>;
-  publicData?: Record<string, any>;
-  privateData?: Record<string, any>;
+  protectedData?: TObject;
+  metadata?: TObject;
+  publicData?: TObject;
+  privateData?: TObject;
 };
 
 export type TAuthorAttributes = {
@@ -186,7 +188,7 @@ export type TListingAttributes = {
   deleted?: boolean;
   state?: TListingState;
   price?: typeof Money;
-  publicData: Record<string, any>;
+  publicData: TObject;
 };
 
 export type TDayOfWeek = TReverseMapFromEnum<typeof EDayOfWeek>;
@@ -213,7 +215,7 @@ export type TOwnListingAttributes = {
   deleted: boolean;
   state: TListingState;
   price?: typeof Money;
-  publicData: Record<string, any>;
+  publicData: TObject;
   availabilityPlan?: TAvailabilityPlan;
   description?: string;
   geolocation?: typeof LatLng;

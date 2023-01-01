@@ -13,6 +13,7 @@ import {
   pickRenderableImagesByProperty,
   pickRenderableLicenseImagesByProperty,
 } from '@utils/images';
+import type { TObject } from '@utils/types';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
@@ -67,26 +68,26 @@ const EditPartnerPage = () => {
   const router = useRouter();
   const { query } = router;
   const { restaurantId } = query;
-  const onAvatarUpload = (params: any) =>
+  const onAvatarUpload = (params: TObject) =>
     dispatch(createAndEditPartnerPageThunks.requestAvatarUpload(params));
 
   const onRemoveAvatar = (id: any) => {
     return dispatch(removeAvatar(id));
   };
 
-  const onCoverUpload = (params: any) =>
+  const onCoverUpload = (params: TObject) =>
     dispatch(createAndEditPartnerPageThunks.requestCoverUpload(params));
 
   const onRemoveCover = (id: any) => {
     return dispatch(removeCover(id));
   };
 
-  const onUpdatePartnerListing = (values: any) =>
+  const onUpdatePartnerListing = (values: TObject) =>
     dispatch(
       createAndEditPartnerPageThunks.updatePartnerRestaurantListing(values),
     );
 
-  const onBusinessLicenseUpload = (params: any) => {
+  const onBusinessLicenseUpload = (params: TObject) => {
     return dispatch(
       createAndEditPartnerPageThunks.requestBusinessLicenseUpload(params),
     );
@@ -95,7 +96,7 @@ const EditPartnerPage = () => {
   const onRemoveBusinessLicense = (id: any) => {
     return dispatch(removeBusinessLicense(id));
   };
-  const onFoodCertificateUpload = (params: any) => {
+  const onFoodCertificateUpload = (params: TObject) => {
     return dispatch(
       createAndEditPartnerPageThunks.requestFoodCertificateUpload(params),
     );
@@ -105,7 +106,7 @@ const EditPartnerPage = () => {
     return dispatch(removeFoodCertificate(id));
   };
 
-  const onPartyInsuranceUpload = (params: any) => {
+  const onPartyInsuranceUpload = (params: TObject) => {
     return dispatch(
       createAndEditPartnerPageThunks.requestPartyInsuranceUpload(params),
     );
@@ -115,11 +116,11 @@ const EditPartnerPage = () => {
     return dispatch(removePartyInsurance(id));
   };
 
-  const onPublishDraftPartner = (params: any) => {
+  const onPublishDraftPartner = (params: TObject) => {
     return dispatch(createAndEditPartnerPageThunks.publishDraftPartner(params));
   };
 
-  const onDiscardDraftPartner = (params: any) => {
+  const onDiscardDraftPartner = (params: TObject) => {
     return dispatch(createAndEditPartnerPageThunks.discardDraftPartner(params));
   };
 

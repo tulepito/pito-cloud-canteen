@@ -2,6 +2,7 @@ import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { passwordThunks } from '@redux/slices/password.slice';
 import type { AppDispatch } from '@redux/store';
+import type { TObject } from '@utils/types';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -21,7 +22,7 @@ const PasswordRecoverPage = () => {
     }
   }, [setIsLoading, timeLeft]);
 
-  const handleSubmitRecoverPasswordForm = (values: Record<string, any>) => {
+  const handleSubmitRecoverPasswordForm = (values: TObject) => {
     setIsLoading(true);
     setTimeLeft(5);
     interval.current = setInterval(() => {
