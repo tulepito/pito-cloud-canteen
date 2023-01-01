@@ -1,29 +1,36 @@
 import { useAppSelector } from '@hooks/reduxHooks';
-import { adminPaths, companyPaths, generalPaths } from '@src/paths';
+import {
+  adminPaths,
+  companyPaths,
+  generalPaths,
+  IgnoredPermissionCheckRoutes,
+} from '@src/paths';
 import { EUserPermission } from '@utils/enums';
 import { getLayout } from '@utils/layout.helper';
 import { isPathMatchedPermission } from '@utils/urlHelpers';
 import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 type TPermissionGuardGuard = PropsWithChildren<{}>;
 
 const PermissionGuard: React.FC<TPermissionGuardGuard> = (props) => {
   const router = useRouter();
+  const { pathname: pathName } = router;
   const { userPermission, currentUser } = useAppSelector((state) => state.user);
   const { children } = props;
   const isMatchedPermission =
     currentUser !== null
-      ? isPathMatchedPermission(router.route, userPermission)
+      ? isPathMatchedPermission(pathName, userPermission)
       : true;
+  const isIgnoredPermissionCheckRoute =
+    IgnoredPermissionCheckRoutes.includes(pathName);
 
-  const LayoutWrapper = getLayout(userPermission);
-  const ComponentToRender = isMatchedPermission ? (
-    <LayoutWrapper>{children}</LayoutWrapper>
-  ) : null;
+  const verifyPermission = useCallback(() => {
+    if (isIgnoredPermissionCheckRoute) {
+      return;
+    }
 
-  useEffect(() => {
     let homePageRoute;
 
     switch (userPermission) {
@@ -41,9 +48,35 @@ const PermissionGuard: React.FC<TPermissionGuardGuard> = (props) => {
     if (!isMatchedPermission) {
       router.push(homePageRoute);
     }
-  }, [isMatchedPermission]);
+  }, [
+    isIgnoredPermissionCheckRoute,
+    isMatchedPermission,
+    router,
+    userPermission,
+  ]);
 
-  return ComponentToRender;
+  const renderComponent = useCallback(() => {
+    if (isIgnoredPermissionCheckRoute) {
+      return children;
+    }
+
+    const LayoutWrapper = getLayout(userPermission);
+
+    return isMatchedPermission ? (
+      <LayoutWrapper>{children}</LayoutWrapper>
+    ) : null;
+  }, [
+    children,
+    isIgnoredPermissionCheckRoute,
+    isMatchedPermission,
+    userPermission,
+  ]);
+
+  useEffect(() => {
+    verifyPermission();
+  }, [verifyPermission]);
+
+  return <>{renderComponent()}</>;
 };
 
 export default PermissionGuard;

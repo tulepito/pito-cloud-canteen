@@ -12,8 +12,10 @@ export const NonRequireAuthenticationRoutes = [
   generalPaths.ResetPassword,
   generalPaths.SignIn,
   generalPaths.SignUp,
-  generalPaths.StyleGuide,
 ];
+
+export const IgnoredAuthCheckRoutes = [generalPaths.StyleGuide];
+export const IgnoredPermissionCheckRoutes = [generalPaths.StyleGuide];
 
 export const adminPaths = {
   Dashboard: '/admin',
