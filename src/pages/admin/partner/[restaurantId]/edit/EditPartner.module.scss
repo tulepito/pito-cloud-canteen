@@ -1,0 +1,11 @@
+@use '/src/styles/vars.scss' as *;
+
+.loadingContainer {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  svg {
+    stroke: $marketplaceColor;
+  }
+}

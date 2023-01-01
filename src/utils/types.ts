@@ -1,7 +1,3 @@
-// Options for showing just date or date and time on BookingTimeInfo and BookingBreakdown
-// export const DATE_TYPE_DATE = 'date';
-// export const DATE_TYPE_DATETIME = 'datetime';
-// propTypes.dateType = oneOf([DATE_TYPE_DATE, DATE_TYPE_DATETIME]);
 import { types as sdkLoader } from '@sharetribe/sdk';
 import type Decimal from 'decimal.js';
 import type { NextPage } from 'next';
@@ -190,7 +186,7 @@ export type TListingAttributes = {
   deleted?: boolean;
   state?: TListingState;
   price?: typeof Money;
-  publicData?: Record<string, any>;
+  publicData: Record<string, any>;
 };
 
 export type TDayOfWeek = TReverseMapFromEnum<typeof EDayOfWeek>;

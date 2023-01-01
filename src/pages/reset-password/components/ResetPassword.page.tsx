@@ -1,7 +1,7 @@
 import Button from '@components/Button/Button';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { passwordThunks } from '@redux/slices/password.slice';
-import paths from '@src/paths';
+import { generalPaths } from '@src/paths';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -35,7 +35,7 @@ const ResetPasswordPage = () => {
   };
 
   const recoveryLink = (
-    <Link href={paths.RecoveryPassword}>
+    <Link href={generalPaths.RecoveryPassword}>
       <u>
         <FormattedMessage id="ResetPasswordPage.recoveryLinkText" />
       </u>

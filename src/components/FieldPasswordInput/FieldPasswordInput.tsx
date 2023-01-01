@@ -27,6 +27,7 @@ interface InputComponentProps extends FieldRenderProps<string, any> {
   leftIcon: TIconComponent;
   fullWidth?: boolean;
   required?: boolean;
+  shouldHideEyeIcon?: boolean;
 }
 
 const FieldPasswordInputComponent = (props: InputComponentProps) => {
@@ -47,6 +48,7 @@ const FieldPasswordInputComponent = (props: InputComponentProps) => {
     inputRef,
     leftIcon,
     required = false,
+    shouldHideEyeIcon,
     ...rest
   } = props;
 
@@ -135,7 +137,9 @@ const FieldPasswordInputComponent = (props: InputComponentProps) => {
           <div className={css.leftIconContainer}>{leftIconElement}</div>
         )}
         <input {...inputProps} />
-        <div className={css.rightIconContainer}>{rightIconElement}</div>
+        {!shouldHideEyeIcon && (
+          <div className={css.rightIconContainer}>{rightIconElement}</div>
+        )}
       </div>
       <ValidationError fieldMeta={fieldMeta} />
     </div>

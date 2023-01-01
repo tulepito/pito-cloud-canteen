@@ -1,0 +1,16 @@
+@use '/src/styles/vars.scss' as *;
+.inputImage {
+  margin: 20px auto;
+  height: 350px;
+  width: 70%;
+}
+
+.label {
+  font-weight: $fontWeightBold;
+}
+
+.description {
+  color: $neutralGray7;
+  font-size: 14px;
+  font-style: italic;
+}

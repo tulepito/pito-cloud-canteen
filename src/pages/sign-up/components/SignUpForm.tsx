@@ -3,7 +3,7 @@ import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
-import paths from '@src/paths';
+import { generalPaths } from '@src/paths';
 import {
   composeValidators,
   composeValidatorsWithAllValues,
@@ -126,7 +126,7 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
   );
 
   const navigateToSignInPage = () => {
-    router.push(paths.SignIn);
+    router.push(generalPaths.SignIn);
   };
 
   return (

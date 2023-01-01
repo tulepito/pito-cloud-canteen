@@ -4,9 +4,9 @@
 .root {
   margin-top: 6px;
   margin-bottom: 12px;
-  color: $failColor;
+  color: $errorRed6;
   overflow: hidden;
-  font-size: 0.75rem;
+  font-size: 12px;
   font-weight: $fontWeightRegular;
 
   @include viewportMedium {

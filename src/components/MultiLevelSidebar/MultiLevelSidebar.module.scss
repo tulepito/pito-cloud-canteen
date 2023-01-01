@@ -20,7 +20,7 @@
         border-radius: 9px;
         .label {
           color: $primaryPri5 !important;
-          font-weight: $fontWeightSemiBold;
+          font-weight: $fontWeightBold;
         }
         .entityIcon {
           fill: $primaryPri5;
@@ -41,7 +41,7 @@
           padding-bottom: 3px;
           &.active {
             color: $primaryPri5;
-            font-weight: $fontWeightSemiBold;
+            font-weight: $fontWeightBold;
           }
         }
         .entityIcon {

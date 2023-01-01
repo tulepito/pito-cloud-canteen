@@ -1,7 +1,7 @@
 import Button from '@components/Button/Button';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
-import paths from '@src/paths';
+import { generalPaths } from '@src/paths';
 import {
   composeValidators,
   emailFormatValid,
@@ -74,7 +74,7 @@ const PasswordRecoveryFormComponent: React.FC<
   );
 
   const navigateToSignInPage = () => {
-    router.push(paths.SignIn);
+    router.push(generalPaths.SignIn);
   };
 
   const { rootClassName, className, formId, handleSubmit, invalid } = props;
