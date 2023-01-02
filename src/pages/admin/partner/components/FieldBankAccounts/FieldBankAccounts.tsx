@@ -97,6 +97,7 @@ const FieldBankAccounts: React.FC<any> = (props) => {
                     />
                     <FieldTextInput
                       className={css.field}
+                      type="number"
                       label={intl.formatMessage({
                         id: 'FieldBankAccounts.bankAccountNumberLabel',
                       })}

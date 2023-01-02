@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import cookies from '@services/cookie';
-import adminChecker from '@services/permissionChecker/admin';
 import { deserialize, getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -66,4 +65,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   }
 }
 
-export default cookies(adminChecker(handler));
+export default cookies(handler);

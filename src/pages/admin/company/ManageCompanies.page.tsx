@@ -49,26 +49,6 @@ const companyStatusOptions = [
 
 const TABLE_COLUMN: TColumn[] = [
   {
-    key: 'id',
-    label: 'ID',
-    render: (data: any) => {
-      return (
-        <span title={data.id} className={classNames(css.rowText, css.rowId)}>
-          {data.id}
-        </span>
-      );
-    },
-    renderSearch: () => {
-      return (
-        <FieldTextInput
-          className={css.keywordInput}
-          name="searchId"
-          id="searchId"
-        />
-      );
-    },
-  },
-  {
     key: 'name',
     label: 'Họ và tên',
     render: (data: any) => {
@@ -205,12 +185,13 @@ const TABLE_COLUMN: TColumn[] = [
 
 const parseEntitiesToTableData = (
   companies: TUser[],
+  page: number,
   extraData: TExtraDataMapToCompanyTable,
 ) => {
-  return companies.map((company: any) => ({
+  return companies.map((company: any, index: number) => ({
     key: company.id.uuid,
     data: {
-      id: company.id.uuid,
+      id: (page - 1) * 10 + index + 1,
       name: company.attributes.profile.displayName,
       phone: company.attributes.profile.publicData?.phoneNumber,
       email: company.attributes.email,
@@ -323,7 +304,7 @@ export default function ManageCompanies() {
 
   const companiesTableData = useMemo(
     () =>
-      parseEntitiesToTableData(slicesCompanies, {
+      parseEntitiesToTableData(slicesCompanies, Number(page), {
         updateStatus,
       }),
     [slicesCompanies, updateStatus],
@@ -368,6 +349,7 @@ export default function ManageCompanies() {
         <LoadingContainer />
       ) : (
         <Table
+          rootClassName={css.table}
           initialValues={initialValues}
           onSubmit={onSearchKeyword}
           columns={TABLE_COLUMN}

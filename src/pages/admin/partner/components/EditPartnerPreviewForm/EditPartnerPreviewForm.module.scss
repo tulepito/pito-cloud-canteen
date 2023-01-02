@@ -63,10 +63,16 @@
 }
 
 .configField {
-  display: grid;
+  display: flex;
   gap: 20px;
+  flex-direction: column;
+
+  .field {
+    flex: 1;
+  }
   @include viewportMedium {
-    grid-template-columns: repeat(2, 1fr);
+    flex-direction: row;
+    align-items: flex-start;
   }
 }
 
@@ -74,7 +80,6 @@
   border-collapse: collapse;
   width: 100%;
   padding: 10px;
-  max-width: 500px;
   tr {
     td,
     th {
@@ -189,4 +194,14 @@
   .button {
     margin-left: 10px;
   }
+}
+
+.currency {
+  border-left: 1px solid $neutralGray5;
+  padding: 0 15px;
+}
+
+.restaurantConfigLabel {
+  font-weight: $fontWeightBold;
+  margin-bottom: 20px;
 }

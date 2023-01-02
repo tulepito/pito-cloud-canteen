@@ -1,9 +1,9 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
-  createAndEditPartnerPageThunks,
+  partnerThunks,
   removeAvatar,
   removeCover,
-} from '@redux/slices/CreateAndEditPartnerPage.slice';
+} from '@redux/slices/partners.slice';
 import { isSignupEmailTakenError } from '@utils/errors';
 import { pickRenderableImages } from '@utils/images';
 import React from 'react';
@@ -24,18 +24,18 @@ const CreatePartnerPage: React.FC<any> = () => {
 
     createDraftPartnerInProgress,
     createDraftPartnerError,
-  } = useAppSelector((state) => state.CreateAndEditPartnerPage);
+  } = useAppSelector((state) => state.partners);
   const dispatch = useAppDispatch();
 
   const onAvatarUpload = (params: any) => {
-    return dispatch(createAndEditPartnerPageThunks.requestAvatarUpload(params));
+    return dispatch(partnerThunks.requestAvatarUpload(params));
   };
   const onRemoveAvatar = (id: any) => {
     return dispatch(removeAvatar(id));
   };
 
   const onCoverUpload = (params: any) => {
-    return dispatch(createAndEditPartnerPageThunks.requestCoverUpload(params));
+    return dispatch(partnerThunks.requestCoverUpload(params));
   };
 
   const onRemoveCover = (id: any) => {
@@ -43,7 +43,7 @@ const CreatePartnerPage: React.FC<any> = () => {
   };
 
   const onCreateDraftPartner = (body: any) =>
-    dispatch(createAndEditPartnerPageThunks.createDraftPartner(body));
+    dispatch(partnerThunks.createDraftPartner(body));
 
   const intl = useIntl();
 

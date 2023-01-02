@@ -65,6 +65,8 @@ const EditPartnerWizardTab = (props: any) => {
     tabs,
     onPublishDraftPartner,
     onDiscardDraftPartner,
+    onSetAuthorized,
+    onSetUnsatisfactory,
   } = props;
   const router = useRouter();
   const isDraftFlow =
@@ -127,10 +129,11 @@ const EditPartnerWizardTab = (props: any) => {
       );
     }
     case LICENSE_TAB: {
-      const { businessLicense, foodCertificate, partyInsurance } =
+      const { businessLicense, foodCertificate, partyInsurance, businessType } =
         partnerListingRef?.attributes?.publicData || {};
       const initialValues = useMemo(() => {
         return {
+          businessType: businessType || 'company',
           businessLicense: businessLicense || {
             status: 'no',
           },
@@ -272,6 +275,9 @@ const EditPartnerWizardTab = (props: any) => {
 
       const { bankAccounts = [] } =
         partnerListingRef?.attributes?.privateData || {};
+
+      const { status = [] } = partnerListingRef?.attributes?.metadata || {};
+
       const { address } = location || {};
       const initialValues = useMemo(() => {
         return {
@@ -303,8 +309,9 @@ const EditPartnerWizardTab = (props: any) => {
           extraServices,
           bankAccounts,
           packagingOther,
+          status,
         };
-      }, []);
+      }, [JSON.stringify(partnerListingRef)]);
 
       const handleSubmitPreviewForm = async () => {
         const params = {
@@ -329,6 +336,8 @@ const EditPartnerWizardTab = (props: any) => {
           onDiscard={handleDiscardDraftPartner}
           initialValues={initialValues}
           isDraftFlow={isDraftFlow}
+          onSetAuthorized={onSetAuthorized}
+          onSetUnsatisfactory={onSetUnsatisfactory}
         />
       );
     }
