@@ -1,6 +1,16 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 
+.tabHeaderWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.navigateBtn {
+  display: flex;
+  gap: 20px;
+}
+
 .tabHeaders {
   display: -webkit-inline-box;
   overflow-x: auto;

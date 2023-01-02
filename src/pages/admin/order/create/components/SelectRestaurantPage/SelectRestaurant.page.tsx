@@ -18,7 +18,7 @@ type TSelectRestaurantPage = {
   goBack: () => void;
 };
 
-const SelectRestaurantPage = (props) => {
+const SelectRestaurantPage: React.FC<TSelectRestaurantPage> = (props) => {
   const { goBack } = props;
   const [currentRestaurant, setCurrentRestaurant] = useState<any>();
   const [isSelectedRestaurant, setIsSelectedRestaurant] = useState(false);
