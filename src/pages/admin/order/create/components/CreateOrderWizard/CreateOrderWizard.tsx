@@ -1,6 +1,6 @@
 import FormWizard from '@components/FormWizard/FormWizard';
 import { getItem } from '@utils/localStorageHelpers';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import ClientSelector from '../../../StepScreen/ClientSelector/ClientSelector';
@@ -23,6 +23,32 @@ export const TABS = [
 ];
 
 export const DRAFT_ORDER_LOCAL_STORAGE_NAME = 'draftOrder';
+
+const tabCompleted = (order: any, tab: string) => {
+  switch (tab) {
+    case CLIENT_SELECT_TAB:
+      return true;
+    case MEAL_PLAN_SETUP:
+      return true;
+    case CREATE_MEAL_PLAN_TAB:
+      return true;
+    case REVIEW_TAB:
+      return true;
+    default:
+      return <></>;
+  }
+};
+
+const tabsActive = (order: any) => {
+  return TABS.reduce((acc, tab) => {
+    const previousTabIndex = TABS.findIndex((t) => t === tab) - 1;
+    const isActive =
+      previousTabIndex >= 0
+        ? tabCompleted(order, TABS[previousTabIndex])
+        : true;
+    return { ...acc, [tab]: isActive };
+  }, {});
+};
 
 const CreateOrderTab: React.FC<any> = (props) => {
   const { tab, goBack } = props;
@@ -57,6 +83,21 @@ const CreateOrderWizard = () => {
   };
 
   const draftOrder = getItem(DRAFT_ORDER_LOCAL_STORAGE_NAME);
+
+  const tabsStatus = tabsActive(getItem('draftOrder')) as any;
+
+  useEffect(() => {
+    // If selectedTab is not active, redirect to the beginning of wizard
+    if (!tabsStatus[currentStep as string]) {
+      const currentTabIndex = TABS.indexOf(currentStep as string);
+      const nearestActiveTab = TABS.slice(0, currentTabIndex)
+        .reverse()
+        .find((t) => tabsStatus[t]);
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      nearestActiveTab && setCurrentStep(nearestActiveTab);
+    }
+  }, [tabsStatus, currentStep]);
 
   return (
     <>
