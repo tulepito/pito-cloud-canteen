@@ -1,6 +1,6 @@
 import OrderManagement from './OrderManagement';
 
-const OrderManagementRoute = (props) => {
+const OrderManagementRoute = () => {
   return <OrderManagement />;
 };
 

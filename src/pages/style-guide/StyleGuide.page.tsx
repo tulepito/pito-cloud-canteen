@@ -533,11 +533,28 @@ const StyleGuidePage = (props: any) => {
           </div>
         </StyleGuideCard>
         <StyleGuideCard>
+          <p>No stop at</p>
           <CountdownTimer
             deadline={DateTime.fromJSDate(new Date())
-              .plus({ day: 20, hour: 6, minute: 14 })
+              .plus({ day: 0, hour: 0, minute: 0, second: 10 })
               .toJSDate()
               .getTime()}
+          />
+          <p>Stop at 0s</p>
+          <CountdownTimer
+            deadline={DateTime.fromJSDate(new Date())
+              .plus({ day: 0, hour: 0, minute: 0, second: 10 })
+              .toJSDate()
+              .getTime()}
+            stopAt={0}
+          />
+          <p>Stop at 5s</p>
+          <CountdownTimer
+            deadline={DateTime.fromJSDate(new Date())
+              .plus({ day: 0, hour: 0, minute: 0, second: 10 })
+              .toJSDate()
+              .getTime()}
+            stopAt={{ day: 0, hour: 0, minute: 0, second: 5 }}
           />
         </StyleGuideCard>
       </div>
