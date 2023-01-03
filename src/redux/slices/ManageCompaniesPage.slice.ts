@@ -92,15 +92,12 @@ export const manageCompaniesSlice = createSlice({
         queryCompaniesError: null,
       }))
       .addCase(queryCompanies.fulfilled, (state, action) => {
-        const {
-          companies,
-          pagination: { totalItems },
-        } = action.payload;
+        const { companies } = action.payload;
         return {
           ...state,
           companyRefs: companies,
           queryCompaniesInProgress: false,
-          totalItems,
+          totalItems: companies.length,
         };
       })
       .addCase(queryCompanies.rejected, (state, action) => ({

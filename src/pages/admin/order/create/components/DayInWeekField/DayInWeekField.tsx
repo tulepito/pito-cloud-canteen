@@ -17,11 +17,13 @@ const DAY_IN_WEEK = [
 
 type DayInWeekFieldProps = {
   form: any;
+  values: Record<string, any>;
 };
 const DayInWeekField: React.FC<DayInWeekFieldProps> = (props) => {
-  const { form } = props;
+  const { form, values } = props;
   const intl = useIntl();
-  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const { dayInWeek = [] } = values;
+  const [selectedDays, setSelectedDays] = useState<string[]>(dayInWeek);
   useEffect(() => {
     form.change('dayInWeek', selectedDays);
   }, [form, selectedDays, selectedDays.length]);

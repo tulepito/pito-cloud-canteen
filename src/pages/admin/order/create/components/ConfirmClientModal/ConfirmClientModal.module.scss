@@ -1,0 +1,10 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.modalContainer {
+  @include flexAlign(center, space-between);
+}
+
+.cancel {
+  @include buttonColorSecondary;
+}

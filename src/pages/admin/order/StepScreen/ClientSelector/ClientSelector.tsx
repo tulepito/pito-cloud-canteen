@@ -1,4 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import {
   manageCompaniesThunks,
   paginateCompanies,
@@ -17,12 +18,19 @@ import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import ClientTable from '../../create/components/ClientTable/ClientTable';
+import ConfirmClientModal from '../../create/components/ConfirmClientModal/ConfirmClientModal';
 import css from './ClientSelector.module.scss';
 
 const ClientSelector = () => {
   const intl = useIntl();
   const [queryParams, setQueryParams] = useState({});
   const [page, setPage] = useState<number>(1);
+  const [selectedConpanyId, setSelectedCompanyId] = useState<string>('');
+  const {
+    value: isConfirmClientModalOpen,
+    setTrue: onConfirmClientModalOpen,
+    setFalse: onConfirmClientModalClose,
+  } = useBoolean();
   const dispatch = useAppDispatch();
   const { companyRefs, totalItems } = useAppSelector(
     (state) => state.ManageCompaniesPage,
@@ -72,7 +80,12 @@ const ClientSelector = () => {
     setPage(value);
   };
   const onItemClick = (id: string) => () => {
-    dispatch(addCompanyClient(id));
+    setSelectedCompanyId(id);
+    onConfirmClientModalOpen();
+  };
+  const onClientConfirm = () => {
+    dispatch(addCompanyClient(selectedConpanyId));
+    onConfirmClientModalClose();
   };
   return (
     <div>
@@ -99,6 +112,12 @@ const ClientSelector = () => {
           onItemClick={onItemClick}
         />
       </div>
+      <ConfirmClientModal
+        isOpen={isConfirmClientModalOpen}
+        onClose={onConfirmClientModalClose}
+        onCancel={onConfirmClientModalClose}
+        onConfirm={onClientConfirm}
+      />
     </div>
   );
 };
