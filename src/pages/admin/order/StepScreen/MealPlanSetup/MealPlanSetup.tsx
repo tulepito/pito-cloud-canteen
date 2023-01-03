@@ -44,6 +44,19 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     },
   } = useAppSelector((state) => state.Order, shallowEqual);
   const { address, origin } = deliveryAddress || {};
+  const companies = useAppSelector(
+    (state) => state.ManageCompaniesPage.companyRefs,
+    shallowEqual,
+  );
+  const currentClient = companies.find(
+    (company) => company.id.uuid === clientId,
+  );
+
+  const {
+    location: { address: defaultAddress = '', origin: defautlOrigin = {} } = {},
+    location,
+  } = currentClient?.attributes.profile.publicData || {};
+
   const onSubmit = (values: any) => {
     const { deliveryAddress: deliveryAddressValues, ...rest } = values;
     const {
@@ -66,17 +79,21 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       vatAllow: vatAllow || true,
       pickAllow: pickAllow || true,
       selectedGroups: selectedGroups || ['allMembers'],
-      deliveryHour: deliveryHour || '',
-      deliveryAddress: deliveryAddress
-        ? {
-            search: address,
-            selectedPlace: { address, origin },
-          }
-        : null,
+      deliveryHour: deliveryHour || '7:00',
+      deliveryAddress:
+        location || deliveryAddress
+          ? {
+              search: defaultAddress || address,
+              selectedPlace: {
+                address: defaultAddress || address,
+                origin: defautlOrigin || origin,
+              },
+            }
+          : null,
       startDate: startDate || '',
       endDate: endDate || '',
       deadlineDate: deadlineDate || null,
-      deadlineHour: deadlineHour || null,
+      deadlineHour: deadlineHour || '7:00',
     }),
     [
       dayInWeek,
@@ -85,8 +102,11 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       pickAllow,
       selectedGroups,
       deliveryHour,
+      location,
       deliveryAddress,
+      defaultAddress,
       address,
+      defautlOrigin,
       origin,
       startDate,
       endDate,
@@ -130,6 +150,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
               </div>
               <div className={css.verticalSpace}>
                 <ParticipantSetupField
+                  form={form}
                   clientId={clientId}
                   title={intl.formatMessage({
                     id: 'ParticipantSetupField.title',

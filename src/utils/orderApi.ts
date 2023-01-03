@@ -39,12 +39,6 @@ export const createOrderApi = (body: CreateOrderApiBody) =>
 
 type AddMealPlanDetailApiBody = {
   orderId: string;
-  meal: string;
-  orderDetail: {
-    [date: string]: {
-      restaurant: string; // restaurant listing id
-    };
-  };
 };
 export const addMealPlanDetailApi = (body: AddMealPlanDetailApiBody) =>
   post('/api/order/plan', body);

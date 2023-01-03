@@ -3,6 +3,7 @@ import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/AddMorePlan';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
+import IconRefreshing from '@components/Icons/IconRefreshing';
 import IconSetting from '@components/IconSetting/IconSetting';
 import { calculateGroupMembersAmount } from '@helpers/companyMembers';
 import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
@@ -12,7 +13,7 @@ import { updateDraftMealPlan } from '@redux/slices/Order.slice';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import { useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 // eslint-disable-next-line import/no-cycle
@@ -92,11 +93,16 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const currentClient = companies.find(
     (company) => company.id.uuid === clientId,
   );
+  const partnerName = currentClient?.attributes.profile.displayName;
   const resourcesForCalender = renderResourcesForCalendar(orderDetail);
 
   const handleAddMorePlanClick = (date: Date) => () => {
     setSelectedDate(date);
     setIsSelectingRestaurant(true);
+  };
+
+  const handleGoBackWhenSelectingRestaurant = () => {
+    setIsSelectingRestaurant(false);
   };
 
   const handleSubmitRestaurant = (values: Record<string, any>) => {
@@ -123,7 +129,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         };
       },
       {},
-    );
+    ) || {};
   const selectedGroupsName = selectedGroups.map((groupId: string) => {
     if (groupId === 'allMembers') {
       return intl.formatMessage({ id: 'ParticipantSetupField.allMembers' });
@@ -133,7 +139,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const pickingDeadline = parseDateFromTimestampAndHourString(
     deadlineDate,
     deadlineHour,
-    'yyyy-MM-dd, hh:mm',
+    'dd/MM/yyyy, hh:mm',
   );
   const allMembersAmount =
     currentClient && calculateGroupMembersAmount(currentClient, selectedGroups);
@@ -149,29 +155,39 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     [OrderSettingField.ACCESS_SETTING]: selectedGroupsName?.join(', '),
     [OrderSettingField.PER_PACK]: packagePerMember,
   };
+
   return (
     <>
       {isSelectingRestaurant ? (
-        <SelectRestaurantPage onSubmitRestaurant={handleSubmitRestaurant} />
+        <SelectRestaurantPage
+          onSubmitRestaurant={handleSubmitRestaurant}
+          selectedDate={selectedDate}
+          onBack={handleGoBackWhenSelectingRestaurant}
+        />
       ) : (
         <div>
           <div className={css.titleContainer}>
             <div>
               <div className={css.row}>
-                <div>#PT1000</div>
-                <Badge label="Đơn hàng tuần • Capi Creative" />
+                <FormattedMessage id="SetupOrderDetail.orderId.draft" />
+
+                <Badge label={`Đơn hàng tuần • ${partnerName}`} />
               </div>
               <div
                 className={classNames(css.row, css.settingBtn)}
                 onClick={onOrderSettingModalOpen}>
                 <IconSetting className={css.settingIcon} />
-                <span>Cài đặt bữa ăn</span>
+                <FormattedMessage id="SetupOrderDetail.orderSettings" />
               </div>
             </div>
             <div className={css.buttonContainer}>
-              <Button disabled>Cập nhật lại đơn hàng</Button>
               <Button disabled>
-                <span>Gợi ý nhà hàng mới</span>
+                {' '}
+                <FormattedMessage id="SetupOrderDetail.orderSettings" />
+              </Button>
+              <Button disabled className={css.recommendNewRestaurantBtn}>
+                <IconRefreshing />
+                <FormattedMessage id="SetupOrderDetail.recommendNewRestaurant" />
               </Button>
             </div>
           </div>

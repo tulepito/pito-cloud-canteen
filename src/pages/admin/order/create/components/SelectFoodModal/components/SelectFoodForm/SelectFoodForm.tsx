@@ -4,12 +4,13 @@ import Form from '@components/Form/Form';
 import IconClose from '@components/IconClose/IconClose';
 import EmptyIcon from '@components/Icons/EmptyIcon';
 import SearchIcon from '@components/Icons/SearchIcon';
-import type { FormState } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm, FormSpy } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { OnChange } from 'react-final-form-listeners';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import FieldFoodSelectCheckboxGroup from './components/FieldFoodSelect/FieldFoodSelectCheckboxGroup';
 import FieldFoodSelectAll from './components/FieldFoodSelectAll/FieldFoodSelectAll';
@@ -29,9 +30,7 @@ type TExtraProps = {
   className?: string;
   inProgress?: boolean;
   items: any[];
-  handleFormChange: (
-    form: FormState<TSelectFoodFormValues, Partial<TSelectFoodFormValues>>,
-  ) => void;
+  handleFormChange: (food: string[] | undefined) => void;
 };
 type TSelectFoodFormProps = FormProps<TSelectFoodFormValues> & TExtraProps;
 type TSelectFoodFormComponentProps = FormRenderProps<TSelectFoodFormValues> &
@@ -48,13 +47,14 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
     form,
     handleFormChange,
   } = props;
+  const intl = useIntl();
   const submitDisable = foodIds?.length === 0;
 
   const options = items.map((item) => {
     const { id, attributes } = item || {};
     const { title, price } = attributes;
 
-    return { key: id?.uuid, value: id?.uuid, title, price };
+    return { key: id?.uuid, value: id?.uuid, title, price: price || 0 };
   });
 
   const removeFood = (foodId: string) => () => {
@@ -110,13 +110,15 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
 
   return (
     <Form onSubmit={handleSubmit}>
-      <FormSpy onChange={handleFormChange} />
+      <OnChange name="food">{handleFormChange}</OnChange>
       <div className={css.formContainer}>
         <div className={css.searchInputContainer}>
           <FieldTextInput
             name="name"
             leftIcon={<SearchIcon />}
-            placeholder="Tìm tên nhà hàng"
+            placeholder={intl.formatMessage({
+              id: 'SelectFoodForm.findFoodByName',
+            })}
           />
         </div>
         <div className={css.contentContainer}>
@@ -140,14 +142,16 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
               </div>
             ) : (
               <div>
-                <div className={css.partTitle}>Món đã chọn</div>
+                <div className={css.partTitle}>
+                  <FormattedMessage id="SelectFoodForm.selectedFood" />
+                </div>
                 <div className={css.divider} />
                 <div>{renderSelectedFoodList()}</div>
               </div>
             )}
             <div className={css.actionContainer}>
               <Button fullWidth disabled={submitDisable}>
-                {'Lưu kết quả'}
+                <FormattedMessage id="SelectFoodForm.saveResult" />
               </Button>
             </div>
           </div>

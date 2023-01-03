@@ -96,12 +96,12 @@
 
     .phone {
       color: $neutralGray10;
-      @include text(14px);
+      @include text(14px, 20px);
     }
 
     .email {
       color: $neutralGray7;
-      @include text(12px);
+      @include text(12px, 20px);
       margin-top: 4px;
       overflow: hidden;
       text-overflow: ellipsis;

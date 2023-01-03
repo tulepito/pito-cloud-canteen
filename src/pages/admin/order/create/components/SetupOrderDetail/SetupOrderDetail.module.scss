@@ -43,6 +43,12 @@
     & > button {
       @include textTemplate(14px, 700, 24px, '');
     }
+
+    .recommendNewRestaurantBtn {
+      display: flex;
+      align-items: center;
+      column-gap: 8px;
+    }
   }
 }
 

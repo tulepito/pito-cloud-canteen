@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import { useIntl } from 'react-intl';
 
 import css from './RestaurantTable.module.scss';
 
@@ -8,15 +9,16 @@ type TRestaurantTableHeadProps = {
 };
 
 const RestaurantTableHead: React.FC<TRestaurantTableHeadProps> = (props) => {
+  const intl = useIntl();
   const { rootClassName, className } = props;
   const headClasses = classNames(rootClassName || css.headRoot, className);
   const headItemClasses = classNames(css.item, css.headItem);
 
   const heads = [
-    'Tên đối tác',
-    'Danh mục thực đơn',
-    'Phong cách ẩm thực',
-    'Tiêu chí',
+    intl.formatMessage({ id: 'RestaurantTableHead.head.partnerName' }),
+    intl.formatMessage({ id: 'RestaurantTableHead.head.categories' }),
+    intl.formatMessage({ id: 'RestaurantTableHead.head.foodStyles' }),
+    intl.formatMessage({ id: 'RestaurantTableHead.head.criteria' }),
   ];
 
   return (

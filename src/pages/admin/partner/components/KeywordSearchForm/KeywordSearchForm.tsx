@@ -16,10 +16,12 @@ type TKeywordSearchForm = {
   onSubmit: (e: TKeywordSearchFormValues) => void;
   initialValues?: TKeywordSearchFormValues;
   searchValue?: string;
+  placeholder?: string;
 };
 
 const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
   const intl = useIntl();
+  const { placeholder } = props;
   return (
     <FinalForm
       {...props}
@@ -28,9 +30,12 @@ const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
         return (
           <Form onSubmit={handleSubmit} className={css.root}>
             <FieldTextInput
-              placeholder={intl.formatMessage({
-                id: 'KeywordSearchForm.keywordPlaceholder',
-              })}
+              placeholder={
+                placeholder ||
+                intl.formatMessage({
+                  id: 'KeywordSearchForm.keywordPlaceholder',
+                })
+              }
               name={props?.searchValue || 'keyword'}
               id={props?.searchValue || 'keyword'}
               className={css.searchInput}

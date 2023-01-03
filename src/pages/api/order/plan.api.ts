@@ -3,7 +3,6 @@ import { getIntegrationSdk, handleError } from '@services/sdk';
 import subAccountLogin from '@services/subAccountLogin';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
-import type { TOrder } from '@utils/orderTypes';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -14,12 +13,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case 'POST':
       try {
-        const { orderId, ...rest } = req.body;
-        const { meal, orderDetail } = rest;
+        const { orderId } = req.body;
 
         const orderListing = await fetchListing(orderId);
         const orderTitle = orderListing.attributes.title;
-        const { metadata }: { metadata: TOrder } = orderListing.attributes;
+        const { orderDetail } = orderListing.attributes.metadata;
+        const { metadata } = orderListing.attributes;
 
         const { companyId, plans = [] } = metadata;
         const companyAccount = await fetchUser(companyId);
@@ -37,7 +36,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         await integrationSdk.listings.update({
           id: planListing.id.uuid,
           metadata: {
-            meal,
             orderDetail,
             orderId,
             listingType: ListingTypes.PLAN,
@@ -47,7 +45,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         await integrationSdk.listings.update({
           id: orderListing.id.uuid,
           metadata: {
-            ...metadata,
             plans: plans.concat(planListing.id.uuid),
           },
         });

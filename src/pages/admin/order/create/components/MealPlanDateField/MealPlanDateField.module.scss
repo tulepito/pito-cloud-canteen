@@ -8,7 +8,7 @@
 }
 
 .fieldGroups {
-  @include flexAlign(center);
+  @include flexAlign(flex-start);
   gap: 36px;
   margin-top: 16px;
 
@@ -57,7 +57,7 @@
     &::placeholder {
       font-weight: $fontWeightRegular;
       font-size: 16px;
-      color: $neutralGray6;
+      color: $formFieldPlaceholderColor;
     }
     &:disabled {
       cursor: not-allowed;

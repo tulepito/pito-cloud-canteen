@@ -1,6 +1,9 @@
+import { useAppSelector } from '@hooks/reduxHooks';
 import type { FormState } from 'final-form';
+import { FormattedMessage } from 'react-intl';
 
 import FieldRestaurant from './FieldRestaurant';
+import css from './RestaurantTable.module.scss';
 import RestaurantTableHead from './RestaurantTableHead';
 import type { TSelectRestaurantFormValues } from './SelectRestaurantForm';
 import SelectRestaurantForm from './SelectRestaurantForm';
@@ -25,6 +28,10 @@ const RestaurantTable: React.FC<TRestaurantTableProps> = ({
   currentRestaurant,
   onFormChange,
 }) => {
+  const { fetchRestaurantsPending } = useAppSelector(
+    (state) => state.SelectRestaurantPage,
+  );
+
   return (
     <>
       <RestaurantTableHead />
@@ -34,15 +41,27 @@ const RestaurantTable: React.FC<TRestaurantTableProps> = ({
         isSelectedRestaurant={isSelectedRestaurant}
         onFormChange={onFormChange}>
         <>
-          {restaurants?.length > 0
-            ? restaurants.map((restaurant: any, index: any) => (
-                <FieldRestaurant
-                  key={index}
-                  restaurant={restaurant}
-                  onItemClick={onItemClick(restaurant)}
-                />
-              ))
-            : null}
+          {fetchRestaurantsPending ? (
+            <div className={css.center}>
+              <FormattedMessage id="RestaurantTable.loadingText" />
+            </div>
+          ) : (
+            <>
+              {restaurants?.length > 0 ? (
+                restaurants.map((restaurant: any, index: any) => (
+                  <FieldRestaurant
+                    key={index}
+                    restaurant={restaurant}
+                    onItemClick={onItemClick(restaurant)}
+                  />
+                ))
+              ) : (
+                <div className={css.center}>
+                  <FormattedMessage id="RestaurantTable.noResults" />
+                </div>
+              )}
+            </>
+          )}
         </>
       </SelectRestaurantForm>
     </>

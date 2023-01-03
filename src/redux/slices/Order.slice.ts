@@ -20,6 +20,7 @@ interface OrderInitialState {
   completeOrderInProgress: boolean;
   completeOrderError: any;
   draftOrder: any;
+  selectedCompany: any;
 }
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -39,6 +40,7 @@ const initialState: OrderInitialState = {
   completeOrderInProgress: false,
   completeOrderError: null,
   draftOrder: {},
+  selectedCompany: null,
 };
 
 const createOrder = createAsyncThunk(
@@ -55,7 +57,9 @@ const createOrder = createAsyncThunk(
       orderDetail,
     };
     const { data: orderListing } = await createOrderApi(apiBody);
-    // return order listing entity
+    await addMealPlanDetailApi({
+      orderId: orderListing.data.id.uuid,
+    });
     return orderListing;
   },
 );
@@ -116,8 +120,9 @@ const orderSlice = createSlice({
         ...state,
         draftOrder: {
           ...state.draftOrder,
-          clientId: payload,
+          clientId: payload.id,
         },
+        selectedCompany: payload.company,
       };
     },
     updateDraftMealPlan: (state, { payload }) => {
@@ -144,6 +149,7 @@ const orderSlice = createSlice({
       .addCase(createOrder.pending, (state) => ({
         ...state,
         createOrderInProcess: true,
+        createOrderError: null,
       }))
       .addCase(createOrder.fulfilled, (state, { payload }) => ({
         ...state,
