@@ -110,12 +110,13 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
             const activeWithSubNameLinks = subNameLinks?.includes(pathname);
             const isActive = activeWithSubNameLinks || pathname === nameLink;
             return (
-              <NamedLink path={nameLink} key={id} className={css.sidebarButton}>
-                <Icon
-                  className={classNames(css.sidebarIcon, {
-                    [css.active]: isActive,
-                  })}
-                />
+              <NamedLink
+                path={nameLink}
+                key={id}
+                className={classNames(css.sidebarButton, {
+                  [css.active]: isActive,
+                })}>
+                <Icon className={css.sidebarIcon} />
               </NamedLink>
             );
           })}

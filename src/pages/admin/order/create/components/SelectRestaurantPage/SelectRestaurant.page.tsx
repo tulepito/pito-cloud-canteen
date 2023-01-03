@@ -6,6 +6,7 @@ import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.s
 import type { FormState } from 'final-form';
 import { useEffect, useState } from 'react';
 
+// eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../NavigateButtons/NavigateButtons';
 import type { TSelectFoodFormValues } from '../SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
 import SelectFoodModal from '../SelectFoodModal/SelectFoodModal';

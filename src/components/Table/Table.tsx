@@ -119,7 +119,11 @@ const Table = (props: any) => {
                 key={row.key}>
                 {columns.map((col: TColumn) => (
                   <td
-                    className={classNames(tableBodyCellClassName, css.bodyCell)}
+                    className={classNames(
+                      tableBodyCellClassName,
+                      css.bodyCell,
+                      { [css.isParent]: row.data.isParent },
+                    )}
                     data-label={col.label}
                     key={col.key}>
                     {col.render(row.data)}

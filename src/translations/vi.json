@@ -381,5 +381,19 @@
   "ParticipantSetupField.title": "Cài đặt truy cập",
   "ParticipantSetupField.allMembers": "Tất cả thành viên",
   "MealPlanSetup.back": "Trở về",
-  "MealPlanSetup.submit": "Tiếp theo"
+  "MealPlanSetup.submit": "Tiếp theo",
+  "ReviewOrder.staffNamePlaceholder": "Nhập tên",
+  "ReviewOrder.staffNameRequired": "Vui lòng nhập tên nhân viên phụ trách",
+  "ReviewOrder.generalInfo": "Thông tin chung",
+  "ReviewOrder.deliveryTime": "Thời gian giao hàng",
+  "ReviewOrder.address": "Địa chỉ",
+  "ReviewOrder.staffNameLabel": "Nhân viên phụ trách",
+  "ReviewOrder.providerLabel": "Nhà cung cấp",
+  "ReviewOrder.providerName": "Tên nhà cung cấp",
+  "ReviewOrder.phoneNumberLabel": "Số điện thoại liên hệ",
+  "ReviewOrder.menuLabel": "Thực đơn",
+  "ReviewOrder.memberOrder": "Chi tiết đơn hàng",
+  "NavigateButtons.goBack": "Quay lại",
+  "NavigateButtons.complete": "Hoàn tất",
+  "NavigateButtons.continue": "Tiếp theo"
 }

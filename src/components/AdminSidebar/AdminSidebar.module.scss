@@ -48,15 +48,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      &.active {
+        border-radius: 8px;
+        background-color: $matterColorLight;
+      }
+
       .sidebarIcon {
         width: 20px;
         height: 20px;
-
-        &.active {
-          path {
-            fill: $marketplaceColorDark;
-          }
-        }
       }
     }
   }
