@@ -346,6 +346,7 @@
   "EditPartnerBasicInfomationForm.createBtn": "Thêm",
   "LocationAutocompleteInput.currentLocation": "Địa chỉ hiện tại",
   "ClientSelector.title": "Chọn khách hàng",
+  "ClientSelector.keywordFieldPlaceholder": "Tìm kiếm theo tên công ty...",
   "AdminSidebar.createOrderLabel": "Tạo đơn hàng",
   "OrderSettingModal.title": "Cài đặt đơn hàng",
   "OrderSettingModal.field.company": "Công ty",
@@ -410,7 +411,7 @@
   "NavigateButtons.complete": "Hoàn tất",
   "NavigateButtons.continue": "Tiếp theo",
   "ClientTable.id": "ID",
-  "ClientTable.companyName": "Họ và tên",
+  "ClientTable.companyName": "Tên công ty",
   "ClientTable.contact": "Liên hệ",
   "ClientTable.address": "Địa chỉ",
   "ManageCompanies.searchStatusLabel": "Trạng thái",
@@ -544,5 +545,8 @@
   "OrderDealineField.deadlineDateLabel": "Chọn ngày",
   "OrderDealineField.deliveryHourLabel": "Chọn giờ",
   "OrderDealineField.deadlineDateRequired": "Vui lòng nhập ngày",
-  "OrderDealineField.deadlineHourRequired": "Vui lòng nhập giờ"
+  "OrderDealineField.deadlineHourRequired": "Vui lòng nhập giờ",
+  "ConfirmClientModal.title": "Xác nhận chọn công ty này",
+  "ConfirmClientModal.cancel": "Huỷ bỏ",
+  "ConfirmClientModal.confirm": "Xác nhận"
 }

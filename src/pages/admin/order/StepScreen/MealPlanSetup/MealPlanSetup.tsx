@@ -44,6 +44,19 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     },
   } = useAppSelector((state) => state.Order, shallowEqual);
   const { address, origin } = deliveryAddress || {};
+  const companies = useAppSelector(
+    (state) => state.ManageCompaniesPage.companyRefs,
+    shallowEqual,
+  );
+  const currentClient = companies.find(
+    (company) => company.id.uuid === clientId,
+  );
+
+  const {
+    location: { address: defaultAddress = '', origin: defautlOrigin = {} } = {},
+    location,
+  } = currentClient?.attributes.profile.publicData || {};
+
   const onSubmit = (values: any) => {
     const { deliveryAddress: deliveryAddressValues, ...rest } = values;
     const {
@@ -67,12 +80,16 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       pickAllow: pickAllow || true,
       selectedGroups: selectedGroups || ['allMembers'],
       deliveryHour: deliveryHour || '',
-      deliveryAddress: deliveryAddress
-        ? {
-            search: address,
-            selectedPlace: { address, origin },
-          }
-        : null,
+      deliveryAddress:
+        location || deliveryAddress
+          ? {
+              search: defaultAddress || address,
+              selectedPlace: {
+                address: defaultAddress || address,
+                origin: defautlOrigin || origin,
+              },
+            }
+          : null,
       startDate: startDate || '',
       endDate: endDate || '',
       deadlineDate: deadlineDate || null,
@@ -85,8 +102,11 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       pickAllow,
       selectedGroups,
       deliveryHour,
+      location,
       deliveryAddress,
+      defaultAddress,
       address,
+      defautlOrigin,
       origin,
       startDate,
       endDate,
