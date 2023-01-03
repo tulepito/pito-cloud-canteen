@@ -2,14 +2,37 @@ import { post, put } from './api';
 
 type CreateOrderApiBody = {
   companyId: string;
-  deliveryAddress: string;
-  startDate: Date;
-  endDate: Date;
-  deliveryHour: string;
-  period: number;
-  selectedGroups: string[];
-  packagePerMember: number;
-  orderDeadline?: string;
+  generalInfo: {
+    deliveryAddress: {
+      address: string;
+      origin: {
+        lat: number;
+        lng: number;
+      };
+    };
+    startDate: number;
+    endDate: number;
+    deliveryHour: string;
+    selectedGroups: string[];
+    packagePerMember: number;
+    deadlineDate: number;
+    deadlineHour: string;
+    period?: number;
+  };
+  orderDetail: {
+    [date: string]: {
+      restaurant: {
+        id: string;
+        restaurantName: string;
+      };
+      foodList: {
+        [foodId: string]: {
+          foodPrice: number;
+          foodName: string;
+        };
+      };
+    };
+  };
 };
 export const createOrderApi = (body: CreateOrderApiBody) =>
   post('/api/order', body);

@@ -2,7 +2,7 @@ import type { TUser } from '@utils/types';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
 
-export const calculateGroupMembersAmount = (
+export const calculateGroupMembers = (
   companyAccount: TUser,
   groupList: string[],
 ) => {
@@ -16,5 +16,12 @@ export const calculateGroupMembersAmount = (
     return currentGroup.members.map((member: any) => member.id);
   });
 
-  return uniq(flatten(allGroupMembers)).length;
+  return uniq(flatten(allGroupMembers));
+};
+
+export const calculateGroupMembersAmount = (
+  companyAccount: TUser,
+  groupList: string[],
+) => {
+  return calculateGroupMembers(companyAccount, groupList).length;
 };
