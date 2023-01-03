@@ -1,17 +1,20 @@
 import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import { useAppSelector } from '@hooks/reduxHooks';
+import difference from 'lodash/difference';
 import Link from 'next/link';
+import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import css from './ParticipantSetupField.module.scss';
 
 type ParticipantSetupFieldProps = {
+  form: any;
   clientId: string;
   title?: string;
 };
 const ParticipantSetupField: React.FC<ParticipantSetupFieldProps> = (props) => {
-  const { clientId, title } = props;
+  const { clientId, title, form } = props;
   const companies = useAppSelector(
     (state) => state.ManageCompaniesPage.companyRefs,
     shallowEqual,
@@ -32,10 +35,28 @@ const ParticipantSetupField: React.FC<ParticipantSetupFieldProps> = (props) => {
     />
   ));
   const intl = useIntl();
+  const handleSelectedGroupsChange = (value: any, previosValue: any) => {
+    const [newOption] = difference(value, previosValue);
+    if (newOption && newOption !== 'allMembers') {
+      form.batch(() => {
+        form.change(
+          'selectedGroups',
+          value.filter((v: string) => v !== 'allMembers'),
+        );
+      });
+    } else if (newOption && newOption === 'allMembers') {
+      form.batch(() => {
+        form.change(
+          'selectedGroups',
+          value.filter((v: string) => v === 'allMembers'),
+        );
+      });
+    }
+  };
   return (
     <div className={css.container}>
       {title && <div className={css.fieldTitle}>{title}</div>}
-
+      <OnChange name="selectedGroups">{handleSelectedGroupsChange}</OnChange>
       <div className={css.fieldGroups}>
         <FieldCheckbox
           id={`selectedGroups-allMember`}
