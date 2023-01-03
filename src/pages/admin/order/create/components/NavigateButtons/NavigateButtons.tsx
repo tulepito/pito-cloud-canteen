@@ -12,10 +12,11 @@ import css from './NavigateButtons.module.scss';
 
 type TNavigateButtons = {
   goBack: () => void;
+  onNextClick?: () => void;
 };
 
 const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
-  const { goBack } = props;
+  const { goBack, onNextClick } = props;
 
   const step = getItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME);
 
@@ -24,7 +25,10 @@ const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
       <Button onClick={goBack} type="button" className={css.backButton}>
         <FormattedMessage id="NavigateButtons.goBack" />
       </Button>
-      <Button type="submit" className={css.nextButton}>
+      <Button
+        type="submit"
+        className={css.nextButton}
+        onClick={onNextClick || undefined}>
         {step === REVIEW_TAB ? (
           <FormattedMessage id="NavigateButtons.complete" />
         ) : (

@@ -9,6 +9,8 @@ import { updateDraftMealPlan } from '@redux/slices/Order.slice';
 import { DateTime } from 'luxon';
 import { useState } from 'react';
 
+// eslint-disable-next-line import/no-cycle
+import NavigateButtons from '../NavigateButtons/NavigateButtons';
 import SelectRestaurantPage from '../SelectRestaurantPage/SelectRestaurant.page';
 import css from './SetupOrderDetail.module.scss';
 
@@ -40,7 +42,15 @@ const renderResourcesForCalendar = (orderDetail: Record<string, any>) => {
   return resources;
 };
 
-const SetupOrderDetail = () => {
+type TSetupOrderDetailProps = {
+  goBack: () => void;
+  nextTab: () => void;
+};
+
+const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
+  goBack,
+  nextTab,
+}) => {
   const {
     draftOrder: { orderDetail = {} },
   } = useAppSelector((state) => state.Order);
@@ -105,6 +115,9 @@ const SetupOrderDetail = () => {
                 ),
               }}
             />
+          </div>
+          <div>
+            <NavigateButtons goBack={goBack} onNextClick={nextTab} />
           </div>
         </div>
       )}
