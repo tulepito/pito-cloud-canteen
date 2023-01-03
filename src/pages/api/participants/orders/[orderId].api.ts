@@ -121,7 +121,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     case HTTP_METHODS.POST: {
-      const { planId, memberOrders, orderDay } = req.body;
+      const { planId, memberOrders, orderDay, orderDays, planData } = req.body;
 
       try {
         const currentUser = denormalisedResponseEntities(
@@ -133,8 +133,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         )[0];
 
         const orderDetail = LISTING(updatingPlan).getMetadata()?.orderDetail;
-        orderDetail[orderDay].memberOrders[currentUserId] =
-          memberOrders[currentUserId];
+
+        if (orderDay && memberOrders) {
+          orderDetail[orderDay].memberOrders[currentUserId] =
+            memberOrders[currentUserId];
+        } else if (orderDays && planData) {
+          orderDays.forEach((day: any) => {
+            orderDetail[day].memberOrders[currentUserId] =
+              planData?.[day]?.[currentUserId];
+          });
+        }
 
         await integrationSdk.listings.update({
           id: planId,

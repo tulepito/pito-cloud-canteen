@@ -10,16 +10,6 @@ import React, { useEffect, useState } from 'react';
 
 import css from './ParticipantSetupPlan.module.scss';
 
-// Mock data
-const mockRestaurantListing = {
-  attributes: {
-    title: 'Nhà hàng vua hải sản',
-  },
-  images: [
-    'https://res.cloudinary.com/eventors/image/upload/f_auto/v1584529827/eventors/hero-back_lbofw9.png',
-  ],
-};
-
 const orderDeadline = 1673456400000;
 
 const ParticipantSetupPlan = () => {
@@ -29,6 +19,7 @@ const ParticipantSetupPlan = () => {
   const dispatch = useAppDispatch();
   const { planId, orderDay } = router.query;
   const order = useAppSelector((state) => state.ParticipantSetupPlanPage.order);
+  const orderId = order?.id?.uuid;
   const plan = useAppSelector((state) => state.ParticipantSetupPlanPage.plan);
   const [orderDayState, setOrderDayState] = useState<number>();
 
@@ -73,7 +64,7 @@ const ParticipantSetupPlan = () => {
         </div>
         <div className={css.rightSection}>
           <SectionCountdown orderDeadline={orderDeadline} />
-          <SectionOrderPanel planId={`${planId}`} />
+          <SectionOrderPanel planId={`${planId}`} orderId={orderId} />
         </div>
       </div>
     </ParticipantLayout>

@@ -1,5 +1,6 @@
 import Button, { InlineTextButton } from '@components/Button/Button';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { ParticipantSetupPlanThunks } from '@redux/slices/ParticipantSetupPlanPage.slice';
 import { shopingCartThunks } from '@redux/slices/shopingCart.slice';
 import { LISTING } from '@utils/data';
 import { DateTime } from 'luxon';
@@ -11,9 +12,13 @@ import css from './SectionOrderPanel.module.scss';
 
 type TSectionOrderPanelProps = {
   planId: string;
+  orderId: string;
 };
 
-const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({ planId }) => {
+const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
+  planId,
+  orderId,
+}) => {
   const intl = useIntl();
   const cartList = useAppSelector((state: any) => {
     const currentUser = state.user.currentUser;
@@ -28,6 +33,10 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({ planId }) => {
 
   const handleRemoveAllItem = () => {
     dispatch(shopingCartThunks.removeAllFromPlanCart({ planId }));
+  };
+
+  const handleSubmit = () => {
+    dispatch(ParticipantSetupPlanThunks.updateOrder({ orderId, planId }));
   };
 
   // Functions
@@ -80,7 +89,9 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({ planId }) => {
         )}
       </div>
       <div className={css.sectionFooter}>
-        <Button fullWidth>{completeOrderButtonLabel}</Button>
+        <Button fullWidth onClick={handleSubmit}>
+          {completeOrderButtonLabel}
+        </Button>
         <InlineTextButton
           className={css.removeCartLabel}
           onClick={handleRemoveAllItem}>
