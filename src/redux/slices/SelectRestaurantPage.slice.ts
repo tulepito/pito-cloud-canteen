@@ -33,8 +33,13 @@ const QUERY_RESTAURANT_FOOD = 'app/SelectRestaurantPage/QUERY_RESTAURANT_FOOD';
 const getRestaurants = createAsyncThunk(
   QUERY_RESTAURANTS,
   async (params: Record<string, any> | undefined, { extra: sdk }) => {
+    const queryParams: Record<string, any> = {};
+
+    if (params) {
+      queryParams.keywords = params.title;
+    }
     const response = await sdk.listings.query({
-      ...params,
+      ...queryParams,
       meta_listingType: 'restaurant',
     });
     const { meta } = response?.data || {};

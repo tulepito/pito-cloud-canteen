@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import type { FormState } from 'final-form';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // eslint-disable-next-line import/no-cycle
 import type { TSelectFoodFormValues } from '../SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
@@ -14,6 +14,8 @@ import type { TSelectRestaurantFormValues } from './components/RestaurantTable/S
 import SearchRestaurantForm from './components/SearchRestaurantForm/SearchRestaurantForm';
 import css from './SelectRestaurantPage.module.scss';
 
+const DEBOUNCE_TIME = 300;
+
 type TSelectRestaurantPageProps = {
   onSubmitRestaurant: (values: Record<string, any>) => void;
 };
@@ -21,6 +23,7 @@ type TSelectRestaurantPageProps = {
 const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   onSubmitRestaurant,
 }) => {
+  const [mounted, setMounted] = useState<boolean>();
   const [currentRestaurant, setCurrentRestaurant] = useState<any>();
   const [isSelectedRestaurant, setIsSelectedRestaurant] = useState(false);
   const [currentFoodList, setCurrentFoodList] = useState<string[]>([]);
@@ -42,6 +45,8 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   const paginationProps = { total, defaultCurrent: current, pageSize };
   const showModalCondition =
     isModalOpen && !fetchFoodPending && !!currentRestaurant;
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  let currDebounceRef = debounceRef.current;
 
   const handlePageChange = (page: number) => {
     const params = {
@@ -53,6 +58,18 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   const handleCloseModal = () => {
     setModalOpen(false);
     setCurrentRestaurant(undefined);
+  };
+
+  const handleSearchRestaurant = (title: string) => {
+    if (currDebounceRef) {
+      clearTimeout(currDebounceRef);
+    }
+
+    currDebounceRef = setTimeout(() => {
+      if (title.length > 0) {
+        dispatch(selectRestaurantPageThunks.getRestaurants({ title }));
+      }
+    }, DEBOUNCE_TIME);
   };
 
   const handleSelectFood = (values: TSelectFoodFormValues) => {
@@ -112,6 +129,10 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       Partial<TSelectRestaurantFormValues>
     >,
   ) => {
+    if (!mounted) {
+      return;
+    }
+
     const {
       values: { restaurant: restaurantId },
     } = form;
@@ -128,6 +149,10 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     dispatch(selectRestaurantPageThunks.getRestaurants());
   }, [dispatch]);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <section className={css.root}>
       <div className={css.titleContainer}>
@@ -140,6 +165,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       </div>
       <SearchRestaurantForm
         onSubmit={() => {}}
+        onSearchRestaurant={handleSearchRestaurant}
         onSelectRestaurant={handleConfirmSelectRestaurant}
         selectRestaurantDisable={!isSelectedRestaurant}
       />
