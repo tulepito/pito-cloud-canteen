@@ -30,6 +30,7 @@ const fetchSubOrder = async (orderDetail: any) => {
         meta_listingType: 'food',
       }),
     );
+
     orderDetailResult = {
       ...orderDetailResult,
       [planKey]: {
@@ -38,7 +39,6 @@ const fetchSubOrder = async (orderDetail: any) => {
       },
     };
   }
-
   return orderDetailResult;
 };
 
@@ -50,7 +50,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     case HTTP_METHODS.GET:
       {
         const { planId } = req.query;
-        console.log({ planId });
 
         if (!planId) {
           return res.status(400).json({
@@ -59,20 +58,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
 
         try {
-          console.log('Meo here');
           const plan = denormalisedResponseEntities(
             await integrationSdk.listings.show({
               id: planId,
             }),
           )[0];
-          console.log('Meo here 1');
           const { orderId, orderDetail } = LISTING(plan).getMetadata();
           const order = denormalisedResponseEntities(
             await integrationSdk.listings.show({
               id: orderId,
             }),
           )[0];
-          console.log('Meo here 2');
           const mealPlan = await fetchSubOrder(orderDetail);
           res.json({
             statusCode: 200,
@@ -83,7 +79,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             },
           });
         } catch (error) {
-          console.log('Meo here error');
           handleError(res, error);
           console.log(error);
         }

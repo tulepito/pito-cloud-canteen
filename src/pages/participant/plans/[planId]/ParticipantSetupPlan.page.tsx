@@ -33,7 +33,10 @@ const ParticipantSetupPlan = () => {
 
   const handleSelectRestaurant = (selectedItem: any) => {
     const dayId = selectedItem?.id;
-    if (dayId && dayId !== 'Loading...' && dayId !== orderDay) {
+    const { orderDay: orderDayQ } = new URLSearchParams(
+      window.location.search,
+    ) as any;
+    if (dayId && dayId !== 'Loading...' && dayId !== orderDayQ) {
       const restaurant = dayId ? plan?.[dayId]?.restaurant : null;
       setSelectedRestaurant(restaurant);
       window.history.pushState(

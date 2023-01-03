@@ -108,7 +108,6 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
 
   const tabItems = converDataToTabItem(plan);
   const defaultActiveKey = tabItems.findIndex((item) => item.id === orderDay);
-  console.log('defaultActiveKey', defaultActiveKey);
   return (
     <div className={css.root}>
       <div className={css.sectionOrderNotify}>

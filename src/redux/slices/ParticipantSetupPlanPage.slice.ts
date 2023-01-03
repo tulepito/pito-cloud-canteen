@@ -27,7 +27,6 @@ const initialState: ParticipantSetupPlanState = {
 const loadData = createAsyncThunk(
   LOAD_DATA,
   async (planId: string) => {
-    console.log({ planId });
     const response: any = await loadPlanDataApi(planId);
     return response?.data?.data;
   },
