@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { denormalisedResponseEntities } from '@utils/data';
 import { EListingStates, OTHER_OPTION } from '@utils/enums';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
@@ -91,15 +90,12 @@ const EditPartnerWizardTab = (props: any) => {
               createSubmitCreatePartnerValues(submitValues),
             );
 
-        const listingResponse = !partnerListingRef ? payload?.listing : payload;
+        const listing = !partnerListingRef ? payload?.listing : payload;
 
-        const [listing] = listingResponse
-          ? denormalisedResponseEntities(listingResponse)
-          : [];
         const isDraft =
           listing?.attributes?.metadata?.listingState === EListingStates.draft;
 
-        if (listingResponse || isDraft) {
+        if (isDraft) {
           return redirectAfterDraftUpdate(
             listing?.id?.uuid,
             tab,
@@ -108,7 +104,7 @@ const EditPartnerWizardTab = (props: any) => {
             `/admin/partner`,
           );
         }
-        return listingResponse;
+        return listing;
       };
 
       return (

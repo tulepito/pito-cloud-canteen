@@ -185,13 +185,12 @@ const TABLE_COLUMN: TColumn[] = [
 
 const parseEntitiesToTableData = (
   companies: TUser[],
-  page: number,
   extraData: TExtraDataMapToCompanyTable,
 ) => {
-  return companies.map((company: any, index: number) => ({
+  return companies.map((company: any) => ({
     key: company.id.uuid,
     data: {
-      id: (page - 1) * 10 + index + 1,
+      id: company.id.uuid,
       name: company.attributes.profile.displayName,
       phone: company.attributes.profile.publicData?.phoneNumber,
       email: company.attributes.email,
@@ -304,7 +303,7 @@ export default function ManageCompanies() {
 
   const companiesTableData = useMemo(
     () =>
-      parseEntitiesToTableData(slicesCompanies, Number(page), {
+      parseEntitiesToTableData(slicesCompanies, {
         updateStatus,
       }),
     [slicesCompanies, updateStatus],

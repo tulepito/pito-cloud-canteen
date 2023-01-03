@@ -328,7 +328,9 @@ const createDraftPartner = createAsyncThunk(
         },
       };
       const { data } = await createDraftPartnerApi(submitValues);
-      const { listing, user } = data;
+      const { listing: listingRes, user: userRes } = data;
+      const [listing] = denormalisedResponseEntities(listingRes);
+      const [user] = denormalisedResponseEntities(userRes);
       return fulfillWithValue({ listing, user });
     } catch (error: any) {
       console.error(error);
@@ -366,10 +368,12 @@ const updatePartnerRestaurantListing = createAsyncThunk(
       const { data } = await updateRestaurantApi({
         dataParams: values,
         queryParams: {
+          ...SHOW_RESTAURANT_LISTING_PARAMS,
           expand: true,
         },
       });
-      return fulfillWithValue(data);
+      const [restaurant] = denormalisedResponseEntities(data);
+      return fulfillWithValue(restaurant);
     } catch (error) {
       console.error(error);
       return rejectWithValue(storableError(error));
@@ -827,7 +831,7 @@ export const partnerSlice = createSlice({
         return {
           ...state,
           updatePartnerListingInProgress: false,
-          partnerListingRef: denormalisedResponseEntities(action.payload),
+          partnerListingRef: action.payload,
         };
       })
       .addCase(updatePartnerRestaurantListing.rejected, (state, action) => {
