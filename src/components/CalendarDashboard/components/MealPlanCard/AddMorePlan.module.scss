@@ -1,0 +1,50 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  margin-left: -8px;
+}
+
+.addMore {
+  width: 100%;
+  height: 36px;
+  min-height: 36px;
+  padding: 6px;
+  text-align: center;
+  border-radius: 0 8px 8px 0;
+  background-color: $neutralGray1;
+  border: 1px solid $neutralGray5;
+  border-left: none;
+  @include textTemplate(14px, 700, 20px, '');
+  color: $neutralGray7;
+  margin-bottom: 12px;
+
+  &:hover {
+    background-color: $neutralGray5;
+
+    color: $matterColorBright;
+
+    path {
+      fill: $matterColorBright;
+    }
+  }
+
+  &:active,
+  &:focus {
+    background-color: $neutralGray1;
+    color: $neutralGray7;
+  }
+}
+
+.plusIcon {
+  margin-right: 10px;
+  & path {
+    fill: $neutralGray7;
+  }
+}
+
+.haveNoMeal {
+  color: $neutralGray9;
+  @include textTemplate(12px, 400, 16px, '');
+  text-align: center;
+}

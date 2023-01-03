@@ -11,12 +11,14 @@ import EventCard from './components/EventCard/EventCard';
 import createMonthViewWrapper from './components/MonthView/withMonthViewWrapper';
 import Toolbar from './components/Toolbar/Toolbar';
 import withWeekViewWrapper from './components/WeekView/withWeekViewWrapper';
+import type { TCalendarItemCardComponents } from './helpers/types';
 
 type TCalendarDashboard = {
   defaultDate?: Date;
   events?: Event[] | undefined;
   renderEvent?: React.FC<any>;
   companyLogo?: ReactNode;
+  components?: TCalendarItemCardComponents;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboard> = ({
@@ -24,11 +26,18 @@ const CalendarDashboard: React.FC<TCalendarDashboard> = ({
   events = [],
   renderEvent = EventCard,
   companyLogo,
+  components,
 }) => {
   const localizer = luxonLocalizer(DateTime);
 
-  const MonthViewWrapper = createMonthViewWrapper(renderEvent);
-  const WeekViewWrapper = withWeekViewWrapper(renderEvent);
+  const MonthViewWrapper = createMonthViewWrapper({
+    renderEvent,
+    customComponents: components,
+  });
+  const WeekViewWrapper = withWeekViewWrapper({
+    renderEvent,
+    customComponents: components,
+  });
 
   const { defaultDate, views } = useMemo(
     () => ({

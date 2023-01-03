@@ -4,11 +4,17 @@ import React from 'react';
 
 import css from './IconMagnifier.module.scss';
 
-const IconMagnifier: React.FC<TIconProps> = (props) => {
-  const classes = classNames(css.root, props.className);
+const IconMagnifier: React.FC<TIconProps> = ({
+  className,
+  width = 24,
+  height = 24,
+}) => {
+  const classes = classNames(css.root, className);
   return (
     <svg
       className={classes}
+      width={width}
+      height={height}
       clipRule="evenodd"
       fillRule="evenodd"
       strokeLinejoin="round"

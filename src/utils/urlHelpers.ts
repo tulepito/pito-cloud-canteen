@@ -1,6 +1,8 @@
 import { types as sdkTypes } from '@sharetribe/sdk';
 import queryString from 'query-string';
 
+import { EUserPermission, startRouteBaseOnPermission } from './enums';
+
 const { LatLng, LatLngBounds } = sdkTypes;
 
 // Create slug from random texts
@@ -230,4 +232,22 @@ export const twitterPageURL = (twitterHandle: string) => {
     return `https://twitter.com/${twitterHandle}`;
   }
   return null;
+};
+
+export const isPathMatchedPermission = (
+  pathName: string,
+  permission: EUserPermission,
+) => {
+  let isMatched;
+
+  if (permission !== EUserPermission.normal) {
+    const startPath = startRouteBaseOnPermission[permission];
+    isMatched = pathName.startsWith(startPath);
+  } else {
+    isMatched = Object.values(startRouteBaseOnPermission).every((item) => {
+      return !pathName.startsWith(item);
+    });
+  }
+
+  return isMatched;
 };

@@ -29,10 +29,8 @@ const queryCompanies = createAsyncThunk(
     { fulfillWithValue, rejectWithValue }: ThunkAPI,
   ) => {
     try {
-      const { data } = await getCompaniesApi();
-      const { meta: pagination } = data.data;
-      const companies = denormalisedResponseEntities(data);
-      return fulfillWithValue({ companies, page, data, pagination });
+      const { data: companies } = await getCompaniesApi();
+      return fulfillWithValue({ companies, page });
     } catch (error: any) {
       console.error('Query company error : ', error);
       return rejectWithValue(storableError(error.response.data));
@@ -94,15 +92,12 @@ export const manageCompaniesSlice = createSlice({
         queryCompaniesError: null,
       }))
       .addCase(queryCompanies.fulfilled, (state, action) => {
-        const {
-          companies,
-          pagination: { totalItems },
-        } = action.payload;
+        const { companies } = action.payload;
         return {
           ...state,
           companyRefs: companies,
           queryCompaniesInProgress: false,
-          totalItems,
+          totalItems: companies.length,
         };
       })
       .addCase(queryCompanies.rejected, (state, action) => ({

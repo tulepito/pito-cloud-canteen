@@ -2,6 +2,7 @@
 @use '/src/styles/vars.scss' as *;
 
 .styleGuideContainer {
+  background-color: $neutralGray4;
   padding: 40px 24px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));

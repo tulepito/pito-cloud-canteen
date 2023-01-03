@@ -8,6 +8,7 @@ import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
 import { Navigate } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
+import type { TCalendarItemCardComponents } from '../../helpers/types';
 import WDayItem from '../DayItem/WDayItem';
 import css from './WeekView.module.scss';
 
@@ -19,6 +20,7 @@ type TWeekViewProps = {
   range: any;
   accessors: any;
   renderEvent?: React.FC<any>;
+  customComponents?: TCalendarItemCardComponents;
 } & TimeGridProps;
 
 type TWeekViewObject = {
@@ -33,6 +35,7 @@ function WeekView({
   localizer,
   events = [],
   renderEvent,
+  customComponents,
 }: TWeekViewProps & TWeekViewObject) {
   const {
     viewport: { width },
@@ -63,6 +66,7 @@ function WeekView({
             key={item.getTime()}
             events={getEventsInDate(item, events)}
             renderEvent={renderEvent}
+            components={customComponents}
           />
         ))}
       </div>

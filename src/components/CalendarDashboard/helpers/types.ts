@@ -1,3 +1,5 @@
+import type React from 'react';
+
 export type TDaySession =
   | 'MORNING_SESSION'
   | 'AFTERNOON_SESSION'
@@ -13,3 +15,7 @@ export type TDayInWeek =
   | 'friday'
   | 'saturday'
   | 'sunday';
+
+export type TCalendarItemCardComponents = {
+  contentEnd: React.FC<any>;
+};

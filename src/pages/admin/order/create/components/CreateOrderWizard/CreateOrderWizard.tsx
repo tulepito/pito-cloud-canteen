@@ -1,15 +1,17 @@
 import FormWizard from '@components/FormWizard/FormWizard';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
+import CalendarPage from '@src/pages/calendar/CalendarPage.page';
 import { getItem, setItem } from '@utils/localStorageHelpers';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import ClientSelector from '../../../StepScreen/ClientSelector/ClientSelector';
-// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import/no-cycle, import/no-named-as-default
 import MealPlanSetup from '../../../StepScreen/MealPlanSetup/MealPlanSetup';
 // eslint-disable-next-line import/no-cycle
 import ReviewOrder from '../ReviewOrder/ReviewOrder';
 // eslint-disable-next-line import/no-cycle
-import SelectRestaurantPage from '../SelectRestaurantPage/SelectRestaurant.page';
 import css from './CreateOrderWizard.module.scss';
 
 export const CLIENT_SELECT_TAB = 'clientSelect';
@@ -62,9 +64,9 @@ const CreateOrderTab: React.FC<any> = (props) => {
     case CLIENT_SELECT_TAB:
       return <ClientSelector />;
     case MEAL_PLAN_SETUP:
-      return <MealPlanSetup goBack={goBack} />;
+      return <MealPlanSetup />;
     case CREATE_MEAL_PLAN_TAB:
-      return <SelectRestaurantPage goBack={goBack} />;
+      return <CalendarPage />;
     case REVIEW_TAB:
       return <ReviewOrder goBack={goBack} />;
     default:
@@ -74,7 +76,13 @@ const CreateOrderTab: React.FC<any> = (props) => {
 
 const CreateOrderWizard = () => {
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   const [currentStep, setCurrentStep] = useState<string>(CLIENT_SELECT_TAB);
+
+  useEffect(() => {
+    if (currentStep === CLIENT_SELECT_TAB)
+      dispatch(manageCompaniesThunks.queryCompanies());
+  }, [currentStep, dispatch]);
 
   const saveStep = (tab: string) => {
     setCurrentStep(tab);

@@ -11,7 +11,7 @@ import css from './Table.module.scss';
 export type TColumn = {
   key: string | number;
   label: string;
-  render: (data: any) => ReactNode;
+  render: (data: any, index?: number) => ReactNode;
   renderSearch?: () => ReactNode;
 };
 

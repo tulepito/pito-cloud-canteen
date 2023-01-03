@@ -37,7 +37,7 @@ export const NAVIGATE: Record<string, string> = {
   DATE: 'DATE',
 };
 
-export const views: Record<string, string> = {
+export const VIEW_MODES: Record<string, string> = {
   MONTH: 'month',
   WEEK: 'week',
 };
