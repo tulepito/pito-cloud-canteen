@@ -66,8 +66,10 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
     const convertedData = [];
 
     for (const item in plan) {
-      const { foodList, restaurant }: { foodList: any[]; restaurant: any } =
-        plan[item];
+      const {
+        foodList,
+        restaurant,
+      }: { foodList: any[]; restaurant: any; memberOrder: any } = plan[item];
       const hasDishInCart = cartList?.[item as any];
       const planDate = DateTime.fromMillis(Number(item)).toJSDate();
       const itemLabel = (

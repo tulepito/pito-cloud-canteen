@@ -1,20 +1,24 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
-import { denormalisedResponseEntities, LISTING } from '@utils/data';
+import {
+  CURRENT_USER,
+  denormalisedResponseEntities,
+  LISTING,
+} from '@utils/data';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { getIntegrationSdk } from '../../../../services/integrationSdk';
-import { handleError } from '../../../../services/sdk';
+import { getSdk, handleError } from '../../../../services/sdk';
 import { HTTP_METHODS } from '../../helpers/constants';
 
-const fetchSubOrder = async (orderDetail: any) => {
+const fetchSubOrder = async (orderDetail: any, currentUserId: string) => {
   let orderDetailResult = {};
   const integrationSdk = getIntegrationSdk();
   const planKeys = Object.keys(orderDetail);
 
   for (const planKey of planKeys) {
     const planItem = orderDetail[planKey];
-    const { foodList, restaurant } = planItem;
+    const { foodList, restaurant, memberOrders } = planItem;
     const restaurantId = restaurant?.id;
 
     // Fetch restaurant data
@@ -36,6 +40,7 @@ const fetchSubOrder = async (orderDetail: any) => {
       [planKey]: {
         foodList: foodListData,
         restaurant: restaurantData,
+        memberOrder: { [currentUserId]: memberOrders[currentUserId] },
       },
     };
   }
@@ -45,6 +50,7 @@ const fetchSubOrder = async (orderDetail: any) => {
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
   const integrationSdk = getIntegrationSdk();
+  const sdk = getSdk(req, res);
 
   switch (apiMethod) {
     case HTTP_METHODS.GET:
@@ -69,7 +75,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               id: orderId,
             }),
           )[0];
-          const mealPlan = await fetchSubOrder(orderDetail);
+
+          const currentUser = denormalisedResponseEntities(
+            await sdk.currentUser.show(),
+          )[0];
+          const currentUserId = CURRENT_USER(currentUser).getId();
+
+          const mealPlan = await fetchSubOrder(orderDetail, currentUserId);
           res.json({
             statusCode: 200,
             meta: {},

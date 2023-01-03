@@ -164,4 +164,6 @@ export const shopingCartSlice = createSlice({
   },
 });
 
+export const shopingCartActions = shopingCartSlice.actions;
+
 export default shopingCartSlice.reducer;

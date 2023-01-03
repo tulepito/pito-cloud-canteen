@@ -7,7 +7,6 @@ import { shopingCartThunks } from '@redux/slices/shopingCart.slice';
 import { LISTING } from '@utils/data';
 import classNames from 'classnames';
 import Image from 'next/image';
-import React from 'react';
 
 import css from './ListingCard.module.scss';
 

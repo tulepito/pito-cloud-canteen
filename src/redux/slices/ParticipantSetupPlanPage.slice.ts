@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
 
 import { loadPlanDataApi, updateParticipantOrderApi } from '../../utils/api';
+import { shopingCartActions } from './shopingCart.slice';
 
 const LOAD_DATA = 'app/ParticipantSetupPlanPage/LOAD_DATA';
 const UPDATE_ORDER = 'app/ParticipantSetupPlanPage/UPDATE_ORDER';
@@ -27,8 +28,27 @@ const initialState: ParticipantSetupPlanState = {
 
 const loadData = createAsyncThunk(
   LOAD_DATA,
-  async (planId: string) => {
+  async (planId: string, { getState, dispatch }) => {
+    const currentUser = getState().user.currentUser;
+    const currentUserId = currentUser?.id?.uuid;
     const response: any = await loadPlanDataApi(planId);
+    const plan = response?.data?.data?.plan;
+    const orderDaysRaw = Object.keys(plan);
+    const orderDays = orderDaysRaw.filter(
+      (day) => plan?.[day]?.memberOrder?.[currentUserId]?.foodId,
+    );
+
+    orderDays.forEach((day) => {
+      dispatch(
+        shopingCartActions.addToCart({
+          currentUserId: currentUserId,
+          planId,
+          dayId: day,
+          mealId: plan?.[day]?.memberOrder?.[currentUserId]?.foodId,
+        }),
+      );
+    });
+
     return response?.data?.data;
   },
   {
