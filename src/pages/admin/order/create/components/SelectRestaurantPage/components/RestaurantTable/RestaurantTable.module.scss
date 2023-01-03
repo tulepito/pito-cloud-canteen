@@ -7,6 +7,11 @@
 .itemRoot {
 }
 
+.center {
+  margin-top: 56px;
+  text-align: center;
+}
+
 .row {
   display: flex;
   align-items: flex-start;
@@ -24,7 +29,7 @@
 }
 
 .item {
-  padding-left: calc(28px);
+  margin-left: calc(28px);
   display: flex;
   flex-grow: 1;
   flex-direction: row;
@@ -37,7 +42,7 @@
   :nth-child(2),
   :nth-child(3),
   :nth-child(4) {
-    flex-basis: 200px;
+    flex-basis: calc((100% - 16px * 3) / 5);
     word-break: break-all;
     @include lineClamp(4);
   }
@@ -55,7 +60,7 @@
 }
 
 .headItem {
-  padding-left: calc(28px + 16px);
+  margin-left: calc(28px + 16px);
   color: $neutralGray7;
 
   :nth-child(4) {

@@ -1,5 +1,6 @@
 import { InlineTextButton } from '@components/Button/Button';
 import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
+import { CATEGORY_OPTIONS } from '@utils/enums';
 import classNames from 'classnames';
 import get from 'lodash/get';
 
@@ -24,7 +25,15 @@ const FieldRestaurant: React.FC<TFieldRestaurantProps> = (props) => {
   const itemClasses = classNames(rootClassName || css.item, className);
   const { restaurantId, title, categories } =
     prepareDataForRestaurant(restaurant);
-  const categoriesContent = categories ? categories.join(', ') : [];
+  const categoriesContent = categories
+    ? categories
+        .map((cat: string) => {
+          const category = CATEGORY_OPTIONS.find((item) => item.key === cat);
+          return category?.label || undefined;
+        })
+        .filter((item: string | undefined) => item)
+        .join(', ')
+    : [];
 
   return (
     <div className={css.row}>

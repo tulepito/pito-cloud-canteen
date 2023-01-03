@@ -5,6 +5,7 @@ import type { TPagination } from '@utils/types';
 import get from 'lodash/get';
 
 type TSelectRestaurantPageSliceInitialState = {
+  fetchRestaurantsPending: boolean;
   restaurants: any[] | null;
   pagination: TPagination | null;
   selectRestaurantPageError: any;
@@ -16,6 +17,7 @@ type TSelectRestaurantPageSliceInitialState = {
 };
 
 const initialState: TSelectRestaurantPageSliceInitialState = {
+  fetchRestaurantsPending: false,
   restaurants: null,
   pagination: null,
   selectRestaurantPageError: null,
@@ -79,15 +81,24 @@ const SelectRestaurantPageSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getRestaurants.pending, (state) => {
-        return { ...state, selectRestaurantPageError: null };
+        return {
+          ...state,
+          fetchRestaurantsPending: true,
+          selectRestaurantPageError: null,
+        };
       })
       .addCase(getRestaurants.fulfilled, (state, { payload }) => {
         const { pagination, restaurants } = payload;
         state.restaurants = restaurants;
         state.pagination = pagination;
+        state.fetchRestaurantsPending = false;
       })
       .addCase(getRestaurants.rejected, (state, { error }) => {
-        return { ...state, selectRestaurantPageError: error };
+        return {
+          ...state,
+          selectRestaurantPageError: error,
+          fetchRestaurantsPending: false,
+        };
       })
 
       .addCase(getRestaurantFood.pending, (state) => {

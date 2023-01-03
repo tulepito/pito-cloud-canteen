@@ -183,9 +183,11 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
         currentRestaurant={currentRestaurant}
         onFormChange={handleFormChange}
       />
-      <div className={css.paginationContainer}>
-        <Pagination {...paginationProps} onChange={handlePageChange} />
-      </div>
+      {!!restaurants && restaurants?.length > 0 && (
+        <div className={css.paginationContainer}>
+          <Pagination {...paginationProps} onChange={handlePageChange} />
+        </div>
+      )}
       <SelectFoodModal
         restaurant={currentRestaurant}
         items={foodList}

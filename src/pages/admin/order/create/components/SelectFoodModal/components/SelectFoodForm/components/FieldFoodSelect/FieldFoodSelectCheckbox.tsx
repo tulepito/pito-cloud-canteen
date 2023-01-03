@@ -16,7 +16,7 @@ const FieldFoodSelectCheckbox = (props: any) => {
     foodData,
     ...rest
   } = props;
-  const { title: foodTitle, price: foodPrice = '150000' } = foodData;
+  const { title: foodTitle, price: foodPrice } = foodData;
   const classes = classNames(rootClassName || css.root, className);
 
   const handleOnChange = (input: any, event: TFormEvent): void => {
@@ -66,7 +66,7 @@ const FieldFoodSelectCheckbox = (props: any) => {
 
         <div className={css.labelContainer}>
           <div className={css.foodTitle}>{foodTitle}</div>
-          <div>{foodPrice}đ</div>
+          <div>{foodPrice} đ</div>
         </div>
       </div>
     </div>
