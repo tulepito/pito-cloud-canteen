@@ -29,12 +29,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   const mealType = event.resource?.type;
   const startTime = event.resource.deliveryHour;
   const dishes: any[] = event.resource?.meal?.dishes || [];
-  const {
-    orderId,
-    subOrderId,
-    id: orderDay,
-    subOrderKey: planId,
-  } = event.resource;
+  const { orderId, subOrderId: planId, id: orderDay } = event.resource;
 
   const onSelectDish = (values: any, reject?: boolean) => {
     const currentUserId = CURRENT_USER(user).getId();
@@ -43,7 +38,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
         updateValues: {
           orderId,
           orderDay,
-          planId: subOrderId,
+          planId,
           memberOrders: {
             [currentUserId]: {
               status: 'notJoined',
@@ -59,7 +54,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
         updateValues: {
           orderId,
           orderDay,
-          planId: subOrderId,
+          planId,
           memberOrders: {
             [currentUserId]: {
               status: 'joined',
