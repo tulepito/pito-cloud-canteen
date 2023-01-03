@@ -1,10 +1,10 @@
 import FormWizard from '@components/FormWizard/FormWizard';
-import { getPersistState } from '@helpers/persistHelper';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
 import { getItem, setItem } from '@utils/localStorageHelpers';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
 
 import ClientSelector from '../../../StepScreen/ClientSelector/ClientSelector';
 // eslint-disable-next-line import/no-cycle, import/no-named-as-default
@@ -32,13 +32,12 @@ export const TABS = [
 export const CREATE_ORDER_STEP_LOCAL_STORAGE_NAME = 'orderStep';
 
 const tabCompleted = (order: any, tab: string) => {
-  const { generalInfo = {} } = order || {};
-  const { staffName } = generalInfo;
+  const { clientId, deliveryAddress, staffName } = order || {};
   switch (tab) {
     case CLIENT_SELECT_TAB:
-      return true;
+      return clientId;
     case MEAL_PLAN_SETUP:
-      return true;
+      return deliveryAddress;
     case CREATE_MEAL_PLAN_TAB:
       return true;
     case REVIEW_TAB:
@@ -111,7 +110,8 @@ const CreateOrderWizard = () => {
     }
   };
 
-  const { draftOrder } = getPersistState('Order');
+  // const { draftOrder } = getPersistState('Order');
+  const { draftOrder } = useAppSelector((state) => state.Order, shallowEqual);
   const tabsStatus = tabsActive(draftOrder) as any;
 
   useEffect(() => {

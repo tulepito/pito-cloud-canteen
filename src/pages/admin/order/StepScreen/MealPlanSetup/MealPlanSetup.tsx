@@ -1,11 +1,11 @@
 import Form from '@components/Form/Form';
-import { getPersistState } from '@helpers/persistHelper';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { updateDraftMealPlan } from '@redux/slices/Order.slice';
 import { useMemo } from 'react';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
 
 import DayInWeekField from '../../create/components/DayInWeekField/DayInWeekField';
 import DeliveryAddressField from '../../create/components/DeliveryAddressField/DeliveryAddressField';
@@ -26,7 +26,6 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   const { goBack, nextTab } = props;
   const dispatch = useAppDispatch();
   const intl = useIntl();
-  console.log('draft', getPersistState('Order'));
 
   const {
     draftOrder: {
@@ -43,7 +42,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       deadlineDate,
       deadlineHour,
     },
-  } = getPersistState('Order');
+  } = useAppSelector((state) => state.Order, shallowEqual);
   const { address, origin } = deliveryAddress || {};
   const onSubmit = (values: any) => {
     const { deliveryAddress: deliveryAddressValues, ...rest } = values;
