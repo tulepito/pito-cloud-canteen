@@ -50,6 +50,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     if (isNonRequireAuthenticationRoute) {
       if (homePageNavigateCondition) {
         router.prefetch(generalPaths.Home);
+        router.push(generalPaths.Home);
       }
     } else if (!isAuthenticated) {
       router.push(generalPaths.SignIn);
