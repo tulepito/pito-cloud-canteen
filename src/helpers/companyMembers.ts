@@ -8,7 +8,7 @@ export const calculateGroupMembers = (
 ) => {
   const { groups, members = {} } = companyAccount.attributes.profile.metadata;
   if (groupList.includes('allMembers')) {
-    return Object.keys(members).length;
+    return Object.keys(members);
   }
 
   const allGroupMembers = groupList.map((groupId: string) => {

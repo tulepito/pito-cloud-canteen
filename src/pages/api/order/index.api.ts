@@ -67,13 +67,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           }),
           {},
         );
-        const updatedOrderDetail = Object.keys(orderDetail).map(
-          (date: string) => {
+
+        const updatedOrderDetail = Object.keys(orderDetail).reduce(
+          (result, date) => {
             return {
-              ...orderDetail[date],
-              memberOrders: initialMemberOrder,
+              ...result,
+              [date]: {
+                ...orderDetail[date],
+                memberOrders: initialMemberOrder,
+              },
             };
           },
+          {},
         );
         const updatedDraftOrderListingResponse =
           await integrationSdk.listings.update({
