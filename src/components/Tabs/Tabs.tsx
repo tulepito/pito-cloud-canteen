@@ -2,29 +2,38 @@ import { InlineTextButton } from '@components/Button/Button';
 import IconArrow from '@components/IconArrow/IconArrow';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import css from './Tabs.module.scss';
 
-export type TTabsItem = {
-  label: string;
-  key: string;
-  children?: ReactNode | string | number;
+type TTabsItem = {
+  label: ReactNode;
+  id: string | number;
+  children: ReactNode | string | number;
   childrenFn?: (e: any) => ReactNode;
   childrenProps?: any;
 };
 interface ITabsProps {
   defaultActiveKey?: string;
   items: TTabsItem[];
-  onChange?: () => void;
+  onChange?: (params: any) => void;
+  contentClassName?: string;
+  headerClassName?: string;
 }
 
 const Tabs = (props: ITabsProps) => {
-  const { defaultActiveKey, items } = props;
+  const {
+    defaultActiveKey,
+    items,
+    contentClassName,
+    headerClassName,
+    onChange = () => null,
+  } = props;
   const [activeTabKey, setActiveTabKey] = useState(defaultActiveKey || 1);
 
-  const onChangeTab = (tabKey: number) => {
+  const onChangeTab = (tabKey: number) => () => {
     setActiveTabKey(tabKey);
+    onChange(items[Number(tabKey) - 1]);
   };
 
   const goLeft = () => {
@@ -40,6 +49,9 @@ const Tabs = (props: ITabsProps) => {
     }
     setActiveTabKey(+activeTabKey + 1);
   };
+  useEffect(() => {
+    onChangeTab(Number(defaultActiveKey || 1))();
+  }, [defaultActiveKey]);
 
   const tabHeader = items.map((item, index) => {
     const { label } = item;
@@ -49,11 +61,12 @@ const Tabs = (props: ITabsProps) => {
     const tabItemClasses = classNames(css.tabHeaderItem, {
       [css.tabActive]: isActiveClass,
     });
+
     return (
       <div
         key={`tab-${index}`}
         className={tabItemClasses}
-        onClick={() => onChangeTab(index + 1)}>
+        onClick={onChangeTab(index + 1)}>
         <span
           className={classNames(css.tabItemContent, {
             [css.tabActive]: isActiveClass,
@@ -72,8 +85,8 @@ const Tabs = (props: ITabsProps) => {
       : activeItem?.children || '';
 
   // classes setup
-  const headerClassName = classNames(css.tabHeaders);
-  const contentClassName = classNames(css.tabPanel);
+  const headerClasses = classNames(css.tabHeaders, headerClassName);
+  const contentClasses = classNames(css.tabPanel, contentClassName);
   return (
     <div>
       <div className={css.tabHeaderWrapper}>
@@ -88,6 +101,10 @@ const Tabs = (props: ITabsProps) => {
         </div>
       </div>
       <div className={contentClassName}>{tabContent}</div>
+      <div className={css.root}>
+        <div className={headerClasses}>{tabHeader}</div>
+        <div className={contentClasses}>{tabContent}</div>
+      </div>
     </div>
   );
 };

@@ -28,17 +28,17 @@ import css from './StyleGuide.module.scss';
 const tabItems = [
   {
     label: `Đơn hàng mới`,
-    key: 'don-hang-moi',
+    id: 'don-hang-moi',
     children: `Content of Tab Pane 1`,
   },
   {
     label: `Đang chờ xác nhận`,
-    key: 'cho-xac-nhan',
+    id: 'cho-xac-nhan',
     children: `Content of Tab Pane 2`,
   },
   {
     label: `Đã xác nhận`,
-    key: 'da-xac-nhan',
+    id: 'da-xac-nhan',
     children: `Content of Tab Pane 3`,
   },
 ];

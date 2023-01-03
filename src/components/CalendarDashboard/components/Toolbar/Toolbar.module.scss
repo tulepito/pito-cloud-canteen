@@ -27,11 +27,7 @@
 .companyId {
   @include textTemplate(24px, 700, 32px, '');
   color: $matterColorDark;
-  margin-bottom: 20px;
-
-  @include viewportLarge {
-    margin-bottom: 0;
-  }
+  margin-bottom: 8px;
 }
 
 .actions {
@@ -39,75 +35,56 @@
   align-items: center;
 }
 
-// .viewModeSelect {
-//   width: 100px;
-//   height: 36px;
-//   padding: 6px 16px;
-//   border: 1px solid $neutralGray5;
-//   background-color: $neutralGray1;
-//   border-radius: 8px;
-//   @include textTemplate(12px, 700, 20px, '');
-//   color: $neutralGray10;
-//   margin-right: 20px;
-//   margin-bottom: 20px;
-
-//   @include viewportMedium {
-//     margin-bottom: 0px;
-//   }
-// }
-
 .viewModeGroup {
   padding: 4px;
   display: flex;
+  background: $neutralGray3;
+  border-radius: 24px;
   margin-right: 20px;
-  border-radius: 8px;
-  border: 1px solid $neutralGray5;
-  overflow: hidden;
 }
-
 .viewMode {
-  width: 80px;
-  height: 36px;
-  min-height: 36px;
-  padding: 8px;
-  text-align: center;
-  border-radius: 6px;
-  background-color: $neutralGray1;
-  @include textTemplate(12px, 700, 20px, '');
-  color: $neutralGray10;
+  height: 32px;
+  min-height: 32px;
 
-  &:first-child {
-  }
+  padding: 6px 24px;
+  text-align: center;
+  background: transparent;
+  border-radius: 24px;
+  -webkit-tap-highlight-color: transparent;
+
+  @include textTemplate(12px, 700, 20px, '');
+  color: $neutralGray5;
 
   &:last-child {
     border-right: 0px;
   }
 
   &:hover {
-    background-color: $neutralGray5;
+    background-color: $neutralGray3;
   }
 
   &:active,
   &:focus {
-    background-color: $primaryPri5;
-    color: $neutralGray1;
+    background-color: $neutralGray1;
+    color: $neutralGray10;
   }
 }
 
 .activeViewMode {
-  background-color: $primaryPri5;
-  color: $neutralGray1;
+  background-color: $neutralGray1;
+  color: $neutralGray10;
 
-  &:hover {
-    background-color: $primaryPri5;
-    color: $neutralGray1;
+  &:active,
+  &:focus {
+    background-color: $neutralGray1;
+    color: $neutralGray10;
   }
 }
 
 .todayBtn {
   width: 80px;
-  height: 44px;
-  min-height: 44px;
+  height: 40px;
+  min-height: 40px;
   padding: 8px;
   margin-right: 28px;
   text-align: center;

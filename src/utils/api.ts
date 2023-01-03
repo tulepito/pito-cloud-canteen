@@ -64,3 +64,12 @@ export const queryRestaurantListingsApi = (body: any) =>
 
 export const updateRestaurantStatusApi = (body: any) =>
   post('/api/admin/listings/restaurant/status', body);
+
+export const loadOrderDataApi = (orderId: string) =>
+  get(`/api/participants/orders/${orderId}`);
+
+export const loadPlanDataApi = (planId: string) =>
+  get(`/api/participants/plans/${planId}`);
+
+export const updateParticipantOrderApi = (orderId: string, body: any) =>
+  post(`/api/participants/orders/${orderId}`, body);

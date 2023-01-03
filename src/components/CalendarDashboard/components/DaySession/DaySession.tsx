@@ -2,7 +2,7 @@ import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
-import EventCard from '../EventCard/EventCard';
+import OrderEventCard from '../OrderEventCard/OrderEventCard';
 import css from './DaySession.module.scss';
 
 type TDaySessionProps = {
@@ -17,7 +17,7 @@ const DaySession: React.FC<TDaySessionProps> = ({ session, groupEvents }) => {
         <FormattedMessage id={`DayColumn.Session.${session}`} />
       </div>
       {groupEvents.map((event: Event, index: number) => (
-        <EventCard key={event.resource?.id} event={event} index={index} />
+        <OrderEventCard key={event.resource?.id} event={event} index={index} />
       ))}
     </div>
   );

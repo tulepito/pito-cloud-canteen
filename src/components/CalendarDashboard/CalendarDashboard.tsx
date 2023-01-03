@@ -7,8 +7,8 @@ import type { Event, ViewsProps } from 'react-big-calendar';
 import { Calendar, luxonLocalizer, Views } from 'react-big-calendar';
 
 import css from './CalendarDashboard.module.scss';
-import EventCard from './components/EventCard/EventCard';
 import createMonthViewWrapper from './components/MonthView/withMonthViewWrapper';
+import OrderEventCard from './components/OrderEventCard/OrderEventCard';
 import Toolbar from './components/Toolbar/Toolbar';
 import withWeekViewWrapper from './components/WeekView/withWeekViewWrapper';
 import type { TCalendarItemCardComponents } from './helpers/types';
@@ -24,7 +24,7 @@ type TCalendarDashboard = {
 const CalendarDashboard: React.FC<TCalendarDashboard> = ({
   defaultDate: propsDefaultDate,
   events = [],
-  renderEvent = EventCard,
+  renderEvent = OrderEventCard,
   companyLogo,
   components,
 }) => {

@@ -6,11 +6,12 @@ export const EVENTS_MOCKUP = [
       status: 'notJoined',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -35,13 +36,7 @@ export const EVENTS_MOCKUP = [
       daySession: 'MORNING_SESSION',
       status: 'joined',
       type: 'dailyMeal',
-      deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
-      },
+      deliveryAddress: {},
       restaurant: {
         id: '12',
         name: 'Vua Hải Sản',
@@ -67,11 +62,12 @@ export const EVENTS_MOCKUP = [
       status: 'empty',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -98,11 +94,12 @@ export const EVENTS_MOCKUP = [
       status: 'empty',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -129,11 +126,12 @@ export const EVENTS_MOCKUP = [
       status: 'joined',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -159,11 +157,12 @@ export const EVENTS_MOCKUP = [
       status: 'empty',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -190,11 +189,12 @@ export const EVENTS_MOCKUP = [
       status: 'empty',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -221,11 +221,12 @@ export const EVENTS_MOCKUP = [
       status: 'empty',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -252,11 +253,12 @@ export const EVENTS_MOCKUP = [
       status: 'empty',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -282,11 +284,12 @@ export const EVENTS_MOCKUP = [
       status: 'joined',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -313,11 +316,12 @@ export const EVENTS_MOCKUP = [
       status: 'empty',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -343,11 +347,12 @@ export const EVENTS_MOCKUP = [
       status: 'empty',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -373,11 +378,12 @@ export const EVENTS_MOCKUP = [
       status: 'empty',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -403,11 +409,12 @@ export const EVENTS_MOCKUP = [
       status: 'empty',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -433,11 +440,12 @@ export const EVENTS_MOCKUP = [
       status: 'empty',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -463,11 +471,12 @@ export const EVENTS_MOCKUP = [
       status: 'empty',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',
@@ -497,11 +506,12 @@ export const MEAL_PLANS_MOCKUP = [
       status: 'notJoined',
       type: 'dailyMeal',
       deliveryAddress: {
-        address: '133 Duong Ba Trac',
-        ward: '1',
-        district: '8',
-        city: 'Ho Chi Minh',
-        country: 'Vietnam',
+        address:
+          'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
+        origin: {
+          lat: 10.7899885,
+          lng: 106.7505416,
+        },
       },
       restaurant: {
         id: '12',

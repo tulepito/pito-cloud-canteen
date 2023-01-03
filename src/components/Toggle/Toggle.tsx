@@ -7,7 +7,7 @@ import css from './Toggle.module.scss';
 type TToggle = {
   disabled?: boolean;
   status: 'on' | 'off';
-  onClick: (value: boolean) => void;
+  onClick?: (value: boolean) => void;
   className?: string;
   label?: string;
   id?: string;
@@ -29,7 +29,10 @@ const Toggle = (props: TToggle) => {
     if (disabled) {
       return;
     }
-    onClick(!switchControl.value);
+    if (onClick) {
+      onClick(!switchControl.value);
+    }
+
     switchControl.toggle();
   };
 

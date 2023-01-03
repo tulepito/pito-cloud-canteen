@@ -6,7 +6,10 @@ import type {
   TAvailabilityPlan,
   TCurrentUser,
   TLineItemCode,
+  TListing,
+  TOwnListing,
   TTimeSlot,
+  TTransaction,
   TUser,
 } from './types';
 
@@ -399,3 +402,179 @@ export const entityRefs = (entities: any) =>
     id: entity.id,
     type: entity.type,
   }));
+
+export const CURRENT_USER = (user: TCurrentUser) => {
+  const ensuredUser = ensureCurrentUser(user);
+  const id = ensuredUser?.id?.uuid;
+  const profile = ensuredUser?.attributes?.profile || {};
+  const { privateData, publicData, protectedData, metadata } = profile;
+  return {
+    getId: () => {
+      return id;
+    },
+    getFullData: () => {
+      return ensuredUser || {};
+    },
+    getProfile: () => {
+      return profile || {};
+    },
+    getMetadata: () => {
+      return metadata || {};
+    },
+    getProtectedData: () => {
+      return protectedData || {};
+    },
+    getPrivateData: () => {
+      return privateData || {};
+    },
+    getPublicData: () => {
+      return publicData || {};
+    },
+  };
+};
+
+export const USER = (user: TUser) => {
+  const ensuredUser = ensureUser(user);
+  const id = ensuredUser?.id?.uuid;
+  const attributes = ensuredUser?.attributes || {};
+  const profile = attributes?.profile || {};
+  const { privateData, publicData, protectedData, metadata } = profile;
+  return {
+    getId: () => {
+      return id;
+    },
+    getFullData: () => {
+      return ensuredUser || {};
+    },
+    getAttributes: () => {
+      return attributes || {};
+    },
+    getProfile: () => {
+      return profile || {};
+    },
+    getMetadata: () => {
+      return metadata || {};
+    },
+    getProtectedData: () => {
+      return protectedData || {};
+    },
+    getPrivateData: () => {
+      return privateData || {};
+    },
+    getPublicData: () => {
+      return publicData || {};
+    },
+  };
+};
+
+export const LISTING = (listing: TListing) => {
+  const ensuredListing = ensureListing(listing);
+  const id = ensuredListing?.id?.uuid;
+  const attributes = ensuredListing?.attributes;
+  const { privateData, publicData, protectedData, metadata } = attributes || {};
+
+  return {
+    getId: () => {
+      return id;
+    },
+    getFullData: () => {
+      return ensuredListing || {};
+    },
+    getAttributes: () => {
+      return attributes || {};
+    },
+    getMetadata: () => {
+      return metadata || {};
+    },
+    getProtectedData: () => {
+      return protectedData || {};
+    },
+    getPrivateData: () => {
+      return privateData || {};
+    },
+    getPublicData: () => {
+      return publicData || {};
+    },
+  };
+};
+
+export const OWN_LISTING = (listing: TOwnListing) => {
+  const ensuredListing = ensureOwnListing(listing);
+  const id = ensuredListing?.id?.uuid;
+  const attributes = ensuredListing?.attributes;
+  const { privateData, publicData, protectedData, metadata } = attributes;
+
+  return {
+    getId: () => {
+      return id;
+    },
+    getFullData: () => {
+      return ensuredListing || {};
+    },
+    getAttributes: () => {
+      return attributes || {};
+    },
+    getMetadata: () => {
+      return metadata || {};
+    },
+    getProtectedData: () => {
+      return protectedData || {};
+    },
+    getPrivateData: () => {
+      return privateData || {};
+    },
+    getPublicData: () => {
+      return publicData || {};
+    },
+  };
+};
+
+export const TRANSACTION = (transaction: TTransaction) => {
+  const ensuredTransaction = ensureTransaction(transaction);
+  const id = ensuredTransaction?.id?.uuid;
+  const attributes = ensuredTransaction?.attributes;
+  const { privateData, publicData, protectedData, metadata } = attributes || {};
+  return {
+    getId: () => {
+      return id;
+    },
+    getFullData: () => {
+      return ensuredTransaction || {};
+    },
+    getAttributes: () => {
+      return attributes || {};
+    },
+    getMetadata: () => {
+      return metadata || {};
+    },
+    getProtectedData: () => {
+      return protectedData || {};
+    },
+    getPrivateData: () => {
+      return privateData || {};
+    },
+    getPublicData: () => {
+      return publicData || {};
+    },
+  };
+};
+
+export const TRANSACTION_WITH_EXTENDED_DATA = (transaction: TTransaction) => {
+  const originTransaction = TRANSACTION(transaction);
+  const { listing, provider, booking, customer } = transaction;
+  return {
+    ...originTransaction,
+    getListing: () => {
+      return listing || {};
+    },
+    getBooking: () => {
+      return booking || {};
+    },
+    getCustomer: () => {
+      return customer || {};
+    },
+    getProvider: () => {
+      return provider || {};
+    },
+  };
+};

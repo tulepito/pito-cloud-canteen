@@ -1,6 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import '@src/styles/globals.scss';
 import '@src/styles/nprogress.scss';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 import AuthGuard from '@components/Guards/AuthGuard';
 import PermissionGuard from '@components/Guards/PermissionGuard';
@@ -12,7 +13,6 @@ import type { AppProps } from 'next/app';
 import { Router } from 'next/router';
 import Script from 'next/script';
 import nProgress from 'nprogress';
-import React from 'react';
 import { Provider } from 'react-redux';
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -29,7 +29,7 @@ type AppCustomProps = {
 
 const font = Manrope({
   subsets: ['vietnamese', 'latin'],
-  weight: ['400', '500', '700'],
+  weight: ['400', '500', '600', '700'],
 });
 
 const MyApp = ({
@@ -39,6 +39,7 @@ const MyApp = ({
 }: AppProps & AppCustomProps) => {
   const { store, props } = wrapper.useWrappedStore(restProps);
   const persistence = persistStore(store);
+
   return (
     <main className={font.className}>
       <TranslationProvider>

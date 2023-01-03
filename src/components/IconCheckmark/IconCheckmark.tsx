@@ -11,10 +11,12 @@ type TIconCheckmark = {
   rootClassName?: string;
   className?: string;
   size?: Size;
+  width?: number;
+  height?: number;
 };
 
 const IconCheckmark = (props: TIconCheckmark) => {
-  const { rootClassName, className, size = Size.BIG } = props;
+  const { rootClassName, className, size = Size.BIG, height, width } = props;
   const classes = classNames(rootClassName || css.root, className);
 
   let content = null;
@@ -23,8 +25,8 @@ const IconCheckmark = (props: TIconCheckmark) => {
       content = (
         <svg
           className={classes}
-          width="16"
-          height="12"
+          width={width}
+          height={height}
           xmlns="http://www.w3.org/2000/svg">
           <path
             d="M14 2l-8 8-4-4"
