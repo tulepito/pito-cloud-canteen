@@ -146,6 +146,7 @@ const orderSlice = createSlice({
       .addCase(createOrder.pending, (state) => ({
         ...state,
         createOrderInProcess: true,
+        createOrderError: null,
       }))
       .addCase(createOrder.fulfilled, (state, { payload }) => ({
         ...state,
