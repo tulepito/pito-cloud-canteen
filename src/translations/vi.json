@@ -569,5 +569,6 @@
   "SelectFoodModal.selectedTitle": "Đã chọn: {foodCount} món",
   "SelectFoodForm.findFoodByName": "Tìm kiếm món ăn",
   "SelectFoodForm.selectedFood": "Món đã chọn",
-  "SelectFoodForm.saveResult": "Lưu kết quả"
+  "SelectFoodForm.saveResult": "Lưu kết quả",
+  "AdminSidebar.dashboardLabel": "Trang chủ"
 }
