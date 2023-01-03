@@ -6,6 +6,9 @@ import { useIntl } from 'react-intl';
 
 import css from './PerPackageField.module.scss';
 
+const VNDIcon = () => {
+  return <div className={css.vndIcon}>đ</div>;
+};
 const PerPackageField = () => {
   const intl = useIntl();
   const perPackRequiredMessage = intl.formatMessage({
@@ -18,8 +21,8 @@ const PerPackageField = () => {
       </div>
       <div className={css.fieldGroup}>
         <FieldTextInput
-          id="perPack"
-          name="perPack"
+          id="packagePerMember"
+          name="packagePerMember"
           label={intl.formatMessage({
             id: 'PerPackageField.label',
           })}
@@ -28,7 +31,7 @@ const PerPackageField = () => {
           })}
           type="number"
           className={css.numberInput}
-          // rightIcon={<div className={css.vndIcon}>đ</div>}
+          rightIcon={<VNDIcon />}
           validate={required(perPackRequiredMessage)}
         />
 

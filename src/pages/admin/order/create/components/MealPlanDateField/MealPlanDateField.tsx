@@ -21,12 +21,25 @@ const TIME_OPTIONS = [
   '17:00',
   '18:00',
 ];
-const MealPlanDateField = () => {
+
+type MealPlanDateFieldProps = {
+  form: any;
+  values: Record<string, any>;
+};
+const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
+  const { values } = props;
+  const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
+    values;
   const intl = useIntl();
   const today = new Date();
-  const initialStartDate = addDays(today, 2);
+  const initialStartDate = startDateInitialValue
+    ? new Date(startDateInitialValue)
+    : addDays(today, 2);
+  const initialEndDate = endDateInitialValue
+    ? new Date(endDateInitialValue)
+    : null;
   const [startDate, setStartDate] = useState<Date>(initialStartDate);
-  const [endDate, setEndDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>(initialEndDate!);
   const startDateRequiredMessage = intl.formatMessage({
     id: 'MealPlanDateField.startDateRequired',
   });

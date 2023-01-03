@@ -1,6 +1,8 @@
 import FormWizard from '@components/FormWizard/FormWizard';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
 import CalendarPage from '@src/pages/calendar/CalendarPage.page';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import ClientSelector from '../../../StepScreen/ClientSelector/ClientSelector';
@@ -39,8 +41,13 @@ const CreateOrderTab: React.FC<any> = (props) => {
 
 const CreateOrderWizard = () => {
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   const [currentStep, setCurrentStep] = useState<string>(CLIENT_SELECT_TAB);
 
+  useEffect(() => {
+    if (currentStep === CLIENT_SELECT_TAB)
+      dispatch(manageCompaniesThunks.queryCompanies());
+  }, [currentStep, dispatch]);
   const onClick = (tab: string) => () => {
     setCurrentStep(tab);
   };
