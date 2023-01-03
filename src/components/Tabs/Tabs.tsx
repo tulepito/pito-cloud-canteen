@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import type { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import React, { useState } from 'react';
 
 import css from './Tabs.module.scss';
@@ -13,18 +13,33 @@ type TTabsItem = {
 interface ITabsProps {
   defaultActiveKey?: string;
   items: TTabsItem[];
-  onChange?: () => void;
+  onChange?: (params: any) => void;
   contentClassName?: string;
   headerClassName?: string;
 }
 
 const Tabs = (props: ITabsProps) => {
-  const { defaultActiveKey, items, contentClassName, headerClassName } = props;
+  const {
+    defaultActiveKey,
+    items,
+    contentClassName,
+    headerClassName,
+    onChange = () => null,
+  } = props;
   const [activeTabKey, setActiveTabKey] = useState(defaultActiveKey || 1);
 
   const onChangeTab = (tabKey: number) => {
     setActiveTabKey(tabKey);
+    onChange(items[Number(tabKey) - 1]);
   };
+
+  useEffect(() => {
+    onChangeTab(Number(defaultActiveKey || 1));
+  }, [defaultActiveKey]);
+
+  // useEffect(() => {
+  //   onChange(items[Number(activeTabKey) - 1].id);
+  // }, [items, activeTabKey]);
 
   const tabHeader = items.map((item, index) => {
     const { label } = item;
@@ -34,11 +49,16 @@ const Tabs = (props: ITabsProps) => {
     const tabItemClasses = classNames(css.tabHeaderItem, {
       [css.tabActive]: isActiveClass,
     });
+
+    const handleChangeChangeTab = (index: number) => () => {
+      onChangeTab(index + 1);
+    };
+
     return (
       <div
         key={`tab-${index}`}
         className={tabItemClasses}
-        onClick={() => onChangeTab(index + 1)}>
+        onClick={handleChangeChangeTab(index)}>
         <span
           className={classNames(css.tabItemContent, {
             [css.tabActive]: isActiveClass,

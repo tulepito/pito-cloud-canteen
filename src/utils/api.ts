@@ -48,3 +48,6 @@ export const loadOrderDataApi = (orderId: string) =>
 
 export const loadPlanDataApi = (planId: string) =>
   get(`/api/participants/plans/${planId}`);
+
+export const updateParticipantOrderApi = (orderId: string, body: any) =>
+  post(`/api/participants/orders/${orderId}`, body);

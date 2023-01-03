@@ -212,7 +212,7 @@
   "EventCard.mealType.dailyMeal": "Bữa ăn hằng ngày",
   "MealPlanCard.footer.unselect": "Bỏ lựa chọn",
   "MealPlanCard.footer.applyForOtherDays": "Áp dụng cho ngày khác",
-  "EventCard.deliveryAddress": "{address}, P/X. {ward}, quận/huyện {district}, tỉnh/thành phố {city}",
+  "EventCard.deliveryAddress": "{address}",
   "EventCard.remainTime": "Còn {hour}h {minute}p để chọn",
   "MealPlanCard.content.viewMenu": "Xem menu",
   "MonthView.dayInWeekHeader.monday": "Thứ hai",

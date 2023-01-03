@@ -1,4 +1,5 @@
 import Button from '@components/Button/Button';
+import { useAppSelector } from '@hooks/reduxHooks';
 import React from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage } from 'react-intl';
@@ -33,6 +34,10 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
     onSubmit(values);
   };
 
+  const { updateOrderError, updateOrderInProgress } = useAppSelector(
+    (state) => state.ParticipantOrderManagementPage,
+  );
+
   const { form, handleSubmit, values, submitting, hasValidationErrors } =
     useForm<TDishSelectionFormValues>({
       onSubmit: handleCustomSubmit,
@@ -45,6 +50,11 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
 
   const dishSelection = useField('dishSelection', form);
   const disabledSubmit = submitting || hasValidationErrors;
+  const disabledRejectButton = updateOrderInProgress || updateOrderError;
+
+  const hasValues = values && !!values.dishSelection;
+  const rejectSubmitting = !hasValues && updateOrderInProgress;
+  const submitSubmiting = hasValues && updateOrderInProgress;
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>
@@ -69,13 +79,16 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
           type="button"
           className={css.rejectBtn}
           onClick={handleReject}
-          disabled={submitting}>
+          disabled={disabledRejectButton}
+          inProgress={rejectSubmitting}>
           <FormattedMessage id="DishSelectionForm.reject" />
         </Button>
         <Button
           className={css.acceptBtn}
           type="submit"
-          disabled={disabledSubmit}>
+          disabled={disabledSubmit}
+          inProgress={submitSubmiting}
+          spinnerClassName={css.spinnerClassName}>
           <FormattedMessage id="DishSelectionForm.accept" />
         </Button>
       </div>

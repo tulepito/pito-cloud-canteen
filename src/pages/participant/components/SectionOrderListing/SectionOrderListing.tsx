@@ -4,19 +4,23 @@ import Tabs from '@components/Tabs/Tabs';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 
 import css from './SectionOrderListing.module.scss';
 
 type TSectionOrderListingProps = {
   plan: any;
+  onSelectTab: (restaurant: any) => void;
 };
 
-const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({ plan }) => {
+const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
+  plan,
+  onSelectTab,
+}) => {
   const intl = useIntl();
   const router = useRouter();
-  const { planId } = router.query;
+  const { planId, orderDay } = router.query;
   const cartList = useAppSelector((state) => {
     const currentUser = state.user.currentUser;
     const currUserId = currentUser?.id?.uuid;
@@ -26,13 +30,6 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({ plan }) => {
     (state) => state.ParticipantSetupPlanPage.loadDataInProgress,
   );
 
-  const ParticipantSetupPlanPage = useAppSelector(
-    (state) => state.ParticipantSetupPlanPage,
-  );
-
-  console.log('loadDataInProgress', loadDataInProgress);
-  console.log('ParticipantSetupPlanPage', ParticipantSetupPlanPage);
-
   const autoSelectionButtonLabel = intl.formatMessage({
     id: 'SectionOrderListing.autoSelectionButtonLabel',
   });
@@ -41,13 +38,28 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({ plan }) => {
   });
 
   const converDataToTabItem = (plan: any) => {
-    // console.log('loadDataInProgress', loadDataInProgress);
     if (loadDataInProgress) {
       return [
         {
-          label: 'Loading...',
+          label: <Skeleton className={css.loadTitle} />,
           id: 'Loading...',
-          children: <div>Loading...</div>,
+          children: [1, 2, 3].map((item) => (
+            <Skeleton key={item} className={css.loading} />
+          )),
+        },
+        {
+          label: <Skeleton className={css.loadTitle} />,
+          id: 'Loading...',
+          children: [1, 2, 3].map((item) => (
+            <Skeleton key={item} className={css.loading} />
+          )),
+        },
+        {
+          label: <Skeleton className={css.loadTitle} />,
+          id: 'Loading...',
+          children: [1, 2, 3].map((item) => (
+            <Skeleton key={item} className={css.loading} />
+          )),
         },
       ];
     }
@@ -88,13 +100,15 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({ plan }) => {
         label: itemLabel,
         id: item,
         children: <>{childrenList}</>,
+        restaurant: restaurant,
       });
     }
     return convertedData;
   };
 
   const tabItems = converDataToTabItem(plan);
-
+  const defaultActiveKey = tabItems.findIndex((item) => item.id === orderDay);
+  console.log('defaultActiveKey', defaultActiveKey);
   return (
     <div className={css.root}>
       <div className={css.sectionOrderNotify}>
@@ -103,9 +117,12 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({ plan }) => {
       <div className={css.sectionMainOrder}>
         <Tabs
           items={tabItems}
-          defaultActiveKey="1"
+          defaultActiveKey={`${
+            (defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
+          }`}
           contentClassName={css.sectionMainOrderListings}
           headerClassName={css.sectionMainOrderHeader}
+          onChange={onSelectTab}
         />
       </div>
     </div>

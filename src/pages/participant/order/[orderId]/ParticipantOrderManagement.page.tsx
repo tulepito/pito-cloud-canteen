@@ -16,9 +16,10 @@ const ParticipantOrderManagement = () => {
 
   // State
   const [currentView, setCurrentView] = useState(VIEWS.CALENDAR);
+  const currentUser = useAppSelector((state) => state.user.currentUser);
 
   // Hooks
-  const { order, company, restaurant } = useAppSelector(
+  const { order, company, plans, subOrders } = useAppSelector(
     (state) => state.ParticipantOrderManagementPage,
   );
 
@@ -40,7 +41,13 @@ const ParticipantOrderManagement = () => {
         setViewFunction={setCurrentView}
       />
       {currentView === VIEWS.CALENDAR ? (
-        <OrderCalendarView company={company} />
+        <OrderCalendarView
+          company={company}
+          order={order}
+          plans={plans}
+          subOrders={subOrders}
+          currentUser={currentUser}
+        />
       ) : (
         <OrderListView />
       )}

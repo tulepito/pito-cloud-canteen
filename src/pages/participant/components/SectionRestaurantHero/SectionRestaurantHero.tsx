@@ -15,7 +15,9 @@ const SectionRestaurantHero: React.FC<TSectionRestaurantHeroProps> = ({
 }) => {
   const intl = useIntl();
 
-  const heroImage = listing?.images[0];
+  const heroImage =
+    listing?.images?.[0] ||
+    'https://res.cloudinary.com/eventors/image/upload/f_auto/v1584529827/eventors/hero-back_lbofw9.png';
   const { title } = LISTING(listing).getAttributes();
   const parsedOrderDay = DateTime.fromMillis(Number(orderDay));
   const weekDay = parsedOrderDay.get('day');

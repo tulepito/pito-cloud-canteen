@@ -39,15 +39,12 @@ const loadData = createAsyncThunk(
 export const ParticipantSetupPlanThunks = { loadData };
 
 const participantSetupPlanSlice = createSlice({
-  name: 'ParticipantSetupPlan',
+  name: 'ParticipantSetupPlanPage',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(loadData.pending, (state) => {
-        console.log('hereeeee');
-        state.loadDataInProgress = true;
-        state.loadDataError = null;
         return {
           ...state,
           loadDataInProgress: true,
@@ -55,7 +52,6 @@ const participantSetupPlanSlice = createSlice({
         };
       })
       .addCase(loadData.fulfilled, (state, { payload }) => {
-        console.log('hereeeee 2');
         return {
           ...state,
           ...payload,
