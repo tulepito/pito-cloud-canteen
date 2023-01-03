@@ -167,10 +167,14 @@
   color: #03acca;
   border-radius: 4px;
   font-size: 14px;
+  max-width: 200px;
+  word-break: break-all;
 }
 
 .services {
   padding: 0 0 0 20px;
+  max-width: 200px;
+  word-break: break-all;
   li {
     margin-bottom: 10px;
     font-size: 16px;

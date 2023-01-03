@@ -155,6 +155,7 @@ export const PACKAGING_OPTIONS = [
     key: OTHER_OPTION,
     label: 'Khác',
     hasTextInput: true,
+    textPlaceholder: 'Nhập bao bì thường sử dụng',
   },
 ];
 
@@ -278,6 +279,7 @@ export const CATEGORY_OPTIONS = [
     key: OTHER_OPTION,
     label: 'Khác',
     hasTextInput: true,
+    textPlaceholder: 'Nhập phong cách ẩm thực khác',
   },
 ];
 
@@ -302,5 +304,6 @@ export const EXTRA_SERVICE_OPTIONS = [
     key: OTHER_OPTION,
     label: 'Khác',
     hasTextInput: true,
+    textPlaceholder: 'Nhập dịch vụ khác',
   },
 ];

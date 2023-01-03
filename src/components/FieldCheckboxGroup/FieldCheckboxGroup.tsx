@@ -63,6 +63,7 @@ const FieldCheckboxRenderer: React.FC<TFieldCheckboxRenderer> = (props) => {
                 label={option.label}
                 value={option.key}
                 hasTextInput={option.hasTextInput}
+                textPlaceholder={option.textPlaceholder}
               />
             </li>
           );

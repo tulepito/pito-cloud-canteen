@@ -67,6 +67,7 @@ const FieldCheckbox = (props: any) => {
     customOnChange,
     disabled,
     hasTextInput,
+    textPlaceholder,
     ...rest
   } = props;
 
@@ -129,6 +130,7 @@ const FieldCheckbox = (props: any) => {
                   <FieldTextInput
                     showText
                     disabled={disabled}
+                    placeholder={textPlaceholder}
                     className={css.textInput}
                     name={`${input.name}${CHECKBOX_TEXT_PREFIX}`}
                     id={`${input.name}${CHECKBOX_TEXT_PREFIX}`}
