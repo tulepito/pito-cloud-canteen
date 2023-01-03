@@ -108,3 +108,10 @@
   font-weight: $fontWeightSemiBold;
   margin-left: 2px;
 }
+
+.textValue {
+  word-break: break-all;
+  border: 1px solid $neutralGray6;
+  padding: 7px;
+  border-radius: 5px;
+}

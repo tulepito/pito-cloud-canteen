@@ -241,58 +241,60 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                 </div>
               </div>
               <div className={css.configFields}>
-                <p className={css.label}>
-                  {intl.formatMessage({
-                    id: 'EditPartnerPreviewForm.availablePlan',
-                  })}
-                </p>
                 <div className={css.configField}>
-                  <table
-                    className={classNames(css.field, css.availabilityTable)}>
-                    <thead>
-                      <tr>
-                        <th>
-                          {intl.formatMessage({
-                            id: 'EditPartnerPreviewForm.day',
-                          })}
-                        </th>
-                        <th>
-                          {intl.formatMessage({
-                            id: 'EditPartnerPreviewForm.time',
-                          })}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.keys(entries).map((day: any) => {
-                        const isEntries = Array.isArray(entries[day]);
-                        return isEntries ? (
-                          entries[day]?.map((e: any, eIndx: number) => (
-                            <tr key={`${e.startTime}.${eIndx}`}>
-                              {eIndx === 0 && (
-                                <td rowSpan={entries[day].length}>
-                                  {intl.formatMessage({
-                                    id: `FieldAvailability.${day}Label`,
-                                  })}
-                                </td>
-                              )}
-                              <td>
-                                {e.startTime} : {e.endTime}
-                              </td>
-                            </tr>
-                          ))
-                        ) : (
-                          <></>
-                        );
+                  <div className={css.field}>
+                    <div className={css.configLabel}>
+                      {intl.formatMessage({
+                        id: 'EditPartnerPreviewForm.availablePlan',
                       })}
-                    </tbody>
-                  </table>
+                    </div>
+                    <table
+                      className={classNames(css.field, css.availabilityTable)}>
+                      <thead>
+                        <tr>
+                          <th>
+                            {intl.formatMessage({
+                              id: 'EditPartnerPreviewForm.day',
+                            })}
+                          </th>
+                          <th>
+                            {intl.formatMessage({
+                              id: 'EditPartnerPreviewForm.time',
+                            })}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.keys(entries).map((day: any) => {
+                          const isEntries = Array.isArray(entries[day]);
+                          return isEntries ? (
+                            entries[day]?.map((e: any, eIndx: number) => (
+                              <tr key={`${e.startTime}.${eIndx}`}>
+                                {eIndx === 0 && (
+                                  <td rowSpan={entries[day].length}>
+                                    {intl.formatMessage({
+                                      id: `FieldAvailability.${day}Label`,
+                                    })}
+                                  </td>
+                                )}
+                                <td>
+                                  {e.startTime} : {e.endTime}
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <></>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                   <div className={classNames(css.field, css.restaurantConfig)}>
-                    <p className={css.restaurantConfigLabel}>
+                    <div className={css.configLabel}>
                       {intl.formatMessage({
                         id: 'EditPartnerForm.retaurantConfigLabel',
                       })}
-                    </p>
+                    </div>
                     <Field name="vat" id="vat">
                       {(vatFieldProps: any) => {
                         const { input } = vatFieldProps;

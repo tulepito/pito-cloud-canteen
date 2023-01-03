@@ -25,6 +25,7 @@ interface InputComponentProps extends FieldRenderProps<string, any> {
   leftIcon?: TIconComponent;
   rightIcon?: TIconComponent;
   required?: boolean;
+  showText?: boolean;
 }
 
 const FieldTextInputComponent = (props: InputComponentProps) => {
@@ -45,6 +46,7 @@ const FieldTextInputComponent = (props: InputComponentProps) => {
     leftIcon,
     rightIcon,
     required,
+    showText = false,
     ...rest
   } = props;
 
@@ -126,13 +128,17 @@ const FieldTextInputComponent = (props: InputComponentProps) => {
           {required && <span className={labelRequiredRedStar}>*</span>}
         </label>
       )}
-      <div className={inputContainerClasses}>
-        {!!leftIcon && (
-          <div className={css.leftIconContainer}>{leftIconElement}</div>
-        )}
-        <input {...inputProps} />
-        <div className={css.rightIconContainer}>{rightIconElement}</div>
-      </div>
+      {disabled && showText ? (
+        <p className={css.textValue}>{input.value}</p>
+      ) : (
+        <div className={inputContainerClasses}>
+          {!!leftIcon && (
+            <div className={css.leftIconContainer}>{leftIconElement}</div>
+          )}
+          <input {...inputProps} />
+          <div className={css.rightIconContainer}>{rightIconElement}</div>
+        </div>
+      )}
       <ValidationError fieldMeta={fieldMeta} />
     </div>
   );
