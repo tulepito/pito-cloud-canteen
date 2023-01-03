@@ -51,6 +51,9 @@
       &.active {
         border-radius: 8px;
         background-color: $matterColorLight;
+        .sidebarIcon {
+          fill: $marketplaceColorLight;
+        }
       }
 
       .sidebarIcon {

@@ -30,6 +30,58 @@ export const adminPaths = {
   CreateOrder: '/admin/order/create',
 };
 
+// Should be an object => path should has its label
+export const adminRoutes = {
+  Dashboard: {
+    path: '/admin',
+    label: 'Trang chủ',
+  },
+  ManageUsers: {
+    path: '/admin/users',
+    label: 'Quản lý người dùng',
+  },
+  ManageCompanies: {
+    path: '/admin/company',
+    label: 'Quản lý khách hàng',
+  },
+  EditCompany: {
+    path: '/admin/company/[companyId]/edit',
+    label: 'Chỉnh sửa',
+  },
+  CompanyDetails: {
+    path: '/admin/company/[companyId]/edit',
+    label: 'Thông tin khách hàng',
+  },
+  CreateCompany: {
+    path: '/admin/company/create',
+    label: 'Tạo khách hàng',
+  },
+  ManagePartners: {
+    path: '/admin/partner',
+    label: 'Quản lý đối tác',
+  },
+  CreatePartner: {
+    path: '/admin/partner/create',
+    label: 'Tạo đối tác',
+  },
+  EditPartner: {
+    path: '/admin/partner/[restaurantId]/edit',
+    label: 'Chỉnh sửa',
+  },
+  PartnerDetails: {
+    path: '/admin/partner/[restaurantId]',
+    label: 'Thông tin đối tác',
+  },
+  ManageOrders: {
+    path: '/admin/order',
+    label: 'Quản lý đơn hàng',
+  },
+  CreateOrder: {
+    path: '/admin/order/create',
+    label: 'Tạo đơn hàng',
+  },
+} as const;
+
 export const companyPaths = {
   Home: '/company',
   Detail: '/company/[companyId]',
