@@ -11,12 +11,18 @@ const fetchSubOrder = async (orderDetail: any) => {
   let orderDetailResult = {};
   const integrationSdk = getIntegrationSdk();
   const planKeys = Object.keys(orderDetail);
+
   for (const planKey of planKeys) {
     const planItem = orderDetail[planKey];
-    const { foodList, restaurant: restaurantId } = planItem;
-    const restaurant = denormalisedResponseEntities(
+    const { foodList, restaurant } = planItem;
+    const restaurantId = restaurant?.id;
+
+    // Fetch restaurant data
+    const restaurantData = denormalisedResponseEntities(
       await integrationSdk.listings.show({ id: restaurantId }),
     )[0];
+
+    // Fetch food listings data
     const foodListIds = Object.keys(foodList);
     const foodListData = denormalisedResponseEntities(
       await integrationSdk.listings.query({
@@ -28,7 +34,7 @@ const fetchSubOrder = async (orderDetail: any) => {
       ...orderDetailResult,
       [planKey]: {
         foodList: foodListData,
-        restaurant,
+        restaurant: restaurantData,
       },
     };
   }
