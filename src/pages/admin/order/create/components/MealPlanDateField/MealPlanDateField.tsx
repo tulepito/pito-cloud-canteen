@@ -71,6 +71,9 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           label={intl.formatMessage({ id: 'MealPlanDateField.startDateLabel' })}
           minDate={addDays(today, 2)}
           dateFormat={'EEE, dd MMMM, yyyy'}
+          placeholderText={intl.formatMessage({
+            id: 'MealPlanDateField.startDatePlaceholder',
+          })}
           validate={required(startDateRequiredMessage)}
         />
         <FieldDatePicker
@@ -83,6 +86,9 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           minDate={startDate}
           maxDate={maxEndDate}
           dateFormat={'EEE, dd MMMM, yyyy'}
+          placeholderText={intl.formatMessage({
+            id: 'MealPlanDateField.endDatePlaceholder',
+          })}
           validate={required(endDateRequiredMessage)}
           disabled={!startDate}
         />
