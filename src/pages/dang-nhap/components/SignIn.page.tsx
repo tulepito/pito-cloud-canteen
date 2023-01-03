@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
-import paths from '@src/paths';
+import { generalPaths } from '@src/paths';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -34,7 +34,7 @@ const SignInPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push(paths.HomePage);
+      router.push(generalPaths.Home);
     }
   }, [isAuthenticated, router]);
 

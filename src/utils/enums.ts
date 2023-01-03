@@ -104,3 +104,14 @@ export enum EListingType {
   partner = 'partner',
   transactionListing = 'transactionListing',
 }
+
+export enum EUserPermission {
+  company = 'company',
+  admin = 'admin',
+  normal = 'normal',
+}
+
+export const startRouteBaseOnPermission = {
+  [EUserPermission.company]: '/company',
+  [EUserPermission.admin]: '/admin',
+};
