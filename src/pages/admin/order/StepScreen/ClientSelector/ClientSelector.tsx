@@ -105,6 +105,9 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
       </div>
       <div className={css.searchInput}>
         <KeywordSearchForm
+          placeholder={intl.formatMessage({
+            id: 'ClientSelector.keywordFieldPlaceholder',
+          })}
           searchValue="searchCompanyName"
           onSubmit={(values: any) => {
             setQueryParams(values);
