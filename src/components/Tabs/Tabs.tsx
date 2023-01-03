@@ -19,6 +19,7 @@ interface ITabsProps {
   onChange?: (params: any) => void;
   contentClassName?: string;
   headerClassName?: string;
+  showNavigation?: boolean;
 }
 
 const Tabs = (props: ITabsProps) => {
@@ -28,6 +29,7 @@ const Tabs = (props: ITabsProps) => {
     contentClassName,
     headerClassName,
     onChange = () => null,
+    showNavigation = false,
   } = props;
   const [activeTabKey, setActiveTabKey] = useState(defaultActiveKey || 1);
 
@@ -88,9 +90,10 @@ const Tabs = (props: ITabsProps) => {
   const headerClasses = classNames(css.tabHeaders, headerClassName);
   const contentClasses = classNames(css.tabPanel, contentClassName);
   return (
-    <div>
-      <div className={css.tabHeaderWrapper}>
-        <div className={headerClassName}>{tabHeader}</div>
+    <div className={showNavigation ? css.tabHeaderWrapper : css.root}>
+      <div className={headerClasses}>{tabHeader}</div>
+      <div className={contentClasses}>{tabContent}</div>
+      {showNavigation && (
         <div className={css.navigateBtn}>
           <InlineTextButton type="button" onClick={goLeft}>
             <IconArrow direction="left" />
@@ -99,12 +102,7 @@ const Tabs = (props: ITabsProps) => {
             <IconArrow direction="right" />
           </InlineTextButton>
         </div>
-      </div>
-      <div className={contentClassName}>{tabContent}</div>
-      <div className={css.root}>
-        <div className={headerClasses}>{tabHeader}</div>
-        <div className={contentClasses}>{tabContent}</div>
-      </div>
+      )}
     </div>
   );
 };
