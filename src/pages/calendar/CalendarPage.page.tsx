@@ -12,7 +12,7 @@ function CalendarPage() {
       <CalendarDashboard
         events={MEAL_PLANS_MOCKUP}
         renderEvent={AddMorePlan}
-        companyLogo="Chu"
+        companyLogo={'Company'}
       />
     </div>
   );

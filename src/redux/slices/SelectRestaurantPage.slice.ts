@@ -9,6 +9,7 @@ type TSelectRestaurantPageSliceInitialState = {
   pagination: TPagination | null;
   selectRestaurantPageError: any;
 
+  foodOfRestaurant: string | null;
   foodList: any[];
   fetchFoodPending: boolean;
   fetchFoodError: any;
@@ -18,6 +19,7 @@ const initialState: TSelectRestaurantPageSliceInitialState = {
   restaurants: null,
   pagination: null,
   selectRestaurantPageError: null,
+  foodOfRestaurant: null,
   foodList: [],
   fetchFoodPending: false,
   fetchFoodError: null,
@@ -56,7 +58,7 @@ const getRestaurantFood = createAsyncThunk(
     });
     const result = await Promise.all(promises);
 
-    return result;
+    return { foodOfRestaurant: restaurantId, foodList: result };
   },
 );
 
@@ -89,7 +91,8 @@ const SelectRestaurantPageSlice = createSlice({
       })
       .addCase(getRestaurantFood.fulfilled, (state, { payload }) => {
         state.fetchFoodPending = false;
-        state.foodList = payload;
+        state.foodList = payload.foodList;
+        state.foodOfRestaurant = payload.foodOfRestaurant;
       })
       .addCase(getRestaurantFood.rejected, (state, { error }) => {
         state.fetchFoodPending = false;

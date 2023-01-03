@@ -8,12 +8,12 @@ import { shallowEqual } from 'react-redux';
 
 import ClientSelector from '../../../StepScreen/ClientSelector/ClientSelector';
 // eslint-disable-next-line import/no-cycle, import/no-named-as-default
-import MealPlanCreator from '../../../StepScreen/MealPlanCreator/MealPlanCreator';
 // eslint-disable-next-line import/no-named-as-default, import/no-cycle
 import MealPlanSetup from '../../../StepScreen/MealPlanSetup/MealPlanSetup';
 // eslint-disable-next-line import/no-cycle
 import ReviewOrder from '../ReviewOrder/ReviewOrder';
 // eslint-disable-next-line import/no-cycle
+import SetupOrderDetail from '../SetupOrderDetail/SetupOrderDetail';
 import css from './CreateOrderWizard.module.scss';
 
 export const CLIENT_SELECT_TAB = 'clientSelect';
@@ -67,7 +67,7 @@ const CreateOrderTab: React.FC<any> = (props) => {
     case MEAL_PLAN_SETUP:
       return <MealPlanSetup goBack={goBack} nextTab={nextTab} />;
     case CREATE_MEAL_PLAN_TAB:
-      return <MealPlanCreator goBack={goBack} nextTab={nextTab} />;
+      return <SetupOrderDetail goBack={goBack} nextTab={nextTab} />;
     case REVIEW_TAB:
       return <ReviewOrder goBack={goBack} />;
     default:

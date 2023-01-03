@@ -1,15 +1,17 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
-.formContainer {
-  @include flexAlign(center, space-between);
-  padding-bottom: 32px;
+.root {
+  .formContainer {
+    @include flexAlign(center, space-between);
+    padding-bottom: 32px;
 
-  .searchInputContainer {
-    width: 320px;
+    .searchInputContainer {
+      width: 320px;
 
-    ::placeholder {
-      color: $neutralGray7;
+      ::placeholder {
+        color: $neutralGray7;
+      }
     }
   }
 }

@@ -8,23 +8,32 @@ import css from './AddMorePlan.module.scss';
 
 type TAddMorePlanProps = {
   className?: string;
-  events?: Event[];
+  events: Event[];
+  date: Date;
+  onClick: (date: Date) => () => void;
 };
 
-const AddMorePlan: React.FC<TAddMorePlanProps> = ({ className, events }) => {
-  return (
-    <div className={classNames(css.root, className)}>
-      <Button className={css.addMore}>
-        <IconPlus className={css.plusIcon} />
-        <FormattedMessage id="AddMorePlan.addMore" />
-      </Button>
-      {(!events || events.length === 0) && (
-        <div className={css.haveNoMeal}>
-          <FormattedMessage id="AddMorePlan.haveNoMeal" />
-        </div>
-      )}
-    </div>
-  );
-};
+const AddMorePlan: React.FC<TAddMorePlanProps> = ({
+  className,
+  events = [],
+  date,
+  onClick,
+}) => (
+  <>
+    {events.length < 1 && (
+      <div className={classNames(css.root, className)}>
+        <Button className={css.addMore} onClick={onClick(date)} type="button">
+          <IconPlus className={css.plusIcon} />
+          <FormattedMessage id="AddMorePlan.addMore" />
+        </Button>
+        {(!events || events.length === 0) && (
+          <div className={css.haveNoMeal}>
+            <FormattedMessage id="AddMorePlan.haveNoMeal" />
+          </div>
+        )}
+      </div>
+    )}
+  </>
+);
 
 export default AddMorePlan;

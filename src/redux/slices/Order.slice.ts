@@ -110,11 +110,16 @@ const orderSlice = createSlice({
       };
     },
     updateDraftMealPlan: (state, { payload }) => {
+      const { orderDetail, ...restPayload } = payload;
+      const { orderDetail: oldOrderDetail } = state.draftOrder;
+      const updatedOrderDetailData = { ...oldOrderDetail, ...orderDetail };
+
       return {
         ...state,
         draftOrder: {
           ...state.draftOrder,
-          ...payload,
+          ...restPayload,
+          orderDetail: updatedOrderDetailData,
         },
       };
     },
