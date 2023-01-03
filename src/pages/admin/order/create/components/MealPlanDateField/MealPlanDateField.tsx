@@ -2,6 +2,7 @@ import FieldDatePicker from '@components/FieldDatePicker/FieldDatePicker';
 import FieldSelect from '@components/FieldSelect/FieldSelect';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
+import addDays from 'date-fns/addDays';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -38,6 +39,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
   const initialEndDate = endDateInitialValue
     ? new Date(endDateInitialValue)
     : null;
+  const today = new Date();
   const [startDate, setStartDate] = useState<Date>(initialStartDate!);
   const [endDate, setEndDate] = useState<Date>(initialEndDate!);
   const startDateRequiredMessage = intl.formatMessage({
@@ -53,6 +55,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
   const fieldGroupLayout = classNames(css.fieldGroups, {
     [css.column]: columnLayout,
   });
+  const maxEndDate = startDate ? addDays(startDate, 6) : undefined;
   return (
     <div className={css.container}>
       <div className={css.fieldTitle}>
@@ -66,7 +69,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           onChange={(date: Date) => setStartDate(date)}
           className={css.customInput}
           label={intl.formatMessage({ id: 'MealPlanDateField.startDateLabel' })}
-          minDate={initialStartDate}
+          minDate={today}
           dateFormat={'EEE, dd MMMM, yyyy'}
           validate={required(startDateRequiredMessage)}
         />
@@ -78,8 +81,10 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           label={intl.formatMessage({ id: 'MealPlanDateField.endDateLabel' })}
           className={css.customInput}
           minDate={startDate}
+          maxDate={maxEndDate}
           dateFormat={'EEE, dd MMMM, yyyy'}
           validate={required(endDateRequiredMessage)}
+          disabled={!startDate}
         />
         <FieldSelect
           id="deliveryHour"
