@@ -20,13 +20,19 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   orderId,
 }) => {
   const intl = useIntl();
+
   const cartList = useAppSelector((state: any) => {
     const currentUser = state.user.currentUser;
     const currUserId = currentUser?.id?.uuid;
     return state.shopingCart.orders?.[currUserId]?.[planId || 1];
   });
   const plan = useAppSelector((state) => state.ParticipantSetupPlanPage.plan);
+  const submitDataInprogress = useAppSelector(
+    (state) => state.ParticipantSetupPlanPage.submitDataInprogress,
+  );
+
   const dispatch = useAppDispatch();
+
   const handleRemoveItem = (dayId: string) => () => {
     dispatch(shopingCartThunks.removeFromCart({ planId, dayId }));
   };
@@ -89,7 +95,11 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
         )}
       </div>
       <div className={css.sectionFooter}>
-        <Button fullWidth onClick={handleSubmit}>
+        <Button
+          fullWidth
+          onClick={handleSubmit}
+          disabled={submitDataInprogress}
+          inProgress={submitDataInprogress}>
           {completeOrderButtonLabel}
         </Button>
         <InlineTextButton
