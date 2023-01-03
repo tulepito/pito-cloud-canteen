@@ -49,14 +49,13 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     page: current,
     perPage: pageSize = 100,
   } = pagination || {};
-  const paginationProps = { total, defaultCurrent: current, pageSize };
+  const paginationProps = { total, current, pageSize };
   const showModalCondition =
     isModalOpen && !fetchFoodPending && !!currentRestaurant;
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   let currDebounceRef = debounceRef.current;
 
   const dateTime = DateTime.fromJSDate(selectedDate);
-
   const formattedDate = dateTime.toFormat('dd/MM/yyyy');
   const labelForBadge = `Cho ngày ${formattedDate} - ${weekDayFormatFromDateTime(
     dateTime,
