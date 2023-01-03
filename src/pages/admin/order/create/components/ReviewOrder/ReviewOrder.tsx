@@ -3,8 +3,7 @@ import Form from '@components/Form/Form';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
-import { getPersistState } from '@helpers/persistHelper';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { updateDraftMealPlan } from '@redux/slices/Order.slice';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
@@ -13,6 +12,7 @@ import { DateTime } from 'luxon';
 import React, { useMemo } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-intl/src/utils';
 
 // eslint-disable-next-line import/no-cycle
 // eslint-disable-next-line import/no-cycle
@@ -174,10 +174,11 @@ const ReviewContent: React.FC<any> = (props) => {
     foodList,
     deliveryHour,
     deliveryAddress = {},
-    restaurantName,
-    phoneNumber,
+    restaurant,
     order,
   } = props;
+
+  const { restaurantName, phoneNumber } = restaurant;
 
   const { address } = deliveryAddress;
   const intl = useIntl();
@@ -192,12 +193,12 @@ const ReviewContent: React.FC<any> = (props) => {
     };
   }) as any;
 
-  const { orderDetails = {} } = order;
+  const { orderDetail = {} } = order;
 
-  const orderDetailsAsArray = Object.keys(orderDetails).map((key) => {
+  const orderDetailsAsArray = Object.keys(orderDetail).map((key) => {
     return {
       date: key,
-      ...orderDetails[key],
+      ...orderDetail[key],
     };
   }) as any;
 
@@ -311,26 +312,27 @@ type TReviewOrder = {
 };
 
 const parseDataToReviewTab = (values: any) => {
-  const { orderDetails = {}, ...rest } = values || {};
-  const items = Object.keys(orderDetails).map((key: any) => {
+  const { orderDetail = {}, ...rest } = values || {};
+  const items = Object.keys(orderDetail).map((key: any) => {
     return {
       key,
       label: parseTimestaimpToFormat(Number(key)),
       childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
-      childrenProps: { ...orderDetails[key], ...rest, order: values },
+      childrenProps: { ...orderDetail[key], ...rest, order: values },
     };
   });
   return items;
 };
 
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
-  const { orderDetails } =
+  const { draftOrder } = useAppSelector((state) => state.Order, shallowEqual);
+
+  const { orderDetail } =
     useMemo(() => {
-      const { draftOrder } = getPersistState('Order');
       return {
-        orderDetails: parseDataToReviewTab(draftOrder),
+        orderDetail: parseDataToReviewTab(draftOrder),
       };
-    }, []) || {};
+    }, [draftOrder]) || {};
 
   const dispatch = useAppDispatch();
 
@@ -351,7 +353,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
           const { handleSubmit, goBack } = fieldRenderProps;
           return (
             <Form onSubmit={handleSubmit}>
-              <Tabs items={orderDetails as any} />
+              <Tabs items={orderDetail as any} />
               <NavigateButtons goBack={goBack} />
             </Form>
           );

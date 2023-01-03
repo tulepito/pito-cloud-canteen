@@ -31,15 +31,16 @@ export const TABS = [
 
 export const CREATE_ORDER_STEP_LOCAL_STORAGE_NAME = 'orderStep';
 
-const tabCompleted = (order: any, tab: string) => {
-  const { clientId, deliveryAddress, staffName } = order || {};
+const tabCompleted = (draftOrder: any, tab: string) => {
+  const { clientId, deliveryAddress, staffName, orderDetail } =
+    draftOrder || {};
   switch (tab) {
     case CLIENT_SELECT_TAB:
       return clientId;
     case MEAL_PLAN_SETUP:
       return deliveryAddress;
     case CREATE_MEAL_PLAN_TAB:
-      return true;
+      return orderDetail;
     case REVIEW_TAB:
       return !!staffName;
     default:

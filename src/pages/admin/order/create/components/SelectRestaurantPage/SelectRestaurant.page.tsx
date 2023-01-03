@@ -97,6 +97,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     const submitRestaurantData = {
       id: currRestaurantId,
       restaurantName: currentRestaurant?.attributes?.title,
+      phoneNumber: currentRestaurant?.attributes?.publicData?.phoneNumber,
     };
 
     onSubmitRestaurant({
