@@ -32,7 +32,7 @@ const SearchRestaurantFormComponent: React.FC<
   const { handleSubmit, onSelectRestaurant, selectRestaurantDisable } = props;
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit} className={css.root}>
       <div className={css.formContainer}>
         <div className={css.searchInputContainer}>
           <FieldTextInput

@@ -13,14 +13,25 @@ import type { TSelectRestaurantFormValues } from './components/RestaurantTable/S
 import SearchRestaurantForm from './components/SearchRestaurantForm/SearchRestaurantForm';
 import css from './SelectRestaurantPage.module.scss';
 
-const SelectRestaurantPage = () => {
+type TSelectRestaurantPageProps = {
+  onSubmitRestaurant: (values: Record<string, any>) => void;
+};
+
+const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
+  onSubmitRestaurant,
+}) => {
   const [currentRestaurant, setCurrentRestaurant] = useState<any>();
   const [isSelectedRestaurant, setIsSelectedRestaurant] = useState(false);
   const [currentFoodList, setCurrentFoodList] = useState<string[]>([]);
   const { value: isModalOpen, setValue: setModalOpen } = useBoolean();
   const dispatch = useAppDispatch();
-  const { restaurants, pagination, foodList, fetchFoodPending } =
-    useAppSelector((state) => state.SelectRestaurantPage);
+  const {
+    restaurants,
+    pagination,
+    foodOfRestaurant,
+    foodList,
+    fetchFoodPending,
+  } = useAppSelector((state) => state.SelectRestaurantPage);
 
   const {
     totalItems: total,
@@ -60,23 +71,37 @@ const SelectRestaurantPage = () => {
   };
 
   const handleConfirmSelectRestaurant = () => {
-    console.log(currentRestaurant);
-    console.log(currentFoodList);
+    if (!currentRestaurant) return;
+    const currRestaurantId = currentRestaurant?.id?.uuid;
 
-    if (currentRestaurant) return;
-
-    const currentRestaurantId = currentRestaurant?.id?.uuid;
-
-    if (currentFoodList.length === 0) {
-      dispatch(
-        selectRestaurantPageThunks.getRestaurantFood(currentRestaurantId),
-      );
-      const fetchedFoodList = foodList.map((food) => food?.id?.uuid);
-
-      setCurrentFoodList(fetchedFoodList);
+    if (currentFoodList.length === 0 || currRestaurantId !== foodOfRestaurant) {
+      handleRestaurantClick(currentRestaurant)();
+      return;
     }
 
-    return { restaurant: currentRestaurant, foodIds: currentFoodList };
+    const submitFoodListData = currentFoodList
+      .map((foodId) => {
+        const item = foodList.find((food) => food?.id?.uuid === foodId);
+        const { id, attributes } = item || {};
+        const { title, price } = attributes;
+
+        return { id: id?.uuid, foodName: title, foodPrice: price || 0 };
+      })
+      .reduce((result, curr) => {
+        const { id, foodName, foodPrice } = curr;
+
+        return { ...result, [id]: { foodName, foodPrice } };
+      }, {});
+
+    const submitRestaurantData = {
+      id: currRestaurantId,
+      restaurantName: currentRestaurant?.attributes?.title,
+    };
+
+    onSubmitRestaurant({
+      restaurant: submitRestaurantData,
+      selectedFoodList: submitFoodListData,
+    });
   };
 
   const handleFormChange = (
@@ -102,7 +127,7 @@ const SelectRestaurantPage = () => {
   }, [dispatch]);
 
   return (
-    <section>
+    <section className={css.root}>
       <div className={css.titleContainer}>
         <h1>Danh sach nha hang</h1>
         <Badge

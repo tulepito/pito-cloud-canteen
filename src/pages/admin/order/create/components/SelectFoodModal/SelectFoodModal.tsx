@@ -17,6 +17,7 @@ type TSelectFoodModalProps = {
 
 const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
   const { isOpen, handleClose, items, restaurant, handleSelectFood } = props;
+  const restaurantId = restaurant?.id?.uuid;
   const { title } = restaurant?.attributes || {};
   const [foodCount, setFoodCount] = useState(0);
   const [mounted, setMounted] = useState(false);
@@ -50,11 +51,15 @@ const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
 
   return (
     <Modal title={titlePart} isOpen={isOpen} handleClose={handleClose}>
-      <SelectFoodForm
-        onSubmit={handleSelectFood}
-        items={items}
-        handleFormChange={handleFormChange}
-      />
+      {isOpen && (
+        <SelectFoodForm
+          formId={restaurantId}
+          onSubmit={handleSelectFood}
+          items={items}
+          handleFormChange={handleFormChange}
+          initialValues={{ checkAll: false }}
+        />
+      )}
     </Modal>
   );
 };

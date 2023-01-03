@@ -1,16 +1,17 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+.root {
+  .titleContainer {
+    @include flexAlign(center, flex-start);
+    gap: 16px;
 
-.titleContainer {
-  @include flexAlign(center, flex-start);
-  gap: 16px;
-
-  h1 {
-    @include textTemplate(18px, 700, 23px, null);
+    h1 {
+      @include textTemplate(18px, 700, 23px, null);
+    }
   }
-}
 
-.paginationContainer {
-  margin: 32px 0;
-  @include flexAlign(center, flex-end);
+  .paginationContainer {
+    margin: 32px 0;
+    @include flexAlign(center, flex-end);
+  }
 }

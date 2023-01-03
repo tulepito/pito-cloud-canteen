@@ -41,9 +41,10 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
   props,
 ) => {
   const {
+    formId,
     handleSubmit,
     items = [],
-    values: { checkAll, food: foodIds },
+    values: { checkAll, food: foodIds = [] },
     form,
     handleFormChange,
   } = props;
@@ -62,14 +63,15 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
     form.change('food', newFoodList);
   };
 
-  const selectedFoodList =
-    foodIds?.map((foodId) => {
+  const selectedFoodList = foodIds
+    .map((foodId) => {
       return options.find((option) => foodId === option.key);
-    }) || [];
+    })
+    .filter((item) => item);
 
   const renderSelectedFoodList = () =>
     selectedFoodList.map((foodItem) => {
-      const { key, title, price } = foodItem as any;
+      const { key, title, price } = foodItem || {};
 
       return (
         <div key={key} className={css.selectFoodItem}>
@@ -120,7 +122,10 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
         <div className={css.contentContainer}>
           <div className={css.leftPart}>
             <div>
-              <FieldFoodSelectAll id="food.checkAll" name="checkAll" />
+              <FieldFoodSelectAll
+                id={`${formId}.food.checkAll`}
+                name="checkAll"
+              />
               <FieldFoodSelectCheckboxGroup
                 id="food"
                 name="food"

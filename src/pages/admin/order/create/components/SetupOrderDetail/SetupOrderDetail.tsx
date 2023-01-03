@@ -4,87 +4,111 @@ import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/AddMorePlan';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
 import IconSetting from '@components/IconSetting/IconSetting';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { updateDraftMealPlan } from '@redux/slices/Order.slice';
+import { DateTime } from 'luxon';
+import { useState } from 'react';
 
+import SelectRestaurantPage from '../SelectRestaurantPage/SelectRestaurant.page';
 import css from './SetupOrderDetail.module.scss';
 
 const renderResourcesForCalendar = (orderDetail: Record<string, any>) => {
   const entries = Object.entries(orderDetail);
-  console.log(entries);
 
-  return [
-    {
+  const resources = entries.map((item) => {
+    const [date, data] = item;
+    const { restaurant /* foodList */ } = data;
+
+    return {
       resource: {
-        id: '1',
+        id: date,
         daySession: 'MORNING_SESSION',
         suitableAmount: 10,
-        status: 'notJoined',
         type: 'dailyMeal',
-        deliveryAddress: {
-          address: '133 Duong Ba Trac',
-          ward: '1',
-          district: '8',
-          city: 'Ho Chi Minh',
-          country: 'Vietnam',
-        },
         restaurant: {
-          id: '12',
-          name: 'Vua Hải Sản',
+          id: restaurant.id,
+          name: restaurant.restaurantName,
         },
-        expiredTime: new Date(2023, 11, 29, 16, 0, 0),
-        meal: {
-          dishes: [
-            { key: 'mon_an_1', value: 'Mon an 1' },
-            { key: 'mon_an_2', value: 'Mon an 2' },
-            { key: 'mon_an_3', value: 'Mon an 3' },
-          ],
-        },
+        // expiredTime: new Date(2023, 11, 29, 16, 0, 0),
       },
       title: 'PT3040',
-      start: new Date(2023, 0, 4, 16, 0, 0),
-      end: new Date(2023, 0, 4, 20, 0, 0),
-    },
-  ];
+      start: DateTime.fromMillis(Number(date)).toJSDate(),
+      end: DateTime.fromMillis(Number(date)).plus({ hour: 1 }).toJSDate(),
+    };
+  });
+
+  return resources;
 };
 
 const SetupOrderDetail = () => {
-  const { draftOrder: orderDetail = {} } = useAppSelector(
-    (state) => state.Order,
-  );
+  const {
+    draftOrder: { orderDetail = {} },
+  } = useAppSelector((state) => state.Order);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [isSelectingRestaurant, setIsSelectingRestaurant] = useState(false);
+  const dispatch = useAppDispatch();
 
   const resourcesForCalender = renderResourcesForCalendar(orderDetail);
 
+  const handleAddMorePlanClick = (date: Date) => () => {
+    setSelectedDate(date);
+    setIsSelectingRestaurant(true);
+  };
+
+  const handleSubmitRestaurant = (values: Record<string, any>) => {
+    const { restaurant, selectedFoodList } = values;
+    const updateData = {
+      orderDetail: {
+        [selectedDate.getTime()]: {
+          restaurant,
+          foodList: selectedFoodList,
+        },
+      },
+    };
+
+    dispatch(updateDraftMealPlan(updateData));
+    setIsSelectingRestaurant(false);
+  };
+
   return (
-    <div>
-      <div className={css.titleContainer}>
+    <>
+      {isSelectingRestaurant ? (
+        <SelectRestaurantPage onSubmitRestaurant={handleSubmitRestaurant} />
+      ) : (
         <div>
-          <div className={css.row}>
-            <div>#PT1000</div>
-            <Badge label="Đơn hàng tuần • Capi Creative" />
+          <div className={css.titleContainer}>
+            <div>
+              <div className={css.row}>
+                <div>#PT1000</div>
+                <Badge label="Đơn hàng tuần • Capi Creative" />
+              </div>
+              <div className={css.row}>
+                <IconSetting className={css.settingIcon} />
+                <span>Cài đặt bữa ăn</span>
+              </div>
+            </div>
+            <div className={css.buttonContainer}>
+              <Button disabled>Cập nhật lại đơn hàng</Button>
+              <Button disabled>
+                <span>Gợi ý nhà hàng mới</span>
+              </Button>
+            </div>
           </div>
-          <div className={css.row}>
-            <IconSetting className={css.settingIcon} />
-            <span>Cài đặt bữa ăn</span>
+          <div className={css.calendarContainer}>
+            <CalendarDashboard
+              events={resourcesForCalender}
+              renderEvent={MealPlanCard}
+              companyLogo="Company"
+              components={{
+                contentEnd: (props) => (
+                  <AddMorePlan onClick={handleAddMorePlanClick} {...props} />
+                ),
+              }}
+            />
           </div>
         </div>
-        <div className={css.buttonContainer}>
-          <Button disabled>Cập nhật lại đơn hàng</Button>
-          <Button disabled>
-            <span>Gợi ý nhà hàng mới</span>
-          </Button>
-        </div>
-      </div>
-      <div className={css.calendarContainer}>
-        <CalendarDashboard
-          events={resourcesForCalender}
-          renderEvent={MealPlanCard}
-          companyLogo="Chu"
-          components={{
-            contentEnd: (props) => <AddMorePlan {...props} />,
-          }}
-        />
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
