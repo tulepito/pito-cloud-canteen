@@ -4,7 +4,7 @@ import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { updateDraftMealPlan } from '@redux/slices/Order.slice';
+import { OrderAsyncAction, removeDraftOrder } from '@redux/slices/Order.slice';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
@@ -325,7 +325,10 @@ const parseDataToReviewTab = (values: any) => {
 };
 
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
-  const { draftOrder } = useAppSelector((state) => state.Order, shallowEqual);
+  const { draftOrder, createOrderInProcess, createOrderError } = useAppSelector(
+    (state) => state.Order,
+    shallowEqual,
+  );
 
   const { orderDetail } =
     useMemo(() => {
@@ -336,8 +339,14 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
 
   const dispatch = useAppDispatch();
 
-  const onSubmit = (values: any) => {
-    dispatch(updateDraftMealPlan(values));
+  const onSubmit = async (values: any) => {
+    const { staffName } = values;
+    const { error } = (await dispatch(
+      OrderAsyncAction.createOrder(staffName),
+    )) as any;
+    if (!error) {
+      dispatch(removeDraftOrder());
+    }
   };
 
   return (
@@ -354,7 +363,13 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
           return (
             <Form onSubmit={handleSubmit}>
               <Tabs items={orderDetail as any} />
-              <NavigateButtons goBack={goBack} />
+              <NavigateButtons
+                goBack={goBack}
+                inProgress={createOrderInProcess}
+              />
+              {createOrderError && (
+                <div className={css.error}>{createOrderError}</div>
+              )}
             </Form>
           );
         }}
