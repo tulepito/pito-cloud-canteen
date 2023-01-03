@@ -36,7 +36,9 @@ const OrderDealineField: React.FC<OrderDealineFieldProps> = (props) => {
     deadlineDate: deadlineDateInitialValue,
     startDate: startDateInitialValue,
   } = values;
-  const maxSelectedDate = subDays(startDateInitialValue, 2);
+  const maxSelectedDate = startDateInitialValue
+    ? subDays(startDateInitialValue, 2)
+    : undefined;
   const intl = useIntl();
   const today = new Date();
   const initialDeadlineDate = deadlineDateInitialValue
