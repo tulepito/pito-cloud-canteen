@@ -27,6 +27,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     return state.shopingCart.orders?.[currUserId]?.[planId || 1];
   });
   const plan = useAppSelector((state) => state.ParticipantSetupPlanPage.plan);
+  const orderDays = Object.keys(plan);
   const submitDataInprogress = useAppSelector(
     (state) => state.ParticipantSetupPlanPage.submitDataInprogress,
   );
@@ -87,7 +88,17 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     <div className={css.root}>
       <div className={css.sectionHeader}>
         <p className={css.title}>{sectionTitle}</p>
-        <p className={css.selectedDay}>(2/5 ngày đã chọn)</p>
+        <p className={css.selectedDay}>
+          {intl.formatMessage(
+            {
+              id: 'SectionOrderPanel.numberSelectedDays',
+            },
+            {
+              selectedDays: cartListKeys.length,
+              sumDays: orderDays.length,
+            },
+          )}
+        </p>
       </div>
       <div className={css.sectionBody}>
         {cartListKeys.map((cartKey: string) =>
