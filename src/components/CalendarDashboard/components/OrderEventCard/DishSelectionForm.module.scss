@@ -32,6 +32,12 @@
   background-color: $neutralGray1;
   @include textTemplate(12px, 700, 20px, '');
 }
+.spinnerClassName {
+  stroke: $primaryPri5;
+  width: 24px;
+  height: 24px;
+  stroke-width: 3px;
+}
 
 .rejectBtn {
   margin-right: 8px;

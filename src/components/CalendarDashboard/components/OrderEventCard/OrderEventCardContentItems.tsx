@@ -12,7 +12,8 @@ export type TEventCardContentProps = {
 };
 
 const EventCardContent: React.FC<TEventCardContentProps> = ({ event }) => {
-  const deliAddressObj = event.resource?.deliveryAddress || {};
+  const deliAddress = event.resource?.deliveryAddress || '';
+
   const restaurantObj = event.resource?.restaurant || {};
   const expiredTime = event.resource?.expiredTime as Date;
   const remainTime = DateTime.fromJSDate(new Date()).diff(
@@ -40,10 +41,7 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({ event }) => {
         <FormattedMessage
           id="EventCard.deliveryAddress"
           values={{
-            address: deliAddressObj.address,
-            ward: deliAddressObj.ward,
-            district: deliAddressObj.district,
-            city: deliAddressObj.city,
+            address: deliAddress.address,
           }}
         />
       </OrderEventCardContentItem>

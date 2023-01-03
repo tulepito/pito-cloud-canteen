@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
@@ -12,9 +11,7 @@ const OrderEventCardHeader: React.FC<TOrderEventCardHeaderProps> = ({
   event,
 }) => {
   const mealType = event.resource?.type;
-  const startTime = event.start
-    ? DateTime.fromJSDate(event.start).toLocaleString(DateTime.TIME_24_SIMPLE)
-    : null;
+  const startTime = event.resource.deliveryHour;
 
   return (
     <div className={css.eventCardHeader}>

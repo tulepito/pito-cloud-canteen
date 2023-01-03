@@ -1,10 +1,13 @@
-import { DateTime } from 'luxon';
+import { InlineTextButton } from '@components/Button/Button';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { ParticipantOrderAsyncAction } from '@redux/slices/ParticipantOrderManagementPage';
+import { CURRENT_USER } from '@utils/data';
+import { useRouter } from 'next/router';
 import React from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
 import type { TEventStatus } from '../../helpers/types';
-import { submitDishSelection } from './api.helpers';
 import DishSelectionForm from './DishSelectionForm';
 import OrderEventCardContentItems from './OrderEventCardContentItems';
 import css from './OrderEventCardPopup.module.scss';
@@ -19,14 +22,60 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   event,
   status,
 }) => {
+  const router = useRouter();
+  const user = useAppSelector((state) => state.user.currentUser);
+
+  const dispatch = useAppDispatch();
   const mealType = event.resource?.type;
-  const startTime = event.start
-    ? DateTime.fromJSDate(event.start).toLocaleString(DateTime.TIME_24_SIMPLE)
-    : null;
+  const startTime = event.resource.deliveryHour;
   const dishes: any[] = event.resource?.meal?.dishes || [];
+  const {
+    orderId,
+    subOrderId,
+    id: orderDay,
+    subOrderKey: planId,
+  } = event.resource;
 
   const onSelectDish = (values: any, reject?: boolean) => {
-    submitDishSelection(values, reject);
+    const currentUserId = CURRENT_USER(user).getId();
+    if (reject) {
+      const payload = {
+        updateValues: {
+          orderId,
+          orderDay,
+          planId: subOrderId,
+          memberOrders: {
+            [currentUserId]: {
+              status: 'notJoined',
+              foodId: '',
+            },
+          },
+        },
+        orderId,
+      };
+      dispatch(ParticipantOrderAsyncAction.updateOrder(payload));
+    } else {
+      const payload = {
+        updateValues: {
+          orderId,
+          orderDay,
+          planId: subOrderId,
+          memberOrders: {
+            [currentUserId]: {
+              status: 'joined',
+              foodId: values?.dishSelection,
+            },
+          },
+        },
+        orderId,
+      };
+      dispatch(ParticipantOrderAsyncAction.updateOrder(payload));
+    }
+  };
+
+  const onNavigateToOrderDetail = () => {
+    const to = `/participant/plans/${planId}?orderDay=${orderDay}`;
+    router.push(to);
   };
 
   return (
@@ -47,9 +96,11 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
           <div className={css.formTitle}>
             <FormattedMessage id="EventCard.form.selectFood" />
           </div>
-          <div className={css.viewDetail}>
+          <InlineTextButton
+            className={css.viewDetail}
+            onClick={onNavigateToOrderDetail}>
             <FormattedMessage id="EventCard.form.viewDetail" />
-          </div>
+          </InlineTextButton>
         </div>
         <div className={css.selectDishContent}>
           <DishSelectionForm dishes={dishes} onSubmit={onSelectDish} />
