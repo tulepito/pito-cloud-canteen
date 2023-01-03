@@ -37,6 +37,15 @@
   }
 }
 
+.tabTitle {
+  display: inline-flex;
+  align-items: center;
+}
+
+.tabTitleCheckmark {
+  margin-left: 7px;
+}
+
 .dishSelectionButtons {
   display: flex;
   align-items: center;

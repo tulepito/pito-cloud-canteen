@@ -52,7 +52,7 @@ const SectionCountdown: React.FC<TSectionCountDownProps> = ({
   return (
     <div className={css.root}>
       <p className={css.title}>{sectionTitle}</p>
-      <CountdownTimer deadline={orderDeadline} />
+      <CountdownTimer deadline={orderDeadline} stopAt={0} />
       <p className={css.orderEndAtMessage}>{orderEndAtMessage}</p>
       <div className={css.toggleNotification}>
         <span>

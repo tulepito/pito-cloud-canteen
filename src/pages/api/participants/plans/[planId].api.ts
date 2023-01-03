@@ -44,6 +44,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     case HTTP_METHODS.GET:
       {
         const { planId } = req.query;
+        console.log({ planId });
 
         if (!planId) {
           return res.status(400).json({
@@ -63,12 +64,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               id: orderId,
             }),
           )[0];
-          const plans = await fetchSubOrder(orderDetail);
+          const mealPlan = await fetchSubOrder(orderDetail);
           res.json({
             statusCode: 200,
             meta: {},
             data: {
-              plans,
+              plan: mealPlan,
               order,
             },
           });

@@ -48,6 +48,7 @@
     "react-final-form-hooks": "^2.0.2",
     "react-intl": "^6.2.5",
     "react-joyride": "^2.5.3",
+    "react-loading-skeleton": "^3.1.0",
     "react-redux": "^8.0.5",
     "reselect": "^4.1.7",
     "seedrandom": "^3.0.5",

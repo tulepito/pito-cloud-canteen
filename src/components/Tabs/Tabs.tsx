@@ -5,8 +5,8 @@ import React, { useState } from 'react';
 import css from './Tabs.module.scss';
 
 type TTabsItem = {
-  label: string;
-  key: string;
+  label: ReactNode;
+  id: string | number;
   children: ReactNode | string | number;
 };
 

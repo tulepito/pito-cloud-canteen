@@ -45,3 +45,6 @@ export const updateCompanyStatusApi = (body: any) =>
 
 export const loadOrderDataApi = (orderId: string) =>
   get(`/api/participants/orders/${orderId}`);
+
+export const loadPlanDataApi = (planId: string) =>
+  get(`/api/participants/plans/${planId}`);

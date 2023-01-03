@@ -52,11 +52,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
 
         try {
-          // const currentUserId = '63a51b42-84f2-4520-800f-6c7680189803';
-          // const participant = denormalisedResponseEntities(
-          //   await integrationSdk.users.show({ id: currentUserId }),
-          // );
-
           // Get order data
           const order = denormalisedResponseEntities(
             await integrationSdk.listings.show({

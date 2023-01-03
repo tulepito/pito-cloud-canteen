@@ -8,7 +8,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (apiMethod) {
     case HTTP_METHODS.GET:
       return res.send('Hello participant order API');
-      break;
     default:
       break;
   }

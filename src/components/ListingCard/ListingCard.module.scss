@@ -14,8 +14,10 @@
   }
 }
 .listingImage {
+  position: relative;
   height: 146px;
   width: 100%;
+  overflow: hidden;
 
   & > img {
     width: 100%;
@@ -74,5 +76,18 @@
     border-radius: 50%;
     border: 1px solid $primaryPri5;
     @include flexCenter;
+  }
+  .selectDisabled {
+    border: 1px solid $neutralGray5;
+    cursor: not-allowed;
+
+    & svg path {
+      fill: $neutralGray5;
+    }
+  }
+  .removeDish {
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
   }
 }
