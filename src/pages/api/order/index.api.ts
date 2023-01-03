@@ -1,3 +1,4 @@
+import { calculateGroupMembers } from '@helpers/companyMembers';
 import getAdminAccount from '@services/getAdminAccount';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -21,7 +22,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case HTTP_METHODS.POST:
       try {
-        const { companyId, dealineDate, deadlineHour, ...rest } = req.body;
+        const { companyId, generalInfo, orderDetail } = req.body;
+        const { deadlineDate, deadlineHour, ...rest } = generalInfo;
+        const { selectedGroups } = rest;
         const adminAccount = await getAdminAccount();
         const { currentOrderNumber } = adminAccount.attributes.profile.metadata;
         await integrationSdk.users.updateProfile({
@@ -46,10 +49,32 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         )[0];
 
         const parsedDeadlineDate =
-          DateTime.fromMillis(dealineDate).toFormat('yyyy-MM-dd');
+          DateTime.fromMillis(deadlineDate).toFormat('yyyy-MM-dd');
         const orderDeadline = DateTime.fromISO(
           `${parsedDeadlineDate}T${deadlineHour}:00`,
         ).toMillis();
+        const allMembers = calculateGroupMembers(
+          companyAccount,
+          selectedGroups,
+        );
+        const initialMemberOrder = allMembers.reduce(
+          (result: any, _memberId: any) => ({
+            ...result,
+            [_memberId]: {
+              foodId: '',
+              status: 'empty',
+            },
+          }),
+          {},
+        );
+        const updatedOrderDetail = Object.keys(orderDetail).map(
+          (date: string) => {
+            return {
+              ...orderDetail[date],
+              memberOrders: initialMemberOrder,
+            };
+          },
+        );
         const updatedDraftOrderListingResponse =
           await integrationSdk.listings.update({
             id: draftedOrderListing.id.uuid,
@@ -60,6 +85,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 ...rest,
                 orderDeadline,
               },
+              orderDetail: updatedOrderDetail,
             },
           });
         const updatedDraftOrderListing = denormalisedResponseEntities(
