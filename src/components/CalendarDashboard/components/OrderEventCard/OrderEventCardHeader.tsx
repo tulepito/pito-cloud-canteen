@@ -2,13 +2,15 @@ import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
-import css from './EventCard.module.scss';
+import css from './OrderEventCard.module.scss';
 
-export type TEventCardHeaderProps = {
+export type TOrderEventCardHeaderProps = {
   event: Event;
 };
 
-const EventCardHeader: React.FC<TEventCardHeaderProps> = ({ event }) => {
+const OrderEventCardHeader: React.FC<TOrderEventCardHeaderProps> = ({
+  event,
+}) => {
   const mealType = event.resource?.type;
   const startTime = event.start
     ? DateTime.fromJSDate(event.start).toLocaleString(DateTime.TIME_24_SIMPLE)
@@ -27,4 +29,4 @@ const EventCardHeader: React.FC<TEventCardHeaderProps> = ({ event }) => {
   );
 };
 
-export default EventCardHeader;
+export default OrderEventCardHeader;

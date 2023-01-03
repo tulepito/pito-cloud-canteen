@@ -34,7 +34,7 @@ type AppCustomProps = {
 
 const font = Manrope({
   subsets: ['vietnamese', 'latin'],
-  weight: ['400', '500', '700'],
+  weight: ['400', '500', '600', '700'],
 });
 
 const MyApp = ({

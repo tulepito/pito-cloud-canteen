@@ -5,7 +5,7 @@ import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
-import EventCardContentItem from './EventCardContentItem';
+import OrderEventCardContentItem from './OrderEventCardContentItem';
 
 export type TEventCardContentProps = {
   event: Event;
@@ -26,7 +26,7 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({ event }) => {
   return (
     <>
       {!isExpired && (
-        <EventCardContentItem icon={<IconClock />}>
+        <OrderEventCardContentItem icon={<IconClock />}>
           <FormattedMessage
             id="EventCard.remainTime"
             values={{
@@ -34,9 +34,9 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({ event }) => {
               minute: Math.abs(remainMinutes),
             }}
           />
-        </EventCardContentItem>
+        </OrderEventCardContentItem>
       )}
-      <EventCardContentItem icon={<IconLocation />}>
+      <OrderEventCardContentItem icon={<IconLocation />}>
         <FormattedMessage
           id="EventCard.deliveryAddress"
           values={{
@@ -46,10 +46,10 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({ event }) => {
             city: deliAddressObj.city,
           }}
         />
-      </EventCardContentItem>
-      <EventCardContentItem icon={<IconShop />}>
+      </OrderEventCardContentItem>
+      <OrderEventCardContentItem icon={<IconShop />}>
         {restaurantObj.name}
-      </EventCardContentItem>
+      </OrderEventCardContentItem>
     </>
   );
 };

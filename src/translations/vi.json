@@ -342,5 +342,20 @@
   "EditPartnerMenuForm.extraServiceCheckboxLabel": "Dịch vụ thêm",
   "EditPartnerBasicInfomationForm.createBtn": "Thêm",
   "LocationAutocompleteInput.currentLocation": "Địa chỉ hiện tại",
-  "ManageCompanies.searchStatusLabel": "Chọn trạng thái"
+  "ManageCompanies.searchStatusLabel": "Chọn trạng thái",
+  "SectionOrderHeader.title": "Đơn hàng",
+  "SectionOrderHeader.contactNotification": "Vui lòng liên hệ người tạo đơn để biết thêm chi tiết.",
+  "SectionOrderHeader.list": "Danh sách",
+  "SectionOrderHeader.calendar": "Lịch",
+  "SectionRestaurantHero.orderDayMessage": "Thứ {weekDay}, {fullDay}",
+  "SectionCountDown.sectionTitle": "Thời hạn chọn món",
+  "SectionCountdown.orderEndAtLabel": "Kết thúc vào",
+  "SectionCountdown.orderEndAtMessage": "{label} {hour}, {day} tháng {month} {year}",
+  "SectionCountdown.toggleNotificationLabel": "Nhắc tôi khi đến hạn chọn món",
+  "SectionOrderPanel.completeOrder": "Đăng ký",
+  "SectionOrderPanel.removeAllOrderCartLabel": "Xoá toàn bộ giỏ hàng",
+  "SectionOrderListing.sectionOrderNotify": "Thành viên có thể bỏ qua ngày trong trường hợp không ăn ngày đó.",
+  "SectionOrderPanel.sectionTitle": "Thực đơn của bạn",
+  "SectionOrderListing.autoSelectionButtonLabel": "Chọn giúp tôi",
+  "SectionOrderListing.unCheckThisDateButtonLabel": "Bỏ chọn ngày này"
 }

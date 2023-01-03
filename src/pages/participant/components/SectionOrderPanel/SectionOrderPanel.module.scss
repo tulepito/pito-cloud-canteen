@@ -1,0 +1,50 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  padding: 16px;
+  border: 1px solid $neutralGray4;
+  border-radius: 16px;
+
+  .sectionHeader {
+    margin-bottom: 16px;
+    .title {
+      margin: 0 0 4px;
+      @include textTemplate(18px, 700, 24px, '');
+      color: $neutralGray10;
+    }
+    .selectedDay {
+      margin: 0;
+      padding-bottom: 4px;
+      position: relative;
+      @include textTemplate(14px, 400, 24px, '');
+      color: $neutralGray7;
+      &::after {
+        position: absolute;
+        content: '';
+        bottom: 0;
+        left: 0;
+        width: 37px;
+        height: 1px;
+        background: $primaryPri5;
+      }
+    }
+  }
+
+  .sectionBody {
+    max-height: 264px;
+    height: 264px;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+
+  .sectionFooter {
+    .removeCartLabel {
+      width: 100%;
+      color: $neutralGray10;
+      @include textTemplate(16px, 600, 24px, '');
+      margin: 0;
+    }
+  }
+}

@@ -134,7 +134,6 @@ const GroupSettingPage = () => {
   };
   useEffect(() => {
     const fetchData = async () => {
-      console.log('run useeffect');
       dispatch(addWorkspaceCompanyId(companyId));
       await dispatch(BookerManageCompany.companyInfo());
     };

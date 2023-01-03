@@ -6,16 +6,19 @@ import { FormattedMessage } from 'react-intl';
 import type { TEventStatus } from '../../helpers/types';
 import { submitDishSelection } from './api.helpers';
 import DishSelectionForm from './DishSelectionForm';
-import EventCardContentItems from './EventCardContentItems';
-import css from './EventCardPopup.module.scss';
-import EventCardStatus from './EventCardStatus';
+import OrderEventCardContentItems from './OrderEventCardContentItems';
+import css from './OrderEventCardPopup.module.scss';
+import OrderEventCardStatus from './OrderEventCardStatus';
 
-type TEventCardPopupProps = {
+type TOrderEventCardPopupProps = {
   event: Event;
   status?: TEventStatus;
 };
 
-const EventCardPopup: React.FC<TEventCardPopupProps> = ({ event, status }) => {
+const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
+  event,
+  status,
+}) => {
   const mealType = event.resource?.type;
   const startTime = event.start
     ? DateTime.fromJSDate(event.start).toLocaleString(DateTime.TIME_24_SIMPLE)
@@ -30,14 +33,14 @@ const EventCardPopup: React.FC<TEventCardPopupProps> = ({ event, status }) => {
     <div className={css.root}>
       <div className={css.header}>
         <div className={css.title}>{event.title}</div>
-        {status && <EventCardStatus status={status} />}
+        {status && <OrderEventCardStatus status={status} />}
       </div>
       <div className={css.mealType}>
         <FormattedMessage id={`EventCard.mealType.${mealType}`} />
       </div>
       <div className={css.eventTime}>{startTime}</div>
       <div className={css.divider} />
-      <EventCardContentItems event={event} />
+      <OrderEventCardContentItems event={event} />
       <div className={css.divider} />
       <div className={css.selectFoodForm}>
         <div className={css.selectFoodHeader}>
@@ -56,4 +59,4 @@ const EventCardPopup: React.FC<TEventCardPopupProps> = ({ event, status }) => {
   );
 };
 
-export default EventCardPopup;
+export default OrderEventCardPopup;

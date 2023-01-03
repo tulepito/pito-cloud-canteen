@@ -7,7 +7,7 @@ import css from './Toggle.module.scss';
 type TToggle = {
   disabled?: boolean;
   status: 'on' | 'off';
-  onClick: (value: boolean) => void;
+  onClick?: (value: boolean) => void;
   className?: string;
   label?: string;
 };

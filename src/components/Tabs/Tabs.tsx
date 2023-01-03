@@ -14,10 +14,12 @@ interface ITabsProps {
   defaultActiveKey?: string;
   items: TTabsItem[];
   onChange?: () => void;
+  contentClassName?: string;
+  headerClassName?: string;
 }
 
 const Tabs = (props: ITabsProps) => {
-  const { defaultActiveKey, items } = props;
+  const { defaultActiveKey, items, contentClassName, headerClassName } = props;
   const [activeTabKey, setActiveTabKey] = useState(defaultActiveKey || 1);
 
   const onChangeTab = (tabKey: number) => {
@@ -50,12 +52,12 @@ const Tabs = (props: ITabsProps) => {
   const tabContent = items[+activeTabKey - 1]?.children || '';
 
   // classes setup
-  const headerClassName = classNames(css.tabHeaders);
-  const contentClassName = classNames(css.tabPanel);
+  const headerClasses = classNames(css.tabHeaders, headerClassName);
+  const contentClasses = classNames(css.tabPanel, contentClassName);
   return (
-    <div>
-      <div className={headerClassName}>{tabHeader}</div>
-      <div className={contentClassName}>{tabContent}</div>
+    <div className={css.root}>
+      <div className={headerClasses}>{tabHeader}</div>
+      <div className={contentClasses}>{tabContent}</div>
     </div>
   );
 };

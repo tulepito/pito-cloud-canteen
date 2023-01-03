@@ -1,0 +1,45 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+}
+
+.sectionOrderNotify {
+  background-color: $neutralGray4;
+  color: $neutralGray10;
+  @include textTemplate(14px, 400, 24px, '');
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-bottom: 16px;
+}
+.sectionMainOrder {
+  .sectionMainOrderHeader {
+    margin-bottom: 36px;
+  }
+  .sectionMainOrderListings {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    column-gap: 20px;
+    .listingCard {
+      width: 100%;
+      margin-bottom: 24px;
+
+      @include viewportMedium {
+        width: calc(100% / 2 - 10px);
+      }
+
+      @include viewportLarge {
+        width: calc(100% / 3 - 40px / 3);
+      }
+    }
+  }
+}
+
+.dishSelectionButtons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 24px;
+}

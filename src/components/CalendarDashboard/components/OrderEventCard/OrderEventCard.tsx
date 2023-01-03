@@ -4,18 +4,18 @@ import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
 
 import { EVENT_STATUS } from '../../helpers/constant';
-import css from './EventCard.module.scss';
-import EventCardContentItems from './EventCardContentItems';
-import EventCardHeader from './EventCardHeader';
-import EventCardPopup from './EventCardPopup';
-import EventCardStatus from './EventCardStatus';
+import css from './OrderEventCard.module.scss';
+import OrderEventCardContentItems from './OrderEventCardContentItems';
+import OrderEventCardHeader from './OrderEventCardHeader';
+import OrderEventCardPopup from './OrderEventCardPopup';
+import OrderEventCardStatus from './OrderEventCardStatus';
 
-export type TEventCardProps = {
+export type TOrderEventCardProps = {
   event: Event;
   index: number;
 };
 
-const EventCard: React.FC<TEventCardProps> = ({ event, index }) => {
+const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event, index }) => {
   const status = event.resource?.status;
 
   const expiredTime = event.resource?.expiredTime as Date;
@@ -32,7 +32,7 @@ const EventCard: React.FC<TEventCardProps> = ({ event, index }) => {
     <Tooltip
       overlayClassName={css.tooltipOverlay}
       tooltipContent={
-        !isExpired && <EventCardPopup event={event} status={eventStatus} />
+        !isExpired && <OrderEventCardPopup event={event} status={eventStatus} />
       }
       placement="rightTop"
       trigger="click"
@@ -43,14 +43,17 @@ const EventCard: React.FC<TEventCardProps> = ({ event, index }) => {
           [css.rootBlue]: !isExpired && index % 2 === 1,
           [css.rootOrange]: !isExpired && index % 2 === 0,
         })}>
-        <EventCardHeader event={event} />
+        <OrderEventCardHeader event={event} />
         <div className={css.eventCardContentWrapper}>
-          <EventCardStatus className={css.cardStatus} status={eventStatus} />
-          <EventCardContentItems event={event} />
+          <OrderEventCardStatus
+            className={css.cardStatus}
+            status={eventStatus}
+          />
+          <OrderEventCardContentItems event={event} />
         </div>
       </div>
     </Tooltip>
   );
 };
 
-export default EventCard;
+export default OrderEventCard;

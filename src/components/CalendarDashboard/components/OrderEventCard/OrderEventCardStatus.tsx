@@ -4,14 +4,14 @@ import { FormattedMessage } from 'react-intl';
 
 import { EVENT_STATUS } from '../../helpers/constant';
 import type { TEventStatus } from '../../helpers/types';
-import css from './EventCard.module.scss';
+import css from './OrderEventCard.module.scss';
 
-type TEventCardStatusProps = {
+type TOrderEventCardStatusProps = {
   status: TEventStatus;
   className?: string;
 };
 
-const EventCardStatus: React.FC<TEventCardStatusProps> = ({
+const OrderEventCardStatus: React.FC<TOrderEventCardStatusProps> = ({
   status,
   className,
 }) => {
@@ -28,4 +28,4 @@ const EventCardStatus: React.FC<TEventCardStatusProps> = ({
   );
 };
 
-export default EventCardStatus;
+export default OrderEventCardStatus;

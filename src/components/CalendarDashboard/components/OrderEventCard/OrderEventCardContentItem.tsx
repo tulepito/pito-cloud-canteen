@@ -1,12 +1,12 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 
-import css from './EventCard.module.scss';
+import css from './OrderEventCard.module.scss';
 
 type TEventCardContentItemProps = PropsWithChildren<{
   icon?: ReactNode;
 }>;
 
-const EventCardContentItem: React.FC<TEventCardContentItemProps> = ({
+const OrderEventCardContentItem: React.FC<TEventCardContentItemProps> = ({
   icon,
   children,
 }) => {
@@ -18,4 +18,4 @@ const EventCardContentItem: React.FC<TEventCardContentItemProps> = ({
   );
 };
 
-export default EventCardContentItem;
+export default OrderEventCardContentItem;
