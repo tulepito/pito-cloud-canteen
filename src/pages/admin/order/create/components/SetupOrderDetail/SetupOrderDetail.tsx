@@ -152,7 +152,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   return (
     <>
       {isSelectingRestaurant ? (
-        <SelectRestaurantPage onSubmitRestaurant={handleSubmitRestaurant} />
+        <SelectRestaurantPage
+          onSubmitRestaurant={handleSubmitRestaurant}
+          selectedDate={selectedDate}
+        />
       ) : (
         <div>
           <div className={css.titleContainer}>

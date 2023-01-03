@@ -3,7 +3,9 @@ import Pagination from '@components/Pagination/Pagination';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
+import { weekDayFormatFromDateTime } from '@utils/dates';
 import type { FormState } from 'final-form';
+import { DateTime } from 'luxon';
 import { useEffect, useRef, useState } from 'react';
 
 // eslint-disable-next-line import/no-cycle
@@ -18,10 +20,12 @@ const DEBOUNCE_TIME = 300;
 
 type TSelectRestaurantPageProps = {
   onSubmitRestaurant: (values: Record<string, any>) => void;
+  selectedDate: Date;
 };
 
 const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   onSubmitRestaurant,
+  selectedDate,
 }) => {
   const [mounted, setMounted] = useState<boolean>();
   const [currentRestaurant, setCurrentRestaurant] = useState<any>();
@@ -36,6 +40,9 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     foodList,
     fetchFoodPending,
   } = useAppSelector((state) => state.SelectRestaurantPage);
+  const {
+    draftOrder: { deliveryAddress, deliveryHour },
+  } = useAppSelector((state) => state.Order);
 
   const {
     totalItems: total,
@@ -47,6 +54,13 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     isModalOpen && !fetchFoodPending && !!currentRestaurant;
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   let currDebounceRef = debounceRef.current;
+
+  const dateTime = DateTime.fromJSDate(selectedDate);
+
+  const formattedDate = dateTime.toFormat('dd/MM/yyyy');
+  const labelForBadge = `Cho ngày ${formattedDate} - ${weekDayFormatFromDateTime(
+    dateTime,
+  )} (${deliveryHour})- tại ${deliveryAddress?.address}`;
 
   const handlePageChange = (page: number) => {
     const params = {
@@ -66,9 +80,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     }
 
     currDebounceRef = setTimeout(() => {
-      if (title.length > 0) {
-        dispatch(selectRestaurantPageThunks.getRestaurants({ title }));
-      }
+      dispatch(selectRestaurantPageThunks.getRestaurants({ title }));
     }, DEBOUNCE_TIME);
   };
 
@@ -157,11 +169,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     <section className={css.root}>
       <div className={css.titleContainer}>
         <h1>Danh sach nha hang</h1>
-        <Badge
-          label={
-            'Cho ngày 15/02/2022 - Thứ 3 (16:00) - tại 111 Trần Huy Liệu, P8, Q.Phú Nhuận, HCM  '
-          }
-        />
+        <Badge label={labelForBadge} />
       </div>
       <SearchRestaurantForm
         onSubmit={() => {}}
