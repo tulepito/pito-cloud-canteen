@@ -41,20 +41,24 @@ const initialState: OrderInitialState = {
   draftOrder: {},
 };
 
-const createOrder = createAsyncThunk(CREATE_ORDER, async (_, { getState }) => {
-  const { draftOrder } = getState().Order;
-  const { clientId, orderDetail, ...rest } = draftOrder;
-  const apiBody = {
-    companyId: clientId,
-    generalInfo: {
-      ...rest,
-    },
-    orderDetail,
-  };
-  const { data: orderListing } = await createOrderApi(apiBody);
-  // return order listing entity
-  return orderListing;
-});
+const createOrder = createAsyncThunk(
+  CREATE_ORDER,
+  async (staffName: string, { getState }) => {
+    const { draftOrder } = getState().Order;
+    const { clientId, orderDetail, ...rest } = draftOrder;
+    const apiBody = {
+      companyId: clientId,
+      generalInfo: {
+        ...rest,
+        staffName,
+      },
+      orderDetail,
+    };
+    const { data: orderListing } = await createOrderApi(apiBody);
+    // return order listing entity
+    return orderListing;
+  },
+);
 
 const addMealPlanDetail = createAsyncThunk(
   ADD_MEAL_PLAN_DETAIL,
@@ -130,6 +134,10 @@ const orderSlice = createSlice({
         },
       };
     },
+    removeDraftOrder: (state) => ({
+      ...state,
+      draftOrder: {},
+    }),
   },
   extraReducers: (builder) => {
     builder
@@ -195,6 +203,7 @@ const orderSlice = createSlice({
   },
 });
 
-export const { addCompanyClient, updateDraftMealPlan } = orderSlice.actions;
+export const { addCompanyClient, updateDraftMealPlan, removeDraftOrder } =
+  orderSlice.actions;
 
 export default orderSlice.reducer;
