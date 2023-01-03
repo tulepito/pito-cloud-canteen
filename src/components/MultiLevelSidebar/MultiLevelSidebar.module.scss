@@ -51,10 +51,6 @@
       }
       .menuArrowIcon {
         float: right;
-        transform: rotate(-90deg);
-        &.menuArrowOpen {
-          transform: rotate(0deg);
-        }
       }
     }
     .menuWrapper {

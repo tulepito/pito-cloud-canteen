@@ -7,7 +7,7 @@ import Meta from '@components/Layout/Meta';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import SelectSingleFilterPopup from '@components/SelectSingleFilterPopup/SelectSingleFilterPopup';
 import type { TColumn } from '@components/Table/Table';
-import Table from '@components/Table/Table';
+import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { managePartnerThunks } from '@redux/slices/ManagePartnersPage.slice';
 import { EListingStates, ERestaurantListingStatus } from '@utils/enums';
@@ -295,7 +295,7 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
   } else if (restaurantRefs.length > 0) {
     content = (
       <>
-        <Table
+        <TableForm
           columns={TABLE_COLUMN}
           data={dataTable}
           pagination={pagination}

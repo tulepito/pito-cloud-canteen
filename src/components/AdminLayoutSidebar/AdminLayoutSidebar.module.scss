@@ -3,32 +3,9 @@
 
 .root {
   flex: 1;
-  min-width: $adminSidebarWidth;
   z-index: $adminSidebarzIndex;
   background-color: $matterColorLight;
-  box-shadow: $boxShadow;
   position: fixed;
-  left: -100%;
   transition: all 0.5s;
-
-  &.menuOpen {
-    left: 0;
-    &::before {
-      content: '';
-      position: fixed;
-      width: 100vw;
-      z-index: -1;
-      left: 0;
-      height: 100%;
-      background-color: rgba($color: #000000, $alpha: 0.4);
-    }
-    @include viewportLarge {
-      &::before {
-        display: none;
-      }
-    }
-  }
-  @include viewportLarge {
-    left: 0;
-  }
+  top: $adminTopbarHeight;
 }

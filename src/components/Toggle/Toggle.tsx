@@ -10,11 +10,20 @@ type TToggle = {
   onClick: (value: boolean) => void;
   className?: string;
   label?: string;
+  id?: string;
+  name?: string;
 };
 
 const Toggle = (props: TToggle) => {
-  const { disabled = false, status, onClick, className, label } = props;
-
+  const {
+    disabled = false,
+    status,
+    onClick,
+    className,
+    label,
+    id,
+    name,
+  } = props;
   const switchControl = useBoolean(status === 'on');
   const onFieldSwitchChange = () => {
     if (disabled) {
@@ -36,13 +45,13 @@ const Toggle = (props: TToggle) => {
         <input
           type="checkbox"
           className={inputClasses}
-          id="toggle"
-          name="toggle"
+          id={id || 'toggle'}
+          name={name || 'toggle'}
           disabled={disabled}
           defaultChecked={switchControl.value}
         />
         <label
-          htmlFor="switch"
+          htmlFor={id}
           className={toggleClasses}
           onClick={onFieldSwitchChange}
         />

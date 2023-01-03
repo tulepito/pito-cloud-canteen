@@ -16,6 +16,7 @@ interface ManageCompanyState {
   pagination?: TPagination | null;
   updateStatusInProgress: boolean;
   updateStatusError: any;
+  totalItems: number;
 }
 
 const QUERY_COMPANIES = 'app/ManageCompanies/QUERY_COMPANIES';
@@ -23,7 +24,10 @@ const UPDATE_COMPANY_STATUS = 'app/ManageCompanies/UPDATE_COMPANY_STATUS';
 
 const queryCompanies = createAsyncThunk(
   QUERY_COMPANIES,
-  async (page: number, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (
+    page: number | undefined,
+    { fulfillWithValue, rejectWithValue }: ThunkAPI,
+  ) => {
     try {
       const { data: companies } = await getCompaniesApi();
       return fulfillWithValue({ companies, page });
@@ -60,6 +64,7 @@ const initialState: ManageCompanyState = {
   updateStatusInProgress: false,
   updateStatusError: null,
   pagination: null,
+  totalItems: 0,
 };
 
 export const manageCompaniesSlice = createSlice({
@@ -92,7 +97,7 @@ export const manageCompaniesSlice = createSlice({
           ...state,
           companyRefs: companies,
           queryCompaniesInProgress: false,
-          pagination: null,
+          totalItems: companies.length,
         };
       })
       .addCase(queryCompanies.rejected, (state, action) => ({

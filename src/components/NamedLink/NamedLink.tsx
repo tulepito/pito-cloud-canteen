@@ -15,6 +15,7 @@ type TNameLinkProps = {
   };
   title?: string;
   path?: string;
+  replace?: boolean;
 };
 
 const NamedLink: React.FC<TNameLinkProps> = ({
@@ -25,6 +26,7 @@ const NamedLink: React.FC<TNameLinkProps> = ({
   to,
   title,
   path,
+  replace = false,
 }) => {
   const queryString = to?.search ? `?${to.search}` : '';
 
@@ -35,6 +37,7 @@ const NamedLink: React.FC<TNameLinkProps> = ({
       className={classes}
       title={title}
       href={`${path}${queryString}`}
+      replace={replace}
       passHref={passHref}>
       {children}
     </Link>

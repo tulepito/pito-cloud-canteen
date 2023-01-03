@@ -1,4 +1,4 @@
-import IconMenuArrow from '@components/IconMenuArrow/IconMenuArrow';
+import IconArrow from '@components/IconArrow/IconArrow';
 import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -14,6 +14,7 @@ export type TSidebarMenu = {
   childrenMenus?: TSidebarMenu[];
   nameLink?: string;
   level?: number;
+  subNameLinks?: any[];
 };
 
 type TMenuWithClasses = {
@@ -48,7 +49,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
   const { pathname, query } = router;
   const [isOpen, setIsOpen] = useState(false);
 
-  const { Icon, label, childrenMenus, nameLink, level } = menu;
+  const { Icon, label, childrenMenus, nameLink, level, subNameLinks } = menu;
 
   const hasChildrenMenus = childrenMenus && childrenMenus.length > 0;
 
@@ -56,11 +57,11 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     (e: React.MouseEvent<HTMLElement>) => {
       e.stopPropagation();
       if (nameLink && !hasChildrenMenus) {
-        return router.push({ pathname: `${nameLink}`, query });
+        return router.push({ pathname: nameLink, query });
       }
       return setIsOpen(!isOpen);
     },
-    [nameLink, hasChildrenMenus, setIsOpen, router, isOpen],
+    [nameLink, hasChildrenMenus, setIsOpen, router, isOpen, query],
   );
 
   const childIsActive = useMemo(
@@ -79,7 +80,10 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     subMenuWrapperClassName,
   );
 
-  const isActive = pathname === nameLink;
+  const activeWithSubNameLinks = subNameLinks?.includes(pathname);
+
+  const isActive = activeWithSubNameLinks || pathname === nameLink;
+
   const firstLevel = level === 1;
   const subMenuLayoutClasses = classNames(
     css.subMenuLayout,
@@ -96,7 +100,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
       <div className={subMenuLayoutClasses}>
         <div className={css.subMenuItem}>
           {Icon && <Icon className={css.entityIcon} />}
-          <p
+          <div
             className={classNames(
               css.label,
               { [css.labelOpen]: isOpen },
@@ -105,13 +109,12 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
             {intl.formatMessage({
               id: label,
             })}
-          </p>
+          </div>
         </div>
         {hasChildrenMenus && (
-          <IconMenuArrow
-            className={classNames(css.menuArrowIcon, {
-              [css.menuArrowOpen]: isOpen,
-            })}
+          <IconArrow
+            direction={isOpen ? 'up' : 'down'}
+            className={css.menuArrowIcon}
           />
         )}
       </div>

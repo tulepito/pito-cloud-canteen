@@ -74,6 +74,7 @@
           border-bottom: 1px solid $matterColorNegative;
           position: relative;
           font-size: 14px;
+
           span {
             word-break: break-all;
           }
@@ -96,4 +97,8 @@
       }
     }
   }
+}
+
+.isParent {
+  background-color: $neutralGray3;
 }

@@ -1,0 +1,106 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  .title {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+  .generalInfo {
+    padding: 16px;
+    border: 1px solid $neutralGray4;
+    border-radius: 4px;
+    margin-bottom: 24px;
+
+    .contentTitle {
+      color: $singleUseTabRed;
+      font-size: 16px;
+      font-weight: $fontWeightBold;
+      text-transform: uppercase;
+    }
+
+    .tableRoot {
+      border-collapse: collapse;
+      width: 100%;
+      .tableHead {
+        tr {
+          td {
+            background-color: $singleUseTableTanColor;
+            padding: 16px;
+            font-size: 16px;
+            color: $neutralGray8;
+          }
+        }
+        :nth-child(3),
+        :nth-child(4) {
+          text-align: right;
+        }
+      }
+
+      .tableHeadMemberOrder {
+        :nth-child(4),
+        :nth-child(5) {
+          text-align: right;
+        }
+      }
+
+      .tableBody {
+        .tableBodyRow {
+          box-shadow: none;
+          border-right: 1px solid $neutralGray4;
+          border-left: 1px solid $neutralGray4;
+          :nth-child(3),
+          :nth-child(4) {
+            text-align: right;
+          }
+          .tableBodyCell {
+            border-bottom: 1px solid $neutralGray4;
+            padding: 9px 16px;
+            font-size: 16px;
+            color: $matterColorDark;
+          }
+        }
+        .tableBodyRowMemberOrder {
+          :nth-child(4),
+          :nth-child(5) {
+            text-align: right;
+          }
+        }
+      }
+    }
+
+    .contentBox {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px;
+      background-color: $neutralGray2;
+
+      &.spaceStart {
+        justify-content: flex-start;
+        .flexChild {
+          margin-right: 100px;
+        }
+      }
+
+      .flexChild {
+        display: flex;
+        flex-direction: column;
+        .boxTitle {
+          font-size: 14px;
+          color: $neutralGray7;
+          margin-bottom: 16px;
+        }
+        .boxContent {
+          font-size: 16px;
+          color: $neutralGray10;
+          font-weight: $fontWeightBold;
+          max-width: 260px;
+        }
+        .staffInput {
+          min-width: 344px;
+          border-radius: 8px;
+        }
+      }
+    }
+  }
+}

@@ -163,3 +163,23 @@ $buttonBorderRadius: 8px;
 @mixin mediumText {
   @include textTemplate(12px, 500, 16px, '');
 }
+
+@mixin fullWidthDivider($color, $size) {
+  width: 100%;
+  height: $size;
+  background-color: $color;
+}
+
+@mixin lineClamp($numberOfLines: 4) {
+  display: -webkit-box;
+  line-clamp: $numberOfLines;
+  -webkit-line-clamp: $numberOfLines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@mixin verticalDivider($color, $width, $height) {
+  width: $width;
+  height: $height;
+  background-color: $color;
+}

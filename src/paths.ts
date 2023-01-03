@@ -12,11 +12,22 @@ export const NonRequireAuthenticationRoutes = [
   generalPaths.ResetPassword,
   generalPaths.SignIn,
   generalPaths.SignUp,
-  generalPaths.StyleGuide,
 ];
 
+export const IgnoredAuthCheckRoutes = [generalPaths.StyleGuide];
+export const IgnoredPermissionCheckRoutes = [generalPaths.StyleGuide];
+
 export const adminPaths = {
-  Home: '/admin',
+  Dashboard: '/admin',
+  ManageUsers: '/admin/users',
+  ManageCompanies: '/admin/company',
+  EditCompany: '/admin/company/[companyId]/edit',
+  CreateCompany: '/admin/company/create',
+  ManagePartners: '/admin/partner',
+  CreatePartner: '/admin/partner/create',
+  EditPartner: '/admin/partner/[partnerId]/edit',
+  ManageOrders: '/admin/order',
+  CreateOrder: '/admin/order/create',
 };
 
 export const companyPaths = {
