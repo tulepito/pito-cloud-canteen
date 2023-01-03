@@ -9,12 +9,17 @@ import css from './AddMorePlan.module.scss';
 type TAddMorePlanProps = {
   className?: string;
   events?: Event[];
+  date?: Date;
 };
 
-const AddMorePlan: React.FC<TAddMorePlanProps> = ({ className, events }) => {
+const AddMorePlan: React.FC<TAddMorePlanProps> = ({
+  className,
+  events,
+  date,
+}) => {
   return (
     <div className={classNames(css.root, className)}>
-      <Button className={css.addMore}>
+      <Button className={css.addMore} onClick={() => console.log(date)}>
         <IconPlus className={css.plusIcon} />
         <FormattedMessage id="AddMorePlan.addMore" />
       </Button>

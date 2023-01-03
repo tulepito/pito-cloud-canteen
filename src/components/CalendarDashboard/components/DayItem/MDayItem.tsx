@@ -29,6 +29,7 @@ const MDayItem: React.FC<TMDayItemProps> = ({
   return (
     <div className={css.monthDay}>
       <DayItemContent
+        date={date}
         events={events}
         renderEvent={renderEvent}
         components={components}

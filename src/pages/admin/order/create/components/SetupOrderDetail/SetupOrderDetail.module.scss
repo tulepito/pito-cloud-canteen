@@ -1,0 +1,47 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.titleContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  padding-bottom: 16px;
+
+  &::after {
+    position: absolute;
+    bottom: 0;
+    content: '';
+    height: 1px;
+    background-color: $neutralGray4;
+    width: 100%;
+  }
+
+  .row {
+    display: flex;
+    column-gap: 8px;
+
+    &:first-of-type {
+      margin-bottom: 10px;
+    }
+
+    .settingIcon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .buttonContainer {
+    display: flex;
+    column-gap: 16px;
+
+    & > button {
+      @include textTemplate(14px, 700, 24px, '');
+    }
+  }
+}
+
+.calendarContainer {
+  padding-top: 28px;
+}
