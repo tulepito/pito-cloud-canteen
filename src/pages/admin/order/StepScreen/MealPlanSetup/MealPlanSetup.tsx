@@ -18,10 +18,16 @@ import ParticipantSetupField from '../../create/components/ParticipantSetupField
 import PerPackageField from '../../create/components/PerPackageField/PerPackageField';
 import css from './MealPlanSetup.module.scss';
 
-type MealPlanSetupProps = {};
-const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
+type MealPlanSetupProps = {
+  goBack: () => void;
+  nextTab: () => void;
+};
+const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
+  const { goBack, nextTab } = props;
   const dispatch = useAppDispatch();
   const intl = useIntl();
+  console.log('draft', getPersistState('Order'));
+
   const {
     draftOrder: {
       clientId,
@@ -52,6 +58,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
       ...rest,
     };
     dispatch(updateDraftMealPlan(createOrderValue));
+    nextTab();
   };
   const initialValues = useMemo(
     () => ({
@@ -132,7 +139,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
               </div>
             </div>
 
-            <NavigateButtons goBack={() => {}} />
+            <NavigateButtons goBack={goBack} />
           </Form>
         );
       }}

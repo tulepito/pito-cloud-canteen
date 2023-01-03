@@ -1,4 +1,5 @@
 import FormWizard from '@components/FormWizard/FormWizard';
+import { getPersistState } from '@helpers/persistHelper';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
 import { getItem, setItem } from '@utils/localStorageHelpers';
@@ -28,7 +29,6 @@ export const TABS = [
   REVIEW_TAB,
 ];
 
-export const DRAFT_ORDER_LOCAL_STORAGE_NAME = 'draftOrder';
 export const CREATE_ORDER_STEP_LOCAL_STORAGE_NAME = 'orderStep';
 
 const tabCompleted = (order: any, tab: string) => {
@@ -60,14 +60,15 @@ const tabsActive = (order: any) => {
 };
 
 const CreateOrderTab: React.FC<any> = (props) => {
-  const { tab, goBack } = props;
+  const { tab, goBack, nextTab } = props;
+
   switch (tab) {
     case CLIENT_SELECT_TAB:
-      return <ClientSelector />;
+      return <ClientSelector nextTab={nextTab} />;
     case MEAL_PLAN_SETUP:
-      return <MealPlanSetup />;
+      return <MealPlanSetup goBack={goBack} nextTab={nextTab} />;
     case CREATE_MEAL_PLAN_TAB:
-      return <MealPlanCreator />;
+      return <MealPlanCreator goBack={goBack} nextTab={nextTab} />;
     case REVIEW_TAB:
       return <ReviewOrder goBack={goBack} />;
     default:
@@ -94,6 +95,14 @@ const CreateOrderWizard = () => {
     saveStep(tab);
   };
 
+  const nextTab = (tab: string) => () => {
+    const tabIndex = TABS.indexOf(tab);
+    if (tabIndex < TABS.length - 1) {
+      const backTab = TABS[tabIndex + 1];
+      saveStep(backTab);
+    }
+  };
+
   const goBack = (tab: string) => () => {
     const tabIndex = TABS.indexOf(tab);
     if (tabIndex > 0) {
@@ -102,9 +111,8 @@ const CreateOrderWizard = () => {
     }
   };
 
-  const draftOrder = getItem(DRAFT_ORDER_LOCAL_STORAGE_NAME);
-
-  const tabsStatus = tabsActive(getItem(DRAFT_ORDER_LOCAL_STORAGE_NAME)) as any;
+  const { draftOrder } = getPersistState('Order');
+  const tabsStatus = tabsActive(draftOrder) as any;
 
   useEffect(() => {
     const stepFromLocal = getItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME);
@@ -137,6 +145,7 @@ const CreateOrderWizard = () => {
               id: `CreateOrderWizard.${tab}Label`,
             })}
             onClick={onClick(tab)}
+            nextTab={nextTab(tab)}
             tab={tab}
             goBack={goBack(tab)}
             draftOrder={draftOrder}

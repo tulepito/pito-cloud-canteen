@@ -3,7 +3,9 @@ import Form from '@components/Form/Form';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
-import { getItem } from '@utils/localStorageHelpers';
+import { getPersistState } from '@helpers/persistHelper';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { updateDraftMealPlan } from '@redux/slices/Order.slice';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
@@ -13,7 +15,6 @@ import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 // eslint-disable-next-line import/no-cycle
-import { DRAFT_ORDER_LOCAL_STORAGE_NAME } from '../CreateOrderWizard/CreateOrderWizard';
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../NavigateButtons/NavigateButtons';
 import css from './ReviewOrder.module.scss';
@@ -310,13 +311,13 @@ type TReviewOrder = {
 };
 
 const parseDataToReviewTab = (values: any) => {
-  const { orderDetails = {}, generalInfo = {} } = values || {};
+  const { orderDetails = {}, ...rest } = values || {};
   const items = Object.keys(orderDetails).map((key: any) => {
     return {
       key,
       label: parseTimestaimpToFormat(Number(key)),
       childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
-      childrenProps: { ...orderDetails[key], ...generalInfo, order: values },
+      childrenProps: { ...orderDetails[key], ...rest, order: values },
     };
   });
   return items;
@@ -325,14 +326,16 @@ const parseDataToReviewTab = (values: any) => {
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const { orderDetails } =
     useMemo(() => {
-      const order = getItem(DRAFT_ORDER_LOCAL_STORAGE_NAME);
+      const { draftOrder } = getPersistState('Order');
       return {
-        orderDetails: parseDataToReviewTab(order),
+        orderDetails: parseDataToReviewTab(draftOrder),
       };
     }, []) || {};
 
-  const onSubmit = (e: any) => {
-    console.log(e);
+  const dispatch = useAppDispatch();
+
+  const onSubmit = (values: any) => {
+    dispatch(updateDraftMealPlan(values));
   };
 
   return (

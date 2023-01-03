@@ -21,7 +21,12 @@ import ClientTable from '../../create/components/ClientTable/ClientTable';
 import ConfirmClientModal from '../../create/components/ConfirmClientModal/ConfirmClientModal';
 import css from './ClientSelector.module.scss';
 
-const ClientSelector = () => {
+type TClientSelector = {
+  nextTab: () => void;
+};
+
+const ClientSelector: React.FC<TClientSelector> = (props) => {
+  const { nextTab } = props;
   const intl = useIntl();
   const [queryParams, setQueryParams] = useState({});
   const [page, setPage] = useState<number>(1);
@@ -83,10 +88,13 @@ const ClientSelector = () => {
     setSelectedCompanyId(id);
     onConfirmClientModalOpen();
   };
+
   const onClientConfirm = () => {
     dispatch(addCompanyClient(selectedConpanyId));
     onConfirmClientModalClose();
+    nextTab();
   };
+
   return (
     <div>
       <div className={css.header}>

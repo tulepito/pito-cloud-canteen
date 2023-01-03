@@ -12,7 +12,10 @@ import OrderSettingModal, {
 } from '../../create/components/OrderSettingModal/OrderSettingModal';
 import css from './MealPlanCreator.module.scss';
 
-type MealPlanCreatorProps = {};
+type MealPlanCreatorProps = {
+  goBack: () => void;
+  nextTab: () => void;
+};
 
 const MealPlanCreator: React.FC<MealPlanCreatorProps> = () => {
   const intl = useIntl();

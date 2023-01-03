@@ -38,7 +38,7 @@ const initialState: OrderInitialState = {
 
   completeOrderInProgress: false,
   completeOrderError: null,
-  draftOrder: null,
+  draftOrder: {},
 };
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
