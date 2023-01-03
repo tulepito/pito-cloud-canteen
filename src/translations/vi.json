@@ -382,6 +382,8 @@
   "MealPlanDateField.endDateRequired": "Vui lòng chọn ngày kết thúc",
   "MealPlanDateField.deliveryHourLabel": "Giờ giao hàng",
   "MealPlanDateField.deliveryHourRequired": "Vui lòng chọn giờ giao hàng",
+  "MealPlanDateField.startDatePlaceholder": "CN, 01 tháng 01, 2023",
+  "MealPlanDateField.endDatePlaceholder": "CN, 01 tháng 01, 2023",
   "DayInWeekField.label": "Chọn ngày ăn trong tuần",
   "DayInWeekField.mon": "Thứ 2",
   "DayInWeekField.tue": "Thứ 3",

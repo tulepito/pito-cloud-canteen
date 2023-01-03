@@ -325,9 +325,12 @@ const parseDataToReviewTab = (values: any) => {
 };
 
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
-  const { draftOrder, createOrderInProcess, createOrderError } = useAppSelector(
+  const { draftOrder, createOrderInProcess } = useAppSelector(
     (state) => state.Order,
     shallowEqual,
+  );
+  const createOrderError = useAppSelector(
+    (state) => state.Order.createOrderError,
   );
 
   const { orderDetail } =
