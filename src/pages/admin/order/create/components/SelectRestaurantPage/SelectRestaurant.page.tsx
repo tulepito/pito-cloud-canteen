@@ -14,11 +14,7 @@ import type { TSelectRestaurantFormValues } from './components/RestaurantTable/S
 import SearchRestaurantForm from './components/SearchRestaurantForm/SearchRestaurantForm';
 import css from './SelectRestaurantPage.module.scss';
 
-type TSelectRestaurantPage = {
-  goBack: () => void;
-};
-
-const SelectRestaurantPage: React.FC<TSelectRestaurantPage> = (props) => {
+const SelectRestaurantPage: React.FC<any> = (props) => {
   const { goBack } = props;
   const [currentRestaurant, setCurrentRestaurant] = useState<any>();
   const [isSelectedRestaurant, setIsSelectedRestaurant] = useState(false);

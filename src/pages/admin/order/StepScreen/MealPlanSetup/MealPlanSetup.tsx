@@ -11,11 +11,7 @@ import ParticipantSetupField from '../../create/components/ParticipantSetupField
 import PerPackageField from '../../create/components/PerPackageField/PerPackageField';
 import css from './MealPlanSetup.module.scss';
 
-type MealPlanSetupProps = {
-  goBack: () => void;
-};
-
-const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
+const MealPlanSetup: React.FC<any> = (props) => {
   const { goBack } = props;
   const onSubmit = (values: any) => {
     console.log('values: ', values);
