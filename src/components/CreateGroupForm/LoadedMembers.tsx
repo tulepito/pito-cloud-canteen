@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import IconEdit from '@components/IconEdit/IconEdit';
 import { Close } from '@components/Icons/Icons';
@@ -17,11 +18,7 @@ const getMemberDisplayName = (companyMembers: any[], memberId: string) => {
 
 const LoadedItem = ({ item, companyMembers, onDelete }: any) => {
   const { email, id } = item;
-  const {
-    value: isEditing,
-    setTrue: onEditing,
-    // setFalse: finishEditing,
-  } = useBoolean();
+  const { value: isEditing, setTrue: onEditing } = useBoolean();
   const renderedEditState = isEditing ? (
     <FieldTextInput id={`${email}-editEmail`} name="memberEmail" />
   ) : (
@@ -52,7 +49,6 @@ const LoadedItem = ({ item, companyMembers, onDelete }: any) => {
 const LoadedMembers: React.FC<LoadedMembersProps> = (props) => {
   const { formattedLoadedMembers, companyMembers } = props;
   const onDeleteMember = (memberIndex: number) => () => {
-    // update member
     console.log('memberIndex: ', memberIndex);
   };
   return (

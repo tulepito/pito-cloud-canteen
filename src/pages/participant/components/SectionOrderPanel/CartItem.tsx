@@ -1,8 +1,7 @@
 import IconClose from '@components/IconClose/IconClose';
 import IconRefreshing from '@components/Icons/IconRefreshing';
-import { useAppDispatch } from '@hooks/reduxHooks';
-import { shopingCartThunks } from '@redux/slices/shopingCart.slice';
 import classNames from 'classnames';
+
 import css from './CartItem.module.scss';
 
 type TCartItemProps = {

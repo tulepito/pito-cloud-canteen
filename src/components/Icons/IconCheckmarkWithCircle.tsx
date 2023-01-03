@@ -1,4 +1,4 @@
-import { TIconProps } from '@utils/types';
+import type { TIconProps } from '@utils/types';
 
 const IconCheckmarkWithCircle: React.FC<TIconProps> = (props) => {
   const { className, width, height } = props;

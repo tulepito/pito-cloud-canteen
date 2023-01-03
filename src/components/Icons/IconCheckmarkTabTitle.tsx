@@ -1,4 +1,4 @@
-import { TIconProps } from '@utils/types';
+import type { TIconProps } from '@utils/types';
 
 const IconCheckmarkTabTitle: React.FC<TIconProps> = (props) => {
   const { className, width = 14, height = 10 } = props;

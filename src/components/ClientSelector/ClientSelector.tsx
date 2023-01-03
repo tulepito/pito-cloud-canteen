@@ -41,6 +41,7 @@ const ClientSelector = () => {
         }),
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [dispatch, manageCompaniesThunks],
   );
   const filteredCompanies = useMemo(

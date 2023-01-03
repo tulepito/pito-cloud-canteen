@@ -6,8 +6,8 @@ import { LISTING } from '@utils/data';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { useIntl } from 'react-intl';
-import CartItem from './CartItem';
 
+import CartItem from './CartItem';
 import css from './SectionOrderPanel.module.scss';
 
 type TSectionOrderPanelProps = {
@@ -21,7 +21,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
 }) => {
   const intl = useIntl();
   const cartList = useAppSelector((state: any) => {
-    const currentUser = state.user.currentUser;
+    const { currentUser } = state.user;
     const currUserId = currentUser?.id?.uuid;
     return state.shopingCart.orders?.[currUserId]?.[planId || 1];
   });

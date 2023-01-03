@@ -22,7 +22,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
   const router = useRouter();
   const { planId, orderDay } = router.query;
   const cartList = useAppSelector((state) => {
-    const currentUser = state.user.currentUser;
+    const { currentUser } = state.user;
     const currUserId = currentUser?.id?.uuid;
     return state.shopingCart.orders?.[currUserId]?.[`${planId}` || 1];
   });
@@ -30,14 +30,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
     (state) => state.ParticipantSetupPlanPage.loadDataInProgress,
   );
 
-  const autoSelectionButtonLabel = intl.formatMessage({
-    id: 'SectionOrderListing.autoSelectionButtonLabel',
-  });
-  const unCheckThisDateButtonLabel = intl.formatMessage({
-    id: 'SectionOrderListing.unCheckThisDateButtonLabel',
-  });
-
-  const converDataToTabItem = (plan: any) => {
+  const convertDataToTabItem = () => {
     if (loadDataInProgress) {
       return [
         {
@@ -63,9 +56,8 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
         },
       ];
     }
-    const convertedData = [];
-
-    for (const item in plan) {
+    const convertedData: any = [];
+    Object.keys(plan).forEach((item) => {
       const {
         foodList,
         restaurant,
@@ -102,14 +94,17 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
         label: itemLabel,
         id: item,
         children: <>{childrenList}</>,
-        restaurant: restaurant,
+        restaurant,
       });
-    }
+    });
+
     return convertedData;
   };
 
-  const tabItems = converDataToTabItem(plan);
-  const defaultActiveKey = tabItems.findIndex((item) => item.id === orderDay);
+  const tabItems = convertDataToTabItem();
+  const defaultActiveKey = tabItems.findIndex(
+    (item: any) => item.id === orderDay,
+  );
   return (
     <div className={css.root}>
       <div className={css.sectionOrderNotify}>

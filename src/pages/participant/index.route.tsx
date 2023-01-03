@@ -1,4 +1,4 @@
-import ParticipantDashboard from './ParticipantDashboard';
+import ParticipantDashboard from './ParticipantDashboard.page';
 
 const ParticipantDashboardRoute = () => {
   return <ParticipantDashboard />;

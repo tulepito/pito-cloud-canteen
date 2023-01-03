@@ -1,6 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import '@src/styles/globals.scss';
 import '@src/styles/nprogress.scss';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 import AuthGuard from '@components/Guards/AuthGuard';
 import PermissionGuard from '@components/Guards/PermissionGuard';
@@ -13,7 +14,6 @@ import { Router } from 'next/router';
 import Script from 'next/script';
 import nProgress from 'nprogress';
 import { Provider } from 'react-redux';
-import 'react-loading-skeleton/dist/skeleton.css';
 
 Router.events.on('routeChangeStart', nProgress.start);
 Router.events.on('routeChangeError', nProgress.done);

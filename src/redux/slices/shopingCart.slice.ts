@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, current } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import type { ThunkAPI } from './types';
 
@@ -31,7 +31,7 @@ const addToCartThunk = createAsyncThunk(
     }: { planId: string; dayId: string; mealId: string },
     { getState, dispatch }: ThunkAPI,
   ) => {
-    const currentUser = getState().user.currentUser;
+    const { currentUser } = getState().user;
     return dispatch(
       shopingCartSlice.actions.addToCart({
         currentUserId: currentUser.id.uuid,
@@ -49,7 +49,7 @@ const removeFromCartThunk = createAsyncThunk(
     { planId, dayId }: { planId: string; dayId: string },
     { getState, dispatch }: ThunkAPI,
   ) => {
-    const currentUser = getState().user.currentUser;
+    const { currentUser } = getState().user;
     return dispatch(
       shopingCartSlice.actions.removeToCart({
         currentUserId: currentUser.id.uuid,
@@ -63,7 +63,7 @@ const removeFromCartThunk = createAsyncThunk(
 const removeAllFromPlanCartThunk = createAsyncThunk(
   REMOVE_ALL_FROM_PLAN_CART,
   async ({ planId }: { planId: string }, { getState, dispatch }: ThunkAPI) => {
-    const currentUser = getState().user.currentUser;
+    const { currentUser } = getState().user;
     return dispatch(
       shopingCartSlice.actions.removeAllFromPlanCart({
         currentUserId: currentUser.id.uuid,
