@@ -43,7 +43,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     (!isSignUpPath || shouldNavigateInSignUpFlow);
 
   const verifyAuthentication = useCallback(() => {
-    if (!isIgnoredAuthCheckRoute || !authInfoLoaded) {
+    if (isIgnoredAuthCheckRoute || !authInfoLoaded) {
       return;
     }
 
