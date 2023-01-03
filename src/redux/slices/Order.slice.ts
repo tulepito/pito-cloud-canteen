@@ -41,10 +41,17 @@ const initialState: OrderInitialState = {
   draftOrder: {},
 };
 
-const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
-  // call api to create order listing
-  // params: {companyId}
-  const { data: orderListing } = await createOrderApi(params);
+const createOrder = createAsyncThunk(CREATE_ORDER, async (_, { getState }) => {
+  const { draftOrder } = getState().Order;
+  const { clientId, orderDetail, ...rest } = draftOrder;
+  const apiBody = {
+    companyId: clientId,
+    generalInfo: {
+      ...rest,
+    },
+    orderDetail,
+  };
+  const { data: orderListing } = await createOrderApi(apiBody);
   // return order listing entity
   return orderListing;
 });
