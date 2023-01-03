@@ -30,15 +30,12 @@ const ParticipantSetupPlan = () => {
   const { planId, orderDay } = router.query;
   const order = useAppSelector((state) => state.ParticipantSetupPlanPage.order);
   const plan = useAppSelector((state) => state.ParticipantSetupPlanPage.plan);
+  const [orderDayState, setOrderDayState] = useState<number>();
 
   const handleSelectRestaurant = (selectedItem: any) => {
     const dayId = selectedItem?.id;
-    const { orderDay: orderDayQ } = new URLSearchParams(
-      window.location.search,
-    ) as any;
-    if (dayId && dayId !== 'Loading...' && dayId !== orderDayQ) {
-      const restaurant = dayId ? plan?.[dayId]?.restaurant : null;
-      setSelectedRestaurant(restaurant);
+    setOrderDayState(Number(dayId));
+    if (dayId && dayId !== 'Loading...') {
       window.history.pushState(
         { urlPath: `/participant/plans/${planId}?orderDay=${dayId}` },
         '',
@@ -49,9 +46,17 @@ const ParticipantSetupPlan = () => {
 
   useEffect(() => {
     if (router.isReady) {
+      setOrderDayState(Number(orderDay));
       dispatch(ParticipantSetupPlanThunks.loadData(`${planId}`));
     }
   }, [router.isReady]);
+
+  useEffect(() => {
+    const restaurant = orderDayState
+      ? plan?.[`${orderDayState}`]?.restaurant
+      : null;
+    setSelectedRestaurant(restaurant);
+  }, [plan, orderDayState]);
 
   return (
     <ParticipantLayout>
@@ -59,7 +64,7 @@ const ParticipantSetupPlan = () => {
         <div className={css.leftSection}>
           <SectionRestaurantHero
             listing={selectedRestaurant}
-            orderDay={Number(orderDay)}
+            orderDay={Number(orderDayState)}
           />
           <SectionOrderListing
             plan={plan}
