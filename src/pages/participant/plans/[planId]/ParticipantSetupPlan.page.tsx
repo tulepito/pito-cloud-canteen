@@ -6,7 +6,7 @@ import SectionRestaurantHero from '@src/pages/participant/components/SectionRest
 import { useRouter } from 'next/router';
 import React from 'react';
 
-import css from './ParticipantOrderRestaurant.module.scss';
+import css from './ParticipantSetupPlan.module.scss';
 
 // Mock data
 const mockRestaurantListing = {
@@ -17,14 +17,13 @@ const mockRestaurantListing = {
     'https://res.cloudinary.com/eventors/image/upload/f_auto/v1584529827/eventors/hero-back_lbofw9.png',
   ],
 };
-const orderDay = 1672674762993;
+
 const orderDeadline = 1673456400000;
 
-const mockDishListing = [];
-
-const ParticipantOrderRestaurant = () => {
+const ParticipantSetupPlan = () => {
   const router = useRouter();
-  const { orderId, restaurantId } = router.query;
+
+  const { planId, orderDay } = router.query;
 
   return (
     <ParticipantLayout>
@@ -45,4 +44,4 @@ const ParticipantOrderRestaurant = () => {
   );
 };
 
-export default ParticipantOrderRestaurant;
+export default ParticipantSetupPlan;

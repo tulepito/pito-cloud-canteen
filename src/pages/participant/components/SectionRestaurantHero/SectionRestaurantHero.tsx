@@ -7,7 +7,7 @@ import css from './SectionRestaurantHero.module.scss';
 
 type TSectionRestaurantHeroProps = {
   listing?: any;
-  orderDay?: number;
+  orderDay?: string | number;
 };
 const SectionRestaurantHero: React.FC<TSectionRestaurantHeroProps> = ({
   listing,
@@ -17,7 +17,7 @@ const SectionRestaurantHero: React.FC<TSectionRestaurantHeroProps> = ({
 
   const heroImage = listing?.images[0];
   const { title } = LISTING(listing).getAttributes();
-  const parsedOrderDay = DateTime.fromMillis(orderDay as number);
+  const parsedOrderDay = DateTime.fromMillis(Number(orderDay));
   const weekDay = parsedOrderDay.get('day');
   const fullDay = parsedOrderDay.toFormat('dd/LL/yyyy');
 

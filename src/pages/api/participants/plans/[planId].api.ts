@@ -5,8 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { getIntegrationSdk } from '../../../../services/integrationSdk';
 import { handleError } from '../../../../services/sdk';
-import type { TListing } from '../../../../utils/types';
-import { HTTP_METHODS, LISTING_TYPE } from '../../helpers/constants';
+import { HTTP_METHODS } from '../../helpers/constants';
 
 const fetchSubOrder = async (orderDetail: any) => {
   let orderDetailResult = {};
@@ -44,70 +43,33 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (apiMethod) {
     case HTTP_METHODS.GET:
       {
-        const { orderId } = req.query;
-        if (!orderId) {
+        const { planId } = req.query;
+
+        if (!planId) {
           return res.status(400).json({
             message: 'Missing required keys',
           });
         }
 
         try {
-          // const currentUserId = '63a51b42-84f2-4520-800f-6c7680189803';
-          // const participant = denormalisedResponseEntities(
-          //   await integrationSdk.users.show({ id: currentUserId }),
-          // );
-
-          // Get order data
+          const plan = denormalisedResponseEntities(
+            await integrationSdk.listings.show({
+              id: planId,
+            }),
+          )[0];
+          const { orderId, orderDetail } = LISTING(plan).getMetadata();
           const order = denormalisedResponseEntities(
             await integrationSdk.listings.show({
               id: orderId,
             }),
           )[0];
-
-          // Get company data (user)
-          const companyId = order?.attributes.metadata?.companyId || '';
-          const company = denormalisedResponseEntities(
-            await integrationSdk.users.show(
-              { id: companyId },
-              {
-                expand: true,
-                include: ['profileImage'],
-                'fields.image': [
-                  'variants.square-small',
-                  'variants.square-small2x',
-                ],
-              },
-            ),
-          )[0];
-
-          // Get list sub-order (plan)
-          const planIds = order?.attributes.metadata?.plans || [];
-
-          const plans = denormalisedResponseEntities(
-            await integrationSdk.listings.query({
-              ids: planIds.join(','),
-              meta_listingType: LISTING_TYPE.SUB_ORDER,
-            }),
-          );
-
-          const subOrderPromises = plans.map(async (plan: TListing) => {
-            const { orderDetail } = LISTING(plan).getMetadata();
-            const planId = LISTING(plan).getId();
-            return {
-              [planId]: await fetchSubOrder(orderDetail),
-            };
-          });
-
-          const subOrderData = await Promise.all(subOrderPromises);
-
+          const plans = await fetchSubOrder(orderDetail);
           res.json({
             statusCode: 200,
             meta: {},
             data: {
-              company,
-              order,
               plans,
-              subOrders: subOrderData,
+              order,
             },
           });
         } catch (error) {
