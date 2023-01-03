@@ -123,7 +123,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         };
       },
       {},
-    );
+    ) || {};
   const selectedGroupsName = selectedGroups.map((groupId: string) => {
     if (groupId === 'allMembers') {
       return intl.formatMessage({ id: 'ParticipantSetupField.allMembers' });
@@ -133,7 +133,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const pickingDeadline = parseDateFromTimestampAndHourString(
     deadlineDate,
     deadlineHour,
-    'yyyy-MM-dd, hh:mm',
+    'dd/MM/yyyy, hh:mm',
   );
   const allMembersAmount =
     currentClient && calculateGroupMembersAmount(currentClient, selectedGroups);

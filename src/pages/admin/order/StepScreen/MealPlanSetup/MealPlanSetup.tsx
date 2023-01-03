@@ -150,6 +150,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
               </div>
               <div className={css.verticalSpace}>
                 <ParticipantSetupField
+                  form={form}
                   clientId={clientId}
                   title={intl.formatMessage({
                     id: 'ParticipantSetupField.title',

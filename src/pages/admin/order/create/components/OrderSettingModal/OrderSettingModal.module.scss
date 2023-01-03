@@ -34,7 +34,7 @@
 
     .fieldValue {
       @include text(14px, 24px);
-      max-width: 140px;
+      max-width: 110px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;

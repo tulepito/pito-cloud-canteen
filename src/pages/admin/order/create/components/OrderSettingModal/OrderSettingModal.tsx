@@ -3,8 +3,10 @@ import Form from '@components/Form/Form';
 import IconArrow from '@components/IconArrow/IconArrow';
 import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { updateDraftMealPlan } from '@redux/slices/Order.slice';
 import classNames from 'classnames';
+import arrayMutators from 'final-form-arrays';
 import { useMemo, useState } from 'react';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
@@ -41,7 +43,7 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
     OrderSettingField.COMPANY,
   );
   const intl = useIntl();
-
+  const dispatch = useAppDispatch();
   const {
     draftOrder: {
       clientId,
@@ -186,7 +188,7 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
           <>
             <div className={css.title}>Cài đặt truy cập</div>
             <div className={css.fieldContent}>
-              <ParticipantSetupField clientId={clientId} />
+              <ParticipantSetupField form={form} clientId={clientId} />
             </div>
           </>
         );
@@ -204,6 +206,9 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
         return null;
     }
   };
+  const onSubmit = (values: any) => {
+    dispatch(updateDraftMealPlan(values));
+  };
   return (
     <Modal
       isOpen={isOpen}
@@ -215,7 +220,8 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
           <div className={css.leftSide}>{leftSideRenderer()}</div>
           <div className={css.rightSide}>
             <FinalForm
-              onSubmit={() => {}}
+              mutators={{ ...arrayMutators }}
+              onSubmit={onSubmit}
               initialValues={initialValues}
               render={(formRenderProps: FormRenderProps) => {
                 const { handleSubmit, form, values } = formRenderProps;
