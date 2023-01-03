@@ -43,7 +43,11 @@ const FormTab: React.FC<TFormTab> = (props) => {
       <span className={css.linkText}>{text}</span>
     </NamedLink>
   ) : (
-    <InlineTextButton className={linkClasses} type="button" onClick={onClick}>
+    <InlineTextButton
+      className={linkClasses}
+      type="button"
+      onClick={onClick}
+      disabled={disabled}>
       <div className={css.order}>{order}</div>
       <span className={css.linkText}>{text}</span>
     </InlineTextButton>

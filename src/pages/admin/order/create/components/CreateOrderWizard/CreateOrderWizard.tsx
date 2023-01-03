@@ -32,15 +32,21 @@ export const TABS = [
 export const CREATE_ORDER_STEP_LOCAL_STORAGE_NAME = 'orderStep';
 
 const tabCompleted = (draftOrder: any, tab: string) => {
-  const { clientId, deliveryAddress, staffName, orderDetail } =
-    draftOrder || {};
+  const {
+    clientId,
+    deliveryAddress,
+    staffName,
+    orderDetail = {},
+  } = draftOrder || {};
+  const isMealPlanTabCompleted = Object.entries(orderDetail).length > 0;
+
   switch (tab) {
     case CLIENT_SELECT_TAB:
       return clientId;
     case MEAL_PLAN_SETUP:
       return deliveryAddress;
     case CREATE_MEAL_PLAN_TAB:
-      return orderDetail;
+      return isMealPlanTabCompleted;
     case REVIEW_TAB:
       return !!staffName;
     default:
@@ -136,7 +142,9 @@ const CreateOrderWizard = () => {
 
   return (
     <FormWizard formTabNavClassName={css.formTabNav}>
-      {TABS.map((tab: string) => {
+      {TABS.map((tab: string, index) => {
+        const disabled = !tabCompleted(draftOrder, TABS[index - 1]);
+
         return (
           <CreateOrderTab
             key={tab}
@@ -150,6 +158,7 @@ const CreateOrderWizard = () => {
             tab={tab}
             goBack={goBack(tab)}
             draftOrder={draftOrder}
+            disabled={disabled}
           />
         );
       })}
