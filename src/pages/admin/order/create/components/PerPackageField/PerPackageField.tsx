@@ -9,16 +9,19 @@ import css from './PerPackageField.module.scss';
 const VNDIcon = () => {
   return <div className={css.vndIcon}>đ</div>;
 };
-const PerPackageField = () => {
+
+type PerPackageFieldProps = {
+  title?: string;
+};
+const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
+  const { title } = props;
   const intl = useIntl();
   const perPackRequiredMessage = intl.formatMessage({
     id: 'PerPackageField.perPackRequired',
   });
   return (
     <div className={css.container}>
-      <div className={css.fieldTitle}>
-        {intl.formatMessage({ id: 'PerPackageField.title' })}
-      </div>
+      {title && <div className={css.fieldTitle}>{title}</div>}
       <div className={css.fieldGroup}>
         <FieldTextInput
           id="packagePerMember"
@@ -36,8 +39,8 @@ const PerPackageField = () => {
         />
 
         <Field id="vatAllow" name="vatAllow">
-          {(props) => {
-            const { id, input } = props;
+          {(fieldProps) => {
+            const { id, input } = fieldProps;
             return (
               <Toggle
                 label={intl.formatMessage({

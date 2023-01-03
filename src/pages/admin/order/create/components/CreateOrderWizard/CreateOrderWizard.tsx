@@ -1,13 +1,14 @@
 import FormWizard from '@components/FormWizard/FormWizard';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
-import CalendarPage from '@src/pages/calendar/CalendarPage.page';
 import { getItem, setItem } from '@utils/localStorageHelpers';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import ClientSelector from '../../../StepScreen/ClientSelector/ClientSelector';
 // eslint-disable-next-line import/no-cycle, import/no-named-as-default
+import MealPlanCreator from '../../../StepScreen/MealPlanCreator/MealPlanCreator';
+// eslint-disable-next-line import/no-named-as-default, import/no-cycle
 import MealPlanSetup from '../../../StepScreen/MealPlanSetup/MealPlanSetup';
 // eslint-disable-next-line import/no-cycle
 import ReviewOrder from '../ReviewOrder/ReviewOrder';
@@ -66,7 +67,7 @@ const CreateOrderTab: React.FC<any> = (props) => {
     case MEAL_PLAN_SETUP:
       return <MealPlanSetup />;
     case CREATE_MEAL_PLAN_TAB:
-      return <CalendarPage />;
+      return <MealPlanCreator />;
     case REVIEW_TAB:
       return <ReviewOrder goBack={goBack} />;
     default:

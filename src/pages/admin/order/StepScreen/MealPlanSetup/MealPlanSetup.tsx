@@ -5,6 +5,7 @@ import { updateDraftMealPlan } from '@redux/slices/Order.slice';
 import { useMemo } from 'react';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
 
 import DayInWeekField from '../../create/components/DayInWeekField/DayInWeekField';
 import DeliveryAddressField from '../../create/components/DeliveryAddressField/DeliveryAddressField';
@@ -12,6 +13,7 @@ import FoodPickingField from '../../create/components/FoodPickingField/FoodPicki
 import MealPlanDateField from '../../create/components/MealPlanDateField/MealPlanDateField';
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../../create/components/NavigateButtons/NavigateButtons';
+import OrderDealineField from '../../create/components/OrderDealineField/OrderDealineField';
 import ParticipantSetupField from '../../create/components/ParticipantSetupField/ParticipantSetupField';
 import PerPackageField from '../../create/components/PerPackageField/PerPackageField';
 import css from './MealPlanSetup.module.scss';
@@ -19,6 +21,7 @@ import css from './MealPlanSetup.module.scss';
 type MealPlanSetupProps = {};
 const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
   const dispatch = useAppDispatch();
+  const intl = useIntl();
   const {
     draftOrder: {
       clientId,
@@ -26,11 +29,13 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
       packagePerMember,
       vatAllow,
       pickAllow,
-      participantSetup,
+      selectedGroups,
       deliveryHour,
       startDate,
       endDate,
       deliveryAddress,
+      deadlineDate,
+      deadlineHour,
     },
   } = getPersistState('Order');
   const { address, origin } = deliveryAddress || {};
@@ -54,7 +59,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
       packagePerMember: packagePerMember || '',
       vatAllow: vatAllow || true,
       pickAllow: pickAllow || true,
-      participantSetup: participantSetup || ['allMembers'],
+      selectedGroups: selectedGroups || ['allMembers'],
       deliveryHour: deliveryHour || '',
       deliveryAddress: deliveryAddress
         ? {
@@ -64,19 +69,23 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
         : null,
       startDate: startDate || '',
       endDate: endDate || '',
+      deadlineDate: deadlineDate || null,
+      deadlineHour: deadlineHour || null,
     }),
     [
       dayInWeek,
       packagePerMember,
       vatAllow,
       pickAllow,
-      participantSetup,
+      selectedGroups,
       deliveryHour,
       deliveryAddress,
       address,
       origin,
       startDate,
       endDate,
+      deadlineDate,
+      deadlineHour,
     ],
   );
   return (
@@ -88,10 +97,14 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
         return (
           <Form onSubmit={handleSubmit}>
             <div className={css.fieldSection}>
-              <DeliveryAddressField />
+              <DeliveryAddressField
+                title={intl.formatMessage({ id: 'DeliveryAddressField.title' })}
+              />
             </div>
             <div className={css.fieldSection}>
-              <PerPackageField />
+              <PerPackageField
+                title={intl.formatMessage({ id: 'PerPackageField.title' })}
+              />
             </div>
             <div className={css.fieldSection}>
               <MealPlanDateField form={form} values={values} />
@@ -103,7 +116,19 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
             <div className={css.fieldSection}>
               <FoodPickingField />
               <div className={css.verticalSpace}>
-                <ParticipantSetupField clientId={clientId} />
+                <OrderDealineField
+                  title={intl.formatMessage({ id: 'OrderDealineField.title' })}
+                  form={form}
+                  values={values}
+                />
+              </div>
+              <div className={css.verticalSpace}>
+                <ParticipantSetupField
+                  clientId={clientId}
+                  title={intl.formatMessage({
+                    id: 'ParticipantSetupField.title',
+                  })}
+                />
               </div>
             </div>
 

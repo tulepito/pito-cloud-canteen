@@ -6,6 +6,7 @@ import subAccountLogin from '@services/subAccountLogin';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { TOrder, TPlan } from '@utils/orderTypes';
+import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HTTP_METHODS } from '../helpers/constants';
@@ -20,7 +21,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case HTTP_METHODS.POST:
       try {
-        const { companyId, ...rest } = req.body;
+        const { companyId, dealineDate, deadlineHour, ...rest } = req.body;
         const adminAccount = await getAdminAccount();
         const { currentOrderNumber } = adminAccount.attributes.profile.metadata;
         await integrationSdk.users.updateProfile({
@@ -43,6 +44,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const draftedOrderListing = denormalisedResponseEntities(
           draftedOrderListinResponse,
         )[0];
+
+        const parsedDeadlineDate =
+          DateTime.fromMillis(dealineDate).toFormat('yyyy-MM-dd');
+        const orderDeadline = DateTime.fromISO(
+          `${parsedDeadlineDate}T${deadlineHour}:00`,
+        ).toMillis();
         const updatedDraftOrderListingResponse =
           await integrationSdk.listings.update({
             id: draftedOrderListing.id.uuid,
@@ -51,6 +58,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               listingType: ListingTypes.ORDER,
               generalInfo: {
                 ...rest,
+                orderDeadline,
               },
             },
           });
