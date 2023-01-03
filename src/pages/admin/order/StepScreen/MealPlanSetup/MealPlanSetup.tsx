@@ -12,6 +12,7 @@ import DayInWeekField from '../../create/components/DayInWeekField/DayInWeekFiel
 import DeliveryAddressField from '../../create/components/DeliveryAddressField/DeliveryAddressField';
 import FoodPickingField from '../../create/components/FoodPickingField/FoodPickingField';
 import MealPlanDateField from '../../create/components/MealPlanDateField/MealPlanDateField';
+import OrderDealineField from '../../create/components/OrderDealineField/OrderDealineField';
 import ParticipantSetupField from '../../create/components/ParticipantSetupField/ParticipantSetupField';
 import PerPackageField from '../../create/components/PerPackageField/PerPackageField';
 import css from './MealPlanSetup.module.scss';
@@ -27,11 +28,13 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
       packagePerMember,
       vatAllow,
       pickAllow,
-      participantSetup,
+      selectedGroups,
       deliveryHour,
       startDate,
       endDate,
       deliveryAddress,
+      deadlineDate,
+      deadlineHour,
     },
   } = getPersistState('Order');
   const { address, origin } = deliveryAddress || {};
@@ -55,7 +58,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
       packagePerMember: packagePerMember || '',
       vatAllow: vatAllow || true,
       pickAllow: pickAllow || true,
-      participantSetup: participantSetup || ['allMembers'],
+      selectedGroups: selectedGroups || ['allMembers'],
       deliveryHour: deliveryHour || '',
       deliveryAddress: deliveryAddress
         ? {
@@ -65,19 +68,23 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
         : null,
       startDate: startDate || '',
       endDate: endDate || '',
+      deadlineDate: deadlineDate || null,
+      deadlineHour: deadlineHour || null,
     }),
     [
       dayInWeek,
       packagePerMember,
       vatAllow,
       pickAllow,
-      participantSetup,
+      selectedGroups,
       deliveryHour,
       deliveryAddress,
       address,
       origin,
       startDate,
       endDate,
+      deadlineDate,
+      deadlineHour,
     ],
   );
   return (
@@ -89,10 +96,14 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
         return (
           <Form onSubmit={handleSubmit}>
             <div className={css.fieldSection}>
-              <DeliveryAddressField />
+              <DeliveryAddressField
+                title={intl.formatMessage({ id: 'DeliveryAddressField.title' })}
+              />
             </div>
             <div className={css.fieldSection}>
-              <PerPackageField />
+              <PerPackageField
+                title={intl.formatMessage({ id: 'PerPackageField.title' })}
+              />
             </div>
             <div className={css.fieldSection}>
               <MealPlanDateField form={form} values={values} />
@@ -104,7 +115,19 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = () => {
             <div className={css.fieldSection}>
               <FoodPickingField />
               <div className={css.verticalSpace}>
-                <ParticipantSetupField clientId={clientId} />
+                <OrderDealineField
+                  title={intl.formatMessage({ id: 'OrderDealineField.title' })}
+                  form={form}
+                  values={values}
+                />
+              </div>
+              <div className={css.verticalSpace}>
+                <ParticipantSetupField
+                  clientId={clientId}
+                  title={intl.formatMessage({
+                    id: 'ParticipantSetupField.title',
+                  })}
+                />
               </div>
             </div>
 

@@ -10,3 +10,11 @@
 .fieldGroups {
   margin-top: 16px;
 }
+
+.groupSetup {
+  @include text(14px, 24px);
+  color: $secondaryBlue6;
+  font-weight: $fontWeightBold;
+  margin-top: 12px;
+  display: block;
+}

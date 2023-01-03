@@ -52,4 +52,17 @@
 .rightSide {
   width: 65%;
   padding-left: 16px;
+
+  .title {
+    @include text(20px, 32px);
+    font-weight: $fontWeightBold;
+    text-transform: capitalize;
+  }
+
+  .fieldContent {
+    margin-top: 12px;
+  }
+  .submitBtn {
+    margin-top: 16px;
+  }
 }
