@@ -7,12 +7,14 @@ export const generalPaths = {
   Home: '/',
 };
 
+export const IgnoredAuthCheckRoutes = [generalPaths.StyleGuide];
+export const IgnoredPermissionCheckRoutes = [generalPaths.StyleGuide];
+
 export const NonRequireAuthenticationRoutes = [
   generalPaths.RecoveryPassword,
   generalPaths.ResetPassword,
   generalPaths.SignIn,
   generalPaths.SignUp,
-  generalPaths.StyleGuide,
 ];
 
 export const adminPaths = {
