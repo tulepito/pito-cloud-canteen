@@ -29,7 +29,7 @@ const initialState: ParticipantSetupPlanState = {
 const loadData = createAsyncThunk(
   LOAD_DATA,
   async (planId: string, { getState, dispatch }) => {
-    const currentUser = getState().user.currentUser;
+    const { currentUser } = getState().user;
     const currentUserId = currentUser?.id?.uuid;
     const response: any = await loadPlanDataApi(planId);
     const plan = response?.data?.data?.plan;
@@ -41,7 +41,7 @@ const loadData = createAsyncThunk(
     orderDays.forEach((day) => {
       dispatch(
         shopingCartActions.addToCart({
-          currentUserId: currentUserId,
+          currentUserId,
           planId,
           dayId: day,
           mealId: plan?.[day]?.memberOrder?.[currentUserId]?.foodId,
@@ -60,9 +60,9 @@ const updateOrder = createAsyncThunk(
   UPDATE_ORDER,
   async (data: { orderId: string; planId: string }, { getState, dispatch }) => {
     const { orderId, planId } = data;
-    const currentUser = getState().user.currentUser;
+    const { currentUser } = getState().user;
     const currentUserId = currentUser?.id?.uuid;
-    const orders = getState().shopingCart.orders;
+    const { orders } = getState().shopingCart;
     const planData = orders?.[currentUserId]?.[planId];
     const orderDaysRaw = Object.keys(planData);
     const orderDays = orderDaysRaw.filter((item: any) => planData[item]);

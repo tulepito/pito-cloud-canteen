@@ -20,7 +20,10 @@ const Toggle = (props: TToggle) => {
     if (disabled) {
       return;
     }
-    onClick(!switchControl.value);
+    if (onClick) {
+      onClick(!switchControl.value);
+    }
+
     switchControl.toggle();
   };
 

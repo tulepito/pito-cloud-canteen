@@ -1,5 +1,4 @@
 import Badge from '@components/Badge/Badge';
-import IconCheckmark from '@components/IconCheckmark/IconCheckmark';
 import IconPlusDish from '@components/IconPlusDish/IconPlusDish';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmarkWithCircle';
 import { useAppDispatch } from '@hooks/reduxHooks';

@@ -21,64 +21,7 @@ const initialState: ShopingCartState = {
   orders: {},
 };
 
-const addToCartThunk = createAsyncThunk(
-  ADD_TO_CART,
-  async (
-    {
-      planId,
-      dayId,
-      mealId,
-    }: { planId: string; dayId: string; mealId: string },
-    { getState, dispatch }: ThunkAPI,
-  ) => {
-    const { currentUser } = getState().user;
-    return dispatch(
-      shopingCartSlice.actions.addToCart({
-        currentUserId: currentUser.id.uuid,
-        planId,
-        dayId,
-        mealId,
-      }),
-    );
-  },
-);
-
-const removeFromCartThunk = createAsyncThunk(
-  REMOVE_FROM_CART,
-  async (
-    { planId, dayId }: { planId: string; dayId: string },
-    { getState, dispatch }: ThunkAPI,
-  ) => {
-    const { currentUser } = getState().user;
-    return dispatch(
-      shopingCartSlice.actions.removeToCart({
-        currentUserId: currentUser.id.uuid,
-        planId,
-        dayId,
-      }),
-    );
-  },
-);
-
-const removeAllFromPlanCartThunk = createAsyncThunk(
-  REMOVE_ALL_FROM_PLAN_CART,
-  async ({ planId }: { planId: string }, { getState, dispatch }: ThunkAPI) => {
-    const { currentUser } = getState().user;
-    return dispatch(
-      shopingCartSlice.actions.removeAllFromPlanCart({
-        currentUserId: currentUser.id.uuid,
-        planId,
-      }),
-    );
-  },
-);
-
-export const shopingCartThunks = {
-  addToCart: addToCartThunk,
-  removeFromCart: removeFromCartThunk,
-  removeAllFromPlanCart: removeAllFromPlanCartThunk,
-};
-
+// ================ Slice ================ //
 export const shopingCartSlice = createSlice({
   name: 'shopingCart',
   initialState,
@@ -163,6 +106,65 @@ export const shopingCartSlice = createSlice({
     },
   },
 });
+
+// ================ Thunk functions ================ //
+const addToCartThunk = createAsyncThunk(
+  ADD_TO_CART,
+  async (
+    {
+      planId,
+      dayId,
+      mealId,
+    }: { planId: string; dayId: string; mealId: string },
+    { getState, dispatch }: ThunkAPI,
+  ) => {
+    const { currentUser } = getState().user;
+    return dispatch(
+      shopingCartSlice.actions.addToCart({
+        currentUserId: currentUser.id.uuid,
+        planId,
+        dayId,
+        mealId,
+      }),
+    );
+  },
+);
+
+const removeFromCartThunk = createAsyncThunk(
+  REMOVE_FROM_CART,
+  async (
+    { planId, dayId }: { planId: string; dayId: string },
+    { getState, dispatch }: ThunkAPI,
+  ) => {
+    const { currentUser } = getState().user;
+    return dispatch(
+      shopingCartSlice.actions.removeToCart({
+        currentUserId: currentUser.id.uuid,
+        planId,
+        dayId,
+      }),
+    );
+  },
+);
+
+const removeAllFromPlanCartThunk = createAsyncThunk(
+  REMOVE_ALL_FROM_PLAN_CART,
+  async ({ planId }: { planId: string }, { getState, dispatch }: ThunkAPI) => {
+    const { currentUser } = getState().user;
+    return dispatch(
+      shopingCartSlice.actions.removeAllFromPlanCart({
+        currentUserId: currentUser.id.uuid,
+        planId,
+      }),
+    );
+  },
+);
+
+export const shopingCartThunks = {
+  addToCart: addToCartThunk,
+  removeFromCart: removeFromCartThunk,
+  removeAllFromPlanCart: removeAllFromPlanCartThunk,
+};
 
 export const shopingCartActions = shopingCartSlice.actions;
 
