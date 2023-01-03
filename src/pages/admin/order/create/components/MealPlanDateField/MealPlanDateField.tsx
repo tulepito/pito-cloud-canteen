@@ -1,7 +1,7 @@
 import FieldDatePicker from '@components/FieldDatePicker/FieldDatePicker';
 import FieldSelect from '@components/FieldSelect/FieldSelect';
 import { required } from '@utils/validators';
-import addDays from 'date-fns/addDays';
+import classNames from 'classnames';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -25,20 +25,20 @@ const TIME_OPTIONS = [
 type MealPlanDateFieldProps = {
   form: any;
   values: Record<string, any>;
+  columnLayout?: boolean;
 };
 const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
-  const { values } = props;
+  const { values, columnLayout = false } = props;
   const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
     values;
   const intl = useIntl();
-  const today = new Date();
   const initialStartDate = startDateInitialValue
     ? new Date(startDateInitialValue)
-    : addDays(today, 2);
+    : null;
   const initialEndDate = endDateInitialValue
     ? new Date(endDateInitialValue)
     : null;
-  const [startDate, setStartDate] = useState<Date>(initialStartDate);
+  const [startDate, setStartDate] = useState<Date>(initialStartDate!);
   const [endDate, setEndDate] = useState<Date>(initialEndDate!);
   const startDateRequiredMessage = intl.formatMessage({
     id: 'MealPlanDateField.startDateRequired',
@@ -49,12 +49,16 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
   const deliveryHourRequiredMessage = intl.formatMessage({
     id: 'MealPlanDateField.deliveryHourRequired',
   });
+
+  const fieldGroupLayout = classNames(css.fieldGroups, {
+    [css.column]: columnLayout,
+  });
   return (
     <div className={css.container}>
       <div className={css.fieldTitle}>
         {intl.formatMessage({ id: 'MealPlanDateField.title' })}
       </div>
-      <div className={css.fieldGroups}>
+      <div className={fieldGroupLayout}>
         <FieldDatePicker
           id="startDate"
           name="startDate"

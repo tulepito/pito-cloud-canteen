@@ -1,13 +1,21 @@
+import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import IconArrow from '@components/IconArrow/IconArrow';
 import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
+import { useAppSelector } from '@hooks/reduxHooks';
 import classNames from 'classnames';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
 
+import DeliveryAddressField from '../DeliveryAddressField/DeliveryAddressField';
+import MealPlanDateField from '../MealPlanDateField/MealPlanDateField';
+import OrderDealineField from '../OrderDealineField/OrderDealineField';
+import ParticipantSetupField from '../ParticipantSetupField/ParticipantSetupField';
+import PerPackageField from '../PerPackageField/PerPackageField';
 import css from './OrderSettingModal.module.scss';
 
 type OrderSettingModalProps = {
@@ -33,6 +41,53 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
     OrderSettingField.COMPANY,
   );
   const intl = useIntl();
+
+  const {
+    draftOrder: {
+      clientId,
+      packagePerMember,
+      selectedGroups = [],
+      deliveryHour,
+      deliveryAddress,
+      deadlineDate,
+      deadlineHour,
+      vatAllow,
+      startDate,
+      endDate,
+    },
+  } = useAppSelector((state) => state.Order, shallowEqual);
+  const { address, origin } = deliveryAddress || {};
+  const initialValues = useMemo(
+    () => ({
+      packagePerMember: packagePerMember || '',
+      vatAllow: vatAllow || true,
+      selectedGroups: selectedGroups || ['allMembers'],
+      deliveryHour: deliveryHour || '',
+      deadlineDate: deadlineDate || null,
+      deadlineHour: deadlineHour || null,
+      deliveryAddress: deliveryAddress
+        ? {
+            search: address,
+            selectedPlace: { address, origin },
+          }
+        : null,
+      startDate: startDate || null,
+      endDate: endDate || null,
+    }),
+    [
+      packagePerMember,
+      vatAllow,
+      selectedGroups,
+      deliveryHour,
+      deadlineDate,
+      deadlineHour,
+      deliveryAddress,
+      address,
+      origin,
+      startDate,
+      endDate,
+    ],
+  );
   const leftSideRenderer = () =>
     Object.keys(initialFieldValues).map((field: string) => {
       const fieldSelectorClasses = classNames(css.fieldSelector, {
@@ -54,24 +109,96 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
         </div>
       );
     });
-  const rightSideRenderer = () => {
+  const rightSideRenderer = (form: any, values: any) => {
     switch (selectedField) {
       case OrderSettingField.COMPANY:
-        return <div>Company</div>;
+        return (
+          <>
+            <div className={css.title}>
+              {intl.formatMessage({
+                id: 'OrderSettingModal.field.company',
+              })}
+            </div>
+            <div className={css.fieldContent}></div>
+          </>
+        );
       case OrderSettingField.DELIVERY_ADDRESS:
-        return <div>deliveryAddress</div>;
+        return (
+          <>
+            <div className={css.title}>
+              {intl.formatMessage({
+                id: 'OrderSettingModal.field.deliveryAddress',
+              })}
+            </div>
+            <div className={css.fieldContent}>
+              <DeliveryAddressField />
+            </div>
+          </>
+        );
       case OrderSettingField.DELIVERY_TIME:
-        return <div>deliveryTime</div>;
+        return (
+          <>
+            <div className={css.title}>
+              {intl.formatMessage({
+                id: 'OrderSettingModal.field.deliveryTime',
+              })}
+            </div>
+            <MealPlanDateField columnLayout form={form} values={values} />
+          </>
+        );
       case OrderSettingField.PICKING_DEADLINE:
-        return <div>pickingDeadline</div>;
+        return (
+          <>
+            <div className={css.title}>
+              {intl.formatMessage({
+                id: 'OrderSettingModal.field.pickingDeadline',
+              })}
+            </div>
+            <div className={css.fieldContent}>
+              <OrderDealineField columnLayout form={form} values={values} />
+            </div>
+          </>
+        );
       case OrderSettingField.EMPLOYEE_AMOUNT:
-        return <div>employeeAmount</div>;
+        return (
+          <>
+            <div className={css.title}>
+              {intl.formatMessage({
+                id: 'OrderSettingModal.field.employeeAmount',
+              })}
+            </div>
+            <div className={css.fieldContent}></div>
+          </>
+        );
       case OrderSettingField.SPECIAL_DEMAND:
-        return <div>specialDemand</div>;
+        return (
+          <>
+            <div className={css.title}>
+              {intl.formatMessage({
+                id: 'OrderSettingModal.field.specialDemand',
+              })}
+            </div>
+            <div className={css.fieldContent}></div>
+          </>
+        );
       case OrderSettingField.ACCESS_SETTING:
-        return <div>accessSetting</div>;
+        return (
+          <>
+            <div className={css.title}>Cài đặt truy cập</div>
+            <div className={css.fieldContent}>
+              <ParticipantSetupField clientId={clientId} />
+            </div>
+          </>
+        );
       case OrderSettingField.PER_PACK:
-        return <div>perPack</div>;
+        return (
+          <>
+            <div className={css.title}>Ngân sách 1 người</div>
+            <div className={css.fieldContent}>
+              <PerPackageField />
+            </div>
+          </>
+        );
 
       default:
         return null;
@@ -89,10 +216,18 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
           <div className={css.rightSide}>
             <FinalForm
               onSubmit={() => {}}
+              initialValues={initialValues}
               render={(formRenderProps: FormRenderProps) => {
-                const { handleSubmit } = formRenderProps;
+                const { handleSubmit, form, values } = formRenderProps;
                 return (
-                  <Form onSubmit={handleSubmit}>{rightSideRenderer()}</Form>
+                  <Form onSubmit={handleSubmit}>
+                    {rightSideRenderer(form, values)}
+                    <Button className={css.submitBtn} type="submit">
+                      {intl.formatMessage({
+                        id: 'OrderSettingModal.saveChange',
+                      })}
+                    </Button>
+                  </Form>
                 );
               }}
             />

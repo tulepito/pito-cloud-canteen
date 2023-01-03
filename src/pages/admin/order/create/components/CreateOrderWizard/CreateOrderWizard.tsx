@@ -1,11 +1,11 @@
 import FormWizard from '@components/FormWizard/FormWizard';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
-import CalendarPage from '@src/pages/calendar/CalendarPage.page';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import ClientSelector from '../../../StepScreen/ClientSelector/ClientSelector';
+import MealPlanCreator from '../../../StepScreen/MealPlanCreator/MealPlanCreator';
 import MealPlanSetup from '../../../StepScreen/MealPlanSetup/MealPlanSetup';
 import ReviewOrder from '../ReviewOrder/ReviewOrder';
 import css from './CreateOrderWizard.module.scss';
@@ -31,7 +31,7 @@ const CreateOrderTab: React.FC<any> = (props) => {
     case MEAL_PLAN_SETUP:
       return <MealPlanSetup />;
     case CREATE_MEAL_PLAN_TAB:
-      return <CalendarPage />;
+      return <MealPlanCreator />;
     case REVIEW_TAB:
       return <ReviewOrder goBack={goBack} />;
     default:

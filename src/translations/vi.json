@@ -356,6 +356,7 @@
   "OrderSettingModal.field.specialDemand": "Yêu cầu đặc biệt",
   "OrderSettingModal.field.accessSetting": "Cài đặt truy cập",
   "OrderSettingModal.field.perPack": "Ngân sách 1 người",
+  "OrderSettingModal.saveChange": "Lưu thay đổi",
   "CreateOrderWizard.clientSelectLabel": "Chọn khách hàng",
   "CreateOrderWizard.mealPlanSetupLabel": "Thiết lập kế hoạch bữa ăn",
   "CreateOrderWizard.createMealPlanLabel": "Tạo kế hoạch bữa ăn",
@@ -524,5 +525,10 @@
   "EditCompanyForm.taxValid": "Mã số thuế phải là dãy số có 13 chữ số hoặc 10 chữ số ( bao gồm nhiều nhất một dấu ' - ' ).",
   "EditCompanyForm.createSuccess": "Tạo thành công",
   "EditCompanyForm.updateSuccess": "Cập nhật thành công",
-  "EditPartnerBasicInformationForm.minPriceRequired": "Vui lòng nhập giá trị tối thiểu"
+  "EditPartnerBasicInformationForm.minPriceRequired": "Vui lòng nhập giá trị tối thiểu",
+  "OrderDealineField.title": "Thời hạn kết thúc chọn món",
+  "OrderDealineField.deadlineDateLabel": "Chọn ngày",
+  "OrderDealineField.deliveryHourLabel": "Chọn giờ",
+  "OrderDealineField.deadlineDateRequired": "Vui lòng nhập ngày",
+  "OrderDealineField.deadlineHourRequired": "Vui lòng nhập giờ"
 }

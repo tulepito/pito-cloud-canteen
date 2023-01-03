@@ -4,16 +4,18 @@ import { useIntl } from 'react-intl';
 
 import css from './DeliveryAddressField.module.scss';
 
-const DeliveryAddressField = () => {
+type DeliveryAddressFieldProps = {
+  title?: string;
+};
+const DeliveryAddressField: React.FC<DeliveryAddressFieldProps> = (props) => {
+  const { title } = props;
   const intl = useIntl();
   const deliveryAddressRequiredMessage = intl.formatMessage({
     id: 'DeliveryAddressField.title',
   });
   return (
     <div className={css.container}>
-      <div className={css.fieldTitle}>
-        {intl.formatMessage({ id: 'DeliveryAddressField.title' })}
-      </div>
+      {title && <div className={css.fieldTitle}>{title}</div>}
       <LocationAutocompleteInputField
         id="deliveryAddress"
         name="deliveryAddress"
