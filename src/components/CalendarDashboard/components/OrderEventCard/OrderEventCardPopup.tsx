@@ -1,6 +1,6 @@
 import { InlineTextButton } from '@components/Button/Button';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { ParticipantOrderAsyncAction } from '@redux/slices/ParticipantOrderManagementPage';
+import { ParticipantOrderAsyncAction } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { CURRENT_USER } from '@utils/data';
 import { useRouter } from 'next/router';
 import React from 'react';

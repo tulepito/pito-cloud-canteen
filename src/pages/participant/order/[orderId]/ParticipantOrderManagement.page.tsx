@@ -1,6 +1,6 @@
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { ParticipantOrderAsyncAction } from '@redux/slices/ParticipantOrderManagementPage';
+import { ParticipantOrderAsyncAction } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
