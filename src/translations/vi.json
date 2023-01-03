@@ -357,5 +357,6 @@
   "SectionOrderListing.sectionOrderNotify": "Thành viên có thể bỏ qua ngày trong trường hợp không ăn ngày đó.",
   "SectionOrderPanel.sectionTitle": "Thực đơn của bạn",
   "SectionOrderListing.autoSelectionButtonLabel": "Chọn giúp tôi",
-  "SectionOrderListing.unCheckThisDateButtonLabel": "Bỏ chọn ngày này"
+  "SectionOrderListing.unCheckThisDateButtonLabel": "Bỏ chọn ngày này",
+  "SectionOrderPanel.numberSelectedDays": "({selectedDays}/{sumDays} ngày đã chọn)"
 }

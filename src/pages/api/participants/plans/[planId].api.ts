@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
+import cookies from '@services/cookie';
 import {
   CURRENT_USER,
   denormalisedResponseEntities,
@@ -101,4 +102,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default handler;
+export default cookies(handler);

@@ -15,6 +15,8 @@ interface ParticipantSetupPlanState {
   order: any;
   loadDataInProgress: boolean;
   loadDataError: any;
+  submitDataInprogress: boolean;
+  submitDataError: any;
 }
 
 const initialState: ParticipantSetupPlanState = {
@@ -24,6 +26,8 @@ const initialState: ParticipantSetupPlanState = {
   order: {},
   loadDataInProgress: false,
   loadDataError: null,
+  submitDataInprogress: false,
+  submitDataError: null,
 };
 
 const loadData = createAsyncThunk(
@@ -85,7 +89,7 @@ const updateOrder = createAsyncThunk(
     };
 
     await updateParticipantOrderApi(orderId, updateValues);
-    await dispatch(loadData(planId));
+    return dispatch(loadData(planId));
   },
   {
     serializeError: storableError,
@@ -118,7 +122,18 @@ const participantSetupPlanSlice = createSlice({
         ...state,
         loadDataError: error.message,
         loadDataInProgress: false,
-      }));
+      }))
+      .addCase(updateOrder.pending, (state) => {
+        state.submitDataInprogress = true;
+        state.submitDataError = null;
+      })
+      .addCase(updateOrder.fulfilled, (state) => {
+        state.submitDataInprogress = false;
+      })
+      .addCase(updateOrder.rejected, (state, { error }) => {
+        state.submitDataInprogress = false;
+        state.submitDataError = error.message;
+      });
   },
 });
 
