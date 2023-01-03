@@ -58,7 +58,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             subAccountId: subAccount.id.uuid,
           },
           metadata: {
-            isCompanyAccount: true,
+            isCompany: true,
             status: ECompanyStatus.unactive,
           },
         },
