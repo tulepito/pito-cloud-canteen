@@ -55,7 +55,9 @@ const createOrder = createAsyncThunk(
       orderDetail,
     };
     const { data: orderListing } = await createOrderApi(apiBody);
-    // return order listing entity
+    await addMealPlanDetailApi({
+      orderId: orderListing.data.id.uuid,
+    });
     return orderListing;
   },
 );
