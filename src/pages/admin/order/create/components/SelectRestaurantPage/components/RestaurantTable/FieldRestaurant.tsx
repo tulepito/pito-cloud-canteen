@@ -3,6 +3,7 @@ import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
 import { CATEGORY_OPTIONS } from '@utils/enums';
 import classNames from 'classnames';
 import get from 'lodash/get';
+import { FormattedMessage } from 'react-intl';
 
 import css from './RestaurantTable.module.scss';
 
@@ -51,7 +52,7 @@ const FieldRestaurant: React.FC<TFieldRestaurantProps> = (props) => {
         <div></div>
         <div></div>
         <InlineTextButton className={css.seeMenuButton} onClick={onItemClick}>
-          Xem menu
+          <FormattedMessage id="FieldRestaurant.viewMenu" />
         </InlineTextButton>
       </div>
     </div>

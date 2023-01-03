@@ -1,6 +1,7 @@
 import Badge from '@components/Badge/Badge';
 import Modal from '@components/Modal/Modal';
 import { useState } from 'react';
+import { useIntl } from 'react-intl';
 
 import type { TSelectFoodFormValues } from './components/SelectFoodForm/SelectFoodForm';
 import SelectFoodForm from './components/SelectFoodForm/SelectFoodForm';
@@ -15,6 +16,7 @@ type TSelectFoodModalProps = {
 };
 
 const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
+  const intl = useIntl();
   const { isOpen, handleClose, items, restaurant, handleSelectFood } = props;
   const restaurantId = restaurant?.id?.uuid;
   const { title } = restaurant?.attributes || {};
@@ -29,7 +31,16 @@ const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
       <div className={css.title} title={title}>
         {title}
       </div>
-      <Badge type="warning" label={`Đã chọn: ${foodCount} món`} hasDotIcon />
+      <Badge
+        type="warning"
+        label={intl.formatMessage(
+          {
+            id: 'SelectFoodModal.selectedTitle',
+          },
+          { foodCount },
+        )}
+        hasDotIcon
+      />
     </div>
   );
 

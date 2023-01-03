@@ -20,6 +20,7 @@ interface OrderInitialState {
   completeOrderInProgress: boolean;
   completeOrderError: any;
   draftOrder: any;
+  selectedCompany: any;
 }
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -39,6 +40,7 @@ const initialState: OrderInitialState = {
   completeOrderInProgress: false,
   completeOrderError: null,
   draftOrder: {},
+  selectedCompany: null,
 };
 
 const createOrder = createAsyncThunk(
@@ -116,8 +118,9 @@ const orderSlice = createSlice({
         ...state,
         draftOrder: {
           ...state.draftOrder,
-          clientId: payload,
+          clientId: payload.id,
         },
+        selectedCompany: payload.company,
       };
     },
     updateDraftMealPlan: (state, { payload }) => {

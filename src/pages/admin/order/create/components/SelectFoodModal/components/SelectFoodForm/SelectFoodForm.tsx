@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import FieldFoodSelectCheckboxGroup from './components/FieldFoodSelect/FieldFoodSelectCheckboxGroup';
 import FieldFoodSelectAll from './components/FieldFoodSelectAll/FieldFoodSelectAll';
@@ -46,6 +47,7 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
     form,
     handleFormChange,
   } = props;
+  const intl = useIntl();
   const submitDisable = foodIds?.length === 0;
 
   const options = items.map((item) => {
@@ -114,7 +116,9 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
           <FieldTextInput
             name="name"
             leftIcon={<SearchIcon />}
-            placeholder="Tìm tên nhà hàng"
+            placeholder={intl.formatMessage({
+              id: 'SelectFoodForm.findFoodByName',
+            })}
           />
         </div>
         <div className={css.contentContainer}>
@@ -138,14 +142,16 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
               </div>
             ) : (
               <div>
-                <div className={css.partTitle}>Món đã chọn</div>
+                <div className={css.partTitle}>
+                  <FormattedMessage id="SelectFoodForm.selectedFood" />
+                </div>
                 <div className={css.divider} />
                 <div>{renderSelectedFoodList()}</div>
               </div>
             )}
             <div className={css.actionContainer}>
               <Button fullWidth disabled={submitDisable}>
-                {'Lưu kết quả'}
+                <FormattedMessage id="SelectFoodForm.saveResult" />
               </Button>
             </div>
           </div>

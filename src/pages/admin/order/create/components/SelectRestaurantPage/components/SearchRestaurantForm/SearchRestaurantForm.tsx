@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './SearchRestaurantForm.module.scss';
 
@@ -31,6 +32,7 @@ type TSearchRestaurantFormComponentProps =
 const SearchRestaurantFormComponent: React.FC<
   TSearchRestaurantFormComponentProps
 > = (props) => {
+  const intl = useIntl();
   const {
     handleSubmit,
     onSelectRestaurant,
@@ -46,14 +48,16 @@ const SearchRestaurantFormComponent: React.FC<
           <FieldTextInput
             name="name"
             leftIcon={<SearchIcon />}
-            placeholder="Tìm tên nhà hàng"
+            placeholder={intl.formatMessage({
+              id: 'SearchRestaurantForm.findRestaurantByName',
+            })}
           />
         </div>
         <Button
           type="button"
           disabled={selectRestaurantDisable}
           onClick={onSelectRestaurant}>
-          {'Chọn nhà hàng này'}
+          <FormattedMessage id="SearchRestaurantForm.selectThisRestaurant" />
         </Button>
       </div>
     </Form>

@@ -90,7 +90,10 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   };
 
   const onClientConfirm = () => {
-    dispatch(addCompanyClient(selectedConpanyId));
+    const company = companyRefs.find(
+      (item) => item?.id?.uuid === selectedConpanyId,
+    );
+    dispatch(addCompanyClient({ id: selectedConpanyId, company }));
     onConfirmClientModalClose();
     nextTab();
   };

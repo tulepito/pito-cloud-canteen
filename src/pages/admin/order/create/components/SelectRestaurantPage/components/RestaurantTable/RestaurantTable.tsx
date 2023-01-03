@@ -1,5 +1,6 @@
 import { useAppSelector } from '@hooks/reduxHooks';
 import type { FormState } from 'final-form';
+import { FormattedMessage } from 'react-intl';
 
 import FieldRestaurant from './FieldRestaurant';
 import css from './RestaurantTable.module.scss';
@@ -41,7 +42,9 @@ const RestaurantTable: React.FC<TRestaurantTableProps> = ({
         onFormChange={onFormChange}>
         <>
           {fetchRestaurantsPending ? (
-            <div className={css.center}>... Loading</div>
+            <div className={css.center}>
+              <FormattedMessage id="RestaurantTable.loadingText" />
+            </div>
           ) : (
             <>
               {restaurants?.length > 0 ? (
@@ -53,7 +56,9 @@ const RestaurantTable: React.FC<TRestaurantTableProps> = ({
                   />
                 ))
               ) : (
-                <div className={css.center}>Không có nhà hàng nào</div>
+                <div className={css.center}>
+                  <FormattedMessage id="RestaurantTable.noResults" />
+                </div>
               )}
             </>
           )}

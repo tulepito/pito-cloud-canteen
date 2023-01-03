@@ -1,4 +1,5 @@
 import Badge from '@components/Badge/Badge';
+import IconArrowHead from '@components/IconArrowHead/IconArrowHead';
 import Pagination from '@components/Pagination/Pagination';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -7,6 +8,7 @@ import { weekDayFormatFromDateTime } from '@utils/dates';
 import type { FormState } from 'final-form';
 import { DateTime } from 'luxon';
 import { useEffect, useRef, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
 
 // eslint-disable-next-line import/no-cycle
 import type { TSelectFoodFormValues } from '../SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
@@ -21,11 +23,13 @@ const DEBOUNCE_TIME = 300;
 type TSelectRestaurantPageProps = {
   onSubmitRestaurant: (values: Record<string, any>) => void;
   selectedDate: Date;
+  onBack: () => void;
 };
 
 const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   onSubmitRestaurant,
   selectedDate,
+  onBack,
 }) => {
   const [mounted, setMounted] = useState<boolean>();
   const [currentRestaurant, setCurrentRestaurant] = useState<any>();
@@ -166,8 +170,15 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
 
   return (
     <section className={css.root}>
+      <div className={css.goBackContainer} onClick={onBack}>
+        <IconArrowHead direction="left" />
+        <span className={css.goBack}></span>
+        <FormattedMessage id="SelectRestaurantPage.goBack" />
+      </div>
       <div className={css.titleContainer}>
-        <h1>Danh sach nha hang</h1>
+        <h1>
+          <FormattedMessage id="SelectRestaurantPage.title" />
+        </h1>
         <Badge label={labelForBadge} />
       </div>
       <SearchRestaurantForm
