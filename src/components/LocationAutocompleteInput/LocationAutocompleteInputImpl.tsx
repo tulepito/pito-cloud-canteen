@@ -243,7 +243,7 @@ const LocationAutocompleteInputImpl = (props: any) => {
         // This is essentially the same as switchLatest in RxJS or
         // takeLatest in Redux Saga, without canceling the earlier
         // requests.
-        console.log(results.search);
+
         onChangeInput({
           search: results.search,
           predictions: results.predictions,
