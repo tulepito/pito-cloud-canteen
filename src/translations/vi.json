@@ -396,5 +396,7 @@
   "EditPartnerBasicInformationForm.passwordInvalid": "Mật khẩu phải từ 8-16 kí tự, bao gồm chữ cái in hoa, chữ cái in thường, ký tự đặc biệt và chữ số.",
   "EditPartnerForm.websiteInvalid": "Đường dẫn website không hợp lệ",
   "EditPartnerLicenseForm.businessTypeLabel": "Loại hình kinh doanh",
-  "EditPartnerBasicInformationForm.packagingLabel": "Bao bì thường sử dụng"
+  "EditPartnerBasicInformationForm.packagingLabel": "Bao bì thường sử dụng",
+  "EditPartnerForm.businessTypeLabel": "Loại hình kinh doanh",
+  "FieldBankAccounts.bankAccountNumberInvalid": "Số tài khoản không hợp lệ"
 }

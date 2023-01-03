@@ -197,6 +197,7 @@ export const composeValidators =
 export const validFacebookUrl = (message: string) => (value: string) => {
   if (!value) return VALID;
   const pattern =
+    // eslint-disable-next-line no-useless-escape
     /^(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?$/;
   if (pattern.test(value)) {
     return VALID;

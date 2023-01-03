@@ -21,6 +21,7 @@ import React from 'react';
 import { Field, Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { BUSINESS_TYPE_OPTIONS } from '../EditPartnerLicenseForm/EditPartnerLicenseForm';
 import { createAvailabilityPlanInitialValues } from '../EditPartnerWizardTab/utils';
 import css from './EditPartnerPreviewForm.module.scss';
 
@@ -72,6 +73,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
           extraServices = [],
           bankAccounts = [],
           status,
+          businessType,
         } = values;
 
         const entries = createAvailabilityPlanInitialValues(availabilityPlan);
@@ -405,6 +407,14 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                     </div>
                   )}
                 </div>
+              </div>
+              <div>
+                <p className={css.label}>
+                  {intl.formatMessage({
+                    id: 'EditPartnerForm.businessTypeLabel',
+                  })}
+                </p>
+                <p>{getLabelByKey(BUSINESS_TYPE_OPTIONS, businessType)}</p>
               </div>
             </div>
             <div className={classNames(css.section, css.licenseSection)}>

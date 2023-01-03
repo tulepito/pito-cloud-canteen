@@ -5,7 +5,11 @@ import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import IconAdd from '@components/IconAdd/IconAdd';
 import IconDelete from '@components/IconDelete/IconDelete';
 import { LIST_BANKS } from '@utils/enums';
-import { required } from '@utils/validators';
+import {
+  composeValidators,
+  numberMinLength,
+  required,
+} from '@utils/validators';
 import classNames from 'classnames';
 import React, { Fragment } from 'react';
 import { FieldArray } from 'react-final-form-arrays';
@@ -106,10 +110,18 @@ const FieldBankAccounts: React.FC<any> = (props) => {
                       })}
                       id={`${fieldName}.bankAccountNumber`}
                       name={`${fieldName}.bankAccountNumber`}
-                      validate={required(
-                        intl.formatMessage({
-                          id: 'FieldBankAccounts.bankAccountNumberRequired',
-                        }),
+                      validate={composeValidators(
+                        required(
+                          intl.formatMessage({
+                            id: 'FieldBankAccounts.bankAccountNumberRequired',
+                          }),
+                        ),
+                        numberMinLength(
+                          intl.formatMessage({
+                            id: 'FieldBankAccounts.bankAccountNumberInvalid',
+                          }),
+                          0,
+                        ),
                       )}
                     />
                     <FieldTextInput

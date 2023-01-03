@@ -20,7 +20,7 @@ type TBusinessTypeOptions = {
   label: string;
 };
 
-const BUSINESS_TYPE_OPTIONS: TBusinessTypeOptions[] = [
+export const BUSINESS_TYPE_OPTIONS: TBusinessTypeOptions[] = [
   {
     id: 'businessType.company',
     value: 'company',
@@ -33,7 +33,7 @@ const BUSINESS_TYPE_OPTIONS: TBusinessTypeOptions[] = [
   },
 ];
 
-const BUSINESS_LICENSE_RADIO_OPTIONS = [
+export const BUSINESS_LICENSE_RADIO_OPTIONS = [
   {
     id: 'businessLicense.yes',
     value: 'yes',
@@ -61,7 +61,7 @@ const BUSINESS_LICENSE_RADIO_OPTIONS = [
   },
 ];
 
-const FOOD_CERTIFICATE_RADIO_OPTIONS = [
+export const FOOD_CERTIFICATE_RADIO_OPTIONS = [
   {
     id: 'foodCertificate.yes',
     value: 'yes',
