@@ -24,7 +24,7 @@ export const defaultPredictions = (
     : []
 ).concat(config.maps.search.defaults);
 
-const DEBOUNCE_WAIT_TIME = 300;
+const DEBOUNCE_WAIT_TIME = 400;
 const KEY_CODE_ARROW_UP = 38;
 const KEY_CODE_ARROW_DOWN = 40;
 const KEY_CODE_ENTER = 13;
@@ -243,7 +243,7 @@ const LocationAutocompleteInputImpl = (props: any) => {
         // This is essentially the same as switchLatest in RxJS or
         // takeLatest in Redux Saga, without canceling the earlier
         // requests.
-
+        console.log(results.search);
         onChangeInput({
           search: results.search,
           predictions: results.predictions,
@@ -277,9 +277,12 @@ const LocationAutocompleteInputImpl = (props: any) => {
     // Clear highlighted prediction since the input value changed and
     // results will change as well
     setHighlightedIndex(-1);
-
+    console.log(newValue);
     if (!newValue) {
       // No need to fetch predictions on empty input
+      if (shortQueryTimeoutRef.current) {
+        window.clearTimeout(shortQueryTimeoutRef.current);
+      }
       return;
     }
 
