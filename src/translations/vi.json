@@ -361,5 +361,7 @@
   "SectionOrderPanel.numberSelectedDays": "({selectedDays}/{sumDays} ngày đã chọn)",
   "NotificationSelectionForm.aDayAgo": "1 ngày trước hạn",
   "NotificationSelectionForm.aHourAgo": "1 tiếng trước hạn",
-  "NotificationSelectionForm.thirtyMinutesAgo": "30 phút trước hạn"
+  "NotificationSelectionForm.thirtyMinutesAgo": "30 phút trước hạn",
+  "SectionOrderListing.notJoinThisDay": "Bỏ chọn ngày này",
+  "SectionOrderPanel.notJoined": "[Không tham gia]"
 }

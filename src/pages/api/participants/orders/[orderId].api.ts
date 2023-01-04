@@ -151,7 +151,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               planData?.[day]?.[currentUserId];
           });
         }
-
         await integrationSdk.listings.update({
           id: planId,
           metadata: {
