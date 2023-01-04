@@ -43,13 +43,14 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     (!isSignUpPath || shouldNavigateInSignUpFlow);
 
   const verifyAuthentication = useCallback(() => {
-    if (!isIgnoredAuthCheckRoute || !authInfoLoaded) {
+    if (isIgnoredAuthCheckRoute || !authInfoLoaded) {
       return;
     }
 
     if (isNonRequireAuthenticationRoute) {
       if (homePageNavigateCondition) {
         router.prefetch(generalPaths.Home);
+        router.push(generalPaths.Home);
       }
     } else if (!isAuthenticated) {
       router.push(generalPaths.SignIn);
