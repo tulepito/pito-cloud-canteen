@@ -35,7 +35,9 @@ const AdminHeader: React.FC<TAdminHeader> = () => {
         <PitoLogo className={css.logo} />
       </div>
       <div className={css.headerLeft}>
-        <IconBell className={css.iconBell} />
+        <InlineTextButton type="button">
+          <IconBell className={css.iconBell} />
+        </InlineTextButton>
         <div className={css.line}></div>
         <ProfileMenu>
           <ProfileMenuLabel className={css.profileMenuWrapper}>

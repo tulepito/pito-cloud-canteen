@@ -1,60 +1,12 @@
 import IconArrow from '@components/IconArrow/IconArrow';
+import { adminRoutes } from '@src/paths';
+import type { RouteKey } from '@utils/types';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import css from './AdminBreadCrumbs.module.scss';
-
-type TPath = {
-  path: string;
-  label: string;
-};
-
-type TPaths = Record<string, TPath>;
-
-export const paths: TPaths = {
-  Dashboard: {
-    path: '/admin',
-    label: 'Trang chủ',
-  },
-  ManageUsers: {
-    path: '/admin/users',
-    label: 'Quản lý người dùng',
-  },
-  ManageCompanies: {
-    path: '/admin/company',
-    label: 'Quản lý khách hàng',
-  },
-  EditCompany: {
-    path: '/admin/company/[companyId]/edit',
-    label: 'Chỉnh sửa khách hàng',
-  },
-  CreateCompany: {
-    path: '/admin/company/create',
-    label: 'Tạo khách hàng',
-  },
-  ManagePartners: {
-    path: '/admin/partner',
-    label: 'Quản lý đối tác',
-  },
-  CreatePartner: {
-    path: '/admin/partner/create',
-    label: 'Tạo đối tác',
-  },
-  EditPartner: {
-    path: '/admin/partner/[partnerId]/edit',
-    label: 'Chỉnh sửa đối tác',
-  },
-  ManageOrders: {
-    path: '/admin/order',
-    label: 'Quản lý đơn hàng',
-  },
-  CreateOrder: {
-    path: '/admin/order/create',
-    label: 'Tạo đơn hàng',
-  },
-};
 
 const combineAccumulatively = (segments: any[], isAdminRoute: boolean) => {
   const links = segments.reduce((acc, cur, curIndex) => {
@@ -83,13 +35,13 @@ export const BreadCrumbs = () => {
     const crumbLabels = combineAccumulatively(segmentsRoute, isAdminRoute);
     const newCrumbs = crumbLinks.map((link: any, index: string | number) => {
       const currentRoute = crumbLabels[index];
-      const activeKey = Object.keys(paths).find((key: any) => {
-        return paths[key].path === currentRoute;
-      }) as string;
+      const activeKey = Object.keys(adminRoutes).find((key) => {
+        return adminRoutes[key as RouteKey].path === currentRoute;
+      }) as RouteKey;
       const crumb = {
         link,
         route,
-        label: paths?.[activeKey]?.label,
+        label: adminRoutes?.[activeKey]?.label,
       };
       return crumb;
     });

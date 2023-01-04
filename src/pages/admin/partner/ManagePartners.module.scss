@@ -4,7 +4,7 @@
 .root {
 }
 
-.rowText {
+.rowId {
   min-width: 50px;
   max-width: 200px;
   text-overflow: ellipsis;
@@ -12,6 +12,11 @@
   -webkit-line-clamp: 3; /* number of lines to show */
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.rowText {
+  min-width: 50px;
+  max-width: 200px;
 }
 
 .badge {

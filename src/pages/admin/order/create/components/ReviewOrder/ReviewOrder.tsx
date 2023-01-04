@@ -352,6 +352,12 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     }
   };
 
+  const initialValues = useMemo(() => {
+    return {
+      staffName: draftOrder?.staffName,
+    };
+  }, [draftOrder]);
+
   return (
     <div className={css.root}>
       <h1 className={css.title}>
@@ -360,6 +366,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       <FinalForm
         mutators={{ ...arrayMutators }}
         {...props}
+        initialValues={initialValues}
         onSubmit={onSubmit}
         render={(fieldRenderProps: any) => {
           const { handleSubmit, goBack } = fieldRenderProps;

@@ -1,10 +1,11 @@
 import IconHome from '@components/IconHome/IconHome';
 import IconOrderManagement from '@components/IconOrderManagement/IconOrderManagement';
 import IconUserManagement from '@components/IconUserManagement/IconUserManagement';
+import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import NamedLink from '@components/NamedLink/NamedLink';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
-import { adminPaths } from '@src/paths';
+import { adminRoutes } from '@src/paths';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
@@ -12,28 +13,30 @@ import { useIntl } from 'react-intl';
 
 import css from './AdminSidebar.module.scss';
 
-const LIST_SIDEBAR_MENU = [
+const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
   {
     id: 'dashboard',
     Icon: IconHome,
-    nameLink: adminPaths.Dashboard,
-    label: 'Trang chủ',
+    nameLink: adminRoutes.Dashboard.path,
+    label: 'AdminSidebar.dashboardLabel',
+    isFirstLevel: true,
   },
   {
     id: 'order',
     Icon: IconOrderManagement,
-    nameLink: adminPaths.CreateOrder,
+    nameLink: adminRoutes.CreateOrder.path,
     label: 'AdminSidebar.orderLabel',
+    isFirstLevel: true,
     childrenMenus: [
       {
         id: 'createOrder',
         label: 'AdminSidebar.createOrderLabel',
-        nameLink: '/admin/order/create',
+        nameLink: adminRoutes.CreateOrder.path,
       },
       {
         id: 'manageOrders',
         label: 'AdminSidebar.manageOrderLabel',
-        nameLink: '/admin/order',
+        nameLink: adminRoutes.ManageOrders.path,
       },
     ],
   },
@@ -41,26 +44,30 @@ const LIST_SIDEBAR_MENU = [
     id: 'user',
     label: 'AdminSidebar.userLabel',
     Icon: IconUserManagement,
-    level: 1,
-    nameLink: adminPaths.ManageCompanies,
+    isFirstLevel: true,
+    nameLink: adminRoutes.ManageCompanies.path,
     childrenMenus: [
       {
         id: 'company',
         label: 'AdminSidebar.companyLabel',
-        nameLink: '/admin/company',
+        nameLink: adminRoutes.ManageCompanies.path,
+        // Sub name links => if pathname in these path, it will active the parent namelink
+        // Example : current pathname is '/admin/company/create' => the menu with nameLink '/admin/company' will be hightlighted
         subNameLinks: [
-          '/admin/company/create',
-          '/admin/company/[companyId]/edit',
+          adminRoutes.CreateCompany.path,
+          adminRoutes.EditCompany.path,
+          adminRoutes.CompanyDetails.path,
         ],
       },
       {
         id: 'partner',
         label: 'AdminSidebar.partnerLabel',
-        nameLink: '/admin/partner',
+        nameLink: adminRoutes.ManagePartners.path,
         subNameLinks: [
-          '/admin/partner',
-          '/admin/partner/create',
-          '/admin/partner/[partnerId]/edit',
+          adminRoutes.ManagePartners.path,
+          adminRoutes.CreatePartner.path,
+          adminRoutes.EditPartner.path,
+          adminRoutes.PartnerDetails.path,
         ],
       },
     ],
@@ -106,9 +113,27 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
       <div className={css.root}>
         <div className={css.leftSide}>
           {LIST_SIDEBAR_MENU.map((item: any) => {
-            const { Icon, id, nameLink, subNameLinks } = item;
+            const {
+              Icon,
+              id,
+              nameLink,
+              subNameLinks,
+              childrenMenus = [],
+            } = item;
+            const activeWithChildrenNameLinks = childrenMenus.find(
+              (m: TSidebarMenu) => m.nameLink === pathname,
+            );
+
+            const activeWithChildrenSubNameLinks = childrenMenus.find(
+              (m: TSidebarMenu) => m.subNameLinks?.includes(pathname),
+            );
+
             const activeWithSubNameLinks = subNameLinks?.includes(pathname);
-            const isActive = activeWithSubNameLinks || pathname === nameLink;
+            const isActive =
+              activeWithChildrenSubNameLinks ||
+              activeWithChildrenNameLinks ||
+              activeWithSubNameLinks ||
+              pathname === nameLink;
             return (
               <NamedLink
                 path={nameLink}
