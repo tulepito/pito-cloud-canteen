@@ -16,6 +16,8 @@ interface ITabsProps {
   onChange?: (params: any) => void;
   contentClassName?: string;
   headerClassName?: string;
+  actionsClassName?: string;
+  actionsComponent?: ReactNode;
 }
 
 const Tabs = (props: ITabsProps) => {
@@ -24,7 +26,9 @@ const Tabs = (props: ITabsProps) => {
     items,
     contentClassName,
     headerClassName,
+    actionsClassName,
     onChange = () => null,
+    actionsComponent,
   } = props;
   const [activeTabKey, setActiveTabKey] = useState(defaultActiveKey || 1);
 
@@ -65,10 +69,12 @@ const Tabs = (props: ITabsProps) => {
 
   // classes setup
   const headerClasses = classNames(css.tabHeaders, headerClassName);
+  const actionsClasses = classNames(css.actions, actionsClassName);
   const contentClasses = classNames(css.tabPanel, contentClassName);
   return (
     <div className={css.root}>
       <div className={headerClasses}>{tabHeader}</div>
+      <div className={actionsClasses}>{actionsComponent}</div>
       <div className={contentClasses}>{tabContent}</div>
     </div>
   );

@@ -1,3 +1,5 @@
+import { InlineTextButton } from '@components/Button/Button';
+import IconBanned from '@components/Icons/IconBanned';
 import IconCheckmarkTabTitle from '@components/Icons/IconCheckmarkTabTitle';
 import ListingCard from '@components/ListingCard/ListingCard';
 import Tabs from '@components/Tabs/Tabs';
@@ -5,22 +7,27 @@ import { useAppSelector } from '@hooks/reduxHooks';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import Skeleton from 'react-loading-skeleton';
+import { listingLoading } from './Loading';
 
 import css from './SectionOrderListing.module.scss';
+import TabActions from './TabActions';
 
 type TSectionOrderListingProps = {
   plan: any;
   onSelectTab: (restaurant: any) => void;
+  orderDay: string;
 };
 
 const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
   plan,
   onSelectTab,
+  orderDay,
 }) => {
   const intl = useIntl();
+
   const router = useRouter();
-  const { planId, orderDay } = router.query;
+  const { planId } = router.query;
+
   const cartList = useAppSelector((state) => {
     const { currentUser } = state.user;
     const currUserId = currentUser?.id?.uuid;
@@ -32,29 +39,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
 
   const convertDataToTabItem = () => {
     if (loadDataInProgress) {
-      return [
-        {
-          label: <Skeleton className={css.loadTitle} />,
-          id: 'Loading...',
-          children: [1, 2, 3].map((item) => (
-            <Skeleton key={item} className={css.loading} />
-          )),
-        },
-        {
-          label: <Skeleton className={css.loadTitle} />,
-          id: 'Loading...',
-          children: [1, 2, 3].map((item) => (
-            <Skeleton key={item} className={css.loading} />
-          )),
-        },
-        {
-          label: <Skeleton className={css.loadTitle} />,
-          id: 'Loading...',
-          children: [1, 2, 3].map((item) => (
-            <Skeleton key={item} className={css.loading} />
-          )),
-        },
-      ];
+      return listingLoading();
     }
     const convertedData: any = [];
     Object.keys(plan).forEach((item) => {
@@ -72,9 +57,13 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
             })}
             , {planDate.getDate()}/{planDate.getMonth() + 1}
           </span>
-          {hasDishInCart && (
-            <IconCheckmarkTabTitle className={css.tabTitleCheckmark} />
-          )}
+          {hasDishInCart &&
+            (hasDishInCart === 'notJoined' ? (
+              <IconBanned className={css.tabTitleIcon} />
+            ) : (
+              <IconCheckmarkTabTitle className={css.tabTitleIcon} />
+            ))}
+          {}
         </div>
       );
 
@@ -119,6 +108,9 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
           contentClassName={css.sectionMainOrderListings}
           headerClassName={css.sectionMainOrderHeader}
           onChange={onSelectTab}
+          actionsComponent={
+            <TabActions orderDay={orderDay} planId={`${planId}`} />
+          }
         />
       </div>
     </div>

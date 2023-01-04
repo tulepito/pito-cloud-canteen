@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
 
 import { loadPlanDataApi, updateParticipantOrderApi } from '../../utils/api';
-import { shopingCartActions } from './shopingCart.slice';
+import { shopingCartActions, shopingCartThunks } from './shopingCart.slice';
 
 const LOAD_DATA = 'app/ParticipantSetupPlanPage/LOAD_DATA';
 const UPDATE_ORDER = 'app/ParticipantSetupPlanPage/UPDATE_ORDER';
@@ -33,24 +33,26 @@ const initialState: ParticipantSetupPlanState = {
 const loadData = createAsyncThunk(
   LOAD_DATA,
   async (planId: string, { getState, dispatch }) => {
-    const { currentUser } = getState().user;
+    const currentUser = getState().user.currentUser;
     const currentUserId = currentUser?.id?.uuid;
     const response: any = await loadPlanDataApi(planId);
     const plan = response?.data?.data?.plan;
-    const orderDaysRaw = Object.keys(plan);
-    const orderDays = orderDaysRaw.filter(
-      (day) => plan?.[day]?.memberOrder?.[currentUserId]?.foodId,
-    );
+    const orderDays = Object.keys(plan);
 
+    dispatch(shopingCartThunks.removeAllFromPlanCart({ planId }));
     orderDays.forEach((day) => {
-      dispatch(
-        shopingCartActions.addToCart({
-          currentUserId,
-          planId,
-          dayId: day,
-          mealId: plan?.[day]?.memberOrder?.[currentUserId]?.foodId,
-        }),
-      );
+      const userOder = plan?.[day]?.memberOrder?.[currentUserId];
+      const status = userOder?.status;
+      if (status === 'joined' || status === 'notJoined') {
+        dispatch(
+          shopingCartActions.addToCart({
+            currentUserId,
+            planId,
+            dayId: day,
+            mealId: status === 'notJoined' ? 'notJoined' : userOder?.foodId,
+          }),
+        );
+      }
     });
 
     return response?.data?.data;
@@ -68,15 +70,25 @@ const updateOrder = createAsyncThunk(
     const currentUserId = currentUser?.id?.uuid;
     const { orders } = getState().shopingCart;
     const planData = orders?.[currentUserId]?.[planId];
-    const orderDaysRaw = Object.keys(planData);
-    const orderDays = orderDaysRaw.filter((item: any) => planData[item]);
+    const orderDays = Object.keys(planData);
 
     const updatedPlan = orderDays.reduce((acc: any, curr: any) => {
       acc[curr] = {
-        [currentUserId]: {
-          status: 'joined',
-          foodId: planData[curr],
-        },
+        [currentUserId]:
+          planData[curr] === 'notJoined'
+            ? {
+                status: 'notJoined',
+                foodId: '',
+              }
+            : planData[curr]
+            ? {
+                status: 'joined',
+                foodId: planData[curr],
+              }
+            : {
+                status: 'empty',
+                foodId: '',
+              },
       };
       return acc;
     }, {});
@@ -89,7 +101,8 @@ const updateOrder = createAsyncThunk(
     };
 
     await updateParticipantOrderApi(orderId, updateValues);
-    return dispatch(loadData(planId));
+    await dispatch(loadData(planId));
+    return true;
   },
   {
     serializeError: storableError,

@@ -22,11 +22,14 @@ const ParticipantSetupPlan = () => {
   const orderId = order?.id?.uuid;
   const plan = useAppSelector((state) => state.ParticipantSetupPlanPage.plan);
   const [orderDayState, setOrderDayState] = useState<number>();
+  const currentUser = useAppSelector((state) => state.user.currentUser);
 
   const handleSelectRestaurant = (selectedItem: any) => {
     const dayId = selectedItem?.id;
-    setOrderDayState(Number(dayId));
+
     if (dayId && dayId !== 'Loading...') {
+      setOrderDayState(Number(dayId));
+
       window.history.pushState(
         { urlPath: `/participant/plans/${planId}?orderDay=${dayId}` },
         '',
@@ -36,11 +39,11 @@ const ParticipantSetupPlan = () => {
   };
 
   useEffect(() => {
-    if (router.isReady) {
+    if (router.isReady && currentUser?.id?.uuid) {
       setOrderDayState(Number(orderDay));
       dispatch(ParticipantSetupPlanThunks.loadData(`${planId}`));
     }
-  }, [router.isReady]);
+  }, [router.isReady, currentUser?.id?.uuid]);
 
   useEffect(() => {
     const restaurant = orderDayState
@@ -60,6 +63,7 @@ const ParticipantSetupPlan = () => {
           <SectionOrderListing
             plan={plan}
             onSelectTab={handleSelectRestaurant}
+            orderDay={`${orderDayState}`}
           />
         </div>
         <div className={css.rightSection}>
