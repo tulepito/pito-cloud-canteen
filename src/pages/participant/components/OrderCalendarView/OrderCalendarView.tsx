@@ -8,6 +8,7 @@ import type { TCurrentUser, TListing, TUser } from '@utils/types';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
 import React from 'react';
+import Skeleton from 'react-loading-skeleton';
 
 import css from './OrderCalendarView.module.scss';
 
@@ -17,12 +18,14 @@ type TOrderCalendarView = {
   plans?: TListing[];
   subOrders?: any;
   currentUser: TCurrentUser;
+  loadDataInProgress?: boolean;
 };
 
 type TPlanItem = Record<string, any>;
 
 const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
-  const { company, order, subOrders, currentUser, plans } = props;
+  const { company, order, subOrders, currentUser, plans, loadDataInProgress } =
+    props;
 
   const companyTitle = USER(company).getPublicData().displayName;
   const ensureCompanyUser = USER(company).getFullData();
@@ -50,7 +53,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
         key: LISTING(food).getId(),
         value: LISTING(food).getAttributes().title,
       }));
-      const { status } =
+      const { status = 'empty' } =
         LISTING(currentPlan).getMetadata().orderDetail[planItemKey]
           .memberOrders[currentUserId] || {};
 
@@ -84,7 +87,12 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
   });
   const flattenEvents = flatten(events);
 
-  const sectionCompanyBranding = (
+  const sectionCompanyBranding = loadDataInProgress ? (
+    <div className={css.sectionCompanyBranding}>
+      <Skeleton className={css.avatarSkeleton} />
+      <Skeleton className={css.companyTitleSkeleton} />
+    </div>
+  ) : (
     <div className={css.sectionCompanyBranding}>
       <Avatar disableProfileLink user={ensureCompanyUser} />
       <span className={css.companyTitle}>{companyTitle}</span>
@@ -97,6 +105,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
         events={flattenEvents}
         companyLogo={sectionCompanyBranding}
         renderEvent={OrderEventCard}
+        inProgress={loadDataInProgress}
       />
     </div>
   );

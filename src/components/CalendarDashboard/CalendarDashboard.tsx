@@ -19,6 +19,7 @@ type TCalendarDashboard = {
   renderEvent?: React.FC<any>;
   companyLogo?: ReactNode;
   components?: TCalendarItemCardComponents;
+  inProgress?: boolean;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboard> = ({
@@ -27,6 +28,7 @@ const CalendarDashboard: React.FC<TCalendarDashboard> = ({
   renderEvent = OrderEventCard,
   companyLogo,
   components,
+  inProgress,
 }) => {
   const localizer = luxonLocalizer(DateTime);
 
@@ -35,6 +37,7 @@ const CalendarDashboard: React.FC<TCalendarDashboard> = ({
     customComponents: components,
   });
   const WeekViewWrapper = withWeekViewWrapper({
+    inProgress,
     renderEvent,
     customComponents: components,
   });
@@ -44,14 +47,14 @@ const CalendarDashboard: React.FC<TCalendarDashboard> = ({
       defaultDate:
         propsDefaultDate || DateTime.now().startOf('week').toJSDate(),
       views: {
-        month: MonthViewWrapper as any,
         week: WeekViewWrapper as any,
+        month: MonthViewWrapper as any,
       } as ViewsProps,
     }),
     // If you guys want to update defaultDate for calendar when props.propsDefaultDate
     // changes, please add "propsDefaultDate" to deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [inProgress],
   );
 
   return (

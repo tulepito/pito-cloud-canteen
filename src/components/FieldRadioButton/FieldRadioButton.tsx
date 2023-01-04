@@ -25,7 +25,7 @@ const IconRadioButton: React.FC<TIconRadioButton> = (props) => {
           cy="19"
           r="6"
           transform="translate(2 -12)"
-          strokeWidth="2"
+          strokeWidth="1"
           fill="none"
           fillRule="evenodd"
         />
@@ -38,8 +38,8 @@ const IconRadioButton: React.FC<TIconRadioButton> = (props) => {
           transform="translate(2 -12)"
           fill="none"
           fillRule="evenodd">
-          <circle strokeWidth="2" cx="5" cy="19" r="6" />
-          <circle fill="#FFF" fillRule="nonzero" cx="5" cy="19" r="3" />
+          <circle strokeWidth="1" cx="5" cy="19" r="6" />
+          <circle fillRule="nonzero" cx="5" cy="19" r="3" />
         </g>
       </svg>
     </div>

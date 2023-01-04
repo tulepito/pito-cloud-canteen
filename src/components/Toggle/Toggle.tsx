@@ -45,7 +45,7 @@ const Toggle = (props: TToggle) => {
           defaultChecked={switchControl.value}
         />
         <label
-          htmlFor="switch"
+          htmlFor="toggle"
           className={toggleClasses}
           onClick={onFieldSwitchChange}
         />

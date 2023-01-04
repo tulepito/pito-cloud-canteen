@@ -197,7 +197,7 @@
   "Calendar.week.dayHeader.5": "Thứ sáu",
   "Calendar.week.dayHeader.6": "Thứ bảy",
   "Calendar.week.dayHeader.0": "Chủ nhật",
-  "Calendar.Week.title": "{start} - {end}, Tháng {month}, {year}",
+  "Calendar.Week.title": "{start}/{month} - {end}/{month}",
   "Calendar.Week.title.diffMonth": "{start} - {end}, {year}",
   "Calendar.Week.title.diffYear": "{start} - {end}",
   "DayColumn.Session.MORNING_SESSION": "Bữa sáng",
@@ -358,5 +358,8 @@
   "SectionOrderPanel.sectionTitle": "Thực đơn của bạn",
   "SectionOrderListing.autoSelectionButtonLabel": "Chọn giúp tôi",
   "SectionOrderListing.unCheckThisDateButtonLabel": "Bỏ chọn ngày này",
-  "SectionOrderPanel.numberSelectedDays": "({selectedDays}/{sumDays} ngày đã chọn)"
+  "SectionOrderPanel.numberSelectedDays": "({selectedDays}/{sumDays} ngày đã chọn)",
+  "NotificationSelectionForm.aDayAgo": "1 ngày trước hạn",
+  "NotificationSelectionForm.aHourAgo": "1 tiếng trước hạn",
+  "NotificationSelectionForm.thirtyMinutesAgo": "30 phút trước hạn"
 }
