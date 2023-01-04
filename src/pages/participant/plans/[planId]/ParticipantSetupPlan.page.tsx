@@ -19,6 +19,9 @@ const ParticipantSetupPlan = () => {
   const dispatch = useAppDispatch();
   const { planId, orderDay } = router.query;
   const order = useAppSelector((state) => state.ParticipantSetupPlanPage.order);
+  const loadDataInProgress = useAppSelector(
+    (state) => state.ParticipantSetupPlanPage.loadDataInProgress,
+  );
   const orderId = order?.id?.uuid;
   const plan = useAppSelector((state) => state.ParticipantSetupPlanPage.plan);
   const [orderDayState, setOrderDayState] = useState<number>();
@@ -59,6 +62,7 @@ const ParticipantSetupPlan = () => {
           <SectionRestaurantHero
             listing={selectedRestaurant}
             orderDay={Number(orderDayState)}
+            inProgress={loadDataInProgress}
           />
           <SectionOrderListing
             plan={plan}
