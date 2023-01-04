@@ -52,7 +52,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
       }));
       const { status } =
         LISTING(currentPlan).getMetadata().orderDetail[planItemKey]
-          .memberOrders[currentUserId];
+          .memberOrders[currentUserId] || {};
 
       const event = {
         resource: {
