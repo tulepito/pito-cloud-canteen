@@ -569,5 +569,7 @@
   "SelectFoodModal.selectedTitle": "Đã chọn: {foodCount} món",
   "SelectFoodForm.findFoodByName": "Tìm kiếm món ăn",
   "SelectFoodForm.selectedFood": "Món đã chọn",
-  "SelectFoodForm.saveResult": "Lưu kết quả"
+  "SelectFoodForm.saveResult": "Lưu kết quả",
+  "CreateOrderRoute.title": "Tạo đơn hàng",
+  "CreateOrderRoute.description": "Tạo đơn hàng"
 }
