@@ -12,7 +12,7 @@ import type { TCalendarItemCardComponents } from '../../helpers/types';
 import MDayItem from '../DayItem/MDayItem';
 import css from './MonthView.module.scss';
 
-const MONTH_DAY_NUMBER = 30;
+const MONTH_DAY_NUMBER = 31;
 
 type TMonthViewProps = {
   date: Date;
@@ -40,7 +40,9 @@ function MonthView({
     () => MonthView.range(date, { localizer }),
     [date, localizer],
   );
-
+  const firstDay = currRange[0];
+  const totalEmptyDays = (firstDay.getDay() || 7) - 1;
+  const emptyDayEls = Array.from(Array(totalEmptyDays).keys());
   return (
     <div className={css.root}>
       <div className={css.scrollContainer}>
@@ -48,6 +50,9 @@ function MonthView({
           <div key={item} className={css.dayInWeekHeader}>
             <FormattedMessage id={`MonthView.dayInWeekHeader.${item}`} />
           </div>
+        ))}
+        {emptyDayEls.map((item) => (
+          <div key={item} className={css.emptyDay}></div>
         ))}
         {currRange.map((item) => (
           <MDayItem
