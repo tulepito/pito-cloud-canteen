@@ -171,7 +171,7 @@ const EditPartnerWizard = (props: any) => {
   }, [tabsStatus, selectedTab, partnerListingRef, router]);
 
   return (
-    <FormWizard formTabNavClassName={css.formWizard}>
+    <FormWizard className={css.formWizard}>
       {TABS.map((tab: string) => (
         <EditPartnerWizardTab
           key={tab}

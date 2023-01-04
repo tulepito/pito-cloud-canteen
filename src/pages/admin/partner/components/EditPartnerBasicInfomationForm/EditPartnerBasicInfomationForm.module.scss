@@ -52,6 +52,7 @@
   @include viewportMedium {
     grid-template-columns: repeat(2, 1fr);
   }
+
   .field {
     &:nth-child(1) {
       margin-bottom: 20px;
