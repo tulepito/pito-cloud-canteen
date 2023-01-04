@@ -4,13 +4,13 @@ import { showCompanyApi, updateCompanyApi } from '@utils/api';
 import { denormalisedResponseEntities } from '@utils/data';
 import { storableError } from '@utils/errors';
 
-interface EditCompanyState {
+type EditCompanyState = {
   companyRef: any;
   showCompanyInProgress: boolean;
   showCompanyError: any;
   updateCompanyInProgress: boolean;
   updateCompanyError: any;
-}
+};
 
 const UPDATE_COMPANY = 'app/UpdateCompanyPage/UPDATE_COMPANY';
 const SHOW_COMPANY = 'app/UpdateCompanyPage/SHOW_COMPANY';

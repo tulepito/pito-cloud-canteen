@@ -11,7 +11,8 @@ type TGroupInfo = {
   name: string;
   description: string;
 };
-interface CompanyState {
+
+type CompanyState = {
   groupList: any;
   fetchGroupListInProgress: boolean;
   companyMembers: any[];
@@ -33,7 +34,7 @@ interface CompanyState {
   updateGroupError: any;
   originCompanyMembers: TObject;
   isCompanyNotFound: boolean;
-}
+};
 
 // ================ Thunk types ================ //
 const COMPANY_INFO = 'app/Company/COMPANY_INFO';

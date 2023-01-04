@@ -8,7 +8,7 @@ import { shopingCartActions } from './shopingCart.slice';
 const LOAD_DATA = 'app/ParticipantSetupPlanPage/LOAD_DATA';
 const UPDATE_ORDER = 'app/ParticipantSetupPlanPage/UPDATE_ORDER';
 
-interface ParticipantSetupPlanState {
+type ParticipantSetupPlanState = {
   restaurant: any;
   company: any;
   plan: any;
@@ -17,7 +17,7 @@ interface ParticipantSetupPlanState {
   loadDataError: any;
   submitDataInprogress: boolean;
   submitDataError: any;
-}
+};
 
 const initialState: ParticipantSetupPlanState = {
   restaurant: {},

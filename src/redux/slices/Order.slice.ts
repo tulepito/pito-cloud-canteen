@@ -8,7 +8,7 @@ import {
 } from '@utils/orderApi';
 import type { TListing } from '@utils/types';
 
-interface OrderInitialState {
+type OrderInitialState = {
   order: TListing | null;
   plans: TListing[];
   createOrderInProcess: boolean;
@@ -21,7 +21,7 @@ interface OrderInitialState {
   completeOrderError: any;
   draftOrder: any;
   selectedCompany: any;
-}
+};
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
 const ADD_MEAL_PLAN_DETAIL = 'app/Order/ADD_MEAL_PLAN_DETAIL';

@@ -7,7 +7,7 @@ import type { TCompany, TPagination } from '@utils/types';
 
 export const RESULT_PAGE_SIZE = 10;
 
-interface ManageCompanyState {
+type ManageCompanyState = {
   companyRefs: any[];
   queryCompaniesInProgress: boolean;
   queryCompaniesError: any;
@@ -15,7 +15,7 @@ interface ManageCompanyState {
   updateStatusInProgress: boolean;
   updateStatusError: any;
   totalItems: number;
-}
+};
 
 const QUERY_COMPANIES = 'app/ManageCompanies/QUERY_COMPANIES';
 const UPDATE_COMPANY_STATUS = 'app/ManageCompanies/UPDATE_COMPANY_STATUS';

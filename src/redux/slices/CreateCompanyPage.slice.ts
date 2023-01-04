@@ -3,10 +3,10 @@ import { createSlice } from '@reduxjs/toolkit';
 import { createCompanyApi } from '@utils/api';
 import { storableError } from '@utils/errors';
 
-interface CreateCompanyState {
+type CreateCompanyState = {
   createCompanyInProgress: boolean;
   createCompanyError: any;
-}
+};
 
 const CREATE_COMPANY = 'app/CreateCompanyPage/CREATE_COMPANY';
 
