@@ -7,6 +7,7 @@ import IconEdit from '@components/IconEdit/IconEdit';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import {
+  BUSINESS_TYPE_OPTIONS,
   CATEGORY_OPTIONS,
   EImageVariants,
   ERestaurantListingStatus,
@@ -21,7 +22,6 @@ import React from 'react';
 import { Field, Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { BUSINESS_TYPE_OPTIONS } from '../EditPartnerLicenseForm/EditPartnerLicenseForm';
 import { createAvailabilityPlanInitialValues } from '../EditPartnerWizardTab/utils';
 import css from './EditPartnerPreviewForm.module.scss';
 

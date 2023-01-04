@@ -2,7 +2,15 @@ import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
 import Form from '@components/Form/Form';
-import { EImageVariants } from '@utils/enums';
+import {
+  BUSINESS_LICENSE_OPTIONS,
+  BUSINESS_TYPE_OPTIONS,
+  EImageVariants,
+  FOOD_CERTIFICATE_RADIO_OPTIONS,
+  NO,
+  PARTY_INSURANCE_RADIO_OPTIONS,
+  YES,
+} from '@utils/enums';
 import isEqual from 'lodash/isEqual';
 import React, { useState } from 'react';
 import { Form as FinalForm } from 'react-final-form';
@@ -14,108 +22,103 @@ import css from './EditPartnerLicenseForm.module.scss';
 const ACCEPT_IMAGES = 'image/png, image/gif, image/jpeg';
 const VARIANTS = [EImageVariants.scaledMedium];
 
-type TBusinessTypeOptions = {
-  id: string;
-  value: string;
-  label: string;
+const businessTypeRadioOptions = () => {
+  return BUSINESS_LICENSE_OPTIONS.map((value) => {
+    if (value.key === YES) {
+      return {
+        ...value,
+        label: (
+          <span>
+            <FormattedMessage id="EditPartnerLicenseForm.businessLicenseYes" />
+            <span className={css.italicFont}>
+              <FormattedMessage id="EditPartnerLicenseForm.businessLicenseYesDescription" />
+            </span>
+          </span>
+        ),
+      };
+    }
+    if (value.key === NO) {
+      return {
+        ...value,
+        label: (
+          <FormattedMessage id="EditPartnerLicenseForm.businessLicenseNo" />
+        ),
+      };
+    }
+
+    return {
+      ...value,
+      label: (
+        <FormattedMessage id="EditPartnerLicenseForm.businessLicenseRegistering" />
+      ),
+    };
+  });
 };
 
-export const BUSINESS_TYPE_OPTIONS: TBusinessTypeOptions[] = [
-  {
-    id: 'businessType.company',
-    value: 'company',
-    label: 'Công ty',
-  },
-  {
-    id: 'businessType.individualBusinessHouseholds',
-    value: 'company.individualBusinessHouseholds',
-    label: 'Loại hình kinh doanh cá thể',
-  },
-];
+const foodCertificateOptions = () => {
+  return FOOD_CERTIFICATE_RADIO_OPTIONS.map((value) => {
+    if (value.key === YES) {
+      return {
+        ...value,
+        label: (
+          <span>
+            <FormattedMessage id="EditPartnerLicenseForm.foodCertificateYes" />
+            <span className={css.italicFont}>
+              <FormattedMessage id="EditPartnerLicenseForm.foodCertificateYesDescription" />
+            </span>
+          </span>
+        ),
+      };
+    }
+    if (value.key === NO) {
+      return {
+        ...value,
+        label: (
+          <FormattedMessage id="EditPartnerLicenseForm.foodCertificateNo" />
+        ),
+      };
+    }
 
-export const BUSINESS_LICENSE_RADIO_OPTIONS = [
-  {
-    id: 'businessLicense.yes',
-    value: 'yes',
-    label: (
-      <span>
-        <FormattedMessage id="EditPartnerLicenseForm.businessLicenseYes" />
-        <span className={css.italicFont}>
-          <FormattedMessage id="EditPartnerLicenseForm.businessLicenseYesDescription" />
-        </span>
-      </span>
-    ),
-    hasImage: true,
-  },
-  {
-    id: 'businessLicense.registering',
-    value: 'registering',
-    label: (
-      <FormattedMessage id="EditPartnerLicenseForm.businessLicenseRegistering" />
-    ),
-  },
-  {
-    id: 'businessLicense.no',
-    value: 'no',
-    label: <FormattedMessage id="EditPartnerLicenseForm.businessLicenseNo" />,
-  },
-];
+    return {
+      ...value,
+      label: (
+        <FormattedMessage id="EditPartnerLicenseForm.foodCertificateRegistering" />
+      ),
+    };
+  });
+};
 
-export const FOOD_CERTIFICATE_RADIO_OPTIONS = [
-  {
-    id: 'foodCertificate.yes',
-    value: 'yes',
-    label: (
-      <span>
-        <FormattedMessage id="EditPartnerLicenseForm.foodCertificateYes" />
-        <span className={css.italicFont}>
-          <FormattedMessage id="EditPartnerLicenseForm.foodCertificateYesDescription" />
-        </span>
-      </span>
-    ),
-    hasImage: true,
-  },
-  {
-    id: 'foodCertificate.registering',
-    value: 'registering',
-    label: (
-      <FormattedMessage id="EditPartnerLicenseForm.foodCertificateRegistering" />
-    ),
-  },
-  {
-    id: 'foodCertificate.no',
-    value: 'no',
-    label: <FormattedMessage id="EditPartnerLicenseForm.foodCertificateNo" />,
-  },
-];
-
-const PARTY_INSURANCE_RADIO_OPTIONS = [
-  {
-    id: 'partyInsurance.yes',
-    value: 'yes',
-    label: (
-      <span>
-        <FormattedMessage id="EditPartnerLicenseForm.partyInsuranceYes" />
-        <span className={css.italicFont}>
-          <FormattedMessage id="EditPartnerLicenseForm.partyInsuranceYesDescription" />
-        </span>
-      </span>
-    ),
-    hasImage: true,
-  },
-  {
-    id: 'partyInsurance.registering',
-    value: 'registering',
-    label: (
-      <FormattedMessage id="EditPartnerLicenseForm.partyInsuranceRegistering" />
-    ),
-  },
-  {
-    id: 'partyInsurance.no',
-    value: 'no',
-    label: <FormattedMessage id="EditPartnerLicenseForm.partyInsuranceNo" />,
-  },
-];
+const partyInsuranceOptions = () => {
+  return PARTY_INSURANCE_RADIO_OPTIONS.map((value) => {
+    if (value.key === YES) {
+      return {
+        ...value,
+        label: (
+          <span>
+            <FormattedMessage id="EditPartnerLicenseForm.partyInsuranceYes" />
+            <span className={css.italicFont}>
+              <FormattedMessage id="EditPartnerLicenseForm.partyInsuranceYesDescription" />
+            </span>
+          </span>
+        ),
+      };
+    }
+    if (value.key === NO) {
+      return {
+        ...value,
+        label: (
+          <FormattedMessage id="EditPartnerLicenseForm.partyInsuranceNo" />
+        ),
+      };
+    }
+    return {
+      ...value,
+      label: (
+        <FormattedMessage id="EditPartnerLicenseForm.partyInsuranceRegistering" />
+      ),
+    };
+  });
+};
 
 const EditPartnerLicenseForm: React.FC<any> = (props) => {
   const intl = useIntl();
@@ -130,7 +133,7 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
       console.error(error);
     }
   };
-
+  console.log(businessTypeRadioOptions());
   return (
     <FinalForm
       {...rest}
@@ -165,7 +168,7 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
                 <FieldRadioButtonPhoto
                   values={values}
                   name="businessLicense"
-                  options={BUSINESS_LICENSE_RADIO_OPTIONS}
+                  options={businessTypeRadioOptions()}
                   label={intl.formatMessage({
                     id: 'EditPartnerLicenseForm.businessLicenseLabel',
                   })}
@@ -182,13 +185,13 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
                       id: 'EditPartnerLicenseForm.businessTypeLabel',
                     })}
                   </div>
-                  {BUSINESS_TYPE_OPTIONS.map((opt: TBusinessTypeOptions) => (
+                  {BUSINESS_TYPE_OPTIONS.map((opt) => (
                     <FieldRadioButton
-                      key={opt.id}
-                      id={opt.id}
+                      key={opt.key}
+                      id={opt.key}
                       label={opt.label}
                       name="businessType"
-                      value={opt.value}
+                      value={opt.key}
                     />
                   ))}
                 </div>
@@ -206,7 +209,7 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
                 description={intl.formatMessage({
                   id: 'EditPartnerLicenseForm.foodCertificateDescription',
                 })}
-                options={FOOD_CERTIFICATE_RADIO_OPTIONS}
+                options={foodCertificateOptions()}
                 label={intl.formatMessage({
                   id: 'EditPartnerLicenseForm.foodCertificateLabel',
                 })}
@@ -226,7 +229,7 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
                 description={intl.formatMessage({
                   id: 'EditPartnerLicenseForm.partyInsuranceDescription',
                 })}
-                options={PARTY_INSURANCE_RADIO_OPTIONS}
+                options={partyInsuranceOptions()}
                 label={intl.formatMessage({
                   id: 'EditPartnerLicenseForm.partyInsuranceLabel',
                 })}

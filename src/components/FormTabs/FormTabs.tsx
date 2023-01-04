@@ -1,6 +1,6 @@
 import FormTabNav from '@components/FormTabNav/FormTabNav';
 import classNames from 'classnames';
-import type { PropsWithChildren } from 'react';
+import type { ReactElement } from 'react';
 import React from 'react';
 
 import css from './FormTabs.module.scss';
@@ -11,9 +11,10 @@ type TFormTabs = {
   navRootClassName?: string;
   tabRootClassName?: string;
   formTabNavClassName?: string;
+  children: ReactElement[] & { props?: any };
 };
 
-const FormTabs: React.FC<PropsWithChildren<TFormTabs>> = (props) => {
+const FormTabs: React.FC<TFormTabs> = (props) => {
   const {
     children,
     className,
@@ -25,7 +26,7 @@ const FormTabs: React.FC<PropsWithChildren<TFormTabs>> = (props) => {
   const rootClasses = rootClassName || css.root;
   const classes = classNames(rootClasses, className);
 
-  const tabNavTabs = React.Children.map(children, (child: any) => {
+  const tabNavTabs = React.Children.map(children, (child) => {
     const { tabId, tabLabel } = child.props;
 
     // Child components need to have TabNav props included
@@ -47,8 +48,8 @@ const FormTabs: React.FC<PropsWithChildren<TFormTabs>> = (props) => {
     };
   });
 
-  const childArray = React.Children.toArray(children);
-  const selectedTabPanel = childArray.find((c: any) => c.props.selected);
+  const childArray = React.Children.toArray(children) as ReactElement[];
+  const selectedTabPanel = childArray.find((c) => c.props.selected);
 
   // One of the children needs to be selected
   if (!selectedTabPanel) {

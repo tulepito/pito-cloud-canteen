@@ -272,6 +272,7 @@ const EditPartnerWizardTab = (props: any) => {
         hasOutsideMenuAndService,
         categories = [],
         extraServices,
+        businessType,
       } = partnerListingRef?.attributes?.publicData || {};
 
       const { bankAccounts = [] } =
@@ -311,6 +312,7 @@ const EditPartnerWizardTab = (props: any) => {
           bankAccounts,
           packagingOther,
           status,
+          businessType: businessType || '-',
         };
       }, [JSON.stringify(partnerListingRef)]);
 

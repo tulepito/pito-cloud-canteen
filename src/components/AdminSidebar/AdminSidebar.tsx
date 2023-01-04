@@ -79,7 +79,7 @@ type TAdminSidebar = {
   onCloseMenu: () => void;
 };
 
-const checkNestedPathActive = (arr: any[], pathName: string) => {
+const checkNestedPathActive = (arr: TSidebarMenu[], pathName: string) => {
   // eslint-disable-next-line no-restricted-syntax
   for (const item of arr) {
     if (item.subNameLinks?.includes(pathName)) return item;
@@ -112,7 +112,7 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
     <OutsideClickHandler onOutsideClick={onOutsideClick}>
       <div className={css.root}>
         <div className={css.leftSide}>
-          {LIST_SIDEBAR_MENU.map((item: any) => {
+          {LIST_SIDEBAR_MENU.map((item: TSidebarMenu) => {
             const {
               Icon,
               id,
@@ -141,7 +141,7 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
                 className={classNames(css.sidebarButton, {
                   [css.active]: isActive,
                 })}>
-                <Icon className={css.sidebarIcon} />
+                {Icon && <Icon className={css.sidebarIcon} />}
               </NamedLink>
             );
           })}

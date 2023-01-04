@@ -65,7 +65,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         queryParams,
       );
 
-    const encryptedPasswrod = CryptoJS.AES.encrypt(
+    const encryptedPassword = CryptoJS.AES.encrypt(
       dataParams.password,
       process.env.ENCRYPT_PASSWORD_SECRET_KEY,
     ).toString();
@@ -74,7 +74,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     await intergrationSdk.users.updateProfile({
       id: subAccount.id,
       privateData: {
-        accountPassword: encryptedPasswrod,
+        accountPassword: encryptedPassword,
       },
     });
 
