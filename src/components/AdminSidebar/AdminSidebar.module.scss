@@ -50,9 +50,9 @@
       justify-content: center;
       &.active {
         border-radius: 8px;
-        background-color: $matterColorLight;
+        background-color: $neutralGray10;
         .sidebarIcon {
-          fill: $marketplaceColorLight;
+          fill: $matterColorLight;
         }
       }
 

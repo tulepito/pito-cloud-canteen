@@ -90,19 +90,23 @@ const Tabs = (props: ITabsProps) => {
   const headerClasses = classNames(css.tabHeaders, headerClassName);
   const contentClasses = classNames(css.tabPanel, contentClassName);
   return (
-    <div className={showNavigation ? css.tabHeaderWrapper : css.root}>
-      <div className={headerClasses}>{tabHeader}</div>
-      <div className={contentClasses}>{tabContent}</div>
-      {showNavigation && (
-        <div className={css.navigateBtn}>
-          <InlineTextButton type="button" onClick={goLeft}>
-            <IconArrow direction="left" />
-          </InlineTextButton>
-          <InlineTextButton type="button" onClick={goRight}>
-            <IconArrow direction="right" />
-          </InlineTextButton>
+    <div className={css.root}>
+      <div className={headerClasses}>
+        <div className={css.tabHeaderWrapper}>
+          <div className={css.tabHeader}>{tabHeader}</div>
+          {showNavigation && (
+            <div className={css.navigateBtn}>
+              <InlineTextButton type="button" onClick={goLeft}>
+                <IconArrow direction="left" />
+              </InlineTextButton>
+              <InlineTextButton type="button" onClick={goRight}>
+                <IconArrow direction="right" />
+              </InlineTextButton>
+            </div>
+          )}
         </div>
-      )}
+      </div>
+      <div className={contentClasses}>{tabContent}</div>
     </div>
   );
 };

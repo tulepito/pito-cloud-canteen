@@ -49,7 +49,7 @@ export const adminRoutes = {
     label: 'Chỉnh sửa',
   },
   CompanyDetails: {
-    path: '/admin/company/[companyId]/edit',
+    path: '/admin/company/[companyId]',
     label: 'Thông tin khách hàng',
   },
   CreateCompany: {

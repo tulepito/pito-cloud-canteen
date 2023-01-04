@@ -1,3 +1,4 @@
+import Collapsible from '@components/Collapsible/Collapsible';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import type { TColumn } from '@components/Table/Table';
@@ -74,7 +75,7 @@ const MEMBER_ORDER_TABLE_COLUMN: TColumn[] = [
   {
     key: 'stt',
     label: 'STT',
-    render: (data: any) => {
+    render: (data) => {
       return (
         <span
           title={data.index}
@@ -87,7 +88,7 @@ const MEMBER_ORDER_TABLE_COLUMN: TColumn[] = [
   {
     key: 'label',
     label: 'Hạng mục',
-    render: (data: any) => {
+    render: (data) => {
       return (
         <span
           title={data.index}
@@ -100,7 +101,7 @@ const MEMBER_ORDER_TABLE_COLUMN: TColumn[] = [
   {
     key: 'dvt',
     label: 'DVT',
-    render: (data: any) => {
+    render: (data) => {
       return (
         <span
           title={data.id}
@@ -111,7 +112,7 @@ const MEMBER_ORDER_TABLE_COLUMN: TColumn[] = [
   {
     key: 'quantity',
     label: 'SL',
-    render: (data: any) => {
+    render: (data) => {
       return (
         <span title={data.id} className={classNames(css.rowText, css.rowId)}>
           {data.quantity}
@@ -122,7 +123,7 @@ const MEMBER_ORDER_TABLE_COLUMN: TColumn[] = [
   {
     key: 'price',
     label: 'Đơn gía',
-    render: (data: any) => {
+    render: (data) => {
       return (
         <span title={data.id} className={classNames(css.rowText, css.rowId)}>
           {data.price}đ
@@ -134,7 +135,7 @@ const MEMBER_ORDER_TABLE_COLUMN: TColumn[] = [
 
 const generateOrderDetails = (orders: any[]) => {
   let newData: any[] = [];
-  orders.forEach((data: any, index: number) => {
+  orders.forEach((data, index) => {
     const { date, memberOrders = {}, foodList = {} } = data;
     const memeberDetails = Object.keys(memberOrders).map(
       (key: any, memberIndex: number) => {
@@ -206,103 +207,92 @@ const ReviewContent: React.FC<any> = (props) => {
 
   return (
     <div>
-      <div className={css.content}>
-        <div className={css.generalInfo}>
-          <h2 className={css.contentTitle}>
-            {intl.formatMessage({ id: 'ReviewOrder.generalInfo' })}
-          </h2>
-          <div className={css.contentBox}>
-            <div className={css.flexChild}>
-              <span className={css.boxTitle}>
-                {intl.formatMessage({ id: 'ReviewOrder.deliveryTime' })}
-              </span>
-              <span className={css.boxContent}>{deliveryHour}</span>
-            </div>
-            <div className={css.flexChild}>
-              <span className={css.boxTitle}>
-                {intl.formatMessage({ id: 'ReviewOrder.address' })}
-              </span>
-              <span className={css.boxContent}>{address}</span>
-            </div>
-            <div className={css.flexChild}>
-              <span className={css.boxTitle}>
-                {intl.formatMessage({ id: 'ReviewOrder.staffNameLabel' })}
-              </span>
-              <FieldTextInput
-                className={css.staffInput}
-                name="staffName"
-                id="staffName"
-                placeholder={intl.formatMessage({
-                  id: 'ReviewOrder.staffNamePlaceholder',
-                })}
-                validate={required(
-                  intl.formatMessage({ id: 'ReviewOrder.staffNameRequired' }),
-                )}
-              />
-            </div>
+      <Collapsible
+        label={intl.formatMessage({ id: 'ReviewOrder.generalInfo' })}>
+        <div className={css.contentBox}>
+          <div className={css.flexChild}>
+            <span className={css.boxTitle}>
+              {intl.formatMessage({ id: 'ReviewOrder.deliveryTime' })}
+            </span>
+            <span className={css.boxContent}>{deliveryHour}</span>
+          </div>
+          <div className={css.flexChild}>
+            <span className={css.boxTitle}>
+              {intl.formatMessage({ id: 'ReviewOrder.address' })}
+            </span>
+            <span className={css.boxContent}>{address}</span>
+          </div>
+          <div className={css.flexChild}>
+            <span className={css.boxTitle}>
+              {intl.formatMessage({ id: 'ReviewOrder.staffNameLabel' })}
+            </span>
+            <FieldTextInput
+              className={css.staffInput}
+              name="staffName"
+              id="staffName"
+              placeholder={intl.formatMessage({
+                id: 'ReviewOrder.staffNamePlaceholder',
+              })}
+              validate={required(
+                intl.formatMessage({ id: 'ReviewOrder.staffNameRequired' }),
+              )}
+            />
           </div>
         </div>
-      </div>
-
-      <div className={css.content}>
-        <div className={css.generalInfo}>
-          <h2 className={css.contentTitle}>
-            {intl.formatMessage({ id: 'ReviewOrder.providerLabel' })}
-          </h2>
-          <div className={classNames(css.contentBox, css.spaceStart)}>
-            <div className={css.flexChild}>
-              <span className={css.boxTitle}>
-                {intl.formatMessage({ id: 'ReviewOrder.providerName' })}
-              </span>
-              <span className={css.boxContent}>{restaurantName}</span>
-            </div>
-            <div className={css.flexChild}>
-              <span className={css.boxTitle}>
-                {intl.formatMessage({ id: 'ReviewOrder.phoneNumberLabel' })}
-              </span>
-              <span className={css.boxContent}>{phoneNumber}</span>
-            </div>
+      </Collapsible>
+      <Collapsible
+        label={intl.formatMessage({
+          id: 'ReviewOrder.providerLabel',
+        })}>
+        <div className={classNames(css.contentBox, css.spaceStart)}>
+          <div className={css.flexChild}>
+            <span className={css.boxTitle}>
+              {intl.formatMessage({ id: 'ReviewOrder.providerName' })}
+            </span>
+            <span className={css.boxContent}>{restaurantName}</span>
+          </div>
+          <div className={css.flexChild}>
+            <span className={css.boxTitle}>
+              {intl.formatMessage({ id: 'ReviewOrder.phoneNumberLabel' })}
+            </span>
+            <span className={css.boxContent}>{phoneNumber}</span>
           </div>
         </div>
-      </div>
-      <div className={css.content}>
-        <div className={css.generalInfo}>
-          <h2 className={css.contentTitle}>
-            {intl.formatMessage({ id: 'ReviewOrder.menuLabel' })}
-          </h2>
-          <Table
-            columns={MENU_TABLE_COLUMN}
-            data={parsedFoodList}
-            tableClassName={css.tableRoot}
-            tableHeadClassName={css.tableHead}
-            tableBodyClassName={css.tableBody}
-            tableBodyRowClassName={css.tableBodyRow}
-            tableBodyCellClassName={css.tableBodyCell}
-          />
-        </div>
-      </div>
-      <div className={css.content}>
-        <div className={css.generalInfo}>
-          <h2 className={css.contentTitle}>
-            {intl.formatMessage({ id: 'ReviewOrder.memberOrder' })}
-          </h2>
-          <Table
-            columns={MEMBER_ORDER_TABLE_COLUMN}
-            data={parsedMemberOrders}
-            tableClassName={css.tableRoot}
-            tableHeadClassName={classNames(
-              css.tableHead,
-              css.tableHeadMemberOrder,
-            )}
-            tableBodyClassName={css.tableBody}
-            tableBodyRowClassName={classNames(
-              css.tableBodyRow,
-              css.tableBodyRowMemberOrder,
-            )}
-            tableBodyCellClassName={css.tableBodyCell}
-          />
-        </div>
-      </div>
+      </Collapsible>
+      <Collapsible
+        label={intl.formatMessage({
+          id: 'ReviewOrder.menuLabel',
+        })}>
+        <Table
+          columns={MENU_TABLE_COLUMN}
+          data={parsedFoodList}
+          tableClassName={css.tableRoot}
+          tableHeadClassName={css.tableHead}
+          tableBodyClassName={css.tableBody}
+          tableBodyRowClassName={css.tableBodyRow}
+          tableBodyCellClassName={css.tableBodyCell}
+        />
+      </Collapsible>
+      <Collapsible
+        label={intl.formatMessage({
+          id: 'ReviewOrder.memberOrder',
+        })}>
+        <Table
+          columns={MEMBER_ORDER_TABLE_COLUMN}
+          data={parsedMemberOrders}
+          tableClassName={css.tableRoot}
+          tableHeadClassName={classNames(
+            css.tableHead,
+            css.tableHeadMemberOrder,
+          )}
+          tableBodyClassName={css.tableBody}
+          tableBodyRowClassName={classNames(
+            css.tableBodyRow,
+            css.tableBodyRowMemberOrder,
+          )}
+          tableBodyCellClassName={css.tableBodyCell}
+        />
+      </Collapsible>
     </div>
   );
 };
@@ -372,7 +362,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
           const { handleSubmit, goBack } = fieldRenderProps;
           return (
             <Form onSubmit={handleSubmit}>
-              <Tabs items={orderDetail as any} />
+              <Tabs items={orderDetail as any} showNavigation />
               <NavigateButtons
                 goBack={goBack}
                 inProgress={createOrderInProcess}
