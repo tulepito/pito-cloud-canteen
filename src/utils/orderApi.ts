@@ -35,13 +35,13 @@ type CreateOrderApiBody = {
   };
 };
 export const createOrderApi = (body: CreateOrderApiBody) =>
-  post('/api/order', body);
+  post('/api/orders', body);
 
 type AddMealPlanDetailApiBody = {
   orderId: string;
 };
 export const addMealPlanDetailApi = (body: AddMealPlanDetailApiBody) =>
-  post('/api/order/plan', body);
+  post('/api/orders/plan', body);
 
 type UpdateMealPlanDetailApiBody = {
   planId: string;
@@ -52,11 +52,11 @@ type UpdateMealPlanDetailApiBody = {
   };
 };
 export const updateMealPlanDetailApi = (body: UpdateMealPlanDetailApiBody) =>
-  put('/api/order/plan', body);
+  put('/api/orders/plan', body);
 
 type CompleteOrderApiBody = {
   orderId: string;
   planId: string;
 };
 export const completeOrderApi = (body: CompleteOrderApiBody) =>
-  put('/api/order', body);
+  put('/api/orders', body);
