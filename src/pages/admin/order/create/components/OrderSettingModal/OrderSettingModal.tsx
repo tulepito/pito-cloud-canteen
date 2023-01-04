@@ -15,7 +15,7 @@ import { shallowEqual } from 'react-redux';
 
 import DeliveryAddressField from '../DeliveryAddressField/DeliveryAddressField';
 import MealPlanDateField from '../MealPlanDateField/MealPlanDateField';
-import OrderDealineField from '../OrderDealineField/OrderDealineField';
+import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
 import ParticipantSetupField from '../ParticipantSetupField/ParticipantSetupField';
 import PerPackageField from '../PerPackageField/PerPackageField';
 import css from './OrderSettingModal.module.scss';
@@ -157,7 +157,7 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
               })}
             </div>
             <div className={css.fieldContent}>
-              <OrderDealineField columnLayout form={form} values={values} />
+              <OrderDeadlineField columnLayout form={form} values={values} />
             </div>
           </>
         );

@@ -193,3 +193,7 @@ export const composeValidators =
       (error: any, validator: any) => error || validator(value),
       VALID,
     );
+
+export const nonNegativeValue = (message: string) => (value: number) => {
+  return value <= 0 ? message : VALID;
+};
