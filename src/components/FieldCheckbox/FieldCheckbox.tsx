@@ -13,8 +13,9 @@ interface IconCheckboxProps extends TIconProps {
   boxClassName?: string;
 }
 
-const IconCheckbox = (props: IconCheckboxProps) => {
+export const IconCheckbox = (props: IconCheckboxProps) => {
   const { className, checkedClassName, boxClassName } = props;
+
   return (
     <svg
       className={className}
@@ -67,6 +68,7 @@ const FieldCheckbox = (props: any) => {
     customOnChange,
     disabled,
     hasTextInput,
+    textPlaceholder,
     ...rest
   } = props;
 
@@ -99,6 +101,7 @@ const FieldCheckbox = (props: any) => {
         <Field type="checkbox" {...rest}>
           {(formRenderProps) => {
             const { input } = formRenderProps;
+
             return (
               <>
                 <input
@@ -126,7 +129,9 @@ const FieldCheckbox = (props: any) => {
                 )}
                 {input.checked && hasTextInput && (
                   <FieldTextInput
+                    showText
                     disabled={disabled}
+                    placeholder={textPlaceholder}
                     className={css.textInput}
                     name={`${input.name}${CHECKBOX_TEXT_PREFIX}`}
                     id={`${input.name}${CHECKBOX_TEXT_PREFIX}`}

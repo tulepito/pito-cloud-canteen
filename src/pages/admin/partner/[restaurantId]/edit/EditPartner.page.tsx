@@ -2,13 +2,14 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconSpinner from '@components/IconSpinner/IconSpinner';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
-  createAndEditPartnerPageThunks,
+  partnerThunks,
   removeAvatar,
   removeBusinessLicense,
   removeCover,
   removeFoodCertificate,
   removePartyInsurance,
-} from '@redux/slices/CreateAndEditPartnerPage.slice';
+} from '@redux/slices/partners.slice';
+import { ERestaurantListingStatus } from '@utils/enums';
 import {
   pickRenderableImagesByProperty,
   pickRenderableLicenseImagesByProperty,
@@ -62,73 +63,80 @@ const EditPartnerPage = () => {
 
     discardDraftPartnerInProgress,
     discardDraftPartnerError,
-  } = useAppSelector((state) => state.CreateAndEditPartnerPage);
-  const dispatch = useAppDispatch();
 
+    restaurantTableActionInProgress,
+    restaurantTableActionError,
+  } = useAppSelector((state) => state.partners);
+  const dispatch = useAppDispatch();
   const router = useRouter();
   const { query } = router;
   const { restaurantId } = query;
-  const onAvatarUpload = (params: TObject) =>
-    dispatch(createAndEditPartnerPageThunks.requestAvatarUpload(params));
 
+  const onAvatarUpload = (params: TObject) => {
+    return dispatch(partnerThunks.requestAvatarUpload(params));
+  };
   const onRemoveAvatar = (id: any) => {
     return dispatch(removeAvatar(id));
   };
 
-  const onCoverUpload = (params: TObject) =>
-    dispatch(createAndEditPartnerPageThunks.requestCoverUpload(params));
-
+  const onCoverUpload = (params: TObject) => {
+    return dispatch(partnerThunks.requestCoverUpload(params));
+  };
   const onRemoveCover = (id: any) => {
     return dispatch(removeCover(id));
   };
 
-  const onUpdatePartnerListing = (values: TObject) =>
-    dispatch(
-      createAndEditPartnerPageThunks.updatePartnerRestaurantListing(values),
-    );
-
-  const onBusinessLicenseUpload = (params: TObject) => {
-    return dispatch(
-      createAndEditPartnerPageThunks.requestBusinessLicenseUpload(params),
-    );
+  const onUpdatePartnerListing = (values: TObject) => {
+    return dispatch(partnerThunks.updatePartnerRestaurantListing(values));
   };
 
+  const onBusinessLicenseUpload = (params: TObject) => {
+    return dispatch(partnerThunks.requestBusinessLicenseUpload(params));
+  };
   const onRemoveBusinessLicense = (id: any) => {
     return dispatch(removeBusinessLicense(id));
   };
-  const onFoodCertificateUpload = (params: TObject) => {
-    return dispatch(
-      createAndEditPartnerPageThunks.requestFoodCertificateUpload(params),
-    );
-  };
 
+  const onFoodCertificateUpload = (params: TObject) => {
+    return dispatch(partnerThunks.requestFoodCertificateUpload(params));
+  };
   const onRemoveFoodCertificate = (id: any) => {
     return dispatch(removeFoodCertificate(id));
   };
 
   const onPartyInsuranceUpload = (params: TObject) => {
-    return dispatch(
-      createAndEditPartnerPageThunks.requestPartyInsuranceUpload(params),
-    );
+    return dispatch(partnerThunks.requestPartyInsuranceUpload(params));
   };
-
   const onRemovePartyInsurance = (id: any) => {
     return dispatch(removePartyInsurance(id));
   };
 
   const onPublishDraftPartner = (params: TObject) => {
-    return dispatch(createAndEditPartnerPageThunks.publishDraftPartner(params));
+    return dispatch(partnerThunks.publishDraftPartner(params));
+  };
+  const onDiscardDraftPartner = (params: TObject) => {
+    return dispatch(partnerThunks.discardDraftPartner(params));
   };
 
-  const onDiscardDraftPartner = (params: TObject) => {
-    return dispatch(createAndEditPartnerPageThunks.discardDraftPartner(params));
+  const onSetAuthorized = async () => {
+    const params = {
+      id: restaurantId,
+      status: ERestaurantListingStatus.authorized,
+    };
+    await dispatch(partnerThunks.setRestaurantStatus(params));
+  };
+
+  const onSetUnsatisfactory = async () => {
+    const params = {
+      id: restaurantId,
+      status: ERestaurantListingStatus.unsatisfactory,
+    };
+    await dispatch(partnerThunks.setRestaurantStatus(params));
   };
 
   useEffect(() => {
     if (!restaurantId) return;
-    dispatch(
-      createAndEditPartnerPageThunks.showPartnerRestaurantListing(restaurantId),
-    );
+    dispatch(partnerThunks.showPartnerRestaurantListing(restaurantId));
   }, [restaurantId]);
 
   let content;
@@ -167,13 +175,15 @@ const EditPartnerPage = () => {
           createDraftPartnerInProgress ||
           updatePartnerListingInProgress ||
           publishDraftPartnerInProgress ||
-          discardDraftPartnerInProgress
+          discardDraftPartnerInProgress ||
+          restaurantTableActionInProgress
         }
         formError={
           createDraftPartnerError ||
           updatePartnerListingError ||
           publishDraftPartnerError ||
-          discardDraftPartnerError
+          discardDraftPartnerError ||
+          restaurantTableActionError
         }
         onDiscardDraftPartner={onDiscardDraftPartner}
         onPublishDraftPartner={onPublishDraftPartner}
@@ -209,6 +219,8 @@ const EditPartnerPage = () => {
         onPartyInsuranceUpload={onPartyInsuranceUpload}
         uploadPartyInsuranceError={uploadPartyInsuranceError}
         onRemovePartyInsurance={onRemovePartyInsurance}
+        onSetAuthorized={onSetAuthorized}
+        onSetUnsatisfactory={onSetUnsatisfactory}
       />
     );
   } else {

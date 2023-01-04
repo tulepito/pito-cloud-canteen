@@ -1,4 +1,5 @@
 import jstz from 'jstimezonedetect';
+import type { DateTime } from 'luxon';
 
 /**
  * Check if the browser's DateTimeFormat API supports time zones.
@@ -48,4 +49,52 @@ export const getDefaultTimeZoneOnBrowser = () => {
   // Fallback to jstimezonedetect dependency.
   // However, most browsers support Intl.DateTimeFormat already.
   return jstz.determine().name();
+};
+
+export const weekDayFormatFromDateTime = (dateTime: DateTime) => {
+  const { weekday: weekDay } = dateTime;
+  let formattedWeekDay;
+
+  switch (weekDay) {
+    case 1: {
+      formattedWeekDay = 'Thứ 2';
+      break;
+    }
+    case 2: {
+      formattedWeekDay = 'Thứ 3';
+
+      break;
+    }
+    case 3: {
+      formattedWeekDay = 'Thứ 4';
+
+      break;
+    }
+    case 4: {
+      formattedWeekDay = 'Thứ 5';
+
+      break;
+    }
+    case 5: {
+      formattedWeekDay = 'Thứ 6';
+
+      break;
+    }
+    case 6: {
+      formattedWeekDay = 'Thứ 7';
+
+      break;
+    }
+    case 7: {
+      formattedWeekDay = 'Chủ nhật';
+
+      break;
+    }
+    default: {
+      formattedWeekDay = 'Thứ 2';
+      break;
+    }
+  }
+
+  return formattedWeekDay;
 };

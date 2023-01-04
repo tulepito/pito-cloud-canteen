@@ -6,6 +6,7 @@ import { useIntl } from 'react-intl';
 
 // eslint-disable-next-line import/no-cycle
 import EditPartnerWizardTab from '../EditPartnerWizardTab/EditPartnerWizardTab';
+import css from './EditPartnerWizard.module.scss';
 
 export const BASIC_INFORMATION_TAB = 'basic-information';
 export const LICENSE_TAB = 'license';
@@ -48,6 +49,7 @@ const tabCompleted = (tab: string, listing: any) => {
     meals,
     categories,
     extraServices,
+    businessType,
   } = publicData;
   const { bankAccounts } = privateData;
   const basicInformationCompleted = !!(
@@ -63,7 +65,8 @@ const tabCompleted = (tab: string, listing: any) => {
   const licenseTabCompleted = !!(
     businessLicense &&
     foodCertificate &&
-    partyInsurance
+    partyInsurance &&
+    businessType
   );
   const menuTabCompleted = !!(
     hasOutsideMenuAndService &&
@@ -127,6 +130,8 @@ const EditPartnerWizard = (props: any) => {
     onRemovePartyInsurance,
     onPublishDraftPartner,
     onDiscardDraftPartner,
+    onSetAuthorized,
+    onSetUnsatisfactory,
   } = props;
   const intl = useIntl();
   const router = useRouter();
@@ -163,10 +168,10 @@ const EditPartnerWizard = (props: any) => {
         ? router.push(`/admin/partner/create`)
         : router.push(`/admin/partner/${id}/edit?tab=${nearestActiveTab}`);
     }
-  }, [tabsStatus, selectedTab, partnerListingRef]);
+  }, [tabsStatus, selectedTab, partnerListingRef, router]);
 
   return (
-    <FormWizard>
+    <FormWizard formTabNavClassName={css.formWizard}>
       {TABS.map((tab: string) => (
         <EditPartnerWizardTab
           key={tab}
@@ -203,6 +208,8 @@ const EditPartnerWizard = (props: any) => {
           onRemovePartyInsurance={onRemovePartyInsurance}
           onPublishDraftPartner={onPublishDraftPartner}
           onDiscardDraftPartner={onDiscardDraftPartner}
+          onSetAuthorized={onSetAuthorized}
+          onSetUnsatisfactory={onSetUnsatisfactory}
         />
       ))}
     </FormWizard>

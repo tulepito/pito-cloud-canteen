@@ -31,6 +31,10 @@
     border-color: $primaryPri5;
     outline: none;
   }
+
+  &::placeholder {
+    color: $formFieldPlaceholderColor;
+  }
 }
 .selectedColor {
   color: $neutralGray10;

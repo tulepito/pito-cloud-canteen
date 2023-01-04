@@ -1,4 +1,5 @@
 import { types as sdkLoader } from '@sharetribe/sdk';
+import type { adminRoutes } from '@src/paths';
 import type Decimal from 'decimal.js';
 import type { NextPage } from 'next';
 
@@ -47,6 +48,8 @@ export type TError = {
 export type TIconProps = {
   className?: string;
   rootClassName?: string;
+  width?: number;
+  height?: number;
   onClick?: () => void;
 };
 
@@ -378,3 +381,5 @@ export type TInputAttributes = React.HTMLAttributes<HTMLInputElement>;
 export type TFormLabel =
   | React.ReactElement<React.ComponentProps<'label'>>
   | string;
+
+export type RouteKey = keyof typeof adminRoutes;

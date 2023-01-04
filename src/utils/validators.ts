@@ -194,3 +194,31 @@ export const composeValidators =
       (error: any, validator: any) => error || validator(value),
       VALID,
     );
+
+export const validFacebookUrl = (message: string) => (value: string) => {
+  if (!value) return VALID;
+  const pattern =
+    // eslint-disable-next-line no-useless-escape
+    /^(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?$/;
+  if (pattern.test(value)) {
+    return VALID;
+  }
+  return message;
+};
+
+export const validURL = (message: string) => (str: string) => {
+  if (!str) return VALID;
+  const pattern = new RegExp(
+    '^(https?:\\/\\/)?' + // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+      '(\\#[-a-z\\d_]*)?$',
+    'i',
+  ); // fragment locator
+  if (pattern.test(str)) {
+    return VALID;
+  }
+  return message;
+};

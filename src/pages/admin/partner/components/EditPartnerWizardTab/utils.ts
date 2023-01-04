@@ -293,11 +293,13 @@ export const createSubmitLicenseTabValues = (values: any) => {
     foodCertificate,
     partyInsurance,
     oldImages,
+    businessType,
   } = values;
 
   const submitValues = {
     id,
     publicData: {
+      businessType,
       businessLicense: {
         imageId: getSubmitImageId(uploadedBusinessLicense)?.[0]?.uuid,
         status: businessLicense?.status,

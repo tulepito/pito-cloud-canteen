@@ -1,6 +1,7 @@
 /**
  * This is a wrapper component for different Layouts. Main content should be added to this wrapper.
  */
+import { BreadCrumbs } from '@components/AdminBreadCrumbs/AdminBreadCrumbs';
 import classNames from 'classnames';
 import React from 'react';
 
@@ -14,6 +15,7 @@ const AdminLayoutContent = (props: any) => {
 
   return (
     <div className={classes} role="main">
+      <BreadCrumbs />
       <div className={css.container}>{children}</div>
     </div>
   );

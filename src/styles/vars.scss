@@ -3,7 +3,7 @@ $marketplaceColorLight: #ff4c38;
 $marketplaceColorDark: #8c291e;
 // Primary
 $primaryPri1: #ffecea;
-$primaryPri2: #ffc1bb;
+$primaryPri2: #ef3d2a;
 $primaryPri3: #ff968b;
 $primaryPri4: #ff7f72;
 $primaryPri5: #ef3d2a;
@@ -15,10 +15,10 @@ $primaryPri10: #450700;
 // Neutral
 $neutralGray1: #ffffff;
 $neutralGray2: #fafafa;
-$neutralGray3: #f5f5f5;
-$neutralGray4: #f0f0f0;
-$neutralGray5: #d9d9d9;
-$neutralGray6: #bfbfbf;
+$neutralGray3: #f0f0f0;
+$neutralGray4: #d9d9d9;
+$neutralGray5: #8c8c8c;
+$neutralGray6: #262626;
 $neutralGray7: #8c8c8c;
 $neutralGray8: #595959;
 $neutralGray9: #434343;
@@ -36,6 +36,10 @@ $successScreen7: #389e0d;
 $successScreen8: #237804;
 $successScreen9: #135200;
 $successScreen10: #092b00;
+// Green
+$green1: #f0ffe0;
+$green2: #027a48;
+
 // Warning
 $warningOrange1: #fff7e6;
 $warningOrange2: #ffe7ba;
@@ -47,6 +51,10 @@ $warningOrange7: #d46b08;
 $warningOrange8: #ad4e00;
 $warningOrange9: #873800;
 $warningOrange10: #612500;
+// Orange
+$orange1: #fff4db;
+$orange2: #d46b08;
+
 // Error
 $errorRed1: #fff1f0;
 $errorRed2: #ffccc7;
@@ -58,6 +66,10 @@ $errorRed7: #cf1322;
 $errorRed8: #a8071a;
 $errorRed9: #820014;
 $errorRed10: #5c0011;
+// Red
+$red1: #fff1f0;
+$red2: #cf1322;
+
 // Secondary
 $secondaryBlue1: #f0f5ff;
 $secondaryBlue2: #d6e4ff;
@@ -151,9 +163,14 @@ $zIndexModal: 100;
 $transitionStyle: ease-in 0.2s;
 $transitionStyleButton: ease-in-out 0.1s;
 
-$adminTopbarHeight: 70px;
+$adminTopbarHeight: 52px;
 $adminTopbarzIndex: 49;
 $adminSidebarzIndex: 50;
-$adminSidebarWidth: 300px;
+$adminSidebarWidth: 280px;
+$adminSidebarLeftPartWidth: 60px;
+$adminSidebarRightPartWidth: 220px;
 
 $marketplaceButtonSmallDesktopPadding: 9px 16px 9px 16px;
+
+$singleUseTabRed: #db4a37;
+$singleUseTableTanColor: #fbefd2;

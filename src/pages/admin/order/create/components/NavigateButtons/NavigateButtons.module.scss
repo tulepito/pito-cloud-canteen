@@ -1,0 +1,23 @@
+@use '/src/styles/vars.scss' as *;
+
+.navigationBtn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 24px 0;
+}
+
+.nextButton {
+  min-width: 252px;
+  height: 48px;
+}
+
+.backButton {
+  background-color: $matterColorLight;
+  border: 1px solid $neutralGray11;
+  color: $neutralGray10;
+  height: 48px;
+  &:hover {
+    background-color: $neutralGray3;
+  }
+}

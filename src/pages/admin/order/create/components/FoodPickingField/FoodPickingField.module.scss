@@ -1,0 +1,19 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.fieldTitle {
+  @include text(18px, 24px);
+  font-weight: $fontWeightBold;
+}
+
+.fieldGroups {
+  margin-top: 16px;
+}
+
+.toggle {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  margin-top: 16px;
+  gap: 15px;
+}

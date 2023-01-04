@@ -1,0 +1,19 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  display: grid;
+  grid-template-columns: 1fr;
+
+  .leftSection,
+  .rightSection {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  @include viewportMedium {
+    grid-template-columns: 1fr 328px;
+    column-gap: 32px;
+  }
+}

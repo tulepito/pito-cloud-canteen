@@ -676,7 +676,9 @@ const FieldAvailability = (props: any) => {
 
   return (
     <div className={classNames(css.root, className)}>
-      <p>{intl.formatMessage({ id: 'FieldAvailability.label' })}</p>
+      <p className={css.fieldLabel}>
+        {intl.formatMessage({ id: 'FieldAvailability.label' })}
+      </p>
       <div className={css.wrapper}>
         <div className={css.listDay}>
           <p className={css.listDayLabel}>

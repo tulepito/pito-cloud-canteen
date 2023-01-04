@@ -66,7 +66,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       {
         id: createdPartner?.id?.uuid,
         metadata: {
-          isPartnerAccount: true,
+          isPartner: true,
           restaurantListingId: restaurantListing?.id?.uuid,
           userState: 'draft',
         },

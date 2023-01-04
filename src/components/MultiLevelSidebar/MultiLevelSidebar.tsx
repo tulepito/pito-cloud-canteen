@@ -1,4 +1,4 @@
-import IconMenuArrow from '@components/IconMenuArrow/IconMenuArrow';
+import IconArrow from '@components/IconArrow/IconArrow';
 import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -7,13 +7,29 @@ import { useIntl } from 'react-intl';
 
 import css from './MultiLevelSidebar.module.scss';
 
+const getDynamicPathParamsName = (pathname: string) => {
+  const newPathname = pathname.split('/');
+  const paramNames: string[] = [];
+  newPathname.forEach((path: string) => {
+    const paramsName = path.substring(
+      path.indexOf('[') + 1,
+      path.lastIndexOf(']'),
+    );
+    if (paramsName) {
+      paramNames.push(paramsName);
+    }
+  });
+  return paramNames;
+};
+
 export type TSidebarMenu = {
   id: string | number;
   label: string;
   Icon?: React.FC<TIconProps>;
   childrenMenus?: TSidebarMenu[];
   nameLink?: string;
-  level?: number;
+  isFirstLevel?: boolean;
+  subNameLinks?: string[];
 };
 
 type TMenuWithClasses = {
@@ -46,21 +62,38 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
   const intl = useIntl();
   const router = useRouter();
   const { pathname, query } = router;
+
   const [isOpen, setIsOpen] = useState(false);
 
-  const { Icon, label, childrenMenus, nameLink, level } = menu;
+  const {
+    Icon,
+    label,
+    childrenMenus,
+    nameLink = '',
+    isFirstLevel,
+    subNameLinks,
+  } = menu;
 
   const hasChildrenMenus = childrenMenus && childrenMenus.length > 0;
 
+  const paramNames = getDynamicPathParamsName(nameLink);
+  // Only get dynamic params not search params
+  const newQueryParams = Object.keys(query).reduce((acc: any, key: string) => {
+    if (paramNames.includes(key)) {
+      return { ...acc, [key]: query[key] };
+    }
+    return acc;
+  }, {});
   const handleMenuClick = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
       e.stopPropagation();
+
       if (nameLink && !hasChildrenMenus) {
-        return router.push({ pathname: `${nameLink}`, query });
+        return router.push({ pathname: nameLink, query: newQueryParams });
       }
       return setIsOpen(!isOpen);
     },
-    [nameLink, hasChildrenMenus, setIsOpen, router, isOpen],
+    [nameLink, hasChildrenMenus, isOpen, router, newQueryParams],
   );
 
   const childIsActive = useMemo(
@@ -79,14 +112,16 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     subMenuWrapperClassName,
   );
 
-  const isActive = pathname === nameLink;
-  const firstLevel = level === 1;
+  const activeWithSubNameLinks = subNameLinks?.includes(pathname);
+
+  const isActive = activeWithSubNameLinks || pathname === nameLink;
+
   const subMenuLayoutClasses = classNames(
     css.subMenuLayout,
     subMenuLayoutClassName,
     {
       [css.isOpen]:
-        firstLevel &&
+        isFirstLevel &&
         ((isOpen && childIsActive) || (!hasChildrenMenus && isActive)),
     },
   );
@@ -96,7 +131,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
       <div className={subMenuLayoutClasses}>
         <div className={css.subMenuItem}>
           {Icon && <Icon className={css.entityIcon} />}
-          <p
+          <div
             className={classNames(
               css.label,
               { [css.labelOpen]: isOpen },
@@ -105,13 +140,12 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
             {intl.formatMessage({
               id: label,
             })}
-          </p>
+          </div>
         </div>
         {hasChildrenMenus && (
-          <IconMenuArrow
-            className={classNames(css.menuArrowIcon, {
-              [css.menuArrowOpen]: isOpen,
-            })}
+          <IconArrow
+            direction={isOpen ? 'up' : 'down'}
+            className={css.menuArrowIcon}
           />
         )}
       </div>

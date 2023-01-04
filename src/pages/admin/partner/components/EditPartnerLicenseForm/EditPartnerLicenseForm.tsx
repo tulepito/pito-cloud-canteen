@@ -1,5 +1,6 @@
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
+import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
 import Form from '@components/Form/Form';
 import { EImageVariants } from '@utils/enums';
 import isEqual from 'lodash/isEqual';
@@ -13,7 +14,26 @@ import css from './EditPartnerLicenseForm.module.scss';
 const ACCEPT_IMAGES = 'image/png, image/gif, image/jpeg';
 const VARIANTS = [EImageVariants.scaledMedium];
 
-const BUSINESS_LICENSE_RADIO_OPTIONS = [
+type TBusinessTypeOptions = {
+  id: string;
+  value: string;
+  label: string;
+};
+
+export const BUSINESS_TYPE_OPTIONS: TBusinessTypeOptions[] = [
+  {
+    id: 'businessType.company',
+    value: 'company',
+    label: 'Công ty',
+  },
+  {
+    id: 'businessType.individualBusinessHouseholds',
+    value: 'company.individualBusinessHouseholds',
+    label: 'Loại hình kinh doanh cá thể',
+  },
+];
+
+export const BUSINESS_LICENSE_RADIO_OPTIONS = [
   {
     id: 'businessLicense.yes',
     value: 'yes',
@@ -41,7 +61,7 @@ const BUSINESS_LICENSE_RADIO_OPTIONS = [
   },
 ];
 
-const FOOD_CERTIFICATE_RADIO_OPTIONS = [
+export const FOOD_CERTIFICATE_RADIO_OPTIONS = [
   {
     id: 'foodCertificate.yes',
     value: 'yes',
@@ -140,21 +160,38 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
         return (
           <Form onSubmit={handleSubmit}>
             <div className={css.fields}>
-              <FieldRadioButtonPhoto
-                values={values}
-                className={css.field}
-                name="businessLicense"
-                options={BUSINESS_LICENSE_RADIO_OPTIONS}
-                label={intl.formatMessage({
-                  id: 'EditPartnerLicenseForm.businessLicenseLabel',
-                })}
-                image={uploadedBusinessLicense?.[0]}
-                accept={ACCEPT_IMAGES}
-                variants={VARIANTS}
-                onImageUpload={onBusinessLicenseUpload}
-                onRemoveImage={onRemoveBusinessLicense}
-                uploadImageError={uploadBusinessLicenseError}
-              />
+              <div className={css.field}>
+                <FieldRadioButtonPhoto
+                  values={values}
+                  name="businessLicense"
+                  options={BUSINESS_LICENSE_RADIO_OPTIONS}
+                  label={intl.formatMessage({
+                    id: 'EditPartnerLicenseForm.businessLicenseLabel',
+                  })}
+                  image={uploadedBusinessLicense?.[0]}
+                  accept={ACCEPT_IMAGES}
+                  variants={VARIANTS}
+                  onImageUpload={onBusinessLicenseUpload}
+                  onRemoveImage={onRemoveBusinessLicense}
+                  uploadImageError={uploadBusinessLicenseError}
+                />
+                <div className={css.businessTypeWrapper}>
+                  <div className={css.businessTypeLabel}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerLicenseForm.businessTypeLabel',
+                    })}
+                  </div>
+                  {BUSINESS_TYPE_OPTIONS.map((opt: TBusinessTypeOptions) => (
+                    <FieldRadioButton
+                      key={opt.id}
+                      id={opt.id}
+                      label={opt.label}
+                      name="businessType"
+                      value={opt.value}
+                    />
+                  ))}
+                </div>
+              </div>
               <FieldRadioButtonPhoto
                 image={uploadedFoodCertificate?.[0]}
                 accept={ACCEPT_IMAGES}

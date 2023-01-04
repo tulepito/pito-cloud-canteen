@@ -9,7 +9,7 @@ import IconMagnifier from '@components/IconMagnifier/IconMagnifier';
 import Meta from '@components/Layout/Meta';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import type { TColumn } from '@components/Table/Table';
-import Table from '@components/Table/Table';
+import { TableForm } from '@components/Table/Table';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -18,23 +18,19 @@ import {
   RESULT_PAGE_SIZE,
 } from '@redux/slices/ManageCompaniesPage.slice';
 import { ECompanyStatus } from '@utils/enums';
-import type { TCompany, TReverseMapFromEnum, TUser } from '@utils/types';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import type { TUpdateStatus } from './helpers';
+import {
+  filterCompanies,
+  parseEntitiesToTableData,
+  sliceCompanies,
+} from './helpers';
 import css from './ManageCompanies.module.scss';
-
-type TUpdateStatus = {
-  id: string;
-  status: TReverseMapFromEnum<ECompanyStatus>;
-};
-
-type TExtraDataMapToCompanyTable = {
-  updateStatus: (e: TUpdateStatus) => void;
-};
 
 const companyStatusOptions = [
   {
@@ -48,26 +44,6 @@ const companyStatusOptions = [
 ];
 
 const TABLE_COLUMN: TColumn[] = [
-  {
-    key: 'id',
-    label: 'ID',
-    render: (data: any) => {
-      return (
-        <span title={data.id} className={classNames(css.rowText, css.rowId)}>
-          {data.id}
-        </span>
-      );
-    },
-    renderSearch: () => {
-      return (
-        <FieldTextInput
-          className={css.keywordInput}
-          name="searchId"
-          id="searchId"
-        />
-      );
-    },
-  },
   {
     key: 'name',
     label: 'Họ và tên',
@@ -204,86 +180,6 @@ const TABLE_COLUMN: TColumn[] = [
   },
 ];
 
-const parseEntitiesToTableData = (
-  companies: Array<TUser & Partial<{ order: number }>>,
-  extraData: TExtraDataMapToCompanyTable,
-) => {
-  return companies.map((company: any) => {
-    const companyId = company.id?.uuid;
-    const {
-      profile: {
-        displayName,
-        publicData: { phoneNumber, companyName },
-        metadata: { status },
-      },
-      email,
-    } = company.attributes;
-
-    return {
-      key: companyId,
-      data: {
-        id: companyId,
-        name: displayName,
-        phone: phoneNumber,
-        email,
-        companyName,
-        status: status || ECompanyStatus.unactive,
-        ...extraData,
-      },
-    };
-  });
-};
-
-const sliceCompanies = (companies: TCompany[], page: any) => {
-  const pageAsNum = Number(page);
-
-  return companies.slice(
-    (pageAsNum - 1) * RESULT_PAGE_SIZE,
-    pageAsNum * RESULT_PAGE_SIZE,
-  );
-};
-
-const filterCompanies = (companies: TCompany[], filterValues: any) => {
-  const {
-    searchId,
-    searchDisplayName,
-    searchCompanyName,
-    searchEmail,
-    searchPhone,
-    searchStatus,
-  } = filterValues;
-
-  if (Object.keys(filterValues).length === 0) return companies;
-  return companies.filter((company: any) => {
-    const companyId = company.id?.uuid;
-    const {
-      profile: {
-        displayName,
-        publicData: { companyName, phoneNumber },
-        metadata: { status },
-      },
-      email,
-    } = company.attributes;
-
-    return (
-      (searchId ? companyId.includes(searchId) : true) &&
-      (searchDisplayName
-        ? displayName.toLowerCase().includes(searchDisplayName.toLowerCase())
-        : true) &&
-      (searchCompanyName
-        ? companyName?.toLowerCase().includes(searchCompanyName?.toLowerCase())
-        : true) &&
-      (searchEmail
-        ? email?.toLowerCase().includes(searchEmail?.toLowerCase())
-        : true) &&
-      (searchPhone
-        ? phoneNumber?.toLowerCase().includes(searchPhone?.toLowerCase())
-        : true) &&
-      (searchStatus ? status === Number(searchStatus) : true)
-    );
-  });
-};
-
 export default function ManageCompanies() {
   const intl = useIntl();
   const { value: mounted, setValue: setMounted } = useBoolean(false);
@@ -378,7 +274,7 @@ export default function ManageCompanies() {
       {queryCompaniesInProgress ? (
         <LoadingContainer />
       ) : (
-        <Table
+        <TableForm
           initialValues={initialValues}
           onSubmit={onSearchKeyword}
           columns={TABLE_COLUMN}
