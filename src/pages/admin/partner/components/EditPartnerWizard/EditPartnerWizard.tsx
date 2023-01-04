@@ -6,6 +6,7 @@ import { useIntl } from 'react-intl';
 
 // eslint-disable-next-line import/no-cycle
 import EditPartnerWizardTab from '../EditPartnerWizardTab/EditPartnerWizardTab';
+import css from './EditPartnerWizard.module.scss';
 
 export const BASIC_INFORMATION_TAB = 'basic-information';
 export const LICENSE_TAB = 'license';
@@ -170,7 +171,7 @@ const EditPartnerWizard = (props: any) => {
   }, [tabsStatus, selectedTab, partnerListingRef]);
 
   return (
-    <FormWizard>
+    <FormWizard className={css.formWizard}>
       {TABS.map((tab: string) => (
         <EditPartnerWizardTab
           key={tab}
