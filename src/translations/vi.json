@@ -571,5 +571,6 @@
   "SelectFoodForm.selectedFood": "Món đã chọn",
   "SelectFoodForm.saveResult": "Lưu kết quả",
   "CreateOrderRoute.title": "Tạo đơn hàng",
-  "CreateOrderRoute.description": "Tạo đơn hàng"
+  "CreateOrderRoute.description": "Tạo đơn hàng",
+  "AdminSidebar.dashboardLabel": "Trang chủ"
 }

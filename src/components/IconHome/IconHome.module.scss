@@ -1,4 +1,7 @@
+@use '/src/styles/vars.scss' as *;
+
 .root {
   width: 25px;
   height: 25px;
+  fill: $neutralGray5;
 }

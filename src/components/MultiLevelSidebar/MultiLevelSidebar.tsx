@@ -7,14 +7,29 @@ import { useIntl } from 'react-intl';
 
 import css from './MultiLevelSidebar.module.scss';
 
+const getDynamicPathParamsName = (pathname: string) => {
+  const newPathname = pathname.split('/');
+  const paramNames: string[] = [];
+  newPathname.forEach((path: string) => {
+    const paramsName = path.substring(
+      path.indexOf('[') + 1,
+      path.lastIndexOf(']'),
+    );
+    if (paramsName) {
+      paramNames.push(paramsName);
+    }
+  });
+  return paramNames;
+};
+
 export type TSidebarMenu = {
   id: string | number;
   label: string;
   Icon?: React.FC<TIconProps>;
   childrenMenus?: TSidebarMenu[];
   nameLink?: string;
-  level?: number;
-  subNameLinks?: any[];
+  isFirstLevel?: boolean;
+  subNameLinks?: string[];
 };
 
 type TMenuWithClasses = {
@@ -47,21 +62,38 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
   const intl = useIntl();
   const router = useRouter();
   const { pathname, query } = router;
+
   const [isOpen, setIsOpen] = useState(false);
 
-  const { Icon, label, childrenMenus, nameLink, level, subNameLinks } = menu;
+  const {
+    Icon,
+    label,
+    childrenMenus,
+    nameLink = '',
+    isFirstLevel,
+    subNameLinks,
+  } = menu;
 
   const hasChildrenMenus = childrenMenus && childrenMenus.length > 0;
 
+  const paramNames = getDynamicPathParamsName(nameLink);
+  // Only get dynamic params not search params
+  const newQueryParams = Object.keys(query).reduce((acc: any, key: string) => {
+    if (paramNames.includes(key)) {
+      return { ...acc, [key]: query[key] };
+    }
+    return acc;
+  }, {});
   const handleMenuClick = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
       e.stopPropagation();
+
       if (nameLink && !hasChildrenMenus) {
-        return router.push({ pathname: nameLink, query });
+        return router.push({ pathname: nameLink, query: newQueryParams });
       }
       return setIsOpen(!isOpen);
     },
-    [nameLink, hasChildrenMenus, setIsOpen, router, isOpen, query],
+    [nameLink, hasChildrenMenus, isOpen, router, newQueryParams],
   );
 
   const childIsActive = useMemo(
@@ -84,13 +116,12 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
 
   const isActive = activeWithSubNameLinks || pathname === nameLink;
 
-  const firstLevel = level === 1;
   const subMenuLayoutClasses = classNames(
     css.subMenuLayout,
     subMenuLayoutClassName,
     {
       [css.isOpen]:
-        firstLevel &&
+        isFirstLevel &&
         ((isOpen && childIsActive) || (!hasChildrenMenus && isActive)),
     },
   );
