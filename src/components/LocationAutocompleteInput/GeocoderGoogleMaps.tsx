@@ -17,8 +17,8 @@ export const CURRENT_LOCATION_ID = 'current-location';
 // attribution is required next to the results.
 // See: https://developers.google.com/places/web-service/policies#powered
 type TGeocoderAttribution = {
-  rootClassName: string;
-  className: string;
+  rootClassName?: string;
+  className?: string;
 };
 export const GeocoderAttribution = (props: TGeocoderAttribution) => {
   const { rootClassName, className } = props;
