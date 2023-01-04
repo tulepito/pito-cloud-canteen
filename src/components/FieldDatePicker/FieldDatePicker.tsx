@@ -2,7 +2,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import classNames from 'classnames';
 import viLocale from 'date-fns/locale/vi';
-import type { ReactDatePickerProps } from 'react-datepicker';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import type { FieldProps, FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
@@ -10,9 +9,7 @@ import { Field } from 'react-final-form';
 import css from './FieldDatePicker.module.scss';
 
 registerLocale('vi', viLocale);
-interface FieldDatePickerProps
-  extends FieldRenderProps<string, any>,
-    ReactDatePickerProps {
+interface FieldDatePickerProps extends FieldRenderProps<string, any> {
   label?: string;
   name?: string;
 }
