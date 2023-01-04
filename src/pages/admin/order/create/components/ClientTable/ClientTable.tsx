@@ -1,4 +1,5 @@
 import Pagination from '@components/Pagination/Pagination';
+import Tooltip from '@components/Tooltip/Tooltip';
 import classNames from 'classnames';
 import { useIntl } from 'react-intl';
 
@@ -36,7 +37,9 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
               </span>
               <span className={classNames(css.bodyCell, css.phoneEmail)}>
                 <div className={css.phone}>{itemData.phone}</div>
-                <div className={css.email}>{itemData.email}</div>
+                <Tooltip placement="bottom" tooltipContent={itemData.email}>
+                  <div className={css.email}>{itemData.email}</div>
+                </Tooltip>
               </span>
               <span className={css.bodyCell}>{itemData.address}</span>
             </div>
