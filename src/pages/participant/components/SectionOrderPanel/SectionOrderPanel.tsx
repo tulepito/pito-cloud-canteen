@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { ParticipantSetupPlanThunks } from '@redux/slices/ParticipantSetupPlanPage.slice';
 import { shopingCartThunks } from '@redux/slices/shopingCart.slice';
 import { LISTING } from '@utils/data';
+import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { useIntl } from 'react-intl';
@@ -111,7 +112,10 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
           )}
         </p>
       </div>
-      <div className={css.sectionBody}>
+      <div
+        className={classNames(css.sectionBody, {
+          [css.sectionBodyEmpty]: cartListKeys.length === 0,
+        })}>
         {loadDataInProgress ? (
           <Skeleton className={css.lineItemLoading} count={4} />
         ) : (
@@ -124,7 +128,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
         <Button
           fullWidth
           onClick={handleSubmit}
-          disabled={submitDataInprogress}
+          disabled={submitDataInprogress || cartListKeys.length === 0}
           inProgress={submitDataInprogress}>
           {completeOrderButtonLabel}
         </Button>
