@@ -1,19 +1,38 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable import/no-cycle */
+
 import type { ThunkAPI } from '@redux/store';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
   createDraftPartnerApi,
   deletePartnerApi,
   publishDraftPartnerApi,
+  queryRestaurantListingsApi,
   showRestaurantApi,
   updateRestaurantApi,
+  updateRestaurantStatusApi,
 } from '@utils/api';
 import { denormalisedResponseEntities } from '@utils/data';
-import { EImageVariants } from '@utils/enums';
+import {
+  EImageVariants,
+  EListingType,
+  ERestaurantListingState,
+} from '@utils/enums';
 import { storableError } from '@utils/errors';
+import type { TPagination } from '@utils/types';
 import omit from 'lodash/omit';
 
-interface CreateAndEditPartnerState {
+export const MANAGE_PARTNER_RESULT_PAGE_SIZE = 10;
+
+type TPartnerStates = {
+  // Manage partners page slice
+  restaurantRefs: any[];
+  queryRestaurantsInProgress: boolean;
+  queryRestaurantsError: any;
+  pagination: TPagination;
+  restaurantTableActionInProgress: any;
+  restaurantTableActionError: any;
+
+  // Create or edit partner slice
   createDraftPartnerInProgress: boolean;
   createDraftPartnerError: any;
 
@@ -60,7 +79,13 @@ interface CreateAndEditPartnerState {
 
   discardDraftPartnerInProgress: boolean;
   discardDraftPartnerError: any;
-}
+};
+
+const QUERY_RESTAURANTS = 'app/ManagePartnersPage/QUERY_RESTAURANTS';
+
+const SET_RESTAURANT_STATUS = 'app/ManagePartnersPage/SET_RESTAURANT_STATUS';
+
+const DELETE_RESTAURANT = 'app/ManagePartnersPage/DELETE_RESTAURANT';
 
 const REQUEST_AVATAR_UPLOAD =
   'app/CreateAndEditPartnerPage/REQUEST_AVATAR_UPLOAD';
@@ -89,6 +114,31 @@ const UPDATE_PARTNER_RESTAURANT_LISTING =
 const PUBLISH_PARTNER = 'app/CreateAndEditPartnerPage/PUBLISH_PARTNER';
 const DISCARD_DRAFT_PARTNER =
   'app/CreateAndEditPartnerPage/DISCARD_DRAFT_PARTNER';
+
+const SHOW_RESTAURANT_LISTING_PARAMS = {
+  include: ['author', 'author.profileImage', 'images'],
+  'fields.image': [
+    // Listing page
+    'variants.landscape-crop',
+    'variants.landscape-crop2x',
+    'variants.landscape-crop4x',
+    'variants.landscape-crop6x',
+
+    // Social media
+    'variants.facebook',
+    'variants.twitter',
+
+    // Image carousel
+    'variants.scaled-small',
+    'variants.scaled-medium',
+    'variants.scaled-large',
+    'variants.scaled-xlarge',
+
+    // Avatars
+    'variants.square-small',
+    'variants.square-small2x',
+  ],
+};
 
 const requestAvatarUpload = createAsyncThunk(
   REQUEST_AVATAR_UPLOAD,
@@ -278,7 +328,9 @@ const createDraftPartner = createAsyncThunk(
         },
       };
       const { data } = await createDraftPartnerApi(submitValues);
-      const { listing, user } = data;
+      const { listing: listingRes, user: userRes } = data;
+      const [listing] = denormalisedResponseEntities(listingRes);
+      const [user] = denormalisedResponseEntities(userRes);
       return fulfillWithValue({ listing, user });
     } catch (error: any) {
       console.error(error);
@@ -294,28 +346,7 @@ const showPartnerRestaurantListing = createAsyncThunk(
       const { data } = await showRestaurantApi({
         id,
         dataParams: {
-          include: ['author', 'author.profileImage', 'images'],
-          'fields.image': [
-            // Listing page
-            'variants.landscape-crop',
-            'variants.landscape-crop2x',
-            'variants.landscape-crop4x',
-            'variants.landscape-crop6x',
-
-            // Social media
-            'variants.facebook',
-            'variants.twitter',
-
-            // Image carousel
-            'variants.scaled-small',
-            'variants.scaled-medium',
-            'variants.scaled-large',
-            'variants.scaled-xlarge',
-
-            // Avatars
-            'variants.square-small',
-            'variants.square-small2x',
-          ],
+          ...SHOW_RESTAURANT_LISTING_PARAMS,
         },
         queryParams: {
           expand: true,
@@ -337,10 +368,12 @@ const updatePartnerRestaurantListing = createAsyncThunk(
       const { data } = await updateRestaurantApi({
         dataParams: values,
         queryParams: {
+          ...SHOW_RESTAURANT_LISTING_PARAMS,
           expand: true,
         },
       });
-      return fulfillWithValue(data);
+      const [restaurant] = denormalisedResponseEntities(data);
+      return fulfillWithValue(restaurant);
     } catch (error) {
       console.error(error);
       return rejectWithValue(storableError(error));
@@ -348,7 +381,75 @@ const updatePartnerRestaurantListing = createAsyncThunk(
   },
 );
 
-export const createAndEditPartnerPageThunks = {
+const setRestaurantStatus = createAsyncThunk(
+  SET_RESTAURANT_STATUS,
+  async (params: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+    try {
+      const { data } = await updateRestaurantStatusApi({
+        dataParams: params,
+        queryParams: {
+          ...SHOW_RESTAURANT_LISTING_PARAMS,
+          expand: true,
+        },
+      });
+      const [restaurant] = denormalisedResponseEntities(data);
+      return fulfillWithValue(restaurant);
+    } catch (error: any) {
+      console.error('Query company error : ', error);
+      return rejectWithValue(storableError(error.response.data));
+    }
+  },
+);
+
+const deleteRestaurant = createAsyncThunk(
+  DELETE_RESTAURANT,
+  async (params: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+    try {
+      const { partnerId: id } = params;
+      const { data } = await deletePartnerApi({ id });
+      return fulfillWithValue(data);
+    } catch (error) {
+      console.log('error', error);
+      return rejectWithValue(storableError(error));
+    }
+  },
+);
+
+const queryRestaurants = createAsyncThunk(
+  QUERY_RESTAURANTS,
+  async (params: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+    try {
+      const dataParams = {
+        ...params,
+        meta_listingState: [
+          ERestaurantListingState.draft,
+          ERestaurantListingState.published,
+        ],
+        meta_listingType: EListingType.restaurant,
+        perPage: MANAGE_PARTNER_RESULT_PAGE_SIZE,
+        include: ['author'],
+        'fields.listing': [
+          'title',
+          'geolocation',
+          'price',
+          'publicData',
+          'metadata',
+        ],
+      };
+      const { data } = await queryRestaurantListingsApi({
+        dataParams,
+        queryParams: { expand: true },
+      });
+      const restaurantRefs = denormalisedResponseEntities(data);
+      return fulfillWithValue({ restaurantRefs, response: data });
+    } catch (error: any) {
+      console.error('Query company error : ', error);
+      return rejectWithValue(storableError(error.response.data));
+    }
+  },
+);
+
+export const partnerThunks = {
   requestAvatarUpload,
   createDraftPartner,
   requestCoverUpload,
@@ -359,9 +460,24 @@ export const createAndEditPartnerPageThunks = {
   requestPartyInsuranceUpload,
   publishDraftPartner,
   discardDraftPartner,
+  queryRestaurants,
+  setRestaurantStatus,
+  deleteRestaurant,
 };
 
-const initialState: CreateAndEditPartnerState = {
+const initialState: TPartnerStates = {
+  restaurantRefs: [],
+  queryRestaurantsInProgress: false,
+  queryRestaurantsError: null,
+  pagination: {
+    totalItems: 0,
+    totalPages: 0,
+    page: 0,
+    perPage: 0,
+  },
+  restaurantTableActionInProgress: null,
+  restaurantTableActionError: null,
+
   // handle create partner
   createDraftPartnerInProgress: false,
   createDraftPartnerError: null,
@@ -414,8 +530,8 @@ const initialState: CreateAndEditPartnerState = {
   discardDraftPartnerError: null,
 };
 
-export const createAndEditPartnerSlice = createSlice({
-  name: 'CreateAndEditPartnerPage',
+export const partnerSlice = createSlice({
+  name: 'partners',
   initialState,
   reducers: {
     removeAvatar: (state: any, { payload }) => {
@@ -533,6 +649,58 @@ export const createAndEditPartnerSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(queryRestaurants.pending, (state) => ({
+        ...state,
+        queryRestaurantsError: null,
+        queryRestaurantsInProgress: true,
+      }))
+      .addCase(queryRestaurants.fulfilled, (state, action) => {
+        const { restaurantRefs, response } = action.payload || {};
+        return {
+          ...state,
+          restaurantRefs,
+          queryRestaurantsInProgress: false,
+          pagination: response.data.meta,
+        };
+      })
+      .addCase(queryRestaurants.rejected, (state, action) => ({
+        ...state,
+        queryRestaurantsError: action.payload,
+        queryRestaurantsInProgress: false,
+      }))
+      .addCase(setRestaurantStatus.pending, (state, action) => {
+        return {
+          ...state,
+          restaurantTableActionInProgress: action.meta.arg.id,
+          restaurantTableActionError: null,
+        };
+      })
+      .addCase(setRestaurantStatus.fulfilled, (state, action) => ({
+        ...state,
+        partnerListingRef: action.payload,
+        restaurantTableActionInProgress: null,
+      }))
+      .addCase(setRestaurantStatus.rejected, (state, action) => ({
+        ...state,
+        restaurantTableActionInProgress: null,
+        restaurantTableActionError: action.payload,
+      }))
+      .addCase(deleteRestaurant.pending, (state, action) => {
+        return {
+          ...state,
+          restaurantTableActionInProgress: action.meta.arg.restaurantId,
+          restaurantTableActionError: null,
+        };
+      })
+      .addCase(deleteRestaurant.fulfilled, (state) => ({
+        ...state,
+        restaurantTableActionInProgress: null,
+      }))
+      .addCase(deleteRestaurant.rejected, (state, action) => ({
+        ...state,
+        restaurantTableActionInProgress: null,
+        restaurantTableActionError: action.payload,
+      }))
       .addCase(requestAvatarUpload.pending, (state, action) => {
         const { id } = action.meta.arg;
 
@@ -663,7 +831,7 @@ export const createAndEditPartnerSlice = createSlice({
         return {
           ...state,
           updatePartnerListingInProgress: false,
-          partnerListingRef: denormalisedResponseEntities(action.payload),
+          partnerListingRef: action.payload,
         };
       })
       .addCase(updatePartnerRestaurantListing.rejected, (state, action) => {
@@ -855,6 +1023,6 @@ export const {
   removeBusinessLicense,
   removeFoodCertificate,
   removePartyInsurance,
-} = createAndEditPartnerSlice.actions;
+} = partnerSlice.actions;
 
-export default createAndEditPartnerSlice.reducer;
+export default partnerSlice.reducer;

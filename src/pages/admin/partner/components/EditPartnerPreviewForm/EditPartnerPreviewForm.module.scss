@@ -63,10 +63,16 @@
 }
 
 .configField {
-  display: grid;
+  display: flex;
   gap: 20px;
+  flex-direction: column;
+
+  .field {
+    flex: 1;
+  }
   @include viewportMedium {
-    grid-template-columns: repeat(2, 1fr);
+    flex-direction: row;
+    align-items: flex-start;
   }
 }
 
@@ -74,7 +80,6 @@
   border-collapse: collapse;
   width: 100%;
   padding: 10px;
-  max-width: 500px;
   tr {
     td,
     th {
@@ -94,6 +99,9 @@
 
 .restaurantConfig {
   margin-top: 30px;
+  @include viewportLarge {
+    margin-top: 0;
+  }
 }
 
 .sectionLabel {
@@ -159,10 +167,14 @@
   color: #03acca;
   border-radius: 4px;
   font-size: 14px;
+  max-width: 200px;
+  word-break: break-all;
 }
 
 .services {
   padding: 0 0 0 20px;
+  max-width: 200px;
+  word-break: break-all;
   li {
     margin-bottom: 10px;
     font-size: 16px;
@@ -189,4 +201,14 @@
   .button {
     margin-left: 10px;
   }
+}
+
+.currency {
+  border-left: 1px solid $neutralGray5;
+  padding: 0 15px;
+}
+
+.configLabel {
+  font-weight: $fontWeightBold;
+  margin: 30px 0 20px 0;
 }

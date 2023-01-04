@@ -9,6 +9,7 @@ import ToggleButton from '@components/ToggleButton/ToggleButton';
 import {
   CATEGORY_OPTIONS,
   EImageVariants,
+  ERestaurantListingStatus,
   EXTRA_SERVICE_OPTIONS,
   LIST_BANKS,
   MEAL_OPTIONS,
@@ -18,8 +19,9 @@ import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
 import React from 'react';
 import { Field, Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
+import { BUSINESS_TYPE_OPTIONS } from '../EditPartnerLicenseForm/EditPartnerLicenseForm';
 import { createAvailabilityPlanInitialValues } from '../EditPartnerWizardTab/utils';
 import css from './EditPartnerPreviewForm.module.scss';
 
@@ -43,6 +45,8 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
           inProgress,
           onDiscard,
           isDraftFlow,
+          onSetAuthorized,
+          onSetUnsatisfactory,
         } = fieldRenderProps;
         const {
           cover,
@@ -68,12 +72,19 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
           hasOutsideMenuAndService,
           extraServices = [],
           bankAccounts = [],
+          status,
+          businessType,
         } = values;
 
         const entries = createAvailabilityPlanInitialValues(availabilityPlan);
+
+        const isUnsatisfactory =
+          status === ERestaurantListingStatus.unsatisfactory;
+        const isAuthorized = status === ERestaurantListingStatus.authorized;
+        const isNew = !status || status === ERestaurantListingStatus.new;
         return (
           <Form onSubmit={handleSubmit}>
-            {isDraftFlow && (
+            {isDraftFlow ? (
               <div className={css.buttonWrapper}>
                 <Button
                   onClick={onDiscard}
@@ -89,6 +100,39 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                   className={css.button}>
                   {intl.formatMessage({ id: 'EditPartnerPreviewForm.publish' })}
                 </Button>
+              </div>
+            ) : (
+              <div className={css.buttonWrapper}>
+                {(isNew || isUnsatisfactory) && (
+                  <Button
+                    type="button"
+                    inProgress={inProgress}
+                    disabled={inProgress}
+                    onClick={onSetAuthorized}
+                    className={css.button}>
+                    <FormattedMessage id="EditPartnerPreviewForm.authorizeBtn" />
+                  </Button>
+                )}
+                {(isNew || isAuthorized) && (
+                  <Button
+                    type="button"
+                    inProgress={inProgress}
+                    disabled={inProgress}
+                    onClick={onSetUnsatisfactory}
+                    className={css.button}>
+                    <FormattedMessage id="EditPartnerPreviewForm.unsatisfactoryBtn" />
+                  </Button>
+                )}
+                {!isAuthorized && (
+                  <Button
+                    type="button"
+                    inProgress={inProgress}
+                    disabled={inProgress}
+                    onClick={onDiscard}
+                    className={css.button}>
+                    <FormattedMessage id="EditPartnerPreviewForm.deleteBtn" />
+                  </Button>
+                )}
               </div>
             )}
             {formError && <ErrorMessage message={formError.message} />}
@@ -199,53 +243,60 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                 </div>
               </div>
               <div className={css.configFields}>
-                <p className={css.label}>
-                  {intl.formatMessage({
-                    id: 'EditPartnerPreviewForm.availablePlan',
-                  })}
-                </p>
                 <div className={css.configField}>
-                  <table
-                    className={classNames(css.field, css.availabilityTable)}>
-                    <thead>
-                      <tr>
-                        <th>
-                          {intl.formatMessage({
-                            id: 'EditPartnerPreviewForm.day',
-                          })}
-                        </th>
-                        <th>
-                          {intl.formatMessage({
-                            id: 'EditPartnerPreviewForm.time',
-                          })}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.keys(entries).map((day: any) => {
-                        const isEntries = Array.isArray(entries[day]);
-                        return isEntries ? (
-                          entries[day]?.map((e: any, eIndx: number) => (
-                            <tr key={`${e.startTime}.${eIndx}`}>
-                              {eIndx === 0 && (
-                                <td rowSpan={entries[day].length}>
-                                  {intl.formatMessage({
-                                    id: `FieldAvailability.${day}Label`,
-                                  })}
-                                </td>
-                              )}
-                              <td>
-                                {e.startTime} : {e.endTime}
-                              </td>
-                            </tr>
-                          ))
-                        ) : (
-                          <></>
-                        );
+                  <div className={css.field}>
+                    <div className={css.configLabel}>
+                      {intl.formatMessage({
+                        id: 'EditPartnerPreviewForm.availablePlan',
                       })}
-                    </tbody>
-                  </table>
+                    </div>
+                    <table
+                      className={classNames(css.field, css.availabilityTable)}>
+                      <thead>
+                        <tr>
+                          <th>
+                            {intl.formatMessage({
+                              id: 'EditPartnerPreviewForm.day',
+                            })}
+                          </th>
+                          <th>
+                            {intl.formatMessage({
+                              id: 'EditPartnerPreviewForm.time',
+                            })}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.keys(entries).map((day: any) => {
+                          const isEntries = Array.isArray(entries[day]);
+                          return isEntries ? (
+                            entries[day]?.map((e: any, eIndx: number) => (
+                              <tr key={`${e.startTime}.${eIndx}`}>
+                                {eIndx === 0 && (
+                                  <td rowSpan={entries[day].length}>
+                                    {intl.formatMessage({
+                                      id: `FieldAvailability.${day}Label`,
+                                    })}
+                                  </td>
+                                )}
+                                <td>
+                                  {e.startTime} : {e.endTime}
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <></>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                   <div className={classNames(css.field, css.restaurantConfig)}>
+                    <div className={css.configLabel}>
+                      {intl.formatMessage({
+                        id: 'EditPartnerForm.retaurantConfigLabel',
+                      })}
+                    </div>
                     <Field name="vat" id="vat">
                       {(vatFieldProps: any) => {
                         const { input } = vatFieldProps;
@@ -273,6 +324,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                       label={intl.formatMessage({
                         id: 'EditPartnerForm.minPrice',
                       })}
+                      rightIcon={<div className={css.currency}>đ</div>}
                     />
                     <FieldCheckboxGroup
                       id="packaging"
@@ -355,6 +407,14 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                     </div>
                   )}
                 </div>
+              </div>
+              <div>
+                <p className={css.label}>
+                  {intl.formatMessage({
+                    id: 'EditPartnerForm.businessTypeLabel',
+                  })}
+                </p>
+                <p>{getLabelByKey(BUSINESS_TYPE_OPTIONS, businessType)}</p>
               </div>
             </div>
             <div className={classNames(css.section, css.licenseSection)}>

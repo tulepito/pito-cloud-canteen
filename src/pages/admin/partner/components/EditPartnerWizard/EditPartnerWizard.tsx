@@ -49,6 +49,7 @@ const tabCompleted = (tab: string, listing: any) => {
     meals,
     categories,
     extraServices,
+    businessType,
   } = publicData;
   const { bankAccounts } = privateData;
   const basicInformationCompleted = !!(
@@ -64,7 +65,8 @@ const tabCompleted = (tab: string, listing: any) => {
   const licenseTabCompleted = !!(
     businessLicense &&
     foodCertificate &&
-    partyInsurance
+    partyInsurance &&
+    businessType
   );
   const menuTabCompleted = !!(
     hasOutsideMenuAndService &&
@@ -128,6 +130,8 @@ const EditPartnerWizard = (props: any) => {
     onRemovePartyInsurance,
     onPublishDraftPartner,
     onDiscardDraftPartner,
+    onSetAuthorized,
+    onSetUnsatisfactory,
   } = props;
   const intl = useIntl();
   const router = useRouter();
@@ -204,6 +208,8 @@ const EditPartnerWizard = (props: any) => {
           onRemovePartyInsurance={onRemovePartyInsurance}
           onPublishDraftPartner={onPublishDraftPartner}
           onDiscardDraftPartner={onDiscardDraftPartner}
+          onSetAuthorized={onSetAuthorized}
+          onSetUnsatisfactory={onSetUnsatisfactory}
         />
       ))}
     </FormWizard>

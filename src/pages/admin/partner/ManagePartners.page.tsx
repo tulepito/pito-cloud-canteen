@@ -9,7 +9,7 @@ import SelectSingleFilterPopup from '@components/SelectSingleFilterPopup/SelectS
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { managePartnerThunks } from '@redux/slices/ManagePartnersPage.slice';
+import { partnerThunks } from '@redux/slices/partners.slice';
 import { EListingStates, ERestaurantListingStatus } from '@utils/enums';
 import classNames from 'classnames';
 import Link from 'next/link';
@@ -24,12 +24,12 @@ type TManagePartnersPage = {};
 
 const TABLE_COLUMN: TColumn[] = [
   {
-    key: 'id',
-    label: 'ID',
+    key: 'order',
+    label: 'STT',
     render: (data: any) => {
       return (
         <span title={data.id} className={classNames(css.rowText, css.rowId)}>
-          {data.id}
+          {data.order}
         </span>
       );
     },
@@ -129,7 +129,6 @@ const TABLE_COLUMN: TColumn[] = [
           restaurantId: data.id,
         });
       };
-
       const isUnsatisfactory =
         data.status === ERestaurantListingStatus.unsatisfactory;
       const isAuthorized = data.status === ERestaurantListingStatus.authorized;
@@ -137,53 +136,60 @@ const TABLE_COLUMN: TColumn[] = [
         !data.status || data.status === ERestaurantListingStatus.new;
 
       return (
-        <div className={css.tableActions}>
-          {data.isLoading ? (
-            <IconSpinner className={css.loadingIcon} />
-          ) : (
-            <>
-              {(isNew || isUnsatisfactory) && (
-                <InlineTextButton
-                  type="button"
-                  onClick={setAuthorizeHandle}
-                  className={css.actionBtn}>
-                  <FormattedMessage id="ManagePartners.authorizeBtn" />
-                </InlineTextButton>
-              )}
-              {(isNew || isAuthorized) && (
-                <InlineTextButton
-                  type="button"
-                  onClick={setUnsatisfactoryHandle}
-                  className={css.actionBtn}>
-                  <FormattedMessage id="ManagePartners.unsatisfactoryBtn" />
-                </InlineTextButton>
-              )}
-              {!isAuthorized && (
-                <InlineTextButton
-                  type="button"
-                  onClick={deleteHandle}
-                  className={css.actionBtn}>
-                  <FormattedMessage id="ManagePartners.deleteBtn" />
-                </InlineTextButton>
-              )}
-            </>
-          )}
-        </div>
+        !data.isDraft && (
+          <div className={css.tableActions}>
+            {data.isLoading ? (
+              <IconSpinner className={css.loadingIcon} />
+            ) : (
+              <>
+                {(isNew || isUnsatisfactory) && (
+                  <InlineTextButton
+                    type="button"
+                    onClick={setAuthorizeHandle}
+                    className={css.actionBtn}>
+                    <FormattedMessage id="ManagePartners.authorizeBtn" />
+                  </InlineTextButton>
+                )}
+                {(isNew || isAuthorized) && (
+                  <InlineTextButton
+                    type="button"
+                    onClick={setUnsatisfactoryHandle}
+                    className={css.actionBtn}>
+                    <FormattedMessage id="ManagePartners.unsatisfactoryBtn" />
+                  </InlineTextButton>
+                )}
+                {!isAuthorized && (
+                  <InlineTextButton
+                    type="button"
+                    onClick={deleteHandle}
+                    className={css.actionBtn}>
+                    <FormattedMessage id="ManagePartners.deleteBtn" />
+                  </InlineTextButton>
+                )}
+              </>
+            )}
+          </div>
+        )
       );
     },
   },
 ];
 
-const parseEntitiesToTableData = (entityRefs: any[], extraData: any = {}) => {
+const parseEntitiesToTableData = (
+  entityRefs: any[],
+  page: number,
+  extraData: any = {},
+) => {
   if (entityRefs.length === 0) return [];
-  return entityRefs.map((entity: any) => {
+  return entityRefs.map((entity: any, index: number) => {
     const isLoading = entity.id.uuid === extraData.loadingId;
     return {
       key: entity.id.uuid,
       data: {
+        order: (page - 1) * 10 + index + 1,
+        id: entity.id.uuid,
         isDraft:
           entity.attributes.metadata.listingState === EListingStates.draft,
-        id: entity.id.uuid,
         title: entity.attributes.title,
         phoneNumber: entity.attributes.publicData.phoneNumber,
         email: entity.author.attributes.email,
@@ -213,7 +219,7 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
     queryRestaurantsInProgress,
     queryRestaurantsError,
     restaurantTableActionInProgress,
-  } = useAppSelector((state) => state.ManageParnersPage);
+  } = useAppSelector((state) => state.partners);
   const router = useRouter();
   const { query, pathname } = router;
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -227,10 +233,10 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
       status: ERestaurantListingStatus.authorized,
     };
     const response = (await dispatch(
-      managePartnerThunks.setRestaurantStatus(params),
+      partnerThunks.setRestaurantStatus(params),
     )) as any;
     if (!response?.error) {
-      dispatch(managePartnerThunks.queryRestaurants({ page, keywords }));
+      dispatch(partnerThunks.queryRestaurants({ page, keywords }));
     }
   };
 
@@ -240,25 +246,25 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
       status: ERestaurantListingStatus.unsatisfactory,
     };
     const response = (await dispatch(
-      managePartnerThunks.setRestaurantStatus(params),
+      partnerThunks.setRestaurantStatus(params),
     )) as any;
     if (!response?.error) {
-      dispatch(managePartnerThunks.queryRestaurants({ page, keywords }));
+      dispatch(partnerThunks.queryRestaurants({ page, keywords }));
     }
   };
 
   const onDeleteRestaurant = async ({ partnerId, restaurantId }: any) => {
     const response = (await dispatch(
-      managePartnerThunks.deleteRestaurant({ partnerId, restaurantId }),
+      partnerThunks.deleteRestaurant({ partnerId, restaurantId }),
     )) as any;
     if (!response?.error) {
-      dispatch(managePartnerThunks.queryRestaurants({ page, keywords }));
+      dispatch(partnerThunks.queryRestaurants({ page, keywords }));
     }
   };
 
   useEffect(() => {
     dispatch(
-      managePartnerThunks.queryRestaurants({
+      partnerThunks.queryRestaurants({
         page,
         keywords,
         ...(meta_status ? { meta_status } : {}),
@@ -268,13 +274,13 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
 
   const dataTable = useMemo(
     () =>
-      parseEntitiesToTableData(restaurantRefs, {
+      parseEntitiesToTableData(restaurantRefs, Number(page), {
         onSetUnsatisfactory,
         onSetAuthorized,
         loadingId: restaurantTableActionInProgress,
         onDeleteRestaurant,
       }),
-    [restaurantRefs, restaurantTableActionInProgress],
+    [restaurantRefs, restaurantTableActionInProgress, page],
   );
 
   const onSubmit = (values: any) => {

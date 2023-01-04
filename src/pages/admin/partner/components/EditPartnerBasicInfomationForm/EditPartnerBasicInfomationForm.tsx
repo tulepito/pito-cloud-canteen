@@ -20,9 +20,13 @@ import {
   composeValidatorsWithAllValues,
   emailFormatValid,
   nonEmptyImage,
+  numberMinLength,
+  passwordFormatValid,
   passwordMatchConfirmPassword,
   phoneNumberFormatValid,
   required,
+  validFacebookUrl,
+  validURL,
 } from '@utils/validators';
 import arrayMutators from 'final-form-arrays';
 import isEqual from 'lodash/isEqual';
@@ -241,6 +245,7 @@ const EditPartnerBasicInfomationForm: React.FC<
                     id: 'EditPartnerBasicInformationForm.titleRequired',
                   }),
                 )}
+                required
               />
               <FieldTextInput
                 name="companyName"
@@ -257,6 +262,7 @@ const EditPartnerBasicInfomationForm: React.FC<
                     id: 'EditPartnerBasicInformationForm.companyNameRequired',
                   }),
                 )}
+                required
               />
               <LocationAutocompleteInputField
                 name="location"
@@ -281,6 +287,7 @@ const EditPartnerBasicInfomationForm: React.FC<
                     }),
                   ),
                 )}
+                required
               />
 
               <FieldTextInput
@@ -298,6 +305,7 @@ const EditPartnerBasicInfomationForm: React.FC<
                     id: 'EditPartnerBasicInformationForm.contactorNameRequired',
                   }),
                 )}
+                required
               />
               <FieldTextInput
                 className={css.field}
@@ -321,6 +329,7 @@ const EditPartnerBasicInfomationForm: React.FC<
                     }),
                   ),
                 )}
+                required
               />
               {!partnerListingRef && (
                 <FieldTextInput
@@ -345,6 +354,7 @@ const EditPartnerBasicInfomationForm: React.FC<
                       }),
                     ),
                   )}
+                  required
                 />
               )}
               {!partnerListingRef && (
@@ -360,11 +370,19 @@ const EditPartnerBasicInfomationForm: React.FC<
                       id: 'EditPartnerForm.passwordLabel',
                     })}
                     shoudHideEyeIcon
-                    validate={required(
-                      intl.formatMessage({
-                        id: 'EditPartnerBasicInformationForm.passwordRequired',
-                      }),
+                    validate={composeValidators(
+                      required(
+                        intl.formatMessage({
+                          id: 'EditPartnerBasicInformationForm.passwordRequired',
+                        }),
+                      ),
+                      passwordFormatValid(
+                        intl.formatMessage({
+                          id: 'EditPartnerBasicInformationForm.passwordInvalid',
+                        }),
+                      ),
                     )}
+                    required
                   />
                   <FieldPasswordInput
                     className={css.field}
@@ -389,6 +407,7 @@ const EditPartnerBasicInfomationForm: React.FC<
                         }),
                       ),
                     )}
+                    required
                   />
                 </>
               )}
@@ -402,6 +421,11 @@ const EditPartnerBasicInfomationForm: React.FC<
                 label={intl.formatMessage({
                   id: 'EditPartnerForm.websiteLabel',
                 })}
+                validate={validURL(
+                  intl.formatMessage({
+                    id: 'EditPartnerForm.websiteInvalid',
+                  }),
+                )}
               />
               <FieldTextInput
                 className={css.field}
@@ -413,6 +437,11 @@ const EditPartnerBasicInfomationForm: React.FC<
                 label={intl.formatMessage({
                   id: 'EditPartnerForm.facebookLabel',
                 })}
+                validate={validFacebookUrl(
+                  intl.formatMessage({
+                    id: 'EditPartnerForm.facebookUrlValid',
+                  }),
+                )}
               />
               <FieldTextInput
                 className={css.field}
@@ -428,11 +457,6 @@ const EditPartnerBasicInfomationForm: React.FC<
             </div>
 
             <div className={css.flexFields}>
-              <p>
-                {intl.formatMessage({
-                  id: 'EditPartnerForm.retaurantConfigLabel',
-                })}
-              </p>
               <div className={css.fields}>
                 <FieldAvailability
                   values={values}
@@ -442,6 +466,11 @@ const EditPartnerBasicInfomationForm: React.FC<
                   name="availabilityPlan"
                 />
                 <div className={css.retaurantConfigFields}>
+                  <p className={css.retaurantConfigLabel}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerForm.retaurantConfigLabel',
+                    })}
+                  </p>
                   <Field name="vat" id="vat">
                     {(vatFieldProps: any) => {
                       const { input } = vatFieldProps;
@@ -461,18 +490,31 @@ const EditPartnerBasicInfomationForm: React.FC<
                   </Field>
                   <FieldTextInput
                     name="minPrice"
-                    type="number"
                     className={css.minPrice}
                     id="minPrice"
                     label={intl.formatMessage({
                       id: 'EditPartnerForm.minPrice',
                     })}
-                    validate={required(
-                      intl.formatMessage({
-                        id: 'EditPartnerBasicInformationForm.minPriceRequired',
-                      }),
+                    validate={composeValidators(
+                      required(
+                        intl.formatMessage({
+                          id: 'EditPartnerBasicInformationForm.minPriceRequired',
+                        }),
+                      ),
+                      numberMinLength(
+                        intl.formatMessage({
+                          id: 'EditPartnerBasicInformationForm.minPriceValid',
+                        }),
+                        0,
+                      ),
                     )}
+                    rightIcon={<div className={css.currency}>đ</div>}
                   />
+                  <p className={css.packagingLabel}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerBasicInformationForm.packagingLabel',
+                    })}
+                  </p>
                   <FieldCheckboxGroup
                     id="packaging"
                     name="packaging"
