@@ -10,3 +10,14 @@
   @include textTemplate(24px, 700, 32px, '');
   color: $neutralGray10;
 }
+
+.avatarSkeleton {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+.companyTitleSkeleton {
+  width: 200px;
+  height: 32px;
+  border-radius: 8px;
+}

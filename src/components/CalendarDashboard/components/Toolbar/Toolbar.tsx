@@ -56,7 +56,6 @@ const Toolbar: React.FC<TToolbarProps> = ({
     <div className={css.root}>
       <div className={css.companyLogo}>
         <div className={css.companyId}>{companyLogo}</div>
-        <span>{label}</span>
       </div>
       <div>
         <div className={css.actions}>
@@ -66,13 +65,16 @@ const Toolbar: React.FC<TToolbarProps> = ({
             onClick={navigateFunc(NAVIGATE.TODAY)}>
             <FormattedMessage id="Toolbar.action.today" />
           </Button>
-          <div
-            className={css.arrowBtn}
-            onClick={navigateFunc(NAVIGATE.PREVIOUS)}>
-            <IconArrow className={css.arrowIcon} direction="left" />
-          </div>
-          <div className={css.arrowBtn} onClick={navigateFunc(NAVIGATE.NEXT)}>
-            <IconArrow className={css.arrowIcon} direction="right" />
+          <div className={css.toolbarNavigation}>
+            <div
+              className={css.arrowBtn}
+              onClick={navigateFunc(NAVIGATE.PREVIOUS)}>
+              <IconArrow className={css.arrowIcon} direction="left" />
+            </div>
+            {label}
+            <div className={css.arrowBtn} onClick={navigateFunc(NAVIGATE.NEXT)}>
+              <IconArrow className={css.arrowIcon} direction="right" />
+            </div>
           </div>
         </div>
       </div>

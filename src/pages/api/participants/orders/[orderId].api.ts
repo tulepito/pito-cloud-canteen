@@ -61,13 +61,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       try {
+        console.log('First fetch order listing');
         // Get order data
         const order = denormalisedResponseEntities(
           await integrationSdk.listings.show({
             id: orderId,
           }),
         )[0];
+        console.log('End fetch order listing');
 
+        console.log('First fetch company listing');
         // Get company data (user)
         const companyId = order?.attributes.metadata?.companyId || '';
         const company = denormalisedResponseEntities(
@@ -83,17 +86,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             },
           ),
         )[0];
+        console.log('End fetch company listing');
 
+        console.log('First fetch plan listing');
         // Get list sub-order (plan)
         const planIds = order?.attributes.metadata?.plans || [];
-
         const plans = denormalisedResponseEntities(
           await integrationSdk.listings.query({
             ids: planIds.join(','),
             meta_listingType: LISTING_TYPE.SUB_ORDER,
           }),
         );
+        console.log('End fetch plan listing');
 
+        console.log('First fetch sub order listing');
         const subOrderPromises = plans.map(async (plan: TListing) => {
           const { orderDetail } = LISTING(plan).getMetadata();
           const planId = LISTING(plan).getId();
@@ -103,6 +109,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         });
 
         const subOrderData = await Promise.all(subOrderPromises);
+        console.log('End fetch sub order listing');
+
         return res.json({
           statusCode: 200,
           meta: {},
@@ -143,7 +151,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               planData?.[day]?.[currentUserId];
           });
         }
-
         await integrationSdk.listings.update({
           id: planId,
           metadata: {

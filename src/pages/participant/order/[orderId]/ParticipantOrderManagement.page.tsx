@@ -19,18 +19,14 @@ const ParticipantOrderManagement = () => {
   const currentUser = useAppSelector((state) => state.user.currentUser);
 
   // Hooks
-  const { order, company, plans, subOrders } = useAppSelector(
-    (state) => state.ParticipantOrderManagementPage,
-  );
+  const { order, company, plans, subOrders, loadDataInProgress } =
+    useAppSelector((state) => state.ParticipantOrderManagementPage);
 
   const dispatch = useAppDispatch();
 
-  const fetchData = async () => {
-    await dispatch(ParticipantOrderAsyncAction.loadData(orderId as string));
-  };
   useEffect(() => {
     if (isReady) {
-      fetchData();
+      dispatch(ParticipantOrderAsyncAction.loadData(orderId as string));
     }
   }, [isReady]);
 
@@ -47,6 +43,7 @@ const ParticipantOrderManagement = () => {
           plans={plans}
           subOrders={subOrders}
           currentUser={currentUser}
+          loadDataInProgress={loadDataInProgress}
         />
       ) : (
         <OrderListView />

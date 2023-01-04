@@ -5,6 +5,8 @@ import { DateTime } from 'luxon';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
+import type { TNotificationSelectionFormValues } from '../NotificationSelectionForm/NotificationSelectionForm';
+import NotificationSelectionForm from '../NotificationSelectionForm/NotificationSelectionForm';
 import css from './SectionCountdown.module.scss';
 
 type TSectionCountDownProps = {
@@ -23,6 +25,12 @@ const SectionCountdown: React.FC<TSectionCountDownProps> = ({
   const onReceiveNotification = (value: boolean) => {
     // TODO: logic notification later
     receiveNotificationControl.setValue(value);
+  };
+
+  const onSubmitNotificationForm = (
+    values: TNotificationSelectionFormValues,
+  ) => {
+    console.log(values);
   };
 
   // Renderers
@@ -63,6 +71,9 @@ const SectionCountdown: React.FC<TSectionCountDownProps> = ({
           />
         </span>
       </div>
+      {receiveNotificationControl.value && (
+        <NotificationSelectionForm onSubmit={onSubmitNotificationForm} />
+      )}
     </div>
   );
 };

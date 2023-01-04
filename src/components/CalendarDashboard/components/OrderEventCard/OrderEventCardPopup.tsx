@@ -76,7 +76,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   return (
     <div className={css.root}>
       <div className={css.header}>
-        <div className={css.title}>{event.title}</div>
+        <div className={css.title}>#{event.title}</div>
         {status && <OrderEventCardStatus status={status} />}
       </div>
       <div className={css.mealType}>
@@ -84,7 +84,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
       </div>
       <div className={css.eventTime}>{startTime}</div>
       <div className={css.divider} />
-      <OrderEventCardContentItems event={event} />
+      <OrderEventCardContentItems event={event} isFirstHighlight />
       <div className={css.divider} />
       <div className={css.selectFoodForm}>
         <div className={css.selectFoodHeader}>

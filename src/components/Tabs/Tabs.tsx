@@ -20,6 +20,8 @@ interface ITabsProps {
   contentClassName?: string;
   headerClassName?: string;
   showNavigation?: boolean;
+  actionsClassName?: string;
+  actionsComponent?: ReactNode;
 }
 
 const Tabs = (props: ITabsProps) => {
@@ -28,8 +30,10 @@ const Tabs = (props: ITabsProps) => {
     items,
     contentClassName,
     headerClassName,
+    actionsClassName,
     onChange = () => null,
     showNavigation = false,
+    actionsComponent,
   } = props;
   const [activeTabKey, setActiveTabKey] = useState(defaultActiveKey || 1);
 
@@ -88,10 +92,12 @@ const Tabs = (props: ITabsProps) => {
 
   // classes setup
   const headerClasses = classNames(css.tabHeaders, headerClassName);
+  const actionsClasses = classNames(css.actions, actionsClassName);
   const contentClasses = classNames(css.tabPanel, contentClassName);
   return (
     <div className={showNavigation ? css.tabHeaderWrapper : css.root}>
       <div className={headerClasses}>{tabHeader}</div>
+      <div className={actionsClasses}>{actionsComponent}</div>
       <div className={contentClasses}>{tabContent}</div>
       {showNavigation && (
         <div className={css.navigateBtn}>
