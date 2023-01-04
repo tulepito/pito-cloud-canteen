@@ -2,22 +2,25 @@ import { LISTING } from '@utils/data';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 
 import css from './SectionRestaurantHero.module.scss';
 
 type TSectionRestaurantHeroProps = {
   listing?: any;
   orderDay?: string | number;
+  inProgress?: boolean;
 };
 const SectionRestaurantHero: React.FC<TSectionRestaurantHeroProps> = ({
   listing,
   orderDay,
+  inProgress,
 }) => {
   const intl = useIntl();
 
   const heroImage =
-    listing?.images?.[0] ||
-    'https://res.cloudinary.com/eventors/image/upload/f_auto/v1584529827/eventors/hero-back_lbofw9.png';
+    listing?.images?.[0]?.attributes?.variants['landscape-crop2x']?.url;
+
   const { title } = LISTING(listing).getAttributes();
   const parsedOrderDay = DateTime.fromMillis(Number(orderDay));
   const weekDay = parsedOrderDay.get('day');
@@ -29,6 +32,10 @@ const SectionRestaurantHero: React.FC<TSectionRestaurantHeroProps> = ({
     },
     { weekDay, fullDay },
   );
+
+  if (inProgress) {
+    return <Skeleton className={css.skeleton} />;
+  }
 
   return (
     <div className={css.root}>

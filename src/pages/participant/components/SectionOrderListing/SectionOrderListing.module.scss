@@ -68,3 +68,18 @@
   justify-content: flex-end;
   margin-bottom: 15px;
 }
+
+.notJoinThisDay {
+  @include textTemplate(12px, 700, 20px, '');
+  color: $neutralGray7;
+  display: inline-flex;
+  align-items: center;
+}
+
+.iconNotJoined {
+  margin-right: 8px;
+
+  & > path {
+    fill: $neutralGray7;
+  }
+}
