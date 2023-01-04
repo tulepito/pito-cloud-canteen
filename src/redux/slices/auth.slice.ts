@@ -16,7 +16,7 @@ enum EAuthState {
   isSigningUp = 'isSigningUp',
 }
 
-interface IAuthState {
+type IAuthState = {
   isAuthenticated: boolean;
   // scopes associated with current token
   authScopes: [];
@@ -30,7 +30,7 @@ interface IAuthState {
   logoutError: any;
   // signup
   signUpError: any;
-}
+};
 
 const initialState: IAuthState = {
   isAuthenticated: false,

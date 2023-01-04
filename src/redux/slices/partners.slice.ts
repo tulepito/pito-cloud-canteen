@@ -753,7 +753,6 @@ export const partnerSlice = createSlice({
         return { ...state, uploadedCovers, uploadingAvatar: false };
       })
       .addCase(requestCoverUpload.rejected, (state, action: any) => {
-        // eslint-disable-next-line no-console
         const { id, error } = action.payload;
         const uploadedCoversOrder = state.uploadedCoversOrder.filter(
           (i: any) => i !== id,
@@ -861,7 +860,6 @@ export const partnerSlice = createSlice({
         };
       })
       .addCase(requestBusinessLicenseUpload.rejected, (state, action: any) => {
-        // eslint-disable-next-line no-console
         const { id, error } = action.payload;
         const uploadedBusinessLicensesOrder =
           state.uploadedBusinessLicensesOrder.filter((i: any) => i !== id);
@@ -906,7 +904,6 @@ export const partnerSlice = createSlice({
         };
       })
       .addCase(requestFoodCertificateUpload.rejected, (state, action: any) => {
-        // eslint-disable-next-line no-console
         const { id, error } = action.payload;
         const uploadedFoodCertificatesOrder =
           state.uploadedFoodCertificatesOrder.filter((i: any) => i !== id);
@@ -950,7 +947,6 @@ export const partnerSlice = createSlice({
         };
       })
       .addCase(requestPartyInsuranceUpload.rejected, (state, action: any) => {
-        // eslint-disable-next-line no-console
         const { id, error } = action.payload;
         const uploadedPartyInsurancesOrder =
           state.uploadedPartyInsurancesOrder.filter((i: any) => i !== id);

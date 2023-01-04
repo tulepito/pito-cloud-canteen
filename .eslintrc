@@ -11,7 +11,8 @@
       "warn",
       { "props": true, "ignorePropertyModificationsFor": ["state"] }
     ],
-    "no-nested-ternary": "off"
+    "no-nested-ternary": "off",
+    "no-console": "off"
   },
   "overrides": [
     // Configuration for TypeScript files
