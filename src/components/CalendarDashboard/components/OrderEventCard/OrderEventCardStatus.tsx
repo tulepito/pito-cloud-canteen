@@ -23,7 +23,7 @@ const OrderEventCardStatus: React.FC<TOrderEventCardStatusProps> = ({
         [css.notJoinedStatus]: status === EVENT_STATUS.NOT_JOINED_STATUS,
         [css.expiredStatus]: status === EVENT_STATUS.EXPIRED_STATUS,
       })}>
-      <FormattedMessage id={`DayColumn.Status.${status}`} />
+      {status && <FormattedMessage id={`DayColumn.Status.${status}`} />}
     </div>
   );
 };
