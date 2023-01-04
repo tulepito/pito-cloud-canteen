@@ -28,7 +28,6 @@
   }
   .heroInfo {
     position: absolute;
-
     bottom: 24px;
     left: 32px;
     z-index: 1;
@@ -48,7 +47,11 @@
 
   @include viewportLarge {
     height: 160px;
-    .heroInfo {
-    }
   }
+}
+
+.skeleton {
+  height: 160px;
+  border-radius: 16px;
+  width: 100%;
 }
