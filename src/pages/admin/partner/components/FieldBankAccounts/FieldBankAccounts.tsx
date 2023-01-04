@@ -67,6 +67,7 @@ const FieldBankAccounts: React.FC<any> = (props) => {
                       })}
                       id={`${fieldName}.bankId`}
                       name={`${fieldName}.bankId`}
+                      required
                       validate={required(
                         intl.formatMessage({
                           id: 'FieldBankAccounts.bankIdRequired',
@@ -98,6 +99,7 @@ const FieldBankAccounts: React.FC<any> = (props) => {
                           id: 'FieldBankAccounts.bankAgencyRequired',
                         }),
                       )}
+                      required
                     />
                     <FieldTextInput
                       className={css.field}
@@ -123,6 +125,7 @@ const FieldBankAccounts: React.FC<any> = (props) => {
                           0,
                         ),
                       )}
+                      required
                     />
                     <FieldTextInput
                       className={css.field}
@@ -139,6 +142,7 @@ const FieldBankAccounts: React.FC<any> = (props) => {
                           id: 'FieldBankAccounts.bankOwnerNameRequired',
                         }),
                       )}
+                      required
                     />
                     <div className={css.bankWidgets}>
                       <FieldCheckbox

@@ -154,6 +154,7 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
           uploadPartyInsuranceError,
           onRemovePartyInsurance,
           inProgress,
+          goBack,
         } = fieldRenderProps;
         const ready = !formError && isEqual(submittedValues, values);
 
@@ -235,17 +236,29 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
               <div>
                 {formError && <ErrorMessage message={formError.message} />}
               </div>
-              <Button
-                inProgress={inProgress}
-                disabled={inProgress}
-                ready={ready}
-                className={css.submitButton}>
-                {intl.formatMessage({
-                  id: partnerListingRef
-                    ? 'EditPartnerLicenseForm.updateBtn'
-                    : 'EditPartnerLicenseForm.createBtn',
-                })}
-              </Button>
+              <div className={css.buttons}>
+                {goBack && (
+                  <Button
+                    type="button"
+                    className={css.secondaryButton}
+                    onClick={goBack}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerForms.goBack',
+                    })}
+                  </Button>
+                )}
+                <Button
+                  inProgress={inProgress}
+                  disabled={inProgress}
+                  ready={ready}
+                  className={css.submitButton}>
+                  {intl.formatMessage({
+                    id: partnerListingRef
+                      ? 'EditPartnerLicenseForm.updateBtn'
+                      : 'EditPartnerLicenseForm.createBtn',
+                  })}
+                </Button>
+              </div>
             </div>
           </Form>
         );

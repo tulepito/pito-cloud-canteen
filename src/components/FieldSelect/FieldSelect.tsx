@@ -50,6 +50,7 @@ const FieldSelectComponent = (props: IFieldSelect) => {
     onChange,
     labelClassName,
     leftIcon,
+    required,
     ...rest
   } = props;
 
@@ -87,14 +88,14 @@ const FieldSelectComponent = (props: IFieldSelect) => {
 
   const classes = classNames(rootClassName || css.root, className);
   const labelClasses = classNames(css.labelRoot, labelClassName);
-  const labelRequiredRedStar = meta.error ? css.labelRequiredRedStar : '';
+  const labelRequiredRedStar = required ? css.labelRequiredRedStar : '';
 
   return (
     <div className={classes}>
       {label ? (
         <label htmlFor={id} className={labelClasses}>
           {label}
-          {meta.error && <span className={labelRequiredRedStar}>*</span>}
+          {required && <span className={labelRequiredRedStar}>*</span>}
         </label>
       ) : null}
       <div className={css.selectContainer}>

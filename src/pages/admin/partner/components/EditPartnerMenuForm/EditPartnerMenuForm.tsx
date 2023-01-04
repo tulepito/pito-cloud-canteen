@@ -24,6 +24,7 @@ type TEditPartnerMenuForm = {
   inProgress?: boolean;
   formError?: any;
   initialValues?: any;
+  goBack?: () => void;
 };
 
 export const YES = 'yes';
@@ -56,6 +57,7 @@ const EditPartnerMenuForm: React.FC<TEditPartnerMenuForm> = (props) => {
           partnerListingRef,
           values,
           formError,
+          goBack,
         } = fieldRenderProps;
 
         const ready = !formError && isEqual(submittedValues, values);
@@ -130,16 +132,28 @@ const EditPartnerMenuForm: React.FC<TEditPartnerMenuForm> = (props) => {
               <div>
                 {fornError && <ErrorMessage message={fornError.message} />}
               </div>
-              <Button
-                ready={ready}
-                inProgress={inProgress}
-                disabled={inProgress}>
-                {intl.formatMessage({
-                  id: partnerListingRef
-                    ? 'EditPartnerLicenseForm.updateBtn'
-                    : 'EditPartnerLicenseForm.createBtn',
-                })}
-              </Button>
+              <div className={css.buttons}>
+                {goBack && (
+                  <Button
+                    type="button"
+                    className={css.secondaryButton}
+                    onClick={goBack}>
+                    {intl.formatMessage({
+                      id: 'EditPartnerForms.goBack',
+                    })}
+                  </Button>
+                )}
+                <Button
+                  ready={ready}
+                  inProgress={inProgress}
+                  disabled={inProgress}>
+                  {intl.formatMessage({
+                    id: partnerListingRef
+                      ? 'EditPartnerLicenseForm.updateBtn'
+                      : 'EditPartnerLicenseForm.createBtn',
+                  })}
+                </Button>
+              </div>
             </div>
           </Form>
         );

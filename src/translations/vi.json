@@ -601,5 +601,7 @@
   "EditPartnerLicenseForm.businessTypeLabel": "Loại hình kinh doanh",
   "EditPartnerBasicInformationForm.packagingLabel": "Bao bì thường sử dụng",
   "EditPartnerForm.businessTypeLabel": "Loại hình kinh doanh",
-  "FieldBankAccounts.bankAccountNumberInvalid": "Số tài khoản không hợp lệ"
+  "FieldBankAccounts.bankAccountNumberInvalid": "Số tài khoản không hợp lệ",
+  "EditPartnerPreviewForm.packagingLabel": "Bao bì thường sử dụng",
+  "EditPartnerForms.goBack": "Quay lại"
 }

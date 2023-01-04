@@ -1,4 +1,5 @@
 import FormWizard from '@components/FormWizard/FormWizard';
+import { adminRoutes } from '@src/paths';
 import { EListingStates } from '@utils/enums';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
@@ -153,6 +154,23 @@ const EditPartnerWizard = (props: any) => {
 
   const tabsStatus = tabsActive(isNew, partnerListingRef) as any;
 
+  const handleGoBack = (tab: string) => () => {
+    const currentTabIndex = TABS.indexOf(tab as string);
+    const nearestActiveTab = TABS.slice(0, currentTabIndex)
+      .reverse()
+      .find((t) => tabsStatus[t]);
+
+    router.push({
+      pathname: !restaurantId
+        ? adminRoutes.CreatePartner.path
+        : adminRoutes.EditPartner.path,
+      query: {
+        tab: nearestActiveTab,
+        restaurantId,
+      },
+    });
+  };
+
   useEffect(() => {
     // If selectedTab is not active, redirect to the beginning of wizard
     if (!tabsStatus[selectedTab as string]) {
@@ -171,7 +189,7 @@ const EditPartnerWizard = (props: any) => {
   }, [tabsStatus, selectedTab, partnerListingRef, router]);
 
   return (
-    <FormWizard formTabNavClassName={css.formWizard}>
+    <FormWizard className={css.formWizard}>
       {TABS.map((tab: string) => (
         <EditPartnerWizardTab
           key={tab}
@@ -210,6 +228,7 @@ const EditPartnerWizard = (props: any) => {
           onDiscardDraftPartner={onDiscardDraftPartner}
           onSetAuthorized={onSetAuthorized}
           onSetUnsatisfactory={onSetUnsatisfactory}
+          goBack={handleGoBack(tab)}
         />
       ))}
     </FormWizard>

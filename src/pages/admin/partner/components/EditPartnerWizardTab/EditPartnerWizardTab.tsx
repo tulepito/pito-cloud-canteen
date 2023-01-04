@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import { adminRoutes } from '@src/paths';
 import { EListingStates, OTHER_OPTION } from '@utils/enums';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
@@ -66,7 +67,9 @@ const EditPartnerWizardTab = (props: any) => {
     onDiscardDraftPartner,
     onSetAuthorized,
     onSetUnsatisfactory,
+    goBack,
   } = props;
+
   const router = useRouter();
   const isDraftFlow =
     partnerListingRef?.attributes?.metadata?.listingState ===
@@ -101,7 +104,7 @@ const EditPartnerWizardTab = (props: any) => {
             tab,
             tabs,
             router,
-            `/admin/partner`,
+            adminRoutes.ManagePartners.path,
           );
         }
         return listing;
@@ -160,7 +163,7 @@ const EditPartnerWizardTab = (props: any) => {
             tab,
             tabs,
             router,
-            `/admin/partner`,
+            adminRoutes.ManagePartners.path,
           );
         }
       };
@@ -184,6 +187,7 @@ const EditPartnerWizardTab = (props: any) => {
           inProgress={inProgress}
           formError={formError}
           initialValues={initialValues}
+          goBack={goBack}
         />
       );
     }
@@ -205,7 +209,7 @@ const EditPartnerWizardTab = (props: any) => {
             tab,
             tabs,
             router,
-            `/admin/partner`,
+            adminRoutes.ManagePartners.path,
           );
         }
       };
@@ -241,6 +245,7 @@ const EditPartnerWizardTab = (props: any) => {
           inProgress={inProgress}
           formError={formError}
           initialValues={initialValues}
+          goBack={goBack}
         />
       );
     }
@@ -314,7 +319,7 @@ const EditPartnerWizardTab = (props: any) => {
           id: partnerListingRef?.author?.id?.uuid,
         };
         const response = await onPublishDraftPartner(params);
-        if (!response.error) router.push('/admin/partner');
+        if (!response.error) router.push(adminRoutes.ManagePartners.path);
       };
 
       const handleDiscardDraftPartner = async () => {
@@ -322,7 +327,7 @@ const EditPartnerWizardTab = (props: any) => {
           id: partnerListingRef?.author?.id?.uuid,
         };
         const response = await onDiscardDraftPartner(params);
-        if (!response.error) router.push('/admin/partner');
+        if (!response.error) router.push(adminRoutes.ManagePartners.path);
       };
       return (
         <EditPartnerPreviewForm

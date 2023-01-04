@@ -185,14 +185,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                   </p>
                   <p className={css.content}>{contactorName}</p>
                 </div>
-                <div className={css.field}>
-                  <p className={css.label}>
-                    {intl.formatMessage({
-                      id: 'EditPartnerPreviewForm.contactorName',
-                    })}
-                  </p>
-                  <p className={css.content}>{contactorName}</p>
-                </div>
+
                 <div className={css.field}>
                   <p className={css.label}>
                     {intl.formatMessage({
@@ -280,7 +273,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                                   </td>
                                 )}
                                 <td>
-                                  {e.startTime} : {e.endTime}
+                                  {e.startTime} - {e.endTime}
                                 </td>
                               </tr>
                             ))
@@ -326,12 +319,19 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                       })}
                       rightIcon={<div className={css.currency}>đ</div>}
                     />
-                    <FieldCheckboxGroup
-                      id="packaging"
-                      name="packaging"
-                      disabled
-                      options={PACKAGING_OPTIONS}
-                    />
+                    <div>
+                      <div className={css.label}>
+                        {intl.formatMessage({
+                          id: 'EditPartnerPreviewForm.packagingLabel',
+                        })}
+                      </div>
+                      <FieldCheckboxGroup
+                        id="packaging"
+                        name="packaging"
+                        disabled
+                        options={PACKAGING_OPTIONS}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

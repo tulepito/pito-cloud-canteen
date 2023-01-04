@@ -534,6 +534,9 @@ export const partnerSlice = createSlice({
   name: 'partners',
   initialState,
   reducers: {
+    resetInitialStates: () => {
+      return { ...initialState };
+    },
     removeAvatar: (state: any, { payload }) => {
       const id = payload;
 
@@ -1023,6 +1026,7 @@ export const {
   removeBusinessLicense,
   removeFoodCertificate,
   removePartyInsurance,
+  resetInitialStates,
 } = partnerSlice.actions;
 
 export default partnerSlice.reducer;

@@ -184,6 +184,7 @@
 .bankItem {
   display: flex;
   padding: 20px;
+  margin-bottom: 15px;
   box-shadow: $boxShadow;
   flex-wrap: wrap;
   .left,
@@ -211,4 +212,19 @@
 .configLabel {
   font-weight: $fontWeightBold;
   margin: 30px 0 20px 0;
+}
+
+.buttons {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.secondaryButton {
+  background-color: $matterColorLight;
+  color: $neutralGray6;
+  border: 1px solid $neutralGray6;
+  &:hover {
+    background-color: $neutralGray11;
+  }
 }

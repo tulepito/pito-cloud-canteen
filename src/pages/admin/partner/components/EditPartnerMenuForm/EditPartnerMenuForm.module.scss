@@ -33,3 +33,18 @@
   margin: 40px 0;
   justify-content: space-between;
 }
+
+.buttons {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.secondaryButton {
+  background-color: $matterColorLight;
+  color: $neutralGray6;
+  border: 1px solid $neutralGray6;
+  &:hover {
+    background-color: $neutralGray11;
+  }
+}
