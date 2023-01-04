@@ -5,13 +5,15 @@ import React from 'react';
 import css from './IconWallet.module.scss';
 
 const IconWallet: React.FC<TIconProps> = (props) => {
-  const { className } = props;
-  const classes = classNames(css.root, className);
+  const { rootClassName, className } = props;
+  const classes = classNames(rootClassName, css.root, className);
+
   return (
     <svg
-      className={classes}
+      preserveAspectRatio="none"
       viewBox="0 0 20 20"
       fill="none"
+      className={classes}
       xmlns="http://www.w3.org/2000/svg">
       <path
         fillRule="evenodd"

@@ -5,10 +5,12 @@ import React from 'react';
 import css from './IconOrderManagement.module.scss';
 
 const IconOrderManagement: React.FC<TIconProps> = (props) => {
-  const { className } = props;
-  const classes = classNames(className, css.root);
+  const { rootClassName, className } = props;
+  const classes = classNames(rootClassName, className, css.root);
+
   return (
     <svg
+      preserveAspectRatio="none"
       className={classes}
       viewBox="0 0 16 18"
       fill="none"

@@ -22,7 +22,6 @@ const FoodPickingField = () => {
                 })}
                 id={id}
                 name={input.name}
-                status="on"
                 onClick={(value) => {
                   input.onChange(value);
                 }}

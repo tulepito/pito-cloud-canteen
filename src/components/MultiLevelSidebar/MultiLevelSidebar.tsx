@@ -46,7 +46,7 @@ type TMenuProps = {
   menus: TSidebarMenu[];
 } & TMenuWithClasses;
 
-type TMultiLevelSidebar = {
+type TMultiLevelSidebarProps = {
   menus: TSidebarMenu[];
   rootClassName?: string;
 } & TMenuWithClasses;
@@ -190,7 +190,7 @@ const Menu: React.FC<TMenuProps> = (props) => {
   );
 };
 
-const MultiLevelSidebar = (props: TMultiLevelSidebar) => {
+const MultiLevelSidebar: React.FC<TMultiLevelSidebarProps> = (props) => {
   const {
     menus,
     rootClassName,

@@ -43,7 +43,7 @@ const tabItems = [
   },
 ];
 
-const IconVoucher = (props: TIconProps) => {
+const IconVoucher: React.FC<TIconProps> = (props) => {
   const { rootClassName, className, ...rest } = props;
   const classes = classNames(rootClassName, className);
   return (
@@ -100,7 +100,7 @@ const IconVoucher = (props: TIconProps) => {
   );
 };
 
-const StyleGuideCard = (props: PropsWithChildren) => {
+const StyleGuideCard: React.FC<PropsWithChildren> = (props) => {
   return <div className={css.styleGuideCard}>{props.children}</div>;
 };
 const StyleGuidePage = (props: any) => {
@@ -321,16 +321,11 @@ const StyleGuidePage = (props: any) => {
             marginTop: '24px',
           }}>
           <Toggle
-            status="on"
             onClick={onSingleToggle}
             disabled
             label=" Toggle on , disabled status "
           />
-          <Toggle
-            status="on"
-            onClick={onSingleToggle}
-            label="Toggle on status"
-          />
+          <Toggle onClick={onSingleToggle} label="Toggle on status" />
           <Toggle status="off" onClick={onSingleToggle} label="Toggle off" />
           <Toggle
             status="off"

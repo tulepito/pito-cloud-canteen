@@ -5,6 +5,7 @@ type TEmptyIconProps = {
 const EmptyIcon: React.FC<TEmptyIconProps> = ({ className }) => {
   return (
     <svg
+      preserveAspectRatio="none"
       width="241"
       height="129"
       viewBox="0 0 241 129"

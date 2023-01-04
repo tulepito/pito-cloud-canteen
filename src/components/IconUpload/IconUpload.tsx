@@ -7,6 +7,7 @@ import css from './IconUpload.module.scss';
 const IconUpload: React.FC<TIconProps> = (props) => {
   return (
     <svg
+      preserveAspectRatio="none"
       className={classNames(css.root, props.className)}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24">

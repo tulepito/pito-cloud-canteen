@@ -13,16 +13,17 @@ type TTabsItem = {
   childrenFn?: (e: any) => ReactNode;
   childrenProps?: any;
 };
-interface ITabsProps {
+
+type ITabsProps = {
   defaultActiveKey?: string;
   items: TTabsItem[];
   onChange?: (params: any) => void;
   contentClassName?: string;
   headerClassName?: string;
   showNavigation?: boolean;
-}
+};
 
-const Tabs = (props: ITabsProps) => {
+const Tabs: React.FC<ITabsProps> = (props) => {
   const {
     defaultActiveKey,
     items,

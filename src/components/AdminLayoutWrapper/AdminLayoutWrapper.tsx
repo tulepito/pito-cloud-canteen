@@ -6,6 +6,7 @@ import AdminLayoutContent from '@components/AdminLayoutContent/AdminLayoutConten
 import AdminLayoutSidebar from '@components/AdminLayoutSidebar/AdminLayoutSidebar';
 import AdminLayoutTopbar from '@components/AdminLayoutTopbar/AdminLayoutTopbar';
 import classNames from 'classnames';
+import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import css from './AdminLayoutWrapper.module.scss';
@@ -15,7 +16,7 @@ const prepareChildren = (children: any) => {
   if (!(childrenCount === 2 || childrenCount === 3)) {
     throw new Error(
       `AdminLayoutWrapper needs to have 2 - 3 children:
-      AdminLayoutTopbar ,AdminLayoutContent.`,
+      AdminLayoutTopbar, AdminLayoutContent.`,
     );
   }
 
@@ -42,7 +43,12 @@ const prepareChildren = (children: any) => {
   return childrenMap;
 };
 
-const AdminLayoutWrapper = (props: any) => {
+type TAdminLayoutWrapperProps = PropsWithChildren<{
+  rootClassName?: string;
+  className?: string;
+}>;
+
+const AdminLayoutWrapper: React.FC<TAdminLayoutWrapperProps> = (props) => {
   const { className, rootClassName, children } = props;
   const preparedChildren = prepareChildren(children);
   const classes = classNames(rootClassName || css.root, className);

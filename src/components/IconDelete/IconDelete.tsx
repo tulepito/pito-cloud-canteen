@@ -7,8 +7,10 @@ import css from './IconDelete.module.scss';
 const IconDelete: React.FC<TIconProps> = (props) => {
   const { className, onClick } = props;
   const classes = classNames(css.root, className);
+
   return (
     <svg
+      preserveAspectRatio="none"
       width="24"
       height="24"
       viewBox="0 0 24 24"

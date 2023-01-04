@@ -19,16 +19,16 @@ type TPlacement =
   | 'leftTop'
   | 'leftBottom';
 
-type TTooltip = {
-  placement?: TPlacement;
+type TTooltipProps = PropsWithChildren<{
   overlayClassName?: string;
+  placement?: TPlacement;
   tooltipContent?: any;
   trigger?: string;
   showArrow?: boolean;
   overlayInnerStyle?: React.CSSProperties;
-};
+}>;
 
-const Tooltip = (props: PropsWithChildren<TTooltip>) => {
+const Tooltip: React.FC<TTooltipProps> = (props) => {
   const {
     placement = 'left',
     overlayClassName,

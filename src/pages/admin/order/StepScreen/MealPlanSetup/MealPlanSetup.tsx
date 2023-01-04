@@ -138,7 +138,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
                 <DayInWeekField form={form} values={values} />
               </div>
             </div>
-            {/* <NutritionField /> */}
+
             <div className={css.fieldSection}>
               <FoodPickingField />
               <div className={css.verticalSpace}>

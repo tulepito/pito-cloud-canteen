@@ -5,10 +5,12 @@ import React from 'react';
 import css from './IconEdit.module.scss';
 
 const IconEdit: React.FC<TIconProps> = (props) => {
-  const { className, onClick } = props;
-  const classes = classNames(css.root, className);
+  const { rootClassName, className, onClick } = props;
+  const classes = classNames(rootClassName || css.root, className);
+
   return (
     <svg
+      preserveAspectRatio="none"
       width="24"
       height="24"
       viewBox="0 0 24 24"

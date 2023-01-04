@@ -10,6 +10,7 @@ const IconSetting: React.FC<TIconProps> = (props) => {
 
   return (
     <svg
+      preserveAspectRatio="none"
       className={classes}
       viewBox="0 0 20 20"
       fill="none"

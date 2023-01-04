@@ -3,24 +3,26 @@ import type { TFormEvent, TIconProps } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import React from 'react';
+import type { FieldProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
 import css from './FieldCheckbox.module.scss';
 
-interface IconCheckboxProps extends TIconProps {
+type IconCheckboxProps = TIconProps & {
   checkedClassName?: string;
   boxClassName?: string;
-}
+};
 
-export const IconCheckbox = (props: IconCheckboxProps) => {
+export const IconCheckbox: React.FC<IconCheckboxProps> = (props) => {
   const { className, checkedClassName, boxClassName } = props;
 
   return (
     <svg
-      className={className}
+      preserveAspectRatio="none"
       width="15"
       height="15"
+      className={className}
       xmlns="http://www.w3.org/2000/svg">
       <g fill="none" fillRule="evenodd">
         <g transform="translate(2 2)">
@@ -45,18 +47,17 @@ export const IconCheckbox = (props: IconCheckboxProps) => {
 
 const CHECKBOX_TEXT_PREFIX = 'Other';
 
-// interface CheckboxProps extends FieldRenderProps<string, any> {
-//   className?: string;
-//   rootClassName?: string;
-//   svgClassName?: string;
-//   textClassName?: string;
-//   useSuccessColor?: boolean;
-//   customOnChange?: (event: TFormEvent) => void;
-//   label?: TFormLabel;
-//   id: string;
-//   name: string;
-// }
-const FieldCheckbox = (props: any) => {
+type TFieldCheckboxProps = FieldProps<string, any> & {
+  className?: string;
+  rootClassName?: string;
+  svgClassName?: string;
+  textClassName?: string;
+  useSuccessColor?: boolean;
+  customOnChange?: (event: React.ChangeEvent | any) => void;
+  label?: string | React.ReactNode;
+};
+
+const FieldCheckbox: React.FC<TFieldCheckboxProps> = (props) => {
   const {
     rootClassName,
     className,

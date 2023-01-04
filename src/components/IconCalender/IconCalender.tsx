@@ -7,8 +7,10 @@ import css from './IconCalender.module.scss';
 const IconCalendar: React.FC<TIconProps> = (props) => {
   const { className, rootClassName } = props;
   const classes = classNames(rootClassName || css.root, className);
+
   return (
     <svg
+      preserveAspectRatio="none"
       className={classes}
       width={20}
       height={22}

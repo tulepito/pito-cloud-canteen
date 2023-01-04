@@ -5,9 +5,12 @@ import React from 'react';
 import css from './IconEye.module.scss';
 
 const IconEye: React.FC<TIconProps> = (props) => {
-  const classes = classNames(css.root, props.className);
+  const { rootClassName, className } = props;
+
+  const classes = classNames(rootClassName || css.root, className);
   return (
     <svg
+      preserveAspectRatio="none"
       className={classes}
       clipRule="evenodd"
       fillRule="evenodd"

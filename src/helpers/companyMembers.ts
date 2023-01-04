@@ -6,7 +6,9 @@ export const calculateGroupMembers = (
   companyAccount: TUser,
   groupList: string[],
 ) => {
-  const { groups, members = {} } = companyAccount.attributes.profile.metadata;
+  const { groups, members = {} } =
+    companyAccount.attributes.profile.metadata || {};
+
   if (groupList.includes('allMembers')) {
     return Object.values(members).map((_member: any) => _member.id);
   }

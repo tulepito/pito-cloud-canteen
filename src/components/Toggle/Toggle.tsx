@@ -4,9 +4,9 @@ import React from 'react';
 
 import css from './Toggle.module.scss';
 
-type TToggle = {
+type TToggleProps = {
   disabled?: boolean;
-  status: 'on' | 'off';
+  status?: 'on' | 'off';
   onClick?: (value: boolean) => void;
   className?: string;
   label?: string;
@@ -14,10 +14,10 @@ type TToggle = {
   name?: string;
 };
 
-const Toggle = (props: TToggle) => {
+const Toggle: React.FC<TToggleProps> = (props) => {
   const {
     disabled = false,
-    status,
+    status = 'on',
     onClick,
     className,
     label,

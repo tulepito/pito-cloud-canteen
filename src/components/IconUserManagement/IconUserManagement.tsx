@@ -4,15 +4,16 @@ import React from 'react';
 
 import css from './IconUserManagement.module.scss';
 
-const IconUserManagement = (props: TIconProps) => {
-  const { className } = props;
+const IconUserManagement: React.FC<TIconProps> = (props) => {
+  const { rootClassName, className } = props;
+  const classes = classNames(rootClassName || css.root, className);
 
-  const classes = classNames(css.root, className);
   return (
     <svg
-      className={classes}
+      preserveAspectRatio="none"
       viewBox="0 0 20 20"
       fill="none"
+      className={classes}
       xmlns="http://www.w3.org/2000/svg">
       <mask
         id="mask0_3330_1041"

@@ -1,3 +1,4 @@
+import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 
@@ -7,15 +8,14 @@ enum Size {
   SMALL = 'small',
   BIG = 'big',
 }
-type TIconCheckmark = {
-  rootClassName?: string;
-  className?: string;
+
+type TIconCheckmarkProps = TIconProps & {
   size?: Size;
   width?: number;
   height?: number;
 };
 
-const IconCheckmark = (props: TIconCheckmark) => {
+const IconCheckmark: React.FC<TIconCheckmarkProps> = (props) => {
   const { rootClassName, className, size = Size.BIG, height, width } = props;
   const classes = classNames(rootClassName || css.root, className);
 
@@ -24,9 +24,10 @@ const IconCheckmark = (props: TIconCheckmark) => {
     case Size.SMALL:
       content = (
         <svg
-          className={classes}
+          preserveAspectRatio="none"
           width={width}
           height={height}
+          className={classes}
           xmlns="http://www.w3.org/2000/svg">
           <path
             d="M14 2l-8 8-4-4"
@@ -42,8 +43,9 @@ const IconCheckmark = (props: TIconCheckmark) => {
     case Size.BIG:
       content = (
         <svg
-          className={classes}
+          preserveAspectRatio="none"
           strokeWidth="2"
+          className={classes}
           xmlns="http://www.w3.org/2000/svg">
           <path d="M22.6 1.2c-.4-.3-1-.2-1.3.2L7.8 19l-5.2-5c-.4-.4-1-.4-1.3 0-.4.3-.4.8 0 1l6 5.6.6.2s.2 0 .4-.4l14.3-18c.3-.5.2-1-.2-1" />
         </svg>

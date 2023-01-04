@@ -57,9 +57,8 @@ const PaginationLinks = (props: any) => {
     pageSearchParams,
     pagination,
   } = props;
-  const classes = classNames(rootClassName || css.root, className);
-
   const intl = useIntl();
+  const classes = classNames(rootClassName || css.root, className);
 
   const { page, totalPages } = pagination;
   const prevPage = page > 1 ? page - 1 : null;
@@ -120,7 +119,6 @@ const PaginationLinks = (props: any) => {
   );
 
   /* Numbered pagination links */
-
   const pageNumbersNavLinks = getPageNumbersArray(page, totalPages).map(
     (v: any) => {
       const isCurrentPage = v === page;

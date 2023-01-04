@@ -7,6 +7,7 @@ const IconClock: React.FC<TIconClockProps> = (props) => {
 
   return (
     <svg
+      preserveAspectRatio="none"
       className={className}
       width={width}
       height={height}

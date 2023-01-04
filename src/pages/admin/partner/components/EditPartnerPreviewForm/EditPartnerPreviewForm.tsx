@@ -30,7 +30,7 @@ const getLabelByKey = (list: any[], key: any) => {
   return item && item.label ? item.label : key;
 };
 
-const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
+const EditPartnerPreviewForm: React.FC<any> = (props) => {
   const intl = useIntl();
   return (
     <FinalForm

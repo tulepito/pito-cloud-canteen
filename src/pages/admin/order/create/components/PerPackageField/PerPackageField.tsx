@@ -48,7 +48,6 @@ const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
                 })}
                 id={id}
                 name={input.name}
-                status="on"
                 onClick={(value) => {
                   input.onChange(value);
                 }}

@@ -1,16 +1,13 @@
+import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 
 import css from './IconSpinner.module.scss';
 
-type TIconSpinner = {
-  rootClassName?: string;
-  className?: string;
-};
-
-const IconSpinner = (props: TIconSpinner) => {
+const IconSpinner: React.FC<TIconProps> = (props) => {
   const { rootClassName, className } = props;
   const classes = classNames(rootClassName || css.root, className);
+
   return (
     <svg
       className={classes}

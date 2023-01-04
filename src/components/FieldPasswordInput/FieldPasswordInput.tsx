@@ -4,6 +4,7 @@ import ValidationError from '@components/ValidationError/ValidationError';
 import useBoolean from '@hooks/useBoolean';
 import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
+import type { DetailedHTMLProps, InputHTMLAttributes } from 'react';
 import React from 'react';
 import type { FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
@@ -11,26 +12,25 @@ import { Field } from 'react-final-form';
 import css from './FieldPasswordInput.module.scss';
 
 type TIconComponent = React.ReactElement<TIconProps>;
-interface InputComponentProps extends FieldRenderProps<string, any> {
-  id: string;
-  label?: string;
-  rootClassName?: string;
-  className?: string;
-  inputRootClass?: string;
-  disabled?: boolean;
-  labelClassName?: string;
-  customErrorText?: string;
-  isUncontrolled?: boolean;
-  input: any;
-  meta: any;
-  inputRef: any;
-  leftIcon: TIconComponent;
-  fullWidth?: boolean;
-  required?: boolean;
-  shouldHideEyeIcon?: boolean;
-}
+type InputComponentProps = FieldRenderProps<string, HTMLInputElement> &
+  DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
+    id: string;
+    label?: string;
+    rootClassName?: string;
+    className?: string;
+    inputRootClass?: string;
+    disabled?: boolean;
+    labelClassName?: string;
+    customErrorText?: string;
+    isUncontrolled?: boolean;
+    inputRef: any;
+    leftIcon: TIconComponent;
+    fullWidth?: boolean;
+    required?: boolean;
+    shouldHideEyeIcon?: boolean;
+  };
 
-const FieldPasswordInputComponent = (props: InputComponentProps) => {
+const FieldPasswordInputComponent: React.FC<InputComponentProps> = (props) => {
   const showPasswordControl = useBoolean(false);
   const {
     label,

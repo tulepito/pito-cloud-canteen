@@ -6,7 +6,7 @@ import { Field } from 'react-final-form';
 
 import css from './FieldTextArea.module.scss';
 
-interface InputComponentProps extends FieldRenderProps<string, any> {
+type InputComponentProps = FieldRenderProps<string, any> & {
   id: string;
   label?: string;
   rootClassName?: string;
@@ -20,10 +20,10 @@ interface InputComponentProps extends FieldRenderProps<string, any> {
   meta: any;
   inputRef: any;
   fullWidth?: boolean;
-}
+};
 const CONTENT_MAX_LENGTH = 5000;
 
-const FieldTextAreaComponent = (props: InputComponentProps) => {
+const FieldTextAreaComponent: React.FC<InputComponentProps> = (props) => {
   const {
     label,
     id,

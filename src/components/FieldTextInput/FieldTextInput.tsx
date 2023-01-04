@@ -8,7 +8,7 @@ import { Field } from 'react-final-form';
 import css from './FieldTextInput.module.scss';
 
 type TIconComponent = React.ReactElement<TIconProps>;
-interface InputComponentProps extends FieldRenderProps<string, any> {
+type InputComponentProps = FieldRenderProps<string, any> & {
   id: string;
   label?: string;
   rootClassName?: string;
@@ -26,9 +26,9 @@ interface InputComponentProps extends FieldRenderProps<string, any> {
   rightIcon?: TIconComponent;
   required?: boolean;
   showText?: boolean;
-}
+};
 
-const FieldTextInputComponent = (props: InputComponentProps) => {
+const FieldTextInputComponent: React.FC<InputComponentProps> = (props) => {
   const {
     label,
     id,

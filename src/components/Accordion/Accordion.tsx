@@ -6,14 +6,14 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import css from './Accordion.module.scss';
 
-type TAccordion = {
+type TAccordionProps = PropsWithChildren<{
+  contentClassName?: string;
+  headerClassName?: string;
   title: string;
   isOpen?: boolean;
-  headerClassName?: string;
-  contentClassName?: string;
-};
+}>;
 
-const Accordion = (props: PropsWithChildren<TAccordion>) => {
+const Accordion: React.FC<TAccordionProps> = (props) => {
   const {
     title = 'Accordion label',
     children,

@@ -86,7 +86,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
 
   const sectionCompanyBranding = (
     <div className={css.sectionCompanyBranding}>
-      <Avatar disableProfileLink user={ensureCompanyUser} />
+      <Avatar disableProfileLink user={ensureCompanyUser as TUser} />
       <span className={css.companyTitle}>{companyTitle}</span>
     </div>
   );

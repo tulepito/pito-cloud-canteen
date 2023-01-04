@@ -7,11 +7,13 @@ import css from './IconAnalysis.module.scss';
 const IconAnalysis: React.FC<TIconProps> = (props) => {
   const { className } = props;
   const classes = classNames(className, css.root);
+
   return (
     <svg
-      className={classes}
+      preserveAspectRatio="none"
       viewBox="0 0 20 20"
       fill="none"
+      className={classes}
       xmlns="http://www.w3.org/2000/svg">
       <path
         fillRule="evenodd"

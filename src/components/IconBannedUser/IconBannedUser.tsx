@@ -5,8 +5,10 @@ import css from './IconBannedUser.module.scss';
 
 const IconBannedUser: React.FC<TIconProps> = (props) => {
   const { className } = props;
+
   return (
     <svg
+      preserveAspectRatio="none"
       className={className}
       width="40"
       height="40"

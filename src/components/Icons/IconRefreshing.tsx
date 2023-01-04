@@ -7,6 +7,7 @@ const IconRefreshing: React.FC<TIconRefreshingProps> = (props) => {
 
   return (
     <svg
+      preserveAspectRatio="none"
       className={className}
       width={width}
       height={height}

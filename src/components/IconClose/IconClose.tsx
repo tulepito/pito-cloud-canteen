@@ -4,17 +4,19 @@ import React from 'react';
 
 import css from './IconClose.module.scss';
 
-const IconClose = (props: TIconProps) => {
+const IconClose: React.FC<TIconProps> = (props) => {
   const { className, rootClassName, ...rest } = props;
   const classes = classNames(rootClassName || css.root, className);
+
   return (
     <svg
-      className={classes}
+      preserveAspectRatio="none"
       width={12}
       height={12}
       viewBox="0 0 12 12"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      className={classes}
       {...rest}>
       <path
         fillRule="evenodd"

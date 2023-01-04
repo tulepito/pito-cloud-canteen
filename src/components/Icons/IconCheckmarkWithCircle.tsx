@@ -4,6 +4,7 @@ const IconCheckmarkWithCircle: React.FC<TIconProps> = (props) => {
   const { className, width, height } = props;
   return (
     <svg
+      preserveAspectRatio="none"
       className={className}
       width={width}
       height={height}

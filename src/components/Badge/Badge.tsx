@@ -4,16 +4,17 @@ import React from 'react';
 
 import css from './Badge.module.scss';
 
-const IconCloseBadge = (props: TIconProps) => {
+const IconCloseBadge: React.FC<TIconProps> = (props) => {
   const { className } = props;
 
   return (
     <svg
-      className={className}
+      preserveAspectRatio="none"
       width={6}
       height={6}
       viewBox="0 0 6 6"
       fill="none"
+      className={className}
       xmlns="http://www.w3.org/2000/svg">
       <path
         fillRule="evenodd"
@@ -41,11 +42,11 @@ type TBadge = {
   label: string;
 };
 
-const Badge = (props: TBadge) => {
+const Badge: React.FC<TBadge> = (props) => {
   const {
     type = BadgeType.DEFAULT,
-    hasCloseIcon,
-    hasDotIcon,
+    hasCloseIcon = false,
+    hasDotIcon = false,
     onCloseIcon,
     label,
   } = props;

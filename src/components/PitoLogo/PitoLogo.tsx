@@ -1,20 +1,20 @@
+import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 
 import css from './PitoLogo.module.scss';
 
-type TPitoLogo = {
-  className?: string;
-};
+const PitoLogo: React.FC<TIconProps> = (props) => {
+  const { rootClassName, className } = props;
 
-const PitoLogo = (props: TPitoLogo) => {
-  const { className } = props;
-  const classes = classNames(css.root, className);
+  const classes = classNames(rootClassName, css.root, className);
+
   return (
     <svg
-      className={classes}
+      preserveAspectRatio="none"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 348 184"
+      className={classes}
       fill="none">
       <path
         fillRule="evenodd"

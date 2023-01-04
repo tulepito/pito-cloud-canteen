@@ -5,13 +5,16 @@ import React from 'react';
 import css from './IconMagnifier.module.scss';
 
 const IconMagnifier: React.FC<TIconProps> = ({
+  rootClassName,
   className,
   width = 24,
   height = 24,
 }) => {
-  const classes = classNames(css.root, className);
+  const classes = classNames(rootClassName, css.root, className);
+
   return (
     <svg
+      preserveAspectRatio="none"
       className={classes}
       width={width}
       height={height}

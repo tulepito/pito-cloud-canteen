@@ -1,6 +1,6 @@
 import { IconCheckbox } from '@components/FieldCheckbox/FieldCheckbox';
-import type { TFormEvent } from '@utils/types';
 import classNames from 'classnames';
+import type { FieldInputProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 
 import css from './FieldFoodSelectCheckbox.module.scss';
@@ -19,7 +19,10 @@ const FieldFoodSelectCheckbox = (props: any) => {
   const { title: foodTitle, price: foodPrice } = foodData;
   const classes = classNames(rootClassName || css.root, className);
 
-  const handleOnChange = (input: any, event: TFormEvent): void => {
+  const handleOnChange = (
+    input: FieldInputProps<string, HTMLInputElement>,
+    event: React.ChangeEvent | any,
+  ): void => {
     const { onBlur, onChange } = input;
     if (customOnChange) {
       customOnChange(event);
@@ -49,7 +52,9 @@ const FieldFoodSelectCheckbox = (props: any) => {
                 id={id}
                 className={css.input}
                 {...input}
-                onChange={(event: TFormEvent) => handleOnChange(input, event)}
+                onChange={(event: React.ChangeEvent | any) =>
+                  handleOnChange(input, event)
+                }
               />
             );
           }}

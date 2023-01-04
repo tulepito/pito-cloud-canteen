@@ -5,10 +5,12 @@ import React from 'react';
 import css from './IconPhone.module.scss';
 
 const IconPhone: React.FC<TIconProps> = (props) => {
-  const { className } = props;
-  const classes = classNames(css.root, className);
+  const { rootClassName, className } = props;
+  const classes = classNames(rootClassName || css.root, className);
+
   return (
     <svg
+      preserveAspectRatio="none"
       className={classes}
       viewBox="0 0 20 20"
       fill="none"

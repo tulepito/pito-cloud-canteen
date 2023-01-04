@@ -9,10 +9,10 @@ import { Field } from 'react-final-form';
 import css from './FieldDatePicker.module.scss';
 
 registerLocale('vi', viLocale);
-interface FieldDatePickerProps extends FieldRenderProps<string, any> {
+type FieldDatePickerProps = FieldRenderProps<string, any> & {
   label?: string;
   name?: string;
-}
+};
 
 const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (props) => {
   const {

@@ -4,9 +4,11 @@ type IconArrowProps = {
 };
 const IconArrow = (props: IconArrowProps) => {
   const { className, direction = 'up' } = props;
+
   if (direction === 'up') {
     return (
       <svg
+        preserveAspectRatio="none"
         className={className}
         width="20"
         height="20"
@@ -26,6 +28,7 @@ const IconArrow = (props: IconArrowProps) => {
   if (direction === 'right') {
     return (
       <svg
+        preserveAspectRatio="none"
         className={className}
         width="20"
         height="20"
@@ -46,6 +49,7 @@ const IconArrow = (props: IconArrowProps) => {
   if (direction === 'down') {
     return (
       <svg
+        preserveAspectRatio="none"
         className={className}
         width="20"
         height="20"
@@ -64,6 +68,7 @@ const IconArrow = (props: IconArrowProps) => {
   }
   return (
     <svg
+      preserveAspectRatio="none"
       className={className}
       width="20"
       height="20"

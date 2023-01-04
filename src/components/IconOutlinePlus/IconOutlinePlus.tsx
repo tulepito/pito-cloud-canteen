@@ -1,14 +1,17 @@
+import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 
 import css from './IconOutlinePlus.module.scss';
 
-type IconOutlinePlusProps = {
-  className?: string;
-};
-const IconOutlinePlus: React.FC<IconOutlinePlusProps> = ({ className }) => {
+type IconOutlinePlusProps = TIconProps & {};
+const IconOutlinePlus: React.FC<IconOutlinePlusProps> = ({
+  rootClassName,
+  className,
+}) => {
   return (
     <svg
-      className={classNames(css.root, className)}
+      preserveAspectRatio="none"
+      className={classNames(rootClassName || css.root, className)}
       width="24"
       height="24"
       viewBox="0 0 24 24"

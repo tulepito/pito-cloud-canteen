@@ -7,6 +7,7 @@ const IconUser: React.FC<TIconUserProps> = (props) => {
 
   return (
     <svg
+      preserveAspectRatio="none"
       className={className}
       width={width}
       height={height}

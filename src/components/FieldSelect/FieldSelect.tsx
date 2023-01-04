@@ -8,7 +8,7 @@ import { Field } from 'react-final-form';
 
 import css from './FieldSelect.module.scss';
 
-interface IFieldSelect extends FieldRenderProps<string, any> {
+type IFieldSelect = FieldRenderProps<string, any> & {
   rootClassName?: string;
   className?: string;
   id?: string;
@@ -20,7 +20,7 @@ interface IFieldSelect extends FieldRenderProps<string, any> {
   children: ReactNode;
   onChange: () => void;
   leftIcon: React.ReactElement<TIconProps>;
-}
+};
 
 const handleChange =
   (propsOnChange: any, inputOnChange: any) => (event: any) => {
@@ -37,7 +37,7 @@ const handleChange =
     inputOnChange(event);
   };
 
-const FieldSelectComponent = (props: IFieldSelect) => {
+const FieldSelectComponent: React.FC<IFieldSelect> = (props) => {
   const {
     rootClassName,
     className,

@@ -7,6 +7,7 @@ const IconShop: React.FC<TIconShopProps> = (props) => {
 
   return (
     <svg
+      preserveAspectRatio="none"
       className={className}
       width={width}
       height={height}

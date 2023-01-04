@@ -3,6 +3,7 @@ import React from 'react';
 const IconPlusDish = () => {
   return (
     <svg
+      preserveAspectRatio="none"
       width={12}
       height={12}
       viewBox="0 0 12 12"

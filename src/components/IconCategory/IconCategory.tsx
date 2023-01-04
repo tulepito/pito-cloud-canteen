@@ -7,8 +7,10 @@ import css from './IconCategory.module.scss';
 const IconCategory: React.FC<TIconProps> = (props) => {
   const { className } = props;
   const classes = classNames(css.root, className);
+
   return (
     <svg
+      preserveAspectRatio="none"
       className={classes}
       viewBox="0 0 20 20"
       fill="none"

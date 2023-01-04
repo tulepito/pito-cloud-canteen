@@ -1,18 +1,18 @@
+import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 
 import css from './IconModalClose.module.scss';
 
-type IconModalCloseProps = {
-  onClick: () => void;
-  className?: string;
-};
+type IconModalCloseProps = TIconProps & {};
 const IconModalClose: React.FC<IconModalCloseProps> = ({
-  onClick,
   className,
+  rootClassName,
+  onClick,
 }) => {
   return (
     <svg
-      className={classNames(css.root, className)}
+      preserveAspectRatio="none"
+      className={classNames(rootClassName, css.root, className)}
       width="24"
       height="24"
       viewBox="0 0 24 24"

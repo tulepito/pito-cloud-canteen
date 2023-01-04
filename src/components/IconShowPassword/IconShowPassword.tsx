@@ -4,11 +4,13 @@ import React from 'react';
 
 import css from './IconShowPassword.module.scss';
 
-const IconShowPassword = (props: TIconProps) => {
+const IconShowPassword: React.FC<TIconProps> = (props) => {
   const { className, rootClassName, onClick } = props;
   const classes = classNames(rootClassName || css.root, className);
+
   return (
     <svg
+      preserveAspectRatio="none"
       width={20}
       height={17}
       viewBox="0 0 20 17"

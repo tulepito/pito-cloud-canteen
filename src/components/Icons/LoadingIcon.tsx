@@ -3,6 +3,7 @@ import type { TIconProps } from '@utils/types';
 const LoadingIcon: React.FC<TIconProps> = ({ className }) => {
   return (
     <svg
+      preserveAspectRatio="none"
       width="100"
       height="100"
       viewBox="0 0 44 44"

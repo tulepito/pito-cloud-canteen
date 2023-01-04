@@ -8,7 +8,7 @@ import css from './Button.module.scss';
 
 type TButtonSize = 'large' | 'medium' | 'small';
 
-type TButton = {
+type TButtonProps = PropsWithChildren<{
   rootClassName?: string;
   className?: string;
   spinnerClassName?: string;
@@ -18,7 +18,8 @@ type TButton = {
   checkmarkClassName?: string;
   size?: TButtonSize;
   fullWidth?: boolean;
-} & React.ComponentProps<'button'>;
+}> &
+  React.ComponentProps<'button'>;
 
 const getButtonSizeClassName = (size: string) => {
   switch (size) {
@@ -33,7 +34,7 @@ const getButtonSizeClassName = (size: string) => {
   }
 };
 
-const Button = (props: PropsWithChildren<TButton>) => {
+const Button: React.FC<TButtonProps> = (props) => {
   const [mounted, setMounted] = useState(false);
   const {
     rootClassName,
@@ -87,7 +88,7 @@ const Button = (props: PropsWithChildren<TButton>) => {
   );
 };
 
-export const InlineTextButton = (props: TButton) => {
+export const InlineTextButton: React.FC<TButtonProps> = (props) => {
   const classes = classNames(
     props.rootClassName || css.inlineTextButtonRoot,
     css.inlineTextButton,
