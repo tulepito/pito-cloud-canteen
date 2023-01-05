@@ -8,6 +8,7 @@ import type { TCurrentUser, TListing, TUser } from '@utils/types';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
 import React from 'react';
+import type { Event } from 'react-big-calendar';
 import Skeleton from 'react-loading-skeleton';
 
 import css from './OrderCalendarView.module.scss';
@@ -43,7 +44,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
       (plan) => LISTING(plan).getId() === planKey,
     ) as TListing;
 
-    const listEvent: any = [];
+    const listEvent: Event[] = [];
 
     Object.keys(planItem).forEach((planItemKey: string) => {
       const meal = planItem[planItemKey];
@@ -53,7 +54,8 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
         key: LISTING(food).getId(),
         value: LISTING(food).getAttributes().title,
       }));
-      const { status = 'empty' } =
+
+      const foodSelection =
         LISTING(currentPlan).getMetadata().orderDetail[planItemKey]
           .memberOrders[currentUserId] || {};
 
@@ -63,7 +65,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
           subOrderId: planKey,
           orderId,
           daySession: 'MORNING_SESSION',
-          status,
+          status: foodSelection?.status,
           type: 'dailyMeal',
           deliveryAddress: LISTING(restaurant).getPublicData().location,
           restaurant: {
@@ -75,11 +77,13 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
           },
           expiredTime: DateTime.fromMillis(+orderDeadline).toJSDate(),
           deliveryHour,
+          dishSelection: { dishSelection: foodSelection?.foodId },
         },
         title: orderTile,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
         end: DateTime.fromMillis(+planItemKey).plus({ hour: 1 }).toJSDate(),
       };
+
       listEvent.push(event);
     });
 

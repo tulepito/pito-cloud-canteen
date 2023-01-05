@@ -12,9 +12,10 @@ type TDishSelectionFormProps = {
     value: string;
   }[];
   onSubmit: (values: TDishSelectionFormValues, reject?: boolean) => void;
+  initialValues: TDishSelectionFormValues;
 };
 
-type TDishSelectionFormValues = {
+export type TDishSelectionFormValues = {
   dishSelection: string;
 };
 
@@ -29,6 +30,7 @@ const validate = (values: TDishSelectionFormValues) => {
 const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
   dishes,
   onSubmit,
+  initialValues,
 }) => {
   const handleCustomSubmit = (values: TDishSelectionFormValues) => {
     onSubmit(values);
@@ -54,7 +56,7 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
 
   const hasValues = values && !!values.dishSelection;
   const rejectSubmitting = !hasValues && updateOrderInProgress;
-  const submitSubmiting = hasValues && updateOrderInProgress;
+  const submitSubmitting = hasValues && updateOrderInProgress;
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>
@@ -68,6 +70,7 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
             className={css.radioInput}
             type={'radio'}
             value={dish.key}
+            defaultChecked={dish.key === initialValues.dishSelection}
             id={`dishSelection-${index}`}
             name="dishSelection"
           />
@@ -87,7 +90,7 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
           className={css.acceptBtn}
           type="submit"
           disabled={disabledSubmit}
-          inProgress={submitSubmiting}
+          inProgress={submitSubmitting}
           spinnerClassName={css.spinnerClassName}>
           <FormattedMessage id="DishSelectionForm.accept" />
         </Button>
