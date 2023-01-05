@@ -1,6 +1,4 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { getSdk } from '@services/sdk';
-import { createWrapper, HYDRATE } from 'next-redux-wrapper';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
@@ -17,26 +15,11 @@ const persistConfig = {
   storage,
   whitelist: ['Order'],
 };
-const rootReducer: typeof combinedReducer = (state, action) => {
-  if (action.type === HYDRATE) {
-    const nextState = {
-      ...state,
-      ...action.payload,
-    };
-    return nextState;
-  }
-  return combinedReducer(state, action);
-};
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
-export const makeStore = (context: any) => {
-  let sdk = createSdkInstance();
+const persistedReducer = persistReducer(persistConfig, combinedReducer);
 
-  if (context?.ctx) {
-    const { ctx } = context;
-    const { req, res } = ctx;
-    sdk = getSdk(req, res);
-  }
+export const makeStore = () => {
+  const sdk = createSdkInstance();
 
   return configureStore({
     reducer: persistedReducer,
@@ -48,9 +31,8 @@ export const makeStore = (context: any) => {
   });
 };
 
+export default makeStore();
+
 export type AppStore = ReturnType<typeof makeStore>;
 export type AppDispatch = AppStore['dispatch'];
-export type RootState = ReturnType<typeof rootReducer>;
-
-const wrapper = createWrapper<AppStore>(makeStore, { debug: false });
-export default wrapper;
+export type RootState = ReturnType<typeof combinedReducer>;
