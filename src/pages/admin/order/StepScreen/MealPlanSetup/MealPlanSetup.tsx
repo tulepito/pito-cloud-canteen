@@ -81,7 +81,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   const initialValues = useMemo(
     () => ({
       dayInWeek: dayInWeek || [],
-      packagePerMember: addCommas(packagePerMember.toString()) || '',
+      packagePerMember: addCommas(packagePerMember?.toString()) || '',
       vatAllow: vatAllow || true,
       pickAllow: pickAllow || true,
       selectedGroups: selectedGroups || ['allMembers'],
