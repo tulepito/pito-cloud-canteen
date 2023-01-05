@@ -199,7 +199,7 @@
   "Calendar.week.dayHeader.5": "Thứ sáu",
   "Calendar.week.dayHeader.6": "Thứ bảy",
   "Calendar.week.dayHeader.0": "Chủ nhật",
-  "Calendar.Week.title": "{start} - {end}, Tháng {month}, {year}",
+  "Calendar.Week.title": "{start}/{month} - {end}/{month}",
   "Calendar.Week.title.diffMonth": "{start} - {end}, {year}",
   "Calendar.Week.title.diffYear": "{start} - {end}",
   "DayColumn.Session.MORNING_SESSION": "Bữa sáng",
@@ -603,5 +603,10 @@
   "EditPartnerForm.businessTypeLabel": "Loại hình kinh doanh",
   "FieldBankAccounts.bankAccountNumberInvalid": "Số tài khoản không hợp lệ",
   "EditPartnerPreviewForm.packagingLabel": "Bao bì thường sử dụng",
-  "EditPartnerForms.goBack": "Quay lại"
+  "EditPartnerForms.goBack": "Quay lại",
+  "NotificationSelectionForm.aDayAgo": "1 ngày trước hạn",
+  "NotificationSelectionForm.aHourAgo": "1 tiếng trước hạn",
+  "NotificationSelectionForm.thirtyMinutesAgo": "30 phút trước hạn",
+  "SectionOrderListing.notJoinThisDay": "Bỏ chọn ngày này",
+  "SectionOrderPanel.notJoined": "[Không tham gia]"
 }

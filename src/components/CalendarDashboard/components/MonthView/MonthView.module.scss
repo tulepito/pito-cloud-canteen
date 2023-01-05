@@ -43,3 +43,14 @@
   border-bottom: 1px solid $primaryPri3;
   color: $primaryPri5;
 }
+
+.emptyDay {
+  flex-basis: calc(100% / 7);
+  border-bottom: 1px solid $neutralGray5;
+  border-right: 1px solid $neutralGray5;
+  min-height: 150px;
+
+  &:nth-child(7n + 1) {
+    border-left: 1px solid $neutralGray5;
+  }
+}

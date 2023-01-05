@@ -1,4 +1,5 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .root {
   position: relative;
@@ -44,8 +45,6 @@
 
 .radioButtonWrapper {
   /* This should follow line-height */
-  height: 32px;
-  margin-top: -2px;
   margin-right: 12px;
   align-self: baseline;
 
@@ -55,8 +54,11 @@
 }
 
 .checkedStyle {
-  stroke: $marketplaceColor;
-  fill: $marketplaceColor;
+  stroke: $neutralGray10;
+
+  circle:nth-child(2) {
+    fill: $neutralGray10;
+  }
 }
 
 .checked {
@@ -64,22 +66,21 @@
 }
 
 .notChecked {
-  stroke: $matterColorAnti;
+  stroke: $neutralGray5;
   &:hover {
-    stroke: pink;
+    stroke: $neutralGray5;
   }
 }
 
 .required {
-  stroke: $attentionColor;
+  stroke: $neutralGray5;
   &:hover {
-    stroke: pink;
+    stroke: $neutralGray5;
   }
 }
 
 .text {
-  color: $matterColor;
-  margin-top: -1px;
-  margin-bottom: 1px;
+  color: $neutralGray10;
+  @include textTemplate(14px, 400, 24px, '');
   cursor: pointer;
 }

@@ -35,11 +35,19 @@
 
   .sectionBody {
     padding: 8px 0 20px;
-    min-height: 200px;
+  }
+
+  .sectionBodyEmpty {
+    padding: 0;
+  }
+
+  .lineItemLoading {
+    margin: 10px 18px;
+    width: calc(100% - 36px);
   }
 
   .sectionFooter {
-    padding: 18px;
+    padding: 18px 18px 0;
 
     .removeCartLabel {
       width: 100%;

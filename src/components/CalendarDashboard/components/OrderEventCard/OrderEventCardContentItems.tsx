@@ -9,9 +9,13 @@ import OrderEventCardContentItem from './OrderEventCardContentItem';
 
 export type TEventCardContentProps = {
   event: Event;
+  isFirstHighlight?: boolean;
 };
 
-const EventCardContent: React.FC<TEventCardContentProps> = ({ event }) => {
+const EventCardContent: React.FC<TEventCardContentProps> = ({
+  event,
+  isFirstHighlight,
+}) => {
   const deliAddress = event.resource?.deliveryAddress || '';
 
   const restaurantObj = event.resource?.restaurant || {};
@@ -27,7 +31,9 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({ event }) => {
   return (
     <>
       {!isExpired && (
-        <OrderEventCardContentItem icon={<IconClock />}>
+        <OrderEventCardContentItem
+          icon={<IconClock />}
+          isHighlight={isFirstHighlight}>
           <FormattedMessage
             id="EventCard.remainTime"
             values={{

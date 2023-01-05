@@ -86,7 +86,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         // Get list sub-order (plan)
         const planIds = order?.attributes.metadata?.plans || [];
-
         const plans = denormalisedResponseEntities(
           await integrationSdk.listings.query({
             ids: planIds.join(','),
@@ -103,6 +102,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         });
 
         const subOrderData = await Promise.all(subOrderPromises);
+
         return res.json({
           statusCode: 200,
           meta: {},
@@ -143,7 +143,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               planData?.[day]?.[currentUserId];
           });
         }
-
         await integrationSdk.listings.update({
           id: planId,
           metadata: {
