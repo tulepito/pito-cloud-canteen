@@ -221,3 +221,21 @@ export const validURL = (message: string) => (str: string) => {
   }
   return message;
 };
+
+export const minPriceLength =
+  (message: string, minimumLength: number) => (value: number | number) => {
+    const removeComma = value.toString().split(',');
+    const mergeWithoutComma = removeComma.join('');
+    const parsedValue = Number(mergeWithoutComma);
+    const isNumber = typeof parsedValue === 'number';
+    return isNumber && parsedValue >= minimumLength ? VALID : message;
+  };
+
+export const parsePrice = (value: string | number) => {
+  const removeComma = value.toString().split(',');
+  const mergeWithoutComma = removeComma.join('');
+  const parseNumber = Number(mergeWithoutComma);
+  const isNotANumber =
+    Number.isNaN(parseNumber) || typeof parseNumber !== 'number';
+  return !isNotANumber ? parseNumber.toLocaleString() : value;
+};

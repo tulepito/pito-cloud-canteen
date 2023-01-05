@@ -19,8 +19,9 @@ import {
   composeValidators,
   composeValidatorsWithAllValues,
   emailFormatValid,
+  minPriceLength,
   nonEmptyImage,
-  numberMinLength,
+  parsePrice,
   passwordFormatValid,
   passwordMatchConfirmPassword,
   phoneNumberFormatValid,
@@ -501,13 +502,14 @@ const EditPartnerBasicInfomationForm: React.FC<
                           id: 'EditPartnerBasicInformationForm.minPriceRequired',
                         }),
                       ),
-                      numberMinLength(
+                      minPriceLength(
                         intl.formatMessage({
                           id: 'EditPartnerBasicInformationForm.minPriceValid',
                         }),
                         0,
                       ),
                     )}
+                    parse={parsePrice}
                     rightIcon={<div className={css.currency}>đ</div>}
                   />
                   <p className={css.packagingLabel}>
