@@ -342,6 +342,7 @@ const EditPartnerWizardTab = (props: any) => {
           isDraftFlow={isDraftFlow}
           onSetAuthorized={onSetAuthorized}
           onSetUnsatisfactory={onSetUnsatisfactory}
+          partnerListingRef={partnerListingRef}
         />
       );
     }

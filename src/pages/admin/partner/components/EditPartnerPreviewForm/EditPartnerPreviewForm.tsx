@@ -1,9 +1,11 @@
+/* eslint-disable import/no-cycle */
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldCheckboxGroup from '@components/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import IconEdit from '@components/IconEdit/IconEdit';
+import NamedLink from '@components/NamedLink/NamedLink';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import {
@@ -22,6 +24,11 @@ import React from 'react';
 import { Field, Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import {
+  BASIC_INFORMATION_TAB,
+  LICENSE_TAB,
+  MENU_TAB,
+} from '../EditPartnerWizard/EditPartnerWizard';
 import { createAvailabilityPlanInitialValues } from '../EditPartnerWizardTab/utils';
 import css from './EditPartnerPreviewForm.module.scss';
 
@@ -47,6 +54,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
           isDraftFlow,
           onSetAuthorized,
           onSetUnsatisfactory,
+          partnerListingRef,
         } = fieldRenderProps;
         const {
           cover,
@@ -141,7 +149,11 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                 {intl.formatMessage({
                   id: 'EditPartnerForm.basicInformationLabel',
                 })}
-                <IconEdit className={css.editIcon} />
+                <NamedLink
+                  path={`/admin/partner/${partnerListingRef?.id?.uuid}/edit`}
+                  to={{ search: `tab=${BASIC_INFORMATION_TAB}` }}>
+                  <IconEdit className={css.editIcon} />
+                </NamedLink>
               </p>
               <div className={css.mediaWrapper}>
                 <p className={css.sectionLabel}>
@@ -344,7 +356,11 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                 {intl.formatMessage({
                   id: 'EditPartnerForm.licenseLabel',
                 })}
-                <IconEdit className={css.editIcon} />
+                <NamedLink
+                  path={`/admin/partner/${partnerListingRef?.id?.uuid}/edit`}
+                  to={{ search: `tab=${LICENSE_TAB}` }}>
+                  <IconEdit className={css.editIcon} />
+                </NamedLink>
               </p>
               <div className={css.licenseWrapper}>
                 <div className={css.box}>
@@ -425,7 +441,11 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                 {intl.formatMessage({
                   id: 'EditPartnerForm.menuLabel',
                 })}
-                <IconEdit className={css.editIcon} />
+                <NamedLink
+                  path={`/admin/partner/${partnerListingRef?.id?.uuid}/edit`}
+                  to={{ search: `tab=${MENU_TAB}` }}>
+                  <IconEdit className={css.editIcon} />
+                </NamedLink>
               </p>
               <div className={css.licenseWrapper}>
                 <div className={css.box}>
@@ -475,7 +495,11 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                 {intl.formatMessage({
                   id: 'EditPartnerPreviewForm.serviceLabel',
                 })}
-                <IconEdit className={css.editIcon} />
+                <NamedLink
+                  path={`/admin/partner/${partnerListingRef?.id?.uuid}/edit/`}
+                  to={{ search: `tab=${MENU_TAB}` }}>
+                  <IconEdit className={css.editIcon} />
+                </NamedLink>
               </p>
               <div className={css.licenseWrapper}>
                 <ul className={css.services}>
@@ -490,7 +514,11 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                 {intl.formatMessage({
                   id: 'EditPartnerPreviewForm.bankAccountLabel',
                 })}
-                <IconEdit className={css.editIcon} />
+                <NamedLink
+                  path={`/admin/partner/${partnerListingRef?.id?.uuid}/edit/`}
+                  to={{ search: `tab=${BASIC_INFORMATION_TAB}` }}>
+                  <IconEdit className={css.editIcon} />
+                </NamedLink>
               </p>
               <div className={css.licenseWrapper}>
                 <div className={css.bankAccounts}>
