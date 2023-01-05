@@ -35,6 +35,11 @@
 
   &:first-child {
     border-left: 1px solid $neutralGray5;
+    border-top-left-radius: 9px;
+  }
+
+  &:nth-child(7) {
+    border-top-right-radius: 9px;
   }
 }
 
@@ -53,4 +58,10 @@
   &:nth-child(7n + 1) {
     border-left: 1px solid $neutralGray5;
   }
+}
+
+.calendarTitleWrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
