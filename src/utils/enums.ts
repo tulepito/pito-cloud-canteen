@@ -385,12 +385,12 @@ export const PARTY_INSURANCE_RADIO_OPTIONS = [
   },
   {
     id: 'partyInsurance.registering',
-    value: REGISTERING,
+    key: REGISTERING,
     label: 'Đang đăng ký',
   },
   {
     id: 'partyInsurance.no',
-    value: NO,
+    key: NO,
     label: 'Chưa',
   },
 ];
