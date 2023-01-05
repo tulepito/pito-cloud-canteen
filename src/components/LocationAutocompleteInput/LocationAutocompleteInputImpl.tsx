@@ -277,7 +277,7 @@ const LocationAutocompleteInputImpl = (props: any) => {
     // Clear highlighted prediction since the input value changed and
     // results will change as well
     setHighlightedIndex(-1);
-    console.log(newValue);
+
     if (!newValue) {
       // No need to fetch predictions on empty input
       if (shortQueryTimeoutRef.current) {

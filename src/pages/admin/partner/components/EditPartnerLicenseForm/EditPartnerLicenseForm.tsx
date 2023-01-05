@@ -133,7 +133,7 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
       console.error(error);
     }
   };
-  console.log(businessTypeRadioOptions());
+
   return (
     <FinalForm
       {...rest}
