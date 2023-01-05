@@ -32,7 +32,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     draftOrder: {
       clientId,
       dayInWeek,
-      packagePerMember,
+      packagePerMember = '',
       vatAllow,
       pickAllow,
       selectedGroups,
