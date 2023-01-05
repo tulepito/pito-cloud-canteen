@@ -231,7 +231,7 @@ export const minPriceLength =
     return isNumber && parsedValue >= minimumLength ? VALID : message;
   };
 
-export const parsePrice = (value: string | number) => {
+export const parsePrice = (value: string) => {
   const removeComma = value.toString().split(',');
   const mergeWithoutComma = removeComma.join('');
   const parseNumber = Number(mergeWithoutComma);
