@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { adminRoutes } from '@src/paths';
 import { EListingStates, OTHER_OPTION } from '@utils/enums';
+import { parsePrice } from '@utils/validators';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
 
@@ -298,7 +299,7 @@ const EditPartnerWizardTab = (props: any) => {
           vat,
           // Add other otion to packaging list to show up the checkbox input in preview tab
           packaging: [...packaging, ...(packagingOther ? [OTHER_OPTION] : [])],
-          minPrice,
+          minPrice: parsePrice(minPrice),
           meals,
           hasOutsideMenuAndService,
           businessLicenseStatus: businessLicense?.status,

@@ -150,7 +150,7 @@ const EditPartnerBasicInfomationForm: React.FC<
       facebookLink,
       description,
       packaging: [...packaging, ...(packagingOther ? [OTHER_OPTION] : [])],
-      minPrice,
+      minPrice: parsePrice(minPrice),
       bankAccounts: bankAccounts || defaultBankAccounts,
       packagingOther,
     }),

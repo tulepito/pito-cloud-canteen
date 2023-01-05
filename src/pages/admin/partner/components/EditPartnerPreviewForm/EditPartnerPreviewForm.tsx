@@ -75,7 +75,6 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
           status,
           businessType,
         } = values;
-
         const entries = createAvailabilityPlanInitialValues(availabilityPlan);
 
         const isUnsatisfactory =
@@ -316,7 +315,6 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                     <FieldTextInput
                       disabled
                       name="minPrice"
-                      type="number"
                       className={css.minPrice}
                       id="minPrice"
                       label={intl.formatMessage({
