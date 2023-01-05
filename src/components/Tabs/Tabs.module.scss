@@ -2,7 +2,7 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
-.tabHeaderWrapper {
+.headerWrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
