@@ -8,6 +8,7 @@ import React, { useMemo } from 'react';
 import EditPartnerBasicInfomationForm from '../EditPartnerBasicInfomationForm/EditPartnerBasicInfomationForm';
 import EditPartnerLicenseForm from '../EditPartnerLicenseForm/EditPartnerLicenseForm';
 import EditPartnerMenuForm from '../EditPartnerMenuForm/EditPartnerMenuForm';
+// eslint-disable-next-line import/no-cycle
 import EditPartnerPreviewForm from '../EditPartnerPreviewForm/EditPartnerPreviewForm';
 // eslint-disable-next-line import/no-cycle
 import {
