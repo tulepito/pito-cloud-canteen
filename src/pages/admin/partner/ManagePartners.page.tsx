@@ -324,7 +324,7 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
   const description = intl.formatMessage({
     id: 'ManagePartners.description',
   });
-  console.log(keywords);
+
   return (
     <div className={css.root}>
       <Meta title={title} description={description} />
