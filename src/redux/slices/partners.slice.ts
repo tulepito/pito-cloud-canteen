@@ -323,6 +323,7 @@ const createDraftPartner = createAsyncThunk(
         listingParams: {
           listingDataParams: listingData,
           listingQueryParams: {
+            ...SHOW_RESTAURANT_LISTING_PARAMS,
             expand: true,
           },
         },
