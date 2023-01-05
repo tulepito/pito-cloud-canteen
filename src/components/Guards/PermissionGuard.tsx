@@ -1,3 +1,4 @@
+import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppSelector } from '@hooks/reduxHooks';
 import {
   adminPaths,
@@ -19,10 +20,9 @@ const PermissionGuard: React.FC<TPermissionGuardGuard> = (props) => {
   const { pathname: pathName } = router;
   const { userPermission, currentUser } = useAppSelector((state) => state.user);
   const { children } = props;
-  const isMatchedPermission =
-    currentUser !== null
-      ? isPathMatchedPermission(pathName, userPermission)
-      : true;
+  const isMatchedPermission = currentUser
+    ? isPathMatchedPermission(pathName, userPermission)
+    : null;
   const isIgnoredPermissionCheckRoute =
     IgnoredPermissionCheckRoutes.includes(pathName);
 
@@ -51,26 +51,23 @@ const PermissionGuard: React.FC<TPermissionGuardGuard> = (props) => {
   }, [
     isIgnoredPermissionCheckRoute,
     isMatchedPermission,
-    router,
+    pathName,
     userPermission,
   ]);
 
-  const renderComponent = useCallback(() => {
+  const renderComponent = () => {
     if (isIgnoredPermissionCheckRoute) {
       return children;
     }
 
     const LayoutWrapper = getLayout(userPermission);
 
-    return isMatchedPermission ? (
+    return !!isMatchedPermission && isMatchedPermission ? (
       <LayoutWrapper>{children}</LayoutWrapper>
-    ) : null;
-  }, [
-    children,
-    isIgnoredPermissionCheckRoute,
-    isMatchedPermission,
-    userPermission,
-  ]);
+    ) : (
+      <LoadingContainer />
+    );
+  };
 
   useEffect(() => {
     verifyPermission();

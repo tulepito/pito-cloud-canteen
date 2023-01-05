@@ -1,3 +1,4 @@
+import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
 import { emailVerificationActions } from '@redux/slices/emailVerification.slice';
@@ -49,7 +50,6 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
 
     if (isNonRequireAuthenticationRoute) {
       if (homePageNavigateCondition) {
-        router.prefetch(generalPaths.Home);
         router.push(generalPaths.Home);
       }
     } else if (!isAuthenticated) {
@@ -61,7 +61,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     isAuthenticated,
     isIgnoredAuthCheckRoute,
     isNonRequireAuthenticationRoute,
-    router,
+    pathName,
   ]);
 
   const renderComponent = () => {
@@ -70,15 +70,15 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     }
 
     if (!authInfoLoaded) {
-      return null;
+      return <LoadingContainer />;
     }
 
     if (isNonRequireAuthenticationRoute) {
       if (homePageNavigateCondition) {
-        return null;
+        return <LoadingContainer />;
       }
     } else if (!isAuthenticated) {
-      return null;
+      return <LoadingContainer />;
     }
 
     return children;
