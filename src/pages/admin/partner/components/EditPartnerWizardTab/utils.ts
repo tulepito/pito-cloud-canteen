@@ -121,6 +121,10 @@ const getListWithNewOtherValues = (
   return newList;
 };
 
+const createSubmitPrice = (minPrice: string) => {
+  return minPrice.split(',').join('');
+};
+
 export const createSubmitUpdatePartnerValues = (
   values: any,
   partnerListingRef: TOwnListing,
@@ -177,7 +181,7 @@ export const createSubmitUpdatePartnerValues = (
     ]),
     publicData: {
       location: { address },
-      minPrice,
+      minPrice: createSubmitPrice(minPrice),
       packaging: getDataWithRemovedOtherField(
         getListWithNewOtherValues(
           packagingOther,
@@ -259,7 +263,7 @@ export const createSubmitCreatePartnerValues = (values: any) => {
     ],
     publicData: {
       location: { address },
-      minPrice,
+      minPrice: createSubmitPrice(minPrice),
       packaging: getDataWithRemovedOtherField([
         ...packaging,
         ...(packagingOther ? [packagingOther] : []),
