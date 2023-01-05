@@ -26,7 +26,7 @@ import { createAvailabilityPlanInitialValues } from '../EditPartnerWizardTab/uti
 import css from './EditPartnerPreviewForm.module.scss';
 
 const getLabelByKey = (list: any[], key: any) => {
-  const item = list.find((l: any) => l.key === key);
+  const item = list?.find((l: any) => l.key === key);
   return item && item.label ? item.label : key;
 };
 
@@ -145,6 +145,11 @@ const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
                 <IconEdit className={css.editIcon} />
               </p>
               <div className={css.mediaWrapper}>
+                <p className={css.sectionLabel}>
+                  {intl.formatMessage({
+                    id: 'EditPartnerForm.mediaLabel',
+                  })}
+                </p>
                 <div className={css.previewCover}>
                   <ResponsiveImage
                     variants={[EImageVariants.scaledLarge]}

@@ -608,5 +608,6 @@
   "NotificationSelectionForm.aHourAgo": "1 tiếng trước hạn",
   "NotificationSelectionForm.thirtyMinutesAgo": "30 phút trước hạn",
   "SectionOrderListing.notJoinThisDay": "Bỏ chọn ngày này",
-  "SectionOrderPanel.notJoined": "[Không tham gia]"
+  "SectionOrderPanel.notJoined": "[Không tham gia]",
+  "EditPartnerForm.mediaLabel": "Hình nền và ảnh đại diện"
 }
