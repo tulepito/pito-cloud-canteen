@@ -74,12 +74,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           });
         }
 
+        console.log('goheree');
+
         try {
+          console.log('meow');
+          console.log('req', req.headers);
+          const currentUser = denormalisedResponseEntities(
+            await sdk.currentUser.show(),
+          )[0];
+
           const plan = denormalisedResponseEntities(
             await integrationSdk.listings.show({
               id: planId,
             }),
           )[0];
+          console.log('goheree 1', plan);
           const { orderId, orderDetail } = LISTING(plan).getMetadata();
           const order = denormalisedResponseEntities(
             await integrationSdk.listings.show({
@@ -87,12 +96,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             }),
           )[0];
 
-          const currentUser = denormalisedResponseEntities(
-            await sdk.currentUser.show(),
-          )[0];
-          const currentUserId = CURRENT_USER(currentUser).getId();
+          console.log('goheree 2', order);
 
+          console.log('goheree 3', currentUser);
+          const currentUserId = CURRENT_USER(currentUser).getId();
           const mealPlan = await fetchSubOrder(orderDetail, currentUserId);
+          console.log('goheree 4', mealPlan);
           res.json({
             statusCode: 200,
             meta: {},
@@ -101,9 +110,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               order,
             },
           });
-        } catch (error) {
+        } catch (error: any) {
+          console.log(error?.data?.errors);
           handleError(res, error);
-          console.log(error);
         }
       }
       break;

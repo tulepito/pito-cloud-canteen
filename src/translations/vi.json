@@ -363,5 +363,9 @@
   "NotificationSelectionForm.aHourAgo": "1 tiếng trước hạn",
   "NotificationSelectionForm.thirtyMinutesAgo": "30 phút trước hạn",
   "SectionOrderListing.notJoinThisDay": "Bỏ chọn ngày này",
-  "SectionOrderPanel.notJoined": "[Không tham gia]"
+  "SectionOrderPanel.notJoined": "[Không tham gia]",
+  "SectionOrderPanel.Alert.confirmDeleteTitle": "Xoá toàn bộ giỏ hàng",
+  "SectionOrderPanel.Alert.confirmDeleteMessage": "Bạn có chắc chắn muốn xoá toàn bộ giỏ hàng không?",
+  "SectionOrderPanel.Alert.cancelDeleteBtn": "Huỷ",
+  "SectionOrderPanel.Alert.confirmDeleteBtn": "Xoá tất cả"
 }

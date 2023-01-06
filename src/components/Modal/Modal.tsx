@@ -36,7 +36,7 @@ const Modal = (props: TModal) => {
   const intl = useIntl();
   const isOpenClass = isOpen ? css.isOpen : css.isClosed;
   const classes = classNames(isOpenClass, className);
-  const containerClasses = containerClassName || css.container;
+  const containerClasses = classNames(css.container, containerClassName);
   const scrollLayerClasses = scrollLayerClassName || css.scrollLayer;
   const hasTitle = title && title.length > 0;
   const closeModalMessage = intl.formatMessage({ id: 'Modal.closeModal' });
