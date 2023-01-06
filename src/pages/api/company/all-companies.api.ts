@@ -7,7 +7,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const integrationSdk = getIntegrationSdk();
   try {
     const allCompaniesResponse = await integrationSdk.users.query({
-      meta_isCompanyAccount: true,
+      meta_isCompany: true,
     });
     const { status, statusText, data } = allCompaniesResponse;
     res.status(status).setHeader('Content-Type', 'application/json').json({

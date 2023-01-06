@@ -16,7 +16,11 @@ export const CURRENT_LOCATION_ID = 'current-location';
 // When displaying data from the Google Maps Places API, and
 // attribution is required next to the results.
 // See: https://developers.google.com/places/web-service/policies#powered
-export const GeocoderAttribution = (props: any) => {
+type TGeocoderAttribution = {
+  rootClassName?: string;
+  className?: string;
+};
+export const GeocoderAttribution = (props: TGeocoderAttribution) => {
   const { rootClassName, className } = props;
   const classes = classNames(rootClassName || css.poweredByGoogle, className);
   return <div className={classes} />;
@@ -54,7 +58,7 @@ class GeocoderGoogleMaps {
    * and an array of predictions. The format of the predictions is
    * only relevant for the `getPlaceDetails` function below.
    */
-  getPlacePredictions(search: any) {
+  getPlacePredictions(search: string) {
     const limitCountriesMaybe = config.maps.search.countryLimit
       ? {
           componentRestrictions: {

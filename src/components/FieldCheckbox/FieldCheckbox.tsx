@@ -1,7 +1,10 @@
+import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import type { TFormEvent, TIconProps } from '@utils/types';
+import { required } from '@utils/validators';
 import classNames from 'classnames';
 import React from 'react';
 import { Field } from 'react-final-form';
+import { useIntl } from 'react-intl';
 
 import css from './FieldCheckbox.module.scss';
 
@@ -10,8 +13,9 @@ interface IconCheckboxProps extends TIconProps {
   boxClassName?: string;
 }
 
-const IconCheckbox = (props: IconCheckboxProps) => {
+export const IconCheckbox = (props: IconCheckboxProps) => {
   const { className, checkedClassName, boxClassName } = props;
+
   return (
     <svg
       className={className}
@@ -39,6 +43,8 @@ const IconCheckbox = (props: IconCheckboxProps) => {
   );
 };
 
+const CHECKBOX_TEXT_PREFIX = 'Other';
+
 // interface CheckboxProps extends FieldRenderProps<string, any> {
 //   className?: string;
 //   rootClassName?: string;
@@ -60,13 +66,19 @@ const FieldCheckbox = (props: any) => {
     label,
     useSuccessColor,
     customOnChange,
+    disabled,
+    hasTextInput,
+    textPlaceholder,
     ...rest
   } = props;
-  const classes = classNames(rootClassName || css.root, className);
 
+  const intl = useIntl();
+
+  const classes = classNames(rootClassName || css.root, className);
   // This is a workaround for a bug in Firefox & React Final Form.
   // https://github.com/final-form/react-final-form/issues/134
   const handleOnChange = (input: any, event: TFormEvent): void => {
+    if (disabled) return;
     const { onBlur, onChange } = input;
     if (customOnChange) {
       customOnChange(event);
@@ -84,34 +96,58 @@ const FieldCheckbox = (props: any) => {
     : {};
 
   return (
-    <span className={classes}>
-      <Field type="checkbox" {...rest}>
-        {(formRenderProps) => {
-          const { input } = formRenderProps;
-          return (
-            <input
-              id={id}
-              className={css.input}
-              {...input}
-              onChange={(event: TFormEvent) => handleOnChange(input, event)}
-            />
-          );
-        }}
-      </Field>
-      {label && (
-        <label htmlFor={id} className={css.label}>
-          <span className={css.checkboxWrapper}>
-            <IconCheckbox
-              className={svgClassName}
-              {...successColorVariantMaybe}
-            />
-          </span>
-          <span className={classNames(css.text, textClassName || css.textRoot)}>
-            {label}
-          </span>
-        </label>
-      )}
-    </span>
+    <>
+      <span className={classes}>
+        <Field type="checkbox" {...rest}>
+          {(formRenderProps) => {
+            const { input } = formRenderProps;
+
+            return (
+              <>
+                <input
+                  id={id}
+                  className={css.input}
+                  {...input}
+                  onChange={(event: TFormEvent) => handleOnChange(input, event)}
+                />
+                {label && (
+                  <label htmlFor={id} className={css.label}>
+                    <span className={css.checkboxWrapper}>
+                      <IconCheckbox
+                        className={svgClassName}
+                        {...successColorVariantMaybe}
+                      />
+                    </span>
+                    <span
+                      className={classNames(
+                        css.text,
+                        textClassName || css.textRoot,
+                      )}>
+                      {label}
+                    </span>
+                  </label>
+                )}
+                {input.checked && hasTextInput && (
+                  <FieldTextInput
+                    showText
+                    disabled={disabled}
+                    placeholder={textPlaceholder}
+                    className={css.textInput}
+                    name={`${input.name}${CHECKBOX_TEXT_PREFIX}`}
+                    id={`${input.name}${CHECKBOX_TEXT_PREFIX}`}
+                    validate={required(
+                      intl.formatMessage({
+                        id: 'FieldCheckbox.contentRequired',
+                      }),
+                    )}
+                  />
+                )}
+              </>
+            );
+          }}
+        </Field>
+      </span>
+    </>
   );
 };
 

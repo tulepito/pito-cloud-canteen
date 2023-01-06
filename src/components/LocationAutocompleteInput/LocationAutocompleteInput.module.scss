@@ -38,8 +38,8 @@
 }
 
 .input {
-  border: 1px solid $formFieldBorderColor;
-  color: $formFieldColor;
+  border: 1px solid $neutralGray5;
+  color: $neutralGray10;
   background: transparent;
   display: block;
   width: 100%;
@@ -62,17 +62,20 @@
     -webkit-box-shadow 0.15s ease-in-out;
   outline: none;
 
-  &:focus {
-    border-color: $formFieldBorderColorFocus;
+  &:hover {
+    border-color: $primaryPri4;
     outline: 0;
-    -webkit-box-shadow: $boxShadowInputFocus;
-    box-shadow: $boxShadowInputFocus;
+  }
+
+  &:focus {
+    border-color: $primaryPri5;
+    box-shadow: 0px 0px 0px 2px rgba(239, 61, 42, 0.2);
   }
 
   &::placeholder {
     font-weight: $fontWeightRegular;
-    font-size: 14px;
-    color: $formFieldPlaceholderColor;
+    font-size: 16px;
+    color: $neutralGray5;
   }
 }
 
@@ -89,7 +92,8 @@ size and position, etc.
   background-color: $matterColorLight;
   border-bottom-left-radius: 15px;
   border-bottom-right-radius: 15px;
-  box-shadow: $boxShadowPopup;
+  box-shadow: 0px 8px 8px -4px rgba(16, 24, 40, 0.04),
+    0px 20px 24px 4px rgba(16, 24, 40, 0.1);
   z-index: calc($zIndexPopup + 1);
 }
 
@@ -119,7 +123,7 @@ bottom of the container.
   padding: 14px 0;
 
   & li {
-    color: $neutralGray7;
+    color: $neutralGray10;
     transition: $transitionStyleButton;
     margin: 0; /* Remove the double white space */
     line-height: 24px;
@@ -128,18 +132,18 @@ bottom of the container.
     padding: 9px 24px;
     list-style: none;
     @include viewportMedium {
-      color: $neutralGray7;
-      padding: 10px 50px;
+      color: $neutralGray10;
+      padding: 8px 24px;
       margin: 0;
     }
 
     &:hover,
     &.highlighted {
       cursor: pointer;
-      border-left: 6px solid $neutralGray10;
-      border-top-right-radius: 20px;
-      border-bottom-right-radius: 20px;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
       color: $neutralGray10;
+      background: $neutralGray3;
     }
   }
 }
@@ -157,6 +161,13 @@ bottom of the container.
   line-height: 24px;
   color: $neutralGray10;
   margin-bottom: 8px;
-  display: inline-block;
-  display: flex;
+  display: inline-flex;
+}
+
+.labelRequiredRedStar {
+  color: $failColor;
+  margin-left: 2px;
+  font-weight: $fontWeightBold;
+  margin-left: 2px;
+  display: inline-flex;
 }

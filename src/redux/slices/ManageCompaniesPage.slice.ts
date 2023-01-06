@@ -16,6 +16,7 @@ interface ManageCompanyState {
   pagination?: TPagination | null;
   updateStatusInProgress: boolean;
   updateStatusError: any;
+  totalItems: number;
 }
 
 const QUERY_COMPANIES = 'app/ManageCompanies/QUERY_COMPANIES';
@@ -23,12 +24,13 @@ const UPDATE_COMPANY_STATUS = 'app/ManageCompanies/UPDATE_COMPANY_STATUS';
 
 const queryCompanies = createAsyncThunk(
   QUERY_COMPANIES,
-  async (page: number, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (
+    page: number | undefined,
+    { fulfillWithValue, rejectWithValue }: ThunkAPI,
+  ) => {
     try {
-      const { data } = await getCompaniesApi();
-      const { meta: pagination } = data.data;
-      const companies = denormalisedResponseEntities(data);
-      return fulfillWithValue({ companies, page, data, pagination });
+      const { data: companies } = await getCompaniesApi();
+      return fulfillWithValue({ companies, page });
     } catch (error: any) {
       console.error('Query company error : ', error);
       return rejectWithValue(storableError(error.response.data));
@@ -62,6 +64,7 @@ const initialState: ManageCompanyState = {
   updateStatusInProgress: false,
   updateStatusError: null,
   pagination: null,
+  totalItems: 0,
 };
 
 export const manageCompaniesSlice = createSlice({
@@ -89,21 +92,12 @@ export const manageCompaniesSlice = createSlice({
         queryCompaniesError: null,
       }))
       .addCase(queryCompanies.fulfilled, (state, action) => {
-        const {
-          companies,
-          pagination: { totalItems },
-          page,
-        } = action.payload;
+        const { companies } = action.payload;
         return {
           ...state,
           companyRefs: companies,
           queryCompaniesInProgress: false,
-          pagination: {
-            totalItems,
-            totalPages: Math.ceil(totalItems / RESULT_PAGE_SIZE),
-            perPage: RESULT_PAGE_SIZE,
-            page,
-          },
+          totalItems: companies.length,
         };
       })
       .addCase(queryCompanies.rejected, (state, action) => ({

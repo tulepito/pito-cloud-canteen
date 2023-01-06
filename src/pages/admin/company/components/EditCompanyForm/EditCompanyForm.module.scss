@@ -2,7 +2,8 @@
 @use '/src/styles/vars.scss' as *;
 
 .form {
-  width: 100%;
+  max-width: 1440px;
+  margin: auto;
 }
 
 .fields {
@@ -44,4 +45,9 @@
 .formHeader {
   text-align: center;
   border-bottom: 1px solid $neutralGray5;
+}
+
+.successMessage {
+  color: $successColor;
+  font-weight: $fontWeightMedium;
 }

@@ -1,6 +1,8 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { getSdk } from '@services/sdk';
 import { createWrapper, HYDRATE } from 'next-redux-wrapper';
+import { persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 
 import { createSdkInstance } from '../sharetribe/sdk';
 import * as globalReducers from './slices';
@@ -9,6 +11,12 @@ const combinedReducer = combineReducers({
   ...globalReducers,
 });
 
+const persistConfig = {
+  key: 'root',
+  version: 1,
+  storage,
+  whitelist: ['Order'],
+};
 const rootReducer: typeof combinedReducer = (state, action) => {
   if (action.type === HYDRATE) {
     const nextState = {
@@ -20,6 +28,7 @@ const rootReducer: typeof combinedReducer = (state, action) => {
   return combinedReducer(state, action);
 };
 
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 export const makeStore = (context: any) => {
   let sdk = createSdkInstance();
 
@@ -30,7 +39,7 @@ export const makeStore = (context: any) => {
   }
 
   return configureStore({
-    reducer: rootReducer,
+    reducer: persistedReducer,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: false,

@@ -24,7 +24,7 @@ export const defaultPredictions = (
     : []
 ).concat(config.maps.search.defaults);
 
-const DEBOUNCE_WAIT_TIME = 300;
+const DEBOUNCE_WAIT_TIME = 400;
 const KEY_CODE_ARROW_UP = 38;
 const KEY_CODE_ARROW_DOWN = 40;
 const KEY_CODE_ENTER = 13;
@@ -280,6 +280,9 @@ const LocationAutocompleteInputImpl = (props: any) => {
 
     if (!newValue) {
       // No need to fetch predictions on empty input
+      if (shortQueryTimeoutRef.current) {
+        window.clearTimeout(shortQueryTimeoutRef.current);
+      }
       return;
     }
 

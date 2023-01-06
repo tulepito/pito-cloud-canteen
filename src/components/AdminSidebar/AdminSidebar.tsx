@@ -1,51 +1,74 @@
-import HamburgerMenuButton from '@components/HamburgerMenuButton/HamburgerMenuButton';
 import IconHome from '@components/IconHome/IconHome';
 import IconOrderManagement from '@components/IconOrderManagement/IconOrderManagement';
 import IconUserManagement from '@components/IconUserManagement/IconUserManagement';
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
+import NamedLink from '@components/NamedLink/NamedLink';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
-import PitoLogo from '@components/PitoLogo/PitoLogo';
-import React from 'react';
+import { adminRoutes } from '@src/paths';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+import React, { useMemo } from 'react';
+import { useIntl } from 'react-intl';
 
 import css from './AdminSidebar.module.scss';
 
-const SIDEBAR_MENUS: TSidebarMenu[] = [
+const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
   {
-    id: 'home',
-    label: 'AdminSidebar.homeLabel',
-    nameLink: '/admin',
+    id: 'dashboard',
     Icon: IconHome,
-    level: 1,
+    nameLink: adminRoutes.Dashboard.path,
+    label: 'AdminSidebar.dashboardLabel',
+    isFirstLevel: true,
+  },
+  {
+    id: 'order',
+    Icon: IconOrderManagement,
+    nameLink: adminRoutes.CreateOrder.path,
+    label: 'AdminSidebar.orderLabel',
+    isFirstLevel: true,
+    childrenMenus: [
+      {
+        id: 'createOrder',
+        label: 'AdminSidebar.createOrderLabel',
+        nameLink: adminRoutes.CreateOrder.path,
+      },
+      {
+        id: 'manageOrders',
+        label: 'AdminSidebar.manageOrderLabel',
+        nameLink: adminRoutes.ManageOrders.path,
+      },
+    ],
   },
   {
     id: 'user',
     label: 'AdminSidebar.userLabel',
     Icon: IconUserManagement,
-    level: 1,
+    isFirstLevel: true,
+    nameLink: adminRoutes.ManageCompanies.path,
     childrenMenus: [
       {
         id: 'company',
         label: 'AdminSidebar.companyLabel',
-        nameLink: '/admin/company',
+        nameLink: adminRoutes.ManageCompanies.path,
+        // Sub name links => if pathname in these path, it will active the parent namelink
+        // Example : current pathname is '/admin/company/create' => the menu with nameLink '/admin/company' will be hightlighted
+        subNameLinks: [
+          adminRoutes.CreateCompany.path,
+          adminRoutes.EditCompany.path,
+          adminRoutes.CompanyDetails.path,
+        ],
       },
       {
         id: 'partner',
         label: 'AdminSidebar.partnerLabel',
-        nameLink: '/admin/partner',
-      },
-    ],
-  },
-  {
-    id: 'order',
-    label: 'AdminSidebar.orderLabel',
-    Icon: IconOrderManagement,
-    level: 1,
-    childrenMenus: [
-      {
-        id: 'createOrder',
-        label: 'AdminSidebar.createOrder',
-        nameLink: '/admin/order/create',
+        nameLink: adminRoutes.ManagePartners.path,
+        subNameLinks: [
+          adminRoutes.ManagePartners.path,
+          adminRoutes.CreatePartner.path,
+          adminRoutes.EditPartner.path,
+          adminRoutes.PartnerDetails.path,
+        ],
       },
     ],
   },
@@ -56,24 +79,85 @@ type TAdminSidebar = {
   onCloseMenu: () => void;
 };
 
+const checkNestedPathActive = (arr: TSidebarMenu[], pathName: string) => {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const item of arr) {
+    if (item.subNameLinks?.includes(pathName)) return item;
+    if (item.nameLink === pathName) return item;
+    if (item.childrenMenus) {
+      const child = checkNestedPathActive(item.childrenMenus, pathName);
+      if (child) return item;
+    }
+  }
+};
+
 const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
-  const { onMenuClick, onCloseMenu } = props;
+  const { onCloseMenu } = props;
+  const intl = useIntl();
 
   const onOutsideClick = () => {
     onCloseMenu();
   };
 
+  const router = useRouter();
+
+  const { pathname } = router;
+
+  const activeMenu = useMemo(
+    () => checkNestedPathActive(LIST_SIDEBAR_MENU, pathname),
+    [pathname],
+  );
+
   return (
     <OutsideClickHandler onOutsideClick={onOutsideClick}>
       <div className={css.root}>
-        <div className={css.logo}>
-          <PitoLogo />
-          <HamburgerMenuButton
-            onClick={onMenuClick}
-            className={css.hamburgerMenu}
-          />
+        <div className={css.leftSide}>
+          {LIST_SIDEBAR_MENU.map((item: TSidebarMenu) => {
+            const {
+              Icon,
+              id,
+              nameLink,
+              subNameLinks,
+              childrenMenus = [],
+            } = item;
+            const activeWithChildrenNameLinks = childrenMenus.find(
+              (m: TSidebarMenu) => m.nameLink === pathname,
+            );
+
+            const activeWithChildrenSubNameLinks = childrenMenus.find(
+              (m: TSidebarMenu) => m.subNameLinks?.includes(pathname),
+            );
+
+            const activeWithSubNameLinks = subNameLinks?.includes(pathname);
+            const isActive =
+              activeWithChildrenSubNameLinks ||
+              activeWithChildrenNameLinks ||
+              activeWithSubNameLinks ||
+              pathname === nameLink;
+            return (
+              <NamedLink
+                path={nameLink}
+                key={id}
+                className={classNames(css.sidebarButton, {
+                  [css.active]: isActive,
+                })}>
+                {Icon && <Icon className={css.sidebarIcon} />}
+              </NamedLink>
+            );
+          })}
         </div>
-        <MultiLevelSidebar menus={SIDEBAR_MENUS} />
+        {activeMenu && (
+          <div className={css.rightSide}>
+            <h1 className={css.menuLabel}>
+              {intl.formatMessage({ id: activeMenu.label })}
+            </h1>
+            <MultiLevelSidebar
+              rootClassName={css.multiLevelMenu}
+              subMenuLayoutClassName={css.subMenuLayout}
+              menus={activeMenu.childrenMenus || []}
+            />
+          </div>
+        )}
       </div>
     </OutsideClickHandler>
   );

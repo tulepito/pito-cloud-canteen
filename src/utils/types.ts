@@ -2,6 +2,7 @@
 // export const DATE_TYPE_DATE = 'date';
 // export const DATE_TYPE_DATETIME = 'datetime';
 // propTypes.dateType = oneOf([DATE_TYPE_DATE, DATE_TYPE_DATETIME]);
+import type { adminRoutes } from '@src/paths';
 import type Decimal from 'decimal.js';
 import type { NextPage } from 'next';
 
@@ -201,7 +202,7 @@ export type TListingAttributes = {
   deleted?: boolean;
   state?: TListingState;
   price?: any;
-  publicData?: object;
+  publicData?: any;
 };
 
 export type TDayOfWeek = TReverseMapFromEnum<typeof EDayOfWeek>;
@@ -228,7 +229,7 @@ export type TOwnListingAttributes = {
   deleted: boolean;
   state: TListingState;
   price?: any;
-  publicData: object;
+  publicData: any;
   availabilityPlan?: TAvailabilityPlan;
   description?: string;
   geolocation?: any;
@@ -412,3 +413,5 @@ export type TError = {
   statusText: string;
   apiErrors: TSharetribeFlexSdkApiError[];
 };
+
+export type RouteKey = keyof typeof adminRoutes;

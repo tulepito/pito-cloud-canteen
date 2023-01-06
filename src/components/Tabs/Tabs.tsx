@@ -1,3 +1,5 @@
+import { InlineTextButton } from '@components/Button/Button';
+import IconArrow from '@components/IconArrow/IconArrow';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';
 import React, { useEffect, useState } from 'react';
@@ -8,16 +10,20 @@ type TTabsItem = {
   label: ReactNode;
   id: string | number;
   children: ReactNode | string | number;
+  childrenFn?: (e: any) => ReactNode;
+  childrenProps?: any;
 };
-
 interface ITabsProps {
   defaultActiveKey?: string;
   items: TTabsItem[];
   onChange?: (params: any) => void;
   contentClassName?: string;
   headerClassName?: string;
+  showNavigation?: boolean;
   actionsClassName?: string;
   actionsComponent?: ReactNode;
+  headerWrapperClassName?: string;
+  className?: string;
 }
 
 const Tabs = (props: ITabsProps) => {
@@ -28,7 +34,10 @@ const Tabs = (props: ITabsProps) => {
     headerClassName,
     actionsClassName,
     onChange = () => null,
+    showNavigation = false,
     actionsComponent,
+    headerWrapperClassName,
+    className,
   } = props;
   const [activeTabKey, setActiveTabKey] = useState(defaultActiveKey || 1);
 
@@ -37,6 +46,19 @@ const Tabs = (props: ITabsProps) => {
     onChange(items[Number(tabKey) - 1]);
   };
 
+  const goLeft = () => {
+    if (activeTabKey === 1) {
+      return;
+    }
+    setActiveTabKey(+activeTabKey - 1);
+  };
+
+  const goRight = () => {
+    if (activeTabKey === items.length) {
+      return;
+    }
+    setActiveTabKey(+activeTabKey + 1);
+  };
   useEffect(() => {
     onChangeTab(Number(defaultActiveKey || 1))();
   }, [defaultActiveKey]);
@@ -65,15 +87,38 @@ const Tabs = (props: ITabsProps) => {
     );
   });
 
-  const tabContent = items[+activeTabKey - 1]?.children || '';
+  const activeItem = items[+activeTabKey - 1];
+
+  const tabContent =
+    activeItem && activeItem.childrenFn
+      ? activeItem?.childrenFn(activeItem?.childrenProps)
+      : activeItem?.children || '';
 
   // classes setup
   const headerClasses = classNames(css.tabHeaders, headerClassName);
   const actionsClasses = classNames(css.actions, actionsClassName);
   const contentClasses = classNames(css.tabPanel, contentClassName);
+  const headerWrapperClasses = classNames(
+    css.headerWrapper,
+    headerWrapperClassName,
+  );
+  const classes = classNames(css.root, className);
+
   return (
-    <div className={css.root}>
-      <div className={headerClasses}>{tabHeader}</div>
+    <div className={classes}>
+      <div className={headerWrapperClasses}>
+        <div className={headerClasses}>{tabHeader}</div>
+        {showNavigation && (
+          <div className={css.navigateBtn}>
+            <InlineTextButton type="button" onClick={goLeft}>
+              <IconArrow direction="left" />
+            </InlineTextButton>
+            <InlineTextButton type="button" onClick={goRight}>
+              <IconArrow direction="right" />
+            </InlineTextButton>
+          </div>
+        )}
+      </div>
       <div className={actionsClasses}>{actionsComponent}</div>
       <div className={contentClasses}>{tabContent}</div>
     </div>

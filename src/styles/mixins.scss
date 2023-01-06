@@ -170,6 +170,14 @@ $buttonBorderRadius: 8px;
   background-color: $color;
 }
 
+@mixin lineClamp($numberOfLines: 4) {
+  display: -webkit-box;
+  line-clamp: $numberOfLines;
+  -webkit-line-clamp: $numberOfLines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 @mixin verticalDivider($color, $width, $height) {
   width: $width;
   height: $height;

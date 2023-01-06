@@ -30,6 +30,7 @@ const WDayItem: React.FC<TWDayItemProps> = ({
     <div className={css.weekDay} id={`dayHeader-${date.getDay()}`}>
       <DayItemHeader date={date} isCurrentDay={isCurrentDay} />
       <DayItemContent
+        date={date}
         events={events}
         renderEvent={renderEvent}
         components={components}

@@ -44,6 +44,22 @@ export const minLength =
     return hasLength && value.length >= minimumLength ? VALID : message;
   };
 
+export const taxLengthRequired = (message: string) => (value: string) => {
+  const numberWithoutDash = value.split('-').join('');
+  const hasOneDashNumber = value.length - numberWithoutDash.length;
+  const hasInvalidChac =
+    (value.includes('-') && Number.isNaN(Number(numberWithoutDash))) ||
+    (!value.includes('-') && Number.isNaN(Number(value))) ||
+    hasOneDashNumber > 1;
+  if (hasInvalidChac) {
+    return message;
+  }
+  const hasLength = value && typeof value.length === 'number';
+  return hasLength && (value.length === 13 || value.length === 10)
+    ? VALID
+    : message;
+};
+
 export const maxLength =
   (message: string, maximumLength: number) => (value: string) => {
     if (!value) {
@@ -59,6 +75,12 @@ export const nonEmptyArray = (message: string) => (value: string) => {
 
 export const autocompleteSearchRequired = (message: string) => (value: any) => {
   return value && value.search ? VALID : message;
+};
+
+export const autocompletePlaceSelected = (message: string) => (value: any) => {
+  const selectedPlaceIsValid =
+    value && value.selectedPlace && value.selectedPlace.address;
+  return selectedPlaceIsValid ? VALID : message;
 };
 
 // Source: http://www.regular-expressions.info/email.html
@@ -151,6 +173,10 @@ export const confirmPassword =
     return allValues[fieldNameToCompare] === value ? VALID : message;
   };
 
+export const nonEmptyImage = (message: string) => (value: any) => {
+  return value && (value.id || value.imageId) ? VALID : message;
+};
+
 export const composeValidatorsWithAllValues =
   (...validators: any) =>
   (value: any, allValues: any, fieldState: any) =>
@@ -167,3 +193,49 @@ export const composeValidators =
       (error: any, validator: any) => error || validator(value),
       VALID,
     );
+
+export const validFacebookUrl = (message: string) => (value: string) => {
+  if (!value) return VALID;
+  const pattern =
+    // eslint-disable-next-line no-useless-escape
+    /^(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?$/;
+  if (pattern.test(value)) {
+    return VALID;
+  }
+  return message;
+};
+
+export const validURL = (message: string) => (str: string) => {
+  if (!str) return VALID;
+  const pattern = new RegExp(
+    '^(https?:\\/\\/)?' + // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+      '(\\#[-a-z\\d_]*)?$',
+    'i',
+  ); // fragment locator
+  if (pattern.test(str)) {
+    return VALID;
+  }
+  return message;
+};
+
+export const minPriceLength =
+  (message: string, minimumLength: number) => (value: number | number) => {
+    const removeComma = value.toString().split(',');
+    const mergeWithoutComma = removeComma.join('');
+    const parsedValue = Number(mergeWithoutComma);
+    const isNumber = typeof parsedValue === 'number';
+    return isNumber && parsedValue >= minimumLength ? VALID : message;
+  };
+
+export const parsePrice = (value: string = '') => {
+  const removeComma = value.toString().split(',');
+  const mergeWithoutComma = removeComma.join('');
+  const parseNumber = Number(mergeWithoutComma);
+  const isNotANumber =
+    Number.isNaN(parseNumber) || typeof parseNumber !== 'number';
+  return !isNotANumber ? parseNumber.toLocaleString() : value;
+};

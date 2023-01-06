@@ -101,8 +101,8 @@ export enum ECompanyStatus {
 }
 
 export enum EListingType {
-  partner = 'partner',
-  transactionListing = 'transactionListing',
+  restaurant = 'restaurant',
+  transaction = 'transaction',
 }
 
 export enum EUserPermission {
@@ -115,3 +115,282 @@ export const startRouteBaseOnPermission = {
   [EUserPermission.company]: '/company',
   [EUserPermission.admin]: '/admin',
 };
+export enum ERestaurantListingState {
+  draft = 'draft',
+  published = 'published',
+  deleted = 'deleted',
+}
+
+export enum ERestaurantListingStatus {
+  new = 'new',
+  authorized = 'authorized',
+  unsatisfactory = 'unsatisfactory',
+}
+
+export const OTHER_OPTION = 'other';
+
+export const LIST_BANKS = [
+  {
+    key: 'ncb',
+    label: 'Ngân hàng NCB',
+  },
+  {
+    key: 'vcb',
+    label: 'Ngân hàng Vietcombank',
+  },
+  {
+    key: 'techcombank',
+    label: 'Ngân hàng Techcombank',
+  },
+];
+
+export const PACKAGING_OPTIONS = [
+  {
+    key: 'paper-box',
+    label: 'Hộp giấy',
+  },
+  {
+    key: 'plastic-box',
+    label: 'Hộp nhựa',
+  },
+  {
+    key: 'bagasse-box',
+    label: 'Hộp bã mía',
+  },
+  {
+    key: 'reusable-box',
+    label: 'Hộp ăn tái sử dụng',
+  },
+  {
+    key: OTHER_OPTION,
+    label: 'Khác',
+    hasTextInput: true,
+    textPlaceholder: 'Nhập bao bì thường sử dụng',
+  },
+];
+
+export const MEAL_OPTIONS = [
+  {
+    key: 'breakfast',
+    label: 'Ăn sáng',
+  },
+  {
+    key: 'lunch',
+    label: 'Ăn trưa',
+  },
+  {
+    key: 'dinner',
+    label: 'Ăn tối',
+  },
+  {
+    key: 'brunch',
+    label: 'Ăn xế',
+  },
+  {
+    key: 'snack',
+    label: 'Ăn vặt',
+  },
+];
+
+export const CATEGORY_OPTIONS = [
+  {
+    key: 'vietnam-food',
+    label: 'Thuần Việt',
+  },
+  {
+    key: 'vietnam-north-food',
+    label: 'Món Bắc',
+  },
+  {
+    key: 'vietnam-centrel-food',
+    label: 'Món Trung',
+  },
+  {
+    key: 'vietnam-west-food',
+    label: 'Món Miền Tây',
+  },
+  {
+    key: 'chinese-food',
+    label: 'Hoa',
+  },
+  {
+    key: 'thai-food',
+    label: 'Thái',
+  },
+  {
+    key: 'korean-food',
+    label: 'Hàn quốc',
+  },
+  {
+    key: 'japanes-food',
+    label: 'Nhật Bản',
+  },
+  {
+    key: 'indian-food',
+    label: 'Ấn độ',
+  },
+  {
+    key: 'frech-food',
+    label: 'Pháp',
+  },
+  {
+    key: 'mediterranean-food',
+    label: 'Địa Trung Hải',
+  },
+  {
+    key: 'italian-food',
+    label: 'Ý',
+  },
+  {
+    key: 'barbeque',
+    label: 'BBQ',
+  },
+  {
+    key: 'sea-food',
+    label: 'Hải sản',
+  },
+  {
+    key: 'international-food',
+    label: 'Quốc Tế',
+  },
+  {
+    key: 'europe-food',
+    label: 'Âu',
+  },
+  {
+    key: 'asian-food',
+    label: 'Á',
+  },
+  {
+    key: 'vegetarian-food',
+    label: 'Chay',
+  },
+  {
+    key: 'macrobiotic-food',
+    label: 'Thực dưỡng',
+  },
+  {
+    key: 'halal',
+    label: 'Halal',
+  },
+  {
+    key: 'keto',
+    label: 'keto',
+  },
+  {
+    key: 'dessert',
+    label: 'Tráng miệng',
+  },
+  {
+    key: 'snack',
+    label: 'Ăn vặt',
+  },
+  {
+    key: OTHER_OPTION,
+    label: 'Khác',
+    hasTextInput: true,
+    textPlaceholder: 'Nhập phong cách ẩm thực khác',
+  },
+];
+
+export const EXTRA_SERVICE_OPTIONS = [
+  {
+    key: 'print-personalized-labels',
+    label: 'In label cá nhân hóa',
+  },
+  {
+    key: 'reusable-box',
+    label: 'Hộp tái sử dụng',
+  },
+  {
+    key: 'bagasse-box',
+    label: 'Hộp bã mía',
+  },
+  {
+    key: 'delivery-to-the-office',
+    label: 'Giao tận văn phòng ',
+  },
+  {
+    key: OTHER_OPTION,
+    label: 'Khác',
+    hasTextInput: true,
+    textPlaceholder: 'Nhập dịch vụ khác',
+  },
+];
+
+export type TBusinessTypeOptions = {
+  key: string;
+  label: string;
+};
+
+export const BUSINESS_TYPE_OPTIONS: TBusinessTypeOptions[] = [
+  {
+    key: 'company',
+    label: 'Công ty',
+  },
+  {
+    key: 'individualBusinessHouseholds',
+    label: 'Loại hình kinh doanh cá thể',
+  },
+];
+
+export const YES = 'yes';
+export const NO = 'no';
+export const REGISTERING = 'registering';
+
+export const BUSINESS_LICENSE_OPTIONS = [
+  {
+    id: 'businessLicense.yes',
+    key: YES,
+    hasImage: true,
+    label: 'Có',
+  },
+  {
+    id: 'businessLicense.registering',
+    key: REGISTERING,
+    label: 'Đang đăng ký',
+  },
+  {
+    id: 'businessLicense.no',
+    key: NO,
+    label: 'Chưa',
+  },
+];
+
+export const FOOD_CERTIFICATE_RADIO_OPTIONS = [
+  {
+    id: 'foodCertificate.yes',
+    key: YES,
+    hasImage: true,
+    label: 'Có',
+  },
+  {
+    id: 'foodCertificate.registering',
+    key: REGISTERING,
+    label: 'Đang đăng ký',
+  },
+  {
+    id: 'foodCertificate.no',
+    key: NO,
+    label: 'Chưa',
+  },
+];
+
+export const PARTY_INSURANCE_RADIO_OPTIONS = [
+  {
+    id: 'partyInsurance.yes',
+    key: YES,
+    hasImage: true,
+    label: 'Có',
+  },
+  {
+    id: 'partyInsurance.registering',
+    key: REGISTERING,
+    label: 'Đang đăng ký',
+  },
+  {
+    id: 'partyInsurance.no',
+    key: NO,
+    label: 'Chưa',
+  },
+];

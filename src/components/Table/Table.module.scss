@@ -11,18 +11,16 @@
       display: table;
     }
     thead {
-      background-color: $marketplaceColorLight;
       display: none;
       @include viewportLarge {
         display: table-header-group;
       }
       .headRow {
         .headCell {
-          padding: 10px;
+          padding: 5px 10px;
           text-align: left;
-          color: $neutralGray8;
-          background-color: $neutralGray3;
-          font-size: 14px;
+          color: $neutralGray7;
+          font-size: 12px;
         }
       }
     }
@@ -33,8 +31,7 @@
           display: none;
         }
         .formHeadCell {
-          padding: 10px;
-          margin-bottom: 10px;
+          padding: 0px 10px;
           text-align: center;
           color: $neutralGray8;
           background-color: $neutralGray3;
@@ -59,7 +56,6 @@
         display: block;
         width: 100%;
         margin-bottom: 40px;
-        box-shadow: $boxShadow;
         @include viewportLarge {
           display: table-row;
         }
@@ -74,6 +70,7 @@
           border-bottom: 1px solid $matterColorNegative;
           position: relative;
           font-size: 14px;
+
           span {
             word-break: break-all;
           }
@@ -96,4 +93,8 @@
       }
     }
   }
+}
+
+.isParent {
+  background-color: $neutralGray3;
 }

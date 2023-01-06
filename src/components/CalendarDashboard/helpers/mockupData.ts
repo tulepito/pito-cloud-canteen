@@ -517,7 +517,7 @@ export const MEAL_PLANS_MOCKUP = [
         id: '12',
         name: 'Vua Hải Sản',
       },
-      expiredTime: new Date(2022, 11, 29, 16, 0, 0),
+      expiredTime: new Date(2023, 11, 29, 16, 0, 0),
       meal: {
         dishes: [
           { key: 'mon_an_1', value: 'Mon an 1' },
@@ -527,7 +527,69 @@ export const MEAL_PLANS_MOCKUP = [
       },
     },
     title: 'PT3040',
-    start: new Date(2022, 11, 29, 16, 0, 0),
-    end: new Date(2022, 11, 29, 20, 0, 0),
+    start: new Date(2023, 0, 2, 16, 0, 0),
+    end: new Date(2023, 0, 2, 20, 0, 0),
+  },
+  {
+    resource: {
+      id: '1',
+      daySession: 'MORNING_SESSION',
+      suitableAmount: 10,
+      status: 'notJoined',
+      type: 'dailyMeal',
+      deliveryAddress: {
+        address: '133 Duong Ba Trac',
+        ward: '1',
+        district: '8',
+        city: 'Ho Chi Minh',
+        country: 'Vietnam',
+      },
+      restaurant: {
+        id: '12',
+        name: 'Vua Hải Sản',
+      },
+      expiredTime: new Date(2023, 11, 29, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
+    },
+    title: 'PT3040',
+    start: new Date(2023, 0, 3, 16, 0, 0),
+    end: new Date(2023, 0, 3, 20, 0, 0),
+  },
+  {
+    resource: {
+      id: '1',
+      daySession: 'MORNING_SESSION',
+      suitableAmount: 10,
+      status: 'notJoined',
+      type: 'dailyMeal',
+      deliveryAddress: {
+        address: '133 Duong Ba Trac',
+        ward: '1',
+        district: '8',
+        city: 'Ho Chi Minh',
+        country: 'Vietnam',
+      },
+      restaurant: {
+        id: '12',
+        name: 'Vua Hải Sản',
+      },
+      expiredTime: new Date(2023, 11, 29, 16, 0, 0),
+      meal: {
+        dishes: [
+          { key: 'mon_an_1', value: 'Mon an 1' },
+          { key: 'mon_an_2', value: 'Mon an 2' },
+          { key: 'mon_an_3', value: 'Mon an 3' },
+        ],
+      },
+    },
+    title: 'PT3040',
+    start: new Date(2023, 0, 4, 16, 0, 0),
+    end: new Date(2023, 0, 4, 20, 0, 0),
   },
 ];

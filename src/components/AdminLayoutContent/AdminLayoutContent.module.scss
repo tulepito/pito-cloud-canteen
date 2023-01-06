@@ -3,11 +3,9 @@
 
 .root {
   margin-top: $adminTopbarHeight;
-  background-color: $secondaryBlue1;
-  min-height: 100vh;
-  border-radius: 3px;
-  padding: 30px;
+  min-height: calc(100vh - $adminTopbarHeight);
   transition: all 0.5s;
+  margin-left: $adminSidebarLeftPartWidth;
   @include viewportLarge {
     margin-left: $adminSidebarWidth;
   }
@@ -16,10 +14,5 @@
 .container {
   background-color: $matterColorLight;
   border-radius: 6px;
-  box-shadow: $boxShadow;
-  padding: 10px 20px;
-
-  @include viewportMedium {
-    padding: 10px 50px;
-  }
+  padding: 19px 40px 40px 40px;
 }

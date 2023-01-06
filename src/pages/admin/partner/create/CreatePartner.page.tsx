@@ -1,32 +1,93 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
-  createPartnerPageThunks,
+  partnerThunks,
   removeAvatar,
-} from '@redux/slices/CreatePartnerPage.slice';
-import React from 'react';
+  removeCover,
+  resetInitialStates,
+} from '@redux/slices/partners.slice';
+import { isSignupEmailTakenError } from '@utils/errors';
+import { pickRenderableImages } from '@utils/images';
+import React, { useEffect } from 'react';
+import { useIntl } from 'react-intl';
 
-import EditPartnerBasicInfomationForm from '../components/EditPartnerBasicInfomationForm/EditPartnerBasicInfomationForm';
+import EditPartnerWizard from '../components/EditPartnerWizard/EditPartnerWizard';
 
 const CreatePartnerPage: React.FC<any> = () => {
-  const { uploadedAvatars, uploadAvatarError } = useAppSelector(
-    (state) => state.CreatePartnerPage,
-  );
+  const {
+    uploadedAvatars,
+    uploadAvatarError,
+    uploadedCovers,
+    uploadCoverError,
+    uploadedAvatarsOrder,
+    removedAvatarIds,
+    uploadedCoversOrder,
+    removedCoverIds,
+
+    createDraftPartnerInProgress,
+    createDraftPartnerError,
+  } = useAppSelector((state) => state.partners);
   const dispatch = useAppDispatch();
 
-  const onAvatarUpload = (e: any) => {
-    dispatch(createPartnerPageThunks.requestAvatarUpload(e));
+  const onAvatarUpload = (params: any) => {
+    return dispatch(partnerThunks.requestAvatarUpload(params));
   };
   const onRemoveAvatar = (id: any) => {
-    dispatch(removeAvatar(id));
+    return dispatch(removeAvatar(id));
   };
 
+  const onCoverUpload = (params: any) => {
+    return dispatch(partnerThunks.requestCoverUpload(params));
+  };
+
+  const onRemoveCover = (id: any) => {
+    return dispatch(removeCover(id));
+  };
+
+  const onCreateDraftPartner = (body: any) =>
+    dispatch(partnerThunks.createDraftPartner(body));
+
+  const intl = useIntl();
+
+  const formError = createDraftPartnerError
+    ? {
+        message: isSignupEmailTakenError(createDraftPartnerError)
+          ? intl.formatMessage({
+              id: 'CreateCompanyPage.createCompanyEmailAlreadyTaken',
+            })
+          : intl.formatMessage({
+              id: 'CreateCompanyPage.createCompanyFailed',
+            }),
+      }
+    : null;
+
+  useEffect(() => {
+    // should reset initial states
+    dispatch(resetInitialStates());
+  }, [dispatch]);
+
   return (
-    <EditPartnerBasicInfomationForm
-      onSubmit={() => {}}
-      images={uploadedAvatars}
+    <EditPartnerWizard
+      uploadedAvatars={pickRenderableImages(
+        {},
+        uploadedAvatars,
+        uploadedAvatarsOrder,
+        removedAvatarIds,
+      )}
+      uploadedCovers={pickRenderableImages(
+        {},
+        uploadedCovers,
+        uploadedCoversOrder,
+        removedCoverIds,
+      )}
       onAvatarUpload={onAvatarUpload}
+      onCoverUpload={onCoverUpload}
+      onRemoveCover={onRemoveCover}
       onRemoveAvatar={onRemoveAvatar}
-      uploadImageError={uploadAvatarError}
+      uploadAvatarError={uploadAvatarError}
+      uploadCoverError={uploadCoverError}
+      inProgress={createDraftPartnerInProgress}
+      formError={formError}
+      onCreateDraftPartner={onCreateDraftPartner}
     />
   );
 };

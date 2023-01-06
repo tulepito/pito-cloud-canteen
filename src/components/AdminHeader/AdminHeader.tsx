@@ -1,13 +1,17 @@
 // eslint-disable-next-line import/no-named-as-default
 import Avatar from '@components/Avatar/Avatar';
-import HamburgerMenuButton from '@components/HamburgerMenuButton/HamburgerMenuButton';
+import { InlineTextButton } from '@components/Button/Button';
+import IconArrow from '@components/IconArrow/IconArrow';
 import IconBell from '@components/IconBell/IconBell';
-import NamedLink from '@components/NamedLink/NamedLink';
+import PitoLogo from '@components/PitoLogo/PitoLogo';
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { authThunks } from '@redux/slices/auth.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 import css from './AdminHeader.module.scss';
@@ -16,28 +20,40 @@ type TAdminHeader = {
   onMenuClick: () => void;
 };
 
-const AdminHeader: React.FC<TAdminHeader> = (props) => {
-  const { onMenuClick } = props;
-  const { currentUser } = useAppSelector((state) => state.user);
+const AdminHeader: React.FC<TAdminHeader> = () => {
+  const currentUser = useAppSelector(currentUserSelector);
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+
+  const onLogout = async () => {
+    await dispatch(authThunks.logout());
+    router.push('/');
+  };
   return (
     <div className={css.root}>
       <div className={css.headerRight}>
-        <HamburgerMenuButton onClick={onMenuClick} />
+        <PitoLogo />
       </div>
       <div className={css.headerLeft}>
-        <IconBell className={css.iconBell} />
+        <InlineTextButton type="button">
+          <IconBell className={css.iconBell} />
+        </InlineTextButton>
+        <div className={css.line}></div>
         <ProfileMenu>
           <ProfileMenuLabel className={css.profileMenuWrapper}>
             <div className={css.avatar}>
               <Avatar disableProfileLink user={currentUser} />
             </div>
-            <p>{currentUser?.attributes?.profile?.displayName}</p>
+            <p className={css.displayName}>
+              {currentUser?.attributes?.profile?.displayName}
+            </p>
+            <IconArrow direction="down" />
           </ProfileMenuLabel>
           <ProfileMenuContent className={css.profileMenuContent}>
             <ProfileMenuItem key="AccountSettingsPage">
-              <NamedLink>
-                <p>Dang xuat</p>
-              </NamedLink>
+              <InlineTextButton type="button" onClick={onLogout}>
+                <p>Đăng xuất</p>
+              </InlineTextButton>
             </ProfileMenuItem>
           </ProfileMenuContent>
         </ProfileMenu>

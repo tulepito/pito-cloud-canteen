@@ -19,6 +19,8 @@ interface OrderInitialState {
 
   completeOrderInProgress: boolean;
   completeOrderError: any;
+  draftOrder: any;
+  selectedCompany: any;
 }
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -37,15 +39,30 @@ const initialState: OrderInitialState = {
 
   completeOrderInProgress: false,
   completeOrderError: null,
+  draftOrder: {},
+  selectedCompany: null,
 };
 
-const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
-  // call api to create order listing
-  // params: {companyId}
-  const { data: orderListing } = await createOrderApi(params);
-  // return order listing entity
-  return orderListing;
-});
+const createOrder = createAsyncThunk(
+  CREATE_ORDER,
+  async (staffName: string, { getState }) => {
+    const { draftOrder } = getState().Order;
+    const { clientId, orderDetail, ...rest } = draftOrder;
+    const apiBody = {
+      companyId: clientId,
+      generalInfo: {
+        ...rest,
+        staffName,
+      },
+      orderDetail,
+    };
+    const { data: orderListing } = await createOrderApi(apiBody);
+    await addMealPlanDetailApi({
+      orderId: orderListing.data.id.uuid,
+    });
+    return orderListing;
+  },
+);
 
 const addMealPlanDetail = createAsyncThunk(
   ADD_MEAL_PLAN_DETAIL,
@@ -97,7 +114,36 @@ export const OrderAsyncAction = {
 const orderSlice = createSlice({
   name: 'Order',
   initialState,
-  reducers: {},
+  reducers: {
+    addCompanyClient: (state, { payload }) => {
+      return {
+        ...state,
+        draftOrder: {
+          ...state.draftOrder,
+          clientId: payload.id,
+        },
+        selectedCompany: payload.company,
+      };
+    },
+    updateDraftMealPlan: (state, { payload }) => {
+      const { orderDetail, ...restPayload } = payload;
+      const { orderDetail: oldOrderDetail } = state.draftOrder;
+      const updatedOrderDetailData = { ...oldOrderDetail, ...orderDetail };
+
+      return {
+        ...state,
+        draftOrder: {
+          ...state.draftOrder,
+          ...restPayload,
+          orderDetail: updatedOrderDetailData,
+        },
+      };
+    },
+    removeDraftOrder: (state) => ({
+      ...state,
+      draftOrder: {},
+    }),
+  },
   extraReducers: (builder) => {
     builder
       .addCase(createOrder.pending, (state) => ({
@@ -162,5 +208,8 @@ const orderSlice = createSlice({
       }));
   },
 });
+
+export const { addCompanyClient, updateDraftMealPlan, removeDraftOrder } =
+  orderSlice.actions;
 
 export default orderSlice.reducer;

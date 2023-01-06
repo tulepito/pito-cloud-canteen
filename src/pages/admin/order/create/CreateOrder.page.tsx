@@ -1,10 +1,16 @@
-import ClientSelector from '@components/ClientSelector/ClientSelector';
+import { FormattedMessage } from 'react-intl';
+
+import CreateOrderWizard from './components/CreateOrderWizard/CreateOrderWizard';
+import css from './CreateOrder.module.scss';
 
 const CreateOrderPage = () => {
   return (
-    <div>
-      <ClientSelector />
-    </div>
+    <>
+      <h2 className={css.title}>
+        <FormattedMessage id="CreateOrderPage.title" />
+      </h2>
+      <CreateOrderWizard />
+    </>
   );
 };
 

@@ -11,7 +11,7 @@ import css from './Table.module.scss';
 export type TColumn = {
   key: string | number;
   label: string;
-  render: (data: any) => ReactNode;
+  render: (data: any, index?: number) => ReactNode;
   renderSearch?: () => ReactNode;
 };
 
@@ -43,12 +43,10 @@ type TTable = {
   showFilterFrom?: boolean;
 };
 
-const Table = (props: TTable) => {
+const Table = (props: any) => {
   const {
     columns = [],
     data = [],
-    rootClassName,
-    tableClassName,
     tableHeadClassName,
     tableHeadRowClassName,
     tableHeadCellClassName,
@@ -62,12 +60,97 @@ const Table = (props: TTable) => {
     pageSearchParams,
     pagination,
     isLoading,
-    onSubmit,
-    initialValues,
     showFilterFrom,
+    tableClassName,
   } = props;
-  const rootClasses = classNames(css.root, rootClassName);
+
   const tableClasses = classNames(css.table, tableClassName);
+
+  return (
+    <>
+      <table className={tableClasses}>
+        <thead className={tableHeadClassName}>
+          <tr className={classNames(tableHeadRowClassName, css.headRow)}>
+            {columns.map((col: TColumn) => (
+              <td
+                className={classNames(tableHeadCellClassName, css.headCell)}
+                key={col.key}>
+                {col.label}
+              </td>
+            ))}
+          </tr>
+        </thead>
+        {isLoading ? (
+          <tbody>
+            <tr>
+              <td>Loading...</td>
+            </tr>
+          </tbody>
+        ) : (
+          <tbody className={tableBodyClassName}>
+            {showFilterFrom && (
+              <>
+                <tr className={css.formHeadRow}>
+                  {columns.map(
+                    (col: TColumn) =>
+                      col.renderSearch && (
+                        <td key={col.key} className={css.formHeadCell}>
+                          {col.label}
+                        </td>
+                      ),
+                  )}
+                </tr>
+                <tr className={css.formRow}>
+                  {columns.map(
+                    (col: TColumn) =>
+                      col.renderSearch && (
+                        <td key={col.key} className={css.formCell}>
+                          {col.renderSearch()}
+                        </td>
+                      ),
+                  )}
+                </tr>
+              </>
+            )}
+
+            {data.map((row: TRowData) => (
+              <tr
+                className={classNames(tableBodyRowClassName, css.bodyRow)}
+                key={row.key}>
+                {columns.map((col: TColumn) => (
+                  <td
+                    className={classNames(
+                      tableBodyCellClassName,
+                      css.bodyCell,
+                      { [css.isParent]: row.data.isParent },
+                    )}
+                    data-label={col.label}
+                    key={col.key}>
+                    {col.render(row.data)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        )}
+      </table>
+      {pagination && pagination.totalPages > 1 && (
+        <PaginationLinks
+          className={paginationLinksClassName}
+          rootClassName={paginationLinksRootClassName}
+          path={paginationPath}
+          pagePathParams={pagePathParams}
+          pageSearchParams={pageSearchParams}
+          pagination={pagination}
+        />
+      )}
+    </>
+  );
+};
+
+export const TableForm = (props: TTable) => {
+  const { rootClassName, onSubmit, initialValues, ...rest } = props;
+  const rootClasses = classNames(css.root, rootClassName);
   return (
     <FinalForm
       onSubmit={onSubmit || (() => {})}
@@ -76,84 +159,7 @@ const Table = (props: TTable) => {
         const { handleSubmit } = fieldRenderProps;
         return (
           <Form onSubmit={handleSubmit} className={rootClasses}>
-            <table className={tableClasses}>
-              <thead className={tableHeadClassName}>
-                <tr className={classNames(tableHeadRowClassName, css.headRow)}>
-                  {columns.map((col: TColumn) => (
-                    <td
-                      className={classNames(
-                        tableHeadCellClassName,
-                        css.headCell,
-                      )}
-                      key={col.key}>
-                      {col.label}
-                    </td>
-                  ))}
-                </tr>
-              </thead>
-              {isLoading ? (
-                <tbody>
-                  <tr>
-                    <td>Loading...</td>
-                  </tr>
-                </tbody>
-              ) : (
-                <tbody className={tableBodyClassName}>
-                  {showFilterFrom && (
-                    <>
-                      <tr className={css.formHeadRow}>
-                        {columns.map(
-                          (col: TColumn) =>
-                            col.renderSearch && (
-                              <td key={col.key} className={css.formHeadCell}>
-                                {col.label}
-                              </td>
-                            ),
-                        )}
-                      </tr>
-                      <tr className={css.formRow}>
-                        {columns.map(
-                          (col: TColumn) =>
-                            col.renderSearch && (
-                              <td key={col.key} className={css.formCell}>
-                                {col.renderSearch()}
-                              </td>
-                            ),
-                        )}
-                      </tr>
-                    </>
-                  )}
-
-                  {data.map((row: TRowData) => (
-                    <tr
-                      className={classNames(tableBodyRowClassName, css.bodyRow)}
-                      key={row.key}>
-                      {columns.map((col: TColumn) => (
-                        <td
-                          className={classNames(
-                            tableBodyCellClassName,
-                            css.bodyCell,
-                          )}
-                          data-label={col.label}
-                          key={col.key}>
-                          {col.render(row.data)}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              )}
-            </table>
-            {pagination && pagination.totalPages > 1 && (
-              <PaginationLinks
-                className={paginationLinksClassName}
-                rootClassName={paginationLinksRootClassName}
-                path={paginationPath}
-                pagePathParams={pagePathParams}
-                pageSearchParams={pageSearchParams}
-                pagination={pagination}
-              />
-            )}
+            <Table {...rest} />
           </Form>
         );
       }}

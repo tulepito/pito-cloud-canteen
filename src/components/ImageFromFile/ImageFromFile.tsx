@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import css from './ImageFromFile.module.scss';
 
 type TImageFromFile = {
-  className: string;
+  className?: string;
   rootClassName: string;
   aspectRatioClassName?: string;
   file: File;
@@ -21,15 +21,16 @@ type TImageFromFile = {
 const readImage = (file: File) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = (e: any) => resolve(e.target.result);
-    reader.onerror = (e: any) => {
+    reader.onload = (e: ProgressEvent<FileReader>) =>
+      resolve(e?.target?.result);
+    reader.onerror = (e: ProgressEvent<FileReader>) => {
       // eslint-disable-next-line
       console.error(
         'Error (',
         e,
-        `) happened while reading ${file.name}: ${e.target.result}`,
+        `) happened while reading ${file.name}: ${e?.target?.result}`,
       );
-      reject(new Error(`Error reading ${file.name}: ${e.target.result}`));
+      reject(new Error(`Error reading ${file.name}: ${e?.target?.result}`));
     };
     reader.readAsDataURL(file);
   });
