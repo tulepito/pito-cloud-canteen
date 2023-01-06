@@ -181,10 +181,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               </div>
             </div>
             <div className={css.buttonContainer}>
-              <Button disabled>
-                {' '}
-                <FormattedMessage id="SetupOrderDetail.orderSettings" />
-              </Button>
               <Button disabled className={css.recommendNewRestaurantBtn}>
                 <IconRefreshing />
                 <FormattedMessage id="SetupOrderDetail.recommendNewRestaurant" />

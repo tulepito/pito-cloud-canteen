@@ -1,4 +1,5 @@
 import Form from '@components/Form/Form';
+import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { updateDraftMealPlan } from '@redux/slices/Order.slice';
 import { useMemo } from 'react';
@@ -13,7 +14,7 @@ import FoodPickingField from '../../create/components/FoodPickingField/FoodPicki
 import MealPlanDateField from '../../create/components/MealPlanDateField/MealPlanDateField';
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../../create/components/NavigateButtons/NavigateButtons';
-import OrderDealineField from '../../create/components/OrderDealineField/OrderDealineField';
+import OrderDeadlineField from '../../create/components/OrderDeadlineField/OrderDeadlineField';
 import ParticipantSetupField from '../../create/components/ParticipantSetupField/ParticipantSetupField';
 import PerPackageField from '../../create/components/PerPackageField/PerPackageField';
 import css from './MealPlanSetup.module.scss';
@@ -31,7 +32,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     draftOrder: {
       clientId,
       dayInWeek,
-      packagePerMember,
+      packagePerMember = '',
       vatAllow,
       pickAllow,
       selectedGroups,
@@ -58,7 +59,11 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   } = currentClient?.attributes.profile.publicData || {};
 
   const onSubmit = (values: any) => {
-    const { deliveryAddress: deliveryAddressValues, ...rest } = values;
+    const {
+      deliveryAddress: deliveryAddressValues,
+      packagePerMember: packagePerMemberValue,
+      ...rest
+    } = values;
     const {
       selectedPlace: { address: addressValue, origin: originValue },
     } = deliveryAddressValues;
@@ -67,6 +72,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         address: addressValue,
         origin: originValue,
       },
+      packagePerMember: +packagePerMemberValue.replace(/,/g, ''),
       ...rest,
     };
     dispatch(updateDraftMealPlan(createOrderValue));
@@ -75,7 +81,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   const initialValues = useMemo(
     () => ({
       dayInWeek: dayInWeek || [],
-      packagePerMember: packagePerMember || '',
+      packagePerMember: addCommas(packagePerMember?.toString()) || '',
       vatAllow: vatAllow || true,
       pickAllow: pickAllow || true,
       selectedGroups: selectedGroups || ['allMembers'],
@@ -142,8 +148,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
             <div className={css.fieldSection}>
               <FoodPickingField />
               <div className={css.verticalSpace}>
-                <OrderDealineField
-                  title={intl.formatMessage({ id: 'OrderDealineField.title' })}
+                <OrderDeadlineField
+                  title={intl.formatMessage({ id: 'OrderDeadlineField.title' })}
                   form={form}
                   values={values}
                 />

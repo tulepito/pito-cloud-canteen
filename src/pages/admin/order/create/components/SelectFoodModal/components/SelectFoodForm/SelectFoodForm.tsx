@@ -6,7 +6,7 @@ import EmptyIcon from '@components/Icons/EmptyIcon';
 import SearchIcon from '@components/Icons/SearchIcon';
 import arrayMutators from 'final-form-arrays';
 import type { ReactNode } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
@@ -17,6 +17,14 @@ import FieldFoodSelectAll from './components/FieldFoodSelectAll/FieldFoodSelectA
 import css from './SelectFoodForm.module.scss';
 
 const DELAY_UPDATE_TIME = 300;
+const DEBOUNCE_TIME = 300;
+
+const mapFoodOptionsFn = (item: any) => {
+  const { id, attributes } = item || {};
+  const { title, price } = attributes;
+
+  return { key: id?.uuid, value: id?.uuid, title, price: price || 0 };
+};
 
 export type TSelectFoodFormValues = {
   food: string[];
@@ -43,31 +51,81 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
     formId,
     handleSubmit,
     items = [],
-    values: { checkAll, food: foodIds = [] },
+    values: { food: selectedFoodIds = [] },
     form,
     handleFormChange,
   } = props;
+  const selectedFoodListLength = selectedFoodIds?.length;
   const intl = useIntl();
-  const submitDisable = foodIds?.length === 0;
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const [currentItems, setCurrentItems] = useState(items);
+  const submitDisable = selectedFoodIds?.length === 0;
+  let currDebounceRef = debounceRef.current;
 
-  const options = items.map((item) => {
-    const { id, attributes } = item || {};
-    const { title, price } = attributes;
+  const rootOptions = useMemo(() => items.map(mapFoodOptionsFn), [items]);
+  const rootFoodIds = useMemo(
+    () => rootOptions.map((item) => item.key),
+    [rootOptions],
+  );
+  const currentOptions = useMemo(
+    () => currentItems.map(mapFoodOptionsFn),
+    [currentItems],
+  );
+  const currentFoodIds = useMemo(
+    () => currentOptions.map((item) => item.key),
+    [currentOptions],
+  );
+  const shouldCheckAll = currentFoodIds.every((id) =>
+    selectedFoodIds.includes(id),
+  );
 
-    return { key: id?.uuid, value: id?.uuid, title, price: price || 0 };
-  });
-
-  const removeFood = (foodId: string) => () => {
-    const newFoodList = foodIds.filter((id) => id !== foodId);
+  const handleRemoveFood = (foodId: string) => () => {
+    const newFoodList = selectedFoodIds.filter((id) => id !== foodId);
 
     form.change('food', newFoodList);
   };
 
-  const selectedFoodList = foodIds
+  const selectedFoodList = selectedFoodIds
     .map((foodId) => {
-      return options.find((option) => foodId === option.key);
+      return rootOptions.find((option) => foodId === option.key);
     })
     .filter((item) => item);
+
+  const handleCheckAllFieldChange = (event: any) => {
+    let newFoodList: string[] = [];
+    const newCheckAllValue = event.target.checked;
+
+    form.change('checkAll', newCheckAllValue);
+
+    if (newCheckAllValue) {
+      newFoodList = rootFoodIds.reduce((result, id) => {
+        if (selectedFoodIds.includes(id) || currentFoodIds.includes(id)) {
+          return [...result, id];
+        }
+        return result;
+      }, []);
+    } else {
+      newFoodList = selectedFoodIds.filter(
+        (id) => !currentFoodIds.includes(id),
+      );
+    }
+
+    setTimeout(() => form.change('food', newFoodList), DELAY_UPDATE_TIME);
+  };
+
+  const handleSearchFoodWithDebounce = (foodName: string) => {
+    if (currDebounceRef) {
+      clearTimeout(currDebounceRef);
+    }
+
+    currDebounceRef = setTimeout(() => {
+      const newItems = items.filter((item) =>
+        item?.attributes?.title.includes(foodName),
+      );
+
+      setCurrentItems(newItems);
+    }, DEBOUNCE_TIME);
+  };
 
   const renderSelectedFoodList = () =>
     selectedFoodList.map((foodItem) => {
@@ -75,7 +133,7 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
 
       return (
         <div key={key} className={css.selectFoodItem}>
-          <div className={css.deleteIconBox} onClick={removeFood(key)}>
+          <div className={css.deleteIconBox} onClick={handleRemoveFood(key)}>
             <IconClose className={css.deleteIcon} />
           </div>
           <div className={css.titleContainer}>
@@ -87,26 +145,16 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
     });
 
   useEffect(() => {
-    if (foodIds?.length === 0) {
+    if (
+      currentOptions.length === 0 ||
+      selectedFoodListLength === 0 ||
+      !shouldCheckAll
+    ) {
       form.change('checkAll', false);
-    }
-  }, [foodIds?.length]);
-
-  useEffect(() => {
-    let timeoutFn: Function;
-
-    if (checkAll) {
-      timeoutFn = () =>
-        form.change(
-          'food',
-          options.map((o) => o.key),
-        );
     } else {
-      timeoutFn = () => form.change('food', []);
+      form.change('checkAll', true);
     }
-
-    setTimeout(() => timeoutFn(), DELAY_UPDATE_TIME);
-  }, [checkAll]);
+  }, [currentOptions.length, selectedFoodListLength, shouldCheckAll]);
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -120,23 +168,25 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
               id: 'SelectFoodForm.findFoodByName',
             })}
           />
+          <OnChange name="name">{handleSearchFoodWithDebounce}</OnChange>
         </div>
         <div className={css.contentContainer}>
           <div className={css.leftPart}>
             <div>
               <FieldFoodSelectAll
                 id={`${formId}.food.checkAll`}
+                customOnChange={handleCheckAllFieldChange}
                 name="checkAll"
               />
               <FieldFoodSelectCheckboxGroup
                 id="food"
                 name="food"
-                options={options}
+                options={currentOptions}
               />
             </div>
           </div>
           <div className={css.rightPart}>
-            {foodIds?.length === 0 ? (
+            {selectedFoodIds?.length === 0 ? (
               <div className={css.emptyIconContainer}>
                 <EmptyIcon />
               </div>
