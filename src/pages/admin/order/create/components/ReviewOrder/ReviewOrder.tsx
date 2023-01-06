@@ -20,7 +20,7 @@ import NavigateButtons from '../NavigateButtons/NavigateButtons';
 import css from './ReviewOrder.module.scss';
 
 const parseTimestaimpToFormat = (date: number) => {
-  return DateTime.fromMillis(date).toFormat('MM-dd-yyyy');
+  return DateTime.fromMillis(date).toFormat('dd-MM-yyyy');
 };
 
 const MENU_TABLE_COLUMN: TColumn[] = [

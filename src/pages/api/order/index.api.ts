@@ -26,7 +26,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const { deadlineDate, deadlineHour, ...rest } = generalInfo;
         const { selectedGroups } = rest;
         const adminAccount = await getAdminAccount();
-        const { currentOrderNumber } = adminAccount.attributes.profile.metadata;
+        const { currentOrderNumber = 0 } =
+          adminAccount.attributes.profile.metadata;
         await integrationSdk.users.updateProfile({
           id: ADMIN_ID,
           metadata: {
