@@ -17,7 +17,7 @@
   justify-content: space-between;
   width: 100%;
   @include textTemplate(14px, 700, 20px, '');
-  color: $matterColorDark;
+  color: $neutralGray6;
   margin-bottom: 4px;
 }
 
@@ -33,15 +33,15 @@
   margin-bottom: 12px;
 }
 
-.verticalDivider {
-  @include verticalDivider($neutralGray5, 1px, 12px);
-}
-
 .suitableAmount {
   @include textTemplate(12px, 400, 20px, '');
-  color: $neutralGray9;
+  color: $neutralGray5;
   margin-left: 4px;
   margin-right: 12px;
+}
+
+.verticalDivider {
+  @include verticalDivider($neutralGray4, 1px, 12px);
 }
 
 .searchIcon {
@@ -82,7 +82,7 @@
 
 .viewMenu {
   @include textTemplate(12px, 700, 20px, '');
-  color: $primaryPri5;
+  color: $primaryPri2;
   cursor: pointer;
 }
 
@@ -99,7 +99,7 @@
   background-color: $neutralGray1;
   border: 1px solid $neutralGray5;
   @include textTemplate(14px, 700, 20px, '');
-  color: $neutralGray10;
+  color: $neutralGray6;
   margin-bottom: 12px;
 
   &:hover {
@@ -109,13 +109,13 @@
   &:active,
   &:focus {
     background-color: $neutralGray1;
-    color: $neutralGray10;
+    color: $neutralGray6;
   }
 }
 
 .applyForOtherDays {
   @include textTemplate(12px, 700, 20px, '');
-  color: $neutralGray10;
+  color: $neutralGray6;
   text-align: center;
   cursor: pointer;
 }

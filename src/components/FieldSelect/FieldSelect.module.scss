@@ -6,13 +6,13 @@
 .labelRoot {
   font-size: 14px;
   line-height: 24px;
-  color: $neutralGray10;
+  color: $neutralGray6;
   margin-bottom: 8px;
   display: inline-block;
   display: flex;
 }
 .labelRequiredRedStar {
-  color: $failColor;
+  color: $sematicRed2;
   font-weight: $fontWeightBold;
   margin-left: 2px;
 }
@@ -28,7 +28,7 @@
   outline: none;
 
   &:hover {
-    border-color: $primaryPri5;
+    border-color: $primaryPri2;
     outline: none;
   }
 
@@ -37,7 +37,7 @@
   }
 }
 .selectedColor {
-  color: $neutralGray10;
+  color: $neutralGray6;
 }
 
 .selectSuccess {

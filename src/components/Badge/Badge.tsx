@@ -51,37 +51,19 @@ const Badge: React.FC<TBadge> = (props) => {
     label,
   } = props;
 
-  const badgeContainerClassName = classNames(css.root, {
-    ...(type === BadgeType.DEFAULT ? { [css.default]: true } : {}),
-    ...(type === BadgeType.PROCESSING ? { [css.processing]: true } : {}),
-    ...(type === BadgeType.ERROR ? { [css.error]: true } : {}),
-    ...(type === BadgeType.SUCCESS ? { [css.success]: true } : {}),
-    ...(type === BadgeType.WARNING ? { [css.warning]: true } : {}),
-  });
+  const classesFormType = {
+    [css.default]: type === BadgeType.DEFAULT,
+    [css.processing]: type === BadgeType.PROCESSING,
+    [css.error]: type === BadgeType.ERROR,
+    [css.success]: type === BadgeType.SUCCESS,
+    [css.warning]: type === BadgeType.WARNING,
+  };
 
-  const labelClasses = classNames(css.label, {
-    ...(type === BadgeType.DEFAULT ? { [css.default]: true } : {}),
-    ...(type === BadgeType.PROCESSING ? { [css.processing]: true } : {}),
-    ...(type === BadgeType.ERROR ? { [css.error]: true } : {}),
-    ...(type === BadgeType.SUCCESS ? { [css.success]: true } : {}),
-    ...(type === BadgeType.WARNING ? { [css.warning]: true } : {}),
-  });
+  const badgeContainerClassName = classNames(css.root, classesFormType);
+  const labelClasses = classNames(css.label, classesFormType);
+  const badgeCloseClasses = classNames(classesFormType);
+  const badgeDotClasses = classNames(css.badgeDot, classesFormType);
 
-  const badgeCloseClasses = classNames({
-    ...(type === BadgeType.DEFAULT ? { [css.default]: true } : {}),
-    ...(type === BadgeType.PROCESSING ? { [css.processing]: true } : {}),
-    ...(type === BadgeType.ERROR ? { [css.error]: true } : {}),
-    ...(type === BadgeType.SUCCESS ? { [css.success]: true } : {}),
-    ...(type === BadgeType.WARNING ? { [css.warning]: true } : {}),
-  });
-
-  const badgeDotClasses = classNames(css.badgeDot, {
-    ...(type === BadgeType.DEFAULT ? { [css.default]: true } : {}),
-    ...(type === BadgeType.PROCESSING ? { [css.processing]: true } : {}),
-    ...(type === BadgeType.ERROR ? { [css.error]: true } : {}),
-    ...(type === BadgeType.SUCCESS ? { [css.success]: true } : {}),
-    ...(type === BadgeType.WARNING ? { [css.warning]: true } : {}),
-  });
   return (
     <div className={badgeContainerClassName}>
       <div className={css.badgeContent}>

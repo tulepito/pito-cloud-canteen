@@ -1,4 +1,5 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
   position: relative;
@@ -14,27 +15,27 @@
   &:hover + label .box,
   &:focus + label .box,
   &:checked + label .box {
-    stroke: $neutralGray10;
+    stroke: $neutralGray6;
   }
 
-  /* successColor version */
+  /* sematicGreen2 version */
   &:hover + label .boxSuccess,
   &:focus + label .boxSuccess,
   &:checked + label .boxSuccess {
-    stroke: $neutralGray10;
+    stroke: $neutralGray6;
   }
 
   /* Display the "check" when checked */
   &:checked + label .checked {
     display: inline;
-    stroke: $neutralGray10;
+    stroke: $neutralGray6;
     stroke-width: 1px;
   }
 
   /* Display the "check" when checked */
   &:checked + label .checkedSuccess {
     display: inline;
-    stroke: $neutralGray10;
+    stroke: $neutralGray6;
     stroke-width: 1px;
   }
 
@@ -42,7 +43,7 @@
   &:focus + label .text,
   &:hover + label .text,
   &:checked + label .text {
-    color: $neutralGray10;
+    color: $neutralGray6;
   }
 }
 
@@ -66,22 +67,22 @@
 
 .checked {
   display: none;
-  fill: $neutralGray10;
+  fill: $neutralGray6;
 }
 .checkedSuccess {
   display: none;
-  fill: $neutralGray10;
+  fill: $neutralGray6;
 }
 
 .boxSuccess,
 .box {
-  stroke: $neutralGray10;
+  stroke: $neutralGray6;
 }
 
 .text {
 }
 .textRoot {
-  color: var(--matterColor);
+  color: $neutralGray6;
   margin-top: -1px;
   margin-bottom: 1px;
   cursor: pointer;

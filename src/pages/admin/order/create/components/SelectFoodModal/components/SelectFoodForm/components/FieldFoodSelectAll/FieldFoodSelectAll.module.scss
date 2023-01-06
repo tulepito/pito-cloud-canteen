@@ -24,27 +24,27 @@
     }
 
     &:checked + label .box {
-      stroke: $neutralGray10;
+      stroke: $neutralGray6;
     }
 
-    /* successColor version */
+    /* sematicGreen2 version */
     &:hover + label .boxSuccess,
     &:focus + label .boxSuccess,
     &:checked + label .boxSuccess {
-      stroke: $neutralGray10;
+      stroke: $neutralGray6;
     }
 
     /* Display the "check" when checked */
     &:checked + label .checked {
       display: inline;
-      stroke: $neutralGray10;
+      stroke: $neutralGray6;
       stroke-width: 1px;
     }
 
     /* Display the "check" when checked */
     &:checked + label .checkedSuccess {
       display: inline;
-      stroke: $neutralGray10;
+      stroke: $neutralGray6;
       stroke-width: 1px;
     }
   }
@@ -68,11 +68,11 @@
 
   .checked {
     display: none;
-    fill: $neutralGray10;
+    fill: $neutralGray6;
   }
   .checkedSuccess {
     display: none;
-    fill: $neutralGray10;
+    fill: $neutralGray6;
   }
 
   .boxSuccess,

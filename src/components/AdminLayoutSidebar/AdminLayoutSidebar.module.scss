@@ -4,7 +4,7 @@
 .root {
   flex: 1;
   z-index: $adminSidebarzIndex;
-  background-color: $matterColorLight;
+  background-color: $neutralGray1;
   position: fixed;
   transition: all 0.5s;
   top: $adminTopbarHeight;

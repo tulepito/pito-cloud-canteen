@@ -1,143 +1,53 @@
-$marketplaceColor: #c0392b;
-$marketplaceColorLight: #ff4c38;
-$marketplaceColorDark: #8c291e;
-// Primary
+/* =============== Primary =============== */
+
 $primaryPri1: #ffecea;
 $primaryPri2: #ef3d2a;
-$primaryPri3: #ff968b;
-$primaryPri4: #ff7f72;
-$primaryPri5: #ef3d2a;
-$primaryPri6: #ab1a0b;
-$primaryPri7: #890e01;
-$primaryPri8: #890e01;
-$primaryPri9: #670a00;
-$primaryPri10: #450700;
-// Neutral
+$buttonCTAHoverColor: #ff9f95;
+
+/* =============== Neutral =============== */
+
 $neutralGray1: #ffffff;
 $neutralGray2: #fafafa;
 $neutralGray3: #f0f0f0;
 $neutralGray4: #d9d9d9;
 $neutralGray5: #8c8c8c;
 $neutralGray6: #262626;
-$neutralGray7: #8c8c8c;
-$neutralGray8: #595959;
-$neutralGray9: #434343;
-$neutralGray10: #262626;
-$neutralGray11: #d9d9d9;
 
-// Success
-$successScreen1: #f6ffed;
-$successScreen2: #d9f7be;
-$successScreen3: #b7eb8f;
-$successScreen4: #95de64;
-$successScreen5: #73d13d;
-$successScreen6: #52c41a;
-$successScreen7: #389e0d;
-$successScreen8: #237804;
-$successScreen9: #135200;
-$successScreen10: #092b00;
-// Green
-$green1: #f0ffe0;
-$green2: #027a48;
+/* =============== Sematic =============== */
 
-// Warning
-$warningOrange1: #fff7e6;
-$warningOrange2: #ffe7ba;
-$warningOrange3: #ffd591;
-$warningOrange4: #ffc069;
-$warningOrange5: #ffa940;
-$warningOrange6: #fa8c16;
-$warningOrange7: #d46b08;
-$warningOrange8: #ad4e00;
-$warningOrange9: #873800;
-$warningOrange10: #612500;
-// Orange
-$orange1: #fff4db;
-$orange2: #d46b08;
+$sematicRed1: #fff1f0;
+$sematicRed2: #cf1322;
+$sematicGreen1: #f0ffe0;
+$sematicGreen2: #027a48;
 
-// Error
-$errorRed1: #fff1f0;
-$errorRed2: #ffccc7;
-$errorRed3: #ffa39e;
-$errorRed4: #ff7875;
-$errorRed5: #ff4d4f;
-$errorRed6: #f5222d;
-$errorRed7: #cf1322;
-$errorRed8: #a8071a;
-$errorRed9: #820014;
-$errorRed10: #5c0011;
-// Red
-$red1: #fff1f0;
-$red2: #cf1322;
+/* =============== Label =============== */
 
-// Secondary
-$secondaryBlue1: #f0f5ff;
-$secondaryBlue2: #d6e4ff;
-$secondaryBlue3: #adc6ff;
-$secondaryBlue4: #85a5ff;
-$secondaryBlue5: #597ef7;
-$secondaryBlue6: #2f54eb;
-$secondaryBlue7: #1d39c4;
-$secondaryBlue8: #10239e;
-$secondaryBlue9: #061178;
-$secondaryBlue10: #030852;
+$labelBlue1: #f0f5ff;
+$labelBlue2: #2f54eb;
+$labelOrange1: #fff4db;
+$labelOrange2: #d46b08;
 
-$secondaryYellow1: #feffe6;
-$secondaryYellow2: #ffffb8;
-$secondaryYellow3: #fffb8f;
-$secondaryYellow4: #fff566;
-$secondaryYellow5: #ffec3d;
-$secondaryYellow6: #fadb14;
-$secondaryYellow7: #d4b106;
-$secondaryYellow8: #ad8b00;
-$secondaryYellow9: #876800;
-$secondaryYellow10: #614700;
-// Label
-$labelLightBlue: #f0f9ff;
-$labelBlue: #026aa2;
-$labelLightGreen: #ecfdf3;
-$labelGreen: #027a48;
-$labelLightPurple: #f9f5ff;
-$labelPurple: #5925dc;
-$labelLightOrange: #fffaeb;
-$labelOrange: #b54708;
+/* ===============  =============== */
 
-$successColor: #2ecc71;
-$successColorDark: #239954;
-$successColorLight: #f0fff6;
-$failColor: #ff0000;
-$failColorLight: #fff0f0;
-$attentionColor: #ffaa00;
-$attentionColorLight: #fff7f0;
-$bannedColorLight: $marketplaceColorLight;
-$bannedColorDark: $marketplaceColor;
+$bannedColorLight: $primaryPri2;
+$bannedColorDark: $primaryPri2;
 
-$matterColorDark: #000000;
-$matterColor: #4a4a4a;
-$matterColorAnti: #b2b2b2;
 $matterColorNegative: #e7e7e7;
 $matterColorBright: #fcfcfc;
-$matterColorLight: #ffffff;
-$matterGrey8f: #8f8f8f;
-$matterGreyd9: #d9d9d9;
 
-$facebookBackground: #39579a;
 $googleBackground: #dc4e41;
-$neutralGray2: #fafafa;
-$neutralGray3: #f5f5f5;
-$neutralGray4: #f0f0f0;
 
-$textGray: #3d3d3d;
+/* =============== Form & field =============== */
 
-// Form colors
 $formFieldBorderColor: #dee2e6;
 $formFieldBorderColorFocus: #5e72e4;
 $formFieldColor: #242424;
 $formFieldPlaceholderColor: #adb5bd;
-$formLabelColor: #616162;
-$matterColorLightTransparent: rgba(35, 28, 28, 0.65);
+$formLabelColor: $neutralGray6;
+$fieldTextAreaMinHeight: 158px;
 
-/* ================ Font ================ */
+/* =============== Font =============== */
+
 $fontFamily: 'poppins', Helvetica, Arial, sans-serif;
 
 $fontWeightRegular: 400;
@@ -146,19 +56,20 @@ $fontWeightBold: 700;
 
 $fontWeightHighlightEmail: $fontWeightBold;
 
-/* ================ Box shadow ================*/
+/* =============== Box shadow =============== */
+
 $boxShadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
 $boxShadowPopup: 0 8px 16px 0 rgba(0, 0, 0, 0.3);
 $shadowInput: 0 3px 2px rgb(233 236 239 / 5%);
 $boxShadowInputFocus: 0 3px 9px rgb(50 50 9 / 0%),
   3px 4px 8px rgb(94 114 228 / 10%);
 
-/* ================ Z-index base levels ================ */
+/* =============== Z-index base levels =============== */
 
 $zIndexPopup: 50;
 $zIndexModal: 100;
 
-/* ================ Transition styles ================ */
+/* =============== Transition styles =============== */
 
 $transitionStyle: ease-in 0.2s;
 $transitionStyleButton: ease-in-out 0.1s;

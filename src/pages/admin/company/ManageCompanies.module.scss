@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   .addIcon {
-    fill: $matterColorLight;
+    fill: $neutralGray1;
   }
 }
 .active,
@@ -29,25 +29,25 @@
 }
 
 .active {
-  color: $matterColorLight;
+  color: $neutralGray1;
   padding: 10px;
   text-align: center;
   display: inline;
   border-radius: 5px;
-  background-color: $successColor;
+  background-color: $sematicGreen2;
 }
 
 .inActive {
-  color: $matterColorLight;
+  color: $neutralGray1;
   padding: 10px;
   display: inline;
   text-align: center;
   border-radius: 5px;
-  background-color: $marketplaceColor;
+  background-color: $primaryPri2;
 }
 
 .spinner {
-  stroke: $marketplaceColorLight;
+  stroke: $primaryPri2;
 }
 
 .tableActions {
@@ -110,6 +110,6 @@
   width: 100%;
   svg {
     width: 20px;
-    fill: $matterColorLight;
+    fill: $neutralGray1;
   }
 }

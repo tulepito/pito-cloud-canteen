@@ -2,49 +2,46 @@
 @use '/src/styles/mixins.scss' as *;
 
 .root {
-  margin-left: -8px;
-}
+  .addMore {
+    width: 100%;
+    height: 36px;
+    min-height: 36px;
+    padding: 6px;
+    margin-bottom: 12px;
+    text-align: center;
+    @include textTemplate(14px, 700, 20px, '');
+    border-radius: 8px;
+    background-color: $neutralGray1;
+    border: 1px solid $neutralGray4;
+    color: $neutralGray6;
 
-.addMore {
-  width: 100%;
-  height: 36px;
-  min-height: 36px;
-  padding: 6px;
-  text-align: center;
-  border-radius: 0 8px 8px 0;
-  background-color: $neutralGray1;
-  border: 1px solid $neutralGray5;
-  border-left: none;
-  @include textTemplate(14px, 700, 20px, '');
-  color: $neutralGray7;
-  margin-bottom: 12px;
+    &:hover {
+      background-color: $neutralGray1;
+      color: $neutralGray6;
+      border-color: $neutralGray6;
 
-  &:hover {
-    background-color: $neutralGray5;
+      path {
+        fill: $neutralGray6;
+      }
+    }
 
-    color: $matterColorBright;
+    &:active,
+    &:focus {
+      background-color: $neutralGray1;
+      color: $neutralGray6;
+    }
 
-    path {
-      fill: $matterColorBright;
+    .plusIcon {
+      margin-right: 10px;
+      & path {
+        fill: $neutralGray6;
+      }
     }
   }
 
-  &:active,
-  &:focus {
-    background-color: $neutralGray1;
-    color: $neutralGray7;
+  .haveNoMeal {
+    color: $neutralGray5;
+    @include textTemplate(12px, 400, 16px, '');
+    text-align: center;
   }
-}
-
-.plusIcon {
-  margin-right: 10px;
-  & path {
-    fill: $neutralGray7;
-  }
-}
-
-.haveNoMeal {
-  color: $neutralGray9;
-  @include textTemplate(12px, 400, 16px, '');
-  text-align: center;
 }

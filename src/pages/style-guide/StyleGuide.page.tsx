@@ -342,18 +342,59 @@ const StyleGuidePage = (props: any) => {
       </StyleGuideCard>
       <StyleGuideCard>
         <p className={css.title}>Button component</p>
+        <div>Primary</div>
         <Button
-          type="submit"
+          type="button"
           fullWidth
           inProgress={true}
           style={{ margin: '8px 0' }}>
           Loading button
         </Button>
-        <Button type="submit" fullWidth style={{ margin: '8px 0' }}>
+        <Button type="button" fullWidth style={{ margin: '8px 0' }}>
           Submit
         </Button>
-        <Button type="submit" fullWidth disabled>
+        <Button type="button" fullWidth disabled>
           Submit
+        </Button>
+
+        <div>Secondary</div>
+        <Button
+          variant="secondary"
+          type="button"
+          fullWidth
+          inProgress={true}
+          style={{ margin: '8px 0' }}>
+          Loading button
+        </Button>
+        <Button
+          variant="secondary"
+          type="button"
+          fullWidth
+          style={{ margin: '8px 0' }}>
+          Submit
+        </Button>
+        <Button variant="secondary" type="button" fullWidth disabled>
+          Submit
+        </Button>
+
+        <div>CTA</div>
+        <Button
+          variant="cta"
+          type="button"
+          fullWidth
+          inProgress={true}
+          style={{ margin: '8px 0' }}>
+          Loading button
+        </Button>
+        <Button
+          variant="cta"
+          type="button"
+          fullWidth
+          style={{ margin: '8px 0' }}>
+          Submit
+        </Button>
+        <Button variant="cta" type="button" fullWidth disabled>
+          CTA
         </Button>
       </StyleGuideCard>
 

@@ -11,7 +11,7 @@
       display: table;
     }
     thead {
-      background-color: $marketplaceColorLight;
+      background-color: $primaryPri2;
       display: none;
       @include viewportLarge {
         display: table-header-group;
@@ -20,7 +20,7 @@
         .headCell {
           padding: 10px;
           text-align: left;
-          color: $neutralGray8;
+          color: $neutralGray5;
           background-color: $neutralGray3;
           font-size: 14px;
         }
@@ -36,7 +36,7 @@
           padding: 10px;
           margin-bottom: 10px;
           text-align: center;
-          color: $neutralGray8;
+          color: $neutralGray5;
           background-color: $neutralGray3;
           font-size: 14px;
         }
@@ -71,7 +71,7 @@
           text-align: right;
           padding: 10px;
           color: #616161;
-          border-bottom: 1px solid $matterColorNegative;
+          border-bottom: 1px solid $neutralGray1;
           position: relative;
           font-size: 14px;
 

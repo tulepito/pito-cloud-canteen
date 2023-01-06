@@ -27,19 +27,19 @@
   flex-basis: calc(100% / 7);
   padding: 4px 8px;
   @include textTemplate(12px, 600, 20px, '');
-  color: $neutralGray9;
+  color: $neutralGray6;
   text-align: center;
-  border-top: 1px solid $neutralGray5;
-  border-bottom: 1px solid $neutralGray5;
-  border-right: 1px solid $neutralGray5;
+  border-top: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray4;
+  border-right: 1px solid $neutralGray4;
 
   &:first-child {
-    border-left: 1px solid $neutralGray5;
+    border-left: 1px solid $neutralGray4;
   }
 }
 
 .activeDayHeader {
   background-color: $primaryPri1;
-  border-bottom: 1px solid $primaryPri3;
-  color: $primaryPri5;
+  border-bottom: 1px solid $primaryPri2;
+  color: $neutralGray6;
 }

@@ -4,7 +4,7 @@
 .root {
   display: flex;
   height: 100vh;
-  background-color: $matterColorLight;
+  background-color: $neutralGray1;
   &::after {
     content: '';
     position: fixed;
@@ -50,9 +50,9 @@
       justify-content: center;
       &.active {
         border-radius: 8px;
-        background-color: $matterColorLight;
+        background-color: $neutralGray1;
         .sidebarIcon {
-          fill: $marketplaceColorLight;
+          fill: $primaryPri2;
         }
       }
 
@@ -67,7 +67,7 @@
     padding: 32px 16px 0 16px;
     width: 220px;
     position: absolute;
-    background-color: $matterColorLight;
+    background-color: $neutralGray1;
     border-right: 1px solid #d9d9d9;
     left: -$adminSidebarRightPartWidth;
     transition: left 0.3s ease-in;

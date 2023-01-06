@@ -5,17 +5,17 @@
 }
 
 .dayButton {
-  border: 1px solid $matterGreyd9;
+  border: 1px solid $neutralGray4;
   padding: 7px 16px;
   margin-right: 4px;
   font-size: 15px;
-  color: $matterGrey8f;
+  color: $neutralGray5;
   border-radius: 20px;
   cursor: pointer;
   &.active {
-    border: 2px solid $matterColorDark;
+    border: 2px solid $neutralGray6;
     font-weight: $fontWeightBold;
-    color: $matterColorDark;
+    color: $neutralGray6;
   }
   * {
     cursor: pointer;

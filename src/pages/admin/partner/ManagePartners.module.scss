@@ -29,18 +29,18 @@
 }
 
 .unsatisfactoryBox {
-  background-color: $secondaryBlue1;
-  color: $secondaryBlue6;
+  background-color: $labelBlue1;
+  color: $labelBlue2;
 }
 
 .newBox {
-  background-color: $warningOrange1;
-  color: $warningOrange5;
+  background-color: $labelOrange1;
+  color: $labelOrange2;
 }
 
 .authorizedBox {
-  background-color: $successScreen3;
-  color: $successScreen8;
+  background-color: $sematicGreen1;
+  color: $sematicGreen2;
 }
 
 .rowId {
@@ -74,19 +74,19 @@
 .actionBtn {
   min-height: unset;
   font-size: 12px;
-  color: $warningOrange8;
+  color: $labelOrange2;
   margin: 0 0 10px 0;
 
   @include viewportLarge {
     margin: 0;
   }
   &:hover {
-    color: $matterColorDark;
+    color: $neutralGray6;
   }
 }
 
 .loadingIcon {
-  stroke: $matterColor;
+  stroke: $neutralGray5;
 }
 
 .filterWrapper {
@@ -112,7 +112,7 @@
   display: flex;
   align-items: center;
   .addIcon {
-    fill: $matterColorLight;
+    fill: $neutralGray1;
   }
 }
 
@@ -123,8 +123,8 @@
 .draftBox {
   padding: 3px 5px;
   display: inline-flex;
-  background-color: $warningOrange1;
-  color: $warningOrange6;
+  background-color: $labelOrange1;
+  color: $labelOrange2;
   font-size: 12px;
   border-radius: 4px;
   margin-left: 5px;

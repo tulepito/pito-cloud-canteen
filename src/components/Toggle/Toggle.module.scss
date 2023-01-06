@@ -38,7 +38,7 @@
     display: none;
 
     &:checked + .switch {
-      background-color: $primaryPri5;
+      background-color: $primaryPri2;
     }
 
     &:checked + .switch::after {
@@ -47,7 +47,7 @@
     }
 
     &:checked + .disabled {
-      background: $primaryPri4;
+      background: $primaryPri2;
       cursor: not-allowed;
     }
 
@@ -61,6 +61,6 @@
     font-size: 14px;
     font-weight: $fontWeightMedium;
     line-height: 24px;
-    color: $neutralGray10;
+    color: $neutralGray6;
   }
 }

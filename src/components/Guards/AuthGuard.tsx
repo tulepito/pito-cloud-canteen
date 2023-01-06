@@ -30,6 +30,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
 
   const isNonRequireAuthenticationRoute =
     NonRequireAuthenticationRoutes.includes(pathName);
+
   const isIgnoredAuthCheckRoute = IgnoredAuthCheckRoutes.includes(pathName);
 
   // TODO: check sign up path and consider showing verification email form or not
@@ -65,7 +66,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   ]);
 
   const renderComponent = () => {
-    if (!isIgnoredAuthCheckRoute) {
+    if (isIgnoredAuthCheckRoute) {
       return children;
     }
 

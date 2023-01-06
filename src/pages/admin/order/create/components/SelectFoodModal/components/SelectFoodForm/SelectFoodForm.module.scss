@@ -43,13 +43,13 @@
 
     .partTitle {
       @include textTemplate(16px, 700, 24px, '');
-      color: $neutralGray9;
+      color: $neutralGray5;
     }
 
     .divider {
       height: 1px;
       width: 37px;
-      background-color: $red2;
+      background-color: $primaryPri2;
       margin-top: 8px;
     }
 

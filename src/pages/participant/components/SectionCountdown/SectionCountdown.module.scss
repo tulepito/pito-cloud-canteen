@@ -9,7 +9,7 @@
 
   .title {
     @include textTemplate(18px, 700, 24px, '');
-    color: $neutralGray10;
+    color: $neutralGray6;
     position: relative;
     margin: 0 0 25px;
 
@@ -21,18 +21,18 @@
       left: 0;
       width: 37px;
       height: 1px;
-      background: $primaryPri5;
+      background: $primaryPri2;
     }
   }
 
   .orderEndAtMessage {
-    color: $neutralGray10;
+    color: $neutralGray6;
     margin: 16px 0 16px;
     padding-bottom: 16px;
     border-bottom: 1px solid $neutralGray5;
     @include textTemplate(14px, 400, 24px, '');
     .orderEndAtLabel {
-      color: $neutralGray7;
+      color: $neutralGray5;
     }
   }
 }

@@ -43,7 +43,7 @@
 
 .activeHeader {
   background-color: $primaryPri1;
-  border-bottom: 1px solid $primaryPri3;
+  border-bottom: 1px solid $primaryPri2;
 }
 
 .dateNumber {
@@ -56,7 +56,7 @@
 
 .activeHeader .dateNumber,
 .activeHeader .dayText {
-  color: $primaryPri5;
+  color: $primaryPri2;
 }
 
 .dayContent {
@@ -81,7 +81,7 @@
   width: 36px;
   height: 32px;
   border-radius: 20px;
-  background-color: $primaryPri5;
+  background-color: $primaryPri2;
   color: $neutralGray1;
   margin-left: auto;
   display: flex;

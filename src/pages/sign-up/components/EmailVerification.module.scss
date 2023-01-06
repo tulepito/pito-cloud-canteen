@@ -24,7 +24,7 @@
 }
 
 .name {
-  color: $secondaryBlue7;
+  color: $labelBlue2;
 }
 
 .bottomWrapper {
@@ -58,17 +58,17 @@
 }
 
 .resendEmailLink {
-  color: $secondaryBlue6;
+  color: $labelBlue2;
   font-weight: $fontWeightBold;
   cursor: pointer;
 }
 
 .toHomePageLink {
-  columns: $labelBlue;
+  color: $labelBlue2;
   font-weight: $fontWeightBold;
   cursor: pointer;
 }
 
 .error {
-  color: $errorRed7;
+  color: $sematicRed2;
 }

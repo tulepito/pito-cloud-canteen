@@ -20,7 +20,7 @@
   display: flex;
   width: 100%;
   height: auto;
-  border: 1px dashed $matterColor;
+  border: 1px dashed $neutralGray5;
   align-items: center;
   justify-content: center;
   border-radius: 16px;
@@ -28,7 +28,7 @@
 }
 
 .error {
-  border-color: $failColor;
+  border-color: $sematicRed2;
   border-width: 2px;
 }
 
@@ -52,7 +52,7 @@
   height: 100%;
   margin: 0;
   overflow: hidden;
-  background-color: $matterColor; /* Loading BG color */
+  background-color: $neutralGray5; /* Loading BG color */
 }
 
 .iconUpload {

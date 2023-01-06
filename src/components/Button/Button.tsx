@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import css from './Button.module.scss';
 
 type TButtonSize = 'large' | 'medium' | 'small';
+type TButtonVariant = 'primary' | 'secondary' | 'cta';
 
 type TButtonProps = PropsWithChildren<{
   rootClassName?: string;
@@ -17,6 +18,7 @@ type TButtonProps = PropsWithChildren<{
   disabled?: boolean;
   checkmarkClassName?: string;
   size?: TButtonSize;
+  variant?: TButtonVariant;
   fullWidth?: boolean;
 }> &
   React.ComponentProps<'button'>;
@@ -47,6 +49,7 @@ const Button: React.FC<TButtonProps> = (props) => {
     checkmarkClassName,
     size = 'large',
     fullWidth = false,
+    variant = 'primary',
     ...rest
   } = props;
 
@@ -64,11 +67,15 @@ const Button: React.FC<TButtonProps> = (props) => {
   } else {
     content = children;
   }
-  const buttonSizeClassName = getButtonSizeClassName(size);
+  const buttonSizeClasses = getButtonSizeClassName(size);
   const classes = classNames(
     rootClassName || css.root,
     className,
-    buttonSizeClassName,
+    buttonSizeClasses,
+    {
+      [css.secondaryStyle]: variant === 'secondary',
+      [css.CTAStyle]: variant === 'cta',
+    },
     {
       [css.ready]: ready,
       [css.inProgress]: inProgress,
@@ -98,6 +105,7 @@ export const InlineTextButton: React.FC<TButtonProps> = (props) => {
 
   return <Button {...rest} type={type} rootClassName={classes} />;
 };
+
 InlineTextButton.displayName = 'InlineTextButton';
 
 export default Button;

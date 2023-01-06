@@ -18,11 +18,11 @@
       height: 0;
 
       &:checked + .slider {
-        background-color: $marketplaceColor;
+        background-color: $primaryPri2;
       }
 
       &:focus + .slider {
-        box-shadow: 0 0 1px $marketplaceColor;
+        box-shadow: 0 0 1px $primaryPri2;
       }
 
       &:checked + .slider:before {
@@ -53,7 +53,7 @@
     width: 16px;
     left: 4px;
     bottom: 4px;
-    background-color: $matterColorLight;
+    background-color: $neutralGray1;
     -webkit-transition: 0.4s;
     transition: 0.4s;
     border-radius: 50%;

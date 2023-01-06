@@ -1,0 +1,120 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+@mixin inputStyles {
+  background: transparent;
+  display: block;
+  width: auto;
+
+  color: $neutralGray6;
+  background-color: $neutralGray1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  @include textTemplate(16px, 400, 1.5, '');
+  background-clip: padding-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+  -webkit-transition: border-color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out;
+  outline: 1px solid $neutralGray4;
+  outline-offset: -1px;
+
+  &::placeholder {
+    color: $neutralGray4;
+    transition: color 0.15s ease-in-out;
+    -webkit-transition: color 0.15s ease-in-out;
+  }
+  &:hover {
+    background-color: $neutralGray2;
+
+    &::placeholder {
+      color: $neutralGray5;
+    }
+  }
+  &:focus {
+    outline-color: $neutralGray6;
+    outline-width: 2px;
+    outline-offset: -2px;
+  }
+  &:disabled {
+    background-color: $neutralGray3;
+    cursor: not-allowed;
+
+    &::placeholder {
+      color: $neutralGray4;
+    }
+  }
+
+  &.inputFullWidth {
+    width: 100%;
+  }
+  &.inputError {
+    outline: 1px solid $primaryPri2;
+    outline-offset: -1px;
+  }
+  &.inputWithPaddingLeft {
+    padding-left: 40px;
+  }
+  &.inputWithPaddingRight {
+    padding-right: 40px;
+  }
+}
+
+@mixin inputIconContainerStyles {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  @include flexCenter;
+}
+
+@mixin inputContainerStyles {
+  position: relative;
+
+  .input {
+    @include inputStyles;
+  }
+
+  textarea.input {
+    min-height: $fieldTextAreaMinHeight;
+  }
+
+  .leftIconContainer {
+    @include inputIconContainerStyles;
+
+    .leftIcon {
+      & path {
+        fill: $neutralGray6;
+      }
+    }
+  }
+  .rightIconContainer {
+    @include inputIconContainerStyles;
+    left: unset;
+    right: 8px;
+    cursor: pointer;
+    user-select: none;
+
+    .rightIcon {
+      & path {
+        fill: $neutralGray6;
+      }
+    }
+  }
+}
+
+@mixin inputLabelStyles {
+  @include textTemplate(14px, 400, 24px, '');
+  color: $neutralGray6;
+  margin-bottom: 8px;
+  display: inline-flex;
+
+  &.labelRequiredRedStar {
+    color: $sematicRed2;
+    font-weight: $fontWeightBold;
+  }
+}

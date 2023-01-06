@@ -3,7 +3,7 @@
 .root {
   flex: 1;
   min-height: 100vh;
-  background-color: $matterColorLight;
+  background-color: $neutralGray1;
   min-width: 100%;
   padding: 10px;
 
@@ -19,14 +19,14 @@
         background-color: $primaryPri1;
         border-radius: 9px;
         .label {
-          color: $primaryPri5 !important;
+          color: $primaryPri2 !important;
           font-weight: $fontWeightBold;
         }
         .entityIcon {
-          fill: $primaryPri5;
+          fill: $primaryPri2;
         }
         .menuArrowIcon {
-          fill: $primaryPri5;
+          fill: $primaryPri2;
         }
       }
       .subMenuItem {
@@ -37,10 +37,10 @@
         .label {
           font-size: 14px;
           font-weight: $fontWeightMedium;
-          color: $matterColor;
+          color: $neutralGray5;
           padding-bottom: 3px;
           &.active {
-            color: $primaryPri5;
+            color: $primaryPri2;
             font-weight: $fontWeightBold;
           }
         }

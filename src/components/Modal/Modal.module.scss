@@ -19,7 +19,7 @@
 
     /* Add default background color to avoid bouncing scroll showing the
    page contents from behind the modal. */
-    background-color: $matterColorLight;
+    background-color: $neutralGray1;
 
     /* Additional styles for the modal window, dimming the background and positioning the modal */
     min-height: 100vh;
@@ -47,7 +47,7 @@
     padding: 0 24px 24px;
     overflow-y: auto;
 
-    background-color: $matterColorLight;
+    background-color: $neutralGray1;
     border-radius: 20px;
     border: none;
 
