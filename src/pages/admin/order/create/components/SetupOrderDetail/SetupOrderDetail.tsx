@@ -62,8 +62,23 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   nextTab,
 }) => {
   const {
-    draftOrder: { orderDetail = {} },
-  } = useAppSelector((state) => state.Order);
+    draftOrder: {
+      startDate,
+      endDate,
+      clientId,
+      packagePerMember,
+      selectedGroups = [],
+      deliveryHour,
+      deliveryAddress,
+      deadlineDate,
+      deadlineHour,
+      orderDetail = {},
+    },
+  } = useAppSelector((state) => state.Order, shallowEqual);
+  const companies = useAppSelector(
+    (state) => state.ManageCompaniesPage.companyRefs,
+    shallowEqual,
+  );
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isSelectingRestaurant, setIsSelectingRestaurant] = useState(false);
   const dispatch = useAppDispatch();
@@ -74,22 +89,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     setTrue: onOrderSettingModalOpen,
   } = useBoolean();
 
-  const {
-    draftOrder: {
-      clientId,
-      packagePerMember,
-      selectedGroups = [],
-      deliveryHour,
-      deliveryAddress,
-      deadlineDate,
-      deadlineHour,
-    },
-  } = useAppSelector((state) => state.Order, shallowEqual);
   const { address } = deliveryAddress || {};
-  const companies = useAppSelector(
-    (state) => state.ManageCompaniesPage.companyRefs,
-    shallowEqual,
-  );
   const currentClient = companies.find(
     (company) => company.id.uuid === clientId,
   );
@@ -155,6 +155,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     [OrderSettingField.ACCESS_SETTING]: selectedGroupsName?.join(', '),
     [OrderSettingField.PER_PACK]: packagePerMember,
   };
+  const addMorePlanExtraProps = {
+    onClick: handleAddMorePlanClick,
+    startDate,
+    endDate,
+  };
 
   return (
     <>
@@ -194,7 +199,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               companyLogo="Company"
               components={{
                 contentEnd: (props) => (
-                  <AddMorePlan onClick={handleAddMorePlanClick} {...props} />
+                  <AddMorePlan {...props} {...addMorePlanExtraProps} />
                 ),
               }}
             />
