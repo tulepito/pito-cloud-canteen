@@ -1,7 +1,7 @@
 import Button from '@components/Button/Button';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
-import IconMagnifier from '@components/IconMagnifier/IconMagnifier';
+import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
 import React from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';

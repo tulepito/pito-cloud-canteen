@@ -1,4 +1,4 @@
-import IconArrowHead from '@components/IconArrowHead/IconArrowHead';
+import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import NamedLink from '@components/NamedLink/NamedLink';
 import { stringify } from '@helpers/urlHelpers';
 import classNames from 'classnames';

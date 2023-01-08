@@ -4,10 +4,10 @@ import React from 'react';
 
 import css from './PitoLogo.module.scss';
 
-const PitoLogo: React.FC<TIconProps> = (props) => {
+const PITOLogo: React.FC<TIconProps> = (props) => {
   const { rootClassName, className } = props;
 
-  const classes = classNames(rootClassName, css.root, className);
+  const classes = classNames(rootClassName || css.root, className);
 
   return (
     <svg
@@ -50,4 +50,4 @@ const PitoLogo: React.FC<TIconProps> = (props) => {
   );
 };
 
-export default PitoLogo;
+export default PITOLogo;

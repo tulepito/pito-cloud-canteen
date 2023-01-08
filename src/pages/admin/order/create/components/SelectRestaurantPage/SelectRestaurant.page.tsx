@@ -1,5 +1,5 @@
 import Badge from '@components/Badge/Badge';
-import IconArrowHead from '@components/IconArrowHead/IconArrowHead';
+import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Pagination from '@components/Pagination/Pagination';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';

@@ -13,7 +13,7 @@ import Toolbar from './components/Toolbar/Toolbar';
 import withWeekViewWrapper from './components/WeekView/withWeekViewWrapper';
 import type { TCalendarItemCardComponents } from './helpers/types';
 
-type TCalendarDashboard = {
+type TCalendarDashboardProps = {
   defaultDate?: Date;
   startDate?: Date;
   endDate?: Date;
@@ -24,7 +24,7 @@ type TCalendarDashboard = {
   inProgress?: boolean;
 };
 
-const CalendarDashboard: React.FC<TCalendarDashboard> = ({
+const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   startDate,
   endDate,
   defaultDate: propsDefaultDate,

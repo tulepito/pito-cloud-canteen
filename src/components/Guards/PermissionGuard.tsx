@@ -13,9 +13,9 @@ import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
 import React, { useCallback, useEffect } from 'react';
 
-type TPermissionGuardGuard = PropsWithChildren<{}>;
+type TPermissionGuardGuardProps = PropsWithChildren<{}>;
 
-const PermissionGuard: React.FC<TPermissionGuardGuard> = (props) => {
+const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
   const router = useRouter();
   const { pathname: pathName } = router;
   const { userPermission, currentUser } = useAppSelector((state) => state.user);

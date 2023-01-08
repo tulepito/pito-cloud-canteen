@@ -1,10 +1,10 @@
 import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import CreateGroupModal from '@components/CreateGroupModal/CreateGroupModal';
-import IconDelete from '@components/IconDelete/IconDelete';
-import IconEdit from '@components/IconEdit/IconEdit';
-import IconOutlinePlus from '@components/IconOutlinePlus/IconOutlinePlus';
-import IconSpinner from '@components/IconSpinner/IconSpinner';
+import IconDelete from '@components/Icons/IconDelete/IconDelete';
+import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import IconOutlinePlus from '@components/Icons/IconOutlinePlus/IconOutlinePlus';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';

@@ -1,6 +1,6 @@
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
-import IconArrow from '@components/IconArrow/IconArrow';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';

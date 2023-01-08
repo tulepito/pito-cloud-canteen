@@ -1,4 +1,4 @@
-import IconSpinner from '@components/IconSpinner/IconSpinner';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import React from 'react';
 
 import css from './LoadingContainer.module.scss';

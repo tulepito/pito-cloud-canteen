@@ -1,5 +1,5 @@
 import Button from '@components/Button/Button';
-import IconModalClose from '@components/IconModalClose/IconModalClose';
+import IconModalClose from '@components/Icons/IconModalClose/IconModalClose';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import classNames from 'classnames';
 import { useIntl } from 'react-intl';

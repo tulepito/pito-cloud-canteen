@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import IconSpinner from '@components/IconSpinner/IconSpinner';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import classNames from 'classnames';
 import React, { useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';

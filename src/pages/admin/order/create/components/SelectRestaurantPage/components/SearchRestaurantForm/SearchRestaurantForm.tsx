@@ -1,7 +1,7 @@
 import Button from '@components/Button/Button';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
-import SearchIcon from '@components/Icons/SearchIcon';
+import IconSearch from '@components/Icons/IconSearch/IconSearch';
 import type { ReactNode } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
@@ -47,7 +47,7 @@ const SearchRestaurantFormComponent: React.FC<
           <OnChange name="name">{onSearchRestaurant}</OnChange>
           <FieldTextInput
             name="name"
-            leftIcon={<SearchIcon />}
+            leftIcon={<IconSearch />}
             placeholder={intl.formatMessage({
               id: 'SearchRestaurantForm.findRestaurantByName',
             })}

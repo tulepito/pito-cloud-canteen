@@ -1,4 +1,4 @@
-import IconArrowHead from '@components/IconArrowHead/IconArrowHead';
+import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import useBoolean from '@hooks/useBoolean';
 import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';

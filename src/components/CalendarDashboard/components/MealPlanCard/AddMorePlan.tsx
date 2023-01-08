@@ -1,5 +1,5 @@
 import Button from '@components/Button/Button';
-import IconPlus from '@components/IconPlus/IconPlus';
+import IconPlus from '@components/Icons/IconPlus/IconPlus';
 import classNames from 'classnames';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';

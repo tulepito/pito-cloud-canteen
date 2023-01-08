@@ -2,7 +2,7 @@ import Button from '@components/Button/Button';
 import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
-import GoogleIcon from '@components/Icons/GoogleIcon';
+import IconGoogle from '@components/Icons/IconGoogle/IconGoogle';
 import { generalPaths } from '@src/paths';
 import {
   composeValidators,
@@ -141,7 +141,7 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
           <span>{orText}</span>
         </div>
         <Button className={css.googleLoginButton} type="button" disabled>
-          <GoogleIcon className={css.googleIcon} />
+          <IconGoogle className={css.googleIcon} />
           <span>{googleLoginText}</span>
         </Button>
       </div>

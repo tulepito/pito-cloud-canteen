@@ -7,7 +7,7 @@ import FieldSelect from '@components/FieldSelect/FieldSelect';
 import FieldTextArea from '@components/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
-import IconCalendar from '@components/IconCalender/IconCalender';
+import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import Modal from '@components/Modal/Modal';
 import Pagination from '@components/Pagination/Pagination';

@@ -1,8 +1,8 @@
 import { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import IconClose from '@components/IconClose/IconClose';
-import IconSpinner from '@components/IconSpinner/IconSpinner';
-import IconUpload from '@components/IconUpload/IconUpload';
+import IconClose from '@components/Icons/IconClose/IconClose';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
+import IconUpload from '@components/Icons/IconUpload/IconUpload';
 import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { isUploadImageOverLimitError } from '@utils/errors';

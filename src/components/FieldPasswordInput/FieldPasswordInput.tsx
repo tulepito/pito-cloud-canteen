@@ -1,5 +1,5 @@
-import IconHidePassword from '@components/IconHidePassword/IconHidePassword';
-import IconShowPassword from '@components/IconShowPassword/IconShowPassword';
+import IconHidePassword from '@components/Icons/IconHidePassword/IconHidePassword';
+import IconShowPassword from '@components/Icons/IconShowPassword/IconShowPassword';
 import ValidationError from '@components/ValidationError/ValidationError';
 import useBoolean from '@hooks/useBoolean';
 import type { TIconProps } from '@utils/types';

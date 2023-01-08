@@ -1,6 +1,6 @@
-import AdminLayout from '@components/AdminLayout/AdminLayout';
-import CompanyLayout from '@components/CompanyLayout/CompanyLayout';
-import Layout from '@components/Layout/Layout';
+import AdminLayout from '@components/Layout/AdminLayout/AdminLayout';
+import CompanyLayout from '@components/Layout/CompanyLayout/CompanyLayout';
+import GeneralLayout from '@components/Layout/GeneralLayout/Layout';
 import React from 'react';
 
 import { EUserPermission } from './enums';
@@ -12,7 +12,7 @@ export const getLayout = (permission: EUserPermission) => {
     case EUserPermission.company:
       return CompanyLayout;
     case EUserPermission.normal:
-      return Layout;
+      return GeneralLayout;
     default:
       return React.Fragment;
   }

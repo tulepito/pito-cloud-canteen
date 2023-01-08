@@ -1,5 +1,5 @@
-import IconCheckmark from '@components/IconCheckmark/IconCheckmark';
-import IconSpinner from '@components/IconSpinner/IconSpinner';
+import IconCheckmark from '@components/Icons/IconCheckmark/IconCheckmark';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect, useState } from 'react';
@@ -62,7 +62,9 @@ const Button: React.FC<TButtonProps> = (props) => {
     content = <IconSpinner rootClassName={spinnerClassName || css.spinner} />;
   } else if (ready) {
     content = (
-      <IconCheckmark rootClassName={checkmarkClassName || css.checkmark} />
+      <IconCheckmark.IconCheckmark
+        rootClassName={checkmarkClassName || css.checkmark}
+      />
     );
   } else {
     content = children;

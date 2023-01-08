@@ -1,9 +1,9 @@
 import Button from '@components/Button/Button';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
-import IconClose from '@components/IconClose/IconClose';
-import EmptyIcon from '@components/Icons/EmptyIcon';
-import SearchIcon from '@components/Icons/SearchIcon';
+import IconClose from '@components/Icons/IconClose/IconClose';
+import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
+import IconSearch from '@components/Icons/IconSearch/IconSearch';
 import arrayMutators from 'final-form-arrays';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -163,7 +163,7 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
         <div className={css.searchInputContainer}>
           <FieldTextInput
             name="name"
-            leftIcon={<SearchIcon />}
+            leftIcon={<IconSearch />}
             placeholder={intl.formatMessage({
               id: 'SelectFoodForm.findFoodByName',
             })}
@@ -188,7 +188,7 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
           <div className={css.rightPart}>
             {selectedFoodIds?.length === 0 ? (
               <div className={css.emptyIconContainer}>
-                <EmptyIcon />
+                <IconEmpty />
               </div>
             ) : (
               <div>

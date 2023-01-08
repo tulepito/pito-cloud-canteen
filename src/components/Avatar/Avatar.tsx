@@ -1,4 +1,4 @@
-import IconBannedUser from '@components/IconBannedUser/IconBannedUser';
+import IconBannedUser from '@components/Icons/IconBannedUser/IconBannedUser';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import {
   ensureCurrentUser,

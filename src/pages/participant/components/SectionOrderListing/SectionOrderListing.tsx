@@ -1,5 +1,5 @@
-import IconBanned from '@components/Icons/IconBanned';
-import IconCheckmarkTabTitle from '@components/Icons/IconCheckmarkTabTitle';
+import IconBanned from '@components/Icons/IconBanned/IconBanned';
+import IconCheckmark from '@components/Icons/IconCheckmark/IconCheckmark';
 import ListingCard from '@components/ListingCard/ListingCard';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppSelector } from '@hooks/reduxHooks';
@@ -60,7 +60,9 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
             (hasDishInCart === 'notJoined' ? (
               <IconBanned className={css.tabTitleIcon} />
             ) : (
-              <IconCheckmarkTabTitle className={css.tabTitleIcon} />
+              <IconCheckmark.IconCheckmarkWithCircle
+                className={css.tabTitleIcon}
+              />
             ))}
           {}
         </div>

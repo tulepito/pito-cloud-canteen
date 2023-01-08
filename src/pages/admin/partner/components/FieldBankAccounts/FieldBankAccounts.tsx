@@ -2,8 +2,8 @@ import { InlineTextButton } from '@components/Button/Button';
 import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldSelect from '@components/FieldSelect/FieldSelect';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
-import IconAdd from '@components/IconAdd/IconAdd';
-import IconDelete from '@components/IconDelete/IconDelete';
+import IconAdd from '@components/Icons/IconAdd/IconAdd';
+import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import { LIST_BANKS } from '@utils/enums';
 import {
   composeValidators,

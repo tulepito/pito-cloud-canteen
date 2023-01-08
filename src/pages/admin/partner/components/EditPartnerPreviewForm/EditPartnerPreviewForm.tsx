@@ -4,7 +4,7 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldCheckboxGroup from '@components/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
-import IconEdit from '@components/IconEdit/IconEdit';
+import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import NamedLink from '@components/NamedLink/NamedLink';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import ToggleButton from '@components/ToggleButton/ToggleButton';

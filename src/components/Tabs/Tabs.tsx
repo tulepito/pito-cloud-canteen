@@ -1,5 +1,5 @@
 import { InlineTextButton } from '@components/Button/Button';
-import IconArrow from '@components/IconArrow/IconArrow';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';
 import React, { useEffect, useState } from 'react';

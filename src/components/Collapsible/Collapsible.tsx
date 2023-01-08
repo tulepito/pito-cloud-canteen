@@ -1,5 +1,5 @@
 import { InlineTextButton } from '@components/Button/Button';
-import IconArrow from '@components/IconArrow/IconArrow';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import useBoolean from '@hooks/useBoolean';
 import classNames from 'classnames';
 import type { MutableRefObject, PropsWithChildren, ReactNode } from 'react';
@@ -7,16 +7,16 @@ import React, { useRef } from 'react';
 
 import css from './Collapsible.module.scss';
 
-type TCollapsible = {
+type TCollapsibleProps = PropsWithChildren<{
   rootClassName?: string;
   className?: string;
   label: string | ReactNode | number;
   labelSectionClassName?: string;
   labelClassName?: string;
   contentClassName?: string;
-};
+}>;
 
-const Collapsible: React.FC<PropsWithChildren<TCollapsible>> = (props) => {
+const Collapsible: React.FC<TCollapsibleProps> = (props) => {
   const {
     className,
     rootClassName,
