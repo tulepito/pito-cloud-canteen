@@ -1,11 +1,14 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import { adminRoutes } from '@src/paths';
 import { EListingStates, OTHER_OPTION } from '@utils/enums';
+import { parsePrice } from '@utils/validators';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
 
 import EditPartnerBasicInformationForm from '../EditPartnerBasicInformationForm/EditPartnerBasicInformationForm';
 import EditPartnerLicenseForm from '../EditPartnerLicenseForm/EditPartnerLicenseForm';
 import EditPartnerMenuForm from '../EditPartnerMenuForm/EditPartnerMenuForm';
+// eslint-disable-next-line import/no-cycle
 import EditPartnerPreviewForm from '../EditPartnerPreviewForm/EditPartnerPreviewForm';
 // eslint-disable-next-line import/no-cycle
 import {
@@ -66,7 +69,9 @@ const EditPartnerWizardTab = (props: any) => {
     onDiscardDraftPartner,
     onSetAuthorized,
     onSetUnsatisfactory,
+    goBack,
   } = props;
+
   const router = useRouter();
   const isDraftFlow =
     partnerListingRef?.attributes?.metadata?.listingState ===
@@ -101,7 +106,7 @@ const EditPartnerWizardTab = (props: any) => {
             tab,
             tabs,
             router,
-            `/admin/partner`,
+            adminRoutes.ManagePartners.path,
           );
         }
         return listing;
@@ -160,7 +165,7 @@ const EditPartnerWizardTab = (props: any) => {
             tab,
             tabs,
             router,
-            `/admin/partner`,
+            adminRoutes.ManagePartners.path,
           );
         }
       };
@@ -184,6 +189,7 @@ const EditPartnerWizardTab = (props: any) => {
           inProgress={inProgress}
           formError={formError}
           initialValues={initialValues}
+          goBack={goBack}
         />
       );
     }
@@ -205,7 +211,7 @@ const EditPartnerWizardTab = (props: any) => {
             tab,
             tabs,
             router,
-            `/admin/partner`,
+            adminRoutes.ManagePartners.path,
           );
         }
       };
@@ -241,6 +247,7 @@ const EditPartnerWizardTab = (props: any) => {
           inProgress={inProgress}
           formError={formError}
           initialValues={initialValues}
+          goBack={goBack}
         />
       );
     }
@@ -267,6 +274,7 @@ const EditPartnerWizardTab = (props: any) => {
         hasOutsideMenuAndService,
         categories = [],
         extraServices,
+        businessType,
       } = partnerListingRef?.attributes?.publicData || {};
 
       const { bankAccounts = [] } =
@@ -292,7 +300,7 @@ const EditPartnerWizardTab = (props: any) => {
           vat,
           // Add other otion to packaging list to show up the checkbox input in preview tab
           packaging: [...packaging, ...(packagingOther ? [OTHER_OPTION] : [])],
-          minPrice,
+          minPrice: parsePrice(minPrice),
           meals,
           hasOutsideMenuAndService,
           businessLicenseStatus: businessLicense?.status,
@@ -306,6 +314,7 @@ const EditPartnerWizardTab = (props: any) => {
           bankAccounts,
           packagingOther,
           status,
+          businessType: businessType || '-',
         };
       }, [JSON.stringify(partnerListingRef)]);
 
@@ -314,7 +323,7 @@ const EditPartnerWizardTab = (props: any) => {
           id: partnerListingRef?.author?.id?.uuid,
         };
         const response = await onPublishDraftPartner(params);
-        if (!response.error) router.push('/admin/partner');
+        if (!response.error) router.push(adminRoutes.ManagePartners.path);
       };
 
       const handleDiscardDraftPartner = async () => {
@@ -322,7 +331,7 @@ const EditPartnerWizardTab = (props: any) => {
           id: partnerListingRef?.author?.id?.uuid,
         };
         const response = await onDiscardDraftPartner(params);
-        if (!response.error) router.push('/admin/partner');
+        if (!response.error) router.push(adminRoutes.ManagePartners.path);
       };
       return (
         <EditPartnerPreviewForm
@@ -334,6 +343,7 @@ const EditPartnerWizardTab = (props: any) => {
           isDraftFlow={isDraftFlow}
           onSetAuthorized={onSetAuthorized}
           onSetUnsatisfactory={onSetUnsatisfactory}
+          partnerListingRef={partnerListingRef}
         />
       );
     }

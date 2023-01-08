@@ -15,7 +15,7 @@
 }
 .sectionMainOrder {
   .sectionMainOrderHeader {
-    margin-bottom: 36px;
+    margin-bottom: 10px;
   }
   .sectionMainOrderListings {
     display: flex;
@@ -42,7 +42,7 @@
   align-items: center;
 }
 
-.tabTitleCheckmark {
+.tabTitleIcon {
   margin-left: 7px;
 }
 
@@ -61,4 +61,25 @@
 .loading {
   width: 300px;
   height: 300px;
+}
+
+.tabActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+}
+
+.notJoinThisDay {
+  @include textTemplate(12px, 700, 20px, '');
+  color: $neutralGray5;
+  display: inline-flex;
+  align-items: center;
+}
+
+.iconNotJoined {
+  margin-right: 8px;
+
+  & > path {
+    fill: $neutralGray5;
+  }
 }

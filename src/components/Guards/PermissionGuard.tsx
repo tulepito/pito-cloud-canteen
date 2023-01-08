@@ -25,7 +25,6 @@ const PermissionGuard: React.FC<TPermissionGuardGuard> = (props) => {
     : null;
   const isIgnoredPermissionCheckRoute =
     IgnoredPermissionCheckRoutes.includes(pathName);
-  console.log(isMatchedPermission);
 
   const verifyPermission = useCallback(() => {
     if (isIgnoredPermissionCheckRoute) {

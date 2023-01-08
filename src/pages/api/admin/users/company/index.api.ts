@@ -19,11 +19,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     }
   }
   try {
-    const response = await queryAllUsers({
+    const response = (await queryAllUsers({
       query: {
-        meta_isCompanyAccount: true,
+        meta_isCompany: true,
       },
-    });
+    })) as any;
     res.json(response);
   } catch (error) {
     console.error(error);

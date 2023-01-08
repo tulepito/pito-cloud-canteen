@@ -339,6 +339,7 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
       <div className={css.filterWrapper}>
         <KeywordSearchForm
           onSubmit={onSubmit}
+          searchValue="keywords"
           initialValues={{ keywords: keywords as string }}
         />
         <SelectSingleFilterPopup

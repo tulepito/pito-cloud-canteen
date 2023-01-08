@@ -3,11 +3,12 @@ import {
   partnerThunks,
   removeAvatar,
   removeCover,
+  resetInitialStates,
 } from '@redux/slices/partners.slice';
 import { isSignUpEmailTakenError } from '@utils/errors';
 import { pickRenderableImages } from '@utils/images';
 import type { TObject } from '@utils/types';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
 import EditPartnerWizard from '../components/EditPartnerWizard/EditPartnerWizard';
@@ -54,6 +55,11 @@ const CreatePartnerPage: React.FC<any> = () => {
             }),
       }
     : null;
+
+  useEffect(() => {
+    // should reset initial states
+    dispatch(resetInitialStates());
+  }, [dispatch]);
 
   return (
     <EditPartnerWizard

@@ -29,12 +29,16 @@
   @include textTemplate(12px, 600, 20px, '');
   color: $neutralGray6;
   text-align: center;
-  border-top: 1px solid $neutralGray4;
-  border-bottom: 1px solid $neutralGray4;
-  border-right: 1px solid $neutralGray4;
+  border: 1px solid $neutralGray4;
+  border-left: none;
 
   &:first-child {
     border-left: 1px solid $neutralGray4;
+    border-top-left-radius: 9px;
+  }
+
+  &:nth-child(7) {
+    border-top-right-radius: 9px;
   }
 }
 
@@ -42,4 +46,21 @@
   background-color: $primaryPri1;
   border-bottom: 1px solid $primaryPri2;
   color: $neutralGray6;
+}
+
+.emptyDay {
+  flex-basis: calc(100% / 7);
+  border-bottom: 1px solid $neutralGray5;
+  border-right: 1px solid $neutralGray5;
+  min-height: 150px;
+
+  &:nth-child(7n + 1) {
+    border-left: 1px solid $neutralGray5;
+  }
+}
+
+.calendarTitleWrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }

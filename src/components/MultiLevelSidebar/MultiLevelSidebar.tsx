@@ -78,7 +78,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
 
   const paramNames = getDynamicPathParamsName(nameLink);
   // Only get dynamic params not search params
-  const newQueryParams = Object.keys(query).reduce((acc: any, key: string) => {
+  const newQueryParams = Object.keys(query).reduce((acc, key) => {
     if (paramNames.includes(key)) {
       return { ...acc, [key]: query[key] };
     }

@@ -24,7 +24,17 @@ const fetchSubOrder = async (orderDetail: any, currentUserId: string) => {
 
     // Fetch restaurant data
     const restaurantData = denormalisedResponseEntities(
-      await integrationSdk.listings.show({ id: restaurantId }),
+      await integrationSdk.listings.show({
+        id: restaurantId,
+        include: ['images'],
+        'fields.image': [
+          'variants.landscape-crop',
+          'variants.landscape-crop2x',
+          'variants.landscape-crop4x',
+          'variants.landscape-crop6x',
+        ],
+        expand: true,
+      }),
     )[0];
 
     // Fetch food listings data

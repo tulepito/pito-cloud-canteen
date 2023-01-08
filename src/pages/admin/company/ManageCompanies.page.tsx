@@ -45,6 +45,26 @@ const companyStatusOptions = [
 
 const TABLE_COLUMN: TColumn[] = [
   {
+    key: 'id',
+    label: 'ID',
+    render: (data: any) => {
+      return (
+        <span title={data.id} className={classNames(css.rowText, css.rowId)}>
+          {data.id}
+        </span>
+      );
+    },
+    renderSearch: () => {
+      return (
+        <FieldTextInput
+          className={css.keywordInput}
+          name="searchId"
+          id="searchId"
+        />
+      );
+    },
+  },
+  {
     key: 'name',
     label: 'Họ và tên',
     render: (data: any) => {

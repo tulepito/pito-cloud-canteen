@@ -51,7 +51,7 @@ const FieldRadioButtonPhoto: React.FC<TFieldRadioButtonPhoto> = (props) => {
               id={opt.id}
               label={opt.label}
               name={`${name}.status`}
-              value={opt.value}
+              value={opt.key}
             />
             {values[name]?.status === 'yes' && opt.hasImage && (
               <FieldPhotoUpload

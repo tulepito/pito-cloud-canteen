@@ -53,6 +53,8 @@
     width: 100%;
     .content {
       font-size: 14px;
+      word-break: break-all;
+      white-space: pre-line;
       font-weight: $fontWeightMedium;
     }
   }
@@ -184,6 +186,7 @@
 .bankItem {
   display: flex;
   padding: 20px;
+  margin-bottom: 15px;
   box-shadow: $boxShadow;
   flex-wrap: wrap;
   .left,
@@ -211,4 +214,10 @@
 .configLabel {
   font-weight: $fontWeightBold;
   margin: 30px 0 20px 0;
+}
+
+.buttons {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
 }

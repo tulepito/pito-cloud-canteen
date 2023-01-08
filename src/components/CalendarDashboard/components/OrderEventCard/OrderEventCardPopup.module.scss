@@ -52,6 +52,8 @@
 .viewDetail {
   @include textTemplate(12px, 600, 16px, '');
   color: $labelBlue2;
+  height: unset;
+  min-height: unset;
 }
 
 .selectDishContent {

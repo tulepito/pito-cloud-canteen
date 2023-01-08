@@ -32,3 +32,9 @@
   margin: 20px 0 10px 0;
   font-style: italic;
 }
+
+.buttons {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}

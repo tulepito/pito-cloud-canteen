@@ -7,6 +7,27 @@ import {
   updateMealPlanDetailApi,
 } from '@utils/orderApi';
 import type { TListing } from '@utils/types';
+import cloneDeep from 'lodash/cloneDeep';
+
+const updateSetUpPlan = ({
+  startDate,
+  endDate,
+  orderDetail,
+}: {
+  startDate: number;
+  endDate: number;
+  orderDetail: Record<string, any>;
+}) => {
+  const newOrderDetail = cloneDeep(orderDetail);
+
+  Object.keys(orderDetail).forEach((date) => {
+    if (Number(date) < startDate || Number(date) > endDate) {
+      delete newOrderDetail[date];
+    }
+  });
+
+  return newOrderDetail;
+};
 
 type OrderInitialState = {
   order: TListing | null;
@@ -127,6 +148,7 @@ const orderSlice = createSlice({
     },
     updateDraftMealPlan: (state, { payload }) => {
       const { orderDetail, ...restPayload } = payload;
+      const { startDate, endDate } = restPayload;
       const { orderDetail: oldOrderDetail } = state.draftOrder;
       const updatedOrderDetailData = { ...oldOrderDetail, ...orderDetail };
 
@@ -135,7 +157,11 @@ const orderSlice = createSlice({
         draftOrder: {
           ...state.draftOrder,
           ...restPayload,
-          orderDetail: updatedOrderDetailData,
+          orderDetail: updateSetUpPlan({
+            startDate,
+            endDate,
+            orderDetail: updatedOrderDetailData,
+          }),
         },
       };
     },

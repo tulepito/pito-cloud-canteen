@@ -312,6 +312,7 @@ const createDraftPartner = createAsyncThunk(
         listingParams: {
           listingDataParams: listingData,
           listingQueryParams: {
+            ...SHOW_RESTAURANT_LISTING_PARAMS,
             expand: true,
           },
         },
@@ -523,6 +524,9 @@ export const partnerSlice = createSlice({
   name: 'partners',
   initialState,
   reducers: {
+    resetInitialStates: () => {
+      return { ...initialState };
+    },
     removeAvatar: (state: any, { payload }) => {
       const id = payload;
 
@@ -1008,6 +1012,7 @@ export const {
   removeBusinessLicense,
   removeFoodCertificate,
   removePartyInsurance,
+  resetInitialStates,
 } = partnerSlice.actions;
 
 export default partnerSlice.reducer;

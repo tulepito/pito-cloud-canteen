@@ -2,7 +2,6 @@
 . "$(dirname "$0")/_/husky.sh"
 
 yarn lint-staged
-
 echo '🤔🤔🤔🤔... Alright... Code looks good to me... Trying to build now. 🤔🤔🤔🤔'
 
 yarn build ||
@@ -12,5 +11,4 @@ yarn build ||
     '
     false;
 )
-
 echo '✅✅✅✅ You win this time... I am committing this now. ✅✅✅✅'

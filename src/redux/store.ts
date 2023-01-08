@@ -13,7 +13,7 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage,
-  whitelist: ['Order'],
+  whitelist: ['Order', 'ManageCompaniesPage'],
 };
 
 const persistedReducer = persistReducer(persistConfig, combinedReducer);

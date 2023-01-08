@@ -1,6 +1,11 @@
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Toggle from '@components/Toggle/Toggle';
-import { required } from '@utils/validators';
+import { addCommas, removeNonNumeric } from '@helpers/format';
+import {
+  composeValidators,
+  nonNegativeValue,
+  required,
+} from '@utils/validators';
 import { Field } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
@@ -13,12 +18,19 @@ const VNDIcon = () => {
 type PerPackageFieldProps = {
   title?: string;
 };
+
 const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
   const { title } = props;
   const intl = useIntl();
   const perPackRequiredMessage = intl.formatMessage({
     id: 'PerPackageField.perPackRequired',
   });
+  const perPackNonNegativeMessage = intl.formatMessage({
+    id: 'PerPackageField.perPackNonNegative',
+  });
+  const parseThousandNumber = (value: string) => {
+    return addCommas(removeNonNumeric(value));
+  };
   return (
     <div className={css.container}>
       {title && <div className={css.fieldTitle}>{title}</div>}
@@ -29,13 +41,17 @@ const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
           label={intl.formatMessage({
             id: 'PerPackageField.label',
           })}
+          parse={parseThousandNumber}
           placeholder={intl.formatMessage({
             id: 'PerPackageField.placeholder',
           })}
-          type="number"
+          type="text"
           className={css.numberInput}
           rightIcon={<VNDIcon />}
-          validate={required(perPackRequiredMessage)}
+          validate={composeValidators(
+            required(perPackRequiredMessage),
+            nonNegativeValue(perPackNonNegativeMessage),
+          )}
         />
 
         <Field id="vatAllow" name="vatAllow">

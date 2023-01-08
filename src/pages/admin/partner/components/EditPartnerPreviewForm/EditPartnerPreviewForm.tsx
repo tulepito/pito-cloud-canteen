@@ -1,12 +1,15 @@
+/* eslint-disable import/no-cycle */
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldCheckboxGroup from '@components/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import IconEdit from '@components/IconEdit/IconEdit';
+import NamedLink from '@components/NamedLink/NamedLink';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import {
+  BUSINESS_TYPE_OPTIONS,
   CATEGORY_OPTIONS,
   EImageVariants,
   ERestaurantListingStatus,
@@ -21,12 +24,16 @@ import React from 'react';
 import { Field, Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { BUSINESS_TYPE_OPTIONS } from '../EditPartnerLicenseForm/EditPartnerLicenseForm';
+import {
+  BASIC_INFORMATION_TAB,
+  LICENSE_TAB,
+  MENU_TAB,
+} from '../EditPartnerWizard/EditPartnerWizard';
 import { createAvailabilityPlanInitialValues } from '../EditPartnerWizardTab/utils';
 import css from './EditPartnerPreviewForm.module.scss';
 
 const getLabelByKey = (list: any[], key: any) => {
-  const item = list.find((l: any) => l.key === key);
+  const item = list?.find((l: any) => l.key === key);
   return item && item.label ? item.label : key;
 };
 
@@ -47,6 +54,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
           isDraftFlow,
           onSetAuthorized,
           onSetUnsatisfactory,
+          partnerListingRef,
         } = fieldRenderProps;
         const {
           cover,
@@ -75,7 +83,6 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
           status,
           businessType,
         } = values;
-
         const entries = createAvailabilityPlanInitialValues(availabilityPlan);
 
         const isUnsatisfactory =
@@ -142,9 +149,18 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                 {intl.formatMessage({
                   id: 'EditPartnerForm.basicInformationLabel',
                 })}
-                <IconEdit className={css.editIcon} />
+                <NamedLink
+                  path={`/admin/partner/${partnerListingRef?.id?.uuid}/edit`}
+                  to={{ search: `tab=${BASIC_INFORMATION_TAB}` }}>
+                  <IconEdit className={css.editIcon} />
+                </NamedLink>
               </p>
               <div className={css.mediaWrapper}>
+                <p className={css.sectionLabel}>
+                  {intl.formatMessage({
+                    id: 'EditPartnerForm.mediaLabel',
+                  })}
+                </p>
                 <div className={css.previewCover}>
                   <ResponsiveImage
                     variants={[EImageVariants.scaledLarge]}
@@ -185,14 +201,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                   </p>
                   <p className={css.content}>{contactorName}</p>
                 </div>
-                <div className={css.field}>
-                  <p className={css.label}>
-                    {intl.formatMessage({
-                      id: 'EditPartnerPreviewForm.contactorName',
-                    })}
-                  </p>
-                  <p className={css.content}>{contactorName}</p>
-                </div>
+
                 <div className={css.field}>
                   <p className={css.label}>
                     {intl.formatMessage({
@@ -280,7 +289,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                                   </td>
                                 )}
                                 <td>
-                                  {e.startTime} : {e.endTime}
+                                  {e.startTime} - {e.endTime}
                                 </td>
                               </tr>
                             ))
@@ -318,7 +327,6 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                     <FieldTextInput
                       disabled
                       name="minPrice"
-                      type="number"
                       className={css.minPrice}
                       id="minPrice"
                       label={intl.formatMessage({
@@ -326,12 +334,19 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                       })}
                       rightIcon={<div className={css.currency}>đ</div>}
                     />
-                    <FieldCheckboxGroup
-                      id="packaging"
-                      name="packaging"
-                      disabled
-                      options={PACKAGING_OPTIONS}
-                    />
+                    <div>
+                      <div className={css.label}>
+                        {intl.formatMessage({
+                          id: 'EditPartnerPreviewForm.packagingLabel',
+                        })}
+                      </div>
+                      <FieldCheckboxGroup
+                        id="packaging"
+                        name="packaging"
+                        disabled
+                        options={PACKAGING_OPTIONS}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -341,7 +356,11 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                 {intl.formatMessage({
                   id: 'EditPartnerForm.licenseLabel',
                 })}
-                <IconEdit className={css.editIcon} />
+                <NamedLink
+                  path={`/admin/partner/${partnerListingRef?.id?.uuid}/edit`}
+                  to={{ search: `tab=${LICENSE_TAB}` }}>
+                  <IconEdit className={css.editIcon} />
+                </NamedLink>
               </p>
               <div className={css.licenseWrapper}>
                 <div className={css.box}>
@@ -422,7 +441,11 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                 {intl.formatMessage({
                   id: 'EditPartnerForm.menuLabel',
                 })}
-                <IconEdit className={css.editIcon} />
+                <NamedLink
+                  path={`/admin/partner/${partnerListingRef?.id?.uuid}/edit`}
+                  to={{ search: `tab=${MENU_TAB}` }}>
+                  <IconEdit className={css.editIcon} />
+                </NamedLink>
               </p>
               <div className={css.licenseWrapper}>
                 <div className={css.box}>
@@ -472,7 +495,11 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                 {intl.formatMessage({
                   id: 'EditPartnerPreviewForm.serviceLabel',
                 })}
-                <IconEdit className={css.editIcon} />
+                <NamedLink
+                  path={`/admin/partner/${partnerListingRef?.id?.uuid}/edit/`}
+                  to={{ search: `tab=${MENU_TAB}` }}>
+                  <IconEdit className={css.editIcon} />
+                </NamedLink>
               </p>
               <div className={css.licenseWrapper}>
                 <ul className={css.services}>
@@ -487,7 +514,11 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                 {intl.formatMessage({
                   id: 'EditPartnerPreviewForm.bankAccountLabel',
                 })}
-                <IconEdit className={css.editIcon} />
+                <NamedLink
+                  path={`/admin/partner/${partnerListingRef?.id?.uuid}/edit/`}
+                  to={{ search: `tab=${BASIC_INFORMATION_TAB}` }}>
+                  <IconEdit className={css.editIcon} />
+                </NamedLink>
               </p>
               <div className={css.licenseWrapper}>
                 <div className={css.bankAccounts}>

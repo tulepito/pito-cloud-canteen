@@ -1,5 +1,6 @@
 import 'react-datepicker/dist/react-datepicker.css';
 
+import ValidationError from '@components/ValidationError/ValidationError';
 import classNames from 'classnames';
 import viLocale from 'date-fns/locale/vi';
 import DatePicker, { registerLocale } from 'react-datepicker';
@@ -53,6 +54,7 @@ const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (props) => {
         onChange={onInputChange}
         {...rest}
       />
+      <ValidationError fieldMeta={fieldMeta} />
     </div>
   );
 };

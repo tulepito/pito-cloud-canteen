@@ -1,9 +1,17 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
-.tabHeaderWrapper {
+.headerWrapper {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.tabHeader {
+  @include flexCenter;
+  gap: 32px;
 }
 
 .navigateBtn {
@@ -38,33 +46,38 @@
   &::after {
     position: absolute;
     content: '';
-    height: 1px;
+    height: 2px;
     width: 0;
     left: 0;
     bottom: 0;
-    background-color: $primaryPri2;
+    background-color: $neutralGray6;
   }
 
   &.tabActive::after {
     position: absolute;
     content: '';
-    height: 1px;
+    height: 2px;
     width: 100%;
     left: 0;
     bottom: 0;
     transition: width 0.3s;
-    background-color: $primaryPri2;
+    background-color: $neutralGray6;
   }
 }
+
+.actions {
+}
+
 .tabItemContent {
-  color: $neutralGray6;
+  color: $neutralGray5;
   font-size: 14px;
   font-weight: $fontWeightRegular;
   line-height: 24px;
 
   &.tabActive {
-    color: $singleUseTabRed;
+    color: $neutralGray6;
     transition: color 0.3s;
+    font-weight: $fontWeightBold;
   }
 }
 .tabPanel {

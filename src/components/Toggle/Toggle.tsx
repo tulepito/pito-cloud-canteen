@@ -54,7 +54,7 @@ const Toggle: React.FC<TToggleProps> = (props) => {
           defaultChecked={switchControl.value}
         />
         <label
-          htmlFor={id}
+          htmlFor={id || 'toggle'}
           className={toggleClasses}
           onClick={onFieldSwitchChange}
         />

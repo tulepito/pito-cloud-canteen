@@ -1,6 +1,6 @@
 import FormTabs from '@components/FormTabs/FormTabs';
 import classNames from 'classnames';
-import type { PropsWithChildren } from 'react';
+import type { ReactElement } from 'react';
 import React from 'react';
 
 import css from './FormWizard.module.scss';
@@ -8,9 +8,10 @@ import css from './FormWizard.module.scss';
 type TFormWizard = {
   className?: string;
   formTabNavClassName?: string;
+  children: ReactElement[];
 };
 
-const FormWizard: React.FC<PropsWithChildren<TFormWizard>> = (props) => {
+const FormWizard: React.FC<TFormWizard> = (props) => {
   const { className, children, formTabNavClassName } = props;
   const classes = classNames(css.root, className);
   return (

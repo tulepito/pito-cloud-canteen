@@ -6,7 +6,7 @@
   position: fixed;
   top: 0;
   height: $adminTopbarHeight;
-  padding: 10px 28px;
+  padding: 0 28px;
   width: 100%;
   left: 0;
   background-color: $neutralGray1;
@@ -15,6 +15,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  .headerRight {
+    .logo {
+      width: unset;
+      height: 36px;
+    }
+  }
   .headerLeft {
     display: flex;
     align-items: center;

@@ -8,6 +8,7 @@ import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
 import type { TEventStatus } from '../../helpers/types';
+import type { TDishSelectionFormValues } from './DishSelectionForm';
 import DishSelectionForm from './DishSelectionForm';
 import OrderEventCardContentItems from './OrderEventCardContentItems';
 import css from './OrderEventCardPopup.module.scss';
@@ -27,45 +28,33 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
 
   const dispatch = useAppDispatch();
   const mealType = event.resource?.type;
-  const startTime = event.resource.deliveryHour;
+  const startTime = event.resource?.deliveryHour;
   const dishes: any[] = event.resource?.meal?.dishes || [];
-  const { orderId, subOrderId: planId, id: orderDay } = event.resource;
+  const {
+    orderId,
+    subOrderId: planId,
+    id: orderDay,
+    dishSelection,
+  } = event.resource;
 
-  const onSelectDish = (values: any, reject?: boolean) => {
+  const onSelectDish = (values: TDishSelectionFormValues, reject?: boolean) => {
     const currentUserId = CURRENT_USER(user).getId();
-    if (reject) {
-      const payload = {
-        updateValues: {
-          orderId,
-          orderDay,
-          planId,
-          memberOrders: {
-            [currentUserId]: {
-              status: 'notJoined',
-              foodId: '',
-            },
+    const payload = {
+      updateValues: {
+        orderId,
+        orderDay,
+        planId,
+        memberOrders: {
+          [currentUserId]: {
+            status: reject ? 'notJoined' : 'joined',
+            foodId: reject ? '' : values?.dishSelection,
           },
         },
-        orderId,
-      };
-      dispatch(ParticipantOrderAsyncAction.updateOrder(payload));
-    } else {
-      const payload = {
-        updateValues: {
-          orderId,
-          orderDay,
-          planId,
-          memberOrders: {
-            [currentUserId]: {
-              status: 'joined',
-              foodId: values?.dishSelection,
-            },
-          },
-        },
-        orderId,
-      };
-      dispatch(ParticipantOrderAsyncAction.updateOrder(payload));
-    }
+      },
+      orderId,
+    };
+
+    dispatch(ParticipantOrderAsyncAction.updateOrder(payload));
   };
 
   const onNavigateToOrderDetail = () => {
@@ -76,7 +65,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   return (
     <div className={css.root}>
       <div className={css.header}>
-        <div className={css.title}>{event.title}</div>
+        <div className={css.title}>#{event.title}</div>
         {status && <OrderEventCardStatus status={status} />}
       </div>
       <div className={css.mealType}>
@@ -84,7 +73,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
       </div>
       <div className={css.eventTime}>{startTime}</div>
       <div className={css.divider} />
-      <OrderEventCardContentItems event={event} />
+      <OrderEventCardContentItems event={event} isFirstHighlight />
       <div className={css.divider} />
       <div className={css.selectFoodForm}>
         <div className={css.selectFoodHeader}>
@@ -98,7 +87,11 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
           </InlineTextButton>
         </div>
         <div className={css.selectDishContent}>
-          <DishSelectionForm dishes={dishes} onSubmit={onSelectDish} />
+          <DishSelectionForm
+            dishes={dishes}
+            onSubmit={onSelectDish}
+            initialValues={dishSelection}
+          />
         </div>
       </div>
     </div>

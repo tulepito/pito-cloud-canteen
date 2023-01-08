@@ -10,6 +10,7 @@ import { FormattedMessage } from 'react-intl';
 
 import type { TCalendarItemCardComponents } from '../../helpers/types';
 import WDayItem from '../DayItem/WDayItem';
+import IconCalendarToolbar from '../Icons/IconCalendar';
 import css from './WeekView.module.scss';
 
 const WEEK_DAYS_NUMBER = 7;
@@ -116,47 +117,56 @@ WeekView.title = (date: Date, { localizer }: { localizer: any }) => {
   const isSameYear = start.getFullYear() === end.getFullYear();
   if (isSameMonth) {
     return (
-      <span className={css.calendarTitle}>
-        <FormattedMessage
-          id="Calendar.Week.title"
-          values={{
-            start: start.getDate(),
-            end: end.getDate(),
-            month: start.getMonth() + 1,
-            year: start.getFullYear(),
-          }}
-        />
-      </span>
+      <div className={css.calendarTitleWrapper}>
+        <IconCalendarToolbar />
+        <span className={css.calendarTitle}>
+          <FormattedMessage
+            id="Calendar.Week.title"
+            values={{
+              start: start.getDate(),
+              end: end.getDate(),
+              month: start.getMonth() + 1,
+              year: start.getFullYear(),
+            }}
+          />
+        </span>
+      </div>
     );
   }
   if (isSameYear) {
     return (
-      <span className={css.calendarTitle}>
-        <FormattedMessage
-          id="Calendar.Week.title.diffMonth"
-          values={{
-            start: `${start.getDate()} Tháng ${start.getMonth() + 1}`,
-            end: `${end.getDate()} Tháng ${end.getMonth() + 1}`,
-            year: start.getFullYear(),
-          }}
-        />
-      </span>
+      <div className={css.calendarTitleWrapper}>
+        <IconCalendarToolbar />
+        <span className={css.calendarTitle}>
+          <FormattedMessage
+            id="Calendar.Week.title.diffMonth"
+            values={{
+              start: `${start.getDate()} Tháng ${start.getMonth() + 1}`,
+              end: `${end.getDate()} Tháng ${end.getMonth() + 1}`,
+              year: start.getFullYear(),
+            }}
+          />
+        </span>
+      </div>
     );
   }
   return (
-    <span className={css.calendarTitle}>
-      <FormattedMessage
-        id="Calendar.Week.title.diffYear"
-        values={{
-          start: `${start.getDate()} Tháng ${
-            start.getMonth() + 1
-          }, ${start.getFullYear()}`,
-          end: `${end.getDate()} Tháng ${
-            end.getMonth() + 1
-          }, ${end.getFullYear()}`,
-        }}
-      />
-    </span>
+    <div className={css.calendarTitleWrapper}>
+      <IconCalendarToolbar />
+      <span className={css.calendarTitle}>
+        <FormattedMessage
+          id="Calendar.Week.title.diffYear"
+          values={{
+            start: `${start.getDate()} Tháng ${
+              start.getMonth() + 1
+            }, ${start.getFullYear()}`,
+            end: `${end.getDate()} Tháng ${
+              end.getMonth() + 1
+            }, ${end.getFullYear()}`,
+          }}
+        />
+      </span>
+    </div>
   );
 };
 

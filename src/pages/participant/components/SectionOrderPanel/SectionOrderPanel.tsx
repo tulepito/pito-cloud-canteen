@@ -3,9 +3,11 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { ParticipantSetupPlanThunks } from '@redux/slices/ParticipantSetupPlanPage.slice';
 import { shopingCartThunks } from '@redux/slices/shopingCart.slice';
 import { LISTING } from '@utils/data';
+import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 
 import CartItem from './CartItem';
 import css from './SectionOrderPanel.module.scss';
@@ -28,6 +30,9 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   });
   const plan = useAppSelector((state) => state.ParticipantSetupPlanPage.plan);
   const orderDays = Object.keys(plan);
+  const loadDataInProgress = useAppSelector(
+    (state) => state.ParticipantSetupPlanPage.loadDataInProgress,
+  );
   const submitDataInprogress = useAppSelector(
     (state) => state.ParticipantSetupPlanPage.submitDataInprogress,
   );
@@ -58,9 +63,16 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     }/${planDate.getFullYear()}`;
 
     const foodList = plan?.[key]?.foodList || [];
-    const selectedDish = foodList.find((food: any) => food?.id?.uuid === item);
-    const dishAttributes = LISTING(selectedDish).getAttributes();
-    const dishTitle = dishAttributes?.title;
+    const selectedDish =
+      item === 'notJoined'
+        ? null
+        : foodList.find((food: any) => food?.id?.uuid === item);
+    const dishAttributes =
+      item === 'notJoined' ? null : LISTING(selectedDish).getAttributes();
+    const dishTitle =
+      item === 'notJoined'
+        ? intl.formatMessage({ id: 'SectionOrderPanel.notJoined' })
+        : dishAttributes?.title;
 
     return (
       <CartItem
@@ -100,16 +112,23 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
           )}
         </p>
       </div>
-      <div className={css.sectionBody}>
-        {cartListKeys.map((cartKey: string) =>
-          renderItem(cartList[cartKey], cartKey),
+      <div
+        className={classNames(css.sectionBody, {
+          [css.sectionBodyEmpty]: cartListKeys.length === 0,
+        })}>
+        {loadDataInProgress ? (
+          <Skeleton className={css.lineItemLoading} count={4} />
+        ) : (
+          cartListKeys.map((cartKey: string) =>
+            renderItem(cartList[cartKey], cartKey),
+          )
         )}
       </div>
       <div className={css.sectionFooter}>
         <Button
           fullWidth
           onClick={handleSubmit}
-          disabled={submitDataInprogress}
+          disabled={submitDataInprogress || cartListKeys.length === 0}
           inProgress={submitDataInprogress}>
           {completeOrderButtonLabel}
         </Button>

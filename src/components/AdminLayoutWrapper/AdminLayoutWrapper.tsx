@@ -6,12 +6,12 @@ import AdminLayoutContent from '@components/AdminLayoutContent/AdminLayoutConten
 import AdminLayoutSidebar from '@components/AdminLayoutSidebar/AdminLayoutSidebar';
 import AdminLayoutTopbar from '@components/AdminLayoutTopbar/AdminLayoutTopbar';
 import classNames from 'classnames';
-import type { PropsWithChildren } from 'react';
+import type { ReactElement } from 'react';
 import React from 'react';
 
 import css from './AdminLayoutWrapper.module.scss';
 
-const prepareChildren = (children: any) => {
+const prepareChildren = (children: ReactElement[]) => {
   const childrenCount = React.Children.count(children);
   if (!(childrenCount === 2 || childrenCount === 3)) {
     throw new Error(
@@ -22,7 +22,7 @@ const prepareChildren = (children: any) => {
 
   const childrenMap = {} as any;
 
-  React.Children.forEach(children, (child) => {
+  React.Children.forEach(children, (child: ReactElement) => {
     if (child.type === AdminLayoutTopbar) {
       childrenMap.layoutWrapperTopbar = child;
     } else if (child.type === AdminLayoutSidebar) {
@@ -43,13 +43,14 @@ const prepareChildren = (children: any) => {
   return childrenMap;
 };
 
-type TAdminLayoutWrapperProps = PropsWithChildren<{
-  rootClassName?: string;
+type TAdminLayoutWrapper = {
   className?: string;
-}>;
+  rootClassName?: string;
+  children: ReactElement[];
+};
 
-const AdminLayoutWrapper: React.FC<TAdminLayoutWrapperProps> = (props) => {
-  const { className, rootClassName, children } = props;
+const AdminLayoutWrapper = (props: TAdminLayoutWrapper) => {
+  const { className, children, rootClassName } = props;
   const preparedChildren = prepareChildren(children);
   const classes = classNames(rootClassName || css.root, className);
   const maybeFooter = preparedChildren.layoutWrapperFooter || null;

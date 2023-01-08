@@ -317,3 +317,80 @@ export const EXTRA_SERVICE_OPTIONS = [
     textPlaceholder: 'Nhập dịch vụ khác',
   },
 ];
+
+export type TBusinessTypeOptions = {
+  key: string;
+  label: string;
+};
+
+export const BUSINESS_TYPE_OPTIONS: TBusinessTypeOptions[] = [
+  {
+    key: 'company',
+    label: 'Công ty',
+  },
+  {
+    key: 'individualBusinessHouseholds',
+    label: 'Loại hình kinh doanh cá thể',
+  },
+];
+
+export const YES = 'yes';
+export const NO = 'no';
+export const REGISTERING = 'registering';
+
+export const BUSINESS_LICENSE_OPTIONS = [
+  {
+    id: 'businessLicense.yes',
+    key: YES,
+    hasImage: true,
+    label: 'Có',
+  },
+  {
+    id: 'businessLicense.registering',
+    key: REGISTERING,
+    label: 'Đang đăng ký',
+  },
+  {
+    id: 'businessLicense.no',
+    key: NO,
+    label: 'Chưa',
+  },
+];
+
+export const FOOD_CERTIFICATE_RADIO_OPTIONS = [
+  {
+    id: 'foodCertificate.yes',
+    key: YES,
+    hasImage: true,
+    label: 'Có',
+  },
+  {
+    id: 'foodCertificate.registering',
+    key: REGISTERING,
+    label: 'Đang đăng ký',
+  },
+  {
+    id: 'foodCertificate.no',
+    key: NO,
+    label: 'Chưa',
+  },
+];
+
+export const PARTY_INSURANCE_RADIO_OPTIONS = [
+  {
+    id: 'partyInsurance.yes',
+    key: YES,
+    hasImage: true,
+    label: 'Có',
+  },
+  {
+    id: 'partyInsurance.registering',
+    key: REGISTERING,
+    label: 'Đang đăng ký',
+  },
+  {
+    id: 'partyInsurance.no',
+    key: NO,
+    label: 'Chưa',
+  },
+];

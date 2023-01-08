@@ -6,6 +6,7 @@ import FieldAvailability, {
 import FieldCheckboxGroup from '@components/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
 import FieldPhotoUpload from '@components/FieldPhotoUpload/FieldPhotoUpload';
+import FieldTextArea from '@components/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
@@ -19,8 +20,9 @@ import {
   composeValidators,
   composeValidatorsWithAllValues,
   emailFormatValid,
+  minPriceLength,
   nonEmptyImage,
-  numberMinLength,
+  parsePrice,
   passwordFormatValid,
   passwordMatchConfirmPassword,
   phoneNumberFormatValid,
@@ -148,7 +150,7 @@ const EditPartnerBasicInformationForm: React.FC<
       facebookLink,
       description,
       packaging: [...packaging, ...(packagingOther ? [OTHER_OPTION] : [])],
-      minPrice,
+      minPrice: parsePrice(minPrice),
       bankAccounts: bankAccounts || defaultBankAccounts,
       packagingOther,
     }),
@@ -443,7 +445,7 @@ const EditPartnerBasicInformationForm: React.FC<
                   }),
                 )}
               />
-              <FieldTextInput
+              <FieldTextArea
                 className={css.field}
                 name="description"
                 id="description"
@@ -453,6 +455,7 @@ const EditPartnerBasicInformationForm: React.FC<
                 label={intl.formatMessage({
                   id: 'EditPartnerForm.partnerIntroductionLabel',
                 })}
+                type="textarea"
               />
             </div>
 
@@ -501,13 +504,14 @@ const EditPartnerBasicInformationForm: React.FC<
                           id: 'EditPartnerBasicInformationForm.minPriceRequired',
                         }),
                       ),
-                      numberMinLength(
+                      minPriceLength(
                         intl.formatMessage({
                           id: 'EditPartnerBasicInformationForm.minPriceValid',
                         }),
                         0,
                       ),
                     )}
+                    parse={parsePrice}
                     rightIcon={<div className={css.currency}>đ</div>}
                   />
                   <p className={css.packagingLabel}>

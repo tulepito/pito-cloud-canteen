@@ -92,13 +92,21 @@ export const shopingCartSlice = createSlice({
       },
     ) => {
       const { currentUserId, planId } = payload || {};
+      const orderDays = Object.keys(
+        state.orders?.[currentUserId]?.[planId] || {},
+      );
+      const mappingData = orderDays.reduce((acc: any, currDay: any) => {
+        acc[currDay] = null;
+        return acc;
+      }, {});
+
       return {
         ...state,
         orders: {
           ...state.orders,
           [currentUserId]: {
             ...(state.orders?.[currentUserId] || {}),
-            [planId]: {},
+            [planId]: mappingData,
           },
         },
       };
@@ -118,6 +126,7 @@ const addToCartThunk = createAsyncThunk(
     { getState, dispatch },
   ) => {
     const { currentUser } = getState().user;
+
     return dispatch(
       shopingCartSlice.actions.addToCart({
         currentUserId: currentUser.id.uuid,

@@ -10,9 +10,10 @@ import { FormattedMessage } from 'react-intl';
 
 import type { TCalendarItemCardComponents } from '../../helpers/types';
 import MDayItem from '../DayItem/MDayItem';
+import IconCalendarToolbar from '../Icons/IconCalendar';
 import css from './MonthView.module.scss';
 
-const MONTH_DAY_NUMBER = 30;
+const MONTH_DAY_NUMBER = 31;
 
 type TMonthViewProps = {
   date: Date;
@@ -40,7 +41,9 @@ function MonthView({
     () => MonthView.range(date, { localizer }),
     [date, localizer],
   );
-
+  const firstDay = currRange[0];
+  const totalEmptyDays = (firstDay.getDay() || 7) - 1;
+  const emptyDayEls = Array.from(Array(totalEmptyDays).keys());
   return (
     <div className={css.root}>
       <div className={css.scrollContainer}>
@@ -48,6 +51,9 @@ function MonthView({
           <div key={item} className={css.dayInWeekHeader}>
             <FormattedMessage id={`MonthView.dayInWeekHeader.${item}`} />
           </div>
+        ))}
+        {emptyDayEls.map((item) => (
+          <div key={item} className={css.emptyDay}></div>
         ))}
         {currRange.map((item) => (
           <MDayItem
@@ -65,7 +71,8 @@ function MonthView({
 
 MonthView.range = (date: Date, { localizer }: { localizer: any }) => {
   const start = DateTime.fromJSDate(date).startOf('month').toJSDate();
-  const end = localizer.add(start, MONTH_DAY_NUMBER - 1, 'day');
+  const { daysInMonth } = DateTime.fromJSDate(date);
+  const end = localizer.add(start, daysInMonth - 1, 'day');
 
   let current = start;
   const range = [];
@@ -102,47 +109,56 @@ MonthView.title = (date: Date, { localizer }: { localizer: any }) => {
   const isSameYear = start.getFullYear() === end.getFullYear();
   if (isSameMonth) {
     return (
-      <span className={css.calendarTitle}>
-        <FormattedMessage
-          id="Calendar.Week.title"
-          values={{
-            start: start.getDate(),
-            end: end.getDate(),
-            month: start.getMonth() + 1,
-            year: start.getFullYear(),
-          }}
-        />
-      </span>
+      <div className={css.calendarTitleWrapper}>
+        <IconCalendarToolbar />
+        <span className={css.calendarTitle}>
+          <FormattedMessage
+            id="Calendar.Week.title"
+            values={{
+              start: start.getDate(),
+              end: end.getDate(),
+              month: start.getMonth() + 1,
+              year: start.getFullYear(),
+            }}
+          />
+        </span>
+      </div>
     );
   }
   if (isSameYear) {
     return (
-      <span className={css.calendarTitle}>
-        <FormattedMessage
-          id="Calendar.Week.title.diffMonth"
-          values={{
-            start: `${start.getDate()} Tháng ${start.getMonth() + 1}`,
-            end: `${end.getDate()} Tháng ${end.getMonth() + 1}`,
-            year: start.getFullYear(),
-          }}
-        />
-      </span>
+      <div className={css.calendarTitleWrapper}>
+        <IconCalendarToolbar />
+        <span className={css.calendarTitle}>
+          <FormattedMessage
+            id="Calendar.Week.title.diffMonth"
+            values={{
+              start: `${start.getDate()} Tháng ${start.getMonth() + 1}`,
+              end: `${end.getDate()} Tháng ${end.getMonth() + 1}`,
+              year: start.getFullYear(),
+            }}
+          />
+        </span>
+      </div>
     );
   }
   return (
-    <span className={css.calendarTitle}>
-      <FormattedMessage
-        id="Calendar.Week.title.diffYear"
-        values={{
-          start: `${start.getDate()} Tháng ${
-            start.getMonth() + 1
-          }, ${start.getFullYear()}`,
-          end: `${end.getDate()} Tháng ${
-            end.getMonth() + 1
-          }, ${end.getFullYear()}`,
-        }}
-      />
-    </span>
+    <div className={css.calendarTitleWrapper}>
+      <IconCalendarToolbar />
+      <span className={css.calendarTitle}>
+        <FormattedMessage
+          id="Calendar.Week.title.diffYear"
+          values={{
+            start: `${start.getDate()} Tháng ${
+              start.getMonth() + 1
+            }, ${start.getFullYear()}`,
+            end: `${end.getDate()} Tháng ${
+              end.getMonth() + 1
+            }, ${end.getFullYear()}`,
+          }}
+        />
+      </span>
+    </div>
   );
 };
 
