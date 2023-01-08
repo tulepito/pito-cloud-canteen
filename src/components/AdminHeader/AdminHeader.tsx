@@ -3,7 +3,7 @@ import Avatar from '@components/Avatar/Avatar';
 import { InlineTextButton } from '@components/Button/Button';
 import IconArrow from '@components/IconArrow/IconArrow';
 import IconBell from '@components/IconBell/IconBell';
-import PitoLogo from '@components/PitoLogo/PitoLogo';
+import PitoLogo from '@components/PITOLogo/PITOLogo';
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';

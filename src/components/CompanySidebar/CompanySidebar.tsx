@@ -1,6 +1,6 @@
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
-import PitoLogo from '@components/PitoLogo/PitoLogo';
+import PitoLogo from '@components/PITOLogo/PITOLogo';
 import { companyPaths } from '@src/paths';
 import React from 'react';
 

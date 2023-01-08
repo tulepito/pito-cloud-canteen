@@ -1,5 +1,5 @@
 import IconBell from '@components/IconBell/IconBell';
-import PitoLogo from '@components/PitoLogo/PitoLogo';
+import PitoLogo from '@components/PITOLogo/PITOLogo';
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';

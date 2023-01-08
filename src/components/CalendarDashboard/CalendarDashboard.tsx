@@ -15,6 +15,8 @@ import type { TCalendarItemCardComponents } from './helpers/types';
 
 type TCalendarDashboard = {
   defaultDate?: Date;
+  startDate?: Date;
+  endDate?: Date;
   events?: Event[] | undefined;
   renderEvent?: React.FC<any>;
   companyLogo?: ReactNode;
@@ -22,6 +24,8 @@ type TCalendarDashboard = {
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboard> = ({
+  startDate,
+  endDate,
   defaultDate: propsDefaultDate,
   events = [],
   renderEvent = EventCard,
@@ -42,7 +46,9 @@ const CalendarDashboard: React.FC<TCalendarDashboard> = ({
   const { defaultDate, views } = useMemo(
     () => ({
       defaultDate:
-        propsDefaultDate || DateTime.now().startOf('week').toJSDate(),
+        startDate ||
+        propsDefaultDate ||
+        DateTime.now().startOf('week').toJSDate(),
       views: {
         month: MonthViewWrapper as any,
         week: WeekViewWrapper as any,
@@ -54,6 +60,12 @@ const CalendarDashboard: React.FC<TCalendarDashboard> = ({
     [],
   );
 
+  const toolbarExtraProps = {
+    companyLogo,
+    startDate,
+    endDate,
+  };
+
   return (
     <div className={css.root}>
       <Calendar
@@ -64,7 +76,7 @@ const CalendarDashboard: React.FC<TCalendarDashboard> = ({
         views={views}
         components={{
           toolbar: (props: any) => (
-            <Toolbar {...props} companyLogo={companyLogo} />
+            <Toolbar {...props} {...toolbarExtraProps} />
           ),
         }}
       />
