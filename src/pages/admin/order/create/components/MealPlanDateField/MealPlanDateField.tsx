@@ -1,5 +1,5 @@
-import FieldDatePicker from '@components/FieldDatePicker/FieldDatePicker';
-import FieldSelect from '@components/FieldSelect/FieldSelect';
+import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
+import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import addDays from 'date-fns/addDays';

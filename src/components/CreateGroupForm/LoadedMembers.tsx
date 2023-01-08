@@ -1,4 +1,4 @@
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import { Close } from '@components/Icons/Icons';
 import useBoolean from '@hooks/useBoolean';

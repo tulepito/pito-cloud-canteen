@@ -1,8 +1,8 @@
 import Button from '@components/Button/Button';
-import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
-import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { generalPaths } from '@src/paths';
 import {
   composeValidators,

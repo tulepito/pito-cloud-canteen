@@ -1,8 +1,8 @@
 import Button from '@components/Button/Button';
 import CSVFieldInput from '@components/CSVFieldInput/CSVFieldInput';
-import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { BookerManageCompany } from '@src/redux/slices/company.slice';
 import type { TObject } from '@utils/types';

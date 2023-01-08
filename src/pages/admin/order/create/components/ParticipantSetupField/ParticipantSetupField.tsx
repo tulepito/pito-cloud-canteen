@@ -1,4 +1,4 @@
-import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import { useAppSelector } from '@hooks/reduxHooks';
 import difference from 'lodash/difference';
 import Link from 'next/link';

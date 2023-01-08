@@ -7,7 +7,7 @@
  *
  */
 
-import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import ValidationError from '@components/ValidationError/ValidationError';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';

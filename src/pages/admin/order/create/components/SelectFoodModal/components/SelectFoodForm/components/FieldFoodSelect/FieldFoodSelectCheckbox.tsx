@@ -1,4 +1,4 @@
-import { IconCheckbox } from '@components/FieldCheckbox/FieldCheckbox';
+import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import classNames from 'classnames';
 import type { FieldInputProps } from 'react-final-form';
 import { Field } from 'react-final-form';

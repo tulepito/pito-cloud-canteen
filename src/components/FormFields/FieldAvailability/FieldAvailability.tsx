@@ -1,7 +1,7 @@
 import { InlineTextButton } from '@components/Button/Button';
-import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
-import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
-import FieldSelect from '@components/FieldSelect/FieldSelect';
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
+import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import { EDayOfWeek } from '@utils/enums';

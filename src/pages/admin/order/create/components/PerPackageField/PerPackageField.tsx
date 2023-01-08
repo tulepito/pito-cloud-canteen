@@ -1,4 +1,4 @@
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import Toggle from '@components/Toggle/Toggle';
 import { addCommas, removeNonNumeric } from '@helpers/format';
 import {

@@ -1,6 +1,6 @@
 import Button from '@components/Button/Button';
-import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
 import Form from '@components/Form/Form';
+import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
 import {
   composeValidators,
   passwordFormatValid,

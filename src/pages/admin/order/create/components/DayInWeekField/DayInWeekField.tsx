@@ -1,4 +1,4 @@
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';

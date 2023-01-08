@@ -1,7 +1,7 @@
 import Button from '@components/Button/Button';
-import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconGoogle from '@components/Icons/IconGoogle/IconGoogle';
 import { generalPaths } from '@src/paths';
 import {

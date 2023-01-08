@@ -1,5 +1,5 @@
-import FieldPhotoUpload from '@components/FieldPhotoUpload/FieldPhotoUpload';
-import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
+import FieldPhotoUpload from '@components/FormFields/FieldPhotoUpload/FieldPhotoUpload';
+import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import { nonEmptyImage } from '@utils/validators';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';

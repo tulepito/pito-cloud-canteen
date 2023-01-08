@@ -1,5 +1,5 @@
 import { InlineTextButton } from '@components/Button/Button';
-import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
+import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import { CATEGORY_OPTIONS } from '@utils/enums';
 import classNames from 'classnames';
 import get from 'lodash/get';

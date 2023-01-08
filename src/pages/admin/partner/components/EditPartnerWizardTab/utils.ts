@@ -1,4 +1,4 @@
-import { ALL_WEEK_APPLY } from '@components/FieldAvailability/FieldAvailability';
+import { ALL_WEEK_APPLY } from '@components/FormFields/FieldAvailability/FieldAvailability';
 import { getDefaultTimeZoneOnBrowser } from '@utils/dates';
 import { EDayOfWeek, OTHER_OPTION } from '@utils/enums';
 import type { TAvailabilityPlan, TOwnListing } from '@utils/types';

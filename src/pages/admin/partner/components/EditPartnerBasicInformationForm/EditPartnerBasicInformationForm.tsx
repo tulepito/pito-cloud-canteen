@@ -1,14 +1,14 @@
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
+import Form from '@components/Form/Form';
 import FieldAvailability, {
   SINGLE_DAY_APPLY,
-} from '@components/FieldAvailability/FieldAvailability';
-import FieldCheckboxGroup from '@components/FieldCheckboxGroup/FieldCheckboxGroup';
-import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
-import FieldPhotoUpload from '@components/FieldPhotoUpload/FieldPhotoUpload';
-import FieldTextArea from '@components/FieldTextArea/FieldTextArea';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
-import Form from '@components/Form/Form';
+} from '@components/FormFields/FieldAvailability/FieldAvailability';
+import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
+import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
+import FieldPhotoUpload from '@components/FormFields/FieldPhotoUpload/FieldPhotoUpload';
+import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useViewport } from '@hooks/useViewport';

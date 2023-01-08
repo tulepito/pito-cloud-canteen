@@ -1,4 +1,4 @@
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import type { TFormEvent, TIconProps } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';

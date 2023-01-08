@@ -1,12 +1,12 @@
 import Accordion from '@components/Accordion/Accordion';
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
-import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
-import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
-import FieldSelect from '@components/FieldSelect/FieldSelect';
-import FieldTextArea from '@components/FieldTextArea/FieldTextArea';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
+import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import Modal from '@components/Modal/Modal';
