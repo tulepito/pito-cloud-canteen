@@ -194,6 +194,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           </div>
           <div className={css.calendarContainer}>
             <CalendarDashboard
+              startDate={new Date(startDate)}
+              endDate={new Date(endDate)}
               events={resourcesForCalender}
               renderEvent={MealPlanCard}
               companyLogo="Company"
