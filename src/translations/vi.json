@@ -616,5 +616,8 @@
   "EditPartnerForm.mediaLabel": "Hình nền và ảnh đại diện",
   "SectionOrderPanel.successModal.title": "Đăng Ký Thành Công",
   "SectionOrderPanel.successModal.description": "Vui lòng liên hệ người tạo đơn để biết thêm chi tiết.",
-  "SectionOrderPanel.successModal.confirmBtn": "Tiếp tục chọn món"
+  "SectionOrderPanel.successModal.confirmBtn": "Tiếp tục chọn món",
+  "CreateOrderRoute.title": "Tạo đơn hàng",
+  "CreateOrderRoute.description": "Tạo đơn hàng",
+  "SectionOrderListing.selectForMeBtn": "Chọn giúp tôi"
 }
