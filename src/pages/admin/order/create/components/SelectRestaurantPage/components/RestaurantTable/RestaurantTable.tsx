@@ -1,32 +1,19 @@
+import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppSelector } from '@hooks/reduxHooks';
-import type { FormState } from 'final-form';
 import { FormattedMessage } from 'react-intl';
 
-import FieldRestaurant from './FieldRestaurant';
+import RestaurantRow from './RestaurantRow';
 import css from './RestaurantTable.module.scss';
 import RestaurantTableHead from './RestaurantTableHead';
-import type { TSelectRestaurantFormValues } from './SelectRestaurantForm';
-import SelectRestaurantForm from './SelectRestaurantForm';
 
 type TRestaurantTableProps = {
   restaurants: any;
-  currentRestaurant: any;
-  isSelectedRestaurant: boolean;
   onItemClick: (id: string) => () => void;
-  onFormChange: (
-    form: FormState<
-      TSelectRestaurantFormValues,
-      Partial<TSelectRestaurantFormValues>
-    >,
-  ) => void;
 };
 
 const RestaurantTable: React.FC<TRestaurantTableProps> = ({
   restaurants,
   onItemClick,
-  isSelectedRestaurant,
-  currentRestaurant,
-  onFormChange,
 }) => {
   const { fetchRestaurantsPending } = useAppSelector(
     (state) => state.SelectRestaurantPage,
@@ -35,35 +22,34 @@ const RestaurantTable: React.FC<TRestaurantTableProps> = ({
   return (
     <>
       <RestaurantTableHead />
-      <SelectRestaurantForm
-        onSubmit={() => {}}
-        currentRestaurant={currentRestaurant}
-        isSelectedRestaurant={isSelectedRestaurant}
-        onFormChange={onFormChange}>
-        <>
-          {fetchRestaurantsPending ? (
-            <div className={css.center}>
-              <FormattedMessage id="RestaurantTable.loadingText" />
-            </div>
-          ) : (
-            <>
-              {restaurants?.length > 0 ? (
-                restaurants.map((restaurant: any, index: any) => (
-                  <FieldRestaurant
-                    key={index}
+
+      <div>
+        {fetchRestaurantsPending ? (
+          <div className={css.center}>
+            <FormattedMessage id="RestaurantTable.loadingText" />
+          </div>
+        ) : (
+          <>
+            {restaurants?.length > 0 ? (
+              restaurants.map((restaurant: any) => (
+                <Tooltip
+                  key={restaurant?.id?.uuid}
+                  placement="bottom"
+                  tooltipContent={<>{'Xem menu'}</>}>
+                  <RestaurantRow
                     restaurant={restaurant}
                     onItemClick={onItemClick(restaurant)}
                   />
-                ))
-              ) : (
-                <div className={css.center}>
-                  <FormattedMessage id="RestaurantTable.noResults" />
-                </div>
-              )}
-            </>
-          )}
-        </>
-      </SelectRestaurantForm>
+                </Tooltip>
+              ))
+            ) : (
+              <div className={css.center}>
+                <FormattedMessage id="RestaurantTable.noResults" />
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </>
   );
 };
