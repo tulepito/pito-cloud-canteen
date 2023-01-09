@@ -30,7 +30,7 @@ export const createEntriesFromSubmitValues = (values: any) =>
       return startTime && endTime
         ? {
             dayOfWeek,
-            seats: 1,
+            seats: 100,
             startTime,
             endTime: endTime === '24:00' ? '00:00' : endTime,
           }
@@ -76,7 +76,7 @@ const createAvailabilityPlanFromAllWeekEntries = (
         return {
           ...curE,
           dayOfWeek: curD,
-          seats: 1,
+          seats: 100,
         };
       }),
     }),
