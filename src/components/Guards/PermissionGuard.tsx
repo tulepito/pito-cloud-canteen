@@ -45,9 +45,7 @@ const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
         break;
     }
 
-    if (isMatchedPermission === null) {
-      router.push(generalPaths.SignIn);
-    } else if (!isMatchedPermission) {
+    if (isMatchedPermission !== null && !isMatchedPermission) {
       router.push(homePageRoute);
     }
   }, [
