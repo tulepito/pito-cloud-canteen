@@ -85,7 +85,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       vatAllow: vatAllow || true,
       pickAllow: pickAllow || true,
       selectedGroups: selectedGroups || ['allMembers'],
-      deliveryHour: deliveryHour || '7:00',
+      deliveryHour: deliveryHour || '07:00',
       deliveryAddress:
         location || deliveryAddress
           ? {
@@ -99,7 +99,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       startDate: startDate || '',
       endDate: endDate || '',
       deadlineDate: deadlineDate || null,
-      deadlineHour: deadlineHour || '7:00',
+      deadlineHour: deadlineHour || '07:00',
     }),
     [
       dayInWeek,

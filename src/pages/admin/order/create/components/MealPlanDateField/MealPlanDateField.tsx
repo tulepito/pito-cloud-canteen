@@ -10,9 +10,9 @@ import { useIntl } from 'react-intl';
 import css from './MealPlanDateField.module.scss';
 
 const TIME_OPTIONS = [
-  '7:00',
-  '8:00',
-  '9:00',
+  '07:00',
+  '08:00',
+  '09:00',
   '10:00',
   '11:00',
   '12:00',
