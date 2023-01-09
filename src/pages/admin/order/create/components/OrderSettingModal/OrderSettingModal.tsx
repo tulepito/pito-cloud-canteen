@@ -208,7 +208,23 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
     }
   };
   const onSubmit = (values: any) => {
-    dispatch(updateDraftMealPlan(values));
+    const {
+      deliveryAddress: deliveryAddressValues,
+      packagePerMember: packagePerMemberValue,
+      ...rest
+    } = values;
+    const {
+      selectedPlace: { address: addressValue, origin: originValue },
+    } = deliveryAddressValues;
+    const createOrderValue = {
+      deliveryAddress: {
+        address: addressValue,
+        origin: originValue,
+      },
+      packagePerMember: +packagePerMemberValue.replace(/,/g, ''),
+      ...rest,
+    };
+    dispatch(updateDraftMealPlan(createOrderValue));
   };
   return (
     <Modal
