@@ -18,7 +18,7 @@ type TModal = {
   contentClassName?: string;
   handleClose: () => void;
   scrollLayerClassName?: string;
-  customHeader: ReactNode;
+  customHeader?: ReactNode;
 };
 
 const Modal = (props: TModal) => {
