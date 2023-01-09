@@ -1,10 +1,9 @@
-import AlertModal from '@components/Modal/AlertModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { ParticipantSetupPlanThunks } from '@redux/slices/ParticipantSetupPlanPage.slice';
 import { shopingCartThunks } from '@redux/slices/shopingCart.slice';
 import { useState } from 'react';
-import { useIntl } from 'react-intl';
 
+import DeleteCartModal from './DeleteCartModal';
 import OrderPanelBody from './OrderPanelBody';
 import OrderPanelFooter from './OrderPanelFooter';
 import OrderPanelHeader from './OrderPanelHeader';
@@ -20,8 +19,6 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   planId,
   orderId,
 }) => {
-  const intl = useIntl();
-
   const cartList = useAppSelector((state: any) => {
     const { currentUser } = state.user;
     const currUserId = currentUser?.id?.uuid;
@@ -74,6 +71,8 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     setIsSubmitSuccess(false);
   };
 
+  const handleAutoSelect = () => {};
+
   return (
     <div className={css.root}>
       <OrderPanelHeader
@@ -86,6 +85,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
         cartListKeys={cartListKeys}
         loadDataInProgress={loadDataInProgress}
         handleRemoveItem={handleRemoveItem}
+        onAutoSelect={handleAutoSelect}
       />
       <OrderPanelFooter
         submitDataInprogress={submitDataInprogress}
@@ -93,24 +93,12 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
         handleSubmit={handleSubmit}
         handleRemoveAllItem={handleRemoveAllItem}
       />
-      <AlertModal
+      <DeleteCartModal
         isOpen={isOpenConfirmDeleteAll}
-        handleClose={handleCloseConfirmDeleteAll}
-        title={intl.formatMessage({
-          id: 'SectionOrderPanel.Alert.confirmDeleteTitle',
-        })}
-        cancelLabel={intl.formatMessage({
-          id: 'SectionOrderPanel.Alert.cancelDeleteBtn',
-        })}
-        confirmLabel={intl.formatMessage({
-          id: 'SectionOrderPanel.Alert.confirmDeleteBtn',
-        })}
+        onClose={handleCloseConfirmDeleteAll}
         onCancel={handleCloseConfirmDeleteAll}
-        onConfirm={handleConfirmDeleteAll}>
-        {intl.formatMessage({
-          id: 'SectionOrderPanel.Alert.confirmDeleteMessage',
-        })}
-      </AlertModal>
+        onConfirm={handleConfirmDeleteAll}
+      />
       <SuccessModal
         isOpen={isSubmitSuccess}
         handleClose={handleCloseSuccessModal}

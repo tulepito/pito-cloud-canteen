@@ -619,5 +619,8 @@
   "SectionOrderPanel.successModal.confirmBtn": "Tiếp tục chọn món",
   "CreateOrderRoute.title": "Tạo đơn hàng",
   "CreateOrderRoute.description": "Tạo đơn hàng",
-  "SectionOrderListing.selectForMeBtn": "Chọn giúp tôi"
+  "SectionOrderListing.selectForMeBtn": "Chọn giúp tôi",
+  "SectionOrderListing.selectForMeWholeWeekBtn": "Chọn giúp tôi cả tuần",
+  "MonthView.monthName": "Tháng {month}",
+  "DishSelectionForm.youAreNotJoined": "Bạn đã không tham gia"
 }

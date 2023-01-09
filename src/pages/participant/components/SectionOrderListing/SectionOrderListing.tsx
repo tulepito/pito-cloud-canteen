@@ -2,6 +2,7 @@ import IconBanned from '@components/Icons/IconBanned';
 import IconCheckmarkTabTitle from '@components/Icons/IconCheckmarkTabTitle';
 import ListingCard from '@components/ListingCard/ListingCard';
 import Tabs from '@components/Tabs/Tabs';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
@@ -58,9 +59,13 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
           </span>
           {hasDishInCart &&
             (hasDishInCart === 'notJoined' ? (
-              <IconBanned className={css.tabTitleIcon} />
+              <Tooltip tooltipContent={'meow'}>
+                <IconBanned className={css.tabTitleIcon} />
+              </Tooltip>
             ) : (
-              <IconCheckmarkTabTitle className={css.tabTitleIcon} />
+              <Tooltip tooltipContent={'meow'}>
+                <IconCheckmarkTabTitle className={css.tabTitleIcon} />
+              </Tooltip>
             ))}
           {}
         </div>
