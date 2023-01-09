@@ -14,6 +14,15 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './FieldAvailability.module.scss';
 
+const defaultAvailabilityPlan = (dayOfWeek: string) => {
+  return {
+    dayOfWeek,
+    startTime: '07:00',
+    endTime: '22:00',
+    seats: 100,
+  };
+};
+
 const printHourStrings = memoize((i: number) => {
   const h = Math.floor(i / 2);
   const m = i % 2;
@@ -287,7 +296,7 @@ const getEntryWeeklyBoundaries =
     }, []);
   };
 
-const handleDayToApplyChange = ({
+const getNewValuesOnDayToApplyChange = ({
   checked,
   dayToApplyValue,
   availabilityPlan,
@@ -298,27 +307,22 @@ const handleDayToApplyChange = ({
   const allValues = { ...values };
   let newDayToApplyValues = [];
   let newAvailabilityPlan = {};
-  const valueIsAllWeek = dayToApplyValue === ALL_WEEK_APPLY;
+  const dayToApplyIsAllWeek = dayToApplyValue === ALL_WEEK_APPLY;
   if (checked) {
-    if (valueIsAllWeek) {
+    // Get unpicked days of week yet
+    const remainDays = [] as string[];
+    Object.keys(EDayOfWeek).forEach((d: string) => {
+      if (!availabilityPlan[d]) {
+        remainDays.push(d);
+      }
+    });
+    if (dayToApplyIsAllWeek) {
       newDayToApplyValues = [ALL_WEEK_APPLY];
-      const remainDays = [] as string[];
-      Object.keys(EDayOfWeek).forEach((d: string) => {
-        if (!availabilityPlan[d]) {
-          remainDays.push(d);
-        }
-      });
+      // Add default availability to all remaining days of week
       const remainAvailability = remainDays.reduce((prev, cur) => {
         return {
           ...prev,
-          [cur]: [
-            {
-              dayOfWeek: cur,
-              startTime: '00:00',
-              endTime: '23:00',
-              seats: 1,
-            },
-          ],
+          [cur]: [defaultAvailabilityPlan(cur)],
         };
       }, {});
       newAvailabilityPlan = {
@@ -326,12 +330,6 @@ const handleDayToApplyChange = ({
         ...remainAvailability,
       };
     } else {
-      const remainDays = [] as string[];
-      Object.keys(EDayOfWeek).forEach((d: string) => {
-        if (!availabilityPlan[d]) {
-          remainDays.push(d);
-        }
-      });
       newDayToApplyValues = uniqueStringEntries([
         ...allValues[daysToApplyName],
         dayToApplyValue,
@@ -343,18 +341,13 @@ const handleDayToApplyChange = ({
             ...(allValues[availabilityName][dayToApplyValue]
               ? values[availabilityName][dayToApplyValue]
               : []),
-            {
-              dayOfWeek: dayToApplyValue,
-              startTime: '00:00',
-              endTime: '23:00',
-              seats: 1,
-            },
+            defaultAvailabilityPlan(dayToApplyValue),
           ],
           ['dayOfWeek'],
         ),
       };
     }
-  } else if (valueIsAllWeek) {
+  } else if (dayToApplyIsAllWeek) {
     newDayToApplyValues = [...allValues[daysToApplyName]].filter(
       (i: string) => i !== dayToApplyValue,
     );
@@ -381,19 +374,13 @@ const handleDayToApplyChange = ({
     filteredTargetValue.length !== Object.keys(EDayOfWeek).length;
 
   if (shouldClearAllWeeKApply && dayToApplyValue !== ALL_WEEK_APPLY) {
-    newDayToApplyValues = filteredTargetValue;
     let availabilityWithClearedAllWeekApply = {};
+
+    newDayToApplyValues = filteredTargetValue;
     newDayToApplyValues.forEach((d: string) => {
       availabilityWithClearedAllWeekApply = {
         ...availabilityWithClearedAllWeekApply,
-        [d]: [
-          {
-            dayOfWeek: dayToApplyValue,
-            startTime: '00:00',
-            endTime: '23:00',
-            seats: 1,
-          },
-        ],
+        [d]: [defaultAvailabilityPlan(dayToApplyValue)],
       };
     });
     newAvailabilityPlan = availabilityWithClearedAllWeekApply;
@@ -633,7 +620,7 @@ const DailyPlan: React.FC<any> = (props) => {
                   onClick={() =>
                     fields.push({
                       dayOfWeek,
-                      seets: 1,
+                      seets: 100,
                       startTime: null,
                       endTime: null,
                     })
@@ -658,18 +645,17 @@ const FieldAvailability = (props: any) => {
   const dayToApplys = Object.keys(values[name]);
   const availabilityPlan = values[name];
 
-  const handleOnCheckDay = (e: any) => {
+  const handleOnCheckDayToApply = (e: any) => {
     const { name: daysToApplyName, value: dayToApplyValue, checked } = e.target;
-    const { newAvailabilityPlan, newDayToApplyValues } = handleDayToApplyChange(
-      {
+    const { newAvailabilityPlan, newDayToApplyValues } =
+      getNewValuesOnDayToApplyChange({
         values,
         daysToApplyName,
         dayToApplyValue,
         availabilityPlan,
         checked,
         availabilityName: name,
-      },
-    );
+      });
     form.change(daysToApplyName, newDayToApplyValues);
     form.change(name, newAvailabilityPlan);
   };
@@ -697,7 +683,7 @@ const FieldAvailability = (props: any) => {
                     id={`daysToApply.${day}`}
                     name={'daysToApply'}
                     value={day}
-                    customOnChange={handleOnCheckDay}
+                    customOnChange={handleOnCheckDayToApply}
                   />
                   <label htmlFor={`daysToApply.${day}`} key={day}>
                     {intl.formatMessage({
@@ -716,7 +702,7 @@ const FieldAvailability = (props: any) => {
                 id={`daysToApply.${ALL_WEEK_APPLY}`}
                 name={`daysToApply`}
                 value={ALL_WEEK_APPLY}
-                customOnChange={handleOnCheckDay}
+                customOnChange={handleOnCheckDayToApply}
               />
               <label htmlFor={`daysToApply.${ALL_WEEK_APPLY}`}>
                 {intl.formatMessage({

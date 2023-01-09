@@ -1,16 +1,15 @@
-import Button, { InlineTextButton } from '@components/Button/Button';
+import AlertModal from '@components/Modal/AlertModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { ParticipantSetupPlanThunks } from '@redux/slices/ParticipantSetupPlanPage.slice';
 import { shopingCartThunks } from '@redux/slices/shopingCart.slice';
-import { LISTING } from '@utils/data';
-import classNames from 'classnames';
-import { DateTime } from 'luxon';
-import React from 'react';
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
-import Skeleton from 'react-loading-skeleton';
 
-import CartItem from './CartItem';
+import OrderPanelBody from './OrderPanelBody';
+import OrderPanelFooter from './OrderPanelFooter';
+import OrderPanelHeader from './OrderPanelHeader';
 import css from './SectionOrderPanel.module.scss';
+import SuccessModal from './SuccessModal';
 
 type TSectionOrderPanelProps = {
   planId: string;
@@ -37,107 +36,85 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     (state) => state.ParticipantSetupPlanPage.submitDataInprogress,
   );
 
+  const cartListKeys = Object.keys(cartList || []).filter(
+    (cartKey) => !!cartList[cartKey],
+  );
+
+  // Local state
+  const [isOpenConfirmDeleteAll, setIsOpenConfirmDeleteAll] = useState(false);
+  const [isSubmitSuccess, setIsSubmitSuccess] = useState(false);
+
   const dispatch = useAppDispatch();
 
-  const handleRemoveItem = (dayId: string) => () => {
+  // Functions
+  const handleRemoveItem = (dayId: string) => {
     dispatch(shopingCartThunks.removeFromCart({ planId, dayId }));
   };
 
   const handleRemoveAllItem = () => {
-    dispatch(shopingCartThunks.removeAllFromPlanCart({ planId }));
+    setIsOpenConfirmDeleteAll(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    await dispatch(ParticipantSetupPlanThunks.updateOrder({ orderId, planId }));
+    setIsSubmitSuccess(true);
+  };
+
+  const handleConfirmDeleteAll = () => {
+    dispatch(shopingCartThunks.removeAllFromPlanCart({ planId }));
+    setIsOpenConfirmDeleteAll(false);
     dispatch(ParticipantSetupPlanThunks.updateOrder({ orderId, planId }));
   };
 
-  // Functions
-  const cartListKeysRaw = Object.keys(cartList || []);
-  const cartListKeys = cartListKeysRaw.filter((cartKey) => !!cartList[cartKey]);
-  const renderItem = (item: any, key: string) => {
-    const planDate = DateTime.fromMillis(Number(key)).toJSDate();
-    const itemLabel = `${intl.formatMessage({
-      id: `Calendar.week.dayHeader.${planDate.getDay()}`,
-    })}, ${planDate.getDate()}/${
-      planDate.getMonth() + 1
-    }/${planDate.getFullYear()}`;
-
-    const foodList = plan?.[key]?.foodList || [];
-    const selectedDish =
-      item === 'notJoined'
-        ? null
-        : foodList.find((food: any) => food?.id?.uuid === item);
-    const dishAttributes =
-      item === 'notJoined' ? null : LISTING(selectedDish).getAttributes();
-    const dishTitle =
-      item === 'notJoined'
-        ? intl.formatMessage({ id: 'SectionOrderPanel.notJoined' })
-        : dishAttributes?.title;
-
-    return (
-      <CartItem
-        key={key}
-        label={itemLabel}
-        value={dishTitle}
-        onRemove={handleRemoveItem(key)}
-      />
-    );
+  const handleCloseConfirmDeleteAll = () => {
+    setIsOpenConfirmDeleteAll(false);
   };
 
-  // Renders
-  const sectionTitle = intl.formatMessage({
-    id: 'SectionOrderPanel.sectionTitle',
-  });
-
-  const completeOrderButtonLabel = intl.formatMessage({
-    id: 'SectionOrderPanel.completeOrder',
-  });
-  const removeAllOrderCartLabel = intl.formatMessage({
-    id: 'SectionOrderPanel.removeAllOrderCartLabel',
-  });
+  const handleCloseSuccessModal = () => {
+    setIsSubmitSuccess(false);
+  };
 
   return (
     <div className={css.root}>
-      <div className={css.sectionHeader}>
-        <p className={css.title}>{sectionTitle}</p>
-        <p className={css.selectedDay}>
-          {intl.formatMessage(
-            {
-              id: 'SectionOrderPanel.numberSelectedDays',
-            },
-            {
-              selectedDays: cartListKeys.length,
-              sumDays: orderDays.length,
-            },
-          )}
-        </p>
-      </div>
-      <div
-        className={classNames(css.sectionBody, {
-          [css.sectionBodyEmpty]: cartListKeys.length === 0,
-        })}>
-        {loadDataInProgress ? (
-          <Skeleton className={css.lineItemLoading} count={4} />
-        ) : (
-          cartListKeys.map((cartKey: string) =>
-            renderItem(cartList[cartKey], cartKey),
-          )
-        )}
-      </div>
-      <div className={css.sectionFooter}>
-        <Button
-          fullWidth
-          onClick={handleSubmit}
-          disabled={submitDataInprogress || cartListKeys.length === 0}
-          inProgress={submitDataInprogress}>
-          {completeOrderButtonLabel}
-        </Button>
-        <InlineTextButton
-          className={css.removeCartLabel}
-          onClick={handleRemoveAllItem}>
-          {removeAllOrderCartLabel}
-        </InlineTextButton>
-      </div>
+      <OrderPanelHeader
+        selectedDays={cartListKeys.length}
+        sumDays={orderDays.length}
+      />
+      <OrderPanelBody
+        plan={plan}
+        cartList={cartList}
+        cartListKeys={cartListKeys}
+        loadDataInProgress={loadDataInProgress}
+        handleRemoveItem={handleRemoveItem}
+      />
+      <OrderPanelFooter
+        submitDataInprogress={submitDataInprogress}
+        cartListKeys={cartListKeys}
+        handleSubmit={handleSubmit}
+        handleRemoveAllItem={handleRemoveAllItem}
+      />
+      <AlertModal
+        isOpen={isOpenConfirmDeleteAll}
+        handleClose={handleCloseConfirmDeleteAll}
+        title={intl.formatMessage({
+          id: 'SectionOrderPanel.Alert.confirmDeleteTitle',
+        })}
+        cancelLabel={intl.formatMessage({
+          id: 'SectionOrderPanel.Alert.cancelDeleteBtn',
+        })}
+        confirmLabel={intl.formatMessage({
+          id: 'SectionOrderPanel.Alert.confirmDeleteBtn',
+        })}
+        onCancel={handleCloseConfirmDeleteAll}
+        onConfirm={handleConfirmDeleteAll}>
+        {intl.formatMessage({
+          id: 'SectionOrderPanel.Alert.confirmDeleteMessage',
+        })}
+      </AlertModal>
+      <SuccessModal
+        isOpen={isSubmitSuccess}
+        handleClose={handleCloseSuccessModal}
+      />
     </div>
   );
 };

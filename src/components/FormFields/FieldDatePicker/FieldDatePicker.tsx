@@ -30,7 +30,7 @@ const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (props) => {
   const onInputChange = (date: Date, event: any) => {
     if (typeof onDatePickerChange === 'function') {
       onDatePickerChange(date, event);
-      onChange(date.getTime());
+      onChange(date?.getTime());
     }
   };
   const { invalid, touched, error } = meta;

@@ -75,6 +75,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
 
         try {
+          const currentUser = denormalisedResponseEntities(
+            await sdk.currentUser.show(),
+          )[0];
+
           const plan = denormalisedResponseEntities(
             await integrationSdk.listings.show({
               id: planId,
@@ -87,11 +91,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             }),
           )[0];
 
-          const currentUser = denormalisedResponseEntities(
-            await sdk.currentUser.show(),
-          )[0];
           const currentUserId = CURRENT_USER(currentUser).getId();
-
           const mealPlan = await fetchSubOrder(orderDetail, currentUserId);
           res.json({
             statusCode: 200,
@@ -101,9 +101,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               order,
             },
           });
-        } catch (error) {
+        } catch (error: any) {
+          console.log(error?.data?.errors);
           handleError(res, error);
-          console.log(error);
         }
       }
       break;

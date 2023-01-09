@@ -5,12 +5,11 @@ import SectionCountdown from '@src/pages/participant/components/SectionCountdown
 import SectionOrderListing from '@src/pages/participant/components/SectionOrderListing/SectionOrderListing';
 import SectionOrderPanel from '@src/pages/participant/components/SectionOrderPanel/SectionOrderPanel';
 import SectionRestaurantHero from '@src/pages/participant/components/SectionRestaurantHero/SectionRestaurantHero';
+import { LISTING } from '@utils/data';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import css from './ParticipantSetupPlan.module.scss';
-
-const orderDeadline = 1673456400000;
 
 const ParticipantSetupPlan = () => {
   const router = useRouter();
@@ -23,6 +22,9 @@ const ParticipantSetupPlan = () => {
     (state) => state.ParticipantSetupPlanPage.loadDataInProgress,
   );
   const orderId = order?.id?.uuid;
+  const { generalInfo } = LISTING(order).getMetadata();
+  const { orderDeadline } = generalInfo || {};
+
   const plan = useAppSelector((state) => state.ParticipantSetupPlanPage.plan);
   const [orderDayState, setOrderDayState] = useState<number>();
   const currentUser = useAppSelector((state) => state.user.currentUser);
@@ -71,7 +73,7 @@ const ParticipantSetupPlan = () => {
           />
         </div>
         <div className={css.rightSection}>
-          <SectionCountdown orderDeadline={orderDeadline} />
+          <SectionCountdown orderDeadline={orderDeadline || Date.now()} />
           <SectionOrderPanel planId={`${planId}`} orderId={orderId} />
         </div>
       </div>

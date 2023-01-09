@@ -9,7 +9,7 @@
     padding: 6px;
     margin-bottom: 12px;
     text-align: center;
-    @include textTemplate(14px, 700, 20px, '');
+    @include textTemplate(14px, 700, 14px, '');
     border-radius: 8px;
     background-color: $neutralGray1;
     border: 1px solid $neutralGray4;

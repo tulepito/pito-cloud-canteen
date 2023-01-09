@@ -1,9 +1,11 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
 import IconSearch from '@components/Icons/IconSearch/IconSearch';
+import { toLowerCaseNonAccentVietnamese } from '@utils/nonAccentVietnamese';
 import arrayMutators from 'final-form-arrays';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -19,11 +21,28 @@ import css from './SelectFoodForm.module.scss';
 const DELAY_UPDATE_TIME = 300;
 const DEBOUNCE_TIME = 300;
 
-const mapFoodOptionsFn = (item: any) => {
-  const { id, attributes } = item || {};
-  const { title, price } = attributes;
+const normalizeItems = (items: any[]) => {
+  return items.map((item) => {
+    const { id, attributes } = item || {};
+    const { title, price } = attributes;
+    const nonAccentTitle = toLowerCaseNonAccentVietnamese(title);
 
-  return { key: id?.uuid, value: id?.uuid, title, price: price || 0 };
+    return { id: id?.uuid, title, nonAccentTitle, price: price || 0 };
+  });
+};
+
+const mapFoodOptionsFn = (item: any) => {
+  const { id, title, price, nonAccentTitle } = item || {};
+
+  return { key: id, value: id, title, price, nonAccentTitle };
+};
+
+const generateOptionsFormItems = (items: any[]) => {
+  return useMemo(() => items.map(mapFoodOptionsFn), [items]);
+};
+
+const generateIdsFromOptions = (options: any[]) => {
+  return useMemo(() => options.map((item) => item.key), [options]);
 };
 
 export type TSelectFoodFormValues = {
@@ -58,23 +77,16 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
   const selectedFoodListLength = selectedFoodIds?.length;
   const intl = useIntl();
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
-  const [currentItems, setCurrentItems] = useState(items);
+  const normalizedItems = normalizeItems(items);
+  const [currentItems, setCurrentItems] = useState(normalizedItems);
   const submitDisable = selectedFoodIds?.length === 0;
   let currDebounceRef = debounceRef.current;
 
-  const rootOptions = useMemo(() => items.map(mapFoodOptionsFn), [items]);
-  const rootFoodIds = useMemo(
-    () => rootOptions.map((item) => item.key),
-    [rootOptions],
-  );
-  const currentOptions = useMemo(
-    () => currentItems.map(mapFoodOptionsFn),
-    [currentItems],
-  );
-  const currentFoodIds = useMemo(
-    () => currentOptions.map((item) => item.key),
-    [currentOptions],
-  );
+  const rootOptions = generateOptionsFormItems(normalizedItems);
+  const rootFoodIds = generateIdsFromOptions(rootOptions);
+  const currentOptions = generateOptionsFormItems(currentItems);
+  const currentFoodIds = generateIdsFromOptions(currentOptions);
+
   const shouldCheckAll = currentFoodIds.every((id) =>
     selectedFoodIds.includes(id),
   );
@@ -119,8 +131,8 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
     }
 
     currDebounceRef = setTimeout(() => {
-      const newItems = items.filter((item) =>
-        item?.attributes?.title.includes(foodName),
+      const newItems = normalizedItems.filter((item) =>
+        item.nonAccentTitle.includes(toLowerCaseNonAccentVietnamese(foodName)),
       );
 
       setCurrentItems(newItems);
@@ -189,6 +201,9 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
             {selectedFoodIds?.length === 0 ? (
               <div className={css.emptyIconContainer}>
                 <IconEmpty />
+                <div className={css.noSelectedItemsText}>
+                  <FormattedMessage id="SelectFoodForm.noSelectedItems" />
+                </div>
               </div>
             ) : (
               <div>

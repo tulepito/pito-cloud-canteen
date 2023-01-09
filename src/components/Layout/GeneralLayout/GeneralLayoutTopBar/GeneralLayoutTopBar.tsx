@@ -1,4 +1,4 @@
-import PITOLogo from '@components/PITOLogo/PITOLogo';
+import PITOLogo from '@components/PitoLogo/PitoLogo';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import get from 'lodash/get';

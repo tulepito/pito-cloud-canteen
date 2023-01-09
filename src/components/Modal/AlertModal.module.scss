@@ -1,0 +1,38 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+}
+
+.container {
+  width: 100%;
+  max-width: 480px;
+}
+
+.children {
+  @include textTemplate(14px, 500, 24px, '');
+  color: $neutralGray4;
+  padding-bottom: 40px;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.reject {
+  flex-basis: calc(50% - 8px);
+  background-color: $neutralGray1;
+  color: $neutralGray6;
+  border: 1px solid $neutralGray6;
+
+  &:hover {
+    background-color: $neutralGray3;
+    color: $neutralGray6;
+  }
+}
+
+.confirm {
+  flex-basis: calc(50% - 8px);
+}

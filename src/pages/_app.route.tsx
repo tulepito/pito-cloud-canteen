@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import '@src/styles/globals.scss';
 import '@src/styles/nprogress.scss';
 import 'react-loading-skeleton/dist/skeleton.css';

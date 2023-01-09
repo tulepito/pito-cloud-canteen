@@ -4,9 +4,8 @@ import React from 'react';
 
 import css from './PitoLogo.module.scss';
 
-const PITOLogo: React.FC<TIconProps> = (props) => {
+const PitoLogo: React.FC<TIconProps> = (props) => {
   const { rootClassName, className } = props;
-
   const classes = classNames(rootClassName || css.root, className);
 
   return (
@@ -50,4 +49,4 @@ const PITOLogo: React.FC<TIconProps> = (props) => {
   );
 };
 
-export default PITOLogo;
+export default PitoLogo;

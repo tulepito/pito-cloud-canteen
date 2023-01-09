@@ -39,6 +39,12 @@
 
     .emptyIconContainer {
       margin: 72px auto;
+
+      .noSelectedItemsText {
+        padding-top: 24px;
+        text-align: center;
+        color: $neutralGray5;
+      }
     }
 
     .partTitle {
