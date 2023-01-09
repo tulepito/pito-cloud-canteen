@@ -574,6 +574,7 @@
   "SetupOrderDetail.orderSettings": "Cài đặt bữa ăn",
   "SetupOrderDetail.updateOrder": "Cập nhật lại đơn hàng",
   "SetupOrderDetail.recommendNewRestaurant": "Gợi ý nhà hàng mới",
+  "SetupOrderDetail.perPack": "{value}đ/bữa",
   "SelectFoodModal.selectedTitle": "Đã chọn: {foodCount} món",
   "SelectFoodForm.findFoodByName": "Tìm kiếm món ăn",
   "SelectFoodForm.selectedFood": "Món đã chọn",

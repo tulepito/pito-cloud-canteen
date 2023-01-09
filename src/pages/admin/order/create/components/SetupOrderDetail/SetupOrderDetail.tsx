@@ -7,6 +7,7 @@ import IconRefreshing from '@components/Icons/IconRefreshing';
 import IconSetting from '@components/IconSetting/IconSetting';
 import { calculateGroupMembersAmount } from '@helpers/companyMembers';
 import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
+import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { updateDraftMealPlan } from '@redux/slices/Order.slice';
@@ -153,7 +154,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     [OrderSettingField.EMPLOYEE_AMOUNT]: allMembersAmount,
     [OrderSettingField.SPECIAL_DEMAND]: '',
     [OrderSettingField.ACCESS_SETTING]: selectedGroupsName?.join(', '),
-    [OrderSettingField.PER_PACK]: packagePerMember,
+    [OrderSettingField.PER_PACK]: intl.formatMessage(
+      { id: 'SetupOrderDetail.perPack' },
+      { value: addCommas(packagePerMember.toString()) || '' },
+    ),
   };
   const addMorePlanExtraProps = {
     onClick: handleAddMorePlanClick,
