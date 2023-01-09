@@ -1,5 +1,6 @@
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
+import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
@@ -14,6 +15,8 @@ import withWeekViewWrapper from './components/WeekView/withWeekViewWrapper';
 import type { TCalendarItemCardComponents } from './helpers/types';
 
 type TCalendarDashboardProps = {
+  rootClassName?: string;
+  className?: string;
   defaultDate?: Date;
   startDate?: Date;
   endDate?: Date;
@@ -25,6 +28,8 @@ type TCalendarDashboardProps = {
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
+  rootClassName,
+  className,
   startDate,
   endDate,
   defaultDate: propsDefaultDate,
@@ -35,6 +40,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   inProgress,
 }) => {
   const localizer = luxonLocalizer(DateTime);
+  const classes = classNames(rootClassName || css.root, className);
 
   const MonthViewWrapper = createMonthViewWrapper({
     renderEvent,
@@ -70,7 +76,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   };
 
   return (
-    <div className={css.root}>
+    <div className={classes}>
       <Calendar
         defaultDate={defaultDate}
         defaultView={Views.WEEK}

@@ -7,7 +7,8 @@
   height: 100%;
   overflow-x: auto;
   border-radius: 9px;
-  border: 1px solid $neutralGray5;
+  outline: 1px solid $neutralGray3;
+  outline-offset: -1px;
 }
 
 .scrollContainer {

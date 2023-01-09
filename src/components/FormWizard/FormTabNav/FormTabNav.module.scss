@@ -56,15 +56,6 @@
   border: 1px solid $neutralGray5;
 }
 
-.selectedLink {
-  .order {
-    border: none;
-  }
-  .linkText {
-    display: flex;
-  }
-}
-
 .linkText {
   display: none;
   text-align: center;
@@ -78,10 +69,12 @@
 .selectedLink {
   .order {
     color: $neutralGray1;
-    background-color: $primaryPri2;
-    border: 1px solid $primaryPri2;
+    background-color: $neutralGray6;
+    border: 1px solid $neutralGray6;
   }
   .linkText {
+    display: flex;
+
     color: $neutralGray6;
   }
 }

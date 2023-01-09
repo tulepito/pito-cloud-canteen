@@ -15,14 +15,16 @@
 
 .dayItem {
   @include flexAlign(center, center);
-  padding: 4px 12px;
-  color: $neutralGray6;
-  background-color: $neutralGray3;
-  border-radius: 4px;
+  padding: 8px 16px;
+  color: $neutralGray5;
+  outline: 1px solid $neutralGray4;
+  outline-offset: -1px;
+  border-radius: 20px;
   cursor: pointer;
 
   &.selected {
-    color: $neutralGray1;
-    background-color: $primaryPri2;
+    color: $neutralGray6;
+    outline: 2px solid $neutralGray6;
+    outline-offset: -2px;
   }
 }

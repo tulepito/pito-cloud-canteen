@@ -41,6 +41,7 @@
     z-index: 2;
     background-color: $neutralGray2;
     border-right: 1px solid #f0f0f0;
+
     .sidebarButton {
       width: 36px;
       height: 36px;
@@ -52,7 +53,7 @@
         border-radius: 8px;
         background-color: $neutralGray6;
         .sidebarIcon {
-          fill: $primaryPri2;
+          fill: $neutralGray1;
         }
       }
 

@@ -67,6 +67,8 @@
   &:focus {
     background-color: $neutralGray1;
     color: $neutralGray6;
+    border: none;
+    outline: none;
   }
 }
 
