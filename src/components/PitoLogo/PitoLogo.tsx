@@ -2,7 +2,7 @@ import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 
-import css from './PITOLogo.module.scss';
+import css from './PitoLogo.module.scss';
 
 const PitoLogo: React.FC<TIconProps> = (props) => {
   const { className } = props;
