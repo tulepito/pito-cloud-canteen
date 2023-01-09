@@ -18,12 +18,12 @@ const OrderEventCardStatus: React.FC<TOrderEventCardStatusProps> = ({
   return (
     <div
       className={classNames(css.status, className, {
-        [css.emptyStatus]: status === EVENT_STATUS.EMPTY_STATUS,
+        [css.emptyStatus]: status === EVENT_STATUS.EMPTY_STATUS || !status,
         [css.joinedStatus]: status === EVENT_STATUS.JOINED_STATUS,
         [css.notJoinedStatus]: status === EVENT_STATUS.NOT_JOINED_STATUS,
         [css.expiredStatus]: status === EVENT_STATUS.EXPIRED_STATUS,
       })}>
-      {status && <FormattedMessage id={`DayColumn.Status.${status}`} />}
+      <FormattedMessage id={`DayColumn.Status.${status || 'empty'}`} />
     </div>
   );
 };

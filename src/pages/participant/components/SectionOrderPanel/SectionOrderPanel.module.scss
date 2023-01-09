@@ -56,4 +56,37 @@
       margin: 0;
     }
   }
+
+  .successModalContainer {
+    width: 100%;
+    max-width: 418px;
+    padding: 24px;
+
+    & > div {
+      padding: 0;
+      margin: 0;
+    }
+  }
+
+  .successModalTitle {
+    text-align: center;
+    margin: auto;
+    font-weight: $fontWeightBold;
+    font-size: 20px;
+    line-height: 32px;
+  }
+
+  .successModalImage {
+    width: 192px;
+    height: 196px;
+    margin: 32px auto 0;
+  }
+
+  .successModalDescription {
+    margin: 32px 0;
+  }
+
+  .successModalConfirmBtn {
+    margin: auto;
+  }
 }

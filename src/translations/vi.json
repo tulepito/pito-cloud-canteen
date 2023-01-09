@@ -613,5 +613,8 @@
   "SectionOrderPanel.Alert.confirmDeleteMessage": "Bạn có chắc chắn muốn xoá toàn bộ giỏ hàng không?",
   "SectionOrderPanel.Alert.cancelDeleteBtn": "Huỷ",
   "SectionOrderPanel.Alert.confirmDeleteBtn": "Xoá tất cả",
-  "EditPartnerForm.mediaLabel": "Hình nền và ảnh đại diện"
+  "EditPartnerForm.mediaLabel": "Hình nền và ảnh đại diện",
+  "SectionOrderPanel.successModal.title": "Đăng Ký Thành Công",
+  "SectionOrderPanel.successModal.description": "Vui lòng liên hệ người tạo đơn để biết thêm chi tiết.",
+  "SectionOrderPanel.successModal.confirmBtn": "Tiếp tục chọn món"
 }

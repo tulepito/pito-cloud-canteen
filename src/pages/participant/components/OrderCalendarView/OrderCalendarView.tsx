@@ -36,7 +36,6 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
 
   const { orderDeadline, deliveryHour } =
     LISTING(order).getMetadata().generalInfo || {};
-
   const events = subOrders.map((subOrder: any) => {
     const planKey = Object.keys(subOrder)[0];
     const planItem: TPlanItem = subOrder[planKey];
@@ -75,7 +74,9 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
           meal: {
             dishes,
           },
-          expiredTime: DateTime.fromMillis(+orderDeadline).toJSDate(),
+          expiredTime: orderDeadline
+            ? DateTime.fromMillis(+orderDeadline).toJSDate()
+            : DateTime.fromMillis(+planItemKey).minus({ day: 2 }).toJSDate(),
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
         },

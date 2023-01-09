@@ -18,6 +18,7 @@ type TModal = {
   contentClassName?: string;
   handleClose: () => void;
   scrollLayerClassName?: string;
+  customHeader: ReactNode;
 };
 
 const Modal = (props: TModal) => {
@@ -31,6 +32,7 @@ const Modal = (props: TModal) => {
     contentClassName,
     handleClose,
     scrollLayerClassName,
+    customHeader,
   } = props;
 
   const intl = useIntl();
@@ -57,14 +59,13 @@ const Modal = (props: TModal) => {
     <div className={classes}>
       <div className={scrollLayerClasses}>
         <div className={containerClasses}>
-          <div className={css.modalHeader}>
-            {hasTitle && (
-              <div className={css.title}>
-                <span>{title}</span>
-              </div>
-            )}
-            {closeBtn}
-          </div>
+          {!customHeader && (
+            <div className={css.modalHeader}>
+              {hasTitle && <div className={css.title}>{title}</div>}
+              {closeBtn}
+            </div>
+          )}
+          {customHeader}
           <div className={classNames(contentClassName || css.content)}>
             {children}
           </div>

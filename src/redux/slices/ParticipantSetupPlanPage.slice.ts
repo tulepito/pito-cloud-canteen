@@ -6,6 +6,7 @@ import { loadPlanDataApi, updateParticipantOrderApi } from '../../utils/api';
 import { shopingCartActions, shopingCartThunks } from './shopingCart.slice';
 
 const LOAD_DATA = 'app/ParticipantSetupPlanPage/LOAD_DATA';
+const RELOAD_DATA = 'app/ParticipantSetupPlanPage/RELOAD_DATA';
 const UPDATE_ORDER = 'app/ParticipantSetupPlanPage/UPDATE_ORDER';
 
 interface ParticipantSetupPlanState {
@@ -15,6 +16,8 @@ interface ParticipantSetupPlanState {
   order: any;
   loadDataInProgress: boolean;
   loadDataError: any;
+  reloadDataInProgress: boolean;
+  reloadDataError: any;
   submitDataInprogress: boolean;
   submitDataError: any;
 }
@@ -26,6 +29,8 @@ const initialState: ParticipantSetupPlanState = {
   order: {},
   loadDataInProgress: false,
   loadDataError: null,
+  reloadDataInProgress: false,
+  reloadDataError: null,
   submitDataInprogress: false,
   submitDataError: null,
 };
@@ -39,7 +44,39 @@ const loadData = createAsyncThunk(
     const plan = response?.data?.data?.plan;
     const orderDays = Object.keys(plan);
 
+    orderDays.forEach((day) => {
+      const userOder = plan?.[day]?.memberOrder?.[currentUserId];
+      const status = userOder?.status;
+      if (status === 'joined' || status === 'notJoined') {
+        dispatch(
+          shopingCartActions.addToCart({
+            currentUserId,
+            planId,
+            dayId: day,
+            mealId: status === 'notJoined' ? 'notJoined' : userOder?.foodId,
+          }),
+        );
+      }
+    });
+
+    return response?.data?.data;
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
+const reloadData = createAsyncThunk(
+  RELOAD_DATA,
+  async (planId: string, { getState, dispatch }) => {
+    const { currentUser } = getState().user;
+    const currentUserId = currentUser?.id?.uuid;
+    const response: any = await loadPlanDataApi(planId);
+    const plan = response?.data?.data?.plan;
+    const orderDays = Object.keys(plan);
+
     dispatch(shopingCartThunks.removeAllFromPlanCart({ planId }));
+
     orderDays.forEach((day) => {
       const userOder = plan?.[day]?.memberOrder?.[currentUserId];
       const status = userOder?.status;
@@ -102,7 +139,7 @@ const updateOrder = createAsyncThunk(
     };
 
     await updateParticipantOrderApi(orderId, updateValues);
-    await dispatch(loadData(planId));
+    await dispatch(reloadData(planId));
     return true;
   },
   {
@@ -110,7 +147,7 @@ const updateOrder = createAsyncThunk(
   },
 );
 
-export const ParticipantSetupPlanThunks = { loadData, updateOrder };
+export const ParticipantSetupPlanThunks = { loadData, reloadData, updateOrder };
 
 const participantSetupPlanSlice = createSlice({
   name: 'ParticipantSetupPlanPage',
@@ -136,6 +173,25 @@ const participantSetupPlanSlice = createSlice({
         ...state,
         loadDataError: error.message,
         loadDataInProgress: false,
+      }))
+      .addCase(reloadData.pending, (state) => {
+        return {
+          ...state,
+          reloadDataInProgress: true,
+          reloadDataError: null,
+        };
+      })
+      .addCase(reloadData.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          ...payload,
+          reloadDataInProgress: false,
+        };
+      })
+      .addCase(reloadData.rejected, (state, { error }) => ({
+        ...state,
+        reloadDataError: error.message,
+        reloadDataInProgress: false,
       }))
       .addCase(updateOrder.pending, (state) => {
         state.submitDataInprogress = true;

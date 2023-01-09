@@ -15,7 +15,6 @@ import Script from 'next/script';
 import nProgress from 'nprogress';
 import { Provider } from 'react-redux';
 import { persistStore } from 'redux-persist';
-import { PersistGate } from 'redux-persist/integration/react';
 
 Router.events.on('routeChangeStart', nProgress.start);
 Router.events.on('routeChangeError', nProgress.done);
@@ -47,13 +46,13 @@ const MyApp = ({
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
         />
         <Provider store={store}>
-          <PersistGate loading={null} persistor={persistence}>
-            <AuthGuard>
-              <PermissionGuard>
-                <Component {...props.pageProps} key={router.asPath} />
-              </PermissionGuard>
-            </AuthGuard>
-          </PersistGate>
+          {/* <PersistGate loading={null} persistor={persistence}> */}
+          <AuthGuard>
+            <PermissionGuard>
+              <Component {...props.pageProps} key={router.asPath} />
+            </PermissionGuard>
+          </AuthGuard>
+          {/* </PersistGate> */}
         </Provider>
       </TranslationProvider>
     </main>

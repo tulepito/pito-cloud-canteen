@@ -9,6 +9,7 @@ import OrderPanelBody from './OrderPanelBody';
 import OrderPanelFooter from './OrderPanelFooter';
 import OrderPanelHeader from './OrderPanelHeader';
 import css from './SectionOrderPanel.module.scss';
+import SuccessModal from './SuccessModal';
 
 type TSectionOrderPanelProps = {
   planId: string;
@@ -41,6 +42,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
 
   // Local state
   const [isOpenConfirmDeleteAll, setIsOpenConfirmDeleteAll] = useState(false);
+  const [isSubmitSuccess, setIsSubmitSuccess] = useState(false);
 
   const dispatch = useAppDispatch();
 
@@ -53,17 +55,23 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     setIsOpenConfirmDeleteAll(true);
   };
 
-  const handleSubmit = () => {
-    dispatch(ParticipantSetupPlanThunks.updateOrder({ orderId, planId }));
+  const handleSubmit = async () => {
+    await dispatch(ParticipantSetupPlanThunks.updateOrder({ orderId, planId }));
+    setIsSubmitSuccess(true);
   };
 
   const handleConfirmDeleteAll = () => {
     dispatch(shopingCartThunks.removeAllFromPlanCart({ planId }));
     setIsOpenConfirmDeleteAll(false);
+    dispatch(ParticipantSetupPlanThunks.updateOrder({ orderId, planId }));
   };
 
   const handleCloseConfirmDeleteAll = () => {
     setIsOpenConfirmDeleteAll(false);
+  };
+
+  const handleCloseSuccessModal = () => {
+    setIsSubmitSuccess(false);
   };
 
   return (
@@ -103,6 +111,10 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
           id: 'SectionOrderPanel.Alert.confirmDeleteMessage',
         })}
       </AlertModal>
+      <SuccessModal
+        isOpen={isSubmitSuccess}
+        handleClose={handleCloseSuccessModal}
+      />
     </div>
   );
 };
