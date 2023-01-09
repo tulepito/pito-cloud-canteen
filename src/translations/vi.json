@@ -561,7 +561,6 @@
   "ConfirmClientModal.confirm": "Xác nhận",
   "RestaurantTable.loadingText": "...Đang tải",
   "RestaurantTable.noResults": "Không có nhà hàng nào",
-  "FieldRestaurant.viewMenu": "Xem menu",
   "RestaurantTableHead.head.partnerName": "Tên đối tác",
   "RestaurantTableHead.head.categories": "Danh mục thực đơn",
   "RestaurantTableHead.head.foodStyles": "Phong cách ẩm thực",
@@ -620,6 +619,7 @@
   "SectionOrderPanel.successModal.title": "Đăng Ký Thành Công",
   "SectionOrderPanel.successModal.description": "Vui lòng liên hệ người tạo đơn để biết thêm chi tiết.",
   "SectionOrderPanel.successModal.confirmBtn": "Tiếp tục chọn món",
+  "SelectFoodForm.noSelectedItems": "Bạn chưa chọn thực đơn!",
   "CreateOrderRoute.title": "Tạo đơn hàng",
   "CreateOrderRoute.description": "Tạo đơn hàng",
   "SectionOrderListing.selectForMeBtn": "Chọn giúp tôi"

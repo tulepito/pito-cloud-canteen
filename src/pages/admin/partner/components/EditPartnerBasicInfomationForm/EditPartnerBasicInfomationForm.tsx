@@ -87,9 +87,9 @@ const EditPartnerBasicInfomationForm: React.FC<
     type: 'availability-plan/time',
     timezone: defaultTimeZone(),
     entries: [
-      { dayOfWeek: 'mon', startTime: '07:00', endTime: '23:00', seats: 1 },
+      { dayOfWeek: 'mon', startTime: '07:00', endTime: '23:00', seats: 100 },
     ],
-  } as any;
+  };
 
   const {
     availabilityPlan: listingAvailability = {},

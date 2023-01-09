@@ -5,7 +5,6 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { weekDayFormatFromDateTime } from '@utils/dates';
-import type { FormState } from 'final-form';
 import { DateTime } from 'luxon';
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -14,7 +13,6 @@ import { FormattedMessage } from 'react-intl';
 import type { TSelectFoodFormValues } from '../SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
 import SelectFoodModal from '../SelectFoodModal/SelectFoodModal';
 import RestaurantTable from './components/RestaurantTable/RestaurantTable';
-import type { TSelectRestaurantFormValues } from './components/RestaurantTable/SelectRestaurantForm';
 import SearchRestaurantForm from './components/SearchRestaurantForm/SearchRestaurantForm';
 import css from './SelectRestaurantPage.module.scss';
 
@@ -31,22 +29,20 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   selectedDate,
   onBack,
 }) => {
-  const [mounted, setMounted] = useState<boolean>();
   const [currentRestaurant, setCurrentRestaurant] = useState<any>();
-  const [isSelectedRestaurant, setIsSelectedRestaurant] = useState(false);
-  const [currentFoodList, setCurrentFoodList] = useState<string[]>([]);
   const { value: isModalOpen, setValue: setModalOpen } = useBoolean();
   const dispatch = useAppDispatch();
   const {
-    restaurants,
-    pagination,
-    foodOfRestaurant,
-    foodList,
-    fetchFoodPending,
-  } = useAppSelector((state) => state.SelectRestaurantPage);
-  const {
-    draftOrder: { deliveryAddress, deliveryHour },
-  } = useAppSelector((state) => state.Order);
+    Order: {
+      draftOrder: { deliveryAddress, deliveryHour },
+    },
+    SelectRestaurantPage: {
+      restaurants,
+      pagination,
+      foodList,
+      fetchFoodPending,
+    },
+  } = useAppSelector((state) => state);
 
   const {
     totalItems: total,
@@ -54,8 +50,8 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     perPage: pageSize = 100,
   } = pagination || {};
   const paginationProps = { total, current, pageSize };
-  const showModalCondition =
-    isModalOpen && !fetchFoodPending && !!currentRestaurant;
+  const showModalCondition = isModalOpen && !fetchFoodPending;
+
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   let currDebounceRef = debounceRef.current;
 
@@ -90,29 +86,9 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   const handleSelectFood = (values: TSelectFoodFormValues) => {
     const { food: foodIds } = values;
 
-    setCurrentFoodList(foodIds);
-    setIsSelectedRestaurant(true);
-    setModalOpen(false);
-  };
-
-  const handleRestaurantClick = (restaurant: any) => () => {
-    const restaurantId = restaurant?.id?.uuid;
-
-    dispatch(selectRestaurantPageThunks.getRestaurantFood(restaurantId));
-    setCurrentRestaurant(restaurant);
-    setModalOpen(true);
-  };
-
-  const handleConfirmSelectRestaurant = () => {
-    if (!currentRestaurant) return;
     const currRestaurantId = currentRestaurant?.id?.uuid;
 
-    if (currentFoodList.length === 0 || currRestaurantId !== foodOfRestaurant) {
-      handleRestaurantClick(currentRestaurant)();
-      return;
-    }
-
-    const submitFoodListData = currentFoodList
+    const submitFoodListData = foodIds
       .map((foodId) => {
         const item = foodList.find((food) => food?.id?.uuid === foodId);
         const { id, attributes } = item || {};
@@ -136,37 +112,20 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       restaurant: submitRestaurantData,
       selectedFoodList: submitFoodListData,
     });
+    setModalOpen(false);
   };
 
-  const handleFormChange = (
-    form: FormState<
-      TSelectRestaurantFormValues,
-      Partial<TSelectRestaurantFormValues>
-    >,
-  ) => {
-    if (!mounted) {
-      return;
-    }
+  const handleRestaurantClick = (restaurant: any) => () => {
+    const restaurantId = restaurant?.id?.uuid;
 
-    const {
-      values: { restaurant: restaurantId },
-    } = form;
-
-    if (restaurantId) {
-      const res = restaurants?.find((r) => r?.id?.uuid === restaurantId);
-
-      setCurrentRestaurant(res);
-      setIsSelectedRestaurant(true);
-    }
+    dispatch(selectRestaurantPageThunks.getRestaurantFood(restaurantId));
+    setCurrentRestaurant(restaurant);
+    setModalOpen(true);
   };
 
   useEffect(() => {
     dispatch(selectRestaurantPageThunks.getRestaurants());
   }, [dispatch]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
     <section className={css.root}>
@@ -184,15 +143,10 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       <SearchRestaurantForm
         onSubmit={() => {}}
         onSearchRestaurant={handleSearchRestaurant}
-        onSelectRestaurant={handleConfirmSelectRestaurant}
-        selectRestaurantDisable={!isSelectedRestaurant}
       />
       <RestaurantTable
         restaurants={restaurants}
         onItemClick={handleRestaurantClick}
-        isSelectedRestaurant={isSelectedRestaurant}
-        currentRestaurant={currentRestaurant}
-        onFormChange={handleFormChange}
       />
       {!!restaurants && restaurants?.length > 0 && (
         <div className={css.paginationContainer}>

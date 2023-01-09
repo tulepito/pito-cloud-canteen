@@ -5,7 +5,7 @@
 }
 
 .addMore {
-  @include textTemplate(14px, 700, 20px, '');
+  @include textTemplate(14px, 700, 14px, '');
   background-color: $neutralGray1;
   border-radius: 8px;
   border: 1px solid $neutralGray5;

@@ -1,4 +1,3 @@
-import Button from '@components/Button/Button';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
 import SearchIcon from '@components/Icons/SearchIcon';
@@ -6,7 +5,7 @@ import type { ReactNode } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 
 import css from './SearchRestaurantForm.module.scss';
 
@@ -20,9 +19,7 @@ type TExtraProps = {
   rootClassName?: string;
   className?: string;
   inProgress?: boolean;
-  selectRestaurantDisable: boolean;
   onSearchRestaurant: (value: string) => void;
-  onSelectRestaurant: () => void;
 };
 type TSearchRestaurantFormProps = FormProps<TSearchRestaurantFormValues> &
   TExtraProps;
@@ -33,12 +30,7 @@ const SearchRestaurantFormComponent: React.FC<
   TSearchRestaurantFormComponentProps
 > = (props) => {
   const intl = useIntl();
-  const {
-    handleSubmit,
-    onSelectRestaurant,
-    selectRestaurantDisable,
-    onSearchRestaurant,
-  } = props;
+  const { handleSubmit, onSearchRestaurant } = props;
 
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
@@ -53,12 +45,6 @@ const SearchRestaurantFormComponent: React.FC<
             })}
           />
         </div>
-        <Button
-          type="button"
-          disabled={selectRestaurantDisable}
-          onClick={onSelectRestaurant}>
-          <FormattedMessage id="SearchRestaurantForm.selectThisRestaurant" />
-        </Button>
       </div>
     </Form>
   );
