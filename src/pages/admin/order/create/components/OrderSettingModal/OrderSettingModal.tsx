@@ -3,6 +3,7 @@ import Form from '@components/Form/Form';
 import IconArrow from '@components/IconArrow/IconArrow';
 import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
+import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { updateDraftMealPlan } from '@redux/slices/Order.slice';
 import classNames from 'classnames';
@@ -61,7 +62,7 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
   const { address, origin } = deliveryAddress || {};
   const initialValues = useMemo(
     () => ({
-      packagePerMember: packagePerMember || '',
+      packagePerMember: addCommas(packagePerMember.toString()) || '',
       vatAllow: vatAllow || true,
       selectedGroups: selectedGroups || ['allMembers'],
       deliveryHour: deliveryHour || '',
@@ -215,7 +216,7 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
       handleClose={onClose}
       title={intl.formatMessage({ id: 'OrderSettingModal.title' })}>
       <OutsideClickHandler onOutsideClick={onClose}>
-        <div className={css.orderId}>PT0001</div>
+        <div className={css.orderId}>#Draft</div>
         <div className={css.container}>
           <div className={css.leftSide}>{leftSideRenderer()}</div>
           <div className={css.rightSide}>
