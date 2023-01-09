@@ -11,9 +11,10 @@ import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { updateDraftMealPlan } from '@redux/slices/Order.slice';
+import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -53,6 +54,41 @@ const renderResourcesForCalendar = (orderDetail: Record<string, any>) => {
   return resources;
 };
 
+const renderDateRange = (
+  startDate = new Date().getTime(),
+  endDate = new Date().getTime(),
+) => {
+  const result = [];
+  let currentDate = new Date(startDate).getTime();
+
+  while (currentDate <= endDate) {
+    result.push(currentDate);
+    currentDate = DateTime.fromMillis(currentDate).plus({ day: 1 }).toMillis();
+  }
+
+  return result;
+};
+
+const findSuitableStartDate = ({
+  startDate = new Date().getTime(),
+  endDate = new Date().getTime(),
+  orderDetail = {},
+}: {
+  startDate?: number;
+  endDate?: number;
+  orderDetail: TObject;
+}) => {
+  const dateRange = renderDateRange(startDate, endDate);
+  const setUpDates = Object.keys(orderDetail);
+  const suitableDateList = dateRange.filter(
+    (date) => !setUpDates.includes(date.toString()),
+  );
+  const suitableStartDate =
+    suitableDateList?.length > 0 ? suitableDateList[0] : endDate;
+
+  return suitableStartDate;
+};
+
 type TSetupOrderDetailProps = {
   goBack: () => void;
   nextTab: () => void;
@@ -90,6 +126,16 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     setTrue: onOrderSettingModalOpen,
   } = useBoolean();
 
+  const suitableStartDate = useMemo(
+    () =>
+      findSuitableStartDate({
+        startDate,
+        endDate,
+        orderDetail,
+      }),
+    [startDate, endDate, orderDetail],
+  );
+
   const { address } = deliveryAddress || {};
   const currentClient = companies.find(
     (company) => company.id.uuid === clientId,
@@ -110,7 +156,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     const { restaurant, selectedFoodList } = values;
     const updateData = {
       orderDetail: {
-        [selectedDate.getTime()]: {
+        [selectedDate?.getTime()]: {
           restaurant,
           foodList: selectedFoodList,
         },
@@ -198,7 +244,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           </div>
           <div className={css.calendarContainer}>
             <CalendarDashboard
-              startDate={new Date(startDate)}
+              startDate={new Date(suitableStartDate)}
               endDate={new Date(endDate)}
               events={resourcesForCalender}
               renderEvent={MealPlanCard}
