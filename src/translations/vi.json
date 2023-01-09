@@ -555,7 +555,6 @@
   "ConfirmClientModal.confirm": "Xác nhận",
   "RestaurantTable.loadingText": "...Đang tải",
   "RestaurantTable.noResults": "Không có nhà hàng nào",
-  "FieldRestaurant.viewMenu": "Xem menu",
   "RestaurantTableHead.head.partnerName": "Tên đối tác",
   "RestaurantTableHead.head.categories": "Danh mục thực đơn",
   "RestaurantTableHead.head.foodStyles": "Phong cách ẩm thực",
@@ -573,6 +572,7 @@
   "SelectFoodForm.findFoodByName": "Tìm kiếm món ăn",
   "SelectFoodForm.selectedFood": "Món đã chọn",
   "SelectFoodForm.saveResult": "Lưu kết quả",
+  "SelectFoodForm.noSelectedItems": "Bạn chưa chọn thực đơn!",
   "CreateOrderRoute.title": "Tạo đơn hàng",
   "CreateOrderRoute.description": "Tạo đơn hàng",
   "AdminSidebar.dashboardLabel": "Trang chủ"

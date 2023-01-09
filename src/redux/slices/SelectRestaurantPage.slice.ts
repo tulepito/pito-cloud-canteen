@@ -104,6 +104,7 @@ const SelectRestaurantPageSlice = createSlice({
       .addCase(getRestaurantFood.pending, (state) => {
         state.fetchFoodPending = true;
         state.fetchFoodError = null;
+        state.foodList = [];
       })
       .addCase(getRestaurantFood.fulfilled, (state, { payload }) => {
         state.fetchFoodPending = false;
@@ -113,6 +114,7 @@ const SelectRestaurantPageSlice = createSlice({
       .addCase(getRestaurantFood.rejected, (state, { error }) => {
         state.fetchFoodPending = false;
         state.fetchFoodError = error;
+        state.foodList = [];
       });
   },
 });
