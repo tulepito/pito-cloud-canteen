@@ -64,11 +64,11 @@ export const Avatar: React.FC<TAvatarProps> = (props) => {
 
   const bannedUserDisplayName = intl.formatMessage({
     id: 'Avatar.bannedUserDisplayName',
-  }) as string;
+  });
 
   const deletedUserDisplayName = intl.formatMessage({
     id: 'Avatar.deletedUserDisplayName',
-  }) as string;
+  });
 
   const defaultUserDisplayNameFn = () => {
     if (isBannedUser) return bannedUserDisplayName;
