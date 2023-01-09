@@ -57,9 +57,7 @@ const ButtonIcon: React.FC<TButtonIconProps> = (props) => {
     content = <IconSpinner rootClassName={spinnerClassName || css.spinner} />;
   } else if (ready) {
     content = (
-      <IconCheckmark.IconCheckmark
-        rootClassName={checkmarkClassName || css.checkmark}
-      />
+      <IconCheckmark rootClassName={checkmarkClassName || css.checkmark} />
     );
   } else {
     content = children;

@@ -1,5 +1,5 @@
 import Badge from '@components/Badge/Badge';
-import IconCheckmark from '@components/Icons/IconCheckmark/IconCheckmark';
+import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import IconPlusDish from '@components/Icons/IconPlusDish/IconPlusDish';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { shopingCartThunks } from '@redux/slices/shopingCart.slice';
@@ -60,7 +60,7 @@ const ListingCard: React.FC<TListCardProps> = ({
           <p className={css.allergiesLabel}>Có hải sản</p>
           {isSelected ? (
             <span className={css.removeDish}>
-              <IconCheckmark.IconCheckmarkWithCircle />
+              <IconCheckmarkWithCircle />
             </span>
           ) : (
             <span
