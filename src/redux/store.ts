@@ -15,7 +15,7 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage,
-  whitelist: ['Order'],
+  whitelist: ['Order', 'ManageCompaniesPage'],
 };
 const rootReducer: typeof combinedReducer = (state, action) => {
   if (action.type === HYDRATE) {

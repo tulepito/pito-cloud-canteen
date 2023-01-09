@@ -4,14 +4,15 @@ import { required } from '@utils/validators';
 import classNames from 'classnames';
 import addDays from 'date-fns/addDays';
 import { useState } from 'react';
+import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 
 import css from './MealPlanDateField.module.scss';
 
 const TIME_OPTIONS = [
-  '7:00',
-  '8:00',
-  '9:00',
+  '07:00',
+  '08:00',
+  '09:00',
   '10:00',
   '11:00',
   '12:00',
@@ -29,7 +30,7 @@ type MealPlanDateFieldProps = {
   columnLayout?: boolean;
 };
 const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
-  const { values, columnLayout = false } = props;
+  const { values, columnLayout = false, form } = props;
   const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
     values;
   const intl = useIntl();
@@ -56,11 +57,20 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
     [css.column]: columnLayout,
   });
   const maxEndDate = startDate ? addDays(startDate, 6) : undefined;
+  const handleStartDateChange = (value: any, prevValue: any) => {
+    if (endDateInitialValue && value !== prevValue) {
+      form.batch(() => {
+        form.change('endDate', undefined);
+        setEndDate(undefined!);
+      });
+    }
+  };
   return (
     <div className={css.container}>
       <div className={css.fieldTitle}>
         {intl.formatMessage({ id: 'MealPlanDateField.title' })}
       </div>
+      <OnChange name="startDate">{handleStartDateChange}</OnChange>
       <div className={fieldGroupLayout}>
         <FieldDatePicker
           id="startDate"
@@ -74,6 +84,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           placeholderText={intl.formatMessage({
             id: 'MealPlanDateField.startDatePlaceholder',
           })}
+          autoComplete="off"
           validate={required(startDateRequiredMessage)}
         />
         <FieldDatePicker
@@ -89,6 +100,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           placeholderText={intl.formatMessage({
             id: 'MealPlanDateField.endDatePlaceholder',
           })}
+          autoComplete="off"
           validate={required(endDateRequiredMessage)}
           disabled={!startDate}
         />

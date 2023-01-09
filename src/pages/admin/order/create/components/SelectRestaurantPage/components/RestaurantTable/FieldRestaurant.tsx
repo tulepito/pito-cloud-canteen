@@ -48,8 +48,8 @@ const FieldRestaurant: React.FC<TFieldRestaurantProps> = (props) => {
       />
       <div className={itemClasses}>
         <div>{title}</div>
-        <div>{categoriesContent}</div>
         <div></div>
+        <div>{categoriesContent}</div>
         <div></div>
         <InlineTextButton className={css.seeMenuButton} onClick={onItemClick}>
           <FormattedMessage id="FieldRestaurant.viewMenu" />

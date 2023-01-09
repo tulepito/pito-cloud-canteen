@@ -83,9 +83,12 @@ const CreateOrderTab: React.FC<any> = (props) => {
 };
 
 const CreateOrderWizard = () => {
+  const stepFromLocal = getItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME);
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const [currentStep, setCurrentStep] = useState<string>(CLIENT_SELECT_TAB);
+  const [currentStep, setCurrentStep] = useState<string>(
+    stepFromLocal || CLIENT_SELECT_TAB,
+  );
 
   useEffect(() => {
     if (currentStep === CLIENT_SELECT_TAB)
@@ -120,12 +123,6 @@ const CreateOrderWizard = () => {
   // const { draftOrder } = getPersistState('Order');
   const { draftOrder } = useAppSelector((state) => state.Order, shallowEqual);
   const tabsStatus = tabsActive(draftOrder) as any;
-
-  useEffect(() => {
-    const stepFromLocal = getItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME);
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    stepFromLocal && setCurrentStep(stepFromLocal);
-  }, []);
 
   useEffect(() => {
     // If selectedTab is not active, redirect to the beginning of wizard

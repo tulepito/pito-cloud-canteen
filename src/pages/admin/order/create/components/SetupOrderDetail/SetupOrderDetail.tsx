@@ -7,6 +7,7 @@ import IconRefreshing from '@components/Icons/IconRefreshing';
 import IconSetting from '@components/IconSetting/IconSetting';
 import { calculateGroupMembersAmount } from '@helpers/companyMembers';
 import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
+import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { updateDraftMealPlan } from '@redux/slices/Order.slice';
@@ -62,8 +63,23 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   nextTab,
 }) => {
   const {
-    draftOrder: { orderDetail = {} },
-  } = useAppSelector((state) => state.Order);
+    draftOrder: {
+      startDate,
+      endDate,
+      clientId,
+      packagePerMember,
+      selectedGroups = [],
+      deliveryHour,
+      deliveryAddress,
+      deadlineDate,
+      deadlineHour,
+      orderDetail = {},
+    },
+  } = useAppSelector((state) => state.Order, shallowEqual);
+  const companies = useAppSelector(
+    (state) => state.ManageCompaniesPage.companyRefs,
+    shallowEqual,
+  );
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isSelectingRestaurant, setIsSelectingRestaurant] = useState(false);
   const dispatch = useAppDispatch();
@@ -74,22 +90,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     setTrue: onOrderSettingModalOpen,
   } = useBoolean();
 
-  const {
-    draftOrder: {
-      clientId,
-      packagePerMember,
-      selectedGroups = [],
-      deliveryHour,
-      deliveryAddress,
-      deadlineDate,
-      deadlineHour,
-    },
-  } = useAppSelector((state) => state.Order, shallowEqual);
   const { address } = deliveryAddress || {};
-  const companies = useAppSelector(
-    (state) => state.ManageCompaniesPage.companyRefs,
-    shallowEqual,
-  );
   const currentClient = companies.find(
     (company) => company.id.uuid === clientId,
   );
@@ -153,7 +154,15 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     [OrderSettingField.EMPLOYEE_AMOUNT]: allMembersAmount,
     [OrderSettingField.SPECIAL_DEMAND]: '',
     [OrderSettingField.ACCESS_SETTING]: selectedGroupsName?.join(', '),
-    [OrderSettingField.PER_PACK]: packagePerMember,
+    [OrderSettingField.PER_PACK]: intl.formatMessage(
+      { id: 'SetupOrderDetail.perPack' },
+      { value: addCommas(packagePerMember.toString()) || '' },
+    ),
+  };
+  const addMorePlanExtraProps = {
+    onClick: handleAddMorePlanClick,
+    startDate,
+    endDate,
   };
 
   return (
@@ -181,10 +190,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               </div>
             </div>
             <div className={css.buttonContainer}>
-              <Button disabled>
-                {' '}
-                <FormattedMessage id="SetupOrderDetail.orderSettings" />
-              </Button>
               <Button disabled className={css.recommendNewRestaurantBtn}>
                 <IconRefreshing />
                 <FormattedMessage id="SetupOrderDetail.recommendNewRestaurant" />
@@ -193,12 +198,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           </div>
           <div className={css.calendarContainer}>
             <CalendarDashboard
+              startDate={new Date(startDate)}
+              endDate={new Date(endDate)}
               events={resourcesForCalender}
               renderEvent={MealPlanCard}
               companyLogo="Company"
               components={{
                 contentEnd: (props) => (
-                  <AddMorePlan onClick={handleAddMorePlanClick} {...props} />
+                  <AddMorePlan {...props} {...addMorePlanExtraProps} />
                 ),
               }}
             />

@@ -239,3 +239,7 @@ export const parsePrice = (value: string = '') => {
     Number.isNaN(parseNumber) || typeof parseNumber !== 'number';
   return !isNotANumber ? parseNumber.toLocaleString() : value;
 };
+
+export const nonNegativeValue = (message: string) => (value: number) => {
+  return value <= 0 ? message : VALID;
+};

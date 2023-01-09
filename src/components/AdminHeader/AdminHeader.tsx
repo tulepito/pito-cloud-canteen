@@ -32,7 +32,7 @@ const AdminHeader: React.FC<TAdminHeader> = () => {
   return (
     <div className={css.root}>
       <div className={css.headerRight}>
-        <PitoLogo />
+        <PitoLogo className={css.logo} />
       </div>
       <div className={css.headerLeft}>
         <InlineTextButton type="button">
