@@ -36,6 +36,12 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
   const loadDataInProgress = useAppSelector(
     (state) => state.ParticipantSetupPlanPage.loadDataInProgress,
   );
+  const reloadDataInProgress = useAppSelector(
+    (state) => state.ParticipantSetupPlanPage.reloadDataInProgress,
+  );
+  const submitDataInprogress = useAppSelector(
+    (state) => state.ParticipantSetupPlanPage.submitDataInprogress,
+  );
 
   const convertDataToTabItem = () => {
     if (loadDataInProgress) {
@@ -79,7 +85,9 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
           dayId={item}
           planId={`${planId}`}
           isSelected={hasDishInCart === dish?.id?.uuid}
-          selectDisabled={!!hasDishInCart}
+          selectDisabled={
+            !!hasDishInCart || reloadDataInProgress || submitDataInprogress
+          }
         />
       ));
 

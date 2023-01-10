@@ -2,7 +2,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { Event, ViewsProps } from 'react-big-calendar';
 import { Calendar, luxonLocalizer, Views } from 'react-big-calendar';
 
@@ -14,6 +14,7 @@ import withWeekViewWrapper from './components/WeekView/withWeekViewWrapper';
 import type { TCalendarItemCardComponents } from './helpers/types';
 
 type TCalendarDashboard = {
+  anchorDate?: Date;
   defaultDate?: Date;
   events?: Event[] | undefined;
   renderEvent?: React.FC<any>;
@@ -23,6 +24,7 @@ type TCalendarDashboard = {
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboard> = ({
+  anchorDate,
   defaultDate: propsDefaultDate,
   events = [],
   renderEvent = OrderEventCard,
@@ -30,7 +32,9 @@ const CalendarDashboard: React.FC<TCalendarDashboard> = ({
   components,
   inProgress,
 }) => {
-  const localizer = luxonLocalizer(DateTime);
+  const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
+
+  const localizer = luxonLocalizer(DateTime) as any;
 
   const MonthViewWrapper = createMonthViewWrapper({
     renderEvent,
@@ -54,20 +58,37 @@ const CalendarDashboard: React.FC<TCalendarDashboard> = ({
     // If you guys want to update defaultDate for calendar when props.propsDefaultDate
     // changes, please add "propsDefaultDate" to deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [inProgress],
+    [inProgress, propsDefaultDate],
   );
+
+  const anchorDateProps = anchorDate
+    ? {
+        date: calDate,
+        onNavigate: (newDate: Date) => {
+          setCalDate(newDate);
+        },
+      }
+    : { defaultDate };
+
+  const toolbarExtraProps = {
+    companyLogo,
+  };
+
+  useEffect(() => {
+    setCalDate(anchorDate);
+  }, [anchorDate]);
 
   return (
     <div className={css.root}>
       <Calendar
-        defaultDate={defaultDate}
+        {...anchorDateProps}
         defaultView={Views.WEEK}
         localizer={localizer}
         events={events}
         views={views}
         components={{
           toolbar: (props: any) => (
-            <Toolbar {...props} companyLogo={companyLogo} />
+            <Toolbar {...props} {...toolbarExtraProps} />
           ),
         }}
       />
