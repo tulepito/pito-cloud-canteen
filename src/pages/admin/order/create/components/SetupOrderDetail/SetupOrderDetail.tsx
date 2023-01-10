@@ -236,7 +236,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
             <div>
               <div className={css.row}>
                 <FormattedMessage id="SetupOrderDetail.orderId.draft" />
-
                 <Badge label={`Đơn hàng tuần • ${partnerName}`} />
               </div>
               <div
@@ -255,8 +254,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           </div>
           <div className={css.calendarContainer}>
             <CalendarDashboard
-              startDate={suitableStartDate}
-              endDate={new Date(endDate)}
+              anchorDate={suitableStartDate}
               events={resourcesForCalender}
               renderEvent={MealPlanCard}
               companyLogo="Company"
