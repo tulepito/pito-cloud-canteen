@@ -48,12 +48,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const draftedOrderListing = denormalisedResponseEntities(
           draftedOrderListinResponse,
         )[0];
-
+        console.log('deadlineDate: ', deadlineDate);
+        console.log('deadlineHour: ', deadlineHour);
         const parsedDeadlineDate =
           DateTime.fromMillis(deadlineDate).toFormat('yyyy-MM-dd');
+        console.log('parsedDeadlineDate: ', parsedDeadlineDate);
         const orderDeadline = DateTime.fromISO(
           `${parsedDeadlineDate}T${deadlineHour}:00`,
         ).toMillis();
+        console.log('orderDeadline: ', orderDeadline);
         const allMembers = calculateGroupMembers(
           companyAccount,
           selectedGroups,
