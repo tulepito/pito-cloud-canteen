@@ -10,6 +10,7 @@ import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { partnerThunks } from '@redux/slices/partners.slice';
+import { adminRoutes } from '@src/paths';
 import { EListingStates, ERestaurantListingStatus } from '@utils/enums';
 import classNames from 'classnames';
 import Link from 'next/link';
@@ -305,7 +306,7 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
           columns={TABLE_COLUMN}
           data={dataTable}
           pagination={pagination}
-          paginationPath="/admin/partner"
+          paginationPath={adminRoutes.ManagePartners.path}
         />
       </>
     );

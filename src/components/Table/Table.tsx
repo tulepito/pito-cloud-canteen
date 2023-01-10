@@ -1,7 +1,8 @@
 import Form from '@components/Form/Form';
-import PaginationLinks from '@components/PaginationLinks/PaginationLinks';
+import Pagination from '@components/Pagination/Pagination';
 import type { TPagination } from '@utils/types';
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import React from 'react';
 import { Form as FinalForm } from 'react-final-form';
@@ -54,17 +55,25 @@ const Table = (props: any) => {
     tableBodyRowClassName,
     tableBodyCellClassName,
     paginationLinksClassName,
-    paginationLinksRootClassName,
-    paginationPath,
-    pagePathParams,
-    pageSearchParams,
     pagination,
     isLoading,
     showFilterFrom,
     tableClassName,
+    paginationPath,
   } = props;
 
   const tableClasses = classNames(css.table, tableClassName);
+
+  const router = useRouter();
+
+  const onPageChange = (page: number) => {
+    router.push({
+      pathname: paginationPath,
+      query: {
+        page,
+      },
+    });
+  };
 
   return (
     <>
@@ -135,13 +144,12 @@ const Table = (props: any) => {
         )}
       </table>
       {pagination && pagination.totalPages > 1 && (
-        <PaginationLinks
+        <Pagination
           className={paginationLinksClassName}
-          rootClassName={paginationLinksRootClassName}
-          path={paginationPath}
-          pagePathParams={pagePathParams}
-          pageSearchParams={pageSearchParams}
-          pagination={pagination}
+          total={pagination.totalItems}
+          pageSize={pagination.perPage}
+          current={pagination.page}
+          onChange={onPageChange}
         />
       )}
     </>

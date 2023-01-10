@@ -126,7 +126,7 @@ const ManageOrdersPage = () => {
           columns={TABLE_COLUMN}
           data={dataTable}
           pagination={manageOrdersPagination}
-          paginationPath="/admin/order"
+          paginationPath={adminRoutes.ManageOrders.path}
         />
       </>
     );
