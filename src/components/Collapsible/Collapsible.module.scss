@@ -25,6 +25,10 @@
     }
   }
   .content {
-    transition: all 0.3s;
+    transition: height 0.3s;
+    height: initial;
+    &.isClose {
+      height: 0;
+    }
   }
 }
