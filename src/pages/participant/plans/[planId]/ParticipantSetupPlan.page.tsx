@@ -7,13 +7,14 @@ import SectionOrderPanel from '@src/pages/participant/components/SectionOrderPan
 import SectionRestaurantHero from '@src/pages/participant/components/SectionRestaurantHero/SectionRestaurantHero';
 import { LISTING } from '@utils/data';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import css from './ParticipantSetupPlan.module.scss';
 
 const ParticipantSetupPlan = () => {
   const router = useRouter();
   const [selectedRestaurant, setSelectedRestaurant] = useState<any>(null);
+  const loadedData = useRef(false);
 
   const dispatch = useAppDispatch();
   const { planId, orderDay } = router.query;
@@ -44,7 +45,8 @@ const ParticipantSetupPlan = () => {
   };
 
   useEffect(() => {
-    if (router.isReady && currentUser?.id?.uuid) {
+    if (router.isReady && currentUser?.id?.uuid && !loadedData.current) {
+      loadedData.current = true;
       setOrderDayState(Number(orderDay));
       dispatch(ParticipantSetupPlanThunks.loadData(`${planId}`));
     }

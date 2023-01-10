@@ -75,6 +75,8 @@
 .activeViewMode {
   background-color: $neutralGray1;
   color: $neutralGray6;
+  box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06),
+    0px 4px 8px -2px rgba(16, 24, 40, 0.1);
 
   &:active,
   &:focus {
@@ -114,13 +116,8 @@
   background-color: transparent;
   border: unset;
   outline: none;
-  margin-right: 8px;
   cursor: pointer;
   border-radius: 4px;
-
-  &:last-child {
-    margin-right: 0;
-  }
 
   &:hover {
     background-color: $neutralGray4;

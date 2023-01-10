@@ -3,7 +3,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { Event, ViewsProps } from 'react-big-calendar';
 import { Calendar, luxonLocalizer, Views } from 'react-big-calendar';
 
@@ -17,6 +17,7 @@ import type { TCalendarItemCardComponents } from './helpers/types';
 type TCalendarDashboardProps = {
   rootClassName?: string;
   className?: string;
+  anchorDate?: Date;
   defaultDate?: Date;
   startDate?: Date;
   endDate?: Date;
@@ -30,8 +31,7 @@ type TCalendarDashboardProps = {
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   rootClassName,
   className,
-  startDate,
-  endDate,
+  anchorDate,
   defaultDate: propsDefaultDate,
   events = [],
   renderEvent = OrderEventCard,
@@ -39,7 +39,10 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   components,
   inProgress,
 }) => {
-  const localizer = luxonLocalizer(DateTime);
+  const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
+
+  const localizer = luxonLocalizer(DateTime) as any;
+
   const classes = classNames(rootClassName || css.root, className);
 
   const MonthViewWrapper = createMonthViewWrapper({
@@ -55,9 +58,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   const { defaultDate, views } = useMemo(
     () => ({
       defaultDate:
-        startDate ||
-        propsDefaultDate ||
-        DateTime.now().startOf('week').toJSDate(),
+        propsDefaultDate || DateTime.now().startOf('week').toJSDate(),
       views: {
         week: WeekViewWrapper as any,
         month: MonthViewWrapper as any,
@@ -66,19 +67,30 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
     // If you guys want to update defaultDate for calendar when props.propsDefaultDate
     // changes, please add "propsDefaultDate" to deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [inProgress],
+    [inProgress, propsDefaultDate],
   );
+
+  const anchorDateProps = anchorDate
+    ? {
+        date: calDate,
+        onNavigate: (newDate: Date) => {
+          setCalDate(newDate);
+        },
+      }
+    : { defaultDate };
 
   const toolbarExtraProps = {
     companyLogo,
-    startDate,
-    endDate,
   };
+
+  useEffect(() => {
+    setCalDate(anchorDate);
+  }, [anchorDate]);
 
   return (
     <div className={classes}>
       <Calendar
-        defaultDate={defaultDate}
+        {...anchorDateProps}
         defaultView={Views.WEEK}
         localizer={localizer}
         events={events}

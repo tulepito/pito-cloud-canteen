@@ -21,6 +21,7 @@
 }
 
 .rootExpired {
+  box-shadow: none;
   &:hover {
     border: 1px solid $neutralGray6;
   }

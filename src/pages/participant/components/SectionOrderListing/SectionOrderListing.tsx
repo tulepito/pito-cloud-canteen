@@ -2,6 +2,7 @@ import IconBanned from '@components/Icons/IconBanned/IconBanned';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import ListingCard from '@components/ListingCard/ListingCard';
 import Tabs from '@components/Tabs/Tabs';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
@@ -35,6 +36,12 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
   const loadDataInProgress = useAppSelector(
     (state) => state.ParticipantSetupPlanPage.loadDataInProgress,
   );
+  const reloadDataInProgress = useAppSelector(
+    (state) => state.ParticipantSetupPlanPage.reloadDataInProgress,
+  );
+  const submitDataInprogress = useAppSelector(
+    (state) => state.ParticipantSetupPlanPage.submitDataInprogress,
+  );
 
   const convertDataToTabItem = () => {
     if (loadDataInProgress) {
@@ -58,9 +65,13 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
           </span>
           {hasDishInCart &&
             (hasDishInCart === 'notJoined' ? (
-              <IconBanned className={css.tabTitleIcon} />
+              <Tooltip tooltipContent={'meow'}>
+                <IconBanned className={css.tabTitleIcon} />
+              </Tooltip>
             ) : (
-              <IconCheckmarkWithCircle className={css.tabTitleIcon} />
+              <Tooltip tooltipContent={'meow'}>
+                <IconCheckmarkWithCircle className={css.tabTitleIcon} />
+              </Tooltip>
             ))}
           {}
         </div>
@@ -74,7 +85,9 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
           dayId={item}
           planId={`${planId}`}
           isSelected={hasDishInCart === dish?.id?.uuid}
-          selectDisabled={!!hasDishInCart}
+          selectDisabled={
+            !!hasDishInCart || reloadDataInProgress || submitDataInprogress
+          }
         />
       ));
 

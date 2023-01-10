@@ -1,4 +1,7 @@
+import { InlineTextButton } from '@components/Button/Button';
+import IconRefreshing from '@components/Icons/IconRefreshing';
 import classNames from 'classnames';
+import { FormattedMessage } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 
 import CartItemList from './CartItemList';
@@ -11,6 +14,7 @@ type TOrderPanelBody = {
   cartListKeys: string[];
   plan: any;
   handleRemoveItem: (dayId: string) => void;
+  onAutoSelect: () => void;
 };
 
 const OrderPanelBody: React.FC<TOrderPanelBody> = ({
@@ -19,12 +23,17 @@ const OrderPanelBody: React.FC<TOrderPanelBody> = ({
   cartListKeys,
   plan,
   handleRemoveItem,
+  onAutoSelect,
 }) => {
   return (
     <div
       className={classNames(css.sectionBody, {
         [css.sectionBodyEmpty]: cartListKeys.length === 0,
       })}>
+      <InlineTextButton onClick={onAutoSelect} className={css.autoSelect}>
+        <IconRefreshing className={css.iconRefresh} />
+        <FormattedMessage id="SectionOrderListing.selectForMeWholeWeekBtn" />
+      </InlineTextButton>
       {loadDataInProgress ? (
         <Skeleton className={css.lineItemLoading} count={4} />
       ) : (
