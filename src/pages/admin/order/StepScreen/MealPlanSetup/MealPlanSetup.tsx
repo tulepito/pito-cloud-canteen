@@ -89,10 +89,10 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       deliveryAddress:
         location || deliveryAddress
           ? {
-              search: defaultAddress || address,
+              search: address || defaultAddress,
               selectedPlace: {
-                address: defaultAddress || address,
-                origin: defautlOrigin || origin,
+                address: address || defaultAddress,
+                origin: origin || defautlOrigin,
               },
             }
           : null,

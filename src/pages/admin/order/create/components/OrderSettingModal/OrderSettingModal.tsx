@@ -241,11 +241,14 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
               onSubmit={onSubmit}
               initialValues={initialValues}
               render={(formRenderProps: FormRenderProps) => {
-                const { handleSubmit, form, values } = formRenderProps;
+                const { handleSubmit, form, values, invalid } = formRenderProps;
                 return (
                   <Form onSubmit={handleSubmit}>
                     {rightSideRenderer(form, values)}
-                    <Button className={css.submitBtn} type="submit">
+                    <Button
+                      className={css.submitBtn}
+                      disabled={invalid}
+                      type="submit">
                       {intl.formatMessage({
                         id: 'OrderSettingModal.saveChange',
                       })}
