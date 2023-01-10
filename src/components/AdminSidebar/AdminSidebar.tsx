@@ -37,9 +37,9 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         id: 'manageOrders',
         label: 'AdminSidebar.manageOrderLabel',
         nameLink: adminRoutes.ManageOrders.path,
-        // Sub name links => if pathname in these paths, it will activate the parent namelink
+        // highlightRefLinks => if pathname in these paths, it will activate the parent namelink
         // Example : current pathname is '/admin/company/create' => the menu with nameLink '/admin/company' will be hightlighted
-        subNameLinks: [adminRoutes.OrderDetails.path],
+        highlightRefLinks: [adminRoutes.OrderDetails.path],
       },
     ],
   },
@@ -54,7 +54,7 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         id: 'company',
         label: 'AdminSidebar.companyLabel',
         nameLink: adminRoutes.ManageCompanies.path,
-        subNameLinks: [
+        highlightRefLinks: [
           adminRoutes.CreateCompany.path,
           adminRoutes.EditCompany.path,
           adminRoutes.CompanyDetails.path,
@@ -64,6 +64,8 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         id: 'partner',
         label: 'AdminSidebar.partnerLabel',
         nameLink: adminRoutes.ManagePartners.path,
+        // showOnActiveChildrenMenus has all childrens that only show up when these menues is active
+        // Example : Default is not showing these paths. But when the pathname === nameLink in these paths
         showOnActiveChildrenMenus: [
           {
             id: 'orderDetails',
@@ -72,12 +74,11 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
           },
           {
             id: 'editOrder',
-            label: 'AdminSidebar.partnerDetailsLabel',
+            label: 'AdminSidebar.editPartnerLabel',
             nameLink: adminRoutes.EditPartner.path,
           },
         ],
-        subNameLinks: [
-          adminRoutes.ManagePartners.path,
+        highlightRefLinks: [
           adminRoutes.CreatePartner.path,
           adminRoutes.EditPartner.path,
           adminRoutes.PartnerDetails.path,
@@ -102,7 +103,7 @@ const checkNestedPathActive = (arr: TSidebarMenu[], pathName: string) => {
       );
       if (child) return item;
     }
-    if (item.subNameLinks?.includes(pathName)) return item;
+    if (item.highlightRefLinks?.includes(pathName)) return item;
     if (item.nameLink === pathName) return item;
     if (item.childrenMenus) {
       const child = checkNestedPathActive(item.childrenMenus, pathName);
@@ -115,10 +116,6 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
   const { onCloseMenu } = props;
   const intl = useIntl();
 
-  const onOutsideClick = () => {
-    onCloseMenu();
-  };
-
   const router = useRouter();
 
   const { pathname } = router;
@@ -129,7 +126,7 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
   );
 
   return (
-    <OutsideClickHandler onOutsideClick={onOutsideClick}>
+    <OutsideClickHandler onOutsideClick={onCloseMenu}>
       <div className={css.root}>
         <div className={css.leftSide}>
           {LIST_SIDEBAR_MENU.map((item: TSidebarMenu) => {
@@ -137,7 +134,7 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
               Icon,
               id,
               nameLink,
-              subNameLinks,
+              highlightRefLinks,
               childrenMenus = [],
             } = item;
             const activeWithChildrenNameLinks = childrenMenus.find(
@@ -145,10 +142,11 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
             );
 
             const activeWithChildrenSubNameLinks = childrenMenus.find(
-              (m: TSidebarMenu) => m.subNameLinks?.includes(pathname),
+              (m: TSidebarMenu) => m.highlightRefLinks?.includes(pathname),
             );
 
-            const activeWithSubNameLinks = subNameLinks?.includes(pathname);
+            const activeWithSubNameLinks =
+              highlightRefLinks?.includes(pathname);
             const isActive =
               activeWithChildrenSubNameLinks ||
               activeWithChildrenNameLinks ||

@@ -29,7 +29,7 @@ export type TSidebarMenu = {
   childrenMenus?: TSidebarMenu[];
   nameLink?: string;
   isFirstLevel?: boolean;
-  subNameLinks?: string[];
+  highlightRefLinks?: string[];
   showOnActiveChildrenMenus?: TSidebarMenu[];
 };
 
@@ -73,7 +73,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     showOnActiveChildrenMenus,
     nameLink = '',
     isFirstLevel,
-    subNameLinks,
+    highlightRefLinks,
   } = menu;
 
   const hasChildrenMenus =
@@ -129,9 +129,10 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     subMenuWrapperClassName,
   );
 
-  const activeWithSubNameLinks = subNameLinks?.includes(pathname);
+  const activeWithHighlightRefLinksLinks =
+    highlightRefLinks?.includes(pathname);
 
-  const isActive = activeWithSubNameLinks || pathname === nameLink;
+  const isActive = activeWithHighlightRefLinksLinks || pathname === nameLink;
 
   const subMenuLayoutClasses = classNames(
     css.subMenuLayout,
@@ -144,11 +145,12 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
   );
 
   return (
-    <div onClick={handleMenuClick} className={subMenuWrapperClasses}>
+    <div className={subMenuWrapperClasses}>
       <div className={subMenuLayoutClasses}>
         <div className={css.subMenuItem}>
           {Icon && <Icon className={css.entityIcon} />}
           <div
+            onClick={handleMenuClick}
             className={classNames(
               css.label,
               { [css.labelOpen]: isOpen },
