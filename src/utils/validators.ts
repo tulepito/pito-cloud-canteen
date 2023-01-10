@@ -1,6 +1,6 @@
 import toPairs from 'lodash/toPairs';
 
-import type { TObject } from './types';
+import type { TAddress, TObject } from './types';
 
 /**
  * Validator functions and helpers for Final Forms
@@ -23,6 +23,14 @@ export const required = (message: string) => (value: string) => {
     return isNonEmptyString(value) ? VALID : message;
   }
   return VALID;
+};
+
+export const addressRequired = (message: string) => (value: TAddress) => {
+  if (typeof value === 'undefined' || value === null) {
+    // undefined or null values are invalid
+    return message;
+  }
+  return isNonEmptyString(value.search) ? VALID : message;
 };
 
 export const requiredStringNoTrim = (message: string) => (value: string) => {
