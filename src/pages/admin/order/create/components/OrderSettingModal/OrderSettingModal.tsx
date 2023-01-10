@@ -54,7 +54,7 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
       deliveryAddress,
       deadlineDate,
       deadlineHour,
-      vatAllow,
+      vatAllow = false,
       startDate,
       endDate,
     },
@@ -62,8 +62,8 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
   const { address, origin } = deliveryAddress || {};
   const initialValues = useMemo(
     () => ({
+      vatAllow,
       packagePerMember: addCommas(packagePerMember.toString()) || '',
-      vatAllow: vatAllow || true,
       selectedGroups: selectedGroups || ['allMembers'],
       deliveryHour: deliveryHour || '',
       deadlineDate: deadlineDate || null,
