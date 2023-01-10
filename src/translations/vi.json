@@ -622,5 +622,8 @@
   "SelectFoodForm.noSelectedItems": "Bạn chưa chọn thực đơn!",
   "CreateOrderRoute.title": "Tạo đơn hàng",
   "CreateOrderRoute.description": "Tạo đơn hàng",
-  "SectionOrderListing.selectForMeBtn": "Chọn giúp tôi"
+  "SectionOrderListing.selectForMeBtn": "Chọn giúp tôi",
+  "ManageOrders.noResults": "Không có kết quả nào hiển thị",
+  "ManageOrders.title": "Danh sách đơn hàng",
+  "AdminSidebar.orderDetailsLabel": "Chi tiết đơn hàng"
 }

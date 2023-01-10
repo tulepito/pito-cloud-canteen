@@ -415,3 +415,25 @@ export type TError = {
 };
 
 export type RouteKey = keyof typeof adminRoutes;
+
+export type TAdminOrderListingAttributes = {
+  title: string;
+  description?: string;
+  geolocation?: any;
+  deleted?: boolean;
+  state?: TListingState;
+  price?: any;
+  publicData?: any;
+  metadata?: any;
+  privateData?: any;
+};
+
+// Denormalised integration order listing object
+export type TIntergrationOrderListing = {
+  id: any;
+  type: 'listing';
+  attributes: TAdminOrderListingAttributes & TDeletedListingAttributes;
+  author?: TUser;
+  images?: TImage[];
+  company?: TCompany;
+};

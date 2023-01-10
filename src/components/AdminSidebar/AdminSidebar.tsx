@@ -37,6 +37,9 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         id: 'manageOrders',
         label: 'AdminSidebar.manageOrderLabel',
         nameLink: adminRoutes.ManageOrders.path,
+        // Sub name links => if pathname in these paths, it will activate the parent namelink
+        // Example : current pathname is '/admin/company/create' => the menu with nameLink '/admin/company' will be hightlighted
+        subNameLinks: [adminRoutes.OrderDetails.path],
       },
     ],
   },
@@ -51,8 +54,6 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         id: 'company',
         label: 'AdminSidebar.companyLabel',
         nameLink: adminRoutes.ManageCompanies.path,
-        // Sub name links => if pathname in these path, it will active the parent namelink
-        // Example : current pathname is '/admin/company/create' => the menu with nameLink '/admin/company' will be hightlighted
         subNameLinks: [
           adminRoutes.CreateCompany.path,
           adminRoutes.EditCompany.path,
@@ -107,7 +108,7 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
     () => checkNestedPathActive(LIST_SIDEBAR_MENU, pathname),
     [pathname],
   );
-
+  console.log(activeMenu, pathname);
   return (
     <OutsideClickHandler onOutsideClick={onOutsideClick}>
       <div className={css.root}>

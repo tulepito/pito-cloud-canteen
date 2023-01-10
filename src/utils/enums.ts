@@ -394,3 +394,7 @@ export const PARTY_INSURANCE_RADIO_OPTIONS = [
     label: 'Chưa',
   },
 ];
+
+export enum EOrderStates {
+  draft = 'Đang tiến hành',
+}

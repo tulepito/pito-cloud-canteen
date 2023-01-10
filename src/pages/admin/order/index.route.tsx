@@ -1,5 +1,7 @@
+import ManageOrdersPage from './ManageOrders.page';
+
 const OrderManagementRoute = () => {
-  return <div>OrderManagementRoute</div>;
+  return <ManageOrdersPage />;
 };
 
 export default OrderManagementRoute;
