@@ -20,7 +20,6 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event, index }) => {
 
   const expiredTime = DateTime.fromJSDate(event.resource?.expiredTime)
     .plus({ day: 1 })
-    .startOf('day')
     .toJSDate();
   const remainTime = DateTime.fromJSDate(new Date()).diff(
     DateTime.fromJSDate(expiredTime),
