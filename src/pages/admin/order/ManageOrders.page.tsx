@@ -1,7 +1,7 @@
-import { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
+import SelectSingleFilterPopup from '@components/SelectSingleFilterPopup/SelectSingleFilterPopup';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -12,14 +12,23 @@ import type { TIntergrationOrderListing } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
+import type { TKeywordSearchFormValues } from '../partner/components/KeywordSearchForm/KeywordSearchForm';
+import KeywordSearchForm from '../partner/components/KeywordSearchForm/KeywordSearchForm';
 import css from './ManageOrders.module.scss';
 
 const parseTimestaimpToFormat = (date: number) => {
   return DateTime.fromMillis(date).toFormat('dd-MM-yyyy');
 };
+
+const ORDER_STATES = Object.keys(EOrderStates).map((key: string) => {
+  return {
+    key,
+    label: <FormattedMessage id={`ManageOrdersPage.${key}State`} />,
+  };
+});
 
 const TABLE_COLUMN: TColumn[] = [
   {
@@ -65,14 +74,24 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'state',
     label: 'Trạng thái',
     render: (data: any) => {
-      return <span className={css.rowText}>{data.state}</span>;
+      return (
+        <div className={css.rowState}>
+          <span>
+            <FormattedMessage id={`ManageOrdersPage.${data.state}State`} />
+          </span>
+        </div>
+      );
     },
   },
   {
     key: 'action',
     label: '',
-    render: () => {
-      return <InlineTextButton type="button">Tạo đơn</InlineTextButton>;
+    render: (data: any) => {
+      return (
+        <NamedLink path={`${adminRoutes.ManageOrders.path}/${data.id}`}>
+          <FormattedMessage id="ManageOrdersPage.orderDetails" />
+        </NamedLink>
+      );
     },
   },
 ];
@@ -82,29 +101,34 @@ const parseEntitiesToTableData = (
   page: number,
 ) => {
   if (orders.length === 0) return [];
-  return orders.map((entity, index) => ({
-    key: entity.id.uuid,
-    data: {
-      id: entity.id.uuid,
-      title: entity.attributes.title,
-      orderNumber: (page - 1) * 10 + index + 1,
-      name: entity.attributes.title,
-      location:
-        entity.attributes.metadata?.generalInfo?.deliveryAddress?.address,
-      companyName: entity.company?.attributes.profile.displayName,
-      startDate: parseTimestaimpToFormat(
-        entity.attributes.metadata?.generalInfo?.startDate,
-      ),
-      staffName: entity.attributes.metadata?.generalInfo?.staffName,
-      state: entity.attributes.metadata?.state || EOrderStates.draft,
-    },
-  }));
+  return orders.map((entity, index) => {
+    const { company } = entity;
+    return {
+      key: entity.id.uuid,
+      data: {
+        id: entity.id.uuid,
+        title: entity.attributes.title,
+        orderNumber: (page - 1) * 10 + index + 1,
+        location:
+          entity?.attributes?.metadata?.generalInfo?.deliveryAddress?.address,
+        companyName: company?.attributes.profile.displayName,
+        startDate: parseTimestaimpToFormat(
+          entity?.attributes?.metadata?.generalInfo?.startDate,
+        ),
+        staffName: entity?.attributes?.metadata?.generalInfo?.staffName,
+        state: entity.attributes.metadata?.state || EOrderStates.inProgress,
+        orderId: entity?.id?.uuid,
+      },
+    };
+  });
 };
 
 const ManageOrdersPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { page = 1 } = router.query;
+  const intl = useIntl();
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const { page = 1, keywords = '', meta_state = '' } = router.query;
   const {
     queryOrderInProgress,
     queryOrderError,
@@ -139,14 +163,40 @@ const ManageOrdersPage = () => {
   }
 
   useEffect(() => {
-    dispatch(OrderAsyncAction.queryOrders({ page }));
+    dispatch(OrderAsyncAction.queryOrders({ page, keywords }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
+
+  const onSubmitKeywordForm = (value: TKeywordSearchFormValues) => {
+    router.push({
+      pathname: adminRoutes.ManageOrders.path,
+      query: {
+        ...value,
+      },
+    });
+  };
 
   return (
     <div className={css.root}>
       <h1 className={css.title}>
         <FormattedMessage id="ManageOrders.title" />
       </h1>
+      <div className={css.filterForm}>
+        <KeywordSearchForm
+          onSubmit={onSubmitKeywordForm}
+          initialValues={{ keywords: keywords as string }}
+        />
+        <SelectSingleFilterPopup
+          className={css.singleFilter}
+          options={ORDER_STATES}
+          label={intl.formatMessage({ id: 'ManageCompanies.status' })}
+          queryParamNames="meta_state"
+          onSelect={onSubmitKeywordForm}
+          initialValues={{
+            meta_state: meta_state as string,
+          }}
+        />
+      </div>
       {content}
     </div>
   );

@@ -87,7 +87,38 @@ export const getSdk = (req: NextApiRequest | NextRequest, res: any) => {
 
 export const getTrustedSdk = (req: NextApiRequest) => {
   const userToken = getUserToken(req);
+  // Initiate an SDK instance for token exchange
+  const sdk = sharetribeSdk.createInstance({
+    transitVerbose: TRANSIT_VERBOSE,
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+    tokenStore: memoryStore(userToken),
+    typeHandlers,
+    ...baseUrlMaybe,
+  });
 
+  // Perform a token exchange
+  return sdk.exchangeToken().then((response: any) => {
+    // Setup a trusted sdk with the token we got from the exchange:
+    const trustedToken = response.data;
+
+    return sharetribeSdk.createInstance({
+      transitVerbose: TRANSIT_VERBOSE,
+
+      // We don't need CLIENT_SECRET here anymore
+      clientId: CLIENT_ID,
+
+      // Important! Do not use a cookieTokenStore here but a memoryStore
+      // instead so that we don't leak the token back to browser client.
+      tokenStore: memoryStore(trustedToken),
+
+      typeHandlers,
+      ...baseUrlMaybe,
+    });
+  });
+};
+
+export const getTrustedSdkWithSubAccountToken = (userToken: any) => {
   // Initiate an SDK instance for token exchange
   const sdk = sharetribeSdk.createInstance({
     transitVerbose: TRANSIT_VERBOSE,

@@ -1,0 +1,21 @@
+@use '/src/styles/vars.scss' as *;
+
+.filterForm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 50px 0;
+}
+
+.title {
+  font-weight: $fontWeightRegular;
+  font-size: 20px;
+}
+
+.rowState {
+  padding: 5px;
+  border-radius: 5px;
+  max-width: 70%;
+  text-align: center;
+  background-color: $successScreen3;
+}

@@ -58,5 +58,5 @@ type CompleteOrderApiBody = {
   orderId: string;
   planId: string;
 };
-export const completeOrderApi = (body: CompleteOrderApiBody) =>
+export const initiateTransactionsApi = (body: CompleteOrderApiBody) =>
   put('/api/orders', body);

@@ -115,6 +115,7 @@ export const startRouteBaseOnPermission = {
   [EUserPermission.company]: '/company',
   [EUserPermission.admin]: '/admin',
 };
+
 export enum ERestaurantListingState {
   draft = 'draft',
   published = 'published',
@@ -396,5 +397,5 @@ export const PARTY_INSURANCE_RADIO_OPTIONS = [
 ];
 
 export enum EOrderStates {
-  draft = 'Đang tiến hành',
+  inProgress = 'inProgress',
 }

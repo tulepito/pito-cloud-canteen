@@ -30,6 +30,11 @@ export const deleteMethod = (path: string, body: any) => {
   return axios.delete(`${apiBaseUrl()}${path}`, body);
 };
 
+type TBodyParams = {
+  dataParams: Record<string, any>;
+  queryParams: Record<string, any>;
+};
+
 export const getCompaniesApi = () => get('/api/admin/users/company');
 
 export const updateCompanyApi = (body: any) =>
@@ -74,5 +79,6 @@ export const loadPlanDataApi = (planId: string) =>
 export const updateParticipantOrderApi = (orderId: string, body: any) =>
   post(`/api/participants/orders/${orderId}`, body);
 
-export const queryOrdersApi = (body: any) =>
-  post(`/api/admin/listings/order`, body);
+export const queryOrdersApi = (body: TBodyParams) => {
+  return post(`/api/admin/listings/order/query`, body);
+};

@@ -428,6 +428,14 @@ export type TAdminOrderListingAttributes = {
   privateData?: any;
 };
 
+export type TOrderListing = {
+  id: any;
+  type: 'listing';
+  attributes: TAdminOrderListingAttributes & TDeletedListingAttributes;
+  author?: TUser;
+  images?: TImage[];
+};
+
 // Denormalised integration order listing object
 export type TIntergrationOrderListing = {
   id: any;
@@ -436,4 +444,5 @@ export type TIntergrationOrderListing = {
   author?: TUser;
   images?: TImage[];
   company?: TCompany;
+  order?: TOrderListing;
 };

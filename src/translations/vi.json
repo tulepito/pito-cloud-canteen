@@ -627,5 +627,7 @@
   "ManageOrders.title": "Danh sách đơn hàng",
   "AdminSidebar.orderDetailsLabel": "Chi tiết đơn hàng",
   "AdminSidebar.partnerDetailsLabel": "Thông tin đối tác",
-  "AdminSidebar.editPartnerLabel": "Chỉnh sửa"
+  "AdminSidebar.editPartnerLabel": "Chỉnh sửa",
+  "ManageOrdersPage.orderDetails": "Chi tiết",
+  "ManageOrdersPage.inProgressState": "Đang tiến hành"
 }

@@ -4,8 +4,8 @@ import { queryOrdersApi } from '@utils/api';
 import { storableError } from '@utils/errors';
 import {
   addMealPlanDetailApi,
-  completeOrderApi,
   createOrderApi,
+  initiateTransactionsApi,
   updateMealPlanDetailApi,
 } from '@utils/orderApi';
 import type { TListing, TPagination } from '@utils/types';
@@ -42,8 +42,8 @@ interface OrderInitialState {
   addMealPlanDetailInProgress: boolean;
   addMealPlanDetailError: any;
 
-  completeOrderInProgress: boolean;
-  completeOrderError: any;
+  initiateTransactionsInProgress: boolean;
+  initiateTransactionsError: any;
   draftOrder: any;
   selectedCompany: any;
 
@@ -57,8 +57,8 @@ interface OrderInitialState {
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
 const ADD_MEAL_PLAN_DETAIL = 'app/Order/ADD_MEAL_PLAN_DETAIL';
 const UPDATE_MEAL_PLAN_DETAIL = 'app/Order/UPDATE_MEAL_PLAN_DETAIL';
-const COMPLETE_ORDER = 'app/Order/COMPLETE_ORDER';
-const QUERY_ORDERS = 'app/Order/QUERY_ORDERS';
+const INITIATE_TRANSACTIONS = 'app/Order/INITIATE_TRANSACTIONS';
+const QUERY_SUB_ORDERS = 'app/Order/QUERY_SUB_ORDERS';
 
 const initialState: OrderInitialState = {
   order: null,
@@ -69,8 +69,8 @@ const initialState: OrderInitialState = {
   addMealPlanDetailInProgress: false,
   addMealPlanDetailError: null,
 
-  completeOrderInProgress: false,
-  completeOrderError: null,
+  initiateTransactionsInProgress: false,
+  initiateTransactionsError: null,
   draftOrder: {},
   selectedCompany: null,
 
@@ -135,27 +135,23 @@ const updateMealPlanDetail = createAsyncThunk(
   },
 );
 
-const completeOrder = createAsyncThunk(
-  COMPLETE_ORDER,
-  async (planId: string, { getState }) => {
-    const { order } = getState().Order;
-    await completeOrderApi({
-      orderId: order?.id.uuid,
-      planId,
-    });
+const initiateTransactions = createAsyncThunk(
+  INITIATE_TRANSACTIONS,
+  async (params: any) => {
+    await initiateTransactionsApi(params);
     return '';
   },
 );
 
 const queryOrders = createAsyncThunk(
-  QUERY_ORDERS,
+  QUERY_SUB_ORDERS,
   async (payload: any = {}) => {
     const params = {
       dataParams: {
         ...payload,
         perPage: MANAGE_ORDER_PAGE_SIZE,
       },
-      listingParams: {
+      queryParams: {
         expand: true,
       },
     };
@@ -173,7 +169,7 @@ export const OrderAsyncAction = {
   createOrder,
   addMealPlanDetail,
   updateMealPlanDetail,
-  completeOrder,
+  initiateTransactions,
   queryOrders,
 };
 
@@ -264,18 +260,19 @@ const orderSlice = createSlice({
         addMealPlanDetailError: error.message,
       }))
 
-      .addCase(completeOrder.pending, (state) => ({
+      .addCase(initiateTransactions.pending, (state) => ({
         ...state,
-        completeOrderInProgress: true,
+        initiateTransactionsError: null,
+        initiateTransactionsInProgress: true,
       }))
-      .addCase(completeOrder.fulfilled, (state) => ({
+      .addCase(initiateTransactions.fulfilled, (state) => ({
         ...state,
-        completeOrderInProgress: false,
+        initiateTransactionsInProgress: false,
       }))
-      .addCase(completeOrder.rejected, (state, { error }) => ({
+      .addCase(initiateTransactions.rejected, (state, { payload }) => ({
         ...state,
-        completeOrderInProgress: false,
-        completeOrderError: error.message,
+        initiateTransactionsInProgress: false,
+        initiateTransactionsError: payload,
       }))
       .addCase(queryOrders.pending, (state) => ({
         ...state,

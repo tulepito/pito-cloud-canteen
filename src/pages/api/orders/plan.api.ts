@@ -1,6 +1,6 @@
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk, handleError } from '@services/sdk';
-import subAccountLogin from '@services/subAccountLogin';
+import { getSubAccountSdk } from '@services/subAccountSdk';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -25,7 +25,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         const { subAccountId } = companyAccount.attributes.profile.privateData;
         const subCompanyAccount = await fetchUser(subAccountId);
-        const loggedinSubAccount = await subAccountLogin(subCompanyAccount);
+        const loggedinSubAccount = await getSubAccountSdk(subCompanyAccount);
         const planListingResponse =
           await loggedinSubAccount.ownListings.createDraft({
             title: `${orderTitle} - Plan week ${plans.length + 1}`,

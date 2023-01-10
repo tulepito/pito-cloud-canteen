@@ -36,8 +36,8 @@ const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
                   id: 'KeywordSearchForm.keywordPlaceholder',
                 })
               }
-              name={props?.searchValue || 'keyword'}
-              id={props?.searchValue || 'keyword'}
+              name={props?.searchValue || 'keywords'}
+              id={props?.searchValue || 'keywords'}
               className={css.searchInput}
             />
             <Button className={css.searchButton} onClick={handleSubmit}>
