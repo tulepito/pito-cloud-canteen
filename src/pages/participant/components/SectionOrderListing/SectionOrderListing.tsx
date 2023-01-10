@@ -34,13 +34,13 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
     return state.shopingCart.orders?.[currUserId]?.[`${planId}` || 1];
   });
   const loadDataInProgress = useAppSelector(
-    (state) => state.ParticipantSetupPlanPage.loadDataInProgress,
+    (state) => state.ParticipantPlanPage.loadDataInProgress,
   );
   const reloadDataInProgress = useAppSelector(
-    (state) => state.ParticipantSetupPlanPage.reloadDataInProgress,
+    (state) => state.ParticipantPlanPage.reloadDataInProgress,
   );
   const submitDataInprogress = useAppSelector(
-    (state) => state.ParticipantSetupPlanPage.submitDataInprogress,
+    (state) => state.ParticipantPlanPage.submitDataInprogress,
   );
 
   const convertDataToTabItem = () => {
