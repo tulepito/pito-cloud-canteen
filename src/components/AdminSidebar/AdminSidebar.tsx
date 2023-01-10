@@ -64,6 +64,18 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         id: 'partner',
         label: 'AdminSidebar.partnerLabel',
         nameLink: adminRoutes.ManagePartners.path,
+        showOnActiveChildrenMenus: [
+          {
+            id: 'orderDetails',
+            label: 'AdminSidebar.partnerDetailsLabel',
+            nameLink: adminRoutes.PartnerDetails.path,
+          },
+          {
+            id: 'editOrder',
+            label: 'AdminSidebar.partnerDetailsLabel',
+            nameLink: adminRoutes.EditPartner.path,
+          },
+        ],
         subNameLinks: [
           adminRoutes.ManagePartners.path,
           adminRoutes.CreatePartner.path,
@@ -83,6 +95,13 @@ type TAdminSidebar = {
 const checkNestedPathActive = (arr: TSidebarMenu[], pathName: string) => {
   // eslint-disable-next-line no-restricted-syntax
   for (const item of arr) {
+    if (item.showOnActiveChildrenMenus) {
+      const child = checkNestedPathActive(
+        item.showOnActiveChildrenMenus,
+        pathName,
+      );
+      if (child) return item;
+    }
     if (item.subNameLinks?.includes(pathName)) return item;
     if (item.nameLink === pathName) return item;
     if (item.childrenMenus) {
@@ -108,7 +127,7 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
     () => checkNestedPathActive(LIST_SIDEBAR_MENU, pathname),
     [pathname],
   );
-  console.log(activeMenu, pathname);
+
   return (
     <OutsideClickHandler onOutsideClick={onOutsideClick}>
       <div className={css.root}>

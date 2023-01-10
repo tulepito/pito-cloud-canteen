@@ -625,5 +625,6 @@
   "SectionOrderListing.selectForMeBtn": "Chọn giúp tôi",
   "ManageOrders.noResults": "Không có kết quả nào hiển thị",
   "ManageOrders.title": "Danh sách đơn hàng",
-  "AdminSidebar.orderDetailsLabel": "Chi tiết đơn hàng"
+  "AdminSidebar.orderDetailsLabel": "Chi tiết đơn hàng",
+  "AdminSidebar.partnerDetailsLabel": "Thông tin đối tác"
 }
