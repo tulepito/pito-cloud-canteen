@@ -8,6 +8,7 @@ import {
 } from '@utils/orderApi';
 import type { TListing } from '@utils/types';
 import cloneDeep from 'lodash/cloneDeep';
+import { DateTime } from 'luxon';
 
 const updateSetUpPlan = ({
   startDate,
@@ -69,11 +70,18 @@ const createOrder = createAsyncThunk(
   async (staffName: string, { getState }) => {
     const { draftOrder } = getState().Order;
     const { clientId, orderDetail, ...rest } = draftOrder;
+    const { deadlineDate, deadlineHour } = rest;
+    const parsedDeadlineDate =
+      DateTime.fromMillis(deadlineDate).toFormat('yyyy-MM-dd');
+    const orderDeadline = DateTime.fromISO(
+      `${parsedDeadlineDate}T${deadlineHour}:00`,
+    ).toMillis();
     const apiBody = {
       companyId: clientId,
       generalInfo: {
         ...rest,
         staffName,
+        orderDeadline,
       },
       orderDetail,
     };

@@ -7,7 +7,6 @@ import subAccountLogin from '@services/subAccountLogin';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { TOrder, TPlan } from '@utils/orderTypes';
-import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HTTP_METHODS } from '../helpers/constants';
@@ -23,8 +22,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     case HTTP_METHODS.POST:
       try {
         const { companyId, generalInfo, orderDetail } = req.body;
-        const { deadlineDate, deadlineHour, ...rest } = generalInfo;
-        const { selectedGroups } = rest;
+        const { selectedGroups } = generalInfo;
         const adminAccount = await getAdminAccount();
         const { currentOrderNumber = 0 } =
           adminAccount.attributes.profile.metadata;
@@ -49,11 +47,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           draftedOrderListinResponse,
         )[0];
 
-        const parsedDeadlineDate =
-          DateTime.fromMillis(deadlineDate).toFormat('yyyy-MM-dd');
-        const orderDeadline = DateTime.fromISO(
-          `${parsedDeadlineDate}T${deadlineHour}:00`,
-        ).toMillis();
         const allMembers = calculateGroupMembers(
           companyAccount,
           selectedGroups,
@@ -87,10 +80,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             metadata: {
               companyId,
               listingType: ListingTypes.ORDER,
-              generalInfo: {
-                ...rest,
-                orderDeadline,
-              },
+              generalInfo,
               orderDetail: updatedOrderDetail,
             },
           });
