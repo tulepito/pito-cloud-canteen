@@ -77,6 +77,23 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
             label: 'AdminSidebar.editPartnerLabel',
             nameLink: adminRoutes.EditPartner.path,
           },
+          {
+            id: 'partnerSettings',
+            label: 'AdminSidebar.partnerSettingLabel',
+            nameLink: adminRoutes.PartnerSettings.path,
+            childrenMenus: [
+              {
+                id: 'managePartnerFood',
+                label: 'AdminSidebar.managePartnerFoodLabel',
+                nameLink: adminRoutes.ManagePartnerFoods.path,
+              },
+              {
+                id: 'managePartnerMenu',
+                label: 'AdminSidebar.managePartnerMenuLabel',
+                nameLink: adminRoutes.ManagePartnerMenus.path,
+              },
+            ],
+          },
         ],
       },
     ],
@@ -125,40 +142,9 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
       <div className={css.root}>
         <div className={css.leftSide}>
           {LIST_SIDEBAR_MENU.map((item: TSidebarMenu) => {
-            const {
-              Icon,
-              id,
-              nameLink,
-              highlightRefLinks,
-              childrenMenus = [],
-              showOnActiveChildrenMenus = [],
-            } = item;
-            const activeWithChildrenNameLinks = childrenMenus.find(
-              (m: TSidebarMenu) =>
-                m.showOnActiveChildrenMenus?.find(
-                  (c) => c.nameLink === pathname,
-                ) || m.nameLink === pathname,
-            );
+            const { Icon, id, nameLink } = item;
 
-            const activeWithChildrenSubNameLinks = childrenMenus.find(
-              (m: TSidebarMenu) => m.highlightRefLinks?.includes(pathname),
-            );
-
-            const activeWithShowOnActiveChildrenMenus =
-              showOnActiveChildrenMenus.find(
-                (m: TSidebarMenu) => m.nameLink === pathname,
-              );
-
-            const activeWithSubNameLinks =
-              highlightRefLinks?.includes(pathname);
-
-            const isActive =
-              activeWithShowOnActiveChildrenMenus ||
-              activeWithChildrenSubNameLinks ||
-              activeWithChildrenNameLinks ||
-              activeWithSubNameLinks ||
-              pathname === nameLink;
-
+            const isActive = activeMenu?.id === item.id;
             return (
               <NamedLink
                 path={nameLink}

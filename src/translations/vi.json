@@ -629,5 +629,8 @@
   "AdminSidebar.partnerDetailsLabel": "Thông tin đối tác",
   "AdminSidebar.editPartnerLabel": "Chỉnh sửa",
   "ManageOrdersPage.orderDetails": "Chi tiết",
-  "ManageOrdersPage.inProgressState": "Đang tiến hành"
+  "ManageOrdersPage.inProgressState": "Đang tiến hành",
+  "AdminSidebar.partnerSettingLabel": "Cài đặt nhà hàng",
+  "AdminSidebar.managePartnerFoodLabel": "Món ăn",
+  "AdminSidebar.managePartnerMenuLabel": "Thực đơn"
 }
