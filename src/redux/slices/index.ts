@@ -13,4 +13,5 @@ export { default as RestaurantSearch } from './RestaurantSearch.slice';
 export { default as SelectRestaurantPage } from './SelectRestaurantPage.slice';
 export { default as shopingCart } from './shopingCart.slice';
 export { default as user } from './user.slice';
+export { default as walkthrough } from './walkthrough.slice';
 export { default as ParticipantPlanPage } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';
