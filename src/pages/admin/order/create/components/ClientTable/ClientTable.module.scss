@@ -117,4 +117,10 @@
       width: 100%;
     }
   }
+
+  .paginationContainer {
+    display: flex;
+
+    align-items: flex-end;
+  }
 }

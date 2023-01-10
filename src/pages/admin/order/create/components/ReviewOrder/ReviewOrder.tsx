@@ -60,7 +60,7 @@ const MENU_TABLE_COLUMN: TColumn[] = [
   },
   {
     key: 'foodPrice',
-    label: 'Đơn gía',
+    label: 'Đơn giá',
     render: (data: any) => {
       return (
         <span title={data.id} className={classNames(css.rowText, css.rowId)}>
@@ -122,7 +122,7 @@ const MEMBER_ORDER_TABLE_COLUMN: TColumn[] = [
   },
   {
     key: 'price',
-    label: 'Đơn gía',
+    label: 'Đơn giá',
     render: (data) => {
       return (
         <span title={data.id} className={classNames(css.rowText, css.rowId)}>

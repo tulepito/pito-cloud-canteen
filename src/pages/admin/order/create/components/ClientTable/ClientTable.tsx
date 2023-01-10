@@ -61,12 +61,14 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
         </div>
       </div>
       {shouldShowPagination && (
-        <Pagination
-          total={totalItems}
-          pageSize={10}
-          current={page}
-          onChange={onPageChange}
-        />
+        <div className={css.paginationContainer}>
+          <Pagination
+            total={totalItems}
+            pageSize={10}
+            current={page}
+            onChange={onPageChange}
+          />
+        </div>
       )}
     </div>
   );
