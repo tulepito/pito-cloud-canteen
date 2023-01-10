@@ -55,6 +55,7 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
       deadlineDate,
       deadlineHour,
       vatAllow = false,
+      pickAllow = true,
       startDate,
       endDate,
     },
@@ -151,16 +152,18 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
         );
       case OrderSettingField.PICKING_DEADLINE:
         return (
-          <>
-            <div className={css.title}>
-              {intl.formatMessage({
-                id: 'OrderSettingModal.field.pickingDeadline',
-              })}
-            </div>
-            <div className={css.fieldContent}>
-              <OrderDeadlineField columnLayout form={form} values={values} />
-            </div>
-          </>
+          pickAllow && (
+            <>
+              <div className={css.title}>
+                {intl.formatMessage({
+                  id: 'OrderSettingModal.field.pickingDeadline',
+                })}
+              </div>
+              <div className={css.fieldContent}>
+                <OrderDeadlineField columnLayout form={form} values={values} />
+              </div>
+            </>
+          )
         );
       case OrderSettingField.EMPLOYEE_AMOUNT:
         return (
@@ -186,12 +189,14 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
         );
       case OrderSettingField.ACCESS_SETTING:
         return (
-          <>
-            <div className={css.title}>Cài đặt truy cập</div>
-            <div className={css.fieldContent}>
-              <ParticipantSetupField form={form} clientId={clientId} />
-            </div>
-          </>
+          pickAllow && (
+            <>
+              <div className={css.title}>Cài đặt truy cập</div>
+              <div className={css.fieldContent}>
+                <ParticipantSetupField form={form} clientId={clientId} />
+              </div>
+            </>
+          )
         );
       case OrderSettingField.PER_PACK:
         return (
