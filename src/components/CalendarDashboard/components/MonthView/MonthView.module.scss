@@ -63,5 +63,7 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  justify-content: center;
   @include textTemplate(14px, 400, 24px, '');
+  width: 105px;
 }
