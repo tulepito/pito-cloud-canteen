@@ -78,11 +78,6 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
             nameLink: adminRoutes.EditPartner.path,
           },
         ],
-        highlightRefLinks: [
-          adminRoutes.CreatePartner.path,
-          adminRoutes.EditPartner.path,
-          adminRoutes.PartnerDetails.path,
-        ],
       },
     ],
   },
@@ -136,22 +131,34 @@ const AdminSidebar: React.FC<TAdminSidebar> = (props) => {
               nameLink,
               highlightRefLinks,
               childrenMenus = [],
+              showOnActiveChildrenMenus = [],
             } = item;
             const activeWithChildrenNameLinks = childrenMenus.find(
-              (m: TSidebarMenu) => m.nameLink === pathname,
+              (m: TSidebarMenu) =>
+                m.showOnActiveChildrenMenus?.find(
+                  (c) => c.nameLink === pathname,
+                ) || m.nameLink === pathname,
             );
 
             const activeWithChildrenSubNameLinks = childrenMenus.find(
               (m: TSidebarMenu) => m.highlightRefLinks?.includes(pathname),
             );
 
+            const activeWithShowOnActiveChildrenMenus =
+              showOnActiveChildrenMenus.find(
+                (m: TSidebarMenu) => m.nameLink === pathname,
+              );
+
             const activeWithSubNameLinks =
               highlightRefLinks?.includes(pathname);
+
             const isActive =
+              activeWithShowOnActiveChildrenMenus ||
               activeWithChildrenSubNameLinks ||
               activeWithChildrenNameLinks ||
               activeWithSubNameLinks ||
               pathname === nameLink;
+
             return (
               <NamedLink
                 path={nameLink}
