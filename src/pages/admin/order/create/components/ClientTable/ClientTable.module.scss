@@ -41,6 +41,14 @@
     @include flexAlign(center);
     flex-direction: column;
 
+    .noClientsFound {
+      margin: 72px auto 0;
+
+      svg {
+        margin-bottom: 16px;
+      }
+    }
+
     .bodyRow {
       position: relative;
       @include flexAlign(center);

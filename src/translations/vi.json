@@ -37,6 +37,7 @@
   "ClientTable.companyName": "Tên công ty",
   "ClientTable.contact": "Liên hệ",
   "ClientTable.id": "ID",
+  "ClientTable.noClientsFound": "Danh sách khách hàng trống",
   "CompanySidebar.groupList": "Danh sách nhóm",
   "CompanySidebar.memberList": "Danh sách nhân viên",
   "CompanySidebar.members": "Thành viên",
@@ -564,6 +565,7 @@
   "SectionOrderListing.autoSelectionButtonLabel": "Chọn giúp tôi",
   "SectionOrderListing.notJoinThisDay": "Bỏ chọn ngày này",
   "SectionOrderListing.sectionOrderNotify": "Thành viên có thể bỏ qua ngày trong trường hợp không ăn ngày đó.",
+  "SectionOrderListing.selectForMeBtn": "Chọn giúp tôi",
   "SectionOrderListing.unCheckThisDateButtonLabel": "Bỏ chọn ngày này",
   "SectionOrderPanel.Alert.cancelDeleteBtn": "Huỷ",
   "SectionOrderPanel.Alert.confirmDeleteBtn": "Xoá tất cả",
@@ -635,6 +637,5 @@
   "SignUpPage.Title": "Đăng ký",
   "Toolbar.action.today": "Hôm nay",
   "Toolbar.viewMode.month": "Tháng",
-  "Toolbar.viewMode.week": "Tuần",
-  "SectionOrderListing.selectForMeBtn": "Chọn giúp tôi"
+  "Toolbar.viewMode.week": "Tuần"
 }

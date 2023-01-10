@@ -70,14 +70,20 @@ const renderDateRange = (
 };
 
 const findSuitableStartDate = ({
+  selectedDate,
   startDate = new Date().getTime(),
   endDate = new Date().getTime(),
   orderDetail = {},
 }: {
+  selectedDate?: Date;
   startDate?: number;
   endDate?: number;
   orderDetail: TObject;
 }) => {
+  if (selectedDate && selectedDate instanceof Date) {
+    return selectedDate;
+  }
+
   const dateRange = renderDateRange(startDate, endDate);
   const setUpDates = Object.keys(orderDetail);
   const suitableDateList = dateRange.filter(
@@ -116,7 +122,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     (state) => state.ManageCompaniesPage.companyRefs,
     shallowEqual,
   );
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [isSelectingRestaurant, setIsSelectingRestaurant] = useState(false);
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -126,15 +132,20 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     setTrue: onOrderSettingModalOpen,
   } = useBoolean();
 
-  const suitableStartDate = useMemo(
-    () =>
-      findSuitableStartDate({
-        startDate,
-        endDate,
-        orderDetail,
-      }),
-    [startDate, endDate, orderDetail],
-  );
+  const suitableStartDate = useMemo(() => {
+    const temp = findSuitableStartDate({
+      selectedDate,
+      startDate,
+      endDate,
+      orderDetail,
+    });
+
+    if (temp instanceof Date) {
+      return temp;
+    }
+
+    return new Date(temp);
+  }, [selectedDate, startDate, endDate, orderDetail]);
 
   const { address } = deliveryAddress || {};
   const currentClient = companies.find(
@@ -156,7 +167,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     const { restaurant, selectedFoodList } = values;
     const updateData = {
       orderDetail: {
-        [selectedDate?.getTime()]: {
+        [(selectedDate as Date).getTime()]: {
           restaurant,
           foodList: selectedFoodList,
         },
@@ -216,7 +227,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       {isSelectingRestaurant ? (
         <SelectRestaurantPage
           onSubmitRestaurant={handleSubmitRestaurant}
-          selectedDate={selectedDate}
+          selectedDate={selectedDate as Date}
           onBack={handleGoBackWhenSelectingRestaurant}
         />
       ) : (
@@ -244,7 +255,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           </div>
           <div className={css.calendarContainer}>
             <CalendarDashboard
-              startDate={new Date(suitableStartDate)}
+              startDate={suitableStartDate}
               endDate={new Date(endDate)}
               events={resourcesForCalender}
               renderEvent={MealPlanCard}
