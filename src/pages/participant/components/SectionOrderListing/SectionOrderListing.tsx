@@ -1,5 +1,5 @@
 import IconBanned from '@components/Icons/IconBanned/IconBanned';
-import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
+import IconCheckmarkTabTitle from '@components/Icons/IconCheckmark/IconCheckmarkTabTitle';
 import ListingCard from '@components/ListingCard/ListingCard';
 import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
@@ -70,7 +70,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
               </Tooltip>
             ) : (
               <Tooltip tooltipContent={'meow'}>
-                <IconCheckmarkWithCircle className={css.tabTitleIcon} />
+                <IconCheckmarkTabTitle className={css.tabTitleIcon} />
               </Tooltip>
             ))}
           {}
