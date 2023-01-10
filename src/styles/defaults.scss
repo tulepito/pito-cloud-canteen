@@ -62,6 +62,127 @@
   }
 }
 
+@mixin checkBoxInputStyles {
+  position: relative;
+
+  .input {
+    position: absolute;
+    opacity: 0;
+    height: 0;
+    width: 0;
+
+    /* Highlight the borders if the checkbox is hovered, focused or checked */
+    &:hover + label .box,
+    &:focus + label .box,
+    &:checked + label .box {
+    }
+
+    /* sematicGreen2 version */
+    &:hover + label .boxSuccess,
+    &:focus + label .boxSuccess,
+    &:checked + label .boxSuccess {
+    }
+
+    &:checked + label:hover {
+      .box,
+      .boxSuccess {
+        stroke: $neutralGray6;
+      }
+
+      path:nth-of-type(2) {
+        stroke: $neutralGray1;
+      }
+    }
+
+    /* Display the "check" when checked */
+    &:checked + label .checked {
+      display: inline;
+      stroke-width: 1px;
+      fill: $neutralGray6;
+      stroke: $neutralGray6;
+    }
+
+    /* Display the "check" when checked */
+    &:checked + label .checkedSuccess {
+      display: inline;
+      stroke-width: 1px;
+      stroke: $neutralGray6;
+    }
+
+    &:disabled + label {
+      pointer-events: none;
+    }
+
+    &:disabled + label {
+      &:hover {
+        .checked,
+        .checkedSuccess {
+          stroke: $neutralGray4;
+          fill: $neutralGray3;
+        }
+      }
+
+      .checked,
+      .checkedSuccess {
+        stroke: $neutralGray4;
+        fill: $neutralGray3;
+      }
+
+      .box,
+      .boxSuccess {
+        stroke: $neutralGray3;
+      }
+    }
+
+    &:checked:disabled + label {
+      .box,
+      .boxSuccess {
+        stroke: $neutralGray4;
+      }
+    }
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    padding: 0;
+
+    .checkboxWrapper {
+      /* This should follow line-height */
+      height: 32px;
+      margin-top: -1px;
+      margin-right: 12px;
+      align-self: baseline;
+
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+
+      .checked {
+        fill: none;
+        stroke: $neutralGray4;
+        transition: all 0.15s ease-in-out;
+      }
+      .checkedSuccess {
+        display: none;
+        fill: $neutralGray4;
+        stroke: $neutralGray4;
+        transition: all 0.15s ease-in-out;
+      }
+
+      .boxSuccess,
+      .box {
+        stroke: $neutralGray1;
+      }
+
+      :hover .checked,
+      :hover .checkedSuccess {
+        stroke: $neutralGray6;
+      }
+    }
+  }
+}
+
 @mixin inputIconContainerStyles {
   position: absolute;
   left: 8px;

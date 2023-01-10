@@ -42,7 +42,6 @@ export const IconCheckbox: React.FC<IconCheckboxProps> = (props) => {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-
       <path
         className={css.boxHover}
         d="M3.98438 10H16.0156"
