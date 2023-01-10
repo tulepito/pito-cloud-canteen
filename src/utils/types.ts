@@ -415,3 +415,25 @@ export type TError = {
 };
 
 export type RouteKey = keyof typeof adminRoutes;
+
+export type TAddress = {
+  predictions: any[];
+  search: string;
+  selectedPlace: {
+    address: string;
+    origin: {
+      lat: number;
+      lng: number;
+    };
+    bounds?: {
+      ne: {
+        lat: number;
+        lng: number;
+      };
+      sw: {
+        lat: number;
+        lng: number;
+      };
+    };
+  };
+};

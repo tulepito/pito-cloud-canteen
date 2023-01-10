@@ -7,7 +7,6 @@ import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { updateDraftMealPlan } from '@redux/slices/Order.slice';
 import classNames from 'classnames';
-import arrayMutators from 'final-form-arrays';
 import { useMemo, useState } from 'react';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
@@ -237,15 +236,19 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
           <div className={css.leftSide}>{leftSideRenderer()}</div>
           <div className={css.rightSide}>
             <FinalForm
-              mutators={{ ...arrayMutators }}
+              // mutators={{ ...arrayMutators }}
               onSubmit={onSubmit}
               initialValues={initialValues}
               render={(formRenderProps: FormRenderProps) => {
-                const { handleSubmit, form, values } = formRenderProps;
+                const { handleSubmit, form, values, invalid } = formRenderProps;
+                console.log('invalid: ', invalid);
                 return (
                   <Form onSubmit={handleSubmit}>
                     {rightSideRenderer(form, values)}
-                    <Button className={css.submitBtn} type="submit">
+                    <Button
+                      className={css.submitBtn}
+                      disabled={invalid}
+                      type="submit">
                       {intl.formatMessage({
                         id: 'OrderSettingModal.saveChange',
                       })}
