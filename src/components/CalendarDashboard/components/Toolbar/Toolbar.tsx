@@ -16,31 +16,13 @@ export type TToolbarProps = {
   onNavigate: (action: string) => void;
   onView: (name: string) => void;
   companyLogo?: ReactNode;
-  startDate?: Date;
-  endDate?: Date;
 };
 
 const Toolbar: React.FC<TToolbarProps> = (props) => {
-  const {
-    label,
-    view,
-    views,
-    onNavigate,
-    onView,
-    companyLogo,
-    // startDate,
-    // endDate,
-  } = props;
+  const { label, view, views, onNavigate, onView, companyLogo } = props;
   const intl = useIntl();
-  // const today = new Date();
+
   const shouldShowNavigateToday = true;
-  //   startDate && endDate
-  //     ? startDate <= today && today <= endDate
-  //     : startDate
-  //     ? startDate <= today
-  //     : endDate
-  //     ? today <= endDate
-  //     : true;
 
   const navigateFunc = (action: string) => () => {
     onNavigate(action);
