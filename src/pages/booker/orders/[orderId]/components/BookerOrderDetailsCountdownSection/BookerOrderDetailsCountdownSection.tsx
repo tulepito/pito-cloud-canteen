@@ -52,7 +52,6 @@ const BookerOrderDetailsCountdownSection: React.FC<
         </div>
       </Button>
       <CountdownTimer deadline={orderDeadlineTime} stopAt={0} />
-
       <div className={css.orderEndAtMessage}>{orderEndAtMessage}</div>
     </div>
   );
