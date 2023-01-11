@@ -28,6 +28,7 @@ const ParticipantOrderManagement = () => {
     if (isReady) {
       dispatch(ParticipantOrderAsyncAction.loadData(orderId as string));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady]);
 
   return (

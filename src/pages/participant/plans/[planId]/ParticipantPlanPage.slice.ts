@@ -1,15 +1,17 @@
 import { createAsyncThunk } from '@redux/redux.helper';
+import {
+  shopingCartActions,
+  shopingCartThunks,
+} from '@redux/slices/shopingCart.slice';
 import { createSlice } from '@reduxjs/toolkit';
+import { loadPlanDataApi, updateParticipantOrderApi } from '@utils/api';
 import { storableError } from '@utils/errors';
 
-import { loadPlanDataApi, updateParticipantOrderApi } from '../../utils/api';
-import { shopingCartActions, shopingCartThunks } from './shopingCart.slice';
+const LOAD_DATA = 'app/ParticipantPlanPage/LOAD_DATA';
+const RELOAD_DATA = 'app/ParticipantPlanPage/RELOAD_DATA';
+const UPDATE_ORDER = 'app/ParticipantPlanPage/UPDATE_ORDER';
 
-const LOAD_DATA = 'app/ParticipantSetupPlanPage/LOAD_DATA';
-const RELOAD_DATA = 'app/ParticipantSetupPlanPage/RELOAD_DATA';
-const UPDATE_ORDER = 'app/ParticipantSetupPlanPage/UPDATE_ORDER';
-
-type ParticipantSetupPlanState = {
+type ParticipantPlanState = {
   restaurant: any;
   company: any;
   plan: any;
@@ -22,7 +24,7 @@ type ParticipantSetupPlanState = {
   submitDataError: any;
 };
 
-const initialState: ParticipantSetupPlanState = {
+const initialState: ParticipantPlanState = {
   restaurant: {},
   company: {},
   plan: {},
@@ -147,10 +149,10 @@ const updateOrder = createAsyncThunk(
   },
 );
 
-export const ParticipantSetupPlanThunks = { loadData, reloadData, updateOrder };
+export const ParticipantPlanThunks = { loadData, reloadData, updateOrder };
 
-const participantSetupPlanSlice = createSlice({
-  name: 'ParticipantSetupPlanPage',
+const participantPlanSlice = createSlice({
+  name: 'ParticipantPlanPage',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -207,4 +209,4 @@ const participantSetupPlanSlice = createSlice({
   },
 });
 
-export default participantSetupPlanSlice.reducer;
+export default participantPlanSlice.reducer;

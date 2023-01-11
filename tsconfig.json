@@ -17,6 +17,7 @@
     "incremental": true,
     "paths": {
       "*": ["."],
+      "@pages/*": ["src/pages/*"],
       "@components/*": ["src/components/*"],
       "@configs/*": ["src/configs/*"],
       "@forms/*": ["src/forms/*"],

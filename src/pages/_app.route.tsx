@@ -5,6 +5,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import AuthGuard from '@components/Guards/AuthGuard';
 import PermissionGuard from '@components/Guards/PermissionGuard';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import Walkthrough from '@components/Walkthrough/Walkthrough';
 import store from '@redux/store';
 import TranslationProvider from '@translations/TranslationProvider';
 import type { NextApplicationPage } from '@utils/types';
@@ -46,6 +47,7 @@ const MyApp = ({
           <AuthGuard>
             <PermissionGuard>
               <Component {...restProps.pageProps} key={router.asPath} />
+              <Walkthrough />
             </PermissionGuard>
           </AuthGuard>
         </PersistGate>
