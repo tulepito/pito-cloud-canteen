@@ -1,0 +1,21 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  display: flex;
+  justify-content: space-between;
+
+  .titleText {
+    padding-bottom: 7px;
+    color: $neutralGray6;
+    @include textTemplate(24px, 700, 4/3);
+  }
+
+  .makeOrderBtn {
+    width: 160px;
+    align-self: center;
+    background-color: transparent;
+    padding: 0;
+  }
+}

@@ -1,0 +1,42 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  @include textTemplate(14px, 400, 24px);
+
+  .title {
+  }
+
+  .editDeadlineContainer {
+    padding: 0;
+    height: fit-content;
+    margin-bottom: 8px;
+
+    .editDeadlineContent {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      column-gap: 4px;
+
+      .editIcon {
+        width: 20px;
+        height: 20px;
+      }
+
+      & > :last-child {
+        font-weight: 700;
+      }
+    }
+  }
+
+  .orderEndAtMessage {
+    margin-top: 16px;
+    color: $neutralGray5;
+
+    b {
+      color: $neutralGray6;
+    }
+  }
+}
