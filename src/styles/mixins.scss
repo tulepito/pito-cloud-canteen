@@ -106,24 +106,25 @@ $buttonBorderRadius: 8px;
   }
 }
 
-@mixin buttonTextColor {
-  background: transparent;
-  color: $primaryPri2;
+@mixin buttonColorInline {
+  background: $neutralGray1;
+  color: $neutralGray6;
   border: none;
+  outline: none;
 
   &:focus,
   &:hover {
-    background-color: transparent;
-    border: 1px solid $neutralGray4;
+    background-color: $neutralGray2;
+    outline: none;
   }
 
   &:disabled {
-    color: $neutralGray6;
-    border: 1px solid $neutralGray3;
+    color: $neutralGray4;
+    outline: none;
   }
 }
 
-@mixin buttonCTAColor {
+@mixin buttonColorCTA {
   background-color: $primaryPri2;
   color: $neutralGray1;
   outline: none;
@@ -174,8 +175,13 @@ $buttonBorderRadius: 8px;
   &.secondaryStyle {
     @include buttonColorSecondary;
   }
+
   &.CTAStyle {
-    @include buttonCTAColor;
+    @include buttonColorCTA;
+  }
+
+  &.inlineStyle {
+    @include buttonColorInline;
   }
 }
 
@@ -204,7 +210,7 @@ $buttonBorderRadius: 8px;
 }
 
 // Typography
-@mixin textTemplate($size: 12px, $weight: 400, $height: 16px, $family) {
+@mixin textTemplate($size: 12px, $weight: 400, $height: 16px, $family: '') {
   @if $family == '' {
     font-family: 'Manrope', Helvetica, Arial, sans-serif;
   } @else {

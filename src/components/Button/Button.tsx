@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import css from './Button.module.scss';
 
 type TButtonSize = 'large' | 'medium' | 'small';
-type TButtonVariant = 'primary' | 'secondary' | 'cta';
+type TButtonVariant = 'primary' | 'secondary' | 'cta' | 'inline';
 
 type TButtonProps = PropsWithChildren<{
   rootClassName?: string;
@@ -70,17 +70,18 @@ const Button: React.FC<TButtonProps> = (props) => {
   const buttonSizeClasses = getButtonSizeClassName(size);
   const classes = classNames(
     rootClassName || css.root,
-    className,
     buttonSizeClasses,
     {
       [css.secondaryStyle]: variant === 'secondary',
       [css.CTAStyle]: variant === 'cta',
+      [css.inlineStyle]: variant === 'inline',
     },
     {
       [css.ready]: ready,
       [css.inProgress]: inProgress,
       [css.buttonFullWidth]: fullWidth,
     },
+    className,
   );
 
   // All buttons are disabled until the component is mounted. This

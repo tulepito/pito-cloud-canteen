@@ -34,7 +34,7 @@
 
 .addMemberBtn {
   @include flexAlign(center);
-  @include buttonTextColor;
+  @include buttonColorInline;
   font-size: 16px;
 }
 
