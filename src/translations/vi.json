@@ -30,6 +30,12 @@
   "BookerOrderDetailsTitle.deliveryInfo": "Giao hàng {time} tại {place}",
   "BookerOrderDetailsTitle.makeOrderButtonText": "Đặt đơn",
   "BookerOrderDetailsTitle.title": "Quản lý chọn món",
+  "BookerOrderDetailsManageParticipantsSection.deleteParticipantPopup.title": "Xoá thành viên",
+  "BookerOrderDetailsManageParticipantsSection.deleteParticipantPopup.confirmQuestion": "Bạn có chắc chắn muốn xoá thành viên này không?",
+  "BookerOrderDetailsManageParticipantsSection.title": "Danh sách thành viên ({total})",
+  "BookerOrderDetailsManageParticipantsSection.viewDetailText": "Xem thêm",
+  "BookerOrderDetailsManageParticipantsSection.deleteParticipantPopup.cancel": "Huỷ",
+  "BookerOrderDetailsManageParticipantsSection.deleteParticipantPopup.confirm": "Xoá thành viên",
   "Calendar.week.dayHeader.0": "Chủ nhật",
   "Calendar.week.dayHeader.1": "Thứ hai",
   "Calendar.week.dayHeader.2": "Thứ ba",
@@ -649,5 +655,7 @@
   "SignUpPage.Title": "Đăng ký",
   "Toolbar.action.today": "Hôm nay",
   "Toolbar.viewMode.month": "Tháng",
-  "Toolbar.viewMode.week": "Tuần"
+  "Toolbar.viewMode.week": "Tuần",
+  "AddParticipantForm.email.placeholder": "Nhập email để thêm thành viên",
+  "AddParticipantForm.email.invalid": "Vui lòng nhập đúng định dạng Email"
 }

@@ -1,5 +1,6 @@
 import css from './BookerOrderDetails.module.scss';
 import BookerOrderDetailsCountdownSection from './BookerOrderDetailsCountdownSection/BookerOrderDetailsCountdownSection';
+import BookerOrderDetailsManageParticipantsSection from './BookerOrderDetailsManageParticipantsSection/BookerOrderDetailsManageParticipantsSection';
 import BookerOrderDetailsOrderLinkSection from './BookerOrderDetailsOrderLinkSection/BookerOrderDetailsOrderLinkSection';
 import BookerOrderDetailsTitle from './BookerOrderDetailsTitle/BookerOrderDetailsTitle';
 
@@ -12,7 +13,9 @@ const BookerOrderDetailsPage = () => {
       <div className={css.rightPart}>
         <BookerOrderDetailsCountdownSection className={css.container} />
         <BookerOrderDetailsOrderLinkSection className={css.container} />
-        <div className={css.container}>Participants</div>
+        <BookerOrderDetailsManageParticipantsSection
+          className={css.container}
+        />
       </div>
     </div>
   );

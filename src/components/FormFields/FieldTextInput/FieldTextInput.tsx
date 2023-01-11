@@ -20,7 +20,7 @@ type InputComponentProps = FieldRenderProps<string, any> & {
   isUncontrolled?: boolean;
   input: any;
   meta: any;
-  inputRef: any;
+  inputRef?: any;
   fullWidth?: boolean;
   leftIcon?: TIconComponent;
   rightIcon?: TIconComponent;
@@ -28,7 +28,9 @@ type InputComponentProps = FieldRenderProps<string, any> & {
   showText?: boolean;
 };
 
-const FieldTextInputComponent: React.FC<InputComponentProps> = (props) => {
+export const FieldTextInputComponent: React.FC<InputComponentProps> = (
+  props,
+) => {
   const {
     label,
     id,

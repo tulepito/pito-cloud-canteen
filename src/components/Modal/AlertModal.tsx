@@ -33,7 +33,11 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
       containerClassName={css.container}>
       <div className={css.children}>{children}</div>
       <div className={css.actions}>
-        <Button className={css.reject} size="medium" onClick={onCancel}>
+        <Button
+          className={css.reject}
+          variant="secondary"
+          size="medium"
+          onClick={onCancel}>
           {cancelLabel}
         </Button>
         <Button className={css.confirm} size="medium" onClick={onConfirm}>
