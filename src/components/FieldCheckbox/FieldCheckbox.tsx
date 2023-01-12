@@ -69,6 +69,8 @@ const FieldCheckbox = (props: any) => {
     disabled,
     hasTextInput,
     textPlaceholder,
+    labelClassName,
+    retrieveValue,
     ...rest
   } = props;
 
@@ -85,6 +87,11 @@ const FieldCheckbox = (props: any) => {
     } else {
       onChange(event);
     }
+
+    if (retrieveValue) {
+      retrieveValue(event);
+    }
+
     onBlur(event);
   };
 
@@ -111,7 +118,9 @@ const FieldCheckbox = (props: any) => {
                   onChange={(event: TFormEvent) => handleOnChange(input, event)}
                 />
                 {label && (
-                  <label htmlFor={id} className={css.label}>
+                  <label
+                    htmlFor={id}
+                    className={classNames(css.label, labelClassName)}>
                     <span className={css.checkboxWrapper}>
                       <IconCheckbox
                         className={svgClassName}
