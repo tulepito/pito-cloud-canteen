@@ -1,0 +1,15 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  .modalContainer {
+    overflow: unset;
+
+    @include viewportMedium {
+      flex-basis: 480px;
+    }
+
+    @include viewportLarge {
+      flex-basis: 480px;
+    }
+  }
+}

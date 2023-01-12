@@ -1,5 +1,6 @@
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import config from '@src/configs';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import subDays from 'date-fns/subDays';
@@ -8,21 +9,6 @@ import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 
 import css from './OrderDeadlineField.module.scss';
-
-const TIME_OPTIONS = [
-  '07:00',
-  '08:00',
-  '09:00',
-  '10:00',
-  '11:00',
-  '12:00',
-  '13:00',
-  '14:00',
-  '15:00',
-  '16:00',
-  '17:00',
-  '18:00',
-];
 
 type OrderDeadlineFieldProps = {
   form: any;
@@ -95,7 +81,7 @@ const OrderDeadlineField: React.FC<OrderDeadlineFieldProps> = (props) => {
           })}
           className={css.fieldSelect}
           validate={required(deadlineHourRequired)}>
-          {TIME_OPTIONS.map((option) => (
+          {config.deadlineTimeOptions.map((option) => (
             <option key={option}>{option}</option>
           ))}
         </FieldSelect>

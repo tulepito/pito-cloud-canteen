@@ -3,9 +3,12 @@ import CountdownTimer from '@components/CountdownTimer/CountdownTimer';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './BookerOrderDetailsCountdownSection.module.scss';
+import type { TEditOrderDeadlineFormValues } from './EditOrderDeadlineForm';
+import EditOrderDeadlineModal from './EditOrderDeadlineModal';
 
 type BookerOrderDetailsCountdownSectionProps = {
   rootClassName?: string;
@@ -16,6 +19,8 @@ const BookerOrderDetailsCountdownSection: React.FC<
   BookerOrderDetailsCountdownSectionProps
 > = (props) => {
   const intl = useIntl();
+  const [isEditOrderDeadlineModalOpen, setIsEditOrderDeadlineModalOpen] =
+    useState(false);
   const { className, rootClassName } = props;
 
   const rootClasses = classNames(rootClassName || css.root, className);
@@ -42,10 +47,25 @@ const BookerOrderDetailsCountdownSection: React.FC<
     id: 'BookerOrderDetailsCountdownSection.editDeadline',
   });
 
+  const handleClickEditIcon = () => {
+    setIsEditOrderDeadlineModalOpen(true);
+  };
+  const handleCloseEditDeadlineModal = () => {
+    setIsEditOrderDeadlineModalOpen(false);
+  };
+
+  const handleSubmitEditDeadline = (values: TEditOrderDeadlineFormValues) => {
+    console.log(values);
+    setIsEditOrderDeadlineModalOpen(false);
+  };
+
   return (
     <div className={rootClasses}>
       <div className={css.title}>{sectionTitle}</div>
-      <Button variant="inline" className={css.editDeadlineContainer}>
+      <Button
+        variant="inline"
+        className={css.editDeadlineContainer}
+        onClick={handleClickEditIcon}>
         <div className={css.editDeadlineContent}>
           <IconEdit className={css.editIcon} />
           <div>{editDeadlineText}</div>
@@ -53,6 +73,11 @@ const BookerOrderDetailsCountdownSection: React.FC<
       </Button>
       <CountdownTimer deadline={orderDeadlineTime} stopAt={0} />
       <div className={css.orderEndAtMessage}>{orderEndAtMessage}</div>
+      <EditOrderDeadlineModal
+        isOpen={isEditOrderDeadlineModalOpen}
+        onClose={handleCloseEditDeadlineModal}
+        onSubmit={handleSubmitEditDeadline}
+      />
     </div>
   );
 };
