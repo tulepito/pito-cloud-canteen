@@ -2,7 +2,7 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
-import { EFoodTypes, FIXED_MENU_KEY } from '@utils/enums';
+import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo } from 'react';
@@ -52,7 +52,7 @@ const CreatePartnerFoodPage = () => {
       title,
       description,
       price: price?.amount,
-      menuType: menuType || FIXED_MENU_KEY,
+      menuType: menuType || EMenuTypes.cycleMenu,
       foodType: foodType || EFoodTypes.vegetarianDish,
       ...rest,
     };

@@ -412,12 +412,14 @@ export const PARTY_INSURANCE_RADIO_OPTIONS = [
   },
 ];
 
-export const FIXED_MENU_KEY = 'fixedMenu';
-export const CYCLE_MENU_KEY = 'cycleMenu';
+export enum EMenuTypes {
+  fixedMenu = 'fixedMenu',
+  cycleMenu = 'cycleMenu',
+}
 
 export const MENU_OPTIONS = [
-  { key: FIXED_MENU_KEY, label: 'Menu cố định' },
-  { key: CYCLE_MENU_KEY, label: 'Menu theo chu kỳ' },
+  { key: EMenuTypes.fixedMenu, label: 'Menu cố định' },
+  { key: EMenuTypes.cycleMenu, label: 'Menu theo chu kỳ' },
 ];
 
 export enum EOrderStates {
