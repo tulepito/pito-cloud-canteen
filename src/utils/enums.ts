@@ -462,13 +462,18 @@ export const SIDE_DISH_OPTIONS = [
   },
 ];
 
+export enum EFoodTypes {
+  vegetarianDish = 'vegetarian-dish',
+  savoryDish = 'savory-dish',
+}
+
 export const FOOD_TYPE_OPTIONS = [
   {
-    key: 'vegetarian-dish',
+    key: EFoodTypes.vegetarianDish,
     label: 'Món chay',
   },
   {
-    key: 'savory-dish',
+    key: EFoodTypes.savoryDish,
     label: 'Món mặn',
   },
 ];

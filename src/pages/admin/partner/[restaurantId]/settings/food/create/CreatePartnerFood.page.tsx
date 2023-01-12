@@ -2,6 +2,7 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
+import { EFoodTypes, FIXED_MENU_KEY } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo } from 'react';
@@ -45,12 +46,15 @@ const CreatePartnerFoodPage = () => {
   const initialValues = useMemo(() => {
     const attributes = currentFoodListing?.attributes || {};
     const { publicData = {}, price, title, description } = attributes || {};
+    const { foodType, menuType, ...rest } = publicData;
     return {
       images: getInitialAddImages(currentFoodListing?.images || []),
       title,
       description,
       price: price?.amount,
-      ...publicData,
+      menuType: menuType || FIXED_MENU_KEY,
+      foodType: foodType || EFoodTypes.vegetarianDish,
+      ...rest,
     };
   }, [currentFoodListing]) as TEditPartnerFoodFormValues;
 
