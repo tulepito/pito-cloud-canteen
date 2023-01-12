@@ -1,17 +1,20 @@
+/* eslint-disable @typescript-eslint/no-shadow */
+import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import Form from '@components/Form/Form';
 import Pagination from '@components/Pagination/Pagination';
 import type { TPagination } from '@utils/types';
 import classNames from 'classnames';
+import type { FormApi } from 'final-form';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import React from 'react';
-import { Form as FinalForm } from 'react-final-form';
+import { Form as FinalForm, FormSpy } from 'react-final-form';
 
 import css from './Table.module.scss';
 
 export type TColumn = {
   key: string | number;
-  label: string;
+  label: string | ReactNode;
   render: (data: any, index?: number) => ReactNode;
   renderSearch?: () => ReactNode;
 };
@@ -42,9 +45,19 @@ type TTable = {
   onSubmit?: (e: any) => void;
   initialValues?: any;
   showFilterFrom?: boolean;
+  hasCheckbox?: boolean;
+  form?: FormApi;
+  values?: any;
+  exposeValues?: (e: any) => void;
 };
 
-const Table = (props: any) => {
+const getUniqueString = (list: string[]) => {
+  return list.filter((value, index, self) => {
+    return self.indexOf(value) === index;
+  });
+};
+
+const Table = (props: TTable) => {
   const {
     columns = [],
     data = [],
@@ -60,6 +73,9 @@ const Table = (props: any) => {
     showFilterFrom,
     tableClassName,
     paginationPath,
+    hasCheckbox,
+    form,
+    values,
   } = props;
 
   const tableClasses = classNames(css.table, tableClassName);
@@ -75,11 +91,50 @@ const Table = (props: any) => {
     });
   };
 
+  const customOnChange = (e: any) => {
+    const { checked, value, name } = e.target;
+    form?.change(name, !checked ? [] : [value]);
+    const { rowCheckbox = [] } = values;
+    const newValues = [...rowCheckbox];
+    data.forEach((val) => {
+      newValues.push(val.key);
+    });
+    form?.change('rowCheckbox', !checked ? [] : getUniqueString(newValues));
+  };
+
+  const rowCheckboxChange = (e: any) => {
+    const { checked, value, name } = e.target;
+    const { rowCheckbox = [] } = values;
+    const newValues = [...rowCheckbox];
+    if (!checked) {
+      const index = newValues.findIndex((val) => val === value);
+      newValues.splice(index, 1);
+      form?.change('checkAll', []);
+    } else {
+      newValues.push(value);
+    }
+    if (newValues.length === data.length) {
+      form?.change('checkAll', ['checkAll']);
+    }
+    form?.change(name, newValues);
+  };
   return (
     <>
       <table className={tableClasses}>
         <thead className={tableHeadClassName}>
           <tr className={classNames(tableHeadRowClassName, css.headRow)}>
+            {hasCheckbox && (
+              <td className={classNames(tableHeadCellClassName, css.headCell)}>
+                <FieldCheckbox
+                  labelClassName={css.checkboxLabel}
+                  customOnChange={customOnChange}
+                  name="checkAll"
+                  id="checkAll"
+                  value="checkAll"
+                  label=" "
+                />
+              </td>
+            )}
             {columns.map((col: TColumn) => (
               <td
                 className={classNames(tableHeadCellClassName, css.headCell)}
@@ -126,6 +181,25 @@ const Table = (props: any) => {
               <tr
                 className={classNames(tableBodyRowClassName, css.bodyRow)}
                 key={row.key}>
+                {hasCheckbox && (
+                  <td
+                    className={classNames(
+                      tableBodyCellClassName,
+                      css.bodyCell,
+                      {
+                        [css.isParent]: row.data.isParent,
+                      },
+                    )}>
+                    <FieldCheckbox
+                      labelClassName={css.checkboxLabel}
+                      name="rowCheckbox"
+                      id={`rowCheckbox.${row.key}`}
+                      value={row.key}
+                      label=" "
+                      customOnChange={rowCheckboxChange}
+                    />
+                  </td>
+                )}
                 {columns.map((col: TColumn) => (
                   <td
                     className={classNames(
@@ -157,17 +231,27 @@ const Table = (props: any) => {
 };
 
 export const TableForm = (props: TTable) => {
-  const { rootClassName, onSubmit, initialValues, ...rest } = props;
+  const { rootClassName, onSubmit, initialValues, exposeValues, ...rest } =
+    props;
   const rootClasses = classNames(css.root, rootClassName);
   return (
     <FinalForm
       onSubmit={onSubmit || (() => {})}
       initialValues={initialValues}
       render={(fieldRenderProps) => {
-        const { handleSubmit } = fieldRenderProps;
+        const { handleSubmit, form, values } = fieldRenderProps;
         return (
           <Form onSubmit={handleSubmit} className={rootClasses}>
-            <Table {...rest} />
+            <FormSpy
+              subscription={{ values: true, valid: true }}
+              onChange={(state) => {
+                const { values, valid } = state;
+                if (exposeValues) {
+                  exposeValues({ values, valid });
+                }
+              }}
+            />
+            <Table {...rest} form={form} values={values} />
           </Form>
         );
       }}

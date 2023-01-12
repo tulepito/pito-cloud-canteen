@@ -129,6 +129,21 @@ export enum ERestaurantListingStatus {
   unsatisfactory = 'unsatisfactory',
 }
 
+export const RESTAURANT_STATUS_OPTIONS = [
+  {
+    key: ERestaurantListingStatus.new,
+    label: 'Mới',
+  },
+  {
+    key: ERestaurantListingStatus.authorized,
+    label: 'Đã xác thực',
+  },
+  {
+    key: ERestaurantListingStatus.unsatisfactory,
+    label: 'Không đạt yêu cầu',
+  },
+];
+
 export const OTHER_OPTION = 'other';
 
 export const LIST_BANKS = [

@@ -1,65 +1,70 @@
-import Button from '@components/Button/Button';
+/* eslint-disable @typescript-eslint/no-shadow */
+import Button, { InlineTextButton } from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import IconFilter from '@components/IconFilter/IconFilter';
-import Modal from '@components/Modal/Modal';
+import AlertModal from '@components/Modal/AlertModal';
 import useBoolean from '@hooks/useBoolean';
-import React from 'react';
+import type { FormApi } from 'final-form';
+import React, { useRef } from 'react';
 import { Form as FinalForm } from 'react-final-form';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './IntegrationFilterModal.module.scss';
 
 const IntegrationFilterModal = (props: any) => {
   const { onSubmit, onClear, children, initialValues = {} } = props;
+  const formRef = useRef<FormApi>();
   const {
     value: isOpen,
     setFalse: onClose,
     setTrue: onOpen,
   } = useBoolean(false);
+
+  const intl = useIntl();
+
+  const handleSubmit = () => {
+    formRef.current?.submit();
+  };
+
   return (
     <div className={css.root}>
       <Button onClick={onOpen} type="button" className={css.filterButton}>
         <IconFilter className={css.filterIcon} />
         <FormattedMessage id="IntegrationFilterModal.filterMessage" />
       </Button>
-      <Modal
-        containerClassName={css.modalContainer}
+      <AlertModal
+        onCancel={onClose}
+        onConfirm={handleSubmit}
         isOpen={isOpen}
-        handleClose={onClose}>
+        handleClose={onClose}
+        cancelLabel={intl.formatMessage({
+          id: 'IntegrationFilterModal.filterFormDiscardBtn',
+        })}
+        confirmLabel={intl.formatMessage({
+          id: 'IntegrationFilterModal.filterFormBtn',
+        })}>
         <FinalForm
           initialValues={initialValues}
           onSubmit={onSubmit}
           render={(fieldRenderProps) => {
-            const { handleSubmit } = fieldRenderProps;
+            const { handleSubmit, form } = fieldRenderProps;
+            formRef.current = form;
             return (
               <Form className={css.filterForm} onSubmit={handleSubmit}>
                 <>
                   {children}
-                  <div className={css.formButtons}>
-                    <Button
-                      onClick={onClear}
-                      type="button"
-                      className={css.leftButton}>
-                      <FormattedMessage id="IntegrationFilterModal.clearBtn" />
-                    </Button>
-                    <div className={css.rightButtons}>
-                      <Button
-                        onClick={onClose}
-                        type="button"
-                        className={css.discardButton}>
-                        <FormattedMessage id="IntegrationFilterModal.filterFormDiscardBtn" />
-                      </Button>
-                      <Button className={css.submitButton}>
-                        <FormattedMessage id="IntegrationFilterModal.filterFormBtn" />
-                      </Button>
-                    </div>
-                  </div>
+                  <InlineTextButton
+                    onClick={onClear}
+                    type="button"
+                    className={css.clearButton}>
+                    <FormattedMessage id="IntegrationFilterModal.clearBtn" />
+                  </InlineTextButton>
                 </>
               </Form>
             );
           }}
         />
-      </Modal>
+      </AlertModal>
     </div>
   );
 };

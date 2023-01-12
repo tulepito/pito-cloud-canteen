@@ -13,6 +13,8 @@ type TAlertModal = {
   handleClose: () => void;
   onCancel: () => void;
   onConfirm: () => void;
+  confirmDisabled?: boolean;
+  confirmInProgress?: boolean;
 };
 
 const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
@@ -24,6 +26,8 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
   handleClose,
   onCancel,
   onConfirm,
+  confirmInProgress,
+  confirmDisabled,
 }) => {
   return (
     <Modal
@@ -36,7 +40,12 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
         <Button className={css.reject} size="medium" onClick={onCancel}>
           {cancelLabel}
         </Button>
-        <Button className={css.confirm} size="medium" onClick={onConfirm}>
+        <Button
+          disabled={confirmDisabled}
+          inProgress={confirmInProgress}
+          className={css.confirm}
+          size="medium"
+          onClick={onConfirm}>
           {confirmLabel}
         </Button>
       </div>

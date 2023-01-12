@@ -1,15 +1,15 @@
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import {
-  closePartnerFoodApi,
   createPartnerFoodApi,
+  deletePartnerFoodApi,
   showPartnerFoodApi,
   updatePartnerFoodApi,
 } from '@utils/api';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants, EListingType } from '@utils/enums';
 import { storableError } from '@utils/errors';
-import type { TListing } from '@utils/types';
+import type { TImage, TListing } from '@utils/types';
 import omit from 'lodash/omit';
 
 export const MANAGE_FOOD_PAGE_SIZE = 10;
@@ -86,6 +86,9 @@ const SHOW_PARTNER_FOOD_LISTING =
 const REMOVE_PARTNER_FOOD_LISTING =
   'app/ManageFoodsPage/REMOVE_PARTNER_FOOD_LISTING';
 
+const SHOW_DUPLICATE_FOOD = 'app/ManageFoodsPage/SHOW_DUPLICATE_FOOD';
+const DUPLICATE_FOOD = 'app/ManageFoodsPage/DUPLICATE_FOOD';
+
 // ================ Async thunks ================ //
 
 const queryPartnerFoods = createAsyncThunk(
@@ -96,6 +99,7 @@ const queryPartnerFoods = createAsyncThunk(
       ...rest,
       meta_listingType: EListingType.food,
       meta_restaurantId: restaurantId,
+      meta_isDeleted: false,
       perPage: MANAGE_FOOD_PAGE_SIZE,
     });
     const foods = denormalisedResponseEntities(response);
@@ -135,6 +139,51 @@ const createPartnerFoodListing = createAsyncThunk(
     try {
       const { data } = await createPartnerFoodApi({
         dataParams: payload,
+        queryParams: {},
+      });
+      return data;
+    } catch (error) {
+      console.error(`${CREATE_PARTNER_FOOD_LISTING} error: `, error);
+      return rejectWithValue(storableError(error));
+    }
+  },
+);
+
+const duplicateFood = createAsyncThunk(
+  DUPLICATE_FOOD,
+  async (payload: any, { extra: sdk, rejectWithValue }) => {
+    try {
+      const { images = [], title } = payload || {};
+      // parse url to file
+      const imageAsFiles = await Promise.all(
+        images.map(async (image: TImage) => {
+          const response = await fetch(
+            image.attributes.variants[EImageVariants.squareSmall2x].url,
+          );
+          const data = await response.blob();
+          const metadata = {
+            type: 'image/jpeg',
+          };
+          const file = new File(
+            [data],
+            `${`${title}_${new Date().getTime()}`}.jpg`,
+            metadata,
+          );
+          return file;
+        }),
+      );
+      // upload image to Flex
+      const uploadRes = await Promise.all(
+        imageAsFiles.map(async (file) =>
+          sdk.images.upload({
+            image: file,
+          }),
+        ),
+      );
+
+      const newImages = uploadRes.map((res) => res.data.data.id);
+      const { data } = await createPartnerFoodApi({
+        dataParams: { ...payload, images: newImages },
         queryParams: {},
       });
       return data;
@@ -193,7 +242,7 @@ const removePartnerFood = createAsyncThunk(
   REMOVE_PARTNER_FOOD_LISTING,
   async (payload: any, { rejectWithValue }) => {
     try {
-      const { data } = await closePartnerFoodApi({
+      const { data } = await deletePartnerFoodApi({
         dataParams: {
           ...payload,
         },
@@ -207,6 +256,28 @@ const removePartnerFood = createAsyncThunk(
   },
 );
 
+const showDuplicateFood = createAsyncThunk(
+  SHOW_DUPLICATE_FOOD,
+  async (id: any) => {
+    try {
+      const { data } = await showPartnerFoodApi(id, {
+        dataParams: {
+          include: ['images'],
+          'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
+        },
+        queryParams: {
+          expand: true,
+        },
+      });
+
+      const [food] = denormalisedResponseEntities(data);
+      return food;
+    } catch (error) {
+      return storableError(error);
+    }
+  },
+);
+
 export const foodSliceThunks = {
   queryPartnerFoods,
   requestUploadFoodImages,
@@ -214,6 +285,8 @@ export const foodSliceThunks = {
   updatePartnerFoodListing,
   showPartnerFoodListing,
   removePartnerFood,
+  showDuplicateFood,
+  duplicateFood,
 };
 
 // ================ Slice ================ //
@@ -358,6 +431,35 @@ const foodSlice = createSlice({
         ...state,
         removeFoodInProgress: false,
         removeFoodError: payload,
+      }))
+      .addCase(showDuplicateFood.pending, (state) => ({
+        ...state,
+        showFoodInProgress: true,
+        showFoodError: null,
+      }))
+      .addCase(showDuplicateFood.fulfilled, (state, { payload }) => ({
+        ...state,
+        showFoodInProgress: false,
+        currentFoodListing: payload,
+      }))
+      .addCase(showDuplicateFood.rejected, (state, { payload }) => ({
+        ...state,
+        showFoodInProgress: true,
+        showFoodError: payload,
+      }))
+      .addCase(duplicateFood.pending, (state) => ({
+        ...state,
+        createFoodError: null,
+        createFoodInProgress: true,
+      }))
+      .addCase(duplicateFood.fulfilled, (state) => ({
+        ...state,
+        createFoodInProgress: false,
+      }))
+      .addCase(duplicateFood.rejected, (state, { payload }) => ({
+        ...state,
+        createFoodInProgress: false,
+        createFoodError: payload,
       }));
   },
 });

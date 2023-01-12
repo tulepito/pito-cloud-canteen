@@ -75,3 +75,29 @@ export const getUpdateFoodData = (values: TEditPartnerFoodFormValues) => {
     },
   };
 };
+
+export const getDuplicateData = (values: TEditPartnerFoodFormValues) => {
+  const {
+    images = [],
+    title,
+    description,
+    price,
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    addImages,
+    restaurantId,
+    ...rest
+  } = values;
+  return {
+    images: images.filter((i: TImage) => !!i),
+    title,
+    description,
+    price: new Money(Number(price), 'VND'),
+    publicData: {
+      ...rest,
+    },
+    metadata: {
+      restaurantId,
+      listingType: ListingTypes.FOOD,
+    },
+  };
+};

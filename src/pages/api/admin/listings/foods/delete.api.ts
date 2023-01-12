@@ -28,12 +28,28 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     if (ids && ids.length > 0) {
       response = await Promise.all(
-        ids.map((i: string) => {
-          return intergrationSdk.listings.close({ id: i }, queryParams);
+        ids.map(async (i: string) => {
+          return intergrationSdk.listings.update(
+            {
+              id: i,
+              metadata: {
+                isDeleted: true,
+              },
+            },
+            queryParams,
+          );
         }),
       );
     } else {
-      response = await intergrationSdk.listings.close({ id }, queryParams);
+      response = await intergrationSdk.listings.update(
+        {
+          id,
+          metadata: {
+            isDeleted: true,
+          },
+        },
+        queryParams,
+      );
     }
 
     res.json(response);

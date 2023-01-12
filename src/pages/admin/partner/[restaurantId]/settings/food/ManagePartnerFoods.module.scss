@@ -12,6 +12,8 @@
 
 .idRow {
   max-width: 150px;
+  font-weight: $fontWeightBold;
+  color: $secondaryBlue6;
 }
 
 .actionBtn {
@@ -39,18 +41,20 @@
 }
 
 .tableActions {
-  margin: 20px 0;
+  margin: 20px 0 40px 0;
   display: flex;
   justify-content: space-between;
 }
 
 .ctaButtons {
   display: flex;
-  gap: 10px;
+  gap: 16px;
 }
 
-.ctaButton {
+.addButton {
   composes: secondaryButton;
+  background-color: $matterColorDark;
+  color: $matterColorLight;
 }
 
 .filterForm {
@@ -78,7 +82,6 @@
 
 .rightButtons {
   display: flex;
-  gap: 10px;
   justify-content: flex-end;
 }
 
@@ -108,4 +111,44 @@
 
 .iconSpinner {
   stroke: $neutralGray5;
+}
+
+.removeButton {
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $neutralGray6;
+}
+
+.buttonIcon {
+  margin-right: 12px;
+}
+
+.lightButton {
+  composes: secondaryButton;
+}
+
+.deletedFood {
+  text-transform: uppercase;
+  font-weight: $fontWeightBold;
+}
+
+.foodTitle {
+  display: inline-flex;
+  font-weight: $fontWeightBold;
+  color: $matterColorDark;
+}
+
+.removeTitle {
+  font-weight: $fontWeightBold;
+  font-size: 20px;
+  color: $neutralGray6;
+  margin-bottom: 28px;
+}
+
+.removeContent {
+  font-size: 14px;
+  font-weight: $fontWeightRegular;
+  color: $neutralGray5;
 }

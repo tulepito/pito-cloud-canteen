@@ -1,6 +1,6 @@
 import React from 'react';
 
-import ManagePartnerFoods from './ManagePartnerFoods';
+import ManagePartnerFoods from './ManagePartnerFoods.page';
 
 const FoodDetailsRoute = () => {
   return <ManagePartnerFoods />;

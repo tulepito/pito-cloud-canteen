@@ -1,22 +1,30 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldMultipleSelect from '@components/FieldMutipleSelect/FieldMultipleSelect';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import IconDelete from '@components/IconDelete/IconDelete';
 import IconEdit from '@components/IconEdit/IconEdit';
-import IconSpinner from '@components/IconSpinner/IconSpinner';
+import IconDuplicate from '@components/Icons/IconDuplicate/IconDuplicate';
+import IconPrint from '@components/Icons/IconPrint/IconPrint';
+import IconUploadFile from '@components/Icons/IconUploadFile/IconUploadFile';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import AlertModal from '@components/Modal/AlertModal';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
-import { CATEGORY_OPTIONS } from '@utils/enums';
-import type { TListing } from '@utils/types';
+import {
+  CATEGORY_OPTIONS,
+  FOOD_TYPE_OPTIONS,
+  getLabelByKey,
+  MENU_OPTIONS,
+} from '@utils/enums';
+import type { TIntergrationFoodListing } from '@utils/types';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -26,24 +34,12 @@ import css from './ManagePartnerFoods.module.scss';
 
 const TABLE_COLUMN: TColumn[] = [
   {
-    key: 'foodId',
-    label: '',
-    render: (data: any) => {
-      return (
-        <FieldCheckbox
-          retrieveValue={data.onCheckboxChange(data.id)}
-          name="foodIds"
-          id={data.id}
-          value={data.id}
-          label=" "
-        />
-      );
-    },
-  },
-  {
     key: 'id',
     label: 'ID',
     render: (data: any) => {
+      if (data.isDeleted) {
+        return <div className={css.deletedFood}>Deleted food</div>;
+      }
       return (
         <div className={css.idRow} title={data.id}>
           {data.id}
@@ -55,54 +51,97 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'title',
     label: 'Tên món',
     render: (data: any) => {
+      if (data.isDeleted) {
+        return <div></div>;
+      }
       return <div title={data.title}>{data.title}</div>;
     },
   },
   {
-    key: 'description',
-    label: 'Mô tả',
+    key: 'menuType',
+    label: 'Loại menu',
     render: (data: any) => {
-      return <div className={css.descriptionRow}>{data.description}</div>;
+      if (data.isDeleted) {
+        return <div></div>;
+      }
+      return <div className={css.descriptionRow}>{data.menuType}</div>;
+    },
+  },
+  {
+    key: 'foodType',
+    label: 'Loại món',
+    render: (data: any) => {
+      if (data.isDeleted) {
+        return <div></div>;
+      }
+      return <div className={css.descriptionRow}>{data.foodType}</div>;
+    },
+  },
+  {
+    key: 'category',
+    label: 'Phong cách ẩm thực',
+    render: (data: any) => {
+      if (data.isDeleted) {
+        return <div></div>;
+      }
+      return <div className={css.descriptionRow}>{data.category}</div>;
     },
   },
   {
     key: 'action',
     label: '',
     render: (data: any) => {
+      if (data.isDeleted) {
+        return <div></div>;
+      }
       return (
         <div>
-          {data.isLoading ? (
-            <IconSpinner className={css.iconSpinner} />
-          ) : (
-            <>
-              <NamedLink
-                path={`/admin/partner/${data.restaurantId}/settings/food/${data.id}`}
-                className={css.actionBtn}>
-                <IconEdit />
-              </NamedLink>
-              <InlineTextButton
-                type="button"
-                onClick={data.removeFood(data.id)}
-                className={css.actionBtn}>
-                <IconDelete />
-              </InlineTextButton>
-            </>
-          )}
+          <NamedLink
+            path={`/admin/partner/${data.restaurantId}/settings/food/${data.id}`}
+            className={css.actionBtn}>
+            <IconEdit />
+          </NamedLink>
+          <NamedLink
+            path={`/admin/partner/${data.restaurantId}/settings/food/create?duplicateId=${data.id}`}
+            className={css.actionBtn}>
+            <IconDuplicate />
+          </NamedLink>
+          <InlineTextButton
+            type="button"
+            onClick={data.onSetFoodToRemove(data)}
+            className={css.actionBtn}>
+            <IconDelete />
+          </InlineTextButton>
         </div>
       );
     },
   },
 ];
 
-const parseEntitiesToTableData = (foods: TListing[], extraData: any) => {
+const parseEntitiesToTableData = (
+  foods: TIntergrationFoodListing[],
+  extraData: any,
+) => {
   return foods.map((food) => {
     return {
       key: food.id.uuid,
       data: {
+        isDeleted: food.attributes.metadata.isDeleted,
         title: food.attributes.title,
         description: food.attributes.description,
         id: food.id.uuid,
-        isLoading: extraData.removeFoodInProgress === food.id.uuid,
+        menuType: getLabelByKey(
+          MENU_OPTIONS,
+          food.attributes.publicData.menuType,
+        ),
+        category: getLabelByKey(
+          CATEGORY_OPTIONS,
+          food.attributes.publicData.category,
+        ),
+        foodType: getLabelByKey(
+          FOOD_TYPE_OPTIONS,
+          food.attributes.publicData.foodType,
+        ),
         ...extraData,
       },
     };
@@ -114,6 +153,13 @@ const ManagePartnerFoods = () => {
   const router = useRouter();
 
   const [idsToRemove, setIdsToRemove] = useState<string[]>([]);
+  const [foodToRemove, setFoodToRemove] = useState<any>(null);
+
+  const {
+    value: removeCheckedModalOpen,
+    setTrue: openRemoveCheckedModal,
+    setFalse: closeRemoveCheckedModal,
+  } = useBoolean(false);
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { restaurantId, page = 1, keywords, pub_category = '' } = router.query;
@@ -127,15 +173,9 @@ const ManagePartnerFoods = () => {
     ?.split(',')
     .filter((item: string) => !!item);
 
-  const onCheckboxChange = (value: string) => () => {
-    const newIds = [...idsToRemove];
-    const alreadyAddedIndex = newIds.findIndex((id: string) => id === value);
-    if (alreadyAddedIndex >= 0) {
-      newIds.splice(alreadyAddedIndex, 1);
-    } else {
-      newIds.push(value);
-    }
-    setIdsToRemove(newIds);
+  const getExposeValues = ({ values }: any) => {
+    const { rowCheckbox = [] } = values || {};
+    setIdsToRemove(rowCheckbox);
   };
 
   const handleSubmitFilter = ({ pub_category = [], keywords }: any) => {
@@ -149,7 +189,17 @@ const ManagePartnerFoods = () => {
     });
   };
 
-  const removeFood = (id: string) => async () => {
+  const onSetFoodToRemove = (foodData: any) => () => {
+    setFoodToRemove(foodData);
+  };
+
+  const onClearFoodToRemove = () => {
+    setFoodToRemove(null);
+  };
+
+  const removeFood = async () => {
+    if (!foodToRemove) return;
+    const { id } = foodToRemove;
     const { error } = (await dispatch(
       foodSliceThunks.removePartnerFood({ id }),
     )) as any;
@@ -187,9 +237,7 @@ const ManagePartnerFoods = () => {
 
   const parsedFoods = parseEntitiesToTableData(foods, {
     restaurantId,
-    removeFood,
-    removeFoodInProgress,
-    onCheckboxChange,
+    onSetFoodToRemove,
   });
 
   const handleClearFilter = () => {
@@ -248,17 +296,28 @@ const ManagePartnerFoods = () => {
           />
         </IntegrationFilterModal>
         <div className={css.ctaButtons}>
+          <InlineTextButton
+            inProgress={removeFoodInProgress}
+            onClick={openRemoveCheckedModal}
+            disabled={idsToRemove.length === 0 || removeFoodInProgress}
+            className={css.removeButton}>
+            <IconDelete className={css.buttonIcon} />
+            Xóa món
+          </InlineTextButton>
+          <Button className={css.lightButton}>
+            <IconUploadFile className={css.buttonIcon} />
+            Tải món ăn
+          </Button>
+          <Button
+            disabled={idsToRemove.length === 0}
+            className={css.lightButton}>
+            <IconPrint className={css.buttonIcon} />
+            In danh sách món ăn
+          </Button>
           <NamedLink
             path={`/admin/partner/${restaurantId}/settings/food/create`}>
-            <Button className={css.ctaButton}>Thêm</Button>
+            <Button className={css.addButton}>Thêm món ăn</Button>
           </NamedLink>
-          <Button
-            inProgress={removeFoodInProgress}
-            onClick={removeCheckedFoods}
-            disabled={idsToRemove.length === 0 || removeFoodInProgress}
-            className={css.ctaButton}>
-            Xóa
-          </Button>
         </div>
       </div>
       {queryFoodsError && <ErrorMessage message={queryFoodsError.message} />}
@@ -269,8 +328,50 @@ const ManagePartnerFoods = () => {
           columns={TABLE_COLUMN}
           data={parsedFoods}
           isLoading={queryFoodsInProgress}
+          hasCheckbox
+          exposeValues={getExposeValues}
         />
       )}
+      <AlertModal
+        isOpen={foodToRemove || removeCheckedModalOpen}
+        handleClose={
+          removeCheckedModalOpen ? closeRemoveCheckedModal : onClearFoodToRemove
+        }
+        onCancel={
+          removeCheckedModalOpen ? closeRemoveCheckedModal : onClearFoodToRemove
+        }
+        onConfirm={
+          removeCheckedModalOpen
+            ? removeCheckedFoods
+            : (removeFood as unknown as () => void)
+        }
+        cancelLabel="Hủy"
+        confirmLabel="Xóa món ăn"
+        confirmInProgress={removeFoodInProgress}
+        confirmDisabled={removeFoodInProgress}>
+        <div className={css.removeTitle}>
+          <FormattedMessage id="ManagePartnerFoods.removeTitle" />
+        </div>
+        <p className={css.removeContent}>
+          <FormattedMessage
+            id="ManagePartnerFoods.removeContent"
+            values={{
+              foodName: (
+                <div className={css.foodTitle}>
+                  {removeCheckedModalOpen ? (
+                    <FormattedMessage
+                      id="ManagePartnerFoods.foodLength"
+                      values={{ foodLength: idsToRemove.length }}
+                    />
+                  ) : (
+                    foodToRemove?.title
+                  )}
+                </div>
+              ),
+            }}
+          />
+        </p>
+      </AlertModal>
     </div>
   );
 };

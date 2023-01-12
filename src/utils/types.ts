@@ -446,3 +446,11 @@ export type TIntergrationOrderListing = {
   company?: TCompany;
   order?: TOrderListing;
 };
+
+export type TIntergrationFoodListing = {
+  id: any;
+  type: 'listing';
+  attributes: TAdminOrderListingAttributes & TDeletedListingAttributes;
+  author?: TUser;
+  images?: TImage[];
+};

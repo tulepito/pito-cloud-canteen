@@ -70,7 +70,6 @@ const FieldCheckbox = (props: any) => {
     hasTextInput,
     textPlaceholder,
     labelClassName,
-    retrieveValue,
     ...rest
   } = props;
 
@@ -86,10 +85,6 @@ const FieldCheckbox = (props: any) => {
       customOnChange(event);
     } else {
       onChange(event);
-    }
-
-    if (retrieveValue) {
-      retrieveValue(event);
     }
 
     onBlur(event);

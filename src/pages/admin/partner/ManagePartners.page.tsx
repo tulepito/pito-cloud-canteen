@@ -1,24 +1,30 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
+import FieldMultipleSelect from '@components/FieldMutipleSelect/FieldMultipleSelect';
+import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import IconAdd from '@components/IconAdd/IconAdd';
 import IconEdit from '@components/IconEdit/IconEdit';
 import IconSpinner from '@components/IconSpinner/IconSpinner';
+import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import Meta from '@components/Layout/Meta';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
-import SelectSingleFilterPopup from '@components/SelectSingleFilterPopup/SelectSingleFilterPopup';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { partnerThunks } from '@redux/slices/partners.slice';
 import { adminRoutes } from '@src/paths';
-import { EListingStates, ERestaurantListingStatus } from '@utils/enums';
+import {
+  EListingStates,
+  ERestaurantListingStatus,
+  RESTAURANT_STATUS_OPTIONS,
+} from '@utils/enums';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import KeywordSearchForm from './components/KeywordSearchForm/KeywordSearchForm';
 import css from './ManagePartners.module.scss';
 
 type TManagePartnersPage = {};
@@ -204,15 +210,6 @@ const parseEntitiesToTableData = (
   });
 };
 
-const PARTNER_LISTING_STATUS = Object.keys(ERestaurantListingStatus).map(
-  (key: string) => {
-    return {
-      key,
-      label: <FormattedMessage id={`ManagePartnersPage.${key}Status`} />,
-    };
-  },
-);
-
 const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
   const {
     restaurantRefs,
@@ -263,12 +260,18 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
     }
   };
 
+  const statusAsString = meta_status as string;
+
+  const groupStatus = statusAsString
+    ?.split(',')
+    .filter((item: string) => !!item);
+
   useEffect(() => {
     dispatch(
       partnerThunks.queryRestaurants({
         page,
         keywords,
-        ...(meta_status ? { meta_status } : {}),
+        ...(meta_status ? { meta_status: groupStatus } : {}),
       }),
     );
   }, [page, keywords, meta_status]);
@@ -284,11 +287,21 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
     [restaurantRefs, restaurantTableActionInProgress, page],
   );
 
-  const onSubmit = (values: any) => {
+  const onSubmit = ({ keywords, meta_status }: any) => {
     router.replace({
       pathname,
       query: {
-        ...values,
+        meta_status: meta_status.join(','),
+        keywords,
+        page: 1,
+      },
+    });
+  };
+
+  const onClear = () => {
+    router.replace({
+      pathname,
+      query: {
         page: 1,
       },
     });
@@ -338,21 +351,26 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
         </Link>
       </div>
       <div className={css.filterWrapper}>
-        <KeywordSearchForm
+        <IntegrationFilterModal
           onSubmit={onSubmit}
-          searchValue="keywords"
-          initialValues={{ keywords: keywords as string }}
-        />
-        <SelectSingleFilterPopup
-          className={css.singleFilter}
-          options={PARTNER_LISTING_STATUS}
-          label={intl.formatMessage({ id: 'ManageCompanies.status' })}
-          queryParamNames="meta_status"
-          onSelect={onSubmit}
-          initialValues={{
-            meta_status: meta_status as string,
-          }}
-        />
+          onClear={onClear}
+          initialValues={{ keywords, meta_status: groupStatus }}>
+          <FieldTextInput
+            className={css.field}
+            name="keywords"
+            id="keywords"
+            label="Tên đối tác"
+            placeholder="Tìm kiếm"
+          />
+          <FieldMultipleSelect
+            className={css.field}
+            name="meta_status"
+            id="meta_status"
+            label="Trạng thái"
+            placeholder="Chọn trạng thái"
+            options={RESTAURANT_STATUS_OPTIONS}
+          />
+        </IntegrationFilterModal>
       </div>
       {content}
     </div>

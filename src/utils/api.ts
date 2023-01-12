@@ -98,6 +98,6 @@ export const updatePartnerFoodApi = (body: TBodyParams) => {
   return post(`/api/admin/listings/foods/update`, body);
 };
 
-export const closePartnerFoodApi = (body: TBodyParams) => {
-  return post(`/api/admin/listings/foods/close`, body);
+export const deletePartnerFoodApi = (body: TBodyParams) => {
+  return post(`/api/admin/listings/foods/delete`, body);
 };

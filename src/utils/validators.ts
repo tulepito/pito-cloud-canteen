@@ -178,7 +178,6 @@ export const nonEmptyImage = (message: string) => (value: any) => {
 };
 
 export const nonEmptyImageArray = (message: string) => (value: any) => {
-  console.log({ value });
   return value &&
     Array.isArray(value) &&
     value.some((val) => val.id || val.imageId)

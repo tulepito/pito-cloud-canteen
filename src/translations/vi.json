@@ -679,5 +679,8 @@
   "IntegrationFilterModal.filterMessage": "Lọc",
   "IntegrationFilterModal.filterFormBtn": "Tìm kiếm",
   "IntegrationFilterModal.filterFormDiscardBtn": "Hủy",
-  "IntegrationFilterModal.clearBtn": "Xóa"
+  "IntegrationFilterModal.clearBtn": "Xóa bộ lọc",
+  "ManagePartnerFoods.removeTitle": "Xóa món ăn",
+  "ManagePartnerFoods.removeContent": "Bạn có chắc chắn muốn xóa {foodName} không?",
+  "ManagePartnerFoods.foodLength": "{foodLength} món ăn"
 }

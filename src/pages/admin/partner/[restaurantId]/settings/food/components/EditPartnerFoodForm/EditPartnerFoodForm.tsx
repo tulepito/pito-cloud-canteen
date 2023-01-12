@@ -250,30 +250,22 @@ const EditPartnerFoodFormComponent: React.FC<
             }),
           )}
         />
-        <FieldSelect
-          className={css.field}
-          name="foodType"
-          id="foodType"
-          placeholder={intl.formatMessage({
-            id: 'EditPartnerFoodForm.foodTypePlaceholder',
-          })}
-          label={intl.formatMessage({
-            id: 'EditPartnerFoodForm.foodTypeLabel',
-          })}
-          validate={required(
-            intl.formatMessage({
-              id: 'EditPartnerFoodForm.foodTypeRequired',
-            }),
-          )}>
-          {FOOD_TYPE_OPTIONS.map((cat) => (
-            <option key={cat.key} value={cat.key}>
-              {cat.label}
-            </option>
+        <div className={css.field}>
+          <label className={css.label}>
+            {intl.formatMessage({ id: 'EditPartnerFoodForm.foodTypeLabel' })}
+          </label>
+          {FOOD_TYPE_OPTIONS.map((option) => (
+            <FieldRadioButton
+              key={option.key}
+              name="foodType"
+              id={option.key}
+              value={option.key}
+              label={option.label}
+            />
           ))}
-        </FieldSelect>
+        </div>
       </div>
       <div className={css.flexField}>
-        <div className={css.field}></div>
         <FieldTextInput
           className={classNames(css.field, css.priceField)}
           name="price"
@@ -286,6 +278,18 @@ const EditPartnerFoodFormComponent: React.FC<
           validate={required(
             intl.formatMessage({ id: 'EditPartnerFoodForm.priceRequired' }),
           )}
+        />
+        <FieldMultipleSelect
+          className={css.field}
+          name="sideDishes"
+          id="sideDishes"
+          placeholder={intl.formatMessage({
+            id: 'EditPartnerFoodForm.sideDishPlaceholder',
+          })}
+          label={intl.formatMessage({
+            id: 'EditPartnerFoodForm.sideDishLabel',
+          })}
+          options={SIDE_DISH_OPTIONS}
         />
       </div>
       <div className={css.flexField}>
@@ -300,18 +304,8 @@ const EditPartnerFoodFormComponent: React.FC<
             id: 'EditPartnerFoodForm.ingredientsLabel',
           })}
         />
-        <FieldMultipleSelect
-          className={css.field}
-          name="sideDishes"
-          id="sideDishes"
-          placeholder={intl.formatMessage({
-            id: 'EditPartnerFoodForm.sideDishPlaceholder',
-          })}
-          label={intl.formatMessage({
-            id: 'EditPartnerFoodForm.sideDishLabel',
-          })}
-          options={SIDE_DISH_OPTIONS}
-        />
+
+        <div className={css.field}></div>
       </div>
       <div className={css.flexField}>
         <FieldTextArea
