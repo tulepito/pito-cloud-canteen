@@ -1,4 +1,5 @@
 import { sanitizeEntity } from '@utils/sanitize';
+import merge from 'lodash/merge';
 import reduce from 'lodash/reduce';
 
 import type {
@@ -239,7 +240,7 @@ export const ensureOwnListing = (listing: any) => {
  */
 export const ensureUser = (user: TUser) => {
   const empty = { id: null, type: 'user', attributes: { profile: {} } };
-  return { ...empty, ...user };
+  return merge(empty, user);
 };
 
 /**

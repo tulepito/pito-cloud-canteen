@@ -42,7 +42,7 @@ type TAvatarProps = {
   disableProfileLink?: boolean;
 };
 
-export const Avatar: React.FC<TAvatarProps> = (props) => {
+const Avatar: React.FC<TAvatarProps> = (props) => {
   const {
     rootClassName,
     className,
