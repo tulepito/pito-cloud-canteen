@@ -398,11 +398,49 @@ export const PARTY_INSURANCE_RADIO_OPTIONS = [
 
 export enum EOrderStates {
   inProgress = 'inProgress',
+  picking = 'picking',
+  cancel = 'cancel',
+  delivery = 'delivery',
+  pendingPayment = 'pendingPayment',
+  isNew = 'isNew',
+  completed = 'completed',
 }
 
 export const ORDER_STATES_OPTIONS = [
   {
     key: EOrderStates.inProgress,
+    label: 'Đang triển khai',
+  },
+  {
+    key: EOrderStates.picking,
+    label: 'Đang chọn món',
+  },
+  {
+    key: EOrderStates.cancel,
+    label: 'Hủy',
+  },
+  {
+    key: EOrderStates.delivery,
+    label: 'Đang giao hàng',
+  },
+  {
+    key: EOrderStates.pendingPayment,
+    label: 'Chờ thanh toán',
+  },
+  {
+    key: EOrderStates.isNew,
     label: 'Mới tạo',
   },
+  {
+    key: EOrderStates.completed,
+    label: 'Đã hoàn thành',
+  },
 ];
+
+export const getLabelByKey = (
+  list: { key: string; label: string }[],
+  key: any,
+) => {
+  const item = list?.find((l: any) => l.key === key);
+  return item && item.label ? item.label : key;
+};

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-shadow */
+import Badge, { BadgeType } from '@components/Badge/Badge';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldMultipleSelect from '@components/FieldMutipleSelect/FieldMultipleSelect';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
@@ -9,82 +11,143 @@ import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderAsyncAction } from '@redux/slices/Order.slice';
 import { adminRoutes } from '@src/paths';
-import { EOrderStates, ORDER_STATES_OPTIONS } from '@utils/enums';
-import type { TIntergrationOrderListing } from '@utils/types';
+import {
+  EOrderStates,
+  getLabelByKey,
+  ORDER_STATES_OPTIONS,
+} from '@utils/enums';
+import type {
+  TIntergrationOrderListing,
+  TReverseMapFromEnum,
+} from '@utils/types';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
-import type { TKeywordSearchFormValues } from '../partner/components/KeywordSearchForm/KeywordSearchForm';
 import css from './ManageOrders.module.scss';
 
 const parseTimestaimpToFormat = (date: number) => {
-  return DateTime.fromMillis(date).toFormat('dd-MM-yyyy');
+  return DateTime.fromMillis(date).toFormat('dd/MM/yyyy');
+};
+
+const ORDER_STATE_BAGDE_TYPE: Record<
+  TReverseMapFromEnum<typeof EOrderStates>,
+  | typeof BadgeType.PROCESSING
+  | typeof BadgeType.DEFAULT
+  | typeof BadgeType.SUCCESS
+  | typeof BadgeType.WARNING
+> = {
+  [EOrderStates.inProgress]: BadgeType.PROCESSING,
+  [EOrderStates.isNew]: BadgeType.PROCESSING,
+  [EOrderStates.cancel]: BadgeType.DEFAULT,
+  [EOrderStates.delivery]: BadgeType.SUCCESS,
+  [EOrderStates.completed]: BadgeType.SUCCESS,
+  [EOrderStates.pendingPayment]: BadgeType.WARNING,
+  [EOrderStates.picking]: BadgeType.WARNING,
 };
 
 const TABLE_COLUMN: TColumn[] = [
   {
-    key: 'orderNumber',
-    label: 'STT',
-    render: (data: any) => {
-      return <p>{data.orderNumber}</p>;
-    },
-  },
-  {
     key: 'title',
-    label: 'Mã đơn',
+    label: 'Đơn hàng',
     render: (data: any) => {
       return (
         <NamedLink path={`${adminRoutes.ManageOrders.path}/${data.id}`}>
-          <p>{data.title}</p>
+          <div className={css.boldText}>#{data.title}</div>
         </NamedLink>
       );
+    },
+  },
+  {
+    key: 'orderName',
+    label: 'Tên đơn hàng',
+    render: ({ title }: any) => {
+      return <div>Pito Cloud Canteen - #{title}</div>;
+    },
+  },
+  {
+    key: 'address',
+    label: 'Địa điểm giao hàng',
+    render: (data: any) => {
+      return <div>{data.location}</div>;
     },
   },
   {
     key: 'companyName',
     label: 'Khách hàng',
     render: (data: any) => {
-      return <span>{data.companyName}</span>;
+      return <div>{data.companyName}</div>;
     },
   },
   {
-    key: 'staffName',
-    label: 'Tên nhân viên',
-    render: (data: any) => {
-      return <span>{data.staffName}</span>;
-    },
-  },
-  {
-    key: 'address',
-    label: 'Địa chỉ',
-    render: (data: any) => {
-      return <span className={css.rowText}>{data.location}</span>;
-    },
-  },
-  {
-    key: 'state',
-    label: 'Trạng thái',
+    key: 'dates',
+    label: 'Thời gian',
     render: (data: any) => {
       return (
-        <div className={css.rowState}>
-          <span>
-            <FormattedMessage id={`ManageOrdersPage.${data.state}State`} />
-          </span>
+        <div className={css.rowText}>
+          {data.startDate} - {data.endDate}
         </div>
       );
     },
   },
   {
-    key: 'action',
-    label: '',
-    render: (data: any) => {
+    key: 'dates',
+    label: 'Đối tác',
+    render: ({ restaurants = [] }: any) => {
+      const { length } = restaurants;
+      const moreThanTwo = restaurants.length > 2;
+      const remainLength = length - 2;
       return (
-        <NamedLink path={`${adminRoutes.ManageOrders.path}/${data.id}`}>
-          <FormattedMessage id="ManageOrdersPage.orderDetails" />
-        </NamedLink>
+        <div className={css.rowText}>
+          {restaurants.slice(0, 2).map((restaurantName: string) => (
+            <div key={restaurantName}>{restaurantName}</div>
+          ))}
+          {moreThanTwo && (
+            <div className={css.remainText}>+ {remainLength} đối tác </div>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    key: 'staffName',
+    label: 'Nhân viên phụ trách',
+    render: (data: any) => {
+      return <div>{data.staffName}</div>;
+    },
+  },
+
+  {
+    key: 'state',
+    label: 'Trạng thái',
+    render: ({
+      state,
+    }: {
+      state: TReverseMapFromEnum<typeof EOrderStates>;
+    }) => {
+      return (
+        <Badge
+          containerClassName={css.badge}
+          labelClassName={css.badgeLabel}
+          type={ORDER_STATE_BAGDE_TYPE[state] || BadgeType.DEFAULT}
+          label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
+        />
+      );
+    },
+  },
+  {
+    key: 'isPaid',
+    label: 'Thanh toán',
+    render: ({ isPaid }: any) => {
+      return (
+        <Badge
+          containerClassName={css.badge}
+          labelClassName={css.badgeLabel}
+          type={isPaid ? 'success' : 'warning'}
+          label={isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}
+        />
       );
     },
   },
@@ -97,6 +160,7 @@ const parseEntitiesToTableData = (
   if (orders.length === 0) return [];
   return orders.map((entity, index) => {
     const { company } = entity;
+    const { orderDetail = {} } = entity?.attributes?.metadata || {};
     return {
       key: entity.id.uuid,
       data: {
@@ -109,9 +173,15 @@ const parseEntitiesToTableData = (
         startDate: parseTimestaimpToFormat(
           entity?.attributes?.metadata?.generalInfo?.startDate,
         ),
+        endDate: parseTimestaimpToFormat(
+          entity?.attributes?.metadata?.generalInfo?.endDate,
+        ),
         staffName: entity?.attributes?.metadata?.generalInfo?.staffName,
         state: entity.attributes.metadata?.state || EOrderStates.inProgress,
         orderId: entity?.id?.uuid,
+        restaurants: Object.keys(orderDetail).map((key) => {
+          return orderDetail[key]?.restaurant?.restaurantName;
+        }),
       },
     };
   });
@@ -144,6 +214,7 @@ const ManageOrdersPage = () => {
           data={dataTable}
           pagination={manageOrdersPagination}
           paginationPath={adminRoutes.ManageOrders.path}
+          tableBodyCellClassName={css.bodyCell}
         />
       </>
     );
@@ -173,11 +244,12 @@ const ManageOrdersPage = () => {
     });
   };
 
-  const onSubmit = (values: TKeywordSearchFormValues) => {
+  const onSubmit = ({ keywords, meta_state }: any) => {
     router.push({
       pathname: adminRoutes.ManageOrders.path,
       query: {
-        ...values,
+        keywords,
+        meta_state: meta_state.join(','),
       },
     });
   };
