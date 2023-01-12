@@ -7,9 +7,12 @@
     margin: 16px 0;
 
     span {
+      word-break: break-all;
       @include lineClamp(1);
       @include textTemplate(16px, 400, 1.5);
       color: $labelBlue2;
+      white-space: nowrap;
+      display: inline-block;
 
       padding: 10px 16px;
       outline: 1px solid $neutralGray4;
@@ -18,6 +21,9 @@
       flex-grow: 1;
     }
 
+    button {
+      padding: 8px;
+    }
     display: flex;
     justify-content: space-between;
     column-gap: 12px;

@@ -242,6 +242,7 @@ $buttonBorderRadius: 8px;
   -webkit-line-clamp: $numberOfLines;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @mixin verticalDivider($color, $width, $height) {

@@ -35,6 +35,7 @@
   @include viewportMedium {
     grid-template-columns: 1fr 320px;
     column-gap: 40px;
+    row-gap: 28px;
     padding: 40px 130px;
     max-width: calc(1180px + 130px * 2);
     margin: 40px auto;
