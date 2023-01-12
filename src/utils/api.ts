@@ -82,3 +82,22 @@ export const updateParticipantOrderApi = (orderId: string, body: any) =>
 export const queryOrdersApi = (body: TBodyParams) => {
   return post(`/api/admin/listings/order/query`, body);
 };
+
+export const showPartnerFoodApi = (
+  id: string,
+  queryParams: Record<any, any>,
+) => {
+  return post(`/api/admin/listings/foods/${id}`, queryParams);
+};
+
+export const createPartnerFoodApi = (body: TBodyParams) => {
+  return post(`/api/admin/listings/foods/create`, body);
+};
+
+export const updatePartnerFoodApi = (body: TBodyParams) => {
+  return post(`/api/admin/listings/foods/update`, body);
+};
+
+export const closePartnerFoodApi = (body: TBodyParams) => {
+  return post(`/api/admin/listings/foods/close`, body);
+};

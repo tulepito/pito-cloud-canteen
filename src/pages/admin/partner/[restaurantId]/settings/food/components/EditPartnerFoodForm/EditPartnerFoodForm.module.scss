@@ -1,0 +1,106 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  max-width: 1440px;
+  margin: auto;
+}
+
+.fieldPhotos {
+  max-width: 600px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.smallPhotos {
+  display: flex;
+  gap: 10px;
+}
+
+.bigPhotoField {
+  max-width: 70%;
+  margin: auto;
+  width: 300px;
+  height: 200px;
+}
+
+.smallPhotoField {
+  width: 100%;
+  height: 100px;
+}
+
+.flexField {
+  display: flex;
+  margin-bottom: 40px;
+  flex-direction: column;
+  gap: 20px;
+  .field {
+    width: 100%;
+  }
+  @include viewportLarge {
+    flex-direction: row;
+  }
+}
+
+.label {
+  font-size: 14px;
+}
+
+.radioFields {
+  margin-bottom: 20px;
+}
+
+.inputSuffixed {
+  padding: 0 10px;
+  border-left: 1px solid $neutralGray4;
+  color: $neutralGray5;
+}
+
+.inputSuffixedContainer {
+  right: 20px;
+}
+
+.specialDietsList {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.specialDietsCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.specialDietsLabel {
+  font-size: 14px;
+  line-height: 24px;
+  color: $neutralGray10;
+  font-weight: $fontWeightMedium;
+  margin: 0 0 8px 0;
+}
+
+.specialDietsItem {
+  padding: 0;
+}
+
+.submitButtons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.imageInputWrapper {
+  display: grid !important;
+  .imageInput:nth-child(1) {
+    @include viewportLarge {
+      grid-column-start: 1;
+      height: 250px;
+      width: 400px;
+      margin: auto;
+      grid-column-end: 5;
+    }
+  }
+}

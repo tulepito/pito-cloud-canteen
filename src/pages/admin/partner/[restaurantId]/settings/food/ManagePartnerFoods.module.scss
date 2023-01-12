@@ -1,0 +1,111 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.title {
+  font-weight: $fontWeightRegular;
+  font-size: 20px;
+}
+
+.descriptionRow {
+  max-width: 250px;
+}
+
+.idRow {
+  max-width: 150px;
+}
+
+.actionBtn {
+  margin: 0 10px;
+}
+
+.secondaryButton {
+  @include buttonColorSecondary;
+  &:focus,
+  &:hover {
+    background-color: $neutralGray3;
+    color: unset;
+    border-color: unset;
+  }
+}
+
+.filterButton {
+  composes: secondaryButton;
+}
+
+.filterIcon {
+  fill: $neutralGray6;
+  width: 20px;
+  margin-right: 10px;
+}
+
+.tableActions {
+  margin: 20px 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.ctaButtons {
+  display: flex;
+  gap: 10px;
+}
+
+.ctaButton {
+  composes: secondaryButton;
+}
+
+.filterForm {
+  max-width: 400px;
+  padding: 50px 0 150px 0;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: center;
+  margin: auto;
+}
+
+.modal {
+  top: 100px;
+}
+
+.input {
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.discardButton {
+  composes: secondaryButton;
+}
+
+.rightButtons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.leftButton {
+  composes: secondaryButton;
+}
+
+.formButtons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.filteButtonActive {
+  background-color: $marketplaceColorLight;
+  color: $matterColorLight;
+  border-color: $marketplaceColorLight;
+  svg {
+    fill: $matterColorLight;
+  }
+  &:focus,
+  &:hover {
+    background-color: $marketplaceColor;
+    color: $matterColorLight;
+  }
+}
+
+.iconSpinner {
+  stroke: $neutralGray5;
+}

@@ -98,7 +98,9 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
         (value: TSidebarMenu) =>
           value.nameLink === pathname ||
           value.childrenMenus?.some(
-            (childMenu) => childMenu.nameLink === pathname,
+            (childMenu) =>
+              childMenu.nameLink === pathname ||
+              childMenu.highlightRefLinks?.includes(pathname),
           ),
       ),
     [pathname, childMenus],

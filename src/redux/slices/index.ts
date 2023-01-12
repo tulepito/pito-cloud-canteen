@@ -3,6 +3,7 @@ export { default as company } from './company.slice';
 export { default as CreateCompanyPage } from './CreateCompanyPage.slice';
 export { default as EditCompanyPage } from './EditCompanyPage.slice';
 export { default as emailVerification } from './emailVerification.slice';
+export { default as foods } from './foods.slice';
 export { default as ManageCompaniesPage } from './ManageCompaniesPage.slice';
 export { default as marketplaceData } from './marketplaceData.slice';
 export { default as Order } from './Order.slice';

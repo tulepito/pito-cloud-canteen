@@ -1,7 +1,9 @@
 import React from 'react';
 
+import ManagePartnerFoods from './ManagePartnerFoods';
+
 const FoodDetailsRoute = () => {
-  return <div>FoodDetailsRoute</div>;
+  return <ManagePartnerFoods />;
 };
 
 export default FoodDetailsRoute;

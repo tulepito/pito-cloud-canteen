@@ -97,12 +97,8 @@ export const adminRoutes = {
     label: 'Tạo món ăn',
   },
   EditPartnerFood: {
-    path: '/admin/partner/[restaurantId]/settings/food/[foodId]/edit',
-    label: 'Chỉnh sửa món ăn',
-  },
-  PartnerFoodDetails: {
     path: '/admin/partner/[restaurantId]/settings/food/[foodId]',
-    label: 'Thông tin món ăn',
+    label: 'Chỉnh sửa món ăn',
   },
   ManagePartnerMenus: {
     path: '/admin/partner/[restaurantId]/settings/menu',

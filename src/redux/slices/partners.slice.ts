@@ -540,7 +540,6 @@ export const partnerSlice = createSlice({
     },
     removeAvatar: (state: any, { payload }) => {
       const id = payload;
-
       // Only mark the image removed if it hasn't been added to the
       // listing already
       const removedAvatarIds = state.uploadedAvatars[id]

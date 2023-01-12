@@ -103,6 +103,7 @@ export enum ECompanyStatus {
 export enum EListingType {
   restaurant = 'restaurant',
   transaction = 'transaction',
+  food = 'food',
 }
 
 export enum EUserPermission {
@@ -396,6 +397,57 @@ export const PARTY_INSURANCE_RADIO_OPTIONS = [
   },
 ];
 
+export const FIXED_MENU_KEY = 'fixedMenu';
+export const CYCLE_MENU_KEY = 'cycleMenu';
+
+export const MENU_OPTIONS = [
+  { key: FIXED_MENU_KEY, label: 'Menu cố định' },
+  { key: CYCLE_MENU_KEY, label: 'Menu theo chu kỳ' },
+];
+
 export enum EOrderStates {
   inProgress = 'inProgress',
 }
+
+export const SPECIAL_DIET_OPTIONS = [
+  {
+    key: 'halal',
+    label: 'Halal',
+  },
+  {
+    key: 'keto',
+    label: 'Keto',
+  },
+  {
+    key: OTHER_OPTION,
+    label: 'Khác',
+    hasTextInput: true,
+    textPlaceholder: 'Nhập chế độ dinh dưỡng',
+  },
+];
+
+export const SIDE_DISH_OPTIONS = [
+  {
+    key: 'soup',
+    label: 'Món canh',
+  },
+  {
+    key: 'stir-fried-meal',
+    label: 'Món xào',
+  },
+  {
+    key: 'dessert',
+    label: 'Món tráng miệng',
+  },
+];
+
+export const FOOD_TYPE_OPTIONS = [
+  {
+    key: 'vegetarian-dish',
+    label: 'Món chay',
+  },
+  {
+    key: 'savory-dish',
+    label: 'Món mặn',
+  },
+];

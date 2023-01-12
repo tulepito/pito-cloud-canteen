@@ -177,6 +177,15 @@ export const nonEmptyImage = (message: string) => (value: any) => {
   return value && (value.id || value.imageId) ? VALID : message;
 };
 
+export const nonEmptyImageArray = (message: string) => (value: any) => {
+  console.log({ value });
+  return value &&
+    Array.isArray(value) &&
+    value.some((val) => val.id || val.imageId)
+    ? VALID
+    : message;
+};
+
 export const composeValidatorsWithAllValues =
   (...validators: any) =>
   (value: any, allValues: any, fieldState: any) =>
