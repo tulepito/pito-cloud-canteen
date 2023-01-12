@@ -629,5 +629,9 @@
   "AdminSidebar.partnerDetailsLabel": "Thông tin đối tác",
   "AdminSidebar.editPartnerLabel": "Chỉnh sửa",
   "ManageOrdersPage.orderDetails": "Chi tiết",
-  "ManageOrdersPage.inProgressState": "Đang tiến hành"
+  "ManageOrdersPage.inProgressState": "Mới tạo",
+  "IntegrationFilterModal.filterMessage": "Lọc",
+  "IntegrationFilterModal.filterFormBtn": "Tìm kiếm",
+  "IntegrationFilterModal.filterFormDiscardBtn": "Hủy",
+  "IntegrationFilterModal.clearBtn": "Xóa"
 }

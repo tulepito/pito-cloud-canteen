@@ -399,3 +399,10 @@ export const PARTY_INSURANCE_RADIO_OPTIONS = [
 export enum EOrderStates {
   inProgress = 'inProgress',
 }
+
+export const ORDER_STATES_OPTIONS = [
+  {
+    key: EOrderStates.inProgress,
+    label: 'Mới tạo',
+  },
+];
