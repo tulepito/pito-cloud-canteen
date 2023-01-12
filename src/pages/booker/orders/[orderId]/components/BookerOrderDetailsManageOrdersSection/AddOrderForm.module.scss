@@ -1,0 +1,18 @@
+.root {
+  .fieldContainer {
+    margin-top: 8px;
+    display: inline-block;
+
+    .fieldSelect {
+      display: inline-block;
+      width: 240px;
+      margin: 0 12px 0 0;
+    }
+  }
+  .submitButton {
+    display: inline-block;
+    min-height: unset;
+    height: 44px;
+    width: 80px;
+  }
+}

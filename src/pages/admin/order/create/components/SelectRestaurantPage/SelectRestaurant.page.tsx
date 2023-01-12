@@ -4,7 +4,6 @@ import Pagination from '@components/Pagination/Pagination';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
-import { weekDayFormatFromDateTime } from '@utils/dates';
 import { DateTime } from 'luxon';
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -59,10 +58,8 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   let currDebounceRef = debounceRef.current;
 
   const dateTime = DateTime.fromJSDate(selectedDate);
-  const formattedDate = dateTime.toFormat('dd/MM/yyyy');
-  const labelForBadge = `Cho ngày ${formattedDate} - ${weekDayFormatFromDateTime(
-    dateTime,
-  )} (${deliveryHour})- tại ${deliveryAddress?.address}`;
+  const formattedDate = dateTime.toFormat('dd/MM/yyyy - EEE', { locale: 'vi' });
+  const labelForBadge = `Cho ngày ${formattedDate} (${deliveryHour})- tại ${deliveryAddress?.address}`;
 
   const handlePageChange = (page: number) => {
     const params = {
