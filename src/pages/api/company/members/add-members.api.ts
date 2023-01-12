@@ -3,14 +3,26 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import companyChecker from '@services/permissionChecker/company';
 import { handleError } from '@services/sdk';
-import { UserPermission } from '@src/types/UserPermission';
+import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, USER } from '@utils/data';
+import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+const defaultExpireTime =
+  parseInt(process.env.DEFAUTL_INVITATION_EMAIL_EXPIRE_TIME as string, 10) || 7;
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const integrationSdk = getIntegrationSdk();
   try {
     const { userIdList, noAccountEmailList, companyId } = req.body;
+
+    // Step calculate expire time of invitation email
+    const expireTime = DateTime.now()
+      .setZone('Asia/Ho_Chi_Minh')
+      .startOf('day')
+      .plus({ day: defaultExpireTime })
+      .toMillis();
+
     // Step update data for existed user
     const newParticipantMembers = await Promise.all(
       userIdList.map(async (userId: string) => {
@@ -36,6 +48,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             email: userEmail,
             permission: UserPermission.PARTICIPANT,
             groups: [],
+            inviteStatus: UserInviteStatus.NOT_ACCEPTED,
+            expireTime,
           },
         };
       }),
@@ -57,6 +71,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         id: null,
         permission: UserPermission.PARTICIPANT,
         groups: [],
+        inviteStatus: UserInviteStatus.NOT_ACCEPTED,
+        expireTime,
       }))
       .reduce((result: any, memberObj: any) => {
         return {
