@@ -4,26 +4,21 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldMultipleSelect from '@components/FieldMutipleSelect/FieldMultipleSelect';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
-import Form from '@components/Form/Form';
 import IconDelete from '@components/IconDelete/IconDelete';
 import IconEdit from '@components/IconEdit/IconEdit';
-import IconFilter from '@components/IconFilter/IconFilter';
 import IconSpinner from '@components/IconSpinner/IconSpinner';
+import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
-import Modal from '@components/Modal/Modal';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
 import { CATEGORY_OPTIONS } from '@utils/enums';
 import type { TListing } from '@utils/types';
-import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -116,11 +111,6 @@ const parseEntitiesToTableData = (foods: TListing[], extraData: any) => {
 
 const ManagePartnerFoods = () => {
   const dispatch = useAppDispatch();
-  const {
-    value: isModalOpen,
-    setFalse: onClose,
-    setTrue: onOpen,
-  } = useBoolean(false);
   const router = useRouter();
 
   const [idsToRemove, setIdsToRemove] = useState<string[]>([]);
@@ -228,23 +218,35 @@ const ManagePartnerFoods = () => {
     keywords,
   ]);
 
-  const filterButtonActive = !!keywords || !!pub_category;
-
   return (
     <div className={css.root}>
       <h1 className={css.title}>
         <FormattedMessage id="ManagePartnerFoods.title" />
       </h1>
       <div className={css.tableActions}>
-        <Button
-          type="button"
-          onClick={onOpen}
-          className={classNames(css.filterButton, {
-            [css.filteButtonActive]: filterButtonActive,
-          })}>
-          <IconFilter className={css.filterIcon} />
-          <FormattedMessage id="ManagePartnerFoods.filter" />
-        </Button>
+        <IntegrationFilterModal
+          onSubmit={handleSubmitFilter}
+          onClear={handleClearFilter}
+          initialValues={{
+            keywords,
+            pub_category: groupPubCategory,
+          }}>
+          <FieldTextInput
+            name="keywords"
+            id="keywords"
+            label="Tên món"
+            placeholder="Nhập tên món"
+            className={css.input}
+          />
+          <FieldMultipleSelect
+            className={css.input}
+            name="pub_category"
+            id="pub_category"
+            label="Phong cách ẩm thực"
+            placeholder="Phong cách ẩm thực"
+            options={CATEGORY_OPTIONS}
+          />
+        </IntegrationFilterModal>
         <div className={css.ctaButtons}>
           <NamedLink
             path={`/admin/partner/${restaurantId}/settings/food/create`}>
@@ -269,59 +271,6 @@ const ManagePartnerFoods = () => {
           isLoading={queryFoodsInProgress}
         />
       )}
-      <Modal
-        containerClassName={css.modal}
-        isOpen={isModalOpen}
-        handleClose={onClose}>
-        <FinalForm
-          onSubmit={handleSubmitFilter}
-          initialValues={{
-            keywords,
-            pub_category: groupPubCategory,
-          }}
-          render={(fieldRenderProps) => {
-            const { handleSubmit } = fieldRenderProps;
-            return (
-              <Form className={css.filterForm} onSubmit={handleSubmit}>
-                <FieldTextInput
-                  name="keywords"
-                  id="keywords"
-                  label="Tên món"
-                  placeholder="Nhập tên món"
-                  className={css.input}
-                />
-                <FieldMultipleSelect
-                  className={css.input}
-                  name="pub_category"
-                  id="pub_category"
-                  label="Phong cách ẩm thực"
-                  placeholder="Phong cách ẩm thực"
-                  options={CATEGORY_OPTIONS}
-                />
-                <div className={css.formButtons}>
-                  <Button
-                    onClick={handleClearFilter}
-                    type="button"
-                    className={css.leftButton}>
-                    <FormattedMessage id="ManagePartnerFoods.clearBtn" />
-                  </Button>
-                  <div className={css.rightButtons}>
-                    <Button
-                      onClick={onClose}
-                      type="button"
-                      className={css.discardButton}>
-                      <FormattedMessage id="ManagePartnerFoods.filterFormDiscardBtn" />
-                    </Button>
-                    <Button className={css.submitButton}>
-                      <FormattedMessage id="ManagePartnerFoods.filterFormBtn" />
-                    </Button>
-                  </div>
-                </div>
-              </Form>
-            );
-          }}
-        />
-      </Modal>
     </div>
   );
 };
