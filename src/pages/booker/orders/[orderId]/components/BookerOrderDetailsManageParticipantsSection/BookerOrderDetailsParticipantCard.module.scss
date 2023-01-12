@@ -15,10 +15,17 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 
     .avatar {
       width: 28px;
       height: 28px;
+    }
+
+    .checkIcon {
+      position: absolute;
+      top: 14px;
+      left: 14px;
     }
     margin-right: 12px;
   }

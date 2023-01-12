@@ -1,5 +1,6 @@
 import Collapsible from '@components/Collapsible/Collapsible';
 import Modal from '@components/Modal/Modal';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import AddParticipantForm from './AddParticipantForm';
@@ -20,12 +21,23 @@ const RawParticipants: React.FC<TRawParticipantsProps> = ({ participants }) => {
   return (
     <div className={css.rawParticipants}>
       {participants.map((number, index) => {
-        return (
+        const isSelectedFood = index % 3 === 0;
+
+        return isSelectedFood ? (
           <BookerOrderDetailsParticipantCard
             className={css.participantCard}
             onClickDeleteIcon={() => () => console.log(index)}
             key={index}
+            hasCheckIcon
           />
+        ) : (
+          <Tooltip tooltipContent={'Đã chọn món xong'} placement="topRight">
+            <BookerOrderDetailsParticipantCard
+              className={css.participantCard}
+              onClickDeleteIcon={() => () => console.log(index)}
+              key={index}
+            />
+          </Tooltip>
         );
       })}
     </div>
