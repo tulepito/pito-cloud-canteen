@@ -25,7 +25,7 @@ const IconCloseBadge = (props: TIconProps) => {
   );
 };
 
-const BadgeType = {
+export const BadgeType = {
   DEFAULT: 'default',
   PROCESSING: 'processing',
   ERROR: 'error',
@@ -39,6 +39,8 @@ type TBadge = {
   hasDotIcon?: boolean;
   onCloseIcon?: () => void;
   label: string;
+  containerClassName?: string;
+  labelClassName?: string;
 };
 
 const Badge = (props: TBadge) => {
@@ -48,9 +50,11 @@ const Badge = (props: TBadge) => {
     hasDotIcon,
     onCloseIcon,
     label,
+    containerClassName,
+    labelClassName,
   } = props;
 
-  const badgeContainerClassName = classNames(css.root, {
+  const badgeContainerClassName = classNames(css.root, containerClassName, {
     ...(type === BadgeType.DEFAULT ? { [css.default]: true } : {}),
     ...(type === BadgeType.PROCESSING ? { [css.processing]: true } : {}),
     ...(type === BadgeType.ERROR ? { [css.error]: true } : {}),
@@ -58,7 +62,7 @@ const Badge = (props: TBadge) => {
     ...(type === BadgeType.WARNING ? { [css.warning]: true } : {}),
   });
 
-  const labelClasses = classNames(css.label, {
+  const labelClasses = classNames(css.label, labelClassName, {
     ...(type === BadgeType.DEFAULT ? { [css.default]: true } : {}),
     ...(type === BadgeType.PROCESSING ? { [css.processing]: true } : {}),
     ...(type === BadgeType.ERROR ? { [css.error]: true } : {}),
@@ -85,7 +89,7 @@ const Badge = (props: TBadge) => {
     <div className={badgeContainerClassName}>
       <div className={css.badgeContent}>
         {hasDotIcon && <span className={badgeDotClasses}></span>}
-        <span className={labelClasses}>{label}</span>
+        <div className={labelClasses}>{label}</div>
       </div>
       {hasCloseIcon && (
         <div className={css.badgeClose} onClick={onCloseIcon}>

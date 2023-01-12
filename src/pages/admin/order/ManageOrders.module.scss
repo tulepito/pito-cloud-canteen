@@ -1,4 +1,5 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .filterForm {
   display: flex;
@@ -22,4 +23,28 @@
 
 .input {
   margin-bottom: 20px;
+}
+
+.boldText {
+  font-weight: $fontWeightBold;
+}
+
+.bodyCell:nth-child(3) {
+  @include viewportLarge {
+    max-width: 100px;
+  }
+}
+
+.remainText {
+  margin: 5px 0 0 0;
+  font-weight: $fontWeightBold;
+}
+
+.badge {
+  border-radius: 50px;
+  .badgeLabel {
+    min-width: 100px;
+    font-weight: $fontWeightBold;
+    text-align: center;
+  }
 }
