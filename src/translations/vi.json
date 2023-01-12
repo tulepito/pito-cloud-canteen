@@ -629,7 +629,6 @@
   "AdminSidebar.partnerDetailsLabel": "Thông tin đối tác",
   "AdminSidebar.editPartnerLabel": "Chỉnh sửa",
   "ManageOrdersPage.orderDetails": "Chi tiết",
-  "ManageOrdersPage.inProgressState": "Đang tiến hành",
   "AdminSidebar.partnerSettingLabel": "Cài đặt nhà hàng",
   "AdminSidebar.managePartnerFoodLabel": "Món ăn",
   "AdminSidebar.managePartnerMenuLabel": "Thực đơn",
@@ -675,5 +674,10 @@
   "EditPartnerFoodForm.categoryRequired": "Vui lòng nhập phong cách ẩm thực",
   "EditPartnerFoodForm.foodTypeRequired": "Vui lòng nhập loại món ăn",
   "EditPartnerFoodForm.specialDietsRequired": "Vui lòng nhập chế độ dinh dưỡng đặc biệt",
-  "EditPartnerFoodForm.priceRequired": "Vui lòng nhập đơn giá"
+  "EditPartnerFoodForm.priceRequired": "Vui lòng nhập đơn giá",
+  "ManageOrdersPage.inProgressState": "Mới tạo",
+  "IntegrationFilterModal.filterMessage": "Lọc",
+  "IntegrationFilterModal.filterFormBtn": "Tìm kiếm",
+  "IntegrationFilterModal.filterFormDiscardBtn": "Hủy",
+  "IntegrationFilterModal.clearBtn": "Xóa"
 }

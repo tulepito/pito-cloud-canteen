@@ -1,34 +1,28 @@
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
+import FieldMultipleSelect from '@components/FieldMutipleSelect/FieldMultipleSelect';
+import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
+import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
-import SelectSingleFilterPopup from '@components/SelectSingleFilterPopup/SelectSingleFilterPopup';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderAsyncAction } from '@redux/slices/Order.slice';
 import { adminRoutes } from '@src/paths';
-import { EOrderStates } from '@utils/enums';
+import { EOrderStates, ORDER_STATES_OPTIONS } from '@utils/enums';
 import type { TIntergrationOrderListing } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import type { TKeywordSearchFormValues } from '../partner/components/KeywordSearchForm/KeywordSearchForm';
-import KeywordSearchForm from '../partner/components/KeywordSearchForm/KeywordSearchForm';
 import css from './ManageOrders.module.scss';
 
 const parseTimestaimpToFormat = (date: number) => {
   return DateTime.fromMillis(date).toFormat('dd-MM-yyyy');
 };
-
-const ORDER_STATES = Object.keys(EOrderStates).map((key: string) => {
-  return {
-    key,
-    label: <FormattedMessage id={`ManageOrdersPage.${key}State`} />,
-  };
-});
 
 const TABLE_COLUMN: TColumn[] = [
   {
@@ -126,7 +120,6 @@ const parseEntitiesToTableData = (
 const ManageOrdersPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const intl = useIntl();
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page = 1, keywords = '', meta_state = '' } = router.query;
   const {
@@ -162,16 +155,29 @@ const ManageOrdersPage = () => {
     );
   }
 
+  const stateAsString = meta_state as string;
+
+  const groupStateString = stateAsString
+    ?.split(',')
+    .filter((item: string) => !!item);
+
   useEffect(() => {
     dispatch(OrderAsyncAction.queryOrders({ page, keywords }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
-  const onSubmitKeywordForm = (value: TKeywordSearchFormValues) => {
+  const onClearFilter = () => {
+    router.push({
+      pathname: adminRoutes.ManageOrders.path,
+      query: {},
+    });
+  };
+
+  const onSubmit = (values: TKeywordSearchFormValues) => {
     router.push({
       pathname: adminRoutes.ManageOrders.path,
       query: {
-        ...value,
+        ...values,
       },
     });
   };
@@ -182,20 +188,26 @@ const ManageOrdersPage = () => {
         <FormattedMessage id="ManageOrders.title" />
       </h1>
       <div className={css.filterForm}>
-        <KeywordSearchForm
-          onSubmit={onSubmitKeywordForm}
-          initialValues={{ keywords: keywords as string }}
-        />
-        <SelectSingleFilterPopup
-          className={css.singleFilter}
-          options={ORDER_STATES}
-          label={intl.formatMessage({ id: 'ManageCompanies.status' })}
-          queryParamNames="meta_state"
-          onSelect={onSubmitKeywordForm}
-          initialValues={{
-            meta_state: meta_state as string,
-          }}
-        />
+        <IntegrationFilterModal
+          onClear={onClearFilter}
+          initialValues={{ meta_state: groupStateString, keywords }}
+          onSubmit={onSubmit}>
+          <FieldTextInput
+            name="keywords"
+            id="keywords"
+            label="Mã đơn"
+            placeholder="Nhập mã đơn"
+            className={css.input}
+          />
+          <FieldMultipleSelect
+            className={css.input}
+            name="meta_state"
+            id="meta_state"
+            label="Trạng thái"
+            placeholder="Chọn trạng thái"
+            options={ORDER_STATES_OPTIONS}
+          />
+        </IntegrationFilterModal>
       </div>
       {content}
     </div>

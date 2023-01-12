@@ -451,3 +451,10 @@ export const FOOD_TYPE_OPTIONS = [
     label: 'Món mặn',
   },
 ];
+
+export const ORDER_STATES_OPTIONS = [
+  {
+    key: EOrderStates.inProgress,
+    label: 'Mới tạo',
+  },
+];
