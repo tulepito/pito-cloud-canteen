@@ -1,3 +1,4 @@
+import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { emailFormatValid } from '@utils/validators';
@@ -11,7 +12,9 @@ export type TAddParticipantFormValues = {
   email: string;
 };
 
-type TExtraProps = {};
+type TExtraProps = {
+  hasSubmitButton?: boolean;
+};
 type TAddParticipantFormComponentProps =
   FormRenderProps<TAddParticipantFormValues> & Partial<TExtraProps>;
 type TAddParticipantFormProps = FormProps<TAddParticipantFormValues> &
@@ -21,7 +24,7 @@ const AddParticipantFormComponent: React.FC<
   TAddParticipantFormComponentProps
 > = (props) => {
   const intl = useIntl();
-  const { handleSubmit } = props;
+  const { handleSubmit, hasSubmitButton } = props;
 
   return (
     <Form onSubmit={handleSubmit} className={css.formContainer}>
@@ -35,6 +38,11 @@ const AddParticipantFormComponent: React.FC<
           intl.formatMessage({ id: 'AddParticipantForm.email.invalid' }),
         )}
       />
+      {hasSubmitButton && (
+        <Button className={css.submitButton}>
+          {intl.formatMessage({ id: 'AddParticipantForm.submitButtonText' })}
+        </Button>
+      )}
     </Form>
   );
 };

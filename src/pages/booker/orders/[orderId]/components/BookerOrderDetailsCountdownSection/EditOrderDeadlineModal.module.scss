@@ -5,11 +5,11 @@
     overflow: unset;
 
     @include viewportMedium {
-      flex-basis: 480px;
+      flex-basis: 700px;
     }
 
     @include viewportLarge {
-      flex-basis: 480px;
+      flex-basis: 700px;
     }
   }
 }

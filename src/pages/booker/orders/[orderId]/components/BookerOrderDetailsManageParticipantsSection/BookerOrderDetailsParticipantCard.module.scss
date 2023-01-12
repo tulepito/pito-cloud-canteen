@@ -4,9 +4,18 @@
 .root {
   display: flex;
   align-items: center;
-  padding: 4px 0;
+  padding: 4px 12px;
+  border-radius: 8px;
+
+  &:hover {
+    background-color: $neutralGray3;
+  }
 
   .avatarContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     .avatar {
       width: 28px;
       height: 28px;

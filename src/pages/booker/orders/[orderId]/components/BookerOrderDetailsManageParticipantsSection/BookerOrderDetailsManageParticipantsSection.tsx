@@ -4,9 +4,10 @@ import classNames from 'classnames';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import BookerOrderDetailsParticipantCard from '../BookerOrderDetailsParticipantCard/BookerOrderDetailsParticipantCard';
 import AddParticipantForm from './AddParticipantForm';
 import css from './BookerOrderDetailsManageParticipantsSection.module.scss';
+import BookerOrderDetailsParticipantCard from './BookerOrderDetailsParticipantCard';
+import ManageParticipantsModal from './ManageParticipantsModal';
 
 type BookerOrderDetailsManageParticipantsSectionProps = {
   rootClassName?: string;
@@ -17,7 +18,10 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
   BookerOrderDetailsManageParticipantsSectionProps
 > = (props) => {
   const intl = useIntl();
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isDeleteParticipantModalOpen, setIsDeleteParticipantModalOpen] =
+    useState(false);
+  const [isManageParticipantsModalOpen, setIsManageParticipantsModalOpen] =
+    useState(false);
 
   const { rootClassName, className } = props;
   const rootClasses = classNames(rootClassName || css.root, className);
@@ -46,34 +50,31 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
     id: 'BookerOrderDetailsManageParticipantsSection.viewDetailText',
   });
 
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
-  };
-  const handleConfirmDeleteParticipant = () => {
-    setIsPopupOpen(false);
-  };
-  const handleCancelDeleteParticipant = () => {
-    setIsPopupOpen(false);
-  };
-
   const handleClickDeleteParticipant = (id: string) => () => {
     console.log('id', id);
-    setIsPopupOpen(true);
+    setIsDeleteParticipantModalOpen(true);
+  };
+  const handleCloseDeleteParticipantModal = () => {
+    setIsDeleteParticipantModalOpen(false);
+  };
+  const handleConfirmDeleteParticipant = () => {
+    setIsDeleteParticipantModalOpen(false);
+  };
+  const handleCancelDeleteParticipant = () => {
+    setIsDeleteParticipantModalOpen(false);
+  };
+
+  const handleClickViewMoreParticipants = () => {
+    setIsManageParticipantsModalOpen(true);
+  };
+  const handleCloseManageParticipantModal = () => {
+    setIsManageParticipantsModalOpen(false);
   };
 
   return (
     <div className={rootClasses}>
       <div>{sectionTitle}</div>
-      <AlertModal
-        title={deleteParticipantPopupTitle}
-        isOpen={isPopupOpen}
-        handleClose={handleClosePopup}
-        cancelLabel={cancelDeleteParticipantText}
-        confirmLabel={confirmDeleteParticipantText}
-        onCancel={handleCancelDeleteParticipant}
-        onConfirm={handleConfirmDeleteParticipant}>
-        <div>{deleteParticipantPopupQuestion}</div>
-      </AlertModal>
+
       <AddParticipantForm onSubmit={() => {}} />
       <div className={css.participantContainer}>
         <BookerOrderDetailsParticipantCard
@@ -86,9 +87,28 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
           onClickDeleteIcon={handleClickDeleteParticipant}
         />
       </div>
-      <Button variant="inline" className={css.viewDetailBtn}>
+      <Button
+        variant="inline"
+        className={css.viewDetailBtn}
+        onClick={handleClickViewMoreParticipants}>
         {viewDetailText}
       </Button>
+
+      <AlertModal
+        title={deleteParticipantPopupTitle}
+        isOpen={isDeleteParticipantModalOpen}
+        handleClose={handleCloseDeleteParticipantModal}
+        cancelLabel={cancelDeleteParticipantText}
+        confirmLabel={confirmDeleteParticipantText}
+        onCancel={handleCancelDeleteParticipant}
+        onConfirm={handleConfirmDeleteParticipant}>
+        <div>{deleteParticipantPopupQuestion}</div>
+      </AlertModal>
+
+      <ManageParticipantsModal
+        isOpen={isManageParticipantsModalOpen}
+        onClose={handleCloseManageParticipantModal}
+      />
     </div>
   );
 };
