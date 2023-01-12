@@ -11,6 +11,7 @@ import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { updateDraftMealPlan } from '@redux/slices/Order.slice';
+import { renderDateRange } from '@utils/dates';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
@@ -52,21 +53,6 @@ const renderResourcesForCalendar = (orderDetail: Record<string, any>) => {
   });
 
   return resources;
-};
-
-const renderDateRange = (
-  startDate = new Date().getTime(),
-  endDate = new Date().getTime(),
-) => {
-  const result = [];
-  let currentDate = new Date(startDate).getTime();
-
-  while (currentDate <= endDate) {
-    result.push(currentDate);
-    currentDate = DateTime.fromMillis(currentDate).plus({ day: 1 }).toMillis();
-  }
-
-  return result;
 };
 
 const findSuitableStartDate = ({
