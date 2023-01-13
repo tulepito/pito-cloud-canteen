@@ -18,6 +18,8 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
+import { getTableDataForExport, makeCsv } from '@utils/csv';
+import { parseTimestaimpToFormat } from '@utils/dates';
 import {
   CATEGORY_OPTIONS,
   FOOD_TYPE_OPTIONS,
@@ -148,11 +150,38 @@ const parseEntitiesToTableData = (
   });
 };
 
+const parseEntitiesToExportCsv = (
+  foods: TIntergrationFoodListing[],
+  ids: string[],
+) => {
+  return foods
+    .filter((food) => ids.includes(food.id.uuid))
+    .map((food) => {
+      return {
+        title: food.attributes.title,
+        description: food.attributes.description,
+        id: food.id.uuid,
+        menuType: getLabelByKey(
+          MENU_OPTIONS,
+          food.attributes.publicData.menuType,
+        ),
+        category: getLabelByKey(
+          CATEGORY_OPTIONS,
+          food.attributes.publicData.category,
+        ),
+        foodType: getLabelByKey(
+          FOOD_TYPE_OPTIONS,
+          food.attributes.publicData.foodType,
+        ),
+      };
+    });
+};
+
 const ManagePartnerFoods = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const [idsToRemove, setIdsToRemove] = useState<string[]>([]);
+  const [idsToAction, setIdsToAction] = useState<string[]>([]);
   const [foodToRemove, setFoodToRemove] = useState<any>(null);
 
   const {
@@ -175,7 +204,7 @@ const ManagePartnerFoods = () => {
 
   const getExposeValues = ({ values }: any) => {
     const { rowCheckbox = [] } = values || {};
-    setIdsToRemove(rowCheckbox);
+    setIdsToAction(rowCheckbox);
   };
 
   const handleSubmitFilter = ({ pub_category = [], keywords }: any) => {
@@ -219,7 +248,7 @@ const ManagePartnerFoods = () => {
 
   const removeCheckedFoods = async () => {
     const { error } = (await dispatch(
-      foodSliceThunks.removePartnerFood({ ids: idsToRemove }),
+      foodSliceThunks.removePartnerFood({ ids: idsToAction }),
     )) as any;
     if (!error) {
       dispatch(
@@ -299,7 +328,7 @@ const ManagePartnerFoods = () => {
           <InlineTextButton
             inProgress={removeFoodInProgress}
             onClick={openRemoveCheckedModal}
-            disabled={idsToRemove.length === 0 || removeFoodInProgress}
+            disabled={idsToAction.length === 0 || removeFoodInProgress}
             className={css.removeButton}>
             <IconDelete className={css.buttonIcon} />
             Xóa món
@@ -309,7 +338,16 @@ const ManagePartnerFoods = () => {
             Tải món ăn
           </Button>
           <Button
-            disabled={idsToRemove.length === 0}
+            onClick={() =>
+              makeCsv(
+                getTableDataForExport(
+                  parseEntitiesToExportCsv(foods, idsToAction),
+                  TABLE_COLUMN,
+                ),
+                `${parseTimestaimpToFormat(new Date().getTime())}_donhang.csv`,
+              )
+            }
+            disabled={idsToAction.length === 0}
             className={css.lightButton}>
             <IconPrint className={css.buttonIcon} />
             In danh sách món ăn
@@ -361,7 +399,7 @@ const ManagePartnerFoods = () => {
                   {removeCheckedModalOpen ? (
                     <FormattedMessage
                       id="ManagePartnerFoods.foodLength"
-                      values={{ foodLength: idsToRemove.length }}
+                      values={{ foodLength: idsToAction.length }}
                     />
                   ) : (
                     foodToRemove?.title

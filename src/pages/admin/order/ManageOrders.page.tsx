@@ -11,6 +11,7 @@ import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderAsyncAction } from '@redux/slices/Order.slice';
 import { adminRoutes } from '@src/paths';
+import { parseTimestaimpToFormat } from '@utils/dates';
 import {
   EOrderStates,
   getLabelByKey,
@@ -20,17 +21,12 @@ import type {
   TIntergrationOrderListing,
   TReverseMapFromEnum,
 } from '@utils/types';
-import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import css from './ManageOrders.module.scss';
-
-const parseTimestaimpToFormat = (date: number) => {
-  return DateTime.fromMillis(date).toFormat('dd/MM/yyyy');
-};
 
 const ORDER_STATE_BAGDE_TYPE: Record<
   TReverseMapFromEnum<typeof EOrderStates>,

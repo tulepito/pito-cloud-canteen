@@ -1,5 +1,5 @@
 import jstz from 'jstimezonedetect';
-import type { DateTime } from 'luxon';
+import { DateTime } from 'luxon';
 
 /**
  * Check if the browser's DateTimeFormat API supports time zones.
@@ -97,4 +97,8 @@ export const weekDayFormatFromDateTime = (dateTime: DateTime) => {
   }
 
   return formattedWeekDay;
+};
+
+export const parseTimestaimpToFormat = (date: number) => {
+  return DateTime.fromMillis(date).toFormat('dd/MM/yyyy');
 };
