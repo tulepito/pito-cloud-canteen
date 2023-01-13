@@ -32,6 +32,14 @@
             border-top-right-radius: 8px;
             border-bottom-right-radius: 8px;
           }
+          .headCellLabel {
+            display: inline-flex;
+            align-items: center;
+            .sortIcon {
+              margin-left: 5px;
+              cursor: pointer;
+            }
+          }
         }
       }
     }

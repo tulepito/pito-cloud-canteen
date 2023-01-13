@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import Form from '@components/Form/Form';
+import IconSort from '@components/Icons/IconSort/IconSort';
 import Pagination from '@components/Pagination/Pagination';
 import type { TPagination } from '@utils/types';
 import classNames from 'classnames';
@@ -17,6 +18,7 @@ export type TColumn = {
   label: string | ReactNode;
   render: (data: any, index?: number) => ReactNode;
   renderSearch?: () => ReactNode;
+  sortable?: boolean;
 };
 
 export type TRowData = {
@@ -49,6 +51,8 @@ type TTable = {
   form?: FormApi;
   values?: any;
   exposeValues?: (e: any) => void;
+  handleSort?: (columnName: string | number) => void;
+  sortValue?: { columnName: string | number; type: 'asc' | 'desc' };
 };
 
 const getUniqueString = (list: string[]) => {
@@ -76,6 +80,8 @@ const Table = (props: TTable) => {
     hasCheckbox,
     form,
     values,
+    handleSort,
+    sortValue,
   } = props;
 
   const tableClasses = classNames(css.table, tableClassName);
@@ -118,6 +124,11 @@ const Table = (props: TTable) => {
     }
     form?.change(name, newValues);
   };
+  const sortData = (key: string | number) => () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    handleSort && handleSort(key);
+  };
+
   return (
     <>
       <table className={tableClasses}>
@@ -139,7 +150,20 @@ const Table = (props: TTable) => {
               <td
                 className={classNames(tableHeadCellClassName, css.headCell)}
                 key={col.key}>
-                {col.label}
+                <div className={css.headCellLabel}>
+                  {col.label}
+                  {col.sortable && (
+                    <IconSort
+                      onClick={sortData(col.key)}
+                      className={css.sortIcon}
+                      type={
+                        col.key === sortValue?.columnName
+                          ? sortValue?.type
+                          : undefined
+                      }
+                    />
+                  )}
+                </div>
               </td>
             ))}
           </tr>
