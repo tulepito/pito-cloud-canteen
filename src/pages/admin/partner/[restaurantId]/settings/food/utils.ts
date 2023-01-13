@@ -25,6 +25,7 @@ export type TEditPartnerFoodFormValues = {
   description: string;
   notes: string;
   restaurantId?: string;
+  unit?: string;
 };
 
 export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {

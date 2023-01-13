@@ -104,3 +104,22 @@
     }
   }
 }
+
+.titleFields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  @include viewportMedium {
+    flex-direction: row;
+  }
+}
+
+.titleField {
+  flex: 1;
+}
+
+.unitField {
+  @include viewportMedium {
+    width: 110px;
+  }
+}

@@ -27,6 +27,7 @@ import {
   MENU_OPTIONS,
 } from '@utils/enums';
 import type { TIntergrationFoodListing } from '@utils/types';
+import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -43,9 +44,12 @@ const TABLE_COLUMN: TColumn[] = [
         return <div className={css.deletedFood}>Deleted food</div>;
       }
       return (
-        <div className={css.idRow} title={data.id}>
+        <NamedLink
+          path={`/admin/partner/${data.restaurantId}/settings/food/${data.id}`}
+          className={css.idRow}
+          title={data.id}>
           {data.id}
-        </div>
+        </NamedLink>
       );
     },
   },
@@ -330,8 +334,19 @@ const ManagePartnerFoods = () => {
             onClick={openRemoveCheckedModal}
             disabled={idsToAction.length === 0 || removeFoodInProgress}
             className={css.removeButton}>
-            <IconDelete className={css.buttonIcon} />
-            Xóa món
+            <IconDelete
+              className={classNames(css.buttonIcon, {
+                [css.disabled]:
+                  idsToAction.length === 0 || removeFoodInProgress,
+              })}
+            />
+            <div
+              className={classNames({
+                [css.disabled]:
+                  idsToAction.length === 0 || removeFoodInProgress,
+              })}>
+              Xóa món
+            </div>
           </InlineTextButton>
           <Button className={css.lightButton}>
             <IconUploadFile className={css.buttonIcon} />
@@ -349,10 +364,20 @@ const ManagePartnerFoods = () => {
             }
             disabled={idsToAction.length === 0}
             className={css.lightButton}>
-            <IconPrint className={css.buttonIcon} />
-            In danh sách món ăn
+            <IconPrint
+              className={classNames(css.buttonIcon, {
+                [css.disabled]: idsToAction.length === 0,
+              })}
+            />
+            <div
+              className={classNames({
+                [css.disabled]: idsToAction.length === 0,
+              })}>
+              In danh sách món ăn
+            </div>
           </Button>
           <NamedLink
+            className={css.link}
             path={`/admin/partner/${restaurantId}/settings/food/create`}>
             <Button className={css.addButton}>Thêm món ăn</Button>
           </NamedLink>

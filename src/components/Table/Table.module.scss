@@ -21,7 +21,7 @@
         .headCell {
           padding: 14px 10px 14px 20px;
           text-align: left;
-          color: $neutralGray5;
+          color: $neutralGray6;
           font-weight: $fontWeightBold;
           font-size: 14px;
           &:first-child {
@@ -84,7 +84,7 @@
           align-items: center;
           text-align: right;
           padding: 14px 0 14px 20px;
-          color: #616161;
+          color: $neutralGray6;
           border-bottom: 1px solid $matterColorNegative;
           position: relative;
           font-size: 14px;

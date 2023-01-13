@@ -682,5 +682,8 @@
   "IntegrationFilterModal.clearBtn": "Xóa bộ lọc",
   "ManagePartnerFoods.removeTitle": "Xóa món ăn",
   "ManagePartnerFoods.removeContent": "Bạn có chắc chắn muốn xóa {foodName} không?",
-  "ManagePartnerFoods.foodLength": "{foodLength} món ăn"
+  "ManagePartnerFoods.foodLength": "{foodLength} món ăn",
+  "EditPartnerFoodForm.unitPlaceholder": "Nhập",
+  "EditPartnerFoodForm.unitLabel": "Đơn vị tính",
+  "EditPartnerFoodForm.unitRequired": "Vui lòng nhập đơn vị tính"
 }

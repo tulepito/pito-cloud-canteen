@@ -197,20 +197,36 @@ const EditPartnerFoodFormComponent: React.FC<
         />
       </div>
       <div className={css.flexField}>
-        <FieldTextInput
-          className={css.field}
-          name="title"
-          id="title"
-          placeholder={intl.formatMessage({
-            id: 'EditPartnerFoodForm.foodTitlePlaceholder',
-          })}
-          label={intl.formatMessage({
-            id: 'EditPartnerFoodForm.foodTitleLabel',
-          })}
-          validate={required(
-            intl.formatMessage({ id: 'EditPartnerFoodForm.titleRequired' }),
-          )}
-        />
+        <div className={classNames(css.field, css.titleFields)}>
+          <FieldTextInput
+            name="title"
+            className={css.titleField}
+            id="title"
+            placeholder={intl.formatMessage({
+              id: 'EditPartnerFoodForm.foodTitlePlaceholder',
+            })}
+            label={intl.formatMessage({
+              id: 'EditPartnerFoodForm.foodTitleLabel',
+            })}
+            validate={required(
+              intl.formatMessage({ id: 'EditPartnerFoodForm.titleRequired' }),
+            )}
+          />
+          <FieldTextInput
+            className={css.unitField}
+            name="unit"
+            id="unit"
+            placeholder={intl.formatMessage({
+              id: 'EditPartnerFoodForm.unitPlaceholder',
+            })}
+            label={intl.formatMessage({
+              id: 'EditPartnerFoodForm.unitLabel',
+            })}
+            validate={required(
+              intl.formatMessage({ id: 'EditPartnerFoodForm.unitRequired' }),
+            )}
+          />
+        </div>
         <FieldSelect
           className={css.field}
           name="category"

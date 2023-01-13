@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .title {
   font-weight: $fontWeightRegular;
@@ -11,7 +12,8 @@
 }
 
 .idRow {
-  max-width: 150px;
+  width: 150px;
+  word-break: break-all;
   font-weight: $fontWeightBold;
   color: $secondaryBlue6;
 }
@@ -22,6 +24,8 @@
 
 .secondaryButton {
   @include buttonColorSecondary;
+  background-color: $neutralGray2;
+
   &:focus,
   &:hover {
     background-color: $neutralGray3;
@@ -41,14 +45,24 @@
 }
 
 .tableActions {
-  margin: 20px 0 40px 0;
   display: flex;
-  justify-content: space-between;
+  margin: 20px 0 40px 0;
+  flex-direction: column;
+  row-gap: 40px;
+  @include viewportLarge {
+    flex-direction: row;
+    justify-content: space-between;
+  }
 }
 
 .ctaButtons {
   display: flex;
+  flex-direction: column;
   gap: 16px;
+
+  @include viewportLarge {
+    flex-direction: row;
+  }
 }
 
 .addButton {
@@ -113,14 +127,6 @@
   stroke: $neutralGray5;
 }
 
-.removeButton {
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: $neutralGray6;
-}
-
 .buttonIcon {
   margin-right: 12px;
 }
@@ -151,4 +157,29 @@
   font-size: 14px;
   font-weight: $fontWeightRegular;
   color: $neutralGray5;
+}
+
+.removeButton {
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $neutralGray6;
+  font-weight: $fontWeightBold;
+}
+
+.disabled {
+  color: $neutralGray5;
+  path {
+    fill: $neutralGray5;
+  }
+}
+
+.link {
+  button {
+    width: 100%;
+    @include viewportLarge {
+      width: unset;
+    }
+  }
 }

@@ -21,8 +21,8 @@ const IconUploadFile = (props: TIconProps) => {
         width="18"
         height="12">
         <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
+          fillRule="evenodd"
+          clipRule="evenodd"
           d="M1.66699 7.32812H18.3333V18.7815H1.66699V7.32812Z"
           fill="white"
         />
