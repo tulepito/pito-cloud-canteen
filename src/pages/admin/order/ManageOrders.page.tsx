@@ -32,13 +32,7 @@ const parseTimestaimpToFormat = (date: number) => {
   return DateTime.fromMillis(date).toFormat('dd/MM/yyyy');
 };
 
-const ORDER_STATE_BAGDE_TYPE: Record<
-  TReverseMapFromEnum<typeof EOrderStates>,
-  | typeof BadgeType.PROCESSING
-  | typeof BadgeType.DEFAULT
-  | typeof BadgeType.SUCCESS
-  | typeof BadgeType.WARNING
-> = {
+const ORDER_STATE_BAGDE_TYPE = {
   [EOrderStates.inProgress]: BadgeType.PROCESSING,
   [EOrderStates.isNew]: BadgeType.PROCESSING,
   [EOrderStates.cancel]: BadgeType.DEFAULT,
@@ -63,8 +57,12 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'orderName',
     label: 'Tên đơn hàng',
-    render: ({ title }: any) => {
-      return <div>Pito Cloud Canteen - #{title}</div>;
+    render: ({ companyName, startDate, endDate }: any) => {
+      return (
+        <div className={css.orderName}>
+          {companyName}_PCC_{startDate} - {endDate}
+        </div>
+      );
     },
   },
   {
@@ -131,7 +129,7 @@ const TABLE_COLUMN: TColumn[] = [
         <Badge
           containerClassName={css.badge}
           labelClassName={css.badgeLabel}
-          type={ORDER_STATE_BAGDE_TYPE[state] || BadgeType.DEFAULT}
+          type={(ORDER_STATE_BAGDE_TYPE[state] as any) || BadgeType.DEFAULT}
           label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
         />
       );
