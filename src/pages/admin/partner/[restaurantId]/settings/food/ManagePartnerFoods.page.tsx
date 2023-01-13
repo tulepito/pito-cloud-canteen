@@ -187,6 +187,13 @@ const ManagePartnerFoods = () => {
 
   const [idsToAction, setIdsToAction] = useState<string[]>([]);
   const [foodToRemove, setFoodToRemove] = useState<any>(null);
+  const [file, setFile] = useState<File>();
+
+  const {
+    value: isImportModalOpen,
+    setTrue: openImportModal,
+    setFalse: closeImportModal,
+  } = useBoolean(false);
 
   const {
     value: removeCheckedModalOpen,
@@ -348,9 +355,9 @@ const ManagePartnerFoods = () => {
               Xóa món
             </div>
           </InlineTextButton>
-          <Button className={css.lightButton}>
+          <Button onClick={openImportModal} className={css.lightButton}>
             <IconUploadFile className={css.buttonIcon} />
-            Tải món ăn
+            Tải món
           </Button>
           <Button
             onClick={() =>
@@ -395,6 +402,39 @@ const ManagePartnerFoods = () => {
           exposeValues={getExposeValues}
         />
       )}
+      <AlertModal
+        isOpen={isImportModalOpen}
+        handleClose={closeImportModal}
+        confirmLabel="Nhập"
+        onCancel={closeImportModal}
+        onConfirm={() => {}}
+        cancelLabel="Hủy">
+        <h2 className={css.importTitle}>
+          <FormattedMessage id="ManagePartnerFoods.importTitle" />
+        </h2>
+        <div className={css.inputWrapper}>
+          <input
+            accept=".csv"
+            onChange={({ target }) => setFile(target?.files?.[0])}
+            type="file"
+            className={css.inputFile}
+            name="file"
+            id="file"
+          />
+          <label className={css.importLabel}>
+            <FormattedMessage id="ManagePartnerFoods.importLabel" />
+          </label>
+          <label htmlFor="file">
+            <div className={css.fileLabel}>
+              {file ? (
+                file.name
+              ) : (
+                <FormattedMessage id="ManagePartnerFoods.inputFile" />
+              )}
+            </div>
+          </label>
+        </div>
+      </AlertModal>
       <AlertModal
         isOpen={foodToRemove || removeCheckedModalOpen}
         handleClose={

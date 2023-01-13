@@ -183,3 +183,25 @@
     }
   }
 }
+
+.inputFile {
+  display: none;
+}
+
+.fileLabel {
+  width: 100%;
+  min-height: 200px;
+  border: 1px dashed $neutralGray5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.importTitle {
+  color: $neutralGray6;
+  margin: 0 0 30px 0;
+}
+
+.importLabel {
+  margin-bottom: 20px;
+}

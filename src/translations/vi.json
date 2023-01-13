@@ -685,5 +685,8 @@
   "ManagePartnerFoods.foodLength": "{foodLength} món ăn",
   "EditPartnerFoodForm.unitPlaceholder": "Nhập",
   "EditPartnerFoodForm.unitLabel": "Đơn vị tính",
-  "EditPartnerFoodForm.unitRequired": "Vui lòng nhập đơn vị tính"
+  "EditPartnerFoodForm.unitRequired": "Vui lòng nhập đơn vị tính",
+  "ManagePartnerFoods.inputFile": "Click chọn file hoặc kéo thả",
+  "ManagePartnerFoods.importLabel": "Import file",
+  "ManagePartnerFoods.importTitle": "Import món"
 }

@@ -39,6 +39,9 @@ type TFoodSliceState = {
 
   removeFoodInProgress: boolean;
   removeFoodError: any;
+
+  createPartnerFoodFromCsvInProgress: boolean;
+  creataPartnerFoodFromCsvError: any;
 };
 
 const initialState: TFoodSliceState = {
@@ -69,6 +72,9 @@ const initialState: TFoodSliceState = {
   // remove food
   removeFoodInProgress: false,
   removeFoodError: null,
+
+  createPartnerFoodFromCsvInProgress: false,
+  creataPartnerFoodFromCsvError: null,
 };
 
 // ================ Thunk types ================ //
@@ -88,6 +94,8 @@ const REMOVE_PARTNER_FOOD_LISTING =
 
 const SHOW_DUPLICATE_FOOD = 'app/ManageFoodsPage/SHOW_DUPLICATE_FOOD';
 const DUPLICATE_FOOD = 'app/ManageFoodsPage/DUPLICATE_FOOD';
+
+const CREATE_FOOD_FROM_FILE = 'app/ManageFoodsPage/CREATE_FOOD_FROM_FILE';
 
 // ================ Async thunks ================ //
 
@@ -213,6 +221,13 @@ const updatePartnerFoodListing = createAsyncThunk(
       console.error(`${UPDATE_PARTNER_FOOD_LISTING} error: `, error);
       return rejectWithValue(storableError(error));
     }
+  },
+);
+
+const creataPartnerFoodFromCsv = createAsyncThunk(
+  CREATE_FOOD_FROM_FILE,
+  async (payload) => {
+    console.log(payload);
   },
 );
 
@@ -460,6 +475,11 @@ const foodSlice = createSlice({
         ...state,
         createFoodInProgress: false,
         createFoodError: payload,
+      }))
+      .addCase(creataPartnerFoodFromCsv.pending, (state) => ({
+        ...state,
+        createPartnerFoodFromCsvInProgress: true,
+        createPartnerFoodFromCsvError: null,
       }));
   },
 });
