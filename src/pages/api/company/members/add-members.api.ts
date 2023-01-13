@@ -27,17 +27,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const newParticipantMembers = await Promise.all(
       userIdList.map(async (userId: string) => {
         const userAccount = await fetchUser(userId);
-        const { company: userCompany = {}, companyList: userCompanyList = [] } =
+        const { companyList: userCompanyList = [] } =
           USER(userAccount).getMetadata();
         await integrationSdk.users.updateProfile({
           id: userId,
           metadata: {
-            company: {
-              ...userCompany,
-              [companyId]: {
-                permission: UserPermission.PARTICIPANT,
-              },
-            },
             companyList: [...userCompanyList, companyId],
           },
         });
