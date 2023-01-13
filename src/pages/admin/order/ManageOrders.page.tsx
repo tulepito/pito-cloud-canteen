@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import Badge, { BadgeType } from '@components/Badge/Badge';
+import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldMultipleSelect from '@components/FieldMutipleSelect/FieldMultipleSelect';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
@@ -22,7 +23,7 @@ import type {
 } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -30,6 +31,12 @@ import css from './ManageOrders.module.scss';
 
 const parseTimestaimpToFormat = (date: number) => {
   return DateTime.fromMillis(date).toFormat('dd/MM/yyyy');
+};
+
+const uniqueStrings = (array: string[]) => {
+  return array.filter((item, pos) => {
+    return array.indexOf(item) === pos;
+  });
 };
 
 const ORDER_STATE_BAGDE_TYPE = {
@@ -45,7 +52,7 @@ const ORDER_STATE_BAGDE_TYPE = {
 const TABLE_COLUMN: TColumn[] = [
   {
     key: 'title',
-    label: 'Đơn hàng',
+    label: 'ID',
     render: (data: any) => {
       return (
         <NamedLink path={`${adminRoutes.ManageOrders.path}/${data.id}`}>
@@ -53,6 +60,7 @@ const TABLE_COLUMN: TColumn[] = [
         </NamedLink>
       );
     },
+    sortable: true,
   },
   {
     key: 'orderName',
@@ -69,7 +77,7 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'address',
     label: 'Địa điểm giao hàng',
     render: (data: any) => {
-      return <div>{data.location}</div>;
+      return <div className={css.locationRow}>{data.location}</div>;
     },
   },
   {
@@ -80,7 +88,7 @@ const TABLE_COLUMN: TColumn[] = [
     },
   },
   {
-    key: 'dates',
+    key: 'startDate',
     label: 'Thời gian',
     render: (data: any) => {
       return (
@@ -89,9 +97,10 @@ const TABLE_COLUMN: TColumn[] = [
         </div>
       );
     },
+    sortable: true,
   },
   {
-    key: 'dates',
+    key: 'restaurantName',
     label: 'Đối tác',
     render: ({ restaurants = [] }: any) => {
       const { length } = restaurants;
@@ -115,8 +124,16 @@ const TABLE_COLUMN: TColumn[] = [
     render: (data: any) => {
       return <div>{data.staffName}</div>;
     },
+    sortable: true,
   },
-
+  {
+    key: 'shipperName',
+    label: 'Nhân viên giao hàng',
+    render: (data: any) => {
+      return <div>{data.shipperName}</div>;
+    },
+    sortable: true,
+  },
   {
     key: 'state',
     label: 'Trạng thái',
@@ -134,6 +151,7 @@ const TABLE_COLUMN: TColumn[] = [
         />
       );
     },
+    sortable: true,
   },
   {
     key: 'isPaid',
@@ -175,13 +193,41 @@ const parseEntitiesToTableData = (
           entity?.attributes?.metadata?.generalInfo?.endDate,
         ),
         staffName: entity?.attributes?.metadata?.generalInfo?.staffName,
-        state: entity.attributes.metadata?.state || EOrderStates.inProgress,
+        state: entity.attributes.metadata?.orderState || EOrderStates.isNew,
         orderId: entity?.id?.uuid,
-        restaurants: Object.keys(orderDetail).map((key) => {
-          return orderDetail[key]?.restaurant?.restaurantName;
-        }),
+        restaurants: uniqueStrings(
+          Object.keys(orderDetail).map((key) => {
+            return orderDetail[key]?.restaurant?.restaurantName;
+          }),
+        ),
       },
     };
+  });
+};
+
+type TSortValue = {
+  columnName: string | number;
+  type: 'asc' | 'desc';
+};
+
+const sortOrders = ({ columnName, type }: TSortValue, data: any) => {
+  const isAsc = type === 'asc';
+  // eslint-disable-next-line array-callback-return
+  return data.sort((a: any, b: any) => {
+    if (typeof a.data[columnName] === 'number') {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      isAsc
+        ? b.data[columnName] - a.data[columnName]
+        : a.data[columnName] - b.data[columnName];
+    } else if (typeof a.data[columnName] === 'string') {
+      if (a.data[columnName] < b.data[columnName]) {
+        return isAsc ? -1 : 1;
+      }
+      if (a.data[columnName] > b.data[columnName]) {
+        return isAsc ? 1 : -1;
+      }
+      return 0;
+    }
   });
 };
 
@@ -190,6 +236,7 @@ const ManageOrdersPage = () => {
   const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page = 1, keywords = '', meta_state = '' } = router.query;
+  const [sortValue, setSortValue] = useState<TSortValue>();
   const {
     queryOrderInProgress,
     queryOrderError,
@@ -198,6 +245,15 @@ const ManageOrdersPage = () => {
   } = useAppSelector((state) => state.Order, shallowEqual);
 
   const dataTable = parseEntitiesToTableData(orders, Number(page));
+
+  const sortedData = sortValue ? sortOrders(sortValue, dataTable) : dataTable;
+
+  const handleSort = (columnName: string | number) => {
+    setSortValue({
+      columnName,
+      type: sortValue?.type === 'asc' ? 'desc' : 'asc',
+    });
+  };
 
   let content;
   if (queryOrderInProgress) {
@@ -209,10 +265,12 @@ const ManageOrdersPage = () => {
       <>
         <TableForm
           columns={TABLE_COLUMN}
-          data={dataTable}
+          data={sortedData}
           pagination={manageOrdersPagination}
           paginationPath={adminRoutes.ManageOrders.path}
           tableBodyCellClassName={css.bodyCell}
+          handleSort={handleSort}
+          sortValue={sortValue}
         />
       </>
     );
@@ -278,6 +336,9 @@ const ManageOrdersPage = () => {
             options={ORDER_STATES_OPTIONS}
           />
         </IntegrationFilterModal>
+        <NamedLink path={adminRoutes.CreateOrder.path}>
+          <Button>Tạo đơn</Button>
+        </NamedLink>
       </div>
       {content}
     </div>

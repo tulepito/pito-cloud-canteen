@@ -22,6 +22,14 @@
           color: $neutralGray5;
           font-weight: $fontWeightBold;
           font-size: 14px;
+          .headCellLabel {
+            display: inline-flex;
+            align-items: center;
+            .sortIcon {
+              margin-left: 5px;
+              cursor: pointer;
+            }
+          }
         }
       }
     }
