@@ -61,6 +61,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       [userEmail]: {
         ...userMember,
         inviteStatus: UserInviteStatus.ACCEPTED,
+        id: userId,
       },
     };
     await integrationSdk.users.updateProfile({

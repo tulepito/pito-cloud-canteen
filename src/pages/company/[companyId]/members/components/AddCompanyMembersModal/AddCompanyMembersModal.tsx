@@ -62,6 +62,7 @@ const AddCompanyMembersModal: React.FC<CreateGroupModalProps> = (props) => {
     dispatch(companyMemberThunks.checkEmailExisted(value));
   };
   const onAddMembersSubmit = () => {
+    dispatch(resetCheckedEmailInputChunk());
     const noAccountEmailList = loadedResult
       .filter((_result) => _result.response.statusCode)
       .map((_result) => _result.email);
@@ -71,10 +72,9 @@ const AddCompanyMembersModal: React.FC<CreateGroupModalProps> = (props) => {
     dispatch(
       companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
     ).then(() => {
-      onClose();
       setEmailList([]);
       setLoadedResult([]);
-      dispatch(resetCheckedEmailInputChunk());
+      onClose();
     });
   };
 

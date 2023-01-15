@@ -8,8 +8,8 @@ import type {
 } from 'aws-sdk/clients/ses';
 
 const credential = new AWS.Config({
-  accessKeyId: `${process.env.AWS_SES_SECRET_ACCESS_KEY}`,
-  secretAccessKey: `${process.env.AWS_SES_ACCESS_KEY_ID}`,
+  accessKeyId: `${process.env.AWS_SES_ACCESS_KEY_ID}`,
+  secretAccessKey: `${process.env.AWS_SES_SECRET_ACCESS_KEY}`,
   region: `${process.env.AWS_SES_REGION}`,
 });
 

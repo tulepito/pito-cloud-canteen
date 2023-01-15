@@ -51,6 +51,8 @@ const CompanyInvitationPage = () => {
     }
   }, [companyId, currentUser, dispatch, isReady]);
 
+  useEffect(() => {}, [responseToInvitationResult]);
+
   const onResponseInvitation = (response: 'accept' | 'decline') => () => {
     dispatch(
       companyInvitationThunks.responseToInvitation({
@@ -64,18 +66,30 @@ const CompanyInvitationPage = () => {
     router.push(generalPaths.Home);
   };
 
-  if (checkInvitationResult === 'invitationExpired')
+  if (
+    !responseToInvitationResult &&
+    checkInvitationResult === 'invitationExpired'
+  )
     return <InvitationNotiModal status="expire" goToHomePage={goToHomePage} />;
 
-  if (checkInvitationResult === 'invalidInvitaion') {
+  if (
+    !responseToInvitationResult &&
+    checkInvitationResult === 'invalidInvitaion'
+  ) {
     return <InvitationNotiModal status="invalid" goToHomePage={goToHomePage} />;
   }
 
-  if (checkInvitationResult === 'invitationDeclinedBefore') {
+  if (
+    !responseToInvitationResult &&
+    checkInvitationResult === 'invitationDeclinedBefore'
+  ) {
     return <InvitationNotiModal status="decline" goToHomePage={goToHomePage} />;
   }
 
-  if (checkInvitationResult === 'redirectToCalendar') {
+  if (
+    !responseToInvitationResult &&
+    checkInvitationResult === 'redirectToCalendar'
+  ) {
     return <RedirectLink pathname={generalPaths.Home} />;
   }
 

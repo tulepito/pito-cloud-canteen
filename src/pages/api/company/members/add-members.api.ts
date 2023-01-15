@@ -1,3 +1,4 @@
+import { createEmailParams, sendEmail } from '@services/awsSES';
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -5,12 +6,14 @@ import companyChecker from '@services/permissionChecker/company';
 import { handleError } from '@services/sdk';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, USER } from '@utils/data';
+import { companyInvitation } from '@utils/emailTemplate/companyInvitation';
 import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const defaultExpireTime =
   parseInt(process.env.DEFAUTL_INVITATION_EMAIL_EXPIRE_TIME as string, 10) || 7;
-
+const baseUrl = process.env.NEXT_PUBLIC_CANONICAL_URL;
+const systemSenderEmail = process.env.AWS_SES_SENDER_EMAIL;
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const integrationSdk = getIntegrationSdk();
   try {
@@ -96,10 +99,43 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       updatedCompanyAccountResponse,
     );
 
+    const newParticipantMembersEmailTemplate = companyInvitation({
+      companyName: USER(companyAccount).getPublicData().companyName,
+      url: `${baseUrl}/invitation/${companyId}`,
+    });
     // Step handle send email for new participant members
-
+    const hasFlexAccountEmailParamsData = {
+      receiver: Object.keys(newParticipantMembersObj),
+      subject: 'PITO Cloud Canteen - Bạn có một lời mời tham gia công ty',
+      content: newParticipantMembersEmailTemplate,
+      sender: systemSenderEmail as string,
+    };
+    const hasFlexAccountEmailParams = createEmailParams(
+      hasFlexAccountEmailParamsData.receiver,
+      hasFlexAccountEmailParamsData.subject,
+      hasFlexAccountEmailParamsData.content,
+      hasFlexAccountEmailParamsData.sender,
+    );
+    if (hasFlexAccountEmailParamsData.receiver.length > 0) {
+      sendEmail(hasFlexAccountEmailParams);
+    }
     // Step handle send email for new no account members
 
+    const noFlexAccountEmailParamsData = {
+      receiver: noAccountEmailList,
+      subject: 'PITO Cloud Canteen - Bạn có một lời mời tham gia công ty',
+      content: newParticipantMembersEmailTemplate,
+      sender: systemSenderEmail as string,
+    };
+    const noFlexAccountEmailParams = createEmailParams(
+      noFlexAccountEmailParamsData.receiver,
+      noFlexAccountEmailParamsData.subject,
+      noFlexAccountEmailParamsData.content,
+      noFlexAccountEmailParamsData.sender,
+    );
+    if (noFlexAccountEmailParamsData.receiver.length > 0) {
+      sendEmail(noFlexAccountEmailParams);
+    }
     res.json(updatedCompanyAccount);
   } catch (error) {
     handleError(res, error);
