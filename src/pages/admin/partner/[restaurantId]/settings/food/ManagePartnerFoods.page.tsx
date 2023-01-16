@@ -35,6 +35,9 @@ import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import css from './ManagePartnerFoods.module.scss';
+
+const fileUrl = process.env.NEXT_PUBLIC_IMPORT_FOOD_GUIDE_FILE_URL;
+
 const TABLE_COLUMN: TColumn[] = [
   {
     key: 'id',
@@ -318,7 +321,26 @@ const ManagePartnerFoods = () => {
     }
   };
 
-  const downloadGuide = () => {};
+  const downloadGuide = () => {
+    fetch(fileUrl as string)
+      .then((response) => response.blob())
+      .then((blob) => {
+        // Create blob link to download
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `FileName.pdf`);
+
+        // Append to html link element page
+        document.body.appendChild(link);
+
+        // Start download
+        link.click();
+
+        // Clean up and remove the link
+        link.parentNode && link.parentNode.removeChild(link);
+      });
+  };
 
   return (
     <div className={css.root}>
