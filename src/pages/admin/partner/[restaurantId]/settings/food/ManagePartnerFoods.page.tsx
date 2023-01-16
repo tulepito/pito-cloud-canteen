@@ -35,8 +35,6 @@ import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import css from './ManagePartnerFoods.module.scss';
-import guideFile from './data/guide.csv';
-
 const TABLE_COLUMN: TColumn[] = [
   {
     key: 'id',
@@ -320,9 +318,7 @@ const ManagePartnerFoods = () => {
     }
   };
 
-  const downloadGuide = () => {
-    makeCsv(guideFile, 'guide.csv');
-  };
+  const downloadGuide = () => {};
 
   return (
     <div className={css.root}>

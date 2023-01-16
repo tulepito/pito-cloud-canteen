@@ -239,7 +239,7 @@ export const CATEGORY_OPTIONS = [
     label: 'Hàn quốc',
   },
   {
-    key: 'japanes-food',
+    key: 'japanese-food',
     label: 'Nhật Bản',
   },
   {
@@ -247,7 +247,7 @@ export const CATEGORY_OPTIONS = [
     label: 'Ấn độ',
   },
   {
-    key: 'frech-food',
+    key: 'french-food',
     label: 'Pháp',
   },
   {
@@ -413,8 +413,8 @@ export const PARTY_INSURANCE_RADIO_OPTIONS = [
 ];
 
 export enum EMenuTypes {
-  fixedMenu = 'fixedMenu',
-  cycleMenu = 'cycleMenu',
+  fixedMenu = 'fixed-menu',
+  cycleMenu = 'cycle-menu',
 }
 
 export const MENU_OPTIONS = [
