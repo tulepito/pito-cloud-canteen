@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
+import { getImportDataFromCsv } from '@src/pages/admin/partner/[restaurantId]/settings/food/utils';
 import {
   createPartnerFoodApi,
   deletePartnerFoodApi,
@@ -9,8 +11,14 @@ import {
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants, EListingType } from '@utils/enums';
 import { storableError } from '@utils/errors';
-import type { TImage, TListing } from '@utils/types';
+import type {
+  TImage,
+  TIntergrationFoodListing,
+  TListing,
+  TPagination,
+} from '@utils/types';
 import omit from 'lodash/omit';
+import Papa from 'papaparse';
 
 export const MANAGE_FOOD_PAGE_SIZE = 10;
 
@@ -19,6 +27,7 @@ type TFoodSliceState = {
   foods: any[];
   queryFoodsInProgress: boolean;
   queryFoodsError: any;
+  managePartnerFoodPagination: TPagination | null;
 
   uploadedImages: any;
   uploadedImagesOrder: any[];
@@ -48,6 +57,7 @@ const initialState: TFoodSliceState = {
   foods: [],
   queryFoodsError: null,
   queryFoodsInProgress: false,
+  managePartnerFoodPagination: null,
 
   // Upload food's images
   uploadedImages: null,
@@ -111,7 +121,7 @@ const queryPartnerFoods = createAsyncThunk(
       perPage: MANAGE_FOOD_PAGE_SIZE,
     });
     const foods = denormalisedResponseEntities(response);
-    return foods;
+    return { foods, managePartnerFoodPagination: response.data.meta };
   },
   {
     serializeError: storableError,
@@ -226,8 +236,67 @@ const updatePartnerFoodListing = createAsyncThunk(
 
 const creataPartnerFoodFromCsv = createAsyncThunk(
   CREATE_FOOD_FROM_FILE,
-  async (payload) => {
-    console.log(payload);
+  async (
+    { file, restaurantId }: { file: File; restaurantId: string },
+    { extra: sdk },
+  ) => {
+    return new Promise((resolve, reject) => {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        async complete({ data }: any) {
+          const response = await Promise.all(
+            data.map(async (l: any) => {
+              const { images, title } = l;
+              const imagesAsArray = images ? images.split(',') : [];
+              const imageAsFiles = await Promise.all(
+                imagesAsArray.map(async (src: string) => {
+                  const response = await fetch(src);
+                  const blobData = await response.blob();
+                  const metadata = {
+                    type: 'image/jpeg',
+                  };
+                  const file = new File(
+                    [blobData],
+                    `${`${title}_${new Date().getTime()}`}.jpg`,
+                    metadata,
+                  );
+                  return file;
+                }),
+              );
+              // upload image to Flex
+              const uploadRes = await Promise.all(
+                imageAsFiles.map(async (file) =>
+                  sdk.images.upload({
+                    image: file,
+                  }),
+                ),
+              );
+
+              const newImages = uploadRes.map((res) => res.data.data.id);
+
+              const dataParams = getImportDataFromCsv({
+                ...l,
+                restaurantId,
+                images: newImages,
+              });
+              const queryParams = {
+                expand: true,
+              };
+              const { data } = await createPartnerFoodApi({
+                dataParams,
+                queryParams,
+              });
+              return denormalisedResponseEntities(data)[0];
+            }),
+          );
+          resolve(response as any);
+        },
+        error(err: any) {
+          reject(err);
+        },
+      });
+    });
   },
 );
 
@@ -302,6 +371,7 @@ export const foodSliceThunks = {
   removePartnerFood,
   showDuplicateFood,
   duplicateFood,
+  creataPartnerFoodFromCsv,
 };
 
 // ================ Slice ================ //
@@ -346,7 +416,8 @@ const foodSlice = createSlice({
       .addCase(queryPartnerFoods.fulfilled, (state, { payload }) => ({
         ...state,
         queryFoodsInProgress: false,
-        foods: payload,
+        foods: payload.foods,
+        managePartnerFoodPagination: payload.managePartnerFoodPagination,
       }))
       .addCase(queryPartnerFoods.rejected, (state, { payload }) => ({
         ...state,
@@ -480,6 +551,23 @@ const foodSlice = createSlice({
         ...state,
         createPartnerFoodFromCsvInProgress: true,
         createPartnerFoodFromCsvError: null,
+      }))
+      .addCase(
+        creataPartnerFoodFromCsv.fulfilled,
+        (state, { payload = [] }) => ({
+          ...state,
+          createPartnerFoodFromCsvInProgress: false,
+          createPartnerFoodFromCsvError: null,
+          foods: [
+            ...(payload as unknown as TIntergrationFoodListing[]),
+            ...state.foods,
+          ],
+        }),
+      )
+      .addCase(creataPartnerFoodFromCsv.rejected, (state, { payload }) => ({
+        ...state,
+        createPartnerFoodFromCsvInProgress: false,
+        createPartnerFoodFromCsvError: payload,
       }));
   },
 });

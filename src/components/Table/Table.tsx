@@ -92,6 +92,7 @@ const Table = (props: TTable) => {
     router.push({
       pathname: paginationPath,
       query: {
+        ...router.query,
         page,
       },
     });

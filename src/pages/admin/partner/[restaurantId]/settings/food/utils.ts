@@ -1,6 +1,6 @@
 import { types as sdkTypes } from '@helpers/sdkLoader';
 import { ListingTypes } from '@src/types/listingTypes';
-import type { CYCLE_MENU_KEY, FIXED_MENU_KEY } from '@utils/enums';
+import type { CYCLE_MENU_KEY, FIXED_MENU_KEY } from '@utils/errors';
 import { getSubmitImageId, getUniqueImages } from '@utils/images';
 import type { TImage } from '@utils/types';
 
@@ -8,7 +8,7 @@ const { Money } = sdkTypes;
 
 export type TEditPartnerFoodFormValues = {
   id?: string;
-  images: TImage[] | number[];
+  images: TImage[];
   addImages: TImage[] | number[];
   title: string;
   menuType: typeof FIXED_MENU_KEY | typeof CYCLE_MENU_KEY;
@@ -21,7 +21,7 @@ export type TEditPartnerFoodFormValues = {
   categoryOther: string;
   price: string;
   ingredients: string;
-  sideDishes: string;
+  sideDishes: string[];
   description: string;
   notes: string;
   restaurantId?: string;
@@ -89,11 +89,41 @@ export const getDuplicateData = (values: TEditPartnerFoodFormValues) => {
     ...rest
   } = values;
   return {
-    images: images.filter((i: TImage) => !!i),
+    ...(images ? { images: images.filter((i: TImage) => !!i) } : {}),
     title,
     description,
     price: new Money(Number(price), 'VND'),
     publicData: {
+      ...rest,
+    },
+    metadata: {
+      restaurantId,
+      listingType: ListingTypes.FOOD,
+    },
+  };
+};
+
+export const getImportDataFromCsv = (values: any) => {
+  const {
+    images = [],
+    title,
+    description,
+    price,
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    addImages,
+    restaurantId,
+    specialDiets,
+    sideDishes,
+    ...rest
+  } = values;
+  return {
+    ...(images ? { images: images.filter((i: TImage) => !!i) } : {}),
+    title,
+    description,
+    price: new Money(Number(price), 'VND'),
+    publicData: {
+      specialDiets: specialDiets.split(','),
+      sideDishes: sideDishes.split(','),
       ...rest,
     },
     metadata: {

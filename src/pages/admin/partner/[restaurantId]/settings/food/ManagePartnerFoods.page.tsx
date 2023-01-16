@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
@@ -34,6 +35,7 @@ import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import css from './ManagePartnerFoods.module.scss';
+import guideFile from './data/guide.csv';
 
 const TABLE_COLUMN: TColumn[] = [
   {
@@ -161,22 +163,15 @@ const parseEntitiesToExportCsv = (
   return foods
     .filter((food) => ids.includes(food.id.uuid))
     .map((food) => {
+      const { publicData = {}, description, title } = food.attributes || {};
+      const { sideDishes = [], specialDiets = [], ...rest } = publicData;
       return {
-        title: food.attributes.title,
-        description: food.attributes.description,
+        title,
+        description,
         id: food.id.uuid,
-        menuType: getLabelByKey(
-          MENU_OPTIONS,
-          food.attributes.publicData.menuType,
-        ),
-        category: getLabelByKey(
-          CATEGORY_OPTIONS,
-          food.attributes.publicData.category,
-        ),
-        foodType: getLabelByKey(
-          FOOD_TYPE_OPTIONS,
-          food.attributes.publicData.foodType,
-        ),
+        ...rest,
+        sideDishes: sideDishes.join(','),
+        specialDiets: specialDiets.join(','),
       };
     });
 };
@@ -201,15 +196,32 @@ const ManagePartnerFoods = () => {
     setFalse: closeRemoveCheckedModal,
   } = useBoolean(false);
 
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { restaurantId, page = 1, keywords, pub_category = '' } = router.query;
+  const {
+    restaurantId,
+    page = 1,
+    keywords,
+    pub_category = '',
+    pub_menuType = '',
+  } = router.query;
 
-  const { foods, queryFoodsInProgress, queryFoodsError, removeFoodInProgress } =
-    useAppSelector((state) => state.foods, shallowEqual);
+  const {
+    foods,
+    queryFoodsInProgress,
+    queryFoodsError,
+    removeFoodInProgress,
+    createPartnerFoodFromCsvInProgress,
+    createPartnerFoodFromCsvError,
+    managePartnerFoodPagination,
+  } = useAppSelector((state) => state.foods, shallowEqual);
 
   const categoryString = pub_category as string;
+  const menuTypeString = pub_menuType as string;
 
   const groupPubCategory = categoryString
+    ?.split(',')
+    .filter((item: string) => !!item);
+
+  const groupMenuTypeString = menuTypeString
     ?.split(',')
     .filter((item: string) => !!item);
 
@@ -218,12 +230,17 @@ const ManagePartnerFoods = () => {
     setIdsToAction(rowCheckbox);
   };
 
-  const handleSubmitFilter = ({ pub_category = [], keywords }: any) => {
+  const handleSubmitFilter = ({
+    pub_category = [],
+    keywords,
+    pub_menuType = [],
+  }: any) => {
     router.push({
       pathname: adminRoutes.ManagePartnerFoods.path,
       query: {
         keywords,
         pub_category: pub_category?.join(','),
+        pub_menuType: pub_menuType?.join(','),
         restaurantId,
       },
     });
@@ -237,6 +254,10 @@ const ManagePartnerFoods = () => {
     setFoodToRemove(null);
   };
 
+  const onQueryPartnerFood = (params: any = {}) => {
+    return dispatch(foodSliceThunks.queryPartnerFoods(params));
+  };
+
   const removeFood = async () => {
     if (!foodToRemove) return;
     const { id } = foodToRemove;
@@ -244,16 +265,7 @@ const ManagePartnerFoods = () => {
       foodSliceThunks.removePartnerFood({ id }),
     )) as any;
     if (!error) {
-      dispatch(
-        foodSliceThunks.queryPartnerFoods({
-          restaurantId,
-          page,
-          ...(groupPubCategory.length > 0
-            ? { pub_category: groupPubCategory }
-            : {}),
-          ...(keywords ? { keywords } : {}),
-        }),
-      );
+      return onQueryPartnerFood({ page: 1, restaurantId });
     }
   };
 
@@ -262,16 +274,7 @@ const ManagePartnerFoods = () => {
       foodSliceThunks.removePartnerFood({ ids: idsToAction }),
     )) as any;
     if (!error) {
-      dispatch(
-        foodSliceThunks.queryPartnerFoods({
-          restaurantId,
-          page,
-          ...(groupPubCategory.length > 0
-            ? { pub_category: groupPubCategory }
-            : {}),
-          ...(keywords ? { keywords } : {}),
-        }),
-      );
+      return onQueryPartnerFood({ page: 1, restaurantId });
     }
   };
 
@@ -288,23 +291,37 @@ const ManagePartnerFoods = () => {
   };
 
   useEffect(() => {
-    dispatch(
-      foodSliceThunks.queryPartnerFoods({
-        restaurantId,
-        page,
-        ...(groupPubCategory.length > 0
-          ? { pub_category: groupPubCategory }
-          : {}),
-        ...(keywords ? { keywords } : {}),
-      }),
-    );
-  }, [
-    dispatch,
-    page,
-    restaurantId,
-    JSON.stringify(groupPubCategory),
-    keywords,
-  ]);
+    onQueryPartnerFood({
+      restaurantId,
+      page,
+      ...(groupPubCategory.length > 0
+        ? { pub_category: groupPubCategory }
+        : {}),
+      ...(groupMenuTypeString.length > 0
+        ? { pub_menuType: groupMenuTypeString }
+        : {}),
+      ...(keywords ? { keywords } : {}),
+    });
+  }, [page, restaurantId, keywords, categoryString]);
+
+  const onImportFoodFromCsv = async () => {
+    if (file) {
+      const { error } = (await dispatch(
+        foodSliceThunks.creataPartnerFoodFromCsv({
+          file,
+          restaurantId: restaurantId as string,
+        }),
+      )) as any;
+
+      if (!error) {
+        closeImportModal();
+      }
+    }
+  };
+
+  const downloadGuide = () => {
+    makeCsv(guideFile, 'guide.csv');
+  };
 
   return (
     <div className={css.root}>
@@ -318,6 +335,7 @@ const ManagePartnerFoods = () => {
           initialValues={{
             keywords,
             pub_category: groupPubCategory,
+            pub_menuType: groupMenuTypeString,
           }}>
           <FieldTextInput
             name="keywords"
@@ -333,6 +351,14 @@ const ManagePartnerFoods = () => {
             label="Phong cách ẩm thực"
             placeholder="Phong cách ẩm thực"
             options={CATEGORY_OPTIONS}
+          />
+          <FieldMultipleSelect
+            className={css.input}
+            name="pub_menuType"
+            id="pub_menuType"
+            label="Loại menu"
+            placeholder="Chọn loại menu"
+            options={MENU_OPTIONS}
           />
         </IntegrationFilterModal>
         <div className={css.ctaButtons}>
@@ -400,6 +426,8 @@ const ManagePartnerFoods = () => {
           isLoading={queryFoodsInProgress}
           hasCheckbox
           exposeValues={getExposeValues}
+          pagination={managePartnerFoodPagination}
+          paginationPath={`/admin/partner/${restaurantId}/settings/food`}
         />
       )}
       <AlertModal
@@ -407,11 +435,25 @@ const ManagePartnerFoods = () => {
         handleClose={closeImportModal}
         confirmLabel="Nhập"
         onCancel={closeImportModal}
-        onConfirm={() => {}}
-        cancelLabel="Hủy">
+        onConfirm={onImportFoodFromCsv}
+        cancelLabel="Hủy"
+        confirmInProgress={createPartnerFoodFromCsvInProgress}
+        confirmDisabled={createPartnerFoodFromCsvInProgress}>
         <h2 className={css.importTitle}>
           <FormattedMessage id="ManagePartnerFoods.importTitle" />
         </h2>
+        <p>
+          <FormattedMessage
+            id="ManagePartnerFoods.downloadFileHere"
+            values={{
+              link: (
+                <InlineTextButton type="button" onClick={downloadGuide}>
+                  <FormattedMessage id="ManagePartnerFoods.templateLink" />
+                </InlineTextButton>
+              ),
+            }}
+          />
+        </p>
         <div className={css.inputWrapper}>
           <input
             accept=".csv"
@@ -433,6 +475,9 @@ const ManagePartnerFoods = () => {
               )}
             </div>
           </label>
+          {createPartnerFoodFromCsvError && (
+            <ErrorMessage message={createPartnerFoodFromCsvError.message} />
+          )}
         </div>
       </AlertModal>
       <AlertModal

@@ -688,5 +688,7 @@
   "EditPartnerFoodForm.unitRequired": "Vui lòng nhập đơn vị tính",
   "ManagePartnerFoods.inputFile": "Click chọn file hoặc kéo thả",
   "ManagePartnerFoods.importLabel": "Import file",
-  "ManagePartnerFoods.importTitle": "Import món"
+  "ManagePartnerFoods.importTitle": "Import món",
+  "ManagePartnerFoods.templateLink": "đây.",
+  "ManagePartnerFoods.downloadFileHere": "Tải bản mẫu tại {link}"
 }
