@@ -11,7 +11,7 @@ type TBookerOrderManagementState = {
   isFetchingOrderDetail: boolean;
   companyId: string | null;
   orderData: TObject | null;
-  planData: TObject | null;
+  planData: TObject;
   participantData: Array<TUser>;
 
   isDeletingParticipant: boolean;
@@ -19,8 +19,8 @@ type TBookerOrderManagementState = {
 const initialState: TBookerOrderManagementState = {
   isFetchingOrderDetail: false,
   companyId: null,
-  orderData: null,
-  planData: null,
+  orderData: {},
+  planData: {},
   participantData: [],
   isDeletingParticipant: false,
 };

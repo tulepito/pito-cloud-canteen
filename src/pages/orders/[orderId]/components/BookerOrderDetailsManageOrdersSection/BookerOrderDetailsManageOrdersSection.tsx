@@ -3,6 +3,7 @@ import IconPlus from '@components/Icons/IconPlus/IconPlus';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { renderDateRange } from '@utils/dates';
+import type { TObject } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -11,15 +12,26 @@ import AddOrderForm from './AddOrderForm';
 import css from './BookerOrderDetailsManageOrdersSection.module.scss';
 import OrderDetailsTable from './OrderDetailsTable';
 
-const BookerOrderDetailsManageOrdersSection = () => {
+type TBookerOrderDetailsManageOrdersSectionProps = {
+  data: {
+    planData: TObject;
+    startDate: number;
+    endDate: number;
+  };
+};
+
+const BookerOrderDetailsManageOrdersSection: React.FC<
+  TBookerOrderDetailsManageOrdersSectionProps
+> = (props) => {
+  const {
+    data: { /* planData, */ startDate, endDate },
+  } = props;
+
   const intl = useIntl();
   const [currentViewDate, setCurrentViewDate] = useState(
     new Date().getTime().toString(),
   );
-  const dateList = renderDateRange(
-    new Date(2022, 1, 1).getTime(),
-    new Date(2022, 1, 14).getTime(),
-  );
+  const dateList = renderDateRange(startDate, endDate);
   console.log(currentViewDate);
 
   const items = dateList.map((date) => {

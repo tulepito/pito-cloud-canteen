@@ -9,12 +9,13 @@ import BookerOrderDetailsOrderLinkSection from './BookerOrderDetailsOrderLinkSec
 import BookerOrderDetailsTitle from './BookerOrderDetailsTitle/BookerOrderDetailsTitle';
 
 const BookerOrderDetailsPage = () => {
-  const { orderData, /* planData */ participantData, isFetchingOrderDetail } =
+  const { orderData, planData, participantData, isFetchingOrderDetail } =
     useAppSelector((state) => state.BookerOrderManagement);
 
   const { generalInfo = {} } = orderData?.attributes?.metadata || {};
   const {
     startDate = 0,
+    endDate = 0,
     deliveryHour,
     deliveryAddress,
     orderDeadline = 0,
@@ -24,6 +25,15 @@ const BookerOrderDetailsPage = () => {
   const countdownSectionData = {
     orderDeadline,
     startDate,
+  };
+  const manageParticipantData = {
+    planData,
+    participantData,
+  };
+  const manageOrdersData = {
+    planData,
+    startDate,
+    endDate,
   };
 
   return (
@@ -38,7 +48,7 @@ const BookerOrderDetailsPage = () => {
           />
 
           <div className={css.leftPart}>
-            <BookerOrderDetailsManageOrdersSection />
+            <BookerOrderDetailsManageOrdersSection data={manageOrdersData} />
           </div>
           <div className={css.rightPart}>
             <BookerOrderDetailsCountdownSection
@@ -48,7 +58,7 @@ const BookerOrderDetailsPage = () => {
             <BookerOrderDetailsOrderLinkSection className={css.container} />
             <BookerOrderDetailsManageParticipantsSection
               className={css.container}
-              data={participantData}
+              data={manageParticipantData}
             />
           </div>
         </div>

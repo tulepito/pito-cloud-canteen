@@ -82,9 +82,11 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = () => {
     ) : (
       <table className={css.tableRoot}>
         <thead>
-          {tableHeads.map((head: string, index: number) => (
-            <th key={index}>{head}</th>
-          ))}
+          <tr>
+            {tableHeads.map((head: string, index: number) => (
+              <th key={index}>{head}</th>
+            ))}
+          </tr>
         </thead>
         <tbody>
           <tr>
