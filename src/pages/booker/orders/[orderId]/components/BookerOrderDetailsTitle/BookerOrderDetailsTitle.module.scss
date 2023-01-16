@@ -5,6 +5,15 @@
 .root {
   display: flex;
   justify-content: space-between;
+  column-gap: 16px;
+  background-color: $neutralGray1;
+  position: sticky;
+  top: 0px;
+  z-index: 2;
+
+  @include viewportMedium {
+    position: static;
+  }
 
   .titleText {
     padding-bottom: 7px;

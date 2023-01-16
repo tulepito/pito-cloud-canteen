@@ -1,18 +1,40 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+
 .root {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 12px;
+  align-items: center;
+  margin-top: 8px;
+  order: 4;
+
   .fieldContainer {
-    margin-top: 8px;
     display: inline-block;
+    flex: 1 1 100%;
+
+    @include viewportMedium {
+      flex: unset;
+    }
 
     .fieldSelect {
       display: inline-block;
-      width: 240px;
-      margin: 0 12px 0 0;
+      width: 100%;
+
+      @include viewportMedium {
+        width: 240px;
+      }
     }
   }
+
   .submitButton {
     display: inline-block;
     min-height: unset;
     height: 44px;
-    width: 80px;
+    flex: 1 1 100%;
+
+    @include viewportMedium {
+      flex: unset;
+      flex-basis: 80px;
+    }
   }
 }

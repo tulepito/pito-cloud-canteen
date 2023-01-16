@@ -133,8 +133,9 @@
   }
 
   .noChoices {
+    width: 100%;
     @include textTemplate(14px, 400, 24px);
-    white-space: pre;
+    white-space: pre-line;
     color: $neutralGray5;
   }
 }
