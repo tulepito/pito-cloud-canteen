@@ -7,6 +7,10 @@ import css from './EditOrderDeadlineModal.module.scss';
 
 type EditOrderDeadlineModalProps = {
   isOpen: boolean;
+  data: {
+    orderStartDate: number;
+    orderDeadline: number;
+  };
   onClose: () => void;
   onSubmit: (values: TEditOrderDeadlineFormValues) => void;
 };
@@ -14,11 +18,16 @@ type EditOrderDeadlineModalProps = {
 const EditOrderDeadlineModal: React.FC<EditOrderDeadlineModalProps> = (
   props,
 ) => {
-  const { isOpen, onClose, onSubmit } = props;
+  const {
+    isOpen,
+    onClose,
+    onSubmit,
+    data: { orderStartDate, orderDeadline },
+  } = props;
   const intl = useIntl();
 
   const formInitialValues: TEditOrderDeadlineFormValues = {
-    deadlineDate: new Date(2023, 1, 1),
+    deadlineDate: new Date(orderDeadline) || new Date(2023, 1, 1),
     deadlineHour: '',
   };
 
@@ -33,7 +42,7 @@ const EditOrderDeadlineModal: React.FC<EditOrderDeadlineModalProps> = (
       })}>
       <EditOrderDeadlineForm
         onSubmit={onSubmit}
-        startDate={new Date(2023, 2, 1)}
+        startDate={orderStartDate}
         initialValues={formInitialValues}
       />
     </Modal>

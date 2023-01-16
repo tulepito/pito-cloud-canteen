@@ -18,7 +18,7 @@ export type TEditOrderDeadlineFormValues = {
 };
 
 type TExtraProps = {
-  startDate: Date;
+  startDate: number;
 };
 type TEditOrderDeadlineFormComponentProps =
   FormRenderProps<TEditOrderDeadlineFormValues> & Partial<TExtraProps>;
@@ -31,7 +31,7 @@ const EditOrderDeadlineFormComponent: React.FC<
   const intl = useIntl();
   const { handleSubmit, startDate, values } = props;
   const today = new Date();
-  const maxSelectedDate = DateTime.fromJSDate(startDate!)
+  const maxSelectedDate = DateTime.fromMillis(startDate!)
     .minus({ day: 2 })
     .toJSDate();
 

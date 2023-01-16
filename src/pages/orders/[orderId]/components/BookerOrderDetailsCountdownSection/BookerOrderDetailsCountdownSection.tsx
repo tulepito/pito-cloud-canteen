@@ -15,6 +15,7 @@ type BookerOrderDetailsCountdownSectionProps = {
   className?: string;
   data: {
     orderDeadline: number;
+    startDate: number;
   };
 };
 
@@ -28,7 +29,7 @@ const BookerOrderDetailsCountdownSection: React.FC<
   const {
     className,
     rootClassName,
-    data: { orderDeadline = 0 },
+    data: { orderDeadline, startDate },
   } = props;
   console.log(orderDeadline);
 
@@ -81,6 +82,7 @@ const BookerOrderDetailsCountdownSection: React.FC<
       <CountdownTimer deadline={orderDeadline} stopAt={0} />
       <div className={css.orderEndAtMessage}>{orderEndAtMessage}</div>
       <EditOrderDeadlineModal
+        data={{ orderDeadline, orderStartDate: startDate }}
         isOpen={isEditOrderDeadlineModalOpen}
         onClose={handleCloseEditDeadlineModal}
         onSubmit={handleSubmitEditDeadline}
