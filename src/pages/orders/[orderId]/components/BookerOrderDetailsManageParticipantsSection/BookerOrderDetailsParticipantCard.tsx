@@ -1,11 +1,14 @@
 import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
 import IconClose from '@components/Icons/IconClose/IconClose';
+import { shortenString } from '@utils/string';
 import classNames from 'classnames';
 import React from 'react';
 
 import css from './BookerOrderDetailsParticipantCard.module.scss';
 
 const DEFAULT_AVATAR_PATH = '/images/default_avatar.png';
+const MAXLENGTH_NAME = 26;
+const MAXLENGTH_EMAIL = 30;
 
 type BookerOrderDetailsParticipantCardProps = {
   className?: string;
@@ -14,7 +17,7 @@ type BookerOrderDetailsParticipantCardProps = {
   hasCheckIcon?: boolean;
   name?: string;
   email?: string;
-  onClickDeleteIcon: (id: string) => () => void;
+  onClickDeleteIcon: () => void;
 };
 
 const BookerOrderDetailsParticipantCard: React.FC<
@@ -38,12 +41,10 @@ const BookerOrderDetailsParticipantCard: React.FC<
         {hasCheckIcon && <IconCheckWithBackground className={css.checkIcon} />}
       </div>
       <div className={css.infoContainer}>
-        <div>{name}</div>
-        <div>{email}</div>
+        <div title={name}>{shortenString(name, MAXLENGTH_NAME)}</div>
+        <div title={email}>{shortenString(email, MAXLENGTH_EMAIL)}</div>
       </div>
-      <div
-        className={css.closeIconContainer}
-        onClick={onClickDeleteIcon('delete')}>
+      <div className={css.closeIconContainer} onClick={onClickDeleteIcon}>
         <IconClose className={css.closeIcon} />
       </div>
     </div>

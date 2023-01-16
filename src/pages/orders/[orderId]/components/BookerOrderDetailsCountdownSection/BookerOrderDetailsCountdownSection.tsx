@@ -31,8 +31,6 @@ const BookerOrderDetailsCountdownSection: React.FC<
     rootClassName,
     data: { orderDeadline, startDate },
   } = props;
-  console.log(orderDeadline);
-
   const rootClasses = classNames(rootClassName || css.root, className);
 
   const formattedDeadline = DateTime.fromMillis(orderDeadline).toFormat(

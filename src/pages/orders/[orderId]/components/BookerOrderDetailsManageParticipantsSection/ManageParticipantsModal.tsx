@@ -1,44 +1,69 @@
 import Collapsible from '@components/Collapsible/Collapsible';
 import Modal from '@components/Modal/Modal';
 import Tooltip from '@components/Tooltip/Tooltip';
+import type { TObject, TUser } from '@utils/types';
+import get from 'lodash/get';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import AddParticipantForm from './AddParticipantForm';
+import { isParticipantCompletedPickFood } from './BookerOrderDetailsManageParticipantsSection.helper';
 import BookerOrderDetailsParticipantCard from './BookerOrderDetailsParticipantCard';
 import css from './ManageParticipantsModal.module.scss';
 
-const rawMockupData = [1, 3, 4, 5, 1, 1, 1, 1, 1, 1, 1];
-const groupedMockupData = [
-  { name: 'Group A', participants: [1, 3, 4, 5] },
-  { name: 'Group B', participants: [1, 3, 4, 1, 1, 1, 1, 1] },
-];
+// const groupedMockupData = [
+//   { name: 'Group A', participants: [1, 3, 4, 5] },
+//   { name: 'Group B', participants: [1, 3, 4, 1, 1, 1, 1, 1] },
+// ];
 
 type TRawParticipantsProps = {
-  participants: any[];
+  data: {
+    participantData: Array<TUser>;
+    planData: TObject;
+  };
+  handleClickDeleteParticipant: (id: string) => () => void;
 };
 
-const RawParticipants: React.FC<TRawParticipantsProps> = ({ participants }) => {
+const RawParticipants: React.FC<TRawParticipantsProps> = ({
+  data,
+  handleClickDeleteParticipant,
+}) => {
+  const { participantData, planData } = data;
+  const planOrderDetails = get(planData, 'attributes.metadata.orderDetail');
+
   return (
     <div className={css.rawParticipants}>
-      {participants.map((number, index) => {
-        const isSelectedFood = index % 3 === 0;
+      {participantData.map((item) => {
+        const {
+          id: { uuid },
+          attributes: {
+            email,
+            profile: { displayName },
+          },
+        } = item;
+        const isSelectedFood = isParticipantCompletedPickFood(
+          uuid,
+          planOrderDetails,
+        );
+
+        const cardComponent = (
+          <BookerOrderDetailsParticipantCard
+            name={displayName}
+            email={email}
+            className={css.participantCard}
+            onClickDeleteIcon={handleClickDeleteParticipant(uuid)}
+            key={uuid}
+            hasCheckIcon={isSelectedFood}
+          />
+        );
 
         return isSelectedFood ? (
-          <BookerOrderDetailsParticipantCard
-            className={css.participantCard}
-            onClickDeleteIcon={() => () => console.log(index)}
-            key={index}
-            hasCheckIcon
-          />
+          cardComponent
         ) : (
           <Tooltip
             tooltipContent={'Đã chọn món xong'}
             placement="topRight"
-            key={index}>
-            <BookerOrderDetailsParticipantCard
-              className={css.participantCard}
-              onClickDeleteIcon={() => () => console.log(index)}
-            />
+            key={uuid}>
+            {cardComponent}
           </Tooltip>
         );
       })}
@@ -61,7 +86,7 @@ type TGroupedParticipantsProps = {
   groupedParticipants: any[];
 };
 
-const GroupedParticipants: React.FC<TGroupedParticipantsProps> = ({
+export const GroupedParticipants: React.FC<TGroupedParticipantsProps> = ({
   groupedParticipants,
 }) => {
   return (
@@ -95,13 +120,18 @@ const GroupedParticipants: React.FC<TGroupedParticipantsProps> = ({
 type ManageParticipantsModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  handleClickDeleteParticipant: (id: string) => () => void;
+  data: {
+    participantData: Array<TUser>;
+    planData: TObject;
+  };
 };
 
 const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
   props,
 ) => {
   const intl = useIntl();
-  const { isOpen, onClose } = props;
+  const { isOpen, onClose, handleClickDeleteParticipant, data } = props;
   const count = 0;
 
   const modalTitle = intl.formatMessage(
@@ -126,8 +156,11 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
       <div className={css.subTitle}>{modalSubTitle}</div>
       <AddParticipantForm onSubmit={() => {}} hasSubmitButton />
       <div className={css.participantsContainer}>
-        <RawParticipants participants={rawMockupData} />
-        <GroupedParticipants groupedParticipants={groupedMockupData} />
+        <RawParticipants
+          data={data}
+          handleClickDeleteParticipant={handleClickDeleteParticipant}
+        />
+        {/* <GroupedParticipants groupedParticipants={groupedMockupData} /> */}
       </div>
     </Modal>
   );

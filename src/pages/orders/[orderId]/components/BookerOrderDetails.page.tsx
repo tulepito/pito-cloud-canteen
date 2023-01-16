@@ -11,7 +11,6 @@ import BookerOrderDetailsTitle from './BookerOrderDetailsTitle/BookerOrderDetail
 const BookerOrderDetailsPage = () => {
   const { orderData, /* planData */ participantData, isFetchingOrderDetail } =
     useAppSelector((state) => state.BookerOrderManagement);
-  console.log(participantData);
 
   const { generalInfo = {} } = orderData?.attributes?.metadata || {};
   const {

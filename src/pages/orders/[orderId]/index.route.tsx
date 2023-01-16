@@ -17,11 +17,9 @@ const BookerOrderDetailsRoute = () => {
 
   useEffect(() => {
     if (isReady) {
-      console.log(orderId);
-
       dispatch(BookerOrderManagementsThunks.loadData(orderId as string));
     }
-  }, [dispatch, isReady, orderId]);
+  }, [isReady]);
 
   return (
     <>

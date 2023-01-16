@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import type { TObject } from './types';
+
 export const apiBaseUrl = () => {
   const port = process.env.NEXT_PORT || 3000;
   const useDevApiServer =
@@ -73,6 +75,9 @@ export const loadPlanDataApi = (planId: string) =>
 
 export const loadBookerOrderDataApi = (orderId: string) =>
   get(`/api/orders/${orderId}`);
+
+export const deleteParticipantFromOrderApi = (orderId: string, body: TObject) =>
+  post(`/api/orders/${orderId}/delete-participant`, body);
 
 export const updateParticipantOrderApi = (orderId: string, body: any) =>
   post(`/api/participants/orders/${orderId}`, body);

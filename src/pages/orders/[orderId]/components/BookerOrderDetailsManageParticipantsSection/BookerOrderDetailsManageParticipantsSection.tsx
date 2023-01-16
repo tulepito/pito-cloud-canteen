@@ -1,29 +1,66 @@
 import Button from '@components/Button/Button';
 import AlertModal from '@components/Modal/AlertModal';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import type { TObject, TUser } from '@utils/types';
 import classNames from 'classnames';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
+import { BookerOrderManagementsThunks } from '../../BookerOrderManagement.slice';
 import AddParticipantForm from './AddParticipantForm';
 import css from './BookerOrderDetailsManageParticipantsSection.module.scss';
 import BookerOrderDetailsParticipantCard from './BookerOrderDetailsParticipantCard';
 import ManageParticipantsModal from './ManageParticipantsModal';
 
+export const renderParticipantCards = (
+  items: Array<TUser>,
+  handleClickDeleteParticipant: (id: string) => () => void,
+) => {
+  return items.map((item) => {
+    const {
+      id: { uuid },
+      attributes: {
+        email,
+        profile: { displayName },
+      },
+    } = item;
+
+    return (
+      <BookerOrderDetailsParticipantCard
+        name={displayName}
+        email={email}
+        key={uuid}
+        onClickDeleteIcon={handleClickDeleteParticipant(uuid)}
+      />
+    );
+  });
+};
+
 type BookerOrderDetailsManageParticipantsSectionProps = {
   rootClassName?: string;
   className?: string;
+  data: {
+    participantData: Array<TUser>;
+    planData: TObject;
+  };
 };
 
 const BookerOrderDetailsManageParticipantsSection: React.FC<
   BookerOrderDetailsManageParticipantsSectionProps
 > = (props) => {
   const intl = useIntl();
+  const dispatch = useAppDispatch();
+  const [currentParticipantId, setCurrentParticipantId] = useState<string>();
   const [isDeleteParticipantModalOpen, setIsDeleteParticipantModalOpen] =
     useState(false);
   const [isManageParticipantsModalOpen, setIsManageParticipantsModalOpen] =
     useState(false);
+  const { isFetchingOrderDetail, isDeletingParticipant } = useAppSelector(
+    (state) => state.BookerOrderManagement,
+  );
+  const disableButton = isFetchingOrderDetail || isDeletingParticipant;
 
-  const { rootClassName, className } = props;
+  const { rootClassName, className, data } = props;
   const rootClasses = classNames(rootClassName || css.root, className);
 
   const sectionTitle = intl.formatMessage(
@@ -50,14 +87,17 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
     id: 'BookerOrderDetailsManageParticipantsSection.viewDetailText',
   });
 
-  const handleClickDeleteParticipant = (id: string) => () => {
-    console.log('id', id);
+  const handleClickDeleteParticipant = (participantId: string) => () => {
+    setCurrentParticipantId(participantId);
     setIsDeleteParticipantModalOpen(true);
   };
   const handleCloseDeleteParticipantModal = () => {
     setIsDeleteParticipantModalOpen(false);
   };
   const handleConfirmDeleteParticipant = () => {
+    dispatch(
+      BookerOrderManagementsThunks.deleteParticipant({ currentParticipantId }),
+    );
     setIsDeleteParticipantModalOpen(false);
   };
   const handleCancelDeleteParticipant = () => {
@@ -77,15 +117,10 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
 
       <AddParticipantForm onSubmit={() => {}} />
       <div className={css.participantContainer}>
-        <BookerOrderDetailsParticipantCard
-          onClickDeleteIcon={handleClickDeleteParticipant}
-        />
-        <BookerOrderDetailsParticipantCard
-          onClickDeleteIcon={handleClickDeleteParticipant}
-        />
-        <BookerOrderDetailsParticipantCard
-          onClickDeleteIcon={handleClickDeleteParticipant}
-        />
+        {renderParticipantCards(
+          data.participantData.slice(0, 4),
+          handleClickDeleteParticipant,
+        )}
       </div>
       <Button
         variant="inline"
@@ -95,6 +130,8 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
       </Button>
 
       <AlertModal
+        disabledCancelButton={disableButton}
+        disabledConfirmButton={disableButton}
         title={deleteParticipantPopupTitle}
         isOpen={isDeleteParticipantModalOpen}
         handleClose={handleCloseDeleteParticipantModal}
@@ -108,6 +145,8 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
       <ManageParticipantsModal
         isOpen={isManageParticipantsModalOpen}
         onClose={handleCloseManageParticipantModal}
+        data={data}
+        handleClickDeleteParticipant={handleClickDeleteParticipant}
       />
     </div>
   );

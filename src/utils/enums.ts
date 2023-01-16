@@ -127,6 +127,14 @@ export enum ERestaurantListingStatus {
   unsatisfactory = 'unsatisfactory',
 }
 
+export enum EParticipantOrderStatus {
+  empty = 'empty',
+  joined = 'joined',
+  notJoined = 'notJoined',
+  notAllowed = 'notAllowed',
+  expired = 'expired',
+}
+
 export const OTHER_OPTION = 'other';
 
 export const LIST_BANKS = [
