@@ -94,9 +94,6 @@ const signUp = createAsyncThunk(
           ...defaultParams,
           protectedData: {
             ...rest,
-            company: {},
-            companyList: [],
-            groupList: [],
           },
         };
 

@@ -36,7 +36,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
             })}
           </option>
         </FieldSelect>
-      </div>{' '}
+      </div>
       <div className={css.fieldContainer}>
         <FieldSelect
           id={'addOrder.foodId'}
@@ -47,7 +47,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
               id: 'AddOrderForm.foodIdField.placeholder',
             })}
           </option>
-        </FieldSelect>{' '}
+        </FieldSelect>
       </div>
       <Button className={css.submitButton}>
         {intl.formatMessage({
