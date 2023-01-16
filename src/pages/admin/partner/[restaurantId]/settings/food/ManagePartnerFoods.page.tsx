@@ -161,7 +161,7 @@ const parseEntitiesToExportCsv = (
   foods: TIntergrationFoodListing[],
   ids: string[],
 ) => {
-  return foods
+  const foodsToExport = foods
     .filter((food) => ids.includes(food.id.uuid))
     .map((food) => {
       const { publicData = {}, description, title } = food.attributes || {};
@@ -173,8 +173,13 @@ const parseEntitiesToExportCsv = (
         ...rest,
         sideDishes: sideDishes.join(','),
         specialDiets: specialDiets.join(','),
+        images: food.images?.map(
+          (image) => image.attributes.variants['square-small2x'].url,
+        ),
       };
     });
+  console.log({ foodsToExport });
+  return foodsToExport;
 };
 
 const ManagePartnerFoods = () => {
@@ -407,10 +412,7 @@ const ManagePartnerFoods = () => {
           <Button
             onClick={() =>
               makeCsv(
-                getTableDataForExport(
-                  parseEntitiesToExportCsv(foods, idsToAction),
-                  TABLE_COLUMN,
-                ),
+                parseEntitiesToExportCsv(foods, idsToAction),
                 `${parseTimestaimpToFormat(new Date().getTime())}_donhang.csv`,
               )
             }

@@ -119,6 +119,8 @@ const queryPartnerFoods = createAsyncThunk(
       meta_restaurantId: restaurantId,
       meta_isDeleted: false,
       perPage: MANAGE_FOOD_PAGE_SIZE,
+      include: ['images'],
+      'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
     });
     const foods = denormalisedResponseEntities(response);
     return { foods, managePartnerFoodPagination: response.data.meta };
