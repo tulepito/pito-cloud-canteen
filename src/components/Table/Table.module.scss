@@ -6,53 +6,76 @@
     margin-bottom: 20px;
     border-collapse: collapse;
     width: 100%;
-    padding: 10px;
     display: block;
     @include viewportLarge {
       display: table;
     }
     thead {
-      background-color: $marketplaceColorLight;
       display: none;
       @include viewportLarge {
         display: table-header-group;
       }
-      tr {
-        td {
-          padding: 10px;
+      .headRow {
+        .headCell {
+          padding: 5px 10px;
           text-align: left;
-          color: #616161;
-          background-color: #fff0eb;
+          color: $neutralGray7;
+          font-size: 12px;
         }
       }
     }
 
     tbody {
+      .formHeadRow {
+        @include viewportLarge {
+          display: none;
+        }
+        .formHeadCell {
+          padding: 0px 10px;
+          text-align: center;
+          color: $neutralGray8;
+          background-color: $neutralGray3;
+          font-size: 14px;
+        }
+      }
+
+      .formRow {
+        margin: 10px;
+        .formCell {
+          width: 200px;
+        }
+      }
+
       display: block;
       width: 100%;
       @include viewportLarge {
         display: table-row-group;
       }
-      tr {
+
+      .bodyRow {
         display: block;
         width: 100%;
         margin-bottom: 40px;
-        box-shadow: $boxShadow;
         @include viewportLarge {
           display: table-row;
         }
-        td {
-          display: block;
+        .bodyCell {
+          display: flex;
+          justify-content: space-between;
           width: 100%;
+          align-items: center;
           text-align: right;
-          padding: 20px 10px;
+          padding: 10px;
           color: #616161;
           border-bottom: 1px solid $matterColorNegative;
           position: relative;
           font-size: 14px;
+
+          span {
+            word-break: break-all;
+          }
           &:before {
             content: attr(data-label);
-            position: absolute;
             left: 0;
             width: 50%;
             padding-left: 15px;
@@ -70,4 +93,8 @@
       }
     }
   }
+}
+
+.isParent {
+  background-color: $neutralGray3;
 }

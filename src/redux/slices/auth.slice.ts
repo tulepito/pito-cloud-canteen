@@ -1,14 +1,47 @@
-/* eslint-disable import/no-cycle */
-
-import type { ThunkAPI } from '@redux/store';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@redux/redux.helper';
+import type { RootState } from '@redux/store';
+import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
 import isEmpty from 'lodash/isEmpty';
 
+// eslint-disable-next-line import/no-cycle
 import { userActions, userThunks } from './user.slice';
 
 const authenticated = (authInfo: Record<string, any>) => {
   return authInfo && authInfo.isAnonymous === false;
+};
+
+enum EAuthState {
+  idle = 'idle',
+  isSigningIn = 'isSigningIn',
+  isLoggingOut = 'isLoggingOut',
+  isSigningUp = 'isSigningUp',
+}
+
+interface IAuthState {
+  isAuthenticated: boolean;
+  // scopes associated with current token
+  authScopes: [];
+  // auth info
+  authInfoLoaded: boolean;
+  // auth Status
+  authStatus: EAuthState;
+  // login
+  signInError: any;
+  // logout
+  logoutError: any;
+  // signup
+  signupError: any;
+}
+
+const initialState: IAuthState = {
+  isAuthenticated: false,
+  authScopes: [],
+  authInfoLoaded: false,
+  authStatus: EAuthState.idle,
+  signInError: null,
+  logoutError: null,
+  signupError: null,
 };
 
 // ================ Thunk types ================ //
@@ -17,51 +50,9 @@ const SIGN_UP = 'app/Auth/SIGN_UP';
 const LOGIN = 'app/Auth/LOGIN';
 const LOGOUT = 'app/Auth/LOGOUT';
 
-interface IAuthState {
-  isAuthenticated: boolean;
-  // scopes associated with current token
-  authScopes: [];
-  // auth info
-  authInfoLoaded: boolean;
-  // login
-  loginError: any;
-  loginInProgress: boolean;
-  // logout
-  logoutError: any;
-  logoutInProgress: boolean;
-  // signup
-  signupError: any;
-  signupInProgress: boolean;
-  // confirm (create use with idp)
-  confirmError: any;
-  confirmInProgress: boolean;
-}
-
-const initialState: IAuthState = {
-  isAuthenticated: false,
-  authScopes: [],
-  authInfoLoaded: false,
-  loginError: null,
-  loginInProgress: false,
-  logoutError: null,
-  logoutInProgress: false,
-  signupError: null,
-  signupInProgress: false,
-  confirmError: null,
-  confirmInProgress: false,
-};
-
-// ================ Selectors ================ //
-export const authenticationInProgress = (state: any) => {
-  const { loginInProgress, logoutInProgress, signupInProgress } = state.auth;
-  return loginInProgress || logoutInProgress || signupInProgress;
-};
-
-//
-
 const authInfo = createAsyncThunk(
   AUTH_INFO,
-  async (_, { extra: sdk, fulfillWithValue }: ThunkAPI) => {
+  async (_, { extra: sdk, fulfillWithValue }) => {
     try {
       const info = await sdk.authInfo();
       return fulfillWithValue(info);
@@ -75,50 +66,43 @@ const login = createAsyncThunk(
   LOGIN,
   async (
     params: { email: string; password: string },
-    { dispatch, extra: sdk, rejectWithValue }: ThunkAPI,
+    { dispatch, extra: sdk },
   ) => {
-    try {
-      const { email: username, password } = params;
-      await sdk.login({ username, password });
-
-      dispatch(userThunks.fetchCurrentUser(undefined));
-    } catch (error: any) {
-      return rejectWithValue(storableError(error));
-    }
+    const { email: username, password } = params;
+    await sdk.login({ username, password });
+    await dispatch(userThunks.fetchCurrentUser(undefined));
+  },
+  {
+    serializeError: storableError,
   },
 );
 
 const logout = createAsyncThunk(
   LOGOUT,
-  async (_, { dispatch, extra: sdk, rejectWithValue }: ThunkAPI) => {
-    try {
-      await sdk.logout();
-      dispatch(userActions.clearCurrentUser());
-    } catch (error: any) {
-      return rejectWithValue(storableError(error));
-    }
+  async (_, { dispatch, extra: sdk }) => {
+    await sdk.logout();
+    dispatch(userActions.clearCurrentUser());
+  },
+  {
+    serializeError: storableError,
   },
 );
 
 const signUp = createAsyncThunk(
   SIGN_UP,
-  async (
-    params: Record<string, any>,
-    { dispatch, extra: sdk, rejectWithValue }: ThunkAPI,
-  ) => {
-    try {
-      const { email, password, firstName, lastName, ...rest } = params;
-      const createUserParams = isEmpty(rest)
-        ? { email, password, firstName, lastName }
-        : { email, password, firstName, lastName, protectedData: { ...rest } };
+  async (params: Record<string, any>, { dispatch, extra: sdk }) => {
+    const { email, password, firstName, lastName, ...rest } = params;
+    const createUserParams = isEmpty(rest)
+      ? { email, password, firstName, lastName }
+      : { email, password, firstName, lastName, protectedData: { ...rest } };
 
-      // We must login the user if signup succeeds since the API doesn't
-      // do that automatically.
-      await sdk.currentUser.create(createUserParams);
-      dispatch(login({ email, password }));
-    } catch (error) {
-      return rejectWithValue(storableError(error));
-    }
+    // We must login the user if signup succeeds since the API doesn't
+    // do that automatically.
+    await sdk.currentUser.create(createUserParams);
+    dispatch(login({ email, password }));
+  },
+  {
+    serializeError: storableError,
   },
 );
 
@@ -148,54 +132,54 @@ const authSlice = createSlice({
       .addCase(signUp.pending, (state) => {
         return {
           ...state,
-          signupInProgress: true,
-          loginError: null,
+          authStatus: EAuthState.isSigningUp,
+          signInError: null,
           signupError: null,
         };
       })
       .addCase(signUp.fulfilled, (state) => {
-        return { ...state, signupInProgress: false };
+        return { ...state, authStatus: EAuthState.idle };
       })
       .addCase(signUp.rejected, (state, action) => {
         return {
           ...state,
-          signupInProgress: false,
-          signupError: action.payload,
+          authStatus: EAuthState.idle,
+          signupError: action.error,
         };
       })
 
       .addCase(login.pending, (state) => {
         return {
           ...state,
-          loginInProgress: true,
-          loginError: null,
+          authStatus: EAuthState.isSigningIn,
+          signInError: null,
           logoutError: null,
           signupError: null,
         };
       })
       .addCase(login.fulfilled, (state) => {
-        return { ...state, loginInProgress: false, isAuthenticated: true };
+        return { ...state, authStatus: EAuthState.idle };
       })
       .addCase(login.rejected, (state, action) => {
         return {
           ...state,
-          loginInProgress: false,
-          loginError: action.payload,
+          authStatus: EAuthState.idle,
+          signInError: action.error,
         };
       })
 
       .addCase(logout.pending, (state) => {
         return {
           ...state,
-          logoutInProgress: true,
-          loginError: null,
+          authStatus: EAuthState.isLoggingOut,
+          signInError: null,
           logoutError: null,
         };
       })
       .addCase(logout.fulfilled, (state) => {
         return {
           ...state,
-          logoutInProgress: false,
+          authStatus: EAuthState.idle,
           isAuthenticated: false,
           authScopes: [],
         };
@@ -203,11 +187,16 @@ const authSlice = createSlice({
       .addCase(logout.rejected, (state, action) => {
         return {
           ...state,
-          logoutInProgress: false,
-          logoutError: action.payload,
+          authStatus: EAuthState.idle,
+          logoutError: action.error,
         };
       });
   },
 });
 
 export default authSlice.reducer;
+
+// ================ Selectors ================ //
+export const authenticationInProgress = (state: RootState) => {
+  return state.auth.authStatus !== EAuthState.idle;
+};

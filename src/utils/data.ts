@@ -1,4 +1,5 @@
 import { sanitizeEntity } from '@utils/sanitize';
+import merge from 'lodash/merge';
 import reduce from 'lodash/reduce';
 
 import type {
@@ -6,7 +7,10 @@ import type {
   TAvailabilityPlan,
   TCurrentUser,
   TLineItemCode,
+  TListing,
+  TOwnListing,
   TTimeSlot,
+  TTransaction,
   TUser,
 } from './types';
 
@@ -236,7 +240,7 @@ export const ensureOwnListing = (listing: any) => {
  */
 export const ensureUser = (user: TUser) => {
   const empty = { id: null, type: 'user', attributes: { profile: {} } };
-  return { ...empty, ...user };
+  return merge(empty, user);
 };
 
 /**
@@ -357,4 +361,221 @@ export const humanizeLineItemCode = (code: TLineItemCode) => {
   const lowercase = code.replace(/^line-item\//, '').replace(/-/g, ' ');
 
   return lowercase.charAt(0).toUpperCase() + lowercase.slice(1);
+};
+
+// ================ Selectors ================ //
+
+/**
+ * Get the denormalised listing entities with the given IDs
+ *
+ * @param {Object} state the full Redux store
+ * @param {Array<UUID>} listingIds listing IDs to select from the store
+ */
+export const getListingsById = (state: any, listingIds: any[]) => {
+  const { entities } = state.marketplaceData;
+  const resources = listingIds.map((id) => ({
+    id,
+    type: 'listing',
+  }));
+  const throwIfNotFound = false;
+  return denormalisedEntities(entities, resources, throwIfNotFound);
+};
+
+/**
+ * Get the denormalised entities from the given entity references.
+ *
+ * @param {Object} state the full Redux store
+ *
+ * @param {Array<{ id, type }} entityRefs References to entities that
+ * we want to query from the data. Currently we expect that all the
+ * entities have the same type.
+ *
+ * @return {Array<Object>} denormalised entities
+ */
+export const getMarketplaceEntities = (state: any, entityRefs: any[]) => {
+  const { entities } = state.marketplaceData;
+  const throwIfNotFound = false;
+  return denormalisedEntities(entities, entityRefs, throwIfNotFound);
+};
+
+export const entityRefs = (entities: any) =>
+  entities.map((entity: any) => ({
+    id: entity.id,
+    type: entity.type,
+  }));
+
+export const CURRENT_USER = (user: TCurrentUser) => {
+  const ensuredUser = ensureCurrentUser(user);
+  const id = ensuredUser?.id?.uuid;
+  const profile = ensuredUser?.attributes?.profile || {};
+  const { privateData, publicData, protectedData, metadata } = profile;
+  return {
+    getId: () => {
+      return id;
+    },
+    getFullData: () => {
+      return ensuredUser || {};
+    },
+    getProfile: () => {
+      return profile || {};
+    },
+    getMetadata: () => {
+      return metadata || {};
+    },
+    getProtectedData: () => {
+      return protectedData || {};
+    },
+    getPrivateData: () => {
+      return privateData || {};
+    },
+    getPublicData: () => {
+      return publicData || {};
+    },
+  };
+};
+
+export const USER = (user: TUser) => {
+  const ensuredUser = ensureUser(user);
+  const id = ensuredUser?.id?.uuid;
+  const attributes = ensuredUser?.attributes || {};
+  const profile = attributes?.profile || {};
+  const { privateData, publicData, protectedData, metadata } = profile;
+  return {
+    getId: () => {
+      return id;
+    },
+    getFullData: () => {
+      return ensuredUser || {};
+    },
+    getAttributes: () => {
+      return attributes || {};
+    },
+    getProfile: () => {
+      return profile || {};
+    },
+    getMetadata: () => {
+      return metadata || {};
+    },
+    getProtectedData: () => {
+      return protectedData || {};
+    },
+    getPrivateData: () => {
+      return privateData || {};
+    },
+    getPublicData: () => {
+      return publicData || {};
+    },
+  };
+};
+
+export const LISTING = (listing: TListing) => {
+  const ensuredListing = ensureListing(listing);
+  const id = ensuredListing?.id?.uuid;
+  const attributes = ensuredListing?.attributes;
+  const { privateData, publicData, protectedData, metadata } = attributes || {};
+
+  return {
+    getId: () => {
+      return id;
+    },
+    getFullData: () => {
+      return ensuredListing || {};
+    },
+    getAttributes: () => {
+      return attributes || {};
+    },
+    getMetadata: () => {
+      return metadata || {};
+    },
+    getProtectedData: () => {
+      return protectedData || {};
+    },
+    getPrivateData: () => {
+      return privateData || {};
+    },
+    getPublicData: () => {
+      return publicData || {};
+    },
+  };
+};
+
+export const OWN_LISTING = (listing: TOwnListing) => {
+  const ensuredListing = ensureOwnListing(listing);
+  const id = ensuredListing?.id?.uuid;
+  const attributes = ensuredListing?.attributes;
+  const { privateData, publicData, protectedData, metadata } = attributes;
+
+  return {
+    getId: () => {
+      return id;
+    },
+    getFullData: () => {
+      return ensuredListing || {};
+    },
+    getAttributes: () => {
+      return attributes || {};
+    },
+    getMetadata: () => {
+      return metadata || {};
+    },
+    getProtectedData: () => {
+      return protectedData || {};
+    },
+    getPrivateData: () => {
+      return privateData || {};
+    },
+    getPublicData: () => {
+      return publicData || {};
+    },
+  };
+};
+
+export const TRANSACTION = (transaction: TTransaction) => {
+  const ensuredTransaction = ensureTransaction(transaction);
+  const id = ensuredTransaction?.id?.uuid;
+  const attributes = ensuredTransaction?.attributes;
+  const { privateData, publicData, protectedData, metadata } = attributes || {};
+  return {
+    getId: () => {
+      return id;
+    },
+    getFullData: () => {
+      return ensuredTransaction || {};
+    },
+    getAttributes: () => {
+      return attributes || {};
+    },
+    getMetadata: () => {
+      return metadata || {};
+    },
+    getProtectedData: () => {
+      return protectedData || {};
+    },
+    getPrivateData: () => {
+      return privateData || {};
+    },
+    getPublicData: () => {
+      return publicData || {};
+    },
+  };
+};
+
+export const TRANSACTION_WITH_EXTENDED_DATA = (transaction: TTransaction) => {
+  const originTransaction = TRANSACTION(transaction);
+  const { listing, provider, booking, customer } = transaction;
+  return {
+    ...originTransaction,
+    getListing: () => {
+      return listing || {};
+    },
+    getBooking: () => {
+      return booking || {};
+    },
+    getCustomer: () => {
+      return customer || {};
+    },
+    getProvider: () => {
+      return provider || {};
+    },
+  };
 };

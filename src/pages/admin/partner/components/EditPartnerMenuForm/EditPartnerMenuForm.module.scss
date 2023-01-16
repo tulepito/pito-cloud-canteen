@@ -1,0 +1,50 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.fieldLabel {
+  font-weight: $fontWeightBold;
+}
+
+.fieldDescription {
+  color: $neutralGray7;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.categoryFields {
+  width: 100%;
+}
+
+.categoryList {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 20px;
+  @include viewportLarge {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.fields {
+  margin-bottom: 30px;
+}
+
+.btnWrapper {
+  display: flex;
+  margin: 40px 0;
+  justify-content: space-between;
+}
+
+.buttons {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.secondaryButton {
+  background-color: $matterColorLight;
+  color: $neutralGray6;
+  border: 1px solid $neutralGray6;
+  &:hover {
+    background-color: $neutralGray11;
+  }
+}

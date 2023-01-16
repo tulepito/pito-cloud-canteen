@@ -1,15 +1,13 @@
+import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 
 import css from './PitoLogo.module.scss';
 
-type TPitoLogo = {
-  className?: string;
-};
-
-const PitoLogo = (props: TPitoLogo) => {
+const PitoLogo: React.FC<TIconProps> = (props) => {
   const { className } = props;
   const classes = classNames(css.root, className);
+
   return (
     <svg
       className={classes}

@@ -5,17 +5,17 @@ import axios from 'axios';
 
 import type { ThunkAPI } from './types';
 
+export type TCompanyImageActionPayload = {
+  id: string;
+  file: any;
+};
+
 const MEMBER_PER_PAGE = 10;
 
 type TGroupInfo = {
   id: string;
   name: string;
   description: string;
-};
-
-export type TCompanyImageActionPayload = {
-  id: string;
-  file: any;
 };
 interface CompanyState {
   groupList: any;
@@ -34,11 +34,12 @@ interface CompanyState {
   deleteGroupError: any;
   deletingGroupId: string;
 
+  company: TUser | null;
   updateGroupInProgress: boolean;
   updateGroupError: any;
   originCompanyMembers: Record<string, any>;
+  isCompanyNotFound: boolean;
 
-  company: TUser | null;
   companyImage: any;
   uploadCompanyImageInProgress: boolean;
   uploadCompanyImageError: any;
@@ -60,7 +61,7 @@ const initialState: CompanyState = {
   groupList: [],
   fetchGroupListInProgress: false,
   groupMembers: [],
-  workspaceCompanyId: '639a9857-879a-4090-97a0-032fa3851542',
+  workspaceCompanyId: '',
   groupInfo: {} as TGroupInfo,
   fetchGroupDetailInProgress: false,
   companyMembers: [],
@@ -73,11 +74,12 @@ const initialState: CompanyState = {
   deleteGroupError: null,
   deletingGroupId: '',
 
+  company: null,
   updateGroupInProgress: false,
   updateGroupError: null,
   originCompanyMembers: {},
+  isCompanyNotFound: false,
 
-  company: null,
   companyImage: null,
   uploadCompanyImageInProgress: false,
   uploadCompanyImageError: null,
@@ -97,18 +99,18 @@ const companyInfo = createAsyncThunk(
     const [companyAccount] = denormalisedResponseEntities(
       companyAccountResponse,
     );
+    const companyImageId = companyAccount.profileImage?.id;
     const { data: allEmployeesData } = await axios.get(
       `/api/company/all-employees?companyId=${workspaceCompanyId}`,
     );
-    const companyImageId = companyAccount.profileImage?.id;
     const { groups = [], members = {} } =
       companyAccount.attributes.profile.metadata;
     return {
       companyImage: {
         imageId: companyImageId || null,
       },
-      company: companyAccount,
       groupList: groups,
+      company: companyAccount,
       originCompanyMembers: members,
       companyMembers: [...allEmployeesData.data.data],
     };
@@ -246,6 +248,7 @@ const updateCompanyAccount = createAsyncThunk(
     };
   },
 );
+
 export const BookerManageCompany = {
   companyInfo,
   groupInfo,
@@ -274,16 +277,27 @@ export const companySlice = createSlice({
         return {
           ...state,
           fetchCompanyInfoInProgress: true,
+          isCompanyNotFound: false,
         };
       })
       .addCase(companyInfo.fulfilled, (state, { payload }) => {
-        const { groupList, companyMembers, company } = payload;
+        const { groupList, companyMembers, originCompanyMembers, company } =
+          payload;
         return {
           ...state,
           groupList,
           companyMembers,
           company,
+          originCompanyMembers,
+          isCompanyNotFound: false,
           fetchCompanyInfoInProgress: false,
+        };
+      })
+      .addCase(companyInfo.rejected, (state) => {
+        return {
+          ...state,
+          fetchCompanyInfoInProgress: false,
+          isCompanyNotFound: true,
         };
       })
       .addCase(groupInfo.pending, (state) => {

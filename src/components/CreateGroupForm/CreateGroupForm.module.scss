@@ -8,6 +8,15 @@
   }
 }
 
+.uploadMemberListWrapper {
+  @include flexAlign(center);
+  margin-top: 16px;
+
+  .uploadMemberListTitle {
+    margin-right: 16px;
+  }
+}
+
 .submitBtn {
   margin: 40px auto 0;
   width: 400px;

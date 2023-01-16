@@ -1,0 +1,42 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  padding: 16px;
+  border: 1px solid $neutralGray4;
+  border-radius: 16px;
+
+  .title {
+    @include textTemplate(18px, 700, 24px, '');
+    color: $neutralGray10;
+    position: relative;
+    margin: 0 0 25px;
+
+    padding-bottom: 8px;
+    &::after {
+      position: absolute;
+      content: '';
+      bottom: 0;
+      left: 0;
+      width: 37px;
+      height: 1px;
+      background: $primaryPri5;
+    }
+  }
+
+  .orderEndAtMessage {
+    color: $neutralGray10;
+    margin: 16px 0 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid $neutralGray5;
+    @include textTemplate(14px, 400, 24px, '');
+    .orderEndAtLabel {
+      color: $neutralGray7;
+    }
+  }
+}
+
+.toggleNotification {
+  margin-bottom: 16px;
+}

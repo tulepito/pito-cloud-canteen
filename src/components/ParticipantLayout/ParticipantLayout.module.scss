@@ -1,0 +1,15 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px 24px 0;
+
+  @include viewportMedium {
+    padding: 40px 48px;
+  }
+
+  @include viewportLarge {
+    padding: 40px 60px;
+  }
+}

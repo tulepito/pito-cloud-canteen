@@ -1,5 +1,5 @@
-import type { ThunkAPI } from '@redux/store';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
 
 import { userThunks } from './user.slice';
@@ -31,16 +31,15 @@ const verify = createAsyncThunk(
   VERIFICATION,
   async (
     params: Record<string, any>,
-    { dispatch, extra: sdk, fulfillWithValue, rejectWithValue }: ThunkAPI,
+    { dispatch, extra: sdk, fulfillWithValue },
   ) => {
-    try {
-      const { verificationToken } = params;
-      await sdk.currentUser.verifyEmail({ verificationToken });
-      fulfillWithValue(undefined);
-      dispatch(userThunks.fetchCurrentUser(undefined));
-    } catch (error) {
-      return rejectWithValue(storableError(error));
-    }
+    const { verificationToken } = params;
+    await sdk.currentUser.verifyEmail({ verificationToken });
+    fulfillWithValue(undefined);
+    dispatch(userThunks.fetchCurrentUser(undefined));
+  },
+  {
+    serializeError: storableError,
   },
 );
 
@@ -51,7 +50,11 @@ export const emailVerificationThunks = {
 const emailVerificationSlice = createSlice({
   name: 'EmailVerification',
   initialState,
-  reducers: {},
+  reducers: {
+    updateVerificationState(state, { payload }) {
+      state.isVerified = payload;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(verify.pending, (state) => {
       return {
@@ -63,14 +66,15 @@ const emailVerificationSlice = createSlice({
     builder.addCase(verify.fulfilled, (state) => {
       return { ...state, verificationInProgress: false, isVerified: true };
     });
-    builder.addCase(verify.rejected, (state, action) => {
+    builder.addCase(verify.rejected, (state, { error }) => {
       return {
         ...state,
         verificationInProgress: false,
-        verificationError: action.payload,
+        verificationError: error,
       };
     });
   },
 });
 
+export const emailVerificationActions = emailVerificationSlice.actions;
 export default emailVerificationSlice.reducer;

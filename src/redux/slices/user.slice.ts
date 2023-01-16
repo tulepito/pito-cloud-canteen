@@ -1,11 +1,14 @@
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable no-nested-ternary */
-/* eslint-disable import/no-cycle */
-import type { ThunkAPI } from '@redux/store';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { denormalisedResponseEntities } from '@utils/data';
+import { createAsyncThunk, createDeepEqualSelector } from '@redux/redux.helper';
+import type { RootState } from '@redux/store';
+import { createSlice } from '@reduxjs/toolkit';
+import { denormalisedResponseEntities, ensureCurrentUser } from '@utils/data';
+import { EUserPermission } from '@utils/enums';
 import { storableError } from '@utils/errors';
+import get from 'lodash/get';
 
+// eslint-disable-next-line import/no-cycle
 import { authThunks } from './auth.slice';
 
 const mergeCurrentUser = (oldCurrentUser: any, newCurrentUser: any) => {
@@ -27,60 +30,56 @@ const mergeCurrentUser = (oldCurrentUser: any, newCurrentUser: any) => {
     : { id, type, attributes, ...oldRelationships, ...relationships };
 };
 
-// ================ Thunk types ================ //
-const FETCH_CURRENT_USER = 'app/User/FETCH_CURRENT_USER';
-const SEND_VERIFICATION_EMAIL = 'app/user/SEND_VERIFICATION_EMAIL';
+const detectUserPermission = (currentUser: any) => {
+  const { isCompany, isAdmin, company } = get(
+    currentUser,
+    'attributes.profile.metadata',
+  );
 
-interface IUserState {
+  let isBooker;
+
+  if (!company) {
+    isBooker = false;
+  } else {
+    isBooker = Object.values(company).some(({ permission }: any) => {
+      return permission === 'booker';
+    });
+  }
+
+  if (isAdmin) return EUserPermission.admin;
+  if (isCompany || isBooker) return EUserPermission.company;
+
+  return EUserPermission.normal;
+};
+
+type TUserState = {
   currentUser: any;
   currentUserShowError: any;
+  userPermission: EUserPermission;
   sendVerificationEmailInProgress: boolean;
   sendVerificationEmailError: any;
-}
+};
 
-const initialState: IUserState = {
+const initialState: TUserState = {
   currentUser: null,
   currentUserShowError: null,
+  userPermission: EUserPermission.normal,
   sendVerificationEmailInProgress: false,
   sendVerificationEmailError: null,
 };
 
-// ================ Selectors ================ //
-
-export const hasCurrentUserErrors = (state: any) => {
-  const { user } = state;
-  return (
-    user.currentUserShowError ||
-    user.currentUserHasListingsError ||
-    user.currentUserNotificationCountError ||
-    user.currentUserHasOrdersError
-  );
-};
-
-export const verificationSendingInProgress = (state: any) => {
-  return state.user.sendVerificationEmailInProgress;
-};
-
 // ================ Thunks ================ //
+const FETCH_CURRENT_USER = 'app/User/FETCH_CURRENT_USER';
+const SEND_VERIFICATION_EMAIL = 'app/user/SEND_VERIFICATION_EMAIL';
+
 const fetchCurrentUser = createAsyncThunk(
   FETCH_CURRENT_USER,
   async (
-    params: any,
-    { dispatch, extra: sdk, rejectWithValue, fulfillWithValue }: ThunkAPI,
+    params: any | undefined,
+    { dispatch, extra: sdk, rejectWithValue, fulfillWithValue },
   ) => {
     try {
-      const parameters =
-        params ||
-        {
-          // include: ['profileImage'],
-          // 'fields.image': [
-          //   'variants.square-small',
-          //   'variants.square-small2x',
-          //   'variants.square-xsmall',
-          //   'variants.square-xsmall2x',
-          // ],
-        };
-
+      const parameters = params || {};
       const response = await sdk.currentUser.show(parameters);
       const entities = denormalisedResponseEntities(response);
 
@@ -90,11 +89,12 @@ const fetchCurrentUser = createAsyncThunk(
         );
       }
       const currentUser = entities[0];
+
       // Make sure auth info is up to date
       dispatch(authThunks.authInfo());
 
       return fulfillWithValue(currentUser);
-    } catch (error: any) {
+    } catch (error) {
       // Make sure auth info is up to date
       dispatch(authThunks.authInfo());
       return rejectWithValue(storableError(error));
@@ -104,12 +104,11 @@ const fetchCurrentUser = createAsyncThunk(
 
 const sendVerificationEmail = createAsyncThunk(
   SEND_VERIFICATION_EMAIL,
-  async (_, { extra: sdk, rejectWithValue }: ThunkAPI) => {
-    try {
-      await sdk.currentUser.sendVerificationEmail();
-    } catch (error) {
-      return rejectWithValue(storableError(error));
-    }
+  async (_, { extra: sdk }) => {
+    await sdk.currentUser.sendVerificationEmail();
+  },
+  {
+    serializeError: storableError,
   },
 );
 
@@ -119,7 +118,7 @@ export const userThunks = {
 };
 
 const userSlice = createSlice({
-  name: 'User',
+  name: 'user',
   initialState,
   reducers: {
     clearCurrentUser: (state) => {
@@ -127,41 +126,32 @@ const userSlice = createSlice({
         ...state,
         currentUser: null,
         currentUserShowError: null,
-        currentUserHasListings: false,
-        currentUserHasListingsError: null,
-        currentUserNotificationCount: 0,
-        currentUserNotificationCountError: null,
-        currentUserListing: null,
-        currentUserListingFetched: false,
+        userPermission: EUserPermission.normal,
+        sendVerificationEmailInProgress: false,
+        sendVerificationEmailError: null,
       };
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCurrentUser.pending, (state) => {
-        return { ...state, currentUserShowError: null };
+        state.currentUserShowError = null;
       })
-      .addCase(fetchCurrentUser.fulfilled, (state, { payload }) => {
-        return {
-          ...state,
-          currentUser: mergeCurrentUser(state.currentUser, payload),
-        };
+      .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+        const currentUser = action.payload;
+
+        state.currentUser = mergeCurrentUser(state.currentUser, currentUser);
+        state.userPermission = detectUserPermission(currentUser);
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
-        return { ...state, currentUserShowError: action.payload };
+        state.currentUserShowError = action.payload;
       })
 
       .addCase(sendVerificationEmail.pending, (state) => {
-        return {
-          ...state,
-          sendVerificationEmailInProgress: true,
-        };
+        state.sendVerificationEmailInProgress = true;
       })
       .addCase(sendVerificationEmail.fulfilled, (state) => {
-        return {
-          ...state,
-          sendVerificationEmailInProgress: false,
-        };
+        state.sendVerificationEmailInProgress = false;
       })
       .addCase(sendVerificationEmail.rejected, (state, action) => {
         return {
@@ -175,3 +165,17 @@ const userSlice = createSlice({
 
 export const userActions = userSlice.actions;
 export default userSlice.reducer;
+
+// ================ Selectors ================ //
+export const currentUserSelector = createDeepEqualSelector(
+  (state: RootState) => state.user.currentUser,
+  (currentUser) => ensureCurrentUser(currentUser),
+);
+
+export const hasCurrentUserErrorsSelector = (state: RootState) => {
+  return state.user.currentUserShowError;
+};
+
+export const verificationSendingInProgress = (state: RootState) => {
+  return state.user.sendVerificationEmailInProgress;
+};

@@ -1,13 +1,8 @@
-import type {
-  Action,
-  AnyAction,
-  Store,
-  ThunkAction,
-  ThunkDispatch,
-} from '@reduxjs/toolkit';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { getSdk } from '@services/sdk';
 import { createWrapper, HYDRATE } from 'next-redux-wrapper';
+import { persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 
 import { createSdkInstance } from '../sharetribe/sdk';
 import * as globalReducers from './slices';
@@ -16,7 +11,13 @@ const combinedReducer = combineReducers({
   ...globalReducers,
 });
 
-const rootReducer = (state: RootState, action: AnyAction) => {
+const persistConfig = {
+  key: 'root',
+  version: 1,
+  storage,
+  whitelist: ['Order', 'ManageCompaniesPage'],
+};
+const rootReducer: typeof combinedReducer = (state, action) => {
   if (action.type === HYDRATE) {
     const nextState = {
       ...state,
@@ -27,6 +28,7 @@ const rootReducer = (state: RootState, action: AnyAction) => {
   return combinedReducer(state, action);
 };
 
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 export const makeStore = (context: any) => {
   let sdk = createSdkInstance();
 
@@ -37,7 +39,7 @@ export const makeStore = (context: any) => {
   }
 
   return configureStore({
-    reducer: rootReducer,
+    reducer: persistedReducer,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: false,
@@ -47,15 +49,9 @@ export const makeStore = (context: any) => {
 };
 
 export type AppStore = ReturnType<typeof makeStore>;
-export type AppDispatch = Store['dispatch'] &
-  ThunkDispatch<RootState, null, AnyAction>;
-export type RootState = ReturnType<Store['getState']>;
-export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  RootState,
-  unknown,
-  Action<string>
->;
+export type AppDispatch = AppStore['dispatch'];
+export type RootState = ReturnType<typeof rootReducer>;
+
 export type ThunkAPI = {
   dispatch?: any;
   getState?: any;

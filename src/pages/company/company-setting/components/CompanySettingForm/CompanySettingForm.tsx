@@ -2,7 +2,7 @@
 import Button from '@components/Button/Button';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
-import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TCompanyImageActionPayload } from '@redux/slices/company.slice';
 import { BookerManageCompany } from '@redux/slices/company.slice';
 import { isUploadImageOverLimitError } from '@utils/errors';

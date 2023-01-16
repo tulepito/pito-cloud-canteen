@@ -1,0 +1,173 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  position: relative;
+}
+
+.icon {
+  display: flex;
+  position: absolute;
+  right: 5px;
+  pointer-events: none;
+  top: 0;
+  width: 24px;
+  height: 100%;
+  align-self: stretch;
+  svg {
+    stroke: $neutralGray6;
+  }
+}
+
+.iconSvg {
+  margin: auto;
+}
+
+.iconSvgGroup {
+  stroke: $marketplaceColor;
+  stroke-width: 2.5px;
+
+  @include viewportMedium {
+    stroke-width: 2px;
+  }
+}
+
+.iconSpinner {
+  margin: auto;
+  width: 23px;
+}
+
+.input {
+  border: 1px solid $neutralGray5;
+  color: $neutralGray10;
+  background: transparent;
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  background-color: $matterColorLight;
+  background-clip: padding-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 4px;
+  -webkit-transition: border-color 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+  outline: none;
+
+  &:hover {
+    border-color: $primaryPri4;
+    outline: 0;
+  }
+
+  &:focus {
+    border-color: $primaryPri5;
+    box-shadow: 0px 0px 0px 2px rgba(239, 61, 42, 0.2);
+  }
+
+  &::placeholder {
+    font-weight: $fontWeightRegular;
+    font-size: 16px;
+    color: $neutralGray5;
+  }
+}
+
+/*
+Predictions container can be overriden with new container styles for
+size and position, etc.
+*/
+.predictionsRoot {
+  position: absolute;
+  width: 100%;
+  padding-bottom: 50px;
+  top: 50px;
+  left: 0;
+  background-color: $matterColorLight;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  box-shadow: 0px 8px 8px -4px rgba(16, 24, 40, 0.04),
+    0px 20px 24px 4px rgba(16, 24, 40, 0.1);
+  z-index: calc($zIndexPopup + 1);
+}
+
+/*
+The Google Maps API TOS requires us to show a Powered by Google logo
+next to the autocomplete service predictions. It is rendered to the
+bottom of the container.
+*/
+.poweredByGoogle {
+  position: absolute;
+  bottom: 30px;
+  width: 100%;
+  height: 18px;
+  background-image: url(./images/powered_by_google_on_non_white_hdpi.png);
+  background-size: auto 18px;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  @include viewportMedium {
+    background-position: center left 50px;
+  }
+}
+
+/* List of predictions, with a responsive padding size */
+.predictions {
+  margin: 0;
+  padding: 14px 0;
+
+  & li {
+    color: $neutralGray10;
+    transition: $transitionStyleButton;
+    margin: 0; /* Remove the double white space */
+    line-height: 24px;
+
+    /* Assign enough vertical padding to make the element at least 44px high */
+    padding: 9px 24px;
+    list-style: none;
+    @include viewportMedium {
+      color: $neutralGray10;
+      padding: 8px 24px;
+      margin: 0;
+    }
+
+    &:hover,
+    &.highlighted {
+      cursor: pointer;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+      color: $neutralGray10;
+      background: $neutralGray3;
+    }
+  }
+}
+
+.currentLocation {
+  composes: h4 from global;
+}
+
+.currentLocationIcon {
+  margin-right: 10px;
+}
+
+.labelRoot {
+  font-size: 14px;
+  line-height: 24px;
+  color: $neutralGray10;
+  margin-bottom: 8px;
+  display: inline-flex;
+}
+
+.labelRequiredRedStar {
+  color: $failColor;
+  margin-left: 2px;
+  font-weight: $fontWeightBold;
+  margin-left: 2px;
+  display: inline-flex;
+}

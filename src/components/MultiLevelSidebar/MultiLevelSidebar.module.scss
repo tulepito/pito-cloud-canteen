@@ -8,37 +8,53 @@
   padding: 10px;
 
   .subMenu {
+    margin: 10px 0;
     cursor: pointer;
     list-style: none;
     .subMenuLayout {
       display: flex;
       align-items: center;
+      padding: 0 8px;
+      &.isOpen {
+        background-color: $primaryPri1;
+        border-radius: 9px;
+        .label {
+          color: $primaryPri5 !important;
+          font-weight: $fontWeightBold;
+        }
+        .entityIcon {
+          fill: $primaryPri5;
+        }
+        .menuArrowIcon {
+          fill: $primaryPri5;
+        }
+      }
       .subMenuItem {
         display: flex;
         align-items: center;
         width: 100%;
+
         .label {
           font-size: 14px;
+          font-weight: $fontWeightMedium;
           color: $matterColor;
-          &.labelOpen {
-            color: red;
+          padding-bottom: 3px;
+          &.active {
+            color: $primaryPri5;
+            font-weight: $fontWeightBold;
           }
         }
         .entityIcon {
-          margin-right: 10px;
-          width: 20px;
+          margin-right: 15px;
+          width: 15px;
         }
       }
       .menuArrowIcon {
         float: right;
-        transform: rotate(-90deg);
-        &.menuArrowOpen {
-          transform: rotate(0deg);
-        }
       }
     }
     .menuWrapper {
-      margin-left: 40px;
+      margin-left: 32px;
       padding-bottom: 0;
     }
   }

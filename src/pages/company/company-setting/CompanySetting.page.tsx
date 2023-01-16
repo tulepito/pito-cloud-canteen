@@ -1,4 +1,4 @@
-import { useAppDispatch } from '@redux/reduxHooks';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import { BookerManageCompany } from '@redux/slices/company.slice';
 import { useEffect } from 'react';
 

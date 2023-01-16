@@ -2,15 +2,57 @@
 @use '/src/styles/vars.scss' as *;
 
 .styleGuideContainer {
-  width: 100%;
-  padding: 40px;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-  border-radius: 0;
-  background: #ffffff;
-  margin: auto;
+  background-color: $neutralGray4;
+  padding: 40px 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  grid-auto-rows: auto auto;
+  gap: 1rem;
+  justify-content: center;
 
   @include viewportMedium {
-    width: 640px;
-    border-radius: 16px;
+    padding: 64px 80px;
   }
+}
+
+.styleGuideCard {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.styleGuideCardTwoSpan {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+}
+.badgeContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 20px;
+  margin-bottom: 24px;
+  font-weight: $fontWeightBold;
+}
+
+.fieldItem {
+  margin-bottom: 10px;
+}
+.tooltipContainer {
+  padding: 6px 8px;
+  text-align: center;
+  background-color: $primaryPri3;
+  border-radius: 8px;
+  color: $matterColorLight;
+}
+.tooltipWrapper {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }

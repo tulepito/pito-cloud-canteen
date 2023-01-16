@@ -1,5 +1,5 @@
 import Button from '@components/Button/Button';
-import { useAppDispatch, useAppSelector } from '@redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
 import { useRouter } from 'next/router';
 
@@ -29,5 +29,3 @@ export default function Home() {
     </div>
   );
 }
-
-Home.requireAuth = true;

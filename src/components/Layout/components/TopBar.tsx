@@ -1,12 +1,13 @@
 import PitoLogo from '@components/PitoLogo/PitoLogo';
-import { useAppSelector } from '@redux/reduxHooks';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import get from 'lodash/get';
 import Link from 'next/link';
 
 import css from './TopBar.module.scss';
 
 const TopBar = () => {
-  const { currentUser } = useAppSelector((state) => state.user);
+  const currentUser = useAppSelector(currentUserSelector);
   const email = get(currentUser, 'attributes.email');
 
   return (

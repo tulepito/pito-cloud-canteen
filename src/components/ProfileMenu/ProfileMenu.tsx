@@ -47,7 +47,7 @@ type TProfileMenu = {
   contentPlacementOffset?: number;
   useArrow?: boolean;
   isOpen?: boolean;
-  onToggleActive?: (e: boolean) => null;
+  onToggleActive?: (e: boolean) => void;
 };
 
 const ProfileMenu = (props: TProfileMenu) => {

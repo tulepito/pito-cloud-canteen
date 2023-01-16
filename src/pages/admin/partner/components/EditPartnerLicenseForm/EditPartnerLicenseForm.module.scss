@@ -1,0 +1,49 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.italicFont {
+  font-style: italic;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  row-gap: 40px;
+  @include viewportLarge {
+    flex-direction: row;
+    column-gap: 20px;
+  }
+  .field {
+    flex: 0.5;
+  }
+}
+
+.buttonWrapper {
+  margin: 30px 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.businessTypeWrapper {
+  margin-bottom: 20px;
+}
+
+.businessTypeLabel {
+  margin: 20px 0 10px 0;
+  font-style: italic;
+}
+
+.buttons {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.secondaryButton {
+  background-color: $matterColorLight;
+  color: $neutralGray6;
+  border: 1px solid $neutralGray6;
+  &:hover {
+    background-color: $neutralGray11;
+  }
+}

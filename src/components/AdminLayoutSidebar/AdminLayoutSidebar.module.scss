@@ -1,10 +1,11 @@
-@use '/src/styles//vars.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
   flex: 1;
-  min-width: $adminSidebarWidth;
   z-index: $adminSidebarzIndex;
   background-color: $matterColorLight;
-  box-shadow: $boxShadow;
   position: fixed;
+  transition: all 0.5s;
+  top: $adminTopbarHeight;
 }

@@ -1,0 +1,62 @@
+import Badge from '@components/Badge/Badge';
+import Modal from '@components/Modal/Modal';
+import { useState } from 'react';
+import { useIntl } from 'react-intl';
+
+import type { TSelectFoodFormValues } from './components/SelectFoodForm/SelectFoodForm';
+import SelectFoodForm from './components/SelectFoodForm/SelectFoodForm';
+import css from './SelectFoodModal.module.scss';
+
+type TSelectFoodModalProps = {
+  isOpen: boolean;
+  handleClose: () => void;
+  items: any[];
+  restaurant: any;
+  handleSelectFood: (values: TSelectFoodFormValues) => void;
+};
+
+const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
+  const intl = useIntl();
+  const { isOpen, handleClose, items, restaurant, handleSelectFood } = props;
+  const restaurantId = restaurant?.id?.uuid;
+  const { title } = restaurant?.attributes || {};
+  const [foodCount, setFoodCount] = useState(0);
+
+  const handleFormChange = (food: string[] | undefined) => {
+    setFoodCount(food?.length || 0);
+  };
+
+  const titlePart = (
+    <div className={css.modalTitleContainer}>
+      <div className={css.title} title={title}>
+        {title}
+      </div>
+      <Badge
+        type="warning"
+        label={intl.formatMessage(
+          {
+            id: 'SelectFoodModal.selectedTitle',
+          },
+          { foodCount },
+        )}
+        hasDotIcon
+      />
+    </div>
+  );
+
+  return (
+    <Modal title={titlePart} isOpen={isOpen} handleClose={handleClose}>
+      {isOpen && (
+        <SelectFoodForm
+          formId={restaurantId}
+          onSubmit={handleSelectFood}
+          items={items}
+          handleFormChange={handleFormChange}
+          initialValues={{ checkAll: false }}
+        />
+      )}
+    </Modal>
+  );
+};
+
+export default SelectFoodModal;

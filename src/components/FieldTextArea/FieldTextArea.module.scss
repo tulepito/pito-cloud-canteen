@@ -1,0 +1,77 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.input {
+  border: 1px solid $neutralGray5;
+  color: $neutralGray10;
+  background: transparent;
+  display: block;
+  width: auto;
+  padding: 10px 12px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  background-color: $matterColorLight;
+  background-clip: padding-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 4px;
+  -webkit-transition: border-color 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+  min-height: 158px;
+  outline: none;
+  font-family: Manrope, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+    Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  &:hover {
+    border-color: $primaryPri4;
+    outline: 0;
+  }
+
+  &:focus {
+    border-color: $primaryPri5;
+    box-shadow: 0px 0px 0px 2px rgba(239, 61, 42, 0.2);
+  }
+
+  &::placeholder {
+    font-weight: $fontWeightRegular;
+    font-size: 16px;
+    color: $neutralGray5;
+  }
+}
+
+.inputFullWidth {
+  width: 100%;
+}
+
+.inputError {
+  border-color: $primaryPri5;
+  box-shadow: 0px 0px 0px 2px rgba(239, 61, 42, 0.2);
+}
+.inputDisabled {
+  background-color: $neutralGray3;
+  border-color: $neutralGray5;
+  color: $neutralGray6;
+  cursor: not-allowed;
+}
+.inputContainer {
+}
+
+.labelRoot {
+  font-size: 14px;
+  line-height: 24px;
+  color: $neutralGray10;
+  margin-bottom: 8px;
+  display: inline-block;
+  display: flex;
+}
+.labelRequiredRedStar {
+  color: $failColor;
+  font-weight: $fontWeightBold;
+  margin-left: 2px;
+}

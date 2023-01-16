@@ -1,0 +1,48 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+}
+
+.addMore {
+  @include textTemplate(14px, 700, 20px, '');
+  background-color: $neutralGray1;
+  border-radius: 8px;
+  border: 1px solid $neutralGray5;
+  color: $neutralGray7;
+  height: 36px;
+  margin-bottom: 12px;
+  min-height: 36px;
+  padding: 6px;
+  text-align: center;
+  width: 100%;
+
+  &:hover {
+    background-color: $neutralGray5;
+
+    color: $matterColorBright;
+
+    path {
+      fill: $matterColorBright;
+    }
+  }
+
+  &:active,
+  &:focus {
+    background-color: $neutralGray1;
+    color: $neutralGray7;
+  }
+}
+
+.plusIcon {
+  margin-right: 10px;
+  & path {
+    fill: $neutralGray7;
+  }
+}
+
+.haveNoMeal {
+  color: $neutralGray9;
+  @include textTemplate(12px, 400, 16px, '');
+  text-align: center;
+}

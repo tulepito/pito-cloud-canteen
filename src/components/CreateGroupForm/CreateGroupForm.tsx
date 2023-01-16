@@ -3,12 +3,13 @@ import CSVFieldInput from '@components/CSVFieldInput/CSVFieldInput';
 import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
-import { useAppDispatch, useAppSelector } from '@src/redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { BookerManageCompany } from '@src/redux/slices/company.slice';
 import { required } from '@utils/validators';
 import { useMemo, useState } from 'react';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
 
 import css from './CreateGroupForm.module.scss';
 import LoadedMembers from './LoadedMembers';
@@ -27,6 +28,7 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
   companyMembers,
   originCompanyMembers,
 }) => {
+  const intl = useIntl();
   const dispatch = useAppDispatch();
   const [loadedMembers, setLoadedMemebers] = useState<any[]>([]);
   const createGroupInProgress = useAppSelector(
@@ -58,17 +60,26 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
       onSubmit={onSubmit}
       render={(formRenderProps: FormRenderProps) => {
         const { handleSubmit, invalid } = formRenderProps;
-        const groupNameRequireMessage = required('Vui lòng nhập tên nhóm');
+        const groupNameRequireMessage = required(
+          intl.formatMessage({ id: 'CreateGroupForm.groupNameRequireMessage' }),
+        );
         return (
           <Form onSubmit={handleSubmit}>
             <FieldTextInput
               id="groupName"
-              label="Ten nhom"
+              label={intl.formatMessage({
+                id: 'CreateGroupForm.groupName',
+              })}
               name="groupName"
               rootClassName={css.fieldInput}
               validate={groupNameRequireMessage}
             />
-            <CSVFieldInput setData={setLoadedMemebers} />
+            <div className={css.uploadMemberListWrapper}>
+              <div className={css.uploadMemberListTitle}>
+                {intl.formatMessage({ id: 'CreateGroupForm.uploadMemberList' })}
+              </div>
+              <CSVFieldInput setData={setLoadedMemebers} />
+            </div>
             <LoadedMembers
               formattedLoadedMembers={formattedLoadedMembers}
               companyMembers={companyMembers}
@@ -91,7 +102,9 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
               className={css.submitBtn}
               disabled={invalid || createGroupInProgress}
               inProgress={createGroupInProgress}>
-              Tao nhom
+              {intl.formatMessage({
+                id: 'CreateGroupForm.createGroup',
+              })}
             </Button>
           </Form>
         );

@@ -1,7 +1,7 @@
 import Button from '@components/Button/Button';
 import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import Form from '@components/Form/Form';
-import { useAppDispatch, useAppSelector } from '@src/redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { BookerManageCompany } from '@src/redux/slices/company.slice';
 import differenceBy from 'lodash/differenceBy';
 import { useMemo } from 'react';

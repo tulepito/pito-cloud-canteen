@@ -1,0 +1,38 @@
+@use '/src/styles/vars.scss' as *;
+.root {
+}
+
+.accordionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid $neutralGray5;
+  user-select: none;
+  cursor: pointer;
+  .title {
+    font-weight: $fontWeightBold;
+    font-size: 14px;
+    line-height: 24px;
+    color: $neutralGray10;
+  }
+}
+.accordionContent {
+  padding: 12px 0;
+  color: $neutralGray10;
+}
+
+.accordionContent {
+  overflow: hidden;
+  will-change: height;
+  transition: height 0.3s ease-in-out;
+}
+
+.iconArrowUp {
+  transform: rotate(90deg);
+  transition: all 0.3s;
+}
+.iconArrowDown {
+  transition: all 0.3s;
+  transform: rotate(270deg);
+}

@@ -1,0 +1,36 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  display: flex;
+  align-items: center;
+}
+.paginationInfoContainer {
+  margin-right: 16px;
+  .paginationInfo {
+    font-size: 12px;
+    font-weight: $fontWeightRegular;
+    color: $neutralGray10;
+  }
+}
+
+.nextIconContainer,
+.prevIconContainer {
+  @include flexCenter;
+  width: 28px;
+  height: 28px;
+  border: 1px solid $neutralGray3;
+  border-radius: 4px;
+  transition: all 0.3s;
+
+  &:hover {
+    border-color: $primaryPri5;
+
+    .nextIcon,
+    .prevIcon {
+      & path {
+        fill: $primaryPri5;
+      }
+    }
+  }
+}

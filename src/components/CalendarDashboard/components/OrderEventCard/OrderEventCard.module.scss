@@ -1,0 +1,166 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  margin-bottom: 12px;
+  background-color: $neutralGray1;
+  box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06),
+    0px 4px 8px -2px rgba(16, 24, 40, 0.1);
+  border-radius: 8px 8px;
+  transition: 0.3s ease-in-out;
+  border: 1px solid transparent;
+  cursor: pointer;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    box-shadow: none;
+  }
+}
+
+.rootExpired {
+  &:hover {
+    border: 1px solid $neutralGray6;
+  }
+}
+
+.rootBlue {
+  &:hover {
+    border: 1px solid $secondaryBlue6;
+  }
+}
+
+.rootOrange {
+  &:hover {
+    border: 1px solid $warningOrange7;
+  }
+}
+
+.eventCardHeader {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: $neutralGray1;
+}
+
+.rootBlue .eventCardHeader {
+  background-color: $secondaryBlue6;
+}
+
+.rootOrange .eventCardHeader {
+  background-color: $warningOrange7;
+}
+
+.rootExpired .eventCardHeader {
+  background-color: $neutralGray6;
+}
+
+.eventCardTitleWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.eventTitle {
+  @include textTemplate(14px, 600, 24px, '');
+}
+
+.eventTime {
+  @include textTemplate(12px, 400, 20px, '');
+}
+
+.mealType {
+  @include textTemplate(12px, 400, 20px, '');
+}
+
+.eventCardContentWrapper {
+  padding: 8px;
+}
+
+.status {
+  padding: 4px 12px;
+  border-radius: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  @include textTemplate(12px, 600, 16px, '');
+  width: fit-content;
+}
+
+.cardStatus {
+  margin-bottom: 8px;
+}
+
+.emptyStatus {
+  background-color: $warningOrange2;
+  color: $warningOrange7;
+}
+
+.joinedStatus {
+  background-color: $successScreen2;
+  color: $successScreen6;
+}
+
+.notJoinedStatus {
+  background-color: $errorRed2;
+  color: $primaryPri5;
+}
+
+.expiredStatus {
+  background-color: $neutralGray4;
+  color: $neutralGray6;
+}
+
+.eventContentItem {
+  display: flex;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.eventContentItemText {
+  @include textTemplate(12px, 500, 20px, '');
+  color: $neutralGray10;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  width: calc(100% - 17px);
+}
+
+.eventContentItemIcon {
+  width: 12px;
+  height: 12px;
+  margin-right: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tooltipOverlay {
+  opacity: 1;
+}
+
+.tooltipOverlay :global(.rc-tooltip-inner) {
+  box-shadow: 0px 8px 8px -4px rgba(16, 24, 40, 0.04),
+    0px 20px 24px -4px rgba(16, 24, 40, 0.1);
+  border: 1px solid $neutralGray4;
+  padding: 0;
+}
+
+.tooltipOverlay :global(.rc-tooltip-arrow) {
+  border-right-color: $neutralGray1;
+  box-shadow: 0px 8px 8px -4px rgba(16, 24, 40, 0.04),
+    0px 20px 24px -4px rgba(16, 24, 40, 0.1);
+}
+
+.highlightText {
+  color: $primaryPri5;
+}
+.highLightIcon {
+  & path {
+    fill: $primaryPri5;
+  }
+}

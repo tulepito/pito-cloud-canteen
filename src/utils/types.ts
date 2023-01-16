@@ -2,10 +2,12 @@
 // export const DATE_TYPE_DATE = 'date';
 // export const DATE_TYPE_DATETIME = 'datetime';
 // propTypes.dateType = oneOf([DATE_TYPE_DATE, DATE_TYPE_DATETIME]);
+import type { adminRoutes } from '@src/paths';
 import type Decimal from 'decimal.js';
 import type { NextPage } from 'next';
 
 import type {
+  EAvailabilityPlans,
   EBookingStates,
   EDayOfWeek,
   EErrorCode,
@@ -18,9 +20,7 @@ import type {
   ETxTransitionActors,
 } from './enums';
 
-export type NextApplicationPage<P = any, IP = P> = NextPage<P, IP> & {
-  requireAuth?: boolean;
-};
+export type NextApplicationPage<P = any, IP = P> = NextPage<P, IP> & {};
 
 export enum ErrorCodes {
   ERROR_CODE_TRANSACTION_LISTING_NOT_FOUND = 'transaction-listing-not-found',
@@ -59,6 +59,8 @@ export type TReverseMapFromEnum<T> = T[keyof T];
 export type TIconProps = {
   className?: string;
   rootClassName?: string;
+  width?: number;
+  height?: number;
   onClick?: () => void;
 };
 
@@ -88,6 +90,10 @@ export type TProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
+  protectedData?: any;
+  metadata?: any;
+  publicData?: any;
+  privateData?: any;
 };
 
 export type TCurrentUserAttributes = {
@@ -110,12 +116,35 @@ export type TUserProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
+  protectedData?: any;
+  metadata?: any;
+  publicData?: any;
 };
 
 export type TUserAttributes = {
   banned: boolean;
   deleted: boolean;
+  email: string;
   profile: TUserProfile;
+};
+
+export type TCompanyProfile = {
+  displayName: string;
+  firstName: string;
+  lastName: string;
+  abbreviatedName: string;
+  bio?: string;
+  protectedData?: any;
+  metadata?: any;
+  publicData?: any;
+  privateData?: any;
+};
+
+export type TCompanyAttributes = {
+  banned: boolean;
+  deleted: boolean;
+  email: string;
+  profile: TCompanyProfile;
 };
 
 // Listing queries can include author.
@@ -126,6 +155,10 @@ export type TAuthorProfile = {
   displayName: string;
   abbreviatedName: string;
   bio?: string;
+  protectedData?: any;
+  metadata?: any;
+  publicData?: any;
+  privateData?: any;
 };
 
 export type TAuthorAttributes = {
@@ -150,6 +183,16 @@ export type TUser = {
   profileImage: TImage;
 };
 
+export type TCompany = {
+  id: any;
+  type: 'user';
+  attributes: TAuthorAttributes &
+    TBannedUserAttributes &
+    TDeletedUserAttributes &
+    TCompanyAttributes;
+  profileImage: TImage;
+};
+
 export type TListingState = TReverseMapFromEnum<typeof EListingStates>;
 
 export type TListingAttributes = {
@@ -159,7 +202,7 @@ export type TListingAttributes = {
   deleted?: boolean;
   state?: TListingState;
   price?: any;
-  publicData?: object;
+  publicData?: any;
 };
 
 export type TDayOfWeek = TReverseMapFromEnum<typeof EDayOfWeek>;
@@ -171,12 +214,14 @@ export type TAvailabilityPlanEntries = {
   end?: string;
 };
 
-export type TAvailabilityPlanType = TReverseMapFromEnum<typeof EDayOfWeek>;
+export type TAvailabilityPlanType = TReverseMapFromEnum<
+  typeof EAvailabilityPlans
+>;
 
 export type TAvailabilityPlan = {
   type: TAvailabilityPlanType;
   timezone: string;
-  entries: TAvailabilityPlanEntries;
+  entries: TAvailabilityPlanEntries[];
 };
 
 export type TOwnListingAttributes = {
@@ -184,7 +229,7 @@ export type TOwnListingAttributes = {
   deleted: boolean;
   state: TListingState;
   price?: any;
-  publicData: object;
+  publicData: any;
   availabilityPlan?: TAvailabilityPlan;
   description?: string;
   geolocation?: any;
@@ -337,7 +382,7 @@ export type TMessage = {
 export type TPagination = {
   page: number;
   perPage: number;
-  paginationUnsupported: boolean;
+  paginationUnsupported?: boolean;
   totalItems: number;
   totalPages: number;
 };
@@ -368,3 +413,5 @@ export type TError = {
   statusText: string;
   apiErrors: TSharetribeFlexSdkApiError[];
 };
+
+export type RouteKey = keyof typeof adminRoutes;

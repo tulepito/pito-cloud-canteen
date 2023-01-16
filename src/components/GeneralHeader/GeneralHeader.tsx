@@ -29,11 +29,6 @@ const GeneralHeader = () => {
                 <p>Dang xuat</p>
               </button>
             </ProfileMenuItem>
-            <ProfileMenuItem key="ABC">
-              <button>
-                <p>Dang xuat</p>
-              </button>
-            </ProfileMenuItem>
           </ProfileMenuContent>
         </ProfileMenu>
       </div>

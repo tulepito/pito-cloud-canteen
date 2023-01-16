@@ -4,23 +4,28 @@ import AdminLayoutSidebar from '@components/AdminLayoutSidebar/AdminLayoutSideba
 import AdminLayoutTopbar from '@components/AdminLayoutTopbar/AdminLayoutTopbar';
 import AdminLayoutWrapper from '@components/AdminLayoutWrapper/AdminLayoutWrapper';
 import AdminSidebar from '@components/AdminSidebar/AdminSidebar';
-import type { ReactNode } from 'react';
+import useBoolean from '@hooks/useBoolean';
+import type { PropsWithChildren } from 'react';
 
-type TAdminLayout = {
-  children: ReactNode;
-};
-
-const AdminLayout = (props: TAdminLayout) => {
+const AdminLayout: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
+  const {
+    value: isMenuOpen,
+    setFalse: onCloseMenu,
+    toggle: toggleMenuOpen,
+  } = useBoolean(false);
+
   return (
     <AdminLayoutWrapper>
       <AdminLayoutTopbar>
-        <AdminHeader />
+        <AdminHeader onMenuClick={toggleMenuOpen} />
       </AdminLayoutTopbar>
-      <AdminLayoutSidebar>
-        <AdminSidebar />
+      <AdminLayoutSidebar isMenuOpen={isMenuOpen}>
+        <AdminSidebar onCloseMenu={onCloseMenu} onMenuClick={toggleMenuOpen} />
       </AdminLayoutSidebar>
-      <AdminLayoutContent>{children}</AdminLayoutContent>
+      <AdminLayoutContent isMenuOpen={isMenuOpen}>
+        {children}
+      </AdminLayoutContent>
     </AdminLayoutWrapper>
   );
 };

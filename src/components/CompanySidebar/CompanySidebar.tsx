@@ -1,6 +1,7 @@
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
+import { companyPaths } from '@src/paths';
 import React from 'react';
 
 import css from './CompanySidebar.module.scss';
@@ -17,19 +18,14 @@ const SIDEBAR_MENUS: TSidebarMenu[] = [
       {
         id: 'memberList',
         label: 'CompanySidebar.memberList',
-        nameLink: 'EmployeeSetting',
+        nameLink: '/company/[companyId]/members',
       },
       {
         id: 'groupList',
         label: 'CompanySidebar.groupList',
-        nameLink: 'GroupSetting',
+        nameLink: companyPaths.GroupSetting,
       },
     ],
-  },
-  {
-    id: 'companySetting',
-    label: 'CompanySidebar.companySetting',
-    nameLink: 'company-setting',
   },
 ];
 

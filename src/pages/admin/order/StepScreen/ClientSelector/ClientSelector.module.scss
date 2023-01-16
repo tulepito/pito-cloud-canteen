@@ -1,0 +1,31 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.header {
+  @include flexAlign(center);
+  .title {
+    @include text(18px);
+    color: $neutralGray10;
+    font-weight: $fontWeightBold;
+    margin-right: 16px;
+  }
+
+  .amount {
+    @include text(14px);
+    color: $neutralGray10;
+    width: 41px;
+    height: 32px;
+    background-color: $neutralGray3;
+    border-radius: 4px;
+    @include flexAlign(center, center);
+  }
+}
+
+.searchInput {
+  margin-top: 16px;
+}
+
+.clientTable {
+  margin-top: 16px;
+}

@@ -1,0 +1,68 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use 'src/styles/mixins.scss' as *;
+
+.container {
+  @include flexAlign(flex-start, space-betweeb);
+}
+
+.leftSide {
+  @include flexAlign(flex-start);
+  flex-direction: column;
+  width: 318px;
+  padding-right: 34px;
+  gap: 8px;
+  border-right: 1px solid $neutralGray5;
+
+  .fieldSelector {
+    @include flexAlign(center, space-between);
+    position: relative;
+    width: 100%;
+    height: 48px;
+    padding: 12px 40px 12px 12px;
+    cursor: pointer;
+
+    &.selected {
+      background-color: $neutralGray3;
+      border-radius: 12px;
+    }
+    .fieldName {
+      @include text(14px, 24px);
+      color: $matterColorDark;
+      font-weight: $fontWeightBold;
+    }
+
+    .fieldValue {
+      @include text(14px, 24px);
+      max-width: 110px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .iconArrowRight {
+      position: absolute;
+      top: 50%;
+      right: 16px;
+      transform: translateY(-50%);
+    }
+  }
+}
+
+.rightSide {
+  width: 65%;
+  padding-left: 16px;
+
+  .title {
+    @include text(20px, 32px);
+    font-weight: $fontWeightBold;
+    text-transform: capitalize;
+  }
+
+  .fieldContent {
+    margin-top: 12px;
+  }
+  .submitBtn {
+    margin-top: 16px;
+  }
+}

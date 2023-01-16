@@ -9,6 +9,7 @@
   @include flexAlign(center, center);
   font-size: 12px;
   font-weight: $fontWeightBold;
+  cursor: pointer;
 }
 
 .input {
@@ -18,4 +19,6 @@
 .downloadIcon {
   width: 20px;
   height: 20px;
+
+  transform: rotate(180deg);
 }

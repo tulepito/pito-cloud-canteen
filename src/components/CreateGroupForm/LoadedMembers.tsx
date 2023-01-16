@@ -1,7 +1,8 @@
+/* eslint-disable no-console */
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import IconEdit from '@components/IconEdit/IconEdit';
 import { Close } from '@components/Icons/Icons';
-import { useState } from 'react';
+import useBoolean from '@hooks/useBoolean';
 
 import css from './LoadedMembers.module.scss';
 
@@ -17,25 +18,29 @@ const getMemberDisplayName = (companyMembers: any[], memberId: string) => {
 
 const LoadedItem = ({ item, companyMembers, onDelete }: any) => {
   const { email, id } = item;
-  const [isEditing, setEditing] = useState<boolean>(false);
+  const { value: isEditing, setTrue: onEditing } = useBoolean();
   const renderedEditState = isEditing ? (
     <FieldTextInput id={`${email}-editEmail`} name="memberEmail" />
   ) : (
-    <div>{email}</div>
+    <div className={css.fullRowEmail}>{email}</div>
   );
   return (
-    <div>
-      <div className={css.grayCircle} />
-      {id ? (
-        <div>
-          <div>{getMemberDisplayName(companyMembers, id)}</div>
-          <div>{email}</div>
-        </div>
-      ) : (
-        renderedEditState
-      )}
-      <div>
-        {!id && <IconEdit onClick={() => setEditing(true)} />}
+    <div className={css.memberItem}>
+      <div className={css.memberWrapper}>
+        <div className={css.grayCircle} />
+        {id ? (
+          <div>
+            <div className={css.name}>
+              {getMemberDisplayName(companyMembers, id)}
+            </div>
+            <div className={css.email}>{email}</div>
+          </div>
+        ) : (
+          renderedEditState
+        )}
+      </div>
+      <div className={css.actionsWrapper}>
+        {!id && <IconEdit onClick={() => onEditing()} />}
         <Close onClick={onDelete} />
       </div>
     </div>
@@ -44,11 +49,10 @@ const LoadedItem = ({ item, companyMembers, onDelete }: any) => {
 const LoadedMembers: React.FC<LoadedMembersProps> = (props) => {
   const { formattedLoadedMembers, companyMembers } = props;
   const onDeleteMember = (memberIndex: number) => () => {
-    // update member
     console.log('memberIndex: ', memberIndex);
   };
   return (
-    <div>
+    <div className={css.container}>
       {formattedLoadedMembers.map((item, index) => (
         <LoadedItem
           key={index}
