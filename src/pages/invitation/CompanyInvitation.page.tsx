@@ -93,7 +93,10 @@ const CompanyInvitationPage = () => {
     return <RedirectLink pathname={generalPaths.Home} />;
   }
 
-  if (checkInvitationResult === 'showInvitation') {
+  if (
+    !responseToInvitationResult &&
+    checkInvitationResult === 'showInvitation'
+  ) {
     return (
       <div className={css.foodBackground}>
         <InvitationCard

@@ -5,7 +5,7 @@ export enum UserPermission {
 }
 
 export enum UserInviteStatus {
-  NOT_ACCEPTED = 'notAccepted',
+  NOT_ACCEPTED = 'pending',
   ACCEPTED = 'accepted',
   DECLINED = 'declined',
 }
