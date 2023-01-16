@@ -1,5 +1,6 @@
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
+import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import { useIntl } from 'react-intl';
 
@@ -8,13 +9,21 @@ import css from './BookerOrderDetailsTitle.module.scss';
 type TBookerOrderDetailsTitleProps = {
   rootClassName?: string;
   className?: string;
+  data: {
+    deliveryHour: string;
+    deliveryAddress: TObject;
+  };
 };
 
 const BookerOrderDetailsTitle: React.FC<TBookerOrderDetailsTitleProps> = (
   props,
 ) => {
   const intl = useIntl();
-  const { rootClassName, className } = props;
+  const {
+    rootClassName,
+    className,
+    data: { deliveryHour, deliveryAddress = {} },
+  } = props;
   const rootClasses = classNames(rootClassName || css.root, className);
 
   const deliveryInfo = intl.formatMessage(
@@ -22,8 +31,13 @@ const BookerOrderDetailsTitle: React.FC<TBookerOrderDetailsTitleProps> = (
       id: 'BookerOrderDetailsTitle.deliveryInfo',
     },
     {
-      time: <b>12:00</b>,
-      place: <b>123 Nguyễn Công Trứ, phường 3, quận 3, HCM</b>,
+      time: <b>{deliveryHour || '12:00'}</b>,
+      place: (
+        <b>
+          {deliveryAddress.address ||
+            '123 Nguyễn Công Trứ, phường 3, quận 3, HCM'}
+        </b>
+      ),
     },
   ) as string;
 

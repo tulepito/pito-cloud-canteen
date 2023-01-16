@@ -5,6 +5,7 @@ export const generalPaths = {
   ResetPassword: '/dat-lai-mat-khau',
   StyleGuide: '/style-guide',
   Home: '/',
+  OrderManageMent: '/orders/[orderId]',
 };
 
 const enGeneralPaths = {
@@ -34,6 +35,7 @@ export const IgnoredPermissionCheckRoutes = [
   generalPaths.StyleGuide,
   enGeneralPaths.SignIn,
   enGeneralPaths.SignUp,
+  generalPaths.OrderManageMent,
 ];
 
 export const adminPaths = {

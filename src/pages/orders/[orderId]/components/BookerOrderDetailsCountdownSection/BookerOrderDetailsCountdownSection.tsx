@@ -13,6 +13,9 @@ import EditOrderDeadlineModal from './EditOrderDeadlineModal';
 type BookerOrderDetailsCountdownSectionProps = {
   rootClassName?: string;
   className?: string;
+  data: {
+    orderDeadline: number;
+  };
 };
 
 const BookerOrderDetailsCountdownSection: React.FC<
@@ -21,13 +24,17 @@ const BookerOrderDetailsCountdownSection: React.FC<
   const intl = useIntl();
   const [isEditOrderDeadlineModalOpen, setIsEditOrderDeadlineModalOpen] =
     useState(false);
-  const { className, rootClassName } = props;
+
+  const {
+    className,
+    rootClassName,
+    data: { orderDeadline = 0 },
+  } = props;
+  console.log(orderDeadline);
 
   const rootClasses = classNames(rootClassName || css.root, className);
 
-  const orderDeadline = DateTime.fromJSDate(new Date(2023, 3, 1));
-  const orderDeadlineTime = orderDeadline.toMillis();
-  const formattedDeadline = orderDeadline.toFormat(
+  const formattedDeadline = DateTime.fromMillis(orderDeadline).toFormat(
     "HH:mm, dd 'tháng' MM, yyyy",
   );
 
@@ -71,7 +78,7 @@ const BookerOrderDetailsCountdownSection: React.FC<
           <div>{editDeadlineText}</div>
         </div>
       </Button>
-      <CountdownTimer deadline={orderDeadlineTime} stopAt={0} />
+      <CountdownTimer deadline={orderDeadline} stopAt={0} />
       <div className={css.orderEndAtMessage}>{orderEndAtMessage}</div>
       <EditOrderDeadlineModal
         isOpen={isEditOrderDeadlineModalOpen}

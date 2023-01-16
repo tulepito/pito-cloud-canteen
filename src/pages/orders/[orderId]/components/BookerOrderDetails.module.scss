@@ -28,6 +28,7 @@
     @include viewportMedium {
       order: 1;
       margin-top: 0;
+      width: min(820px, calc(100vw - 320px - 260px - 4px));
     }
 
     @include viewportSLarge {

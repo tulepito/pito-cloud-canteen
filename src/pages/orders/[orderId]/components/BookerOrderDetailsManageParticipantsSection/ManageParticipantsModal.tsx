@@ -31,11 +31,13 @@ const RawParticipants: React.FC<TRawParticipantsProps> = ({ participants }) => {
             hasCheckIcon
           />
         ) : (
-          <Tooltip tooltipContent={'Đã chọn món xong'} placement="topRight">
+          <Tooltip
+            tooltipContent={'Đã chọn món xong'}
+            placement="topRight"
+            key={index}>
             <BookerOrderDetailsParticipantCard
               className={css.participantCard}
               onClickDeleteIcon={() => () => console.log(index)}
-              key={index}
             />
           </Tooltip>
         );

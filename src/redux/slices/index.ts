@@ -14,3 +14,4 @@ export { default as RestaurantSearch } from './RestaurantSearch.slice';
 export { default as SelectRestaurantPage } from './SelectRestaurantPage.slice';
 export { default as shopingCart } from './shopingCart.slice';
 export { default as user } from './user.slice';
+export { default as BookerOrderManagement } from '@pages/orders/[orderId]/BookerOrderManagement.slice';
