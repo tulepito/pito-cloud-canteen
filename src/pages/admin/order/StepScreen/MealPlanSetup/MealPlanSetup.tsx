@@ -148,7 +148,11 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
               />
             </div>
             <div className={css.fieldSection}>
-              <MealPlanDateField form={form} values={values} />
+              <MealPlanDateField
+                form={form}
+                values={values}
+                title={intl.formatMessage({ id: 'MealPlanDateField.title' })}
+              />
               <div className={css.verticalSpace}>
                 <DayInWeekField form={form} values={values} />
               </div>

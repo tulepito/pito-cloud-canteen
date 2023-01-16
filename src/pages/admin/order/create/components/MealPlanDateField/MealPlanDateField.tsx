@@ -28,9 +28,10 @@ type MealPlanDateFieldProps = {
   form: any;
   values: Record<string, any>;
   columnLayout?: boolean;
+  title?: string;
 };
 const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
-  const { values, columnLayout = false, form } = props;
+  const { values, columnLayout = false, form, title } = props;
   const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
     values;
   const intl = useIntl();
@@ -67,9 +68,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
   };
   return (
     <div className={css.container}>
-      <div className={css.fieldTitle}>
-        {intl.formatMessage({ id: 'MealPlanDateField.title' })}
-      </div>
+      {title && <div className={css.fieldTitle}>{title}</div>}
       <OnChange name="startDate">{handleStartDateChange}</OnChange>
       <div className={fieldGroupLayout}>
         <FieldDatePicker

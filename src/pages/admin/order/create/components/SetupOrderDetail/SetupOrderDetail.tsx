@@ -102,6 +102,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       deadlineDate,
       deadlineHour,
       orderDetail = {},
+      pickAllow = true,
     },
   } = useAppSelector((state) => state.Order, shallowEqual);
   const companies = useAppSelector(
@@ -193,14 +194,18 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       currentClient?.attributes.profile.publicData.companyName,
     [OrderSettingField.DELIVERY_ADDRESS]: address,
     [OrderSettingField.DELIVERY_TIME]: deliveryHour,
-    [OrderSettingField.PICKING_DEADLINE]: pickingDeadline,
     [OrderSettingField.EMPLOYEE_AMOUNT]: allMembersAmount,
     [OrderSettingField.SPECIAL_DEMAND]: '',
-    [OrderSettingField.ACCESS_SETTING]: selectedGroupsName?.join(', '),
     [OrderSettingField.PER_PACK]: intl.formatMessage(
       { id: 'SetupOrderDetail.perPack' },
       { value: addCommas(packagePerMember.toString()) || '' },
     ),
+    ...(pickAllow
+      ? {
+          [OrderSettingField.PICKING_DEADLINE]: pickingDeadline,
+          [OrderSettingField.ACCESS_SETTING]: selectedGroupsName?.join(', '),
+        }
+      : {}),
   };
   const addMorePlanExtraProps = {
     onClick: handleAddMorePlanClick,

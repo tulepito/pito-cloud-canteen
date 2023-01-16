@@ -7,7 +7,6 @@ import subAccountLogin from '@services/subAccountLogin';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { TOrder, TPlan } from '@utils/orderTypes';
-import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HTTP_METHODS } from '../helpers/constants';
@@ -23,8 +22,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     case HTTP_METHODS.POST:
       try {
         const { companyId, generalInfo, orderDetail } = req.body;
-        const { deadlineDate, deadlineHour, ...rest } = generalInfo;
-        const { selectedGroups } = rest;
+        const { selectedGroups } = generalInfo;
         const adminAccount = await getAdminAccount();
         const { currentOrderNumber = 0 } =
           adminAccount.attributes.profile.metadata;
@@ -48,15 +46,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const draftedOrderListing = denormalisedResponseEntities(
           draftedOrderListinResponse,
         )[0];
-        console.log('deadlineDate: ', deadlineDate);
-        console.log('deadlineHour: ', deadlineHour);
-        const parsedDeadlineDate =
-          DateTime.fromMillis(deadlineDate).toFormat('yyyy-MM-dd');
-        console.log('parsedDeadlineDate: ', parsedDeadlineDate);
-        const orderDeadline = DateTime.fromISO(
-          `${parsedDeadlineDate}T${deadlineHour}:00`,
-        ).toMillis();
-        console.log('orderDeadline: ', orderDeadline);
         const allMembers = calculateGroupMembers(
           companyAccount,
           selectedGroups,
@@ -90,10 +79,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             metadata: {
               companyId,
               listingType: ListingTypes.ORDER,
-              generalInfo: {
-                ...rest,
-                orderDeadline,
-              },
+              generalInfo,
               orderDetail: updatedOrderDetail,
             },
           });
