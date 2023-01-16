@@ -182,7 +182,7 @@ const ManagePartnerFoods = () => {
 
   const [idsToAction, setIdsToAction] = useState<string[]>([]);
   const [foodToRemove, setFoodToRemove] = useState<any>(null);
-  const [file, setFile] = useState<File>();
+  const [file, setFile] = useState<File | null>();
 
   const {
     value: isImportModalOpen,
@@ -315,6 +315,7 @@ const ManagePartnerFoods = () => {
 
       if (!error) {
         closeImportModal();
+        setFile(null);
       }
     }
   };
