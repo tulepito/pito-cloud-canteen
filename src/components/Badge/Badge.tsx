@@ -51,6 +51,7 @@ const Badge: React.FC<TBadge> = (props) => {
     hasDotIcon = false,
     onCloseIcon,
     label,
+    labelClassName,
   } = props;
 
   const classesFormType = {
@@ -61,10 +62,18 @@ const Badge: React.FC<TBadge> = (props) => {
     [css.warning]: type === BadgeType.WARNING,
   };
 
-  const badgeContainerClassName = classNames(css.root, classesFormType);
-  const labelClasses = classNames(css.label, classesFormType);
-  const badgeCloseClasses = classNames(classesFormType);
-  const badgeDotClasses = classNames(css.badgeDot, classesFormType);
+  const badgeContainerClassName = classNames(
+    css.root,
+    classesFormType,
+    labelClassName,
+  );
+  const labelClasses = classNames(css.label, classesFormType, labelClassName);
+  const badgeCloseClasses = classNames(classesFormType, labelClassName);
+  const badgeDotClasses = classNames(
+    css.badgeDot,
+    classesFormType,
+    labelClassName,
+  );
 
   return (
     <div className={badgeContainerClassName}>

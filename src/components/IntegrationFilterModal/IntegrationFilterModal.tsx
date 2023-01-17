@@ -1,6 +1,6 @@
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
-import IconFilter from '@components/IconFilter/IconFilter';
+import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import Modal from '@components/Modal/Modal';
 import useBoolean from '@hooks/useBoolean';
 import React from 'react';
