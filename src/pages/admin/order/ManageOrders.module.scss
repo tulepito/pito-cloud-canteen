@@ -1,6 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
-@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
 
 .filterForm {
   display: flex;
@@ -106,14 +106,18 @@
 }
 
 .inputDate {
-  @include textInputStyles;
-  z-index: 1;
-  width: 50%;
+  @include inputContainerStyles;
+  border: 1px solid $neutralGray3;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 16px;
+
   input {
-    border: none;
     width: 100%;
-    font-size: 14px;
-    outline: none;
+    &::placeholder {
+      color: $neutralGray4;
+      font-family: $fontFamily;
+    }
   }
 }
 
