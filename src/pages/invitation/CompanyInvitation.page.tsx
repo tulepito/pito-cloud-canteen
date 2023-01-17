@@ -6,6 +6,7 @@ import {
 } from '@redux/slices/company.slice';
 import { companyInvitationThunks } from '@redux/slices/companyInvitation.slice';
 import { generalPaths } from '@src/paths';
+import { UserInviteResponse } from '@src/types/UserPermission';
 import { USER } from '@utils/data';
 import type { TUser } from '@utils/types';
 import { useRouter } from 'next/router';
@@ -51,9 +52,7 @@ const CompanyInvitationPage = () => {
     }
   }, [companyId, currentUser, dispatch, isReady]);
 
-  useEffect(() => {}, [responseToInvitationResult]);
-
-  const onResponseInvitation = (response: 'accept' | 'decline') => () => {
+  const onResponseInvitation = (response: UserInviteResponse) => () => {
     dispatch(
       companyInvitationThunks.responseToInvitation({
         response,
@@ -101,8 +100,8 @@ const CompanyInvitationPage = () => {
       <div className={css.foodBackground}>
         <InvitationCard
           companyName={USER(company as TUser).getPublicData().companyName}
-          onAccept={onResponseInvitation('accept')}
-          onDecline={onResponseInvitation('decline')}
+          onAccept={onResponseInvitation(UserInviteResponse.ACCEPT)}
+          onDecline={onResponseInvitation(UserInviteResponse.DECLINE)}
           responseToInvitationInProgress={responseToInvitationInProgress}
         />
       </div>

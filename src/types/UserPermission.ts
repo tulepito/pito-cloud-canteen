@@ -9,3 +9,8 @@ export enum UserInviteStatus {
   ACCEPTED = 'accepted',
   DECLINED = 'declined',
 }
+
+export enum UserInviteResponse {
+  ACCEPT = 'accept',
+  DECLINE = 'decline',
+}

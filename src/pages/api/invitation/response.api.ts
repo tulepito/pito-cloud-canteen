@@ -4,7 +4,11 @@ import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { getSdk, handleError } from '@services/sdk';
-import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
+import {
+  UserInviteResponse,
+  UserInviteStatus,
+  UserPermission,
+} from '@src/types/UserPermission';
 import { denormalisedResponseEntities, USER } from '@utils/data';
 import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -37,7 +41,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       });
     }
 
-    if (response === 'decline') {
+    if (response === UserInviteResponse.DECLINE) {
       const newMembers = {
         ...members,
         [userEmail]: {
