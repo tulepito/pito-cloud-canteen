@@ -19,7 +19,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
-import { getTableDataForExport, makeCsv } from '@utils/csv';
+import { makeCsv } from '@utils/csv';
 import { parseTimestaimpToFormat } from '@utils/dates';
 import {
   CATEGORY_OPTIONS,
@@ -340,29 +340,33 @@ const ManagePartnerFoods = () => {
             pub_category: groupPubCategory,
             pub_menuType: groupMenuTypeString,
           }}>
-          <FieldTextInput
-            name="keywords"
-            id="keywords"
-            label="Tên món"
-            placeholder="Nhập tên món"
-            className={css.input}
-          />
-          <FieldMultipleSelect
-            className={css.input}
-            name="pub_category"
-            id="pub_category"
-            label="Phong cách ẩm thực"
-            placeholder="Phong cách ẩm thực"
-            options={CATEGORY_OPTIONS}
-          />
-          <FieldMultipleSelect
-            className={css.input}
-            name="pub_menuType"
-            id="pub_menuType"
-            label="Loại menu"
-            placeholder="Chọn loại menu"
-            options={MENU_OPTIONS}
-          />
+          {() => (
+            <>
+              <FieldTextInput
+                name="keywords"
+                id="keywords"
+                label="Tên món"
+                placeholder="Nhập tên món"
+                className={css.input}
+              />
+              <FieldMultipleSelect
+                className={css.input}
+                name="pub_category"
+                id="pub_category"
+                label="Phong cách ẩm thực"
+                placeholder="Phong cách ẩm thực"
+                options={CATEGORY_OPTIONS}
+              />
+              <FieldMultipleSelect
+                className={css.input}
+                name="pub_menuType"
+                id="pub_menuType"
+                label="Loại menu"
+                placeholder="Chọn loại menu"
+                options={MENU_OPTIONS}
+              />
+            </>
+          )}
         </IntegrationFilterModal>
         <div className={css.ctaButtons}>
           <InlineTextButton

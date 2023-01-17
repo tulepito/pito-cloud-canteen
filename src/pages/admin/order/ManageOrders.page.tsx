@@ -1,13 +1,19 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
 import Badge, { BadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
+import FieldDatePicker from '@components/FieldDatePicker/FieldDatePicker';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
+import IconTick from '@components/Icons/IconTick/IconTick';
+import IconTruck from '@components/Icons/IconTruck/IconTruck';
+import IconWarning from '@components/Icons/IconWarning/IconWarning';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderAsyncAction } from '@redux/slices/Order.slice';
 import { adminRoutes } from '@src/paths';
@@ -22,19 +28,14 @@ import type {
   TIntergrationOrderListing,
   TReverseMapFromEnum,
 } from '@utils/types';
+import classNames from 'classnames';
+import addDays from 'date-fns/addDays';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import css from './ManageOrders.module.scss';
-import classNames from 'classnames';
-import Tooltip from '@components/Tooltip/Tooltip';
-import IconTick from '@components/Icons/IconTick/IconTick';
-import IconWarning from '@components/Icons/IconWarning/IconWarning';
-import IconTruck from '@components/Icons/IconTruck/IconTruck';
-import FieldDatePicker from '@components/FieldDatePicker/FieldDatePicker';
-import addDays from 'date-fns/addDays';
 
 const uniqueStrings = (array: string[]) => {
   return array.filter((item, pos) => {
@@ -64,7 +65,7 @@ const BAGDE_CLASSNAME_BASE_ON_ORDER_STATE = {
 
 const OrderDetailTooltip = ({ orderDetail }: any) => {
   const orderDetails = Object.keys(orderDetail).map((key) => {
-    const status = orderDetail[key].status;
+    const { status } = orderDetail[key] || {};
     const OrderIcon = () => {
       switch (status) {
         case EOrderDetailsStatus.cancelled:
@@ -93,13 +94,13 @@ const OrderDetailTooltip = ({ orderDetail }: any) => {
     };
 
     return (
-      <div className={css.orderDetailTooltipItem}>
+      <div key={key} className={css.orderDetailTooltipItem}>
         <OrderIcon />
         <span>
           <span className={css.orderDate}>
             {parseTimestaimpToFormat(Number(key))}
           </span>
-          : {20000}đ
+          : {0}đ
         </span>
       </div>
     );

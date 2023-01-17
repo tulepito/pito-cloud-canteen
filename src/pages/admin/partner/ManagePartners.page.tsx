@@ -355,21 +355,25 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
           onSubmit={onSubmit}
           onClear={onClear}
           initialValues={{ keywords, meta_status: groupStatus }}>
-          <FieldTextInput
-            className={css.field}
-            name="keywords"
-            id="keywords"
-            label="Tên đối tác"
-            placeholder="Tìm kiếm"
-          />
-          <FieldMultipleSelect
-            className={css.field}
-            name="meta_status"
-            id="meta_status"
-            label="Trạng thái"
-            placeholder="Chọn trạng thái"
-            options={RESTAURANT_STATUS_OPTIONS}
-          />
+          {() => (
+            <>
+              <FieldTextInput
+                className={css.field}
+                name="keywords"
+                id="keywords"
+                label="Tên đối tác"
+                placeholder="Tìm kiếm"
+              />
+              <FieldMultipleSelect
+                className={css.field}
+                name="meta_status"
+                id="meta_status"
+                label="Trạng thái"
+                placeholder="Chọn trạng thái"
+                options={RESTAURANT_STATUS_OPTIONS}
+              />
+            </>
+          )}
         </IntegrationFilterModal>
       </div>
       {content}
