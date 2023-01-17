@@ -79,11 +79,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       try {
         const {
           query: { orderId },
-          body: { updateData },
+          body: { data },
         } = req;
         await integrationSdk.listings.update({
           id: orderId,
-          ...updateData,
+          ...data,
         });
 
         res.json({

@@ -53,11 +53,13 @@ const updateOrderGeneralInfo = createAsyncThunk(
     } = orderData;
 
     const updateParams = {
-      metadata: {
-        ...metadata,
-        generalInfo: {
-          ...metadata.generalInfo,
-          ...params,
+      data: {
+        metadata: {
+          ...metadata,
+          generalInfo: {
+            ...metadata.generalInfo,
+            ...params,
+          },
         },
       },
     };

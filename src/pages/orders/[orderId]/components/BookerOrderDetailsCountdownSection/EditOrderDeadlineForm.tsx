@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl';
 import css from './EditOrderDeadlineForm.module.scss';
 
 export type TEditOrderDeadlineFormValues = {
-  deadlineDate: Date;
+  deadlineDate: number;
   deadlineHour: string;
 };
 
@@ -29,11 +29,15 @@ const EditOrderDeadlineFormComponent: React.FC<
   TEditOrderDeadlineFormComponentProps
 > = (props) => {
   const intl = useIntl();
-  const { handleSubmit, startDate, values } = props;
+  const { handleSubmit, startDate, values, form } = props;
   const today = new Date();
   const maxSelectedDate = DateTime.fromMillis(startDate!)
     .minus({ day: 2 })
     .toJSDate();
+
+  const handleDeadlineDateChange = (date: number) => {
+    form.change('deadlineDate', date);
+  };
 
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
@@ -42,7 +46,7 @@ const EditOrderDeadlineFormComponent: React.FC<
           id="deadlineDate"
           name="deadlineDate"
           selected={values.deadlineDate}
-          // onChange={(date: Date) => setDeadlineDate(date)}
+          onChange={handleDeadlineDateChange}
           className={css.customInput}
           label={intl.formatMessage({
             id: 'EditOrderDeadlineForm.deadlineDate.label',

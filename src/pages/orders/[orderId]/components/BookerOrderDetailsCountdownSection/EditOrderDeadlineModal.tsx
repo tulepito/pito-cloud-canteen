@@ -30,8 +30,8 @@ const EditOrderDeadlineModal: React.FC<EditOrderDeadlineModalProps> = (
 
   const formInitialValues: TEditOrderDeadlineFormValues = {
     deadlineDate:
-      new Date(orderDeadline) ||
-      DateTime.fromJSDate(new Date()).plus({ day: 7 }).toJSDate(),
+      orderDeadline ||
+      DateTime.fromJSDate(new Date()).plus({ day: 7 }).toMillis(),
     deadlineHour: orderDeadlineHour || '',
   };
 

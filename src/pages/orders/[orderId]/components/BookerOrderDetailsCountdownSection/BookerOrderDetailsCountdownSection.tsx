@@ -1,11 +1,13 @@
 import Button from '@components/Button/Button';
 import CountdownTimer from '@components/CountdownTimer/CountdownTimer';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
+import { BookerOrderManagementsThunks } from '../../BookerOrderManagement.slice';
 import css from './BookerOrderDetailsCountdownSection.module.scss';
 import type { TEditOrderDeadlineFormValues } from './EditOrderDeadlineForm';
 import EditOrderDeadlineModal from './EditOrderDeadlineModal';
@@ -24,6 +26,7 @@ const BookerOrderDetailsCountdownSection: React.FC<
   BookerOrderDetailsCountdownSectionProps
 > = (props) => {
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   const [isEditOrderDeadlineModalOpen, setIsEditOrderDeadlineModalOpen] =
     useState(false);
 
@@ -62,7 +65,24 @@ const BookerOrderDetailsCountdownSection: React.FC<
   };
 
   const handleSubmitEditDeadline = (values: TEditOrderDeadlineFormValues) => {
-    console.log(values);
+    const {
+      deadlineDate: deadlineDateFromSubmission,
+      deadlineHour: deadlineHourFromSubmission,
+    } = values;
+    const parsedDeadlineDate = DateTime.fromMillis(
+      deadlineDateFromSubmission,
+    ).toFormat('yyyy-MM-dd');
+    const newOrderDeadline = DateTime.fromISO(
+      `${parsedDeadlineDate}T${deadlineHourFromSubmission}:00`,
+    ).toMillis();
+
+    const updateData = {
+      deadlineDate: deadlineDateFromSubmission,
+      deadlineHour: deadlineHourFromSubmission,
+      orderDeadline: newOrderDeadline,
+    };
+
+    dispatch(BookerOrderManagementsThunks.updateOrderGeneralInfo(updateData));
     setIsEditOrderDeadlineModalOpen(false);
   };
 
