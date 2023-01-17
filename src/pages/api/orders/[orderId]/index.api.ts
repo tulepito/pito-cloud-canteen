@@ -70,12 +70,29 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           data = { ...data, orderListing, planListing };
         }
 
-        res.json({ ...data });
+        res.json({ statusCode: 200, ...data });
       } catch (error) {
         handleError(res, error);
       }
       break;
     case 'POST':
+      try {
+        const {
+          query: { orderId },
+          body: { updateData },
+        } = req;
+        await integrationSdk.listings.update({
+          id: orderId,
+          ...updateData,
+        });
+
+        res.json({
+          statusCode: 200,
+          message: `Successfully update order info, orderId: ${orderId}`,
+        });
+      } catch (error) {
+        handleError(res, error);
+      }
       break;
     case 'PUT':
       break;

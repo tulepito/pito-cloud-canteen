@@ -73,8 +73,12 @@ export const loadOrderDataApi = (orderId: string) =>
 export const loadPlanDataApi = (planId: string) =>
   get(`/api/participants/plans/${planId}`);
 
+// Booker manage order details
 export const loadBookerOrderDataApi = (orderId: string) =>
   get(`/api/orders/${orderId}`);
+
+export const updateOrderDetailsApi = (orderId: string, body: TObject) =>
+  post(`/api/orders/${orderId}`, body);
 
 export const deleteParticipantFromOrderApi = (orderId: string, body: TObject) =>
   post(`/api/orders/${orderId}/delete-participant`, body);

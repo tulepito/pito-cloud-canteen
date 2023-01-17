@@ -1,28 +1,35 @@
 import { createAsyncThunk } from '@redux/redux.helper';
+import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
 import {
   deleteParticipantFromOrderApi,
   loadBookerOrderDataApi,
+  updateOrderDetailsApi,
 } from '@utils/api';
 import type { TObject, TUser } from '@utils/types';
 
 // ================ Initial states ================ //
 type TBookerOrderManagementState = {
-  isFetchingOrderDetail: boolean;
+  // Fetch data state
+  isFetchingOrderDetails: boolean;
+  // Delete state
+  isDeletingParticipant: boolean;
+  // Update state
+  isUpdatingOrderDetails: boolean;
+  // Data states
   companyId: string | null;
   orderData: TObject | null;
   planData: TObject;
   participantData: Array<TUser>;
-
-  isDeletingParticipant: boolean;
 };
 const initialState: TBookerOrderManagementState = {
-  isFetchingOrderDetail: false,
+  isFetchingOrderDetails: false,
+  isDeletingParticipant: false,
+  isUpdatingOrderDetails: false,
   companyId: null,
   orderData: {},
   planData: {},
   participantData: [],
-  isDeletingParticipant: false,
 };
 
 // ================ Thunk types ================ //
@@ -33,6 +40,30 @@ const loadData = createAsyncThunk(
   async (orderId: string) => {
     const response: any = await loadBookerOrderDataApi(orderId);
     return response.data;
+  },
+);
+
+const updateOrderGeneralInfo = createAsyncThunk(
+  'app/BookerOrderManagement/UPDATE_ORDER_GENERAL_INFO',
+  async (params: TObject, { getState, dispatch }) => {
+    const orderData = getState().BookerOrderManagement.orderData!;
+    const {
+      id: { uuid: orderId },
+      attributes: { metadata },
+    } = orderData;
+
+    const updateParams = {
+      metadata: {
+        ...metadata,
+        generalInfo: {
+          ...metadata.generalInfo,
+          ...params,
+        },
+      },
+    };
+
+    await updateOrderDetailsApi(orderId, updateParams);
+    await dispatch(loadData(orderId));
   },
 );
 
@@ -47,6 +78,7 @@ const deleteParticipant = createAsyncThunk(
 
 export const BookerOrderManagementsThunks = {
   loadData,
+  updateOrderGeneralInfo,
   deleteParticipant,
 };
 
@@ -57,8 +89,9 @@ const BookerOrderManagementSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      /* =============== loadData =============== */
       .addCase(loadData.pending, (state) => {
-        state.isFetchingOrderDetail = true;
+        state.isFetchingOrderDetails = true;
       })
       .addCase(loadData.fulfilled, (state, { payload }) => {
         const {
@@ -69,16 +102,16 @@ const BookerOrderManagementSlice = createSlice({
 
         return {
           ...state,
-          isFetchingOrderDetail: false,
+          isFetchingOrderDetails: false,
           orderData,
           planData,
           ...restPayload,
         };
       })
       .addCase(loadData.rejected, (state) => {
-        state.isFetchingOrderDetail = false;
+        state.isFetchingOrderDetails = false;
       })
-
+      /* =============== deleteParticipant =============== */
       .addCase(deleteParticipant.pending, (state) => {
         state.isDeletingParticipant = true;
       })
@@ -87,6 +120,16 @@ const BookerOrderManagementSlice = createSlice({
       })
       .addCase(deleteParticipant.rejected, (state) => {
         state.isDeletingParticipant = false;
+      })
+      /* =============== updateOrderGeneralInfo =============== */
+      .addCase(updateOrderGeneralInfo.pending, (state) => {
+        state.isUpdatingOrderDetails = true;
+      })
+      .addCase(updateOrderGeneralInfo.fulfilled, (state) => {
+        state.isUpdatingOrderDetails = false;
+      })
+      .addCase(updateOrderGeneralInfo.rejected, (state) => {
+        state.isUpdatingOrderDetails = false;
       });
   },
 });
@@ -96,3 +139,14 @@ export const BookerOrderManagementsAction = BookerOrderManagementSlice.actions;
 export default BookerOrderManagementSlice.reducer;
 
 // ================ Selectors ================ //
+export const orderDetailsAnyActionsInProgress = (state: RootState) => {
+  const {
+    isFetchingOrderDetails: isFetchingOrderDetail,
+    isDeletingParticipant,
+    isUpdatingOrderDetails: isUpdatingOrderDetail,
+  } = state.BookerOrderManagement;
+
+  return (
+    isFetchingOrderDetail || isDeletingParticipant || isUpdatingOrderDetail
+  );
+};
