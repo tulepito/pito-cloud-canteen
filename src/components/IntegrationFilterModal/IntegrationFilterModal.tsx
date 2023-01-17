@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import Button, { InlineTextButton } from '@components/Button/Button';
+import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import IconFilter from '@components/IconFilter/IconFilter';
 import AlertModal from '@components/Modal/AlertModal';
@@ -47,18 +47,31 @@ const IntegrationFilterModal = (props: any) => {
           initialValues={initialValues}
           onSubmit={onSubmit}
           render={(fieldRenderProps) => {
-            const { handleSubmit, form } = fieldRenderProps;
+            const { handleSubmit, form, values } = fieldRenderProps;
             formRef.current = form;
             return (
               <Form className={css.filterForm} onSubmit={handleSubmit}>
                 <>
-                  {children}
-                  <InlineTextButton
-                    onClick={onClear}
-                    type="button"
-                    className={css.clearButton}>
-                    <FormattedMessage id="IntegrationFilterModal.clearBtn" />
-                  </InlineTextButton>
+                  {children({ values, form })}
+                  <div className={css.formButtons}>
+                    <Button
+                      onClick={onClear}
+                      type="button"
+                      className={css.leftButton}>
+                      <FormattedMessage id="IntegrationFilterModal.clearBtn" />
+                    </Button>
+                    <div className={css.rightButtons}>
+                      <Button
+                        onClick={onClose}
+                        type="button"
+                        className={css.discardButton}>
+                        <FormattedMessage id="IntegrationFilterModal.filterFormDiscardBtn" />
+                      </Button>
+                      <Button className={css.submitButton}>
+                        <FormattedMessage id="IntegrationFilterModal.filterFormBtn" />
+                      </Button>
+                    </div>
+                  </div>
                 </>
               </Form>
             );

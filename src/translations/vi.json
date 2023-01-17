@@ -476,6 +476,7 @@
   "ManageCompanies.searchStatusLabel": "Chọn trạng thái",
   "ManageCompanies.status": "Trạng thái",
   "ManageCompanies.title": "Bảng khách hàng",
+  "ManageOrderPage.createDateLabel": "Ngày triển khai",
   "ManageOrders.noResults": "Không có kết quả nào hiển thị",
   "ManageOrders.title": "Danh sách đơn hàng",
   "ManageOrdersPage.inProgressState": "Mới tạo",

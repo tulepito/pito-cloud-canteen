@@ -13,7 +13,7 @@ const IconFilter: React.FC<TIconProps> = (props) => {
       xmlns="http://www.w3.org/2000/svg">
       <path
         fillRule="evenodd"
-        clip-Rule="evenodd"
+        clipRule="evenodd"
         d="M6.40006 11.4951H1.14923C0.804231 11.4951 0.524231 11.2151 0.524231 10.8701C0.524231 10.5251 0.804231 10.2451 1.14923 10.2451H6.40006C6.74506 10.2451 7.02506 10.5251 7.02506 10.8701C7.02506 11.2151 6.74506 11.4951 6.40006 11.4951Z"
         fill="#262626"
       />

@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .filterForm {
   display: flex;
@@ -29,6 +30,7 @@
 
 .boldText {
   font-weight: $fontWeightBold;
+  color: $secondaryBlue6;
 }
 
 .bodyCell:nth-child(3) {
@@ -49,10 +51,11 @@
 }
 
 .badge {
-  border-radius: 50px;
+  border-radius: 4px;
   .badgeLabel {
     min-width: 100px;
-    font-weight: $fontWeightBold;
+    font-size: 12px;
+    color: $neutralGray6 !important;
     text-align: center;
   }
 }
@@ -62,4 +65,68 @@
 }
 
 .locationRow {
+}
+
+.tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.orderDetailTooltipItem {
+  color: $neutralGray6;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+
+  .orderIcon {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    border-radius: 50%;
+    &.pendingIcon {
+      border: 1px solid $neutralGray4;
+      background-color: $neutralGray3;
+    }
+    &.receivedIcon {
+      background-color: $successScreen6;
+    }
+    &.cancelledIcon {
+      background-color: $warningOrange5;
+    }
+    &.deliveredIcon {
+      background-color: #171760;
+    }
+  }
+
+  .orderDate {
+    font-weight: $fontWeightBold;
+  }
+}
+
+.inputDate {
+  @include textInputStyles;
+  z-index: 1;
+  width: 50%;
+  input {
+    border: none;
+    width: 100%;
+    font-size: 14px;
+    outline: none;
+  }
+}
+
+.labelDate {
+  font-size: 14px;
+  line-height: 24px;
+  color: $neutralGray10;
+  margin-bottom: 8px;
+  display: inline-block;
+  display: flex;
+}
+
+.dateInputs {
+  display: flex;
+  gap: 10px;
 }
