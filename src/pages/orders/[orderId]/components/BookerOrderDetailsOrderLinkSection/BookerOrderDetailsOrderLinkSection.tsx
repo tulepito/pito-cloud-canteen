@@ -3,11 +3,13 @@ import ButtonIcon from '@components/ButtonIcon/ButtonIcon';
 import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import IconShare from '@components/Icons/IconShare/IconShare';
 import Tooltip from '@components/Tooltip/Tooltip';
+import { useAppSelector } from '@hooks/reduxHooks';
 import classNames from 'classnames';
 import React, { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './BookerOrderDetailsOrderLinkSection.module.scss';
+import type { TSendNotificationFormValues } from './SendNotificationForm';
 import SendNotificationModal from './SendNotificationModal';
 
 type BookerOrderDetailsOrderLinkSectionProps = {
@@ -21,8 +23,9 @@ type BookerOrderDetailsOrderLinkSectionProps = {
 const BookerOrderDetailsOrderLinkSection: React.FC<
   BookerOrderDetailsOrderLinkSectionProps
 > = (props) => {
+  const { orderData } = useAppSelector((state) => state.BookerOrderManagement);
   const intl = useIntl();
-  const orderLink = 'https://app-test.pito.vn/AOaemvKULgst0cvmSuhO7XCj6EL_ds';
+  const orderLink = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderData?.id?.uuid}`;
   const defaultCopyText = useMemo(
     () =>
       intl.formatMessage({
@@ -69,6 +72,12 @@ const BookerOrderDetailsOrderLinkSection: React.FC<
     setIsSendNotificationModalOpen(false);
   };
 
+  const handleSubmitSendNotification = (
+    values: TSendNotificationFormValues,
+  ) => {
+    console.log({ ...values, orderLink });
+  };
+
   return (
     <div className={rootClasses}>
       <div className={css.title}>{sectionTitle}</div>
@@ -93,6 +102,7 @@ const BookerOrderDetailsOrderLinkSection: React.FC<
       </Button>
 
       <SendNotificationModal
+        onSubmit={handleSubmitSendNotification}
         data={{ orderLink, orderDeadline }}
         isOpen={isSendNotificationModalOpen}
         onClose={handleCloseSendNotificationModal}

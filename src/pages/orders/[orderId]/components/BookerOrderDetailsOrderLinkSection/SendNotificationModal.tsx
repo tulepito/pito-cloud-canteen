@@ -14,6 +14,7 @@ type SendNotificationModalProps = {
   isOpen: boolean;
   onClose: () => void;
   data: { orderLink: string; orderDeadline: number };
+  onSubmit: (values: TSendNotificationFormValues) => void;
 };
 
 const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
@@ -22,6 +23,7 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
     onClose,
     isOpen,
     data: { orderDeadline, orderLink },
+    onSubmit,
   } = props;
 
   const defaultCopyText = useMemo(
@@ -66,12 +68,6 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
     setCopyToClipboardTooltip(copiedCopyText);
   };
 
-  const handleSubmitSendNotification = (
-    values: TSendNotificationFormValues,
-  ) => {
-    console.log(values);
-  };
-
   return (
     <Modal
       isOpen={isOpen}
@@ -96,7 +92,7 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
             {sendNotificationModalDescriptionLabel}
           </div>
         </div>
-        <SendNotificationForm onSubmit={handleSubmitSendNotification} />
+        <SendNotificationForm onSubmit={onSubmit} />
       </div>
     </Modal>
   );
