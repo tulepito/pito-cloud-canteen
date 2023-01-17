@@ -9,7 +9,9 @@ import {
 } from '@services/subAccountSdk';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
-import type { TPlan, TPlan } from '@utils/orderTypes';
+import { parseTimestaimpToFormat } from '@utils/dates';
+import { EOrderStates } from '@utils/enums';
+import type { TPlan } from '@utils/orderTypes';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HTTP_METHODS } from '../helpers/constants';
@@ -45,6 +47,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const draftedOrderListinResponse =
           await loggedinSubAccount.ownListings.createDraft({
             title: generatedOrderId,
+            publicData: {
+              orderName: `${
+                companyAccount.attributes.profile.displayName
+              } PCC_${parseTimestaimpToFormat(
+                generalInfo.startDate,
+              )} - ${parseTimestaimpToFormat(generalInfo.endDate)}`,
+              startDate: generalInfo.startDate,
+              enddate: generalInfo.endDate,
+            },
           });
         const draftedOrderListing = denormalisedResponseEntities(
           draftedOrderListinResponse,
@@ -84,6 +95,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               listingType: ListingTypes.ORDER,
               generalInfo,
               orderDetail: updatedOrderDetail,
+              orderState: EOrderStates.isNew,
             },
           });
         const updatedDraftOrderListing = denormalisedResponseEntities(

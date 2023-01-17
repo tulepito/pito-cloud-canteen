@@ -136,12 +136,8 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'orderName',
     label: 'Tên đơn hàng',
-    render: ({ companyName, startDate, endDate }: any) => {
-      return (
-        <div className={css.orderName}>
-          {companyName}_PCC_{startDate} - {endDate}
-        </div>
-      );
+    render: ({ orderName }: any) => {
+      return <div className={css.orderName}>{orderName || 'NULL'}</div>;
     },
   },
   {
@@ -277,6 +273,7 @@ const parseEntitiesToTableData = (
           }),
         ),
         orderDetail: entity.attributes.metadata?.orderDetail,
+        orderName: entity.attributes.publicData.orderName,
       },
     };
   });
