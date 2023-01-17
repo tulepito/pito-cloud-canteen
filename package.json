@@ -20,6 +20,7 @@
     "@types/luxon": "^3.1.0",
     "@types/react-big-calendar": "^0.38.2",
     "autosize": "^5.0.2",
+    "aws-sdk": "^2.1293.0",
     "axios": "^1.2.1",
     "classnames": "^2.3.2",
     "cookie": "^0.5.0",

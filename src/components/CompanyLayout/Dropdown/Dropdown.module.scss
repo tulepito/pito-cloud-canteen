@@ -1,0 +1,25 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.wrapper {
+  position: relative;
+}
+
+.dropdown {
+  position: absolute;
+  top: 32px;
+  left: -64px;
+  box-shadow: $boxShadow;
+  width: 200px;
+  z-index: 1;
+  color: $neutralGray6;
+  background-color: $neutralGray1;
+
+  .item {
+    padding: 8px 16px;
+
+    &:hover {
+      background-color: $neutralGray4;
+    }
+  }
+}

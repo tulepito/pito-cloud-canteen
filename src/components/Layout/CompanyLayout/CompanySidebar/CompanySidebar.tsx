@@ -18,7 +18,7 @@ const SIDEBAR_MENUS: TSidebarMenu[] = [
       {
         id: 'memberList',
         label: 'CompanySidebar.memberList',
-        nameLink: '/company/[companyId]/employee-setting',
+        nameLink: '/company/[companyId]/members',
       },
       {
         id: 'groupList',
