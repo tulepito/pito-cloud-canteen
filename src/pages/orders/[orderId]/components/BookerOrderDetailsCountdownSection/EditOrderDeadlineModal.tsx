@@ -1,4 +1,5 @@
 import Modal from '@components/Modal/Modal';
+import { DateTime } from 'luxon';
 import { useIntl } from 'react-intl';
 
 import type { TEditOrderDeadlineFormValues } from './EditOrderDeadlineForm';
@@ -10,6 +11,7 @@ type EditOrderDeadlineModalProps = {
   data: {
     orderStartDate: number;
     orderDeadline: number;
+    orderDeadlineHour: string;
   };
   onClose: () => void;
   onSubmit: (values: TEditOrderDeadlineFormValues) => void;
@@ -22,13 +24,15 @@ const EditOrderDeadlineModal: React.FC<EditOrderDeadlineModalProps> = (
     isOpen,
     onClose,
     onSubmit,
-    data: { orderStartDate, orderDeadline },
+    data: { orderStartDate, orderDeadline, orderDeadlineHour },
   } = props;
   const intl = useIntl();
 
   const formInitialValues: TEditOrderDeadlineFormValues = {
-    deadlineDate: new Date(orderDeadline) || new Date(2023, 1, 1),
-    deadlineHour: '',
+    deadlineDate:
+      new Date(orderDeadline) ||
+      DateTime.fromJSDate(new Date()).plus({ day: 7 }).toJSDate(),
+    deadlineHour: orderDeadlineHour || '',
   };
 
   return (

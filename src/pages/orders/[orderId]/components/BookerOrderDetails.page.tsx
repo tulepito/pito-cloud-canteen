@@ -1,6 +1,7 @@
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppSelector } from '@hooks/reduxHooks';
 
+import { orderDetailsAnyActionsInProgress } from '../BookerOrderManagement.slice';
 import css from './BookerOrderDetails.module.scss';
 import BookerOrderDetailsCountdownSection from './BookerOrderDetailsCountdownSection/BookerOrderDetailsCountdownSection';
 import BookerOrderDetailsManageOrdersSection from './BookerOrderDetailsManageOrdersSection/BookerOrderDetailsManageOrdersSection';
@@ -9,8 +10,10 @@ import BookerOrderDetailsOrderLinkSection from './BookerOrderDetailsOrderLinkSec
 import BookerOrderDetailsTitle from './BookerOrderDetailsTitle/BookerOrderDetailsTitle';
 
 const BookerOrderDetailsPage = () => {
-  const { orderData, planData, participantData, isFetchingOrderDetail } =
-    useAppSelector((state) => state.BookerOrderManagement);
+  const { orderData, planData, participantData } = useAppSelector(
+    (state) => state.BookerOrderManagement,
+  );
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
   const { generalInfo = {} } = orderData?.attributes?.metadata || {};
   const {
@@ -19,13 +22,12 @@ const BookerOrderDetailsPage = () => {
     deliveryHour,
     deliveryAddress,
     orderDeadline = 0,
+    deadlineHour,
   } = generalInfo || {};
 
   const titleSectionData = { deliveryHour, deliveryAddress };
-  const countdownSectionData = {
-    orderDeadline,
-    startDate,
-  };
+  const countdownSectionData = { deadlineHour, orderDeadline, startDate };
+  const linkSectionData = { orderDeadline };
   const manageParticipantData = {
     planData,
     participantData,
@@ -38,7 +40,7 @@ const BookerOrderDetailsPage = () => {
 
   return (
     <>
-      {isFetchingOrderDetail ? (
+      {inProgress ? (
         <LoadingContainer />
       ) : (
         <div className={css.root}>
@@ -55,7 +57,10 @@ const BookerOrderDetailsPage = () => {
               className={css.container}
               data={countdownSectionData}
             />
-            <BookerOrderDetailsOrderLinkSection className={css.container} />
+            <BookerOrderDetailsOrderLinkSection
+              className={css.container}
+              data={linkSectionData}
+            />
             <BookerOrderDetailsManageParticipantsSection
               className={css.container}
               data={manageParticipantData}

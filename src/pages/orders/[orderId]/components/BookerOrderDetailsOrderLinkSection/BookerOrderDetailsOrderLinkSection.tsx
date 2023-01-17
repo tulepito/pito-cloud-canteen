@@ -13,6 +13,9 @@ import SendNotificationModal from './SendNotificationModal';
 type BookerOrderDetailsOrderLinkSectionProps = {
   rootClassName?: string;
   className?: string;
+  data: {
+    orderDeadline: number;
+  };
 };
 
 const BookerOrderDetailsOrderLinkSection: React.FC<
@@ -40,7 +43,11 @@ const BookerOrderDetailsOrderLinkSection: React.FC<
   const [isSendNotificationModalOpen, setIsSendNotificationModalOpen] =
     useState(false);
 
-  const { rootClassName, className } = props;
+  const {
+    rootClassName,
+    className,
+    data: { orderDeadline },
+  } = props;
   const rootClasses = classNames(rootClassName || css.root, className);
 
   const sectionTitle = intl.formatMessage({
@@ -86,7 +93,7 @@ const BookerOrderDetailsOrderLinkSection: React.FC<
       </Button>
 
       <SendNotificationModal
-        orderLink={orderLink}
+        data={{ orderLink, orderDeadline }}
         isOpen={isSendNotificationModalOpen}
         onClose={handleCloseSendNotificationModal}
       />

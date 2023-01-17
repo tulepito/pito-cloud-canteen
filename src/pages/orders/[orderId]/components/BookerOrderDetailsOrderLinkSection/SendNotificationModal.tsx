@@ -2,6 +2,7 @@ import ButtonIcon from '@components/ButtonIcon/ButtonIcon';
 import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import Modal from '@components/Modal/Modal';
 import Tooltip from '@components/Tooltip/Tooltip';
+import { DateTime } from 'luxon';
 import React, { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -12,12 +13,16 @@ import css from './SendNotificationModal.module.scss';
 type SendNotificationModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  orderLink: string;
+  data: { orderLink: string; orderDeadline: number };
 };
 
 const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
   const intl = useIntl();
-  const { onClose, isOpen, orderLink } = props;
+  const {
+    onClose,
+    isOpen,
+    data: { orderDeadline, orderLink },
+  } = props;
 
   const defaultCopyText = useMemo(
     () =>
@@ -40,9 +45,15 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
   const sendNotificationModalTitle = intl.formatMessage({
     id: 'SendNotificationModal.title',
   });
-  const sendNotificationModalAlert = intl.formatMessage({
-    id: 'SendNotificationModal.alert',
-  });
+  const sendNotificationModalAlert = intl.formatMessage(
+    {
+      id: 'SendNotificationModal.alert',
+    },
+    {
+      dateTime:
+        DateTime.fromMillis(orderDeadline).toFormat('dd/MM/yyyy  HH:mm'),
+    },
+  );
   const sendNotificationModalLinkLabel = intl.formatMessage({
     id: 'SendNotificationModal.linkLabel',
   });

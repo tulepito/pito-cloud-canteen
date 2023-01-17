@@ -637,7 +637,7 @@
   "SelectRestaurantPage.title": "Danh sách Nhà hàng",
   "SelectSingleFilter.popupClear": "Clear",
   "SendNotificationForm.submitButtonText": "Gửi email",
-  "SendNotificationModal.alert": "Vui lòng hoàn tất chọn món trước {dateTime}",
+  "SendNotificationModal.alert": "Vui lòng hoàn tất chọn món trước ngày {dateTime}",
   "SendNotificationModal.copyToClipboardTooltip.copied": "Đã sao chép",
   "SendNotificationModal.copyToClipboardTooltip.default": "Sao chép vào bộ nhớ tạm",
   "SendNotificationModal.descriptionLabel": "Thêm mô tả để giải thích thêm về đơn hàng này",

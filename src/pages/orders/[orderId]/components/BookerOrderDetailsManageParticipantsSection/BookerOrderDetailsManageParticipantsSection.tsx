@@ -6,7 +6,10 @@ import classNames from 'classnames';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { BookerOrderManagementsThunks } from '../../BookerOrderManagement.slice';
+import {
+  BookerOrderManagementsThunks,
+  orderDetailsAnyActionsInProgress,
+} from '../../BookerOrderManagement.slice';
 import AddParticipantForm from './AddParticipantForm';
 import css from './BookerOrderDetailsManageParticipantsSection.module.scss';
 import BookerOrderDetailsParticipantCard from './BookerOrderDetailsParticipantCard';
@@ -55,10 +58,8 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
     useState(false);
   const [isManageParticipantsModalOpen, setIsManageParticipantsModalOpen] =
     useState(false);
-  const { isFetchingOrderDetail, isDeletingParticipant } = useAppSelector(
-    (state) => state.BookerOrderManagement,
-  );
-  const disableButton = isFetchingOrderDetail || isDeletingParticipant;
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
+  const disableButton = inProgress;
 
   const { rootClassName, className, data } = props;
   const rootClasses = classNames(rootClassName || css.root, className);
