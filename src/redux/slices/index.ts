@@ -1,5 +1,7 @@
 export { default as auth } from './auth.slice';
 export { default as company } from './company.slice';
+export { default as companyInvitation } from './companyInvitation.slice';
+export { default as companyMember } from './companyMember.slice';
 export { default as CreateCompanyPage } from './CreateCompanyPage.slice';
 export { default as EditCompanyPage } from './EditCompanyPage.slice';
 export { default as emailVerification } from './emailVerification.slice';
