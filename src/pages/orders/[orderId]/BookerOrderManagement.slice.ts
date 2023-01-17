@@ -2,10 +2,12 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
 import {
+  addUpdateMemberOrder,
   deleteParticipantFromOrderApi,
   loadBookerOrderDataApi,
   updateOrderDetailsApi,
 } from '@utils/api';
+import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject, TUser } from '@utils/types';
 
 // ================ Initial states ================ //
@@ -69,6 +71,69 @@ const updateOrderGeneralInfo = createAsyncThunk(
   },
 );
 
+const addOrUpdateMemberOrder = createAsyncThunk(
+  'app/BookerOrderManagement/ADD_OR_UPDATE_MEMBER_ORDER',
+  async (params: TObject, { getState, dispatch }) => {
+    const { currentViewDate, foodId, memberId, requirement } = params;
+    const {
+      id: { uuid: orderId },
+    } = getState().BookerOrderManagement.orderData!;
+    const {
+      id: { uuid: planId },
+      attributes: { metadata },
+    } = getState().BookerOrderManagement.planData!;
+
+    const memberOrderDetailOnUpdateDate =
+      metadata?.orderDetail[currentViewDate].memberOrders[memberId];
+    const { foodId: oldFoodId, status } = memberOrderDetailOnUpdateDate;
+
+    if (foodId === '' || oldFoodId === foodId) {
+      return;
+    }
+    let newMemberOrderValues = memberOrderDetailOnUpdateDate;
+
+    switch (status) {
+      case EParticipantOrderStatus.joined:
+      case EParticipantOrderStatus.notAllowed:
+        newMemberOrderValues = {
+          ...newMemberOrderValues,
+          foodId,
+        };
+        break;
+      case EParticipantOrderStatus.empty:
+      case EParticipantOrderStatus.notJoined:
+        newMemberOrderValues = {
+          ...newMemberOrderValues,
+          foodId,
+          status: EParticipantOrderStatus.joined,
+        };
+        break;
+      case EParticipantOrderStatus.expired:
+        break;
+      default:
+        break;
+    }
+    newMemberOrderValues = { ...newMemberOrderValues, requirement };
+
+    const updateParams = {
+      planId,
+      orderDetail: {
+        ...metadata.orderDetail,
+        [currentViewDate]: {
+          ...metadata.orderDetail[currentViewDate],
+          memberOrders: {
+            ...metadata.orderDetail[currentViewDate].memberOrders,
+            [memberId]: newMemberOrderValues,
+          },
+        },
+      },
+    };
+
+    await addUpdateMemberOrder(orderId, updateParams);
+    await dispatch(loadData(orderId));
+  },
+);
+
 const deleteParticipant = createAsyncThunk(
   'app/BookerOrderManagement/DELETE_PARTICIPANT',
   async (params: TObject, { getState }) => {
@@ -81,6 +146,7 @@ const deleteParticipant = createAsyncThunk(
 export const BookerOrderManagementsThunks = {
   loadData,
   updateOrderGeneralInfo,
+  addOrUpdateMemberOrder,
   deleteParticipant,
 };
 

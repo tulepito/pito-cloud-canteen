@@ -79,7 +79,7 @@
           border: none;
         }
 
-        .totalRow td {
+        &.totalRow td {
           @include textTemplate(14px, 700, 20px);
         }
 

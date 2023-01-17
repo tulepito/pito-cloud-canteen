@@ -2,7 +2,7 @@ import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject, TUser } from '@utils/types';
 import classNames from 'classnames';
@@ -10,6 +10,7 @@ import get from 'lodash/get';
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
+import { BookerOrderManagementsThunks } from '../../BookerOrderManagement.slice';
 import type { TEditOrderRowFormValues } from './EditOrderRowForm';
 import EditOrderRowModal from './EditOrderRowModal';
 import css from './OrderDetailsTable.module.scss';
@@ -208,10 +209,13 @@ const renderTableLayout = ({
 const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   const { currentViewDate } = props;
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   const [currentTab, setCurrentTab] = useState(
     TABLE_TABS[EOrderDetailsTableTab.chose].value,
   );
-  const [currentMemberOrderData, setCurrentMemberOrderData] = useState({});
+  const [currentMemberOrderData, setCurrentMemberOrderData] = useState<TObject>(
+    {},
+  );
   const [isEditSelectionModalOpen, setIsEditSelectionModalOpen] =
     useState(false);
   const { planData, participantData, orderData } = useAppSelector(
@@ -263,7 +267,17 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
     setIsEditSelectionModalOpen(false);
   };
   const handleSubmitEditSelectionModal = (values: TEditOrderRowFormValues) => {
-    console.log('🚀 ~ values', values);
+    const { foodId, requirement } = values;
+    const { memberData } = currentMemberOrderData;
+
+    const updateValues = {
+      memberId: memberData?.id,
+      foodId,
+      requirement: requirement || '',
+      currentViewDate,
+    };
+
+    dispatch(BookerOrderManagementsThunks.addOrUpdateMemberOrder(updateValues));
     setIsEditSelectionModalOpen(false);
   };
 

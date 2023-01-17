@@ -22,13 +22,18 @@
 
   .leftPart {
     order: 3;
+    $maxWidthWithPadding: calc(100vw - 320px - 40px);
 
     margin-top: 24px;
 
     @include viewportMedium {
       order: 1;
       margin-top: 0;
-      width: min(820px, calc(100vw - 320px - 260px - 4px));
+      width: min(820px, calc($maxWidthWithPadding - 48px));
+    }
+
+    @include viewportLarge {
+      width: min(820px, calc($maxWidthWithPadding - 72px));
     }
 
     @include viewportSLarge {
@@ -56,20 +61,27 @@
       }
     }
   }
+
   @include viewportSmall {
     padding: 24px 16px;
   }
+
   @include viewportMedium {
     width: fit-content;
     display: grid;
     grid-template-columns: 1fr 320px;
     column-gap: 40px;
     row-gap: 28px;
-    padding: 40px 130px;
+    padding: 24px;
     margin: 40px auto;
   }
 
+  @include viewportLarge {
+    padding: 40px 36px;
+  }
+
   @include viewportSLarge {
+    padding: 40px 130px;
     max-width: calc(1180px + 130px * 2);
     margin: 40px calc(50vw - $sl/2);
   }
