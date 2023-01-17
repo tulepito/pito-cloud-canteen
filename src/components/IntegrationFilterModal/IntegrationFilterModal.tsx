@@ -30,11 +30,11 @@ const IntegrationFilterModal = (props: any) => {
           initialValues={initialValues}
           onSubmit={onSubmit}
           render={(fieldRenderProps) => {
-            const { handleSubmit } = fieldRenderProps;
+            const { handleSubmit, values, form } = fieldRenderProps;
             return (
               <Form className={css.filterForm} onSubmit={handleSubmit}>
                 <>
-                  {children}
+                  {children({ values, form })}
                   <div className={css.formButtons}>
                     <Button
                       onClick={onClear}

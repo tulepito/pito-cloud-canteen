@@ -68,6 +68,11 @@
         @include viewportLarge {
           display: table-row;
         }
+        transition: all 0.3s;
+        &:hover {
+          background-color: $neutralGray2;
+        }
+
         .bodyCell {
           display: flex;
           justify-content: space-between;

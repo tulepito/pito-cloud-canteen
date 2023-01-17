@@ -633,5 +633,6 @@
   "SignUpPage.Title": "Đăng ký",
   "Toolbar.action.today": "Hôm nay",
   "Toolbar.viewMode.month": "Tháng",
-  "Toolbar.viewMode.week": "Tuần"
+  "Toolbar.viewMode.week": "Tuần",
+  "ManageOrderPage.createDateLabel": "Ngày triển khai"
 }

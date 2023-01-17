@@ -2,7 +2,6 @@
 import Badge, { BadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FieldMultipleSelect from '@components/FieldMutipleSelect/FieldMultipleSelect';
 import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
@@ -13,6 +12,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderAsyncAction } from '@redux/slices/Order.slice';
 import { adminRoutes } from '@src/paths';
 import {
+  EOrderDetailsStatus,
   EOrderStates,
   getLabelByKey,
   ORDER_STATES_OPTIONS,
@@ -28,6 +28,13 @@ import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import css from './ManageOrders.module.scss';
+import classNames from 'classnames';
+import Tooltip from '@components/Tooltip/Tooltip';
+import IconTick from '@components/Icons/IconTick/IconTick';
+import IconWarning from '@components/Icons/IconWarning/IconWarning';
+import IconTruck from '@components/Icons/IconTruck/IconTruck';
+import FieldDatePicker from '@components/FieldDatePicker/FieldDatePicker';
+import addDays from 'date-fns/addDays';
 
 const parseTimestaimpToFormat = (date: number) => {
   return DateTime.fromMillis(date).toFormat('dd/MM/yyyy');
@@ -39,7 +46,7 @@ const uniqueStrings = (array: string[]) => {
   });
 };
 
-const ORDER_STATE_BAGDE_TYPE = {
+const BAGDE_TYPE_BASE_ON_ORDER_STATE = {
   [EOrderStates.inProgress]: BadgeType.PROCESSING,
   [EOrderStates.isNew]: BadgeType.PROCESSING,
   [EOrderStates.cancel]: BadgeType.DEFAULT,
@@ -49,6 +56,61 @@ const ORDER_STATE_BAGDE_TYPE = {
   [EOrderStates.picking]: BadgeType.WARNING,
 };
 
+const BAGDE_CLASSNAME_BASE_ON_ORDER_STATE = {
+  [EOrderStates.inProgress]: css.badgeInProgress,
+  [EOrderStates.isNew]: css.badgeProcessing,
+  [EOrderStates.cancel]: css.badgedefault,
+  [EOrderStates.delivery]: css.badgeSuccess,
+  [EOrderStates.completed]: css.badgeSuccess,
+  [EOrderStates.pendingPayment]: css.badgeWarning,
+  [EOrderStates.picking]: css.badgeWarning,
+};
+
+const OrderDetailTooltip = ({ orderDetail }: any) => {
+  const orderDetails = Object.keys(orderDetail).map((key) => {
+    const status = orderDetail[key].status;
+    const OrderIcon = () => {
+      switch (status) {
+        case EOrderDetailsStatus.cancelled:
+          return (
+            <div className={classNames(css.orderIcon, css.cancelledIcon)}>
+              <IconWarning />
+            </div>
+          );
+        case EOrderDetailsStatus.delivered:
+          return (
+            <div className={classNames(css.orderIcon, css.deliveredIcon)}>
+              <IconTruck />
+            </div>
+          );
+        case EOrderDetailsStatus.received:
+          return (
+            <div className={classNames(css.orderIcon, css.receivedIcon)}>
+              <IconTick />
+            </div>
+          );
+        default:
+          return (
+            <div className={classNames(css.orderIcon, css.pendingIcon)}></div>
+          );
+      }
+    };
+
+    return (
+      <div className={css.orderDetailTooltipItem}>
+        <OrderIcon />
+        <span>
+          <span className={css.orderDate}>
+            {parseTimestaimpToFormat(Number(key))}
+          </span>
+          : {20000}đ
+        </span>
+      </div>
+    );
+  });
+  return <div className={css.tooltip}>{orderDetails}</div>;
+};
+
 const TABLE_COLUMN: TColumn[] = [
   {
     key: 'title',
@@ -56,7 +118,15 @@ const TABLE_COLUMN: TColumn[] = [
     render: (data: any) => {
       return (
         <NamedLink path={`${adminRoutes.ManageOrders.path}/${data.id}`}>
-          <div className={css.boldText}>#{data.title}</div>
+          <Tooltip
+            overlayInnerStyle={{ backgroundColor: '#ffffff' }}
+            showArrow={false}
+            tooltipContent={
+              <OrderDetailTooltip orderDetail={data.orderDetail} />
+            }
+            placement="bottomLeft">
+            <div className={css.boldText}>#{data.title}</div>
+          </Tooltip>
         </NamedLink>
       );
     },
@@ -144,9 +214,14 @@ const TABLE_COLUMN: TColumn[] = [
     }) => {
       return (
         <Badge
-          containerClassName={css.badge}
+          containerClassName={classNames(
+            css.badge,
+            BAGDE_CLASSNAME_BASE_ON_ORDER_STATE[state],
+          )}
           labelClassName={css.badgeLabel}
-          type={(ORDER_STATE_BAGDE_TYPE[state] as any) || BadgeType.DEFAULT}
+          type={
+            (BAGDE_TYPE_BASE_ON_ORDER_STATE[state] as any) || BadgeType.DEFAULT
+          }
           label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
         />
       );
@@ -200,6 +275,7 @@ const parseEntitiesToTableData = (
             return orderDetail[key]?.restaurant?.restaurantName;
           }),
         ),
+        orderDetail: entity.attributes.metadata?.orderDetail,
       },
     };
   });
@@ -235,7 +311,13 @@ const ManageOrdersPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { page = 1, keywords = '', meta_state = '' } = router.query;
+  const {
+    page = 1,
+    keywords = '',
+    meta_state = '',
+    pub_endDate,
+    pub_startDate,
+  } = router.query;
   const [sortValue, setSortValue] = useState<TSortValue>();
   const {
     queryOrderInProgress,
@@ -289,7 +371,19 @@ const ManageOrdersPage = () => {
     .filter((item: string) => !!item);
 
   useEffect(() => {
-    dispatch(OrderAsyncAction.queryOrders({ page, keywords }));
+    const endDateWithOneMoreDay = addDays(new Date(pub_endDate as string), 1);
+    dispatch(
+      OrderAsyncAction.queryOrders({
+        page,
+        keywords,
+        ...(pub_endDate
+          ? { pub_endDate: `,${new Date(endDateWithOneMoreDay).getTime()}` }
+          : {}),
+        ...(pub_startDate
+          ? { pub_startDate: `${new Date(pub_startDate as string).getTime()},` }
+          : {}),
+      }),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
@@ -300,12 +394,19 @@ const ManageOrdersPage = () => {
     });
   };
 
-  const onSubmit = ({ keywords, meta_state }: any) => {
+  const onSubmit = ({
+    keywords,
+    meta_state,
+    pub_startDate,
+    pub_endDate,
+  }: any) => {
     router.push({
       pathname: adminRoutes.ManageOrders.path,
       query: {
         keywords,
         meta_state: meta_state.join(','),
+        pub_startDate: new Date(pub_startDate).toISOString(),
+        pub_endDate: new Date(pub_endDate).toISOString(),
       },
     });
   };
@@ -318,23 +419,70 @@ const ManageOrdersPage = () => {
       <div className={css.filterForm}>
         <IntegrationFilterModal
           onClear={onClearFilter}
-          initialValues={{ meta_state: groupStateString, keywords }}
+          initialValues={{
+            meta_state: groupStateString,
+            keywords,
+            pub_startDate: pub_startDate
+              ? new Date(pub_startDate as string).getTime()
+              : undefined,
+            pub_endDate: pub_endDate
+              ? new Date(pub_endDate as string).getTime()
+              : undefined,
+          }}
           onSubmit={onSubmit}>
-          <FieldTextInput
-            name="keywords"
-            id="keywords"
-            label="Mã đơn"
-            placeholder="Nhập mã đơn"
-            className={css.input}
-          />
-          <FieldMultipleSelect
-            className={css.input}
-            name="meta_state"
-            id="meta_state"
-            label="Trạng thái"
-            placeholder="Chọn trạng thái"
-            options={ORDER_STATES_OPTIONS}
-          />
+          {({ values, form }: any) => {
+            const setStartDate = (date: Date) => {
+              form.change('pub_startDate', date);
+              if (values.pub_endDate) {
+                form.change('pub_endDate', undefined);
+              }
+            };
+            const setEndDate = (date: Date) => {
+              form.change('pub_endDate', date);
+            };
+
+            const minEndDate = addDays(values.pub_startDate, 1);
+
+            return (
+              <>
+                <FieldTextInput
+                  name="keywords"
+                  id="keywords"
+                  label="Mã đơn"
+                  placeholder="Nhập mã đơn"
+                  className={css.input}
+                />
+
+                <label className={css.labelDate}>
+                  <FormattedMessage id="ManageOrderPage.createDateLabel" />
+                </label>
+                <div className={css.dateInputs}>
+                  <FieldDatePicker
+                    id="pub_startDate"
+                    name="pub_startDate"
+                    selected={values.pub_startDate}
+                    onChange={setStartDate}
+                    className={css.inputDate}
+                    dateFormat={'dd MMMM, yyyy'}
+                    placeholderText={'Nhập ngày bắt đầu'}
+                    autoComplete="off"
+                  />
+                  <FieldDatePicker
+                    id="pub_endDate"
+                    name="pub_endDate"
+                    onChange={setEndDate}
+                    selected={values.pub_endDate}
+                    className={css.inputDate}
+                    dateFormat={'dd MMMM, yyyy'}
+                    placeholderText={'Nhập ngày kết thúc'}
+                    autoComplete="off"
+                    minDate={minEndDate}
+                    disabled={!values.pub_startDate}
+                  />
+                </div>
+              </>
+            );
+          }}
         </IntegrationFilterModal>
         <NamedLink path={adminRoutes.CreateOrder.path}>
           <Button>Tạo đơn</Button>
