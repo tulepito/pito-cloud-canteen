@@ -31,6 +31,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
 }) => {
   return (
     <Modal
+      className={css.modalRoot}
       title={title}
       isOpen={isOpen}
       handleClose={handleClose}

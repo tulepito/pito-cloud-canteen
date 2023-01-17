@@ -149,6 +149,7 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
 
   return (
     <Modal
+      className={css.root}
       isOpen={isOpen}
       handleClose={onClose}
       containerClassName={css.modalContainer}

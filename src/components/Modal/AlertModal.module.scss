@@ -5,9 +5,13 @@
 .root {
 }
 
-.container {
-  width: 100%;
-  max-width: 480px;
+.modalRoot {
+  z-index: 101;
+
+  .container {
+    width: 100%;
+    max-width: 480px;
+  }
 }
 
 .children {
