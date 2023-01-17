@@ -3,6 +3,7 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import companyChecker from '@services/permissionChecker/company';
 import { handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
+import { EImageVariants } from '@utils/enums';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const { UUID } = require('sharetribe-flex-sdk').types;
@@ -21,7 +22,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const queryParams = {
           expand: true,
           include: ['profileImage'],
-          'fields.image': ['variants.square-small', 'variants.square-small2x'],
+          'fields.image': [
+            EImageVariants.squareSmall,
+            EImageVariants.squareSmall2x,
+            EImageVariants.scaledLarge,
+          ],
         };
         const companyAccountResponse = await integrationSdk.users.updateProfile(
           {

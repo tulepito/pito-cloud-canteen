@@ -4,7 +4,7 @@ import { createAsyncThunk, createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities, ensureCurrentUser } from '@utils/data';
-import { EUserPermission } from '@utils/enums';
+import { EImageVariants, EUserPermission } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import get from 'lodash/get';
 
@@ -79,7 +79,14 @@ const fetchCurrentUser = createAsyncThunk(
     { dispatch, extra: sdk, rejectWithValue, fulfillWithValue },
   ) => {
     try {
-      const parameters = params || {};
+      const parameters = params || {
+        include: ['profileImage'],
+        'fields.image': [
+          EImageVariants.squareSmall,
+          EImageVariants.squareSmall2x,
+          EImageVariants.scaledLarge,
+        ],
+      };
       const response = await sdk.currentUser.show(parameters);
       const entities = denormalisedResponseEntities(response);
 

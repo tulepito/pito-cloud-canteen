@@ -15,4 +15,5 @@ export { default as password } from './password.slice';
 export { default as RestaurantSearch } from './RestaurantSearch.slice';
 export { default as SelectRestaurantPage } from './SelectRestaurantPage.slice';
 export { default as shopingCart } from './shopingCart.slice';
+export { default as uploadImage } from './uploadImage.slice';
 export { default as user } from './user.slice';
