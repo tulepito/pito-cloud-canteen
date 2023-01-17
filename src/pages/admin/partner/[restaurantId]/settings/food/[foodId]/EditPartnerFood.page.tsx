@@ -10,6 +10,7 @@ import { shallowEqual } from 'react-redux';
 import EditPartnerFoodForm from '../components/EditPartnerFoodForm/EditPartnerFoodForm';
 import type { TEditPartnerFoodFormValues } from '../utils';
 import { getUpdateFoodData } from '../utils';
+import { EFoodTypes, EMenuTypes } from '@utils/enums';
 
 const EditPartnerFoodPage = () => {
   const { foodId = '' } = useRouter().query;
@@ -32,12 +33,15 @@ const EditPartnerFoodPage = () => {
   const initialValues = useMemo(() => {
     const attributes = currentFoodListing?.attributes || {};
     const { publicData = {}, price, title, description } = attributes || {};
+    const { menuType, foodType } = publicData;
     return {
       images: getInitialAddImages(currentFoodListing?.images || []),
       title,
       description,
       price: price?.amount,
       ...publicData,
+      menuType: menuType ? menuType : EMenuTypes.fixedMenu,
+      foodType: foodType ? foodType : EFoodTypes.savoryDish,
     };
   }, [currentFoodListing]) as TEditPartnerFoodFormValues;
 
