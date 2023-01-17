@@ -1,5 +1,5 @@
 import Badge from '@components/Badge/Badge';
-import IconArrowHead from '@components/IconArrowHead/IconArrowHead';
+import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Pagination from '@components/Pagination/Pagination';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -41,9 +41,12 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       pagination,
       foodList,
       fetchFoodPending,
+      fetchRestaurantsPending,
     },
   } = useAppSelector((state) => state);
 
+  const shouldShowRestaurantPagination =
+    !!restaurants && restaurants?.length > 0 && fetchRestaurantsPending;
   const {
     totalItems: total,
     page: current,
@@ -148,7 +151,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
         restaurants={restaurants}
         onItemClick={handleRestaurantClick}
       />
-      {!!restaurants && restaurants?.length > 0 && (
+      {shouldShowRestaurantPagination && (
         <div className={css.paginationContainer}>
           <Pagination {...paginationProps} onChange={handlePageChange} />
         </div>

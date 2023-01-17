@@ -1,4 +1,6 @@
+import { USER } from '@utils/data';
 import type { TUser } from '@utils/types';
+import filter from 'lodash/filter';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
 
@@ -6,7 +8,9 @@ export const calculateGroupMembers = (
   companyAccount: TUser,
   groupList: string[],
 ) => {
-  const { groups, members = {} } = companyAccount.attributes.profile.metadata;
+  const { groups, members = {} } =
+    companyAccount.attributes.profile.metadata || {};
+
   if (groupList.includes('allMembers')) {
     return Object.values(members).map((_member: any) => _member.id);
   }
@@ -24,4 +28,18 @@ export const calculateGroupMembersAmount = (
   groupList: string[],
 ) => {
   return calculateGroupMembers(companyAccount, groupList).length;
+};
+
+export const getGroupNames = (groupIds: string[], groupList: any) => {
+  return filter(groupList, (group: any) => groupIds.includes(group.id))
+    .map((group: any) => group.name)
+    .join(', ');
+};
+
+export const checkMemberBelongToCompany = (
+  memberEmail: string,
+  companyAccount: TUser,
+) => {
+  const { members = {} } = USER(companyAccount).getMetadata();
+  return !!members[memberEmail];
 };

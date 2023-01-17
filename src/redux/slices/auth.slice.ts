@@ -2,12 +2,10 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
+import type { TObject } from '@utils/types';
 import isEmpty from 'lodash/isEmpty';
 
-// eslint-disable-next-line import/no-cycle
-import { userActions, userThunks } from './user.slice';
-
-const authenticated = (authInfo: Record<string, any>) => {
+const authenticated = (authInfo: TObject) => {
   return authInfo && authInfo.isAnonymous === false;
 };
 
@@ -18,7 +16,7 @@ enum EAuthState {
   isSigningUp = 'isSigningUp',
 }
 
-interface IAuthState {
+type IAuthState = {
   isAuthenticated: boolean;
   // scopes associated with current token
   authScopes: [];
@@ -31,8 +29,8 @@ interface IAuthState {
   // logout
   logoutError: any;
   // signup
-  signupError: any;
-}
+  signUpError: any;
+};
 
 const initialState: IAuthState = {
   isAuthenticated: false,
@@ -41,36 +39,29 @@ const initialState: IAuthState = {
   authStatus: EAuthState.idle,
   signInError: null,
   logoutError: null,
-  signupError: null,
+  signUpError: null,
 };
 
 // ================ Thunk types ================ //
-const AUTH_INFO = 'app/Auth/AUTH_INFO';
-const SIGN_UP = 'app/Auth/SIGN_UP';
-const LOGIN = 'app/Auth/LOGIN';
-const LOGOUT = 'app/Auth/LOGOUT';
+const AUTH_INFO = 'app/auth/AUTH_INFO';
+const SIGN_UP = 'app/auth/SIGN_UP';
+const LOGIN = 'app/auth/LOGIN';
+const LOGOUT = 'app/auth/LOGOUT';
 
-const authInfo = createAsyncThunk(
-  AUTH_INFO,
-  async (_, { extra: sdk, fulfillWithValue }) => {
-    try {
-      const info = await sdk.authInfo();
-      return fulfillWithValue(info);
-    } catch (error) {
-      return fulfillWithValue(null);
-    }
-  },
-);
+const authInfo = createAsyncThunk(AUTH_INFO, async (_, { extra: sdk }) => {
+  try {
+    const info = await sdk.authInfo();
+    return info;
+  } catch (error) {
+    return null;
+  }
+});
 
 const login = createAsyncThunk(
   LOGIN,
-  async (
-    params: { email: string; password: string },
-    { dispatch, extra: sdk },
-  ) => {
+  async (params: { email: string; password: string }, { extra: sdk }) => {
     const { email: username, password } = params;
     await sdk.login({ username, password });
-    await dispatch(userThunks.fetchCurrentUser(undefined));
   },
   {
     serializeError: storableError,
@@ -79,9 +70,8 @@ const login = createAsyncThunk(
 
 const logout = createAsyncThunk(
   LOGOUT,
-  async (_, { dispatch, extra: sdk }) => {
+  async (_, { extra: sdk }) => {
     await sdk.logout();
-    dispatch(userActions.clearCurrentUser());
   },
   {
     serializeError: storableError,
@@ -90,7 +80,7 @@ const logout = createAsyncThunk(
 
 const signUp = createAsyncThunk(
   SIGN_UP,
-  async (params: Record<string, any>, { dispatch, extra: sdk }) => {
+  async (params: TObject, { dispatch, extra: sdk }) => {
     const { email, password, firstName, lastName, ...rest } = params;
     const createUserParams = isEmpty(rest)
       ? { email, password, firstName, lastName }
@@ -99,7 +89,7 @@ const signUp = createAsyncThunk(
     // We must login the user if signup succeeds since the API doesn't
     // do that automatically.
     await sdk.currentUser.create(createUserParams);
-    dispatch(login({ email, password }));
+    await dispatch(login({ email, password }));
   },
   {
     serializeError: storableError,
@@ -114,7 +104,7 @@ export const authThunks = {
 };
 
 const authSlice = createSlice({
-  name: 'Auth',
+  name: 'auth',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -134,7 +124,7 @@ const authSlice = createSlice({
           ...state,
           authStatus: EAuthState.isSigningUp,
           signInError: null,
-          signupError: null,
+          signUpError: null,
         };
       })
       .addCase(signUp.fulfilled, (state) => {
@@ -144,7 +134,7 @@ const authSlice = createSlice({
         return {
           ...state,
           authStatus: EAuthState.idle,
-          signupError: action.error,
+          signUpError: action.error,
         };
       })
 
@@ -154,7 +144,7 @@ const authSlice = createSlice({
           authStatus: EAuthState.isSigningIn,
           signInError: null,
           logoutError: null,
-          signupError: null,
+          signUpError: null,
         };
       })
       .addCase(login.fulfilled, (state) => {

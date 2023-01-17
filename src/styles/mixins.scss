@@ -47,79 +47,139 @@ $buttonBorderRadius: 8px;
   border-radius: $buttonBorderRadius;
 }
 
-@mixin button {
+@mixin buttonColorPrimary {
+  background: $neutralGray6;
+  color: $neutralGray1;
+  .spinner {
+    width: 24px;
+    height: 24px;
+    stroke: $neutralGray1;
+    stroke-width: 3px;
+  }
+
+  &:focus,
+  &:hover {
+    background: $neutralGray1;
+    outline: 1px solid $neutralGray6;
+    outline-offset: -1px;
+    color: $neutralGray6;
+
+    .spinner {
+      stroke: $neutralGray6;
+    }
+  }
+
+  &:disabled {
+    background: $neutralGray2;
+    color: $neutralGray4;
+    outline: 1px solid $neutralGray4;
+    outline-offset: -1px;
+    cursor: not-allowed;
+  }
+}
+
+@mixin buttonColorSecondary {
+  background-color: $neutralGray1;
+  color: $neutralGray6;
+  outline: 1px solid $neutralGray6;
+  outline-offset: -1px;
+
+  .spinner {
+    stroke: $neutralGray6;
+  }
+
+  &:focus,
+  &:hover {
+    background-color: $neutralGray6;
+    color: $neutralGray1;
+    outline: 1px solid $neutralGray1;
+
+    .spinner {
+      stroke: $neutralGray1;
+    }
+  }
+
+  &:disabled {
+    background-color: $neutralGray2;
+    color: $neutralGray4;
+    outline: 1px solid $neutralGray4;
+  }
+}
+
+@mixin buttonTextColor {
+  background: transparent;
+  color: $primaryPri2;
+  border: none;
+
+  &:focus,
+  &:hover {
+    background-color: transparent;
+    border: 1px solid $neutralGray4;
+  }
+
+  &:disabled {
+    color: $neutralGray6;
+    border: 1px solid $neutralGray3;
+  }
+}
+
+@mixin buttonCTAColor {
+  background-color: $primaryPri2;
+  color: $neutralGray1;
+  outline: none;
+  border: none;
+  .spinner {
+    stroke: $neutralGray1;
+  }
+
+  &:focus,
+  &:hover {
+    outline: none;
+    background-color: $buttonCTAHoverColor;
+    color: $neutralGray1;
+
+    .spinner {
+      stroke: $primaryPri2;
+    }
+  }
+
+  &:disabled {
+    background: $neutralGray2;
+    color: $neutralGray4;
+    outline: 1px solid $neutralGray4;
+    outline-offset: -1px;
+  }
+}
+
+@mixin buttonStyles {
   display: block;
   width: auto;
   margin: 0;
   /* Padding is only for <a> elements where button styles are applied,
   buttons elements should have zero padding */
   padding: 8px 16px;
+  outline: none;
+
   @include flexCenter;
 
   transition: all $transitionStyleButton;
   cursor: pointer;
 
-  &:focus,
-  &:hover {
-    outline: none;
-  }
-
   &:disabled {
     box-shadow: none;
     cursor: not-allowed;
   }
-}
 
-@mixin buttonColorPrimary {
-  background: $primaryPri5;
-  color: $neutralGray1;
-
-  &:focus,
-  &:hover {
-    background: $primaryPri4;
+  @include buttonColorPrimary;
+  &.secondaryStyle {
+    @include buttonColorSecondary;
   }
-
-  &:disabled {
-    color: $neutralGray6;
-    background: $neutralGray3;
-    border: 1px solid $neutralGray5;
-  }
-}
-
-@mixin buttonColorSecondary {
-  background: transparent;
-  color: $neutralGray10;
-  border: 1px solid $neutralGray10;
-  &:focus,
-  &:hover {
-    border-color: $primaryPri5;
-    color: $primaryPri5;
-  }
-
-  &:disabled {
-    color: $neutralGray6;
-    border: 1px solid $neutralGray3;
-  }
-}
-
-@mixin buttonTextColor {
-  background: transparent;
-  color: $primaryPri5;
-  border: none;
-  &:focus,
-  &:hover {
-    background: transparent;
-    border: 1px solid $primaryPri5;
-  }
-
-  &:disabled {
-    color: $neutralGray6;
-    border: 1px solid $neutralGray3;
+  &.CTAStyle {
+    @include buttonCTAColor;
   }
 }
 
 // Layout mixins
-
 @mixin flexCenter {
   display: flex;
   align-items: center;

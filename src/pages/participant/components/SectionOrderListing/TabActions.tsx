@@ -1,6 +1,6 @@
 import { InlineTextButton } from '@components/Button/Button';
-import IconBanned from '@components/Icons/IconBanned';
-import IconRefreshing from '@components/Icons/IconRefreshing';
+import IconBanned from '@components/Icons/IconBanned/IconBanned';
+import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { shopingCartThunks } from '@redux/slices/shopingCart.slice';
 import classNames from 'classnames';

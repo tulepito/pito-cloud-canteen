@@ -6,13 +6,14 @@ import type { TListing, TPagination } from '@utils/types';
 
 const RESTAURANT_PER_PAGE = 10;
 const SEARCH_RESTAURANT = 'app/RestaurantSearch/SEARCH_RESTAURANT';
-interface RestaurantSearchInitialState {
+
+type RestaurantSearchInitialState = {
   pagination: TPagination | null;
   searchParams: Record<string, any> | null;
   searchInProgress: boolean;
   searchError: any;
   searchResults: TListing[];
-}
+};
 
 type SearchParams = {
   keywords?: string;
@@ -53,6 +54,7 @@ const searchRestaurant = createAsyncThunk(
 export const RestaurantSearchAction = {
   searchRestaurant,
 };
+
 const RestaurantSearch = createSlice({
   name: 'RestaurantSearch',
   initialState,

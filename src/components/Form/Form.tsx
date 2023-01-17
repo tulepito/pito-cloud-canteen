@@ -1,11 +1,12 @@
-import type { FormHTMLAttributes, ReactNode } from 'react';
+import type { FormHTMLAttributes, PropsWithChildren } from 'react';
 
-interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
-  children: ReactNode | ReactNode[];
-  contentRef?: any;
-}
+type FormProps = PropsWithChildren<
+  FormHTMLAttributes<HTMLFormElement> & {
+    contentRef?: any;
+  }
+>;
 
-const Form = (props: FormProps) => {
+const Form: React.FC<FormProps> = (props) => {
   const { children, contentRef, ...rest } = props;
 
   const formProps = {

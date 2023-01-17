@@ -27,14 +27,13 @@
   flex-basis: calc(100% / 7);
   padding: 4px 8px;
   @include textTemplate(12px, 600, 20px, '');
-  color: $neutralGray9;
+  color: $neutralGray6;
   text-align: center;
-  border-top: 1px solid $neutralGray5;
-  border-bottom: 1px solid $neutralGray5;
-  border-right: 1px solid $neutralGray5;
+  border: 1px solid $neutralGray4;
+  border-left: none;
 
   &:first-child {
-    border-left: 1px solid $neutralGray5;
+    border-left: 1px solid $neutralGray4;
     border-top-left-radius: 9px;
   }
 
@@ -45,8 +44,8 @@
 
 .activeDayHeader {
   background-color: $primaryPri1;
-  border-bottom: 1px solid $primaryPri3;
-  color: $primaryPri5;
+  border-bottom: 1px solid $primaryPri2;
+  color: $neutralGray6;
 }
 
 .emptyDay {
@@ -64,4 +63,7 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  justify-content: center;
+  @include textTemplate(14px, 400, 24px, '');
+  width: 105px;
 }

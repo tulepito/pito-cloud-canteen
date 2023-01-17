@@ -1,8 +1,8 @@
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FieldCheckboxGroup from '@components/FieldCheckboxGroup/FieldCheckboxGroup';
-import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
 import Form from '@components/Form/Form';
+import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
+import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import {
   CATEGORY_OPTIONS,
   EXTRA_SERVICE_OPTIONS,
@@ -136,7 +136,8 @@ const EditPartnerMenuForm: React.FC<TEditPartnerMenuForm> = (props) => {
                 {goBack && (
                   <Button
                     type="button"
-                    className={css.secondaryButton}
+                    variant="secondary"
+                    // className={css.secondaryButton}
                     onClick={goBack}>
                     {intl.formatMessage({
                       id: 'EditPartnerForms.goBack',

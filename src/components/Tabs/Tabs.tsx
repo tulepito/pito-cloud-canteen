@@ -1,5 +1,5 @@
 import { InlineTextButton } from '@components/Button/Button';
-import IconArrow from '@components/IconArrow/IconArrow';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';
 import React, { useEffect, useState } from 'react';
@@ -13,7 +13,8 @@ type TTabsItem = {
   childrenFn?: (e: any) => ReactNode;
   childrenProps?: any;
 };
-interface ITabsProps {
+
+type ITabsProps = {
   defaultActiveKey?: string;
   items: TTabsItem[];
   onChange?: (params: any) => void;
@@ -24,9 +25,9 @@ interface ITabsProps {
   actionsComponent?: ReactNode;
   headerWrapperClassName?: string;
   className?: string;
-}
+};
 
-const Tabs = (props: ITabsProps) => {
+const Tabs: React.FC<ITabsProps> = (props) => {
   const {
     defaultActiveKey,
     items,

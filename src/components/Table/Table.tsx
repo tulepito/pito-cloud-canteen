@@ -23,7 +23,7 @@ export type TRowData = {
   data: any;
 };
 
-type TTable = {
+type TTableProps = {
   columns: TColumn[];
   data: TRowData[];
   rootClassName?: string;
@@ -180,7 +180,7 @@ const Table = (props: TTable) => {
   );
 };
 
-export const TableForm = (props: TTable) => {
+export const TableForm: React.FC<TTableProps> = (props) => {
   const { rootClassName, onSubmit, initialValues, ...rest } = props;
   const rootClasses = classNames(css.root, rootClassName);
   return (

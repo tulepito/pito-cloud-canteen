@@ -1,0 +1,16 @@
+@use '/src/styles/vars' as *;
+
+.errorContainer {
+  margin-top: 35px;
+  margin-bottom: 20px;
+}
+
+.errorLogIn {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 14px;
+}
+
+.errLoginText {
+  color: $sematicRed2;
+}

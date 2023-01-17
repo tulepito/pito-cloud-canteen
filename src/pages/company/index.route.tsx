@@ -1,3 +1,5 @@
+import CompanyDashboardPage from './CompanyDashboard.page';
+
 export default function CompanyRoute() {
-  return <div>Company Dashboard</div>;
+  return <CompanyDashboardPage />;
 }

@@ -50,7 +50,7 @@
     width: 0;
     left: 0;
     bottom: 0;
-    background-color: $neutralGray10;
+    background-color: $neutralGray6;
   }
 
   &.tabActive::after {
@@ -61,7 +61,7 @@
     left: 0;
     bottom: 0;
     transition: width 0.3s;
-    background-color: $neutralGray10;
+    background-color: $neutralGray6;
   }
 }
 
@@ -75,7 +75,7 @@
   line-height: 24px;
 
   &.tabActive {
-    color: $neutralGray10;
+    color: $neutralGray6;
     transition: color 0.3s;
     font-weight: $fontWeightBold;
   }

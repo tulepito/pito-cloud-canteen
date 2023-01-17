@@ -21,6 +21,7 @@
 }
 
 .rootExpired {
+  box-shadow: none;
   &:hover {
     border: 1px solid $neutralGray6;
   }
@@ -28,13 +29,13 @@
 
 .rootBlue {
   &:hover {
-    border: 1px solid $secondaryBlue6;
+    border: 1px solid $labelBlue2;
   }
 }
 
 .rootOrange {
   &:hover {
-    border: 1px solid $warningOrange7;
+    border: 1px solid $labelOrange2;
   }
 }
 
@@ -45,11 +46,11 @@
 }
 
 .rootBlue .eventCardHeader {
-  background-color: $secondaryBlue6;
+  background-color: $labelBlue2;
 }
 
 .rootOrange .eventCardHeader {
-  background-color: $warningOrange7;
+  background-color: $labelOrange2;
 }
 
 .rootExpired .eventCardHeader {
@@ -93,18 +94,18 @@
 }
 
 .emptyStatus {
-  background-color: $warningOrange2;
-  color: $warningOrange7;
+  background-color: $labelOrange1;
+  color: $labelOrange2;
 }
 
 .joinedStatus {
-  background-color: $successScreen2;
-  color: $successScreen6;
+  background-color: $sematicGreen1;
+  color: $sematicGreen2;
 }
 
 .notJoinedStatus {
-  background-color: $errorRed2;
-  color: $primaryPri5;
+  background-color: $sematicRed1;
+  color: $primaryPri2;
 }
 
 .expiredStatus {
@@ -120,7 +121,7 @@
 
 .eventContentItemText {
   @include textTemplate(12px, 500, 20px, '');
-  color: $neutralGray10;
+  color: $neutralGray6;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -157,10 +158,10 @@
 }
 
 .highlightText {
-  color: $primaryPri5;
+  color: $primaryPri2;
 }
 .highLightIcon {
   & path {
-    fill: $primaryPri5;
+    fill: $primaryPri2;
   }
 }

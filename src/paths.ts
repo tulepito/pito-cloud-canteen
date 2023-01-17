@@ -7,15 +7,34 @@ export const generalPaths = {
   Home: '/',
 };
 
+const enGeneralPaths = {
+  SignIn: '/sign-in',
+  SignUp: '/sign-up',
+  RecoveryPassword: '/forgot-password',
+  ResetPassword: '/reset-password',
+  StyleGuide: '/style-guide',
+  Home: '/',
+};
+
 export const NonRequireAuthenticationRoutes = [
   generalPaths.RecoveryPassword,
   generalPaths.ResetPassword,
   generalPaths.SignIn,
   generalPaths.SignUp,
+  enGeneralPaths.RecoveryPassword,
+  enGeneralPaths.ResetPassword,
+  enGeneralPaths.SignIn,
+  enGeneralPaths.SignUp,
 ];
 
 export const IgnoredAuthCheckRoutes = [generalPaths.StyleGuide];
-export const IgnoredPermissionCheckRoutes = [generalPaths.StyleGuide];
+export const IgnoredPermissionCheckRoutes = [
+  generalPaths.SignIn,
+  generalPaths.SignUp,
+  generalPaths.StyleGuide,
+  enGeneralPaths.SignIn,
+  enGeneralPaths.SignUp,
+];
 
 export const adminPaths = {
   Dashboard: '/admin',

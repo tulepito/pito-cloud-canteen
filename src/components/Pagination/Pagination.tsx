@@ -1,27 +1,29 @@
 import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
-import type { PaginationProps } from 'rc-pagination';
+import type { PaginationProps as RCPaginationProps } from 'rc-pagination';
 import ExternalPagination from 'rc-pagination';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './Pagination.module.scss';
 
-type TPagination = PaginationProps & {
+type TPaginationProps = RCPaginationProps & {
   showInfo?: boolean;
   paginationInfoClassName?: string;
 };
 
-const NextIcon = (props: TIconProps) => {
-  const { className } = props;
-  const classes = classNames(className);
+const NextIcon: React.FC<TIconProps> = (props) => {
+  const { rootClassName, className } = props;
+  const classes = classNames(rootClassName, className);
+
   return (
     <svg
-      className={classes}
+      preserveAspectRatio="none"
       width={6}
       height={10}
       viewBox="0 0 6 10"
       fill="none"
+      className={classes}
       xmlns="http://www.w3.org/2000/svg">
       <path
         fillRule="evenodd"
@@ -33,16 +35,18 @@ const NextIcon = (props: TIconProps) => {
   );
 };
 
-const PreviousIcon = (props: TIconProps) => {
-  const { className } = props;
-  const classes = classNames(className);
+const PreviousIcon: React.FC<TIconProps> = (props) => {
+  const { rootClassName, className } = props;
+  const classes = classNames(rootClassName, className);
+
   return (
     <svg
-      className={classes}
+      preserveAspectRatio="none"
       width={6}
       height={10}
       viewBox="0 0 6 10"
       fill="none"
+      className={classes}
       xmlns="http://www.w3.org/2000/svg">
       <path
         fillRule="evenodd"
@@ -53,7 +57,7 @@ const PreviousIcon = (props: TIconProps) => {
     </svg>
   );
 };
-const Pagination: React.FC<TPagination> = (props) => {
+const Pagination: React.FC<TPaginationProps> = (props) => {
   const { showInfo = true, paginationInfoClassName, ...restProps } = props;
   const intl = useIntl();
 

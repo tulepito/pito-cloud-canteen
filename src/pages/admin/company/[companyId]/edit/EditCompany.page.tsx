@@ -1,5 +1,5 @@
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import IconSpinner from '@components/IconSpinner/IconSpinner';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   clearError,

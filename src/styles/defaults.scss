@@ -1,0 +1,240 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+@mixin inputStyles {
+  display: block;
+  width: auto;
+
+  color: $neutralGray6;
+  background-color: $neutralGray1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  @include textTemplate(16px, 400, 1.5, '');
+  background-clip: padding-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+  -webkit-transition: border-color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out;
+  outline: 1px solid $neutralGray4;
+  outline-offset: -1px;
+
+  &::placeholder {
+    color: $neutralGray4;
+    transition: color 0.15s ease-in-out;
+    -webkit-transition: color 0.15s ease-in-out;
+  }
+  &:hover {
+    background-color: $neutralGray2;
+
+    &::placeholder {
+      color: $neutralGray5;
+    }
+  }
+  &:focus {
+    outline-color: $neutralGray6;
+    outline-width: 2px;
+    outline-offset: -2px;
+  }
+  &:disabled {
+    background-color: $neutralGray3;
+    cursor: not-allowed;
+
+    &::placeholder {
+      color: $neutralGray4;
+    }
+  }
+
+  &.inputFullWidth {
+    width: 100%;
+  }
+  &.inputError {
+    outline: 1px solid $primaryPri2;
+    outline-offset: -1px;
+  }
+  &.inputWithPaddingLeft {
+    padding-left: 40px;
+  }
+  &.inputWithPaddingRight {
+    padding-right: 40px;
+  }
+}
+
+@mixin checkBoxInputStyles {
+  position: relative;
+
+  .input {
+    position: absolute;
+    opacity: 0;
+    height: 0;
+    width: 0;
+
+    /* Highlight the borders if the checkbox is hovered, focused or checked */
+    &:hover + label .box,
+    &:focus + label .box,
+    &:checked + label .box {
+    }
+
+    /* sematicGreen2 version */
+    &:hover + label .boxSuccess,
+    &:focus + label .boxSuccess,
+    &:checked + label .boxSuccess {
+    }
+
+    &:checked + label:hover {
+      .box,
+      .boxSuccess {
+        stroke: $neutralGray6;
+      }
+
+      path:nth-of-type(2) {
+        stroke: $neutralGray1;
+      }
+    }
+
+    /* Display the "check" when checked */
+    &:checked + label .checked {
+      display: inline;
+      stroke-width: 1px;
+      fill: $neutralGray6;
+      stroke: $neutralGray6;
+    }
+
+    /* Display the "check" when checked */
+    &:checked + label .checkedSuccess {
+      display: inline;
+      stroke-width: 1px;
+      stroke: $neutralGray6;
+    }
+
+    &:disabled + label {
+      pointer-events: none;
+    }
+
+    &:disabled + label {
+      &:hover {
+        .checked,
+        .checkedSuccess {
+          stroke: $neutralGray4;
+          fill: $neutralGray3;
+        }
+      }
+
+      .checked,
+      .checkedSuccess {
+        stroke: $neutralGray4;
+        fill: $neutralGray3;
+      }
+
+      .box,
+      .boxSuccess {
+        stroke: $neutralGray3;
+      }
+    }
+
+    &:checked:disabled + label {
+      .box,
+      .boxSuccess {
+        stroke: $neutralGray4;
+      }
+    }
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    padding: 0;
+
+    .checkboxWrapper {
+      /* This should follow line-height */
+      height: 32px;
+      margin-top: -1px;
+      margin-right: 12px;
+      align-self: baseline;
+
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+
+      .checked {
+        fill: none;
+        stroke: $neutralGray4;
+        transition: all 0.15s ease-in-out;
+      }
+      .checkedSuccess {
+        display: none;
+        fill: $neutralGray4;
+        stroke: $neutralGray4;
+        transition: all 0.15s ease-in-out;
+      }
+
+      .boxSuccess,
+      .box {
+        stroke: $neutralGray1;
+      }
+
+      :hover .checked,
+      :hover .checkedSuccess {
+        stroke: $neutralGray6;
+      }
+    }
+  }
+}
+
+@mixin inputIconContainerStyles {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  @include flexCenter;
+}
+
+@mixin inputContainerStyles {
+  position: relative;
+
+  .input {
+    @include inputStyles;
+  }
+
+  textarea.input {
+    min-height: $fieldTextAreaMinHeight;
+  }
+
+  .leftIconContainer {
+    @include inputIconContainerStyles;
+
+    .leftIcon {
+      & path {
+        fill: $neutralGray6;
+      }
+    }
+  }
+  .rightIconContainer {
+    @include inputIconContainerStyles;
+    left: unset;
+    right: 8px;
+    cursor: pointer;
+    user-select: none;
+
+    .rightIcon {
+      & path {
+        fill: $neutralGray6;
+      }
+    }
+  }
+}
+
+@mixin inputLabelStyles {
+  @include textTemplate(14px, 400, 24px, '');
+  color: $neutralGray6;
+  margin-bottom: 8px;
+  display: inline-flex;
+
+  & .labelRequiredRedStar {
+    color: $sematicRed2;
+    font-weight: $fontWeightBold;
+  }
+}

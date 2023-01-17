@@ -1,10 +1,11 @@
 import Button from '@components/Button/Button';
 import CSVFieldInput from '@components/CSVFieldInput/CSVFieldInput';
-import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { BookerManageCompany } from '@src/redux/slices/company.slice';
+import type { TObject } from '@utils/types';
 import { required } from '@utils/validators';
 import { useMemo, useState } from 'react';
 import type { FormRenderProps } from 'react-final-form';
@@ -30,11 +31,11 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
 }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const [loadedMembers, setLoadedMemebers] = useState<any[]>([]);
+  const [loadedMembers, setLoadedMembers] = useState<any[]>([]);
   const createGroupInProgress = useAppSelector(
     (state) => state.company.createGroupInProgress,
   );
-  const onSubmit = (values: Record<string, any>) => {
+  const onSubmit = (values: TObject) => {
     const { groupName, members } = values;
     const groupMembers = companyMembers
       .filter((member) => members.includes(member.id.uuid))
@@ -78,7 +79,7 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
               <div className={css.uploadMemberListTitle}>
                 {intl.formatMessage({ id: 'CreateGroupForm.uploadMemberList' })}
               </div>
-              <CSVFieldInput setData={setLoadedMemebers} />
+              <CSVFieldInput setData={setLoadedMembers} />
             </div>
             <LoadedMembers
               formattedLoadedMembers={formattedLoadedMembers}

@@ -1,0 +1,112 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+}
+
+.dayButton {
+  border: 1px solid $neutralGray4;
+  padding: 7px 16px;
+  margin-right: 4px;
+  font-size: 15px;
+  color: $neutralGray5;
+  border-radius: 20px;
+  cursor: pointer;
+  &.active {
+    border: 2px solid $neutralGray6;
+    font-weight: $fontWeightBold;
+    color: $neutralGray6;
+  }
+  * {
+    cursor: pointer;
+  }
+}
+
+.dailyPlanOptionsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.listDayLabel {
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.dayPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.wrapper {
+  padding: 0 10px;
+}
+
+.dailyPlan {
+  display: flex;
+}
+
+.fieldArray {
+  display: flex;
+}
+
+.dayOfWeekLabel {
+  @include viewportLarge {
+    width: 130px;
+  }
+}
+
+.availabilityTable {
+  border-collapse: collapse;
+  width: 100%;
+  padding: 10px;
+  tr {
+    td {
+      font-size: 14px;
+      padding: 10px;
+      text-align: left;
+      color: #616161;
+      border: 1px solid $neutralGray5;
+      &.tableActions {
+        display: flex;
+        justify-content: space-evenly;
+
+        .addButton {
+          width: 20px;
+          padding: 5px;
+          .iconClose {
+            width: 10px;
+            height: auto;
+          }
+        }
+      }
+
+      select {
+        /* Background */
+        background-image: url('data:image/svg+xml;utf8,<svg width="14" height="14" xmlns="http://www.w3.org/2000/svg"><g transform="translate%281 -3%29" fill="none" fill-rule="evenodd"><circle stroke="%23E6E6E6" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" cx="6" cy="10" r="6"/><g transform="translate%282 6%29" fill="%23E6E6E6"><rect x="3.5" width="1" height="5" rx=".5"/><rect transform="rotate%2890 2.5 4.5%29" x="2" y="2.5" width="1" height="4" rx=".5"/></g></g></svg>');
+        background-size: 16px 16px;
+        background-repeat: no-repeat;
+        background-position: center right;
+        padding: 0;
+        border: none;
+        &:disabled {
+          background-image: url('data:image/svg+xml;utf8,<svg width="14" height="9" viewBox="0 0 14 9" xmlns="http://www.w3.org/2000/svg"><path d="M6.53 7.472c.26.26.68.26.94 0l5.335-5.333c.26-.263.26-.684 0-.944-.26-.26-.683-.26-.943 0L7 6.056l-4.862-4.86c-.26-.26-.683-.26-.943 0-.26.26-.26.68 0 .943L6.53 7.47z" stroke="%23E7E7E7" fill="%23E7E7E7" fill-rule="evenodd"/></svg>');
+        }
+      }
+    }
+  }
+}
+
+.checkbox {
+  display: flex;
+}
+
+.hidden {
+  display: none;
+}
+
+.fieldLabel {
+  font-weight: $fontWeightBold;
+  margin-bottom: 20px;
+}

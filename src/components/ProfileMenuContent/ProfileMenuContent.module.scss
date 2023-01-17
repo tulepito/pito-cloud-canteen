@@ -4,8 +4,8 @@
   position: absolute;
   z-index: $zIndexPopup;
 
-  background-color: $matterColorLight;
-  border-top: 1px solid $matterColorNegative;
+  background-color: $neutralGray1;
+  border-top: 1px solid $neutralGray1;
   box-shadow: $boxShadowPopup;
   border-radius: 0 0 2px 2px;
   transition: $transitionStyleButton;
@@ -42,13 +42,13 @@
 }
 
 .arrowTop {
-  border-bottom-color: $matterColorLight;
+  border-bottom-color: $neutralGray1;
   border-width: 7px;
   margin-left: -7px;
 }
 
 .arrowBelow {
-  border-bottom-color: $matterColorNegative;
+  border-bottom-color: $neutralGray1;
   border-width: 9px;
   margin-left: -9px;
 }

@@ -1,8 +1,8 @@
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import IconAdd from '@components/IconAdd/IconAdd';
-import IconEdit from '@components/IconEdit/IconEdit';
-import IconSpinner from '@components/IconSpinner/IconSpinner';
+import IconAdd from '@components/Icons/IconAdd/IconAdd';
+import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import Meta from '@components/Layout/Meta';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import SelectSingleFilterPopup from '@components/SelectSingleFilterPopup/SelectSingleFilterPopup';

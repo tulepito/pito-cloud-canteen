@@ -1,0 +1,136 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  padding: 32px 8px 0;
+  width: 100%;
+
+  @include viewportLarge {
+    padding-top: 48px;
+  }
+
+  .formContainer {
+    @include formContainer;
+
+    margin: 0 auto;
+    width: fit-content;
+    row-gap: 16px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 90%;
+  }
+
+  .formTitle {
+    text-align: center;
+    color: $neutralGray6;
+    font-size: 24px;
+
+    @include viewportMedium {
+      font-size: 32px;
+    }
+  }
+
+  .forgotPassword {
+    text-align: right;
+    color: $neutralGray6;
+
+    & > span {
+      cursor: pointer;
+    }
+  }
+
+  .errorSignIn {
+    margin-top: 35px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: left;
+    color: $sematicRed2;
+  }
+
+  .submitButton {
+    background-color: $primaryPri2;
+    color: $neutralGray1;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px 0;
+    border-radius: 8px;
+  }
+
+  .orText {
+    $width: calc(100%);
+    text-align: center;
+    position: relative;
+
+    & > span {
+      position: relative;
+      z-index: 2;
+      color: $neutralGray6;
+      background-color: $neutralGray1;
+      padding: 0 8px;
+    }
+
+    &::after {
+      content: '';
+      z-index: 1;
+      width: $width;
+      height: 1px;
+      background-color: $neutralGray4;
+
+      position: absolute;
+      top: 10px;
+      right: 0;
+    }
+  }
+
+  .googleLoginButton {
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px 12px;
+    position: relative;
+    border-radius: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $neutralGray1;
+    border-color: 1px solid $neutralGray4;
+
+    &:disabled {
+      background-color: $neutralGray4;
+      border-color: $neutralGray5;
+    }
+  }
+
+  .googleIcon {
+    position: absolute;
+    left: 12px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .doNotHaveAnAccount {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    width: 90%;
+    background: $neutralGray4;
+    padding: 16px;
+
+    @include viewportMedium {
+      padding: 16px 24px;
+      width: min(450px, calc(150% / 2));
+    }
+
+    @include viewportLarge {
+      padding: 24px 32px;
+    }
+
+    .toSignUp {
+      color: $primaryPri2;
+      cursor: pointer;
+    }
+  }
+}

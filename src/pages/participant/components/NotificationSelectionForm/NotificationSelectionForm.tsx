@@ -1,5 +1,5 @@
-import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
 import Form from '@components/Form/Form';
+import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';

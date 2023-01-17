@@ -6,7 +6,7 @@ import { useIntl } from 'react-intl';
 import { VIEWS } from '../../helpers/constants';
 import css from './SectionOrderHeader.module.scss';
 
-type TSectionOrderHeader = {
+type TSectionOrderHeaderProps = {
   setViewFunction: (view: string) => void;
   currentView: string;
 };
@@ -22,7 +22,7 @@ const LIST_VIEW = [
   },
 ];
 
-const SectionOrderHeader = (props: TSectionOrderHeader) => {
+const SectionOrderHeader: React.FC<TSectionOrderHeaderProps> = (props) => {
   const { currentView, setViewFunction } = props;
 
   const intl = useIntl();

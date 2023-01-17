@@ -1,77 +1,9 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
 
 .root {
-  position: relative;
-
-  .input {
-    position: absolute;
-    opacity: 0;
-    height: 0;
-    width: 0;
-
-    /* Highlight the borders if the checkbox is hovered, focused or checked */
-    &:hover + label .box,
-    &:focus + label .box,
-    &:checked + label .box {
-      stroke: $neutralGray4;
-    }
-
-    /* successColor version */
-    &:hover + label .boxSuccess,
-    &:focus + label .boxSuccess {
-      stroke: $neutralGray10;
-    }
-
-    &:checked + label .box {
-      stroke: $neutralGray10;
-    }
-
-    /* Display the "check" when checked */
-    &:checked + label .checked {
-      display: inline;
-      stroke: $neutralGray10;
-      stroke-width: 1px;
-    }
-
-    /* Display the "check" when checked */
-    &:checked + label .checkedSuccess {
-      display: inline;
-      stroke: $neutralGray10;
-      stroke-width: 1px;
-    }
-  }
-
-  .label {
-    display: flex;
-    align-items: center;
-    padding: 0;
-  }
-
-  .checkboxWrapper {
-    /* This should follow line-height */
-    height: 24px;
-    margin-top: -1px;
-    align-self: baseline;
-
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  .checked {
-    display: none;
-    fill: $neutralGray10;
-  }
-  .checkedSuccess {
-    display: none;
-    fill: $neutralGray10;
-  }
-
-  .boxSuccess,
-  .box {
-    stroke: $neutralGray4;
-  }
+  @include checkBoxInputStyles;
 
   .row {
     display: flex;

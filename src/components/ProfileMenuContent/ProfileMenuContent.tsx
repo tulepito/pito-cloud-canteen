@@ -4,23 +4,22 @@
  */
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import classNames from 'classnames';
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, PropsWithChildren } from 'react';
 import React, { Children } from 'react';
 
 import css from './ProfileMenuContent.module.scss';
 
-type TProfileMenuContent = {
-  arrowPosition?: number;
-  children: ReactNode;
+type TProfileMenuContentProps = PropsWithChildren<{
+  rootClassName?: string;
   className?: string;
   contentClassName?: string;
+  arrowPosition?: number;
   contentRef?: (e: HTMLElement | null) => HTMLElement;
   isOpen?: boolean;
-  rootClassName?: string;
   style?: CSSProperties;
-};
+}>;
 
-const ProfileMenuContent = (props: TProfileMenuContent) => {
+const ProfileMenuContent: React.FC<TProfileMenuContentProps> = (props) => {
   const {
     arrowPosition = null,
     children,

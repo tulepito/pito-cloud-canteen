@@ -1,8 +1,9 @@
 import Button from '@components/Button/Button';
-import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import Form from '@components/Form/Form';
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { BookerManageCompany } from '@src/redux/slices/company.slice';
+import type { TObject } from '@utils/types';
 import differenceBy from 'lodash/differenceBy';
 import { useMemo } from 'react';
 import type { FormRenderProps } from 'react-final-form';
@@ -31,7 +32,7 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
     () => differenceBy(companyMembers, groupMembers, 'id.uuid'),
     [companyMembers, groupMembers],
   );
-  const onSubmit = (values: Record<string, any>) => {
+  const onSubmit = (values: TObject) => {
     const { members } = values;
     const addedMembers = companyMembers
       .filter((member) => members.includes(member.id.uuid))

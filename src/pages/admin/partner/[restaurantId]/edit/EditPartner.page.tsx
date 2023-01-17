@@ -1,5 +1,5 @@
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import IconSpinner from '@components/IconSpinner/IconSpinner';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   partnerThunks,
@@ -14,6 +14,7 @@ import {
   pickRenderableImagesByProperty,
   pickRenderableLicenseImagesByProperty,
 } from '@utils/images';
+import type { TObject } from '@utils/types';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
@@ -62,60 +63,58 @@ const EditPartnerPage = () => {
 
     discardDraftPartnerInProgress,
     discardDraftPartnerError,
+
     restaurantTableActionInProgress,
     restaurantTableActionError,
   } = useAppSelector((state) => state.partners);
-
   const dispatch = useAppDispatch();
-
   const router = useRouter();
   const { query } = router;
   const { restaurantId } = query;
-  const onAvatarUpload = (params: any) =>
-    dispatch(partnerThunks.requestAvatarUpload(params));
 
+  const onAvatarUpload = (params: TObject) => {
+    return dispatch(partnerThunks.requestAvatarUpload(params));
+  };
   const onRemoveAvatar = (id: any) => {
     return dispatch(removeAvatar(id));
   };
 
-  const onCoverUpload = (params: any) =>
-    dispatch(partnerThunks.requestCoverUpload(params));
-
+  const onCoverUpload = (params: TObject) => {
+    return dispatch(partnerThunks.requestCoverUpload(params));
+  };
   const onRemoveCover = (id: any) => {
     return dispatch(removeCover(id));
   };
 
-  const onUpdatePartnerListing = (values: any) =>
-    dispatch(partnerThunks.updatePartnerRestaurantListing(values));
-
-  const onBusinessLicenseUpload = (params: any) => {
-    return dispatch(partnerThunks.requestBusinessLicenseUpload(params));
+  const onUpdatePartnerListing = (values: TObject) => {
+    return dispatch(partnerThunks.updatePartnerRestaurantListing(values));
   };
 
+  const onBusinessLicenseUpload = (params: TObject) => {
+    return dispatch(partnerThunks.requestBusinessLicenseUpload(params));
+  };
   const onRemoveBusinessLicense = (id: any) => {
     return dispatch(removeBusinessLicense(id));
   };
-  const onFoodCertificateUpload = (params: any) => {
+
+  const onFoodCertificateUpload = (params: TObject) => {
     return dispatch(partnerThunks.requestFoodCertificateUpload(params));
   };
-
   const onRemoveFoodCertificate = (id: any) => {
     return dispatch(removeFoodCertificate(id));
   };
 
-  const onPartyInsuranceUpload = (params: any) => {
+  const onPartyInsuranceUpload = (params: TObject) => {
     return dispatch(partnerThunks.requestPartyInsuranceUpload(params));
   };
-
   const onRemovePartyInsurance = (id: any) => {
     return dispatch(removePartyInsurance(id));
   };
 
-  const onPublishDraftPartner = (params: any) => {
+  const onPublishDraftPartner = (params: TObject) => {
     return dispatch(partnerThunks.publishDraftPartner(params));
   };
-
-  const onDiscardDraftPartner = (params: any) => {
+  const onDiscardDraftPartner = (params: TObject) => {
     return dispatch(partnerThunks.discardDraftPartner(params));
   };
 

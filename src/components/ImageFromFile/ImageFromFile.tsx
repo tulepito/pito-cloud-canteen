@@ -1,20 +1,19 @@
 import Promised from '@components/Promised/Promised';
 import classNames from 'classnames';
 import Image from 'next/image';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import css from './ImageFromFile.module.scss';
 
-type TImageFromFile = {
+type TImageFromFileProps = PropsWithChildren<{
   className?: string;
   rootClassName: string;
   aspectRatioClassName?: string;
   file: File;
   id: string;
-  children: ReactNode;
-};
+}>;
 
 // readImage returns a promise which is resolved
 // when FileReader has loaded given file as dataURL
@@ -36,7 +35,7 @@ const readImage = (file: File) =>
   });
 
 // Create elements out of given thumbnail file
-const ImageFromFile: React.FC<TImageFromFile> = (props) => {
+const ImageFromFile: React.FC<TImageFromFileProps> = (props) => {
   const [promisedImage, setPromisedImage] = useState<any>();
 
   const { className, rootClassName, aspectRatioClassName, file, id, children } =

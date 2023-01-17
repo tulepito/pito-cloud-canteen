@@ -1,0 +1,11 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.inputContainer {
+  @include inputContainerStyles;
+}
+
+.labelRoot {
+  @include inputLabelStyles;
+}

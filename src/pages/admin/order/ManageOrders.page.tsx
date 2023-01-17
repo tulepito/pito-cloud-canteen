@@ -97,13 +97,13 @@ const OrderDetailTooltip = ({ orderDetail }: any) => {
     };
 
     return (
-      <div className={css.orderDetailTooltipItem}>
+      <div key={key} className={css.orderDetailTooltipItem}>
         <OrderIcon />
         <span>
           <span className={css.orderDate}>
             {parseTimestaimpToFormat(Number(key))}
           </span>
-          : {20000}đ
+          : {0}đ
         </span>
       </div>
     );

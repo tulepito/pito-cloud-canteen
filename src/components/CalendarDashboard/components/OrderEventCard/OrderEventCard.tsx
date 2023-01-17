@@ -18,7 +18,9 @@ export type TOrderEventCardProps = {
 const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event, index }) => {
   const status = event.resource?.status;
 
-  const expiredTime = event.resource?.expiredTime as Date;
+  const expiredTime = DateTime.fromJSDate(event.resource?.expiredTime)
+    .plus({ day: 1 })
+    .toJSDate();
   const remainTime = DateTime.fromJSDate(new Date()).diff(
     DateTime.fromJSDate(expiredTime),
     ['hour', 'minute', 'second'],

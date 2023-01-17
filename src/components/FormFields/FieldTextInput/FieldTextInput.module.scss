@@ -1,0 +1,18 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.inputContainer {
+  @include inputContainerStyles;
+}
+
+.labelRoot {
+  @include inputLabelStyles;
+}
+
+.textValue {
+  word-break: break-all;
+  border: 1px solid $neutralGray6;
+  padding: 7px;
+  border-radius: 5px;
+}
