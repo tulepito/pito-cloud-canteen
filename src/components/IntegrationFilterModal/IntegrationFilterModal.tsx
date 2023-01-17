@@ -36,6 +36,7 @@ const IntegrationFilterModal = (props: any) => {
         onCancel={onClose}
         onConfirm={handleSubmit}
         isOpen={isOpen}
+        containerClassName={css.container}
         handleClose={onClose}
         cancelLabel={intl.formatMessage({
           id: 'IntegrationFilterModal.filterFormDiscardBtn',
