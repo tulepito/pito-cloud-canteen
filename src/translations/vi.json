@@ -168,7 +168,7 @@
   "EditOrderRowForm.foodSelectField.placeholder": "Chọn món ăn",
   "EditOrderRowForm.requirementField.label": "Yêu cầu",
   "EditOrderRowForm.requirementField.placeholder": "Nhập yêu cầu đặc biệt",
-  "EditOrderRowModal.subtitle": "Chi phí tối ta cho 1 người/bữa: {packagePerPerson}",
+  "EditOrderRowModal.subtitle": "Chi phí tối ta cho 1 người/bữa: {packagePerMember}",
   "EditOrderRowModal.submitButtonText": "Lưu thay đổi",
   "EditOrderRowModal.title": "Chỉnh sửa món ăn",
   "EditPartnerBasicInfomationForm.createBtn": "Thêm",

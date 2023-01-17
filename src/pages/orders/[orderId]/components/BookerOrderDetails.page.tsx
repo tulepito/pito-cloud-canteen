@@ -33,7 +33,6 @@ const BookerOrderDetailsPage = () => {
     participantData,
   };
   const manageOrdersData = {
-    planData,
     startDate,
     endDate,
   };

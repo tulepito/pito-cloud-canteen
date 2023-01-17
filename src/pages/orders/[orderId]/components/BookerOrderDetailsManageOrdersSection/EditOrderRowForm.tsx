@@ -17,7 +17,9 @@ export type TEditOrderRowFormValues = {
   requirement: string;
 };
 
-type TExtraProps = {};
+type TExtraProps = {
+  foodOptions: any[];
+};
 type TEditOrderRowFormComponentProps =
   FormRenderProps<TEditOrderRowFormValues> & Partial<TExtraProps>;
 type TEditOrderRowFormProps = FormProps<TEditOrderRowFormValues> & TExtraProps;
@@ -25,6 +27,7 @@ type TEditOrderRowFormProps = FormProps<TEditOrderRowFormValues> & TExtraProps;
 const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
   props,
 ) => {
+  const { handleSubmit, foodOptions } = props;
   const intl = useIntl();
   const showRequirementText = intl.formatMessage({
     id: 'EditOrderRowForm.addRequirement.show',
@@ -39,8 +42,22 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
     currentRequirementFieldActionText,
     setCurrentRequirementFieldActionText,
   ] = useState(showRequirementText);
-  const { handleSubmit } = props;
 
+  const selectFoodOptions = (
+    <>
+      <option disabled value="">
+        {intl.formatMessage({
+          id: 'EditOrderRowForm.foodSelectField.placeholder',
+        })}
+      </option>
+
+      {foodOptions?.map(({ foodId, foodName }) => (
+        <option key={foodId} value={foodId}>
+          {foodName}
+        </option>
+      ))}
+    </>
+  );
   const handleToggleShowHideRequirementField = () => {
     setIsRequirementInputShow(!isRequirementInputShow);
   };
@@ -58,11 +75,7 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
       <div className={css.fieldOnRow}>
         <FieldTextInput name="memberName" disabled className={css.input} />
         <FieldSelect id="foodId" name="foodId" className={css.input}>
-          <option disabled value="">
-            {intl.formatMessage({
-              id: 'EditOrderRowForm.foodSelectField.placeholder',
-            })}
-          </option>
+          {selectFoodOptions}
         </FieldSelect>
       </div>
 

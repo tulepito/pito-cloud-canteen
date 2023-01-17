@@ -3,7 +3,6 @@ import IconPlus from '@components/Icons/IconPlus/IconPlus';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { renderDateRange } from '@utils/dates';
-import type { TObject } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -14,7 +13,6 @@ import OrderDetailsTable from './OrderDetailsTable';
 
 type TBookerOrderDetailsManageOrdersSectionProps = {
   data: {
-    planData: TObject;
     startDate: number;
     endDate: number;
   };
@@ -24,15 +22,12 @@ const BookerOrderDetailsManageOrdersSection: React.FC<
   TBookerOrderDetailsManageOrdersSectionProps
 > = (props) => {
   const {
-    data: { /* planData, */ startDate, endDate },
+    data: { startDate, endDate },
   } = props;
 
   const intl = useIntl();
-  const [currentViewDate, setCurrentViewDate] = useState(
-    new Date().getTime().toString(),
-  );
+  const [currentViewDate, setCurrentViewDate] = useState(startDate);
   const dateList = renderDateRange(startDate, endDate);
-  console.log(currentViewDate);
 
   const items = dateList.map((date) => {
     const formattedDate = DateTime.fromMillis(date).toFormat('EEE, dd/MM', {
@@ -49,7 +44,7 @@ const BookerOrderDetailsManageOrdersSection: React.FC<
             })}
           </div>
           <div className={css.orderDetails}>
-            <OrderDetailsTable />
+            <OrderDetailsTable currentViewDate={currentViewDate} />
           </div>
           <div className={css.addOrder}>
             <div className={css.addOrderTitle}>
@@ -79,7 +74,7 @@ const BookerOrderDetailsManageOrdersSection: React.FC<
   });
 
   const handleDateTabChange = ({ id }: TTabsItem) => {
-    setCurrentViewDate(id as string);
+    setCurrentViewDate(Number(id));
   };
 
   return (

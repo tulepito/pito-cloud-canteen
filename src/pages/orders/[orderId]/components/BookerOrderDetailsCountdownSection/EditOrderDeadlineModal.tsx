@@ -6,7 +6,7 @@ import type { TEditOrderDeadlineFormValues } from './EditOrderDeadlineForm';
 import EditOrderDeadlineForm from './EditOrderDeadlineForm';
 import css from './EditOrderDeadlineModal.module.scss';
 
-type EditOrderDeadlineModalProps = {
+type TEditOrderDeadlineModalProps = {
   isOpen: boolean;
   data: {
     orderStartDate: number;
@@ -17,7 +17,7 @@ type EditOrderDeadlineModalProps = {
   onSubmit: (values: TEditOrderDeadlineFormValues) => void;
 };
 
-const EditOrderDeadlineModal: React.FC<EditOrderDeadlineModalProps> = (
+const EditOrderDeadlineModal: React.FC<TEditOrderDeadlineModalProps> = (
   props,
 ) => {
   const {
