@@ -35,6 +35,8 @@ const EditOrderDeadlineFormComponent: React.FC<
     .minus({ day: 2 })
     .toJSDate();
 
+  const buttonDisabled = today.getTime() >= values.deadlineDate;
+
   const handleDeadlineDateChange = (date: number) => {
     form.change('deadlineDate', date);
   };
@@ -71,7 +73,7 @@ const EditOrderDeadlineFormComponent: React.FC<
         ))}
       </FieldSelect>
       <div className={css.actions}>
-        <Button>
+        <Button disabled={buttonDisabled}>
           {intl.formatMessage({ id: 'EditOrderDeadlineForm.submitButtonText' })}
         </Button>
       </div>

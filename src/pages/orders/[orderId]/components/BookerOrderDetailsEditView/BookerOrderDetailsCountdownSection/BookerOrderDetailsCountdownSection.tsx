@@ -35,8 +35,10 @@ const BookerOrderDetailsCountdownSection: React.FC<
     rootClassName,
     data: { startDate, deadlineHour, orderDeadline },
   } = props;
+  const currentTime = new Date().getTime();
   const rootClasses = classNames(rootClassName || css.root, className);
 
+  const disabledEditButton = currentTime >= orderDeadline;
   const formattedDeadline = DateTime.fromMillis(orderDeadline).toFormat(
     "HH:mm, dd 'tháng' MM, yyyy",
   );
@@ -90,6 +92,7 @@ const BookerOrderDetailsCountdownSection: React.FC<
     <div className={rootClasses}>
       <div className={css.title}>{sectionTitle}</div>
       <Button
+        disabled={disabledEditButton}
         variant="inline"
         className={css.editDeadlineContainer}
         onClick={handleClickEditIcon}>

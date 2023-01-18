@@ -79,8 +79,8 @@ const BookerOrderDetailsPage = () => {
     setViewMode(EBookerOrderDetailsPageViewMode.edit);
   };
 
-  const handleSubmitReviewInfo = (values: TReviewInfoFormValues) => {
-    console.log(values);
+  const handleSubmitReviewInfoForm = (_values: TReviewInfoFormValues) => {
+    console.log('🚀 ~ handleSubmitReviewInfoForm ~ _values', _values);
   };
 
   const EditView = (
@@ -122,7 +122,7 @@ const BookerOrderDetailsPage = () => {
         <ReviewInfoSection
           className={css.infoRoot}
           data={reviewInfoData}
-          onSubmit={handleSubmitReviewInfo}
+          onSubmit={handleSubmitReviewInfoForm}
         />
         <ReviewOrdersResultSection
           className={css.resultRoot}
