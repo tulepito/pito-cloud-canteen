@@ -26,6 +26,7 @@
     "description": "css/scss note"
   },
   "Typescript final-form snippet": {
+    "scope": "typescriptreact",
     "prefix": "tsfinalform",
     "body": [
       "import Form from '@components/Form/Form';",
@@ -58,7 +59,29 @@
     ],
     "description": "Create typescript react-final-form"
   },
+  "Typescript icon snippet": {
+    "scope": "typescriptreact",
+    "prefix": "tsicon",
+    "body": [
+      "import type { TIconProps } from '@utils/types';",
+      "import classNames from 'classnames';",
+      "import React from 'react';",
+      "",
+      "import css from './${1:$TM_FILENAME_BASE}.module.scss';",
+      "",
+      "const ${1:$TM_FILENAME_BASE}: React.FC<TIconProps> = (props) => {",
+      "  const { className } = props;",
+      "  const classes = classNames(css.root, className);",
+      "",
+      "  return <svg className={classes}>${2}</svg>;",
+      "};",
+      "",
+      "export default ${1:$TM_FILENAME_BASE};"
+    ],
+    "description": "Icon snippet"
+  },
   "RTK slice snippet": {
+    "scope": "typescript",
     "prefix": "slice",
     "body": [
       "import { createSlice } from '@reduxjs/toolkit';",
@@ -81,7 +104,7 @@
       "});",
       "",
       "// ================ Actions ================ //",
-      "export const ${1:$TM_FILENAME_BASE}Action = ${1:$TM_FILENAME_BASE}Slice.actions;",
+      "export const ${1:$TM_FILENAME_BASE}Actions = ${1:$TM_FILENAME_BASE}Slice.actions;",
       "export default ${1:$TM_FILENAME_BASE}Slice.reducer;",
       "",
       "// ================ Selectors ================ //",
