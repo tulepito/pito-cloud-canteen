@@ -38,6 +38,7 @@
   "Calendar.Week.title": "{start}/{month} - {end}/{month}",
   "ClientSelector.keywordFieldPlaceholder": "Tìm kiếm theo tên công ty...",
   "ClientSelector.title": "Chọn khách hàng",
+  "ClientTable.submit": "Tiếp theo",
   "ClientTable.address": "Địa chỉ",
   "ClientTable.companyName": "Tên công ty",
   "ClientTable.contact": "Liên hệ",

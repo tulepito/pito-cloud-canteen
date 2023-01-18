@@ -4,12 +4,13 @@ import {
   manageCompaniesThunks,
   paginateCompanies,
 } from '@redux/slices/ManageCompaniesPage.slice';
-import { addCompanyClient } from '@redux/slices/Order.slice';
+import { addCompanyClient, OrderAsyncAction } from '@redux/slices/Order.slice';
 import type { TUpdateStatus } from '@src/pages/admin/company/helpers';
 import {
   filterCompanies,
   parseEntitiesToTableData,
   sliceCompanies,
+  sortCompanies,
 } from '@src/pages/admin/company/helpers';
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import isEmpty from 'lodash/isEmpty';
@@ -18,7 +19,6 @@ import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import ClientTable from '../../create/components/ClientTable/ClientTable';
-import ConfirmClientModal from '../../create/components/ConfirmClientModal/ConfirmClientModal';
 import css from './ClientSelector.module.scss';
 
 type TClientSelector = {
@@ -31,11 +31,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   const [queryParams, setQueryParams] = useState({});
   const [page, setPage] = useState<number>(1);
   const [selectedConpanyId, setSelectedCompanyId] = useState<string>('');
-  const {
-    value: isConfirmClientModalOpen,
-    setTrue: onConfirmClientModalOpen,
-    setFalse: onConfirmClientModalClose,
-  } = useBoolean();
+  const { value: isSortAZ, toggle: toggleSort } = useBoolean(true);
   const dispatch = useAppDispatch();
   const { companyRefs, totalItems } = useAppSelector(
     (state) => state.ManageCompaniesPage,
@@ -43,6 +39,17 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   );
   const [totalItemsPagination, setTotalItemsPagination] =
     useState<number>(totalItems);
+
+  const bookerList = useAppSelector(
+    (state) => state.Order.bookerList,
+    shallowEqual,
+  );
+  const fetchBookersInProgress = useAppSelector(
+    (state) => state.Order.fetchBookersInProgress,
+  );
+  // const fetchBookersError = useAppSelector(
+  //   (state) => state.Order.fetchBookersError,
+  // );
   useEffect(() => {
     dispatch(paginateCompanies({ page }));
   }, [dispatch, page]);
@@ -62,9 +69,13 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
     () => filterCompanies(companyRefs, queryParams),
     [queryParams, companyRefs],
   );
+  const sortedCompanies = useMemo(
+    () => sortCompanies(filteredCompanies, isSortAZ),
+    [filteredCompanies, isSortAZ],
+  );
   const slicesCompanies = useMemo(
-    () => sliceCompanies(filteredCompanies, page),
-    [filteredCompanies, page],
+    () => sliceCompanies(sortedCompanies, page),
+    [sortedCompanies, page],
   );
   const companiesTableData = useMemo(
     () =>
@@ -84,17 +95,16 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   const onPageChange = (value: number) => {
     setPage(value);
   };
-  const onItemClick = (id: string) => () => {
+  const onItemClick = (id: string) => {
     setSelectedCompanyId(id);
-    onConfirmClientModalOpen();
+    dispatch(OrderAsyncAction.fetchCompanyBookers(id));
   };
 
-  const onClientConfirm = () => {
+  const onSubmit = () => {
     const company = companyRefs.find(
       (item) => item?.id?.uuid === selectedConpanyId,
     );
     dispatch(addCompanyClient({ id: selectedConpanyId, company }));
-    onConfirmClientModalClose();
     nextTab();
   };
 
@@ -124,14 +134,12 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
           totalItems={totalItemsPagination}
           onPageChange={onPageChange}
           onItemClick={onItemClick}
+          onSubmit={onSubmit}
+          bookerList={bookerList}
+          fetchBookersInProgress={fetchBookersInProgress}
+          toggleSort={toggleSort}
         />
       </div>
-      <ConfirmClientModal
-        isOpen={isConfirmClientModalOpen}
-        onClose={onConfirmClientModalClose}
-        onCancel={onConfirmClientModalClose}
-        onConfirm={onClientConfirm}
-      />
     </div>
   );
 };

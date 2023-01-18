@@ -1,6 +1,7 @@
 import FormWizard from '@components/FormWizard/FormWizard';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
+import { removeBookerList } from '@redux/slices/Order.slice';
 import { getItem, setItem } from '@utils/localStorageHelpers';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -91,8 +92,10 @@ const CreateOrderWizard = () => {
   );
 
   useEffect(() => {
-    if (currentStep === CLIENT_SELECT_TAB)
+    if (currentStep === CLIENT_SELECT_TAB) {
       dispatch(manageCompaniesThunks.queryCompanies());
+      dispatch(removeBookerList());
+    }
   }, [currentStep, dispatch]);
 
   const saveStep = (tab: string) => {

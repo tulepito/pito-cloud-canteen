@@ -1,5 +1,8 @@
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
+import { UserPermission } from '@src/types/UserPermission';
+import { fetchUserApi } from '@utils/api';
+import { denormalisedResponseEntities, USER } from '@utils/data';
 import {
   addMealPlanDetailApi,
   completeOrderApi,
@@ -43,12 +46,18 @@ type OrderInitialState = {
   completeOrderError: any;
   draftOrder: any;
   selectedCompany: any;
+
+  fetchBookersInProgress: boolean;
+  fetchBookersError: any;
+  bookerList: any[];
+  selectedBooker: any;
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
 const ADD_MEAL_PLAN_DETAIL = 'app/Order/ADD_MEAL_PLAN_DETAIL';
 const UPDATE_MEAL_PLAN_DETAIL = 'app/Order/UPDATE_MEAL_PLAN_DETAIL';
 const COMPLETE_ORDER = 'app/Order/COMPLETE_ORDER';
+const FETCH_COMPANY_BOOKERS = 'app/Order/FETCH_COMPANY_BOOKERS';
 
 const initialState: OrderInitialState = {
   order: null,
@@ -63,6 +72,11 @@ const initialState: OrderInitialState = {
   completeOrderError: null,
   draftOrder: {},
   selectedCompany: null,
+
+  fetchBookersInProgress: false,
+  fetchBookersError: null,
+  bookerList: [],
+  selectedBooker: null,
 };
 
 const createOrder = createAsyncThunk(
@@ -133,11 +147,37 @@ const completeOrder = createAsyncThunk(
   },
 );
 
+const fetchCompanyBookers = createAsyncThunk(
+  FETCH_COMPANY_BOOKERS,
+  async (companyId: string, { extra: sdk }) => {
+    const companyAccount = denormalisedResponseEntities(
+      await sdk.users.show(
+        {
+          id: companyId,
+        },
+        { expand: true },
+      ),
+    )[0];
+    const { members = {} } = USER(companyAccount).getMetadata();
+    const bookerEmails = Object.keys(members).filter(
+      (email) => members[email].permission === UserPermission.BOOKER,
+    );
+    const bookers = await Promise.all(
+      bookerEmails.map(async (email) => {
+        const { data } = await fetchUserApi(members[email].id);
+        return data;
+      }),
+    );
+    return bookers;
+  },
+);
+
 export const OrderAsyncAction = {
   createOrder,
   addMealPlanDetail,
   updateMealPlanDetail,
   completeOrder,
+  fetchCompanyBookers,
 };
 
 const orderSlice = createSlice({
@@ -154,6 +194,10 @@ const orderSlice = createSlice({
         selectedCompany: payload.company,
       };
     },
+    addBooker: (state, { payload }) => ({
+      ...state,
+      selectedBooker: payload,
+    }),
     updateDraftMealPlan: (state, { payload }) => {
       const { orderDetail, ...restPayload } = payload;
       const { startDate, endDate } = restPayload;
@@ -176,6 +220,10 @@ const orderSlice = createSlice({
     removeDraftOrder: (state) => ({
       ...state,
       draftOrder: {},
+    }),
+    removeBookerList: (state) => ({
+      ...state,
+      bookerList: [],
     }),
   },
   extraReducers: (builder) => {
@@ -239,11 +287,32 @@ const orderSlice = createSlice({
         ...state,
         completeOrderInProgress: false,
         completeOrderError: error.message,
+      }))
+
+      .addCase(fetchCompanyBookers.pending, (state) => ({
+        ...state,
+        fetchBookersInProgress: true,
+        fetchBookersError: null,
+      }))
+      .addCase(fetchCompanyBookers.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchBookersInProgress: false,
+        bookerList: payload,
+      }))
+      .addCase(fetchCompanyBookers.rejected, (state, { error }) => ({
+        ...state,
+        fetchBookersInProgress: false,
+        fetchBookersError: error.message,
       }));
   },
 });
 
-export const { addCompanyClient, updateDraftMealPlan, removeDraftOrder } =
-  orderSlice.actions;
+export const {
+  addCompanyClient,
+  updateDraftMealPlan,
+  removeDraftOrder,
+  removeBookerList,
+  addBooker,
+} = orderSlice.actions;
 
 export default orderSlice.reducer;
