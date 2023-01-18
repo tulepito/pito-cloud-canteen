@@ -86,5 +86,8 @@ export const deleteParticipantFromOrderApi = (orderId: string, body: TObject) =>
 export const addUpdateMemberOrder = (orderId: string, body: TObject) =>
   put(`/api/orders/${orderId}/member-order`, body);
 
+export const sendRemindEmailToMemberApi = (orderId: string, body: TObject) =>
+  post(`/api/orders/${orderId}/remind-member`, body);
+
 export const updateParticipantOrderApi = (orderId: string, body: any) =>
   post(`/api/participants/orders/${orderId}`, body);

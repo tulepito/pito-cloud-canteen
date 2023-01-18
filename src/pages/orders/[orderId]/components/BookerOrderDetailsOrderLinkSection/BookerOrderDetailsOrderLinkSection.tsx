@@ -3,11 +3,13 @@ import ButtonIcon from '@components/ButtonIcon/ButtonIcon';
 import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import IconShare from '@components/Icons/IconShare/IconShare';
 import Tooltip from '@components/Tooltip/Tooltip';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import classNames from 'classnames';
+import { DateTime } from 'luxon';
 import React, { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
+import { BookerOrderManagementsThunks } from '../../BookerOrderManagement.slice';
 import css from './BookerOrderDetailsOrderLinkSection.module.scss';
 import type { TSendNotificationFormValues } from './SendNotificationForm';
 import SendNotificationModal from './SendNotificationModal';
@@ -23,9 +25,23 @@ type BookerOrderDetailsOrderLinkSectionProps = {
 const BookerOrderDetailsOrderLinkSection: React.FC<
   BookerOrderDetailsOrderLinkSectionProps
 > = (props) => {
-  const { orderData } = useAppSelector((state) => state.BookerOrderManagement);
+  const {
+    rootClassName,
+    className,
+    data: { orderDeadline },
+  } = props;
   const intl = useIntl();
+  const dispatch = useAppDispatch();
+  const { orderData } = useAppSelector((state) => state.BookerOrderManagement);
   const orderLink = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderData?.id?.uuid}`;
+  const formattedOrderDeadline = DateTime.fromMillis(orderDeadline).toFormat(
+    'HH:mm EEE,dd/MM/yyyy',
+    {
+      locale: 'vi',
+    },
+  );
+  const rootClasses = classNames(rootClassName || css.root, className);
+
   const defaultCopyText = useMemo(
     () =>
       intl.formatMessage({
@@ -46,13 +62,6 @@ const BookerOrderDetailsOrderLinkSection: React.FC<
   const [isSendNotificationModalOpen, setIsSendNotificationModalOpen] =
     useState(false);
 
-  const {
-    rootClassName,
-    className,
-    data: { orderDeadline },
-  } = props;
-  const rootClasses = classNames(rootClassName || css.root, className);
-
   const sectionTitle = intl.formatMessage({
     id: 'BookerOrderDetailsOrderLinkSection.title',
   });
@@ -72,10 +81,16 @@ const BookerOrderDetailsOrderLinkSection: React.FC<
     setIsSendNotificationModalOpen(false);
   };
 
-  const handleSubmitSendNotification = (
+  const handleSubmitSendNotification = async (
     values: TSendNotificationFormValues,
   ) => {
-    console.log({ ...values, orderLink });
+    const emailParams = {
+      ...values,
+      orderLink,
+      deadline: formattedOrderDeadline,
+    };
+
+    dispatch(BookerOrderManagementsThunks.sendRemindEmailToMember(emailParams));
   };
 
   return (

@@ -5,6 +5,7 @@ import {
   addUpdateMemberOrder,
   deleteParticipantFromOrderApi,
   loadBookerOrderDataApi,
+  sendRemindEmailToMemberApi,
   updateOrderDetailsApi,
 } from '@utils/api';
 import { EParticipantOrderStatus } from '@utils/enums';
@@ -18,6 +19,8 @@ type TBookerOrderManagementState = {
   isDeletingParticipant: boolean;
   // Update state
   isUpdatingOrderDetails: boolean;
+  // Send email state
+  isSendingRemindEmail: boolean;
   // Data states
   companyId: string | null;
   orderData: TObject | null;
@@ -28,6 +31,7 @@ const initialState: TBookerOrderManagementState = {
   isFetchingOrderDetails: false,
   isDeletingParticipant: false,
   isUpdatingOrderDetails: false,
+  isSendingRemindEmail: false,
   companyId: null,
   orderData: {},
   planData: {},
@@ -68,6 +72,65 @@ const updateOrderGeneralInfo = createAsyncThunk(
 
     await updateOrderDetailsApi(orderId, updateParams);
     await dispatch(loadData(orderId));
+  },
+);
+
+const sendRemindEmailToMember = createAsyncThunk(
+  'app/BookerOrderManagement/SEND_REMIND_EMAIL_TO_MEMBER',
+  async (params: TObject, { getState }) => {
+    const { orderLink, deadline, description } = params;
+
+    const {
+      id: { uuid: orderId },
+    } = getState().BookerOrderManagement.orderData!;
+    const participantList = getState().BookerOrderManagement.participantData!;
+    const {
+      attributes: {
+        metadata: { orderDetail },
+      },
+    } = getState().BookerOrderManagement.planData!;
+
+    const memberIdList = Object.values(orderDetail).reduce(
+      (result, currentDateOrders) => {
+        const { memberOrders } = currentDateOrders as TObject;
+        const memberIds = Object.entries(memberOrders).reduce(
+          (ids: string[], [memberId, orders]) => {
+            const { foodId, status } = orders as TObject;
+
+            if (
+              foodId === '' ||
+              status === EParticipantOrderStatus.empty ||
+              status === EParticipantOrderStatus.notJoined
+            ) {
+              return [...ids, memberId as string];
+            }
+            return ids;
+          },
+          [],
+        );
+
+        return [...(result as string[]), ...memberIds];
+      },
+      [],
+    ) as string[];
+
+    const uniqueMemberIdList = memberIdList.filter((item, pos) => {
+      return memberIdList.indexOf(item) === pos;
+    });
+
+    const emailList = uniqueMemberIdList.map((id) => {
+      const participant = participantList.find((p: TUser) => {
+        return p.id.uuid === id;
+      });
+      return participant?.attributes.email;
+    });
+
+    sendRemindEmailToMemberApi(orderId, {
+      orderLink,
+      deadline,
+      description,
+      emailList,
+    });
   },
 );
 
@@ -147,6 +210,7 @@ export const BookerOrderManagementsThunks = {
   loadData,
   updateOrderGeneralInfo,
   addOrUpdateMemberOrder,
+  sendRemindEmailToMember,
   deleteParticipant,
 };
 
@@ -165,6 +229,8 @@ const BookerOrderManagementSlice = createSlice({
         const {
           orderListing: orderData,
           planListing: planData,
+          // eslint-disable-next-line unused-imports/no-unused-vars
+          statusCode,
           ...restPayload
         } = payload;
 
@@ -198,6 +264,16 @@ const BookerOrderManagementSlice = createSlice({
       })
       .addCase(updateOrderGeneralInfo.rejected, (state) => {
         state.isUpdatingOrderDetails = false;
+      })
+      /* =============== sendRemindEmailToMember =============== */
+      .addCase(sendRemindEmailToMember.pending, (state) => {
+        state.isSendingRemindEmail = true;
+      })
+      .addCase(sendRemindEmailToMember.fulfilled, (state) => {
+        state.isSendingRemindEmail = false;
+      })
+      .addCase(sendRemindEmailToMember.rejected, (state) => {
+        state.isSendingRemindEmail = false;
       });
   },
 });
@@ -209,12 +285,16 @@ export default BookerOrderManagementSlice.reducer;
 // ================ Selectors ================ //
 export const orderDetailsAnyActionsInProgress = (state: RootState) => {
   const {
-    isFetchingOrderDetails: isFetchingOrderDetail,
+    isFetchingOrderDetails,
     isDeletingParticipant,
-    isUpdatingOrderDetails: isUpdatingOrderDetail,
+    isUpdatingOrderDetails,
+    isSendingRemindEmail,
   } = state.BookerOrderManagement;
 
   return (
-    isFetchingOrderDetail || isDeletingParticipant || isUpdatingOrderDetail
+    isFetchingOrderDetails ||
+    isDeletingParticipant ||
+    isUpdatingOrderDetails ||
+    isSendingRemindEmail
   );
 };

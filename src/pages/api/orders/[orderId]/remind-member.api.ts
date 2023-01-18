@@ -1,6 +1,5 @@
 import { createEmailParams, sendEmail } from '@services/awsSES';
 import cookies from '@services/cookie';
-import companyChecker from '@services/permissionChecker/company';
 import { handleError } from '@services/sdk';
 import { memberOrderRemind } from '@utils/emailTemplate/memberOrderRemind';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -19,7 +18,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const hasFlexAccountEmailParamsData = {
       receiver: emailList,
-      subject: 'PITO Cloud Canteen - Bạn có một lời mời tham gia công ty',
+      subject: 'PITO Cloud Canteen - Nhắc nhở chọn món',
       content: newParticipantMembersEmailTemplate,
       sender: systemSenderEmail as string,
     };
@@ -35,10 +34,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       sendEmail(hasFlexAccountEmailParams);
     }
 
-    res.json({});
+    res.json({
+      statusCode: 200,
+      message: `Successfully send email to member, memberList: ${emailList}`,
+    });
   } catch (error) {
     handleError(res, error);
   }
 };
 
-export default cookies(companyChecker(handler));
+export default cookies(handler);
