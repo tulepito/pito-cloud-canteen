@@ -7,7 +7,7 @@ import { DateTime } from 'luxon';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { BookerOrderManagementsThunks } from '../../BookerOrderManagement.slice';
+import { BookerOrderManagementsThunks } from '../../../BookerOrderManagement.slice';
 import css from './BookerOrderDetailsCountdownSection.module.scss';
 import type { TEditOrderDeadlineFormValues } from './EditOrderDeadlineForm';
 import EditOrderDeadlineModal from './EditOrderDeadlineModal';

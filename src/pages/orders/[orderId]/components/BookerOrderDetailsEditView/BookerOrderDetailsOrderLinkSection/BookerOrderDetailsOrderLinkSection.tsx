@@ -9,7 +9,7 @@ import { DateTime } from 'luxon';
 import React, { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { BookerOrderManagementsThunks } from '../../BookerOrderManagement.slice';
+import { BookerOrderManagementsThunks } from '../../../BookerOrderManagement.slice';
 import css from './BookerOrderDetailsOrderLinkSection.module.scss';
 import type { TSendNotificationFormValues } from './SendNotificationForm';
 import SendNotificationModal from './SendNotificationModal';

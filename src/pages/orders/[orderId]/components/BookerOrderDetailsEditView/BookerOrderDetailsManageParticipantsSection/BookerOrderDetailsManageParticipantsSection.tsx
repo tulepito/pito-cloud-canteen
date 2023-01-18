@@ -9,7 +9,7 @@ import { useIntl } from 'react-intl';
 import {
   BookerOrderManagementsThunks,
   orderDetailsAnyActionsInProgress,
-} from '../../BookerOrderManagement.slice';
+} from '../../../BookerOrderManagement.slice';
 import AddParticipantForm from './AddParticipantForm';
 import css from './BookerOrderDetailsManageParticipantsSection.module.scss';
 import BookerOrderDetailsParticipantCard from './BookerOrderDetailsParticipantCard';

@@ -11,7 +11,7 @@ import { DateTime } from 'luxon';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { BookerOrderManagementsThunks } from '../../BookerOrderManagement.slice';
+import { BookerOrderManagementsThunks } from '../../../BookerOrderManagement.slice';
 import type { TAddOrderFormValues } from './AddOrderForm';
 import AddOrderForm from './AddOrderForm';
 import css from './BookerOrderDetailsManageOrdersSection.module.scss';

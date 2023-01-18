@@ -10,7 +10,7 @@ import get from 'lodash/get';
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { BookerOrderManagementsThunks } from '../../BookerOrderManagement.slice';
+import { BookerOrderManagementsThunks } from '../../../BookerOrderManagement.slice';
 import type { TEditOrderRowFormValues } from './EditOrderRowForm';
 import EditOrderRowModal from './EditOrderRowModal';
 import css from './OrderDetailsTable.module.scss';

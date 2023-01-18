@@ -1,9 +1,11 @@
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
+import { useAppSelector } from '@hooks/reduxHooks';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import { useIntl } from 'react-intl';
 
+import { orderDetailsAnyActionsInProgress } from '../../../BookerOrderManagement.slice';
 import css from './BookerOrderDetailsTitle.module.scss';
 
 type TBookerOrderDetailsTitleProps = {
@@ -13,6 +15,7 @@ type TBookerOrderDetailsTitleProps = {
     deliveryHour: string;
     deliveryAddress: TObject;
   };
+  onConfirmOrder: () => void;
 };
 
 const BookerOrderDetailsTitle: React.FC<TBookerOrderDetailsTitleProps> = (
@@ -23,7 +26,10 @@ const BookerOrderDetailsTitle: React.FC<TBookerOrderDetailsTitleProps> = (
     rootClassName,
     className,
     data: { deliveryHour, deliveryAddress = {} },
+    onConfirmOrder,
   } = props;
+  const shouldButtonDisabled = useAppSelector(orderDetailsAnyActionsInProgress);
+
   const rootClasses = classNames(rootClassName || css.root, className);
 
   const deliveryInfo = intl.formatMessage(
@@ -49,7 +55,12 @@ const BookerOrderDetailsTitle: React.FC<TBookerOrderDetailsTitleProps> = (
         </div>
         <Badge label={deliveryInfo} />
       </div>
-      <Button type="button" variant="cta" className={css.makeOrderBtn}>
+      <Button
+        disabled={shouldButtonDisabled}
+        type="button"
+        variant="cta"
+        className={css.makeOrderBtn}
+        onClick={onConfirmOrder}>
         {intl.formatMessage({
           id: 'BookerOrderDetailsTitle.makeOrderButtonText',
         })}
