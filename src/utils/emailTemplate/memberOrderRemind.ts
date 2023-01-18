@@ -12,6 +12,6 @@ export const memberOrderRemind = ({
   return `
   <p>Nhắc nhở đặt phần ăn. </p>
   <p>Vui lòng nhấn vào <a href="${url}" target="_blank">đây</a> để đặt món trước hạn định (${deadline})</p>
-  <div>${description}</div>
+  <div>${description || ''}</div>
   `;
 };
