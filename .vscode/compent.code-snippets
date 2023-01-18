@@ -1,0 +1,57 @@
+{
+  "Typescript final-form snippet": {
+    "scope": "typescriptreact",
+    "prefix": "tsfinalform",
+    "body": [
+      "import Form from '@components/Form/Form';",
+      "import type { FormProps, FormRenderProps } from 'react-final-form';",
+      "import { Form as FinalForm } from 'react-final-form';",
+      "",
+      "export type T${1:$TM_FILENAME_BASE}Values = {};",
+      "",
+      "type TExtraProps = {};",
+      "type T${1:$TM_FILENAME_BASE}ComponentProps = FormRenderProps<T${1:$TM_FILENAME_BASE}Values> &",
+      "  Partial<TExtraProps>;",
+      "type T${1:$TM_FILENAME_BASE}Props = FormProps<T${1:$TM_FILENAME_BASE}Values> & TExtraProps;",
+      "",
+      "const ${1:$TM_FILENAME_BASE}Component: React.FC<T${1:$TM_FILENAME_BASE}ComponentProps> = (props) => {",
+      "  const { handleSubmit } = props;",
+      "",
+      "  return (",
+      "    <Form onSubmit={handleSubmit}>",
+      "      <></>",
+      "    </Form>",
+      "  );",
+      "};",
+      "",
+      "const ${1:$TM_FILENAME_BASE}: React.FC<T${1:$TM_FILENAME_BASE}Props> = (props) => {",
+      "  return <FinalForm {...props} component={${1:$TM_FILENAME_BASE}Component} />;",
+      "};",
+      "",
+      "export default ${1:$TM_FILENAME_BASE};",
+      ""
+    ],
+    "description": "Create typescript react-final-form"
+  },
+  "Typescript icon snippet": {
+    "scope": "typescriptreact",
+    "prefix": "tsicon",
+    "body": [
+      "import type { TIconProps } from '@utils/types';",
+      "import classNames from 'classnames';",
+      "import React from 'react';",
+      "",
+      "import css from './${1:$TM_FILENAME_BASE}.module.scss';",
+      "",
+      "const ${1:$TM_FILENAME_BASE}: React.FC<TIconProps> = (props) => {",
+      "  const { className } = props;",
+      "  const classes = classNames(css.root, className);",
+      "",
+      "  return <svg className={classes}>${2}</svg>;",
+      "};",
+      "",
+      "export default ${1:$TM_FILENAME_BASE};"
+    ],
+    "description": "Icon snippet"
+  }
+}
