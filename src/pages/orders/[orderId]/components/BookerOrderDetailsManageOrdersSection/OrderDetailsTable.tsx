@@ -192,7 +192,11 @@ const renderTableLayout = ({
 
           return (
             <tr key={memberId} className={rowClasses}>
-              <td title={memberName}>{memberName}</td>
+              <td title={memberName}>
+                <div>{memberName}</div>
+                {/* <div>Người dùng</div> */}
+                {/* <div>Ngoài nhóm</div> */}
+              </td>
               <td title={memberEmail}>{memberEmail}</td>
               <td title={foodName}>{foodName}</td>
               <td title={formattedFoodPrice}>{formattedFoodPrice}</td>

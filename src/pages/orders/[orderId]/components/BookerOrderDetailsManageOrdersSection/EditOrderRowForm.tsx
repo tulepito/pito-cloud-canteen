@@ -111,6 +111,7 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
 
       <div className={css.submitButtonContainer}>
         <Button
+          className={css.submitButton}
           type="submit"
           disabled={submitDisabled}
           inProgress={submitInprogress}>

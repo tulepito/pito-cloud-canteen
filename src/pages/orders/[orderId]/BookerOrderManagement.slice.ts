@@ -10,7 +10,7 @@ import {
 } from '@utils/api';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject, TUser } from '@utils/types';
-
+import omit from 'lodash/omit';
 // ================ Initial states ================ //
 type TBookerOrderManagementState = {
   // Fetch data state
@@ -249,10 +249,48 @@ const disallowMember = createAsyncThunk(
 
 const deleteParticipant = createAsyncThunk(
   'app/BookerOrderManagement/DELETE_PARTICIPANT',
-  async (params: TObject, { getState }) => {
-    const orderId = getState().BookerOrderManagement.orderData!.id.uuid;
-    const response: any = await deleteParticipantFromOrderApi(orderId, params);
-    return response;
+  async (params: TObject, { getState, dispatch }) => {
+    const { participantId } = params;
+    const {
+      id: { uuid: orderId },
+      attributes: {
+        metadata: { participants = [] },
+      },
+    } = getState().BookerOrderManagement.orderData!;
+    const {
+      id: { uuid: planId },
+      attributes: {
+        metadata: { orderDetail },
+      },
+    } = getState().BookerOrderManagement.planData!;
+
+    const newOrderDetail = Object.entries(orderDetail).reduce(
+      (result, current) => {
+        const [date, orderDetailOnDate] = current;
+        const { memberOrders } = orderDetailOnDate as TObject;
+
+        omit(memberOrders, participantId);
+
+        return {
+          ...result,
+          [date]: {
+            ...(orderDetailOnDate as TObject),
+            memberOrders: omit(memberOrders, participantId),
+          },
+        };
+      },
+      {},
+    );
+
+    const bodyParams = {
+      participantId,
+      participants: participants.filter((pId: string) => pId !== participantId),
+      newOrderDetail,
+      planId,
+    };
+
+    await deleteParticipantFromOrderApi(orderId, bodyParams);
+    await dispatch(loadData(orderId));
   },
 );
 

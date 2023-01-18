@@ -96,9 +96,13 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
     setIsDeleteParticipantModalOpen(false);
   };
   const handleConfirmDeleteParticipant = () => {
-    dispatch(
-      BookerOrderManagementsThunks.deleteParticipant({ currentParticipantId }),
-    );
+    if (currentParticipantId) {
+      dispatch(
+        BookerOrderManagementsThunks.deleteParticipant({
+          participantId: currentParticipantId,
+        }),
+      );
+    }
     setIsDeleteParticipantModalOpen(false);
   };
   const handleCancelDeleteParticipant = () => {
