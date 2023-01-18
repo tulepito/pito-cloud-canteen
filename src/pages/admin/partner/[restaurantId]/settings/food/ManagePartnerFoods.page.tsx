@@ -44,7 +44,11 @@ const TABLE_COLUMN: TColumn[] = [
     label: 'ID',
     render: (data: any) => {
       if (data.isDeleted) {
-        return <div className={css.deletedFood}>Deleted food</div>;
+        return (
+          <div className={css.deletedFood}>
+            <FormattedMessage id="ManagePartnerFoods.deletedFood" />
+          </div>
+        );
       }
       return (
         <NamedLink
@@ -178,7 +182,6 @@ const parseEntitiesToExportCsv = (
         ),
       };
     });
-  console.log({ foodsToExport });
   return foodsToExport;
 };
 

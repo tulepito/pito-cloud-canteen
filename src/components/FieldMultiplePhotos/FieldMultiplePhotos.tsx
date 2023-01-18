@@ -110,7 +110,7 @@ const FieldMutiplePhotos = (props: any) => {
           uploadImageFailed = (
             <p className={css.error}>
               {intl.formatMessage({
-                id: 'EditListingPhotosForm.imageUploadFailed.uploadOverLimit',
+                id: 'FieldMutiplePhotos.imageUploadFailed.uploadOverLimit',
               })}
             </p>
           );
@@ -118,7 +118,7 @@ const FieldMutiplePhotos = (props: any) => {
           uploadImageFailed = (
             <p className={css.error}>
               {intl.formatMessage({
-                id: 'EditListingPhotosForm.imageUploadFailed.uploadFailed',
+                id: 'FieldMutiplePhotos.imageUploadFailed.uploadFailed',
               })}
             </p>
           );
@@ -153,7 +153,7 @@ const FieldMutiplePhotos = (props: any) => {
                               input.onChange(params);
                               input.onBlur();
 
-                              await onImageUpload(params);
+                              onImageUpload(params);
                               // To reset input files.
                               // The problem is when choose same file browser doesn't trigger on change
                               setTriggerFlag(

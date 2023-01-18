@@ -98,7 +98,7 @@
     @include viewportLarge {
       grid-column-start: 1;
       height: 250px;
-      width: 400px;
+      width: 50%;
       margin: auto;
       grid-column-end: 5;
     }
@@ -122,4 +122,9 @@
   @include viewportMedium {
     width: 110px;
   }
+}
+
+.notePriceDescription {
+  font-style: italic;
+  font-size: 14px;
 }

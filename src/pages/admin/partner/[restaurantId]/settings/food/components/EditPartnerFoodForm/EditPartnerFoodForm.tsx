@@ -335,17 +335,23 @@ const EditPartnerFoodFormComponent: React.FC<
             id: 'EditPartnerFoodForm.descriptionLabel',
           })}
         />
-        <FieldTextArea
-          className={css.field}
-          name="notes"
-          id="notes"
-          placeholder={intl.formatMessage({
-            id: 'EditPartnerFoodForm.notesPlaceholder',
-          })}
-          label={intl.formatMessage({
-            id: 'EditPartnerFoodForm.notesLabel',
-          })}
-        />
+        <div className={css.field}>
+          <FieldTextArea
+            name="notes"
+            id="notes"
+            placeholder={intl.formatMessage({
+              id: 'EditPartnerFoodForm.notesPlaceholder',
+            })}
+            label={intl.formatMessage({
+              id: 'EditPartnerFoodForm.notesLabel',
+            })}
+          />
+          <p className={css.notePriceDescription}>
+            {intl.formatMessage({
+              id: 'EditPartnerFoodForm.notePriceDescription',
+            })}
+          </p>
+        </div>
       </div>
       <div className={css.submitButtons}>
         <ErrorMessage message={formError?.message} />

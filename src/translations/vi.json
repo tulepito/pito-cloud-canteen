@@ -182,6 +182,7 @@
   "EditPartnerFoodForm.minQuantityPerOrderLabel": "Đặt tối thiểu",
   "EditPartnerFoodForm.minQuantityPerOrderPlaceholder": "Nhập số phần",
   "EditPartnerFoodForm.minQuantityRequired": "Vui lòng nhập số phần tối thiểu",
+  "EditPartnerFoodForm.notePriceDescription": "Chú thích: Đơn giá không bắt buộc đối với các món thuộc thực đơn có giá tính theo đầu người hoặc theo bàn.",
   "EditPartnerFoodForm.notesLabel": "Ghi chú từ đối tác",
   "EditPartnerFoodForm.notesPlaceholder": "Nhập ghi chú",
   "EditPartnerFoodForm.orderHourInAdvanceLabel": "Đặt tối thiểu trước",
@@ -430,6 +431,8 @@
   "FieldBankAccounts.bankOwnerNameRequired": "Vui lòng nhập tên tài khoản",
   "FieldBusinessLicensePhoto.label": "Giấy phép kinh doanh",
   "FieldCheckbox.contentRequired": "Vui lòng nhập nội dụng tại đây",
+  "FieldMutiplePhotos.imageUploadFailed.uploadFailed": "Không thể tải hình ảnh.",
+  "FieldMutiplePhotos.imageUploadFailed.uploadOverLimit": "Dung lượng hình không được quá 20MB.",
   "FieldPhotoUpload.imageUploadFailed.uploadFailed": "Không thể tải lên hình.",
   "FieldPhotoUpload.imageUploadFailed.uploadOverLimit": " Dung lượng hình không được quá 20MB.",
   "FieldPhotoUpload.uploadLabel": "Click để chọn file.",
@@ -483,6 +486,7 @@
   "ManageOrdersPage.orderDetails": "Chi tiết",
   "ManagePartnerFoods.categoryPlaceholder": "Nhập phong cách ẩm thực",
   "ManagePartnerFoods.clearBtn": "Xóa",
+  "ManagePartnerFoods.deletedFood": "Món ăn đã bị xóa",
   "ManagePartnerFoods.downloadFileHere": "Tải bản mẫu tại {link}",
   "ManagePartnerFoods.filter": "Lọc",
   "ManagePartnerFoods.filterFormBtn": "Tìm kiếm",
@@ -690,6 +694,5 @@
   "SignUpPage.signupFailedEmailAlreadyTaken": "Email đã được sử dụng cho tài khoản khác. Thử lại hoặc thử đăng nhập!",
   "SignUpPage.Title": "Đăng ký",
   "Toolbar.action.today": "Hôm nay",
-  "Toolbar.viewMode.month": "Tháng",
-  "Toolbar.viewMode.week": "Tuần"
+  "Toolbar.viewMode.month": "Tháng"
 }
