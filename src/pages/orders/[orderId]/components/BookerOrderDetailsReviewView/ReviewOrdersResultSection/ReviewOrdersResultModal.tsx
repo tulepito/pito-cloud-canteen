@@ -9,8 +9,8 @@ import { useIntl } from 'react-intl';
 import css from './ReviewOrdersResultModal.module.scss';
 
 const prepareData = ({
-  orderDetail,
-  participantData,
+  orderDetail = {},
+  participantData = {},
 }: {
   orderDetail: TObject;
   participantData: TObject;
