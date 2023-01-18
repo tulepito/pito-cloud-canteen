@@ -69,7 +69,11 @@ const BAGDE_CLASSNAME_BASE_ON_ORDER_STATE = {
 
 const OrderDetailTooltip = ({ orderDetail }: any) => {
   const orderDetails = Object.keys(orderDetail).map((key) => {
-    const { status } = orderDetail[key];
+    const { status, foodList } = orderDetail[key];
+    const totalPrice = Object.keys(foodList).reduce((prev, cur) => {
+      const price = foodList[cur].foodPrice;
+      return prev + price;
+    }, 0);
     const OrderIcon = () => {
       switch (status) {
         case EOrderDetailsStatus.cancelled:
@@ -104,7 +108,7 @@ const OrderDetailTooltip = ({ orderDetail }: any) => {
           <span className={css.orderDate}>
             {parseTimestaimpToFormat(Number(key))}
           </span>
-          : {0}đ
+          : {totalPrice}đ
         </span>
       </div>
     );
@@ -158,8 +162,10 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'startDate',
     label: 'Thời gian',
     render: (data: any) => {
+      console.log(data);
       return (
         <div className={css.rowText}>
+          <div className={css.deliveryHour}>{data.deliveryHour}</div>
           {data.startDate} - {data.endDate}
         </div>
       );
@@ -274,6 +280,7 @@ const parseEntitiesToTableData = (
         ),
         orderDetail: entity.attributes.metadata?.orderDetail,
         orderName: entity.attributes.publicData.orderName,
+        deliveryHour: entity.attributes.metadata?.generalInfo?.deliveryHour,
       },
     };
   });
@@ -403,8 +410,12 @@ const ManageOrdersPage = () => {
       query: {
         keywords,
         meta_state: meta_state.join(','),
-        pub_startDate: new Date(pub_startDate).toISOString(),
-        pub_endDate: new Date(pub_endDate).toISOString(),
+        ...(pub_startDate
+          ? { pub_startDate: new Date(pub_startDate).toISOString() }
+          : {}),
+        ...(pub_endDate
+          ? { pub_endDate: new Date(pub_endDate).toISOString() }
+          : {}),
       },
     });
   };

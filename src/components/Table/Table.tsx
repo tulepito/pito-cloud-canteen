@@ -48,7 +48,7 @@ type TTableProps = {
   sortValue?: { columnName: string | number; type: 'asc' | 'desc' };
 };
 
-const Table = (props: TTable) => {
+const Table = (props: TTableProps) => {
   const {
     columns = [],
     data = [],

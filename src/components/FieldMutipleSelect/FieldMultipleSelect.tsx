@@ -17,7 +17,7 @@ const FieldMutipleSelectComponent = (props: any) => {
   const { value: isOpen, toggle, setFalse: onClose } = useBoolean(false);
   const { value = [], name } = input;
   const hasValues = value.length > 0;
-  const unCheck = (newVal: string) => (e) => {
+  const unCheck = (newVal: string) => (e: any) => {
     e.stopPropagation();
     input.onChange(value.filter((val: string) => val !== newVal));
   };
