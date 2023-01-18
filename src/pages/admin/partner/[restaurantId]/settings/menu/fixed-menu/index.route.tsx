@@ -1,9 +1,10 @@
+import { EMenuTypes } from '@utils/enums';
 import React from 'react';
 
-import ManagePartnerFixedMenuPage from './ManagePartnerFixedMenu.page';
+import ManagePartnerMenusPage from '../components/ManagePartnerMenus.page';
 
 const ManagePartnerFixedMenuRoute = () => {
-  return <ManagePartnerFixedMenuPage />;
+  return <ManagePartnerMenusPage menuType={EMenuTypes.fixedMenu} />;
 };
 
 export default ManagePartnerFixedMenuRoute;

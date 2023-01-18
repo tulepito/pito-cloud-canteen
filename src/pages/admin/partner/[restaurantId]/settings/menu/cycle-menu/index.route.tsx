@@ -1,9 +1,10 @@
+import { EMenuTypes } from '@utils/enums';
 import React from 'react';
 
-import ManagePartnerCycleMenuPage from './ManagePartnerCycleMenu.page';
+import ManagePartnerMenusPage from '../components/ManagePartnerMenus.page';
 
-const ManagePartnerFixedMenuRoute = () => {
-  return <ManagePartnerCycleMenuPage />;
+const ManagePartnerCycleMenuRoute = () => {
+  return <ManagePartnerMenusPage menuType={EMenuTypes.cycleMenu} />;
 };
 
-export default ManagePartnerFixedMenuRoute;
+export default ManagePartnerCycleMenuRoute;

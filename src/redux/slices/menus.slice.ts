@@ -30,9 +30,9 @@ const QUERY_PARTNER_MENUS = 'app/ManageFoodsPage/QUERY_PARTNER_MENUS';
 const queryPartnerMenus = createAsyncThunk(
   QUERY_PARTNER_MENUS,
   async (payload: any, { extra: sdk }) => {
-    const { restaurantId, ...rest } = payload;
+    const { restaurantId, menuType } = payload;
     const response = await sdk.listings.query({
-      ...rest,
+      meta_menuType: menuType,
       meta_listingType: EListingType.menu,
       meta_restaurantId: restaurantId,
       meta_isDeleted: false,
