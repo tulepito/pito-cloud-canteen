@@ -7,6 +7,7 @@ import {
   resetCheckedEmailInputChunk,
 } from '@redux/slices/companyMember.slice';
 import { USER } from '@utils/data';
+import type { TUser } from '@utils/types';
 import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -44,6 +45,11 @@ const AddCompanyMembersModal: React.FC<CreateGroupModalProps> = (props) => {
     shallowEqual,
   );
 
+  const currentUser = useAppSelector(
+    (state) => state.user.currentUser,
+    shallowEqual,
+  );
+
   const removeEmailValue = (email: string) => {
     const newEmailList = emailList.filter((_email) => _email !== email);
     const newLoadResult = loadedResult.filter(
@@ -57,6 +63,7 @@ const AddCompanyMembersModal: React.FC<CreateGroupModalProps> = (props) => {
     if (checkedEmailInputChunk) {
       setLoadedResult([...loadedResult, ...checkedEmailInputChunk]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkedEmailInputChunk]);
   const checkEmailList = (value: string[]) => {
     dispatch(companyMemberThunks.checkEmailExisted(value));
@@ -106,10 +113,11 @@ const AddCompanyMembersModal: React.FC<CreateGroupModalProps> = (props) => {
                 loadedResult={loadedResult}
                 checkInputEmailValue={checkEmailList}
                 emailCheckingInProgress={checkEmailExistedInProgress}
-                companyAccount={companyAccount}
+                companyAccount={companyAccount as TUser}
                 removeEmailValue={removeEmailValue}
                 addMembersInProgress={addMembersInProgress}
                 addMembersError={addMembersError}
+                currentUser={currentUser}
               />
             </div>
             <div className={css.modalFooter}>

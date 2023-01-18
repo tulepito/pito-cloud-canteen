@@ -101,3 +101,5 @@ export const updatePartnerFoodApi = (body: TBodyParams) => {
 export const deletePartnerFoodApi = (body: TBodyParams) => {
   return post(`/api/admin/listings/foods/delete`, body);
 };
+export const fetchUserApi = (userId: string) =>
+  get(`/api/users/fetch-user/${userId}`);

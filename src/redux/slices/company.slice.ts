@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
-import { denormalisedResponseEntities } from '@utils/data';
+import { fetchUserApi } from '@utils/api';
+import { denormalisedResponseEntities, USER } from '@utils/data';
 import type { TObject, TUser } from '@utils/types';
 import axios from 'axios';
 
@@ -68,29 +69,20 @@ const initialState: CompanyState = {
   isCompanyNotFound: false,
 };
 
-const companyInfo = createAsyncThunk(
-  COMPANY_INFO,
-  async (_, { getState, extra: sdk }) => {
-    const { workspaceCompanyId } = getState().company;
-    const companyAccountResponse = await sdk.users.show({
-      id: workspaceCompanyId,
-    });
-    const [companyAccount] = denormalisedResponseEntities(
-      companyAccountResponse,
-    );
-    const { data: allEmployeesData } = await axios.get(
-      `/api/company/all-employees?companyId=${workspaceCompanyId}`,
-    );
-    const { groups = [], members = {} } =
-      companyAccount.attributes.profile.metadata;
-    return {
-      groupList: groups,
-      company: companyAccount,
-      originCompanyMembers: members,
-      companyMembers: [...allEmployeesData.data.data],
-    };
-  },
-);
+const companyInfo = createAsyncThunk(COMPANY_INFO, async (_, { getState }) => {
+  const { workspaceCompanyId } = getState().company;
+  const { data: companyAccount } = await fetchUserApi(workspaceCompanyId);
+  const { data: allEmployeesData } = await axios.get(
+    `/api/company/all-employees?companyId=${workspaceCompanyId}`,
+  );
+  const { groups = [], members = {} } = USER(companyAccount).getMetadata();
+  return {
+    groupList: groups,
+    company: companyAccount,
+    originCompanyMembers: members,
+    companyMembers: [...allEmployeesData.data.data],
+  };
+});
 
 const groupInfo = createAsyncThunk(
   GROUP_INFO,
