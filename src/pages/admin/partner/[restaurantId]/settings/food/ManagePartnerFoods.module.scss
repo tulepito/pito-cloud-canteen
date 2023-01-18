@@ -110,16 +110,16 @@
 }
 
 .filteButtonActive {
-  background-color: $marketplaceColorLight;
-  color: $matterColorLight;
-  border-color: $marketplaceColorLight;
+  background-color: #ff4c38;
+  color: $neutralGray1;
+  border-color: #ff4c38;
   svg {
-    fill: $matterColorLight;
+    fill: $neutralGray1;
   }
   &:focus,
   &:hover {
-    background-color: $marketplaceColor;
-    color: $matterColorLight;
+    background-color: #c0392b;
+    color: #c0392b;
   }
 }
 
@@ -143,7 +143,7 @@
 .foodTitle {
   display: inline-flex;
   font-weight: $fontWeightBold;
-  color: $matterColorDark;
+  color: #000000;
 }
 
 .removeTitle {
