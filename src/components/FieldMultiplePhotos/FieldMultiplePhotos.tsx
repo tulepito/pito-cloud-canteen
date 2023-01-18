@@ -76,7 +76,7 @@ const PhotoWithOverlay = (props: any) => {
         type="button"
         className={css.removeButton}
         onClick={handleRemoveClick}>
-        <IconClose />
+        <IconClose className={css.iconClose} />
       </InlineTextButton>
     </div>
   );
