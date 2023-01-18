@@ -18,6 +18,10 @@
       .headRow {
         background-color: $neutralGray4;
 
+        .checkboxSvg {
+          background-color: $neutralGray1;
+        }
+
         .headCell {
           padding: 14px 10px 14px 20px;
           text-align: left;
@@ -88,7 +92,7 @@
           width: 100%;
           align-items: center;
           text-align: right;
-          padding: 10px;
+          padding: 14px 10px 14px 20px;
           color: #616161;
           border-bottom: 1px solid $neutralGray1;
           position: relative;

@@ -139,6 +139,7 @@ const Table = (props: TTableProps) => {
               <td className={classNames(tableHeadCellClassName, css.headCell)}>
                 <FieldCheckbox
                   labelClassName={css.checkboxLabel}
+                  svgClassName={css.checkboxSvg}
                   customOnChange={customOnChange}
                   name="checkAll"
                   id="checkAll"

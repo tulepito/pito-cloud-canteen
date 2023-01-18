@@ -112,7 +112,7 @@ const TABLE_COLUMN: TColumn[] = [
         <Link href={`/admin/partner/${data.id}/edit`}>
           <InlineTextButton
             className={classNames(css.actionButton, css.editButton)}>
-            <IconEdit />
+            <IconEdit className={css.iconEdit} />
           </InlineTextButton>
         </Link>
       );
