@@ -9,6 +9,10 @@
   flex-wrap: nowrap;
   padding: 12px;
 
+  & > div {
+    word-break: break-word;
+  }
+
   & > div:nth-of-type(1) {
     flex-basis: 30px;
   }
@@ -71,13 +75,27 @@
           &.collapsed + .rows .row {
             height: 0;
             padding: 0 12px;
+            opacity: 0;
+          }
+
+          .restaurantName {
+            @include textTemplate(14px, 400, 20px);
+            color: $neutralGray5;
           }
 
           .actionCell {
             cursor: pointer;
             display: flex;
             justify-content: flex-end;
-            align-items: center;
+
+            svg {
+              rotate: 0deg;
+              transition: rotate 0.2s linear;
+            }
+
+            .reversed {
+              rotate: x 180deg;
+            }
           }
         }
 

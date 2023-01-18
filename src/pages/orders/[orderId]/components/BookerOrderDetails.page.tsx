@@ -129,7 +129,10 @@ const BookerOrderDetailsPage = () => {
           data={reviewResultData}
           goBackToEditMode={handleGoBackFromReviewMode}
         />
-        <ReviewOrderDetailsSection className={css.detailRoot} />
+        <ReviewOrderDetailsSection
+          className={css.detailRoot}
+          orderDetail={orderDetail}
+        />
       </div>
       <div className={css.rightPart}>
         <ReviewCartSection className={css.cartRoot} />
