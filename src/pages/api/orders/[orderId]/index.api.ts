@@ -23,8 +23,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           companyId,
           participants = [],
         } = get(orderListing, 'attributes.metadata', {});
-        let data: TObject = { companyId };
 
+        const companyResponse = await integrationSdk.users.show({
+          id: companyId,
+        });
+        const companyUser = denormalisedResponseEntities(companyResponse)[0];
+
+        let data: TObject = { companyId, companyData: companyUser };
         const participantData = await Promise.all(
           participants.map(async (id: string) => {
             const [memberAccount] = denormalisedResponseEntities(

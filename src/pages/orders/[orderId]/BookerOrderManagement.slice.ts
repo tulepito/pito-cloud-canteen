@@ -9,7 +9,7 @@ import {
   updateOrderDetailsApi,
 } from '@utils/api';
 import { EParticipantOrderStatus } from '@utils/enums';
-import type { TObject, TUser } from '@utils/types';
+import type { TCompany, TObject, TUser } from '@utils/types';
 import omit from 'lodash/omit';
 // ================ Initial states ================ //
 type TBookerOrderManagementState = {
@@ -23,6 +23,7 @@ type TBookerOrderManagementState = {
   isSendingRemindEmail: boolean;
   // Data states
   companyId: string | null;
+  companyData: TCompany | null;
   orderData: TObject | null;
   planData: TObject;
   participantData: Array<TUser>;
@@ -33,6 +34,7 @@ const initialState: TBookerOrderManagementState = {
   isUpdatingOrderDetails: false,
   isSendingRemindEmail: false,
   companyId: null,
+  companyData: null,
   orderData: {},
   planData: {},
   participantData: [],
