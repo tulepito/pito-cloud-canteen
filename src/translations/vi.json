@@ -690,5 +690,7 @@
   "SignUpPage.Title": "Đăng ký",
   "Toolbar.action.today": "Hôm nay",
   "Toolbar.viewMode.month": "Tháng",
-  "Toolbar.viewMode.week": "Tuần"
+  "Toolbar.viewMode.week": "Tuần",
+  "AdminSidebar.managePartnerFixedMenuLabel": "Menu cố định",
+  "AdminSidebar.managePartnerCycleMenuLabel": "Menu theo chu kỳ"
 }

@@ -102,18 +102,38 @@ export const adminRoutes = {
   },
   ManagePartnerMenus: {
     path: '/admin/partner/[restaurantId]/settings/menu',
-    label: 'Danh sách thực đơn',
+    label: 'Thực đơn',
   },
-  PartnerMenuDetails: {
-    path: '/admin/partner/[restaurantId]/settings/menu/[menuId]',
-    label: 'Danh sách thực đơn',
+  ManagePartnerFixedMenus: {
+    path: '/admin/partner/[restaurantId]/settings/menu/fixed-menu',
+    label: 'Thực đơn cố định',
   },
-  CreatePartnerMenu: {
-    path: '/admin/partner/[restaurantId]/settings/menu/create',
-    label: 'Tạo thực đơn',
+  ManagePartnerCycleMenus: {
+    path: '/admin/partner/[restaurantId]/settings/menu/cycle-menu',
+    label: 'Thực đơn theo chu kỳ',
   },
-  EditPartnerMenu: {
-    path: '/admin/partner/[restaurantId]/settings/menu/create',
+  PartnerMenuFixedDetails: {
+    path: '/admin/partner/[restaurantId]/settings/menu/fixed-menu/[menuId]',
+    label: 'Chi tiết thực đơn',
+  },
+  PartnerMenuCycleDetails: {
+    path: '/admin/partner/[restaurantId]/settings/menu/cycle-menu/[menuId]',
+    label: 'Chi tiết thực đơn',
+  },
+  CreatePartnerFixedMenu: {
+    path: '/admin/partner/[restaurantId]/settings/menu/fixed-menu/create',
+    label: 'Tạo thực đơn cố định',
+  },
+  CreatePartnerCycleMenu: {
+    path: '/admin/partner/[restaurantId]/settings/menu/cycle-menu/create',
+    label: 'Tạo thực đơn cố định',
+  },
+  EditPartnerFixedMenu: {
+    path: '/admin/partner/[restaurantId]/settings/menu/fixed-menu/[menuId]/edit',
+    label: 'Chỉnh sửa thực đơn',
+  },
+  EditPartnerCycleMenu: {
+    path: '/admin/partner/[restaurantId]/settings/menu/cycle-menu/[menuId]/edit',
     label: 'Chỉnh sửa thực đơn',
   },
 } as const;

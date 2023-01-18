@@ -94,7 +94,27 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
               {
                 id: 'managePartnerMenu',
                 label: 'AdminSidebar.managePartnerMenuLabel',
-                nameLink: adminRoutes.ManagePartnerMenus.path,
+                nameLink: adminRoutes.ManagePartnerFixedMenus.path,
+                childrenMenus: [
+                  {
+                    id: 'managePartnerFixedMenu',
+                    label: 'AdminSidebar.managePartnerFixedMenuLabel',
+                    nameLink: adminRoutes.ManagePartnerFixedMenus.path,
+                    highlightRefLinks: [
+                      adminRoutes.CreatePartnerFixedMenu.path,
+                      adminRoutes.EditPartnerFixedMenu.path,
+                    ],
+                  },
+                  {
+                    id: 'managePartnerCycleMenu',
+                    label: 'AdminSidebar.managePartnerCycleMenuLabel',
+                    nameLink: adminRoutes.ManagePartnerCycleMenus.path,
+                    highlightRefLinks: [
+                      adminRoutes.CreatePartnerCycleMenu.path,
+                      adminRoutes.EditPartnerCycleMenu.path,
+                    ],
+                  },
+                ],
               },
             ],
           },
