@@ -10,9 +10,19 @@ import css from './AddOrderForm.module.scss';
 export type TAddOrderFormValues = {
   participantId: string;
   foodId: string;
+  requirement: string;
 };
 
-type TExtraProps = {};
+type TExtraProps = {
+  foodOptions: {
+    foodId: string;
+    foodName: string;
+  }[];
+  memberOptions: {
+    memberId: string;
+    memberName: string;
+  }[];
+};
 type TAddOrderFormComponentProps = FormRenderProps<TAddOrderFormValues> &
   Partial<TExtraProps>;
 type TAddOrderFormProps = FormProps<TAddOrderFormValues> & TExtraProps;
@@ -21,35 +31,63 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   props,
 ) => {
   const intl = useIntl();
-  const { handleSubmit } = props;
+  const { foodOptions, memberOptions, handleSubmit } = props;
+  const fieldSelectMemberDisable = memberOptions?.length === 0;
+  const fieldSelectFoodDisable =
+    fieldSelectMemberDisable || foodOptions?.length === 0;
+
+  const selectMemberOptions = (
+    <>
+      <option disabled value="">
+        {intl.formatMessage({
+          id: 'AddOrderForm.participantIdField.placeholder',
+        })}
+      </option>
+
+      {memberOptions?.map(({ memberId, memberName }) => (
+        <option key={memberId} value={memberId}>
+          {memberName}
+        </option>
+      ))}
+    </>
+  );
+  const selectFoodOptions = (
+    <>
+      <option disabled value="">
+        {intl.formatMessage({
+          id: 'AddOrderForm.foodIdField.placeholder',
+        })}
+      </option>
+
+      {foodOptions?.map(({ foodId, foodName }) => (
+        <option key={foodId} value={foodId}>
+          {foodName}
+        </option>
+      ))}
+    </>
+  );
 
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
       <div className={css.fieldContainer}>
         <FieldSelect
+          disabled={fieldSelectMemberDisable}
           id={'addOrder.participantName'}
           name="participantId"
           selectClassName={css.fieldSelect}>
-          <option disabled value="">
-            {intl.formatMessage({
-              id: 'AddOrderForm.participantIdField.placeholder',
-            })}
-          </option>
+          {selectMemberOptions}
         </FieldSelect>
       </div>
       <div className={css.fieldContainer}>
         <FieldSelect
+          disabled={fieldSelectFoodDisable}
           id={'addOrder.foodId'}
           name="foodId"
           selectClassName={css.fieldSelect}>
-          <option disabled value="">
-            {intl.formatMessage({
-              id: 'AddOrderForm.foodIdField.placeholder',
-            })}
-          </option>
+          {selectFoodOptions}
         </FieldSelect>
       </div>
-      <Button className={css.submitButton}>
+      <Button disabled={fieldSelectMemberDisable} className={css.submitButton}>
         {intl.formatMessage({
           id: 'AddOrderForm.submitButtonText',
         })}

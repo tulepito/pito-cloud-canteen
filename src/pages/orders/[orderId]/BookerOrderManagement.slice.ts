@@ -98,7 +98,8 @@ const sendRemindEmailToMember = createAsyncThunk(
             const { foodId, status } = orders as TObject;
 
             if (
-              foodId === '' ||
+              (foodId === '' &&
+                status !== EParticipantOrderStatus.notAllowed) ||
               status === EParticipantOrderStatus.empty ||
               status === EParticipantOrderStatus.notJoined
             ) {
@@ -197,6 +198,55 @@ const addOrUpdateMemberOrder = createAsyncThunk(
   },
 );
 
+const disallowMember = createAsyncThunk(
+  'app/BookerOrderManagement/DISALLOW_MEMBER',
+  async (params: TObject, { getState, dispatch }) => {
+    const { currentViewDate, memberId } = params;
+    const {
+      id: { uuid: orderId },
+    } = getState().BookerOrderManagement.orderData!;
+    const {
+      id: { uuid: planId },
+      attributes: { metadata },
+    } = getState().BookerOrderManagement.planData!;
+
+    const memberOrderDetailOnUpdateDate =
+      metadata?.orderDetail[currentViewDate].memberOrders[memberId];
+    const { status } = memberOrderDetailOnUpdateDate;
+
+    const validStatuses = [
+      EParticipantOrderStatus.notJoined,
+      EParticipantOrderStatus.expired,
+    ];
+
+    if (validStatuses.includes(status)) {
+      return;
+    }
+
+    const newMemberOrderValues = {
+      ...memberOrderDetailOnUpdateDate,
+      status: EParticipantOrderStatus.notAllowed,
+    };
+
+    const updateParams = {
+      planId,
+      orderDetail: {
+        ...metadata.orderDetail,
+        [currentViewDate]: {
+          ...metadata.orderDetail[currentViewDate],
+          memberOrders: {
+            ...metadata.orderDetail[currentViewDate].memberOrders,
+            [memberId]: newMemberOrderValues,
+          },
+        },
+      },
+    };
+
+    await addUpdateMemberOrder(orderId, updateParams);
+    await dispatch(loadData(orderId));
+  },
+);
+
 const deleteParticipant = createAsyncThunk(
   'app/BookerOrderManagement/DELETE_PARTICIPANT',
   async (params: TObject, { getState }) => {
@@ -211,6 +261,7 @@ export const BookerOrderManagementsThunks = {
   updateOrderGeneralInfo,
   addOrUpdateMemberOrder,
   sendRemindEmailToMember,
+  disallowMember,
   deleteParticipant,
 };
 

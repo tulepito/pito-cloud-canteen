@@ -27,8 +27,11 @@ type TEditOrderRowFormProps = FormProps<TEditOrderRowFormValues> & TExtraProps;
 const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, foodOptions } = props;
+  const { handleSubmit, foodOptions, submitting, pristine } = props;
   const intl = useIntl();
+
+  const submitDisabled = pristine || submitting;
+  const submitInprogress = submitting;
   const showRequirementText = intl.formatMessage({
     id: 'EditOrderRowForm.addRequirement.show',
   });
@@ -58,6 +61,7 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
       ))}
     </>
   );
+
   const handleToggleShowHideRequirementField = () => {
     setIsRequirementInputShow(!isRequirementInputShow);
   };
@@ -106,7 +110,10 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
       )}
 
       <div className={css.submitButtonContainer}>
-        <Button type="submit">
+        <Button
+          type="submit"
+          disabled={submitDisabled}
+          inProgress={submitInprogress}>
           {intl.formatMessage({ id: 'EditOrderRowModal.submitButtonText' })}
         </Button>
       </div>

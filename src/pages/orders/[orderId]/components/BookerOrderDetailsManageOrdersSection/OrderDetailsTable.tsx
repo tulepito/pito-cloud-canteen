@@ -63,6 +63,10 @@ const ActionCellContent: React.FC<TActionCellContentProps> = ({
 
 type TOrderDetailsTableProps = {
   currentViewDate: number;
+  foodOptions: {
+    foodId: string;
+    foodName: string;
+  }[];
 };
 
 const prepareDataForTab = ({
@@ -92,7 +96,7 @@ const prepareDataForTab = ({
       const {
         chose: choseList,
         notChoose: notChooseList,
-        // notJoin: notJoinedList,
+        notJoin: notJoinedList,
       } = result;
 
       const [memberId, orderItemData] = currentOrderItem;
@@ -101,6 +105,7 @@ const prepareDataForTab = ({
 
       const rowData = {
         memberData,
+        status,
         foodData:
           foodId?.length > 0 && foodList[foodId]
             ? { ...foodList[foodId], foodId }
@@ -109,13 +114,18 @@ const prepareDataForTab = ({
 
       switch (status) {
         case EParticipantOrderStatus.joined:
-        case EParticipantOrderStatus.notAllowed:
           return { ...result, chose: [...choseList, rowData] };
+        case EParticipantOrderStatus.notAllowed: {
+          if (foodId === '') {
+            return { ...result, notChoose: [...choseList, rowData] };
+          }
+          return { ...result, chose: [...choseList, rowData] };
+        }
         case EParticipantOrderStatus.empty:
         case EParticipantOrderStatus.expired:
           return { ...result, notChoose: [...notChooseList, rowData] };
         case EParticipantOrderStatus.notJoined:
-          return result;
+          return { ...result, notJoin: [...notJoinedList, rowData] };
         default:
           return result;
       }
@@ -146,10 +156,7 @@ const renderTableLayout = ({
     tab: EOrderDetailsTableTab,
     id: string,
   ) => () => void;
-  handleClickDeleteOrderItem: (
-    tab: EOrderDetailsTableTab,
-    id: string,
-  ) => () => void;
+  handleClickDeleteOrderItem: (id: string) => () => void;
 }) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const intl = useIntl();
@@ -170,13 +177,21 @@ const renderTableLayout = ({
           const {
             memberData: { id: memberId, name: memberName, email: memberEmail },
             foodData: { foodName = '', foodPrice = '' },
+            status,
           } = item;
 
           const formattedFoodPrice =
-            foodPrice?.length > 0 ? `${foodPrice}đ` : '';
+            typeof foodPrice === 'number'
+              ? `${foodPrice}đ`
+              : foodPrice?.length > 0
+              ? `${foodPrice}đ`
+              : '';
+          const rowClasses = classNames({
+            [css.notAllowed]: status === EParticipantOrderStatus.notAllowed,
+          });
 
           return (
-            <tr key={memberId}>
+            <tr key={memberId} className={rowClasses}>
               <td title={memberName}>{memberName}</td>
               <td title={memberEmail}>{memberEmail}</td>
               <td title={foodName}>{foodName}</td>
@@ -184,7 +199,7 @@ const renderTableLayout = ({
               <td>
                 <ActionCellContent
                   onEdit={handleClickEditOrderItem(tab, memberId)}
-                  onDelete={handleClickDeleteOrderItem(tab, memberId)}
+                  onDelete={handleClickDeleteOrderItem(memberId)}
                 />
               </td>
             </tr>
@@ -207,7 +222,7 @@ const renderTableLayout = ({
 };
 
 const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
-  const { currentViewDate } = props;
+  const { currentViewDate, foodOptions } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [currentTab, setCurrentTab] = useState(
@@ -241,12 +256,6 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   );
   const selectedTabData = allTabData[EOrderDetailsTableTab.chose];
   const notChoseTabData = allTabData[EOrderDetailsTableTab.notChoose];
-  const foodOptions = Object.entries(foodList).map(([foodId, foodData]) => {
-    return {
-      foodId,
-      foodName: (foodData as TObject)?.foodName || '',
-    };
-  });
 
   const handleClickEditOrderItem =
     (tab: EOrderDetailsTableTab, memberId: string) => () => {
@@ -259,14 +268,21 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
       setIsEditSelectionModalOpen(true);
     };
 
-  const handleClickDeleteOrderItem =
-    (tab: EOrderDetailsTableTab, memberId: string) => () => {
-      console.log('delete', memberId);
+  const handleClickDeleteOrderItem = (memberId: string) => () => {
+    const updateValues = {
+      memberId,
+      currentViewDate,
     };
+
+    dispatch(BookerOrderManagementsThunks.disallowMember(updateValues));
+  };
+
   const handleCloseEditSelectionModal = () => {
     setIsEditSelectionModalOpen(false);
   };
-  const handleSubmitEditSelectionModal = (values: TEditOrderRowFormValues) => {
+  const handleSubmitEditSelectionModal = async (
+    values: TEditOrderRowFormValues,
+  ) => {
     const { foodId, requirement } = values;
     const { memberData } = currentMemberOrderData;
 
@@ -277,7 +293,9 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
       currentViewDate,
     };
 
-    dispatch(BookerOrderManagementsThunks.addOrUpdateMemberOrder(updateValues));
+    await dispatch(
+      BookerOrderManagementsThunks.addOrUpdateMemberOrder(updateValues),
+    );
     setIsEditSelectionModalOpen(false);
   };
 

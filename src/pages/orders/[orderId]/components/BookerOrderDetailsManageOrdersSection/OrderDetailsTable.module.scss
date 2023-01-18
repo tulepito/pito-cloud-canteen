@@ -82,6 +82,19 @@
         &.totalRow td {
           @include textTemplate(14px, 700, 20px);
         }
+        &.notAllowed {
+          position: relative;
+
+          &::after {
+            position: absolute;
+            content: '';
+            width: calc(100% - 32px);
+            top: 50%;
+            left: 16px;
+            height: 1px;
+            background-color: $neutralGray5;
+          }
+        }
 
         td {
           height: fit-content;
