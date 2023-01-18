@@ -7,18 +7,17 @@
  *   <MenuItem key="item 1"><a href="example.com">Click me</a><MenuItem>
  */
 import classNames from 'classnames';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import css from './ProfileMenuItem.module.scss';
 
-type TMenuItem = {
-  children: ReactNode;
+type TMenuItemProps = PropsWithChildren<{
   className?: string;
   rootClassName?: string;
-};
+}>;
 
-const ProfileMenuItem = (props: TMenuItem) => {
+const ProfileMenuItem: React.FC<TMenuItemProps> = (props) => {
   const { children, className, rootClassName } = props;
   const rootClass = rootClassName || css.root;
   const classes = classNames(rootClass, className);

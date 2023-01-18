@@ -1,13 +1,13 @@
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FieldCheckboxGroup from '@components/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldMutiplePhotos from '@components/FieldMultiplePhotos/FieldMultiplePhotos';
 import FieldMultipleSelect from '@components/FieldMutipleSelect/FieldMultipleSelect';
-import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
-import FieldSelect from '@components/FieldSelect/FieldSelect';
-import FieldTextArea from '@components/FieldTextArea/FieldTextArea';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
+import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
+import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
 import {

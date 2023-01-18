@@ -1,0 +1,108 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  position: relative;
+
+  .input {
+    position: absolute;
+    opacity: 0;
+    height: 0;
+    width: 0;
+
+    /* Display the "check" when checked */
+    &:checked + label .checked {
+      display: inline;
+    }
+
+    /* Highlight the borders if the checkbox is hovered, focused or checked */
+    &:hover + label .notChecked,
+    &:hover + label .required,
+    &:focus + label .notChecked,
+    &:focus + label .required,
+    &:checked + label .required {
+      stroke: $neutralGray6;
+    }
+
+    &:checked + label .notChecked {
+      stroke: none;
+    }
+
+    /* Hightlight the text on checked, hover and focus */
+    &:focus + label .text,
+    &:hover + label .text,
+    &:checked + label .text {
+      color: $neutralGray6;
+    }
+
+    &:disabled + label {
+      cursor: not-allowed;
+      & * {
+        cursor: not-allowed;
+      }
+
+      & .notChecked,
+      & .required,
+      & .required,
+      & .notChecked {
+        stroke: $neutralGray4;
+      }
+    }
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    padding-top: 6px;
+
+    .radioButtonWrapper {
+      /* This should follow line-height */
+      height: 32px;
+      margin-top: -2px;
+      margin-right: 12px;
+      align-self: baseline;
+
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+
+      .checkedStyle {
+        stroke: $neutralGray6;
+        fill: $neutralGray1;
+        transition: all 0.25 ease-in-out;
+
+        circle:last-of-type {
+          fill: $neutralGray6;
+        }
+      }
+
+      .checked {
+        display: none;
+      }
+
+      .notChecked {
+        stroke: $neutralGray4;
+
+        &:hover {
+          stroke: $neutralGray6;
+        }
+      }
+
+      .required {
+        stroke: $neutralGray5;
+        &:hover {
+          stroke: $neutralGray5;
+        }
+      }
+    }
+
+    .text {
+      color: $neutralGray6;
+      @include textTemplate(14px, 400, 24px, '');
+
+      margin-top: -1px;
+      margin-bottom: 1px;
+      cursor: pointer;
+    }
+  }
+}

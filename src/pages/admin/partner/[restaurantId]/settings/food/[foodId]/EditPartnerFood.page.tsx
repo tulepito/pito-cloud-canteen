@@ -2,6 +2,7 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
+import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo } from 'react';
@@ -10,7 +11,6 @@ import { shallowEqual } from 'react-redux';
 import EditPartnerFoodForm from '../components/EditPartnerFoodForm/EditPartnerFoodForm';
 import type { TEditPartnerFoodFormValues } from '../utils';
 import { getUpdateFoodData } from '../utils';
-import { EFoodTypes, EMenuTypes } from '@utils/enums';
 
 const EditPartnerFoodPage = () => {
   const { foodId = '' } = useRouter().query;
@@ -40,8 +40,8 @@ const EditPartnerFoodPage = () => {
       description,
       price: price?.amount,
       ...publicData,
-      menuType: menuType ? menuType : EMenuTypes.fixedMenu,
-      foodType: foodType ? foodType : EFoodTypes.savoryDish,
+      menuType: menuType || EMenuTypes.fixedMenu,
+      foodType: foodType || EFoodTypes.savoryDish,
     };
   }, [currentFoodListing]) as TEditPartnerFoodFormValues;
 

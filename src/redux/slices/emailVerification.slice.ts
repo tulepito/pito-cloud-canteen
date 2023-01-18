@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
+import type { TObject } from '@utils/types';
 
 import { userThunks } from './user.slice';
 
@@ -29,14 +30,11 @@ export const verificationInProgress = (state: any) => {
 
 const verify = createAsyncThunk(
   VERIFICATION,
-  async (
-    params: Record<string, any>,
-    { dispatch, extra: sdk, fulfillWithValue },
-  ) => {
+  async (params: TObject, { dispatch, extra: sdk }) => {
     const { verificationToken } = params;
     await sdk.currentUser.verifyEmail({ verificationToken });
-    fulfillWithValue(undefined);
-    dispatch(userThunks.fetchCurrentUser(undefined));
+    dispatch(userThunks.fetchCurrentUser());
+    return undefined;
   },
   {
     serializeError: storableError,

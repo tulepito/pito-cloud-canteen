@@ -4,12 +4,12 @@ import React from 'react';
 
 import css from './HamburgerMenuButton.module.scss';
 
-type THamburgerMenuButton = {
+type THamburgerMenuButtonProps = {
   className?: string;
   onClick?: () => void;
 };
 
-const HamburgerMenuButton: React.FC<THamburgerMenuButton> = (props) => {
+const HamburgerMenuButton: React.FC<THamburgerMenuButtonProps> = (props) => {
   return (
     <InlineTextButton
       onClick={props.onClick}

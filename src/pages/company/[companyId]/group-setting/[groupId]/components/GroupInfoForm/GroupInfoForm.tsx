@@ -1,6 +1,6 @@
 import Button from '@components/Button/Button';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { BookerManageCompany } from '@redux/slices/company.slice';
 import type { FormRenderProps } from 'react-final-form';

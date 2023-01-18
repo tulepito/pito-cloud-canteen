@@ -70,8 +70,8 @@
   }
 
   &:hover svg {
-    fill: $matterColorLight;
-    stroke: $matterColorLight;
+    fill: $neutralGray1;
+    stroke: $neutralGray1;
   }
 }
 
@@ -129,6 +129,6 @@
 }
 
 .error {
-  color: $errorRed1;
+  color: #fff1f0;
   font-size: 14px;
 }

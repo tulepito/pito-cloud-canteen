@@ -1,4 +1,4 @@
-import { IconCheckbox } from '@components/FieldCheckbox/FieldCheckbox';
+import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import type { TFormEvent } from '@utils/types';
 import classNames from 'classnames';
 import { Field } from 'react-final-form';

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
-import IconFilter from '@components/IconFilter/IconFilter';
+import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import AlertModal from '@components/Modal/AlertModal';
 import useBoolean from '@hooks/useBoolean';
 import type { FormApi } from 'final-form';

@@ -1,6 +1,5 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import IconSpinner from '@components/IconSpinner/IconSpinner';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import classNames from 'classnames';
 import React, { useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -252,7 +251,6 @@ const LocationAutocompleteInputImpl = (props: any) => {
       })
       .catch((e: any) => {
         setFetchingPredictions(false);
-        // eslint-disable-next-line no-console
         console.error(e);
         const value = currentValue(valueInput);
         onChangeInput({

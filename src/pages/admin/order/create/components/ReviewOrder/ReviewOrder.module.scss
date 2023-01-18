@@ -13,10 +13,10 @@
     .tableHead {
       tr {
         td {
-          background-color: $singleUseTableTanColor;
+          background-color: $neutralGray3;
           padding: 16px;
           font-size: 16px;
-          color: $neutralGray8;
+          color: $neutralGray6;
         }
       }
       :nth-child(3),
@@ -35,17 +35,17 @@
     .tableBody {
       .tableBodyRow {
         box-shadow: none;
-        border-right: 1px solid $neutralGray4;
-        border-left: 1px solid $neutralGray4;
+        border-right: 1px solid $neutralGray3;
+        border-left: 1px solid $neutralGray3;
         :nth-child(3),
         :nth-child(4) {
           text-align: right;
         }
         .tableBodyCell {
-          border-bottom: 1px solid $neutralGray4;
+          border-bottom: 1px solid $neutralGray3;
           padding: 9px 16px;
           font-size: 16px;
-          color: $matterColorDark;
+          color: $neutralGray6;
         }
       }
       .tableBodyRowMemberOrder {
@@ -81,12 +81,12 @@
       flex-direction: column;
       .boxTitle {
         font-size: 14px;
-        color: $neutralGray7;
+        color: $neutralGray5;
         margin-bottom: 16px;
       }
       .boxContent {
         font-size: 16px;
-        color: $neutralGray10;
+        color: $neutralGray6;
         font-weight: $fontWeightBold;
         max-width: 260px;
       }
@@ -102,5 +102,5 @@
 }
 
 .error {
-  color: $errorRed5;
+  color: $sematicRed2;
 }

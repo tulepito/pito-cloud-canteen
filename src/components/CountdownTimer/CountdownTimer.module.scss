@@ -17,7 +17,7 @@
   width: calc((100% - 12px) / 4);
   height: 68px;
   border-radius: 12px;
-  background-color: $secondaryBlue1;
+  background-color: $labelBlue1;
   padding: 10px;
 
   @include viewportMedium {

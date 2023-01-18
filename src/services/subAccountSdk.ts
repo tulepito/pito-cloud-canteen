@@ -9,7 +9,7 @@ export const getSubAccountSdk = async (subAccount: TUser) => {
 
   const subAccountEmail = subAccount.attributes.email;
   const subAccountPassword =
-    subAccount.attributes.profile.privateData.accountPassword;
+    subAccount.attributes.profile.privateData?.accountPassword;
 
   const decryptedPassword = CryptoJS.AES.decrypt(
     subAccountPassword,
@@ -29,7 +29,7 @@ export const getSubAccountTrustedSdk = async (subAccount: TUser) => {
 
   const subAccountEmail = subAccount.attributes.email;
   const subAccountPassword =
-    subAccount.attributes.profile.privateData.accountPassword;
+    subAccount.attributes.profile.privateData?.accountPassword;
 
   const decryptedPassword = CryptoJS.AES.decrypt(
     subAccountPassword,

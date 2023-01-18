@@ -21,7 +21,8 @@
   }
 
   .rightPart {
-    padding: 16px 24px 0 24px;
+    min-height: 413px;
+    padding: 24px 24px 0;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -30,9 +31,9 @@
     &::before {
       position: absolute;
       left: 0;
-      top: 0;
+      top: 24px;
       content: '';
-      height: 100%;
+      height: calc(100% - 24px);
       width: 1px;
       background-color: $neutralGray3;
     }
@@ -49,13 +50,13 @@
 
     .partTitle {
       @include textTemplate(16px, 700, 24px, '');
-      color: $neutralGray9;
+      color: $neutralGray5;
     }
 
     .divider {
       height: 1px;
       width: 37px;
-      background-color: $red2;
+      background-color: $primaryPri2;
       margin-top: 8px;
     }
 

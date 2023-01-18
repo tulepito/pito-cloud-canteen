@@ -1,6 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
-@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
 
 .filterForm {
   display: flex;
@@ -21,7 +21,7 @@
   border-radius: 5px;
   max-width: 70%;
   text-align: center;
-  background-color: $successScreen3;
+  background-color: #b7eb8f;
 }
 
 .input {
@@ -30,7 +30,7 @@
 
 .boldText {
   font-weight: $fontWeightBold;
-  color: $secondaryBlue6;
+  color: #2f54eb;
 }
 
 .bodyCell:nth-child(3) {
@@ -52,12 +52,12 @@
 
 .badge {
   border-radius: 4px;
-  .badgeLabel {
-    min-width: 100px;
-    font-size: 12px;
-    color: $neutralGray6 !important;
-    text-align: center;
-  }
+}
+
+.badgeLabel {
+  font-size: 12px;
+  color: $neutralGray6 !important;
+  text-align: center;
 }
 
 .orderName {
@@ -90,10 +90,10 @@
       background-color: $neutralGray3;
     }
     &.receivedIcon {
-      background-color: $successScreen6;
+      background-color: #52c41a;
     }
     &.cancelledIcon {
-      background-color: $warningOrange5;
+      background-color: #ffa940;
     }
     &.deliveredIcon {
       background-color: #171760;
@@ -106,21 +106,25 @@
 }
 
 .inputDate {
-  @include textInputStyles;
-  z-index: 1;
-  width: 50%;
+  @include inputContainerStyles;
+  border: 1px solid $neutralGray3;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 16px;
+
   input {
-    border: none;
     width: 100%;
-    font-size: 14px;
-    outline: none;
+    &::placeholder {
+      color: $neutralGray4;
+      font-family: $fontFamily;
+    }
   }
 }
 
 .labelDate {
   font-size: 14px;
   line-height: 24px;
-  color: $neutralGray10;
+  color: $neutralGray6;
   margin-bottom: 8px;
   display: inline-block;
   display: flex;
@@ -129,4 +133,9 @@
 .dateInputs {
   display: flex;
   gap: 10px;
+}
+
+.deliveryHour {
+  font-weight: $fontWeightBold;
+  display: block;
 }

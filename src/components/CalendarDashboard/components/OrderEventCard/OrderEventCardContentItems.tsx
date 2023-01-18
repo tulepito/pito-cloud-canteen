@@ -1,6 +1,6 @@
-import IconClock from '@components/Icons/IconClock';
-import IconLocation from '@components/Icons/IconLocation';
-import IconShop from '@components/Icons/IconShop';
+import IconClock from '@components/Icons/IconClock/IconClock';
+import IconLocation from '@components/Icons/IconLocation/IconLocation';
+import IconShop from '@components/Icons/IconShop/IconShop';
 import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';

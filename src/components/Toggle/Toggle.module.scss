@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+
 .root {
   display: flex;
   align-items: center;
@@ -14,7 +15,7 @@
     display: block;
     margin: 0 auto;
     overflow: hidden;
-    background: $neutralGray6;
+    background: $neutralGray4;
     border-radius: 9px;
     transition: background-color 0.25s linear;
 
@@ -24,13 +25,10 @@
       width: 14px;
       height: 14px;
       border-radius: 14px;
-      background-color: #fff;
+      background-color: $neutralGray1;
       top: 2px;
       left: 2px;
       transition: background-color 0.25s linear, transform 0.25s linear;
-    }
-    &:hover {
-      box-shadow: 0px 0px 0px 2px rgba(239, 61, 42, 0.2);
     }
   }
 
@@ -38,22 +36,31 @@
     display: none;
 
     &:checked + .switch {
-      background-color: $primaryPri5;
+      background-color: $neutralGray6;
+      transform: matrix(-1, 0, 0, 1, 0, 0);
     }
 
     &:checked + .switch::after {
-      transform: translateX(18px);
-      background-color: white;
+    }
+
+    &:checked + .switch:hover {
+      &::after {
+        background-color: $neutralGray2;
+      }
     }
 
     &:checked + .disabled {
-      background: $primaryPri4;
+      background: $neutralGray4;
       cursor: not-allowed;
     }
 
     & + .disabled {
       background: $neutralGray4;
       cursor: not-allowed;
+
+      &::after {
+        background-color: $neutralGray3;
+      }
     }
   }
 
@@ -61,6 +68,6 @@
     font-size: 14px;
     font-weight: $fontWeightMedium;
     line-height: 24px;
-    color: $neutralGray10;
+    color: $neutralGray6;
   }
 }

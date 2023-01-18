@@ -30,12 +30,13 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
 
   const companyTitle = USER(company).getPublicData().displayName;
   const ensureCompanyUser = USER(company).getFullData();
-  const orderId = LISTING(order).getId();
-  const orderTile = LISTING(order).getAttributes().title;
+  const orderObj = LISTING(order);
+  const orderId = orderObj.getId();
+  const orderTile = orderObj.getAttributes().title;
   const currentUserId = CURRENT_USER(currentUser).getId();
 
-  const { orderDeadline, deliveryHour } =
-    LISTING(order).getMetadata().generalInfo || {};
+  const { orderDeadline, deliveryHour, startDate } =
+    orderObj.getMetadata().generalInfo || {};
   const events = subOrders.map((subOrder: any) => {
     const planKey = Object.keys(subOrder)[0];
     const planItem: TPlanItem = subOrder[planKey];
@@ -99,7 +100,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
     </div>
   ) : (
     <div className={css.sectionCompanyBranding}>
-      <Avatar disableProfileLink user={ensureCompanyUser} />
+      <Avatar disableProfileLink user={ensureCompanyUser as TUser} />
       <span className={css.companyTitle}>{companyTitle}</span>
     </div>
   );
@@ -107,6 +108,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
   return (
     <div>
       <CalendarDashboard
+        anchorDate={DateTime.fromMillis(startDate || Date.now()).toJSDate()}
         events={flattenEvents}
         companyLogo={sectionCompanyBranding}
         renderEvent={OrderEventCard}

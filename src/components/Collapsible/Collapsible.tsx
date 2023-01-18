@@ -1,22 +1,22 @@
 import { InlineTextButton } from '@components/Button/Button';
-import IconArrow from '@components/IconArrow/IconArrow';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import useBoolean from '@hooks/useBoolean';
 import classNames from 'classnames';
-import type { MutableRefObject, PropsWithChildren, ReactNode } from 'react';
-import React, { useRef } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
+import React from 'react';
 
 import css from './Collapsible.module.scss';
 
-type TCollapsible = {
+type TCollapsibleProps = PropsWithChildren<{
   rootClassName?: string;
   className?: string;
   label: string | ReactNode | number;
   labelSectionClassName?: string;
   labelClassName?: string;
   contentClassName?: string;
-};
+}>;
 
-const Collapsible: React.FC<PropsWithChildren<TCollapsible>> = (props) => {
+const Collapsible: React.FC<TCollapsibleProps> = (props) => {
   const {
     className,
     rootClassName,
@@ -27,9 +27,8 @@ const Collapsible: React.FC<PropsWithChildren<TCollapsible>> = (props) => {
     contentClassName,
   } = props;
 
-  const contentRef = useRef() as MutableRefObject<HTMLDivElement>;
-
   const { value: isOpen, toggle } = useBoolean(true);
+
   const classes = classNames(rootClassName || css.root, className, {
     [css.isOpen]: isOpen,
   });
@@ -39,7 +38,9 @@ const Collapsible: React.FC<PropsWithChildren<TCollapsible>> = (props) => {
   );
   const labelClasses = classNames(labelClassName, css.label);
 
-  const contentClasses = classNames(contentClassName, css.content);
+  const contentClasses = classNames(contentClassName, css.content, {
+    [css.isClose]: !isOpen,
+  });
 
   return (
     <div className={classes}>
@@ -53,16 +54,7 @@ const Collapsible: React.FC<PropsWithChildren<TCollapsible>> = (props) => {
           className={css.arrowIcon}
         />
       </InlineTextButton>
-      <div
-        ref={contentRef}
-        style={
-          isOpen
-            ? { height: `${contentRef.current?.scrollHeight}px` }
-            : { height: '0px' }
-        }
-        className={contentClasses}>
-        {children}
-      </div>
+      <div className={contentClasses}>{children}</div>
     </div>
   );
 };

@@ -1,7 +1,5 @@
-/* eslint-disable import/no-cycle */
-
-import type { ThunkAPI } from '@redux/store';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 import { getCompaniesApi, updateCompanyStatusApi } from '@utils/api';
 import { denormalisedResponseEntities } from '@utils/data';
 import { storableError } from '@utils/errors';
@@ -9,7 +7,7 @@ import type { TCompany, TPagination } from '@utils/types';
 
 export const RESULT_PAGE_SIZE = 10;
 
-interface ManageCompanyState {
+type ManageCompanyState = {
   companyRefs: any[];
   queryCompaniesInProgress: boolean;
   queryCompaniesError: any;
@@ -17,17 +15,14 @@ interface ManageCompanyState {
   updateStatusInProgress: boolean;
   updateStatusError: any;
   totalItems: number;
-}
+};
 
 const QUERY_COMPANIES = 'app/ManageCompanies/QUERY_COMPANIES';
 const UPDATE_COMPANY_STATUS = 'app/ManageCompanies/UPDATE_COMPANY_STATUS';
 
 const queryCompanies = createAsyncThunk(
   QUERY_COMPANIES,
-  async (
-    page: number | undefined,
-    { fulfillWithValue, rejectWithValue }: ThunkAPI,
-  ) => {
+  async (page: number | undefined, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { data: companies } = await getCompaniesApi();
       return fulfillWithValue({ companies, page });
@@ -40,7 +35,7 @@ const queryCompanies = createAsyncThunk(
 
 const updateCompanyStatus = createAsyncThunk(
   UPDATE_COMPANY_STATUS,
-  async (updateData: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (updateData: any, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { data } = await updateCompanyStatusApi(updateData);
       const [company] = denormalisedResponseEntities(data);

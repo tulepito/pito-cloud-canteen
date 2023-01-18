@@ -1,6 +1,6 @@
 import Collapsible from '@components/Collapsible/Collapsible';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
@@ -56,7 +56,7 @@ const MENU_TABLE_COLUMN: TColumn[] = [
   },
   {
     key: 'foodPrice',
-    label: 'Đơn gía',
+    label: 'Đơn giá',
     render: (data: any) => {
       return (
         <span title={data.id} className={classNames(css.rowText, css.rowId)}>
@@ -118,7 +118,7 @@ const MEMBER_ORDER_TABLE_COLUMN: TColumn[] = [
   },
   {
     key: 'price',
-    label: 'Đơn gía',
+    label: 'Đơn giá',
     render: (data) => {
       return (
         <span title={data.id} className={classNames(css.rowText, css.rowId)}>

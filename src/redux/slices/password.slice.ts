@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
+import type { TObject } from '@utils/types';
 
 type TPasswordSliceInitialState = {
   initialEmail: string | null;
@@ -29,7 +30,7 @@ const PASSWORD_RESET = 'app/Password/Reset';
 const recoverPassword = createAsyncThunk(
   PASSWORD_RECOVERY,
   async (
-    params: Record<string, any>,
+    params: TObject,
     { extra: sdk, fulfillWithValue, rejectWithValue },
   ) => {
     const { email } = params;
@@ -45,7 +46,7 @@ const recoverPassword = createAsyncThunk(
 
 const resetPassword = createAsyncThunk(
   PASSWORD_RESET,
-  async (params: Record<string, any>, { extra: sdk }) => {
+  async (params: TObject, { extra: sdk }) => {
     const { email, passwordResetToken, newPassword } = params;
     const requestParams = { email, passwordResetToken, newPassword };
 

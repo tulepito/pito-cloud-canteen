@@ -10,7 +10,7 @@
   .paginationInfo {
     font-size: 12px;
     font-weight: $fontWeightRegular;
-    color: $neutralGray10;
+    color: $neutralGray6;
   }
 }
 
@@ -24,12 +24,12 @@
   transition: all 0.3s;
 
   &:hover {
-    border-color: $primaryPri5;
+    border-color: $neutralGray6;
 
     .nextIcon,
     .prevIcon {
       & path {
-        fill: $primaryPri5;
+        fill: $neutralGray6;
       }
     }
   }

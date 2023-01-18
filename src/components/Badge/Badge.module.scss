@@ -8,45 +8,47 @@
   justify-content: flex-start;
   border-radius: 4px;
 
+  /* ===============  background =============== */
   &.default {
-    background-color: $neutralGray3;
+    background-color: $neutralGray2;
   }
   &.processing {
-    background-color: $secondaryBlue1;
+    background-color: $labelBlue1;
   }
-
   &.error {
-    background-color: $errorRed1;
+    background-color: $sematicRed1;
   }
-
   &.success {
-    background-color: $successScreen1;
+    background-color: $sematicGreen1;
   }
-
   &.warning {
-    background-color: $warningOrange1;
+    background-color: $labelOrange1;
   }
+  /* ===============  =============== */
 
+  /* =============== label =============== */
   .label {
     font-size: 12px;
     font-weight: $fontWeightRegular;
     line-height: 17px;
+
     &.default {
-      color: $neutralGray10;
+      color: $neutralGray6;
     }
     &.processing {
-      color: $secondaryBlue6;
+      color: $labelBlue2;
     }
     &.error {
-      color: $errorRed6;
+      color: $primaryPri2;
     }
     &.success {
-      color: $successScreen6;
+      color: $sematicGreen2;
     }
     &.warning {
-      color: $warningOrange6;
+      color: $labelOrange2;
     }
   }
+  /* ===============  =============== */
 
   .badgeClose {
     @include flexCenter;
@@ -54,6 +56,8 @@
     width: 12px;
     margin-left: 8px;
     cursor: pointer;
+
+    /* =============== close icon =============== */
     & .default {
       path {
         fill: $neutralGray6;
@@ -61,24 +65,25 @@
     }
     & .processing {
       path {
-        fill: $secondaryBlue3;
+        fill: $labelBlue2;
       }
     }
     & .error {
       path {
-        fill: $errorRed3;
+        fill: $primaryPri2;
       }
     }
     & .success {
       path {
-        fill: $successScreen3;
+        fill: $sematicGreen2;
       }
     }
     & .warning {
       path {
-        fill: $warningOrange3;
+        fill: $labelOrange2;
       }
     }
+    /* ===============  =============== */
   }
 
   .badgeDot {
@@ -88,21 +93,23 @@
     display: inline-block;
     margin-right: 8px;
 
+    /* =============== dot =============== */
     &.default {
-      background: $neutralGray7;
+      background: $neutralGray6;
     }
     &.processing {
-      background: $secondaryBlue6;
+      background: $labelBlue2;
     }
     &.error {
-      background: $errorRed6;
+      background: $primaryPri1;
     }
     &.success {
-      background: $successScreen6;
+      background: $sematicGreen2;
     }
     &.warning {
-      background: $warningOrange6;
+      background: $labelOrange2;
     }
+    /* ===============  =============== */
   }
 
   .badgeContent {

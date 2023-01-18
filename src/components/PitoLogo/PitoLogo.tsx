@@ -5,14 +5,15 @@ import React from 'react';
 import css from './PitoLogo.module.scss';
 
 const PitoLogo: React.FC<TIconProps> = (props) => {
-  const { className } = props;
-  const classes = classNames(css.root, className);
+  const { rootClassName, className } = props;
+  const classes = classNames(rootClassName || css.root, className);
 
   return (
     <svg
-      className={classes}
+      preserveAspectRatio="none"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 348 184"
+      className={classes}
       fill="none">
       <path
         fillRule="evenodd"

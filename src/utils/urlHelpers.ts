@@ -2,6 +2,7 @@ import { types as sdkTypes } from '@sharetribe/sdk';
 import queryString from 'query-string';
 
 import { EUserPermission, startRouteBaseOnPermission } from './enums';
+import type { TObject } from './types';
 
 const { LatLng, LatLngBounds } = sdkTypes;
 
@@ -135,7 +136,7 @@ export const decodeLatLngBounds = (str: string) => {
 
 // Serialise SDK types in given object values into strings
 const serialiseSdkTypes = (obj: any) =>
-  Object.keys(obj).reduce((result: Record<string, any>, key) => {
+  Object.keys(obj).reduce((result: TObject, key) => {
     const val = obj[key];
     /* eslint-disable no-param-reassign */
     if (val instanceof LatLngBounds) {
@@ -160,20 +161,17 @@ const serialiseSdkTypes = (obj: any) =>
  * @return {String} query string with sorted keys and serialised
  * values, `undefined` and `null` values are removed
  */
-export const stringify = (params: Record<string, any>) => {
+export const stringify = (params: TObject) => {
   const serialised = serialiseSdkTypes(params);
-  const cleaned = Object.keys(serialised).reduce(
-    (result: Record<string, any>, key) => {
-      const val = serialised[key];
-      /* eslint-disable no-param-reassign */
-      if (val !== null) {
-        result[key] = val;
-      }
-      /* eslint-enable no-param-reassign */
-      return result;
-    },
-    {},
-  );
+  const cleaned = Object.keys(serialised).reduce((result: TObject, key) => {
+    const val = serialised[key];
+    /* eslint-disable no-param-reassign */
+    if (val !== null) {
+      result[key] = val;
+    }
+    /* eslint-enable no-param-reassign */
+    return result;
+  }, {});
   return queryString.stringify(cleaned);
 };
 
@@ -194,10 +192,10 @@ export const stringify = (params: Record<string, any>) => {
  *
  * @return {Object} key/value pairs parsed from the given String
  */
-export const parse = (search: any, options: Record<string, any> = {}) => {
+export const parse = (search: any, options: TObject = {}) => {
   const { latlng = [], latlngBounds = [] } = options;
   const params = queryString.parse(search);
-  return Object.keys(params).reduce((result: Record<string, any>, key) => {
+  return Object.keys(params).reduce((result: TObject, key) => {
     const val = params[key] as string;
     /* eslint-disable no-param-reassign */
     if (latlng.includes(key)) {

@@ -3,10 +3,10 @@
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldMultipleSelect from '@components/FieldMutipleSelect/FieldMultipleSelect';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
-import IconDelete from '@components/IconDelete/IconDelete';
-import IconEdit from '@components/IconEdit/IconEdit';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconDuplicate from '@components/Icons/IconDuplicate/IconDuplicate';
+import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import IconPrint from '@components/Icons/IconPrint/IconPrint';
 import IconUploadFile from '@components/Icons/IconUploadFile/IconUploadFile';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';

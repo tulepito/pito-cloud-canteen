@@ -1,3 +1,4 @@
+import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppSelector } from '@hooks/reduxHooks';
 import {
   adminPaths,
@@ -12,17 +13,16 @@ import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
 import React, { useCallback, useEffect } from 'react';
 
-type TPermissionGuardGuard = PropsWithChildren<{}>;
+type TPermissionGuardGuardProps = PropsWithChildren<{}>;
 
-const PermissionGuard: React.FC<TPermissionGuardGuard> = (props) => {
+const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
   const router = useRouter();
   const { pathname: pathName } = router;
   const { userPermission, currentUser } = useAppSelector((state) => state.user);
   const { children } = props;
-  const isMatchedPermission =
-    currentUser !== null
-      ? isPathMatchedPermission(pathName, userPermission)
-      : true;
+  const isMatchedPermission = currentUser
+    ? isPathMatchedPermission(pathName, userPermission)
+    : null;
   const isIgnoredPermissionCheckRoute =
     IgnoredPermissionCheckRoutes.includes(pathName);
 
@@ -45,32 +45,29 @@ const PermissionGuard: React.FC<TPermissionGuardGuard> = (props) => {
         break;
     }
 
-    if (!isMatchedPermission) {
+    if (isMatchedPermission !== null && !isMatchedPermission) {
       router.push(homePageRoute);
     }
   }, [
     isIgnoredPermissionCheckRoute,
     isMatchedPermission,
-    router,
+    pathName,
     userPermission,
   ]);
 
-  const renderComponent = useCallback(() => {
+  const renderComponent = () => {
     if (isIgnoredPermissionCheckRoute) {
       return children;
     }
 
     const LayoutWrapper = getLayout(userPermission);
 
-    return isMatchedPermission ? (
+    return !!isMatchedPermission && isMatchedPermission ? (
       <LayoutWrapper>{children}</LayoutWrapper>
-    ) : null;
-  }, [
-    children,
-    isIgnoredPermissionCheckRoute,
-    isMatchedPermission,
-    userPermission,
-  ]);
+    ) : (
+      <LoadingContainer />
+    );
+  };
 
   useEffect(() => {
     verifyPermission();

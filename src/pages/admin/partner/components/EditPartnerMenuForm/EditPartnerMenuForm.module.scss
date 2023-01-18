@@ -6,7 +6,7 @@
 }
 
 .fieldDescription {
-  color: $neutralGray7;
+  color: $neutralGray5;
   font-size: 14px;
   font-style: italic;
 }
@@ -38,13 +38,4 @@
   display: flex;
   width: 100%;
   justify-content: space-between;
-}
-
-.secondaryButton {
-  background-color: $matterColorLight;
-  color: $neutralGray6;
-  border: 1px solid $neutralGray6;
-  &:hover {
-    background-color: $neutralGray11;
-  }
 }

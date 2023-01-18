@@ -32,7 +32,7 @@
   border-bottom: 1px solid $neutralGray5;
   .title {
     @include textTemplate(16px, 700, 24px, '');
-    color: $neutralGray10;
+    color: $neutralGray6;
     margin: 0 0 4px 0;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -49,7 +49,7 @@
   }
   .description {
     @include textTemplate(14px, 400, 24px, '');
-    color: $neutralGray7;
+    color: $neutralGray5;
     margin: 0;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -64,7 +64,7 @@
   align-items: center;
   justify-content: space-between;
   .allergiesLabel {
-    color: $neutralGray7;
+    color: $neutralGray5;
     @include textTemplate(12px, 500, 16px, '');
     margin: 0;
   }
@@ -74,7 +74,7 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    border: 1px solid $primaryPri5;
+    border: 1px solid $primaryPri2;
     @include flexCenter;
   }
   .selectDisabled {

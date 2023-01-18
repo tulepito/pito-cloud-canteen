@@ -6,14 +6,14 @@
   @include flexAlign(center);
   .title {
     @include text(18px);
-    color: $neutralGray10;
+    color: $neutralGray6;
     font-weight: $fontWeightBold;
     margin-right: 16px;
   }
 
   .amount {
     @include text(14px);
-    color: $neutralGray10;
+    color: $neutralGray6;
     width: 41px;
     height: 32px;
     background-color: $neutralGray3;

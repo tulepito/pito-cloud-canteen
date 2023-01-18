@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import Button from '@components/Button/Button';
-import IconArrow from '@components/IconArrow/IconArrow';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -16,31 +16,13 @@ export type TToolbarProps = {
   onNavigate: (action: string) => void;
   onView: (name: string) => void;
   companyLogo?: ReactNode;
-  startDate?: Date;
-  endDate?: Date;
 };
 
 const Toolbar: React.FC<TToolbarProps> = (props) => {
-  const {
-    label,
-    view,
-    views,
-    onNavigate,
-    onView,
-    companyLogo,
-    // startDate,
-    // endDate,
-  } = props;
+  const { label, view, views, onNavigate, onView, companyLogo } = props;
   const intl = useIntl();
-  // const today = new Date();
+
   const shouldShowNavigateToday = true;
-  //   startDate && endDate
-  //     ? startDate <= today && today <= endDate
-  //     : startDate
-  //     ? startDate <= today
-  //     : endDate
-  //     ? today <= endDate
-  //     : true;
 
   const navigateFunc = (action: string) => () => {
     onNavigate(action);

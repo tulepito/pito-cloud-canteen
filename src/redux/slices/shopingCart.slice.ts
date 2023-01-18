@@ -1,8 +1,7 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 
-import type { ThunkAPI } from './types';
-
-interface ShopingCartState {
+type ShopingCartState = {
   orders: {
     [memberId: string]: {
       [planId: string]: {
@@ -10,7 +9,7 @@ interface ShopingCartState {
       };
     };
   };
-}
+};
 
 // ================ Thunk types ================ //
 const ADD_TO_CART = 'app/ShopingCart/ADD_TO_CART';
@@ -124,7 +123,7 @@ const addToCartThunk = createAsyncThunk(
       dayId,
       mealId,
     }: { planId: string; dayId: string; mealId: string },
-    { getState, dispatch }: ThunkAPI,
+    { getState, dispatch },
   ) => {
     const { currentUser } = getState().user;
 
@@ -143,7 +142,7 @@ const removeFromCartThunk = createAsyncThunk(
   REMOVE_FROM_CART,
   async (
     { planId, dayId }: { planId: string; dayId: string },
-    { getState, dispatch }: ThunkAPI,
+    { getState, dispatch },
   ) => {
     const { currentUser } = getState().user;
     return dispatch(
@@ -158,7 +157,7 @@ const removeFromCartThunk = createAsyncThunk(
 
 const removeAllFromPlanCartThunk = createAsyncThunk(
   REMOVE_ALL_FROM_PLAN_CART,
-  async ({ planId }: { planId: string }, { getState, dispatch }: ThunkAPI) => {
+  async ({ planId }: { planId: string }, { getState, dispatch }) => {
     const { currentUser } = getState().user;
     return dispatch(
       shopingCartSlice.actions.removeAllFromPlanCart({

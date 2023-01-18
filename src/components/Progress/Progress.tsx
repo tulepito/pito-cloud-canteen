@@ -3,7 +3,7 @@ import React from 'react';
 
 import css from './Progress.module.scss';
 
-type TProgress = {
+type TProgressProps = {
   type?: 'bar' | 'circle';
   percent: number;
   showInfo?: boolean;
@@ -18,10 +18,9 @@ type TProgress = {
   onAnimationEnd?: () => void;
 };
 
-const ProgressBar = (props: TProgress) => {
+const ProgressBar: React.FC<TProgressProps> = (props) => {
   const { percent, showInfo = true, format } = props;
 
-  // eslint-disable-next-line no-nested-ternary
   const info = showInfo ? (
     format ? (
       <span className={css.info}>{format}</span>
@@ -30,6 +29,7 @@ const ProgressBar = (props: TProgress) => {
     )
   ) : null;
   const roundedWidth = Math.round(percent) === 100 ? 100 : Math.round(percent);
+
   return (
     <div className={css.progressBarContainer}>
       <div className={css.progressBar}>
@@ -49,15 +49,15 @@ const getOffset = (val: number, radius: number) => {
   return Math.round(((100 - Math.min(val, 100)) / 100) * diameter(radius));
 };
 
-const ProgressCircle = (props: TProgress) => {
+const ProgressCircle: React.FC<TProgressProps> = (props) => {
   const {
     percent = 0,
     animate = true,
     animationDuration = '1s',
     showInfo = true,
     showInfoSymbol = true,
-    progressColor = '#EF3D2A',
-    bgColor = '#FFECEA',
+    progressColor = '#262626',
+    bgColor = '#f0f0f0',
     size = 80,
     lineWidth = '32',
     onAnimationEnd,
@@ -67,12 +67,12 @@ const ProgressCircle = (props: TProgress) => {
   const transition = animate
     ? `stroke-dashoffset ${animationDuration} ease-out`
     : undefined;
-
   const infoSymbol = showInfoSymbol && '%';
 
   return (
     <div className={css.progressCircle}>
       <svg
+        preserveAspectRatio="none"
         className={css.progressCircleSVG}
         width={size}
         height={size}
@@ -110,7 +110,7 @@ const ProgressCircle = (props: TProgress) => {
   );
 };
 
-const Progress = (props: TProgress) => {
+const Progress: React.FC<TProgressProps> = (props) => {
   const { type = 'bar', ...rest } = props;
 
   return type === 'bar' ? (

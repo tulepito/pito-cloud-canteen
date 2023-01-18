@@ -1,13 +1,13 @@
 import Accordion from '@components/Accordion/Accordion';
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
-import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
-import FieldPasswordInput from '@components/FieldPasswordInput/FieldPasswordInput';
-import FieldSelect from '@components/FieldSelect/FieldSelect';
-import FieldTextArea from '@components/FieldTextArea/FieldTextArea';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
-import IconCalendar from '@components/IconCalender/IconCalender';
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
+import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import Modal from '@components/Modal/Modal';
 import Pagination from '@components/Pagination/Pagination';
@@ -43,7 +43,7 @@ const tabItems = [
   },
 ];
 
-const IconVoucher = (props: TIconProps) => {
+const IconVoucher: React.FC<TIconProps> = (props) => {
   const { rootClassName, className, ...rest } = props;
   const classes = classNames(rootClassName, className);
   return (
@@ -100,7 +100,7 @@ const IconVoucher = (props: TIconProps) => {
   );
 };
 
-const StyleGuideCard = (props: PropsWithChildren) => {
+const StyleGuideCard: React.FC<PropsWithChildren> = (props) => {
   return <div className={css.styleGuideCard}>{props.children}</div>;
 };
 const StyleGuidePage = (props: any) => {
@@ -321,16 +321,11 @@ const StyleGuidePage = (props: any) => {
             marginTop: '24px',
           }}>
           <Toggle
-            status="on"
             onClick={onSingleToggle}
             disabled
             label=" Toggle on , disabled status "
           />
-          <Toggle
-            status="on"
-            onClick={onSingleToggle}
-            label="Toggle on status"
-          />
+          <Toggle onClick={onSingleToggle} label="Toggle on status" />
           <Toggle status="off" onClick={onSingleToggle} label="Toggle off" />
           <Toggle
             status="off"
@@ -347,18 +342,59 @@ const StyleGuidePage = (props: any) => {
       </StyleGuideCard>
       <StyleGuideCard>
         <p className={css.title}>Button component</p>
+        <div>Primary</div>
         <Button
-          type="submit"
+          type="button"
           fullWidth
           inProgress={true}
           style={{ margin: '8px 0' }}>
           Loading button
         </Button>
-        <Button type="submit" fullWidth style={{ margin: '8px 0' }}>
+        <Button type="button" fullWidth style={{ margin: '8px 0' }}>
           Submit
         </Button>
-        <Button type="submit" fullWidth disabled>
+        <Button type="button" fullWidth disabled>
           Submit
+        </Button>
+
+        <div>Secondary</div>
+        <Button
+          variant="secondary"
+          type="button"
+          fullWidth
+          inProgress={true}
+          style={{ margin: '8px 0' }}>
+          Loading button
+        </Button>
+        <Button
+          variant="secondary"
+          type="button"
+          fullWidth
+          style={{ margin: '8px 0' }}>
+          Submit
+        </Button>
+        <Button variant="secondary" type="button" fullWidth disabled>
+          Submit
+        </Button>
+
+        <div>CTA</div>
+        <Button
+          variant="cta"
+          type="button"
+          fullWidth
+          inProgress={true}
+          style={{ margin: '8px 0' }}>
+          Loading button
+        </Button>
+        <Button
+          variant="cta"
+          type="button"
+          fullWidth
+          style={{ margin: '8px 0' }}>
+          Submit
+        </Button>
+        <Button variant="cta" type="button" fullWidth disabled>
+          CTA
         </Button>
       </StyleGuideCard>
 

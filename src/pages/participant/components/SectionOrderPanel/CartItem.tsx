@@ -1,5 +1,5 @@
-import IconClose from '@components/IconClose/IconClose';
-import IconRefreshing from '@components/Icons/IconRefreshing';
+import IconClose from '@components/Icons/IconClose/IconClose';
+import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import classNames from 'classnames';
 
 import css from './CartItem.module.scss';

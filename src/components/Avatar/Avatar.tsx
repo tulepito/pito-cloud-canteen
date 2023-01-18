@@ -1,4 +1,4 @@
-import IconBannedUser from '@components/IconBannedUser/IconBannedUser';
+import IconBannedUser from '@components/Icons/IconBannedUser/IconBannedUser';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import {
   ensureCurrentUser,
@@ -42,7 +42,7 @@ type TAvatarProps = {
   disableProfileLink?: boolean;
 };
 
-export const Avatar: React.FC<TAvatarProps> = (props) => {
+const Avatar: React.FC<TAvatarProps> = (props) => {
   const {
     rootClassName,
     className,

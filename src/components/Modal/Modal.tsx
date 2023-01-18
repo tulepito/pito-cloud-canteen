@@ -1,27 +1,26 @@
 import Button from '@components/Button/Button';
-import IconClose from '@components/IconClose/IconClose';
+import IconClose from '@components/Icons/IconClose/IconClose';
 import useLockBodyScroll from '@hooks/useDisableBodyScroll';
 import classNames from 'classnames';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './Modal.module.scss';
 
-type TModal = {
-  children?: ReactNode;
+type TModalProps = PropsWithChildren<{
+  className?: string;
+  containerClassName?: string;
+  contentClassName?: string;
   isOpen: boolean;
   title?: ReactNode | string;
   shouldHideIconClose?: boolean;
-  containerClassName?: string;
-  className?: string;
-  contentClassName?: string;
   handleClose: () => void;
   scrollLayerClassName?: string;
   customHeader?: ReactNode;
-};
+}>;
 
-const Modal = (props: TModal) => {
+const Modal: React.FC<TModalProps> = (props) => {
   const {
     children,
     isOpen,
