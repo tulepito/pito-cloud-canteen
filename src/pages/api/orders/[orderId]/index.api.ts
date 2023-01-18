@@ -21,43 +21,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const {
           plans = [],
           companyId,
-          generalInfo = {},
+          participants = [],
         } = get(orderListing, 'attributes.metadata', {});
-        const { selectedGroups = [] } = generalInfo;
         let data: TObject = { companyId };
 
-        if (
-          selectedGroups?.length === 1 &&
-          selectedGroups[0] === 'allMembers'
-        ) {
-          const [companyAccount] = denormalisedResponseEntities(
-            await integrationSdk.users.show({
-              id: companyId,
-            }),
-          );
+        const participantData = await Promise.all(
+          participants.map(async (id: string) => {
+            const [memberAccount] = denormalisedResponseEntities(
+              await integrationSdk.users.show({
+                id,
+              }),
+            );
 
-          const { members } = get(
-            companyAccount,
-            'attributes.profile.metadata',
-            {},
-          );
+            return memberAccount;
+          }),
+        );
 
-          const memberEmails = Object.keys(members);
-
-          const participantData = await Promise.all(
-            memberEmails.map(async (email) => {
-              const [memberAccount] = denormalisedResponseEntities(
-                await integrationSdk.users.show({
-                  email,
-                }),
-              );
-
-              return memberAccount;
-            }),
-          );
-
-          data = { ...data, participantData };
-        }
+        data = { ...data, participantData };
 
         if (plans?.length > 0) {
           const planId = plans[0];

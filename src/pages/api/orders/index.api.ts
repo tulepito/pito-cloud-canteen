@@ -78,6 +78,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             id: draftedOrderListing.id.uuid,
             metadata: {
               companyId,
+              participants: allMembers,
               listingType: ListingTypes.ORDER,
               generalInfo,
               orderDetail: updatedOrderDetail,
