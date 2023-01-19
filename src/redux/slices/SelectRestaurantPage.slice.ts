@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
-import type { TPagination } from '@utils/types';
+import type { TObject, TPagination } from '@utils/types';
 import get from 'lodash/get';
 
 type TSelectRestaurantPageSliceInitialState = {
@@ -34,8 +34,8 @@ const QUERY_RESTAURANT_FOOD = 'app/SelectRestaurantPage/QUERY_RESTAURANT_FOOD';
 // ================ Thunks ================ //
 const getRestaurants = createAsyncThunk(
   QUERY_RESTAURANTS,
-  async (params: Record<string, any> | undefined, { extra: sdk }) => {
-    const queryParams: Record<string, any> = {};
+  async (params: TObject | undefined, { extra: sdk }) => {
+    const queryParams: TObject = {};
 
     if (params) {
       queryParams.keywords = params.title;

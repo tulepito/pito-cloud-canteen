@@ -1,5 +1,6 @@
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import type { TObject } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import addDays from 'date-fns/addDays';
@@ -26,10 +27,11 @@ const TIME_OPTIONS = [
 
 type MealPlanDateFieldProps = {
   form: any;
-  values: Record<string, any>;
+  values: TObject;
   columnLayout?: boolean;
   title?: string;
 };
+
 const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
   const { values, columnLayout = false, form, title } = props;
   const { startDate: startDateInitialValue, endDate: endDateInitialValue } =

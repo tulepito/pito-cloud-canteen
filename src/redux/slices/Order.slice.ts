@@ -8,7 +8,7 @@ import {
   initiateTransactionsApi,
   updateMealPlanDetailApi,
 } from '@utils/orderApi';
-import type { TListing, TPagination } from '@utils/types';
+import type { TListing, TObject, TPagination } from '@utils/types';
 import cloneDeep from 'lodash/cloneDeep';
 import { DateTime } from 'luxon';
 
@@ -21,7 +21,7 @@ const updateSetUpPlan = ({
 }: {
   startDate: number;
   endDate: number;
-  orderDetail: Record<string, any>;
+  orderDetail: TObject;
 }) => {
   const newOrderDetail = cloneDeep(orderDetail);
 

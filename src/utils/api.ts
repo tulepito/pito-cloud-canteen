@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import type { TObject } from './types';
+
 export const apiBaseUrl = () => {
   const port = process.env.NEXT_PORT || 3000;
   const useDevApiServer =
@@ -31,8 +33,8 @@ export const deleteMethod = (path: string, body: any) => {
 };
 
 type TBodyParams = {
-  dataParams: Record<string, any>;
-  queryParams: Record<string, any>;
+  dataParams: TObject;
+  queryParams: TObject;
 };
 
 export const getCompaniesApi = () => get('/api/admin/users/company');

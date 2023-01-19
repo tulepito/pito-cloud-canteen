@@ -26,7 +26,7 @@ import OrderSettingModal, {
 import SelectRestaurantPage from '../SelectRestaurantPage/SelectRestaurant.page';
 import css from './SetupOrderDetail.module.scss';
 
-const renderResourcesForCalendar = (orderDetail: Record<string, any>) => {
+const renderResourcesForCalendar = (orderDetail: TObject) => {
   const entries = Object.entries(orderDetail);
 
   const resources = entries.map((item) => {
@@ -164,7 +164,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     setIsSelectingRestaurant(false);
   };
 
-  const handleSubmitRestaurant = (values: Record<string, any>) => {
+  const handleSubmitRestaurant = (values: TObject) => {
     const { restaurant, selectedFoodList } = values;
     const updateData = {
       orderDetail: {

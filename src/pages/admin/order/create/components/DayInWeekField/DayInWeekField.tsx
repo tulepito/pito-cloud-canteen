@@ -1,4 +1,5 @@
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -17,7 +18,7 @@ const DAY_IN_WEEK = [
 
 type DayInWeekFieldProps = {
   form: any;
-  values: Record<string, any>;
+  values: TObject;
 };
 const DayInWeekField: React.FC<DayInWeekFieldProps> = (props) => {
   const { form, values } = props;

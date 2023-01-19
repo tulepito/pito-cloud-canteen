@@ -1,5 +1,6 @@
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import type { TObject } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import subDays from 'date-fns/subDays';
@@ -26,7 +27,7 @@ const TIME_OPTIONS = [
 
 type OrderDeadlineFieldProps = {
   form: any;
-  values: Record<string, any>;
+  values: TObject;
   columnLayout?: boolean;
   title?: string;
 };

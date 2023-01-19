@@ -1,4 +1,6 @@
-export const setItem = (key: string, item: string | Record<string, any>) => {
+import type { TObject } from './types';
+
+export const setItem = (key: string, item: string | TObject) => {
   if (typeof localStorage !== 'undefined') {
     localStorage.setItem(key, JSON.stringify(item));
   }

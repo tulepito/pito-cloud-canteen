@@ -1,10 +1,8 @@
-// eslint-disable no-restricted-syntax
-// eslint-disable-next-line import/no-named-as-default
 import Avatar from '@components/Avatar/Avatar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
 import { CURRENT_USER, LISTING, USER } from '@utils/data';
-import type { TCurrentUser, TListing, TUser } from '@utils/types';
+import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
 import React from 'react';
@@ -13,7 +11,7 @@ import Skeleton from 'react-loading-skeleton';
 
 import css from './OrderCalendarView.module.scss';
 
-type TOrderCalendarView = {
+type TOrderCalendarViewProps = {
   company: TUser;
   order: TListing;
   plans?: TListing[];
@@ -22,9 +20,9 @@ type TOrderCalendarView = {
   loadDataInProgress?: boolean;
 };
 
-type TPlanItem = Record<string, any>;
+type TPlanItem = TObject;
 
-const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
+const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const { company, order, subOrders, currentUser, plans, loadDataInProgress } =
     props;
 
@@ -117,4 +115,5 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
     </div>
   );
 };
+
 export default OrderCalendarView;
