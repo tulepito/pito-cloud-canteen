@@ -2,6 +2,8 @@ import Form from '@components/Form/Form';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { updateDraftMealPlan } from '@redux/slices/Order.slice';
+import { USER } from '@utils/data';
+import isEmpty from 'lodash/isEmpty';
 import { useMemo } from 'react';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
@@ -14,6 +16,7 @@ import FoodPickingField from '../../create/components/FoodPickingField/FoodPicki
 import MealPlanDateField from '../../create/components/MealPlanDateField/MealPlanDateField';
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../../create/components/NavigateButtons/NavigateButtons';
+import NutritionField from '../../create/components/NutritionField/NutritionField';
 import OrderDeadlineField from '../../create/components/OrderDeadlineField/OrderDeadlineField';
 import ParticipantSetupField from '../../create/components/ParticipantSetupField/ParticipantSetupField';
 import PerPackageField from '../../create/components/PerPackageField/PerPackageField';
@@ -39,10 +42,13 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       deliveryHour,
       startDate,
       endDate,
+      nutritions,
       deliveryAddress,
+      detailAddress,
       deadlineDate,
       deadlineHour,
     },
+    selectedBooker,
   } = useAppSelector((state) => state.Order, shallowEqual);
   const { address, origin } = deliveryAddress || {};
   const companies = useAppSelector(
@@ -86,13 +92,17 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     dispatch(updateDraftMealPlan(createOrderValue));
     nextTab();
   };
+
   const initialValues = useMemo(
     () => ({
       vatAllow,
       pickAllow,
-      dayInWeek: dayInWeek || [],
+      dayInWeek: !isEmpty(dayInWeek)
+        ? dayInWeek
+        : ['mon', 'tue', 'wed', 'thu', 'fri'],
       packagePerMember: addCommas(packagePerMember?.toString()) || '',
       selectedGroups: selectedGroups || ['allMembers'],
+      nutritions: !isEmpty(nutritions) ? nutritions : [],
       deliveryHour: deliveryHour || '07:00',
       deliveryAddress:
         location || deliveryAddress
@@ -104,6 +114,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
               },
             }
           : null,
+      detailAddress: detailAddress || '',
       startDate: startDate || '',
       endDate: endDate || '',
       deadlineDate: deadlineDate || null,
@@ -114,11 +125,13 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       packagePerMember,
       vatAllow,
       pickAllow,
+      nutritions,
       selectedGroups,
       deliveryHour,
       location,
       deliveryAddress,
       defaultAddress,
+      detailAddress,
       address,
       defautlOrigin,
       origin,
@@ -137,6 +150,15 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         const { pickAllow: pickAllowValue = true } = values;
         return (
           <Form onSubmit={handleSubmit}>
+            <div className={css.headerLabel}>
+              {intl.formatMessage(
+                { id: 'MealPlanSetup.headerLabel' },
+                {
+                  companyName: USER(currentClient).getPublicData().companyName,
+                  bookerName: USER(selectedBooker).getProfile().displayName,
+                },
+              )}
+            </div>
             <div className={css.fieldSection}>
               <DeliveryAddressField
                 title={intl.formatMessage({ id: 'DeliveryAddressField.title' })}
@@ -145,6 +167,11 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
             <div className={css.fieldSection}>
               <PerPackageField
                 title={intl.formatMessage({ id: 'PerPackageField.title' })}
+              />
+            </div>
+            <div className={css.fieldSection}>
+              <NutritionField
+                title={intl.formatMessage({ id: 'NutritionField.title' })}
               />
             </div>
             <div className={css.fieldSection}>

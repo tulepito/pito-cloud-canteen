@@ -20,9 +20,16 @@
 }
 
 .customInput {
+  width: 300px;
   input {
     @include inputStyles;
     width: 100%;
+    padding-left: 48px !important;
+  }
+  &.placeholder {
+    input {
+      color: $formFieldPlaceholderColor;
+    }
   }
 }
 

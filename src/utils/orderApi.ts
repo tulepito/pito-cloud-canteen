@@ -18,6 +18,7 @@ type CreateOrderApiBody = {
     deadlineDate: number;
     deadlineHour: string;
     period?: number;
+    nutritions: string[];
   };
   orderDetail: {
     [date: string]: {

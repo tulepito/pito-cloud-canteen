@@ -252,3 +252,8 @@ export const parsePrice = (value: string = '') => {
 export const nonNegativeValue = (message: string) => (value: number) => {
   return value <= 0 ? message : VALID;
 };
+
+export const nonSatOrSunDay = (message: string) => (value: number) => {
+  const dayOfWeek = new Date(value).getDay();
+  return dayOfWeek === 6 || dayOfWeek === 0 ? message : VALID;
+};

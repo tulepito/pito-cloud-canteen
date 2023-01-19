@@ -1,5 +1,5 @@
 import jstz from 'jstimezonedetect';
-import type { DateTime } from 'luxon';
+import { DateTime, Interval } from 'luxon';
 
 /**
  * Check if the browser's DateTimeFormat API supports time zones.
@@ -97,4 +97,68 @@ export const weekDayFormatFromDateTime = (dateTime: DateTime) => {
   }
 
   return formattedWeekDay;
+};
+
+export const generateTimeOptions = () => {
+  let initHour = 6;
+  let initMinute = 30;
+  const options = [];
+  while (initHour < 23) {
+    while (initMinute < 60) {
+      options.push(
+        `${initHour.toString().padStart(2, '0')}:${initMinute
+          .toString()
+          .padStart(2, '0')}`,
+      );
+      initMinute += 15;
+      if (initMinute === 60) {
+        initMinute = 0;
+        initHour += 1;
+        break;
+      }
+    }
+  }
+  options.push('23:00');
+  return options;
+};
+
+export const getDayInWeekFromPeriod = (start: number, end: number) => {
+  if (!start || !end) return [];
+  const startDateObj = new Date(start);
+  const endDateObj = new Date(end);
+  return Interval.fromDateTimes(
+    DateTime.fromJSDate(startDateObj).startOf('day'),
+    DateTime.fromJSDate(endDateObj).endOf('day'),
+  )
+    .splitBy({ days: 1 })
+    .map((d) => d.start.weekday);
+};
+
+export const convertWeekDay = (weekDay: number) => {
+  switch (weekDay) {
+    case 1: {
+      return { key: 'mon', label: 'DayInWeekField.mon' };
+    }
+    case 2: {
+      return { key: 'tue', label: 'DayInWeekField.tue' };
+    }
+    case 3: {
+      return { key: 'wed', label: 'DayInWeekField.wed' };
+    }
+    case 4: {
+      return { key: 'thu', label: 'DayInWeekField.thu' };
+    }
+    case 5: {
+      return { key: 'fri', label: 'DayInWeekField.fri' };
+    }
+    case 6: {
+      return { key: 'sat', label: 'DayInWeekField.sat' };
+    }
+    case 7: {
+      return { key: 'sun', label: 'DayInWeekField.sun' };
+    }
+    default: {
+      return { key: 'mon', label: 'DayInWeekField.mon' };
+    }
+  }
 };
