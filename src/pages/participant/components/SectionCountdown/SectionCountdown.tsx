@@ -28,10 +28,8 @@ const SectionCountdown: React.FC<TSectionCountDownProps> = ({
   };
 
   const onSubmitNotificationForm = (
-    values: TNotificationSelectionFormValues,
-  ) => {
-    console.log(values);
-  };
+    _values: TNotificationSelectionFormValues,
+  ) => {};
 
   // Renderers
   const sectionTitle = intl.formatMessage({

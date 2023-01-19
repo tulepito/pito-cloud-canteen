@@ -81,7 +81,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
           {},
         );
-        console.log('🚀 ~ handler ~ newOrderDetail', newOrderDetail);
 
         await integrationSdk.listings.update({
           id: orderId,

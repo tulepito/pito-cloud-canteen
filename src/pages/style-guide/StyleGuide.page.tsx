@@ -110,14 +110,12 @@ const StyleGuidePage = (props: any) => {
   const onShowSizeChange = (current: number, _pageSize: number) => {
     setPageSize(_pageSize);
   };
-  const onSubmitHandler = (values: object) => {
-    console.log('Values:', { values });
-  };
+  const onSubmitHandler = (_values: object) => {};
 
-  const onSingleToggle = (value: boolean) => {
-    console.log('Single toggle:', value);
-  };
+  const onSingleToggle = (_value: boolean) => {};
+
   const onSetPageCurrent = (value: number) => setPageCurrent(value);
+
   return (
     <div className={css.styleGuideContainer}>
       <StyleGuideCard>
