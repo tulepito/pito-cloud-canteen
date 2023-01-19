@@ -2,9 +2,13 @@ import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
+import { createNewPrint } from '@services/pdf';
 import config from '@src/configs';
+import TranslationProvider from '@translations/TranslationProvider';
+import type { TObject } from '@utils/types';
 import get from 'lodash/get';
 import { useMemo, useState } from 'react';
+import ReactDOM from 'react-dom';
 
 import { orderDetailsAnyActionsInProgress } from '../BookerOrderManagement.slice';
 import { calculateTotalPriceAndDishes } from '../helpers/cartInfoHelper';
@@ -156,14 +160,25 @@ const BookerOrderDetailsPage = () => {
     setReviewInfoValues(_values);
   };
 
-  const handleDownloadPriceQuotation = () => {
-    // const printComponent = (
-    //   <BookerOrderDetailsPriceQuotation data={priceQuotationData} />
-    // );
-    // const string = renderToStaticMarkup(printComponent);
-    // const pdf: any = new JsPDF('p', 'mm', 'a4');
-    // pdf.fromHTML(string);
-    // pdf.save('pdf');
+  const handleDownloadPriceQuotation = async () => {
+    const ele = (
+      <TranslationProvider>
+        <BookerOrderDetailsPriceQuotation data={priceQuotationData} />
+      </TranslationProvider>
+    );
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+    ReactDOM.render(ele, div);
+
+    await createNewPrint('priceQuotation').then((response) => {
+      const { doc, id } = response as TObject;
+      if (doc && id) {
+        const fileName = `${id}.pdf`;
+        doc.save(fileName, { returnPromise: true }).then((_res: any) => {});
+      }
+    });
+
+    document.body.removeChild(div);
   };
 
   const EditView = (

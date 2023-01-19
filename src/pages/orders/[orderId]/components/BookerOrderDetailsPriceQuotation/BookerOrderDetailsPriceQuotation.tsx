@@ -69,7 +69,7 @@ const BookerOrderDetailsPriceQuotation: React.FC<
   const formattedEndDate = formatDate(endDate);
 
   return (
-    <div className={css.root}>
+    <div className={css.root} id="priceQuotation">
       <div className={css.titleContainer}>
         <div>
           {intl.formatMessage(
