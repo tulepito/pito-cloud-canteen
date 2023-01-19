@@ -9,6 +9,7 @@ import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import Meta from '@components/Layout/Meta';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -35,9 +36,9 @@ const TABLE_COLUMN: TColumn[] = [
     label: 'STT',
     render: (data: any) => {
       return (
-        <span title={data.id} className={classNames(css.rowText, css.rowId)}>
+        <div title={data.id} className={css.rowId}>
           {data.order}
-        </span>
+        </div>
       );
     },
   },
@@ -46,14 +47,16 @@ const TABLE_COLUMN: TColumn[] = [
     label: 'Tên thương hiệu',
     render: (data: any) => {
       return (
-        <div className={classNames(css.rowText, css.rowTitle)}>
-          <span>{data.title}</span>
+        <NamedLink
+          path={`/admin/partner/${data.id}/edit`}
+          className={classNames(css.rowText, css.rowTitle)}>
+          <div>{data.title}</div>
           {data.isDraft && (
             <div className={css.draftBox}>
               <FormattedMessage id="ManagePartnersPage.draftState" />
             </div>
           )}
-        </div>
+        </NamedLink>
       );
     },
   },
@@ -61,21 +64,21 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'phoneNumber',
     label: 'Số điện thoại',
     render: (data: any) => {
-      return <span className={css.rowText}>{data.phoneNumber}</span>;
+      return <div className={css.rowText}>{data.phoneNumber}</div>;
     },
   },
   {
     key: 'email',
     label: 'Email',
     render: (data: any) => {
-      return <span className={css.rowText}>{data.email}</span>;
+      return <div className={css.rowText}>{data.email}</div>;
     },
   },
   {
     key: 'address',
     label: 'Địa chỉ',
     render: (data: any) => {
-      return <span className={css.rowText}>{data.address}</span>;
+      return <div className={css.rowText}>{data.address}</div>;
     },
   },
   {
