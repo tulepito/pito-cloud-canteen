@@ -157,7 +157,7 @@
   "EditPartnerBasicInformationForm.emailValid": "Email không hợp lệ",
   "EditPartnerBasicInformationForm.locationRequried": "Vui lòng nhập địa chỉ",
   "EditPartnerBasicInformationForm.minPriceRequired": "Vui lòng nhập giá trị tối thiểu",
-  "EditPartnerBasicInformationForm.minPriceValid": "Giá trị tối thiểu không hợp lệ",
+  "EditPartnerBasicInformationForm.minPriceValid": "Giá trị tối thiểu là chữ số có giá trị tối thiểu là 1000",
   "EditPartnerBasicInformationForm.packagingLabel": "Bao bì thường sử dụng",
   "EditPartnerBasicInformationForm.passwordInvalid": "Mật khẩu phải từ 8-16 kí tự, bao gồm chữ cái in hoa, chữ cái in thường, ký tự đặc biệt và chữ số.",
   "EditPartnerBasicInformationForm.passwordRequired": "Vui lòng nhập mật khẩu",

@@ -63,21 +63,20 @@
   padding: 10px;
   tr {
     td {
+      border: 1px solid $neutralGray3;
       font-size: 14px;
       padding: 10px;
       text-align: left;
       color: #616161;
-      border: 1px solid $neutralGray5;
-      &.tableActions {
+      .tableActions {
         display: flex;
+        align-items: center;
+        width: 100%;
         justify-content: space-evenly;
-
         .addButton {
-          width: 20px;
-          padding: 5px;
           .iconClose {
-            width: 10px;
-            height: auto;
+            width: 12px;
+            height: 12px;
           }
         }
       }
@@ -109,4 +108,9 @@
 .fieldLabel {
   font-weight: $fontWeightBold;
   margin-bottom: 20px;
+}
+
+.fieldSelect {
+  border: none;
+  outline: none;
 }
