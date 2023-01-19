@@ -692,5 +692,7 @@
   "Toolbar.viewMode.month": "Tháng",
   "Toolbar.viewMode.week": "Tuần",
   "AdminSidebar.managePartnerFixedMenuLabel": "Menu cố định",
-  "AdminSidebar.managePartnerCycleMenuLabel": "Menu theo chu kỳ"
+  "AdminSidebar.managePartnerCycleMenuLabel": "Menu theo chu kỳ",
+  "ManagePartnerMenusPage.fixedMenuTitle": "Menu theo cố định",
+  "ManagePartnerMenusPage.cycleMenuTitle": "Menu theo chu kỳ"
 }

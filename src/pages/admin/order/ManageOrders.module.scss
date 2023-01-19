@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .filterForm {
   display: flex;
@@ -9,10 +10,7 @@
 }
 
 .title {
-  font-weight: $fontWeightBold;
-  font-size: 24px;
-  line-height: 32px;
-  text-transform: capitalize;
+  @include pageTitle;
 }
 
 .rowState {

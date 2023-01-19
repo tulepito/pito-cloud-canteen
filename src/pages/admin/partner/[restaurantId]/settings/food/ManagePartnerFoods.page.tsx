@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
 import Button, { InlineTextButton } from '@components/Button/Button';
@@ -19,7 +20,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
-import { getTableDataForExport, makeCsv } from '@utils/csv';
+import { makeCsv } from '@utils/csv';
 import { parseTimestaimpToFormat } from '@utils/dates';
 import {
   CATEGORY_OPTIONS,

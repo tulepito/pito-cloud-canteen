@@ -3,8 +3,7 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .title {
-  font-weight: $fontWeightRegular;
-  font-size: 20px;
+  @include pageTitle;
 }
 
 .descriptionRow {
