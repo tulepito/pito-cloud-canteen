@@ -38,14 +38,15 @@ const BookerOrderDetailsRoute = () => {
   }, [isReady]);
 
   useEffect(() => {
-    if (!pageDataLoading) {
+    if (!pageDataLoading && companyId !== null) {
       const permissionData = companyData[companyId as string] || {};
+      console.log(permissionData.permission);
 
       if (permissionData.permission !== UserPermission.BOOKER) {
         push(generalPaths.Home);
       }
     }
-  }, []);
+  }, [companyId]);
 
   return (
     <>

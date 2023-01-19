@@ -42,7 +42,7 @@ const prepareData = ({ orderDetail = {} }: { orderDetail: TObject }) => {
 
           return foodFrequencyResult;
         },
-        [] as TObject,
+        {} as TObject,
       );
       const foodDataList = Object.values(foodDataMap);
       const summary = foodDataList.reduce(

@@ -34,21 +34,23 @@ const BadgeType = {
   WARNING: 'warning',
 };
 
-type TBadge = {
+type TBadgeProps = {
   type?: 'default' | 'processing' | 'error' | 'success' | 'warning';
   hasCloseIcon?: boolean;
   hasDotIcon?: boolean;
   onCloseIcon?: () => void;
   label: string;
+  className?: string;
 };
 
-const Badge: React.FC<TBadge> = (props) => {
+const Badge: React.FC<TBadgeProps> = (props) => {
   const {
     type = BadgeType.DEFAULT,
     hasCloseIcon = false,
     hasDotIcon = false,
     onCloseIcon,
     label,
+    className,
   } = props;
 
   const classesFormType = {
@@ -59,7 +61,11 @@ const Badge: React.FC<TBadge> = (props) => {
     [css.warning]: type === BadgeType.WARNING,
   };
 
-  const badgeContainerClassName = classNames(css.root, classesFormType);
+  const badgeContainerClassName = classNames(
+    css.root,
+    classesFormType,
+    className,
+  );
   const labelClasses = classNames(css.label, classesFormType);
   const badgeCloseClasses = classNames(classesFormType);
   const badgeDotClasses = classNames(css.badgeDot, classesFormType);

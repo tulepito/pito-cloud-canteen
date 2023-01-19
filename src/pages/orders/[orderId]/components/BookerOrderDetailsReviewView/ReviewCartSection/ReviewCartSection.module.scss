@@ -1,0 +1,100 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid $neutralGray4;
+  background-color: $neutralGray1;
+
+  .title {
+    @include textTemplate(20px, 700, 32px);
+    text-transform: capitalize;
+  }
+
+  .feeContainer {
+    .feeItem {
+      position: relative;
+      padding: 24px 0 8px;
+
+      &::after {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+
+        content: '';
+        background-color: $neutralGray3;
+      }
+
+      .feeItemContainer {
+        display: flex;
+        justify-content: space-between;
+
+        .label {
+          @include textTemplate(12px, 600, 16px);
+          display: flex;
+          align-items: center;
+          column-gap: 8px;
+
+          .VATBadge {
+            span {
+              color: $neutralGray5;
+            }
+          }
+        }
+
+        .totalWithoutVATLabel,
+        .fee {
+          @include textTemplate(14px, 700, 20px);
+        }
+
+        &.VATItemContainer {
+          color: $neutralGray5;
+        }
+      }
+
+      .totalWithVATLabel {
+        text-align: right;
+        @include textTemplate(14px, 700, 20px);
+        margin-bottom: 4px;
+      }
+
+      .totalWithVAT {
+        text-align: right;
+        @include textTemplate(24px, 700, 32px);
+      }
+
+      .PITOPoints {
+        text-align: right;
+        color: $primaryPri2;
+        @include textTemplate(14px, 700, 20px);
+      }
+
+      .totalDescription {
+        margin-top: 4px;
+        text-align: right;
+        color: $neutralGray5;
+        @include textTemplate(12px, 600, 16px);
+      }
+    }
+  }
+
+  .downloadPriceQuotation {
+    margin-top: 20px;
+    text-align: right;
+    color: $labelBlue2;
+    @include textTemplate(14px, 700, 24px);
+  }
+
+  .makePaymentButton {
+    width: 100%;
+    margin: 16px 0;
+  }
+
+  .overflowPackageInfo {
+    color: $sematicRed2;
+    @include textTemplate(12px, 600, 16px);
+  }
+}

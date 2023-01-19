@@ -42,6 +42,7 @@ const BookerOrderDetailsPage = () => {
     orderDeadline = 0,
     deadlineHour,
     staffName,
+    packagePerMember = 0,
   } = generalInfo || {};
   const { orderDetail } = get(planData, 'attributes.metadata', {});
   const { companyName } = get(companyData, 'attributes.profile.publicData', {});
@@ -69,6 +70,10 @@ const BookerOrderDetailsPage = () => {
     participantData,
     participants,
     orderDetail,
+  };
+  const reviewCartData = {
+    orderDetail,
+    packagePerMember,
   };
 
   const handleConfirmOrder = () => {
@@ -135,7 +140,7 @@ const BookerOrderDetailsPage = () => {
         />
       </div>
       <div className={css.rightPart}>
-        <ReviewCartSection className={css.cartRoot} />
+        <ReviewCartSection className={css.cartRoot} data={reviewCartData} />
       </div>
     </div>
   );
