@@ -35,15 +35,13 @@ enum EBookerOrderDetailsPageViewMode {
 
 const BookerOrderDetailsPage = () => {
   const [viewMode, setViewMode] = useState<EBookerOrderDetailsPageViewMode>(
-    EBookerOrderDetailsPageViewMode.review,
+    EBookerOrderDetailsPageViewMode.edit,
   );
   const { orderData, planData, participantData, companyData } = useAppSelector(
     (state) => state.BookerOrderManagement,
   );
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const currentUser = useAppSelector(currentUserSelector);
-  // eslint-disable-next-line unused-imports/no-unused-vars
-
   const [reviewInfoValues, setReviewInfoValues] =
     useState<TReviewInfoFormValues>();
 

@@ -175,10 +175,15 @@ const renderTableLayout = ({
       <tbody>
         {data.map((item: TObject) => {
           const {
-            memberData: { id: memberId, name: memberName, email: memberEmail },
+            memberData,
             foodData: { foodName = '', foodPrice = '' },
             status,
           } = item;
+          const {
+            id: memberId,
+            name: memberName,
+            email: memberEmail,
+          } = memberData || {};
 
           const formattedFoodPrice =
             typeof foodPrice === 'number'

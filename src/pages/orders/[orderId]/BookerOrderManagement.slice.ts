@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
 import {
+  addParticipantToOrderApi,
   addUpdateMemberOrder,
   deleteParticipantFromOrderApi,
   loadBookerOrderDataApi,
@@ -249,6 +250,39 @@ const disallowMember = createAsyncThunk(
   },
 );
 
+const addParticipant = createAsyncThunk(
+  'app/BookerOrderManagement/ADD_PARTICIPANT',
+  async (params: TObject, { getState, dispatch }) => {
+    const { email } = params;
+    const { companyId } = getState().BookerOrderManagement;
+
+    const {
+      id: { uuid: orderId },
+      attributes: {
+        metadata: { participants = [] },
+      },
+    } = getState().BookerOrderManagement.orderData!;
+    const {
+      id: { uuid: planId },
+      attributes: {
+        metadata: { orderDetail },
+      },
+    } = getState().BookerOrderManagement.planData!;
+
+    const bodyParams = {
+      email,
+      companyId,
+      orderId,
+      planId,
+      participants,
+      orderDetail,
+    };
+
+    await addParticipantToOrderApi(orderId, bodyParams);
+    await dispatch(loadData(orderId));
+  },
+);
+
 const deleteParticipant = createAsyncThunk(
   'app/BookerOrderManagement/DELETE_PARTICIPANT',
   async (params: TObject, { getState, dispatch }) => {
@@ -270,8 +304,6 @@ const deleteParticipant = createAsyncThunk(
       (result, current) => {
         const [date, orderDetailOnDate] = current;
         const { memberOrders } = orderDetailOnDate as TObject;
-
-        omit(memberOrders, participantId);
 
         return {
           ...result,
@@ -302,6 +334,7 @@ export const BookerOrderManagementsThunks = {
   addOrUpdateMemberOrder,
   sendRemindEmailToMember,
   disallowMember,
+  addParticipant,
   deleteParticipant,
 };
 

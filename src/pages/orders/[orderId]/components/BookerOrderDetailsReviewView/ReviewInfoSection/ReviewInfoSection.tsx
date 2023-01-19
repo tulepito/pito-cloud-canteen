@@ -35,7 +35,6 @@ const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
     onSubmit,
     startSubmitReviewInfoForm,
   } = props;
-  console.log('🚀 ~ reviewInfoValues', reviewInfoValues);
   const intl = useIntl();
   const currentUser = useAppSelector(currentUserSelector);
 

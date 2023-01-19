@@ -10,6 +10,7 @@ import {
   BookerOrderManagementsThunks,
   orderDetailsAnyActionsInProgress,
 } from '../../../BookerOrderManagement.slice';
+import type { TAddParticipantFormValues } from './AddParticipantForm';
 import AddParticipantForm from './AddParticipantForm';
 import css from './BookerOrderDetailsManageParticipantsSection.module.scss';
 import BookerOrderDetailsParticipantCard from './BookerOrderDetailsParticipantCard';
@@ -116,11 +117,15 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
     setIsManageParticipantsModalOpen(false);
   };
 
+  const handleSubmitAddParticipant = ({ email }: TAddParticipantFormValues) => {
+    dispatch(BookerOrderManagementsThunks.addParticipant({ email }));
+  };
+
   return (
     <div className={rootClasses}>
       <div>{sectionTitle}</div>
 
-      <AddParticipantForm onSubmit={() => {}} />
+      <AddParticipantForm onSubmit={handleSubmitAddParticipant} />
       <div className={css.participantContainer}>
         {renderParticipantCards(
           data.participantData.slice(0, 4),
@@ -152,6 +157,7 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
         onClose={handleCloseManageParticipantModal}
         data={data}
         handleClickDeleteParticipant={handleClickDeleteParticipant}
+        onSubmitAddParticipant={handleSubmitAddParticipant}
       />
     </div>
   );

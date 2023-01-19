@@ -5,6 +5,7 @@ import type { TObject, TUser } from '@utils/types';
 import get from 'lodash/get';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import type { TAddParticipantFormValues } from './AddParticipantForm';
 import AddParticipantForm from './AddParticipantForm';
 import { isParticipantCompletedPickFood } from './BookerOrderDetailsManageParticipantsSection.helper';
 import BookerOrderDetailsParticipantCard from './BookerOrderDetailsParticipantCard';
@@ -125,6 +126,8 @@ type ManageParticipantsModalProps = {
     participantData: Array<TUser>;
     planData: TObject;
   };
+
+  onSubmitAddParticipant: (values: TAddParticipantFormValues) => void;
 };
 
 const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
