@@ -1,7 +1,7 @@
 import { InlineTextButton } from '@components/Button/Button';
-import IconDelete from '@components/IconDelete/IconDelete';
-import IconEdit from '@components/IconEdit/IconEdit';
+import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconDuplicate from '@components/Icons/IconDuplicate/IconDuplicate';
+import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
