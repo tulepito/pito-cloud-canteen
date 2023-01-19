@@ -62,31 +62,22 @@
         font-size: 14px;
       }
     }
-  }
 
-  .formRow {
-    margin: 10px;
-    .formCell {
-      width: 200px;
+    .formRow {
+      margin: 10px;
+      .formCell {
+        width: 200px;
+      }
     }
-  }
 
-  display: block;
-  width: 100%;
-  @include viewportLarge {
-    display: table-row-group;
-  }
-
-  .bodyRow {
     display: block;
     width: 100%;
-    margin-bottom: 40px;
     @include viewportLarge {
-      display: table-row;
+      display: table-row-group;
     }
-    .bodyCell {
-      display: flex;
-      justify-content: space-between;
+
+    .bodyRow {
+      display: block;
       width: 100%;
       margin-bottom: 40px;
       @include viewportLarge {
