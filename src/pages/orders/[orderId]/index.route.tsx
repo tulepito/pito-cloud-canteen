@@ -20,11 +20,7 @@ const BookerOrderDetailsRoute = () => {
   const pageDataLoading = useAppSelector(orderDetailsAnyActionsInProgress);
   const { companyId } = useAppSelector((state) => state.BookerOrderManagement);
   const currentUser = useAppSelector(currentUserSelector);
-  const companyData = get(
-    currentUser,
-    'attributes.profile.metadata.company',
-    {},
-  );
+  const companyData = get(currentUser, 'attributes.profile.metadata.company');
   const {
     isReady,
     query: { orderId },
@@ -38,15 +34,14 @@ const BookerOrderDetailsRoute = () => {
   }, [isReady]);
 
   useEffect(() => {
-    if (!pageDataLoading && companyId !== null) {
+    if (!pageDataLoading && companyData && companyId !== null) {
       const permissionData = companyData[companyId as string] || {};
-      console.log(permissionData.permission);
 
       if (permissionData.permission !== UserPermission.BOOKER) {
         push(generalPaths.Home);
       }
     }
-  }, [companyId]);
+  }, [pageDataLoading, companyId]);
 
   return (
     <>

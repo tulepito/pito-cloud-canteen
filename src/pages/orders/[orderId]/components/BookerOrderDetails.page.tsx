@@ -1,15 +1,21 @@
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import config from '@src/configs';
 import get from 'lodash/get';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { orderDetailsAnyActionsInProgress } from '../BookerOrderManagement.slice';
+import { calculateTotalPriceAndDishes } from '../helpers/cartInfoHelper';
+import { groupFoodOrderByDate } from '../helpers/orderDetailHelper';
 import css from './BookerOrderDetails.module.scss';
 import BookerOrderDetailsCountdownSection from './BookerOrderDetailsEditView/BookerOrderDetailsCountdownSection/BookerOrderDetailsCountdownSection';
 import BookerOrderDetailsManageOrdersSection from './BookerOrderDetailsEditView/BookerOrderDetailsManageOrdersSection/BookerOrderDetailsManageOrdersSection';
 import BookerOrderDetailsManageParticipantsSection from './BookerOrderDetailsEditView/BookerOrderDetailsManageParticipantsSection/BookerOrderDetailsManageParticipantsSection';
 import BookerOrderDetailsOrderLinkSection from './BookerOrderDetailsEditView/BookerOrderDetailsOrderLinkSection/BookerOrderDetailsOrderLinkSection';
 import BookerOrderDetailsTitle from './BookerOrderDetailsEditView/BookerOrderDetailsTitle/BookerOrderDetailsTitle';
+import BookerOrderDetailsPriceQuotation from './BookerOrderDetailsPriceQuotation/BookerOrderDetailsPriceQuotation';
 import ReviewCartSection from './BookerOrderDetailsReviewView/ReviewCartSection/ReviewCartSection';
 import type { TReviewInfoFormValues } from './BookerOrderDetailsReviewView/ReviewInfoSection/ReviewInfoForm';
 import ReviewInfoSection from './BookerOrderDetailsReviewView/ReviewInfoSection/ReviewInfoSection';
@@ -20,6 +26,7 @@ import ReviewTitleSection from './BookerOrderDetailsReviewView/ReviewTitleSectio
 enum EBookerOrderDetailsPageViewMode {
   edit = 'edit',
   review = 'review',
+  priceQuotation = 'priceQuotation',
 }
 
 const BookerOrderDetailsPage = () => {
@@ -30,8 +37,14 @@ const BookerOrderDetailsPage = () => {
     (state) => state.BookerOrderManagement,
   );
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const { title: orderTitle = '' } = orderData?.attributes || {};
+  const currentUser = useAppSelector(currentUserSelector);
+  // eslint-disable-next-line unused-imports/no-unused-vars
 
+  const [reviewInfoValues, setReviewInfoValues] =
+    useState<TReviewInfoFormValues>();
+
+  const { title: orderTitle = '' } = orderData?.attributes || {};
+  const { email: bookerEmail } = get(currentUser, 'attributes', '');
   const { generalInfo = {}, participants = [] } =
     orderData?.attributes?.metadata || {};
   const {
@@ -61,7 +74,31 @@ const BookerOrderDetailsPage = () => {
   };
 
   /* =============== Review data =============== */
+  const totalInfo = useMemo(
+    () => calculateTotalPriceAndDishes({ orderDetail }),
+    [orderDetail],
+  );
+  const foodOrderGroupedByDate = useMemo(
+    () => groupFoodOrderByDate({ orderDetail }),
+    [orderDetail],
+  );
+
+  const { totalPrice = 0, totalDishes = 0 } = totalInfo || {};
+  const PITOPoints = totalPrice / 100000;
+  const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
+
+  const VATFee = totalPrice * config.VATPercentage;
+  const serviceFee = 0;
+  const transportFee = 0;
+  const promotion = 0;
+  const totalWithoutVAT = totalPrice + serviceFee + transportFee - promotion;
+  const totalWithVAT = VATFee + totalWithoutVAT;
+  const overflow = isOverflowPackage
+    ? totalWithVAT - totalDishes * packagePerMember
+    : 0;
+
   const reviewInfoData = {
+    reviewInfoValues,
     deliveryAddress,
     staffName,
     companyName,
@@ -72,8 +109,39 @@ const BookerOrderDetailsPage = () => {
     orderDetail,
   };
   const reviewCartData = {
-    orderDetail,
-    packagePerMember,
+    overflow,
+    PITOPoints,
+    promotion,
+    serviceFee,
+    totalPrice,
+    totalWithoutVAT,
+    totalWithVAT,
+    transportFee,
+    VATFee,
+  };
+  /* =============== Price quotation data =============== */
+  const priceQuotationData = {
+    customerData: {
+      ...(reviewInfoValues || {}),
+      email: bookerEmail,
+    },
+    orderData: {
+      orderTitle,
+      companyName,
+      startDate,
+      endDate,
+    },
+    cartData: {
+      serviceFee: `${parseThousandNumber(serviceFee.toString())}đ`,
+      totalPrice: `${parseThousandNumber(totalPrice.toString())}đ`,
+      promotion: `${parseThousandNumber(promotion.toString())}đ`,
+      totalWithVAT: `${parseThousandNumber(totalWithVAT.toString())}đ`,
+      transportFee: `${parseThousandNumber(transportFee.toString())}đ`,
+      VATFee: `${parseThousandNumber(VATFee.toString())}đ`,
+    },
+    orderDetailData: {
+      foodOrderGroupedByDate,
+    },
   };
 
   const handleConfirmOrder = () => {
@@ -85,7 +153,17 @@ const BookerOrderDetailsPage = () => {
   };
 
   const handleSubmitReviewInfoForm = (_values: TReviewInfoFormValues) => {
-    console.log('🚀 ~ handleSubmitReviewInfoForm ~ _values', _values);
+    setReviewInfoValues(_values);
+  };
+
+  const handleDownloadPriceQuotation = () => {
+    // const printComponent = (
+    //   <BookerOrderDetailsPriceQuotation data={priceQuotationData} />
+    // );
+    // const string = renderToStaticMarkup(printComponent);
+    // const pdf: any = new JsPDF('p', 'mm', 'a4');
+    // pdf.fromHTML(string);
+    // pdf.save('pdf');
   };
 
   const EditView = (
@@ -125,6 +203,7 @@ const BookerOrderDetailsPage = () => {
       />
       <div className={css.leftPart}>
         <ReviewInfoSection
+          startSubmitReviewInfoForm={true}
           className={css.infoRoot}
           data={reviewInfoData}
           onSubmit={handleSubmitReviewInfoForm}
@@ -136,17 +215,23 @@ const BookerOrderDetailsPage = () => {
         />
         <ReviewOrderDetailsSection
           className={css.detailRoot}
-          orderDetail={orderDetail}
+          foodOrderGroupedByDate={foodOrderGroupedByDate}
         />
       </div>
       <div className={css.rightPart}>
-        <ReviewCartSection className={css.cartRoot} data={reviewCartData} />
+        <ReviewCartSection
+          className={css.cartRoot}
+          data={reviewCartData}
+          onClickDownloadPriceQuotation={handleDownloadPriceQuotation}
+        />
       </div>
     </div>
   );
 
   const renderView = () => {
     switch (viewMode) {
+      case EBookerOrderDetailsPageViewMode.priceQuotation:
+        return <BookerOrderDetailsPriceQuotation data={priceQuotationData} />;
       case EBookerOrderDetailsPageViewMode.review:
         return ReviewView;
       case EBookerOrderDetailsPageViewMode.edit:

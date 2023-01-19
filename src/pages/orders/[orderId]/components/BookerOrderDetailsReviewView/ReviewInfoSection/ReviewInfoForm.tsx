@@ -7,6 +7,7 @@ import {
   phoneNumberFormatValid,
   required,
 } from '@utils/validators';
+import { useEffect, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -21,7 +22,9 @@ export type TReviewInfoFormValues = {
   deliveryAddress: TObject;
 };
 
-type TExtraProps = {};
+type TExtraProps = {
+  startSubmit: boolean;
+};
 type TReviewInfoFormComponentProps = FormRenderProps<TReviewInfoFormValues> &
   Partial<TExtraProps>;
 type TReviewInfoFormProps = FormProps<TReviewInfoFormValues> & TExtraProps;
@@ -29,8 +32,9 @@ type TReviewInfoFormProps = FormProps<TReviewInfoFormValues> & TExtraProps;
 const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
   props,
 ) => {
+  const { handleSubmit, form, startSubmit, modifiedSinceLastSubmit } = props;
   const intl = useIntl();
-  const { handleSubmit } = props;
+  const [isMounted, setIsMounted] = useState(false);
 
   const companyNameField = {
     label: `1. ${intl.formatMessage({
@@ -61,6 +65,16 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
       id: 'ReviewInfoForm.staffNameField.label',
     })}`,
   };
+
+  useEffect(() => {
+    if (isMounted && (modifiedSinceLastSubmit || startSubmit)) {
+      form.submit();
+    }
+  }, [startSubmit, modifiedSinceLastSubmit, isMounted]);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <Form onSubmit={handleSubmit} className={css.formContainer}>

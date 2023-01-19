@@ -1,0 +1,193 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+@mixin cartColumnsLayout {
+  padding: 8px 16px;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  flex-direction: row;
+  column-gap: 2%;
+
+  & > div {
+    word-break: break-word;
+  }
+
+  & > div:nth-of-type(1) {
+    flex-basis: 30px;
+    text-align: center;
+  }
+  & > div:nth-of-type(2) {
+    flex-grow: 1;
+  }
+  & > div:nth-of-type(3) {
+    flex-basis: 140px;
+    text-align: right;
+  }
+}
+
+@mixin orderDetailColumnsLayout {
+  padding: 8px 16px;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  flex-direction: row;
+  column-gap: 2%;
+
+  & > div {
+    word-break: break-word;
+  }
+
+  & > div:nth-of-type(1) {
+    flex-basis: 30px;
+    text-align: center;
+  }
+  & > div:nth-of-type(2) {
+    flex-grow: 1;
+  }
+  & > div:nth-of-type(3) {
+    flex-basis: 50px;
+    text-align: right;
+  }
+  & > div:nth-of-type(4) {
+    flex-basis: 140px;
+    text-align: right;
+  }
+}
+
+.root {
+  padding: 32px 48px;
+  margin: 0 auto;
+  max-width: 600px;
+
+  .titleContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    @include textTemplate(16px, 700, 24px);
+
+    .PITOlogo {
+      width: 42px;
+      height: 22px;
+    }
+  }
+
+  .contentContainer {
+    .sectionTitle {
+      @include textTemplate(12px, 700, 16px);
+      margin-bottom: 8px;
+    }
+
+    .infoContainer {
+      position: relative;
+      padding: 24px 0;
+
+      display: flex;
+      flex-direction: row;
+      column-gap: 10%;
+
+      & > div {
+        flex-basis: 45%;
+      }
+
+      &::after {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+
+        content: '';
+        background-color: $neutralGray5;
+      }
+
+      .sectionContent {
+        @include textTemplate(12px, 400, 16px);
+
+        & > div span:first-of-type {
+          font-weight: 600;
+        }
+      }
+    }
+
+    .cartSection {
+      padding-top: 20px;
+
+      .sectionTitle {
+        margin-bottom: 16px;
+      }
+
+      .sectionContentContainer {
+        border: 1px solid $neutralGray3;
+        border-radius: 8px;
+        overflow: hidden;
+
+        .tableHead {
+          @include cartColumnsLayout;
+          background-color: $neutralGray2;
+          @include textTemplate(10px, 700, 16px);
+          border-bottom: 1px solid $neutralGray4;
+        }
+
+        .tableRow {
+          @include cartColumnsLayout;
+          @include textTemplate(12px, 400, 16px);
+          border-bottom: 1px solid $neutralGray3;
+
+          &:last-of-type {
+            border-bottom: none;
+            @include textTemplate(14px, 700, 20px);
+          }
+        }
+      }
+    }
+
+    .orderDetailSection {
+      padding-top: 20px;
+
+      .sectionTitle {
+        margin-bottom: 16px;
+      }
+
+      .sectionContentContainer {
+        border: 1px solid $neutralGray3;
+        border-radius: 8px;
+        overflow: hidden;
+
+        .tableHead {
+          @include orderDetailColumnsLayout;
+          background-color: $neutralGray2;
+          @include textTemplate(10px, 700, 16px);
+          border-bottom: 1px solid $neutralGray4;
+        }
+
+        .tableRowGroup {
+          &:last-of-type {
+            border-radius: 0 0 8px 8px;
+          }
+
+          .groupTitle,
+          .row {
+            @include orderDetailColumnsLayout;
+          }
+
+          .groupTitle {
+            border-bottom: 1.5px solid $neutralGray4;
+            @include textTemplate(12px, 700, 16px);
+
+            .restaurantName {
+              @include textTemplate(10px, 400, 16px);
+              color: $neutralGray5;
+            }
+          }
+
+          .row {
+            @include textTemplate(12px, 400, 16px);
+            transition: 0.25s linear;
+          }
+        }
+      }
+    }
+  }
+}

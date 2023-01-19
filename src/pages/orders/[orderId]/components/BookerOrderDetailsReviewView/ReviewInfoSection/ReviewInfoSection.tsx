@@ -16,27 +16,36 @@ type TReviewInfoSectionProps = {
     deliveryAddress: TObject;
     staffName: string;
     companyName: string;
+    reviewInfoValues?: TReviewInfoFormValues;
   };
   onSubmit: (values: TReviewInfoFormValues) => void;
+
+  startSubmitReviewInfoForm: boolean;
 };
 
 const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
   const {
     className,
-    data: { deliveryAddress, staffName = '', companyName = '' },
+    data: {
+      deliveryAddress,
+      staffName = '',
+      companyName = '',
+      reviewInfoValues,
+    },
     onSubmit,
+    startSubmitReviewInfoForm,
   } = props;
+  console.log('🚀 ~ reviewInfoValues', reviewInfoValues);
   const intl = useIntl();
   const currentUser = useAppSelector(currentUserSelector);
 
   const rootClasses = classNames(css.root, className);
 
   const { address, origin } = deliveryAddress || {};
-  console.log(currentUser.attributes);
-
   const {
     profile: { displayName, protectedData: { phoneNumber = '' } = {} },
   } = currentUser.attributes || {};
+
   const formInitialValues = {
     staffName,
     companyName,
@@ -46,13 +55,18 @@ const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
     },
     contactPeopleName: displayName,
     contactPhoneNumber: phoneNumber,
+    ...(reviewInfoValues ? { ...reviewInfoValues } : {}),
   };
 
   return (
     <Collapsible
       label={intl.formatMessage({ id: 'ReviewInfoSection.title' })}
       className={rootClasses}>
-      <ReviewInfoForm onSubmit={onSubmit} initialValues={formInitialValues} />
+      <ReviewInfoForm
+        startSubmit={startSubmitReviewInfoForm}
+        onSubmit={onSubmit}
+        initialValues={formInitialValues}
+      />
     </Collapsible>
   );
 };

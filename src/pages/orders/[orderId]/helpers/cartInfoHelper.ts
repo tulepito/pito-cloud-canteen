@@ -1,0 +1,68 @@
+import { EParticipantOrderStatus } from '@utils/enums';
+import type { TObject } from '@utils/types';
+
+export const calculateTotalPriceAndDishes = ({
+  orderDetail = {},
+}: {
+  orderDetail: TObject;
+}) => {
+  return Object.entries(orderDetail).reduce(
+    (result, currentOrderDetailEntry) => {
+      const [, rawOrderDetailOfDate] = currentOrderDetailEntry;
+
+      const { memberOrders, foodList: foodListOfDate } =
+        rawOrderDetailOfDate as TObject;
+
+      const foodDataMap = Object.entries(memberOrders).reduce(
+        (foodFrequencyResult, currentMemberOrderEntry) => {
+          const [, memberOrderData] = currentMemberOrderEntry;
+          const { foodId, status } = memberOrderData as TObject;
+          const { foodName, foodPrice } = foodListOfDate[foodId];
+
+          if (status === EParticipantOrderStatus.joined && foodId !== '') {
+            const data = foodFrequencyResult[foodId] as TObject;
+            const { frequency } = data || {};
+
+            return {
+              ...foodFrequencyResult,
+              [foodId]: data
+                ? { ...data, frequency: frequency + 1 }
+                : { foodId, foodName, foodPrice, frequency: 1 },
+            };
+          }
+
+          return foodFrequencyResult;
+        },
+        {} as TObject,
+      );
+
+      const foodDataList = Object.values(foodDataMap);
+      const totalInfo = foodDataList.reduce(
+        (previousResult: TObject, current: TObject) => {
+          const { totalPrice, totalDishes } = previousResult;
+
+          const { frequency, foodPrice } = current;
+          return {
+            ...previousResult,
+            totalDishes: totalDishes + frequency,
+            totalPrice: totalPrice + foodPrice * frequency,
+          };
+        },
+        {
+          totalDishes: 0,
+          totalPrice: 0,
+        } as TObject,
+      );
+
+      return {
+        ...result,
+        totalPrice: result.totalPrice + totalInfo.totalPrice,
+        totalDishes: result.totalDishes + totalInfo.totalDishes,
+      };
+    },
+    {
+      totalDishes: 0,
+      totalPrice: 0,
+    } as TObject,
+  );
+};

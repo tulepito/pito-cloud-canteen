@@ -1,99 +1,26 @@
 import Collapsible from '@components/Collapsible/Collapsible';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './ReviewOrderDetailsSection.module.scss';
 
-const prepareData = ({ orderDetail = {} }: { orderDetail: TObject }) => {
-  return Object.entries(orderDetail).reduce(
-    (result, currentOrderDetailEntry, index) => {
-      const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
-
-      const {
-        memberOrders,
-        foodList: foodListOfDate,
-        restaurant: { restaurantName },
-      } = rawOrderDetailOfDate as TObject;
-
-      // Object.entries(foodListOfDate).reduce((result, foodData) => {}, );
-
-      const foodDataMap = Object.entries(memberOrders).reduce(
-        (foodFrequencyResult, currentMemberOrderEntry) => {
-          const [, memberOrderData] = currentMemberOrderEntry;
-          const { foodId, status } = memberOrderData as TObject;
-          const { foodName, foodPrice } = foodListOfDate[foodId];
-
-          if (status === EParticipantOrderStatus.joined && foodId !== '') {
-            const data = foodFrequencyResult[foodId] as TObject;
-            const { frequency } = data || {};
-
-            return {
-              ...foodFrequencyResult,
-              [foodId]: data
-                ? { ...data, frequency: frequency + 1 }
-                : { foodId, foodName, foodPrice, frequency: 1 },
-            };
-          }
-
-          return foodFrequencyResult;
-        },
-        {} as TObject,
-      );
-      const foodDataList = Object.values(foodDataMap);
-      const summary = foodDataList.reduce(
-        (previousResult: TObject, current: TObject) => {
-          const { totalPrice, totalDishes } = previousResult;
-          const { frequency, foodPrice } = current;
-
-          return {
-            ...previousResult,
-            totalDishes: totalDishes + frequency,
-            totalPrice: totalPrice + foodPrice * frequency,
-          };
-        },
-        {
-          totalDishes: 0,
-          totalPrice: 0,
-          restaurantName,
-        } as TObject,
-      );
-
-      return [
-        ...result,
-        {
-          date,
-          index,
-          ...summary,
-          foodDataList,
-        },
-      ];
-    },
-    [] as TObject[],
-  );
-};
-
 type TReviewOrderDetailsSectionProps = {
   className?: string;
-  orderDetail: TObject;
+  foodOrderGroupedByDate: TObject[];
 };
 
 const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
   props,
 ) => {
-  const { className, orderDetail } = props;
+  const { className, foodOrderGroupedByDate } = props;
   const intl = useIntl();
-  const preparedData = useMemo(
-    () => prepareData({ orderDetail }),
-    [orderDetail],
-  );
 
   const [isCollapsed, setIsCollapsed] = useState(
-    Array.from({ length: preparedData?.length }).fill(0),
+    Array.from({ length: foodOrderGroupedByDate?.length }).fill(0),
   );
 
   const rootClasses = classNames(css.root, className);
@@ -146,7 +73,7 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
         </div>
 
         <div className={css.tableBody}>
-          {preparedData.map((dateData) => {
+          {foodOrderGroupedByDate.map((dateData) => {
             const {
               date,
               totalDishes,

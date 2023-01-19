@@ -156,6 +156,8 @@ const deadlineTimeOptions = [
   '18:00',
 ];
 
+const VATPercentage = 0.1;
+
 const config = {
   env,
   dev,
@@ -177,6 +179,7 @@ const config = {
   facebookAppId,
   usingSSL,
   maps,
+  VATPercentage,
 };
 
 export default config;
