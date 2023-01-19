@@ -5,14 +5,16 @@ import {
   removeCover,
   resetInitialStates,
 } from '@redux/slices/partners.slice';
-import { isSignupEmailTakenError } from '@utils/errors';
+import { isSignUpEmailTakenError } from '@utils/errors';
 import { pickRenderableImages } from '@utils/images';
+import type { TObject } from '@utils/types';
 import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
 import EditPartnerWizard from '../components/EditPartnerWizard/EditPartnerWizard';
 
 const CreatePartnerPage: React.FC<any> = () => {
+  const intl = useIntl();
   const {
     uploadedAvatars,
     uploadAvatarError,
@@ -22,35 +24,29 @@ const CreatePartnerPage: React.FC<any> = () => {
     removedAvatarIds,
     uploadedCoversOrder,
     removedCoverIds,
-
     createDraftPartnerInProgress,
     createDraftPartnerError,
   } = useAppSelector((state) => state.partners);
   const dispatch = useAppDispatch();
 
-  const onAvatarUpload = (params: any) => {
+  const onAvatarUpload = (params: TObject) => {
     return dispatch(partnerThunks.requestAvatarUpload(params));
   };
   const onRemoveAvatar = (id: any) => {
     return dispatch(removeAvatar(id));
   };
-
-  const onCoverUpload = (params: any) => {
+  const onCoverUpload = (params: TObject) => {
     return dispatch(partnerThunks.requestCoverUpload(params));
   };
-
   const onRemoveCover = (id: any) => {
     return dispatch(removeCover(id));
   };
-
-  const onCreateDraftPartner = (body: any) =>
+  const onCreateDraftPartner = (body: TObject) =>
     dispatch(partnerThunks.createDraftPartner(body));
-
-  const intl = useIntl();
 
   const formError = createDraftPartnerError
     ? {
-        message: isSignupEmailTakenError(createDraftPartnerError)
+        message: isSignUpEmailTakenError(createDraftPartnerError)
           ? intl.formatMessage({
               id: 'CreateCompanyPage.createCompanyEmailAlreadyTaken',
             })

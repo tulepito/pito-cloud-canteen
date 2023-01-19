@@ -20,7 +20,7 @@ import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuConten
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import useBoolean from '@hooks/useBoolean';
 import classNames from 'classnames';
-import type { FocusEvent, KeyboardEvent } from 'react';
+import type { FocusEvent, KeyboardEvent, PropsWithChildren } from 'react';
 import React, { Children, cloneElement, useEffect, useRef } from 'react';
 
 import css from './ProfileMenu.module.scss';
@@ -39,18 +39,17 @@ const isControlledMenu = (
   return isOpenProp !== null && onToggleActiveProp !== null;
 };
 
-type TProfileMenu = {
+type TProfileMenuProps = PropsWithChildren<{
   className?: string;
   rootClassName?: string;
-  children: React.ReactNode;
   contentPosition?: string;
   contentPlacementOffset?: number;
   useArrow?: boolean;
   isOpen?: boolean;
   onToggleActive?: (e: boolean) => void;
-};
+}>;
 
-const ProfileMenu = (props: TProfileMenu) => {
+const ProfileMenu: React.FC<TProfileMenuProps> = (props) => {
   const {
     isOpen: isOpenProps = null,
     onToggleActive = null,

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
 import Form from '@components/Form/Form';
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import IconSort from '@components/Icons/IconSort/IconSort';
 import Pagination from '@components/Pagination/Pagination';
 import type { TPagination } from '@utils/types';
@@ -26,7 +26,7 @@ export type TRowData = {
   data: any;
 };
 
-type TTable = {
+type TTableProps = {
   columns: TColumn[];
   data: TRowData[];
   rootClassName?: string;
@@ -61,7 +61,7 @@ const getUniqueString = (list: string[]) => {
   });
 };
 
-const Table = (props: TTable) => {
+const Table = (props: TTableProps) => {
   const {
     columns = [],
     data = [],
@@ -139,6 +139,7 @@ const Table = (props: TTable) => {
               <td className={classNames(tableHeadCellClassName, css.headCell)}>
                 <FieldCheckbox
                   labelClassName={css.checkboxLabel}
+                  svgClassName={css.checkboxSvg}
                   customOnChange={customOnChange}
                   name="checkAll"
                   id="checkAll"
@@ -219,7 +220,7 @@ const Table = (props: TTable) => {
                       labelClassName={css.checkboxLabel}
                       name="rowCheckbox"
                       id={`rowCheckbox.${row.key}`}
-                      value={row.key}
+                      value={row.key as any}
                       label=" "
                       customOnChange={rowCheckboxChange}
                     />
@@ -255,7 +256,7 @@ const Table = (props: TTable) => {
   );
 };
 
-export const TableForm = (props: TTable) => {
+export const TableForm: React.FC<TTableProps> = (props) => {
   const { rootClassName, onSubmit, initialValues, exposeValues, ...rest } =
     props;
   const rootClasses = classNames(css.root, rootClassName);

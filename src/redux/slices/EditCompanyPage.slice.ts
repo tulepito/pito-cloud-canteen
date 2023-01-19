@@ -1,23 +1,23 @@
-import type { ThunkAPI } from '@redux/store';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 import { showCompanyApi, updateCompanyApi } from '@utils/api';
 import { denormalisedResponseEntities } from '@utils/data';
 import { storableError } from '@utils/errors';
 
-interface EditCompanyState {
+type EditCompanyState = {
   companyRef: any;
   showCompanyInProgress: boolean;
   showCompanyError: any;
   updateCompanyInProgress: boolean;
   updateCompanyError: any;
-}
+};
 
 const UPDATE_COMPANY = 'app/UpdateCompanyPage/UPDATE_COMPANY';
 const SHOW_COMPANY = 'app/UpdateCompanyPage/SHOW_COMPANY';
 
 const updateCompany = createAsyncThunk(
   UPDATE_COMPANY,
-  async (userData: any, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (userData: any, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { data } = await updateCompanyApi(userData);
       const [company] = denormalisedResponseEntities(data);
@@ -31,7 +31,7 @@ const updateCompany = createAsyncThunk(
 
 const showCompany = createAsyncThunk(
   SHOW_COMPANY,
-  async (id: string, { fulfillWithValue, rejectWithValue }: ThunkAPI) => {
+  async (id: string, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { data } = await showCompanyApi(id);
       const [company] = denormalisedResponseEntities(data);

@@ -1,4 +1,5 @@
 import Button from '@components/Button/Button';
+import classNames from 'classnames';
 import type { PropsWithChildren, ReactNode } from 'react';
 
 import css from './AlertModal.module.scss';
@@ -15,6 +16,7 @@ type TAlertModal = {
   onConfirm: () => void;
   confirmDisabled?: boolean;
   confirmInProgress?: boolean;
+  containerClassName?: string;
 };
 
 const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
@@ -28,13 +30,14 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
   onConfirm,
   confirmInProgress,
   confirmDisabled,
+  containerClassName,
 }) => {
   return (
     <Modal
       title={title}
       isOpen={isOpen}
       handleClose={handleClose}
-      containerClassName={css.container}>
+      containerClassName={classNames(css.container, containerClassName)}>
       <div className={css.children}>{children}</div>
       <div className={css.actions}>
         <Button className={css.reject} size="medium" onClick={onCancel}>

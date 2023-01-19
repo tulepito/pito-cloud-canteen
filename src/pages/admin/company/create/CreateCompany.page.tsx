@@ -3,7 +3,7 @@ import {
   clearError,
   createCompanyPageThunks,
 } from '@redux/slices/CreateCompanyPage.slice';
-import { isSignupEmailTakenError } from '@utils/errors';
+import { isSignUpEmailTakenError } from '@utils/errors';
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -66,7 +66,7 @@ export default function CreateCompanyPage() {
     );
   };
 
-  const formErrorMessage = isSignupEmailTakenError(createCompanyError)
+  const formErrorMessage = isSignUpEmailTakenError(createCompanyError)
     ? intl.formatMessage({
         id: 'CreateCompanyPage.createCompanyEmailAlreadyTaken',
       })
@@ -76,6 +76,7 @@ export default function CreateCompanyPage() {
 
   useEffect(() => {
     dispatch(clearError());
+
     return () => {
       dispatch(clearError());
     };

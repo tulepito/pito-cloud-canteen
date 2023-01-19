@@ -9,8 +9,8 @@
  * name and the docstring of the function to ensure correct usage.
  */
 
+import { EErrorCode } from './enums';
 import type { TError, TSharetribeFlexSdkApiError } from './types';
-import { ErrorCodes } from './types';
 
 const errorAPIErrors = (error: TError) => {
   return error && error.apiErrors ? error.apiErrors : [];
@@ -33,15 +33,15 @@ const responseAPIErrors = (error: any) => {
  * Check if the given API error (from `sdk.currentuser.create()`) is
  * due to the email address already being in use.
  */
-export const isSignupEmailTakenError = (error: TError) =>
-  hasErrorWithCode(error, ErrorCodes.ERROR_CODE_EMAIL_TAKEN);
+export const isSignUpEmailTakenError = (error: TError) =>
+  hasErrorWithCode(error, EErrorCode.emailTaken);
 
 /**
  * Check if the given API error (from `sdk.currentuser.changeEmail()`) is
  * due to the email address already being in use.
  */
 export const isChangeEmailTakenError = (error: TError) =>
-  hasErrorWithCode(error, ErrorCodes.ERROR_CODE_EMAIL_TAKEN);
+  hasErrorWithCode(error, EErrorCode.emailTaken);
 
 /**
  * Check if the given API error (from
@@ -53,7 +53,7 @@ export const isChangeEmailTakenError = (error: TError) =>
  * request sending new verification emails.
  */
 export const isTooManyEmailVerificationRequestsError = (error: TError) =>
-  hasErrorWithCode(error, ErrorCodes.ERROR_CODE_TOO_MANY_VERIFICATION_REQUESTS);
+  hasErrorWithCode(error, EErrorCode.tooManyVerificationRequests);
 
 /**
  * Check if the given API error (from
@@ -61,14 +61,14 @@ export const isTooManyEmailVerificationRequestsError = (error: TError) =>
  * the size limit.
  */
 export const isUploadImageOverLimitError = (error: TError) =>
-  hasErrorWithCode(error, ErrorCodes.ERROR_CODE_UPLOAD_OVER_LIMIT);
+  hasErrorWithCode(error, EErrorCode.uploadOverLimit);
 
 /**
  * Check if the given API error (from `sdk.passwordReset.request()`)
  * is due to no user having the given email address.
  */
 export const isPasswordRecoveryEmailNotFoundError = (error: TError) =>
-  hasErrorWithCode(error, ErrorCodes.ERROR_CODE_EMAIL_NOT_FOUND);
+  hasErrorWithCode(error, EErrorCode.emailNotFound);
 
 /**
  * Check if the given API error (from `sdk.transaction.initiate()` or
@@ -76,7 +76,7 @@ export const isPasswordRecoveryEmailNotFoundError = (error: TError) =>
  * being closed or deleted.
  */
 export const isTransactionInitiateListingNotFoundError = (error: TError) =>
-  hasErrorWithCode(error, ErrorCodes.ERROR_CODE_TRANSACTION_LISTING_NOT_FOUND);
+  hasErrorWithCode(error, EErrorCode.transactionListingNotFound);
 
 /**
  * Check if the given API error (from `sdk.transaction.initiate()` or
@@ -84,7 +84,7 @@ export const isTransactionInitiateListingNotFoundError = (error: TError) =>
  * connection from the listing author.
  */
 export const isTransactionInitiateMissingStripeAccountError = (error: TError) =>
-  hasErrorWithCode(error, ErrorCodes.ERROR_CODE_MISSING_STRIPE_ACCOUNT);
+  hasErrorWithCode(error, EErrorCode.missingStripeAccount);
 
 /**
  * Check if the given API error (from `sdk.transaction.initiate()` or
@@ -93,18 +93,14 @@ export const isTransactionInitiateMissingStripeAccountError = (error: TError) =>
  */
 export const isTransactionInitiateBookingTimeNotAvailableError = (
   error: TError,
-) =>
-  hasErrorWithCode(
-    error,
-    ErrorCodes.ERROR_CODE_TRANSACTION_BOOKING_TIME_NOT_AVAILABLE,
-  );
+) => hasErrorWithCode(error, EErrorCode.transactionBookingTimeNotAvailable);
 
 /**
  * Check if the given API error (from `sdk.transaction.initiate()` or
  * `sdk.transaction.initiateSpeculative()`) is due to payment being zero.
  */
 export const isTransactionZeroPaymentError = (error: TError) =>
-  hasErrorWithCode(error, ErrorCodes.ERROR_CODE_CHARGE_ZERO_PAYIN);
+  hasErrorWithCode(error, EErrorCode.chargeZeroPayin);
 
 /**
  * Check if the given API error (from `sdk.transactions.transition(id, transition, params)`)
@@ -113,7 +109,7 @@ export const isTransactionZeroPaymentError = (error: TError) =>
 export const isTransactionsTransitionInvalidTransition = (error: TError) =>
   error &&
   error.status === 409 &&
-  hasErrorWithCode(error, ErrorCodes.ERROR_CODE_TRANSACTION_INVALID_TRANSITION);
+  hasErrorWithCode(error, EErrorCode.transactionInvalidTransition);
 
 /**
  * Check if the given API error (from `sdk.transactions.transition(id, transition, params)`)
@@ -122,14 +118,8 @@ export const isTransactionsTransitionInvalidTransition = (error: TError) =>
 export const isTransactionsTransitionAlreadyReviewed = (error: TError) =>
   error &&
   error.status === 409 &&
-  (hasErrorWithCode(
-    error,
-    ErrorCodes.ERROR_CODE_TRANSACTION_ALREADY_REVIEWED_BY_CUSTOMER,
-  ) ||
-    hasErrorWithCode(
-      error,
-      ErrorCodes.ERROR_CODE_TRANSACTION_ALREADY_REVIEWED_BY_PROVIDER,
-    ));
+  (hasErrorWithCode(error, EErrorCode.transactionAlreadyReviewedByCustomer) ||
+    hasErrorWithCode(error, EErrorCode.transactionAlreadyReviewedByProvider));
 
 /**
  * Check if the given API error (from `sdk.currentUser.changeEmail(params)`)
@@ -145,7 +135,7 @@ export const isChangeEmailWrongPassword = (error: TError) =>
 export const isChangePasswordWrongPassword = (error: TError) =>
   error && error.status === 403;
 
-export const storableError = (error: any) => {
+export const storableError = (error: any): TError => {
   const err = error || {};
   const { name, message, status, statusText } = err;
   // Status, statusText, and data.errors are (possibly) added to the error object by SDK
@@ -162,7 +152,7 @@ export const storableError = (error: any) => {
   };
 };
 
-export const responseApiErrorInfo = (error: any) =>
+export const responseApiErrorInfo = (error: TError) =>
   responseAPIErrors(error).map((e: any) => ({
     status: e.status,
     code: e.code,

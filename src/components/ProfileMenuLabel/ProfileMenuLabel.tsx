@@ -4,21 +4,20 @@
  */
 import useBoolean from '@hooks/useBoolean';
 import classNames from 'classnames';
-import type { MouseEvent, ReactNode } from 'react';
+import type { MouseEvent, PropsWithChildren } from 'react';
 import React from 'react';
 
 import css from './ProfileMenuLabel.module.scss';
 
-type TProfileMenuLabel = {
-  children: ReactNode;
+type TProfileMenuLabelProps = PropsWithChildren<{
+  rootClassName?: string;
   className?: string;
   isOpenClassName?: string;
   isOpen?: boolean;
   onToggleActive?: () => void;
-  rootClassName?: string;
-};
+}>;
 
-const ProfileMenuLabel = (props: TProfileMenuLabel) => {
+const ProfileMenuLabel: React.FC<TProfileMenuLabelProps> = (props) => {
   const { value: clickedWithMouse, setValue: setClickedWithMouse } =
     useBoolean(false);
 

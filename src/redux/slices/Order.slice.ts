@@ -10,6 +10,7 @@ import {
 } from '@utils/orderApi';
 import type { TListing, TPagination } from '@utils/types';
 import cloneDeep from 'lodash/cloneDeep';
+import { DateTime } from 'luxon';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
 
@@ -33,7 +34,7 @@ const updateSetUpPlan = ({
   return newOrderDetail;
 };
 
-interface OrderInitialState {
+type OrderInitialState = {
   order: TListing | null;
   plans: TListing[];
   createOrderInProcess: boolean;
@@ -52,7 +53,7 @@ interface OrderInitialState {
   queryOrderInProgress: boolean;
   queryOrderError: any;
   manageOrdersPagination: TPagination;
-}
+};
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
 const ADD_MEAL_PLAN_DETAIL = 'app/Order/ADD_MEAL_PLAN_DETAIL';
@@ -91,11 +92,18 @@ const createOrder = createAsyncThunk(
   async (staffName: string, { getState }) => {
     const { draftOrder } = getState().Order;
     const { clientId, orderDetail, ...rest } = draftOrder;
+    const { deadlineDate, deadlineHour } = rest;
+    const parsedDeadlineDate =
+      DateTime.fromMillis(deadlineDate).toFormat('yyyy-MM-dd');
+    const orderDeadline = DateTime.fromISO(
+      `${parsedDeadlineDate}T${deadlineHour}:00`,
+    ).toMillis();
     const apiBody = {
       companyId: clientId,
       generalInfo: {
         ...rest,
         staffName,
+        orderDeadline,
       },
       orderDetail,
     };

@@ -1,6 +1,6 @@
 import { types as sdkTypes } from '@helpers/sdkLoader';
 import { ListingTypes } from '@src/types/listingTypes';
-import type { CYCLE_MENU_KEY, FIXED_MENU_KEY } from '@utils/errors';
+import type { EMenuTypes } from '@utils/enums';
 import { getSubmitImageId, getUniqueImages } from '@utils/images';
 import type { TImage } from '@utils/types';
 
@@ -11,7 +11,7 @@ export type TEditPartnerFoodFormValues = {
   images: TImage[];
   addImages: TImage[] | number[];
   title: string;
-  menuType: typeof FIXED_MENU_KEY | typeof CYCLE_MENU_KEY;
+  menuType: typeof EMenuTypes.fixedMenu | typeof EMenuTypes.cycleMenu;
   minOrderHourInAdvance: string;
   minQuantity: string;
   maxMember: string;

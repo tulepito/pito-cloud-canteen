@@ -26,7 +26,6 @@ export const getTableDataForExport = (tableData: any[], columns: TColumn[]) => {
 export const makeCsv = async (rows: any[], filename: string) => {
   const separator: string = ';';
   const keys: string[] = Object.keys(rows[0]);
-  console.log(rows);
   const csvContent = `${keys.join(separator)}\n${rows
     .map((row) =>
       keys

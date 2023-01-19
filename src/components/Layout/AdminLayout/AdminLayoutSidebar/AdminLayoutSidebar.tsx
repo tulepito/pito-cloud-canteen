@@ -1,0 +1,26 @@
+/**
+ * This is a wrapper component for different Layouts.
+ * Topbar should be added to this wrapper.
+ */
+import classNames from 'classnames';
+import type { PropsWithChildren } from 'react';
+import React from 'react';
+
+import css from './AdminLayoutSidebar.module.scss';
+
+type TAdminLayoutSidebarProps = PropsWithChildren<{
+  rootClassName?: string;
+  className?: string;
+  isMenuOpen?: boolean;
+}>;
+
+const AdminLayoutSidebar: React.FC<TAdminLayoutSidebarProps> = (props) => {
+  const { className, rootClassName, children, isMenuOpen } = props;
+  const classes = classNames(rootClassName || css.root, className, {
+    [css.menuOpen]: isMenuOpen,
+  });
+
+  return <div className={classes}>{children}</div>;
+};
+
+export default AdminLayoutSidebar;

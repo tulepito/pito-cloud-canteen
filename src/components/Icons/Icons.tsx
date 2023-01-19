@@ -6,6 +6,7 @@ type IconProps = {
 export const DownloadInvoice: React.FC<IconProps> = ({ className }) => {
   return (
     <svg
+      preserveAspectRatio="none"
       className={className}
       width="24"
       height="24"
@@ -25,6 +26,7 @@ export const DownloadInvoice: React.FC<IconProps> = ({ className }) => {
 export const Close: React.FC<IconProps> = ({ className, onClick }) => {
   return (
     <svg
+      preserveAspectRatio="none"
       className={className}
       onClick={onClick}
       width="24"

@@ -1,5 +1,5 @@
-import FieldPhotoUpload from '@components/FieldPhotoUpload/FieldPhotoUpload';
-import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
+import FieldPhotoUpload from '@components/FormFields/FieldPhotoUpload/FieldPhotoUpload';
+import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import { nonEmptyImage } from '@utils/validators';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';
@@ -7,6 +7,10 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './FieldRadioButtonPhoto.module.scss';
+
+type TImageUploadFnReturnValue = {
+  payload: Record<any, any>;
+};
 
 type TFieldRadioButtonPhoto = {
   name: string;
@@ -18,7 +22,10 @@ type TFieldRadioButtonPhoto = {
   image: any;
   accept: string;
   variants: string[];
-  onImageUpload: (e: any) => void;
+  onImageUpload: (params: {
+    id: string;
+    file: File;
+  }) => Promise<TImageUploadFnReturnValue>;
   onRemoveImage: (e: any) => void;
   uploadImageError: any;
 };
@@ -55,6 +62,7 @@ const FieldRadioButtonPhoto: React.FC<TFieldRadioButtonPhoto> = (props) => {
             />
             {values[name]?.status === 'yes' && opt.hasImage && (
               <FieldPhotoUpload
+                id={`${name}.image`}
                 name={`${name}.image`}
                 className={css.inputImage}
                 image={image}

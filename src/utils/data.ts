@@ -1,4 +1,5 @@
 import { sanitizeEntity } from '@utils/sanitize';
+import merge from 'lodash/merge';
 import reduce from 'lodash/reduce';
 
 import type {
@@ -7,6 +8,7 @@ import type {
   TCurrentUser,
   TLineItemCode,
   TListing,
+  TObject,
   TOwnListing,
   TTimeSlot,
   TTransaction,
@@ -58,14 +60,11 @@ export const combinedResourceObjects = (oldRes: any, newRes: any) => {
  * Combine the resource objects form the given api response to the
  * existing entities.
  */
-export const updatedEntities = (
-  oldEntities: Record<string, any>,
-  apiResponse: any,
-) => {
+export const updatedEntities = (oldEntities: TObject, apiResponse: any) => {
   const { data, included = [] } = apiResponse;
   const objects = (Array.isArray(data) ? data : [data]).concat(included);
 
-  const newEntities = objects.reduce((entities: Record<string, any>, curr) => {
+  const newEntities = objects.reduce((entities: TObject, curr) => {
     const { id, type } = curr;
 
     // Some entities (e.g. listing and user) might include extended data,
@@ -239,7 +238,7 @@ export const ensureOwnListing = (listing: any) => {
  */
 export const ensureUser = (user: TUser) => {
   const empty = { id: null, type: 'user', attributes: { profile: {} } };
-  return { ...empty, ...user };
+  return merge(empty, user);
 };
 
 /**
@@ -247,11 +246,16 @@ export const ensureUser = (user: TUser) => {
  *
  * @param {Object} current user entity object, which is to be ensured against null values
  */
-export const ensureCurrentUser = (user: TCurrentUser) => {
+export const ensureCurrentUser = (user: any) => {
   const empty = {
     id: null,
     type: 'currentUser',
-    attributes: { profile: {} },
+    attributes: {
+      profile: {},
+      emailVerified: false,
+      banned: false,
+      deleted: false,
+    },
     profileImage: {},
   };
   return { ...empty, ...user };
@@ -436,9 +440,11 @@ export const CURRENT_USER = (user: TCurrentUser) => {
 export const USER = (user: TUser) => {
   const ensuredUser = ensureUser(user);
   const id = ensuredUser?.id?.uuid;
-  const attributes = ensuredUser?.attributes || {};
-  const profile = attributes?.profile || {};
-  const { privateData, publicData, protectedData, metadata } = profile;
+  const { attributes } = ensuredUser;
+  const { profile } = attributes;
+  const { privateData, publicData, protectedData, metadata } =
+    profile as TObject;
+
   return {
     getId: () => {
       return id;

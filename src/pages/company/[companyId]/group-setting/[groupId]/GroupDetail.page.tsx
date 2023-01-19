@@ -1,8 +1,8 @@
 import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
-import IconArrow from '@components/IconArrow/IconArrow';
-import IconDelete from '@components/IconDelete/IconDelete';
-import IconSpinner from '@components/IconSpinner/IconSpinner';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import IconDelete from '@components/Icons/IconDelete/IconDelete';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -11,6 +11,7 @@ import {
   addWorkspaceCompanyId,
   BookerManageCompany,
 } from '@src/redux/slices/company.slice';
+import type { TObject } from '@utils/types';
 import filter from 'lodash/filter';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -46,8 +47,7 @@ const GroupDetailPage = () => {
     setTrue: openDeleteGroupConfirmationModal,
   } = useBoolean();
 
-  const [deletingMemberInfo, setDeletingMemberInfo] =
-    useState<Record<string, any>>();
+  const [deletingMemberInfo, setDeletingMemberInfo] = useState<TObject>();
 
   const { name, description } = useAppSelector(
     (state) => state.company.groupInfo,

@@ -1,6 +1,6 @@
 import Badge from '@components/Badge/Badge';
-import IconPlusDish from '@components/IconPlusDish/IconPlusDish';
-import IconCheckmarkWithCircle from '@components/Icons/IconCheckmarkWithCircle';
+import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
+import IconPlusDish from '@components/Icons/IconPlusDish/IconPlusDish';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { shopingCartThunks } from '@redux/slices/shopingCart.slice';
 import { LISTING } from '@utils/data';
@@ -9,7 +9,7 @@ import Image from 'next/image';
 
 import css from './ListingCard.module.scss';
 
-type TListCard = {
+type TListCardProps = {
   className?: string;
   listing: any;
   planId: string;
@@ -18,7 +18,7 @@ type TListCard = {
   selectDisabled?: boolean;
 };
 
-const ListingCard: React.FC<TListCard> = ({
+const ListingCard: React.FC<TListCardProps> = ({
   className,
   listing,
   planId,

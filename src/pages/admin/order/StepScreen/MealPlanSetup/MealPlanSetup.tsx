@@ -33,8 +33,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       clientId,
       dayInWeek,
       packagePerMember = '',
-      vatAllow,
-      pickAllow,
+      vatAllow = true,
+      pickAllow = true,
       selectedGroups,
       deliveryHour,
       startDate,
@@ -62,6 +62,10 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     const {
       deliveryAddress: deliveryAddressValues,
       packagePerMember: packagePerMemberValue,
+      pickAllow: pickAllowSubmitValue,
+      deadlineDate: deadlineDateSubmitValue,
+      deadlineHour: deadlineHourSubmitValue,
+      selectedGroups: selectedGroupsSubmitValue,
       ...rest
     } = values;
     const {
@@ -72,7 +76,11 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         address: addressValue,
         origin: originValue,
       },
+      pickAllow: pickAllowSubmitValue,
       packagePerMember: +packagePerMemberValue.replace(/,/g, ''),
+      selectedGroups: pickAllowSubmitValue ? selectedGroupsSubmitValue : [],
+      deadlineDate: pickAllowSubmitValue ? deadlineDateSubmitValue : null,
+      deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
       ...rest,
     };
     dispatch(updateDraftMealPlan(createOrderValue));
@@ -80,19 +88,19 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   };
   const initialValues = useMemo(
     () => ({
+      vatAllow,
+      pickAllow,
       dayInWeek: dayInWeek || [],
       packagePerMember: addCommas(packagePerMember?.toString()) || '',
-      vatAllow: vatAllow || true,
-      pickAllow: pickAllow || true,
       selectedGroups: selectedGroups || ['allMembers'],
       deliveryHour: deliveryHour || '07:00',
       deliveryAddress:
         location || deliveryAddress
           ? {
-              search: defaultAddress || address,
+              search: address || defaultAddress,
               selectedPlace: {
-                address: defaultAddress || address,
-                origin: defautlOrigin || origin,
+                address: address || defaultAddress,
+                origin: origin || defautlOrigin,
               },
             }
           : null,
@@ -126,6 +134,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       onSubmit={onSubmit}
       render={(formRenderProps: FormRenderProps) => {
         const { handleSubmit, form, values } = formRenderProps;
+        const { pickAllow: pickAllowValue = true } = values;
         return (
           <Form onSubmit={handleSubmit}>
             <div className={css.fieldSection}>
@@ -139,30 +148,40 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
               />
             </div>
             <div className={css.fieldSection}>
-              <MealPlanDateField form={form} values={values} />
+              <MealPlanDateField
+                form={form}
+                values={values}
+                title={intl.formatMessage({ id: 'MealPlanDateField.title' })}
+              />
               <div className={css.verticalSpace}>
                 <DayInWeekField form={form} values={values} />
               </div>
             </div>
-            {/* <NutritionField /> */}
+
             <div className={css.fieldSection}>
               <FoodPickingField />
-              <div className={css.verticalSpace}>
-                <OrderDeadlineField
-                  title={intl.formatMessage({ id: 'OrderDeadlineField.title' })}
-                  form={form}
-                  values={values}
-                />
-              </div>
-              <div className={css.verticalSpace}>
-                <ParticipantSetupField
-                  form={form}
-                  clientId={clientId}
-                  title={intl.formatMessage({
-                    id: 'ParticipantSetupField.title',
-                  })}
-                />
-              </div>
+              {pickAllowValue && (
+                <div className={css.verticalSpace}>
+                  <OrderDeadlineField
+                    title={intl.formatMessage({
+                      id: 'OrderDeadlineField.title',
+                    })}
+                    form={form}
+                    values={values}
+                  />
+                </div>
+              )}
+              {pickAllowValue && (
+                <div className={css.verticalSpace}>
+                  <ParticipantSetupField
+                    form={form}
+                    clientId={clientId}
+                    title={intl.formatMessage({
+                      id: 'ParticipantSetupField.title',
+                    })}
+                  />
+                </div>
+              )}
             </div>
 
             <NavigateButtons goBack={goBack} />

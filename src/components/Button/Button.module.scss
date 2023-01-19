@@ -2,7 +2,7 @@
 @use '/src/styles/mixins.scss' as *;
 
 .root {
-  @include button;
+  @include buttonStyles;
   @include buttonFont;
   @include buttonText;
   @include buttonBorders;
@@ -20,13 +20,6 @@
 .largeButton {
   min-height: 48px;
   font-size: 16px;
-}
-
-.spinner {
-  width: 24px;
-  height: 24px;
-  stroke: $neutralGray1;
-  stroke-width: 3px;
 }
 
 .checkmark {
@@ -69,7 +62,7 @@
   border: none;
 
   /* Colors */
-  color: $marketplaceColor;
+  color: $primaryPri2;
   background-color: transparent;
 
   /* Text size should be inherited */

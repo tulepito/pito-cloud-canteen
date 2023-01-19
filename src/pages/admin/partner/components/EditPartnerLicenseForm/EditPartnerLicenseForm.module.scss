@@ -38,12 +38,3 @@
   width: 100%;
   justify-content: space-between;
 }
-
-.secondaryButton {
-  background-color: $matterColorLight;
-  color: $neutralGray6;
-  border: 1px solid $neutralGray6;
-  &:hover {
-    background-color: $neutralGray11;
-  }
-}

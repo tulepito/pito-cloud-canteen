@@ -1,5 +1,5 @@
-import IconCheckmark from '@components/IconCheckmark/IconCheckmark';
-import IconSpinner from '@components/IconSpinner/IconSpinner';
+import IconCheckmark from '@components/Icons/IconCheckmark/IconCheckmark';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect, useState } from 'react';
@@ -8,7 +8,7 @@ import css from './ButtonIcon.module.scss';
 
 type TButtonSize = 'large' | 'medium' | 'small';
 
-type TButton = {
+type TButtonIconProps = PropsWithChildren<{
   rootClassName?: string;
   className?: string;
   spinnerClassName?: string;
@@ -17,7 +17,8 @@ type TButton = {
   disabled?: boolean;
   checkmarkClassName?: string;
   size?: TButtonSize;
-} & React.ComponentProps<'button'>;
+}> &
+  React.ComponentProps<'button'>;
 
 const getButtonSizeClassName = (size: string) => {
   switch (size) {
@@ -32,7 +33,7 @@ const getButtonSizeClassName = (size: string) => {
   }
 };
 
-const ButtonIcon = (props: PropsWithChildren<TButton>) => {
+const ButtonIcon: React.FC<TButtonIconProps> = (props) => {
   const [mounted, setMounted] = useState(false);
   const {
     rootClassName,

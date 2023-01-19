@@ -2,7 +2,7 @@
 @use '/src/styles/mixins.scss' as *;
 
 .root {
-  @include button;
+  @include buttonStyles;
   @include buttonFont;
   @include buttonText;
   @include buttonBorders;

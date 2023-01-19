@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import Button, { InlineTextButton } from '@components/Button/Button';
+import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
-import IconFilter from '@components/IconFilter/IconFilter';
+import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import AlertModal from '@components/Modal/AlertModal';
 import useBoolean from '@hooks/useBoolean';
 import type { FormApi } from 'final-form';
@@ -12,7 +12,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import css from './IntegrationFilterModal.module.scss';
 
 const IntegrationFilterModal = (props: any) => {
-  const { onSubmit, onClear, children, initialValues = {} } = props;
+  const { onSubmit, children, initialValues = {} } = props;
   const formRef = useRef<FormApi>();
   const {
     value: isOpen,
@@ -36,6 +36,7 @@ const IntegrationFilterModal = (props: any) => {
         onCancel={onClose}
         onConfirm={handleSubmit}
         isOpen={isOpen}
+        containerClassName={css.container}
         handleClose={onClose}
         cancelLabel={intl.formatMessage({
           id: 'IntegrationFilterModal.filterFormDiscardBtn',
@@ -47,19 +48,11 @@ const IntegrationFilterModal = (props: any) => {
           initialValues={initialValues}
           onSubmit={onSubmit}
           render={(fieldRenderProps) => {
-            const { handleSubmit, form } = fieldRenderProps;
+            const { handleSubmit, form, values } = fieldRenderProps;
             formRef.current = form;
             return (
               <Form className={css.filterForm} onSubmit={handleSubmit}>
-                <>
-                  {children}
-                  <InlineTextButton
-                    onClick={onClear}
-                    type="button"
-                    className={css.clearButton}>
-                    <FormattedMessage id="IntegrationFilterModal.clearBtn" />
-                  </InlineTextButton>
-                </>
+                <>{children({ values, form })}</>
               </Form>
             );
           }}

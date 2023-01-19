@@ -70,8 +70,8 @@
   }
 
   &:hover svg {
-    fill: $matterColorLight;
-    stroke: $matterColorLight;
+    fill: $neutralGray1;
+    stroke: $neutralGray1;
   }
 }
 
@@ -108,10 +108,11 @@
 
 .removeButton {
   right: 7px;
-  top: 7px;
+  top: 10px;
   min-height: unset;
   position: absolute;
   width: 30px;
+  height: 30px;
   display: flex;
   border-radius: 4px;
   align-items: center;
@@ -119,6 +120,7 @@
   background-color: $neutralGray4;
   svg {
     width: 15px;
+    height: auto;
   }
 }
 
@@ -129,6 +131,6 @@
 }
 
 .error {
-  color: $errorRed1;
+  color: #fff1f0;
   font-size: 14px;
 }

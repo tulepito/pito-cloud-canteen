@@ -18,13 +18,17 @@
     justify-content: space-between;
     width: 100%;
     .label {
-      color: $neutralGray10;
+      color: $neutralGray6;
       font-size: 16px;
       font-weight: $fontWeightBold;
       text-transform: uppercase;
     }
   }
   .content {
-    transition: all 0.3s;
+    transition: height 0.3s;
+    height: initial;
+    &.isClose {
+      height: 0;
+    }
   }
 }

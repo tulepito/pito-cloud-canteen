@@ -1,6 +1,6 @@
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
-import IconArrow from '@components/IconArrow/IconArrow';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import { addCommas } from '@helpers/format';
@@ -54,7 +54,8 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
       deliveryAddress,
       deadlineDate,
       deadlineHour,
-      vatAllow,
+      vatAllow = false,
+      pickAllow = true,
       startDate,
       endDate,
     },
@@ -62,8 +63,8 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
   const { address, origin } = deliveryAddress || {};
   const initialValues = useMemo(
     () => ({
+      vatAllow,
       packagePerMember: addCommas(packagePerMember.toString()) || '',
-      vatAllow: vatAllow || true,
       selectedGroups: selectedGroups || ['allMembers'],
       deliveryHour: deliveryHour || '',
       deadlineDate: deadlineDate || null,
@@ -151,16 +152,18 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
         );
       case OrderSettingField.PICKING_DEADLINE:
         return (
-          <>
-            <div className={css.title}>
-              {intl.formatMessage({
-                id: 'OrderSettingModal.field.pickingDeadline',
-              })}
-            </div>
-            <div className={css.fieldContent}>
-              <OrderDeadlineField columnLayout form={form} values={values} />
-            </div>
-          </>
+          pickAllow && (
+            <>
+              <div className={css.title}>
+                {intl.formatMessage({
+                  id: 'OrderSettingModal.field.pickingDeadline',
+                })}
+              </div>
+              <div className={css.fieldContent}>
+                <OrderDeadlineField columnLayout form={form} values={values} />
+              </div>
+            </>
+          )
         );
       case OrderSettingField.EMPLOYEE_AMOUNT:
         return (
@@ -186,12 +189,14 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
         );
       case OrderSettingField.ACCESS_SETTING:
         return (
-          <>
-            <div className={css.title}>Cài đặt truy cập</div>
-            <div className={css.fieldContent}>
-              <ParticipantSetupField form={form} clientId={clientId} />
-            </div>
-          </>
+          pickAllow && (
+            <>
+              <div className={css.title}>Cài đặt truy cập</div>
+              <div className={css.fieldContent}>
+                <ParticipantSetupField form={form} clientId={clientId} />
+              </div>
+            </>
+          )
         );
       case OrderSettingField.PER_PACK:
         return (
@@ -241,11 +246,14 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
               onSubmit={onSubmit}
               initialValues={initialValues}
               render={(formRenderProps: FormRenderProps) => {
-                const { handleSubmit, form, values } = formRenderProps;
+                const { handleSubmit, form, values, invalid } = formRenderProps;
                 return (
                   <Form onSubmit={handleSubmit}>
                     {rightSideRenderer(form, values)}
-                    <Button className={css.submitBtn} type="submit">
+                    <Button
+                      className={css.submitBtn}
+                      disabled={invalid}
+                      type="submit">
                       {intl.formatMessage({
                         id: 'OrderSettingModal.saveChange',
                       })}

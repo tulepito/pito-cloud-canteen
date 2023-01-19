@@ -1,0 +1,48 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.root {
+}
+.labelRoot {
+  font-size: 14px;
+  line-height: 24px;
+  color: $neutralGray6;
+  margin-bottom: 8px;
+  display: inline-block;
+  display: flex;
+}
+.labelRequiredRedStar {
+  color: $sematicRed2;
+  font-weight: $fontWeightBold;
+  margin-left: 2px;
+}
+
+.select {
+  @include inputStyles;
+  width: 100%;
+}
+
+.selectedColor {
+  color: $neutralGray6;
+}
+
+.selectSuccess {
+}
+.selectError {
+  color: $neutralGray5;
+}
+
+.leftIcon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+.selectContainer {
+  position: relative;
+}
+.paddingWithLeftIcon {
+  padding-left: 52px;
+}

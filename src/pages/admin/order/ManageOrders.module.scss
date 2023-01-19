@@ -1,6 +1,7 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
 
 .filterForm {
   display: flex;
@@ -18,7 +19,7 @@
   border-radius: 5px;
   max-width: 70%;
   text-align: center;
-  background-color: $successScreen3;
+  background-color: #b7eb8f;
 }
 
 .input {
@@ -27,6 +28,7 @@
 
 .boldText {
   font-weight: $fontWeightBold;
+  color: #2f54eb;
 }
 
 .bodyCell:nth-child(3) {
@@ -47,12 +49,13 @@
 }
 
 .badge {
-  border-radius: 50px;
-  .badgeLabel {
-    min-width: 100px;
-    font-weight: $fontWeightBold;
-    text-align: center;
-  }
+  border-radius: 4px;
+}
+
+.badgeLabel {
+  font-size: 12px;
+  color: $neutralGray6 !important;
+  text-align: center;
 }
 
 .orderName {
@@ -60,4 +63,77 @@
 }
 
 .locationRow {
+}
+
+.tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.orderDetailTooltipItem {
+  color: $neutralGray6;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+
+  .orderIcon {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    border-radius: 50%;
+    &.pendingIcon {
+      border: 1px solid $neutralGray4;
+      background-color: $neutralGray3;
+    }
+    &.receivedIcon {
+      background-color: #52c41a;
+    }
+    &.cancelledIcon {
+      background-color: #ffa940;
+    }
+    &.deliveredIcon {
+      background-color: #171760;
+    }
+  }
+
+  .orderDate {
+    font-weight: $fontWeightBold;
+  }
+}
+
+.inputDate {
+  @include inputContainerStyles;
+  border: 1px solid $neutralGray3;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 16px;
+
+  input {
+    width: 100%;
+    &::placeholder {
+      color: $neutralGray4;
+      font-family: $fontFamily;
+    }
+  }
+}
+
+.labelDate {
+  font-size: 14px;
+  line-height: 24px;
+  color: $neutralGray6;
+  margin-bottom: 8px;
+  display: inline-block;
+  display: flex;
+}
+
+.dateInputs {
+  display: flex;
+  gap: 10px;
+}
+
+.deliveryHour {
+  font-weight: $fontWeightBold;
+  display: block;
 }

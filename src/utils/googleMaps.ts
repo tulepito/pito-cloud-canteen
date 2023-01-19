@@ -1,5 +1,7 @@
 import { types as sdkTypes } from '@helpers/sdkLoader';
 
+import type { TObject } from './types';
+
 const { LatLng: SDKLatLng, LatLngBounds: SDKLatLngBounds } = sdkTypes;
 
 const placeOrigin = (place: any) => {
@@ -196,7 +198,7 @@ export const locationBounds = (latlng: any, distance: any) => {
  * @param {object} props - map props
  * @return position offset to allow custom position for the OverlayView
  */
-export const getOffsetOverride = (containerElement: any, props: any) => {
+export const getOffsetOverride = (containerElement: any, props: TObject) => {
   const { getPixelPositionOffset } = props;
   //
   // Allows the component to control the visual position of the OverlayView

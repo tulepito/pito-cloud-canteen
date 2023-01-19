@@ -1,5 +1,5 @@
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
-import { required } from '@utils/validators';
+import { addressRequired } from '@utils/validators';
 import { useIntl } from 'react-intl';
 
 import css from './DeliveryAddressField.module.scss';
@@ -23,7 +23,7 @@ const DeliveryAddressField: React.FC<DeliveryAddressFieldProps> = (props) => {
         placeholder={intl.formatMessage({
           id: 'EditCompanyForm.addressPlaceholder',
         })}
-        validate={required(deliveryAddressRequiredMessage)}
+        validate={addressRequired(deliveryAddressRequiredMessage)}
       />
     </div>
   );

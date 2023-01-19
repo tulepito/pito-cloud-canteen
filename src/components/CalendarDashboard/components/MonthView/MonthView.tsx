@@ -103,58 +103,16 @@ MonthView.navigate = (
 };
 
 MonthView.title = (date: Date, { localizer }: { localizer: any }) => {
-  const [start, ...rest] = MonthView.range(date, { localizer });
-  const end = rest[rest.length - 1];
-  const isSameMonth = start.getMonth() === end.getMonth();
-  const isSameYear = start.getFullYear() === end.getFullYear();
-  if (isSameMonth) {
-    return (
-      <div className={css.calendarTitleWrapper}>
-        <IconCalendarToolbar />
-        <span className={css.calendarTitle}>
-          <FormattedMessage
-            id="Calendar.Week.title"
-            values={{
-              start: start.getDate(),
-              end: end.getDate(),
-              month: start.getMonth() + 1,
-              year: start.getFullYear(),
-            }}
-          />
-        </span>
-      </div>
-    );
-  }
-  if (isSameYear) {
-    return (
-      <div className={css.calendarTitleWrapper}>
-        <IconCalendarToolbar />
-        <span className={css.calendarTitle}>
-          <FormattedMessage
-            id="Calendar.Week.title.diffMonth"
-            values={{
-              start: `${start.getDate()} Tháng ${start.getMonth() + 1}`,
-              end: `${end.getDate()} Tháng ${end.getMonth() + 1}`,
-              year: start.getFullYear(),
-            }}
-          />
-        </span>
-      </div>
-    );
-  }
+  const [start] = MonthView.range(date, { localizer });
+
   return (
     <div className={css.calendarTitleWrapper}>
       <IconCalendarToolbar />
       <span className={css.calendarTitle}>
         <FormattedMessage
-          id="Calendar.Week.title.diffYear"
+          id="MonthView.monthName"
           values={{
-            start: `${start.getDate()} Tháng ${
-              start.getMonth() + 1
-            }, ${start.getFullYear()}`,
-            end: `${end.getDate()} Tháng ${
-              end.getMonth() + 1
-            }, ${end.getFullYear()}`,
+            month: start.getMonth() + 1,
           }}
         />
       </span>

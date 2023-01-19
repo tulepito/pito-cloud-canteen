@@ -5,7 +5,7 @@ import { parsePrice } from '@utils/validators';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
 
-import EditPartnerBasicInfomationForm from '../EditPartnerBasicInfomationForm/EditPartnerBasicInfomationForm';
+import EditPartnerBasicInformationForm from '../EditPartnerBasicInformationForm/EditPartnerBasicInformationForm';
 import EditPartnerLicenseForm from '../EditPartnerLicenseForm/EditPartnerLicenseForm';
 import EditPartnerMenuForm from '../EditPartnerMenuForm/EditPartnerMenuForm';
 // eslint-disable-next-line import/no-cycle
@@ -113,7 +113,7 @@ const EditPartnerWizardTab = (props: any) => {
       };
 
       return (
-        <EditPartnerBasicInfomationForm
+        <EditPartnerBasicInformationForm
           onSubmit={handleBasicInformationTabSubmit}
           partnerListingRef={partnerListingRef}
           uploadedAvatars={uploadedAvatars}

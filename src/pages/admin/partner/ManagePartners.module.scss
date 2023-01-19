@@ -6,18 +6,13 @@
 }
 
 .rowId {
-  min-width: 50px;
-  max-width: 200px;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3; /* number of lines to show */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  max-width: 50px;
 }
 
 .rowText {
   min-width: 50px;
   max-width: 200px;
+  word-wrap: break-word;
 }
 
 .badge {
@@ -30,18 +25,18 @@
 }
 
 .unsatisfactoryBox {
-  background-color: $secondaryBlue1;
-  color: $secondaryBlue6;
+  background-color: $labelBlue1;
+  color: $labelBlue2;
 }
 
 .newBox {
-  background-color: $warningOrange1;
-  color: $warningOrange5;
+  background-color: $labelOrange1;
+  color: $labelOrange2;
 }
 
 .authorizedBox {
-  background-color: $successScreen3;
-  color: $successScreen8;
+  background-color: $sematicGreen1;
+  color: $sematicGreen2;
 }
 
 .rowId {
@@ -75,19 +70,19 @@
 .actionBtn {
   min-height: unset;
   font-size: 12px;
-  color: $warningOrange8;
+  color: $labelOrange2;
   margin: 0 0 10px 0;
 
   @include viewportLarge {
     margin: 0;
   }
   &:hover {
-    color: $matterColorDark;
+    color: $neutralGray6;
   }
 }
 
 .loadingIcon {
-  stroke: $matterColor;
+  stroke: $neutralGray5;
 }
 
 .filterWrapper {
@@ -102,7 +97,7 @@
 }
 
 .top {
-  margin: 20px 0 10px 0;
+  margin: 0px 0 10px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -112,19 +107,15 @@
   display: flex;
   align-items: center;
   .addIcon {
-    fill: $matterColorLight;
+    fill: $neutralGray1;
   }
-}
-
-.rowTitle {
-  min-width: 100px;
 }
 
 .draftBox {
   padding: 3px 5px;
   display: inline-flex;
-  background-color: $warningOrange1;
-  color: $warningOrange6;
+  background-color: $labelOrange1;
+  color: $labelOrange2;
   font-size: 12px;
   border-radius: 4px;
   margin-left: 5px;
@@ -132,4 +123,12 @@
 
 .field {
   margin-bottom: 20px;
+}
+
+.iconEdit {
+  height: auto;
+}
+
+.rowTitle {
+  color: $neutralGray6;
 }

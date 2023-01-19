@@ -1,0 +1,18 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  position: relative;
+  @include checkBoxInputStyles;
+  .textRoot {
+    color: $neutralGray6;
+    margin-top: -1px;
+    margin-bottom: 1px;
+    cursor: pointer;
+  }
+
+  .textInput {
+    max-width: 300px;
+  }
+}

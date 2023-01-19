@@ -1,0 +1,93 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  display: flex;
+  height: 100vh;
+  background-color: $neutralGray1;
+  &::after {
+    content: '';
+    position: fixed;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1000;
+    background-color: rgba($color: #000000, $alpha: 0.3);
+    top: $adminTopbarHeight;
+    pointer-events: none;
+    transition: all 0.5s;
+    visibility: hidden;
+    opacity: 0;
+  }
+  &:hover {
+    .rightSide {
+      left: $adminSidebarLeftPartWidth;
+    }
+    &::after {
+      opacity: 1;
+      visibility: visible;
+      @include viewportLarge {
+        display: none;
+      }
+    }
+  }
+
+  .leftSide {
+    display: flex;
+    width: 60px;
+    align-items: center;
+    flex-direction: column;
+    padding: 16px 0 0 0;
+    z-index: 2;
+    background-color: $neutralGray2;
+    border-right: 1px solid #f0f0f0;
+
+    .sidebarButton {
+      width: 36px;
+      height: 36px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &.active {
+        border-radius: 8px;
+        background-color: $neutralGray6;
+        .sidebarIcon {
+          fill: $neutralGray1;
+        }
+      }
+
+      .sidebarIcon {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
+  .rightSide {
+    padding: 32px 16px 0 16px;
+    width: 220px;
+    position: absolute;
+    background-color: $neutralGray1;
+    border-right: 1px solid #d9d9d9;
+    left: -$adminSidebarRightPartWidth;
+    transition: left 0.3s ease-in;
+    @include viewportLarge {
+      left: $adminSidebarLeftPartWidth;
+    }
+    .menuLabel {
+      font-size: 18px;
+      line-height: 24px;
+      font-weight: $fontWeightBold;
+      margin-bottom: 32px;
+      padding: 0;
+    }
+    .multiLevelMenu {
+      padding: 0;
+    }
+    .subMenuLayout {
+      padding: 0;
+      margin-bottom: 32px;
+    }
+  }
+}

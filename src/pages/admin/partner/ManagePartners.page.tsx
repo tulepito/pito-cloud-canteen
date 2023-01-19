@@ -2,13 +2,14 @@
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldMultipleSelect from '@components/FieldMutipleSelect/FieldMultipleSelect';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
-import IconAdd from '@components/IconAdd/IconAdd';
-import IconEdit from '@components/IconEdit/IconEdit';
-import IconSpinner from '@components/IconSpinner/IconSpinner';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconAdd from '@components/Icons/IconAdd/IconAdd';
+import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import Meta from '@components/Layout/Meta';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -35,9 +36,9 @@ const TABLE_COLUMN: TColumn[] = [
     label: 'STT',
     render: (data: any) => {
       return (
-        <span title={data.id} className={classNames(css.rowText, css.rowId)}>
+        <div title={data.id} className={css.rowId}>
           {data.order}
-        </span>
+        </div>
       );
     },
   },
@@ -46,14 +47,16 @@ const TABLE_COLUMN: TColumn[] = [
     label: 'Tên thương hiệu',
     render: (data: any) => {
       return (
-        <div className={classNames(css.rowText, css.rowTitle)}>
-          <span>{data.title}</span>
+        <NamedLink
+          path={`/admin/partner/${data.id}/edit`}
+          className={classNames(css.rowText, css.rowTitle)}>
+          <div>{data.title}</div>
           {data.isDraft && (
             <div className={css.draftBox}>
               <FormattedMessage id="ManagePartnersPage.draftState" />
             </div>
           )}
-        </div>
+        </NamedLink>
       );
     },
   },
@@ -61,21 +64,21 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'phoneNumber',
     label: 'Số điện thoại',
     render: (data: any) => {
-      return <span className={css.rowText}>{data.phoneNumber}</span>;
+      return <div className={css.rowText}>{data.phoneNumber}</div>;
     },
   },
   {
     key: 'email',
     label: 'Email',
     render: (data: any) => {
-      return <span className={css.rowText}>{data.email}</span>;
+      return <div className={css.rowText}>{data.email}</div>;
     },
   },
   {
     key: 'address',
     label: 'Địa chỉ',
     render: (data: any) => {
-      return <span className={css.rowText}>{data.address}</span>;
+      return <div className={css.rowText}>{data.address}</div>;
     },
   },
   {
@@ -112,7 +115,7 @@ const TABLE_COLUMN: TColumn[] = [
         <Link href={`/admin/partner/${data.id}/edit`}>
           <InlineTextButton
             className={classNames(css.actionButton, css.editButton)}>
-            <IconEdit />
+            <IconEdit className={css.iconEdit} />
           </InlineTextButton>
         </Link>
       );
@@ -355,21 +358,25 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
           onSubmit={onSubmit}
           onClear={onClear}
           initialValues={{ keywords, meta_status: groupStatus }}>
-          <FieldTextInput
-            className={css.field}
-            name="keywords"
-            id="keywords"
-            label="Tên đối tác"
-            placeholder="Tìm kiếm"
-          />
-          <FieldMultipleSelect
-            className={css.field}
-            name="meta_status"
-            id="meta_status"
-            label="Trạng thái"
-            placeholder="Chọn trạng thái"
-            options={RESTAURANT_STATUS_OPTIONS}
-          />
+          {() => (
+            <>
+              <FieldTextInput
+                className={css.field}
+                name="keywords"
+                id="keywords"
+                label="Tên đối tác"
+                placeholder="Tìm kiếm"
+              />
+              <FieldMultipleSelect
+                className={css.field}
+                name="meta_status"
+                id="meta_status"
+                label="Trạng thái"
+                placeholder="Chọn trạng thái"
+                options={RESTAURANT_STATUS_OPTIONS}
+              />
+            </>
+          )}
         </IntegrationFilterModal>
       </div>
       {content}

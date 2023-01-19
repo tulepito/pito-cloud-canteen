@@ -1,7 +1,7 @@
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
 import Form from '@components/Form/Form';
+import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import {
   BUSINESS_LICENSE_OPTIONS,
   BUSINESS_TYPE_OPTIONS,
@@ -243,7 +243,8 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
                 {goBack && (
                   <Button
                     type="button"
-                    className={css.secondaryButton}
+                    variant="secondary"
+                    // className={css.secondaryButton}
                     onClick={goBack}>
                     {intl.formatMessage({
                       id: 'EditPartnerForms.goBack',

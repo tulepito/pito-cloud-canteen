@@ -1,4 +1,4 @@
-import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import { useIntl } from 'react-intl';
 
 import css from './NutritionField.module.scss';

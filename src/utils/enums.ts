@@ -519,3 +519,10 @@ export const getLabelByKey = (
   const item = list?.find((l: any) => l.key === key);
   return item && item.label ? item.label : key;
 };
+
+export enum EOrderDetailsStatus {
+  received = 'received',
+  delivered = 'delivered',
+  cancelled = 'cancelled',
+  pending = 'pending',
+}

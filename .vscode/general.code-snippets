@@ -15,6 +15,16 @@
   // 	],
   // 	"description": "Log output to console"
   // }
+  "Import global scss": {
+    "prefix": "style",
+    "body": ["@use '/src/styles${1}' as *;"],
+    "description": "Import global scss"
+  },
+  "css/scss note": {
+    "prefix": "comment",
+    "body": ["/* =============== ${1} =============== */", ""],
+    "description": "css/scss note"
+  },
   "Typescript final-form snippet": {
     "prefix": "tsfinalform",
     "body": [

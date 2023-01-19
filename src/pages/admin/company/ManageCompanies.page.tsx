@@ -1,11 +1,11 @@
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FieldSelect from '@components/FieldSelect/FieldSelect';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
-import IconAdd from '@components/IconAdd/IconAdd';
-import IconEdit from '@components/IconEdit/IconEdit';
-import IconEye from '@components/IconEye/IconEye';
-import IconMagnifier from '@components/IconMagnifier/IconMagnifier';
+import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconAdd from '@components/Icons/IconAdd/IconAdd';
+import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import IconEye from '@components/Icons/IconEye/IconEye';
+import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
 import Meta from '@components/Layout/Meta';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import type { TColumn } from '@components/Table/Table';
@@ -142,6 +142,7 @@ const TABLE_COLUMN: TColumn[] = [
         };
         data.updateStatus(updateData);
       };
+
       return (
         <ToggleButton
           name={data.id}

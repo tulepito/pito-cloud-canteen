@@ -14,7 +14,7 @@
     span {
       display: inline-block;
       @include text(12px, 16px);
-      color: $neutralGray7;
+      color: $neutralGray5;
     }
     span:nth-child(1) {
       width: 5%;
@@ -40,6 +40,14 @@
   .tableBody {
     @include flexAlign(center);
     flex-direction: column;
+
+    .noClientsFound {
+      margin: 72px auto 0;
+
+      svg {
+        margin-bottom: 16px;
+      }
+    }
 
     .bodyRow {
       position: relative;
@@ -95,12 +103,12 @@
     }
 
     .phone {
-      color: $neutralGray10;
+      color: $neutralGray6;
       @include text(14px, 20px);
     }
 
     .email {
-      color: $neutralGray7;
+      color: $neutralGray5;
       @include text(12px, 20px);
       margin-top: 4px;
       overflow: hidden;
@@ -108,5 +116,11 @@
       white-space: nowrap;
       width: 100%;
     }
+  }
+
+  .paginationContainer {
+    display: flex;
+
+    align-items: flex-end;
   }
 }

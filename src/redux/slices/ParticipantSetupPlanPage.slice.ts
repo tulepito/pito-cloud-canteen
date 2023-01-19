@@ -9,7 +9,7 @@ const LOAD_DATA = 'app/ParticipantSetupPlanPage/LOAD_DATA';
 const RELOAD_DATA = 'app/ParticipantSetupPlanPage/RELOAD_DATA';
 const UPDATE_ORDER = 'app/ParticipantSetupPlanPage/UPDATE_ORDER';
 
-interface ParticipantSetupPlanState {
+type ParticipantSetupPlanState = {
   restaurant: any;
   company: any;
   plan: any;
@@ -20,7 +20,7 @@ interface ParticipantSetupPlanState {
   reloadDataError: any;
   submitDataInprogress: boolean;
   submitDataError: any;
-}
+};
 
 const initialState: ParticipantSetupPlanState = {
   restaurant: {},

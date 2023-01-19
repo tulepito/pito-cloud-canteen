@@ -1,0 +1,9 @@
+@use '/src/styles/defaults.scss' as *;
+
+.inputContainer {
+  @include inputContainerStyles;
+}
+
+.labelRoot {
+  @include inputLabelStyles;
+}

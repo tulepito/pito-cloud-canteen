@@ -1,7 +1,7 @@
 import { InlineTextButton } from '@components/Button/Button';
-import IconClose from '@components/IconClose/IconClose';
-import IconSpinner from '@components/IconSpinner/IconSpinner';
-import IconUpload from '@components/IconUpload/IconUpload';
+import IconClose from '@components/Icons/IconClose/IconClose';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
+import IconUpload from '@components/Icons/IconUpload/IconUpload';
 import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import ValidationError from '@components/ValidationError/ValidationError';
@@ -76,7 +76,7 @@ const PhotoWithOverlay = (props: any) => {
         type="button"
         className={css.removeButton}
         onClick={handleRemoveClick}>
-        <IconClose />
+        <IconClose className={css.iconClose} />
       </InlineTextButton>
     </div>
   );
@@ -110,7 +110,7 @@ const FieldMutiplePhotos = (props: any) => {
           uploadImageFailed = (
             <p className={css.error}>
               {intl.formatMessage({
-                id: 'EditListingPhotosForm.imageUploadFailed.uploadOverLimit',
+                id: 'FieldMutiplePhotos.imageUploadFailed.uploadOverLimit',
               })}
             </p>
           );
@@ -118,7 +118,7 @@ const FieldMutiplePhotos = (props: any) => {
           uploadImageFailed = (
             <p className={css.error}>
               {intl.formatMessage({
-                id: 'EditListingPhotosForm.imageUploadFailed.uploadFailed',
+                id: 'FieldMutiplePhotos.imageUploadFailed.uploadFailed',
               })}
             </p>
           );
@@ -153,7 +153,7 @@ const FieldMutiplePhotos = (props: any) => {
                               input.onChange(params);
                               input.onBlur();
 
-                              await onImageUpload(params);
+                              onImageUpload(params);
                               // To reset input files.
                               // The problem is when choose same file browser doesn't trigger on change
                               setTriggerFlag(

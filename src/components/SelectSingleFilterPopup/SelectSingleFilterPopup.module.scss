@@ -20,7 +20,7 @@
 
   &:focus {
     outline: none;
-    background-color: $matterColorLight;
+    background-color: $neutralGray1;
     border-color: transparent;
     text-decoration: none;
   }
@@ -35,11 +35,11 @@
   height: auto;
   min-height: 0;
   border-radius: 4px;
-  border: 1px solid $marketplaceColor;
+  border: 1px solid $primaryPri2;
 
   &:hover,
   &:focus {
-    border: 1px solid $marketplaceColorDark;
+    border: 1px solid $primaryPri2;
   }
 }
 
@@ -57,7 +57,7 @@
   left: 0px;
   height: calc(100% - 4px);
   width: 0;
-  background-color: $marketplaceColor;
+  background-color: $primaryPri2;
   transition: width $transitionStyleButton;
 }
 
@@ -68,11 +68,11 @@
   left: 0px;
   height: calc(100% - 7px);
   width: 6px;
-  background-color: $matterColorDark;
+  background-color: $neutralGray6;
 }
 
 .menuItem {
-  color: $matterColor;
+  color: $neutralGray5;
   background-color: transparent;
   /* Layout */
   position: relative;
@@ -90,7 +90,7 @@
 
   &:focus,
   &:hover {
-    color: $matterColorDark;
+    color: $neutralGray6;
   }
 
   &:hover .menuItemBorder {
@@ -100,7 +100,7 @@
 
 .clearMenuItem {
   font-weight: $fontWeightMedium;
-  color: $matterColorAnti;
+  color: $neutralGray4;
   background-color: transparent;
   /* Layout */
   position: relative;
@@ -118,7 +118,7 @@
 
   &:focus,
   &:hover {
-    color: $matterColor;
+    color: $neutralGray5;
     transition: width $transitionStyleButton;
   }
 }

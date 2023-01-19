@@ -1,13 +1,13 @@
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FieldCheckboxGroup from '@components/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldMutiplePhotos from '@components/FieldMultiplePhotos/FieldMultiplePhotos';
 import FieldMultipleSelect from '@components/FieldMutipleSelect/FieldMultipleSelect';
-import FieldRadioButton from '@components/FieldRadioButton/FieldRadioButton';
-import FieldSelect from '@components/FieldSelect/FieldSelect';
-import FieldTextArea from '@components/FieldTextArea/FieldTextArea';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
+import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
+import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
+import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
 import {
@@ -335,17 +335,23 @@ const EditPartnerFoodFormComponent: React.FC<
             id: 'EditPartnerFoodForm.descriptionLabel',
           })}
         />
-        <FieldTextArea
-          className={css.field}
-          name="notes"
-          id="notes"
-          placeholder={intl.formatMessage({
-            id: 'EditPartnerFoodForm.notesPlaceholder',
-          })}
-          label={intl.formatMessage({
-            id: 'EditPartnerFoodForm.notesLabel',
-          })}
-        />
+        <div className={css.field}>
+          <FieldTextArea
+            name="notes"
+            id="notes"
+            placeholder={intl.formatMessage({
+              id: 'EditPartnerFoodForm.notesPlaceholder',
+            })}
+            label={intl.formatMessage({
+              id: 'EditPartnerFoodForm.notesLabel',
+            })}
+          />
+          <p className={css.notePriceDescription}>
+            {intl.formatMessage({
+              id: 'EditPartnerFoodForm.notePriceDescription',
+            })}
+          </p>
+        </div>
       </div>
       <div className={css.submitButtons}>
         <ErrorMessage message={formError?.message} />

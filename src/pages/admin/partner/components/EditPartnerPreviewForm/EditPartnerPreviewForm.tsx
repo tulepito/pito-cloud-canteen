@@ -1,10 +1,10 @@
 /* eslint-disable import/no-cycle */
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FieldCheckboxGroup from '@components/FieldCheckboxGroup/FieldCheckboxGroup';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
 import Form from '@components/Form/Form';
-import IconEdit from '@components/IconEdit/IconEdit';
+import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import NamedLink from '@components/NamedLink/NamedLink';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
@@ -37,7 +37,7 @@ const getLabelByKey = (list: any[], key: any) => {
   return item && item.label ? item.label : key;
 };
 
-const EditPartnerPreviewForm: React.FC<any> = (props: any) => {
+const EditPartnerPreviewForm: React.FC<any> = (props) => {
   const intl = useIntl();
   return (
     <FinalForm

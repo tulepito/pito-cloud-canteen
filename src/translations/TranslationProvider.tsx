@@ -4,7 +4,7 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 import { IntlProvider } from 'react-intl';
 
-const DEFAULT_LOCALE = 'vi-VN';
+export const DEFAULT_LOCALE = 'vi';
 
 const TranslationProvider = ({ children }: PropsWithChildren<{}>) => {
   let message;

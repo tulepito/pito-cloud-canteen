@@ -3,17 +3,18 @@ import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/AddMorePlan';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
-import IconRefreshing from '@components/Icons/IconRefreshing';
-import IconSetting from '@components/IconSetting/IconSetting';
+import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
+import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import { calculateGroupMembersAmount } from '@helpers/companyMembers';
 import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { updateDraftMealPlan } from '@redux/slices/Order.slice';
+import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -53,6 +54,47 @@ const renderResourcesForCalendar = (orderDetail: Record<string, any>) => {
   return resources;
 };
 
+const renderDateRange = (
+  startDate = new Date().getTime(),
+  endDate = new Date().getTime(),
+) => {
+  const result = [];
+  let currentDate = new Date(startDate).getTime();
+
+  while (currentDate <= endDate) {
+    result.push(currentDate);
+    currentDate = DateTime.fromMillis(currentDate).plus({ day: 1 }).toMillis();
+  }
+
+  return result;
+};
+
+const findSuitableStartDate = ({
+  selectedDate,
+  startDate = new Date().getTime(),
+  endDate = new Date().getTime(),
+  orderDetail = {},
+}: {
+  selectedDate?: Date;
+  startDate?: number;
+  endDate?: number;
+  orderDetail: TObject;
+}) => {
+  if (selectedDate && selectedDate instanceof Date) {
+    return selectedDate;
+  }
+
+  const dateRange = renderDateRange(startDate, endDate);
+  const setUpDates = Object.keys(orderDetail);
+  const suitableDateList = dateRange.filter(
+    (date) => !setUpDates.includes(date.toString()),
+  );
+  const suitableStartDate =
+    suitableDateList?.length > 0 ? suitableDateList[0] : endDate;
+
+  return suitableStartDate;
+};
+
 type TSetupOrderDetailProps = {
   goBack: () => void;
   nextTab: () => void;
@@ -74,13 +116,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       deadlineDate,
       deadlineHour,
       orderDetail = {},
+      pickAllow = true,
     },
   } = useAppSelector((state) => state.Order, shallowEqual);
   const companies = useAppSelector(
     (state) => state.ManageCompaniesPage.companyRefs,
     shallowEqual,
   );
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [isSelectingRestaurant, setIsSelectingRestaurant] = useState(false);
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -89,6 +132,21 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     setFalse: onOrderSettingModalClose,
     setTrue: onOrderSettingModalOpen,
   } = useBoolean();
+
+  const suitableStartDate = useMemo(() => {
+    const temp = findSuitableStartDate({
+      selectedDate,
+      startDate,
+      endDate,
+      orderDetail,
+    });
+
+    if (temp instanceof Date) {
+      return temp;
+    }
+
+    return new Date(temp);
+  }, [selectedDate, startDate, endDate, orderDetail]);
 
   const { address } = deliveryAddress || {};
   const currentClient = companies.find(
@@ -110,7 +168,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     const { restaurant, selectedFoodList } = values;
     const updateData = {
       orderDetail: {
-        [selectedDate.getTime()]: {
+        [(selectedDate as Date).getTime()]: {
           restaurant,
           foodList: selectedFoodList,
         },
@@ -150,14 +208,18 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       currentClient?.attributes.profile.publicData.companyName,
     [OrderSettingField.DELIVERY_ADDRESS]: address,
     [OrderSettingField.DELIVERY_TIME]: deliveryHour,
-    [OrderSettingField.PICKING_DEADLINE]: pickingDeadline,
     [OrderSettingField.EMPLOYEE_AMOUNT]: allMembersAmount,
     [OrderSettingField.SPECIAL_DEMAND]: '',
-    [OrderSettingField.ACCESS_SETTING]: selectedGroupsName?.join(', '),
     [OrderSettingField.PER_PACK]: intl.formatMessage(
       { id: 'SetupOrderDetail.perPack' },
       { value: addCommas(packagePerMember.toString()) || '' },
     ),
+    ...(pickAllow
+      ? {
+          [OrderSettingField.PICKING_DEADLINE]: pickingDeadline,
+          [OrderSettingField.ACCESS_SETTING]: selectedGroupsName?.join(', '),
+        }
+      : {}),
   };
   const addMorePlanExtraProps = {
     onClick: handleAddMorePlanClick,
@@ -170,7 +232,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       {isSelectingRestaurant ? (
         <SelectRestaurantPage
           onSubmitRestaurant={handleSubmitRestaurant}
-          selectedDate={selectedDate}
+          selectedDate={selectedDate as Date}
           onBack={handleGoBackWhenSelectingRestaurant}
         />
       ) : (
@@ -179,7 +241,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
             <div>
               <div className={css.row}>
                 <FormattedMessage id="SetupOrderDetail.orderId.draft" />
-
                 <Badge label={`Đơn hàng tuần • ${partnerName}`} />
               </div>
               <div
@@ -198,8 +259,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           </div>
           <div className={css.calendarContainer}>
             <CalendarDashboard
-              startDate={new Date(startDate)}
-              endDate={new Date(endDate)}
+              anchorDate={suitableStartDate}
               events={resourcesForCalender}
               renderEvent={MealPlanCard}
               companyLogo="Company"

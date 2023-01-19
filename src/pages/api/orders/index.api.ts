@@ -9,8 +9,9 @@ import {
 } from '@services/subAccountSdk';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
+import { parseTimestaimpToFormat } from '@utils/dates';
+import { EOrderStates } from '@utils/enums';
 import type { TPlan } from '@utils/orderTypes';
-import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HTTP_METHODS } from '../helpers/constants';
@@ -26,8 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     case HTTP_METHODS.POST:
       try {
         const { companyId, generalInfo, orderDetail } = req.body;
-        const { deadlineDate, deadlineHour, ...rest } = generalInfo;
-        const { selectedGroups } = rest;
+        const { selectedGroups } = generalInfo;
         const adminAccount = await getAdminAccount();
         const { currentOrderNumber = 0 } =
           adminAccount.attributes.profile.metadata;
@@ -47,16 +47,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const draftedOrderListinResponse =
           await loggedinSubAccount.ownListings.createDraft({
             title: generatedOrderId,
+            publicData: {
+              orderName: `${
+                companyAccount.attributes.profile.displayName
+              } PCC_${parseTimestaimpToFormat(
+                generalInfo.startDate,
+              )} - ${parseTimestaimpToFormat(generalInfo.endDate)}`,
+              startDate: generalInfo.startDate,
+              enddate: generalInfo.endDate,
+            },
           });
         const draftedOrderListing = denormalisedResponseEntities(
           draftedOrderListinResponse,
         )[0];
-
-        const parsedDeadlineDate =
-          DateTime.fromMillis(deadlineDate).toFormat('yyyy-MM-dd');
-        const orderDeadline = DateTime.fromISO(
-          `${parsedDeadlineDate}T${deadlineHour}:00`,
-        ).toMillis();
         const allMembers = calculateGroupMembers(
           companyAccount,
           selectedGroups,
@@ -90,11 +93,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             metadata: {
               companyId,
               listingType: ListingTypes.ORDER,
-              generalInfo: {
-                ...rest,
-                orderDeadline,
-              },
+              generalInfo,
               orderDetail: updatedOrderDetail,
+              orderState: EOrderStates.isNew,
             },
           });
         const updatedDraftOrderListing = denormalisedResponseEntities(
@@ -113,7 +114,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         });
         const orderListing =
           denormalisedResponseEntities(orderListingResponse)[0];
-        const { companyId, generalInfo } = orderListing.attributes.metadata;
+        const { companyId } = orderListing.attributes.metadata;
         const companyAccountResponse = await integrationSdk.users.show(
           { id: companyId },
           { expand: true },

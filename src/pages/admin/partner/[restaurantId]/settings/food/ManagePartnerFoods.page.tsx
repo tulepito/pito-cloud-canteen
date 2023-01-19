@@ -4,10 +4,10 @@
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldMultipleSelect from '@components/FieldMutipleSelect/FieldMultipleSelect';
-import FieldTextInput from '@components/FieldTextInput/FieldTextInput';
-import IconDelete from '@components/IconDelete/IconDelete';
-import IconEdit from '@components/IconEdit/IconEdit';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconDuplicate from '@components/Icons/IconDuplicate/IconDuplicate';
+import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import IconPrint from '@components/Icons/IconPrint/IconPrint';
 import IconUploadFile from '@components/Icons/IconUploadFile/IconUploadFile';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
@@ -45,7 +45,11 @@ const TABLE_COLUMN: TColumn[] = [
     label: 'ID',
     render: (data: any) => {
       if (data.isDeleted) {
-        return <div className={css.deletedFood}>Deleted food</div>;
+        return (
+          <div className={css.deletedFood}>
+            <FormattedMessage id="ManagePartnerFoods.deletedFood" />
+          </div>
+        );
       }
       return (
         <NamedLink
@@ -179,7 +183,6 @@ const parseEntitiesToExportCsv = (
         ),
       };
     });
-  console.log({ foodsToExport });
   return foodsToExport;
 };
 
@@ -327,27 +330,6 @@ const ManagePartnerFoods = () => {
     }
   };
 
-  const downloadGuide = () => {
-    fetch(fileUrl as string)
-      .then((response) => response.blob())
-      .then((blob) => {
-        // Create blob link to download
-        const url = window.URL.createObjectURL(new Blob([blob]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `FileName.pdf`);
-
-        // Append to html link element page
-        document.body.appendChild(link);
-
-        // Start download
-        link.click();
-
-        // Clean up and remove the link
-        link.parentNode && link.parentNode.removeChild(link);
-      });
-  };
-
   return (
     <div className={css.root}>
       <h1 className={css.title}>
@@ -362,29 +344,33 @@ const ManagePartnerFoods = () => {
             pub_category: groupPubCategory,
             pub_menuType: groupMenuTypeString,
           }}>
-          <FieldTextInput
-            name="keywords"
-            id="keywords"
-            label="Tên món"
-            placeholder="Nhập tên món"
-            className={css.input}
-          />
-          <FieldMultipleSelect
-            className={css.input}
-            name="pub_category"
-            id="pub_category"
-            label="Phong cách ẩm thực"
-            placeholder="Phong cách ẩm thực"
-            options={CATEGORY_OPTIONS}
-          />
-          <FieldMultipleSelect
-            className={css.input}
-            name="pub_menuType"
-            id="pub_menuType"
-            label="Loại menu"
-            placeholder="Chọn loại menu"
-            options={MENU_OPTIONS}
-          />
+          {() => (
+            <>
+              <FieldTextInput
+                name="keywords"
+                id="keywords"
+                label="Tên món"
+                placeholder="Nhập tên món"
+                className={css.input}
+              />
+              <FieldMultipleSelect
+                className={css.input}
+                name="pub_category"
+                id="pub_category"
+                label="Phong cách ẩm thực"
+                placeholder="Phong cách ẩm thực"
+                options={CATEGORY_OPTIONS}
+              />
+              <FieldMultipleSelect
+                className={css.input}
+                name="pub_menuType"
+                id="pub_menuType"
+                label="Loại menu"
+                placeholder="Chọn loại menu"
+                options={MENU_OPTIONS}
+              />
+            </>
+          )}
         </IntegrationFilterModal>
         <div className={css.ctaButtons}>
           <InlineTextButton
@@ -469,9 +455,9 @@ const ManagePartnerFoods = () => {
             id="ManagePartnerFoods.downloadFileHere"
             values={{
               link: (
-                <InlineTextButton type="button" onClick={downloadGuide}>
+                <NamedLink path={fileUrl}>
                   <FormattedMessage id="ManagePartnerFoods.templateLink" />
-                </InlineTextButton>
+                </NamedLink>
               ),
             }}
           />

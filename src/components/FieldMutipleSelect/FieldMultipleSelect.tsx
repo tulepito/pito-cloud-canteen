@@ -1,4 +1,4 @@
-import FieldCheckbox from '@components/FieldCheckbox/FieldCheckbox';
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import useBoolean from '@hooks/useBoolean';
 import classNames from 'classnames';

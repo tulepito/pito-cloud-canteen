@@ -7,6 +7,8 @@
  * You should especially consider how you are using extended data inside the app.
  */
 
+import type { TObject } from './types';
+
 const ESCAPE_TEXT_REGEXP = /[<>]/g;
 const ESCAPE_TEXT_REPLACEMENTS = {
   // fullwidth lesser-than character
@@ -42,7 +44,7 @@ const sanitizeText = (str: any) =>
  * but if you use this data on props, it might create XSS vulnerabilities
  * E.g. you should sanitize and encode URI if you are creating links from public data.
  */
-export const sanitizeUser = (entity: Record<string, any>) => {
+export const sanitizeUser = (entity: TObject) => {
   const { attributes, ...restEntity } = entity || {};
   const { profile, ...restAttributes } = attributes || {};
   const {
@@ -94,7 +96,7 @@ export const sanitizeUser = (entity: Record<string, any>) => {
  * but if you use this data on props, it might create XSS vulnerabilities
  * E.g. you should sanitize and encode URI if you are creating links from public data.
  */
-export const sanitizeListing = (entity: Record<string, any>) => {
+export const sanitizeListing = (entity: TObject) => {
   const { attributes, ...restEntity } = entity;
   const { title, description, publicData, ...restAttributes } =
     attributes || {};
@@ -131,7 +133,7 @@ export const sanitizeListing = (entity: Record<string, any>) => {
  * Sanitize entities if needed.
  * Remember to add your own sanitization rules for your extended data
  */
-export const sanitizeEntity = (entity: Record<string, any>) => {
+export const sanitizeEntity = (entity: TObject) => {
   const { type } = entity;
   switch (type) {
     case 'listing':

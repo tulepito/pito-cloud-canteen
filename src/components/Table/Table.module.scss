@@ -20,6 +20,10 @@
     .headRow {
       background-color: $neutralGray4;
 
+      .checkboxSvg {
+        background-color: $neutralGray1;
+      }
+
       .headCell {
         padding: 14px 10px 14px 20px;
         text-align: left;
@@ -53,41 +57,55 @@
       }
       .formHeadCell {
         text-align: center;
-        color: $neutralGray8;
+        color: $neutralGray5;
         background-color: $neutralGray3;
         font-size: 14px;
       }
     }
+  }
 
-    .formRow {
-      margin: 10px;
-      .formCell {
-        width: 200px;
-      }
+  .formRow {
+    margin: 10px;
+    .formCell {
+      width: 200px;
     }
+  }
 
+  display: block;
+  width: 100%;
+  @include viewportLarge {
+    display: table-row-group;
+  }
+
+  .bodyRow {
     display: block;
     width: 100%;
+    margin-bottom: 40px;
     @include viewportLarge {
-      display: table-row-group;
+      display: table-row;
     }
-
-    .bodyRow {
-      display: block;
+    .bodyCell {
+      display: flex;
+      justify-content: space-between;
       width: 100%;
       margin-bottom: 40px;
       @include viewportLarge {
         display: table-row;
       }
+      transition: all 0.3s;
+      &:hover {
+        background-color: $neutralGray2;
+      }
+
       .bodyCell {
         display: flex;
         justify-content: space-between;
         width: 100%;
         align-items: center;
         text-align: right;
-        padding: 14px 0 14px 20px;
-        color: $neutralGray6;
-        border-bottom: 1px solid $matterColorNegative;
+        padding: 14px 10px 14px 20px;
+        color: #616161;
+        border-bottom: 1px solid $neutralGray3;
         position: relative;
         font-size: 14px;
 

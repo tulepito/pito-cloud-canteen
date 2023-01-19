@@ -6,7 +6,7 @@
 
 .radioLabel {
   @include textTemplate(12px, 400, 16px, '');
-  color: $neutralGray10;
+  color: $neutralGray6;
   display: flex;
   align-items: center;
   margin-bottom: 10px;
@@ -18,55 +18,32 @@
 
 .actions {
   display: flex;
+  justify-content: space-between;
   padding-top: 2px;
 }
 
-.rejectBtn,
-.acceptBtn {
+.rejectBtn {
+  @include buttonColorSecondary;
+  @include textTemplate(12px, 700, 20px, '');
+  display: block;
   width: calc((100% - 8px) / 2);
   height: 36px;
   min-height: 36px;
   padding: 8px 4px;
-  text-align: center;
-  border-radius: 8px;
-  background-color: $neutralGray1;
-  @include textTemplate(12px, 700, 20px, '');
-}
-.spinnerClassName {
-  stroke: $primaryPri5;
-  width: 24px;
-  height: 24px;
-  stroke-width: 3px;
-}
-
-.rejectBtn {
-  margin-right: 8px;
-  border: 1px solid $neutralGray5;
-  color: $neutralGray10;
-
-  &:hover {
-    background-color: $neutralGray5;
-  }
-
-  &:active,
-  &:focus {
-    background-color: $neutralGray1;
-    color: $neutralGray10;
-  }
 }
 
 .acceptBtn {
-  color: $primaryPri5;
-  border: 1px solid $primaryPri5;
+  @include textTemplate(12px, 700, 20px, '');
+  display: block;
+  width: calc((100% - 8px) / 2);
+  height: 36px;
+  min-height: 36px;
+  padding: 8px 4px;
+}
 
-  &:hover {
-    color: $neutralGray1;
-    background-color: $primaryPri5;
-  }
-
-  &:active,
-  &:focus {
-    background-color: $neutralGray1;
-    color: $primaryPri5;
-  }
+.spinnerClassName {
+  stroke: $primaryPri2;
+  width: 24px;
+  height: 24px;
+  stroke-width: 3px;
 }

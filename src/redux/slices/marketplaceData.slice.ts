@@ -2,12 +2,13 @@ import { createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedEntities, updatedEntities } from '@utils/data';
+import type { TObject } from '@utils/types';
 
 const initialState = {
   entities: {},
 };
 
-const merge = (entities: Record<string, any>, sdkResponse: any) => {
+const merge = (entities: TObject, sdkResponse: any) => {
   const apiResponse = sdkResponse.data;
   return updatedEntities(entities, apiResponse);
 };
