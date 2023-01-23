@@ -73,5 +73,27 @@
       "export default ${1:$TM_FILENAME_BASE};"
     ],
     "description": "Icon snippet"
+  },
+  "Typescript component snippet with default classname props": {
+    "prefix": "tsrfcdp",
+    "body": [
+      "import type { TDefaultProps } from '@utils/types';",
+      "import classNames from 'classnames';",
+      "",
+      "import css from './${1:$TM_FILENAME_BASE}.module.scss';",
+      "",
+      "type T${1:$TM_FILENAME_BASE}Props = TDefaultProps & {};",
+      "",
+      "const ${1:$TM_FILENAME_BASE}: React.FC<T${1:$TM_FILENAME_BASE}Props> = (props) => {",
+      "  const { className, rootClassName } = props;",
+      "  const rootClasses = classNames(rootClassName || css.root, className);",
+      "",
+      "  return <div className={rootClasses}></div>;",
+      "};",
+      "",
+      "export default ${1:$TM_FILENAME_BASE};",
+      ""
+    ],
+    "description": "Typescript component snippet with default classname props"
   }
 }
