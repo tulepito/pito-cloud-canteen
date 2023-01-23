@@ -117,7 +117,7 @@ const prepareDataForTab = ({
           return { ...result, chose: [...choseList, rowData] };
         case EParticipantOrderStatus.notAllowed: {
           if (foodId === '') {
-            return { ...result, notChoose: [...choseList, rowData] };
+            return { ...result, notChoose: [...notChooseList, rowData] };
           }
           return { ...result, chose: [...choseList, rowData] };
         }
