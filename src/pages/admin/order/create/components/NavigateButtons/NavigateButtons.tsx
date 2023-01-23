@@ -1,5 +1,5 @@
 import Button from '@components/Button/Button';
-import { getItem } from '@utils/localStorageHelpers';
+import { getItem } from '@helpers/localStorageHelpers';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 

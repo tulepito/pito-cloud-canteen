@@ -10,15 +10,15 @@ import get from 'lodash/get';
 import { useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 
-import { orderDetailsAnyActionsInProgress } from '../BookerOrderManagement.slice';
 import { calculateTotalPriceAndDishes } from '../helpers/cartInfoHelper';
 import { groupFoodOrderByDate } from '../helpers/orderDetailHelper';
+import { orderDetailsAnyActionsInProgress } from '../OrderManagement.slice';
 import css from './BookerOrderDetails.module.scss';
-import BookerOrderDetailsCountdownSection from './BookerOrderDetailsEditView/BookerOrderDetailsCountdownSection/BookerOrderDetailsCountdownSection';
-import BookerOrderDetailsManageOrdersSection from './BookerOrderDetailsEditView/BookerOrderDetailsManageOrdersSection/BookerOrderDetailsManageOrdersSection';
-import BookerOrderDetailsManageParticipantsSection from './BookerOrderDetailsEditView/BookerOrderDetailsManageParticipantsSection/BookerOrderDetailsManageParticipantsSection';
-import BookerOrderDetailsOrderLinkSection from './BookerOrderDetailsEditView/BookerOrderDetailsOrderLinkSection/BookerOrderDetailsOrderLinkSection';
 import BookerOrderDetailsTitle from './BookerOrderDetailsEditView/BookerOrderDetailsTitle/BookerOrderDetailsTitle';
+import ManageOrdersSection from './BookerOrderDetailsEditView/ManageOrdersSection/ManageOrdersSection';
+import ManageParticipantsSection from './BookerOrderDetailsEditView/ManageParticipantsSection/ManageParticipantsSection';
+import OrderDeadlineCountdownSection from './BookerOrderDetailsEditView/OrderDeadlineCountdownSection/OrderDeadlineCountdownSection';
+import OrderLinkSection from './BookerOrderDetailsEditView/OrderLinkSection/OrderLinkSection';
 import BookerOrderDetailsPriceQuotation from './BookerOrderDetailsPriceQuotation/BookerOrderDetailsPriceQuotation';
 import ReviewCartSection from './BookerOrderDetailsReviewView/ReviewCartSection/ReviewCartSection';
 import type { TReviewInfoFormValues } from './BookerOrderDetailsReviewView/ReviewInfoSection/ReviewInfoForm';
@@ -27,18 +27,16 @@ import ReviewOrderDetailsSection from './BookerOrderDetailsReviewView/ReviewOrde
 import ReviewOrdersResultSection from './BookerOrderDetailsReviewView/ReviewOrdersResultSection/ReviewOrdersResultSection';
 import ReviewTitleSection from './BookerOrderDetailsReviewView/ReviewTitleSection/ReviewTitleSection';
 
-enum EBookerOrderDetailsPageViewMode {
+enum EPageViewMode {
   edit = 'edit',
   review = 'review',
   priceQuotation = 'priceQuotation',
 }
 
 const BookerOrderDetailsPage = () => {
-  const [viewMode, setViewMode] = useState<EBookerOrderDetailsPageViewMode>(
-    EBookerOrderDetailsPageViewMode.edit,
-  );
+  const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
   const { orderData, planData, participantData, companyData } = useAppSelector(
-    (state) => state.BookerOrderManagement,
+    (state) => state.OrderManagement,
   );
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const currentUser = useAppSelector(currentUserSelector);
@@ -147,11 +145,11 @@ const BookerOrderDetailsPage = () => {
   };
 
   const handleConfirmOrder = () => {
-    setViewMode(EBookerOrderDetailsPageViewMode.review);
+    setViewMode(EPageViewMode.review);
   };
 
   const handleGoBackFromReviewMode = () => {
-    setViewMode(EBookerOrderDetailsPageViewMode.edit);
+    setViewMode(EPageViewMode.edit);
   };
 
   const handleSubmitReviewInfoForm = (_values: TReviewInfoFormValues) => {
@@ -188,18 +186,15 @@ const BookerOrderDetailsPage = () => {
       />
 
       <div className={css.leftPart}>
-        <BookerOrderDetailsManageOrdersSection data={manageOrdersData} />
+        <ManageOrdersSection data={manageOrdersData} />
       </div>
       <div className={css.rightPart}>
-        <BookerOrderDetailsCountdownSection
+        <OrderDeadlineCountdownSection
           className={css.container}
           data={countdownSectionData}
         />
-        <BookerOrderDetailsOrderLinkSection
-          className={css.container}
-          data={linkSectionData}
-        />
-        <BookerOrderDetailsManageParticipantsSection
+        <OrderLinkSection className={css.container} data={linkSectionData} />
+        <ManageParticipantsSection
           className={css.container}
           data={manageParticipantData}
         />
@@ -243,11 +238,11 @@ const BookerOrderDetailsPage = () => {
 
   const renderView = () => {
     switch (viewMode) {
-      case EBookerOrderDetailsPageViewMode.priceQuotation:
+      case EPageViewMode.priceQuotation:
         return <BookerOrderDetailsPriceQuotation data={priceQuotationData} />;
-      case EBookerOrderDetailsPageViewMode.review:
+      case EPageViewMode.review:
         return ReviewView;
-      case EBookerOrderDetailsPageViewMode.edit:
+      case EPageViewMode.edit:
       default:
         return EditView;
     }

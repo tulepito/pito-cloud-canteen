@@ -1,18 +1,17 @@
 import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import { shortenString } from '@utils/string';
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 
-import css from './BookerOrderDetailsParticipantCard.module.scss';
+import css from './ParticipantCard.module.scss';
 
 const DEFAULT_AVATAR_PATH = '/images/default_avatar.png';
 const MAXLENGTH_NAME = 26;
 const MAXLENGTH_EMAIL = 30;
 
-type BookerOrderDetailsParticipantCardProps = {
-  className?: string;
-  rootClassName?: string;
+type TParticipantCardProps = TDefaultProps & {
   avatar?: any;
   hasCheckIcon?: boolean;
   name?: string;
@@ -20,9 +19,7 @@ type BookerOrderDetailsParticipantCardProps = {
   onClickDeleteIcon: () => void;
 };
 
-const BookerOrderDetailsParticipantCard: React.FC<
-  BookerOrderDetailsParticipantCardProps
-> = (props) => {
+const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
   const {
     rootClassName,
     className,
@@ -34,6 +31,9 @@ const BookerOrderDetailsParticipantCard: React.FC<
   } = props;
   const rootClasses = classNames(rootClassName || css.root, className);
 
+  const formattedName = shortenString(name, MAXLENGTH_NAME);
+  const formattedEmail = shortenString(email, MAXLENGTH_EMAIL);
+
   return (
     <div className={rootClasses}>
       <div className={css.avatarContainer}>
@@ -41,8 +41,8 @@ const BookerOrderDetailsParticipantCard: React.FC<
         {hasCheckIcon && <IconCheckWithBackground className={css.checkIcon} />}
       </div>
       <div className={css.infoContainer}>
-        <div title={name}>{shortenString(name, MAXLENGTH_NAME)}</div>
-        <div title={email}>{shortenString(email, MAXLENGTH_EMAIL)}</div>
+        <div title={name}>{formattedName}</div>
+        <div title={email}>{formattedEmail}</div>
       </div>
       <div className={css.closeIconContainer} onClick={onClickDeleteIcon}>
         <IconClose className={css.closeIcon} />
@@ -51,4 +51,4 @@ const BookerOrderDetailsParticipantCard: React.FC<
   );
 };
 
-export default BookerOrderDetailsParticipantCard;
+export default ParticipantCard;

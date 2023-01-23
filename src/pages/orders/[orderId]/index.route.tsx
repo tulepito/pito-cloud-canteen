@@ -8,17 +8,17 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
-import {
-  BookerOrderManagementsThunks,
-  orderDetailsAnyActionsInProgress,
-} from './BookerOrderManagement.slice';
 import BookerOrderDetailsPage from './components/BookerOrderDetails.page';
+import {
+  orderDetailsAnyActionsInProgress,
+  orderManagementsThunks,
+} from './OrderManagement.slice';
 
 const BookerOrderDetailsRoute = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const pageDataLoading = useAppSelector(orderDetailsAnyActionsInProgress);
-  const { companyId } = useAppSelector((state) => state.BookerOrderManagement);
+  const { companyId } = useAppSelector((state) => state.OrderManagement);
   const currentUser = useAppSelector(currentUserSelector);
   const companyData = get(currentUser, 'attributes.profile.metadata.company');
   const {
@@ -29,7 +29,7 @@ const BookerOrderDetailsRoute = () => {
 
   useEffect(() => {
     if (isReady) {
-      dispatch(BookerOrderManagementsThunks.loadData(orderId as string));
+      dispatch(orderManagementsThunks.loadData(orderId as string));
     }
   }, [isReady]);
 

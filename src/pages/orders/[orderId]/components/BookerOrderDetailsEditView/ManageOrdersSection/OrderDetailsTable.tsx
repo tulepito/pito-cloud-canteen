@@ -10,7 +10,7 @@ import get from 'lodash/get';
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { BookerOrderManagementsThunks } from '../../../BookerOrderManagement.slice';
+import { orderManagementsThunks } from '../../../OrderManagement.slice';
 import type { TEditOrderRowFormValues } from './EditOrderRowForm';
 import EditOrderRowModal from './EditOrderRowModal';
 import css from './OrderDetailsTable.module.scss';
@@ -243,7 +243,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   const [isEditSelectionModalOpen, setIsEditSelectionModalOpen] =
     useState(false);
   const { planData, participantData, orderData } = useAppSelector(
-    (state) => state.BookerOrderManagement,
+    (state) => state.OrderManagement,
   );
   const packagePerMember = get(
     orderData,
@@ -283,7 +283,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
       currentViewDate,
     };
 
-    dispatch(BookerOrderManagementsThunks.disallowMember(updateValues));
+    dispatch(orderManagementsThunks.disallowMember(updateValues));
   };
 
   const handleCloseEditSelectionModal = () => {
@@ -302,9 +302,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
       currentViewDate,
     };
 
-    await dispatch(
-      BookerOrderManagementsThunks.addOrUpdateMemberOrder(updateValues),
-    );
+    await dispatch(orderManagementsThunks.addOrUpdateMemberOrder(updateValues));
     setIsEditSelectionModalOpen(false);
   };
 

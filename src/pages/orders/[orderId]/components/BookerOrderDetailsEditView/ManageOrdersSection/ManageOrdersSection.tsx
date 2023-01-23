@@ -11,22 +11,20 @@ import { DateTime } from 'luxon';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { BookerOrderManagementsThunks } from '../../../BookerOrderManagement.slice';
+import { orderManagementsThunks } from '../../../OrderManagement.slice';
 import type { TAddOrderFormValues } from './AddOrderForm';
 import AddOrderForm from './AddOrderForm';
-import css from './BookerOrderDetailsManageOrdersSection.module.scss';
+import css from './ManageOrdersSection.module.scss';
 import OrderDetailsTable from './OrderDetailsTable';
 
-type TBookerOrderDetailsManageOrdersSectionProps = {
+type TManageOrdersSectionProps = {
   data: {
     startDate: number;
     endDate: number;
   };
 };
 
-const BookerOrderDetailsManageOrdersSection: React.FC<
-  TBookerOrderDetailsManageOrdersSectionProps
-> = (props) => {
+const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
   const {
     data: { startDate, endDate },
   } = props;
@@ -35,7 +33,7 @@ const BookerOrderDetailsManageOrdersSection: React.FC<
   const intl = useIntl();
   const [currentViewDate, setCurrentViewDate] = useState(startDate);
   const { planData, participantData } = useAppSelector(
-    (state) => state.BookerOrderManagement,
+    (state) => state.OrderManagement,
   );
 
   const orderDetail = get(planData, 'attributes.metadata.orderDetail', {});
@@ -93,7 +91,7 @@ const BookerOrderDetailsManageOrdersSection: React.FC<
       currentViewDate,
     };
 
-    dispatch(BookerOrderManagementsThunks.addOrUpdateMemberOrder(updateValues));
+    dispatch(orderManagementsThunks.addOrUpdateMemberOrder(updateValues));
   };
 
   const items = dateList.map((date) => {
@@ -107,7 +105,7 @@ const BookerOrderDetailsManageOrdersSection: React.FC<
         <div className={css.manageOrdersContainer}>
           <div className={css.title}>
             {intl.formatMessage({
-              id: 'BookerOrderDetailsManageOrdersSection.manageOrdersContainer.title',
+              id: 'ManageOrdersSection.manageOrdersContainer.title',
             })}
           </div>
           <div className={css.orderDetails}>
@@ -119,7 +117,7 @@ const BookerOrderDetailsManageOrdersSection: React.FC<
           <div className={css.addOrder}>
             <div className={css.addOrderTitle}>
               {intl.formatMessage({
-                id: 'BookerOrderDetailsManageOrdersSection.addOrder.title',
+                id: 'ManageOrdersSection.addOrder.title',
               })}
               <AddOrderForm
                 onSubmit={handleSubmitAddSelection}
@@ -136,7 +134,7 @@ const BookerOrderDetailsManageOrdersSection: React.FC<
               <IconPlus className={css.plusIcon} />
               <span>
                 {intl.formatMessage({
-                  id: 'BookerOrderDetailsManageOrdersSection.addRequirement.text',
+                  id: 'ManageOrdersSection.addRequirement.text',
                 })}
               </span>
             </Button>
@@ -158,4 +156,4 @@ const BookerOrderDetailsManageOrdersSection: React.FC<
   );
 };
 
-export default BookerOrderDetailsManageOrdersSection;
+export default ManageOrdersSection;

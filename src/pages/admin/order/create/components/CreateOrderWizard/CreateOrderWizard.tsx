@@ -1,7 +1,7 @@
 import FormWizard from '@components/FormWizard/FormWizard';
+import { getItem, setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
-import { getItem, setItem } from '@utils/localStorageHelpers';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';

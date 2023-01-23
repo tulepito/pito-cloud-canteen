@@ -6,7 +6,7 @@ import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
-import { orderDetailsAnyActionsInProgress } from '../../../BookerOrderManagement.slice';
+import { orderDetailsAnyActionsInProgress } from '../../../OrderManagement.slice';
 import css from './SendNotificationForm.module.scss';
 
 export type TSendNotificationFormValues = {

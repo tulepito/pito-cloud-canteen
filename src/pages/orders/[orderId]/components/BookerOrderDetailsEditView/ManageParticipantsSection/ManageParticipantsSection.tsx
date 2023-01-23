@@ -1,20 +1,20 @@
 import Button from '@components/Button/Button';
 import AlertModal from '@components/Modal/AlertModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import type { TObject, TUser } from '@utils/types';
+import type { TDefaultProps, TObject, TUser } from '@utils/types';
 import classNames from 'classnames';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import {
-  BookerOrderManagementsThunks,
   orderDetailsAnyActionsInProgress,
-} from '../../../BookerOrderManagement.slice';
+  orderManagementsThunks,
+} from '../../../OrderManagement.slice';
 import type { TAddParticipantFormValues } from './AddParticipantForm';
 import AddParticipantForm from './AddParticipantForm';
-import css from './BookerOrderDetailsManageParticipantsSection.module.scss';
-import BookerOrderDetailsParticipantCard from './BookerOrderDetailsParticipantCard';
 import ManageParticipantsModal from './ManageParticipantsModal';
+import css from './ManageParticipantsSection.module.scss';
+import ParticipantCard from './ParticipantCard';
 
 export const renderParticipantCards = (
   items: Array<TUser>,
@@ -30,7 +30,7 @@ export const renderParticipantCards = (
     } = item;
 
     return (
-      <BookerOrderDetailsParticipantCard
+      <ParticipantCard
         name={displayName}
         email={email}
         key={uuid}
@@ -40,18 +40,17 @@ export const renderParticipantCards = (
   });
 };
 
-type BookerOrderDetailsManageParticipantsSectionProps = {
-  rootClassName?: string;
-  className?: string;
+type TManageParticipantsSectionProps = TDefaultProps & {
   data: {
     participantData: Array<TUser>;
     planData: TObject;
   };
 };
 
-const BookerOrderDetailsManageParticipantsSection: React.FC<
-  BookerOrderDetailsManageParticipantsSectionProps
-> = (props) => {
+const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
+  props,
+) => {
+  const { rootClassName, className, data } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [currentParticipantId, setCurrentParticipantId] = useState<string>();
@@ -59,34 +58,35 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
     useState(false);
   const [isManageParticipantsModalOpen, setIsManageParticipantsModalOpen] =
     useState(false);
+
+  const rootClasses = classNames(rootClassName || css.root, className);
+
+  const { participantData } = data;
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const disableButton = inProgress;
 
-  const { rootClassName, className, data } = props;
-  const rootClasses = classNames(rootClassName || css.root, className);
-
   const sectionTitle = intl.formatMessage(
     {
-      id: 'BookerOrderDetailsManageParticipantsSection.title',
+      id: 'ManageParticipantsSection.title',
     },
-    { total: 30 },
+    { total: participantData.length },
   );
 
   const deleteParticipantPopupTitle = intl.formatMessage({
-    id: 'BookerOrderDetailsManageParticipantsSection.deleteParticipantPopup.title',
+    id: 'ManageParticipantsSection.deleteParticipantPopup.title',
   });
   const deleteParticipantPopupQuestion = intl.formatMessage({
-    id: 'BookerOrderDetailsManageParticipantsSection.deleteParticipantPopup.confirmQuestion',
+    id: 'ManageParticipantsSection.deleteParticipantPopup.confirmQuestion',
   });
   const cancelDeleteParticipantText = intl.formatMessage({
-    id: 'BookerOrderDetailsManageParticipantsSection.deleteParticipantPopup.cancel',
+    id: 'ManageParticipantsSection.deleteParticipantPopup.cancel',
   });
   const confirmDeleteParticipantText = intl.formatMessage({
-    id: 'BookerOrderDetailsManageParticipantsSection.deleteParticipantPopup.confirm',
+    id: 'ManageParticipantsSection.deleteParticipantPopup.confirm',
   });
 
   const viewDetailText = intl.formatMessage({
-    id: 'BookerOrderDetailsManageParticipantsSection.viewDetailText',
+    id: 'ManageParticipantsSection.viewDetailText',
   });
 
   const handleClickDeleteParticipant = (participantId: string) => () => {
@@ -99,7 +99,7 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
   const handleConfirmDeleteParticipant = () => {
     if (currentParticipantId) {
       dispatch(
-        BookerOrderManagementsThunks.deleteParticipant({
+        orderManagementsThunks.deleteParticipant({
           participantId: currentParticipantId,
         }),
       );
@@ -118,7 +118,7 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
   };
 
   const handleSubmitAddParticipant = ({ email }: TAddParticipantFormValues) => {
-    dispatch(BookerOrderManagementsThunks.addParticipant({ email }));
+    dispatch(orderManagementsThunks.addParticipant({ email }));
   };
 
   return (
@@ -128,7 +128,7 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
       <AddParticipantForm onSubmit={handleSubmitAddParticipant} />
       <div className={css.participantContainer}>
         {renderParticipantCards(
-          data.participantData.slice(0, 4),
+          participantData.slice(0, 4),
           handleClickDeleteParticipant,
         )}
       </div>
@@ -163,4 +163,4 @@ const BookerOrderDetailsManageParticipantsSection: React.FC<
   );
 };
 
-export default BookerOrderDetailsManageParticipantsSection;
+export default ManageParticipantsSection;

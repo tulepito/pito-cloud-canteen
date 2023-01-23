@@ -44,10 +44,11 @@ export type TError = {
   statusText: string;
   apiErrors: TSharetribeFlexSdkApiError[];
 };
+/* =============== Props =============== */
 
-export type TIconProps = {
-  className?: string;
-  rootClassName?: string;
+export type TDefaultProps = { className?: string; rootClassName?: string };
+
+export type TIconProps = TDefaultProps & {
   width?: number;
   height?: number;
   onClick?: () => void;

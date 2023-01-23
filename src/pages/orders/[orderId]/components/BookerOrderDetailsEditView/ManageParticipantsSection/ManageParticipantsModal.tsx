@@ -7,9 +7,9 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { TAddParticipantFormValues } from './AddParticipantForm';
 import AddParticipantForm from './AddParticipantForm';
-import { isParticipantCompletedPickFood } from './BookerOrderDetailsManageParticipantsSection.helper';
-import BookerOrderDetailsParticipantCard from './BookerOrderDetailsParticipantCard';
 import css from './ManageParticipantsModal.module.scss';
+import { isParticipantCompletedPickFood } from './ManageParticipantsSection.helper';
+import ParticipantCard from './ParticipantCard';
 
 // const groupedMockupData = [
 //   { name: 'Group A', participants: [1, 3, 4, 5] },
@@ -47,7 +47,7 @@ const RawParticipants: React.FC<TRawParticipantsProps> = ({
         );
 
         const cardComponent = (
-          <BookerOrderDetailsParticipantCard
+          <ParticipantCard
             name={displayName}
             email={email}
             className={css.participantCard}
@@ -103,7 +103,7 @@ export const GroupedParticipants: React.FC<TGroupedParticipantsProps> = ({
             <div className={css.rawParticipants}>
               {participants.map((number: any, index: number) => {
                 return (
-                  <BookerOrderDetailsParticipantCard
+                  <ParticipantCard
                     className={css.participantCard}
                     onClickDeleteIcon={() => () => console.log(index)}
                     key={index}

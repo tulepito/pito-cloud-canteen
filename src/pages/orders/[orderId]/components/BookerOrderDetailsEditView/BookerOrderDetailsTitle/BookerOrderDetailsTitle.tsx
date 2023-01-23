@@ -5,7 +5,7 @@ import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import { useIntl } from 'react-intl';
 
-import { orderDetailsAnyActionsInProgress } from '../../../BookerOrderManagement.slice';
+import { orderDetailsAnyActionsInProgress } from '../../../OrderManagement.slice';
 import css from './BookerOrderDetailsTitle.module.scss';
 
 type TBookerOrderDetailsTitleProps = {

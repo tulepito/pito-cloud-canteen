@@ -4,27 +4,24 @@ import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import IconShare from '@components/Icons/IconShare/IconShare';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import React, { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { BookerOrderManagementsThunks } from '../../../BookerOrderManagement.slice';
-import css from './BookerOrderDetailsOrderLinkSection.module.scss';
+import { orderManagementsThunks } from '../../../OrderManagement.slice';
+import css from './OrderLinkSection.module.scss';
 import type { TSendNotificationFormValues } from './SendNotificationForm';
 import SendNotificationModal from './SendNotificationModal';
 
-type BookerOrderDetailsOrderLinkSectionProps = {
-  rootClassName?: string;
-  className?: string;
+type TOrderLinkSectionProps = TDefaultProps & {
   data: {
     orderDeadline: number;
   };
 };
 
-const BookerOrderDetailsOrderLinkSection: React.FC<
-  BookerOrderDetailsOrderLinkSectionProps
-> = (props) => {
+const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const {
     rootClassName,
     className,
@@ -32,7 +29,7 @@ const BookerOrderDetailsOrderLinkSection: React.FC<
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const { orderData } = useAppSelector((state) => state.BookerOrderManagement);
+  const { orderData } = useAppSelector((state) => state.OrderManagement);
   const orderLink = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderData?.id?.uuid}`;
   const formattedOrderDeadline = DateTime.fromMillis(orderDeadline).toFormat(
     'HH:mm EEE,dd/MM/yyyy',
@@ -45,14 +42,14 @@ const BookerOrderDetailsOrderLinkSection: React.FC<
   const defaultCopyText = useMemo(
     () =>
       intl.formatMessage({
-        id: 'BookerOrderDetailsOrderLinkSection.copyToClipboardTooltip.default',
+        id: 'OrderLinkSection.copyToClipboardTooltip.default',
       }),
     [],
   );
   const copiedCopyText = useMemo(
     () =>
       intl.formatMessage({
-        id: 'BookerOrderDetailsOrderLinkSection.copyToClipboardTooltip.copied',
+        id: 'OrderLinkSection.copyToClipboardTooltip.copied',
       }),
     [],
   );
@@ -63,10 +60,10 @@ const BookerOrderDetailsOrderLinkSection: React.FC<
     useState(false);
 
   const sectionTitle = intl.formatMessage({
-    id: 'BookerOrderDetailsOrderLinkSection.title',
+    id: 'OrderLinkSection.title',
   });
   const shareText = intl.formatMessage({
-    id: 'BookerOrderDetailsOrderLinkSection.shareText',
+    id: 'OrderLinkSection.shareText',
   });
 
   const handleCopyLink = () => {
@@ -90,7 +87,7 @@ const BookerOrderDetailsOrderLinkSection: React.FC<
       deadline: formattedOrderDeadline,
     };
 
-    dispatch(BookerOrderManagementsThunks.sendRemindEmailToMember(emailParams));
+    dispatch(orderManagementsThunks.sendRemindEmailToMember(emailParams));
   };
 
   return (
@@ -126,4 +123,4 @@ const BookerOrderDetailsOrderLinkSection: React.FC<
   );
 };
 
-export default BookerOrderDetailsOrderLinkSection;
+export default OrderLinkSection;

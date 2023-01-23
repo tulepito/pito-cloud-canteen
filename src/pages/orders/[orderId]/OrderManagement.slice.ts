@@ -12,8 +12,9 @@ import {
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TCompany, TObject, TUser } from '@utils/types';
 import omit from 'lodash/omit';
+
 // ================ Initial states ================ //
-type TBookerOrderManagementState = {
+type TOrderManagementState = {
   // Fetch data state
   isFetchingOrderDetails: boolean;
   // Delete state
@@ -29,7 +30,7 @@ type TBookerOrderManagementState = {
   planData: TObject;
   participantData: Array<TUser>;
 };
-const initialState: TBookerOrderManagementState = {
+const initialState: TOrderManagementState = {
   isFetchingOrderDetails: false,
   isDeletingParticipant: false,
   isUpdatingOrderDetails: false,
@@ -45,7 +46,7 @@ const initialState: TBookerOrderManagementState = {
 
 // ================ Async thunks ================ //
 const loadData = createAsyncThunk(
-  'app/BookerOrderManagement/LOAD_DATA',
+  'app/OrderManagement/LOAD_DATA',
   async (orderId: string) => {
     const response: any = await loadBookerOrderDataApi(orderId);
     return response.data;
@@ -53,9 +54,9 @@ const loadData = createAsyncThunk(
 );
 
 const updateOrderGeneralInfo = createAsyncThunk(
-  'app/BookerOrderManagement/UPDATE_ORDER_GENERAL_INFO',
+  'app/OrderManagement/UPDATE_ORDER_GENERAL_INFO',
   async (params: TObject, { getState, dispatch }) => {
-    const orderData = getState().BookerOrderManagement.orderData!;
+    const orderData = getState().OrderManagement.orderData!;
     const {
       id: { uuid: orderId },
       attributes: { metadata },
@@ -79,19 +80,19 @@ const updateOrderGeneralInfo = createAsyncThunk(
 );
 
 const sendRemindEmailToMember = createAsyncThunk(
-  'app/BookerOrderManagement/SEND_REMIND_EMAIL_TO_MEMBER',
+  'app/OrderManagement/SEND_REMIND_EMAIL_TO_MEMBER',
   async (params: TObject, { getState }) => {
     const { orderLink, deadline, description } = params;
 
     const {
       id: { uuid: orderId },
-    } = getState().BookerOrderManagement.orderData!;
-    const participantList = getState().BookerOrderManagement.participantData!;
+    } = getState().OrderManagement.orderData!;
+    const participantList = getState().OrderManagement.participantData!;
     const {
       attributes: {
         metadata: { orderDetail },
       },
-    } = getState().BookerOrderManagement.planData!;
+    } = getState().OrderManagement.planData!;
 
     const memberIdList = Object.values(orderDetail).reduce(
       (result, currentDateOrders) => {
@@ -139,16 +140,16 @@ const sendRemindEmailToMember = createAsyncThunk(
 );
 
 const addOrUpdateMemberOrder = createAsyncThunk(
-  'app/BookerOrderManagement/ADD_OR_UPDATE_MEMBER_ORDER',
+  'app/OrderManagement/ADD_OR_UPDATE_MEMBER_ORDER',
   async (params: TObject, { getState, dispatch }) => {
     const { currentViewDate, foodId, memberId, requirement } = params;
     const {
       id: { uuid: orderId },
-    } = getState().BookerOrderManagement.orderData!;
+    } = getState().OrderManagement.orderData!;
     const {
       id: { uuid: planId },
       attributes: { metadata },
-    } = getState().BookerOrderManagement.planData!;
+    } = getState().OrderManagement.planData!;
 
     const memberOrderDetailOnUpdateDate =
       metadata?.orderDetail[currentViewDate].memberOrders[memberId];
@@ -202,16 +203,16 @@ const addOrUpdateMemberOrder = createAsyncThunk(
 );
 
 const disallowMember = createAsyncThunk(
-  'app/BookerOrderManagement/DISALLOW_MEMBER',
+  'app/OrderManagement/DISALLOW_MEMBER',
   async (params: TObject, { getState, dispatch }) => {
     const { currentViewDate, memberId } = params;
     const {
       id: { uuid: orderId },
-    } = getState().BookerOrderManagement.orderData!;
+    } = getState().OrderManagement.orderData!;
     const {
       id: { uuid: planId },
       attributes: { metadata },
-    } = getState().BookerOrderManagement.planData!;
+    } = getState().OrderManagement.planData!;
 
     const memberOrderDetailOnUpdateDate =
       metadata?.orderDetail[currentViewDate].memberOrders[memberId];
@@ -251,23 +252,23 @@ const disallowMember = createAsyncThunk(
 );
 
 const addParticipant = createAsyncThunk(
-  'app/BookerOrderManagement/ADD_PARTICIPANT',
+  'app/OrderManagement/ADD_PARTICIPANT',
   async (params: TObject, { getState, dispatch }) => {
     const { email } = params;
-    const { companyId } = getState().BookerOrderManagement;
+    const { companyId } = getState().OrderManagement;
 
     const {
       id: { uuid: orderId },
       attributes: {
         metadata: { participants = [] },
       },
-    } = getState().BookerOrderManagement.orderData!;
+    } = getState().OrderManagement.orderData!;
     const {
       id: { uuid: planId },
       attributes: {
         metadata: { orderDetail },
       },
-    } = getState().BookerOrderManagement.planData!;
+    } = getState().OrderManagement.planData!;
 
     const bodyParams = {
       email,
@@ -284,7 +285,7 @@ const addParticipant = createAsyncThunk(
 );
 
 const deleteParticipant = createAsyncThunk(
-  'app/BookerOrderManagement/DELETE_PARTICIPANT',
+  'app/OrderManagement/DELETE_PARTICIPANT',
   async (params: TObject, { getState, dispatch }) => {
     const { participantId } = params;
     const {
@@ -292,13 +293,13 @@ const deleteParticipant = createAsyncThunk(
       attributes: {
         metadata: { participants = [] },
       },
-    } = getState().BookerOrderManagement.orderData!;
+    } = getState().OrderManagement.orderData!;
     const {
       id: { uuid: planId },
       attributes: {
         metadata: { orderDetail },
       },
-    } = getState().BookerOrderManagement.planData!;
+    } = getState().OrderManagement.planData!;
 
     const newOrderDetail = Object.entries(orderDetail).reduce(
       (result, current) => {
@@ -328,7 +329,7 @@ const deleteParticipant = createAsyncThunk(
   },
 );
 
-export const BookerOrderManagementsThunks = {
+export const orderManagementsThunks = {
   loadData,
   updateOrderGeneralInfo,
   addOrUpdateMemberOrder,
@@ -339,8 +340,8 @@ export const BookerOrderManagementsThunks = {
 };
 
 // ================ Slice ================ //
-const BookerOrderManagementSlice = createSlice({
-  name: 'BookerOrderManagement',
+const OrderManagementSlice = createSlice({
+  name: 'OrderManagement',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -403,8 +404,8 @@ const BookerOrderManagementSlice = createSlice({
 });
 
 // ================ Actions ================ //
-export const BookerOrderManagementsAction = BookerOrderManagementSlice.actions;
-export default BookerOrderManagementSlice.reducer;
+export const OrderManagementsAction = OrderManagementSlice.actions;
+export default OrderManagementSlice.reducer;
 
 // ================ Selectors ================ //
 export const orderDetailsAnyActionsInProgress = (state: RootState) => {
@@ -413,7 +414,7 @@ export const orderDetailsAnyActionsInProgress = (state: RootState) => {
     isDeletingParticipant,
     isUpdatingOrderDetails,
     isSendingRemindEmail,
-  } = state.BookerOrderManagement;
+  } = state.OrderManagement;
 
   return (
     isFetchingOrderDetails ||

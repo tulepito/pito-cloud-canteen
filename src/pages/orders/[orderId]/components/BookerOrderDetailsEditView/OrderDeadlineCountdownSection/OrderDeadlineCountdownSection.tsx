@@ -7,12 +7,12 @@ import { DateTime } from 'luxon';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { BookerOrderManagementsThunks } from '../../../BookerOrderManagement.slice';
-import css from './BookerOrderDetailsCountdownSection.module.scss';
+import { orderManagementsThunks } from '../../../OrderManagement.slice';
 import type { TEditOrderDeadlineFormValues } from './EditOrderDeadlineForm';
 import EditOrderDeadlineModal from './EditOrderDeadlineModal';
+import css from './OrderDeadlineCountdownSection.module.scss';
 
-type BookerOrderDetailsCountdownSectionProps = {
+type OrderDeadlineCountdownSectionProps = {
   rootClassName?: string;
   className?: string;
   data: {
@@ -22,8 +22,8 @@ type BookerOrderDetailsCountdownSectionProps = {
   };
 };
 
-const BookerOrderDetailsCountdownSection: React.FC<
-  BookerOrderDetailsCountdownSectionProps
+const OrderDeadlineCountdownSection: React.FC<
+  OrderDeadlineCountdownSectionProps
 > = (props) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -44,11 +44,11 @@ const BookerOrderDetailsCountdownSection: React.FC<
   );
 
   const sectionTitle = intl.formatMessage({
-    id: 'BookerOrderDetailsCountdownSection.title',
+    id: 'OrderDeadlineCountdownSection.title',
   });
   const orderEndAtMessage = intl.formatMessage(
     {
-      id: 'BookerOrderDetailsCountdownSection.orderEndAt',
+      id: 'OrderDeadlineCountdownSection.orderEndAt',
     },
     {
       deadline: <b>{formattedDeadline}</b>,
@@ -56,7 +56,7 @@ const BookerOrderDetailsCountdownSection: React.FC<
   );
 
   const editDeadlineText = intl.formatMessage({
-    id: 'BookerOrderDetailsCountdownSection.editDeadline',
+    id: 'OrderDeadlineCountdownSection.editDeadline',
   });
 
   const handleClickEditIcon = () => {
@@ -84,7 +84,7 @@ const BookerOrderDetailsCountdownSection: React.FC<
       orderDeadline: newOrderDeadline,
     };
 
-    dispatch(BookerOrderManagementsThunks.updateOrderGeneralInfo(updateData));
+    dispatch(orderManagementsThunks.updateOrderGeneralInfo(updateData));
     setIsEditOrderDeadlineModalOpen(false);
   };
 
@@ -117,4 +117,4 @@ const BookerOrderDetailsCountdownSection: React.FC<
   );
 };
 
-export default BookerOrderDetailsCountdownSection;
+export default OrderDeadlineCountdownSection;
