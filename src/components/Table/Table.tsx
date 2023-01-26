@@ -1,6 +1,6 @@
 import Form from '@components/Form/Form';
 import PaginationLinks from '@components/PaginationLinks/PaginationLinks';
-import type { TPagination } from '@utils/types';
+import type { TDefaultProps, TPagination } from '@utils/types';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';
 import React from 'react';
@@ -20,10 +20,9 @@ export type TRowData = {
   data: any;
 };
 
-type TTableProps = {
+type TTableProps = TDefaultProps & {
   columns: TColumn[];
   data: TRowData[];
-  rootClassName?: string;
   tableClassName?: string;
   tableHeadClassName?: string;
   tableHeadRowClassName?: string;

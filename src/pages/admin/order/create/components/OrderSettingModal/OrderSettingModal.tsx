@@ -21,7 +21,7 @@ import ParticipantSetupField from '../ParticipantSetupField/ParticipantSetupFiel
 import PerPackageField from '../PerPackageField/PerPackageField';
 import css from './OrderSettingModal.module.scss';
 
-type OrderSettingModalProps = {
+type TOrderSettingModalProps = {
   isOpen: boolean;
   onClose: () => void;
   initialFieldValues: any;
@@ -38,7 +38,7 @@ export enum OrderSettingField {
   PER_PACK = 'perPack',
 }
 
-const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
+const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
   const { isOpen, onClose, initialFieldValues } = props;
   const [selectedField, setSelectedField] = useState<string>(
     OrderSettingField.COMPANY,

@@ -2,6 +2,7 @@ import Button from '@components/Button/Button';
 import CountdownTimer from '@components/CountdownTimer/CountdownTimer';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import { useState } from 'react';
@@ -12,9 +13,7 @@ import type { TEditOrderDeadlineFormValues } from './EditOrderDeadlineForm';
 import EditOrderDeadlineModal from './EditOrderDeadlineModal';
 import css from './OrderDeadlineCountdownSection.module.scss';
 
-type OrderDeadlineCountdownSectionProps = {
-  rootClassName?: string;
-  className?: string;
+type TOrderDeadlineCountdownSectionProps = TDefaultProps & {
   data: {
     startDate: number;
     deadlineHour: string;
@@ -23,7 +22,7 @@ type OrderDeadlineCountdownSectionProps = {
 };
 
 const OrderDeadlineCountdownSection: React.FC<
-  OrderDeadlineCountdownSectionProps
+  TOrderDeadlineCountdownSectionProps
 > = (props) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();

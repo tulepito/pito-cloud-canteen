@@ -1,16 +1,14 @@
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import { useAppSelector } from '@hooks/reduxHooks';
-import type { TObject } from '@utils/types';
+import type { TDefaultProps, TObject } from '@utils/types';
 import classNames from 'classnames';
 import { useIntl } from 'react-intl';
 
 import { orderDetailsAnyActionsInProgress } from '../../../OrderManagement.slice';
 import css from './BookerOrderDetailsTitle.module.scss';
 
-type TBookerOrderDetailsTitleProps = {
-  rootClassName?: string;
-  className?: string;
+type TBookerOrderDetailsTitleProps = TDefaultProps & {
   data: {
     deliveryHour: string;
     deliveryAddress: TObject;

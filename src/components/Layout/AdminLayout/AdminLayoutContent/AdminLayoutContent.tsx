@@ -1,6 +1,7 @@
 /**
  * This is a wrapper component for different Layouts. Main content should be added to this wrapper.
  */
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
@@ -8,11 +9,11 @@ import React from 'react';
 import { BreadCrumbs } from '../AdminBreadCrumbs/AdminBreadCrumbs';
 import css from './AdminLayoutContent.module.scss';
 
-type TAdminLayoutContentProps = PropsWithChildren<{
-  rootClassName?: string;
-  className?: string;
-  isMenuOpen?: boolean;
-}>;
+type TAdminLayoutContentProps = PropsWithChildren<
+  TDefaultProps & {
+    isMenuOpen?: boolean;
+  }
+>;
 
 const AdminLayoutContent: React.FC<TAdminLayoutContentProps> = (props) => {
   const { className, rootClassName, children, isMenuOpen } = props;

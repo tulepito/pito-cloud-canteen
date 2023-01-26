@@ -1,12 +1,11 @@
 import { CATEGORY_OPTIONS } from '@utils/enums';
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import get from 'lodash/get';
 
 import css from './RestaurantTable.module.scss';
 
-type TRestaurantRowProps = {
-  rootClassName?: string;
-  className?: string;
+type TRestaurantRowProps = TDefaultProps & {
   restaurant: any;
   onItemClick: () => void;
 };

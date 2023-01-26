@@ -1,20 +1,21 @@
 import { InlineTextButton } from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import useBoolean from '@hooks/useBoolean';
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import type { PropsWithChildren, ReactNode } from 'react';
 import React from 'react';
 
 import css from './Collapsible.module.scss';
 
-type TCollapsibleProps = PropsWithChildren<{
-  rootClassName?: string;
-  className?: string;
-  label: string | ReactNode | number;
-  labelSectionClassName?: string;
-  labelClassName?: string;
-  contentClassName?: string;
-}>;
+type TCollapsibleProps = PropsWithChildren<
+  TDefaultProps & {
+    label: string | ReactNode | number;
+    labelSectionClassName?: string;
+    labelClassName?: string;
+    contentClassName?: string;
+  }
+>;
 
 const Collapsible: React.FC<TCollapsibleProps> = (props) => {
   const {

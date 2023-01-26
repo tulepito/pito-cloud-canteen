@@ -10,14 +10,14 @@ import { useIntl } from 'react-intl';
 
 import css from './OrderDeadlineField.module.scss';
 
-type OrderDeadlineFieldProps = {
+type TOrderDeadlineFieldProps = {
   form: any;
   values: Record<string, any>;
   columnLayout?: boolean;
   title?: string;
 };
 
-const OrderDeadlineField: React.FC<OrderDeadlineFieldProps> = (props) => {
+const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
   const { values, columnLayout, title, form } = props;
   const {
     deadlineDate: deadlineDateInitialValue,

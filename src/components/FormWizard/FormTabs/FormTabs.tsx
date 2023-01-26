@@ -1,3 +1,4 @@
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import type { ReactElement } from 'react';
 import React from 'react';
@@ -5,9 +6,7 @@ import React from 'react';
 import FormTabNav from '../FormTabNav/FormTabNav';
 import css from './FormTabs.module.scss';
 
-type TFormTabsProps = {
-  className?: string;
-  rootClassName?: string;
+type TFormTabsProps = TDefaultProps & {
   navRootClassName?: string;
   tabRootClassName?: string;
   formTabNavClassName?: string;

@@ -1,6 +1,7 @@
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconSearch from '@components/Icons/IconSearch/IconSearch';
+import type { TDefaultProps } from '@utils/types';
 import type { ReactNode } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
@@ -13,11 +14,9 @@ export type TSearchRestaurantFormValues = {
   name: string;
 };
 
-type TExtraProps = {
+type TExtraProps = TDefaultProps & {
   formId?: string;
   errorMessage?: ReactNode;
-  rootClassName?: string;
-  className?: string;
   inProgress?: boolean;
   onSearchRestaurant: (value: string) => void;
 };

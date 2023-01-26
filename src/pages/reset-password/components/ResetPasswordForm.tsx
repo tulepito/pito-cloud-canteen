@@ -1,6 +1,7 @@
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
+import type { TDefaultProps } from '@utils/types';
 import {
   composeValidators,
   passwordFormatValid,
@@ -17,10 +18,8 @@ export type TResetPasswordFormValues = {
   password: string;
 };
 
-type TExtraProps = {
+type TExtraProps = TDefaultProps & {
   formId?: string;
-  rootClassName?: string;
-  className?: string;
   inProgress: boolean;
 };
 type TResetPasswordFormComponentProps =

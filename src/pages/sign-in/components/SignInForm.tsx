@@ -4,6 +4,7 @@ import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldP
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconGoogle from '@components/Icons/IconGoogle/IconGoogle';
 import { generalPaths } from '@src/paths';
+import type { TDefaultProps } from '@utils/types';
 import {
   composeValidators,
   emailFormatValid,
@@ -24,11 +25,9 @@ export type TSignInFormValues = {
   password: string;
 };
 
-type TExtraProps = {
+type TExtraProps = TDefaultProps & {
   formId?: string;
   errorMessage?: ReactNode;
-  rootClassName?: string;
-  className?: string;
   inProgress: boolean;
 };
 type TSignInFormComponentProps = FormRenderProps<TSignInFormValues> &

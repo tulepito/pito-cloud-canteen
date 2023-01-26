@@ -19,7 +19,10 @@ import type {
 
 const { UUID, LatLng, Money } = sdkLoader;
 
-export type TObject<T = any> = Record<string, T>;
+export type TObject<
+  K extends string | number | symbol = string,
+  V = any,
+> = Record<K, V>;
 export type ReverseMap<T> = T[keyof T];
 export type TReverseMapFromEnum<T> = T[keyof T];
 export type NextApplicationPage<P = any, IP = P> = NextPage<P, IP> & {

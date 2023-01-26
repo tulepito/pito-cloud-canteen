@@ -6,6 +6,7 @@ import IconClose from '@components/Icons/IconClose/IconClose';
 import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
 import IconSearch from '@components/Icons/IconSearch/IconSearch';
 import { toLowerCaseNonAccentVietnamese } from '@utils/nonAccentVietnamese';
+import type { TDefaultProps } from '@utils/types';
 import arrayMutators from 'final-form-arrays';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -50,11 +51,9 @@ export type TSelectFoodFormValues = {
   checkAll: boolean;
 };
 
-type TExtraProps = {
+type TExtraProps = TDefaultProps & {
   formId?: string;
   errorMessage?: ReactNode;
-  rootClassName?: string;
-  className?: string;
   inProgress?: boolean;
   items: any[];
   handleFormChange: (food: string[] | undefined) => void;
