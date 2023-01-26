@@ -61,27 +61,19 @@ const GroupDetailPage = () => {
     (state) => state.company.groupMembers,
     shallowEqual,
   );
-  const fetchGroupDetailInProgress = useAppSelector(
-    (state) => state.company.fetchGroupDetailInProgress,
-  );
   const companyMembers = useAppSelector(
     (state) => state.company.companyMembers,
     shallowEqual,
   );
-  const updateGroupInProgress = useAppSelector(
-    (state) => state.company.updateGroupInProgress,
-  );
-  const deleteGroupInProgress = useAppSelector(
-    (state) => state.company.deleteGroupInProgress,
-  );
 
-  const deleteGroupError = useAppSelector(
-    (state) => state.company.deleteGroupError,
-  );
+  const {
+    fetchGroupDetailInProgress,
+    updateGroupInProgress,
+    deleteGroupInProgress,
+    deleteGroupError,
+    updateGroupError,
+  } = useAppSelector((state) => state.company);
 
-  const updateGroupError = useAppSelector(
-    (state) => state.company.updateGroupError,
-  );
   const getGroupNames = (groupIds: string[]) => {
     return filter(groupList, (group: any) => groupIds.includes(group.id))
       .map((group: any) => group.name)

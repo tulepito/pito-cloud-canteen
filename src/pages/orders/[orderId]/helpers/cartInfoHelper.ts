@@ -1,4 +1,4 @@
-import { EParticipantOrderStatus } from '@utils/enums';
+import { isJoinedPlan } from '@helpers/orderHelper';
 import type { TObject } from '@utils/types';
 
 export const calculateTotalPriceAndDishes = ({
@@ -6,20 +6,19 @@ export const calculateTotalPriceAndDishes = ({
 }: {
   orderDetail: TObject;
 }) => {
-  return Object.entries(orderDetail).reduce(
+  return Object.entries<TObject>(orderDetail).reduce<TObject>(
     (result, currentOrderDetailEntry) => {
       const [, rawOrderDetailOfDate] = currentOrderDetailEntry;
 
-      const { memberOrders, foodList: foodListOfDate } =
-        rawOrderDetailOfDate as TObject;
+      const { memberOrders, foodList: foodListOfDate } = rawOrderDetailOfDate;
 
-      const foodDataMap = Object.entries(memberOrders).reduce(
+      const foodDataMap = Object.entries(memberOrders).reduce<TObject>(
         (foodFrequencyResult, currentMemberOrderEntry) => {
           const [, memberOrderData] = currentMemberOrderEntry;
           const { foodId, status } = memberOrderData as TObject;
           const { foodName, foodPrice } = foodListOfDate[foodId] || {};
 
-          if (status === EParticipantOrderStatus.joined && foodId !== '') {
+          if (isJoinedPlan(foodId, status)) {
             const data = foodFrequencyResult[foodId] as TObject;
             const { frequency } = data || {};
 
@@ -33,12 +32,12 @@ export const calculateTotalPriceAndDishes = ({
 
           return foodFrequencyResult;
         },
-        {} as TObject,
+        {},
       );
 
       const foodDataList = Object.values(foodDataMap);
-      const totalInfo = foodDataList.reduce(
-        (previousResult: TObject, current: TObject) => {
+      const totalInfo = foodDataList.reduce<TObject>(
+        (previousResult, current: TObject) => {
           const { totalPrice, totalDishes } = previousResult;
 
           const { frequency, foodPrice } = current;
@@ -51,7 +50,7 @@ export const calculateTotalPriceAndDishes = ({
         {
           totalDishes: 0,
           totalPrice: 0,
-        } as TObject,
+        },
       );
 
       return {
@@ -63,6 +62,6 @@ export const calculateTotalPriceAndDishes = ({
     {
       totalDishes: 0,
       totalPrice: 0,
-    } as TObject,
+    },
   );
 };

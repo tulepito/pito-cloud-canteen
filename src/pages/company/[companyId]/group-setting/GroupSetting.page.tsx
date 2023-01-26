@@ -52,19 +52,13 @@ const GroupSettingPage = () => {
     (state) => state.company.companyMembers,
     shallowEqual,
   );
-  const fetchCompanyInfoInProgress = useAppSelector(
-    (state) => state.company.fetchCompanyInfoInProgress,
-  );
-  const deleteGroupInProgress = useAppSelector(
-    (state) => state.company.deleteGroupInProgress,
-  );
-  const deletingGroupId = useAppSelector(
-    (state) => state.company.deletingGroupId,
-  );
+  const { fetchCompanyInfoInProgress, deleteGroupInProgress, deletingGroupId } =
+    useAppSelector((state) => state.company);
   const originCompanyMembers = useAppSelector(
     (state) => state.company.originCompanyMembers,
     shallowEqual,
   );
+
   const formattedGroupList = useMemo<TRowData[]>(
     () =>
       groupList.reduce(

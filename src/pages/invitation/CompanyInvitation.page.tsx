@@ -5,6 +5,7 @@ import {
   BookerManageCompany,
 } from '@redux/slices/company.slice';
 import { companyInvitationThunks } from '@redux/slices/companyInvitation.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { generalPaths } from '@src/paths';
 import { UserInviteResponse } from '@src/types/UserPermission';
 import { USER } from '@utils/data';
@@ -22,23 +23,17 @@ const CompanyInvitationPage = () => {
   const dispatch = useAppDispatch();
   const { isReady } = router;
   const { companyId = '' } = router.query;
-  const currentUser = useAppSelector(
-    (state) => state.user.currentUser,
-    shallowEqual,
-  );
+  const currentUser = useAppSelector(currentUserSelector);
   const company = useAppSelector(
     (state) => state.company.company,
     shallowEqual,
   );
-  const responseToInvitationInProgress = useAppSelector(
-    (state) => state.companyInvitation.responseToInvitationInProgress,
-  );
-  const checkInvitationResult = useAppSelector(
-    (state) => state.companyInvitation.checkInvitationResult,
-  );
-  const responseToInvitationResult = useAppSelector(
-    (state) => state.companyInvitation.responseToInvitationResult,
-  );
+  const {
+    responseToInvitationInProgress,
+    checkInvitationResult,
+    responseToInvitationResult,
+  } = useAppSelector((state) => state.companyInvitation);
+
   useEffect(() => {
     const fetchData = async () => {
       dispatch(addWorkspaceCompanyId(companyId));

@@ -24,14 +24,10 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     const currUserId = currentUser?.id?.uuid;
     return state.shopingCart.orders?.[currUserId]?.[planId || 1];
   });
-  const plan = useAppSelector((state) => state.ParticipantSetupPlanPage.plan);
+  const { plan, loadDataInProgress, submitDataInprogress } = useAppSelector(
+    (state) => state.ParticipantSetupPlanPage,
+  );
   const orderDays = Object.keys(plan);
-  const loadDataInProgress = useAppSelector(
-    (state) => state.ParticipantSetupPlanPage.loadDataInProgress,
-  );
-  const submitDataInprogress = useAppSelector(
-    (state) => state.ParticipantSetupPlanPage.submitDataInprogress,
-  );
 
   const cartListKeys = Object.keys(cartList || []).filter(
     (cartKey) => !!cartList[cartKey],

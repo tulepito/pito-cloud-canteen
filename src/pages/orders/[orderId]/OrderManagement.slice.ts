@@ -329,7 +329,7 @@ const deleteParticipant = createAsyncThunk(
   },
 );
 
-export const orderManagementsThunks = {
+export const orderManagementThunks = {
   loadData,
   updateOrderGeneralInfo,
   addOrUpdateMemberOrder,

@@ -10,7 +10,7 @@ import { DateTime } from 'luxon';
 import React, { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { orderManagementsThunks } from '../../../OrderManagement.slice';
+import { orderManagementThunks } from '../../../OrderManagement.slice';
 import css from './OrderLinkSection.module.scss';
 import type { TSendNotificationFormValues } from './SendNotificationForm';
 import SendNotificationModal from './SendNotificationModal';
@@ -87,7 +87,7 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
       deadline: formattedOrderDeadline,
     };
 
-    dispatch(orderManagementsThunks.sendRemindEmailToMember(emailParams));
+    dispatch(orderManagementThunks.sendRemindEmailToMember(emailParams));
   };
 
   return (

@@ -1,6 +1,7 @@
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { ParticipantSetupPlanThunks } from '@redux/slices/ParticipantSetupPlanPage.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import SectionCountdown from '@src/pages/participant/components/SectionCountdown/SectionCountdown';
 import SectionOrderListing from '@src/pages/participant/components/SectionOrderListing/SectionOrderListing';
 import SectionOrderPanel from '@src/pages/participant/components/SectionOrderPanel/SectionOrderPanel';
@@ -18,17 +19,16 @@ const ParticipantSetupPlan = () => {
 
   const dispatch = useAppDispatch();
   const { planId, orderDay } = router.query;
-  const order = useAppSelector((state) => state.ParticipantSetupPlanPage.order);
-  const loadDataInProgress = useAppSelector(
-    (state) => state.ParticipantSetupPlanPage.loadDataInProgress,
+  const { order, loadDataInProgress, plan } = useAppSelector(
+    (state) => state.ParticipantSetupPlanPage,
   );
+  const currentUser = useAppSelector(currentUserSelector);
+
   const orderId = order?.id?.uuid;
   const { generalInfo } = LISTING(order).getMetadata();
   const { orderDeadline } = generalInfo || {};
 
-  const plan = useAppSelector((state) => state.ParticipantSetupPlanPage.plan);
   const [orderDayState, setOrderDayState] = useState<number>();
-  const currentUser = useAppSelector((state) => state.user.currentUser);
 
   const handleSelectRestaurant = (selectedItem: any) => {
     const dayId = selectedItem?.id;

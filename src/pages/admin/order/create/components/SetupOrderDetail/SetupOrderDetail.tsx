@@ -27,8 +27,8 @@ import OrderSettingModal, {
 import SelectRestaurantPage from '../SelectRestaurantPage/SelectRestaurant.page';
 import css from './SetupOrderDetail.module.scss';
 
-const renderResourcesForCalendar = (orderDetail: Record<string, any>) => {
-  const entries = Object.entries(orderDetail);
+const renderResourcesForCalendar = (orderDetail: TObject) => {
+  const entries = Object.entries<TObject>(orderDetail);
 
   const resources = entries.map((item) => {
     const [date, data] = item;

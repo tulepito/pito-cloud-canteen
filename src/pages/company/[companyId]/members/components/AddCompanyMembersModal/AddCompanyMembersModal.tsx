@@ -33,11 +33,8 @@ const AddCompanyMembersModal: React.FC<CreateGroupModalProps> = (props) => {
     (state) => state.companyMember.checkedEmailInputChunk,
     shallowEqual,
   );
-  const addMembersInProgress = useAppSelector(
-    (state) => state.companyMember.addMembersInProgress,
-  );
-  const addMembersError = useAppSelector(
-    (state) => state.companyMember.addMembersError,
+  const { addMembersInProgress, addMembersError } = useAppSelector(
+    (state) => state.companyMember,
   );
   const companyAccount = useAppSelector(
     (state) => state.company.company,

@@ -8,7 +8,7 @@ import { DateTime } from 'luxon';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { orderManagementsThunks } from '../../../OrderManagement.slice';
+import { orderManagementThunks } from '../../../OrderManagement.slice';
 import type { TEditOrderDeadlineFormValues } from './EditOrderDeadlineForm';
 import EditOrderDeadlineModal from './EditOrderDeadlineModal';
 import css from './OrderDeadlineCountdownSection.module.scss';
@@ -83,7 +83,7 @@ const OrderDeadlineCountdownSection: React.FC<
       orderDeadline: newOrderDeadline,
     };
 
-    dispatch(orderManagementsThunks.updateOrderGeneralInfo(updateData));
+    dispatch(orderManagementThunks.updateOrderGeneralInfo(updateData));
     setIsEditOrderDeadlineModalOpen(false);
   };
 

@@ -1,5 +1,5 @@
 import Button from '@components/Button/Button';
-import { EParticipantOrderStatus } from '@utils/enums';
+import { isJoinedPlan } from '@helpers/orderHelper';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import React, { useState } from 'react';
@@ -15,17 +15,14 @@ const isCompletePickFood = ({
   participantId: string;
   orderDetail: TObject;
 }) => {
-  const allOrderDetails = Object.values(orderDetail);
+  const allOrderDetails = Object.values<TObject>(orderDetail);
   const totalDates = allOrderDetails.length;
 
   const completedDates = allOrderDetails.reduce((result: number, current) => {
-    const { memberOrders } = current as TObject;
+    const { memberOrders } = current;
     const { status, foodId } = memberOrders[participantId];
 
-    if (foodId !== '' && status === EParticipantOrderStatus.joined) {
-      return result + 1;
-    }
-    return result;
+    return result + +isJoinedPlan(foodId, status);
   }, 0);
 
   return completedDates === totalDates;

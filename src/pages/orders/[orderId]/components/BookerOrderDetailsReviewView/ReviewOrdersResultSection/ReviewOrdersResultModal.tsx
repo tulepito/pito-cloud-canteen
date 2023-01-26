@@ -1,6 +1,6 @@
 import Button from '@components/Button/Button';
 import Modal from '@components/Modal/Modal';
-import { EParticipantOrderStatus } from '@utils/enums';
+import { isJoinedPlan } from '@helpers/orderHelper';
 import type { TObject, TUser } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useMemo } from 'react';
@@ -15,34 +15,29 @@ const prepareData = ({
   orderDetail: TObject;
   participantData: TObject;
 }) => {
-  return Object.entries(orderDetail).reduce(
+  return Object.entries<TObject>(orderDetail).reduce<TObject[]>(
     (result, currentOrderDetailEntry) => {
       const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
 
-      const { memberOrders, foodList: foodListOfDate } =
-        rawOrderDetailOfDate as TObject;
+      const { memberOrders, foodList: foodListOfDate } = rawOrderDetailOfDate;
 
-      const orderData = Object.entries(memberOrders).reduce(
+      const orderData = Object.entries<TObject>(memberOrders).reduce<TObject[]>(
         (memberOrderResult, currentMemberOrderEntry) => {
           const [memberId, memberOrderData] = currentMemberOrderEntry;
-          const { foodId, status } = memberOrderData as TObject;
+          const { foodId, status } = memberOrderData;
+          const newItem = {
+            memberData: participantData[memberId],
+            foodData: {
+              foodId,
+              ...foodListOfDate[foodId],
+            },
+          };
 
-          if (status === EParticipantOrderStatus.joined && foodId !== '') {
-            return [
-              ...memberOrderResult,
-              {
-                memberData: participantData[memberId],
-                foodData: {
-                  foodId,
-                  ...foodListOfDate[foodId],
-                },
-              },
-            ];
-          }
-
-          return memberOrderResult;
+          return isJoinedPlan(foodId, status)
+            ? memberOrderResult.concat([newItem])
+            : memberOrderResult;
         },
-        [] as TObject[],
+        [],
       );
 
       return [
@@ -53,7 +48,7 @@ const prepareData = ({
         },
       ];
     },
-    [] as TObject[],
+    [],
   );
 };
 

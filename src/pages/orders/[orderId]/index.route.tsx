@@ -11,7 +11,7 @@ import { useIntl } from 'react-intl';
 import BookerOrderDetailsPage from './components/BookerOrderDetails.page';
 import {
   orderDetailsAnyActionsInProgress,
-  orderManagementsThunks,
+  orderManagementThunks,
 } from './OrderManagement.slice';
 
 const BookerOrderDetailsRoute = () => {
@@ -29,7 +29,7 @@ const BookerOrderDetailsRoute = () => {
 
   useEffect(() => {
     if (isReady) {
-      dispatch(orderManagementsThunks.loadData(orderId as string));
+      dispatch(orderManagementThunks.loadData(orderId as string));
     }
   }, [isReady]);
 

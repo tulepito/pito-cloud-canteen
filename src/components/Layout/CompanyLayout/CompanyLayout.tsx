@@ -2,6 +2,7 @@ import Dropdown from '@components/CompanyLayout/Dropdown/Dropdown';
 import FeatureIcons from '@components/FeatureIcons/FeatureIcons';
 import FeaturesHeader from '@components/FeaturesHeader/FeaturesHeader';
 import { useAppSelector } from '@hooks/reduxHooks';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { CURRENT_USER, USER } from '@utils/data';
 import type { TUser } from '@utils/types';
 import filter from 'lodash/filter';
@@ -16,10 +17,7 @@ import GeneralMainContent from './GeneralMainContent/GeneralMainContent';
 
 const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
-  const currentUser = useAppSelector(
-    (state) => state.user.currentUser,
-    shallowEqual,
-  );
+  const currentUser = useAppSelector(currentUserSelector);
   const companyRefs = useAppSelector(
     (state) => state.ManageCompaniesPage.companyRefs,
     shallowEqual,

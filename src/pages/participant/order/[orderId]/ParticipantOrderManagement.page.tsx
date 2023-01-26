@@ -1,6 +1,7 @@
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { ParticipantOrderAsyncAction } from '@redux/slices/ParticipantOrderManagementPage.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
@@ -16,7 +17,7 @@ const ParticipantOrderManagement = () => {
 
   // State
   const [currentView, setCurrentView] = useState(VIEWS.CALENDAR);
-  const currentUser = useAppSelector((state) => state.user.currentUser);
+  const currentUser = useAppSelector(currentUserSelector);
 
   // Hooks
   const { order, company, plans, subOrders, loadDataInProgress } =

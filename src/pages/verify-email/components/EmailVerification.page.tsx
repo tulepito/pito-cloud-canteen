@@ -1,4 +1,8 @@
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import {
+  useAppDispatch,
+  useAppSelector,
+  useAppSelectorFullStates,
+} from '@hooks/reduxHooks';
 import { emailVerificationThunks } from '@redux/slices/emailVerification.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import type { TObject } from '@utils/types';
@@ -15,7 +19,7 @@ const EmailVerificationPage = () => {
   const { t: verificationTokenFromQuery } = query;
   const {
     emailVerification: { verificationInProgress, verificationError },
-  } = useAppSelector((state) => state);
+  } = useAppSelectorFullStates();
   const user = useAppSelector(currentUserSelector);
   const dispatch = useAppDispatch();
 

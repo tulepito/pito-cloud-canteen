@@ -11,11 +11,11 @@ import { DateTime } from 'luxon';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { orderManagementsThunks } from '../../../OrderManagement.slice';
+import { orderManagementThunks } from '../../../OrderManagement.slice';
 import type { TAddOrderFormValues } from './AddOrderForm';
 import AddOrderForm from './AddOrderForm';
 import css from './ManageOrdersSection.module.scss';
-import OrderDetailsTable from './OrderDetailsTable';
+import OrderDetailsTable from './OrderDetailsTable/OrderDetailsTable';
 
 type TManageOrdersSectionProps = {
   data: {
@@ -41,29 +41,30 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
 
   const { foodList = {}, memberOrders = {} } =
     orderDetail[currentViewDate.toString()] || {};
-  const foodOptions = Object.entries(foodList).map(([foodId, foodData]) => {
-    return {
-      foodId,
-      foodName: (foodData as TObject)?.foodName || '',
-    };
-  });
-
-  // Available member IDs to adding order details
-  const availableMemberIds = Object.entries(memberOrders).reduce(
-    (result, current) => {
-      const [memberId, order] = current;
-      const { status } = order as TObject;
-
-      if (
-        status === EParticipantOrderStatus.empty ||
-        status === EParticipantOrderStatus.notJoined
-      ) {
-        return [...(result as string[]), memberId];
-      }
-      return result;
+  const foodOptions = Object.entries<TObject>(foodList).map(
+    ([foodId, foodData]) => {
+      return {
+        foodId,
+        foodName: foodData?.foodName || '',
+      };
     },
-    [] as string[],
   );
+
+  // Available member IDs to add order details
+  const availableMemberIds = Object.entries<TObject>(memberOrders).reduce<
+    string[]
+  >((result, current) => {
+    const [memberId, order] = current;
+    const { status } = order;
+
+    if (
+      status === EParticipantOrderStatus.empty ||
+      status === EParticipantOrderStatus.notJoined
+    ) {
+      return [...result, memberId];
+    }
+    return result;
+  }, []);
 
   const memberOptions = availableMemberIds.map((memberId) => {
     const participant = participantData.find(
@@ -91,7 +92,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
       currentViewDate,
     };
 
-    dispatch(orderManagementsThunks.addOrUpdateMemberOrder(updateValues));
+    dispatch(orderManagementThunks.addOrUpdateMemberOrder(updateValues));
   };
 
   const items = dateList.map((date) => {

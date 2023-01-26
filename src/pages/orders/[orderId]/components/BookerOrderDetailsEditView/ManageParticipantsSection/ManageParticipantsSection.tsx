@@ -8,7 +8,7 @@ import { useIntl } from 'react-intl';
 
 import {
   orderDetailsAnyActionsInProgress,
-  orderManagementsThunks,
+  orderManagementThunks,
 } from '../../../OrderManagement.slice';
 import type { TAddParticipantFormValues } from './AddParticipantForm';
 import AddParticipantForm from './AddParticipantForm';
@@ -99,7 +99,7 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
   const handleConfirmDeleteParticipant = () => {
     if (currentParticipantId) {
       dispatch(
-        orderManagementsThunks.deleteParticipant({
+        orderManagementThunks.deleteParticipant({
           participantId: currentParticipantId,
         }),
       );
@@ -118,7 +118,7 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
   };
 
   const handleSubmitAddParticipant = ({ email }: TAddParticipantFormValues) => {
-    dispatch(orderManagementsThunks.addParticipant({ email }));
+    dispatch(orderManagementThunks.addParticipant({ email }));
   };
 
   return (

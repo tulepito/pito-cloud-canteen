@@ -1,6 +1,7 @@
 import { InlineTextButton } from '@components/Button/Button';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { ParticipantOrderAsyncAction } from '@redux/slices/ParticipantOrderManagementPage.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { CURRENT_USER } from '@utils/data';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -24,7 +25,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   status,
 }) => {
   const router = useRouter();
-  const user = useAppSelector((state) => state.user.currentUser);
+  const user = useAppSelector(currentUserSelector);
 
   const dispatch = useAppDispatch();
   const mealType = event.resource?.type;
