@@ -640,5 +640,21 @@
   "SignUpPage.Title": "Đăng ký",
   "Toolbar.action.today": "Hôm nay",
   "Toolbar.viewMode.month": "Tháng",
-  "Toolbar.viewMode.week": "Tuần"
+  "Toolbar.viewMode.week": "Tuần",
+  "BookerNewOrder.modal.createTitle": "Tạo đơn hàng mới",
+  "CreateOrderForm.submit": "Tạo đơn hàng",
+  "CreateOrderForm.companyLabel": "Chọn đơn vị đặt",
+  "CreateOrderForm.previousOrderLabel": "Đơn hàng đã đặt",
+  "CreateOrderForm.usePreviousDataLabel": "Sao chép đơn hàng đã đặt",
+  "CreateOrderForm.cancel": "Huỷ",
+  "CreateOrderForm.company.placeholder": "Chọn 1 đơn vị",
+  "CreateOrderForm.previousOrder.placeholder": "Chọn 1 đơn đã đặt",
+  "SidebarContent.nav.settings.location": "Địa điểm",
+  "SidebarContent.nav.settings.deliveryTime": "Thời gian giao hàng",
+  "SidebarContent.nav.settings.expiredTime": "Hạn chọn món",
+  "SidebarContent.nav.settings.numberEmployees": "Số lượng nhân viên",
+  "SidebarContent.nav.settings.nutrition": "Chế độ dinh dưỡng",
+  "SidebarContent.nav.settings.access": "Cài đặt truy cập",
+  "SidebarContent.nav.settings.unitBudget": "Ngân sách 1 người",
+  "SidebarContent.details.goBack": "Quay lại"
 }

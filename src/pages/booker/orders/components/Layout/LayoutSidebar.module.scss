@@ -1,0 +1,66 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  overflow: hidden;
+  flex-basis: 280px;
+  transition: linear 0.2s;
+  border-right: 1px solid $neutralGray4;
+  padding: 0;
+}
+
+.collapse {
+  display: flex;
+  flex-direction: column;
+  width: 60px;
+  flex-basis: 60px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding: 28px 28px 0;
+}
+
+.collapse .header {
+  padding: 28px 18px 0;
+}
+
+.menuIcon {
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+}
+
+.logo {
+  height: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.collapse .logo {
+  width: 0;
+  transition: linear 0.2s;
+}
+
+.innerLogo {
+  position: relative;
+  left: 0;
+  transition: linear 0.2s;
+}
+
+.collapse .innerLogo {
+  left: -240px;
+}
+
+.content {
+  position: relative;
+  overflow: hidden;
+  left: 0px;
+  transition: linear 0.2s;
+  width: 100%;
+  width: 280px;
+}
+
+.collapse .content {
+  left: -280px;
+}

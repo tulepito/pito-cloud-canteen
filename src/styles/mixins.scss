@@ -204,7 +204,7 @@ $buttonBorderRadius: 8px;
 }
 
 // Typography
-@mixin textTemplate($size: 12px, $weight: 400, $height: 16px, $family) {
+@mixin textTemplate($size: 12px, $weight: 400, $height: 16px, $family: '') {
   @if $family == '' {
     font-family: 'Manrope', Helvetica, Arial, sans-serif;
   } @else {

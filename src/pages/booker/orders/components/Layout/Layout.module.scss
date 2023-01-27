@@ -1,5 +1,10 @@
 @use '/src/styles/vars.scss' as *;
 
-.main {
+.root {
+  display: flex;
   min-height: calc(100vh - 65px);
+}
+
+.layoutMain {
+  flex-grow: 1;
 }
