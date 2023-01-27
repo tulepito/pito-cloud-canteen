@@ -1,7 +1,7 @@
 // HTTP methos
 const GET = 'GET';
 const POST = 'POST';
-const PUT = 'PUT ';
+const PUT = 'PUT';
 const DELETE = 'DELETE';
 
 const HTTP_METHODS = {

@@ -37,6 +37,9 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         id: 'manageOrders',
         label: 'AdminSidebar.manageOrderLabel',
         nameLink: adminRoutes.ManageOrders.path,
+        // highlightRefLinks => if pathname in these paths, it will activate the parent namelink
+        // Example : current pathname is '/admin/company/create' => the menu with nameLink '/admin/company' will be hightlighted
+        highlightRefLinks: [adminRoutes.OrderDetails.path],
       },
     ],
   },
@@ -51,9 +54,7 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         id: 'company',
         label: 'AdminSidebar.companyLabel',
         nameLink: adminRoutes.ManageCompanies.path,
-        // Sub name links => if pathname in these path, it will active the parent namelink
-        // Example : current pathname is '/admin/company/create' => the menu with nameLink '/admin/company' will be hightlighted
-        subNameLinks: [
+        highlightRefLinks: [
           adminRoutes.CreateCompany.path,
           adminRoutes.EditCompany.path,
           adminRoutes.CompanyDetails.path,
@@ -63,11 +64,40 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         id: 'partner',
         label: 'AdminSidebar.partnerLabel',
         nameLink: adminRoutes.ManagePartners.path,
-        subNameLinks: [
-          adminRoutes.ManagePartners.path,
-          adminRoutes.CreatePartner.path,
-          adminRoutes.EditPartner.path,
-          adminRoutes.PartnerDetails.path,
+        // showOnActiveChildrenMenus has all childrens that only show up when these menues is active
+        // Example : Default is not showing these paths. But when the pathname === nameLink in these paths
+        showOnActiveChildrenMenus: [
+          {
+            id: 'orderDetails',
+            label: 'AdminSidebar.partnerDetailsLabel',
+            nameLink: adminRoutes.PartnerDetails.path,
+          },
+          {
+            id: 'editOrder',
+            label: 'AdminSidebar.editPartnerLabel',
+            nameLink: adminRoutes.EditPartner.path,
+          },
+          {
+            id: 'partnerSettings',
+            label: 'AdminSidebar.partnerSettingLabel',
+            nameLink: adminRoutes.PartnerSettings.path,
+            childrenMenus: [
+              {
+                id: 'managePartnerFood',
+                label: 'AdminSidebar.managePartnerFoodLabel',
+                nameLink: adminRoutes.ManagePartnerFoods.path,
+                highlightRefLinks: [
+                  adminRoutes.CreatePartnerFood.path,
+                  adminRoutes.EditPartnerFood.path,
+                ],
+              },
+              {
+                id: 'managePartnerMenu',
+                label: 'AdminSidebar.managePartnerMenuLabel',
+                nameLink: adminRoutes.ManagePartnerMenus.path,
+              },
+            ],
+          },
         ],
       },
     ],
@@ -82,7 +112,14 @@ type TAdminSidebarProps = {
 const checkNestedPathActive = (arr: TSidebarMenu[], pathName: string) => {
   // eslint-disable-next-line no-restricted-syntax
   for (const item of arr) {
-    if (item.subNameLinks?.includes(pathName)) return item;
+    if (item.showOnActiveChildrenMenus) {
+      const child = checkNestedPathActive(
+        item.showOnActiveChildrenMenus,
+        pathName,
+      );
+      if (child) return item;
+    }
+    if (item.highlightRefLinks?.includes(pathName)) return item;
     if (item.nameLink === pathName) return item;
     if (item.childrenMenus) {
       const child = checkNestedPathActive(item.childrenMenus, pathName);
@@ -95,10 +132,6 @@ const AdminSidebar: React.FC<TAdminSidebarProps> = (props) => {
   const { onCloseMenu } = props;
   const intl = useIntl();
 
-  const onOutsideClick = () => {
-    onCloseMenu();
-  };
-
   const router = useRouter();
 
   const { pathname } = router;
@@ -109,31 +142,13 @@ const AdminSidebar: React.FC<TAdminSidebarProps> = (props) => {
   );
 
   return (
-    <OutsideClickHandler onOutsideClick={onOutsideClick}>
+    <OutsideClickHandler onOutsideClick={onCloseMenu}>
       <div className={css.root}>
         <div className={css.leftSide}>
           {LIST_SIDEBAR_MENU.map((item: TSidebarMenu) => {
-            const {
-              Icon,
-              id,
-              nameLink,
-              subNameLinks,
-              childrenMenus = [],
-            } = item;
-            const activeWithChildrenNameLinks = childrenMenus.find(
-              (m: TSidebarMenu) => m.nameLink === pathname,
-            );
+            const { Icon, id, nameLink } = item;
 
-            const activeWithChildrenSubNameLinks = childrenMenus.find(
-              (m: TSidebarMenu) => m.subNameLinks?.includes(pathname),
-            );
-
-            const activeWithSubNameLinks = subNameLinks?.includes(pathname);
-            const isActive =
-              activeWithChildrenSubNameLinks ||
-              activeWithChildrenNameLinks ||
-              activeWithSubNameLinks ||
-              pathname === nameLink;
+            const isActive = activeMenu?.id === item.id;
             return (
               <NamedLink
                 path={nameLink}

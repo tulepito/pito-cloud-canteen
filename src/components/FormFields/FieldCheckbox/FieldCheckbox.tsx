@@ -78,6 +78,7 @@ const FieldCheckbox: React.FC<TFieldCheckboxProps> = (props) => {
     disabled,
     hasTextInput,
     textPlaceholder,
+    labelClassName,
     ...rest
   } = props;
 
@@ -94,6 +95,7 @@ const FieldCheckbox: React.FC<TFieldCheckboxProps> = (props) => {
     } else {
       onChange(event);
     }
+
     onBlur(event);
   };
 
@@ -120,7 +122,9 @@ const FieldCheckbox: React.FC<TFieldCheckboxProps> = (props) => {
                   onChange={(event: TFormEvent) => handleOnChange(input, event)}
                 />
                 {label && (
-                  <label htmlFor={id} className={css.label}>
+                  <label
+                    htmlFor={id}
+                    className={classNames(css.label, labelClassName)}>
                     <span className={css.checkboxWrapper}>
                       <IconCheckbox
                         className={svgClassName}

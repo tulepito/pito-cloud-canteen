@@ -26,7 +26,7 @@ const IconCloseBadge: React.FC<TIconProps> = (props) => {
   );
 };
 
-const BadgeType = {
+export const BadgeType = {
   DEFAULT: 'default',
   PROCESSING: 'processing',
   ERROR: 'error',
@@ -40,6 +40,8 @@ type TBadge = {
   hasDotIcon?: boolean;
   onCloseIcon?: () => void;
   label: string;
+  containerClassName?: string;
+  labelClassName?: string;
 };
 
 const Badge: React.FC<TBadge> = (props) => {
@@ -49,6 +51,7 @@ const Badge: React.FC<TBadge> = (props) => {
     hasDotIcon = false,
     onCloseIcon,
     label,
+    labelClassName,
   } = props;
 
   const classesFormType = {
@@ -59,16 +62,24 @@ const Badge: React.FC<TBadge> = (props) => {
     [css.warning]: type === BadgeType.WARNING,
   };
 
-  const badgeContainerClassName = classNames(css.root, classesFormType);
-  const labelClasses = classNames(css.label, classesFormType);
-  const badgeCloseClasses = classNames(classesFormType);
-  const badgeDotClasses = classNames(css.badgeDot, classesFormType);
+  const badgeContainerClassName = classNames(
+    css.root,
+    classesFormType,
+    labelClassName,
+  );
+  const labelClasses = classNames(css.label, classesFormType, labelClassName);
+  const badgeCloseClasses = classNames(classesFormType, labelClassName);
+  const badgeDotClasses = classNames(
+    css.badgeDot,
+    classesFormType,
+    labelClassName,
+  );
 
   return (
     <div className={badgeContainerClassName}>
       <div className={css.badgeContent}>
         {hasDotIcon && <span className={badgeDotClasses}></span>}
-        <span className={labelClasses}>{label}</span>
+        <div className={labelClasses}>{label}</div>
       </div>
       {hasCloseIcon && (
         <div className={css.badgeClose} onClick={onCloseIcon}>

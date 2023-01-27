@@ -103,6 +103,7 @@ export enum ECompanyStatus {
 export enum EListingType {
   restaurant = 'restaurant',
   transaction = 'transaction',
+  food = 'food',
 }
 
 export enum EUserPermission {
@@ -115,6 +116,7 @@ export const startRouteBaseOnPermission = {
   [EUserPermission.company]: '/company',
   [EUserPermission.admin]: '/admin',
 };
+
 export enum ERestaurantListingState {
   draft = 'draft',
   published = 'published',
@@ -126,6 +128,21 @@ export enum ERestaurantListingStatus {
   authorized = 'authorized',
   unsatisfactory = 'unsatisfactory',
 }
+
+export const RESTAURANT_STATUS_OPTIONS = [
+  {
+    key: ERestaurantListingStatus.new,
+    label: 'Mới',
+  },
+  {
+    key: ERestaurantListingStatus.authorized,
+    label: 'Đã xác thực',
+  },
+  {
+    key: ERestaurantListingStatus.unsatisfactory,
+    label: 'Không đạt yêu cầu',
+  },
+];
 
 export const OTHER_OPTION = 'other';
 
@@ -222,7 +239,7 @@ export const CATEGORY_OPTIONS = [
     label: 'Hàn quốc',
   },
   {
-    key: 'japanes-food',
+    key: 'japanese-food',
     label: 'Nhật Bản',
   },
   {
@@ -230,7 +247,7 @@ export const CATEGORY_OPTIONS = [
     label: 'Ấn độ',
   },
   {
-    key: 'frech-food',
+    key: 'french-food',
     label: 'Pháp',
   },
   {
@@ -394,3 +411,117 @@ export const PARTY_INSURANCE_RADIO_OPTIONS = [
     label: 'Chưa',
   },
 ];
+
+export enum EMenuTypes {
+  fixedMenu = 'fixed-menu',
+  cycleMenu = 'cycle-menu',
+}
+
+export const MENU_OPTIONS = [
+  { key: EMenuTypes.fixedMenu, label: 'Menu cố định' },
+  { key: EMenuTypes.cycleMenu, label: 'Menu theo chu kỳ' },
+];
+
+export enum EOrderStates {
+  inProgress = 'inProgress',
+  picking = 'picking',
+  cancel = 'cancel',
+  delivery = 'delivery',
+  pendingPayment = 'pendingPayment',
+  isNew = 'isNew',
+  completed = 'completed',
+}
+
+export const SPECIAL_DIET_OPTIONS = [
+  {
+    key: 'halal',
+    label: 'Halal',
+  },
+  {
+    key: 'keto',
+    label: 'Keto',
+  },
+  {
+    key: OTHER_OPTION,
+    label: 'Khác',
+    hasTextInput: true,
+    textPlaceholder: 'Nhập chế độ dinh dưỡng',
+  },
+];
+
+export const SIDE_DISH_OPTIONS = [
+  {
+    key: 'soup',
+    label: 'Món canh',
+  },
+  {
+    key: 'stir-fried-meal',
+    label: 'Món xào',
+  },
+  {
+    key: 'dessert',
+    label: 'Món tráng miệng',
+  },
+];
+
+export enum EFoodTypes {
+  vegetarianDish = 'vegetarian-dish',
+  savoryDish = 'savory-dish',
+}
+
+export const FOOD_TYPE_OPTIONS = [
+  {
+    key: EFoodTypes.vegetarianDish,
+    label: 'Món chay',
+  },
+  {
+    key: EFoodTypes.savoryDish,
+    label: 'Món mặn',
+  },
+];
+
+export const ORDER_STATES_OPTIONS = [
+  {
+    key: EOrderStates.inProgress,
+    label: 'Đang triển khai',
+  },
+  {
+    key: EOrderStates.picking,
+    label: 'Đang chọn món',
+  },
+  {
+    key: EOrderStates.cancel,
+    label: 'Hủy',
+  },
+  {
+    key: EOrderStates.delivery,
+    label: 'Đang giao hàng',
+  },
+  {
+    key: EOrderStates.pendingPayment,
+    label: 'Chờ thanh toán',
+  },
+  {
+    key: EOrderStates.isNew,
+    label: 'Mới tạo',
+  },
+  {
+    key: EOrderStates.completed,
+    label: 'Đã hoàn thành',
+  },
+];
+
+export const getLabelByKey = (
+  list: { key: string; label: string }[],
+  key: any,
+) => {
+  const item = list?.find((l: any) => l.key === key);
+  return item && item.label ? item.label : key;
+};
+
+export enum EOrderDetailsStatus {
+  received = 'received',
+  delivered = 'delivered',
+  cancelled = 'cancelled',
+  pending = 'pending',
+}

@@ -2,7 +2,7 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './MultiLevelSidebar.module.scss';
@@ -29,7 +29,8 @@ export type TSidebarMenu = {
   childrenMenus?: TSidebarMenu[];
   nameLink?: string;
   isFirstLevel?: boolean;
-  subNameLinks?: string[];
+  highlightRefLinks?: string[];
+  showOnActiveChildrenMenus?: TSidebarMenu[];
 };
 
 type TMenuWithClasses = {
@@ -69,12 +70,18 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     Icon,
     label,
     childrenMenus,
+    showOnActiveChildrenMenus,
     nameLink = '',
     isFirstLevel,
-    subNameLinks,
+    highlightRefLinks,
   } = menu;
 
-  const hasChildrenMenus = childrenMenus && childrenMenus.length > 0;
+  const hasChildrenMenus =
+    (showOnActiveChildrenMenus && showOnActiveChildrenMenus.length > 0) ||
+    (childrenMenus && childrenMenus.length > 0);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const childMenus = showOnActiveChildrenMenus || childrenMenus || [];
 
   const paramNames = getDynamicPathParamsName(nameLink);
   // Only get dynamic params not search params
@@ -84,22 +91,24 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     }
     return acc;
   }, {});
-  const handleMenuClick = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
-      e.stopPropagation();
-
-      if (nameLink && !hasChildrenMenus) {
-        return router.push({ pathname: nameLink, query: newQueryParams });
-      }
-      return setIsOpen(!isOpen);
-    },
-    [nameLink, hasChildrenMenus, isOpen, router, newQueryParams],
-  );
 
   const childIsActive = useMemo(
-    () => childrenMenus?.some((value) => value.nameLink === pathname),
-    [pathname, childrenMenus],
+    () =>
+      childMenus.some(
+        (value: TSidebarMenu) =>
+          value.nameLink === pathname ||
+          value.childrenMenus?.some(
+            (childMenu) =>
+              childMenu.nameLink === pathname ||
+              childMenu.highlightRefLinks?.includes(pathname),
+          ),
+      ),
+    [pathname, childMenus],
   ) as boolean;
+
+  const shouldShowMenuesOnActiveOnly =
+    (childIsActive && showOnActiveChildrenMenus) ||
+    (!showOnActiveChildrenMenus && childMenus.length > 0);
 
   useEffect(() => {
     if (childIsActive) {
@@ -112,9 +121,10 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     subMenuWrapperClassName,
   );
 
-  const activeWithSubNameLinks = subNameLinks?.includes(pathname);
+  const activeWithHighlightRefLinksLinks =
+    highlightRefLinks?.includes(pathname);
 
-  const isActive = activeWithSubNameLinks || pathname === nameLink;
+  const isActive = activeWithHighlightRefLinksLinks || pathname === nameLink;
 
   const subMenuLayoutClasses = classNames(
     css.subMenuLayout,
@@ -126,12 +136,30 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     },
   );
 
+  const shouldRenderChildMenues =
+    isOpen && childMenus.length > 0 && shouldShowMenuesOnActiveOnly;
+
+  const shouldShowArrowIcon =
+    childMenus.length > 0 && shouldShowMenuesOnActiveOnly;
+
+  const handleMenuClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    if (
+      showOnActiveChildrenMenus ||
+      (!showOnActiveChildrenMenus && !childrenMenus)
+    ) {
+      return router.push({ pathname: nameLink, query: newQueryParams });
+    }
+    return setIsOpen(!isOpen);
+  };
+
   return (
-    <div onClick={handleMenuClick} className={subMenuWrapperClasses}>
+    <div className={subMenuWrapperClasses}>
       <div className={subMenuLayoutClasses}>
         <div className={css.subMenuItem}>
           {Icon && <Icon className={css.entityIcon} />}
           <div
+            onClick={handleMenuClick}
             className={classNames(
               css.label,
               { [css.labelOpen]: isOpen },
@@ -142,7 +170,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
             })}
           </div>
         </div>
-        {hasChildrenMenus && (
+        {shouldShowArrowIcon && (
           <IconArrow
             direction={isOpen ? 'up' : 'down'}
             className={css.menuArrowIcon}
@@ -150,10 +178,10 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
         )}
       </div>
       {/* render children menu */}
-      {isOpen && hasChildrenMenus && (
+      {shouldRenderChildMenues && (
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         <Menu
-          menus={childrenMenus}
+          menus={childMenus}
           subMenuWrapperClassName={subMenuWrapperClassName}
           subMenuLayoutClassName={subMenuLayoutClassName}
           menuWrapperClassName={menuWrapperClassName}

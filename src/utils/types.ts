@@ -405,3 +405,42 @@ export type TAddress = {
     };
   };
 };
+
+export type TAdminOrderListingAttributes = {
+  title: string;
+  description?: string;
+  geolocation?: any;
+  deleted?: boolean;
+  state?: TListingState;
+  price?: any;
+  publicData?: any;
+  metadata?: any;
+  privateData?: any;
+};
+
+export type TOrderListing = {
+  id: any;
+  type: 'listing';
+  attributes: TAdminOrderListingAttributes & TDeletedListingAttributes;
+  author?: TUser;
+  images?: TImage[];
+};
+
+// Denormalised integration order listing object
+export type TIntergrationOrderListing = {
+  id: any;
+  type: 'listing';
+  attributes: TAdminOrderListingAttributes & TDeletedListingAttributes;
+  author?: TUser;
+  images?: TImage[];
+  company?: TCompany;
+  order?: TOrderListing;
+};
+
+export type TIntergrationFoodListing = {
+  id: any;
+  type: 'listing';
+  attributes: TAdminOrderListingAttributes & TDeletedListingAttributes;
+  author?: TUser;
+  images?: TImage[];
+};

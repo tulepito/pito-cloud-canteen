@@ -508,7 +508,7 @@ const EditPartnerBasicInformationForm: React.FC<
                         intl.formatMessage({
                           id: 'EditPartnerBasicInformationForm.minPriceValid',
                         }),
-                        0,
+                        1000,
                       ),
                     )}
                     parse={parsePrice}

@@ -30,6 +30,11 @@ export const deleteMethod = (path: string, body: any) => {
   return axios.delete(`${apiBaseUrl()}${path}`, body);
 };
 
+type TBodyParams = {
+  dataParams: Record<string, any>;
+  queryParams: Record<string, any>;
+};
+
 export const getCompaniesApi = () => get('/api/admin/users/company');
 
 export const updateCompanyApi = (body: any) =>
@@ -73,3 +78,28 @@ export const loadPlanDataApi = (planId: string) =>
 
 export const updateParticipantOrderApi = (orderId: string, body: any) =>
   post(`/api/participants/orders/${orderId}`, body);
+
+export const queryOrdersApi = (body: TBodyParams) => {
+  return post(`/api/admin/listings/order/query`, body);
+};
+
+export const showPartnerFoodApi = (
+  id: string,
+  queryParams: Record<any, any>,
+) => {
+  return post(`/api/admin/listings/foods/${id}`, queryParams);
+};
+
+export const createPartnerFoodApi = (body: TBodyParams) => {
+  return post(`/api/admin/listings/foods/create`, body);
+};
+
+export const updatePartnerFoodApi = (body: TBodyParams) => {
+  return post(`/api/admin/listings/foods/update`, body);
+};
+
+export const deletePartnerFoodApi = (body: TBodyParams) => {
+  return post(`/api/admin/listings/foods/delete`, body);
+};
+export const fetchUserApi = (userId: string) =>
+  get(`/api/users/fetch-user/${userId}`);

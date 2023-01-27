@@ -5,18 +5,13 @@
 }
 
 .rowId {
-  min-width: 50px;
-  max-width: 200px;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3; /* number of lines to show */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  max-width: 50px;
 }
 
 .rowText {
   min-width: 50px;
   max-width: 200px;
+  word-wrap: break-word;
 }
 
 .badge {
@@ -97,12 +92,14 @@
 }
 
 .title {
-  font-weight: $fontWeightRegular;
-  font-size: 20px;
+  font-weight: $fontWeightBold;
+  font-size: 24px;
+  line-height: 32px;
+  text-transform: capitalize;
 }
 
 .top {
-  margin: 20px 0 10px 0;
+  margin: 0px 0 10px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -116,10 +113,6 @@
   }
 }
 
-.rowTitle {
-  min-width: 100px;
-}
-
 .draftBox {
   padding: 3px 5px;
   display: inline-flex;
@@ -128,4 +121,16 @@
   font-size: 12px;
   border-radius: 4px;
   margin-left: 5px;
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+.iconEdit {
+  height: auto;
+}
+
+.rowTitle {
+  color: $neutralGray6;
 }

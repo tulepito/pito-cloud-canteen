@@ -16,11 +16,34 @@
         display: table-header-group;
       }
       .headRow {
+        background-color: $neutralGray4;
+
+        .checkboxSvg {
+          background-color: $neutralGray1;
+        }
+
         .headCell {
-          padding: 5px 10px;
+          padding: 14px 10px 14px 20px;
           text-align: left;
-          color: $neutralGray5;
-          font-size: 12px;
+          color: $neutralGray6;
+          font-weight: $fontWeightBold;
+          font-size: 14px;
+          &:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+          }
+          &:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+          }
+          .headCellLabel {
+            display: inline-flex;
+            align-items: center;
+            .sortIcon {
+              margin-left: 5px;
+              cursor: pointer;
+            }
+          }
         }
       }
     }
@@ -31,7 +54,6 @@
           display: none;
         }
         .formHeadCell {
-          padding: 0px 10px;
           text-align: center;
           color: $neutralGray5;
           background-color: $neutralGray3;
@@ -59,15 +81,20 @@
         @include viewportLarge {
           display: table-row;
         }
+        transition: all 0.3s;
+        &:hover {
+          background-color: $neutralGray2;
+        }
+
         .bodyCell {
           display: flex;
           justify-content: space-between;
           width: 100%;
           align-items: center;
           text-align: right;
-          padding: 10px;
+          padding: 14px 10px 14px 20px;
           color: #616161;
-          border-bottom: 1px solid $neutralGray1;
+          border-bottom: 1px solid $neutralGray3;
           position: relative;
           font-size: 14px;
 

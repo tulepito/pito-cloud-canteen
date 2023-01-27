@@ -1,14 +1,18 @@
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
+import { queryOrdersApi } from '@utils/api';
+import { storableError } from '@utils/errors';
 import {
   addMealPlanDetailApi,
-  completeOrderApi,
   createOrderApi,
+  initiateTransactionsApi,
   updateMealPlanDetailApi,
 } from '@utils/orderApi';
-import type { TListing } from '@utils/types';
+import type { TListing, TPagination } from '@utils/types';
 import cloneDeep from 'lodash/cloneDeep';
 import { DateTime } from 'luxon';
+
+export const MANAGE_ORDER_PAGE_SIZE = 10;
 
 const updateSetUpPlan = ({
   startDate,
@@ -39,16 +43,23 @@ type OrderInitialState = {
   addMealPlanDetailInProgress: boolean;
   addMealPlanDetailError: any;
 
-  completeOrderInProgress: boolean;
-  completeOrderError: any;
+  initiateTransactionsInProgress: boolean;
+  initiateTransactionsError: any;
   draftOrder: any;
   selectedCompany: any;
+
+  // Manage Orders Page
+  orders: TListing[];
+  queryOrderInProgress: boolean;
+  queryOrderError: any;
+  manageOrdersPagination: TPagination;
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
 const ADD_MEAL_PLAN_DETAIL = 'app/Order/ADD_MEAL_PLAN_DETAIL';
 const UPDATE_MEAL_PLAN_DETAIL = 'app/Order/UPDATE_MEAL_PLAN_DETAIL';
-const COMPLETE_ORDER = 'app/Order/COMPLETE_ORDER';
+const INITIATE_TRANSACTIONS = 'app/Order/INITIATE_TRANSACTIONS';
+const QUERY_SUB_ORDERS = 'app/Order/QUERY_SUB_ORDERS';
 
 const initialState: OrderInitialState = {
   order: null,
@@ -59,10 +70,21 @@ const initialState: OrderInitialState = {
   addMealPlanDetailInProgress: false,
   addMealPlanDetailError: null,
 
-  completeOrderInProgress: false,
-  completeOrderError: null,
+  initiateTransactionsInProgress: false,
+  initiateTransactionsError: null,
   draftOrder: {},
   selectedCompany: null,
+
+  // Manage Orders
+  orders: [],
+  queryOrderInProgress: false,
+  queryOrderError: null,
+  manageOrdersPagination: {
+    totalItems: 0,
+    totalPages: 0,
+    page: 0,
+    perPage: 0,
+  },
 };
 
 const createOrder = createAsyncThunk(
@@ -121,15 +143,33 @@ const updateMealPlanDetail = createAsyncThunk(
   },
 );
 
-const completeOrder = createAsyncThunk(
-  COMPLETE_ORDER,
-  async (planId: string, { getState }) => {
-    const { order } = getState().Order;
-    await completeOrderApi({
-      orderId: order?.id.uuid,
-      planId,
-    });
+const initiateTransactions = createAsyncThunk(
+  INITIATE_TRANSACTIONS,
+  async (params: any) => {
+    await initiateTransactionsApi(params);
     return '';
+  },
+);
+
+const queryOrders = createAsyncThunk(
+  QUERY_SUB_ORDERS,
+  async (payload: any = {}) => {
+    const params = {
+      dataParams: {
+        ...payload,
+        perPage: MANAGE_ORDER_PAGE_SIZE,
+      },
+      queryParams: {
+        expand: true,
+      },
+    };
+    const { data } = await queryOrdersApi(params);
+    const { orders, pagination } = data;
+
+    return { orders, pagination };
+  },
+  {
+    serializeError: storableError,
   },
 );
 
@@ -137,7 +177,8 @@ export const OrderAsyncAction = {
   createOrder,
   addMealPlanDetail,
   updateMealPlanDetail,
-  completeOrder,
+  initiateTransactions,
+  queryOrders,
 };
 
 const orderSlice = createSlice({
@@ -227,18 +268,38 @@ const orderSlice = createSlice({
         addMealPlanDetailError: error.message,
       }))
 
-      .addCase(completeOrder.pending, (state) => ({
+      .addCase(initiateTransactions.pending, (state) => ({
         ...state,
-        completeOrderInProgress: true,
+        initiateTransactionsError: null,
+        initiateTransactionsInProgress: true,
       }))
-      .addCase(completeOrder.fulfilled, (state) => ({
+      .addCase(initiateTransactions.fulfilled, (state) => ({
         ...state,
-        completeOrderInProgress: false,
+        initiateTransactionsInProgress: false,
       }))
-      .addCase(completeOrder.rejected, (state, { error }) => ({
+      .addCase(initiateTransactions.rejected, (state, { payload }) => ({
         ...state,
-        completeOrderInProgress: false,
-        completeOrderError: error.message,
+        initiateTransactionsInProgress: false,
+        initiateTransactionsError: payload,
+      }))
+      .addCase(queryOrders.pending, (state) => ({
+        ...state,
+        queryOrderInProgress: true,
+        queryOrderError: null,
+      }))
+      .addCase(
+        queryOrders.fulfilled,
+        (state, { payload: { orders, pagination } }) => ({
+          ...state,
+          queryOrderInProgress: false,
+          orders,
+          manageOrdersPagination: pagination,
+        }),
+      )
+      .addCase(queryOrders.rejected, (state, { payload }) => ({
+        ...state,
+        queryOrderInProgress: false,
+        queryOrderError: payload,
       }));
   },
 });

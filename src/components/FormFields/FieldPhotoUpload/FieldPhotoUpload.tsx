@@ -83,7 +83,29 @@ const PhotoWithOverlay = (props: TPhotoWithOverlay) => {
   );
 };
 
-const FieldPhotoUpload: React.FC<any> = (props) => {
+type TImageUploadFnReturnValue = {
+  payload: Record<any, any>;
+};
+
+type TFieldPhotoUpload = {
+  onImageUpload: (params: {
+    id: string;
+    file: File;
+  }) => Promise<TImageUploadFnReturnValue>;
+  onRemoveImage: (id: string) => void;
+  image: any;
+  accept?: string;
+  disabled?: boolean;
+  className?: string;
+  variants: string[];
+  uploadImageError: any;
+  name: string;
+  id: string;
+  validate: any;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
   const intl = useIntl();
   const [triggerFlag, setTriggerFlag] = useState<string>('');
 
@@ -161,7 +183,7 @@ const FieldPhotoUpload: React.FC<any> = (props) => {
             <>
               <div className={classNames(css.root, className)}>
                 <input {...inputProps} className={css.addImageInput} />
-                {image ? (
+                {image && !uploadImageFailed ? (
                   <PhotoWithOverlay
                     id={image.imageId}
                     rootClassName={css.rootForImage}

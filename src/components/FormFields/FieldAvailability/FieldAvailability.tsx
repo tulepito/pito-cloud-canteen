@@ -474,30 +474,32 @@ const HourlyPlan: React.FC<any> = (props) => {
                   ))}
                 </FieldSelect>
               </td>
-              <td
-                className={classNames(css.tableActions, {
-                  [css.tableActionsFlexEnd]:
-                    fields && fields.length && fields.length > 0,
-                })}>
-                {index > 0 && (
+              <td>
+                <div
+                  className={classNames(css.tableActions, {
+                    [css.tableActionsFlexEnd]:
+                      fields && fields.length && fields.length > 0,
+                  })}>
+                  {index > 0 && (
+                    <InlineTextButton
+                      type="button"
+                      onClick={() => fields.remove(index)}
+                      className={css.addButton}>
+                      <IconClose rootClassName={css.iconClose} />
+                    </InlineTextButton>
+                  )}
                   <InlineTextButton
                     type="button"
-                    onClick={() => fields.remove(index)}
+                    onClick={() =>
+                      fields.push({
+                        startTime: null,
+                        endTime: null,
+                      })
+                    }
                     className={css.addButton}>
-                    <IconClose className={css.iconClose} />
+                    <IconAdd />
                   </InlineTextButton>
-                )}
-                <InlineTextButton
-                  type="button"
-                  onClick={() =>
-                    fields.push({
-                      startTime: null,
-                      endTime: null,
-                    })
-                  }
-                  className={css.addButton}>
-                  <IconAdd />
-                </InlineTextButton>
+                </div>
               </td>
             </tr>
           );
@@ -604,30 +606,32 @@ const DailyPlan: React.FC<any> = (props) => {
                   ))}
                 </FieldSelect>
               </td>
-              <td
-                className={classNames(css.tableActions, {
-                  [css.tableActionsFlexEnd]:
-                    fields && fields.length && fields.length > 0,
-                })}>
-                {index > 0 && (
+              <td>
+                <div
+                  className={classNames(css.tableActions, {
+                    [css.tableActionsFlexEnd]:
+                      fields && fields.length && fields.length > 0,
+                  })}>
+                  {index > 0 && (
+                    <InlineTextButton
+                      onClick={() => fields.remove(index)}
+                      className={css.addButton}>
+                      <IconClose className={css.iconClose} />
+                    </InlineTextButton>
+                  )}
                   <InlineTextButton
-                    onClick={() => fields.remove(index)}
+                    onClick={() =>
+                      fields.push({
+                        dayOfWeek,
+                        seets: 100,
+                        startTime: null,
+                        endTime: null,
+                      })
+                    }
                     className={css.addButton}>
-                    <IconClose className={css.iconClose} />
+                    <IconAdd />
                   </InlineTextButton>
-                )}
-                <InlineTextButton
-                  onClick={() =>
-                    fields.push({
-                      dayOfWeek,
-                      seets: 100,
-                      startTime: null,
-                      endTime: null,
-                    })
-                  }
-                  className={css.addButton}>
-                  <IconAdd />
-                </InlineTextButton>
+                </div>
               </td>
             </tr>
           );

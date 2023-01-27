@@ -47,6 +47,8 @@ const FieldTextInputComponent: React.FC<InputComponentProps> = (props) => {
     rightIcon,
     required,
     showText = false,
+    leftIconContainerClassName,
+    rightIconContainerClassName,
     ...rest
   } = props;
 
@@ -133,10 +135,22 @@ const FieldTextInputComponent: React.FC<InputComponentProps> = (props) => {
       ) : (
         <div className={inputContainerClasses}>
           {!!leftIcon && (
-            <div className={css.leftIconContainer}>{leftIconElement}</div>
+            <div
+              className={classNames(
+                css.leftIconContainer,
+                leftIconContainerClassName,
+              )}>
+              {leftIconElement}
+            </div>
           )}
           <input {...inputProps} />
-          <div className={css.rightIconContainer}>{rightIconElement}</div>
+          <div
+            className={classNames(
+              css.rightIconContainer,
+              rightIconContainerClassName,
+            )}>
+            {rightIconElement}
+          </div>
         </div>
       )}
       <ValidationError fieldMeta={fieldMeta} />
