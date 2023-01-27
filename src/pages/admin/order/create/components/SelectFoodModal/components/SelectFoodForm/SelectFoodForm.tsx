@@ -5,7 +5,7 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
 import IconSearch from '@components/Icons/IconSearch/IconSearch';
-import { toLowerCaseNonAccentVietnamese } from '@utils/nonAccentVietnamese';
+import { toNonAccentVietnamese } from '@utils/nonAccentVietnamese';
 import type { TDefaultProps } from '@utils/types';
 import arrayMutators from 'final-form-arrays';
 import type { ReactNode } from 'react';
@@ -26,7 +26,7 @@ const normalizeItems = (items: any[]) => {
   return items.map((item) => {
     const { id, attributes } = item || {};
     const { title, price } = attributes;
-    const nonAccentTitle = toLowerCaseNonAccentVietnamese(title);
+    const nonAccentTitle = toNonAccentVietnamese(title, true);
 
     return { id: id?.uuid, title, nonAccentTitle, price: price || 0 };
   });
@@ -131,7 +131,7 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
 
     currDebounceRef = setTimeout(() => {
       const newItems = normalizedItems.filter((item) =>
-        item.nonAccentTitle.includes(toLowerCaseNonAccentVietnamese(foodName)),
+        item.nonAccentTitle.includes(toNonAccentVietnamese(foodName, true)),
       );
 
       setCurrentItems(newItems);
