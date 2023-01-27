@@ -1,0 +1,71 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+.fieldInput {
+  margin-top: 24px;
+}
+
+.submitBtn {
+  margin: 40px auto 0;
+  width: 400px;
+  height: 48px;
+  @include text(16px);
+}
+
+.skeletonWrapper {
+  width: 298px;
+  height: 44px;
+  background-color: $neutralGray3;
+}
+
+.loadedResult {
+  @include flexAlign(flex-start);
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.memberItem {
+  width: 300px;
+  @include flexAlign(center, space-between);
+
+  .memberWrapper {
+    @include flexAlign(center);
+
+    .grayCircle {
+      width: 28px;
+      height: 28px;
+      background-color: $neutralGray6;
+      border-radius: 50%;
+      flex-basis: 28px;
+      margin-right: 12px;
+    }
+
+    .fullRowEmail {
+      @include text(14px);
+      color: $neutralGray6;
+      word-break: break-all;
+      width: 200px;
+      font-weight: $fontWeightBold;
+    }
+
+    .email {
+      @include text(12px);
+      color: $neutralGray5;
+    }
+
+    .name {
+      @include text(14px);
+      color: $neutralGray6;
+    }
+  }
+
+  .actionsWrapper {
+    @include flexAlign(center);
+
+    .closeIcon {
+      width: 9px;
+      height: 9px;
+      cursor: pointer;
+    }
+  }
+}
