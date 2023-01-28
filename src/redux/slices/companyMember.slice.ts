@@ -1,15 +1,15 @@
-import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import {
   addMembersApi,
   checkEmailExistedApi,
   deleteMemberApi,
-} from '@utils/companyApi';
+} from '@apis/companyApi';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 import type { TUser } from '@utils/types';
 
 import { BookerManageCompany } from './company.slice';
 
-interface CompanyMemberState {
+interface TCompanyMemberState {
   company: TUser | null;
   companyMembers: any[];
   addMembersInProgress: boolean;
@@ -22,7 +22,7 @@ interface CompanyMemberState {
   checkEmailExistedInProgress: boolean;
 }
 
-const initialState: CompanyMemberState = {
+const initialState: TCompanyMemberState = {
   company: null,
   companyMembers: [],
   addMembersInProgress: false,

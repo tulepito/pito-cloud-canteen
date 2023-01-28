@@ -1,15 +1,15 @@
+import { loadPlanDataApi, updateParticipantOrderApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
 
-import { loadPlanDataApi, updateParticipantOrderApi } from '../../utils/api';
 import { shopingCartActions, shopingCartThunks } from './shopingCart.slice';
 
 const LOAD_DATA = 'app/ParticipantSetupPlanPage/LOAD_DATA';
 const RELOAD_DATA = 'app/ParticipantSetupPlanPage/RELOAD_DATA';
 const UPDATE_ORDER = 'app/ParticipantSetupPlanPage/UPDATE_ORDER';
 
-type ParticipantSetupPlanState = {
+type TParticipantSetupPlanState = {
   restaurant: any;
   company: any;
   plan: any;
@@ -22,7 +22,7 @@ type ParticipantSetupPlanState = {
   submitDataError: any;
 };
 
-const initialState: ParticipantSetupPlanState = {
+const initialState: TParticipantSetupPlanState = {
   restaurant: {},
   company: {},
   plan: {},

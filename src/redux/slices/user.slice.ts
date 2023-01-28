@@ -5,10 +5,13 @@ import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities, ensureCurrentUser } from '@utils/data';
 import { EUserPermission } from '@utils/enums';
 import { storableError } from '@utils/errors';
-import type { TObject } from '@utils/types';
+import type { TCurrentUser, TObject } from '@utils/types';
 import get from 'lodash/get';
 
-const mergeCurrentUser = (oldCurrentUser: any, newCurrentUser: any) => {
+const mergeCurrentUser = (
+  oldCurrentUser: TCurrentUser | null,
+  newCurrentUser: TCurrentUser | null,
+) => {
   const {
     id: oId,
     type: oType,
@@ -20,14 +23,16 @@ const mergeCurrentUser = (oldCurrentUser: any, newCurrentUser: any) => {
   // Passing null will remove currentUser entity.
   // Only relationships are merged.
   // TODO figure out if sparse fields handling needs a better handling.
-  return newCurrentUser === null
-    ? null
-    : oldCurrentUser === null
-    ? newCurrentUser
-    : { id, type, attributes, ...oldRelationships, ...relationships };
+  return (
+    newCurrentUser === null
+      ? null
+      : oldCurrentUser === null
+      ? newCurrentUser
+      : { id, type, attributes, ...oldRelationships, ...relationships }
+  ) as TCurrentUser | null;
 };
 
-const detectUserPermission = (currentUser: any) => {
+const detectUserPermission = (currentUser: TCurrentUser) => {
   const { isCompany, isAdmin, company } = get(
     currentUser,
     'attributes.profile.metadata',
@@ -50,7 +55,7 @@ const detectUserPermission = (currentUser: any) => {
 };
 
 type TUserState = {
-  currentUser: any;
+  currentUser: TCurrentUser | null;
   currentUserShowError: any;
   userPermission: EUserPermission;
   sendVerificationEmailInProgress: boolean;
@@ -66,17 +71,14 @@ const initialState: TUserState = {
 };
 
 // ================ Thunks ================ //
-const FETCH_CURRENT_USER = 'app/User/FETCH_CURRENT_USER';
-const SEND_VERIFICATION_EMAIL = 'app/user/SEND_VERIFICATION_EMAIL';
-
 const fetchCurrentUser = createAsyncThunk(
-  FETCH_CURRENT_USER,
-  async (params: TObject | undefined, { extra: sdk, fulfillWithValue }) => {
-    const parameters = params || {};
-    const response = await sdk.currentUser.show(parameters);
-    const entities = denormalisedResponseEntities(response);
-    const currentUser = entities[0];
-    return fulfillWithValue(currentUser);
+  'app/user/FETCH_CURRENT_USER',
+  async (params: TObject | undefined, { extra: sdk }) => {
+    const queryParams = params || {};
+    const [currentUser] = denormalisedResponseEntities(
+      await sdk.currentUser.show(queryParams),
+    );
+    return currentUser;
   },
   {
     serializeError: storableError,
@@ -84,7 +86,7 @@ const fetchCurrentUser = createAsyncThunk(
 );
 
 const sendVerificationEmail = createAsyncThunk(
-  SEND_VERIFICATION_EMAIL,
+  'app/user/SEND_VERIFICATION_EMAIL',
   async (_, { extra: sdk }) => {
     await sdk.currentUser.sendVerificationEmail();
   },

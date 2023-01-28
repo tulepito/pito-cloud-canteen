@@ -1,6 +1,3 @@
-import { createAsyncThunk } from '@redux/redux.helper';
-import type { RootState } from '@redux/store';
-import { createSlice } from '@reduxjs/toolkit';
 import {
   addParticipantToOrderApi,
   addUpdateMemberOrder,
@@ -8,7 +5,10 @@ import {
   loadBookerOrderDataApi,
   sendRemindEmailToMemberApi,
   updateOrderDetailsApi,
-} from '@utils/api';
+} from '@apis/orderApi';
+import { createAsyncThunk } from '@redux/redux.helper';
+import type { RootState } from '@redux/store';
+import { createSlice } from '@reduxjs/toolkit';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TCompany, TObject, TUser } from '@utils/types';
 import omit from 'lodash/omit';

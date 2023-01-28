@@ -16,7 +16,7 @@ enum EAuthState {
   isSigningUp = 'isSigningUp',
 }
 
-type IAuthState = {
+type TAuthState = {
   isAuthenticated: boolean;
   // scopes associated with current token
   authScopes: [];
@@ -32,7 +32,7 @@ type IAuthState = {
   signUpError: any;
 };
 
-const initialState: IAuthState = {
+const initialState: TAuthState = {
   isAuthenticated: false,
   authScopes: [],
   authInfoLoaded: false,

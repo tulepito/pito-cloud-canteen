@@ -1,11 +1,11 @@
-import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import {
   addMealPlanDetailApi,
   completeOrderApi,
   createOrderApi,
   updateMealPlanDetailApi,
-} from '@utils/orderApi';
+} from '@apis/orderApi';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 import type { TListing } from '@utils/types';
 import cloneDeep from 'lodash/cloneDeep';
 import { DateTime } from 'luxon';
@@ -30,7 +30,7 @@ const updateSetUpPlan = ({
   return newOrderDetail;
 };
 
-type OrderInitialState = {
+type TOrderInitialState = {
   order: TListing | null;
   plans: TListing[];
   createOrderInProcess: boolean;
@@ -50,7 +50,7 @@ const ADD_MEAL_PLAN_DETAIL = 'app/Order/ADD_MEAL_PLAN_DETAIL';
 const UPDATE_MEAL_PLAN_DETAIL = 'app/Order/UPDATE_MEAL_PLAN_DETAIL';
 const COMPLETE_ORDER = 'app/Order/COMPLETE_ORDER';
 
-const initialState: OrderInitialState = {
+const initialState: TOrderInitialState = {
   order: null,
   plans: [],
   createOrderInProcess: false,

@@ -12,7 +12,7 @@ type TGroupInfo = {
   description: string;
 };
 
-type CompanyState = {
+type TCompanyState = {
   groupList: any;
   fetchGroupListInProgress: boolean;
   companyMembers: any[];
@@ -44,7 +44,7 @@ const CREATE_GROUP = 'app/Company/CREATE_GROUP';
 const UPDATE_GROUP = 'app/Company/UPDATE_GROUP';
 const DELETE_GROUP = 'app/Company/DELETE_GROUP';
 
-const initialState: CompanyState = {
+const initialState: TCompanyState = {
   groupList: [],
   fetchGroupListInProgress: false,
   groupMembers: [],
