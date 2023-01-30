@@ -1,6 +1,6 @@
 import { InlineTextButton } from '@components/Button/Button';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { ParticipantOrderAsyncAction } from '@redux/slices/ParticipantOrderManagementPage.slice';
+import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { CURRENT_USER } from '@utils/data';
 import { useRouter } from 'next/router';
@@ -55,7 +55,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
       orderId,
     };
 
-    dispatch(ParticipantOrderAsyncAction.updateOrder(payload));
+    dispatch(participantOrderManagementThunks.updateOrder(payload));
   };
 
   const onNavigateToOrderDetail = () => {

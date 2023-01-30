@@ -57,7 +57,7 @@ const updateOrder = createAsyncThunk(
   },
 );
 
-export const ParticipantOrderAsyncAction = { loadData, updateOrder };
+export const participantOrderManagementThunks = { loadData, updateOrder };
 
 const participantOrderSlice = createSlice({
   name: 'ParticipantOrderManagement',
@@ -65,6 +65,7 @@ const participantOrderSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      /* =============== loadData =============== */
       .addCase(loadData.pending, (state) => ({
         ...state,
         loadDataInProgress: true,
@@ -82,6 +83,7 @@ const participantOrderSlice = createSlice({
         loadDataError: error.message,
         loadDataInProgress: false,
       }))
+      /* =============== updateOrder =============== */
       .addCase(updateOrder.pending, (state) => ({
         ...state,
         updateOrderInProgress: true,

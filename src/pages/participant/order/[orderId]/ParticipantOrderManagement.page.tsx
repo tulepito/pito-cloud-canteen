@@ -1,6 +1,6 @@
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { ParticipantOrderAsyncAction } from '@redux/slices/ParticipantOrderManagementPage.slice';
+import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import type { TListing, TUser } from '@utils/types';
 import { useRouter } from 'next/router';
@@ -28,7 +28,7 @@ const ParticipantOrderManagement = () => {
 
   useEffect(() => {
     if (isReady) {
-      dispatch(ParticipantOrderAsyncAction.loadData(orderId as string));
+      dispatch(participantOrderManagementThunks.loadData(orderId as string));
     }
   }, [isReady]);
 
