@@ -5,7 +5,6 @@
 .root {
   position: relative;
   @include checkBoxInputStyles;
-
   .textRoot {
     color: $neutralGray6;
     margin-top: -1px;

@@ -22,8 +22,8 @@ const initialState: TShoppingCartState = {
 };
 
 // ================ Slice ================ //
-export const shopingCartSlice = createSlice({
-  name: 'shopingCart',
+export const shoppingCartSlice = createSlice({
+  name: 'ShoppingCart',
   initialState,
   reducers: {
     addToCart: (
@@ -129,7 +129,7 @@ const addToCartThunk = createAsyncThunk(
     const { currentUser } = getState().user;
 
     return dispatch(
-      shopingCartSlice.actions.addToCart({
+      shoppingCartSlice.actions.addToCart({
         currentUserId: (currentUser as TCurrentUser).id.uuid,
         planId,
         dayId,
@@ -147,7 +147,7 @@ const removeFromCartThunk = createAsyncThunk(
   ) => {
     const { currentUser } = getState().user;
     return dispatch(
-      shopingCartSlice.actions.removeToCart({
+      shoppingCartSlice.actions.removeToCart({
         currentUserId: (currentUser as TCurrentUser).id.uuid,
         planId,
         dayId,
@@ -161,7 +161,7 @@ const removeAllFromPlanCartThunk = createAsyncThunk(
   async ({ planId }: { planId: string }, { getState, dispatch }) => {
     const { currentUser } = getState().user;
     return dispatch(
-      shopingCartSlice.actions.removeAllFromPlanCart({
+      shoppingCartSlice.actions.removeAllFromPlanCart({
         currentUserId: (currentUser as TCurrentUser).id.uuid,
         planId,
       }),
@@ -169,12 +169,12 @@ const removeAllFromPlanCartThunk = createAsyncThunk(
   },
 );
 
-export const shopingCartThunks = {
+export const shoppingCartThunks = {
   addToCart: addToCartThunk,
   removeFromCart: removeFromCartThunk,
   removeAllFromPlanCart: removeAllFromPlanCartThunk,
 };
 
-export const shopingCartActions = shopingCartSlice.actions;
+export const shoppingCartActions = shoppingCartSlice.actions;
 
-export default shopingCartSlice.reducer;
+export default shoppingCartSlice.reducer;

@@ -140,8 +140,8 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
       </Button>
 
       <AlertModal
-        disabledCancelButton={disableButton}
-        disabledConfirmButton={disableButton}
+        cancelDisabled={disableButton}
+        confirmDisabled={disableButton}
         title={deleteParticipantPopupTitle}
         isOpen={isDeleteParticipantModalOpen}
         handleClose={handleCloseDeleteParticipantModal}

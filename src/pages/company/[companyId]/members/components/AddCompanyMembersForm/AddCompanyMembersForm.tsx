@@ -3,6 +3,7 @@ import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import { USER } from '@utils/data';
+import type { TCurrentUser, TUser } from '@utils/types';
 import { emailFormatValid } from '@utils/validators';
 import difference from 'lodash/difference';
 import fill from 'lodash/fill';
@@ -22,10 +23,11 @@ type AddCompanyMembersFormProps = {
   loadedResult: any[];
   emailCheckingInProgress: boolean;
   checkInputEmailValue: (value: string[]) => void;
-  companyAccount: any;
+  companyAccount: TUser;
   removeEmailValue: (email: string) => void;
   addMembersInProgress: boolean;
   addMembersError: any;
+  currentUser: TUser | TCurrentUser;
 };
 
 const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
@@ -38,9 +40,18 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
     removeEmailValue,
     addMembersInProgress = false,
     addMembersError,
+    companyAccount,
+    currentUser,
   } = props;
   const intl = useIntl();
   const [loadingRow, setLoadingRow] = useState<number>(0);
+  const { members: originCompanyMembers } = USER(companyAccount).getMetadata();
+  const restrictEmailList = [
+    ...Object.keys(originCompanyMembers),
+    USER(companyAccount).getAttributes().email,
+    USER(currentUser).getAttributes().email,
+  ];
+
   return (
     <FinalForm
       {...props}
@@ -58,7 +69,13 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
           if (!value) {
             return;
           }
-          const emailListValue = value.split(',');
+          const rawEmailListValue = value.split(', ');
+
+          const emailListValue = difference(
+            rawEmailListValue,
+            restrictEmailList,
+          );
+
           setLoadingRow(emailListValue.length);
           const formatListEmailValue = emailListValue.reduce(
             (result: string[], separatedEmail: string) => {

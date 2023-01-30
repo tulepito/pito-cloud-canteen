@@ -45,3 +45,6 @@ export const loadPlanDataApi = (planId: string) =>
 
 export const updateParticipantOrderApi = (orderId: string, body: TObject) =>
   postApi(`/api/participants/orders/${orderId}`, body);
+
+export const fetchUserApi = (userId: string) =>
+  getApi(`/api/users/fetch-user/${userId}`);

@@ -26,6 +26,9 @@ type TFieldCheckboxRenderer = TDefaultProps & {
   meta: any;
   listClassName?: string;
   disabled?: boolean;
+  checkboxClassName?: string;
+  labelClassName?: string;
+  itemClassName?: string;
 };
 
 const FieldCheckboxRenderer: React.FC<TFieldCheckboxRenderer> = (props) => {
@@ -40,6 +43,9 @@ const FieldCheckboxRenderer: React.FC<TFieldCheckboxRenderer> = (props) => {
     meta,
     disabled,
     listClassName,
+    checkboxClassName,
+    labelClassName,
+    itemClassName,
   } = props;
 
   const classes = classNames(rootClassName || css.root, className);
@@ -49,13 +55,16 @@ const FieldCheckboxRenderer: React.FC<TFieldCheckboxRenderer> = (props) => {
 
   return (
     <fieldset className={classes}>
-      {label ? <p className={css.label}>{label}</p> : null}
+      {label ? (
+        <p className={classNames(css.label, labelClassName)}>{label}</p>
+      ) : null}
       <ul className={listClasses}>
         {options.map((option: any) => {
           const fieldId = `${id}.${option.key}`;
           return (
-            <li key={fieldId} className={css.item}>
+            <li key={fieldId} className={classNames(css.item, itemClassName)}>
               <FieldCheckbox
+                className={checkboxClassName}
                 disabled={disabled}
                 id={fieldId}
                 name={fields.name}

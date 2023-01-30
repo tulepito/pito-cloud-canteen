@@ -30,3 +30,8 @@ export const putApi = (path: string, body: TObject) => {
 export const deleteApi = (path: string, body: TObject) => {
   return axios.delete(`${apiBaseUrl()}${path}`, body);
 };
+
+export type TBodyParams = {
+  dataParams: TObject;
+  queryParams: TObject;
+};

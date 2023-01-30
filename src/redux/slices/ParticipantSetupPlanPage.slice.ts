@@ -3,7 +3,7 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
 
-import { shopingCartActions, shopingCartThunks } from './shopingCart.slice';
+import { shoppingCartActions, shoppingCartThunks } from './shopingCart.slice';
 
 const LOAD_DATA = 'app/ParticipantSetupPlanPage/LOAD_DATA';
 const RELOAD_DATA = 'app/ParticipantSetupPlanPage/RELOAD_DATA';
@@ -49,7 +49,7 @@ const loadData = createAsyncThunk(
       const status = userOder?.status;
       if (status === 'joined' || status === 'notJoined') {
         dispatch(
-          shopingCartActions.addToCart({
+          shoppingCartActions.addToCart({
             currentUserId,
             planId,
             dayId: day,
@@ -75,14 +75,14 @@ const reloadData = createAsyncThunk(
     const plan = response?.data?.data?.plan;
     const orderDays = Object.keys(plan);
 
-    dispatch(shopingCartThunks.removeAllFromPlanCart({ planId }));
+    dispatch(shoppingCartThunks.removeAllFromPlanCart({ planId }));
 
     orderDays.forEach((day) => {
       const userOder = plan?.[day]?.memberOrder?.[currentUserId];
       const status = userOder?.status;
       if (status === 'joined' || status === 'notJoined') {
         dispatch(
-          shopingCartActions.addToCart({
+          shoppingCartActions.addToCart({
             currentUserId,
             planId,
             dayId: day,

@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { ParticipantSetupPlanThunks } from '@redux/slices/ParticipantSetupPlanPage.slice';
-import { shopingCartThunks } from '@redux/slices/shopingCart.slice';
+import { shoppingCartThunks } from '@redux/slices/shopingCart.slice';
 import { useState } from 'react';
 
 import DeleteCartModal from './DeleteCartModal';
@@ -41,7 +41,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
 
   // Functions
   const handleRemoveItem = (dayId: string) => {
-    dispatch(shopingCartThunks.removeFromCart({ planId, dayId }));
+    dispatch(shoppingCartThunks.removeFromCart({ planId, dayId }));
   };
 
   const handleRemoveAllItem = () => {
@@ -54,7 +54,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   };
 
   const handleConfirmDeleteAll = () => {
-    dispatch(shopingCartThunks.removeAllFromPlanCart({ planId }));
+    dispatch(shoppingCartThunks.removeAllFromPlanCart({ planId }));
     setIsOpenConfirmDeleteAll(false);
     dispatch(ParticipantSetupPlanThunks.updateOrder({ orderId, planId }));
   };

@@ -6,23 +6,18 @@ import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderAsyncAction, removeDraftOrder } from '@redux/slices/Order.slice';
+import { parseTimestampToFormat } from '@utils/dates';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
-import { DateTime } from 'luxon';
 import React, { useMemo } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-intl/src/utils';
 
 // eslint-disable-next-line import/no-cycle
-// eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../NavigateButtons/NavigateButtons';
 import css from './ReviewOrder.module.scss';
-
-const parseTimestaimpToFormat = (date: number) => {
-  return DateTime.fromMillis(date).toFormat('dd-MM-yyyy');
-};
 
 const MENU_TABLE_COLUMN: TColumn[] = [
   {
@@ -159,7 +154,7 @@ const generateOrderDetails = (orders: any[]) => {
       data: {
         isParent: true,
         index: index + 1,
-        label: parseTimestaimpToFormat(Number(date)),
+        label: parseTimestampToFormat(Number(date)),
         quantity: memeberDetails.length,
         price: totalDatePricing,
       },
@@ -306,7 +301,7 @@ const parseDataToReviewTab = (values: any) => {
   const items = Object.keys(orderDetail).map((key: any) => {
     return {
       key,
-      label: parseTimestaimpToFormat(Number(key)),
+      label: parseTimestampToFormat(Number(key)),
       childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
       childrenProps: { ...orderDetail[key], ...rest, order: values },
     };

@@ -113,3 +113,7 @@ export const renderDateRange = (
 
   return result;
 };
+
+export const parseTimestampToFormat = (date: number) => {
+  return DateTime.fromMillis(date).toFormat('dd/MM/yyyy');
+};

@@ -18,7 +18,7 @@ export type TPlan = {
   meal: string;
   orderDetail: {
     [date: string]: {
-      restaurant: string; // restaurant listing id
+      restaurant: any; // restaurant listing id
       memberOrders: {
         [participant: string]: string; // food id
       };

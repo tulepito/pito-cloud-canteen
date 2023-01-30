@@ -1,5 +1,6 @@
 import type { TObject } from '@utils/types';
 
+import type { TBodyParams } from './configs';
 import { getApi, postApi, putApi } from './configs';
 
 type CreateOrderApiBody = {
@@ -60,7 +61,7 @@ type CompleteOrderApiBody = {
   orderId: string;
   planId: string;
 };
-export const completeOrderApi = (body: CompleteOrderApiBody) =>
+export const initiateTransactionsApi = (body: CompleteOrderApiBody) =>
   putApi('/api/orders', body);
 
 // Booker manage order details
@@ -81,3 +82,7 @@ export const addUpdateMemberOrder = (orderId: string, body: TObject) =>
 
 export const sendRemindEmailToMemberApi = (orderId: string, body: TObject) =>
   postApi(`/api/orders/${orderId}/remind-member`, body);
+
+export const queryOrdersApi = (body: TBodyParams) => {
+  return postApi(`/api/admin/listings/order/query`, body);
+};

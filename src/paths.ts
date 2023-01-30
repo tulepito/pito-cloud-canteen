@@ -101,6 +101,42 @@ export const adminRoutes = {
     path: '/admin/order/create',
     label: 'Tạo đơn hàng',
   },
+  OrderDetails: {
+    path: '/admin/order/[orderId]',
+    label: 'Chi tiết đơn hàng',
+  },
+  PartnerSettings: {
+    path: '/admin/partner/[restaurantId]/settings',
+    label: 'Cài đặt nhà hàng',
+  },
+  ManagePartnerFoods: {
+    path: '/admin/partner/[restaurantId]/settings/food',
+    label: 'Danh sách món ăn',
+  },
+  CreatePartnerFood: {
+    path: '/admin/partner/[restaurantId]/settings/food/create',
+    label: 'Tạo món ăn',
+  },
+  EditPartnerFood: {
+    path: '/admin/partner/[restaurantId]/settings/food/[foodId]',
+    label: 'Chỉnh sửa món ăn',
+  },
+  ManagePartnerMenus: {
+    path: '/admin/partner/[restaurantId]/settings/menu',
+    label: 'Danh sách thực đơn',
+  },
+  PartnerMenuDetails: {
+    path: '/admin/partner/[restaurantId]/settings/menu/[menuId]',
+    label: 'Danh sách thực đơn',
+  },
+  CreatePartnerMenu: {
+    path: '/admin/partner/[restaurantId]/settings/menu/create',
+    label: 'Tạo thực đơn',
+  },
+  EditPartnerMenu: {
+    path: '/admin/partner/[restaurantId]/settings/menu/create',
+    label: 'Chỉnh sửa thực đơn',
+  },
 } as const;
 
 export const companyPaths = {

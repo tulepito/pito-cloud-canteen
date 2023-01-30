@@ -26,55 +26,63 @@ const IconCloseBadge: React.FC<TIconProps> = (props) => {
   );
 };
 
-const BadgeType = {
-  DEFAULT: 'default',
-  PROCESSING: 'processing',
-  ERROR: 'error',
-  SUCCESS: 'success',
-  WARNING: 'warning',
-};
+export enum EBadgeType {
+  DEFAULT = 'default',
+  PROCESSING = 'processing',
+  ERROR = 'error',
+  SUCCESS = 'success',
+  WARNING = 'warning',
+}
 
 type TBadgeProps = {
-  type?: 'default' | 'processing' | 'error' | 'success' | 'warning';
+  type?: EBadgeType;
   hasCloseIcon?: boolean;
   hasDotIcon?: boolean;
   onCloseIcon?: () => void;
   label: string;
   className?: string;
+  containerClassName?: string;
+  labelClassName?: string;
 };
 
 const Badge: React.FC<TBadgeProps> = (props) => {
   const {
-    type = BadgeType.DEFAULT,
+    type = EBadgeType.DEFAULT,
     hasCloseIcon = false,
     hasDotIcon = false,
     onCloseIcon,
     label,
     className,
+    labelClassName,
   } = props;
 
   const classesFormType = {
-    [css.default]: type === BadgeType.DEFAULT,
-    [css.processing]: type === BadgeType.PROCESSING,
-    [css.error]: type === BadgeType.ERROR,
-    [css.success]: type === BadgeType.SUCCESS,
-    [css.warning]: type === BadgeType.WARNING,
+    [css.default]: type === EBadgeType.DEFAULT,
+    [css.processing]: type === EBadgeType.PROCESSING,
+    [css.error]: type === EBadgeType.ERROR,
+    [css.success]: type === EBadgeType.SUCCESS,
+    [css.warning]: type === EBadgeType.WARNING,
   };
 
   const badgeContainerClassName = classNames(
     css.root,
     classesFormType,
     className,
+    labelClassName,
   );
-  const labelClasses = classNames(css.label, classesFormType);
-  const badgeCloseClasses = classNames(classesFormType);
-  const badgeDotClasses = classNames(css.badgeDot, classesFormType);
+  const labelClasses = classNames(css.label, classesFormType, labelClassName);
+  const badgeCloseClasses = classNames(classesFormType, labelClassName);
+  const badgeDotClasses = classNames(
+    css.badgeDot,
+    classesFormType,
+    labelClassName,
+  );
 
   return (
     <div className={badgeContainerClassName}>
       <div className={css.badgeContent}>
         {hasDotIcon && <span className={badgeDotClasses}></span>}
-        <span className={labelClasses}>{label}</span>
+        <div className={labelClasses}>{label}</div>
       </div>
       {hasCloseIcon && (
         <div className={css.badgeClose} onClick={onCloseIcon}>
