@@ -6,6 +6,7 @@ import { storableError } from '@utils/errors';
 import { loadOrderDataApi, updateParticipantOrderApi } from '../../utils/api';
 
 const LOAD_DATA = 'app/OrderManagementPage/LOAD_DATA';
+const RELOAD_DATA = 'app/OrderManagementPage/RELOAD_DATA';
 const UPDATE_ORDER = 'app/OrderManagementPage/UPDATE_ORDER';
 
 const initialState: any = {
@@ -33,12 +34,24 @@ const loadData = createAsyncThunk(
   },
 );
 
+const reloadData = createAsyncThunk(
+  RELOAD_DATA,
+  async (orderId: string, { dispatch }) => {
+    const response = await loadOrderDataApi(orderId);
+    await dispatch(userThunks.fetchCurrentUser({}));
+    return response?.data.data;
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
 const updateOrder = createAsyncThunk(
   UPDATE_ORDER,
   async (data: { orderId: string; updateValues: any }, { dispatch }) => {
     const { orderId, updateValues } = data;
     await updateParticipantOrderApi(orderId, updateValues);
-    await dispatch(loadData(orderId));
+    await dispatch(reloadData(orderId));
   },
   {
     serializeError: storableError,
@@ -69,6 +82,23 @@ const participantOrderSlice = createSlice({
         ...state,
         loadDataError: error.message,
         loadDataInProgress: false,
+      }))
+      .addCase(reloadData.pending, (state) => ({
+        ...state,
+        reloadDataInProgress: true,
+        reloadDataError: null,
+      }))
+      .addCase(reloadData.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          ...payload,
+          reloadDataInProgress: false,
+        };
+      })
+      .addCase(reloadData.rejected, (state, { error }) => ({
+        ...state,
+        reloadDataError: error.message,
+        reloadDataInProgress: false,
       }))
       .addCase(updateOrder.pending, (state) => ({
         ...state,
