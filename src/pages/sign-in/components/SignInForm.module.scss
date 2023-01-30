@@ -49,15 +49,6 @@
     color: $sematicRed2;
   }
 
-  .submitButton {
-    background-color: $primaryPri2;
-    color: $neutralGray1;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 8px 0;
-    border-radius: 8px;
-  }
-
   .orText {
     $width: calc(100%);
     text-align: center;
@@ -85,6 +76,7 @@
   }
 
   .googleLoginButton {
+    color: $neutralGray6;
     font-size: 16px;
     cursor: pointer;
     padding: 8px 12px;
@@ -95,11 +87,12 @@
     align-items: center;
     justify-content: center;
     background-color: $neutralGray1;
-    border-color: 1px solid $neutralGray4;
+    border: 1px solid $neutralGray4;
 
     &:disabled {
       background-color: $neutralGray4;
       border-color: $neutralGray5;
+      color: $neutralGray5;
     }
   }
 

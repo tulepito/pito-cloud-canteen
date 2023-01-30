@@ -131,6 +131,7 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
 
         {errorMessage && <div className={css.errorSignIn}>{errorMessage}</div>}
         <Button
+          variant="cta"
           className={css.submitButton}
           type="submit"
           disabled={submitDisable}
