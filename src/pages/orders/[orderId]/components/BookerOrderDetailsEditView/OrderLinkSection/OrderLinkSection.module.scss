@@ -3,8 +3,27 @@
 @use '/src/styles/vars.scss' as *;
 
 .root {
+  .titleContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .shareLinkButton {
+      padding: 0;
+      height: fit-content;
+      min-height: unset;
+      margin: 0;
+
+      .editIcon {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
   .linkContainer {
-    margin: 16px 0;
+    margin-top: 16px;
 
     span {
       word-break: break-all;
@@ -27,29 +46,5 @@
     display: flex;
     justify-content: space-between;
     column-gap: 12px;
-  }
-
-  .shareLinkContainer {
-    padding: 0;
-    height: fit-content;
-    min-height: unset;
-    margin-bottom: 8px;
-    margin: 0;
-
-    .shareLinkContent {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      column-gap: 4px;
-
-      .editIcon {
-        width: 20px;
-        height: 20px;
-      }
-
-      & > :last-child {
-        font-weight: 700;
-      }
-    }
   }
 }

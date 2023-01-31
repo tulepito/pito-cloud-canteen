@@ -65,12 +65,9 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const disableButton = inProgress;
 
-  const sectionTitle = intl.formatMessage(
-    {
-      id: 'ManageParticipantsSection.title',
-    },
-    { total: participantData.length },
-  );
+  const sectionTitle = intl.formatMessage({
+    id: 'ManageParticipantsSection.title',
+  });
 
   const deleteParticipantPopupTitle = intl.formatMessage({
     id: 'ManageParticipantsSection.deleteParticipantPopup.title',
@@ -123,7 +120,12 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
 
   return (
     <div className={rootClasses}>
-      <div>{sectionTitle}</div>
+      <div className={css.titleContainer}>
+        {sectionTitle}
+        {participantData.length && (
+          <span className={css.participantCount}>{participantData.length}</span>
+        )}
+      </div>
 
       <AddParticipantForm onSubmit={handleSubmitAddParticipant} />
       <div className={css.participantContainer}>

@@ -5,28 +5,29 @@
 .root {
   @include textTemplate(14px, 400, 24px);
 
-  .title {
-  }
+  .titleContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
 
-  .editDeadlineContainer {
-    padding: 0;
-    height: fit-content;
-    margin-bottom: 8px;
+    .title {
+    }
 
-    .editDeadlineContent {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      padding: 8px 0;
-      column-gap: 4px;
+    .editDeadlineButton {
+      padding: 0;
+      height: fit-content;
+      min-height: unset;
 
       .editIcon {
         width: 20px;
         height: 20px;
       }
 
-      & > :last-child {
-        font-weight: 700;
+      &:disabled {
+        .editIcon {
+          fill: $neutralGray4;
+        }
       }
     }
   }

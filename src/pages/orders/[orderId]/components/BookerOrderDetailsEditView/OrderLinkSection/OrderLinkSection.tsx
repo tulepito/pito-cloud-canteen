@@ -62,9 +62,6 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const sectionTitle = intl.formatMessage({
     id: 'OrderLinkSection.title',
   });
-  const shareText = intl.formatMessage({
-    id: 'OrderLinkSection.shareText',
-  });
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(orderLink);
@@ -92,7 +89,15 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
 
   return (
     <div className={rootClasses}>
-      <div className={css.title}>{sectionTitle}</div>
+      <div className={css.titleContainer}>
+        <div className={css.title}>{sectionTitle}</div>
+        <Button
+          variant="inline"
+          className={css.shareLinkButton}
+          onClick={handleShareButtonClick}>
+          <IconShare className={css.editIcon} />
+        </Button>
+      </div>
 
       <div className={css.linkContainer}>
         <span>{orderLink}</span>
@@ -102,16 +107,6 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
           </ButtonIcon>
         </Tooltip>
       </div>
-
-      <Button
-        variant="inline"
-        className={css.shareLinkContainer}
-        onClick={handleShareButtonClick}>
-        <div className={css.shareLinkContent}>
-          <IconShare className={css.editIcon} />
-          <div>{shareText}</div>
-        </div>
-      </Button>
 
       <SendNotificationModal
         onSubmit={handleSubmitSendNotification}

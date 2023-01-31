@@ -54,10 +54,6 @@ const OrderDeadlineCountdownSection: React.FC<
     },
   );
 
-  const editDeadlineText = intl.formatMessage({
-    id: 'OrderDeadlineCountdownSection.editDeadline',
-  });
-
   const handleClickEditIcon = () => {
     setIsEditOrderDeadlineModalOpen(true);
   };
@@ -89,17 +85,17 @@ const OrderDeadlineCountdownSection: React.FC<
 
   return (
     <div className={rootClasses}>
-      <div className={css.title}>{sectionTitle}</div>
-      <Button
-        disabled={disabledEditButton}
-        variant="inline"
-        className={css.editDeadlineContainer}
-        onClick={handleClickEditIcon}>
-        <div className={css.editDeadlineContent}>
+      <div className={css.titleContainer}>
+        <div className={css.title}>{sectionTitle}</div>
+        <Button
+          disabled={disabledEditButton}
+          variant="inline"
+          className={css.editDeadlineButton}
+          onClick={handleClickEditIcon}>
           <IconEdit className={css.editIcon} />
-          <div>{editDeadlineText}</div>
-        </div>
-      </Button>
+        </Button>
+      </div>
+
       <CountdownTimer deadline={orderDeadline} stopAt={0} />
       <div className={css.orderEndAtMessage}>{orderEndAtMessage}</div>
       <EditOrderDeadlineModal
