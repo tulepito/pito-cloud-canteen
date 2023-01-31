@@ -21,10 +21,13 @@ type ITabsProps = {
   contentClassName?: string;
   headerClassName?: string;
   showNavigation?: boolean;
+  middleLabel?: boolean;
   actionsClassName?: string;
   actionsComponent?: ReactNode;
   headerWrapperClassName?: string;
   className?: string;
+  navigationStartClassName?: string;
+  navigationEndClassName?: string;
 };
 
 const Tabs: React.FC<ITabsProps> = (props) => {
@@ -39,6 +42,9 @@ const Tabs: React.FC<ITabsProps> = (props) => {
     actionsComponent,
     headerWrapperClassName,
     className,
+    middleLabel,
+    navigationStartClassName,
+    navigationEndClassName,
   } = props;
   const [activeTabKey, setActiveTabKey] = useState(defaultActiveKey || 1);
 
@@ -104,16 +110,39 @@ const Tabs: React.FC<ITabsProps> = (props) => {
     headerWrapperClassName,
   );
   const classes = classNames(css.root, className);
+  const navigationStartClasses = classNames(
+    css.navigateBtnStart,
+    {
+      [css.middleLabel]: middleLabel,
+    },
+    navigationStartClassName,
+  );
+  const navigationEndClasses = classNames(
+    css.navigateBtnEnd,
+    {
+      [css.middleLabel]: middleLabel,
+    },
+    navigationEndClassName,
+  );
 
   return (
     <div className={classes}>
       <div className={headerWrapperClasses}>
-        <div className={headerClasses}>{tabHeader}</div>
-        {showNavigation && (
-          <div className={css.navigateBtn}>
+        {showNavigation && middleLabel && (
+          <div className={navigationStartClasses}>
             <InlineTextButton type="button" onClick={goLeft}>
               <IconArrow direction="left" />
             </InlineTextButton>
+          </div>
+        )}
+        <div className={headerClasses}>{tabHeader}</div>
+        {showNavigation && (
+          <div className={navigationEndClasses}>
+            {!middleLabel && (
+              <InlineTextButton type="button" onClick={goLeft}>
+                <IconArrow direction="left" />
+              </InlineTextButton>
+            )}
             <InlineTextButton type="button" onClick={goRight}>
               <IconArrow direction="right" />
             </InlineTextButton>

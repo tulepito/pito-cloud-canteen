@@ -152,7 +152,12 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
 
   return (
     <div className={css.root}>
-      <Tabs items={items} onChange={handleDateTabChange} showNavigation />
+      <Tabs
+        items={items}
+        onChange={handleDateTabChange}
+        showNavigation
+        middleLabel
+      />
     </div>
   );
 };
