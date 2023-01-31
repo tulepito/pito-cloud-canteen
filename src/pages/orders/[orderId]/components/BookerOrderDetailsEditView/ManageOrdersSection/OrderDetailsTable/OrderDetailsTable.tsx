@@ -136,7 +136,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
         children = (
           <>
             {tabData.length > 0 ? (
-              <OrderDetailsTableComponent {...initialParams} hasTotalLine />
+              <OrderDetailsTableComponent {...initialParams} />
             ) : (
               <p className={css.noChoices}>
                 {intl.formatMessage({ id: 'OrderDetailsTable.noChoices' })}

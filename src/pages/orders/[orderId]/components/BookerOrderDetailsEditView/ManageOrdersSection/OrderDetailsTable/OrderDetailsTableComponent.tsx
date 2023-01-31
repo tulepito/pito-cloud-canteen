@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import { useIntl } from 'react-intl';
 
 import css from './OrderDetailsTable.module.scss';
-import type { EOrderDetailsTableTab } from './OrderDetailsTable.utils';
+import { EOrderDetailsTableTab } from './OrderDetailsTable.utils';
 
 type TOrderDetailsTableComponentProps = {
   tab: EOrderDetailsTableTab;
@@ -25,9 +25,29 @@ export const OrderDetailsTableComponent: React.FC<
   data,
   onClickEditOrderItem,
   onClickDeleteOrderItem,
-  hasTotalLine = false,
 }) => {
   const intl = useIntl();
+  let totalText;
+
+  switch (tab) {
+    case EOrderDetailsTableTab.chose:
+      totalText = intl.formatMessage({
+        id: 'OrderDetailsTable.totalChose',
+      });
+      break;
+    case EOrderDetailsTableTab.notChoose:
+      totalText = intl.formatMessage({
+        id: 'OrderDetailsTable.totalNotChose',
+      });
+      break;
+    case EOrderDetailsTableTab.notJoined:
+      totalText = intl.formatMessage({
+        id: 'OrderDetailsTable.totalNotJoined',
+      });
+      break;
+    default:
+      break;
+  }
 
   return (
     <table className={css.tableRoot}>
@@ -84,16 +104,10 @@ export const OrderDetailsTableComponent: React.FC<
           );
         })}
 
-        {hasTotalLine && (
-          <tr className={css.totalRow}>
-            <td>
-              {intl.formatMessage({
-                id: 'OrderDetailsTable.totalChoices',
-              })}
-            </td>
-            <td>{data?.length}</td>
-          </tr>
-        )}
+        <tr className={css.totalRow}>
+          <td>{totalText}</td>
+          <td>{data?.length}</td>
+        </tr>
       </tbody>
     </table>
   );
