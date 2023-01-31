@@ -1,5 +1,3 @@
-import Button from '@components/Button/Button';
-import IconPlus from '@components/Icons/IconPlus/IconPlus';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -126,19 +124,6 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
                 memberOptions={memberOptions}
               />
             </div>
-          </div>
-          <div className={css.addRequirement}>
-            <Button
-              variant="inline"
-              type="button"
-              className={css.addRequirementBtn}>
-              <IconPlus className={css.plusIcon} />
-              <span>
-                {intl.formatMessage({
-                  id: 'ManageOrdersSection.addRequirement.text',
-                })}
-              </span>
-            </Button>
           </div>
         </div>
       ),

@@ -1,6 +1,9 @@
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
+import IconMinus from '@components/Icons/IconMinus/IconMinus';
+import { useEffect, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -31,10 +34,36 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   props,
 ) => {
   const intl = useIntl();
+
   const { foodOptions, memberOptions, handleSubmit } = props;
   const fieldSelectMemberDisable = memberOptions?.length === 0;
   const fieldSelectFoodDisable =
     fieldSelectMemberDisable || foodOptions?.length === 0;
+
+  const showRequirementText = intl.formatMessage({
+    id: 'AddOrderForm.addRequirement.show',
+  });
+
+  const hideRequirementText = intl.formatMessage({
+    id: 'AddOrderForm.addRequirement.hide',
+  });
+  const [isRequirementInputShow, setIsRequirementInputShow] = useState(false);
+  const [
+    currentRequirementFieldActionText,
+    setCurrentRequirementFieldActionText,
+  ] = useState(showRequirementText);
+
+  const handleToggleShowHideRequirementField = () => {
+    setIsRequirementInputShow(!isRequirementInputShow);
+  };
+
+  useEffect(() => {
+    if (isRequirementInputShow) {
+      setCurrentRequirementFieldActionText(hideRequirementText);
+    } else {
+      setCurrentRequirementFieldActionText(showRequirementText);
+    }
+  }, [isRequirementInputShow]);
 
   const selectMemberOptions = (
     <>
@@ -69,29 +98,60 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
 
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
-      <div className={css.fieldContainer}>
-        <FieldSelect
+      <div className={css.fieldsContainer}>
+        <div className={css.fieldContainer}>
+          <FieldSelect
+            disabled={fieldSelectMemberDisable}
+            id={'addOrder.participantName'}
+            name="participantId"
+            selectClassName={css.fieldSelect}>
+            {selectMemberOptions}
+          </FieldSelect>
+        </div>
+        <div className={css.fieldContainer}>
+          <FieldSelect
+            disabled={fieldSelectFoodDisable}
+            id={'addOrder.foodId'}
+            name="foodId"
+            selectClassName={css.fieldSelect}>
+            {selectFoodOptions}
+          </FieldSelect>
+        </div>
+        <Button
           disabled={fieldSelectMemberDisable}
-          id={'addOrder.participantName'}
-          name="participantId"
-          selectClassName={css.fieldSelect}>
-          {selectMemberOptions}
-        </FieldSelect>
+          className={css.submitButton}>
+          {intl.formatMessage({
+            id: 'AddOrderForm.submitButtonText',
+          })}
+        </Button>
       </div>
-      <div className={css.fieldContainer}>
-        <FieldSelect
+
+      <div className={css.addRequirementContainer}>
+        <Button
+          type="button"
+          variant="inline"
           disabled={fieldSelectFoodDisable}
-          id={'addOrder.foodId'}
-          name="foodId"
-          selectClassName={css.fieldSelect}>
-          {selectFoodOptions}
-        </FieldSelect>
+          onClick={handleToggleShowHideRequirementField}>
+          <div className={css.buttonContent}>
+            <IconMinus />
+            <div>{currentRequirementFieldActionText}</div>
+          </div>
+        </Button>
+        {isRequirementInputShow && (
+          <div className={css.fieldRequirementContainer}>
+            <FieldTextArea
+              id="AddOrderForm.requirement"
+              name="requirement"
+              label={intl.formatMessage({
+                id: 'AddOrderForm.requirementField.label',
+              })}
+              placeholder={intl.formatMessage({
+                id: 'AddOrderForm.requirementField.placeholder',
+              })}
+            />
+          </div>
+        )}
       </div>
-      <Button disabled={fieldSelectMemberDisable} className={css.submitButton}>
-        {intl.formatMessage({
-          id: 'AddOrderForm.submitButtonText',
-        })}
-      </Button>
     </Form>
   );
 };
