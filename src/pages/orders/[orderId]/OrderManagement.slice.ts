@@ -251,6 +251,91 @@ const disallowMember = createAsyncThunk(
   },
 );
 
+const restoredDisAllowedMember = createAsyncThunk(
+  'app/OrderManagement/RESTORE_DISALLOWED_MEMBER',
+  async (params: TObject, { getState, dispatch }) => {
+    const { currentViewDate, memberIds = [] } = params;
+    const {
+      id: { uuid: orderId },
+    } = getState().OrderManagement.orderData!;
+    const {
+      id: { uuid: planId },
+      attributes: { metadata },
+    } = getState().OrderManagement.planData!;
+
+    const updateMemberOrders = (memberIds as string[]).reduce<TObject>(
+      (result, memberId) => {
+        const memberOrderDetailOnUpdateDate =
+          metadata?.orderDetail[currentViewDate].memberOrders[memberId];
+        const { foodId } = memberOrderDetailOnUpdateDate;
+        const newStatus =
+          foodId === ''
+            ? EParticipantOrderStatus.empty
+            : EParticipantOrderStatus.joined;
+
+        return {
+          ...result,
+          [memberId]: { ...memberOrderDetailOnUpdateDate, status: newStatus },
+        };
+      },
+      {} as TObject,
+    );
+
+    const updateParams = {
+      planId,
+      orderDetail: {
+        ...metadata.orderDetail,
+        [currentViewDate]: {
+          ...metadata.orderDetail[currentViewDate],
+          memberOrders: {
+            ...metadata.orderDetail[currentViewDate].memberOrders,
+            ...(updateMemberOrders as TObject),
+          },
+        },
+      },
+    };
+
+    await addUpdateMemberOrder(orderId, updateParams);
+    await dispatch(loadData(orderId));
+  },
+);
+
+const deleteDisAllowedMember = createAsyncThunk(
+  'app/OrderManagement/DELETE_DISALLOWED_MEMBER',
+  async (params: TObject, { getState, dispatch }) => {
+    const { currentViewDate, memberIds = [] } = params;
+    const {
+      id: { uuid: orderId },
+    } = getState().OrderManagement.orderData!;
+    const {
+      id: { uuid: planId },
+      attributes: { metadata },
+    } = getState().OrderManagement.planData!;
+
+    const oldMemberOrders = metadata.orderDetail[currentViewDate].memberOrders;
+    const newMemberOrders = (memberIds as string[]).reduce<TObject>(
+      (result, memberId) => {
+        return omit(result, memberId);
+      },
+      oldMemberOrders,
+    );
+
+    const updateParams = {
+      planId,
+      orderDetail: {
+        ...metadata.orderDetail,
+        [currentViewDate]: {
+          ...metadata.orderDetail[currentViewDate],
+          memberOrders: newMemberOrders,
+        },
+      },
+    };
+
+    await addUpdateMemberOrder(orderId, updateParams);
+    await dispatch(loadData(orderId));
+  },
+);
+
 const addParticipant = createAsyncThunk(
   'app/OrderManagement/ADD_PARTICIPANT',
   async (params: TObject, { getState, dispatch }) => {
@@ -335,6 +420,8 @@ export const orderManagementThunks = {
   addOrUpdateMemberOrder,
   sendRemindEmailToMember,
   disallowMember,
+  restoredDisAllowedMember,
+  deleteDisAllowedMember,
   addParticipant,
   deleteParticipant,
 };

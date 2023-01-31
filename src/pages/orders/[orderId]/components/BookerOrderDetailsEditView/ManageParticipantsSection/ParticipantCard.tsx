@@ -14,9 +14,10 @@ const MAXLENGTH_EMAIL = 30;
 type TParticipantCardProps = TDefaultProps & {
   avatar?: any;
   hasCheckIcon?: boolean;
+  hasDeleteIcon?: boolean;
   name?: string;
   email?: string;
-  onClickDeleteIcon: () => void;
+  onClickDeleteIcon?: () => void;
 };
 
 const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
@@ -27,6 +28,7 @@ const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
     name = 'Demo participant',
     email = 'xyzasd1234@gmail.com',
     onClickDeleteIcon,
+    hasDeleteIcon = true,
     hasCheckIcon,
   } = props;
   const rootClasses = classNames(rootClassName || css.root, className);
@@ -44,9 +46,11 @@ const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
         <div title={name}>{formattedName}</div>
         <div title={email}>{formattedEmail}</div>
       </div>
-      <div className={css.closeIconContainer} onClick={onClickDeleteIcon}>
-        <IconClose className={css.closeIcon} />
-      </div>
+      {hasDeleteIcon && (
+        <div className={css.closeIconContainer} onClick={onClickDeleteIcon}>
+          <IconClose className={css.closeIcon} />
+        </div>
+      )}
     </div>
   );
 };

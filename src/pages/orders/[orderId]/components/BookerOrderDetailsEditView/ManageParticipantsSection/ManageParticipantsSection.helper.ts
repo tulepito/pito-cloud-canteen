@@ -11,6 +11,7 @@ export const isParticipantCompletedPickFood = (
     const { memberOrders } = orderDetailItem;
 
     return (
+      memberOrders[participantId] &&
       memberOrders[participantId].status === EParticipantOrderStatus.joined
     );
   });

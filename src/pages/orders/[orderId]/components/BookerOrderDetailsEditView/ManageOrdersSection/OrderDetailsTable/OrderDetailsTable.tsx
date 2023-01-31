@@ -61,6 +61,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
       }),
     [participantData, memberOrders, foodList],
   );
+  const deletedTabData = allTabData[EOrderDetailsTableTab.deleted];
 
   const handleClickEditOrderItem =
     (tab: EOrderDetailsTableTab, memberId: string) => () => {
@@ -102,6 +103,23 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
     setIsEditSelectionModalOpen(false);
   };
 
+  const handleRestoreMembers = async (memberIds: string[]) => {
+    await dispatch(
+      orderManagementThunks.restoredDisAllowedMember({
+        currentViewDate,
+        memberIds,
+      }),
+    );
+  };
+  const handleDeletePermanentlyMembers = async (memberIds: string[]) => {
+    await dispatch(
+      orderManagementThunks.deleteDisAllowedMember({
+        currentViewDate,
+        memberIds,
+      }),
+    );
+  };
+
   const tableHeads = useMemo(
     () => SELECTED_TABLE_HEAD_IDS.map((id) => intl.formatMessage({ id })),
     [],
@@ -129,6 +147,9 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
       onClickDeleteOrderItem: handleClickDeleteOrderItem,
       onClickEditOrderItem: handleClickEditOrderItem,
       data: tabData,
+      deletedTabData,
+      onRestoreMembers: handleRestoreMembers,
+      onDeletePermanentlyMembers: handleDeletePermanentlyMembers,
     };
 
     switch (tabValue) {
@@ -146,26 +167,10 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
         );
         break;
       case EOrderDetailsTableTab.notChoose:
-        children = (
-          <>
-            {tabData.length > 0 ? (
-              <OrderDetailsTableComponent {...initialParams} />
-            ) : (
-              <p className={css.noChoices}></p>
-            )}
-          </>
-        );
+        children = <OrderDetailsTableComponent {...initialParams} />;
         break;
       case EOrderDetailsTableTab.notJoined:
-        children = (
-          <>
-            {tabData.length > 0 ? (
-              <OrderDetailsTableComponent {...initialParams} />
-            ) : (
-              <p className={css.noChoices}></p>
-            )}
-          </>
-        );
+        children = <OrderDetailsTableComponent {...initialParams} />;
         break;
 
       default:

@@ -59,16 +59,16 @@
           max-width: 25%;
         }
         th:nth-child(4) {
-          // width: 35%;
-          // max-width: 35%;
+          width: 35%;
+          max-width: 35%;
           padding-right: 16px;
         }
-        // th:nth-child(5) {
-        //   width: 15%;
-        //   max-width: 15%;
+        th:nth-child(5) {
+          width: 15%;
+          max-width: 15%;
 
-        //   text-align: right;
-        // }
+          text-align: right;
+        }
       }
     }
 
@@ -79,8 +79,21 @@
           border: none;
         }
 
-        &.totalRow td {
-          @include textTemplate(14px, 700, 20px);
+        &.totalRow {
+          td {
+            @include textTemplate(14px, 700, 20px);
+
+            &.actionTd {
+              text-align: right;
+              text-decoration: underline;
+              padding-right: 16px;
+              cursor: pointer;
+            }
+
+            &.actionTdDisabled {
+              cursor: not-allowed;
+            }
+          }
         }
         &.notAllowed {
           position: relative;

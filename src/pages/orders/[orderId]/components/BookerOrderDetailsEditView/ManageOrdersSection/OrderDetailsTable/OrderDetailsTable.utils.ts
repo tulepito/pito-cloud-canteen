@@ -5,6 +5,7 @@ export enum EOrderDetailsTableTab {
   chose = 'chose',
   notChoose = 'notChoose',
   notJoined = 'notJoined',
+  deleted = 'deleted',
 }
 
 export const TABLE_TABS = {

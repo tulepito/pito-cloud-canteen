@@ -36,6 +36,7 @@ export const prepareDataForTabs = ({
         chose: choseList,
         notChoose: notChooseList,
         notJoined: notJoinedList,
+        deleted: deletedList,
       } = result;
 
       const [memberId, orderItemData] = currentOrderItem;
@@ -55,10 +56,7 @@ export const prepareDataForTabs = ({
         case EParticipantOrderStatus.joined:
           return { ...result, chose: [...choseList, itemData] };
         case EParticipantOrderStatus.notAllowed: {
-          if (foodId === '') {
-            return { ...result, notChoose: [...notChooseList, itemData] };
-          }
-          return { ...result, chose: [...choseList, itemData] };
+          return { ...result, deleted: [...deletedList, itemData] };
         }
         case EParticipantOrderStatus.empty:
         case EParticipantOrderStatus.expired:
@@ -73,6 +71,7 @@ export const prepareDataForTabs = ({
       [EOrderDetailsTableTab.chose]: [],
       [EOrderDetailsTableTab.notChoose]: [],
       [EOrderDetailsTableTab.notJoined]: [],
+      [EOrderDetailsTableTab.deleted]: [],
     },
   );
 

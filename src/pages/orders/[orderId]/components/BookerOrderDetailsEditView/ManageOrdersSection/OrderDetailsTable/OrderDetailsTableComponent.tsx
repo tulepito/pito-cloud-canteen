@@ -3,8 +3,10 @@ import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
+import ManageDeletedListModal from '../ManageDeletedListModal';
 import css from './OrderDetailsTable.module.scss';
 import { EOrderDetailsTableTab } from './OrderDetailsTable.utils';
 
@@ -12,9 +14,12 @@ type TOrderDetailsTableComponentProps = {
   tab: EOrderDetailsTableTab;
   tableHeads: string[];
   data: TObject[];
+  deletedTabData: TObject[];
   hasTotalLine?: boolean;
   onClickEditOrderItem: (tab: EOrderDetailsTableTab, id: string) => () => void;
   onClickDeleteOrderItem: (id: string) => () => void;
+  onRestoreMembers: (memberIds: string[]) => void;
+  onDeletePermanentlyMembers: (memberIds: string[]) => void;
 };
 
 export const OrderDetailsTableComponent: React.FC<
@@ -23,10 +28,21 @@ export const OrderDetailsTableComponent: React.FC<
   tab,
   tableHeads,
   data,
+  deletedTabData = [],
   onClickEditOrderItem,
   onClickDeleteOrderItem,
+  onRestoreMembers,
+  onDeletePermanentlyMembers,
 }) => {
   const intl = useIntl();
+  const [isManageDeletedModalOpen, setIsManageDeletedModalOpen] =
+    useState(false);
+
+  const isDataEmpty = deletedTabData?.length === 0;
+  const actionTdClasses = classNames(css.actionTd, {
+    [css.actionTdDisabled]: isDataEmpty,
+  });
+
   let totalText;
 
   switch (tab) {
@@ -48,6 +64,13 @@ export const OrderDetailsTableComponent: React.FC<
     default:
       break;
   }
+
+  const handleClickViewDeletedList = () => {
+    if (!isDataEmpty) setIsManageDeletedModalOpen(true);
+  };
+  const handleCloseDeletedList = () => {
+    setIsManageDeletedModalOpen(false);
+  };
 
   return (
     <table className={css.tableRoot}>
@@ -107,8 +130,23 @@ export const OrderDetailsTableComponent: React.FC<
         <tr className={css.totalRow}>
           <td>{totalText}</td>
           <td>{data?.length}</td>
+          <td></td>
+          <td
+            colSpan={2}
+            onClick={handleClickViewDeletedList}
+            className={actionTdClasses}>
+            {intl.formatMessage({ id: 'OrderDetailsTable.viewDeletedList' })}
+          </td>
         </tr>
       </tbody>
+
+      <ManageDeletedListModal
+        isOpen={isManageDeletedModalOpen}
+        onClose={handleCloseDeletedList}
+        deletedTabData={deletedTabData}
+        onRestoreMembers={onRestoreMembers}
+        onDeletePermanentlyMembers={onDeletePermanentlyMembers}
+      />
     </table>
   );
 };

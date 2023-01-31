@@ -1,0 +1,43 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.root {
+  margin: 0;
+  padding: 0;
+  border: none;
+  max-height: 268px;
+  margin-bottom: 24px;
+
+  .list {
+    margin: 0;
+    list-style: none;
+    padding: 0;
+    display: flex;
+    column-gap: 16px;
+    flex-wrap: wrap;
+
+    @include viewportMedium {
+      li {
+        flex-basis: calc(50% - 8px);
+      }
+    }
+
+    .fieldRoot {
+      @include checkBoxInputStyles;
+      max-width: 100%;
+      .label {
+        span {
+          align-self: center !important;
+        }
+      }
+    }
+  }
+
+  .item {
+    /* Fix broken multi-column layout in Chrome */
+    page-break-inside: avoid;
+  }
+}
