@@ -5,8 +5,9 @@ import { useAppSelector } from '@hooks/reduxHooks';
 import { CURRENT_USER, USER } from '@utils/data';
 import type { TUser } from '@utils/types';
 import filter from 'lodash/filter';
+import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import CompanySidebar from './CompanySidebar/CompanySidebar';
@@ -16,6 +17,8 @@ import GeneralMainContent from './GeneralMainContent/GeneralMainContent';
 
 const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
+  const router = useRouter();
+  const { companyId = '' } = router.query;
   const currentUser = useAppSelector(
     (state) => state.user.currentUser,
     shallowEqual,
@@ -44,6 +47,19 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
     { value: '', label: 'Cá nhân' },
     ...assignedCompanies,
   ];
+
+  useEffect(() => {
+    if (companyId) {
+      const currentCompany = companyRefs.find(
+        (_company) => USER(_company).getId() === companyId,
+      );
+      setSelectedAccount({
+        value: USER(currentCompany).getId(),
+        label: USER(currentCompany).getPublicData()?.companyName,
+      });
+    }
+  }, [companyId]);
+
   const featureHeaderData = [
     {
       key: 'cart',

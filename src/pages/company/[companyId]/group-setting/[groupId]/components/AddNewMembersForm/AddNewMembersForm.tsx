@@ -16,11 +16,13 @@ type AddNewMembersFormProps = {
   companyMembers: any[];
   groupMembers: any[];
   groupId: string;
+  onModalClose: () => void;
 };
 const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
   companyMembers,
   groupMembers,
   groupId,
+  onModalClose,
 }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -45,7 +47,9 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
         groupId,
         addedMembers,
       }),
-    );
+    ).then(() => {
+      onModalClose();
+    });
   };
   return (
     <FinalForm

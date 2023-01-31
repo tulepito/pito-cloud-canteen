@@ -141,4 +141,6 @@ export const companyPaths = {
   Home: '/company',
   Detail: '/company/[companyId]',
   GroupSetting: '/company/[companyId]/group-setting',
+  GroupMemberDetail:
+    '/company/[companyId]/group-setting/[groupId]/member/[memberId]',
 };

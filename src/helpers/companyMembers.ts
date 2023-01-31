@@ -31,7 +31,7 @@ export const calculateGroupMembersAmount = (
 };
 
 export const getGroupNames = (groupIds: string[], groupList: any) => {
-  return filter(groupList, (group: any) => groupIds.includes(group.id))
+  return filter(groupList, (group: any) => (groupIds || []).includes(group.id))
     .map((group: any) => group.name)
     .join(', ');
 };
@@ -42,4 +42,8 @@ export const checkMemberBelongToCompany = (
 ) => {
   const { members = {} } = USER(companyAccount).getMetadata();
   return !!members[memberEmail];
+};
+
+export const getMemberById = (id: string, companyMembers: TUser[]) => {
+  return companyMembers.find((_member) => USER(_member).getId() === id);
 };

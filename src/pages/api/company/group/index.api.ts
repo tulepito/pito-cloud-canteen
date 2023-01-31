@@ -89,6 +89,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const { addedMembers = [], deletedMembers = [] } = req.body;
         const { groups = [], members = {} } =
           companyAccount.attributes.profile.metadata;
+
         const currentGroupIndex = groups.findIndex(
           (_group: any) => _group.id === groupId,
         );
@@ -105,16 +106,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           ...(groupInfo || {}),
           members: newGroupMembers,
         };
+        if (addedMembers.length > 0) {
+          addedMembers.forEach(({ email }: TMemberApi) => {
+            members[email].groups = members[email].groups.concat(groupId);
+          });
+        }
 
-        addedMembers.forEach(({ email }: TMemberApi) => {
-          members[email].groups = members[email].groups.concat(groupId);
-        });
+        if (deletedMembers.length > 0) {
+          deletedMembers.forEach(({ email }: TMemberApi) => {
+            members[email].groups = members[email].groups.filter(
+              (_groupId: string) => _groupId !== groupId,
+            );
+          });
+        }
 
-        deletedMembers.forEach(({ email }: TMemberApi) => {
-          members[email].groups = members[email].groups.filter(
-            (_groupId: string) => _groupId !== groupId,
-          );
-        });
         console.log('=== UPDATE COMPANY ACCOUNT STEP ===');
         const updatedCompanyAccountResponse =
           await integrationSdk.users.updateProfile(
