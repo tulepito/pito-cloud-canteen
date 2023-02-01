@@ -1,3 +1,4 @@
+import { USER } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject, TUser } from '@utils/types';
 
@@ -76,4 +77,10 @@ export const prepareDataForTabs = ({
   );
 
   return data;
+};
+
+export const isStranger = (memberId: string, participants: TUser[]) => {
+  return (
+    participants.findIndex((user) => USER(user).getId() === memberId) === -1
+  );
 };

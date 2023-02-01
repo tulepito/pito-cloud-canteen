@@ -75,6 +75,12 @@
     tbody {
       tr {
         border-bottom: 1px solid $neutralGray3;
+
+        .stranger {
+          @include textTemplate(12px, 600, 16px);
+          color: $neutralGray5;
+        }
+
         &:last-of-type {
           border: none;
         }

@@ -676,6 +676,7 @@
   "OrderDetailsTable.totalNotChose": "Tổng lượt chưa chọn",
   "OrderDetailsTable.totalNotJoined": "Tổng lượt không chọn",
   "OrderDetailsTable.viewDeletedList": "Danh sách đã xoá",
+  "OrderDetailsTableComponent.strangerText": "Ngoài nhóm",
   "OrderLinkSection.copyToClipboardTooltip.copied": "Đã sao chép",
   "OrderLinkSection.copyToClipboardTooltip.default": "Sao chép vào bộ nhớ tạm",
   "OrderLinkSection.title": "Liên kết đặt hàng",

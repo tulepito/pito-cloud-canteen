@@ -1,5 +1,6 @@
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
@@ -7,6 +8,7 @@ import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import ManageDeletedListModal from '../ManageDeletedListModal';
+import { isStranger } from './OrderDetailsTable.helpers';
 import css from './OrderDetailsTable.module.scss';
 import { EOrderDetailsTableTab } from './OrderDetailsTable.utils';
 
@@ -37,6 +39,9 @@ export const OrderDetailsTableComponent: React.FC<
   const intl = useIntl();
   const [isManageDeletedModalOpen, setIsManageDeletedModalOpen] =
     useState(false);
+  const participants = useAppSelector(
+    (state) => state.OrderManagement.participantData,
+  );
 
   const isDataEmpty = deletedTabData?.length === 0;
   const actionTdClasses = classNames(css.actionTd, {
@@ -96,6 +101,7 @@ export const OrderDetailsTableComponent: React.FC<
             email: memberEmail,
           } = memberData || {};
           const formattedFoodPrice = `${foodPrice}đ`;
+          const isStrange = isStranger(memberId, participants);
 
           const rowClasses = classNames({
             [css.notAllowed]: status === EParticipantOrderStatus.notAllowed,
@@ -106,7 +112,13 @@ export const OrderDetailsTableComponent: React.FC<
               <td title={memberName}>
                 <div>{memberName}</div>
                 {/* <div>Người dùng</div> */}
-                {/* <div>Ngoài nhóm</div> */}
+                {isStrange && (
+                  <div className={css.stranger}>
+                    {intl.formatMessage({
+                      id: 'OrderDetailsTableComponent.strangerText',
+                    })}
+                  </div>
+                )}
               </td>
               <td title={memberEmail}>{memberEmail}</td>
               <td title={foodName}>{foodName}</td>
