@@ -4,6 +4,7 @@ import Pagination from '@components/Pagination/Pagination';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
+import { LISTING } from '@utils/data';
 import { weekDayFormatFromDateTime } from '@utils/dates';
 import { DateTime } from 'luxon';
 import { useEffect, useRef, useState } from 'react';
@@ -119,15 +120,16 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   };
 
   const handleRestaurantClick = (restaurant: any) => () => {
-    const restaurantId = restaurant?.id?.uuid;
+    const { restaurantInfo } = restaurant;
+    const restaurantId = LISTING(restaurantInfo).getId();
 
     dispatch(selectRestaurantPageThunks.getRestaurantFood(restaurantId));
-    setCurrentRestaurant(restaurant);
+    setCurrentRestaurant(restaurantInfo);
     setModalOpen(true);
   };
 
   useEffect(() => {
-    dispatch(selectRestaurantPageThunks.getRestaurants());
+    dispatch(selectRestaurantPageThunks.getRestaurants({ dateTime }));
   }, [dispatch]);
 
   return (

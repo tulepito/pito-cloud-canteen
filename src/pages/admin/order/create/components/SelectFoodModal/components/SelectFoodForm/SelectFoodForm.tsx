@@ -5,6 +5,7 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
 import IconSearch from '@components/Icons/IconSearch/IconSearch';
+import { addCommas } from '@helpers/format';
 import { toLowerCaseNonAccentVietnamese } from '@utils/nonAccentVietnamese';
 import arrayMutators from 'final-form-arrays';
 import type { ReactNode } from 'react';
@@ -150,7 +151,7 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
           </div>
           <div className={css.titleContainer}>
             <div className={css.title}>{title}</div>
-            <div>{price}đ</div>
+            <div>{addCommas(price.amount)}đ</div>
           </div>
         </div>
       );

@@ -123,6 +123,11 @@
   &:hover {
     background-color: $neutralGray4;
   }
+
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
 }
 
 .arrowIcon {

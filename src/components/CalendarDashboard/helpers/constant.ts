@@ -3,10 +3,12 @@ import type { TDayInWeek, TDaySession } from './types';
 export const MORNING_SESSION = 'MORNING_SESSION';
 export const AFTERNOON_SESSION = 'AFTERNOON_SESSION';
 export const EVENING_SESSION = 'EVENING_SESSION';
+export const DINNER_SESSION = 'DINNER_SESSION';
 export const DAY_SESSIONS: TDaySession[] = [
   MORNING_SESSION,
   AFTERNOON_SESSION,
   EVENING_SESSION,
+  DINNER_SESSION,
 ];
 
 export const EMPTY_STATUS = 'empty';

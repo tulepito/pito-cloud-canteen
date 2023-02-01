@@ -10,11 +10,17 @@ import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { updateDraftMealPlan } from '@redux/slices/Order.slice';
+import {
+  selectCalendarDate,
+  selectRestaurant,
+  unSelectRestaurant,
+  updateDraftMealPlan,
+} from '@redux/slices/Order.slice';
+import { getDaySessionFromDeliveryTime } from '@utils/dates';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -26,23 +32,26 @@ import OrderSettingModal, {
 import SelectRestaurantPage from '../SelectRestaurantPage/SelectRestaurant.page';
 import css from './SetupOrderDetail.module.scss';
 
-const renderResourcesForCalendar = (orderDetail: Record<string, any>) => {
+const renderResourcesForCalendar = (
+  orderDetail: Record<string, any>,
+  deliveryHour: string,
+) => {
   const entries = Object.entries(orderDetail);
-
   const resources = entries.map((item) => {
     const [date, data] = item;
-    const { restaurant /* foodList */ } = data;
+    const { restaurant, foodList } = data;
 
     return {
       resource: {
         id: date,
-        daySession: 'MORNING_SESSION',
+        daySession: getDaySessionFromDeliveryTime(deliveryHour),
         suitableAmount: 10,
         type: 'dailyMeal',
         restaurant: {
           id: restaurant.id,
           name: restaurant.restaurantName,
         },
+        foodList,
         // expiredTime: new Date(2023, 11, 29, 16, 0, 0),
       },
       title: 'PT3040',
@@ -123,8 +132,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     (state) => state.ManageCompaniesPage.companyRefs,
     shallowEqual,
   );
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
-  const [isSelectingRestaurant, setIsSelectingRestaurant] = useState(false);
+  const selectedDate = useAppSelector(
+    (state) => state.Order.selectedCalendarDate,
+  );
+
+  const isSelectingRestaurant = useAppSelector(
+    (state) => state.Order.isSelectingRestaurant,
+  );
+
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const {
@@ -153,15 +168,18 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     (company) => company.id.uuid === clientId,
   );
   const partnerName = currentClient?.attributes.profile.displayName;
-  const resourcesForCalender = renderResourcesForCalendar(orderDetail);
+  const resourcesForCalender = renderResourcesForCalendar(
+    orderDetail,
+    deliveryHour,
+  );
 
   const handleAddMorePlanClick = (date: Date) => () => {
-    setSelectedDate(date);
-    setIsSelectingRestaurant(true);
+    dispatch(selectCalendarDate(date));
+    dispatch(selectRestaurant());
   };
 
   const handleGoBackWhenSelectingRestaurant = () => {
-    setIsSelectingRestaurant(false);
+    dispatch(unSelectRestaurant());
   };
 
   const handleSubmitRestaurant = (values: Record<string, any>) => {
@@ -176,7 +194,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     };
 
     dispatch(updateDraftMealPlan(updateData));
-    setIsSelectingRestaurant(false);
+    dispatch(unSelectRestaurant());
   };
 
   const allCompanyGroups =
@@ -250,12 +268,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
                 <FormattedMessage id="SetupOrderDetail.orderSettings" />
               </div>
             </div>
-            <div className={css.buttonContainer}>
-              <Button disabled className={css.recommendNewRestaurantBtn}>
-                <IconRefreshing />
-                <FormattedMessage id="SetupOrderDetail.recommendNewRestaurant" />
-              </Button>
-            </div>
           </div>
           <div className={css.calendarContainer}>
             <CalendarDashboard
@@ -263,11 +275,21 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               events={resourcesForCalender}
               renderEvent={MealPlanCard}
               companyLogo="Company"
+              startDate={new Date(startDate)}
+              endDate={new Date(endDate)}
               components={{
                 contentEnd: (props) => (
                   <AddMorePlan {...props} {...addMorePlanExtraProps} />
                 ),
               }}
+              recommendButton={
+                <div className={css.buttonContainer}>
+                  <Button disabled className={css.recommendNewRestaurantBtn}>
+                    <IconRefreshing />
+                    <FormattedMessage id="SetupOrderDetail.recommendNewRestaurant" />
+                  </Button>
+                </div>
+              }
             />
           </div>
           <div>

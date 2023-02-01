@@ -1,3 +1,9 @@
+import {
+  AFTERNOON_SESSION,
+  DINNER_SESSION,
+  EVENING_SESSION,
+  MORNING_SESSION,
+} from '@components/CalendarDashboard/helpers/constant';
 import jstz from 'jstimezonedetect';
 import { DateTime, Interval } from 'luxon';
 
@@ -161,4 +167,26 @@ export const convertWeekDay = (weekDay: number) => {
       return { key: 'mon', label: 'DayInWeekField.mon' };
     }
   }
+};
+
+export const getDaySessionFromDeliveryTime = (time: string) => {
+  const [hourStr, minuteStr] = time.split(':');
+  const hour = parseInt(hourStr, 10);
+  const minute = parseInt(minuteStr, 10);
+  const timeSecond = hour * 3600 + minute * 60;
+  // 6:30 - 10:30
+  if (timeSecond >= 23400 && timeSecond < 37800) {
+    return MORNING_SESSION;
+  }
+  // 10:30 - 14:00
+  if (timeSecond >= 37800 && timeSecond < 50400) {
+    return AFTERNOON_SESSION;
+  }
+  // 14:00 - 16:30
+  if (timeSecond >= 50400 && timeSecond < 59400) {
+    return EVENING_SESSION;
+  }
+
+  // 16:30 - 23:00
+  return DINNER_SESSION;
 };

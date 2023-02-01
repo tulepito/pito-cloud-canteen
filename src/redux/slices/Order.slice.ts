@@ -51,6 +51,9 @@ type OrderInitialState = {
   fetchBookersError: any;
   bookerList: any[];
   selectedBooker: any;
+
+  selectedCalendarDate: Date;
+  isSelectingRestaurant: boolean;
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -77,6 +80,9 @@ const initialState: OrderInitialState = {
   fetchBookersError: null,
   bookerList: [],
   selectedBooker: null,
+
+  selectedCalendarDate: undefined!,
+  isSelectingRestaurant: false,
 };
 
 const createOrder = createAsyncThunk(
@@ -217,6 +223,25 @@ const orderSlice = createSlice({
         },
       };
     },
+    removeMealDay: (state, { payload }) => ({
+      ...state,
+      draftOrder: {
+        ...state.draftOrder,
+        orderDetail: payload,
+      },
+    }),
+    selectCalendarDate: (state, { payload }) => ({
+      ...state,
+      selectedCalendarDate: payload,
+    }),
+    selectRestaurant: (state) => ({
+      ...state,
+      isSelectingRestaurant: true,
+    }),
+    unSelectRestaurant: (state) => ({
+      ...state,
+      isSelectingRestaurant: false,
+    }),
     removeDraftOrder: (state) => ({
       ...state,
       draftOrder: {},
@@ -313,6 +338,10 @@ export const {
   removeDraftOrder,
   removeBookerList,
   addBooker,
+  removeMealDay,
+  selectCalendarDate,
+  selectRestaurant,
+  unSelectRestaurant,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;
