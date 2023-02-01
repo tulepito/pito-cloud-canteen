@@ -1,0 +1,47 @@
+@use '/src/styles/vars.scss' as *;
+
+.foodPickContainer {
+  display: flex;
+}
+
+.modal {
+  flex-basis: 1100px !important;
+}
+
+.tableContainer {
+  flex: 1;
+  padding-right: 24px;
+  border-right: 1px solid $neutralGray4;
+}
+
+.pickedFoodContainer {
+  flex: 0.7;
+  padding-left: 24px;
+}
+
+.keywordForm {
+  margin-bottom: 26px;
+}
+
+.tableBodyCell {
+  vertical-align: top;
+}
+
+.tableHeadCell:nth-child(1) {
+  width: 30px;
+}
+
+.title {
+  font-size: 16px;
+  margin-bottom: 30px;
+  font-weight: $fontWeightBold;
+}
+
+.modalButton {
+  display: flex;
+  justify-content: center;
+}
+
+.button {
+  width: 252px;
+}

@@ -13,7 +13,7 @@ import { EImageVariants, EListingType } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type {
   TImage,
-  TIntergrationFoodListing,
+  TIntergrationListing,
   TListing,
   TPagination,
 } from '@utils/types';
@@ -561,7 +561,7 @@ const foodSlice = createSlice({
           createPartnerFoodFromCsvInProgress: false,
           createPartnerFoodFromCsvError: null,
           foods: [
-            ...(payload as unknown as TIntergrationFoodListing[]),
+            ...(payload as unknown as TIntergrationListing[]),
             ...state.foods,
           ],
         }),

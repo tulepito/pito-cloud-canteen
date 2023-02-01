@@ -139,20 +139,12 @@ export const adminRoutes = {
     path: '/admin/partner/[restaurantId]/settings/menu/cycle-menu/[menuId]',
     label: 'Chi tiết thực đơn',
   },
-  CreatePartnerFixedMenu: {
-    path: '/admin/partner/[restaurantId]/settings/menu/fixed-menu/create',
-    label: 'Tạo thực đơn cố định',
+  CreatePartnerMenu: {
+    path: '/admin/partner/[restaurantId]/settings/menu/create',
+    label: 'Tạo thực đơn',
   },
-  CreatePartnerCycleMenu: {
-    path: '/admin/partner/[restaurantId]/settings/menu/cycle-menu/create',
-    label: 'Tạo thực đơn cố định',
-  },
-  EditPartnerFixedMenu: {
-    path: '/admin/partner/[restaurantId]/settings/menu/fixed-menu/[menuId]/edit',
-    label: 'Chỉnh sửa thực đơn',
-  },
-  EditPartnerCycleMenu: {
-    path: '/admin/partner/[restaurantId]/settings/menu/cycle-menu/[menuId]/edit',
+  EditPartnerMenu: {
+    path: '/admin/partner/[restaurantId]/settings/menu/[menuId]',
     label: 'Chỉnh sửa thực đơn',
   },
 } as const;

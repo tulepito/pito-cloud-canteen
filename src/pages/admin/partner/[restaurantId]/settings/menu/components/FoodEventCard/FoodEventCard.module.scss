@@ -1,0 +1,28 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  display: flex;
+  border: 1px solid $neutralGray4;
+  padding: 5px 10px;
+  border-radius: 10px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  justify-content: space-between;
+  .title {
+    font-size: 14px;
+    font-weight: $fontWeightBold;
+  }
+  .buttonClose {
+    min-width: 16px;
+    min-height: 16px;
+    display: flex;
+    border-radius: 4px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid $neutralGray6;
+    .iconClose {
+      width: 7px;
+      height: 7px;
+    }
+  }
+}

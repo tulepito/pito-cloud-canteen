@@ -437,7 +437,7 @@ export type TIntergrationOrderListing = {
   order?: TOrderListing;
 };
 
-export type TIntergrationFoodListing = {
+export type TIntergrationListing = {
   id: any;
   type: 'listing';
   attributes: TAdminOrderListingAttributes & TDeletedListingAttributes;

@@ -6,8 +6,8 @@ import React, { useEffect, useState } from 'react';
 
 import css from './Tabs.module.scss';
 
-type TTabsItem = {
-  label: ReactNode;
+export type TTabsItem = {
+  label: (e: TTabsItem & { isActive: boolean }) => ReactNode | ReactNode;
   id: string | number;
   children: ReactNode | string | number;
   childrenFn?: (e: any) => ReactNode;
@@ -82,7 +82,9 @@ const Tabs: React.FC<ITabsProps> = (props) => {
           className={classNames(css.tabItemContent, {
             [css.tabActive]: isActiveClass,
           })}>
-          {label}
+          {typeof label === 'function'
+            ? label({ ...item, isActive: isActiveClass })
+            : label}
         </span>
       </div>
     );
@@ -92,7 +94,10 @@ const Tabs: React.FC<ITabsProps> = (props) => {
 
   const tabContent =
     activeItem && activeItem.childrenFn
-      ? activeItem?.childrenFn(activeItem?.childrenProps)
+      ? activeItem?.childrenFn({
+          id: activeItem.id,
+          ...activeItem?.childrenProps,
+        })
       : activeItem?.children || '';
 
   // classes setup

@@ -16,7 +16,7 @@ import css from './Table.module.scss';
 export type TColumn = {
   key: string | number;
   label: string | ReactNode;
-  render: (data: any, index?: number) => ReactNode;
+  render: (data: any, isChecked: boolean) => ReactNode;
   renderSearch?: () => ReactNode;
   sortable?: boolean;
 };
@@ -53,6 +53,8 @@ type TTableProps = {
   exposeValues?: (e: any) => void;
   handleSort?: (columnName: string | number) => void;
   sortValue?: { columnName: string | number; type: 'asc' | 'desc' };
+  customCheckboxChange?: (e: any) => void;
+  afterCheckboxChangeHandler?: (e: any, rowCheckboxValues: any) => void;
 };
 
 const getUniqueString = (list: string[]) => {
@@ -82,6 +84,7 @@ const Table = (props: TTableProps) => {
     values,
     handleSort,
     sortValue,
+    afterCheckboxChangeHandler,
   } = props;
 
   const tableClasses = classNames(css.table, tableClassName);
@@ -98,7 +101,7 @@ const Table = (props: TTableProps) => {
     });
   };
 
-  const customOnChange = (e: any) => {
+  const customOnChangeCheckAllCheckbox = (e: any) => {
     const { checked, value, name } = e.target;
     form?.change(name, !checked ? [] : [value]);
     const { rowCheckbox = [] } = values;
@@ -107,6 +110,9 @@ const Table = (props: TTableProps) => {
       newValues.push(val.key);
     });
     form?.change('rowCheckbox', !checked ? [] : getUniqueString(newValues));
+    if (afterCheckboxChangeHandler) {
+      afterCheckboxChangeHandler(e, rowCheckbox);
+    }
   };
 
   const rowCheckboxChange = (e: any) => {
@@ -124,7 +130,11 @@ const Table = (props: TTableProps) => {
       form?.change('checkAll', ['checkAll']);
     }
     form?.change(name, newValues);
+    if (afterCheckboxChangeHandler) {
+      afterCheckboxChangeHandler(e, rowCheckbox);
+    }
   };
+
   const sortData = (key: string | number) => () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     handleSort && handleSort(key);
@@ -140,7 +150,7 @@ const Table = (props: TTableProps) => {
                 <FieldCheckbox
                   labelClassName={css.checkboxLabel}
                   svgClassName={css.checkboxSvg}
-                  customOnChange={customOnChange}
+                  customOnChange={customOnChangeCheckAllCheckbox}
                   name="checkAll"
                   id="checkAll"
                   value="checkAll"
@@ -226,18 +236,22 @@ const Table = (props: TTableProps) => {
                     />
                   </td>
                 )}
-                {columns.map((col: TColumn) => (
-                  <td
-                    className={classNames(
-                      tableBodyCellClassName,
-                      css.bodyCell,
-                      { [css.isParent]: row.data.isParent },
-                    )}
-                    data-label={col.label}
-                    key={col.key}>
-                    {col.render(row.data)}
-                  </td>
-                ))}
+                {columns.map((col: TColumn) => {
+                  const rowCheckbox = values?.rowCheckbox || [];
+                  const isChecked = rowCheckbox.includes(row.key);
+                  return (
+                    <td
+                      className={classNames(
+                        tableBodyCellClassName,
+                        css.bodyCell,
+                        { [css.isParent]: row.data.isParent },
+                      )}
+                      data-label={col.label}
+                      key={col.key}>
+                      {col.render(row.data, isChecked)}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>

@@ -99,6 +99,11 @@ export const weekDayFormatFromDateTime = (dateTime: DateTime) => {
   return formattedWeekDay;
 };
 
-export const parseTimestaimpToFormat = (date: number) => {
-  return DateTime.fromMillis(date).toFormat('dd/MM/yyyy');
+export const parseTimestaimpToFormat = (date: number, format?: string) => {
+  return DateTime.fromMillis(date).toFormat(format || 'dd/MM/yyyy');
+};
+
+export const addWeeksToDate = (dateObj: Date, numberOfWeeks: number) => {
+  dateObj.setDate(dateObj.getDate() + numberOfWeeks * 7);
+  return dateObj;
 };

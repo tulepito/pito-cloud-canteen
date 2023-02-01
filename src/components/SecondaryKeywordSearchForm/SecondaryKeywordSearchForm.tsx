@@ -1,38 +1,33 @@
-import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
-import classNames from 'classnames';
 import React from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
-import css from './KeywordSearchForm.module.scss';
+import css from './SecondaryKeywordSearchForm.module.scss';
 
-export type TKeywordSearchFormValues = {
+export type TSecondaryKeywordSearchFormValues = {
   keywords?: string;
 };
 
 type TKeywordSearchForm = {
-  onSubmit: (e: TKeywordSearchFormValues) => void;
-  initialValues?: TKeywordSearchFormValues;
+  onSubmit: (e: TSecondaryKeywordSearchFormValues) => void;
+  initialValues?: TSecondaryKeywordSearchFormValues;
   searchValue?: string;
   placeholder?: string;
-  className?: string;
 };
 
-const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
+const SecondaryKeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
   const intl = useIntl();
-  const { placeholder, className } = props;
+  const { placeholder } = props;
   return (
     <FinalForm
       {...props}
       render={(fieldRenderProps) => {
         const { handleSubmit } = fieldRenderProps;
         return (
-          <Form
-            onSubmit={handleSubmit}
-            className={classNames(css.root, className)}>
+          <Form onSubmit={handleSubmit} className={css.root}>
             <FieldTextInput
               placeholder={
                 placeholder ||
@@ -43,10 +38,8 @@ const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
               name={props?.searchValue || 'keywords'}
               id={props?.searchValue || 'keywords'}
               className={css.searchInput}
+              leftIcon={<IconMagnifier className={css.iconSearch} />}
             />
-            <Button className={css.searchButton} onClick={handleSubmit}>
-              <IconMagnifier className={css.iconSearch} />
-            </Button>
           </Form>
         );
       }}
@@ -54,4 +47,4 @@ const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
   );
 };
 
-export default KeywordSearchForm;
+export default SecondaryKeywordSearchForm;

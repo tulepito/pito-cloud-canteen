@@ -2,7 +2,7 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './MultiLevelSidebar.module.scss';
@@ -92,19 +92,15 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     return acc;
   }, {});
 
-  const childIsActive = useMemo(
-    () =>
-      childMenus.some(
-        (value: TSidebarMenu) =>
-          value.nameLink === pathname ||
-          value.childrenMenus?.some(
-            (childMenu) =>
-              childMenu.nameLink === pathname ||
-              childMenu.highlightRefLinks?.includes(pathname),
-          ),
-      ),
-    [pathname, childMenus],
-  ) as boolean;
+  const nestedCheckChildrenActive = (menus: TSidebarMenu[]) =>
+    menus.some(
+      (childMenu) =>
+        childMenu.nameLink === pathname ||
+        childMenu.highlightRefLinks?.includes(pathname) ||
+        nestedCheckChildrenActive(childMenu?.childrenMenus || []),
+    );
+
+  const childIsActive = nestedCheckChildrenActive(childMenus);
 
   const shouldShowMenuesOnActiveOnly =
     (childIsActive && showOnActiveChildrenMenus) ||

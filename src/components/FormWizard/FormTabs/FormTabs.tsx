@@ -5,13 +5,22 @@ import React from 'react';
 import FormTabNav from '../FormTabNav/FormTabNav';
 import css from './FormTabs.module.scss';
 
+export type TFormTabChildrenProps = {
+  tabId: string;
+  tabLabel: string;
+  tabLinkProps?: Record<any, any>;
+  disabled: boolean;
+  selected: boolean;
+  onClick?: () => void;
+};
+
 type TFormTabsProps = {
   className?: string;
   rootClassName?: string;
   navRootClassName?: string;
   tabRootClassName?: string;
   formTabNavClassName?: string;
-  children: ReactElement[] & { props?: any };
+  children: ReactElement[] & { props?: TFormTabChildrenProps };
 };
 
 const FormTabs: React.FC<TFormTabsProps> = (props) => {

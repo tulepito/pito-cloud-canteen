@@ -103,3 +103,22 @@ export const deletePartnerFoodApi = (body: TBodyParams) => {
 };
 export const fetchUserApi = (userId: string) =>
   get(`/api/users/fetch-user/${userId}`);
+
+export const createPartnerMenuApi = (body: TBodyParams) => {
+  return post(`/api/admin/listings/menus/create`, body);
+};
+
+export const updatePartnerMenuApi = (body: TBodyParams) => {
+  return post(`/api/admin/listings/menus/update`, body);
+};
+
+export const deletePartnerMenuApi = (body: TBodyParams) => {
+  return post(`/api/admin/listings/menus/delete`, body);
+};
+
+export const showPartnerMenuApi = (
+  id: string,
+  queryParams: Record<any, any>,
+) => {
+  return post(`/api/admin/listings/menus/${id}`, queryParams);
+};

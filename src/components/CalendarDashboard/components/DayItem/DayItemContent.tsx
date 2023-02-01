@@ -16,10 +16,11 @@ const DayColumnContent: React.FC<TDayColumnContentProps> = ({
   renderEvent: EventRender,
   components,
 }) => {
-  const { contentEnd } = components || {};
+  const { contentEnd, contentStart } = components || {};
 
   return (
     <div className={css.dayContent}>
+      {contentStart && <div>{contentStart({ events, date })}</div>}
       {EventRender &&
         events.map((event, index) => (
           <EventRender key={event.resource?.id} event={event} index={index} />

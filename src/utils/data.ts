@@ -6,6 +6,7 @@ import type {
   TAvailabilityException,
   TAvailabilityPlan,
   TCurrentUser,
+  TIntergrationListing,
   TLineItemCode,
   TListing,
   TObject,
@@ -581,6 +582,53 @@ export const TRANSACTION_WITH_EXTENDED_DATA = (transaction: TTransaction) => {
     },
     getProvider: () => {
       return provider || {};
+    },
+  };
+};
+
+export const getArrayByUuid = (items: any[]) => {
+  const resArr = [] as any[];
+  items.forEach((item) => {
+    if (!item?.id) {
+      return;
+    }
+    const i = resArr.findIndex((x) => x.id === item.id);
+    if (i <= -1) {
+      resArr.push(item);
+    }
+  });
+  return resArr;
+};
+
+export const INTERGRATION_LISTING = (
+  listing: TIntergrationListing | undefined | null,
+) => {
+  const ensuredListing = ensureListing(listing);
+  const id = ensuredListing?.id?.uuid;
+  const attributes = ensuredListing?.attributes;
+  const { privateData, publicData, protectedData, metadata } = attributes || {};
+
+  return {
+    getId: () => {
+      return id;
+    },
+    getFullData: () => {
+      return ensuredListing || {};
+    },
+    getAttributes: () => {
+      return attributes || {};
+    },
+    getMetadata: () => {
+      return metadata || {};
+    },
+    getProtectedData: () => {
+      return protectedData || {};
+    },
+    getPrivateData: () => {
+      return privateData || {};
+    },
+    getPublicData: () => {
+      return publicData || {};
     },
   };
 };

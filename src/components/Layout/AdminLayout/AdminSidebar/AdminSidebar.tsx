@@ -101,8 +101,8 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
                     label: 'AdminSidebar.managePartnerFixedMenuLabel',
                     nameLink: adminRoutes.ManagePartnerFixedMenus.path,
                     highlightRefLinks: [
-                      adminRoutes.CreatePartnerFixedMenu.path,
-                      adminRoutes.EditPartnerFixedMenu.path,
+                      adminRoutes.CreatePartnerMenu.path,
+                      adminRoutes.EditPartnerMenu.path,
                     ],
                   },
                   {
@@ -110,8 +110,8 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
                     label: 'AdminSidebar.managePartnerCycleMenuLabel',
                     nameLink: adminRoutes.ManagePartnerCycleMenus.path,
                     highlightRefLinks: [
-                      adminRoutes.CreatePartnerCycleMenu.path,
-                      adminRoutes.EditPartnerCycleMenu.path,
+                      adminRoutes.CreatePartnerMenu.path,
+                      adminRoutes.EditPartnerMenu.path,
                     ],
                   },
                 ],

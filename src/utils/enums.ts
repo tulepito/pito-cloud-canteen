@@ -526,3 +526,34 @@ export enum EOrderDetailsStatus {
   cancelled = 'cancelled',
   pending = 'pending',
 }
+
+export enum EMenuStatus {
+  active = 'active',
+  inactive = 'inactive',
+}
+
+export enum EMenuMealType {
+  breakfast = 'breakfast',
+  lunch = 'lunch',
+  dinner = 'dinner',
+  snack = 'snack',
+}
+
+export const MENU_MEAL_TYPE_OPTIONS = [
+  {
+    key: EMenuMealType.breakfast,
+    label: 'Ăn sáng',
+  },
+  {
+    key: EMenuMealType.dinner,
+    label: 'Ăn tối',
+  },
+  {
+    key: EMenuMealType.lunch,
+    label: 'Ăn trưa',
+  },
+  {
+    key: EMenuMealType.snack,
+    label: 'Ăn xế',
+  },
+];
