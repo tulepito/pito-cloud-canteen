@@ -167,7 +167,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         );
         res.json(allTsxResponse);
       } catch (error) {
-        console.log('initiate transactions error : ', error);
+        console.error('initiate transactions error : ', error);
         handleError(res, error);
       }
       break;

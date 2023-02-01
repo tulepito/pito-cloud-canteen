@@ -156,7 +156,7 @@ const requestAvatarUpload = createAsyncThunk(
       const img = response.data.data;
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return rejectWithValue({ id, error: storableError(error) });
     }
   },
@@ -209,7 +209,7 @@ const requestBusinessLicenseUpload = createAsyncThunk(
       const img = response.data.data;
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
-      console.log('error', error);
+      console.erroror('error', error);
       return rejectWithValue({ id, error: storableError(error) });
     }
   },
@@ -234,7 +234,7 @@ const requestFoodCertificateUpload = createAsyncThunk(
       const img = response.data.data;
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return rejectWithValue({ id, error: storableError(error) });
     }
   },
@@ -259,7 +259,7 @@ const requestPartyInsuranceUpload = createAsyncThunk(
       const img = response.data.data;
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return rejectWithValue({ id, error: storableError(error) });
     }
   },
@@ -275,7 +275,7 @@ const publishDraftPartner = createAsyncThunk(
       const [restaurant] = denormalisedResponseEntities(listing);
       return fulfillWithValue({ restaurant, partner });
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return rejectWithValue(storableError(error));
     }
   },
@@ -291,7 +291,7 @@ const discardDraftPartner = createAsyncThunk(
       const [restaurant] = denormalisedResponseEntities(listing);
       return fulfillWithValue({ restaurant, partner });
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return rejectWithValue(storableError(error));
     }
   },
@@ -399,7 +399,7 @@ const deleteRestaurant = createAsyncThunk(
       const { data } = await deletePartnerApi({ id });
       return fulfillWithValue(data);
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return rejectWithValue(storableError(error));
     }
   },

@@ -102,7 +102,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             },
           });
         } catch (error: any) {
-          console.log(error?.data?.errors);
+          console.error(error?.data?.errors);
           handleError(res, error);
         }
       }

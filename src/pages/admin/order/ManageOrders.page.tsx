@@ -155,7 +155,6 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'startDate',
     label: 'Thời gian',
     render: (data: any) => {
-      console.log(data);
       return (
         <div className={css.rowText}>
           <div className={css.deliveryHour}>{data.deliveryHour}</div>
