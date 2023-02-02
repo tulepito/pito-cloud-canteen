@@ -160,7 +160,6 @@ const fetchOrderDetail = createAsyncThunk(
     const { order } = getState().Order;
 
     const { plans = [] } = LISTING(order as TListing).getMetadata();
-    console.log('plans: ', plans[0]);
     if (plans[0]) {
       const response = denormalisedResponseEntities(
         await sdk.listings.show({
@@ -181,7 +180,14 @@ const fetchOrder = createAsyncThunk(
         id: orderId,
       }),
     )[0];
-    return response;
+
+    const { bookerId } = LISTING(response).getMetadata();
+    const selectedBooker = denormalisedResponseEntities(
+      await sdk.users.show({
+        id: bookerId,
+      }),
+    )[0];
+    return { order: response, selectedBooker };
   },
 );
 
@@ -333,7 +339,8 @@ const orderSlice = createSlice({
       .addCase(fetchOrder.fulfilled, (state, { payload }) => ({
         ...state,
         fetchOrderInProgress: false,
-        order: payload,
+        order: payload.order,
+        selectedBooker: payload.selectedBooker,
       }))
       .addCase(fetchOrder.rejected, (state, { error }) => ({
         ...state,
