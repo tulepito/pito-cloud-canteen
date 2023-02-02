@@ -32,12 +32,14 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
   );
   const onSubmit = (values: TObject) => {
     const { groupName, members } = values;
-    const groupMembers = companyMembers
-      .filter((member) => members.includes(member.id.uuid))
-      .map((member) => ({
-        id: member.id.uuid,
+    const groupMembers = companyMembers.reduce((result, member) => {
+      const id = member.id.uuid;
+      const newItem = {
+        id,
         email: member.attributes.email,
-      }));
+      };
+      return members.includes(id) ? result : result.concat([newItem]);
+    }, []);
     dispatch(
       BookerManageCompany.createGroup({
         groupInfo: {

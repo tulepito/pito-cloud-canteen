@@ -136,12 +136,12 @@ const GroupDetailPage = () => {
     {
       key: 'email',
       label: intl.formatMessage({ id: 'GroupDetail.columnLabel.email' }),
-      render: (data: any) => {
+      render: ({ id, email }: TObject) => {
         return (
           <span
             className={css.clickable}
-            onClick={goToGroupMemberDetailPage(data.id)}>
-            {data.email}
+            onClick={goToGroupMemberDetailPage(id)}>
+            {email}
           </span>
         );
       },
