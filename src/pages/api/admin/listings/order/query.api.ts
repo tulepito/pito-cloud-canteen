@@ -22,17 +22,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         return;
       }
     }
-    const integrationSdk = getIntegrationSdk();
     const { dataParams = {}, queryParams = {} } = req.body;
-    // eslint-disable-next-line unused-imports/no-unused-vars
-    const { needQueryAllStates = false, ...restDataParams } = dataParams;
-
-    const newDataParams = {
-      ...restDataParams,
-      meta_listingType: LISTING_TYPE.ORDER,
-    };
+    const integrationSdk = getIntegrationSdk();
     const response = await integrationSdk.listings.query(
-      newDataParams,
+      {
+        ...dataParams,
+        meta_listingType: LISTING_TYPE.ORDER,
+      },
       queryParams,
     );
     const orders = denormalisedResponseEntities(response);
@@ -52,26 +48,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       }),
     );
 
-    // if (needQueryAllStates) {
-    //   const queryStates = [
-    //     EOrderStates.picking,
-    //     EOrderStates.completed,
-    //     EOrderStates.isNew,
-    //     EOrderStates.canceled,
-    //   ];
-
-    //   const orderCounts = await Promise.all(
-    //     queryStates.map(async (state) => {
-    //       const params = {
-    //         ...newDataParams,
-    //         meta_orderState: state,
-    //       };
-    //       const orderResponse = await integrationSdk.listings.query(params);
-
-    //       console.log(state, orderResponse.data.meta.totalItems);
-    //     }),
-    //   );
-    // }
     res.json({ orders: orderWithCompany, pagination: response.data.meta });
   } catch (error) {
     handleError(res, error);

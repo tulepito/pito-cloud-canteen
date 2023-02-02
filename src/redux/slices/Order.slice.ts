@@ -1,3 +1,4 @@
+import { companyApi } from '@apis/companyApi';
 import {
   addMealPlanDetailApi,
   createOrderApi,
@@ -5,8 +6,10 @@ import {
   queryOrdersApi,
   updateMealPlanDetailApi,
 } from '@apis/orderApi';
+import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
+import { EOrderStates } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TPagination } from '@utils/types';
 import cloneDeep from 'lodash/cloneDeep';
@@ -52,6 +55,13 @@ type TOrderInitialState = {
   orders: TListing[];
   queryOrderInProgress: boolean;
   queryOrderError: any;
+  totalItemMap: {
+    [EOrderStates.picking]: number;
+    [EOrderStates.completed]: number;
+    [EOrderStates.isNew]: number;
+    [EOrderStates.canceled]: number;
+    all: number;
+  };
   manageOrdersPagination: TPagination;
 };
 
@@ -84,6 +94,13 @@ const initialState: TOrderInitialState = {
     totalPages: 0,
     page: 0,
     perPage: 0,
+  },
+  totalItemMap: {
+    [EOrderStates.picking]: 0,
+    [EOrderStates.completed]: 0,
+    [EOrderStates.isNew]: 0,
+    [EOrderStates.canceled]: 0,
+    all: 0,
   },
 };
 
@@ -154,13 +171,10 @@ const initiateTransactions = createAsyncThunk(
 const queryOrders = createAsyncThunk(
   QUERY_SUB_ORDERS,
   async (payload: TObject = {}) => {
-    const { companyId = '', ...restPayload } = payload;
-
     const params = {
       dataParams: {
-        ...restPayload,
+        ...payload,
         perPage: MANAGE_ORDER_PAGE_SIZE,
-        ...(companyId !== '' ? { meta_companyId: companyId } : {}),
       },
       queryParams: {
         expand: true,
@@ -176,12 +190,42 @@ const queryOrders = createAsyncThunk(
   },
 );
 
+const queryCompanyOrders = createAsyncThunk(
+  'app/Orders/COMPANY_QUERY_ORDERS',
+  async (payload: TObject, { rejectWithValue }) => {
+    const { companyId = '', ...restPayload } = payload;
+
+    if (companyId === '') {
+      return rejectWithValue('Company ID is empty');
+    }
+    const params = {
+      dataParams: {
+        ...restPayload,
+        perPage: MANAGE_ORDER_PAGE_SIZE,
+        meta_companyId: companyId,
+        meta_listingType: LISTING_TYPE.ORDER,
+      },
+      queryParams: {
+        expand: true,
+      },
+    };
+    const { data } = await companyApi.queryOrdersApi(companyId, params);
+    const { orders, pagination, totalItemMap } = data;
+
+    return { orders, pagination, totalItemMap };
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   addMealPlanDetail,
   updateMealPlanDetail,
   initiateTransactions,
   queryOrders,
+  queryCompanyOrders,
 };
 
 const orderSlice = createSlice({
@@ -303,7 +347,26 @@ const orderSlice = createSlice({
         ...state,
         queryOrderInProgress: false,
         queryOrderError: payload,
-      }));
+      }))
+      /* =============== queryCompanyOrders =============== */
+      .addCase(queryCompanyOrders.pending, (state) => {
+        state.queryOrderInProgress = false;
+        state.queryOrderError = null;
+      })
+      .addCase(
+        queryCompanyOrders.fulfilled,
+        (state, { payload: { orders, pagination, totalItemMap } }) => ({
+          ...state,
+          queryOrderInProgress: false,
+          orders,
+          manageOrdersPagination: pagination,
+          totalItemMap,
+        }),
+      )
+      .addCase(queryCompanyOrders.rejected, (state, { payload }) => {
+        state.queryOrderInProgress = false;
+        state.queryOrderError = payload;
+      });
   },
 });
 

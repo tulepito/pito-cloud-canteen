@@ -1,4 +1,5 @@
 import Badge, { EBadgeType } from '@components/Badge/Badge';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
@@ -30,10 +31,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import css from './ManageCompanyOrdersPage.module.scss';
+import { ManageCompanyOrdersPageTabIds } from './utils/constant';
 
 type TManageCompanyOrdersPageProps = {};
 
-const tabLabelIds = {
+const tabLabelMap = {
   [EOrderStates.picking]: 'ManageCompanyOrdersPage.tabSection.pickingLabel',
   [EOrderStates.completed]: 'ManageCompanyOrdersPage.tabSection.completedLabel',
   [EOrderStates.isNew]: 'ManageCompanyOrdersPage.tabSection.draftLabel',
@@ -163,14 +165,18 @@ const parseEntitiesToTableData = (
 
 const ManageCompanyOrdersPage: React.FC<TManageCompanyOrdersPageProps> = () => {
   const intl = useIntl();
-  const [currentTab, setCurrentTab] = useState<string>(tabLabelIds.all);
+  const [currentTab, setCurrentTab] = useState<string>(
+    ManageCompanyOrdersPageTabIds[4],
+  );
+
   const { query, isReady } = useRouter();
   const dispatch = useAppDispatch();
   const {
     queryOrderInProgress,
-    // queryOrderError,
+    queryOrderError,
     orders = [],
     manageOrdersPagination,
+    totalItemMap = {},
   } = useAppSelector((state) => state.Order, shallowEqual);
 
   const { page = 1, keywords = '' } = query;
@@ -186,7 +192,7 @@ const ManageCompanyOrdersPage: React.FC<TManageCompanyOrdersPageProps> = () => {
   const companyId = company ? company[0] : '';
 
   const tableData = parseEntitiesToTableData(orders, Number(page));
-  const tabItems = Object.entries(tabLabelIds).map(([key, id]) => {
+  const tabItems = Object.entries(tabLabelMap).map(([key, id]) => {
     const isTabActive = currentTab === key;
 
     const countClasses = classNames(css.count, {
@@ -196,15 +202,15 @@ const ManageCompanyOrdersPage: React.FC<TManageCompanyOrdersPageProps> = () => {
     const label = (
       <div className={css.tabLabel}>
         {intl.formatMessage({ id })}
-        <span className={countClasses}>{0}</span>
+        <span className={countClasses}>{(totalItemMap as TObject)[key]}</span>
       </div>
     );
 
     let content;
     if (queryOrderInProgress) {
       content = <LoadingContainer />;
-      // } else if (queryOrderError) {
-      //   content = <ErrorMessage message={queryOrderError.message} />;
+    } else if (queryOrderError) {
+      content = <ErrorMessage message={queryOrderError.message} />;
     } else if (orders.length > 0) {
       content = (
         <TableForm
@@ -256,7 +262,6 @@ const ManageCompanyOrdersPage: React.FC<TManageCompanyOrdersPageProps> = () => {
       page,
       keywords,
       companyId,
-      needQueryAllStates: true,
     };
 
     if (currentTab !== 'all') {
@@ -264,7 +269,7 @@ const ManageCompanyOrdersPage: React.FC<TManageCompanyOrdersPageProps> = () => {
     }
 
     if (isReady) {
-      dispatch(orderAsyncActions.queryOrders(params));
+      dispatch(orderAsyncActions.queryCompanyOrders(params));
     }
   }, [companyId, currentTab, dispatch, isReady, keywords, page]);
 
@@ -274,7 +279,11 @@ const ManageCompanyOrdersPage: React.FC<TManageCompanyOrdersPageProps> = () => {
         <div className={css.title}>{sectionTitle}</div>
         <div className={css.subtitle}>{sectionTitleSubtitle}</div>
       </section>
-      <Tabs items={tabItems} onChange={handleTabChange} />
+      <Tabs
+        items={tabItems}
+        onChange={handleTabChange}
+        defaultActiveKey={'5'}
+      />
     </div>
   );
 };
