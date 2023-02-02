@@ -824,6 +824,7 @@
   "SelectFoodModal.selectedTitle": "Đã chọn: {foodCount} món",
   "SelectRestaurantPage.goBack": "Quay lại",
   "SelectRestaurantPage.title": "Danh sách Nhà hàng",
+  "SelectRestaurantPage.subtitle":"Cho ngày {date} ({hour})- tại {address}",
   "SelectSingleFilter.popupClear": "Clear",
   "SendNotificationForm.submitButtonText": "Gửi email",
   "SendNotificationModal.alert": "Vui lòng hoàn tất chọn món trước ngày {dateTime}",
