@@ -8,6 +8,7 @@
 
 .navWrapper {
   @include flexAlign(center, center);
+  margin: 0;
   list-style-type: none;
   gap: 24px;
 

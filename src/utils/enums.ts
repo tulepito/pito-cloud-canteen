@@ -18,7 +18,7 @@ export enum EImageVariants {
 
 export enum EListingStates {
   draft = 'draft',
-  penddingArroval = 'pendingApproval',
+  pendingApproval = 'pendingApproval',
   published = 'published',
   closed = 'closed',
 }
@@ -433,7 +433,7 @@ export const MENU_OPTIONS = [
 export enum EOrderStates {
   inProgress = 'inProgress',
   picking = 'picking',
-  cancel = 'cancel',
+  canceled = 'canceled',
   delivery = 'delivery',
   pendingPayment = 'pendingPayment',
   isNew = 'isNew',
@@ -498,7 +498,7 @@ export const ORDER_STATES_OPTIONS = [
     label: 'Đang chọn món',
   },
   {
-    key: EOrderStates.cancel,
+    key: EOrderStates.canceled,
     label: 'Hủy',
   },
   {

@@ -19,3 +19,6 @@ export type DeleteMemberApiBody = {
 };
 export const deleteMemberApi = (body: DeleteMemberApiBody) =>
   deleteApi('/api/company/members/delete-member', body);
+
+export const queryOrdersApi = (companyId: string, params = {}) =>
+  getApi(`/api/company/${companyId}/orders`, params);

@@ -15,8 +15,8 @@ export const apiBaseUrl = () => {
   return `${window.location.origin}`;
 };
 
-export const getApi = (path: string) => {
-  return axios.get(`${apiBaseUrl()}${path}`);
+export const getApi = (path: string, params: TObject = {}) => {
+  return axios.get(`${apiBaseUrl()}${path}`, { params });
 };
 
 export const postApi = (path: string, body: TObject) => {

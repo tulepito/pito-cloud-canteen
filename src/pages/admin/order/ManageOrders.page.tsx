@@ -15,7 +15,7 @@ import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { adminRoutes } from '@src/paths';
 import { parseTimestampToFormat } from '@utils/dates';
 import {
@@ -40,20 +40,20 @@ const uniqueStrings = (array: string[]) => {
   });
 };
 
-const BADGE_TYPE_BASE_ON_ORDER_STATE = {
+export const BADGE_TYPE_BASE_ON_ORDER_STATE = {
   [EOrderStates.inProgress]: EBadgeType.PROCESSING,
   [EOrderStates.isNew]: EBadgeType.PROCESSING,
-  [EOrderStates.cancel]: EBadgeType.DEFAULT,
+  [EOrderStates.canceled]: EBadgeType.DEFAULT,
   [EOrderStates.delivery]: EBadgeType.SUCCESS,
   [EOrderStates.completed]: EBadgeType.SUCCESS,
   [EOrderStates.pendingPayment]: EBadgeType.WARNING,
   [EOrderStates.picking]: EBadgeType.WARNING,
 };
 
-const BADGE_CLASSNAME_BASE_ON_ORDER_STATE = {
+export const BADGE_CLASSNAME_BASE_ON_ORDER_STATE = {
   [EOrderStates.inProgress]: css.badgeInProgress,
   [EOrderStates.isNew]: css.badgeProcessing,
-  [EOrderStates.cancel]: css.badgedefault,
+  [EOrderStates.canceled]: css.badgedefault,
   [EOrderStates.delivery]: css.badgeSuccess,
   [EOrderStates.completed]: css.badgeSuccess,
   [EOrderStates.pendingPayment]: css.badgeWarning,
@@ -237,7 +237,6 @@ const parseEntitiesToTableData = (
   orders: TIntegrationOrderListing[],
   page: number,
 ) => {
-  if (orders.length === 0) return [];
   return orders.map((entity, index) => {
     const { company } = entity;
     const { orderDetail = {} } = entity?.attributes?.metadata || {};
@@ -364,7 +363,7 @@ const ManageOrdersPage = () => {
   useEffect(() => {
     const endDateWithOneMoreDay = addDays(new Date(pub_endDate as string), 1);
     dispatch(
-      OrderAsyncAction.queryOrders({
+      orderAsyncActions.queryOrders({
         page,
         keywords,
         ...(pub_endDate

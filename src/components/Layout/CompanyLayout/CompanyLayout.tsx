@@ -3,6 +3,7 @@ import FeatureIcons from '@components/FeatureIcons/FeatureIcons';
 import FeaturesHeader from '@components/FeaturesHeader/FeaturesHeader';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
+import { companyPaths } from '@src/paths';
 import { CURRENT_USER, USER } from '@utils/data';
 import type { TUser } from '@utils/types';
 import filter from 'lodash/filter';
@@ -10,7 +11,6 @@ import type { PropsWithChildren } from 'react';
 import { useState } from 'react';
 import { shallowEqual } from 'react-redux';
 
-import CompanySidebar from './CompanySidebar/CompanySidebar';
 import GeneralHeader from './GeneralHeader/GeneralHeader';
 import GeneralLayoutContent from './GeneralLayoutContent/GeneralLayoutContent';
 import GeneralMainContent from './GeneralMainContent/GeneralMainContent';
@@ -53,7 +53,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       key: 'order',
       icon: <FeatureIcons.Box />,
       title: 'Đơn hàng',
-      pathname: '/',
+      pathname: companyPaths.ManageOrders,
     },
     {
       key: 'invoice',
@@ -93,7 +93,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       <GeneralHeader />
       <FeaturesHeader headerData={featureHeaderData} />
       <GeneralLayoutContent>
-        <CompanySidebar />
+        {/* <CompanySidebar /> */}
         <GeneralMainContent>{children}</GeneralMainContent>
       </GeneralLayoutContent>
     </>

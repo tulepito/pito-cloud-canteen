@@ -8,7 +8,7 @@ import {
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
-import type { TListing, TPagination } from '@utils/types';
+import type { TListing, TObject, TPagination } from '@utils/types';
 import cloneDeep from 'lodash/cloneDeep';
 import { DateTime } from 'luxon';
 
@@ -153,11 +153,14 @@ const initiateTransactions = createAsyncThunk(
 
 const queryOrders = createAsyncThunk(
   QUERY_SUB_ORDERS,
-  async (payload: any = {}) => {
+  async (payload: TObject = {}) => {
+    const { companyId = '', ...restPayload } = payload;
+
     const params = {
       dataParams: {
-        ...payload,
+        ...restPayload,
         perPage: MANAGE_ORDER_PAGE_SIZE,
+        ...(companyId !== '' ? { meta_companyId: companyId } : {}),
       },
       queryParams: {
         expand: true,
@@ -173,7 +176,7 @@ const queryOrders = createAsyncThunk(
   },
 );
 
-export const OrderAsyncAction = {
+export const orderAsyncActions = {
   createOrder,
   addMealPlanDetail,
   updateMealPlanDetail,

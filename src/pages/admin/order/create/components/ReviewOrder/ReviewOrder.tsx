@@ -5,7 +5,7 @@ import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { OrderAsyncAction, removeDraftOrder } from '@redux/slices/Order.slice';
+import { orderAsyncActions, removeDraftOrder } from '@redux/slices/Order.slice';
 import { parseTimestampToFormat } from '@utils/dates';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
@@ -330,7 +330,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const onSubmit = async (values: any) => {
     const { staffName } = values;
     const { error } = (await dispatch(
-      OrderAsyncAction.createOrder(staffName),
+      orderAsyncActions.createOrder(staffName),
     )) as any;
     if (!error) {
       dispatch(removeDraftOrder());

@@ -209,7 +209,7 @@ const requestBusinessLicenseUpload = createAsyncThunk(
       const img = response.data.data;
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
-      console.erroror('error', error);
+      console.error('error', error);
       return rejectWithValue({ id, error: storableError(error) });
     }
   },

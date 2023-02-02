@@ -142,5 +142,6 @@ export const adminRoutes = {
 export const companyPaths = {
   Home: '/company',
   Detail: '/company/[companyId]',
+  ManageOrders: '/company/orders',
   GroupSetting: '/company/[companyId]/group-setting',
 };
