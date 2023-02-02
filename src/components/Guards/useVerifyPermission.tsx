@@ -1,16 +1,14 @@
 import { useAppSelector } from '@hooks/reduxHooks';
-import {
-  adminPaths,
-  companyPaths,
-  generalPaths,
-  IgnoredPermissionCheckRoutes,
-} from '@src/paths';
-import { EUserPermission } from '@utils/enums';
+import { IgnoredPermissionCheckRoutes } from '@src/paths';
+import type { EUserPermission } from '@utils/enums';
 import type { NextRouter } from 'next/router';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 
-import { isPathMatchedPermission } from './Guards.helper';
+import {
+  getHomePageRouteBaseOnPermission,
+  isPathMatchedPermission,
+} from './Guards.helper';
 
 const verifyPermissionFn = ({
   isPassChecking,
@@ -27,19 +25,7 @@ const verifyPermissionFn = ({
     return;
   }
 
-  let homePageRoute;
-
-  switch (userPermission) {
-    case EUserPermission.admin:
-      homePageRoute = adminPaths.Dashboard;
-      break;
-    case EUserPermission.company:
-      homePageRoute = companyPaths.Home;
-      break;
-    default:
-      homePageRoute = generalPaths.Home;
-      break;
-  }
+  const homePageRoute = getHomePageRouteBaseOnPermission(userPermission);
 
   if (isMatchedPermission !== null && !isMatchedPermission) {
     router.push(homePageRoute);

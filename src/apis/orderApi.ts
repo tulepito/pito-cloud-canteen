@@ -38,13 +38,13 @@ type CreateOrderApiBody = {
   };
 };
 export const createOrderApi = (body: CreateOrderApiBody) =>
-  postApi('/api/orders', body);
+  postApi('/orders', body);
 
 type AddMealPlanDetailApiBody = {
   orderId: string;
 };
 export const addMealPlanDetailApi = (body: AddMealPlanDetailApiBody) =>
-  postApi('/api/orders/plan', body);
+  postApi('/orders/plan', body);
 
 type UpdateMealPlanDetailApiBody = {
   planId: string;
@@ -55,34 +55,34 @@ type UpdateMealPlanDetailApiBody = {
   };
 };
 export const updateMealPlanDetailApi = (body: UpdateMealPlanDetailApiBody) =>
-  putApi('/api/orders/plan', body);
+  putApi('/orders/plan', body);
 
 type CompleteOrderApiBody = {
   orderId: string;
   planId: string;
 };
 export const initiateTransactionsApi = (body: CompleteOrderApiBody) =>
-  putApi('/api/orders', body);
+  putApi('/orders', body);
 
 // Booker manage order details
 export const loadBookerOrderDataApi = (orderId: string) =>
-  getApi(`/api/orders/${orderId}`);
+  getApi(`/orders/${orderId}`);
 
 export const updateOrderDetailsApi = (orderId: string, body: TObject) =>
-  postApi(`/api/orders/${orderId}`, body);
+  postApi(`/orders/${orderId}`, body);
 
 export const deleteParticipantFromOrderApi = (orderId: string, body: TObject) =>
-  postApi(`/api/orders/${orderId}/delete-participant`, body);
+  postApi(`/orders/${orderId}/delete-participant`, body);
 
 export const addParticipantToOrderApi = (orderId: string, body: TObject) =>
-  postApi(`/api/orders/${orderId}/add-participant`, body);
+  postApi(`/orders/${orderId}/add-participant`, body);
 
 export const addUpdateMemberOrder = (orderId: string, body: TObject) =>
-  putApi(`/api/orders/${orderId}/member-order`, body);
+  putApi(`/orders/${orderId}/member-order`, body);
 
 export const sendRemindEmailToMemberApi = (orderId: string, body: TObject) =>
-  postApi(`/api/orders/${orderId}/remind-member`, body);
+  postApi(`/orders/${orderId}/remind-member`, body);
 
 export const queryOrdersApi = (body: TBodyParams) => {
-  return postApi(`/api/admin/listings/order/query`, body);
+  return postApi(`/admin/listings/order/query`, body);
 };
