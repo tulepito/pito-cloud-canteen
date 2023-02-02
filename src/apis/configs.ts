@@ -16,7 +16,9 @@ export const apiBaseUrl = () => {
 };
 
 export const getApi = (path: string, params: TObject = {}) => {
-  return axios.get(`${apiBaseUrl()}${path}`, { params });
+  return axios.get(`${apiBaseUrl()}${path}`, {
+    params: { JSONParams: JSON.stringify(params) },
+  });
 };
 
 export const postApi = (path: string, body: TObject) => {
@@ -27,8 +29,8 @@ export const putApi = (path: string, body: TObject) => {
   return axios.put(`${apiBaseUrl()}${path}`, body);
 };
 
-export const deleteApi = (path: string, body: TObject) => {
-  return axios.delete(`${apiBaseUrl()}${path}`, body);
+export const deleteApi = (path: string, data: TObject = {}) => {
+  return axios.delete(`${apiBaseUrl()}${path}`, { data });
 };
 
 export type TBodyParams = {
