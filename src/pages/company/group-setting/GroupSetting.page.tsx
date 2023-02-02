@@ -38,7 +38,8 @@ const GroupSettingPage = () => {
 
   const [selectingDeleteGroupId, setSelectingDeleteGroupId] =
     useState<string>('');
-  const groupList =
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const groupList: Record<string, any>[] =
     useAppSelector((state) => state.company.groupList, shallowEqual) || [];
   const companyMembers =
     useAppSelector((state) => state.company.companyMembers, shallowEqual) || [];
@@ -57,7 +58,7 @@ const GroupSettingPage = () => {
   );
   const formattedGroupList = useMemo<TRowData[]>(
     () =>
-      groupList.reduce(
+      groupList.reduce<TRowData[]>(
         (result: any, group: any) => [
           ...result,
           {

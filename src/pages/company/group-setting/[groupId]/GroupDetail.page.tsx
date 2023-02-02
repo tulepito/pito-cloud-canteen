@@ -52,7 +52,7 @@ const GroupDetailPage = () => {
     (state) => state.company.groupList,
     shallowEqual,
   );
-  const groupMembers = useAppSelector(
+  const groupMembers: Record<string, any>[] = useAppSelector(
     (state) => state.company.groupMembers,
     shallowEqual,
   );
@@ -84,8 +84,8 @@ const GroupDetailPage = () => {
   };
   const formattedGroupMembers = useMemo<TRowData[]>(
     () =>
-      groupMembers.reduce(
-        (result: any, member: any) => [
+      groupMembers.reduce<TRowData[]>(
+        (result, member) => [
           ...result,
           {
             key: member.id.uuid,

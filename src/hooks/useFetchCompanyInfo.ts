@@ -8,17 +8,18 @@ import { useEffect } from 'react';
 import { useAppDispatch } from './reduxHooks';
 
 const useFetchCompanyInfo = () => {
-  const router = useRouter();
+  const { query, isReady } = useRouter();
   const dispatch = useAppDispatch();
-  const { companyId = '' } = router.query;
+  const { companyId = '' } = query;
 
   useEffect(() => {
-    const fetchData = async () => {
-      dispatch(addWorkspaceCompanyId(companyId));
-      await dispatch(BookerManageCompany.companyInfo());
-    };
-    fetchData();
-  }, [companyId, dispatch]);
+    if (isReady && companyId !== '') {
+      (async () => {
+        dispatch(addWorkspaceCompanyId(companyId));
+        await dispatch(BookerManageCompany.companyInfo());
+      })();
+    }
+  }, [companyId, dispatch, isReady]);
 };
 
 export default useFetchCompanyInfo;
