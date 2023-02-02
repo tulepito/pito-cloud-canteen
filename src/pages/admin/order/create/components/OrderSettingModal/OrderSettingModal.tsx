@@ -6,6 +6,8 @@ import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHan
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { updateDraftMealPlan } from '@redux/slices/Order.slice';
+import { LISTING } from '@utils/data';
+import type { TListing } from '@utils/types';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
 import { useMemo, useState } from 'react';
@@ -45,21 +47,21 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
   );
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const { order } = useAppSelector((state) => state.Order, shallowEqual);
+
   const {
-    draftOrder: {
-      clientId,
-      packagePerMember,
-      selectedGroups = [],
-      deliveryHour,
-      deliveryAddress,
-      deadlineDate,
-      deadlineHour,
-      vatAllow = false,
-      pickAllow = true,
-      startDate,
-      endDate,
-    },
-  } = useAppSelector((state) => state.Order, shallowEqual);
+    companyId: clientId,
+    packagePerMember = '',
+    pickAllow = true,
+    vatAllow = true,
+    selectedGroups = [],
+    deliveryHour,
+    startDate,
+    endDate,
+    deliveryAddress,
+    deadlineDate,
+    deadlineHour,
+  } = LISTING(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const initialValues = useMemo(
     () => ({

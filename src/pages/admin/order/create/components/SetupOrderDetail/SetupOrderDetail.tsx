@@ -11,16 +11,18 @@ import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
+  OrderAsyncAction,
   selectCalendarDate,
   selectRestaurant,
   unSelectRestaurant,
   updateDraftMealPlan,
 } from '@redux/slices/Order.slice';
+import { LISTING } from '@utils/data';
 import { getDaySessionFromDeliveryTime } from '@utils/dates';
-import type { TObject } from '@utils/types';
+import type { TListing, TObject } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -114,20 +116,22 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   nextTab,
 }) => {
   const {
-    draftOrder: {
-      startDate,
-      endDate,
-      clientId,
-      packagePerMember,
-      selectedGroups = [],
-      deliveryHour,
-      deliveryAddress,
-      deadlineDate,
-      deadlineHour,
-      orderDetail = {},
-      pickAllow = true,
-    },
+    order,
+    orderDetail = {},
+    updateOrderInProgress,
   } = useAppSelector((state) => state.Order, shallowEqual);
+  const {
+    companyId: clientId,
+    packagePerMember = '',
+    pickAllow = true,
+    selectedGroups = [],
+    deliveryHour,
+    startDate,
+    endDate,
+    deliveryAddress,
+    deadlineDate,
+    deadlineHour,
+  } = LISTING(order as TListing).getMetadata();
   const companies = useAppSelector(
     (state) => state.ManageCompaniesPage.companyRefs,
     shallowEqual,
@@ -147,7 +151,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     setFalse: onOrderSettingModalClose,
     setTrue: onOrderSettingModalOpen,
   } = useBoolean();
-
+  useEffect(() => {
+    dispatch(OrderAsyncAction.fetchOrderDetail());
+  }, []);
   const suitableStartDate = useMemo(() => {
     const temp = findSuitableStartDate({
       selectedDate,
@@ -230,7 +236,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     [OrderSettingField.SPECIAL_DEMAND]: '',
     [OrderSettingField.PER_PACK]: intl.formatMessage(
       { id: 'SetupOrderDetail.perPack' },
-      { value: addCommas(packagePerMember.toString()) || '' },
+      { value: addCommas(packagePerMember?.toString()) || '' },
     ),
     ...(pickAllow
       ? {
@@ -243,6 +249,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     onClick: handleAddMorePlanClick,
     startDate,
     endDate,
+  };
+
+  const onSubmit = () => {
+    dispatch(OrderAsyncAction.updateOrder({ orderDetail }))
+      .then(() => {
+        nextTab();
+      })
+      .catch(() => {});
   };
 
   return (
@@ -293,7 +307,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
             />
           </div>
           <div>
-            <NavigateButtons goBack={goBack} onNextClick={nextTab} />
+            <NavigateButtons
+              goBack={goBack}
+              onNextClick={onSubmit}
+              inProgress={updateOrderInProgress}
+            />
           </div>
           <OrderSettingModal
             isOpen={isOrderSettingModalOpen}

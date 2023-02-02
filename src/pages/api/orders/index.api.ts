@@ -1,12 +1,12 @@
 import { calculateGroupMembers } from '@helpers/companyMembers';
 import getAdminAccount from '@services/getAdminAccount';
-import { fetchUser } from '@services/integrationHelper';
+import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import subAccountLogin from '@services/subAccountLogin';
 import { ListingTypes } from '@src/types/listingTypes';
-import { denormalisedResponseEntities } from '@utils/data';
-import type { TOrder, TPlan } from '@utils/orderTypes';
+import { denormalisedResponseEntities, LISTING } from '@utils/data';
+import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HTTP_METHODS } from '../helpers/constants';
@@ -21,8 +21,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case HTTP_METHODS.POST:
       try {
-        const { companyId, generalInfo, orderDetail } = req.body;
-        const { selectedGroups } = generalInfo;
+        const { companyId, bookerId } = req.body;
         const adminAccount = await getAdminAccount();
         const { currentOrderNumber = 0 } =
           adminAccount.attributes.profile.metadata;
@@ -40,116 +39,121 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           .toString()
           .padStart(5, '0')}`;
         const draftedOrderListinResponse =
-          await loggedinSubAccount.ownListings.createDraft({
+          await loggedinSubAccount.ownListings.create({
             title: generatedOrderId,
           });
         const draftedOrderListing = denormalisedResponseEntities(
           draftedOrderListinResponse,
         )[0];
-        const allMembers = calculateGroupMembers(
-          companyAccount,
-          selectedGroups,
-        );
-        const initialMemberOrder = allMembers.reduce(
-          (result: any, _memberId: any) => ({
-            ...result,
-            [_memberId]: {
-              foodId: '',
-              status: 'empty',
-            },
-          }),
-          {},
-        );
-
-        const updatedOrderDetail = Object.keys(orderDetail).reduce(
-          (result, date) => {
-            return {
-              ...result,
-              [date]: {
-                ...orderDetail[date],
-                memberOrders: initialMemberOrder,
-              },
-            };
-          },
-          {},
-        );
         const updatedDraftOrderListingResponse =
-          await integrationSdk.listings.update({
-            id: draftedOrderListing.id.uuid,
-            metadata: {
-              companyId,
-              listingType: ListingTypes.ORDER,
-              generalInfo,
-              orderDetail: updatedOrderDetail,
+          await integrationSdk.listings.update(
+            {
+              id: draftedOrderListing.id.uuid,
+              metadata: {
+                companyId,
+                bookerId,
+                listingType: ListingTypes.ORDER,
+                orderState: 'draft',
+              },
             },
-          });
+            { expand: true },
+          );
         const updatedDraftOrderListing = denormalisedResponseEntities(
           updatedDraftOrderListingResponse,
         )[0];
-        res.json({ data: updatedDraftOrderListing });
+        res.json(updatedDraftOrderListing);
       } catch (error) {
         handleError(res, error);
       }
       break;
     case HTTP_METHODS.PUT:
       try {
-        const { orderId, planId } = req.body;
-        const orderListingResponse = await integrationSdk.listings.show({
-          id: orderId,
-        });
-        const orderListing =
-          denormalisedResponseEntities(orderListingResponse)[0];
-        const { order }: { order: TOrder } = orderListing.attributes.metadata;
-        const { companyId } = order;
-        const companyAccountResponse = await integrationSdk.users.show(
-          { id: companyId },
-          { expand: true },
-        );
-        const companyAccount = denormalisedResponseEntities(
-          companyAccountResponse,
-        )[0];
+        const { orderId, generalInfo, orderDetail } = req.body;
+        const orderListing = await fetchListing(orderId);
+        const {
+          companyId,
+          plans = [],
+          selectedGroups = [],
+        } = LISTING(orderListing).getMetadata();
+        const companyAccount = await fetchUser(companyId);
         const { subAccountId } = companyAccount.attributes.profile.privateData;
 
-        const subCompanyAccountResponse = await integrationSdk.users.show(
-          { id: subAccountId },
-          { expand: true },
-        );
-        const subCompanyAccount = denormalisedResponseEntities(
-          subCompanyAccountResponse,
-        )[0];
+        const subCompanyAccount = await fetchUser(subAccountId);
         const loggedinSubAccount = await subAccountLogin(subCompanyAccount);
-        const planListingResponse =
-          await loggedinSubAccount.ownListings.publishDraft(
-            {
-              id: planId,
-            },
-            { expand: true },
-          );
-        const planListing =
-          denormalisedResponseEntities(planListingResponse)[0];
-        const { metadata: plan }: { metadata: TPlan } = planListing.attributes;
-        const { orderDetail } = plan;
-        const allTsxResponse = await Promise.all(
-          Object.keys(orderDetail).map(async (orderItem) => {
-            const body = {
-              processAlias: 'sharetribe-flex/release-1',
-              transition: 'transition/request',
-            };
-            const params = {
-              listingId: orderDetail[orderItem].restaurant,
-            };
-            const transactionResponse =
-              await loggedinSubAccount.transactions.initiate(
-                {
-                  ...body,
-                  params,
+        let updatedOrderListing;
+        if (!isEmpty(generalInfo)) {
+          // eslint-disable-next-line prefer-destructuring
+          updatedOrderListing = denormalisedResponseEntities(
+            await integrationSdk.listings.update(
+              {
+                id: orderId,
+                metadata: {
+                  ...generalInfo,
                 },
-                { expand: true },
-              );
-            return denormalisedResponseEntities(transactionResponse)[0];
-          }),
-        );
-        res.json(allTsxResponse);
+              },
+              { expand: true },
+            ),
+          )[0];
+        }
+        if (orderDetail) {
+          const allMembers = calculateGroupMembers(
+            companyAccount,
+            selectedGroups,
+          );
+          const initialMemberOrder = allMembers.reduce(
+            (result: any, _memberId: any) => ({
+              ...result,
+              [_memberId]: {
+                foodId: '',
+                status: 'empty',
+              },
+            }),
+            {},
+          );
+          const updatedOrderDetail = Object.keys(orderDetail).reduce(
+            (result, date) => {
+              return {
+                ...result,
+                [date]: {
+                  ...orderDetail[date],
+                  memberOrders: initialMemberOrder,
+                },
+              };
+            },
+            {},
+          );
+
+          const orderTitle = orderListing.attributes.title;
+          const planListingResponse =
+            await loggedinSubAccount.ownListings.create({
+              title: `${orderTitle} - Plan week ${plans.length + 1}`,
+            });
+
+          const planListing =
+            denormalisedResponseEntities(planListingResponse)[0];
+          await integrationSdk.listings.update({
+            id: planListing.id.uuid,
+            metadata: {
+              orderDetail: updatedOrderDetail,
+              orderId,
+              listingType: ListingTypes.PLAN,
+            },
+          });
+
+          // eslint-disable-next-line prefer-destructuring
+          updatedOrderListing = denormalisedResponseEntities(
+            await integrationSdk.listings.update(
+              {
+                id: orderListing.id.uuid,
+                metadata: {
+                  plans: plans.concat(planListing.id.uuid),
+                },
+              },
+              { expand: true },
+            ),
+          )[0];
+        }
+        res.json(updatedOrderListing);
       } catch (error) {
         handleError(res, error);
       }

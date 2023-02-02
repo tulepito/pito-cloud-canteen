@@ -99,6 +99,10 @@ export const adminRoutes = {
     path: '/admin/order/create',
     label: 'Tạo đơn hàng',
   },
+  EditOrder: {
+    path: '/admin/order/[orderId]',
+    label: 'Tạo đơn hàng',
+  },
 } as const;
 
 export const companyPaths = {

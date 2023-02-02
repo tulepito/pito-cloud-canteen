@@ -1,8 +1,9 @@
 import Form from '@components/Form/Form';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { updateDraftMealPlan } from '@redux/slices/Order.slice';
-import { USER } from '@utils/data';
+import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { LISTING, USER } from '@utils/data';
+import type { TListing } from '@utils/types';
 import isEmpty from 'lodash/isEmpty';
 import { useMemo } from 'react';
 import type { FormRenderProps } from 'react-final-form';
@@ -31,25 +32,27 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
 
+  const { selectedBooker, updateOrderInProgress } = useAppSelector(
+    (state) => state.Order,
+    shallowEqual,
+  );
+  const { order } = useAppSelector((state) => state.Order, shallowEqual);
   const {
-    draftOrder: {
-      clientId,
-      dayInWeek,
-      packagePerMember = '',
-      vatAllow = true,
-      pickAllow = true,
-      selectedGroups,
-      deliveryHour,
-      startDate,
-      endDate,
-      nutritions,
-      deliveryAddress,
-      detailAddress,
-      deadlineDate,
-      deadlineHour,
-    },
-    selectedBooker,
-  } = useAppSelector((state) => state.Order, shallowEqual);
+    companyId: clientId,
+    dayInWeek,
+    packagePerMember = '',
+    vatAllow = true,
+    pickAllow = true,
+    selectedGroups,
+    deliveryHour,
+    startDate,
+    endDate,
+    nutritions,
+    deliveryAddress,
+    detailAddress,
+    deadlineDate,
+    deadlineHour,
+  } = LISTING(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const companies = useAppSelector(
     (state) => state.ManageCompaniesPage.companyRefs,
@@ -77,7 +80,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     const {
       selectedPlace: { address: addressValue, origin: originValue },
     } = deliveryAddressValues;
-    const createOrderValue = {
+    const generalInfo = {
       deliveryAddress: {
         address: addressValue,
         origin: originValue,
@@ -89,8 +92,9 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
       ...rest,
     };
-    dispatch(updateDraftMealPlan(createOrderValue));
-    nextTab();
+    dispatch(OrderAsyncAction.updateOrder({ generalInfo })).then(() => {
+      nextTab();
+    });
   };
 
   const initialValues = useMemo(
@@ -211,7 +215,10 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
               )}
             </div>
 
-            <NavigateButtons goBack={goBack} />
+            <NavigateButtons
+              goBack={goBack}
+              inProgress={updateOrderInProgress}
+            />
           </Form>
         );
       }}

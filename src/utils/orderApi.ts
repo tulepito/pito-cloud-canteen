@@ -2,7 +2,14 @@ import { post, put } from './api';
 
 type CreateOrderApiBody = {
   companyId: string;
-  generalInfo: {
+  bookerId: string;
+};
+export const createOrderApi = (body: CreateOrderApiBody) =>
+  post('/api/orders', body);
+
+type UpdateOrderApiBody = {
+  orderId: string;
+  generalInfo?: {
     deliveryAddress: {
       address: string;
       origin: {
@@ -19,8 +26,10 @@ type CreateOrderApiBody = {
     deadlineHour: string;
     period?: number;
     nutritions: string[];
+    staffName?: string;
+    shipperName?: string;
   };
-  orderDetail: {
+  orderDetail?: {
     [date: string]: {
       restaurant: {
         id: string;
@@ -35,9 +44,8 @@ type CreateOrderApiBody = {
     };
   };
 };
-export const createOrderApi = (body: CreateOrderApiBody) =>
-  post('/api/orders', body);
-
+export const updateOrderApi = (body: UpdateOrderApiBody) =>
+  put('/api/orders', body);
 type AddMealPlanDetailApiBody = {
   orderId: string;
 };

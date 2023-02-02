@@ -4,7 +4,7 @@ import {
   manageCompaniesThunks,
   paginateCompanies,
 } from '@redux/slices/ManageCompaniesPage.slice';
-import { addCompanyClient, OrderAsyncAction } from '@redux/slices/Order.slice';
+import { OrderAsyncAction } from '@redux/slices/Order.slice';
 import type { TUpdateStatus } from '@src/pages/admin/company/helpers';
 import {
   filterCompanies,
@@ -13,7 +13,10 @@ import {
   sortCompanies,
 } from '@src/pages/admin/company/helpers';
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
+import { adminRoutes } from '@src/paths';
+import { LISTING } from '@utils/data';
 import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -27,10 +30,10 @@ type TClientSelector = {
 
 const ClientSelector: React.FC<TClientSelector> = (props) => {
   const { nextTab } = props;
+  const router = useRouter();
   const intl = useIntl();
   const [queryParams, setQueryParams] = useState({});
   const [page, setPage] = useState<number>(1);
-  const [selectedConpanyId, setSelectedCompanyId] = useState<string>('');
   const { value: isSortAZ, toggle: toggleSort } = useBoolean(true);
   const dispatch = useAppDispatch();
   const { companyRefs, totalItems } = useAppSelector(
@@ -46,6 +49,9 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   );
   const fetchBookersInProgress = useAppSelector(
     (state) => state.Order.fetchBookersInProgress,
+  );
+  const createOrderInProgress = useAppSelector(
+    (state) => state.Order.createOrderInProcess,
   );
   // const fetchBookersError = useAppSelector(
   //   (state) => state.Order.fetchBookersError,
@@ -96,16 +102,27 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
     setPage(value);
   };
   const onItemClick = (id: string) => {
-    setSelectedCompanyId(id);
     dispatch(OrderAsyncAction.fetchCompanyBookers(id));
   };
 
-  const onSubmit = () => {
-    const company = companyRefs.find(
-      (item) => item?.id?.uuid === selectedConpanyId,
-    );
-    dispatch(addCompanyClient({ id: selectedConpanyId, company }));
-    nextTab();
+  const onSubmit = (values: any) => {
+    const { clientId, booker } = values;
+    dispatch(
+      OrderAsyncAction.createOrder({
+        clientId,
+        bookerId: booker,
+      }),
+    )
+      .then(({ payload }) => {
+        nextTab();
+        router.push({
+          pathname: adminRoutes.EditOrder.path,
+          query: {
+            orderId: LISTING(payload).getId(),
+          },
+        });
+      })
+      .catch(() => {});
   };
 
   return (
@@ -136,6 +153,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
           onItemClick={onItemClick}
           onSubmit={onSubmit}
           bookerList={bookerList}
+          createOrderInProgress={createOrderInProgress}
           fetchBookersInProgress={fetchBookersInProgress}
           toggleSort={toggleSort}
         />

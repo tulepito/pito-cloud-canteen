@@ -6,6 +6,7 @@ import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { LISTING } from '@utils/data';
 import { weekDayFormatFromDateTime } from '@utils/dates';
+import type { TListing } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -34,9 +35,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   const { value: isModalOpen, setValue: setModalOpen } = useBoolean();
   const dispatch = useAppDispatch();
   const {
-    Order: {
-      draftOrder: { deliveryAddress, deliveryHour },
-    },
+    Order: { order },
     SelectRestaurantPage: {
       restaurants,
       pagination,
@@ -45,7 +44,9 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       fetchRestaurantsPending,
     },
   } = useAppSelector((state) => state);
-
+  const { deliveryHour, deliveryAddress } = LISTING(
+    order as TListing,
+  ).getMetadata();
   const shouldShowRestaurantPagination =
     !!restaurants && restaurants?.length > 0 && fetchRestaurantsPending;
   const {
@@ -98,7 +99,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
         const { id, attributes } = item || {};
         const { title, price } = attributes;
 
-        return { id: id?.uuid, foodName: title, foodPrice: price || 0 };
+        return { id: id?.uuid, foodName: title, foodPrice: price?.amount || 0 };
       })
       .reduce((result, curr) => {
         const { id, foodName, foodPrice } = curr;

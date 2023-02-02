@@ -26,6 +26,7 @@ type ClientTableProps = {
   page: number;
   bookerList: TUser[];
   fetchBookersInProgress: boolean;
+  createOrderInProgress: boolean;
   onPageChange: (value: number) => void;
   onItemClick?: (value: string) => void;
   onSubmit: (values: any) => void;
@@ -45,6 +46,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
     bookerList,
     fetchBookersInProgress,
     toggleSort,
+    createOrderInProgress,
   } = props;
   const [selectedConpanyId, setSelectedCompanyId] = useState<string>('');
   const [selectedBookerId, setSelectedBookerId] = useState<string>('');
@@ -67,7 +69,9 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
         }
       };
       const showBookerList =
-        selectedConpanyId === itemData.id && bookerList.length > 0;
+        selectedConpanyId === itemData.id &&
+        bookerList.length > 0 &&
+        !fetchBookersInProgress;
       const showLoading =
         selectedConpanyId === itemData.id && fetchBookersInProgress;
       return (
@@ -159,7 +163,8 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
         const { handleSubmit, form, values } = formRenderProps;
         const { booker: bookerValue = '', clientId: clientIdValue = '' } =
           values;
-        const disabled = !bookerValue || !clientIdValue;
+        const disabled =
+          !bookerValue || !clientIdValue || createOrderInProgress;
         return (
           <Form onSubmit={handleSubmit}>
             <div className={css.container}>
@@ -193,7 +198,10 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
               )}
             </div>
             <div className={css.submitBtnWrapper}>
-              <Button className={css.submitBtn} disabled={disabled}>
+              <Button
+                className={css.submitBtn}
+                inProgress={createOrderInProgress}
+                disabled={disabled}>
                 {intl.formatMessage({ id: 'ClientTable.submit' })}
               </Button>
             </div>
