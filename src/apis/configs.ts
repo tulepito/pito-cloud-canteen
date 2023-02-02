@@ -2,7 +2,7 @@ import type { TObject } from '@utils/types';
 import axios from 'axios';
 
 export const apiBaseUrl = () => {
-  const port = process.env.NEXT_PORT || 3000;
+  const port = process.env.NEXT_PUBLIC_PORT || 3000;
   const useDevApiServer =
     process.env.NEXT_PUBLIC_ENV === 'development' && !!port;
 
