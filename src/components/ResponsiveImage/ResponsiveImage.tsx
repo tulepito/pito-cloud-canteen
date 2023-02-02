@@ -85,11 +85,11 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
     );
   }
 
-  const imageVariants = image.attributes.variants;
+  const imageVariants = image?.attributes?.variants;
 
   const srcSet = variants
     .map((variantName: TImageVariant) => {
-      const variant = imageVariants[variantName];
+      const variant = imageVariants?.[variantName];
 
       if (!variant) {
         // Variant not available (most like just not loaded yet)

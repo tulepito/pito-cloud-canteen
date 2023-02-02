@@ -12,7 +12,7 @@ const getLabelByKey = (list: any[], key: any) => {
   return item && item.label ? item.label : key;
 };
 
-const FieldMutipleSelectComponent = (props: any) => {
+const FieldMultipleSelectComponent = (props: any) => {
   const { options, placeholder, className, label, input } = props;
   const { value: isOpen, toggle, setFalse: onClose } = useBoolean(false);
   const { value = [], name } = input;
@@ -56,7 +56,7 @@ const FieldMutipleSelectComponent = (props: any) => {
 };
 
 const FieldMultipleSelect = (props: any) => {
-  return <Field {...props} render={FieldMutipleSelectComponent} />;
+  return <Field {...props} render={FieldMultipleSelectComponent} />;
 };
 
 export default FieldMultipleSelect;

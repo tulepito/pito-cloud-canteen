@@ -3,7 +3,7 @@ import { createAsyncThunk, createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities, ensureCurrentUser } from '@utils/data';
-import { EUserPermission } from '@utils/enums';
+import { EImageVariants, EUserPermission } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TObject } from '@utils/types';
 import get from 'lodash/get';
@@ -71,12 +71,29 @@ const SEND_VERIFICATION_EMAIL = 'app/user/SEND_VERIFICATION_EMAIL';
 
 const fetchCurrentUser = createAsyncThunk(
   FETCH_CURRENT_USER,
-  async (params: TObject | undefined, { extra: sdk, fulfillWithValue }) => {
-    const parameters = params || {};
+  async (
+    params: TObject | undefined,
+    { extra: sdk, rejectWithValue, fulfillWithValue },
+  ) => {
+    const parameters = params || {
+      include: ['profileImage'],
+      'fields.image': [
+        EImageVariants.squareSmall,
+        EImageVariants.squareSmall2x,
+        EImageVariants.scaledLarge,
+      ],
+    };
     const response = await sdk.currentUser.show(parameters);
     const entities = denormalisedResponseEntities(response);
+
+    if (entities.length !== 1) {
+      return rejectWithValue(
+        new Error('Expected a resource in the sdk.currentUser.show response'),
+      );
+    }
+
     const currentUser = entities[0];
-    return fulfillWithValue(currentUser);
+    return currentUser;
   },
   {
     serializeError: storableError,

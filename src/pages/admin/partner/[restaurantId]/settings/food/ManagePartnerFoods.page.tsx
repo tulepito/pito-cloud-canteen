@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FieldMultipleSelect from '@components/FieldMutipleSelect/FieldMultipleSelect';
+import FieldMultipleSelect from '@components/FormFields/FieldMultipleSelect/FieldMultipleSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconDuplicate from '@components/Icons/IconDuplicate/IconDuplicate';

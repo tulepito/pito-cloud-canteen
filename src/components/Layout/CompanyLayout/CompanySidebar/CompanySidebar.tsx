@@ -9,7 +9,8 @@ import css from './CompanySidebar.module.scss';
 const SIDEBAR_MENUS: TSidebarMenu[] = [
   {
     id: 'home',
-    label: 'CompanySidebar.members',
+    label: 'CompanySidebar.account',
+    nameLink: companyPaths.ContactPoint,
   },
   {
     id: 'user',
@@ -26,6 +27,11 @@ const SIDEBAR_MENUS: TSidebarMenu[] = [
         nameLink: companyPaths.GroupSetting,
       },
     ],
+  },
+  {
+    id: 'logo',
+    label: 'CompanySidebar.logo',
+    nameLink: companyPaths.Logo,
   },
 ];
 

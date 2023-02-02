@@ -140,5 +140,7 @@ export const adminRoutes = {
 export const companyPaths = {
   Home: '/company',
   Detail: '/company/[companyId]',
+  ContactPoint: '/company/[companyId]/contact-point',
   GroupSetting: '/company/[companyId]/group-setting',
+  Logo: '/company/[companyId]/logo',
 };
