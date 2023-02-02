@@ -64,6 +64,10 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         id: 'partner',
         label: 'AdminSidebar.partnerLabel',
         nameLink: adminRoutes.ManagePartners.path,
+        highlightRefLinks: [
+          adminRoutes.CreatePartner.path,
+          adminRoutes.EditPartner.path,
+        ],
         // showOnActiveChildrenMenus has all childrens that only show up when these menues is active
         // Example : Default is not showing these paths. But when the pathname === nameLink in these paths
         showOnActiveChildrenMenus: [

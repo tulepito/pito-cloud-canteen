@@ -776,5 +776,9 @@
   "UploadImageForm.limitImage": "Dung lượng ảnh không được quá 2MB",
   "UploadImageForm.selectImage": "Chọn ảnh",
   "UploadImageForm.submit": "Lưu thay đổi",
-  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại."
+  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại.",
+  "FieldAvailability.conflictEntries": "Khung giờ được chọn không được trùng với khung giờ khác trong ngày",
+  "FieldAvailability.invalidEntries": "Thời gian được chọn là bắt buộc và phải có số phút chia hết cho 5",
+  "FieldAvailability.startAndEndTimeIsDifferent": "Giờ bắt đầu và giờ kết thúc không được trùng",
+  "FieldAvailability.startAndEndTimeValdid": "Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc"
 }

@@ -1,10 +1,20 @@
+/* eslint-disable no-plusplus */
 import { InlineTextButton } from '@components/Button/Button';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import { EDayOfWeek } from '@utils/enums';
+import {
+  composeValidatorsWithAllValues,
+  entriesStartAndEndIsDifferent,
+  entriesStartAndEndIsDifferentOnEachDayOfWeek,
+  nonConflictAvailabilityEntries,
+  nonConflictAvailabilityEntriesByDayOfWeek,
+  startTimeGreaterThanEndTime,
+  startTimeGreaterThanEndTimeOnEachDayOfWeek,
+  validAvailabilityPlanEntries,
+} from '@utils/validators';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import memoize from 'lodash/memoize';
@@ -13,12 +23,13 @@ import { FieldArray } from 'react-final-form-arrays';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './FieldAvailability.module.scss';
+import FieldEntryTime from './FieldEntryTime';
 
 const defaultAvailabilityPlan = (dayOfWeek: string) => {
   return {
     dayOfWeek,
-    startTime: '07:00',
-    endTime: '22:00',
+    startTime: '06:30',
+    endTime: '23:00',
     seats: 100,
   };
 };
@@ -33,6 +44,7 @@ const printHourStrings = memoize((i: number) => {
 });
 
 const HOURS = Array(48).fill(1);
+
 const ALL_START_HOURS = [...HOURS].map((v, i) => printHourStrings(i));
 const ALL_END_HOURS = [...HOURS].map((v, i) => printHourStrings(i + 1));
 
@@ -391,7 +403,7 @@ const getNewValuesOnDayToApplyChange = ({
 };
 
 const HourlyPlan: React.FC<any> = (props) => {
-  const { values, intl, name: fieldName } = props;
+  const { intl, name: fieldName } = props;
 
   const startTimePlaceholder = intl.formatMessage({
     id: 'FieldAvailability.startTimePlaceholder',
@@ -400,79 +412,73 @@ const HourlyPlan: React.FC<any> = (props) => {
     id: 'FieldAvailability.endTimePlaceholder',
   });
 
-  const getEntryStartTimes = getEntryWeeklyBoundaries(
-    values,
-    fieldName,
-    intl,
-    true,
-  );
-  const getEntryEndTimes = getEntryWeeklyBoundaries(
-    values,
-    fieldName,
-    intl,
-    false,
-  );
   return (
     <FieldArray name={fieldName}>
       {({ fields }) => {
         return fields.map((name: any, index: number) => {
-          // Pick available start hours
-          const pickUnreservedStartHours = (h: any) =>
-            !getEntryStartTimes(index).includes(h);
-
-          const availableStartHours = ALL_START_HOURS.filter(
-            pickUnreservedStartHours,
-          );
-
-          // Pick available end hours
-          const pickUnreservedEndHours = (h: any) =>
-            !getEntryEndTimes(index).includes(h);
-
-          const availableEndHours = ALL_END_HOURS.filter(
-            pickUnreservedEndHours,
-          );
-
           return (
             <tr key={`${fieldName}.${index}`} className={css.dailyPlanWrapper}>
               <td>
-                <FieldSelect
+                <FieldEntryTime
                   id={`${name}.startTime`}
                   name={`${name}.startTime`}
-                  selectClassName={css.fieldSelect}>
-                  <option disabled value="">
-                    {startTimePlaceholder}
-                  </option>
-                  {filterStartAllWeekHours(
-                    availableStartHours,
-                    values,
-                    fieldName,
-                    index,
-                  ).map((s: any) => (
-                    <option value={s} key={s}>
-                      {s}
-                    </option>
-                  ))}
-                </FieldSelect>
+                  type="time"
+                  className={css.fieldSelect}
+                  placeholder={startTimePlaceholder}
+                  validate={composeValidatorsWithAllValues(
+                    nonConflictAvailabilityEntries(
+                      intl.formatMessage({
+                        id: 'FieldAvailability.conflictEntries',
+                      }),
+                    ),
+                    validAvailabilityPlanEntries(
+                      intl.formatMessage({
+                        id: 'FieldAvailability.invalidEntries',
+                      }),
+                    ),
+                    entriesStartAndEndIsDifferent(
+                      intl.formatMessage({
+                        id: 'FieldAvailability.startAndEndTimeIsDifferent',
+                      }),
+                    ),
+                    startTimeGreaterThanEndTime(
+                      intl.formatMessage({
+                        id: 'FieldAvailability.startAndEndTimeValdid',
+                      }),
+                    ),
+                  )}
+                />
               </td>
               <td>
-                <FieldSelect
+                <FieldEntryTime
                   id={`${name}.endTime`}
+                  className={css.fieldSelect}
                   name={`${name}.endTime`}
-                  selectClassName={css.fieldSelect}>
-                  <option disabled value="">
-                    {endTimePlaceholder}
-                  </option>
-                  {filterEndAllWeekHours(
-                    availableEndHours,
-                    values,
-                    fieldName,
-                    index,
-                  ).map((s: any) => (
-                    <option value={s} key={s}>
-                      {s}
-                    </option>
-                  ))}
-                </FieldSelect>
+                  type="time"
+                  placeholder={endTimePlaceholder}
+                  validate={composeValidatorsWithAllValues(
+                    nonConflictAvailabilityEntries(
+                      intl.formatMessage({
+                        id: 'FieldAvailability.conflictEntries',
+                      }),
+                    ),
+                    validAvailabilityPlanEntries(
+                      intl.formatMessage({
+                        id: 'FieldAvailability.invalidEntries',
+                      }),
+                    ),
+                    entriesStartAndEndIsDifferent(
+                      intl.formatMessage({
+                        id: 'FieldAvailability.startAndEndTimeIsDifferent',
+                      }),
+                    ),
+                    startTimeGreaterThanEndTime(
+                      intl.formatMessage({
+                        id: 'FieldAvailability.startAndEndTimeValdid',
+                      }),
+                    ),
+                  )}
+                />
               </td>
               <td>
                 <div
@@ -510,23 +516,7 @@ const HourlyPlan: React.FC<any> = (props) => {
 };
 
 const DailyPlan: React.FC<any> = (props) => {
-  const { dayOfWeek, values, intl, name: fieldName } = props;
-  const getEntryStartTimes = getEntryBoundaries(
-    values,
-    fieldName,
-    dayOfWeek,
-    intl,
-    true,
-  );
-
-  const getEntryEndTimes = getEntryBoundaries(
-    values,
-    fieldName,
-    dayOfWeek,
-    intl,
-    false,
-  );
-
+  const { dayOfWeek, intl, name: fieldName } = props;
   const startTimePlaceholder = intl.formatMessage({
     id: 'FieldAvailability.startTimePlaceholder',
   });
@@ -538,102 +528,109 @@ const DailyPlan: React.FC<any> = (props) => {
     <FieldArray name={`${fieldName}.${dayOfWeek}`}>
       {({ fields }) => {
         return fields.map((name: any, index: number) => {
-          // Pick available start hours
-          const pickUnreservedStartHours = (h: any) =>
-            !getEntryStartTimes(index).includes(h);
-
-          const availableStartHours = ALL_START_HOURS.filter(
-            pickUnreservedStartHours,
-          );
-
-          // Pick available end hours
-          const pickUnreservedEndHours = (h: any) =>
-            !getEntryEndTimes(index).includes(h);
-
-          const availableEndHours = ALL_END_HOURS.filter(
-            pickUnreservedEndHours,
-          );
           return (
-            <tr key={`${name}.${index + 1}`} className={css.dailyPlanWrapper}>
-              {index === 0 && (
-                <td rowSpan={fields.length}>
-                  <div className={css.dayOfWeek}>
-                    <FormattedMessage
-                      id={`FieldAvailability.${dayOfWeek}Label`}
-                    />
+            <>
+              <tr key={`${name}.${index + 1}`} className={css.dailyPlanWrapper}>
+                {index === 0 && (
+                  <td rowSpan={Number(fields.length)}>
+                    <div className={css.dayOfWeek}>
+                      <FormattedMessage
+                        id={`FieldAvailability.${dayOfWeek}Label`}
+                      />
+                    </div>
+                  </td>
+                )}
+                <td>
+                  <FieldEntryTime
+                    id={`${name}.startTime`}
+                    name={`${name}.startTime`}
+                    type="time"
+                    className={css.fieldSelect}
+                    placeholder={startTimePlaceholder}
+                    validate={composeValidatorsWithAllValues(
+                      nonConflictAvailabilityEntriesByDayOfWeek(
+                        intl.formatMessage({
+                          id: 'FieldAvailability.conflictEntries',
+                        }),
+                      ),
+                      validAvailabilityPlanEntries(
+                        intl.formatMessage({
+                          id: 'FieldAvailability.invalidEntries',
+                        }),
+                      ),
+                      entriesStartAndEndIsDifferentOnEachDayOfWeek(
+                        intl.formatMessage({
+                          id: 'FieldAvailability.startAndEndTimeIsDifferent',
+                        }),
+                      ),
+                      startTimeGreaterThanEndTimeOnEachDayOfWeek(
+                        intl.formatMessage({
+                          id: 'FieldAvailability.startAndEndTimeValdid',
+                        }),
+                      ),
+                    )}
+                  />
+                </td>
+                <td>
+                  <FieldEntryTime
+                    id={`${name}.endTime`}
+                    name={`${name}.endTime`}
+                    type="time"
+                    className={css.fieldSelect}
+                    placeholder={endTimePlaceholder}
+                    validate={composeValidatorsWithAllValues(
+                      nonConflictAvailabilityEntriesByDayOfWeek(
+                        intl.formatMessage({
+                          id: 'FieldAvailability.conflictEntries',
+                        }),
+                      ),
+                      validAvailabilityPlanEntries(
+                        intl.formatMessage({
+                          id: 'FieldAvailability.invalidEntries',
+                        }),
+                      ),
+                      entriesStartAndEndIsDifferentOnEachDayOfWeek(
+                        intl.formatMessage({
+                          id: 'FieldAvailability.startAndEndTimeIsDifferent',
+                        }),
+                      ),
+                      startTimeGreaterThanEndTimeOnEachDayOfWeek(
+                        intl.formatMessage({
+                          id: 'FieldAvailability.startAndEndTimeValdid',
+                        }),
+                      ),
+                    )}
+                  />
+                </td>
+                <td>
+                  <div
+                    className={classNames(css.tableActions, {
+                      [css.tableActionsFlexEnd]:
+                        fields && fields.length && fields.length > 0,
+                    })}>
+                    {index > 0 && (
+                      <InlineTextButton
+                        onClick={() => fields.remove(index)}
+                        className={css.addButton}>
+                        <IconClose className={css.iconClose} />
+                      </InlineTextButton>
+                    )}
+                    <InlineTextButton
+                      onClick={() =>
+                        fields.push({
+                          dayOfWeek,
+                          seets: 100,
+                          startTime: null,
+                          endTime: null,
+                        })
+                      }
+                      className={css.addButton}>
+                      <IconAdd />
+                    </InlineTextButton>
                   </div>
                 </td>
-              )}
-              <td>
-                <FieldSelect
-                  id={`${name}.startTime`}
-                  name={`${name}.startTime`}
-                  selectClassName={css.fieldSelect}>
-                  <option disabled value="">
-                    {startTimePlaceholder}
-                  </option>
-                  {filterStartHours(
-                    availableStartHours,
-                    values,
-                    fieldName,
-                    dayOfWeek,
-                    index,
-                  ).map((s: any) => (
-                    <option value={s} key={s}>
-                      {s}
-                    </option>
-                  ))}
-                </FieldSelect>
-              </td>
-              <td>
-                <FieldSelect
-                  id={`${name}.endTime`}
-                  name={`${name}.endTime`}
-                  selectClassName={css.fieldSelect}>
-                  <option disabled value="">
-                    {endTimePlaceholder}
-                  </option>
-                  {filterEndHours(
-                    availableEndHours,
-                    values,
-                    fieldName,
-                    dayOfWeek,
-                    index,
-                  ).map((s: any) => (
-                    <option value={s} key={s}>
-                      {s}
-                    </option>
-                  ))}
-                </FieldSelect>
-              </td>
-              <td>
-                <div
-                  className={classNames(css.tableActions, {
-                    [css.tableActionsFlexEnd]:
-                      fields && fields.length && fields.length > 0,
-                  })}>
-                  {index > 0 && (
-                    <InlineTextButton
-                      onClick={() => fields.remove(index)}
-                      className={css.addButton}>
-                      <IconClose className={css.iconClose} />
-                    </InlineTextButton>
-                  )}
-                  <InlineTextButton
-                    onClick={() =>
-                      fields.push({
-                        dayOfWeek,
-                        seets: 100,
-                        startTime: null,
-                        endTime: null,
-                      })
-                    }
-                    className={css.addButton}>
-                    <IconAdd />
-                  </InlineTextButton>
-                </div>
-              </td>
-            </tr>
+              </tr>
+            </>
           );
         });
       }}
@@ -798,6 +795,7 @@ const FieldAvailability = (props: any) => {
                           key={w}
                           values={values}
                           intl={intl}
+                          form={form}
                         />
                       );
                     })}
