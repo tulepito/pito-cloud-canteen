@@ -1,4 +1,5 @@
 import Form from '@components/Form/Form';
+import { calculateGroupMembersAmount } from '@helpers/companyMembers';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderAsyncAction } from '@redux/slices/Order.slice';
@@ -15,6 +16,7 @@ import DayInWeekField from '../../create/components/DayInWeekField/DayInWeekFiel
 import DeliveryAddressField from '../../create/components/DeliveryAddressField/DeliveryAddressField';
 import FoodPickingField from '../../create/components/FoodPickingField/FoodPickingField';
 import MealPlanDateField from '../../create/components/MealPlanDateField/MealPlanDateField';
+import MemberAmountField from '../../create/components/MemberAmountField/MemberAmountField';
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../../create/components/NavigateButtons/NavigateButtons';
 import NutritionField from '../../create/components/NutritionField/NutritionField';
@@ -52,6 +54,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     detailAddress,
     deadlineDate,
     deadlineHour,
+    memberAmount,
   } = LISTING(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const companies = useAppSelector(
@@ -123,6 +126,9 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       endDate: endDate || '',
       deadlineDate: deadlineDate || null,
       deadlineHour: deadlineHour || '07:00',
+      memberAmount:
+        memberAmount ||
+        calculateGroupMembersAmount(currentClient, selectedGroups),
     }),
     [
       dayInWeek,
@@ -143,6 +149,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       endDate,
       deadlineDate,
       deadlineHour,
+      memberAmount,
+      currentClient,
     ],
   );
   return (
@@ -172,6 +180,11 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
               <PerPackageField
                 title={intl.formatMessage({ id: 'PerPackageField.title' })}
               />
+              <div className={css.verticalSpace}>
+                <MemberAmountField
+                  title={intl.formatMessage({ id: 'MemberAmountField.title' })}
+                />
+              </div>
             </div>
             <div className={css.fieldSection}>
               <NutritionField

@@ -18,6 +18,8 @@ import { shallowEqual } from 'react-redux';
 
 import DeliveryAddressField from '../DeliveryAddressField/DeliveryAddressField';
 import MealPlanDateField from '../MealPlanDateField/MealPlanDateField';
+import MemberAmountField from '../MemberAmountField/MemberAmountField';
+import NutritionField from '../NutritionField/NutritionField';
 import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
 import ParticipantSetupField from '../ParticipantSetupField/ParticipantSetupField';
 import PerPackageField from '../PerPackageField/PerPackageField';
@@ -65,6 +67,7 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
     detailAddress,
     deadlineDate,
     deadlineHour,
+    memberAmount,
   } = LISTING(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const initialValues = useMemo(
@@ -84,6 +87,8 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
         : null,
       startDate: startDate || null,
       endDate: endDate || null,
+      memberAmount:
+        memberAmount || initialFieldValues[OrderSettingField.EMPLOYEE_AMOUNT],
     }),
     [
       packagePerMember,
@@ -98,6 +103,8 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
       origin,
       startDate,
       endDate,
+      memberAmount,
+      initialFieldValues,
     ],
   );
   const leftSideRenderer = () =>
@@ -181,7 +188,9 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
                 id: 'OrderSettingModal.field.employeeAmount',
               })}
             </div>
-            <div className={css.fieldContent}></div>
+            <div className={css.fieldContent}>
+              <MemberAmountField />
+            </div>
           </>
         );
       case OrderSettingField.SPECIAL_DEMAND:
@@ -192,7 +201,12 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
                 id: 'OrderSettingModal.field.specialDemand',
               })}
             </div>
-            <div className={css.fieldContent}></div>
+            <div className={css.fieldContent}>
+              <div className={css.subLabel}>
+                {intl.formatMessage({ id: 'NutritionField.title' })}
+              </div>
+              <NutritionField />
+            </div>
           </>
         );
       case OrderSettingField.ACCESS_SETTING:
