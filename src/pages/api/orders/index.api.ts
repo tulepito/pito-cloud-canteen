@@ -1,7 +1,9 @@
 import { calculateGroupMembers } from '@helpers/companyMembers';
+import cookies from '@services/cookie';
 import getAdminAccount from '@services/getAdminAccount';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import orderChecker from '@services/permissionChecker/order';
 import { handleError } from '@services/sdk';
 import subAccountLogin from '@services/subAccountLogin';
 import { ListingTypes } from '@src/types/listingTypes';
@@ -166,4 +168,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default handler;
+export default cookies(orderChecker(handler));
