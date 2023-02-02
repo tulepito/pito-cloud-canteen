@@ -28,7 +28,7 @@ type MealPlanSetupProps = {
   nextTab: () => void;
 };
 const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
-  const { goBack, nextTab } = props;
+  const { nextTab } = props;
   const dispatch = useAppDispatch();
   const intl = useIntl();
 
@@ -215,10 +215,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
               )}
             </div>
 
-            <NavigateButtons
-              goBack={goBack}
-              inProgress={updateOrderInProgress}
-            />
+            <NavigateButtons inProgress={updateOrderInProgress} />
           </Form>
         );
       }}

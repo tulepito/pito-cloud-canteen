@@ -132,6 +132,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     deadlineDate,
     deadlineHour,
   } = LISTING(order as TListing).getMetadata();
+  const { title: orderTitle } = LISTING(order as TListing).getAttributes();
   const companies = useAppSelector(
     (state) => state.ManageCompaniesPage.companyRefs,
     shallowEqual,
@@ -272,7 +273,16 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           <div className={css.titleContainer}>
             <div>
               <div className={css.row}>
-                <FormattedMessage id="SetupOrderDetail.orderId.draft" />
+                {orderTitle ? (
+                  <span className={css.orderTitle}>{`#${orderTitle}`}</span>
+                ) : (
+                  <span className={css.orderTitle}>
+                    {intl.formatMessage({
+                      id: 'SetupOrderDetail.orderId.draft',
+                    })}
+                  </span>
+                )}
+
                 <Badge label={`Đơn hàng tuần • ${partnerName}`} />
               </div>
               <div

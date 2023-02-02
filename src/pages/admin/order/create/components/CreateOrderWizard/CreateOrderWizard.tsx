@@ -8,6 +8,7 @@ import {
 } from '@redux/slices/Order.slice';
 import { LISTING } from '@utils/data';
 import { getItem, setItem } from '@utils/localStorageHelpers';
+import type { TListing } from '@utils/types';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -104,10 +105,13 @@ const CreateOrderWizard = () => {
       dispatch(manageCompaniesThunks.queryCompanies());
       dispatch(removeBookerList());
     }
+  }, [currentStep, dispatch]);
+
+  useEffect(() => {
     if (orderId) {
       dispatch(OrderAsyncAction.fetchOrder(orderId as string));
     }
-  }, [currentStep, dispatch, orderId]);
+  }, [dispatch, orderId]);
 
   useEffect(() => {
     if (!orderId) {
@@ -147,6 +151,20 @@ const CreateOrderWizard = () => {
   const tabsStatus = tabsActive(order) as any;
 
   useEffect(() => {
+    if (order) {
+      const { plans = [], staffName } = LISTING(
+        order as TListing,
+      ).getMetadata();
+      if (staffName) {
+        return setCurrentStep(REVIEW_TAB);
+      }
+      if (plans.length > 0) {
+        return setCurrentStep(CREATE_MEAL_PLAN_TAB);
+      }
+      return setCurrentStep(MEAL_PLAN_SETUP);
+    }
+  }, [order]);
+  useEffect(() => {
     // If selectedTab is not active, redirect to the beginning of wizard
     if (!tabsStatus[currentStep as string]) {
       const currentTabIndex = TABS.indexOf(currentStep as string);
@@ -162,7 +180,9 @@ const CreateOrderWizard = () => {
   return (
     <FormWizard formTabNavClassName={css.formTabNav}>
       {TABS.map((tab: string, index) => {
-        const disabled = !tabCompleted(order, TABS[index - 1]);
+        const disabled =
+          !tabCompleted(order, TABS[index - 1]) ||
+          (orderId && tab === CLIENT_SELECT_TAB);
 
         return (
           <CreateOrderTab
