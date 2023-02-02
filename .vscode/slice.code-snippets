@@ -1,7 +1,7 @@
 {
   "Add case snippet": {
     "prefix": "addCase",
-    "scope": "ts",
+    "scope": "typescript",
     "body": [
       "      /* =============== ${1:} =============== */",
       "      .addCase(${1:}.pending, (state) => {",
