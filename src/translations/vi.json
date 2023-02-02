@@ -793,5 +793,20 @@
   "EditMenuCompleteForm.foodList": "Danh sách món ăn",
   "EditMenuCompleteForm.startDate": "Ngày bắt đầu",
   "EditMenuCompleteForm.endDate": "Ngày kết thúc",
-  "EditPartnerMenuWizard.complete": "Hoàn thành"
+  "EditPartnerMenuWizard.complete": "Hoàn thành",
+  "ManagePartnerMenu.removeTitle": "Xóa Menu",
+  "ManagePartnerMenu.removeContent": "Bạn có chắc chắn muốn xoá {menuTitle} không?",
+  "ManagePartnerMenus.deletedMenu": "Menu đã bị xóa",
+  "ManagePartnerMenu.createTitle": "Thêm thực đơn",
+  "CreateMenuOptionForm.createOptionLabel": "Tạo mới",
+  "CreateMenuOptionForm.duplicateOptionLabel": "Sao chép từ thực đơn cũ",
+  "CreateMenuOptionForm.duplicateIdPlaceholder": "Chọn thực đơn",
+  "CreateMenuOptionForm.duplicateIdLabel": "Tên thực đơn",
+  "ManagePartnerMenu.createLabel": "Đồng ý",
+  "ManagePartnerMenu.cancelLabel": "Hủy",
+  "FoodEventCard.sideDishesContent": "có {boldText}",
+  "FoodEventCard.sideDishesLabel": "Món ăn kèm",
+  "ManagePartnerMenu.preventRemoveTitle": "Không thể xóa Menu",
+  "ManagePartnerMenu.preventRemoveContent": "Menu đang được triển khai trong các đơn hàng. Cập nhật danh sách đơn hàng {link}. ",
+  "ManagePartnerMenu.preventRemoveLink": "tạị đây"
 }

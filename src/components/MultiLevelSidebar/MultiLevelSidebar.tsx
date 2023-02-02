@@ -92,7 +92,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     return acc;
   }, {});
 
-  const nestedCheckChildrenActive = (menus: TSidebarMenu[]) =>
+  const nestedCheckChildrenActive = (menus: TSidebarMenu[] = []) =>
     menus.some(
       (childMenu) =>
         childMenu.nameLink === pathname ||

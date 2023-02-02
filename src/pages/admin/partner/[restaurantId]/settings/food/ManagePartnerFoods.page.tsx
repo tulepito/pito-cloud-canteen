@@ -46,8 +46,8 @@ const TABLE_COLUMN: TColumn[] = [
     render: (data: any) => {
       if (data.isDeleted) {
         return (
-          <div className={css.deletedFood}>
-            <FormattedMessage id="ManagePartnerFoods.deletedFood" />
+          <div className={css.deletedMenu}>
+            <FormattedMessage id="ManagePartnerFoods.deletedMenu" />
           </div>
         );
       }

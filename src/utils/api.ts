@@ -122,3 +122,11 @@ export const showPartnerMenuApi = (
 ) => {
   return post(`/api/admin/listings/menus/${id}`, queryParams);
 };
+
+export const queryAllMenusApi = (body: TBodyParams) => {
+  return post(`/api/admin/listings/menus/queryAll`, body);
+};
+
+export const checkMenuInTransactionProgressApi = (id: string) => {
+  return get(`/api/admin/listings/menus/${id}/isInTransactionProgress`);
+};

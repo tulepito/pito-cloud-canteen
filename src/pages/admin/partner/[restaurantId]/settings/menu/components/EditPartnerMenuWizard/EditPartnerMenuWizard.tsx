@@ -5,7 +5,7 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import type { TFormTabChildrenProps } from '@components/FormWizard/FormTabs/FormTabs';
 import FormWizard from '@components/FormWizard/FormWizard';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { menusSliceThunks } from '@redux/slices/menus.slice';
+import { menusSliceAction, menusSliceThunks } from '@redux/slices/menus.slice';
 import { adminRoutes } from '@src/paths';
 import { INTERGRATION_LISTING, LISTING } from '@utils/data';
 import { EListingStates, EMenuTypes } from '@utils/enums';
@@ -22,6 +22,7 @@ import EditMenuPricingForm from '../EditMenuPricingForm/EditMenuPricingForm';
 import css from './EditPartnerMenuWizard.module.scss';
 import type { TEditMenuFormValues } from './utils';
 import {
+  createDuplicateSubmitMenuValues,
   createSubmitMenuValues,
   EDIT_PARTNER_MENU_TABS,
   MENU_COMPLETE_TAB,
@@ -39,6 +40,7 @@ type TEditPartnerMenuTabProps = {
   menuId?: string;
   restaurantId: string;
   currentMenu?: TIntergrationListing | null;
+  duplicateId?: string;
 } & TFormTabChildrenProps;
 
 const redirectAfterDraftUpdate = (
@@ -57,16 +59,20 @@ const redirectAfterDraftUpdate = (
 };
 
 const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
-  const { tab, formRef, restaurantId, currentMenu, menuId } = props;
+  const { tab, formRef, restaurantId, currentMenu, menuId, duplicateId } =
+    props;
   const router = useRouter();
 
   const dispatch = useAppDispatch();
 
   const onSubmit = async (values: any) => {
-    const submitValues = createSubmitMenuValues(
-      { ...values, restaurantId },
-      tab,
-    );
+    const submitValues = !duplicateId
+      ? createSubmitMenuValues({ ...values, restaurantId }, tab, currentMenu)
+      : createDuplicateSubmitMenuValues(
+          { ...values, restaurantId },
+          currentMenu as TIntergrationListing,
+          tab,
+        );
     const { payload: listing } = menuId
       ? await dispatch(
           menusSliceThunks.updatePartnerMenuListing({
@@ -191,14 +197,20 @@ const EditPartnerMenuWizard = () => {
   const { query, pathname } = router;
   const formRef = useRef<FormApi>();
   const intl = useIntl();
-  const { tab, menuId, restaurantId } = query;
+  const { tab, menuId, restaurantId, duplicateId } = query;
   const selectedTab = tab || MENU_INFORMATION_TAB;
   const tabLink = (tab: string) => {
     return {
       path: !menuId
-        ? pathname
+        ? duplicateId
+          ? `/admin/partner/${restaurantId}/settings/menu/create`
+          : pathname
         : `/admin/partner/${restaurantId}/settings/menu/${menuId}`,
-      to: { search: `tab=${tab}` },
+      to: {
+        search: !duplicateId
+          ? `tab=${tab}`
+          : `tab=${tab}&duplicateId=${duplicateId}`,
+      },
     };
   };
 
@@ -212,6 +224,17 @@ const EditPartnerMenuWizard = () => {
     if (!menuId || !!currentMenu) return;
     dispatch(menusSliceThunks.showPartnerMenuListing(menuId));
   }, [dispatch, menuId, currentMenu]);
+
+  useEffect(() => {
+    if (!duplicateId || menuId) return;
+    dispatch(menusSliceThunks.showPartnerMenuListing(duplicateId));
+  }, [duplicateId, menuId, dispatch]);
+
+  useEffect(() => {
+    if (!duplicateId) {
+      dispatch(menusSliceAction.setInitialStates());
+    }
+  }, [duplicateId]);
 
   const createOrUpdateMenuInProgress = useAppSelector(
     (state) => state.menus.createOrUpdateMenuInProgress,
@@ -265,6 +288,7 @@ const EditPartnerMenuWizard = () => {
               menuId={menuId as string}
               restaurantId={restaurantId as string}
               currentMenu={currentMenu}
+              duplicateId={duplicateId as string}
             />
           );
         })}

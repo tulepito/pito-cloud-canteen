@@ -1,0 +1,10 @@
+@use '/src/styles/vars.scss' as *;
+
+.fieldSelect {
+  margin-top: 16px;
+}
+
+.iconSpinner {
+  margin-top: 16px;
+  stroke: $neutralGray6;
+}

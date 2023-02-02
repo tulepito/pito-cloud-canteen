@@ -11,7 +11,16 @@
   .title {
     font-size: 14px;
     font-weight: $fontWeightBold;
+    line-height: 24px;
   }
+  .sideDishesContent {
+    font-weight: $fontWeightRegular;
+    color: $neutralGray5;
+    .boldText {
+      font-weight: $fontWeightBold;
+    }
+  }
+
   .buttonClose {
     min-width: 16px;
     min-height: 16px;
@@ -19,7 +28,6 @@
     border-radius: 4px;
     align-items: center;
     justify-content: center;
-    border: 1px solid $neutralGray6;
     .iconClose {
       width: 7px;
       height: 7px;

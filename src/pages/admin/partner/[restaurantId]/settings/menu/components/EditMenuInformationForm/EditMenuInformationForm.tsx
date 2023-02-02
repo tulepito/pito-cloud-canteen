@@ -1,10 +1,9 @@
 import Form from '@components/Form/Form';
 import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
-import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
-import FieldDaysOfWeekCheckboxGroup from '@components/FormFields/FieldDaysOfWeekCheckboxGroup/FieldDaysOfWeekCheckboxGroup';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import { EMenuTypes, MENU_MEAL_TYPE_OPTIONS, MENU_OPTIONS } from '@utils/enums';
+import { MENU_MEAL_TYPE_OPTIONS, MENU_OPTIONS } from '@utils/enums';
+import type { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import { useImperativeHandle } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
@@ -12,6 +11,7 @@ import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { TEditMenuInformationFormValues } from '../EditPartnerMenuWizard/utils';
+import FieldMenuApplyTimeGroup from '../FieldMenuApplyTimeGroup/FieldMenuApplyTimeGroup';
 import css from './EditMenuInformationForm.module.scss';
 
 type TExtraProps = {
@@ -30,9 +30,6 @@ const EditMenuInformationFormComponent: React.FC<
 
   useImperativeHandle(formRef, () => form);
 
-  const setStartDate = (date: Date) => {
-    form.change('startDate', date);
-  };
   return (
     <Form onSubmit={handleSubmit}>
       <div className={css.wrapperFields}>
@@ -82,50 +79,10 @@ const EditMenuInformationFormComponent: React.FC<
         <h2 className={css.title}>
           <FormattedMessage id="EditMenuInformationForm.applyTimeTitle" />
         </h2>
-        <div>
-          <div className={css.fields}>
-            <FieldDatePicker
-              id="startDate"
-              name="startDate"
-              selected={values.startDate}
-              onChange={setStartDate}
-              className={css.inputDate}
-              dateFormat={'dd MMMM, yyyy'}
-              placeholderText={'Nhập ngày bắt đầu'}
-              autoComplete="off"
-              label={intl.formatMessage({
-                id: 'EditMenuInformationForm.startDateLabel',
-              })}
-            />
-            {values.menuType === EMenuTypes.cycleMenu && (
-              <FieldTextInput
-                id="numberOfCycles"
-                name="numberOfCycles"
-                placeholder={intl.formatMessage({
-                  id: 'EditMenuInformationForm.numberOfCyclesPlaceholder',
-                })}
-                label={intl.formatMessage({
-                  id: 'EditMenuInformationForm.numberOfCyclesLabel',
-                })}
-                rightIcon={
-                  <div className={css.weekSuffixed}>
-                    {intl.formatMessage({
-                      id: 'EditMenuInformationForm.week',
-                    })}
-                  </div>
-                }
-                rightIconContainerClassName={css.inputSuffixedContainer}
-              />
-            )}
-          </div>
-          <FieldDaysOfWeekCheckboxGroup
-            label={intl.formatMessage({
-              id: 'EditMenuInformationForm.daysOfWeekLabel',
-            })}
-            values={values}
-            name="daysOfWeek"
-          />
-        </div>
+        <FieldMenuApplyTimeGroup
+          values={values}
+          form={form as unknown as FormApi}
+        />
       </div>
     </Form>
   );

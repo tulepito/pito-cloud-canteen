@@ -2,7 +2,7 @@ import { InlineTextButton } from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import Form from '@components/Form/Form';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
-import { LISTING } from '@utils/data';
+import { INTERGRATION_LISTING } from '@utils/data';
 import type { TIntergrationListing } from '@utils/types';
 import type { FormApi } from 'final-form';
 import { DateTime } from 'luxon';
@@ -38,7 +38,7 @@ const renderResourcesForCalendar = (
   },
 ) => {
   const resourses: {
-    resource: { title: any; hasSideDish: boolean; id: any };
+    resource: { title: any; sideDishes: string[]; id: any };
     start: Date;
     end: Date;
   }[] = [];
@@ -49,7 +49,7 @@ const renderResourcesForCalendar = (
         resource: {
           id: foodsByDate[key][foodKey]?.id,
           title: foodsByDate[key][foodKey]?.title,
-          hasSideDish: true,
+          sideDishes: foodsByDate[key][foodKey]?.sideDishes || [],
           ...extraData,
         },
         start: DateTime.fromMillis(Number(key)).toJSDate(),
@@ -84,7 +84,7 @@ const EditMenuPricingFormComponent: React.FC<
     });
   };
 
-  const { daysOfWeek } = LISTING(currentMenu).getPublicData();
+  const { daysOfWeek } = INTERGRATION_LISTING(currentMenu).getPublicData();
 
   const resourcesForCalendar = renderResourcesForCalendar(
     values.foodsByDate || {},

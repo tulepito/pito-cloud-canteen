@@ -100,7 +100,9 @@ export const weekDayFormatFromDateTime = (dateTime: DateTime) => {
 };
 
 export const parseTimestaimpToFormat = (date: number, format?: string) => {
-  return DateTime.fromMillis(date).toFormat(format || 'dd/MM/yyyy');
+  return DateTime.fromMillis(date).toFormat(format || 'dd/MM/yyyy', {
+    locale: 'vi',
+  });
 };
 
 export const addWeeksToDate = (dateObj: Date, numberOfWeeks: number) => {

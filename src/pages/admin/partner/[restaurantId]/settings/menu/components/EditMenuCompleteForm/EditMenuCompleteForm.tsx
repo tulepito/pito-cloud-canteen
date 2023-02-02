@@ -39,6 +39,7 @@ const renderResourcesForCalendar = (foodsByDate: any) => {
           id: foodsByDate[key][foodKey]?.id,
           title: foodsByDate[key][foodKey]?.title,
           hideRemoveButton: true,
+          sideDishes: foodsByDate[key][foodKey]?.sideDishes || [],
         },
         start: DateTime.fromMillis(Number(key)).toJSDate(),
         end: DateTime.fromMillis(Number(key)).plus({ hour: 1 }).toJSDate(),
@@ -94,7 +95,8 @@ const EditMenuCompleteFormComponent: React.FC<
                 <FormattedMessage id="EditMenuCompleteForm.startDate" />
               </label>
               <div className={css.title}>
-                {parseTimestaimpToFormat(startDate, 'EEE, dd MMMM, yyyy')}
+                {startDate &&
+                  parseTimestaimpToFormat(startDate, 'EEE, dd MMMM, yyyy')}
               </div>
             </div>
             {!isFixedMenu && (
@@ -103,7 +105,6 @@ const EditMenuCompleteFormComponent: React.FC<
                   <FormattedMessage id="EditMenuCompleteForm.menuType" />
                 </label>
                 <div>
-                  {' '}
                   {endDate &&
                     parseTimestaimpToFormat(endDate, 'EEE, dd MMMM, yyyy')}
                 </div>
