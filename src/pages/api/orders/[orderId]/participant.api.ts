@@ -1,5 +1,5 @@
 import cookies from '@services/cookie';
-import { getIntegrationSdk } from '@services/sdk';
+import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
@@ -14,7 +14,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     case 'GET':
       break;
     case 'POST':
-      {
+      try {
         const {
           query: { orderId = '' },
           body: {
@@ -37,6 +37,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             statusCode: 401,
             message: `The email ${email} is not belong any account`,
           });
+          return;
         }
 
         const userId = user?.id?.uuid;
@@ -51,6 +52,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             statusCode: 400,
             message: `Participant is already in accessible list`,
           });
+          return;
         }
 
         if (!isUserInCompany) {
@@ -58,6 +60,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             statusCode: 400,
             message: `Participant is not belong to company ${companyId}`,
           });
+          return;
         }
 
         const newOrderDetail = Object.entries(orderDetail).reduce(
@@ -96,15 +99,52 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
         });
 
-        res.json({
+        res.status(200).json({
           statusCode: 200,
           message: `Successfully add participant, email: ${email}`,
         });
+      } catch (error) {
+        handleError(res, error);
       }
       break;
     case 'PUT':
       break;
     case 'DELETE':
+      try {
+        const {
+          query: { orderId = '' },
+          body: {
+            planId = '',
+            participantId = '',
+            participants,
+            newOrderDetail = {},
+          },
+        } = req;
+
+        if (participants) {
+          await integrationSdk.listings.update({
+            id: orderId,
+            metadata: {
+              participants,
+            },
+          });
+        }
+        if (planId?.length > 0) {
+          await integrationSdk.listings.update({
+            id: planId,
+            metadata: {
+              orderDetail: newOrderDetail,
+            },
+          });
+        }
+
+        res.json({
+          statusCode: 200,
+          message: `Successfully delete participant, participantId: ${participantId}`,
+        });
+      } catch (error) {
+        handleError(res, error);
+      }
       break;
     default:
       break;

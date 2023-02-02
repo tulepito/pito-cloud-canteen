@@ -1,7 +1,7 @@
 import type { TObject } from '@utils/types';
 
 import type { TBodyParams } from './configs';
-import { getApi, postApi, putApi } from './configs';
+import { deleteApi, getApi, postApi, putApi } from './configs';
 
 type CreateOrderApiBody = {
   companyId: string;
@@ -71,11 +71,11 @@ export const loadBookerOrderDataApi = (orderId: string) =>
 export const updateOrderDetailsApi = (orderId: string, body: TObject) =>
   postApi(`/orders/${orderId}`, body);
 
-export const deleteParticipantFromOrderApi = (orderId: string, body: TObject) =>
-  postApi(`/orders/${orderId}/delete-participant`, body);
-
 export const addParticipantToOrderApi = (orderId: string, body: TObject) =>
-  postApi(`/orders/${orderId}/add-participant`, body);
+  postApi(`/orders/${orderId}/participant`, body);
+
+export const deleteParticipantFromOrderApi = (orderId: string, body: TObject) =>
+  deleteApi(`/orders/${orderId}/participant`, body);
 
 export const addUpdateMemberOrder = (orderId: string, body: TObject) =>
   putApi(`/orders/${orderId}/member-order`, body);

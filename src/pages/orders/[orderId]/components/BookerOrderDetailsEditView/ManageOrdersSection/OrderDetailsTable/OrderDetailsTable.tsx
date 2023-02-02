@@ -3,7 +3,6 @@ import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderManagementThunks } from '@pages/orders/[orderId]/OrderManagement.slice';
 import type { TObject } from '@utils/types';
-import classNames from 'classnames';
 import get from 'lodash/get';
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -18,7 +17,7 @@ import {
   SELECTED_TABLE_HEAD_IDS,
   TABLE_TABS,
 } from './OrderDetailsTable.utils';
-import { OrderDetailsTableComponent } from './OrderDetailsTableComponent';
+import { usePrepareTabItems } from './usePrepareTabItems';
 
 type TOrderDetailsTableProps = {
   currentViewDate: number;
@@ -125,63 +124,15 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
     [],
   );
 
-  const tabItems = Object.values(TABLE_TABS).map((itemValue) => {
-    const { id: tabId, value: tabValue } = itemValue;
-    const tabData = allTabData[tabValue];
-
-    const numberClasses = classNames(css.number, {
-      [css.numberActive]: tabId === currentTab,
-    });
-
-    const label = (
-      <div className={css.tabItemContainer}>
-        <span>{intl.formatMessage({ id: tabId })}</span>
-        <div className={numberClasses}>{tabData.length}</div>
-      </div>
-    );
-
-    let children = <></>;
-    const initialParams = {
-      tab: tabValue,
-      tableHeads,
-      onClickDeleteOrderItem: handleClickDeleteOrderItem,
-      onClickEditOrderItem: handleClickEditOrderItem,
-      data: tabData,
-      deletedTabData,
-      onRestoreMembers: handleRestoreMembers,
-      onDeletePermanentlyMembers: handleDeletePermanentlyMembers,
-    };
-
-    switch (tabValue) {
-      case EOrderDetailsTableTab.chose:
-        children = (
-          <>
-            {tabData.length > 0 ? (
-              <OrderDetailsTableComponent {...initialParams} />
-            ) : (
-              <p className={css.noChoices}>
-                {intl.formatMessage({ id: 'OrderDetailsTable.noChoices' })}
-              </p>
-            )}
-          </>
-        );
-        break;
-      case EOrderDetailsTableTab.notChoose:
-        children = <OrderDetailsTableComponent {...initialParams} />;
-        break;
-      case EOrderDetailsTableTab.notJoined:
-        children = <OrderDetailsTableComponent {...initialParams} />;
-        break;
-
-      default:
-        break;
-    }
-
-    return {
-      id: tabId,
-      label,
-      children,
-    };
+  const tabItems = usePrepareTabItems({
+    allTabData,
+    tableHeads,
+    deletedTabData,
+    currentTab,
+    handleClickEditOrderItem,
+    handleClickDeleteOrderItem,
+    handleRestoreMembers,
+    handleDeletePermanentlyMembers,
   });
 
   const handleTabChange = ({ id }: TTabsItem) => {

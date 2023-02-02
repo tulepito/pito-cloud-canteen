@@ -17,7 +17,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const orderResponse = await integrationSdk.listings.show({
           id: orderId,
         });
-        const orderListing = denormalisedResponseEntities(orderResponse)[0];
+        const [orderListing] = denormalisedResponseEntities(orderResponse);
         const {
           plans = [],
           companyId,
@@ -27,7 +27,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const companyResponse = await integrationSdk.users.show({
           id: companyId,
         });
-        const companyUser = denormalisedResponseEntities(companyResponse)[0];
+        const [companyUser] = denormalisedResponseEntities(companyResponse);
 
         let data: TObject = { companyId, companyData: companyUser };
         const participantData = await Promise.all(
