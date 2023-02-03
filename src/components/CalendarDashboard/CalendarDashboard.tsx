@@ -26,6 +26,8 @@ type TCalendarDashboardProps = {
   companyLogo?: ReactNode;
   components?: TCalendarItemCardComponents;
   inProgress?: boolean;
+  hideMonthView?: boolean;
+  hideWeekView?: boolean;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
@@ -38,6 +40,8 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   companyLogo,
   components,
   inProgress,
+  hideMonthView,
+  hideWeekView,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
 
@@ -45,23 +49,27 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
 
   const classes = classNames(rootClassName || css.root, className);
 
-  const MonthViewWrapper = createMonthViewWrapper({
-    renderEvent,
-    customComponents: components,
-  });
-  const WeekViewWrapper = withWeekViewWrapper({
-    inProgress,
-    renderEvent,
-    customComponents: components,
-  });
+  const MonthViewWrapper = !hideMonthView
+    ? createMonthViewWrapper({
+        renderEvent,
+        customComponents: components,
+      })
+    : false;
+  const WeekViewWrapper = !hideWeekView
+    ? withWeekViewWrapper({
+        inProgress,
+        renderEvent,
+        customComponents: components,
+      })
+    : false;
 
   const { defaultDate, views } = useMemo(
     () => ({
       defaultDate:
         propsDefaultDate || DateTime.now().startOf('week').toJSDate(),
       views: {
-        week: WeekViewWrapper as any,
-        month: MonthViewWrapper as any,
+        ...(hideWeekView ? {} : { week: WeekViewWrapper as any }),
+        ...(hideMonthView ? {} : { month: MonthViewWrapper as any }),
       } as ViewsProps,
     }),
     // If you guys want to update defaultDate for calendar when props.propsDefaultDate
@@ -87,6 +95,10 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
     setCalDate(anchorDate);
   }, [anchorDate]);
 
+  const defaultToolbar = (props: any) => (
+    <Toolbar {...props} {...toolbarExtraProps} />
+  );
+
   return (
     <div className={classes}>
       <Calendar
@@ -96,9 +108,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
         events={events}
         views={views}
         components={{
-          toolbar: (props: any) => (
-            <Toolbar {...props} {...toolbarExtraProps} />
-          ),
+          toolbar: components?.toolbar || defaultToolbar,
         }}
       />
     </div>

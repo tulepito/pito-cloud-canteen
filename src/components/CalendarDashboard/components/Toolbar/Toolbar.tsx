@@ -47,6 +47,7 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
         </Button>
       ));
     }
+    return <div></div>;
   };
 
   return (
@@ -55,7 +56,11 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
         <div className={css.companyId}>{companyLogo}</div>
       </div>
       <div className={css.actions}>
-        <div className={css.viewModeGroup}>{viewNamesGroupFunc()}</div>
+        {views.length > 1 ? (
+          <div className={css.viewModeGroup}>{viewNamesGroupFunc()}</div>
+        ) : (
+          <div />
+        )}
         {shouldShowNavigateToday && (
           <Button
             className={css.todayBtn}

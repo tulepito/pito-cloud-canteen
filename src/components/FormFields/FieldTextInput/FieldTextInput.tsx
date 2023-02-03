@@ -16,11 +16,12 @@ type InputComponentProps = FieldRenderProps<string, any> & {
   inputRootClass?: string;
   disabled?: boolean;
   labelClassName?: string;
+  rightIconClassName?: string;
   customErrorText?: string;
   isUncontrolled?: boolean;
   input: any;
   meta: any;
-  inputRef: any;
+  inputRef?: any;
   fullWidth?: boolean;
   leftIcon?: TIconComponent;
   rightIcon?: TIconComponent;
@@ -28,7 +29,9 @@ type InputComponentProps = FieldRenderProps<string, any> & {
   showText?: boolean;
 };
 
-const FieldTextInputComponent: React.FC<InputComponentProps> = (props) => {
+export const FieldTextInputComponent: React.FC<InputComponentProps> = (
+  props,
+) => {
   const {
     label,
     id,
@@ -37,6 +40,7 @@ const FieldTextInputComponent: React.FC<InputComponentProps> = (props) => {
     inputRootClass,
     disabled,
     labelClassName,
+    rightIconClassName,
     customErrorText,
     isUncontrolled = false,
     fullWidth = true,
@@ -136,7 +140,10 @@ const FieldTextInputComponent: React.FC<InputComponentProps> = (props) => {
             <div className={css.leftIconContainer}>{leftIconElement}</div>
           )}
           <input {...inputProps} />
-          <div className={css.rightIconContainer}>{rightIconElement}</div>
+          <div
+            className={classNames(css.rightIconContainer, rightIconClassName)}>
+            {rightIconElement}
+          </div>
         </div>
       )}
       <ValidationError fieldMeta={fieldMeta} />

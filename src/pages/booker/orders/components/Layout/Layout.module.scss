@@ -1,10 +1,19 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
+  position: relative;
   display: flex;
   min-height: calc(100vh - 65px);
 }
 
 .layoutMain {
-  flex-grow: 1;
+  box-sizing: border-box;
+  flex-basis: calc(100vw);
+
+  @include viewportLargeWithPaddings {
+    padding-left: 0;
+    flex-basis: unset;
+    flex-grow: 1;
+  }
 }

@@ -15,6 +15,7 @@
 }
 
 .hideMain {
+  position: absolute;
   left: -240px;
   opacity: 0;
 }
@@ -62,10 +63,11 @@
   opacity: 0;
   background-color: $neutralGray1;
   transition: 0.3s linear;
-  padding: 28px;
+  padding: 0 28px 28px;
 }
 
 .showDetailContent {
+  position: relative;
   left: 0px;
   opacity: 1;
 }
@@ -88,4 +90,5 @@
 
 .detailsTitle {
   @include textTemplate(20px, 700, 32px);
+  margin-bottom: 24px;
 }

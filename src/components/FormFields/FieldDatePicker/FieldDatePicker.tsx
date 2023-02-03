@@ -15,7 +15,9 @@ type FieldDatePickerProps = FieldRenderProps<string, any> & {
   name?: string;
 };
 
-const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (props) => {
+export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
+  props,
+) => {
   const {
     className,
     label,
@@ -30,8 +32,8 @@ const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (props) => {
   const onInputChange = (date: Date, event: any) => {
     if (typeof onDatePickerChange === 'function') {
       onDatePickerChange(date, event);
-      onChange(date?.getTime());
     }
+    onChange(date?.getTime());
   };
   const { invalid, touched, error } = meta;
   const errorText = customErrorText || error;

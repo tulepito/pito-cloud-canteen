@@ -4,6 +4,13 @@ import classNames from 'classnames';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import AccessForm from '../../forms/AccessForm';
+import DeliveryTimeForm from '../../forms/DeliveryTimeForm';
+import ExpiredTimeForm from '../../forms/ExpiredTimeForm';
+import LocationForm from '../../forms/LocationForm';
+import NumberEmployeesForm from '../../forms/NumberEmployeesForm';
+import NutritionForm from '../../forms/NutritionForm';
+import UnitBudgetForm from '../../forms/UnitBudgetForm';
 import css from './SidebarContent.module.scss';
 
 type TSidebarContentProps = {
@@ -42,6 +49,27 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({ className }) => {
 
   const handleCloseDetails = () => {
     setIsOpenDetails(false);
+  };
+
+  const renderForm = () => {
+    switch (isOpenDetails) {
+      case 'location':
+        return <LocationForm onSubmit={() => null} />;
+      case 'deliveryTime':
+        return <DeliveryTimeForm onSubmit={() => null} />;
+      case 'expiredTime':
+        return <ExpiredTimeForm onSubmit={() => null} />;
+      case 'numberEmployees':
+        return <NumberEmployeesForm onSubmit={() => null} />;
+      case 'nutrition':
+        return <NutritionForm onSubmit={() => null} />;
+      case 'access':
+        return <AccessForm onSubmit={() => null} />;
+      case 'unitBudget':
+        return <UnitBudgetForm onSubmit={() => null} />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -85,6 +113,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({ className }) => {
             />
           )}
         </div>
+        <div className={css.detailsForm}>{renderForm()}</div>
       </div>
     </div>
   );

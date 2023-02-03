@@ -1,0 +1,33 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.fieldGroups {
+  margin-bottom: 18px;
+}
+
+.checkboxItem {
+  margin-bottom: 10px;
+  @include checkBoxInputStyles;
+
+  .labelText {
+    cursor: pointer;
+    @include textTemplate(14px, 400, 24px);
+  }
+}
+
+.groupsSettings {
+  @include textTemplate(14px, 700, 24px);
+  margin-bottom: 24px;
+  cursor: pointer;
+}
+
+.emptyGroups {
+  @include textTemplate(14px, 400, 20px);
+  color: $neutralGray5;
+  margin-bottom: 16px;
+}
+
+.submitBtn {
+  width: 100%;
+}
