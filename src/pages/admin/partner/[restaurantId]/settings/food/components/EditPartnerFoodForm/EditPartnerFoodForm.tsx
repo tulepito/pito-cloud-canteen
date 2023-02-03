@@ -22,6 +22,7 @@ import {
 import { pickRenderableImages } from '@utils/images';
 import {
   composeValidators,
+  minPriceLength,
   nonEmptyImageArray,
   numberMinLength,
   parsePrice,
@@ -314,7 +315,7 @@ const EditPartnerFoodFormComponent: React.FC<
             required(
               intl.formatMessage({ id: 'EditPartnerFoodForm.priceRequired' }),
             ),
-            numberMinLength(
+            minPriceLength(
               intl.formatMessage({
                 id: 'EditPartnerFoodForm.priceMinLength',
               }),
