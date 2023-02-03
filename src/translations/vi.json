@@ -808,6 +808,7 @@
   "ReviewOrdersResultSection.viewResultText": "Xem kết quả chọn",
   "ReviewTitleSection.goBackText": "Quay lại",
   "ReviewTitleSection.title": "Xem lại thông tin đơn hàng {orderTitle}",
+  "SearchOrderForm.keywordsField.placeholder": "Tìm đơn hàng",
   "SearchRestaurantForm.findRestaurantByName": "Tìm tên nhà hàng",
   "SearchRestaurantForm.selectThisRestaurant": "Chọn nhà hàng này",
   "SectionCountdown.orderEndAtLabel": "Kết thúc vào",
