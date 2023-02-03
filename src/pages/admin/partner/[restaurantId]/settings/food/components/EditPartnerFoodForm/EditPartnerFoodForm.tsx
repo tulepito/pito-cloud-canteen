@@ -231,10 +231,6 @@ const EditPartnerFoodFormComponent: React.FC<
               required(
                 intl.formatMessage({ id: 'EditPartnerFoodForm.unitRequired' }),
               ),
-              numberMinLength(
-                intl.formatMessage({ id: 'EditPartnerFoodForm.unitMinLength' }),
-                0,
-              ),
             )}
           />
         </div>

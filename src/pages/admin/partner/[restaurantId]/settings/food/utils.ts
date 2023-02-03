@@ -6,6 +6,13 @@ import type { TImage } from '@utils/types';
 
 const { Money } = sdkTypes;
 
+const parsePriceToMoneyFormat = (price: string) => {
+  const priceRemoveComma = price.toString().split(',');
+  const mergeWithoutComma = priceRemoveComma.join('');
+  const parsedPrice = Number(mergeWithoutComma);
+  return new Money(Number(parsedPrice), 'VND');
+};
+
 export type TEditPartnerFoodFormValues = {
   id?: string;
   images: TImage[];
@@ -39,11 +46,14 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
     restaurantId,
     ...rest
   } = values;
+  const priceRemoveComma = price.toString().split(',');
+  const mergeWithoutComma = priceRemoveComma.join('');
+  const parsePrice = Number(mergeWithoutComma);
   return {
     images: getUniqueImages([...getSubmitImageId(images)]),
     title,
     description,
-    price: new Money(Number(price), 'VND'),
+    price: new Money(Number(parsePrice), 'VND'),
     publicData: {
       ...rest,
     },
@@ -70,7 +80,7 @@ export const getUpdateFoodData = (values: TEditPartnerFoodFormValues) => {
     images: getUniqueImages([...getSubmitImageId(images)]),
     title,
     description,
-    price: new Money(Number(price), 'VND'),
+    price: parsePriceToMoneyFormat(price),
     publicData: {
       ...rest,
     },
@@ -92,7 +102,7 @@ export const getDuplicateData = (values: TEditPartnerFoodFormValues) => {
     ...(images ? { images: images.filter((i: TImage) => !!i) } : {}),
     title,
     description,
-    price: new Money(Number(price), 'VND'),
+    price: parsePriceToMoneyFormat(price),
     publicData: {
       ...rest,
     },
@@ -120,7 +130,7 @@ export const getImportDataFromCsv = (values: any) => {
     ...(images ? { images: images.filter((i: TImage) => !!i) } : {}),
     title,
     description,
-    price: new Money(Number(price), 'VND'),
+    price: parsePriceToMoneyFormat(price),
     publicData: {
       specialDiets: specialDiets.split(','),
       sideDishes: sideDishes.split(','),

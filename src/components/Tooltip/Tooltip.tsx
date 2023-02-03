@@ -48,6 +48,7 @@ const Tooltip: React.FC<TTooltipProps> = (props) => {
     overlayInnerStyle,
     destroyTooltipOnHide: true,
     showArrow,
+    visible: true,
   };
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

@@ -60,7 +60,7 @@ const BADGE_CLASSNAME_BASE_ON_ORDER_STATE = {
   [EOrderStates.picking]: css.badgeWarning,
 };
 
-const OrderDetailTooltip = ({ orderDetail }: any) => {
+const OrderDetailTooltip = ({ orderDetail = {} }: any) => {
   const orderDetails = Object.keys(orderDetail).map((key) => {
     const { status, foodList } = orderDetail[key];
     const totalPrice = Object.keys(foodList).reduce((prev, cur) => {
@@ -117,7 +117,7 @@ const TABLE_COLUMN: TColumn[] = [
       return (
         <NamedLink path={`${adminRoutes.ManageOrders.path}/${data.id}`}>
           <Tooltip
-            overlayInnerStyle={{ backgroundColor: '#ffffff' }}
+            overlayInnerStyle={{ backgroundColor: '#ffffff', opacity: 1 }}
             showArrow={false}
             tooltipContent={
               <OrderDetailTooltip orderDetail={data.orderDetail} />
@@ -193,14 +193,6 @@ const TABLE_COLUMN: TColumn[] = [
     sortable: true,
   },
   {
-    key: 'shipperName',
-    label: 'Nhân viên giao hàng',
-    render: (data: any) => {
-      return <div>{data.shipperName}</div>;
-    },
-    sortable: true,
-  },
-  {
     key: 'state',
     label: 'Trạng thái',
     render: ({ state }: { state: EOrderStates }) => {
@@ -242,23 +234,20 @@ const parseEntitiesToTableData = (
   return orders.map((entity, index) => {
     const { company } = entity;
     const { orderDetail = {} } = entity?.attributes?.metadata || {};
+    const { startDate, endDate, orderState, staffName, deliveryAddress } =
+      entity?.attributes?.metadata?.generalInfo || {};
     return {
       key: entity.id.uuid,
       data: {
         id: entity.id.uuid,
         title: entity.attributes.title,
         orderNumber: (page - 1) * 10 + index + 1,
-        location:
-          entity?.attributes?.metadata?.generalInfo?.deliveryAddress?.address,
+        location: deliveryAddress?.address,
         companyName: company?.attributes.profile.displayName,
-        startDate: parseTimestampToFormat(
-          entity?.attributes?.metadata?.generalInfo?.startDate,
-        ),
-        endDate: parseTimestampToFormat(
-          entity?.attributes?.metadata?.generalInfo?.endDate,
-        ),
-        staffName: entity?.attributes?.metadata?.generalInfo?.staffName,
-        state: entity.attributes.metadata?.orderState || EOrderStates.isNew,
+        startDate: startDate && parseTimestampToFormat(startDate),
+        endDate: endDate && parseTimestampToFormat(endDate),
+        staffName,
+        state: orderState || EOrderStates.isNew,
         orderId: entity?.id?.uuid,
         restaurants: uniqueStrings(
           Object.keys(orderDetail).map((key) => {
@@ -409,9 +398,14 @@ const ManageOrdersPage = () => {
 
   return (
     <div className={css.root}>
-      <h1 className={css.title}>
-        <FormattedMessage id="ManageOrders.title" />
-      </h1>
+      <div className={css.pageHeader}>
+        <h1 className={css.title}>
+          <FormattedMessage id="ManageOrders.title" />
+        </h1>
+        <NamedLink path={adminRoutes.CreateOrder.path}>
+          <Button>Tạo đơn</Button>
+        </NamedLink>
+      </div>
       <div className={css.filterForm}>
         <IntegrationFilterModal
           onClear={onClearFilter}
@@ -480,9 +474,6 @@ const ManageOrdersPage = () => {
             );
           }}
         </IntegrationFilterModal>
-        <NamedLink path={adminRoutes.CreateOrder.path}>
-          <Button>Tạo đơn</Button>
-        </NamedLink>
       </div>
       {content}
     </div>
