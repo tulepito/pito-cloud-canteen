@@ -180,11 +180,13 @@ const Table = (props: TTableProps) => {
             </tr>
           </tbody>
         ) : data.length === 0 ? (
-          <tr>
-            <td colSpan={columns.length} className={css.emptyCell}>
-              <FormattedMessage id="Table.noResults" />
-            </td>
-          </tr>
+          <tbody>
+            <tr>
+              <td colSpan={columns.length} className={css.emptyCell}>
+                <FormattedMessage id="Table.noResults" />
+              </td>
+            </tr>
+          </tbody>
         ) : (
           <tbody className={tableBodyClassName}>
             {showFilterFrom && (
@@ -227,6 +229,7 @@ const Table = (props: TTableProps) => {
                     )}>
                     <FieldCheckbox
                       labelClassName={css.checkboxLabel}
+                      svgClassName={css.checkboxSvg}
                       name="rowCheckbox"
                       id={`rowCheckbox.${row.key}`}
                       value={row.key as any}

@@ -6,11 +6,13 @@ import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import EditPartnerFoodForm from '../components/EditPartnerFoodForm/EditPartnerFoodForm';
 import type { TEditPartnerFoodFormValues } from '../utils';
 import { getDuplicateData, getSubmitFoodData } from '../utils';
+import css from './CreatePartnerFood.module.scss';
 
 const CreatePartnerFoodPage = () => {
   const dispatch = useAppDispatch();
@@ -78,12 +80,17 @@ const CreatePartnerFoodPage = () => {
   }
 
   return (
-    <EditPartnerFoodForm
-      onSubmit={handleSubmit}
-      initialValues={initialValues}
-      inProgress={createFoodInProgress}
-      formError={createFoodError}
-    />
+    <>
+      <h3 className={css.title}>
+        <FormattedMessage id="CreatePartnerFood.title" />
+      </h3>
+      <EditPartnerFoodForm
+        onSubmit={handleSubmit}
+        initialValues={initialValues}
+        inProgress={createFoodInProgress}
+        formError={createFoodError}
+      />
+    </>
   );
 };
 

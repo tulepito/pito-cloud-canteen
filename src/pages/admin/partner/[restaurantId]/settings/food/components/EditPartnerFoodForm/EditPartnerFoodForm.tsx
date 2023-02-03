@@ -24,6 +24,7 @@ import {
   composeValidators,
   nonEmptyImageArray,
   numberMinLength,
+  parsePrice,
   required,
 } from '@utils/validators';
 import classNames from 'classnames';
@@ -115,59 +116,62 @@ const EditPartnerFoodFormComponent: React.FC<
         ))}
       </div>
       <div className={css.flexField}>
-        <FieldTextInput
-          className={css.field}
-          type="number"
-          name="minOrderHourInAdvance"
-          id="minOrderHourInAdvance"
-          placeholder={intl.formatMessage({
-            id: 'EditPartnerFoodForm.orderHourInAdvancePlaceholder',
-          })}
-          label={intl.formatMessage({
-            id: 'EditPartnerFoodForm.orderHourInAdvanceLabel',
-          })}
-          rightIcon={<div className={css.inputSuffixed}>h</div>}
-          validate={composeValidators(
-            required(
-              intl.formatMessage({
-                id: 'EditPartnerFoodForm.minOrderHourInAdvanceRequired',
-              }),
-            ),
-            numberMinLength(
-              intl.formatMessage({
-                id: 'EditPartnerFoodForm.minOrderHourInAdvanceInvalid',
-              }),
-              1,
-            ),
-          )}
-        />
-        <FieldTextInput
-          className={css.field}
-          name="minQuantity"
-          type="number"
-          id="minQuantity"
-          placeholder={intl.formatMessage({
-            id: 'EditPartnerFoodForm.minQuantityPerOrderPlaceholder',
-          })}
-          label={intl.formatMessage({
-            id: 'EditPartnerFoodForm.minQuantityPerOrderLabel',
-          })}
-          rightIcon={<div className={css.inputSuffixed}>phần</div>}
-          rightIconContainerClassName={css.inputSuffixedContainer}
-          validate={composeValidators(
-            required(
-              intl.formatMessage({
-                id: 'EditPartnerFoodForm.minQuantityRequired',
-              }),
-            ),
-            numberMinLength(
-              intl.formatMessage({
-                id: 'EditPartnerFoodForm.minQuantityInvalid',
-              }),
-              1,
-            ),
-          )}
-        />
+        <div className={css.field}>
+          <label className={css.label}>
+            {intl.formatMessage({
+              id: 'EditPartnerFoodForm.minQuantityPerOrderLabel',
+            })}
+          </label>
+          <div className={css.minOrderFields}>
+            <FieldTextInput
+              className={css.minOrderField}
+              type="number"
+              name="minOrderHourInAdvance"
+              id="minOrderHourInAdvance"
+              placeholder={intl.formatMessage({
+                id: 'EditPartnerFoodForm.orderHourInAdvancePlaceholder',
+              })}
+              rightIcon={<div className={css.inputSuffixed}>h</div>}
+              validate={composeValidators(
+                required(
+                  intl.formatMessage({
+                    id: 'EditPartnerFoodForm.minOrderHourInAdvanceRequired',
+                  }),
+                ),
+                numberMinLength(
+                  intl.formatMessage({
+                    id: 'EditPartnerFoodForm.minOrderHourInAdvanceInvalid',
+                  }),
+                  1,
+                ),
+              )}
+            />
+            <FieldTextInput
+              className={css.minOrderField}
+              name="minQuantity"
+              type="number"
+              id="minQuantity"
+              placeholder={intl.formatMessage({
+                id: 'EditPartnerFoodForm.minQuantityPerOrderPlaceholder',
+              })}
+              rightIcon={<div className={css.inputSuffixed}>phần</div>}
+              rightIconContainerClassName={css.inputSuffixedContainer}
+              validate={composeValidators(
+                required(
+                  intl.formatMessage({
+                    id: 'EditPartnerFoodForm.minQuantityRequired',
+                  }),
+                ),
+                numberMinLength(
+                  intl.formatMessage({
+                    id: 'EditPartnerFoodForm.minQuantityInvalid',
+                  }),
+                  1,
+                ),
+              )}
+            />
+          </div>
+        </div>
         <FieldTextInput
           className={css.field}
           name="maxMember"
@@ -286,6 +290,18 @@ const EditPartnerFoodFormComponent: React.FC<
       </div>
       <div className={css.flexField}>
         <FieldTextInput
+          className={css.field}
+          name="ingredients"
+          id="ingredients"
+          placeholder={intl.formatMessage({
+            id: 'EditPartnerFoodForm.ingredientsPlaceholder',
+          })}
+          label={intl.formatMessage({
+            id: 'EditPartnerFoodForm.ingredientsLabel',
+          })}
+        />
+
+        <FieldTextInput
           className={classNames(css.field, css.priceField)}
           name="price"
           id="price"
@@ -305,7 +321,10 @@ const EditPartnerFoodFormComponent: React.FC<
               1000,
             ),
           )}
+          parse={parsePrice}
         />
+      </div>
+      <div className={css.flexField}>
         <FieldMultipleSelect
           className={css.field}
           name="sideDishes"
@@ -318,20 +337,6 @@ const EditPartnerFoodFormComponent: React.FC<
           })}
           options={SIDE_DISH_OPTIONS}
         />
-      </div>
-      <div className={css.flexField}>
-        <FieldTextInput
-          className={css.field}
-          name="ingredients"
-          id="ingredients"
-          placeholder={intl.formatMessage({
-            id: 'EditPartnerFoodForm.ingredientsPlaceholder',
-          })}
-          label={intl.formatMessage({
-            id: 'EditPartnerFoodForm.ingredientsLabel',
-          })}
-        />
-
         <div className={css.field}></div>
       </div>
       <div className={css.flexField}>
