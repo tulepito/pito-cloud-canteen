@@ -33,7 +33,7 @@ const RestaurantTable: React.FC<TRestaurantTableProps> = ({
             {restaurants?.length > 0 ? (
               restaurants.map((restaurant: any) => (
                 <Tooltip
-                  key={restaurant?.id?.uuid}
+                  key={restaurant.menu?.id?.uuid}
                   placement="bottom"
                   tooltipContent={<>{'Xem menu'}</>}>
                   <RestaurantRow

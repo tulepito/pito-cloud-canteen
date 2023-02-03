@@ -26,6 +26,7 @@ type TCalendarDashboardProps = {
   companyLogo?: ReactNode;
   components?: TCalendarItemCardComponents;
   inProgress?: boolean;
+  recommendButton?: ReactNode;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
@@ -38,6 +39,9 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   companyLogo,
   components,
   inProgress,
+  recommendButton,
+  startDate,
+  endDate,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
 
@@ -81,6 +85,10 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
 
   const toolbarExtraProps = {
     companyLogo,
+    recommendButton,
+    startDate,
+    endDate,
+    anchorDate: calDate,
   };
 
   useEffect(() => {

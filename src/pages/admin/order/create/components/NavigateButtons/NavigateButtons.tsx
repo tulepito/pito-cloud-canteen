@@ -11,7 +11,7 @@ import {
 import css from './NavigateButtons.module.scss';
 
 type TNavigateButtons = {
-  goBack: () => void;
+  goBack?: () => void;
   onNextClick?: () => void;
   inProgress?: boolean;
 };
@@ -23,9 +23,6 @@ const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
 
   return (
     <div className={css.navigationBtn}>
-      <Button onClick={goBack} type="button" className={css.backButton}>
-        <FormattedMessage id="NavigateButtons.goBack" />
-      </Button>
       <Button
         type="submit"
         className={css.nextButton}
@@ -37,6 +34,11 @@ const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
           <FormattedMessage id="NavigateButtons.continue" />
         )}
       </Button>
+      {goBack && (
+        <Button onClick={goBack} type="button" className={css.backButton}>
+          <FormattedMessage id="NavigateButtons.goBack" />
+        </Button>
+      )}
     </div>
   );
 };

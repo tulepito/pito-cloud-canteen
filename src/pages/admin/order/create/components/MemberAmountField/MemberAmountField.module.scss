@@ -9,6 +9,11 @@
 
 .fieldGroup {
   margin-top: 16px;
+
+  .amountLabel {
+    position: absolute;
+    right: 28px;
+  }
 }
 .numberInput {
   width: 400px;
@@ -27,15 +32,8 @@
     }
   }
 }
-.vndIcon {
+.label {
   border-left: 1px solid $neutralGray4;
-  padding: 0 16px;
+  padding-left: 12px;
   color: $neutralGray4;
-}
-
-.toggle {
-  flex-direction: row-reverse;
-  justify-content: flex-end;
-  margin-top: 16px;
-  gap: 15px;
 }

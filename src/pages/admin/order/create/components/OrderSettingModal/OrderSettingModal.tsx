@@ -5,7 +5,9 @@ import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { updateDraftMealPlan } from '@redux/slices/Order.slice';
+import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { LISTING } from '@utils/data';
+import type { TListing } from '@utils/types';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
 import { useMemo, useState } from 'react';
@@ -16,6 +18,8 @@ import { shallowEqual } from 'react-redux';
 
 import DeliveryAddressField from '../DeliveryAddressField/DeliveryAddressField';
 import MealPlanDateField from '../MealPlanDateField/MealPlanDateField';
+import MemberAmountField from '../MemberAmountField/MemberAmountField';
+import NutritionField from '../NutritionField/NutritionField';
 import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
 import ParticipantSetupField from '../ParticipantSetupField/ParticipantSetupField';
 import PerPackageField from '../PerPackageField/PerPackageField';
@@ -45,21 +49,26 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
   );
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const updateOrderInProgress = useAppSelector(
+    (state) => state.Order.updateOrderInProgress,
+  );
+  const order = useAppSelector((state) => state.Order.order, shallowEqual);
+
   const {
-    draftOrder: {
-      clientId,
-      packagePerMember,
-      selectedGroups = [],
-      deliveryHour,
-      deliveryAddress,
-      deadlineDate,
-      deadlineHour,
-      vatAllow = false,
-      pickAllow = true,
-      startDate,
-      endDate,
-    },
-  } = useAppSelector((state) => state.Order, shallowEqual);
+    companyId: clientId,
+    packagePerMember = '',
+    pickAllow = true,
+    vatAllow = true,
+    selectedGroups = [],
+    deliveryHour,
+    startDate,
+    endDate,
+    deliveryAddress,
+    detailAddress,
+    deadlineDate,
+    deadlineHour,
+    memberAmount,
+  } = LISTING(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const initialValues = useMemo(
     () => ({
@@ -69,6 +78,7 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
       deliveryHour: deliveryHour || '',
       deadlineDate: deadlineDate || null,
       deadlineHour: deadlineHour || null,
+      detailAddress: detailAddress || '',
       deliveryAddress: deliveryAddress
         ? {
             search: address,
@@ -77,6 +87,8 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
         : null,
       startDate: startDate || null,
       endDate: endDate || null,
+      memberAmount:
+        memberAmount || initialFieldValues[OrderSettingField.EMPLOYEE_AMOUNT],
     }),
     [
       packagePerMember,
@@ -86,10 +98,13 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
       deadlineDate,
       deadlineHour,
       deliveryAddress,
+      detailAddress,
       address,
       origin,
       startDate,
       endDate,
+      memberAmount,
+      initialFieldValues,
     ],
   );
   const leftSideRenderer = () =>
@@ -173,7 +188,9 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
                 id: 'OrderSettingModal.field.employeeAmount',
               })}
             </div>
-            <div className={css.fieldContent}></div>
+            <div className={css.fieldContent}>
+              <MemberAmountField />
+            </div>
           </>
         );
       case OrderSettingField.SPECIAL_DEMAND:
@@ -184,7 +201,12 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
                 id: 'OrderSettingModal.field.specialDemand',
               })}
             </div>
-            <div className={css.fieldContent}></div>
+            <div className={css.fieldContent}>
+              <div className={css.subLabel}>
+                {intl.formatMessage({ id: 'NutritionField.title' })}
+              </div>
+              <NutritionField />
+            </div>
           </>
         );
       case OrderSettingField.ACCESS_SETTING:
@@ -221,7 +243,7 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
     const {
       selectedPlace: { address: addressValue, origin: originValue },
     } = deliveryAddressValues;
-    const createOrderValue = {
+    const generalInfo = {
       deliveryAddress: {
         address: addressValue,
         origin: originValue,
@@ -229,7 +251,7 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
       packagePerMember: +packagePerMemberValue.replace(/,/g, ''),
       ...rest,
     };
-    dispatch(updateDraftMealPlan(createOrderValue));
+    dispatch(OrderAsyncAction.updateOrder({ generalInfo }));
   };
   return (
     <Modal
@@ -252,7 +274,8 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
                     {rightSideRenderer(form, values)}
                     <Button
                       className={css.submitBtn}
-                      disabled={invalid}
+                      disabled={invalid || updateOrderInProgress}
+                      inProgress={updateOrderInProgress}
                       type="submit">
                       {intl.formatMessage({
                         id: 'OrderSettingModal.saveChange',

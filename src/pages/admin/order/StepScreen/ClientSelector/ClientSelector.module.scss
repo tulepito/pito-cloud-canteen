@@ -2,6 +2,9 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
+.lll {
+  stroke: $neutralGray6;
+}
 .header {
   @include flexAlign(center);
   .title {

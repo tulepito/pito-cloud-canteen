@@ -135,6 +135,10 @@ export const adminRoutes = {
     path: '/admin/partner/[restaurantId]/settings/menu/create',
     label: 'Chỉnh sửa thực đơn',
   },
+  EditOrder: {
+    path: '/admin/order/[orderId]',
+    label: 'Tạo đơn hàng',
+  },
 } as const;
 
 export const companyPaths = {
