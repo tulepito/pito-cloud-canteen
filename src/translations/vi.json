@@ -97,6 +97,7 @@
   "CreateOrderWizard.mealPlanSetupLabel": "Thiết lập kế hoạch bữa ăn",
   "CreateOrderWizard.reviewLabel": "Review và tạo đơn",
   "CreateOrderWizard.serviceFeeAndNoteLabel": "Phí dịch vụ và dặn dò",
+  "CreatePartnerFood.title": "Thêm món ăn",
   "CSVFieldInput.upload": "Tải lên",
   "DayColumn.Session.AFTERNOON_SESSION": "Bữa trưa",
   "DayColumn.Session.EVENING_SESSION": "Bữa chiều",
@@ -187,6 +188,7 @@
   "EditPartnerBasicInformationForm.phoneNumberValid": "Số điện thoại không hợp lệ",
   "EditPartnerBasicInformationForm.titleRequired": "Vui lòng nhập tên thương hiệu",
   "EditPartnerBasicInformationForm.validLocation": "Địa chỉ không hợp lệ",
+  "EditPartnerFood.title": "Chỉnh sửa món ăn",
   "EditPartnerFoodForm.categoryRequired": "Vui lòng nhập phong cách ẩm thực",
   "EditPartnerFoodForm.descriptionLabel": "Mô tả",
   "EditPartnerFoodForm.descriptionPlaceholder": "Nhập mô tả",
@@ -474,6 +476,7 @@
   "FieldBankAccounts.bankOwnerNameRequired": "Vui lòng nhập tên tài khoản",
   "FieldBusinessLicensePhoto.label": "Giấy phép kinh doanh",
   "FieldCheckbox.contentRequired": "Vui lòng nhập nội dụng tại đây",
+  "FieldMultiplePhotos.addLabel": "Click chọn file hoặc kéo thả ảnh",
   "FieldMutiplePhotos.imageUploadFailed.uploadFailed": "Không thể tải hình ảnh.",
   "FieldMutiplePhotos.imageUploadFailed.uploadOverLimit": "Dung lượng hình không được quá 20MB.",
   "FieldPhotoUpload.imageUploadFailed.uploadFailed": "Không thể tải lên hình.",
@@ -787,8 +790,5 @@
   "UploadImageForm.limitImage": "Dung lượng ảnh không được quá 2MB",
   "UploadImageForm.selectImage": "Chọn ảnh",
   "UploadImageForm.submit": "Lưu thay đổi",
-  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại.",
-  "CreatePartnerFood.title": "Thêm món ăn",
-  "EditPartnerFood.title": "Chỉnh sửa món ăn",
-  "FieldMultiplePhotos.addLabel": "Click chọn file hoặc kéo thả ảnh"
+  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại."
 }
