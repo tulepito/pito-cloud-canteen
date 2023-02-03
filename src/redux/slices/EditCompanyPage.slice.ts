@@ -1,10 +1,10 @@
+import { showCompanyApi, updateCompanyApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
-import { showCompanyApi, updateCompanyApi } from '@utils/api';
 import { denormalisedResponseEntities } from '@utils/data';
 import { storableError } from '@utils/errors';
 
-type EditCompanyState = {
+type TEditCompanyState = {
   companyRef: any;
   showCompanyInProgress: boolean;
   showCompanyError: any;
@@ -48,7 +48,7 @@ export const updateCompanyPageThunks = {
   showCompany,
 };
 
-const initialState: EditCompanyState = {
+const initialState: TEditCompanyState = {
   companyRef: null,
   updateCompanyInProgress: false,
   updateCompanyError: null,

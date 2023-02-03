@@ -3,7 +3,7 @@ import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import { USER } from '@utils/data';
-import type { TUser } from '@utils/types';
+import type { TCurrentUser, TUser } from '@utils/types';
 import { emailFormatValid } from '@utils/validators';
 import difference from 'lodash/difference';
 import fill from 'lodash/fill';
@@ -27,7 +27,7 @@ type AddCompanyMembersFormProps = {
   removeEmailValue: (email: string) => void;
   addMembersInProgress: boolean;
   addMembersError: any;
-  currentUser: TUser;
+  currentUser: TUser | TCurrentUser;
 };
 
 const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {

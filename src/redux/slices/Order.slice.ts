@@ -1,14 +1,15 @@
-import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
-import { UserPermission } from '@src/types/UserPermission';
-import { fetchUserApi, queryOrdersApi } from '@utils/api';
-import { denormalisedResponseEntities, LISTING, USER } from '@utils/data';
-import { storableError } from '@utils/errors';
+import { fetchUserApi } from '@apis/index';
 import {
   createOrderApi,
   initiateTransactionsApi,
+  queryOrdersApi,
   updateOrderApi,
-} from '@utils/orderApi';
+} from '@apis/orderApi';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
+import { UserPermission } from '@src/types/UserPermission';
+import { denormalisedResponseEntities, LISTING, USER } from '@utils/data';
+import { storableError } from '@utils/errors';
 import type { TListing, TPagination } from '@utils/types';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -34,7 +35,7 @@ const updateSetUpPlan = ({
   return newOrderDetail;
 };
 
-type OrderInitialState = {
+type TOrderInitialState = {
   order: TListing | null;
   fetchOrderInProgress: boolean;
   fetchOrderError: any;
@@ -81,7 +82,7 @@ const FETCH_ORDER_DETAIL = 'app/Order/FETCH_ORDER_DETAIL';
 const INITIATE_TRANSACTIONS = 'app/Order/INITIATE_TRANSACTIONS';
 const QUERY_SUB_ORDERS = 'app/Order/QUERY_SUB_ORDERS';
 
-const initialState: OrderInitialState = {
+const initialState: TOrderInitialState = {
   order: null,
   fetchOrderInProgress: false,
   fetchOrderError: null,

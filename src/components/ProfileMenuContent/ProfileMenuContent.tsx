@@ -3,21 +3,22 @@
  * Clicking MenuLabel toggles visibility of MenuContent.
  */
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import type { CSSProperties, PropsWithChildren } from 'react';
 import React, { Children } from 'react';
 
 import css from './ProfileMenuContent.module.scss';
 
-type TProfileMenuContentProps = PropsWithChildren<{
-  rootClassName?: string;
-  className?: string;
-  contentClassName?: string;
-  arrowPosition?: number;
-  contentRef?: (e: HTMLElement | null) => HTMLElement;
-  isOpen?: boolean;
-  style?: CSSProperties;
-}>;
+type TProfileMenuContentProps = PropsWithChildren<
+  TDefaultProps & {
+    contentClassName?: string;
+    arrowPosition?: number;
+    contentRef?: (e: HTMLElement | null) => HTMLElement;
+    isOpen?: boolean;
+    style?: CSSProperties;
+  }
+>;
 
 const ProfileMenuContent: React.FC<TProfileMenuContentProps> = (props) => {
   const {

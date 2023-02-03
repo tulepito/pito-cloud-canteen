@@ -1,4 +1,5 @@
 import FormWizard from '@components/FormWizard/FormWizard';
+import { getItem, setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
 import {
@@ -7,7 +8,6 @@ import {
   resetOrder,
 } from '@redux/slices/Order.slice';
 import { LISTING } from '@utils/data';
-import { getItem, setItem } from '@utils/localStorageHelpers';
 import type { TListing } from '@utils/types';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';

@@ -236,7 +236,7 @@ export const ensureOwnListing = (listing: any) => {
  *
  * @param {Object} user entity object, which is to be ensured against null values
  */
-export const ensureUser = (user: TUser) => {
+export const ensureUser = (user: any) => {
   const empty = { id: null, type: 'user', attributes: { profile: {} } };
   return merge(empty, user);
 };
@@ -437,7 +437,7 @@ export const CURRENT_USER = (user: TCurrentUser) => {
   };
 };
 
-export const USER = (user: TUser) => {
+export const USER = (user: TUser | TCurrentUser) => {
   const ensuredUser = ensureUser(user);
   const id = ensuredUser?.id?.uuid;
   const { attributes } = ensuredUser;

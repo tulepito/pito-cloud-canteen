@@ -10,7 +10,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { OrderAsyncAction } from '@redux/slices/Order.slice';
 import { LISTING } from '@utils/data';
-import { parseTimestaimpToFormat } from '@utils/dates';
+import { parseTimestampToFormat } from '@utils/dates';
 import type { TListing } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
@@ -20,7 +20,6 @@ import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-intl/src/utils';
 
-// eslint-disable-next-line import/no-cycle
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../NavigateButtons/NavigateButtons';
 import css from './ReviewOrder.module.scss';
@@ -160,7 +159,7 @@ const generateOrderDetails = (orders: any[]) => {
       data: {
         isParent: true,
         index: index + 1,
-        label: parseTimestaimpToFormat(Number(date)),
+        label: parseTimestampToFormat(Number(date)),
         quantity: memeberDetails.length,
         price: totalDatePricing,
       },
@@ -323,7 +322,7 @@ const parseDataToReviewTab = (values: any) => {
   const items = Object.keys(orderDetail).map((key: any) => {
     return {
       key,
-      label: parseTimestaimpToFormat(Number(key)),
+      label: parseTimestampToFormat(Number(key)),
       childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
       childrenProps: { ...orderDetail[key], ...rest, order: values },
     };

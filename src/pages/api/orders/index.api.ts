@@ -1,4 +1,7 @@
-import { calculateGroupMembers } from '@helpers/companyMembers';
+import {
+  calculateGroupMembers,
+  getAllCompanyMembers,
+} from '@helpers/companyMembers';
 import cookies from '@services/cookie';
 import getAdminAccount from '@services/getAdminAccount';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
@@ -8,7 +11,8 @@ import { handleError } from '@services/sdk';
 import { getSubAccountSdk } from '@services/subAccountSdk';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities, LISTING } from '@utils/data';
-import { parseTimestaimpToFormat } from '@utils/dates';
+import { parseTimestampToFormat } from '@utils/dates';
+import { EOrderStates } from '@utils/enums';
 import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -56,7 +60,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 companyId,
                 bookerId,
                 listingType: ListingTypes.ORDER,
-                orderState: 'draft',
+                orderState: EOrderStates.isNew,
               },
             },
             { expand: true },
@@ -84,7 +88,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const subCompanyAccount = await fetchUser(subAccountId);
         const loggedinSubAccount = await getSubAccountSdk(subCompanyAccount);
         let updatedOrderListing;
+
         if (!isEmpty(generalInfo)) {
+          const newSelectedGroup = generalInfo.selectedGroups || selectedGroups;
+
+          const participants: string[] = isEmpty(newSelectedGroup)
+            ? getAllCompanyMembers(companyAccount)
+            : calculateGroupMembers(companyAccount, selectedGroups);
+
           // eslint-disable-next-line prefer-destructuring
           updatedOrderListing = denormalisedResponseEntities(
             await integrationSdk.listings.update(
@@ -93,20 +104,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 publicData: {
                   orderName: `${
                     companyAccount.attributes.profile.displayName
-                  } PCC_${parseTimestaimpToFormat(
+                  } PCC_${parseTimestampToFormat(
                     generalInfo.startDate,
-                  )} - ${parseTimestaimpToFormat(generalInfo.endDate)}`,
+                  )} - ${parseTimestampToFormat(generalInfo.endDate)}`,
                   startDate: generalInfo.startDate,
                   endDate: generalInfo.endDate,
                 },
                 metadata: {
                   ...generalInfo,
+                  participants,
                 },
               },
               { expand: true },
             ),
           )[0];
         }
+
         if (orderDetail) {
           const allMembers = calculateGroupMembers(
             companyAccount,
@@ -122,6 +135,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             }),
             {},
           );
+
           const updatedOrderDetail = Object.keys(orderDetail).reduce(
             (result, date) => {
               return {

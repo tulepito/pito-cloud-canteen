@@ -26,45 +26,48 @@ const IconCloseBadge: React.FC<TIconProps> = (props) => {
   );
 };
 
-export const BadgeType = {
-  DEFAULT: 'default',
-  PROCESSING: 'processing',
-  ERROR: 'error',
-  SUCCESS: 'success',
-  WARNING: 'warning',
-};
+export enum EBadgeType {
+  DEFAULT = 'default',
+  PROCESSING = 'processing',
+  ERROR = 'error',
+  SUCCESS = 'success',
+  WARNING = 'warning',
+}
 
-type TBadge = {
-  type?: 'default' | 'processing' | 'error' | 'success' | 'warning';
+type TBadgeProps = {
+  type?: EBadgeType;
   hasCloseIcon?: boolean;
   hasDotIcon?: boolean;
   onCloseIcon?: () => void;
   label: string;
+  className?: string;
   containerClassName?: string;
   labelClassName?: string;
 };
 
-const Badge: React.FC<TBadge> = (props) => {
+const Badge: React.FC<TBadgeProps> = (props) => {
   const {
-    type = BadgeType.DEFAULT,
+    type = EBadgeType.DEFAULT,
     hasCloseIcon = false,
     hasDotIcon = false,
     onCloseIcon,
     label,
+    className,
     labelClassName,
   } = props;
 
   const classesFormType = {
-    [css.default]: type === BadgeType.DEFAULT,
-    [css.processing]: type === BadgeType.PROCESSING,
-    [css.error]: type === BadgeType.ERROR,
-    [css.success]: type === BadgeType.SUCCESS,
-    [css.warning]: type === BadgeType.WARNING,
+    [css.default]: type === EBadgeType.DEFAULT,
+    [css.processing]: type === EBadgeType.PROCESSING,
+    [css.error]: type === EBadgeType.ERROR,
+    [css.success]: type === EBadgeType.SUCCESS,
+    [css.warning]: type === EBadgeType.WARNING,
   };
 
   const badgeContainerClassName = classNames(
     css.root,
     classesFormType,
+    className,
     labelClassName,
   );
   const labelClasses = classNames(css.label, classesFormType, labelClassName);

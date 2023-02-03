@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
-import Badge, { BadgeType } from '@components/Badge/Badge';
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
@@ -17,17 +17,14 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderAsyncAction } from '@redux/slices/Order.slice';
 import { adminRoutes } from '@src/paths';
-import { parseTimestaimpToFormat } from '@utils/dates';
+import { parseTimestampToFormat } from '@utils/dates';
 import {
   EOrderDetailsStatus,
   EOrderStates,
   getLabelByKey,
   ORDER_STATES_OPTIONS,
 } from '@utils/enums';
-import type {
-  TIntergrationOrderListing,
-  TReverseMapFromEnum,
-} from '@utils/types';
+import type { TIntegrationOrderListing } from '@utils/types';
 import classNames from 'classnames';
 import addDays from 'date-fns/addDays';
 import { useRouter } from 'next/router';
@@ -43,17 +40,17 @@ const uniqueStrings = (array: string[]) => {
   });
 };
 
-const BAGDE_TYPE_BASE_ON_ORDER_STATE = {
-  [EOrderStates.inProgress]: BadgeType.PROCESSING,
-  [EOrderStates.isNew]: BadgeType.PROCESSING,
-  [EOrderStates.cancel]: BadgeType.DEFAULT,
-  [EOrderStates.delivery]: BadgeType.SUCCESS,
-  [EOrderStates.completed]: BadgeType.SUCCESS,
-  [EOrderStates.pendingPayment]: BadgeType.WARNING,
-  [EOrderStates.picking]: BadgeType.WARNING,
+const BADGE_TYPE_BASE_ON_ORDER_STATE = {
+  [EOrderStates.inProgress]: EBadgeType.PROCESSING,
+  [EOrderStates.isNew]: EBadgeType.PROCESSING,
+  [EOrderStates.cancel]: EBadgeType.DEFAULT,
+  [EOrderStates.delivery]: EBadgeType.SUCCESS,
+  [EOrderStates.completed]: EBadgeType.SUCCESS,
+  [EOrderStates.pendingPayment]: EBadgeType.WARNING,
+  [EOrderStates.picking]: EBadgeType.WARNING,
 };
 
-const BAGDE_CLASSNAME_BASE_ON_ORDER_STATE = {
+const BADGE_CLASSNAME_BASE_ON_ORDER_STATE = {
   [EOrderStates.inProgress]: css.badgeInProgress,
   [EOrderStates.isNew]: css.badgeProcessing,
   [EOrderStates.cancel]: css.badgedefault,
@@ -102,7 +99,7 @@ const OrderDetailTooltip = ({ orderDetail }: any) => {
         <OrderIcon />
         <span>
           <span className={css.orderDate}>
-            {parseTimestaimpToFormat(Number(key))}
+            {parseTimestampToFormat(Number(key))}
           </span>
           : {totalPrice}đ
         </span>
@@ -206,21 +203,15 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'state',
     label: 'Trạng thái',
-    render: ({
-      state,
-    }: {
-      state: TReverseMapFromEnum<typeof EOrderStates>;
-    }) => {
+    render: ({ state }: { state: EOrderStates }) => {
       return (
         <Badge
           containerClassName={classNames(
             css.badge,
-            BAGDE_CLASSNAME_BASE_ON_ORDER_STATE[state],
+            BADGE_CLASSNAME_BASE_ON_ORDER_STATE[state],
           )}
           labelClassName={css.badgeLabel}
-          type={
-            (BAGDE_TYPE_BASE_ON_ORDER_STATE[state] as any) || BadgeType.DEFAULT
-          }
+          type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.DEFAULT}
           label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
         />
       );
@@ -235,7 +226,7 @@ const TABLE_COLUMN: TColumn[] = [
         <Badge
           containerClassName={css.badge}
           labelClassName={css.badgeLabel}
-          type={isPaid ? 'success' : 'warning'}
+          type={isPaid ? EBadgeType.SUCCESS : EBadgeType.WARNING}
           label={isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}
         />
       );
@@ -244,7 +235,7 @@ const TABLE_COLUMN: TColumn[] = [
 ];
 
 const parseEntitiesToTableData = (
-  orders: TIntergrationOrderListing[],
+  orders: TIntegrationOrderListing[],
   page: number,
 ) => {
   if (orders.length === 0) return [];
@@ -260,10 +251,10 @@ const parseEntitiesToTableData = (
         location:
           entity?.attributes?.metadata?.generalInfo?.deliveryAddress?.address,
         companyName: company?.attributes.profile.displayName,
-        startDate: parseTimestaimpToFormat(
+        startDate: parseTimestampToFormat(
           entity?.attributes?.metadata?.generalInfo?.startDate,
         ),
-        endDate: parseTimestaimpToFormat(
+        endDate: parseTimestampToFormat(
           entity?.attributes?.metadata?.generalInfo?.endDate,
         ),
         staffName: entity?.attributes?.metadata?.generalInfo?.staffName,

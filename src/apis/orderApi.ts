@@ -1,11 +1,14 @@
-import { post, put } from './api';
+import type { TObject } from '@utils/types';
+
+import type { TBodyParams } from './configs';
+import { deleteApi, getApi, postApi, putApi } from './configs';
 
 type CreateOrderApiBody = {
   companyId: string;
   bookerId: string;
 };
 export const createOrderApi = (body: CreateOrderApiBody) =>
-  post('/api/orders', body);
+  postApi('/orders', body);
 
 type UpdateOrderApiBody = {
   orderId: string;
@@ -45,12 +48,13 @@ type UpdateOrderApiBody = {
   };
 };
 export const updateOrderApi = (body: UpdateOrderApiBody) =>
-  put('/api/orders', body);
+  putApi('/orders', body);
+
 type AddMealPlanDetailApiBody = {
   orderId: string;
 };
 export const addMealPlanDetailApi = (body: AddMealPlanDetailApiBody) =>
-  post('/api/orders/plan', body);
+  postApi('/orders/plan', body);
 
 type UpdateMealPlanDetailApiBody = {
   planId: string;
@@ -61,11 +65,34 @@ type UpdateMealPlanDetailApiBody = {
   };
 };
 export const updateMealPlanDetailApi = (body: UpdateMealPlanDetailApiBody) =>
-  put('/api/orders/plan', body);
+  putApi('/orders/plan', body);
 
 type CompleteOrderApiBody = {
   orderId: string;
   planId: string;
 };
 export const initiateTransactionsApi = (body: CompleteOrderApiBody) =>
-  put('/api/orders', body);
+  putApi('/orders', body);
+
+// Booker manage order details
+export const loadBookerOrderDataApi = (orderId: string) =>
+  getApi(`/orders/${orderId}`);
+
+export const updateOrderDetailsApi = (orderId: string, body: TObject) =>
+  postApi(`/orders/${orderId}`, body);
+
+export const addParticipantToOrderApi = (orderId: string, body: TObject) =>
+  postApi(`/orders/${orderId}/participant`, body);
+
+export const deleteParticipantFromOrderApi = (orderId: string, body: TObject) =>
+  deleteApi(`/orders/${orderId}/participant`, body);
+
+export const addUpdateMemberOrder = (orderId: string, body: TObject) =>
+  putApi(`/orders/${orderId}/member-order`, body);
+
+export const sendRemindEmailToMemberApi = (orderId: string, body: TObject) =>
+  postApi(`/orders/${orderId}/remind-member`, body);
+
+export const queryOrdersApi = (body: TBodyParams) => {
+  return postApi(`/admin/listings/order/query`, body);
+};

@@ -3,7 +3,7 @@ import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
-import { generateTimeOptions } from '@utils/dates';
+import config from '@src/configs';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import format from 'date-fns/format';
@@ -15,16 +15,14 @@ import { useIntl } from 'react-intl';
 
 import css from './OrderDeadlineField.module.scss';
 
-const TIME_OPTIONS = generateTimeOptions();
-
-type OrderDeadlineFieldProps = {
+type TOrderDeadlineFieldProps = {
   form: any;
   values: Record<string, any>;
   columnLayout?: boolean;
   title?: string;
 };
 
-const OrderDeadlineField: React.FC<OrderDeadlineFieldProps> = (props) => {
+const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
   const { values, columnLayout, title, form } = props;
   const {
     deadlineDate: deadlineDateInitialValue,
@@ -108,7 +106,7 @@ const OrderDeadlineField: React.FC<OrderDeadlineFieldProps> = (props) => {
           className={css.fieldSelect}
           leftIcon={<IconClock />}
           validate={required(deadlineHourRequired)}>
-          {TIME_OPTIONS.map((option) => (
+          {config.deadlineTimeOptions.map((option) => (
             <option key={option}>{option}</option>
           ))}
         </FieldSelect>

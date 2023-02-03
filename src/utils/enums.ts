@@ -129,6 +129,14 @@ export enum ERestaurantListingStatus {
   unsatisfactory = 'unsatisfactory',
 }
 
+export enum EParticipantOrderStatus {
+  empty = 'empty',
+  joined = 'joined',
+  notJoined = 'notJoined',
+  notAllowed = 'notAllowed',
+  expired = 'expired',
+}
+
 export const RESTAURANT_STATUS_OPTIONS = [
   {
     key: ERestaurantListingStatus.new,

@@ -1,14 +1,14 @@
-import { post } from './api';
+import { postApi } from './configs';
 
 export type CheckInvitationApiBody = {
   companyId: string;
 };
 export const checkInvitationApi = (body: CheckInvitationApiBody) =>
-  post('/api/invitation/check-invitation', body);
+  postApi('/invitation/check-invitation', body);
 
 export type ResponseToInvitationApiBody = {
   response: 'accept' | 'decline';
   companyId: string;
 };
 export const reponseToInvitationApi = (body: ResponseToInvitationApiBody) =>
-  post('/api/invitation/response', body);
+  postApi('/invitation/response', body);

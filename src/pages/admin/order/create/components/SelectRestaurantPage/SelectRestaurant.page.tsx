@@ -5,11 +5,10 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { LISTING } from '@utils/data';
-import { weekDayFormatFromDateTime } from '@utils/dates';
 import type { TListing } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useEffect, useRef, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 // eslint-disable-next-line import/no-cycle
 import type { TSelectFoodFormValues } from '../SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
@@ -32,6 +31,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   onBack,
 }) => {
   const [currentRestaurant, setCurrentRestaurant] = useState<any>();
+  const intl = useIntl();
   const { value: isModalOpen, setValue: setModalOpen } = useBoolean();
   const dispatch = useAppDispatch();
   const {
@@ -61,10 +61,15 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   let currDebounceRef = debounceRef.current;
 
   const dateTime = DateTime.fromJSDate(selectedDate);
-  const formattedDate = dateTime.toFormat('dd/MM/yyyy');
-  const labelForBadge = `Cho ngày ${formattedDate} - ${weekDayFormatFromDateTime(
-    dateTime,
-  )} (${deliveryHour})- tại ${deliveryAddress?.address}`;
+  const formattedDate = dateTime.toFormat('dd/MM/yyyy - EEE', { locale: 'vi' });
+  const labelForBadge = intl.formatMessage(
+    { id: 'SelectRestaurantPage.subtitle' },
+    {
+      date: formattedDate,
+      hour: deliveryHour,
+      address: deliveryAddress?.address,
+    },
+  );
 
   const handlePageChange = (page: number) => {
     const params = {

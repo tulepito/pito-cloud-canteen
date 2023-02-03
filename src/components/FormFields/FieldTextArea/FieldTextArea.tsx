@@ -1,4 +1,5 @@
 import ValidationError from '@components/ValidationError/ValidationError';
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 import type { FieldRenderProps } from 'react-final-form';
@@ -6,21 +7,20 @@ import { Field } from 'react-final-form';
 
 import css from './FieldTextArea.module.scss';
 
-type InputComponentProps = FieldRenderProps<string, any> & {
-  id: string;
-  label?: string;
-  rootClassName?: string;
-  className?: string;
-  inputRootClass?: string;
-  disabled?: boolean;
-  labelClassName?: string;
-  customErrorText?: string;
-  isUncontrolled?: boolean;
-  input: any;
-  meta: any;
-  inputRef: any;
-  fullWidth?: boolean;
-};
+type InputComponentProps = FieldRenderProps<string, any> &
+  TDefaultProps & {
+    id: string;
+    label?: string;
+    inputRootClass?: string;
+    disabled?: boolean;
+    labelClassName?: string;
+    customErrorText?: string;
+    isUncontrolled?: boolean;
+    input: any;
+    meta: any;
+    inputRef: any;
+    fullWidth?: boolean;
+  };
 const CONTENT_MAX_LENGTH = 5000;
 
 const FieldTextAreaComponent: React.FC<InputComponentProps> = (props) => {

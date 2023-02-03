@@ -1,11 +1,11 @@
 import { RESULT_PAGE_SIZE } from '@redux/slices/ManageCompaniesPage.slice';
 import { USER } from '@utils/data';
 import { ECompanyStatus } from '@utils/enums';
-import type { TCompany, TReverseMapFromEnum, TUser } from '@utils/types';
+import type { TCompany, TUser } from '@utils/types';
 
 export type TUpdateStatus = {
   id: string;
-  status: TReverseMapFromEnum<ECompanyStatus>;
+  status: ECompanyStatus;
 };
 
 type TExtraDataMapToCompanyTable = {

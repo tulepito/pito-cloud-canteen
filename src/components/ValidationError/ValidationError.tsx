@@ -1,3 +1,4 @@
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import type { FC } from 'react';
 import React from 'react';
@@ -8,9 +9,7 @@ type TFieldMeta = {
   touched?: boolean;
   error?: boolean;
 };
-type ValidationErrorProps = {
-  rootClassName?: string;
-  className?: string;
+type ValidationErrorProps = TDefaultProps & {
   fieldMeta: TFieldMeta;
 };
 

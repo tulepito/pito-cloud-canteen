@@ -1,5 +1,6 @@
 import { InlineTextButton } from '@components/Button/Button';
 import NamedLink from '@components/NamedLink/NamedLink';
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 
@@ -63,9 +64,7 @@ const FormTab: React.FC<TFormTabProps> = (props) => {
   );
 };
 
-type TTabNavProps = {
-  className?: string;
-  rootClassName?: string;
+type TTabNavProps = TDefaultProps & {
   tabRootClassName?: string;
   tabs?: any[];
 };

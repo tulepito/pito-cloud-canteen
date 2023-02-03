@@ -1,26 +1,26 @@
 import ValidationError from '@components/ValidationError/ValidationError';
-import type { TIconProps } from '@utils/types';
+import type { TDefaultProps, TIconProps } from '@utils/types';
 import classNames from 'classnames';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 import React from 'react';
 import type { FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 
 import css from './FieldSelect.module.scss';
 
-type IFieldSelect = FieldRenderProps<string, any> & {
-  rootClassName?: string;
-  className?: string;
-  id?: string;
-  label?: string | ReactNode;
-  labelClassName?: string;
-  selectClassName?: string;
-  input: any;
-  meta: any;
-  children: ReactNode;
-  onChange: () => void;
-  leftIcon: React.ReactElement<TIconProps>;
-};
+type TFieldSelect = PropsWithChildren<
+  FieldRenderProps<string, any> &
+    TDefaultProps & {
+      id?: string;
+      label?: string | ReactNode;
+      labelClassName?: string;
+      selectClassName?: string;
+      input: any;
+      meta: any;
+      onChange: () => void;
+      leftIcon: React.ReactElement<TIconProps>;
+    }
+>;
 
 const handleChange =
   (propsOnChange: any, inputOnChange: any) => (event: any) => {
@@ -37,7 +37,7 @@ const handleChange =
     inputOnChange(event);
   };
 
-const FieldSelectComponent: React.FC<IFieldSelect> = (props) => {
+const FieldSelectComponent: React.FC<TFieldSelect> = (props) => {
   const {
     rootClassName,
     className,

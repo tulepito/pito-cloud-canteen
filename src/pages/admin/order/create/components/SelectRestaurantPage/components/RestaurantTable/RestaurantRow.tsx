@@ -1,13 +1,12 @@
 import { LISTING } from '@utils/data';
 import { CATEGORY_OPTIONS } from '@utils/enums';
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import { useIntl } from 'react-intl';
 
 import css from './RestaurantTable.module.scss';
 
-type TRestaurantRowProps = {
-  rootClassName?: string;
-  className?: string;
+type TRestaurantRowProps = TDefaultProps & {
   restaurant: any;
   onItemClick: () => void;
 };

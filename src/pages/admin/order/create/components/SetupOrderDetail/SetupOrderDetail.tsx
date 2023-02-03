@@ -18,7 +18,7 @@ import {
   updateDraftMealPlan,
 } from '@redux/slices/Order.slice';
 import { LISTING } from '@utils/data';
-import { getDaySessionFromDeliveryTime } from '@utils/dates';
+import { getDaySessionFromDeliveryTime, renderDateRange } from '@utils/dates';
 import type { TListing, TObject } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
@@ -35,10 +35,10 @@ import SelectRestaurantPage from '../SelectRestaurantPage/SelectRestaurant.page'
 import css from './SetupOrderDetail.module.scss';
 
 const renderResourcesForCalendar = (
-  orderDetail: Record<string, any>,
+  orderDetail: TObject,
   deliveryHour: string,
 ) => {
-  const entries = Object.entries(orderDetail);
+  const entries = Object.entries<TObject>(orderDetail);
   const resources = entries.map((item) => {
     const [date, data] = item;
     const { restaurant, foodList } = data;
@@ -63,21 +63,6 @@ const renderResourcesForCalendar = (
   });
 
   return resources;
-};
-
-const renderDateRange = (
-  startDate = new Date().getTime(),
-  endDate = new Date().getTime(),
-) => {
-  const result = [];
-  let currentDate = new Date(startDate).getTime();
-
-  while (currentDate <= endDate) {
-    result.push(currentDate);
-    currentDate = DateTime.fromMillis(currentDate).plus({ day: 1 }).toMillis();
-  }
-
-  return result;
 };
 
 const findSuitableStartDate = ({

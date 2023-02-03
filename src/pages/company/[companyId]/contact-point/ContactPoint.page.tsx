@@ -5,7 +5,7 @@ import {
   BookerManageCompany,
 } from '@redux/slices/company.slice';
 import { USER } from '@utils/data';
-import type { TUser } from '@utils/types';
+import type { TCurrentUser, TUser } from '@utils/types';
 import take from 'lodash/take';
 import takeRight from 'lodash/takeRight';
 import { useRouter } from 'next/router';
@@ -44,11 +44,13 @@ const ContactPointPage = () => {
   const { email = '' } = USER(company as TUser).getAttributes();
   const { address = '' } = location;
 
-  const { email: bookerEmail = '' } = USER(currentUser).getAttributes();
-  const { displayName: bookerDisplayName = '' } =
-    USER(currentUser).getProfile();
-  const { phoneNumber: bookerPhoneNumber = '' } =
-    USER(currentUser).getProtectedData();
+  const { email: bookerEmail = '' } = USER(currentUser!).getAttributes();
+  const { displayName: bookerDisplayName = '' } = USER(
+    currentUser!,
+  ).getProfile();
+  const { phoneNumber: bookerPhoneNumber = '' } = USER(
+    currentUser!,
+  ).getProtectedData();
   const initialFormValues = useMemo<TContactPointProfileFormValues>(
     () => ({
       displayName: bookerDisplayName,
@@ -99,7 +101,7 @@ const ContactPointPage = () => {
         </div>
         <div className={css.formWrapper}>
           <ContactPointProfileForm
-            bookerAccount={currentUser}
+            bookerAccount={currentUser as TCurrentUser}
             onSubmit={onSubmit}
             submitInputRef={formSubmitInputRef}
             initialValues={initialFormValues}

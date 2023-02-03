@@ -2,6 +2,7 @@
  * LayoutSingleColumn needs to have 2-3 children:
  * LayoutWrapperTopbar, LayoutWrapperMain, and possibly LayoutWrapperFooter.
  */
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import type { ReactElement } from 'react';
 import React from 'react';
@@ -43,9 +44,7 @@ const prepareChildren = (children: ReactElement[]) => {
   return childrenMap;
 };
 
-type TAdminLayoutWrapperProps = {
-  className?: string;
-  rootClassName?: string;
+type TAdminLayoutWrapperProps = TDefaultProps & {
   children: ReactElement[];
 };
 

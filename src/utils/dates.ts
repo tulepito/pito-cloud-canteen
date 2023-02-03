@@ -105,7 +105,22 @@ export const weekDayFormatFromDateTime = (dateTime: DateTime) => {
   return formattedWeekDay;
 };
 
-export const parseTimestaimpToFormat = (date: number) => {
+export const renderDateRange = (
+  startDate = new Date().getTime(),
+  endDate = new Date().getTime(),
+) => {
+  const result = [];
+  let currentDate = new Date(startDate).getTime();
+
+  while (currentDate <= endDate) {
+    result.push(currentDate);
+    currentDate = DateTime.fromMillis(currentDate).plus({ day: 1 }).toMillis();
+  }
+
+  return result;
+};
+
+export const parseTimestampToFormat = (date: number) => {
   return DateTime.fromMillis(date).toFormat('dd/MM/yyyy');
 };
 

@@ -1,5 +1,5 @@
 import ValidationError from '@components/ValidationError/ValidationError';
-import type { TIconProps } from '@utils/types';
+import type { TDefaultProps, TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 import type { FieldProps, FieldRenderProps } from 'react-final-form';
@@ -8,27 +8,28 @@ import { Field } from 'react-final-form';
 import css from './FieldTextInput.module.scss';
 
 type TIconComponent = React.ReactElement<TIconProps>;
-type InputComponentProps = FieldRenderProps<string, any> & {
-  id: string;
-  label?: string;
-  rootClassName?: string;
-  className?: string;
-  inputRootClass?: string;
-  disabled?: boolean;
-  labelClassName?: string;
-  customErrorText?: string;
-  isUncontrolled?: boolean;
-  input: any;
-  meta: any;
-  inputRef: any;
-  fullWidth?: boolean;
-  leftIcon?: TIconComponent;
-  rightIcon?: TIconComponent;
-  required?: boolean;
-  showText?: boolean;
-};
+type InputComponentProps = FieldRenderProps<string, any> &
+  TDefaultProps & {
+    id: string;
+    label?: string;
+    inputRootClass?: string;
+    disabled?: boolean;
+    labelClassName?: string;
+    customErrorText?: string;
+    isUncontrolled?: boolean;
+    input: any;
+    meta: any;
+    inputRef?: any;
+    fullWidth?: boolean;
+    leftIcon?: TIconComponent;
+    rightIcon?: TIconComponent;
+    required?: boolean;
+    showText?: boolean;
+  };
 
-const FieldTextInputComponent: React.FC<InputComponentProps> = (props) => {
+export const FieldTextInputComponent: React.FC<InputComponentProps> = (
+  props,
+) => {
   const {
     label,
     id,

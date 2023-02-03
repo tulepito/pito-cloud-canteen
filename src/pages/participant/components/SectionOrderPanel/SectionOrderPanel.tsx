@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { shopingCartThunks } from '@redux/slices/shopingCart.slice';
+import { shoppingCartThunks } from '@redux/slices/shopingCart.slice';
 import { useState } from 'react';
 
 import { ParticipantPlanThunks } from '../../plans/[planId]/ParticipantPlanPage.slice';
@@ -25,13 +25,14 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     return state.shopingCart.orders?.[currUserId]?.[planId || 1];
   });
   const plan = useAppSelector((state) => state.ParticipantPlanPage.plan);
-  const orderDays = Object.keys(plan);
   const loadDataInProgress = useAppSelector(
     (state) => state.ParticipantPlanPage.loadDataInProgress,
   );
   const submitDataInprogress = useAppSelector(
     (state) => state.ParticipantPlanPage.submitDataInprogress,
   );
+
+  const orderDays = Object.keys(plan);
 
   const cartListKeys = Object.keys(cartList || []).filter(
     (cartKey) => !!cartList[cartKey],
@@ -45,7 +46,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
 
   // Functions
   const handleRemoveItem = (dayId: string) => {
-    dispatch(shopingCartThunks.removeFromCart({ planId, dayId }));
+    dispatch(shoppingCartThunks.removeFromCart({ planId, dayId }));
   };
 
   const handleRemoveAllItem = () => {
@@ -58,7 +59,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   };
 
   const handleConfirmDeleteAll = () => {
-    dispatch(shopingCartThunks.removeAllFromPlanCart({ planId }));
+    dispatch(shoppingCartThunks.removeAllFromPlanCart({ planId }));
     setIsOpenConfirmDeleteAll(false);
     dispatch(ParticipantPlanThunks.updateOrder({ orderId, planId }));
   };

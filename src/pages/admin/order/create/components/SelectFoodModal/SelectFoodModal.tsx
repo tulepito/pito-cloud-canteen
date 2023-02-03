@@ -1,4 +1,4 @@
-import Badge from '@components/Badge/Badge';
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Modal from '@components/Modal/Modal';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -32,7 +32,7 @@ const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
         {title}
       </div>
       <Badge
-        type="warning"
+        type={EBadgeType.WARNING}
         label={intl.formatMessage(
           {
             id: 'SelectFoodModal.selectedTitle',

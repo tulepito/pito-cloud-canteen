@@ -2,7 +2,7 @@ import { InlineTextButton } from '@components/Button/Button';
 import IconBanned from '@components/Icons/IconBanned/IconBanned';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import { useAppDispatch } from '@hooks/reduxHooks';
-import { shopingCartThunks } from '@redux/slices/shopingCart.slice';
+import { shoppingCartThunks } from '@redux/slices/shopingCart.slice';
 import classNames from 'classnames';
 import { FormattedMessage } from 'react-intl';
 
@@ -25,7 +25,7 @@ const TabActions: React.FC<TTabActionsProps> = ({
 
   const handleNotJoinDay = () => {
     dispatch(
-      shopingCartThunks.addToCart({
+      shoppingCartThunks.addToCart({
         planId,
         dayId: orderDay,
         mealId: 'notJoined',

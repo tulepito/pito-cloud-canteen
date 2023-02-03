@@ -1,5 +1,5 @@
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import type { TIconProps } from '@utils/types';
+import type { TDefaultProps, TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -47,9 +47,8 @@ type TMenuProps = {
   menus: TSidebarMenu[];
 } & TMenuWithClasses;
 
-type TMultiLevelSidebarProps = {
+type TMultiLevelSidebarProps = TDefaultProps & {
   menus: TSidebarMenu[];
-  rootClassName?: string;
 } & TMenuWithClasses;
 
 const SubMenu: React.FC<TSubMenuProps> = (props) => {

@@ -1,4 +1,4 @@
-import IconClock from '@components/Icons/IconClock/IconClock';
+import IconClockWithExclamation from '@components/Icons/IconClock/IconClockWithExclamation';
 import IconLocation from '@components/Icons/IconLocation/IconLocation';
 import IconShop from '@components/Icons/IconShop/IconShop';
 import { DateTime } from 'luxon';
@@ -32,7 +32,7 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
     <>
       {!isExpired && (
         <OrderEventCardContentItem
-          icon={<IconClock />}
+          icon={<IconClockWithExclamation />}
           isHighlight={isFirstHighlight}>
           <FormattedMessage
             id="EventCard.remainTime"

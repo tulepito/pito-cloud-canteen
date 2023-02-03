@@ -56,6 +56,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     } else if (!isAuthenticated) {
       router.push(generalPaths.SignIn);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     authInfoLoaded,
     homePageNavigateCondition,
@@ -70,15 +71,12 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
       return children;
     }
 
-    if (!authInfoLoaded) {
-      return <LoadingContainer />;
-    }
+    const loadingCondition =
+      !authInfoLoaded ||
+      (isNonRequireAuthenticationRoute && homePageNavigateCondition) ||
+      (!isNonRequireAuthenticationRoute && !isAuthenticated);
 
-    if (isNonRequireAuthenticationRoute) {
-      if (homePageNavigateCondition) {
-        return <LoadingContainer />;
-      }
-    } else if (!isAuthenticated) {
+    if (loadingCondition) {
       return <LoadingContainer />;
     }
 

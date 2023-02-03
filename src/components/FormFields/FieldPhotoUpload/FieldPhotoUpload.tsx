@@ -6,7 +6,7 @@ import IconUpload from '@components/Icons/IconUpload/IconUpload';
 import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { isUploadImageOverLimitError } from '@utils/errors';
-import type { TImage, TImageVariant } from '@utils/types';
+import type { TDefaultProps, TImage, TImageVariant } from '@utils/types';
 import classNames from 'classnames';
 import type { ChangeEvent } from 'react';
 import React, { useState } from 'react';
@@ -15,15 +15,13 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './FieldPhotoUpload.module.scss';
 
-type TPhotoWithOverlay = {
+type TPhotoWithOverlay = TDefaultProps & {
   id: string;
-  className?: string;
   image: TImage & { file: File; imageId: string };
   savedImageAltText: string;
   onRemoveImage: (id: any) => void;
   onClick?: () => void;
   variants: TImageVariant[];
-  rootClassName?: string;
 };
 
 const PhotoWithOverlay = (props: TPhotoWithOverlay) => {

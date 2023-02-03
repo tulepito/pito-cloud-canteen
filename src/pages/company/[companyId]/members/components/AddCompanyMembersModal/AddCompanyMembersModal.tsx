@@ -7,7 +7,7 @@ import {
   resetCheckedEmailInputChunk,
 } from '@redux/slices/companyMember.slice';
 import { USER } from '@utils/data';
-import type { TUser } from '@utils/types';
+import type { TCurrentUser, TUser } from '@utils/types';
 import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -34,11 +34,8 @@ const AddCompanyMembersModal: React.FC<CreateGroupModalProps> = (props) => {
     (state) => state.companyMember.checkedEmailInputChunk,
     shallowEqual,
   );
-  const addMembersInProgress = useAppSelector(
-    (state) => state.companyMember.addMembersInProgress,
-  );
-  const addMembersError = useAppSelector(
-    (state) => state.companyMember.addMembersError,
+  const { addMembersInProgress, addMembersError } = useAppSelector(
+    (state) => state.companyMember,
   );
   const companyAccount = useAppSelector(
     (state) => state.company.company,
@@ -117,7 +114,7 @@ const AddCompanyMembersModal: React.FC<CreateGroupModalProps> = (props) => {
                 removeEmailValue={removeEmailValue}
                 addMembersInProgress={addMembersInProgress}
                 addMembersError={addMembersError}
-                currentUser={currentUser}
+                currentUser={currentUser as TCurrentUser}
               />
             </div>
             <div className={css.modalFooter}>
