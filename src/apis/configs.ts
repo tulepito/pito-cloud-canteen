@@ -16,6 +16,9 @@ export const apiBaseUrl = () => {
 };
 
 export const getApi = (path: string, params: TObject = {}) => {
+  // get 'JSONParams' in req.query, remember using JSON.parse()
+  // to convert JSONParams in to params
+
   return axios.get(`${apiBaseUrl()}${path}`, {
     params: { JSONParams: JSON.stringify(params) },
   });
@@ -30,6 +33,7 @@ export const putApi = (path: string, body: TObject) => {
 };
 
 export const deleteApi = (path: string, data: TObject = {}) => {
+  // get any keys of data in req.body
   return axios.delete(`${apiBaseUrl()}${path}`, { data });
 };
 
