@@ -49,10 +49,10 @@ const OrderSettingModal: React.FC<OrderSettingModalProps> = (props) => {
   );
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const { order, updateOrderInProgress } = useAppSelector(
-    (state) => state.Order,
-    shallowEqual,
+  const updateOrderInProgress = useAppSelector(
+    (state) => state.Order.updateOrderInProgress,
   );
+  const order = useAppSelector((state) => state.Order.order, shallowEqual);
 
   const {
     companyId: clientId,

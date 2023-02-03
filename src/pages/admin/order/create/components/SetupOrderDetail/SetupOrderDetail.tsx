@@ -115,11 +115,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   goBack,
   nextTab,
 }) => {
-  const {
-    order,
-    orderDetail = {},
-    updateOrderInProgress,
-  } = useAppSelector((state) => state.Order, shallowEqual);
+  const updateOrderInProgress = useAppSelector(
+    (state) => state.Order.updateOrderInProgress,
+  );
+  const orderDetail = useAppSelector(
+    (state) => state.Order.orderDetail,
+    shallowEqual,
+  );
+  const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const {
     companyId: clientId,
     packagePerMember = '',

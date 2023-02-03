@@ -34,11 +34,14 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
 
-  const { selectedBooker, updateOrderInProgress } = useAppSelector(
-    (state) => state.Order,
+  const updateOrderInProgress = useAppSelector(
+    (state) => state.Order.updateOrderInProgress,
+  );
+  const selectedBooker = useAppSelector(
+    (state) => state.Order.selectedBooker,
     shallowEqual,
   );
-  const { order } = useAppSelector((state) => state.Order, shallowEqual);
+  const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const {
     companyId: clientId,
     dayInWeek,
