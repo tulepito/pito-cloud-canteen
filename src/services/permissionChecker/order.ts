@@ -14,7 +14,7 @@ const orderChecker =
       const { companyId, orderId } = req.body;
       const apiMethod = req.method;
       const [currentUser] = denormalisedResponseEntities(currentUserResponse);
-      const { isPITOAdmin = false } = USER(currentUser).getMetadata();
+      const { isAdmin = false } = USER(currentUser).getMetadata();
       const { company = {} } = USER(currentUser).getMetadata();
       switch (apiMethod) {
         case HTTP_METHODS.POST: {
@@ -26,9 +26,8 @@ const orderChecker =
 
           const userPermission = company[companyId]?.permission;
           if (
-            !userPermission ||
-            userPermission !== UserPermission.BOOKER ||
-            !isPITOAdmin
+            (userPermission && userPermission !== UserPermission.BOOKER) ||
+            !isAdmin
           ) {
             return res.status(403).json({
               message: "You don't have permission to access this api!",
@@ -46,9 +45,8 @@ const orderChecker =
           const { clientId } = LISTING(orderListing).getMetadata();
           const userPermission = company[clientId]?.permission;
           if (
-            !userPermission ||
-            userPermission !== UserPermission.BOOKER ||
-            !isPITOAdmin
+            (userPermission && userPermission !== UserPermission.BOOKER) ||
+            !isAdmin
           ) {
             return res.status(403).json({
               message: "You don't have permission to access this api!",

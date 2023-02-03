@@ -1,3 +1,4 @@
+import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
@@ -53,13 +54,25 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   const createOrderInProgress = useAppSelector(
     (state) => state.Order.createOrderInProcess,
   );
+  const createOrderError = useAppSelector(
+    (state) => state.Order.createOrderError,
+  );
   // const fetchBookersError = useAppSelector(
   //   (state) => state.Order.fetchBookersError,
   // );
+  const {
+    value: createOrderFailingModalOpen,
+    setTrue: openCreateOrderFailingModal,
+    setFalse: closeCreateOrderFailingModal,
+  } = useBoolean(!!createOrderError);
   useEffect(() => {
     dispatch(paginateCompanies({ page }));
   }, [dispatch, page]);
-
+  useEffect(() => {
+    if (createOrderError) {
+      openCreateOrderFailingModal();
+    }
+  }, [createOrderError, openCreateOrderFailingModal]);
   const updateStatus = useCallback(
     (updateData: TUpdateStatus) => {
       dispatch(
@@ -112,8 +125,9 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
         clientId,
         bookerId: booker,
       }),
-    )
-      .then(({ payload }) => {
+    ).then((res) => {
+      const { payload, meta } = res;
+      if (meta.requestStatus !== 'rejected') {
         nextTab();
         router.push({
           pathname: adminRoutes.EditOrder.path,
@@ -121,8 +135,8 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
             orderId: LISTING(payload).getId(),
           },
         });
-      })
-      .catch(() => {});
+      }
+    });
   };
 
   return (
@@ -158,6 +172,16 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
           toggleSort={toggleSort}
         />
       </div>
+      <ConfirmationModal
+        id="CreateOrderFailingModal"
+        isOpen={createOrderFailingModalOpen}
+        onClose={closeCreateOrderFailingModal}
+        onConfirm={closeCreateOrderFailingModal}
+        title={intl.formatMessage({
+          id: 'ClientSelector.createOrderFail.title',
+        })}
+        confirmText="Đóng"
+      />
     </div>
   );
 };

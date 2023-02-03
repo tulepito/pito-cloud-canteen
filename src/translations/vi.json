@@ -36,6 +36,7 @@
   "Calendar.Week.title.diffMonth": "{start} - {end}, {year}",
   "Calendar.Week.title.diffYear": "{start} - {end}",
   "Calendar.Week.title": "{start}/{month} - {end}/{month}",
+  "ClientSelector.createOrderFail.title": "Có lỗi xảy ra trong quá trình tạo đơn hàng",
   "ClientSelector.keywordFieldPlaceholder": "Tìm kiếm theo tên công ty...",
   "ClientSelector.title": "Chọn khách hàng",
   "ClientTable.address": "Địa chỉ",
