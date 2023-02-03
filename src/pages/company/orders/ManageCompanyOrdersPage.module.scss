@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
   padding: 24px 48px;
@@ -15,27 +16,6 @@
       .phoneNumber {
         color: $labelBlue2;
         font-weight: 600;
-      }
-    }
-  }
-
-  .tabLabel {
-    display: flex;
-    align-items: center;
-    column-gap: 12px;
-
-    .count {
-      display: inline-block;
-      padding: 4px;
-      text-align: center;
-      border-radius: 8px;
-      color: $neutralGray5;
-      background-color: $neutralGray3;
-      @include textTemplate(8px, 400, 1);
-
-      &.countActive {
-        color: $neutralGray1;
-        background-color: $neutralGray6;
       }
     }
   }

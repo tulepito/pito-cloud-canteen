@@ -1,13 +1,12 @@
 import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import config from '@src/configs';
 import { LISTING, USER } from '@utils/data';
-import type { TListing, TUser } from '@utils/types';
+import type { TListing, TObject, TUser } from '@utils/types';
 import { useState } from 'react';
 
 import type { TReviewInfoFormValues } from '../components/BookerOrderDetailsReviewView/ReviewInfoSection/ReviewInfoForm';
-import { calculateTotalPriceAndDishes } from '../helpers/cartInfoHelper';
+import { calculatePriceQuotationInfo } from '../helpers/cartInfoHelper';
 import { groupFoodOrderByDate } from '../helpers/orderDetailHelper';
 
 export const usePrepareOrderDetailPageData = () => {
@@ -36,7 +35,6 @@ export const usePrepareOrderDetailPageData = () => {
     orderDeadline = 0,
     deadlineHour,
     staffName,
-    packagePerMember = 0,
   } = generalInfo || {};
 
   const titleSectionData = { deliveryHour, deliveryAddress };
@@ -59,22 +57,21 @@ export const usePrepareOrderDetailPageData = () => {
     manageOrdersData,
   };
   /* =============== Review data =============== */
-  const totalInfo = calculateTotalPriceAndDishes({ orderDetail });
   const foodOrderGroupedByDate = groupFoodOrderByDate({ orderDetail });
-
-  const { totalPrice = 0, totalDishes = 0 } = totalInfo || {};
-  const PITOPoints = totalPrice / 100000;
-  const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
-
-  const VATFee = totalPrice * config.VATPercentage;
-  const serviceFee = 0;
-  const transportFee = 0;
-  const promotion = 0;
-  const totalWithoutVAT = totalPrice + serviceFee + transportFee - promotion;
-  const totalWithVAT = VATFee + totalWithoutVAT;
-  const overflow = isOverflowPackage
-    ? totalWithVAT - totalDishes * packagePerMember
-    : 0;
+  const {
+    totalPrice,
+    PITOPoints,
+    VATFee,
+    totalWithVAT,
+    serviceFee,
+    transportFee,
+    promotion,
+    overflow,
+    totalWithoutVAT,
+  } = calculatePriceQuotationInfo({
+    planOrderDetail: orderDetail,
+    order: orderData as TObject,
+  });
 
   const reviewInfoData = {
     reviewInfoValues,

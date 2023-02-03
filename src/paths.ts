@@ -143,5 +143,6 @@ export const companyPaths = {
   Home: '/company',
   Detail: '/company/[companyId]',
   ManageOrders: '/company/orders',
+  ManageOrderDetail: '/company/orders/[orderId]',
   GroupSetting: '/company/[companyId]/group-setting',
 };

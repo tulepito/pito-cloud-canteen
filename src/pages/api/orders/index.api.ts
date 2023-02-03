@@ -1,4 +1,4 @@
-import { calculateGroupMembers } from '@helpers/companyMembers';
+import { calculateGroupMembers } from '@helpers/company';
 import getAdminAccount from '@services/getAdminAccount';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';

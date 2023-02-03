@@ -433,6 +433,7 @@ export type TIntegrationOrderListing = {
   author?: TUser;
   images?: TImage[];
   company?: TCompany;
+  plan?: TListing;
   order?: TOrderListing;
 };
 

@@ -1,8 +1,20 @@
+import { UserPermission } from '@src/types/UserPermission';
 import { USER } from '@utils/data';
-import type { TUser } from '@utils/types';
+import type { TCurrentUser, TObject, TUser } from '@utils/types';
 import filter from 'lodash/filter';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
+
+export const getCompanyIdFromBookerUser = (user: TUser | TCurrentUser) => {
+  const companies = user?.attributes?.profile?.metadata?.company || {};
+  const companyIds = Object.entries(companies).find((entry) => {
+    const [, permissionData] = entry;
+
+    return (permissionData as TObject).permission === UserPermission.BOOKER;
+  });
+
+  return companyIds ? companyIds[0] : '';
+};
 
 export const calculateGroupMembers = (
   companyAccount: TUser,

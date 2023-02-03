@@ -1,5 +1,7 @@
 import { isJoinedPlan } from '@helpers/orderHelper';
-import type { TObject } from '@utils/types';
+import config from '@src/configs';
+import { LISTING } from '@utils/data';
+import type { TListing, TObject } from '@utils/types';
 
 type TFoodDataValue = {
   foodId: string;
@@ -82,4 +84,44 @@ export const calculateTotalPriceAndDishes = ({
       totalPrice: 0,
     },
   );
+};
+
+export const calculatePriceQuotationInfo = ({
+  planOrderDetail = {},
+  order,
+}: {
+  planOrderDetail: TObject;
+  order: TObject;
+}) => {
+  const { generalInfo = {} } = LISTING(order as TListing).getMetadata();
+  const { packagePerMember = 0 } = generalInfo;
+  const { totalPrice = 0, totalDishes = 0 } = calculateTotalPriceAndDishes({
+    orderDetail: planOrderDetail,
+  });
+
+  const PITOPoints = totalPrice / 100000;
+  const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
+  const VATFee = totalPrice * config.VATPercentage;
+  const serviceFee = 0;
+  const transportFee = 0;
+  const promotion = 0;
+  const totalWithoutVAT = totalPrice + serviceFee + transportFee - promotion;
+  const totalWithVAT = VATFee + totalWithoutVAT;
+  const overflow = isOverflowPackage
+    ? totalWithVAT - totalDishes * packagePerMember
+    : 0;
+
+  return {
+    totalPrice,
+    totalDishes,
+    PITOPoints,
+    VATFee,
+    totalWithVAT,
+    serviceFee,
+    transportFee,
+    promotion,
+    overflow,
+    isOverflowPackage,
+    totalWithoutVAT,
+  };
 };
