@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { TableForm } from '@components/Table/Table';
@@ -11,7 +12,7 @@ import { companyPaths } from '@src/paths';
 import { EOrderStates } from '@utils/enums';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
-import { useRouter } from 'next-router-mock';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -31,12 +32,11 @@ const tabLabelMap = {
 
 const prepareTabItems = ({ intl, currentTab, tableData }: any) => {
   const {
-    queryOrderInProgress,
     queryOrderError,
+    queryOrderInProgress,
     orders = [],
     manageOrdersPagination,
     totalItemMap = {},
-    // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useAppSelector((state) => state.Order, shallowEqual);
 
   return Object.entries(tabLabelMap).map(([key, id]) => {
@@ -93,14 +93,10 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   );
   const { query, isReady } = useRouter();
   const dispatch = useAppDispatch();
-  const {
-    orders = [],
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-  } = useAppSelector((state) => state.Order, shallowEqual);
+  const { orders = [] } = useAppSelector((state) => state.Order, shallowEqual);
   const currentUser = useAppSelector(currentUserSelector);
 
   const { page = 1, keywords = '' } = query;
-
   const companyId = getCompanyIdFromBookerUser(currentUser);
   const tableData = parseEntitiesToTableData(orders, Number(page));
   const tabItems = prepareTabItems({

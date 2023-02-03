@@ -72,14 +72,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const paramList = queryStates.reduce<TObject[]>(
           (previousList, currentState) => {
             if (currentState !== orderStateFromParams) {
-              let newItem = omit(dataParams, 'meta_orderState');
-
-              if (currentState !== 'all') {
-                newItem = {
-                  ...dataParams,
-                  meta_orderState: currentState,
-                };
-              }
+              const newItem =
+                currentState !== 'all'
+                  ? {
+                      ...dataParams,
+                      meta_orderState: currentState,
+                    }
+                  : omit(dataParams, 'meta_orderState');
 
               return previousList.concat([newItem]);
             }

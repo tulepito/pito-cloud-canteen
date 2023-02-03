@@ -20,10 +20,11 @@ export type DeleteMemberApiBody = {
   };
 };
 export const deleteMemberApi = (body: DeleteMemberApiBody) =>
-  deleteApi('/api/company/members/delete-member', body);
+  deleteApi('/company/members/delete-member', body);
 
-const queryOrdersApi = (companyId: string, params: TObject = {}) =>
-  getApi(`/api/company/${companyId}/orders`, params);
+const queryOrdersApi = (companyId: string, params: TObject = {}) => {
+  return getApi(`/company/${companyId}/orders`, params);
+};
 
 export const companyApi = {
   queryOrdersApi,

@@ -350,7 +350,7 @@ const orderSlice = createSlice({
       }))
       /* =============== queryCompanyOrders =============== */
       .addCase(queryCompanyOrders.pending, (state) => {
-        state.queryOrderInProgress = false;
+        state.queryOrderInProgress = true;
         state.queryOrderError = null;
       })
       .addCase(
