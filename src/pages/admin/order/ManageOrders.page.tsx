@@ -251,23 +251,20 @@ const parseEntitiesToTableData = (
   return orders.map((entity, index) => {
     const { company } = entity;
     const { orderDetail = {} } = entity?.attributes?.metadata || {};
+    const { startDate, endDate, orderState, staffName, deliveryAddress } =
+      entity?.attributes?.metadata?.generalInfo || {};
     return {
       key: entity.id.uuid,
       data: {
         id: entity.id.uuid,
         title: entity.attributes.title,
         orderNumber: (page - 1) * 10 + index + 1,
-        location:
-          entity?.attributes?.metadata?.generalInfo?.deliveryAddress?.address,
+        location: deliveryAddress?.address,
         companyName: company?.attributes.profile.displayName,
-        startDate: parseTimestaimpToFormat(
-          entity?.attributes?.metadata?.generalInfo?.startDate,
-        ),
-        endDate: parseTimestaimpToFormat(
-          entity?.attributes?.metadata?.generalInfo?.endDate,
-        ),
-        staffName: entity?.attributes?.metadata?.generalInfo?.staffName,
-        state: entity.attributes.metadata?.orderState || EOrderStates.isNew,
+        startDate: startDate && parseTimestaimpToFormat(startDate),
+        endDate: endDate && parseTimestaimpToFormat(endDate),
+        staffName,
+        state: orderState || EOrderStates.isNew,
         orderId: entity?.id?.uuid,
         restaurants: uniqueStrings(
           Object.keys(orderDetail).map((key) => {
