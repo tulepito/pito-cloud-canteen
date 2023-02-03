@@ -195,6 +195,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  color: $neutralGray5;
 }
 
 .importTitle {
@@ -203,5 +204,14 @@
 }
 
 .importLabel {
+  color: $neutralGray6;
   margin-bottom: 30px;
+}
+
+.downloadFileHere {
+  color: $neutralGray5;
+  a {
+    color: $neutralGray6;
+    font-weight: $fontWeightBold;
+  }
 }
