@@ -9,10 +9,14 @@ import {
   BADGE_TYPE_BASE_ON_ORDER_STATE,
 } from '@pages/admin/order/ManageOrders.page';
 import { companyPaths } from '@src/paths';
-import type { EOrderStates } from '@utils/enums';
-import { getLabelByKey, ORDER_STATES_OPTIONS } from '@utils/enums';
+import {
+  EOrderStates,
+  getLabelByKey,
+  ORDER_STATES_OPTIONS,
+} from '@utils/enums';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
+import type { ReactNode } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './CompanyOrdersTable.module.scss';
@@ -106,7 +110,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
   {
     key: 'action',
     label: '',
-    render: (/* { _state }: { state: EOrderStates } */) => {
+    render: ({ state }: { state: EOrderStates }) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const intl = useIntl();
 
@@ -172,16 +176,29 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         </Button>
       );
 
-      const buttonList = [
-        cancelOrderButton,
-        updateOrderButton,
-        viewDetailButton,
-        completeOrderButton,
-        reorderButton,
-        reviewOrderButton,
-        copyLinkButton,
-        deleteDraftButton,
-      ];
+      let buttonList: Array<ReactNode> = [];
+
+      switch (state) {
+        case EOrderStates.isNew:
+          buttonList = [completeOrderButton, deleteDraftButton];
+          break;
+        case EOrderStates.picking:
+          buttonList = [cancelOrderButton, updateOrderButton, copyLinkButton];
+          break;
+        case EOrderStates.canceled:
+          break;
+
+        case EOrderStates.inProgress:
+          buttonList = [viewDetailButton];
+          break;
+        case EOrderStates.completed:
+          buttonList = [reviewOrderButton, reorderButton, copyLinkButton];
+          break;
+        case EOrderStates.reviewed:
+          break;
+        default:
+          break;
+      }
 
       return <div className={css.action}>{buttonList}</div>;
     },

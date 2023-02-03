@@ -48,6 +48,7 @@ export const BADGE_TYPE_BASE_ON_ORDER_STATE = {
   [EOrderStates.completed]: EBadgeType.SUCCESS,
   [EOrderStates.pendingPayment]: EBadgeType.WARNING,
   [EOrderStates.picking]: EBadgeType.WARNING,
+  [EOrderStates.reviewed]: EBadgeType.WARNING,
 };
 
 export const BADGE_CLASSNAME_BASE_ON_ORDER_STATE = {
@@ -58,6 +59,7 @@ export const BADGE_CLASSNAME_BASE_ON_ORDER_STATE = {
   [EOrderStates.completed]: css.badgeSuccess,
   [EOrderStates.pendingPayment]: css.badgeWarning,
   [EOrderStates.picking]: css.badgeWarning,
+  [EOrderStates.reviewed]: css.badgeWarning,
 };
 
 const OrderDetailTooltip = ({ orderDetail }: any) => {

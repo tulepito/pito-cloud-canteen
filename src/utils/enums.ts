@@ -431,13 +431,14 @@ export const MENU_OPTIONS = [
 ];
 
 export enum EOrderStates {
-  inProgress = 'inProgress',
+  isNew = 'isNew',
   picking = 'picking',
+  pendingPayment = 'pendingPayment',
+  inProgress = 'inProgress',
   canceled = 'canceled',
   delivery = 'delivery',
-  pendingPayment = 'pendingPayment',
-  isNew = 'isNew',
   completed = 'completed',
+  reviewed = 'reviewed',
 }
 
 export const SPECIAL_DIET_OPTIONS = [
