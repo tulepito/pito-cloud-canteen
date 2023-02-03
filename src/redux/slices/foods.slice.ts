@@ -161,7 +161,7 @@ const createPartnerFoodListing = createAsyncThunk(
         dataParams: payload,
         queryParams: {},
       });
-      return data;
+      return denormalisedResponseEntities(data)[0];
     } catch (error) {
       console.error(`${CREATE_PARTNER_FOOD_LISTING} error: `, error);
       return rejectWithValue(storableError(error));
@@ -206,7 +206,7 @@ const duplicateFood = createAsyncThunk(
         dataParams: { ...payload, images: newImages },
         queryParams: {},
       });
-      return data;
+      return denormalisedResponseEntities(data)[0];
     } catch (error) {
       console.error(`${CREATE_PARTNER_FOOD_LISTING} error: `, error);
       return rejectWithValue(storableError(error));

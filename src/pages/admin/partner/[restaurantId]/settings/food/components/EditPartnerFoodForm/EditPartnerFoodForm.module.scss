@@ -131,10 +131,15 @@
 }
 
 .minOrderFields {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+
   @include viewportMedium {
-    display: flex;
-    justify-content: space-between;
+    flex-direction: row;
     gap: 20px;
+
+    justify-content: space-between;
     .minOrderField {
       flex: 1;
     }
