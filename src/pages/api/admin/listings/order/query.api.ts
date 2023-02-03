@@ -4,6 +4,7 @@ import cookies from '@services/cookie';
 import { deserialize, getIntegrationSdk, handleError } from '@services/sdk';
 import { LISTING_TYPE } from '@src/pages/api/helpers/constants';
 import { denormalisedResponseEntities } from '@utils/data';
+import { EListingType } from '@utils/enums';
 import type { TCompany, TIntegrationOrderListing } from '@utils/types';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -32,23 +33,32 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       queryParams,
     );
     const orders = denormalisedResponseEntities(response);
-    const orderWithCompany = await Promise.all(
+    const orderWithCompanAndSubOrders = await Promise.all(
       orders.map(async (order: TIntegrationOrderListing) => {
         const { companyId } = order.attributes.metadata;
         const companyUserResponse = await intergrationSdk.users.show({
           id: companyId,
         });
+        const subOrderResponse = await intergrationSdk.listings.query({
+          meta_orderId: order.id.uuid,
+          meta_listingType: EListingType.subOrder,
+        });
+        const subOrders = denormalisedResponseEntities(subOrderResponse);
         const [company] = denormalisedResponseEntities(
           companyUserResponse,
         ) as TCompany[];
         return {
           ...order,
           company,
+          subOrders,
         };
       }),
     );
 
-    res.json({ orders: orderWithCompany, pagination: response.data.meta });
+    res.json({
+      orders: orderWithCompanAndSubOrders,
+      pagination: response.data.meta,
+    });
   } catch (error) {
     handleError(res, error);
   }

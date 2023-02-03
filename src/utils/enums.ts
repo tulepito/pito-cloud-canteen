@@ -104,6 +104,8 @@ export enum EListingType {
   restaurant = 'restaurant',
   transaction = 'transaction',
   food = 'food',
+  subOrder = 'sub-order',
+  order = 'order',
 }
 
 export enum EUserPermission {

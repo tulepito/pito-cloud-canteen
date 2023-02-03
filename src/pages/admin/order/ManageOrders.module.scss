@@ -145,3 +145,16 @@
   font-weight: $fontWeightBold;
   display: block;
 }
+
+.draftText {
+  font-weight: $fontWeightBold;
+  text-transform: uppercase;
+  color: $neutralGray4;
+}
+
+.orderDetailTooltip {
+  background-color: $neutralGray1;
+  .rc-tooltip {
+    opacity: 1 !important;
+  }
+}

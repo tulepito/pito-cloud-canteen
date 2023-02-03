@@ -95,21 +95,28 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           const participants: string[] = isEmpty(newSelectedGroup)
             ? getAllCompanyMembers(companyAccount)
             : calculateGroupMembers(companyAccount, selectedGroups);
+          const { startDate, endDate } = generalInfo;
+          const companyDisplayName =
+            companyAccount.attributes.profile.displayName;
 
+          const shouldUpdateOrderName =
+            companyDisplayName && startDate && endDate;
           // eslint-disable-next-line prefer-destructuring
           updatedOrderListing = denormalisedResponseEntities(
             await integrationSdk.listings.update(
               {
                 id: orderId,
-                publicData: {
-                  orderName: `${
-                    companyAccount.attributes.profile.displayName
-                  } PCC_${parseTimestampToFormat(
-                    generalInfo.startDate,
-                  )} - ${parseTimestampToFormat(generalInfo.endDate)}`,
-                  startDate: generalInfo.startDate,
-                  endDate: generalInfo.endDate,
-                },
+                ...(shouldUpdateOrderName
+                  ? {
+                      publicData: {
+                        orderName: `${
+                          companyAccount.attributes.profile.displayName
+                        } PCC_${parseTimestampToFormat(
+                          generalInfo.startDate,
+                        )} - ${parseTimestampToFormat(generalInfo.endDate)}`,
+                      },
+                    }
+                  : {}),
                 metadata: {
                   ...generalInfo,
                   participants,

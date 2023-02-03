@@ -953,5 +953,10 @@
   "UploadImageForm.limitImage": "Dung lượng ảnh không được quá 2MB",
   "UploadImageForm.selectImage": "Chọn ảnh",
   "UploadImageForm.submit": "Lưu thay đổi",
-  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại."
+  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại.",
+  "ManageOrdersPage.draftOrderTitle": "Chưa có tên",
+  "ManageOrdersPage.draftOrderLocation": "Chưa nhập địa điểm giao hàng",
+  "ManageOrdersPage.draftOrderDate": "Chưa nhập thời gian",
+  "ManageOrdersPage.draftOrderRestaurant": "Chưa chọn đối tác",
+  "ManageOrdersPage.draftOrderStaff": "Chưa nhập nhân viên phụ trách"
 }

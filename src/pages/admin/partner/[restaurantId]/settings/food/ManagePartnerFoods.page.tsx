@@ -27,7 +27,7 @@ import {
   getLabelByKey,
   MENU_OPTIONS,
 } from '@utils/enums';
-import type { TIntegrationFoodListing } from '@utils/types';
+import type { TIntegrationListing } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -132,7 +132,7 @@ const TABLE_COLUMN: TColumn[] = [
 ];
 
 const parseEntitiesToTableData = (
-  foods: TIntegrationFoodListing[],
+  foods: TIntegrationListing[],
   extraData: any,
 ) => {
   return foods.map((food) => {
@@ -162,7 +162,7 @@ const parseEntitiesToTableData = (
 };
 
 const parseEntitiesToExportCsv = (
-  foods: TIntegrationFoodListing[],
+  foods: TIntegrationListing[],
   ids: string[],
 ) => {
   const foodsToExport = foods
