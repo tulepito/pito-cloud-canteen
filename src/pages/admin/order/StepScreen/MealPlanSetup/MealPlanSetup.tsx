@@ -48,7 +48,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     packagePerMember = '',
     vatAllow = true,
     pickAllow = true,
-    selectedGroups,
+    selectedGroups = ['allMembers'],
     deliveryHour,
     startDate,
     endDate,
@@ -92,7 +92,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         origin: originValue,
       },
       pickAllow: pickAllowSubmitValue,
-      packagePerMember: +packagePerMemberValue.replace(/,/g, ''),
+      packagePerMember: +packagePerMemberValue.replace(/,/g, '') || 0,
       selectedGroups: pickAllowSubmitValue ? selectedGroupsSubmitValue : [],
       deadlineDate: pickAllowSubmitValue ? deadlineDateSubmitValue : null,
       deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
@@ -111,7 +111,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         ? dayInWeek
         : ['mon', 'tue', 'wed', 'thu', 'fri'],
       packagePerMember: addCommas(packagePerMember?.toString()) || '',
-      selectedGroups: selectedGroups || ['allMembers'],
+      selectedGroups,
       nutritions: !isEmpty(nutritions) ? nutritions : [],
       deliveryHour: deliveryHour || '07:00',
       deliveryAddress:
@@ -130,8 +130,9 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       deadlineDate: deadlineDate || null,
       deadlineHour: deadlineHour || '07:00',
       memberAmount:
-        memberAmount ||
-        calculateGroupMembersAmount(currentClient, selectedGroups),
+        memberAmount || currentClient
+          ? calculateGroupMembersAmount(currentClient, selectedGroups)
+          : null,
     }),
     [
       dayInWeek,

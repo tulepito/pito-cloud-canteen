@@ -144,10 +144,7 @@ const CreateOrderWizard = () => {
     }
   };
 
-  const { draftOrder, order } = useAppSelector(
-    (state) => state.Order,
-    shallowEqual,
-  );
+  const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const tabsStatus = tabsActive(order) as any;
 
   useEffect(() => {
@@ -196,7 +193,6 @@ const CreateOrderWizard = () => {
             nextTab={nextTab(tab)}
             tab={tab}
             goBack={goBack(tab)}
-            draftOrder={draftOrder}
             disabled={disabled}
           />
         );
