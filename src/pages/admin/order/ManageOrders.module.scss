@@ -9,6 +9,11 @@
   margin: 50px 0;
 }
 
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
 .title {
   font-weight: $fontWeightBold;
   font-size: 24px;

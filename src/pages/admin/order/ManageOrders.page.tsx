@@ -63,7 +63,7 @@ const BAGDE_CLASSNAME_BASE_ON_ORDER_STATE = {
   [EOrderStates.picking]: css.badgeWarning,
 };
 
-const OrderDetailTooltip = ({ orderDetail }: any) => {
+const OrderDetailTooltip = ({ orderDetail = {} }: any) => {
   const orderDetails = Object.keys(orderDetail).map((key) => {
     const { status, foodList } = orderDetail[key];
     const totalPrice = Object.keys(foodList).reduce((prev, cur) => {
@@ -120,7 +120,7 @@ const TABLE_COLUMN: TColumn[] = [
       return (
         <NamedLink path={`${adminRoutes.ManageOrders.path}/${data.id}`}>
           <Tooltip
-            overlayInnerStyle={{ backgroundColor: '#ffffff' }}
+            overlayInnerStyle={{ backgroundColor: '#ffffff', opacity: 1 }}
             showArrow={false}
             tooltipContent={
               <OrderDetailTooltip orderDetail={data.orderDetail} />
@@ -192,14 +192,6 @@ const TABLE_COLUMN: TColumn[] = [
     label: 'Nhân viên phụ trách',
     render: (data: any) => {
       return <div>{data.staffName}</div>;
-    },
-    sortable: true,
-  },
-  {
-    key: 'shipperName',
-    label: 'Nhân viên giao hàng',
-    render: (data: any) => {
-      return <div>{data.shipperName}</div>;
     },
     sortable: true,
   },
@@ -415,9 +407,14 @@ const ManageOrdersPage = () => {
 
   return (
     <div className={css.root}>
-      <h1 className={css.title}>
-        <FormattedMessage id="ManageOrders.title" />
-      </h1>
+      <div className={css.pageHeader}>
+        <h1 className={css.title}>
+          <FormattedMessage id="ManageOrders.title" />
+        </h1>
+        <NamedLink path={adminRoutes.CreateOrder.path}>
+          <Button>Tạo đơn</Button>
+        </NamedLink>
+      </div>
       <div className={css.filterForm}>
         <IntegrationFilterModal
           onClear={onClearFilter}
@@ -486,9 +483,6 @@ const ManageOrdersPage = () => {
             );
           }}
         </IntegrationFilterModal>
-        <NamedLink path={adminRoutes.CreateOrder.path}>
-          <Button>Tạo đơn</Button>
-        </NamedLink>
       </div>
       {content}
     </div>
