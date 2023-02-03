@@ -1,7 +1,13 @@
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconCalendar from '@components/Icons/IconCalender/IconCalender';
+import IconClock from '@components/Icons/IconClock/IconClock';
+import config from '@src/configs';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
+import format from 'date-fns/format';
+import viLocale from 'date-fns/locale/vi';
 import subDays from 'date-fns/subDays';
 import { useState } from 'react';
 import { OnChange } from 'react-final-form-listeners';
@@ -9,29 +15,14 @@ import { useIntl } from 'react-intl';
 
 import css from './OrderDeadlineField.module.scss';
 
-const TIME_OPTIONS = [
-  '07:00',
-  '08:00',
-  '09:00',
-  '10:00',
-  '11:00',
-  '12:00',
-  '13:00',
-  '14:00',
-  '15:00',
-  '16:00',
-  '17:00',
-  '18:00',
-];
-
-type OrderDeadlineFieldProps = {
+type TOrderDeadlineFieldProps = {
   form: any;
   values: Record<string, any>;
   columnLayout?: boolean;
   title?: string;
 };
 
-const OrderDeadlineField: React.FC<OrderDeadlineFieldProps> = (props) => {
+const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
   const { values, columnLayout, title, form } = props;
   const {
     deadlineDate: deadlineDateInitialValue,
@@ -64,6 +55,11 @@ const OrderDeadlineField: React.FC<OrderDeadlineFieldProps> = (props) => {
       });
     }
   };
+
+  const deadlineDateClasses = classNames(
+    css.customInput,
+    !dealineDate && css.placeholder,
+  );
   return (
     <div className={css.container}>
       {title && <div className={css.fieldTitle}>{title}</div>}
@@ -74,18 +70,32 @@ const OrderDeadlineField: React.FC<OrderDeadlineFieldProps> = (props) => {
           name="deadlineDate"
           selected={dealineDate}
           onChange={(date: Date) => setDeadlineDate(date)}
-          className={css.customInput}
+          className={deadlineDateClasses}
           label={intl.formatMessage({
             id: 'OrderDeadlineField.deadlineDateLabel',
-          })}
-          placeholderText={intl.formatMessage({
-            id: 'OrderDeadlineField.deadlineDatePlaceholder',
           })}
           autoComplete="off"
           minDate={today}
           maxDate={maxSelectedDate}
           dateFormat={'EEE, dd MMMM, yyyy'}
           validate={required(deadlineDateRequired)}
+          customInput={
+            <FieldTextInput
+              id="deadlineDate"
+              name="deadlineDate"
+              disabled
+              format={(value) => {
+                return value
+                  ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
+                      locale: viLocale,
+                    })
+                  : intl.formatMessage({
+                      id: 'OrderDeadlineField.deadlineDatePlaceholder',
+                    });
+              }}
+              leftIcon={<IconCalendar />}
+            />
+          }
         />
         <FieldSelect
           id="deadlineHour"
@@ -94,8 +104,9 @@ const OrderDeadlineField: React.FC<OrderDeadlineFieldProps> = (props) => {
             id: 'OrderDeadlineField.deliveryHourLabel',
           })}
           className={css.fieldSelect}
+          leftIcon={<IconClock />}
           validate={required(deadlineHourRequired)}>
-          {TIME_OPTIONS.map((option) => (
+          {config.deadlineTimeOptions.map((option) => (
             <option key={option}>{option}</option>
           ))}
         </FieldSelect>

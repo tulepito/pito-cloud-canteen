@@ -1,12 +1,10 @@
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import { useIntl } from 'react-intl';
 
 import css from './RestaurantTable.module.scss';
 
-type TRestaurantTableHeadProps = {
-  rootClassName?: string;
-  className?: string;
-};
+type TRestaurantTableHeadProps = TDefaultProps & {};
 
 const RestaurantTableHead: React.FC<TRestaurantTableHeadProps> = (props) => {
   const intl = useIntl();

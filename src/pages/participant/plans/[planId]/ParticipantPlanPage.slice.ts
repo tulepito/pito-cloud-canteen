@@ -1,17 +1,17 @@
+import { loadPlanDataApi, updateParticipantOrderApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import {
-  shopingCartActions,
-  shopingCartThunks,
+  shoppingCartActions,
+  shoppingCartThunks,
 } from '@redux/slices/shopingCart.slice';
 import { createSlice } from '@reduxjs/toolkit';
-import { loadPlanDataApi, updateParticipantOrderApi } from '@utils/api';
 import { storableError } from '@utils/errors';
 
 const LOAD_DATA = 'app/ParticipantPlanPage/LOAD_DATA';
 const RELOAD_DATA = 'app/ParticipantPlanPage/RELOAD_DATA';
 const UPDATE_ORDER = 'app/ParticipantPlanPage/UPDATE_ORDER';
 
-type ParticipantPlanState = {
+type TParticipantPlanState = {
   restaurant: any;
   company: any;
   plan: any;
@@ -24,7 +24,7 @@ type ParticipantPlanState = {
   submitDataError: any;
 };
 
-const initialState: ParticipantPlanState = {
+const initialState: TParticipantPlanState = {
   restaurant: {},
   company: {},
   plan: {},
@@ -51,7 +51,7 @@ const loadData = createAsyncThunk(
       const status = userOder?.status;
       if (status === 'joined' || status === 'notJoined') {
         dispatch(
-          shopingCartActions.addToCart({
+          shoppingCartActions.addToCart({
             currentUserId,
             planId,
             dayId: day,
@@ -77,14 +77,14 @@ const reloadData = createAsyncThunk(
     const plan = response?.data?.data?.plan;
     const orderDays = Object.keys(plan);
 
-    dispatch(shopingCartThunks.removeAllFromPlanCart({ planId }));
+    dispatch(shoppingCartThunks.removeAllFromPlanCart({ planId }));
 
     orderDays.forEach((day) => {
       const userOder = plan?.[day]?.memberOrder?.[currentUserId];
       const status = userOder?.status;
       if (status === 'joined' || status === 'notJoined') {
         dispatch(
-          shopingCartActions.addToCart({
+          shoppingCartActions.addToCart({
             currentUserId,
             planId,
             dayId: day,

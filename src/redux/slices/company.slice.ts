@@ -19,7 +19,7 @@ type TGroupInfo = {
   description: string;
 };
 
-type CompanyState = {
+type TCompanyState = {
   groupList: any;
   fetchGroupListInProgress: boolean;
   companyMembers: any[];
@@ -59,7 +59,7 @@ const DELETE_GROUP = 'app/Company/DELETE_GROUP';
 const UPDATE_COMPANY_ACCOUNT = 'app/Company/UPDATE_COMPANY_ACCOUNT';
 const UPDATE_BOOKER_ACCOUNT = 'app/Company/UPDATE_BOOKER_ACCOUNT';
 
-const initialState: CompanyState = {
+const initialState: TCompanyState = {
   groupList: [],
   fetchGroupListInProgress: false,
   groupMembers: [],
@@ -144,7 +144,7 @@ const groupDetailInfo = createAsyncThunk(
       (_group: any) => _group.id === groupId,
     );
     const { data: allMembersData } = await axios.get(
-      `/api/company/group/all-member?groupId=${groupId}&perPage=${MEMBER_PER_PAGE}&page=${page}`,
+      `/company/group/all-member?groupId=${groupId}&perPage=${MEMBER_PER_PAGE}&page=${page}`,
     );
     const groupInfoState: TGroupInfo = {
       id,
@@ -163,7 +163,7 @@ const createGroup = createAsyncThunk(
   CREATE_GROUP,
   async (params: TObject, { getState }) => {
     const { workspaceCompanyId } = getState().company;
-    const { data: newCompanyAccount } = await axios.post('/api/company/group', {
+    const { data: newCompanyAccount } = await axios.post('/company/group', {
       ...params,
       companyId: workspaceCompanyId,
     });
@@ -179,7 +179,7 @@ const updateGroup = createAsyncThunk(
     { getState, dispatch },
   ) => {
     const { workspaceCompanyId } = getState().company;
-    await axios.put('/api/company/group', {
+    await axios.put('/company/group', {
       addedMembers,
       deletedMembers,
       groupId,
@@ -194,15 +194,12 @@ const deleteGroup = createAsyncThunk(
   DELETE_GROUP,
   async (groupId: string, { getState }) => {
     const { workspaceCompanyId } = getState().company;
-    const { data: newCompanyAccount } = await axios.delete(
-      '/api/company/group',
-      {
-        data: {
-          groupId,
-          companyId: workspaceCompanyId,
-        },
+    const { data: newCompanyAccount } = await axios.delete('/company/group', {
+      data: {
+        groupId,
+        companyId: workspaceCompanyId,
       },
-    );
+    });
     const { groups } = newCompanyAccount.attributes.profile.metadata;
     return groups;
   },

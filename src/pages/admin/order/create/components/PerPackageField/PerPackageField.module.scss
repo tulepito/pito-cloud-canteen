@@ -11,7 +11,7 @@
   margin-top: 16px;
 }
 .numberInput {
-  width: 300px;
+  width: 400px;
 
   input {
     &::-webkit-inner-spin-button {
@@ -28,8 +28,9 @@
   }
 }
 .vndIcon {
-  border-left: 1px solid $neutralGray5;
+  border-left: 1px solid $neutralGray4;
   padding: 0 16px;
+  color: $neutralGray4;
 }
 
 .toggle {

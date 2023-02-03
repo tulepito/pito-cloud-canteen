@@ -3,19 +3,20 @@
  * Clicking it toggles visibility of MenuContent.
  */
 import useBoolean from '@hooks/useBoolean';
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import type { MouseEvent, PropsWithChildren } from 'react';
 import React from 'react';
 
 import css from './ProfileMenuLabel.module.scss';
 
-type TProfileMenuLabelProps = PropsWithChildren<{
-  rootClassName?: string;
-  className?: string;
-  isOpenClassName?: string;
-  isOpen?: boolean;
-  onToggleActive?: () => void;
-}>;
+type TProfileMenuLabelProps = PropsWithChildren<
+  TDefaultProps & {
+    isOpenClassName?: string;
+    isOpen?: boolean;
+    onToggleActive?: () => void;
+  }
+>;
 
 const ProfileMenuLabel: React.FC<TProfileMenuLabelProps> = (props) => {
   const { value: clickedWithMouse, setValue: setClickedWithMouse } =

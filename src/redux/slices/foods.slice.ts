@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
-import { getImportDataFromCsv } from '@src/pages/admin/partner/[restaurantId]/settings/food/utils';
 import {
   createPartnerFoodApi,
   deletePartnerFoodApi,
   showPartnerFoodApi,
   updatePartnerFoodApi,
-} from '@utils/api';
+} from '@apis/foodApi';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
+import { getImportDataFromCsv } from '@src/pages/admin/partner/[restaurantId]/settings/food/utils';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants, EListingType } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type {
   TImage,
-  TIntergrationFoodListing,
+  TIntegrationFoodListing,
   TListing,
   TPagination,
 } from '@utils/types';
@@ -561,7 +561,7 @@ const foodSlice = createSlice({
           createPartnerFoodFromCsvInProgress: false,
           createPartnerFoodFromCsvError: null,
           foods: [
-            ...(payload as unknown as TIntergrationFoodListing[]),
+            ...(payload as unknown as TIntegrationFoodListing[]),
             ...state.foods,
           ],
         }),

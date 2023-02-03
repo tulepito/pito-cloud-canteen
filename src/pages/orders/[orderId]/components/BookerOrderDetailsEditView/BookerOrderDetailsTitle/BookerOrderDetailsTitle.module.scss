@@ -1,0 +1,29 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  display: flex;
+  justify-content: space-between;
+  column-gap: 16px;
+  background-color: $neutralGray1;
+  position: sticky;
+  top: 0px;
+  z-index: 2;
+
+  @include viewportMedium {
+    position: static;
+  }
+
+  .titleText {
+    padding-bottom: 7px;
+    color: $neutralGray6;
+    @include textTemplate(24px, 700, 4/3);
+  }
+
+  .makeOrderBtn {
+    width: 160px;
+    align-self: center;
+    padding: 0;
+  }
+}

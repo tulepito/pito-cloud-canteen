@@ -3,7 +3,7 @@ import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import IconSort from '@components/Icons/IconSort/IconSort';
 import Pagination from '@components/Pagination/Pagination';
-import type { TPagination } from '@utils/types';
+import type { TDefaultProps, TPagination } from '@utils/types';
 import classNames from 'classnames';
 import type { FormApi } from 'final-form';
 import { useRouter } from 'next/router';
@@ -27,10 +27,9 @@ export type TRowData = {
   data: any;
 };
 
-type TTableProps = {
+type TTableProps = TDefaultProps & {
   columns: TColumn[];
   data: TRowData[];
-  rootClassName?: string;
   tableClassName?: string;
   tableHeadClassName?: string;
   tableHeadRowClassName?: string;

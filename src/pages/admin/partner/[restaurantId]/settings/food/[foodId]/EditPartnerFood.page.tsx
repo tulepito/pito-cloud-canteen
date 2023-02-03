@@ -74,6 +74,7 @@ const EditPartnerFoodPage = () => {
         inProgress={updateFoodInProgress}
         formError={updateFoodError}
         initialValues={initialValues}
+        isEditting
       />
     </>
   );

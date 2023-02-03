@@ -1,5 +1,7 @@
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import { convertWeekDay, getDayInWeekFromPeriod } from '@utils/dates';
 import classNames from 'classnames';
+import differenceBy from 'lodash/differenceBy';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -22,8 +24,17 @@ type DayInWeekFieldProps = {
 const DayInWeekField: React.FC<DayInWeekFieldProps> = (props) => {
   const { form, values } = props;
   const intl = useIntl();
-  const { dayInWeek = [] } = values;
+  const { dayInWeek = [], startDate, endDate } = values;
   const [selectedDays, setSelectedDays] = useState<string[]>(dayInWeek);
+  const dayInWeekFromStartDateToEndDate = getDayInWeekFromPeriod(
+    parseInt(startDate, 10),
+    parseInt(endDate, 10),
+  ).map((weekDay) => convertWeekDay(weekDay));
+  const disableDayInWeekOptions = differenceBy(
+    DAY_IN_WEEK,
+    dayInWeekFromStartDateToEndDate,
+    'key',
+  );
   useEffect(() => {
     form.change('dayInWeek', selectedDays);
   }, [form, selectedDays, selectedDays.length]);
@@ -45,6 +56,7 @@ const DayInWeekField: React.FC<DayInWeekFieldProps> = (props) => {
               key={day.key}
               className={classNames(css.dayItem, {
                 [css.selected]: selectedDays.includes(day.key),
+                [css.disabled]: disableDayInWeekOptions.includes(day),
               })}
               onClick={onDaySelect}>
               {intl.formatMessage({ id: day.label })}

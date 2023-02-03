@@ -39,6 +39,11 @@
   justify-content: center;
   border-bottom: 1px solid $neutralGray5;
   padding: 4px;
+
+  &.hover {
+    background-color: $primaryPri1;
+    border-bottom-color: $primaryPri2;
+  }
 }
 
 .activeHeader {

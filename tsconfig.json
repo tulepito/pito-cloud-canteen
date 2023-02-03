@@ -30,6 +30,8 @@
       "@translations/*": ["src/translations/*"],
       "@helpers/*": ["src/helpers/*"],
       "@reducer/*": ["src/reducer/*"],
+      "@pages/*": ["src/pages/*"],
+      "@apis/*": ["src/apis/*"],
       "@src/*": ["src/*"]
     }
   },

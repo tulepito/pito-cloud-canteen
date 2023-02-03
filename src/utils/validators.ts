@@ -451,3 +451,7 @@ export const maxTimeValidate =
   (message: string, maxVal: string) => (value: string) => {
     return timeToMinute(value) <= timeToMinute(maxVal) ? VALID : message;
   };
+export const nonSatOrSunDay = (message: string) => (value: number) => {
+  const dayOfWeek = new Date(value).getDay();
+  return dayOfWeek === 6 || dayOfWeek === 0 ? message : VALID;
+};

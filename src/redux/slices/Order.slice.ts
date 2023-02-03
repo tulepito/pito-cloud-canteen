@@ -1,16 +1,17 @@
-import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
-import { queryOrdersApi } from '@utils/api';
-import { storableError } from '@utils/errors';
+import { fetchUserApi } from '@apis/index';
 import {
-  addMealPlanDetailApi,
   createOrderApi,
   initiateTransactionsApi,
-  updateMealPlanDetailApi,
-} from '@utils/orderApi';
+  queryOrdersApi,
+  updateOrderApi,
+} from '@apis/orderApi';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
+import { UserPermission } from '@src/types/UserPermission';
+import { denormalisedResponseEntities, LISTING, USER } from '@utils/data';
+import { storableError } from '@utils/errors';
 import type { TListing, TPagination } from '@utils/types';
 import cloneDeep from 'lodash/cloneDeep';
-import { DateTime } from 'luxon';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
 
@@ -34,19 +35,37 @@ const updateSetUpPlan = ({
   return newOrderDetail;
 };
 
-type OrderInitialState = {
+type TOrderInitialState = {
   order: TListing | null;
+  fetchOrderInProgress: boolean;
+  fetchOrderError: any;
   plans: TListing[];
+
   createOrderInProcess: boolean;
   createOrderError: any;
 
-  addMealPlanDetailInProgress: boolean;
-  addMealPlanDetailError: any;
+  completeOrderInProgress: boolean;
+  completeOrderError: any;
+  draftOrder: any;
+  selectedCompany: any;
+
+  fetchBookersInProgress: boolean;
+  fetchBookersError: any;
+  bookerList: any[];
+  selectedBooker: any;
+
+  selectedCalendarDate: Date;
+  isSelectingRestaurant: boolean;
+
+  updateOrderInProgress: boolean;
+  updateOrderError: any;
+
+  orderDetail: any;
+  fetchOrderDetailInProgress: boolean;
+  fetchOrderDetailError: any;
 
   initiateTransactionsInProgress: boolean;
   initiateTransactionsError: any;
-  draftOrder: any;
-  selectedCompany: any;
 
   // Manage Orders Page
   orders: TListing[];
@@ -56,24 +75,43 @@ type OrderInitialState = {
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
-const ADD_MEAL_PLAN_DETAIL = 'app/Order/ADD_MEAL_PLAN_DETAIL';
-const UPDATE_MEAL_PLAN_DETAIL = 'app/Order/UPDATE_MEAL_PLAN_DETAIL';
+const UPDATE_ORDER = 'app/Order/UPDATE_ORDER';
+const FETCH_COMPANY_BOOKERS = 'app/Order/FETCH_COMPANY_BOOKERS';
+const FETCH_ORDER = 'app/Order/FETCH_ORDER';
+const FETCH_ORDER_DETAIL = 'app/Order/FETCH_ORDER_DETAIL';
 const INITIATE_TRANSACTIONS = 'app/Order/INITIATE_TRANSACTIONS';
 const QUERY_SUB_ORDERS = 'app/Order/QUERY_SUB_ORDERS';
 
-const initialState: OrderInitialState = {
+const initialState: TOrderInitialState = {
   order: null,
+  fetchOrderInProgress: false,
+  fetchOrderError: null,
   plans: [],
+  orderDetail: {},
   createOrderInProcess: false,
   createOrderError: null,
 
-  addMealPlanDetailInProgress: false,
-  addMealPlanDetailError: null,
+  completeOrderInProgress: false,
+  completeOrderError: null,
+  draftOrder: {},
+  selectedCompany: null,
+
+  fetchBookersInProgress: false,
+  fetchBookersError: null,
+  bookerList: [],
+  selectedBooker: null,
+
+  selectedCalendarDate: undefined!,
+  isSelectingRestaurant: false,
+
+  updateOrderInProgress: false,
+  updateOrderError: null,
+
+  fetchOrderDetailInProgress: false,
+  fetchOrderDetailError: null,
 
   initiateTransactionsInProgress: false,
   initiateTransactionsError: null,
-  draftOrder: {},
-  selectedCompany: null,
 
   // Manage Orders
   orders: [],
@@ -87,59 +125,23 @@ const initialState: OrderInitialState = {
   },
 };
 
-const createOrder = createAsyncThunk(
-  CREATE_ORDER,
-  async (staffName: string, { getState }) => {
-    const { draftOrder } = getState().Order;
-    const { clientId, orderDetail, ...rest } = draftOrder;
-    const { deadlineDate, deadlineHour } = rest;
-    const parsedDeadlineDate =
-      DateTime.fromMillis(deadlineDate).toFormat('yyyy-MM-dd');
-    const orderDeadline = DateTime.fromISO(
-      `${parsedDeadlineDate}T${deadlineHour}:00`,
-    ).toMillis();
-    const apiBody = {
-      companyId: clientId,
-      generalInfo: {
-        ...rest,
-        staffName,
-        orderDeadline,
-      },
-      orderDetail,
-    };
-    const { data: orderListing } = await createOrderApi(apiBody);
-    await addMealPlanDetailApi({
-      orderId: orderListing.data.id.uuid,
-    });
-    return orderListing;
-  },
-);
+const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
+  const { clientId, bookerId } = params;
+  const apiBody = {
+    companyId: clientId,
+    bookerId,
+  };
+  const { data: orderListing } = await createOrderApi(apiBody);
+  return orderListing;
+});
 
-const addMealPlanDetail = createAsyncThunk(
-  ADD_MEAL_PLAN_DETAIL,
-  async (params: any) => {
-    const {
-      data: { orderListing, planListing },
-    } = await addMealPlanDetailApi({ ...params });
-    // return order listing entity
-    return {
-      orderListing,
-      planListing,
-    };
-  },
-);
-
-const updateMealPlanDetail = createAsyncThunk(
-  UPDATE_MEAL_PLAN_DETAIL,
+const updateOrder = createAsyncThunk(
+  UPDATE_ORDER,
   async (params: any, { getState }) => {
-    const { plans } = getState().Order;
-    const {
-      data: { planListing },
-    } = await updateMealPlanDetailApi(params);
-    const newPlans = plans.map((plan) =>
-      plan.id.uuid === planListing.id.uuid ? planListing : plan,
-    );
-    return newPlans;
+    const { order } = getState().Order;
+    const orderId = LISTING(order as TListing).getId();
+    const { data: orderListing } = await updateOrderApi({ ...params, orderId });
+    return orderListing;
   },
 );
 
@@ -173,10 +175,74 @@ const queryOrders = createAsyncThunk(
   },
 );
 
+const fetchCompanyBookers = createAsyncThunk(
+  FETCH_COMPANY_BOOKERS,
+  async (companyId: string, { extra: sdk }) => {
+    const companyAccount = denormalisedResponseEntities(
+      await sdk.users.show(
+        {
+          id: companyId,
+        },
+        { expand: true },
+      ),
+    )[0];
+    const { members = {} } = USER(companyAccount).getMetadata();
+    const bookerEmails = Object.keys(members).filter(
+      (email) => members[email].permission === UserPermission.BOOKER,
+    );
+    const bookers = await Promise.all(
+      bookerEmails.map(async (email) => {
+        const { data } = await fetchUserApi(members[email].id);
+        return data;
+      }),
+    );
+    return bookers;
+  },
+);
+
+const fetchOrderDetail = createAsyncThunk(
+  FETCH_ORDER_DETAIL,
+  async (_, { getState, extra: sdk }) => {
+    const { order } = getState().Order;
+
+    const { plans = [] } = LISTING(order as TListing).getMetadata();
+    if (plans[0]) {
+      const response = denormalisedResponseEntities(
+        await sdk.listings.show({
+          id: plans[0],
+        }),
+      )[0];
+      return LISTING(response).getMetadata().orderDetail;
+    }
+    return {};
+  },
+);
+
+const fetchOrder = createAsyncThunk(
+  FETCH_ORDER,
+  async (orderId: string, { extra: sdk }) => {
+    const response = denormalisedResponseEntities(
+      await sdk.listings.show({
+        id: orderId,
+      }),
+    )[0];
+
+    const { bookerId } = LISTING(response).getMetadata();
+    const selectedBooker = denormalisedResponseEntities(
+      await sdk.users.show({
+        id: bookerId,
+      }),
+    )[0];
+    return { order: response, selectedBooker };
+  },
+);
+
 export const OrderAsyncAction = {
   createOrder,
-  addMealPlanDetail,
-  updateMealPlanDetail,
+  updateOrder,
+  fetchCompanyBookers,
+  fetchOrderDetail,
+  fetchOrder,
   initiateTransactions,
   queryOrders,
 };
@@ -195,28 +261,57 @@ const orderSlice = createSlice({
         selectedCompany: payload.company,
       };
     },
+    addBooker: (state, { payload }) => ({
+      ...state,
+      selectedBooker: payload,
+    }),
     updateDraftMealPlan: (state, { payload }) => {
       const { orderDetail, ...restPayload } = payload;
       const { startDate, endDate } = restPayload;
-      const { orderDetail: oldOrderDetail } = state.draftOrder;
+      const { orderDetail: oldOrderDetail } = state;
       const updatedOrderDetailData = { ...oldOrderDetail, ...orderDetail };
 
       return {
         ...state,
-        draftOrder: {
-          ...state.draftOrder,
-          ...restPayload,
-          orderDetail: updateSetUpPlan({
-            startDate,
-            endDate,
-            orderDetail: updatedOrderDetailData,
-          }),
-        },
+        orderDetail: updateSetUpPlan({
+          startDate,
+          endDate,
+          orderDetail: updatedOrderDetailData,
+        }),
       };
     },
+    removeMealDay: (state, { payload }) => ({
+      ...state,
+      draftOrder: {
+        ...state.draftOrder,
+        orderDetail: payload,
+      },
+    }),
+    selectCalendarDate: (state, { payload }) => ({
+      ...state,
+      selectedCalendarDate: payload,
+    }),
+    selectRestaurant: (state) => ({
+      ...state,
+      isSelectingRestaurant: true,
+    }),
+    unSelectRestaurant: (state) => ({
+      ...state,
+      isSelectingRestaurant: false,
+    }),
     removeDraftOrder: (state) => ({
       ...state,
       draftOrder: {},
+    }),
+    removeBookerList: (state) => ({
+      ...state,
+      bookerList: [],
+    }),
+    resetOrder: (state) => ({
+      ...state,
+      order: null,
+      orderDetail: {},
+      selectedBooker: null,
     }),
   },
   extraReducers: (builder) => {
@@ -237,35 +332,20 @@ const orderSlice = createSlice({
         createOrderInProcess: false,
       }))
 
-      .addCase(addMealPlanDetail.pending, (state) => ({
+      .addCase(updateOrder.pending, (state) => ({
         ...state,
-        addMealPlanDetailInProgress: true,
+        updateOrderInProgress: true,
+        updateOrderError: null,
       }))
-      .addCase(addMealPlanDetail.fulfilled, (state, { payload }) => ({
+      .addCase(updateOrder.fulfilled, (state, { payload }) => ({
         ...state,
-        addMealPlanDetailInProgress: false,
-        order: payload.orderListing,
-        plans: [...state.plans, payload.planListing],
+        updateOrderInProgress: false,
+        order: payload,
       }))
-      .addCase(addMealPlanDetail.rejected, (state, { error }) => ({
+      .addCase(updateOrder.rejected, (state, { error }) => ({
         ...state,
-        addMealPlanDetailInProgress: false,
-        addMealPlanDetailError: error.message,
-      }))
-
-      .addCase(updateMealPlanDetail.pending, (state) => ({
-        ...state,
-        addMealPlanDetailInProgress: true,
-      }))
-      .addCase(updateMealPlanDetail.fulfilled, (state, { payload }) => ({
-        ...state,
-        addMealPlanDetailInProgress: false,
-        plans: payload,
-      }))
-      .addCase(updateMealPlanDetail.rejected, (state, { error }) => ({
-        ...state,
-        addMealPlanDetailInProgress: false,
-        addMealPlanDetailError: error.message,
+        updateOrderInProgress: false,
+        updateOrderError: error.message,
       }))
 
       .addCase(initiateTransactions.pending, (state) => ({
@@ -300,11 +380,70 @@ const orderSlice = createSlice({
         ...state,
         queryOrderInProgress: false,
         queryOrderError: payload,
+      }))
+
+      .addCase(fetchCompanyBookers.pending, (state) => ({
+        ...state,
+        fetchBookersInProgress: true,
+        fetchBookersError: null,
+      }))
+      .addCase(fetchCompanyBookers.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchBookersInProgress: false,
+        bookerList: payload,
+      }))
+      .addCase(fetchCompanyBookers.rejected, (state, { error }) => ({
+        ...state,
+        fetchBookersInProgress: false,
+        fetchBookersError: error.message,
+      }))
+
+      .addCase(fetchOrder.pending, (state) => ({
+        ...state,
+        fetchOrderInProgress: true,
+        fetchOrderError: null,
+      }))
+      .addCase(fetchOrder.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchOrderInProgress: false,
+        order: payload.order,
+        selectedBooker: payload.selectedBooker,
+      }))
+      .addCase(fetchOrder.rejected, (state, { error }) => ({
+        ...state,
+        fetchOrderInProgress: false,
+        fetchOrderError: error.message,
+      }))
+
+      .addCase(fetchOrderDetail.pending, (state) => ({
+        ...state,
+        fetchOrderDetailInProgress: true,
+        fetchOrderDetailError: null,
+      }))
+      .addCase(fetchOrderDetail.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchOrderDetailInProgress: false,
+        orderDetail: payload,
+      }))
+      .addCase(fetchOrderDetail.rejected, (state, { error }) => ({
+        ...state,
+        fetchOrderDetailInProgress: false,
+        fetchOrderDetailError: error.message,
       }));
   },
 });
 
-export const { addCompanyClient, updateDraftMealPlan, removeDraftOrder } =
-  orderSlice.actions;
+export const {
+  addCompanyClient,
+  updateDraftMealPlan,
+  removeDraftOrder,
+  removeBookerList,
+  addBooker,
+  removeMealDay,
+  selectCalendarDate,
+  selectRestaurant,
+  unSelectRestaurant,
+  resetOrder,
+} = orderSlice.actions;
 
 export default orderSlice.reducer;

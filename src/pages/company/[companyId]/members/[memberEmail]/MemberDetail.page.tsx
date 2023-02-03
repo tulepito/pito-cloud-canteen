@@ -44,11 +44,8 @@ const MemberDetailPage: React.FC<MemberDetailPageProps> = () => {
     (state) => state.company.companyMembers,
     shallowEqual,
   );
-  const deleteMemberInProgress = useAppSelector(
-    (state) => state.companyMember.deleteMemberInProgress,
-  );
-  const deleteMemberError = useAppSelector(
-    (state) => state.companyMember.deleteMemberError,
+  const { deleteMemberInProgress, deleteMemberError } = useAppSelector(
+    (state) => state.companyMember,
   );
 
   const checkMemberHasFlexAccount =

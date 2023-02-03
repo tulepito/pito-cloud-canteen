@@ -43,7 +43,7 @@
 
 .deleteBtn {
   cursor: pointer;
-  @include buttonTextColor;
+  @include buttonColorInline;
   &:hover {
     border: none;
   }

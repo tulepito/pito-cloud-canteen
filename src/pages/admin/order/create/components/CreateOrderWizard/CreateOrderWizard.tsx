@@ -1,7 +1,15 @@
 import FormWizard from '@components/FormWizard/FormWizard';
+import { getItem, setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
-import { getItem, setItem } from '@utils/localStorageHelpers';
+import {
+  OrderAsyncAction,
+  removeBookerList,
+  resetOrder,
+} from '@redux/slices/Order.slice';
+import { LISTING } from '@utils/data';
+import type { TListing } from '@utils/types';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -31,18 +39,18 @@ export const TABS = [
 
 export const CREATE_ORDER_STEP_LOCAL_STORAGE_NAME = 'orderStep';
 
-const tabCompleted = (draftOrder: any, tab: string) => {
+const tabCompleted = (order: any, tab: string) => {
+  const orderId = LISTING(order).getId();
   const {
-    clientId,
     deliveryAddress,
     staffName,
-    orderDetail = {},
-  } = draftOrder || {};
-  const isMealPlanTabCompleted = Object.entries(orderDetail).length > 0;
+    plans = [],
+  } = LISTING(order).getMetadata();
+  const isMealPlanTabCompleted = plans.length > 0;
 
   switch (tab) {
     case CLIENT_SELECT_TAB:
-      return clientId;
+      return orderId;
     case MEAL_PLAN_SETUP:
       return deliveryAddress;
     case CREATE_MEAL_PLAN_TAB:
@@ -86,14 +94,30 @@ const CreateOrderWizard = () => {
   const stepFromLocal = getItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME);
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { orderId } = router.query;
   const [currentStep, setCurrentStep] = useState<string>(
     stepFromLocal || CLIENT_SELECT_TAB,
   );
 
   useEffect(() => {
-    if (currentStep === CLIENT_SELECT_TAB)
+    if (currentStep === CLIENT_SELECT_TAB) {
       dispatch(manageCompaniesThunks.queryCompanies());
+      dispatch(removeBookerList());
+    }
   }, [currentStep, dispatch]);
+
+  useEffect(() => {
+    if (orderId) {
+      dispatch(OrderAsyncAction.fetchOrder(orderId as string));
+    }
+  }, [dispatch, orderId]);
+
+  useEffect(() => {
+    if (!orderId) {
+      dispatch(resetOrder());
+    }
+  }, []);
 
   const saveStep = (tab: string) => {
     setCurrentStep(tab);
@@ -120,10 +144,23 @@ const CreateOrderWizard = () => {
     }
   };
 
-  // const { draftOrder } = getPersistState('Order');
-  const { draftOrder } = useAppSelector((state) => state.Order, shallowEqual);
-  const tabsStatus = tabsActive(draftOrder) as any;
+  const order = useAppSelector((state) => state.Order.order, shallowEqual);
+  const tabsStatus = tabsActive(order) as any;
 
+  useEffect(() => {
+    if (order) {
+      const { plans = [], staffName } = LISTING(
+        order as TListing,
+      ).getMetadata();
+      if (staffName) {
+        return setCurrentStep(REVIEW_TAB);
+      }
+      if (plans.length > 0) {
+        return setCurrentStep(CREATE_MEAL_PLAN_TAB);
+      }
+      return setCurrentStep(MEAL_PLAN_SETUP);
+    }
+  }, [order]);
   useEffect(() => {
     // If selectedTab is not active, redirect to the beginning of wizard
     if (!tabsStatus[currentStep as string]) {
@@ -140,7 +177,9 @@ const CreateOrderWizard = () => {
   return (
     <FormWizard formTabNavClassName={css.formTabNav}>
       {TABS.map((tab: string, index) => {
-        const disabled = !tabCompleted(draftOrder, TABS[index - 1]);
+        const disabled =
+          !tabCompleted(order, TABS[index - 1]) ||
+          (orderId && tab === CLIENT_SELECT_TAB);
 
         return (
           <CreateOrderTab
@@ -154,7 +193,6 @@ const CreateOrderWizard = () => {
             nextTab={nextTab(tab)}
             tab={tab}
             goBack={goBack(tab)}
-            draftOrder={draftOrder}
             disabled={disabled}
           />
         );

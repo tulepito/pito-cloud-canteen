@@ -33,15 +33,16 @@
   color: $neutralGray5;
 }
 
-.leftIcon {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1;
-}
 .selectContainer {
   position: relative;
+
+  .leftIcon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+  }
 }
 .paddingWithLeftIcon {
   padding-left: 52px;

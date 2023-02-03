@@ -1,18 +1,30 @@
+import { loadOrderDataApi, updateParticipantOrderApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { userThunks } from '@redux/slices/user.slice';
 import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
-
-import { loadOrderDataApi, updateParticipantOrderApi } from '../../utils/api';
+import type { TListing, TObject, TUser } from '@utils/types';
 
 const LOAD_DATA = 'app/OrderManagementPage/LOAD_DATA';
 const RELOAD_DATA = 'app/OrderManagementPage/RELOAD_DATA';
 const UPDATE_ORDER = 'app/OrderManagementPage/UPDATE_ORDER';
 
-const initialState: any = {
+type TParticipantOrderManagementState = {
+  company: TUser | {};
+  order: TListing | {};
+  plans: TListing[];
+  subOrders: any[];
+  loadDataInProgress: boolean;
+  loadDataError: any;
+  // Update order
+  updateOrderInProgress: boolean;
+  updateOrderError: any;
+};
+
+const initialState: TParticipantOrderManagementState = {
   company: {},
   order: {},
-  plans: {},
+  plans: [],
   subOrders: [],
   loadDataInProgress: false,
   loadDataError: null,
@@ -48,7 +60,7 @@ const reloadData = createAsyncThunk(
 
 const updateOrder = createAsyncThunk(
   UPDATE_ORDER,
-  async (data: { orderId: string; updateValues: any }, { dispatch }) => {
+  async (data: { orderId: string; updateValues: TObject }, { dispatch }) => {
     const { orderId, updateValues } = data;
     await updateParticipantOrderApi(orderId, updateValues);
     await dispatch(reloadData(orderId));
@@ -58,7 +70,7 @@ const updateOrder = createAsyncThunk(
   },
 );
 
-export const ParticipantOrderAsyncAction = { loadData, updateOrder };
+export const participantOrderManagementThunks = { loadData, updateOrder };
 
 const participantOrderSlice = createSlice({
   name: 'ParticipantOrderManagement',
@@ -66,6 +78,7 @@ const participantOrderSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      /* =============== loadData =============== */
       .addCase(loadData.pending, (state) => ({
         ...state,
         loadDataInProgress: true,

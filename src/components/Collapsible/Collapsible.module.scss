@@ -9,6 +9,7 @@
 
   &.isOpen {
     padding-bottom: 16px;
+    overflow: visible;
   }
 
   .labelSection {
@@ -24,9 +25,11 @@
       text-transform: uppercase;
     }
   }
+
   .content {
     transition: height 0.3s;
     height: initial;
+
     &.isClose {
       height: 0;
     }

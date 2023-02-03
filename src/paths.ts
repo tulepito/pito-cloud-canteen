@@ -5,6 +5,7 @@ export const generalPaths = {
   ResetPassword: '/dat-lai-mat-khau',
   StyleGuide: '/style-guide',
   Home: '/',
+  OrderManageMent: '/orders/[orderId]',
 };
 
 const enGeneralPaths = {
@@ -34,6 +35,7 @@ export const IgnoredPermissionCheckRoutes = [
   generalPaths.StyleGuide,
   enGeneralPaths.SignIn,
   enGeneralPaths.SignUp,
+  generalPaths.OrderManageMent,
 ];
 
 export const adminPaths = {
@@ -134,6 +136,10 @@ export const adminRoutes = {
   EditPartnerMenu: {
     path: '/admin/partner/[restaurantId]/settings/menu/create',
     label: 'Chỉnh sửa thực đơn',
+  },
+  EditOrder: {
+    path: '/admin/order/[orderId]',
+    label: 'Tạo đơn hàng',
   },
 } as const;
 

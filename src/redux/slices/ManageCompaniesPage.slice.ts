@@ -1,13 +1,13 @@
+import { getCompaniesApi, updateCompanyStatusApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
-import { getCompaniesApi, updateCompanyStatusApi } from '@utils/api';
 import { denormalisedResponseEntities } from '@utils/data';
 import { storableError } from '@utils/errors';
 import type { TCompany, TPagination } from '@utils/types';
 
 export const RESULT_PAGE_SIZE = 10;
 
-type ManageCompanyState = {
+type TManageCompanyState = {
   companyRefs: any[];
   queryCompaniesInProgress: boolean;
   queryCompaniesError: any;
@@ -52,7 +52,7 @@ export const manageCompaniesThunks = {
   updateCompanyStatus,
 };
 
-const initialState: ManageCompanyState = {
+const initialState: TManageCompanyState = {
   companyRefs: [],
   queryCompaniesInProgress: false,
   queryCompaniesError: true,

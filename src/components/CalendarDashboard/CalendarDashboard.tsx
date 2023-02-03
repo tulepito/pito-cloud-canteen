@@ -1,5 +1,6 @@
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
@@ -14,9 +15,7 @@ import Toolbar from './components/Toolbar/Toolbar';
 import withWeekViewWrapper from './components/WeekView/withWeekViewWrapper';
 import type { TCalendarItemCardComponents } from './helpers/types';
 
-type TCalendarDashboardProps = {
-  rootClassName?: string;
-  className?: string;
+type TCalendarDashboardProps = TDefaultProps & {
   anchorDate?: Date;
   defaultDate?: Date;
   startDate?: Date;
@@ -26,6 +25,7 @@ type TCalendarDashboardProps = {
   companyLogo?: ReactNode;
   components?: TCalendarItemCardComponents;
   inProgress?: boolean;
+  recommendButton?: ReactNode;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
@@ -38,6 +38,9 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   companyLogo,
   components,
   inProgress,
+  recommendButton,
+  startDate,
+  endDate,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
 
@@ -81,6 +84,10 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
 
   const toolbarExtraProps = {
     companyLogo,
+    recommendButton,
+    startDate,
+    endDate,
+    anchorDate: calDate,
   };
 
   useEffect(() => {

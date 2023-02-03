@@ -1,0 +1,39 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.fieldTitle {
+  @include text(18px, 24px);
+  font-weight: $fontWeightBold;
+}
+
+.fieldGroup {
+  margin-top: 16px;
+
+  .amountLabel {
+    position: absolute;
+    right: 28px;
+  }
+}
+.numberInput {
+  width: 400px;
+
+  input {
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+      // -moz-appearance: textfield;
+    }
+
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+      // -moz-appearance: textfield;
+    }
+  }
+}
+.label {
+  border-left: 1px solid $neutralGray4;
+  padding-left: 12px;
+  color: $neutralGray4;
+}

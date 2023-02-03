@@ -6,16 +6,18 @@ import css from './DayItem.module.scss';
 type TDayColumnHeaderProps = {
   isCurrentDay: boolean;
   date: Date;
+  isMouseOnDay: boolean;
 };
 
 const DayColumnHeader: React.FC<TDayColumnHeaderProps> = ({
   isCurrentDay,
   date,
+  isMouseOnDay,
 }) => {
   return (
     <div
       className={classNames(css.dayHeader, {
-        [css.activeHeader]: isCurrentDay,
+        [css.activeHeader]: isCurrentDay || isMouseOnDay,
       })}>
       <div className={css.dateNumber}>{date.getDate()}</div>
       <div className={css.dayText}>

@@ -24,6 +24,7 @@ const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (props) => {
     meta,
     customErrorText,
     onChange: onDatePickerChange,
+    customInput,
     ...rest
   } = props;
   const { name, onChange } = input;
@@ -52,9 +53,10 @@ const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (props) => {
         id={id}
         name={name}
         onChange={onInputChange}
+        customInput={customInput}
         {...rest}
       />
-      <ValidationError fieldMeta={fieldMeta} />
+      {!customInput && <ValidationError fieldMeta={fieldMeta} />}
     </div>
   );
 };

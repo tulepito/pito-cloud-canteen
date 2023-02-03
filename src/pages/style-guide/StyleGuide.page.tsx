@@ -1,5 +1,5 @@
 import Accordion from '@components/Accordion/Accordion';
-import Badge from '@components/Badge/Badge';
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
@@ -110,14 +110,12 @@ const StyleGuidePage = (props: any) => {
   const onShowSizeChange = (current: number, _pageSize: number) => {
     setPageSize(_pageSize);
   };
-  const onSubmitHandler = (values: object) => {
-    console.log('Values:', { values });
-  };
+  const onSubmitHandler = (_values: object) => {};
 
-  const onSingleToggle = (value: boolean) => {
-    console.log('Single toggle:', value);
-  };
+  const onSingleToggle = (_value: boolean) => {};
+
   const onSetPageCurrent = (value: number) => setPageCurrent(value);
+
   return (
     <div className={css.styleGuideContainer}>
       <StyleGuideCard>
@@ -402,34 +400,52 @@ const StyleGuidePage = (props: any) => {
         <p className={css.title}>Single label</p>
         <div className={css.badgeContainer}>
           <Badge label="Label" />
-          <Badge label="Label" type="warning" />
-          <Badge label="Đang xác nhận" type="processing" />
-          <Badge label="Thành công" type="success" />
-          <Badge label="Thanh toán thất bại" type="error" />
+          <Badge label="Label" type={EBadgeType.WARNING} />
+          <Badge label="Đang xác nhận" type={EBadgeType.PROCESSING} />
+          <Badge label="Thành công" type={EBadgeType.SUCCESS} />
+          <Badge label="Thanh toán thất bại" type={EBadgeType.ERROR} />
         </div>
 
         <p className={css.title}>Single label with dot status</p>
         <div className={css.badgeContainer}>
           <Badge label="Label" hasDotIcon />
-          <Badge label="Label" type="warning" hasDotIcon />
-          <Badge label="Đang xác nhận" hasDotIcon type="processing" />
-          <Badge label="Thành công" hasDotIcon type="success" />
-          <Badge label="Thanh toán thất bại" type="error" hasDotIcon />
+          <Badge label="Label" type={EBadgeType.WARNING} hasDotIcon />
+          <Badge
+            label="Đang xác nhận"
+            hasDotIcon
+            type={EBadgeType.PROCESSING}
+          />
+          <Badge label="Thành công" hasDotIcon type={EBadgeType.SUCCESS} />
+          <Badge
+            label="Thanh toán thất bại"
+            type={EBadgeType.ERROR}
+            hasDotIcon
+          />
         </div>
         <p className={css.title}>Single label with dot status and icon close</p>
         <div className={css.badgeContainer}>
           <Badge label="Label" hasDotIcon hasCloseIcon />
-          <Badge label="Label" type="warning" hasDotIcon hasCloseIcon />
+          <Badge
+            label="Label"
+            type={EBadgeType.WARNING}
+            hasDotIcon
+            hasCloseIcon
+          />
           <Badge
             label="Đang xác nhận"
             hasDotIcon
-            type="processing"
+            type={EBadgeType.PROCESSING}
             hasCloseIcon
           />
-          <Badge label="Thành công" hasDotIcon type="success" hasCloseIcon />
+          <Badge
+            label="Thành công"
+            hasDotIcon
+            type={EBadgeType.SUCCESS}
+            hasCloseIcon
+          />
           <Badge
             label="Thanh toán thất bại"
-            type="error"
+            type={EBadgeType.ERROR}
             hasDotIcon
             hasCloseIcon
           />

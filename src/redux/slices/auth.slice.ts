@@ -16,7 +16,7 @@ enum EAuthState {
   isSigningUp = 'isSigningUp',
 }
 
-type IAuthState = {
+type TAuthState = {
   isAuthenticated: boolean;
   // scopes associated with current token
   authScopes: [];
@@ -32,7 +32,7 @@ type IAuthState = {
   signUpError: any;
 };
 
-const initialState: IAuthState = {
+const initialState: TAuthState = {
   isAuthenticated: false,
   authScopes: [],
   authInfoLoaded: false,
@@ -82,9 +82,20 @@ const signUp = createAsyncThunk(
   SIGN_UP,
   async (params: TObject, { dispatch, extra: sdk }) => {
     const { email, password, firstName, lastName, ...rest } = params;
+    const defaultParams = {
+      email,
+      password,
+      firstName,
+      lastName,
+    };
     const createUserParams = isEmpty(rest)
-      ? { email, password, firstName, lastName }
-      : { email, password, firstName, lastName, protectedData: { ...rest } };
+      ? defaultParams
+      : {
+          ...defaultParams,
+          protectedData: {
+            ...rest,
+          },
+        };
 
     // We must login the user if signup succeeds since the API doesn't
     // do that automatically.

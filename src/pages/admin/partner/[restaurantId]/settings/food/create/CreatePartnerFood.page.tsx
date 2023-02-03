@@ -5,7 +5,7 @@ import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
-import type { TIntergrationFoodListing } from '@utils/types';
+import type { TIntegrationFoodListing } from '@utils/types';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -27,7 +27,7 @@ const CreatePartnerFoodPage = () => {
     showFoodInProgress,
     showFoodError,
   } = useAppSelector((state) => state.foods, shallowEqual);
-  const redirectToEditPage = (listing: TIntergrationFoodListing) => {
+  const redirectToEditPage = (listing: TIntegrationFoodListing) => {
     setTimeout(() => {
       const foodId = listing?.id?.uuid;
       if (foodId)

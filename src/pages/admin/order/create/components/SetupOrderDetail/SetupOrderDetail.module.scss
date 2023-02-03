@@ -35,23 +35,29 @@
   .settingBtn {
     cursor: pointer;
   }
+}
 
-  .buttonContainer {
+.buttonContainer {
+  display: flex;
+  column-gap: 16px;
+
+  & > button {
+    @include textTemplate(14px, 700, 24px, '');
+  }
+
+  .recommendNewRestaurantBtn {
     display: flex;
-    column-gap: 16px;
-
-    & > button {
-      @include textTemplate(14px, 700, 24px, '');
-    }
-
-    .recommendNewRestaurantBtn {
-      display: flex;
-      align-items: center;
-      column-gap: 8px;
-    }
+    align-items: center;
+    column-gap: 8px;
+    min-height: 44px;
   }
 }
 
 .calendarContainer {
   padding-top: 28px;
+}
+
+.orderTitle {
+  @include text(24px, 32px);
+  font-weight: $fontWeightBold;
 }

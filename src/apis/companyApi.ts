@@ -1,7 +1,7 @@
-import { deleteMethod, get, post } from './api';
+import { deleteApi, getApi, postApi } from './configs';
 
 export const checkEmailExistedApi = (email: string) =>
-  get(`/api/users/check-email-existed/${email}`);
+  getApi(`/users/check-email-existed/${email}`);
 
 export type AddMembersApiBody = {
   userIdList: string[];
@@ -9,7 +9,7 @@ export type AddMembersApiBody = {
   companyId: string;
 };
 export const addMembersApi = (body: AddMembersApiBody) =>
-  post('/api/company/members/add-members', body);
+  postApi('/company/members/add-members', body);
 
 export type DeleteMemberApiBody = {
   data: {
@@ -18,4 +18,4 @@ export type DeleteMemberApiBody = {
   };
 };
 export const deleteMemberApi = (body: DeleteMemberApiBody) =>
-  deleteMethod('/api/company/members/delete-member', body);
+  deleteApi('/company/members/delete-member', body);

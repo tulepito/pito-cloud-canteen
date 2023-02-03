@@ -3,15 +3,14 @@ import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuConten
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import useBoolean from '@hooks/useBoolean';
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import css from './SelectSingleFilterPopup.module.scss';
 
-type TSelectSingleFilterPopup = {
-  rootClassName?: string;
-  className?: string;
+type TSelectSingleFilterPopup = TDefaultProps & {
   label?: string;
   options: any[];
   queryParamNames?: string;

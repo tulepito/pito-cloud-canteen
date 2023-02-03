@@ -1,15 +1,14 @@
+import type { TDefaultProps, TObject } from '@utils/types';
 import classNames from 'classnames';
 import Link from 'next/link';
 import React from 'react';
 
 import css from './NamedLink.module.scss';
 
-type TNameLinkProps = {
-  className?: string;
-  rootClassName?: string;
+type TNameLinkProps = TDefaultProps & {
   passHref?: boolean;
   children?: React.ReactNode;
-  params?: { [name: string]: string | number | boolean };
+  params?: TObject<string, string | number | boolean>;
   to?: {
     search: string;
   };

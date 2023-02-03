@@ -33,7 +33,7 @@
  * sizes, see the API documentation.
  */
 
-import type { TImage, TImageVariant } from '@utils/types';
+import type { TDefaultProps, TImage, TImageVariant } from '@utils/types';
 import classNames from 'classnames';
 import Image from 'next/image';
 import type { CSSProperties } from 'react';
@@ -43,9 +43,7 @@ import { FormattedMessage } from 'react-intl';
 import NoImageIcon from './NoImageIcon';
 import css from './ResponsiveImage.module.scss';
 
-type TResponsiveImageProps = {
-  className?: string;
-  rootClassName?: string;
+type TResponsiveImageProps = TDefaultProps & {
   alt: string;
   noImageMessage?: string;
   image: TImage;

@@ -1,12 +1,11 @@
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import type { MutableRefObject, PropsWithChildren } from 'react';
 import React, { useEffect, useRef } from 'react';
 
 import css from './OutsideClickHandler.module.scss';
 
-type TOutsideClickHandler = {
-  rootClassName?: string;
-  className?: string;
+type TOutsideClickHandler = TDefaultProps & {
   onOutsideClick: () => void;
 };
 
