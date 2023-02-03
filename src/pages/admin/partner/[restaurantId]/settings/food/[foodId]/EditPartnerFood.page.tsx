@@ -1,7 +1,7 @@
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { foodSliceThunks } from '@redux/slices/foods.slice';
+import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 import { useRouter } from 'next/router';
@@ -49,6 +49,10 @@ const EditPartnerFoodPage = () => {
     if (!foodId) return;
     dispatch(foodSliceThunks.showPartnerFoodListing(foodId));
   }, [dispatch, foodId]);
+
+  useEffect(() => {
+    dispatch(foodSliceAction.setInitialStates());
+  }, []);
 
   if (showFoodInProgress) {
     return <LoadingContainer />;

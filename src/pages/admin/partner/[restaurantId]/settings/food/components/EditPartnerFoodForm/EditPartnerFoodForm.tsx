@@ -15,13 +15,13 @@ import {
   EImageVariants,
   FOOD_TYPE_OPTIONS,
   MENU_OPTIONS,
+  OTHER_OPTION,
   SIDE_DISH_OPTIONS,
   SPECIAL_DIET_OPTIONS,
 } from '@utils/enums';
 import { pickRenderableImages } from '@utils/images';
 import {
   composeValidators,
-  nonEmptyArray,
   nonEmptyImageArray,
   numberMinLength,
   required,
@@ -137,7 +137,7 @@ const EditPartnerFoodFormComponent: React.FC<
               intl.formatMessage({
                 id: 'EditPartnerFoodForm.minOrderHourInAdvanceInvalid',
               }),
-              0,
+              1,
             ),
           )}
         />
@@ -164,7 +164,7 @@ const EditPartnerFoodFormComponent: React.FC<
               intl.formatMessage({
                 id: 'EditPartnerFoodForm.minQuantityInvalid',
               }),
-              0,
+              1,
             ),
           )}
         />
@@ -191,7 +191,7 @@ const EditPartnerFoodFormComponent: React.FC<
               intl.formatMessage({
                 id: 'EditPartnerFoodForm.maxMemberInvalid',
               }),
-              0,
+              1,
             ),
           )}
         />
@@ -222,8 +222,14 @@ const EditPartnerFoodFormComponent: React.FC<
             label={intl.formatMessage({
               id: 'EditPartnerFoodForm.unitLabel',
             })}
-            validate={required(
-              intl.formatMessage({ id: 'EditPartnerFoodForm.unitRequired' }),
+            validate={composeValidators(
+              required(
+                intl.formatMessage({ id: 'EditPartnerFoodForm.unitRequired' }),
+              ),
+              numberMinLength(
+                intl.formatMessage({ id: 'EditPartnerFoodForm.unitMinLength' }),
+                0,
+              ),
             )}
           />
         </div>
@@ -240,11 +246,13 @@ const EditPartnerFoodFormComponent: React.FC<
           validate={required(
             intl.formatMessage({ id: 'EditPartnerFoodForm.categoryRequired' }),
           )}>
-          {CATEGORY_OPTIONS.map((cat) => (
-            <option key={cat.key} value={cat.key}>
-              {cat.label}
-            </option>
-          ))}
+          {CATEGORY_OPTIONS.filter((cate) => cate.key !== OTHER_OPTION).map(
+            (cat) => (
+              <option key={cat.key} value={cat.key}>
+                {cat.label}
+              </option>
+            ),
+          )}
         </FieldSelect>
       </div>
       <div className={css.flexField}>
@@ -260,11 +268,6 @@ const EditPartnerFoodFormComponent: React.FC<
           checkboxClassName={css.specialDietsCheckbox}
           labelClassName={css.specialDietsLabel}
           itemClassName={css.specialDietsItem}
-          validate={nonEmptyArray(
-            intl.formatMessage({
-              id: 'EditPartnerFoodForm.specialDietsRequired',
-            }),
-          )}
         />
         <div className={css.field}>
           <label className={css.label}>
@@ -291,8 +294,16 @@ const EditPartnerFoodFormComponent: React.FC<
             id: 'EditPartnerFoodForm.pricePlaceholder',
           })}
           rightIcon={<div className={css.inputSuffixed}>đ</div>}
-          validate={required(
-            intl.formatMessage({ id: 'EditPartnerFoodForm.priceRequired' }),
+          validate={composeValidators(
+            required(
+              intl.formatMessage({ id: 'EditPartnerFoodForm.priceRequired' }),
+            ),
+            numberMinLength(
+              intl.formatMessage({
+                id: 'EditPartnerFoodForm.priceMinLength',
+              }),
+              1000,
+            ),
           )}
         />
         <FieldMultipleSelect
