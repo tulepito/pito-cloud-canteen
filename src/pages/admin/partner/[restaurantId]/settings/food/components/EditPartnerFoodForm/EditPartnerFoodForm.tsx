@@ -44,6 +44,7 @@ type TExtraProps = {
   submittedValues?: TEditPartnerFoodFormValues;
   inProgress: boolean;
   formError?: any;
+  isEditting?: boolean;
 };
 type TEditPartnerFoodFormComponentProps =
   FormRenderProps<TEditPartnerFoodFormValues> & Partial<TExtraProps>;
@@ -53,7 +54,7 @@ type TEditPartnerFoodFormProps = FormProps<TEditPartnerFoodFormValues> &
 const EditPartnerFoodFormComponent: React.FC<
   TEditPartnerFoodFormComponentProps
 > = (props) => {
-  const { values, submittedValues, inProgress, formError } = props;
+  const { values, submittedValues, inProgress, formError, isEditting } = props;
   const dispatch = useAppDispatch();
   const ready = isEqual(submittedValues, values);
   const {
@@ -373,7 +374,13 @@ const EditPartnerFoodFormComponent: React.FC<
           inProgress={inProgress}
           disabled={inProgress}
           className={css.submitBtn}>
-          {intl.formatMessage({ id: 'EditPartnerFoodForm.submitBtn' })}
+          {isEditting
+            ? intl.formatMessage({
+                id: 'EditPartnerFoodForm.updateBtn',
+              })
+            : intl.formatMessage({
+                id: 'EditPartnerFoodForm.submitBtn',
+              })}
         </Button>
       </div>
     </Form>
