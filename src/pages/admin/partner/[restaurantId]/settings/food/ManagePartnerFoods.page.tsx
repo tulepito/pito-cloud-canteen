@@ -82,7 +82,7 @@ const TABLE_COLUMN: TColumn[] = [
   },
   {
     key: 'foodType',
-    label: 'Loại món',
+    label: 'Loại thức ăn',
     render: (data: any) => {
       if (data.isDeleted) {
         return <div></div>;
@@ -169,12 +169,22 @@ const parseEntitiesToExportCsv = (
     .filter((food) => ids.includes(food.id.uuid))
     .map((food) => {
       const { publicData = {}, description, title } = food.attributes || {};
-      const { sideDishes = [], specialDiets = [], ...rest } = publicData;
+      const {
+        sideDishes = [],
+        specialDiets = [],
+        category,
+        foodType,
+        menuType,
+        ...rest
+      } = publicData;
       return {
         title,
         description,
         id: food.id.uuid,
         ...rest,
+        category: getLabelByKey(CATEGORY_OPTIONS, category),
+        foodType: getLabelByKey(FOOD_TYPE_OPTIONS, foodType),
+        menuType: getLabelByKey(MENU_OPTIONS, menuType),
         sideDishes: sideDishes.join(','),
         specialDiets: specialDiets.join(','),
         images: food.images?.map(
@@ -205,13 +215,7 @@ const ManagePartnerFoods = () => {
     setFalse: closeRemoveCheckedModal,
   } = useBoolean(false);
 
-  const {
-    restaurantId,
-    page = 1,
-    keywords,
-    pub_category = '',
-    pub_menuType = '',
-  } = router.query;
+  const { restaurantId, page = 1, keywords, pub_category = '' } = router.query;
 
   const {
     foods,
@@ -224,13 +228,8 @@ const ManagePartnerFoods = () => {
   } = useAppSelector((state) => state.foods, shallowEqual);
 
   const categoryString = pub_category as string;
-  const menuTypeString = pub_menuType as string;
 
   const groupPubCategory = categoryString
-    ?.split(',')
-    .filter((item: string) => !!item);
-
-  const groupMenuTypeString = menuTypeString
     ?.split(',')
     .filter((item: string) => !!item);
 
@@ -239,17 +238,12 @@ const ManagePartnerFoods = () => {
     setIdsToAction(rowCheckbox);
   };
 
-  const handleSubmitFilter = ({
-    pub_category = [],
-    keywords,
-    pub_menuType = [],
-  }: any) => {
+  const handleSubmitFilter = ({ pub_category = [], keywords }: any) => {
     router.push({
       pathname: adminRoutes.ManagePartnerFoods.path,
       query: {
         keywords,
         pub_category: pub_category?.join(','),
-        pub_menuType: pub_menuType?.join(','),
         restaurantId,
       },
     });
@@ -274,6 +268,7 @@ const ManagePartnerFoods = () => {
       foodSliceThunks.removePartnerFood({ id }),
     )) as any;
     if (!error) {
+      onClearFoodToRemove();
       return onQueryPartnerFood({ page: 1, restaurantId });
     }
   };
@@ -283,6 +278,8 @@ const ManagePartnerFoods = () => {
       foodSliceThunks.removePartnerFood({ ids: idsToAction }),
     )) as any;
     if (!error) {
+      setIdsToAction([]);
+      closeRemoveCheckedModal();
       return onQueryPartnerFood({ page: 1, restaurantId });
     }
   };
@@ -306,9 +303,7 @@ const ManagePartnerFoods = () => {
       ...(groupPubCategory.length > 0
         ? { pub_category: groupPubCategory }
         : {}),
-      ...(groupMenuTypeString.length > 0
-        ? { pub_menuType: groupMenuTypeString }
-        : {}),
+
       ...(keywords ? { keywords } : {}),
     });
   }, [page, restaurantId, keywords, categoryString]);
@@ -341,7 +336,6 @@ const ManagePartnerFoods = () => {
           initialValues={{
             keywords,
             pub_category: groupPubCategory,
-            pub_menuType: groupMenuTypeString,
           }}>
           {() => (
             <>
@@ -359,14 +353,6 @@ const ManagePartnerFoods = () => {
                 label="Phong cách ẩm thực"
                 placeholder="Phong cách ẩm thực"
                 options={CATEGORY_OPTIONS}
-              />
-              <FieldMultipleSelect
-                className={css.input}
-                name="pub_menuType"
-                id="pub_menuType"
-                label="Loại menu"
-                placeholder="Chọn loại menu"
-                options={MENU_OPTIONS}
               />
             </>
           )}
@@ -449,7 +435,7 @@ const ManagePartnerFoods = () => {
         <h2 className={css.importTitle}>
           <FormattedMessage id="ManagePartnerFoods.importTitle" />
         </h2>
-        <p>
+        <p className={css.downloadFileHere}>
           <FormattedMessage
             id="ManagePartnerFoods.downloadFileHere"
             values={{

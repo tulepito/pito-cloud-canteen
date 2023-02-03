@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import React from 'react';
 import { Form as FinalForm, FormSpy } from 'react-final-form';
+import { FormattedMessage } from 'react-intl';
 
 import css from './Table.module.scss';
 
@@ -173,7 +174,17 @@ const Table = (props: TTableProps) => {
         {isLoading ? (
           <tbody>
             <tr>
-              <td>Loading...</td>
+              <td colSpan={columns.length} className={css.emptyCell}>
+                Loading...
+              </td>
+            </tr>
+          </tbody>
+        ) : data.length === 0 ? (
+          <tbody>
+            <tr>
+              <td colSpan={columns.length} className={css.emptyCell}>
+                <FormattedMessage id="Table.noResults" />
+              </td>
             </tr>
           </tbody>
         ) : (
@@ -218,6 +229,7 @@ const Table = (props: TTableProps) => {
                     )}>
                     <FieldCheckbox
                       labelClassName={css.checkboxLabel}
+                      svgClassName={css.checkboxSvg}
                       name="rowCheckbox"
                       id={`rowCheckbox.${row.key}`}
                       value={row.key as any}

@@ -3,8 +3,11 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .title {
-  font-weight: $fontWeightRegular;
-  font-size: 20px;
+  font-weight: $fontWeightBold;
+  font-size: 24px;
+  line-height: 32px;
+  text-transform: capitalize;
+  margin: 0 0 46px 0;
 }
 
 .descriptionRow {
@@ -133,6 +136,7 @@
 
 .lightButton {
   composes: secondaryButton;
+  font-size: 14px;
 }
 
 .deletedFood {
@@ -166,6 +170,7 @@
   justify-content: center;
   color: $neutralGray6;
   font-weight: $fontWeightBold;
+  font-size: 14px;
 }
 
 .disabled {
@@ -177,6 +182,7 @@
 
 .link {
   button {
+    font-size: 14px;
     width: 100%;
     @include viewportLarge {
       width: unset;
@@ -195,6 +201,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  color: $neutralGray5;
 }
 
 .importTitle {
@@ -203,5 +210,14 @@
 }
 
 .importLabel {
+  color: $neutralGray6;
   margin-bottom: 30px;
+}
+
+.downloadFileHere {
+  color: $neutralGray5;
+  a {
+    color: $neutralGray6;
+    font-weight: $fontWeightBold;
+  }
 }

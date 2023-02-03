@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/defaults.scss' as *;
 
 .root {
   .table {
@@ -16,10 +17,11 @@
         display: table-header-group;
       }
       .headRow {
-        background-color: $neutralGray4;
+        background-color: $neutralGray3;
 
         .checkboxSvg {
           background-color: $neutralGray1;
+          border-radius: 4px;
         }
 
         .headCell {
@@ -124,4 +126,10 @@
 
 .isParent {
   background-color: $neutralGray3;
+}
+
+.emptyCell {
+  text-align: center;
+  padding: 50px 0;
+  width: 100%;
 }
