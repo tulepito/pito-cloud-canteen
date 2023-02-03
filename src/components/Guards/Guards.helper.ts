@@ -1,6 +1,7 @@
 import AdminLayout from '@components/Layout/AdminLayout/AdminLayout';
 import CompanyLayout from '@components/Layout/CompanyLayout/CompanyLayout';
 import GeneralLayout from '@components/Layout/GeneralLayout/Layout';
+import { adminPaths, companyPaths, generalPaths } from '@src/paths';
 import { EUserPermission, startRouteBaseOnPermission } from '@utils/enums';
 import React from 'react';
 
@@ -21,16 +22,32 @@ export const isPathMatchedPermission = (
   pathName: string,
   permission: EUserPermission,
 ) => {
-  let isMatched;
-
   if (permission !== EUserPermission.normal) {
     const startPath = startRouteBaseOnPermission[permission];
-    isMatched = pathName.startsWith(startPath);
-  } else {
-    isMatched = Object.values(startRouteBaseOnPermission).every((item) => {
-      return !pathName.startsWith(item);
-    });
+    return pathName.startsWith(startPath);
   }
 
-  return isMatched;
+  return Object.values(startRouteBaseOnPermission).every((item) => {
+    return !pathName.startsWith(item);
+  });
+};
+
+export const getHomePageRouteBaseOnPermission = (
+  permission: EUserPermission,
+) => {
+  let homePageRoute;
+
+  switch (permission) {
+    case EUserPermission.admin:
+      homePageRoute = adminPaths.Dashboard;
+      break;
+    case EUserPermission.company:
+      homePageRoute = companyPaths.Home;
+      break;
+    default:
+      homePageRoute = generalPaths.Home;
+      break;
+  }
+
+  return homePageRoute;
 };

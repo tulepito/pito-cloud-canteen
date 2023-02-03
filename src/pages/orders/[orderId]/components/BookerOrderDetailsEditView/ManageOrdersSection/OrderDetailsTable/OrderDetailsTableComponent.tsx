@@ -78,80 +78,7 @@ export const OrderDetailsTableComponent: React.FC<
   };
 
   return (
-    <table className={css.tableRoot}>
-      <thead>
-        <tr>
-          {tableHeads.map((head: string, index: number) => (
-            <th key={index} colSpan={index === 3 ? 2 : 1}>
-              {head}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((item: TObject) => {
-          const {
-            memberData,
-            foodData: { foodName = '', foodPrice = 0 },
-            status,
-          } = item;
-          const {
-            id: memberId,
-            name: memberName,
-            email: memberEmail,
-          } = memberData || {};
-          const formattedFoodPrice = `${foodPrice}đ`;
-          const isStrange = isStranger(memberId, participants);
-
-          const rowClasses = classNames({
-            [css.notAllowed]: status === EParticipantOrderStatus.notAllowed,
-          });
-
-          return (
-            <tr key={memberId} className={rowClasses}>
-              <td title={memberName}>
-                <div>{memberName}</div>
-                {/* <div>Người dùng</div> */}
-                {isStrange && (
-                  <div className={css.stranger}>
-                    {intl.formatMessage({
-                      id: 'OrderDetailsTableComponent.strangerText',
-                    })}
-                  </div>
-                )}
-              </td>
-              <td title={memberEmail}>{memberEmail}</td>
-              <td title={foodName}>{foodName}</td>
-              <td title={formattedFoodPrice}>{formattedFoodPrice}</td>
-              <td>
-                <div>
-                  <IconEdit
-                    className={css.icon}
-                    onClick={onClickEditOrderItem(tab, memberId)}
-                  />
-                  <IconDelete
-                    className={css.icon}
-                    onClick={onClickDeleteOrderItem(memberId)}
-                  />
-                </div>
-              </td>
-            </tr>
-          );
-        })}
-
-        <tr className={css.totalRow}>
-          <td>{totalText}</td>
-          <td>{data?.length}</td>
-          <td></td>
-          <td
-            colSpan={2}
-            onClick={handleClickViewDeletedList}
-            className={actionTdClasses}>
-            {intl.formatMessage({ id: 'OrderDetailsTable.viewDeletedList' })}
-          </td>
-        </tr>
-      </tbody>
-
+    <>
       <ManageDeletedListModal
         isOpen={isManageDeletedModalOpen}
         onClose={handleCloseDeletedList}
@@ -159,6 +86,80 @@ export const OrderDetailsTableComponent: React.FC<
         onRestoreMembers={onRestoreMembers}
         onDeletePermanentlyMembers={onDeletePermanentlyMembers}
       />
-    </table>
+      <table className={css.tableRoot}>
+        <thead>
+          <tr>
+            {tableHeads.map((head: string, index: number) => (
+              <th key={index} colSpan={index === 3 ? 2 : 1}>
+                {head}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((item: TObject) => {
+            const {
+              memberData,
+              foodData: { foodName = '', foodPrice = 0 },
+              status,
+            } = item;
+            const {
+              id: memberId,
+              name: memberName,
+              email: memberEmail,
+            } = memberData || {};
+            const formattedFoodPrice = `${foodPrice}đ`;
+            const isStrange = isStranger(memberId, participants);
+
+            const rowClasses = classNames({
+              [css.notAllowed]: status === EParticipantOrderStatus.notAllowed,
+            });
+
+            return (
+              <tr key={memberId} className={rowClasses}>
+                <td title={memberName}>
+                  <div>{memberName}</div>
+                  {/* <div>Người dùng</div> */}
+                  {isStrange && (
+                    <div className={css.stranger}>
+                      {intl.formatMessage({
+                        id: 'OrderDetailsTableComponent.strangerText',
+                      })}
+                    </div>
+                  )}
+                </td>
+                <td title={memberEmail}>{memberEmail}</td>
+                <td title={foodName}>{foodName}</td>
+                <td title={formattedFoodPrice}>{formattedFoodPrice}</td>
+                <td>
+                  <div>
+                    <IconEdit
+                      className={css.icon}
+                      onClick={onClickEditOrderItem(tab, memberId)}
+                    />
+                    <IconDelete
+                      className={css.icon}
+                      onClick={onClickDeleteOrderItem(memberId)}
+                    />
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+
+          <tr className={css.totalRow}>
+            <td>{totalText}</td>
+            <td>{data?.length}</td>
+            <td></td>
+            <td
+              colSpan={2}
+              onClick={handleClickViewDeletedList}
+              className={actionTdClasses}>
+              {intl.formatMessage({ id: 'OrderDetailsTable.viewDeletedList' })}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </>
   );
 };

@@ -1,7 +1,5 @@
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
-import type { TObject } from '@utils/types';
 import {
   composeValidators,
   phoneNumberFormatValid,
@@ -19,7 +17,7 @@ export type TReviewInfoFormValues = {
   contactPeopleName: string;
   contactPhoneNumber: string;
   staffName: string;
-  deliveryAddress: TObject;
+  deliveryAddress: string;
 };
 
 type TExtraProps = {
@@ -52,12 +50,21 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
     label: `3. ${intl.formatMessage({
       id: 'ReviewInfoForm.contactPeopleNameField.label',
     })}`,
+    requiredText: intl.formatMessage({
+      id: 'ReviewInfoForm.contactPeopleNameField.required',
+    }),
   };
 
   const contactPhoneNumberField = {
     label: `4. ${intl.formatMessage({
       id: 'ReviewInfoForm.contactPhoneNumberField.label',
     })}`,
+    requiredText: intl.formatMessage({
+      id: 'ReviewInfoForm.contactPhoneNumberField.required',
+    }),
+    inValidText: intl.formatMessage({
+      id: 'ReviewInfoForm.contactPhoneNumberField.inValid',
+    }),
   };
 
   const staffNameField = {
@@ -83,10 +90,10 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
           {companyNameField.label}
         </label>
         <FieldTextInput
+          disabled
           className={css.fieldInput}
           id="ReviewInfoForm.companyName"
           name="companyName"
-          validate={composeValidators(required('Nhập tên công ty'))}
         />
       </div>
       <div className={css.fieldContainer}>
@@ -95,11 +102,11 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
           htmlFor="ReviewInfoForm.deliveryAddress">
           {deliveryAddressField.label}
         </label>
-        <LocationAutocompleteInputField
+        <FieldTextInput
+          disabled
           rootClassName={css.fieldInput}
           id="ReviewInfoForm.deliveryAddress"
           name="deliveryAddress"
-          validate={composeValidators(required('Nhập địa chỉ giao hàng'))}
         />
       </div>
       <div className={css.fieldContainer}>
@@ -112,7 +119,9 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
           className={css.fieldInput}
           id="ReviewInfoForm.contactPeopleName"
           name="contactPeopleName"
-          validate={composeValidators(required('Nhập tên người liên hệ'))}
+          validate={composeValidators(
+            required(contactPeopleNameField.requiredText),
+          )}
         />
       </div>
       <div className={css.fieldContainer}>
@@ -126,8 +135,8 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
           id="ReviewInfoForm.contactPhoneNumber"
           name="contactPhoneNumber"
           validate={composeValidators(
-            required('Nhập số điện thoại'),
-            phoneNumberFormatValid('Nhập đúng định dạng số điện thoại'),
+            required(contactPhoneNumberField.requiredText),
+            phoneNumberFormatValid(contactPhoneNumberField.inValidText),
           )}
         />
       </div>

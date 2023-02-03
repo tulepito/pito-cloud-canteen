@@ -10,7 +10,7 @@ import css from './Collapsible.module.scss';
 
 type TCollapsibleProps = PropsWithChildren<
   TDefaultProps & {
-    label: string | ReactNode | number;
+    label: ReactNode;
     labelSectionClassName?: string;
     labelClassName?: string;
     contentClassName?: string;

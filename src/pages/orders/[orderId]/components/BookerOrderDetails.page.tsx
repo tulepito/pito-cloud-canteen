@@ -1,17 +1,12 @@
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
-import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
-import { currentUserSelector } from '@redux/slices/user.slice';
 import { createNewPrint } from '@services/pdf';
-import config from '@src/configs';
 import TranslationProvider from '@translations/TranslationProvider';
 import type { TObject } from '@utils/types';
-import get from 'lodash/get';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import ReactDOM from 'react-dom';
 
-import { calculateTotalPriceAndDishes } from '../helpers/cartInfoHelper';
-import { groupFoodOrderByDate } from '../helpers/orderDetailHelper';
+import { usePrepareOrderDetailPageData } from '../hooks/usePrepareData';
 import { orderDetailsAnyActionsInProgress } from '../OrderManagement.slice';
 import css from './BookerOrderDetails.module.scss';
 import BookerOrderDetailsTitle from './BookerOrderDetailsEditView/BookerOrderDetailsTitle/BookerOrderDetailsTitle';
@@ -35,114 +30,15 @@ enum EPageViewMode {
 
 const BookerOrderDetailsPage = () => {
   const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
-  const { orderData, planData, participantData, companyData } = useAppSelector(
-    (state) => state.OrderManagement,
-  );
+
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const currentUser = useAppSelector(currentUserSelector);
-  const [reviewInfoValues, setReviewInfoValues] =
-    useState<TReviewInfoFormValues>();
 
-  const { title: orderTitle = '' } = orderData?.attributes || {};
-  const { email: bookerEmail } = get(currentUser, 'attributes', '');
-  const { generalInfo = {}, participants = [] } =
-    orderData?.attributes?.metadata || {};
   const {
-    startDate = 0,
-    endDate = 0,
-    deliveryHour,
-    deliveryAddress,
-    orderDeadline = 0,
-    deadlineHour,
-    staffName,
-    packagePerMember = 0,
-  } = generalInfo || {};
-  const { orderDetail } = get(planData, 'attributes.metadata', {});
-  const { companyName } = get(companyData, 'attributes.profile.publicData', {});
-
-  /* =============== Edit data =============== */
-  const titleSectionData = { deliveryHour, deliveryAddress };
-  const countdownSectionData = { deadlineHour, orderDeadline, startDate };
-  const linkSectionData = { orderDeadline };
-  const manageParticipantData = {
-    planData,
-    participantData,
-  };
-  const manageOrdersData = {
-    startDate,
-    endDate,
-  };
-
-  /* =============== Review data =============== */
-  const totalInfo = useMemo(
-    () => calculateTotalPriceAndDishes({ orderDetail }),
-    [orderDetail],
-  );
-  const foodOrderGroupedByDate = useMemo(
-    () => groupFoodOrderByDate({ orderDetail }),
-    [orderDetail],
-  );
-
-  const { totalPrice = 0, totalDishes = 0 } = totalInfo || {};
-  const PITOPoints = totalPrice / 100000;
-  const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
-
-  const VATFee = totalPrice * config.VATPercentage;
-  const serviceFee = 0;
-  const transportFee = 0;
-  const promotion = 0;
-  const totalWithoutVAT = totalPrice + serviceFee + transportFee - promotion;
-  const totalWithVAT = VATFee + totalWithoutVAT;
-  const overflow = isOverflowPackage
-    ? totalWithVAT - totalDishes * packagePerMember
-    : 0;
-
-  const reviewInfoData = {
-    reviewInfoValues,
-    deliveryAddress,
-    staffName,
-    companyName,
-  };
-  const reviewResultData = {
-    participantData,
-    participants,
-    orderDetail,
-  };
-  const reviewCartData = {
-    overflow,
-    PITOPoints,
-    promotion,
-    serviceFee,
-    totalPrice,
-    totalWithoutVAT,
-    totalWithVAT,
-    transportFee,
-    VATFee,
-  };
-  /* =============== Price quotation data =============== */
-  const priceQuotationData = {
-    customerData: {
-      ...(reviewInfoValues || {}),
-      email: bookerEmail,
-    },
-    orderData: {
-      orderTitle,
-      companyName,
-      startDate,
-      endDate,
-    },
-    cartData: {
-      serviceFee: `${parseThousandNumber(serviceFee.toString())}đ`,
-      totalPrice: `${parseThousandNumber(totalPrice.toString())}đ`,
-      promotion: `${parseThousandNumber(promotion.toString())}đ`,
-      totalWithVAT: `${parseThousandNumber(totalWithVAT.toString())}đ`,
-      transportFee: `${parseThousandNumber(transportFee.toString())}đ`,
-      VATFee: `${parseThousandNumber(VATFee.toString())}đ`,
-    },
-    orderDetailData: {
-      foodOrderGroupedByDate,
-    },
-  };
+    editViewData,
+    reviewViewData,
+    priceQuotationData,
+    setReviewInfoValues,
+  } = usePrepareOrderDetailPageData();
 
   const handleConfirmOrder = () => {
     setViewMode(EPageViewMode.review);
@@ -181,22 +77,25 @@ const BookerOrderDetailsPage = () => {
     <div className={css.editViewRoot}>
       <BookerOrderDetailsTitle
         className={css.titlePart}
-        data={titleSectionData}
+        data={editViewData.titleSectionData}
         onConfirmOrder={handleConfirmOrder}
       />
 
       <div className={css.leftPart}>
-        <ManageOrdersSection data={manageOrdersData} />
+        <ManageOrdersSection data={editViewData.manageOrdersData} />
       </div>
       <div className={css.rightPart}>
         <OrderDeadlineCountdownSection
           className={css.container}
-          data={countdownSectionData}
+          data={editViewData.countdownSectionData}
         />
-        <OrderLinkSection className={css.container} data={linkSectionData} />
+        <OrderLinkSection
+          className={css.container}
+          data={editViewData.linkSectionData}
+        />
         <ManageParticipantsSection
           className={css.container}
-          data={manageParticipantData}
+          data={editViewData.manageParticipantData}
         />
       </div>
     </div>
@@ -206,30 +105,30 @@ const BookerOrderDetailsPage = () => {
     <div className={css.reviewViewRoot}>
       <ReviewTitleSection
         className={css.titlePart}
-        orderTitle={orderTitle}
+        orderTitle={reviewViewData.orderTitle}
         onGoBack={handleGoBackFromReviewMode}
       />
       <div className={css.leftPart}>
         <ReviewInfoSection
           startSubmitReviewInfoForm={true}
           className={css.infoRoot}
-          data={reviewInfoData}
+          data={reviewViewData.reviewInfoData}
           onSubmit={handleSubmitReviewInfoForm}
         />
         <ReviewOrdersResultSection
           className={css.resultRoot}
-          data={reviewResultData}
+          data={reviewViewData.reviewResultData}
           goBackToEditMode={handleGoBackFromReviewMode}
         />
         <ReviewOrderDetailsSection
           className={css.detailRoot}
-          foodOrderGroupedByDate={foodOrderGroupedByDate}
+          foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
         />
       </div>
       <div className={css.rightPart}>
         <ReviewCartSection
           className={css.cartRoot}
-          data={reviewCartData}
+          data={reviewViewData.reviewCartData}
           onClickDownloadPriceQuotation={handleDownloadPriceQuotation}
         />
       </div>

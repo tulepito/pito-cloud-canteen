@@ -20,7 +20,7 @@ const isCompletePickFood = ({
 
   const completedDates = allOrderDetails.reduce((result: number, current) => {
     const { memberOrders } = current;
-    const { status, foodId } = memberOrders[participantId];
+    const { status, foodId } = memberOrders[participantId] || {};
 
     return result + +isJoinedPlan(foodId, status);
   }, 0);

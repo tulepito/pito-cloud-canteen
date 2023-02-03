@@ -1,0 +1,10 @@
+.actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 16px;
+
+  button {
+    width: min(50% - 8px, 260px);
+  }
+}

@@ -51,7 +51,7 @@ const BookerOrderDetailsPriceQuotation: React.FC<
       contactPhoneNumber,
       contactPeopleName,
       email,
-      deliveryAddress: { search: deliveryAddress } = {},
+      deliveryAddress,
     },
     orderData: { orderTitle, companyName, startDate, endDate },
     cartData: {

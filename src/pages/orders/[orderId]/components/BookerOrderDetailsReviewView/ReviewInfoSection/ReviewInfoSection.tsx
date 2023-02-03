@@ -1,7 +1,6 @@
 import Collapsible from '@components/Collapsible/Collapsible';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 import { useIntl } from 'react-intl';
@@ -13,7 +12,7 @@ import css from './ReviewInfoSection.module.scss';
 type TReviewInfoSectionProps = {
   className?: string;
   data: {
-    deliveryAddress: TObject;
+    deliveryAddress: string;
     staffName: string;
     companyName: string;
     reviewInfoValues?: TReviewInfoFormValues;
@@ -40,7 +39,6 @@ const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
 
   const rootClasses = classNames(css.root, className);
 
-  const { address, origin } = deliveryAddress || {};
   const {
     profile: { displayName, protectedData: { phoneNumber = '' } = {} },
   } = currentUser.attributes || {};
@@ -48,10 +46,11 @@ const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
   const formInitialValues = {
     staffName,
     companyName,
-    deliveryAddress: {
-      search: address,
-      selectedPlace: { address, origin },
-    },
+    deliveryAddress,
+    // deliveryAddress: {
+    //   search: address,
+    //   selectedPlace: { address, origin },
+    // },
     contactPeopleName: displayName,
     contactPhoneNumber: phoneNumber,
     ...(reviewInfoValues ? { ...reviewInfoValues } : {}),
