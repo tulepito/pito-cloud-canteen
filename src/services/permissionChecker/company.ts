@@ -19,7 +19,7 @@ const companyChecker =
           message: 'Missing required key',
         });
       }
-      const { company = {}, isPITOAdmin = true } =
+      const { company = {}, isPITOAdmin = false } =
         currentUser.attributes.profile.metadata;
       const userPermission = company[companyId]?.permission;
       if (

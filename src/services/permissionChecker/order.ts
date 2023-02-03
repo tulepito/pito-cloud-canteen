@@ -14,7 +14,7 @@ const orderChecker =
       const { companyId, orderId } = req.body;
       const apiMethod = req.method;
       const [currentUser] = denormalisedResponseEntities(currentUserResponse);
-      const { isPITOAdmin = true } = USER(currentUser).getMetadata();
+      const { isPITOAdmin = false } = USER(currentUser).getMetadata();
       const { company = {} } = USER(currentUser).getMetadata();
       switch (apiMethod) {
         case HTTP_METHODS.POST: {

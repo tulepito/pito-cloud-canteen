@@ -20,6 +20,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import css from './ClientTable.module.scss';
 import IconNoClientsFound from './IconNoClientsFound';
 
+const PAGE_SIZE = 10;
+
 type ClientTableProps = {
   data: any[];
   totalItems: number;
@@ -190,7 +192,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
                 <div className={css.paginationContainer}>
                   <Pagination
                     total={totalItems}
-                    pageSize={10}
+                    pageSize={PAGE_SIZE}
                     current={page}
                     onChange={onPageChange}
                   />
