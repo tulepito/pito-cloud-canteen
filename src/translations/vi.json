@@ -787,5 +787,8 @@
   "UploadImageForm.limitImage": "Dung lượng ảnh không được quá 2MB",
   "UploadImageForm.selectImage": "Chọn ảnh",
   "UploadImageForm.submit": "Lưu thay đổi",
-  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại."
+  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại.",
+  "CreatePartnerFood.title": "Thêm món ăn",
+  "EditPartnerFood.title": "Chỉnh sửa món ăn",
+  "FieldMultiplePhotos.addLabel": "Click chọn file hoặc kéo thả ảnh"
 }

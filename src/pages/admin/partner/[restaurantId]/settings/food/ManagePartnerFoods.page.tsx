@@ -82,7 +82,7 @@ const TABLE_COLUMN: TColumn[] = [
   },
   {
     key: 'foodType',
-    label: 'Loại món',
+    label: 'Loại thức ăn',
     render: (data: any) => {
       if (data.isDeleted) {
         return <div></div>;

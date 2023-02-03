@@ -11,7 +11,7 @@ import classNames from 'classnames';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './FieldMultiplePhotos.module.scss';
 
@@ -141,7 +141,10 @@ const FieldMutiplePhotos = (props: any) => {
                           disabled: fieldDisabled,
                         } = fieldRenderProps;
                         const onChange = async (e: any) => {
-                          const { files } = e.target;
+                          const files =
+                            e.dataTransfer && e.dataTransfer.files.length > 0
+                              ? [...e.dataTransfer.files]
+                              : [...e.target.files];
                           const filesAsArray = Array.from(files);
                           await Promise.all(
                             filesAsArray.map(async (file: any) => {
@@ -195,9 +198,14 @@ const FieldMutiplePhotos = (props: any) => {
                             ) : (
                               <label htmlFor={inputName} className={css.label}>
                                 <div className={css.addPhotoWrapper}>
-                                  <div className={css.addIcon}>
-                                    <IconUpload />
-                                  </div>
+                                  {index === 0 && (
+                                    <div className={css.addIcon}>
+                                      <IconUpload />
+                                      <div className={css.addLabel}>
+                                        <FormattedMessage id="FieldMultiplePhotos.addLabel" />
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               </label>
                             )}
