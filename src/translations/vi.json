@@ -780,5 +780,9 @@
   "FieldAvailability.conflictEntries": "Khung giờ được chọn không được trùng với khung giờ khác trong ngày",
   "FieldAvailability.invalidEntries": "Thời gian được chọn là bắt buộc và phải có số phút chia hết cho 5",
   "FieldAvailability.startAndEndTimeIsDifferent": "Giờ bắt đầu và giờ kết thúc không được trùng",
-  "FieldAvailability.startAndEndTimeValdid": "Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc"
+  "FieldAvailability.startAndEndTimeValdid": "Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc",
+  "FieldAvailability.minStartTime": "Thời gian bắt đầu phải lớn hơn hoặc bằng {time}",
+  "FieldAvailability.maxStartTime": "Thời gian bắt đầu phải bé hơn {time}",
+  "FieldAvailability.minEndTime": "Thời gian kết thúc đầu phải lớn {time}",
+  "FieldAvailability.maxEndTime": "Thời gian bắt đầu phải bé hơn hoặc bằng {time}"
 }

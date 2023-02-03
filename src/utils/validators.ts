@@ -441,3 +441,13 @@ export const startTimeGreaterThanEndTime =
 
     return condition ? message : VALID;
   };
+
+export const minTimeValidate =
+  (message: string, minVal: string) => (value: string) => {
+    return timeToMinute(value) >= timeToMinute(minVal) ? VALID : message;
+  };
+
+export const maxTimeValidate =
+  (message: string, maxVal: string) => (value: string) => {
+    return timeToMinute(value) <= timeToMinute(maxVal) ? VALID : message;
+  };
