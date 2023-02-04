@@ -67,6 +67,7 @@ const prepareTabItems = ({ intl, currentTab, tableData }: any) => {
         <TableForm
           columns={CompanyOrdersTableColumns}
           data={tableData}
+          paginationLinksClassName={css.pagination}
           pagination={manageOrdersPagination}
           paginationPath={companyPaths.ManageOrders}
           tableBodyCellClassName={css.bodyCell}

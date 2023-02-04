@@ -104,11 +104,7 @@ const Pagination: React.FC<TPaginationProps> = (props) => {
     nextIcon,
     prevIcon,
   };
-  return (
-    <div>
-      <ExternalPagination {...paginationProps} />
-    </div>
-  );
+  return <ExternalPagination {...paginationProps} />;
 };
 
 export default Pagination;

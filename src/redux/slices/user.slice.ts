@@ -2,11 +2,14 @@
 import { createAsyncThunk, createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
-import { denormalisedResponseEntities, ensureCurrentUser } from '@utils/data';
+import {
+  CURRENT_USER,
+  denormalisedResponseEntities,
+  ensureCurrentUser,
+} from '@utils/data';
 import { EUserPermission } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TCurrentUser, TObject } from '@utils/types';
-import get from 'lodash/get';
 
 const mergeCurrentUser = (
   oldCurrentUser: TCurrentUser | null,
@@ -33,10 +36,8 @@ const mergeCurrentUser = (
 };
 
 const detectUserPermission = (currentUser: TCurrentUser) => {
-  const { isCompany, isAdmin, company } = get(
-    currentUser,
-    'attributes.profile.metadata',
-  );
+  const { isCompany, isAdmin, company } =
+    CURRENT_USER(currentUser).getMetadata();
 
   let isBooker;
 

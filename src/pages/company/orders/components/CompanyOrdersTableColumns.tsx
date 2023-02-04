@@ -27,7 +27,9 @@ export const CompanyOrdersTableColumns: TColumn[] = [
     label: 'Đơn hàng',
     render: (data: TObject) => {
       return (
-        <NamedLink path={`${companyPaths.ManageOrderDetail}/${data.id}`}>
+        <NamedLink
+          path={companyPaths.ManageOrderDetail}
+          params={{ orderId: data.id }}>
           <div className={css.title}>#{data.title}</div>
         </NamedLink>
       );
