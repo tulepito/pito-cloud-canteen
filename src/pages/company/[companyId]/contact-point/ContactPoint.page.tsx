@@ -1,5 +1,7 @@
 import Button from '@components/Button/Button';
+import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import {
   addWorkspaceCompanyId,
   BookerManageCompany,
@@ -22,6 +24,11 @@ const ContactPointPage = () => {
   const intl = useIntl();
   const router = useRouter();
   const formSubmitInputRef = useRef<any>();
+  const {
+    value: isConfirmationModalOpen,
+    setTrue: openConfirmationModal,
+    setFalse: closeConfirmationModal,
+  } = useBoolean();
   const { companyId = '' } = router.query;
   const currentUser = useAppSelector(
     (state) => state.user.currentUser,
@@ -36,6 +43,12 @@ const ContactPointPage = () => {
   const image = useAppSelector(
     (state) => state.uploadImage.image,
     shallowEqual,
+  );
+  const updateBookerInProgress = useAppSelector(
+    (state) => state.company.updateBookerAccountInProgress,
+  );
+  const updateBookerError = useAppSelector(
+    (state) => state.company.updateBookerAccountError,
   );
 
   const { companyName = '', location = {} } = USER(
@@ -66,7 +79,7 @@ const ContactPointPage = () => {
     };
     fetchData();
   }, [companyId, dispatch]);
-  const onSubmit = (values: TContactPointProfileFormValues) => {
+  const onSubmit = async (values: TContactPointProfileFormValues) => {
     const { displayName, phoneNumber } = values;
     const wordList = displayName.split(' ');
     const firstName = take(wordList, wordList.length - 1);
@@ -83,7 +96,8 @@ const ContactPointPage = () => {
       image && image.imageId && image.file
         ? { ...profile, profileImageId: image.imageId }
         : profile;
-    dispatch(BookerManageCompany.updateBookerAccount(updatedValues));
+    await dispatch(BookerManageCompany.updateBookerAccount(updatedValues));
+    openConfirmationModal();
   };
 
   const onSubmitButtonClick = (e: any) => {
@@ -142,10 +156,30 @@ const ContactPointPage = () => {
         </div>
       </div>
       <div className={css.submitBtn}>
-        <Button className={css.btn} onClick={onSubmitButtonClick}>
+        <Button
+          className={css.btn}
+          onClick={onSubmitButtonClick}
+          inProgress={updateBookerInProgress}>
           {intl.formatMessage({ id: 'ContactPointPage.submitBtn' })}
         </Button>
       </div>
+      <ConfirmationModal
+        id="UpdateBookerConfirmationModal"
+        isOpen={isConfirmationModalOpen}
+        onClose={closeConfirmationModal}
+        title={intl.formatMessage({
+          id: 'ContactPointPage.confirmationModal.title',
+        })}
+        description={
+          updateBookerError
+            ? intl.formatMessage({
+                id: 'ContactPointPage.confirmationModal.error',
+              })
+            : intl.formatMessage({
+                id: 'ContactPointPage.confirmationModal.success',
+              })
+        }
+      />
     </div>
   );
 };

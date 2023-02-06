@@ -95,8 +95,7 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
       }
       return `${variant.url} ${variant.width}w`;
     })
-    .filter((v) => v != null)
-    .join(', ');
+    .filter((v) => v != null)[0];
 
   const style = {
     objectFit: 'cover',
@@ -104,13 +103,13 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
 
   const imgProps = {
     className: classes,
-    src: srcSet,
+    src: srcSet!,
     fill: true,
     style,
     ...rest,
   };
 
-  return <Image alt={alt} {...imgProps} />;
+  return srcSet ? <Image alt={alt} {...imgProps} /> : null;
 };
 
 export default ResponsiveImage;

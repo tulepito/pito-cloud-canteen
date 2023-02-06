@@ -80,9 +80,9 @@ const fetchCurrentUser = createAsyncThunk(
     const parameters = params || {
       include: ['profileImage'],
       'fields.image': [
-        EImageVariants.squareSmall,
-        EImageVariants.squareSmall2x,
-        EImageVariants.scaledLarge,
+        `variants.${EImageVariants.squareSmall}`,
+        `variants.${EImageVariants.squareSmall2x}`,
+        `variants.${EImageVariants.scaledLarge}`,
       ],
     };
     const response = await sdk.currentUser.show(parameters);
