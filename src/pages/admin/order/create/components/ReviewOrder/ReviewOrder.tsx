@@ -6,7 +6,7 @@ import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderAsyncAction, removeDraftOrder } from '@redux/slices/Order.slice';
-import { parseTimestaimpToFormat } from '@utils/dates';
+import { parseTimestampToFormat } from '@utils/dates';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
@@ -155,7 +155,7 @@ const generateOrderDetails = (orders: any[]) => {
       data: {
         isParent: true,
         index: index + 1,
-        label: parseTimestaimpToFormat(Number(date)),
+        label: parseTimestampToFormat(Number(date)),
         quantity: memeberDetails.length,
         price: totalDatePricing,
       },
@@ -302,7 +302,7 @@ const parseDataToReviewTab = (values: any) => {
   const items = Object.keys(orderDetail).map((key: any) => {
     return {
       key,
-      label: parseTimestaimpToFormat(Number(key)),
+      label: parseTimestampToFormat(Number(key)),
       childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
       childrenProps: { ...orderDetail[key], ...rest, order: values },
     };

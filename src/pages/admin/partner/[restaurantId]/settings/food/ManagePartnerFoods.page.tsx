@@ -21,7 +21,7 @@ import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
 import { makeCsv } from '@utils/csv';
-import { parseTimestaimpToFormat } from '@utils/dates';
+import { parseTimestampToFormat } from '@utils/dates';
 import {
   CATEGORY_OPTIONS,
   FOOD_TYPE_OPTIONS,
@@ -400,7 +400,7 @@ const ManagePartnerFoods = () => {
             onClick={() =>
               makeCsv(
                 parseEntitiesToExportCsv(foods, idsToAction),
-                `${parseTimestaimpToFormat(new Date().getTime())}_donhang.csv`,
+                `${parseTimestampToFormat(new Date().getTime())}_donhang.csv`,
               )
             }
             disabled={idsToAction.length === 0}

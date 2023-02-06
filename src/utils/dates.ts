@@ -99,7 +99,7 @@ export const weekDayFormatFromDateTime = (dateTime: DateTime) => {
   return formattedWeekDay;
 };
 
-export const parseTimestaimpToFormat = (date: number, format?: string) => {
+export const parseTimestampToFormat = (date: number, format?: string) => {
   return DateTime.fromMillis(date).toFormat(format || 'dd/MM/yyyy', {
     locale: 'vi',
   });

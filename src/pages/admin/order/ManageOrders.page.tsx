@@ -17,7 +17,7 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderAsyncAction } from '@redux/slices/Order.slice';
 import { adminRoutes } from '@src/paths';
-import { parseTimestaimpToFormat } from '@utils/dates';
+import { parseTimestampToFormat } from '@utils/dates';
 import {
   EOrderDetailsStatus,
   EOrderStates,
@@ -102,7 +102,7 @@ const OrderDetailTooltip = ({ orderDetail }: any) => {
         <OrderIcon />
         <span>
           <span className={css.orderDate}>
-            {parseTimestaimpToFormat(Number(key))}
+            {parseTimestampToFormat(Number(key))}
           </span>
           : {totalPrice}đ
         </span>
@@ -260,10 +260,10 @@ const parseEntitiesToTableData = (
         location:
           entity?.attributes?.metadata?.generalInfo?.deliveryAddress?.address,
         companyName: company?.attributes.profile.displayName,
-        startDate: parseTimestaimpToFormat(
+        startDate: parseTimestampToFormat(
           entity?.attributes?.metadata?.generalInfo?.startDate,
         ),
-        endDate: parseTimestaimpToFormat(
+        endDate: parseTimestampToFormat(
           entity?.attributes?.metadata?.generalInfo?.endDate,
         ),
         staffName: entity?.attributes?.metadata?.generalInfo?.staffName,

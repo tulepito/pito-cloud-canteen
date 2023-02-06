@@ -42,7 +42,6 @@ const RemoveMenuConfirmModal: React.FC<TRemoveMenuConfirmModal> = (props) => {
       const { payload } = (await dispatch(
         menusSliceThunks.checkingMenuInTransactionProgress(menuToRemove.id),
       )) as any;
-      console.log(payload);
       setIsInTransactionProgress(payload);
     };
     checkShouldRemoveMenu();

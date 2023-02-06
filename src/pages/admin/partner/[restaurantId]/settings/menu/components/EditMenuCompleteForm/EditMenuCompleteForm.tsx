@@ -1,7 +1,7 @@
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import Form from '@components/Form/Form';
 import { INTERGRATION_LISTING } from '@utils/data';
-import { parseTimestaimpToFormat } from '@utils/dates';
+import { parseTimestampToFormat } from '@utils/dates';
 import { EMenuTypes, getLabelByKey, MENU_OPTIONS } from '@utils/enums';
 import type { TIntergrationListing } from '@utils/types';
 import { DateTime } from 'luxon';
@@ -122,7 +122,7 @@ const EditMenuCompleteFormComponent: React.FC<
               </label>
               <div className={css.title}>
                 {startDate &&
-                  parseTimestaimpToFormat(startDate, 'EEE, dd MMMM, yyyy')}
+                  parseTimestampToFormat(startDate, 'EEE, dd MMMM, yyyy')}
               </div>
             </div>
             {!isFixedMenu && (
@@ -132,7 +132,7 @@ const EditMenuCompleteFormComponent: React.FC<
                 </label>
                 <div>
                   {endDate &&
-                    parseTimestaimpToFormat(endDate, 'EEE, dd MMMM, yyyy')}
+                    parseTimestampToFormat(endDate, 'EEE, dd MMMM, yyyy')}
                 </div>
               </div>
             )}

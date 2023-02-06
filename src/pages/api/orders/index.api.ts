@@ -9,7 +9,7 @@ import {
 } from '@services/subAccountSdk';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
-import { parseTimestaimpToFormat } from '@utils/dates';
+import { parseTimestampToFormat } from '@utils/dates';
 import { EOrderStates } from '@utils/enums';
 import type { TPlan } from '@utils/orderTypes';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -50,9 +50,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             publicData: {
               orderName: `${
                 companyAccount.attributes.profile.displayName
-              } PCC_${parseTimestaimpToFormat(
+              } PCC_${parseTimestampToFormat(
                 generalInfo.startDate,
-              )} - ${parseTimestaimpToFormat(generalInfo.endDate)}`,
+              )} - ${parseTimestampToFormat(generalInfo.endDate)}`,
               startDate: generalInfo.startDate,
               enddate: generalInfo.endDate,
             },

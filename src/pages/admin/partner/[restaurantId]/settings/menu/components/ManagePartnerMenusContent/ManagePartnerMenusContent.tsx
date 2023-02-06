@@ -12,7 +12,7 @@ import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TMenuMealTypeCount } from '@redux/slices/menus.slice';
 import { menusSliceThunks } from '@redux/slices/menus.slice';
-import { parseTimestaimpToFormat } from '@utils/dates';
+import { parseTimestampToFormat } from '@utils/dates';
 import { EListingStates, EMenuMealType, EMenuTypes } from '@utils/enums';
 import type { TIntergrationListing } from '@utils/types';
 import classNames from 'classnames';
@@ -81,11 +81,11 @@ const TABLE_COLUNMS: TColumn[] = [
           })}>
           {menuType === EMenuTypes.cycleMenu ? (
             <div>
-              {parseTimestaimpToFormat(startDate)} -
-              {parseTimestaimpToFormat(endDate)}
+              {parseTimestampToFormat(startDate)} -
+              {parseTimestampToFormat(endDate)}
             </div>
           ) : (
-            <div>{parseTimestaimpToFormat(startDate)}</div>
+            <div>{parseTimestampToFormat(startDate)}</div>
           )}
         </div>
       );
