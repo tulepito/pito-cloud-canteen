@@ -176,21 +176,28 @@ const duplicateFood = createAsyncThunk(
       const { images = [], title } = payload || {};
       // parse url to file
       const imageAsFiles = await Promise.all(
-        images.map(async (image: TImage) => {
-          const response = await fetch(
-            image.attributes.variants[EImageVariants.squareSmall2x].url,
-          );
-          const data = await response.blob();
-          const metadata = {
-            type: 'image/jpeg',
-          };
-          const file = new File(
-            [data],
-            `${`${title}_${new Date().getTime()}`}.jpg`,
-            metadata,
-          );
-          return file;
-        }),
+        images
+          .map(async (image: TImage) => {
+            try {
+              const response = await fetch(
+                image.attributes.variants[EImageVariants.squareSmall2x].url,
+              );
+              const data = await response.blob();
+              const metadata = {
+                type: 'image/jpeg',
+              };
+              const file = new File(
+                [data],
+                `${`${title}_${new Date().getTime()}`}.jpg`,
+                metadata,
+              );
+              return file;
+            } catch (error) {
+              console.error(error);
+              return null;
+            }
+          })
+          .filter((file: File) => !!file),
       );
       // upload image to Flex
       const uploadRes = await Promise.all(
@@ -252,19 +259,26 @@ const creataPartnerFoodFromCsv = createAsyncThunk(
               const { images, title } = l;
               const imagesAsArray = images ? images.split(',') : [];
               const imageAsFiles = await Promise.all(
-                imagesAsArray.map(async (src: string) => {
-                  const response = await fetch(src);
-                  const blobData = await response.blob();
-                  const metadata = {
-                    type: 'image/jpeg',
-                  };
-                  const file = new File(
-                    [blobData],
-                    `${`${title}_${new Date().getTime()}`}.jpg`,
-                    metadata,
-                  );
-                  return file;
-                }),
+                imagesAsArray
+                  .map(async (src: string) => {
+                    try {
+                      const response = await fetch(src);
+                      const blobData = await response.blob();
+                      const metadata = {
+                        type: 'image/jpeg',
+                      };
+                      const file = new File(
+                        [blobData],
+                        `${`${title}_${new Date().getTime()}`}.jpg`,
+                        metadata,
+                      );
+                      return file;
+                    } catch (error) {
+                      console.error(error);
+                      return null;
+                    }
+                  })
+                  .filter((file: File) => !!file),
               );
               // upload image to Flex
               const uploadRes = await Promise.all(
