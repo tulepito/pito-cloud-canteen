@@ -77,6 +77,10 @@
 
     .fieldInput {
       width: 300px;
+
+      .label {
+        @include textTemplate(14px, $fontWeightMedium, 24px);
+      }
     }
   }
 }

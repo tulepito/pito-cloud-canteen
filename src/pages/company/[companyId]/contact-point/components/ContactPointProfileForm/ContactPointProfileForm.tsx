@@ -191,6 +191,7 @@ const ContactPointProfileFormComponent: React.FC<
           label={intl.formatMessage({
             id: 'ContactPointProfileForm.displayName.label',
           })}
+          labelClassName={css.label}
           placeholder={intl.formatMessage({
             id: 'ContactPointProfileForm.displayName.placeholder',
           })}
@@ -207,6 +208,7 @@ const ContactPointProfileFormComponent: React.FC<
           label={intl.formatMessage({
             id: 'ContactPointProfileForm.email.label',
           })}
+          labelClassName={css.label}
           disabled
           placeholder={intl.formatMessage({
             id: 'ContactPointProfileForm.email.placeholder',
@@ -224,6 +226,7 @@ const ContactPointProfileFormComponent: React.FC<
           label={intl.formatMessage({
             id: 'ContactPointProfileForm.phoneNumber.label',
           })}
+          labelClassName={css.label}
           placeholder={intl.formatMessage({
             id: 'ContactPointProfileForm.phoneNumber.placeholder',
           })}
