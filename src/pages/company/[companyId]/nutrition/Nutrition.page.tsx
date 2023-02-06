@@ -1,6 +1,7 @@
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
-import { USER } from '@utils/data';
+import { BookerManageCompany } from '@redux/slices/company.slice';
+import { LISTING, USER } from '@utils/data';
 import type { TUser } from '@utils/types';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
@@ -12,6 +13,7 @@ import css from './Nutrition.module.scss';
 
 const NutritionPage = () => {
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   useFetchCompanyInfo();
   const company = useAppSelector(
     (state) => state.company.company,
@@ -26,17 +28,32 @@ const NutritionPage = () => {
     (state) => state.company.favoriteFood,
     shallowEqual,
   );
+
   const initialValues = useMemo(
     () => ({
       nutritions,
-      favoriteRestaurantList: favoriteRestaurants,
-      favoriteFoodList: favoriteFood,
+      favoriteRestaurantList: favoriteRestaurants.map((restaurant) =>
+        LISTING(restaurant).getId(),
+      ),
+      favoriteFoodList: favoriteFood.map((food) => LISTING(food).getId()),
     }),
     [favoriteFood, favoriteRestaurants, nutritions],
   );
+
   const onSubmit = (values: TNutritionFormValues) => {
-    console.log('values: ', values);
+    const {
+      favoriteRestaurantList: favoriteRestaurantListValue,
+      favoriteFoodList: favoriteFoodListValue,
+      nutritions: nutritionsValue,
+    } = values;
+    const publicData = {
+      favoriteRestaurantList: favoriteRestaurantListValue,
+      favoriteFoodList: favoriteFoodListValue,
+      nutritions: nutritionsValue,
+    };
+    dispatch(BookerManageCompany.updateCompanyAccount({ publicData }));
   };
+
   return (
     <div className={css.container}>
       <div className={css.header}>

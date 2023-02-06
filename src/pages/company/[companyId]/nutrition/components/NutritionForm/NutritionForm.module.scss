@@ -4,6 +4,11 @@
 .container {
   padding: 40px 24px 0;
 }
+
+.boldText {
+  font-weight: $fontWeightBold;
+}
+
 .tableRoot {
   width: 100%;
   border: 1px solid $neutral4;
@@ -87,6 +92,10 @@
     @include textTemplate(16px, $fontWeightBold, 24px);
     margin-bottom: 12px;
   }
+}
+
+.deleteIcon {
+  cursor: pointer;
 }
 
 .submitChangeBtn {

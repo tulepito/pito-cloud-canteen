@@ -271,14 +271,15 @@ const updateBookerAccount = createAsyncThunk(
 
 const updateCompanyAccount = createAsyncThunk(
   UPDATE_COMPANY_ACCOUNT,
-  async (_, { getState, dispatch }) => {
+  async (params: any, { getState, dispatch }) => {
     const { workspaceCompanyId } = getState().company;
     const { image = {} } = getState().uploadImage;
-    const { imageId, file } = image;
+    const { imageId, file } = image || {};
     const apiBody: UpdateCompanyApiBody = {
       companyId: workspaceCompanyId,
       dataParams: {
         id: workspaceCompanyId,
+        ...params,
         ...(imageId && file ? { profileImageId: imageId.uuid } : {}),
       },
       queryParams: {
