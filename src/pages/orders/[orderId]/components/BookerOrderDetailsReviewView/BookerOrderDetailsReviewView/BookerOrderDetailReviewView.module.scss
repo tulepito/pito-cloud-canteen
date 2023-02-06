@@ -1,8 +1,8 @@
+@use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
-@use '/src/styles/customMediaQueries.scss' as *;
 
-.editViewRoot {
+.root {
   padding: 16px 8px;
   display: flex;
   flex-direction: column;
@@ -17,11 +17,11 @@
   .rightPart {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 32px 24px;
   }
 
   .leftPart {
-    order: 3;
+    order: 2;
     $maxWidthWithPadding: calc(100vw - 320px - 40px);
 
     margin-top: 24px;
@@ -42,7 +42,7 @@
   }
 
   .rightPart {
-    order: 2;
+    order: 3;
 
     @include viewportMedium {
       order: 2;
