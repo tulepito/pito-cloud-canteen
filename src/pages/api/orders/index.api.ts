@@ -111,7 +111,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                       publicData: {
                         orderName: `${
                           companyAccount.attributes.profile.displayName
-                        } PCC_${parseTimestampToFormat(
+                        } PCC ${parseTimestampToFormat(
                           generalInfo.startDate,
                         )} - ${parseTimestampToFormat(generalInfo.endDate)}`,
                       },
