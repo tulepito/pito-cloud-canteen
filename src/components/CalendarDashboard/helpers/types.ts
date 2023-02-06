@@ -18,5 +18,6 @@ export type TDayInWeek =
   | 'sunday';
 
 export type TCalendarItemCardComponents = {
-  contentEnd: React.FC<any>;
+  contentEnd?: React.FC<any>;
+  toolbar?: React.FC<any>;
 };

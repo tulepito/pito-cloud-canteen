@@ -1,0 +1,30 @@
+@use '/src/styles/defaults.scss' as *;
+
+.root {
+  padding-bottom: 150px;
+}
+
+.inputWrapper {
+  margin-bottom: 24px;
+
+  textarea.input {
+    min-height: 72px;
+  }
+}
+
+.dateInput {
+  margin-bottom: 24px;
+
+  input {
+    @include inputStyles;
+    width: 100%;
+  }
+}
+
+.fieldSelect {
+  margin-bottom: 24px;
+}
+
+.submitBtn {
+  width: 100%;
+}

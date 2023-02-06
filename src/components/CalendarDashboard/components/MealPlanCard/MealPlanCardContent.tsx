@@ -1,4 +1,5 @@
 import Button from '@components/Button/Button';
+import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import Image from 'next/image';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
@@ -22,7 +23,7 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
       <Image className={css.coverImg} alt={`${event.title}`} src={coverImg} />
       <div className={css.restaurant}>
         <span>{restaurantName}</span>
-        {/* <IconRefreshing className={css.recommendRestaurant} /> */}
+        <IconRefreshing className={css.recommendRestaurant} />
       </div>
       <Button
         className={css.editFood}

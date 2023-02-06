@@ -17,8 +17,8 @@ type TFieldSelect = PropsWithChildren<
       selectClassName?: string;
       input: any;
       meta: any;
-      onChange: () => void;
-      leftIcon: React.ReactElement<TIconProps>;
+      onChange?: () => void;
+      leftIcon?: React.ReactElement<TIconProps>;
     }
 >;
 
@@ -37,7 +37,7 @@ const handleChange =
     inputOnChange(event);
   };
 
-const FieldSelectComponent: React.FC<TFieldSelect> = (props) => {
+export const FieldSelectComponent: React.FC<TFieldSelect> = (props) => {
   const {
     rootClassName,
     className,

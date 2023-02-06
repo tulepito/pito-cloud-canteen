@@ -18,18 +18,21 @@ type InputComponentProps = FieldRenderProps<string, any> &
     isUncontrolled?: boolean;
     input: any;
     meta: any;
-    inputRef: any;
+    inputRef?: any;
     fullWidth?: boolean;
   };
 const CONTENT_MAX_LENGTH = 5000;
 
-const FieldTextAreaComponent: React.FC<InputComponentProps> = (props) => {
+export const FieldTextAreaComponent: React.FC<InputComponentProps> = (
+  props,
+) => {
   const {
     label,
     id,
     rootClassName,
     className,
     inputRootClass,
+    inputClassName,
     disabled,
     labelClassName,
     customErrorText,
@@ -62,12 +65,16 @@ const FieldTextAreaComponent: React.FC<InputComponentProps> = (props) => {
   // Classes
   const inputClasses =
     inputRootClass ||
-    classNames(css.input, {
-      [css.inputSuccess]: valid,
-      [css.inputError]: hasError,
-      [css.inputDisabled]: disabled,
-      [css.inputFullWidth]: fullWidth,
-    });
+    classNames(
+      css.input,
+      {
+        [css.inputSuccess]: valid,
+        [css.inputError]: hasError,
+        [css.inputDisabled]: disabled,
+        [css.inputFullWidth]: fullWidth,
+      },
+      inputClassName,
+    );
 
   const inputProps = {
     className: inputClasses,

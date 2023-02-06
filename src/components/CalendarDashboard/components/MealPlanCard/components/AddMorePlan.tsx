@@ -21,7 +21,7 @@ const AddMorePlan: React.FC<TAddMorePlanProps> = ({
   date,
   startDate,
   endDate,
-  onClick,
+  onClick = () => () => null,
 }) => {
   const dateInNumberType = Number(date);
   const isValidDate =
