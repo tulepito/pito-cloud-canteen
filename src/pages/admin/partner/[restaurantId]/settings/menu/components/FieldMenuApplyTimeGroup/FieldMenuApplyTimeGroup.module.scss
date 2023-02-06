@@ -1,3 +1,5 @@
+@use '/src/styles/vars.scss' as *;
+
 .fields {
   display: grid;
   gap: 80px;
@@ -11,4 +13,8 @@
 
 .numberOfCyclesInput {
   width: 300px;
+}
+
+.inputSuffixedContainer {
+  right: 15px !important;
 }

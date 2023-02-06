@@ -1,5 +1,6 @@
 import Form from '@components/Form/Form';
 import type { FormApi } from 'final-form';
+import arrayMutators from 'final-form-arrays';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 
@@ -35,7 +36,13 @@ const UpdateMenuModalFormComponent: React.FC<
 };
 
 const UpdateMenuModalForm: React.FC<TUpdateMenuModalFormProps> = (props) => {
-  return <FinalForm {...props} component={UpdateMenuModalFormComponent} />;
+  return (
+    <FinalForm
+      {...props}
+      mutators={{ ...arrayMutators }}
+      component={UpdateMenuModalFormComponent}
+    />
+  );
 };
 
 export default UpdateMenuModalForm;

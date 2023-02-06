@@ -3,6 +3,7 @@ import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldC
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { MENU_MEAL_TYPE_OPTIONS, MENU_OPTIONS } from '@utils/enums';
+import { nonEmptyArray, required } from '@utils/validators';
 import type { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import { useImperativeHandle } from 'react';
@@ -47,6 +48,11 @@ const EditMenuInformationFormComponent: React.FC<
             placeholder={intl.formatMessage({
               id: 'EditMenuInformationForm.titlePlaceholder',
             })}
+            validate={required(
+              intl.formatMessage({
+                id: 'EditMenuInformationForm.titleRequired',
+              }),
+            )}
           />
           <div className={css.field}>
             <label className={css.inputLabel}>
@@ -72,6 +78,11 @@ const EditMenuInformationFormComponent: React.FC<
               id: 'EditMenuInformationForm.mealTypeLabel',
             })}
             labelClassName={css.label}
+            validate={nonEmptyArray(
+              intl.formatMessage({
+                id: 'EditMenuInformationForm.mealTypeRequired',
+              }),
+            )}
           />
         </div>
       </div>

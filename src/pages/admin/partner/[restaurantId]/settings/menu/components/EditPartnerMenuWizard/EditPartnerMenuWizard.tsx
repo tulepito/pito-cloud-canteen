@@ -117,12 +117,13 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
           : {
               menuType: EMenuTypes.fixedMenu,
             };
-      case MENU_PRICING_TAB:
+      case MENU_PRICING_TAB: {
         return currentMenu
           ? {
               foodsByDate,
             }
           : {};
+      }
       default:
         break;
     }
@@ -145,6 +146,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
           initialValues={initialValues}
           onSubmit={onSubmit}
           currentMenu={currentMenu as TIntergrationListing}
+          restaurantId={restaurantId}
         />
       );
     }
@@ -156,6 +158,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
           formRef={formRef}
           initialValues={initialValues}
           currentMenu={currentMenu}
+          restaurantId={restaurantId}
         />
       );
     }

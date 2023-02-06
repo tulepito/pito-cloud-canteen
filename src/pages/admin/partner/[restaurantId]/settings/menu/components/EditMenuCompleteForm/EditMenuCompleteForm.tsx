@@ -9,7 +9,9 @@ import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 
+import useQueryMenuPickedFoods from '../EditPartnerMenuWizard/useQueryMenuPickedFoods';
 import type { TEditMenuPricingCalendarResources } from '../EditPartnerMenuWizard/utils';
+import { renderInitialValuesForFoodsByDate } from '../EditPartnerMenuWizard/utils';
 import FoodEventCard from '../FoodEventCard/FoodEventCard';
 import css from './EditMenuCompleteForm.module.scss';
 
@@ -18,6 +20,7 @@ export type TEditMenuCompleteFormValues = {};
 type TExtraProps = {
   currentMenu?: TIntergrationListing | null;
   formRef: any;
+  restaurantId: string;
 };
 type TEditMenuCompleteFormComponentProps =
   FormRenderProps<TEditMenuCompleteFormValues> & Partial<TExtraProps>;
@@ -52,14 +55,37 @@ const renderResourcesForCalendar = (foodsByDate: any) => {
 const EditMenuCompleteFormComponent: React.FC<
   TEditMenuCompleteFormComponentProps
 > = (props) => {
-  const { handleSubmit, currentMenu, formRef, form } = props;
+  const { handleSubmit, currentMenu, formRef, form, restaurantId } = props;
   formRef.current = form;
   const { title } = INTERGRATION_LISTING(currentMenu).getAttributes();
   const { menuType } = INTERGRATION_LISTING(currentMenu).getMetadata();
-  const { foodsByDate, startDate, endDate } =
-    INTERGRATION_LISTING(currentMenu).getPublicData();
+  const {
+    foodsByDate = {},
+    startDate,
+    endDate,
+  } = INTERGRATION_LISTING(currentMenu).getPublicData();
 
-  const resourcesForCalendar = renderResourcesForCalendar(foodsByDate);
+  const getFoodsByDateIds = () => {
+    const ids: string[] = [];
+    Object.keys(foodsByDate).forEach((dKey) => {
+      Object.keys(foodsByDate[dKey]).forEach((id) => {
+        ids.push(id);
+      });
+    });
+    return ids;
+  };
+
+  const { menuPickedFoods } = useQueryMenuPickedFoods({
+    restaurantId: restaurantId as string,
+    ids: getFoodsByDateIds(),
+  });
+
+  const foodsByDateToRender = renderInitialValuesForFoodsByDate(
+    foodsByDate,
+    menuPickedFoods,
+  );
+
+  const resourcesForCalendar = renderResourcesForCalendar(foodsByDateToRender);
 
   const isFixedMenu = menuType === EMenuTypes.fixedMenu;
 

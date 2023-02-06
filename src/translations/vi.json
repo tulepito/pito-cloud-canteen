@@ -808,5 +808,12 @@
   "FoodEventCard.sideDishesLabel": "Món ăn kèm",
   "ManagePartnerMenu.preventRemoveTitle": "Không thể xóa Menu",
   "ManagePartnerMenu.preventRemoveContent": "Menu đang được triển khai trong các đơn hàng. Cập nhật danh sách đơn hàng {link}. ",
-  "ManagePartnerMenu.preventRemoveLink": "tạị đây"
+  "ManagePartnerMenu.preventRemoveLink": "tạị đây",
+  "EditMenuInformationForm.titleRequired": "Vui lòng nhập tên thực đơn",
+  "EditMenuInformationForm.mealTypeRequired": "Vui lòng chọn bữa phục vụ",
+  "EditMenuInformationForm.numberOfCyclesMinLength": "Số chu kỳ không hợp lệ",
+  "EditMenuInformationForm.numberOfCyclesRequired": "Vui lòng nhập số chu kỳ",
+  "EditMenuInformationForm.startDateRequired": "Vui lòng nhập ngày bắt đầu",
+  "EditMenuInformationForm.daysOfWeekRequired": "Vui lòng chọn ngày trong tuần",
+  "AddFoodModal.maxFood": "Bạn không thể chọn quá 10 món cho 1 ngày"
 }

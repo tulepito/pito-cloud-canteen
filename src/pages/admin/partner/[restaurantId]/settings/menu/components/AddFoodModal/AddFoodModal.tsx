@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import Button from '@components/Button/Button';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import Modal from '@components/Modal/Modal';
@@ -9,16 +10,18 @@ import Table from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
-import { getArrayByUuid, INTERGRATION_LISTING } from '@utils/data';
+import { INTERGRATION_LISTING } from '@utils/data';
 import { EDayOfWeek, getLabelByKey, SIDE_DISH_OPTIONS } from '@utils/enums';
 import type { TIntergrationListing } from '@utils/types';
 import { parsePrice } from '@utils/validators';
 import type { FormApi } from 'final-form';
+import cloneDeep from 'lodash/cloneDeep';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
+import useQueryMenuPickedFoods from '../EditPartnerMenuWizard/useQueryMenuPickedFoods';
 import FieldPickedFood from '../FieldPickedFood/FieldPickedFood';
 import css from './AddFoodModal.module.scss';
 
@@ -76,9 +79,9 @@ const parseEntitiesToTableData = (foods: TIntergrationListing[]) => {
   });
 };
 
-const renderPickedFoods = (ids: string[], foods: Record<any, any>[]) => {
+const renderPickedFoods = (ids: string[], foods: TIntergrationListing[]) => {
   return ids.map((id) => {
-    return foods.find((l) => l.id === id);
+    return foods.find((l) => l.id.uuid === id);
   });
 };
 
@@ -87,12 +90,14 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
   const dispatch = useAppDispatch();
   const [page, setPage] = useState<number>(1);
   const [keywords, setKeywords] = useState<string>('');
+  const intl = useIntl();
   const foods = useAppSelector((state) => state.foods.foods, shallowEqual);
+
   const queryFoodsInProgress = useAppSelector(
     (state) => state.foods.queryFoodsInProgress,
     shallowEqual,
   );
-  const [tempFoodTitles, setTempFoodTitles] = useState<any[]>([]);
+
   const pagination = useAppSelector(
     (state) => state.foods.managePartnerFoodPagination,
     shallowEqual,
@@ -120,55 +125,69 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
     }
   }, [currentMenu, dispatch, isOpen, page, restaurantId, keywords]);
 
-  useEffect(() => {
-    const tempFoods = foods.map((f: TIntergrationListing) => ({
-      id: f.id.uuid,
-      title: f.attributes.title,
-      price: f.attributes.price.amount,
-    }));
-    const newTempFoods = getArrayByUuid([
-      ...tempFoodTitles,
-      ...tempFoods,
-    ]) as any;
-    setTempFoodTitles(newTempFoods);
-  }, [JSON.stringify(foods)]);
+  const idsToQuery = values?.rowCheckbox || [];
 
-  const foodsByDate = renderPickedFoods(
-    values.rowCheckbox || [],
-    tempFoodTitles,
-  );
+  const { menuPickedFoods, queryMenuPickedFoodsInProgress } =
+    useQueryMenuPickedFoods({
+      restaurantId: restaurantId as string,
+      ids: idsToQuery,
+    });
+
+  const handleCloseModal = () => {
+    tableData.forEach((item: any) => {
+      form.change(`${item.data.id}`, null);
+    });
+    handleClose();
+  };
 
   const savePickedFoods = () => {
     const { rowCheckbox = [], foodsByDate = {} } = values;
-    const newPickedFoods = { ...foodsByDate };
+
+    const newFoodsByDate = cloneDeep(foodsByDate);
+
     if (!currentDate || !form) return;
+
+    if (!newFoodsByDate[currentDate]) {
+      newFoodsByDate[currentDate] = {};
+    }
+    const foodsLength = Object.keys(newFoodsByDate[currentDate]).length;
+
+    if (foodsLength > 10) return;
+
     const dayOfWeekIndex = new Date(currentDate).getDay();
     const dayOfWeek = Object.keys(EDayOfWeek).find(
       (_d, index) => index === dayOfWeekIndex,
     );
+
     rowCheckbox.forEach((key: string) => {
-      const { title = '', id = '' } =
-        tempFoodTitles.find((item) => item.id === key) || {};
-      newPickedFoods[currentDate] = {
-        ...newPickedFoods[currentDate],
-        [key]: values[key]
-          ? {
-              ...values[key],
-              id,
-              title,
-              dayOfWeek,
-            }
-          : {
-              id,
-              title,
-              dayOfWeek,
-            },
+      const food = menuPickedFoods.find(
+        (item: TIntergrationListing) => item?.id?.uuid === key,
+      );
+      const title = food?.attributes?.title;
+
+      Object.keys(newFoodsByDate).forEach((foodId) => {
+        if (!rowCheckbox.includes(foodId)) {
+          delete newFoodsByDate[currentDate][foodId];
+        }
+      });
+
+      const sideDishes = values[key]?.sideDishes || [];
+
+      newFoodsByDate[currentDate] = {
+        ...newFoodsByDate[currentDate],
+        [key]: {
+          id: key,
+          title,
+          dayOfWeek,
+          sideDishes,
+        },
       };
     });
-    form.change('foodsByDate', newPickedFoods);
+
+    form.change('foodsByDate', newFoodsByDate);
     form.change('rowCheckbox', []);
     form.change('checkAll', []);
-    handleClose();
+    handleCloseModal();
   };
 
   const onRemovePickedFood = (id: string) => () => {
@@ -195,13 +214,19 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
 
   const onSubmitSearchForm = ({ keywords = '' }) => {
     setKeywords(keywords);
+    setPage(1);
   };
+
+  const foodsByDate = renderPickedFoods(
+    values.rowCheckbox || [],
+    menuPickedFoods,
+  );
 
   return (
     <Modal
       containerClassName={css.modal}
       isOpen={isOpen}
-      handleClose={handleClose}>
+      handleClose={handleCloseModal}>
       <h2 className={css.title}>
         <FormattedMessage id="AddFoodModal.title" />
       </h2>
@@ -229,6 +254,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
             />
             {pagination && pagination.totalPages > 1 && (
               <Pagination
+                className={css.pagination}
                 total={pagination.totalItems}
                 pageSize={pagination.perPage}
                 current={pagination.page}
@@ -239,21 +265,33 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
           <div className={css.pickedFoodContainer}>
             <div className={css.title}>Món đã chọn</div>
             <div className={css.foodsByDate}>
-              {foodsByDate.map((f) => {
-                return (
-                  <FieldPickedFood
-                    id={f?.id}
-                    title={f?.title}
-                    key={f?.id}
-                    price={f?.price}
-                    onRemovePickedFood={onRemovePickedFood}
-                  />
-                );
-              })}
+              {queryMenuPickedFoodsInProgress ? (
+                <LoadingContainer />
+              ) : (
+                foodsByDate.map((f) => {
+                  return (
+                    <FieldPickedFood
+                      id={f?.id?.uuid}
+                      title={f?.attributes.title}
+                      key={f?.id?.uuid}
+                      price={f?.attributes?.price?.amount}
+                      onRemovePickedFood={onRemovePickedFood}
+                    />
+                  );
+                })
+              )}
             </div>
             <div className={css.modalButton}>
+              {foodsByDate.length > 10 && (
+                <ErrorMessage
+                  message={intl.formatMessage({
+                    id: 'AddFoodModal.maxFood',
+                  })}
+                />
+              )}
               <Button
                 type="button"
+                disabled={foodsByDate.length > 10}
                 onClick={savePickedFoods}
                 className={css.button}>
                 <FormattedMessage id="AddFoodModal.modalButton" />

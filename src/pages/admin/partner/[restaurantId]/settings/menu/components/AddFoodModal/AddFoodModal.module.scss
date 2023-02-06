@@ -40,8 +40,14 @@
 .modalButton {
   display: flex;
   justify-content: center;
+  flex-direction: column;
 }
 
 .button {
   width: 252px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: flex-end;
 }

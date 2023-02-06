@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import css from './Tabs.module.scss';
 
 export type TTabsItem = {
-  label: (e: TTabsItem & { isActive: boolean }) => ReactNode | ReactNode;
+  label: ((e: TTabsItem & { isActive?: boolean }) => ReactNode) | string;
   id: string | number;
   children: ReactNode | string | number;
   childrenFn?: (e: any) => ReactNode;

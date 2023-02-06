@@ -1,6 +1,9 @@
+import ValidationError from '@components/ValidationError/ValidationError';
 import { EDayOfWeek } from '@utils/enums';
 import classNames from 'classnames';
 import React from 'react';
+import type { FieldArrayProps } from 'react-final-form-arrays';
+import { FieldArray } from 'react-final-form-arrays';
 import { useIntl } from 'react-intl';
 
 import FieldCheckbox from '../FieldCheckbox/FieldCheckbox';
@@ -12,15 +15,20 @@ type TFieldDaysOfWeekCheckboxGroup = {
   name: string;
   values: Record<any, any>;
   label?: string;
-};
+  rootClassName?: string;
+  className?: string;
+} & FieldArrayProps<any, any>;
 
-const FieldDaysOfWeekCheckboxGroup: React.FC<TFieldDaysOfWeekCheckboxGroup> = (
-  props,
-) => {
-  const { name, values, label } = props;
+const FieldDaysOfWeekCheckboxGroupComponent: React.FC<
+  TFieldDaysOfWeekCheckboxGroup
+> = (props) => {
+  const { fields, values, label, rootClassName, className, meta } = props;
   const intl = useIntl();
+  const { name } = fields;
+  const classes = classNames(rootClassName || css.root, className);
+
   return (
-    <div className={css.root}>
+    <div className={classes}>
       {label && <label className={css.label}>{label}</label>}
       <div className={css.dayPicker}>
         {daysOfWeek.map((day) => {
@@ -45,8 +53,13 @@ const FieldDaysOfWeekCheckboxGroup: React.FC<TFieldDaysOfWeekCheckboxGroup> = (
           );
         })}
       </div>
+      <ValidationError fieldMeta={meta} />
     </div>
   );
 };
+
+const FieldDaysOfWeekCheckboxGroup: React.FC<any> = (props) => (
+  <FieldArray component={FieldDaysOfWeekCheckboxGroupComponent} {...props} />
+);
 
 export default FieldDaysOfWeekCheckboxGroup;

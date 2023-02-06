@@ -43,6 +43,33 @@ export type TEditMenuPricingCalendarResources = {
   sideDishes: string[];
 };
 
+const createSubmitFoodsByDate = (foodsByDate: any) => {
+  let submitValues = {};
+  Object.keys(foodsByDate).forEach((dKey) => {
+    const foodByDate = foodsByDate[dKey];
+    let newFoodByDate = {};
+    Object.keys(foodByDate).forEach((k) => {
+      const food = foodByDate[k];
+      const { dayOfWeek, sideDishes = [], id } = food;
+      newFoodByDate = {
+        ...newFoodByDate,
+        [k]: {
+          dayOfWeek,
+          id,
+          sideDishes,
+        },
+      };
+    });
+    submitValues = {
+      ...submitValues,
+      [dKey]: {
+        ...newFoodByDate,
+      },
+    };
+  });
+  return submitValues;
+};
+
 export const createSubmitMenuValues = (
   values: TCreateSubmitCreateMenuValues,
   tab: string,
@@ -87,7 +114,7 @@ export const createSubmitMenuValues = (
     case MENU_PRICING_TAB: {
       return {
         publicData: {
-          foodsByDate,
+          foodsByDate: createSubmitFoodsByDate(foodsByDate),
         },
       };
     }
@@ -154,7 +181,7 @@ export const createDuplicateSubmitMenuValues = (
           startDate,
           ...(endDate ? { endDate } : {}),
           ...(isCycleMenu ? { numberOfCycles } : {}),
-          foodsByDate: foodsByDateFromMenu,
+          foodsByDate: createSubmitFoodsByDate(foodsByDateFromMenu),
         },
         metadata: {
           menuType,
@@ -168,7 +195,7 @@ export const createDuplicateSubmitMenuValues = (
       return {
         title: titleFromMenu,
         publicData: {
-          foodsByDate,
+          foodsByDate: createSubmitFoodsByDate(foodsByDate),
           daysOfWeek: daysOfWeekFromMenu,
           mealTypes: mealTypesFromMenu,
           startDate: startDateFromMenu,
@@ -189,7 +216,7 @@ export const createDuplicateSubmitMenuValues = (
       return {
         title: titleFromMenu,
         publicData: {
-          foodsByDate: foodsByDateFromMenu,
+          foodsByDate: createSubmitFoodsByDate(foodsByDateFromMenu),
           daysOfWeek: daysOfWeekFromMenu,
           mealTypes: mealTypesFromMenu,
           startDate: startDateFromMenu,
@@ -226,4 +253,37 @@ export const createUpdateMenuApplyTimeValues = (values: any) => {
       ...(isCycleMenu ? { numberOfCycles } : {}),
     },
   };
+};
+
+export const renderInitialValuesForFoodsByDate = (
+  foodsByDate: any = {},
+  menuPickedFoods: TIntergrationListing[] = [],
+) => {
+  let initialValue = {};
+  Object.keys(foodsByDate).forEach((dKey) => {
+    const foodByDate = foodsByDate[dKey];
+    let newFoodByDate = {};
+    Object.keys(foodByDate).forEach((k) => {
+      const food = foodByDate[k];
+      const { dayOfWeek, sideDishes = [], id } = food;
+      const foodFromDuck = menuPickedFoods.find((m) => m.id.uuid === id);
+      const title = foodFromDuck?.attributes.title;
+      newFoodByDate = {
+        ...newFoodByDate,
+        [k]: {
+          title,
+          dayOfWeek,
+          id,
+          sideDishes,
+        },
+      };
+    });
+    initialValue = {
+      ...initialValue,
+      [dKey]: {
+        ...newFoodByDate,
+      },
+    };
+  });
+  return initialValue;
 };

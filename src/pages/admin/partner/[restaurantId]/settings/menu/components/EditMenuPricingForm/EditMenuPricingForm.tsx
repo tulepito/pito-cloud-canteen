@@ -12,6 +12,8 @@ import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 
 import AddFoodModal from '../AddFoodModal/AddFoodModal';
+import useQueryMenuPickedFoods from '../EditPartnerMenuWizard/useQueryMenuPickedFoods';
+import { renderInitialValuesForFoodsByDate } from '../EditPartnerMenuWizard/utils';
 import FoodEventCard from '../FoodEventCard/FoodEventCard';
 import css from './EditMenuPricingForm.module.scss';
 
@@ -19,16 +21,20 @@ export type TEditMenuPricingFormValues = {
   foodsByDate: any;
   checkAll: string[];
   rowCheckbox: string[];
+  [id: string]: any;
 };
 
 type TExtraProps = {
   currentMenu: TIntergrationListing;
   formRef: any;
+  restaurantId: string;
 };
 type TEditMenuPricingFormComponentProps =
   FormRenderProps<TEditMenuPricingFormValues> & Partial<TExtraProps>;
 type TEditMenuPricingFormProps = FormProps<TEditMenuPricingFormValues> &
   TExtraProps;
+
+type TFoodResource = { title: string; sideDishes: string[]; id: string };
 
 const renderResourcesForCalendar = (
   foodsByDate: any,
@@ -38,7 +44,7 @@ const renderResourcesForCalendar = (
   },
 ) => {
   const resourses: {
-    resource: { title: any; sideDishes: string[]; id: any };
+    resource: TFoodResource;
     start: Date;
     end: Date;
   }[] = [];
@@ -64,9 +70,27 @@ const EditMenuPricingFormComponent: React.FC<
   TEditMenuPricingFormComponentProps
 > = (props) => {
   const [currentDate, setCurrentDate] = useState<number | null>();
-  const { handleSubmit, currentMenu, values, form, formRef } = props;
+  const { handleSubmit, currentMenu, values, form, formRef, restaurantId } =
+    props;
 
   useImperativeHandle(formRef, () => form);
+
+  const foodsByDate = values?.foodsByDate || {};
+
+  const getFoodsByDateIds = () => {
+    const ids: string[] = [];
+    Object.keys(foodsByDate).forEach((dKey) => {
+      Object.keys(foodsByDate[dKey]).forEach((id) => {
+        ids.push(id);
+      });
+    });
+    return ids;
+  };
+
+  const { menuPickedFoods } = useQueryMenuPickedFoods({
+    restaurantId: restaurantId as string,
+    ids: getFoodsByDateIds(),
+  });
 
   const onRemovePickedFood = (removeId: string, date: Date) => {
     const dateAsTimeStaimp = date.getTime();
@@ -74,22 +98,29 @@ const EditMenuPricingFormComponent: React.FC<
     Object.keys(pickedFoodsOnDate).forEach((keyId: string) => {
       if (removeId === keyId) {
         delete pickedFoodsOnDate[removeId];
-        form.change('foodsByDate', {
+        const newFoodsByDate = {
           ...values.foodsByDate,
           [dateAsTimeStaimp]: {
             ...pickedFoodsOnDate,
           },
-        });
+        };
+
+        form.change('foodsByDate', newFoodsByDate);
       }
     });
   };
 
   const { daysOfWeek } = INTERGRATION_LISTING(currentMenu).getPublicData();
 
-  const resourcesForCalendar = renderResourcesForCalendar(
-    values.foodsByDate || {},
-    { onRemovePickedFood, daysOfWeek },
+  const foodByDateToRender = renderInitialValuesForFoodsByDate(
+    values?.foodsByDate,
+    menuPickedFoods,
   );
+
+  const resourcesForCalendar = renderResourcesForCalendar(foodByDateToRender, {
+    onRemovePickedFood,
+    daysOfWeek,
+  });
 
   const onSetCurrentDate = (params: any) => () => {
     const { date, events } = params;
@@ -99,17 +130,22 @@ const EditMenuPricingFormComponent: React.FC<
       (e: any) => new Date(e.start).getTime() === new Date(date).getTime(),
     );
     const listIds = currentDayEvents.map((e: any) => e.resource.id);
+    const listIdsWithSideDishes = currentDayEvents.map((e: any) => e.resource);
+    console.log(listIdsWithSideDishes);
     form.change('rowCheckbox', listIds);
+    listIdsWithSideDishes.forEach(({ id, sideDishes = [] }: TFoodResource) => {
+      return form.change(`${id}.sideDishes`, sideDishes);
+    });
   };
 
   const onCloseModal = () => {
     setCurrentDate(null);
   };
 
-  const calendarContentStart = (params: any) => {
+  const calendarContentStart = (contentProps: any) => {
     return (
       <InlineTextButton
-        onClick={onSetCurrentDate(params)}
+        onClick={onSetCurrentDate(contentProps)}
         className={css.addButton}>
         <div className={css.iconAdd}>
           <IconAdd />

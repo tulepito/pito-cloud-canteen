@@ -8,6 +8,7 @@
 .dayPicker {
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 15px;
   gap: 7px;
   .dayButton {
     border: 1px solid $neutralGray4;

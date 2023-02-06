@@ -2,6 +2,12 @@ import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePic
 import FieldDaysOfWeekCheckboxGroup from '@components/FormFields/FieldDaysOfWeekCheckboxGroup/FieldDaysOfWeekCheckboxGroup';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { EMenuTypes } from '@utils/enums';
+import {
+  composeValidators,
+  nonEmptyArray,
+  numberMinLength,
+  required,
+} from '@utils/validators';
 import type { FormApi } from 'final-form';
 import React from 'react';
 import { useIntl } from 'react-intl';
@@ -38,6 +44,11 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
           label={intl.formatMessage({
             id: 'EditMenuInformationForm.startDateLabel',
           })}
+          validate={required(
+            intl.formatMessage({
+              id: 'EditMenuInformationForm.startDateRequired',
+            }),
+          )}
         />
         {values.menuType === EMenuTypes.cycleMenu && (
           <FieldTextInput
@@ -58,6 +69,19 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
               </div>
             }
             rightIconContainerClassName={css.inputSuffixedContainer}
+            validate={composeValidators(
+              numberMinLength(
+                intl.formatMessage({
+                  id: 'EditMenuInformationForm.numberOfCyclesMinLength',
+                }),
+                0,
+              ),
+              required(
+                intl.formatMessage({
+                  id: 'EditMenuInformationForm.numberOfCyclesRequired',
+                }),
+              ),
+            )}
           />
         )}
       </div>
@@ -67,6 +91,11 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
         })}
         values={values}
         name="daysOfWeek"
+        validate={nonEmptyArray(
+          intl.formatMessage({
+            id: 'EditMenuInformationForm.daysOfWeekRequired',
+          }),
+        )}
       />
     </div>
   );
