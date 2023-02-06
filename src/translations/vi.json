@@ -128,6 +128,7 @@
   "CompanySidebar.logo": "Logo",
   "CompanySidebar.memberList": "Danh sách nhân viên",
   "CompanySidebar.members": "Thành viên",
+  "CompanySidebar.nutrition": "Chế độ bữa ăn",
   "ConfirmClientModal.cancel": "Huỷ bỏ",
   "ConfirmClientModal.confirm": "Xác nhận",
   "ConfirmClientModal.title": "Xác nhận chọn công ty này",
@@ -1015,5 +1016,11 @@
   "UploadImageForm.limitImage": "Dung lượng ảnh không được quá 2MB",
   "UploadImageForm.selectImage": "Chọn ảnh",
   "UploadImageForm.submit": "Lưu thay đổi",
+  "NutritionPage.nutrition": "Chế độ bữa ăn",
+  "NutritionForm.nutrition.title": "Chế độ dinh dưỡng",
+  "NutritionForm.favoriteRestaurant.title": "Nhà hàng yêu thích",
+  "NutritionForm.favoriteFood.title": "Món ăn yêu thích",
+  "NutritionForm.submit": "Lưu thay đổi",
+  "Restaurant.category.vietnam-food": "Việt",
   "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại."
 }

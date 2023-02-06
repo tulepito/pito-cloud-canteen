@@ -14,7 +14,7 @@ import {
 } from '@apis/companyApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
-import { denormalisedResponseEntities } from '@utils/data';
+import { denormalisedResponseEntities, USER } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TObject, TUser } from '@utils/types';
 import axios from 'axios';
@@ -62,6 +62,9 @@ type TCompanyState = {
 
   updateBookerAccountInProgress: boolean;
   updateBookerAccountError: any;
+
+  favoriteRestaurants: any[];
+  favoriteFood: any[];
 };
 
 // ================ Thunk types ================ //
@@ -102,6 +105,9 @@ const initialState: TCompanyState = {
 
   updateBookerAccountInProgress: false,
   updateBookerAccountError: null,
+
+  favoriteRestaurants: [],
+  favoriteFood: [],
 };
 
 const companyInfo = createAsyncThunk(
@@ -116,11 +122,30 @@ const companyInfo = createAsyncThunk(
       companyAccountResponse,
     );
     const companyImageId = companyAccount.profileImage?.id;
+    const { favoriteRestaurantList = [], favoriteFoodList = [] } =
+      USER(companyAccount).getPublicData();
     const { data: allEmployeesData } = await axios.get(
       `/api/company/all-employees?companyId=${workspaceCompanyId}`,
     );
     const { groups = [], members = {} } =
       companyAccount.attributes.profile.metadata;
+    const favoriteRestaurants = await Promise.all(
+      favoriteRestaurantList.map(
+        async (restaurantId: string) =>
+          denormalisedResponseEntities(
+            await sdk.listings.show({ id: restaurantId }),
+          )[0],
+      ),
+    );
+
+    const favoriteFood = await Promise.all(
+      favoriteFoodList.map(
+        async (foodId: string) =>
+          denormalisedResponseEntities(
+            await sdk.listings.show({ id: foodId }),
+          )[0],
+      ),
+    );
     return {
       companyImage: {
         imageId: companyImageId || null,
@@ -129,6 +154,8 @@ const companyInfo = createAsyncThunk(
       company: companyAccount,
       originCompanyMembers: members,
       companyMembers: [...allEmployeesData.data.data],
+      favoriteRestaurants,
+      favoriteFood,
     };
   },
 );
@@ -304,14 +331,22 @@ export const companySlice = createSlice({
         };
       })
       .addCase(companyInfo.fulfilled, (state, { payload }) => {
-        const { groupList, companyMembers, originCompanyMembers, company } =
-          payload;
+        const {
+          groupList,
+          companyMembers,
+          originCompanyMembers,
+          company,
+          favoriteRestaurants,
+          favoriteFood,
+        } = payload;
         return {
           ...state,
           groupList,
           companyMembers,
           company,
           originCompanyMembers,
+          favoriteRestaurants,
+          favoriteFood,
           isCompanyNotFound: false,
           fetchCompanyInfoInProgress: false,
         };
