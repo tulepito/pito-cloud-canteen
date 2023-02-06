@@ -28,6 +28,7 @@ type TOrderManagementState = {
   companyData: TCompany | null;
   orderData: TObject | null;
   planData: TObject;
+  bookerData: TUser | null;
   participantData: Array<TUser>;
 };
 const initialState: TOrderManagementState = {
@@ -39,6 +40,7 @@ const initialState: TOrderManagementState = {
   companyData: null,
   orderData: {},
   planData: {},
+  bookerData: null,
   participantData: [],
 };
 
@@ -48,7 +50,7 @@ const initialState: TOrderManagementState = {
 const loadData = createAsyncThunk(
   'app/OrderManagement/LOAD_DATA',
   async (orderId: string) => {
-    const response: any = await loadBookerOrderDataApi(orderId);
+    const response = await loadBookerOrderDataApi(orderId);
     return response.data;
   },
 );

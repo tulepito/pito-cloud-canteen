@@ -2,7 +2,7 @@ import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { LISTING, USER } from '@utils/data';
-import type { TListing, TObject, TUser } from '@utils/types';
+import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 import { useState } from 'react';
 
 import type { TReviewInfoFormValues } from '../components/BookerOrderDetailsReviewView/ReviewInfoSection/ReviewInfoForm';
@@ -13,20 +13,33 @@ export const usePrepareOrderDetailPageData = () => {
   const [reviewInfoValues, setReviewInfoValues] =
     useState<TReviewInfoFormValues>();
 
-  const { orderData, planData, participantData, companyData } = useAppSelector(
-    (state) => state.OrderManagement,
-  );
+  const { orderData, planData, participantData, companyData, bookerData } =
+    useAppSelector((state) => state.OrderManagement);
   const currentUser = useAppSelector(currentUserSelector);
 
   const { title: orderTitle = '' } = LISTING(
     orderData as TListing,
   ).getAttributes();
-  const { email: bookerEmail } = USER(currentUser as TUser).getAttributes();
+  const constCurrUserAttributes = USER(
+    currentUser as TCurrentUser,
+  ).getAttributes();
   const { orderDetail } = LISTING(planData as TListing).getMetadata();
-  const { companyName } = USER(companyData as TUser).getPublicData();
+  const { companyName = '' } = USER(companyData as TUser).getPublicData();
   const { generalInfo = {}, participants = [] } = LISTING(
     orderData as TListing,
   ).getMetadata();
+
+  const {
+    email: bookerEmail,
+    profile: {
+      displayName: contactPeopleName = '',
+      protectedData: { phoneNumber: contactPhoneNumber = '' } = {},
+    },
+  } =
+    bookerData !== null
+      ? USER(bookerData).getAttributes()
+      : constCurrUserAttributes;
+
   const {
     startDate = 0,
     endDate = 0,
@@ -34,7 +47,7 @@ export const usePrepareOrderDetailPageData = () => {
     deliveryAddress,
     orderDeadline = 0,
     deadlineHour,
-    staffName,
+    staffName = '',
   } = generalInfo || {};
 
   const titleSectionData = { deliveryHour, deliveryAddress };
@@ -75,9 +88,13 @@ export const usePrepareOrderDetailPageData = () => {
 
   const reviewInfoData = {
     reviewInfoValues,
-    deliveryAddress: deliveryAddress?.address,
+    deliveryHour,
+    deliveryAddress: deliveryAddress?.address || '',
     staffName,
     companyName,
+    contactPeopleName,
+    contactPeopleEmail: bookerEmail,
+    contactPhoneNumber,
   };
 
   const reviewResultData = {
@@ -130,6 +147,7 @@ export const usePrepareOrderDetailPageData = () => {
   };
 
   return {
+    orderTitle,
     editViewData,
     reviewViewData,
     priceQuotationData,
