@@ -8,16 +8,17 @@ import css from './NumberEmployeesForm.module.scss';
 type TNumberEmployeesFormProps = {
   onSubmit: (values: TNumberEmployeesFormValues) => void;
   initialValues?: TNumberEmployeesFormValues;
+  loading?: boolean;
 };
 
 export type TNumberEmployeesFormValues = {
-  numberMembers: string;
+  memberAmount: number;
 };
 
 const validate = (values: TNumberEmployeesFormValues) => {
   const errors: any = {};
-  if (!values.numberMembers) {
-    errors.numberMembers = 'Required';
+  if (!values.memberAmount) {
+    errors.memberAmount = 'Required';
   }
   return errors;
 };
@@ -25,40 +26,51 @@ const validate = (values: TNumberEmployeesFormValues) => {
 const NumberEmployeesForm: React.FC<TNumberEmployeesFormProps> = ({
   onSubmit,
   initialValues,
+  loading,
 }) => {
+  const onSubmitInternal = (values: TNumberEmployeesFormValues) => {
+    onSubmit({
+      memberAmount: Number(values.memberAmount),
+    });
+  };
+
   const { form, handleSubmit, submitting, hasValidationErrors } =
     useForm<TNumberEmployeesFormValues>({
-      onSubmit,
+      onSubmit: onSubmitInternal,
       validate,
       initialValues,
     });
 
   const intl = useIntl();
 
-  const numberMembers = useField('numberMembers', form);
-  const disabledSubmit = submitting || hasValidationErrors;
+  const memberAmount = useField('memberAmount', form);
+  const submitInprogress = loading || submitting;
+  const disabledSubmit = submitInprogress || hasValidationErrors;
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>
       <FieldTextInputComponent
         className={css.inputWrapper}
-        id="numberMembers"
-        name="numberMembers"
-        input={numberMembers.input}
-        meta={numberMembers.meta}
+        id="memberAmount"
+        name="memberAmount"
+        input={memberAmount.input}
+        meta={memberAmount.meta}
         label={intl.formatMessage({
-          id: 'Booker.CreateOrder.Form.field.numberMembers',
+          id: 'Booker.CreateOrder.Form.field.memberAmount',
         })}
         rightIconContainerClassName={css.rightIconContainer}
         rightIcon={
           <span className={css.rightIcon}>
             {intl.formatMessage({
-              id: 'Booker.CreateOrder.Form.field.numberMembers.unit',
+              id: 'Booker.CreateOrder.Form.field.memberAmount.unit',
             })}
           </span>
         }
       />
-      <Button className={css.submitBtn} disabled={disabledSubmit}>
+      <Button
+        className={css.submitBtn}
+        inProgress={submitInprogress}
+        disabled={disabledSubmit}>
         <FormattedMessage id="Booker.CreateOrder.Form.saveChange" />
       </Button>
     </form>

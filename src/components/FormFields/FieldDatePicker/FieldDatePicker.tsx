@@ -27,9 +27,10 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
     customErrorText,
     onChange: onDatePickerChange,
     customInput,
+    selected,
     ...rest
   } = props;
-  const { name, onChange } = input;
+  const { name, onChange, value } = input;
   const onInputChange = (date: Date, event: any) => {
     if (typeof onDatePickerChange === 'function') {
       onDatePickerChange(date, event);
@@ -56,6 +57,7 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
         name={name}
         onChange={onInputChange}
         customInput={customInput}
+        selected={value || selected}
         {...rest}
       />
       {!customInput && <ValidationError fieldMeta={fieldMeta} />}

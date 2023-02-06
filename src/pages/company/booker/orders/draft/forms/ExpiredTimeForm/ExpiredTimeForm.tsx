@@ -25,6 +25,7 @@ const TIME_OPTIONS = [
 type TExpiredTimeFormProps = {
   onSubmit: (values: TExpiredTimeFormValues) => void;
   initialValues?: TExpiredTimeFormValues;
+  loading?: boolean;
 };
 
 export type TExpiredTimeFormValues = {
@@ -46,6 +47,7 @@ const validate = (values: TExpiredTimeFormValues) => {
 const ExpiredTimeForm: React.FC<TExpiredTimeFormProps> = ({
   onSubmit,
   initialValues,
+  loading,
 }) => {
   const { form, handleSubmit, submitting, hasValidationErrors } =
     useForm<TExpiredTimeFormValues>({
@@ -58,7 +60,8 @@ const ExpiredTimeForm: React.FC<TExpiredTimeFormProps> = ({
 
   const deadlineDate = useField('deadlineDate', form);
   const deadlineHour = useField('deadlineHour', form);
-  const disabledSubmit = submitting || hasValidationErrors;
+  const submitInprogress = loading || submitting;
+  const disabledSubmit = submitInprogress || hasValidationErrors;
 
   const selectedDeadlineDate = deadlineDate.input.value
     ? new Date(Number(deadlineDate.input.value))
@@ -101,7 +104,10 @@ const ExpiredTimeForm: React.FC<TExpiredTimeFormProps> = ({
           </option>
         ))}
       </FieldSelectComponent>
-      <Button className={css.submitBtn} disabled={disabledSubmit}>
+      <Button
+        className={css.submitBtn}
+        inProgress={submitInprogress}
+        disabled={disabledSubmit}>
         <FormattedMessage id="Booker.CreateOrder.Form.saveChange" />
       </Button>
     </form>

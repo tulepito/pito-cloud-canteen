@@ -1,5 +1,5 @@
 import Button from '@components/Button/Button';
-import { FieldTextAreaComponent } from '@components/FormFields/FieldTextArea/FieldTextArea';
+import { LocationAutocompleteInputComponent } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -8,16 +8,17 @@ import css from './LocationForm.module.scss';
 type TLocationFormProps = {
   onSubmit: (values: TLocationFormValues) => void;
   initialValues?: TLocationFormValues;
+  loading?: boolean;
 };
 
 export type TLocationFormValues = {
-  address: string;
+  deliveryAddress: any;
 };
 
 const validate = (values: TLocationFormValues) => {
   const errors: any = {};
-  if (!values.address) {
-    errors.address = 'Required';
+  if (!values.deliveryAddress) {
+    errors.deliveryAddress = 'Required';
   }
   return errors;
 };
@@ -25,33 +26,53 @@ const validate = (values: TLocationFormValues) => {
 const LocationForm: React.FC<TLocationFormProps> = ({
   onSubmit,
   initialValues,
+  loading,
 }) => {
+  const onSubmitInside = (values: TLocationFormValues) => {
+    const {
+      selectedPlace: { address, origin },
+    } = values?.deliveryAddress || {};
+
+    onSubmit({
+      deliveryAddress: {
+        address,
+        origin: {
+          lat: origin.lat,
+          lng: origin.lng,
+        },
+      },
+    });
+  };
+
   const { form, handleSubmit, submitting, hasValidationErrors } =
     useForm<TLocationFormValues>({
-      onSubmit,
+      onSubmit: onSubmitInside,
       validate,
       initialValues,
     });
 
   const intl = useIntl();
 
-  const address = useField('address', form);
-  const disabledSubmit = submitting || hasValidationErrors;
+  const deliveryAddress = useField('deliveryAddress', form);
+  const submitInprogress = loading || submitting;
+  const disabledSubmit = loading || submitting || hasValidationErrors;
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>
-      <FieldTextAreaComponent
+      <LocationAutocompleteInputComponent
         className={css.inputWrapper}
-        inputClassName={css.input}
-        id="address"
-        meta={address.meta}
-        input={address.input}
+        id="deliveryAddress"
+        meta={deliveryAddress.meta}
+        input={deliveryAddress.input}
         rows={3}
         label={intl.formatMessage({
           id: 'Booker.CreateOrder.Form.field.address',
         })}
       />
-      <Button className={css.submitBtn} disabled={disabledSubmit}>
+      <Button
+        className={css.submitBtn}
+        inProgress={submitInprogress}
+        disabled={disabledSubmit}>
         <FormattedMessage id="Booker.CreateOrder.Form.saveChange" />
       </Button>
     </form>

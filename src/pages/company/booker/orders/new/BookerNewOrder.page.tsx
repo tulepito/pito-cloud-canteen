@@ -1,5 +1,6 @@
 import Modal from '@components/Modal/Modal';
-// import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { OrderAsyncAction } from '@redux/slices/Order.slice';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
@@ -9,16 +10,34 @@ import CreateOrderForm from './CreateOrderForm';
 function BookerNewOrderPage() {
   const intl = useIntl();
   const route = useRouter();
-  // const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
+  const currentUser = useAppSelector((state) => state.user.currentUser);
+
+  // Redux
+  const createOrderInProcess = useAppSelector(
+    (state) => state.Order.createOrderInProcess,
+  );
+  const createOrderError = useAppSelector(
+    (state) => state.Order.createOrderError,
+  );
 
   const handleCancel = () => {
-    route.push('/booker/orders');
+    route.push('/company/booker/orders');
   };
 
-  const handleSubmit = (values: any) => {
-    console.log('values', values);
-    // dispatch(BookerNewOrderThunks.createDraftOrder(values));
-    route.push('/booker/orders/draft');
+  const handleSubmit = async (values: any) => {
+    try {
+      const newOrder = await dispatch(
+        OrderAsyncAction.createOrder({
+          clientId: values.company,
+          bookerId: currentUser?.id?.uuid,
+        }),
+      );
+      const newOrderId = newOrder?.payload?.id?.uuid;
+      route.push(`/company/booker/orders/draft/${newOrderId}`);
+    } catch (error) {
+      console.log('error', error);
+    }
   };
 
   return (
@@ -36,7 +55,7 @@ function BookerNewOrderPage() {
           <CreateOrderForm
             companies={[
               {
-                id: '1234',
+                id: '63c76be1-7dd8-40fd-9920-b087847943fd',
                 name: 'Chu Tuan',
               },
               {
@@ -67,6 +86,8 @@ function BookerNewOrderPage() {
             initialValues={{
               company: '1235',
             }}
+            submitInprogress={createOrderInProcess}
+            submitError={createOrderError}
           />
         </div>
       </Modal>

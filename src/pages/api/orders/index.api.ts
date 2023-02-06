@@ -22,7 +22,6 @@ const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
   const integrationSdk = getIntegrationSdk();
-
   switch (apiMethod) {
     case HTTP_METHODS.GET:
       break;

@@ -20,26 +20,28 @@ const NUTRITION_LIST = [
 type TNutritionFormProps = {
   onSubmit: (values: TNutritionFormValues) => void;
   initialValues?: TNutritionFormValues;
+  loading?: boolean;
 };
 
 export type TNutritionFormValues = {
-  nutrition: string;
+  nutritions: string;
 };
 
 const NutritionForm: React.FC<TNutritionFormProps> = ({
   onSubmit,
   initialValues,
+  loading,
 }) => {
   const { form, handleSubmit, submitting, hasValidationErrors } =
     useForm<TNutritionFormValues>({
       onSubmit,
       initialValues,
     });
-
   const intl = useIntl();
 
-  const nutrition = useField('nutrition', form);
-  const disabledSubmit = submitting || hasValidationErrors;
+  const nutritions = useField('nutritions', form);
+  const submitInprogress = loading || submitting;
+  const disabledSubmit = submitInprogress || hasValidationErrors;
 
   const handleChangeCheckboxGroup: (data: {
     value: string;
@@ -47,16 +49,16 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
   }) => ChangeEventHandler<HTMLInputElement> = (data: any) => (e) => {
     if (e.target.checked) {
       form.change(
-        'nutrition',
-        (Array.isArray(nutrition.input.value)
-          ? Array.from(new Set([...nutrition.input.value, data.value]))
+        'nutritions',
+        (Array.isArray(nutritions.input.value)
+          ? Array.from(new Set([...nutritions.input.value, data.value]))
           : [data.value]) as any,
       );
     } else {
       form.change(
-        'nutrition',
-        (Array.isArray(nutrition.input.value)
-          ? nutrition.input.value.filter((item) => item !== data.value)
+        'nutritions',
+        (Array.isArray(nutritions.input.value)
+          ? nutritions.input.value.filter((item) => item !== data.value)
           : []) as any,
       );
     }
@@ -68,7 +70,7 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
         <div className={css.groupLabel}>
           <span>
             {intl.formatMessage({
-              id: 'Booker.CreateOrder.Form.field.nutrition',
+              id: 'Booker.CreateOrder.Form.field.nutritions',
             })}
           </span>
         </div>
@@ -76,13 +78,14 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
           <div className={css.checkboxItem} key={data.value}>
             <input
               className={css.input}
-              id={`nutrition-${data.value}`}
-              {...nutrition.input}
+              id={`nutritions-${data.value}`}
+              {...nutritions.input}
               onChange={handleChangeCheckboxGroup(data)}
+              checked={(nutritions.input.value || []).includes(data.value)}
               type="checkbox"
               value={data.value}
             />
-            <label className={css.label} htmlFor={`nutrition-${data.value}`}>
+            <label className={css.label} htmlFor={`nutritions-${data.value}`}>
               <span className={css.checkboxWrapper}>
                 <IconCheckbox
                   checkedClassName={css.checked}
@@ -95,7 +98,10 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
         ))}
       </div>
 
-      <Button className={css.submitBtn} disabled={disabledSubmit}>
+      <Button
+        className={css.submitBtn}
+        inProgress={submitInprogress}
+        disabled={disabledSubmit}>
         <FormattedMessage id="Booker.CreateOrder.Form.saveChange" />
       </Button>
     </form>

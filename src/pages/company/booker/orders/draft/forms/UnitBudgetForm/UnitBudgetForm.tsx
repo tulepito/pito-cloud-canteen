@@ -15,10 +15,11 @@ const VNDIcon = () => {
 type TUnitBudgetFormProps = {
   onSubmit: (values: TUnitBudgetFormValues) => void;
   initialValues?: TUnitBudgetFormValues;
+  loading?: boolean;
 };
 
 export type TUnitBudgetFormValues = {
-  packagePerMember: string;
+  packagePerMember: number | string;
   vatAllow: boolean;
 };
 
@@ -33,29 +34,39 @@ const validate = (values: TUnitBudgetFormValues) => {
 const UnitBudgetForm: React.FC<TUnitBudgetFormProps> = ({
   onSubmit,
   initialValues,
+  loading,
 }) => {
+  const onSubmitInternal = (values: TUnitBudgetFormValues) => {
+    onSubmit({
+      packagePerMember: +`${values.packagePerMember}`.replace(/,/g, ''),
+      vatAllow: values.vatAllow,
+    });
+  };
   const { form, handleSubmit, submitting, hasValidationErrors } =
     useForm<TUnitBudgetFormValues>({
-      onSubmit,
+      onSubmit: onSubmitInternal,
       validate,
       initialValues,
     });
-
   const intl = useIntl();
 
   const packagePerMember = useField('packagePerMember', form);
   const vatAllow = useField('vatAllow', form);
-  const disabledSubmit = submitting || hasValidationErrors;
+  const submitInprogress = loading || submitting;
+  const disabledSubmit = submitInprogress || hasValidationErrors;
 
   const parseThousandNumber = (value: string) => {
     return addCommas(removeNonNumeric(value));
   };
 
   useEffect(() => {
-    form.change(
-      'packagePerMember',
-      parseThousandNumber(packagePerMember.input.value),
-    );
+    if (packagePerMember.input.value) {
+      form.change(
+        'packagePerMember',
+        parseThousandNumber(`${packagePerMember.input.value}`),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [packagePerMember.input.value]);
 
   return (
@@ -68,7 +79,7 @@ const UnitBudgetForm: React.FC<TUnitBudgetFormProps> = ({
         label={intl.formatMessage({
           id: 'Booker.CreateOrder.Form.field.packagePerMember',
         })}
-        parse={parseThousandNumber}
+        // parse={parseThousandNumber}
         placeholder={intl.formatMessage({
           id: 'Booker.CreateOrder.Form.field.price.placeholder',
         })}
@@ -93,7 +104,10 @@ const UnitBudgetForm: React.FC<TUnitBudgetFormProps> = ({
         }}
         className={css.toggle}
       />
-      <Button className={css.submitBtn} disabled={disabledSubmit}>
+      <Button
+        className={css.submitBtn}
+        inProgress={submitInprogress}
+        disabled={disabledSubmit}>
         <FormattedMessage id="Booker.CreateOrder.Form.saveChange" />
       </Button>
     </form>

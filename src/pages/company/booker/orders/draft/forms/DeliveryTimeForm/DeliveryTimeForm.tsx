@@ -25,6 +25,7 @@ const TIME_OPTIONS = [
 type TDeliveryTimeFormProps = {
   onSubmit: (values: TDeliveryTimeFormValues) => void;
   initialValues?: TDeliveryTimeFormValues;
+  loading?: boolean;
 };
 
 export type TDeliveryTimeFormValues = {
@@ -42,6 +43,7 @@ const validate = (values: TDeliveryTimeFormValues) => {
 const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
   onSubmit,
   initialValues,
+  loading,
 }) => {
   const { form, handleSubmit, submitting, hasValidationErrors } =
     useForm<TDeliveryTimeFormValues>({
@@ -52,13 +54,14 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
 
   const intl = useIntl();
 
-  const orderStartDate = useField('orderStartDate', form);
-  const orderEndDate = useField('orderEndDate', form);
+  const startDate = useField('startDate', form);
+  const endDate = useField('endDate', form);
   const deliveryHour = useField('deliveryHour', form);
-  const disabledSubmit = submitting || hasValidationErrors;
+  const submitInprogress = loading || submitting;
+  const disabledSubmit = submitInprogress || hasValidationErrors;
 
-  const selectedStartDate = orderStartDate.input.value
-    ? new Date(Number(orderStartDate.input.value))
+  const selectedStartDate = startDate.input.value
+    ? new Date(Number(startDate.input.value))
     : DateTime.fromMillis(Number(Date.now())).plus({ days: 2 }).toJSDate();
   const minStartDate = DateTime.fromJSDate(new Date())
     .plus({ days: 2 })
@@ -77,10 +80,10 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
   return (
     <form className={css.root} onSubmit={handleSubmit}>
       <FieldDatePickerComponent
-        id="orderStartDate"
-        name="orderStartDate"
-        input={orderStartDate.input}
-        meta={orderStartDate.meta}
+        id="startDate"
+        name="startDate"
+        input={startDate.input}
+        meta={startDate.meta}
         selected={selectedStartDate}
         label={intl.formatMessage({
           id: 'Booker.CreateOrder.Form.field.orderStartDate',
@@ -94,10 +97,10 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
         autoComplete="off"
       />
       <FieldDatePickerComponent
-        id="orderEndDate"
-        name="orderEndDate"
-        input={orderEndDate.input}
-        meta={orderEndDate.meta}
+        id="endDate"
+        name="endDate"
+        input={endDate.input}
+        meta={endDate.meta}
         selected={selectedEndDate}
         label={intl.formatMessage({
           id: 'Booker.CreateOrder.Form.field.orderEndDate',
@@ -126,7 +129,10 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
           </option>
         ))}
       </FieldSelectComponent>
-      <Button className={css.submitBtn} disabled={disabledSubmit}>
+      <Button
+        className={css.submitBtn}
+        inProgress={submitInprogress}
+        disabled={disabledSubmit}>
         <FormattedMessage id="Booker.CreateOrder.Form.saveChange" />
       </Button>
     </form>

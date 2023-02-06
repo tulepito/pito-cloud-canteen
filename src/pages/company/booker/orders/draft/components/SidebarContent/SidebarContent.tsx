@@ -1,5 +1,9 @@
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import { getInitialLocationValues } from '@helpers/mapHelpers';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { LISTING } from '@utils/data';
 import classNames from 'classnames';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -15,6 +19,7 @@ import css from './SidebarContent.module.scss';
 
 type TSidebarContentProps = {
   className?: string;
+  order?: any;
 };
 
 type TNavigationItemProps = {
@@ -38,10 +43,57 @@ const NavigationItem: React.FC<TNavigationItemProps> = ({
   );
 };
 
-const SidebarContent: React.FC<TSidebarContentProps> = ({ className }) => {
+const SidebarContent: React.FC<TSidebarContentProps> = ({
+  className,
+  order,
+}) => {
   const classes = classNames(css.root, className);
 
   const [isOpenDetails, setIsOpenDetails] = useState<string | boolean>(false);
+  const updateOrderInProgress = useAppSelector(
+    (state) => state.Order.updateOrderInProgress,
+  );
+
+  const orderData = LISTING(order);
+  const {
+    deliveryAddress,
+    deliveryHour,
+    startDate,
+    endDate,
+    deadlineDate,
+    deadlineHour,
+    memberAmount,
+    nutritions,
+    selectedGroups,
+    packagePerMember,
+    vatAllow,
+  } = orderData.getMetadata();
+  const locationInitValues = {
+    deliveryAddress: getInitialLocationValues(deliveryAddress || {}),
+  };
+  const deliveryInitValues = {
+    startDate,
+    endDate,
+    deliveryHour,
+  };
+  const deadlineInitValues = {
+    deadlineDate,
+    deadlineHour,
+  };
+  const numberEmployeesInitValues = {
+    memberAmount,
+  };
+  const nutritionsInitValues = {
+    nutritions,
+  };
+  const selectedGroupsInitValues = {
+    selectedGroups,
+  };
+  const packagePerMemberInitValues = {
+    packagePerMember,
+    vatAllow,
+  };
+  const dispatch = useAppDispatch();
 
   const handleOpenDetails = (id: string | boolean) => {
     setIsOpenDetails(id);
@@ -51,22 +103,75 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({ className }) => {
     setIsOpenDetails(false);
   };
 
+  const handleSubmit = (values: any) => {
+    console.log(values);
+    dispatch(
+      OrderAsyncAction.updateOrder({
+        generalInfo: {
+          ...values,
+        },
+      }),
+    );
+  };
+
   const renderForm = () => {
     switch (isOpenDetails) {
       case 'location':
-        return <LocationForm onSubmit={() => null} />;
+        return (
+          <LocationForm
+            initialValues={locationInitValues}
+            onSubmit={handleSubmit}
+            loading={updateOrderInProgress}
+          />
+        );
       case 'deliveryTime':
-        return <DeliveryTimeForm onSubmit={() => null} />;
+        return (
+          <DeliveryTimeForm
+            initialValues={deliveryInitValues}
+            onSubmit={handleSubmit}
+            loading={updateOrderInProgress}
+          />
+        );
       case 'expiredTime':
-        return <ExpiredTimeForm onSubmit={() => null} />;
+        return (
+          <ExpiredTimeForm
+            initialValues={deadlineInitValues}
+            onSubmit={handleSubmit}
+            loading={updateOrderInProgress}
+          />
+        );
       case 'numberEmployees':
-        return <NumberEmployeesForm onSubmit={() => null} />;
+        return (
+          <NumberEmployeesForm
+            initialValues={numberEmployeesInitValues}
+            onSubmit={handleSubmit}
+            loading={updateOrderInProgress}
+          />
+        );
       case 'nutrition':
-        return <NutritionForm onSubmit={() => null} />;
+        return (
+          <NutritionForm
+            initialValues={nutritionsInitValues}
+            onSubmit={handleSubmit}
+            loading={updateOrderInProgress}
+          />
+        );
       case 'access':
-        return <AccessForm onSubmit={() => null} />;
+        return (
+          <AccessForm
+            initialValues={selectedGroupsInitValues}
+            onSubmit={handleSubmit}
+            loading={updateOrderInProgress}
+          />
+        );
       case 'unitBudget':
-        return <UnitBudgetForm onSubmit={() => null} />;
+        return (
+          <UnitBudgetForm
+            initialValues={packagePerMemberInitValues}
+            onSubmit={handleSubmit}
+            loading={updateOrderInProgress}
+          />
+        );
       default:
         return null;
     }
