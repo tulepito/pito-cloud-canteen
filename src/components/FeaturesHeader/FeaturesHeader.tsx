@@ -9,16 +9,21 @@ type FeaturesHeaderProps = {
   headerData: {
     key: string;
     icon: ReactNode;
-    title: string | ReactNode;
+    title: ReactNode;
     pathname: string;
   }[];
 };
+
 const FeaturesHeader: React.FC<FeaturesHeaderProps> = (props) => {
   const { headerData } = props;
-  const router = useRouter();
-  const activeKey = headerData.find(
-    (data) => data.pathname === router.pathname,
-  )?.key;
+  const { pathname: routerPathName } = useRouter();
+  const { key: activeKey } =
+    headerData.find(({ pathname }) =>
+      pathname === '/'
+        ? routerPathName === pathname
+        : routerPathName.includes(pathname),
+    ) || {};
+
   return (
     <nav className={css.container}>
       <ul className={css.navWrapper}>
@@ -26,6 +31,7 @@ const FeaturesHeader: React.FC<FeaturesHeaderProps> = (props) => {
           const activeHeaderItemClasses = classNames(css.headerItem, {
             [css.active]: key === activeKey,
           });
+
           return (
             <li key={key}>
               <Link className={activeHeaderItemClasses} href={pathname}>
