@@ -9,7 +9,11 @@ import type { TImageActionPayload } from '@redux/slices/uploadImage.slice';
 import { uploadImageThunks } from '@redux/slices/uploadImage.slice';
 import { isUploadImageOverLimitError } from '@utils/errors';
 import type { TCurrentUser, TUser } from '@utils/types';
-import { required } from '@utils/validators';
+import {
+  composeValidators,
+  phoneNumberFormatValid,
+  required,
+} from '@utils/validators';
 import { useRef } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Field, Form as FinalForm } from 'react-final-form';
@@ -105,7 +109,9 @@ const ContactPointProfileFormComponent: React.FC<
       </div>
     ) : (
       <div className={css.avatarPlaceholder}>
-        <div className={css.avatarPlaceholderTextMobile}>No image</div>
+        <div className={css.avatarPlaceholderTextMobile}>
+          {intl.formatMessage({ id: 'ContactPointProfileForm.photo.noImage' })}
+        </div>
       </div>
     );
   const onImageUpload = async ({ id, file }: TImageActionPayload) => {
@@ -221,10 +227,17 @@ const ContactPointProfileFormComponent: React.FC<
           placeholder={intl.formatMessage({
             id: 'ContactPointProfileForm.phoneNumber.placeholder',
           })}
-          validate={required(
-            intl.formatMessage({
-              id: 'ContactPointProfileForm.phoneNumber.required',
-            }),
+          validate={composeValidators(
+            phoneNumberFormatValid(
+              intl.formatMessage({
+                id: 'ContactPointProfileForm.phoneNumber.format',
+              }),
+            ),
+            required(
+              intl.formatMessage({
+                id: 'ContactPointProfileForm.phoneNumber.required',
+              }),
+            ),
           )}
         />
       </div>

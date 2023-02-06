@@ -1,6 +1,9 @@
+import type { UpdateCompanyApiBody } from '@apis/companyApi';
+import { updateCompany } from '@apis/companyApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
+import { EImageVariants } from '@utils/enums';
 import type { TObject, TUser } from '@utils/types';
 import axios from 'axios';
 
@@ -215,7 +218,7 @@ const updateBookerAccount = createAsyncThunk(
     };
 
     await sdk.currentUser.updateProfile(params, queryParams);
-    await dispatch(userThunks.fetchCurrentUser(undefined));
+    await dispatch(userThunks.fetchCurrentUser());
     return '';
   },
 );
@@ -226,10 +229,23 @@ const updateCompanyAccount = createAsyncThunk(
     const { workspaceCompanyId } = getState().company;
     const { image = {} } = getState().uploadImage;
     const { imageId, file } = image;
-    const { data: companyAccount } = await axios.put('/api/company', {
-      ...(imageId && file ? { companyImageId: imageId.uuid } : {}),
+    const apiBody: UpdateCompanyApiBody = {
       companyId: workspaceCompanyId,
-    });
+      dataParams: {
+        id: workspaceCompanyId,
+        ...(imageId && file ? { profileImageId: imageId.uuid } : {}),
+      },
+      queryParams: {
+        expand: true,
+        include: ['profileImage'],
+        'fields.image': [
+          EImageVariants.squareSmall,
+          EImageVariants.squareSmall2x,
+          EImageVariants.scaledLarge,
+        ],
+      },
+    };
+    const { data: companyAccount } = await updateCompany(apiBody);
     return {
       company: companyAccount,
     };
@@ -399,6 +415,27 @@ export const companySlice = createSlice({
           ...state,
           updateCompanyInProgress: false,
           updateCompanyError: error.message,
+        };
+      })
+
+      .addCase(updateBookerAccount.pending, (state) => {
+        return {
+          ...state,
+          updateBookerAccountInProgress: true,
+          updateBookerAccountError: null,
+        };
+      })
+      .addCase(updateBookerAccount.fulfilled, (state) => {
+        return {
+          ...state,
+          updateBookerAccountInProgress: false,
+        };
+      })
+      .addCase(updateBookerAccount.rejected, (state, { error }) => {
+        return {
+          ...state,
+          updateBookerAccountInProgress: false,
+          updateBookerAccountError: error.message,
         };
       });
   },
