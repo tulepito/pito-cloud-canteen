@@ -527,8 +527,8 @@ export const MEAL_PLANS_MOCKUP = [
       },
     },
     title: 'PT3040',
-    start: new Date(2023, 1, 2, 0, 0, 0),
-    end: new Date(2023, 1, 2, 23, 0, 0),
+    start: new Date(2023, 1, 6, 0, 0, 0),
+    end: new Date(2023, 1, 6, 23, 0, 0),
   },
   {
     resource: {
@@ -558,8 +558,8 @@ export const MEAL_PLANS_MOCKUP = [
       },
     },
     title: 'PT3040',
-    start: new Date(2023, 1, 3, 16, 0, 0),
-    end: new Date(2023, 1, 3, 20, 0, 0),
+    start: new Date(2023, 1, 8, 16, 0, 0),
+    end: new Date(2023, 1, 8, 20, 0, 0),
   },
   {
     resource: {
@@ -589,7 +589,7 @@ export const MEAL_PLANS_MOCKUP = [
       },
     },
     title: 'PT3040',
-    start: new Date(2023, 1, 4, 16, 0, 0),
-    end: new Date(2023, 1, 4, 20, 0, 0),
+    start: new Date(2023, 1, 7, 16, 0, 0),
+    end: new Date(2023, 1, 7, 20, 0, 0),
   },
 ];

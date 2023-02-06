@@ -1,5 +1,5 @@
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
-import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/AddMorePlan';
+import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/components/AddMorePlan';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
 import { MEAL_PLANS_MOCKUP } from '@components/CalendarDashboard/helpers/mockupData';
 import { DateTime } from 'luxon';

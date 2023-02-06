@@ -4,13 +4,13 @@ import classNames from 'classnames';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import AccessForm from '../../forms/AccessForm';
-import DeliveryTimeForm from '../../forms/DeliveryTimeForm';
-import ExpiredTimeForm from '../../forms/ExpiredTimeForm';
-import LocationForm from '../../forms/LocationForm';
-import NumberEmployeesForm from '../../forms/NumberEmployeesForm';
-import NutritionForm from '../../forms/NutritionForm';
-import UnitBudgetForm from '../../forms/UnitBudgetForm';
+import AccessForm from '../../forms/AccessForm/AccessForm';
+import DeliveryTimeForm from '../../forms/DeliveryTimeForm/DeliveryTimeForm';
+import ExpiredTimeForm from '../../forms/ExpiredTimeForm/ExpiredTimeForm';
+import LocationForm from '../../forms/LocationForm/LocationForm';
+import NumberEmployeesForm from '../../forms/NumberEmployeesForm/NumberEmployeesForm';
+import NutritionForm from '../../forms/NutritionForm/NutritionForm';
+import UnitBudgetForm from '../../forms/UnitBudgetForm/UnitBudgetForm';
 import css from './SidebarContent.module.scss';
 
 type TSidebarContentProps = {

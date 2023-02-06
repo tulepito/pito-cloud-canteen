@@ -676,5 +676,9 @@
   "Booker.CreateOrder.Form.field.price.minPrice": "Đơn giá tối thiểu: 40,000đ",
   "Booker.CreateOrder.Form.field.price.vat": "Bao gồm VAT",
   "Booker.CreateOrder.Toolbar.finish": "Hoàn tất",
-  "Booker.CreateOrder.Toolbar.suggestNewRestaurant": "Gợi ý nhà hàng mới"
+  "Booker.CreateOrder.Toolbar.suggestNewRestaurant": "Gợi ý nhà hàng mới",
+  "ApplyOtherDaysModal.title": "Áp dụng cho ngày khác",
+  "MealPlanCard.DeleteMealModal.title": "Xoá bữa ăn",
+  "MealPlanCard.DeleteMealModal.confirm": "Xoá bữa ăn",
+  "MealPlanCard.DeleteMealModal.cancel": "Huỷ"
 }
