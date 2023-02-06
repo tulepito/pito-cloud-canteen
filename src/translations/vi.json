@@ -266,7 +266,7 @@
   "EditPartnerFoodForm.maxMemberRequired": "Vui lòng nhập số người áp dụng tối đa",
   "EditPartnerFoodForm.menuLabel": "Chọn loại menu",
   "EditPartnerFoodForm.minOrderHourInAdvanceInvalid": "Số giờ đặt tối thiểu trước không hợp lệ",
-  "EditPartnerFoodForm.minOrderHourInAdvanceRequired": "Vui lòng nhập số giờ đặt tối thiểu trước",
+  "EditPartnerFoodForm.minOrderHourInAdvanceRequired": "Vui lòng nhập số giờ đặt trước tối thiểu",
   "EditPartnerFoodForm.minQuantityInvalid": "Số phần tối thiểu không hợp lệ",
   "EditPartnerFoodForm.minQuantityPerOrderLabel": "Đặt tối thiểu",
   "EditPartnerFoodForm.minQuantityPerOrderPlaceholder": "Nhập số phần",
