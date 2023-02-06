@@ -19,7 +19,6 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
-import { makeCsv } from '@utils/csv';
 import { parseTimestampToFormat } from '@utils/dates';
 import {
   CATEGORY_OPTIONS,
@@ -30,7 +29,8 @@ import {
 import type { TIntegrationListing } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { CSVLink } from 'react-csv';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -212,7 +212,7 @@ const ManagePartnerFoods = () => {
   const [idsToAction, setIdsToAction] = useState<string[]>([]);
   const [foodToRemove, setFoodToRemove] = useState<any>(null);
   const [file, setFile] = useState<File | null>();
-
+  const csvLinkRef = useRef<any>();
   const {
     value: isImportModalOpen,
     setTrue: openImportModal,
@@ -334,6 +334,10 @@ const ManagePartnerFoods = () => {
     }
   };
 
+  const makeCsv = () => {
+    csvLinkRef.current?.link?.click();
+  };
+
   return (
     <div className={css.root}>
       <h1 className={css.title}>
@@ -391,13 +395,17 @@ const ManagePartnerFoods = () => {
             <IconUploadFile className={css.buttonIcon} />
             Tải món
           </Button>
+          <CSVLink
+            data={parseEntitiesToExportCsv(foods, idsToAction)}
+            filename={`${parseTimestampToFormat(
+              new Date().getTime(),
+            )}_donhang.csv`}
+            className="hidden"
+            ref={csvLinkRef}
+            target="_blank"
+          />
           <Button
-            onClick={() =>
-              makeCsv(
-                parseEntitiesToExportCsv(foods, idsToAction),
-                `${parseTimestampToFormat(new Date().getTime())}_donhang.csv`,
-              )
-            }
+            onClick={makeCsv}
             disabled={idsToAction.length === 0}
             className={css.lightButton}>
             <IconPrint
