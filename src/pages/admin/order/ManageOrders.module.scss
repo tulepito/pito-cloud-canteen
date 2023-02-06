@@ -155,7 +155,7 @@
 
 .orderDetailTooltip {
   background-color: $neutralGray1;
-  .rc-tooltip {
+  &:global.rc-tooltip {
     opacity: 1 !important;
   }
 }
