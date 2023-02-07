@@ -17,7 +17,7 @@ import {
   shouldShowFeatureHeader,
   shouldShowSidebar,
 } from './companyLayout.helpers';
-import css from './companyLayout.module.scss';
+import css from './CompanyLayout.module.scss';
 import CompanySidebar from './CompanySidebar/CompanySidebar';
 // import { useState } from 'react';
 // import { shallowEqual } from 'react-redux';
