@@ -225,7 +225,7 @@ const updateBookerAccount = createAsyncThunk(
 
 const updateCompanyAccount = createAsyncThunk(
   UPDATE_COMPANY_ACCOUNT,
-  async (_, { getState }) => {
+  async (_, { getState, dispatch }) => {
     const { workspaceCompanyId } = getState().company;
     const { image = {} } = getState().uploadImage;
     const { imageId, file } = image;
@@ -246,6 +246,7 @@ const updateCompanyAccount = createAsyncThunk(
       },
     };
     const { data: companyAccount } = await updateCompany(apiBody);
+    dispatch(companyInfo());
     return {
       company: companyAccount,
     };

@@ -92,6 +92,7 @@ const uploadImageSlice = createSlice({
   },
 });
 
+export const { resetImage } = uploadImageSlice.actions;
 // ================ Actions ================ //
 export default uploadImageSlice.reducer;
 
