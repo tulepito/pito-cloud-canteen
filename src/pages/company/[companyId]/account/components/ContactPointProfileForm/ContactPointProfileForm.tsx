@@ -14,7 +14,7 @@ import {
   phoneNumberFormatValid,
   required,
 } from '@utils/validators';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Field, Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -32,7 +32,8 @@ export type TContactPointProfileFormValues = {
 
 type TExtraProps = {
   bookerAccount: TUser | TCurrentUser;
-  submitInputRef: any;
+  formRef: any;
+  setFormDisabled: (value: boolean) => void;
 };
 type TContactPointProfileFormComponentProps =
   FormRenderProps<TContactPointProfileFormValues> & Partial<TExtraProps>;
@@ -42,8 +43,16 @@ type TContactPointProfileFormProps = FormProps<TContactPointProfileFormValues> &
 const ContactPointProfileFormComponent: React.FC<
   TContactPointProfileFormComponentProps
 > = (props) => {
-  const { handleSubmit, bookerAccount, form, submitInputRef } = props;
-  submitInputRef.current = handleSubmit;
+  const {
+    handleSubmit,
+    bookerAccount,
+    form,
+    formRef,
+    pristine,
+    invalid,
+    setFormDisabled,
+  } = props;
+  formRef.current = handleSubmit;
   const intl = useIntl();
   const dispatch = useAppDispatch();
 
@@ -57,6 +66,11 @@ const ContactPointProfileFormComponent: React.FC<
   const fileUploadImageError = useAppSelector(
     (state) => state.uploadImage.uploadImageError,
   );
+
+  useEffect(() => {
+    const disabled = invalid || pristine;
+    setFormDisabled?.(disabled);
+  }, [pristine, invalid, setFormDisabled]);
 
   const imageLabelRef = useRef(null);
 

@@ -9,7 +9,7 @@ import { USER } from '@utils/data';
 import type { TCurrentUser, TUser } from '@utils/types';
 import take from 'lodash/take';
 import takeRight from 'lodash/takeRight';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -22,6 +22,7 @@ const AccountPage = () => {
   const intl = useIntl();
 
   const formSubmitInputRef = useRef<any>();
+  const [formDisabled, setFormDisabled] = useState<boolean>(true);
   const {
     value: isConfirmationModalOpen,
     setTrue: openConfirmationModal,
@@ -77,7 +78,7 @@ const AccountPage = () => {
 
   const onSubmit = async (values: TContactPointProfileFormValues) => {
     const { displayName, phoneNumber } = values;
-    const wordList = displayName.split(' ');
+    const wordList = displayName.trim().split(' ');
     const firstName = take(wordList, wordList.length - 1);
     const lastName = takeRight(wordList).join();
     const profile = {
@@ -114,8 +115,9 @@ const AccountPage = () => {
           <ContactPointProfileForm
             bookerAccount={currentUser as TCurrentUser}
             onSubmit={onSubmit}
-            submitInputRef={formSubmitInputRef}
+            formRef={formSubmitInputRef}
             initialValues={initialFormValues}
+            setFormDisabled={setFormDisabled}
           />
         </div>
       </div>
@@ -156,6 +158,7 @@ const AccountPage = () => {
         <Button
           className={css.btn}
           onClick={onSubmitButtonClick}
+          disabled={formDisabled}
           inProgress={updateBookerInProgress}>
           {intl.formatMessage({ id: 'AccountPage.submitBtn' })}
         </Button>
