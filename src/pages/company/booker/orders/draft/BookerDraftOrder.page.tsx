@@ -29,7 +29,7 @@ function BookerDraftOrderPage() {
 
   const startDate = DateTime.fromJSDate(new Date()).startOf('week').toJSDate();
   const endDate = DateTime.fromJSDate(new Date()).endOf('week').toJSDate();
-  console.log('order', order);
+
   return (
     <Layout className={css.root}>
       <LayoutSidebar
