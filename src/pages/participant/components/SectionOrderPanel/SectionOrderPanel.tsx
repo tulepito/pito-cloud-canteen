@@ -1,3 +1,4 @@
+import { isOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { shoppingCartThunks } from '@redux/slices/shopingCart.slice';
 import { useState } from 'react';
@@ -24,6 +25,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     const currUserId = currentUser?.id?.uuid;
     return state.shopingCart.orders?.[currUserId]?.[planId || 1];
   });
+  const order = useAppSelector((state) => state.ParticipantPlanPage.order);
   const plan = useAppSelector((state) => state.ParticipantPlanPage.plan);
   const loadDataInProgress = useAppSelector(
     (state) => state.ParticipantPlanPage.loadDataInProgress,
@@ -33,10 +35,11 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   );
 
   const orderDays = Object.keys(plan);
-
   const cartListKeys = Object.keys(cartList || []).filter(
     (cartKey) => !!cartList[cartKey],
   );
+
+  const isOrderDeadlineOver = isOverDeadline(order);
 
   // Local state
   const [isOpenConfirmDeleteAll, setIsOpenConfirmDeleteAll] = useState(false);
@@ -91,6 +94,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
       <OrderPanelFooter
         submitDataInprogress={submitDataInprogress}
         cartListKeys={cartListKeys}
+        isOrderDeadlineOver={isOrderDeadlineOver}
         handleSubmit={handleSubmit}
         handleRemoveAllItem={handleRemoveAllItem}
       />

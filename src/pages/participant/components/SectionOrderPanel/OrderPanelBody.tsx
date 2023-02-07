@@ -1,4 +1,4 @@
-import { InlineTextButton } from '@components/Button/Button';
+import Button from '@components/Button/Button';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import classNames from 'classnames';
 import { FormattedMessage } from 'react-intl';
@@ -30,10 +30,14 @@ const OrderPanelBody: React.FC<TOrderPanelBody> = ({
       className={classNames(css.sectionBody, {
         [css.sectionBodyEmpty]: cartListKeys.length === 0,
       })}>
-      <InlineTextButton onClick={onAutoSelect} className={css.autoSelect}>
+      <Button
+        variant="inline"
+        disabled
+        onClick={onAutoSelect}
+        className={css.autoSelect}>
         <IconRefreshing className={css.iconRefresh} />
         <FormattedMessage id="SectionOrderListing.selectForMeWholeWeekBtn" />
-      </InlineTextButton>
+      </Button>
       {loadDataInProgress ? (
         <Skeleton className={css.lineItemLoading} count={4} />
       ) : (

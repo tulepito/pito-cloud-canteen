@@ -1,3 +1,5 @@
+import { isOverDeadline } from '@helpers/orderHelper';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { LISTING } from '@utils/data';
 import { DateTime } from 'luxon';
 import React from 'react';
@@ -20,6 +22,9 @@ const CartItemList: React.FC<TCartItemList> = ({
   handleRemoveItem,
 }) => {
   const intl = useIntl();
+  const order = useAppSelector((state) => state.ParticipantPlanPage.order);
+
+  const isOrderDeadlineOver = isOverDeadline(order);
 
   const onRemoveItem = (dayId: string) => () => {
     handleRemoveItem(dayId);
@@ -50,6 +55,7 @@ const CartItemList: React.FC<TCartItemList> = ({
         key={key}
         label={itemLabel}
         value={dishTitle}
+        removeDisabled={isOrderDeadlineOver}
         onRemove={onRemoveItem(key)}
       />
     );
