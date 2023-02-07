@@ -2,15 +2,13 @@ import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import {
-  addWorkspaceCompanyId,
-  BookerManageCompany,
-} from '@redux/slices/company.slice';
+import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
+import { BookerManageCompany } from '@redux/slices/company.slice';
+import { resetImage } from '@redux/slices/uploadImage.slice';
 import { USER } from '@utils/data';
 import type { TCurrentUser, TUser } from '@utils/types';
 import take from 'lodash/take';
 import takeRight from 'lodash/takeRight';
-import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -22,14 +20,13 @@ import css from './ContactPoint.module.scss';
 const ContactPointPage = () => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
-  const router = useRouter();
+
   const formSubmitInputRef = useRef<any>();
   const {
     value: isConfirmationModalOpen,
     setTrue: openConfirmationModal,
     setFalse: closeConfirmationModal,
   } = useBoolean();
-  const { companyId = '' } = router.query;
   const currentUser = useAppSelector(
     (state) => state.user.currentUser,
     shallowEqual,
@@ -72,13 +69,12 @@ const ContactPointPage = () => {
     }),
     [bookerDisplayName, bookerEmail, bookerPhoneNumber],
   );
+
   useEffect(() => {
-    const fetchData = async () => {
-      dispatch(addWorkspaceCompanyId(companyId));
-      await dispatch(BookerManageCompany.companyInfo());
-    };
-    fetchData();
-  }, [companyId, dispatch]);
+    dispatch(resetImage());
+  }, [dispatch]);
+  useFetchCompanyInfo();
+
   const onSubmit = async (values: TContactPointProfileFormValues) => {
     const { displayName, phoneNumber } = values;
     const wordList = displayName.split(' ');
@@ -97,6 +93,7 @@ const ContactPointPage = () => {
         ? { ...profile, profileImageId: image.imageId }
         : profile;
     await dispatch(BookerManageCompany.updateBookerAccount(updatedValues));
+    dispatch(resetImage());
     openConfirmationModal();
   };
 
