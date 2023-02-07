@@ -39,6 +39,17 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   //   { value: '', label: 'Cá nhân' },
   //   ...assignedCompanies,
   // ];
+  // useEffect(() => {
+  //   if (companyId) {
+  //     const currentCompany = companyRefs.find(
+  //       (_company) => USER(_company).getId() === companyId,
+  //     );
+  //     setSelectedAccount({
+  //       value: USER(currentCompany).getId(),
+  //       label: USER(currentCompany).getPublicData()?.companyName,
+  //     });
+  //   }
+  // }, [companyId]);
   const featureHeaderData = [
     {
       key: 'cart',

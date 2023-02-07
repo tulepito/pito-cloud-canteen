@@ -53,6 +53,7 @@ type TTableProps = TDefaultProps & {
   exposeValues?: (e: any) => void;
   handleSort?: (columnName: string | number) => void;
   sortValue?: { columnName: string | number; type: 'asc' | 'desc' };
+  extraRows?: ReactNode;
 };
 
 const getUniqueString = (list: string[]) => {
@@ -82,6 +83,7 @@ const Table = (props: TTableProps) => {
     values,
     handleSort,
     sortValue,
+    extraRows,
   } = props;
 
   const tableClasses = classNames(css.table, tableClassName);
@@ -251,6 +253,7 @@ const Table = (props: TTableProps) => {
                 ))}
               </tr>
             ))}
+            {extraRows && <tr className={css.bodyRow}>{extraRows}</tr>}
           </tbody>
         )}
       </table>

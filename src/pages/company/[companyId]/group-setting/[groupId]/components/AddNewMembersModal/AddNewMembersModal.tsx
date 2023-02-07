@@ -39,6 +39,7 @@ const AddNewMembersModal: React.FC<AddNewMembersModalProps> = (props) => {
                 companyMembers={companyMembers}
                 groupMembers={groupMembers}
                 groupId={groupId}
+                onModalClose={onClose}
               />
             </div>
             <div className={css.modalFooter}>
