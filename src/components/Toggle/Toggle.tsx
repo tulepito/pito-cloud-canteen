@@ -1,6 +1,6 @@
 import useBoolean from '@hooks/useBoolean';
 import classNames from 'classnames';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import css from './Toggle.module.scss';
 
@@ -36,6 +36,14 @@ const Toggle: React.FC<TToggleProps> = (props) => {
     switchControl.toggle();
   };
 
+  useEffect(() => {
+    if (status === 'on') {
+      switchControl.setTrue();
+    } else if (status === 'off') {
+      switchControl.setFalse();
+    }
+  }, [status, switchControl]);
+
   const inputClasses = classNames(css.switchInput);
   const toggleClasses = classNames(css.switch, {
     [css.disabled]: disabled,
@@ -50,8 +58,10 @@ const Toggle: React.FC<TToggleProps> = (props) => {
           className={inputClasses}
           id={id || 'toggle'}
           name={name || 'toggle'}
+          checked={switchControl.value}
           disabled={disabled}
-          defaultChecked={switchControl.value}
+          onChange={() => null}
+          // defaultChecked={switchControl.value}
         />
         <label
           htmlFor={id || 'toggle'}

@@ -22,7 +22,6 @@ const ApplyOtherDaysModal: React.FC<TApplyOtherDaysModalProps> = ({
   };
 
   const handleSubmit = (values: any) => {
-    console.log('values', values);
     onSubmit(values);
   };
 

@@ -1,8 +1,6 @@
-import Button from '@components/Button/Button';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import Image from 'next/image';
 import type { Event } from 'react-big-calendar';
-import { FormattedMessage } from 'react-intl';
 
 import coverImg from '../../../../assets/mealPlanCover.png';
 import css from './MealPlanCard.module.scss';
@@ -14,7 +12,6 @@ type TMealPlanCardContentProps = {
 
 const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
   event,
-  onEditMeal,
 }) => {
   const restaurantName = event.resource?.restaurant?.name;
 
@@ -25,11 +22,6 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
         <span>{restaurantName}</span>
         <IconRefreshing className={css.recommendRestaurant} />
       </div>
-      <Button
-        className={css.editFood}
-        onClick={() => onEditMeal(event?.start!)}>
-        <FormattedMessage id="MealPlanCard.content.viewMenu" />
-      </Button>
     </div>
   );
 };

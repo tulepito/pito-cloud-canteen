@@ -8,7 +8,7 @@ import css from './AccessForm.module.scss';
 
 const GROUP_LIST = [
   {
-    value: 'allGroup',
+    value: 'allMembers',
     label: 'Tất cả nhóm',
   },
   {
@@ -24,6 +24,7 @@ const GROUP_LIST = [
 type TAccessFormProps = {
   onSubmit: (values: TAccessFormValues) => void;
   initialValues?: TAccessFormValues;
+  loading?: boolean;
 };
 
 export type TAccessFormValues = {
@@ -41,6 +42,7 @@ const validate = (values: TAccessFormValues) => {
 const AccessForm: React.FC<TAccessFormProps> = ({
   onSubmit,
   initialValues,
+  loading,
 }) => {
   const { form, handleSubmit, submitting, hasValidationErrors } =
     useForm<TAccessFormValues>({
@@ -52,6 +54,7 @@ const AccessForm: React.FC<TAccessFormProps> = ({
   const intl = useIntl();
 
   const selectedGroups = useField('selectedGroups', form);
+  const submitInprogress = loading || submitting;
   const disabledSubmit = submitting || hasValidationErrors;
 
   const handleChangeCheckboxGroup: (data: {
@@ -92,6 +95,7 @@ const AccessForm: React.FC<TAccessFormProps> = ({
               id={`selectedGroups-${data.value}`}
               {...selectedGroups.input}
               onChange={handleChangeCheckboxGroup(data)}
+              checked={(selectedGroups.input.value || []).includes(data.value)}
               type="checkbox"
               value={data.value}
             />
@@ -116,7 +120,10 @@ const AccessForm: React.FC<TAccessFormProps> = ({
         })}
       </div>
 
-      <Button className={css.submitBtn} disabled={disabledSubmit}>
+      <Button
+        className={css.submitBtn}
+        inProgress={submitInprogress}
+        disabled={disabledSubmit}>
         <FormattedMessage id="Booker.CreateOrder.Form.saveChange" />
       </Button>
     </form>

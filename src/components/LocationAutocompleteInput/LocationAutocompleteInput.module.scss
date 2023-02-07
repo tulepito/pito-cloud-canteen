@@ -85,6 +85,8 @@ bottom of the container.
 .predictions {
   margin: 0;
   padding: 14px 0;
+  max-height: 300px;
+  overflow-y: scroll;
 
   & li {
     color: $neutralGray6;

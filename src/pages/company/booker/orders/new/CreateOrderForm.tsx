@@ -19,6 +19,8 @@ type TCreateOrderFormProps = {
   onSubmit: (values: TCreateOrderFormValues, reject?: boolean) => void;
   onCancel: () => void;
   initialValues?: TCreateOrderFormValues;
+  submitInprogress?: boolean;
+  submitError?: any;
 };
 
 export type TCreateOrderFormValues = {
@@ -44,6 +46,7 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
   onSubmit,
   onCancel,
   initialValues,
+  submitInprogress,
 }) => {
   const intl = useIntl();
 
@@ -64,7 +67,7 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
   const previousOrder = useField('previousOrder', form);
   const disabledSubmit = submitting || hasValidationErrors;
 
-  const submitInprogress = submitting;
+  const isSubmitting = submitting || submitInprogress;
 
   const companyLabel = intl.formatMessage({
     id: 'CreateOrderForm.companyLabel',
@@ -133,7 +136,7 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
         className={css.submitBtn}
         type="submit"
         disabled={disabledSubmit}
-        inProgress={submitInprogress}
+        inProgress={isSubmitting}
         spinnerClassName={css.spinnerClassName}>
         <FormattedMessage id="CreateOrderForm.submit" />
       </Button>

@@ -23,10 +23,11 @@ const orderChecker =
               message: 'Missing required key',
             });
           }
-
           const userPermission = company[companyId]?.permission;
+
           if (
-            (userPermission && userPermission !== UserPermission.BOOKER) ||
+            userPermission &&
+            userPermission !== UserPermission.BOOKER &&
             !isAdmin
           ) {
             return res.status(403).json({
@@ -41,11 +42,13 @@ const orderChecker =
               message: 'Missing required key',
             });
           }
+
           const orderListing = await fetchListing(orderId);
           const { clientId } = LISTING(orderListing).getMetadata();
           const userPermission = company[clientId]?.permission;
           if (
-            (userPermission && userPermission !== UserPermission.BOOKER) ||
+            userPermission &&
+            userPermission !== UserPermission.BOOKER &&
             !isAdmin
           ) {
             return res.status(403).json({

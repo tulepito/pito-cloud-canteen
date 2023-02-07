@@ -149,4 +149,6 @@ export const companyPaths = {
   ContactPoint: '/company/[companyId]/contact-point',
   GroupSetting: '/company/[companyId]/group-setting',
   Logo: '/company/[companyId]/logo',
+  CreateNewOrder: '/company/booker/orders/new',
+  EditDraftOrder: '/company/booker/orders/draft/[orderId]',
 };
