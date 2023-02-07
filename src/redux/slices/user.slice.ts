@@ -36,7 +36,7 @@ const detectUserPermission = (currentUser: TCurrentUser) => {
   const { isCompany, isAdmin, company } = get(
     currentUser,
     'attributes.profile.metadata',
-  );
+  ) as TObject;
 
   let isBooker;
 
