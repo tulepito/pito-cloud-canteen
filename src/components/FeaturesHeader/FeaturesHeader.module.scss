@@ -2,8 +2,12 @@
 @use '/src/styles/mixins.scss' as *;
 
 .container {
-  padding-top: 72px;
   border-bottom: 1px solid $neutral4;
+  position: fixed;
+  top: 66px;
+  z-index: 2;
+  width: 100%;
+  background-color: $neutralGray1;
 }
 
 .navWrapper {

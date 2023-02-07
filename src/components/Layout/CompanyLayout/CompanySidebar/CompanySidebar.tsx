@@ -1,7 +1,6 @@
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
-import PitoLogo from '@components/PitoLogo/PitoLogo';
-import { companyPaths } from '@src/paths';
+import { companyPaths, personalPaths } from '@src/paths';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -14,7 +13,7 @@ const CompanySidebar = () => {
     {
       id: 'home',
       label: 'CompanySidebar.account',
-      nameLink: companyPaths.ContactPoint,
+      nameLink: companyId ? companyPaths.Account : personalPaths.Account,
     },
   ];
   if (companyId) {
@@ -27,7 +26,7 @@ const CompanySidebar = () => {
             {
               id: 'memberList',
               label: 'CompanySidebar.memberList',
-              nameLink: '/company/[companyId]/members',
+              nameLink: companyPaths.Members,
             },
             {
               id: 'groupList',
@@ -46,9 +45,6 @@ const CompanySidebar = () => {
   }
   return (
     <div className={css.root}>
-      <div className={css.logo}>
-        <PitoLogo />
-      </div>
       <MultiLevelSidebar menus={SIDEBAR_MENUS} />
     </div>
   );
