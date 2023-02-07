@@ -187,6 +187,7 @@ const Table = (props: TTableProps) => {
                 <FormattedMessage id="Table.noResults" />
               </td>
             </tr>
+            {extraRows && <tr className={css.bodyRow}>{extraRows}</tr>}
           </tbody>
         ) : (
           <tbody className={tableBodyClassName}>

@@ -39,3 +39,56 @@ export type UpdateCompanyApiBody = {
 };
 export const updateCompany = (body: UpdateCompanyApiBody) =>
   putApi(`/company`, body);
+
+export type GetGroupDetailApiParams = {
+  groupId: string;
+  page: number;
+  perPage: number;
+};
+export const getGroupDetailApi = ({
+  groupId,
+  page,
+  perPage,
+}: GetGroupDetailApiParams) =>
+  getApi(
+    `/company/group/all-member?groupId=${groupId}&perPage=${perPage}&page=${page}`,
+  );
+
+export type CreateGroupApiBody = {
+  companyId: string;
+  groupInfo: {
+    name: string;
+  };
+  groupMembers: {
+    id: string;
+    email: string;
+  }[];
+};
+export const createGroupApi = (body: CreateGroupApiBody) =>
+  postApi('/company/group', body);
+
+export type UpdateGroupApiBody = {
+  companyId: string;
+  groupId: string;
+  groupInfo?: {
+    name?: string;
+    description?: string;
+  };
+  addedMembers?: {
+    id: string;
+    email: string;
+  }[];
+  deletedMembers?: {
+    id: string;
+    email: string;
+  }[];
+};
+export const updateGroupApi = (body: UpdateGroupApiBody) =>
+  putApi('/company/group', body);
+
+export type DeleteGroupApiData = {
+  companyId: string;
+  groupId: string;
+};
+export const deleteGroupApi = (data: DeleteGroupApiData) =>
+  deleteApi('/company/group', data);
