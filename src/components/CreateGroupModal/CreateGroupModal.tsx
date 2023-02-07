@@ -37,6 +37,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = (props) => {
               <CreateGroupForm
                 companyMembers={companyMembers}
                 originCompanyMembers={originCompanyMembers}
+                onModalClose={onClose}
               />
             </div>
             <div className={css.modalFooter}>

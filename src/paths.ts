@@ -151,4 +151,6 @@ export const companyPaths = {
   Logo: '/company/[companyId]/logo',
   CreateNewOrder: '/company/booker/orders/new',
   EditDraftOrder: '/company/booker/orders/draft/[orderId]',
+  GroupMemberDetail:
+    '/company/[companyId]/group-setting/[groupId]/member/[memberId]',
 };
