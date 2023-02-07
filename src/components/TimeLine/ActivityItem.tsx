@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import { useIntl } from 'react-intl';
 
 import css from './ActivityItem.module.scss';
 import type { TTimeLineItemProps } from './types';
@@ -10,7 +11,11 @@ const ActivityItem: React.FC<TActivityItemProps> = ({
   rootClassName,
   className,
 }) => {
-  const { label = 'Activity name', description } = data;
+  const intl = useIntl();
+  const {
+    label = intl.formatMessage({ id: 'ActivityItem.defaultLabel' }),
+    description,
+  } = data;
 
   const rootClasses = classNames(rootClassName || css.root, className);
 

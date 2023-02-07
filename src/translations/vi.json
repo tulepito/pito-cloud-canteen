@@ -1,4 +1,5 @@
 {
+  "ActivityItem.defaultLabel": "Tên hoạt động",
   "AddCompanyMembersForm.addMembersSubmit": "Thêm thành viên",
   "AddCompanyMembersForm.emailInvalid": "Email không hợp lệ",
   "AddCompanyMembersForm.emailListPlaceholder": "Nhập email để thêm thành viên",

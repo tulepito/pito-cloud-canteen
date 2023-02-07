@@ -6,8 +6,10 @@ import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { getCompanyIdFromBookerUser } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { createDeepEqualSelector } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
+import type { RootState } from '@redux/store';
 import { companyPaths } from '@src/paths';
 import { EOrderStates } from '@utils/enums';
 import type { TObject } from '@utils/types';
@@ -15,7 +17,6 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import { parseEntitiesToTableData } from '../helpers/parseEntitiesToTableData';
 import { ManageCompanyOrdersPageTabIds } from '../utils/constant';
@@ -34,14 +35,31 @@ const tabLabelMap = {
   all: 'ManageCompanyOrdersPage.tabSection.allLabel',
 };
 
-const prepareTabItems = ({ intl, currentTab, tableData }: any) => {
-  const {
+const statesSelector = createDeepEqualSelector(
+  (state: RootState) => state.Order,
+  ({
     queryOrderError,
     queryOrderInProgress,
     orders = [],
     manageOrdersPagination,
     totalItemMap = {},
-  } = useAppSelector((state) => state.Order, shallowEqual);
+  }) => ({
+    queryOrderError,
+    queryOrderInProgress,
+    orders,
+    manageOrdersPagination,
+    totalItemMap,
+  }),
+);
+
+const prepareTabItems = ({ intl, currentTab, tableData }: any) => {
+  const {
+    queryOrderError,
+    queryOrderInProgress,
+    orders,
+    manageOrdersPagination,
+    totalItemMap,
+  } = useAppSelector(statesSelector);
 
   return Object.entries(tabLabelMap).map(([key, id]) => {
     const isTabActive = currentTab === key;
@@ -98,7 +116,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   );
   const { query, isReady, replace } = useRouter();
   const dispatch = useAppDispatch();
-  const { orders = [] } = useAppSelector((state) => state.Order, shallowEqual);
+  const orders = useAppSelector((state) => state.Order.orders) || [];
   const currentUser = useAppSelector(currentUserSelector);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   let currDebounceRef = debounceRef.current;
