@@ -13,11 +13,11 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
+import css from './Account.module.scss';
 import type { TContactPointProfileFormValues } from './components/ContactPointProfileForm/ContactPointProfileForm';
 import ContactPointProfileForm from './components/ContactPointProfileForm/ContactPointProfileForm';
-import css from './ContactPoint.module.scss';
 
-const ContactPointPage = () => {
+const AccountPage = () => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
 
@@ -104,11 +104,11 @@ const ContactPointPage = () => {
   return (
     <div className={css.container}>
       <div className={css.header}>
-        {intl.formatMessage({ id: 'ContactPointPage.account' })}
+        {intl.formatMessage({ id: 'AccountPage.account' })}
       </div>
       <div className={css.contactPointSection}>
         <div className={css.sectionTitle}>
-          {intl.formatMessage({ id: 'ContactPointPage.contactPoint' })}
+          {intl.formatMessage({ id: 'AccountPage.contactPoint' })}
         </div>
         <div className={css.formWrapper}>
           <ContactPointProfileForm
@@ -121,18 +121,18 @@ const ContactPointPage = () => {
       </div>
       <div className={css.companyInfoSection}>
         <div className={css.sectionTitle}>
-          {intl.formatMessage({ id: 'ContactPointPage.companyInfo' })}
+          {intl.formatMessage({ id: 'AccountPage.companyInfo' })}
         </div>
         <div className={css.row}>
           <div className={css.info}>
             <div className={css.title}>
-              {intl.formatMessage({ id: 'ContactPointPage.companyName' })}
+              {intl.formatMessage({ id: 'AccountPage.companyName' })}
             </div>
             <div className={css.content}>{companyName}</div>
           </div>
           <div className={css.info}>
             <div className={css.title}>
-              {intl.formatMessage({ id: 'ContactPointPage.address' })}
+              {intl.formatMessage({ id: 'AccountPage.address' })}
             </div>
             <div className={css.content}>{address}</div>
           </div>
@@ -140,13 +140,13 @@ const ContactPointPage = () => {
         <div className={css.row}>
           <div className={css.info}>
             <div className={css.title}>
-              {intl.formatMessage({ id: 'ContactPointPage.taxCode' })}
+              {intl.formatMessage({ id: 'AccountPage.taxCode' })}
             </div>
             <div className={css.content}></div>
           </div>
           <div className={css.info}>
             <div className={css.title}>
-              {intl.formatMessage({ id: 'ContactPointPage.email' })}
+              {intl.formatMessage({ id: 'AccountPage.email' })}
             </div>
             <div className={css.content}>{email}</div>
           </div>
@@ -157,7 +157,7 @@ const ContactPointPage = () => {
           className={css.btn}
           onClick={onSubmitButtonClick}
           inProgress={updateBookerInProgress}>
-          {intl.formatMessage({ id: 'ContactPointPage.submitBtn' })}
+          {intl.formatMessage({ id: 'AccountPage.submitBtn' })}
         </Button>
       </div>
       <ConfirmationModal
@@ -165,15 +165,15 @@ const ContactPointPage = () => {
         isOpen={isConfirmationModalOpen}
         onClose={closeConfirmationModal}
         title={intl.formatMessage({
-          id: 'ContactPointPage.confirmationModal.title',
+          id: 'AccountPage.confirmationModal.title',
         })}
         description={
           updateBookerError
             ? intl.formatMessage({
-                id: 'ContactPointPage.confirmationModal.error',
+                id: 'AccountPage.confirmationModal.error',
               })
             : intl.formatMessage({
-                id: 'ContactPointPage.confirmationModal.success',
+                id: 'AccountPage.confirmationModal.success',
               })
         }
       />
@@ -181,4 +181,4 @@ const ContactPointPage = () => {
   );
 };
 
-export default ContactPointPage;
+export default AccountPage;
