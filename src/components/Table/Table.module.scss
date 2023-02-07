@@ -1,6 +1,7 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/defaults.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .root {
   .table {
@@ -101,6 +102,7 @@
           font-size: 14px;
 
           span {
+            @include lineClamp(3);
             word-break: break-all;
           }
           &:before {
