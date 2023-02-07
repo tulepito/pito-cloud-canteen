@@ -8,6 +8,7 @@ type TCartItemProps = {
   className?: string;
   label: string;
   value: string;
+  removeDisabled?: boolean;
   onRemove: () => void;
 };
 
@@ -15,6 +16,7 @@ const CartItem: React.FC<TCartItemProps> = ({
   className,
   label,
   value,
+  removeDisabled = false,
   onRemove,
 }) => {
   return (
@@ -25,7 +27,9 @@ const CartItem: React.FC<TCartItemProps> = ({
       </div>
       <div className={css.value}>
         <span>{value}</span>
-        <IconClose onClick={onRemove} className={css.iconClose} />
+        {!removeDisabled && (
+          <IconClose onClick={onRemove} className={css.iconClose} />
+        )}
       </div>
     </div>
   );
