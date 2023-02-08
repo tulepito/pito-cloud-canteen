@@ -11,10 +11,12 @@ import {
 import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
 import React, { useCallback, useEffect } from 'react';
+import { useIntl } from 'react-intl';
 
 type TAuthGuardProps = PropsWithChildren<{}>;
 
 const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
+  const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isAuthenticated, authInfoLoaded } = useAppSelector(
@@ -77,7 +79,11 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
       (!isNonRequireAuthenticationRoute && !isAuthenticated);
 
     if (loadingCondition) {
-      return <LoadingContainer />;
+      return (
+        <LoadingContainer
+          loadingText={intl.formatMessage({ id: 'AuthGuard.loadingText' })}
+        />
+      );
     }
 
     return children;
