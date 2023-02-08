@@ -23,6 +23,7 @@ type MealPlanDateFieldProps = {
   columnLayout?: boolean;
   title?: string;
 };
+
 const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
   const { values, columnLayout = false, form, title } = props;
   const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
@@ -71,6 +72,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
     css.customInput,
     !endDate && css.placeholder,
   );
+
   return (
     <div className={css.container}>
       {title && <div className={css.fieldTitle}>{title}</div>}
@@ -81,7 +83,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           name="startDate"
           selected={startDate}
           onChange={(date: Date) => setStartDate(date)}
-          minDate={addDays(today, 2)}
+          minDate={addDays(today, 3)}
           autoComplete="off"
           label={intl.formatMessage({
             id: 'MealPlanDateField.startDateLabel',
