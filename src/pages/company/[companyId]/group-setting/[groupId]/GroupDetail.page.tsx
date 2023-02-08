@@ -62,7 +62,7 @@ const GroupDetailPage = () => {
     (state) => state.company.groupMembers,
     shallowEqual,
   );
-  console.log('groupMembers: ', groupMembers);
+
   const companyMembers = useAppSelector(
     (state) => state.company.companyMembers,
     shallowEqual,
