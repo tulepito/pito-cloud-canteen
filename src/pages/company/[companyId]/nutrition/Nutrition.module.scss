@@ -6,3 +6,8 @@
   border-bottom: 1px solid $neutral4;
   @include textTemplate(24px, $fontWeightBold, 32px);
 }
+
+.loading {
+  @include flexAlign(center, center);
+  margin-top: 40px;
+}

@@ -19,6 +19,7 @@ const enGeneralPaths = {
 
 export const personalPaths = {
   Account: '/company/personal/account',
+  Nutrition: '/company/personal/nutrition',
 };
 
 export const NonRequireAuthenticationRoutes = [

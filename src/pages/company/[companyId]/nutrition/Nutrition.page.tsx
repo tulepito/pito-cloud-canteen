@@ -1,8 +1,9 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { BookerManageCompany } from '@redux/slices/company.slice';
-import { LISTING, USER } from '@utils/data';
+import { CURRENT_USER, LISTING, USER } from '@utils/data';
 import type { TUser } from '@utils/types';
+import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -14,7 +15,10 @@ import css from './Nutrition.module.scss';
 const NutritionPage = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { companyId } = router.query;
   useFetchCompanyInfo();
+
   const company = useAppSelector(
     (state) => state.company.company,
     shallowEqual,
@@ -28,16 +32,54 @@ const NutritionPage = () => {
     (state) => state.company.favoriteFood,
     shallowEqual,
   );
+  const currentUser = useAppSelector(
+    (state) => state.user.currentUser,
+    shallowEqual,
+  );
+  const personalFavoriteRestaurants = useAppSelector(
+    (state) => state.user.favoriteRestaurants,
+    shallowEqual,
+  );
+  const personalFavoriteFood = useAppSelector(
+    (state) => state.user.favoriteFood,
+    shallowEqual,
+  );
+  const fetchCompanyInfoInProgress = useAppSelector(
+    (state) => state.company.fetchCompanyInfoInProgress,
+  );
+  const { nutritions: personalNutritions = [] } = CURRENT_USER(
+    currentUser!,
+  ).getPublicData();
+  const isPersonal = companyId === 'personal';
 
   const initialValues = useMemo(
-    () => ({
+    () =>
+      isPersonal
+        ? {
+            nutritions: personalNutritions,
+            favoriteRestaurantList: personalFavoriteRestaurants.map(
+              (restaurant) => LISTING(restaurant).getId(),
+            ),
+            favoriteFoodList: personalFavoriteFood.map((food) =>
+              LISTING(food).getId(),
+            ),
+          }
+        : {
+            nutritions,
+            favoriteRestaurantList: favoriteRestaurants.map((restaurant) =>
+              LISTING(restaurant).getId(),
+            ),
+            favoriteFoodList: favoriteFood.map((food) => LISTING(food).getId()),
+          },
+    [
+      favoriteFood,
+      favoriteRestaurants,
+      isPersonal,
       nutritions,
-      favoriteRestaurantList: favoriteRestaurants.map((restaurant) =>
-        LISTING(restaurant).getId(),
-      ),
-      favoriteFoodList: favoriteFood.map((food) => LISTING(food).getId()),
-    }),
-    [favoriteFood, favoriteRestaurants, nutritions],
+      personalFavoriteFood,
+      personalFavoriteRestaurants,
+      personalNutritions,
+    ],
   );
 
   const onSubmit = (values: TNutritionFormValues) => {
@@ -59,9 +101,19 @@ const NutritionPage = () => {
       <div className={css.header}>
         {intl.formatMessage({ id: 'NutritionPage.nutrition' })}
       </div>
-      <div className={css.uploadImageFormWrapper}>
-        <NutritionForm initialValues={initialValues} onSubmit={onSubmit} />
-      </div>
+      {fetchCompanyInfoInProgress ? (
+        <div className={css.loading}>
+          {intl.formatMessage({ id: 'NutritionPage.loadingText' })}
+        </div>
+      ) : (
+        <div>
+          <NutritionForm
+            initialValues={initialValues}
+            onSubmit={onSubmit}
+            isPersonal={isPersonal}
+          />
+        </div>
+      )}
     </div>
   );
 };

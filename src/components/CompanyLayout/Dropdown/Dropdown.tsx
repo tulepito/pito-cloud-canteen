@@ -31,16 +31,22 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
     shallowEqual,
   );
   useEffect(() => {
-    if (companyId) {
-      const currentCompany = companyRefs.find(
-        (_company) => USER(_company).getId() === companyId,
-      );
-      setSelectedValue({
-        value: USER(currentCompany).getId(),
-        label: USER(currentCompany).getPublicData()?.companyName,
-      });
-      titleRef.current = USER(currentCompany).getPublicData()?.companyName;
-    }
+    const findCompanyFn = (_company: any) =>
+      USER(_company).getId() === companyId;
+    const initialSelectedValue =
+      companyId && companyId !== 'personal'
+        ? {
+            value: USER(companyRefs.find(findCompanyFn)).getId(),
+            label: USER(companyRefs.find(findCompanyFn)).getPublicData()
+              ?.companyName,
+          }
+        : {
+            value: '',
+            label: 'Cá nhân',
+          };
+
+    setSelectedValue(initialSelectedValue);
+    titleRef.current = initialSelectedValue.label;
   }, [companyId, companyRefs, setSelectedValue]);
 
   return (

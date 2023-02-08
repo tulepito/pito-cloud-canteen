@@ -3,6 +3,7 @@ import Form from '@components/Form/Form';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
+import { customPristine } from '@helpers/form';
 import { useAppSelector } from '@hooks/reduxHooks';
 import NutritionField from '@pages/admin/order/create/components/NutritionField/NutritionField';
 import { LISTING } from '@utils/data';
@@ -20,7 +21,7 @@ export type TNutritionFormValues = {
   nutritions: string[];
 };
 
-type TExtraProps = {};
+type TExtraProps = { isPersonal: boolean };
 type TNutritionFormComponentProps = FormRenderProps<TNutritionFormValues> &
   Partial<TExtraProps>;
 type TNutritionFormProps = FormProps<TNutritionFormValues> & TExtraProps;
@@ -35,7 +36,7 @@ const setRestaurantCategoryNames = (intl: any, categories: string[] = []) => {
 const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, form, values } = props;
+  const { handleSubmit, form, values, isPersonal, initialValues } = props;
   const intl = useIntl();
   const [removedFavoriteRestaurantIds, setRemovedFavoriteRestaurantIds] =
     useState<string[]>([]);
@@ -52,51 +53,74 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
     (state) => state.company.favoriteFood,
     shallowEqual,
   );
+  const personalFavoriteRestaurants = useAppSelector(
+    (state) => state.user.favoriteRestaurants,
+    shallowEqual,
+  );
+  const personalFavoriteFood = useAppSelector(
+    (state) => state.user.favoriteFood,
+    shallowEqual,
+  );
+
   const updateCompanyAccountInProgress = useAppSelector(
     (state) => state.company.updateCompanyInProgress,
   );
   const favoriteRestaurantTableData = useMemo<TRowData[]>(
     () =>
-      favoriteRestaurants.reduce((result, restaurant) => {
-        return removedFavoriteRestaurantIds.includes(
-          LISTING(restaurant).getId(),
-        )
-          ? result
-          : [
-              ...result,
-              {
-                key: LISTING(restaurant).getId(),
-                data: {
-                  id: LISTING(restaurant).getId(),
-                  title: LISTING(restaurant).getAttributes()?.title,
-                  category: setRestaurantCategoryNames(
-                    intl,
-                    LISTING(restaurant).getPublicData()?.categories,
-                  ),
+      (isPersonal ? personalFavoriteRestaurants : favoriteRestaurants).reduce(
+        (result, restaurant) => {
+          return removedFavoriteRestaurantIds.includes(
+            LISTING(restaurant).getId(),
+          )
+            ? result
+            : [
+                ...result,
+                {
+                  key: LISTING(restaurant).getId(),
+                  data: {
+                    id: LISTING(restaurant).getId(),
+                    title: LISTING(restaurant).getAttributes()?.title,
+                    category: setRestaurantCategoryNames(
+                      intl,
+                      LISTING(restaurant).getPublicData()?.categories,
+                    ),
+                  },
                 },
-              },
-            ];
-      }, []),
-    [favoriteRestaurants, intl, removedFavoriteRestaurantIds],
+              ];
+        },
+        [],
+      ),
+    [
+      favoriteRestaurants,
+      intl,
+      isPersonal,
+      personalFavoriteRestaurants,
+      removedFavoriteRestaurantIds,
+    ],
   );
   const favoriteFoodTableData = useMemo<TRowData[]>(
     () =>
-      favoriteFood.reduce((result, food) => {
-        return removedFavoriteFoodIds.includes(LISTING(food).getId())
-          ? result
-          : [
-              ...result,
-              {
-                key: LISTING(food).getId(),
-                data: {
-                  id: LISTING(food).getId(),
-                  title: LISTING(food).getAttributes()?.title,
+      (isPersonal ? personalFavoriteFood : favoriteFood).reduce(
+        (result, food) => {
+          return removedFavoriteFoodIds.includes(LISTING(food).getId())
+            ? result
+            : [
+                ...result,
+                {
+                  key: LISTING(food).getId(),
+                  data: {
+                    id: LISTING(food).getId(),
+                    title: LISTING(food).getAttributes()?.title,
+                  },
                 },
-              },
-            ];
-      }, []),
-    [favoriteFood, removedFavoriteFoodIds],
+              ];
+        },
+        [],
+      ),
+    [favoriteFood, isPersonal, personalFavoriteFood, removedFavoriteFoodIds],
   );
+  const formPristine = customPristine(initialValues, values);
+  const submitDisabled = formPristine || updateCompanyAccountInProgress;
 
   const handleRemoveRestaurant = (restaurantId: string) => () => {
     const { favoriteRestaurantList: oldFavoriteRestaurantList = [] } = values;
@@ -214,7 +238,10 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
         />
       </div>
       <div className={css.submitChangeBtn}>
-        <Button type="submit" inProgress={updateCompanyAccountInProgress}>
+        <Button
+          type="submit"
+          disabled={submitDisabled}
+          inProgress={updateCompanyAccountInProgress}>
           {intl.formatMessage({ id: 'NutritionForm.submit' })}
         </Button>
       </div>
