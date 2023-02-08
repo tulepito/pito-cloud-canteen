@@ -1,5 +1,6 @@
 import cookies from '@services/cookie';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { denormalisedResponseEntities } from '@utils/data';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -10,12 +11,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     page,
     perPage,
   });
-  const { status, statusText, data } = allMembersResponse;
-  res.status(status).setHeader('Content-Type', 'application/json').json({
-    status,
-    statusText,
-    data,
-  });
+  const {
+    data: { meta },
+  } = allMembersResponse;
+  const allMembers = denormalisedResponseEntities(allMembersResponse);
+  res.json({ allMembers, meta });
 }
 
 export default cookies(handler);

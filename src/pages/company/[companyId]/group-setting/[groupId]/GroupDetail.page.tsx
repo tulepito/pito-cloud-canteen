@@ -7,11 +7,9 @@ import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { companyPaths } from '@src/paths';
-import {
-  addWorkspaceCompanyId,
-  BookerManageCompany,
-} from '@src/redux/slices/company.slice';
+import { BookerManageCompany } from '@src/redux/slices/company.slice';
 import type { TObject } from '@utils/types';
 import filter from 'lodash/filter';
 import isEmpty from 'lodash/isEmpty';
@@ -64,6 +62,7 @@ const GroupDetailPage = () => {
     (state) => state.company.groupMembers,
     shallowEqual,
   );
+
   const companyMembers = useAppSelector(
     (state) => state.company.companyMembers,
     shallowEqual,
@@ -176,11 +175,8 @@ const GroupDetailPage = () => {
     },
   ];
 
+  useFetchCompanyInfo();
   useEffect(() => {
-    dispatch(addWorkspaceCompanyId(companyId));
-  }, [companyId, dispatch]);
-  useEffect(() => {
-    dispatch(BookerManageCompany.companyInfo());
     dispatch(BookerManageCompany.groupInfo());
     dispatch(
       BookerManageCompany.groupDetailInfo({
@@ -273,11 +269,9 @@ const GroupDetailPage = () => {
           tableBodyRowClassName={css.tableBodyRow}
           tableBodyCellClassName={css.tableBodyCell}
           extraRows={
-            <Button
-              className={css.addMemberBtn}
-              onClick={openAddNewMembersModal}>
+            <td className={css.addMemberBtn} onClick={openAddNewMembersModal}>
               {intl.formatMessage({ id: 'GroupDetail.addGroupMember' })}
-            </Button>
+            </td>
           }
         />
       </div>

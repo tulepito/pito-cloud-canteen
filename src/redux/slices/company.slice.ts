@@ -1,5 +1,17 @@
-import type { UpdateCompanyApiBody } from '@apis/companyApi';
-import { updateCompany } from '@apis/companyApi';
+import type {
+  CreateGroupApiBody,
+  DeleteGroupApiData,
+  GetGroupDetailApiParams,
+  UpdateCompanyApiBody,
+  UpdateGroupApiBody,
+} from '@apis/companyApi';
+import {
+  createGroupApi,
+  deleteGroupApi,
+  getGroupDetailApi,
+  updateCompany,
+  updateGroupApi,
+} from '@apis/companyApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
@@ -146,9 +158,13 @@ const groupDetailInfo = createAsyncThunk(
     const { id, name, description } = groups.find(
       (_group: any) => _group.id === groupId,
     );
-    const { data: allMembersData } = await axios.get(
-      `/company/group/all-member?groupId=${groupId}&perPage=${MEMBER_PER_PAGE}&page=${page}`,
-    );
+    const apiParams: GetGroupDetailApiParams = {
+      groupId,
+      page,
+      perPage: MEMBER_PER_PAGE,
+    };
+    const { data: allMembersData } = await getGroupDetailApi(apiParams);
+    const { allMembers, meta } = allMembersData;
     const groupInfoState: TGroupInfo = {
       id,
       name,
@@ -156,8 +172,8 @@ const groupDetailInfo = createAsyncThunk(
     };
     return {
       groupInfo: groupInfoState,
-      groupMembers: [...allMembersData.data.data],
-      groupMembersPagination: allMembersData.data.meta,
+      groupMembers: allMembers,
+      groupMembersPagination: meta,
     };
   },
 );
@@ -166,10 +182,13 @@ const createGroup = createAsyncThunk(
   CREATE_GROUP,
   async (params: TObject, { getState }) => {
     const { workspaceCompanyId } = getState().company;
-    const { data: newCompanyAccount } = await axios.post('/company/group', {
-      ...params,
+    const { groupInfo: groupInforParam, groupMembers } = params;
+    const apiBody: CreateGroupApiBody = {
       companyId: workspaceCompanyId,
-    });
+      groupInfo: groupInforParam,
+      groupMembers,
+    };
+    const { data: newCompanyAccount } = await createGroupApi(apiBody);
     const { groups } = newCompanyAccount.attributes.profile.metadata;
     return groups;
   },
@@ -182,13 +201,14 @@ const updateGroup = createAsyncThunk(
     { getState, dispatch },
   ) => {
     const { workspaceCompanyId } = getState().company;
-    await axios.put('/company/group', {
+    const apiBody: UpdateGroupApiBody = {
       addedMembers,
       deletedMembers,
       groupId,
       groupInfo: groupInfoParams,
       companyId: workspaceCompanyId,
-    });
+    };
+    await updateGroupApi(apiBody);
     return [dispatch(groupDetailInfo({ groupId })), dispatch(groupInfo())];
   },
 );
@@ -197,12 +217,11 @@ const deleteGroup = createAsyncThunk(
   DELETE_GROUP,
   async (groupId: string, { getState }) => {
     const { workspaceCompanyId } = getState().company;
-    const { data: newCompanyAccount } = await axios.delete('/company/group', {
-      data: {
-        groupId,
-        companyId: workspaceCompanyId,
-      },
-    });
+    const apiData: DeleteGroupApiData = {
+      groupId,
+      companyId: workspaceCompanyId,
+    };
+    const { data: newCompanyAccount } = await deleteGroupApi(apiData);
     const { groups } = newCompanyAccount.attributes.profile.metadata;
     return groups;
   },

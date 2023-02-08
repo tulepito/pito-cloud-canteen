@@ -1,8 +1,10 @@
+import { HTTP_METHODS } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
+import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import companyChecker from '@services/permissionChecker/company';
-import { getSdk, handleError } from '@services/sdk';
-import { denormalisedResponseEntities } from '@utils/data';
+import { handleError } from '@services/sdk';
+import { denormalisedResponseEntities, USER } from '@utils/data';
 import { randomUUID } from 'crypto';
 import difference from 'lodash/difference';
 import differenceBy from 'lodash/differenceBy';
@@ -17,21 +19,14 @@ type TMemberApi = {
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const { companyId, groupId, groupInfo, groupMembers } = req.body;
-  const sdk = getSdk(req, res);
   const integrationSdk = getIntegrationSdk();
-  const companyAccountResponse = await sdk.users.show({
-    id: companyId,
-  });
-  const [companyAccount] = denormalisedResponseEntities(companyAccountResponse);
-
+  const companyAccount = await fetchUser(companyId);
   const apiMethod = req.method;
   switch (apiMethod) {
-    case 'GET':
-      break;
-    case 'POST':
+    case HTTP_METHODS.POST:
       try {
         const { groups = [], members = {} } =
-          companyAccount.attributes.profile.metadata;
+          USER(companyAccount).getMetadata();
         const newGroupId = randomUUID();
         const newGroup = {
           id: newGroupId,
@@ -45,7 +40,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             groups: members[email].groups.concat(newGroupId),
           };
         });
-        console.log('=== UPDATE COMPANY ACCOUNT STEP ===');
+
         const updatedCompanyAccountResponse =
           await integrationSdk.users.updateProfile(
             {
@@ -62,7 +57,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           updatedCompanyAccountResponse,
         );
 
-        console.log('=== UPDATE MEMBER ACCOUNTS STEP ===');
         await Promise.all(
           groupMembers.map(async ({ id }: TMemberApi) => {
             const memberResponse = await integrationSdk.users.show({
@@ -84,11 +78,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         handleError(res, error);
       }
       break;
-    case 'PUT':
+    case HTTP_METHODS.PUT:
       {
         const { addedMembers = [], deletedMembers = [] } = req.body;
         const { groups = [], members = {} } =
-          companyAccount.attributes.profile.metadata;
+          USER(companyAccount).getMetadata();
 
         const currentGroupIndex = groups.findIndex(
           (_group: any) => _group.id === groupId,
@@ -120,7 +114,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           });
         }
 
-        console.log('=== UPDATE COMPANY ACCOUNT STEP ===');
         const updatedCompanyAccountResponse =
           await integrationSdk.users.updateProfile(
             {
@@ -135,7 +128,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const [updatedCompanyAccount] = denormalisedResponseEntities(
           updatedCompanyAccountResponse,
         );
-        console.log('=== UPDATE ADD MEMBER ACCOUNTS STEP ===');
+
         await Promise.all(
           addedMembers.map(async ({ id }: TMemberApi) => {
             const memberResponse = await integrationSdk.users.show({
@@ -152,7 +145,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             });
           }),
         );
-        console.log('=== UPDATE DELETE MEMBER ACCOUNTS STEP ===');
+
         await Promise.all(
           deletedMembers.map(async ({ id }: TMemberApi) => {
             const memberResponse = await integrationSdk.users.show({
@@ -173,10 +166,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         res.status(200).json(updatedCompanyAccount);
       }
       break;
-    case 'DELETE':
+    case HTTP_METHODS.DELETE:
       try {
         const { groups = [], members = {} } =
-          companyAccount.attributes.profile.metadata;
+          USER(companyAccount).getMetadata();
 
         const onDeletingGroup = groups.find(
           (_group: any) => _group.id === groupId,
@@ -194,7 +187,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const updatedGroups = groups.filter(
           (_group: any) => _group.id !== groupId,
         );
-        console.log('=== UPDATE COMPANY ACCOUNT STEP ===');
+
         const updatedCompanyAccountResponse =
           await integrationSdk.users.updateProfile(
             {
@@ -209,7 +202,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const [updatedCompanyAccount] = denormalisedResponseEntities(
           updatedCompanyAccountResponse,
         );
-        console.log('=== UPDATE MEMBER ACCOUNTS STEP ===');
+
         await Promise.all(
           onDeletingGroup.members.map(async ({ id }: TMemberApi) => {
             const memberResponse = await integrationSdk.users.show({

@@ -17,7 +17,8 @@
   display: inline-flex;
   cursor: pointer;
   padding-top: 24px;
-  padding-left: 24px;
+  margin-left: 24px;
+  font-weight: $fontWeightBold;
   &:hover {
     border-bottom: 1px solid $neutralGray5;
   }
@@ -38,7 +39,11 @@
 .addMemberBtn {
   @include flexAlign(center);
   @include buttonColorInline;
-  font-size: 16px;
+  min-height: 64px;
+  border-radius: 8px;
+  padding-left: 12px;
+  cursor: pointer;
+  @include textTemplate(16px, $fontWeightBold, 24px);
 }
 
 .deleteBtn {

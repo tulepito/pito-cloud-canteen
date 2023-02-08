@@ -2,14 +2,14 @@
 @use '/src/styles/mixins.scss' as *;
 
 .container {
-  padding-top: 24px;
-  padding-left: 24px;
+  padding: 24px 24px 0;
 }
 
 .backBtn {
   @include flexAlign(center);
   display: inline-flex;
   cursor: pointer;
+  font-weight: $fontWeightBold;
   &:hover {
     border-bottom: 1px solid $neutralGray5;
   }
