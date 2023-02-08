@@ -21,6 +21,7 @@ import { LISTING } from '@utils/data';
 import { getDaySessionFromDeliveryTime, renderDateRange } from '@utils/dates';
 import type { TListing, TObject } from '@utils/types';
 import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 import { useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -82,11 +83,17 @@ const findSuitableStartDate = ({
 
   const dateRange = renderDateRange(startDate, endDate);
   const setUpDates = Object.keys(orderDetail);
+
+  if (isEmpty(setUpDates)) {
+    return startDate;
+  }
+
   const suitableDateList = dateRange.filter(
     (date) => !setUpDates.includes(date.toString()),
   );
-  const suitableStartDate =
-    suitableDateList?.length > 0 ? suitableDateList[0] : endDate;
+  const suitableStartDate = !isEmpty(suitableDateList)
+    ? suitableDateList[0]
+    : endDate;
 
   return suitableStartDate;
 };
@@ -100,6 +107,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   goBack,
   nextTab,
 }) => {
+  const dispatch = useAppDispatch();
+  const intl = useIntl();
+  const {
+    value: isOrderSettingModalOpen,
+    setFalse: onOrderSettingModalClose,
+    setTrue: onOrderSettingModalOpen,
+  } = useBoolean();
+
   const updateOrderInProgress = useAppSelector(
     (state) => state.Order.updateOrderInProgress,
   );
@@ -128,21 +143,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const selectedDate = useAppSelector(
     (state) => state.Order.selectedCalendarDate,
   );
-
   const isSelectingRestaurant = useAppSelector(
     (state) => state.Order.isSelectingRestaurant,
   );
 
-  const dispatch = useAppDispatch();
-  const intl = useIntl();
-  const {
-    value: isOrderSettingModalOpen,
-    setFalse: onOrderSettingModalClose,
-    setTrue: onOrderSettingModalOpen,
-  } = useBoolean();
-  useEffect(() => {
-    dispatch(OrderAsyncAction.fetchOrderDetail());
-  }, []);
   const suitableStartDate = useMemo(() => {
     const temp = findSuitableStartDate({
       selectedDate,
@@ -151,11 +155,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       orderDetail,
     });
 
-    if (temp instanceof Date) {
-      return temp;
-    }
-
-    return new Date(temp);
+    return temp instanceof Date ? temp : new Date(temp);
   }, [selectedDate, startDate, endDate, orderDetail]);
 
   const { address } = deliveryAddress || {};
@@ -247,6 +247,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       })
       .catch(() => {});
   };
+
+  useEffect(() => {
+    dispatch(OrderAsyncAction.fetchOrderDetail());
+  }, []);
 
   return (
     <>

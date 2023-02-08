@@ -1,6 +1,7 @@
 import Button from '@components/Button/Button';
 import { FieldDatePickerComponent } from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
+import { findMinStartDate } from '@helpers/orderHelper';
 import { DateTime } from 'luxon';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -60,12 +61,10 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
   const submitInprogress = loading || submitting;
   const disabledSubmit = submitInprogress || hasValidationErrors;
 
+  const minStartDate = findMinStartDate();
   const selectedStartDate = startDate.input.value
     ? new Date(Number(startDate.input.value))
-    : DateTime.fromMillis(Number(Date.now())).plus({ days: 2 }).toJSDate();
-  const minStartDate = DateTime.fromJSDate(new Date())
-    .plus({ days: 2 })
-    .toJSDate();
+    : minStartDate;
 
   const selectedEndDate = DateTime.fromJSDate(selectedStartDate)
     .plus({ days: 1 })
