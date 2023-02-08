@@ -31,14 +31,14 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
     (state) => state.company.createGroupInProgress,
   );
   const onSubmit = (values: TObject) => {
-    const { groupName, members } = values;
+    const { groupName, members = [] } = values;
     const groupMembers = companyMembers.reduce((result, member) => {
       const id = member.id.uuid;
       const newItem = {
         id,
         email: member.attributes.email,
       };
-      return members.includes(id) ? result : result.concat([newItem]);
+      return !members.includes(id) ? result : result.concat([newItem]);
     }, []);
     dispatch(
       BookerManageCompany.createGroup({
