@@ -13,18 +13,20 @@ import { currentUserSelector, userActions } from '@redux/slices/user.slice';
 import { useRouter } from 'next/router';
 import React from 'react';
 
-import css from './GeneralHeader.module.scss';
+import css from './CompanyHeader.module.scss';
 
-const GeneralHeader = () => {
+const CompanyHeader = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector(currentUserSelector);
+
   const onLogout = async () => {
     await dispatch(authThunks.logout());
     await dispatch(userActions.clearCurrentUser());
 
     router.push('/');
   };
+
   return (
     <div className={css.root}>
       <div className={css.headerLeft}>
@@ -55,4 +57,4 @@ const GeneralHeader = () => {
   );
 };
 
-export default GeneralHeader;
+export default CompanyHeader;
