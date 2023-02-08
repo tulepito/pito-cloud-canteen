@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FieldMultipleSelect from '@components/FieldMutipleSelect/FieldMultipleSelect';
+import FieldMultipleSelect from '@components/FormFields/FieldMultipleSelect/FieldMultipleSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconDuplicate from '@components/Icons/IconDuplicate/IconDuplicate';
@@ -19,18 +19,18 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
-import { makeCsv } from '@utils/csv';
-import { parseTimestaimpToFormat } from '@utils/dates';
+import { parseTimestampToFormat } from '@utils/dates';
 import {
   CATEGORY_OPTIONS,
   FOOD_TYPE_OPTIONS,
   getLabelByKey,
   MENU_OPTIONS,
 } from '@utils/enums';
-import type { TIntergrationFoodListing } from '@utils/types';
+import type { TIntegrationListing } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { CSVLink } from 'react-csv';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -82,7 +82,7 @@ const TABLE_COLUMN: TColumn[] = [
   },
   {
     key: 'foodType',
-    label: 'Loại món',
+    label: 'Loại thức ăn',
     render: (data: any) => {
       if (data.isDeleted) {
         return <div></div>;
@@ -132,7 +132,7 @@ const TABLE_COLUMN: TColumn[] = [
 ];
 
 const parseEntitiesToTableData = (
-  foods: TIntergrationFoodListing[],
+  foods: TIntegrationListing[],
   extraData: any,
 ) => {
   return foods.map((food) => {
@@ -162,22 +162,42 @@ const parseEntitiesToTableData = (
 };
 
 const parseEntitiesToExportCsv = (
-  foods: TIntergrationFoodListing[],
+  foods: TIntegrationListing[],
   ids: string[],
 ) => {
   const foodsToExport = foods
     .filter((food) => ids.includes(food.id.uuid))
     .map((food) => {
       const { publicData = {}, description, title } = food.attributes || {};
-      const { sideDishes = [], specialDiets = [], ...rest } = publicData;
+      const {
+        sideDishes = [],
+        specialDiets = [],
+        category,
+        foodType,
+        menuType,
+        ingredients,
+        maxMember,
+        minOrderHourInAdvance,
+        minQuantity,
+        notes,
+        unit,
+      } = publicData;
       return {
-        title,
-        description,
-        id: food.id.uuid,
-        ...rest,
-        sideDishes: sideDishes.join(','),
-        specialDiets: specialDiets.join(','),
-        images: food.images?.map(
+        'Mã món': food.id.uuid,
+        'Tên món ăn': title,
+        'Mô tả': description,
+        'Thành phần chính': ingredients,
+        'Phong cách ẩm thực': getLabelByKey(CATEGORY_OPTIONS, category),
+        'Loại món ăn': getLabelByKey(FOOD_TYPE_OPTIONS, foodType),
+        'Loại menu': getLabelByKey(MENU_OPTIONS, menuType),
+        'Món ăn kèm': sideDishes.join(','),
+        'Chế độ dinh dưỡng đặc biệt': specialDiets.join(','),
+        'Số nguời tối đa': maxMember,
+        'Giờ đặt trước tối thiểu': minOrderHourInAdvance,
+        'Số lượng tối thiểu': minQuantity,
+        'Ghi chú': notes,
+        'Đơn vị tính': unit,
+        'Hình ảnh': food.images?.map(
           (image) => image.attributes.variants['square-small2x'].url,
         ),
       };
@@ -192,7 +212,7 @@ const ManagePartnerFoods = () => {
   const [idsToAction, setIdsToAction] = useState<string[]>([]);
   const [foodToRemove, setFoodToRemove] = useState<any>(null);
   const [file, setFile] = useState<File | null>();
-
+  const csvLinkRef = useRef<any>();
   const {
     value: isImportModalOpen,
     setTrue: openImportModal,
@@ -205,13 +225,7 @@ const ManagePartnerFoods = () => {
     setFalse: closeRemoveCheckedModal,
   } = useBoolean(false);
 
-  const {
-    restaurantId,
-    page = 1,
-    keywords,
-    pub_category = '',
-    pub_menuType = '',
-  } = router.query;
+  const { restaurantId, page = 1, keywords, pub_category = '' } = router.query;
 
   const {
     foods,
@@ -224,13 +238,8 @@ const ManagePartnerFoods = () => {
   } = useAppSelector((state) => state.foods, shallowEqual);
 
   const categoryString = pub_category as string;
-  const menuTypeString = pub_menuType as string;
 
   const groupPubCategory = categoryString
-    ?.split(',')
-    .filter((item: string) => !!item);
-
-  const groupMenuTypeString = menuTypeString
     ?.split(',')
     .filter((item: string) => !!item);
 
@@ -239,17 +248,12 @@ const ManagePartnerFoods = () => {
     setIdsToAction(rowCheckbox);
   };
 
-  const handleSubmitFilter = ({
-    pub_category = [],
-    keywords,
-    pub_menuType = [],
-  }: any) => {
+  const handleSubmitFilter = ({ pub_category = [], keywords }: any) => {
     router.push({
       pathname: adminRoutes.ManagePartnerFoods.path,
       query: {
         keywords,
         pub_category: pub_category?.join(','),
-        pub_menuType: pub_menuType?.join(','),
         restaurantId,
       },
     });
@@ -274,6 +278,7 @@ const ManagePartnerFoods = () => {
       foodSliceThunks.removePartnerFood({ id }),
     )) as any;
     if (!error) {
+      onClearFoodToRemove();
       return onQueryPartnerFood({ page: 1, restaurantId });
     }
   };
@@ -283,6 +288,8 @@ const ManagePartnerFoods = () => {
       foodSliceThunks.removePartnerFood({ ids: idsToAction }),
     )) as any;
     if (!error) {
+      setIdsToAction([]);
+      closeRemoveCheckedModal();
       return onQueryPartnerFood({ page: 1, restaurantId });
     }
   };
@@ -306,9 +313,7 @@ const ManagePartnerFoods = () => {
       ...(groupPubCategory.length > 0
         ? { pub_category: groupPubCategory }
         : {}),
-      ...(groupMenuTypeString.length > 0
-        ? { pub_menuType: groupMenuTypeString }
-        : {}),
+
       ...(keywords ? { keywords } : {}),
     });
   }, [page, restaurantId, keywords, categoryString]);
@@ -329,6 +334,10 @@ const ManagePartnerFoods = () => {
     }
   };
 
+  const makeCsv = () => {
+    csvLinkRef.current?.link?.click();
+  };
+
   return (
     <div className={css.root}>
       <h1 className={css.title}>
@@ -341,7 +350,6 @@ const ManagePartnerFoods = () => {
           initialValues={{
             keywords,
             pub_category: groupPubCategory,
-            pub_menuType: groupMenuTypeString,
           }}>
           {() => (
             <>
@@ -359,14 +367,6 @@ const ManagePartnerFoods = () => {
                 label="Phong cách ẩm thực"
                 placeholder="Phong cách ẩm thực"
                 options={CATEGORY_OPTIONS}
-              />
-              <FieldMultipleSelect
-                className={css.input}
-                name="pub_menuType"
-                id="pub_menuType"
-                label="Loại menu"
-                placeholder="Chọn loại menu"
-                options={MENU_OPTIONS}
               />
             </>
           )}
@@ -395,13 +395,17 @@ const ManagePartnerFoods = () => {
             <IconUploadFile className={css.buttonIcon} />
             Tải món
           </Button>
+          <CSVLink
+            data={parseEntitiesToExportCsv(foods, idsToAction)}
+            filename={`${parseTimestampToFormat(
+              new Date().getTime(),
+            )}_donhang.csv`}
+            className="hidden"
+            ref={csvLinkRef}
+            target="_blank"
+          />
           <Button
-            onClick={() =>
-              makeCsv(
-                parseEntitiesToExportCsv(foods, idsToAction),
-                `${parseTimestaimpToFormat(new Date().getTime())}_donhang.csv`,
-              )
-            }
+            onClick={makeCsv}
             disabled={idsToAction.length === 0}
             className={css.lightButton}>
             <IconPrint
@@ -449,7 +453,7 @@ const ManagePartnerFoods = () => {
         <h2 className={css.importTitle}>
           <FormattedMessage id="ManagePartnerFoods.importTitle" />
         </h2>
-        <p>
+        <p className={css.downloadFileHere}>
           <FormattedMessage
             id="ManagePartnerFoods.downloadFileHere"
             values={{

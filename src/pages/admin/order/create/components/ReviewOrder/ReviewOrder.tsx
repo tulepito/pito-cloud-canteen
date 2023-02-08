@@ -1,21 +1,25 @@
 import Collapsible from '@components/Collapsible/Collapsible';
+import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
+import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { OrderAsyncAction, removeDraftOrder } from '@redux/slices/Order.slice';
-import { parseTimestaimpToFormat } from '@utils/dates';
+import useBoolean from '@hooks/useBoolean';
+import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { LISTING } from '@utils/data';
+import { parseTimestampToFormat } from '@utils/dates';
+import type { TListing } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-intl/src/utils';
 
-// eslint-disable-next-line import/no-cycle
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../NavigateButtons/NavigateButtons';
 import css from './ReviewOrder.module.scss';
@@ -60,7 +64,7 @@ const MENU_TABLE_COLUMN: TColumn[] = [
     render: (data: any) => {
       return (
         <span title={data.id} className={classNames(css.rowText, css.rowId)}>
-          {data.foodPrice}đ
+          {addCommas(data.foodPrice.amount)}đ
         </span>
       );
     },
@@ -139,7 +143,7 @@ const generateOrderDetails = (orders: any[]) => {
           key: key + memberIndex + date,
           data: {
             label: foodList[memberOrders[key].foodId]?.foodName || 'Com ga',
-            price: foodList[memberOrders[key].foodId]?.foodPrice || 0,
+            price: foodList[memberOrders[key].foodId]?.foodPrice.amount || 0,
             quantity: 1,
           },
         };
@@ -155,7 +159,7 @@ const generateOrderDetails = (orders: any[]) => {
       data: {
         isParent: true,
         index: index + 1,
-        label: parseTimestaimpToFormat(Number(date)),
+        label: parseTimestampToFormat(Number(date)),
         quantity: memeberDetails.length,
         price: totalDatePricing,
       },
@@ -234,6 +238,22 @@ const ReviewContent: React.FC<any> = (props) => {
               )}
             />
           </div>
+          <div className={css.flexChild}>
+            <span className={css.boxTitle}>
+              {intl.formatMessage({ id: 'ReviewOrder.shipperName.label' })}
+            </span>
+            <FieldTextInput
+              className={css.staffInput}
+              name="shipperName"
+              id="shipperName"
+              placeholder={intl.formatMessage({
+                id: 'ReviewOrder.shipperName.placeholder',
+              })}
+              validate={required(
+                intl.formatMessage({ id: 'ReviewOrder.shipperName.required' }),
+              )}
+            />
+          </div>
         </div>
       </Collapsible>
       <Collapsible
@@ -302,7 +322,7 @@ const parseDataToReviewTab = (values: any) => {
   const items = Object.keys(orderDetail).map((key: any) => {
     return {
       key,
-      label: parseTimestaimpToFormat(Number(key)),
+      label: parseTimestampToFormat(Number(key)),
       childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
       childrenProps: { ...orderDetail[key], ...rest, order: values },
     };
@@ -311,38 +331,62 @@ const parseDataToReviewTab = (values: any) => {
 };
 
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
-  const { draftOrder, createOrderInProcess } = useAppSelector(
+  const dispatch = useAppDispatch();
+  const intl = useIntl();
+  const { orderDetail, order } = useAppSelector(
     (state) => state.Order,
     shallowEqual,
   );
   const createOrderError = useAppSelector(
     (state) => state.Order.createOrderError,
   );
+  const updateOrderInProgress = useAppSelector(
+    (state) => state.Order.updateOrderInProgress,
+  );
 
-  const { orderDetail } =
+  const {
+    value: isSuccessModalOpen,
+    setTrue: openSuccessModal,
+    setFalse: closeSuccessModal,
+  } = useBoolean();
+  useEffect(() => {
+    dispatch(OrderAsyncAction.fetchOrderDetail());
+  }, []);
+  const { staffName, deliveryHour, deliveryAddress, shipperName } = LISTING(
+    order as TListing,
+  ).getMetadata();
+  const { renderedOrderDetail } =
     useMemo(() => {
       return {
-        orderDetail: parseDataToReviewTab(draftOrder),
+        renderedOrderDetail: parseDataToReviewTab({
+          orderDetail,
+          deliveryHour,
+          deliveryAddress,
+        }),
       };
-    }, [draftOrder]) || {};
-
-  const dispatch = useAppDispatch();
+    }, [deliveryAddress, deliveryHour, orderDetail]) || {};
 
   const onSubmit = async (values: any) => {
-    const { staffName } = values;
+    const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
     const { error } = (await dispatch(
-      OrderAsyncAction.createOrder(staffName),
+      OrderAsyncAction.updateOrder({
+        generalInfo: {
+          staffName: staffNameValue,
+          shipperName: shipperNameValue,
+        },
+      }),
     )) as any;
     if (!error) {
-      dispatch(removeDraftOrder());
+      openSuccessModal();
     }
   };
 
   const initialValues = useMemo(() => {
     return {
-      staffName: draftOrder?.staffName,
+      staffName,
+      shipperName,
     };
-  }, [draftOrder]);
+  }, [staffName, shipperName]);
 
   return (
     <div className={css.root}>
@@ -358,10 +402,10 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
           const { handleSubmit, goBack } = fieldRenderProps;
           return (
             <Form onSubmit={handleSubmit}>
-              <Tabs items={orderDetail as any} showNavigation />
+              <Tabs items={renderedOrderDetail as any} showNavigation />
               <NavigateButtons
                 goBack={goBack}
-                inProgress={createOrderInProcess}
+                inProgress={updateOrderInProgress}
               />
               {createOrderError && (
                 <div className={css.error}>{createOrderError}</div>
@@ -369,6 +413,19 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
             </Form>
           );
         }}
+      />
+      <ConfirmationModal
+        id="SuccessOrderModal"
+        isOpen={isSuccessModalOpen}
+        onClose={closeSuccessModal}
+        confirmText={intl.formatMessage({
+          id: 'ReviewOrder.successModal.confirmText',
+        })}
+        title={intl.formatMessage({ id: 'ReviewOrder.successModal.title' })}
+        description={intl.formatMessage({
+          id: 'ReviewOrder.successModal.description',
+        })}
+        onConfirm={closeSuccessModal}
       />
     </div>
   );

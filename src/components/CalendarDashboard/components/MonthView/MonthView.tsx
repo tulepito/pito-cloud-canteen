@@ -13,8 +13,6 @@ import MDayItem from '../DayItem/MDayItem';
 import IconCalendarToolbar from '../Icons/IconCalendar';
 import css from './MonthView.module.scss';
 
-const MONTH_DAY_NUMBER = 31;
-
 type TMonthViewProps = {
   date: Date;
   localizer: any;
@@ -90,12 +88,19 @@ MonthView.navigate = (
   action: NavigateAction,
   { localizer }: { localizer: any },
 ) => {
+  const currentDate = DateTime.fromJSDate(date);
   switch (action) {
-    case Navigate.PREVIOUS:
-      return localizer.add(date, -MONTH_DAY_NUMBER, 'day');
+    case Navigate.PREVIOUS: {
+      return localizer.add(date, -currentDate.day, 'day');
+    }
 
-    case Navigate.NEXT:
-      return localizer.add(date, MONTH_DAY_NUMBER, 'day');
+    case Navigate.NEXT: {
+      return localizer.add(
+        date,
+        currentDate.daysInMonth + 1 - currentDate.day,
+        'day',
+      );
+    }
 
     default:
       return date;

@@ -19,16 +19,17 @@ import type {
 
 const { UUID, LatLng, Money } = sdkLoader;
 
-export type TObject<T = any> = Record<string, T>;
-export type ReverseMap<T> = T[keyof T];
-export type TReverseMapFromEnum<T> = T[keyof T];
+export type TObject<
+  K extends string | number | symbol = string,
+  V = any,
+> = Record<K, V>;
 export type NextApplicationPage<P = any, IP = P> = NextPage<P, IP> & {
   requireAuth?: boolean;
 };
 
 // API error
 // TODO this is likely to change soonish
-export type TErrorCode = TReverseMapFromEnum<typeof EErrorCode>;
+export type TErrorCode = EErrorCode;
 export type TSharetribeFlexSdkApiError = {
   id: typeof UUID;
   status: number;
@@ -44,10 +45,11 @@ export type TError = {
   statusText: string;
   apiErrors: TSharetribeFlexSdkApiError[];
 };
+/* =============== Props =============== */
 
-export type TIconProps = {
-  className?: string;
-  rootClassName?: string;
+export type TDefaultProps = { className?: string; rootClassName?: string };
+
+export type TIconProps = TDefaultProps & {
   width?: number;
   height?: number;
   onClick?: () => void;
@@ -61,7 +63,7 @@ export type TImageVariantAttributes = {
   url: string;
 };
 
-export type TImageVariant = TReverseMapFromEnum<typeof EImageVariants>;
+export type TImageVariant = EImageVariants;
 
 export type TImageAttributes = {
   variants: Record<EImageVariants, TImageVariantAttributes>;
@@ -73,6 +75,7 @@ export type TImage = {
   attributes: TImageAttributes;
 };
 
+/* =============== Profile type =============== */
 export type TProfile = {
   firstName: string;
   lastName: string;
@@ -182,7 +185,7 @@ export type TCompany = {
   profileImage: TImage;
 };
 
-export type TListingState = TReverseMapFromEnum<typeof EListingStates>;
+export type TListingState = EListingStates;
 
 export type TListingAttributes = {
   title: string;
@@ -192,9 +195,10 @@ export type TListingAttributes = {
   state?: TListingState;
   price?: typeof Money;
   publicData: TObject;
+  metadata: TObject;
 };
 
-export type TDayOfWeek = TReverseMapFromEnum<typeof EDayOfWeek>;
+export type TDayOfWeek = EDayOfWeek;
 
 export type TAvailabilityPlanEntries = {
   dayOfWeek: TDayOfWeek;
@@ -203,9 +207,7 @@ export type TAvailabilityPlanEntries = {
   end?: string;
 };
 
-export type TAvailabilityPlanType = TReverseMapFromEnum<
-  typeof EAvailabilityPlans
->;
+export type TAvailabilityPlanType = EAvailabilityPlans;
 
 export type TAvailabilityPlan = {
   type: TAvailabilityPlanType;
@@ -246,7 +248,7 @@ export type TOwnListing = {
   images?: TImage[];
 };
 
-export type TBookingState = TReverseMapFromEnum<typeof EBookingStates>;
+export type TBookingState = EBookingStates;
 
 export type TBookingAttributes = {
   end: Date;
@@ -262,7 +264,7 @@ export type TBooking = {
   attributes: TBookingAttributes;
 };
 
-export type TTimeSlotType = TReverseMapFromEnum<typeof ETimeSlots>;
+export type TTimeSlotType = ETimeSlots;
 
 export type TTimeSlotAttributes = {
   type: TTimeSlotType;
@@ -288,9 +290,7 @@ export type TAvailabilityException = {
   attributes: TAvailabilityExceptionAttributes;
 };
 
-export type TTxTransitionActors = TReverseMapFromEnum<
-  typeof ETxTransitionActors
->;
+export type TTxTransitionActors = ETxTransitionActors;
 
 export type TTransition = {
   createdAt: Date;
@@ -299,8 +299,8 @@ export type TTransition = {
   transition: string[];
 };
 
-export type TReviewRating = TReverseMapFromEnum<typeof EReviewRatings>;
-export type TReviewType = TReverseMapFromEnum<typeof EReviewTypes>;
+export type TReviewRating = EReviewRatings;
+export type TReviewType = EReviewTypes;
 
 export type TReviewAttributes = {
   createdAt: Date;
@@ -319,7 +319,7 @@ export type TReview = {
 
 export type TLineItemCode = `line-item/${string}`;
 
-export type TTransactionRole = TReverseMapFromEnum<typeof ETransactionRoles>;
+export type TTransactionRole = ETransactionRoles;
 
 export type TLineItem = {
   code: TLineItemCode;
@@ -382,7 +382,7 @@ export type TFormLabel =
   | React.ReactElement<React.ComponentProps<'label'>>
   | string;
 
-export type RouteKey = keyof typeof adminRoutes;
+export type AdminRouteKey = keyof typeof adminRoutes;
 
 export type TAddress = {
   predictions: any[];
@@ -406,7 +406,7 @@ export type TAddress = {
   };
 };
 
-export type TAdminOrderListingAttributes = {
+export type TAdminListingAttributes = {
   title: string;
   description?: string;
   geolocation?: any;
@@ -421,26 +421,27 @@ export type TAdminOrderListingAttributes = {
 export type TOrderListing = {
   id: any;
   type: 'listing';
-  attributes: TAdminOrderListingAttributes & TDeletedListingAttributes;
+  attributes: TListingAttributes & TDeletedListingAttributes;
   author?: TUser;
   images?: TImage[];
 };
 
 // Denormalised integration order listing object
-export type TIntergrationOrderListing = {
+
+export type TIntegrationListing = {
   id: any;
   type: 'listing';
-  attributes: TAdminOrderListingAttributes & TDeletedListingAttributes;
+  attributes: TAdminListingAttributes & TDeletedListingAttributes;
+  author?: TUser;
+  images?: TImage[];
+};
+
+export type TIntegrationOrderListing = {
+  id: any;
+  type: 'listing';
+  attributes: TAdminListingAttributes & TDeletedListingAttributes;
   author?: TUser;
   images?: TImage[];
   company?: TCompany;
-  order?: TOrderListing;
-};
-
-export type TIntergrationFoodListing = {
-  id: any;
-  type: 'listing';
-  attributes: TAdminOrderListingAttributes & TDeletedListingAttributes;
-  author?: TUser;
-  images?: TImage[];
+  subOrders?: TIntegrationListing[];
 };

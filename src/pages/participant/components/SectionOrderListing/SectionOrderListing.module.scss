@@ -89,6 +89,18 @@
   border: 1px solid $neutralGray5;
   color: $neutralGray6;
   margin-right: 22px;
+
+  &:hover .iconRefresh path {
+    fill: $neutralGray1;
+  }
+
+  .iconRefresh {
+    margin-right: 8px;
+
+    & path {
+      fill: $neutralGray6;
+    }
+  }
 }
 
 .iconNotJoined {
@@ -96,13 +108,5 @@
 
   & > path {
     fill: $neutralGray5;
-  }
-}
-
-.iconRefresh {
-  margin-right: 8px;
-
-  & > path {
-    fill: $neutralGray6;
   }
 }

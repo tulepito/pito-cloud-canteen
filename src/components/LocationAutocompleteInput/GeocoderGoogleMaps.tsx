@@ -5,6 +5,7 @@ import {
   locationBounds,
 } from '@utils/googleMaps';
 import { userLocation } from '@utils/maps';
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 
@@ -16,11 +17,9 @@ export const CURRENT_LOCATION_ID = 'current-location';
 // When displaying data from the Google Maps Places API, and
 // attribution is required next to the results.
 // See: https://developers.google.com/places/web-service/policies#powered
-type TGeocoderAttribution = {
-  rootClassName?: string;
-  className?: string;
-};
-export const GeocoderAttribution = (props: TGeocoderAttribution) => {
+type TGeocoderAttributionProps = TDefaultProps & {};
+
+export const GeocoderAttribution = (props: TGeocoderAttributionProps) => {
   const { rootClassName, className } = props;
   const classes = classNames(rootClassName || css.poweredByGoogle, className);
   return <div className={classes} />;

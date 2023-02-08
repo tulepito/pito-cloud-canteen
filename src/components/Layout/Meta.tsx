@@ -9,6 +9,7 @@ type TMetaProps = {
   canonical?: string;
   imageUrl?: string;
 };
+
 const Meta: React.FC<TMetaProps> = (props) => {
   const intl = useIntl();
   const {

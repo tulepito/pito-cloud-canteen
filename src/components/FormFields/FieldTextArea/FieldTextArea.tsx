@@ -1,4 +1,5 @@
 import ValidationError from '@components/ValidationError/ValidationError';
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 import type { FieldRenderProps } from 'react-final-form';
@@ -6,30 +7,32 @@ import { Field } from 'react-final-form';
 
 import css from './FieldTextArea.module.scss';
 
-type InputComponentProps = FieldRenderProps<string, any> & {
-  id: string;
-  label?: string;
-  rootClassName?: string;
-  className?: string;
-  inputRootClass?: string;
-  disabled?: boolean;
-  labelClassName?: string;
-  customErrorText?: string;
-  isUncontrolled?: boolean;
-  input: any;
-  meta: any;
-  inputRef: any;
-  fullWidth?: boolean;
-};
+type InputComponentProps = FieldRenderProps<string, any> &
+  TDefaultProps & {
+    id: string;
+    label?: string;
+    inputRootClass?: string;
+    disabled?: boolean;
+    labelClassName?: string;
+    customErrorText?: string;
+    isUncontrolled?: boolean;
+    input: any;
+    meta: any;
+    inputRef?: any;
+    fullWidth?: boolean;
+  };
 const CONTENT_MAX_LENGTH = 5000;
 
-const FieldTextAreaComponent: React.FC<InputComponentProps> = (props) => {
+export const FieldTextAreaComponent: React.FC<InputComponentProps> = (
+  props,
+) => {
   const {
     label,
     id,
     rootClassName,
     className,
     inputRootClass,
+    inputClassName,
     disabled,
     labelClassName,
     customErrorText,
@@ -62,12 +65,16 @@ const FieldTextAreaComponent: React.FC<InputComponentProps> = (props) => {
   // Classes
   const inputClasses =
     inputRootClass ||
-    classNames(css.input, {
-      [css.inputSuccess]: valid,
-      [css.inputError]: hasError,
-      [css.inputDisabled]: disabled,
-      [css.inputFullWidth]: fullWidth,
-    });
+    classNames(
+      css.input,
+      {
+        [css.inputSuccess]: valid,
+        [css.inputError]: hasError,
+        [css.inputDisabled]: disabled,
+        [css.inputFullWidth]: fullWidth,
+      },
+      inputClassName,
+    );
 
   const inputProps = {
     className: inputClasses,

@@ -19,13 +19,11 @@ const companyChecker =
           message: 'Missing required key',
         });
       }
-      const { company = {}, isPITOAdmin = true } =
-        currentUser.attributes.profile.metadata;
+      const { company = {} } = currentUser.attributes.profile.metadata;
       const userPermission = company[companyId]?.permission;
       if (
         !userPermission ||
-        userPermission !== UserPermission.BOOKER ||
-        !isPITOAdmin
+        (userPermission && userPermission !== UserPermission.BOOKER)
       ) {
         return res.status(403).json({
           message: "You don't have permission to access this api!",

@@ -33,7 +33,7 @@
  * sizes, see the API documentation.
  */
 
-import type { TImage, TImageVariant } from '@utils/types';
+import type { TDefaultProps, TImage, TImageVariant } from '@utils/types';
 import classNames from 'classnames';
 import Image from 'next/image';
 import type { CSSProperties } from 'react';
@@ -43,9 +43,7 @@ import { FormattedMessage } from 'react-intl';
 import NoImageIcon from './NoImageIcon';
 import css from './ResponsiveImage.module.scss';
 
-type TResponsiveImageProps = {
-  className?: string;
-  rootClassName?: string;
+type TResponsiveImageProps = TDefaultProps & {
   alt: string;
   noImageMessage?: string;
   image: TImage;
@@ -85,11 +83,11 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
     );
   }
 
-  const imageVariants = image.attributes.variants;
+  const imageVariants = image?.attributes?.variants;
 
   const srcSet = variants
     .map((variantName: TImageVariant) => {
-      const variant = imageVariants[variantName];
+      const variant = imageVariants?.[variantName];
 
       if (!variant) {
         // Variant not available (most like just not loaded yet)
@@ -97,8 +95,7 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
       }
       return `${variant.url} ${variant.width}w`;
     })
-    .filter((v) => v != null)
-    .join(', ');
+    .filter((v) => v != null)[0];
 
   const style = {
     objectFit: 'cover',
@@ -106,13 +103,13 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
 
   const imgProps = {
     className: classes,
-    src: srcSet,
+    src: srcSet!,
     fill: true,
     style,
     ...rest,
   };
 
-  return <Image alt={alt} {...imgProps} />;
+  return srcSet ? <Image alt={alt} {...imgProps} /> : null;
 };
 
 export default ResponsiveImage;

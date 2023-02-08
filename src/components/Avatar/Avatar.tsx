@@ -7,7 +7,7 @@ import {
   userDisplayNameAsString,
 } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
-import type { TCurrentUser, TUser } from '@utils/types';
+import type { TCurrentUser, TDefaultProps, TUser } from '@utils/types';
 import classNames from 'classnames';
 import Link from 'next/link';
 import React from 'react';
@@ -33,9 +33,7 @@ const AVATAR_IMAGE_VARIANTS = [
   EImageVariants.squareSmall2x,
 ];
 
-type TAvatarProps = {
-  rootClassName?: string;
-  className?: string;
+type TAvatarProps = TDefaultProps & {
   initialsClassName?: string;
   user: TCurrentUser | TUser;
   renderSizes?: typeof AVATAR_SIZES_MEDIUM | typeof AVATAR_SIZES_LARGE;

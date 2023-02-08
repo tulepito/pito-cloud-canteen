@@ -1,5 +1,7 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .root {
   .table {
@@ -16,10 +18,11 @@
         display: table-header-group;
       }
       .headRow {
-        background-color: $neutralGray4;
+        background-color: $neutralGray3;
 
         .checkboxSvg {
           background-color: $neutralGray1;
+          border-radius: 4px;
         }
 
         .headCell {
@@ -99,6 +102,7 @@
           font-size: 14px;
 
           span {
+            @include lineClamp(3);
             word-break: break-all;
           }
           &:before {
@@ -124,4 +128,10 @@
 
 .isParent {
   background-color: $neutralGray3;
+}
+
+.emptyCell {
+  text-align: center;
+  padding: 50px 0;
+  width: 100%;
 }

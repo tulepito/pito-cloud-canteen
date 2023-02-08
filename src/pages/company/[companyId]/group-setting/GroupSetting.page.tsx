@@ -9,13 +9,14 @@ import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import IconNoClientsFound from '@src/pages/admin/order/create/components/ClientTable/IconNoClientsFound';
 import {
   addWorkspaceCompanyId,
   BookerManageCompany,
 } from '@src/redux/slices/company.slice';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import css from './GroupSetting.module.scss';
@@ -52,19 +53,13 @@ const GroupSettingPage = () => {
     (state) => state.company.companyMembers,
     shallowEqual,
   );
-  const fetchCompanyInfoInProgress = useAppSelector(
-    (state) => state.company.fetchCompanyInfoInProgress,
-  );
-  const deleteGroupInProgress = useAppSelector(
-    (state) => state.company.deleteGroupInProgress,
-  );
-  const deletingGroupId = useAppSelector(
-    (state) => state.company.deletingGroupId,
-  );
+  const { fetchCompanyInfoInProgress, deleteGroupInProgress, deletingGroupId } =
+    useAppSelector((state) => state.company);
   const originCompanyMembers = useAppSelector(
     (state) => state.company.originCompanyMembers,
     shallowEqual,
   );
+
   const formattedGroupList = useMemo<TRowData[]>(
     () =>
       groupList.reduce(
@@ -147,17 +142,21 @@ const GroupSettingPage = () => {
     };
     fetchData();
   }, [companyId, dispatch, router]);
+
+  const noGroupFound = (
+    <div className={css.noGroupFound}>
+      <IconNoClientsFound />
+      <div>
+        <FormattedMessage id="GroupSetting.noGroupFound" />
+      </div>
+    </div>
+  );
+
   return (
     <div className={css.container}>
       <div className={css.header}>
         <div className={css.titleWrapper}>
           <h2>{intl.formatMessage({ id: 'GroupSetting.pageTitle' })}</h2>
-          <p>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aliquid,
-            accusantium! Iure porro veritatis, laboriosam non suscipit libero
-            sint nesciunt numquam modi. Quam architecto in amet eius, esse vitae
-            nemo saepe?
-          </p>
         </div>
         <Button className={css.createGroupBtn} onClick={openCreateGroupModal}>
           <IconOutlinePlus />
@@ -165,11 +164,21 @@ const GroupSettingPage = () => {
         </Button>
       </div>
       <div className={css.tableContainer}>
-        <Table
-          columns={TABLE_COLUMN}
-          data={formattedGroupList}
-          isLoading={fetchCompanyInfoInProgress}
-        />
+        {formattedGroupList && formattedGroupList.length > 0 ? (
+          <Table
+            columns={TABLE_COLUMN}
+            data={formattedGroupList}
+            isLoading={fetchCompanyInfoInProgress}
+            tableClassName={css.tableRoot}
+            tableHeadClassName={css.tableHead}
+            tableHeadCellClassName={css.tableHeadCell}
+            tableBodyClassName={css.tableBody}
+            tableBodyRowClassName={css.tableBodyRow}
+            tableBodyCellClassName={css.tableBodyCell}
+          />
+        ) : (
+          noGroupFound
+        )}
       </div>
       <CreateGroupModal
         isOpen={isOpenCreateGroupModal}

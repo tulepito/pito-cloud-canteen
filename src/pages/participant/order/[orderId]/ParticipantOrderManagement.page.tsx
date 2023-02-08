@@ -1,6 +1,8 @@
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { ParticipantOrderAsyncAction } from '@redux/slices/ParticipantOrderManagementPage.slice';
+import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import type { TListing, TUser } from '@utils/types';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
@@ -16,7 +18,7 @@ const ParticipantOrderManagement = () => {
 
   // State
   const [currentView, setCurrentView] = useState(VIEWS.CALENDAR);
-  const currentUser = useAppSelector((state) => state.user.currentUser);
+  const currentUser = useAppSelector(currentUserSelector);
 
   // Hooks
   const { order, company, plans, subOrders, loadDataInProgress } =
@@ -26,8 +28,9 @@ const ParticipantOrderManagement = () => {
 
   useEffect(() => {
     if (isReady) {
-      dispatch(ParticipantOrderAsyncAction.loadData(orderId as string));
+      dispatch(participantOrderManagementThunks.loadData(orderId as string));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady]);
 
   return (
@@ -38,8 +41,8 @@ const ParticipantOrderManagement = () => {
       />
       {currentView === VIEWS.CALENDAR ? (
         <OrderCalendarView
-          company={company}
-          order={order}
+          company={company as TUser}
+          order={order as TListing}
           plans={plans}
           subOrders={subOrders}
           currentUser={currentUser}

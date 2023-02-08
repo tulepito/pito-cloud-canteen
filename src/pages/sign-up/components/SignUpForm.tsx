@@ -4,6 +4,7 @@ import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { generalPaths } from '@src/paths';
+import type { TDefaultProps } from '@utils/types';
 import {
   composeValidators,
   composeValidatorsWithAllValues,
@@ -31,11 +32,9 @@ export type TSignUpFormValues = {
   privacyAndPolicy: boolean;
 };
 
-type TExtraProps = {
+type TExtraProps = TDefaultProps & {
   formId?: string;
   errorMessage?: ReactNode;
-  rootClassName?: string;
-  className?: string;
   inProgress?: boolean;
 };
 type TSignUpFormProps = FormProps<TSignUpFormValues> & Partial<TExtraProps>;

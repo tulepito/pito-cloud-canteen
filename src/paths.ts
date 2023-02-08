@@ -5,6 +5,7 @@ export const generalPaths = {
   ResetPassword: '/dat-lai-mat-khau',
   StyleGuide: '/style-guide',
   Home: '/',
+  OrderManageMent: '/orders/[orderId]',
 };
 
 const enGeneralPaths = {
@@ -14,6 +15,10 @@ const enGeneralPaths = {
   ResetPassword: '/reset-password',
   StyleGuide: '/style-guide',
   Home: '/',
+};
+
+export const personalPaths = {
+  Account: '/company/personal/account',
 };
 
 export const NonRequireAuthenticationRoutes = [
@@ -34,6 +39,7 @@ export const IgnoredPermissionCheckRoutes = [
   generalPaths.StyleGuide,
   enGeneralPaths.SignIn,
   enGeneralPaths.SignUp,
+  generalPaths.OrderManageMent,
 ];
 
 export const adminPaths = {
@@ -135,10 +141,23 @@ export const adminRoutes = {
     path: '/admin/partner/[restaurantId]/settings/menu/create',
     label: 'Chỉnh sửa thực đơn',
   },
+  EditOrder: {
+    path: '/admin/order/[orderId]',
+    label: 'Tạo đơn hàng',
+  },
 } as const;
 
 export const companyPaths = {
   Home: '/company',
   Detail: '/company/[companyId]',
+  Account: '/company/[companyId]/account',
   GroupSetting: '/company/[companyId]/group-setting',
+  Logo: '/company/[companyId]/logo',
+  Members: '/company/[companyId]/members',
+  MembersDetail: '/company/[companyId]/members/[memberEmail]',
+  CreateNewOrder: '/company/booker/orders/new',
+  EditDraftOrder: '/company/booker/orders/draft/[orderId]',
+  GroupDetail: '/company/[companyId]/group-setting',
+  GroupMemberDetail:
+    '/company/[companyId]/group-setting/[groupId]/member/[memberId]',
 };

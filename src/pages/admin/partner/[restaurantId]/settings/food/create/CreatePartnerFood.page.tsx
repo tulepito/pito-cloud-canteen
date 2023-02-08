@@ -2,19 +2,24 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
+import { adminRoutes } from '@src/paths';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
+import type { TIntegrationListing } from '@utils/types';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import EditPartnerFoodForm from '../components/EditPartnerFoodForm/EditPartnerFoodForm';
 import type { TEditPartnerFoodFormValues } from '../utils';
 import { getDuplicateData, getSubmitFoodData } from '../utils';
+import css from './CreatePartnerFood.module.scss';
 
 const CreatePartnerFoodPage = () => {
   const dispatch = useAppDispatch();
-  const { restaurantId = '', duplicateId } = useRouter().query;
+  const router = useRouter();
+  const { restaurantId = '', duplicateId } = router.query;
   const {
     createFoodInProgress,
     createFoodError,
@@ -22,9 +27,22 @@ const CreatePartnerFoodPage = () => {
     showFoodInProgress,
     showFoodError,
   } = useAppSelector((state) => state.foods, shallowEqual);
-  const handleSubmit = (values: TEditPartnerFoodFormValues) => {
+  const redirectToEditPage = (listing: TIntegrationListing) => {
+    setTimeout(() => {
+      const foodId = listing?.id?.uuid;
+      if (foodId)
+        return router.push({
+          pathname: adminRoutes.EditPartnerFood.path,
+          query: {
+            foodId,
+            restaurantId,
+          },
+        });
+    }, 1000);
+  };
+  const handleSubmit = async (values: TEditPartnerFoodFormValues) => {
     if (duplicateId) {
-      return dispatch(
+      const response = await dispatch(
         foodSliceThunks.duplicateFood(
           getDuplicateData({
             ...values,
@@ -32,8 +50,10 @@ const CreatePartnerFoodPage = () => {
           }),
         ),
       );
+      redirectToEditPage(response.payload);
+      return response;
     }
-    return dispatch(
+    const response = await dispatch(
       foodSliceThunks.createPartnerFoodListing(
         getSubmitFoodData({
           ...values,
@@ -41,6 +61,8 @@ const CreatePartnerFoodPage = () => {
         }),
       ),
     );
+    redirectToEditPage(response.payload);
+    return response;
   };
 
   const initialValues = useMemo(() => {
@@ -78,12 +100,17 @@ const CreatePartnerFoodPage = () => {
   }
 
   return (
-    <EditPartnerFoodForm
-      onSubmit={handleSubmit}
-      initialValues={initialValues}
-      inProgress={createFoodInProgress}
-      formError={createFoodError}
-    />
+    <>
+      <h3 className={css.title}>
+        <FormattedMessage id="CreatePartnerFood.title" />
+      </h3>
+      <EditPartnerFoodForm
+        onSubmit={handleSubmit}
+        initialValues={initialValues}
+        inProgress={createFoodInProgress}
+        formError={createFoodError}
+      />
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 import toPairs from 'lodash/toPairs';
 
+import { EDayOfWeek } from './enums';
 import type { TAddress, TObject } from './types';
 
 /**
@@ -259,4 +260,198 @@ export const parsePrice = (value: string = '') => {
 
 export const nonNegativeValue = (message: string) => (value: number) => {
   return value <= 0 ? message : VALID;
+};
+
+const timeToMinute = (timeInHour: string) => {
+  if (!timeInHour) {
+    return 0;
+  }
+  const timeParts = timeInHour.split(':');
+  return Number(timeParts[0]) * 60 + Number(timeParts[1]);
+};
+
+export const nonConflictAvailabilityEntriesByDayOfWeek =
+  (message: string) => (value: string, allValues: TObject, input: TObject) => {
+    const [fieldName, dayOfWeekString] = input.name.split('.');
+    const [dayOfWeek] = dayOfWeekString.split('[');
+    const valueEntryIndex = Number(dayOfWeekString.match(/\d+/)?.[0]);
+    const availabilityPlans = allValues[fieldName];
+    let isConflict = false;
+    Object.keys(availabilityPlans).forEach((k) => {
+      if (Object.values(EDayOfWeek).includes(k as EDayOfWeek)) {
+        availabilityPlans[k].forEach((entry: any, entryIndex: number) => {
+          if (k === dayOfWeek) {
+            const { startTime, endTime } = entry;
+            const startTimeInMinutesToCompare = timeToMinute(startTime);
+            const endTimeInMinutesToCompare = timeToMinute(endTime);
+            const valueInMinute = timeToMinute(value);
+            if (
+              !isConflict &&
+              valueEntryIndex !== Number(entryIndex) &&
+              valueInMinute > startTimeInMinutesToCompare &&
+              valueInMinute < endTimeInMinutesToCompare
+            ) {
+              isConflict = true;
+            }
+          }
+        });
+      }
+    });
+
+    return isConflict ? message : VALID;
+  };
+
+export const nonConflictAvailabilityEntries =
+  (message: string) => (value: string, allValues: TObject, input: TObject) => {
+    const [fieldNameString] = input.name.split('.');
+    const [fieldName, entryIndexString] = fieldNameString.split('[');
+    const valueEntryIndex = Number(entryIndexString.match(/\d+/)?.[0]);
+    const allWeekAvailabilityEntries = allValues[fieldName];
+    let isConflict = false;
+    allWeekAvailabilityEntries.forEach((entry: any, index: number) => {
+      const { startTime, endTime } = entry;
+      const startTimeInMinutesToCompare = timeToMinute(startTime);
+      const endTimeInMinutesToCompare = timeToMinute(endTime);
+      const valueInMinute = timeToMinute(value);
+      if (
+        !isConflict &&
+        valueEntryIndex !== Number(index) &&
+        valueInMinute > startTimeInMinutesToCompare &&
+        valueInMinute < endTimeInMinutesToCompare
+      ) {
+        isConflict = true;
+      }
+    });
+
+    return isConflict ? message : VALID;
+  };
+
+export const validAvailabilityPlanEntries =
+  (message: string) => (value: string) => {
+    if (!value) return message;
+    const time = value?.split(':')?.[1];
+    if (time && Number(time) % 5 === 0) {
+      return VALID;
+    }
+    return message;
+  };
+
+export const entriesStartAndEndIsDifferentOnEachDayOfWeek =
+  (message: string) => (value: string, allValues: TObject, input: any) => {
+    const [fieldName, dayOfWeekString, timeName] = input.name.split('.');
+    const [dayOfWeek] = dayOfWeekString.split('[');
+    const valueEntryIndex = Number(dayOfWeekString.match(/\d+/)?.[0]);
+
+    const availabilityPlans = allValues[fieldName];
+    let isConflict = false;
+    Object.keys(availabilityPlans).forEach((k) => {
+      if (Object.values(EDayOfWeek).includes(k as EDayOfWeek)) {
+        availabilityPlans[k].forEach((entry: any, index: number) => {
+          if (k === dayOfWeek && valueEntryIndex === index) {
+            const { startTime, endTime } = entry;
+            const startTimeInMinutesToCompare = timeToMinute(startTime);
+            const endTimeInMinutesToCompare = timeToMinute(endTime);
+            const valueInMinute = timeToMinute(value);
+            isConflict =
+              valueInMinute ===
+              (timeName === 'startTime'
+                ? endTimeInMinutesToCompare
+                : startTimeInMinutesToCompare);
+          }
+        });
+      }
+    });
+
+    return isConflict ? message : VALID;
+  };
+
+export const entriesStartAndEndIsDifferent =
+  (message: string) => (value: string, allValues: TObject, input: any) => {
+    const [fieldNameString, timeName] = input.name.split('.');
+    const [fieldName, valueEntryIndexString] = fieldNameString.split('[');
+    const valueEntryIndex = Number(valueEntryIndexString.match(/\d+/)?.[0]);
+
+    const allWeekAvailabilityEntries = allValues[fieldName];
+    let isConflict = false;
+    allWeekAvailabilityEntries.forEach((entry: any, index: number) => {
+      if (valueEntryIndex === index) {
+        const { startTime, endTime } = entry;
+        const startTimeInMinutesToCompare = timeToMinute(startTime);
+        const endTimeInMinutesToCompare = timeToMinute(endTime);
+        const valueInMinute = timeToMinute(value);
+        isConflict =
+          valueInMinute ===
+          (timeName === 'startTime'
+            ? endTimeInMinutesToCompare
+            : startTimeInMinutesToCompare);
+      }
+    });
+
+    return isConflict ? message : VALID;
+  };
+
+export const startTimeGreaterThanEndTimeOnEachDayOfWeek =
+  (message: string) => (value: string, allValues: TObject, input: any) => {
+    const [fieldName, dayOfWeekString, timeName] = input.name.split('.');
+    const [dayOfWeek] = dayOfWeekString.split('[');
+    const availabilityPlans = allValues[fieldName];
+    let condition = false;
+    const valueEntryIndex = Number(dayOfWeekString.match(/\d+/)?.[0]);
+
+    Object.keys(availabilityPlans).forEach((k) => {
+      if (Object.values(EDayOfWeek).includes(k as EDayOfWeek)) {
+        availabilityPlans[k].forEach((entry: any, index: number) => {
+          if (k === dayOfWeek && valueEntryIndex === index) {
+            const { startTime, endTime } = entry;
+            const startTimeInMinutesToCompare = timeToMinute(startTime);
+            const endTimeInMinutesToCompare = timeToMinute(endTime);
+            const valueInMinute = timeToMinute(value);
+            condition =
+              timeName === 'startTime'
+                ? valueInMinute > endTimeInMinutesToCompare
+                : valueInMinute < startTimeInMinutesToCompare;
+          }
+        });
+      }
+    });
+
+    return condition ? message : VALID;
+  };
+
+export const startTimeGreaterThanEndTime =
+  (message: string) => (value: string, allValues: TObject, input: any) => {
+    const [fieldNameString, timeName] = input.name.split('.');
+    const [fieldName, valueEntryIndexString] = fieldNameString.split('[');
+    const valueEntryIndex = Number(valueEntryIndexString.match(/\d+/)?.[0]);
+
+    const allWeekAvailabilityEntries = allValues[fieldName];
+    let condition = false;
+    allWeekAvailabilityEntries.forEach((entry: any, index: number) => {
+      if (valueEntryIndex === index) {
+        const { startTime, endTime } = entry;
+        const startTimeInMinutesToCompare = timeToMinute(startTime);
+        const endTimeInMinutesToCompare = timeToMinute(endTime);
+        const valueInMinute = timeToMinute(value);
+        condition =
+          timeName === 'startTime'
+            ? valueInMinute > endTimeInMinutesToCompare
+            : valueInMinute < startTimeInMinutesToCompare;
+      }
+    });
+
+    return condition ? message : VALID;
+  };
+
+export const minTimeValidate =
+  (message: string, minVal: string) => (value: string) => {
+    return timeToMinute(value) >= timeToMinute(minVal) ? VALID : message;
+  };
+
+export const maxTimeValidate =
+  (message: string, maxVal: string) => (value: string) => {
+    return timeToMinute(value) <= timeToMinute(maxVal) ? VALID : message;
+  };
+export const nonSatOrSunDay = (message: string) => (value: number) => {
+  const dayOfWeek = new Date(value).getDay();
+  return dayOfWeek === 6 || dayOfWeek === 0 ? message : VALID;
 };

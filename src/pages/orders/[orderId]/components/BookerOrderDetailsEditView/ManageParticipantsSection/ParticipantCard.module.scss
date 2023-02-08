@@ -1,0 +1,65 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  display: flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 8px;
+
+  &:hover {
+    background-color: $neutralGray3;
+  }
+
+  .avatarContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+    }
+
+    .checkIcon {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+    }
+    margin-right: 12px;
+  }
+
+  .infoContainer {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    & > * {
+      @include lineClamp(1);
+    }
+
+    & :nth-child(1) {
+      @include textTemplate(14px, 700, 20px);
+    }
+
+    & :nth-child(2) {
+      @include textTemplate(12px, 400, 16px);
+      color: $neutralGray5;
+    }
+  }
+
+  .closeIconContainer {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+    .closeIcon {
+      width: 10px;
+      height: 10px;
+    }
+  }
+}

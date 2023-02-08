@@ -2,6 +2,7 @@ import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
+import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -16,17 +17,36 @@ export type TToolbarProps = {
   onNavigate: (action: string) => void;
   onView: (name: string) => void;
   companyLogo?: ReactNode;
+  recommendButton?: ReactNode;
+  startDate: Date;
+  endDate: Date;
+  anchorDate: Date;
 };
 
 const Toolbar: React.FC<TToolbarProps> = (props) => {
-  const { label, view, views, onNavigate, onView, companyLogo } = props;
+  const {
+    label,
+    onNavigate,
+    recommendButton,
+    startDate,
+    endDate,
+    anchorDate,
+    onView,
+    views,
+    view,
+  } = props;
   const intl = useIntl();
-
-  const shouldShowNavigateToday = true;
-
+  const shouldShowNavigateToday = false;
+  const startDateDateTime = DateTime.fromJSDate(startDate);
+  const endDateDateTime = DateTime.fromJSDate(endDate);
+  const anchorDateDateTime = DateTime.fromJSDate(anchorDate);
   const navigateFunc = (action: string) => () => {
     onNavigate(action);
   };
+  const showPrevBtn =
+    startDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
+  const showNextBtn =
+    endDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
 
   const viewFunc = (viewName: string) => () => {
     onView(viewName);
@@ -47,15 +67,17 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
         </Button>
       ));
     }
+    return <div></div>;
   };
 
   return (
     <div className={css.root}>
-      <div className={css.companyLogo}>
-        <div className={css.companyId}>{companyLogo}</div>
-      </div>
       <div className={css.actions}>
-        <div className={css.viewModeGroup}>{viewNamesGroupFunc()}</div>
+        {views.length > 1 ? (
+          <div className={css.viewModeGroup}>{viewNamesGroupFunc()}</div>
+        ) : (
+          <div />
+        )}
         {shouldShowNavigateToday && (
           <Button
             className={css.todayBtn}
@@ -65,16 +87,19 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
         )}
         <div className={css.toolbarNavigation}>
           <div
-            className={css.arrowBtn}
+            className={classNames(css.arrowBtn, !showPrevBtn && css.disabled)}
             onClick={navigateFunc(NAVIGATE.PREVIOUS)}>
             <IconArrow className={css.arrowIcon} direction="left" />
           </div>
           {label}
-          <div className={css.arrowBtn} onClick={navigateFunc(NAVIGATE.NEXT)}>
+          <div
+            className={classNames(css.arrowBtn, !showNextBtn && css.disabled)}
+            onClick={navigateFunc(NAVIGATE.NEXT)}>
             <IconArrow className={css.arrowIcon} direction="right" />
           </div>
         </div>
       </div>
+      {recommendButton}
     </div>
   );
 };

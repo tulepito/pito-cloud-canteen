@@ -1,4 +1,5 @@
 import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import { addCommas } from '@helpers/format';
 import classNames from 'classnames';
 import type { FieldInputProps } from 'react-final-form';
 import { Field } from 'react-final-form';
@@ -71,7 +72,7 @@ const FieldFoodSelectCheckbox = (props: any) => {
 
         <div className={css.labelContainer}>
           <div className={css.foodTitle}>{foodTitle}</div>
-          <div>{foodPrice} đ</div>
+          <div>{addCommas(foodPrice.amount)}đ</div>
         </div>
       </div>
     </div>

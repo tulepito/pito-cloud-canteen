@@ -2,6 +2,7 @@ import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { generalPaths } from '@src/paths';
+import type { TDefaultProps } from '@utils/types';
 import {
   composeValidators,
   emailFormatValid,
@@ -20,9 +21,7 @@ export type TPasswordRecoveryFormValues = {
   email: string;
 };
 
-type TExtraProps = {
-  rootClassName?: string;
-  className?: string;
+type TExtraProps = TDefaultProps & {
   formId?: string;
   timeLeft: number;
   inProgress: boolean;

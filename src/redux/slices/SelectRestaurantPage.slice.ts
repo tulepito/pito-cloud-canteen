@@ -1,8 +1,9 @@
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
-import { denormalisedResponseEntities } from '@utils/data';
-import type { TObject, TPagination } from '@utils/types';
-import get from 'lodash/get';
+import { ListingTypes } from '@src/types/listingTypes';
+import { denormalisedResponseEntities, LISTING } from '@utils/data';
+import { convertWeekDay } from '@utils/dates';
+import type { TListing, TObject, TPagination } from '@utils/types';
 
 type TSelectRestaurantPageSliceInitialState = {
   fetchRestaurantsPending: boolean;
@@ -40,31 +41,41 @@ const getRestaurants = createAsyncThunk(
     if (params) {
       queryParams.keywords = params.title;
     }
+    const { dateTime } = params || {};
+    const dayOfWeek = convertWeekDay(dateTime.weekday).key;
     const response = await sdk.listings.query({
-      ...queryParams,
-      meta_listingType: 'restaurant',
+      meta_listingType: ListingTypes.MENU,
+      pub_startDate: `,${dateTime.toMillis()}`,
+      pub_daysOfWeek: `has_any:${dayOfWeek}`,
     });
-    const { meta } = response?.data || {};
-    const entities = denormalisedResponseEntities(response);
 
-    return { restaurants: entities, pagination: meta };
+    const { meta } = response?.data || {};
+
+    const menuList = denormalisedResponseEntities(response);
+    const restaurantList = await Promise.all(
+      menuList.map(async (menu: TListing) => {
+        const { restaurantId } = LISTING(menu).getMetadata();
+        const restaurantResponse = await sdk.listings.show({
+          id: restaurantId,
+        });
+        return {
+          restaurantInfo: denormalisedResponseEntities(restaurantResponse)[0],
+          menu,
+        };
+      }),
+    );
+    return { restaurants: restaurantList, pagination: meta };
   },
 );
 
 const getRestaurantFood = createAsyncThunk(
   QUERY_RESTAURANT_FOOD,
-  async (restaurantId: string, { extra: sdk, getState }) => {
-    const restaurant = getState().SelectRestaurantPage.restaurants?.find(
-      (rest) => rest?.id?.uuid === restaurantId,
-    );
-    const foodIds = get(restaurant, 'attributes.metadata.foods', []);
-    const promises = foodIds.map(async (foodId: string) => {
-      const response = await sdk.listings.show({ id: foodId });
-      const [food] = denormalisedResponseEntities(response);
-      return food;
+  async (restaurantId: string, { extra: sdk }) => {
+    const response = await sdk.listings.query({
+      meta_restaurantId: restaurantId,
+      meta_listingType: ListingTypes.FOOD,
     });
-    const result = await Promise.all(promises);
-
+    const result = denormalisedResponseEntities(response);
     return { foodOfRestaurant: restaurantId, foodList: result };
   },
 );

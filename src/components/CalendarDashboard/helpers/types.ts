@@ -3,7 +3,8 @@ import type React from 'react';
 export type TDaySession =
   | 'MORNING_SESSION'
   | 'AFTERNOON_SESSION'
-  | 'EVENING_SESSION';
+  | 'EVENING_SESSION'
+  | 'DINNER_SESSION';
 
 export type TEventStatus = 'empty' | 'joined' | 'expired' | 'notJoined';
 
@@ -17,5 +18,6 @@ export type TDayInWeek =
   | 'sunday';
 
 export type TCalendarItemCardComponents = {
-  contentEnd: React.FC<any>;
+  contentEnd?: React.FC<any>;
+  toolbar?: React.FC<any>;
 };

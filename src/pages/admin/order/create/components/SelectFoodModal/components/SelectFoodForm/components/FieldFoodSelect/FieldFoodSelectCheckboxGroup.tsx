@@ -8,6 +8,7 @@
  */
 
 import ValidationError from '@components/ValidationError/ValidationError';
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';
 import React from 'react';
@@ -16,9 +17,7 @@ import { FieldArray } from 'react-final-form-arrays';
 import FieldFoodSelectCheckbox from './FieldFoodSelectCheckbox';
 import css from './FieldFoodSelectCheckboxGroup.module.scss';
 
-type TFieldFoodSelectCheckboxGroupRendererProps = {
-  className?: string;
-  rootClassName?: string;
+type TFieldFoodSelectCheckboxGroupRendererProps = TDefaultProps & {
   label?: string | ReactNode;
   twoColumns?: boolean;
   id?: string;

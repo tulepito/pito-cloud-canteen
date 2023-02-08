@@ -89,7 +89,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
 
     return listEvent;
   });
-  const flattenEvents = flatten(events);
+  const flattenEvents = flatten<Event>(events);
 
   const sectionCompanyBranding = loadDataInProgress ? (
     <div className={css.sectionCompanyBranding}>

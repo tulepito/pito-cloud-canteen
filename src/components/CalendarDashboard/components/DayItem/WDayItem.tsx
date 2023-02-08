@@ -1,3 +1,4 @@
+import useBoolean from '@hooks/useBoolean';
 import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
 
@@ -19,6 +20,11 @@ const WDayItem: React.FC<TWDayItemProps> = ({
   renderEvent,
   components,
 }) => {
+  const {
+    value: isMouseOnDay,
+    setTrue: setMouseOnDay,
+    setFalse: setMouseLeaveDay,
+  } = useBoolean();
   const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
   const isCurrentDay =
     DateTime.fromJSDate(date)
@@ -27,8 +33,16 @@ const WDayItem: React.FC<TWDayItemProps> = ({
       .get('day') === 0;
 
   return (
-    <div className={css.weekDay} id={`dayHeader-${date.getDay()}`}>
-      <DayItemHeader date={date} isCurrentDay={isCurrentDay} />
+    <div
+      onMouseEnter={setMouseOnDay}
+      onMouseLeave={setMouseLeaveDay}
+      className={css.weekDay}
+      id={`dayHeader-${date.getDay()}`}>
+      <DayItemHeader
+        date={date}
+        isCurrentDay={isCurrentDay}
+        isMouseOnDay={isMouseOnDay}
+      />
       <DayItemContent
         date={date}
         events={events}

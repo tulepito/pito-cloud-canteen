@@ -12,6 +12,7 @@ type TModalProps = PropsWithChildren<{
   className?: string;
   containerClassName?: string;
   contentClassName?: string;
+  openClassName?: string;
   isOpen: boolean;
   title?: ReactNode | string;
   shouldHideIconClose?: boolean;
@@ -29,16 +30,19 @@ const Modal: React.FC<TModalProps> = (props) => {
     className,
     containerClassName,
     contentClassName,
+    openClassName,
     handleClose,
     scrollLayerClassName,
     customHeader,
   } = props;
 
   const intl = useIntl();
-  const isOpenClass = isOpen ? css.isOpen : css.isClosed;
+  const isOpenClass = isOpen
+    ? classNames(css.isOpen, openClassName)
+    : css.isClosed;
   const classes = classNames(isOpenClass, className);
   const containerClasses = classNames(css.container, containerClassName);
-  const scrollLayerClasses = scrollLayerClassName || css.scrollLayer;
+  const scrollLayerClasses = classNames(css.scrollLayer, scrollLayerClassName);
   const hasTitle = !!title;
   const closeModalMessage = intl.formatMessage({ id: 'Modal.closeModal' });
 

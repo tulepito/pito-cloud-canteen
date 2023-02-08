@@ -1,6 +1,6 @@
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import Toggle from '@components/Toggle/Toggle';
-import { addCommas, removeNonNumeric } from '@helpers/format';
+import { parseThousandNumber } from '@helpers/format';
 import {
   composeValidators,
   nonNegativeValue,
@@ -28,9 +28,7 @@ const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
   const perPackNonNegativeMessage = intl.formatMessage({
     id: 'PerPackageField.perPackNonNegative',
   });
-  const parseThousandNumber = (value: string) => {
-    return addCommas(removeNonNumeric(value));
-  };
+
   return (
     <div className={css.container}>
       {title && <div className={css.fieldTitle}>{title}</div>}

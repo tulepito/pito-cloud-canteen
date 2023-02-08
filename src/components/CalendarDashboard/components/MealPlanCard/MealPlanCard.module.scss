@@ -90,7 +90,7 @@
 .footer {
 }
 
-.unselectBtn {
+.actionButton {
   width: 100%;
   height: 36px;
   min-height: 36px;
@@ -115,8 +115,15 @@
 }
 
 .applyForOtherDays {
-  @include textTemplate(12px, 700, 20px, '');
+  @include textTemplate(12px, 700, 16px);
   color: $neutralGray6;
   text-align: center;
   cursor: pointer;
+}
+
+.editFood {
+  @include buttonColorSecondary;
+  margin: 20px auto 0;
+  width: 90%;
+  min-height: 36px;
 }

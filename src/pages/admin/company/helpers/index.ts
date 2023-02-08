@@ -1,10 +1,11 @@
 import { RESULT_PAGE_SIZE } from '@redux/slices/ManageCompaniesPage.slice';
+import { USER } from '@utils/data';
 import { ECompanyStatus } from '@utils/enums';
-import type { TCompany, TReverseMapFromEnum, TUser } from '@utils/types';
+import type { TCompany, TUser } from '@utils/types';
 
 export type TUpdateStatus = {
   id: string;
-  status: TReverseMapFromEnum<ECompanyStatus>;
+  status: ECompanyStatus;
 };
 
 type TExtraDataMapToCompanyTable = {
@@ -80,4 +81,36 @@ export const parseEntitiesToTableData = (
       ...extraData,
     },
   }));
+};
+
+export const sortCompanies = (
+  companies: TCompany[],
+  isSortAZ: boolean = true,
+) => {
+  return [...companies].sort((a, b) => {
+    if (isSortAZ) {
+      if (
+        USER(a).getPublicData().companyName.toLowerCase() <
+        USER(b).getPublicData().companyName.toLowerCase()
+      )
+        return -1;
+      if (
+        USER(a).getPublicData().companyName.toLowerCase() >
+        USER(b).getPublicData().companyName.toLowerCase()
+      )
+        return 1;
+      return 0;
+    }
+    if (
+      USER(b).getPublicData().companyName.toLowerCase() <
+      USER(a).getPublicData().companyName.toLowerCase()
+    )
+      return -1;
+    if (
+      USER(b).getPublicData().companyName.toLowerCase() >
+      USER(a).getPublicData().companyName.toLowerCase()
+    )
+      return 1;
+    return 0;
+  });
 };

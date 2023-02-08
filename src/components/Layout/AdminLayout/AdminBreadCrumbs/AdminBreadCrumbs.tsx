@@ -1,6 +1,6 @@
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { adminRoutes } from '@src/paths';
-import type { RouteKey } from '@utils/types';
+import type { AdminRouteKey } from '@utils/types';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -45,8 +45,8 @@ export const BreadCrumbs = () => {
     const newCrumbs = crumbLinks.map((link: string, index: number) => {
       const currentRoute = crumbLabels[index];
       const activeKey = Object.keys(adminRoutes).find((key) => {
-        return adminRoutes[key as RouteKey].path === currentRoute;
-      }) as RouteKey;
+        return adminRoutes[key as AdminRouteKey].path === currentRoute;
+      }) as AdminRouteKey;
       const crumb = {
         link,
         route,

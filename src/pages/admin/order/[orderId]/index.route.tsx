@@ -1,9 +1,22 @@
+import Meta from '@components/Layout/Meta';
 import React from 'react';
+import { useIntl } from 'react-intl';
 
-import OrderDetailsPage from './OrderDetails.page';
+import CreateOrderPage from '../create/CreateOrder.page';
 
-const OrderDetailsRoute = () => {
-  return <OrderDetailsPage />;
-};
+export default function CreateOrderRoute() {
+  const intl = useIntl();
+  const title = intl.formatMessage({
+    id: 'CreateOrderRoute.title',
+  });
 
-export default OrderDetailsRoute;
+  const description = intl.formatMessage({
+    id: 'CreateOrderRoute.description',
+  });
+  return (
+    <>
+      <Meta title={title} description={description} />
+      <CreateOrderPage />
+    </>
+  );
+}

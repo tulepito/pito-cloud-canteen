@@ -11,10 +11,12 @@ import {
 import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
 import React, { useCallback, useEffect } from 'react';
+import { useIntl } from 'react-intl';
 
 type TAuthGuardProps = PropsWithChildren<{}>;
 
 const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
+  const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isAuthenticated, authInfoLoaded } = useAppSelector(
@@ -56,6 +58,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     } else if (!isAuthenticated) {
       router.push(generalPaths.SignIn);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     authInfoLoaded,
     homePageNavigateCondition,
@@ -70,16 +73,17 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
       return children;
     }
 
-    if (!authInfoLoaded) {
-      return <LoadingContainer />;
-    }
+    const loadingCondition =
+      !authInfoLoaded ||
+      (isNonRequireAuthenticationRoute && homePageNavigateCondition) ||
+      (!isNonRequireAuthenticationRoute && !isAuthenticated);
 
-    if (isNonRequireAuthenticationRoute) {
-      if (homePageNavigateCondition) {
-        return <LoadingContainer />;
-      }
-    } else if (!isAuthenticated) {
-      return <LoadingContainer />;
+    if (loadingCondition) {
+      return (
+        <LoadingContainer
+          loadingText={intl.formatMessage({ id: 'AuthGuard.loadingText' })}
+        />
+      );
     }
 
     return children;

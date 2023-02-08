@@ -4,7 +4,7 @@ import cookies from '@services/cookie';
 import { deserialize, getIntegrationSdk, handleError } from '@services/sdk';
 import { LISTING_TYPE } from '@src/pages/api/helpers/constants';
 import { denormalisedResponseEntities } from '@utils/data';
-import type { TIntergrationOrderListing } from '@utils/types';
+import type { TIntegrationOrderListing } from '@utils/types';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -34,7 +34,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     );
     const subOrders = denormalisedResponseEntities(response);
     const orderWithCompany = await Promise.all(
-      subOrders.map(async (subOrder: TIntergrationOrderListing) => {
+      subOrders.map(async (subOrder: TIntegrationOrderListing) => {
         const { orderId } = subOrder.attributes.metadata;
         const orderResponse = await intergrationSdk.listings.show({
           id: orderId,

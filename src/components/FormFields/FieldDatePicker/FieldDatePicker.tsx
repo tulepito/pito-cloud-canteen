@@ -15,7 +15,9 @@ type FieldDatePickerProps = FieldRenderProps<string, any> & {
   name?: string;
 };
 
-const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (props) => {
+export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
+  props,
+) => {
   const {
     className,
     label,
@@ -24,14 +26,16 @@ const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (props) => {
     meta,
     customErrorText,
     onChange: onDatePickerChange,
+    customInput,
+    selected,
     ...rest
   } = props;
-  const { name, onChange } = input;
+  const { name, onChange, value } = input;
   const onInputChange = (date: Date, event: any) => {
     if (typeof onDatePickerChange === 'function') {
       onDatePickerChange(date, event);
-      onChange(date?.getTime());
     }
+    onChange(date?.getTime());
   };
   const { invalid, touched, error } = meta;
   const errorText = customErrorText || error;
@@ -52,9 +56,11 @@ const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (props) => {
         id={id}
         name={name}
         onChange={onInputChange}
+        customInput={customInput}
+        selected={value || selected}
         {...rest}
       />
-      <ValidationError fieldMeta={fieldMeta} />
+      {!customInput && <ValidationError fieldMeta={fieldMeta} />}
     </div>
   );
 };

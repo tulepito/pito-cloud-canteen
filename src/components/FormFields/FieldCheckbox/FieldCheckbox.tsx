@@ -1,5 +1,5 @@
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import type { TFormEvent, TIconProps } from '@utils/types';
+import type { TDefaultProps, TFormEvent, TIconProps } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import React from 'react';
@@ -55,15 +55,14 @@ export const IconCheckbox: React.FC<IconCheckboxProps> = (props) => {
 
 const CHECKBOX_TEXT_PREFIX = 'Other';
 
-type TFieldCheckboxProps = FieldProps<string, any> & {
-  className?: string;
-  rootClassName?: string;
-  svgClassName?: string;
-  textClassName?: string;
-  useSuccessColor?: boolean;
-  customOnChange?: (event: React.ChangeEvent | any) => void;
-  label?: string | React.ReactNode;
-};
+type TFieldCheckboxProps = FieldProps<string, any> &
+  TDefaultProps & {
+    svgClassName?: string;
+    textClassName?: string;
+    useSuccessColor?: boolean;
+    customOnChange?: (event: React.ChangeEvent | any) => void;
+    label?: string | React.ReactNode;
+  };
 
 const FieldCheckbox: React.FC<TFieldCheckboxProps> = (props) => {
   const {

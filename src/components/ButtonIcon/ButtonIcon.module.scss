@@ -9,6 +9,10 @@
   @include buttonColorPrimary;
   @include flexCenter;
   padding: 0;
+
+  &:hover path {
+    fill: $neutralGray6;
+  }
 }
 
 .smallButton {

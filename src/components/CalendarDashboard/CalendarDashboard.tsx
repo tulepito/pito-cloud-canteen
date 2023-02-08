@@ -1,5 +1,6 @@
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
@@ -14,9 +15,7 @@ import Toolbar from './components/Toolbar/Toolbar';
 import withWeekViewWrapper from './components/WeekView/withWeekViewWrapper';
 import type { TCalendarItemCardComponents } from './helpers/types';
 
-type TCalendarDashboardProps = {
-  rootClassName?: string;
-  className?: string;
+type TCalendarDashboardProps = TDefaultProps & {
   anchorDate?: Date;
   defaultDate?: Date;
   startDate?: Date;
@@ -26,6 +25,9 @@ type TCalendarDashboardProps = {
   companyLogo?: ReactNode;
   components?: TCalendarItemCardComponents;
   inProgress?: boolean;
+  recommendButton?: ReactNode;
+  hideMonthView?: boolean;
+  hideWeekView?: boolean;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
@@ -38,6 +40,11 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   companyLogo,
   components,
   inProgress,
+  recommendButton,
+  startDate,
+  endDate,
+  hideMonthView,
+  hideWeekView,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
 
@@ -45,23 +52,27 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
 
   const classes = classNames(rootClassName || css.root, className);
 
-  const MonthViewWrapper = createMonthViewWrapper({
-    renderEvent,
-    customComponents: components,
-  });
-  const WeekViewWrapper = withWeekViewWrapper({
-    inProgress,
-    renderEvent,
-    customComponents: components,
-  });
+  const MonthViewWrapper = !hideMonthView
+    ? createMonthViewWrapper({
+        renderEvent,
+        customComponents: components,
+      })
+    : false;
+  const WeekViewWrapper = !hideWeekView
+    ? withWeekViewWrapper({
+        inProgress,
+        renderEvent,
+        customComponents: components,
+      })
+    : false;
 
   const { defaultDate, views } = useMemo(
     () => ({
       defaultDate:
         propsDefaultDate || DateTime.now().startOf('week').toJSDate(),
       views: {
-        week: WeekViewWrapper as any,
-        month: MonthViewWrapper as any,
+        ...(hideWeekView ? {} : { week: WeekViewWrapper as any }),
+        ...(hideMonthView ? {} : { month: MonthViewWrapper as any }),
       } as ViewsProps,
     }),
     // If you guys want to update defaultDate for calendar when props.propsDefaultDate
@@ -81,11 +92,19 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
 
   const toolbarExtraProps = {
     companyLogo,
+    recommendButton,
+    startDate,
+    endDate,
+    anchorDate: calDate,
   };
 
   useEffect(() => {
     setCalDate(anchorDate);
   }, [anchorDate]);
+
+  const defaultToolbar = (props: any) => (
+    <Toolbar {...props} {...toolbarExtraProps} />
+  );
 
   return (
     <div className={classes}>
@@ -96,9 +115,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
         events={events}
         views={views}
         components={{
-          toolbar: (props: any) => (
-            <Toolbar {...props} {...toolbarExtraProps} />
-          ),
+          toolbar: components?.toolbar || defaultToolbar,
         }}
       />
     </div>

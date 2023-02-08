@@ -17,7 +17,7 @@ export const EVENTS_MOCKUP = [
         id: '12',
         name: 'Vua Hải Sản',
       },
-      expiredTime: new Date(2022, 11, 29, 16, 0, 0),
+      expiredTime: new Date(2023, 2, 2, 16, 0, 0),
       meal: {
         dishes: [
           { key: 'mon_an_1', value: 'Mon an 1' },
@@ -27,8 +27,8 @@ export const EVENTS_MOCKUP = [
       },
     },
     title: 'PT3040',
-    start: new Date(2022, 11, 29, 16, 0, 0),
-    end: new Date(2022, 11, 29, 20, 0, 0),
+    start: new Date(2023, 2, 2, 16, 0, 0),
+    end: new Date(2022, 2, 2, 20, 0, 0),
   },
   {
     resource: {
@@ -41,7 +41,7 @@ export const EVENTS_MOCKUP = [
         id: '12',
         name: 'Vua Hải Sản',
       },
-      expiredTime: new Date(2022, 11, 29, 16, 0, 0),
+      expiredTime: new Date(2023, 2, 2, 16, 0, 0),
       meal: {
         dishes: [
           { key: 'mon_an_1', value: 'Mon an 1' },
@@ -51,8 +51,8 @@ export const EVENTS_MOCKUP = [
       },
     },
     title: 'PT3041',
-    start: new Date(2022, 11, 29, 16, 0, 0),
-    end: new Date(2022, 11, 29, 20, 0, 0),
+    start: new Date(2023, 2, 2, 16, 0, 0),
+    end: new Date(2022, 2, 2, 20, 0, 0),
   },
 
   {
@@ -168,7 +168,7 @@ export const EVENTS_MOCKUP = [
         id: '12',
         name: 'Vua Hải Sản',
       },
-      expiredTime: new Date(2022, 11, 29, 16, 0, 0),
+      expiredTime: new Date(2023, 2, 2, 16, 0, 0),
       meal: {
         dishes: [
           { key: 'mon_an_1', value: 'Mon an 1' },
@@ -178,8 +178,8 @@ export const EVENTS_MOCKUP = [
       },
     },
     title: 'PT3045',
-    start: new Date(2022, 11, 29, 16, 0, 0),
-    end: new Date(2022, 11, 29, 20, 0, 0),
+    start: new Date(2023, 2, 2, 16, 0, 0),
+    end: new Date(2022, 2, 2, 20, 0, 0),
     desc: 'Big conference for important people',
   },
   {
@@ -527,8 +527,8 @@ export const MEAL_PLANS_MOCKUP = [
       },
     },
     title: 'PT3040',
-    start: new Date(2023, 0, 2, 16, 0, 0),
-    end: new Date(2023, 0, 2, 20, 0, 0),
+    start: new Date(2023, 1, 6, 0, 0, 0),
+    end: new Date(2023, 1, 6, 23, 0, 0),
   },
   {
     resource: {
@@ -558,8 +558,8 @@ export const MEAL_PLANS_MOCKUP = [
       },
     },
     title: 'PT3040',
-    start: new Date(2023, 0, 3, 16, 0, 0),
-    end: new Date(2023, 0, 3, 20, 0, 0),
+    start: new Date(2023, 1, 8, 16, 0, 0),
+    end: new Date(2023, 1, 8, 20, 0, 0),
   },
   {
     resource: {
@@ -589,7 +589,7 @@ export const MEAL_PLANS_MOCKUP = [
       },
     },
     title: 'PT3040',
-    start: new Date(2023, 0, 4, 16, 0, 0),
-    end: new Date(2023, 0, 4, 20, 0, 0),
+    start: new Date(2023, 1, 7, 16, 0, 0),
+    end: new Date(2023, 1, 7, 20, 0, 0),
   },
 ];
