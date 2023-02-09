@@ -20,11 +20,13 @@ import { HTTP_METHODS } from '../helpers/constants';
 
 const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const apiMethod = req.method;
   const integrationSdk = getIntegrationSdk();
+  const apiMethod = req.method;
+
   switch (apiMethod) {
     case HTTP_METHODS.GET:
       break;
+
     case HTTP_METHODS.POST:
       try {
         const { companyId, bookerId } = req.body;
@@ -80,20 +82,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           companyId,
           plans = [],
           selectedGroups = [],
+          orderState,
         } = Listing(orderListing).getMetadata();
         const companyAccount = await fetchUser(companyId);
         const { subAccountId } = companyAccount.attributes.profile.privateData;
+        const enabledToUpdateRelatedBookingInfo =
+          orderState === EOrderStates.isNew;
 
-        const subCompanyAccount = await fetchUser(subAccountId);
-        const loggedinSubAccount = await getSubAccountSdk(subCompanyAccount);
         let updatedOrderListing;
 
         if (!isEmpty(generalInfo)) {
           const newSelectedGroup = generalInfo.selectedGroups || selectedGroups;
-
           const participants: string[] = isEmpty(newSelectedGroup)
             ? getAllCompanyMembers(companyAccount)
             : calculateGroupMembers(companyAccount, selectedGroups);
+
           const { startDate, endDate } = generalInfo;
           const companyDisplayName =
             companyAccount.attributes.profile.displayName;
@@ -118,7 +121,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                   : {}),
                 metadata: {
                   ...generalInfo,
-                  participants,
+                  ...(enabledToUpdateRelatedBookingInfo
+                    ? { participants }
+                    : {}),
                 },
               },
               { expand: true },
@@ -126,7 +131,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           )[0];
         }
 
-        if (orderDetail) {
+        // TODO: Check plan list is empty, create new plan, else, update plan existed instead.
+        if (orderDetail && enabledToUpdateRelatedBookingInfo) {
           const allMembers = calculateGroupMembers(
             companyAccount,
             selectedGroups,
@@ -155,35 +161,45 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             {},
           );
 
-          const orderTitle = orderListing.attributes.title;
-          const planListingResponse =
-            await loggedinSubAccount.ownListings.create({
+          // TODO: Check plan list is empty, create new plan, else, update plan existed instead.
+          if (isEmpty(plans)) {
+            const orderTitle = orderListing.attributes.title;
+            const [planListingResponse] = await integrationSdk.listings.create({
+              authorId: subAccountId,
               title: `${orderTitle} - Plan week ${plans.length + 1}`,
-            });
-
-          const planListing =
-            denormalisedResponseEntities(planListingResponse)[0];
-          await integrationSdk.listings.update({
-            id: planListing.id.uuid,
-            metadata: {
-              orderDetail: updatedOrderDetail,
-              orderId,
-              listingType: ListingTypes.PLAN,
-            },
-          });
-
-          // eslint-disable-next-line prefer-destructuring
-          updatedOrderListing = denormalisedResponseEntities(
-            await integrationSdk.listings.update(
-              {
-                id: orderListing.id.uuid,
-                metadata: {
-                  plans: plans.concat(planListing.id.uuid),
-                },
+              metadata: {
+                orderDetail: updatedOrderDetail,
+                orderId,
+                listingType: ListingTypes.PLAN,
               },
-              { expand: true },
-            ),
-          )[0];
+            });
+            const planListing =
+              denormalisedResponseEntities(planListingResponse)[0];
+
+            // eslint-disable-next-line prefer-destructuring
+            updatedOrderListing = denormalisedResponseEntities(
+              await integrationSdk.listings.update(
+                {
+                  id: orderListing.id.uuid,
+                  metadata: {
+                    plans: plans.concat(planListing.id.uuid),
+                  },
+                },
+                { expand: true },
+              ),
+            )[0];
+          } else {
+            const [planId] = plans;
+
+            if (planId) {
+              await integrationSdk.listings.update({
+                id: planId,
+                metadata: {
+                  orderDetail: updatedOrderDetail,
+                },
+              });
+            }
+          }
         }
         res.json(updatedOrderListing);
       } catch (error) {
