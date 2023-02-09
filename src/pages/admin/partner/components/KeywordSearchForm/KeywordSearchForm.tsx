@@ -2,6 +2,8 @@ import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
+import classNames from 'classnames';
+import type { ReactNode } from 'react';
 import React from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -17,11 +19,16 @@ type TKeywordSearchForm = {
   initialValues?: TKeywordSearchFormValues;
   searchValue?: string;
   placeholder?: string;
+  hideButton?: boolean;
+  inputClassName?: string;
+  label?: ReactNode;
+  buttonClassName?: string;
 };
 
 const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
   const intl = useIntl();
-  const { placeholder } = props;
+  const { placeholder, hideButton, inputClassName, label, buttonClassName } =
+    props;
   return (
     <FinalForm
       {...props}
@@ -37,12 +44,18 @@ const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
                 })
               }
               name={props?.searchValue || 'keywords'}
+              label={label}
               id={props?.searchValue || 'keywords'}
-              className={css.searchInput}
+              className={classNames(css.searchInput, inputClassName)}
+              leftIcon={<IconMagnifier />}
             />
-            <Button className={css.searchButton} onClick={handleSubmit}>
-              <IconMagnifier className={css.iconSearch} />
-            </Button>
+            {!hideButton && (
+              <Button
+                className={classNames(css.searchButton, buttonClassName)}
+                onClick={handleSubmit}>
+                <IconMagnifier className={css.iconSearch} />
+              </Button>
+            )}
           </Form>
         );
       }}

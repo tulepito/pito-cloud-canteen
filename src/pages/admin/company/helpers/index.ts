@@ -1,7 +1,8 @@
+import type { TCompanyMembers } from '@redux/slices/ManageCompaniesPage.slice';
 import { RESULT_PAGE_SIZE } from '@redux/slices/ManageCompaniesPage.slice';
 import { USER } from '@utils/data';
 import { ECompanyStatus } from '@utils/enums';
-import type { TCompany, TUser } from '@utils/types';
+import type { TCompany } from '@utils/types';
 
 export type TUpdateStatus = {
   id: string;
@@ -64,23 +65,28 @@ export const filterCompanies = (companies: TCompany[], filterValues: any) => {
 };
 
 export const parseEntitiesToTableData = (
-  companies: TUser[],
+  companies: TCompany[],
   extraData: TExtraDataMapToCompanyTable,
+  companyMembers?: TCompanyMembers | null,
 ) => {
-  return companies.map((company: any) => ({
-    key: company.id.uuid,
-    data: {
-      id: company.id.uuid,
-      name: company.attributes.profile.displayName,
-      phone: company.attributes.profile.publicData?.phoneNumber,
-      email: company.attributes.email,
-      companyName: company.attributes.profile.publicData?.companyName,
-      address: company.attributes.profile.publicData?.location?.address,
-      status:
-        company.attributes.profile.metadata.status || ECompanyStatus.unactive,
-      ...extraData,
-    },
-  }));
+  return companies.map((company) => {
+    const { profile = {} } = company.attributes || {};
+    const { displayName, publicData = {}, metadata = {} } = profile as any;
+    const { status } = metadata;
+    const { location = {} } = publicData;
+
+    return {
+      key: company.id.uuid,
+      data: {
+        id: company.id.uuid,
+        name: displayName,
+        address: location?.address,
+        status: status || ECompanyStatus.unactive,
+        ...(companyMembers ? { members: companyMembers[company.id.uuid] } : {}),
+        ...extraData,
+      },
+    };
+  });
 };
 
 export const sortCompanies = (

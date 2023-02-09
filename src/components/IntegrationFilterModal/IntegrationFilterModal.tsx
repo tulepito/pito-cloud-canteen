@@ -5,15 +5,31 @@ import Form from '@components/Form/Form';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import AlertModal from '@components/Modal/AlertModal';
 import useBoolean from '@hooks/useBoolean';
+import classNames from 'classnames';
 import type { FormApi } from 'final-form';
+import type { ReactNode } from 'react';
 import React, { useRef } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './IntegrationFilterModal.module.scss';
 
-const IntegrationFilterModal = (props: any) => {
-  const { onSubmit, children, initialValues = {}, onClear } = props;
+type TIntegrationFilterModal = {
+  onSubmit: (values: Record<any, any>) => void;
+  children: ({
+    values,
+    form,
+  }: {
+    values: Record<any, any>;
+    form: FormApi;
+  }) => ReactNode;
+  initialValues: Record<any, any>;
+  onClear: () => void;
+  className?: string;
+};
+
+const IntegrationFilterModal: React.FC<TIntegrationFilterModal> = (props) => {
+  const { onSubmit, children, initialValues = {}, onClear, className } = props;
   const formRef = useRef<FormApi>();
   const {
     value: isOpen,
@@ -33,7 +49,7 @@ const IntegrationFilterModal = (props: any) => {
   };
 
   return (
-    <div className={css.root}>
+    <div className={classNames(css.root, className)}>
       <Button onClick={onOpen} type="button" className={css.filterButton}>
         <IconFilter className={css.filterIcon} />
         <FormattedMessage id="IntegrationFilterModal.filterMessage" />

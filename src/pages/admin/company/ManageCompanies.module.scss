@@ -69,6 +69,11 @@
     &:hover {
       background-color: $neutralGray5;
     }
+
+    .iconEdit {
+      width: 17px;
+      height: auto;
+    }
   }
 }
 
@@ -111,6 +116,11 @@
   overflow: hidden;
 }
 
+.boldTextRow {
+  font-weight: $fontWeightBold;
+  color: #2f54eb;
+}
+
 .keywordInput {
   width: 100%;
 }
@@ -121,5 +131,31 @@
     width: 20px;
     height: auto;
     fill: $neutralGray1;
+  }
+}
+
+.filterWrapper {
+  margin-bottom: 24px;
+}
+
+.badgeContainer {
+  border-radius: 100px;
+  background-color: $neutralGray3 !important;
+  min-width: 93px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .badgeLabel {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600 !important;
+    color: $neutralGray5 !important;
+  }
+  &.badgeContainerActive {
+    min-width: 77px !important;
+    background-color: $singleUseBadgeGreen1 !important;
+    .badgeLabel {
+      color: $singleUseBadgeGreen2 !important;
+    }
   }
 }

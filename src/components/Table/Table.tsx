@@ -18,7 +18,6 @@ export type TColumn = {
   key: string | number;
   label: string | ReactNode;
   render: (data: any, index?: number) => ReactNode;
-  renderSearch?: () => ReactNode;
   sortable?: boolean;
 };
 
@@ -46,7 +45,6 @@ type TTableProps = TDefaultProps & {
   isLoading?: boolean;
   onSubmit?: (e: any) => void;
   initialValues?: any;
-  showFilterFrom?: boolean;
   hasCheckbox?: boolean;
   form?: FormApi;
   values?: any;
@@ -74,7 +72,6 @@ const Table = (props: TTableProps) => {
     paginationLinksClassName,
     pagination,
     isLoading,
-    showFilterFrom,
     tableClassName,
     paginationPath,
     hasCheckbox,
@@ -188,31 +185,6 @@ const Table = (props: TTableProps) => {
           </tbody>
         ) : (
           <tbody className={tableBodyClassName}>
-            {showFilterFrom && (
-              <>
-                <tr className={css.formHeadRow}>
-                  {columns.map(
-                    (col: TColumn) =>
-                      col.renderSearch && (
-                        <td key={col.key} className={css.formHeadCell}>
-                          {col.label}
-                        </td>
-                      ),
-                  )}
-                </tr>
-                <tr className={css.formRow}>
-                  {columns.map(
-                    (col: TColumn) =>
-                      col.renderSearch && (
-                        <td key={col.key} className={css.formCell}>
-                          {col.renderSearch()}
-                        </td>
-                      ),
-                  )}
-                </tr>
-              </>
-            )}
-
             {data.map((row: TRowData) => (
               <tr
                 className={classNames(tableBodyRowClassName, css.bodyRow)}
