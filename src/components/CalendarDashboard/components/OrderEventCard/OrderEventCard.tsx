@@ -18,23 +18,22 @@ export type TOrderEventCardProps = {
 const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event, index }) => {
   const status = event.resource?.status;
 
+  const today = new Date();
   const expiredTime = DateTime.fromJSDate(event.resource?.expiredTime)
     .plus({ day: 1 })
     .toJSDate();
-  const remainTime = DateTime.fromJSDate(new Date()).diff(
-    DateTime.fromJSDate(expiredTime),
-    ['hour', 'minute', 'second'],
-  );
-  const remainHours = remainTime.get('hour');
-  const remainMinutes = remainTime.get('minute');
-  const isExpired = remainHours > 0 && remainMinutes > 0;
+  const isExpired = expiredTime < today;
   const eventStatus = isExpired ? EVENT_STATUS.EXPIRED_STATUS : status;
 
   return (
     <Tooltip
       overlayClassName={css.tooltipOverlay}
       tooltipContent={
-        !isExpired && <OrderEventCardPopup event={event} status={eventStatus} />
+        <OrderEventCardPopup
+          event={event}
+          status={eventStatus}
+          isExpired={isExpired}
+        />
       }
       placement="rightTop"
       trigger="click"

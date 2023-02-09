@@ -18,11 +18,13 @@ import OrderEventCardStatus from './OrderEventCardStatus';
 type TOrderEventCardPopupProps = {
   event: Event;
   status?: TEventStatus;
+  isExpired: boolean;
 };
 
 const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   event,
   status,
+  isExpired = false,
 }) => {
   const router = useRouter();
   const user = useAppSelector(currentUserSelector);
@@ -89,6 +91,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
         </div>
         <div className={css.selectDishContent}>
           <DishSelectionForm
+            actionsDisabled={isExpired}
             dishes={dishes}
             onSubmit={onSelectDish}
             initialValues={dishSelection}

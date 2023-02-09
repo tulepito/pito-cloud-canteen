@@ -35,7 +35,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
   const orderTile = orderObj.getAttributes().title;
   const currentUserId = CURRENT_USER(currentUser).getId();
 
-  const { orderDeadline, deliveryHour, startDate } = orderObj.getMetadata();
+  const { deadlineDate, deliveryHour, startDate } = orderObj.getMetadata();
   const [anchorTime, setAnchorTime] = useState<number | undefined>();
 
   const anchorDate =
@@ -88,8 +88,8 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
           meal: {
             dishes,
           },
-          expiredTime: orderDeadline
-            ? DateTime.fromMillis(+orderDeadline).toJSDate()
+          expiredTime: deadlineDate
+            ? DateTime.fromMillis(+deadlineDate).toJSDate()
             : DateTime.fromMillis(+planItemKey).minus({ day: 2 }).toJSDate(),
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
