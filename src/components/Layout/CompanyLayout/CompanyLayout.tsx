@@ -1,18 +1,19 @@
-// import Dropdown from '@components/CompanyLayout/Dropdown/Dropdown';
-// import FeatureIcons from '@components/FeatureIcons/FeatureIcons';
-// import { useAppSelector } from '@hooks/reduxHooks';
-// import { currentUserSelector } from '@redux/slices/user.slice';
-// import { CURRENT_USER, USER } from '@utils/data';
-// import type { TUser } from '@utils/types';
-// import filter from 'lodash/filter';
+import FeatureIcons from '@components/FeatureIcons/FeatureIcons';
+import FeaturesHeader from '@components/FeaturesHeader/FeaturesHeader';
+import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
 
+import { shouldShowFeatureHeader } from './companyLayout.helpers';
 // import { useState } from 'react';
 // import { shallowEqual } from 'react-redux';
 import GeneralHeader from './GeneralHeader/GeneralHeader';
 
 const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
+  const router = useRouter();
+
+  const showFeatureHeader = shouldShowFeatureHeader(router.pathname);
+
   // const currentUser = useAppSelector(currentUserSelector);
   // const companyRefs = useAppSelector(
   //   (state) => state.ManageCompaniesPage.companyRefs,
@@ -38,57 +39,58 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   //   { value: '', label: 'Cá nhân' },
   //   ...assignedCompanies,
   // ];
-  // const featureHeaderData = [
-  //   {
-  //     key: 'cart',
-  //     icon: <FeatureIcons.Cart />,
-  //     title: 'Đặt hàng',
-  //     pathname: '/',
-  //   },
-  //   {
-  //     key: 'order',
-  //     icon: <FeatureIcons.Box />,
-  //     title: 'Đơn hàng',
-  //     pathname: '/',
-  //   },
-  //   {
-  //     key: 'invoice',
-  //     icon: <FeatureIcons.Invoice />,
-  //     title: 'Hoá đơn',
-  //     pathname: '/',
-  //   },
-  //   {
-  //     key: 'review',
-  //     icon: <FeatureIcons.Star />,
-  //     title: 'Đánh giá',
-  //     pathname: '/',
-  //   },
-  //   {
-  //     key: 'introduce',
-  //     icon: <FeatureIcons.UserCirclePlus />,
-  //     title: 'Giới thiệu',
-  //     pathname: '/',
-  //   },
-  //   {
-  //     key: 'account',
-  //     icon: <FeatureIcons.User />,
-  //     title: (
-  //       <Dropdown
-  //         options={accountOptions}
-  //         selectedValue={selectedAccount}
-  //         setSelectedValue={setSelectedAccount}
-  //       />
-  //     ),
-  //     pathname: selectedAccount.value
-  //       ? `/company/${selectedAccount.value}`
-  //       : '/company',
-  //   },
-  // ];
+  const featureHeaderData = [
+    {
+      key: 'cart',
+      icon: <FeatureIcons.Cart />,
+      title: 'Đặt hàng',
+      pathname: '/',
+    },
+    {
+      key: 'order',
+      icon: <FeatureIcons.Box />,
+      title: 'Đơn hàng',
+      pathname: '/',
+    },
+    {
+      key: 'invoice',
+      icon: <FeatureIcons.Invoice />,
+      title: 'Hoá đơn',
+      pathname: '/',
+    },
+    {
+      key: 'review',
+      icon: <FeatureIcons.Star />,
+      title: 'Đánh giá',
+      pathname: '/',
+    },
+    {
+      key: 'introduce',
+      icon: <FeatureIcons.UserCirclePlus />,
+      title: 'Giới thiệu',
+      pathname: '/',
+    },
+    // {
+    //   key: 'account',
+    //   icon: <FeatureIcons.User />,
+    //   title: (
+    //     <Dropdown
+    //       options={accountOptions}
+    //       selectedValue={selectedAccount}
+    //       setSelectedValue={setSelectedAccount}
+    //     />
+    //   ),
+    //   pathname: selectedAccount.value
+    //     ? `/company/${selectedAccount.value}`
+    //     : '/company',
+    // },
+  ];
+
   return (
     <>
       <GeneralHeader />
-      {/* <FeaturesHeader headerData={featureHeaderData} />
-      <GeneralLayoutContent> */}
+      {showFeatureHeader && <FeaturesHeader headerData={featureHeaderData} />}
+      {/*  <GeneralLayoutContent> */}
       {/* <CompanySidebar /> */}
       {/* <GeneralMainContent>{children}</GeneralMainContent> */}
       {/* </GeneralLayoutContent> */}
