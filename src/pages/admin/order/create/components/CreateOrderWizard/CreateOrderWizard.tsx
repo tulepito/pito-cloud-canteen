@@ -7,7 +7,7 @@ import {
   removeBookerList,
   resetOrder,
 } from '@redux/slices/Order.slice';
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -40,12 +40,12 @@ export const TABS = [
 export const CREATE_ORDER_STEP_LOCAL_STORAGE_NAME = 'orderStep';
 
 const tabCompleted = (order: any, tab: string) => {
-  const orderId = LISTING(order).getId();
+  const orderId = Listing(order).getId();
   const {
     deliveryAddress,
     staffName,
     plans = [],
-  } = LISTING(order).getMetadata();
+  } = Listing(order).getMetadata();
   const isMealPlanTabCompleted = plans.length > 0;
 
   switch (tab) {
@@ -149,7 +149,7 @@ const CreateOrderWizard = () => {
 
   useEffect(() => {
     if (order) {
-      const { plans = [], staffName } = LISTING(
+      const { plans = [], staffName } = Listing(
         order as TListing,
       ).getMetadata();
       if (staffName) {

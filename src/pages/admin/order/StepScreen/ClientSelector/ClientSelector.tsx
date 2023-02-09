@@ -15,7 +15,7 @@ import {
 } from '@src/pages/admin/company/helpers';
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { adminRoutes } from '@src/paths';
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -132,7 +132,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
         router.push({
           pathname: adminRoutes.EditOrder.path,
           query: {
-            orderId: LISTING(payload).getId(),
+            orderId: Listing(payload).getId(),
           },
         });
       }

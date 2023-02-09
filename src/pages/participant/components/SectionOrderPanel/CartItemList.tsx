@@ -1,6 +1,6 @@
 import { isOverDeadline } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { useIntl } from 'react-intl';
@@ -44,7 +44,7 @@ const CartItemList: React.FC<TCartItemList> = ({
         ? null
         : foodList.find((food: any) => food?.id?.uuid === item);
     const dishAttributes =
-      item === 'notJoined' ? null : LISTING(selectedDish).getAttributes();
+      item === 'notJoined' ? null : Listing(selectedDish).getAttributes();
     const dishTitle =
       item === 'notJoined'
         ? intl.formatMessage({ id: 'SectionOrderPanel.notJoined' })

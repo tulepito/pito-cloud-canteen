@@ -2,7 +2,7 @@ import { InlineTextButton } from '@components/Button/Button';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { CURRENT_USER } from '@utils/data';
+import { CurrentUser } from '@utils/data';
 import { useRouter } from 'next/router';
 import React from 'react';
 import type { Event } from 'react-big-calendar';
@@ -41,7 +41,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   } = event.resource;
 
   const onSelectDish = (values: TDishSelectionFormValues, reject?: boolean) => {
-    const currentUserId = CURRENT_USER(user).getId();
+    const currentUserId = CurrentUser(user).getId();
     const payload = {
       updateValues: {
         orderId,

@@ -1,4 +1,4 @@
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TListing } from '@utils/types';
 import { addDays, min, subDays } from 'date-fns';
@@ -13,7 +13,7 @@ export const isJoinedPlan = (
 
 export const isOverDeadline = (order: TListing) => {
   const currentTime = new Date().getTime();
-  const { deadlineDate = 0 } = LISTING(order).getMetadata();
+  const { deadlineDate = 0 } = Listing(order).getMetadata();
 
   return currentTime >= deadlineDate;
 };

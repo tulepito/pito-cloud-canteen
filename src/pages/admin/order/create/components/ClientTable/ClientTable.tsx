@@ -9,7 +9,7 @@ import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import Pagination from '@components/Pagination/Pagination';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { addBooker } from '@redux/slices/Order.slice';
-import { USER } from '@utils/data';
+import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 import classNames from 'classnames';
 import { useState } from 'react';
@@ -104,41 +104,41 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
             <div className={css.bookerList}>
               {bookerList.map((booker) => {
                 const handleBookerClick = () => {
-                  form.change('booker', USER(booker).getId());
-                  setSelectedBookerId(USER(booker).getId());
+                  form.change('booker', User(booker).getId());
+                  setSelectedBookerId(User(booker).getId());
                   dispatch(addBooker(booker));
                 };
                 const bookerCardClasses = classNames(
                   css.bookerCard,
-                  selectedBookerId === USER(booker).getId() && css.selected,
+                  selectedBookerId === User(booker).getId() && css.selected,
                 );
                 return (
                   <div
-                    key={USER(booker).getId()}
+                    key={User(booker).getId()}
                     className={bookerCardClasses}
                     onClick={handleBookerClick}>
                     <div className={css.profile}>
                       <Avatar user={booker} disableProfileLink />
                       <div className={css.name}>
-                        {USER(booker).getProfile().displayName}
+                        {User(booker).getProfile().displayName}
                       </div>
                     </div>
                     <div className={css.contact}>
                       <div className={css.row}>
                         <IconPhone />
                         <span>
-                          {USER(booker).getProtectedData().phoneNumber}
+                          {User(booker).getProtectedData().phoneNumber}
                         </span>
                       </div>
                       <div className={css.row}>
                         <IconMail />
-                        <div>{USER(booker).getAttributes().email}</div>
+                        <div>{User(booker).getAttributes().email}</div>
                       </div>
                     </div>
                     <FieldRadioButton
-                      id={`booker-${USER(booker).getId()}`}
+                      id={`booker-${User(booker).getId()}`}
                       name="booker"
-                      value={USER(booker).getId()}
+                      value={User(booker).getId()}
                       rootClassName={css.bookerRadio}
                     />
                   </div>

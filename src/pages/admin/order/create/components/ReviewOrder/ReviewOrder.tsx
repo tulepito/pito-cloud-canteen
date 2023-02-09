@@ -9,7 +9,7 @@ import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { OrderAsyncAction } from '@redux/slices/Order.slice';
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import { parseTimestampToFormat } from '@utils/dates';
 import type { TListing } from '@utils/types';
 import { required } from '@utils/validators';
@@ -352,7 +352,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   useEffect(() => {
     dispatch(OrderAsyncAction.fetchOrderDetail());
   }, []);
-  const { staffName, deliveryHour, deliveryAddress, shipperName } = LISTING(
+  const { staffName, deliveryHour, deliveryAddress, shipperName } = Listing(
     order as TListing,
   ).getMetadata();
   const { renderedOrderDetail } =

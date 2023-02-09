@@ -17,7 +17,7 @@ import {
   unSelectRestaurant,
   updateDraftMealPlan,
 } from '@redux/slices/Order.slice';
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import { getDaySessionFromDeliveryTime, renderDateRange } from '@utils/dates';
 import type { TListing, TObject } from '@utils/types';
 import classNames from 'classnames';
@@ -134,8 +134,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     deliveryAddress,
     deadlineDate,
     deadlineHour,
-  } = LISTING(order as TListing).getMetadata();
-  const { title: orderTitle } = LISTING(order as TListing).getAttributes();
+  } = Listing(order as TListing).getMetadata();
+  const { title: orderTitle } = Listing(order as TListing).getAttributes();
   const companies = useAppSelector(
     (state) => state.ManageCompaniesPage.companyRefs,
     shallowEqual,

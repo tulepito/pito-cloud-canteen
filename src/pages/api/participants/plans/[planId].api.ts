@@ -2,9 +2,9 @@
 /* eslint-disable no-restricted-syntax */
 import cookies from '@services/cookie';
 import {
-  CURRENT_USER,
+  CurrentUser,
   denormalisedResponseEntities,
-  LISTING,
+  Listing,
 } from '@utils/data';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -84,14 +84,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               id: planId,
             }),
           )[0];
-          const { orderId, orderDetail } = LISTING(plan).getMetadata();
+          const { orderId, orderDetail } = Listing(plan).getMetadata();
           const order = denormalisedResponseEntities(
             await integrationSdk.listings.show({
               id: orderId,
             }),
           )[0];
 
-          const currentUserId = CURRENT_USER(currentUser).getId();
+          const currentUserId = CurrentUser(currentUser).getId();
           const mealPlan = await fetchSubOrder(orderDetail, currentUserId);
           res.json({
             statusCode: 200,
