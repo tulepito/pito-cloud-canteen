@@ -24,7 +24,11 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   );
   const user = useAppSelector(currentUserSelector);
 
-  const { pathname, asPath: fullPath } = router;
+  const {
+    pathname,
+    asPath: fullPath,
+    query: { from: fromUrl },
+  } = router;
   const {
     id: userId,
     attributes: { emailVerified: isUserEmailVerified },
@@ -53,10 +57,13 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
 
     if (isNonRequireAuthenticationRoute) {
       if (homePageNavigateCondition) {
-        router.push(generalPaths.Home);
+        router.push(fromUrl ? (fromUrl as string) : generalPaths.Home);
       }
     } else if (!isAuthenticated) {
-      router.push({ pathname: generalPaths.SignIn, query: { from: fullPath } });
+      router.push({
+        pathname: generalPaths.SignIn,
+        query: { from: fullPath },
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
