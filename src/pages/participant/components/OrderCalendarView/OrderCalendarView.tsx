@@ -7,7 +7,7 @@ import { CURRENT_USER, LISTING, USER } from '@utils/data';
 import type { TCurrentUser, TListing, TUser } from '@utils/types';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
-import React from 'react';
+import React, { useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import Skeleton from 'react-loading-skeleton';
 
@@ -35,8 +35,12 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
   const orderTile = orderObj.getAttributes().title;
   const currentUserId = CURRENT_USER(currentUser).getId();
 
-  const { orderDeadline, deliveryHour, startDate } =
-    orderObj.getMetadata().generalInfo || {};
+  const { orderDeadline, deliveryHour, startDate } = orderObj.getMetadata();
+  const [anchorTime, setAnchorTime] = useState<number | undefined>();
+
+  const anchorDate =
+    anchorTime || startDate ? new Date(anchorTime || startDate) : new Date();
+
   const events = subOrders.map((subOrder: any) => {
     const planKey = Object.keys(subOrder)[0];
     const planItem: TPlanItem = subOrder[planKey];
@@ -45,6 +49,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
     ) as TListing;
 
     const listEvent: Event[] = [];
+    let isAnchorTimeChanged: any = false;
 
     Object.keys(planItem).forEach((planItemKey: string) => {
       const meal = planItem[planItemKey];
@@ -59,13 +64,21 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
         LISTING(currentPlan).getMetadata().orderDetail[planItemKey]
           .memberOrders[currentUserId] || {};
 
+      const pickFoodStatus = foodSelection?.status;
+
+      if (!pickFoodStatus && !anchorTime && !isAnchorTimeChanged) {
+        isAnchorTimeChanged = true;
+        console.log('🚀 ~ Object.keys ~ anchorTime', anchorTime);
+        setAnchorTime(+planItemKey);
+      }
+
       const event = {
         resource: {
           id: `${planItemKey}`,
           subOrderId: planKey,
           orderId,
           daySession: 'MORNING_SESSION',
-          status: foodSelection?.status,
+          status: pickFoodStatus,
           type: 'dailyMeal',
           deliveryAddress: LISTING(restaurant).getPublicData().location,
           restaurant: {
@@ -91,7 +104,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
 
     return listEvent;
   });
-  const flattenEvents = flatten(events);
+  const flattenEvents = flatten<Event>(events);
 
   const sectionCompanyBranding = loadDataInProgress ? (
     <div className={css.sectionCompanyBranding}>
@@ -108,7 +121,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
   return (
     <div>
       <CalendarDashboard
-        anchorDate={DateTime.fromMillis(startDate || Date.now()).toJSDate()}
+        anchorDate={anchorDate}
         events={flattenEvents}
         companyLogo={sectionCompanyBranding}
         renderEvent={OrderEventCard}
