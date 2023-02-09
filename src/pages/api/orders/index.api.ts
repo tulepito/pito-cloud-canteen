@@ -76,7 +76,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case HTTP_METHODS.PUT:
       try {
-        const { orderId, generalInfo, orderDetail } = req.body;
+        const { orderId, generalInfo, orderDetail = {} } = req.body;
         const orderListing = await fetchListing(orderId);
         const {
           companyId,
@@ -132,7 +132,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
 
         // TODO: Check plan list is empty, create new plan, else, update plan existed instead.
-        if (orderDetail && enabledToUpdateRelatedBookingInfo) {
+        if (!isEmpty(orderDetail) && enabledToUpdateRelatedBookingInfo) {
           const allMembers = calculateGroupMembers(
             companyAccount,
             selectedGroups,
@@ -164,9 +164,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           // TODO: Check plan list is empty, create new plan, else, update plan existed instead.
           if (isEmpty(plans)) {
             const orderTitle = orderListing.attributes.title;
-            const [planListingResponse] = await integrationSdk.listings.create({
+            const planListingResponse = await integrationSdk.listings.create({
               authorId: subAccountId,
               title: `${orderTitle} - Plan week ${plans.length + 1}`,
+              state: 'published',
               metadata: {
                 orderDetail: updatedOrderDetail,
                 orderId,
@@ -180,7 +181,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             updatedOrderListing = denormalisedResponseEntities(
               await integrationSdk.listings.update(
                 {
-                  id: orderListing.id.uuid,
+                  id: orderId,
                   metadata: {
                     plans: plans.concat(planListing.id.uuid),
                   },
