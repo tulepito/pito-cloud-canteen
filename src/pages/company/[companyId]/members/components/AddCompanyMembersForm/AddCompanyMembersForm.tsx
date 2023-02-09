@@ -45,7 +45,8 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
   } = props;
   const intl = useIntl();
   const [loadingRow, setLoadingRow] = useState<number>(0);
-  const { members: originCompanyMembers } = User(companyAccount).getMetadata();
+  const { members: originCompanyMembers = {} } =
+    User(companyAccount).getMetadata();
   const restrictEmailList = [
     ...Object.keys(originCompanyMembers),
     User(companyAccount).getAttributes().email,

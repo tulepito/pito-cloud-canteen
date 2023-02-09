@@ -38,10 +38,13 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
     [companyMembers, groupMembers],
   );
 
-  const initialValues = {
-    members: [],
-  };
-  const onSubmit = (values: TObject) => {
+  const initialValues = useMemo(
+    () => ({
+      members: [],
+    }),
+    [],
+  );
+  const onSubmit = async (values: TObject) => {
     const { members } = values;
     const addedMembers = companyMembers
       .filter((member) => members.includes(member.id.uuid))
@@ -49,14 +52,18 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
         id: member.id.uuid,
         email: member.attributes.email,
       }));
-    dispatch(
+    await dispatch(
       BookerManageCompany.updateGroup({
         groupId,
         addedMembers,
       }),
-    ).then(() => {
-      onModalClose();
-    });
+    );
+    onModalClose();
+    await dispatch(
+      BookerManageCompany.groupDetailInfo({
+        groupId: groupId as string,
+      }),
+    );
   };
   return (
     <FinalForm
@@ -81,7 +88,11 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
                     />
                     <div className={css.memberItem}>
                       <div className={css.memberWrapper}>
-                        <Avatar className={css.smallAvatar} user={member} />
+                        <Avatar
+                          disableProfileLink
+                          className={css.smallAvatar}
+                          user={member}
+                        />
                         <div>
                           <div className={css.name}>
                             {User(member).getProfile().displayName}
