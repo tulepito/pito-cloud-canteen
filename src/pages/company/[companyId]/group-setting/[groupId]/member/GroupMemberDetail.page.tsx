@@ -88,8 +88,12 @@ const GroupMemberDetailPage: React.FC<GroupMemberDetailPageProps> = () => {
       </div>
       <div className={css.header}>
         <div className={css.profileWrapper}>
-          <Avatar disableProfileLink user={companyMember!} />
-          <h2>{memberName}</h2>
+          <Avatar
+            className={css.avatar}
+            disableProfileLink
+            user={companyMember!}
+          />
+          <h2 className={css.name}>{memberName}</h2>
         </div>
         <div className={css.actionBtns}>
           <Button

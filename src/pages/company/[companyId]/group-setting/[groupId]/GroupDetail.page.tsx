@@ -193,17 +193,21 @@ const GroupDetailPage = () => {
     [name, description],
   );
 
-  const onConfirmDeleteMember = () => {
-    dispatch(
+  const onConfirmDeleteMember = async () => {
+    const { meta } = await dispatch(
       BookerManageCompany.updateGroup({
         groupId,
         deletedMembers: [deletingMemberInfo],
       }),
-    ).then(({ error }: any) => {
-      if (!error) {
-        closeDeleteMemberConfirmationModal();
-      }
-    });
+    );
+    if (meta.requestStatus !== 'rejected') {
+      closeDeleteMemberConfirmationModal();
+      await dispatch(
+        BookerManageCompany.groupDetailInfo({
+          groupId: groupId as string,
+        }),
+      );
+    }
   };
 
   const onConfirmDeleteGroup = () => {
