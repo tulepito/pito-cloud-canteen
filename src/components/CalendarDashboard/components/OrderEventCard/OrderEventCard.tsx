@@ -1,6 +1,6 @@
 import Tooltip from '@components/Tooltip/Tooltip';
+import { isOver } from '@helpers/orderHelper';
 import classNames from 'classnames';
-import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
 
 import { EVENT_STATUS } from '../../helpers/constant';
@@ -17,12 +17,7 @@ export type TOrderEventCardProps = {
 
 const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event, index }) => {
   const status = event.resource?.status;
-
-  const today = new Date();
-  const expiredTime = DateTime.fromJSDate(event.resource?.expiredTime)
-    .plus({ day: 1 })
-    .toJSDate();
-  const isExpired = expiredTime < today;
+  const isExpired = isOver(event.resource?.expiredTime);
   const eventStatus = isExpired ? EVENT_STATUS.EXPIRED_STATUS : status;
 
   return (

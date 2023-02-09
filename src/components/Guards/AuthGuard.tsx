@@ -24,19 +24,19 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   );
   const user = useAppSelector(currentUserSelector);
 
-  const { pathname: pathName } = router;
+  const { pathname, asPath: fullPath } = router;
   const {
     id: userId,
     attributes: { emailVerified: isUserEmailVerified },
   } = user;
 
   const isNonRequireAuthenticationRoute =
-    NonRequireAuthenticationRoutes.includes(pathName);
+    NonRequireAuthenticationRoutes.includes(pathname);
 
-  const isIgnoredAuthCheckRoute = IgnoredAuthCheckRoutes.includes(pathName);
+  const isIgnoredAuthCheckRoute = IgnoredAuthCheckRoutes.includes(pathname);
 
   // TODO: check sign up path and consider showing verification email form or not
-  const isSignUpPath = pathName === generalPaths.SignUp;
+  const isSignUpPath = pathname === generalPaths.SignUp;
   const shouldShowEmailVerification = !!userId && !isUserEmailVerified;
   const shouldNavigateInSignUpFlow =
     isSignUpPath && !shouldShowEmailVerification;
@@ -56,7 +56,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
         router.push(generalPaths.Home);
       }
     } else if (!isAuthenticated) {
-      router.push(generalPaths.SignIn);
+      router.push({ pathname: generalPaths.SignIn, query: { from: fullPath } });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -65,7 +65,8 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     isAuthenticated,
     isIgnoredAuthCheckRoute,
     isNonRequireAuthenticationRoute,
-    pathName,
+    pathname,
+    fullPath,
   ]);
 
   const renderComponent = () => {
@@ -91,7 +92,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
 
   useEffect(() => {
     dispatch(authThunks.authInfo());
-  }, [dispatch, pathName]);
+  }, [dispatch, pathname]);
 
   useEffect(() => {
     if (isAuthenticated) {

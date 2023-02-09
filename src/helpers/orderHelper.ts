@@ -11,11 +11,14 @@ export const isJoinedPlan = (
   return foodId !== '' && status === EParticipantOrderStatus.joined;
 };
 
-export const isOverDeadline = (order: TListing) => {
-  const currentTime = new Date().getTime();
-  const { deadlineDate = 0 } = Listing(order).getMetadata();
+export const isOver = (deadline = 0) => {
+  return new Date().getTime() > deadline;
+};
 
-  return currentTime >= deadlineDate;
+export const isOrderOverDeadline = (order: TListing) => {
+  const { deadlineDate } = Listing(order).getMetadata();
+
+  return isOver(deadlineDate);
 };
 
 export const findMinStartDate = () => {
