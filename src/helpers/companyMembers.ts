@@ -30,7 +30,7 @@ export const calculateGroupMembers = (
 
 export const calculateGroupMembersAmount = (
   companyAccount: TUser,
-  groupList: string[],
+  groupList: string[] = [],
 ) => {
   return calculateGroupMembers(companyAccount, groupList).length;
 };

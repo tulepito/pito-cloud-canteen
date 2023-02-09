@@ -126,10 +126,14 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   };
 
   const handleRestaurantClick = (restaurant: any) => () => {
-    const { restaurantInfo } = restaurant;
-    const restaurantId = Listing(restaurantInfo).getId();
+    const { restaurantInfo, menu } = restaurant;
 
-    dispatch(selectRestaurantPageThunks.getRestaurantFood(restaurantId));
+    dispatch(
+      selectRestaurantPageThunks.getRestaurantFood({
+        dateTime,
+        menuId: Listing(menu).getId(),
+      }),
+    );
     setCurrentRestaurant(restaurantInfo);
     setModalOpen(true);
   };
