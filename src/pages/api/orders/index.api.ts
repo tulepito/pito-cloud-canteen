@@ -1,3 +1,4 @@
+import { HttpMethod } from '@apis/configs';
 import {
   calculateGroupMembers,
   getAllCompanyMembers,
@@ -16,16 +17,14 @@ import { EOrderStates } from '@utils/enums';
 import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { HTTP_METHODS } from '../helpers/constants';
-
 const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
   const integrationSdk = getIntegrationSdk();
   switch (apiMethod) {
-    case HTTP_METHODS.GET:
+    case HttpMethod.GET:
       break;
-    case HTTP_METHODS.POST:
+    case HttpMethod.POST:
       try {
         const { companyId, bookerId } = req.body;
         const adminAccount = await getAdminAccount();
@@ -72,7 +71,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         handleError(res, error);
       }
       break;
-    case HTTP_METHODS.PUT:
+
+    case HttpMethod.PUT:
       try {
         const { orderId, generalInfo, orderDetail } = req.body;
         const orderListing = await fetchListing(orderId);
@@ -191,7 +191,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         handleError(res, error);
       }
       break;
-    case HTTP_METHODS.DELETE:
+    case HttpMethod.DELETE:
       break;
 
     default:

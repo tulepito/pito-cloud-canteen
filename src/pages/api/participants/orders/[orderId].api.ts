@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
+import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import {
@@ -10,7 +11,7 @@ import {
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import type { TListing } from '../../../../utils/types';
-import { HTTP_METHODS, LISTING_TYPE } from '../../helpers/constants';
+import { LISTING_TYPE } from '../../helpers/constants';
 
 const fetchSubOrder = async (orderDetail: any) => {
   let orderDetailResult = {};
@@ -52,7 +53,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const sdk = getSdk(req, res);
 
   switch (apiMethod) {
-    case HTTP_METHODS.GET: {
+    case HttpMethod.GET: {
       const { orderId } = req.query;
       if (!orderId) {
         return res.status(400).json({
@@ -120,7 +121,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     }
 
-    case HTTP_METHODS.POST: {
+    case HttpMethod.POST: {
       const { planId, memberOrders, orderDay, orderDays, planData } = req.body;
 
       try {

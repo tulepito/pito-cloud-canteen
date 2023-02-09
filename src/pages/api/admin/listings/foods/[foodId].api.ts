@@ -1,36 +1,78 @@
 /* eslint-disable no-console */
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import cookies from '@services/cookie';
-import { deserialize, getIntegrationSdk, handleError } from '@services/sdk';
+import { HttpMethod } from '@apis/configs';
+import { getIntegrationSdk, handleError } from '@services/sdk';
+import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
-    if (
-      req.headers['content-type'] === 'application/transit+json' &&
-      typeof req.body === 'string'
-    ) {
-      try {
-        req.body = deserialize(req.body);
-      } catch (e) {
-        console.error('Failed to parse request body as Transit:');
-        console.error(e);
-        res.status(400).send('Invalid Transit in request body.');
-        return;
-      }
+    const apiMethod = req.method;
+    const integrationSdk = getIntegrationSdk();
+
+    switch (apiMethod) {
+      case HttpMethod.GET:
+        {
+          const { foodId, JSONParams } = req.query;
+          const { dataParams = {}, queryParams = {} } = JSON.parse(
+            JSONParams as string,
+          );
+          const response = await integrationSdk.listings.show(
+            { id: foodId, ...dataParams },
+            queryParams,
+          );
+
+          res.json(response);
+        }
+        break;
+
+      case HttpMethod.POST:
+        break;
+
+      case HttpMethod.PUT:
+        {
+          const { dataParams = {}, queryParams = {} } = req.body;
+          const response = await integrationSdk.listings.update(
+            dataParams,
+            queryParams,
+          );
+
+          res.json(response);
+        }
+        break;
+
+      case HttpMethod.DELETE:
+        {
+          const { foodId } = req.query;
+          const { dataParams = {}, queryParams = {} } = req.body;
+          const { ids = [] } = dataParams;
+
+          const updateFoodFn = (_id: string) =>
+            integrationSdk.listings.update(
+              {
+                id: _id,
+                metadata: {
+                  isDeleted: true,
+                },
+              },
+              queryParams,
+            );
+
+          const response = isEmpty(ids)
+            ? await updateFoodFn(foodId as string)
+            : await Promise.all(ids.map(updateFoodFn));
+
+          res.json(response);
+        }
+        break;
+
+      default:
+        break;
     }
-    const { dataParams = {}, queryParams = {} } = req.body;
-    const { foodId } = req.query;
-    const intergrationSdk = getIntegrationSdk();
-    const response = await intergrationSdk.listings.show(
-      { id: foodId, ...dataParams },
-      queryParams,
-    );
-    res.json(response);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     handleError(res, error);
   }
 }
 
-export default cookies(handler);
+export default handler;

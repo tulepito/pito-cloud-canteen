@@ -91,8 +91,8 @@ const REQUEST_AVATAR_UPLOAD =
 const REQUEST_BUSINESS_LICENSE_UPLOAD =
   'app/CreateAndEditPartnerPage/REQUEST_BUSINESS_LICENSE_UPLOAD';
 
-const REQUEST_FOOR_CERTIFICATE_UPLOAD =
-  'app/CreateAndEditPartnerPage/REQUEST_FOOR_CERTIFICATE_UPLOAD';
+const REQUEST_FOOD_CERTIFICATE_UPLOAD =
+  'app/CreateAndEditPartnerPage/REQUEST_FOOD_CERTIFICATE_UPLOAD';
 
 const REQUEST_PARTY_INSURANCE_UPLOAD =
   'app/CreateAndEditPartnerPage/REQUEST_PARTY_INSURANCE_UPLOAD';
@@ -156,7 +156,7 @@ const requestAvatarUpload = createAsyncThunk(
       const img = response.data.data;
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return rejectWithValue({ id, error: storableError(error) });
     }
   },
@@ -209,14 +209,14 @@ const requestBusinessLicenseUpload = createAsyncThunk(
       const img = response.data.data;
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return rejectWithValue({ id, error: storableError(error) });
     }
   },
 );
 
 const requestFoodCertificateUpload = createAsyncThunk(
-  REQUEST_FOOR_CERTIFICATE_UPLOAD,
+  REQUEST_FOOD_CERTIFICATE_UPLOAD,
   async (payload: any, { extra: sdk, fulfillWithValue, rejectWithValue }) => {
     const { file, id } = payload || {};
     try {
@@ -234,7 +234,7 @@ const requestFoodCertificateUpload = createAsyncThunk(
       const img = response.data.data;
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return rejectWithValue({ id, error: storableError(error) });
     }
   },
@@ -259,7 +259,7 @@ const requestPartyInsuranceUpload = createAsyncThunk(
       const img = response.data.data;
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return rejectWithValue({ id, error: storableError(error) });
     }
   },
@@ -275,7 +275,7 @@ const publishDraftPartner = createAsyncThunk(
       const [restaurant] = denormalisedResponseEntities(listing);
       return fulfillWithValue({ restaurant, partner });
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return rejectWithValue(storableError(error));
     }
   },
@@ -291,7 +291,7 @@ const discardDraftPartner = createAsyncThunk(
       const [restaurant] = denormalisedResponseEntities(listing);
       return fulfillWithValue({ restaurant, partner });
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return rejectWithValue(storableError(error));
     }
   },

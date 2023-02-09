@@ -1,10 +1,5 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import {
-  createPartnerFoodApi,
-  deletePartnerFoodApi,
-  showPartnerFoodApi,
-  updatePartnerFoodApi,
-} from '@apis/foodApi';
+import { partnerFoodApi } from '@apis/foodApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { getImportDataFromCsv } from '@src/pages/admin/partner/[restaurantId]/settings/food/utils';
@@ -15,6 +10,7 @@ import type {
   TImage,
   TIntegrationListing,
   TListing,
+  TObject,
   TPagination,
 } from '@utils/types';
 import omit from 'lodash/omit';
@@ -157,7 +153,7 @@ const createPartnerFoodListing = createAsyncThunk(
   CREATE_PARTNER_FOOD_LISTING,
   async (payload: any, { rejectWithValue }) => {
     try {
-      const { data } = await createPartnerFoodApi({
+      const { data } = await partnerFoodApi.createFood({
         dataParams: payload,
         queryParams: {},
       });
@@ -209,7 +205,7 @@ const duplicateFood = createAsyncThunk(
       );
 
       const newImages = uploadRes.map((res) => res.data.data.id);
-      const { data } = await createPartnerFoodApi({
+      const { data } = await partnerFoodApi.createFood({
         dataParams: { ...payload, images: newImages },
         queryParams: {},
       });
@@ -223,7 +219,7 @@ const duplicateFood = createAsyncThunk(
 
 const updatePartnerFoodListing = createAsyncThunk(
   UPDATE_PARTNER_FOOD_LISTING,
-  async (payload: any, { rejectWithValue }) => {
+  async (payload: TObject, { rejectWithValue }) => {
     try {
       const dataParams = {
         ...payload,
@@ -233,7 +229,10 @@ const updatePartnerFoodListing = createAsyncThunk(
         'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
         expand: true,
       };
-      const { data } = await updatePartnerFoodApi({ dataParams, queryParams });
+      const { data } = await partnerFoodApi.updateFood(dataParams.id, {
+        dataParams,
+        queryParams,
+      });
       const [food] = denormalisedResponseEntities(data);
       return food;
     } catch (error) {
@@ -243,7 +242,7 @@ const updatePartnerFoodListing = createAsyncThunk(
   },
 );
 
-const creataPartnerFoodFromCsv = createAsyncThunk(
+const createPartnerFoodFromCsv = createAsyncThunk(
   CREATE_FOOD_FROM_FILE,
   async (
     { file, restaurantId }: { file: File; restaurantId: string },
@@ -299,7 +298,7 @@ const creataPartnerFoodFromCsv = createAsyncThunk(
               const queryParams = {
                 expand: true,
               };
-              const { data } = await createPartnerFoodApi({
+              const { data } = await partnerFoodApi.createFood({
                 dataParams,
                 queryParams,
               });
@@ -320,7 +319,7 @@ const showPartnerFoodListing = createAsyncThunk(
   SHOW_PARTNER_FOOD_LISTING,
   async (id: any, { rejectWithValue, fulfillWithValue }) => {
     try {
-      const { data } = await showPartnerFoodApi(id, {
+      const { data } = await partnerFoodApi.showFood(id, {
         dataParams: {
           include: ['images'],
           'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
@@ -340,14 +339,16 @@ const showPartnerFoodListing = createAsyncThunk(
 
 const removePartnerFood = createAsyncThunk(
   REMOVE_PARTNER_FOOD_LISTING,
-  async (payload: any, { rejectWithValue }) => {
+  async (payload: TObject, { rejectWithValue }) => {
     try {
-      const { data } = await deletePartnerFoodApi({
+      const { id = '' } = payload;
+      const { data } = await partnerFoodApi.deleteFood(id, {
         dataParams: {
           ...payload,
         },
         queryParams: {},
       });
+
       return data;
     } catch (error) {
       console.error(`${REMOVE_PARTNER_FOOD_LISTING} error: `, error);
@@ -360,7 +361,7 @@ const showDuplicateFood = createAsyncThunk(
   SHOW_DUPLICATE_FOOD,
   async (id: any) => {
     try {
-      const { data } = await showPartnerFoodApi(id, {
+      const { data } = await partnerFoodApi.showFood(id, {
         dataParams: {
           include: ['images'],
           'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
@@ -387,7 +388,7 @@ export const foodSliceThunks = {
   removePartnerFood,
   showDuplicateFood,
   duplicateFood,
-  creataPartnerFoodFromCsv,
+  creataPartnerFoodFromCsv: createPartnerFoodFromCsv,
 };
 
 // ================ Slice ================ //
@@ -563,13 +564,13 @@ const foodSlice = createSlice({
         createFoodInProgress: false,
         createFoodError: payload,
       }))
-      .addCase(creataPartnerFoodFromCsv.pending, (state) => ({
+      .addCase(createPartnerFoodFromCsv.pending, (state) => ({
         ...state,
         createPartnerFoodFromCsvInProgress: true,
         createPartnerFoodFromCsvError: null,
       }))
       .addCase(
-        creataPartnerFoodFromCsv.fulfilled,
+        createPartnerFoodFromCsv.fulfilled,
         (state, { payload = [] }) => ({
           ...state,
           createPartnerFoodFromCsvInProgress: false,
@@ -580,7 +581,7 @@ const foodSlice = createSlice({
           ],
         }),
       )
-      .addCase(creataPartnerFoodFromCsv.rejected, (state, { payload }) => ({
+      .addCase(createPartnerFoodFromCsv.rejected, (state, { payload }) => ({
         ...state,
         createPartnerFoodFromCsvInProgress: false,
         createPartnerFoodFromCsvError: payload,

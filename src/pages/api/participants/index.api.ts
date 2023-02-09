@@ -1,12 +1,11 @@
+import { HttpMethod } from '@apis/configs';
 import type { NextApiRequest, NextApiResponse } from 'next';
-
-import { HTTP_METHODS } from '../helpers/constants';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
 
   switch (apiMethod) {
-    case HTTP_METHODS.GET:
+    case HttpMethod.GET:
       return res.send('Hello participant order API');
     default:
       break;

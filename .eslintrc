@@ -8,11 +8,10 @@
   "rules": {
     "consistent-return": "off",
     "no-param-reassign": [
-      "warn",
+      "off",
       { "props": true, "ignorePropertyModificationsFor": ["state"] }
     ],
-    "no-nested-ternary": "off",
-    "no-console": "off"
+    "no-nested-ternary": "off"
   },
   "overrides": [
     // Configuration for TypeScript files

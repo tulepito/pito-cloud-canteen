@@ -1,21 +1,22 @@
+import { HttpMethod } from '@apis/configs';
 import { getIntegrationSdk } from '@services/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { denormalisedResponseEntities } from '../../../utils/data';
-import { HTTP_METHODS, LISTING_TYPE } from '../helpers/constants';
+import { LISTING_TYPE } from '../helpers/constants';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
   const integrationSdk = getIntegrationSdk();
 
   switch (apiMethod) {
-    case HTTP_METHODS.GET: {
+    case HttpMethod.GET: {
       return res.json({
         msg: 'Hello babe',
       });
       break;
     }
-    case HTTP_METHODS.POST: {
+    case HttpMethod.POST: {
       try {
         const { restaurantId, title, description } = req.body;
 

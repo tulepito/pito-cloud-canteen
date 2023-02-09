@@ -1,6 +1,6 @@
+import { HttpMethod } from '@apis/configs';
 import { fetchListing } from '@services/integrationHelper';
 import { getSdk, handleError } from '@services/sdk';
-import { HTTP_METHODS } from '@src/pages/api/helpers/constants';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, LISTING, USER } from '@utils/data';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
@@ -14,10 +14,10 @@ const orderChecker =
       const { companyId, orderId } = req.body;
       const apiMethod = req.method;
       const [currentUser] = denormalisedResponseEntities(currentUserResponse);
-      const { isAdmin = false } = USER(currentUser).getMetadata();
-      const { company = {} } = USER(currentUser).getMetadata();
+      const { isAdmin = false, company = {} } = USER(currentUser).getMetadata();
+
       switch (apiMethod) {
-        case HTTP_METHODS.POST: {
+        case HttpMethod.POST: {
           if (!companyId) {
             return res.status(403).json({
               message: 'Missing required key',
@@ -36,7 +36,7 @@ const orderChecker =
           }
           break;
         }
-        case HTTP_METHODS.PUT: {
+        case HttpMethod.PUT: {
           if (!orderId) {
             return res.status(403).json({
               message: 'Missing required key',

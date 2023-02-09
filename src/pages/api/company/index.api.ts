@@ -1,3 +1,4 @@
+import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import companyChecker from '@services/permissionChecker/company';
@@ -8,11 +9,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const apiMethod = req.method;
   switch (apiMethod) {
-    case 'GET':
+    case HttpMethod.GET:
       break;
-    case 'POST':
+    case HttpMethod.POST:
       break;
-    case 'PUT':
+    case HttpMethod.PUT:
       try {
         const { dataParams, queryParams } = req.body;
         const integrationSdk = getIntegrationSdk();
@@ -29,7 +30,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       }
 
       break;
-    case 'DELETE':
+    case HttpMethod.DELETE:
       break;
 
     default:

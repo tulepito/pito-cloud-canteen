@@ -1,4 +1,4 @@
-import { HTTP_METHODS } from '@pages/api/helpers/constants';
+import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -22,8 +22,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const integrationSdk = getIntegrationSdk();
   const companyAccount = await fetchUser(companyId);
   const apiMethod = req.method;
+
   switch (apiMethod) {
-    case HTTP_METHODS.POST:
+    case HttpMethod.POST:
       try {
         const { groups = [], members = {} } =
           USER(companyAccount).getMetadata();
@@ -78,7 +79,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         handleError(res, error);
       }
       break;
-    case HTTP_METHODS.PUT:
+    case HttpMethod.PUT:
       {
         const { addedMembers = [], deletedMembers = [] } = req.body;
         const { groups = [], members = {} } =
@@ -166,7 +167,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         res.status(200).json(updatedCompanyAccount);
       }
       break;
-    case HTTP_METHODS.DELETE:
+    case HttpMethod.DELETE:
       try {
         const { groups = [], members = {} } =
           USER(companyAccount).getMetadata();

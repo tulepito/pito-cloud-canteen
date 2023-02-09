@@ -1,3 +1,4 @@
+import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
@@ -11,9 +12,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
   const apiMethod = req.method;
   switch (apiMethod) {
-    case 'GET':
+    case HttpMethod.GET:
       break;
-    case 'POST':
+    case HttpMethod.POST:
       try {
         const {
           query: { orderId = '' },
@@ -107,9 +108,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         handleError(res, error);
       }
       break;
-    case 'PUT':
+    case HttpMethod.PUT:
       break;
-    case 'DELETE':
+    case HttpMethod.DELETE:
       try {
         const {
           query: { orderId = '' },

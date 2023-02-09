@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
+import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import {
   CURRENT_USER,
@@ -10,7 +11,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { getIntegrationSdk } from '../../../../services/integrationSdk';
 import { getSdk, handleError } from '../../../../services/sdk';
-import { HTTP_METHODS } from '../../helpers/constants';
 
 const fetchSubOrder = async (orderDetail: any, currentUserId: string) => {
   let orderDetailResult = {};
@@ -64,7 +64,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const sdk = getSdk(req, res);
 
   switch (apiMethod) {
-    case HTTP_METHODS.GET:
+    case HttpMethod.GET:
       {
         const { planId } = req.query;
 

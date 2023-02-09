@@ -1,20 +1,29 @@
 import type { TObject } from '@utils/types';
 
 import type { TBodyParams } from './configs';
-import { postApi } from './configs';
+import { getApi, postApi } from './configs';
 
-export const showPartnerFoodApi = (id: string, queryParams: TObject) => {
-  return postApi(`/admin/listings/foods/${id}`, queryParams);
+const baseUrl = '/admin/listings/foods';
+
+const showFood = (id: string, queryParams: TObject) => {
+  return getApi(`${baseUrl}/${id}`, queryParams);
 };
 
-export const createPartnerFoodApi = (body: TBodyParams) => {
-  return postApi(`/admin/listings/foods/create`, body);
+const createFood = (body: TBodyParams) => {
+  return postApi(`${baseUrl}`, body);
 };
 
-export const updatePartnerFoodApi = (body: TBodyParams) => {
-  return postApi(`/admin/listings/foods/update`, body);
+const updateFood = (foodId: string, body: TBodyParams) => {
+  return postApi(`${baseUrl}/${foodId}`, body);
 };
 
-export const deletePartnerFoodApi = (body: TBodyParams) => {
-  return postApi(`/admin/listings/foods/delete`, body);
+const deleteFood = (foodId: string, body: TBodyParams) => {
+  return postApi(`${baseUrl}/${foodId}`, body);
+};
+
+export const partnerFoodApi = {
+  showFood,
+  createFood,
+  updateFood,
+  deleteFood,
 };

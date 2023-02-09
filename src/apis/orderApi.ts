@@ -50,23 +50,6 @@ type UpdateOrderApiBody = {
 export const updateOrderApi = (body: UpdateOrderApiBody) =>
   putApi('/orders', body);
 
-type AddMealPlanDetailApiBody = {
-  orderId: string;
-};
-export const addMealPlanDetailApi = (body: AddMealPlanDetailApiBody) =>
-  postApi('/orders/plan', body);
-
-type UpdateMealPlanDetailApiBody = {
-  planId: string;
-  orderDetail: {
-    [date: string]: {
-      restaurant: string; // restaurant listing id
-    };
-  };
-};
-export const updateMealPlanDetailApi = (body: UpdateMealPlanDetailApiBody) =>
-  putApi('/orders/plan', body);
-
 type CompleteOrderApiBody = {
   orderId: string;
   planId: string;
@@ -94,5 +77,5 @@ export const sendRemindEmailToMemberApi = (orderId: string, body: TObject) =>
   postApi(`/orders/${orderId}/remind-member`, body);
 
 export const queryOrdersApi = (body: TBodyParams) => {
-  return postApi(`/admin/listings/order/query`, body);
+  return getApi(`/admin/listings/order`, body);
 };

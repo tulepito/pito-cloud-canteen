@@ -1,3 +1,4 @@
+import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
@@ -8,10 +9,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const integrationSdk = getIntegrationSdk();
-
   const apiMethod = req.method;
+
   switch (apiMethod) {
-    case 'GET':
+    case HttpMethod.GET:
       try {
         const { orderId } = req.query;
         const orderResponse = await integrationSdk.listings.show({
@@ -60,7 +61,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         handleError(res, error);
       }
       break;
-    case 'POST':
+    case HttpMethod.POST:
       try {
         const {
           query: { orderId },
@@ -79,9 +80,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         handleError(res, error);
       }
       break;
-    case 'PUT':
+    case HttpMethod.PUT:
       break;
-    case 'DELETE':
+    case HttpMethod.DELETE:
       break;
     default:
       break;
