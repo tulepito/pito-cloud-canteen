@@ -16,19 +16,23 @@ import MealPlanCardHeader from './MealPlanCardHeader';
 type TMealPlanCardProps = {
   event: Event;
   index: number;
+  onRemove?: (id: string) => void;
 };
 
-const MealPlanCard: React.FC<TMealPlanCardProps> = ({ event }) => {
+const MealPlanCard: React.FC<TMealPlanCardProps> = ({ event, onRemove }) => {
   const dispatch = useAppDispatch();
   const { orderDetail } = useAppSelector(
     (state) => state.Order.draftOrder,
     shallowEqual,
   );
-  const removeEventItem = (resourceId: string) => {
-    const cloneOrderDetail = clone(orderDetail);
-    delete cloneOrderDetail[resourceId];
-    dispatch(removeMealDay(cloneOrderDetail));
-  };
+
+  const removeEventItem =
+    onRemove ||
+    ((resourceId: string) => {
+      const cloneOrderDetail = clone(orderDetail);
+      delete cloneOrderDetail[resourceId];
+      dispatch(removeMealDay(cloneOrderDetail));
+    });
 
   const onEditMeal = (date: Date) => {
     dispatch(selectCalendarDate(date));

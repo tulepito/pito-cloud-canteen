@@ -1,9 +1,9 @@
 import { fetchUserApi } from '@apis/index';
 import {
-  createOrderApi,
-  initiateTransactionsApi,
+  createBookerOrderApi,
   queryOrdersApi,
-  updateOrderApi,
+  updateBookerOrderApi,
+  updatePlanDetailsApi,
 } from '@apis/orderApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
@@ -81,6 +81,7 @@ const FETCH_ORDER = 'app/Order/FETCH_ORDER';
 const FETCH_ORDER_DETAIL = 'app/Order/FETCH_ORDER_DETAIL';
 const INITIATE_TRANSACTIONS = 'app/Order/INITIATE_TRANSACTIONS';
 const QUERY_SUB_ORDERS = 'app/Order/QUERY_SUB_ORDERS';
+const UPDATE_PLAN_DETAIL = 'app/Order/UPDATE_PLAN_DETAIL';
 
 const initialState: TOrderInitialState = {
   order: null,
@@ -131,24 +132,45 @@ const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
     companyId: clientId,
     bookerId,
   };
-  const { data: orderListing } = await createOrderApi(apiBody);
+  const { data: orderListing } = await createBookerOrderApi(apiBody);
   return orderListing;
 });
+
+const fetchOrder = createAsyncThunk(
+  FETCH_ORDER,
+  async (orderId: string, { extra: sdk }) => {
+    const response = denormalisedResponseEntities(
+      await sdk.listings.show({
+        id: orderId,
+      }),
+    )[0];
+
+    const { bookerId } = LISTING(response).getMetadata();
+    const selectedBooker = denormalisedResponseEntities(
+      await sdk.users.show({
+        id: bookerId,
+      }),
+    )[0];
+    return { order: response, selectedBooker };
+  },
+);
 
 const updateOrder = createAsyncThunk(
   UPDATE_ORDER,
   async (params: any, { getState }) => {
     const { order } = getState().Order;
     const orderId = LISTING(order as TListing).getId();
-    const { data: orderListing } = await updateOrderApi({ ...params, orderId });
+    const { data: orderListing } = await updateBookerOrderApi(orderId, {
+      ...params,
+    });
     return orderListing;
   },
 );
 
 const initiateTransactions = createAsyncThunk(
   INITIATE_TRANSACTIONS,
-  async (params: any) => {
-    await initiateTransactionsApi(params);
+  async (_) => {
+    // await initiateTransactionsApi(params);
     return '';
   },
 );
@@ -218,22 +240,15 @@ const fetchOrderDetail = createAsyncThunk(
   },
 );
 
-const fetchOrder = createAsyncThunk(
-  FETCH_ORDER,
-  async (orderId: string, { extra: sdk }) => {
-    const response = denormalisedResponseEntities(
-      await sdk.listings.show({
-        id: orderId,
-      }),
-    )[0];
-
-    const { bookerId } = LISTING(response).getMetadata();
-    const selectedBooker = denormalisedResponseEntities(
-      await sdk.users.show({
-        id: bookerId,
-      }),
-    )[0];
-    return { order: response, selectedBooker };
+const updatePlanDetail = createAsyncThunk(
+  UPDATE_PLAN_DETAIL,
+  async ({ orderId, planId, orderDetail, updateMode }: any, _) => {
+    const { data: orderListing } = await updatePlanDetailsApi(orderId, {
+      orderDetail,
+      planId,
+      updateMode,
+    });
+    return orderListing;
   },
 );
 
@@ -245,6 +260,7 @@ export const OrderAsyncAction = {
   fetchOrder,
   initiateTransactions,
   queryOrders,
+  updatePlanDetail,
 };
 
 const orderSlice = createSlice({
@@ -429,6 +445,21 @@ const orderSlice = createSlice({
         ...state,
         fetchOrderDetailInProgress: false,
         fetchOrderDetailError: error.message,
+      }))
+      .addCase(updatePlanDetail.pending, (state) => ({
+        ...state,
+        updateOrderDetailInProgress: true,
+        updateOrderDetailError: null,
+      }))
+      .addCase(updatePlanDetail.fulfilled, (state, { payload }) => ({
+        ...state,
+        updateOrderDetailInProgress: false,
+        orderDetail: LISTING(payload).getMetadata().orderDetail || {},
+      }))
+      .addCase(updatePlanDetail.rejected, (state, { error }) => ({
+        ...state,
+        updateOrderDetailInProgress: false,
+        updateOrderDetailError: error.message,
       }));
   },
 });

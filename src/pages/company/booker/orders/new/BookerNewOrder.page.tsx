@@ -34,6 +34,7 @@ function BookerNewOrderPage() {
         }),
       );
       const newOrderId = newOrder?.payload?.id?.uuid;
+
       route.push(`/company/booker/orders/draft/${newOrderId}`);
     } catch (error) {
       console.log('error', error);
