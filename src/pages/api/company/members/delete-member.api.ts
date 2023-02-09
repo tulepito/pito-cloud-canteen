@@ -26,7 +26,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       );
       return {
         ...group,
-        memberEmail: newGroupMembers,
+        members: newGroupMembers,
       };
     });
 
