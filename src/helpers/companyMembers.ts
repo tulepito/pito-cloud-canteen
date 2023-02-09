@@ -14,7 +14,7 @@ export const calculateGroupMembers = (
   companyAccount: TUser,
   groupList: string[],
 ) => {
-  const { groups } = USER(companyAccount).getMetadata();
+  const { groups = [] } = USER(companyAccount).getMetadata();
 
   if (groupList.includes('allMembers')) {
     return getAllCompanyMembers(companyAccount);
@@ -30,7 +30,7 @@ export const calculateGroupMembers = (
 
 export const calculateGroupMembersAmount = (
   companyAccount: TUser,
-  groupList: string[],
+  groupList: string[] = [],
 ) => {
   return calculateGroupMembers(companyAccount, groupList).length;
 };
