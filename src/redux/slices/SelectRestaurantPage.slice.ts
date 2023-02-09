@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { ListingTypes } from '@src/types/listingTypes';
-import { denormalisedResponseEntities, LISTING } from '@utils/data';
+import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { convertWeekDay } from '@utils/dates';
 import type { TListing, TPagination } from '@utils/types';
 
@@ -54,7 +54,7 @@ const getRestaurants = createAsyncThunk(
     const menuList = denormalisedResponseEntities(response);
     const restaurantList = await Promise.all(
       menuList.map(async (menu: TListing) => {
-        const { restaurantId } = LISTING(menu).getMetadata();
+        const { restaurantId } = Listing(menu).getMetadata();
         const restaurantResponse = await sdk.listings.show({
           id: restaurantId,
         });

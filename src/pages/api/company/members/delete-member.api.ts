@@ -4,7 +4,7 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import companyChecker from '@services/permissionChecker/company';
 import { handleError } from '@services/sdk';
 import type { TCompanyGroup } from '@src/types/companyGroup';
-import { denormalisedResponseEntities, USER } from '@utils/data';
+import { denormalisedResponseEntities, User } from '@utils/data';
 import compact from 'lodash/compact';
 import difference from 'lodash/difference';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -14,7 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { memberEmail = '', companyId = '' } = req.body;
     const companyAccount = await fetchUser(companyId);
-    const { members = {}, groups = [] } = USER(companyAccount).getMetadata();
+    const { members = {}, groups = [] } = User(companyAccount).getMetadata();
 
     // Step delete email in members
     delete members[memberEmail];
@@ -53,12 +53,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         company = {},
         companyList = [],
         groupList,
-      } = USER(memberAccount).getMetadata();
+      } = User(memberAccount).getMetadata();
       const newGroupList = difference(groupList, groupListMemberJoined);
       delete company[companyId];
       const newCompanyList = difference(companyList, [companyId]);
       await integrationSdk.users.updateProfile({
-        id: USER(memberAccount).getId(),
+        id: User(memberAccount).getId(),
         metadata: {
           company,
           companyList: newCompanyList,

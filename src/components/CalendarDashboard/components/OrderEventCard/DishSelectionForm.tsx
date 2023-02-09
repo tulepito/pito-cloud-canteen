@@ -13,6 +13,7 @@ type TDishSelectionFormProps = {
   }[];
   onSubmit: (values: TDishSelectionFormValues, reject?: boolean) => void;
   initialValues: TDishSelectionFormValues;
+  actionsDisabled: boolean;
 };
 
 export type TDishSelectionFormValues = {
@@ -31,6 +32,7 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
   dishes,
   onSubmit,
   initialValues,
+  actionsDisabled = false,
 }) => {
   const [clickedType, setClickedType] = useState<
     'reject' | 'submit' | undefined
@@ -56,8 +58,9 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
   };
 
   const dishSelection = useField('dishSelection', form);
-  const disabledSubmit = submitting || hasValidationErrors;
-  const disabledRejectButton = updateOrderInProgress || updateOrderError;
+  const disabledSubmit = actionsDisabled || submitting || hasValidationErrors;
+  const disabledRejectButton =
+    actionsDisabled || updateOrderInProgress || updateOrderError;
 
   const rejectSubmitting = clickedType === 'reject' && updateOrderInProgress;
   const confirmSubmitting = clickedType === 'submit' && updateOrderInProgress;
@@ -72,6 +75,7 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
           <input
             {...dishSelection.input}
             className={css.radioInput}
+            disabled={actionsDisabled}
             type={'radio'}
             value={dish.key}
             defaultChecked={dish.key === initialValues.dishSelection}

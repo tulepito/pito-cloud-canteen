@@ -10,7 +10,7 @@ import {
   BookerManageCompany,
 } from '@redux/slices/company.slice';
 import { companyMemberThunks } from '@redux/slices/companyMember.slice';
-import { USER } from '@utils/data';
+import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
@@ -52,9 +52,9 @@ const GroupMemberDetailPage: React.FC<GroupMemberDetailPageProps> = () => {
   );
 
   const memberName =
-    USER(companyMember as TUser).getProfile()?.displayName || '---';
+    User(companyMember as TUser).getProfile()?.displayName || '---';
 
-  const memberEmail = USER(companyMember as TUser).getAttributes().email;
+  const memberEmail = User(companyMember as TUser).getAttributes().email;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -71,7 +71,7 @@ const GroupMemberDetailPage: React.FC<GroupMemberDetailPageProps> = () => {
   const onConfirmDeleteMember = useCallback(() => {
     dispatch(
       companyMemberThunks.deleteMember(
-        USER(companyMember!).getAttributes().email,
+        User(companyMember!).getAttributes().email,
       ),
     ).then(({ error }: any) => {
       if (!error) {
@@ -112,7 +112,7 @@ const GroupMemberDetailPage: React.FC<GroupMemberDetailPageProps> = () => {
           </span>
           <span className={css.content}>
             {getGroupNames(
-              USER(companyMember!).getMetadata()?.groups || [],
+              User(companyMember!).getMetadata()?.groups || [],
               groupList,
             )}
           </span>
@@ -129,14 +129,14 @@ const GroupMemberDetailPage: React.FC<GroupMemberDetailPageProps> = () => {
         </div>
         <div className={css.tableBody}>
           <div className={css.bodyCol}>
-            {USER(companyMember!)
+            {User(companyMember!)
               .getPublicData()
               ?.allergies?.map((allergyItem: string) => (
                 <div key={allergyItem}>{allergyItem}</div>
               ))}
           </div>
           <div className={css.bodyCol}>
-            {USER(companyMember!)
+            {User(companyMember!)
               .getPublicData()
               ?.nutritions?.map((nutritionItem: string) => (
                 <div key={nutritionItem}>{nutritionItem}</div>

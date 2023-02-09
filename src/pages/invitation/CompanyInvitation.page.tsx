@@ -8,7 +8,7 @@ import { companyInvitationThunks } from '@redux/slices/companyInvitation.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { generalPaths } from '@src/paths';
 import { UserInviteResponse } from '@src/types/UserPermission';
-import { USER } from '@utils/data';
+import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -94,7 +94,7 @@ const CompanyInvitationPage = () => {
     return (
       <div className={css.foodBackground}>
         <InvitationCard
-          companyName={USER(company as TUser).getPublicData().companyName}
+          companyName={User(company as TUser).getPublicData().companyName}
           onAccept={onResponseInvitation(UserInviteResponse.ACCEPT)}
           onDecline={onResponseInvitation(UserInviteResponse.DECLINE)}
           responseToInvitationInProgress={responseToInvitationInProgress}

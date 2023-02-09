@@ -8,7 +8,7 @@ import {
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { UserPermission } from '@src/types/UserPermission';
-import { denormalisedResponseEntities, LISTING, USER } from '@utils/data';
+import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import { storableError } from '@utils/errors';
 import type { TListing, TPagination } from '@utils/types';
 import cloneDeep from 'lodash/cloneDeep';
@@ -139,7 +139,7 @@ const updateOrder = createAsyncThunk(
   UPDATE_ORDER,
   async (params: any, { getState }) => {
     const { order } = getState().Order;
-    const orderId = LISTING(order as TListing).getId();
+    const orderId = Listing(order as TListing).getId();
     const { data: orderListing } = await updateOrderApi({ ...params, orderId });
     return orderListing;
   },
@@ -186,7 +186,7 @@ const fetchCompanyBookers = createAsyncThunk(
         { expand: true },
       ),
     )[0];
-    const { members = {} } = USER(companyAccount).getMetadata();
+    const { members = {} } = User(companyAccount).getMetadata();
     const bookerEmails = Object.keys(members).filter(
       (email) => members[email].permission === UserPermission.BOOKER,
     );
@@ -205,14 +205,14 @@ const fetchOrderDetail = createAsyncThunk(
   async (_, { getState, extra: sdk }) => {
     const { order } = getState().Order;
 
-    const { plans = [] } = LISTING(order as TListing).getMetadata();
+    const { plans = [] } = Listing(order as TListing).getMetadata();
     if (plans[0]) {
       const response = denormalisedResponseEntities(
         await sdk.listings.show({
           id: plans[0],
         }),
       )[0];
-      return LISTING(response).getMetadata().orderDetail;
+      return Listing(response).getMetadata().orderDetail;
     }
     return {};
   },
@@ -227,7 +227,7 @@ const fetchOrder = createAsyncThunk(
       }),
     )[0];
 
-    const { bookerId } = LISTING(response).getMetadata();
+    const { bookerId } = Listing(response).getMetadata();
     const selectedBooker = denormalisedResponseEntities(
       await sdk.users.show({
         id: bookerId,

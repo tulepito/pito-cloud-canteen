@@ -4,7 +4,7 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import companyChecker from '@services/permissionChecker/company';
 import { handleError } from '@services/sdk';
-import { denormalisedResponseEntities, USER } from '@utils/data';
+import { denormalisedResponseEntities, User } from '@utils/data';
 import { randomUUID } from 'crypto';
 import difference from 'lodash/difference';
 import differenceBy from 'lodash/differenceBy';
@@ -26,7 +26,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     case HTTP_METHODS.POST:
       try {
         const { groups = [], members = {} } =
-          USER(companyAccount).getMetadata();
+          User(companyAccount).getMetadata();
         const newGroupId = randomUUID();
         const newGroup = {
           id: newGroupId,
@@ -82,7 +82,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       {
         const { addedMembers = [], deletedMembers = [] } = req.body;
         const { groups = [], members = {} } =
-          USER(companyAccount).getMetadata();
+          User(companyAccount).getMetadata();
 
         const currentGroupIndex = groups.findIndex(
           (_group: any) => _group.id === groupId,
@@ -169,7 +169,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     case HTTP_METHODS.DELETE:
       try {
         const { groups = [], members = {} } =
-          USER(companyAccount).getMetadata();
+          User(companyAccount).getMetadata();
 
         const onDeletingGroup = groups.find(
           (_group: any) => _group.id === groupId,

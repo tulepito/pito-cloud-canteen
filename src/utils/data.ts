@@ -389,7 +389,7 @@ export const getListingsById = (state: any, listingIds: any[]) => {
  *
  * @param {Object} state the full Redux store
  *
- * @param {Array<{ id, type }} entityRefs References to entities that
+ * @param {Array<{ id, type }>} entityRefs References to entities that
  * we want to query from the data. Currently we expect that all the
  * entities have the same type.
  *
@@ -407,11 +407,12 @@ export const entityRefs = (entities: any) =>
     type: entity.type,
   }));
 
-export const CURRENT_USER = (user: TCurrentUser) => {
+export const CurrentUser = (user: TCurrentUser) => {
   const ensuredUser = ensureCurrentUser(user);
   const id = ensuredUser?.id?.uuid;
   const profile = ensuredUser?.attributes?.profile || {};
   const { privateData, publicData, protectedData, metadata } = profile;
+
   return {
     getId: () => {
       return id;
@@ -422,22 +423,22 @@ export const CURRENT_USER = (user: TCurrentUser) => {
     getProfile: () => {
       return profile || {};
     },
-    getMetadata: () => {
+    getMetadata: (): TObject => {
       return metadata || {};
     },
-    getProtectedData: () => {
+    getProtectedData: (): TObject => {
       return protectedData || {};
     },
-    getPrivateData: () => {
+    getPrivateData: (): TObject => {
       return privateData || {};
     },
-    getPublicData: () => {
+    getPublicData: (): TObject => {
       return publicData || {};
     },
   };
 };
 
-export const USER = (user: TUser | TCurrentUser) => {
+export const User = (user: TUser | TCurrentUser) => {
   const ensuredUser = ensureUser(user);
   const id = ensuredUser?.id?.uuid;
   const { attributes } = ensuredUser;
@@ -458,22 +459,22 @@ export const USER = (user: TUser | TCurrentUser) => {
     getProfile: () => {
       return profile || {};
     },
-    getMetadata: () => {
+    getMetadata: (): TObject => {
       return metadata || {};
     },
-    getProtectedData: () => {
+    getProtectedData: (): TObject => {
       return protectedData || {};
     },
-    getPrivateData: () => {
+    getPrivateData: (): TObject => {
       return privateData || {};
     },
-    getPublicData: () => {
+    getPublicData: (): TObject => {
       return publicData || {};
     },
   };
 };
 
-export const LISTING = (listing: TListing) => {
+export const Listing = (listing: TListing) => {
   const ensuredListing = ensureListing(listing);
   const id = ensuredListing?.id?.uuid;
   const attributes = ensuredListing?.attributes;
@@ -489,22 +490,22 @@ export const LISTING = (listing: TListing) => {
     getAttributes: () => {
       return attributes || {};
     },
-    getMetadata: () => {
+    getMetadata: (): TObject => {
       return metadata || {};
     },
-    getProtectedData: () => {
+    getProtectedData: (): TObject => {
       return protectedData || {};
     },
-    getPrivateData: () => {
+    getPrivateData: (): TObject => {
       return privateData || {};
     },
-    getPublicData: () => {
+    getPublicData: (): TObject => {
       return publicData || {};
     },
   };
 };
 
-export const OWN_LISTING = (listing: TOwnListing) => {
+export const OwnListing = (listing: TOwnListing) => {
   const ensuredListing = ensureOwnListing(listing);
   const id = ensuredListing?.id?.uuid;
   const attributes = ensuredListing?.attributes;
@@ -520,26 +521,27 @@ export const OWN_LISTING = (listing: TOwnListing) => {
     getAttributes: () => {
       return attributes || {};
     },
-    getMetadata: () => {
+    getMetadata: (): TObject => {
       return metadata || {};
     },
-    getProtectedData: () => {
+    getProtectedData: (): TObject => {
       return protectedData || {};
     },
-    getPrivateData: () => {
+    getPrivateData: (): TObject => {
       return privateData || {};
     },
-    getPublicData: () => {
+    getPublicData: (): TObject => {
       return publicData || {};
     },
   };
 };
 
-export const TRANSACTION = (transaction: TTransaction) => {
+export const Transaction = (transaction: TTransaction) => {
   const ensuredTransaction = ensureTransaction(transaction);
   const id = ensuredTransaction?.id?.uuid;
   const attributes = ensuredTransaction?.attributes;
   const { privateData, publicData, protectedData, metadata } = attributes || {};
+
   return {
     getId: () => {
       return id;
@@ -550,23 +552,23 @@ export const TRANSACTION = (transaction: TTransaction) => {
     getAttributes: () => {
       return attributes || {};
     },
-    getMetadata: () => {
+    getMetadata: (): TObject => {
       return metadata || {};
     },
-    getProtectedData: () => {
+    getProtectedData: (): TObject => {
       return protectedData || {};
     },
-    getPrivateData: () => {
+    getPrivateData: (): TObject => {
       return privateData || {};
     },
-    getPublicData: () => {
+    getPublicData: (): TObject => {
       return publicData || {};
     },
   };
 };
 
-export const TRANSACTION_WITH_EXTENDED_DATA = (transaction: TTransaction) => {
-  const originTransaction = TRANSACTION(transaction);
+export const TransactionWithExtendedData = (transaction: TTransaction) => {
+  const originTransaction = Transaction(transaction);
   const { listing, provider, booking, customer } = transaction;
   return {
     ...originTransaction,

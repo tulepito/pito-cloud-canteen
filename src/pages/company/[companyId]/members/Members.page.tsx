@@ -15,7 +15,7 @@ import {
   companyMemberThunks,
   resetError,
 } from '@redux/slices/companyMember.slice';
-import { ensureUser, USER } from '@utils/data';
+import { ensureUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -164,9 +164,9 @@ const MembersPage = () => {
                 groupList,
               ),
               allergy:
-                USER(member).getPublicData()?.allergies?.join(', ') || [],
+                User(member).getPublicData()?.allergies?.join(', ') || [],
               nutrition:
-                USER(member).getPublicData()?.nutritions?.join(', ') || [],
+                User(member).getPublicData()?.nutritions?.join(', ') || [],
             },
           },
         ],

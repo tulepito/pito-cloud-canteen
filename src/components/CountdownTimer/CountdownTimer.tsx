@@ -29,13 +29,15 @@ const CountdownTimer: React.FC<TCountdownTimerProps> = ({
 
   useEffect(() => {
     const stopTime = getStopTime(stopAt);
+
     const intervalId = setInterval(() => {
-      const diffObj = DateTime.fromMillis(parseInt(`${deadline}`, 10)).diffNow([
+      let diffObj = DateTime.fromMillis(parseInt(`${deadline}`, 10)).diffNow([
         'day',
         'hour',
         'minute',
         'second',
       ]);
+
       if (stopTime) {
         if (
           diffObj.get('day') <= stopTime.day &&
@@ -43,6 +45,9 @@ const CountdownTimer: React.FC<TCountdownTimerProps> = ({
           diffObj.get('minute') <= stopTime.minute &&
           diffObj.get('second') <= stopTime.second
         ) {
+          diffObj = diffObj.set({
+            ...stopTime,
+          });
           clearInterval(intervalId);
         }
       }

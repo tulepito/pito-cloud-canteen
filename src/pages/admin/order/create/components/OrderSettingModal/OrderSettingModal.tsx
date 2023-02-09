@@ -6,7 +6,7 @@ import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHan
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderAsyncAction } from '@redux/slices/Order.slice';
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
@@ -68,7 +68,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
     deadlineDate,
     deadlineHour,
     memberAmount,
-  } = LISTING(order as TListing).getMetadata();
+  } = Listing(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const initialValues = useMemo(
     () => ({

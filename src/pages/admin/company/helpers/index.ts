@@ -1,5 +1,5 @@
 import { RESULT_PAGE_SIZE } from '@redux/slices/ManageCompaniesPage.slice';
-import { USER } from '@utils/data';
+import { User } from '@utils/data';
 import { ECompanyStatus } from '@utils/enums';
 import type { TCompany, TUser } from '@utils/types';
 
@@ -90,25 +90,25 @@ export const sortCompanies = (
   return [...companies].sort((a, b) => {
     if (isSortAZ) {
       if (
-        USER(a).getPublicData().companyName.toLowerCase() <
-        USER(b).getPublicData().companyName.toLowerCase()
+        User(a).getPublicData().companyName.toLowerCase() <
+        User(b).getPublicData().companyName.toLowerCase()
       )
         return -1;
       if (
-        USER(a).getPublicData().companyName.toLowerCase() >
-        USER(b).getPublicData().companyName.toLowerCase()
+        User(a).getPublicData().companyName.toLowerCase() >
+        User(b).getPublicData().companyName.toLowerCase()
       )
         return 1;
       return 0;
     }
     if (
-      USER(b).getPublicData().companyName.toLowerCase() <
-      USER(a).getPublicData().companyName.toLowerCase()
+      User(b).getPublicData().companyName.toLowerCase() <
+      User(a).getPublicData().companyName.toLowerCase()
     )
       return -1;
     if (
-      USER(b).getPublicData().companyName.toLowerCase() >
-      USER(a).getPublicData().companyName.toLowerCase()
+      User(b).getPublicData().companyName.toLowerCase() >
+      User(a).getPublicData().companyName.toLowerCase()
     )
       return 1;
     return 0;

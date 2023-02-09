@@ -2,7 +2,7 @@ import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import config from '@src/configs';
-import { LISTING, USER } from '@utils/data';
+import { Listing, User } from '@utils/data';
 import type { TListing, TUser } from '@utils/types';
 import { useState } from 'react';
 
@@ -19,15 +19,12 @@ export const usePrepareOrderDetailPageData = () => {
   );
   const currentUser = useAppSelector(currentUserSelector);
 
-  const { title: orderTitle = '' } = LISTING(
+  const { title: orderTitle = '' } = Listing(
     orderData as TListing,
   ).getAttributes();
-  const { email: bookerEmail } = USER(currentUser as TUser).getAttributes();
-  const { orderDetail } = LISTING(planData as TListing).getMetadata();
-  const { companyName } = USER(companyData as TUser).getPublicData();
-  const { generalInfo = {}, participants = [] } = LISTING(
-    orderData as TListing,
-  ).getMetadata();
+  const { email: bookerEmail } = User(currentUser as TUser).getAttributes();
+  const { orderDetail } = Listing(planData as TListing).getMetadata();
+  const { companyName } = User(companyData as TUser).getPublicData();
   const {
     startDate = 0,
     endDate = 0,
@@ -37,7 +34,8 @@ export const usePrepareOrderDetailPageData = () => {
     deadlineHour,
     staffName,
     packagePerMember = 0,
-  } = generalInfo || {};
+    participants = [],
+  } = Listing(orderData as TListing).getMetadata();
 
   const titleSectionData = { deliveryHour, deliveryAddress };
   const countdownSectionData = { deadlineHour, orderDeadline, startDate };

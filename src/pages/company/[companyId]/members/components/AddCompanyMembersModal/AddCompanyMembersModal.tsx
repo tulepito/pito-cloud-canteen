@@ -6,7 +6,7 @@ import {
   companyMemberThunks,
   resetCheckedEmailInputChunk,
 } from '@redux/slices/companyMember.slice';
-import { USER } from '@utils/data';
+import { User } from '@utils/data';
 import type { TCurrentUser, TUser } from '@utils/types';
 import classNames from 'classnames';
 import { useEffect, useState } from 'react';
@@ -72,7 +72,7 @@ const AddCompanyMembersModal: React.FC<CreateGroupModalProps> = (props) => {
       .map((_result) => _result.email);
     const userIdList = loadedResult
       .filter((_result) => !_result.response.statusCode)
-      .map((_result) => USER(_result.response).getId());
+      .map((_result) => User(_result.response).getId());
     dispatch(
       companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
     ).then(() => {

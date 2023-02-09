@@ -10,7 +10,7 @@ import orderChecker from '@services/permissionChecker/order';
 import { handleError } from '@services/sdk';
 import { getSubAccountSdk } from '@services/subAccountSdk';
 import { ListingTypes } from '@src/types/listingTypes';
-import { denormalisedResponseEntities, LISTING } from '@utils/data';
+import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { parseTimestampToFormat } from '@utils/dates';
 import { EOrderStates } from '@utils/enums';
 import isEmpty from 'lodash/isEmpty';
@@ -80,7 +80,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           companyId,
           plans = [],
           selectedGroups = [],
-        } = LISTING(orderListing).getMetadata();
+        } = Listing(orderListing).getMetadata();
         const companyAccount = await fetchUser(companyId);
         const { subAccountId } = companyAccount.attributes.profile.privateData;
 
