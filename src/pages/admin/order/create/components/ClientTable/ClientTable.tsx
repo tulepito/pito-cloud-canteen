@@ -50,14 +50,14 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
     toggleSort,
     createOrderInProgress,
   } = props;
-  const [selectedConpanyId, setSelectedCompanyId] = useState<string>('');
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
   const [selectedBookerId, setSelectedBookerId] = useState<string>('');
   const shouldShowPagination = page && data?.length > 0;
 
   const renderTableRowFn = (tableData: any, form: any) => {
     return tableData.map(({ key, data: itemData }: any, index: number) => {
       const onCustomItemClick = () => {
-        if (selectedConpanyId === itemData.id) {
+        if (selectedCompanyId === itemData.id) {
           return;
         }
         form.batch(() => {
@@ -71,11 +71,13 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
         }
       };
       const showBookerList =
-        selectedConpanyId === itemData.id &&
+        selectedCompanyId === itemData.id &&
         bookerList.length > 0 &&
         !fetchBookersInProgress;
       const showLoading =
-        selectedConpanyId === itemData.id && fetchBookersInProgress;
+        selectedCompanyId === itemData.id && fetchBookersInProgress;
+      const currentIdx = (page - 1) * 10 + (index + 1);
+
       return (
         <div key={key} className={css.bodyRow}>
           <div className={css.mainRow} onClick={onCustomItemClick}>
@@ -86,7 +88,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
                 value={itemData.id}
               />
             </span>
-            <span className={css.bodyCell}>{index + 1}</span>
+            <span className={css.bodyCell}>{currentIdx}</span>
             <span className={css.bodyCell}>
               <span>{itemData.companyName}</span>
             </span>
