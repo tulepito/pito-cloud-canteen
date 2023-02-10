@@ -44,7 +44,8 @@ const renderResourcesForCalendar = (
   const entries = Object.entries<TObject>(orderDetail);
   const resources = entries.map((item) => {
     const [date, data] = item;
-    const { restaurant, foodList } = data;
+    const { restaurant } = data;
+    const { foodList = {} } = restaurant;
 
     return {
       resource: {
@@ -56,10 +57,9 @@ const renderResourcesForCalendar = (
           id: restaurant.id,
           name: restaurant.restaurantName,
         },
-        foodList,
+        foodList: Object.keys(foodList),
         // expiredTime: new Date(2023, 11, 29, 16, 0, 0),
       },
-      title: 'PT3040',
       start: DateTime.fromMillis(Number(date)).toJSDate(),
       end: DateTime.fromMillis(Number(date)).plus({ hour: 1 }).toJSDate(),
     };
@@ -259,6 +259,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     endDate,
   };
 
+  const initialFoodList =
+    orderDetail[selectedDate?.getTime()]?.restaurant?.foodList;
+
   const onSubmit = () => {
     dispatch(OrderAsyncAction.updateOrder({ orderDetail }))
       .then(() => {
@@ -386,6 +389,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         restaurant={currentRestaurant}
         items={foodList as any[]}
         isOpen={showPickFoodModal}
+        initialFoodList={initialFoodList}
         handleClose={closePickFoodModal}
         handleSelectFood={handleSelectFood}
       />

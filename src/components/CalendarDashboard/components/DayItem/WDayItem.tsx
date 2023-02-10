@@ -13,7 +13,7 @@ type TWDayItemProps = {
   events?: Event[];
   renderEvent?: React.FC<any>;
   components?: TCalendarItemCardComponents;
-  eventExtraProps: TObject;
+  eventExtraProps?: TObject;
 };
 
 const WDayItem: React.FC<TWDayItemProps> = ({

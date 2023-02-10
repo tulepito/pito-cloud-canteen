@@ -36,6 +36,17 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
+
+  const selectedDate = useAppSelector(
+    (state) => state.Order.selectedCalendarDate,
+  );
+  // TODO: will move these things out of this component
+  const fetchFoodInProgress = useAppSelector(
+    (state) => state.SelectRestaurantPage.fetchFoodPending,
+  );
+  const fetchRestaurantsInProgress = useAppSelector(
+    (state) => state.SelectRestaurantPage.fetchRestaurantsPending,
+  );
   const restaurantId = event.resource?.restaurant.id;
   const dateTime = DateTime.fromJSDate(event?.start!);
   const removeEventItem = (resourceId: string) => {
@@ -69,6 +80,9 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     );
     onPickFoodModal();
   };
+  const onPickFoodInProgress =
+    (fetchFoodInProgress || fetchRestaurantsInProgress) &&
+    selectedDate.getTime() === event.start?.getTime();
   return (
     <div className={css.root}>
       <MealPlanCardHeader event={event} removeEventItem={removeEventItem} />
@@ -76,6 +90,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
       <MealPlanCardFooter
         event={event}
         onPickFoodModal={onCustomPickFoodModalOpen}
+        onPickFoodInProgress={onPickFoodInProgress}
       />
     </div>
   );

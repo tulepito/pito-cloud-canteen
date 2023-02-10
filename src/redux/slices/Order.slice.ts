@@ -13,6 +13,7 @@ import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import { convertWeekDay, getSeparatedDates } from '@utils/dates';
 import { storableError } from '@utils/errors';
 import type { TListing, TPagination } from '@utils/types';
+import { cloneDeep } from 'lodash';
 import { DateTime } from 'luxon';
 
 import { selectRestaurantPageThunks } from './SelectRestaurantPage.slice';
@@ -123,43 +124,59 @@ const updateOrder = createAsyncThunk(
   UPDATE_ORDER,
   async (params: any, { getState, dispatch }) => {
     const { order } = getState().Order;
-    const { generalInfo } = params;
-    const { dayInWeek = [], startDate, endDate } = generalInfo;
+    const { generalInfo, orderDetail: orderDetailParams } = params;
+    const { deadlineDate, deadlineHour } = generalInfo;
     const orderId = Listing(order as TListing).getId();
-    const totalDates = getSeparatedDates(startDate, endDate);
     const orderDetail: any = {};
-    await Promise.all(
-      totalDates.map(async (dateTime) => {
-        if (
-          dayInWeek.includes(
-            convertWeekDay(DateTime.fromMillis(dateTime).weekday).key,
-          )
-        ) {
-          const { payload }: { payload: any } = await dispatch(
-            selectRestaurantPageThunks.getRestaurants({
-              dateTime: DateTime.fromMillis(dateTime),
-            }),
-          );
-          const { restaurants = [] } = payload || {};
-          const randomNumber = Math.floor(
-            Math.random() * (restaurants.length - 1),
-          );
-          orderDetail[dateTime] = {
-            restaurant: {
-              id: Listing(restaurants[0].restaurantInfo).getId(),
-              restaurantName: Listing(
-                restaurants[randomNumber].restaurantInfo,
-              ).getAttributes().title,
-              foodList: [],
-            },
-          };
-        }
-      }),
-    );
+    if (!orderDetailParams) {
+      const { dayInWeek = [], startDate, endDate } = generalInfo;
+      const totalDates = getSeparatedDates(startDate, endDate);
+      await Promise.all(
+        totalDates.map(async (dateTime) => {
+          if (
+            dayInWeek.includes(
+              convertWeekDay(DateTime.fromMillis(dateTime).weekday).key,
+            )
+          ) {
+            const { payload }: { payload: any } = await dispatch(
+              selectRestaurantPageThunks.getRestaurants({
+                dateTime: DateTime.fromMillis(dateTime),
+              }),
+            );
+            const { restaurants = [] } = payload || {};
+            const randomNumber = Math.floor(
+              Math.random() * (restaurants.length - 1),
+            );
+            orderDetail[dateTime] = {
+              restaurant: {
+                id: Listing(restaurants[0].restaurantInfo).getId(),
+                restaurantName: Listing(
+                  restaurants[randomNumber].restaurantInfo,
+                ).getAttributes().title,
+                foodList: [],
+              },
+            };
+          }
+        }),
+      );
+    }
+    const parsedDeadlineDate = DateTime.fromMillis(deadlineDate)
+      .startOf('day')
+      .plus({
+        hours: parseInt(deadlineHour.split(':')[0], 10),
+        minutes: parseInt(deadlineHour.split(':')[1], 10),
+      })
+      .toMillis();
+
     const apiBody: UpdateOrderApiBody = {
       orderId,
-      generalInfo,
-      orderDetail,
+      generalInfo: {
+        ...generalInfo,
+        deadlineDate: parsedDeadlineDate,
+      },
+      orderDetail: orderDetailParams
+        ? cloneDeep(orderDetailParams)
+        : orderDetail,
     };
     const { data: orderListing } = await updateOrderApi(apiBody);
     return orderListing;
