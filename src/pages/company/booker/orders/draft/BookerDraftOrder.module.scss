@@ -2,19 +2,17 @@
 @use '/src/styles/mixins.scss' as *;
 
 .root {
-  padding-top: 72px;
-}
+  .main {
+    height: 100%;
+    padding: 50px 24px;
+    display: flex;
+  }
 
-.main {
-  height: 100%;
-  padding: 50px 24px;
-  display: flex;
-}
+  .calendar {
+    width: calc(100vw - 48px);
 
-.calendar {
-  width: calc(100vw - 48px);
-
-  @include viewportLargeWithPaddings {
-    width: 100%;
+    @include viewportLargeWithPaddings {
+      width: 100%;
+    }
   }
 }

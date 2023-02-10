@@ -1,13 +1,16 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import type { TButtonVariant } from '@components/Button/Button';
 import Button from '@components/Button/Button';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { parseThousandNumber } from '@helpers/format';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import {
   BADGE_CLASSNAME_BASE_ON_ORDER_STATE,
   BADGE_TYPE_BASE_ON_ORDER_STATE,
 } from '@pages/admin/order/ManageOrders.page';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { companyPaths } from '@src/paths';
 import {
   EOrderStates,
@@ -16,6 +19,7 @@ import {
 } from '@utils/enums';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -112,9 +116,34 @@ export const CompanyOrdersTableColumns: TColumn[] = [
   {
     key: 'action',
     label: '',
-    render: ({ state }: { state: EOrderStates }) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
+    render: ({
+      state,
+      id: orderId,
+      companyId,
+    }: {
+      state: EOrderStates;
+      id: string;
+      companyId: string;
+    }) => {
       const intl = useIntl();
+      const router = useRouter();
+      const dispatch = useAppDispatch();
+
+      const navigateToOrderDetailPage = () => {
+        router.push({
+          pathname: companyPaths.EditDraftOrder,
+          query: { orderId },
+        });
+      };
+
+      const handleDeleteDraftOrder = () => {
+        dispatch(
+          orderAsyncActions.bookerDeleteDraftOrder({
+            orderId,
+            companyId,
+          }),
+        );
+      };
 
       const secondaryButtonProps = {
         variant: 'inline' as TButtonVariant,
@@ -150,7 +179,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         </Button>
       );
       const completeOrderButton = (
-        <Button {...secondaryButtonProps}>
+        <Button {...secondaryButtonProps} onClick={navigateToOrderDetailPage}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.completeOrder',
           })}
@@ -171,7 +200,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         </Button>
       );
       const deleteDraftButton = (
-        <Button {...secondaryButtonProps}>
+        <Button {...secondaryButtonProps} onClick={handleDeleteDraftOrder}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.deleteDraft',
           })}

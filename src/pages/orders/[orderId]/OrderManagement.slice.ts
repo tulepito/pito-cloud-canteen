@@ -31,6 +31,7 @@ type TOrderManagementState = {
   bookerData: TUser | null;
   participantData: Array<TUser>;
 };
+
 const initialState: TOrderManagementState = {
   isFetchingOrderDetails: false,
   isDeletingParticipant: false,

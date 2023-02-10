@@ -1,6 +1,7 @@
 import { companyApi } from '@apis/companyApi';
 import { fetchUserApi } from '@apis/index';
 import {
+  bookerDeleteDraftOrderApi,
   createOrderApi,
   initiateTransactionsApi,
   queryOrdersApi,
@@ -11,7 +12,7 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
-import { EOrderStates } from '@utils/enums';
+import { EListingStates, EOrderStates } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TPagination } from '@utils/types';
 import cloneDeep from 'lodash/cloneDeep';
@@ -71,9 +72,12 @@ type TOrderInitialState = {
   initiateTransactionsError: any;
 
   // Manage Orders Page
+  queryParams: TObject;
   orders: TListing[];
   queryOrderInProgress: boolean;
   queryOrderError: any;
+  deleteDraftOrderInProgress: boolean;
+  deleteDraftOrderError: any;
   totalItemMap: {
     [EOrderStates.picking]: number;
     [EOrderStates.completed]: number;
@@ -124,9 +128,12 @@ const initialState: TOrderInitialState = {
   initiateTransactionsError: null,
 
   // Manage Orders
+  queryParams: {},
   orders: [],
   queryOrderInProgress: false,
   queryOrderError: null,
+  deleteDraftOrderInProgress: false,
+  deleteDraftOrderError: null,
   manageOrdersPagination: {
     totalItems: 0,
     totalPages: 0,
@@ -203,6 +210,7 @@ const queryCompanyOrders = createAsyncThunk(
     const params = {
       dataParams: {
         ...restPayload,
+        states: EListingStates.published,
         perPage: MANAGE_ORDER_PAGE_SIZE,
         meta_companyId: companyId,
         meta_listingType: LISTING_TYPE.ORDER,
@@ -214,7 +222,7 @@ const queryCompanyOrders = createAsyncThunk(
     const { data } = await companyApi.queryOrdersApi(companyId, params);
     const { orders, pagination, totalItemMap } = data;
 
-    return { orders, pagination, totalItemMap };
+    return { orders, pagination, totalItemMap, queryParams: payload };
   },
   {
     serializeError: storableError,
@@ -283,9 +291,20 @@ const fetchOrder = createAsyncThunk(
   },
 );
 
+const bookerDeleteDraftOrder = createAsyncThunk(
+  'app/Order/DELETE_DRAFT_ORDER',
+  async ({ orderId, companyId }: TObject, { getState, dispatch }) => {
+    const { queryParams } = getState().Order;
+
+    await bookerDeleteDraftOrderApi({ orderId, companyId });
+    await dispatch(queryCompanyOrders(queryParams));
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
+  bookerDeleteDraftOrder,
   fetchCompanyBookers,
   fetchOrder,
   fetchOrderDetail,
@@ -484,8 +503,13 @@ const orderSlice = createSlice({
       })
       .addCase(
         queryCompanyOrders.fulfilled,
-        (state, { payload: { orders, pagination, totalItemMap } }) => ({
+        (
+          state,
+          { payload: { orders, pagination, totalItemMap, queryParams } },
+        ) => ({
           ...state,
+          queryParams,
+
           queryOrderInProgress: false,
           orders,
           manageOrdersPagination: pagination,
@@ -494,6 +518,18 @@ const orderSlice = createSlice({
       )
       .addCase(queryCompanyOrders.rejected, (state, { payload }) => {
         state.queryOrderInProgress = false;
+        state.queryOrderError = payload;
+      })
+      /* =============== bookerDeleteDraftOrder =============== */
+      .addCase(bookerDeleteDraftOrder.pending, (state) => {
+        state.deleteDraftOrderInProgress = false;
+        state.queryOrderError = null;
+      })
+      .addCase(bookerDeleteDraftOrder.fulfilled, (state) => {
+        state.deleteDraftOrderInProgress = true;
+      })
+      .addCase(bookerDeleteDraftOrder.rejected, (state, { payload }) => {
+        state.deleteDraftOrderInProgress = false;
         state.queryOrderError = payload;
       });
   },

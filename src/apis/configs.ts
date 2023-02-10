@@ -41,3 +41,10 @@ export type TBodyParams = {
   dataParams: TObject;
   queryParams: TObject;
 };
+
+export enum HttpMethod {
+  GET = 'GET',
+  POST = 'POST',
+  PUT = 'PUT',
+  DELETE = 'DELETE',
+}

@@ -672,11 +672,15 @@ export const ORDER_STATES_OPTIONS = [
   },
   {
     key: EOrderStates.isNew,
-    label: 'Mới tạo',
+    label: 'Đơn nháp',
   },
   {
     key: EOrderStates.completed,
-    label: 'Đã hoàn thành',
+    label: 'Chưa đánh giá',
+  },
+  {
+    key: EOrderStates.reviewed,
+    label: 'Đã đánh giá',
   },
 ];
 

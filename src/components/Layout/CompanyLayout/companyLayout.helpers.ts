@@ -1,10 +1,14 @@
 import { companyPaths } from '@src/paths';
 
 export const shouldShowFeatureHeader = (pathName: string) => {
-  if (
-    pathName === companyPaths.CreateNewOrder ||
-    pathName === companyPaths.EditDraftOrder
-  ) {
+  const hideList = [
+    companyPaths.CreateNewOrder,
+    companyPaths.EditDraftOrder,
+    companyPaths.ManageOrders,
+    companyPaths.ManageOrderDetail,
+  ];
+
+  if (hideList.includes(pathName)) {
     return false;
   }
 
@@ -12,10 +16,14 @@ export const shouldShowFeatureHeader = (pathName: string) => {
 };
 
 export const shouldShowSidebar = (pathName: string) => {
-  if (
-    pathName === companyPaths.CreateNewOrder ||
-    pathName === companyPaths.EditDraftOrder
-  ) {
+  const hideList = [
+    companyPaths.CreateNewOrder,
+    companyPaths.EditDraftOrder,
+    companyPaths.ManageOrders,
+    companyPaths.ManageOrderDetail,
+  ];
+
+  if (hideList.includes(pathName)) {
     return false;
   }
 

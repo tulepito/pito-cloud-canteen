@@ -30,7 +30,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         });
         const [companyUser] = denormalisedResponseEntities(companyResponse);
 
-        let data: TObject = { companyId, companyData: companyUser };
+        let data: TObject = {
+          companyId,
+          companyData: companyUser,
+          orderListing,
+        };
         const participantData = await Promise.all(
           participants.map(async (id: string) => {
             const [memberAccount] = denormalisedResponseEntities(
@@ -53,7 +57,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             }),
           );
 
-          data = { ...data, orderListing, planListing };
+          data = { ...data, planListing };
         }
 
         if (!isEmpty(bookerId)) {

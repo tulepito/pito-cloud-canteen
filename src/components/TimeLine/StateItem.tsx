@@ -13,7 +13,6 @@ const StateItem: React.FC<TStateItemProps> = ({
   rootClassName,
   className,
 }) => {
-  console.log('🚀 ~ state', state);
   const rootClasses = classNames(rootClassName || css.root, className);
 
   let stateComponent;

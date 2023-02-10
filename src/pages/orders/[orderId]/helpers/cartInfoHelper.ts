@@ -93,8 +93,7 @@ export const calculatePriceQuotationInfo = ({
   planOrderDetail: TObject;
   order: TObject;
 }) => {
-  const { generalInfo = {} } = Listing(order as TListing).getMetadata();
-  const { packagePerMember = 0 } = generalInfo;
+  const { packagePerMember = 0 } = Listing(order as TListing).getMetadata();
   const { totalPrice = 0, totalDishes = 0 } = calculateTotalPriceAndDishes({
     orderDetail: planOrderDetail,
   });

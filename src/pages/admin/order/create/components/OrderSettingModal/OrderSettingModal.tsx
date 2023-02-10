@@ -234,6 +234,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
         return null;
     }
   };
+
   const onSubmit = (values: any) => {
     const {
       deliveryAddress: deliveryAddressValues,
@@ -253,6 +254,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
     };
     dispatch(orderAsyncActions.updateOrder({ generalInfo }));
   };
+
   return (
     <Modal
       isOpen={isOpen}

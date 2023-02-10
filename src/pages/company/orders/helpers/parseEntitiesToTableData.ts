@@ -12,20 +12,18 @@ export const parseEntitiesToTableData = (
   return orders.map((entity, index) => {
     const { plan } = entity;
     const orderId = entity?.id?.uuid;
-    const { orderDetail: planOrderDetail } = Listing(
+    const { orderDetail: planOrderDetail = {} } = Listing(
       plan as TListing,
     ).getMetadata();
-    const {
-      orderDetail = {},
-      generalInfo = {},
-      orderState = EOrderStates.isNew,
-    } = Listing(entity as TListing).getMetadata();
+
     const {
       startDate = 0,
+      companyId = '',
       endDate = 0,
       deliveryHour,
       deliveryAddress,
-    } = generalInfo;
+      orderState = EOrderStates.isNew,
+    } = Listing(entity as TListing).getMetadata();
 
     const { totalWithVAT } = calculatePriceQuotationInfo({
       order: entity,
@@ -43,12 +41,12 @@ export const parseEntitiesToTableData = (
         endDate: parseTimestampToFormat(endDate),
         state: orderState,
         orderId,
+        companyId,
         restaurants: uniq(
-          Object.keys(orderDetail).map((key) => {
-            return orderDetail[key]?.restaurant?.restaurantName;
+          Object.keys(planOrderDetail).map((key) => {
+            return planOrderDetail[key]?.restaurant?.restaurantName;
           }),
         ),
-        orderDetail,
         orderName: entity.attributes.publicData.orderName,
         deliveryHour,
         totalWithVAT,
