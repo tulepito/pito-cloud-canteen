@@ -103,6 +103,7 @@
 
           span {
             @include lineClamp(3);
+            overflow: unset;
             word-break: break-all;
           }
           &:before {
