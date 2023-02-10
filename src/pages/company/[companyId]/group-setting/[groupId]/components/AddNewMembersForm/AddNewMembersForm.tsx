@@ -4,7 +4,7 @@ import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { BookerManageCompany } from '@redux/slices/company.slice';
-import { USER } from '@utils/data';
+import { User } from '@utils/data';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import differenceBy from 'lodash/differenceBy';
@@ -38,10 +38,13 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
     [companyMembers, groupMembers],
   );
 
-  const initialValues = {
-    members: [],
-  };
-  const onSubmit = (values: TObject) => {
+  const initialValues = useMemo(
+    () => ({
+      members: [],
+    }),
+    [],
+  );
+  const onSubmit = async (values: TObject) => {
     const { members } = values;
     const addedMembers = companyMembers
       .filter((member) => members.includes(member.id.uuid))
@@ -49,14 +52,18 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
         id: member.id.uuid,
         email: member.attributes.email,
       }));
-    dispatch(
+    await dispatch(
       BookerManageCompany.updateGroup({
         groupId,
         addedMembers,
       }),
-    ).then(() => {
-      onModalClose();
-    });
+    );
+    onModalClose();
+    await dispatch(
+      BookerManageCompany.groupDetailInfo({
+        groupId: groupId as string,
+      }),
+    );
   };
   return (
     <FinalForm
@@ -81,13 +88,17 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
                     />
                     <div className={css.memberItem}>
                       <div className={css.memberWrapper}>
-                        <Avatar className={css.smallAvatar} user={member} />
+                        <Avatar
+                          disableProfileLink
+                          className={css.smallAvatar}
+                          user={member}
+                        />
                         <div>
                           <div className={css.name}>
-                            {USER(member).getProfile().displayName}
+                            {User(member).getProfile().displayName}
                           </div>
                           <div className={css.email}>
-                            {USER(member).getAttributes().email}
+                            {User(member).getAttributes().email}
                           </div>
                         </div>
                       </div>

@@ -12,10 +12,8 @@ export const addMembersApi = (body: AddMembersApiBody) =>
   postApi('/company/members/add-members', body);
 
 export type DeleteMemberApiBody = {
-  data: {
-    memberEmail: string;
-    companyId: string;
-  };
+  memberEmail: string;
+  companyId: string;
 };
 export const deleteMemberApi = (body: DeleteMemberApiBody) =>
   deleteApi('/company/members/delete-member', body);

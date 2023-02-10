@@ -2,7 +2,7 @@ import { deliveryDaySessionAdapter } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { ListingTypes } from '@src/types/listingTypes';
-import { denormalisedResponseEntities, LISTING } from '@utils/data';
+import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
 import type { TListing, TPagination } from '@utils/types';
 
@@ -42,7 +42,7 @@ const getRestaurants = createAsyncThunk(
       packagePerMember,
       deliveryHour,
       nutritions = [],
-    } = LISTING(order as TListing).getMetadata();
+    } = Listing(order as TListing).getMetadata();
     const queryParams: Record<string, any> = {};
 
     if (params) {
@@ -84,7 +84,7 @@ const getRestaurants = createAsyncThunk(
     const menuList = denormalisedResponseEntities(response);
     const restaurantList = await Promise.all(
       menuList.map(async (menu: TListing) => {
-        const { restaurantId } = LISTING(menu).getMetadata();
+        const { restaurantId } = Listing(menu).getMetadata();
         const restaurantResponse = await sdk.listings.show({
           id: restaurantId,
         });
@@ -105,7 +105,7 @@ const getRestaurantFood = createAsyncThunk(
     { extra: sdk, getState },
   ) => {
     const { order } = getState().Order;
-    const { packagePerMember, nutritions = [] } = LISTING(
+    const { packagePerMember, nutritions = [] } = Listing(
       order as TListing,
     ).getMetadata();
     const dayOfWeek = convertWeekDay(dateTime.weekday).key;

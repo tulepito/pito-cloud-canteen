@@ -1,5 +1,5 @@
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -22,7 +22,7 @@ const ParticipantPlan = () => {
     useSelectRestaurant();
 
   const orderId = order?.id?.uuid;
-  const { deadlineDate = Date.now() } = LISTING(order).getMetadata();
+  const { deadlineDate = Date.now() } = Listing(order).getMetadata();
 
   // Render
   return (

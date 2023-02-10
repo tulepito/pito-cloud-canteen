@@ -3,6 +3,7 @@ import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
+import { findMinStartDate } from '@helpers/orderHelper';
 import { generateTimeOptions } from '@utils/dates';
 import { composeValidators, nonSatOrSunDay, required } from '@utils/validators';
 import classNames from 'classnames';
@@ -35,9 +36,11 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
   const initialEndDate = endDateInitialValue
     ? new Date(endDateInitialValue)
     : null;
-  const today = new Date();
   const [startDate, setStartDate] = useState<Date>(initialStartDate!);
   const [endDate, setEndDate] = useState<Date>(initialEndDate!);
+
+  const minStartDate = findMinStartDate();
+
   const startDateRequiredMessage = intl.formatMessage({
     id: 'MealPlanDateField.startDateRequired',
   });
@@ -83,7 +86,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           name="startDate"
           selected={startDate}
           onChange={(date: Date) => setStartDate(date)}
-          minDate={addDays(today, 3)}
+          minDate={minStartDate}
           autoComplete="off"
           label={intl.formatMessage({
             id: 'MealPlanDateField.startDateLabel',

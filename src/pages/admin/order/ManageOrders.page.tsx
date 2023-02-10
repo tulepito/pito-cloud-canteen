@@ -280,6 +280,7 @@ const parseEntitiesToTableData = (
   page: number,
 ) => {
   if (orders.length === 0) return [];
+
   return orders.map((entity, index) => {
     const { company, subOrders = [] } = entity;
     const restaurants = subOrders.reduce(
@@ -295,8 +296,15 @@ const parseEntitiesToTableData = (
       },
       [],
     );
-    const { startDate, endDate, orderState, staffName, deliveryAddress } =
-      entity?.attributes?.metadata || {};
+    const {
+      startDate,
+      endDate,
+      orderState,
+      staffName,
+      deliveryAddress,
+      deliveryHour,
+    } = entity?.attributes?.metadata || {};
+
     return {
       key: entity.id.uuid,
       data: {
@@ -313,7 +321,7 @@ const parseEntitiesToTableData = (
         restaurants,
         subOrders,
         orderName: entity.attributes.publicData.orderName,
-        deliveryHour: entity.attributes.metadata?.generalInfo?.deliveryHour,
+        deliveryHour,
       },
     };
   });

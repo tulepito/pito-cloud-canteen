@@ -2,7 +2,7 @@ import { InlineTextButton } from '@components/Button/Button';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { CURRENT_USER } from '@utils/data';
+import { CurrentUser } from '@utils/data';
 import { useRouter } from 'next/router';
 import React from 'react';
 import type { Event } from 'react-big-calendar';
@@ -18,11 +18,13 @@ import OrderEventCardStatus from './OrderEventCardStatus';
 type TOrderEventCardPopupProps = {
   event: Event;
   status?: TEventStatus;
+  isExpired: boolean;
 };
 
 const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   event,
   status,
+  isExpired = false,
 }) => {
   const router = useRouter();
   const user = useAppSelector(currentUserSelector);
@@ -39,7 +41,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   } = event.resource;
 
   const onSelectDish = (values: TDishSelectionFormValues, reject?: boolean) => {
-    const currentUserId = CURRENT_USER(user).getId();
+    const currentUserId = CurrentUser(user).getId();
     const payload = {
       updateValues: {
         orderId,
@@ -89,6 +91,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
         </div>
         <div className={css.selectDishContent}>
           <DishSelectionForm
+            actionsDisabled={isExpired}
             dishes={dishes}
             onSubmit={onSelectDish}
             initialValues={dishSelection}

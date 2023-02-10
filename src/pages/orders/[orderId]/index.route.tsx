@@ -3,7 +3,8 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { generalPaths } from '@src/paths';
 import { UserPermission } from '@src/types/UserPermission';
-import get from 'lodash/get';
+import { CurrentUser } from '@utils/data';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
@@ -20,7 +21,8 @@ const BookerOrderDetailsRoute = () => {
   const pageDataLoading = useAppSelector(orderDetailsAnyActionsInProgress);
   const { companyId } = useAppSelector((state) => state.OrderManagement);
   const currentUser = useAppSelector(currentUserSelector);
-  const companyData = get(currentUser, 'attributes.profile.metadata.company');
+  const { company: companyData } = CurrentUser(currentUser).getMetadata();
+
   const {
     isReady,
     query: { orderId },
@@ -28,10 +30,10 @@ const BookerOrderDetailsRoute = () => {
   } = useRouter();
 
   useEffect(() => {
-    if (isReady) {
+    if (isReady && !isEmpty(orderId)) {
       dispatch(orderManagementThunks.loadData(orderId as string));
     }
-  }, [isReady]);
+  }, [dispatch, isReady, orderId]);
 
   useEffect(() => {
     if (!pageDataLoading && companyData && companyId !== null) {
@@ -41,7 +43,7 @@ const BookerOrderDetailsRoute = () => {
         push(generalPaths.Home);
       }
     }
-  }, [pageDataLoading, companyId]);
+  }, [pageDataLoading, companyId, companyData, push]);
 
   return (
     <>

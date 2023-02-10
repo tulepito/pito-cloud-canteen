@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths, personalPaths } from '@src/paths';
-import { CURRENT_USER, USER } from '@utils/data';
+import { CurrentUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 import filter from 'lodash/filter';
 import { useRouter } from 'next/router';
@@ -42,15 +42,15 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
     (state) => state.ManageCompaniesPage.companyRefs,
     shallowEqual,
   );
-  const { companyList = [] } = CURRENT_USER(currentUser).getMetadata();
+  const { companyList = [] } = CurrentUser(currentUser).getMetadata();
   const assignedCompanies = filter(companyRefs, (o: any) =>
     companyList.includes(o.id.uuid),
   ).reduce((result: any[], cur: TUser) => {
     return [
       ...result,
       {
-        value: USER(cur).getId(),
-        label: USER(cur).getPublicData()?.companyName,
+        value: User(cur).getId(),
+        label: User(cur).getPublicData()?.companyName,
       },
     ];
   }, []);
@@ -136,11 +136,11 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   useEffect(() => {
     if (companyId) {
       const currentCompany = companyRefs.find(
-        (_company) => USER(_company).getId() === companyId,
+        (_company) => User(_company).getId() === companyId,
       );
       setSelectedAccount({
-        value: USER(currentCompany).getId(),
-        label: USER(currentCompany).getPublicData()?.companyName,
+        value: User(currentCompany).getId(),
+        label: User(currentCompany).getPublicData()?.companyName,
       });
     }
   }, [companyId]);

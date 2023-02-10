@@ -5,7 +5,7 @@ import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { BookerManageCompany } from '@src/redux/slices/company.slice';
-import { USER } from '@utils/data';
+import { User } from '@utils/data';
 import type { TObject } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
@@ -89,10 +89,10 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
                         <Avatar className={css.smallAvatar} user={member} />
                         <div>
                           <div className={css.name}>
-                            {USER(member).getProfile().displayName}
+                            {User(member).getProfile().displayName}
                           </div>
                           <div className={css.email}>
-                            {USER(member).getAttributes().email}
+                            {User(member).getAttributes().email}
                           </div>
                         </div>
                       </div>

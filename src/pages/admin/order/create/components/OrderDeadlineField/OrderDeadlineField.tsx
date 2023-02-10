@@ -3,12 +3,12 @@ import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
+import { findValidRangeForDeadlineDate } from '@helpers/orderHelper';
 import config from '@src/configs';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import format from 'date-fns/format';
 import viLocale from 'date-fns/locale/vi';
-import subDays from 'date-fns/subDays';
 import { useState } from 'react';
 import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
@@ -24,15 +24,17 @@ type TOrderDeadlineFieldProps = {
 
 const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
   const { values, columnLayout, title, form } = props;
+  const intl = useIntl();
+
   const {
     deadlineDate: deadlineDateInitialValue,
     startDate: startDateInitialValue,
   } = values;
-  const maxSelectedDate = startDateInitialValue
-    ? subDays(startDateInitialValue, 2)
-    : undefined;
-  const intl = useIntl();
-  const today = new Date();
+
+  const { minSelectedDate, maxSelectedDate } = findValidRangeForDeadlineDate(
+    startDateInitialValue,
+  );
+
   const initialDeadlineDate = deadlineDateInitialValue
     ? new Date(deadlineDateInitialValue)
     : null;
@@ -75,7 +77,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
             id: 'OrderDeadlineField.deadlineDateLabel',
           })}
           autoComplete="off"
-          minDate={today}
+          minDate={minSelectedDate}
           maxDate={maxSelectedDate}
           dateFormat={'EEE, dd MMMM, yyyy'}
           validate={required(deadlineDateRequired)}

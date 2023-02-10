@@ -4,7 +4,7 @@ import Pagination from '@components/Pagination/Pagination';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useEffect, useRef, useState } from 'react';
@@ -44,7 +44,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       fetchRestaurantsPending,
     },
   } = useAppSelector((state) => state);
-  const { deliveryHour, deliveryAddress } = LISTING(
+  const { deliveryHour, deliveryAddress } = Listing(
     order as TListing,
   ).getMetadata();
   const shouldShowRestaurantPagination =
@@ -131,7 +131,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     dispatch(
       selectRestaurantPageThunks.getRestaurantFood({
         dateTime,
-        menuId: LISTING(menu).getId(),
+        menuId: Listing(menu).getId(),
       }),
     );
     setCurrentRestaurant(restaurantInfo);

@@ -1,7 +1,7 @@
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { USER } from '@utils/data';
+import { User } from '@utils/data';
 import { useRouter } from 'next/router';
 import { useEffect, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
@@ -33,13 +33,13 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
   useEffect(() => {
     if (companyId) {
       const currentCompany = companyRefs.find(
-        (_company) => USER(_company).getId() === companyId,
+        (_company) => User(_company).getId() === companyId,
       );
       setSelectedValue({
-        value: USER(currentCompany).getId(),
-        label: USER(currentCompany).getPublicData()?.companyName,
+        value: User(currentCompany).getId(),
+        label: User(currentCompany).getPublicData()?.companyName,
       });
-      titleRef.current = USER(currentCompany).getPublicData()?.companyName;
+      titleRef.current = User(currentCompany).getPublicData()?.companyName;
     }
   }, [companyId, companyRefs, setSelectedValue]);
 
