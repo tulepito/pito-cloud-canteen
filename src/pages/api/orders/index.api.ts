@@ -1,7 +1,4 @@
-import {
-  calculateGroupMembers,
-  getAllCompanyMembers,
-} from '@helpers/companyMembers';
+import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
 import cookies from '@services/cookie';
 import getAdminAccount from '@services/getAdminAccount';
 import { fetchListing, fetchUser } from '@services/integrationHelper';

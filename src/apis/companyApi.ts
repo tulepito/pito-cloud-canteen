@@ -1,3 +1,5 @@
+import type { TObject } from '@utils/types';
+
 import { deleteApi, getApi, postApi, putApi } from './configs';
 
 export const checkEmailExistedApi = (email: string) =>
@@ -90,3 +92,11 @@ export type DeleteGroupApiData = {
 };
 export const deleteGroupApi = (data: DeleteGroupApiData) =>
   deleteApi('/company/group', data);
+
+const queryOrdersApi = (companyId: string, params: TObject = {}) => {
+  return getApi(`/company/${companyId}/orders`, params);
+};
+
+export const companyApi = {
+  queryOrdersApi,
+};

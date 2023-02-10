@@ -5,7 +5,7 @@ import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 import classNames from 'classnames';
@@ -251,7 +251,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
       packagePerMember: +packagePerMemberValue.replace(/,/g, ''),
       ...rest,
     };
-    dispatch(OrderAsyncAction.updateOrder({ generalInfo }));
+    dispatch(orderAsyncActions.updateOrder({ generalInfo }));
   };
   return (
     <Modal

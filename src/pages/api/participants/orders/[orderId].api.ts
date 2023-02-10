@@ -115,7 +115,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         });
       } catch (error) {
         handleError(res, error);
-        console.log(error);
+        console.error(error);
       }
       break;
     }
@@ -153,7 +153,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.json({ message: 'Update successfully' });
       } catch (error) {
         handleError(res, error);
-        console.log(error);
+        console.error(error);
       }
       break;
     }

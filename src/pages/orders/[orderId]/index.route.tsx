@@ -1,7 +1,7 @@
 import Meta from '@components/Layout/Meta';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { generalPaths } from '@src/paths';
+import { companyPaths } from '@src/paths';
 import { UserPermission } from '@src/types/UserPermission';
 import { CurrentUser } from '@utils/data';
 import isEmpty from 'lodash/isEmpty';
@@ -40,7 +40,7 @@ const BookerOrderDetailsRoute = () => {
       const permissionData = companyData[companyId as string] || {};
 
       if (permissionData.permission !== UserPermission.BOOKER) {
-        push(generalPaths.Home);
+        push(companyPaths.Home);
       }
     }
   }, [pageDataLoading, companyId, companyData, push]);

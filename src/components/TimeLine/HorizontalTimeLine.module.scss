@@ -1,0 +1,30 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .itemsContainer {
+    display: flex;
+    padding: 0 16px;
+    column-gap: 28px;
+    max-width: calc(100% - 80px);
+    overflow: auto hidden;
+    scroll-behavior: smooth;
+
+    .connectionLine {
+      min-width: 32px;
+      height: 2px;
+      margin-top: 20px;
+      background-color: $neutralGray4;
+    }
+  }
+
+  .navigatorBtn {
+    background-color: transparent;
+    border: none;
+    width: 32px;
+  }
+}

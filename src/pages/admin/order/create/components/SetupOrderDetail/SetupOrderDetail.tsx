@@ -5,13 +5,13 @@ import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/c
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import IconSetting from '@components/Icons/IconSetting/IconSetting';
-import { calculateGroupMembersAmount } from '@helpers/companyMembers';
+import { calculateGroupMembersAmount } from '@helpers/company';
 import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
-  OrderAsyncAction,
+  orderAsyncActions,
   selectCalendarDate,
   selectRestaurant,
   unSelectRestaurant,
@@ -241,7 +241,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   };
 
   const onSubmit = () => {
-    dispatch(OrderAsyncAction.updateOrder({ orderDetail }))
+    dispatch(orderAsyncActions.updateOrder({ orderDetail }))
       .then(() => {
         nextTab();
       })
@@ -249,7 +249,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   };
 
   useEffect(() => {
-    dispatch(OrderAsyncAction.fetchOrderDetail());
+    dispatch(orderAsyncActions.fetchOrderDetail());
   }, []);
 
   return (

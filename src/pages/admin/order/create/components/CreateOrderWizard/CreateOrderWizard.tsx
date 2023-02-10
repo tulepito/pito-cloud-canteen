@@ -3,7 +3,7 @@ import { getItem, setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
 import {
-  OrderAsyncAction,
+  orderAsyncActions,
   removeBookerList,
   resetOrder,
 } from '@redux/slices/Order.slice';
@@ -109,7 +109,7 @@ const CreateOrderWizard = () => {
 
   useEffect(() => {
     if (orderId) {
-      dispatch(OrderAsyncAction.fetchOrder(orderId as string));
+      dispatch(orderAsyncActions.fetchOrder(orderId as string));
     }
   }, [dispatch, orderId]);
 

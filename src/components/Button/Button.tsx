@@ -7,8 +7,8 @@ import React, { useEffect, useState } from 'react';
 
 import css from './Button.module.scss';
 
-type TButtonSize = 'large' | 'medium' | 'small';
-type TButtonVariant = 'primary' | 'secondary' | 'cta' | 'inline';
+export type TButtonSize = 'large' | 'medium' | 'small';
+export type TButtonVariant = 'primary' | 'secondary' | 'cta' | 'inline';
 
 type TButtonProps = PropsWithChildren<
   TDefaultProps & {

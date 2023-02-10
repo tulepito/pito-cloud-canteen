@@ -1,3 +1,4 @@
+import { companyApi } from '@apis/companyApi';
 import { fetchUserApi } from '@apis/index';
 import {
   createOrderApi,
@@ -5,12 +6,14 @@ import {
   queryOrdersApi,
   updateOrderApi,
 } from '@apis/orderApi';
+import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
+import { EOrderStates } from '@utils/enums';
 import { storableError } from '@utils/errors';
-import type { TListing, TPagination } from '@utils/types';
+import type { TListing, TObject, TPagination } from '@utils/types';
 import cloneDeep from 'lodash/cloneDeep';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
@@ -71,6 +74,13 @@ type TOrderInitialState = {
   orders: TListing[];
   queryOrderInProgress: boolean;
   queryOrderError: any;
+  totalItemMap: {
+    [EOrderStates.picking]: number;
+    [EOrderStates.completed]: number;
+    [EOrderStates.isNew]: number;
+    [EOrderStates.canceled]: number;
+    all: number;
+  };
   manageOrdersPagination: TPagination;
 };
 
@@ -123,6 +133,13 @@ const initialState: TOrderInitialState = {
     page: 0,
     perPage: 0,
   },
+  totalItemMap: {
+    [EOrderStates.picking]: 0,
+    [EOrderStates.completed]: 0,
+    [EOrderStates.isNew]: 0,
+    [EOrderStates.canceled]: 0,
+    all: 0,
+  },
 };
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
@@ -155,7 +172,7 @@ const initiateTransactions = createAsyncThunk(
 
 const queryOrders = createAsyncThunk(
   QUERY_SUB_ORDERS,
-  async (payload: any = {}) => {
+  async (payload: TObject = {}) => {
     const params = {
       dataParams: {
         ...payload,
@@ -169,6 +186,35 @@ const queryOrders = createAsyncThunk(
     const { orders, pagination } = data;
 
     return { orders, pagination };
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
+const queryCompanyOrders = createAsyncThunk(
+  'app/Orders/COMPANY_QUERY_ORDERS',
+  async (payload: TObject, { rejectWithValue }) => {
+    const { companyId = '', ...restPayload } = payload;
+
+    if (companyId === '') {
+      return rejectWithValue('Company ID is empty');
+    }
+    const params = {
+      dataParams: {
+        ...restPayload,
+        perPage: MANAGE_ORDER_PAGE_SIZE,
+        meta_companyId: companyId,
+        meta_listingType: LISTING_TYPE.ORDER,
+      },
+      queryParams: {
+        expand: true,
+      },
+    };
+    const { data } = await companyApi.queryOrdersApi(companyId, params);
+    const { orders, pagination, totalItemMap } = data;
+
+    return { orders, pagination, totalItemMap };
   },
   {
     serializeError: storableError,
@@ -237,14 +283,15 @@ const fetchOrder = createAsyncThunk(
   },
 );
 
-export const OrderAsyncAction = {
+export const orderAsyncActions = {
   createOrder,
   updateOrder,
   fetchCompanyBookers,
-  fetchOrderDetail,
   fetchOrder,
+  fetchOrderDetail,
   initiateTransactions,
   queryOrders,
+  queryCompanyOrders,
 };
 
 const orderSlice = createSlice({
@@ -429,7 +476,26 @@ const orderSlice = createSlice({
         ...state,
         fetchOrderDetailInProgress: false,
         fetchOrderDetailError: error.message,
-      }));
+      }))
+      /* =============== queryCompanyOrders =============== */
+      .addCase(queryCompanyOrders.pending, (state) => {
+        state.queryOrderInProgress = true;
+        state.queryOrderError = null;
+      })
+      .addCase(
+        queryCompanyOrders.fulfilled,
+        (state, { payload: { orders, pagination, totalItemMap } }) => ({
+          ...state,
+          queryOrderInProgress: false,
+          orders,
+          manageOrdersPagination: pagination,
+          totalItemMap,
+        }),
+      )
+      .addCase(queryCompanyOrders.rejected, (state, { payload }) => {
+        state.queryOrderInProgress = false;
+        state.queryOrderError = payload;
+      });
   },
 });
 

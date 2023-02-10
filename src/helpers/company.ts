@@ -1,5 +1,6 @@
+import { UserPermission } from '@src/types/UserPermission';
 import { User } from '@utils/data';
-import type { TObject, TUser } from '@utils/types';
+import type { TCurrentUser, TObject, TUser } from '@utils/types';
 import filter from 'lodash/filter';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
@@ -8,6 +9,17 @@ export const getAllCompanyMembers = (companyAccount: TUser) => {
   const { members = {} } = User(companyAccount).getMetadata();
 
   return Object.values<TObject>(members).map<string>(({ id }: TObject) => id);
+};
+
+export const getCompanyIdFromBookerUser = (user: TUser | TCurrentUser) => {
+  const companies = user?.attributes?.profile?.metadata?.company || {};
+  const companyIds = Object.entries(companies).find((entry) => {
+    const [, permissionData] = entry;
+
+    return (permissionData as TObject).permission === UserPermission.BOOKER;
+  });
+
+  return companyIds ? companyIds[0] : '';
 };
 
 export const calculateGroupMembers = (

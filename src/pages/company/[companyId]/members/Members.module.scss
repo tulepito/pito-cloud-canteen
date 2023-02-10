@@ -2,7 +2,7 @@
 @use '/src/styles/mixins.scss' as *;
 
 .header {
-  border-bottom: 1px solid $neutral4;
+  border-bottom: 1px solid $neutralGray4;
   @include flexAlign(center, space-between);
   padding: 24px;
 
@@ -37,7 +37,7 @@
 
   .tableRoot {
     width: 100%;
-    border: 1px solid $neutral4;
+    border: 1px solid $neutralGray4;
     border-radius: 8px;
     border-spacing: 0;
 

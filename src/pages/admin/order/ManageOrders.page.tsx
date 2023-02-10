@@ -15,7 +15,7 @@ import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { adminRoutes } from '@src/paths';
 import { parseTimestampToFormat } from '@utils/dates';
 import {
@@ -44,24 +44,22 @@ const uniqueStrings = (array: string[]) => {
   });
 };
 
-const BADGE_TYPE_BASE_ON_ORDER_STATE = {
+export const BADGE_TYPE_BASE_ON_ORDER_STATE = {
   [EOrderStates.inProgress]: EBadgeType.PROCESSING,
   [EOrderStates.isNew]: EBadgeType.PROCESSING,
-  [EOrderStates.cancel]: EBadgeType.DEFAULT,
-  [EOrderStates.delivery]: EBadgeType.SUCCESS,
-  [EOrderStates.completed]: EBadgeType.SUCCESS,
-  [EOrderStates.pendingPayment]: EBadgeType.WARNING,
   [EOrderStates.picking]: EBadgeType.WARNING,
+  [EOrderStates.reviewed]: EBadgeType.WARNING,
+  [EOrderStates.completed]: EBadgeType.WARNING,
+  [EOrderStates.canceled]: EBadgeType.DEFAULT,
 };
 
-const BADGE_CLASSNAME_BASE_ON_ORDER_STATE = {
-  [EOrderStates.inProgress]: css.badgeInProgress,
+export const BADGE_CLASSNAME_BASE_ON_ORDER_STATE = {
   [EOrderStates.isNew]: css.badgeProcessing,
-  [EOrderStates.cancel]: css.badgedefault,
-  [EOrderStates.delivery]: css.badgeSuccess,
+  [EOrderStates.inProgress]: css.badgeInProgress,
   [EOrderStates.completed]: css.badgeSuccess,
-  [EOrderStates.pendingPayment]: css.badgeWarning,
   [EOrderStates.picking]: css.badgeWarning,
+  [EOrderStates.reviewed]: css.badgeWarning,
+  [EOrderStates.canceled]: css.badgeDefault,
 };
 
 const OrderDetailTooltip = ({
@@ -419,7 +417,7 @@ const ManageOrdersPage = () => {
   useEffect(() => {
     const endDateWithOneMoreDay = addDays(new Date(meta_endDate as string), 1);
     dispatch(
-      OrderAsyncAction.queryOrders({
+      orderAsyncActions.queryOrders({
         page,
         keywords,
         ...(meta_endDate
