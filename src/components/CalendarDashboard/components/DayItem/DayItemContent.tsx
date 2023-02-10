@@ -1,3 +1,4 @@
+import type { TObject } from '@utils/types';
 import type { Event } from 'react-big-calendar';
 
 import type { TCalendarItemCardComponents } from '../../helpers/types';
@@ -8,6 +9,7 @@ type TDayColumnContentProps = {
   events: Event[];
   renderEvent?: React.FC<any>;
   components?: TCalendarItemCardComponents;
+  eventExtraProps?: TObject;
 };
 
 const DayColumnContent: React.FC<TDayColumnContentProps> = ({
@@ -15,6 +17,7 @@ const DayColumnContent: React.FC<TDayColumnContentProps> = ({
   events,
   renderEvent: EventRender,
   components,
+  eventExtraProps,
 }) => {
   const { contentEnd } = components || {};
 
@@ -22,7 +25,12 @@ const DayColumnContent: React.FC<TDayColumnContentProps> = ({
     <div className={css.dayContent}>
       {EventRender &&
         events.map((event, index) => (
-          <EventRender key={event.resource?.id} event={event} index={index} />
+          <EventRender
+            key={event.resource?.id}
+            event={event}
+            index={index}
+            eventExtraProps={eventExtraProps}
+          />
         ))}
       {contentEnd && <div>{contentEnd({ events, date })}</div>}
     </div>

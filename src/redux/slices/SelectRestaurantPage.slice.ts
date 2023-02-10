@@ -16,6 +16,8 @@ type TSelectRestaurantPageSliceInitialState = {
   foodList: any[];
   fetchFoodPending: boolean;
   fetchFoodError: any;
+
+  selectedRestaurant: TListing | null;
 };
 
 const initialState: TSelectRestaurantPageSliceInitialState = {
@@ -27,6 +29,7 @@ const initialState: TSelectRestaurantPageSliceInitialState = {
   foodList: [],
   fetchFoodPending: false,
   fetchFoodError: null,
+  selectedRestaurant: null,
 };
 
 // ================ Thunk types ================ //
@@ -136,7 +139,12 @@ export const selectRestaurantPageThunks = {
 const SelectRestaurantPageSlice = createSlice({
   name: 'SelectRestaurantPage',
   initialState,
-  reducers: {},
+  reducers: {
+    setSelectedRestaurant: (state, { payload }) => ({
+      ...state,
+      selectedRestaurant: payload,
+    }),
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getRestaurants.pending, (state) => {
@@ -176,5 +184,7 @@ const SelectRestaurantPageSlice = createSlice({
       });
   },
 });
+
+export const { setSelectedRestaurant } = SelectRestaurantPageSlice.actions;
 
 export default SelectRestaurantPageSlice.reducer;

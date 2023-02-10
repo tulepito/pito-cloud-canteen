@@ -1,4 +1,5 @@
 import useBoolean from '@hooks/useBoolean';
+import type { TObject } from '@utils/types';
 import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
 
@@ -12,6 +13,7 @@ type TWDayItemProps = {
   events?: Event[];
   renderEvent?: React.FC<any>;
   components?: TCalendarItemCardComponents;
+  eventExtraProps: TObject;
 };
 
 const WDayItem: React.FC<TWDayItemProps> = ({
@@ -19,6 +21,7 @@ const WDayItem: React.FC<TWDayItemProps> = ({
   events = [],
   renderEvent,
   components,
+  eventExtraProps,
 }) => {
   const {
     value: isMouseOnDay,
@@ -47,6 +50,7 @@ const WDayItem: React.FC<TWDayItemProps> = ({
         date={date}
         events={events}
         renderEvent={renderEvent}
+        eventExtraProps={eventExtraProps}
         components={components}
       />
     </div>

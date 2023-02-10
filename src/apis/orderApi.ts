@@ -10,7 +10,7 @@ type CreateOrderApiBody = {
 export const createOrderApi = (body: CreateOrderApiBody) =>
   postApi('/orders', body);
 
-type UpdateOrderApiBody = {
+export type UpdateOrderApiBody = {
   orderId: string;
   generalInfo?: {
     deliveryAddress: {

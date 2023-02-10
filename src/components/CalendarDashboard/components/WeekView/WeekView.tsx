@@ -2,6 +2,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
 import { useViewport } from '@hooks/useViewport';
+import type { TObject } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useEffect, useMemo } from 'react';
 import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
@@ -21,6 +22,7 @@ type TWeekViewProps = {
   accessors: any;
   renderEvent?: React.FC<any>;
   customComponents?: TCalendarItemCardComponents;
+  eventExtraProps: TObject;
 } & TimeGridProps;
 
 type TWeekViewObject = {
@@ -36,6 +38,7 @@ function WeekView({
   events = [],
   renderEvent,
   customComponents,
+  eventExtraProps,
 }: TWeekViewProps & TWeekViewObject) {
   const {
     viewport: { width },
@@ -66,6 +69,7 @@ function WeekView({
             key={item.getTime()}
             events={getEventsInDate(item, events)}
             renderEvent={renderEvent}
+            eventExtraProps={eventExtraProps}
             components={customComponents}
           />
         ))}

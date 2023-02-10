@@ -209,3 +209,20 @@ export const getDaySessionFromDeliveryTime = (time: string) => {
   // 16:30 - 23:00
   return DINNER_SESSION;
 };
+
+export const getSeparatedDates = (
+  startDateTimestamp: number,
+  endDateTimestamp: number,
+) => {
+  let currentDateTimestamp = startDateTimestamp;
+  const separatedDates = [];
+  while (currentDateTimestamp <= endDateTimestamp) {
+    separatedDates.push(currentDateTimestamp);
+    currentDateTimestamp = DateTime.fromMillis(currentDateTimestamp)
+      .plus({
+        days: 1,
+      })
+      .toMillis();
+  }
+  return separatedDates;
+};

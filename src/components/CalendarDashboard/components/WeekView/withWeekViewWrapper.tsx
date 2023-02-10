@@ -1,3 +1,4 @@
+import type { TObject } from '@utils/types';
 import Skeleton from 'react-loading-skeleton';
 
 import type { TCalendarItemCardComponents } from '../../helpers/types';
@@ -8,10 +9,12 @@ const withWeekViewWrapper = ({
   renderEvent,
   customComponents,
   inProgress,
+  eventExtraProps,
 }: {
   renderEvent: any;
   customComponents?: TCalendarItemCardComponents;
   inProgress?: boolean;
+  eventExtraProps?: TObject;
 }) => {
   const WeekViewWrapper = (props: any) => {
     if (inProgress) {
@@ -27,6 +30,7 @@ const withWeekViewWrapper = ({
       <WeekView
         {...props}
         renderEvent={renderEvent}
+        eventExtraProps={eventExtraProps}
         customComponents={customComponents}
       />
     );
