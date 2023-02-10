@@ -22,7 +22,7 @@ import { shallowEqual } from 'react-redux';
 
 import {
   createUpdateMenuApplyTimeValues,
-  MENU_COMPLETE_TAB,
+  MENU_INFORMATION_TAB,
 } from '../EditPartnerMenuWizard/utils';
 import RemoveMenuConfirmModal from '../RemoveMenuConfirmModal/RemoveMenuConfirmModal';
 import UpdateMenuModal from '../UpdateMenuModal/UpdateMenuModal';
@@ -134,7 +134,7 @@ const TABLE_COLUNMS: TColumn[] = [
             <IconEdit />
           </NamedLink>
           <NamedLink
-            path={`/admin/partner/${restaurantId}/settings/menu/create?duplicateId=${id}&tab=${MENU_COMPLETE_TAB}`}
+            path={`/admin/partner/${restaurantId}/settings/menu/create?duplicateId=${id}&tab=${MENU_INFORMATION_TAB}`}
             className={css.actionBtn}>
             <IconDuplicate />
           </NamedLink>
