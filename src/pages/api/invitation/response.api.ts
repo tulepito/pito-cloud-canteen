@@ -9,7 +9,7 @@ import {
   UserInviteStatus,
   UserPermission,
 } from '@src/types/UserPermission';
-import { denormalisedResponseEntities, USER } from '@utils/data';
+import { denormalisedResponseEntities, User } from '@utils/data';
 import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -22,12 +22,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const currentUser = denormalisedResponseEntities(
       await sdk.currentUser.show(),
     )[0];
-    const { email: userEmail } = USER(currentUser).getAttributes();
-    const { company: userCompany = {} } = USER(currentUser).getMetadata();
-    const userId = USER(currentUser).getId();
+    const { email: userEmail } = User(currentUser).getAttributes();
+    const { company: userCompany = {} } = User(currentUser).getMetadata();
+    const userId = User(currentUser).getId();
 
     const companyAccount = await fetchUser(companyId);
-    const { members = {} } = USER(companyAccount).getMetadata();
+    const { members = {} } = User(companyAccount).getMetadata();
     const userMember = members[userEmail];
 
     const { expireTime = 0 } = userMember;

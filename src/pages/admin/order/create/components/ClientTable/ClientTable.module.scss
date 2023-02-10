@@ -80,6 +80,10 @@
           padding-right: 20px;
         }
 
+        & > span:nth-child(1) {
+          width: 5%;
+        }
+
         & > span:nth-child(2) {
           width: 20%;
           max-width: 240px;
@@ -138,7 +142,7 @@
               }
 
               div {
-                color: $neutral5;
+                color: $neutralGray4;
                 margin-left: 8px;
                 @include text(12px, 16px);
                 width: 160px;

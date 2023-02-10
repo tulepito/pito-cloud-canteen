@@ -5,19 +5,19 @@ import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/c
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import IconSetting from '@components/Icons/IconSetting/IconSetting';
-import { calculateGroupMembersAmount } from '@helpers/companyMembers';
+import { calculateGroupMembersAmount } from '@helpers/company';
 import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
-  OrderAsyncAction,
+  orderAsyncActions,
   selectCalendarDate,
   selectRestaurant,
   unSelectRestaurant,
   updateDraftMealPlan,
 } from '@redux/slices/Order.slice';
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import { getDaySessionFromDeliveryTime, renderDateRange } from '@utils/dates';
 import type { TListing, TObject } from '@utils/types';
 import classNames from 'classnames';
@@ -134,8 +134,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     deliveryAddress,
     deadlineDate,
     deadlineHour,
-  } = LISTING(order as TListing).getMetadata();
-  const { title: orderTitle } = LISTING(order as TListing).getAttributes();
+  } = Listing(order as TListing).getMetadata();
+  const { title: orderTitle } = Listing(order as TListing).getAttributes();
   const companies = useAppSelector(
     (state) => state.ManageCompaniesPage.companyRefs,
     shallowEqual,
@@ -241,7 +241,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   };
 
   const onSubmit = () => {
-    dispatch(OrderAsyncAction.updateOrder({ orderDetail }))
+    dispatch(orderAsyncActions.updateOrder({ orderDetail }))
       .then(() => {
         nextTab();
       })
@@ -249,7 +249,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   };
 
   useEffect(() => {
-    dispatch(OrderAsyncAction.fetchOrderDetail());
+    dispatch(orderAsyncActions.fetchOrderDetail());
   }, []);
 
   return (

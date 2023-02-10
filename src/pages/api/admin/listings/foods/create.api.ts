@@ -39,7 +39,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     );
     res.json(response);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     handleError(res, error);
   }
 }

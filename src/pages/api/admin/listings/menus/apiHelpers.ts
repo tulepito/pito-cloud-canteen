@@ -2,7 +2,7 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import {
   denormalisedResponseEntities,
   getUniqueString,
-  INTERGRATION_LISTING,
+  IntegrationListing,
 } from '@utils/data';
 import type { TIntegrationListing, TObject } from '@utils/types';
 
@@ -15,7 +15,7 @@ const getWeekDayFromListId = (menu: TIntegrationListing, foodId: string) => {
     friFoodIdList = [],
     satFoodIdList = [],
     sunFoodIdList = [],
-  } = INTERGRATION_LISTING(menu).getMetadata();
+  } = IntegrationListing(menu).getMetadata();
   const listIds = {
     sunFoodIdList,
     tueFoodIdList,
@@ -42,8 +42,8 @@ export const updateMenuIdListAndMenuWeekDayListForFood = async (
     friFoodIdList = [],
     satFoodIdList = [],
     sunFoodIdList = [],
-  } = INTERGRATION_LISTING(menu).getMetadata();
-  const menuId = INTERGRATION_LISTING(menu).getId();
+  } = IntegrationListing(menu).getMetadata();
+  const menuId = IntegrationListing(menu).getId();
   const foodIds = getUniqueString([
     ...monFoodIdList,
     ...tueFoodIdList,
@@ -66,7 +66,7 @@ export const updateMenuIdListAndMenuWeekDayListForFood = async (
         );
         const [listing] = denormalisedResponseEntities(foodResponse);
         const { menuIdList = [], menuWeekDay = [] } =
-          INTERGRATION_LISTING(listing).getPublicData();
+          IntegrationListing(listing).getPublicData();
         const newMenuIdList = getUniqueString([...menuIdList, menuId]);
         const newMenuWeekDay = getUniqueString([
           ...menuWeekDay,
@@ -102,9 +102,9 @@ export const updateMenuIdListAndMenuWeekDayListForFood = async (
 
   return Promise.all(
     addedFoods.map(async (addedFood) => {
-      const addedFoodId = INTERGRATION_LISTING(addedFood).getId();
+      const addedFoodId = IntegrationListing(addedFood).getId();
       const { menuIdList = [], menuWeekDay = [] } =
-        INTERGRATION_LISTING(addedFood).getPublicData();
+        IntegrationListing(addedFood).getPublicData();
       const updatedMenuIdList =
         (updatedFoods.find((f) => f.id === addedFoodId)
           ?.menuIdList as unknown as string[]) || [];

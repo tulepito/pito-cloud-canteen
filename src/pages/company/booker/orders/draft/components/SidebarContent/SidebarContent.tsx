@@ -2,8 +2,8 @@ import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { getInitialLocationValues } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
-import { LISTING } from '@utils/data';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { Listing } from '@utils/data';
 import classNames from 'classnames';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -54,7 +54,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     (state) => state.Order.updateOrderInProgress,
   );
 
-  const orderData = LISTING(order);
+  const orderData = Listing(order);
   const {
     deliveryAddress,
     deliveryHour,
@@ -106,7 +106,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   const handleSubmit = (values: any) => {
     console.log(values);
     dispatch(
-      OrderAsyncAction.updateOrder({
+      orderAsyncActions.updateOrder({
         generalInfo: {
           ...values,
         },

@@ -8,7 +8,7 @@ import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { menusSliceAction, menusSliceThunks } from '@redux/slices/menus.slice';
 import { adminRoutes } from '@src/paths';
-import { INTERGRATION_LISTING, LISTING } from '@utils/data';
+import { IntegrationListing, Listing } from '@utils/data';
 import { EListingStates, EMenuMealType, EMenuTypes } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 import classNames from 'classnames';
@@ -98,7 +98,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
         )) as any);
 
     const isDraft =
-      LISTING(listing).getMetadata().listingState === EListingStates.draft;
+      Listing(listing).getMetadata().listingState === EListingStates.draft;
 
     !isDraft && !error && setSubmittedValues(values);
 
@@ -114,10 +114,10 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
     }
   };
 
-  const { title } = INTERGRATION_LISTING(currentMenu).getAttributes();
-  const { menuType } = INTERGRATION_LISTING(currentMenu).getMetadata();
+  const { title } = IntegrationListing(currentMenu).getAttributes();
+  const { menuType } = IntegrationListing(currentMenu).getMetadata();
   const { mealType, startDate, daysOfWeek, numberOfCycles, foodsByDate } =
-    INTERGRATION_LISTING(currentMenu).getPublicData();
+    IntegrationListing(currentMenu).getPublicData();
   const {
     monFoodIdList = [],
     tueFoodIdList = [],
@@ -126,7 +126,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
     friFoodIdList = [],
     satFoodIdList = [],
     sunFoodIdList = [],
-  } = INTERGRATION_LISTING(currentMenu).getMetadata();
+  } = IntegrationListing(currentMenu).getMetadata();
 
   const idsToQuery = [
     ...monFoodIdList,
@@ -223,8 +223,8 @@ const tabCompleted = (tab: string, listing: any) => {
     mealTypes = [],
     startDate,
     daysOfWeek = [],
-  } = LISTING(listing).getPublicData();
-  const { menuType } = LISTING(listing).getMetadata();
+  } = Listing(listing).getPublicData();
+  const { menuType } = Listing(listing).getMetadata();
 
   const informationTabCompleted = !!(
     menuType &&

@@ -1,0 +1,50 @@
+@use '/src/styles/vars.scss' as *;
+
+@mixin timeLineBar {
+  position: absolute;
+  background-color: $neutralGray4;
+  top: 0;
+  left: 8.5px;
+  width: 3px;
+  height: 100%;
+  content: '';
+  z-index: 1;
+}
+
+.root {
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
+  position: relative;
+
+  &::after {
+    @include timeLineBar;
+  }
+
+  & > .activeBar {
+    @include timeLineBar;
+    background-color: $neutralGray6;
+    z-index: 2;
+  }
+
+  .item {
+    padding-left: 34px;
+    position: relative;
+
+    &::after {
+      position: absolute;
+      background-color: $neutralGray4;
+      top: 0;
+      left: 0;
+      width: 20px;
+      height: 20px;
+      content: '';
+      border-radius: 50%;
+      z-index: 2;
+    }
+
+    &.isActive::after {
+      background-color: $neutralGray6;
+    }
+  }
+}

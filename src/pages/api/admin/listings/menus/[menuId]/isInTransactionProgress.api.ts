@@ -27,12 +27,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       {
         meta_menuIds: menuId,
         meta_listingType: EListingType.transaction,
-        meta_orderState: [
-          EOrderStates.inProgress,
-          EOrderStates.picking,
-          EOrderStates.pendingPayment,
-          EOrderStates.delivery,
-        ],
+        meta_orderState: [EOrderStates.inProgress, EOrderStates.picking],
       },
       queryParams,
     );

@@ -11,17 +11,22 @@ export type FeaturesHeaderProps = {
   headerData: {
     key: string;
     icon: ReactNode;
-    title: string | ReactNode;
+    title: ReactNode;
     pathname: string;
     query?: TObject;
   }[];
 };
+
 const FeaturesHeader: React.FC<FeaturesHeaderProps> = (props) => {
   const { headerData } = props;
-  const router = useRouter();
-  const activeKey = headerData.find(
-    (data) => data.pathname === router.pathname,
-  )?.key;
+  const { pathname: routerPathName } = useRouter();
+  const { key: activeKey } =
+    headerData.find(({ pathname }) =>
+      pathname === '/'
+        ? routerPathName === pathname
+        : routerPathName.includes(pathname),
+    ) || {};
+
   return (
     <nav className={css.container}>
       <ul className={css.navWrapper}>
@@ -30,6 +35,7 @@ const FeaturesHeader: React.FC<FeaturesHeaderProps> = (props) => {
             [css.active]: key === activeKey,
           });
           const hrefObject = !isEmpty(query) ? { pathname, query } : pathname;
+
           return (
             <li key={key}>
               <Link className={activeHeaderItemClasses} href={hrefObject}>

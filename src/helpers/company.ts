@@ -1,20 +1,32 @@
-import { USER } from '@utils/data';
-import type { TObject, TUser } from '@utils/types';
+import { UserPermission } from '@src/types/UserPermission';
+import { User } from '@utils/data';
+import type { TCurrentUser, TObject, TUser } from '@utils/types';
 import filter from 'lodash/filter';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
 
 export const getAllCompanyMembers = (companyAccount: TUser) => {
-  const { members = {} } = USER(companyAccount).getMetadata();
+  const { members = {} } = User(companyAccount).getMetadata();
 
   return Object.values<TObject>(members).map<string>(({ id }: TObject) => id);
+};
+
+export const getCompanyIdFromBookerUser = (user: TUser | TCurrentUser) => {
+  const companies = user?.attributes?.profile?.metadata?.company || {};
+  const companyIds = Object.entries(companies).find((entry) => {
+    const [, permissionData] = entry;
+
+    return (permissionData as TObject).permission === UserPermission.BOOKER;
+  });
+
+  return companyIds ? companyIds[0] : '';
 };
 
 export const calculateGroupMembers = (
   companyAccount: TUser,
   groupList: string[],
 ) => {
-  const { groups } = USER(companyAccount).getMetadata();
+  const { groups } = User(companyAccount).getMetadata();
 
   if (groupList.includes('allMembers')) {
     return getAllCompanyMembers(companyAccount);
@@ -45,10 +57,10 @@ export const checkMemberBelongToCompany = (
   memberEmail: string,
   companyAccount: TUser,
 ) => {
-  const { members = {} } = USER(companyAccount).getMetadata();
+  const { members = {} } = User(companyAccount).getMetadata();
   return !!members[memberEmail];
 };
 
 export const getMemberById = (id: string, companyMembers: TUser[]) => {
-  return companyMembers.find((_member) => USER(_member).getId() === id);
+  return companyMembers.find((_member) => User(_member).getId() === id);
 };

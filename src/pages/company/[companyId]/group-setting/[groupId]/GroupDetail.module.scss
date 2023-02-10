@@ -55,7 +55,7 @@
 
   .tableRoot {
     width: 100%;
-    border: 1px solid $neutral4;
+    border: 1px solid $neutralGray4;
     border-radius: 8px;
     border-spacing: 0;
 
@@ -71,6 +71,7 @@
       }
 
       .tableHeadCell {
+        text-transform: uppercase;
         &:first-child {
           border-top-left-radius: 8px;
         }

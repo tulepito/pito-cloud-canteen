@@ -10,7 +10,7 @@ import Table from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
-import { INTERGRATION_LISTING } from '@utils/data';
+import { IntegrationListing } from '@utils/data';
 import { getLabelByKey, SIDE_DISH_OPTIONS } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 import { parsePrice } from '@utils/validators';
@@ -114,7 +114,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
 
   useEffect(() => {
     if (restaurantId && currentMenu && isOpen) {
-      const { menuType } = INTERGRATION_LISTING(currentMenu).getMetadata();
+      const { menuType } = IntegrationListing(currentMenu).getMetadata();
       dispatch(
         foodSliceThunks.queryPartnerFoods({
           restaurantId,

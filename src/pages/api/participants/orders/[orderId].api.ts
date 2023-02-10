@@ -3,9 +3,9 @@
 import cookies from '@services/cookie';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import {
-  CURRENT_USER,
+  CurrentUser,
   denormalisedResponseEntities,
-  LISTING,
+  Listing,
 } from '@utils/data';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -94,8 +94,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         );
 
         const subOrderPromises = plans.map(async (plan: TListing) => {
-          const { orderDetail } = LISTING(plan).getMetadata();
-          const planId = LISTING(plan).getId();
+          const { orderDetail } = Listing(plan).getMetadata();
+          const planId = Listing(plan).getId();
           return {
             [planId]: await fetchSubOrder(orderDetail),
           };
@@ -115,7 +115,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         });
       } catch (error) {
         handleError(res, error);
-        console.log(error);
+        console.error(error);
       }
       break;
     }
@@ -127,12 +127,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const currentUser = denormalisedResponseEntities(
           await sdk.currentUser.show(),
         )[0];
-        const currentUserId = CURRENT_USER(currentUser).getId();
+        const currentUserId = CurrentUser(currentUser).getId();
         const updatingPlan = denormalisedResponseEntities(
           await integrationSdk.listings.show({ id: planId }),
         )[0];
 
-        const orderDetail = LISTING(updatingPlan).getMetadata()?.orderDetail;
+        const orderDetail = Listing(updatingPlan).getMetadata()?.orderDetail;
 
         if (orderDay && memberOrders) {
           orderDetail[orderDay].memberOrders[currentUserId] =
@@ -153,7 +153,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.json({ message: 'Update successfully' });
       } catch (error) {
         handleError(res, error);
-        console.log(error);
+        console.error(error);
       }
       break;
     }

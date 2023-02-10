@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/default-param-last */
 import { ListingTypes } from '@src/types/listingTypes';
-import { INTERGRATION_LISTING } from '@utils/data';
+import { IntegrationListing } from '@utils/data';
 import {
   addDaysToDate,
   addWeeksToDate,
@@ -137,7 +137,7 @@ export const createSubmitMenuValues = (
     numberOfCycles,
   } = values;
   const isCycleMenu = menuType === EMenuTypes.cycleMenu;
-  const { listingState } = INTERGRATION_LISTING(menu).getMetadata();
+  const { listingState } = IntegrationListing(menu).getMetadata();
   const alreadyPublished = listingState === EListingStates.published;
   const endDate =
     isCycleMenu &&
@@ -202,7 +202,7 @@ export const createDuplicateSubmitMenuValues = (
   } = values;
   const isCycleMenu = menuType === EMenuTypes.cycleMenu;
 
-  const { title: titleFromMenu } = INTERGRATION_LISTING(menu).getAttributes();
+  const { title: titleFromMenu } = IntegrationListing(menu).getAttributes();
 
   const {
     mealType: mealTyperFromMenu,
@@ -217,7 +217,7 @@ export const createDuplicateSubmitMenuValues = (
     sunAverageFoodPrice: sunAverageFoodPriceFromMenu,
     daysOfWeek: daysOfWeekFromMenu,
     foodsByDate: foodsByDateFromMenu,
-  } = INTERGRATION_LISTING(menu).getPublicData();
+  } = IntegrationListing(menu).getPublicData();
 
   const {
     monFoodIdList: monFoodIdListFromMenu,
@@ -227,10 +227,9 @@ export const createDuplicateSubmitMenuValues = (
     friFoodIdList: friFoodIdListFromMenu,
     satFoodIdList: satFoodIdListFromMenu,
     sunFoodIdList: sunFoodIdListFromMenu,
-  } = INTERGRATION_LISTING(menu).getMetadata();
+  } = IntegrationListing(menu).getMetadata();
 
-  const { menuType: menuTypeFromMenu } =
-    INTERGRATION_LISTING(menu).getMetadata();
+  const { menuType: menuTypeFromMenu } = IntegrationListing(menu).getMetadata();
 
   const endDateFromMenu =
     menuTypeFromMenu === EMenuTypes.cycleMenu &&

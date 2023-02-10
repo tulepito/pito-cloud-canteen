@@ -434,6 +434,9 @@ export type TIntegrationListing = {
   attributes: TAdminListingAttributes & TDeletedListingAttributes;
   author?: TUser;
   images?: TImage[];
+  company?: TCompany;
+  plan?: TListing;
+  order?: TOrderListing;
 };
 
 export type TIntegrationOrderListing = {
@@ -443,5 +446,6 @@ export type TIntegrationOrderListing = {
   author?: TUser;
   images?: TImage[];
   company?: TCompany;
+  plan?: TListing;
   subOrders?: TIntegrationListing[];
 };

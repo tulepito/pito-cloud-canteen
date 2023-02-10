@@ -1,16 +1,20 @@
+import { companyApi } from '@apis/companyApi';
 import { fetchUserApi } from '@apis/index';
 import {
+  bookerDeleteDraftOrderApi,
   createOrderApi,
   initiateTransactionsApi,
   queryOrdersApi,
   updateOrderApi,
 } from '@apis/orderApi';
+import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { UserPermission } from '@src/types/UserPermission';
-import { denormalisedResponseEntities, LISTING, USER } from '@utils/data';
+import { denormalisedResponseEntities, Listing, User } from '@utils/data';
+import { EListingStates, EOrderStates } from '@utils/enums';
 import { storableError } from '@utils/errors';
-import type { TListing, TPagination } from '@utils/types';
+import type { TListing, TObject, TPagination } from '@utils/types';
 import cloneDeep from 'lodash/cloneDeep';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
@@ -68,9 +72,19 @@ type TOrderInitialState = {
   initiateTransactionsError: any;
 
   // Manage Orders Page
+  queryParams: TObject;
   orders: TListing[];
   queryOrderInProgress: boolean;
   queryOrderError: any;
+  deleteDraftOrderInProgress: boolean;
+  deleteDraftOrderError: any;
+  totalItemMap: {
+    [EOrderStates.picking]: number;
+    [EOrderStates.completed]: number;
+    [EOrderStates.isNew]: number;
+    [EOrderStates.canceled]: number;
+    all: number;
+  };
   manageOrdersPagination: TPagination;
 };
 
@@ -114,14 +128,24 @@ const initialState: TOrderInitialState = {
   initiateTransactionsError: null,
 
   // Manage Orders
+  queryParams: {},
   orders: [],
   queryOrderInProgress: false,
   queryOrderError: null,
+  deleteDraftOrderInProgress: false,
+  deleteDraftOrderError: null,
   manageOrdersPagination: {
     totalItems: 0,
     totalPages: 0,
     page: 0,
     perPage: 0,
+  },
+  totalItemMap: {
+    [EOrderStates.picking]: 0,
+    [EOrderStates.completed]: 0,
+    [EOrderStates.isNew]: 0,
+    [EOrderStates.canceled]: 0,
+    all: 0,
   },
 };
 
@@ -139,7 +163,7 @@ const updateOrder = createAsyncThunk(
   UPDATE_ORDER,
   async (params: any, { getState }) => {
     const { order } = getState().Order;
-    const orderId = LISTING(order as TListing).getId();
+    const orderId = Listing(order as TListing).getId();
     const { data: orderListing } = await updateOrderApi({ ...params, orderId });
     return orderListing;
   },
@@ -155,7 +179,7 @@ const initiateTransactions = createAsyncThunk(
 
 const queryOrders = createAsyncThunk(
   QUERY_SUB_ORDERS,
-  async (payload: any = {}) => {
+  async (payload: TObject = {}) => {
     const params = {
       dataParams: {
         ...payload,
@@ -175,6 +199,36 @@ const queryOrders = createAsyncThunk(
   },
 );
 
+const queryCompanyOrders = createAsyncThunk(
+  'app/Orders/COMPANY_QUERY_ORDERS',
+  async (payload: TObject, { rejectWithValue }) => {
+    const { companyId = '', ...restPayload } = payload;
+
+    if (companyId === '') {
+      return rejectWithValue('Company ID is empty');
+    }
+    const params = {
+      dataParams: {
+        ...restPayload,
+        states: EListingStates.published,
+        perPage: MANAGE_ORDER_PAGE_SIZE,
+        meta_companyId: companyId,
+        meta_listingType: LISTING_TYPE.ORDER,
+      },
+      queryParams: {
+        expand: true,
+      },
+    };
+    const { data } = await companyApi.queryOrdersApi(companyId, params);
+    const { orders, pagination, totalItemMap } = data;
+
+    return { orders, pagination, totalItemMap, queryParams: payload };
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
 const fetchCompanyBookers = createAsyncThunk(
   FETCH_COMPANY_BOOKERS,
   async (companyId: string, { extra: sdk }) => {
@@ -186,7 +240,7 @@ const fetchCompanyBookers = createAsyncThunk(
         { expand: true },
       ),
     )[0];
-    const { members = {} } = USER(companyAccount).getMetadata();
+    const { members = {} } = User(companyAccount).getMetadata();
     const bookerEmails = Object.keys(members).filter(
       (email) => members[email].permission === UserPermission.BOOKER,
     );
@@ -205,14 +259,14 @@ const fetchOrderDetail = createAsyncThunk(
   async (_, { getState, extra: sdk }) => {
     const { order } = getState().Order;
 
-    const { plans = [] } = LISTING(order as TListing).getMetadata();
+    const { plans = [] } = Listing(order as TListing).getMetadata();
     if (plans[0]) {
       const response = denormalisedResponseEntities(
         await sdk.listings.show({
           id: plans[0],
         }),
       )[0];
-      return LISTING(response).getMetadata().orderDetail;
+      return Listing(response).getMetadata().orderDetail;
     }
     return {};
   },
@@ -227,7 +281,7 @@ const fetchOrder = createAsyncThunk(
       }),
     )[0];
 
-    const { bookerId } = LISTING(response).getMetadata();
+    const { bookerId } = Listing(response).getMetadata();
     const selectedBooker = denormalisedResponseEntities(
       await sdk.users.show({
         id: bookerId,
@@ -237,14 +291,26 @@ const fetchOrder = createAsyncThunk(
   },
 );
 
-export const OrderAsyncAction = {
+const bookerDeleteDraftOrder = createAsyncThunk(
+  'app/Order/DELETE_DRAFT_ORDER',
+  async ({ orderId, companyId }: TObject, { getState, dispatch }) => {
+    const { queryParams } = getState().Order;
+
+    await bookerDeleteDraftOrderApi({ orderId, companyId });
+    await dispatch(queryCompanyOrders(queryParams));
+  },
+);
+
+export const orderAsyncActions = {
   createOrder,
   updateOrder,
+  bookerDeleteDraftOrder,
   fetchCompanyBookers,
-  fetchOrderDetail,
   fetchOrder,
+  fetchOrderDetail,
   initiateTransactions,
   queryOrders,
+  queryCompanyOrders,
 };
 
 const orderSlice = createSlice({
@@ -429,7 +495,43 @@ const orderSlice = createSlice({
         ...state,
         fetchOrderDetailInProgress: false,
         fetchOrderDetailError: error.message,
-      }));
+      }))
+      /* =============== queryCompanyOrders =============== */
+      .addCase(queryCompanyOrders.pending, (state) => {
+        state.queryOrderInProgress = true;
+        state.queryOrderError = null;
+      })
+      .addCase(
+        queryCompanyOrders.fulfilled,
+        (
+          state,
+          { payload: { orders, pagination, totalItemMap, queryParams } },
+        ) => ({
+          ...state,
+          queryParams,
+
+          queryOrderInProgress: false,
+          orders,
+          manageOrdersPagination: pagination,
+          totalItemMap,
+        }),
+      )
+      .addCase(queryCompanyOrders.rejected, (state, { payload }) => {
+        state.queryOrderInProgress = false;
+        state.queryOrderError = payload;
+      })
+      /* =============== bookerDeleteDraftOrder =============== */
+      .addCase(bookerDeleteDraftOrder.pending, (state) => {
+        state.deleteDraftOrderInProgress = false;
+        state.queryOrderError = null;
+      })
+      .addCase(bookerDeleteDraftOrder.fulfilled, (state) => {
+        state.deleteDraftOrderInProgress = true;
+      })
+      .addCase(bookerDeleteDraftOrder.rejected, (state, { payload }) => {
+        state.deleteDraftOrderInProgress = false;
+        state.queryOrderError = payload;
+      });
   },
 });
 

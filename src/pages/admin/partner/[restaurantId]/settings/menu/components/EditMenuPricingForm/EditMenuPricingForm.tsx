@@ -3,7 +3,7 @@ import { InlineTextButton } from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import Form from '@components/Form/Form';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
-import { INTERGRATION_LISTING } from '@utils/data';
+import { IntegrationListing } from '@utils/data';
 import { getDayOfWeekByIndex } from '@utils/dates';
 import type { TIntegrationListing } from '@utils/types';
 import type { FormApi } from 'final-form';
@@ -102,7 +102,7 @@ const EditMenuPricingFormComponent: React.FC<
     });
   };
 
-  const { daysOfWeek } = INTERGRATION_LISTING(currentMenu).getPublicData();
+  const { daysOfWeek } = IntegrationListing(currentMenu).getPublicData();
 
   const resourcesForCalendar = renderResourcesForCalendar(values.foodsByDate, {
     onRemovePickedFood,
@@ -136,7 +136,7 @@ const EditMenuPricingFormComponent: React.FC<
     const dayOfWeekToCompare = getDayOfWeekByIndex(dayAsIndex);
 
     const { daysOfWeek: daysOfWeekFromMenu = [] } =
-      INTERGRATION_LISTING(currentMenu).getPublicData();
+      IntegrationListing(currentMenu).getPublicData();
     if (!daysOfWeekFromMenu.includes(dayOfWeekToCompare)) {
       return <></>;
     }
@@ -163,7 +163,7 @@ const EditMenuPricingFormComponent: React.FC<
     const dayOfWeekToCompare = getDayOfWeekByIndex(dayAsIndex);
 
     const { daysOfWeek: daysOfWeekFromMenu = [] } =
-      INTERGRATION_LISTING(currentMenu).getPublicData();
+      IntegrationListing(currentMenu).getPublicData();
     if (!daysOfWeekFromMenu.includes(dayOfWeekToCompare)) {
       return <></>;
     }

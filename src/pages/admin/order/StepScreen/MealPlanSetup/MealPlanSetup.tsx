@@ -1,9 +1,9 @@
 import Form from '@components/Form/Form';
-import { calculateGroupMembersAmount } from '@helpers/companyMembers';
+import { calculateGroupMembersAmount } from '@helpers/company';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
-import { LISTING, USER } from '@utils/data';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { Listing, User } from '@utils/data';
 import type { TListing } from '@utils/types';
 import isEmpty from 'lodash/isEmpty';
 import { useMemo } from 'react';
@@ -58,7 +58,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     deadlineDate,
     deadlineHour,
     memberAmount,
-  } = LISTING(order as TListing).getMetadata();
+  } = Listing(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const companies = useAppSelector(
     (state) => state.ManageCompaniesPage.companyRefs,
@@ -98,7 +98,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
       ...rest,
     };
-    dispatch(OrderAsyncAction.updateOrder({ generalInfo })).then(() => {
+    dispatch(orderAsyncActions.updateOrder({ generalInfo })).then(() => {
       nextTab();
     });
   };
@@ -170,8 +170,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
               {intl.formatMessage(
                 { id: 'MealPlanSetup.headerLabel' },
                 {
-                  companyName: USER(currentClient).getPublicData().companyName,
-                  bookerName: USER(selectedBooker).getProfile().displayName,
+                  companyName: User(currentClient).getPublicData().companyName,
+                  bookerName: User(selectedBooker).getProfile().displayName,
                 },
               )}
             </div>

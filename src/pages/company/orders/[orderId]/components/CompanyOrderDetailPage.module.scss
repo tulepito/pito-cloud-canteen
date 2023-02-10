@@ -1,0 +1,50 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  .titleSection {
+    padding: 0 8px;
+
+    @include viewportSmall {
+      padding: 0 16px;
+    }
+
+    @include viewportMedium {
+      padding: 24px;
+      margin: 0 auto;
+    }
+
+    @include viewportLarge {
+      max-width: 1252px;
+      padding: 0 36px;
+    }
+
+    @include viewportSLarge {
+      padding: 0 130px;
+      max-width: calc(1180px + 130px * 2);
+      margin: 0 calc(50vw - $sl/2);
+    }
+  }
+
+  .reviewInfoContainer {
+    padding: 16px 8px;
+
+    @include viewportSmall {
+      padding: 24px 16px;
+    }
+
+    @include viewportMedium {
+      padding: 24px;
+      margin: 0 auto;
+    }
+
+    @include viewportLarge {
+      padding: 36px;
+    }
+
+    @include viewportSLarge {
+      padding: 36px 130px;
+      max-width: calc(1180px + 130px * 2);
+      margin: 0 calc(50vw - $sl/2);
+    }
+  }
+}

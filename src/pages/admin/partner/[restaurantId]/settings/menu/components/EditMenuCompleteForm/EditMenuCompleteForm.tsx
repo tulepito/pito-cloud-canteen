@@ -1,6 +1,6 @@
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import Form from '@components/Form/Form';
-import { INTERGRATION_LISTING } from '@utils/data';
+import { IntegrationListing } from '@utils/data';
 import { parseTimestampToFormat } from '@utils/dates';
 import { EMenuTypes, getLabelByKey, MENU_OPTIONS } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
@@ -61,10 +61,10 @@ const EditMenuCompleteFormComponent: React.FC<
 > = (props) => {
   const { handleSubmit, currentMenu, formRef, form, restaurantId } = props;
   formRef.current = form;
-  const { title } = INTERGRATION_LISTING(currentMenu).getAttributes();
-  const { menuType } = INTERGRATION_LISTING(currentMenu).getMetadata();
+  const { title } = IntegrationListing(currentMenu).getAttributes();
+  const { menuType } = IntegrationListing(currentMenu).getMetadata();
   const { startDate, endDate } =
-    INTERGRATION_LISTING(currentMenu).getPublicData();
+    IntegrationListing(currentMenu).getPublicData();
 
   const {
     monFoodIdList = [],
@@ -74,7 +74,7 @@ const EditMenuCompleteFormComponent: React.FC<
     friFoodIdList = [],
     satFoodIdList = [],
     sunFoodIdList = [],
-  } = INTERGRATION_LISTING(currentMenu).getMetadata();
+  } = IntegrationListing(currentMenu).getMetadata();
 
   const getFoodsByDateIds = () => {
     return [

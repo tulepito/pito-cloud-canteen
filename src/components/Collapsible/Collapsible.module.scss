@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+
 .root {
   border: 1px solid $neutralGray4;
   border-radius: 4px;
@@ -7,9 +8,17 @@
   padding: 16px 16px 0 16px;
   margin-bottom: 24px;
 
+  .arrowIcon {
+    transition: rotate 0.25s;
+  }
+
   &.isOpen {
     padding-bottom: 16px;
     overflow: visible;
+
+    .arrowIcon {
+      rotate: 180deg;
+    }
   }
 
   .labelSection {

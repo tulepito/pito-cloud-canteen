@@ -1,9 +1,9 @@
 import cookies from '@services/cookie';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
-import { denormalisedResponseEntities } from '@utils/data';
+import { denormalisedResponseEntities, Listing } from '@utils/data';
 import type { TObject } from '@utils/types';
-import get from 'lodash/get';
+import { isEmpty } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -22,14 +22,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           plans = [],
           companyId,
           participants = [],
-        } = get(orderListing, 'attributes.metadata', {});
+          bookerId = '',
+        } = Listing(orderListing).getMetadata();
 
         const companyResponse = await integrationSdk.users.show({
           id: companyId,
         });
         const [companyUser] = denormalisedResponseEntities(companyResponse);
 
-        let data: TObject = { companyId, companyData: companyUser };
+        let data: TObject = {
+          companyId,
+          companyData: companyUser,
+          orderListing,
+        };
         const participantData = await Promise.all(
           participants.map(async (id: string) => {
             const [memberAccount] = denormalisedResponseEntities(
@@ -44,7 +49,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         data = { ...data, participantData };
 
-        if (plans?.length > 0) {
+        if (plans.length > 0) {
           const planId = plans[0];
           const [planListing] = denormalisedResponseEntities(
             await integrationSdk.listings.show({
@@ -52,7 +57,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             }),
           );
 
-          data = { ...data, orderListing, planListing };
+          data = { ...data, planListing };
+        }
+
+        if (!isEmpty(bookerId)) {
+          const [bookerData] = denormalisedResponseEntities(
+            await integrationSdk.users.show({
+              id: bookerId,
+            }),
+          );
+
+          data = { ...data, bookerData };
         }
 
         res.json({ statusCode: 200, ...data });
