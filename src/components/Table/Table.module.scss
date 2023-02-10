@@ -95,11 +95,6 @@
         position: relative;
         font-size: 14px;
 
-        span {
-          @include lineClamp(3);
-          word-break: break-all;
-          overflow: initial;
-        }
         &:before {
           content: attr(data-label);
           left: 0;
