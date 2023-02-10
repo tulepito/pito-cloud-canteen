@@ -1,26 +1,31 @@
 import { USER } from '@utils/data';
-import type { TUser } from '@utils/types';
+import type { TObject, TUser } from '@utils/types';
 import filter from 'lodash/filter';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
+
+export const getAllCompanyMembers = (companyAccount: TUser) => {
+  const { members = {} } = USER(companyAccount).getMetadata();
+
+  return Object.values<TObject>(members).map<string>(({ id }: TObject) => id);
+};
 
 export const calculateGroupMembers = (
   companyAccount: TUser,
   groupList: string[],
 ) => {
-  const { groups, members = {} } =
-    companyAccount.attributes.profile.metadata || {};
+  const { groups } = USER(companyAccount).getMetadata();
 
   if (groupList.includes('allMembers')) {
-    return Object.values(members).map((_member: any) => _member.id);
+    return getAllCompanyMembers(companyAccount);
   }
 
-  const allGroupMembers = groupList.map((groupId: string) => {
+  const allGroupMembers = groupList.map<string>((groupId: string) => {
     const currentGroup = groups.find((_group: any) => _group.id === groupId);
-    return currentGroup.members.map((member: any) => member.id);
+    return currentGroup?.members.map((member: any) => member.id);
   });
 
-  return uniq(flatten(allGroupMembers));
+  return uniq(flatten(allGroupMembers)) as string[];
 };
 
 export const calculateGroupMembersAmount = (
@@ -31,7 +36,7 @@ export const calculateGroupMembersAmount = (
 };
 
 export const getGroupNames = (groupIds: string[], groupList: any) => {
-  return filter(groupList, (group: any) => groupIds.includes(group.id))
+  return filter(groupList, (group: any) => (groupIds || []).includes(group.id))
     .map((group: any) => group.name)
     .join(', ');
 };
@@ -42,4 +47,8 @@ export const checkMemberBelongToCompany = (
 ) => {
   const { members = {} } = USER(companyAccount).getMetadata();
   return !!members[memberEmail];
+};
+
+export const getMemberById = (id: string, companyMembers: TUser[]) => {
+  return companyMembers.find((_member) => USER(_member).getId() === id);
 };

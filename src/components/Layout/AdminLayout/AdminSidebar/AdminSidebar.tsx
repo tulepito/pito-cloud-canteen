@@ -64,17 +64,13 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         id: 'partner',
         label: 'AdminSidebar.partnerLabel',
         nameLink: adminRoutes.ManagePartners.path,
+        highlightRefLinks: [adminRoutes.CreatePartner.path],
         // showOnActiveChildrenMenus has all childrens that only show up when these menues is active
         // Example : Default is not showing these paths. But when the pathname === nameLink in these paths
         showOnActiveChildrenMenus: [
           {
-            id: 'orderDetails',
-            label: 'AdminSidebar.partnerDetailsLabel',
-            nameLink: adminRoutes.PartnerDetails.path,
-          },
-          {
             id: 'editOrder',
-            label: 'AdminSidebar.editPartnerLabel',
+            label: 'AdminSidebar.partnerDetailsLabel',
             nameLink: adminRoutes.EditPartner.path,
           },
           {
@@ -82,15 +78,6 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
             label: 'AdminSidebar.partnerSettingLabel',
             nameLink: adminRoutes.PartnerSettings.path,
             childrenMenus: [
-              {
-                id: 'managePartnerFood',
-                label: 'AdminSidebar.managePartnerFoodLabel',
-                nameLink: adminRoutes.ManagePartnerFoods.path,
-                highlightRefLinks: [
-                  adminRoutes.CreatePartnerFood.path,
-                  adminRoutes.EditPartnerFood.path,
-                ],
-              },
               {
                 id: 'managePartnerMenu',
                 label: 'AdminSidebar.managePartnerMenuLabel',
@@ -109,6 +96,15 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
                     label: 'AdminSidebar.managePartnerCycleMenuLabel',
                     nameLink: adminRoutes.ManagePartnerCycleMenus.path,
                   },
+                ],
+              },
+              {
+                id: 'managePartnerFood',
+                label: 'AdminSidebar.managePartnerFoodLabel',
+                nameLink: adminRoutes.ManagePartnerFoods.path,
+                highlightRefLinks: [
+                  adminRoutes.CreatePartnerFood.path,
+                  adminRoutes.EditPartnerFood.path,
                 ],
               },
             ],
@@ -183,6 +179,7 @@ const AdminSidebar: React.FC<TAdminSidebarProps> = (props) => {
             </h1>
             <MultiLevelSidebar
               rootClassName={css.multiLevelMenu}
+              menuLabelClassName={css.menuItemLabel}
               subMenuLayoutClassName={css.subMenuLayout}
               menus={activeMenu.childrenMenus || []}
             />

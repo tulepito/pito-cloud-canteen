@@ -1,5 +1,3 @@
-import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import {
   createDraftPartnerApi,
   deletePartnerApi,
@@ -8,7 +6,9 @@ import {
   showRestaurantApi,
   updateRestaurantApi,
   updateRestaurantStatusApi,
-} from '@utils/api';
+} from '@apis/index';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
 import {
   EImageVariants,

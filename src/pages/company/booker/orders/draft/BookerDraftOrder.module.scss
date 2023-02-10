@@ -1,0 +1,20 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  padding-top: 72px;
+}
+
+.main {
+  height: 100%;
+  padding: 50px 24px;
+  display: flex;
+}
+
+.calendar {
+  width: calc(100vw - 48px);
+
+  @include viewportLargeWithPaddings {
+    width: 100%;
+  }
+}

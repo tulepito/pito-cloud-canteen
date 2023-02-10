@@ -14,8 +14,19 @@
   min-height: fit-content;
   border: 1px solid $neutralGray4;
   .iconAdd {
+    border: 1px solid $neutralGray4;
+    width: 16.67px;
+    height: 16.67px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    border-radius: 4px;
     svg {
-      margin-right: 10px;
+      path {
+        width: 8px;
+        height: 8px;
+      }
     }
   }
 }

@@ -2,7 +2,9 @@
 @use '/src/styles/vars.scss' as *;
 
 .headRoot {
-  padding-bottom: 8px;
+  padding: 12px 24px;
+  background-color: $neutralGray3;
+  border-radius: 8px;
 }
 
 .itemRoot {
@@ -20,6 +22,10 @@
   padding: 16px 0 21px 0;
   cursor: pointer;
 
+  &:hover {
+    background-color: $neutralGray2;
+  }
+
   &::after {
     position: absolute;
     bottom: 0;
@@ -27,6 +33,12 @@
     width: 100%;
     height: 1px;
     background-color: $neutralGray4;
+  }
+
+  .item {
+    &:first-child {
+      padding-left: 24px;
+    }
   }
 }
 

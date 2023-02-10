@@ -1,42 +1,153 @@
+import Avatar from '@components/Avatar/Avatar';
+import Button from '@components/Button/Button';
+import Form from '@components/Form/Form';
+import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
+import IconMail from '@components/Icons/IconMail/IconMail';
+import IconPhone from '@components/Icons/IconPhone/IconPhone';
+import IconSort from '@components/Icons/IconSort/IconSort';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import Pagination from '@components/Pagination/Pagination';
-import Tooltip from '@components/Tooltip/Tooltip';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { addBooker } from '@redux/slices/Order.slice';
+import { USER } from '@utils/data';
+import type { TUser } from '@utils/types';
 import classNames from 'classnames';
+import { useState } from 'react';
+import type { FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './ClientTable.module.scss';
 import IconNoClientsFound from './IconNoClientsFound';
 
+const PAGE_SIZE = 10;
+
 type ClientTableProps = {
   data: any[];
   totalItems: number;
   page: number;
+  bookerList: TUser[];
+  fetchBookersInProgress: boolean;
+  createOrderInProgress: boolean;
   onPageChange: (value: number) => void;
-  onItemClick?: (value: string) => () => void;
+  onItemClick?: (value: string) => void;
+  onSubmit: (values: any) => void;
+  toggleSort: () => void;
 };
 
 const ClientTable: React.FC<ClientTableProps> = (props) => {
   const intl = useIntl();
-  const { data = [], totalItems, onPageChange, page, onItemClick } = props;
+  const dispatch = useAppDispatch();
+  const {
+    data = [],
+    totalItems,
+    onPageChange,
+    page,
+    onItemClick,
+    onSubmit,
+    bookerList,
+    fetchBookersInProgress,
+    toggleSort,
+    createOrderInProgress,
+  } = props;
+  const [selectedConpanyId, setSelectedCompanyId] = useState<string>('');
+  const [selectedBookerId, setSelectedBookerId] = useState<string>('');
   const shouldShowPagination = page && data?.length > 0;
 
-  const renderTableRowFn = ({ key, data: itemData }: any, index: number) => (
-    <div
-      key={key}
-      className={css.bodyRow}
-      onClick={onItemClick && onItemClick(itemData.id)}>
-      <span className={css.bodyCell}>{index + 1}</span>
-      <span className={css.bodyCell}>
-        <span>{itemData.companyName}</span>
-      </span>
-      <span className={classNames(css.bodyCell, css.phoneEmail)}>
-        <div className={css.phone}>{itemData.phone}</div>
-        <Tooltip placement="bottom" tooltipContent={itemData.email}>
-          <div className={css.email}>{itemData.email}</div>
-        </Tooltip>
-      </span>
-      <span className={css.bodyCell}>{itemData.address}</span>
-    </div>
-  );
+  const renderTableRowFn = (tableData: any, form: any) => {
+    return tableData.map(({ key, data: itemData }: any, index: number) => {
+      const onCustomItemClick = () => {
+        if (selectedConpanyId === itemData.id) {
+          return;
+        }
+        form.batch(() => {
+          form.change('clientId', itemData.id);
+          form.change('booker', '');
+        });
+        setSelectedCompanyId(itemData.id);
+        setSelectedBookerId('');
+        if (onItemClick) {
+          onItemClick(itemData.id);
+        }
+      };
+      const showBookerList =
+        selectedConpanyId === itemData.id &&
+        bookerList.length > 0 &&
+        !fetchBookersInProgress;
+      const showLoading =
+        selectedConpanyId === itemData.id && fetchBookersInProgress;
+      return (
+        <div key={key} className={css.bodyRow}>
+          <div className={css.mainRow} onClick={onCustomItemClick}>
+            <span>
+              <FieldRadioButton
+                id={`clientId-${itemData.id}`}
+                name="clientId"
+                value={itemData.id}
+              />
+            </span>
+            <span className={css.bodyCell}>{index + 1}</span>
+            <span className={css.bodyCell}>
+              <span>{itemData.companyName}</span>
+            </span>
+            <span className={css.bodyCell}>{itemData.address}</span>
+          </div>
+
+          {showLoading && (
+            <div className={css.loading}>
+              <IconSpinner className={css.loadingIcon} />
+            </div>
+          )}
+          {showBookerList && (
+            <div className={css.bookerList}>
+              {bookerList.map((booker) => {
+                const handleBookerClick = () => {
+                  form.change('booker', USER(booker).getId());
+                  setSelectedBookerId(USER(booker).getId());
+                  dispatch(addBooker(booker));
+                };
+                const bookerCardClasses = classNames(
+                  css.bookerCard,
+                  selectedBookerId === USER(booker).getId() && css.selected,
+                );
+                return (
+                  <div
+                    key={USER(booker).getId()}
+                    className={bookerCardClasses}
+                    onClick={handleBookerClick}>
+                    <div className={css.profile}>
+                      <Avatar user={booker} disableProfileLink />
+                      <div className={css.name}>
+                        {USER(booker).getProfile().displayName}
+                      </div>
+                    </div>
+                    <div className={css.contact}>
+                      <div className={css.row}>
+                        <IconPhone />
+                        <span>
+                          {USER(booker).getProtectedData().phoneNumber}
+                        </span>
+                      </div>
+                      <div className={css.row}>
+                        <IconMail />
+                        <div>{USER(booker).getAttributes().email}</div>
+                      </div>
+                    </div>
+                    <FieldRadioButton
+                      id={`booker-${USER(booker).getId()}`}
+                      name="booker"
+                      value={USER(booker).getId()}
+                      rootClassName={css.bookerRadio}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    });
+  };
 
   const noClientsFound = (
     <div className={css.noClientsFound}>
@@ -48,29 +159,58 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
   );
 
   return (
-    <div className={css.container}>
-      <div className={css.table}>
-        <div className={css.header}>
-          <span>{intl.formatMessage({ id: 'ClientTable.id' })}</span>
-          <span>{intl.formatMessage({ id: 'ClientTable.companyName' })}</span>
-          <span>{intl.formatMessage({ id: 'ClientTable.contact' })}</span>
-          <span>{intl.formatMessage({ id: 'ClientTable.address' })}</span>
-        </div>
-        <div className={css.tableBody}>
-          {data?.length > 0 ? data.map(renderTableRowFn) : noClientsFound}
-        </div>
-      </div>
-      {shouldShowPagination && (
-        <div className={css.paginationContainer}>
-          <Pagination
-            total={totalItems}
-            pageSize={10}
-            current={page}
-            onChange={onPageChange}
-          />
-        </div>
-      )}
-    </div>
+    <FinalForm
+      onSubmit={onSubmit}
+      render={(formRenderProps: FormRenderProps) => {
+        const { handleSubmit, form, values } = formRenderProps;
+        const { booker: bookerValue = '', clientId: clientIdValue = '' } =
+          values;
+        const disabled =
+          !bookerValue || !clientIdValue || createOrderInProgress;
+        return (
+          <Form onSubmit={handleSubmit}>
+            <div className={css.container}>
+              <div className={css.table}>
+                <div className={css.header}>
+                  <span></span>
+                  <span>{intl.formatMessage({ id: 'ClientTable.id' })}</span>
+                  <span className={css.companyNameHeaderCol}>
+                    {intl.formatMessage({ id: 'ClientTable.companyName' })}
+                    <IconSort className={css.sortIcon} onClick={toggleSort} />
+                  </span>
+                  <span>
+                    {intl.formatMessage({ id: 'ClientTable.address' })}
+                  </span>
+                </div>
+                <div className={css.tableBody}>
+                  {data?.length > 0
+                    ? renderTableRowFn(data, form)
+                    : noClientsFound}
+                </div>
+              </div>
+              {shouldShowPagination && (
+                <div className={css.paginationContainer}>
+                  <Pagination
+                    total={totalItems}
+                    pageSize={PAGE_SIZE}
+                    current={page}
+                    onChange={onPageChange}
+                  />
+                </div>
+              )}
+            </div>
+            <div className={css.submitBtnWrapper}>
+              <Button
+                className={css.submitBtn}
+                inProgress={createOrderInProgress}
+                disabled={disabled}>
+                {intl.formatMessage({ id: 'ClientTable.submit' })}
+              </Button>
+            </div>
+          </Form>
+        );
+      }}
+    />
   );
 };
 

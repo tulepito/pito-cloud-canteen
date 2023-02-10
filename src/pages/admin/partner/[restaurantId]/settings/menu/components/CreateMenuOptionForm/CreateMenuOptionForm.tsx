@@ -4,7 +4,7 @@ import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { menusSliceThunks } from '@redux/slices/menus.slice';
-import type { TIntergrationListing } from '@utils/types';
+import type { TIntegrationListing } from '@utils/types';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
@@ -27,7 +27,7 @@ type TCreateMenuOptionFormComponentProps =
 type TCreateMenuOptionFormProps = FormProps<TCreateMenuOptionFormValues> &
   TExtraProps;
 
-const parseMenuToOptions = (menues: TIntergrationListing[]) => {
+const parseMenuToOptions = (menues: TIntegrationListing[]) => {
   return menues.map((m) => ({
     key: m.id.uuid,
     label: m.attributes.title,

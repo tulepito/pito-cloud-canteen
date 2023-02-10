@@ -14,7 +14,7 @@ import type { TMenuMealTypeCount } from '@redux/slices/menus.slice';
 import { menusSliceThunks } from '@redux/slices/menus.slice';
 import { parseTimestampToFormat } from '@utils/dates';
 import { EListingStates, EMenuMealType, EMenuTypes } from '@utils/enums';
-import type { TIntergrationListing } from '@utils/types';
+import type { TIntegrationListing } from '@utils/types';
 import classNames from 'classnames';
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -151,7 +151,7 @@ const TABLE_COLUNMS: TColumn[] = [
 ];
 
 const parseEntitiesToTableData = (
-  menues: TIntergrationListing[],
+  menues: TIntegrationListing[],
   extraData: any = {},
 ) => {
   return menues.map((menu) => {

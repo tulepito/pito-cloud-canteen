@@ -2,7 +2,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import cookies from '@services/cookie';
 import { deserialize, getIntegrationSdk, handleError } from '@services/sdk';
+import { denormalisedResponseEntities } from '@utils/data';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+import { updateMenuIdListAndMenuWeekDayListForFood } from './apiHelpers';
+import validateMenu from './validateMenu';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -25,6 +29,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       dataParams,
       queryParams,
     );
+
+    const [menu] = denormalisedResponseEntities(response);
+
+    await updateMenuIdListAndMenuWeekDayListForFood(menu);
+
     res.json(response);
   } catch (error) {
     console.log(error);
@@ -32,4 +41,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   }
 }
 
-export default cookies(handler);
+export default cookies(validateMenu(handler));

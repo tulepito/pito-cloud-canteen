@@ -146,6 +146,7 @@ const LocationAutocompleteInputImpl = (props: any) => {
     input,
     meta,
     ref,
+    disabled = false,
   } = props;
   const {
     onChange: onChangeInput,
@@ -451,7 +452,7 @@ const LocationAutocompleteInputImpl = (props: any) => {
         placeholder={placeholder}
         name={name}
         value={search}
-        disabled={fetchingPlaceDetails}
+        disabled={fetchingPlaceDetails || disabled}
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}
         onChange={onChange}

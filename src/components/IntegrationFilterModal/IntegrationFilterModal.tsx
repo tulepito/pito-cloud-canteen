@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-shadow */
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
@@ -12,7 +13,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import css from './IntegrationFilterModal.module.scss';
 
 const IntegrationFilterModal = (props: any) => {
-  const { onSubmit, children, initialValues = {} } = props;
+  const { onSubmit, children, initialValues = {}, onClear } = props;
   const formRef = useRef<FormApi>();
   const {
     value: isOpen,
@@ -26,6 +27,11 @@ const IntegrationFilterModal = (props: any) => {
     formRef.current?.submit();
   };
 
+  const handleCancel = () => {
+    onClose();
+    onClear && onClear();
+  };
+
   return (
     <div className={css.root}>
       <Button onClick={onOpen} type="button" className={css.filterButton}>
@@ -33,7 +39,7 @@ const IntegrationFilterModal = (props: any) => {
         <FormattedMessage id="IntegrationFilterModal.filterMessage" />
       </Button>
       <AlertModal
-        onCancel={onClose}
+        onCancel={handleCancel}
         onConfirm={handleSubmit}
         isOpen={isOpen}
         containerClassName={css.container}

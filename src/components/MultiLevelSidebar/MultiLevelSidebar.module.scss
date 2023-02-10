@@ -1,20 +1,22 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .root {
   flex: 1;
   min-height: 100vh;
   background-color: $neutralGray1;
   min-width: 100%;
-  padding: 10px;
+  padding: 24px;
 
   .subMenu {
-    margin: 10px 0;
+    margin-top: 32px;
     cursor: pointer;
     list-style: none;
+    @include textTemplate(16px, $fontWeightBold, 24px);
+
     .subMenuLayout {
       display: flex;
       align-items: center;
-      padding: 0 8px;
       &.isOpen {
         background-color: $primaryPri1;
         border-radius: 9px;
@@ -35,9 +37,8 @@
         width: 100%;
 
         .label {
-          font-size: 14px;
-          font-weight: $fontWeightMedium;
-          color: $neutralGray5;
+          @include textTemplate(16px, $fontWeightBold, 24px);
+          color: $neutralGray6;
           padding-bottom: 3px;
           &.active {
             color: $primaryPri2;

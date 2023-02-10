@@ -1,21 +1,18 @@
+import type { TDayColumnHeaderProps } from '@components/CalendarDashboard/helpers/types';
 import classNames from 'classnames';
 import { FormattedMessage } from 'react-intl';
 
 import css from './DayItem.module.scss';
 
-type TDayColumnHeaderProps = {
-  isCurrentDay: boolean;
-  date: Date;
-};
-
 const DayColumnHeader: React.FC<TDayColumnHeaderProps> = ({
   isCurrentDay,
   date,
+  isMouseOnDay,
 }) => {
   return (
     <div
       className={classNames(css.dayHeader, {
-        [css.activeHeader]: isCurrentDay,
+        [css.activeHeader]: isCurrentDay || isMouseOnDay,
       })}>
       <div className={css.dateNumber}>{date.getDate()}</div>
       <div className={css.dayText}>

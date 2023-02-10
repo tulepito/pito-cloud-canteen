@@ -1,0 +1,22 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.inputContainer {
+  position: relative;
+}
+
+.input {
+  @include inputStyles;
+  font-size: 14px;
+  border: none;
+  outline: none;
+}
+
+.error {
+  color: $primaryPri1;
+}
+
+.tooltip {
+  max-width: 100px;
+}

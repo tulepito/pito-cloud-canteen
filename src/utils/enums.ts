@@ -105,6 +105,8 @@ export enum EListingType {
   transaction = 'transaction',
   food = 'food',
   menu = 'menu',
+  subOrder = 'sub-order',
+  order = 'order',
 }
 
 export enum EUserPermission {
@@ -130,6 +132,14 @@ export enum ERestaurantListingStatus {
   unsatisfactory = 'unsatisfactory',
 }
 
+export enum EParticipantOrderStatus {
+  empty = 'empty',
+  joined = 'joined',
+  notJoined = 'notJoined',
+  notAllowed = 'notAllowed',
+  expired = 'expired',
+}
+
 export const RESTAURANT_STATUS_OPTIONS = [
   {
     key: ERestaurantListingStatus.new,
@@ -153,12 +163,176 @@ export const LIST_BANKS = [
     label: 'Ngân hàng NCB',
   },
   {
-    key: 'vcb',
-    label: 'Ngân hàng Vietcombank',
-  },
-  {
     key: 'techcombank',
     label: 'Ngân hàng Techcombank',
+  },
+  {
+    key: 'agribank',
+    label: 'Ngân hàng Agribank',
+  },
+  {
+    key: 'scb',
+    label: 'Ngân hàng SCB',
+  },
+  {
+    key: 'sacombank',
+    label: 'Ngân hàng Sacombank',
+  },
+  {
+    key: 'eximbank',
+    label: 'Ngân hàng Eximbank',
+  },
+  {
+    key: 'msbank',
+    label: 'Ngân hàng MSBank',
+  },
+  {
+    key: 'nam-a-bank',
+    label: 'Ngân hàng NamABank',
+  },
+  {
+    key: 'vnmart',
+    label: 'Ngân hàng VNMart',
+  },
+  {
+    key: 'vietinbank',
+    label: 'Ngân hàng VietinBank',
+  },
+  {
+    key: 'vietcombank',
+    label: 'Ngân hàng VietcomBank',
+  },
+  {
+    key: 'hdbank',
+    label: 'Ngân hàng HDBank',
+  },
+  {
+    key: 'dong-a-bank',
+    label: 'Ngân hàng Đông Á',
+  },
+  {
+    key: 'tpbank',
+    label: 'Ngân hàng TPBank',
+  },
+  {
+    key: 'oceanbank',
+    label: 'Ngân hàng OceanBank',
+  },
+  {
+    key: 'bidv',
+    label: 'Ngân hàng BIDV',
+  },
+  {
+    key: 'vpbank',
+    label: 'Ngân hàng VPBank',
+  },
+  {
+    key: 'mbbank',
+    label: 'Ngân hàng MBBank',
+  },
+  {
+    key: 'acb',
+    label: 'Ngân hàng ACB',
+  },
+  {
+    key: 'ocb',
+    label: 'Ngân hàng OCB',
+  },
+  {
+    key: 'ivb',
+    label: 'Ngân hàng IVB',
+  },
+  {
+    key: 'nasb',
+    label: 'Ngân hàng TMCP Bắc Á (NASP)',
+  },
+  {
+    key: 'anz',
+    label: 'Ngân hàng ANZ (ANZ Bank)',
+  },
+  {
+    key: 'phuong-nam-bank',
+    label: 'Ngân hàng Phương Nam (Phuong Nam Bank)',
+  },
+  {
+    key: 'vib',
+    label: 'Ngân hàng TMCP Quốc Tế Việt Nam (VIB)',
+  },
+  {
+    key: 'viet-a-bank',
+    label: 'Ngân hàng Việt Á (VietABank)',
+  },
+  {
+    key: 'petrolimex',
+    label: 'Ngân hàng xăng đầu Petrolimex (PG Bank)',
+  },
+  {
+    key: 'lien-viet-post-bank',
+    label: 'Ngân hàng bưu điện Liên Việt (LienVietPostBank)',
+  },
+  {
+    key: 'hsbc',
+    label: 'Ngân hàng HSBC Việt Nam (HSBC)',
+  },
+  {
+    key: 'mhbbank',
+    label: 'Ngân hàng phát triển nhà đồng bằng sông cửu long (MHB Bank)',
+  },
+  {
+    key: 'seabank',
+    label: 'Ngân hàng Đông Nam Á (SeABank)',
+  },
+  {
+    key: 'abbank',
+    label: 'Ngân hàng TMCP An Bình (ABBank)',
+  },
+  {
+    key: 'citibank',
+    label: 'Ngân hàng Citibank Việt Nam (Citibank)',
+  },
+  {
+    key: 'gbbank',
+    label: 'Ngân hàng dầu khí toàn cầu (GBBank)',
+  },
+  {
+    key: 'shb',
+    label: 'Ngân hàng TMCP Sài Gòn - Hà Nội (SHB)',
+  },
+  {
+    key: 'saigon-bank',
+    label: 'Ngân hàng TMCP Sài Gòn công thương (SaiGonBank)',
+  },
+  {
+    key: 'vncp',
+    label: 'Ngân hàng xây dựng Việt Nam (VNCP)',
+  },
+  {
+    key: 'kien-long-bank',
+    label: 'Ngân hàng TMCP Kiên Long (Kienlongbank)',
+  },
+  {
+    key: 'shinhanbank',
+    label: 'Ngân hàng Shinhan (ShinhanBank)',
+  },
+  {
+    key: 'bao-viet-bank',
+    label: 'Ngân hàng Bảo Việt (BaovietBank)',
+  },
+  {
+    key: 'vietbank',
+    label: 'Ngân hàng Việt Nam thương tín (VietBank)',
+  },
+  {
+    key: 'pvcombank',
+    label: 'Ngân hàng TMCP Đại chúng Việt Nam (PVComBank)',
+  },
+  {
+    key: 'viet-capital-bank',
+    label: 'Ngân hàng TCMP Bản Việt (VietCapitalBank)',
+  },
+  {
+    key: 'scvn',
+    label: 'Ngân hàng Standard Chartered Bank Việt Nam (SCVN)',
   },
 ];
 

@@ -1,0 +1,40 @@
+@use '/src/styles/defaults.scss' as *;
+
+.root {
+  .fieldDatePickerContainer {
+    position: relative;
+
+    .customInput {
+      input {
+        @include inputStyles;
+        width: 100%;
+        padding-left: 52px;
+      }
+    }
+
+    .calendarIcon {
+      position: absolute;
+      bottom: 12px;
+      left: 16px;
+    }
+
+    :global(.react-datepicker-popper) {
+      z-index: 2;
+    }
+  }
+
+  .fieldSelect {
+    margin-top: 24px;
+
+    // .clockIcon {
+    //   width: 20px;
+    //   height: 20px;
+    // }
+  }
+
+  .actions {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+  }
+}

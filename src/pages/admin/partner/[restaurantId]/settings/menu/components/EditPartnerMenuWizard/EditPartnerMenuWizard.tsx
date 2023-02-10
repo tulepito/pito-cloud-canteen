@@ -4,15 +4,18 @@ import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import type { TFormTabChildrenProps } from '@components/FormWizard/FormTabs/FormTabs';
 import FormWizard from '@components/FormWizard/FormWizard';
+import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { menusSliceAction, menusSliceThunks } from '@redux/slices/menus.slice';
 import { adminRoutes } from '@src/paths';
 import { INTERGRATION_LISTING, LISTING } from '@utils/data';
-import { EListingStates, EMenuTypes } from '@utils/enums';
-import type { TIntergrationListing } from '@utils/types';
+import { EListingStates, EMenuMealType, EMenuTypes } from '@utils/enums';
+import type { TIntegrationListing } from '@utils/types';
+import classNames from 'classnames';
 import type { FormApi } from 'final-form';
+import isEqual from 'lodash/isEqual';
 import { useRouter } from 'next/router';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -20,6 +23,7 @@ import EditMenuCompleteForm from '../EditMenuCompleteForm/EditMenuCompleteForm';
 import EditMenuInformationForm from '../EditMenuInformationForm/EditMenuInformationForm';
 import EditMenuPricingForm from '../EditMenuPricingForm/EditMenuPricingForm';
 import css from './EditPartnerMenuWizard.module.scss';
+import useQueryMenuPickedFoods from './useQueryMenuPickedFoods';
 import type { TEditMenuFormValues } from './utils';
 import {
   createDuplicateSubmitMenuValues,
@@ -28,6 +32,7 @@ import {
   MENU_COMPLETE_TAB,
   MENU_INFORMATION_TAB,
   MENU_PRICING_TAB,
+  renderValuesForFoodsByDate,
 } from './utils';
 
 export type TFormRefObject = React.MutableRefObject<
@@ -39,8 +44,9 @@ type TEditPartnerMenuTabProps = {
   formRef: any;
   menuId?: string;
   restaurantId: string;
-  currentMenu?: TIntergrationListing | null;
+  currentMenu?: TIntegrationListing | null;
   duplicateId?: string;
+  setSubmittedValues: (e: any) => void;
 } & TFormTabChildrenProps;
 
 const redirectAfterDraftUpdate = (
@@ -59,8 +65,15 @@ const redirectAfterDraftUpdate = (
 };
 
 const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
-  const { tab, formRef, restaurantId, currentMenu, menuId, duplicateId } =
-    props;
+  const {
+    tab,
+    formRef,
+    restaurantId,
+    currentMenu,
+    menuId,
+    duplicateId,
+    setSubmittedValues,
+  } = props;
   const router = useRouter();
 
   const dispatch = useAppDispatch();
@@ -70,22 +83,26 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
       ? createSubmitMenuValues({ ...values, restaurantId }, tab, currentMenu)
       : createDuplicateSubmitMenuValues(
           { ...values, restaurantId },
-          currentMenu as TIntergrationListing,
+          currentMenu as TIntegrationListing,
           tab,
         );
-    const { payload: listing } = menuId
-      ? await dispatch(
+    const { payload: listing, error } = menuId
+      ? ((await dispatch(
           menusSliceThunks.updatePartnerMenuListing({
             ...submitValues,
             id: menuId,
           }),
-        )
-      : await dispatch(menusSliceThunks.createPartnerMenuListing(submitValues));
+        )) as any)
+      : ((await dispatch(
+          menusSliceThunks.createPartnerMenuListing(submitValues),
+        )) as any);
 
     const isDraft =
       LISTING(listing).getMetadata().listingState === EListingStates.draft;
 
-    if (isDraft) {
+    !isDraft && !error && setSubmittedValues(values);
+
+    if (isDraft && !error) {
       return redirectAfterDraftUpdate(
         restaurantId,
         listing?.id?.uuid,
@@ -97,37 +114,70 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
     }
   };
 
-  const initialValues = useMemo(() => {
-    const { title } = INTERGRATION_LISTING(currentMenu).getAttributes();
-    const { menuType } = INTERGRATION_LISTING(currentMenu).getMetadata();
-    const { mealTypes, startDate, daysOfWeek, numberOfCycles, foodsByDate } =
-      INTERGRATION_LISTING(currentMenu).getPublicData();
+  const { title } = INTERGRATION_LISTING(currentMenu).getAttributes();
+  const { menuType } = INTERGRATION_LISTING(currentMenu).getMetadata();
+  const { mealType, startDate, daysOfWeek, numberOfCycles, foodsByDate } =
+    INTERGRATION_LISTING(currentMenu).getPublicData();
+  const {
+    monFoodIdList = [],
+    tueFoodIdList = [],
+    wedFoodIdList = [],
+    thuFoodIdList = [],
+    friFoodIdList = [],
+    satFoodIdList = [],
+    sunFoodIdList = [],
+  } = INTERGRATION_LISTING(currentMenu).getMetadata();
 
+  const idsToQuery = [
+    ...monFoodIdList,
+    ...tueFoodIdList,
+    ...wedFoodIdList,
+    ...thuFoodIdList,
+    ...friFoodIdList,
+    ...satFoodIdList,
+    ...sunFoodIdList,
+  ];
+
+  const { menuPickedFoods } = useQueryMenuPickedFoods({
+    restaurantId: restaurantId as string,
+    ids: idsToQuery,
+  });
+
+  const foodByDateToRender = renderValuesForFoodsByDate(
+    foodsByDate,
+    menuPickedFoods,
+  );
+
+  const initialValues = useMemo(() => {
     switch (tab) {
       case MENU_INFORMATION_TAB:
         return currentMenu
           ? {
               title,
               menuType,
-              mealTypes,
+              mealType,
               startDate,
               daysOfWeek,
               numberOfCycles,
             }
           : {
               menuType: EMenuTypes.fixedMenu,
+              mealType: EMenuMealType.breakfast,
             };
       case MENU_PRICING_TAB: {
         return currentMenu
           ? {
-              foodsByDate,
+              foodsByDate: foodByDateToRender,
             }
           : {};
       }
       default:
         break;
     }
-  }, [JSON.stringify(currentMenu)]) as TEditMenuFormValues;
+  }, [
+    JSON.stringify(currentMenu),
+    JSON.stringify(menuPickedFoods),
+  ]) as TEditMenuFormValues;
 
   switch (tab) {
     case MENU_INFORMATION_TAB: {
@@ -145,7 +195,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
           formRef={formRef}
           initialValues={initialValues}
           onSubmit={onSubmit}
-          currentMenu={currentMenu as TIntergrationListing}
+          currentMenu={currentMenu as TIntegrationListing}
           restaurantId={restaurantId}
         />
       );
@@ -199,8 +249,14 @@ const EditPartnerMenuWizard = () => {
   const router = useRouter();
   const { query, pathname } = router;
   const formRef = useRef<FormApi>();
+  const [submittedValues, setSubmittedValues] = useState<any>();
   const intl = useIntl();
-  const { tab, menuId, restaurantId, duplicateId } = query;
+  const {
+    tab = MENU_INFORMATION_TAB,
+    menuId,
+    restaurantId,
+    duplicateId,
+  } = query;
   const selectedTab = tab || MENU_INFORMATION_TAB;
   const tabLink = (tab: string) => {
     return {
@@ -222,6 +278,15 @@ const EditPartnerMenuWizard = () => {
     (state) => state.menus.currentMenu,
     shallowEqual,
   );
+
+  const showCurrentMenuInProgress = useAppSelector(
+    (state) => state.menus.showCurrentMenuInProgress,
+    shallowEqual,
+  );
+
+  useEffect(() => {
+    setSubmittedValues(null);
+  }, [tab]);
 
   useEffect(() => {
     if (!menuId || !!currentMenu) return;
@@ -251,6 +316,7 @@ const EditPartnerMenuWizard = () => {
 
   const handleSubmit = () => {
     if (formRef.current) formRef.current?.submit();
+    setSubmittedValues(formRef.current?.getState().values);
   };
 
   const handleGoBack = () => {
@@ -268,8 +334,24 @@ const EditPartnerMenuWizard = () => {
     });
   };
 
+  if (showCurrentMenuInProgress) {
+    return <LoadingContainer />;
+  }
+
+  const submitReady = isEqual(
+    submittedValues,
+    formRef.current?.getState().values,
+  );
+
   return (
     <div>
+      <h2 className={css.title}>
+        <FormattedMessage
+          id={
+            menuId ? 'EditPartnerMenuPage.title' : 'CreatePartnerMenuPage.title'
+          }
+        />
+      </h2>
       <FormWizard formTabNavClassName={css.formTabNav}>
         {EDIT_PARTNER_MENU_TABS.map((menuTab: string, index: number) => {
           const disabled = !tabCompleted(
@@ -292,6 +374,7 @@ const EditPartnerMenuWizard = () => {
               restaurantId={restaurantId as string}
               currentMenu={currentMenu}
               duplicateId={duplicateId as string}
+              setSubmittedValues={setSubmittedValues}
             />
           );
         })}
@@ -299,7 +382,10 @@ const EditPartnerMenuWizard = () => {
       {createOrUpdateMenuError && (
         <ErrorMessage message={createOrUpdateMenuError.message} />
       )}
-      <div className={css.navigateButtons}>
+      <div
+        className={classNames(css.navigateButtons, {
+          [css.flexEnd]: tab === MENU_INFORMATION_TAB,
+        })}>
         {tab !== MENU_INFORMATION_TAB && (
           <Button
             disabled={createOrUpdateMenuInProgress}
@@ -310,7 +396,8 @@ const EditPartnerMenuWizard = () => {
         <Button
           inProgress={createOrUpdateMenuInProgress}
           disabled={createOrUpdateMenuInProgress}
-          onClick={handleSubmit}>
+          onClick={handleSubmit}
+          ready={submitReady}>
           <FormattedMessage
             id={
               tab !== MENU_COMPLETE_TAB

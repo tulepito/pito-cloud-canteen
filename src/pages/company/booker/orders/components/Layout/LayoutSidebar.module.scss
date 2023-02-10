@@ -1,0 +1,123 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  overflow: hidden;
+  flex-basis: 60px;
+  padding: 0;
+  position: absolute;
+  left: -220px;
+  height: 48px;
+  transition: linear 0.2s;
+
+  @include viewportLargeWithPaddings {
+    position: relative;
+    background-color: $neutralGray1;
+    border-right: 1px solid $neutralGray4;
+    height: auto;
+    background-color: transparent;
+    left: 0;
+    flex-basis: 280px;
+    min-width: 280px;
+  }
+}
+
+.collapse {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 280px;
+  left: 0;
+  border-right: 1px solid $neutralGray4;
+  background-color: $neutralGray1;
+  height: calc(100vh - 65px);
+
+  @include viewportLargeWithPaddings {
+    height: auto;
+    flex-basis: 60px;
+    min-width: 60px;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding: 28px 18px 0;
+
+  @include viewportLargeWithPaddings {
+    padding: 28px 28px 0;
+  }
+}
+
+.collapse .header {
+  padding: 28px 28px 0;
+
+  @include viewportLargeWithPaddings {
+    padding: 28px 18px 0;
+  }
+}
+
+.menuIcon {
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+}
+
+.logo {
+  height: 24px;
+  position: relative;
+  overflow: hidden;
+  width: 0;
+  transition: linear 0.2s;
+
+  @include viewportLargeWithPaddings {
+    width: auto;
+  }
+}
+
+.collapse .logo {
+  width: auto;
+
+  @include viewportLargeWithPaddings {
+    width: 0;
+  }
+}
+
+.innerLogo {
+  position: relative;
+  left: -240px;
+  transition: linear 0.2s;
+
+  @include viewportLargeWithPaddings {
+    left: 0;
+  }
+}
+
+.collapse .innerLogo {
+  left: 0;
+
+  @include viewportLargeWithPaddings {
+    left: -240px;
+  }
+}
+
+.content {
+  position: relative;
+  overflow: hidden;
+  left: 0px;
+  transition: linear 0.2s;
+  width: 100%;
+  width: 280px;
+  left: -280px;
+
+  @include viewportLargeWithPaddings {
+    left: 0px;
+  }
+}
+
+.collapse .content {
+  left: 0px;
+
+  @include viewportLargeWithPaddings {
+    left: -280px;
+  }
+}

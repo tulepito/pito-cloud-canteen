@@ -16,6 +16,7 @@ type TAlertModal = {
   onConfirm: () => void;
   confirmDisabled?: boolean;
   confirmInProgress?: boolean;
+  cancelDisabled?: boolean;
   containerClassName?: string;
   actionsClassName?: string;
   cancelClassName?: string;
@@ -31,8 +32,9 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
   handleClose,
   onCancel,
   onConfirm,
-  confirmInProgress,
-  confirmDisabled,
+  confirmInProgress = false,
+  confirmDisabled = false,
+  cancelDisabled = false,
   containerClassName,
   actionsClassName,
   cancelClassName,
@@ -40,6 +42,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
 }) => {
   return (
     <Modal
+      className={css.modalRoot}
       title={title}
       isOpen={isOpen}
       handleClose={handleClose}
@@ -48,7 +51,9 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
       <div className={classNames(css.actions, actionsClassName)}>
         {cancelLabel && (
           <Button
+            disabled={cancelDisabled}
             className={classNames(css.reject, cancelClassName)}
+            variant="secondary"
             size="medium"
             onClick={onCancel}>
             {cancelLabel}

@@ -1,5 +1,5 @@
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import type { TIconProps } from '@utils/types';
+import type { TDefaultProps, TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -37,6 +37,7 @@ type TMenuWithClasses = {
   menuWrapperClassName?: string;
   subMenuWrapperClassName?: string;
   subMenuLayoutClassName?: string;
+  menuLabelClassName?: string;
 };
 
 type TSubMenuProps = {
@@ -47,9 +48,8 @@ type TMenuProps = {
   menus: TSidebarMenu[];
 } & TMenuWithClasses;
 
-type TMultiLevelSidebarProps = {
+type TMultiLevelSidebarProps = TDefaultProps & {
   menus: TSidebarMenu[];
-  rootClassName?: string;
 } & TMenuWithClasses;
 
 const SubMenu: React.FC<TSubMenuProps> = (props) => {
@@ -58,6 +58,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     subMenuWrapperClassName,
     subMenuLayoutClassName,
     menuWrapperClassName,
+    menuLabelClassName,
   } = props;
 
   const intl = useIntl();
@@ -158,6 +159,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
             onClick={handleMenuClick}
             className={classNames(
               css.label,
+              menuLabelClassName,
               { [css.labelOpen]: isOpen },
               { [css.active]: isActive },
             )}>
@@ -181,6 +183,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
           subMenuWrapperClassName={subMenuWrapperClassName}
           subMenuLayoutClassName={subMenuLayoutClassName}
           menuWrapperClassName={menuWrapperClassName}
+          menuLabelClassName={menuLabelClassName}
         />
       )}
     </div>
@@ -193,6 +196,7 @@ const Menu: React.FC<TMenuProps> = (props) => {
     menuWrapperClassName,
     subMenuWrapperClassName,
     subMenuLayoutClassName,
+    menuLabelClassName,
   } = props;
 
   const menuWrapperClasses = classNames(css.menuWrapper, menuWrapperClassName);
@@ -207,6 +211,7 @@ const Menu: React.FC<TMenuProps> = (props) => {
             menuWrapperClassName={menuWrapperClassName}
             subMenuWrapperClassName={subMenuWrapperClassName}
             subMenuLayoutClassName={subMenuLayoutClassName}
+            menuLabelClassName={menuLabelClassName}
           />
         );
       })}
@@ -221,6 +226,7 @@ const MultiLevelSidebar: React.FC<TMultiLevelSidebarProps> = (props) => {
     menuWrapperClassName,
     subMenuWrapperClassName,
     subMenuLayoutClassName,
+    menuLabelClassName,
   } = props;
   const rootClasses = classNames(css.root, rootClassName);
   return (
@@ -230,6 +236,7 @@ const MultiLevelSidebar: React.FC<TMultiLevelSidebarProps> = (props) => {
         menuWrapperClassName={menuWrapperClassName}
         subMenuWrapperClassName={subMenuWrapperClassName}
         subMenuLayoutClassName={subMenuLayoutClassName}
+        menuLabelClassName={menuLabelClassName}
       />
     </div>
   );

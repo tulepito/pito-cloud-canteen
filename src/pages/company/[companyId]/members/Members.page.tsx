@@ -61,14 +61,11 @@ const MembersPage = () => {
     (state) => state.company.groupList,
     shallowEqual,
   );
-  const fetchCompanyInfoInProgress = useAppSelector(
-    (state) => state.company.fetchCompanyInfoInProgress,
+  const { fetchCompanyInfoInProgress } = useAppSelector(
+    (state) => state.company,
   );
-  const deleteMemberInProgress = useAppSelector(
-    (state) => state.companyMember.deleteMemberInProgress,
-  );
-  const deleteMemberError = useAppSelector(
-    (state) => state.companyMember.deleteMemberError,
+  const { deleteMemberInProgress, deleteMemberError } = useAppSelector(
+    (state) => state.companyMember,
   );
 
   const [deletingMemberEmail, setDeletingMemberEmail] = useState<string>();

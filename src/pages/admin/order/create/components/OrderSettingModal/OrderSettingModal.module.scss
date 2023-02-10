@@ -61,6 +61,11 @@
 
   .fieldContent {
     margin-top: 12px;
+
+    .subLabel {
+      @include text(14px, 20px);
+      color: $neutralGray5;
+    }
   }
   .submitBtn {
     margin-top: 16px;

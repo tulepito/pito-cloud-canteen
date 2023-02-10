@@ -1,9 +1,9 @@
+import { createCompanyApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
-import { createCompanyApi } from '@utils/api';
 import { storableError } from '@utils/errors';
 
-type CreateCompanyState = {
+type TCreateCompanyState = {
   createCompanyInProgress: boolean;
   createCompanyError: any;
 };
@@ -27,7 +27,7 @@ export const createCompanyPageThunks = {
   createCompany,
 };
 
-const initialState: CreateCompanyState = {
+const initialState: TCreateCompanyState = {
   createCompanyInProgress: false,
   createCompanyError: null,
 };

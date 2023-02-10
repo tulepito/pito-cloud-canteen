@@ -1,0 +1,53 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  flex: 1;
+  height: fit-content;
+  padding: 10px 40px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: $neutralGray1;
+  z-index: 49;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .headerLeft {
+  }
+
+  .headerRight {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    .profileMenuContent {
+      width: 200px;
+      padding: 20px 0;
+    }
+
+    .iconBell {
+      margin-right: 15px;
+    }
+
+    .profileMenuWrapper {
+      display: flex;
+      align-items: center;
+
+      .avatar {
+        margin-right: 10px;
+        background-color: $primaryPri2;
+        color: $neutralGray1;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .displayName {
+        margin-right: 11.5px;
+      }
+    }
+  }
+}

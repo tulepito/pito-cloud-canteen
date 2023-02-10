@@ -5,17 +5,21 @@ import React from 'react';
 import css from './LoadingContainer.module.scss';
 
 type TLoadingContainerProps = {
+  loadingText?: string;
+  loadingTextClassName?: string;
   className?: string;
   iconClassName?: string;
 };
 
 const LoadingContainer: React.FC<TLoadingContainerProps> = (props) => {
-  const { className, iconClassName } = props;
-  const classes = classNames(css.root, className);
-  const iconClasses = classNames(css.loadingIcon, iconClassName);
+  const { loadingText, loadingTextClassName, className, iconClassName } = props;
+
+  const loadingTextClasses = classNames(css.loadingText, loadingTextClassName);
+
   return (
-    <div className={classes}>
-      <IconSpinner className={iconClasses} />
+    <div className={classNames(css.root, className)}>
+      <IconSpinner className={classNames(css.loadingIcon, iconClassName)} />
+      <div className={loadingTextClasses}>{loadingText}</div>
     </div>
   );
 };

@@ -1,4 +1,5 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .foodPickContainer {
   display: flex;
@@ -6,6 +7,7 @@
 
 .modal {
   flex-basis: 1100px !important;
+  height: 80vh !important;
 }
 
 .tableContainer {
@@ -43,6 +45,11 @@
   flex-direction: column;
 }
 
+.buttonWrapper {
+  width: 100%;
+  @include flexCenter;
+}
+
 .button {
   width: 252px;
 }
@@ -50,4 +57,33 @@
 .pagination {
   display: flex;
   justify-content: flex-end;
+}
+
+.loadingContainer {
+  min-height: 300px;
+}
+
+.titleRow {
+  font-weight: $fontWeightBold;
+  color: $neutralGray6;
+}
+
+.sideDishiesCheckbox {
+  label {
+    &:nth-child(2) {
+      margin-top: 20px !important;
+    }
+  }
+}
+
+.sideDishiesCheckbox label {
+  display: flex;
+  font-size: 12px;
+  align-items: unset !important;
+  height: 20px;
+
+  svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
 }

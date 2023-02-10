@@ -1,5 +1,3 @@
-import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import {
   checkMenuInTransactionProgressApi,
   createPartnerMenuApi,
@@ -7,11 +5,13 @@ import {
   queryAllMenusApi,
   showPartnerMenuApi,
   updatePartnerMenuApi,
-} from '@utils/api';
+} from '@apis/menuApi';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EListingType, EMenuMealType } from '@utils/enums';
-import { storableError } from '@utils/errors';
-import type { TIntergrationListing, TListing, TPagination } from '@utils/types';
+import { storableAxiosError, storableError } from '@utils/errors';
+import type { TIntegrationListing, TListing, TPagination } from '@utils/types';
 
 export const MANAGE_MENU_PAGE_SIZE = 10;
 
@@ -25,7 +25,7 @@ export type TMenuMealTypeCount = {
 };
 
 type TMenusSliceState = {
-  menus: TIntergrationListing[];
+  menus: TIntegrationListing[];
   queryMenusInProgress: boolean;
   queryMenusError: any;
   manageMenusPagination: TPagination | null;
@@ -43,7 +43,7 @@ type TMenusSliceState = {
   removeMenuInProgress: boolean;
   removeMenuError: any;
 
-  menuOptionsToDuplicate: TIntergrationListing[];
+  menuOptionsToDuplicate: TIntegrationListing[];
   queryMenuOptionsInProgress: boolean;
   queryMenuOptionsError: any;
 
@@ -174,7 +174,7 @@ const createPartnerMenuListing = createAsyncThunk(
       return denormalisedResponseEntities(data)[0];
     } catch (error) {
       console.error(`${CREATE_PARTNER_MENU_LISTING} error: `, error);
-      return rejectWithValue(storableError(error));
+      return rejectWithValue(storableAxiosError(error));
     }
   },
 );
@@ -192,7 +192,7 @@ const updatePartnerMenuListing = createAsyncThunk(
       return denormalisedResponseEntities(data)[0];
     } catch (error) {
       console.error(`${CREATE_PARTNER_MENU_LISTING} error: `, error);
-      return rejectWithValue(storableError(error));
+      return rejectWithValue(storableAxiosError(error));
     }
   },
 );

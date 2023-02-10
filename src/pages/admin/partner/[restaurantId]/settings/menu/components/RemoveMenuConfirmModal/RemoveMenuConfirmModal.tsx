@@ -102,11 +102,19 @@ const RemoveMenuConfirmModal: React.FC<TRemoveMenuConfirmModal> = (props) => {
       handleClose={onClearMenuToRemove}
       onCancel={onClearMenuToRemove}
       onConfirm={onDeleteMenu}
-      cancelLabel="Hủy"
-      confirmLabel={!isInTransactionProgress && 'Xóa Menu'}
+      cancelLabel={isCheckingMenuInTransactionProgress ? '' : 'Hủy'}
+      confirmLabel={
+        !isInTransactionProgress && isCheckingMenuInTransactionProgress
+          ? ''
+          : 'Xóa Menu'
+      }
       confirmInProgress={removeMenuInProgress}
       confirmDisabled={removeMenuInProgress}
-      cancelClassName={!isInTransactionProgress ? '' : css.modalCancelButton}>
+      cancelClassName={
+        !isInTransactionProgress || isCheckingMenuInTransactionProgress
+          ? ''
+          : css.modalCancelButton
+      }>
       {renderContent()}
     </AlertModal>
   );

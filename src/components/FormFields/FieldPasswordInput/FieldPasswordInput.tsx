@@ -2,7 +2,7 @@ import IconHidePassword from '@components/Icons/IconHidePassword/IconHidePasswor
 import IconShowPassword from '@components/Icons/IconShowPassword/IconShowPassword';
 import ValidationError from '@components/ValidationError/ValidationError';
 import useBoolean from '@hooks/useBoolean';
-import type { TIconProps } from '@utils/types';
+import type { TDefaultProps, TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import type { DetailedHTMLProps, InputHTMLAttributes } from 'react';
 import React from 'react';
@@ -13,11 +13,10 @@ import css from './FieldPasswordInput.module.scss';
 
 type TIconComponent = React.ReactElement<TIconProps>;
 type InputComponentProps = FieldRenderProps<string, HTMLInputElement> &
-  DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
+  DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> &
+  TDefaultProps & {
     id: string;
     label?: string;
-    rootClassName?: string;
-    className?: string;
     inputRootClass?: string;
     disabled?: boolean;
     labelClassName?: string;

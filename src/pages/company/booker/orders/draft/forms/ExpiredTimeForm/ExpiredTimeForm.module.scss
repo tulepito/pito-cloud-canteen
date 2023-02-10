@@ -1,0 +1,22 @@
+@use '/src/styles/defaults.scss' as *;
+
+.root {
+  padding-bottom: 150px;
+}
+
+.dateInput {
+  margin-bottom: 24px;
+
+  input {
+    @include inputStyles;
+    width: 100%;
+  }
+}
+
+.fieldSelect {
+  margin-bottom: 24px;
+}
+
+.submitBtn {
+  width: 100%;
+}

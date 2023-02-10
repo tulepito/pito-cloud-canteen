@@ -7,7 +7,7 @@ import css from './LocationAutocompleteInput.module.scss';
 // eslint-disable-next-line import/extensions
 import LocationAutocompleteInputImpl from './LocationAutocompleteInputImpl.tsx';
 
-const LocationAutocompleteInputComponent: React.FC<any> = (props) => {
+export const LocationAutocompleteInputComponent: React.FC<any> = (props) => {
   /* eslint-disable no-unused-vars */
   const { rootClassName, labelClassName, required, ...restProps } = props;
   const { input, label, meta, valueFromForm, ...otherProps } = restProps;

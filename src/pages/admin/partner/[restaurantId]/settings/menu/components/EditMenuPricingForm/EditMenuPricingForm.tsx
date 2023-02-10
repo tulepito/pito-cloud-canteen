@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/default-param-last */
 import { InlineTextButton } from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import Form from '@components/Form/Form';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import { INTERGRATION_LISTING } from '@utils/data';
-import type { TIntergrationListing } from '@utils/types';
+import { getDayOfWeekByIndex } from '@utils/dates';
+import type { TIntegrationListing } from '@utils/types';
 import type { FormApi } from 'final-form';
 import { DateTime } from 'luxon';
 import { useImperativeHandle, useState } from 'react';
@@ -12,8 +14,8 @@ import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 
 import AddFoodModal from '../AddFoodModal/AddFoodModal';
-import useQueryMenuPickedFoods from '../EditPartnerMenuWizard/useQueryMenuPickedFoods';
-import { renderInitialValuesForFoodsByDate } from '../EditPartnerMenuWizard/utils';
+import DayOfWeekCalendarHeader from '../DayOfWeekCalendarHeader/DayOfWeekCalendarHeader';
+import type { TEditMenuPricingCalendarResources } from '../EditPartnerMenuWizard/utils';
 import FoodEventCard from '../FoodEventCard/FoodEventCard';
 import css from './EditMenuPricingForm.module.scss';
 
@@ -25,7 +27,7 @@ export type TEditMenuPricingFormValues = {
 };
 
 type TExtraProps = {
-  currentMenu: TIntergrationListing;
+  currentMenu: TIntegrationListing;
   formRef: any;
   restaurantId: string;
 };
@@ -34,17 +36,23 @@ type TEditMenuPricingFormComponentProps =
 type TEditMenuPricingFormProps = FormProps<TEditMenuPricingFormValues> &
   TExtraProps;
 
-type TFoodResource = { title: string; sideDishes: string[]; id: string };
+type TFoodResource = {
+  title: string;
+  sideDishes: string[];
+  id: string;
+  price: number;
+  foodNote?: string;
+};
 
 const renderResourcesForCalendar = (
-  foodsByDate: any,
+  foodsByDate: any = {},
   extraData: {
     onRemovePickedFood: (id: string, date: Date) => void;
     daysOfWeek: string[];
   },
 ) => {
   const resourses: {
-    resource: TFoodResource;
+    resource: TEditMenuPricingCalendarResources;
     start: Date;
     end: Date;
   }[] = [];
@@ -56,6 +64,8 @@ const renderResourcesForCalendar = (
           id: foodsByDate[key][foodKey]?.id,
           title: foodsByDate[key][foodKey]?.title,
           sideDishes: foodsByDate[key][foodKey]?.sideDishes || [],
+          price: foodsByDate[key][foodKey]?.price || 0,
+          foodNote: foodsByDate[key][foodKey]?.foodNote || '',
           ...extraData,
         },
         start: DateTime.fromMillis(Number(key)).toJSDate(),
@@ -70,37 +80,19 @@ const EditMenuPricingFormComponent: React.FC<
   TEditMenuPricingFormComponentProps
 > = (props) => {
   const [currentDate, setCurrentDate] = useState<number | null>();
-  const { handleSubmit, currentMenu, values, form, formRef, restaurantId } =
-    props;
+  const { handleSubmit, currentMenu, values, form, formRef } = props;
 
   useImperativeHandle(formRef, () => form);
 
-  const foodsByDate = values?.foodsByDate || {};
-
-  const getFoodsByDateIds = () => {
-    const ids: string[] = [];
-    Object.keys(foodsByDate).forEach((dKey) => {
-      Object.keys(foodsByDate[dKey]).forEach((id) => {
-        ids.push(id);
-      });
-    });
-    return ids;
-  };
-
-  const { menuPickedFoods } = useQueryMenuPickedFoods({
-    restaurantId: restaurantId as string,
-    ids: getFoodsByDateIds(),
-  });
-
   const onRemovePickedFood = (removeId: string, date: Date) => {
-    const dateAsTimeStaimp = date.getTime();
-    const pickedFoodsOnDate = { ...values.foodsByDate[dateAsTimeStaimp] };
+    const currentDateAsTimestamp = date.getTime();
+    const pickedFoodsOnDate = { ...values.foodsByDate[currentDateAsTimestamp] };
     Object.keys(pickedFoodsOnDate).forEach((keyId: string) => {
       if (removeId === keyId) {
         delete pickedFoodsOnDate[removeId];
         const newFoodsByDate = {
           ...values.foodsByDate,
-          [dateAsTimeStaimp]: {
+          [currentDateAsTimestamp]: {
             ...pickedFoodsOnDate,
           },
         };
@@ -112,12 +104,7 @@ const EditMenuPricingFormComponent: React.FC<
 
   const { daysOfWeek } = INTERGRATION_LISTING(currentMenu).getPublicData();
 
-  const foodByDateToRender = renderInitialValuesForFoodsByDate(
-    values?.foodsByDate,
-    menuPickedFoods,
-  );
-
-  const resourcesForCalendar = renderResourcesForCalendar(foodByDateToRender, {
+  const resourcesForCalendar = renderResourcesForCalendar(values.foodsByDate, {
     onRemovePickedFood,
     daysOfWeek,
   });
@@ -131,11 +118,13 @@ const EditMenuPricingFormComponent: React.FC<
     );
     const listIds = currentDayEvents.map((e: any) => e.resource.id);
     const listIdsWithSideDishes = currentDayEvents.map((e: any) => e.resource);
-    console.log(listIdsWithSideDishes);
     form.change('rowCheckbox', listIds);
-    listIdsWithSideDishes.forEach(({ id, sideDishes = [] }: TFoodResource) => {
-      return form.change(`${id}.sideDishes`, sideDishes);
-    });
+    listIdsWithSideDishes.forEach(
+      ({ id, sideDishes = [], foodNote }: TFoodResource) => {
+        form.change(`${id}.foodNote`, foodNote);
+        return form.change(`${id}.sideDishes`, sideDishes);
+      },
+    );
   };
 
   const onCloseModal = () => {
@@ -143,6 +132,14 @@ const EditMenuPricingFormComponent: React.FC<
   };
 
   const calendarContentStart = (contentProps: any) => {
+    const dayAsIndex = new Date(contentProps.date).getDay() - 1;
+    const dayOfWeekToCompare = getDayOfWeekByIndex(dayAsIndex);
+
+    const { daysOfWeek: daysOfWeekFromMenu = [] } =
+      INTERGRATION_LISTING(currentMenu).getPublicData();
+    if (!daysOfWeekFromMenu.includes(dayOfWeekToCompare)) {
+      return <></>;
+    }
     return (
       <InlineTextButton
         onClick={onSetCurrentDate(contentProps)}
@@ -155,27 +152,53 @@ const EditMenuPricingFormComponent: React.FC<
     );
   };
 
-  const calendarContentEnd = ({ events = [] }) => {
+  const calendarContentEnd = ({
+    events = [],
+    date,
+  }: {
+    events: any[];
+    date: Date;
+  }) => {
+    const dayAsIndex = new Date(date).getDay() - 1;
+    const dayOfWeekToCompare = getDayOfWeekByIndex(dayAsIndex);
+
+    const { daysOfWeek: daysOfWeekFromMenu = [] } =
+      INTERGRATION_LISTING(currentMenu).getPublicData();
+    if (!daysOfWeekFromMenu.includes(dayOfWeekToCompare)) {
+      return <></>;
+    }
     const noFood = events.length === 0;
-    return noFood ? <div className={css.noFood}>Chưa có món ăn</div> : <></>;
+    return noFood ? (
+      <div className={css.noFood}>
+        <FormattedMessage id="EditMenuPricingForm.noFoods" />
+      </div>
+    ) : (
+      <></>
+    );
   };
 
   return (
     <>
       <Form onSubmit={handleSubmit}>
-        <CalendarDashboard
-          renderEvent={FoodEventCard}
-          events={resourcesForCalendar}
-          components={{
-            contentStart: calendarContentStart,
-            contentEnd: calendarContentEnd,
-          }}
-        />
+        {currentMenu && (
+          <CalendarDashboard
+            renderEvent={FoodEventCard}
+            events={resourcesForCalendar}
+            headerComponent={(params) => (
+              <DayOfWeekCalendarHeader {...params} />
+            )}
+            components={{
+              toolbar: () => <></>,
+              contentStart: calendarContentStart,
+              contentEnd: calendarContentEnd,
+            }}
+          />
+        )}
       </Form>
       <AddFoodModal
         isOpen={!!currentDate}
         handleClose={onCloseModal}
-        currentMenu={currentMenu as TIntergrationListing}
+        currentMenu={currentMenu as TIntegrationListing}
         values={values}
         form={form as unknown as FormApi}
         currentDate={currentDate}

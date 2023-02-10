@@ -35,8 +35,8 @@ const IconWallet: React.FC<TIconProps> = (props) => {
         width="18"
         height="17">
         <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
+          fillRule="evenodd"
+          clipRule="evenodd"
           d="M1.66663 2.5H18.8655V18.4774H1.66663V2.5Z"
           fill="white"
         />

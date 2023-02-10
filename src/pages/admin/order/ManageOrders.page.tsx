@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
-import Badge, { BadgeType } from '@components/Badge/Badge';
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
@@ -25,9 +25,10 @@ import {
   ORDER_STATES_OPTIONS,
 } from '@utils/enums';
 import type {
-  TIntergrationOrderListing,
-  TReverseMapFromEnum,
+  TIntegrationListing,
+  TIntegrationOrderListing,
 } from '@utils/types';
+import { parsePrice } from '@utils/validators';
 import classNames from 'classnames';
 import addDays from 'date-fns/addDays';
 import { useRouter } from 'next/router';
@@ -43,17 +44,17 @@ const uniqueStrings = (array: string[]) => {
   });
 };
 
-const BAGDE_TYPE_BASE_ON_ORDER_STATE = {
-  [EOrderStates.inProgress]: BadgeType.PROCESSING,
-  [EOrderStates.isNew]: BadgeType.PROCESSING,
-  [EOrderStates.cancel]: BadgeType.DEFAULT,
-  [EOrderStates.delivery]: BadgeType.SUCCESS,
-  [EOrderStates.completed]: BadgeType.SUCCESS,
-  [EOrderStates.pendingPayment]: BadgeType.WARNING,
-  [EOrderStates.picking]: BadgeType.WARNING,
+const BADGE_TYPE_BASE_ON_ORDER_STATE = {
+  [EOrderStates.inProgress]: EBadgeType.PROCESSING,
+  [EOrderStates.isNew]: EBadgeType.PROCESSING,
+  [EOrderStates.cancel]: EBadgeType.DEFAULT,
+  [EOrderStates.delivery]: EBadgeType.SUCCESS,
+  [EOrderStates.completed]: EBadgeType.SUCCESS,
+  [EOrderStates.pendingPayment]: EBadgeType.WARNING,
+  [EOrderStates.picking]: EBadgeType.WARNING,
 };
 
-const BAGDE_CLASSNAME_BASE_ON_ORDER_STATE = {
+const BADGE_CLASSNAME_BASE_ON_ORDER_STATE = {
   [EOrderStates.inProgress]: css.badgeInProgress,
   [EOrderStates.isNew]: css.badgeProcessing,
   [EOrderStates.cancel]: css.badgedefault,
@@ -63,52 +64,64 @@ const BAGDE_CLASSNAME_BASE_ON_ORDER_STATE = {
   [EOrderStates.picking]: css.badgeWarning,
 };
 
-const OrderDetailTooltip = ({ orderDetail }: any) => {
-  const orderDetails = Object.keys(orderDetail).map((key) => {
-    const { status, foodList } = orderDetail[key];
-    const totalPrice = Object.keys(foodList).reduce((prev, cur) => {
-      const price = foodList[cur].foodPrice;
-      return prev + price;
-    }, 0);
-    const OrderIcon = () => {
-      switch (status) {
-        case EOrderDetailsStatus.cancelled:
-          return (
-            <div className={classNames(css.orderIcon, css.cancelledIcon)}>
-              <IconWarning />
-            </div>
-          );
-        case EOrderDetailsStatus.delivered:
-          return (
-            <div className={classNames(css.orderIcon, css.deliveredIcon)}>
-              <IconTruck />
-            </div>
-          );
-        case EOrderDetailsStatus.received:
-          return (
-            <div className={classNames(css.orderIcon, css.receivedIcon)}>
-              <IconTick />
-            </div>
-          );
-        default:
-          return (
-            <div className={classNames(css.orderIcon, css.pendingIcon)}></div>
-          );
-      }
-    };
+const OrderDetailTooltip = ({
+  subOrders = [],
+}: {
+  subOrders: TIntegrationListing[];
+}) => {
+  const orderDetails = subOrders.reduce(
+    (prev: any, subOrder: TIntegrationListing) => {
+      const { orderDetail } = subOrder.attributes.metadata || {};
+      const subOrderDetails = Object.keys(orderDetail).map((key) => {
+        const { foodList, status } = orderDetail[key];
+        const totalPrice = Object.keys(foodList).reduce((prev, cur) => {
+          const price = foodList[cur].foodPrice;
+          return prev + price;
+        }, 0);
+        const OrderIcon = () => {
+          switch (status) {
+            case EOrderDetailsStatus.cancelled:
+              return (
+                <div className={classNames(css.orderIcon, css.cancelledIcon)}>
+                  <IconWarning />
+                </div>
+              );
+            case EOrderDetailsStatus.delivered:
+              return (
+                <div className={classNames(css.orderIcon, css.deliveredIcon)}>
+                  <IconTruck />
+                </div>
+              );
+            case EOrderDetailsStatus.received:
+              return (
+                <div className={classNames(css.orderIcon, css.receivedIcon)}>
+                  <IconTick />
+                </div>
+              );
+            default:
+              return (
+                <div
+                  className={classNames(css.orderIcon, css.pendingIcon)}></div>
+              );
+          }
+        };
 
-    return (
-      <div key={key} className={css.orderDetailTooltipItem}>
-        <OrderIcon />
-        <span>
-          <span className={css.orderDate}>
-            {parseTimestampToFormat(Number(key))}
-          </span>
-          : {totalPrice}đ
-        </span>
-      </div>
-    );
-  });
+        return (
+          <div key={key} className={css.orderDetailTooltipItem}>
+            <OrderIcon />
+            <span>
+              <span className={css.orderDate}>
+                {parseTimestampToFormat(Number(key))}
+              </span>
+              : {parsePrice(String(totalPrice))}đ
+            </span>
+          </div>
+        );
+      });
+      return [...prev, ...subOrderDetails];
+    },
+    [],
+  );
   return <div className={css.tooltip}>{orderDetails}</div>;
 };
 
@@ -116,18 +129,21 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'title',
     label: 'ID',
-    render: (data: any) => {
+    render: ({ id, title, subOrders }: any) => {
       return (
-        <NamedLink path={`${adminRoutes.ManageOrders.path}/${data.id}`}>
-          <Tooltip
-            overlayInnerStyle={{ backgroundColor: '#ffffff' }}
-            showArrow={false}
-            tooltipContent={
-              <OrderDetailTooltip orderDetail={data.orderDetail} />
-            }
-            placement="bottomLeft">
-            <div className={css.boldText}>#{data.title}</div>
-          </Tooltip>
+        <NamedLink path={`${adminRoutes.ManageOrders.path}/${id}`}>
+          {subOrders.length > 0 ? (
+            <Tooltip
+              overlayClassName={css.orderDetailTooltip}
+              overlayInnerStyle={{ backgroundColor: '#ffffff' }}
+              showArrow={false}
+              tooltipContent={<OrderDetailTooltip subOrders={subOrders} />}
+              placement="bottomLeft">
+              <div className={css.boldText}>#{title}</div>
+            </Tooltip>
+          ) : (
+            <div className={css.boldText}>#{title}</div>
+          )}
         </NamedLink>
       );
     },
@@ -137,14 +153,30 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'orderName',
     label: 'Tên đơn hàng',
     render: ({ orderName }: any) => {
-      return <div className={css.orderName}>{orderName || 'NULL'}</div>;
+      return (
+        <div className={css.orderName}>
+          {orderName || (
+            <div className={css.draftText}>
+              <FormattedMessage id="ManageOrdersPage.draftOrderTitle" />
+            </div>
+          )}
+        </div>
+      );
     },
   },
   {
     key: 'address',
     label: 'Địa điểm giao hàng',
     render: (data: any) => {
-      return <div className={css.locationRow}>{data.location}</div>;
+      return (
+        <div className={css.locationRow}>
+          {data.location || (
+            <div className={css.draftText}>
+              <FormattedMessage id="ManageOrdersPage.draftOrderLocation" />
+            </div>
+          )}
+        </div>
+      );
     },
   },
   {
@@ -158,11 +190,15 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'startDate',
     label: 'Thời gian',
     render: (data: any) => {
-      console.log(data);
-      return (
+      const { startDate, endDate } = data;
+      return startDate && endDate ? (
         <div className={css.rowText}>
           <div className={css.deliveryHour}>{data.deliveryHour}</div>
           {data.startDate} - {data.endDate}
+        </div>
+      ) : (
+        <div className={css.draftText}>
+          <FormattedMessage id="ManageOrdersPage.draftOrderDate" />
         </div>
       );
     },
@@ -175,7 +211,7 @@ const TABLE_COLUMN: TColumn[] = [
       const { length } = restaurants;
       const moreThanTwo = restaurants.length > 2;
       const remainLength = length - 2;
-      return (
+      return length > 0 ? (
         <div className={css.rowText}>
           {restaurants.slice(0, 2).map((restaurantName: string) => (
             <div key={restaurantName}>{restaurantName}</div>
@@ -184,43 +220,39 @@ const TABLE_COLUMN: TColumn[] = [
             <div className={css.remainText}>+ {remainLength} đối tác </div>
           )}
         </div>
+      ) : (
+        <div className={css.draftText}>
+          <FormattedMessage id="ManageOrdersPage.draftOrderRestaurant" />
+        </div>
       );
     },
   },
   {
     key: 'staffName',
     label: 'Nhân viên phụ trách',
-    render: (data: any) => {
-      return <div>{data.staffName}</div>;
-    },
-    sortable: true,
-  },
-  {
-    key: 'shipperName',
-    label: 'Nhân viên giao hàng',
-    render: (data: any) => {
-      return <div>{data.shipperName}</div>;
+    render: ({ staffName }: any) => {
+      return staffName ? (
+        <div>{staffName}</div>
+      ) : (
+        <div className={css.draftText}>
+          <FormattedMessage id="ManageOrdersPage.draftOrderStaff" />
+        </div>
+      );
     },
     sortable: true,
   },
   {
     key: 'state',
     label: 'Trạng thái',
-    render: ({
-      state,
-    }: {
-      state: TReverseMapFromEnum<typeof EOrderStates>;
-    }) => {
+    render: ({ state }: { state: EOrderStates }) => {
       return (
         <Badge
           containerClassName={classNames(
             css.badge,
-            BAGDE_CLASSNAME_BASE_ON_ORDER_STATE[state],
+            BADGE_CLASSNAME_BASE_ON_ORDER_STATE[state],
           )}
           labelClassName={css.badgeLabel}
-          type={
-            (BAGDE_TYPE_BASE_ON_ORDER_STATE[state] as any) || BadgeType.DEFAULT
-          }
+          type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.DEFAULT}
           label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
         />
       );
@@ -235,7 +267,7 @@ const TABLE_COLUMN: TColumn[] = [
         <Badge
           containerClassName={css.badge}
           labelClassName={css.badgeLabel}
-          type={isPaid ? 'success' : 'warning'}
+          type={isPaid ? EBadgeType.SUCCESS : EBadgeType.WARNING}
           label={isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}
         />
       );
@@ -244,37 +276,42 @@ const TABLE_COLUMN: TColumn[] = [
 ];
 
 const parseEntitiesToTableData = (
-  orders: TIntergrationOrderListing[],
+  orders: TIntegrationOrderListing[],
   page: number,
 ) => {
   if (orders.length === 0) return [];
   return orders.map((entity, index) => {
-    const { company } = entity;
-    const { orderDetail = {} } = entity?.attributes?.metadata || {};
+    const { company, subOrders = [] } = entity;
+    const restaurants = subOrders.reduce(
+      // eslint-disable-next-line array-callback-return
+      (prevSubOrders: any[], subOrder: TIntegrationListing) => {
+        const { orderDetail = {} } = subOrder?.attributes?.metadata || {};
+        const listRestaurantName = uniqueStrings(
+          Object.keys(orderDetail).map((key) => {
+            return orderDetail[key]?.restaurant?.restaurantName;
+          }),
+        );
+        return [...prevSubOrders, ...listRestaurantName];
+      },
+      [],
+    );
+    const { startDate, endDate, orderState, staffName, deliveryAddress } =
+      entity?.attributes?.metadata || {};
     return {
       key: entity.id.uuid,
       data: {
         id: entity.id.uuid,
         title: entity.attributes.title,
         orderNumber: (page - 1) * 10 + index + 1,
-        location:
-          entity?.attributes?.metadata?.generalInfo?.deliveryAddress?.address,
+        location: deliveryAddress?.address,
         companyName: company?.attributes.profile.displayName,
-        startDate: parseTimestampToFormat(
-          entity?.attributes?.metadata?.generalInfo?.startDate,
-        ),
-        endDate: parseTimestampToFormat(
-          entity?.attributes?.metadata?.generalInfo?.endDate,
-        ),
-        staffName: entity?.attributes?.metadata?.generalInfo?.staffName,
-        state: entity.attributes.metadata?.orderState || EOrderStates.isNew,
+        startDate: startDate && parseTimestampToFormat(startDate),
+        endDate: endDate && parseTimestampToFormat(endDate),
+        staffName,
+        state: orderState || EOrderStates.isNew,
         orderId: entity?.id?.uuid,
-        restaurants: uniqueStrings(
-          Object.keys(orderDetail).map((key) => {
-            return orderDetail[key]?.restaurant?.restaurantName;
-          }),
-        ),
-        orderDetail: entity.attributes.metadata?.orderDetail,
+        restaurants,
+        subOrders,
         orderName: entity.attributes.publicData.orderName,
         deliveryHour: entity.attributes.metadata?.generalInfo?.deliveryHour,
       },
@@ -316,8 +353,8 @@ const ManageOrdersPage = () => {
     page = 1,
     keywords = '',
     meta_state = '',
-    pub_endDate,
-    pub_startDate,
+    meta_endDate,
+    meta_startDate,
   } = router.query;
   const [sortValue, setSortValue] = useState<TSortValue>();
   const {
@@ -372,16 +409,20 @@ const ManageOrdersPage = () => {
     .filter((item: string) => !!item);
 
   useEffect(() => {
-    const endDateWithOneMoreDay = addDays(new Date(pub_endDate as string), 1);
+    const endDateWithOneMoreDay = addDays(new Date(meta_endDate as string), 1);
     dispatch(
       OrderAsyncAction.queryOrders({
         page,
         keywords,
-        ...(pub_endDate
-          ? { pub_endDate: `,${new Date(endDateWithOneMoreDay).getTime()}` }
+        ...(meta_endDate
+          ? { meta_endDate: `,${new Date(endDateWithOneMoreDay).getTime()}` }
           : {}),
-        ...(pub_startDate
-          ? { pub_startDate: `${new Date(pub_startDate as string).getTime()},` }
+        ...(meta_startDate
+          ? {
+              meta_startDate: `${new Date(
+                meta_startDate as string,
+              ).getTime()},`,
+            }
           : {}),
       }),
     );
@@ -398,19 +439,19 @@ const ManageOrdersPage = () => {
   const onSubmit = ({
     keywords,
     meta_state,
-    pub_startDate,
-    pub_endDate,
+    meta_startDate,
+    meta_endDate,
   }: any) => {
     router.push({
       pathname: adminRoutes.ManageOrders.path,
       query: {
         keywords,
         meta_state: meta_state.join(','),
-        ...(pub_startDate
-          ? { pub_startDate: new Date(pub_startDate).toISOString() }
+        ...(meta_startDate
+          ? { meta_startDate: new Date(meta_startDate).toISOString() }
           : {}),
-        ...(pub_endDate
-          ? { pub_endDate: new Date(pub_endDate).toISOString() }
+        ...(meta_endDate
+          ? { meta_endDate: new Date(meta_endDate).toISOString() }
           : {}),
       },
     });
@@ -418,35 +459,40 @@ const ManageOrdersPage = () => {
 
   return (
     <div className={css.root}>
-      <h1 className={css.title}>
-        <FormattedMessage id="ManageOrders.title" />
-      </h1>
+      <div className={css.pageHeader}>
+        <h1 className={css.title}>
+          <FormattedMessage id="ManageOrders.title" />
+        </h1>
+        <NamedLink path={adminRoutes.CreateOrder.path}>
+          <Button>Tạo đơn</Button>
+        </NamedLink>
+      </div>
       <div className={css.filterForm}>
         <IntegrationFilterModal
           onClear={onClearFilter}
           initialValues={{
             meta_state: groupStateString,
             keywords,
-            pub_startDate: pub_startDate
-              ? new Date(pub_startDate as string).getTime()
+            meta_startDate: meta_startDate
+              ? new Date(meta_startDate as string).getTime()
               : undefined,
-            pub_endDate: pub_endDate
-              ? new Date(pub_endDate as string).getTime()
+            meta_endDate: meta_endDate
+              ? new Date(meta_endDate as string).getTime()
               : undefined,
           }}
           onSubmit={onSubmit}>
           {({ values, form }: any) => {
             const setStartDate = (date: Date) => {
-              form.change('pub_startDate', date);
-              if (values.pub_endDate) {
-                form.change('pub_endDate', undefined);
+              form.change('meta_startDate', date);
+              if (values.meta_endDate) {
+                form.change('meta_endDate', undefined);
               }
             };
             const setEndDate = (date: Date) => {
-              form.change('pub_endDate', date);
+              form.change('meta_endDate', date);
             };
 
-            const minEndDate = addDays(values.pub_startDate, 1);
+            const minEndDate = addDays(values.meta_startDate, 1);
 
             return (
               <>
@@ -463,9 +509,9 @@ const ManageOrdersPage = () => {
                 </label>
                 <div className={css.dateInputs}>
                   <FieldDatePicker
-                    id="pub_startDate"
-                    name="pub_startDate"
-                    selected={values.pub_startDate}
+                    id="meta_startDate"
+                    name="meta_startDate"
+                    selected={values.meta_startDate}
                     onChange={setStartDate}
                     className={css.inputDate}
                     dateFormat={'dd MMMM, yyyy'}
@@ -473,25 +519,22 @@ const ManageOrdersPage = () => {
                     autoComplete="off"
                   />
                   <FieldDatePicker
-                    id="pub_endDate"
-                    name="pub_endDate"
+                    id="meta_endDate"
+                    name="meta_endDate"
                     onChange={setEndDate}
-                    selected={values.pub_endDate}
+                    selected={values.meta_endDate}
                     className={css.inputDate}
                     dateFormat={'dd MMMM, yyyy'}
                     placeholderText={'Nhập ngày kết thúc'}
                     autoComplete="off"
                     minDate={minEndDate}
-                    disabled={!values.pub_startDate}
+                    disabled={!values.meta_startDate}
                   />
                 </div>
               </>
             );
           }}
         </IntegrationFilterModal>
-        <NamedLink path={adminRoutes.CreateOrder.path}>
-          <Button>Tạo đơn</Button>
-        </NamedLink>
       </div>
       {content}
     </div>

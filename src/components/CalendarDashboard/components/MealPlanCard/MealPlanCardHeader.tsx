@@ -1,28 +1,56 @@
+import IconClose from '@components/Icons/IconClose/IconClose';
+import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
+import IconUser from '@components/Icons/IconUser/IconUser';
+import { useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
+import DeleteMealModal from './components/DeleteMealModal';
 import css from './MealPlanCard.module.scss';
 
 type TMealPlanCardHeaderProps = {
   event: Event;
+  removeEventItem?: (resourceId: string) => void;
 };
 
-const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({ event }) => {
+const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
+  event,
+  removeEventItem,
+}) => {
   const session = event.resource?.daySession;
+  const resourceId = event.resource?.id;
+  const handleDelete = () => {
+    removeEventItem?.(resourceId);
+  };
   // const suitableAmount = event.resource?.suitableAmount;
+
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+
+  const handleOpenDeleteModal = () => {
+    setIsOpenDeleteModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsOpenDeleteModal(false);
+  };
 
   return (
     <div className={css.header}>
       <div className={css.planTitle}>
         <FormattedMessage id={`DayColumn.Session.${session}`} />
-        {/* <IconClose className={css.close} /> */}
+        <IconClose className={css.close} onClick={handleOpenDeleteModal} />
       </div>
-      {/* <div className={css.headerActions}>
+      <div className={css.headerActions}>
         <IconUser />
-        <div className={css.suitableAmount}>{suitableAmount}</div>
+        <div className={css.suitableAmount}>{''}</div>
         <div className={css.verticalDivider} />
         <IconMagnifier className={css.searchIcon} />
-      </div> */}
+      </div>
+      <DeleteMealModal
+        isOpen={isOpenDeleteModal}
+        onClose={handleCloseDeleteModal}
+        handleDelete={handleDelete}
+      />
     </div>
   );
 };

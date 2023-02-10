@@ -3,13 +3,14 @@ import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import IconSort from '@components/Icons/IconSort/IconSort';
 import Pagination from '@components/Pagination/Pagination';
-import type { TPagination } from '@utils/types';
+import type { TDefaultProps, TPagination } from '@utils/types';
 import classNames from 'classnames';
 import type { FormApi } from 'final-form';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import React from 'react';
 import { Form as FinalForm, FormSpy } from 'react-final-form';
+import { FormattedMessage } from 'react-intl';
 
 import css from './Table.module.scss';
 
@@ -26,10 +27,9 @@ export type TRowData = {
   data: any;
 };
 
-type TTableProps = {
+type TTableProps = TDefaultProps & {
   columns: TColumn[];
   data: TRowData[];
-  rootClassName?: string;
   tableClassName?: string;
   tableHeadClassName?: string;
   tableHeadRowClassName?: string;
@@ -55,6 +55,7 @@ type TTableProps = {
   sortValue?: { columnName: string | number; type: 'asc' | 'desc' };
   customCheckboxChange?: (e: any) => void;
   afterCheckboxChangeHandler?: (e: any, rowCheckboxValues: any) => void;
+  extraRows?: ReactNode;
 };
 
 const getUniqueString = (list: string[]) => {
@@ -85,10 +86,10 @@ const Table = (props: TTableProps) => {
     handleSort,
     sortValue,
     afterCheckboxChangeHandler,
+    extraRows,
   } = props;
 
   const tableClasses = classNames(css.table, tableClassName);
-
   const router = useRouter();
 
   const onPageChange = (page: number) => {
@@ -183,8 +184,19 @@ const Table = (props: TTableProps) => {
         {isLoading ? (
           <tbody>
             <tr>
-              <td>Loading...</td>
+              <td colSpan={columns.length} className={css.emptyCell}>
+                Loading...
+              </td>
             </tr>
+          </tbody>
+        ) : data.length === 0 ? (
+          <tbody>
+            <tr>
+              <td colSpan={columns.length} className={css.emptyCell}>
+                <FormattedMessage id="Table.noResults" />
+              </td>
+            </tr>
+            {extraRows && <tr className={css.bodyRow}>{extraRows}</tr>}
           </tbody>
         ) : (
           <tbody className={tableBodyClassName}>
@@ -228,6 +240,7 @@ const Table = (props: TTableProps) => {
                     )}>
                     <FieldCheckbox
                       labelClassName={css.checkboxLabel}
+                      svgClassName={css.checkboxSvg}
                       name="rowCheckbox"
                       id={`rowCheckbox.${row.key}`}
                       value={row.key as any}
@@ -254,6 +267,7 @@ const Table = (props: TTableProps) => {
                 })}
               </tr>
             ))}
+            {extraRows && <tr className={css.bodyRow}>{extraRows}</tr>}
           </tbody>
         )}
       </table>

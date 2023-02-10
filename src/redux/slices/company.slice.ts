@@ -1,9 +1,30 @@
+import type {
+  CreateGroupApiBody,
+  DeleteGroupApiData,
+  GetGroupDetailApiParams,
+  UpdateCompanyApiBody,
+  UpdateGroupApiBody,
+} from '@apis/companyApi';
+import {
+  createGroupApi,
+  deleteGroupApi,
+  getGroupDetailApi,
+  updateCompany,
+  updateGroupApi,
+} from '@apis/companyApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchUserApi } from '@utils/api';
-import { denormalisedResponseEntities, USER } from '@utils/data';
+import { denormalisedResponseEntities } from '@utils/data';
+import { EImageVariants } from '@utils/enums';
 import type { TObject, TUser } from '@utils/types';
 import axios from 'axios';
+
+import { userThunks } from './user.slice';
+
+export type TCompanyImageActionPayload = {
+  id: string;
+  file: any;
+};
 
 const MEMBER_PER_PAGE = 10;
 
@@ -13,7 +34,7 @@ type TGroupInfo = {
   description: string;
 };
 
-type CompanyState = {
+type TCompanyState = {
   groupList: any;
   fetchGroupListInProgress: boolean;
   companyMembers: any[];
@@ -35,6 +56,12 @@ type CompanyState = {
   updateGroupError: any;
   originCompanyMembers: TObject;
   isCompanyNotFound: boolean;
+
+  updateCompanyInProgress: boolean;
+  updateCompanyError: any;
+
+  updateBookerAccountInProgress: boolean;
+  updateBookerAccountError: any;
 };
 
 // ================ Thunk types ================ //
@@ -44,8 +71,10 @@ const GROUP_DETAIL_INFO = 'app/Company/GROUP_DETAIL_INFO';
 const CREATE_GROUP = 'app/Company/CREATE_GROUP';
 const UPDATE_GROUP = 'app/Company/UPDATE_GROUP';
 const DELETE_GROUP = 'app/Company/DELETE_GROUP';
+const UPDATE_COMPANY_ACCOUNT = 'app/Company/UPDATE_COMPANY_ACCOUNT';
+const UPDATE_BOOKER_ACCOUNT = 'app/Company/UPDATE_BOOKER_ACCOUNT';
 
-const initialState: CompanyState = {
+const initialState: TCompanyState = {
   groupList: [],
   fetchGroupListInProgress: false,
   groupMembers: [],
@@ -67,22 +96,42 @@ const initialState: CompanyState = {
   updateGroupError: null,
   originCompanyMembers: {},
   isCompanyNotFound: false,
+
+  updateCompanyInProgress: false,
+  updateCompanyError: null,
+
+  updateBookerAccountInProgress: false,
+  updateBookerAccountError: null,
 };
 
-const companyInfo = createAsyncThunk(COMPANY_INFO, async (_, { getState }) => {
-  const { workspaceCompanyId } = getState().company;
-  const { data: companyAccount } = await fetchUserApi(workspaceCompanyId);
-  const { data: allEmployeesData } = await axios.get(
-    `/api/company/all-employees?companyId=${workspaceCompanyId}`,
-  );
-  const { groups = [], members = {} } = USER(companyAccount).getMetadata();
-  return {
-    groupList: groups,
-    company: companyAccount,
-    originCompanyMembers: members,
-    companyMembers: [...allEmployeesData.data.data],
-  };
-});
+const companyInfo = createAsyncThunk(
+  COMPANY_INFO,
+  async (_, { getState, extra: sdk }) => {
+    const { workspaceCompanyId } = getState().company;
+    const companyAccountResponse = await sdk.users.show({
+      id: workspaceCompanyId,
+      include: ['profileImage'],
+    });
+    const [companyAccount] = denormalisedResponseEntities(
+      companyAccountResponse,
+    );
+    const companyImageId = companyAccount.profileImage?.id;
+    const { data: allEmployeesData } = await axios.get(
+      `/api/company/all-employees?companyId=${workspaceCompanyId}`,
+    );
+    const { groups = [], members = {} } =
+      companyAccount.attributes.profile.metadata;
+    return {
+      companyImage: {
+        imageId: companyImageId || null,
+      },
+      groupList: groups,
+      company: companyAccount,
+      originCompanyMembers: members,
+      companyMembers: [...allEmployeesData.data.data],
+    };
+  },
+);
 
 const groupInfo = createAsyncThunk(
   GROUP_INFO,
@@ -109,9 +158,13 @@ const groupDetailInfo = createAsyncThunk(
     const { id, name, description } = groups.find(
       (_group: any) => _group.id === groupId,
     );
-    const { data: allMembersData } = await axios.get(
-      `/api/company/group/all-member?groupId=${groupId}&perPage=${MEMBER_PER_PAGE}&page=${page}`,
-    );
+    const apiParams: GetGroupDetailApiParams = {
+      groupId,
+      page,
+      perPage: MEMBER_PER_PAGE,
+    };
+    const { data: allMembersData } = await getGroupDetailApi(apiParams);
+    const { allMembers, meta } = allMembersData;
     const groupInfoState: TGroupInfo = {
       id,
       name,
@@ -119,8 +172,8 @@ const groupDetailInfo = createAsyncThunk(
     };
     return {
       groupInfo: groupInfoState,
-      groupMembers: [...allMembersData.data.data],
-      groupMembersPagination: allMembersData.data.meta,
+      groupMembers: allMembers,
+      groupMembersPagination: meta,
     };
   },
 );
@@ -129,10 +182,13 @@ const createGroup = createAsyncThunk(
   CREATE_GROUP,
   async (params: TObject, { getState }) => {
     const { workspaceCompanyId } = getState().company;
-    const { data: newCompanyAccount } = await axios.post('/api/company/group', {
-      ...params,
+    const { groupInfo: groupInforParam, groupMembers } = params;
+    const apiBody: CreateGroupApiBody = {
       companyId: workspaceCompanyId,
-    });
+      groupInfo: groupInforParam,
+      groupMembers,
+    };
+    const { data: newCompanyAccount } = await createGroupApi(apiBody);
     const { groups } = newCompanyAccount.attributes.profile.metadata;
     return groups;
   },
@@ -145,13 +201,14 @@ const updateGroup = createAsyncThunk(
     { getState, dispatch },
   ) => {
     const { workspaceCompanyId } = getState().company;
-    await axios.put('/api/company/group', {
+    const apiBody: UpdateGroupApiBody = {
       addedMembers,
       deletedMembers,
       groupId,
       groupInfo: groupInfoParams,
       companyId: workspaceCompanyId,
-    });
+    };
+    await updateGroupApi(apiBody);
     return [dispatch(groupDetailInfo({ groupId })), dispatch(groupInfo())];
   },
 );
@@ -160,17 +217,58 @@ const deleteGroup = createAsyncThunk(
   DELETE_GROUP,
   async (groupId: string, { getState }) => {
     const { workspaceCompanyId } = getState().company;
-    const { data: newCompanyAccount } = await axios.delete(
-      '/api/company/group',
-      {
-        data: {
-          groupId,
-          companyId: workspaceCompanyId,
-        },
-      },
-    );
+    const apiData: DeleteGroupApiData = {
+      groupId,
+      companyId: workspaceCompanyId,
+    };
+    const { data: newCompanyAccount } = await deleteGroupApi(apiData);
     const { groups } = newCompanyAccount.attributes.profile.metadata;
     return groups;
+  },
+);
+
+const updateBookerAccount = createAsyncThunk(
+  UPDATE_BOOKER_ACCOUNT,
+  async (params: any, { extra: sdk, dispatch }) => {
+    const queryParams = {
+      expand: true,
+      include: ['profileImage'],
+      'fields.image': ['variants.square-small', 'variants.square-small2x'],
+    };
+
+    await sdk.currentUser.updateProfile(params, queryParams);
+    await dispatch(userThunks.fetchCurrentUser());
+    return '';
+  },
+);
+
+const updateCompanyAccount = createAsyncThunk(
+  UPDATE_COMPANY_ACCOUNT,
+  async (_, { getState, dispatch }) => {
+    const { workspaceCompanyId } = getState().company;
+    const { image = {} } = getState().uploadImage;
+    const { imageId, file } = image;
+    const apiBody: UpdateCompanyApiBody = {
+      companyId: workspaceCompanyId,
+      dataParams: {
+        id: workspaceCompanyId,
+        ...(imageId && file ? { profileImageId: imageId.uuid } : {}),
+      },
+      queryParams: {
+        expand: true,
+        include: ['profileImage'],
+        'fields.image': [
+          EImageVariants.squareSmall,
+          EImageVariants.squareSmall2x,
+          EImageVariants.scaledLarge,
+        ],
+      },
+    };
+    const { data: companyAccount } = await updateCompany(apiBody);
+    dispatch(companyInfo());
+    return {
+      company: companyAccount,
+    };
   },
 );
 
@@ -181,6 +279,8 @@ export const BookerManageCompany = {
   createGroup,
   updateGroup,
   deleteGroup,
+  updateCompanyAccount,
+  updateBookerAccount,
 };
 
 export const companySlice = createSlice({
@@ -314,6 +414,48 @@ export const companySlice = createSlice({
           ...state,
           updateGroupInProgress: false,
           updateGroupError: error.message,
+        };
+      })
+      .addCase(updateCompanyAccount.pending, (state) => {
+        return {
+          ...state,
+          updateCompanyInProgress: true,
+        };
+      })
+      .addCase(updateCompanyAccount.fulfilled, (state, { payload }) => {
+        const { company } = payload;
+        return {
+          ...state,
+          updateCompanyInProgress: false,
+          company,
+        };
+      })
+      .addCase(updateCompanyAccount.rejected, (state, { error }) => {
+        return {
+          ...state,
+          updateCompanyInProgress: false,
+          updateCompanyError: error.message,
+        };
+      })
+
+      .addCase(updateBookerAccount.pending, (state) => {
+        return {
+          ...state,
+          updateBookerAccountInProgress: true,
+          updateBookerAccountError: null,
+        };
+      })
+      .addCase(updateBookerAccount.fulfilled, (state) => {
+        return {
+          ...state,
+          updateBookerAccountInProgress: false,
+        };
+      })
+      .addCase(updateBookerAccount.rejected, (state, { error }) => {
+        return {
+          ...state,
+          updateBookerAccountInProgress: false,
+          updateBookerAccountError: error.message,
         };
       });
   },

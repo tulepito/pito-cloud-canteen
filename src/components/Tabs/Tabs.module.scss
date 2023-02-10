@@ -14,9 +14,19 @@
   gap: 32px;
 }
 
-.navigateBtn {
+.navigateBtnStart {
+  &.middleLabel {
+    margin-right: 28px;
+  }
+}
+
+.navigateBtnEnd {
   display: flex;
   gap: 20px;
+
+  &.middleLabel {
+    margin-left: 28px;
+  }
 }
 
 .tabHeaders {

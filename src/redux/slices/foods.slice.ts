@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
-import { getImportDataFromCsv } from '@src/pages/admin/partner/[restaurantId]/settings/food/utils';
 import {
   createPartnerFoodApi,
   deletePartnerFoodApi,
   showPartnerFoodApi,
   updatePartnerFoodApi,
-} from '@utils/api';
+} from '@apis/foodApi';
+import { createAsyncThunk } from '@redux/redux.helper';
+import { createSlice } from '@reduxjs/toolkit';
+import { getImportDataFromCsv } from '@src/pages/admin/partner/[restaurantId]/settings/food/utils';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants, EListingType } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type {
   TImage,
-  TIntergrationListing,
+  TIntegrationListing,
   TListing,
   TPagination,
 } from '@utils/types';
@@ -52,7 +52,7 @@ type TFoodSliceState = {
   createPartnerFoodFromCsvInProgress: boolean;
   creataPartnerFoodFromCsvError: any;
 
-  menuPickedFoods: TIntergrationListing[];
+  menuPickedFoods: TIntegrationListing[];
   queryMenuPickedFoodsInProgress: boolean;
   queryMenuPickedFoodsError: any;
 };
@@ -190,7 +190,7 @@ const createPartnerFoodListing = createAsyncThunk(
         dataParams: payload,
         queryParams: {},
       });
-      return data;
+      return denormalisedResponseEntities(data)[0];
     } catch (error) {
       console.error(`${CREATE_PARTNER_FOOD_LISTING} error: `, error);
       return rejectWithValue(storableError(error));
@@ -205,21 +205,28 @@ const duplicateFood = createAsyncThunk(
       const { images = [], title } = payload || {};
       // parse url to file
       const imageAsFiles = await Promise.all(
-        images.map(async (image: TImage) => {
-          const response = await fetch(
-            image.attributes.variants[EImageVariants.squareSmall2x].url,
-          );
-          const data = await response.blob();
-          const metadata = {
-            type: 'image/jpeg',
-          };
-          const file = new File(
-            [data],
-            `${`${title}_${new Date().getTime()}`}.jpg`,
-            metadata,
-          );
-          return file;
-        }),
+        images
+          .map(async (image: TImage) => {
+            try {
+              const response = await fetch(
+                image.attributes.variants[EImageVariants.squareSmall2x].url,
+              );
+              const data = await response.blob();
+              const metadata = {
+                type: 'image/jpeg',
+              };
+              const file = new File(
+                [data],
+                `${`${title}_${new Date().getTime()}`}.jpg`,
+                metadata,
+              );
+              return file;
+            } catch (error) {
+              console.error(error);
+              return null;
+            }
+          })
+          .filter((file: File) => !!file),
       );
       // upload image to Flex
       const uploadRes = await Promise.all(
@@ -235,7 +242,7 @@ const duplicateFood = createAsyncThunk(
         dataParams: { ...payload, images: newImages },
         queryParams: {},
       });
-      return data;
+      return denormalisedResponseEntities(data)[0];
     } catch (error) {
       console.error(`${CREATE_PARTNER_FOOD_LISTING} error: `, error);
       return rejectWithValue(storableError(error));
@@ -281,19 +288,26 @@ const creataPartnerFoodFromCsv = createAsyncThunk(
               const { images, title } = l;
               const imagesAsArray = images ? images.split(',') : [];
               const imageAsFiles = await Promise.all(
-                imagesAsArray.map(async (src: string) => {
-                  const response = await fetch(src);
-                  const blobData = await response.blob();
-                  const metadata = {
-                    type: 'image/jpeg',
-                  };
-                  const file = new File(
-                    [blobData],
-                    `${`${title}_${new Date().getTime()}`}.jpg`,
-                    metadata,
-                  );
-                  return file;
-                }),
+                imagesAsArray
+                  .map(async (src: string) => {
+                    try {
+                      const response = await fetch(src);
+                      const blobData = await response.blob();
+                      const metadata = {
+                        type: 'image/jpeg',
+                      };
+                      const file = new File(
+                        [blobData],
+                        `${`${title}_${new Date().getTime()}`}.jpg`,
+                        metadata,
+                      );
+                      return file;
+                    } catch (error) {
+                      console.error(error);
+                      return null;
+                    }
+                  })
+                  .filter((file: File) => !!file),
               );
               // upload image to Flex
               const uploadRes = await Promise.all(
@@ -591,7 +605,7 @@ const foodSlice = createSlice({
           createPartnerFoodFromCsvInProgress: false,
           createPartnerFoodFromCsvError: null,
           foods: [
-            ...(payload as unknown as TIntergrationListing[]),
+            ...(payload as unknown as TIntegrationListing[]),
             ...state.foods,
           ],
         }),

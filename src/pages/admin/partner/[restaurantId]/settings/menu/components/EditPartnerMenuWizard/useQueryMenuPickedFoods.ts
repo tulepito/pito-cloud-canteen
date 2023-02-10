@@ -1,7 +1,7 @@
 import { useAppDispatch } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
-import type { TIntergrationListing } from '@utils/types';
+import type { TIntegrationListing } from '@utils/types';
 import { useEffect, useState } from 'react';
 
 const useQueryMenuPickedFoods = ({
@@ -13,9 +13,9 @@ const useQueryMenuPickedFoods = ({
 }) => {
   const dispatch = useAppDispatch();
 
-  const [menuPickedFoods, setMenuPickedFoods] = useState<
-    TIntergrationListing[]
-  >([]);
+  const [menuPickedFoods, setMenuPickedFoods] = useState<TIntegrationListing[]>(
+    [],
+  );
 
   const {
     value: queryMenuPickedFoodsInProgress,
@@ -41,7 +41,6 @@ const useQueryMenuPickedFoods = ({
     };
     queryMenuPickedFoods();
   }, [dispatch, JSON.stringify(ids), restaurantId]);
-
   return { menuPickedFoods, queryMenuPickedFoodsInProgress };
 };
 

@@ -1,6 +1,10 @@
+import type { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 
-import type { TCalendarItemCardComponents } from '../../helpers/types';
+import type {
+  TCalendarItemCardComponents,
+  TDayColumnHeaderProps,
+} from '../../helpers/types';
 import WeekView from './WeekView';
 import css from './WeekView.module.scss';
 
@@ -8,10 +12,12 @@ const withWeekViewWrapper = ({
   renderEvent,
   customComponents,
   inProgress,
+  customHeader,
 }: {
   renderEvent: any;
   customComponents?: TCalendarItemCardComponents;
   inProgress?: boolean;
+  customHeader?: (params: TDayColumnHeaderProps) => ReactNode;
 }) => {
   const WeekViewWrapper = (props: any) => {
     if (inProgress) {
@@ -28,6 +34,7 @@ const withWeekViewWrapper = ({
         {...props}
         renderEvent={renderEvent}
         customComponents={customComponents}
+        customHeader={customHeader}
       />
     );
   };

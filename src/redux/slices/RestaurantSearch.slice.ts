@@ -7,7 +7,7 @@ import type { TListing, TPagination } from '@utils/types';
 const RESTAURANT_PER_PAGE = 10;
 const SEARCH_RESTAURANT = 'app/RestaurantSearch/SEARCH_RESTAURANT';
 
-type RestaurantSearchInitialState = {
+type TRestaurantSearchInitialState = {
   pagination: TPagination | null;
   searchParams: Record<string, any> | null;
   searchInProgress: boolean;
@@ -21,7 +21,7 @@ type SearchParams = {
   perPage: number;
 };
 
-const initialState: RestaurantSearchInitialState = {
+const initialState: TRestaurantSearchInitialState = {
   pagination: null,
   searchParams: null,
   searchInProgress: false,

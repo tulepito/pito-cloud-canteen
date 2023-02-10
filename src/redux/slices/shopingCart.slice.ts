@@ -1,7 +1,8 @@
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
+import type { TCurrentUser } from '@utils/types';
 
-type ShopingCartState = {
+type TShoppingCartState = {
   orders: {
     [memberId: string]: {
       [planId: string]: {
@@ -12,17 +13,17 @@ type ShopingCartState = {
 };
 
 // ================ Thunk types ================ //
-const ADD_TO_CART = 'app/ShopingCart/ADD_TO_CART';
-const REMOVE_FROM_CART = 'app/ShopingCart/REMOVE_FROM_CART';
-const REMOVE_ALL_FROM_PLAN_CART = 'app/ShopingCart/REMOVE_ALL_FROM_PLAN_CART';
+const ADD_TO_CART = 'app/ShoppingCart/ADD_TO_CART';
+const REMOVE_FROM_CART = 'app/ShoppingCart/REMOVE_FROM_CART';
+const REMOVE_ALL_FROM_PLAN_CART = 'app/ShoppingCart/REMOVE_ALL_FROM_PLAN_CART';
 
-const initialState: ShopingCartState = {
+const initialState: TShoppingCartState = {
   orders: {},
 };
 
 // ================ Slice ================ //
-export const shopingCartSlice = createSlice({
-  name: 'shopingCart',
+export const shoppingCartSlice = createSlice({
+  name: 'ShoppingCart',
   initialState,
   reducers: {
     addToCart: (
@@ -128,8 +129,8 @@ const addToCartThunk = createAsyncThunk(
     const { currentUser } = getState().user;
 
     return dispatch(
-      shopingCartSlice.actions.addToCart({
-        currentUserId: currentUser.id.uuid,
+      shoppingCartSlice.actions.addToCart({
+        currentUserId: (currentUser as TCurrentUser).id.uuid,
         planId,
         dayId,
         mealId,
@@ -146,8 +147,8 @@ const removeFromCartThunk = createAsyncThunk(
   ) => {
     const { currentUser } = getState().user;
     return dispatch(
-      shopingCartSlice.actions.removeToCart({
-        currentUserId: currentUser.id.uuid,
+      shoppingCartSlice.actions.removeToCart({
+        currentUserId: (currentUser as TCurrentUser).id.uuid,
         planId,
         dayId,
       }),
@@ -160,20 +161,20 @@ const removeAllFromPlanCartThunk = createAsyncThunk(
   async ({ planId }: { planId: string }, { getState, dispatch }) => {
     const { currentUser } = getState().user;
     return dispatch(
-      shopingCartSlice.actions.removeAllFromPlanCart({
-        currentUserId: currentUser.id.uuid,
+      shoppingCartSlice.actions.removeAllFromPlanCart({
+        currentUserId: (currentUser as TCurrentUser).id.uuid,
         planId,
       }),
     );
   },
 );
 
-export const shopingCartThunks = {
+export const shoppingCartThunks = {
   addToCart: addToCartThunk,
   removeFromCart: removeFromCartThunk,
   removeAllFromPlanCart: removeAllFromPlanCartThunk,
 };
 
-export const shopingCartActions = shopingCartSlice.actions;
+export const shoppingCartActions = shoppingCartSlice.actions;
 
-export default shopingCartSlice.reducer;
+export default shoppingCartSlice.reducer;

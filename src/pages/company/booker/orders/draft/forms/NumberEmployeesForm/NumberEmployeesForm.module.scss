@@ -1,0 +1,20 @@
+@use '/src/styles/vars.scss' as *;
+
+.inputWrapper {
+  margin-bottom: 24px;
+}
+
+.inputWrapper .rightIconContainer {
+  width: 68px;
+  right: 0;
+}
+
+.rightIcon {
+  color: $neutralGray4;
+  border-left: 1px solid $neutralGray4;
+  padding: 0 12px;
+}
+
+.submitBtn {
+  width: 100%;
+}

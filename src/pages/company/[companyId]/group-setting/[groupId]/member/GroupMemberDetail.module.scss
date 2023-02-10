@@ -1,0 +1,85 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  padding: 24px 24px 0;
+}
+
+.backBtn {
+  @include flexAlign(center);
+  display: inline-flex;
+  cursor: pointer;
+  font-weight: $fontWeightBold;
+  &:hover {
+    border-bottom: 1px solid $neutralGray5;
+  }
+}
+
+.header {
+  @include flexAlign(center, space-between);
+  padding: 24px;
+
+  .profileWrapper {
+    @include flexAlign(center);
+    gap: 16px;
+  }
+}
+
+.profileInfo {
+  @include flexAlign(flex-start);
+  flex-direction: column;
+  padding-left: 80px;
+
+  .row {
+    @include flexAlign(center);
+
+    .title {
+      width: 60px;
+      margin-right: 16px;
+      font-weight: $fontWeightSemiBold;
+    }
+  }
+}
+
+.deleteBtn {
+  cursor: pointer;
+  @include buttonColorInline;
+  &:hover {
+    border: none;
+  }
+  color: $neutralGray6;
+}
+
+.restrictionTable {
+  border: 1px solid $neutral4;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 30px;
+
+  .tableHeader {
+    height: 36px;
+    padding: 8px 16px;
+    background-color: $neutralGray2;
+    @include flexAlign(flex-start);
+
+    .headerCol {
+      flex-basis: 50%;
+      @include text(14px, 20px);
+      color: $neutralGray5;
+    }
+  }
+
+  .tableBody {
+    padding: 12px 16px;
+    @include flexAlign(flex-start);
+
+    .bodyCol {
+      flex-basis: 50%;
+      @include flexAlign(flex-start);
+      flex-direction: column;
+      gap: 6px;
+      text-transform: capitalize;
+      color: $neutralGray6;
+    }
+  }
+}

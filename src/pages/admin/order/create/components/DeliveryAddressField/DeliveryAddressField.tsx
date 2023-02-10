@@ -1,3 +1,4 @@
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import { addressRequired } from '@utils/validators';
 import { useIntl } from 'react-intl';
@@ -20,10 +21,24 @@ const DeliveryAddressField: React.FC<DeliveryAddressFieldProps> = (props) => {
         id="deliveryAddress"
         name="deliveryAddress"
         rootClassName={css.field}
+        label={intl.formatMessage({
+          id: 'DeliveryAddressField.deliveryAddress.label',
+        })}
         placeholder={intl.formatMessage({
           id: 'EditCompanyForm.addressPlaceholder',
         })}
         validate={addressRequired(deliveryAddressRequiredMessage)}
+      />
+      <FieldTextInput
+        id="detailAddress"
+        name="detailAddress"
+        rootClassName={css.field}
+        label={intl.formatMessage({
+          id: 'DeliveryAddressField.detailAddress.label',
+        })}
+        placeholder={intl.formatMessage({
+          id: 'DeliveryAddressField.detailAddress.placeholder',
+        })}
       />
     </div>
   );

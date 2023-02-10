@@ -11,8 +11,8 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { INTERGRATION_LISTING } from '@utils/data';
-import { EDayOfWeek, getLabelByKey, SIDE_DISH_OPTIONS } from '@utils/enums';
-import type { TIntergrationListing } from '@utils/types';
+import { getLabelByKey, SIDE_DISH_OPTIONS } from '@utils/enums';
+import type { TIntegrationListing } from '@utils/types';
 import { parsePrice } from '@utils/validators';
 import type { FormApi } from 'final-form';
 import cloneDeep from 'lodash/cloneDeep';
@@ -28,7 +28,7 @@ import css from './AddFoodModal.module.scss';
 type TAddFoodModal = {
   isOpen: boolean;
   handleClose: () => void;
-  currentMenu: TIntergrationListing;
+  currentMenu: TIntegrationListing;
   values: any;
   form: FormApi;
   currentDate?: number | null;
@@ -40,10 +40,11 @@ const FOOD_TABLE_COLUMNS: TColumn[] = [
     label: 'Tên món',
     render: (data: any, isChecked: boolean) => {
       return (
-        <div>
-          <div>{data.title}</div>
+        <div className={css.titleRowWrapper}>
+          <div className={css.titleRow}>{data.title}</div>
           {data.sideDishes.map((item: string) => (
             <FieldCheckbox
+              className={css.sideDishiesCheckbox}
               key={item}
               name={`${data.id}.sideDishes`}
               id={`${data.id}.${item}`}
@@ -65,7 +66,7 @@ const FOOD_TABLE_COLUMNS: TColumn[] = [
   },
 ];
 
-const parseEntitiesToTableData = (foods: TIntergrationListing[]) => {
+const parseEntitiesToTableData = (foods: TIntegrationListing[]) => {
   return foods.map((food) => {
     return {
       key: food.id.uuid,
@@ -79,7 +80,7 @@ const parseEntitiesToTableData = (foods: TIntergrationListing[]) => {
   });
 };
 
-const renderPickedFoods = (ids: string[], foods: TIntergrationListing[]) => {
+const renderPickedFoods = (ids: string[], foods: TIntegrationListing[]) => {
   return ids.map((id) => {
     return foods.find((l) => l.id.uuid === id);
   });
@@ -154,14 +155,9 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
 
     if (foodsLength > 10) return;
 
-    const dayOfWeekIndex = new Date(currentDate).getDay();
-    const dayOfWeek = Object.keys(EDayOfWeek).find(
-      (_d, index) => index === dayOfWeekIndex,
-    );
-
     rowCheckbox.forEach((key: string) => {
       const food = menuPickedFoods.find(
-        (item: TIntergrationListing) => item?.id?.uuid === key,
+        (item: TIntegrationListing) => item?.id?.uuid === key,
       );
       const title = food?.attributes?.title;
 
@@ -172,18 +168,19 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
       });
 
       const sideDishes = values[key]?.sideDishes || [];
-
+      const price = values[key]?.price || 0;
+      const foodNote = values[key]?.foodNote || '';
       newFoodsByDate[currentDate] = {
         ...newFoodsByDate[currentDate],
         [key]: {
           id: key,
           title,
-          dayOfWeek,
           sideDishes,
+          price,
+          foodNote,
         },
       };
     });
-
     form.change('foodsByDate', newFoodsByDate);
     form.change('rowCheckbox', []);
     form.change('checkAll', []);
@@ -266,7 +263,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
             <div className={css.title}>Món đã chọn</div>
             <div className={css.foodsByDate}>
               {queryMenuPickedFoodsInProgress ? (
-                <LoadingContainer />
+                <LoadingContainer className={css.loadingContainer} />
               ) : (
                 foodsByDate.map((f) => {
                   return (
@@ -289,13 +286,15 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
                   })}
                 />
               )}
-              <Button
-                type="button"
-                disabled={foodsByDate.length > 10}
-                onClick={savePickedFoods}
-                className={css.button}>
-                <FormattedMessage id="AddFoodModal.modalButton" />
-              </Button>
+              <div className={css.buttonWrapper}>
+                <Button
+                  type="button"
+                  disabled={foodsByDate.length > 10}
+                  onClick={savePickedFoods}
+                  className={css.button}>
+                  <FormattedMessage id="AddFoodModal.modalButton" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>

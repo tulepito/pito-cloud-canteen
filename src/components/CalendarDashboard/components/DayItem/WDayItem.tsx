@@ -1,7 +1,12 @@
+import useBoolean from '@hooks/useBoolean';
 import { DateTime } from 'luxon';
+import type { ReactNode } from 'react';
 import type { Event } from 'react-big-calendar';
 
-import type { TCalendarItemCardComponents } from '../../helpers/types';
+import type {
+  TCalendarItemCardComponents,
+  TDayColumnHeaderProps,
+} from '../../helpers/types';
 import css from './DayItem.module.scss';
 import DayItemContent from './DayItemContent';
 import DayItemHeader from './DayItemHeader';
@@ -11,6 +16,7 @@ type TWDayItemProps = {
   events?: Event[];
   renderEvent?: React.FC<any>;
   components?: TCalendarItemCardComponents;
+  customHeader?: (params: TDayColumnHeaderProps) => ReactNode;
 };
 
 const WDayItem: React.FC<TWDayItemProps> = ({
@@ -18,7 +24,13 @@ const WDayItem: React.FC<TWDayItemProps> = ({
   events = [],
   renderEvent,
   components,
+  customHeader,
 }) => {
+  const {
+    value: isMouseOnDay,
+    setTrue: setMouseOnDay,
+    setFalse: setMouseLeaveDay,
+  } = useBoolean();
   const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
   const isCurrentDay =
     DateTime.fromJSDate(date)
@@ -27,8 +39,24 @@ const WDayItem: React.FC<TWDayItemProps> = ({
       .get('day') === 0;
 
   return (
-    <div className={css.weekDay} id={`dayHeader-${date.getDay()}`}>
-      <DayItemHeader date={date} isCurrentDay={isCurrentDay} />
+    <div
+      onMouseEnter={setMouseOnDay}
+      onMouseLeave={setMouseLeaveDay}
+      className={css.weekDay}
+      id={`dayHeader-${date.getDay()}`}>
+      {customHeader ? (
+        customHeader({
+          date,
+          isCurrentDay,
+          isMouseOnDay,
+        })
+      ) : (
+        <DayItemHeader
+          date={date}
+          isCurrentDay={isCurrentDay}
+          isMouseOnDay={isMouseOnDay}
+        />
+      )}
       <DayItemContent
         date={date}
         events={events}

@@ -3,22 +3,26 @@ import Form from '@components/Form/Form';
 import { INTERGRATION_LISTING } from '@utils/data';
 import { parseTimestampToFormat } from '@utils/dates';
 import { EMenuTypes, getLabelByKey, MENU_OPTIONS } from '@utils/enums';
-import type { TIntergrationListing } from '@utils/types';
+import type { TIntegrationListing } from '@utils/types';
 import { DateTime } from 'luxon';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 
+import DayOfWeekCalendarHeader from '../DayOfWeekCalendarHeader/DayOfWeekCalendarHeader';
 import useQueryMenuPickedFoods from '../EditPartnerMenuWizard/useQueryMenuPickedFoods';
 import type { TEditMenuPricingCalendarResources } from '../EditPartnerMenuWizard/utils';
-import { renderInitialValuesForFoodsByDate } from '../EditPartnerMenuWizard/utils';
+import {
+  createInitialValuesForFoodsByDate,
+  renderValuesForFoodsByDate,
+} from '../EditPartnerMenuWizard/utils';
 import FoodEventCard from '../FoodEventCard/FoodEventCard';
 import css from './EditMenuCompleteForm.module.scss';
 
 export type TEditMenuCompleteFormValues = {};
 
 type TExtraProps = {
-  currentMenu?: TIntergrationListing | null;
+  currentMenu?: TIntegrationListing | null;
   formRef: any;
   restaurantId: string;
 };
@@ -59,20 +63,29 @@ const EditMenuCompleteFormComponent: React.FC<
   formRef.current = form;
   const { title } = INTERGRATION_LISTING(currentMenu).getAttributes();
   const { menuType } = INTERGRATION_LISTING(currentMenu).getMetadata();
+  const { startDate, endDate } =
+    INTERGRATION_LISTING(currentMenu).getPublicData();
+
   const {
-    foodsByDate = {},
-    startDate,
-    endDate,
-  } = INTERGRATION_LISTING(currentMenu).getPublicData();
+    monFoodIdList = [],
+    tueFoodIdList = [],
+    wedFoodIdList = [],
+    thuFoodIdList = [],
+    friFoodIdList = [],
+    satFoodIdList = [],
+    sunFoodIdList = [],
+  } = INTERGRATION_LISTING(currentMenu).getMetadata();
 
   const getFoodsByDateIds = () => {
-    const ids: string[] = [];
-    Object.keys(foodsByDate).forEach((dKey) => {
-      Object.keys(foodsByDate[dKey]).forEach((id) => {
-        ids.push(id);
-      });
-    });
-    return ids;
+    return [
+      ...monFoodIdList,
+      ...tueFoodIdList,
+      ...wedFoodIdList,
+      ...thuFoodIdList,
+      ...friFoodIdList,
+      ...satFoodIdList,
+      ...sunFoodIdList,
+    ];
   };
 
   const { menuPickedFoods } = useQueryMenuPickedFoods({
@@ -80,8 +93,18 @@ const EditMenuCompleteFormComponent: React.FC<
     ids: getFoodsByDateIds(),
   });
 
-  const foodsByDateToRender = renderInitialValuesForFoodsByDate(
-    foodsByDate,
+  const initialFoodsByDate = createInitialValuesForFoodsByDate({
+    monFoodIdList,
+    tueFoodIdList,
+    wedFoodIdList,
+    thuFoodIdList,
+    friFoodIdList,
+    satFoodIdList,
+    sunFoodIdList,
+  });
+
+  const foodsByDateToRender = renderValuesForFoodsByDate(
+    initialFoodsByDate,
     menuPickedFoods,
   );
 
@@ -143,9 +166,13 @@ const EditMenuCompleteFormComponent: React.FC<
             <FormattedMessage id="EditMenuCompleteForm.foodList" />
           </h3>
           <CalendarDashboard
+            headerComponent={(params) => (
+              <DayOfWeekCalendarHeader {...params} />
+            )}
             renderEvent={FoodEventCard}
             events={resourcesForCalendar}
             components={{
+              toolbar: () => <></>,
               contentEnd: ({ events = [] }) => {
                 const noFood = events.length === 0;
                 return noFood ? (

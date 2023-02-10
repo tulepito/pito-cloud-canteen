@@ -1,3 +1,4 @@
+import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import type { ReactElement } from 'react';
 import React from 'react';
@@ -14,9 +15,7 @@ export type TFormTabChildrenProps = {
   onClick?: () => void;
 };
 
-type TFormTabsProps = {
-  className?: string;
-  rootClassName?: string;
+type TFormTabsProps = TDefaultProps & {
   navRootClassName?: string;
   tabRootClassName?: string;
   formTabNavClassName?: string;

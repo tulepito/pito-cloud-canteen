@@ -1,9 +1,8 @@
 import Form from '@components/Form/Form';
-import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { MENU_MEAL_TYPE_OPTIONS, MENU_OPTIONS } from '@utils/enums';
-import { nonEmptyArray, required } from '@utils/validators';
+import { required } from '@utils/validators';
 import type { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import { useImperativeHandle } from 'react';
@@ -70,20 +69,17 @@ const EditMenuInformationFormComponent: React.FC<
               ))}
             </div>
           </div>
-          <FieldCheckboxGroup
-            options={MENU_MEAL_TYPE_OPTIONS}
-            name="mealTypes"
-            id="mealTypes"
-            label={intl.formatMessage({
-              id: 'EditMenuInformationForm.mealTypeLabel',
-            })}
-            labelClassName={css.label}
-            validate={nonEmptyArray(
-              intl.formatMessage({
-                id: 'EditMenuInformationForm.mealTypeRequired',
-              }),
-            )}
-          />
+          <div className={css.radioGroup}>
+            {MENU_MEAL_TYPE_OPTIONS.map((meal) => (
+              <FieldRadioButton
+                name="mealType"
+                id={meal.key}
+                key={meal.key}
+                value={meal.key}
+                label={meal.label}
+              />
+            ))}
+          </div>
         </div>
       </div>
       <div className={css.wrapperFields}>

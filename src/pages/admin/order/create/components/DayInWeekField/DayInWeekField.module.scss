@@ -27,4 +27,12 @@
     outline: 2px solid $neutralGray6;
     outline-offset: -2px;
   }
+
+  &.disabled {
+    cursor: not-allowed;
+    color: $neutralGray5;
+    outline: 1px solid $neutralGray4;
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }

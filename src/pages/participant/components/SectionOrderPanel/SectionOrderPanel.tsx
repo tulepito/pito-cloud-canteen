@@ -1,8 +1,9 @@
+import { isOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { ParticipantSetupPlanThunks } from '@redux/slices/ParticipantSetupPlanPage.slice';
-import { shopingCartThunks } from '@redux/slices/shopingCart.slice';
+import { shoppingCartThunks } from '@redux/slices/shopingCart.slice';
 import { useState } from 'react';
 
+import { ParticipantPlanThunks } from '../../plans/[planId]/ParticipantPlanPage.slice';
 import DeleteCartModal from './DeleteCartModal';
 import OrderPanelBody from './OrderPanelBody';
 import OrderPanelFooter from './OrderPanelFooter';
@@ -24,18 +25,21 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     const currUserId = currentUser?.id?.uuid;
     return state.shopingCart.orders?.[currUserId]?.[planId || 1];
   });
-  const plan = useAppSelector((state) => state.ParticipantSetupPlanPage.plan);
-  const orderDays = Object.keys(plan);
+  const order = useAppSelector((state) => state.ParticipantPlanPage.order);
+  const plan = useAppSelector((state) => state.ParticipantPlanPage.plan);
   const loadDataInProgress = useAppSelector(
-    (state) => state.ParticipantSetupPlanPage.loadDataInProgress,
+    (state) => state.ParticipantPlanPage.loadDataInProgress,
   );
   const submitDataInprogress = useAppSelector(
-    (state) => state.ParticipantSetupPlanPage.submitDataInprogress,
+    (state) => state.ParticipantPlanPage.submitDataInprogress,
   );
 
+  const orderDays = Object.keys(plan);
   const cartListKeys = Object.keys(cartList || []).filter(
     (cartKey) => !!cartList[cartKey],
   );
+
+  const isOrderDeadlineOver = isOverDeadline(order);
 
   // Local state
   const [isOpenConfirmDeleteAll, setIsOpenConfirmDeleteAll] = useState(false);
@@ -45,7 +49,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
 
   // Functions
   const handleRemoveItem = (dayId: string) => {
-    dispatch(shopingCartThunks.removeFromCart({ planId, dayId }));
+    dispatch(shoppingCartThunks.removeFromCart({ planId, dayId }));
   };
 
   const handleRemoveAllItem = () => {
@@ -53,14 +57,14 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   };
 
   const handleSubmit = async () => {
-    await dispatch(ParticipantSetupPlanThunks.updateOrder({ orderId, planId }));
+    await dispatch(ParticipantPlanThunks.updateOrder({ orderId, planId }));
     setIsSubmitSuccess(true);
   };
 
   const handleConfirmDeleteAll = () => {
-    dispatch(shopingCartThunks.removeAllFromPlanCart({ planId }));
+    dispatch(shoppingCartThunks.removeAllFromPlanCart({ planId }));
     setIsOpenConfirmDeleteAll(false);
-    dispatch(ParticipantSetupPlanThunks.updateOrder({ orderId, planId }));
+    dispatch(ParticipantPlanThunks.updateOrder({ orderId, planId }));
   };
 
   const handleCloseConfirmDeleteAll = () => {
@@ -90,6 +94,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
       <OrderPanelFooter
         submitDataInprogress={submitDataInprogress}
         cartListKeys={cartListKeys}
+        isOrderDeadlineOver={isOrderDeadlineOver}
         handleSubmit={handleSubmit}
         handleRemoveAllItem={handleRemoveAllItem}
       />

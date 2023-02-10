@@ -1,7 +1,7 @@
-import ParticipantSetupPlan from './ParticipantSetupPlan.page';
+import ParticipantPlan from './ParticipantPlan.page';
 
-const ParticipantSetupPlanRoute = () => {
-  return <ParticipantSetupPlan />;
+const ParticipantPlanRoute = () => {
+  return <ParticipantPlan />;
 };
 
-export default ParticipantSetupPlanRoute;
+export default ParticipantPlanRoute;

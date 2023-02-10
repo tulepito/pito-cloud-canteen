@@ -7,7 +7,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 50px 0;
+  margin: 40px 0 40px 0;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .title {
@@ -136,4 +142,17 @@
 .deliveryHour {
   font-weight: $fontWeightBold;
   display: block;
+}
+
+.draftText {
+  font-weight: $fontWeightBold;
+  text-transform: uppercase;
+  color: $neutralGray4;
+}
+
+.orderDetailTooltip {
+  background-color: $neutralGray1;
+  &:global.rc-tooltip {
+    opacity: 1 !important;
+  }
 }

@@ -9,6 +9,7 @@ const IconFilter: React.FC<TIconProps> = (props) => {
 
   return (
     <svg
+      preserveAspectRatio="none"
       className={classNames(rootClassName, css.root, className)}
       viewBox="0 0 16 14"
       fill="none"

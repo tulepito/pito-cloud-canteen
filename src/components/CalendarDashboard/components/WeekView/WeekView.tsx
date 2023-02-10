@@ -3,11 +3,15 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
 import { useViewport } from '@hooks/useViewport';
 import { DateTime } from 'luxon';
+import type { ReactNode } from 'react';
 import { useEffect, useMemo } from 'react';
 import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
 import { Navigate } from 'react-big-calendar';
 
-import type { TCalendarItemCardComponents } from '../../helpers/types';
+import type {
+  TCalendarItemCardComponents,
+  TDayColumnHeaderProps,
+} from '../../helpers/types';
 import WDayItem from '../DayItem/WDayItem';
 import IconCalendarToolbar from '../Icons/IconCalendar';
 import css from './WeekView.module.scss';
@@ -21,6 +25,7 @@ type TWeekViewProps = {
   accessors: any;
   renderEvent?: React.FC<any>;
   customComponents?: TCalendarItemCardComponents;
+  customHeader?: (params: TDayColumnHeaderProps) => ReactNode;
 } & TimeGridProps;
 
 type TWeekViewObject = {
@@ -36,6 +41,7 @@ function WeekView({
   events = [],
   renderEvent,
   customComponents,
+  customHeader,
 }: TWeekViewProps & TWeekViewObject) {
   const {
     viewport: { width },
@@ -67,6 +73,7 @@ function WeekView({
             events={getEventsInDate(item, events)}
             renderEvent={renderEvent}
             components={customComponents}
+            customHeader={customHeader}
           />
         ))}
       </div>
