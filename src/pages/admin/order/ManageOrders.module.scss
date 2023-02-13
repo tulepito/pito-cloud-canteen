@@ -37,6 +37,11 @@
   color: #2f54eb;
 }
 
+.companyName {
+  font-weight: $fontWeightBold;
+  margin-bottom: 5px;
+}
+
 .bodyCell:nth-child(3) {
   @include viewportLarge {
     max-width: 100px;

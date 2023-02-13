@@ -139,6 +139,13 @@ export type TCompanyAttributes = {
   profile: TCompanyProfile;
 };
 
+export type TBookerAttributes = {
+  banned: boolean;
+  deleted: boolean;
+  email: string;
+  profile: TCompanyProfile;
+};
+
 // Listing queries can include author.
 // Banned and deleted are not relevant then
 // since banned and deleted users can't have listings.
@@ -182,6 +189,16 @@ export type TCompany = {
     TBannedUserAttributes &
     TDeletedUserAttributes &
     TCompanyAttributes;
+  profileImage: TImage;
+};
+
+export type TBooker = {
+  id: typeof UUID;
+  type: 'user';
+  attributes: TAuthorAttributes &
+    TBannedUserAttributes &
+    TDeletedUserAttributes &
+    TBookerAttributes;
   profileImage: TImage;
 };
 
@@ -446,6 +463,7 @@ export type TIntegrationOrderListing = {
   author?: TUser;
   images?: TImage[];
   company?: TCompany;
+  booker?: TBooker;
   plan?: TListing;
   subOrders?: TIntegrationListing[];
 };

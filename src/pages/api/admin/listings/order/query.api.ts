@@ -35,10 +35,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const orders = denormalisedResponseEntities(response);
     const orderWithCompanyAndSubOrders = await Promise.all(
       orders.map(async (order: TIntegrationOrderListing) => {
-        const { companyId } = order.attributes.metadata;
-        const companyUserResponse = await integrationSdk.users.show({
-          id: companyId,
-        });
+        const { companyId, bookerId } = order.attributes.metadata;
+
+        const [bookerUserResponse, companyUserResponse] = await Promise.all([
+          integrationSdk.users.show({
+            id: bookerId,
+          }),
+          integrationSdk.users.show({
+            id: companyId,
+          }),
+        ]);
+
         const subOrderResponse = await integrationSdk.listings.query({
           meta_orderId: order.id.uuid,
           meta_listingType: EListingType.subOrder,
@@ -47,10 +54,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const [company] = denormalisedResponseEntities(
           companyUserResponse,
         ) as TCompany[];
+        const [booker] = denormalisedResponseEntities(bookerUserResponse);
         return {
           ...order,
           company,
           subOrders,
+          booker,
         };
       }),
     );

@@ -151,15 +151,7 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'orderName',
     label: 'Tên đơn hàng',
     render: ({ orderName }: any) => {
-      return (
-        <div className={css.orderName}>
-          {orderName || (
-            <div className={css.draftText}>
-              <FormattedMessage id="ManageOrdersPage.draftOrderTitle" />
-            </div>
-          )}
-        </div>
-      );
+      return <div className={css.orderName}>{orderName || <></>}</div>;
     },
   },
   {
@@ -168,20 +160,17 @@ const TABLE_COLUMN: TColumn[] = [
     render: (data: any) => {
       return (
         <div className={css.locationRow}>
-          {data.location || (
-            <div className={css.draftText}>
-              <FormattedMessage id="ManageOrdersPage.draftOrderLocation" />
-            </div>
-          )}
+          <div className={css.companyName}>{data.companyName}</div>
+          {data.location || <></>}
         </div>
       );
     },
   },
   {
-    key: 'companyName',
-    label: 'Khách hàng',
+    key: 'bookerName',
+    label: 'Nguời đại diện',
     render: (data: any) => {
-      return <div>{data.companyName}</div>;
+      return <div>{data.bookerName}</div>;
     },
   },
   {
@@ -195,9 +184,7 @@ const TABLE_COLUMN: TColumn[] = [
           {data.startDate} - {data.endDate}
         </div>
       ) : (
-        <div className={css.draftText}>
-          <FormattedMessage id="ManageOrdersPage.draftOrderDate" />
-        </div>
+        <></>
       );
     },
     sortable: true,
@@ -219,9 +206,7 @@ const TABLE_COLUMN: TColumn[] = [
           )}
         </div>
       ) : (
-        <div className={css.draftText}>
-          <FormattedMessage id="ManageOrdersPage.draftOrderRestaurant" />
-        </div>
+        <></>
       );
     },
   },
@@ -229,13 +214,7 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'staffName',
     label: 'Nhân viên phụ trách',
     render: ({ staffName }: any) => {
-      return staffName ? (
-        <div>{staffName}</div>
-      ) : (
-        <div className={css.draftText}>
-          <FormattedMessage id="ManageOrdersPage.draftOrderStaff" />
-        </div>
-      );
+      return staffName ? <div>{staffName}</div> : <></>;
     },
     sortable: true,
   },
@@ -280,7 +259,7 @@ const parseEntitiesToTableData = (
   if (orders.length === 0) return [];
 
   return orders.map((entity, index) => {
-    const { company, subOrders = [] } = entity;
+    const { company, subOrders = [], booker } = entity;
     const restaurants = subOrders.reduce(
       // eslint-disable-next-line array-callback-return
       (prevSubOrders: any[], subOrder: TIntegrationListing) => {
@@ -311,6 +290,7 @@ const parseEntitiesToTableData = (
         orderNumber: (page - 1) * 10 + index + 1,
         location: deliveryAddress?.address,
         companyName: company?.attributes.profile.displayName,
+        bookerName: booker?.attributes.profile.displayName,
         startDate: startDate && parseTimestampToFormat(startDate),
         endDate: endDate && parseTimestampToFormat(endDate),
         staffName,
