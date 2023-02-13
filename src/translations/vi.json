@@ -119,6 +119,7 @@
   "ClientSelector.keywordFieldPlaceholder": "Tìm kiếm theo tên công ty...",
   "ClientSelector.title": "Chọn khách hàng",
   "ClientTable.address": "Địa chỉ",
+  "ClientTable.loading": "... Đang tải dữ liệu",
   "ClientTable.companyName": "Tên công ty",
   "ClientTable.contact": "Liên hệ",
   "ClientTable.id": "ID",

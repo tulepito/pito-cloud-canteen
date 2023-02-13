@@ -1,7 +1,6 @@
-import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
+import IconSearch from '@components/Icons/IconSearch/IconSearch';
 import classNames from 'classnames';
 import React from 'react';
 import { Form as FinalForm } from 'react-final-form';
@@ -43,10 +42,8 @@ const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
               name={props?.searchValue || 'keywords'}
               id={props?.searchValue || 'keywords'}
               className={css.searchInput}
+              leftIcon={<IconSearch />}
             />
-            <Button className={css.searchButton} onClick={handleSubmit}>
-              <IconMagnifier className={css.iconSearch} />
-            </Button>
           </Form>
         );
       }}

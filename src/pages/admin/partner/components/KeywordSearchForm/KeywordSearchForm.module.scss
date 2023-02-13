@@ -10,16 +10,9 @@
       width: 400px;
     }
     margin-right: 10px;
-  }
-  .searchButton {
-    width: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    .iconSearch {
-      width: 30px;
-      height: auto;
-      fill: $neutralGray1;
+
+    input {
+      padding-left: 48px !important;
     }
   }
 }
