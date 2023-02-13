@@ -1,5 +1,7 @@
 import type { TIntegrationListing, TListing } from '@utils/types';
-import { useEffect } from 'react';
+import { isEqual } from 'lodash';
+import type { MutableRefObject } from 'react';
+import { useEffect, useRef } from 'react';
 
 const tabsActive = (
   isNew: boolean,
@@ -37,6 +39,9 @@ const useRedirectTabWizard = ({
   tabCompleted,
   handleRedirect,
 }: TUseRedirectTabWizard) => {
+  const listingRef = useRef(null) as MutableRefObject<
+    TListing | TIntegrationListing | null
+  >;
   const tabsStatus = tabsActive(isNew, listing, tabs, tabCompleted) as any;
   useEffect(() => {
     // If selectedTab is not active, redirect to the beginning of wizard
@@ -46,10 +51,17 @@ const useRedirectTabWizard = ({
         .slice(0, currentTabIndex)
         .reverse()
         .find((t) => tabsStatus[t]);
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      nearestActiveTab && handleRedirect(nearestActiveTab);
+
+      const shouldRedirect =
+        nearestActiveTab &&
+        !listingRef.current &&
+        !isEqual(listingRef.current, listing);
+      if (shouldRedirect) {
+        handleRedirect(nearestActiveTab);
+        listingRef.current = listing;
+      }
     }
-  }, [tabsStatus, selectedTab, tabs, handleRedirect]);
+  }, [tabsStatus, selectedTab, tabs, handleRedirect, JSON.stringify(listing)]);
 };
 
 export default useRedirectTabWizard;
