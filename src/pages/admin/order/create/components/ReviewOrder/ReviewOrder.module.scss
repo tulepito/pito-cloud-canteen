@@ -94,7 +94,7 @@
         max-width: 100%;
         border-radius: 8px;
         @include viewportLarge {
-          width: 344px;
+          min-width: 244px;
         }
       }
     }

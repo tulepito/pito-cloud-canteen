@@ -12,10 +12,13 @@ type TDeleteMealModalProps = {
 const DeleteMealModal: React.FC<TDeleteMealModalProps> = ({
   isOpen,
   onClose = () => null,
+  handleDelete,
 }) => {
   const intl = useIntl();
 
-  const handleDeletePlan = () => {};
+  const handleDeletePlan = () => {
+    handleDelete();
+  };
 
   const handleClose = () => {
     onClose();
