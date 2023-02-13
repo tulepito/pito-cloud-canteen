@@ -149,7 +149,7 @@ const updateOrder = createAsyncThunk(
   async (params: any, { getState, dispatch }) => {
     const { order } = getState().Order;
     const { generalInfo, orderDetail: orderDetailParams } = params;
-    const { deadlineDate, deadlineHour } = generalInfo;
+    const { deadlineDate, deadlineHour } = generalInfo || {};
     const orderId = Listing(order as TListing).getId();
     const orderDetail: any = {};
     if (!orderDetailParams) {
@@ -184,19 +184,21 @@ const updateOrder = createAsyncThunk(
         }),
       );
     }
-    const parsedDeadlineDate = DateTime.fromMillis(deadlineDate)
-      .startOf('day')
-      .plus({
-        hours: parseInt(deadlineHour.split(':')[0], 10),
-        minutes: parseInt(deadlineHour.split(':')[1], 10),
-      })
-      .toMillis();
+    const parsedDeadlineDate = deadlineDate
+      ? DateTime.fromMillis(deadlineDate)
+          .startOf('day')
+          .plus({
+            hours: parseInt(deadlineHour.split(':')[0], 10),
+            minutes: parseInt(deadlineHour.split(':')[1], 10),
+          })
+          .toMillis()
+      : null;
 
     const apiBody: UpdateOrderApiBody = {
       orderId,
       generalInfo: {
         ...generalInfo,
-        deadlineDate: parsedDeadlineDate,
+        ...(parsedDeadlineDate ? { deadlineDate: parsedDeadlineDate } : {}),
       },
       orderDetail: orderDetailParams
         ? cloneDeep(orderDetailParams)

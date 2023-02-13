@@ -264,12 +264,13 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         initialValues={initialValues}
         onSubmit={onSubmit}
         render={(fieldRenderProps: any) => {
-          const { handleSubmit, goBack } = fieldRenderProps;
+          const { handleSubmit, goBack, invalid } = fieldRenderProps;
           return (
             <Form onSubmit={handleSubmit}>
               <Tabs items={renderedOrderDetail as any} showNavigation />
               <NavigateButtons
                 goBack={goBack}
+                submitDisabled={invalid}
                 inProgress={updateOrderInProgress}
               />
               {createOrderError && (

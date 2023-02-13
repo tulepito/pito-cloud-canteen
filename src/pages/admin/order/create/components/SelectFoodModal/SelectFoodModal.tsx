@@ -61,7 +61,8 @@ const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
       checkAll: false,
       food: Object.keys(initialFoodList),
     }),
-    [initialFoodList],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(initialFoodList)],
   );
 
   return (

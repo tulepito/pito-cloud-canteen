@@ -9,6 +9,7 @@ import type { TListing } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
 
 // eslint-disable-next-line import/no-cycle
 import type { TSelectFoodFormValues } from '../SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
@@ -34,16 +35,26 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   const intl = useIntl();
   const { value: isModalOpen, setValue: setModalOpen } = useBoolean();
   const dispatch = useAppDispatch();
-  const {
-    Order: { order },
-    SelectRestaurantPage: {
-      restaurants,
-      pagination,
-      foodList,
-      fetchFoodPending,
-      fetchRestaurantsPending,
-    },
-  } = useAppSelector((state) => state);
+
+  const restaurants = useAppSelector(
+    (state) => state.SelectRestaurantPage.restaurants,
+    shallowEqual,
+  );
+  const pagination = useAppSelector(
+    (state) => state.SelectRestaurantPage.pagination,
+    shallowEqual,
+  );
+  const foodList = useAppSelector(
+    (state) => state.SelectRestaurantPage.foodList,
+    shallowEqual,
+  );
+  const fetchFoodPending = useAppSelector(
+    (state) => state.SelectRestaurantPage.fetchFoodPending,
+  );
+  const fetchRestaurantsPending = useAppSelector(
+    (state) => state.SelectRestaurantPage.fetchRestaurantsPending,
+  );
+  const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const { deliveryHour, deliveryAddress } = Listing(
     order as TListing,
   ).getMetadata();
