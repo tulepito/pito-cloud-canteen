@@ -52,11 +52,13 @@ const getRestaurants = createAsyncThunk(
       dateTime,
       favoriteRestaurantIdList = [],
       favoriteFoodIdList = [],
+      title = '',
     } = params || {};
     const dayOfWeek = convertWeekDay(dateTime.weekday).key;
     const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
     const mealType = deliveryDaySessionAdapter(deliveryDaySession);
     const response = await sdk.listings.query({
+      keywords: title,
       meta_listingType: ListingTypes.MENU,
       pub_startDate: `,${dateTime.toMillis()}`,
       pub_daysOfWeek: `has_any:${dayOfWeek}`,

@@ -17,7 +17,7 @@ import RestaurantTable from './components/RestaurantTable/RestaurantTable';
 import SearchRestaurantForm from './components/SearchRestaurantForm/SearchRestaurantForm';
 import css from './SelectRestaurantPage.module.scss';
 
-const DEBOUNCE_TIME = 300;
+const DEBOUNCE_TIME = 500;
 
 type TSelectRestaurantPageProps = {
   onSubmitRestaurant: (values: Record<string, any>) => void;
@@ -89,7 +89,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     }
 
     currDebounceRef = setTimeout(() => {
-      dispatch(selectRestaurantPageThunks.getRestaurants({ title }));
+      dispatch(selectRestaurantPageThunks.getRestaurants({ dateTime, title }));
     }, DEBOUNCE_TIME);
   };
 

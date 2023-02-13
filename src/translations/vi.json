@@ -815,6 +815,7 @@
   "OrderLinkSection.title": "Liên kết đặt hàng",
   "OrderSettingModal.field.accessSetting": "Cài đặt truy cập",
   "OrderSettingModal.field.company": "Công ty",
+  "OrderSettingModal.field.company.value": "Công ty: {companyName}",
   "OrderSettingModal.field.deliveryAddress": "Địa điểm",
   "OrderSettingModal.field.deliveryTime": "Thời gian giao hàng",
   "OrderSettingModal.field.employeeAmount": "Số lượng nhân viên",
