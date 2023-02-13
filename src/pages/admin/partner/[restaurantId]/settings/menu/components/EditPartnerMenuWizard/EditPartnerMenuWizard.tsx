@@ -308,7 +308,7 @@ const EditPartnerMenuWizard = () => {
   }, [dispatch, menuId]);
 
   useEffect(() => {
-    menusSliceAction.clearCreateOrUpdateMenuError();
+    dispatch(menusSliceAction.clearCreateOrUpdateMenuError());
   }, [tab]);
 
   useEffect(() => {
