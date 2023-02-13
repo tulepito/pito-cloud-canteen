@@ -85,7 +85,10 @@ const TABLE_COLUNMS: TColumn[] = [
               {parseTimestampToFormat(endDate)}
             </div>
           ) : (
-            <div>{parseTimestampToFormat(startDate)}</div>
+            <div>
+              <span>Từ </span>
+              {parseTimestampToFormat(startDate)}
+            </div>
           )}
         </div>
       );

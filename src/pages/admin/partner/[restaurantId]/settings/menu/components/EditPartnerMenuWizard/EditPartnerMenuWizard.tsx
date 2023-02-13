@@ -7,9 +7,9 @@ import FormWizard from '@components/FormWizard/FormWizard';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useRedirectTabWizard from '@hooks/useRedirectTabWizard';
-import { menusSliceThunks } from '@redux/slices/menus.slice';
+import { menusSliceAction, menusSliceThunks } from '@redux/slices/menus.slice';
 import { adminRoutes } from '@src/paths';
-import { IntegrationMenuListing, Listing } from '@utils/data';
+import { IntegrationMenuListing } from '@utils/data';
 import { EListingStates, EMenuMealType, EMenuTypes } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 import classNames from 'classnames';
@@ -87,6 +87,9 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
           currentMenu as TIntegrationListing,
           tab,
         );
+
+    setSubmittedValues(null);
+
     const { payload: listing, error } = menuId
       ? ((await dispatch(
           menusSliceThunks.updatePartnerMenuListing({
@@ -99,7 +102,8 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
         )) as any);
 
     const isDraft =
-      Listing(listing).getMetadata().listingState === EListingStates.draft;
+      IntegrationMenuListing(listing).getMetadata().listingState ===
+      EListingStates.draft;
 
     !isDraft && !error && setSubmittedValues(values);
 
@@ -293,15 +297,19 @@ const EditPartnerMenuWizard = () => {
     tabCompleted,
     handleRedirect: handleRedirectOnSwitchTab,
   });
-
+  console.log({ submittedValues });
   useEffect(() => {
     setSubmittedValues(null);
   }, [tab]);
 
   useEffect(() => {
-    if (!menuId || !!currentMenu) return;
+    if (!menuId) return;
     dispatch(menusSliceThunks.showPartnerMenuListing(menuId));
-  }, [dispatch, menuId, currentMenu]);
+  }, [dispatch, menuId]);
+
+  useEffect(() => {
+    menusSliceAction.clearCreateOrUpdateMenuError();
+  }, [tab]);
 
   useEffect(() => {
     if (!duplicateId || menuId) return;
@@ -320,7 +328,6 @@ const EditPartnerMenuWizard = () => {
 
   const handleSubmit = () => {
     if (formRef.current) formRef.current?.submit();
-    setSubmittedValues(formRef.current?.getState().values);
   };
 
   if (showCurrentMenuInProgress) {
@@ -347,12 +354,19 @@ const EditPartnerMenuWizard = () => {
     });
   };
 
+  const isDraft =
+    currentMenu &&
+    IntegrationMenuListing(currentMenu as TIntegrationListing).getMetadata()
+      .listingState === EListingStates.draft;
+
   return (
     <div>
       <h2 className={css.title}>
         <FormattedMessage
           id={
-            menuId ? 'EditPartnerMenuPage.title' : 'CreatePartnerMenuPage.title'
+            menuId && !isDraft
+              ? 'EditPartnerMenuPage.title'
+              : 'CreatePartnerMenuPage.title'
           }
         />
       </h2>
