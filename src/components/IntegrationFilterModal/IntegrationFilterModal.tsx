@@ -5,6 +5,7 @@ import Form from '@components/Form/Form';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import AlertModal from '@components/Modal/AlertModal';
 import useBoolean from '@hooks/useBoolean';
+import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import type { FormApi } from 'final-form';
 import type { ReactNode } from 'react';
@@ -15,7 +16,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import css from './IntegrationFilterModal.module.scss';
 
 type TIntegrationFilterModal = {
-  onSubmit: (values: Record<any, any>) => void;
+  onSubmit: (values: TObject) => void;
   children: ({
     values,
     form,

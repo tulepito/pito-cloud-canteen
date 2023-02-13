@@ -91,7 +91,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
 
     return listEvent;
   });
-  const flattenEvents = flatten(events);
+  const flattenEvents = flatten(events) as Event[];
 
   const sectionCompanyBranding = loadDataInProgress ? (
     <div className={css.sectionCompanyBranding}>
@@ -109,7 +109,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
     <div>
       <CalendarDashboard
         anchorDate={DateTime.fromMillis(startDate || Date.now()).toJSDate()}
-        events={flattenEvents as Event[]}
+        events={flattenEvents}
         companyLogo={sectionCompanyBranding}
         renderEvent={OrderEventCard}
         inProgress={loadDataInProgress}
