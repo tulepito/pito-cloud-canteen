@@ -102,6 +102,10 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       nextTab();
     });
   };
+  const allMembersAmount =
+    memberAmount ||
+    (currentClient &&
+      calculateGroupMembersAmount(currentClient, selectedGroups));
 
   const initialValues = useMemo(
     () => ({
@@ -129,10 +133,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       endDate: endDate || '',
       deadlineDate: deadlineDate || null,
       deadlineHour: deadlineHour || '07:00',
-      memberAmount:
-        memberAmount || currentClient
-          ? calculateGroupMembersAmount(currentClient, selectedGroups)
-          : null,
+      memberAmount: allMembersAmount,
     }),
     [
       dayInWeek,
@@ -153,8 +154,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       endDate,
       deadlineDate,
       deadlineHour,
-      memberAmount,
-      currentClient,
+      allMembersAmount,
     ],
   );
   return (

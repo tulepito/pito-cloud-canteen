@@ -134,6 +134,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     deliveryAddress,
     deadlineDate,
     deadlineHour,
+    memberAmount,
   } = Listing(order as TListing).getMetadata();
   const { title: orderTitle } = Listing(order as TListing).getAttributes();
   const companies = useAppSelector(
@@ -214,31 +215,48 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     'dd/MM/yyyy, hh:mm',
   );
   const allMembersAmount =
-    currentClient && calculateGroupMembersAmount(currentClient, selectedGroups);
+    memberAmount ||
+    (currentClient &&
+      calculateGroupMembersAmount(currentClient, selectedGroups));
 
-  const initialFieldValues = {
-    [OrderSettingField.COMPANY]:
+  const initialFieldValues = useMemo(
+    () => ({
+      [OrderSettingField.COMPANY]:
+        currentClient?.attributes.profile.publicData.companyName,
+      [OrderSettingField.DELIVERY_ADDRESS]: address,
+      [OrderSettingField.DELIVERY_TIME]: deliveryHour,
+      [OrderSettingField.EMPLOYEE_AMOUNT]: allMembersAmount,
+      [OrderSettingField.SPECIAL_DEMAND]: '',
+      [OrderSettingField.PER_PACK]: intl.formatMessage(
+        { id: 'SetupOrderDetail.perPack' },
+        { value: addCommas(packagePerMember?.toString()) || '' },
+      ),
+      ...(pickAllow
+        ? {
+            [OrderSettingField.PICKING_DEADLINE]: pickingDeadline,
+            [OrderSettingField.ACCESS_SETTING]: selectedGroupsName?.join(', '),
+          }
+        : {}),
+    }),
+    [
+      address,
+      allMembersAmount,
       currentClient?.attributes.profile.publicData.companyName,
-    [OrderSettingField.DELIVERY_ADDRESS]: address,
-    [OrderSettingField.DELIVERY_TIME]: deliveryHour,
-    [OrderSettingField.EMPLOYEE_AMOUNT]: allMembersAmount,
-    [OrderSettingField.SPECIAL_DEMAND]: '',
-    [OrderSettingField.PER_PACK]: intl.formatMessage(
-      { id: 'SetupOrderDetail.perPack' },
-      { value: addCommas(packagePerMember?.toString()) || '' },
-    ),
-    ...(pickAllow
-      ? {
-          [OrderSettingField.PICKING_DEADLINE]: pickingDeadline,
-          [OrderSettingField.ACCESS_SETTING]: selectedGroupsName?.join(', '),
-        }
-      : {}),
-  };
+      deliveryHour,
+      intl,
+      packagePerMember,
+      pickAllow,
+      pickingDeadline,
+      selectedGroupsName,
+    ],
+  );
   const addMorePlanExtraProps = {
     onClick: handleAddMorePlanClick,
     startDate,
     endDate,
   };
+
+  const disabledSubmit = Object.keys(orderDetail).length === 0;
 
   const onSubmit = () => {
     dispatch(orderAsyncActions.updateOrder({ orderDetail }))
@@ -250,7 +268,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   useEffect(() => {
     dispatch(orderAsyncActions.fetchOrderDetail());
-  }, []);
+  }, [dispatch]);
 
   return (
     <>
@@ -298,6 +316,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
                   <AddMorePlan {...props} {...addMorePlanExtraProps} />
                 ),
               }}
+              hideMonthView
               recommendButton={
                 <div className={css.buttonContainer}>
                   <Button disabled className={css.recommendNewRestaurantBtn}>
@@ -312,6 +331,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
             <NavigateButtons
               goBack={goBack}
               onNextClick={onSubmit}
+              submitDisabled={disabledSubmit}
               inProgress={updateOrderInProgress}
             />
           </div>

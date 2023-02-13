@@ -7,7 +7,7 @@ import IconPhone from '@components/Icons/IconPhone/IconPhone';
 import IconSort from '@components/Icons/IconSort/IconSort';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import Pagination from '@components/Pagination/Pagination';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { addBooker } from '@redux/slices/Order.slice';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
@@ -53,7 +53,9 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
   const [selectedBookerId, setSelectedBookerId] = useState<string>('');
   const shouldShowPagination = page && data?.length > 0;
-
+  const queryCompaniesInProgress = useAppSelector(
+    (state) => state.ManageCompaniesPage.queryCompaniesInProgress,
+  );
   const renderTableRowFn = (tableData: any, form: any) => {
     return tableData.map(({ key, data: itemData }: any, index: number) => {
       const onCustomItemClick = () => {
@@ -167,6 +169,8 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
         const { handleSubmit, form, values } = formRenderProps;
         const { booker: bookerValue = '', clientId: clientIdValue = '' } =
           values;
+        const tableContent =
+          data?.length > 0 ? renderTableRowFn(data, form) : noClientsFound;
         const disabled =
           !bookerValue || !clientIdValue || createOrderInProgress;
         return (
@@ -174,7 +178,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
             <div className={css.container}>
               <div className={css.table}>
                 <div className={css.header}>
-                  <span></span>
+                  <span>&nbsp;</span>
                   <span>{intl.formatMessage({ id: 'ClientTable.id' })}</span>
                   <span className={css.companyNameHeaderCol}>
                     {intl.formatMessage({ id: 'ClientTable.companyName' })}
@@ -185,9 +189,13 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
                   </span>
                 </div>
                 <div className={css.tableBody}>
-                  {data?.length > 0
-                    ? renderTableRowFn(data, form)
-                    : noClientsFound}
+                  {queryCompaniesInProgress ? (
+                    <div className={css.dataLoading}>
+                      {intl.formatMessage({ id: 'ClientTable.loading' })}
+                    </div>
+                  ) : (
+                    tableContent
+                  )}
                 </div>
               </div>
               {shouldShowPagination && (
