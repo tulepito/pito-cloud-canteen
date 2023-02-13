@@ -297,7 +297,7 @@ const EditPartnerMenuWizard = () => {
     tabCompleted,
     handleRedirect: handleRedirectOnSwitchTab,
   });
-  console.log({ submittedValues });
+
   useEffect(() => {
     setSubmittedValues(null);
   }, [tab]);
