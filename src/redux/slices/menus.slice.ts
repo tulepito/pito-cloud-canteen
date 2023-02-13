@@ -286,6 +286,10 @@ const menusSliceSlice = createSlice({
     setInitialStates: () => ({
       ...initialState,
     }),
+    clearCreateOrUpdateMenuError: (state) => ({
+      ...state,
+      createOrUpdateMenuError: null,
+    }),
   },
   extraReducers: (builder) => {
     builder

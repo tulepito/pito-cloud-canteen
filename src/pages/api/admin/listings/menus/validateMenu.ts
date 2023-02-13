@@ -19,9 +19,10 @@ const validateMenu =
       const daysOfWeekAsString = daysOfWeek.join(',');
       const response = await integrationSdk.listings.query({
         pub_mealType: mealType,
-        pub_daysOfWeek: daysOfWeekAsString,
+        pub_daysOfWeek: `has_any:${daysOfWeekAsString}`,
         meta_listingType: EListingType.menu,
         meta_restaurantId: restaurantId,
+        meta_isDeleted: false,
       });
 
       const listings = denormalisedResponseEntities(
