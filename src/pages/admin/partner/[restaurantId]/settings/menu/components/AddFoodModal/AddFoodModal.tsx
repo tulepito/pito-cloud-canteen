@@ -74,7 +74,7 @@ const parseEntitiesToTableData = (foods: TIntegrationListing[]) => {
         title: food.attributes.title,
         id: food.id.uuid,
         price: food.attributes.price,
-        sideDishes: food.attributes.publicData.sideDishes,
+        sideDishes: food.attributes.publicData?.sideDishes || [],
       },
     };
   });
