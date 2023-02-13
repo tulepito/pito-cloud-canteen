@@ -134,6 +134,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     deliveryAddress,
     deadlineDate,
     deadlineHour,
+    memberAmount,
   } = Listing(order as TListing).getMetadata();
   const { title: orderTitle } = Listing(order as TListing).getAttributes();
   const companies = useAppSelector(
@@ -214,7 +215,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     'dd/MM/yyyy, hh:mm',
   );
   const allMembersAmount =
-    currentClient && calculateGroupMembersAmount(currentClient, selectedGroups);
+    memberAmount ||
+    (currentClient &&
+      calculateGroupMembersAmount(currentClient, selectedGroups));
 
   const initialFieldValues = {
     [OrderSettingField.COMPANY]:
