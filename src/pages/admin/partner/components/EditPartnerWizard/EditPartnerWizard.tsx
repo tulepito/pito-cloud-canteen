@@ -189,7 +189,7 @@ const EditPartnerWizard = (props: any) => {
     tabCompleted,
     handleRedirect: handleRedirectOnSwitchTab,
   });
-  console.log({ uploadingImage });
+
   return (
     <FormWizard className={css.formWizard} formTabNavClassName={css.tabNav}>
       {TABS.map((tab: string) => (
