@@ -33,10 +33,8 @@ const mergeCurrentUser = (
 };
 
 const detectUserPermission = (currentUser: TCurrentUser) => {
-  const { isCompany, isAdmin, company } = get(
-    currentUser,
-    'attributes.profile.metadata',
-  );
+  const { isCompany, isAdmin, company } =
+    get(currentUser, 'attributes.profile.metadata') || {};
 
   let isBooker;
 

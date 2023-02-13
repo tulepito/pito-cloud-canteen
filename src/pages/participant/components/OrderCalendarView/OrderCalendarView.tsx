@@ -109,7 +109,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
     <div>
       <CalendarDashboard
         anchorDate={DateTime.fromMillis(startDate || Date.now()).toJSDate()}
-        events={flattenEvents}
+        events={flattenEvents as Event[]}
         companyLogo={sectionCompanyBranding}
         renderEvent={OrderEventCard}
         inProgress={loadDataInProgress}
