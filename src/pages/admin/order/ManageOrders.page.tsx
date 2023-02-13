@@ -69,9 +69,9 @@ const OrderDetailTooltip = ({
 }) => {
   const orderDetails = subOrders.reduce(
     (prev: any, subOrder: TIntegrationListing) => {
-      const { orderDetail } = subOrder.attributes.metadata || {};
+      const { orderDetail = {} } = subOrder.attributes.metadata || {};
       const subOrderDetails = Object.keys(orderDetail).map((key) => {
-        const { foodList, status } = orderDetail[key];
+        const { foodList = {}, status } = orderDetail[key];
         const totalPrice = Object.keys(foodList).reduce((prev, cur) => {
           const price = foodList[cur].foodPrice;
           return prev + price;
