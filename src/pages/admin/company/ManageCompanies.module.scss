@@ -12,7 +12,7 @@
 }
 
 .top {
-  margin: 20px 0 10px 0;
+  margin: 0 0 10px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -158,4 +158,19 @@
       color: $singleUseBadgeGreen2 !important;
     }
   }
+}
+
+.memberName {
+  font-weight: $fontWeightBold;
+  margin-bottom: 2px;
+}
+
+.membersCount {
+  font-weight: $fontWeightBold;
+  margin-top: 4px;
+}
+
+.memberEmail,
+.memberPhoneNumber {
+  color: $neutralGray5;
 }

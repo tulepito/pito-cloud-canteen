@@ -2,7 +2,6 @@ import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
-import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import Meta from '@components/Layout/Meta';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
@@ -65,13 +64,25 @@ const TABLE_COLUMN: TColumn[] = [
     render: ({ members = [], id }: any) => {
       return (
         <div>
-          {members.map((user: TUser) => {
+          {members.slice(0, 1).map((user: TUser) => {
             return (
               <div key={`${id}.${user.id.uuid}`}>
-                {user.attributes.profile.displayName}
+                <div className={css.memberName}>
+                  {user.attributes.profile.displayName}
+                </div>
+                <div className={css.memberEmail}>{user.attributes.email}</div>
+                <div className={css.memberPhoneNumber}>
+                  {user.attributes.profile.protectedData?.phoneNumber}
+                </div>
               </div>
             );
           })}
+          {members.length > 1 && (
+            <div className={css.membersCount}>
+              +{members.length - 1}
+              <FormattedMessage id="ManageCompaniesPage.membersCount" />
+            </div>
+          )}
         </div>
       );
     },
@@ -159,7 +170,7 @@ export default function ManageCompanies() {
   } = useAppSelector((state) => state.ManageCompaniesPage, shallowEqual);
 
   const dispatch = useAppDispatch();
-
+  const { keywords } = queryParams;
   const filteredCompanies = useMemo(
     () => filterCompanies(companyRefs, queryParams),
     [queryParams, companyRefs],
@@ -233,11 +244,6 @@ export default function ManageCompanies() {
     });
   };
 
-  const initialValues = useMemo(
-    () => queryParams,
-    [JSON.stringify(queryParams)],
-  );
-
   return (
     <div className={css.root}>
       <Meta title={title} description={description} />
@@ -250,13 +256,10 @@ export default function ManageCompanies() {
         </Link>
       </div>
       <div className={css.filterWrapper}>
-        <IntegrationFilterModal onSubmit={() => {}} className={css.filterForm}>
-          {() => {
-            return <></>;
-          }}
-        </IntegrationFilterModal>
+        <div></div>
         <KeywordSearchForm
-          onSubmit={() => {}}
+          initialValues={{ keywords: keywords as string }}
+          onSubmit={onSearchKeyword}
           hideButton
           placeholder={intl.formatMessage({
             id: 'ManageCompanies.keywordsPlaceholder',
@@ -267,7 +270,6 @@ export default function ManageCompanies() {
         <LoadingContainer />
       ) : (
         <TableForm
-          initialValues={initialValues}
           onSubmit={onSearchKeyword}
           columns={TABLE_COLUMN}
           data={companiesTableData}

@@ -1000,5 +1000,6 @@
   "UploadImageForm.submit": "Lưu thay đổi",
   "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại.",
   "ManageCompanies.addCompany": "Thêm khách hàng",
-  "ManageCompanies.keywordsPlaceholder": "Tìm tên công ty/ID/ địa chỉ"
+  "ManageCompanies.keywordsPlaceholder": "Tìm tên công ty/ID/ địa chỉ",
+  "ManageCompaniesPage.membersCount": " người đại diện"
 }

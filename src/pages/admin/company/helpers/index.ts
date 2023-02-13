@@ -2,6 +2,7 @@ import type { TCompanyMembers } from '@redux/slices/ManageCompaniesPage.slice';
 import { RESULT_PAGE_SIZE } from '@redux/slices/ManageCompaniesPage.slice';
 import { USER } from '@utils/data';
 import { ECompanyStatus } from '@utils/enums';
+import { removeAccents } from '@utils/string';
 import type { TCompany } from '@utils/types';
 
 export type TUpdateStatus = {
@@ -23,43 +24,19 @@ export const sliceCompanies = (companies: TCompany[], page: any) => {
 };
 
 export const filterCompanies = (companies: TCompany[], filterValues: any) => {
-  const {
-    searchId,
-    searchDisplayName,
-    searchCompanyName,
-    searchEmail,
-    searchPhone,
-    searchStatus,
-  } = filterValues;
+  const { keywords } = filterValues;
 
   if (Object.keys(filterValues).length === 0) return companies;
-  return companies.filter((company: any) => {
+  return companies.filter((company) => {
     return (
       // eslint-disable-next-line no-nested-ternary
-      (searchId ? company.id.uuid.includes(searchId) : true) &&
-      (searchDisplayName
-        ? company.attributes.profile?.displayName
-            .toLowerCase()
-            .includes(searchDisplayName.toLowerCase())
-        : true) &&
-      (searchCompanyName
-        ? company.attributes.profile.publicData?.companyName
-            ?.toLowerCase()
-            .includes(searchCompanyName?.toLowerCase())
-        : true) &&
-      (searchEmail
-        ? company.attributes.email
-            ?.toLowerCase()
-            .includes(searchEmail?.toLowerCase())
-        : true) &&
-      (searchPhone
-        ? company.attributes.profile.publicData?.phoneNumber
-            ?.toLowerCase()
-            .includes(searchPhone?.toLowerCase())
-        : true) &&
-      (searchStatus
-        ? company.attributes.profile.metadata?.status === Number(searchStatus)
-        : true)
+      removeAccents(company.attributes.profile.displayName)
+        ?.toLowerCase()
+        .includes(keywords?.toLowerCase()) ||
+      company.id.uuid?.toLowerCase().includes(keywords?.toLowerCase()) ||
+      removeAccents(company.attributes.profile.publicData?.location?.address)
+        ?.toLowerCase()
+        .includes(keywords?.toLowerCase())
     );
   });
 };

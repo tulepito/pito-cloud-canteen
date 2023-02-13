@@ -29,3 +29,7 @@ export const shortenString = (
     length - maxLength / 2,
   )}`;
 };
+
+export const removeAccents = (str: string) => {
+  return str ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : '';
+};
