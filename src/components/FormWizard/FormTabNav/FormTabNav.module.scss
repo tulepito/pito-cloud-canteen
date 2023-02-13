@@ -78,3 +78,7 @@
     color: $neutralGray6;
   }
 }
+
+.disabled {
+  pointer-events: none;
+}

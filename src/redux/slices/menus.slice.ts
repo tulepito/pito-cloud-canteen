@@ -35,7 +35,7 @@ type TMenusSliceState = {
 
   createOrUpdateMenuInProgress: boolean;
   createOrUpdateMenuError: any;
-  currentMenu: TListing | null;
+  currentMenu: TListing | TIntegrationListing | null;
 
   showCurrentMenuInProgress: boolean;
   showCurrentMenuError: any;
@@ -110,13 +110,13 @@ const CHECK_MENU_IS_IN_TRANSACTION_PROGRESS =
 const queryPartnerMenus = createAsyncThunk(
   QUERY_PARTNER_MENUS,
   async (payload: any, { extra: sdk }) => {
-    const { restaurantId, menuType, mealTypes, keywords } = payload;
+    const { restaurantId, menuType, mealType, keywords } = payload;
     const response = await sdk.listings.query({
       keywords,
       meta_menuType: menuType,
       meta_listingType: EListingType.menu,
       meta_restaurantId: restaurantId,
-      pub_mealTypes: mealTypes,
+      pub_mealType: mealType,
       meta_isDeleted: false,
       perPage: MANAGE_MENU_PAGE_SIZE,
     });
@@ -142,7 +142,7 @@ const getNumberOfMenuByMealType = createAsyncThunk(
             meta_menuType: menuType,
             meta_listingType: EListingType.menu,
             meta_restaurantId: restaurantId,
-            pub_mealTypes: key,
+            pub_mealType: key,
             meta_isDeleted: false,
             perPage: MANAGE_MENU_PAGE_SIZE,
           });
@@ -171,7 +171,8 @@ const createPartnerMenuListing = createAsyncThunk(
           expand: true,
         },
       });
-      return denormalisedResponseEntities(data)[0];
+      const [menu] = denormalisedResponseEntities(data);
+      return menu;
     } catch (error) {
       console.error(`${CREATE_PARTNER_MENU_LISTING} error: `, error);
       return rejectWithValue(storableAxiosError(error));

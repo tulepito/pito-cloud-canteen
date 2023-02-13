@@ -33,7 +33,7 @@ const ManagePartnerMenusPage: React.FC<TManagePartnerMenusPageProps> = (
   }: TSecondaryKeywordSearchFormValues) => {
     router.push({
       pathname: isFixedMenu
-        ? adminRoutes.ManagePartnerFixedMenus.path
+        ? adminRoutes.ManagePartnerMenus.path
         : adminRoutes.ManagePartnerCycleMenus.path,
       query: { ...router.query, keywords: newKeywords },
     });

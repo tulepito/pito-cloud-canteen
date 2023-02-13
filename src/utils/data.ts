@@ -635,6 +635,39 @@ export const IntegrationListing = (
   };
 };
 
+export const IntegrationMenuListing = (
+  listing: TIntegrationListing | undefined | null,
+) => {
+  const ensuredListing = ensureListing(listing);
+  const attributes = ensuredListing?.attributes;
+  const { metadata = {} } = attributes || {};
+
+  const {
+    monFoodIdList = [],
+    tueFoodIdList = [],
+    wedFoodIdList = [],
+    thuFoodIdList = [],
+    friFoodIdList = [],
+    satFoodIdList = [],
+    sunFoodIdList = [],
+  } = metadata;
+  const listFoodIds = [
+    ...monFoodIdList,
+    ...tueFoodIdList,
+    ...wedFoodIdList,
+    ...thuFoodIdList,
+    ...friFoodIdList,
+    ...satFoodIdList,
+    ...sunFoodIdList,
+  ];
+  return {
+    ...IntegrationListing(listing),
+    getListFoodIds: () => {
+      return listFoodIds;
+    },
+  };
+};
+
 export const getUniqueString = (list: string[]) => {
   return list.filter((value, index, self) => {
     return self.indexOf(value) === index;

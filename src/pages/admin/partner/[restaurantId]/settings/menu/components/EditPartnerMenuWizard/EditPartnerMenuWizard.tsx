@@ -6,9 +6,10 @@ import type { TFormTabChildrenProps } from '@components/FormWizard/FormTabs/Form
 import FormWizard from '@components/FormWizard/FormWizard';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { menusSliceAction, menusSliceThunks } from '@redux/slices/menus.slice';
+import useRedirectTabWizard from '@hooks/useRedirectTabWizard';
+import { menusSliceThunks } from '@redux/slices/menus.slice';
 import { adminRoutes } from '@src/paths';
-import { IntegrationListing, Listing } from '@utils/data';
+import { IntegrationMenuListing, Listing } from '@utils/data';
 import { EListingStates, EMenuMealType, EMenuTypes } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 import classNames from 'classnames';
@@ -114,29 +115,12 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
     }
   };
 
-  const { title } = IntegrationListing(currentMenu).getAttributes();
-  const { menuType } = IntegrationListing(currentMenu).getMetadata();
+  const { title } = IntegrationMenuListing(currentMenu).getAttributes();
+  const { menuType } = IntegrationMenuListing(currentMenu).getMetadata();
   const { mealType, startDate, daysOfWeek, numberOfCycles, foodsByDate } =
-    IntegrationListing(currentMenu).getPublicData();
-  const {
-    monFoodIdList = [],
-    tueFoodIdList = [],
-    wedFoodIdList = [],
-    thuFoodIdList = [],
-    friFoodIdList = [],
-    satFoodIdList = [],
-    sunFoodIdList = [],
-  } = IntegrationListing(currentMenu).getMetadata();
+    IntegrationMenuListing(currentMenu).getPublicData();
 
-  const idsToQuery = [
-    ...monFoodIdList,
-    ...tueFoodIdList,
-    ...wedFoodIdList,
-    ...thuFoodIdList,
-    ...friFoodIdList,
-    ...satFoodIdList,
-    ...sunFoodIdList,
-  ];
+  const idsToQuery = IntegrationMenuListing(currentMenu).getListFoodIds();
 
   const { menuPickedFoods } = useQueryMenuPickedFoods({
     restaurantId: restaurantId as string,
@@ -218,30 +202,32 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
   }
 };
 
-const tabCompleted = (tab: string, listing: any) => {
+const tabCompleted = (tab: string, listing: TIntegrationListing) => {
   const {
-    mealTypes = [],
+    mealType,
     startDate,
     daysOfWeek = [],
-  } = Listing(listing).getPublicData();
-  const { menuType } = Listing(listing).getMetadata();
+  } = IntegrationMenuListing(listing).getPublicData();
+  const { menuType } = IntegrationMenuListing(listing).getMetadata();
 
   const informationTabCompleted = !!(
     menuType &&
-    mealTypes.length > 0 &&
+    mealType &&
     startDate &&
     daysOfWeek.length > 0
   );
+
+  const listFoodIds = IntegrationMenuListing(listing).getListFoodIds();
 
   switch (tab) {
     case MENU_INFORMATION_TAB:
       return informationTabCompleted;
     case MENU_PRICING_TAB:
-      return true;
+      return listFoodIds.length > 0;
     case MENU_COMPLETE_TAB:
-      return true;
+      return !!(informationTabCompleted && listFoodIds);
     default:
-      return false;
+      return informationTabCompleted;
   }
 };
 
@@ -284,6 +270,30 @@ const EditPartnerMenuWizard = () => {
     shallowEqual,
   );
 
+  const isNew =
+    !currentMenu ||
+    (currentMenu &&
+      currentMenu?.attributes?.metadata?.listingState === EListingStates.draft);
+
+  const handleRedirectOnSwitchTab = (nearestActiveTab: string) => {
+    !currentMenu
+      ? router.push(
+          `/admin/partner/${restaurantId}/settings/menu/create?tab=${nearestActiveTab}`,
+        )
+      : router.push(
+          `/admin/partner/${restaurantId}/settings/menu/${menuId}?tab=${nearestActiveTab}`,
+        );
+  };
+
+  useRedirectTabWizard({
+    isNew,
+    listing: currentMenu as TIntegrationListing,
+    selectedTab: tab as string,
+    tabs: EDIT_PARTNER_MENU_TABS,
+    tabCompleted,
+    handleRedirect: handleRedirectOnSwitchTab,
+  });
+
   useEffect(() => {
     setSubmittedValues(null);
   }, [tab]);
@@ -297,12 +307,6 @@ const EditPartnerMenuWizard = () => {
     if (!duplicateId || menuId) return;
     dispatch(menusSliceThunks.showPartnerMenuListing(duplicateId));
   }, [duplicateId, menuId, dispatch]);
-
-  useEffect(() => {
-    if (!duplicateId) {
-      dispatch(menusSliceAction.setInitialStates());
-    }
-  }, [duplicateId]);
 
   const createOrUpdateMenuInProgress = useAppSelector(
     (state) => state.menus.createOrUpdateMenuInProgress,
@@ -319,6 +323,15 @@ const EditPartnerMenuWizard = () => {
     setSubmittedValues(formRef.current?.getState().values);
   };
 
+  if (showCurrentMenuInProgress) {
+    return <LoadingContainer />;
+  }
+
+  const submitReady = isEqual(
+    submittedValues,
+    formRef.current?.getState().values,
+  );
+
   const handleGoBack = () => {
     const tabIndex = EDIT_PARTNER_MENU_TABS.findIndex((cur) => cur === tab);
     const prevTab = EDIT_PARTNER_MENU_TABS[tabIndex - 1];
@@ -334,15 +347,6 @@ const EditPartnerMenuWizard = () => {
     });
   };
 
-  if (showCurrentMenuInProgress) {
-    return <LoadingContainer />;
-  }
-
-  const submitReady = isEqual(
-    submittedValues,
-    formRef.current?.getState().values,
-  );
-
   return (
     <div>
       <h2 className={css.title}>
@@ -356,8 +360,9 @@ const EditPartnerMenuWizard = () => {
         {EDIT_PARTNER_MENU_TABS.map((menuTab: string, index: number) => {
           const disabled = !tabCompleted(
             EDIT_PARTNER_MENU_TABS[index - 1],
-            currentMenu,
+            currentMenu as TIntegrationListing,
           );
+
           return (
             <EditPartnerMenuTab
               key={menuTab}

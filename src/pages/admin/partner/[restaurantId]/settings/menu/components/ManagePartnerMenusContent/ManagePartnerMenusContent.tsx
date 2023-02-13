@@ -185,7 +185,7 @@ type TTabContentProps = {
 };
 
 const TabContent: React.FC<TTabContentProps> = (props) => {
-  const { menuType, restaurantId, id: mealTypes, keywords } = props;
+  const { menuType, restaurantId, id: mealType, keywords } = props;
   const dispatch = useAppDispatch();
   const [menuToRemove, setMenuToRemove] = useState<any>();
   const [menuToUpdate, setMenuToUpdate] = useState<any>();
@@ -205,16 +205,16 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
   );
 
   useEffect(() => {
-    if (menuType && restaurantId && mealTypes)
+    if (menuType && restaurantId && mealType)
       dispatch(
         menusSliceThunks.queryPartnerMenus({
           menuType,
           restaurantId,
-          mealTypes,
+          mealType,
           keywords,
         }),
       );
-  }, [menuType, restaurantId, dispatch, mealTypes, keywords]);
+  }, [menuType, restaurantId, dispatch, mealType, keywords]);
 
   const onToggleStatus = (id: string, state: string) => {
     dispatch(
@@ -291,7 +291,7 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
         menusSliceThunks.queryPartnerMenus({
           menuType,
           restaurantId,
-          mealTypes,
+          mealType,
           keywords,
         }),
       );
