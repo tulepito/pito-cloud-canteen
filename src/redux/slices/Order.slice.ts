@@ -173,9 +173,9 @@ const updateOrder = createAsyncThunk(
             );
             orderDetail[dateTime] = {
               restaurant: {
-                id: Listing(restaurants[0].restaurantInfo).getId(),
+                id: Listing(restaurants[0]?.restaurantInfo).getId(),
                 restaurantName: Listing(
-                  restaurants[randomNumber].restaurantInfo,
+                  restaurants[randomNumber]?.restaurantInfo,
                 ).getAttributes().title,
                 foodList: [],
               },
