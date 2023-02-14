@@ -9,7 +9,7 @@ import {
   setSelectedRestaurant,
 } from '@redux/slices/SelectRestaurantPage.slice';
 import { Listing } from '@utils/data';
-import type { TObject } from '@utils/types';
+import type { TListing, TObject } from '@utils/types';
 import clone from 'lodash/clone';
 import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
@@ -37,6 +37,8 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     shallowEqual,
   );
 
+  const order = useAppSelector((state) => state.Order.order, shallowEqual);
+
   const selectedDate = useAppSelector(
     (state) => state.Order.selectedCalendarDate,
   );
@@ -49,6 +51,12 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   );
   const restaurantId = event.resource?.restaurant.id;
   const dateTime = DateTime.fromJSDate(event?.start!);
+
+  const {
+    packagePerMember,
+    deliveryHour,
+    nutritions = [],
+  } = Listing(order as TListing).getMetadata();
   const removeEventItem = (resourceId: string) => {
     const cloneOrderDetail = clone(orderDetail);
     delete cloneOrderDetail[resourceId];
@@ -63,10 +71,15 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   const onCustomPickFoodModalOpen = async () => {
     dispatch(selectCalendarDate(dateTime.toJSDate()));
     const { payload }: { payload: any } = await dispatch(
-      selectRestaurantPageThunks.getRestaurants({ dateTime }),
+      selectRestaurantPageThunks.getRestaurants({
+        dateTime,
+        packagePerMember,
+        deliveryHour,
+        nutritions,
+      }),
     );
 
-    const { restaurants } = payload || {};
+    const { restaurants = [] } = payload || {};
     const selectedRestaurant = restaurants.find(
       (_restaurant: any) =>
         Listing(_restaurant.restaurantInfo).getId() === restaurantId,
@@ -74,7 +87,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     dispatch(setSelectedRestaurant(selectedRestaurant?.restaurantInfo));
     await dispatch(
       selectRestaurantPageThunks.getRestaurantFood({
-        menuId: Listing(selectedRestaurant.menu).getId(),
+        menuId: Listing(selectedRestaurant?.menu).getId(),
         dateTime,
       }),
     );

@@ -124,6 +124,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
       orderAsyncActions.createOrder({
         clientId,
         bookerId: booker,
+        isCreatedByAdmin: true,
       }),
     ).then((res) => {
       const { payload, meta } = res;
