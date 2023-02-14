@@ -6,6 +6,7 @@ import css from './DayItem.module.scss';
 type TDayColumnContentProps = {
   date: Date;
   events: Event[];
+  resources?: any;
   renderEvent?: React.FC<any>;
   components?: TCalendarItemCardComponents;
 };
@@ -13,6 +14,7 @@ type TDayColumnContentProps = {
 const DayColumnContent: React.FC<TDayColumnContentProps> = ({
   date,
   events,
+  resources,
   renderEvent: EventRender,
   components,
 }) => {
@@ -22,9 +24,14 @@ const DayColumnContent: React.FC<TDayColumnContentProps> = ({
     <div className={css.dayContent}>
       {EventRender &&
         events.map((event, index) => (
-          <EventRender key={event.resource?.id} event={event} index={index} />
+          <EventRender
+            key={event.resource?.id}
+            event={event}
+            index={index}
+            resources={resources}
+          />
         ))}
-      {contentEnd && <div>{contentEnd({ events, date })}</div>}
+      {contentEnd && <div>{contentEnd({ events, date, resources })}</div>}
     </div>
   );
 };

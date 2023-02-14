@@ -168,7 +168,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     deliveryHour,
   );
 
-  const handleAddMorePlanClick = (date: Date) => () => {
+  const handleAddMorePlanClick = (date: Date) => {
     dispatch(selectCalendarDate(date));
     dispatch(selectRestaurant());
   };

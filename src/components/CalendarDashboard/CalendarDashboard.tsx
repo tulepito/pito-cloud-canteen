@@ -28,6 +28,7 @@ type TCalendarDashboardProps = TDefaultProps & {
   recommendButton?: ReactNode;
   hideMonthView?: boolean;
   hideWeekView?: boolean;
+  resources?: any;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
@@ -45,6 +46,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   endDate,
   hideMonthView,
   hideWeekView,
+  resources,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
 
@@ -114,6 +116,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
         localizer={localizer}
         events={events}
         views={views}
+        resources={resources}
         components={{
           toolbar: components?.toolbar || defaultToolbar,
         }}

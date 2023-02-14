@@ -34,6 +34,7 @@ function MonthView({
   events = [],
   renderEvent,
   customComponents,
+  resources,
 }: TMonthViewProps & TMonthViewObject) {
   const currRange = useMemo(
     () => MonthView.range(date, { localizer }),
@@ -57,6 +58,7 @@ function MonthView({
           <MDayItem
             date={item}
             key={item.getTime()}
+            resources={resources}
             events={getEventsInDate(item, events)}
             renderEvent={renderEvent}
             components={customComponents}

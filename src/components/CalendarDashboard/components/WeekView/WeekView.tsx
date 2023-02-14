@@ -36,6 +36,7 @@ function WeekView({
   events = [],
   renderEvent,
   customComponents,
+  resources,
 }: TWeekViewProps & TWeekViewObject) {
   const {
     viewport: { width },
@@ -65,6 +66,7 @@ function WeekView({
             date={item}
             key={item.getTime()}
             events={getEventsInDate(item, events)}
+            resources={resources}
             renderEvent={renderEvent}
             components={customComponents}
           />

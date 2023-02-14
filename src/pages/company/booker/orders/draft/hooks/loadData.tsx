@@ -44,7 +44,7 @@ export const useLoadPlanDetails = () => {
     }
   }, [dispatch, order]);
 
-  const normalizeData = normalizePlanDetailsToEvent(orderDetail);
+  const normalizeData = normalizePlanDetailsToEvent(orderDetail, order);
 
   return {
     rawOrderDetail: orderDetail,

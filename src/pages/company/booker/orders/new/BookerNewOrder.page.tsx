@@ -1,19 +1,21 @@
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { USER } from '@utils/data';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
 import css from './BookerNewOrder.module.scss';
 import CreateOrderForm from './CreateOrderForm';
+import useLoadCompanies from './hooks/loadCompanies';
 
 function BookerNewOrderPage() {
   const intl = useIntl();
   const route = useRouter();
   const dispatch = useAppDispatch();
-  const currentUser = useAppSelector((state) => state.user.currentUser);
 
   // Redux
+  const currentUser = useAppSelector((state) => state.user.currentUser);
   const createOrderInProcess = useAppSelector(
     (state) => state.Order.createOrderInProcess,
   );
@@ -41,6 +43,12 @@ function BookerNewOrderPage() {
     }
   };
 
+  const { myCompanies = [] } = useLoadCompanies();
+  const normalizedCompanies = myCompanies.map((company) => ({
+    id: company?.id?.uuid,
+    name: USER(company).getPublicData()?.companyName,
+  }));
+
   return (
     <div className={css.root}>
       <Modal
@@ -54,24 +62,7 @@ function BookerNewOrderPage() {
         })}>
         <div className={css.modalContent}>
           <CreateOrderForm
-            companies={[
-              {
-                id: '63c76be1-7dd8-40fd-9920-b087847943fd',
-                name: 'Chu Tuan',
-              },
-              {
-                id: '1235',
-                name: 'Journey Horizon',
-              },
-              {
-                id: '1236',
-                name: 'Shopee',
-              },
-              {
-                id: '1237',
-                name: 'Lazada',
-              },
-            ]}
+            companies={normalizedCompanies}
             previousOrders={[
               {
                 id: '1234',

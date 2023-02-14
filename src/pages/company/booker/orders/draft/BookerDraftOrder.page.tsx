@@ -34,9 +34,9 @@ function BookerDraftOrderPage() {
   const {
     startDate: startTimestamp,
     endDate: endTimestamp,
-    plans,
+    plans = [],
   } = orderData.getMetadata();
-  console.log('orderData', plans?.[0]);
+
   const nextStartWeek = DateTime.fromJSDate(new Date())
     .startOf('week')
     .startOf('day')
@@ -57,12 +57,11 @@ function BookerDraftOrderPage() {
 
   const { orderDetail = [] } = useLoadPlanDetails();
 
-  const handleAddMeal = (date: Date) => () => {
-    console.log('plans[0]zz', plans?.[0]);
+  const handleAddMeal = (planId: string) => (date: Date) => {
     dispatch(
       OrderAsyncAction.updatePlanDetail({
         orderId,
-        planId: plans[0],
+        planId,
         updateMode: 'merge',
         orderDetail: {
           [date.getTime()]: {
@@ -82,11 +81,11 @@ function BookerDraftOrderPage() {
     );
   };
 
-  const handleRemoveMeal = (resourceId: string) => {
+  const handleRemoveMeal = (planId: string) => (resourceId: string) => {
     dispatch(
       OrderAsyncAction.updatePlanDetail({
         orderId,
-        planId: plans[0],
+        planId,
         orderDetail: {
           [resourceId]: null,
         },
@@ -112,17 +111,21 @@ function BookerDraftOrderPage() {
             endDate={endDate}
             events={orderDetail}
             renderEvent={(props: any) => (
-              <MealPlanCard {...props} onRemove={handleRemoveMeal} />
+              <MealPlanCard
+                {...props}
+                onRemove={handleRemoveMeal(props?.resources?.planId)}
+              />
             )}
             companyLogo="Company"
             hideMonthView
+            resources={{ planId: plans?.[0], startDate, endDate }}
             components={{
-              contentEnd: (props) => (
+              contentEnd: (props: any) => (
                 <AddMorePlan
                   {...props}
-                  onClick={handleAddMeal}
-                  startDate={startDate}
-                  endDate={endDate}
+                  onClick={handleAddMeal(props?.resources?.planId)}
+                  startDate={props?.resources?.startDate}
+                  endDate={props?.resources?.endDate}
                 />
               ),
               toolbar: (props) => <Toolbar {...props} />,

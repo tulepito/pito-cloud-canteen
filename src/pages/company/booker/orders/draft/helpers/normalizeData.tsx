@@ -1,22 +1,9 @@
-// orderDetail?: {
-//     [date: string]: {
-//       restaurant: {
-//         id: string;
-//         restaurantName: string;
-//       };
-//       foodList: {
-//         [foodId: string]: {
-//           foodPrice: number;
-//           foodName: string;
-//         };
-//       };
-//     };
-//   };
-
+import { LISTING } from '@utils/data';
 import { DateTime } from 'luxon';
 
-export const normalizePlanDetailsToEvent = (planDetails: any) => {
+export const normalizePlanDetailsToEvent = (planDetails: any, order: any) => {
   const dateList = Object.keys(planDetails);
+  const planId = LISTING(order).getMetadata()?.plans?.[0];
 
   const normalizeData = dateList.map((timestamp) => {
     const planData = planDetails[timestamp];
@@ -39,6 +26,7 @@ export const normalizePlanDetailsToEvent = (planDetails: any) => {
         meal: {
           dishes: foodList,
         },
+        planId,
       },
       title: 'PT3040',
       start: DateTime.fromMillis(Number(timestamp)).startOf('day').toJSDate(),

@@ -3,7 +3,7 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
-import { EOrderStates } from '@utils/enums';
+import { EListingStates, EOrderStates } from '@utils/enums';
 
 const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 
@@ -39,6 +39,7 @@ const createOrder = async ({
     {
       authorId: subAccountId,
       title: generatedOrderId,
+      state: EListingStates.published,
       metadata: {
         companyId,
         bookerId,

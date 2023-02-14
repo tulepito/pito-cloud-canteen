@@ -18,5 +18,6 @@ export { default as shopingCart } from './shopingCart.slice';
 export { default as uploadImage } from './uploadImage.slice';
 export { default as user } from './user.slice';
 export { default as walkthrough } from './walkthrough.slice';
+export { default as BookerNewOrderPage } from '@pages/company/booker/orders/new/BookerNewOrder.slice';
 export { default as OrderManagement } from '@pages/orders/[orderId]/OrderManagement.slice';
 export { default as ParticipantPlanPage } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';

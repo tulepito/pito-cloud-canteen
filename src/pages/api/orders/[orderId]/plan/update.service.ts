@@ -11,6 +11,30 @@ export const UPDATE_MODES: Record<string, string> = {
 
 export type TUpdateMode = 'merge' | 'replace';
 
+const getNormalizeDetail = ({
+  orderDetail,
+  initialMemberOrder,
+}: {
+  orderDetail: any;
+  initialMemberOrder: any;
+}) => {
+  return Object.keys(orderDetail).reduce(
+    (acc: Record<string, any>, curr: string) => {
+      if (orderDetail[curr]) {
+        return {
+          ...acc,
+          [curr]: {
+            ...orderDetail[curr],
+            memberOrders: initialMemberOrder,
+          },
+        };
+      }
+      return acc;
+    },
+    {},
+  );
+};
+
 const updatePlan = async ({
   orderId,
   planId,
@@ -36,39 +60,33 @@ const updatePlan = async ({
   });
 
   let currPlan;
-  const normalizeDetail = Object.keys(orderDetail).reduce(
-    (acc: Record<string, any>, curr: string) => {
-      if (orderDetail[curr]) {
-        return {
-          ...acc,
-          [curr]: {
-            ...orderDetail[curr],
-            memberOrders: initialMemberOrder,
-          },
-        };
-      }
-      return acc;
-    },
-    {},
-  );
+
+  const normalizeDetail = getNormalizeDetail({
+    orderDetail,
+    initialMemberOrder,
+  });
 
   let updatedOrderDetail = normalizeDetail;
 
   if (updateMode === 'merge') {
     currPlan = await fetchListing(planId as string);
     const { orderDetail: oldOrderDetail } = LISTING(currPlan).getMetadata();
-    updatedOrderDetail = {
-      ...oldOrderDetail,
-      ...normalizeDetail,
-    };
+
+    updatedOrderDetail = getNormalizeDetail({
+      orderDetail: { ...oldOrderDetail, ...orderDetail },
+      initialMemberOrder,
+    });
   }
 
-  const planListingResponse = await integrationSdk.listings.update({
-    id: planId,
-    metadata: {
-      orderDetail: updatedOrderDetail,
+  const planListingResponse = await integrationSdk.listings.update(
+    {
+      id: planId,
+      metadata: {
+        orderDetail: updatedOrderDetail,
+      },
     },
-  });
+    { expand: true },
+  );
 
   const planListing = denormalisedResponseEntities(planListingResponse)[0];
   return planListing;

@@ -3,6 +3,7 @@ import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
+import { EListingStates } from '@utils/enums';
 
 const createPlan = async ({
   orderId,
@@ -46,6 +47,7 @@ const createPlan = async ({
   const planListingResponse = await integrationSdk.listings.create({
     title: `${orderTitle} - Plan week ${plans.length + 1}`,
     authorId: subAccountId,
+    state: EListingStates.published,
     metadata: {
       orderDetail: updatedOrderDetail,
       orderId,
