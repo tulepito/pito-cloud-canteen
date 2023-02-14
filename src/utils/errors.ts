@@ -137,6 +137,7 @@ export const isChangePasswordWrongPassword = (error: TError) =>
 
 export const storableError = (error: any): TError => {
   const err = error || {};
+  console.log({ error });
   const { name, message, status, statusText } = err;
   // Status, statusText, and data.errors are (possibly) added to the error object by SDK
   const apiErrors = responseAPIErrors(err);
@@ -146,6 +147,25 @@ export const storableError = (error: any): TError => {
     type: 'error',
     name,
     message,
+    status,
+    statusText,
+    apiErrors,
+  };
+};
+
+export const storableAxiosError = (error: any): TError => {
+  const errorData = error?.response?.data;
+  const err = errorData || {};
+  const { name, status, message, statusText, data } = err;
+  const { message: messageInData } = data;
+  // Status, statusText, and data.errors are (possibly) added to the error object by SDK
+  const apiErrors = responseAPIErrors(err);
+
+  // Returned object is the same as prop type check in util/types -> error
+  return {
+    type: 'error',
+    name,
+    message: messageInData || message,
     status,
     statusText,
     apiErrors,

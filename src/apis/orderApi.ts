@@ -10,7 +10,7 @@ type CreateOrderApiBody = {
 export const createOrderApi = (body: CreateOrderApiBody) =>
   postApi('/orders', body);
 
-type UpdateOrderApiBody = {
+export type UpdateOrderApiBody = {
   orderId: string;
   generalInfo?: {
     deliveryAddress: {
@@ -95,4 +95,14 @@ export const sendRemindEmailToMemberApi = (orderId: string, body: TObject) =>
 
 export const queryOrdersApi = (body: TBodyParams) => {
   return postApi(`/admin/listings/order/query`, body);
+};
+
+export const bookerDeleteDraftOrderApi = ({
+  companyId,
+  orderId,
+}: {
+  companyId: string;
+  orderId: string;
+}) => {
+  return deleteApi(`/company/${companyId}/orders/${orderId}`);
 };

@@ -1,7 +1,5 @@
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { findMinStartDate } from '@helpers/orderHelper';
 import { generateTimeOptions } from '@utils/dates';
@@ -91,28 +89,15 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           label={intl.formatMessage({
             id: 'MealPlanDateField.startDateLabel',
           })}
+          dateFormat={'EEE, dd MMMM, yyyy'}
           className={startDateClasses}
+          placeholderText={format(new Date(), 'EEE, dd MMMM, yyyy', {
+            locale: viLocale,
+          })}
           validate={composeValidators(
             required(startDateRequiredMessage),
             nonSatOrSunDay(startDateNonSatOrSunDayMessage),
           )}
-          customInput={
-            <FieldTextInput
-              id="startDate"
-              name="startDate"
-              disabled
-              format={(value) => {
-                return value
-                  ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
-                      locale: viLocale,
-                    })
-                  : intl.formatMessage({
-                      id: 'MealPlanDateField.startDatePlaceholder',
-                    });
-              }}
-              leftIcon={<IconCalendar />}
-            />
-          }
         />
         <FieldDatePicker
           id="endDate"
@@ -127,23 +112,9 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           autoComplete="off"
           validate={required(endDateRequiredMessage)}
           disabled={!startDate}
-          customInput={
-            <FieldTextInput
-              id="endDate"
-              name="endDate"
-              disabled
-              format={(value) => {
-                return value
-                  ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
-                      locale: viLocale,
-                    })
-                  : intl.formatMessage({
-                      id: 'MealPlanDateField.endDatePlaceholder',
-                    });
-              }}
-              leftIcon={<IconCalendar />}
-            />
-          }
+          placeholderText={format(new Date(), 'EEE, dd MMMM, yyyy', {
+            locale: viLocale,
+          })}
         />
         <FieldSelect
           id="deliveryHour"

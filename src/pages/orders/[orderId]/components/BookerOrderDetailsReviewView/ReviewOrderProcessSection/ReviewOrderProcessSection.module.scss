@@ -1,0 +1,16 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins' as *;
+
+.root {
+  border: 1px solid $neutralGray4;
+  border-radius: 16px;
+  padding: 16px 24px;
+
+  .sectionTitle {
+    @include textTemplate(18px, 700, 24px);
+  }
+
+  .activityContainer {
+    margin: 16px 0 12px;
+  }
+}

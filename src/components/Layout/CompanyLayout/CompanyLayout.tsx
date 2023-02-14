@@ -90,7 +90,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       key: 'order',
       icon: <FeatureIcons.Box />,
       title: 'Đơn hàng',
-      pathname: '/',
+      pathname: companyPaths.ManageOrders,
     },
     {
       key: 'invoice',

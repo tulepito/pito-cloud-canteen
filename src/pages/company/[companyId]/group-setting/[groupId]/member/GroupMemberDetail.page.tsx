@@ -2,7 +2,7 @@ import Avatar from '@components/Avatar/Avatar';
 import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import { getGroupNames, getMemberById } from '@helpers/companyMembers';
+import { getGroupNames, getMemberById } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {

@@ -5,7 +5,7 @@ import {
   manageCompaniesThunks,
   paginateCompanies,
 } from '@redux/slices/ManageCompaniesPage.slice';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
 import type { TUpdateStatus } from '@src/pages/admin/company/helpers';
 import {
   filterCompanies,
@@ -115,13 +115,13 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
     setPage(value);
   };
   const onItemClick = (id: string) => {
-    dispatch(OrderAsyncAction.fetchCompanyBookers(id));
+    dispatch(orderAsyncActions.fetchCompanyBookers(id));
   };
 
   const onSubmit = (values: any) => {
     const { clientId, booker } = values;
     dispatch(
-      OrderAsyncAction.createOrder({
+      orderAsyncActions.createOrder({
         clientId,
         bookerId: booker,
       }),

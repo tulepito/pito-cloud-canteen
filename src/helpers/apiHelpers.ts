@@ -45,3 +45,11 @@ export const queryAllUsers = async ({ query, include = [] }: any = {}) => {
     query,
   });
 };
+
+export const queryAllListings = async ({ query, include = [] }: any = {}) => {
+  return queryAllPages({
+    sdkModel: getIntegrationSdk().listings,
+    include,
+    query,
+  });
+};

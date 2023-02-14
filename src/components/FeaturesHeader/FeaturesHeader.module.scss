@@ -2,7 +2,7 @@
 @use '/src/styles/mixins.scss' as *;
 
 .container {
-  border-bottom: 1px solid $neutral4;
+  border-bottom: 1px solid $neutralGray4;
   position: fixed;
   top: 66px;
   z-index: 2;
@@ -12,6 +12,7 @@
 
 .navWrapper {
   @include flexAlign(center, center);
+  margin: 0;
   list-style-type: none;
   gap: 24px;
 

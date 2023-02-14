@@ -128,18 +128,30 @@ export const adminRoutes = {
   },
   ManagePartnerMenus: {
     path: '/admin/partner/[restaurantId]/settings/menu',
-    label: 'Danh sách thực đơn',
+    label: 'Thực đơn',
   },
-  PartnerMenuDetails: {
-    path: '/admin/partner/[restaurantId]/settings/menu/[menuId]',
-    label: 'Danh sách thực đơn',
+  ManagePartnerFixedMenus: {
+    path: '/admin/partner/[restaurantId]/settings/menu/fixed-menu',
+    label: 'Thực đơn cố định',
+  },
+  ManagePartnerCycleMenus: {
+    path: '/admin/partner/[restaurantId]/settings/menu/cycle-menu',
+    label: 'Thực đơn theo chu kỳ',
+  },
+  PartnerMenuFixedDetails: {
+    path: '/admin/partner/[restaurantId]/settings/menu/fixed-menu/[menuId]',
+    label: 'Chi tiết thực đơn',
+  },
+  PartnerMenuCycleDetails: {
+    path: '/admin/partner/[restaurantId]/settings/menu/cycle-menu/[menuId]',
+    label: 'Chi tiết thực đơn',
   },
   CreatePartnerMenu: {
     path: '/admin/partner/[restaurantId]/settings/menu/create',
     label: 'Tạo thực đơn',
   },
   EditPartnerMenu: {
-    path: '/admin/partner/[restaurantId]/settings/menu/create',
+    path: '/admin/partner/[restaurantId]/settings/menu/[menuId]',
     label: 'Chỉnh sửa thực đơn',
   },
   EditOrder: {
@@ -156,6 +168,8 @@ export const companyPaths = {
   Home: '/company',
   Detail: '/company/[companyId]',
   Account: '/company/[companyId]/account',
+  ManageOrders: '/company/orders',
+  ManageOrderDetail: '/company/orders/[orderId]',
   GroupSetting: '/company/[companyId]/group-setting',
   Logo: '/company/[companyId]/logo',
   Members: '/company/[companyId]/members',

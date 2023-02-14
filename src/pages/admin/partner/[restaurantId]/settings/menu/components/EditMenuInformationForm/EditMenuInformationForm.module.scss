@@ -1,0 +1,41 @@
+@use '/src/styles/defaults.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.inputLabel {
+  @include inputLabelStyles;
+}
+
+.title {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.wrapperFields {
+  padding: 20px 0 30px 0;
+  border-bottom: 1px solid $neutralGray4;
+}
+
+.topTitle {
+  display: block;
+}
+
+.fields {
+  display: grid;
+  gap: 80px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.inputDate {
+  max-width: 300px;
+  margin-bottom: 16px;
+}
+
+.weekSuffixed {
+  padding: 0 10px;
+  border-left: 1px solid $neutralGray4;
+  color: $neutralGray5;
+}
+
+.inputSuffixedContainer {
+  right: 15px !important;
+}

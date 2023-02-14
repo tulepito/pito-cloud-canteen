@@ -4,7 +4,7 @@ import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconPlus from '@components/Icons/IconPlus/IconPlus';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
-import { getGroupNames } from '@helpers/companyMembers';
+import { getGroupNames } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {

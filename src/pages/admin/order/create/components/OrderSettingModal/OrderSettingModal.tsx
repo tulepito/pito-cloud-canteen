@@ -5,7 +5,7 @@ import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 import classNames from 'classnames';
@@ -53,6 +53,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
     (state) => state.Order.updateOrderInProgress,
   );
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
+  const { title: orderId } = Listing(order as TListing).getAttributes();
 
   const {
     companyId: clientId,
@@ -68,6 +69,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
     deadlineDate,
     deadlineHour,
     memberAmount,
+    nutritions = [],
   } = Listing(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const initialValues = useMemo(
@@ -85,6 +87,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
             selectedPlace: { address, origin },
           }
         : null,
+      nutritions,
       startDate: startDate || null,
       endDate: endDate || null,
       memberAmount:
@@ -105,6 +108,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
       endDate,
       memberAmount,
       initialFieldValues,
+      nutritions,
     ],
   );
   const leftSideRenderer = () =>
@@ -134,9 +138,12 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
         return (
           <>
             <div className={css.title}>
-              {intl.formatMessage({
-                id: 'OrderSettingModal.field.company',
-              })}
+              {intl.formatMessage(
+                {
+                  id: 'OrderSettingModal.field.company.value',
+                },
+                { companyName: initialFieldValues[OrderSettingField.COMPANY] },
+              )}
             </div>
             <div className={css.fieldContent}></div>
           </>
@@ -234,6 +241,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
         return null;
     }
   };
+
   const onSubmit = (values: any) => {
     const {
       deliveryAddress: deliveryAddressValues,
@@ -251,15 +259,18 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
       packagePerMember: +packagePerMemberValue.replace(/,/g, ''),
       ...rest,
     };
-    dispatch(OrderAsyncAction.updateOrder({ generalInfo }));
+    dispatch(orderAsyncActions.updateOrder({ generalInfo }));
   };
+
+  const hideSubmitButton = selectedField === OrderSettingField.COMPANY;
+
   return (
     <Modal
       isOpen={isOpen}
       handleClose={onClose}
       title={intl.formatMessage({ id: 'OrderSettingModal.title' })}>
       <OutsideClickHandler onOutsideClick={onClose}>
-        <div className={css.orderId}>#Draft</div>
+        <div className={css.orderId}>#{orderId}</div>
         <div className={css.container}>
           <div className={css.leftSide}>{leftSideRenderer()}</div>
           <div className={css.rightSide}>
@@ -272,15 +283,17 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
                 return (
                   <Form onSubmit={handleSubmit}>
                     {rightSideRenderer(form, values)}
-                    <Button
-                      className={css.submitBtn}
-                      disabled={invalid || updateOrderInProgress}
-                      inProgress={updateOrderInProgress}
-                      type="submit">
-                      {intl.formatMessage({
-                        id: 'OrderSettingModal.saveChange',
-                      })}
-                    </Button>
+                    {!hideSubmitButton && (
+                      <Button
+                        className={css.submitBtn}
+                        disabled={invalid || updateOrderInProgress}
+                        inProgress={updateOrderInProgress}
+                        type="submit">
+                        {intl.formatMessage({
+                          id: 'OrderSettingModal.saveChange',
+                        })}
+                      </Button>
+                    )}
                   </Form>
                 );
               }}

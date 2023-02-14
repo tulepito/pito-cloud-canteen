@@ -16,6 +16,8 @@ type TSelectRestaurantPageSliceInitialState = {
   foodList: any[];
   fetchFoodPending: boolean;
   fetchFoodError: any;
+
+  selectedRestaurant: TListing | null;
 };
 
 const initialState: TSelectRestaurantPageSliceInitialState = {
@@ -27,6 +29,7 @@ const initialState: TSelectRestaurantPageSliceInitialState = {
   foodList: [],
   fetchFoodPending: false,
   fetchFoodError: null,
+  selectedRestaurant: null,
 };
 
 // ================ Thunk types ================ //
@@ -52,11 +55,13 @@ const getRestaurants = createAsyncThunk(
       dateTime,
       favoriteRestaurantIdList = [],
       favoriteFoodIdList = [],
+      title = '',
     } = params || {};
     const dayOfWeek = convertWeekDay(dateTime.weekday).key;
     const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
     const mealType = deliveryDaySessionAdapter(deliveryDaySession);
     const response = await sdk.listings.query({
+      keywords: title,
       meta_listingType: ListingTypes.MENU,
       pub_startDate: `,${dateTime.toMillis()}`,
       pub_daysOfWeek: `has_any:${dayOfWeek}`,
@@ -136,7 +141,12 @@ export const selectRestaurantPageThunks = {
 const SelectRestaurantPageSlice = createSlice({
   name: 'SelectRestaurantPage',
   initialState,
-  reducers: {},
+  reducers: {
+    setSelectedRestaurant: (state, { payload }) => ({
+      ...state,
+      selectedRestaurant: payload,
+    }),
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getRestaurants.pending, (state) => {
@@ -176,5 +186,7 @@ const SelectRestaurantPageSlice = createSlice({
       });
   },
 });
+
+export const { setSelectedRestaurant } = SelectRestaurantPageSlice.actions;
 
 export default SelectRestaurantPageSlice.reducer;

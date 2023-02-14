@@ -1,8 +1,8 @@
 import Form from '@components/Form/Form';
-import { calculateGroupMembersAmount } from '@helpers/companyMembers';
+import { calculateGroupMembersAmount } from '@helpers/company';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing, User } from '@utils/data';
 import type { TListing } from '@utils/types';
 import isEmpty from 'lodash/isEmpty';
@@ -98,10 +98,14 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
       ...rest,
     };
-    dispatch(OrderAsyncAction.updateOrder({ generalInfo })).then(() => {
+    dispatch(orderAsyncActions.updateOrder({ generalInfo })).then(() => {
       nextTab();
     });
   };
+  const allMembersAmount =
+    memberAmount ||
+    (currentClient &&
+      calculateGroupMembersAmount(currentClient, selectedGroups));
 
   const initialValues = useMemo(
     () => ({
@@ -129,10 +133,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       endDate: endDate || '',
       deadlineDate: deadlineDate || null,
       deadlineHour: deadlineHour || '07:00',
-      memberAmount:
-        memberAmount || currentClient
-          ? calculateGroupMembersAmount(currentClient, selectedGroups)
-          : null,
+      memberAmount: allMembersAmount,
     }),
     [
       dayInWeek,
@@ -153,8 +154,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       endDate,
       deadlineDate,
       deadlineHour,
-      memberAmount,
-      currentClient,
+      allMembersAmount,
     ],
   );
   return (

@@ -1,0 +1,16 @@
+@use '/src/styles/vars.scss' as *;
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.addButton {
+  float: right;
+}
+
+.createTitle {
+  font-size: 20px;
+  font-weight: $fontWeightBold;
+  color: $neutralGray6;
+}

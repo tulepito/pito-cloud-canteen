@@ -82,7 +82,22 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
               {
                 id: 'managePartnerMenu',
                 label: 'AdminSidebar.managePartnerMenuLabel',
-                nameLink: adminRoutes.ManagePartnerMenus.path,
+                highlightRefLinks: [
+                  adminRoutes.CreatePartnerMenu.path,
+                  adminRoutes.EditPartnerMenu.path,
+                ],
+                childrenMenus: [
+                  {
+                    id: 'managePartnerFixedMenu',
+                    label: 'AdminSidebar.managePartnerFixedMenuLabel',
+                    nameLink: adminRoutes.ManagePartnerFixedMenus.path,
+                  },
+                  {
+                    id: 'managePartnerCycleMenu',
+                    label: 'AdminSidebar.managePartnerCycleMenuLabel',
+                    nameLink: adminRoutes.ManagePartnerCycleMenus.path,
+                  },
+                ],
               },
               {
                 id: 'managePartnerFood',
@@ -165,6 +180,7 @@ const AdminSidebar: React.FC<TAdminSidebarProps> = (props) => {
             </h1>
             <MultiLevelSidebar
               rootClassName={css.multiLevelMenu}
+              menuLabelClassName={css.menuItemLabel}
               subMenuLayoutClassName={css.subMenuLayout}
               menus={activeMenu.childrenMenus || []}
             />

@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { useEffect } from 'react';
 
 export const useLoadData = ({ orderId }: { orderId: string }) => {
@@ -14,7 +14,7 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(OrderAsyncAction.fetchOrder(orderId));
+    dispatch(orderAsyncActions.fetchOrder(orderId));
   }, []);
 
   return {

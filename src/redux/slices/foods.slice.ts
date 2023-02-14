@@ -51,6 +51,10 @@ type TFoodSliceState = {
 
   createPartnerFoodFromCsvInProgress: boolean;
   creataPartnerFoodFromCsvError: any;
+
+  menuPickedFoods: TIntegrationListing[];
+  queryMenuPickedFoodsInProgress: boolean;
+  queryMenuPickedFoodsError: any;
 };
 
 const initialState: TFoodSliceState = {
@@ -85,6 +89,11 @@ const initialState: TFoodSliceState = {
 
   createPartnerFoodFromCsvInProgress: false,
   creataPartnerFoodFromCsvError: null,
+
+  // query food for menu picked food
+  menuPickedFoods: [],
+  queryMenuPickedFoodsInProgress: false,
+  queryMenuPickedFoodsError: null,
 };
 
 // ================ Thunk types ================ //
@@ -107,7 +116,27 @@ const DUPLICATE_FOOD = 'app/ManageFoodsPage/DUPLICATE_FOOD';
 
 const CREATE_FOOD_FROM_FILE = 'app/ManageFoodsPage/CREATE_FOOD_FROM_FILE';
 
+const QUERY_MENU_PICKED_FOODS = 'app/ManageFoodsPage/QUERY_MENU_PICKED_FOODS';
+
 // ================ Async thunks ================ //
+
+const queryMenuPickedFoods = createAsyncThunk(
+  QUERY_MENU_PICKED_FOODS,
+  async (payload: any, { extra: sdk }) => {
+    const { restaurantId, ids } = payload;
+    const response = await sdk.listings.query({
+      ids,
+      meta_listingType: EListingType.food,
+      meta_restaurantId: restaurantId,
+      meta_isDeleted: false,
+    });
+    const foods = denormalisedResponseEntities(response);
+    return foods;
+  },
+  {
+    serializeError: storableError,
+  },
+);
 
 const queryPartnerFoods = createAsyncThunk(
   QUERY_PARTNER_FOODS,
@@ -388,6 +417,7 @@ export const foodSliceThunks = {
   showDuplicateFood,
   duplicateFood,
   creataPartnerFoodFromCsv,
+  queryMenuPickedFoods,
 };
 
 // ================ Slice ================ //

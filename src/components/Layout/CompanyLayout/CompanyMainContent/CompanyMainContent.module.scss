@@ -1,4 +1,6 @@
 .root {
+  margin-top: 72px;
+
   &.hasSideBar {
     margin-left: 360px;
     width: calc(100% - 360px);

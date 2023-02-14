@@ -24,8 +24,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       }
     }
     const { dataParams = {}, queryParams = {} } = req.body;
-    const intergrationSdk = getIntegrationSdk();
-    const response = await intergrationSdk.listings.query(
+    const integrationSdk = getIntegrationSdk();
+    const response = await integrationSdk.listings.query(
       {
         ...dataParams,
         meta_listingType: LISTING_TYPE.ORDER,
@@ -33,13 +33,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       queryParams,
     );
     const orders = denormalisedResponseEntities(response);
-    const orderWithCompanAndSubOrders = await Promise.all(
+    const orderWithCompanyAndSubOrders = await Promise.all(
       orders.map(async (order: TIntegrationOrderListing) => {
-        const { companyId } = order.attributes.metadata;
-        const companyUserResponse = await intergrationSdk.users.show({
-          id: companyId,
-        });
-        const subOrderResponse = await intergrationSdk.listings.query({
+        const { companyId, bookerId } = order.attributes.metadata;
+
+        const [bookerUserResponse, companyUserResponse] = await Promise.all([
+          integrationSdk.users.show({
+            id: bookerId,
+          }),
+          integrationSdk.users.show({
+            id: companyId,
+          }),
+        ]);
+
+        const subOrderResponse = await integrationSdk.listings.query({
           meta_orderId: order.id.uuid,
           meta_listingType: EListingType.subOrder,
         });
@@ -47,16 +54,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const [company] = denormalisedResponseEntities(
           companyUserResponse,
         ) as TCompany[];
+        const [booker] = denormalisedResponseEntities(bookerUserResponse);
         return {
           ...order,
           company,
           subOrders,
+          booker,
         };
       }),
     );
 
     res.json({
-      orders: orderWithCompanAndSubOrders,
+      orders: orderWithCompanyAndSubOrders,
       pagination: response.data.meta,
     });
   } catch (error) {

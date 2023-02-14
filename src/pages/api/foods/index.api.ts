@@ -63,7 +63,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           message: 'Create food listing successfully',
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
         res.json(error);
       }
       break;

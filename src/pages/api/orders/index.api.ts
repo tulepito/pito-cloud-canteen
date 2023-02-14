@@ -1,7 +1,4 @@
-import {
-  calculateGroupMembers,
-  getAllCompanyMembers,
-} from '@helpers/companyMembers';
+import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
 import cookies from '@services/cookie';
 import getAdminAccount from '@services/getAdminAccount';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
@@ -199,6 +196,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                   orderDetail: updatedOrderDetail,
                 },
               });
+
+              [updatedOrderListing] = denormalisedResponseEntities(
+                await integrationSdk.listings.show(
+                  {
+                    id: orderId,
+                  },
+                  { expand: true },
+                ),
+              );
             }
           }
         }

@@ -1,6 +1,6 @@
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
@@ -28,7 +28,7 @@ function BookerNewOrderPage() {
   const handleSubmit = async (values: any) => {
     try {
       const newOrder = await dispatch(
-        OrderAsyncAction.createOrder({
+        orderAsyncActions.createOrder({
           clientId: values.company,
           bookerId: currentUser?.id?.uuid,
         }),

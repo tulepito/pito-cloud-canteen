@@ -19,5 +19,12 @@ export type TDayInWeek =
 
 export type TCalendarItemCardComponents = {
   contentEnd?: React.FC<any>;
+  contentStart?: React.FC<any>;
   toolbar?: React.FC<any>;
+};
+
+export type TDayColumnHeaderProps = {
+  isCurrentDay: boolean;
+  date: Date;
+  isMouseOnDay: boolean;
 };

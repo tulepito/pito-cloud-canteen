@@ -1,7 +1,12 @@
 @use '/src/styles/defaults.scss' as *;
 
-.inputContainer {
-  @include inputContainerStyles;
+.root {
+  & > input {
+    @include inputContainerStyles;
+  }
+  .input {
+    width: 100%;
+  }
 }
 
 .labelRoot {
