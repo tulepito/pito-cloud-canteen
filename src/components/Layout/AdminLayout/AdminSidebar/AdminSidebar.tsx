@@ -32,6 +32,7 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         id: 'createOrder',
         label: 'AdminSidebar.createOrderLabel',
         nameLink: adminRoutes.CreateOrder.path,
+        highlightRefLinks: [adminRoutes.UpdateDraftOrder.path],
       },
       {
         id: 'manageOrders',

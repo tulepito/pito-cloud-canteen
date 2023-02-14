@@ -7,6 +7,7 @@ import { deleteApi, getApi, postApi, putApi } from './configs';
 type TCreateBookerOrderApiBody = {
   companyId: string;
   bookerId: string;
+  isCreatedByAdmin?: boolean;
 };
 
 export type TUpdateOrderApiBody = {

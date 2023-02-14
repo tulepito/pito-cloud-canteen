@@ -35,7 +35,6 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   const intl = useIntl();
   const { value: isModalOpen, setValue: setModalOpen } = useBoolean();
   const dispatch = useAppDispatch();
-
   const restaurants = useAppSelector(
     (state) => state.SelectRestaurantPage.restaurants,
     shallowEqual,
@@ -55,9 +54,12 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     (state) => state.SelectRestaurantPage.fetchRestaurantsPending,
   );
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
-  const { deliveryHour, deliveryAddress } = Listing(
-    order as TListing,
-  ).getMetadata();
+  const {
+    deliveryHour,
+    deliveryAddress,
+    packagePerMember,
+    nutritions = [],
+  } = Listing(order as TListing).getMetadata();
   const shouldShowRestaurantPagination =
     !!restaurants && restaurants?.length > 0 && fetchRestaurantsPending;
   const {
@@ -85,6 +87,10 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   const handlePageChange = (page: number) => {
     const params = {
       page,
+      dateTime,
+      packagePerMember,
+      deliveryHour,
+      nutritions,
     };
     dispatch(selectRestaurantPageThunks.getRestaurants(params));
   };
@@ -100,7 +106,15 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     }
 
     currDebounceRef = setTimeout(() => {
-      dispatch(selectRestaurantPageThunks.getRestaurants({ dateTime, title }));
+      dispatch(
+        selectRestaurantPageThunks.getRestaurants({
+          dateTime,
+          title,
+          packagePerMember,
+          deliveryHour,
+          nutritions,
+        }),
+      );
     }, DEBOUNCE_TIME);
   };
 
@@ -150,8 +164,15 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   };
 
   useEffect(() => {
-    dispatch(selectRestaurantPageThunks.getRestaurants({ dateTime }));
-  }, [dispatch]);
+    dispatch(
+      selectRestaurantPageThunks.getRestaurants({
+        dateTime,
+        packagePerMember,
+        deliveryHour,
+        nutritions,
+      }),
+    );
+  }, [deliveryHour, dispatch, nutritions, packagePerMember]);
 
   return (
     <section className={css.root}>
