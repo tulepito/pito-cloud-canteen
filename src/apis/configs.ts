@@ -1,5 +1,7 @@
+import cookies from '@services/cookie';
 import type { TObject } from '@utils/types';
 import axios from 'axios';
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 export const apiBaseUrl = () => {
   const port = process.env.NEXT_PUBLIC_PORT || 3000;
@@ -28,7 +30,7 @@ export const postApi = (path: string, body: TObject) => {
   return axios.post(`${apiBaseUrl()}${path}`, body);
 };
 
-export const putApi = (path: string, body: TObject) => {
+export const putApi = (path: string, body: TObject = {}) => {
   return axios.put(`${apiBaseUrl()}${path}`, body);
 };
 
@@ -48,3 +50,17 @@ export enum HttpMethod {
   PUT = 'PUT',
   DELETE = 'DELETE',
 }
+
+type TApiCheckerFunction = (
+  handler: NextApiHandler,
+) => (req: NextApiRequest, res: NextApiResponse) => Promise<unknown> | void;
+
+export const composeApiCheckers =
+  (...checkers: TApiCheckerFunction[]) =>
+  (handler: NextApiHandler) => {
+    const handlerWithCookies = cookies(handler);
+
+    checkers.forEach((checker) => checker(handlerWithCookies));
+
+    return handlerWithCookies;
+  };

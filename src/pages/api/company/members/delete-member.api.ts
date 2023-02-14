@@ -1,4 +1,4 @@
-import cookies from '@services/cookie';
+import { composeApiCheckers } from '@apis/configs';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import companyChecker from '@services/permissionChecker/company';
@@ -90,4 +90,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default cookies(companyChecker(handler));
+export default composeApiCheckers(companyChecker)(handler);
