@@ -6,18 +6,18 @@ import css from './DeleteMealModal.module.scss';
 type TDeleteMealModalProps = {
   isOpen: boolean;
   onClose?: () => void;
-  handleDelete: () => void;
+  onDelete: () => void;
 };
 
 const DeleteMealModal: React.FC<TDeleteMealModalProps> = ({
   isOpen,
   onClose = () => null,
-  handleDelete,
+  onDelete,
 }) => {
   const intl = useIntl();
 
   const handleDeletePlan = () => {
-    handleDelete();
+    onDelete();
   };
 
   const handleClose = () => {

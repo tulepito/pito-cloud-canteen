@@ -188,7 +188,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   const showPickFoodModal = isPickFoodModalOpen && !fetchFoodInProgress;
 
-  const handleAddMorePlanClick = (date: Date) => () => {
+  const handleAddMorePlanClick = (date: Date) => {
     dispatch(selectCalendarDate(date));
     dispatch(selectRestaurant());
   };

@@ -24,10 +24,12 @@ type TMealPlanCardProps = {
   event: Event;
   index: number;
   eventExtraProps: TObject;
+  onRemove?: (id: string) => void;
 };
 
 const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   event,
+  onRemove,
   eventExtraProps,
 }) => {
   const { onPickFoodModal } = eventExtraProps;
@@ -47,13 +49,17 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   const fetchRestaurantsInProgress = useAppSelector(
     (state) => state.SelectRestaurantPage.fetchRestaurantsPending,
   );
+
   const restaurantId = event.resource?.restaurant.id;
   const dateTime = DateTime.fromJSDate(event?.start!);
-  const removeEventItem = (resourceId: string) => {
-    const cloneOrderDetail = clone(orderDetail);
-    delete cloneOrderDetail[resourceId];
-    dispatch(removeMealDay(cloneOrderDetail));
-  };
+
+  const removeEventItem =
+    onRemove ||
+    ((resourceId: string) => {
+      const cloneOrderDetail = clone(orderDetail);
+      delete cloneOrderDetail[resourceId];
+      dispatch(removeMealDay(cloneOrderDetail));
+    });
 
   const onEditMeal = (date: Date) => {
     dispatch(selectCalendarDate(date));

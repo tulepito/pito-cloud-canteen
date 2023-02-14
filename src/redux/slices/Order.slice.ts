@@ -1,13 +1,14 @@
 import { companyApi } from '@apis/companyApi';
 import { fetchUserApi } from '@apis/index';
-import type { UpdateOrderApiBody } from '@apis/orderApi';
+import type { TUpdateOrderApiBody } from '@apis/orderApi';
 import {
   bookerDeleteDraftOrderApi,
-  createOrderApi,
-  initiateTransactionsApi,
+  createBookerOrderApi,
   queryOrdersApi,
   updateOrderApi,
+  updatePlanDetailsApi,
 } from '@apis/orderApi';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
@@ -17,7 +18,6 @@ import { convertWeekDay, getSeparatedDates } from '@utils/dates';
 import { EListingStates, EOrderStates } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TPagination } from '@utils/types';
-import cloneDeep from 'lodash/cloneDeep';
 import { DateTime } from 'luxon';
 
 import { selectRestaurantPageThunks } from './SelectRestaurantPage.slice';
@@ -80,6 +80,7 @@ const FETCH_ORDER = 'app/Order/FETCH_ORDER';
 const FETCH_ORDER_DETAIL = 'app/Order/FETCH_ORDER_DETAIL';
 const INITIATE_TRANSACTIONS = 'app/Order/INITIATE_TRANSACTIONS';
 const QUERY_SUB_ORDERS = 'app/Order/QUERY_SUB_ORDERS';
+const UPDATE_PLAN_DETAIL = 'app/Order/UPDATE_PLAN_DETAIL';
 
 const initialState: TOrderInitialState = {
   order: null,
@@ -140,7 +141,7 @@ const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
     companyId: clientId,
     bookerId,
   };
-  const { data: orderListing } = await createOrderApi(apiBody);
+  const { data: orderListing } = await createBookerOrderApi(apiBody);
   return orderListing;
 });
 
@@ -188,31 +189,27 @@ const updateOrder = createAsyncThunk(
       ? DateTime.fromMillis(deadlineDate)
           .startOf('day')
           .plus({
-            hours: parseInt(deadlineHour.split(':')[0], 10),
-            minutes: parseInt(deadlineHour.split(':')[1], 10),
+            ...convertHHmmStringToTimeParts(deadlineHour),
           })
           .toMillis()
       : null;
 
-    const apiBody: UpdateOrderApiBody = {
-      orderId,
+    const apiBody: TUpdateOrderApiBody = {
       generalInfo: {
         ...generalInfo,
         ...(parsedDeadlineDate ? { deadlineDate: parsedDeadlineDate } : {}),
       },
-      orderDetail: orderDetailParams
-        ? cloneDeep(orderDetailParams)
-        : orderDetail,
+      orderDetail: orderDetailParams || orderDetail,
     };
-    const { data: orderListing } = await updateOrderApi(apiBody);
+    const { data: orderListing } = await updateOrderApi(orderId, apiBody);
     return orderListing;
   },
 );
 
 const initiateTransactions = createAsyncThunk(
   INITIATE_TRANSACTIONS,
-  async (params: any) => {
-    await initiateTransactionsApi(params);
+  async (_) => {
+    // await initiateTransactionsApi(params);
     return '';
   },
 );
@@ -331,6 +328,18 @@ const fetchOrder = createAsyncThunk(
   },
 );
 
+const updatePlanDetail = createAsyncThunk(
+  UPDATE_PLAN_DETAIL,
+  async ({ orderId, planId, orderDetail, updateMode }: any, _) => {
+    const { data: orderListing } = await updatePlanDetailsApi(orderId, {
+      orderDetail,
+      planId,
+      updateMode,
+    });
+    return orderListing;
+  },
+);
+
 const bookerDeleteDraftOrder = createAsyncThunk(
   'app/Order/DELETE_DRAFT_ORDER',
   async ({ orderId, companyId }: TObject, { getState, dispatch }) => {
@@ -351,6 +360,7 @@ export const orderAsyncActions = {
   initiateTransactions,
   queryOrders,
   queryCompanyOrders,
+  updatePlanDetail,
 };
 
 const orderSlice = createSlice({
@@ -590,7 +600,22 @@ const orderSlice = createSlice({
       .addCase(bookerDeleteDraftOrder.rejected, (state, { payload }) => {
         state.deleteDraftOrderInProgress = false;
         state.queryOrderError = payload;
-      });
+      })
+      .addCase(updatePlanDetail.pending, (state) => ({
+        ...state,
+        updateOrderDetailInProgress: true,
+        updateOrderDetailError: null,
+      }))
+      .addCase(updatePlanDetail.fulfilled, (state, { payload }) => ({
+        ...state,
+        updateOrderDetailInProgress: false,
+        orderDetail: Listing(payload).getMetadata().orderDetail || {},
+      }))
+      .addCase(updatePlanDetail.rejected, (state, { error }) => ({
+        ...state,
+        updateOrderDetailInProgress: false,
+        updateOrderDetailError: error.message,
+      }));
   },
 });
 
