@@ -37,7 +37,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         groupMembers.forEach(({ email }: TMemberApi) => {
           members[email] = {
             ...members[email],
-            groups: members[email].groups.concat(newGroupId),
+            groups: Array.from(new Set(members[email].groups).add(newGroupId)),
           };
         });
 
@@ -68,7 +68,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             await integrationSdk.users.updateProfile({
               id,
               metadata: {
-                groupList: groupList.concat(newGroupId),
+                groupList: Array.from(new Set(groupList).add(newGroupId)),
               },
             });
           }),
@@ -100,19 +100,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           ...(groupInfo || {}),
           members: newGroupMembers,
         };
-        if (addedMembers.length > 0) {
-          addedMembers.forEach(({ email }: TMemberApi) => {
-            members[email].groups = members[email].groups.concat(groupId);
-          });
-        }
 
-        if (deletedMembers.length > 0) {
-          deletedMembers.forEach(({ email }: TMemberApi) => {
-            members[email].groups = members[email].groups.filter(
-              (_groupId: string) => _groupId !== groupId,
-            );
-          });
-        }
+        addedMembers.forEach(({ email }: TMemberApi) => {
+          members[email].groups = Array.from(
+            new Set(members[email].groups).add(groupId),
+          );
+        });
+
+        deletedMembers.forEach(({ email }: TMemberApi) => {
+          members[email].groups = members[email].groups.filter(
+            (_groupId: string) => _groupId !== groupId,
+          );
+        });
 
         const updatedCompanyAccountResponse =
           await integrationSdk.users.updateProfile(
@@ -140,7 +139,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             await integrationSdk.users.updateProfile({
               id,
               metadata: {
-                groupList: groupList.concat(groupId),
+                groupList: Array.from(new Set(groupList).add(groupId)),
               },
             });
           }),
