@@ -10,11 +10,14 @@ const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 const createOrder = async ({
   companyId,
   bookerId,
+  isCreatedByAdmin,
 }: {
   companyId: string;
   bookerId: string;
+  isCreatedByAdmin: boolean;
 }) => {
   const integrationSdk = getIntegrationSdk();
+  const createdAt = new Date();
 
   // Count order number
   const adminAccount = await getAdminAccount();
@@ -34,6 +37,20 @@ const createOrder = async ({
     .toString()
     .padStart(5, '0')}`;
 
+  // Prepare order state history
+  const initStateHistory = [
+    {
+      state: EOrderStates.draft,
+      time: createdAt,
+    },
+  ];
+  const orderStateHistory = isCreatedByAdmin
+    ? initStateHistory
+    : initStateHistory.push({
+        state: EOrderStates.isNew,
+        time: createdAt,
+      });
+
   // Call api to create order listing
   const orderListingResponse = await integrationSdk.listings.create(
     {
@@ -44,7 +61,8 @@ const createOrder = async ({
         companyId,
         bookerId,
         listingType: ListingTypes.ORDER,
-        orderState: EOrderStates.isNew,
+        orderState: isCreatedByAdmin ? EOrderStates.draft : EOrderStates.isNew,
+        orderStateHistory,
       },
     },
     { expand: true },
