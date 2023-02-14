@@ -86,6 +86,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
             <FieldTextInput
               id="deadlineDate"
               name="deadlineDate"
+              rootClassName={css.customInput}
               disabled
               format={(value) => {
                 return value
