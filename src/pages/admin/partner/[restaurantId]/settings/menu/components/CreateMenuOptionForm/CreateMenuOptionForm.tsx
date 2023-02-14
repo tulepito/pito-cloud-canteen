@@ -91,6 +91,9 @@ const CreateMenuOptionFormComponent: React.FC<
               className={css.fieldSelect}
               name="duplicateId"
               id="duplicateId">
+              <option value="" disabled>
+                Chọn Menu
+              </option>
               {options.map((opt) => (
                 <option value={opt.key} key={opt.key}>
                   {opt.label}

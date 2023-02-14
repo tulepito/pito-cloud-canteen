@@ -8,6 +8,7 @@ import {
   numberMinLength,
   required,
 } from '@utils/validators';
+import classNames from 'classnames';
 import type { FormApi } from 'final-form';
 import React from 'react';
 import { useIntl } from 'react-intl';
@@ -17,10 +18,14 @@ import css from './FieldMenuApplyTimeGroup.module.scss';
 type TFieldMenuApplyTimeGroup = {
   values: any;
   form: FormApi;
+  dateInputClassName?: string;
+  className?: string;
+  inputFieldsClassName?: string;
 };
 
 const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
-  const { values, form } = props;
+  const { values, form, dateInputClassName, className, inputFieldsClassName } =
+    props;
   const intl = useIntl();
   const setStartDate = (date: Date) => {
     form.change('startDate', date);
@@ -29,15 +34,15 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
   const today = new Date();
 
   return (
-    <div>
-      <div className={css.fields}>
+    <div className={classNames(css.root, className)}>
+      <div className={classNames(css.fields, inputFieldsClassName)}>
         <FieldDatePicker
           id="startDate"
           name="startDate"
           selected={values.startDate}
           onChange={setStartDate}
           minDate={today}
-          className={css.inputDate}
+          className={classNames(css.inputDate, dateInputClassName)}
           dateFormat={'dd MMMM, yyyy'}
           placeholderText={'Nhập ngày bắt đầu'}
           autoComplete="off"

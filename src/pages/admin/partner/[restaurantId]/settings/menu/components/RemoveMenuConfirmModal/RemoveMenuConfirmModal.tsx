@@ -25,7 +25,6 @@ const RemoveMenuConfirmModal: React.FC<TRemoveMenuConfirmModal> = (props) => {
     onDeleteMenu,
     removeMenuInProgress,
   } = props;
-
   const dispatch = useAppDispatch();
 
   const isCheckingMenuInTransactionProgress = useAppSelector(
@@ -55,9 +54,6 @@ const RemoveMenuConfirmModal: React.FC<TRemoveMenuConfirmModal> = (props) => {
       return (
         <div className={css.preventRemoveMenuContainer}>
           <IconDanger />
-          <h3>
-            <FormattedMessage id="ManagePartnerMenu.preventRemoveTitle" />
-          </h3>
           <p className={css.preventRemoveMenuContent}>
             <FormattedMessage
               id="ManagePartnerMenu.preventRemoveContent"
@@ -77,9 +73,6 @@ const RemoveMenuConfirmModal: React.FC<TRemoveMenuConfirmModal> = (props) => {
     }
     return (
       <>
-        <div className={css.removeTitle}>
-          <FormattedMessage id="ManagePartnerMenu.removeTitle" />
-        </div>
         <p className={css.removeContent}>
           <FormattedMessage
             id="ManagePartnerMenu.removeContent"
@@ -100,6 +93,17 @@ const RemoveMenuConfirmModal: React.FC<TRemoveMenuConfirmModal> = (props) => {
     <AlertModal
       isOpen={menuToRemove}
       handleClose={onClearMenuToRemove}
+      title={
+        isInTransactionProgress ? (
+          <span className={css.removeTitle}>
+            <FormattedMessage id="ManagePartnerMenu.preventRemoveTitle" />
+          </span>
+        ) : (
+          <span className={css.removeTitle}>
+            <FormattedMessage id="ManagePartnerMenu.removeTitle" />
+          </span>
+        )
+      }
       onCancel={onClearMenuToRemove}
       onConfirm={onDeleteMenu}
       cancelLabel={isCheckingMenuInTransactionProgress ? '' : 'Hủy'}
@@ -110,6 +114,7 @@ const RemoveMenuConfirmModal: React.FC<TRemoveMenuConfirmModal> = (props) => {
       }
       confirmInProgress={removeMenuInProgress}
       confirmDisabled={removeMenuInProgress}
+      childrenClassName={css.modalChildren}
       cancelClassName={
         !isInTransactionProgress || isCheckingMenuInTransactionProgress
           ? ''

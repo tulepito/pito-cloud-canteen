@@ -110,7 +110,7 @@ const CHECK_MENU_IS_IN_TRANSACTION_PROGRESS =
 const queryPartnerMenus = createAsyncThunk(
   QUERY_PARTNER_MENUS,
   async (payload: any, { extra: sdk }) => {
-    const { restaurantId, menuType, mealType, keywords } = payload;
+    const { restaurantId, menuType, mealType, keywords, page } = payload;
     const response = await sdk.listings.query({
       keywords,
       meta_menuType: menuType,
@@ -118,6 +118,7 @@ const queryPartnerMenus = createAsyncThunk(
       meta_restaurantId: restaurantId,
       pub_mealType: mealType,
       meta_isDeleted: false,
+      page,
       perPage: MANAGE_MENU_PAGE_SIZE,
     });
     const menus = denormalisedResponseEntities(response);

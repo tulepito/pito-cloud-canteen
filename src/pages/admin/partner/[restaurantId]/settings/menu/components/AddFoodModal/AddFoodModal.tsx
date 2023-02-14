@@ -236,7 +236,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
       />
       {queryFoodsInProgress ? (
         <LoadingContainer />
-      ) : (
+      ) : tableData.length > 0 ? (
         <div className={css.foodPickContainer}>
           <div className={css.tableContainer}>
             <Table
@@ -298,6 +298,8 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
             </div>
           </div>
         </div>
+      ) : (
+        <div>Không có kết quả trả về</div>
       )}
     </Modal>
   );
