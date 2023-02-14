@@ -9,13 +9,14 @@ import { getSubAccountSdk } from '@services/subAccountSdk';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { parseTimestampToFormat } from '@utils/dates';
-import { EOrderStates } from '@utils/enums';
+import { EListingStates, EOrderStates } from '@utils/enums';
 import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HTTP_METHODS } from '../helpers/constants';
 
 const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const integrationSdk = getIntegrationSdk();
   const apiMethod = req.method;
@@ -26,7 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     case HTTP_METHODS.POST:
       try {
-        const { companyId, bookerId } = req.body;
+        const { companyId, bookerId, isCreatedByAdmin } = req.body;
         const adminAccount = await getAdminAccount();
         const { currentOrderNumber = 0 } =
           adminAccount.attributes.profile.metadata;
@@ -39,16 +40,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const companyAccount = await fetchUser(companyId);
         const { subAccountId } = companyAccount.attributes.profile.privateData;
         const subCompanyAccount = await fetchUser(subAccountId);
-        const loggedinSubAccount = await getSubAccountSdk(subCompanyAccount);
+        const loggedInSubAccount = await getSubAccountSdk(subCompanyAccount);
         const generatedOrderId = `PT${(currentOrderNumber + 1)
           .toString()
           .padStart(5, '0')}`;
-        const draftedOrderListinResponse =
-          await loggedinSubAccount.ownListings.create({
+
+        const draftedOrderListingResponse =
+          await loggedInSubAccount.ownListings.create({
             title: generatedOrderId,
+            // TODO: if api is called by admin account, create a listing need approval (by booker).
+            state: isCreatedByAdmin
+              ? EListingStates.pendingApproval
+              : EListingStates.published,
           });
+
         const draftedOrderListing = denormalisedResponseEntities(
-          draftedOrderListinResponse,
+          draftedOrderListingResponse,
         )[0];
         const updatedDraftOrderListingResponse =
           await integrationSdk.listings.update(
@@ -71,6 +78,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         handleError(res, error);
       }
       break;
+
     case HTTP_METHODS.PUT:
       try {
         const { orderId, generalInfo, orderDetail = {} } = req.body;
