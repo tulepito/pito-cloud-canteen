@@ -135,10 +135,11 @@ const initialState: TOrderInitialState = {
 };
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
-  const { clientId, bookerId } = params;
+  const { clientId, bookerId, isCreatedByAdmin = false } = params;
   const apiBody = {
     companyId: clientId,
     bookerId,
+    isCreatedByAdmin,
   };
   const { data: orderListing } = await createOrderApi(apiBody);
   return orderListing;
@@ -149,7 +150,13 @@ const updateOrder = createAsyncThunk(
   async (params: any, { getState, dispatch }) => {
     const { order } = getState().Order;
     const { generalInfo, orderDetail: orderDetailParams } = params;
-    const { deadlineDate, deadlineHour } = generalInfo || {};
+    const {
+      deadlineDate,
+      deadlineHour,
+      packagePerMember,
+      deliveryHour,
+      nutritions,
+    } = generalInfo || {};
     const orderId = Listing(order as TListing).getId();
     const orderDetail: any = {};
     if (!orderDetailParams) {
@@ -165,21 +172,26 @@ const updateOrder = createAsyncThunk(
             const { payload }: { payload: any } = await dispatch(
               selectRestaurantPageThunks.getRestaurants({
                 dateTime: DateTime.fromMillis(dateTime),
+                packagePerMember,
+                deliveryHour,
+                nutritions,
               }),
             );
             const { restaurants = [] } = payload || {};
-            const randomNumber = Math.floor(
-              Math.random() * (restaurants.length - 1),
-            );
-            orderDetail[dateTime] = {
-              restaurant: {
-                id: Listing(restaurants[0]?.restaurantInfo).getId(),
-                restaurantName: Listing(
-                  restaurants[randomNumber]?.restaurantInfo,
-                ).getAttributes().title,
-                foodList: [],
-              },
-            };
+            if (restaurants.length > 0) {
+              const randomNumber = Math.floor(
+                Math.random() * (restaurants.length - 1),
+              );
+              orderDetail[dateTime] = {
+                restaurant: {
+                  id: Listing(restaurants[0]?.restaurantInfo).getId(),
+                  restaurantName: Listing(
+                    restaurants[randomNumber]?.restaurantInfo,
+                  ).getAttributes().title,
+                  foodList: [],
+                },
+              };
+            }
           }
         }),
       );

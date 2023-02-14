@@ -90,25 +90,25 @@ export const sortCompanies = (
   return [...companies].sort((a, b) => {
     if (isSortAZ) {
       if (
-        User(a).getPublicData().companyName.toLowerCase() <
-        User(b).getPublicData().companyName.toLowerCase()
+        User(a).getPublicData()?.companyName?.toLowerCase() <
+        User(b).getPublicData()?.companyName?.toLowerCase()
       )
         return -1;
       if (
-        User(a).getPublicData().companyName.toLowerCase() >
-        User(b).getPublicData().companyName.toLowerCase()
+        User(a).getPublicData()?.companyName?.toLowerCase() >
+        User(b).getPublicData()?.companyName?.toLowerCase()
       )
         return 1;
       return 0;
     }
     if (
-      User(b).getPublicData().companyName.toLowerCase() <
-      User(a).getPublicData().companyName.toLowerCase()
+      User(b).getPublicData()?.companyName?.toLowerCase() <
+      User(a).getPublicData()?.companyName?.toLowerCase()
     )
       return -1;
     if (
-      User(b).getPublicData().companyName.toLowerCase() >
-      User(a).getPublicData().companyName.toLowerCase()
+      User(b).getPublicData()?.companyName?.toLowerCase() >
+      User(a).getPublicData()?.companyName?.toLowerCase()
     )
       return 1;
     return 0;

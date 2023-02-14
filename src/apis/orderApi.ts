@@ -6,6 +6,7 @@ import { deleteApi, getApi, postApi, putApi } from './configs';
 type CreateOrderApiBody = {
   companyId: string;
   bookerId: string;
+  isCreatedByAdmin?: boolean;
 };
 export const createOrderApi = (body: CreateOrderApiBody) =>
   postApi('/orders', body);
