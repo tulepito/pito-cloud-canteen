@@ -1,9 +1,7 @@
 @use '/src/styles/defaults.scss' as *;
 
 .root {
-  & > input {
-    @include inputContainerStyles;
-  }
+  @include inputContainerStyles;
   .input {
     width: 100%;
   }
