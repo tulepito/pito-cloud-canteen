@@ -1,0 +1,62 @@
+{
+  :format :v3
+  :transitions [
+  {
+    :name :transition/initiate-transaction,
+    :actor :actor.role/customer,
+    :actions [],
+    :to :state/initiated
+    :privileged? true
+  }
+  {
+    :name :transition/start-delivery,
+    :actor :actor.role/operator,
+    :actions [],
+    :from :state/initiated
+    :to :state/delivering
+    :privileged? true
+  }
+  {
+    :name :transition/operator-cancel-plan,
+    :actor :actor.role/operator,
+    :actions [],
+    :from :state/initiated
+    :to :state/canceled
+    :privileged? true
+  }
+  {
+    :name :transition/cancel-delivery,
+    :actor :actor.role/operator,
+    :actions [],
+    :from :state/delivering
+    :to :state/failed-delivery
+    :privileged? true
+  }
+  {
+    :name :transition/complete-delivery,
+    :actor :actor.role/operator,
+    :actions [],
+    :from :state/delivering
+    :to :state/delivered
+    :privileged? true
+  }
+  {
+    :name :transition/participant-review,
+    :actor :actor.role/operator,
+    :actions [],
+    :from :state/delivered
+    :to :state/reviewed
+    :privileged? true
+  }  
+  {
+    :name :transition/expired-review,
+    :at {:fn/plus [
+                  {:fn/timepoint [:time/first-entered-state :state/delivered]}
+                  {:fn/period ["P14D"]}]}
+    :actions [],
+    :from :state/delivered
+    :to :state/reviewed
+    :privileged? true
+  }
+  ]
+}
