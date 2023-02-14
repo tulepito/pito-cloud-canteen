@@ -168,18 +168,20 @@ const updateOrder = createAsyncThunk(
               }),
             );
             const { restaurants = [] } = payload || {};
-            const randomNumber = Math.floor(
-              Math.random() * (restaurants.length - 1),
-            );
-            orderDetail[dateTime] = {
-              restaurant: {
-                id: Listing(restaurants[0].restaurantInfo).getId(),
-                restaurantName: Listing(
-                  restaurants[randomNumber].restaurantInfo,
-                ).getAttributes().title,
-                foodList: [],
-              },
-            };
+            if (restaurants.length > 0) {
+              const randomNumber = Math.floor(
+                Math.random() * (restaurants.length - 1),
+              );
+              orderDetail[dateTime] = {
+                restaurant: {
+                  id: Listing(restaurants[0]?.restaurantInfo).getId(),
+                  restaurantName: Listing(
+                    restaurants[randomNumber]?.restaurantInfo,
+                  ).getAttributes().title,
+                  foodList: [],
+                },
+              };
+            }
           }
         }),
       );
