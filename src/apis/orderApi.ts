@@ -3,32 +3,32 @@ import type { TObject } from '@utils/types';
 import type { TBodyParams } from './configs';
 import { deleteApi, getApi, postApi, putApi } from './configs';
 
-type CreateOrderApiBody = {
+// Manage Order apis
+type TCreateBookerOrderApiBody = {
   companyId: string;
   bookerId: string;
+  isCreatedByAdmin?: boolean;
 };
-export const createOrderApi = (body: CreateOrderApiBody) =>
-  postApi('/orders', body);
 
-type UpdateOrderApiBody = {
-  orderId: string;
+export type TUpdateOrderApiBody = {
+  orderId?: string;
   generalInfo?: {
-    deliveryAddress: {
+    deliveryAddress?: {
       address: string;
       origin: {
         lat: number;
         lng: number;
       };
     };
-    startDate: number;
-    endDate: number;
-    deliveryHour: string;
-    selectedGroups: string[];
-    packagePerMember: number;
-    deadlineDate: number;
-    deadlineHour: string;
+    startDate?: number;
+    endDate?: number;
+    deliveryHour?: string;
+    selectedGroups?: string[];
+    packagePerMember?: number;
+    deadlineDate?: number;
+    deadlineHour?: string;
     period?: number;
-    nutritions: string[];
+    nutritions?: string[];
     staffName?: string;
     shipperName?: string;
   };
@@ -47,45 +47,32 @@ type UpdateOrderApiBody = {
     };
   };
 };
-export const updateOrderApi = (body: UpdateOrderApiBody) =>
-  putApi('/orders', body);
 
-type AddMealPlanDetailApiBody = {
-  orderId: string;
-};
-export const addMealPlanDetailApi = (body: AddMealPlanDetailApiBody) =>
-  postApi('/orders/plan', body);
+export const createBookerOrderApi = (body: TCreateBookerOrderApiBody) =>
+  postApi('/orders', body);
 
-type UpdateMealPlanDetailApiBody = {
-  planId: string;
-  orderDetail: {
-    [date: string]: {
-      restaurant: string; // restaurant listing id
-    };
-  };
-};
-export const updateMealPlanDetailApi = (body: UpdateMealPlanDetailApiBody) =>
-  putApi('/orders/plan', body);
-
-type CompleteOrderApiBody = {
-  orderId: string;
-  planId: string;
-};
-export const initiateTransactionsApi = (body: CompleteOrderApiBody) =>
-  putApi('/orders', body);
-
-// Booker manage order details
-export const loadBookerOrderDataApi = (orderId: string) =>
+export const getBookerOrderDataApi = (orderId: string) =>
   getApi(`/orders/${orderId}`);
 
-export const updateOrderDetailsApi = (orderId: string, body: TObject) =>
-  postApi(`/orders/${orderId}`, body);
+export const updateOrderApi = (orderId: string, body: TUpdateOrderApiBody) =>
+  putApi(`/orders/${orderId}`, body);
+// ------------------------- //
 
+// Manage Order - Plan detail
+export const createPlanDetailsApi = (orderId: string, body: TObject) =>
+  postApi(`/orders/${orderId}/plan`, body);
+
+export const updatePlanDetailsApi = (orderId: string, body: TObject) =>
+  putApi(`/orders/${orderId}/plan`, body);
+// ------------------------- //
+
+// Manage participants
 export const addParticipantToOrderApi = (orderId: string, body: TObject) =>
   postApi(`/orders/${orderId}/participant`, body);
 
 export const deleteParticipantFromOrderApi = (orderId: string, body: TObject) =>
   deleteApi(`/orders/${orderId}/participant`, body);
+// ------------------------- //
 
 export const addUpdateMemberOrder = (orderId: string, body: TObject) =>
   putApi(`/orders/${orderId}/member-order`, body);

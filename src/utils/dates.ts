@@ -246,3 +246,20 @@ export const getDayOfWeekByIndex = (index: number) => {
     (key) => DAY_AS_INDEX[key as EDayOfWeek] === index,
   ) as string;
 };
+
+export const getSeparatedDates = (
+  startDateTimestamp: number,
+  endDateTimestamp: number,
+) => {
+  let currentDateTimestamp = startDateTimestamp;
+  const separatedDates = [];
+  while (currentDateTimestamp <= endDateTimestamp) {
+    separatedDates.push(currentDateTimestamp);
+    currentDateTimestamp = DateTime.fromMillis(currentDateTimestamp)
+      .plus({
+        days: 1,
+      })
+      .toMillis();
+  }
+  return separatedDates;
+};

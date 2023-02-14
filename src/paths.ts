@@ -53,6 +53,7 @@ export const adminPaths = {
   EditPartner: '/admin/partner/[partnerId]/edit',
   ManageOrders: '/admin/order',
   CreateOrder: '/admin/order/create',
+  UpdateDraftOrder: '/admin/order/create/[orderId]',
 };
 
 // Should be an object => path should has its label
@@ -156,6 +157,10 @@ export const adminRoutes = {
   EditOrder: {
     path: '/admin/order/[orderId]',
     label: 'Tạo đơn hàng',
+  },
+  UpdateDraftOrder: {
+    path: adminPaths.UpdateDraftOrder,
+    label: 'Chỉnh sửa',
   },
 } as const;
 

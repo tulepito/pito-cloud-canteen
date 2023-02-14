@@ -1,3 +1,4 @@
+import type { TObject } from '@utils/types';
 import type { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
 
@@ -13,11 +14,13 @@ const withWeekViewWrapper = ({
   customComponents,
   inProgress,
   customHeader,
+  eventExtraProps,
 }: {
   renderEvent: any;
   customComponents?: TCalendarItemCardComponents;
   inProgress?: boolean;
   customHeader?: (params: TDayColumnHeaderProps) => ReactNode;
+  eventExtraProps?: TObject;
 }) => {
   const WeekViewWrapper = (props: any) => {
     if (inProgress) {
@@ -33,6 +36,7 @@ const withWeekViewWrapper = ({
       <WeekView
         {...props}
         renderEvent={renderEvent}
+        eventExtraProps={eventExtraProps}
         customComponents={customComponents}
         customHeader={customHeader}
       />

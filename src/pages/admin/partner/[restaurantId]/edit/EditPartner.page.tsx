@@ -27,11 +27,13 @@ const EditPartnerPage = () => {
     uploadAvatarError,
     uploadedAvatarsOrder,
     removedAvatarIds,
+    uploadingAvatars,
 
     uploadCoverError,
     uploadedCoversOrder,
     uploadedCovers,
     removedCoverIds,
+    uploadingCovers,
 
     createDraftPartnerInProgress,
     createDraftPartnerError,
@@ -47,16 +49,19 @@ const EditPartnerPage = () => {
     uploadBusinessLicenseError,
     removedBusinessLicenseIds,
     uploadedBusinessLicensesOrder,
+    uploadingBusinessLicenses,
 
     uploadedFoodCertificate,
     uploadFoodCertificateError,
     removedFoodCertificateIds,
     uploadedFoodCertificatesOrder,
+    uploadingFoodCertificates,
 
     uploadedPartyInsurance,
     uploadPartyInsuranceError,
     removedPartyInsuranceIds,
     uploadedPartyInsurancesOrder,
+    uploadingPartyInsurances,
 
     publishDraftPartnerInProgress,
     publishDraftPartnerError,
@@ -138,6 +143,14 @@ const EditPartnerPage = () => {
     if (!restaurantId) return;
     dispatch(partnerThunks.showPartnerRestaurantListing(restaurantId));
   }, [restaurantId]);
+
+  console.log({
+    uploadingAvatars,
+    uploadingCovers,
+    uploadingBusinessLicenses,
+    uploadingFoodCertificates,
+    uploadingPartyInsurances,
+  });
 
   let content;
   if (showPartnerListingInProgress) {
@@ -221,6 +234,13 @@ const EditPartnerPage = () => {
         onRemovePartyInsurance={onRemovePartyInsurance}
         onSetAuthorized={onSetAuthorized}
         onSetUnsatisfactory={onSetUnsatisfactory}
+        uploadingImage={
+          uploadingAvatars ||
+          uploadingCovers ||
+          uploadingBusinessLicenses ||
+          uploadingFoodCertificates ||
+          uploadingPartyInsurances
+        }
       />
     );
   } else {

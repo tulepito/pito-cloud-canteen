@@ -166,7 +166,7 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
     } else {
       form.change('checkAll', true);
     }
-  }, [currentOptions.length, selectedFoodListLength, shouldCheckAll]);
+  }, [currentOptions.length, form, selectedFoodListLength, shouldCheckAll]);
 
   return (
     <Form onSubmit={handleSubmit}>

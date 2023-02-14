@@ -2,9 +2,9 @@ import {
   addParticipantToOrderApi,
   addUpdateMemberOrder,
   deleteParticipantFromOrderApi,
-  loadBookerOrderDataApi,
+  getBookerOrderDataApi,
   sendRemindEmailToMemberApi,
-  updateOrderDetailsApi,
+  updateOrderApi,
 } from '@apis/orderApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
@@ -51,7 +51,7 @@ const initialState: TOrderManagementState = {
 const loadData = createAsyncThunk(
   'app/OrderManagement/LOAD_DATA',
   async (orderId: string) => {
-    const response = await loadBookerOrderDataApi(orderId);
+    const response: any = await getBookerOrderDataApi(orderId);
     return response.data;
   },
 );
@@ -62,22 +62,15 @@ const updateOrderGeneralInfo = createAsyncThunk(
     const orderData = getState().OrderManagement.orderData!;
     const {
       id: { uuid: orderId },
-      attributes: { metadata },
     } = orderData;
 
     const updateParams = {
-      data: {
-        metadata: {
-          ...metadata,
-          generalInfo: {
-            ...metadata.generalInfo,
-            ...params,
-          },
-        },
+      generalInfo: {
+        ...params,
       },
     };
 
-    await updateOrderDetailsApi(orderId, updateParams);
+    await updateOrderApi(orderId, updateParams);
     await dispatch(loadData(orderId));
   },
 );

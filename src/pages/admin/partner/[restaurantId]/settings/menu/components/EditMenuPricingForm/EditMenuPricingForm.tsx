@@ -184,8 +184,8 @@ const EditMenuPricingFormComponent: React.FC<
           <CalendarDashboard
             renderEvent={FoodEventCard}
             events={resourcesForCalendar}
-            headerComponent={(params) => (
-              <DayOfWeekCalendarHeader {...params} />
+            headerComponent={(headerProps) => (
+              <DayOfWeekCalendarHeader {...headerProps} />
             )}
             components={{
               toolbar: () => <></>,

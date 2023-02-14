@@ -153,11 +153,14 @@ const CreateOrderWizard = () => {
         order as TListing,
       ).getMetadata();
       if (staffName) {
+        setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, REVIEW_TAB);
         return setCurrentStep(REVIEW_TAB);
       }
       if (plans.length > 0) {
+        setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, CREATE_MEAL_PLAN_TAB);
         return setCurrentStep(CREATE_MEAL_PLAN_TAB);
       }
+      setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, MEAL_PLAN_SETUP);
       return setCurrentStep(MEAL_PLAN_SETUP);
     }
   }, [order]);

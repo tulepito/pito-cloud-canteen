@@ -9,6 +9,7 @@ import type { TListing } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
 
 // eslint-disable-next-line import/no-cycle
 import type { TSelectFoodFormValues } from '../SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
@@ -17,7 +18,7 @@ import RestaurantTable from './components/RestaurantTable/RestaurantTable';
 import SearchRestaurantForm from './components/SearchRestaurantForm/SearchRestaurantForm';
 import css from './SelectRestaurantPage.module.scss';
 
-const DEBOUNCE_TIME = 300;
+const DEBOUNCE_TIME = 500;
 
 type TSelectRestaurantPageProps = {
   onSubmitRestaurant: (values: Record<string, any>) => void;
@@ -34,19 +35,31 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   const intl = useIntl();
   const { value: isModalOpen, setValue: setModalOpen } = useBoolean();
   const dispatch = useAppDispatch();
+  const restaurants = useAppSelector(
+    (state) => state.SelectRestaurantPage.restaurants,
+    shallowEqual,
+  );
+  const pagination = useAppSelector(
+    (state) => state.SelectRestaurantPage.pagination,
+    shallowEqual,
+  );
+  const foodList = useAppSelector(
+    (state) => state.SelectRestaurantPage.foodList,
+    shallowEqual,
+  );
+  const fetchFoodPending = useAppSelector(
+    (state) => state.SelectRestaurantPage.fetchFoodPending,
+  );
+  const fetchRestaurantsPending = useAppSelector(
+    (state) => state.SelectRestaurantPage.fetchRestaurantsPending,
+  );
+  const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const {
-    Order: { order },
-    SelectRestaurantPage: {
-      restaurants,
-      pagination,
-      foodList,
-      fetchFoodPending,
-      fetchRestaurantsPending,
-    },
-  } = useAppSelector((state) => state);
-  const { deliveryHour, deliveryAddress } = Listing(
-    order as TListing,
-  ).getMetadata();
+    deliveryHour,
+    deliveryAddress,
+    packagePerMember,
+    nutritions = [],
+  } = Listing(order as TListing).getMetadata();
   const shouldShowRestaurantPagination =
     !!restaurants && restaurants?.length > 0 && fetchRestaurantsPending;
   const {
@@ -74,6 +87,10 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   const handlePageChange = (page: number) => {
     const params = {
       page,
+      dateTime,
+      packagePerMember,
+      deliveryHour,
+      nutritions,
     };
     dispatch(selectRestaurantPageThunks.getRestaurants(params));
   };
@@ -89,7 +106,15 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     }
 
     currDebounceRef = setTimeout(() => {
-      dispatch(selectRestaurantPageThunks.getRestaurants({ title }));
+      dispatch(
+        selectRestaurantPageThunks.getRestaurants({
+          dateTime,
+          title,
+          packagePerMember,
+          deliveryHour,
+          nutritions,
+        }),
+      );
     }, DEBOUNCE_TIME);
   };
 
@@ -126,17 +151,28 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   };
 
   const handleRestaurantClick = (restaurant: any) => () => {
-    const { restaurantInfo } = restaurant;
-    const restaurantId = Listing(restaurantInfo).getId();
+    const { restaurantInfo, menu } = restaurant;
 
-    dispatch(selectRestaurantPageThunks.getRestaurantFood(restaurantId));
+    dispatch(
+      selectRestaurantPageThunks.getRestaurantFood({
+        dateTime,
+        menuId: Listing(menu).getId(),
+      }),
+    );
     setCurrentRestaurant(restaurantInfo);
     setModalOpen(true);
   };
 
   useEffect(() => {
-    dispatch(selectRestaurantPageThunks.getRestaurants({ dateTime }));
-  }, [dispatch]);
+    dispatch(
+      selectRestaurantPageThunks.getRestaurants({
+        dateTime,
+        packagePerMember,
+        deliveryHour,
+        nutritions,
+      }),
+    );
+  }, [deliveryHour, dispatch, nutritions, packagePerMember]);
 
   return (
     <section className={css.root}>

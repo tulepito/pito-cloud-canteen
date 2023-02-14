@@ -74,7 +74,7 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
                 intl.formatMessage({
                   id: 'EditMenuInformationForm.numberOfCyclesMinLength',
                 }),
-                0,
+                1,
               ),
               required(
                 intl.formatMessage({

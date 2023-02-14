@@ -70,8 +70,10 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
           if (!value) {
             return;
           }
-          const rawEmailListValue = value.split(', ');
-
+          const rawEmailListValue = value
+            .trim()
+            .split(', ')
+            .map((email: string) => email.trim());
           const emailListValue = difference(
             rawEmailListValue,
             restrictEmailList,

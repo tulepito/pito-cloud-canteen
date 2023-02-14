@@ -135,6 +135,7 @@ const EditPartnerWizard = (props: any) => {
     onDiscardDraftPartner,
     onSetAuthorized,
     onSetUnsatisfactory,
+    uploadingImage,
   } = props;
   const intl = useIntl();
   const router = useRouter();
@@ -230,6 +231,7 @@ const EditPartnerWizard = (props: any) => {
           onSetAuthorized={onSetAuthorized}
           onSetUnsatisfactory={onSetUnsatisfactory}
           goBack={handleGoBack(tab)}
+          disabled={uploadingImage}
         />
       ))}
     </FormWizard>

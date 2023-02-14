@@ -12,7 +12,7 @@ type TFoodDataValue = {
 
 type TFoodDataMap = TObject<string, TFoodDataValue>;
 
-const getFoodDataMap = ({ foodListOfDate, memberOrders }: any) => {
+const getFoodDataMap = ({ foodListOfDate = {}, memberOrders }: any) => {
   return Object.entries(memberOrders).reduce<TFoodDataMap>(
     (foodFrequencyResult, currentMemberOrderEntry) => {
       const [, memberOrderData] = currentMemberOrderEntry;

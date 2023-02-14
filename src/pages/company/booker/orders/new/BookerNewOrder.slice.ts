@@ -1,40 +1,67 @@
+import { queryMyCompaniesApi } from '@apis/userApi';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { updateDraftMealPlan } from '@redux/slices/Order.slice';
 import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
 
 // ================ Initial states ================ //
 type TBookerNewOrderState = {
-  submitInprogress: boolean;
-  submitError: any | null;
+  queryInprogress: boolean;
+  queryError?: any;
+  myCompanies: any[];
 };
 const initialState: TBookerNewOrderState = {
-  submitInprogress: false,
-  submitError: null,
+  queryInprogress: false,
+  queryError: null,
+  myCompanies: [],
 };
 
 // ================ Thunk types ================ //
-const CREATE_DRAFT_ORDER = 'app/bookerNewOrder/createDraftOrder';
+const QUERY_MY_COMPANIES = 'app/bookerNewOrder/queryMyCompanies';
 
 // ================ Async thunks ================ //
-const createDraftOrder = createAsyncThunk(
-  CREATE_DRAFT_ORDER,
-  (data: any, { dispatch }) => {
-    dispatch(updateDraftMealPlan(data));
+const queryMyCompanies = createAsyncThunk(
+  QUERY_MY_COMPANIES,
+  async (_) => {
+    // call api
+    const companyList = await queryMyCompaniesApi();
+    return companyList.data;
   },
   {
     serializeError: storableError,
   },
 );
 
-export const BookerNewOrderThunks = { createDraftOrder };
+export const BookerNewOrderThunks = { queryMyCompanies };
 
 // ================ Slice ================ //
 const BookerNewOrderSlice = createSlice({
   name: 'BookerNewOrder',
   initialState,
   reducers: {},
-  extraReducers: () => {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(queryMyCompanies.pending, (state) => {
+        return {
+          ...state,
+          queryInprogress: true,
+          queryError: null,
+        };
+      })
+      .addCase(queryMyCompanies.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          queryInprogress: false,
+          myCompanies: payload,
+        };
+      })
+      .addCase(queryMyCompanies.rejected, (state, { error }) => {
+        return {
+          ...state,
+          queryInprogress: false,
+          queryError: error,
+        };
+      });
+  },
 });
 
 // ================ Actions ================ //

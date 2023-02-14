@@ -1,29 +1,15 @@
-import Form from '@components/Form/Form';
 import { calculateGroupMembersAmount } from '@helpers/company';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { Listing, User } from '@utils/data';
+import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 import isEmpty from 'lodash/isEmpty';
-import { useMemo } from 'react';
-import type { FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
+import { useCallback, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 
-import DayInWeekField from '../../create/components/DayInWeekField/DayInWeekField';
-import DeliveryAddressField from '../../create/components/DeliveryAddressField/DeliveryAddressField';
-import FoodPickingField from '../../create/components/FoodPickingField/FoodPickingField';
-import MealPlanDateField from '../../create/components/MealPlanDateField/MealPlanDateField';
-import MemberAmountField from '../../create/components/MemberAmountField/MemberAmountField';
 // eslint-disable-next-line import/no-cycle
-import NavigateButtons from '../../create/components/NavigateButtons/NavigateButtons';
-import NutritionField from '../../create/components/NutritionField/NutritionField';
-import OrderDeadlineField from '../../create/components/OrderDeadlineField/OrderDeadlineField';
-import ParticipantSetupField from '../../create/components/ParticipantSetupField/ParticipantSetupField';
-import PerPackageField from '../../create/components/PerPackageField/PerPackageField';
-import css from './MealPlanSetup.module.scss';
+import MealPlanSetupForm from '../../create/components/MealPlanSetupForm/MealPlanSetupForm';
 
 type MealPlanSetupProps = {
   goBack: () => void;
@@ -32,11 +18,7 @@ type MealPlanSetupProps = {
 const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   const { nextTab } = props;
   const dispatch = useAppDispatch();
-  const intl = useIntl();
 
-  const updateOrderInProgress = useAppSelector(
-    (state) => state.Order.updateOrderInProgress,
-  );
   const selectedBooker = useAppSelector(
     (state) => state.Order.selectedBooker,
     shallowEqual,
@@ -73,35 +55,41 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     location,
   } = currentClient?.attributes.profile.publicData || {};
 
-  const onSubmit = (values: any) => {
-    const {
-      deliveryAddress: deliveryAddressValues,
-      packagePerMember: packagePerMemberValue,
-      pickAllow: pickAllowSubmitValue,
-      deadlineDate: deadlineDateSubmitValue,
-      deadlineHour: deadlineHourSubmitValue,
-      selectedGroups: selectedGroupsSubmitValue,
-      ...rest
-    } = values;
-    const {
-      selectedPlace: { address: addressValue, origin: originValue },
-    } = deliveryAddressValues;
-    const generalInfo = {
-      deliveryAddress: {
-        address: addressValue,
-        origin: originValue,
-      },
-      pickAllow: pickAllowSubmitValue,
-      packagePerMember: +packagePerMemberValue.replace(/,/g, '') || 0,
-      selectedGroups: pickAllowSubmitValue ? selectedGroupsSubmitValue : [],
-      deadlineDate: pickAllowSubmitValue ? deadlineDateSubmitValue : null,
-      deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
-      ...rest,
-    };
-    dispatch(orderAsyncActions.updateOrder({ generalInfo })).then(() => {
+  const onSubmit = useCallback(
+    async (values: any) => {
+      const {
+        deliveryAddress: deliveryAddressValues,
+        packagePerMember: packagePerMemberValue,
+        pickAllow: pickAllowSubmitValue,
+        deadlineDate: deadlineDateSubmitValue,
+        deadlineHour: deadlineHourSubmitValue,
+        selectedGroups: selectedGroupsSubmitValue,
+        ...rest
+      } = values;
+      const {
+        selectedPlace: { address: addressValue, origin: originValue },
+      } = deliveryAddressValues;
+      const generalInfo = {
+        deliveryAddress: {
+          address: addressValue,
+          origin: originValue,
+        },
+        pickAllow: pickAllowSubmitValue,
+        packagePerMember: +packagePerMemberValue.replace(/,/g, '') || 0,
+        selectedGroups: pickAllowSubmitValue ? selectedGroupsSubmitValue : [],
+        deadlineDate: pickAllowSubmitValue ? deadlineDateSubmitValue : null,
+        deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
+        ...rest,
+      };
+      await dispatch(orderAsyncActions.updateOrder({ generalInfo }));
       nextTab();
-    });
-  };
+    },
+    [dispatch, nextTab],
+  );
+  const allMembersAmount =
+    memberAmount ||
+    (currentClient &&
+      calculateGroupMembersAmount(currentClient, selectedGroups));
 
   const initialValues = useMemo(
     () => ({
@@ -129,10 +117,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       endDate: endDate || '',
       deadlineDate: deadlineDate || null,
       deadlineHour: deadlineHour || '07:00',
-      memberAmount:
-        memberAmount || currentClient
-          ? calculateGroupMembersAmount(currentClient, selectedGroups)
-          : null,
+      memberAmount: allMembersAmount,
     }),
     [
       dayInWeek,
@@ -153,89 +138,16 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       endDate,
       deadlineDate,
       deadlineHour,
-      memberAmount,
-      currentClient,
+      allMembersAmount,
     ],
   );
   return (
-    <FinalForm
+    <MealPlanSetupForm
       initialValues={initialValues}
       onSubmit={onSubmit}
-      render={(formRenderProps: FormRenderProps) => {
-        const { handleSubmit, form, values } = formRenderProps;
-        const { pickAllow: pickAllowValue = true } = values;
-        return (
-          <Form onSubmit={handleSubmit}>
-            <div className={css.headerLabel}>
-              {intl.formatMessage(
-                { id: 'MealPlanSetup.headerLabel' },
-                {
-                  companyName: User(currentClient).getPublicData().companyName,
-                  bookerName: User(selectedBooker).getProfile().displayName,
-                },
-              )}
-            </div>
-            <div className={css.fieldSection}>
-              <DeliveryAddressField
-                title={intl.formatMessage({ id: 'DeliveryAddressField.title' })}
-              />
-            </div>
-            <div className={css.fieldSection}>
-              <PerPackageField
-                title={intl.formatMessage({ id: 'PerPackageField.title' })}
-              />
-              <div className={css.verticalSpace}>
-                <MemberAmountField
-                  title={intl.formatMessage({ id: 'MemberAmountField.title' })}
-                />
-              </div>
-            </div>
-            <div className={css.fieldSection}>
-              <NutritionField
-                title={intl.formatMessage({ id: 'NutritionField.title' })}
-              />
-            </div>
-            <div className={css.fieldSection}>
-              <MealPlanDateField
-                form={form}
-                values={values}
-                title={intl.formatMessage({ id: 'MealPlanDateField.title' })}
-              />
-              <div className={css.verticalSpace}>
-                <DayInWeekField form={form} values={values} />
-              </div>
-            </div>
-
-            <div className={css.fieldSection}>
-              <FoodPickingField />
-              {pickAllowValue && (
-                <div className={css.verticalSpace}>
-                  <OrderDeadlineField
-                    title={intl.formatMessage({
-                      id: 'OrderDeadlineField.title',
-                    })}
-                    form={form}
-                    values={values}
-                  />
-                </div>
-              )}
-              {pickAllowValue && (
-                <div className={css.verticalSpace}>
-                  <ParticipantSetupField
-                    form={form}
-                    clientId={clientId}
-                    title={intl.formatMessage({
-                      id: 'ParticipantSetupField.title',
-                    })}
-                  />
-                </div>
-              )}
-            </div>
-
-            <NavigateButtons inProgress={updateOrderInProgress} />
-          </Form>
-        );
-      }}
+      currentClient={currentClient}
+      selectedBooker={selectedBooker}
+      clientId={clientId}
     />
   );
 };

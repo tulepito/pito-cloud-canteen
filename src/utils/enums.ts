@@ -598,6 +598,7 @@ export const MENU_OPTIONS = [
 ];
 
 export enum EOrderStates {
+  draft = 'draft',
   isNew = 'isNew',
   canceled = 'canceled',
   picking = 'picking',

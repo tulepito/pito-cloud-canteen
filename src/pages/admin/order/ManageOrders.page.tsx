@@ -51,6 +51,7 @@ export const BADGE_TYPE_BASE_ON_ORDER_STATE = {
   [EOrderStates.reviewed]: EBadgeType.WARNING,
   [EOrderStates.completed]: EBadgeType.WARNING,
   [EOrderStates.canceled]: EBadgeType.DEFAULT,
+  [EOrderStates.draft]: EBadgeType.DEFAULT,
 };
 
 export const BADGE_CLASSNAME_BASE_ON_ORDER_STATE = {
@@ -60,6 +61,7 @@ export const BADGE_CLASSNAME_BASE_ON_ORDER_STATE = {
   [EOrderStates.picking]: css.badgeWarning,
   [EOrderStates.reviewed]: css.badgeWarning,
   [EOrderStates.canceled]: css.badgeDefault,
+  [EOrderStates.draft]: css.badgeDefault,
 };
 
 const OrderDetailTooltip = ({
@@ -69,9 +71,9 @@ const OrderDetailTooltip = ({
 }) => {
   const orderDetails = subOrders.reduce(
     (prev: any, subOrder: TIntegrationListing) => {
-      const { orderDetail } = subOrder.attributes.metadata || {};
+      const { orderDetail = {} } = subOrder.attributes.metadata || {};
       const subOrderDetails = Object.keys(orderDetail).map((key) => {
-        const { foodList, status } = orderDetail[key];
+        const { foodList = {}, status } = orderDetail[key];
         const totalPrice = Object.keys(foodList).reduce((prev, cur) => {
           const price = foodList[cur].foodPrice;
           return prev + price;
@@ -221,7 +223,11 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'state',
     label: 'Trạng thái',
-    render: ({ state }: { state: EOrderStates }) => {
+    render: ({
+      state,
+    }: {
+      state: Exclude<EOrderStates, EOrderStates.draft>;
+    }) => {
       return (
         <Badge
           containerClassName={classNames(

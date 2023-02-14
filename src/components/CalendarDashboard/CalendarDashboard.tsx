@@ -1,6 +1,6 @@
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-import type { TDefaultProps } from '@utils/types';
+import type { TDefaultProps, TObject } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
@@ -32,6 +32,8 @@ type TCalendarDashboardProps = TDefaultProps & {
   hideMonthView?: boolean;
   hideWeekView?: boolean;
   headerComponent?: (params: TDayColumnHeaderProps) => ReactNode;
+  eventExtraProps?: TObject;
+  resources?: any;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
@@ -50,6 +52,8 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   hideMonthView,
   hideWeekView,
   headerComponent,
+  eventExtraProps,
+  resources,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
 
@@ -69,6 +73,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
         renderEvent,
         customComponents: components,
         customHeader: headerComponent,
+        eventExtraProps,
       })
     : false;
 
@@ -120,6 +125,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
         localizer={localizer}
         events={events}
         views={views}
+        resources={resources}
         components={{
           toolbar: components?.toolbar || defaultToolbar,
         }}

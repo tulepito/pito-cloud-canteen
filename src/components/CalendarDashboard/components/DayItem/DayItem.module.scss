@@ -46,6 +46,13 @@
   }
 }
 
+.weekDay:hover {
+  .dayHeader {
+    background-color: $primaryPri1;
+    border-bottom: 1px solid $primaryPri2;
+  }
+}
+
 .activeHeader {
   background-color: $primaryPri1;
   border-bottom: 1px solid $primaryPri2;
