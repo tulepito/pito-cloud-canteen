@@ -7,6 +7,7 @@ import { handleError } from '@services/sdk';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import { companyInvitation } from '@utils/emailTemplate/companyInvitation';
+import uniqBy from 'lodash/uniqBy';
 import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -35,7 +36,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         await integrationSdk.users.updateProfile({
           id: userId,
           metadata: {
-            companyList: [...userCompanyList, companyId],
+            companyList: Array.from(new Set([...userCompanyList, companyId])),
           },
         });
         const { email: userEmail } = User(userAccount).getAttributes();
@@ -81,11 +82,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // Step update company account metadata
     const companyAccount = await fetchUser(companyId);
     const { members = {} } = User(companyAccount).getMetadata();
-    const newCompanyMembers = {
-      ...members,
-      ...newNoAccountMembers,
-      ...newParticipantMembersObj,
-    };
+    const newCompanyMembers = uniqBy(
+      {
+        ...members,
+        ...newNoAccountMembers,
+        ...newParticipantMembersObj,
+      },
+      'email',
+    );
 
     const updatedCompanyAccountResponse =
       await integrationSdk.users.updateProfile({
