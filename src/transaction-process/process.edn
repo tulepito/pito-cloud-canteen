@@ -37,26 +37,34 @@
     :actor :actor.role/operator,
     :actions [],
     :from :state/delivering
-    :to :state/delivered
+    :to :state/completed
     :privileged? true
   }
   {
-    :name :transition/participant-review,
+    :name :transition/review-restaurant,
     :actor :actor.role/operator,
     :actions [],
-    :from :state/delivered
-    :to :state/reviewed
-    :privileged? true
-  }  
-  {
-    :name :transition/expired-review,
-    :at {:fn/plus [
-                  {:fn/timepoint [:time/first-entered-state :state/delivered]}
-                  {:fn/period ["P14D"]}]}
-    :actions [],
-    :from :state/delivered
+    :from :state/completed
     :to :state/reviewed
     :privileged? true
   }
+    {
+    :name :transition/expired-review-time,
+    :at {:fn/plus [
+                  {:fn/timepoint [:time/first-entered-state :state/completed]}
+                  {:fn/period ["P14D"]}]}
+    :actions [],
+    :from :state/completed
+    :to :state/expired-review
+  }
+  {
+    :name :transition/review-restaurant-after-expire-time,
+    :actor :actor.role/operator,
+    :actions [],
+    :from :state/expired-review
+    :to :state/reviewed
+    :privileged? true
+  }    
+
   ]
 }

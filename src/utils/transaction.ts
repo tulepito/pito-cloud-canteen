@@ -13,8 +13,9 @@ export enum ETransition {
   OPERATOR_CANCEL_PLAN = 'transition/operator-cancel-plan',
   CANCEL_DELIVERY = 'transition/cancel-delivery',
   COMPLETE_DELIVERY = 'transition/complete-delivery',
-  PARTICIPANT_REVIEW = 'transition/participant-review',
-  EXPIRED_REVIEW = 'transition/expired-review',
+  REVIEW_RESTAURANT = 'transition/restaurant-review',
+  REVIEW_RESTAURANT_AFTER_EXPIRE_TIME = 'transition/restaurant-review-after-expire-time',
+  EXPIRED_REVIEW_TIME = 'transition/expired-review-time',
 }
 
 export enum ETransactionState {
@@ -23,8 +24,9 @@ export enum ETransactionState {
   DELIVERING = 'delivering',
   CANCELED = 'canceled',
   FAILED_DELIVERY = 'failed-delivery',
-  DELIVERED = 'delivered',
+  COMPLETED = 'completed',
   REVIEWED = 'reviewed',
+  EXPIRED_REVIEW = 'expired-review',
 }
 
 type TStateDescription = {
@@ -47,6 +49,38 @@ const stateDescription: TStateDescription = {
     [ETransactionState.INITIATED]: {
       on: {
         [ETransition.INITIATE_TRANSACTION]: ETransactionState.INITIAL,
+      },
+    },
+    [ETransactionState.CANCELED]: {
+      on: {
+        [ETransition.OPERATOR_CANCEL_PLAN]: ETransactionState.INITIATED,
+      },
+    },
+    [ETransactionState.DELIVERING]: {
+      on: {
+        [ETransition.START_DELIVERY]: ETransactionState.INITIATED,
+      },
+    },
+    [ETransactionState.FAILED_DELIVERY]: {
+      on: {
+        [ETransition.CANCEL_DELIVERY]: ETransactionState.DELIVERING,
+      },
+    },
+    [ETransactionState.COMPLETED]: {
+      on: {
+        [ETransition.COMPLETE_DELIVERY]: ETransactionState.DELIVERING,
+      },
+    },
+    [ETransactionState.REVIEWED]: {
+      on: {
+        [ETransition.REVIEW_RESTAURANT]: ETransactionState.COMPLETED,
+        [ETransition.REVIEW_RESTAURANT_AFTER_EXPIRE_TIME]:
+          ETransactionState.EXPIRED_REVIEW,
+      },
+    },
+    [ETransactionState.EXPIRED_REVIEW]: {
+      on: {
+        [ETransition.EXPIRED_REVIEW_TIME]: ETransactionState.COMPLETED,
       },
     },
   },
