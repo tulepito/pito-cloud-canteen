@@ -210,7 +210,7 @@ const queryCompanyOrders = createAsyncThunk(
     const params = {
       dataParams: {
         ...restPayload,
-        states: EListingStates.published,
+        states: `${EListingStates.published},${EListingStates.closed}`,
         perPage: MANAGE_ORDER_PAGE_SIZE,
         meta_companyId: companyId,
         meta_listingType: LISTING_TYPE.ORDER,
