@@ -3,7 +3,7 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import type { ReactNode } from 'react';
-import { useRef } from 'react';
+import { cloneElement, useRef } from 'react';
 
 import css from './HorizontalTimeLine.module.scss';
 import type { TTimeLineProps } from './types';
@@ -29,16 +29,23 @@ const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
 
   const totalItems = items.length;
 
-  const connectionLine = <div className={css.connectionLine} />;
-
   const itemsToRender = items.reduce<ReactNode[]>(
     (previousList, itemData, currentIndex) => {
-      const nextItem = itemComponent({
-        data: itemData,
-      });
+      const nextItem = cloneElement(
+        itemComponent({
+          data: itemData,
+        }) as React.ReactElement,
+        { key: currentIndex },
+      );
 
       return currentIndex !== totalItems - 1
-        ? previousList.concat([nextItem, connectionLine])
+        ? previousList.concat([
+            nextItem,
+            <div
+              key={`${currentIndex}separator`}
+              className={css.connectionLine}
+            />,
+          ])
         : previousList.concat([nextItem]);
     },
     [],

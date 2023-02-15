@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import { cloneElement } from 'react';
 
 import type { TTimeLineProps } from './types';
 import css from './VerticalTimeLine.module.scss';
@@ -36,12 +37,19 @@ const VerticalTimeLine: React.FC<TVerticalTimeLineProps> = (props) => {
   return (
     <div className={rootClasses}>
       <div className={css.activeBar} style={rootStyles} />
-      {items.map((item, index) =>
-        itemComponent({
-          data: item,
-          className: itemClasses(index + 1 <= lastActiveItem),
-        }),
-      )}
+      {items.map((item, index) => {
+        const itemCpm = cloneElement(
+          itemComponent({
+            data: item,
+            className: itemClasses(index + 1 <= lastActiveItem),
+          }) as React.ReactElement,
+          {
+            key: index,
+          },
+        );
+
+        return itemCpm;
+      })}
     </div>
   );
 };
