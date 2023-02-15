@@ -23,13 +23,11 @@
 }
 
 .sidebar {
-  position: absolute;
+  position: fixed;
   width: 295px;
-  background-color: red;
-  padding: 16px;
   z-index: 10;
-  top: 0;
-  left: calc(-295px - 24px);
+  top: 72px;
+  left: calc(-295px);
   transition: 0.3s linear;
 
   @include viewportLarge {
@@ -40,7 +38,7 @@
 }
 
 .sidebarOpened {
-  left: -24px;
+  left: 0px;
 
   @include viewportLarge {
     left: unset;
@@ -48,10 +46,10 @@
 }
 
 .filterMobileMenu {
-  position: absolute;
+  position: fixed;
   z-index: 11;
-  top: 0;
-  left: -24px;
+  top: 112px;
+  left: 0;
   transition: 0.3s linear;
 
   @include viewportLarge {
@@ -60,7 +58,7 @@
 }
 
 .filterMobileMenuOpened {
-  left: calc(295px - 24px);
+  left: 295px;
 }
 
 .result {
