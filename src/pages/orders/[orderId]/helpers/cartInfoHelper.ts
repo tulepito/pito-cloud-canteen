@@ -67,7 +67,8 @@ export const calculateTotalPriceAndDishes = ({
   return Object.entries<TObject>(orderDetail).reduce<TObject>(
     (result, currentOrderDetailEntry) => {
       const [, rawOrderDetailOfDate] = currentOrderDetailEntry;
-      const { memberOrders, foodList: foodListOfDate } = rawOrderDetailOfDate;
+      const { memberOrders, foodList: foodListOfDate = {} } =
+        rawOrderDetailOfDate;
 
       const foodDataMap = getFoodDataMap({ foodListOfDate, memberOrders });
       const foodDataList = Object.values(foodDataMap);

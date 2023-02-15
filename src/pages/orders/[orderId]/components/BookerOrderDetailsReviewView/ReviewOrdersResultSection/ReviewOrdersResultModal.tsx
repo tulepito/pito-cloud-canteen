@@ -19,7 +19,8 @@ const prepareData = ({
     (result, currentOrderDetailEntry) => {
       const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
 
-      const { memberOrders, foodList: foodListOfDate } = rawOrderDetailOfDate;
+      const { memberOrders, foodList: foodListOfDate = {} } =
+        rawOrderDetailOfDate;
 
       const orderData = Object.entries<TObject>(memberOrders).reduce<TObject[]>(
         (memberOrderResult, currentMemberOrderEntry) => {

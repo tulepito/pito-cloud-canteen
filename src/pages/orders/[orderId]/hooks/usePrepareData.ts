@@ -43,7 +43,7 @@ export const usePrepareOrderDetailPageData = () => {
     endDate = 0,
     deliveryHour,
     deliveryAddress,
-    orderDeadline = 0,
+    deadlineDate = 0,
     deadlineHour,
     // packagePerMember = 0,
     participants = [],
@@ -51,8 +51,12 @@ export const usePrepareOrderDetailPageData = () => {
   } = Listing(orderData as TListing).getMetadata();
 
   const titleSectionData = { deliveryHour, deliveryAddress };
-  const countdownSectionData = { deadlineHour, orderDeadline, startDate };
-  const linkSectionData = { orderDeadline };
+  const countdownSectionData = {
+    deadlineHour,
+    orderDeadline: deadlineDate,
+    startDate,
+  };
+  const linkSectionData = { orderDeadline: deadlineDate };
   const manageParticipantData = {
     planData,
     participantData,
