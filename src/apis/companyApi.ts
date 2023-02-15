@@ -97,6 +97,17 @@ const queryOrdersApi = (companyId: string, params: TObject = {}) => {
   return getApi(`/company/${companyId}/orders`, params);
 };
 
+const startPickingOrderApi = ({
+  companyId,
+  orderId,
+}: {
+  companyId: string;
+  orderId: string;
+}) => {
+  return putApi(`/company/${companyId}/orders/${orderId}/start-picking-order}`);
+};
+
 export const companyApi = {
   queryOrdersApi,
+  startPickingOrderApi,
 };

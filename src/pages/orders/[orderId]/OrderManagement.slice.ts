@@ -410,6 +410,19 @@ const deleteParticipant = createAsyncThunk(
   },
 );
 
+const startPickingOrder = createAsyncThunk(
+  'app/OrderManagement/START_PICKING_ORDER',
+  async ({ orderId }: TObject, { getState }) => {
+    const {
+      attributes: {
+        metadata: { companyId },
+      },
+    } = getState().OrderManagement.orderData!;
+
+    await startPickingOrder({ orderId, companyId });
+  },
+);
+
 export const orderManagementThunks = {
   loadData,
   updateOrderGeneralInfo,
@@ -420,6 +433,7 @@ export const orderManagementThunks = {
   deleteDisAllowedMember,
   addParticipant,
   deleteParticipant,
+  startPickingOrder,
 };
 
 // ================ Slice ================ //
@@ -482,6 +496,16 @@ const OrderManagementSlice = createSlice({
       })
       .addCase(sendRemindEmailToMember.rejected, (state) => {
         state.isSendingRemindEmail = false;
+      })
+      /* =============== startPickingOrder =============== */
+      .addCase(startPickingOrder.pending, (state) => {
+        state.isUpdatingOrderDetails = true;
+      })
+      .addCase(startPickingOrder.fulfilled, (state) => {
+        state.isUpdatingOrderDetails = false;
+      })
+      .addCase(startPickingOrder.rejected, (state) => {
+        state.isUpdatingOrderDetails = false;
       });
   },
 });
