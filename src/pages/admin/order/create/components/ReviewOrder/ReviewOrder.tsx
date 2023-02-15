@@ -11,6 +11,7 @@ import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import { parseTimestampToFormat } from '@utils/dates';
+import { EOrderStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
@@ -196,6 +197,7 @@ const parseDataToReviewTab = (values: any) => {
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
+
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
     shallowEqual,
@@ -216,9 +218,9 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   useEffect(() => {
     dispatch(orderAsyncActions.fetchOrderDetail());
   }, []);
-  const { staffName, deliveryHour, deliveryAddress, shipperName } = Listing(
-    order as TListing,
-  ).getMetadata();
+  const { staffName, deliveryHour, deliveryAddress, shipperName, orderState } =
+    Listing(order as TListing).getMetadata();
+  const orderId = Listing(order as TListing).getId();
   const { renderedOrderDetail } =
     useMemo(() => {
       return {
@@ -232,6 +234,11 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
 
   const onSubmit = async (values: any) => {
     const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
+
+    if (orderState === EOrderStates.draft) {
+      await dispatch(orderAsyncActions.publishDraftOrder({ orderId }));
+    }
+
     const { error } = (await dispatch(
       orderAsyncActions.updateOrder({
         generalInfo: {

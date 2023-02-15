@@ -93,3 +93,7 @@ export const bookerDeleteDraftOrderApi = ({
 }) => {
   return deleteApi(`/company/${companyId}/orders/${orderId}`);
 };
+
+export const publishDraftOrderApi = (orderId: string) => {
+  return putApi(`/orders/${orderId}/publish-draft-order`);
+};

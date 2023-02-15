@@ -4,6 +4,7 @@ import type { TUpdateOrderApiBody } from '@apis/orderApi';
 import {
   bookerDeleteDraftOrderApi,
   createBookerOrderApi,
+  publishDraftOrderApi,
   queryOrdersApi,
   updateOrderApi,
   updatePlanDetailsApi,
@@ -48,6 +49,9 @@ type TOrderInitialState = {
 
   updateOrderInProgress: boolean;
   updateOrderError: any;
+
+  updateOrderDetailInProgress: boolean;
+  updateOrderDetailError: any;
 
   orderDetail: any;
   fetchOrderDetailInProgress: boolean;
@@ -106,6 +110,9 @@ const initialState: TOrderInitialState = {
 
   updateOrderInProgress: false,
   updateOrderError: null,
+
+  updateOrderDetailInProgress: false,
+  updateOrderDetailError: null,
 
   fetchOrderDetailInProgress: false,
   fetchOrderDetailError: null,
@@ -361,6 +368,15 @@ const bookerDeleteDraftOrder = createAsyncThunk(
   },
 );
 
+const publishDraftOrder = createAsyncThunk(
+  'app/Order/PUBLISH_DRAFT_ORDER',
+  async ({ orderId }: TObject) => {
+    const { data: responseData } = await publishDraftOrderApi(orderId);
+
+    return responseData.data;
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -372,6 +388,7 @@ export const orderAsyncActions = {
   queryOrders,
   queryCompanyOrders,
   updatePlanDetail,
+  publishDraftOrder,
 };
 
 const orderSlice = createSlice({
@@ -626,6 +643,22 @@ const orderSlice = createSlice({
         ...state,
         updateOrderDetailInProgress: false,
         updateOrderDetailError: error.message,
+      }))
+      /* =============== publishDraftOrder =============== */
+      .addCase(publishDraftOrder.pending, (state) => ({
+        ...state,
+        updateOrderInProgress: true,
+        updateOrderError: null,
+      }))
+      .addCase(publishDraftOrder.fulfilled, (state, { payload }) => ({
+        ...state,
+        updateOrderInProgress: false,
+        order: payload,
+      }))
+      .addCase(publishDraftOrder.rejected, (state, { error }) => ({
+        ...state,
+        updateOrderInProgress: false,
+        updateOrderError: error.message,
       }));
   },
 });
