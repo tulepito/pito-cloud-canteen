@@ -1137,5 +1137,8 @@
   "DayOfWeekCalendarHeader.wed": "Thứ 4",
   "DayOfWeekCalendarHeader.fri": "Thứ 6",
   "CreatePartnerMenuPage.title": "Tạo thực đơn",
-  "EditPartnerMenuPage.title": "Chỉnh sửa thực đơn"
+  "EditPartnerMenuPage.title": "Chỉnh sửa thực đơn",
+  "BookerSelectRestaurant.ResultList.emptyResult.title": "Không tìm thấy nhà hàng phù hợp",
+  "BookerSelectRestaurant.ResultList.emptyResult.content": "Bạn có thể thử đổi loại menu, loại ẩm thực, khoảng cách... để xem kết quả. Hoặc liên hệ với chúng tôi nhé",
+  "BookerSelectRestaurant.ResultList.emptyResult.contactUs": "Liên hệ với chúng tôi"
 }
