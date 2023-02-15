@@ -1,6 +1,8 @@
+import IconCancel from '@components/Icons/IconCancel/IconCancel';
 import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
 import IconDelivering from '@components/Icons/IconDelivering/IconDelivering';
-import IconPending from '@components/Icons/IconPending/IconPending';
+import IconFail from '@components/Icons/IconFail/IconFail';
+import { ETransactionState } from '@utils/transaction';
 import classNames from 'classnames';
 
 import css from './StateItem.module.scss';
@@ -18,17 +20,21 @@ const StateItem: React.FC<TStateItemProps> = ({
   let stateComponent;
 
   switch (state) {
-    case 'pending':
-      stateComponent = <IconCheckWithBackground className={css.state} />;
+    case ETransactionState.INITIAL:
+    case ETransactionState.INITIATED:
+      stateComponent = <div className={classNames(css.icon, css.iconEmpty)} />;
       break;
-    case 'delivering':
-      stateComponent = <IconDelivering className={css.state} />;
+    case ETransactionState.DELIVERING:
+      stateComponent = <IconDelivering className={css.icon} />;
       break;
-    case 'completed':
-      stateComponent = <IconPending className={css.state} />;
+    case ETransactionState.FAILED_DELIVERY:
+      stateComponent = <IconFail className={css.icon} />;
+      break;
+    case ETransactionState.CANCELED:
+      stateComponent = <IconCancel className={css.icon} />;
       break;
     default:
-      stateComponent = <div className={classNames(css.icon, css.iconEmpty)} />;
+      stateComponent = <IconCheckWithBackground className={css.icon} />;
       break;
   }
 
