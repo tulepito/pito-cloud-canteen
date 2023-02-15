@@ -53,14 +53,55 @@ export type TEditMenuPricingCalendarResources = {
   foodNote?: string;
 };
 
-export const createAvaragePriceByDayOfWeek = (foodsByDate: any) => {
+const createFoodByDateByDaysOfWeekField = (
+  foodByDate: any,
+  daysOfWeek: string[],
+) => {
+  const newFoodByDates = Object.keys(foodByDate).reduce((prev, key) => {
+    if (daysOfWeek.includes(key)) {
+      return { ...prev, [key]: foodByDate[key] };
+    }
+    return { ...prev };
+  }, {});
+  return newFoodByDates;
+};
+
+const createFoodAveragePriceByDaysOfWeekField = (
+  fieldsData: any,
+  daysOfWeek: string[],
+) => {
+  const newData = Object.keys(fieldsData).reduce((prev, key) => {
+    const substringKey = key.substring(0, 3);
+    if (daysOfWeek.includes(substringKey)) {
+      return { ...prev, [key]: fieldsData[key] };
+    }
+    return { ...prev, [key]: 0 };
+  }, {});
+  return newData;
+};
+
+const createFoodListIdByDaysOfWeekField = (
+  fieldsData: any,
+  daysOfWeek: string[],
+) => {
+  const newData = Object.keys(fieldsData).reduce((prev, key) => {
+    const substringKey = key.substring(0, 3);
+    if (daysOfWeek.includes(substringKey)) {
+      return { ...prev, [key]: fieldsData[key] };
+    }
+    return { ...prev, [key]: [] };
+  }, {});
+  return newData;
+};
+
+export const createAvaragePriceByFoodsByDate = (foodsByDate: any) => {
   let avaragePriceByDayOfWeek = {};
   Object.keys(foodsByDate).forEach((keyAsDate) => {
     let totalPriceByDate = 0;
     let totalFoodLengthByDate = 0;
     Object.keys(foodsByDate[keyAsDate]).forEach((foodId) => {
       const { price = 0 } = foodsByDate[keyAsDate][foodId];
-      totalPriceByDate += price;
+      totalPriceByDate = price + totalPriceByDate;
       totalFoodLengthByDate += 1;
     });
     const priceAverage = totalPriceByDate / totalFoodLengthByDate;
@@ -74,7 +115,7 @@ export const createAvaragePriceByDayOfWeek = (foodsByDate: any) => {
   return avaragePriceByDayOfWeek;
 };
 
-export const createListFoodIdsByDayOfWeek = (foodsByDate: any) => {
+export const createListFoodIdsByFoodsByDate = (foodsByDate: any) => {
   let foodIdsByDayOfWeek = {};
   Object.keys(foodsByDate).forEach((keyAsDate) => {
     const listFoodIds: string[] = [];
@@ -137,7 +178,29 @@ export const createSubmitMenuValues = (
     numberOfCycles,
   } = values;
   const isCycleMenu = menuType === EMenuTypes.cycleMenu;
+
+  const {
+    foodsByDate: foodsByDateFromMenu = {},
+    monAverageFoodPrice: monAverageFoodPriceFromMenu = 0,
+    tueAverageFoodPrice: tueAverageFoodPriceFromMenu = 0,
+    wedAverageFoodPrice: wedAverageFoodPriceFromMenu = 0,
+    thuAverageFoodPrice: thuAverageFoodPriceFromMenu = 0,
+    friAverageFoodPrice: friAverageFoodPriceFromMenu = 0,
+    satAverageFoodPrice: satAverageFoodPriceFromMenu = 0,
+    sunAverageFoodPrice: sunAverageFoodPriceFromMenu = 0,
+  } = IntegrationListing(menu).getPublicData();
+
   const { listingState } = IntegrationListing(menu).getMetadata();
+  const {
+    monFoodIdList: monFoodIdListFromMenu = [],
+    tueFoodIdList: tueFoodIdListFromMenu = [],
+    wedFoodIdList: wedFoodIdListFromMenu = [],
+    thuFoodIdList: thuFoodIdListFromMenu = [],
+    friFoodIdList: friFoodIdListFromMenu = [],
+    satFoodIdList: satFoodIdListFromMenu = [],
+    sunFoodIdList: sunFoodIdListFromMenu = [],
+  } = IntegrationListing(menu).getMetadata();
+
   const alreadyPublished = listingState === EListingStates.published;
   const endDate =
     isCycleMenu &&
@@ -153,23 +216,59 @@ export const createSubmitMenuValues = (
           startDate,
           ...(endDate ? { endDate } : {}),
           ...(isCycleMenu ? { numberOfCycles } : {}),
+          ...(restaurantId
+            ? {
+                foodsByDate: createFoodByDateByDaysOfWeekField(
+                  foodsByDateFromMenu,
+                  daysOfWeek,
+                ),
+                ...createFoodAveragePriceByDaysOfWeekField(
+                  {
+                    monAverageFoodPrice: monAverageFoodPriceFromMenu,
+                    tueAverageFoodPrice: tueAverageFoodPriceFromMenu,
+                    wedAverageFoodPrice: wedAverageFoodPriceFromMenu,
+                    thuAverageFoodPrice: thuAverageFoodPriceFromMenu,
+                    friAverageFoodPrice: friAverageFoodPriceFromMenu,
+                    satAverageFoodPrice: satAverageFoodPriceFromMenu,
+                    sunAverageFoodPrice: sunAverageFoodPriceFromMenu,
+                  },
+                  daysOfWeek,
+                ),
+              }
+            : {}),
         },
         metadata: {
           menuType,
           listingType: ListingTypes.MENU,
           restaurantId,
           ...(!alreadyPublished ? { listingState: EListingStates.draft } : {}),
+          ...(restaurantId
+            ? {
+                ...createFoodListIdByDaysOfWeekField(
+                  {
+                    monFoodIdList: monFoodIdListFromMenu,
+                    tueFoodIdList: tueFoodIdListFromMenu,
+                    wedFoodIdList: wedFoodIdListFromMenu,
+                    thuFoodIdList: thuFoodIdListFromMenu,
+                    friFoodIdList: friFoodIdListFromMenu,
+                    satFoodIdList: satFoodIdListFromMenu,
+                    sunFoodIdList: sunFoodIdListFromMenu,
+                  },
+                  daysOfWeek,
+                ),
+              }
+            : {}),
         },
       };
     }
     case MENU_PRICING_TAB: {
       return {
         publicData: {
-          ...createAvaragePriceByDayOfWeek(foodsByDate),
+          ...createAvaragePriceByFoodsByDate(foodsByDate),
           foodsByDate: createSubmitFoodsByDate(foodsByDate),
         },
         metadata: {
-          ...createListFoodIdsByDayOfWeek(foodsByDate),
+          ...createListFoodIdsByFoodsByDate(foodsByDate),
         },
       };
     }
@@ -252,23 +351,36 @@ export const createDuplicateSubmitMenuValues = (
           startDate,
           ...(endDate ? { endDate } : {}),
           ...(isCycleMenu ? { numberOfCycles } : {}),
-          foodsByDate: foodsByDateFromMenu,
-          monAverageFoodPrice: monAverageFoodPriceFromMenu,
-          tueAverageFoodPrice: tueAverageFoodPriceFromMenu,
-          wedAverageFoodPrice: wedAverageFoodPriceFromMenu,
-          thuAverageFoodPrice: thuAverageFoodPriceFromMenu,
-          friAverageFoodPrice: friAverageFoodPriceFromMenu,
-          satAverageFoodPrice: satAverageFoodPriceFromMenu,
-          sunAverageFoodPrice: sunAverageFoodPriceFromMenu,
+          foodsByDate: createFoodByDateByDaysOfWeekField(
+            foodsByDateFromMenu,
+            daysOfWeek,
+          ),
+          ...createFoodAveragePriceByDaysOfWeekField(
+            {
+              monAverageFoodPrice: monAverageFoodPriceFromMenu,
+              tueAverageFoodPrice: tueAverageFoodPriceFromMenu,
+              wedAverageFoodPrice: wedAverageFoodPriceFromMenu,
+              thuAverageFoodPrice: thuAverageFoodPriceFromMenu,
+              friAverageFoodPrice: friAverageFoodPriceFromMenu,
+              satAverageFoodPrice: satAverageFoodPriceFromMenu,
+              sunAverageFoodPrice: sunAverageFoodPriceFromMenu,
+            },
+            daysOfWeek,
+          ),
         },
         metadata: {
-          monFoodIdList: monFoodIdListFromMenu,
-          tueFoodIdList: tueFoodIdListFromMenu,
-          wedFoodIdList: wedFoodIdListFromMenu,
-          thuFoodIdList: thuFoodIdListFromMenu,
-          friFoodIdList: friFoodIdListFromMenu,
-          satFoodIdList: satFoodIdListFromMenu,
-          sunFoodIdList: sunFoodIdListFromMenu,
+          ...createFoodListIdByDaysOfWeekField(
+            {
+              monFoodIdList: monFoodIdListFromMenu,
+              tueFoodIdList: tueFoodIdListFromMenu,
+              wedFoodIdList: wedFoodIdListFromMenu,
+              thuFoodIdList: thuFoodIdListFromMenu,
+              friFoodIdList: friFoodIdListFromMenu,
+              satFoodIdList: satFoodIdListFromMenu,
+              sunFoodIdList: sunFoodIdListFromMenu,
+            },
+            daysOfWeek,
+          ),
           menuType,
           listingType: ListingTypes.MENU,
           restaurantId,
@@ -280,7 +392,7 @@ export const createDuplicateSubmitMenuValues = (
       return {
         title: titleFromMenu,
         publicData: {
-          ...createAvaragePriceByDayOfWeek(foodsByDate),
+          ...createAvaragePriceByFoodsByDate(foodsByDate),
           foodsByDate: createSubmitFoodsByDate(foodsByDate),
           daysOfWeek: daysOfWeekFromMenu,
           mealType: mealTyperFromMenu,
@@ -291,7 +403,7 @@ export const createDuplicateSubmitMenuValues = (
             : {}),
         },
         metadata: {
-          ...createListFoodIdsByDayOfWeek(foodsByDate),
+          ...createListFoodIdsByFoodsByDate(foodsByDate),
           menuType: menuTypeFromMenu,
           listingType: ListingTypes.MENU,
           restaurantId,

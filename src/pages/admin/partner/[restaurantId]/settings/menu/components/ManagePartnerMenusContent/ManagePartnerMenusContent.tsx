@@ -42,7 +42,7 @@ const TABLE_COLUNMS: TColumn[] = [
         );
       }
       return (
-        <div>
+        <div className={css.row}>
           {title}
           {listingState === EListingStates.draft && (
             <div className={css.draftBox}>
@@ -71,6 +71,7 @@ const TABLE_COLUNMS: TColumn[] = [
       }
       return (
         <div
+          className={css.row}
           onClick={onSetMenuToUpdate({
             id,
             startDate,
@@ -103,12 +104,11 @@ const TABLE_COLUNMS: TColumn[] = [
       }
       const onClick = (checked: boolean) => {
         const newStatus = checked
-          ? EListingStates.closed
-          : EListingStates.published;
+          ? EListingStates.published
+          : EListingStates.closed;
 
         onToggleStatus(id, newStatus);
       };
-
       return listingState === EListingStates.draft ? (
         <></>
       ) : (
@@ -185,10 +185,11 @@ type TTabContentProps = {
   restaurantId: string;
   id: string;
   keywords: string;
+  page: string;
 };
 
 const TabContent: React.FC<TTabContentProps> = (props) => {
-  const { menuType, restaurantId, id: mealType, keywords } = props;
+  const { menuType, restaurantId, id: mealType, keywords, page } = props;
   const dispatch = useAppDispatch();
   const [menuToRemove, setMenuToRemove] = useState<any>();
   const [menuToUpdate, setMenuToUpdate] = useState<any>();
@@ -215,13 +216,14 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
           restaurantId,
           mealType,
           keywords,
+          page,
         }),
       );
-  }, [menuType, restaurantId, dispatch, mealType, keywords]);
+  }, [menuType, restaurantId, dispatch, mealType, keywords, page]);
 
   const onToggleStatus = (id: string, state: string) => {
     dispatch(
-      menusSliceThunks.updatePartnerMenuListing({
+      menusSliceThunks.togglePartnerMenuListing({
         id,
         metadata: {
           listingState: state,
@@ -340,12 +342,14 @@ type TManagePartnerMenusContent = {
   restaurantId: string;
   menuType: string;
   keywords: string;
+  page: string;
 };
 
 const ManagePartnerMenusContent: React.FC<TManagePartnerMenusContent> = ({
   restaurantId,
   menuType,
   keywords,
+  page,
 }) => {
   const menuMealTypeCount = useAppSelector(
     (state) => state.menus.menuMealTypeCount,
@@ -391,6 +395,7 @@ const ManagePartnerMenusContent: React.FC<TManagePartnerMenusContent> = ({
         menuType,
         restaurantId,
         keywords,
+        page,
       },
     },
     {
@@ -403,6 +408,7 @@ const ManagePartnerMenusContent: React.FC<TManagePartnerMenusContent> = ({
         menuType,
         restaurantId,
         keywords,
+        page,
       },
     },
     {
@@ -415,6 +421,7 @@ const ManagePartnerMenusContent: React.FC<TManagePartnerMenusContent> = ({
         menuType,
         restaurantId,
         keywords,
+        page,
       },
     },
     {
@@ -425,6 +432,7 @@ const ManagePartnerMenusContent: React.FC<TManagePartnerMenusContent> = ({
         menuType,
         restaurantId,
         keywords,
+        page,
       },
     },
   ];

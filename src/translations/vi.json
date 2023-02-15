@@ -1045,7 +1045,7 @@
   "Toolbar.viewMode.week": "Tuần",
   "AdminSidebar.managePartnerFixedMenuLabel": "Menu cố định",
   "AdminSidebar.managePartnerCycleMenuLabel": "Menu theo chu kỳ",
-  "ManagePartnerMenusPage.fixedMenuTitle": "Menu theo cố định",
+  "ManagePartnerMenusPage.fixedMenuTitle": "Menu cố định",
   "ManagePartnerMenusPage.cycleMenuTitle": "Menu theo chu kỳ",
   "ManagePartnerMenusPage.breakfast": "Ăn sáng",
   "ManagePartnerMenusPage.lunch": "Ăn trưa",
@@ -1124,5 +1124,7 @@
   "DayOfWeekCalendarHeader.wed": "Thứ 4",
   "DayOfWeekCalendarHeader.fri": "Thứ 6",
   "CreatePartnerMenuPage.title": "Tạo thực đơn",
-  "EditPartnerMenuPage.title": "Chỉnh sửa thực đơn"
+  "EditPartnerMenuPage.title": "Chỉnh sửa thực đơn",
+  "EditMenuPricingForm.pricingTitle": "Chọn món ăn",
+  "UpdateMenuModal.title": "Chỉnh sửa thời gian áp dụng"
 }

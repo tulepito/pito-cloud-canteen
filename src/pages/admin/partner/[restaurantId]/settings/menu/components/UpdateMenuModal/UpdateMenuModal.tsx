@@ -1,6 +1,7 @@
 import AlertModal from '@components/Modal/AlertModal';
 import type { FormApi } from 'final-form';
 import React, { useMemo, useRef } from 'react';
+import { FormattedMessage } from 'react-intl';
 
 import css from './UpdateMenuModal.module.scss';
 import type { TUpdateMenuModalFormValues } from './UpdateMenuModalForm';
@@ -41,6 +42,11 @@ const UpdateMenuModal: React.FC<TUpdateMenuModalProps> = (props) => {
       handleClose={onClearMenuToUpdate}
       onCancel={onClearMenuToUpdate}
       onConfirm={handleSubmitUpdaetMenuModalForm}
+      title={
+        <h3 className={css.title}>
+          <FormattedMessage id="UpdateMenuModal.title" />
+        </h3>
+      }
       confirmLabel="Áp dụng"
       cancelLabel="Hủy"
       actionsClassName={css.modalActions}

@@ -160,6 +160,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
         (item: TIntegrationListing) => item?.id?.uuid === key,
       );
       const title = food?.attributes?.title;
+      const priceAmount = food?.attributes?.price?.amount || 0;
 
       Object.keys(newFoodsByDate).forEach((foodId) => {
         if (!rowCheckbox.includes(foodId)) {
@@ -168,7 +169,6 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
       });
 
       const sideDishes = values[key]?.sideDishes || [];
-      const price = values[key]?.price || 0;
       const foodNote = values[key]?.foodNote || '';
       newFoodsByDate[currentDate] = {
         ...newFoodsByDate[currentDate],
@@ -176,7 +176,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
           id: key,
           title,
           sideDishes,
-          price,
+          price: priceAmount,
           foodNote,
         },
       };
@@ -236,7 +236,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
       />
       {queryFoodsInProgress ? (
         <LoadingContainer />
-      ) : (
+      ) : tableData.length > 0 ? (
         <div className={css.foodPickContainer}>
           <div className={css.tableContainer}>
             <Table
@@ -298,6 +298,8 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
             </div>
           </div>
         </div>
+      ) : (
+        <div>Không có kết quả trả về</div>
       )}
     </Modal>
   );

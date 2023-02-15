@@ -56,7 +56,11 @@ const CreateMenuOptionFormComponent: React.FC<
   );
   useEffect(() => {
     if (!isDuplicateOptionChoosen || !restaurantId) return;
-    dispatch(menusSliceThunks.queryMenuOptionsToDuplicate({ restaurantId }));
+    dispatch(
+      menusSliceThunks.queryMenuOptionsToDuplicate({
+        restaurantId,
+      }),
+    );
   }, [isDuplicateOptionChoosen, dispatch, restaurantId]);
 
   const options = parseMenuToOptions(menuOptionsToDuplicate);
@@ -91,6 +95,9 @@ const CreateMenuOptionFormComponent: React.FC<
               className={css.fieldSelect}
               name="duplicateId"
               id="duplicateId">
+              <option value="" disabled>
+                Chọn Menu
+              </option>
               {options.map((opt) => (
                 <option value={opt.key} key={opt.key}>
                   {opt.label}

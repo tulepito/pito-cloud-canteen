@@ -26,14 +26,14 @@ const ManagePartnerMenusPage: React.FC<TManagePartnerMenusPageProps> = (
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const router = useRouter();
   const formRef = useRef<FormApi>();
-  const { restaurantId, keywords = '' } = router.query;
+  const { restaurantId, keywords = '', page = 1 } = router.query;
 
   const onSubmit = ({
     keywords: newKeywords,
   }: TSecondaryKeywordSearchFormValues) => {
     router.push({
       pathname: isFixedMenu
-        ? adminRoutes.ManagePartnerMenus.path
+        ? adminRoutes.ManagePartnerFixedMenus.path
         : adminRoutes.ManagePartnerCycleMenus.path,
       query: { ...router.query, keywords: newKeywords },
     });
@@ -90,17 +90,20 @@ const ManagePartnerMenusPage: React.FC<TManagePartnerMenusPageProps> = (
         restaurantId={restaurantId as string}
         keywords={keywords as string}
         menuType={menuType as string}
+        page={page as string}
       />
       <AlertModal
         isOpen={isCreateModalOpen}
         handleClose={() => setIsCreateModalOpen(false)}
+        title={
+          <h3 className={css.createTitle}>
+            <FormattedMessage id="ManagePartnerMenu.createTitle" />
+          </h3>
+        }
         onConfirm={handleSubmitCreateOptionForm}
         onCancel={() => setIsCreateModalOpen(false)}
         confirmLabel={<FormattedMessage id="ManagePartnerMenu.createLabel" />}
         cancelLabel={<FormattedMessage id="ManagePartnerMenu.cancelLabel" />}>
-        <h3 className={css.createTitle}>
-          <FormattedMessage id="ManagePartnerMenu.createTitle" />
-        </h3>
         <CreateMenuOptionForm
           formRef={formRef}
           onSubmit={onSubmitCreateOptionForm}

@@ -5,6 +5,7 @@ import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 
 import FieldMenuApplyTimeGroup from '../FieldMenuApplyTimeGroup/FieldMenuApplyTimeGroup';
+import css from './UpdateMenuModalForm.module.scss';
 
 export type TUpdateMenuModalFormValues = {
   startDate: Date;
@@ -30,6 +31,8 @@ const UpdateMenuModalFormComponent: React.FC<
       <FieldMenuApplyTimeGroup
         values={values}
         form={form as unknown as FormApi}
+        dateInputClassName={css.dateInput}
+        inputFieldsClassName={css.inputFields}
       />
     </Form>
   );

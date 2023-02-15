@@ -7,7 +7,7 @@ import Modal from './Modal';
 
 type TAlertModal = {
   isOpen: boolean;
-  title?: string;
+  title?: string | ReactNode;
   className?: string;
   cancelLabel?: ReactNode;
   confirmLabel?: ReactNode;
@@ -21,6 +21,7 @@ type TAlertModal = {
   actionsClassName?: string;
   cancelClassName?: string;
   confirmClassName?: string;
+  childrenClassName?: string;
 };
 
 const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
@@ -39,6 +40,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
   actionsClassName,
   cancelClassName,
   confirmClassName,
+  childrenClassName,
 }) => {
   return (
     <Modal
@@ -47,7 +49,9 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
       isOpen={isOpen}
       handleClose={handleClose}
       containerClassName={classNames(css.container, containerClassName)}>
-      <div className={css.children}>{children}</div>
+      <div className={classNames(css.children, childrenClassName)}>
+        {children}
+      </div>
       <div className={classNames(css.actions, actionsClassName)}>
         {cancelLabel && (
           <Button
