@@ -104,12 +104,11 @@ const TABLE_COLUNMS: TColumn[] = [
       }
       const onClick = (checked: boolean) => {
         const newStatus = checked
-          ? EListingStates.closed
-          : EListingStates.published;
+          ? EListingStates.published
+          : EListingStates.closed;
 
         onToggleStatus(id, newStatus);
       };
-
       return listingState === EListingStates.draft ? (
         <></>
       ) : (
@@ -224,7 +223,7 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
 
   const onToggleStatus = (id: string, state: string) => {
     dispatch(
-      menusSliceThunks.updatePartnerMenuListing({
+      menusSliceThunks.togglePartnerMenuListing({
         id,
         metadata: {
           listingState: state,

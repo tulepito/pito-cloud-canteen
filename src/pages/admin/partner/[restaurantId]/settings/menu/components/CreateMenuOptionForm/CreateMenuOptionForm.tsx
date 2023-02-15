@@ -56,7 +56,11 @@ const CreateMenuOptionFormComponent: React.FC<
   );
   useEffect(() => {
     if (!isDuplicateOptionChoosen || !restaurantId) return;
-    dispatch(menusSliceThunks.queryMenuOptionsToDuplicate({ restaurantId }));
+    dispatch(
+      menusSliceThunks.queryMenuOptionsToDuplicate({
+        restaurantId,
+      }),
+    );
   }, [isDuplicateOptionChoosen, dispatch, restaurantId]);
 
   const options = parseMenuToOptions(menuOptionsToDuplicate);

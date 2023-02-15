@@ -96,6 +96,9 @@ const SHOW_PARTNER_MENU_LISTING =
 const UPDATE_PARTNER_MENU_LISTING =
   'app/ManageMenusPage/UPDATE_PARTNER_MENU_LISTING';
 
+const TOGGLE_PARTNER_MENU_LISTING =
+  'app/ManageMenusPage/TOGGLE_PARTNER_MENU_LISTING';
+
 const DELETE_PARTNER_MENU_LISTING =
   'app/ManageMenusPage/DELETE_PARTNER_MENU_LISTING';
 
@@ -116,8 +119,8 @@ const queryPartnerMenus = createAsyncThunk(
       meta_menuType: menuType,
       meta_listingType: EListingType.menu,
       meta_restaurantId: restaurantId,
-      pub_mealType: mealType,
       meta_isDeleted: false,
+      pub_mealType: mealType,
       page,
       perPage: MANAGE_MENU_PAGE_SIZE,
     });
@@ -183,6 +186,24 @@ const createPartnerMenuListing = createAsyncThunk(
 
 const updatePartnerMenuListing = createAsyncThunk(
   UPDATE_PARTNER_MENU_LISTING,
+  async (payload: any, { rejectWithValue }) => {
+    try {
+      const { data } = await updatePartnerMenuApi({
+        dataParams: payload,
+        queryParams: {
+          expand: true,
+        },
+      });
+      return denormalisedResponseEntities(data)[0];
+    } catch (error) {
+      console.error(`${CREATE_PARTNER_MENU_LISTING} error: `, error);
+      return rejectWithValue(storableAxiosError(error));
+    }
+  },
+);
+
+const togglePartnerMenuListing = createAsyncThunk(
+  TOGGLE_PARTNER_MENU_LISTING,
   async (payload: any, { rejectWithValue }) => {
     try {
       const { data } = await updatePartnerMenuApi({
@@ -277,6 +298,7 @@ export const menusSliceThunks = {
   deletePartnerMenu,
   queryMenuOptionsToDuplicate,
   checkingMenuInTransactionProgress,
+  togglePartnerMenuListing,
 };
 
 // ================ Slice ================ //
