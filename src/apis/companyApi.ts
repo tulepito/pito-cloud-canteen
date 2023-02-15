@@ -97,19 +97,6 @@ const queryOrdersApi = (companyId: string, params: TObject = {}) => {
   return getApi(`/company/${companyId}/orders`, params);
 };
 
-const approveDraftOrder = ({
-  companyId,
-  orderId,
-}: {
-  companyId: string;
-  orderId: string;
-}) => {
-  return putApi(
-    `/company/${companyId}/orders/approve-draft-order?orderId=${orderId}`,
-  );
-};
-
 export const companyApi = {
   queryOrdersApi,
-  approveDraftOrder,
 };
