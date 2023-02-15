@@ -100,6 +100,7 @@ const ManagePartnerMenusPage: React.FC<TManagePartnerMenusPageProps> = (
             <FormattedMessage id="ManagePartnerMenu.createTitle" />
           </h3>
         }
+        actionsClassName={css.modalActions}
         onConfirm={handleSubmitCreateOptionForm}
         onCancel={() => setIsCreateModalOpen(false)}
         confirmLabel={<FormattedMessage id="ManagePartnerMenu.createLabel" />}
