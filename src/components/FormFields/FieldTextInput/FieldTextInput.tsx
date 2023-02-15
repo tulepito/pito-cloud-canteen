@@ -76,12 +76,12 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
   // Handle Icon
   const leftIconElement = leftIcon
     ? React.cloneElement(leftIcon, {
-        rootClassName: css.leftIcon,
+        className: css.leftIcon,
       })
     : undefined;
   const rightIconElement = rightIcon
     ? React.cloneElement(rightIcon, {
-        rootClassName: css.rightIcon,
+        className: css.rightIcon,
       })
     : undefined;
 

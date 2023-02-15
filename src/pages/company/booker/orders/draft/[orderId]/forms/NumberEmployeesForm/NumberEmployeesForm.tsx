@@ -47,6 +47,16 @@ const NumberEmployeesForm: React.FC<TNumberEmployeesFormProps> = ({
   const submitInprogress = loading || submitting;
   const disabledSubmit = submitInprogress || hasValidationErrors;
 
+  const rightIcon = (
+    <span>
+      <span className={css.rightIcon}>
+        {intl.formatMessage({
+          id: 'Booker.CreateOrder.Form.field.memberAmount.unit',
+        })}
+      </span>
+    </span>
+  );
+
   return (
     <form className={css.root} onSubmit={handleSubmit}>
       <FieldTextInputComponent
@@ -59,13 +69,7 @@ const NumberEmployeesForm: React.FC<TNumberEmployeesFormProps> = ({
           id: 'Booker.CreateOrder.Form.field.memberAmount',
         })}
         rightIconContainerClassName={css.rightIconContainer}
-        rightIcon={
-          <span className={css.rightIcon}>
-            {intl.formatMessage({
-              id: 'Booker.CreateOrder.Form.field.memberAmount.unit',
-            })}
-          </span>
-        }
+        rightIcon={rightIcon}
       />
       <Button
         className={css.submitBtn}

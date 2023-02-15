@@ -26,6 +26,7 @@ type TExpiredTimeFormProps = {
   onSubmit: (values: TExpiredTimeFormValues) => void;
   initialValues?: TExpiredTimeFormValues;
   loading?: boolean;
+  deliveryTime: Date;
 };
 
 export type TExpiredTimeFormValues = {
@@ -48,6 +49,7 @@ const ExpiredTimeForm: React.FC<TExpiredTimeFormProps> = ({
   onSubmit,
   initialValues,
   loading,
+  deliveryTime,
 }) => {
   const { form, handleSubmit, submitting, hasValidationErrors } =
     useForm<TExpiredTimeFormValues>({
@@ -66,8 +68,11 @@ const ExpiredTimeForm: React.FC<TExpiredTimeFormProps> = ({
   const selectedDeadlineDate = deadlineDate.input.value
     ? new Date(Number(deadlineDate.input.value))
     : DateTime.fromMillis(Number(Date.now())).plus({ days: 2 }).toJSDate();
-  const minStartDate = DateTime.fromJSDate(new Date())
-    .plus({ days: 2 })
+  const minDeadlineDate = DateTime.fromJSDate(new Date())
+    .plus({ days: 1 })
+    .toJSDate();
+  const maxDeadlineDate = DateTime.fromJSDate(deliveryTime)
+    .minus({ days: 2 })
     .toJSDate();
 
   return (
@@ -81,7 +86,8 @@ const ExpiredTimeForm: React.FC<TExpiredTimeFormProps> = ({
         label={intl.formatMessage({
           id: 'Booker.CreateOrder.Form.field.deadlineDate',
         })}
-        minDate={minStartDate}
+        minDate={minDeadlineDate}
+        maxDate={maxDeadlineDate}
         dateFormat={'EEE, dd MMMM, yyyy'}
         placeholderText={intl.formatMessage({
           id: 'Booker.CreateOrder.Form.field.datePlaceholder',

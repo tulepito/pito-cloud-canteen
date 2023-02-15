@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderAsyncAction } from '@redux/slices/Order.slice';
 import { LISTING } from '@utils/data';
 import classNames from 'classnames';
+import { DateTime } from 'luxon';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -71,9 +72,21 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   const locationInitValues = {
     deliveryAddress: getInitialLocationValues(deliveryAddress || {}),
   };
+
+  const nextStartWeek = DateTime.fromJSDate(new Date())
+    .startOf('week')
+    .startOf('day')
+    .plus({ days: 7 })
+    .toMillis();
+  const nextEndWeek = DateTime.fromJSDate(new Date())
+    .endOf('week')
+    .endOf('day')
+    .plus({ days: 7 })
+    .toMillis();
+
   const deliveryInitValues = {
-    startDate,
-    endDate,
+    startDate: startDate || nextStartWeek,
+    endDate: endDate || nextEndWeek,
     deliveryHour,
   };
   const deadlineInitValues = {
@@ -104,7 +117,6 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   };
 
   const handleSubmit = (values: any) => {
-    console.log(values);
     dispatch(
       OrderAsyncAction.updateOrder({
         generalInfo: {
@@ -135,6 +147,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       case 'expiredTime':
         return (
           <ExpiredTimeForm
+            deliveryTime={new Date(startDate || nextStartWeek)}
             initialValues={deadlineInitValues}
             onSubmit={handleSubmit}
             loading={updateOrderInProgress}

@@ -3,6 +3,8 @@ import Button from '@components/Button/Button';
 import { NAVIGATE } from '@components/CalendarDashboard/helpers/constant';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
+import classNames from 'classnames';
+import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -16,11 +18,26 @@ export type TToolbarProps = {
   onNavigate: (action: string) => void;
   onView: (name: string) => void;
   companyLogo?: ReactNode;
+  startDate: Date;
+  endDate: Date;
+  date: Date;
 };
 
-const Toolbar: React.FC<TToolbarProps> = (props) => {
-  const { label, onNavigate } = props;
+const Toolbar: React.FC<TToolbarProps> = ({
+  label,
+  onNavigate,
+  startDate,
+  endDate,
+  date,
+}) => {
   const intl = useIntl();
+  const startDateDateTime = DateTime.fromJSDate(startDate);
+  const endDateDateTime = DateTime.fromJSDate(endDate);
+  const anchorDateDateTime = DateTime.fromJSDate(date);
+  const showPrevBtn =
+    startDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
+  const showNextBtn =
+    endDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
 
   const navigateFunc = (action: string) => () => {
     onNavigate(action);
@@ -31,12 +48,18 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
       <div className={css.actions}>
         <div className={css.toolbarNavigation}>
           <div
-            className={css.arrowBtn}
+            className={classNames(css.arrowBtn, {
+              [css.disabled]: !showPrevBtn,
+            })}
             onClick={navigateFunc(NAVIGATE.PREVIOUS)}>
             <IconArrow className={css.arrowIcon} direction="left" />
           </div>
           {label}
-          <div className={css.arrowBtn} onClick={navigateFunc(NAVIGATE.NEXT)}>
+          <div
+            className={classNames(css.arrowBtn, {
+              [css.disabled]: !showNextBtn,
+            })}
+            onClick={navigateFunc(NAVIGATE.NEXT)}>
             <IconArrow className={css.arrowIcon} direction="right" />
           </div>
         </div>

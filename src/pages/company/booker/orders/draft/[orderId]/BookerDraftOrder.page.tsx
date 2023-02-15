@@ -9,9 +9,9 @@ import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-import Layout from '../components/Layout/Layout';
-import LayoutMain from '../components/Layout/LayoutMain';
-import LayoutSidebar from '../components/Layout/LayoutSidebar';
+import Layout from '../../components/Layout/Layout';
+import LayoutMain from '../../components/Layout/LayoutMain';
+import LayoutSidebar from '../../components/Layout/LayoutSidebar';
 import css from './BookerDraftOrder.module.scss';
 import SidebarContent from './components/SidebarContent/SidebarContent';
 import Toolbar from './components/Toolbar/Toolbar';
@@ -57,28 +57,35 @@ function BookerDraftOrderPage() {
 
   const { orderDetail = [] } = useLoadPlanDetails();
 
-  const handleAddMeal = (planId: string) => (date: Date) => {
-    dispatch(
-      OrderAsyncAction.updatePlanDetail({
-        orderId,
-        planId,
-        updateMode: 'merge',
-        orderDetail: {
-          [date.getTime()]: {
-            restaurant: {
-              id: '63d776c9-9bc4-4d57-853f-1e9062417220',
-              restaurantName: 'trang',
-            },
-            foodList: {
-              '63e0b73b-60a1-49a3-92af-a9c741db911c': {
-                foodPrice: 10000,
-                foodName: 'Rau muống xào tỏi kèm vị đắng của cafe Copy',
-              },
-            },
-          },
-        },
-      }),
+  const handleAddMeal = () => (date: Date) => {
+    // console.log(
+    //   'url',
+    //   `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date.getTime()}`,
+    // );
+    router.push(
+      `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date.getTime()}`,
     );
+    // dispatch(
+    //   OrderAsyncAction.updatePlanDetail({
+    //     orderId,
+    //     planId,
+    //     updateMode: 'merge',
+    //     orderDetail: {
+    //       [date.getTime()]: {
+    //         restaurant: {
+    //           id: '63d776c9-9bc4-4d57-853f-1e9062417220',
+    //           restaurantName: 'trang',
+    //         },
+    //         foodList: {
+    //           '63e0b73b-60a1-49a3-92af-a9c741db911c': {
+    //             foodPrice: 10000,
+    //             foodName: 'Rau muống xào tỏi kèm vị đắng của cafe Copy',
+    //           },
+    //         },
+    //       },
+    //     },
+    //   }),
+    // );
   };
 
   const handleRemoveMeal = (planId: string) => (resourceId: string) => {
@@ -123,12 +130,14 @@ function BookerDraftOrderPage() {
               contentEnd: (props: any) => (
                 <AddMorePlan
                   {...props}
-                  onClick={handleAddMeal(props?.resources?.planId)}
+                  onClick={handleAddMeal()}
                   startDate={props?.resources?.startDate}
                   endDate={props?.resources?.endDate}
                 />
               ),
-              toolbar: (props) => <Toolbar {...props} />,
+              toolbar: (props) => (
+                <Toolbar {...props} startDate={startDate} endDate={endDate} />
+              ),
             }}
           />
         </div>

@@ -64,7 +64,7 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
     ? new Date(Number(startDate.input.value))
     : DateTime.fromMillis(Number(Date.now())).plus({ days: 2 }).toJSDate();
   const minStartDate = DateTime.fromJSDate(new Date())
-    .plus({ days: 2 })
+    .plus({ days: 3 })
     .toJSDate();
 
   const selectedEndDate = DateTime.fromJSDate(selectedStartDate)
