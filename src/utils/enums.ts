@@ -670,6 +670,10 @@ export const ORDER_STATES_OPTIONS = [
   },
   {
     key: EOrderStates.isNew,
+    label: 'Đơn mới',
+  },
+  {
+    key: EOrderStates.draft,
     label: 'Đơn nháp',
   },
   {
