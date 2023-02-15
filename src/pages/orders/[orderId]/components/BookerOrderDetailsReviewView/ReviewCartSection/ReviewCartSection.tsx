@@ -1,8 +1,11 @@
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import { parseThousandNumber } from '@helpers/format';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { orderManagementThunks } from '@pages/orders/[orderId]/OrderManagement.slice';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
@@ -11,6 +14,7 @@ import css from './ReviewCartSection.module.scss';
 type TReviewCartSectionProps = {
   className?: string;
   data: TObject;
+  showStartPickingOrderButton: boolean;
   onClickDownloadPriceQuotation: () => void;
 };
 
@@ -28,11 +32,23 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
       transportFee = 0,
       VATFee = 0,
     } = {},
+    showStartPickingOrderButton,
     onClickDownloadPriceQuotation,
   } = props;
   const intl = useIntl();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
 
+  const {
+    query: { orderId },
+  } = router;
   const rootClasses = classNames(css.root, className);
+
+  const handleStartPickingOrder = () => {
+    dispatch(
+      orderManagementThunks.startPickingOrder({ orderId: orderId as string }),
+    );
+  };
 
   return (
     <div className={rootClasses}>
@@ -129,13 +145,18 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
         })}
       </div>
 
-      <Button variant="cta" className={css.makePaymentButton} disabled>
-        <div>
-          {intl.formatMessage({
-            id: 'ReviewCardSection.makePayment',
-          })}
-        </div>
-      </Button>
+      {showStartPickingOrderButton && (
+        <Button
+          variant="cta"
+          className={css.makePaymentButton}
+          onClick={handleStartPickingOrder}>
+          <div>
+            {intl.formatMessage({
+              id: 'ReviewCardSection.makePayment',
+            })}
+          </div>
+        </Button>
+      )}
 
       {overflow > 0 && (
         <div className={css.overflowPackageInfo}>
