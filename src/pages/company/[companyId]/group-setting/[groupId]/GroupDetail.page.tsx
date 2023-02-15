@@ -2,6 +2,7 @@ import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
+import IconPlus from '@components/Icons/IconPlus/IconPlus';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
@@ -273,6 +274,7 @@ const GroupDetailPage = () => {
           tableBodyCellClassName={css.tableBodyCell}
           extraRows={
             <td className={css.addMemberBtn} onClick={openAddNewMembersModal}>
+              <IconPlus className={css.plusIcon} />
               {intl.formatMessage({ id: 'GroupDetail.addGroupMember' })}
             </td>
           }
