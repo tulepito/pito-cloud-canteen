@@ -1,0 +1,27 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.header {
+  @include flexAlign(center, space-between);
+  padding: 0 16px;
+  .title {
+    @include textTemplate(18px, $fontWeightBold, 24px);
+  }
+
+  .removeFilters {
+    @include textTemplate(14px, $fontWeightBold, 20px);
+    color: $neutralGray5;
+    cursor: pointer;
+  }
+}
+
+.filtersContainer {
+  padding: 0 16px;
+  overflow-y: auto;
+  height: calc(100vh - 40px - 152px - 24px);
+}
+
+.filterWrapper {
+  margin-top: 20px;
+}

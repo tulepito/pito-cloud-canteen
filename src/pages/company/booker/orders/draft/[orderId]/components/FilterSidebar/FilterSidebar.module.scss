@@ -1,0 +1,15 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.container {
+  border: 1px solid $neutralGray4;
+  border-radius: 16px;
+  padding: 16px 0;
+  height: 100vh;
+  position: fixed;
+  top: 152px;
+  left: 100px;
+  width: 295px;
+  background-color: $neutralGray1;
+}
