@@ -2,11 +2,14 @@
 import { createAsyncThunk, createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
-import { denormalisedResponseEntities, ensureCurrentUser } from '@utils/data';
+import {
+  CurrentUser,
+  denormalisedResponseEntities,
+  ensureCurrentUser,
+} from '@utils/data';
 import { EImageVariants, EUserPermission } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TCurrentUser, TObject } from '@utils/types';
-import get from 'lodash/get';
 
 const mergeCurrentUser = (
   oldCurrentUser: TCurrentUser | null,
@@ -33,10 +36,8 @@ const mergeCurrentUser = (
 };
 
 const detectUserPermission = (currentUser: TCurrentUser) => {
-  const { isCompany, isAdmin, company } = get(
-    currentUser,
-    'attributes.profile.metadata',
-  ) as TObject;
+  const { isCompany, isAdmin, company } =
+    CurrentUser(currentUser).getMetadata();
 
   let isBooker;
 
@@ -80,9 +81,9 @@ const fetchCurrentUser = createAsyncThunk(
     const parameters = params || {
       include: ['profileImage'],
       'fields.image': [
-        EImageVariants.squareSmall,
-        EImageVariants.squareSmall2x,
-        EImageVariants.scaledLarge,
+        `variants.${EImageVariants.squareSmall}`,
+        `variants.${EImageVariants.squareSmall2x}`,
+        `variants.${EImageVariants.scaledLarge}`,
       ],
     };
     const response = await sdk.currentUser.show(parameters);

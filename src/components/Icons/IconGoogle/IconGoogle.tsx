@@ -12,7 +12,7 @@ const IconGoogle: React.FC<TIconProps> = (props) => {
       xmlns="http://www.w3.org/2000/svg"
       preserveAspectRatio="none"
       className={className}>
-      <g clip-path="url(#clip0_6822_74505)">
+      <g clipPath="url(#clip0_6822_74505)">
         <path
           d="M19.8052 10.2312C19.8052 9.55141 19.7501 8.86797 19.6325 8.19922H10.2002V12.05H15.6016C15.3775 13.292 14.6573 14.3907 13.6027 15.0888V17.5874H16.8252C18.7176 15.8457 19.8052 13.2736 19.8052 10.2312Z"
           fill="#4285F4"

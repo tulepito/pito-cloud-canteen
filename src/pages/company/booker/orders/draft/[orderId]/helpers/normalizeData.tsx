@@ -1,9 +1,9 @@
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import { DateTime } from 'luxon';
 
 export const normalizePlanDetailsToEvent = (planDetails: any, order: any) => {
   const dateList = Object.keys(planDetails);
-  const planId = LISTING(order).getMetadata()?.plans?.[0];
+  const planId = Listing(order).getMetadata()?.plans?.[0];
 
   const normalizeData = dateList.map((timestamp) => {
     const planData = planDetails[timestamp];

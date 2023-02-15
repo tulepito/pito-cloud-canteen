@@ -11,10 +11,12 @@ import {
 import { useRouter } from 'next/router';
 import type { PropsWithChildren } from 'react';
 import React, { useCallback, useEffect } from 'react';
+import { useIntl } from 'react-intl';
 
 type TAuthGuardProps = PropsWithChildren<{}>;
 
 const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
+  const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isAuthenticated, authInfoLoaded } = useAppSelector(
@@ -22,19 +24,23 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   );
   const user = useAppSelector(currentUserSelector);
 
-  const { pathname: pathName } = router;
+  const {
+    pathname,
+    asPath: fullPath,
+    query: { from: fromUrl },
+  } = router;
   const {
     id: userId,
     attributes: { emailVerified: isUserEmailVerified },
   } = user;
 
   const isNonRequireAuthenticationRoute =
-    NonRequireAuthenticationRoutes.includes(pathName);
+    NonRequireAuthenticationRoutes.includes(pathname);
 
-  const isIgnoredAuthCheckRoute = IgnoredAuthCheckRoutes.includes(pathName);
+  const isIgnoredAuthCheckRoute = IgnoredAuthCheckRoutes.includes(pathname);
 
   // TODO: check sign up path and consider showing verification email form or not
-  const isSignUpPath = pathName === generalPaths.SignUp;
+  const isSignUpPath = pathname === generalPaths.SignUp;
   const shouldShowEmailVerification = !!userId && !isUserEmailVerified;
   const shouldNavigateInSignUpFlow =
     isSignUpPath && !shouldShowEmailVerification;
@@ -51,10 +57,13 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
 
     if (isNonRequireAuthenticationRoute) {
       if (homePageNavigateCondition) {
-        router.push(generalPaths.Home);
+        router.push(fromUrl ? (fromUrl as string) : generalPaths.Home);
       }
     } else if (!isAuthenticated) {
-      router.push(generalPaths.SignIn);
+      router.push({
+        pathname: generalPaths.SignIn,
+        query: { from: fullPath },
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -63,7 +72,8 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     isAuthenticated,
     isIgnoredAuthCheckRoute,
     isNonRequireAuthenticationRoute,
-    pathName,
+    pathname,
+    fullPath,
   ]);
 
   const renderComponent = () => {
@@ -77,7 +87,11 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
       (!isNonRequireAuthenticationRoute && !isAuthenticated);
 
     if (loadingCondition) {
-      return <LoadingContainer />;
+      return (
+        <LoadingContainer
+          loadingText={intl.formatMessage({ id: 'AuthGuard.loadingText' })}
+        />
+      );
     }
 
     return children;
@@ -85,7 +99,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
 
   useEffect(() => {
     dispatch(authThunks.authInfo());
-  }, [dispatch, pathName]);
+  }, [dispatch, pathname]);
 
   useEffect(() => {
     if (isAuthenticated) {

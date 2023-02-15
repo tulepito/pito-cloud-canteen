@@ -22,8 +22,72 @@
 }
 
 .tableContainer {
-  width: 100%;
   padding: 24px;
+
+  .tableRoot {
+    width: 100%;
+    border: 1px solid $neutralGray4;
+    border-radius: 8px;
+    border-spacing: 0;
+
+    .tableHead {
+      height: 40px;
+      tr {
+        td {
+          background-color: $neutralGray2;
+          padding: 0 16px;
+          font-size: 16px;
+          color: $neutralGray5;
+        }
+      }
+
+      .tableHeadCell {
+        &:first-child {
+          border-top-left-radius: 8px;
+        }
+
+        &:last-child {
+          border-top-right-radius: 8px;
+        }
+      }
+    }
+
+    .tableHeadMemberOrder {
+      :nth-child(4),
+      :nth-child(5) {
+        text-align: right;
+      }
+    }
+
+    .tableBody {
+      .tableBodyRow {
+        box-shadow: none;
+        border-bottom: 1px solid $neutralGray3;
+        height: 64px;
+
+        :nth-child(3),
+        :nth-child(4) {
+          text-align: left;
+        }
+
+        .tableBodyCell {
+          padding: 9px 16px;
+          font-size: 16px;
+          color: $neutralGray6;
+          border-bottom: 1px solid $neutralGray4;
+        }
+        &:last-child .tableBodyCell {
+          border-bottom: none;
+        }
+      }
+      .tableBodyRowMemberOrder {
+        :nth-child(4),
+        :nth-child(5) {
+          text-align: right;
+        }
+      }
+    }
+  }
 }
 
 .editBtn {
@@ -42,4 +106,10 @@
   circle {
     stroke: $neutralGray6;
   }
+}
+
+.noGroupFound {
+  @include flexAlign(center, center);
+  flex-direction: column;
+  margin-top: 40px;
 }

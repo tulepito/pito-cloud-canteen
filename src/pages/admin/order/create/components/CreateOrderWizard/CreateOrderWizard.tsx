@@ -3,11 +3,11 @@ import { getItem, setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
 import {
-  OrderAsyncAction,
+  orderAsyncActions,
   removeBookerList,
   resetOrder,
 } from '@redux/slices/Order.slice';
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -40,12 +40,12 @@ export const TABS = [
 export const CREATE_ORDER_STEP_LOCAL_STORAGE_NAME = 'orderStep';
 
 const tabCompleted = (order: any, tab: string) => {
-  const orderId = LISTING(order).getId();
+  const orderId = Listing(order).getId();
   const {
     deliveryAddress,
     staffName,
     plans = [],
-  } = LISTING(order).getMetadata();
+  } = Listing(order).getMetadata();
   const isMealPlanTabCompleted = plans.length > 0;
 
   switch (tab) {
@@ -109,7 +109,7 @@ const CreateOrderWizard = () => {
 
   useEffect(() => {
     if (orderId) {
-      dispatch(OrderAsyncAction.fetchOrder(orderId as string));
+      dispatch(orderAsyncActions.fetchOrder(orderId as string));
     }
   }, [dispatch, orderId]);
 
@@ -149,15 +149,18 @@ const CreateOrderWizard = () => {
 
   useEffect(() => {
     if (order) {
-      const { plans = [], staffName } = LISTING(
+      const { plans = [], staffName } = Listing(
         order as TListing,
       ).getMetadata();
       if (staffName) {
+        setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, REVIEW_TAB);
         return setCurrentStep(REVIEW_TAB);
       }
       if (plans.length > 0) {
+        setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, CREATE_MEAL_PLAN_TAB);
         return setCurrentStep(CREATE_MEAL_PLAN_TAB);
       }
+      setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, MEAL_PLAN_SETUP);
       return setCurrentStep(MEAL_PLAN_SETUP);
     }
   }, [order]);

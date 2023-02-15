@@ -1,10 +1,7 @@
-import {
-  calculateGroupMembers,
-  getAllCompanyMembers,
-} from '@helpers/companyMembers';
+import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
-import { denormalisedResponseEntities, LISTING } from '@utils/data';
+import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { parseTimestampToFormat } from '@utils/dates';
 import isEmpty from 'lodash/isEmpty';
 
@@ -19,7 +16,7 @@ const updateOrder = async ({
 
   const orderListing = await fetchListing(orderId);
   const { companyId, selectedGroups = [] } =
-    LISTING(orderListing).getMetadata();
+    Listing(orderListing).getMetadata();
   const companyAccount = await fetchUser(companyId);
 
   let updatedOrderListing;

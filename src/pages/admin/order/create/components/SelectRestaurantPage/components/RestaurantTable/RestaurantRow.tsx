@@ -1,4 +1,4 @@
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import { CATEGORY_OPTIONS } from '@utils/enums';
 import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
@@ -13,10 +13,10 @@ type TRestaurantRowProps = TDefaultProps & {
 
 const prepareDataForRestaurant = (restaurant: any) => {
   const { restaurantInfo, menu } = restaurant;
-  const restaurantId = LISTING(restaurantInfo).getId();
-  const { title } = LISTING(restaurantInfo).getAttributes();
-  const { categories = [] } = LISTING(restaurantInfo).getPublicData();
-  const { menuType } = LISTING(menu).getMetadata();
+  const restaurantId = Listing(restaurantInfo).getId();
+  const { title } = Listing(restaurantInfo).getAttributes();
+  const { categories = [] } = Listing(restaurantInfo).getPublicData();
+  const { menuType } = Listing(menu).getMetadata();
   return { restaurantId, title, categories, menuType };
 };
 

@@ -1,10 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
-.container {
-  padding: 24px;
-}
-
 .header {
   @include flexAlign(flex-end, space-between);
   padding: 24px;
@@ -20,6 +16,9 @@
   @include flexAlign(center);
   display: inline-flex;
   cursor: pointer;
+  padding-top: 24px;
+  margin-left: 24px;
+  font-weight: $fontWeightBold;
   &:hover {
     border-bottom: 1px solid $neutralGray5;
   }
@@ -29,15 +28,102 @@
   @include flexAlign(center);
   .changeNameBtn {
     margin-right: 16px;
+    @include buttonColorInline;
+  }
+
+  .deleteGroupBtn {
+    @include buttonColorInline;
   }
 }
 
 .addMemberBtn {
   @include flexAlign(center);
   @include buttonColorInline;
-  font-size: 16px;
+  min-height: 64px;
+  border-radius: 8px;
+  padding-left: 12px;
+  cursor: pointer;
+  @include textTemplate(16px, $fontWeightBold, 24px);
 }
 
 .deleteBtn {
   cursor: pointer;
+}
+
+.tableContainer {
+  padding: 24px;
+
+  .tableRoot {
+    width: 100%;
+    border: 1px solid $neutralGray4;
+    border-radius: 8px;
+    border-spacing: 0;
+
+    .tableHead {
+      height: 40px;
+      tr {
+        td {
+          background-color: $neutralGray2;
+          padding: 0 16px;
+          font-size: 16px;
+          color: $neutralGray5;
+        }
+      }
+
+      .tableHeadCell {
+        text-transform: uppercase;
+        &:first-child {
+          border-top-left-radius: 8px;
+        }
+
+        &:last-child {
+          border-top-right-radius: 8px;
+        }
+      }
+    }
+
+    .tableHeadMemberOrder {
+      :nth-child(4),
+      :nth-child(5) {
+        text-align: right;
+      }
+    }
+
+    .tableBody {
+      .tableBodyRow {
+        box-shadow: none;
+        border-bottom: 1px solid $neutralGray3;
+        height: 64px;
+
+        :nth-child(3),
+        :nth-child(4) {
+          text-align: left;
+        }
+
+        .tableBodyCell {
+          padding: 9px 16px;
+          font-size: 16px;
+          color: $neutralGray6;
+          border-bottom: 1px solid $neutralGray4;
+        }
+        &:last-child .tableBodyCell {
+          border-bottom: none;
+        }
+      }
+      .tableBodyRowMemberOrder {
+        :nth-child(4),
+        :nth-child(5) {
+          text-align: right;
+        }
+      }
+    }
+  }
+}
+
+.clickable {
+  cursor: pointer;
+
+  &:hover {
+    border-bottom: 1px solid $neutralGray5;
+  }
 }

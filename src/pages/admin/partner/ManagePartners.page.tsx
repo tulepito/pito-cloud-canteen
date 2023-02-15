@@ -203,7 +203,7 @@ const parseEntitiesToTableData = (
         title: entity.attributes.title,
         phoneNumber: entity.attributes.publicData.phoneNumber,
         email: entity.author.attributes.email,
-        address: entity.attributes.publicData.location.address,
+        address: entity.attributes.publicData?.location?.address,
         status: entity.attributes.metadata.status,
         authorId: entity.author.id.uuid,
         ...extraData,

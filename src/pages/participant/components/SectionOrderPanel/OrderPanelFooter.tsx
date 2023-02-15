@@ -6,6 +6,7 @@ import css from './SectionOrderPanel.module.scss';
 type TOrderPanelFooter = {
   className?: string;
   submitDataInprogress?: boolean;
+  isOrderDeadlineOver: boolean;
   handleSubmit: () => void;
   handleRemoveAllItem: () => void;
   cartListKeys?: string[];
@@ -14,10 +15,15 @@ type TOrderPanelFooter = {
 const OrderPanelFooter: React.FC<TOrderPanelFooter> = ({
   submitDataInprogress,
   cartListKeys = [],
+  isOrderDeadlineOver,
   handleSubmit,
   handleRemoveAllItem,
 }) => {
   const intl = useIntl();
+
+  const submitDisabled =
+    isOrderDeadlineOver || submitDataInprogress || cartListKeys.length === 0;
+  const removeAllDisabled = isOrderDeadlineOver || cartListKeys.length === 0;
 
   const completeOrderButtonLabel = intl.formatMessage({
     id: 'SectionOrderPanel.completeOrder',
@@ -31,11 +37,12 @@ const OrderPanelFooter: React.FC<TOrderPanelFooter> = ({
       <Button
         fullWidth
         onClick={handleSubmit}
-        disabled={submitDataInprogress || cartListKeys.length === 0}
+        disabled={submitDisabled}
         inProgress={submitDataInprogress}>
         {completeOrderButtonLabel}
       </Button>
       <InlineTextButton
+        disabled={removeAllDisabled}
         className={css.removeCartLabel}
         onClick={handleRemoveAllItem}>
         {removeAllOrderCartLabel}

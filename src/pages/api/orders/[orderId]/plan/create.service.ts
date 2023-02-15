@@ -1,9 +1,10 @@
-import { calculateGroupMembers } from '@helpers/companyMembers';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EListingStates } from '@utils/enums';
+
+import { getInitMemberOrder } from './memberOrder.helper';
 
 const createPlan = async ({
   orderId,
@@ -22,17 +23,10 @@ const createPlan = async ({
 
   const { subAccountId } = companyAccount.attributes.profile.privateData;
 
-  const allMembers = calculateGroupMembers(companyAccount, selectedGroups);
-  const initialMemberOrder = allMembers.reduce(
-    (result: any, _memberId: any) => ({
-      ...result,
-      [_memberId]: {
-        foodId: '',
-        status: 'empty',
-      },
-    }),
-    {},
-  );
+  const initialMemberOrder = getInitMemberOrder({
+    companyAccount,
+    selectedGroups,
+  });
 
   const updatedOrderDetail = Object.keys(orderDetail).reduce((result, date) => {
     return {

@@ -1,7 +1,12 @@
+import type { TObject } from '@utils/types';
 import { DateTime } from 'luxon';
+import type { ReactNode } from 'react';
 import type { Event } from 'react-big-calendar';
 
-import type { TCalendarItemCardComponents } from '../../helpers/types';
+import type {
+  TCalendarItemCardComponents,
+  TDayColumnHeaderProps,
+} from '../../helpers/types';
 import css from './DayItem.module.scss';
 import DayItemContent from './DayItemContent';
 import DayItemHeader from './DayItemHeader';
@@ -12,6 +17,8 @@ type TWDayItemProps = {
   resources?: any;
   renderEvent?: React.FC<any>;
   components?: TCalendarItemCardComponents;
+  customHeader?: (params: TDayColumnHeaderProps) => ReactNode;
+  eventExtraProps?: TObject;
 };
 
 const WDayItem: React.FC<TWDayItemProps> = ({
@@ -20,6 +27,8 @@ const WDayItem: React.FC<TWDayItemProps> = ({
   resources,
   renderEvent,
   components,
+  customHeader,
+  eventExtraProps,
 }) => {
   const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
   const isCurrentDay =
@@ -30,16 +39,24 @@ const WDayItem: React.FC<TWDayItemProps> = ({
 
   return (
     <div className={css.weekDay} id={`dayHeader-${date.getDay()}`}>
-      <DayItemHeader
-        date={date}
-        resources={resources}
-        isCurrentDay={isCurrentDay}
-      />
+      {customHeader ? (
+        customHeader({
+          date,
+          isCurrentDay,
+        })
+      ) : (
+        <DayItemHeader
+          date={date}
+          resources={resources}
+          isCurrentDay={isCurrentDay}
+        />
+      )}
       <DayItemContent
         date={date}
         events={events}
         resources={resources}
         renderEvent={renderEvent}
+        eventExtraProps={eventExtraProps}
         components={components}
       />
     </div>

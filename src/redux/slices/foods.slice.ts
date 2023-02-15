@@ -51,6 +51,10 @@ type TFoodSliceState = {
 
   createPartnerFoodFromCsvInProgress: boolean;
   creataPartnerFoodFromCsvError: any;
+
+  menuPickedFoods: TIntegrationListing[];
+  queryMenuPickedFoodsInProgress: boolean;
+  queryMenuPickedFoodsError: any;
 };
 
 const initialState: TFoodSliceState = {
@@ -85,6 +89,11 @@ const initialState: TFoodSliceState = {
 
   createPartnerFoodFromCsvInProgress: false,
   creataPartnerFoodFromCsvError: null,
+
+  // query food for menu picked food
+  menuPickedFoods: [],
+  queryMenuPickedFoodsInProgress: false,
+  queryMenuPickedFoodsError: null,
 };
 
 // ================ Thunk types ================ //
@@ -107,7 +116,27 @@ const DUPLICATE_FOOD = 'app/ManageFoodsPage/DUPLICATE_FOOD';
 
 const CREATE_FOOD_FROM_FILE = 'app/ManageFoodsPage/CREATE_FOOD_FROM_FILE';
 
+const QUERY_MENU_PICKED_FOODS = 'app/ManageFoodsPage/QUERY_MENU_PICKED_FOODS';
+
 // ================ Async thunks ================ //
+
+const queryMenuPickedFoods = createAsyncThunk(
+  QUERY_MENU_PICKED_FOODS,
+  async (payload: any, { extra: sdk }) => {
+    const { restaurantId, ids } = payload;
+    const response = await sdk.listings.query({
+      ids,
+      meta_listingType: EListingType.food,
+      meta_restaurantId: restaurantId,
+      meta_isDeleted: false,
+    });
+    const foods = denormalisedResponseEntities(response);
+    return foods;
+  },
+  {
+    serializeError: storableError,
+  },
+);
 
 const queryPartnerFoods = createAsyncThunk(
   QUERY_PARTNER_FOODS,
@@ -176,21 +205,28 @@ const duplicateFood = createAsyncThunk(
       const { images = [], title } = payload || {};
       // parse url to file
       const imageAsFiles = await Promise.all(
-        images.map(async (image: TImage) => {
-          const response = await fetch(
-            image.attributes.variants[EImageVariants.squareSmall2x].url,
-          );
-          const data = await response.blob();
-          const metadata = {
-            type: 'image/jpeg',
-          };
-          const file = new File(
-            [data],
-            `${`${title}_${new Date().getTime()}`}.jpg`,
-            metadata,
-          );
-          return file;
-        }),
+        images
+          .map(async (image: TImage) => {
+            try {
+              const response = await fetch(
+                image.attributes.variants[EImageVariants.squareSmall2x].url,
+              );
+              const data = await response.blob();
+              const metadata = {
+                type: 'image/jpeg',
+              };
+              const file = new File(
+                [data],
+                `${`${title}_${new Date().getTime()}`}.jpg`,
+                metadata,
+              );
+              return file;
+            } catch (error) {
+              console.error(error);
+              return null;
+            }
+          })
+          .filter((file: File) => !!file),
       );
       // upload image to Flex
       const uploadRes = await Promise.all(
@@ -252,19 +288,26 @@ const creataPartnerFoodFromCsv = createAsyncThunk(
               const { images, title } = l;
               const imagesAsArray = images ? images.split(',') : [];
               const imageAsFiles = await Promise.all(
-                imagesAsArray.map(async (src: string) => {
-                  const response = await fetch(src);
-                  const blobData = await response.blob();
-                  const metadata = {
-                    type: 'image/jpeg',
-                  };
-                  const file = new File(
-                    [blobData],
-                    `${`${title}_${new Date().getTime()}`}.jpg`,
-                    metadata,
-                  );
-                  return file;
-                }),
+                imagesAsArray
+                  .map(async (src: string) => {
+                    try {
+                      const response = await fetch(src);
+                      const blobData = await response.blob();
+                      const metadata = {
+                        type: 'image/jpeg',
+                      };
+                      const file = new File(
+                        [blobData],
+                        `${`${title}_${new Date().getTime()}`}.jpg`,
+                        metadata,
+                      );
+                      return file;
+                    } catch (error) {
+                      console.error(error);
+                      return null;
+                    }
+                  })
+                  .filter((file: File) => !!file),
               );
               // upload image to Flex
               const uploadRes = await Promise.all(
@@ -374,6 +417,7 @@ export const foodSliceThunks = {
   showDuplicateFood,
   duplicateFood,
   creataPartnerFoodFromCsv,
+  queryMenuPickedFoods,
 };
 
 // ================ Slice ================ //

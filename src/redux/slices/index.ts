@@ -8,6 +8,7 @@ export { default as emailVerification } from './emailVerification.slice';
 export { default as foods } from './foods.slice';
 export { default as ManageCompaniesPage } from './ManageCompaniesPage.slice';
 export { default as marketplaceData } from './marketplaceData.slice';
+export { default as menus } from './menus.slice';
 export { default as Order } from './Order.slice';
 export { default as ParticipantOrderManagementPage } from './ParticipantOrderManagementPage.slice';
 export { default as partners } from './partners.slice';

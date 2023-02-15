@@ -1,7 +1,7 @@
 import { HTTP_METHODS } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
 import { getSdk, handleError } from '@services/sdk';
-import { denormalisedResponseEntities, USER } from '@utils/data';
+import { CurrentUser, denormalisedResponseEntities } from '@utils/data';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import queryCompanies from './query.service';
@@ -15,7 +15,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       try {
         const currentUserRes = await sdk.currentUser.show();
         const [currentUser] = denormalisedResponseEntities(currentUserRes);
-        const companyIdList = USER(currentUser).getMetadata()?.companyList;
+        const { companyList: companyIdList } =
+          CurrentUser(currentUser).getMetadata();
 
         const companyList = await queryCompanies({ companyIdList });
 

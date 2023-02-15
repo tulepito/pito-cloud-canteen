@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
+import { EImageVariants } from '@utils/enums';
 
 // ================ Initial states ================ //
 type TUploadImageState = {
@@ -30,6 +31,11 @@ const uploadImage = createAsyncThunk(
     };
     const queryParams = {
       expand: true,
+      'fields.image': [
+        `variants.${EImageVariants.squareSmall}`,
+        `variants.${EImageVariants.squareSmall2x}`,
+        `variants.${EImageVariants.scaledLarge}`,
+      ],
     };
     const uploadImageResponse = await sdk.images.upload(
       bodyParams,
@@ -86,6 +92,7 @@ const uploadImageSlice = createSlice({
   },
 });
 
+export const { resetImage } = uploadImageSlice.actions;
 // ================ Actions ================ //
 export default uploadImageSlice.reducer;
 

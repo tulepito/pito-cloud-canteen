@@ -1,4 +1,4 @@
-import { calculateGroupMembers } from '@helpers/companyMembers';
+import { calculateGroupMembers } from '@helpers/company';
 
 export const getInitMemberOrder = ({
   companyAccount,

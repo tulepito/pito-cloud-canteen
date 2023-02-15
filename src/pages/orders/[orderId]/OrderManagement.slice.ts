@@ -4,7 +4,7 @@ import {
   deleteParticipantFromOrderApi,
   getBookerOrderDataApi,
   sendRemindEmailToMemberApi,
-  updateBookerOrderApi,
+  updateOrderApi,
 } from '@apis/orderApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
@@ -28,8 +28,10 @@ type TOrderManagementState = {
   companyData: TCompany | null;
   orderData: TObject | null;
   planData: TObject;
+  bookerData: TUser | null;
   participantData: Array<TUser>;
 };
+
 const initialState: TOrderManagementState = {
   isFetchingOrderDetails: false,
   isDeletingParticipant: false,
@@ -39,6 +41,7 @@ const initialState: TOrderManagementState = {
   companyData: null,
   orderData: {},
   planData: {},
+  bookerData: null,
   participantData: [],
 };
 
@@ -67,7 +70,7 @@ const updateOrderGeneralInfo = createAsyncThunk(
       },
     };
 
-    await updateBookerOrderApi(orderId, updateParams);
+    await updateOrderApi(orderId, updateParams);
     await dispatch(loadData(orderId));
   },
 );

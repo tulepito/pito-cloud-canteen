@@ -1,0 +1,12 @@
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  .label {
+    @include textTemplate(14px, 700, 20px);
+  }
+
+  .description {
+    margin-top: 4px;
+    @include textTemplate(12px, 400, 16px);
+  }
+}

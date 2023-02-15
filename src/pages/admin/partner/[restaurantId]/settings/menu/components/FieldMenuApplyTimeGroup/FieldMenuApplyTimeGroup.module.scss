@@ -1,0 +1,21 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.fields {
+  display: grid;
+  gap: 80px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.inputDate {
+  width: 300px;
+  margin-bottom: 16px;
+}
+
+.numberOfCyclesInput {
+  width: 300px;
+}
+
+.inputSuffixedContainer {
+  right: 15px !important;
+}

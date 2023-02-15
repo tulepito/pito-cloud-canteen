@@ -5,8 +5,10 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import companyChecker from '@services/permissionChecker/company';
 import { handleError } from '@services/sdk';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
-import { denormalisedResponseEntities, USER } from '@utils/data';
+import { denormalisedResponseEntities, User } from '@utils/data';
 import { companyInvitation } from '@utils/emailTemplate/companyInvitation';
+import compact from 'lodash/compact';
+import difference from 'lodash/difference';
 import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -18,7 +20,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const integrationSdk = getIntegrationSdk();
   try {
     const { userIdList, noAccountEmailList, companyId } = req.body;
-
+    const companyAccount = await fetchUser(companyId);
+    const { members = {} } = User(companyAccount).getMetadata();
+    const membersIdList = compact(
+      Object.values(members).map((_member: any) => _member?.id),
+    );
+    const membersEmailList = Object.keys(members);
     // Step calculate expire time of invitation email
     const expireTime = DateTime.now()
       .setZone('Asia/Ho_Chi_Minh')
@@ -28,17 +35,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // Step update data for existed user
     const newParticipantMembers = await Promise.all(
-      userIdList.map(async (userId: string) => {
+      difference(userIdList, membersIdList).map(async (userId: string) => {
         const userAccount = await fetchUser(userId);
         const { companyList: userCompanyList = [] } =
-          USER(userAccount).getMetadata();
+          User(userAccount).getMetadata();
         await integrationSdk.users.updateProfile({
           id: userId,
           metadata: {
-            companyList: [...userCompanyList, companyId],
+            companyList: Array.from(new Set([...userCompanyList, companyId])),
           },
         });
-        const { email: userEmail } = USER(userAccount).getAttributes();
+        const { email: userEmail } = User(userAccount).getAttributes();
         return {
           [userEmail]: {
             id: userId,
@@ -62,7 +69,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     );
 
     // Step format no account email list to company member object
-    const newNoAccountMembers = noAccountEmailList
+    const newNoAccountMembers = difference(noAccountEmailList, membersEmailList)
       .map((email: string) => ({
         email,
         id: null,
@@ -79,8 +86,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }, {});
 
     // Step update company account metadata
-    const companyAccount = await fetchUser(companyId);
-    const { members = {} } = USER(companyAccount).getMetadata();
+
     const newCompanyMembers = {
       ...members,
       ...newNoAccountMembers,
@@ -100,7 +106,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     );
 
     const newParticipantMembersEmailTemplate = companyInvitation({
-      companyName: USER(companyAccount).getPublicData().companyName,
+      companyName: User(companyAccount).getPublicData().companyName,
       url: `${baseUrl}/invitation/${companyId}`,
     });
     // Step handle send email for new participant members

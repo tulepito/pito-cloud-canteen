@@ -1,8 +1,7 @@
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
+import { findMinStartDate } from '@helpers/orderHelper';
 import { generateTimeOptions } from '@utils/dates';
 import { composeValidators, nonSatOrSunDay, required } from '@utils/validators';
 import classNames from 'classnames';
@@ -23,6 +22,7 @@ type MealPlanDateFieldProps = {
   columnLayout?: boolean;
   title?: string;
 };
+
 const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
   const { values, columnLayout = false, form, title } = props;
   const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
@@ -34,9 +34,11 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
   const initialEndDate = endDateInitialValue
     ? new Date(endDateInitialValue)
     : null;
-  const today = new Date();
   const [startDate, setStartDate] = useState<Date>(initialStartDate!);
   const [endDate, setEndDate] = useState<Date>(initialEndDate!);
+
+  const minStartDate = findMinStartDate();
+
   const startDateRequiredMessage = intl.formatMessage({
     id: 'MealPlanDateField.startDateRequired',
   });
@@ -71,6 +73,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
     css.customInput,
     !endDate && css.placeholder,
   );
+
   return (
     <div className={css.container}>
       {title && <div className={css.fieldTitle}>{title}</div>}
@@ -81,33 +84,20 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           name="startDate"
           selected={startDate}
           onChange={(date: Date) => setStartDate(date)}
-          minDate={addDays(today, 2)}
+          minDate={minStartDate}
           autoComplete="off"
           label={intl.formatMessage({
             id: 'MealPlanDateField.startDateLabel',
           })}
+          dateFormat={'EEE, dd MMMM, yyyy'}
           className={startDateClasses}
+          placeholderText={format(new Date(), 'EEE, dd MMMM, yyyy', {
+            locale: viLocale,
+          })}
           validate={composeValidators(
             required(startDateRequiredMessage),
             nonSatOrSunDay(startDateNonSatOrSunDayMessage),
           )}
-          customInput={
-            <FieldTextInput
-              id="startDate"
-              name="startDate"
-              disabled
-              format={(value) => {
-                return value
-                  ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
-                      locale: viLocale,
-                    })
-                  : intl.formatMessage({
-                      id: 'MealPlanDateField.startDatePlaceholder',
-                    });
-              }}
-              leftIcon={<IconCalendar />}
-            />
-          }
         />
         <FieldDatePicker
           id="endDate"
@@ -122,23 +112,9 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           autoComplete="off"
           validate={required(endDateRequiredMessage)}
           disabled={!startDate}
-          customInput={
-            <FieldTextInput
-              id="endDate"
-              name="endDate"
-              disabled
-              format={(value) => {
-                return value
-                  ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
-                      locale: viLocale,
-                    })
-                  : intl.formatMessage({
-                      id: 'MealPlanDateField.endDatePlaceholder',
-                    });
-              }}
-              leftIcon={<IconCalendar />}
-            />
-          }
+          placeholderText={format(new Date(), 'EEE, dd MMMM, yyyy', {
+            locale: viLocale,
+          })}
         />
         <FieldSelect
           id="deliveryHour"

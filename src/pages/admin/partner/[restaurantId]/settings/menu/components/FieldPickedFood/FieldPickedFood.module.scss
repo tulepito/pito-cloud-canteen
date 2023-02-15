@@ -1,0 +1,37 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  margin-bottom: 18px;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.labelLeft {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.iconClose {
+  width: 15px;
+  height: 15px;
+  margin-right: 10px;
+}
+
+.title {
+  max-width: 70%;
+}
+
+.price {
+  font-weight: $fontWeightBold;
+}
+
+.field input {
+  padding: 5px 0 !important;
+  outline: none !important;
+}

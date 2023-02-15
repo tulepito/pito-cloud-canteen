@@ -7,12 +7,13 @@ import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import {
-  addWorkspaceCompanyId,
-  BookerManageCompany,
-} from '@src/redux/slices/company.slice';
+import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
+import { companyPaths } from '@src/paths';
+import { BookerManageCompany } from '@src/redux/slices/company.slice';
+import { User } from '@utils/data';
 import type { TObject } from '@utils/types';
 import filter from 'lodash/filter';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -26,6 +27,7 @@ const GroupDetailPage = () => {
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { groupId = '', companyId = '' } = router.query;
   const {
     value: isEditing,
     setTrue: onEditing,
@@ -61,6 +63,7 @@ const GroupDetailPage = () => {
     (state) => state.company.groupMembers,
     shallowEqual,
   );
+
   const companyMembers = useAppSelector(
     (state) => state.company.companyMembers,
     shallowEqual,
@@ -85,16 +88,14 @@ const GroupDetailPage = () => {
         (result: any, member: any) => [
           ...result,
           {
-            key: member.id.uuid,
+            key: User(member).getId(),
             data: {
-              id: member.id.uuid,
-              name: member.attributes.profile.displayName,
-              email: member.attributes.email,
-              group: getGroupNames(
-                member.attributes.profile.metadata.groupList,
-              ),
-              allergy: [],
-              nutrition: [],
+              id: User(member).getId(),
+              name: User(member).getProfile()?.displayName,
+              email: User(member).getAttributes()?.email,
+              group: getGroupNames(User(member).getMetadata()?.groupList),
+              allergy: User(member).getPublicData()?.allergies?.join(', '),
+              nutrition: User(member).getPublicData()?.nutritions?.join(', '),
             },
           },
         ],
@@ -102,6 +103,17 @@ const GroupDetailPage = () => {
       ),
     [groupMembers],
   );
+
+  const goToGroupMemberDetailPage = (memberId: string) => () => {
+    router.push({
+      pathname: companyPaths.GroupMemberDetail,
+      query: {
+        companyId,
+        groupId,
+        memberId,
+      },
+    });
+  };
 
   const TABLE_COLUMN: TColumn[] = [
     {
@@ -114,8 +126,14 @@ const GroupDetailPage = () => {
     {
       key: 'email',
       label: intl.formatMessage({ id: 'GroupDetail.columnLabel.email' }),
-      render: (data: any) => {
-        return <span>{data.email}</span>;
+      render: ({ id, email }: TObject) => {
+        return (
+          <span
+            className={css.clickable}
+            onClick={goToGroupMemberDetailPage(id)}>
+            {email}
+          </span>
+        );
       },
     },
     {
@@ -129,14 +147,14 @@ const GroupDetailPage = () => {
       key: 'allergy',
       label: intl.formatMessage({ id: 'GroupDetail.columnLabel.allergy' }),
       render: (data: any) => {
-        return <span>{data.allergy}</span>;
+        return <span>{isEmpty(data.allergy) ? '-' : data.allergy}</span>;
       },
     },
     {
       key: 'nutrition',
       label: intl.formatMessage({ id: 'GroupDetail.columnLabel.nutrition' }),
       render: (data: any) => {
-        return <span>{data.nutrition}</span>;
+        return <span>{isEmpty(data.nutrition) ? '-' : data.nutrition}</span>;
       },
     },
     {
@@ -155,12 +173,9 @@ const GroupDetailPage = () => {
       },
     },
   ];
-  const { groupId = '', companyId = '' } = router.query;
+
+  useFetchCompanyInfo();
   useEffect(() => {
-    dispatch(addWorkspaceCompanyId(companyId));
-  }, [companyId, dispatch]);
-  useEffect(() => {
-    dispatch(BookerManageCompany.companyInfo());
     dispatch(BookerManageCompany.groupInfo());
     dispatch(
       BookerManageCompany.groupDetailInfo({
@@ -177,23 +192,35 @@ const GroupDetailPage = () => {
     [name, description],
   );
 
-  const onConfirmDeleteMember = () => {
-    dispatch(
+  const onConfirmDeleteMember = async () => {
+    const { meta } = await dispatch(
       BookerManageCompany.updateGroup({
         groupId,
         deletedMembers: [deletingMemberInfo],
       }),
-    ).then(({ error }: any) => {
-      if (!error) {
-        closeDeleteMemberConfirmationModal();
-      }
-    });
+    );
+    if (meta.requestStatus !== 'rejected') {
+      closeDeleteMemberConfirmationModal();
+      await dispatch(
+        BookerManageCompany.groupDetailInfo({
+          groupId: groupId as string,
+        }),
+      );
+    }
   };
 
   const onConfirmDeleteGroup = () => {
     dispatch(BookerManageCompany.deleteGroup(groupId as string)).then(
       ({ error }: any) => {
-        if (!error) onDeleteGroupConfirmationModalClose();
+        if (!error) {
+          onDeleteGroupConfirmationModalClose();
+          router.push({
+            pathname: companyPaths.GroupSetting,
+            query: {
+              companyId,
+            },
+          });
+        }
       },
     );
   };
@@ -219,7 +246,6 @@ const GroupDetailPage = () => {
           <>
             <div className={css.titleWrapper}>
               <h2>{name || '---'}</h2>
-              <p>{description || '---'}</p>
             </div>
             <div className={css.actionBtns}>
               <Button onClick={onEditing} className={css.changeNameBtn}>
@@ -234,15 +260,23 @@ const GroupDetailPage = () => {
           </>
         )}
       </div>
-      <div className={css.container}>
+      <div className={css.tableContainer}>
         <Table
           columns={TABLE_COLUMN}
           data={formattedGroupMembers}
           isLoading={fetchGroupDetailInProgress}
+          tableClassName={css.tableRoot}
+          tableHeadClassName={css.tableHead}
+          tableHeadCellClassName={css.tableHeadCell}
+          tableBodyClassName={css.tableBody}
+          tableBodyRowClassName={css.tableBodyRow}
+          tableBodyCellClassName={css.tableBodyCell}
+          extraRows={
+            <td className={css.addMemberBtn} onClick={openAddNewMembersModal}>
+              {intl.formatMessage({ id: 'GroupDetail.addGroupMember' })}
+            </td>
+          }
         />
-        <Button className={css.addMemberBtn} onClick={openAddNewMembersModal}>
-          {intl.formatMessage({ id: 'GroupDetail.addGroupMember' })}
-        </Button>
       </div>
       <AddNewMembersModal
         isOpen={isAddNewMembersModalOpen}

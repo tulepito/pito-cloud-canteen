@@ -35,7 +35,7 @@ const createOrder = async ({
     .padStart(5, '0')}`;
 
   // Call api to create order listing
-  const orderListinResponse = await integrationSdk.listings.create(
+  const orderListingResponse = await integrationSdk.listings.create(
     {
       authorId: subAccountId,
       title: generatedOrderId,
@@ -50,7 +50,7 @@ const createOrder = async ({
     { expand: true },
   );
 
-  return denormalisedResponseEntities(orderListinResponse)[0];
+  return denormalisedResponseEntities(orderListingResponse)[0];
 };
 
 export default createOrder;

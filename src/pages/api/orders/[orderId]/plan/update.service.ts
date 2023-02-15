@@ -1,15 +1,16 @@
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
-import { denormalisedResponseEntities, LISTING } from '@utils/data';
+import { denormalisedResponseEntities, Listing } from '@utils/data';
+import { EOrderStates } from '@utils/enums';
+import type { TObject } from '@utils/types';
+import { isEmpty } from 'lodash';
 
 import { getInitMemberOrder } from './memberOrder.helper';
 
-export const UPDATE_MODES: Record<string, string> = {
-  MERGE: 'merge',
-  RELACE: 'replace',
-};
-
-export type TUpdateMode = 'merge' | 'replace';
+export enum EApiUpdateMode {
+  MERGE = 'merge',
+  REPLACE = 'replace',
+}
 
 const getNormalizeDetail = ({
   orderDetail,
@@ -18,21 +19,18 @@ const getNormalizeDetail = ({
   orderDetail: any;
   initialMemberOrder: any;
 }) => {
-  return Object.keys(orderDetail).reduce(
-    (acc: Record<string, any>, curr: string) => {
-      if (orderDetail[curr]) {
-        return {
-          ...acc,
-          [curr]: {
-            ...orderDetail[curr],
-            memberOrders: initialMemberOrder,
-          },
-        };
-      }
-      return acc;
-    },
-    {},
-  );
+  return Object.keys(orderDetail).reduce((acc: TObject, curr: string) => {
+    if (orderDetail[curr]) {
+      return {
+        ...acc,
+        [curr]: {
+          ...orderDetail[curr],
+          memberOrders: initialMemberOrder,
+        },
+      };
+    }
+    return acc;
+  }, {});
 };
 
 const updatePlan = async ({
@@ -44,14 +42,17 @@ const updatePlan = async ({
   orderId: string;
   planId: string;
   orderDetail: any;
-  updateMode: TUpdateMode;
+  updateMode: EApiUpdateMode;
 }) => {
   const integrationSdk = getIntegrationSdk();
 
   const orderListing = await fetchListing(orderId as string);
-  const { companyId, selectedGroups = [] } =
-    LISTING(orderListing).getMetadata();
-
+  const {
+    companyId,
+    selectedGroups = [],
+    orderState,
+  } = Listing(orderListing).getMetadata();
+  const enabledToUpdateRelatedBookingInfo = orderState === EOrderStates.isNew;
   const companyAccount = await fetchUser(companyId);
 
   const initialMemberOrder = getInitMemberOrder({
@@ -68,28 +69,30 @@ const updatePlan = async ({
 
   let updatedOrderDetail = normalizeDetail;
 
-  if (updateMode === 'merge') {
-    currPlan = await fetchListing(planId as string);
-    const { orderDetail: oldOrderDetail } = LISTING(currPlan).getMetadata();
+  if (enabledToUpdateRelatedBookingInfo && !isEmpty(updatedOrderDetail)) {
+    if (updateMode === EApiUpdateMode.MERGE) {
+      currPlan = await fetchListing(planId as string);
+      const { orderDetail: oldOrderDetail } = Listing(currPlan).getMetadata();
 
-    updatedOrderDetail = getNormalizeDetail({
-      orderDetail: { ...oldOrderDetail, ...orderDetail },
-      initialMemberOrder,
-    });
-  }
+      updatedOrderDetail = getNormalizeDetail({
+        orderDetail: { ...oldOrderDetail, ...orderDetail },
+        initialMemberOrder,
+      });
+    }
 
-  const planListingResponse = await integrationSdk.listings.update(
-    {
-      id: planId,
-      metadata: {
-        orderDetail: updatedOrderDetail,
+    const planListingResponse = await integrationSdk.listings.update(
+      {
+        id: planId,
+        metadata: {
+          orderDetail: updatedOrderDetail,
+        },
       },
-    },
-    { expand: true },
-  );
+      { expand: true },
+    );
 
-  const planListing = denormalisedResponseEntities(planListingResponse)[0];
-  return planListing;
+    const planListing = denormalisedResponseEntities(planListingResponse)[0];
+    return planListing;
+  }
 };
 
 export default updatePlan;

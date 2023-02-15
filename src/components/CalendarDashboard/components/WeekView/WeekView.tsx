@@ -2,12 +2,17 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
 import { useViewport } from '@hooks/useViewport';
+import type { TObject } from '@utils/types';
 import { DateTime } from 'luxon';
+import type { ReactNode } from 'react';
 import { useEffect, useMemo } from 'react';
 import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
 import { Navigate } from 'react-big-calendar';
 
-import type { TCalendarItemCardComponents } from '../../helpers/types';
+import type {
+  TCalendarItemCardComponents,
+  TDayColumnHeaderProps,
+} from '../../helpers/types';
 import WDayItem from '../DayItem/WDayItem';
 import IconCalendarToolbar from '../Icons/IconCalendar';
 import css from './WeekView.module.scss';
@@ -21,6 +26,8 @@ type TWeekViewProps = {
   accessors: any;
   renderEvent?: React.FC<any>;
   customComponents?: TCalendarItemCardComponents;
+  customHeader?: (params: TDayColumnHeaderProps) => ReactNode;
+  eventExtraProps: TObject;
 } & TimeGridProps;
 
 type TWeekViewObject = {
@@ -36,6 +43,8 @@ function WeekView({
   events = [],
   renderEvent,
   customComponents,
+  customHeader,
+  eventExtraProps,
   resources,
 }: TWeekViewProps & TWeekViewObject) {
   const {
@@ -68,7 +77,9 @@ function WeekView({
             events={getEventsInDate(item, events)}
             resources={resources}
             renderEvent={renderEvent}
+            eventExtraProps={eventExtraProps}
             components={customComponents}
+            customHeader={customHeader}
           />
         ))}
       </div>

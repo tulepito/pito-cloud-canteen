@@ -7,9 +7,9 @@ import IconPhone from '@components/Icons/IconPhone/IconPhone';
 import IconSort from '@components/Icons/IconSort/IconSort';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import Pagination from '@components/Pagination/Pagination';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { addBooker } from '@redux/slices/Order.slice';
-import { USER } from '@utils/data';
+import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 import classNames from 'classnames';
 import { useState } from 'react';
@@ -50,14 +50,16 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
     toggleSort,
     createOrderInProgress,
   } = props;
-  const [selectedConpanyId, setSelectedCompanyId] = useState<string>('');
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
   const [selectedBookerId, setSelectedBookerId] = useState<string>('');
   const shouldShowPagination = page && data?.length > 0;
-
+  const queryCompaniesInProgress = useAppSelector(
+    (state) => state.ManageCompaniesPage.queryCompaniesInProgress,
+  );
   const renderTableRowFn = (tableData: any, form: any) => {
     return tableData.map(({ key, data: itemData }: any, index: number) => {
       const onCustomItemClick = () => {
-        if (selectedConpanyId === itemData.id) {
+        if (selectedCompanyId === itemData.id) {
           return;
         }
         form.batch(() => {
@@ -71,11 +73,13 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
         }
       };
       const showBookerList =
-        selectedConpanyId === itemData.id &&
+        selectedCompanyId === itemData.id &&
         bookerList.length > 0 &&
         !fetchBookersInProgress;
       const showLoading =
-        selectedConpanyId === itemData.id && fetchBookersInProgress;
+        selectedCompanyId === itemData.id && fetchBookersInProgress;
+      const currentIdx = (page - 1) * 10 + (index + 1);
+
       return (
         <div key={key} className={css.bodyRow}>
           <div className={css.mainRow} onClick={onCustomItemClick}>
@@ -86,7 +90,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
                 value={itemData.id}
               />
             </span>
-            <span className={css.bodyCell}>{index + 1}</span>
+            <span className={css.bodyCell}>{currentIdx}</span>
             <span className={css.bodyCell}>
               <span>{itemData.companyName}</span>
             </span>
@@ -102,41 +106,41 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
             <div className={css.bookerList}>
               {bookerList.map((booker) => {
                 const handleBookerClick = () => {
-                  form.change('booker', USER(booker).getId());
-                  setSelectedBookerId(USER(booker).getId());
+                  form.change('booker', User(booker).getId());
+                  setSelectedBookerId(User(booker).getId());
                   dispatch(addBooker(booker));
                 };
                 const bookerCardClasses = classNames(
                   css.bookerCard,
-                  selectedBookerId === USER(booker).getId() && css.selected,
+                  selectedBookerId === User(booker).getId() && css.selected,
                 );
                 return (
                   <div
-                    key={USER(booker).getId()}
+                    key={User(booker).getId()}
                     className={bookerCardClasses}
                     onClick={handleBookerClick}>
                     <div className={css.profile}>
                       <Avatar user={booker} disableProfileLink />
                       <div className={css.name}>
-                        {USER(booker).getProfile().displayName}
+                        {User(booker).getProfile().displayName}
                       </div>
                     </div>
                     <div className={css.contact}>
                       <div className={css.row}>
                         <IconPhone />
                         <span>
-                          {USER(booker).getProtectedData().phoneNumber}
+                          {User(booker).getProtectedData().phoneNumber}
                         </span>
                       </div>
                       <div className={css.row}>
                         <IconMail />
-                        <div>{USER(booker).getAttributes().email}</div>
+                        <div>{User(booker).getAttributes().email}</div>
                       </div>
                     </div>
                     <FieldRadioButton
-                      id={`booker-${USER(booker).getId()}`}
+                      id={`booker-${User(booker).getId()}`}
                       name="booker"
-                      value={USER(booker).getId()}
+                      value={User(booker).getId()}
                       rootClassName={css.bookerRadio}
                     />
                   </div>
@@ -165,6 +169,8 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
         const { handleSubmit, form, values } = formRenderProps;
         const { booker: bookerValue = '', clientId: clientIdValue = '' } =
           values;
+        const tableContent =
+          data?.length > 0 ? renderTableRowFn(data, form) : noClientsFound;
         const disabled =
           !bookerValue || !clientIdValue || createOrderInProgress;
         return (
@@ -172,7 +178,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
             <div className={css.container}>
               <div className={css.table}>
                 <div className={css.header}>
-                  <span></span>
+                  <span>&nbsp;</span>
                   <span>{intl.formatMessage({ id: 'ClientTable.id' })}</span>
                   <span className={css.companyNameHeaderCol}>
                     {intl.formatMessage({ id: 'ClientTable.companyName' })}
@@ -183,9 +189,13 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
                   </span>
                 </div>
                 <div className={css.tableBody}>
-                  {data?.length > 0
-                    ? renderTableRowFn(data, form)
-                    : noClientsFound}
+                  {queryCompaniesInProgress ? (
+                    <div className={css.dataLoading}>
+                      {intl.formatMessage({ id: 'ClientTable.loading' })}
+                    </div>
+                  ) : (
+                    tableContent
+                  )}
                 </div>
               </div>
               {shouldShowPagination && (

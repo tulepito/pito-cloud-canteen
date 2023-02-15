@@ -4,12 +4,14 @@ import type { TBodyParams } from './configs';
 import { deleteApi, getApi, postApi, putApi } from './configs';
 
 // Manage Order apis
-type CreateBookerOrderApiBody = {
+type TCreateBookerOrderApiBody = {
   companyId: string;
   bookerId: string;
+  isCreatedByAdmin?: boolean;
 };
 
-type UpdateBookerOrderApiBody = {
+export type TUpdateOrderApiBody = {
+  orderId?: string;
   generalInfo?: {
     deliveryAddress?: {
       address: string;
@@ -46,16 +48,14 @@ type UpdateBookerOrderApiBody = {
   };
 };
 
-export const createBookerOrderApi = (body: CreateBookerOrderApiBody) =>
+export const createBookerOrderApi = (body: TCreateBookerOrderApiBody) =>
   postApi('/orders', body);
 
 export const getBookerOrderDataApi = (orderId: string) =>
   getApi(`/orders/${orderId}`);
 
-export const updateBookerOrderApi = (
-  orderId: string,
-  body: UpdateBookerOrderApiBody,
-) => putApi(`/orders/${orderId}`, body);
+export const updateOrderApi = (orderId: string, body: TUpdateOrderApiBody) =>
+  putApi(`/orders/${orderId}`, body);
 // ------------------------- //
 
 // Manage Order - Plan detail
@@ -82,4 +82,14 @@ export const sendRemindEmailToMemberApi = (orderId: string, body: TObject) =>
 
 export const queryOrdersApi = (body: TBodyParams) => {
   return postApi(`/admin/listings/order/query`, body);
+};
+
+export const bookerDeleteDraftOrderApi = ({
+  companyId,
+  orderId,
+}: {
+  companyId: string;
+  orderId: string;
+}) => {
+  return deleteApi(`/company/${companyId}/orders/${orderId}`);
 };

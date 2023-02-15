@@ -2,8 +2,8 @@ import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/components/AddMorePlan';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
 import { useAppDispatch } from '@hooks/reduxHooks';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
-import { LISTING } from '@utils/data';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
@@ -30,7 +30,7 @@ function BookerDraftOrderPage() {
   const { order } = useLoadData({
     orderId: orderId as string,
   });
-  const orderData = LISTING(order as TListing);
+  const orderData = Listing(order as TListing);
   const {
     startDate: startTimestamp,
     endDate: endTimestamp,
@@ -90,7 +90,7 @@ function BookerDraftOrderPage() {
 
   const handleRemoveMeal = (planId: string) => (resourceId: string) => {
     dispatch(
-      OrderAsyncAction.updatePlanDetail({
+      orderAsyncActions.updatePlanDetail({
         orderId,
         planId,
         orderDetail: {

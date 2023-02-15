@@ -1,5 +1,5 @@
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -22,8 +22,7 @@ const ParticipantPlan = () => {
     useSelectRestaurant();
 
   const orderId = order?.id?.uuid;
-  const { generalInfo } = LISTING(order).getMetadata();
-  const { orderDeadline } = generalInfo || {};
+  const { deadlineDate = Date.now() } = Listing(order).getMetadata();
 
   // Render
   return (
@@ -42,7 +41,7 @@ const ParticipantPlan = () => {
           />
         </div>
         <div className={css.rightSection}>
-          <SectionCountdown orderDeadline={orderDeadline || Date.now()} />
+          <SectionCountdown orderDeadline={deadlineDate} />
           <SectionOrderPanel planId={`${planId}`} orderId={orderId} />
         </div>
       </div>

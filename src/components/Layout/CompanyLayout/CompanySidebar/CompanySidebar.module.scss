@@ -4,10 +4,10 @@
 .root {
   min-width: 360px;
   position: fixed;
-  height: calc(100vh - 72px);
+  height: 100vh;
   z-index: 1;
   background-color: $neutralGray1;
-  border-right: 1px solid $neutral4;
+  border-right: 1px solid $neutralGray4;
 }
 
 .logo {

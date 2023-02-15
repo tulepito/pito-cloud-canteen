@@ -1,8 +1,23 @@
+import type {
+  CreateGroupApiBody,
+  DeleteGroupApiData,
+  GetGroupDetailApiParams,
+  UpdateCompanyApiBody,
+  UpdateGroupApiBody,
+} from '@apis/companyApi';
+import {
+  createGroupApi,
+  deleteGroupApi,
+  getAllCompanyMembersApi,
+  getGroupDetailApi,
+  updateCompany,
+  updateGroupApi,
+} from '@apis/companyApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
+import { EImageVariants } from '@utils/enums';
 import type { TObject, TUser } from '@utils/types';
-import axios from 'axios';
 
 import { userThunks } from './user.slice';
 
@@ -101,8 +116,8 @@ const companyInfo = createAsyncThunk(
       companyAccountResponse,
     );
     const companyImageId = companyAccount.profileImage?.id;
-    const { data: allEmployeesData } = await axios.get(
-      `/api/company/all-employees?companyId=${workspaceCompanyId}`,
+    const { data: allEmployeesData } = await getAllCompanyMembersApi(
+      workspaceCompanyId,
     );
     const { groups = [], members = {} } =
       companyAccount.attributes.profile.metadata;
@@ -113,7 +128,7 @@ const companyInfo = createAsyncThunk(
       groupList: groups,
       company: companyAccount,
       originCompanyMembers: members,
-      companyMembers: [...allEmployeesData.data.data],
+      companyMembers: [...allEmployeesData],
     };
   },
 );
@@ -143,9 +158,13 @@ const groupDetailInfo = createAsyncThunk(
     const { id, name, description } = groups.find(
       (_group: any) => _group.id === groupId,
     );
-    const { data: allMembersData } = await axios.get(
-      `/company/group/all-member?groupId=${groupId}&perPage=${MEMBER_PER_PAGE}&page=${page}`,
-    );
+    const apiParams: GetGroupDetailApiParams = {
+      groupId,
+      page,
+      perPage: MEMBER_PER_PAGE,
+    };
+    const { data: allMembersData } = await getGroupDetailApi(apiParams);
+    const { allMembers, meta } = allMembersData;
     const groupInfoState: TGroupInfo = {
       id,
       name,
@@ -153,8 +172,8 @@ const groupDetailInfo = createAsyncThunk(
     };
     return {
       groupInfo: groupInfoState,
-      groupMembers: [...allMembersData.data.data],
-      groupMembersPagination: allMembersData.data.meta,
+      groupMembers: allMembers,
+      groupMembersPagination: meta,
     };
   },
 );
@@ -163,10 +182,13 @@ const createGroup = createAsyncThunk(
   CREATE_GROUP,
   async (params: TObject, { getState }) => {
     const { workspaceCompanyId } = getState().company;
-    const { data: newCompanyAccount } = await axios.post('/company/group', {
-      ...params,
+    const { groupInfo: groupInforParam, groupMembers } = params;
+    const apiBody: CreateGroupApiBody = {
       companyId: workspaceCompanyId,
-    });
+      groupInfo: groupInforParam,
+      groupMembers,
+    };
+    const { data: newCompanyAccount } = await createGroupApi(apiBody);
     const { groups } = newCompanyAccount.attributes.profile.metadata;
     return groups;
   },
@@ -179,13 +201,14 @@ const updateGroup = createAsyncThunk(
     { getState, dispatch },
   ) => {
     const { workspaceCompanyId } = getState().company;
-    await axios.put('/company/group', {
+    const apiBody: UpdateGroupApiBody = {
       addedMembers,
       deletedMembers,
       groupId,
       groupInfo: groupInfoParams,
       companyId: workspaceCompanyId,
-    });
+    };
+    await updateGroupApi(apiBody);
     return [dispatch(groupDetailInfo({ groupId })), dispatch(groupInfo())];
   },
 );
@@ -194,12 +217,11 @@ const deleteGroup = createAsyncThunk(
   DELETE_GROUP,
   async (groupId: string, { getState }) => {
     const { workspaceCompanyId } = getState().company;
-    const { data: newCompanyAccount } = await axios.delete('/company/group', {
-      data: {
-        groupId,
-        companyId: workspaceCompanyId,
-      },
-    });
+    const apiData: DeleteGroupApiData = {
+      groupId,
+      companyId: workspaceCompanyId,
+    };
+    const { data: newCompanyAccount } = await deleteGroupApi(apiData);
     const { groups } = newCompanyAccount.attributes.profile.metadata;
     return groups;
   },
@@ -215,21 +237,35 @@ const updateBookerAccount = createAsyncThunk(
     };
 
     await sdk.currentUser.updateProfile(params, queryParams);
-    await dispatch(userThunks.fetchCurrentUser(undefined));
+    await dispatch(userThunks.fetchCurrentUser());
     return '';
   },
 );
 
 const updateCompanyAccount = createAsyncThunk(
   UPDATE_COMPANY_ACCOUNT,
-  async (_, { getState }) => {
+  async (_, { getState, dispatch }) => {
     const { workspaceCompanyId } = getState().company;
     const { image = {} } = getState().uploadImage;
     const { imageId, file } = image;
-    const { data: companyAccount } = await axios.put('/api/company', {
-      ...(imageId && file ? { companyImageId: imageId.uuid } : {}),
+    const apiBody: UpdateCompanyApiBody = {
       companyId: workspaceCompanyId,
-    });
+      dataParams: {
+        id: workspaceCompanyId,
+        ...(imageId && file ? { profileImageId: imageId.uuid } : {}),
+      },
+      queryParams: {
+        expand: true,
+        include: ['profileImage'],
+        'fields.image': [
+          EImageVariants.squareSmall,
+          EImageVariants.squareSmall2x,
+          EImageVariants.scaledLarge,
+        ],
+      },
+    };
+    const { data: companyAccount } = await updateCompany(apiBody);
+    dispatch(companyInfo());
     return {
       company: companyAccount,
     };
@@ -399,6 +435,27 @@ export const companySlice = createSlice({
           ...state,
           updateCompanyInProgress: false,
           updateCompanyError: error.message,
+        };
+      })
+
+      .addCase(updateBookerAccount.pending, (state) => {
+        return {
+          ...state,
+          updateBookerAccountInProgress: true,
+          updateBookerAccountError: null,
+        };
+      })
+      .addCase(updateBookerAccount.fulfilled, (state) => {
+        return {
+          ...state,
+          updateBookerAccountInProgress: false,
+        };
+      })
+      .addCase(updateBookerAccount.rejected, (state, { error }) => {
+        return {
+          ...state,
+          updateBookerAccountInProgress: false,
+          updateBookerAccountError: error.message,
         };
       });
   },

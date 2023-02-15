@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import FormWizard from '@components/FormWizard/FormWizard';
+import useRedirectTabWizard from '@hooks/useRedirectTabWizard';
 import { adminRoutes } from '@src/paths';
 import { EListingStates } from '@utils/enums';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useIntl } from 'react-intl';
 
 // eslint-disable-next-line import/no-cycle
@@ -133,6 +135,7 @@ const EditPartnerWizard = (props: any) => {
     onDiscardDraftPartner,
     onSetAuthorized,
     onSetUnsatisfactory,
+    uploadingImage,
   } = props;
   const intl = useIntl();
   const router = useRouter();
@@ -171,22 +174,21 @@ const EditPartnerWizard = (props: any) => {
     });
   };
 
-  useEffect(() => {
-    // If selectedTab is not active, redirect to the beginning of wizard
-    if (!tabsStatus[selectedTab as string]) {
-      const currentTabIndex = TABS.indexOf(selectedTab as string);
-      const nearestActiveTab = TABS.slice(0, currentTabIndex)
-        .reverse()
-        .find((t) => tabsStatus[t]);
+  const handleRedirectOnSwitchTab = (nearestActiveTab: string) => {
+    const id = partnerListingRef?.id?.uuid;
+    !partnerListingRef
+      ? router.push(`/admin/partner/create`)
+      : router.push(`/admin/partner/${id}/edit?tab=${nearestActiveTab}`);
+  };
 
-      const id = partnerListingRef?.id?.uuid;
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      !partnerListingRef
-        ? router.push(`/admin/partner/create`)
-        : router.push(`/admin/partner/${id}/edit?tab=${nearestActiveTab}`);
-    }
-  }, [tabsStatus, selectedTab, partnerListingRef, router]);
+  useRedirectTabWizard({
+    isNew,
+    listing: partnerListingRef,
+    selectedTab: selectedTab as string,
+    tabs: TABS,
+    tabCompleted,
+    handleRedirect: handleRedirectOnSwitchTab,
+  });
 
   return (
     <FormWizard className={css.formWizard} formTabNavClassName={css.tabNav}>
@@ -229,6 +231,7 @@ const EditPartnerWizard = (props: any) => {
           onSetAuthorized={onSetAuthorized}
           onSetUnsatisfactory={onSetUnsatisfactory}
           goBack={handleGoBack(tab)}
+          disabled={uploadingImage}
         />
       ))}
     </FormWizard>

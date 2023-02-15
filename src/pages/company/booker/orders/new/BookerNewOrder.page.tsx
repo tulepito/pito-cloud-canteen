@@ -1,7 +1,7 @@
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
-import { USER } from '@utils/data';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { User } from '@utils/data';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
@@ -30,7 +30,7 @@ function BookerNewOrderPage() {
   const handleSubmit = async (values: any) => {
     try {
       const newOrder = await dispatch(
-        OrderAsyncAction.createOrder({
+        orderAsyncActions.createOrder({
           clientId: values.company,
           bookerId: currentUser?.id?.uuid,
         }),
@@ -46,7 +46,7 @@ function BookerNewOrderPage() {
   const { myCompanies = [] } = useLoadCompanies();
   const normalizedCompanies = myCompanies.map((company) => ({
     id: company?.id?.uuid,
-    name: USER(company).getPublicData()?.companyName,
+    name: User(company).getPublicData()?.companyName,
   }));
 
   return (

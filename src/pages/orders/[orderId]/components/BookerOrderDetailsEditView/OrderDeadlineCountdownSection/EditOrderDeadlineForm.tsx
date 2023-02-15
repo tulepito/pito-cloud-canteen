@@ -5,6 +5,7 @@ import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import config from '@src/configs';
+import { addDays } from 'date-fns';
 import { DateTime } from 'luxon';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
@@ -54,7 +55,7 @@ const EditOrderDeadlineFormComponent: React.FC<
             id: 'EditOrderDeadlineForm.deadlineDate.label',
           })}
           autoComplete="off"
-          minDate={today}
+          minDate={addDays(today, 1)}
           maxDate={maxSelectedDate}
           dateFormat={'EEE, dd MMMM, yyyy'}
         />

@@ -19,36 +19,16 @@
       height: 100vh;
     }
   }
+}
 
-  .modalContainer {
-    width: 700px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: $neutralGray1;
-    border-radius: 20px;
-    padding: 24px 36px;
+.modalContainer.modalContainer {
+  flex-basis: 700px;
+}
 
-    .modalHeader {
-      @include flexAlign(center, space-between);
-
-      .modalTitle {
-        @include text(20px, 32px);
-        font-weight: 700;
-      }
-    }
-
-    .modalContent {
-      margin-top: 24px;
-    }
-
-    .modalFooter {
-      .cancelBtn {
-        margin: 16px auto 0;
-        width: 400px;
-        @include buttonColorSecondary;
-      }
-    }
+.modalFooter {
+  .cancelBtn {
+    margin: 16px auto 0;
+    width: 400px;
+    @include buttonColorSecondary;
   }
 }

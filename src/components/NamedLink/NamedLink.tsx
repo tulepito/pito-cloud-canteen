@@ -1,5 +1,6 @@
 import type { TDefaultProps, TObject } from '@utils/types';
 import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
 import Link from 'next/link';
 import React from 'react';
 
@@ -25,17 +26,22 @@ const NamedLink: React.FC<TNameLinkProps> = ({
   to,
   title,
   path,
+  params,
   replace = false,
 }) => {
-  const queryString = to?.search ? `?${to.search}` : '';
-
   const classes = classNames(rootClassName || css.root, className);
+  const queryString = to?.search ? `?${to.search}` : '';
+  const fullPathName = `${path}${queryString}`;
+  const href =
+    params && !isEmpty(params)
+      ? { pathname: fullPathName, query: params }
+      : fullPathName;
 
   return (
     <Link
       className={classes}
       title={title}
-      href={`${path}${queryString}`}
+      href={href}
       replace={replace}
       passHref={passHref}>
       {children}

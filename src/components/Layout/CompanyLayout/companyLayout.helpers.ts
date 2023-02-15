@@ -1,13 +1,31 @@
 import { companyPaths } from '@src/paths';
 
-const PAGE_LIST = [
-  companyPaths.CreateNewOrder,
-  companyPaths.EditDraftOrder,
-  companyPaths.OrderSelectRestaurant,
-];
-
 export const shouldShowFeatureHeader = (pathName: string) => {
-  if (PAGE_LIST.includes(pathName)) {
+  const hideList = [
+    companyPaths.CreateNewOrder,
+    companyPaths.EditDraftOrder,
+    companyPaths.OrderSelectRestaurant,
+    companyPaths.ManageOrders,
+    companyPaths.ManageOrderDetail,
+  ];
+
+  if (hideList.includes(pathName)) {
+    return false;
+  }
+
+  return true;
+};
+
+export const shouldShowSidebar = (pathName: string) => {
+  const hideList = [
+    companyPaths.CreateNewOrder,
+    companyPaths.EditDraftOrder,
+    companyPaths.OrderSelectRestaurant,
+    companyPaths.ManageOrders,
+    companyPaths.ManageOrderDetail,
+  ];
+
+  if (hideList.includes(pathName)) {
     return false;
   }
 

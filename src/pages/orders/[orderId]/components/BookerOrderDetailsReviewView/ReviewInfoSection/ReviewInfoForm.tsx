@@ -1,5 +1,6 @@
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import type { TObject } from '@utils/types';
 import {
   composeValidators,
   phoneNumberFormatValid,
@@ -8,7 +9,6 @@ import {
 import { useEffect, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import css from './ReviewInfoForm.module.scss';
 
@@ -22,6 +22,13 @@ export type TReviewInfoFormValues = {
 
 type TExtraProps = {
   startSubmit: boolean;
+  fieldTextContent: {
+    companyNameField: TObject;
+    staffNameField: TObject;
+    contactPhoneNumberField: TObject;
+    contactPeopleNameField: TObject;
+    deliveryAddressField: TObject;
+  };
 };
 type TReviewInfoFormComponentProps = FormRenderProps<TReviewInfoFormValues> &
   Partial<TExtraProps>;
@@ -30,48 +37,20 @@ type TReviewInfoFormProps = FormProps<TReviewInfoFormValues> & TExtraProps;
 const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, form, startSubmit, modifiedSinceLastSubmit } = props;
-  const intl = useIntl();
+  const {
+    handleSubmit,
+    form,
+    startSubmit,
+    modifiedSinceLastSubmit,
+    fieldTextContent: {
+      companyNameField,
+      staffNameField,
+      contactPhoneNumberField,
+      contactPeopleNameField,
+      deliveryAddressField,
+    } = {},
+  } = props;
   const [isMounted, setIsMounted] = useState(false);
-
-  const companyNameField = {
-    label: `1. ${intl.formatMessage({
-      id: 'ReviewInfoForm.companyNameField.label',
-    })}`,
-  };
-
-  const deliveryAddressField = {
-    label: `2. ${intl.formatMessage({
-      id: 'ReviewInfoForm.deliveryAddressField.label',
-    })}`,
-  };
-
-  const contactPeopleNameField = {
-    label: `3. ${intl.formatMessage({
-      id: 'ReviewInfoForm.contactPeopleNameField.label',
-    })}`,
-    requiredText: intl.formatMessage({
-      id: 'ReviewInfoForm.contactPeopleNameField.required',
-    }),
-  };
-
-  const contactPhoneNumberField = {
-    label: `4. ${intl.formatMessage({
-      id: 'ReviewInfoForm.contactPhoneNumberField.label',
-    })}`,
-    requiredText: intl.formatMessage({
-      id: 'ReviewInfoForm.contactPhoneNumberField.required',
-    }),
-    inValidText: intl.formatMessage({
-      id: 'ReviewInfoForm.contactPhoneNumberField.inValid',
-    }),
-  };
-
-  const staffNameField = {
-    label: `5. ${intl.formatMessage({
-      id: 'ReviewInfoForm.staffNameField.label',
-    })}`,
-  };
 
   useEffect(() => {
     if (isMounted && (modifiedSinceLastSubmit || startSubmit)) {
@@ -87,7 +66,7 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
     <Form onSubmit={handleSubmit} className={css.formContainer}>
       <div className={css.fieldContainer}>
         <label className={css.fieldLabel} htmlFor="ReviewInfoForm.companyName">
-          {companyNameField.label}
+          1. {companyNameField?.label} *
         </label>
         <FieldTextInput
           disabled
@@ -100,7 +79,7 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
         <label
           className={css.fieldLabel}
           htmlFor="ReviewInfoForm.deliveryAddress">
-          {deliveryAddressField.label}
+          2. {deliveryAddressField?.label} *
         </label>
         <FieldTextInput
           disabled
@@ -113,14 +92,14 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
         <label
           className={css.fieldLabel}
           htmlFor="ReviewInfoForm.contactPeopleName">
-          {contactPeopleNameField.label}
+          3. {contactPeopleNameField?.label} *
         </label>
         <FieldTextInput
           className={css.fieldInput}
           id="ReviewInfoForm.contactPeopleName"
           name="contactPeopleName"
           validate={composeValidators(
-            required(contactPeopleNameField.requiredText),
+            required(contactPeopleNameField?.requiredText),
           )}
         />
       </div>
@@ -128,21 +107,21 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
         <label
           className={css.fieldLabel}
           htmlFor="ReviewInfoForm.contactPhoneNumber">
-          {contactPhoneNumberField.label}
+          4. {contactPhoneNumberField?.label} *
         </label>
         <FieldTextInput
           className={css.fieldInput}
           id="ReviewInfoForm.contactPhoneNumber"
           name="contactPhoneNumber"
           validate={composeValidators(
-            required(contactPhoneNumberField.requiredText),
-            phoneNumberFormatValid(contactPhoneNumberField.inValidText),
+            required(contactPhoneNumberField?.requiredText),
+            phoneNumberFormatValid(contactPhoneNumberField?.inValidText),
           )}
         />
       </div>
       <div className={css.fieldContainer}>
         <label className={css.fieldLabel} htmlFor="ReviewInfoForm.staffName">
-          {staffNameField.label}
+          5. {staffNameField?.label}
         </label>
         <FieldTextInput
           className={css.fieldInput}

@@ -1,4 +1,4 @@
-import type { TIconProps } from '@utils/types';
+import type { TDefaultProps, TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import type { PaginationProps as RCPaginationProps } from 'rc-pagination';
 import ExternalPagination from 'rc-pagination';
@@ -6,11 +6,6 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './Pagination.module.scss';
-
-type TPaginationProps = RCPaginationProps & {
-  showInfo?: boolean;
-  paginationInfoClassName?: string;
-};
 
 const NextIcon: React.FC<TIconProps> = (props) => {
   const { rootClassName, className } = props;
@@ -57,9 +52,24 @@ const PreviousIcon: React.FC<TIconProps> = (props) => {
     </svg>
   );
 };
+
+type TPaginationProps = TDefaultProps &
+  RCPaginationProps & {
+    showInfo?: boolean;
+    paginationInfoClassName?: string;
+  };
+
 const Pagination: React.FC<TPaginationProps> = (props) => {
-  const { showInfo = true, paginationInfoClassName, ...restProps } = props;
+  const {
+    showInfo = true,
+    paginationInfoClassName,
+    className,
+    rootClassName,
+    ...restProps
+  } = props;
   const intl = useIntl();
+
+  const rootClasses = classNames(rootClassName || css.root, className);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const customShowTotal = (total: number, range: number[]) => {
@@ -99,16 +109,13 @@ const Pagination: React.FC<TPaginationProps> = (props) => {
   );
 
   const paginationProps = {
+    className: rootClasses,
     ...restProps,
     showTotal: customShowTotal,
     nextIcon,
     prevIcon,
   };
-  return (
-    <div>
-      <ExternalPagination {...paginationProps} />
-    </div>
-  );
+  return <ExternalPagination {...paginationProps} />;
 };
 
 export default Pagination;

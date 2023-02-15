@@ -5,7 +5,7 @@ import {
   manageCompaniesThunks,
   paginateCompanies,
 } from '@redux/slices/ManageCompaniesPage.slice';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
 import type { TUpdateStatus } from '@src/pages/admin/company/helpers';
 import {
   filterCompanies,
@@ -14,8 +14,8 @@ import {
   sortCompanies,
 } from '@src/pages/admin/company/helpers';
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
-import { adminRoutes } from '@src/paths';
-import { LISTING } from '@utils/data';
+import { adminPaths } from '@src/paths';
+import { Listing } from '@utils/data';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -115,24 +115,26 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
     setPage(value);
   };
   const onItemClick = (id: string) => {
-    dispatch(OrderAsyncAction.fetchCompanyBookers(id));
+    dispatch(orderAsyncActions.fetchCompanyBookers(id));
   };
 
   const onSubmit = (values: any) => {
     const { clientId, booker } = values;
     dispatch(
-      OrderAsyncAction.createOrder({
+      orderAsyncActions.createOrder({
         clientId,
         bookerId: booker,
+        isCreatedByAdmin: true,
       }),
     ).then((res) => {
       const { payload, meta } = res;
+
       if (meta.requestStatus !== 'rejected') {
         nextTab();
         router.push({
-          pathname: adminRoutes.EditOrder.path,
+          pathname: adminPaths.UpdateDraftOrder,
           query: {
-            orderId: LISTING(payload).getId(),
+            orderId: Listing(payload).getId(),
           },
         });
       }
