@@ -20,3 +20,9 @@
   color: $neutralGray6;
   text-transform: capitalize;
 }
+
+.modalActions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+}

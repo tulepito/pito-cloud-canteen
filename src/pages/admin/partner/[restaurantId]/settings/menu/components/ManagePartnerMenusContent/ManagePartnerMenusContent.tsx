@@ -56,30 +56,12 @@ const TABLE_COLUNMS: TColumn[] = [
   {
     key: 'applyDates',
     label: 'Thời gian áp dụng',
-    render: ({
-      id,
-      startDate,
-      endDate,
-      isDeleted,
-      menuType,
-      onSetMenuToUpdate,
-      daysOfWeek,
-      numberOfCycles,
-    }) => {
+    render: ({ startDate, endDate, isDeleted, menuType }) => {
       if (isDeleted) {
         return <></>;
       }
       return (
-        <div
-          className={css.row}
-          onClick={onSetMenuToUpdate({
-            id,
-            startDate,
-            endDate,
-            daysOfWeek,
-            numberOfCycles,
-            menuType,
-          })}>
+        <div className={css.row}>
           {menuType === EMenuTypes.cycleMenu ? (
             <div>
               {parseTimestampToFormat(startDate)} -
@@ -98,7 +80,18 @@ const TABLE_COLUNMS: TColumn[] = [
   {
     key: 'status',
     label: 'Trạng thái',
-    render: ({ listingState, id, onToggleStatus, isDeleted }) => {
+    render: ({
+      listingState,
+      id,
+      onToggleStatus,
+      isDeleted,
+      startDate,
+      endDate,
+      daysOfWeek,
+      numberOfCycles,
+      menuType,
+      onSetMenuToUpdate,
+    }) => {
       if (isDeleted) {
         return <></>;
       }
@@ -108,7 +101,18 @@ const TABLE_COLUNMS: TColumn[] = [
           : EListingStates.closed;
 
         onToggleStatus(id, newStatus);
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        checked &&
+          onSetMenuToUpdate({
+            id,
+            startDate,
+            endDate,
+            daysOfWeek,
+            numberOfCycles,
+            menuType,
+          });
       };
+
       return listingState === EListingStates.draft ? (
         <></>
       ) : (
@@ -251,7 +255,7 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
     setMenuToRemove(null);
   };
 
-  const onSetMenuToUpdate = (menuData: any) => () => {
+  const onSetMenuToUpdate = (menuData: any) => {
     setMenuToUpdate(menuData);
   };
 

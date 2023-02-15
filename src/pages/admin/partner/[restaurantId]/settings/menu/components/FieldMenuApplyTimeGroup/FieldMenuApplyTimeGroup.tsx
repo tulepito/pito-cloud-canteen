@@ -57,6 +57,7 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
         />
         {values.menuType === EMenuTypes.cycleMenu && (
           <FieldTextInput
+            defaultValue="1"
             id="numberOfCycles"
             name="numberOfCycles"
             className={css.numberOfCyclesInput}
