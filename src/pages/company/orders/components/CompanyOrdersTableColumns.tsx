@@ -151,56 +151,62 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       };
 
       const cancelOrderButton = (
-        <Button {...secondaryButtonProps}>
+        <Button key={'cancelOrderButton'} {...secondaryButtonProps}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.cancelOrder',
           })}
         </Button>
       );
       const updateOrderButton = (
-        <Button {...secondaryButtonProps}>
+        <Button key={'updateOrderButton'} {...secondaryButtonProps}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.updateOrder',
           })}
         </Button>
       );
       const viewDetailButton = (
-        <Button {...secondaryButtonProps}>
+        <Button key={'viewDetailButton'} {...secondaryButtonProps}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.viewOrderDetail',
           })}
         </Button>
       );
       const reorderButton = (
-        <Button {...secondaryButtonProps}>
+        <Button key={'reorderButton'} {...secondaryButtonProps}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.reorder',
           })}
         </Button>
       );
       const completeOrderButton = (
-        <Button {...secondaryButtonProps} onClick={navigateToOrderDetailPage}>
+        <Button
+          key={'completeOrderButton'}
+          {...secondaryButtonProps}
+          onClick={navigateToOrderDetailPage}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.completeOrder',
           })}
         </Button>
       );
       const reviewOrderButton = (
-        <Button {...secondaryButtonProps}>
+        <Button key={'reviewOrderButton'} {...secondaryButtonProps}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.reviewOrder',
           })}
         </Button>
       );
       const copyLinkButton = (
-        <Button {...secondaryButtonProps}>
+        <Button key={'copyLinkButton'} {...secondaryButtonProps}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.copyOrderLink',
           })}
         </Button>
       );
       const deleteDraftButton = (
-        <Button {...secondaryButtonProps} onClick={handleDeleteDraftOrder}>
+        <Button
+          key={'deleteDraftButton'}
+          {...secondaryButtonProps}
+          onClick={handleDeleteDraftOrder}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.deleteDraft',
           })}
