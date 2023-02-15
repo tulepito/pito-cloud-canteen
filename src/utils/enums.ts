@@ -727,3 +727,32 @@ export const MENU_MEAL_TYPE_OPTIONS = [
     label: 'Ăn xế',
   },
 ];
+
+export enum EManageCompanyOrdersTab {
+  ALL = 'all',
+  SCHEDULED = 'scheduled',
+  COMPLETED = 'completed',
+  DRAFT = 'draft',
+  CANCELED = 'canceled',
+}
+
+export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
+  [EManageCompanyOrdersTab.ALL]: [
+    EOrderStates.isNew,
+    EOrderStates.picking,
+    EOrderStates.inProgress,
+    EOrderStates.completed,
+    EOrderStates.reviewed,
+    EOrderStates.canceled,
+  ],
+  [EManageCompanyOrdersTab.SCHEDULED]: [
+    EOrderStates.picking,
+    EOrderStates.inProgress,
+  ],
+  [EManageCompanyOrdersTab.COMPLETED]: [
+    EOrderStates.completed,
+    EOrderStates.reviewed,
+  ],
+  [EManageCompanyOrdersTab.DRAFT]: [EOrderStates.isNew],
+  [EManageCompanyOrdersTab.CANCELED]: [EOrderStates.canceled],
+};

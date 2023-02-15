@@ -11,7 +11,10 @@ import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import type { RootState } from '@redux/store';
 import { companyPaths } from '@src/paths';
-import { EOrderStates } from '@utils/enums';
+import {
+  EManageCompanyOrdersTab,
+  MANAGE_COMPANY_ORDERS_TAB_MAP,
+} from '@utils/enums';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -19,7 +22,6 @@ import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { parseEntitiesToTableData } from '../helpers/parseEntitiesToTableData';
-import { ManageCompanyOrdersPageTabIds } from '../utils/constant';
 import css from './CompanyOrdersTable.module.scss';
 import { CompanyOrdersTableColumns } from './CompanyOrdersTableColumns';
 import type { TSearchOrderFormValues } from './SearchOrderForm';
@@ -28,11 +30,15 @@ import SearchOrderForm from './SearchOrderForm';
 const DEBOUNCE_TIME = 300;
 
 const tabLabelMap = {
-  [EOrderStates.picking]: 'ManageCompanyOrdersPage.tabSection.pickingLabel',
-  [EOrderStates.completed]: 'ManageCompanyOrdersPage.tabSection.completedLabel',
-  [EOrderStates.isNew]: 'ManageCompanyOrdersPage.tabSection.draftLabel',
-  [EOrderStates.canceled]: 'ManageCompanyOrdersPage.tabSection.canceledLabel',
-  all: 'ManageCompanyOrdersPage.tabSection.allLabel',
+  [EManageCompanyOrdersTab.SCHEDULED]:
+    'ManageCompanyOrdersPage.tabSection.scheduledLabel',
+  [EManageCompanyOrdersTab.COMPLETED]:
+    'ManageCompanyOrdersPage.tabSection.completedLabel',
+  [EManageCompanyOrdersTab.DRAFT]:
+    'ManageCompanyOrdersPage.tabSection.draftLabel',
+  [EManageCompanyOrdersTab.CANCELED]:
+    'ManageCompanyOrdersPage.tabSection.canceledLabel',
+  [EManageCompanyOrdersTab.ALL]: 'ManageCompanyOrdersPage.tabSection.allLabel',
 };
 
 const statesSelector = createDeepEqualSelector(
@@ -111,8 +117,8 @@ type TCompanyOrdersTableProps = {};
 
 const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const intl = useIntl();
-  const [currentTab, setCurrentTab] = useState<string>(
-    ManageCompanyOrdersPageTabIds[4],
+  const [currentTab, setCurrentTab] = useState<EManageCompanyOrdersTab>(
+    EManageCompanyOrdersTab.ALL,
   );
   const { query, isReady, replace } = useRouter();
   const dispatch = useAppDispatch();
@@ -131,7 +137,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   });
 
   const handleTabChange = ({ id }: TTabsItem) => {
-    setCurrentTab(id as string);
+    setCurrentTab(id as EManageCompanyOrdersTab);
   };
 
   const handleSubmitSearch = ({
@@ -159,9 +165,9 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
       companyId,
     };
 
-    if (currentTab !== 'all') {
-      params = { ...params, meta_orderState: currentTab };
-    }
+    const parsedOrderState =
+      MANAGE_COMPANY_ORDERS_TAB_MAP[currentTab].join(',');
+    params = { ...params, meta_orderState: parsedOrderState, currentTab };
 
     if (isReady) {
       dispatch(orderAsyncActions.queryCompanyOrders(params));

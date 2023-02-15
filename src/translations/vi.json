@@ -662,7 +662,7 @@
   "ManageCompanyOrdersPage.tabSection.canceledLabel": "Đơn đã huỷ",
   "ManageCompanyOrdersPage.tabSection.completedLabel": "Đơn đã hoàn tất",
   "ManageCompanyOrdersPage.tabSection.draftLabel": "Đơn nháp",
-  "ManageCompanyOrdersPage.tabSection.pickingLabel": "Đơn đã lên lịch",
+  "ManageCompanyOrdersPage.tabSection.scheduledLabel": "Đơn đã lên lịch",
   "ManageCompanyOrdersPage.titleSection.phoneNumber": "1900252530",
   "ManageCompanyOrdersPage.titleSection.subtitle": "Bạn cần thay đổi đơn hàng? Vui lòng gọi cho PITO tại số {phoneNumber}",
   "ManageCompanyOrdersPage.titleSection.title": "ĐƠN HÀNG",

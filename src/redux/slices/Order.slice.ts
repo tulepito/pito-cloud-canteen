@@ -15,7 +15,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import { convertWeekDay, getSeparatedDates } from '@utils/dates';
-import { EListingStates, EOrderStates } from '@utils/enums';
+import { EOrderStates } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TPagination } from '@utils/types';
 import { DateTime } from 'luxon';
@@ -259,7 +259,6 @@ const queryCompanyOrders = createAsyncThunk(
     const params = {
       dataParams: {
         ...restPayload,
-        states: `${EListingStates.published},${EListingStates.closed}`,
         perPage: MANAGE_ORDER_PAGE_SIZE,
         meta_companyId: companyId,
         meta_listingType: LISTING_TYPE.ORDER,
