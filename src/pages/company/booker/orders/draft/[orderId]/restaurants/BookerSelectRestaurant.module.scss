@@ -2,19 +2,71 @@
 @use '/src/styles/mixins.scss' as *;
 
 .root {
-  padding-top: 72px;
+  padding: 40px 24px;
+  width: 100%;
+  margin: auto;
+
+  @include viewportLarge {
+    max-width: 925px;
+    padding: 40px 0;
+  }
+
+  @include viewportSLarge {
+    max-width: 1240px;
+  }
 }
 
 .main {
-  height: 100%;
-  padding: 50px 24px;
   display: flex;
+  justify-content: space-between;
+  position: relative;
 }
 
-.calendar {
-  width: calc(100vw - 48px);
+.sidebar {
+  position: absolute;
+  width: 295px;
+  background-color: red;
+  padding: 16px;
+  z-index: 10;
+  top: 0;
+  left: calc(-295px - 24px);
+  transition: 0.3s linear;
 
-  @include viewportLargeWithPaddings {
-    width: 100%;
+  @include viewportLarge {
+    top: unset;
+    left: unset;
+    position: relative;
+  }
+}
+
+.sidebarOpened {
+  left: -24px;
+
+  @include viewportLarge {
+    left: unset;
+  }
+}
+
+.filterMobileMenu {
+  position: absolute;
+  z-index: 11;
+  top: 0;
+  left: -24px;
+  transition: 0.3s linear;
+
+  @include viewportLarge {
+    display: none;
+  }
+}
+
+.filterMobileMenuOpened {
+  left: calc(295px - 24px);
+}
+
+.result {
+  margin: auto;
+
+  @include viewportLarge {
+    margin: 0 0 0 20px;
   }
 }

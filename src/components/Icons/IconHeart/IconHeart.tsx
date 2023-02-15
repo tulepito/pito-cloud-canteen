@@ -5,13 +5,11 @@ import React from 'react';
 import css from './IconHeart.module.scss';
 
 const IconHeart: React.FC<TIconProps> = (props) => {
-  const { rootClassName, className, width = 24, height = 24 } = props;
+  const { rootClassName, className } = props;
   const classes = classNames(rootClassName || css.root, className);
 
   return (
     <svg
-      width={width}
-      height={height}
       className={classes}
       viewBox="0 0 25 24"
       fill="none"
