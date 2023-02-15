@@ -10,6 +10,7 @@ import type {
   EErrorCode,
   EImageVariants,
   EListingStates,
+  EOrderStates,
   EReviewRatings,
   EReviewTypes,
   ETimeSlots,
@@ -466,4 +467,9 @@ export type TIntegrationOrderListing = {
   booker?: TBooker;
   plan?: TListing;
   subOrders?: TIntegrationListing[];
+};
+
+export type TOrderStateHistory = {
+  state: EOrderStates;
+  time: number;
 };
