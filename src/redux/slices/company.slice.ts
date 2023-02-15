@@ -8,6 +8,7 @@ import type {
 import {
   createGroupApi,
   deleteGroupApi,
+  getAllCompanyMembersApi,
   getGroupDetailApi,
   updateCompany,
   updateGroupApi,
@@ -17,7 +18,6 @@ import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TObject, TUser } from '@utils/types';
-import axios from 'axios';
 
 import { userThunks } from './user.slice';
 
@@ -116,8 +116,8 @@ const companyInfo = createAsyncThunk(
       companyAccountResponse,
     );
     const companyImageId = companyAccount.profileImage?.id;
-    const { data: allEmployeesData } = await axios.get(
-      `/api/company/all-employees?companyId=${workspaceCompanyId}`,
+    const { data: allEmployeesData } = await getAllCompanyMembersApi(
+      workspaceCompanyId,
     );
     const { groups = [], members = {} } =
       companyAccount.attributes.profile.metadata;
@@ -128,7 +128,7 @@ const companyInfo = createAsyncThunk(
       groupList: groups,
       company: companyAccount,
       originCompanyMembers: members,
-      companyMembers: [...allEmployeesData.data.data],
+      companyMembers: [...allEmployeesData],
     };
   },
 );

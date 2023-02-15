@@ -10,6 +10,7 @@ import useBoolean from '@hooks/useBoolean';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { companyPaths } from '@src/paths';
 import { BookerManageCompany } from '@src/redux/slices/company.slice';
+import { User } from '@utils/data';
 import type { TObject } from '@utils/types';
 import filter from 'lodash/filter';
 import isEmpty from 'lodash/isEmpty';
@@ -87,16 +88,14 @@ const GroupDetailPage = () => {
         (result: any, member: any) => [
           ...result,
           {
-            key: member.id.uuid,
+            key: User(member).getId(),
             data: {
-              id: member.id.uuid,
-              name: member.attributes.profile.displayName,
-              email: member.attributes.email,
-              group: getGroupNames(
-                member.attributes.profile.metadata.groupList,
-              ),
-              allergy: [],
-              nutrition: [],
+              id: User(member).getId(),
+              name: User(member).getProfile()?.displayName,
+              email: User(member).getAttributes()?.email,
+              group: getGroupNames(User(member).getMetadata()?.groupList),
+              allergy: User(member).getPublicData()?.allergies?.join(', '),
+              nutrition: User(member).getPublicData()?.nutritions?.join(', '),
             },
           },
         ],
