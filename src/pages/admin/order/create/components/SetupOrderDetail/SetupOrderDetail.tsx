@@ -39,7 +39,7 @@ import css from './SetupOrderDetail.module.scss';
 
 const renderResourcesForCalendar = (
   orderDetail: TObject,
-  deliveryHour: string,
+  deliveryHour = '6:30',
 ) => {
   const entries = Object.entries<TObject>(orderDetail);
   const resources = entries.map((item) => {
@@ -124,6 +124,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const updateOrderInProgress = useAppSelector(
     (state) => state.Order.updateOrderInProgress,
   );
+  const updateOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.updateOrderDetailInProgress,
+  );
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
     shallowEqual,
@@ -141,7 +144,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     deadlineDate,
     deadlineHour,
     memberAmount,
+    plans = [],
   } = Listing(order as TListing).getMetadata();
+  const planId = plans.length > 0 && plans[0];
+  const orderId = Listing(order as TListing).getId();
   const { title: orderTitle } = Listing(order as TListing).getAttributes();
   const companies = useAppSelector(
     (state) => state.ManageCompaniesPage.companyRefs,
@@ -165,6 +171,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     (state) => state.SelectRestaurantPage.foodList,
     shallowEqual,
   );
+
   const suitableStartDate = useMemo(() => {
     const temp = findSuitableStartDate({
       selectedDate,
@@ -276,11 +283,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   };
 
   const disabledSubmit = Object.keys(orderDetail).length === 0;
+  const inProgress = updateOrderInProgress || updateOrderDetailInProgress;
   const initialFoodList =
     orderDetail[selectedDate?.getTime()]?.restaurant?.foodList;
 
   const onSubmit = () => {
-    dispatch(orderAsyncActions.updateOrder({ orderDetail }))
+    dispatch(
+      orderAsyncActions.updatePlanDetail({ orderId, planId, orderDetail }),
+    )
       .then(() => {
         nextTab();
       })
@@ -394,7 +404,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               goBack={goBack}
               onNextClick={onSubmit}
               submitDisabled={disabledSubmit}
-              inProgress={updateOrderInProgress}
+              inProgress={inProgress}
             />
           </div>
           <OrderSettingModal

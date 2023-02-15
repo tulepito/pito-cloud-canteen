@@ -197,7 +197,7 @@ export const convertWeekDay = (weekDay: number) => {
   }
 };
 
-export const getDaySessionFromDeliveryTime = (time: string) => {
+export const getDaySessionFromDeliveryTime = (time: string = '6:30') => {
   const [hourStr, minuteStr] = time.split(':');
   const hour = parseInt(hourStr, 10);
   const minute = parseInt(minuteStr, 10);
