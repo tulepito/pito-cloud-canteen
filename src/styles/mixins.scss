@@ -170,6 +170,9 @@ $buttonBorderRadius: 8px;
   &:disabled {
     box-shadow: none;
     cursor: not-allowed;
+    .spinner {
+      stroke: $neutralGray6;
+    }
   }
 
   @include buttonColorPrimary;

@@ -3,11 +3,11 @@ import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadio
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { MENU_MEAL_TYPE_OPTIONS, MENU_OPTIONS } from '@utils/enums';
 import { required } from '@utils/validators';
-import type { FormApi } from 'final-form';
+import type { FormApi, FormState } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import { useImperativeHandle } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
+import { Form as FinalForm, FormSpy } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { TEditMenuInformationFormValues } from '../EditPartnerMenuWizard/utils';
@@ -16,6 +16,9 @@ import css from './EditMenuInformationForm.module.scss';
 
 type TExtraProps = {
   formRef: any;
+  checkMenuUnconflictedHandle: (
+    values: FormState<TEditMenuInformationFormValues>,
+  ) => void;
 };
 type TEditMenuInformationFormComponentProps =
   FormRenderProps<TEditMenuInformationFormValues> & Partial<TExtraProps>;
@@ -25,13 +28,15 @@ type TEditMenuInformationFormProps = FormProps<TEditMenuInformationFormValues> &
 const EditMenuInformationFormComponent: React.FC<
   TEditMenuInformationFormComponentProps
 > = (props) => {
-  const { handleSubmit, form, values, formRef } = props;
+  const { handleSubmit, form, values, formRef, checkMenuUnconflictedHandle } =
+    props;
   const intl = useIntl();
 
   useImperativeHandle(formRef, () => form);
 
   return (
     <Form onSubmit={handleSubmit}>
+      <FormSpy onChange={checkMenuUnconflictedHandle} />
       <div className={css.wrapperFields}>
         <h2 className={css.title}>
           <FormattedMessage id="EditMenuInformationForm.menuInformationTitle" />

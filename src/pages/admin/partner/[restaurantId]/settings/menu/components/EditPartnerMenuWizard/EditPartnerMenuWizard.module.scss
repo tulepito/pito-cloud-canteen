@@ -1,3 +1,5 @@
+@use '/src/styles/vars.scss' as *;
+
 .formTabNav {
   margin-bottom: 50px;
 }
@@ -19,4 +21,8 @@
     min-height: 48px;
     font-size: 16px;
   }
+}
+
+.loadingIcon {
+  stroke: $neutralGray6;
 }

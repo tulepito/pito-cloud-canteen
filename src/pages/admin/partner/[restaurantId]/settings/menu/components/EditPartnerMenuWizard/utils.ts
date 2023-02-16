@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/default-param-last */
 import { ListingTypes } from '@src/types/listingTypes';
-import { IntegrationListing } from '@utils/data';
+import { getUniqueString, IntegrationListing } from '@utils/data';
 import {
   addDaysToDate,
   addWeeksToDate,
@@ -94,6 +94,20 @@ const createFoodListIdByDaysOfWeekField = (
   return newData;
 };
 
+const createNutritionsByDaysOfWeekField = (
+  fieldsData: any,
+  daysOfWeek: string[],
+) => {
+  const newData = Object.keys(fieldsData).reduce((prev, key) => {
+    const substringKey = key.substring(0, 3);
+    if (daysOfWeek.includes(substringKey)) {
+      return { ...prev, [key]: fieldsData[key] };
+    }
+    return { ...prev, [key]: [] };
+  }, {});
+  return newData;
+};
+
 export const createAvaragePriceByFoodsByDate = (foodsByDate: any) => {
   let avaragePriceByDayOfWeek = {};
   Object.keys(foodsByDate).forEach((keyAsDate) => {
@@ -130,6 +144,27 @@ export const createListFoodIdsByFoodsByDate = (foodsByDate: any) => {
     };
   });
   return foodIdsByDayOfWeek;
+};
+
+export const createListFoodNutritionByFoodsByDate = (foodsByDate: any) => {
+  let nutritionsByDayOfWeek = {};
+  Object.keys(foodsByDate).forEach((keyAsDate) => {
+    let nutritionListByDate: string[] = [];
+    Object.keys(foodsByDate[keyAsDate]).forEach((foodId) => {
+      const { nutritionsList = [] } = foodsByDate[keyAsDate][foodId];
+      nutritionListByDate = getUniqueString([
+        ...nutritionListByDate,
+        ...nutritionsList,
+      ]);
+    });
+    const dayAsIndex = new Date(Number(keyAsDate)).getDay() - 1;
+    const dayOfWeek = getDayOfWeekByIndex(dayAsIndex);
+    nutritionsByDayOfWeek = {
+      ...nutritionsByDayOfWeek,
+      [`${dayOfWeek}Nutritions`]: nutritionListByDate,
+    };
+  });
+  return nutritionsByDayOfWeek;
 };
 
 export const createSubmitFoodsByDate = (foodsByDate: any) => {
@@ -199,6 +234,14 @@ export const createSubmitMenuValues = (
     friFoodIdList: friFoodIdListFromMenu = [],
     satFoodIdList: satFoodIdListFromMenu = [],
     sunFoodIdList: sunFoodIdListFromMenu = [],
+    /// //
+    monNutritions: monNutritionsFromMenu = [],
+    tueNutritions: tueNutritionsFromMenu = [],
+    wedNutritions: wedNutritionsFromMenu = [],
+    thuNutritions: thuNutritionsFromMenu = [],
+    friNutritions: friNutritionsFromMenu = [],
+    satNutritions: satNutritionsFromMenu = [],
+    sunNutritions: sunNutritionsFromMenu = [],
   } = IntegrationListing(menu).getMetadata();
 
   const alreadyPublished = listingState === EListingStates.published;
@@ -256,6 +299,18 @@ export const createSubmitMenuValues = (
                   },
                   daysOfWeek,
                 ),
+                ...createNutritionsByDaysOfWeekField(
+                  {
+                    monNutritions: monNutritionsFromMenu,
+                    tueNutritions: tueNutritionsFromMenu,
+                    wedNutritions: wedNutritionsFromMenu,
+                    thuNutritions: thuNutritionsFromMenu,
+                    friNutritions: friNutritionsFromMenu,
+                    satNutritions: satNutritionsFromMenu,
+                    sunNutritions: sunNutritionsFromMenu,
+                  },
+                  daysOfWeek,
+                ),
               }
             : {}),
         },
@@ -269,6 +324,7 @@ export const createSubmitMenuValues = (
         },
         metadata: {
           ...createListFoodIdsByFoodsByDate(foodsByDate),
+          ...createListFoodNutritionByFoodsByDate(foodsByDate),
         },
       };
     }
@@ -326,6 +382,14 @@ export const createDuplicateSubmitMenuValues = (
     friFoodIdList: friFoodIdListFromMenu,
     satFoodIdList: satFoodIdListFromMenu,
     sunFoodIdList: sunFoodIdListFromMenu,
+    /// /
+    monNutritions: monNutritionsFromMenu = [],
+    tueNutritions: tueNutritionsFromMenu = [],
+    wedNutritions: wedNutritionsFromMenu = [],
+    thuNutritions: thuNutritionsFromMenu = [],
+    friNutritions: friNutritionsFromMenu = [],
+    satNutritions: satNutritionsFromMenu = [],
+    sunNutritions: sunNutritionsFromMenu = [],
   } = IntegrationListing(menu).getMetadata();
 
   const { menuType: menuTypeFromMenu } = IntegrationListing(menu).getMetadata();
@@ -381,6 +445,18 @@ export const createDuplicateSubmitMenuValues = (
             },
             daysOfWeek,
           ),
+          ...createNutritionsByDaysOfWeekField(
+            {
+              monNutritions: monNutritionsFromMenu,
+              tueNutritions: tueNutritionsFromMenu,
+              wedNutritions: wedNutritionsFromMenu,
+              thuNutritions: thuNutritionsFromMenu,
+              friNutritions: friNutritionsFromMenu,
+              satNutritions: satNutritionsFromMenu,
+              sunNutritions: sunNutritionsFromMenu,
+            },
+            daysOfWeek,
+          ),
           menuType,
           listingType: ListingTypes.MENU,
           restaurantId,
@@ -404,6 +480,7 @@ export const createDuplicateSubmitMenuValues = (
         },
         metadata: {
           ...createListFoodIdsByFoodsByDate(foodsByDate),
+          ...createListFoodNutritionByFoodsByDate(foodsByDate),
           menuType: menuTypeFromMenu,
           listingType: ListingTypes.MENU,
           restaurantId,
@@ -439,6 +516,15 @@ export const createDuplicateSubmitMenuValues = (
           friFoodIdList: friFoodIdListFromMenu,
           satFoodIdList: satFoodIdListFromMenu,
           sunFoodIdList: sunFoodIdListFromMenu,
+          /// /
+          monNutritions: monNutritionsFromMenu,
+          tueNutritions: tueNutritionsFromMenu,
+          wedNutritions: wedNutritionsFromMenu,
+          thuNutritions: thuNutritionsFromMenu,
+          friNutritions: friNutritionsFromMenu,
+          satNutritions: satNutritionsFromMenu,
+          sunNutritions: sunNutritionsFromMenu,
+          /// /
           listingState: EListingStates.published,
           menuType: menuTypeFromMenu,
           listingType: ListingTypes.MENU,
@@ -452,7 +538,31 @@ export const createDuplicateSubmitMenuValues = (
 };
 
 export const createUpdateMenuApplyTimeValues = (values: any) => {
-  const { menuType, startDate, daysOfWeek, id, numberOfCycles } = values;
+  const {
+    menuType,
+    startDate,
+    daysOfWeek,
+    id,
+    numberOfCycles,
+    monAverageFoodPrice = 0,
+    tueAverageFoodPrice = 0,
+    wedAverageFoodPrice = 0,
+    thuAverageFoodPrice = 0,
+    friAverageFoodPrice = 0,
+    satAverageFoodPrice = 0,
+    sunAverageFoodPrice = 0,
+    monFoodIdList = [],
+    tueFoodIdList = [],
+    wedFoodIdList = [],
+    thuFoodIdList = [],
+    friFoodIdList = [],
+    satFoodIdList = [],
+    sunFoodIdList = [],
+    foodsByDate = {},
+    restaurantId,
+    mealType,
+  } = values;
+
   const isCycleMenu = menuType === EMenuTypes.cycleMenu;
   const endDate =
     isCycleMenu &&
@@ -462,8 +572,49 @@ export const createUpdateMenuApplyTimeValues = (values: any) => {
     publicData: {
       startDate,
       daysOfWeek,
+      mealType,
       ...(endDate ? { endDate } : {}),
       ...(isCycleMenu ? { numberOfCycles } : {}),
+      foodsByDate: createFoodByDateByDaysOfWeekField(foodsByDate, daysOfWeek),
+      ...createFoodAveragePriceByDaysOfWeekField(
+        {
+          monAverageFoodPrice,
+          tueAverageFoodPrice,
+          wedAverageFoodPrice,
+          thuAverageFoodPrice,
+          friAverageFoodPrice,
+          satAverageFoodPrice,
+          sunAverageFoodPrice,
+        },
+        daysOfWeek,
+      ),
+    },
+    metadata: {
+      restaurantId,
+      ...createFoodListIdByDaysOfWeekField(
+        {
+          monFoodIdList,
+          tueFoodIdList,
+          wedFoodIdList,
+          thuFoodIdList,
+          friFoodIdList,
+          satFoodIdList,
+          sunFoodIdList,
+        },
+        daysOfWeek,
+      ),
+      ...createNutritionsByDaysOfWeekField(
+        {
+          monFoodIdList,
+          tueFoodIdList,
+          wedFoodIdList,
+          thuFoodIdList,
+          friFoodIdList,
+          satFoodIdList,
+          sunFoodIdList,
+        },
+        daysOfWeek,
+      ),
     },
   };
 };

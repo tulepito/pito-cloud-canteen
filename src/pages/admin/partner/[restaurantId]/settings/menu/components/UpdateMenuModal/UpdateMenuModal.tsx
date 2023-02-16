@@ -1,3 +1,4 @@
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import AlertModal from '@components/Modal/AlertModal';
 import type { FormApi } from 'final-form';
 import React, { useMemo, useRef } from 'react';
@@ -12,6 +13,7 @@ type TUpdateMenuModalProps = {
   onClearMenuToUpdate: () => void;
   onUpdateMenuApplyTime: (values: TUpdateMenuModalFormValues) => void;
   updateInProgress: boolean;
+  createOrUpdateMenuError: any;
 };
 
 const UpdateMenuModal: React.FC<TUpdateMenuModalProps> = (props) => {
@@ -20,6 +22,7 @@ const UpdateMenuModal: React.FC<TUpdateMenuModalProps> = (props) => {
     onClearMenuToUpdate,
     updateInProgress,
     onUpdateMenuApplyTime,
+    createOrUpdateMenuError,
   } = props;
   const initialValues = useMemo(() => {
     return {
@@ -59,6 +62,9 @@ const UpdateMenuModal: React.FC<TUpdateMenuModalProps> = (props) => {
         onSubmit={onUpdateMenuApplyTime}
         initialValues={initialValues}
       />
+      {createOrUpdateMenuError && (
+        <ErrorMessage message={createOrUpdateMenuError.message} />
+      )}
     </AlertModal>
   );
 };

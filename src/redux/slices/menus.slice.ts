@@ -1,11 +1,13 @@
 import {
   checkMenuInTransactionProgressApi,
+  checkMenuUnconflictedApi,
   createPartnerMenuApi,
   deletePartnerMenuApi,
   queryAllMenusApi,
   showPartnerMenuApi,
   updatePartnerMenuApi,
 } from '@apis/menuApi';
+import type { TCheckUnconflictedParams } from '@helpers/apiHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
@@ -49,6 +51,9 @@ type TMenusSliceState = {
 
   isCheckingMenuInTransactionProgress: boolean;
   checkingMenuInTransactionError: any;
+
+  isCheckingMenuUnConflicted: boolean;
+  checkingMenuUnConflictedError: any;
 };
 const initialState: TMenusSliceState = {
   menus: [],
@@ -80,6 +85,9 @@ const initialState: TMenusSliceState = {
 
   isCheckingMenuInTransactionProgress: false,
   checkingMenuInTransactionError: null,
+
+  isCheckingMenuUnConflicted: false,
+  checkingMenuUnConflictedError: null,
 };
 
 // ================ Thunk types ================ //
@@ -108,7 +116,21 @@ const QUERY_MENU_OPTIONS_TO_DUPLICATE =
 const CHECK_MENU_IS_IN_TRANSACTION_PROGRESS =
   'app/ManageMenusPage/CHECK_MENU_IS_IN_TRANSACTION_PROGRESS';
 
+const CHECK_MENU_IS_UN_CONFLICTED =
+  'app/ManageMenusPage/CHECK_MENU_IS_UN_CONFLICTED';
+
 // ================ Async thunks ================ //
+
+const checkMenuUnconflicted = createAsyncThunk(
+  CHECK_MENU_IS_UN_CONFLICTED,
+  async (payload: TCheckUnconflictedParams) => {
+    const { data } = await checkMenuUnconflictedApi(payload);
+    return data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
 
 const queryPartnerMenus = createAsyncThunk(
   QUERY_PARTNER_MENUS,
@@ -299,6 +321,7 @@ export const menusSliceThunks = {
   queryMenuOptionsToDuplicate,
   checkingMenuInTransactionProgress,
   togglePartnerMenuListing,
+  checkMenuUnconflicted,
 };
 
 // ================ Slice ================ //
@@ -312,6 +335,7 @@ const menusSliceSlice = createSlice({
     clearCreateOrUpdateMenuError: (state) => ({
       ...state,
       createOrUpdateMenuError: null,
+      checkingMenuUnConflictedError: null,
     }),
   },
   extraReducers: (builder) => {
@@ -371,6 +395,7 @@ const menusSliceSlice = createSlice({
         ...state,
         showCurrentMenuInProgress: false,
         currentMenu: payload,
+        checkingMenuUnConflictedError: null,
       }))
       .addCase(showPartnerMenuListing.rejected, (state, { payload }) => ({
         ...state,
@@ -437,7 +462,23 @@ const menusSliceSlice = createSlice({
           isCheckingMenuInTransactionProgress: false,
           checkingMenuInTransactionError: payload,
         }),
-      );
+      )
+      .addCase(checkMenuUnconflicted.pending, (state) => ({
+        ...state,
+        isCheckingMenuUnConflicted: true,
+        checkingMenuUnConflictedError: null,
+      }))
+      .addCase(checkMenuUnconflicted.fulfilled, (state) => ({
+        ...state,
+        isCheckingMenuUnConflicted: false,
+      }))
+      .addCase(checkMenuUnconflicted.rejected, (state, { error }) => {
+        return {
+          ...state,
+          isCheckingMenuUnConflicted: false,
+          checkingMenuUnConflictedError: error,
+        };
+      });
   },
 });
 

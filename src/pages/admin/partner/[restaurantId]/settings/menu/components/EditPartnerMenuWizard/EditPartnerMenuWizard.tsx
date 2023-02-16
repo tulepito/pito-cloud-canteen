@@ -13,10 +13,17 @@ import { IntegrationMenuListing } from '@utils/data';
 import { EListingStates, EMenuMealType, EMenuTypes } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 import classNames from 'classnames';
-import type { FormApi } from 'final-form';
+import type { FormApi, FormState } from 'final-form';
+import { debounce } from 'lodash';
 import isEqual from 'lodash/isEqual';
 import { useRouter } from 'next/router';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -25,7 +32,10 @@ import EditMenuInformationForm from '../EditMenuInformationForm/EditMenuInformat
 import EditMenuPricingForm from '../EditMenuPricingForm/EditMenuPricingForm';
 import css from './EditPartnerMenuWizard.module.scss';
 import useQueryMenuPickedFoods from './useQueryMenuPickedFoods';
-import type { TEditMenuFormValues } from './utils';
+import type {
+  TEditMenuFormValues,
+  TEditMenuInformationFormValues,
+} from './utils';
 import {
   createDuplicateSubmitMenuValues,
   createSubmitMenuValues,
@@ -48,6 +58,9 @@ type TEditPartnerMenuTabProps = {
   currentMenu?: TIntegrationListing | null;
   duplicateId?: string;
   setSubmittedValues: (e: any) => void;
+  checkMenuUnconflictedHandle: (
+    formState: FormState<TEditMenuInformationFormValues>,
+  ) => void;
 } & TFormTabChildrenProps;
 
 const redirectAfterDraftUpdate = (
@@ -74,6 +87,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
     menuId,
     duplicateId,
     setSubmittedValues,
+    checkMenuUnconflictedHandle,
   } = props;
   const router = useRouter();
 
@@ -174,6 +188,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
           initialValues={initialValues}
           formRef={formRef}
           onSubmit={onSubmit}
+          checkMenuUnconflictedHandle={checkMenuUnconflictedHandle}
         />
       );
     }
@@ -238,6 +253,7 @@ const tabCompleted = (tab: string, listing: TIntegrationListing) => {
 const EditPartnerMenuWizard = () => {
   const router = useRouter();
   const { query, pathname } = router;
+  const mountRef = useRef<boolean>(false);
   const formRef = useRef<FormApi>();
   const [submittedValues, setSubmittedValues] = useState<any>();
   const intl = useIntl();
@@ -271,6 +287,15 @@ const EditPartnerMenuWizard = () => {
 
   const showCurrentMenuInProgress = useAppSelector(
     (state) => state.menus.showCurrentMenuInProgress,
+    shallowEqual,
+  );
+
+  const isCheckingMenuUnConflicted = useAppSelector(
+    (state) => state.menus.isCheckingMenuUnConflicted,
+    shallowEqual,
+  );
+  const checkingMenuUnConflictedError = useAppSelector(
+    (state) => state.menus.checkingMenuUnConflictedError,
     shallowEqual,
   );
 
@@ -315,6 +340,31 @@ const EditPartnerMenuWizard = () => {
     if (!duplicateId || menuId) return;
     dispatch(menusSliceThunks.showPartnerMenuListing(duplicateId));
   }, [duplicateId, menuId, dispatch]);
+
+  useEffect(() => {
+    mountRef.current = true;
+  }, []);
+
+  const checkMenuUnconflictedFn = (
+    formState: FormState<TEditMenuInformationFormValues>,
+  ) => {
+    const { values } = formState;
+    const { mealType, daysOfWeek } = values;
+    if (mountRef.current)
+      dispatch(
+        menusSliceThunks.checkMenuUnconflicted({
+          mealType: mealType as EMenuMealType,
+          daysOfWeek,
+          id: menuId as string,
+          restaurantId: restaurantId as string,
+        }),
+      );
+  };
+
+  const checkMenuUnconflictedHandle = useCallback(
+    debounce(checkMenuUnconflictedFn, 500),
+    [checkMenuUnconflictedFn],
+  );
 
   const createOrUpdateMenuInProgress = useAppSelector(
     (state) => state.menus.createOrUpdateMenuInProgress,
@@ -394,12 +444,20 @@ const EditPartnerMenuWizard = () => {
               currentMenu={currentMenu}
               duplicateId={duplicateId as string}
               setSubmittedValues={setSubmittedValues}
+              checkMenuUnconflictedHandle={checkMenuUnconflictedHandle}
             />
           );
         })}
       </FormWizard>
       {createOrUpdateMenuError && (
         <ErrorMessage message={createOrUpdateMenuError.message} />
+      )}
+      {checkingMenuUnConflictedError && (
+        <ErrorMessage
+          message={intl.formatMessage({
+            id: 'EditPartnerMenuWizard.conflictError',
+          })}
+        />
       )}
       <div
         className={classNames(css.navigateButtons, {
@@ -413,8 +471,14 @@ const EditPartnerMenuWizard = () => {
           </Button>
         )}
         <Button
-          inProgress={createOrUpdateMenuInProgress}
-          disabled={createOrUpdateMenuInProgress}
+          inProgress={
+            createOrUpdateMenuInProgress || isCheckingMenuUnConflicted
+          }
+          disabled={
+            createOrUpdateMenuInProgress ||
+            isCheckingMenuUnConflicted ||
+            !!checkingMenuUnConflictedError
+          }
           onClick={handleSubmit}
           ready={submitReady}>
           <FormattedMessage
