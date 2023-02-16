@@ -30,6 +30,7 @@ const CustomDeadlineFieldInput = forwardRef((props, ref) => {
       {...props}
       id="deadlineDate"
       name="deadlineDate"
+      className={css.customInput}
       format={(value) => {
         return value
           ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
