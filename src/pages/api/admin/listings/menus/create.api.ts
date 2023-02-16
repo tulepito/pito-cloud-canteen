@@ -23,6 +23,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       include: ['author'],
     });
     const [restaurant] = denormalisedResponseEntities(restaurantRes);
+
+    const { geolocation } = restaurant.attributes;
+
     const response = await intergrationSdk.listings.create(
       {
         ...dataParams,
@@ -30,7 +33,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           ...metadata,
           restaurantName: restaurant.attributes.title,
         },
-        geolocation: restaurant.attributes.geolocation,
+        ...(geolocation ? { geolocation } : {}),
         state: 'published',
         authorId: restaurant?.author.id.uuid,
       },
