@@ -9,14 +9,15 @@ import css from './ResultList.module.scss';
 type TResultListProps = {
   className?: string;
   restaurants?: any[];
+  isLoading?: boolean;
 };
 
 const ResultList: React.FC<TResultListProps> = ({
   className,
   restaurants = [],
+  isLoading,
 }) => {
   const classes = classNames(css.root, className);
-  const isLoading = false;
 
   return (
     <div className={classes}>
@@ -30,7 +31,7 @@ const ResultList: React.FC<TResultListProps> = ({
       {!isLoading && restaurants.length === 0 && <EmptyList />}
       {!isLoading &&
         restaurants.map((restaurant) => (
-          <RestaurantCard key={restaurant?.id} className={css.card} />
+          <RestaurantCard key={restaurant?.id.uuid} className={css.card} />
         ))}
     </div>
   );

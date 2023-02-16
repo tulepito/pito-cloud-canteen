@@ -16,10 +16,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         { expand: true },
       ),
     )[0];
-    const { menuTypes = [], mealTypes = [] } = User(response).getMetadata();
+    const { menuTypes = [], categories = [] } = User(response).getMetadata();
     res.json({
       menuTypes,
-      mealTypes,
+      categories,
     });
   } catch (error) {
     handleError(res, error);

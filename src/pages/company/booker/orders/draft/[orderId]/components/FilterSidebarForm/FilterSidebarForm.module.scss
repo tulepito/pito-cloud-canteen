@@ -4,7 +4,7 @@
 
 .header {
   @include flexAlign(center, space-between);
-  padding: 0 16px;
+  padding: 0 16px 16px;
   .title {
     @include textTemplate(18px, $fontWeightBold, 24px);
   }
@@ -23,5 +23,5 @@
 }
 
 .filterWrapper {
-  margin-top: 20px;
+  margin-bottom: 20px;
 }
