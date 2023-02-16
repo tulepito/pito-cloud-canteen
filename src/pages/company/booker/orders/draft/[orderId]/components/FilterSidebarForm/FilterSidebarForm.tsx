@@ -1,7 +1,7 @@
 import Form from '@components/Form/Form';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { SearchFilterThunks } from '@redux/slices/SearchFilter.slice';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { distanceOptions, ratingOptions } from '@src/marketplaceConfig';
+import { companyPaths } from '@src/paths';
 import { useRouter } from 'next/router';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm, FormSpy } from 'react-final-form';
@@ -20,11 +20,10 @@ type TFilterSidebarFormProps = FormProps<TFilterSidebarFormValues> &
 const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, initialValues, form } = props;
+  const { handleSubmit, form } = props;
   const router = useRouter();
   const { timestamp, orderId, page = 1 } = router.query;
 
-  const dispatch = useAppDispatch();
   const menuTypesOptions = useAppSelector(
     (state) => state.SearchFilter.menuTypes,
   );
@@ -33,20 +32,39 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
   );
 
   const onResetAllFilters = () => {
-    form.reset(initialValues);
+    form.reset({
+      menuTypes: [],
+      categories: [],
+      distance: [],
+      rating: [],
+    });
   };
   const handleFormChange = async (values: any) => {
     const { values: formValues } = values;
-    setTimeout(() => {
-      dispatch(
-        SearchFilterThunks.searchRestaurants({
-          timestamp: parseInt(timestamp as string, 10),
-          orderId,
-          page: parseInt(page as string, 10),
-          ...formValues,
-        }),
-      );
-    }, 0);
+    const {
+      menuTypes: menuTypesValue = [],
+      categories: categoriesValue = [],
+      distance: distanceValue = [],
+      rating: ratingValue = [],
+    } = formValues;
+    router.push({
+      pathname: companyPaths.OrderSelectRestaurant,
+      query: {
+        timestamp,
+        orderId,
+        page,
+        ...(menuTypesValue.length > 0
+          ? { menuTypes: menuTypesValue.join(',') }
+          : {}),
+        ...(categoriesValue.length > 0
+          ? { categories: categoriesValue.join(',') }
+          : {}),
+        ...(distanceValue.length > 0
+          ? { distance: distanceValue.join(',') }
+          : {}),
+        ...(ratingValue.length > 0 ? { rating: ratingValue.join(',') } : {}),
+      },
+    });
   };
 
   return (

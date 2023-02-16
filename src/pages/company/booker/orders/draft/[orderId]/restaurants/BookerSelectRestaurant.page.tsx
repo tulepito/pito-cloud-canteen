@@ -14,23 +14,44 @@ import ResultList from './components/ResultList/ResultList';
 
 function BookerSelectRestaurant() {
   const router = useRouter();
-  const { timestamp, orderId, page = 1 } = router.query;
+  const {
+    timestamp,
+    orderId,
+    page = 1,
+    menuTypes,
+    categories,
+    distance,
+    rating,
+  } = router.query;
   const dispatch = useAppDispatch();
   useFetchSearchFilters();
   useLoadData({
     orderId: orderId as string,
   });
   useEffect(() => {
-    if (timestamp) {
-      dispatch(
-        SearchFilterThunks.searchRestaurants({
-          timestamp: Number(timestamp),
-          orderId,
-          page,
-        }),
-      );
-    }
-  }, [dispatch, orderId, page, timestamp]);
+    dispatch(
+      SearchFilterThunks.searchRestaurants({
+        timestamp: Number(timestamp),
+        orderId,
+        page,
+        ...(menuTypes ? { menuTypes: (menuTypes as string).split(',') } : {}),
+        ...(categories
+          ? { categories: (categories as string).split(',') }
+          : {}),
+        ...(distance ? { distance: (distance as string).split(',') } : {}),
+        ...(rating ? { rating: (rating as string).split(',') } : {}),
+      }),
+    );
+  }, [
+    categories,
+    dispatch,
+    distance,
+    menuTypes,
+    orderId,
+    page,
+    rating,
+    timestamp,
+  ]);
 
   const [filterMobileMenuOpen, setFilterMobileMenuOpen] = useState(false);
   const restaurants = useAppSelector(
@@ -49,6 +70,14 @@ function BookerSelectRestaurant() {
       ),
     [page, restaurants],
   );
+  const initialValues = useMemo(() => {
+    return {
+      menuTypes: menuTypes ? (menuTypes as string).split(',') : [],
+      categories: categories ? (categories as string).split(',') : [],
+      distance: distance ? (distance as string).split(',') : [],
+      rating: rating ? (rating as string).split(',') : [],
+    };
+  }, [categories, distance, menuTypes, rating]);
   const handleFilterMobileMenuClick = () => {
     setFilterMobileMenuOpen(!filterMobileMenuOpen);
   };
@@ -67,7 +96,7 @@ function BookerSelectRestaurant() {
           className={classNames(css.sidebar, {
             [css.sidebarOpened]: filterMobileMenuOpen,
           })}>
-          <FilterSidebar />
+          <FilterSidebar initialValues={initialValues} />
         </div>
         <div className={css.result}>
           <ResultList
