@@ -1,9 +1,10 @@
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useFetchSearchFilters from '@hooks/useFetchSearchFilters';
 import { SearchFilterThunks } from '@redux/slices/SearchFilter.slice';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { shallowEqual } from 'react-redux';
 
 import FilterSidebar from '../components/FilterSidebar/FilterSidebar';
 import { useLoadData } from '../hooks/loadData';
@@ -13,9 +14,8 @@ import ResultList from './components/ResultList/ResultList';
 
 function BookerSelectRestaurant() {
   const router = useRouter();
-  const { timestamp, orderId } = router.query;
+  const { timestamp, orderId, page = 1 } = router.query;
   const dispatch = useAppDispatch();
-  console.log('timestamp', timestamp);
   useFetchSearchFilters();
   useLoadData({
     orderId: orderId as string,
@@ -26,13 +26,29 @@ function BookerSelectRestaurant() {
         SearchFilterThunks.searchRestaurants({
           timestamp: Number(timestamp),
           orderId,
+          page,
         }),
       );
     }
-  });
+  }, [dispatch, orderId, page, timestamp]);
 
   const [filterMobileMenuOpen, setFilterMobileMenuOpen] = useState(false);
+  const restaurants = useAppSelector(
+    (state) => state.SearchFilter.searchResult,
+    shallowEqual,
+  );
+  const searchInProgress = useAppSelector(
+    (state) => state.SearchFilter.searchInProgress,
+  );
 
+  const restaurantInPage = useMemo(
+    () =>
+      restaurants.slice(
+        parseInt(page as string, 10) - 1,
+        parseInt(page as string, 10) + 9,
+      ),
+    [page, restaurants],
+  );
   const handleFilterMobileMenuClick = () => {
     setFilterMobileMenuOpen(!filterMobileMenuOpen);
   };
@@ -56,20 +72,8 @@ function BookerSelectRestaurant() {
         <div className={css.result}>
           <ResultList
             className={css.resultList}
-            restaurants={[
-              { id: '1' },
-              { id: '2' },
-              { id: '3' },
-              { id: '4' },
-              { id: '5' },
-              { id: '6' },
-              { id: '7' },
-              { id: '8' },
-              { id: '9' },
-              { id: '10' },
-              { id: '11' },
-              { id: '12' },
-            ]}
+            restaurants={restaurantInPage}
+            isLoading={searchInProgress}
           />
         </div>
         <ResultDetailModal />

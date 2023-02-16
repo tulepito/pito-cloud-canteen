@@ -7,7 +7,10 @@ import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
 import type { TListing } from '@utils/types';
+import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
+
+import { orderAsyncActions } from './Order.slice';
 
 // ================ Initial states ================ //
 type TKeyValue<T = string> = {
@@ -17,22 +20,24 @@ type TKeyValue<T = string> = {
 
 type TSearchFilterState = {
   menuTypes: TKeyValue[];
-  mealTypes: TKeyValue[];
+  categories: TKeyValue[];
   restaurantIdList: string[];
 
   searchResult: TListing[];
 
   fetchFilterInProgress: boolean;
+  searchInProgress: boolean;
 };
 const initialState: TSearchFilterState = {
   menuTypes: [],
-  mealTypes: [],
+  categories: [],
 
   restaurantIdList: [],
 
   searchResult: [],
 
   fetchFilterInProgress: false,
+  searchInProgress: false,
 };
 
 // ================ Thunk types ================ //
@@ -47,64 +52,63 @@ const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
 
 const searchRestaurants = createAsyncThunk(
   SEARCH_RESTAURANT,
-  async (params: Record<string, any>, { extra: sdk, getState }) => {
+  async (params: Record<string, any>, { extra: sdk, getState, dispatch }) => {
     const {
       timestamp,
       favoriteRestaurantIdList = [],
       favoriteFoodIdList = [],
       rating = '',
       menuTypes = [],
+      categories = [],
       page = 1,
+      orderId,
     } = params;
+    await dispatch(orderAsyncActions.fetchOrder(orderId));
     const dateTime = DateTime.fromMillis(timestamp);
     const { order } = getState().Order;
-    const { restaurantIdList = [], searchResult = [] } =
-      getState().SearchFilter;
+    const { restaurantIdList = [] } = getState().SearchFilter;
     let newRestaurantIdList = [...restaurantIdList];
 
-    if (restaurantIdList.length === 0) {
-      const { deliveryHour, nutritions, packagePerMember } = Listing(
-        order as TListing,
-      ).getMetadata();
-      const dayOfWeek = convertWeekDay(dateTime.weekday).key;
-      const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
-      const mealType = deliveryDaySessionAdapter(deliveryDaySession);
-      const query = {
-        meta_listingState: 'published',
-        meta_listingType: ListingTypes.MENU,
-        pub_startDate: `,${dateTime.toMillis()}`,
-        pub_daysOfWeek: `has_any:${dayOfWeek}`,
-        pub_mealTypes: `has_any:${mealType}`,
+    const { deliveryHour, nutritions, packagePerMember } = Listing(
+      order as TListing,
+    ).getMetadata();
+    const dayOfWeek = convertWeekDay(dateTime.weekday).key;
+    const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
+    const mealType = deliveryDaySessionAdapter(deliveryDaySession);
+    const query = {
+      meta_listingState: 'published',
+      meta_listingType: ListingTypes.MENU,
+      pub_startDate: `,${dateTime.toMillis()}`,
+      pub_daysOfWeek: `has_any:${dayOfWeek}`,
+      pub_mealType: mealType,
 
-        ...(menuTypes.length > 0 ? { meta_menuType: menuTypes.join(',') } : {}),
-        ...(nutritions.length > 0
-          ? {
-              [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(
-                ',',
-              )}`,
-            }
-          : {}),
-        ...(favoriteRestaurantIdList.length > 0
-          ? {
-              meta_restaurantId: favoriteRestaurantIdList.join(','),
-            }
-          : {}),
-        ...(favoriteFoodIdList.length > 0
-          ? {
-              [`meta_${dayOfWeek}FoodIdList`]: `has_any:${favoriteFoodIdList.join(
-                ',',
-              )}`,
-            }
-          : {}),
-        [`pub_${dayOfWeek}AverageFoodPrice`]: `,${packagePerMember}`,
-      };
-      const allMenus = await queryAllPages({ sdkModel: sdk.listings, query });
-      newRestaurantIdList = [
-        ...allMenus.map(
-          (menu: TListing) => Listing(menu).getMetadata()?.restaurantId,
-        ),
-      ];
-    }
+      ...(menuTypes.length > 0 ? { meta_menuType: menuTypes.join(',') } : {}),
+      ...(categories.length > 0 ? { pub_category: categories.join(',') } : {}),
+      ...(nutritions.length > 0
+        ? {
+            [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(',')}`,
+          }
+        : {}),
+      ...(favoriteRestaurantIdList.length > 0
+        ? {
+            meta_restaurantId: favoriteRestaurantIdList.join(','),
+          }
+        : {}),
+      ...(favoriteFoodIdList.length > 0
+        ? {
+            [`meta_${dayOfWeek}FoodIdList`]: `has_any:${favoriteFoodIdList.join(
+              ',',
+            )}`,
+          }
+        : {}),
+      [`pub_${dayOfWeek}AverageFoodPrice`]: `,${packagePerMember}`,
+    };
+    const allMenus = await queryAllPages({ sdkModel: sdk.listings, query });
+    newRestaurantIdList = uniq([
+      ...allMenus.map(
+        (menu: TListing) => Listing(menu).getMetadata()?.restaurantId,
+      ),
+    ]);
 
     const restaurants = denormalisedResponseEntities(
       await sdk.listings.query({
@@ -118,7 +122,7 @@ const searchRestaurants = createAsyncThunk(
       ...(newRestaurantIdList.length > 0 && {
         restaurantIdList: newRestaurantIdList,
       }),
-      searchResult: searchResult.concat(restaurants),
+      searchResult: restaurants,
     };
   },
 );
@@ -141,7 +145,18 @@ const SearchFilterSlice = createSlice({
       .addCase(fetchSearchFilter.fulfilled, (state, action) => {
         state.fetchFilterInProgress = false;
         state.menuTypes = action.payload.menuTypes;
-        state.mealTypes = action.payload.mealTypes;
+        state.categories = action.payload.categories;
+      })
+      .addCase(searchRestaurants.pending, (state) => {
+        state.searchInProgress = true;
+      })
+      .addCase(searchRestaurants.fulfilled, (state, action) => {
+        state.searchInProgress = false;
+        state.restaurantIdList = action.payload.restaurantIdList ?? [];
+        state.searchResult = action.payload.searchResult ?? [];
+      })
+      .addCase(searchRestaurants.rejected, (state) => {
+        state.searchInProgress = false;
       });
   },
 });
