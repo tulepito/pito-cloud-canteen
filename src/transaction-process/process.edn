@@ -9,10 +9,10 @@
     :privileged? true
   }
   {
-    :name :transition/expired-delivery,
+    :name :transition/expired-start-delivery,
     :at {:fn/plus [
                   {:fn/timepoint [:time/booking-start]}
-                  {:fn/period ["PT30M"]}]}
+                  {:fn/period ["PT1M"]}]}
     :actions [],
     :from :state/initiated
     :to :state/failed-delivery
@@ -25,6 +25,15 @@
     :to :state/delivering
     :privileged? true
   }
+  {
+    :name :transition/expired-delivery,
+    :at {:fn/plus [
+                  {:fn/timepoint [:time/booking-start]}
+                  {:fn/period ["PT1M"]}]}
+    :actions [],
+    :from :state/delivering
+    :to :state/failed-delivery
+  }  
   {
     :name :transition/operator-cancel-plan,
     :actor :actor.role/operator,
