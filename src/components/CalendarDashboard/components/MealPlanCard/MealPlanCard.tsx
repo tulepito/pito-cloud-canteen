@@ -101,7 +101,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   };
   const onPickFoodInProgress =
     (fetchFoodInProgress || fetchRestaurantsInProgress) &&
-    selectedDate.getTime() === event.start?.getTime();
+    selectedDate?.getTime() === event.start?.getTime();
   return (
     <div className={css.root}>
       <MealPlanCardHeader event={event} removeEventItem={removeEventItem} />

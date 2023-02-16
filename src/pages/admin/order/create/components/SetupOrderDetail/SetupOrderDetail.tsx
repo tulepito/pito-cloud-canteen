@@ -277,20 +277,22 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     endDate,
   };
 
-  const disabledSubmit = Object.keys(orderDetail).length === 0;
+  const missingSelectedFood = Object.keys(orderDetail).filter(
+    (dateTime) => orderDetail[dateTime].restaurant.foodList.length === 0,
+  );
+
+  const disabledSubmit =
+    Object.keys(orderDetail).length === 0 || missingSelectedFood.length > 0;
   const initialFoodList =
     orderDetail[selectedDate?.getTime()]?.restaurant?.foodList;
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     const orderId = Listing(order as TListing).getId();
     const planId = Listing(order as TListing).getMetadata()?.plans?.[0];
-    dispatch(
+    const { meta } = await dispatch(
       orderAsyncActions.updatePlanDetail({ orderId, orderDetail, planId }),
-    )
-      .then(() => {
-        nextTab();
-      })
-      .catch(() => {});
+    );
+    if (meta.requestStatus !== 'rejected') nextTab();
   };
 
   useEffect(() => {
@@ -379,6 +381,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               companyLogo="Company"
               startDate={new Date(startDate)}
               endDate={new Date(endDate)}
+              resources={{
+                startDate,
+                endDate,
+              }}
               components={{
                 contentEnd: (props) => (
                   <AddMorePlan {...props} {...addMorePlanExtraProps} />
