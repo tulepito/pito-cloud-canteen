@@ -37,8 +37,10 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
   const orderDetail = get(planData, 'attributes.metadata.orderDetail', {});
   const dateList = renderDateRange(startDate, endDate);
 
-  const { foodList = {}, memberOrders = {} } =
-    orderDetail[currentViewDate.toString()] || {};
+  const {
+    restaurant: { foodList = {} },
+    memberOrders = {},
+  } = orderDetail[currentViewDate.toString()] || {};
   const foodOptions = Object.entries<TObject>(foodList).map(
     ([foodId, foodData]) => {
       return {

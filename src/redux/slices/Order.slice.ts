@@ -218,7 +218,6 @@ const updateOrder = createAsyncThunk(
         ...generalInfo,
         ...(parsedDeadlineDate ? { deadlineDate: parsedDeadlineDate } : {}),
       },
-      orderDetail: orderDetailParams || orderDetail,
     };
     const { data: orderListing } = await updateOrderApi(orderId, apiBody);
     const { plans = [] } = Listing(orderListing).getMetadata();

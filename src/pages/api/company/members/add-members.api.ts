@@ -86,7 +86,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }, {});
 
     // Step update company account metadata
-
     const newCompanyMembers = {
       ...members,
       ...newNoAccountMembers,
