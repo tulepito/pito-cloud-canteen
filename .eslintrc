@@ -12,7 +12,8 @@
       { "props": true, "ignorePropertyModificationsFor": ["state"] }
     ],
     "no-nested-ternary": "off",
-    "no-console": "off"
+    "no-console": "off",
+    "no-return-await": "off"
   },
   "overrides": [
     // Configuration for TypeScript files
