@@ -9,6 +9,7 @@ export enum ETransactionActor {
 
 export enum ETransition {
   INITIATE_TRANSACTION = 'transition/initiate-transaction',
+  EXPIRED_DELIVERY = 'transition/expired-delivery',
   START_DELIVERY = 'transition/start-delivery',
   OPERATOR_CANCEL_PLAN = 'transition/operator-cancel-plan',
   CANCEL_DELIVERY = 'transition/cancel-delivery',
@@ -63,6 +64,7 @@ const stateDescription: TStateDescription = {
     },
     [ETransactionState.FAILED_DELIVERY]: {
       on: {
+        [ETransition.EXPIRED_DELIVERY]: ETransactionState.INITIATED,
         [ETransition.CANCEL_DELIVERY]: ETransactionState.DELIVERING,
       },
     },

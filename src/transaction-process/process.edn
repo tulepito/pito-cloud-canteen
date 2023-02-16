@@ -9,6 +9,15 @@
     :privileged? true
   }
   {
+    :name :transition/expired-delivery,
+    :at {:fn/plus [
+                  {:fn/timepoint [:time/booking-start]}
+                  {:fn/period ["PT30M"]}]}
+    :actions [],
+    :from :state/initiated
+    :to :state/failed-delivery
+  }  
+  {
     :name :transition/start-delivery,
     :actor :actor.role/operator,
     :actions [],
@@ -43,12 +52,13 @@
   {
     :name :transition/review-restaurant,
     :actor :actor.role/operator,
-    :actions [],
+    :actions [{:name :action/post-review-by-customer}
+              {:name :action/publish-reviews}],
     :from :state/completed
     :to :state/reviewed
     :privileged? true
   }
-    {
+  {
     :name :transition/expired-review-time,
     :at {:fn/plus [
                   {:fn/timepoint [:time/first-entered-state :state/completed]}
@@ -60,7 +70,8 @@
   {
     :name :transition/review-restaurant-after-expire-time,
     :actor :actor.role/operator,
-    :actions [],
+    :actions [{:name :action/post-review-by-customer}
+              {:name :action/publish-reviews}],
     :from :state/expired-review
     :to :state/reviewed
     :privileged? true
