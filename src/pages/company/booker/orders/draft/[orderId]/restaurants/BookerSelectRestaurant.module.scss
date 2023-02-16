@@ -14,11 +14,14 @@
   @include viewportSLarge {
     max-width: 1240px;
   }
+
+  @include viewportXLarge {
+    max-width: 1555px;
+  }
 }
 
 .main {
   display: flex;
-  justify-content: space-between;
   position: relative;
 }
 
@@ -63,6 +66,7 @@
 
 .result {
   margin: auto;
+  flex-grow: 1;
 
   @include viewportLarge {
     margin: 0 0 0 20px;
