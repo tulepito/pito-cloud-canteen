@@ -1,43 +1,41 @@
 /* eslint-disable no-console */
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import cookies from '@services/cookie';
-import { deserialize, getIntegrationSdk, handleError } from '@services/sdk';
+import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { TIntegrationListing } from '@utils/types';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { updateMenuIdListAndMenuWeekDayListForFood } from './apiHelpers';
-import validateMenu from './validateMenu';
+import {
+  checkUnconflictedMenuMiddleware,
+  updateMenuIdListAndMenuWeekDayListForFood,
+} from './apiHelpers';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
-    if (
-      req.headers['content-type'] === 'application/transit+json' &&
-      typeof req.body === 'string'
-    ) {
-      try {
-        req.body = deserialize(req.body);
-      } catch (e) {
-        console.error('Failed to parse request body as Transit:');
-        console.error(e);
-        res.status(400).send('Invalid Transit in request body.');
-        return;
-      }
-    }
     const { dataParams, queryParams = {} } = req.body;
     const intergrationSdk = getIntegrationSdk();
-    const { restaurantId } = dataParams.metadata;
+    const { metadata } = dataParams;
+    const { restaurantId } = metadata;
 
     const restaurantRes = await intergrationSdk.listings.show({
       id: restaurantId,
       include: ['author'],
     });
     const [restaurant] = denormalisedResponseEntities(restaurantRes);
+
+    const { geolocation } = restaurant.attributes;
+
     const response = await intergrationSdk.listings.create(
       {
         ...dataParams,
+        metadata: {
+          ...metadata,
+          restaurantName: restaurant.attributes.title,
+        },
+        ...(geolocation ? { geolocation } : {}),
         state: 'published',
-        authorId: restaurant.author.id.uuid,
+        authorId: restaurant?.author.id.uuid,
       },
       queryParams,
     );
@@ -55,4 +53,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   }
 }
 
-export default cookies(validateMenu(handler));
+const handlerWithCustomParams = (req: NextApiRequest, res: NextApiResponse) => {
+  const { dataParams = {} } = req.body;
+
+  const { publicData = {}, metadata = {}, id } = dataParams || {};
+  const { mealType, daysOfWeek = [] } = publicData;
+  const { restaurantId } = metadata;
+  const dataToCheck = {
+    mealType,
+    restaurantId,
+    daysOfWeek,
+    id,
+  };
+  return checkUnconflictedMenuMiddleware(handler)(req, res, dataToCheck);
+};
+
+export default cookies(handlerWithCustomParams);

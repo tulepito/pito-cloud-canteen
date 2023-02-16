@@ -91,6 +91,23 @@ const TABLE_COLUNMS: TColumn[] = [
       numberOfCycles,
       menuType,
       onSetMenuToUpdate,
+      monFoodIdList,
+      tueFoodIdList,
+      wedFoodIdList,
+      thuFoodIdList,
+      friFoodIdList,
+      satFoodIdList,
+      sunFoodIdList,
+      monAverageFoodPrice,
+      tueAverageFoodPrice,
+      wedAverageFoodPrice,
+      thuAverageFoodPrice,
+      friAverageFoodPrice,
+      satAverageFoodPrice,
+      sunAverageFoodPrice,
+      foodsByDate,
+      restaurantId,
+      mealType,
     }) => {
       if (isDeleted) {
         return <></>;
@@ -110,6 +127,23 @@ const TABLE_COLUNMS: TColumn[] = [
             daysOfWeek,
             numberOfCycles,
             menuType,
+            monFoodIdList,
+            tueFoodIdList,
+            wedFoodIdList,
+            thuFoodIdList,
+            friFoodIdList,
+            satFoodIdList,
+            sunFoodIdList,
+            monAverageFoodPrice,
+            tueAverageFoodPrice,
+            wedAverageFoodPrice,
+            thuAverageFoodPrice,
+            friAverageFoodPrice,
+            satAverageFoodPrice,
+            sunAverageFoodPrice,
+            foodsByDate,
+            restaurantId,
+            mealType,
           });
       };
 
@@ -162,9 +196,34 @@ const parseEntitiesToTableData = (
   extraData: any = {},
 ) => {
   return menues.map((menu) => {
-    const { isDeleted, listingState, menuType } = menu.attributes.metadata;
-    const { startDate, endDate, numberOfCycles, daysOfWeek } =
-      menu.attributes.publicData;
+    const {
+      isDeleted,
+      listingState,
+      menuType,
+      monFoodIdList,
+      tueFoodIdList,
+      wedFoodIdList,
+      thuFoodIdList,
+      friFoodIdList,
+      satFoodIdList,
+      sunFoodIdList,
+      restaurantId,
+    } = menu.attributes.metadata;
+    const {
+      startDate,
+      endDate,
+      numberOfCycles,
+      daysOfWeek,
+      foodsByDate,
+      monAverageFoodPrice,
+      tueAverageFoodPrice,
+      wedAverageFoodPrice,
+      thuAverageFoodPrice,
+      friAverageFoodPrice,
+      satAverageFoodPrice,
+      sunAverageFoodPrice,
+      mealType,
+    } = menu.attributes.publicData;
 
     return {
       key: menu.id.uuid,
@@ -178,6 +237,23 @@ const parseEntitiesToTableData = (
         endDate,
         numberOfCycles,
         daysOfWeek,
+        monFoodIdList,
+        tueFoodIdList,
+        wedFoodIdList,
+        thuFoodIdList,
+        friFoodIdList,
+        satFoodIdList,
+        sunFoodIdList,
+        monAverageFoodPrice,
+        tueAverageFoodPrice,
+        wedAverageFoodPrice,
+        thuAverageFoodPrice,
+        friAverageFoodPrice,
+        satAverageFoodPrice,
+        sunAverageFoodPrice,
+        foodsByDate,
+        restaurantId,
+        mealType,
         ...extraData,
       },
     };
@@ -247,6 +323,11 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
     shallowEqual,
   );
 
+  const createOrUpdateMenuError = useAppSelector(
+    (state) => state.menus.createOrUpdateMenuError,
+    shallowEqual,
+  );
+
   const onSetMenuToRemove = (menuData: any) => () => {
     setMenuToRemove(menuData);
   };
@@ -272,11 +353,12 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
 
     if (!error) {
       setMenuToRemove(null);
-      dispatch(
+      await dispatch(
         menusSliceThunks.queryPartnerMenus({
           menuType,
           restaurantId,
           page: 1,
+          mealType,
         }),
       );
       dispatch(
@@ -337,6 +419,7 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
         onClearMenuToUpdate={onClearMenuToUpdate}
         onUpdateMenuApplyTime={onUpdateMenuApplyTime}
         updateInProgress={createOrUpdateMenuInProgress}
+        createOrUpdateMenuError={createOrUpdateMenuError}
       />
     </>
   );

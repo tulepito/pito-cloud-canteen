@@ -15,7 +15,6 @@ import { getLabelByKey, SIDE_DISH_OPTIONS } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 import { parsePrice } from '@utils/validators';
 import type { FormApi } from 'final-form';
-import cloneDeep from 'lodash/cloneDeep';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -144,14 +143,14 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
   const savePickedFoods = () => {
     const { rowCheckbox = [], foodsByDate = {} } = values;
 
-    const newFoodsByDate = cloneDeep(foodsByDate);
+    const newFoodsByDate: Record<any, any> = {};
 
     if (!currentDate || !form) return;
 
     if (!newFoodsByDate[currentDate]) {
       newFoodsByDate[currentDate] = {};
     }
-    const foodsLength = Object.keys(newFoodsByDate[currentDate]).length;
+    const foodsLength = Object.keys(foodsByDate?.[currentDate] || {}).length;
 
     if (foodsLength > 10) return;
 
@@ -161,6 +160,8 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
       );
       const title = food?.attributes?.title;
       const priceAmount = food?.attributes?.price?.amount || 0;
+
+      const nutritionsList = food?.attributes?.publicData?.specialDiets || [];
 
       Object.keys(newFoodsByDate).forEach((foodId) => {
         if (!rowCheckbox.includes(foodId)) {
@@ -178,6 +179,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
           sideDishes,
           price: priceAmount,
           foodNote,
+          nutritionsList,
         },
       };
     });

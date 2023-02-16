@@ -1126,5 +1126,6 @@
   "CreatePartnerMenuPage.title": "Tạo thực đơn",
   "EditPartnerMenuPage.title": "Chỉnh sửa thực đơn",
   "EditMenuPricingForm.pricingTitle": "Chọn món ăn",
-  "UpdateMenuModal.title": "Chỉnh sửa thời gian áp dụng"
+  "UpdateMenuModal.title": "Chỉnh sửa thời gian áp dụng",
+  "EditPartnerMenuWizard.conflictError": "Một buổi trong một ngày chỉ có thể có một menu"
 }

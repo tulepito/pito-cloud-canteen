@@ -130,6 +130,7 @@ const queryMenuPickedFoods = createAsyncThunk(
       meta_restaurantId: restaurantId,
       meta_isDeleted: false,
     });
+
     const foods = denormalisedResponseEntities(response);
     return foods;
   },

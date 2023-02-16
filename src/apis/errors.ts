@@ -11,4 +11,9 @@ export const errorMessages = {
     id: 'validate-menu-error-conflict',
     code: httpStatusCodes.conflict,
   },
+  BAD_REQUEST: {
+    message: 'Bad request',
+    id: 'bad-request',
+    code: httpStatusCodes.notfound,
+  },
 };
