@@ -68,11 +68,11 @@ function BookerDraftOrderPage() {
             restaurant: {
               id: '63d776c9-9bc4-4d57-853f-1e9062417220',
               restaurantName: 'trang',
-            },
-            foodList: {
-              '63e0b73b-60a1-49a3-92af-a9c741db911c': {
-                foodPrice: 10000,
-                foodName: 'Rau muống xào tỏi kèm vị đắng của cafe Copy',
+              foodList: {
+                '63e0b73b-60a1-49a3-92af-a9c741db911c': {
+                  foodPrice: 10000,
+                  foodName: 'Rau muống xào tỏi kèm vị đắng của cafe Copy',
+                },
               },
             },
           },
