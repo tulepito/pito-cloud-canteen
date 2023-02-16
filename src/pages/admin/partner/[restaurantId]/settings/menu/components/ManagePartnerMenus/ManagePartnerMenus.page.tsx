@@ -105,13 +105,15 @@ const ManagePartnerMenusPage: React.FC<TManagePartnerMenusPageProps> = (
         onCancel={() => setIsCreateModalOpen(false)}
         confirmLabel={<FormattedMessage id="ManagePartnerMenu.createLabel" />}
         cancelLabel={<FormattedMessage id="ManagePartnerMenu.cancelLabel" />}>
-        <CreateMenuOptionForm
-          formRef={formRef}
-          onSubmit={onSubmitCreateOptionForm}
-          initialValues={{
-            createOption: 'create',
-          }}
-        />
+        {isCreateModalOpen && (
+          <CreateMenuOptionForm
+            formRef={formRef}
+            onSubmit={onSubmitCreateOptionForm}
+            initialValues={{
+              createOption: 'create',
+            }}
+          />
+        )}
       </AlertModal>
     </div>
   );
