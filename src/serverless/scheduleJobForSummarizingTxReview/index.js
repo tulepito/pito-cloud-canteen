@@ -6,7 +6,7 @@ const { EventTypes } = require('./utils/constants');
 const handler = async () => {
   try {
     console.log(
-      'Start to run schedule to scan transactions and update order data ...',
+      'Start to run schedule to scan transactions and summarize transaction review...',
     );
 
     const eventTypes = EventTypes.transitTransaction;
