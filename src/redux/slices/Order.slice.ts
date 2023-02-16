@@ -10,7 +10,6 @@ import {
 } from '@apis/orderApi';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
-import { EApiUpdateMode } from '@pages/api/orders/[orderId]/plan/update.service';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { UserPermission } from '@src/types/UserPermission';
@@ -218,16 +217,8 @@ const updateOrder = createAsyncThunk(
         ...generalInfo,
         ...(parsedDeadlineDate ? { deadlineDate: parsedDeadlineDate } : {}),
       },
-      orderDetail: orderDetailParams || orderDetail,
     };
     const { data: orderListing } = await updateOrderApi(orderId, apiBody);
-    const { plans = [] } = Listing(orderListing).getMetadata();
-    const planId = plans[0];
-    await updatePlanDetailsApi(orderId, {
-      orderDetail,
-      planId,
-      updateMode: EApiUpdateMode.REPLACE,
-    });
     return {
       orderListing,
       orderDetail: orderDetailParams || orderDetail,
@@ -505,7 +496,6 @@ const orderSlice = createSlice({
         ...state,
         updateOrderInProgress: false,
         order: payload.orderListing,
-        orderDetail: payload.orderDetail,
       }))
       .addCase(updateOrder.rejected, (state, { error }) => ({
         ...state,

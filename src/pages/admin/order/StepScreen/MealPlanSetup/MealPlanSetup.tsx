@@ -81,7 +81,20 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
         ...rest,
       };
-      await dispatch(orderAsyncActions.updateOrder({ generalInfo }));
+      const { payload }: { payload: any } = await dispatch(
+        orderAsyncActions.updateOrder({ generalInfo }),
+      );
+      const { orderListing, orderDetail } = payload || {};
+      const orderId = Listing(orderListing as TListing).getId();
+      const { plans = [] } = Listing(orderListing as TListing).getMetadata();
+      const planId = plans[0];
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId,
+          orderDetail,
+        }),
+      );
       nextTab();
     },
     [dispatch, nextTab],

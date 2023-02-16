@@ -21,10 +21,17 @@ type MealPlanDateFieldProps = {
   values: Record<string, any>;
   columnLayout?: boolean;
   title?: string;
+  onCustomStartDateChange?: (date: number) => void;
 };
 
 const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
-  const { values, columnLayout = false, form, title } = props;
+  const {
+    values,
+    columnLayout = false,
+    form,
+    title,
+    onCustomStartDateChange,
+  } = props;
   const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
     values;
   const intl = useIntl();
@@ -62,6 +69,9 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
         form.change('endDate', undefined);
         setEndDate(undefined!);
       });
+    }
+    if (typeof onCustomStartDateChange === 'function') {
+      onCustomStartDateChange(value);
     }
   };
   const startDateClasses = classNames(
