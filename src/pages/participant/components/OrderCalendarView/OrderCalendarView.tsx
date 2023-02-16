@@ -68,7 +68,6 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
 
       if (!pickFoodStatus && !anchorTime && !isAnchorTimeChanged) {
         isAnchorTimeChanged = true;
-        console.log('🚀 ~ Object.keys ~ anchorTime', anchorTime);
         setAnchorTime(+planItemKey);
       }
 
@@ -89,8 +88,8 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
             dishes,
           },
           expiredTime: deadlineDate
-            ? DateTime.fromMillis(+deadlineDate).toJSDate()
-            : DateTime.fromMillis(+planItemKey).minus({ day: 2 }).toJSDate(),
+            ? DateTime.fromMillis(+deadlineDate)
+            : DateTime.fromMillis(+planItemKey).minus({ day: 2 }),
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
         },

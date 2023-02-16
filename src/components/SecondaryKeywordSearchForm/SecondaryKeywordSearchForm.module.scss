@@ -1,0 +1,13 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  align-items: center;
+  display: flex;
+  .searchInput {
+    width: 100%;
+    @include viewportLarge {
+      width: 348px;
+    }
+  }
+}

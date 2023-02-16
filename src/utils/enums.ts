@@ -18,7 +18,7 @@ export enum EImageVariants {
 
 export enum EListingStates {
   draft = 'draft',
-  penddingArroval = 'pendingApproval',
+  pendingApproval = 'pendingApproval',
   published = 'published',
   closed = 'closed',
 }
@@ -104,6 +104,7 @@ export enum EListingType {
   restaurant = 'restaurant',
   transaction = 'transaction',
   food = 'food',
+  menu = 'menu',
   subOrder = 'sub-order',
   order = 'order',
 }
@@ -162,10 +163,6 @@ export const LIST_BANKS = [
     label: 'Ngân hàng NCB',
   },
   {
-    key: 'vcb',
-    label: 'Ngân hàng Vietcombank',
-  },
-  {
     key: 'techcombank',
     label: 'Ngân hàng Techcombank',
   },
@@ -211,7 +208,7 @@ export const LIST_BANKS = [
   },
   {
     key: 'dong-a-bank',
-    label: 'Ngân hàng VietinBank',
+    label: 'Ngân hàng Đông Á',
   },
   {
     key: 'tpbank',
@@ -601,13 +598,13 @@ export const MENU_OPTIONS = [
 ];
 
 export enum EOrderStates {
-  inProgress = 'inProgress',
-  picking = 'picking',
-  cancel = 'cancel',
-  delivery = 'delivery',
-  pendingPayment = 'pendingPayment',
+  draft = 'draft',
   isNew = 'isNew',
+  canceled = 'canceled',
+  picking = 'picking',
+  inProgress = 'inProgress',
   completed = 'completed',
+  reviewed = 'reviewed',
 }
 
 export const SPECIAL_DIET_OPTIONS = [
@@ -668,24 +665,20 @@ export const ORDER_STATES_OPTIONS = [
     label: 'Đang chọn món',
   },
   {
-    key: EOrderStates.cancel,
+    key: EOrderStates.canceled,
     label: 'Hủy',
   },
   {
-    key: EOrderStates.delivery,
-    label: 'Đang giao hàng',
-  },
-  {
-    key: EOrderStates.pendingPayment,
-    label: 'Chờ thanh toán',
-  },
-  {
     key: EOrderStates.isNew,
-    label: 'Mới tạo',
+    label: 'Đơn nháp',
   },
   {
     key: EOrderStates.completed,
-    label: 'Đã hoàn thành',
+    label: 'Chưa đánh giá',
+  },
+  {
+    key: EOrderStates.reviewed,
+    label: 'Đã đánh giá',
   },
 ];
 
@@ -703,3 +696,34 @@ export enum EOrderDetailsStatus {
   cancelled = 'cancelled',
   pending = 'pending',
 }
+
+export enum EMenuStatus {
+  active = 'active',
+  inactive = 'inactive',
+}
+
+export enum EMenuMealType {
+  breakfast = 'breakfast',
+  lunch = 'lunch',
+  dinner = 'dinner',
+  snack = 'snack',
+}
+
+export const MENU_MEAL_TYPE_OPTIONS = [
+  {
+    key: EMenuMealType.breakfast,
+    label: 'Ăn sáng',
+  },
+  {
+    key: EMenuMealType.lunch,
+    label: 'Ăn trưa',
+  },
+  {
+    key: EMenuMealType.dinner,
+    label: 'Ăn tối',
+  },
+  {
+    key: EMenuMealType.snack,
+    label: 'Ăn xế',
+  },
+];

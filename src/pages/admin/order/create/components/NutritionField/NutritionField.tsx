@@ -1,4 +1,5 @@
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import { nutritionOptions } from '@src/marketplaceConfig';
 import { useIntl } from 'react-intl';
 
 import css from './NutritionField.module.scss';
@@ -7,11 +8,6 @@ type NutritionFieldProps = {
   title?: string;
 };
 
-const nutritionOptions = [
-  { key: 'vegetarian', label: 'Nutrition.vegetarian' },
-  { key: 'noGluten', label: 'Nutrition.noGluten' },
-  { key: 'keto', label: 'Nutrition.keto' },
-];
 const NutritionField: React.FC<NutritionFieldProps> = (props) => {
   const { title } = props;
   const intl = useIntl();

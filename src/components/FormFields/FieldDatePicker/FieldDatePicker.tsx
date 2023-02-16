@@ -37,6 +37,7 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
     }
     onChange(date?.getTime());
   };
+
   const { invalid, touched, error } = meta;
   const errorText = customErrorText || error;
   const hasError = !!customErrorText || !!(touched && invalid && error);
@@ -44,7 +45,7 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
   const labelClasses = classNames(css.labelRoot);
   const labelRequiredRedStar = fieldMeta.error ? css.labelRequiredRedStar : '';
   return (
-    <div className={className}>
+    <div className={classNames(css.root, className)}>
       {label && (
         <label className={labelClasses} htmlFor={id}>
           {label}
@@ -56,6 +57,7 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
         id={id}
         name={name}
         onChange={onInputChange}
+        className={css.input}
         customInput={customInput}
         selected={value || selected}
         {...rest}

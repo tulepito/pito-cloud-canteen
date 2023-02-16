@@ -32,6 +32,7 @@ const FormTab: React.FC<TFormTabProps> = (props) => {
     isLight,
     onClick,
   } = props;
+
   const linkClasses = classNames(css.link, {
     [css.selectedLink]: selected,
     [css.disabled]: disabled,

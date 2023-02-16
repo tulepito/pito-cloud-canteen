@@ -1,30 +1,43 @@
 import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import config from '@src/configs';
 import { Listing, User } from '@utils/data';
-import type { TListing, TUser } from '@utils/types';
+import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 import { useState } from 'react';
 
 import type { TReviewInfoFormValues } from '../components/BookerOrderDetailsReviewView/ReviewInfoSection/ReviewInfoForm';
-import { calculateTotalPriceAndDishes } from '../helpers/cartInfoHelper';
+import { calculatePriceQuotationInfo } from '../helpers/cartInfoHelper';
 import { groupFoodOrderByDate } from '../helpers/orderDetailHelper';
 
 export const usePrepareOrderDetailPageData = () => {
   const [reviewInfoValues, setReviewInfoValues] =
     useState<TReviewInfoFormValues>();
 
-  const { orderData, planData, participantData, companyData } = useAppSelector(
-    (state) => state.OrderManagement,
-  );
+  const { orderData, planData, participantData, companyData, bookerData } =
+    useAppSelector((state) => state.OrderManagement);
   const currentUser = useAppSelector(currentUserSelector);
 
   const { title: orderTitle = '' } = Listing(
     orderData as TListing,
   ).getAttributes();
-  const { email: bookerEmail } = User(currentUser as TUser).getAttributes();
+  const constCurrUserAttributes = User(
+    currentUser as TCurrentUser,
+  ).getAttributes();
+
   const { orderDetail } = Listing(planData as TListing).getMetadata();
-  const { companyName } = User(companyData as TUser).getPublicData();
+  const { companyName = '' } = User(companyData as TUser).getPublicData();
+
+  const {
+    email: bookerEmail,
+    profile: {
+      displayName: contactPeopleName = '',
+      protectedData: { phoneNumber: contactPhoneNumber = '' } = {},
+    },
+  } =
+    bookerData !== null
+      ? User(bookerData).getAttributes()
+      : constCurrUserAttributes;
+
   const {
     startDate = 0,
     endDate = 0,
@@ -32,9 +45,9 @@ export const usePrepareOrderDetailPageData = () => {
     deliveryAddress,
     orderDeadline = 0,
     deadlineHour,
-    staffName,
-    packagePerMember = 0,
+    // packagePerMember = 0,
     participants = [],
+    staffName = '',
   } = Listing(orderData as TListing).getMetadata();
 
   const titleSectionData = { deliveryHour, deliveryAddress };
@@ -57,28 +70,31 @@ export const usePrepareOrderDetailPageData = () => {
     manageOrdersData,
   };
   /* =============== Review data =============== */
-  const totalInfo = calculateTotalPriceAndDishes({ orderDetail });
   const foodOrderGroupedByDate = groupFoodOrderByDate({ orderDetail });
-
-  const { totalPrice = 0, totalDishes = 0 } = totalInfo || {};
-  const PITOPoints = totalPrice / 100000;
-  const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
-
-  const VATFee = totalPrice * config.VATPercentage;
-  const serviceFee = 0;
-  const transportFee = 0;
-  const promotion = 0;
-  const totalWithoutVAT = totalPrice + serviceFee + transportFee - promotion;
-  const totalWithVAT = VATFee + totalWithoutVAT;
-  const overflow = isOverflowPackage
-    ? totalWithVAT - totalDishes * packagePerMember
-    : 0;
+  const {
+    totalPrice,
+    PITOPoints,
+    VATFee,
+    totalWithVAT,
+    serviceFee,
+    transportFee,
+    promotion,
+    overflow,
+    totalWithoutVAT,
+  } = calculatePriceQuotationInfo({
+    planOrderDetail: orderDetail,
+    order: orderData as TObject,
+  });
 
   const reviewInfoData = {
     reviewInfoValues,
-    deliveryAddress: deliveryAddress?.address,
+    deliveryHour,
+    deliveryAddress: deliveryAddress?.address || '',
     staffName,
     companyName,
+    contactPeopleName,
+    contactPeopleEmail: bookerEmail,
+    contactPhoneNumber,
   };
 
   const reviewResultData = {
@@ -131,6 +147,7 @@ export const usePrepareOrderDetailPageData = () => {
   };
 
   return {
+    orderTitle,
     editViewData,
     reviewViewData,
     priceQuotationData,

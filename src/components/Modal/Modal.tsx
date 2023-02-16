@@ -45,7 +45,6 @@ const Modal: React.FC<TModalProps> = (props) => {
   const scrollLayerClasses = classNames(css.scrollLayer, scrollLayerClassName);
   const hasTitle = !!title;
   const closeModalMessage = intl.formatMessage({ id: 'Modal.closeModal' });
-
   useLockBodyScroll({ isOpen });
 
   const closeBtn =

@@ -2,7 +2,7 @@ import Avatar from '@components/Avatar/Avatar';
 import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import { getGroupNames, getMemberById } from '@helpers/companyMembers';
+import { getGroupNames, getMemberById } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
@@ -88,8 +88,12 @@ const GroupMemberDetailPage: React.FC<GroupMemberDetailPageProps> = () => {
       </div>
       <div className={css.header}>
         <div className={css.profileWrapper}>
-          <Avatar disableProfileLink user={companyMember!} />
-          <h2>{memberName}</h2>
+          <Avatar
+            className={css.avatar}
+            disableProfileLink
+            user={companyMember!}
+          />
+          <h2 className={css.name}>{memberName}</h2>
         </div>
         <div className={css.actionBtns}>
           <Button
@@ -112,7 +116,7 @@ const GroupMemberDetailPage: React.FC<GroupMemberDetailPageProps> = () => {
           </span>
           <span className={css.content}>
             {getGroupNames(
-              User(companyMember!).getMetadata()?.groups || [],
+              User(companyMember!).getMetadata()?.groupList || [],
               groupList,
             )}
           </span>

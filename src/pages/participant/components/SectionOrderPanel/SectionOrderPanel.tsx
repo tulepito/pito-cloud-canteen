@@ -1,4 +1,4 @@
-import { isOverDeadline } from '@helpers/orderHelper';
+import { isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { shoppingCartThunks } from '@redux/slices/shopingCart.slice';
 import { useState } from 'react';
@@ -39,7 +39,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     (cartKey) => !!cartList[cartKey],
   );
 
-  const isOrderDeadlineOver = isOverDeadline(order);
+  const isOrderDeadlineOver = isOrderOverDeadline(order);
 
   // Local state
   const [isOpenConfirmDeleteAll, setIsOpenConfirmDeleteAll] = useState(false);

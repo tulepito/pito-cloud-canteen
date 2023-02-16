@@ -3,7 +3,7 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './ReviewOrderDetailsSection.module.scss';
@@ -17,16 +17,19 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
   props,
 ) => {
   const { className, foodOrderGroupedByDate } = props;
-  const intl = useIntl();
+  const groupedFoodListLength = foodOrderGroupedByDate?.length;
+  const initialCollapseStates = Array.from({
+    length: groupedFoodListLength,
+  }).fill(0);
 
-  const [isCollapsed, setIsCollapsed] = useState(
-    Array.from({ length: foodOrderGroupedByDate?.length }).fill(0),
-  );
+  const intl = useIntl();
+  const [isCollapsed, setIsCollapsed] = useState(initialCollapseStates);
 
   const rootClasses = classNames(css.root, className);
 
   const handleClickGroupTitle = (index: number) => () => {
     const changeValue = !isCollapsed[index];
+
     const newState = isCollapsed.map((i, currIdx) => {
       if (currIdx !== index) {
         return i;
@@ -36,6 +39,10 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
 
     setIsCollapsed(newState);
   };
+
+  useEffect(() => {
+    setIsCollapsed(initialCollapseStates);
+  }, [initialCollapseStates.length]);
 
   return (
     <Collapsible

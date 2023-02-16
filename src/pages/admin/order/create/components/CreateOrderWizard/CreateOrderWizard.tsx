@@ -3,7 +3,7 @@ import { getItem, setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
 import {
-  OrderAsyncAction,
+  orderAsyncActions,
   removeBookerList,
   resetOrder,
 } from '@redux/slices/Order.slice';
@@ -109,7 +109,7 @@ const CreateOrderWizard = () => {
 
   useEffect(() => {
     if (orderId) {
-      dispatch(OrderAsyncAction.fetchOrder(orderId as string));
+      dispatch(orderAsyncActions.fetchOrder(orderId as string));
     }
   }, [dispatch, orderId]);
 
@@ -153,11 +153,14 @@ const CreateOrderWizard = () => {
         order as TListing,
       ).getMetadata();
       if (staffName) {
+        setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, REVIEW_TAB);
         return setCurrentStep(REVIEW_TAB);
       }
       if (plans.length > 0) {
+        setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, CREATE_MEAL_PLAN_TAB);
         return setCurrentStep(CREATE_MEAL_PLAN_TAB);
       }
+      setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, MEAL_PLAN_SETUP);
       return setCurrentStep(MEAL_PLAN_SETUP);
     }
   }, [order]);

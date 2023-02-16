@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
 import Button, { InlineTextButton } from '@components/Button/Button';
@@ -45,8 +46,8 @@ const TABLE_COLUMN: TColumn[] = [
     render: (data: any) => {
       if (data.isDeleted) {
         return (
-          <div className={css.deletedFood}>
-            <FormattedMessage id="ManagePartnerFoods.deletedFood" />
+          <div className={css.deletedMenu}>
+            <FormattedMessage id="ManagePartnerFoods.deletedMenu" />
           </div>
         );
       }

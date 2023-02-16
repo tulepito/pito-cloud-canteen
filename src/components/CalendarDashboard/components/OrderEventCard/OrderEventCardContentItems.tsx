@@ -1,6 +1,7 @@
 import IconClockWithExclamation from '@components/Icons/IconClock/IconClockWithExclamation';
 import IconLocation from '@components/Icons/IconLocation/IconLocation';
 import IconShop from '@components/Icons/IconShop/IconShop';
+import { isOver } from '@helpers/orderHelper';
 import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
@@ -19,14 +20,15 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
   const deliAddress = event.resource?.deliveryAddress || '';
 
   const restaurantObj = event.resource?.restaurant || {};
-  const expiredTime = event.resource?.expiredTime as Date;
+  const expiredTime = event.resource?.expiredTime;
+  const isExpired = isOver(expiredTime);
+
   const remainTime = DateTime.fromJSDate(new Date()).diff(
-    DateTime.fromJSDate(expiredTime),
+    DateTime.fromMillis(+expiredTime),
     ['hour', 'minute', 'second'],
   );
   const remainHours = remainTime.get('hour');
   const remainMinutes = remainTime.get('minute');
-  const isExpired = remainHours > 0 && remainMinutes > 0;
 
   return (
     <>

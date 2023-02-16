@@ -8,9 +8,15 @@ import css from './MealPlanCard.module.scss';
 
 type TMealPlanCardFooterProps = {
   event: Event;
+  onPickFoodModal?: () => void;
+  onPickFoodInProgress?: boolean;
 };
 
-const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({ event }) => {
+const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
+  event,
+  onPickFoodModal,
+  onPickFoodInProgress,
+}) => {
   const foodList = event.resource.foodList || [];
   const [isOpenApplyOtherDaysModal, setIsOpenApplyOtherDaysModal] =
     useState<boolean>(false);
@@ -25,11 +31,17 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({ event }) => {
   return (
     <div className={css.footer}>
       {foodList.length > 0 ? (
-        <Button className={css.actionButton}>
+        <Button
+          className={css.actionButton}
+          onClick={onPickFoodModal}
+          inProgress={onPickFoodInProgress}>
           <FormattedMessage id="MealPlanCard.footer.modify" />
         </Button>
       ) : (
-        <Button className={css.actionButton}>
+        <Button
+          className={css.actionButton}
+          onClick={onPickFoodModal}
+          inProgress={onPickFoodInProgress}>
           <FormattedMessage id="MealPlanCard.footer.selectDish" />
         </Button>
       )}

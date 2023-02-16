@@ -3,7 +3,8 @@
 @use 'src/styles/mixins.scss' as *;
 
 .container {
-  @include flexAlign(flex-start, space-betweeb);
+  @include flexAlign(flex-start, space-between);
+  margin-top: 40px;
 }
 
 .leftSide {

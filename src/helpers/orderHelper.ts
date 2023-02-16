@@ -1,3 +1,9 @@
+import {
+  AFTERNOON_SESSION,
+  DINNER_SESSION,
+  EVENING_SESSION,
+  MORNING_SESSION,
+} from '@components/CalendarDashboard/helpers/constant';
 import { Listing } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TListing } from '@utils/types';
@@ -11,11 +17,14 @@ export const isJoinedPlan = (
   return foodId !== '' && status === EParticipantOrderStatus.joined;
 };
 
-export const isOverDeadline = (order: TListing) => {
-  const currentTime = new Date().getTime();
-  const { deadlineDate = 0 } = Listing(order).getMetadata();
+export const isOver = (deadline = 0) => {
+  return new Date().getTime() > deadline;
+};
 
-  return currentTime >= deadlineDate;
+export const isOrderOverDeadline = (order: TListing) => {
+  const { deadlineDate } = Listing(order).getMetadata();
+
+  return isOver(deadlineDate);
 };
 
 export const findMinStartDate = () => {
@@ -45,4 +54,19 @@ export const findValidRangeForDeadlineDate = (
   ]);
 
   return { minSelectedDate, maxSelectedDate };
+};
+
+export const deliveryDaySessionAdapter = (daySession: string) => {
+  switch (daySession) {
+    case MORNING_SESSION:
+      return 'breakfast';
+    case DINNER_SESSION:
+      return 'dinner';
+    case AFTERNOON_SESSION:
+      return 'lunch';
+    case EVENING_SESSION:
+      return 'brunch';
+    default:
+      break;
+  }
 };

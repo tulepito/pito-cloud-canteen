@@ -1,0 +1,42 @@
+@use '/src/styles/vars.scss' as *;
+
+.actionBtn {
+  margin: 0 10px;
+}
+
+.menuContentTabLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menuContentTabBadge {
+  width: 17px;
+  height: 16px;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  color: $neutralGray5;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 8px;
+
+  &.isActive {
+    background-color: #000;
+    color: $neutralGray1;
+  }
+}
+
+.draftBox {
+  padding: 3px 5px;
+  display: inline-flex;
+  background-color: $labelOrange1;
+  color: $labelOrange2;
+  font-size: 12px;
+  border-radius: 4px;
+  margin-left: 5px;
+}
+
+.row {
+  color: $neutralGray6;
+}

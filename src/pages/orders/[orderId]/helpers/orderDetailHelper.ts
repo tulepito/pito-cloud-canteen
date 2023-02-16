@@ -12,7 +12,7 @@ export const groupFoodOrderByDate = ({
 
       const {
         memberOrders,
-        foodList: foodListOfDate,
+        foodList: foodListOfDate = {},
         restaurant: { restaurantName },
       } = rawOrderDetailOfDate as TObject;
 

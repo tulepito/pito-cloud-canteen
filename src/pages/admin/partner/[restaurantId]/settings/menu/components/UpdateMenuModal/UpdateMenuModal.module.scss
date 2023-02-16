@@ -1,0 +1,26 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.modalContainer {
+  min-height: 436px !important;
+  @include viewportLarge {
+    min-width: 700px;
+  }
+}
+
+.modalActions {
+  gap: 10px;
+  align-items: center;
+  flex-direction: column-reverse;
+  .modalButton {
+    max-width: 100%;
+    width: 400px;
+  }
+}
+
+.title {
+  font-weight: $fontWeightBold;
+  font-size: 20px;
+  line-height: 32px;
+  text-transform: capitalize;
+}
