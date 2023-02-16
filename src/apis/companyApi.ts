@@ -111,3 +111,6 @@ export const companyApi = {
   queryOrdersApi,
   startPickingOrderApi,
 };
+
+export const getAllCompanyMembersApi = (companyId: string) =>
+  getApi(`/company/all-employees?companyId=${companyId}`);

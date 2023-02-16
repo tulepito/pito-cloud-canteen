@@ -1,9 +1,12 @@
+@use '/src/styles/vars.scss' as *;
+
 .formTabNav {
   margin-bottom: 50px;
 }
 
 .title {
   margin: 0 0 30px 0;
+  text-transform: capitalize;
 }
 
 .navigateButtons {
@@ -18,4 +21,8 @@
     min-height: 48px;
     font-size: 16px;
   }
+}
+
+.loadingIcon {
+  stroke: $neutralGray6;
 }

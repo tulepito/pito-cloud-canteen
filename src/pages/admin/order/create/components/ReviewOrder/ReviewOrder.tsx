@@ -74,7 +74,7 @@ const MENU_TABLE_COLUMN: TColumn[] = [
 
 const ReviewContent: React.FC<any> = (props) => {
   const { deliveryHour, deliveryAddress = {}, restaurant } = props;
-  const { restaurantName, phoneNumber, foodList = [] } = restaurant;
+  const { restaurantName, phoneNumber, foodList = {} } = restaurant;
 
   const { address } = deliveryAddress;
   const intl = useIntl();

@@ -1,6 +1,8 @@
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import AlertModal from '@components/Modal/AlertModal';
 import type { FormApi } from 'final-form';
 import React, { useMemo, useRef } from 'react';
+import { FormattedMessage } from 'react-intl';
 
 import css from './UpdateMenuModal.module.scss';
 import type { TUpdateMenuModalFormValues } from './UpdateMenuModalForm';
@@ -11,6 +13,7 @@ type TUpdateMenuModalProps = {
   onClearMenuToUpdate: () => void;
   onUpdateMenuApplyTime: (values: TUpdateMenuModalFormValues) => void;
   updateInProgress: boolean;
+  createOrUpdateMenuError: any;
 };
 
 const UpdateMenuModal: React.FC<TUpdateMenuModalProps> = (props) => {
@@ -19,6 +22,7 @@ const UpdateMenuModal: React.FC<TUpdateMenuModalProps> = (props) => {
     onClearMenuToUpdate,
     updateInProgress,
     onUpdateMenuApplyTime,
+    createOrUpdateMenuError,
   } = props;
   const initialValues = useMemo(() => {
     return {
@@ -41,6 +45,11 @@ const UpdateMenuModal: React.FC<TUpdateMenuModalProps> = (props) => {
       handleClose={onClearMenuToUpdate}
       onCancel={onClearMenuToUpdate}
       onConfirm={handleSubmitUpdaetMenuModalForm}
+      title={
+        <h3 className={css.title}>
+          <FormattedMessage id="UpdateMenuModal.title" />
+        </h3>
+      }
       confirmLabel="Áp dụng"
       cancelLabel="Hủy"
       actionsClassName={css.modalActions}
@@ -53,6 +62,9 @@ const UpdateMenuModal: React.FC<TUpdateMenuModalProps> = (props) => {
         onSubmit={onUpdateMenuApplyTime}
         initialValues={initialValues}
       />
+      {createOrUpdateMenuError && (
+        <ErrorMessage message={createOrUpdateMenuError.message} />
+      )}
     </AlertModal>
   );
 };

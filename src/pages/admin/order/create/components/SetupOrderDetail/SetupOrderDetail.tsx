@@ -289,7 +289,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   const onSubmit = () => {
     dispatch(
-      orderAsyncActions.updatePlanDetail({ orderId, planId, orderDetail }),
+      orderAsyncActions.updatePlanDetail({ orderId, orderDetail, planId }),
     )
       .then(() => {
         nextTab();

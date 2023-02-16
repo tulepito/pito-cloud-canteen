@@ -3,11 +3,13 @@ import { DateTime } from 'luxon';
 
 export const normalizePlanDetailsToEvent = (planDetails: any, order: any) => {
   const dateList = Object.keys(planDetails);
-  const planId = Listing(order).getMetadata()?.plans?.[0];
+  const { plans = [] } = Listing(order).getMetadata();
+  const planId = plans.length > 0 ? plans[0] : undefined;
 
   const normalizeData = dateList.map((timestamp) => {
     const planData = planDetails[timestamp];
-    const foodIds = Object.keys(planData.foodList);
+    const foodIds = Object.keys(planData?.restaurant?.foodList || {});
+
     const foodList = foodIds.map((id) => {
       return {
         key: id,
@@ -15,6 +17,7 @@ export const normalizePlanDetailsToEvent = (planDetails: any, order: any) => {
         price: planData?.foodList?.[id]?.foodPrice,
       };
     });
+
     return {
       resource: {
         id: timestamp,

@@ -70,6 +70,9 @@ const EditMenuInformationFormComponent: React.FC<
             </div>
           </div>
           <div className={css.radioGroup}>
+            <label className={css.inputLabel}>
+              <FormattedMessage id="EditMenuInformationForm.mealTypeLabel" />
+            </label>
             {MENU_MEAL_TYPE_OPTIONS.map((meal) => (
               <FieldRadioButton
                 name="mealType"

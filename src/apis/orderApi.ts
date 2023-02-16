@@ -32,20 +32,6 @@ export type TUpdateOrderApiBody = {
     staffName?: string;
     shipperName?: string;
   };
-  orderDetail?: {
-    [date: string]: {
-      restaurant: {
-        id: string;
-        restaurantName: string;
-      };
-      foodList: {
-        [foodId: string]: {
-          foodPrice: number;
-          foodName: string;
-        };
-      };
-    };
-  };
 };
 
 export const createBookerOrderApi = (body: TCreateBookerOrderApiBody) =>

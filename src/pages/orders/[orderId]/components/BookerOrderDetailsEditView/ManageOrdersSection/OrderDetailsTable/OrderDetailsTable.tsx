@@ -45,8 +45,9 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   const { packagePerMember = 0 } = Listing(orderData as TListing).getMetadata();
   const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
 
-  const { foodList = {}, memberOrders = {} } =
+  const { restaurant = {}, memberOrders = {} } =
     orderDetail[currentViewDate.toString()] || {};
+  const { foodList = {} } = restaurant;
 
   const allTabData: TAllTabData = useMemo(
     () =>

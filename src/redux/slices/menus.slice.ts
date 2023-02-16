@@ -1,11 +1,13 @@
 import {
   checkMenuInTransactionProgressApi,
+  checkMenuUnconflictedApi,
   createPartnerMenuApi,
   deletePartnerMenuApi,
   queryAllMenusApi,
   showPartnerMenuApi,
   updatePartnerMenuApi,
 } from '@apis/menuApi';
+import type { TCheckUnconflictedParams } from '@helpers/apiHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
@@ -49,6 +51,9 @@ type TMenusSliceState = {
 
   isCheckingMenuInTransactionProgress: boolean;
   checkingMenuInTransactionError: any;
+
+  isCheckingMenuUnConflicted: boolean;
+  checkingMenuUnConflictedError: any;
 };
 const initialState: TMenusSliceState = {
   menus: [],
@@ -80,6 +85,9 @@ const initialState: TMenusSliceState = {
 
   isCheckingMenuInTransactionProgress: false,
   checkingMenuInTransactionError: null,
+
+  isCheckingMenuUnConflicted: false,
+  checkingMenuUnConflictedError: null,
 };
 
 // ================ Thunk types ================ //
@@ -96,6 +104,9 @@ const SHOW_PARTNER_MENU_LISTING =
 const UPDATE_PARTNER_MENU_LISTING =
   'app/ManageMenusPage/UPDATE_PARTNER_MENU_LISTING';
 
+const TOGGLE_PARTNER_MENU_LISTING =
+  'app/ManageMenusPage/TOGGLE_PARTNER_MENU_LISTING';
+
 const DELETE_PARTNER_MENU_LISTING =
   'app/ManageMenusPage/DELETE_PARTNER_MENU_LISTING';
 
@@ -105,19 +116,34 @@ const QUERY_MENU_OPTIONS_TO_DUPLICATE =
 const CHECK_MENU_IS_IN_TRANSACTION_PROGRESS =
   'app/ManageMenusPage/CHECK_MENU_IS_IN_TRANSACTION_PROGRESS';
 
+const CHECK_MENU_IS_UN_CONFLICTED =
+  'app/ManageMenusPage/CHECK_MENU_IS_UN_CONFLICTED';
+
 // ================ Async thunks ================ //
+
+const checkMenuUnconflicted = createAsyncThunk(
+  CHECK_MENU_IS_UN_CONFLICTED,
+  async (payload: TCheckUnconflictedParams) => {
+    const { data } = await checkMenuUnconflictedApi(payload);
+    return data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
 
 const queryPartnerMenus = createAsyncThunk(
   QUERY_PARTNER_MENUS,
   async (payload: any, { extra: sdk }) => {
-    const { restaurantId, menuType, mealType, keywords } = payload;
+    const { restaurantId, menuType, mealType, keywords, page } = payload;
     const response = await sdk.listings.query({
       keywords,
       meta_menuType: menuType,
       meta_listingType: EListingType.menu,
       meta_restaurantId: restaurantId,
-      pub_mealType: mealType,
       meta_isDeleted: false,
+      pub_mealType: mealType,
+      page,
       perPage: MANAGE_MENU_PAGE_SIZE,
     });
     const menus = denormalisedResponseEntities(response);
@@ -182,6 +208,24 @@ const createPartnerMenuListing = createAsyncThunk(
 
 const updatePartnerMenuListing = createAsyncThunk(
   UPDATE_PARTNER_MENU_LISTING,
+  async (payload: any, { rejectWithValue }) => {
+    try {
+      const { data } = await updatePartnerMenuApi({
+        dataParams: payload,
+        queryParams: {
+          expand: true,
+        },
+      });
+      return denormalisedResponseEntities(data)[0];
+    } catch (error) {
+      console.error(`${CREATE_PARTNER_MENU_LISTING} error: `, error);
+      return rejectWithValue(storableAxiosError(error));
+    }
+  },
+);
+
+const togglePartnerMenuListing = createAsyncThunk(
+  TOGGLE_PARTNER_MENU_LISTING,
   async (payload: any, { rejectWithValue }) => {
     try {
       const { data } = await updatePartnerMenuApi({
@@ -276,6 +320,8 @@ export const menusSliceThunks = {
   deletePartnerMenu,
   queryMenuOptionsToDuplicate,
   checkingMenuInTransactionProgress,
+  togglePartnerMenuListing,
+  checkMenuUnconflicted,
 };
 
 // ================ Slice ================ //
@@ -289,6 +335,7 @@ const menusSliceSlice = createSlice({
     clearCreateOrUpdateMenuError: (state) => ({
       ...state,
       createOrUpdateMenuError: null,
+      checkingMenuUnConflictedError: null,
     }),
   },
   extraReducers: (builder) => {
@@ -348,6 +395,7 @@ const menusSliceSlice = createSlice({
         ...state,
         showCurrentMenuInProgress: false,
         currentMenu: payload,
+        checkingMenuUnConflictedError: null,
       }))
       .addCase(showPartnerMenuListing.rejected, (state, { payload }) => ({
         ...state,
@@ -414,7 +462,23 @@ const menusSliceSlice = createSlice({
           isCheckingMenuInTransactionProgress: false,
           checkingMenuInTransactionError: payload,
         }),
-      );
+      )
+      .addCase(checkMenuUnconflicted.pending, (state) => ({
+        ...state,
+        isCheckingMenuUnConflicted: true,
+        checkingMenuUnConflictedError: null,
+      }))
+      .addCase(checkMenuUnconflicted.fulfilled, (state) => ({
+        ...state,
+        isCheckingMenuUnConflicted: false,
+      }))
+      .addCase(checkMenuUnconflicted.rejected, (state, { error }) => {
+        return {
+          ...state,
+          isCheckingMenuUnConflicted: false,
+          checkingMenuUnConflictedError: error,
+        };
+      });
   },
 });
 

@@ -17,8 +17,8 @@ const fetchSubOrder = async (orderDetail: any, currentUserId: string) => {
 
   for (const planKey of planKeys) {
     const planItem = orderDetail[planKey];
-    const { foodList, restaurant, memberOrders } = planItem;
-    const restaurantId = restaurant?.id;
+    const { restaurant = {}, memberOrders = {} } = planItem;
+    const { foodList = {}, id: restaurantId } = restaurant;
 
     // Fetch restaurant data
     const restaurantData = denormalisedResponseEntities(

@@ -42,7 +42,7 @@ const TABLE_COLUNMS: TColumn[] = [
         );
       }
       return (
-        <div>
+        <div className={css.row}>
           {title}
           {listingState === EListingStates.draft && (
             <div className={css.draftBox}>
@@ -56,29 +56,12 @@ const TABLE_COLUNMS: TColumn[] = [
   {
     key: 'applyDates',
     label: 'Thời gian áp dụng',
-    render: ({
-      id,
-      startDate,
-      endDate,
-      isDeleted,
-      menuType,
-      onSetMenuToUpdate,
-      daysOfWeek,
-      numberOfCycles,
-    }) => {
+    render: ({ startDate, endDate, isDeleted, menuType }) => {
       if (isDeleted) {
         return <></>;
       }
       return (
-        <div
-          onClick={onSetMenuToUpdate({
-            id,
-            startDate,
-            endDate,
-            daysOfWeek,
-            numberOfCycles,
-            menuType,
-          })}>
+        <div className={css.row}>
           {menuType === EMenuTypes.cycleMenu ? (
             <div>
               {parseTimestampToFormat(startDate)} -
@@ -97,16 +80,71 @@ const TABLE_COLUNMS: TColumn[] = [
   {
     key: 'status',
     label: 'Trạng thái',
-    render: ({ listingState, id, onToggleStatus, isDeleted }) => {
+    render: ({
+      listingState,
+      id,
+      onToggleStatus,
+      isDeleted,
+      startDate,
+      endDate,
+      daysOfWeek,
+      numberOfCycles,
+      menuType,
+      onSetMenuToUpdate,
+      monFoodIdList,
+      tueFoodIdList,
+      wedFoodIdList,
+      thuFoodIdList,
+      friFoodIdList,
+      satFoodIdList,
+      sunFoodIdList,
+      monAverageFoodPrice,
+      tueAverageFoodPrice,
+      wedAverageFoodPrice,
+      thuAverageFoodPrice,
+      friAverageFoodPrice,
+      satAverageFoodPrice,
+      sunAverageFoodPrice,
+      foodsByDate,
+      restaurantId,
+      mealType,
+    }) => {
       if (isDeleted) {
         return <></>;
       }
       const onClick = (checked: boolean) => {
         const newStatus = checked
-          ? EListingStates.closed
-          : EListingStates.published;
+          ? EListingStates.published
+          : EListingStates.closed;
 
         onToggleStatus(id, newStatus);
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        checked &&
+          onSetMenuToUpdate({
+            id,
+            startDate,
+            endDate,
+            daysOfWeek,
+            numberOfCycles,
+            menuType,
+            monFoodIdList,
+            tueFoodIdList,
+            wedFoodIdList,
+            thuFoodIdList,
+            friFoodIdList,
+            satFoodIdList,
+            sunFoodIdList,
+            monAverageFoodPrice,
+            tueAverageFoodPrice,
+            wedAverageFoodPrice,
+            thuAverageFoodPrice,
+            friAverageFoodPrice,
+            satAverageFoodPrice,
+            sunAverageFoodPrice,
+            foodsByDate,
+            restaurantId,
+            mealType,
+          });
       };
 
       return listingState === EListingStates.draft ? (
@@ -158,9 +196,34 @@ const parseEntitiesToTableData = (
   extraData: any = {},
 ) => {
   return menues.map((menu) => {
-    const { isDeleted, listingState, menuType } = menu.attributes.metadata;
-    const { startDate, endDate, numberOfCycles, daysOfWeek } =
-      menu.attributes.publicData;
+    const {
+      isDeleted,
+      listingState,
+      menuType,
+      monFoodIdList,
+      tueFoodIdList,
+      wedFoodIdList,
+      thuFoodIdList,
+      friFoodIdList,
+      satFoodIdList,
+      sunFoodIdList,
+      restaurantId,
+    } = menu.attributes.metadata;
+    const {
+      startDate,
+      endDate,
+      numberOfCycles,
+      daysOfWeek,
+      foodsByDate,
+      monAverageFoodPrice,
+      tueAverageFoodPrice,
+      wedAverageFoodPrice,
+      thuAverageFoodPrice,
+      friAverageFoodPrice,
+      satAverageFoodPrice,
+      sunAverageFoodPrice,
+      mealType,
+    } = menu.attributes.publicData;
 
     return {
       key: menu.id.uuid,
@@ -174,6 +237,23 @@ const parseEntitiesToTableData = (
         endDate,
         numberOfCycles,
         daysOfWeek,
+        monFoodIdList,
+        tueFoodIdList,
+        wedFoodIdList,
+        thuFoodIdList,
+        friFoodIdList,
+        satFoodIdList,
+        sunFoodIdList,
+        monAverageFoodPrice,
+        tueAverageFoodPrice,
+        wedAverageFoodPrice,
+        thuAverageFoodPrice,
+        friAverageFoodPrice,
+        satAverageFoodPrice,
+        sunAverageFoodPrice,
+        foodsByDate,
+        restaurantId,
+        mealType,
         ...extraData,
       },
     };
@@ -185,10 +265,11 @@ type TTabContentProps = {
   restaurantId: string;
   id: string;
   keywords: string;
+  page: string;
 };
 
 const TabContent: React.FC<TTabContentProps> = (props) => {
-  const { menuType, restaurantId, id: mealType, keywords } = props;
+  const { menuType, restaurantId, id: mealType, keywords, page } = props;
   const dispatch = useAppDispatch();
   const [menuToRemove, setMenuToRemove] = useState<any>();
   const [menuToUpdate, setMenuToUpdate] = useState<any>();
@@ -215,13 +296,14 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
           restaurantId,
           mealType,
           keywords,
+          page,
         }),
       );
-  }, [menuType, restaurantId, dispatch, mealType, keywords]);
+  }, [menuType, restaurantId, dispatch, mealType, keywords, page]);
 
   const onToggleStatus = (id: string, state: string) => {
     dispatch(
-      menusSliceThunks.updatePartnerMenuListing({
+      menusSliceThunks.togglePartnerMenuListing({
         id,
         metadata: {
           listingState: state,
@@ -241,6 +323,11 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
     shallowEqual,
   );
 
+  const createOrUpdateMenuError = useAppSelector(
+    (state) => state.menus.createOrUpdateMenuError,
+    shallowEqual,
+  );
+
   const onSetMenuToRemove = (menuData: any) => () => {
     setMenuToRemove(menuData);
   };
@@ -249,7 +336,7 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
     setMenuToRemove(null);
   };
 
-  const onSetMenuToUpdate = (menuData: any) => () => {
+  const onSetMenuToUpdate = (menuData: any) => {
     setMenuToUpdate(menuData);
   };
 
@@ -266,11 +353,12 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
 
     if (!error) {
       setMenuToRemove(null);
-      dispatch(
+      await dispatch(
         menusSliceThunks.queryPartnerMenus({
           menuType,
           restaurantId,
           page: 1,
+          mealType,
         }),
       );
       dispatch(
@@ -331,6 +419,7 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
         onClearMenuToUpdate={onClearMenuToUpdate}
         onUpdateMenuApplyTime={onUpdateMenuApplyTime}
         updateInProgress={createOrUpdateMenuInProgress}
+        createOrUpdateMenuError={createOrUpdateMenuError}
       />
     </>
   );
@@ -340,12 +429,14 @@ type TManagePartnerMenusContent = {
   restaurantId: string;
   menuType: string;
   keywords: string;
+  page: string;
 };
 
 const ManagePartnerMenusContent: React.FC<TManagePartnerMenusContent> = ({
   restaurantId,
   menuType,
   keywords,
+  page,
 }) => {
   const menuMealTypeCount = useAppSelector(
     (state) => state.menus.menuMealTypeCount,
@@ -391,6 +482,7 @@ const ManagePartnerMenusContent: React.FC<TManagePartnerMenusContent> = ({
         menuType,
         restaurantId,
         keywords,
+        page,
       },
     },
     {
@@ -403,6 +495,7 @@ const ManagePartnerMenusContent: React.FC<TManagePartnerMenusContent> = ({
         menuType,
         restaurantId,
         keywords,
+        page,
       },
     },
     {
@@ -415,6 +508,7 @@ const ManagePartnerMenusContent: React.FC<TManagePartnerMenusContent> = ({
         menuType,
         restaurantId,
         keywords,
+        page,
       },
     },
     {
@@ -425,6 +519,7 @@ const ManagePartnerMenusContent: React.FC<TManagePartnerMenusContent> = ({
         menuType,
         restaurantId,
         keywords,
+        page,
       },
     },
   ];

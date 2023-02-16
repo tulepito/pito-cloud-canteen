@@ -719,12 +719,12 @@ export const MENU_MEAL_TYPE_OPTIONS = [
     label: 'Ăn sáng',
   },
   {
-    key: EMenuMealType.dinner,
-    label: 'Ăn tối',
-  },
-  {
     key: EMenuMealType.lunch,
     label: 'Ăn trưa',
+  },
+  {
+    key: EMenuMealType.dinner,
+    label: 'Ăn tối',
   },
   {
     key: EMenuMealType.snack,

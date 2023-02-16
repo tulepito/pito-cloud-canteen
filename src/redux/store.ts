@@ -7,11 +7,15 @@ const combinedReducer = combineReducers({
   ...globalReducers,
 });
 
+const rootReducer: typeof combinedReducer = (state, action) => {
+  return combinedReducer(state, action);
+};
+
 export const makeStore = () => {
   const sdk = createSdkInstance();
 
   return configureStore({
-    reducer: combinedReducer,
+    reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: false,
