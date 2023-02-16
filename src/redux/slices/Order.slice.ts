@@ -10,6 +10,7 @@ import {
 } from '@apis/orderApi';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
+import { EApiUpdateMode } from '@pages/api/orders/[orderId]/plan/update.service';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { UserPermission } from '@src/types/UserPermission';
@@ -55,6 +56,9 @@ type TOrderInitialState = {
 
   initiateTransactionsInProgress: boolean;
   initiateTransactionsError: any;
+
+  updateOrderDetailInProgress: boolean;
+  updateOrderDetailError: any;
 
   // Manage Orders Page
   queryParams: TObject;
@@ -133,6 +137,9 @@ const initialState: TOrderInitialState = {
     [EOrderStates.canceled]: 0,
     all: 0,
   },
+
+  updateOrderDetailInProgress: false,
+  updateOrderDetailError: null,
 };
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
@@ -214,7 +221,17 @@ const updateOrder = createAsyncThunk(
       orderDetail: orderDetailParams || orderDetail,
     };
     const { data: orderListing } = await updateOrderApi(orderId, apiBody);
-    return orderListing;
+    const { plans = [] } = Listing(orderListing).getMetadata();
+    const planId = plans[0];
+    await updatePlanDetailsApi(orderId, {
+      orderDetail,
+      planId,
+      updateMode: EApiUpdateMode.REPLACE,
+    });
+    return {
+      orderListing,
+      orderDetail: orderDetailParams || orderDetail,
+    };
   },
 );
 
@@ -306,7 +323,7 @@ const fetchCompanyBookers = createAsyncThunk(
 const fetchOrderDetail = createAsyncThunk(
   FETCH_ORDER_DETAIL,
   async (_, { getState, extra: sdk }) => {
-    const { order } = getState().Order;
+    const { order, orderDetail: orderDetailState = {} } = getState().Order;
 
     const { plans = [] } = Listing(order as TListing).getMetadata();
     if (plans[0]) {
@@ -317,7 +334,7 @@ const fetchOrderDetail = createAsyncThunk(
       )[0];
       return Listing(response).getMetadata().orderDetail;
     }
-    return {};
+    return orderDetailState;
   },
 );
 
@@ -487,7 +504,8 @@ const orderSlice = createSlice({
       .addCase(updateOrder.fulfilled, (state, { payload }) => ({
         ...state,
         updateOrderInProgress: false,
-        order: payload,
+        order: payload.orderListing,
+        orderDetail: payload.orderDetail,
       }))
       .addCase(updateOrder.rejected, (state, { error }) => ({
         ...state,
