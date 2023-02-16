@@ -7,7 +7,7 @@ export const httpStatusCodes = {
 
 export const errorMessages = {
   VALIDATE_MENU_ERROR_CONFLICT: {
-    message: 'Bữa ăn trong ngày đã có sẵn menu',
+    message: 'Một buổi trong một ngày chỉ có thể có một menu',
     id: 'validate-menu-error-conflict',
     code: httpStatusCodes.conflict,
   },
