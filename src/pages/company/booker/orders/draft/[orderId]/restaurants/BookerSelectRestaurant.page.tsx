@@ -15,7 +15,6 @@ import FilterSidebar from '../components/FilterSidebar/FilterSidebar';
 import { useLoadData } from '../hooks/loadData';
 import css from './BookerSelectRestaurant.module.scss';
 import FilterLabelList from './components/FilterLabelList/FilterLabelList';
-import ResultDetailModal from './components/ResultDetailModal/ResultDetailModal';
 import ResultList from './components/ResultList/ResultList';
 import SortingDropdown from './components/SortingDropdown/SortingDropdown';
 
@@ -43,9 +42,6 @@ function BookerSelectRestaurant() {
     sortBy,
     keywords,
   } = router.query;
-
-  const [isOpenRestaurantDetailModal, setIsOpenRestaurantDetailModal] =
-    useState(false);
 
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -89,6 +85,7 @@ function BookerSelectRestaurant() {
   const [currentSortBy, setCurrentSortBy] = useState<string>(
     (sortBy as string) || 'favorite',
   );
+
   const restaurants = useAppSelector(
     (state) => state.BookerDraftOrderPage.searchResult,
     shallowEqual,
@@ -222,14 +219,6 @@ function BookerSelectRestaurant() {
     setFilterMobileMenuOpen(!filterMobileMenuOpen);
   };
 
-  const handleOpenResultDetailModal = () => {
-    setIsOpenRestaurantDetailModal(true);
-  };
-
-  const handleCloseResultDetailModal = () => {
-    setIsOpenRestaurantDetailModal(false);
-  };
-
   const onChangeSortBy = (value: string) => {
     setCurrentSortBy(value);
     router.push({
@@ -317,16 +306,11 @@ function BookerSelectRestaurant() {
               className={css.resultList}
               restaurants={restaurantInPage}
               isLoading={searchInProgress}
-              onClickCard={handleOpenResultDetailModal}
               companyGeoOrigin={companyGeoOrigin}
               totalRatings={totalRatings}
             />
           </div>
         </div>
-        <ResultDetailModal
-          isOpen={isOpenRestaurantDetailModal}
-          onClose={handleCloseResultDetailModal}
-        />
       </div>
     </div>
   );
