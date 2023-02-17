@@ -9,7 +9,7 @@ import { required } from '@utils/validators';
 import classNames from 'classnames';
 import format from 'date-fns/format';
 import viLocale from 'date-fns/locale/vi';
-import { useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 
@@ -22,6 +22,29 @@ type TOrderDeadlineFieldProps = {
   columnLayout?: boolean;
   title?: string;
 };
+
+// eslint-disable-next-line react/display-name
+const CustomDeadlineFieldInput = forwardRef((props, ref) => {
+  return (
+    <FieldTextInput
+      {...props}
+      id="deadlineDate"
+      name="deadlineDate"
+      className={css.customInput}
+      format={(value) => {
+        return value
+          ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
+              locale: viLocale,
+            })
+          : format(new Date(), 'EEE, dd MMMM, yyyy', {
+              locale: viLocale,
+            });
+      }}
+      leftIcon={<IconCalendar />}
+      inputRef={ref}
+    />
+  );
+});
 
 const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
   const { values, columnLayout, title, form } = props;
@@ -82,24 +105,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
           maxDate={maxSelectedDate}
           dateFormat={'EEE, dd MMMM, yyyy'}
           validate={required(deadlineDateRequired)}
-          customInput={
-            <FieldTextInput
-              id="deadlineDate"
-              name="deadlineDate"
-              rootClassName={css.customInput}
-              disabled
-              format={(value) => {
-                return value
-                  ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
-                      locale: viLocale,
-                    })
-                  : format(new Date(), 'EEE, dd MMMM, yyyy', {
-                      locale: viLocale,
-                    });
-              }}
-              leftIcon={<IconCalendar />}
-            />
-          }
+          customInput={<CustomDeadlineFieldInput />}
         />
         <FieldSelect
           id="deadlineHour"

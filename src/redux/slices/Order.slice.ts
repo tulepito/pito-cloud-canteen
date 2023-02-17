@@ -1,13 +1,14 @@
 import { companyApi } from '@apis/companyApi';
 import { fetchUserApi } from '@apis/index';
-import type { UpdateOrderApiBody } from '@apis/orderApi';
+import type { TUpdateOrderApiBody } from '@apis/orderApi';
 import {
   bookerDeleteDraftOrderApi,
-  createOrderApi,
-  initiateTransactionsApi,
+  createBookerOrderApi,
   queryOrdersApi,
   updateOrderApi,
+  updatePlanDetailsApi,
 } from '@apis/orderApi';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
@@ -17,7 +18,6 @@ import { convertWeekDay, getSeparatedDates } from '@utils/dates';
 import { EListingStates, EOrderStates } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TPagination } from '@utils/types';
-import cloneDeep from 'lodash/cloneDeep';
 import { DateTime } from 'luxon';
 
 import { selectRestaurantPageThunks } from './SelectRestaurantPage.slice';
@@ -56,6 +56,9 @@ type TOrderInitialState = {
   initiateTransactionsInProgress: boolean;
   initiateTransactionsError: any;
 
+  updateOrderDetailInProgress: boolean;
+  updateOrderDetailError: any;
+
   // Manage Orders Page
   queryParams: TObject;
   orders: TListing[];
@@ -80,6 +83,7 @@ const FETCH_ORDER = 'app/Order/FETCH_ORDER';
 const FETCH_ORDER_DETAIL = 'app/Order/FETCH_ORDER_DETAIL';
 const INITIATE_TRANSACTIONS = 'app/Order/INITIATE_TRANSACTIONS';
 const QUERY_SUB_ORDERS = 'app/Order/QUERY_SUB_ORDERS';
+const UPDATE_PLAN_DETAIL = 'app/Order/UPDATE_PLAN_DETAIL';
 
 const initialState: TOrderInitialState = {
   order: null,
@@ -132,15 +136,19 @@ const initialState: TOrderInitialState = {
     [EOrderStates.canceled]: 0,
     all: 0,
   },
+
+  updateOrderDetailInProgress: false,
+  updateOrderDetailError: null,
 };
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
-  const { clientId, bookerId } = params;
+  const { clientId, bookerId, isCreatedByAdmin = false } = params;
   const apiBody = {
     companyId: clientId,
     bookerId,
+    isCreatedByAdmin,
   };
-  const { data: orderListing } = await createOrderApi(apiBody);
+  const { data: orderListing } = await createBookerOrderApi(apiBody);
   return orderListing;
 });
 
@@ -149,7 +157,13 @@ const updateOrder = createAsyncThunk(
   async (params: any, { getState, dispatch }) => {
     const { order } = getState().Order;
     const { generalInfo, orderDetail: orderDetailParams } = params;
-    const { deadlineDate, deadlineHour } = generalInfo || {};
+    const {
+      deadlineDate,
+      deadlineHour,
+      packagePerMember,
+      deliveryHour,
+      nutritions,
+    } = generalInfo || {};
     const orderId = Listing(order as TListing).getId();
     const orderDetail: any = {};
     if (!orderDetailParams) {
@@ -165,21 +179,26 @@ const updateOrder = createAsyncThunk(
             const { payload }: { payload: any } = await dispatch(
               selectRestaurantPageThunks.getRestaurants({
                 dateTime: DateTime.fromMillis(dateTime),
+                packagePerMember,
+                deliveryHour,
+                nutritions,
               }),
             );
             const { restaurants = [] } = payload || {};
-            const randomNumber = Math.floor(
-              Math.random() * (restaurants.length - 1),
-            );
-            orderDetail[dateTime] = {
-              restaurant: {
-                id: Listing(restaurants[0].restaurantInfo).getId(),
-                restaurantName: Listing(
-                  restaurants[randomNumber].restaurantInfo,
-                ).getAttributes().title,
-                foodList: [],
-              },
-            };
+            if (restaurants.length > 0) {
+              const randomNumber = Math.floor(
+                Math.random() * (restaurants.length - 1),
+              );
+              orderDetail[dateTime] = {
+                restaurant: {
+                  id: Listing(restaurants[0]?.restaurantInfo).getId(),
+                  restaurantName: Listing(
+                    restaurants[randomNumber]?.restaurantInfo,
+                  ).getAttributes().title,
+                  foodList: [],
+                },
+              };
+            }
           }
         }),
       );
@@ -188,31 +207,29 @@ const updateOrder = createAsyncThunk(
       ? DateTime.fromMillis(deadlineDate)
           .startOf('day')
           .plus({
-            hours: parseInt(deadlineHour.split(':')[0], 10),
-            minutes: parseInt(deadlineHour.split(':')[1], 10),
+            ...convertHHmmStringToTimeParts(deadlineHour),
           })
           .toMillis()
       : null;
 
-    const apiBody: UpdateOrderApiBody = {
-      orderId,
+    const apiBody: TUpdateOrderApiBody = {
       generalInfo: {
         ...generalInfo,
         ...(parsedDeadlineDate ? { deadlineDate: parsedDeadlineDate } : {}),
       },
-      orderDetail: orderDetailParams
-        ? cloneDeep(orderDetailParams)
-        : orderDetail,
     };
-    const { data: orderListing } = await updateOrderApi(apiBody);
-    return orderListing;
+    const { data: orderListing } = await updateOrderApi(orderId, apiBody);
+    return {
+      orderListing,
+      orderDetail: orderDetailParams || orderDetail,
+    };
   },
 );
 
 const initiateTransactions = createAsyncThunk(
   INITIATE_TRANSACTIONS,
-  async (params: any) => {
-    await initiateTransactionsApi(params);
+  async (_) => {
+    // await initiateTransactionsApi(params);
     return '';
   },
 );
@@ -297,7 +314,7 @@ const fetchCompanyBookers = createAsyncThunk(
 const fetchOrderDetail = createAsyncThunk(
   FETCH_ORDER_DETAIL,
   async (_, { getState, extra: sdk }) => {
-    const { order } = getState().Order;
+    const { order, orderDetail: orderDetailState = {} } = getState().Order;
 
     const { plans = [] } = Listing(order as TListing).getMetadata();
     if (plans[0]) {
@@ -308,7 +325,7 @@ const fetchOrderDetail = createAsyncThunk(
       )[0];
       return Listing(response).getMetadata().orderDetail;
     }
-    return {};
+    return orderDetailState;
   },
 );
 
@@ -328,6 +345,18 @@ const fetchOrder = createAsyncThunk(
       }),
     )[0];
     return { order: response, selectedBooker };
+  },
+);
+
+const updatePlanDetail = createAsyncThunk(
+  UPDATE_PLAN_DETAIL,
+  async ({ orderId, planId, orderDetail, updateMode }: any, _) => {
+    const { data: orderListing } = await updatePlanDetailsApi(orderId, {
+      orderDetail,
+      planId,
+      updateMode,
+    });
+    return orderListing;
   },
 );
 
@@ -351,6 +380,7 @@ export const orderAsyncActions = {
   initiateTransactions,
   queryOrders,
   queryCompanyOrders,
+  updatePlanDetail,
 };
 
 const orderSlice = createSlice({
@@ -465,7 +495,7 @@ const orderSlice = createSlice({
       .addCase(updateOrder.fulfilled, (state, { payload }) => ({
         ...state,
         updateOrderInProgress: false,
-        order: payload,
+        order: payload.orderListing,
       }))
       .addCase(updateOrder.rejected, (state, { error }) => ({
         ...state,
@@ -590,7 +620,22 @@ const orderSlice = createSlice({
       .addCase(bookerDeleteDraftOrder.rejected, (state, { payload }) => {
         state.deleteDraftOrderInProgress = false;
         state.queryOrderError = payload;
-      });
+      })
+      .addCase(updatePlanDetail.pending, (state) => ({
+        ...state,
+        updateOrderDetailInProgress: true,
+        updateOrderDetailError: null,
+      }))
+      .addCase(updatePlanDetail.fulfilled, (state, { payload }) => ({
+        ...state,
+        updateOrderDetailInProgress: false,
+        orderDetail: Listing(payload).getMetadata().orderDetail || {},
+      }))
+      .addCase(updatePlanDetail.rejected, (state, { error }) => ({
+        ...state,
+        updateOrderDetailInProgress: false,
+        updateOrderDetailError: error.message,
+      }));
   },
 });
 

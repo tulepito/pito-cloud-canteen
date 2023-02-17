@@ -49,9 +49,13 @@ const NotificationSelectionFormComponent: React.FC<
   return (
     <Form onSubmit={handleSubmit}>
       {notificationOptions.map((notiItem) => {
-        const label = intl.formatMessage({ id: notiItem.label });
-        notiItem = { ...notiItem, label };
-        return <FieldRadioButton key={notiItem.id} {...notiItem} />;
+        return (
+          <FieldRadioButton
+            key={notiItem.id}
+            {...notiItem}
+            label={intl.formatMessage({ id: notiItem.label })}
+          />
+        );
       })}
     </Form>
   );

@@ -7,13 +7,17 @@ import css from './DayItem.module.scss';
 const DayColumnHeader: React.FC<TDayColumnHeaderProps> = ({
   isCurrentDay,
   date,
-  isMouseOnDay,
+  className,
 }) => {
   return (
     <div
-      className={classNames(css.dayHeader, {
-        [css.activeHeader]: isCurrentDay || isMouseOnDay,
-      })}>
+      className={classNames(
+        css.dayHeader,
+        {
+          [css.activeHeader]: isCurrentDay,
+        },
+        className,
+      )}>
       <div className={css.dateNumber}>{date.getDate()}</div>
       <div className={css.dayText}>
         <FormattedMessage

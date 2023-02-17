@@ -42,7 +42,7 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
     () => ({
       members: [],
     }),
-    [],
+    [groupMembers],
   );
   const onSubmit = async (values: TObject) => {
     const { members } = values;

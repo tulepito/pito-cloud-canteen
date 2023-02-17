@@ -14,7 +14,7 @@ import {
   sortCompanies,
 } from '@src/pages/admin/company/helpers';
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
-import { adminRoutes } from '@src/paths';
+import { adminPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
@@ -124,13 +124,15 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
       orderAsyncActions.createOrder({
         clientId,
         bookerId: booker,
+        isCreatedByAdmin: true,
       }),
     ).then((res) => {
       const { payload, meta } = res;
+
       if (meta.requestStatus !== 'rejected') {
         nextTab();
         router.push({
-          pathname: adminRoutes.EditOrder.path,
+          pathname: adminPaths.UpdateDraftOrder,
           query: {
             orderId: Listing(payload).getId(),
           },

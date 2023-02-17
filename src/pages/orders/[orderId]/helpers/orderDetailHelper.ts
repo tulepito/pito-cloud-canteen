@@ -12,11 +12,8 @@ export const groupFoodOrderByDate = ({
 
       const {
         memberOrders,
-        foodList: foodListOfDate,
-        restaurant: { restaurantName },
+        restaurant: { restaurantName, foodList: foodListOfDate = {} },
       } = rawOrderDetailOfDate as TObject;
-
-      // Object.entries(foodListOfDate).reduce((result, foodData) => {}, );
 
       const foodDataMap = Object.entries(memberOrders).reduce(
         (foodFrequencyResult, currentMemberOrderEntry) => {

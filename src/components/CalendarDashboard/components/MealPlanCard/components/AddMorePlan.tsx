@@ -10,29 +10,31 @@ export type TAddMorePlanProps = {
   className?: string;
   events: Event[];
   date: Date;
-  startDate: number;
-  endDate: number;
-  onClick: (date: Date) => () => void;
+  onClick: (date: Date) => void;
+  resources: any;
 };
 
 const AddMorePlan: React.FC<TAddMorePlanProps> = ({
   className,
   events = [],
   date,
-  startDate,
-  endDate,
-  onClick = () => () => null,
+  resources,
+  onClick = () => null,
 }) => {
   const dateInNumberType = Number(date);
+  const { startDate, endDate } = resources;
   const isValidDate =
     dateInNumberType >= startDate && dateInNumberType <= endDate;
   const showCondition = events.length < 1 && isValidDate;
+  const handleClick = () => {
+    onClick(date);
+  };
 
   return (
     <>
       {showCondition && (
         <div className={classNames(css.root, className)}>
-          <Button className={css.addMore} onClick={onClick(date)} type="button">
+          <Button className={css.addMore} onClick={handleClick} type="button">
             <IconPlus className={css.plusIcon} />
             <FormattedMessage id="AddMorePlan.addMore" />
           </Button>

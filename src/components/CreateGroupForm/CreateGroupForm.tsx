@@ -86,7 +86,11 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
                     />
                     <div className={css.memberItem}>
                       <div className={css.memberWrapper}>
-                        <Avatar className={css.smallAvatar} user={member} />
+                        <Avatar
+                          className={css.smallAvatar}
+                          user={member}
+                          disableProfileLink
+                        />
                         <div>
                           <div className={css.name}>
                             {User(member).getProfile().displayName}

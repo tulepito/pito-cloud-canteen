@@ -15,7 +15,6 @@ import { getLabelByKey, SIDE_DISH_OPTIONS } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 import { parsePrice } from '@utils/validators';
 import type { FormApi } from 'final-form';
-import cloneDeep from 'lodash/cloneDeep';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -144,14 +143,14 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
   const savePickedFoods = () => {
     const { rowCheckbox = [], foodsByDate = {} } = values;
 
-    const newFoodsByDate = cloneDeep(foodsByDate);
+    const newFoodsByDate: Record<any, any> = {};
 
     if (!currentDate || !form) return;
 
     if (!newFoodsByDate[currentDate]) {
       newFoodsByDate[currentDate] = {};
     }
-    const foodsLength = Object.keys(newFoodsByDate[currentDate]).length;
+    const foodsLength = Object.keys(foodsByDate?.[currentDate] || {}).length;
 
     if (foodsLength > 10) return;
 
@@ -160,6 +159,9 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
         (item: TIntegrationListing) => item?.id?.uuid === key,
       );
       const title = food?.attributes?.title;
+      const priceAmount = food?.attributes?.price?.amount || 0;
+
+      const nutritionsList = food?.attributes?.publicData?.specialDiets || [];
 
       Object.keys(newFoodsByDate).forEach((foodId) => {
         if (!rowCheckbox.includes(foodId)) {
@@ -168,7 +170,6 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
       });
 
       const sideDishes = values[key]?.sideDishes || [];
-      const price = values[key]?.price || 0;
       const foodNote = values[key]?.foodNote || '';
       newFoodsByDate[currentDate] = {
         ...newFoodsByDate[currentDate],
@@ -176,8 +177,9 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
           id: key,
           title,
           sideDishes,
-          price,
+          price: priceAmount,
           foodNote,
+          nutritionsList,
         },
       };
     });
@@ -236,7 +238,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
       />
       {queryFoodsInProgress ? (
         <LoadingContainer />
-      ) : (
+      ) : tableData.length > 0 ? (
         <div className={css.foodPickContainer}>
           <div className={css.tableContainer}>
             <Table
@@ -298,6 +300,8 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
             </div>
           </div>
         </div>
+      ) : (
+        <div>Không có kết quả trả về</div>
       )}
     </Modal>
   );

@@ -33,6 +33,7 @@ type TCalendarDashboardProps = TDefaultProps & {
   hideWeekView?: boolean;
   headerComponent?: (params: TDayColumnHeaderProps) => ReactNode;
   eventExtraProps?: TObject;
+  resources?: any;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
@@ -52,6 +53,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   hideWeekView,
   headerComponent,
   eventExtraProps,
+  resources,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
 
@@ -123,6 +125,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
         localizer={localizer}
         events={events}
         views={views}
+        resources={resources}
         components={{
           toolbar: components?.toolbar || defaultToolbar,
         }}

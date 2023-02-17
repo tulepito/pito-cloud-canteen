@@ -9,7 +9,7 @@ import {
   setSelectedRestaurant,
 } from '@redux/slices/SelectRestaurantPage.slice';
 import { Listing } from '@utils/data';
-import type { TObject } from '@utils/types';
+import type { TListing, TObject } from '@utils/types';
 import clone from 'lodash/clone';
 import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
@@ -24,10 +24,12 @@ type TMealPlanCardProps = {
   event: Event;
   index: number;
   eventExtraProps: TObject;
+  onRemove?: (id: string) => void;
 };
 
 const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   event,
+  onRemove,
   eventExtraProps,
 }) => {
   const { onPickFoodModal } = eventExtraProps;
@@ -36,6 +38,8 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
+
+  const order = useAppSelector((state) => state.Order.order, shallowEqual);
 
   const selectedDate = useAppSelector(
     (state) => state.Order.selectedCalendarDate,
@@ -47,13 +51,23 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   const fetchRestaurantsInProgress = useAppSelector(
     (state) => state.SelectRestaurantPage.fetchRestaurantsPending,
   );
+
   const restaurantId = event.resource?.restaurant.id;
   const dateTime = DateTime.fromJSDate(event?.start!);
-  const removeEventItem = (resourceId: string) => {
-    const cloneOrderDetail = clone(orderDetail);
-    delete cloneOrderDetail[resourceId];
-    dispatch(removeMealDay(cloneOrderDetail));
-  };
+
+  const {
+    packagePerMember,
+    deliveryHour,
+    nutritions = [],
+  } = Listing(order as TListing).getMetadata();
+
+  const removeEventItem =
+    onRemove ||
+    ((resourceId: string) => {
+      const cloneOrderDetail = clone(orderDetail);
+      delete cloneOrderDetail[resourceId];
+      dispatch(removeMealDay(cloneOrderDetail));
+    });
 
   const onEditMeal = (date: Date) => {
     dispatch(selectCalendarDate(date));
@@ -63,10 +77,15 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   const onCustomPickFoodModalOpen = async () => {
     dispatch(selectCalendarDate(dateTime.toJSDate()));
     const { payload }: { payload: any } = await dispatch(
-      selectRestaurantPageThunks.getRestaurants({ dateTime }),
+      selectRestaurantPageThunks.getRestaurants({
+        dateTime,
+        packagePerMember,
+        deliveryHour,
+        nutritions,
+      }),
     );
 
-    const { restaurants } = payload || {};
+    const { restaurants = [] } = payload || {};
     const selectedRestaurant = restaurants.find(
       (_restaurant: any) =>
         Listing(_restaurant.restaurantInfo).getId() === restaurantId,
@@ -74,7 +93,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     dispatch(setSelectedRestaurant(selectedRestaurant?.restaurantInfo));
     await dispatch(
       selectRestaurantPageThunks.getRestaurantFood({
-        menuId: Listing(selectedRestaurant.menu).getId(),
+        menuId: Listing(selectedRestaurant?.menu).getId(),
         dateTime,
       }),
     );
@@ -82,7 +101,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   };
   const onPickFoodInProgress =
     (fetchFoodInProgress || fetchRestaurantsInProgress) &&
-    selectedDate.getTime() === event.start?.getTime();
+    selectedDate?.getTime() === event.start?.getTime();
   return (
     <div className={css.root}>
       <MealPlanCardHeader event={event} removeEventItem={removeEventItem} />

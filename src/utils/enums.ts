@@ -603,6 +603,7 @@ export const MENU_OPTIONS = [
 ];
 
 export enum EOrderStates {
+  draft = 'draft',
   isNew = 'isNew',
   canceled = 'canceled',
   picking = 'picking',
@@ -719,12 +720,12 @@ export const MENU_MEAL_TYPE_OPTIONS = [
     label: 'Ăn sáng',
   },
   {
-    key: EMenuMealType.dinner,
-    label: 'Ăn tối',
-  },
-  {
     key: EMenuMealType.lunch,
     label: 'Ăn trưa',
+  },
+  {
+    key: EMenuMealType.dinner,
+    label: 'Ăn tối',
   },
   {
     key: EMenuMealType.snack,

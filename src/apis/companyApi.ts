@@ -100,3 +100,6 @@ const queryOrdersApi = (companyId: string, params: TObject = {}) => {
 export const companyApi = {
   queryOrdersApi,
 };
+
+export const getAllCompanyMembersApi = (companyId: string) =>
+  getApi(`/company/all-employees?companyId=${companyId}`);

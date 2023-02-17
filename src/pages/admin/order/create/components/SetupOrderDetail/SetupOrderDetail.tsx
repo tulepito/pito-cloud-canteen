@@ -121,9 +121,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     setTrue: openPickFoodModal,
     setFalse: closePickFoodModal,
   } = useBoolean();
-  const updateOrderInProgress = useAppSelector(
-    (state) => state.Order.updateOrderInProgress,
-  );
+
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
     shallowEqual,
@@ -142,6 +140,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     deadlineHour,
     memberAmount,
   } = Listing(order as TListing).getMetadata();
+
   const { title: orderTitle } = Listing(order as TListing).getAttributes();
   const companies = useAppSelector(
     (state) => state.ManageCompaniesPage.companyRefs,
@@ -175,6 +174,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
     return temp instanceof Date ? temp : new Date(temp);
   }, [selectedDate, startDate, endDate, orderDetail]);
+  const updateOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.updateOrderDetailInProgress,
+  );
 
   const { address } = deliveryAddress || {};
   const currentClient = companies.find(
@@ -188,7 +190,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   const showPickFoodModal = isPickFoodModalOpen && !fetchFoodInProgress;
 
-  const handleAddMorePlanClick = (date: Date) => () => {
+  const handleAddMorePlanClick = (date: Date) => {
     dispatch(selectCalendarDate(date));
     dispatch(selectRestaurant());
   };
@@ -275,16 +277,22 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     endDate,
   };
 
-  const disabledSubmit = Object.keys(orderDetail).length === 0;
+  const missingSelectedFood = Object.keys(orderDetail).filter(
+    (dateTime) => orderDetail[dateTime].restaurant.foodList.length === 0,
+  );
+
+  const disabledSubmit =
+    Object.keys(orderDetail).length === 0 || missingSelectedFood.length > 0;
   const initialFoodList =
     orderDetail[selectedDate?.getTime()]?.restaurant?.foodList;
 
-  const onSubmit = () => {
-    dispatch(orderAsyncActions.updateOrder({ orderDetail }))
-      .then(() => {
-        nextTab();
-      })
-      .catch(() => {});
+  const onSubmit = async () => {
+    const orderId = Listing(order as TListing).getId();
+    const planId = Listing(order as TListing).getMetadata()?.plans?.[0];
+    const { meta } = await dispatch(
+      orderAsyncActions.updatePlanDetail({ orderId, orderDetail, planId }),
+    );
+    if (meta.requestStatus !== 'rejected') nextTab();
   };
 
   useEffect(() => {
@@ -373,6 +381,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               companyLogo="Company"
               startDate={new Date(startDate)}
               endDate={new Date(endDate)}
+              resources={{
+                startDate,
+                endDate,
+              }}
               components={{
                 contentEnd: (props) => (
                   <AddMorePlan {...props} {...addMorePlanExtraProps} />
@@ -394,7 +406,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               goBack={goBack}
               onNextClick={onSubmit}
               submitDisabled={disabledSubmit}
-              inProgress={updateOrderInProgress}
+              inProgress={updateOrderDetailInProgress}
             />
           </div>
           <OrderSettingModal

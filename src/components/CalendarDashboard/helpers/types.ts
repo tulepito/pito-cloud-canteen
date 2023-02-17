@@ -26,5 +26,6 @@ export type TCalendarItemCardComponents = {
 export type TDayColumnHeaderProps = {
   isCurrentDay: boolean;
   date: Date;
-  isMouseOnDay: boolean;
+  resources?: any;
+  className?: string;
 };

@@ -39,13 +39,7 @@ const QUERY_RESTAURANT_FOOD = 'app/SelectRestaurantPage/QUERY_RESTAURANT_FOOD';
 // ================ Thunks ================ //
 const getRestaurants = createAsyncThunk(
   QUERY_RESTAURANTS,
-  async (params: Record<string, any> | undefined, { extra: sdk, getState }) => {
-    const { order } = getState().Order;
-    const {
-      packagePerMember,
-      deliveryHour,
-      nutritions = [],
-    } = Listing(order as TListing).getMetadata();
+  async (params: Record<string, any> | undefined, { extra: sdk }) => {
     const queryParams: Record<string, any> = {};
 
     if (params) {
@@ -55,6 +49,9 @@ const getRestaurants = createAsyncThunk(
       dateTime,
       favoriteRestaurantIdList = [],
       favoriteFoodIdList = [],
+      packagePerMember,
+      deliveryHour,
+      nutritions = [],
       title = '',
     } = params || {};
     const dayOfWeek = convertWeekDay(dateTime.weekday).key;
@@ -62,6 +59,7 @@ const getRestaurants = createAsyncThunk(
     const mealType = deliveryDaySessionAdapter(deliveryDaySession);
     const response = await sdk.listings.query({
       keywords: title,
+      meta_listingState: 'published',
       meta_listingType: ListingTypes.MENU,
       pub_startDate: `,${dateTime.toMillis()}`,
       pub_daysOfWeek: `has_any:${dayOfWeek}`,

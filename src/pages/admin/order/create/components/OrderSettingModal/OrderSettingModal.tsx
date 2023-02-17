@@ -7,9 +7,13 @@ import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
+import { getDaySessionFromDeliveryTime } from '@utils/dates';
 import type { TListing } from '@utils/types';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
+import difference from 'lodash/difference';
+import isEqual from 'lodash/isEqual';
+import { DateTime } from 'luxon';
 import { useMemo, useState } from 'react';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
@@ -53,6 +57,10 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
     (state) => state.Order.updateOrderInProgress,
   );
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
+  const orderDetail = useAppSelector(
+    (state) => state.Order.orderDetail,
+    shallowEqual,
+  );
   const { title: orderId } = Listing(order as TListing).getAttributes();
 
   const {
@@ -70,6 +78,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
     deadlineHour,
     memberAmount,
     nutritions = [],
+    dayInWeek = ['mon', 'tue', 'wed', 'thu', 'fri'],
   } = Listing(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const initialValues = useMemo(
@@ -92,6 +101,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
       endDate: endDate || null,
       memberAmount:
         memberAmount || initialFieldValues[OrderSettingField.EMPLOYEE_AMOUNT],
+      dayInWeek,
     }),
     [
       packagePerMember,
@@ -109,6 +119,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
       memberAmount,
       initialFieldValues,
       nutritions,
+      dayInWeek,
     ],
   );
   const leftSideRenderer = () =>
@@ -133,6 +144,12 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
       );
     });
   const rightSideRenderer = (form: any, values: any) => {
+    const customStartDateChangeHandler = (date: number) => {
+      form.change(
+        'deadlineDate',
+        DateTime.fromMillis(date).minus({ days: 3 }).toMillis(),
+      );
+    };
     switch (selectedField) {
       case OrderSettingField.COMPANY:
         return (
@@ -169,7 +186,12 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
                 id: 'OrderSettingModal.field.deliveryTime',
               })}
             </div>
-            <MealPlanDateField columnLayout form={form} values={values} />
+            <MealPlanDateField
+              columnLayout
+              form={form}
+              values={values}
+              onCustomStartDateChange={customStartDateChangeHandler}
+            />
           </>
         );
       case OrderSettingField.PICKING_DEADLINE:
@@ -242,10 +264,14 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
     }
   };
 
-  const onSubmit = (values: any) => {
+  const onSubmit = async (values: any) => {
     const {
       deliveryAddress: deliveryAddressValues,
       packagePerMember: packagePerMemberValue,
+      startDate: startDateValue,
+      endDate: endDateValue,
+      deliveryHour: deliveryHourValue,
+      nutritions: nutritionsValue,
       ...rest
     } = values;
     const {
@@ -257,9 +283,36 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
         origin: originValue,
       },
       packagePerMember: +packagePerMemberValue.replace(/,/g, ''),
+      startDate: startDateValue,
+      endDate: endDateValue,
+      deliveryHour: deliveryHourValue,
+      nutritions: nutritionsValue,
       ...rest,
     };
-    dispatch(orderAsyncActions.updateOrder({ generalInfo }));
+    const { payload }: { payload: any } = await dispatch(
+      orderAsyncActions.updateOrder({ generalInfo }),
+    );
+
+    const { plans = [] } = Listing(order as TListing).getMetadata();
+    const changedOrderDetailFactor =
+      startDate !== startDateValue ||
+      endDate !== endDateValue ||
+      difference(nutritions, nutritionsValue).length > 0 ||
+      getDaySessionFromDeliveryTime(deliveryHour) !==
+        getDaySessionFromDeliveryTime(deliveryHourValue) ||
+      packagePerMember !== +packagePerMemberValue.replace(/,/g, '');
+    const { orderDetail: newOrderDetail } = payload || {};
+
+    if (!isEqual(orderDetail, newOrderDetail) && changedOrderDetailFactor) {
+      const planId = plans[0];
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId: Listing(order as TListing).getId(),
+          orderDetail: newOrderDetail,
+          planId,
+        }),
+      );
+    }
   };
 
   const hideSubmitButton = selectedField === OrderSettingField.COMPANY;

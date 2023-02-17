@@ -96,6 +96,7 @@ const fetchCurrentUser = createAsyncThunk(
     }
 
     const currentUser = entities[0];
+
     return currentUser;
   },
   {
