@@ -15,7 +15,7 @@ import { orderAsyncActions } from './Order.slice';
 // ================ Initial states ================ //
 type TKeyValue<T = string> = {
   key: string;
-  value: T;
+  label: T;
 };
 
 type TSearchFilterState = {
@@ -24,6 +24,7 @@ type TSearchFilterState = {
   restaurantIdList: string[];
 
   searchResult: TListing[];
+  totalItems: number;
 
   fetchFilterInProgress: boolean;
   searchInProgress: boolean;
@@ -35,6 +36,7 @@ const initialState: TSearchFilterState = {
   restaurantIdList: [],
 
   searchResult: [],
+  totalItems: 0,
 
   fetchFilterInProgress: false,
   searchInProgress: false,
@@ -111,20 +113,23 @@ const searchRestaurants = createAsyncThunk(
       ),
     ]);
 
-    const restaurants = denormalisedResponseEntities(
-      await sdk.listings.query({
-        ids: newRestaurantIdList.join(','),
-        meta_rating: rating,
-        keywords,
-        page,
-      }),
-    );
+    const restaurantsResponse = await sdk.listings.query({
+      ids: newRestaurantIdList.join(','),
+      meta_rating: rating,
+      keywords,
+      page,
+    });
+
+    const { meta } = restaurantsResponse.data;
+
+    const restaurants = denormalisedResponseEntities(restaurantsResponse);
 
     return {
       ...(newRestaurantIdList.length > 0 && {
         restaurantIdList: newRestaurantIdList,
       }),
       searchResult: restaurants,
+      totalItems: meta.totalItems,
     };
   },
 );
@@ -156,6 +161,7 @@ const SearchFilterSlice = createSlice({
         state.searchInProgress = false;
         state.restaurantIdList = action.payload.restaurantIdList ?? [];
         state.searchResult = action.payload.searchResult ?? [];
+        state.totalItems = action.payload.totalItems ?? 0;
       })
       .addCase(searchRestaurants.rejected, (state) => {
         state.searchInProgress = false;
