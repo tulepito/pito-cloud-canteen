@@ -14,10 +14,18 @@ import coverImg from './restaurantPlaceholder.png';
 type TRestaurantCardProps = {
   className?: string;
   restaurant?: any;
+  onClick?: (restaurantId: string) => void;
 };
 
-const RestaurantCard: React.FC<TRestaurantCardProps> = ({ className }) => {
+const RestaurantCard: React.FC<TRestaurantCardProps> = ({
+  className,
+  onClick = () => null,
+}) => {
   const classes = classNames(css.root, className);
+
+  const handleClickCard = () => {
+    onClick('123');
+  };
 
   return (
     <div className={classes}>
@@ -26,10 +34,12 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({ className }) => {
         <span>x2</span>
       </div>
       <div className={css.coverImage}>
-        <Image src={coverImg} alt="card" />
+        <Image src={coverImg} alt="card" onClick={handleClickCard} />
       </div>
       <div className={css.header}>
-        <p className={css.restaurantName}>Nhà hàng Vua Hải Sản</p>
+        <p className={css.restaurantName} onClick={handleClickCard}>
+          Nhà hàng Vua Hải Sản
+        </p>
         <IconHeart className={css.favoriteIcon} />
       </div>
       <div className={css.nutritions}>

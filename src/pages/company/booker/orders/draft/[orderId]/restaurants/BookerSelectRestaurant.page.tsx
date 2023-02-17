@@ -29,6 +29,7 @@ const convertQueryValueToArray = (value?: string | string[]) => {
 
 function BookerSelectRestaurant() {
   const router = useRouter();
+
   const {
     timestamp,
     orderId,
@@ -40,12 +41,19 @@ function BookerSelectRestaurant() {
     sortBy,
     keywords,
   } = router.query;
+
+  const [isOpenRestaurantDetailModal, setIsOpenRestaurantDetailModal] =
+    useState(false);
+
   const dispatch = useAppDispatch();
   const intl = useIntl();
+
   useFetchSearchFilters();
+
   useLoadData({
     orderId: orderId as string,
   });
+
   useEffect(() => {
     dispatch(
       SearchFilterThunks.searchRestaurants({
@@ -195,6 +203,14 @@ function BookerSelectRestaurant() {
     setFilterMobileMenuOpen(!filterMobileMenuOpen);
   };
 
+  const handleOpenResultDetailModal = () => {
+    setIsOpenRestaurantDetailModal(true);
+  };
+
+  const handleCloseResultDetailModal = () => {
+    setIsOpenRestaurantDetailModal(false);
+  };
+
   const onChangeSortBy = (value: string) => {
     setCurrentSortBy(value);
     router.push({
@@ -282,10 +298,14 @@ function BookerSelectRestaurant() {
               className={css.resultList}
               restaurants={restaurantInPage}
               isLoading={searchInProgress}
+              onClickCard={handleOpenResultDetailModal}
             />
           </div>
         </div>
-        <ResultDetailModal />
+        <ResultDetailModal
+          isOpen={isOpenRestaurantDetailModal}
+          onClose={handleCloseResultDetailModal}
+        />
       </div>
     </div>
   );

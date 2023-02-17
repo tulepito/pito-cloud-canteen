@@ -25,6 +25,7 @@ type InputComponentProps = FieldRenderProps<string, any> &
     rightIcon?: TIconComponent;
     required?: boolean;
     showText?: boolean;
+    placeholder?: string;
   };
 
 export const FieldTextInputComponent: React.FC<InputComponentProps> = (
