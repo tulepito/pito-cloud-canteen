@@ -1,12 +1,13 @@
 import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
+import { calculateBounds } from '@helpers/mapHelpers';
 import { deliveryDaySessionAdapter } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { ListingTypes } from '@src/types/listingTypes';
-import { denormalisedResponseEntities, Listing } from '@utils/data';
+import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
-import type { TListing } from '@utils/types';
+import type { TListing, TUser } from '@utils/types';
 import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
 
@@ -18,33 +19,46 @@ type TKeyValue<T = string> = {
   label: T;
 };
 
-type TSearchFilterState = {
+type TBookerDraftOrderPageState = {
   menuTypes: TKeyValue[];
   categories: TKeyValue[];
   restaurantIdList: string[];
-
+  companyFromOrder: TUser | null;
   searchResult: TListing[];
   totalItems: number;
+  totalRatings: {
+    restaurantId: string;
+    totalReviews: number;
+  }[];
 
   fetchFilterInProgress: boolean;
   searchInProgress: boolean;
+
+  fetchCompanyFromOrderInProgress: boolean;
+  fetchCompanyFromOrderError: any;
 };
-const initialState: TSearchFilterState = {
+const initialState: TBookerDraftOrderPageState = {
   menuTypes: [],
   categories: [],
-
   restaurantIdList: [],
+  companyFromOrder: null,
 
   searchResult: [],
   totalItems: 0,
+  totalRatings: [],
 
   fetchFilterInProgress: false,
   searchInProgress: false,
+
+  fetchCompanyFromOrderInProgress: false,
+  fetchCompanyFromOrderError: null,
 };
 
 // ================ Thunk types ================ //
-const FETCH_SEARCH_FILTER = 'app/SearchFilter/FETCH_SEARCH_FILTER';
-const SEARCH_RESTAURANT = 'app/SearchFilter/SEARCH_RESTAURANT';
+const FETCH_SEARCH_FILTER = 'app/BookerDraftOrderPage/FETCH_SEARCH_FILTER';
+const SEARCH_RESTAURANT = 'app/BookerDraftOrderPage/SEARCH_RESTAURANT';
+const FETCH_COMPANY_FROM_ORDER =
+  'app/BookerDraftOrderPage/FETCH_COMPANY_FROM_ORDER';
 
 // ================ Async thunks ================ //
 const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
@@ -65,11 +79,13 @@ const searchRestaurants = createAsyncThunk(
       page = 1,
       orderId,
       keywords = '',
+      distance,
     } = params;
     await dispatch(orderAsyncActions.fetchOrder(orderId));
     const dateTime = DateTime.fromMillis(timestamp);
     const { order } = getState().Order;
-    const { restaurantIdList = [] } = getState().SearchFilter;
+    const { restaurantIdList = [], companyFromOrder } =
+      getState().BookerDraftOrderPage;
     let newRestaurantIdList = [...restaurantIdList];
 
     const { deliveryHour, nutritions, packagePerMember } = Listing(
@@ -84,7 +100,6 @@ const searchRestaurants = createAsyncThunk(
       pub_startDate: `,${dateTime.toMillis()}`,
       pub_daysOfWeek: `has_any:${dayOfWeek}`,
       pub_mealType: mealType,
-
       ...(menuTypes.length > 0 ? { meta_menuType: menuTypes.join(',') } : {}),
       ...(categories.length > 0 ? { pub_category: categories.join(',') } : {}),
       ...(nutritions.length > 0
@@ -113,16 +128,36 @@ const searchRestaurants = createAsyncThunk(
       ),
     ]);
 
+    const origin = User(companyFromOrder as TUser).getPublicData()?.location
+      ?.origin;
+    const bounds = distance ? calculateBounds(origin, distance) : '';
+
     const restaurantsResponse = await sdk.listings.query({
       ids: newRestaurantIdList.join(','),
       meta_rating: rating,
       keywords,
       page,
+      ...(distance ? { bounds } : {}),
+      include: ['images'],
     });
 
     const { meta } = restaurantsResponse.data;
 
     const restaurants = denormalisedResponseEntities(restaurantsResponse);
+    const totalRatings = await Promise.all(
+      restaurants.map(async (restaurant: TListing) => {
+        const restaurantId = restaurant.id.uuid;
+        const reviewsResponse = await sdk.reviews.query({
+          listingId: restaurantId,
+          type: 'ofCustomer',
+        });
+        const { meta: reviewMeta } = reviewsResponse.data;
+        return {
+          restaurantId,
+          totalReviews: reviewMeta.totalItems,
+        };
+      }),
+    );
 
     return {
       ...(newRestaurantIdList.length > 0 && {
@@ -130,18 +165,37 @@ const searchRestaurants = createAsyncThunk(
       }),
       searchResult: restaurants,
       totalItems: meta.totalItems,
+      totalRatings,
     };
   },
 );
 
-export const SearchFilterThunks = {
+const fetchCompanyFromOrder = createAsyncThunk(
+  FETCH_COMPANY_FROM_ORDER,
+  async (_, { getState, extra: sdk }) => {
+    const { order } = getState().Order;
+    const { companyId } = Listing(order as TListing).getMetadata();
+    const companyAccount = denormalisedResponseEntities(
+      await sdk.users.show({
+        id: companyId,
+      }),
+    )[0];
+
+    return {
+      companyFromOrder: companyAccount,
+    };
+  },
+);
+
+export const BookerDraftOrderPageThunks = {
   searchRestaurants,
   fetchSearchFilter,
+  fetchCompanyFromOrder,
 };
 
 // ================ Slice ================ //
-const SearchFilterSlice = createSlice({
-  name: 'SearchFilter',
+const BookerDraftOrderPageSlice = createSlice({
+  name: 'BookerDraftOrderPage',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -162,15 +216,28 @@ const SearchFilterSlice = createSlice({
         state.restaurantIdList = action.payload.restaurantIdList ?? [];
         state.searchResult = action.payload.searchResult ?? [];
         state.totalItems = action.payload.totalItems ?? 0;
+        state.totalRatings = action.payload.totalRatings ?? [];
       })
       .addCase(searchRestaurants.rejected, (state) => {
         state.searchInProgress = false;
+      })
+      .addCase(fetchCompanyFromOrder.pending, (state) => {
+        state.fetchCompanyFromOrderInProgress = true;
+        state.fetchCompanyFromOrderError = null;
+      })
+      .addCase(fetchCompanyFromOrder.fulfilled, (state, action) => {
+        state.companyFromOrder = action.payload.companyFromOrder;
+        state.fetchCompanyFromOrderInProgress = false;
+      })
+      .addCase(fetchCompanyFromOrder.rejected, (state, { payload }) => {
+        state.fetchCompanyFromOrderInProgress = false;
+        state.fetchCompanyFromOrderError = payload;
       });
   },
 });
 
 // ================ Actions ================ //
-export const SearchFilterActions = SearchFilterSlice.actions;
-export default SearchFilterSlice.reducer;
+export const BookerDraftOrderPageActions = BookerDraftOrderPageSlice.actions;
+export default BookerDraftOrderPageSlice.reducer;
 
 // ================ Selectors ================ //

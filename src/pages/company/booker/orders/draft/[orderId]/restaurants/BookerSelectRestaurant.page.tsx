@@ -1,8 +1,10 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useFetchSearchFilters from '@hooks/useFetchSearchFilters';
 import KeywordSearchForm from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
-import { SearchFilterThunks } from '@redux/slices/SearchFilter.slice';
+import { BookerDraftOrderPageThunks } from '@redux/slices/BookerDraftOrderPage.slice';
 import { distanceOptions, ratingOptions } from '@src/marketplaceConfig';
+import { User } from '@utils/data';
+import type { TUser } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
@@ -56,7 +58,7 @@ function BookerSelectRestaurant() {
 
   useEffect(() => {
     dispatch(
-      SearchFilterThunks.searchRestaurants({
+      BookerDraftOrderPageThunks.searchRestaurants({
         timestamp: Number(timestamp),
         orderId,
         page,
@@ -88,25 +90,35 @@ function BookerSelectRestaurant() {
     (sortBy as string) || 'favorite',
   );
   const restaurants = useAppSelector(
-    (state) => state.SearchFilter.searchResult,
+    (state) => state.BookerDraftOrderPage.searchResult,
     shallowEqual,
   );
   const searchInProgress = useAppSelector(
-    (state) => state.SearchFilter.searchInProgress,
+    (state) => state.BookerDraftOrderPage.searchInProgress,
   );
 
   const menuTypesOptions = useAppSelector(
-    (state) => state.SearchFilter.menuTypes,
+    (state) => state.BookerDraftOrderPage.menuTypes,
     shallowEqual,
   );
 
   const categoriesOptions = useAppSelector(
-    (state) => state.SearchFilter.categories,
+    (state) => state.BookerDraftOrderPage.categories,
     shallowEqual,
   );
 
   const totalResultItems = useAppSelector(
-    (state) => state.SearchFilter.totalItems,
+    (state) => state.BookerDraftOrderPage.totalItems,
+  );
+
+  const companyFromOrder = useAppSelector(
+    (state) => state.BookerDraftOrderPage.companyFromOrder,
+    shallowEqual,
+  );
+
+  const totalRatings = useAppSelector(
+    (state) => state.BookerDraftOrderPage.totalRatings,
+    shallowEqual,
   );
 
   const restaurantInPage = useMemo(
@@ -197,6 +209,13 @@ function BookerSelectRestaurant() {
       menuTypesOptions,
       categoriesOptions,
     ],
+  );
+
+  const companyGeoOrigin = useMemo(
+    () => ({
+      ...User(companyFromOrder as TUser).getPublicData()?.location?.origin,
+    }),
+    [companyFromOrder],
   );
 
   const handleFilterMobileMenuClick = () => {
@@ -299,6 +318,8 @@ function BookerSelectRestaurant() {
               restaurants={restaurantInPage}
               isLoading={searchInProgress}
               onClickCard={handleOpenResultDetailModal}
+              companyGeoOrigin={companyGeoOrigin}
+              totalRatings={totalRatings}
             />
           </div>
         </div>
