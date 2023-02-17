@@ -1146,5 +1146,8 @@
   "BookerSelectRestaurant.ResultList.emptyResult.contactUs": "Liên hệ với chúng tôi",
   "booker.orders.draft.resultDetailModal.selectedDish": "Đã chọn: {number} món",
   "booker.orders.draft.resultDetailModal.selectAll": "Chọn tất cả",
-  "booker.orders.draft.resultDetailModal.keyword.placeholder": "Tìm kiếm"
+  "booker.orders.draft.resultDetailModal.keyword.placeholder": "Tìm kiếm",
+  "booker.orders.draft.foodDetailModal.back": "Quay lại",
+  "booker.orders.draft.foodDetailModal.addDish": "Chọn món này",
+  "booker.orders.draft.resultDetailModal.addRestaurant": "Xác nhận chọn {numberDish} món"
 }

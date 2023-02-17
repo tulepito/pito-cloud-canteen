@@ -7,6 +7,7 @@ import { useAppDispatch } from './reduxHooks';
 const useFetchSearchFilters = () => {
   const dispatch = useAppDispatch();
   const { isReady } = useRouter();
+
   useEffect(() => {
     if (isReady) {
       (async () => {
