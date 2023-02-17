@@ -62,6 +62,7 @@ const searchRestaurants = createAsyncThunk(
       categories = [],
       page = 1,
       orderId,
+      keywords = '',
     } = params;
     await dispatch(orderAsyncActions.fetchOrder(orderId));
     const dateTime = DateTime.fromMillis(timestamp);
@@ -114,6 +115,7 @@ const searchRestaurants = createAsyncThunk(
       await sdk.listings.query({
         ids: newRestaurantIdList.join(','),
         meta_rating: rating,
+        keywords,
         page,
       }),
     );

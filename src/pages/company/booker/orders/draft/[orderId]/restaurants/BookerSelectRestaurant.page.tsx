@@ -1,9 +1,11 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useFetchSearchFilters from '@hooks/useFetchSearchFilters';
+import KeywordSearchForm from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { SearchFilterThunks } from '@redux/slices/SearchFilter.slice';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import FilterSidebar from '../components/FilterSidebar/FilterSidebar';
@@ -11,32 +13,66 @@ import { useLoadData } from '../hooks/loadData';
 import css from './BookerSelectRestaurant.module.scss';
 import ResultDetailModal from './components/ResultDetailModal/ResultDetailModal';
 import ResultList from './components/ResultList/ResultList';
+import SortingDropdown from './components/SortingDropdown/SortingDropdown';
 
 function BookerSelectRestaurant() {
   const router = useRouter();
-  const { timestamp, orderId, page = 1 } = router.query;
+
+  const {
+    timestamp,
+    orderId,
+    page = 1,
+    menuTypes,
+    categories,
+    distance,
+    rating,
+    sortBy,
+    keywords,
+  } = router.query;
 
   const [isOpenRestaurantDetailModal, setIsOpenRestaurantDetailModal] =
     useState(false);
 
   const dispatch = useAppDispatch();
+  const intl = useIntl();
+
   useFetchSearchFilters();
+
   useLoadData({
     orderId: orderId as string,
   });
+
   useEffect(() => {
-    if (timestamp) {
-      dispatch(
-        SearchFilterThunks.searchRestaurants({
-          timestamp: Number(timestamp),
-          orderId,
-          page,
-        }),
-      );
-    }
-  }, [dispatch, orderId, page, timestamp]);
+    dispatch(
+      SearchFilterThunks.searchRestaurants({
+        timestamp: Number(timestamp),
+        orderId,
+        page,
+        ...(menuTypes ? { menuTypes: (menuTypes as string).split(',') } : {}),
+        ...(categories
+          ? { categories: (categories as string).split(',') }
+          : {}),
+        ...(distance ? { distance: (distance as string).split(',') } : {}),
+        ...(rating ? { rating: (rating as string).split(',') } : {}),
+        ...(keywords ? { keywords: keywords as string } : {}),
+      }),
+    );
+  }, [
+    categories,
+    dispatch,
+    distance,
+    menuTypes,
+    orderId,
+    page,
+    rating,
+    timestamp,
+    keywords,
+  ]);
 
   const [filterMobileMenuOpen, setFilterMobileMenuOpen] = useState(false);
+  const [currentSortBy, setCurrentSortBy] = useState<string>(
+    (sortBy as string) || 'favorite',
+  );
   const restaurants = useAppSelector(
     (state) => state.SearchFilter.searchResult,
     shallowEqual,
@@ -53,6 +89,44 @@ function BookerSelectRestaurant() {
       ),
     [page, restaurants],
   );
+  const initialValues = useMemo(() => {
+    return {
+      menuTypes: menuTypes ? (menuTypes as string).split(',') : [],
+      categories: categories ? (categories as string).split(',') : [],
+      distance: distance ? (distance as string).split(',') : [],
+      rating: rating ? (rating as string).split(',') : [],
+    };
+  }, [categories, distance, menuTypes, rating]);
+
+  const sortingOptions = useMemo(() => {
+    return [
+      {
+        label: intl.formatMessage({
+          id: 'BookerSelectRestaurant.sortOption.favorite',
+        }),
+        value: 'favorite',
+      },
+      {
+        label: intl.formatMessage({
+          id: 'BookerSelectRestaurant.sortOption.newest',
+        }),
+        value: 'newest',
+      },
+      {
+        label: intl.formatMessage({
+          id: 'BookerSelectRestaurant.sortOption.mostOrder',
+        }),
+        value: 'mostOrder',
+      },
+    ];
+  }, [intl]);
+
+  const keywordsInitialValue = useMemo(() => {
+    return {
+      keywords: (keywords as string) || '',
+    };
+  }, [keywords]);
+
   const handleFilterMobileMenuClick = () => {
     setFilterMobileMenuOpen(!filterMobileMenuOpen);
   };
@@ -63,6 +137,31 @@ function BookerSelectRestaurant() {
 
   const handleCloseResultDetailModal = () => {
     setIsOpenRestaurantDetailModal(false);
+  };
+
+  const onChangeSortBy = (value: string) => {
+    setCurrentSortBy(value);
+    router.push({
+      query: {
+        ...router.query,
+        sortBy: value,
+      },
+    });
+  };
+
+  const onSearchKeywordsSubmit = (values: any) => {
+    const newQuery = { ...router.query };
+    if (!values.keywords) {
+      delete newQuery.keywords;
+    } else {
+      newQuery.keywords = values.keywords;
+    }
+
+    router.push({
+      query: {
+        ...newQuery,
+      },
+    });
   };
 
   return (
@@ -79,15 +178,33 @@ function BookerSelectRestaurant() {
           className={classNames(css.sidebar, {
             [css.sidebarOpened]: filterMobileMenuOpen,
           })}>
-          <FilterSidebar />
+          <FilterSidebar initialValues={initialValues} />
         </div>
         <div className={css.result}>
-          <ResultList
-            className={css.resultList}
-            restaurants={restaurantInPage}
-            isLoading={searchInProgress}
-            onClickCard={handleOpenResultDetailModal}
-          />
+          <div className={css.resultHeaderWrapper}>
+            <div className={css.searchAndSort}>
+              <KeywordSearchForm
+                onSubmit={onSearchKeywordsSubmit}
+                initialValues={keywordsInitialValue}
+              />
+              <SortingDropdown
+                options={sortingOptions}
+                selectedValue={intl.formatMessage({
+                  id: `BookerSelectRestaurant.sortOption.${currentSortBy}`,
+                })}
+                onOptionChange={onChangeSortBy}
+              />
+            </div>
+            <div className={css.filterLabelWrapper}></div>
+          </div>
+          <div className={css.resultWrapper}>
+            <ResultList
+              className={css.resultList}
+              restaurants={restaurantInPage}
+              isLoading={searchInProgress}
+              onClickCard={handleOpenResultDetailModal}
+            />
+          </div>
         </div>
         <ResultDetailModal
           isOpen={isOpenRestaurantDetailModal}

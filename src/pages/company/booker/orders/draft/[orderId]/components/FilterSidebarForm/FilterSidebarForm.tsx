@@ -1,6 +1,5 @@
 import Form from '@components/Form/Form';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { SearchFilterThunks } from '@redux/slices/SearchFilter.slice';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { distanceOptions, ratingOptions } from '@src/marketplaceConfig';
 import { useRouter } from 'next/router';
 import type { FormProps, FormRenderProps } from 'react-final-form';
@@ -20,11 +19,9 @@ type TFilterSidebarFormProps = FormProps<TFilterSidebarFormValues> &
 const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, initialValues, form } = props;
+  const { handleSubmit, form } = props;
   const router = useRouter();
-  const { timestamp, orderId, page = 1 } = router.query;
 
-  const dispatch = useAppDispatch();
   const menuTypesOptions = useAppSelector(
     (state) => state.SearchFilter.menuTypes,
   );
@@ -33,20 +30,29 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
   );
 
   const onResetAllFilters = () => {
-    form.reset(initialValues);
+    form.reset({
+      menuTypes: [],
+      categories: [],
+      distance: [],
+      rating: [],
+    });
   };
   const handleFormChange = async (values: any) => {
     const { values: formValues } = values;
-    setTimeout(() => {
-      dispatch(
-        SearchFilterThunks.searchRestaurants({
-          timestamp: parseInt(timestamp as string, 10),
-          orderId,
-          page: parseInt(page as string, 10),
-          ...formValues,
-        }),
-      );
-    }, 0);
+    const newQuery = { ...router.query };
+    Object.keys(formValues).forEach((filter) => {
+      if (formValues[filter].length === 0) {
+        delete newQuery[filter];
+      } else {
+        newQuery[filter] = formValues[filter].join(',');
+      }
+    });
+
+    router.push({
+      query: {
+        ...newQuery,
+      },
+    });
   };
 
   return (
