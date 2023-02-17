@@ -71,4 +71,17 @@
   @include viewportLarge {
     margin: 0 0 0 20px;
   }
+
+  .resultHeaderWrapper {
+    position: relative;
+    z-index: 10;
+    .searchAndSort {
+      @include flexAlign(center, space-between);
+    }
+  }
+
+  .resultWrapper {
+    position: relative;
+    margin-top: 24px;
+  }
 }

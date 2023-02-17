@@ -1,7 +1,6 @@
 import Form from '@components/Form/Form';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { distanceOptions, ratingOptions } from '@src/marketplaceConfig';
-import { companyPaths } from '@src/paths';
 import { useRouter } from 'next/router';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm, FormSpy } from 'react-final-form';
@@ -22,7 +21,6 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
 ) => {
   const { handleSubmit, form } = props;
   const router = useRouter();
-  const { timestamp, orderId, page = 1 } = router.query;
 
   const menuTypesOptions = useAppSelector(
     (state) => state.SearchFilter.menuTypes,
@@ -41,28 +39,18 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
   };
   const handleFormChange = async (values: any) => {
     const { values: formValues } = values;
-    const {
-      menuTypes: menuTypesValue = [],
-      categories: categoriesValue = [],
-      distance: distanceValue = [],
-      rating: ratingValue = [],
-    } = formValues;
+    const newQuery = { ...router.query };
+    Object.keys(formValues).forEach((filter) => {
+      if (formValues[filter].length === 0) {
+        delete newQuery[filter];
+      } else {
+        newQuery[filter] = formValues[filter].join(',');
+      }
+    });
+
     router.push({
-      pathname: companyPaths.OrderSelectRestaurant,
       query: {
-        timestamp,
-        orderId,
-        page,
-        ...(menuTypesValue.length > 0
-          ? { menuTypes: menuTypesValue.join(',') }
-          : {}),
-        ...(categoriesValue.length > 0
-          ? { categories: categoriesValue.join(',') }
-          : {}),
-        ...(distanceValue.length > 0
-          ? { distance: distanceValue.join(',') }
-          : {}),
-        ...(ratingValue.length > 0 ? { rating: ratingValue.join(',') } : {}),
+        ...newQuery,
       },
     });
   };
