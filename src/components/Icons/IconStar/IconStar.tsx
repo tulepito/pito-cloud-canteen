@@ -11,8 +11,6 @@ const IconStar: React.FC<TIconProps> = (props) => {
   return (
     <svg
       className={classes}
-      width={17}
-      height={16}
       viewBox="0 0 17 16"
       preserveAspectRatio="none"
       fill="none"

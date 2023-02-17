@@ -10,12 +10,14 @@ type TResultListProps = {
   className?: string;
   restaurants?: any[];
   isLoading?: boolean;
+  onClickCard?: () => void;
 };
 
 const ResultList: React.FC<TResultListProps> = ({
   className,
   restaurants = [],
   isLoading,
+  onClickCard = () => null,
 }) => {
   const classes = classNames(css.root, className);
 
@@ -31,7 +33,11 @@ const ResultList: React.FC<TResultListProps> = ({
       {!isLoading && restaurants.length === 0 && <EmptyList />}
       {!isLoading &&
         restaurants.map((restaurant) => (
-          <RestaurantCard key={restaurant?.id.uuid} className={css.card} />
+          <RestaurantCard
+            onClick={onClickCard}
+            key={restaurant?.id.uuid}
+            className={css.card}
+          />
         ))}
     </div>
   );

@@ -30,9 +30,9 @@ type TMealPlanCardProps = {
 const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   event,
   onRemove,
-  eventExtraProps,
+  eventExtraProps = {},
 }) => {
-  const { onPickFoodModal } = eventExtraProps;
+  const { onPickFoodModal = () => null } = eventExtraProps;
   const dispatch = useAppDispatch();
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,

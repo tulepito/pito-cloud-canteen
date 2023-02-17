@@ -15,6 +15,10 @@ import ResultList from './components/ResultList/ResultList';
 function BookerSelectRestaurant() {
   const router = useRouter();
   const { timestamp, orderId, page = 1 } = router.query;
+
+  const [isOpenRestaurantDetailModal, setIsOpenRestaurantDetailModal] =
+    useState(false);
+
   const dispatch = useAppDispatch();
   useFetchSearchFilters();
   useLoadData({
@@ -53,6 +57,14 @@ function BookerSelectRestaurant() {
     setFilterMobileMenuOpen(!filterMobileMenuOpen);
   };
 
+  const handleOpenResultDetailModal = () => {
+    setIsOpenRestaurantDetailModal(true);
+  };
+
+  const handleCloseResultDetailModal = () => {
+    setIsOpenRestaurantDetailModal(false);
+  };
+
   return (
     <div className={css.root}>
       <div className={css.main}>
@@ -74,9 +86,13 @@ function BookerSelectRestaurant() {
             className={css.resultList}
             restaurants={restaurantInPage}
             isLoading={searchInProgress}
+            onClickCard={handleOpenResultDetailModal}
           />
         </div>
-        <ResultDetailModal />
+        <ResultDetailModal
+          isOpen={isOpenRestaurantDetailModal}
+          onClose={handleCloseResultDetailModal}
+        />
       </div>
     </div>
   );
