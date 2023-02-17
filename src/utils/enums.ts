@@ -601,9 +601,11 @@ export enum EOrderStates {
   draft = 'draft',
   isNew = 'isNew',
   canceled = 'canceled',
+  canceledByBooker = 'canceledByBooker',
   picking = 'picking',
   inProgress = 'inProgress',
   completed = 'completed',
+  pendingPayment = 'pendingPayment',
   reviewed = 'reviewed',
 }
 

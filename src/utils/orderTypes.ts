@@ -1,3 +1,5 @@
+import type { EParticipantOrderStatus } from './enums';
+
 export type TOrder = {
   orderId: string;
   adminFollowerId: string; // admin/collaborator id
@@ -18,9 +20,22 @@ export type TPlan = {
   meal: string;
   orderDetail: {
     [date: string]: {
-      restaurant: any; // restaurant listing id
+      restaurant: {
+        id: string; // restaurant listing id
+        restaurantName: string;
+        foodList: {
+          [foodId: string]: {
+            foodName: string;
+            foodPrice: number;
+          };
+        };
+      };
       memberOrders: {
-        [participant: string]: string; // food id
+        [participant: string]: {
+          foodId: string;
+          status: EParticipantOrderStatus;
+          requirement?: string;
+        };
       };
     };
   };

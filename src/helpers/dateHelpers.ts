@@ -15,8 +15,8 @@ export const parseDateFromTimestampAndHourString = (
  *
  * @param timeStr `HH:mm`
  */
-export const convertHHmmStringToTimeParts = (timeStr: string) => {
-  const [hours, minutes] = timeStr.split(':') || ['0', '0'];
+export const convertHHmmStringToTimeParts = (timeStr = '6:30') => {
+  const [hours, minutes] = timeStr.split(':') || ['6', '30'];
 
   return { hours: parseInt(hours, 10), minutes: parseInt(minutes, 10) };
 };

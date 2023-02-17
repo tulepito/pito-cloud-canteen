@@ -45,23 +45,27 @@ const uniqueStrings = (array: string[]) => {
 };
 
 export const BADGE_TYPE_BASE_ON_ORDER_STATE = {
+  [EOrderStates.canceled]: EBadgeType.DEFAULT,
+  [EOrderStates.canceledByBooker]: EBadgeType.DEFAULT,
+  [EOrderStates.completed]: EBadgeType.WARNING,
+  [EOrderStates.draft]: EBadgeType.DEFAULT,
   [EOrderStates.inProgress]: EBadgeType.PROCESSING,
   [EOrderStates.isNew]: EBadgeType.PROCESSING,
+  [EOrderStates.pendingPayment]: EBadgeType.PROCESSING,
   [EOrderStates.picking]: EBadgeType.WARNING,
   [EOrderStates.reviewed]: EBadgeType.WARNING,
-  [EOrderStates.completed]: EBadgeType.WARNING,
-  [EOrderStates.canceled]: EBadgeType.DEFAULT,
-  [EOrderStates.draft]: EBadgeType.DEFAULT,
 };
 
 export const BADGE_CLASSNAME_BASE_ON_ORDER_STATE = {
-  [EOrderStates.isNew]: css.badgeProcessing,
-  [EOrderStates.inProgress]: css.badgeInProgress,
+  [EOrderStates.canceled]: css.badgeDefault,
+  [EOrderStates.canceledByBooker]: css.badgeDefault,
   [EOrderStates.completed]: css.badgeSuccess,
+  [EOrderStates.draft]: css.badgeDefault,
+  [EOrderStates.inProgress]: css.badgeInProgress,
+  [EOrderStates.isNew]: css.badgeProcessing,
+  [EOrderStates.pendingPayment]: css.badgeProcessing,
   [EOrderStates.picking]: css.badgeWarning,
   [EOrderStates.reviewed]: css.badgeWarning,
-  [EOrderStates.canceled]: css.badgeDefault,
-  [EOrderStates.draft]: css.badgeDefault,
 };
 
 const OrderDetailTooltip = ({
