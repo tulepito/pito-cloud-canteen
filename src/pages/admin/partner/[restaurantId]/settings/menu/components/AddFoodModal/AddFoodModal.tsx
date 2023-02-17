@@ -183,7 +183,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
         },
       };
     });
-    form.change('foodsByDate', newFoodsByDate);
+    form.change('foodsByDate', { ...foodsByDate, ...newFoodsByDate });
     form.change('rowCheckbox', []);
     form.change('checkAll', []);
     handleCloseModal();

@@ -338,6 +338,7 @@
   "EditPartnerBasicInformationForm.titleRequired": "Vui lòng nhập tên thương hiệu",
   "EditPartnerBasicInformationForm.validLocation": "Địa chỉ không hợp lệ",
   "EditPartnerFood.title": "Chỉnh sửa món ăn",
+  "EditPartnerFoodForm.categoryPlaceholder": "Chọn phong cách ẩm thực",
   "EditPartnerFoodForm.categoryRequired": "Vui lòng nhập phong cách ẩm thực",
   "EditPartnerFoodForm.descriptionLabel": "Mô tả",
   "EditPartnerFoodForm.descriptionPlaceholder": "Nhập mô tả",
