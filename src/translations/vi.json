@@ -1124,5 +1124,17 @@
   "DayOfWeekCalendarHeader.wed": "Thứ 4",
   "DayOfWeekCalendarHeader.fri": "Thứ 6",
   "CreatePartnerMenuPage.title": "Tạo thực đơn",
-  "EditPartnerMenuPage.title": "Chỉnh sửa thực đơn"
+  "EditPartnerMenuPage.title": "Chỉnh sửa thực đơn",
+  "EditCompanyWizard.nextStep": "Tiếp theo",
+  "EditCompanyWizard.goBack": "Quay lại",
+  "EditPartnerMenuWizard.informationTabLabel": "Tài khoản",
+  "EditPartnerMenuWizard.settingsTabLabel": "Cài đặt công ty",
+  "EditCompanySettingsInformationForm.logoSettingTitle": "Cài đặt logo công ty",
+  "EditCompanySettingsTabs.informationSetting": "Thông tin",
+  "EditCompanySettingsTabs.paymentSetting": "Thanh toán",
+  "EditCompanySettingsTabs.subscriptionSetting": "Gói mua",
+  "EditCompanySettingsInformationForm.memberSettingMember": "Cài đặt thành viên",
+  "EditCompanySettingsInformationForm.memberSettingCreate": "Thêm thành viên",
+  "EditCompanySettingsInformationForm.groupSettingMember": "Cài đặt nhóm",
+  "EditCompanySettingsInformationForm.groupSettingCreate": "Thêm nhóm"
 }

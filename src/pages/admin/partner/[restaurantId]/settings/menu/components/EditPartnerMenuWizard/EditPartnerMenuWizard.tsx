@@ -291,7 +291,7 @@ const EditPartnerMenuWizard = () => {
 
   useRedirectTabWizard({
     isNew,
-    listing: currentMenu as TIntegrationListing,
+    entity: currentMenu as TIntegrationListing,
     selectedTab: tab as string,
     tabs: EDIT_PARTNER_MENU_TABS,
     tabCompleted,

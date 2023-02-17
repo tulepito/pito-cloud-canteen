@@ -81,7 +81,7 @@ const PhotoWithOverlay = (props: TPhotoWithOverlay) => {
   );
 };
 
-type TImageUploadFnReturnValue = {
+export type TImageUploadFnReturnValue = {
   payload: Record<any, any>;
 };
 
@@ -99,7 +99,7 @@ type TFieldPhotoUpload = {
   uploadImageError: any;
   name: string;
   id: string;
-  validate: any;
+  validate?: any;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare

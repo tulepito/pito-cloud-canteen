@@ -31,9 +31,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const sdk = getSdk(req, res);
 
     const intergrationSdk = getIntegrationSdk();
-
+    const { metadata, ...dataParamsWithoutMetadata } = dataParams;
     // Create company account
-    const companyResponse = await sdk.currentUser.create(dataParams);
+    const companyResponse = await sdk.currentUser.create(
+      dataParamsWithoutMetadata,
+    );
 
     const [companyAccount] = denormalisedResponseEntities(companyResponse);
 
@@ -59,6 +61,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           metadata: {
             isCompany: true,
             status: ECompanyStatus.unactive,
+            ...metadata,
           },
         },
         queryParams,

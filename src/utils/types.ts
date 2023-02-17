@@ -467,3 +467,18 @@ export type TIntegrationOrderListing = {
   plan?: TListing;
   subOrders?: TIntegrationListing[];
 };
+
+export type TCompanyMemberWithDetails = {
+  permission: string;
+  groups: string[];
+} & TUser;
+
+export type TCompanyGroup = {
+  id: string;
+  name: string;
+  description?: string;
+  members: {
+    id: string | null;
+    email: string;
+  }[];
+};

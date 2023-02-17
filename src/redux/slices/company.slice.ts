@@ -12,14 +12,22 @@ import {
   updateCompany,
   updateGroupApi,
 } from '@apis/companyApi';
+import {
+  createCompanyApi,
+  showCompanyApi,
+  updateCompanyApi,
+} from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
-import type { TObject, TUser } from '@utils/types';
+import { storableError } from '@utils/errors';
+import type { TImage, TObject, TUser } from '@utils/types';
 import axios from 'axios';
 
 import { userThunks } from './user.slice';
+
+export const COMPANY_LOGO_VARIANTS = [EImageVariants.default];
 
 export type TCompanyImageActionPayload = {
   id: string;
@@ -52,6 +60,9 @@ type TCompanyState = {
   deletingGroupId: string;
 
   company: TUser | null;
+  showCompanyInProgress: boolean;
+  showCompanyError: any;
+
   updateGroupInProgress: boolean;
   updateGroupError: any;
   originCompanyMembers: TObject;
@@ -62,6 +73,13 @@ type TCompanyState = {
 
   updateBookerAccountInProgress: boolean;
   updateBookerAccountError: any;
+
+  createCompanyInProgress: boolean;
+  createCompanyError: any;
+
+  uploadedCompanyLogo: TImage | null | { id: string; file: File };
+  uploadingCompanyLogo: boolean;
+  uploadCompanyLogoError: any;
 };
 
 // ================ Thunk types ================ //
@@ -73,6 +91,11 @@ const UPDATE_GROUP = 'app/Company/UPDATE_GROUP';
 const DELETE_GROUP = 'app/Company/DELETE_GROUP';
 const UPDATE_COMPANY_ACCOUNT = 'app/Company/UPDATE_COMPANY_ACCOUNT';
 const UPDATE_BOOKER_ACCOUNT = 'app/Company/UPDATE_BOOKER_ACCOUNT';
+const ADMIN_CREATE_COMPANY = 'app/Company/ADMIN_CREATE_COMPANY';
+const SHOW_COMPANY = 'app/UpdateCompanyPage/SHOW_COMPANY';
+const ADMIN_UPDATE_COMPANY = 'app/UpdateCompanyPage/ADMIN_UPDATE_COMPANY';
+const REQUEST_UPLOAD_COMPANY_LOGO =
+  'app/UpdateCompanyPage/REQUEST_UPLOAD_COMPANY_LOGO';
 
 const initialState: TCompanyState = {
   groupList: [],
@@ -92,6 +115,9 @@ const initialState: TCompanyState = {
   deletingGroupId: '',
 
   company: null,
+  showCompanyInProgress: false,
+  showCompanyError: null,
+
   updateGroupInProgress: false,
   updateGroupError: null,
   originCompanyMembers: {},
@@ -102,7 +128,87 @@ const initialState: TCompanyState = {
 
   updateBookerAccountInProgress: false,
   updateBookerAccountError: null,
+
+  createCompanyInProgress: false,
+  createCompanyError: null,
+
+  uploadedCompanyLogo: null,
+  uploadCompanyLogoError: null,
+  uploadingCompanyLogo: false,
 };
+
+const requestUploadCompanyLogo = createAsyncThunk(
+  REQUEST_UPLOAD_COMPANY_LOGO,
+  async (payload: any, { extra: sdk, fulfillWithValue, rejectWithValue }) => {
+    const { file, id } = payload || {};
+    try {
+      const response = await sdk.images.upload(
+        { image: file },
+        {
+          expand: true,
+          'fields.image': [`variants.${EImageVariants.default}`],
+        },
+      );
+      const img = response.data.data;
+      return fulfillWithValue({ ...img, id, imageId: img.id });
+    } catch (error) {
+      console.error('error', error);
+      return rejectWithValue({ id, error: storableError(error) });
+    }
+  },
+);
+
+const adminCreateCompany = createAsyncThunk(
+  ADMIN_CREATE_COMPANY,
+  async (userData: any, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      const { data } = await createCompanyApi({
+        dataParams: userData,
+        queryParams: {
+          expand: true,
+        },
+      });
+      const [company] = denormalisedResponseEntities(data);
+      return fulfillWithValue(company);
+    } catch (error: any) {
+      console.error(error);
+      return rejectWithValue(storableError(error.response.data));
+    }
+  },
+);
+
+const showCompany = createAsyncThunk(
+  SHOW_COMPANY,
+  async (id: string, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      const { data } = await showCompanyApi(id);
+      const [company] = denormalisedResponseEntities(data);
+      return fulfillWithValue(company);
+    } catch (error: any) {
+      console.error('show company error', error);
+      return rejectWithValue(storableError(error.response.data));
+    }
+  },
+);
+
+const adminUpdateCompany = createAsyncThunk(
+  ADMIN_UPDATE_COMPANY,
+  async (userData: any, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      const { data } = await updateCompanyApi({
+        dataParams: userData,
+        queryParams: {
+          expand: true,
+        },
+      });
+      const [company] = denormalisedResponseEntities(data);
+      return fulfillWithValue(company);
+    } catch (error: any) {
+      console.error(`Error : ${ADMIN_UPDATE_COMPANY}`, error);
+      return rejectWithValue(storableError(error.response.data));
+    }
+  },
+);
 
 const companyInfo = createAsyncThunk(
   COMPANY_INFO,
@@ -272,7 +378,7 @@ const updateCompanyAccount = createAsyncThunk(
   },
 );
 
-export const BookerManageCompany = {
+export const companyThunks = {
   companyInfo,
   groupInfo,
   groupDetailInfo,
@@ -281,6 +387,10 @@ export const BookerManageCompany = {
   deleteGroup,
   updateCompanyAccount,
   updateBookerAccount,
+  adminCreateCompany,
+  adminUpdateCompany,
+  showCompany,
+  requestUploadCompanyLogo,
 };
 
 export const companySlice = createSlice({
@@ -293,6 +403,15 @@ export const companySlice = createSlice({
         workspaceCompanyId: payload,
       };
     },
+    clearError: (state) => ({
+      ...state,
+      createCompanyError: null,
+      updateCompanyError: null,
+    }),
+    removeCompanyLogo: (state) => ({
+      ...state,
+      uploadedCompanyLogo: null,
+    }),
   },
   extraReducers: (builder) => {
     builder
@@ -457,7 +576,85 @@ export const companySlice = createSlice({
           updateBookerAccountInProgress: false,
           updateBookerAccountError: error.message,
         };
-      });
+      })
+      .addCase(adminCreateCompany.pending, (state) => ({
+        ...state,
+        createCompanyInProgress: true,
+        createCompanyError: null,
+      }))
+      .addCase(adminCreateCompany.fulfilled, (state, { payload }) => ({
+        ...state,
+        createCompanyInProgress: false,
+        company: payload,
+      }))
+      .addCase(adminCreateCompany.rejected, (state, action) => ({
+        ...state,
+        createCompanyInProgress: false,
+        createCompanyError: action.payload,
+      }))
+      .addCase(showCompany.pending, (state) => {
+        return {
+          ...state,
+          showCompanyInProgress: true,
+          showCom: null,
+        };
+      })
+      .addCase(showCompany.fulfilled, (state, action) => {
+        return {
+          ...state,
+          company: action.payload,
+          showCompanyInProgress: false,
+        };
+      })
+      .addCase(showCompany.rejected, (state, action) => {
+        return {
+          ...state,
+          showCompanyInProgress: false,
+          showCompanyError: action.payload,
+        };
+      })
+      .addCase(adminUpdateCompany.pending, (state) => {
+        return {
+          ...state,
+          updateCompanyInProgress: true,
+        };
+      })
+      .addCase(adminUpdateCompany.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          updateCompanyInProgress: false,
+          company: payload,
+        };
+      })
+      .addCase(adminUpdateCompany.rejected, (state, { error }) => {
+        return {
+          ...state,
+          updateCompanyInProgress: false,
+          updateCompanyError: error.message,
+        };
+      })
+      .addCase(requestUploadCompanyLogo.pending, (state, { meta }) => {
+        const { id, file } = meta.arg;
+
+        return {
+          ...state,
+          uploadedCompanyLogo: { id, file },
+          uploadingCompanyLogo: true,
+          uploadCompanyLogoError: null,
+        };
+      })
+      .addCase(requestUploadCompanyLogo.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          uploadingCompanyLogo: false,
+          uploadedCompanyLogo: payload,
+        };
+      })
+      .addCase(requestUploadCompanyLogo.rejected, (state, { payload }) => ({
+        ...state,
+        uploadingCompanyLogo: false,
+        uploadCompanyLogoError: payload,
+      }));
   },
 });
 

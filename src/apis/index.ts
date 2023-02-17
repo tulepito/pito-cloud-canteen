@@ -10,6 +10,11 @@ export const updateCompanyApi = (body: TObject) =>
 export const createCompanyApi = (body: TObject) =>
   postApi('/admin/users/company/create', body);
 
+export const queryCompanyMembersApi = (id: string, roles?: string[]) => {
+  const rolesAsString = roles ? roles.join(',') : '';
+  return getApi(`/admin/users/company/${id}/members?roles=${rolesAsString}`);
+};
+
 export const showCompanyApi = (id: string) =>
   getApi(`/admin/users/company/${id}`);
 

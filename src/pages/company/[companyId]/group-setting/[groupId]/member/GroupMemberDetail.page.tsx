@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
   addWorkspaceCompanyId,
-  BookerManageCompany,
+  companyThunks,
 } from '@redux/slices/company.slice';
 import { companyMemberThunks } from '@redux/slices/companyMember.slice';
 import { User } from '@utils/data';
@@ -59,7 +59,7 @@ const GroupMemberDetailPage: React.FC<GroupMemberDetailPageProps> = () => {
   useEffect(() => {
     const fetchData = async () => {
       dispatch(addWorkspaceCompanyId(companyId));
-      await dispatch(BookerManageCompany.companyInfo());
+      await dispatch(companyThunks.companyInfo());
     };
     fetchData();
   }, [companyId, dispatch]);

@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   addWorkspaceCompanyId,
-  BookerManageCompany,
+  companyThunks,
 } from '@redux/slices/company.slice';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -19,7 +19,7 @@ const CompanyDetailPage = () => {
   }, [companyId, dispatch, isReady]);
 
   useEffect(() => {
-    if (isReady) dispatch(BookerManageCompany.companyInfo());
+    if (isReady) dispatch(companyThunks.companyInfo());
   }, [isReady]);
   if (isCompanyNotFound) {
     return <div>Khong tim thay cong ty nay, xin vui long thu lai.</div>;

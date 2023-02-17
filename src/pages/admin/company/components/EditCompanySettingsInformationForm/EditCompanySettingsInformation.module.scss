@@ -1,0 +1,26 @@
+@use '/src/styles/vars.scss' as *;
+
+.companyLogoField {
+  height: 206px;
+  max-width: 928px;
+  margin: auto;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.addButtonWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: $neutralGray6;
+}
+
+.addIconWrapper {
+  border: 2px solid $neutralGray6;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+}

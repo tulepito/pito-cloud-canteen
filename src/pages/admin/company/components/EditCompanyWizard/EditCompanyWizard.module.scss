@@ -1,0 +1,13 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.backButton {
+  @include buttonColorSecondary;
+  outline-color: $neutralGray4;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

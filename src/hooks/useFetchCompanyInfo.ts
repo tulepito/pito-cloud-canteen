@@ -1,6 +1,6 @@
 import {
   addWorkspaceCompanyId,
-  BookerManageCompany,
+  companyThunks,
 } from '@redux/slices/company.slice';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -16,7 +16,7 @@ const useFetchCompanyInfo = () => {
     if (isReady && companyId !== '') {
       (async () => {
         dispatch(addWorkspaceCompanyId(companyId));
-        await dispatch(BookerManageCompany.companyInfo());
+        await dispatch(companyThunks.companyInfo());
       })();
     }
   }, [companyId, dispatch, isReady]);

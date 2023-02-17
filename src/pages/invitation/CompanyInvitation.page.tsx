@@ -2,7 +2,7 @@ import RedirectLink from '@components/RedirectLink/RedirectLink';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   addWorkspaceCompanyId,
-  BookerManageCompany,
+  companyThunks,
 } from '@redux/slices/company.slice';
 import { companyInvitationThunks } from '@redux/slices/companyInvitation.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
@@ -37,7 +37,7 @@ const CompanyInvitationPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       dispatch(addWorkspaceCompanyId(companyId));
-      await dispatch(BookerManageCompany.companyInfo());
+      await dispatch(companyThunks.companyInfo());
       dispatch(companyInvitationThunks.checkInvitation(companyId as string));
     };
     if (isReady) {

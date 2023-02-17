@@ -100,6 +100,11 @@ export enum ECompanyStatus {
   unactive = 0,
 }
 
+export enum ECompanyStates {
+  draft = 'draft',
+  published = 'published',
+}
+
 export enum EListingType {
   restaurant = 'restaurant',
   transaction = 'transaction',

@@ -183,7 +183,7 @@ const EditPartnerWizard = (props: any) => {
 
   useRedirectTabWizard({
     isNew,
-    listing: partnerListingRef,
+    entity: partnerListingRef,
     selectedTab: selectedTab as string,
     tabs: TABS,
     tabCompleted,

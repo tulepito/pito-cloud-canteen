@@ -3,11 +3,13 @@ import {
   checkEmailExistedApi,
   deleteMemberApi,
 } from '@apis/companyApi';
+import { queryCompanyMembersApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
+import { storableAxiosError } from '@utils/errors';
 import type { TUser } from '@utils/types';
 
-import { BookerManageCompany } from './company.slice';
+import { companyThunks } from './company.slice';
 
 interface TCompanyMemberState {
   company: TUser | null;
@@ -20,6 +22,9 @@ interface TCompanyMemberState {
 
   checkedEmailInputChunk: any[];
   checkEmailExistedInProgress: boolean;
+
+  queryMembersInProgress: boolean;
+  queryMemberError: any;
 }
 
 const initialState: TCompanyMemberState = {
@@ -33,11 +38,26 @@ const initialState: TCompanyMemberState = {
 
   checkedEmailInputChunk: [],
   checkEmailExistedInProgress: false,
+
+  queryMembersInProgress: false,
+  queryMemberError: null,
 };
 
 const CHECK_EMAILS_EXISTED = 'app/companyMember/CHECK_EMAILS_EXISTED';
 const ADD_MEMBERS = 'app/companyMember/ADD_MEMBERS';
 const DELETE_MEMBER = 'app/companyMember/DELETE_MEMBER';
+const QUERY_COMPANY_MEMBERS = 'app/companyMember/QUERY_COMPANY_MEMBERS';
+
+const queryCompanyMembers = createAsyncThunk(
+  QUERY_COMPANY_MEMBERS,
+  async (id: string) => {
+    const { data } = await queryCompanyMembersApi(id);
+    return data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
 
 const checkEmailExisted = createAsyncThunk(
   CHECK_EMAILS_EXISTED,
@@ -60,7 +80,7 @@ const addMembers = createAsyncThunk(
       ...params,
       companyId: workspaceCompanyId,
     });
-    await dispatch(BookerManageCompany.companyInfo());
+    await dispatch(companyThunks.companyInfo());
     return addMembersResponse;
   },
 );
@@ -81,6 +101,7 @@ export const companyMemberThunks = {
   addMembers,
   deleteMember,
   checkEmailExisted,
+  queryCompanyMembers,
 };
 
 export const companyMemberSlice = createSlice({
@@ -139,6 +160,21 @@ export const companyMemberSlice = createSlice({
         ...state,
         deleteMemberInProgress: false,
         deleteMemberError: error.message,
+      }))
+      .addCase(queryCompanyMembers.pending, (state) => ({
+        ...state,
+        queryMembersInProgress: true,
+        queryMemberError: null,
+      }))
+      .addCase(queryCompanyMembers.fulfilled, (state, { payload }) => ({
+        ...state,
+        queryMembersInProgress: false,
+        companyMembers: payload,
+      }))
+      .addCase(queryCompanyMembers.rejected, (state, { error }) => ({
+        ...state,
+        queryMemberError: error,
+        queryMembersInProgress: false,
       }));
   },
 });

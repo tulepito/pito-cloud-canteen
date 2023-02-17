@@ -20,7 +20,7 @@ export const getApi = (path: string, params: TObject = {}) => {
   // to convert JSONParams in to params
 
   return axios.get(`${apiBaseUrl()}${path}`, {
-    params: { JSONParams: JSON.stringify(params) },
+    ...(params ? { params: { JSONParams: JSON.stringify(params) } } : {}),
   });
 };
 

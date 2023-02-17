@@ -10,7 +10,7 @@ export type TFormTabChildrenProps = {
   tabId: string;
   tabLabel: string;
   tabLinkProps?: Record<any, any>;
-  disabled: boolean;
+  disabled?: boolean;
   selected: boolean;
   onClick?: () => void;
 };

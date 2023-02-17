@@ -4,7 +4,7 @@ import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { BookerManageCompany } from '@src/redux/slices/company.slice';
+import { companyThunks } from '@src/redux/slices/company.slice';
 import { User } from '@utils/data';
 import type { TObject } from '@utils/types';
 import { required } from '@utils/validators';
@@ -41,7 +41,7 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
       return !members.includes(id) ? result : result.concat([newItem]);
     }, []);
     dispatch(
-      BookerManageCompany.createGroup({
+      companyThunks.createGroup({
         groupInfo: {
           name: groupName,
         },

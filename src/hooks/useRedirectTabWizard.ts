@@ -1,19 +1,22 @@
-import type { TIntegrationListing, TListing } from '@utils/types';
+import type { TCompany, TIntegrationListing, TListing } from '@utils/types';
 import { isEqual } from 'lodash';
 import type { MutableRefObject } from 'react';
 import { useEffect, useRef } from 'react';
 
 const tabsActive = (
   isNew: boolean,
-  listing: any,
+  entity: any,
   tabs: string[],
-  tabCompleted: (tab: string, listing: TListing | TIntegrationListing) => void,
+  tabCompleted: (
+    tab: string,
+    entity: TListing | TIntegrationListing | TCompany,
+  ) => boolean,
 ) => {
   return tabs.reduce((acc, tab) => {
     const previousTabIndex = tabs.findIndex((t) => t === tab) - 1;
     const isActive =
       previousTabIndex >= 0
-        ? !isNew || tabCompleted(tabs[previousTabIndex], listing)
+        ? !isNew || tabCompleted(tabs[previousTabIndex], entity)
         : true;
     return { ...acc, [tab]: isActive };
   }, {});
@@ -21,28 +24,28 @@ const tabsActive = (
 
 type TUseRedirectTabWizard = {
   isNew: boolean;
-  listing: TListing | TIntegrationListing;
+  entity: TListing | TIntegrationListing | TCompany;
   selectedTab: string;
   tabs: string[];
   tabCompleted: (
     tab: string,
-    listing: TListing | TIntegrationListing,
+    entity: TListing | TIntegrationListing | TCompany,
   ) => boolean;
   handleRedirect: (nearestActiveTab: string) => void;
 };
 
 const useRedirectTabWizard = ({
   isNew,
-  listing,
+  entity,
   selectedTab,
   tabs,
   tabCompleted,
   handleRedirect,
 }: TUseRedirectTabWizard) => {
-  const listingRef = useRef(null) as MutableRefObject<
-    TListing | TIntegrationListing | null
+  const entityRef = useRef(null) as MutableRefObject<
+    TListing | TIntegrationListing | TCompany | null
   >;
-  const tabsStatus = tabsActive(isNew, listing, tabs, tabCompleted) as any;
+  const tabsStatus = tabsActive(isNew, entity, tabs, tabCompleted) as any;
   useEffect(() => {
     // If selectedTab is not active, redirect to the beginning of wizard
     if (!tabsStatus[selectedTab as string]) {
@@ -54,14 +57,14 @@ const useRedirectTabWizard = ({
 
       const shouldRedirect =
         nearestActiveTab &&
-        !listingRef.current &&
-        !isEqual(listingRef.current, listing);
+        !entityRef.current &&
+        !isEqual(entityRef.current, entity);
       if (shouldRedirect) {
         handleRedirect(nearestActiveTab);
-        listingRef.current = listing;
+        entityRef.current = entity;
       }
     }
-  }, [tabsStatus, selectedTab, tabs, handleRedirect, JSON.stringify(listing)]);
+  }, [tabsStatus, selectedTab, tabs, handleRedirect, JSON.stringify(entity)]);
 };
 
 export default useRedirectTabWizard;

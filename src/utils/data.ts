@@ -5,6 +5,7 @@ import reduce from 'lodash/reduce';
 import type {
   TAvailabilityException,
   TAvailabilityPlan,
+  TCompany,
   TCurrentUser,
   TIntegrationListing,
   TLineItemCode,
@@ -439,7 +440,7 @@ export const CurrentUser = (user: TCurrentUser) => {
   };
 };
 
-export const User = (user: TUser | TCurrentUser) => {
+export const User = (user: TUser | TCurrentUser | TCompany) => {
   const ensuredUser = ensureUser(user);
   const id = ensuredUser?.id?.uuid;
   const { attributes } = ensuredUser;

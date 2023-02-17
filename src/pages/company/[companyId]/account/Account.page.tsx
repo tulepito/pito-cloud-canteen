@@ -3,7 +3,7 @@ import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
-import { BookerManageCompany } from '@redux/slices/company.slice';
+import { companyThunks } from '@redux/slices/company.slice';
 import { resetImage } from '@redux/slices/uploadImage.slice';
 import { User } from '@utils/data';
 import type { TCurrentUser, TUser } from '@utils/types';
@@ -93,7 +93,7 @@ const AccountPage = () => {
       image && image.imageId && image.file
         ? { ...profile, profileImageId: image.imageId }
         : profile;
-    await dispatch(BookerManageCompany.updateBookerAccount(updatedValues));
+    await dispatch(companyThunks.updateBookerAccount(updatedValues));
     dispatch(resetImage());
     openConfirmationModal();
   };

@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { companyPaths } from '@src/paths';
-import { BookerManageCompany } from '@src/redux/slices/company.slice';
+import { companyThunks } from '@src/redux/slices/company.slice';
 import type { TObject } from '@utils/types';
 import filter from 'lodash/filter';
 import isEmpty from 'lodash/isEmpty';
@@ -177,9 +177,9 @@ const GroupDetailPage = () => {
 
   useFetchCompanyInfo();
   useEffect(() => {
-    dispatch(BookerManageCompany.groupInfo());
+    dispatch(companyThunks.groupInfo());
     dispatch(
-      BookerManageCompany.groupDetailInfo({
+      companyThunks.groupDetailInfo({
         groupId: groupId as string,
       }),
     );
@@ -195,7 +195,7 @@ const GroupDetailPage = () => {
 
   const onConfirmDeleteMember = async () => {
     const { meta } = await dispatch(
-      BookerManageCompany.updateGroup({
+      companyThunks.updateGroup({
         groupId,
         deletedMembers: [deletingMemberInfo],
       }),
@@ -203,7 +203,7 @@ const GroupDetailPage = () => {
     if (meta.requestStatus !== 'rejected') {
       closeDeleteMemberConfirmationModal();
       await dispatch(
-        BookerManageCompany.groupDetailInfo({
+        companyThunks.groupDetailInfo({
           groupId: groupId as string,
         }),
       );
@@ -211,7 +211,7 @@ const GroupDetailPage = () => {
   };
 
   const onConfirmDeleteGroup = () => {
-    dispatch(BookerManageCompany.deleteGroup(groupId as string)).then(
+    dispatch(companyThunks.deleteGroup(groupId as string)).then(
       ({ error }: any) => {
         if (!error) {
           onDeleteGroupConfirmationModalClose();
