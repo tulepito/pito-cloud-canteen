@@ -505,7 +505,6 @@ const ManageOrdersPage = () => {
                     name="meta_startDate"
                     selected={values.meta_startDate}
                     onChange={setStartDate}
-                    className={css.inputDate}
                     dateFormat={'dd MMMM, yyyy'}
                     placeholderText={'Nhập ngày bắt đầu'}
                     autoComplete="off"
@@ -515,7 +514,6 @@ const ManageOrdersPage = () => {
                     name="meta_endDate"
                     onChange={setEndDate}
                     selected={values.meta_endDate}
-                    className={css.inputDate}
                     dateFormat={'dd MMMM, yyyy'}
                     placeholderText={'Nhập ngày kết thúc'}
                     autoComplete="off"

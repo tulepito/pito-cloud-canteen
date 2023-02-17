@@ -248,6 +248,11 @@ const EditPartnerFoodFormComponent: React.FC<
           validate={required(
             intl.formatMessage({ id: 'EditPartnerFoodForm.categoryRequired' }),
           )}>
+          <option value="" disabled>
+            {intl.formatMessage({
+              id: 'EditPartnerFoodForm.categoryPlaceholder',
+            })}
+          </option>
           {CATEGORY_OPTIONS.filter((cate) => cate.key !== OTHER_OPTION).map(
             (cat) => (
               <option key={cat.key} value={cat.key}>
