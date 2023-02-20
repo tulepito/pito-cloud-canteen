@@ -152,9 +152,23 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       const router = useRouter();
       const dispatch = useAppDispatch();
 
-      const navigateToOrderDetailPage = () => {
+      const navigateToDraftOrderDetailPage = () => {
         router.push({
           pathname: companyPaths.EditDraftOrder,
+          query: { orderId },
+        });
+      };
+
+      const navigateToOrderDetailPage = () => {
+        router.push({
+          pathname: companyPaths.ManageOrderDetail,
+          query: { orderId },
+        });
+      };
+
+      const navigateToBookerManageOrderDetailPage = () => {
+        router.push({
+          pathname: '/orders/[orderId]',
           query: { orderId },
         });
       };
@@ -173,31 +187,49 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         className: css.actionButton,
       };
 
-      const cancelOrderButton = (
-        <Button key={'cancelOrderButton'} {...secondaryButtonProps}>
+      const deleteDraftButton = (
+        <Button
+          key={'deleteDraftButton'}
+          {...secondaryButtonProps}
+          onClick={handleDeleteDraftOrder}>
           {intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.actionBtn.cancelOrder',
+            id: 'ManageCompanyOrdersPage.actionBtn.deleteDraft',
           })}
         </Button>
       );
-      const updateOrderButton = (
-        <Button key={'updateOrderButton'} {...secondaryButtonProps}>
+      const cancelPickingOrderButton = (
+        <Button key={'cancelPickingOrderButton'} {...secondaryButtonProps}>
           {intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.actionBtn.updateOrder',
+            id: 'ManageCompanyOrdersPage.actionBtn.cancelPickingOrder',
+          })}
+        </Button>
+      );
+      const cancelPendingApprovalOrderButton = (
+        <Button
+          key={'cancelPendingApprovalOrderButton'}
+          {...secondaryButtonProps}>
+          {intl.formatMessage({
+            id: 'ManageCompanyOrdersPage.actionBtn.cancelPendingApprovalOrder',
+          })}
+        </Button>
+      );
+      const updatePlanOrderDetailButton = (
+        <Button
+          key={'updatePlanOrderDetailButton'}
+          {...secondaryButtonProps}
+          onClick={navigateToBookerManageOrderDetailPage}>
+          {intl.formatMessage({
+            id: 'ManageCompanyOrdersPage.actionBtn.updatePlanOrderDetailButton',
           })}
         </Button>
       );
       const viewDetailButton = (
-        <Button key={'viewDetailButton'} {...secondaryButtonProps}>
+        <Button
+          key={'viewDetailButton'}
+          {...secondaryButtonProps}
+          onClick={navigateToOrderDetailPage}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.viewOrderDetail',
-          })}
-        </Button>
-      );
-      const reorderButton = (
-        <Button key={'reorderButton'} {...secondaryButtonProps}>
-          {intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.actionBtn.reorder',
           })}
         </Button>
       );
@@ -205,16 +237,9 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         <Button
           key={'completeOrderButton'}
           {...secondaryButtonProps}
-          onClick={navigateToOrderDetailPage}>
+          onClick={navigateToDraftOrderDetailPage}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.completeOrder',
-          })}
-        </Button>
-      );
-      const reviewOrderButton = (
-        <Button key={'reviewOrderButton'} {...secondaryButtonProps}>
-          {intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.actionBtn.reviewOrder',
           })}
         </Button>
       );
@@ -225,13 +250,17 @@ export const CompanyOrdersTableColumns: TColumn[] = [
           })}
         </Button>
       );
-      const deleteDraftButton = (
-        <Button
-          key={'deleteDraftButton'}
-          {...secondaryButtonProps}
-          onClick={handleDeleteDraftOrder}>
+      const reviewOrderButton = (
+        <Button key={'reviewOrderButton'} {...secondaryButtonProps} disabled>
           {intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.actionBtn.deleteDraft',
+            id: 'ManageCompanyOrdersPage.actionBtn.reviewOrder',
+          })}
+        </Button>
+      );
+      const reorderButton = (
+        <Button key={'reorderButton'} {...secondaryButtonProps} disabled>
+          {intl.formatMessage({
+            id: 'ManageCompanyOrdersPage.actionBtn.reorder',
           })}
         </Button>
       );
@@ -243,10 +272,14 @@ export const CompanyOrdersTableColumns: TColumn[] = [
           buttonList = [completeOrderButton, deleteDraftButton];
           break;
         case EOrderDraftStates.pendingApproval:
-          buttonList = [completeOrderButton, deleteDraftButton];
+          buttonList = [completeOrderButton, cancelPendingApprovalOrderButton];
           break;
         case EOrderStates.picking:
-          buttonList = [cancelOrderButton, updateOrderButton, copyLinkButton];
+          buttonList = [
+            updatePlanOrderDetailButton,
+            cancelPickingOrderButton,
+            copyLinkButton,
+          ];
           break;
         case EOrderStates.canceled:
           break;
@@ -254,10 +287,14 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         case EOrderStates.inProgress:
           buttonList = [viewDetailButton];
           break;
+        case EOrderStates.pendingPayment:
+          buttonList = [reviewOrderButton, reorderButton];
+          break;
         case EOrderStates.completed:
-          buttonList = [reviewOrderButton, reorderButton, copyLinkButton];
+          buttonList = [reorderButton];
           break;
         case EOrderStates.reviewed:
+          buttonList = [reorderButton];
           break;
         default:
           break;

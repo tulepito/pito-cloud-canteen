@@ -602,8 +602,8 @@ export enum EOrderStates {
   canceledByBooker = 'canceledByBooker',
   picking = 'picking',
   inProgress = 'inProgress',
-  completed = 'completed',
   pendingPayment = 'pendingPayment',
+  completed = 'completed',
   reviewed = 'reviewed',
 }
 
