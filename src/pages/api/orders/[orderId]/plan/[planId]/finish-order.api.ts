@@ -1,8 +1,9 @@
-/* eslint-disable no-console */
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { HttpMethod } from '@apis/configs';
 import { handleError } from '@services/sdk';
+import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+import { initiateTransaction } from './initiate-transaction.service';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -12,6 +13,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       case HttpMethod.GET:
         break;
       case HttpMethod.POST:
+        {
+          const { orderId, planId } = req.body;
+          if (isEmpty(orderId) || isEmpty(planId)) {
+            res.status(400).json({ error: 'Missing orderId or planId' });
+          }
+
+          await initiateTransaction({ orderId, planId });
+        }
         break;
       case HttpMethod.DELETE:
         break;

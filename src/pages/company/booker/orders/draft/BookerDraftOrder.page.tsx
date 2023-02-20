@@ -94,6 +94,12 @@ function BookerDraftOrderPage() {
     );
   };
 
+  const handleFinishOrder =
+    ({ planId }: { orderId: string; planId: string }) =>
+    () => {
+      dispatch(orderAsyncActions.bookerFinishOrder({ orderId, planId }));
+    };
+
   return (
     <Layout className={css.root}>
       <LayoutSidebar
@@ -118,7 +124,7 @@ function BookerDraftOrderPage() {
             )}
             companyLogo="Company"
             hideMonthView
-            resources={{ planId: plans?.[0], startDate, endDate }}
+            resources={{ orderId, planId: plans?.[0], startDate, endDate }}
             components={{
               contentEnd: (props: any) => (
                 <AddMorePlan
@@ -128,7 +134,19 @@ function BookerDraftOrderPage() {
                   endDate={props?.resources?.endDate}
                 />
               ),
-              toolbar: (props) => <Toolbar {...props} />,
+              toolbar: (props) => {
+                // eslint-disable-next-line @typescript-eslint/no-shadow
+                const { planId, orderId } = props.resources || {};
+                return (
+                  <Toolbar
+                    {...props}
+                    onFinishOrder={handleFinishOrder({
+                      planId,
+                      orderId,
+                    })}
+                  />
+                );
+              },
             }}
           />
         </div>

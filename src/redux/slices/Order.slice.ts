@@ -3,6 +3,7 @@ import { fetchUserApi } from '@apis/index';
 import type { TUpdateOrderApiBody } from '@apis/orderApi';
 import {
   bookerDeleteDraftOrderApi,
+  bookerFinishOrderApi,
   createBookerOrderApi,
   publishDraftOrderApi,
   queryOrdersApi,
@@ -58,8 +59,8 @@ type TOrderInitialState = {
   fetchOrderDetailInProgress: boolean;
   fetchOrderDetailError: any;
 
-  initiateTransactionsInProgress: boolean;
-  initiateTransactionsError: any;
+  bookerFinishOrderInProgress: boolean;
+  bookerFinishOrderError: any;
 
   // Manage Orders Page
   queryParams: TObject;
@@ -77,15 +78,6 @@ type TOrderInitialState = {
   };
   manageOrdersPagination: TPagination;
 };
-
-const CREATE_ORDER = 'app/Order/CREATE_ORDER';
-const UPDATE_ORDER = 'app/Order/UPDATE_ORDER';
-const FETCH_COMPANY_BOOKERS = 'app/Order/FETCH_COMPANY_BOOKERS';
-const FETCH_ORDER = 'app/Order/FETCH_ORDER';
-const FETCH_ORDER_DETAIL = 'app/Order/FETCH_ORDER_DETAIL';
-const INITIATE_TRANSACTIONS = 'app/Order/INITIATE_TRANSACTIONS';
-const QUERY_SUB_ORDERS = 'app/Order/QUERY_SUB_ORDERS';
-const UPDATE_PLAN_DETAIL = 'app/Order/UPDATE_PLAN_DETAIL';
 
 const initialState: TOrderInitialState = {
   order: null,
@@ -118,8 +110,8 @@ const initialState: TOrderInitialState = {
   fetchOrderDetailInProgress: false,
   fetchOrderDetailError: null,
 
-  initiateTransactionsInProgress: false,
-  initiateTransactionsError: null,
+  bookerFinishOrderInProgress: false,
+  bookerFinishOrderError: null,
 
   // Manage Orders
   queryParams: {},
@@ -142,6 +134,14 @@ const initialState: TOrderInitialState = {
     [EManageCompanyOrdersTab.ALL]: 0,
   },
 };
+
+const CREATE_ORDER = 'app/Order/CREATE_ORDER';
+const UPDATE_ORDER = 'app/Order/UPDATE_ORDER';
+const FETCH_COMPANY_BOOKERS = 'app/Order/FETCH_COMPANY_BOOKERS';
+const FETCH_ORDER = 'app/Order/FETCH_ORDER';
+const FETCH_ORDER_DETAIL = 'app/Order/FETCH_ORDER_DETAIL';
+const QUERY_SUB_ORDERS = 'app/Order/QUERY_SUB_ORDERS';
+const UPDATE_PLAN_DETAIL = 'app/Order/UPDATE_PLAN_DETAIL';
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
   const { clientId, bookerId, isCreatedByAdmin = false } = params;
@@ -232,14 +232,6 @@ const updateOrder = createAsyncThunk(
       orderListing,
       orderDetail: orderDetailParams || orderDetail,
     };
-  },
-);
-
-const initiateTransactions = createAsyncThunk(
-  INITIATE_TRANSACTIONS,
-  async (_) => {
-    // await initiateTransactionsApi(params);
-    return '';
   },
 );
 
@@ -387,6 +379,16 @@ const publishDraftOrder = createAsyncThunk(
   },
 );
 
+const bookerFinishOrder = createAsyncThunk(
+  'app/Order/BOOKER_FINISH_ORDER',
+  async ({ orderId, planId }: TObject) => {
+    await bookerFinishOrderApi({ orderId, planId });
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -394,11 +396,11 @@ export const orderAsyncActions = {
   fetchCompanyBookers,
   fetchOrder,
   fetchOrderDetail,
-  initiateTransactions,
   queryOrders,
   queryCompanyOrders,
   updatePlanDetail,
   publishDraftOrder,
+  bookerFinishOrder,
 };
 
 const orderSlice = createSlice({
@@ -520,21 +522,6 @@ const orderSlice = createSlice({
         ...state,
         updateOrderInProgress: false,
         updateOrderError: error.message,
-      }))
-
-      .addCase(initiateTransactions.pending, (state) => ({
-        ...state,
-        initiateTransactionsError: null,
-        initiateTransactionsInProgress: true,
-      }))
-      .addCase(initiateTransactions.fulfilled, (state) => ({
-        ...state,
-        initiateTransactionsInProgress: false,
-      }))
-      .addCase(initiateTransactions.rejected, (state, { payload }) => ({
-        ...state,
-        initiateTransactionsInProgress: false,
-        initiateTransactionsError: payload,
       }))
       .addCase(queryOrders.pending, (state) => ({
         ...state,
@@ -670,6 +657,21 @@ const orderSlice = createSlice({
         ...state,
         updateOrderInProgress: false,
         updateOrderError: error.message,
+      }))
+      /* =============== bookerFinishOrder =============== */
+      .addCase(bookerFinishOrder.pending, (state) => ({
+        ...state,
+        bookerFinishOrderError: null,
+        bookerFinishOrderInProgress: true,
+      }))
+      .addCase(bookerFinishOrder.fulfilled, (state) => ({
+        ...state,
+        bookerFinishOrderInProgress: false,
+      }))
+      .addCase(bookerFinishOrder.rejected, (state, { payload }) => ({
+        ...state,
+        bookerFinishOrderInProgress: false,
+        bookerFinishOrderError: payload,
       }));
   },
 });

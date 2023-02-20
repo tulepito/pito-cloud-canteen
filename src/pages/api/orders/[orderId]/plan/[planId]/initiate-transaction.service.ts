@@ -54,6 +54,11 @@ const normalizeOrderDetail = ({
         restaurant: { id: restaurantId, foodList = {} },
         memberOrders: memberOrdersMap,
       } = orderOfDate;
+      const startDate = DateTime.fromMillis(Number(date));
+      const bookingStart = startDate
+        .plus({ ...convertHHmmStringToTimeParts(deliveryHour) })
+        .toMillis();
+      const bookingEnd = startDate.plus({ days: 1 }).toMillis();
 
       const { participantIds, bookingInfo } = Object.entries(
         memberOrdersMap,
@@ -82,12 +87,6 @@ const normalizeOrderDetail = ({
         },
         { participantIds: [], bookingInfo: [] },
       );
-
-      const startDate = DateTime.fromMillis(Number(date));
-      const bookingStart = startDate
-        .plus({ ...convertHHmmStringToTimeParts(deliveryHour) })
-        .toMillis();
-      const bookingEnd = startDate.plus({ days: 1 }).toMillis();
 
       const extendedData = {
         metadata: {
@@ -118,8 +117,8 @@ export const initiateTransaction = async ({
   orderId: string;
   planId: string;
 }) => {
+  // Query order and plan listing
   const integrationSdk = getIntegrationSdk();
-
   const [orderListing] = denormalisedResponseEntities(
     await integrationSdk.listings.show({
       id: orderId,
@@ -131,19 +130,29 @@ export const initiateTransaction = async ({
     }),
   );
 
-  const { companyId, deliveryHour } = Listing(orderListing).getMetadata();
+  const {
+    companyId,
+    deliveryHour,
+    plans = [],
+  } = Listing(orderListing).getMetadata();
+
+  if (plans.length === 0 || !plans.includes(planId)) {
+    throw new Error(`Invalid planId, ${planId}`);
+  }
+
   const companyAccount = await fetchUser(companyId);
   const { subAccountId } = companyAccount.attributes.profile.privateData;
   const companySubAccount = await fetchUser(subAccountId);
   const subAccountTrustedSdk = await getSubAccountTrustedSdk(companySubAccount);
-
   const { orderDetail: planOrderDetail } = Listing(planListing).getMetadata();
 
+  // Normalize order detail
   const normalizedOrderDetail = normalizeOrderDetail({
     planOrderDetail,
     deliveryHour,
   });
 
+  // Initiate transaction for each date
   await Promise.all(
     normalizedOrderDetail.map(async (item) => {
       const {

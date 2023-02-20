@@ -16,10 +16,11 @@ export type TToolbarProps = {
   onNavigate: (action: string) => void;
   onView: (name: string) => void;
   companyLogo?: ReactNode;
+  onFinishOrder: () => void;
 };
 
 const Toolbar: React.FC<TToolbarProps> = (props) => {
-  const { label, onNavigate } = props;
+  const { label, onNavigate, onFinishOrder } = props;
   const intl = useIntl();
 
   const navigateFunc = (action: string) => () => {
@@ -48,7 +49,7 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
             id: 'Booker.CreateOrder.Toolbar.suggestNewRestaurant',
           })}
         </Button>
-        <Button variant="cta">
+        <Button variant="cta" onClick={onFinishOrder} disabled>
           {intl.formatMessage({ id: 'Booker.CreateOrder.Toolbar.finish' })}
         </Button>
       </div>
