@@ -93,3 +93,7 @@ export const bookerFinishOrderApi = ({
 }) => {
   return putApi(`/orders/${orderId}/plan/${planId}/finish-order`);
 };
+
+export const cancelPickingOrderApi = (orderId: string) => {
+  return putApi(`/orders/${orderId}/cancel-picking-order`);
+};

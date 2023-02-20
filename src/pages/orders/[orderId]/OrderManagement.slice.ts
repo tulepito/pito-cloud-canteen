@@ -1,6 +1,7 @@
 import {
   addParticipantToOrderApi,
   addUpdateMemberOrder,
+  cancelPickingOrderApi,
   deleteParticipantFromOrderApi,
   getBookerOrderDataApi,
   sendRemindEmailToMemberApi,
@@ -10,6 +11,7 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
 import { EParticipantOrderStatus } from '@utils/enums';
+import { storableError } from '@utils/errors';
 import type { TCompany, TObject, TUser } from '@utils/types';
 import omit from 'lodash/omit';
 
@@ -23,6 +25,10 @@ type TOrderManagementState = {
   isUpdatingOrderDetails: boolean;
   // Send email state
   isSendingRemindEmail: boolean;
+  // Cancel order state
+  cancelPickingOrderInProgress: boolean;
+  cancelPickingOrderError: any;
+
   // Data states
   companyId: string | null;
   companyData: TCompany | null;
@@ -37,6 +43,8 @@ const initialState: TOrderManagementState = {
   isDeletingParticipant: false,
   isUpdatingOrderDetails: false,
   isSendingRemindEmail: false,
+  cancelPickingOrderInProgress: false,
+  cancelPickingOrderError: null,
   companyId: null,
   companyData: null,
   orderData: {},
@@ -423,6 +431,16 @@ const startPickingOrder = createAsyncThunk(
   },
 );
 
+const cancelPickingOrder = createAsyncThunk(
+  'app/OrderManagement/CANCEL_PICKING_ORDER',
+  async (orderId: string) => {
+    await cancelPickingOrderApi(orderId);
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
 export const orderManagementThunks = {
   loadData,
   updateOrderGeneralInfo,
@@ -434,6 +452,7 @@ export const orderManagementThunks = {
   addParticipant,
   deleteParticipant,
   startPickingOrder,
+  cancelPickingOrder,
 };
 
 // ================ Slice ================ //
@@ -506,7 +525,22 @@ const OrderManagementSlice = createSlice({
       })
       .addCase(startPickingOrder.rejected, (state) => {
         state.isUpdatingOrderDetails = false;
-      });
+      })
+      /* =============== cancelPickingOrder =============== */
+      .addCase(cancelPickingOrder.pending, (state) => ({
+        ...state,
+        cancelPickingOrderInProgress: true,
+        cancelPickingOrderError: null,
+      }))
+      .addCase(cancelPickingOrder.fulfilled, (state) => ({
+        ...state,
+        cancelPickingOrderInProgress: false,
+      }))
+      .addCase(cancelPickingOrder.rejected, (state, { payload }) => ({
+        ...state,
+        cancelPickingOrderInProgress: false,
+        cancelPickingOrderError: payload,
+      }));
   },
 });
 
