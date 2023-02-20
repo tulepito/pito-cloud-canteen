@@ -6,7 +6,7 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
 import { Listing } from '@utils/data';
-import { EOrderStates } from '@utils/enums';
+import { EOrderDraftStates } from '@utils/enums';
 import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -33,7 +33,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const { orderState, orderStateHistory = [] } =
             Listing(orderListing).getMetadata();
 
-          if (orderState !== EOrderStates.draft) {
+          if (orderState !== EOrderDraftStates.draft) {
             throw new Error(
               'You can publish draft order (with orderState is "draft") only',
             );
@@ -44,14 +44,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const initOrderStateHistory = isEmpty(orderStateHistory)
             ? [
                 {
-                  state: EOrderStates.draft,
+                  state: EOrderDraftStates.draft,
                   time: updateTime,
                 },
               ]
-            : [...orderStateHistory];
+            : orderStateHistory;
           const updateOrderStateHistory = initOrderStateHistory.concat([
             {
-              state: EOrderStates.isNew,
+              state: EOrderDraftStates.pendingApproval,
               time: updateTime,
             },
           ]);
@@ -61,7 +61,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               {
                 id: orderId,
                 metadata: {
-                  orderState: EOrderStates.isNew,
+                  orderState: EOrderDraftStates.pendingApproval,
                   orderStateHistory: updateOrderStateHistory,
                 },
               },

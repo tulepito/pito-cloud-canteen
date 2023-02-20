@@ -6,13 +6,11 @@ import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppDispatch } from '@hooks/reduxHooks';
-import {
-  BADGE_CLASSNAME_BASE_ON_ORDER_STATE,
-  BADGE_TYPE_BASE_ON_ORDER_STATE,
-} from '@pages/admin/order/ManageOrders.page';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { companyPaths } from '@src/paths';
 import {
+  EBookerOrderDraftStates,
+  EOrderDraftStates,
   EOrderStates,
   getLabelByKey,
   ORDER_STATES_OPTIONS,
@@ -24,6 +22,28 @@ import type { ReactNode } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './CompanyOrdersTable.module.scss';
+
+const BADGE_TYPE_BASE_ON_ORDER_STATE = {
+  [EBookerOrderDraftStates.bookerDraft]: EBadgeType.DEFAULT,
+  [EOrderStates.canceled]: EBadgeType.DEFAULT,
+  [EOrderStates.canceledByBooker]: EBadgeType.DEFAULT,
+  [EOrderStates.completed]: EBadgeType.WARNING,
+  [EOrderStates.inProgress]: EBadgeType.PROCESSING,
+  [EOrderStates.pendingPayment]: EBadgeType.PROCESSING,
+  [EOrderStates.picking]: EBadgeType.WARNING,
+  [EOrderStates.reviewed]: EBadgeType.WARNING,
+};
+
+const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
+  [EBookerOrderDraftStates.bookerDraft]: css.badgeDefault,
+  [EOrderStates.canceled]: css.badgeDefault,
+  [EOrderStates.canceledByBooker]: css.badgeDefault,
+  [EOrderStates.completed]: css.badgeSuccess,
+  [EOrderStates.inProgress]: css.badgeInProgress,
+  [EOrderStates.pendingPayment]: css.badgeProcessing,
+  [EOrderStates.picking]: css.badgeWarning,
+  [EOrderStates.reviewed]: css.badgeWarning,
+};
 
 export const CompanyOrdersTableColumns: TColumn[] = [
   {
@@ -104,7 +124,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         <Badge
           containerClassName={classNames(
             css.badge,
-            BADGE_CLASSNAME_BASE_ON_ORDER_STATE[state],
+            BADGE_CLASS_NAME_BASE_ON_ORDER_STATE[state],
           )}
           labelClassName={css.badgeLabel}
           type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.DEFAULT}
@@ -121,7 +141,10 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       id: orderId,
       companyId,
     }: {
-      state: EOrderStates;
+      state:
+        | EOrderStates
+        | EBookerOrderDraftStates
+        | EOrderDraftStates.pendingApproval;
       id: string;
       companyId: string;
     }) => {
@@ -216,7 +239,10 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       let buttonList: Array<ReactNode> = [];
 
       switch (state) {
-        case EOrderStates.isNew:
+        case EBookerOrderDraftStates.bookerDraft:
+          buttonList = [completeOrderButton, deleteDraftButton];
+          break;
+        case EOrderDraftStates.pendingApproval:
           buttonList = [completeOrderButton, deleteDraftButton];
           break;
         case EOrderStates.picking:

@@ -3,7 +3,11 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
-import { EListingStates, EOrderStates } from '@utils/enums';
+import {
+  EBookerOrderDraftStates,
+  EListingStates,
+  EOrderDraftStates,
+} from '@utils/enums';
 
 const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 
@@ -38,18 +42,14 @@ const createOrder = async ({
     .padStart(5, '0')}`;
 
   // Prepare order state history
-  const initStateHistory = [
+  const orderStateHistory = [
     {
-      state: EOrderStates.draft,
+      state: isCreatedByAdmin
+        ? EOrderDraftStates.draft
+        : EBookerOrderDraftStates.bookerDraft,
       time: createdAt,
     },
   ];
-  const orderStateHistory = isCreatedByAdmin
-    ? initStateHistory
-    : initStateHistory.push({
-        state: EOrderStates.isNew,
-        time: createdAt,
-      });
 
   // Call api to create order listing
   const orderListingResponse = await integrationSdk.listings.create(
@@ -61,7 +61,9 @@ const createOrder = async ({
         companyId,
         bookerId,
         listingType: ListingTypes.ORDER,
-        orderState: isCreatedByAdmin ? EOrderStates.draft : EOrderStates.isNew,
+        orderState: isCreatedByAdmin
+          ? EOrderDraftStates.draft
+          : EBookerOrderDraftStates.bookerDraft,
         orderStateHistory,
       },
     },

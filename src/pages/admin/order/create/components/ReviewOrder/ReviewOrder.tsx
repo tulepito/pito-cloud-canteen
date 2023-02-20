@@ -11,7 +11,7 @@ import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import { parseTimestampToFormat } from '@utils/dates';
-import { EOrderStates } from '@utils/enums';
+import { EOrderDraftStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
@@ -235,7 +235,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const onSubmit = async (values: any) => {
     const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
 
-    if (orderState === EOrderStates.draft) {
+    if (orderState === EOrderDraftStates.draft) {
       await dispatch(orderAsyncActions.publishDraftOrder({ orderId }));
     }
 

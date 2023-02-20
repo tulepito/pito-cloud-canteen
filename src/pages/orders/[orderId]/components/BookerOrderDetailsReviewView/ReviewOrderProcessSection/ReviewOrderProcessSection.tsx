@@ -2,7 +2,11 @@ import ActivityItem from '@components/TimeLine/ActivityItem';
 import VerticalTimeLine from '@components/TimeLine/VerticalTimeLine';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@utils/data';
-import { EOrderStates } from '@utils/enums';
+import {
+  EBookerOrderDraftStates,
+  EOrderDraftStates,
+  EOrderStates,
+} from '@utils/enums';
 import type { TListing, TOrderStateHistory } from '@utils/types';
 import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
@@ -20,9 +24,10 @@ const findCurrentActiveIndex = (orderStateHistory = []) => {
   ] as TOrderStateHistory;
 
   switch (latestHistory.state) {
-    case EOrderStates.draft:
+    case EOrderDraftStates.draft:
       return 0;
-    case EOrderStates.isNew:
+    case EOrderDraftStates.pendingApproval:
+    case EBookerOrderDraftStates.bookerDraft:
       return 1;
     case EOrderStates.picking:
       return 2;
@@ -40,7 +45,7 @@ const prepareItemData = (orderStateHistory: TOrderStateHistory[] = []) => {
 
   orderStateHistory.forEach(({ state, time }) => {
     switch (state) {
-      case EOrderStates.draft:
+      case EOrderDraftStates.pendingApproval:
         parsedCreateOrderTime =
           DateTime.fromMillis(time).toFormat('HH:mm - dd/MM/yyyy');
         break;

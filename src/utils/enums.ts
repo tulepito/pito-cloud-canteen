@@ -598,8 +598,6 @@ export const MENU_OPTIONS = [
 ];
 
 export enum EOrderStates {
-  draft = 'draft',
-  isNew = 'isNew',
   canceled = 'canceled',
   canceledByBooker = 'canceledByBooker',
   picking = 'picking',
@@ -607,6 +605,14 @@ export enum EOrderStates {
   completed = 'completed',
   pendingPayment = 'pendingPayment',
   reviewed = 'reviewed',
+}
+
+export enum EBookerOrderDraftStates {
+  bookerDraft = 'bookerDraft',
+}
+export enum EOrderDraftStates {
+  draft = 'draft',
+  pendingApproval = 'pendingApproval',
 }
 
 export const SPECIAL_DIET_OPTIONS = [
@@ -671,11 +677,19 @@ export const ORDER_STATES_OPTIONS = [
     label: 'Hủy',
   },
   {
-    key: EOrderStates.isNew,
+    key: EOrderStates.canceledByBooker,
+    label: 'Hủy',
+  },
+  {
+    key: EOrderDraftStates.pendingApproval,
     label: 'Đơn mới',
   },
   {
-    key: EOrderStates.draft,
+    key: EOrderDraftStates.draft,
+    label: 'Đơn nháp',
+  },
+  {
+    key: EBookerOrderDraftStates.bookerDraft,
     label: 'Đơn nháp',
   },
   {
@@ -744,7 +758,8 @@ export enum EManageCompanyOrdersTab {
 
 export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
   [EManageCompanyOrdersTab.ALL]: [
-    EOrderStates.isNew,
+    EOrderDraftStates.pendingApproval,
+    EBookerOrderDraftStates.bookerDraft,
     EOrderStates.picking,
     EOrderStates.inProgress,
     EOrderStates.completed,
@@ -759,6 +774,9 @@ export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
     EOrderStates.completed,
     EOrderStates.reviewed,
   ],
-  [EManageCompanyOrdersTab.DRAFT]: [EOrderStates.isNew],
+  [EManageCompanyOrdersTab.DRAFT]: [
+    EOrderDraftStates.pendingApproval,
+    EBookerOrderDraftStates.bookerDraft,
+  ],
   [EManageCompanyOrdersTab.CANCELED]: [EOrderStates.canceled],
 };

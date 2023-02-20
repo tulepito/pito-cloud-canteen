@@ -2,7 +2,7 @@ import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { companyPaths } from '@src/paths';
 import { Listing } from '@utils/data';
-import { EOrderStates } from '@utils/enums';
+import { EOrderDraftStates, EOrderStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -112,7 +112,7 @@ const BookerOrderDetailsPage = () => {
 
   useEffect(() => {
     setViewMode(
-      orderState === EOrderStates.isNew
+      orderState === EOrderDraftStates.pendingApproval
         ? EPageViewMode.edit
         : EPageViewMode.review,
     );
@@ -121,11 +121,10 @@ const BookerOrderDetailsPage = () => {
   useEffect(() => {
     if (isRouterReady && orderState) {
       switch (orderState) {
-        case EOrderStates.isNew:
+        case EOrderDraftStates.pendingApproval:
         case EOrderStates.picking:
           break;
-        case EOrderStates.draft:
-          console.log('go draft');
+        case EOrderDraftStates.draft:
           router.push(companyPaths.ManageOrders);
           break;
         default:

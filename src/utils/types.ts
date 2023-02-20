@@ -5,11 +5,13 @@ import type { NextPage } from 'next';
 
 import type {
   EAvailabilityPlans,
+  EBookerOrderDraftStates,
   EBookingStates,
   EDayOfWeek,
   EErrorCode,
   EImageVariants,
   EListingStates,
+  EOrderDraftStates,
   EOrderStates,
   EReviewRatings,
   EReviewTypes,
@@ -470,6 +472,6 @@ export type TIntegrationOrderListing = {
 };
 
 export type TOrderStateHistory = {
-  state: EOrderStates;
+  state: EOrderStates | EOrderDraftStates | EBookerOrderDraftStates;
   time: number;
 };

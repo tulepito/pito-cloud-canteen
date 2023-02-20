@@ -17,7 +17,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import { convertWeekDay, getSeparatedDates } from '@utils/dates';
-import { EOrderStates } from '@utils/enums';
+import { EManageCompanyOrdersTab } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TPagination } from '@utils/types';
 import { DateTime } from 'luxon';
@@ -69,11 +69,11 @@ type TOrderInitialState = {
   deleteDraftOrderInProgress: boolean;
   deleteDraftOrderError: any;
   totalItemMap: {
-    [EOrderStates.picking]: number;
-    [EOrderStates.completed]: number;
-    [EOrderStates.isNew]: number;
-    [EOrderStates.canceled]: number;
-    all: number;
+    [EManageCompanyOrdersTab.SCHEDULED]: number;
+    [EManageCompanyOrdersTab.CANCELED]: number;
+    [EManageCompanyOrdersTab.DRAFT]: number;
+    [EManageCompanyOrdersTab.COMPLETED]: number;
+    [EManageCompanyOrdersTab.ALL]: number;
   };
   manageOrdersPagination: TPagination;
 };
@@ -135,11 +135,11 @@ const initialState: TOrderInitialState = {
     perPage: 0,
   },
   totalItemMap: {
-    [EOrderStates.picking]: 0,
-    [EOrderStates.completed]: 0,
-    [EOrderStates.isNew]: 0,
-    [EOrderStates.canceled]: 0,
-    all: 0,
+    [EManageCompanyOrdersTab.SCHEDULED]: 0,
+    [EManageCompanyOrdersTab.CANCELED]: 0,
+    [EManageCompanyOrdersTab.DRAFT]: 0,
+    [EManageCompanyOrdersTab.COMPLETED]: 0,
+    [EManageCompanyOrdersTab.ALL]: 0,
   },
 };
 
