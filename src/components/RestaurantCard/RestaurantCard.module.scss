@@ -20,6 +20,7 @@
   @include textTemplate(14px, 700, 24px);
   color: $labelBlue2;
   background-color: $labelBlue1;
+  z-index: 1;
 }
 
 .gift {
@@ -32,6 +33,7 @@
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 12px;
+  position: relative;
   cursor: pointer;
 }
 

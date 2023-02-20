@@ -12,12 +12,19 @@ type TResultListProps = {
   className?: string;
   restaurants?: any[];
   isLoading?: boolean;
+  companyGeoOrigin: {
+    lat: number;
+    lng: number;
+  };
+  totalRatings: any[];
 };
 
 const ResultList: React.FC<TResultListProps> = ({
   className,
   restaurants = [],
   isLoading,
+  companyGeoOrigin,
+  totalRatings,
 }) => {
   const detailModal = useBoolean(false);
 
@@ -40,6 +47,9 @@ const ResultList: React.FC<TResultListProps> = ({
               onClick={detailModal.setTrue}
               key={restaurant?.id.uuid}
               className={css.card}
+              restaurant={restaurant}
+              companyGeoOrigin={companyGeoOrigin}
+              totalRatings={totalRatings}
             />
           ))}
       </div>

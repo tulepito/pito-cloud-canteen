@@ -1,4 +1,4 @@
-import { SearchFilterThunks } from '@redux/slices/SearchFilter.slice';
+import { BookerDraftOrderPageThunks } from '@redux/slices/BookerDraftOrderPage.slice';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
@@ -11,7 +11,7 @@ const useFetchSearchFilters = () => {
   useEffect(() => {
     if (isReady) {
       (async () => {
-        await dispatch(SearchFilterThunks.fetchSearchFilter());
+        await dispatch(BookerDraftOrderPageThunks.fetchSearchFilter());
       })();
     }
   }, [dispatch, isReady]);
