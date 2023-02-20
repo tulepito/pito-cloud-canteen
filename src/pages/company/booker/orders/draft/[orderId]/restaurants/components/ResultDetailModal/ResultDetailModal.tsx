@@ -2,8 +2,9 @@ import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import Modal from '@components/Modal/Modal';
 import useBoolean from '@hooks/useBoolean';
+import type { TListing } from '@utils/types';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import FoodDetailModal from '../FoodDetailModal/FoodDetailModal';
@@ -18,20 +19,62 @@ type TResultDetailModalProps = {
   isOpen?: boolean;
   onClose?: () => void;
   onClickFood?: () => void;
+  selectedRestaurantId?: string;
+  restaurantFood: {
+    [restaurantId: string]: TListing[];
+  };
 };
 
 const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   isOpen = false,
   onClose = () => null,
+  restaurantFood,
+  selectedRestaurantId,
 }) => {
   const intl = useIntl();
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
+  const selectAllControl = useBoolean(false);
   const foodModal = useBoolean(false);
+  // console.log('selectedFoods: ', selectedFoods);
+  console.log('selectAllControl', selectAllControl.value);
 
   const handleSelecFood = (foodId: string) => {
     setSelectedFoods([...selectedFoods, foodId]);
   };
 
+  const handleRemoveFood = (foodId: string) => {
+    setSelectedFoods(selectedFoods.filter((id) => id !== foodId));
+  };
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedFoods([]);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (selectAllControl.value) {
+      const foodList = restaurantFood?.[selectedRestaurantId!];
+      const foodIds = foodList?.map((food) => food.id?.uuid);
+      setSelectedFoods(foodIds || []);
+    }
+  }, [restaurantFood, selectAllControl.value, selectedRestaurantId]);
+
+  useEffect(() => {
+    if (
+      selectedFoods.length < restaurantFood?.[selectedRestaurantId!]?.length &&
+      selectAllControl.value
+    ) {
+      selectAllControl.setFalse();
+    }
+  }, [
+    restaurantFood,
+    selectAllControl,
+    selectedFoods.length,
+    selectedRestaurantId,
+  ]);
+
+  const foodList = restaurantFood?.[selectedRestaurantId!];
   return (
     <>
       <Modal
@@ -51,9 +94,14 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
               <Image src={coverImage} alt="cover" />
             </div>
             <TopContent />
-            <ResultDetailFilters />
+            <ResultDetailFilters
+              initialValues={{ isSelectAll: selectAllControl.value }}
+              onSelectAll={selectAllControl.setValue}
+            />
             <FoodListSection
+              foodList={foodList}
               onSelectFood={handleSelecFood}
+              onRemoveFood={handleRemoveFood}
               onClickFood={foodModal.setTrue}
               selectedFoodIds={selectedFoods}
             />

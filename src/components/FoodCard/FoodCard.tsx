@@ -1,20 +1,22 @@
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import IconPlusCircle from '@components/Icons/IconPlusCircle/IconPlusCircle';
+import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import { Listing } from '@utils/data';
+import { EImageVariants } from '@utils/enums';
+import type { TListing } from '@utils/types';
 import classNames from 'classnames';
-import Image from 'next/image';
 import React from 'react';
 
-import coverImage from './defaultFood.png';
 import css from './FoodCard.module.scss';
 
 type TFoodCardProps = {
   className?: string;
   isSelected?: boolean;
-  food?: any;
+  food?: TListing;
   onClick?: () => void;
   onSelect?: (foodId: string) => void;
-  onRemove?: () => void;
+  onRemove?: (foodId: string) => void;
 };
 
 const FoodCard: React.FC<TFoodCardProps> = ({
@@ -28,17 +30,25 @@ const FoodCard: React.FC<TFoodCardProps> = ({
   const classes = classNames(css.root, className);
 
   const handleSelect = () => {
-    onSelect(`${food}`);
+    onSelect(`${Listing(food!).getId()}`);
   };
 
+  const handleRemove = () => {
+    onRemove(Listing(food!).getId());
+  };
   return (
     <div className={classes}>
       <div className={css.coverImage} onClick={onClick}>
-        <Image src={coverImage} alt="cover" />
+        {/* <Image src={coverImage} alt="cover" /> */}
+        <ResponsiveImage
+          alt="food"
+          image={Listing(food!).getImages()[0]}
+          variants={[EImageVariants.default]}
+        />
       </div>
       <div className={css.contentContainer}>
         <div className={css.title} onClick={onClick}>
-          Hàu sữa nướng phô mai
+          {Listing(food!).getAttributes().title}
         </div>
         <div className={css.badges}>
           <Badge
@@ -47,11 +57,16 @@ const FoodCard: React.FC<TFoodCardProps> = ({
             label="Keto"
           />
         </div>
-        <div className={css.price}>30,000 ₫ / Phần</div>
+        <div className={css.price}>{`${
+          Listing(food!).getAttributes()?.price?.amount
+        } ₫ / Phần`}</div>
         <div className={css.vatIncludedNotice}>(đã bao gồm VAT)</div>
       </div>
       {isSelected ? (
-        <IconCheckmarkWithCircle onClick={onRemove} className={css.checkIcon} />
+        <IconCheckmarkWithCircle
+          onClick={handleRemove}
+          className={css.checkIcon}
+        />
       ) : (
         <IconPlusCircle onClick={handleSelect} className={css.plusIcon} />
       )}

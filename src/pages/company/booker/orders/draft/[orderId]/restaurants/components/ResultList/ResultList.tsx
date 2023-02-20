@@ -1,7 +1,10 @@
 import RestaurantCard from '@components/RestaurantCard/RestaurantCard';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { BookerDraftOrderPageThunks } from '@redux/slices/BookerDraftOrderPage.slice';
+import type { TListing } from '@utils/types';
 import classNames from 'classnames';
-import React from 'react';
+import React, { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 
 import ResultDetailModal from '../ResultDetailModal/ResultDetailModal';
@@ -17,6 +20,10 @@ type TResultListProps = {
     lng: number;
   };
   totalRatings: any[];
+  timestamp: number;
+  restaurantFood: {
+    [restaurantId: string]: TListing[];
+  };
 };
 
 const ResultList: React.FC<TResultListProps> = ({
@@ -25,8 +32,24 @@ const ResultList: React.FC<TResultListProps> = ({
   isLoading,
   companyGeoOrigin,
   totalRatings,
+  timestamp,
+  restaurantFood,
 }) => {
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState<
+    string | undefined
+  >();
   const detailModal = useBoolean(false);
+  const dispatch = useAppDispatch();
+  const onRestaurantClick = (id: string) => () => {
+    detailModal.setTrue();
+    setSelectedRestaurantId(id);
+    dispatch(
+      BookerDraftOrderPageThunks.fetchFoodListFromRestaurant({
+        restaurantId: id,
+        timestamp,
+      }),
+    );
+  };
 
   const classes = classNames(css.root, className);
 
@@ -44,7 +67,7 @@ const ResultList: React.FC<TResultListProps> = ({
         {!isLoading &&
           restaurants.map((restaurant) => (
             <RestaurantCard
-              onClick={detailModal.setTrue}
+              onClick={onRestaurantClick(restaurant?.id.uuid)}
               key={restaurant?.id.uuid}
               className={css.card}
               restaurant={restaurant}
@@ -56,6 +79,8 @@ const ResultList: React.FC<TResultListProps> = ({
       <ResultDetailModal
         isOpen={detailModal.value}
         onClose={detailModal.setFalse}
+        restaurantFood={restaurantFood}
+        selectedRestaurantId={selectedRestaurantId}
       />
     </>
   );

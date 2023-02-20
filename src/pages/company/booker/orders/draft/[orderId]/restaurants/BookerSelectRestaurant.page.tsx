@@ -118,6 +118,11 @@ function BookerSelectRestaurant() {
     shallowEqual,
   );
 
+  const restaurantFood = useAppSelector(
+    (state) => state.BookerDraftOrderPage.restaurantFood,
+    shallowEqual,
+  );
+
   const restaurantInPage = useMemo(
     () =>
       restaurants.slice(
@@ -308,6 +313,8 @@ function BookerSelectRestaurant() {
               isLoading={searchInProgress}
               companyGeoOrigin={companyGeoOrigin}
               totalRatings={totalRatings}
+              timestamp={+timestamp!}
+              restaurantFood={restaurantFood}
             />
           </div>
         </div>

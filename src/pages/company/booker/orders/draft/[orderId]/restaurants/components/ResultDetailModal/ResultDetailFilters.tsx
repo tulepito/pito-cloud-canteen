@@ -1,21 +1,27 @@
 import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconSearch from '@components/Icons/IconSearch/IconSearch';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { useIntl } from 'react-intl';
 
 import css from './ResultDetailModal.module.scss';
 
-export type TResultDetailFiltersValues = {
-  selectAll: boolean;
-  keyword: string;
+type TResultDetailFiltersProps = {
+  onSelectAll: (value: boolean) => void;
+  initialValues?: TResultDetailFiltersValues;
 };
 
-const ResultDetailFilters: React.FC = () => {
-  const intl = useIntl();
+export type TResultDetailFiltersValues = {
+  isSelectAll?: boolean;
+  keyword?: string;
+};
 
-  const initialValues = {};
+const ResultDetailFilters: React.FC<TResultDetailFiltersProps> = ({
+  onSelectAll,
+  initialValues,
+}) => {
+  const intl = useIntl();
 
   const handleSearch = () => {
     console.log('submit');
@@ -23,11 +29,14 @@ const ResultDetailFilters: React.FC = () => {
 
   const { form, handleSubmit } = useForm<TResultDetailFiltersValues>({
     onSubmit: handleSearch,
-    initialValues,
   });
 
   const selectAllField = useField('selectAll', form);
   const keywordField = useField('keyword', form);
+
+  useEffect(() => {
+    onSelectAll(selectAllField.input.value);
+  }, [selectAllField.input.value, onSelectAll]);
 
   return (
     <form onSubmit={handleSubmit} className={css.filters}>
@@ -38,7 +47,7 @@ const ResultDetailFilters: React.FC = () => {
             id={'selectAll'}
             type="checkbox"
             {...selectAllField.input}
-            checked={selectAllField.input.value}
+            checked={initialValues?.isSelectAll}
           />
           <label className={css.label} htmlFor={'selectAll'}>
             <span className={css.checkboxWrapper}>

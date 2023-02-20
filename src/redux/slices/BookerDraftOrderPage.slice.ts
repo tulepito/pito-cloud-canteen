@@ -8,7 +8,7 @@ import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
 import type { TListing, TUser } from '@utils/types';
-import uniq from 'lodash/uniq';
+import uniqBy from 'lodash/uniqBy';
 import { DateTime } from 'luxon';
 
 import { orderAsyncActions } from './Order.slice';
@@ -30,12 +30,22 @@ type TBookerDraftOrderPageState = {
     restaurantId: string;
     totalReviews: number;
   }[];
+  combinedRestaurantMenuData: {
+    restaurantId: string;
+    menuId: string;
+  }[];
 
   fetchFilterInProgress: boolean;
   searchInProgress: boolean;
 
   fetchCompanyFromOrderInProgress: boolean;
   fetchCompanyFromOrderError: any;
+
+  restaurantFood: {
+    [restaurantId: string]: TListing[];
+  };
+  fetchRestaurantFoodInProgress: boolean;
+  fetchRestaurantFoodError: any;
 };
 const initialState: TBookerDraftOrderPageState = {
   menuTypes: [],
@@ -46,12 +56,17 @@ const initialState: TBookerDraftOrderPageState = {
   searchResult: [],
   totalItems: 0,
   totalRatings: [],
+  combinedRestaurantMenuData: [],
 
   fetchFilterInProgress: false,
   searchInProgress: false,
 
   fetchCompanyFromOrderInProgress: false,
   fetchCompanyFromOrderError: null,
+
+  restaurantFood: {},
+  fetchRestaurantFoodInProgress: false,
+  fetchRestaurantFoodError: null,
 };
 
 // ================ Thunk types ================ //
@@ -59,6 +74,8 @@ const FETCH_SEARCH_FILTER = 'app/BookerDraftOrderPage/FETCH_SEARCH_FILTER';
 const SEARCH_RESTAURANT = 'app/BookerDraftOrderPage/SEARCH_RESTAURANT';
 const FETCH_COMPANY_FROM_ORDER =
   'app/BookerDraftOrderPage/FETCH_COMPANY_FROM_ORDER';
+const FETCH_FOOD_LIST_FROM_RESTAURANT =
+  'app/BookerDraftOrderPage/FETCH_FOOD_LIST_FROM_RESTAURANT';
 
 // ================ Async thunks ================ //
 const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
@@ -122,11 +139,14 @@ const searchRestaurants = createAsyncThunk(
       [`pub_${dayOfWeek}AverageFoodPrice`]: `,${packagePerMember}`,
     };
     const allMenus = await queryAllPages({ sdkModel: sdk.listings, query });
-    newRestaurantIdList = uniq([
-      ...allMenus.map(
-        (menu: TListing) => Listing(menu).getMetadata()?.restaurantId,
-      ),
-    ]);
+    const combinedRestaurantMenuData = allMenus.map((menu: TListing) => ({
+      restaurantId: Listing(menu).getMetadata()?.restaurantId,
+      menuId: menu.id.uuid,
+    }));
+    newRestaurantIdList = uniqBy<{ restaurantId: string; menuId: string }>(
+      combinedRestaurantMenuData,
+      'restaurantId',
+    ).map((item) => item.restaurantId);
 
     const origin = User(companyFromOrder as TUser).getPublicData()?.location
       ?.origin;
@@ -164,6 +184,7 @@ const searchRestaurants = createAsyncThunk(
         restaurantIdList: newRestaurantIdList,
       }),
       searchResult: restaurants,
+      combinedRestaurantMenuData,
       totalItems: meta.totalItems,
       totalRatings,
     };
@@ -187,10 +208,46 @@ const fetchCompanyFromOrder = createAsyncThunk(
   },
 );
 
+const fetchFoodListFromRestaurant = createAsyncThunk(
+  FETCH_FOOD_LIST_FROM_RESTAURANT,
+  async (params: Record<string, any>, { getState, extra: sdk }) => {
+    const { restaurantId, timestamp } = params;
+    const { combinedRestaurantMenuData = [], restaurantFood = {} } =
+      getState().BookerDraftOrderPage;
+    const dateTime = DateTime.fromMillis(timestamp);
+    const dayOfWeek = convertWeekDay(dateTime.weekday).key;
+    const menuId = combinedRestaurantMenuData.find(
+      (item) => item.restaurantId === restaurantId,
+    )?.menuId;
+    const { order } = getState().Order;
+    const { nutritions, packagePerMember } = Listing(
+      order as TListing,
+    ).getMetadata();
+
+    const response = await sdk.listings.query({
+      pub_menuIdList: `has_any:${menuId}`,
+      meta_listingType: ListingTypes.FOOD,
+      pub_menuWeekDay: `has_any:${dayOfWeek}`,
+      price: `,${packagePerMember}`,
+      ...(nutritions.length > 0
+        ? { pub_nutritions: `has_any:${nutritions.join(',')}` }
+        : {}),
+      include: ['images'],
+    });
+    const foodList = denormalisedResponseEntities(response);
+    const newRestaurantFood = {
+      ...restaurantFood,
+      [restaurantId]: foodList,
+    };
+    return newRestaurantFood;
+  },
+);
+
 export const BookerDraftOrderPageThunks = {
   searchRestaurants,
   fetchSearchFilter,
   fetchCompanyFromOrder,
+  fetchFoodListFromRestaurant,
 };
 
 // ================ Slice ================ //
@@ -217,10 +274,13 @@ const BookerDraftOrderPageSlice = createSlice({
         state.searchResult = action.payload.searchResult ?? [];
         state.totalItems = action.payload.totalItems ?? 0;
         state.totalRatings = action.payload.totalRatings ?? [];
+        state.combinedRestaurantMenuData =
+          action.payload.combinedRestaurantMenuData ?? [];
       })
       .addCase(searchRestaurants.rejected, (state) => {
         state.searchInProgress = false;
       })
+
       .addCase(fetchCompanyFromOrder.pending, (state) => {
         state.fetchCompanyFromOrderInProgress = true;
         state.fetchCompanyFromOrderError = null;
@@ -232,6 +292,19 @@ const BookerDraftOrderPageSlice = createSlice({
       .addCase(fetchCompanyFromOrder.rejected, (state, { payload }) => {
         state.fetchCompanyFromOrderInProgress = false;
         state.fetchCompanyFromOrderError = payload;
+      })
+
+      .addCase(fetchFoodListFromRestaurant.pending, (state) => {
+        state.fetchRestaurantFoodInProgress = true;
+        state.fetchRestaurantFoodError = null;
+      })
+      .addCase(fetchFoodListFromRestaurant.fulfilled, (state, action) => {
+        state.restaurantFood = action.payload;
+        state.fetchRestaurantFoodInProgress = false;
+      })
+      .addCase(fetchFoodListFromRestaurant.rejected, (state, { payload }) => {
+        state.fetchRestaurantFoodInProgress = false;
+        state.fetchRestaurantFoodError = payload;
       });
   },
 });
