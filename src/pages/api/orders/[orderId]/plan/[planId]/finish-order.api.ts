@@ -14,6 +14,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       case HttpMethod.GET:
         break;
       case HttpMethod.POST:
+        break;
+      case HttpMethod.DELETE:
+        break;
+      case HttpMethod.PUT:
         {
           const { orderId, planId } = req.body;
           if (isEmpty(orderId) || isEmpty(planId)) {
@@ -23,10 +27,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           await initiateTransaction({ orderId, planId });
           await finishOrder(orderId);
         }
-        break;
-      case HttpMethod.DELETE:
-        break;
-      case HttpMethod.PUT:
         break;
       default:
         break;
