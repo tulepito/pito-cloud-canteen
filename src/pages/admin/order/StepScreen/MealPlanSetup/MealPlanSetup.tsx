@@ -40,6 +40,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     deadlineDate,
     deadlineHour,
     memberAmount,
+    displayedDurationTime,
+    durationTimeMode,
   } = Listing(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const companies = useAppSelector(
@@ -131,6 +133,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       deadlineDate: deadlineDate || null,
       deadlineHour: deadlineHour || '07:00',
       memberAmount: allMembersAmount,
+      durationTimeMode: durationTimeMode || 'week',
+      displayedDurationTime: displayedDurationTime || 1,
     }),
     [
       dayInWeek,
@@ -152,6 +156,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       deadlineDate,
       deadlineHour,
       allMembersAmount,
+      displayedDurationTime,
+      durationTimeMode,
     ],
   );
   return (
