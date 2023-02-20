@@ -215,7 +215,7 @@ const HourlyPlan: React.FC<any> = (props) => {
                           time: '23:00',
                         },
                       ),
-                      '23:30',
+                      '23:00',
                     ),
                   )}
                 />
@@ -268,7 +268,7 @@ const HourlyPlan: React.FC<any> = (props) => {
                           time: "'23:00'",
                         },
                       ),
-                      '23:30',
+                      '23:00',
                     ),
                   )}
                 />
@@ -381,7 +381,7 @@ const DailyPlan: React.FC<any> = (props) => {
                             time: '23:00',
                           },
                         ),
-                        '23:30',
+                        '23:00',
                       ),
                     )}
                   />
@@ -434,7 +434,7 @@ const DailyPlan: React.FC<any> = (props) => {
                             time: '23:00',
                           },
                         ),
-                        '23:30',
+                        '23:00',
                       ),
                     )}
                   />
