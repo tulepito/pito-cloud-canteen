@@ -1,4 +1,4 @@
-import { createEmailParams, sendEmail } from '@services/awsSES';
+import { sendIndividualEmail } from '@services/awsSES';
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -115,14 +115,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       content: newParticipantMembersEmailTemplate,
       sender: systemSenderEmail as string,
     };
-    const hasFlexAccountEmailParams = createEmailParams(
-      hasFlexAccountEmailParamsData.receiver,
-      hasFlexAccountEmailParamsData.subject,
-      hasFlexAccountEmailParamsData.content,
-      hasFlexAccountEmailParamsData.sender,
-    );
     if (hasFlexAccountEmailParamsData.receiver.length > 0) {
-      sendEmail(hasFlexAccountEmailParams);
+      sendIndividualEmail(hasFlexAccountEmailParamsData);
     }
     // Step handle send email for new no account members
 
@@ -132,14 +126,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       content: newParticipantMembersEmailTemplate,
       sender: systemSenderEmail as string,
     };
-    const noFlexAccountEmailParams = createEmailParams(
-      noFlexAccountEmailParamsData.receiver,
-      noFlexAccountEmailParamsData.subject,
-      noFlexAccountEmailParamsData.content,
-      noFlexAccountEmailParamsData.sender,
-    );
     if (noFlexAccountEmailParamsData.receiver.length > 0) {
-      sendEmail(noFlexAccountEmailParams);
+      sendIndividualEmail(noFlexAccountEmailParamsData);
     }
     res.json(updatedCompanyAccount);
   } catch (error) {
