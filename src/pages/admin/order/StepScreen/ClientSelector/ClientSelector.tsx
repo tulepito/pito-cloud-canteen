@@ -35,6 +35,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   const intl = useIntl();
   const [queryParams, setQueryParams] = useState({});
   const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
   const { value: isSortAZ, toggle: toggleSort } = useBoolean(true);
   const dispatch = useAppDispatch();
   const { companyRefs, totalItems } = useAppSelector(
@@ -66,8 +67,8 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
     setFalse: closeCreateOrderFailingModal,
   } = useBoolean(!!createOrderError);
   useEffect(() => {
-    dispatch(paginateCompanies({ page }));
-  }, [dispatch, page]);
+    dispatch(paginateCompanies({ page, perPage: pageSize }));
+  }, [dispatch, page, pageSize]);
   useEffect(() => {
     if (createOrderError) {
       openCreateOrderFailingModal();
@@ -93,8 +94,8 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
     [filteredCompanies, isSortAZ],
   );
   const slicesCompanies = useMemo(
-    () => sliceCompanies(sortedCompanies, page),
-    [sortedCompanies, page],
+    () => sliceCompanies(sortedCompanies, page, pageSize),
+    [sortedCompanies, page, pageSize],
   );
   const companiesTableData = useMemo(
     () =>
@@ -113,6 +114,9 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   }, [filteredCompanies.length, queryParams, totalItems]);
   const onPageChange = (value: number) => {
     setPage(value);
+  };
+  const onPageSizeChange = (value: number, pageSizeValue: number) => {
+    setPageSize(pageSizeValue);
   };
   const onItemClick = (id: string) => {
     dispatch(orderAsyncActions.fetchCompanyBookers(id));
@@ -157,6 +161,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
           searchValue="searchCompanyName"
           onSubmit={(values: any) => {
             setQueryParams(values);
+            setPage(1);
           }}
         />
       </div>
@@ -164,8 +169,10 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
         <ClientTable
           data={companiesTableData}
           page={page}
+          pageSize={pageSize}
           totalItems={totalItemsPagination}
           onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
           onItemClick={onItemClick}
           onSubmit={onSubmit}
           bookerList={bookerList}

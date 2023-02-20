@@ -5,8 +5,6 @@ import { denormalisedResponseEntities } from '@utils/data';
 import { storableError } from '@utils/errors';
 import type { TCompany, TPagination } from '@utils/types';
 
-export const RESULT_PAGE_SIZE = 10;
-
 type TManageCompanyState = {
   companyRefs: any[];
   queryCompaniesInProgress: boolean;
@@ -67,13 +65,13 @@ export const manageCompaniesSlice = createSlice({
   initialState,
   reducers: {
     paginateCompanies: (state, action) => {
-      const { page, totalItems } = action.payload;
+      const { page, totalItems, perPage = 10 } = action.payload;
       return {
         ...state,
         pagination: {
           totalItems,
-          totalPages: Math.ceil(totalItems / RESULT_PAGE_SIZE),
-          perPage: RESULT_PAGE_SIZE,
+          totalPages: Math.ceil(totalItems / perPage),
+          perPage,
           page,
         },
       };

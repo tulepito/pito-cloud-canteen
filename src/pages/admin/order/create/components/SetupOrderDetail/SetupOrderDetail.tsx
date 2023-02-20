@@ -335,10 +335,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     openPickFoodModal();
   };
 
-  const eventExtraProps = {
-    onPickFoodModal: handlePickFoodModalOpen,
-  };
-
   return (
     <>
       {isSelectingRestaurant ? (
@@ -377,13 +373,13 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               anchorDate={suitableStartDate}
               events={resourcesForCalender}
               renderEvent={MealPlanCard}
-              eventExtraProps={eventExtraProps}
               companyLogo="Company"
               startDate={new Date(startDate)}
               endDate={new Date(endDate)}
               resources={{
                 startDate,
                 endDate,
+                onPickFoodModal: handlePickFoodModalOpen,
               }}
               components={{
                 contentEnd: (props) => (

@@ -63,7 +63,7 @@ const getRestaurants = createAsyncThunk(
       meta_listingType: ListingTypes.MENU,
       pub_startDate: `,${dateTime.toMillis()}`,
       pub_daysOfWeek: `has_any:${dayOfWeek}`,
-      pub_mealTypes: `has_any:${mealType}`,
+      pub_mealType: mealType,
       ...(nutritions.length > 0
         ? { [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(',')}` }
         : {}),
