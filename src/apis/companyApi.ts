@@ -103,3 +103,14 @@ export const companyApi = {
 
 export const getAllCompanyMembersApi = (companyId: string) =>
   getApi(`/company/all-employees?companyId=${companyId}`);
+
+export const queryMembersByEmailAdminApi = (
+  emails: string[],
+  queryParams?: TObject,
+) => {
+  const emailAsString = emails.join(',');
+  return getApi(
+    `/admin/users/query-users-by-email?emails=${emailAsString}`,
+    queryParams,
+  );
+};

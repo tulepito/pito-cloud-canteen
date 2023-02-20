@@ -1139,5 +1139,8 @@
   "EditCompanySettingsInformationForm.memberSettingCreate": "Thêm thành viên",
   "EditCompanySettingsInformationForm.groupSettingMember": "Cài đặt nhóm",
   "EditCompanySettingsInformationForm.groupSettingCreate": "Thêm nhóm",
-  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại."
+  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại.",
+  "EditCompanySettingsInformationForm.createMemberModalTitle": "Thêm thành viên",
+  "AddCompanyMembersForm.emailPlaceholder": "Nhập email để thêm thành viên",
+  "AddCompanyMembersForm.addButton": "Thêm"
 }

@@ -7,7 +7,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const { companyId, roles: rolesAsString = '' } = req.query;
-    console.log(companyId, rolesAsString);
+
     const intergrationSdk = getIntegrationSdk();
     const response = await intergrationSdk.users.show(
       {

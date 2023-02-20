@@ -1,0 +1,28 @@
+@use '/src/styles/vars.scss' as *;
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.profileWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.userDisplayName {
+  font-size: 14px;
+  margin: 0;
+}
+
+.userEmail {
+  font-size: 12px;
+  color: $neutralGray5;
+  margin: 0;
+}
+
+.iconClose {
+  width: 9px;
+  height: 9px;
+}

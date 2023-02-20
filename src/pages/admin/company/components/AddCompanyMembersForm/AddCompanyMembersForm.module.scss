@@ -1,0 +1,22 @@
+@use '/src/styles/vars.scss' as *;
+
+.emailWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+  .emailField {
+    width: 100%;
+  }
+  .addButton {
+    border-radius: 5px;
+    border: 2px solid $neutralGray6;
+  }
+}
+.fieldMember {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 35px;
+  row-gap: 24px;
+}
