@@ -1,4 +1,3 @@
-import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppDispatch } from '@hooks/reduxHooks';
@@ -30,7 +29,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
       totalWithoutVAT = 0,
       totalWithVAT = 0,
       transportFee = 0,
-      VATFee = 0,
+      // VATFee = 0,
     } = {},
     showStartPickingOrderButton,
     onClickDownloadPriceQuotation,
@@ -108,7 +107,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
             </div>
           </div>
         </div>
-        <div className={css.feeItem}>
+        {/* <div className={css.feeItem}>
           <div
             className={classNames(css.feeItemContainer, css.VATItemContainer)}>
             <div className={css.label}>
@@ -119,7 +118,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
               {parseThousandNumber(VATFee.toString())}đ
             </div>
           </div>
-        </div>
+        </div> */}
         <div className={css.feeItem}>
           <div className={css.totalWithVATLabel}>
             {intl.formatMessage({ id: 'ReviewCardSection.totalWithVAT' })}
