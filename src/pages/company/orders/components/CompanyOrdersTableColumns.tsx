@@ -2,10 +2,12 @@
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import type { TButtonVariant } from '@components/Button/Button';
 import Button from '@components/Button/Button';
+import AlertModal from '@components/Modal/AlertModal';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { companyPaths } from '@src/paths';
 import {
@@ -151,6 +153,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       const intl = useIntl();
       const router = useRouter();
       const dispatch = useAppDispatch();
+      const confirmDeleteDraftOrderActions = useBoolean(false);
 
       const navigateToDraftOrderDetailPage = () => {
         router.push({
@@ -182,6 +185,11 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         );
       };
 
+      const handleCopyOrderLink = () => {
+        const orderLink = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderId}`;
+        navigator.clipboard.writeText(orderLink);
+      };
+
       const secondaryButtonProps = {
         variant: 'inline' as TButtonVariant,
         className: css.actionButton,
@@ -191,14 +199,17 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         <Button
           key={'deleteDraftButton'}
           {...secondaryButtonProps}
-          onClick={handleDeleteDraftOrder}>
+          onClick={confirmDeleteDraftOrderActions.setTrue}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.deleteDraft',
           })}
         </Button>
       );
       const cancelPickingOrderButton = (
-        <Button key={'cancelPickingOrderButton'} {...secondaryButtonProps}>
+        <Button
+          key={'cancelPickingOrderButton'}
+          {...secondaryButtonProps}
+          onClick={navigateToBookerManageOrderDetailPage}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.cancelPickingOrder',
           })}
@@ -244,7 +255,10 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         </Button>
       );
       const copyLinkButton = (
-        <Button key={'copyLinkButton'} {...secondaryButtonProps}>
+        <Button
+          key={'copyLinkButton'}
+          {...secondaryButtonProps}
+          onClick={handleCopyOrderLink}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.copyOrderLink',
           })}
@@ -300,7 +314,30 @@ export const CompanyOrdersTableColumns: TColumn[] = [
           break;
       }
 
-      return <div className={css.action}>{buttonList}</div>;
+      const confirmDeleteDraftOrderModal = (
+        <AlertModal
+          isOpen={confirmDeleteDraftOrderActions.value}
+          onCancel={confirmDeleteDraftOrderActions.setFalse}
+          onConfirm={handleDeleteDraftOrder}
+          handleClose={confirmDeleteDraftOrderActions.setFalse}
+          title={intl.formatMessage({
+            id: 'ManageCompanyOrdersPage.deleteDraftOrderModal.title',
+          })}
+          confirmLabel={intl.formatMessage({
+            id: 'ManageCompanyOrdersPage.deleteDraftOrderModal.confirmBtn',
+          })}
+          cancelLabel={intl.formatMessage({
+            id: 'ManageCompanyOrdersPage.deleteDraftOrderModal.cancelBtn',
+          })}
+        />
+      );
+
+      return (
+        <div className={css.action}>
+          {buttonList}
+          {confirmDeleteDraftOrderModal}
+        </div>
+      );
     },
   },
 ];

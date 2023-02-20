@@ -14,6 +14,7 @@ type TBookerOrderDetailsTitleProps = TDefaultProps & {
     deliveryAddress: TObject;
   };
   onConfirmOrder: () => void;
+  onCancelOrder: () => void;
 };
 
 const BookerOrderDetailsTitle: React.FC<TBookerOrderDetailsTitleProps> = (
@@ -25,6 +26,7 @@ const BookerOrderDetailsTitle: React.FC<TBookerOrderDetailsTitleProps> = (
     className,
     data: { deliveryHour, deliveryAddress = {} },
     onConfirmOrder,
+    onCancelOrder,
   } = props;
   const shouldButtonDisabled = useAppSelector(orderDetailsAnyActionsInProgress);
 
@@ -53,16 +55,28 @@ const BookerOrderDetailsTitle: React.FC<TBookerOrderDetailsTitleProps> = (
         </div>
         <Badge label={deliveryInfo} />
       </div>
-      <Button
-        disabled={shouldButtonDisabled}
-        type="button"
-        variant="cta"
-        className={css.makeOrderBtn}
-        onClick={onConfirmOrder}>
-        {intl.formatMessage({
-          id: 'BookerOrderDetailsTitle.makeOrderButtonText',
-        })}
-      </Button>
+      <div className={css.actions}>
+        <Button
+          disabled={shouldButtonDisabled}
+          type="button"
+          variant="cta"
+          className={css.makeOrderBtn}
+          onClick={onConfirmOrder}>
+          {intl.formatMessage({
+            id: 'BookerOrderDetailsTitle.makeOrderButtonText',
+          })}
+        </Button>
+        <Button
+          disabled={shouldButtonDisabled}
+          type="button"
+          variant="secondary"
+          className={css.cancelOrderBtn}
+          onClick={onCancelOrder}>
+          {intl.formatMessage({
+            id: 'BookerOrderDetailsTitle.cancelOrderButtonText',
+          })}
+        </Button>
+      </div>
     </div>
   );
 };
