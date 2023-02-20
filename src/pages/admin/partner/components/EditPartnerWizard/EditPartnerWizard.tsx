@@ -3,6 +3,7 @@ import FormWizard from '@components/FormWizard/FormWizard';
 import useRedirectTabWizard from '@hooks/useRedirectTabWizard';
 import { adminRoutes } from '@src/paths';
 import { EListingStates } from '@utils/enums';
+import type { TIntegrationListing } from '@utils/types';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useIntl } from 'react-intl';
@@ -192,48 +193,54 @@ const EditPartnerWizard = (props: any) => {
 
   return (
     <FormWizard className={css.formWizard} formTabNavClassName={css.tabNav}>
-      {TABS.map((tab: string) => (
-        <EditPartnerWizardTab
-          key={tab}
-          tab={tab}
-          tabs={TABS}
-          tabId={`${tab}`}
-          tabLabel={tabLabel(intl, tab)}
-          tabLinkProps={tabLink(tab)}
-          selected={selectedTab === tab}
-          uploadedAvatars={uploadedAvatars}
-          uploadedCovers={uploadedCovers}
-          onAvatarUpload={onAvatarUpload}
-          onCoverUpload={onCoverUpload}
-          onRemoveCover={onRemoveCover}
-          onRemoveAvatar={onRemoveAvatar}
-          uploadAvatarError={uploadAvatarError}
-          uploadCoverError={uploadCoverError}
-          inProgress={inProgress}
-          formError={formError}
-          partnerListingRef={partnerListingRef}
-          onUpdatePartnerListing={onUpdatePartnerListing}
-          onCreateDraftPartner={onCreateDraftPartner}
-          uploadedBusinessLicense={uploadedBusinessLicense}
-          onBusinessLicenseUpload={onBusinessLicenseUpload}
-          uploadBusinessLicenseError={uploadBusinessLicenseError}
-          onRemoveBusinessLicense={onRemoveBusinessLicense}
-          uploadedFoodCertificate={uploadedFoodCertificate}
-          onFoodCertificateUpload={onFoodCertificateUpload}
-          uploadFoodCertificateError={uploadFoodCertificateError}
-          onRemoveFoodCertificate={onRemoveFoodCertificate}
-          uploadedPartyInsurance={uploadedPartyInsurance}
-          onPartyInsuranceUpload={onPartyInsuranceUpload}
-          uploadPartyInsuranceError={uploadPartyInsuranceError}
-          onRemovePartyInsurance={onRemovePartyInsurance}
-          onPublishDraftPartner={onPublishDraftPartner}
-          onDiscardDraftPartner={onDiscardDraftPartner}
-          onSetAuthorized={onSetAuthorized}
-          onSetUnsatisfactory={onSetUnsatisfactory}
-          goBack={handleGoBack(tab)}
-          disabled={uploadingImage}
-        />
-      ))}
+      {TABS.map((tab: string, index: number) => {
+        const disabled = !tabCompleted(
+          TABS[index - 1],
+          partnerListingRef as TIntegrationListing,
+        );
+        return (
+          <EditPartnerWizardTab
+            key={tab}
+            tab={tab}
+            tabs={TABS}
+            tabId={`${tab}`}
+            tabLabel={tabLabel(intl, tab)}
+            tabLinkProps={tabLink(tab)}
+            selected={selectedTab === tab}
+            uploadedAvatars={uploadedAvatars}
+            uploadedCovers={uploadedCovers}
+            onAvatarUpload={onAvatarUpload}
+            onCoverUpload={onCoverUpload}
+            onRemoveCover={onRemoveCover}
+            onRemoveAvatar={onRemoveAvatar}
+            uploadAvatarError={uploadAvatarError}
+            uploadCoverError={uploadCoverError}
+            inProgress={inProgress}
+            formError={formError}
+            partnerListingRef={partnerListingRef}
+            onUpdatePartnerListing={onUpdatePartnerListing}
+            onCreateDraftPartner={onCreateDraftPartner}
+            uploadedBusinessLicense={uploadedBusinessLicense}
+            onBusinessLicenseUpload={onBusinessLicenseUpload}
+            uploadBusinessLicenseError={uploadBusinessLicenseError}
+            onRemoveBusinessLicense={onRemoveBusinessLicense}
+            uploadedFoodCertificate={uploadedFoodCertificate}
+            onFoodCertificateUpload={onFoodCertificateUpload}
+            uploadFoodCertificateError={uploadFoodCertificateError}
+            onRemoveFoodCertificate={onRemoveFoodCertificate}
+            uploadedPartyInsurance={uploadedPartyInsurance}
+            onPartyInsuranceUpload={onPartyInsuranceUpload}
+            uploadPartyInsuranceError={uploadPartyInsuranceError}
+            onRemovePartyInsurance={onRemovePartyInsurance}
+            onPublishDraftPartner={onPublishDraftPartner}
+            onDiscardDraftPartner={onDiscardDraftPartner}
+            onSetAuthorized={onSetAuthorized}
+            onSetUnsatisfactory={onSetUnsatisfactory}
+            goBack={handleGoBack(tab)}
+            disabled={uploadingImage || disabled}
+          />
+        );
+      })}
     </FormWizard>
   );
 };
