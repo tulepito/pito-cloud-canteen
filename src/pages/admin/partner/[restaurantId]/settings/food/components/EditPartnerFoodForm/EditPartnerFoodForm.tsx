@@ -45,6 +45,7 @@ type TExtraProps = {
   inProgress: boolean;
   formError?: any;
   isEditting?: boolean;
+  disabled?: boolean;
 };
 type TEditPartnerFoodFormComponentProps =
   FormRenderProps<TEditPartnerFoodFormValues> & Partial<TExtraProps>;
@@ -54,7 +55,14 @@ type TEditPartnerFoodFormProps = FormProps<TEditPartnerFoodFormValues> &
 const EditPartnerFoodFormComponent: React.FC<
   TEditPartnerFoodFormComponentProps
 > = (props) => {
-  const { values, submittedValues, inProgress, formError, isEditting } = props;
+  const {
+    values,
+    submittedValues,
+    inProgress,
+    formError,
+    isEditting,
+    disabled,
+  } = props;
   const dispatch = useAppDispatch();
   const ready = isEqual(submittedValues, values);
   const {
@@ -84,7 +92,7 @@ const EditPartnerFoodFormComponent: React.FC<
   const { handleSubmit } = props;
 
   const intl = useIntl();
-
+  console.log({ disabled });
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
       <div className={css.fieldPhotos}>
@@ -377,7 +385,7 @@ const EditPartnerFoodFormComponent: React.FC<
         <Button
           ready={ready}
           inProgress={inProgress}
-          disabled={inProgress}
+          disabled={disabled}
           className={css.submitBtn}>
           {isEditting
             ? intl.formatMessage({

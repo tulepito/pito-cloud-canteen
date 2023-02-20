@@ -13,9 +13,9 @@
 .fieldAvatar {
   width: 118px;
   height: 118px;
-  position: absolute;
+  position: relative;
   left: 50%;
-  bottom: 0;
+  bottom: 40px;
   transform: translateX(-50%);
   z-index: 1;
   background-color: $neutralGray1;

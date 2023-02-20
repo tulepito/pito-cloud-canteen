@@ -26,6 +26,7 @@ const CreatePartnerFoodPage = () => {
     currentFoodListing,
     showFoodInProgress,
     showFoodError,
+    uploadingImages,
   } = useAppSelector((state) => state.foods, shallowEqual);
   const redirectToEditPage = (listing: TIntegrationListing) => {
     setTimeout(() => {
@@ -108,6 +109,7 @@ const CreatePartnerFoodPage = () => {
         onSubmit={handleSubmit}
         initialValues={initialValues}
         inProgress={createFoodInProgress}
+        disabled={uploadingImages || createFoodInProgress}
         formError={createFoodError}
       />
     </>

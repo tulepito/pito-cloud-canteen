@@ -96,7 +96,7 @@ type TFieldPhotoUpload = {
   disabled?: boolean;
   className?: string;
   variants: string[];
-  uploadImageError: any;
+  uploadImageError?: any;
   name: string;
   id: string;
   validate: any;
@@ -205,7 +205,9 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
                   </label>
                 )}
               </div>
-              {!uploadImageFailed && <ErrorMessage message={'Hello'} />}
+              {uploadImageFailed && (
+                <ErrorMessage message={uploadImageFailed} />
+              )}
             </>
           ) : null;
         }}
