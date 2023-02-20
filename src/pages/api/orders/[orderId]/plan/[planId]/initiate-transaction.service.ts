@@ -44,7 +44,12 @@ const normalizeOrderDetail = ({
   deliveryHour: string;
 }) => {
   return Object.entries(planOrderDetail).reduce<TNormalizedOrderDetail[]>(
-    (prev, [date, orderOfDate]: [string, TOrderOfDate]) => {
+    (
+      prev,
+      [date, orderOfDate]: [string, TOrderOfDate],
+      currIndex,
+      allItems,
+    ) => {
       const {
         restaurant: { id: restaurantId, foodList = {} },
         memberOrders: memberOrdersMap,
@@ -88,6 +93,7 @@ const normalizeOrderDetail = ({
         metadata: {
           participantIds,
           bookingInfo,
+          isLastTxOfPlan: currIndex === allItems.length - 1,
         },
       };
 
