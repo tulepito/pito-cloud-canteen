@@ -9,7 +9,7 @@ import {
   setSelectedRestaurant,
 } from '@redux/slices/SelectRestaurantPage.slice';
 import { Listing } from '@utils/data';
-import type { TListing, TObject } from '@utils/types';
+import type { TListing } from '@utils/types';
 import clone from 'lodash/clone';
 import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
@@ -23,16 +23,16 @@ import MealPlanCardHeader from './MealPlanCardHeader';
 type TMealPlanCardProps = {
   event: Event;
   index: number;
-  eventExtraProps: TObject;
   onRemove?: (id: string) => void;
+  resources?: any;
 };
 
 const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   event,
   onRemove,
-  eventExtraProps,
+  resources,
 }) => {
-  const { onPickFoodModal } = eventExtraProps;
+  const { onPickFoodModal } = resources;
   const dispatch = useAppDispatch();
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,

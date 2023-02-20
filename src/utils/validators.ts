@@ -455,3 +455,7 @@ export const nonSatOrSunDay = (message: string) => (value: number) => {
   const dayOfWeek = new Date(value).getDay();
   return dayOfWeek === 6 || dayOfWeek === 0 ? message : VALID;
 };
+
+export const greaterThanOneThousand = (message: string) => (value: number) => {
+  return value < 1000 ? message : VALID;
+};

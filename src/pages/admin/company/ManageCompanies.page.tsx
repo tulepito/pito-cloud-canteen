@@ -13,15 +13,12 @@ import { TableForm } from '@components/Table/Table';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import {
-  manageCompaniesThunks,
-  RESULT_PAGE_SIZE,
-} from '@redux/slices/ManageCompaniesPage.slice';
+import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
 import { ECompanyStatus } from '@utils/enums';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { TUpdateStatus } from './helpers';
@@ -206,6 +203,7 @@ export default function ManageCompanies() {
   const router = useRouter();
   const { query, pathname } = router;
   const { page = 1, ...queryParams } = query;
+  const [pageSize] = useState<number>(10);
   const title = intl.formatMessage({
     id: 'ManageCompanies.title',
   });
@@ -225,14 +223,14 @@ export default function ManageCompanies() {
   );
 
   const slicesCompanies = useMemo(
-    () => sliceCompanies(filteredCompanies, page),
-    [filteredCompanies, page],
+    () => sliceCompanies(filteredCompanies, page, pageSize),
+    [filteredCompanies, page, pageSize],
   );
 
   const pagination = {
     page: Number(page),
-    perPage: RESULT_PAGE_SIZE,
-    totalPages: Math.ceil(filteredCompanies.length / RESULT_PAGE_SIZE),
+    perPage: pageSize,
+    totalPages: Math.ceil(filteredCompanies.length / pageSize),
     totalItems: filteredCompanies.length,
   };
 
