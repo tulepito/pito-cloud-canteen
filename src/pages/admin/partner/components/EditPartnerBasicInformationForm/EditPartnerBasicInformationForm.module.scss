@@ -5,10 +5,18 @@
   margin-bottom: 40px;
 }
 
+.mediaFieldGroup {
+  position: relative;
+  width: 100%;
+}
+
 .fieldAvatar {
   width: 118px;
   height: 118px;
-  margin-top: -30px;
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
   z-index: 1;
   background-color: $neutralGray1;
 }

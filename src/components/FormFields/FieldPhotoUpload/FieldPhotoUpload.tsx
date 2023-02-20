@@ -205,9 +205,7 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
                   </label>
                 )}
               </div>
-              {uploadImageFailed && (
-                <ErrorMessage message={uploadImageFailed} />
-              )}
+              {!uploadImageFailed && <ErrorMessage message={'Hello'} />}
             </>
           ) : null;
         }}

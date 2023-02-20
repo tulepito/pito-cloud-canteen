@@ -198,38 +198,40 @@ const EditPartnerBasicInformationForm: React.FC<
               <h3 className={css.mediaTitle}>
                 <FormattedMessage id="EditPartnerForm.partnerCoverAndAvatar" />
               </h3>
-              <FieldPhotoUpload
-                name="cover"
-                accept={ACCEPT_IMAGES}
-                id="cover"
-                className={css.fieldCover}
-                image={uploadedCovers?.[0]}
-                variants={COVER_VARIANTS}
-                onImageUpload={onCoverUpload}
-                onRemoveImage={onRemoveCover}
-                uploadImageError={uploadCoverError}
-                validate={nonEmptyImage(
-                  intl.formatMessage({
-                    id: 'EditPartnerBasicInformationForm.coverRequired',
-                  }),
-                )}
-              />
-              <FieldPhotoUpload
-                name="avatar"
-                image={uploadedAvatars?.[0]}
-                accept={ACCEPT_IMAGES}
-                id="avatar"
-                className={css.fieldAvatar}
-                onImageUpload={onAvatarUpload}
-                onRemoveImage={onRemoveAvatar}
-                uploadImageError={uploadAvatarError}
-                variants={AVATAR_VARIANTS}
-                validate={nonEmptyImage(
-                  intl.formatMessage({
-                    id: 'EditPartnerBasicInformationForm.avatarRequired',
-                  }),
-                )}
-              />
+              <div className={css.mediaFieldGroup}>
+                <FieldPhotoUpload
+                  name="cover"
+                  accept={ACCEPT_IMAGES}
+                  id="cover"
+                  className={css.fieldCover}
+                  image={uploadedCovers?.[0]}
+                  variants={COVER_VARIANTS}
+                  onImageUpload={onCoverUpload}
+                  onRemoveImage={onRemoveCover}
+                  uploadImageError={uploadCoverError}
+                  validate={nonEmptyImage(
+                    intl.formatMessage({
+                      id: 'EditPartnerBasicInformationForm.coverRequired',
+                    }),
+                  )}
+                />
+                <FieldPhotoUpload
+                  name="avatar"
+                  image={uploadedAvatars?.[0]}
+                  accept={ACCEPT_IMAGES}
+                  id="avatar"
+                  className={css.fieldAvatar}
+                  onImageUpload={onAvatarUpload}
+                  onRemoveImage={onRemoveAvatar}
+                  uploadImageError={uploadAvatarError}
+                  variants={AVATAR_VARIANTS}
+                  validate={nonEmptyImage(
+                    intl.formatMessage({
+                      id: 'EditPartnerBasicInformationForm.avatarRequired',
+                    }),
+                  )}
+                />
+              </div>
             </div>
             <div className={css.fields}>
               <FieldTextInput
