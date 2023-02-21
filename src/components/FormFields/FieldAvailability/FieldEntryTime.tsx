@@ -1,12 +1,25 @@
+import 'react-datepicker/dist/react-datepicker.css';
+
 import Tooltip from '@components/Tooltip/Tooltip';
 import classNames from 'classnames';
+import viLocale from 'date-fns/locale/vi';
 import React from 'react';
+import DatePicker, { registerLocale } from 'react-datepicker';
 import { Field } from 'react-final-form';
 
 import css from './FieldEntryTime.module.scss';
 
+registerLocale('vi', viLocale);
+
 const FieldEntryTimeComponent = (props: any) => {
-  const { input, meta: fieldMeta } = props;
+  const {
+    input,
+    meta: fieldMeta,
+    minTime,
+    maxTime,
+    timeIntervals = 5,
+    excludeTimes,
+  } = props;
   const { error } = fieldMeta;
   const hasError = error;
   const inputClasses = classNames(css.input, { [css.inputError]: error });
@@ -18,10 +31,32 @@ const FieldEntryTimeComponent = (props: any) => {
           tooltipContent={<div className={css.error}>{error}</div>}
           placement="topRight"
           overlayClassName={css.tooltip}>
-          <input {...input} className={inputClasses} />
+          <DatePicker
+            timeFormat="HH:mm"
+            showTimeSelect
+            showTimeSelectOnly
+            minTime={minTime}
+            maxTime={maxTime}
+            timeIntervals={timeIntervals}
+            startDate={new Date()}
+            excludeTimes={excludeTimes}
+            className={inputClasses}
+            {...input}
+          />
         </Tooltip>
       ) : (
-        <input {...input} className={inputClasses} />
+        <DatePicker
+          showTimeSelect
+          timeFormat="HH:mm"
+          showTimeSelectOnly
+          startDate={new Date()}
+          minTime={minTime}
+          maxTime={maxTime}
+          timeIntervals={timeIntervals}
+          className={inputClasses}
+          excludeTimes={excludeTimes}
+          {...input}
+        />
       )}
     </div>
   );

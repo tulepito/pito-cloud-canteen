@@ -606,7 +606,7 @@
   "FieldAvailability.from": "Từ",
   "FieldAvailability.invalidEntries": "Thời gian được chọn là bắt buộc và phải có số phút chia hết cho 5",
   "FieldAvailability.label": "Thời gian hoạt động",
-  "FieldAvailability.maxEndTime": "Thời gian bắt đầu phải bé hơn hoặc bằng {time}",
+  "FieldAvailability.maxEndTime": "Thời gian kết thúc phải bé hơn hoặc bằng {time}",
   "FieldAvailability.maxStartTime": "Thời gian bắt đầu phải bé hơn {time}",
   "FieldAvailability.minEndTime": "Thời gian kết thúc đầu phải lớn {time}",
   "FieldAvailability.minStartTime": "Thời gian bắt đầu phải lớn hơn hoặc bằng {time}",
