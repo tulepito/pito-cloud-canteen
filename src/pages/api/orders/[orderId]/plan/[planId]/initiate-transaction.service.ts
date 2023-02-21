@@ -5,9 +5,10 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/sdk';
 import { getSubAccountTrustedSdk } from '@services/subAccountSdk';
 import config from '@src/configs';
-import { Listing } from '@utils/data';
+import { Listing, Transaction } from '@utils/data';
 import type { TPlan } from '@utils/orderTypes';
 import { ETransition } from '@utils/transaction';
+import type { TObject } from '@utils/types';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
@@ -34,6 +35,7 @@ type TNormalizedOrderDetail = {
   };
 
   shouldCancel?: boolean;
+  date: string;
 };
 
 const normalizeOrderDetail = ({
@@ -104,9 +106,29 @@ const normalizeOrderDetail = ({
           bookingEnd,
         },
         shouldCancel: isEmpty(participantIds),
+        date,
       });
     },
     [],
+  );
+};
+
+const prepareNewPlanOrderDetail = (
+  planOrderDetail: TPlanOrderDetail,
+  transactionIdMap: TObject,
+) => {
+  if (isEmpty(transactionIdMap)) {
+    return planOrderDetail;
+  }
+
+  return Object.entries(planOrderDetail).reduce<TPlanOrderDetail>(
+    (prev, [date, orderOfDate]: [string, TOrderOfDate]) => {
+      return {
+        ...prev,
+        [date]: { ...orderOfDate, transactionId: transactionIdMap[date] },
+      };
+    },
+    {},
   );
 };
 
@@ -152,28 +174,47 @@ export const initiateTransaction = async ({
     deliveryHour,
   });
 
+  const transactionMap: TObject = {};
+
   // Initiate transaction for each date
   await Promise.all(
     normalizedOrderDetail.map(async (item) => {
       const {
         params: { listingId, bookingStart, bookingEnd, extendedData },
         shouldCancel,
+        date,
       } = item;
 
       if (shouldCancel) {
         return;
       }
 
-      await subAccountTrustedSdk.transactions.initiate({
-        processAlias: config.bookingProcessAlias,
-        transition: ETransition.INITIATE_TRANSACTION,
-        params: {
-          listingId,
-          bookingStart,
-          bookingEnd,
-          ...extendedData,
+      const createTxResponse = await subAccountTrustedSdk.transactions.initiate(
+        {
+          processAlias: config.bookingProcessAlias,
+          transition: ETransition.INITIATE_TRANSACTION,
+          params: {
+            listingId,
+            bookingStart,
+            bookingEnd,
+            ...extendedData,
+          },
         },
-      });
+      );
+
+      const [tx] = denormalisedResponseEntities(createTxResponse);
+      const txId = Transaction(tx).getId() as string;
+
+      transactionMap[date] = txId;
+      return txId;
     }),
   );
+
+  // Update new order detail of plan listing
+  await integrationSdk.listings.update({
+    id: planId,
+    metadata: {
+      orderDetail: prepareNewPlanOrderDetail(planOrderDetail, transactionMap),
+    },
+  });
 };
