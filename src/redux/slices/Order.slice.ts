@@ -259,16 +259,22 @@ const queryOrders = createAsyncThunk(
 
 const queryCompanyOrders = createAsyncThunk(
   'app/Orders/COMPANY_QUERY_ORDERS',
-  async (payload: TObject, { rejectWithValue }) => {
+  async (payload: TObject, { rejectWithValue, extra: sdk }) => {
     const { companyId = '', ...restPayload } = payload;
 
     if (companyId === '') {
       return rejectWithValue('Company ID is empty');
     }
+
+    const bookerId = denormalisedResponseEntities(
+      await sdk.currentUser.show(),
+    )[0]?.id?.uuid;
+
     const params = {
       dataParams: {
         ...restPayload,
         perPage: MANAGE_ORDER_PAGE_SIZE,
+        meta_bookerId: bookerId,
         meta_companyId: companyId,
         meta_listingType: LISTING_TYPE.ORDER,
       },

@@ -44,18 +44,20 @@ const prepareItemData = (orderStateHistory: TOrderStateHistory[] = []) => {
   let parsedStartOrderTime = '';
 
   orderStateHistory.forEach(({ state, updatedAt }) => {
+    const parsedNumberUpdatedAt = Number(updatedAt);
+    const formattedTime = DateTime.fromMillis(parsedNumberUpdatedAt).toFormat(
+      'HH:mm - dd/MM/yyyy',
+    );
+
     switch (state) {
       case EOrderDraftStates.pendingApproval:
-        parsedCreateOrderTime =
-          DateTime.fromMillis(updatedAt).toFormat('HH:mm - dd/MM/yyyy');
+        parsedCreateOrderTime = formattedTime;
         break;
       case EOrderStates.picking:
-        parsedStartPickingTime =
-          DateTime.fromMillis(updatedAt).toFormat('HH:mm - dd/MM/yyyy');
+        parsedStartPickingTime = formattedTime;
         break;
       case EOrderStates.inProgress:
-        parsedStartOrderTime =
-          DateTime.fromMillis(updatedAt).toFormat('HH:mm - dd/MM/yyyy');
+        parsedStartOrderTime = formattedTime;
         break;
       default:
         break;
