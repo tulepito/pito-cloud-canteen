@@ -54,10 +54,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (apiMethod) {
     case HTTP_METHODS.GET: {
       const { orderId } = req.query;
+
       if (!orderId) {
         return res.status(400).json({
           message: 'Missing required keys',
         });
+        return;
       }
 
       try {

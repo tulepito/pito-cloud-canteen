@@ -39,20 +39,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             );
           }
 
-          const updateTime = new Date().getTime();
+          const updatedAt = new Date().getTime();
 
           const initOrderStateHistory = isEmpty(orderStateHistory)
             ? [
                 {
                   state: EOrderDraftStates.draft,
-                  time: updateTime,
+                  updatedAt,
                 },
               ]
             : orderStateHistory;
           const updateOrderStateHistory = initOrderStateHistory.concat([
             {
               state: EOrderDraftStates.pendingApproval,
-              time: updateTime,
+              updatedAt,
             },
           ]);
 

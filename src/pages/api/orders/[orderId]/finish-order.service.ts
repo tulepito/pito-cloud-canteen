@@ -30,7 +30,7 @@ export const finishOrder = async (orderId: string) => {
     metadata: {
       orderStateHistory: orderStateHistory.concat({
         state: EOrderStates.picking,
-        time: new Date().getTime(),
+        updatedAt: new Date().getTime(),
       }),
     },
   });

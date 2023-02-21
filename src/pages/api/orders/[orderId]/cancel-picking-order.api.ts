@@ -22,6 +22,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           if (isEmpty(orderId)) {
             res.status(400).json({ error: 'orderId is required' });
+            return;
           }
 
           await cancelPickingOrder(orderId as string);

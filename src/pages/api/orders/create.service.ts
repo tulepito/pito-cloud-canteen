@@ -21,7 +21,7 @@ const createOrder = async ({
   isCreatedByAdmin: boolean;
 }) => {
   const integrationSdk = getIntegrationSdk();
-  const createdAt = new Date();
+  const updatedAt = new Date();
 
   // Count order number
   const adminAccount = await getAdminAccount();
@@ -47,7 +47,7 @@ const createOrder = async ({
       state: isCreatedByAdmin
         ? EOrderDraftStates.draft
         : EBookerOrderDraftStates.bookerDraft,
-      time: createdAt,
+      updatedAt,
     },
   ];
 
