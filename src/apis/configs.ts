@@ -26,7 +26,7 @@ export const getApi = (path: string, params: TObject = {}) => {
   });
 };
 
-export const postApi = (path: string, body: TObject) => {
+export const postApi = (path: string, body: TObject = {}) => {
   return axios.post(`${apiBaseUrl()}${path}`, body);
 };
 

@@ -3,10 +3,10 @@ import { fetchUserApi } from '@apis/index';
 import type { TUpdateOrderApiBody } from '@apis/orderApi';
 import {
   bookerDeleteDraftOrderApi,
-  bookerFinishOrderApi,
+  bookerPublishOrderApi,
   createBookerOrderApi,
-  publishDraftOrderApi,
   queryOrdersApi,
+  requestApprovalOrderApi,
   updateOrderApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
@@ -59,8 +59,8 @@ type TOrderInitialState = {
   fetchOrderDetailInProgress: boolean;
   fetchOrderDetailError: any;
 
-  bookerFinishOrderInProgress: boolean;
-  bookerFinishOrderError: any;
+  bookerPublishOrderInProgress: boolean;
+  bookerPublishOrderError: any;
 
   // Manage Orders Page
   queryParams: TObject;
@@ -110,8 +110,8 @@ const initialState: TOrderInitialState = {
   fetchOrderDetailInProgress: false,
   fetchOrderDetailError: null,
 
-  bookerFinishOrderInProgress: false,
-  bookerFinishOrderError: null,
+  bookerPublishOrderInProgress: false,
+  bookerPublishOrderError: null,
 
   // Manage Orders
   queryParams: {},
@@ -370,19 +370,19 @@ const bookerDeleteDraftOrder = createAsyncThunk(
   },
 );
 
-const publishDraftOrder = createAsyncThunk(
-  'app/Order/PUBLISH_DRAFT_ORDER',
+const requestApprovalOrder = createAsyncThunk(
+  'app/Order/REQUEST_APPROVAL_ORDER',
   async ({ orderId }: TObject) => {
-    const { data: responseData } = await publishDraftOrderApi(orderId);
+    const { data: responseData } = await requestApprovalOrderApi(orderId);
 
     return responseData.data;
   },
 );
 
-const bookerFinishOrder = createAsyncThunk(
-  'app/Order/BOOKER_FINISH_ORDER',
-  async ({ orderId, planId }: TObject) => {
-    await bookerFinishOrderApi({ orderId, planId });
+const bookerPublishOrder = createAsyncThunk(
+  'app/Order/BOOKER_PUBLISH_ORDER',
+  async ({ orderId }: TObject) => {
+    await bookerPublishOrderApi(orderId as string);
   },
   {
     serializeError: storableError,
@@ -399,8 +399,8 @@ export const orderAsyncActions = {
   queryOrders,
   queryCompanyOrders,
   updatePlanDetail,
-  publishDraftOrder,
-  bookerFinishOrder,
+  requestApprovalOrder,
+  bookerPublishOrder,
 };
 
 const orderSlice = createSlice({
@@ -642,37 +642,34 @@ const orderSlice = createSlice({
         updateOrderDetailInProgress: false,
         updateOrderDetailError: error.message,
       }))
-      /* =============== publishDraftOrder =============== */
-      .addCase(publishDraftOrder.pending, (state) => ({
+      /* =============== requestApprovalOrder =============== */
+      .addCase(requestApprovalOrder.pending, (state) => ({
         ...state,
         updateOrderInProgress: true,
         updateOrderError: null,
       }))
-      .addCase(publishDraftOrder.fulfilled, (state, { payload }) => ({
+      .addCase(requestApprovalOrder.fulfilled, (state, { payload }) => ({
         ...state,
         updateOrderInProgress: false,
         order: payload,
       }))
-      .addCase(publishDraftOrder.rejected, (state, { error }) => ({
+      .addCase(requestApprovalOrder.rejected, (state, { error }) => ({
         ...state,
         updateOrderInProgress: false,
         updateOrderError: error.message,
       }))
-      /* =============== bookerFinishOrder =============== */
-      .addCase(bookerFinishOrder.pending, (state) => ({
-        ...state,
-        bookerFinishOrderError: null,
-        bookerFinishOrderInProgress: true,
-      }))
-      .addCase(bookerFinishOrder.fulfilled, (state) => ({
-        ...state,
-        bookerFinishOrderInProgress: false,
-      }))
-      .addCase(bookerFinishOrder.rejected, (state, { payload }) => ({
-        ...state,
-        bookerFinishOrderInProgress: false,
-        bookerFinishOrderError: payload,
-      }));
+      /* =============== bookerPublishOrder =============== */
+      .addCase(bookerPublishOrder.pending, (state) => {
+        state.bookerPublishOrderError = null;
+        state.bookerPublishOrderInProgress = true;
+      })
+      .addCase(bookerPublishOrder.fulfilled, (state) => {
+        state.bookerPublishOrderInProgress = false;
+      })
+      .addCase(bookerPublishOrder.rejected, (state, { payload }) => {
+        state.bookerPublishOrderInProgress = false;
+        state.bookerPublishOrderError = payload;
+      });
   },
 });
 

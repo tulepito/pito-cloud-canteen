@@ -23,7 +23,7 @@ export const cancelPickingOrder = async (orderId: string) => {
       orderState: EOrderStates.canceled,
       orderStateHistory: orderStateHistory.concat({
         state: EOrderStates.canceled,
-        timestamp: new Date().getTime(),
+        updatedAt: new Date().getTime(),
       }),
     },
   });

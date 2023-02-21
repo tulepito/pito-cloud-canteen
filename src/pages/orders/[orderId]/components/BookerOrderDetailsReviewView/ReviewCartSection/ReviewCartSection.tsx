@@ -45,7 +45,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
 
   const handleStartPickingOrder = () => {
     dispatch(
-      orderManagementThunks.startPickingOrder({ orderId: orderId as string }),
+      orderManagementThunks.bookerStartOrder({ orderId: orderId as string }),
     );
   };
 

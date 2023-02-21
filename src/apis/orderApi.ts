@@ -80,18 +80,22 @@ export const bookerDeleteDraftOrderApi = ({
   return deleteApi(`/company/${companyId}/orders/${orderId}`);
 };
 
-export const publishDraftOrderApi = (orderId: string) => {
-  return putApi(`/orders/${orderId}/publish-draft-order`);
+export const requestApprovalOrderApi = (orderId: string) => {
+  return putApi(`/orders/${orderId}/request-approval-order`);
 };
 
-export const bookerFinishOrderApi = ({
+export const bookerStartOrderApi = ({
   orderId,
   planId,
 }: {
   orderId: string;
   planId: string;
 }) => {
-  return putApi(`/orders/${orderId}/plan/${planId}/finish-order`);
+  return putApi(`/orders/${orderId}/plan/${planId}/start-order`);
+};
+
+export const bookerPublishOrderApi = (orderId: string) => {
+  return postApi(`/orders/${orderId}/publish-order`);
 };
 
 export const cancelPickingOrderApi = (orderId: string) => {

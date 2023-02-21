@@ -97,7 +97,7 @@ function BookerDraftOrderPage() {
   const handleFinishOrder =
     ({ planId }: { orderId: string; planId: string }) =>
     () => {
-      dispatch(orderAsyncActions.bookerFinishOrder({ orderId, planId }));
+      dispatch(orderAsyncActions.bookerPublishOrder({ orderId, planId }));
     };
 
   return (

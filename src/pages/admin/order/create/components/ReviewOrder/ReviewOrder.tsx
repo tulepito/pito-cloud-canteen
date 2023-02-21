@@ -236,7 +236,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
 
     if (orderState === EOrderDraftStates.draft) {
-      await dispatch(orderAsyncActions.publishDraftOrder({ orderId }));
+      await dispatch(orderAsyncActions.requestApprovalOrder({ orderId }));
     }
 
     const { error } = (await dispatch(

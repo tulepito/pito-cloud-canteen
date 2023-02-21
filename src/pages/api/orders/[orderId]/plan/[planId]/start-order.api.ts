@@ -3,7 +3,7 @@ import { handleError } from '@services/sdk';
 import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { finishOrder } from '../../finish-order.service';
+import { startOrder } from '../../start-order.service';
 import { initiateTransaction } from './initiate-transaction.service';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -26,8 +26,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             return;
           }
 
+          await startOrder(orderId);
           await initiateTransaction({ orderId, planId });
-          await finishOrder(orderId);
 
           res.status(200).json({
             message: `Successfully finish picking order`,

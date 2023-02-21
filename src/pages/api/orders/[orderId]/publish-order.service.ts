@@ -12,7 +12,7 @@ const enableToPublishOrderStates = [
   EBookerOrderDraftStates.bookerDraft,
 ];
 
-export const finishOrder = async (orderId: string) => {
+export const publishOrder = async (orderId: string) => {
   const integrationSdk = getIntegrationSdk();
 
   const [orderListing] = denormalisedResponseEntities(

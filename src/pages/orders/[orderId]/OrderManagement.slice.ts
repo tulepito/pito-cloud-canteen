@@ -1,6 +1,7 @@
 import {
   addParticipantToOrderApi,
   addUpdateMemberOrder,
+  bookerStartOrderApi,
   cancelPickingOrderApi,
   deleteParticipantFromOrderApi,
   getBookerOrderDataApi,
@@ -10,9 +11,10 @@ import {
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
+import { Listing } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import { storableError } from '@utils/errors';
-import type { TCompany, TObject, TUser } from '@utils/types';
+import type { TCompany, TListing, TObject, TUser } from '@utils/types';
 import omit from 'lodash/omit';
 
 // ================ Initial states ================ //
@@ -28,7 +30,8 @@ type TOrderManagementState = {
   // Cancel order state
   cancelPickingOrderInProgress: boolean;
   cancelPickingOrderError: any;
-
+  //
+  isStartOrderInProgress: boolean;
   // Data states
   companyId: string | null;
   companyData: TCompany | null;
@@ -45,6 +48,7 @@ const initialState: TOrderManagementState = {
   isSendingRemindEmail: false,
   cancelPickingOrderInProgress: false,
   cancelPickingOrderError: null,
+  isStartOrderInProgress: false,
   companyId: null,
   companyData: null,
   orderData: {},
@@ -418,16 +422,17 @@ const deleteParticipant = createAsyncThunk(
   },
 );
 
-const startPickingOrder = createAsyncThunk(
-  'app/OrderManagement/START_PICKING_ORDER',
+const bookerStartOrder = createAsyncThunk(
+  'app/OrderManagement/startOrder',
   async ({ orderId }: TObject, { getState }) => {
-    const {
-      attributes: {
-        metadata: { companyId },
-      },
-    } = getState().OrderManagement.orderData!;
+    const { plans } = Listing(
+      getState().OrderManagement.orderData! as TListing,
+    ).getMetadata();
 
-    await startPickingOrder({ orderId, companyId });
+    await bookerStartOrderApi({
+      orderId,
+      planId: plans.length > 0 ? plans[0] : '',
+    });
   },
 );
 
@@ -451,7 +456,7 @@ export const orderManagementThunks = {
   deleteDisAllowedMember,
   addParticipant,
   deleteParticipant,
-  startPickingOrder,
+  bookerStartOrder,
   cancelPickingOrder,
 };
 
@@ -517,14 +522,14 @@ const OrderManagementSlice = createSlice({
         state.isSendingRemindEmail = false;
       })
       /* =============== startPickingOrder =============== */
-      .addCase(startPickingOrder.pending, (state) => {
-        state.isUpdatingOrderDetails = true;
+      .addCase(bookerStartOrder.pending, (state) => {
+        state.isStartOrderInProgress = true;
       })
-      .addCase(startPickingOrder.fulfilled, (state) => {
-        state.isUpdatingOrderDetails = false;
+      .addCase(bookerStartOrder.fulfilled, (state) => {
+        state.isStartOrderInProgress = false;
       })
-      .addCase(startPickingOrder.rejected, (state) => {
-        state.isUpdatingOrderDetails = false;
+      .addCase(bookerStartOrder.rejected, (state) => {
+        state.isStartOrderInProgress = false;
       })
       /* =============== cancelPickingOrder =============== */
       .addCase(cancelPickingOrder.pending, (state) => ({
