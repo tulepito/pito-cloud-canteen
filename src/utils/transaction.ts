@@ -1,5 +1,8 @@
 import configs from '@src/configs';
 
+import { ensureTransaction } from './data';
+import type { TTransaction } from './types';
+
 export enum ETransactionActor {
   CUSTOMER = 'customer',
   PROVIDER = 'provider',
@@ -122,6 +125,9 @@ const getTransitions = (states: TStateDescription['states']) => {
   return stateNames.reduce(transitionsReducer, []);
 };
 
+const txLastTransition = (tx: TTransaction) =>
+  ensureTransaction(tx).attributes.lastTransition;
+
 // This is a list of all the transitions that this app should be able to handle.
 export const TRANSITIONS = getTransitions(
   statesFromStateDescription(stateDescription),
@@ -136,3 +142,11 @@ const getTransitionsToStateFn =
 
 // Get all the transitions that lead to specified state.
 export const getTransitionsToState = getTransitionsToStateFn(stateDescription);
+
+export const txIsCompleted = (tx: TTransaction) => {
+  return [ETransition.COMPLETE_DELIVERY].includes(txLastTransition(tx));
+};
+
+export const txIsExpiredReview = (tx: TTransaction) => {
+  return [ETransition.EXPIRED_REVIEW_TIME].includes(txLastTransition(tx));
+};

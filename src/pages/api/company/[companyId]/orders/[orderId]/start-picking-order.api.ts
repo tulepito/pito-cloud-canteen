@@ -41,7 +41,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const updateOrderStateHistory = orderStateHistory.concat([
             {
               state: EOrderStates.inProgress,
-              time: new Date().getTime(),
+              updatedAt: new Date().getTime(),
             },
           ]);
 
