@@ -8,18 +8,22 @@ import { useIntl } from 'react-intl';
 import css from './ResultDetailModal.module.scss';
 
 type TResultDetailFiltersProps = {
-  onSelectAll: (value: boolean) => void;
+  selectedFoodIds: string[];
+  originFoodIdList: string[];
   initialValues?: TResultDetailFiltersValues;
+  onSelectAllFood?: (foodIds: string[]) => void;
 };
 
 export type TResultDetailFiltersValues = {
-  isSelectAll?: boolean;
   keyword?: string;
+  selectAll?: boolean;
 };
 
 const ResultDetailFilters: React.FC<TResultDetailFiltersProps> = ({
-  onSelectAll,
+  selectedFoodIds,
+  originFoodIdList,
   initialValues,
+  onSelectAllFood = () => null,
 }) => {
   const intl = useIntl();
 
@@ -29,14 +33,33 @@ const ResultDetailFilters: React.FC<TResultDetailFiltersProps> = ({
 
   const { form, handleSubmit } = useForm<TResultDetailFiltersValues>({
     onSubmit: handleSearch,
+    initialValues,
   });
 
   const selectAllField = useField('selectAll', form);
   const keywordField = useField('keyword', form);
 
   useEffect(() => {
-    onSelectAll(selectAllField.input.value);
-  }, [selectAllField.input.value, onSelectAll]);
+    if (selectAllField.input.value && originFoodIdList.length !== 0) {
+      onSelectAllFood(originFoodIdList);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [originFoodIdList, selectAllField.input.value]);
+
+  useEffect(() => {
+    if (
+      selectedFoodIds.length === originFoodIdList.length &&
+      originFoodIdList.length !== 0
+    ) {
+      form.change('selectAll', true);
+    } else if (
+      selectedFoodIds.length !== originFoodIdList.length &&
+      originFoodIdList.length !== 0
+    ) {
+      form.change('selectAll', false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFoodIds, originFoodIdList]);
 
   return (
     <form onSubmit={handleSubmit} className={css.filters}>
@@ -47,7 +70,7 @@ const ResultDetailFilters: React.FC<TResultDetailFiltersProps> = ({
             id={'selectAll'}
             type="checkbox"
             {...selectAllField.input}
-            checked={initialValues?.isSelectAll}
+            checked={selectAllField.input.value}
           />
           <label className={css.label} htmlFor={'selectAll'}>
             <span className={css.checkboxWrapper}>

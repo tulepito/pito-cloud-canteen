@@ -4,14 +4,20 @@ import { useIntl } from 'react-intl';
 
 import css from './ResultDetailModal.module.scss';
 
-const ResultDetailHeader: React.FC = () => {
+type TResultDetailHeaderProps = {
+  numberSelectedDish?: number;
+};
+
+const ResultDetailHeader: React.FC<TResultDetailHeaderProps> = ({
+  numberSelectedDish = 0,
+}) => {
   const intl = useIntl();
   const selectedDishText = intl.formatMessage(
     {
       id: 'booker.orders.draft.resultDetailModal.selectedDish',
     },
     {
-      number: 4,
+      number: numberSelectedDish,
     },
   );
 
@@ -21,7 +27,9 @@ const ResultDetailHeader: React.FC = () => {
       <Badge
         className={css.modalBadge}
         label={selectedDishText}
-        type={EBadgeType.PROCESSING}
+        type={
+          numberSelectedDish > 0 ? EBadgeType.PROCESSING : EBadgeType.WARNING
+        }
         hasDotIcon={true}
       />
     </div>
