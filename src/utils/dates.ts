@@ -263,3 +263,10 @@ export const getSeparatedDates = (
   }
   return separatedDates;
 };
+
+export const printHoursToString = (hours: number, minutes: number) => {
+  const minutesToRender = minutes < 10 ? `0${minutes}` : minutes;
+  const hoursToRender = hours < 10 ? `0${hours}` : hours;
+  const hoursAndMinutes = `${hoursToRender}:${minutesToRender}`;
+  return hoursAndMinutes;
+};

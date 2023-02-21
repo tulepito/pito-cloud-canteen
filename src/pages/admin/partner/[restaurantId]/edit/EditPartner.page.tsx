@@ -144,14 +144,6 @@ const EditPartnerPage = () => {
     dispatch(partnerThunks.showPartnerRestaurantListing(restaurantId));
   }, [restaurantId]);
 
-  console.log({
-    uploadingAvatars,
-    uploadingCovers,
-    uploadingBusinessLicenses,
-    uploadingFoodCertificates,
-    uploadingPartyInsurances,
-  });
-
   let content;
   if (showPartnerListingInProgress) {
     content = (

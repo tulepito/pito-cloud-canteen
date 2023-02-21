@@ -4,6 +4,7 @@ import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import IconClose from '@components/Icons/IconClose/IconClose';
+import { printHoursToString } from '@utils/dates';
 import { EDayOfWeek } from '@utils/enums';
 import {
   composeValidatorsWithAllValues,
@@ -13,17 +14,25 @@ import {
   minTimeValidate,
   nonConflictAvailabilityEntries,
   nonConflictAvailabilityEntriesByDayOfWeek,
+  parseAvailabilityEntries,
   startTimeGreaterThanEndTime,
   startTimeGreaterThanEndTimeOnEachDayOfWeek,
+  timeToMinute,
   validAvailabilityPlanEntries,
 } from '@utils/validators';
 import classNames from 'classnames';
+import { setHours, setMinutes } from 'date-fns';
 import React from 'react';
 import { FieldArray } from 'react-final-form-arrays';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './FieldAvailability.module.scss';
 import FieldEntryTime from './FieldEntryTime';
+
+type TAvailabilityEntry = {
+  startTime: string;
+  endTime: string;
+};
 
 const defaultAvailabilityPlan = (dayOfWeek: string) => {
   return {
@@ -55,6 +64,97 @@ const uniqueStringEntries = (array: string[]) => {
   return array.filter((item, pos) => {
     return array.indexOf(item) === pos;
   });
+};
+
+const renderListExcludedTimes = (startTime: string, endTime: string) => {
+  const [startHour, startMinute] = startTime?.split(':') || [];
+  const [endHour, endMinute] = endTime?.split(':') || [];
+  const startInterval = Number(startHour) * 60 + Number(startMinute);
+  const endInterval = Number(endHour) * 60 + Number(endMinute);
+  const result = [];
+  const interval = 5;
+  for (let i = startInterval; i <= endInterval; i += interval) {
+    const hours = Math.floor(i / 60);
+    const minutes = i % 60;
+    result.push(
+      `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`,
+    );
+  }
+  return result;
+};
+
+const renderRangeByStartTime = (
+  startTime: string,
+  timeRanges: TAvailabilityEntry[],
+  index: number,
+) => {
+  const listExcludedTimes = timeRanges.reduce(
+    (prev: string[], cur: TAvailabilityEntry, curIndex: number) => {
+      if (curIndex !== index) {
+        const listTimes = renderListExcludedTimes(cur.startTime, cur.endTime);
+        return [...prev, ...listTimes];
+      }
+      return prev;
+    },
+    [],
+  ) as unknown as string[];
+
+  const endTime = listExcludedTimes.reduce(
+    (acc, loc) => (timeToMinute(acc) < timeToMinute(loc) ? acc : loc),
+    listExcludedTimes[0],
+  );
+
+  const startTimeMoreThanEndTime =
+    timeToMinute(startTime) > timeToMinute(endTime);
+
+  const endTimeToSplit = startTimeMoreThanEndTime ? startTime : endTime;
+  const [endHour, endMinute] = endTimeToSplit?.split(':') || [];
+  const newEndTime = printHoursToString(Number(endHour), Number(endMinute));
+
+  const result = startTime
+    ? [
+        ...renderListExcludedTimes('06:30', startTime),
+        ...(startTimeMoreThanEndTime
+          ? []
+          : renderListExcludedTimes(newEndTime, '23:00')),
+      ]
+    : [];
+  return result;
+};
+
+const renderMinTime = () => {
+  return setHours(setMinutes(new Date(), 30), 6);
+};
+
+const renderMaxTime = () => {
+  return setHours(setMinutes(new Date(), 0), 23);
+};
+
+const renderExculdedTimes = (
+  timeRanges: TAvailabilityEntry[],
+  timeType: 'startTime' | 'endTime',
+  index: number,
+) => {
+  const listTimeRanges = timeRanges.reduce(
+    (prev: string[], cur: TAvailabilityEntry, curIndex: number) => {
+      if (curIndex !== index) {
+        const listTimes = renderListExcludedTimes(cur.startTime, cur.endTime);
+        return [...prev, ...listTimes] as string[];
+      }
+      const listTimes =
+        timeType === 'endTime'
+          ? renderRangeByStartTime(cur.startTime, timeRanges, index)
+          : [];
+      return [...prev, ...listTimes] as string[];
+    },
+    [],
+  );
+
+  const result = listTimeRanges.map((time: string) => {
+    const [hours, minutes] = time.split(':');
+    return setHours(setMinutes(new Date(), Number(minutes)), Number(hours));
+  });
+  return result;
 };
 
 const getNewValuesOnDayToApplyChange = ({
@@ -172,8 +272,16 @@ const HourlyPlan: React.FC<any> = (props) => {
                   id={`${name}.startTime`}
                   name={`${name}.startTime`}
                   type="time"
+                  minTime={renderMinTime()}
+                  maxTime={renderMaxTime()}
+                  excludeTimes={renderExculdedTimes(
+                    fields.value,
+                    'startTime',
+                    index,
+                  )}
                   className={css.fieldSelect}
                   placeholder={startTimePlaceholder}
+                  parse={parseAvailabilityEntries}
                   validate={composeValidatorsWithAllValues(
                     nonConflictAvailabilityEntries(
                       intl.formatMessage({
@@ -225,8 +333,16 @@ const HourlyPlan: React.FC<any> = (props) => {
                   id={`${name}.endTime`}
                   className={css.fieldSelect}
                   name={`${name}.endTime`}
+                  minTime={renderMinTime()}
+                  maxTime={renderMaxTime()}
                   type="time"
+                  excludeTimes={renderExculdedTimes(
+                    fields.value,
+                    'endTime',
+                    index,
+                  )}
                   placeholder={endTimePlaceholder}
+                  parse={parseAvailabilityEntries}
                   validate={composeValidatorsWithAllValues(
                     nonConflictAvailabilityEntries(
                       intl.formatMessage({
@@ -309,7 +425,7 @@ const HourlyPlan: React.FC<any> = (props) => {
 };
 
 const DailyPlan: React.FC<any> = (props) => {
-  const { dayOfWeek, intl, name: fieldName } = props;
+  const { dayOfWeek, intl, name: fieldName, values } = props;
   const startTimePlaceholder = intl.formatMessage({
     id: 'FieldAvailability.startTimePlaceholder',
   });
@@ -321,6 +437,10 @@ const DailyPlan: React.FC<any> = (props) => {
     <FieldArray name={`${fieldName}.${dayOfWeek}`}>
       {({ fields }) => {
         return fields.map((name: any, index: number) => {
+          const [availabilityFieldName, dayOfWeekFieldName] =
+            fields.name.split('.');
+          const timeRanges =
+            values?.[availabilityFieldName]?.[dayOfWeekFieldName] || [];
           return (
             <>
               <tr key={`${name}.${index + 1}`} className={css.dailyPlanWrapper}>
@@ -336,9 +456,17 @@ const DailyPlan: React.FC<any> = (props) => {
                 <td>
                   <FieldEntryTime
                     id={`${name}.startTime`}
+                    minTime={renderMinTime()}
+                    maxTime={renderMaxTime()}
+                    excludeTimes={renderExculdedTimes(
+                      timeRanges,
+                      'startTime',
+                      index,
+                    )}
                     name={`${name}.startTime`}
                     type="time"
                     className={css.fieldSelect}
+                    parse={parseAvailabilityEntries}
                     placeholder={startTimePlaceholder}
                     validate={composeValidatorsWithAllValues(
                       nonConflictAvailabilityEntriesByDayOfWeek(
@@ -391,6 +519,14 @@ const DailyPlan: React.FC<any> = (props) => {
                     id={`${name}.endTime`}
                     name={`${name}.endTime`}
                     type="time"
+                    minTime={renderMinTime()}
+                    maxTime={renderMaxTime()}
+                    excludeTimes={renderExculdedTimes(
+                      timeRanges,
+                      'endTime',
+                      index,
+                    )}
+                    parse={parseAvailabilityEntries}
                     className={css.fieldSelect}
                     placeholder={endTimePlaceholder}
                     validate={composeValidatorsWithAllValues(
@@ -456,7 +592,7 @@ const DailyPlan: React.FC<any> = (props) => {
                       onClick={() =>
                         fields.push({
                           dayOfWeek,
-                          seets: 100,
+                          seats: 100,
                           startTime: null,
                           endTime: null,
                         })
