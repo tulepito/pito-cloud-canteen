@@ -8,11 +8,12 @@ import css from './ResultDetailModal.module.scss';
 
 type TResultDetailHeaderProps = {
   restaurant?: TListing;
-  dishCount: number;
+  numberSelectedDish?: number;
 };
+
 const ResultDetailHeader: React.FC<TResultDetailHeaderProps> = ({
   restaurant,
-  dishCount,
+  numberSelectedDish = 0,
 }) => {
   const intl = useIntl();
   const selectedDishText = intl.formatMessage(
@@ -20,7 +21,7 @@ const ResultDetailHeader: React.FC<TResultDetailHeaderProps> = ({
       id: 'booker.orders.draft.resultDetailModal.selectedDish',
     },
     {
-      number: dishCount,
+      number: numberSelectedDish,
     },
   );
 
@@ -32,7 +33,9 @@ const ResultDetailHeader: React.FC<TResultDetailHeaderProps> = ({
       <Badge
         className={css.modalBadge}
         label={selectedDishText}
-        type={EBadgeType.PROCESSING}
+        type={
+          numberSelectedDish > 0 ? EBadgeType.PROCESSING : EBadgeType.WARNING
+        }
         hasDotIcon={true}
       />
     </div>

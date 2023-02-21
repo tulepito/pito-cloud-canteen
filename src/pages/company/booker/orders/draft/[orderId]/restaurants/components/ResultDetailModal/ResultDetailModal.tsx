@@ -7,7 +7,7 @@ import useBoolean from '@hooks/useBoolean';
 import { Listing } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { getListingImageById } from '../../helpers';
@@ -45,7 +45,6 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
 }) => {
   const intl = useIntl();
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
-  const selectAllControl = useBoolean(false);
   const foodModal = useBoolean(false);
   const [selectedFood, setSelectedFood] = useState<TListing | null>(null);
 
@@ -89,13 +88,29 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     [companyGeoOrigin, restaurantOrigin],
   );
 
-  const handleSelecFood = (foodId: string) => {
-    setSelectedFoods([...selectedFoods, foodId]);
-  };
+  const originFoodIdList = useMemo(() => {
+    return (restaurantFood?.[selectedRestaurantId!] || []).map(
+      (item) => item?.id?.uuid,
+    );
+  }, [restaurantFood, selectedRestaurantId]);
 
-  const handleRemoveFood = (foodId: string) => {
-    setSelectedFoods(selectedFoods.filter((id) => id !== foodId));
-  };
+  const handleSelecFood = useCallback(
+    (foodId: string) => {
+      setSelectedFoods([...selectedFoods, foodId]);
+    },
+    [selectedFoods],
+  );
+
+  const handleRemoveFood = useCallback(
+    (foodId: string) => {
+      setSelectedFoods(selectedFoods.filter((id) => id !== foodId));
+    },
+    [selectedFoods],
+  );
+
+  const handleSelectFoods = useCallback((foodIds: string[]) => {
+    setSelectedFoods([...foodIds]);
+  }, []);
 
   const onClickFood = (foodId: string) => {
     foodModal.setTrue();
@@ -112,28 +127,6 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    if (selectAllControl.value) {
-      const foodList = restaurantFood?.[selectedRestaurantId!];
-      const foodIds = foodList?.map((food) => food.id?.uuid);
-      setSelectedFoods(foodIds || []);
-    }
-  }, [restaurantFood, selectAllControl.value, selectedRestaurantId]);
-
-  useEffect(() => {
-    if (
-      selectedFoods.length < restaurantFood?.[selectedRestaurantId!]?.length &&
-      selectAllControl.value
-    ) {
-      selectAllControl.setFalse();
-    }
-  }, [
-    restaurantFood,
-    selectAllControl,
-    selectedFoods.length,
-    selectedRestaurantId,
-  ]);
-
   const foodList = restaurantFood?.[selectedRestaurantId!];
   return (
     <>
@@ -149,7 +142,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
         }>
         <ResultDetailHeader
           restaurant={currentRestaurant!}
-          dishCount={selectedFoods?.length || 0}
+          numberSelectedDish={selectedFoods.length}
         />
         <div className={css.contentScroll}>
           <div className={css.content}>
@@ -170,8 +163,9 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
               distance={`${distance}km`}
             />
             <ResultDetailFilters
-              initialValues={{ isSelectAll: selectAllControl.value }}
-              onSelectAll={selectAllControl.setValue}
+              onSelectAllFood={handleSelectFoods}
+              selectedFoodIds={selectedFoods}
+              originFoodIdList={originFoodIdList}
             />
             <FoodListSection
               foodList={foodList}
