@@ -69,6 +69,8 @@ type TOrderInitialState = {
   queryOrderError: any;
   deleteDraftOrderInProgress: boolean;
   deleteDraftOrderError: any;
+  manageOrdersPagination: TPagination;
+
   totalItemMap: {
     [EManageCompanyOrdersTab.SCHEDULED]: number;
     [EManageCompanyOrdersTab.CANCELED]: number;
@@ -76,14 +78,13 @@ type TOrderInitialState = {
     [EManageCompanyOrdersTab.COMPLETED]: number;
     [EManageCompanyOrdersTab.ALL]: number;
   };
-  manageOrdersPagination: TPagination;
 };
 
 const initialState: TOrderInitialState = {
   order: null,
   fetchOrderInProgress: false,
   fetchOrderError: null,
-  plans: [],
+  plans: [] as TListing[],
   orderDetail: {},
   createOrderInProcess: false,
   createOrderError: null,
@@ -98,14 +99,14 @@ const initialState: TOrderInitialState = {
   bookerList: [],
   selectedBooker: null,
 
+  updateOrderDetailInProgress: false,
+  updateOrderDetailError: null,
+
   selectedCalendarDate: undefined!,
   isSelectingRestaurant: false,
 
   updateOrderInProgress: false,
   updateOrderError: null,
-
-  updateOrderDetailInProgress: false,
-  updateOrderDetailError: null,
 
   fetchOrderDetailInProgress: false,
   fetchOrderDetailError: null,
@@ -142,6 +143,7 @@ const FETCH_ORDER = 'app/Order/FETCH_ORDER';
 const FETCH_ORDER_DETAIL = 'app/Order/FETCH_ORDER_DETAIL';
 const QUERY_SUB_ORDERS = 'app/Order/QUERY_SUB_ORDERS';
 const UPDATE_PLAN_DETAIL = 'app/Order/UPDATE_PLAN_DETAIL';
+const FETCH_PLAN_DETAIL = 'app/Order/FETCH_PLAN_DETAIL';
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
   const { clientId, bookerId, isCreatedByAdmin = false } = params;
@@ -354,6 +356,21 @@ const fetchOrder = createAsyncThunk(
   },
 );
 
+const fetchPlanDetail = createAsyncThunk(
+  FETCH_PLAN_DETAIL,
+  async ({ planId }: { planId: string }, { extra: sdk }) => {
+    if (planId) {
+      const response = denormalisedResponseEntities(
+        await sdk.listings.show({
+          id: planId,
+        }),
+      )[0];
+      return response;
+    }
+    return {};
+  },
+);
+
 const updatePlanDetail = createAsyncThunk(
   UPDATE_PLAN_DETAIL,
   async ({ orderId, planId, orderDetail, updateMode }: any, _) => {
@@ -404,6 +421,7 @@ export const orderAsyncActions = {
   fetchOrderDetail,
   queryOrders,
   queryCompanyOrders,
+  fetchPlanDetail,
   updatePlanDetail,
   requestApprovalOrder,
   bookerPublishOrder,

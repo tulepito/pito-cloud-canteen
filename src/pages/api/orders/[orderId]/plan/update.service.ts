@@ -3,7 +3,6 @@ import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import type { TObject } from '@utils/types';
-import { isEmpty } from 'lodash';
 
 import { getInitMemberOrder } from './memberOrder.helper';
 
@@ -70,7 +69,7 @@ const updatePlan = async ({
 
   let updatedOrderDetail = normalizeDetail;
 
-  if (enabledToUpdateRelatedBookingInfo && !isEmpty(updatedOrderDetail)) {
+  if (enabledToUpdateRelatedBookingInfo) {
     if (updateMode === EApiUpdateMode.MERGE) {
       currPlan = await fetchListing(planId as string);
       const { orderDetail: oldOrderDetail } = Listing(currPlan).getMetadata();
@@ -80,7 +79,6 @@ const updatePlan = async ({
         initialMemberOrder,
       });
     }
-
     const planListingResponse = await integrationSdk.listings.update(
       {
         id: planId,
@@ -94,6 +92,7 @@ const updatePlan = async ({
     const planListing = denormalisedResponseEntities(planListingResponse)[0];
     return planListing;
   }
+  return {};
 };
 
 export default updatePlan;

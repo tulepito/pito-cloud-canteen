@@ -24,15 +24,17 @@ type TMealPlanCardProps = {
   event: Event;
   index: number;
   eventExtraProps: TObject;
+  removeInprogress: boolean;
   onRemove?: (id: string) => void;
 };
 
 const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   event,
-  onRemove,
   eventExtraProps = {},
+  removeInprogress,
+  onRemove,
 }) => {
-  const { onPickFoodModal = () => {} } = eventExtraProps;
+  const { onPickFoodModal = () => null } = eventExtraProps;
   const dispatch = useAppDispatch();
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
@@ -104,7 +106,11 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     selectedDate.getTime() === event.start?.getTime();
   return (
     <div className={css.root}>
-      <MealPlanCardHeader event={event} removeEventItem={removeEventItem} />
+      <MealPlanCardHeader
+        event={event}
+        removeEventItem={removeEventItem}
+        removeInprogress={removeInprogress}
+      />
       <MealPlanCardContent event={event} onEditMeal={onEditMeal} />
       <MealPlanCardFooter
         event={event}

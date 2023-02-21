@@ -4,6 +4,7 @@ export const shouldShowFeatureHeader = (pathName: string) => {
   const hideList = [
     companyPaths.CreateNewOrder,
     companyPaths.EditDraftOrder,
+    companyPaths.OrderSelectRestaurant,
     companyPaths.ManageOrders,
     companyPaths.ManageOrderDetail,
   ];
@@ -19,6 +20,7 @@ export const shouldShowSidebar = (pathName: string) => {
   const hideList = [
     companyPaths.CreateNewOrder,
     companyPaths.EditDraftOrder,
+    companyPaths.OrderSelectRestaurant,
     companyPaths.ManageOrders,
     companyPaths.ManageOrderDetail,
   ];
