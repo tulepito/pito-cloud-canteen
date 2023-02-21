@@ -7,6 +7,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
+import { EImageVariants } from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
 import uniqBy from 'lodash/uniqBy';
 import { DateTime } from 'luxon';
@@ -159,6 +160,12 @@ const searchRestaurants = createAsyncThunk(
       page,
       ...(distance ? { bounds } : {}),
       include: ['images'],
+      'fields.image': [
+        `variants.${EImageVariants.default}`,
+        `variants.${EImageVariants.squareSmall}`,
+        `variants.${EImageVariants.landscapeCrop}`,
+        `variants.${EImageVariants.landscapeCrop2x}`,
+      ],
     });
 
     const { meta } = restaurantsResponse.data;

@@ -81,6 +81,9 @@ const ResultList: React.FC<TResultListProps> = ({
         onClose={detailModal.setFalse}
         restaurantFood={restaurantFood}
         selectedRestaurantId={selectedRestaurantId}
+        restaurants={restaurants}
+        companyGeoOrigin={companyGeoOrigin}
+        totalRatings={totalRatings}
       />
     </>
   );

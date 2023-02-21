@@ -5,7 +5,7 @@ import React from 'react';
 import css from './ResultDetailModal.module.scss';
 
 type TFoodsListSectionProps = {
-  onClickFood?: () => void;
+  onClickFood?: (foodId: string) => void;
   onSelectFood?: (foodId: string) => void;
   onRemoveFood?: (foodId: string) => void;
   selectedFoodIds?: string[];

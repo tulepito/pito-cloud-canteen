@@ -14,7 +14,7 @@ type TFoodCardProps = {
   className?: string;
   isSelected?: boolean;
   food?: TListing;
-  onClick?: () => void;
+  onClick?: (foodId: string) => void;
   onSelect?: (foodId: string) => void;
   onRemove?: (foodId: string) => void;
 };
@@ -33,13 +33,16 @@ const FoodCard: React.FC<TFoodCardProps> = ({
     onSelect(`${Listing(food!).getId()}`);
   };
 
+  const handleClickFood = () => {
+    onClick(`${Listing(food!).getId()}`);
+  };
+
   const handleRemove = () => {
     onRemove(Listing(food!).getId());
   };
   return (
     <div className={classes}>
-      <div className={css.coverImage} onClick={onClick}>
-        {/* <Image src={coverImage} alt="cover" /> */}
+      <div className={css.coverImage} onClick={handleClickFood}>
         <ResponsiveImage
           alt="food"
           image={Listing(food!).getImages()[0]}
@@ -47,7 +50,7 @@ const FoodCard: React.FC<TFoodCardProps> = ({
         />
       </div>
       <div className={css.contentContainer}>
-        <div className={css.title} onClick={onClick}>
+        <div className={css.title} onClick={handleClickFood}>
           {Listing(food!).getAttributes().title}
         </div>
         <div className={css.badges}>

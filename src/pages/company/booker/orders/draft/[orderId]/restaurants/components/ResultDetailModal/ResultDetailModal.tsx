@@ -1,14 +1,17 @@
 import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import Modal from '@components/Modal/Modal';
+import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import { calculateDistance } from '@helpers/mapHelpers';
 import useBoolean from '@hooks/useBoolean';
+import { Listing } from '@utils/data';
+import { EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
-import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
+import { getListingImageById } from '../../helpers';
 import FoodDetailModal from '../FoodDetailModal/FoodDetailModal';
-import coverImage from './cover.png';
 import FoodListSection from './FoodListSection';
 import ResultDetailFilters from './ResultDetailFilters';
 import ResultDetailHeader from './ResultDetailHeader';
@@ -23,6 +26,12 @@ type TResultDetailModalProps = {
   restaurantFood: {
     [restaurantId: string]: TListing[];
   };
+  restaurants: TListing[];
+  companyGeoOrigin: {
+    lat: number;
+    lng: number;
+  };
+  totalRatings: any[];
 };
 
 const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
@@ -30,13 +39,55 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   onClose = () => null,
   restaurantFood,
   selectedRestaurantId,
+  restaurants,
+  companyGeoOrigin,
+  totalRatings,
 }) => {
   const intl = useIntl();
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
   const selectAllControl = useBoolean(false);
   const foodModal = useBoolean(false);
-  // console.log('selectedFoods: ', selectedFoods);
-  console.log('selectAllControl', selectAllControl.value);
+  const [selectedFood, setSelectedFood] = useState<TListing | null>(null);
+
+  const currentRestaurant = useMemo(
+    () =>
+      restaurants.find(
+        (restaurant) => restaurant.id?.uuid === selectedRestaurantId,
+      ) || null,
+    [restaurants, selectedRestaurantId],
+  );
+  const { geolocation: restaurantOrigin } = Listing(
+    currentRestaurant!,
+  ).getAttributes();
+
+  const { rating = 0 } = Listing(currentRestaurant!).getMetadata();
+  const restaurantName = Listing(currentRestaurant!).getAttributes().title;
+  const { avatarImageId, coverImageId } = Listing(
+    currentRestaurant!,
+  ).getPublicData();
+  const restaurantAvatar = getListingImageById(
+    avatarImageId,
+    Listing(currentRestaurant!).getImages(),
+  );
+  const restaurantCover = getListingImageById(
+    coverImageId,
+    Listing(currentRestaurant!).getImages(),
+  );
+  const totalReviewsOfRestaurant = useMemo(
+    () =>
+      totalRatings.find(
+        (_restaurant) => _restaurant.restaurantId === selectedRestaurantId,
+      )?.totalReviews || 0,
+    [totalRatings, selectedRestaurantId],
+  );
+
+  const distance = useMemo(
+    () =>
+      restaurantOrigin
+        ? calculateDistance(companyGeoOrigin, restaurantOrigin)
+        : '0',
+    [companyGeoOrigin, restaurantOrigin],
+  );
 
   const handleSelecFood = (foodId: string) => {
     setSelectedFoods([...selectedFoods, foodId]);
@@ -44,6 +95,15 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
 
   const handleRemoveFood = (foodId: string) => {
     setSelectedFoods(selectedFoods.filter((id) => id !== foodId));
+  };
+
+  const onClickFood = (foodId: string) => {
+    foodModal.setTrue();
+    setSelectedFood(
+      restaurantFood[selectedRestaurantId!].find(
+        (food) => food.id?.uuid === foodId,
+      ) || null,
+    );
   };
 
   useEffect(() => {
@@ -87,13 +147,28 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
             <IconClose className={css.iconClose} onClick={onClose} />
           </div>
         }>
-        <ResultDetailHeader />
+        <ResultDetailHeader
+          restaurant={currentRestaurant!}
+          dishCount={selectedFoods?.length || 0}
+        />
         <div className={css.contentScroll}>
           <div className={css.content}>
             <div className={css.coverImage}>
-              <Image src={coverImage} alt="cover" />
+              <ResponsiveImage
+                alt={restaurantName}
+                image={restaurantCover}
+                variants={[
+                  EImageVariants.default,
+                  EImageVariants.landscapeCrop,
+                ]}
+              />
             </div>
-            <TopContent />
+            <TopContent
+              avatar={restaurantAvatar}
+              restaurantName={restaurantName}
+              rating={`${rating} (${totalReviewsOfRestaurant})`}
+              distance={`${distance}km`}
+            />
             <ResultDetailFilters
               initialValues={{ isSelectAll: selectAllControl.value }}
               onSelectAll={selectAllControl.setValue}
@@ -102,7 +177,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
               foodList={foodList}
               onSelectFood={handleSelecFood}
               onRemoveFood={handleRemoveFood}
-              onClickFood={foodModal.setTrue}
+              onClickFood={onClickFood}
               selectedFoodIds={selectedFoods}
             />
           </div>
@@ -120,7 +195,11 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
           </Button>
         </div>
       </Modal>
-      <FoodDetailModal isOpen={foodModal.value} onClose={foodModal.setFalse} />
+      <FoodDetailModal
+        isOpen={foodModal.value}
+        food={selectedFood!}
+        onClose={foodModal.setFalse}
+      />
     </>
   );
 };

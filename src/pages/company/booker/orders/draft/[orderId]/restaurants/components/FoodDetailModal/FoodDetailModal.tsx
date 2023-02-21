@@ -2,25 +2,28 @@ import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import Modal from '@components/Modal/Modal';
-import Image from 'next/image';
+import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import { Listing } from '@utils/data';
+import { EImageVariants } from '@utils/enums';
+import type { TListing } from '@utils/types';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import coverImage from './foodCover.png';
 import css from './FoodDetailModal.module.scss';
 import OptionSelectionForm from './OptionSelectionForm';
 
 type TFoodDetailModalProps = {
   isOpen?: boolean;
   onClose?: () => void;
+  food?: TListing;
 };
 
 const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
   isOpen = false,
   onClose = () => null,
+  food,
 }) => {
   const intl = useIntl();
-
   return (
     <Modal
       scrollLayerClassName={css.scrollLayer}
@@ -44,20 +47,22 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
       </div>
       <div className={css.scrollContainer}>
         <div className={css.coverImage}>
-          <Image src={coverImage} alt="cover" />
+          <ResponsiveImage
+            alt="food"
+            image={Listing(food!).getImages()[0]}
+            variants={[EImageVariants.default]}
+          />
         </div>
         <div className={css.topContent}>
-          <div className={css.foodTitle}>Hàu sữa nướng phô mai</div>
-          <div className={css.price}>30,000 ₫ / Phần</div>
+          <div className={css.foodTitle}>
+            {Listing(food!).getAttributes().title}
+          </div>
+          <div className={css.price}>{`${
+            Listing(food!).getAttributes()?.price?.amount
+          } ₫ / Phần`}</div>
         </div>
         <p className={css.description}>
-          Lorem ipsum dolor sit amet consectetur. Sed penatibus ullamcorper ut
-          feugiat non tempor. In ornare diam sapien turpis gravida pulvinar enim
-          elementum. Gravida nunc adipiscing rutrum est ut morbi tellus nulla.
-          Pretium quisque facilisi arcu a et eu. Turpis aliquet cursus ipsum
-          eget nibh fermentum amet. Massa nisl tortor quis in urna odio sagittis
-          nec. Quis tellus in mi tortor tempor lectus id ultrices. Dui tellus
-          velit vel tellus laoreet. At eget massa id semper dolor.
+          {Listing(food!).getAttributes().description || 'Không có mô tả'}
         </p>
         <OptionSelectionForm onSubmit={() => null} />
       </div>

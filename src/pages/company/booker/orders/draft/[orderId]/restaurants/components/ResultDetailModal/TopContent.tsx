@@ -2,27 +2,39 @@ import IconGift from '@components/Icons/IconGift/IconGift';
 import IconHeart from '@components/Icons/IconHeart/IconHeart';
 import IconStar from '@components/Icons/IconStar/IconStar';
 import IconTruck from '@components/Icons/IconTruck/IconTruck';
-import Image from 'next/image';
+import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import { EImageVariants } from '@utils/enums';
 import React from 'react';
 
-import profileImage from './profileImage.jpg';
 import css from './ResultDetailModal.module.scss';
 
-const TopContent: React.FC = () => {
+type TopContentProps = {
+  avatar: any;
+  restaurantName: string;
+  rating: string;
+  distance: string;
+};
+const TopContent: React.FC<TopContentProps> = (props) => {
+  const { avatar, restaurantName, rating, distance } = props;
   return (
     <div className={css.topContent}>
-      <div className={css.profileImage}>
-        <Image src={profileImage} alt="cover" />
+      <div className={css.profileImageWrapper}>
+        <ResponsiveImage
+          className={css.profileImage}
+          alt={restaurantName}
+          image={avatar}
+          variants={[EImageVariants.squareSmall, EImageVariants.squareSmall2x]}
+        />
       </div>
       <div className={css.restaurantInfo}>
         <div className={css.restaurantName}>
-          <span>Nhà hàng Vua hải sản</span>
+          <span>{restaurantName}</span>
           <IconHeart className={css.iconHeart} />
         </div>
         <div className={css.moreInfo}>
           <div className={css.moreInfoItem}>
             <IconTruck className={css.moreInfoItemIcon} />
-            <span>3km</span>
+            <span>{distance}</span>
           </div>
           <div className={css.moreInfoItem}>
             <IconStar className={css.ratingStar} />
@@ -30,7 +42,7 @@ const TopContent: React.FC = () => {
             <IconStar className={css.ratingStar} />
             <IconStar className={css.ratingStar} />
             <IconStar className={css.ratingStar} />
-            <span>5 (100)</span>
+            <span>{rating}</span>
           </div>
           <div className={css.moreInfoItem}>
             <IconGift className={css.moreInfoItemIcon} />
