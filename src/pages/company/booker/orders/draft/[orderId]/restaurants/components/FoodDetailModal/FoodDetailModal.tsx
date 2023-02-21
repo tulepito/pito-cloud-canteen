@@ -26,6 +26,7 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
   const intl = useIntl();
   return (
     <Modal
+      id="FoodDetailModal"
       scrollLayerClassName={css.scrollLayer}
       containerClassName={css.modalContainer}
       isOpen={isOpen}
@@ -48,7 +49,7 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
       <div className={css.scrollContainer}>
         <div className={css.coverImage}>
           <ResponsiveImage
-            alt="food"
+            alt={Listing(food!).getAttributes().title}
             image={Listing(food!).getImages()[0]}
             variants={[EImageVariants.default]}
           />
