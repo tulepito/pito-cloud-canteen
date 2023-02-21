@@ -6,7 +6,7 @@ export const normalizePlanDetailsToEvent = (planDetails: any, order: any) => {
   const planId = Listing(order).getMetadata()?.plans?.[0];
 
   const normalizeData = dateList.map((timestamp) => {
-    const planData = planDetails[timestamp];
+    const planData = planDetails[timestamp]?.restaurant || {};
     const foodIds = Object.keys(planData.foodList);
     const foodList = foodIds.map((id) => {
       return {

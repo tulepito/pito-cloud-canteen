@@ -14,16 +14,23 @@ import OptionSelectionForm from './OptionSelectionForm';
 
 type TFoodDetailModalProps = {
   isOpen?: boolean;
-  onClose?: () => void;
   food?: TListing;
+  onClose?: () => void;
+  onSelect?: (foodId: string) => void;
 };
 
 const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
   isOpen = false,
-  onClose = () => null,
   food,
+  onClose = () => null,
+  onSelect = () => null,
 }) => {
   const intl = useIntl();
+
+  const handleSelectFood = () => {
+    onSelect(food?.id?.uuid);
+  };
+
   return (
     <Modal
       scrollLayerClassName={css.scrollLayer}
@@ -67,7 +74,7 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
         <OptionSelectionForm onSubmit={() => null} />
       </div>
       <div className={css.footer}>
-        <Button className={css.submitBtn}>
+        <Button className={css.submitBtn} onClick={handleSelectFood}>
           {intl.formatMessage({
             id: 'booker.orders.draft.foodDetailModal.addDish',
           })}

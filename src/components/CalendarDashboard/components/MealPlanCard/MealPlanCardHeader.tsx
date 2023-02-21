@@ -10,11 +10,13 @@ import css from './MealPlanCard.module.scss';
 
 type TMealPlanCardHeaderProps = {
   event: Event;
+  removeInprogress?: boolean;
   removeEventItem?: (resourceId: string) => void;
 };
 
 const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
   event,
+  removeInprogress,
   removeEventItem,
 }) => {
   const session = event.resource?.daySession;
@@ -50,6 +52,7 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
         isOpen={isOpenDeleteModal}
         onClose={handleCloseDeleteModal}
         onDelete={handleDelete}
+        removeInprogress={removeInprogress}
       />
     </div>
   );

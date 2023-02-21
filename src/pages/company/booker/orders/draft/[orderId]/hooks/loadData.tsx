@@ -1,8 +1,8 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { BookerDraftOrderPageThunks } from '@redux/slices/BookerDraftOrderPage.slice';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { useEffect } from 'react';
 
+import { BookerDraftOrderPageThunks } from '../BookerDraftOrderPage.slice';
 import { normalizePlanDetailsToEvent } from '../helpers/normalizeData';
 
 export const useLoadData = ({ orderId }: { orderId: string }) => {
@@ -19,7 +19,7 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
   useEffect(() => {
     (async () => {
       await dispatch(orderAsyncActions.fetchOrder(orderId));
-      await dispatch(BookerDraftOrderPageThunks.fetchCompanyFromOrder());
+      await dispatch(BookerDraftOrderPageThunks.fetchCompanyAccount());
     })();
   }, [dispatch, orderId]);
 

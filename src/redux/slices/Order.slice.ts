@@ -53,6 +53,9 @@ type TOrderInitialState = {
   fetchOrderDetailInProgress: boolean;
   fetchOrderDetailError: any;
 
+  updateOrderDetailInProgress: boolean;
+  updateOrderDetailError: any;
+
   initiateTransactionsInProgress: boolean;
   initiateTransactionsError: any;
 
@@ -80,6 +83,7 @@ const FETCH_ORDER = 'app/Order/FETCH_ORDER';
 const FETCH_ORDER_DETAIL = 'app/Order/FETCH_ORDER_DETAIL';
 const INITIATE_TRANSACTIONS = 'app/Order/INITIATE_TRANSACTIONS';
 const QUERY_SUB_ORDERS = 'app/Order/QUERY_SUB_ORDERS';
+const FETCH_PLAN_DETAIL = 'app/Order/FETCH_PLAN_DETAIL';
 const UPDATE_PLAN_DETAIL = 'app/Order/UPDATE_PLAN_DETAIL';
 
 const initialState: TOrderInitialState = {
@@ -100,6 +104,9 @@ const initialState: TOrderInitialState = {
   fetchBookersError: null,
   bookerList: [],
   selectedBooker: null,
+
+  updateOrderDetailInProgress: false,
+  updateOrderDetailError: null,
 
   selectedCalendarDate: undefined!,
   isSelectingRestaurant: false,
@@ -340,6 +347,21 @@ const fetchOrder = createAsyncThunk(
   },
 );
 
+const fetchPlanDetail = createAsyncThunk(
+  FETCH_PLAN_DETAIL,
+  async ({ planId }: { planId: string }, { extra: sdk }) => {
+    if (planId) {
+      const response = denormalisedResponseEntities(
+        await sdk.listings.show({
+          id: planId,
+        }),
+      )[0];
+      return response;
+    }
+    return {};
+  },
+);
+
 const updatePlanDetail = createAsyncThunk(
   UPDATE_PLAN_DETAIL,
   async ({ orderId, planId, orderDetail, updateMode }: any, _) => {
@@ -372,6 +394,7 @@ export const orderAsyncActions = {
   initiateTransactions,
   queryOrders,
   queryCompanyOrders,
+  fetchPlanDetail,
   updatePlanDetail,
 };
 

@@ -1,16 +1,21 @@
 import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import Modal from '@components/Modal/Modal';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { calculateDistance } from '@helpers/mapHelpers';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { Listing } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
+import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
+import { BookerSelectRestaurantThunks } from '../../BookerSelectRestaurant.slice';
 import { getListingImageById } from '../../helpers';
+import { useLoadPlanDetails } from '../../hooks/loadData';
 import FoodDetailModal from '../FoodDetailModal/FoodDetailModal';
 import FoodListSection from './FoodListSection';
 import ResultDetailFilters from './ResultDetailFilters';
@@ -21,7 +26,6 @@ import TopContent from './TopContent';
 type TResultDetailModalProps = {
   isOpen?: boolean;
   onClose?: () => void;
-  onClickFood?: () => void;
   selectedRestaurantId?: string;
   restaurantFood: {
     [restaurantId: string]: TListing[];
@@ -44,9 +48,19 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   totalRatings,
 }) => {
   const intl = useIntl();
+
+  const router = useRouter();
+  const { timestamp } = router.query;
+
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
   const foodModal = useBoolean(false);
   const [selectedFood, setSelectedFood] = useState<TListing | null>(null);
+
+  const { orderId, planId } = useLoadPlanDetails();
+
+  const updatePlanDetailInProgress = useAppSelector(
+    (state) => state.BookerSelectRestaurant.updatePlanDetailInProgress,
+  );
 
   const currentRestaurant = useMemo(
     () =>
@@ -94,11 +108,20 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     );
   }, [restaurantFood, selectedRestaurantId]);
 
+  const foodList = restaurantFood?.[selectedRestaurantId!];
+
+  // Method
+  const dispatch = useAppDispatch();
+
   const handleSelecFood = useCallback(
     (foodId: string) => {
       setSelectedFoods([...selectedFoods, foodId]);
+      if (foodModal.value) {
+        foodModal.setFalse();
+      }
     },
-    [selectedFoods],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedFoods, foodModal.value],
   );
 
   const handleRemoveFood = useCallback(
@@ -112,7 +135,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     setSelectedFoods([...foodIds]);
   }, []);
 
-  const onClickFood = (foodId: string) => {
+  const handleOpenFoodDetail = (foodId: string) => {
     foodModal.setTrue();
     setSelectedFood(
       restaurantFood[selectedRestaurantId!].find(
@@ -121,13 +144,38 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     );
   };
 
+  const handleConfirmFoodList = async () => {
+    if (updatePlanDetailInProgress) {
+      return;
+    }
+
+    const updatedValues = {
+      [`${timestamp}`]: {
+        restaurant: {
+          foodList: selectedFoods,
+          id: selectedRestaurantId,
+          restaurantName,
+        },
+      },
+    };
+    await dispatch(
+      BookerSelectRestaurantThunks.updatePlanDetail({
+        orderId,
+        planId,
+        orderDetail: updatedValues,
+        updateMode: 'merge',
+      }),
+    );
+    router.push(`/company/booker/orders/draft/${orderId}`);
+    onClose();
+  };
+
   useEffect(() => {
     if (!isOpen) {
       setSelectedFoods([]);
     }
   }, [isOpen]);
 
-  const foodList = restaurantFood?.[selectedRestaurantId!];
   return (
     <>
       <Modal
@@ -171,20 +219,25 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
               foodList={foodList}
               onSelectFood={handleSelecFood}
               onRemoveFood={handleRemoveFood}
-              onClickFood={onClickFood}
+              onClickFood={handleOpenFoodDetail}
               selectedFoodIds={selectedFoods}
             />
           </div>
         </div>
         <div className={css.footer}>
-          <Button className={css.submitBtn}>
-            {intl.formatMessage(
-              {
-                id: 'booker.orders.draft.resultDetailModal.addRestaurant',
-              },
-              {
-                numberDish: selectedFoods.length,
-              },
+          <Button className={css.submitBtn} onClick={handleConfirmFoodList}>
+            <span>
+              {intl.formatMessage(
+                {
+                  id: 'booker.orders.draft.resultDetailModal.addRestaurant',
+                },
+                {
+                  numberDish: selectedFoods.length,
+                },
+              )}
+            </span>
+            {updatePlanDetailInProgress && (
+              <IconSpinner className={css.spinner} />
             )}
           </Button>
         </div>
@@ -193,6 +246,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
         isOpen={foodModal.value}
         food={selectedFood!}
         onClose={foodModal.setFalse}
+        onSelect={handleSelecFood}
       />
     </>
   );

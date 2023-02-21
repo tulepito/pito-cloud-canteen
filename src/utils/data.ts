@@ -475,7 +475,7 @@ export const User = (user: TUser | TCurrentUser) => {
   };
 };
 
-export const Listing = (listing: TListing) => {
+export const Listing = (listing: TListing | null) => {
   const ensuredListing = ensureListing(listing);
   const id = ensuredListing?.id?.uuid;
   const attributes = ensuredListing?.attributes;

@@ -3,6 +3,7 @@ import { queryAllPages } from '@helpers/apiHelpers';
 import { calculateBounds } from '@helpers/mapHelpers';
 import { deliveryDaySessionAdapter } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { createSlice } from '@reduxjs/toolkit';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
@@ -11,8 +12,6 @@ import { EImageVariants } from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
 import uniqBy from 'lodash/uniqBy';
 import { DateTime } from 'luxon';
-
-import { orderAsyncActions } from './Order.slice';
 
 // ================ Initial states ================ //
 type TKeyValue<T = string> = {
@@ -24,7 +23,7 @@ type TBookerDraftOrderPageState = {
   menuTypes: TKeyValue[];
   categories: TKeyValue[];
   restaurantIdList: string[];
-  companyFromOrder: TUser | null;
+  companyAccount: TUser | null;
   searchResult: TListing[];
   totalItems: number;
   totalRatings: {
@@ -39,8 +38,8 @@ type TBookerDraftOrderPageState = {
   fetchFilterInProgress: boolean;
   searchInProgress: boolean;
 
-  fetchCompanyFromOrderInProgress: boolean;
-  fetchCompanyFromOrderError: any;
+  fetchCompanyAccountInProgress: boolean;
+  fetchCompanyAccountError: any;
 
   restaurantFood: {
     [restaurantId: string]: TListing[];
@@ -52,7 +51,7 @@ const initialState: TBookerDraftOrderPageState = {
   menuTypes: [],
   categories: [],
   restaurantIdList: [],
-  companyFromOrder: null,
+  companyAccount: null,
 
   searchResult: [],
   totalItems: 0,
@@ -62,8 +61,8 @@ const initialState: TBookerDraftOrderPageState = {
   fetchFilterInProgress: false,
   searchInProgress: false,
 
-  fetchCompanyFromOrderInProgress: false,
-  fetchCompanyFromOrderError: null,
+  fetchCompanyAccountInProgress: false,
+  fetchCompanyAccountError: null,
 
   restaurantFood: {},
   fetchRestaurantFoodInProgress: false,
@@ -102,7 +101,7 @@ const searchRestaurants = createAsyncThunk(
     await dispatch(orderAsyncActions.fetchOrder(orderId));
     const dateTime = DateTime.fromMillis(timestamp);
     const { order } = getState().Order;
-    const { restaurantIdList = [], companyFromOrder } =
+    const { restaurantIdList = [], companyAccount } =
       getState().BookerDraftOrderPage;
     let newRestaurantIdList = [...restaurantIdList];
 
@@ -149,7 +148,7 @@ const searchRestaurants = createAsyncThunk(
       'restaurantId',
     ).map((item) => item.restaurantId);
 
-    const origin = User(companyFromOrder as TUser).getPublicData()?.location
+    const origin = User(companyAccount as TUser).getPublicData()?.location
       ?.origin;
     const bounds = distance ? calculateBounds(origin, distance) : '';
 
@@ -198,7 +197,7 @@ const searchRestaurants = createAsyncThunk(
   },
 );
 
-const fetchCompanyFromOrder = createAsyncThunk(
+const fetchCompanyAccount = createAsyncThunk(
   FETCH_COMPANY_FROM_ORDER,
   async (_, { getState, extra: sdk }) => {
     const { order } = getState().Order;
@@ -210,7 +209,7 @@ const fetchCompanyFromOrder = createAsyncThunk(
     )[0];
 
     return {
-      companyFromOrder: companyAccount,
+      companyAccount,
     };
   },
 );
@@ -253,7 +252,7 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
 export const BookerDraftOrderPageThunks = {
   searchRestaurants,
   fetchSearchFilter,
-  fetchCompanyFromOrder,
+  fetchCompanyAccount,
   fetchFoodListFromRestaurant,
 };
 
@@ -288,17 +287,17 @@ const BookerDraftOrderPageSlice = createSlice({
         state.searchInProgress = false;
       })
 
-      .addCase(fetchCompanyFromOrder.pending, (state) => {
-        state.fetchCompanyFromOrderInProgress = true;
-        state.fetchCompanyFromOrderError = null;
+      .addCase(fetchCompanyAccount.pending, (state) => {
+        state.fetchCompanyAccountInProgress = true;
+        state.fetchCompanyAccountError = null;
       })
-      .addCase(fetchCompanyFromOrder.fulfilled, (state, action) => {
-        state.companyFromOrder = action.payload.companyFromOrder;
-        state.fetchCompanyFromOrderInProgress = false;
+      .addCase(fetchCompanyAccount.fulfilled, (state, action) => {
+        state.companyAccount = action.payload.companyAccount;
+        state.fetchCompanyAccountInProgress = false;
       })
-      .addCase(fetchCompanyFromOrder.rejected, (state, { payload }) => {
-        state.fetchCompanyFromOrderInProgress = false;
-        state.fetchCompanyFromOrderError = payload;
+      .addCase(fetchCompanyAccount.rejected, (state, { payload }) => {
+        state.fetchCompanyAccountInProgress = false;
+        state.fetchCompanyAccountError = payload;
       })
 
       .addCase(fetchFoodListFromRestaurant.pending, (state) => {
