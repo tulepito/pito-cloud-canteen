@@ -205,6 +205,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   return (
     <>
       <Modal
+        id="ResultDetailModal"
         scrollLayerClassName={css.scrollLayer}
         containerClassName={css.modalContainer}
         isOpen={isOpen}
