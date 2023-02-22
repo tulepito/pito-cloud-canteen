@@ -952,7 +952,7 @@
   "RestaurantRow.menu.fixed-menu": "Cố định",
   "RestaurantTable.loadingText": "...Đang tải",
   "RestaurantTable.noResults": "Không có nhà hàng nào",
-  "RestaurantTableHead.head.categories": "Danh mục thực đơn",
+  "RestaurantTableHead.head.categories": "Loại menu",
   "RestaurantTableHead.head.criteria": "Tiêu chí",
   "RestaurantTableHead.head.foodStyles": "Phong cách ẩm thực",
   "RestaurantTableHead.head.partnerName": "Tên đối tác",

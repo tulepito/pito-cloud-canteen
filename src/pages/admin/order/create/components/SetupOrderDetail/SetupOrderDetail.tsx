@@ -40,6 +40,7 @@ import css from './SetupOrderDetail.module.scss';
 const renderResourcesForCalendar = (
   orderDetail: TObject,
   deliveryHour: string,
+  coverImageList: any,
 ) => {
   const entries = Object.entries<TObject>(orderDetail);
   const resources = entries.map((item) => {
@@ -56,9 +57,9 @@ const renderResourcesForCalendar = (
         restaurant: {
           id: restaurant.id,
           name: restaurant.restaurantName,
+          coverImage: coverImageList[restaurant.id],
         },
         foodList: Object.keys(foodList),
-        // expiredTime: new Date(2023, 11, 29, 16, 0, 0),
       },
       start: DateTime.fromMillis(Number(date)).toJSDate(),
       end: DateTime.fromMillis(Number(date)).plus({ hour: 1 }).toJSDate(),
@@ -164,6 +165,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     (state) => state.SelectRestaurantPage.foodList,
     shallowEqual,
   );
+  const restaurantCoverImageList = useAppSelector(
+    (state) => state.Order.restaurantCoverImageList,
+    shallowEqual,
+  );
+
   const suitableStartDate = useMemo(() => {
     const temp = findSuitableStartDate({
       selectedDate,
@@ -186,6 +192,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const resourcesForCalender = renderResourcesForCalendar(
     orderDetail,
     deliveryHour,
+    restaurantCoverImageList,
   );
 
   const showPickFoodModal = isPickFoodModalOpen && !fetchFoodInProgress;
@@ -283,8 +290,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   const disabledSubmit =
     Object.keys(orderDetail).length === 0 || missingSelectedFood.length > 0;
-  const initialFoodList =
-    orderDetail[selectedDate?.getTime()]?.restaurant?.foodList;
+  const initialFoodList = isPickFoodModalOpen
+    ? orderDetail[selectedDate?.getTime()]?.restaurant?.foodList
+    : {};
 
   const onSubmit = async () => {
     const orderId = Listing(order as TListing).getId();
