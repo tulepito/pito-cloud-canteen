@@ -83,15 +83,8 @@ const NutritionPage = () => {
   );
 
   const onSubmit = (values: TNutritionFormValues) => {
-    const {
-      favoriteRestaurantList: favoriteRestaurantListValue,
-      favoriteFoodList: favoriteFoodListValue,
-      nutritions: nutritionsValue,
-    } = values;
     const publicData = {
-      favoriteRestaurantList: favoriteRestaurantListValue,
-      favoriteFoodList: favoriteFoodListValue,
-      nutritions: nutritionsValue,
+      ...values,
     };
     dispatch(BookerManageCompany.updateCompanyAccount({ publicData }));
   };
