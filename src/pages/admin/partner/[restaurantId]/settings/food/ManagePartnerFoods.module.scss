@@ -235,3 +235,17 @@
 .removeModalContent {
   padding: 5px 0 25px 0;
 }
+
+.tableWrapper {
+  @include viewportMedium {
+    max-width: calc(100vw - 350px);
+    overflow-x: scroll;
+    position: relative;
+  }
+}
+
+.table {
+  @include viewportMedium {
+    min-width: 1440px;
+  }
+}

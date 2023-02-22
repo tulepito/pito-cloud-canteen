@@ -250,6 +250,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
               tableHeadCellClassName={css.tableHeadCell}
               tableBodyCellClassName={css.tableBodyCell}
               afterCheckboxChangeHandler={afterCheckboxChangeHandler}
+              tableWrapperClassName={css.tableWrapper}
             />
             {pagination && pagination.totalPages > 1 && (
               <Pagination

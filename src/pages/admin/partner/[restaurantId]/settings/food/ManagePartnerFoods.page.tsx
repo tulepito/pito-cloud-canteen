@@ -445,6 +445,8 @@ const ManagePartnerFoods = () => {
           tableBodyCellClassName={css.tableBodyCell}
           pagination={managePartnerFoodPagination}
           paginationPath={`/admin/partner/${restaurantId}/settings/food`}
+          tableWrapperClassName={css.tableWrapper}
+          tableClassName={css.table}
         />
       )}
       <AlertModal

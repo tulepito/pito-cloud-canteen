@@ -383,6 +383,8 @@ const ManageOrdersPage = () => {
           tableBodyCellClassName={css.bodyCell}
           handleSort={handleSort}
           sortValue={sortValue}
+          tableWrapperClassName={css.tableWrapper}
+          tableClassName={css.table}
         />
       </>
     );

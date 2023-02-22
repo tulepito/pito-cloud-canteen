@@ -56,6 +56,7 @@ type TTableProps = TDefaultProps & {
   customCheckboxChange?: (e: any) => void;
   afterCheckboxChangeHandler?: (e: any, rowCheckboxValues: any) => void;
   extraRows?: ReactNode;
+  tableWrapperClassName?: string;
 };
 
 const getUniqueString = (list: string[]) => {
@@ -87,6 +88,7 @@ const Table = (props: TTableProps) => {
     sortValue,
     afterCheckboxChangeHandler,
     extraRows,
+    tableWrapperClassName,
   } = props;
 
   const tableClasses = classNames(css.table, tableClassName);
@@ -143,7 +145,7 @@ const Table = (props: TTableProps) => {
 
   return (
     <>
-      <div className={css.tableWrapper}>
+      <div className={classNames(css.tableWrapper, tableWrapperClassName)}>
         <table className={tableClasses}>
           <thead className={tableHeadClassName}>
             <tr className={classNames(tableHeadRowClassName, css.headRow)}>
