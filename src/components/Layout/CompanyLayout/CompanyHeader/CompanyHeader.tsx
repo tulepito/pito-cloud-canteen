@@ -2,6 +2,7 @@ import Avatar from '@components/Avatar/Avatar';
 import { InlineTextButton } from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconBell from '@components/Icons/IconBell/IconBell';
+import NamedLink from '@components/NamedLink/NamedLink';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
@@ -10,6 +11,7 @@ import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
 import { currentUserSelector, userActions } from '@redux/slices/user.slice';
+import { companyPaths } from '@src/paths';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -29,9 +31,9 @@ const CompanyHeader = () => {
 
   return (
     <div className={css.root}>
-      <div className={css.headerLeft}>
+      <NamedLink className={css.headerLeft} path={companyPaths.Home}>
         <PitoLogo />
-      </div>
+      </NamedLink>
       <div className={css.headerRight}>
         <IconBell className={css.iconBell} />
         <ProfileMenu>
