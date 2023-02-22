@@ -30,20 +30,22 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
     selected,
     ...rest
   } = props;
-  const { name, onChange, value } = input;
+  const { name, onChange, value, onBlur } = input;
   const onInputChange = (date: Date, event: any) => {
     if (typeof onDatePickerChange === 'function') {
       onDatePickerChange(date, event);
     }
     onChange(date?.getTime());
+    onBlur();
   };
 
-  const { invalid, error } = meta;
+  const { invalid, error, touched } = meta;
   const errorText = customErrorText || error;
-  const hasError = !!customErrorText || !!(invalid && error);
+  const hasError = !!customErrorText || !!(touched && invalid && error);
   const fieldMeta = { touched: hasError, error: errorText };
   const labelClasses = classNames(css.labelRoot);
   const labelRequiredRedStar = fieldMeta.error ? css.labelRequiredRedStar : '';
+
   return (
     <div className={classNames(css.root, className)}>
       {label && (

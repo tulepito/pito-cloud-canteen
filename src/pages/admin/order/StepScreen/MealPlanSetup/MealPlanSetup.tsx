@@ -86,15 +86,18 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       const { payload }: { payload: any } = await dispatch(
         orderAsyncActions.updateOrder({ generalInfo }),
       );
-      const { orderListing, orderDetail } = payload || {};
+      const { orderListing } = payload || {};
       const orderId = Listing(orderListing as TListing).getId();
       const { plans = [] } = Listing(orderListing as TListing).getMetadata();
       const planId = plans[0];
+      const { payload: recommendOrderDetail }: any = await dispatch(
+        orderAsyncActions.recommendRestaurants(),
+      );
       await dispatch(
         orderAsyncActions.updatePlanDetail({
           orderId,
           planId,
-          orderDetail,
+          orderDetail: recommendOrderDetail,
         }),
       );
       nextTab();

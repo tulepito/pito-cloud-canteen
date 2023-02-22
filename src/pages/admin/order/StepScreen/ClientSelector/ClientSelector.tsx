@@ -5,7 +5,7 @@ import {
   manageCompaniesThunks,
   paginateCompanies,
 } from '@redux/slices/ManageCompaniesPage.slice';
-import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { orderAsyncActions, removeBookerList } from '@redux/slices/Order.slice';
 import type { TUpdateStatus } from '@src/pages/admin/company/helpers';
 import {
   filterCompanies,
@@ -66,6 +66,12 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
     setTrue: openCreateOrderFailingModal,
     setFalse: closeCreateOrderFailingModal,
   } = useBoolean(!!createOrderError);
+
+  useEffect(() => {
+    dispatch(manageCompaniesThunks.queryCompanies());
+    dispatch(removeBookerList());
+  }, [dispatch]);
+
   useEffect(() => {
     dispatch(paginateCompanies({ page, perPage: pageSize }));
   }, [dispatch, page, pageSize]);

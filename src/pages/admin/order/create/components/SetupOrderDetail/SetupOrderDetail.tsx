@@ -170,6 +170,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     shallowEqual,
   );
 
+  const restaurants = useAppSelector(
+    (state) => state.SelectRestaurantPage.restaurants,
+    shallowEqual,
+  );
+
   const suitableStartDate = useMemo(() => {
     const temp = findSuitableStartDate({
       selectedDate,
@@ -214,6 +219,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         restaurantName: restaurant.restaurantName,
         dateTimestamp: (selectedDate as Date).getTime(),
         foodList: selectedFoodList,
+        menuId: restaurant.menuId,
+        phoneNumber: restaurant.phoneNumber,
       },
     };
 
@@ -304,8 +311,12 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   };
 
   useEffect(() => {
-    dispatch(orderAsyncActions.fetchOrderDetail());
+    dispatch(orderAsyncActions.fetchOrderDetail(order as TListing));
   }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(orderAsyncActions.fetchRestaurantCoverImages());
+  }, [dispatch, orderDetail]);
 
   const handleSelectFood = (values: TSelectFoodFormValues) => {
     const { food: foodIds } = values;
@@ -330,6 +341,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       id: currRestaurantId,
       restaurantName: currentRestaurant?.attributes?.title,
       phoneNumber: currentRestaurant?.attributes?.publicData?.phoneNumber,
+      menuId: restaurants?.find(
+        (restaurant) => restaurant.restaurantInfo.id.uuid === currRestaurantId,
+      ).menu.id.uuid,
     };
 
     handleSubmitRestaurant({
