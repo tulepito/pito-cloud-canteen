@@ -74,8 +74,6 @@ export const usePrepareTabItems = ({
         );
         break;
       case EOrderDetailsTableTab.notChoose:
-        children = <OrderDetailsTableComponent {...initialParams} />;
-        break;
       case EOrderDetailsTableTab.notJoined:
         children = <OrderDetailsTableComponent {...initialParams} />;
         break;

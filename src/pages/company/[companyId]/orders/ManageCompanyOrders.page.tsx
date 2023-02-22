@@ -45,10 +45,6 @@ const ManageCompanyOrdersPage: React.FC<TManageCompanyOrdersPageProps> = () => {
       (!companyIdFormQuery || companyIdFormQuery === '[companyId]')
     ) {
       const companyId = getCompanyIdFromBookerUser(currentUser);
-
-      console.log('🚀 ~ useEffect ~ companyIdFormQuery:', companyIdFormQuery);
-      console.log('go to company orders page');
-
       replace({ pathname: companyPaths.ManageOrders, query: { companyId } });
     }
   }, [isReady, companyIdFormQuery, replace, currentUser, router]);
