@@ -214,8 +214,8 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     setFalse: closeSuccessModal,
   } = useBoolean();
   useEffect(() => {
-    dispatch(orderAsyncActions.fetchOrderDetail());
-  }, []);
+    dispatch(orderAsyncActions.fetchOrderDetail(order as TListing));
+  }, [dispatch, order]);
   const { staffName, deliveryHour, deliveryAddress, shipperName } = Listing(
     order as TListing,
   ).getMetadata();

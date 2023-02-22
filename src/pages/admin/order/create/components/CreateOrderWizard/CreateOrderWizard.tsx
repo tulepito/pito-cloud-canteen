@@ -1,12 +1,7 @@
 import FormWizard from '@components/FormWizard/FormWizard';
 import { getItem, setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
-import {
-  orderAsyncActions,
-  removeBookerList,
-  resetOrder,
-} from '@redux/slices/Order.slice';
+import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 import { useRouter } from 'next/router';
@@ -39,14 +34,18 @@ export const TABS = [
 
 export const CREATE_ORDER_STEP_LOCAL_STORAGE_NAME = 'orderStep';
 
-const tabCompleted = (order: any, tab: string) => {
+const tabCompleted = (order: any, tab: string, orderDetail: any) => {
   const orderId = Listing(order).getId();
   const {
     deliveryAddress,
     staffName,
     plans = [],
   } = Listing(order).getMetadata();
-  const isMealPlanTabCompleted = plans.length > 0;
+  const missingSelectedFood = Object.keys(orderDetail).filter(
+    (dateTime) => orderDetail[dateTime].restaurant.foodList.length === 0,
+  );
+  const isMealPlanTabCompleted =
+    plans.length > 0 && missingSelectedFood.length === 0;
 
   switch (tab) {
     case CLIENT_SELECT_TAB:
@@ -62,12 +61,12 @@ const tabCompleted = (order: any, tab: string) => {
   }
 };
 
-const tabsActive = (order: any) => {
+const tabsActive = (order: any, orderDetail: any) => {
   return TABS.reduce((acc, tab) => {
     const previousTabIndex = TABS.findIndex((t) => t === tab) - 1;
     const isActive =
       previousTabIndex >= 0
-        ? tabCompleted(order, TABS[previousTabIndex])
+        ? tabCompleted(order, TABS[previousTabIndex], orderDetail)
         : true;
     return { ...acc, [tab]: isActive };
   }, {});
@@ -101,19 +100,9 @@ const CreateOrderWizard = () => {
   );
 
   useEffect(() => {
-    if (currentStep === CLIENT_SELECT_TAB) {
-      dispatch(manageCompaniesThunks.queryCompanies());
-      dispatch(removeBookerList());
+    if (orderId) {
+      dispatch(orderAsyncActions.fetchOrder(orderId as string));
     }
-  }, [currentStep, dispatch]);
-
-  useEffect(() => {
-    (async () => {
-      if (orderId) {
-        await dispatch(orderAsyncActions.fetchOrder(orderId as string));
-        await dispatch(orderAsyncActions.fetchOrderDetail());
-      }
-    })();
   }, [dispatch, orderId]);
 
   useEffect(() => {
@@ -148,7 +137,11 @@ const CreateOrderWizard = () => {
   };
 
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
-  const tabsStatus = tabsActive(order) as any;
+  const orderDetail = useAppSelector(
+    (state) => state.Order.orderDetail,
+    shallowEqual,
+  );
+  const tabsStatus = tabsActive(order, orderDetail) as any;
 
   useEffect(() => {
     if (order) {
@@ -184,7 +177,7 @@ const CreateOrderWizard = () => {
     <FormWizard formTabNavClassName={css.formTabNav}>
       {TABS.map((tab: string, index) => {
         const disabled =
-          !tabCompleted(order, TABS[index - 1]) ||
+          !tabCompleted(order, TABS[index - 1], orderDetail) ||
           (orderId && tab === CLIENT_SELECT_TAB);
 
         return (

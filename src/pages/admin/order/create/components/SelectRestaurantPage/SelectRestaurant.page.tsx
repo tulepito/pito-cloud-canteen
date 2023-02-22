@@ -150,6 +150,9 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       id: currRestaurantId,
       restaurantName: currentRestaurant?.attributes?.title,
       phoneNumber: currentRestaurant?.attributes?.publicData?.phoneNumber,
+      menuId: restaurants?.find(
+        (restaurant) => restaurant.restaurantInfo.id.uuid === currRestaurantId,
+      ).menu.id.uuid,
     };
 
     onSubmitRestaurant({
