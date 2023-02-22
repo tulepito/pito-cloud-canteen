@@ -4,6 +4,7 @@ import { denormalisedResponseEntities } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
 import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -114,14 +115,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const {
           query: { orderId = '' },
           body: {
-            planId = '',
+            planId,
             participantId = '',
-            participants,
+            participants = [],
             newOrderDetail = {},
           },
         } = req;
 
-        if (participants) {
+        if (!isEmpty(participants)) {
           await integrationSdk.listings.update({
             id: orderId,
             metadata: {
@@ -129,7 +130,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             },
           });
         }
-        if (planId?.length > 0) {
+
+        if (!isEmpty(planId)) {
           await integrationSdk.listings.update({
             id: planId,
             metadata: {

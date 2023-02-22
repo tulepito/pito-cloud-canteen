@@ -105,9 +105,11 @@ const searchRestaurants = createAsyncThunk(
       getState().BookerDraftOrderPage;
     let newRestaurantIdList = [...restaurantIdList];
 
-    const { deliveryHour, nutritions, packagePerMember } = Listing(
-      order as TListing,
-    ).getMetadata();
+    const {
+      deliveryHour,
+      nutritions = [],
+      packagePerMember,
+    } = Listing(order as TListing).getMetadata();
     const dayOfWeek = convertWeekDay(dateTime.weekday).key;
     const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
     const mealType = deliveryDaySessionAdapter(deliveryDaySession);
@@ -226,7 +228,7 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
       (item) => item.restaurantId === restaurantId,
     )?.menuId;
     const { order } = getState().Order;
-    const { nutritions, packagePerMember } = Listing(
+    const { nutritions = [], packagePerMember } = Listing(
       order as TListing,
     ).getMetadata();
 

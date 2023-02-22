@@ -1,4 +1,5 @@
 import { Listing } from '@utils/data';
+import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
 export const normalizePlanDetailsToEvent = (planDetails: any, order: any) => {
@@ -7,8 +8,8 @@ export const normalizePlanDetailsToEvent = (planDetails: any, order: any) => {
   const planId = plans.length > 0 ? plans[0] : undefined;
 
   const normalizeData = dateList.map((timestamp) => {
-    const planData = planDetails[timestamp]?.restaurant || {};
-    const foodIds = Object.keys(planData.foodList);
+    const planData = planDetails[timestamp] || {};
+    const foodIds = Object.keys(planData?.restaurant?.foodList);
     const foodList = foodIds.map((id) => {
       return {
         key: id,
@@ -17,18 +18,21 @@ export const normalizePlanDetailsToEvent = (planDetails: any, order: any) => {
       };
     });
 
+    const restaurant = {
+      id: planData?.restaurant?.id,
+      name: planData?.restaurant?.restaurantName,
+    };
+
     return {
       resource: {
         id: timestamp,
         daySession: 'MORNING_SESSION',
-        restaurant: {
-          id: planData?.restaurant?.id,
-          name: planData?.restaurant?.restaurantName,
-        },
+        restaurant,
         meal: {
           dishes: foodList,
         },
         planId,
+        isSelected: !isEmpty(restaurant.id) && !isEmpty(foodList),
       },
       title: 'PT3040',
       start: DateTime.fromMillis(Number(timestamp)).startOf('day').toJSDate(),

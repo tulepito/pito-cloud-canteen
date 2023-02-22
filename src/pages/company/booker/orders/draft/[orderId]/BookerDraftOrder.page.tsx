@@ -4,11 +4,14 @@ import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/c
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { companyPaths } from '@src/paths';
 import { Listing } from '@utils/data';
+import { EBookerOrderDraftStates, EOrderDraftStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
+import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
@@ -18,6 +21,11 @@ import SidebarContent from './components/SidebarContent/SidebarContent';
 import Toolbar from './components/Toolbar/Toolbar';
 import { useLoadData, useLoadPlanDetails } from './hooks/loadData';
 
+const EnableToAccessPageOrderStates = [
+  EOrderDraftStates.pendingApproval,
+  EBookerOrderDraftStates.bookerDraft,
+];
+
 function BookerDraftOrderPage() {
   const router = useRouter();
   const { orderId } = router.query;
@@ -26,7 +34,9 @@ function BookerDraftOrderPage() {
   const updatePlanDetailInprogress = useAppSelector(
     (state) => state.Order.updateOrderDetailInProgress,
   );
-
+  const bookerPublishOrderInProgress = useAppSelector(
+    (state) => state.Order.bookerPublishOrderInProgress,
+  );
   const { order, fetchOrderInProgress } = useLoadData({
     orderId: orderId as string,
   });
@@ -38,9 +48,10 @@ function BookerDraftOrderPage() {
     startDate: startTimestamp,
     endDate: endTimestamp,
     plans = [],
+    orderState,
   } = orderData.getMetadata();
-  const planId = plans?.[0];
 
+  const planId = plans?.[0];
   const startDate = useMemo(() => {
     const nextStartWeek = DateTime.fromJSDate(new Date())
       .startOf('week')
@@ -64,6 +75,9 @@ function BookerDraftOrderPage() {
       ? DateTime.fromMillis(Number(endTimestamp)).endOf('day').toJSDate()
       : nextEndWeek;
   }, [endTimestamp]);
+  const isDoneSetupPlan =
+    !isEmpty(orderDetail) &&
+    orderDetail.every(({ resource: { isSelected } }) => isSelected);
 
   const calendarExtraResources = useMemo(() => {
     return {
@@ -110,11 +124,28 @@ function BookerDraftOrderPage() {
     );
   };
 
-  const handleFinishOrder =
-    ({ planId, orderId }: { orderId: string; planId: string }) =>
-    () => {
-      dispatch(orderAsyncActions.bookerPublishOrder({ orderId, planId }));
-    };
+  const handleFinishOrder = async () => {
+    await dispatch(orderAsyncActions.bookerPublishOrder({ orderId, planId }));
+    setTimeout(() => {
+      router.push({
+        pathname: '/orders/[orderId]',
+        query: { orderId: orderId as string },
+      });
+    }, 1000);
+  };
+
+  useEffect(() => {
+    if (!isEmpty(orderState)) {
+      if (orderState === EOrderDraftStates.draft) {
+        router.push({ pathname: companyPaths.CreateNewOrder });
+      } else if (!EnableToAccessPageOrderStates.includes(orderState)) {
+        router.push({
+          pathname: '/orders/[orderId]',
+          query: { orderId: orderId as string },
+        });
+      }
+    }
+  }, [orderId, orderState]);
 
   return (
     <Layout className={css.root}>
@@ -153,16 +184,13 @@ function BookerDraftOrderPage() {
                 />
               ),
               toolbar: (props) => {
-                const { planId, orderId, startDate, endDate } =
-                  props.resources || {};
                 const newProps = {
                   ...props,
                   startDate,
                   endDate,
-                  onFinishOrder: handleFinishOrder({
-                    planId,
-                    orderId,
-                  }),
+                  finishDisabled: !isDoneSetupPlan,
+                  finishInProgress: bookerPublishOrderInProgress,
+                  onFinishOrder: handleFinishOrder,
                 };
 
                 return <Toolbar {...newProps} />;

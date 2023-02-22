@@ -21,10 +21,11 @@ const createOrder = async ({
   isCreatedByAdmin: boolean;
 }) => {
   const integrationSdk = getIntegrationSdk();
-  const updatedAt = new Date();
+  const updatedAt = new Date().getTime();
 
   // Count order number
   const adminAccount = await getAdminAccount();
+
   const { currentOrderNumber = 0 } = adminAccount.attributes.profile.metadata;
   await integrationSdk.users.updateProfile({
     id: ADMIN_ID,
@@ -35,6 +36,7 @@ const createOrder = async ({
 
   // Get sub account id
   const companyAccount = await fetchUser(companyId);
+
   const { subAccountId } = companyAccount.attributes.profile.privateData;
 
   const generatedOrderId = `PT${(currentOrderNumber + 1)

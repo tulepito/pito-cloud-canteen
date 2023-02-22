@@ -17,7 +17,7 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
-import { convertWeekDay, getSeparatedDates } from '@utils/dates';
+import { convertWeekDay, renderDateRange } from '@utils/dates';
 import { EManageCompanyOrdersTab } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TPagination } from '@utils/types';
@@ -172,7 +172,7 @@ const updateOrder = createAsyncThunk(
     const orderDetail: any = {};
     if (!orderDetailParams) {
       const { dayInWeek = [], startDate, endDate } = generalInfo;
-      const totalDates = getSeparatedDates(startDate, endDate);
+      const totalDates = renderDateRange(startDate, endDate);
       await Promise.all(
         totalDates.map(async (dateTime) => {
           if (

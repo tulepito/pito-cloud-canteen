@@ -27,7 +27,9 @@ export const publishOrder = async (orderId: string) => {
   }
 
   await integrationSdk.listings.update({
+    id: orderId,
     metadata: {
+      orderState: EOrderStates.picking,
       orderStateHistory: orderStateHistory.concat({
         state: EOrderStates.picking,
         updatedAt: new Date().getTime(),

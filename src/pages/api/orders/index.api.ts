@@ -1,4 +1,4 @@
-import cookies from '@services/cookie';
+import { composeApiCheckers } from '@apis/configs';
 import orderChecker from '@services/permissionChecker/order';
 import { handleError } from '@services/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -31,4 +31,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default cookies(orderChecker(handler));
+export default composeApiCheckers(orderChecker)(handler);

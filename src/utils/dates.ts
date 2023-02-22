@@ -5,6 +5,7 @@ import {
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
 import jstz from 'jstimezonedetect';
+import type { DurationUnits } from 'luxon';
 import { DateTime, Interval } from 'luxon';
 
 import { EDayOfWeek } from './enums';
@@ -247,19 +248,11 @@ export const getDayOfWeekByIndex = (index: number) => {
   ) as string;
 };
 
-export const getSeparatedDates = (
-  startDateTimestamp: number,
-  endDateTimestamp: number,
+export const diffDays = (
+  date1 = new Date().getTime(),
+  date2 = new Date().getTime(),
+  units: DurationUnits = ['days'],
 ) => {
-  let currentDateTimestamp = startDateTimestamp;
-  const separatedDates = [];
-  while (currentDateTimestamp <= endDateTimestamp) {
-    separatedDates.push(currentDateTimestamp);
-    currentDateTimestamp = DateTime.fromMillis(currentDateTimestamp)
-      .plus({
-        days: 1,
-      })
-      .toMillis();
-  }
-  return separatedDates;
+  return DateTime.fromMillis(date1).diff(DateTime.fromMillis(date2), units)
+    .days;
 };

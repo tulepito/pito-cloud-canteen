@@ -87,11 +87,11 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   const deliveryInitValues = {
     startDate: startDate || nextStartWeek,
     endDate: endDate || nextEndWeek,
-    deliveryHour,
+    deliveryHour: deliveryHour || '07:00',
   };
   const deadlineInitValues = {
     deadlineDate,
-    deadlineHour,
+    deadlineHour: deadlineHour || '07:00',
   };
   const numberEmployeesInitValues = {
     memberAmount,
