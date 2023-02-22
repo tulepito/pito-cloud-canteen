@@ -14,6 +14,7 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
     plans = [],
     companyId,
     participants = [],
+    anonymous = [],
     bookerId = '',
   } = Listing(orderListing).getMetadata();
 
@@ -34,8 +35,19 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
       return memberAccount;
     }),
   );
+  const anonymousParticipantData = await Promise.all(
+    anonymous.map(async (id: string) => {
+      const [memberAccount] = denormalisedResponseEntities(
+        await integrationSdk.users.show({
+          id,
+        }),
+      );
 
-  data = { ...data, participantData };
+      return memberAccount;
+    }),
+  );
+
+  data = { ...data, participantData, anonymousParticipantData };
 
   if (plans?.length > 0) {
     const planId = plans[0];

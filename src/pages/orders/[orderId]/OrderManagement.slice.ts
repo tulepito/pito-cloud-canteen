@@ -39,6 +39,7 @@ type TOrderManagementState = {
   planData: TObject;
   bookerData: TUser | null;
   participantData: Array<TUser>;
+  anonymousParticipantData: Array<TUser>;
 };
 
 const initialState: TOrderManagementState = {
@@ -55,6 +56,7 @@ const initialState: TOrderManagementState = {
   planData: {},
   bookerData: null,
   participantData: [],
+  anonymousParticipantData: [],
 };
 
 // ================ Thunk types ================ //

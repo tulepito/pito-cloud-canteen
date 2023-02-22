@@ -39,9 +39,8 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   );
   const [isEditSelectionModalOpen, setIsEditSelectionModalOpen] =
     useState(false);
-  const { planData, participantData, orderData } = useAppSelector(
-    (state) => state.OrderManagement,
-  );
+  const { planData, participantData, anonymousParticipantData, orderData } =
+    useAppSelector((state) => state.OrderManagement);
   const { packagePerMember = 0 } = Listing(orderData as TListing).getMetadata();
   const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
 
@@ -52,11 +51,12 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   const allTabData: TAllTabData = useMemo(
     () =>
       prepareDataForTabs({
+        anonymousParticipantData,
         participantData,
         memberOrders,
         foodList,
       }),
-    [participantData, memberOrders, foodList],
+    [anonymousParticipantData, participantData, memberOrders, foodList],
   );
   const deletedTabData = allTabData[EOrderDetailsTableTab.deleted];
 
