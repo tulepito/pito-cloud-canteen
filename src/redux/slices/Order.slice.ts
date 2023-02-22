@@ -2,6 +2,7 @@ import { companyApi } from '@apis/companyApi';
 import { fetchUserApi } from '@apis/index';
 import type { TUpdateOrderApiBody } from '@apis/orderApi';
 import {
+  bookerCancelPendingApprovalOrderApi,
   bookerDeleteDraftOrderApi,
   bookerPublishOrderApi,
   createBookerOrderApi,
@@ -18,7 +19,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import { convertWeekDay, renderDateRange } from '@utils/dates';
-import { EManageCompanyOrdersTab } from '@utils/enums';
+import { EListingStates, EManageCompanyOrdersTab } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TPagination } from '@utils/types';
 import { DateTime } from 'luxon';
@@ -243,6 +244,7 @@ const queryOrders = createAsyncThunk(
     const params = {
       dataParams: {
         ...payload,
+        states: EListingStates.published,
         perPage: MANAGE_ORDER_PAGE_SIZE,
       },
       queryParams: {
@@ -276,6 +278,7 @@ const queryCompanyOrders = createAsyncThunk(
       dataParams: {
         ...restPayload,
         perPage: MANAGE_ORDER_PAGE_SIZE,
+        states: EListingStates.published,
         meta_bookerId: bookerId,
         meta_companyId: companyId,
         meta_listingType: LISTING_TYPE.ORDER,
@@ -402,6 +405,17 @@ const requestApprovalOrder = createAsyncThunk(
   },
 );
 
+const cancelPendingApprovalOrder = createAsyncThunk(
+  'app/Order/CANCEL_PENDING_APPROVAL_ORDER',
+  async ({ orderId }: TObject) => {
+    const { data: responseData } = await bookerCancelPendingApprovalOrderApi(
+      orderId,
+    );
+
+    return responseData.data;
+  },
+);
+
 const bookerPublishOrder = createAsyncThunk(
   'app/Order/BOOKER_PUBLISH_ORDER',
   async ({ orderId }: TObject) => {
@@ -425,6 +439,7 @@ export const orderAsyncActions = {
   updatePlanDetail,
   requestApprovalOrder,
   bookerPublishOrder,
+  cancelPendingApprovalOrder,
 };
 
 const orderSlice = createSlice({
@@ -678,6 +693,22 @@ const orderSlice = createSlice({
         order: payload,
       }))
       .addCase(requestApprovalOrder.rejected, (state, { error }) => ({
+        ...state,
+        updateOrderInProgress: false,
+        updateOrderError: error.message,
+      }))
+      /* =============== cancelNeedApprovalOrder =============== */
+      .addCase(cancelPendingApprovalOrder.pending, (state) => ({
+        ...state,
+        updateOrderInProgress: true,
+        updateOrderError: null,
+      }))
+      .addCase(cancelPendingApprovalOrder.fulfilled, (state, { payload }) => ({
+        ...state,
+        updateOrderInProgress: false,
+        order: payload,
+      }))
+      .addCase(cancelPendingApprovalOrder.rejected, (state, { error }) => ({
         ...state,
         updateOrderInProgress: false,
         updateOrderError: error.message,

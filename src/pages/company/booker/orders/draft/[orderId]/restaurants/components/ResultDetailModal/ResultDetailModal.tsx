@@ -56,10 +56,24 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   const foodModal = useBoolean(false);
   const [selectedFood, setSelectedFood] = useState<TListing | null>(null);
 
-  const { orderId, planId } = useLoadPlanDetails();
+  const { orderId, planId, planDetail } = useLoadPlanDetails();
+
+  const initFoodList = useMemo(() => {
+    const foodListObj =
+      Listing(planDetail).getMetadata().orderDetail?.[`${timestamp}`]
+        ?.restaurant?.foodList || {};
+    return Object.keys(foodListObj) || [];
+  }, [planDetail, timestamp]);
+
+  useEffect(() => {
+    setSelectedFoods(initFoodList);
+  }, [initFoodList]);
 
   const updatePlanDetailInProgress = useAppSelector(
     (state) => state.BookerSelectRestaurant.updatePlanDetailInProgress,
+  );
+  const currentMenuId = useAppSelector(
+    (state) => state.BookerDraftOrderPage.currentMenuId,
   );
 
   const currentRestaurant = useMemo(
@@ -149,12 +163,24 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
       return;
     }
 
+    const updatedFoodList = selectedFoods.reduce((acc: any, foodId: string) => {
+      const food = foodList?.find((item) => item.id?.uuid === foodId);
+      if (food) {
+        acc[foodId] = {
+          foodName: Listing(food).getAttributes().title,
+          foodPrice: Listing(food).getAttributes().price?.amount,
+        };
+      }
+      return acc;
+    }, {});
+
     const updatedValues = {
       [`${timestamp}`]: {
         restaurant: {
-          foodList: selectedFoods,
+          foodList: updatedFoodList,
           id: selectedRestaurantId,
           restaurantName,
+          menuId: currentMenuId,
         },
       },
     };
@@ -179,6 +205,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   return (
     <>
       <Modal
+        id="ResultDetailModal"
         scrollLayerClassName={css.scrollLayer}
         containerClassName={css.modalContainer}
         isOpen={isOpen}

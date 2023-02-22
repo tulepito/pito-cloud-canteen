@@ -11,7 +11,7 @@ import type { TListing } from '@utils/types';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
@@ -77,7 +77,16 @@ function BookerDraftOrderPage() {
   }, [endTimestamp]);
   const isDoneSetupPlan =
     !isEmpty(orderDetail) &&
-    orderDetail.every(({ resource: { isSelected } }) => isSelected);
+    orderDetail.every(({ resource: { isSelectedFood } }) => isSelectedFood);
+
+  const handleEditFood = useCallback(
+    (date: string, restaurantId: string, menuId: string) => {
+      router.push(
+        `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date}&restaurantId=${restaurantId}&menuId=${menuId}`,
+      );
+    },
+    [orderId],
+  );
 
   const calendarExtraResources = useMemo(() => {
     return {
@@ -88,6 +97,7 @@ function BookerDraftOrderPage() {
       updatePlanDetailInprogress,
       fetchPlanDetailInProgress:
         fetchOrderDetailInProgress || fetchOrderInProgress,
+      onEditFood: handleEditFood,
     };
   }, [
     orderId,
@@ -97,6 +107,7 @@ function BookerDraftOrderPage() {
     fetchOrderInProgress,
     startDate,
     updatePlanDetailInprogress,
+    handleEditFood,
   ]);
 
   const dispatch = useAppDispatch();
@@ -106,9 +117,13 @@ function BookerDraftOrderPage() {
   };
 
   const handleAddMeal = () => (date: Date) => {
-    router.push(
-      `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date.getTime()}`,
-    );
+    router.push({
+      pathname: companyPaths.OrderSelectRestaurant,
+      query: {
+        orderId,
+        timestamp: date.getTime(),
+      },
+    });
   };
 
   const handleRemoveMeal = (id: string) => (resourceId: string) => {

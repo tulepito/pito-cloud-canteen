@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-hooks/rules-of-hooks */
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import type { TButtonVariant } from '@components/Button/Button';
@@ -6,7 +7,7 @@ import AlertModal from '@components/Modal/AlertModal';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { parseThousandNumber } from '@helpers/format';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { companyPaths } from '@src/paths';
@@ -154,6 +155,9 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       const router = useRouter();
       const dispatch = useAppDispatch();
       const confirmDeleteDraftOrderActions = useBoolean(false);
+      const updateOrderInProgress = useAppSelector(
+        (state) => state.Order.updateOrderInProgress,
+      );
 
       const navigateToDraftOrderDetailPage = () => {
         router.push({
@@ -185,6 +189,14 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         );
       };
 
+      const handleCancelNeedApprovalOrder = () => {
+        dispatch(
+          orderAsyncActions.cancelPendingApprovalOrder({
+            orderId,
+          }),
+        );
+      };
+
       const handleCopyOrderLink = () => {
         const orderLink = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderId}`;
         navigator.clipboard.writeText(orderLink);
@@ -193,6 +205,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       const secondaryButtonProps = {
         variant: 'inline' as TButtonVariant,
         className: css.actionButton,
+        disabled: updateOrderInProgress,
       };
 
       const deleteDraftButton = (
@@ -218,7 +231,8 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       const cancelPendingApprovalOrderButton = (
         <Button
           key={'cancelPendingApprovalOrderButton'}
-          {...secondaryButtonProps}>
+          {...secondaryButtonProps}
+          onClick={handleCancelNeedApprovalOrder}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.cancelPendingApprovalOrder',
           })}

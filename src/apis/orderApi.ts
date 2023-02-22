@@ -70,6 +70,7 @@ export const queryOrdersApi = (body: TBodyParams) => {
   return postApi(`/admin/listings/order/query`, body);
 };
 
+// Delete draft own draft order
 export const bookerDeleteDraftOrderApi = ({
   companyId,
   orderId,
@@ -79,11 +80,17 @@ export const bookerDeleteDraftOrderApi = ({
 }) => {
   return deleteApi(`/company/${companyId}/orders/${orderId}`);
 };
-
+// Request approval order
 export const requestApprovalOrderApi = (orderId: string) => {
   return putApi(`/orders/${orderId}/request-approval-order`);
 };
 
+// Cancel pending approval order
+export const bookerCancelPendingApprovalOrderApi = (orderId: string) => {
+  return putApi(`/orders/${orderId}/cancel-pending-approval-order`);
+};
+
+// Start order process (inProgress)
 export const bookerStartOrderApi = ({
   orderId,
   planId,
@@ -94,10 +101,12 @@ export const bookerStartOrderApi = ({
   return putApi(`/orders/${orderId}/plan/${planId}/start-order`);
 };
 
+// Allow picking for order
 export const bookerPublishOrderApi = (orderId: string) => {
   return postApi(`/orders/${orderId}/publish-order`);
 };
 
+// Cancel picking order
 export const cancelPickingOrderApi = (orderId: string) => {
   return putApi(`/orders/${orderId}/cancel-picking-order`);
 };

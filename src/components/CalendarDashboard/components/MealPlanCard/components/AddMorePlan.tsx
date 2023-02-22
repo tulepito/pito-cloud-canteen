@@ -1,8 +1,6 @@
 import Button from '@components/Button/Button';
 import IconPlus from '@components/Icons/IconPlus/IconPlus';
-import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import classNames from 'classnames';
-import { useEffect } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
@@ -30,15 +28,11 @@ const AddMorePlan: React.FC<TAddMorePlanProps> = ({
   const dateInNumberType = Number(date);
   const isValidDate =
     dateInNumberType >= startDate && dateInNumberType <= endDate;
-  const showCondition = events.length < 1 && isValidDate;
+  const showCondition = !loading && events.length < 1 && isValidDate;
 
   const handleClick = () => {
     onClick(date);
   };
-
-  useEffect(() => {
-    console.log('lala', startDate);
-  }, [startDate]);
 
   return (
     <>
@@ -48,7 +42,6 @@ const AddMorePlan: React.FC<TAddMorePlanProps> = ({
             <IconPlus className={css.plusIcon} />
             <FormattedMessage id="AddMorePlan.addMore" />
           </Button>
-          {loading && <IconSpinner className={css.spinner} />}
           {!loading && (!events || events.length === 0) && (
             <div className={css.haveNoMeal}>
               <FormattedMessage id="AddMorePlan.haveNoMeal" />

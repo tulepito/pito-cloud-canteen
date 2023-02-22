@@ -4,14 +4,7 @@ import {
   selectCalendarDate,
   selectRestaurant,
 } from '@redux/slices/Order.slice';
-import {
-  selectRestaurantPageThunks,
-  setSelectedRestaurant,
-} from '@redux/slices/SelectRestaurantPage.slice';
-import { Listing } from '@utils/data';
-import type { TListing, TObject } from '@utils/types';
 import clone from 'lodash/clone';
-import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
 
@@ -23,45 +16,23 @@ import MealPlanCardHeader from './MealPlanCardHeader';
 type TMealPlanCardProps = {
   event: Event;
   index: number;
-  eventExtraProps: TObject;
   removeInprogress: boolean;
   onRemove?: (id: string) => void;
+  resources: any;
 };
 
 const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   event,
-  eventExtraProps = {},
   removeInprogress,
   onRemove,
+  resources,
 }) => {
-  const { onPickFoodModal = () => null } = eventExtraProps;
   const dispatch = useAppDispatch();
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
-
-  const order = useAppSelector((state) => state.Order.order, shallowEqual);
-
-  const selectedDate = useAppSelector(
-    (state) => state.Order.selectedCalendarDate,
-  );
-  // TODO: will move these things out of this component
-  const fetchFoodInProgress = useAppSelector(
-    (state) => state.SelectRestaurantPage.fetchFoodPending,
-  );
-  const fetchRestaurantsInProgress = useAppSelector(
-    (state) => state.SelectRestaurantPage.fetchRestaurantsPending,
-  );
-
-  const restaurantId = event.resource?.restaurant.id;
-  const dateTime = DateTime.fromJSDate(event?.start!);
-
-  const {
-    packagePerMember,
-    deliveryHour,
-    nutritions = [],
-  } = Listing(order as TListing).getMetadata();
+  const { onEditFood, editFoodInprogress } = resources;
 
   const removeEventItem =
     onRemove ||
@@ -76,34 +47,6 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     dispatch(selectRestaurant());
   };
 
-  const onCustomPickFoodModalOpen = async () => {
-    dispatch(selectCalendarDate(dateTime.toJSDate()));
-    const { payload }: { payload: any } = await dispatch(
-      selectRestaurantPageThunks.getRestaurants({
-        dateTime,
-        packagePerMember,
-        deliveryHour,
-        nutritions,
-      }),
-    );
-
-    const { restaurants = [] } = payload || {};
-    const selectedRestaurant = restaurants.find(
-      (_restaurant: any) =>
-        Listing(_restaurant.restaurantInfo).getId() === restaurantId,
-    );
-    dispatch(setSelectedRestaurant(selectedRestaurant?.restaurantInfo));
-    await dispatch(
-      selectRestaurantPageThunks.getRestaurantFood({
-        menuId: Listing(selectedRestaurant?.menu).getId(),
-        dateTime,
-      }),
-    );
-    onPickFoodModal();
-  };
-  const onPickFoodInProgress =
-    (fetchFoodInProgress || fetchRestaurantsInProgress) &&
-    selectedDate.getTime() === event.start?.getTime();
   return (
     <div className={css.root}>
       <MealPlanCardHeader
@@ -114,8 +57,8 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
       <MealPlanCardContent event={event} onEditMeal={onEditMeal} />
       <MealPlanCardFooter
         event={event}
-        onPickFoodModal={onCustomPickFoodModalOpen}
-        onPickFoodInProgress={onPickFoodInProgress}
+        onEditFood={onEditFood}
+        editFoodInprogress={editFoodInprogress}
       />
     </div>
   );
