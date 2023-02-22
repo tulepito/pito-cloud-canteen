@@ -1,4 +1,4 @@
-import { BookerDraftOrderPageThunks } from '@redux/slices/BookerDraftOrderPage.slice';
+import { BookerDraftOrderPageThunks } from '@pages/company/booker/orders/draft/[orderId]/BookerDraftOrderPage.slice';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 

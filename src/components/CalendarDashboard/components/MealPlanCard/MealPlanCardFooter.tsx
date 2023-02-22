@@ -8,14 +8,14 @@ import css from './MealPlanCard.module.scss';
 
 type TMealPlanCardFooterProps = {
   event: Event;
-  onPickFoodModal?: () => void;
   onPickFoodInProgress?: boolean;
+  onPickFoodModal?: () => void;
 };
 
 const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
   event,
-  onPickFoodModal,
   onPickFoodInProgress,
+  onPickFoodModal,
 }) => {
   const foodList = event.resource.foodList || [];
   const [isOpenApplyOtherDaysModal, setIsOpenApplyOtherDaysModal] =

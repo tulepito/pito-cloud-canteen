@@ -1,12 +1,12 @@
 import RestaurantCard from '@components/RestaurantCard/RestaurantCard';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { BookerDraftOrderPageThunks } from '@redux/slices/BookerDraftOrderPage.slice';
 import type { TListing } from '@utils/types';
 import classNames from 'classnames';
 import React, { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 
+import { BookerDraftOrderPageThunks } from '../../../BookerDraftOrderPage.slice';
 import ResultDetailModal from '../ResultDetailModal/ResultDetailModal';
 import EmptyList from './EmptyList';
 import css from './ResultList.module.scss';

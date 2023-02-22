@@ -1,7 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useFetchSearchFilters from '@hooks/useFetchSearchFilters';
 import KeywordSearchForm from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
-import { BookerDraftOrderPageThunks } from '@redux/slices/BookerDraftOrderPage.slice';
 import { distanceOptions, ratingOptions } from '@src/marketplaceConfig';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
@@ -11,12 +10,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
+import { BookerDraftOrderPageThunks } from '../BookerDraftOrderPage.slice';
 import FilterSidebar from '../components/FilterSidebar/FilterSidebar';
-import { useLoadData } from '../hooks/loadData';
 import css from './BookerSelectRestaurant.module.scss';
 import FilterLabelList from './components/FilterLabelList/FilterLabelList';
 import ResultList from './components/ResultList/ResultList';
 import SortingDropdown from './components/SortingDropdown/SortingDropdown';
+import { useLoadData } from './hooks/loadData';
 
 const convertQueryValueToArray = (value?: string | string[]) => {
   if (Array.isArray(value)) {
@@ -48,7 +48,7 @@ function BookerSelectRestaurant() {
 
   useFetchSearchFilters();
 
-  useLoadData({
+  const { companyAccount } = useLoadData({
     orderId: orderId as string,
   });
 
@@ -106,11 +106,6 @@ function BookerSelectRestaurant() {
 
   const totalResultItems = useAppSelector(
     (state) => state.BookerDraftOrderPage.totalItems,
-  );
-
-  const companyFromOrder = useAppSelector(
-    (state) => state.BookerDraftOrderPage.companyFromOrder,
-    shallowEqual,
   );
 
   const totalRatings = useAppSelector(
@@ -215,9 +210,9 @@ function BookerSelectRestaurant() {
 
   const companyGeoOrigin = useMemo(
     () => ({
-      ...User(companyFromOrder as TUser).getPublicData()?.location?.origin,
+      ...User(companyAccount as TUser).getPublicData()?.location?.origin,
     }),
-    [companyFromOrder],
+    [companyAccount],
   );
 
   const handleFilterMobileMenuClick = () => {
