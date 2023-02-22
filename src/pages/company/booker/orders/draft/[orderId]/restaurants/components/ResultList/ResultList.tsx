@@ -3,7 +3,8 @@ import { useAppDispatch } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import type { TListing } from '@utils/types';
 import classNames from 'classnames';
-import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 
 import { BookerDraftOrderPageThunks } from '../../../BookerDraftOrderPage.slice';
@@ -35,11 +36,16 @@ const ResultList: React.FC<TResultListProps> = ({
   timestamp,
   restaurantFood,
 }) => {
+  const router = useRouter();
+  const { restaurantId, orderId, menuId } = router.query;
+
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<
     string | undefined
-  >();
-  const detailModal = useBoolean(false);
+  >(`${restaurantId}`);
+  const detailModal = useBoolean(!!restaurantId);
+
   const dispatch = useAppDispatch();
+
   const onRestaurantClick = (id: string) => () => {
     detailModal.setTrue();
     setSelectedRestaurantId(id);
@@ -49,6 +55,29 @@ const ResultList: React.FC<TResultListProps> = ({
         timestamp,
       }),
     );
+  };
+
+  useEffect(() => {
+    if (detailModal.value && restaurantId) {
+      dispatch(
+        BookerDraftOrderPageThunks.fetchFoodListFromRestaurant({
+          restaurantId: `${restaurantId}`,
+          menuId: `${menuId}`,
+          timestamp,
+        }),
+      );
+    }
+  }, [restaurantId, menuId, detailModal.value]);
+
+  const handleCloseDetail = () => {
+    if (restaurantId) {
+      router.push({
+        pathname: router.pathname,
+        query: { orderId, timestamp },
+      });
+    } else {
+      detailModal.setFalse();
+    }
   };
 
   const classes = classNames(css.root, className);
@@ -78,7 +107,7 @@ const ResultList: React.FC<TResultListProps> = ({
       </div>
       <ResultDetailModal
         isOpen={detailModal.value}
-        onClose={detailModal.setFalse}
+        onClose={handleCloseDetail}
         restaurantFood={restaurantFood}
         selectedRestaurantId={selectedRestaurantId}
         restaurants={restaurants}

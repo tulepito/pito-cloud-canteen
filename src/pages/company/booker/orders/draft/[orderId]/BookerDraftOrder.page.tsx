@@ -7,7 +7,7 @@ import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
@@ -64,6 +64,15 @@ function BookerDraftOrderPage() {
       : nextEndWeek;
   }, [endTimestamp]);
 
+  const handleEditFood = useCallback(
+    (date: string, restaurantId: string, menuId: string) => {
+      router.push(
+        `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date}&restaurantId=${restaurantId}&menuId=${menuId}`,
+      );
+    },
+    [orderId],
+  );
+
   const calendarExtraResources = useMemo(() => {
     return {
       planId,
@@ -72,6 +81,7 @@ function BookerDraftOrderPage() {
       updatePlanDetailInprogress,
       fetchPlanDetailInProgress:
         fetchOrderDetailInProgress || fetchOrderInProgress,
+      onEditFood: handleEditFood,
     };
   }, [
     planId,
@@ -80,6 +90,7 @@ function BookerDraftOrderPage() {
     fetchOrderInProgress,
     startDate,
     updatePlanDetailInprogress,
+    handleEditFood,
   ]);
 
   const dispatch = useAppDispatch();

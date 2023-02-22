@@ -46,6 +46,7 @@ type TBookerDraftOrderPageState = {
   };
   fetchRestaurantFoodInProgress: boolean;
   fetchRestaurantFoodError: any;
+  currentMenuId?: string;
 };
 const initialState: TBookerDraftOrderPageState = {
   menuTypes: [],
@@ -67,6 +68,8 @@ const initialState: TBookerDraftOrderPageState = {
   restaurantFood: {},
   fetchRestaurantFoodInProgress: false,
   fetchRestaurantFoodError: null,
+
+  currentMenuId: undefined,
 };
 
 // ================ Thunk types ================ //
@@ -216,15 +219,17 @@ const fetchCompanyAccount = createAsyncThunk(
 
 const fetchFoodListFromRestaurant = createAsyncThunk(
   FETCH_FOOD_LIST_FROM_RESTAURANT,
-  async (params: Record<string, any>, { getState, extra: sdk }) => {
-    const { restaurantId, timestamp } = params;
+  async (params: Record<string, any>, { getState, dispatch, extra: sdk }) => {
+    const { restaurantId, menuId: menuIdParam, timestamp } = params;
     const { combinedRestaurantMenuData = [], restaurantFood = {} } =
       getState().BookerDraftOrderPage;
     const dateTime = DateTime.fromMillis(timestamp);
     const dayOfWeek = convertWeekDay(dateTime.weekday).key;
-    const menuId = combinedRestaurantMenuData.find(
-      (item) => item.restaurantId === restaurantId,
-    )?.menuId;
+    const menuId =
+      menuIdParam ||
+      combinedRestaurantMenuData.find(
+        (item) => item.restaurantId === restaurantId,
+      )?.menuId;
     const { order } = getState().Order;
     const { nutritions, packagePerMember } = Listing(
       order as TListing,
@@ -241,6 +246,10 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
       include: ['images'],
     });
     const foodList = denormalisedResponseEntities(response);
+
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    dispatch(BookerDraftOrderPageActions.setCurrentMenuId(menuId));
+
     const newRestaurantFood = {
       ...restaurantFood,
       [restaurantId]: foodList,
@@ -260,7 +269,11 @@ export const BookerDraftOrderPageThunks = {
 const BookerDraftOrderPageSlice = createSlice({
   name: 'BookerDraftOrderPage',
   initialState,
-  reducers: {},
+  reducers: {
+    setCurrentMenuId: (state, action) => {
+      state.currentMenuId = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchSearchFilter.pending, (state) => {
