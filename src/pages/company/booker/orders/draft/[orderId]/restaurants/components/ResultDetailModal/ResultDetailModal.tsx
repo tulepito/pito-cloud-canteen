@@ -57,13 +57,16 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   const [selectedFood, setSelectedFood] = useState<TListing | null>(null);
 
   const { orderId, planId, planDetail } = useLoadPlanDetails();
-
   const initFoodList = useMemo(() => {
-    const foodListObj =
-      Listing(planDetail).getMetadata().orderDetail?.[`${timestamp}`]
-        ?.restaurant?.foodList || {};
-    return Object.keys(foodListObj) || [];
-  }, [planDetail, timestamp]);
+    const detail =
+      Listing(planDetail).getMetadata().orderDetail?.[`${timestamp}`];
+    const savedRestaurantId = detail?.restaurant?.id;
+    if (selectedRestaurantId === savedRestaurantId) {
+      const foodListObj = detail?.restaurant?.foodList || {};
+      return Object.keys(foodListObj) || [];
+    }
+    return [];
+  }, [planDetail, timestamp, isOpen]);
 
   useEffect(() => {
     setSelectedFoods(initFoodList);
