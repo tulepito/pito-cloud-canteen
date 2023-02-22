@@ -3,11 +3,22 @@
 @use '/src/styles/defaults.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
+.tableWrapper {
+  @include viewportMedium {
+    max-width: calc(100vw - 350px);
+    overflow-x: scroll;
+    position: relative;
+  }
+}
+
 .table {
   margin-bottom: 20px;
   border-collapse: collapse;
   width: 100%;
   display: block;
+  @include viewportMedium {
+    min-width: 1440px;
+  }
   @include viewportLarge {
     display: table;
   }
