@@ -18,6 +18,7 @@ import { convertWeekDay, getSeparatedDates } from '@utils/dates';
 import { EListingStates, EOrderStates } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TPagination } from '@utils/types';
+import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
 
 import { selectRestaurantPageThunks } from './SelectRestaurantPage.slice';
@@ -74,6 +75,10 @@ type TOrderInitialState = {
     all: number;
   };
   manageOrdersPagination: TPagination;
+
+  restaurantCoverImageList: {
+    [restaurantId: string]: any;
+  };
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -139,6 +144,8 @@ const initialState: TOrderInitialState = {
 
   updateOrderDetailInProgress: false,
   updateOrderDetailError: null,
+
+  restaurantCoverImageList: {},
 };
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
@@ -166,6 +173,7 @@ const updateOrder = createAsyncThunk(
     } = generalInfo || {};
     const orderId = Listing(order as TListing).getId();
     const orderDetail: any = {};
+    const restaurantCoverImageList: any = {};
     if (!orderDetailParams) {
       const { dayInWeek = [], startDate, endDate } = generalInfo;
       const totalDates = getSeparatedDates(startDate, endDate);
@@ -189,6 +197,14 @@ const updateOrder = createAsyncThunk(
               const randomNumber = Math.floor(
                 Math.random() * (restaurants.length - 1),
               );
+              const { coverImageId } = Listing(
+                restaurants[randomNumber]?.restaurantInfo,
+              ).getPublicData();
+              restaurantCoverImageList[
+                `${Listing(restaurants[randomNumber]?.restaurantInfo).getId()}`
+              ] = Listing(restaurants[randomNumber]?.restaurantInfo)
+                .getFullData()
+                .images.find((image: any) => image.id.uuid === coverImageId);
               orderDetail[dateTime] = {
                 restaurant: {
                   id: Listing(
@@ -224,6 +240,7 @@ const updateOrder = createAsyncThunk(
     return {
       orderListing,
       orderDetail: orderDetailParams || orderDetail,
+      restaurantCoverImageList,
     };
   },
 );
@@ -320,14 +337,50 @@ const fetchOrderDetail = createAsyncThunk(
 
     const { plans = [] } = Listing(order as TListing).getMetadata();
     if (plans[0]) {
-      const response = denormalisedResponseEntities(
+      const response: any = denormalisedResponseEntities(
         await sdk.listings.show({
           id: plans[0],
         }),
       )[0];
-      return Listing(response).getMetadata().orderDetail;
+      const restaurantIdList = uniq(
+        Object.values(Listing(response).getMetadata().orderDetail).map(
+          (item: any) => item.restaurant.id,
+        ),
+      );
+
+      const restaurantCoverImageList = await Promise.all(
+        restaurantIdList.map(async (restaurantId) => {
+          const restaurantResponse = denormalisedResponseEntities(
+            await sdk.listings.show({
+              id: restaurantId,
+              include: ['images'],
+              'fields.image': [
+                'variants.landscape-crop',
+                'variants.landscape-crop2x',
+              ],
+            }),
+          )[0];
+          const { coverImageId } = Listing(restaurantResponse).getPublicData();
+          return {
+            [restaurantId]: Listing(restaurantResponse)
+              .getFullData()
+              .images.find((image: any) => image.id.uuid === coverImageId),
+          };
+        }),
+      );
+
+      return {
+        orderDetail: Listing(response).getMetadata().orderDetail,
+        restaurantCoverImageList: restaurantCoverImageList.reduce(
+          (result, item) => ({
+            ...result,
+            ...item,
+          }),
+          {},
+        ),
+      };
     }
-    return orderDetailState;
+    return { orderDetail: orderDetailState, restaurantCoverImageList: {} };
   },
 );
 
@@ -498,6 +551,7 @@ const orderSlice = createSlice({
         ...state,
         updateOrderInProgress: false,
         order: payload.orderListing,
+        restaurantCoverImageList: payload.restaurantCoverImageList,
       }))
       .addCase(updateOrder.rejected, (state, { error }) => ({
         ...state,
@@ -580,7 +634,8 @@ const orderSlice = createSlice({
       .addCase(fetchOrderDetail.fulfilled, (state, { payload }) => ({
         ...state,
         fetchOrderDetailInProgress: false,
-        orderDetail: payload,
+        orderDetail: payload.orderDetail,
+        restaurantCoverImageList: payload.restaurantCoverImageList,
       }))
       .addCase(fetchOrderDetail.rejected, (state, { error }) => ({
         ...state,

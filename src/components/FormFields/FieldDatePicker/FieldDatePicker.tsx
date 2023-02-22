@@ -38,9 +38,9 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
     onChange(date?.getTime());
   };
 
-  const { invalid, touched, error } = meta;
+  const { invalid, error } = meta;
   const errorText = customErrorText || error;
-  const hasError = !!customErrorText || !!(touched && invalid && error);
+  const hasError = !!customErrorText || !!(invalid && error);
   const fieldMeta = { touched: hasError, error: errorText };
   const labelClasses = classNames(css.labelRoot);
   const labelRequiredRedStar = fieldMeta.error ? css.labelRequiredRedStar : '';
