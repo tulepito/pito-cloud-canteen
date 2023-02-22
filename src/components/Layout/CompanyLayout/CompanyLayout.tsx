@@ -4,7 +4,7 @@ import FeaturesHeader from '@components/FeaturesHeader/FeaturesHeader';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { companyPaths, personalPaths } from '@src/paths';
+import { companyPaths } from '@src/paths';
 import { CurrentUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 import filter from 'lodash/filter';
@@ -26,6 +26,7 @@ const companySettingPaths = [
   companyPaths.Members,
   companyPaths.GroupSetting,
   companyPaths.Logo,
+  companyPaths.Nutrition,
 ];
 const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
@@ -121,11 +122,11 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
         />
       ),
       query: {
-        ...(selectedAccount.value ? { companyId: selectedAccount.value } : {}),
+        ...(selectedAccount.value
+          ? { companyId: selectedAccount.value }
+          : { companyId: 'personal' }),
       },
-      pathname: selectedAccount.value
-        ? changePathnameByCompanyId()
-        : personalPaths.Account,
+      pathname: selectedAccount.value ? changePathnameByCompanyId() : pathname,
     },
   ];
 
