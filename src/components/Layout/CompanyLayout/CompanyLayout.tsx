@@ -60,7 +60,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
     label?: string;
   }>({});
   const accountOptions = [
-    { value: '', label: 'Cá nhân' },
+    { value: '', label: 'Tài khoản' },
     ...assignedCompanies,
   ];
 
@@ -106,6 +106,12 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       pathname: '/',
     },
     {
+      key: 'pitoClub',
+      icon: <FeatureIcons.Gift />,
+      title: 'PITO club',
+      pathname: '/',
+    },
+    {
       key: 'introduce',
       icon: <FeatureIcons.UserCirclePlus />,
       title: 'Giới thiệu',
@@ -135,7 +141,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (companyId) {
+    if (companyId && companyId !== 'personal') {
       const currentCompany = companyRefs.find(
         (_company) => User(_company).getId() === companyId,
       );
@@ -144,13 +150,19 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
         label: User(currentCompany).getPublicData()?.companyName,
       });
     }
-  }, [companyId]);
+  }, [companyId, companyRefs]);
 
+  const companyName =
+    companyId && companyId !== 'personal'
+      ? User(
+          companyRefs.find((_company) => User(_company).getId() === companyId),
+        ).getPublicData()?.companyName
+      : 'Tài khoản cá nhân';
   return (
     <>
       <CompanyHeader />
       {showFeatureHeader && <FeaturesHeader headerData={featureHeaderData} />}
-      {showSidebar && <CompanySidebar />}
+      {showSidebar && <CompanySidebar companyName={companyName!} />}
       <CompanyMainContent
         hasHeader={showFeatureHeader}
         hasSideBar={showSidebar}>

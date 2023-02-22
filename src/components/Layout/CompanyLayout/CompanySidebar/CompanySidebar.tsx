@@ -6,15 +6,21 @@ import React from 'react';
 
 import css from './CompanySidebar.module.scss';
 
-const CompanySidebar = () => {
+type CompanySidebarProps = {
+  companyName: string;
+};
+
+const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyName }) => {
   const router = useRouter();
   const { companyId } = router.query;
+
   const companyMenuOptions =
     companyId && companyId !== 'personal'
       ? [
           {
             id: 'user',
             label: 'CompanySidebar.members',
+            isFirstLevel: true,
             childrenMenus: [
               {
                 id: 'memberList',
@@ -32,6 +38,7 @@ const CompanySidebar = () => {
             id: 'logo',
             label: 'CompanySidebar.logo',
             nameLink: companyPaths.Logo,
+            isFirstLevel: true,
           },
         ]
       : [];
@@ -40,16 +47,19 @@ const CompanySidebar = () => {
       id: 'home',
       label: 'CompanySidebar.account',
       nameLink: companyId ? companyPaths.Account : personalPaths.Account,
+      isFirstLevel: true,
     },
     ...companyMenuOptions,
     {
       id: 'nutrition',
       label: 'CompanySidebar.nutrition',
       nameLink: companyId ? companyPaths.Nutrition : personalPaths.Nutrition,
+      isFirstLevel: true,
     },
   ];
   return (
     <div className={css.root}>
+      <div className={css.companyName}>{companyName}</div>
       <MultiLevelSidebar menus={SIDEBAR_MENUS} />
     </div>
   );
