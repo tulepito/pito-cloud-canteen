@@ -470,8 +470,13 @@ const orderSlice = createSlice({
     }),
     updateDraftMealPlan: (state, { payload }) => {
       const { orderDetail } = payload;
-      const { dateTimestamp, restaurantId, restaurantName, foodList } =
-        orderDetail;
+      const {
+        dateTimestamp,
+        restaurantId,
+        restaurantName,
+        foodList,
+        phoneNumber,
+      } = orderDetail;
       const { orderDetail: oldOrderDetail } = state;
       const existedOrderDetailDate = Object.keys(oldOrderDetail).includes(
         dateTimestamp.toString(),
@@ -487,6 +492,7 @@ const orderSlice = createSlice({
                 id: restaurantId,
                 restaurantName,
                 foodList,
+                phoneNumber,
               },
             },
           }
