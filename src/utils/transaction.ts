@@ -51,45 +51,40 @@ const stateDescription: TStateDescription = {
 
   // States
   states: {
+    [ETransactionState.INITIAL]: {
+      on: {
+        [ETransition.INITIATE_TRANSACTION]: ETransactionState.INITIATED,
+      },
+    },
     [ETransactionState.INITIATED]: {
       on: {
-        [ETransition.INITIATE_TRANSACTION]: ETransactionState.INITIAL,
+        [ETransition.OPERATOR_CANCEL_PLAN]: ETransactionState.CANCELED,
+        [ETransition.EXPIRED_START_DELIVERY]: ETransactionState.FAILED_DELIVERY,
+        [ETransition.START_DELIVERY]: ETransactionState.DELIVERING,
       },
     },
-    [ETransactionState.CANCELED]: {
-      on: {
-        [ETransition.OPERATOR_CANCEL_PLAN]: ETransactionState.INITIATED,
-      },
-    },
+    [ETransactionState.CANCELED]: {},
+    [ETransactionState.FAILED_DELIVERY]: {},
     [ETransactionState.DELIVERING]: {
       on: {
-        [ETransition.START_DELIVERY]: ETransactionState.INITIATED,
-      },
-    },
-    [ETransactionState.FAILED_DELIVERY]: {
-      on: {
-        [ETransition.EXPIRED_START_DELIVERY]: ETransactionState.INITIAL,
-        [ETransition.EXPIRED_DELIVERY]: ETransactionState.DELIVERING,
-        [ETransition.CANCEL_DELIVERY]: ETransactionState.DELIVERING,
+        [ETransition.EXPIRED_DELIVERY]: ETransactionState.FAILED_DELIVERY,
+        [ETransition.CANCEL_DELIVERY]: ETransactionState.FAILED_DELIVERY,
+        [ETransition.COMPLETE_DELIVERY]: ETransactionState.COMPLETED,
       },
     },
     [ETransactionState.COMPLETED]: {
       on: {
-        [ETransition.COMPLETE_DELIVERY]: ETransactionState.DELIVERING,
-      },
-    },
-    [ETransactionState.REVIEWED]: {
-      on: {
-        [ETransition.REVIEW_RESTAURANT]: ETransactionState.COMPLETED,
-        [ETransition.REVIEW_RESTAURANT_AFTER_EXPIRE_TIME]:
-          ETransactionState.EXPIRED_REVIEW,
+        [ETransition.REVIEW_RESTAURANT]: ETransactionState.REVIEWED,
+        [ETransition.EXPIRED_REVIEW_TIME]: ETransactionState.EXPIRED_REVIEW,
       },
     },
     [ETransactionState.EXPIRED_REVIEW]: {
       on: {
-        [ETransition.EXPIRED_REVIEW_TIME]: ETransactionState.COMPLETED,
+        [ETransition.REVIEW_RESTAURANT_AFTER_EXPIRE_TIME]:
+          ETransactionState.REVIEWED,
       },
     },
+    [ETransactionState.REVIEWED]: {},
   },
 };
 
@@ -107,18 +102,15 @@ const getTransitions = (states: TStateDescription['states']) => {
   ) => {
     const stateTransitions = states[name] && states[name].on;
     const transitionKeys = stateTransitions
-      ? Object.keys(stateTransitions)
+      ? (Object.keys(stateTransitions) as ETransition[])
       : [];
 
     return [
       ...transitionArray,
-      ...transitionKeys.map(
-        (key) =>
-          ({ key, value: stateTransitions[key] } as {
-            key: ETransition;
-            value: ETransactionState;
-          }),
-      ),
+      ...transitionKeys.map<{
+        key: ETransition;
+        value: ETransactionState;
+      }>((key) => ({ key, value: stateTransitions[key] })),
     ];
   };
 
@@ -135,13 +127,18 @@ export const TRANSITIONS = getTransitions(
 
 // This function returns a function that has given stateDesc in scope chain.
 const getTransitionsToStateFn =
-  (stateDesc: TStateDescription) => (state: ETransactionState) =>
-    getTransitions(statesFromStateDescription(stateDesc))
+  (stateDesc: TStateDescription) => (state: ETransactionState) => {
+    return getTransitions(statesFromStateDescription(stateDesc))
       .filter((t) => t.value === state)
       .map((t) => t.key);
+  };
 
 // Get all the transitions that lead to specified state.
 export const getTransitionsToState = getTransitionsToStateFn(stateDescription);
+
+export const txIsInitiated = (tx: TTransaction) => {
+  return [ETransition.INITIATE_TRANSACTION].includes(txLastTransition(tx));
+};
 
 export const txIsCompleted = (tx: TTransaction) => {
   return [ETransition.COMPLETE_DELIVERY].includes(txLastTransition(tx));
@@ -149,4 +146,18 @@ export const txIsCompleted = (tx: TTransaction) => {
 
 export const txIsExpiredReview = (tx: TTransaction) => {
   return [ETransition.EXPIRED_REVIEW_TIME].includes(txLastTransition(tx));
+};
+
+export const txIsDelivering = (tx: TTransaction) => {
+  return [ETransition.START_DELIVERY].includes(txLastTransition(tx));
+};
+
+export const txIsDeliveryFailed = (tx: TTransaction) => {
+  return getTransitionsToState(ETransactionState.FAILED_DELIVERY).includes(
+    txLastTransition(tx),
+  );
+};
+
+export const txIsCanceled = (tx: TTransaction) => {
+  return [ETransition.OPERATOR_CANCEL_PLAN].includes(txLastTransition(tx));
 };
