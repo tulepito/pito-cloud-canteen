@@ -2,6 +2,7 @@ import Button, { InlineTextButton } from '@components/Button/Button';
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
 import Toggle from '@components/Toggle/Toggle';
 import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -41,7 +42,7 @@ const validate = (values: TCreateOrderFormValues) => {
 };
 
 const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
-  companies,
+  companies = [],
   previousOrders = [],
   onSubmit,
   onCancel,
@@ -65,8 +66,14 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
   const company = useField('company', form);
   const usePreviousData = useField('usePreviousData', form);
   const previousOrder = useField('previousOrder', form);
-  const disabledSubmit = submitting || hasValidationErrors;
 
+  const companyValue = company.input.value;
+  const isCompanyListEmpty = isEmpty(companies);
+  const disabledSubmit =
+    isCompanyListEmpty ||
+    isEmpty(companyValue) ||
+    submitting ||
+    hasValidationErrors;
   const isSubmitting = submitting || submitInprogress;
 
   const companyLabel = intl.formatMessage({
@@ -94,7 +101,8 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
         input={company.input}
         meta={company.meta}
         id={`company`}
-        name="company">
+        name="company"
+        disabled={isCompanyListEmpty}>
         <option key={'empty'} disabled value={''}>
           {intl.formatMessage({ id: 'CreateOrderForm.company.placeholder' })}
         </option>
