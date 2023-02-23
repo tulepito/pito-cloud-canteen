@@ -6,6 +6,7 @@ import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './Toolbar.module.scss';
@@ -18,8 +19,8 @@ export type TToolbarProps = {
   onNavigate: (action: string) => void;
   onView: (name: string) => void;
   companyLogo?: ReactNode;
-  startDate: Date;
-  endDate: Date;
+  startDate: number;
+  endDate: number;
   date: Date;
 };
 
@@ -31,17 +32,29 @@ const Toolbar: React.FC<TToolbarProps> = ({
   date,
 }) => {
   const intl = useIntl();
-  const startDateDateTime = DateTime.fromJSDate(startDate);
-  const endDateDateTime = DateTime.fromJSDate(endDate);
-  const anchorDateDateTime = DateTime.fromJSDate(date);
-  const showPrevBtn =
-    startDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
-  const showNextBtn =
-    endDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
+  const startDateDateTime = useMemo(
+    () => DateTime.fromMillis(startDate),
+    [startDate],
+  );
+  const endDateDateTime = useMemo(
+    () => DateTime.fromMillis(endDate),
+    [endDate],
+  );
+  const anchorDateDateTime = useMemo(() => DateTime.fromJSDate(date), [date]);
 
-  const navigateFunc = (action: string) => () => {
-    onNavigate(action);
-  };
+  const showPrevBtn = useMemo(() => {
+    return startDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
+  }, [startDateDateTime, anchorDateDateTime]);
+  const showNextBtn = useMemo(() => {
+    return endDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
+  }, [endDateDateTime, anchorDateDateTime]);
+
+  const navigateFunc = useCallback(
+    (action: string) => () => {
+      onNavigate(action);
+    },
+    [onNavigate],
+  );
 
   return (
     <div className={css.root}>

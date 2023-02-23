@@ -118,6 +118,37 @@ function BookerDraftOrderPage() {
     );
   };
 
+  const toolbarComponent = useCallback(
+    (props: any) => (
+      <Toolbar
+        {...props}
+        startDate={startDate.getTime()}
+        endDate={endDate.getTime()}
+      />
+    ),
+    [startDate, endDate],
+  );
+
+  const contentEndComponent = useCallback(
+    (props: any) => (
+      <AddMorePlan
+        {...props}
+        onClick={handleAddMeal()}
+        startDate={props?.resources?.startDate?.getTime()}
+        endDate={props?.resources?.endDate?.getTime()}
+        loading={props?.resources?.fetchPlanDetailInProgress}
+      />
+    ),
+    [handleAddMeal],
+  );
+
+  const componentsProps = useMemo(() => {
+    return {
+      toolbar: toolbarComponent,
+      contentEnd: contentEndComponent,
+    };
+  }, [toolbarComponent, contentEndComponent]);
+
   return (
     <Layout className={css.root}>
       <LayoutSidebar
@@ -144,20 +175,7 @@ function BookerDraftOrderPage() {
             companyLogo="Company"
             hideMonthView
             resources={calendarExtraResources}
-            components={{
-              contentEnd: (props: any) => (
-                <AddMorePlan
-                  {...props}
-                  onClick={handleAddMeal()}
-                  startDate={props?.resources?.startDate?.getTime()}
-                  endDate={props?.resources?.endDate?.getTime()}
-                  loading={props?.resources?.fetchPlanDetailInProgress}
-                />
-              ),
-              toolbar: (props) => (
-                <Toolbar {...props} startDate={startDate} endDate={endDate} />
-              ),
-            }}
+            components={componentsProps}
           />
         </div>
       </LayoutMain>
