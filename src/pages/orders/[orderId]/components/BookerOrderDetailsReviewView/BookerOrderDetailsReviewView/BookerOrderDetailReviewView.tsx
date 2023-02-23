@@ -51,7 +51,9 @@ const BookerOrderDetailReviewView: React.FC<
         />
       )}
       <div className={css.leftPart}>
-        {!canGoBackEditMode && <ReviewOrderStatesSection />}
+        {!canGoBackEditMode && (
+          <ReviewOrderStatesSection data={reviewViewData.transactionDataMap} />
+        )}
         <ReviewInfoSection
           startSubmitReviewInfoForm
           canEdit={canEditInfo}

@@ -1,34 +1,35 @@
 import HorizontalTimeLine from '@components/TimeLine/HorizontalTimeLine';
 import StateItem from '@components/TimeLine/StateItem';
-import { ETransactionState } from '@utils/transaction';
+import { parseTimestampToFormat } from '@utils/dates';
+import type { TObject, TTransaction } from '@utils/types';
 
 import css from './ReviewOrderStatesSection.module.scss';
 
-export const prepareItemData = (transactionList = []) => {
-  return transactionList;
+export const prepareItemFromData = (
+  transactionMap: TObject<number, TTransaction>,
+) => {
+  const items = Object.entries(transactionMap)
+    .map(([date, tx]) => {
+      return { date: Number(date), tx };
+    })
+    .sort((item) => item.date)
+    .map(({ date, tx }) => {
+      return { date: parseTimestampToFormat(Number(date)), tx };
+    });
+
+  return items;
 };
 
-type TReviewOrderStatesSectionProps = {};
+type TReviewOrderStatesSectionProps = {
+  data: {
+    [date: number]: TTransaction;
+  };
+};
 
-const ReviewOrderStatesSection: React.FC<
-  TReviewOrderStatesSectionProps
-> = () => {
-  // const { orderData, planData } = useAppSelector(
-  //   (state) => state.OrderManagement,
-  // );
-
-  // const { startDate, endDate } = Listing(orderData as TListing).getMetadata();
-  // const { orderDetails: planOrderDetails } = Listing(
-  //   planData as TListing,
-  // ).getMetadata();
-
-  const items = [
-    { state: ETransactionState.COMPLETED, date: '17/9/2022' },
-    { state: ETransactionState.FAILED_DELIVERY, date: '18/9/2022' },
-    { state: ETransactionState.DELIVERING, date: '19/9/2022' },
-    { state: ETransactionState.CANCELED, date: '20/9/2022' },
-    { state: ETransactionState.INITIAL, date: '20/9/2022' },
-  ];
+const ReviewOrderStatesSection: React.FC<TReviewOrderStatesSectionProps> = ({
+  data,
+}) => {
+  const items = prepareItemFromData(data);
 
   return (
     <div className={css.root}>

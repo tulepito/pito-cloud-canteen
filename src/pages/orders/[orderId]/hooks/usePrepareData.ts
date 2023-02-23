@@ -13,8 +13,15 @@ export const usePrepareOrderDetailPageData = () => {
   const [reviewInfoValues, setReviewInfoValues] =
     useState<TReviewInfoFormValues>();
 
-  const { orderData, planData, participantData, companyData, bookerData } =
-    useAppSelector((state) => state.OrderManagement);
+  const {
+    orderData,
+    planData,
+    participantData,
+    anonymousParticipantData,
+    companyData,
+    bookerData,
+    transactionDataMap,
+  } = useAppSelector((state) => state.OrderManagement);
   const currentUser = useAppSelector(currentUserSelector);
 
   const { title: orderTitle = '' } = Listing(
@@ -47,6 +54,7 @@ export const usePrepareOrderDetailPageData = () => {
     deadlineHour,
     // packagePerMember = 0,
     participants = [],
+    anonymous = [],
     staffName = '',
   } = Listing(orderData as TListing).getMetadata();
 
@@ -84,7 +92,7 @@ export const usePrepareOrderDetailPageData = () => {
     transportFee,
     promotion,
     overflow,
-    totalWithoutVAT,
+    // totalWithoutVAT,
   } = calculatePriceQuotationInfo({
     planOrderDetail: orderDetail,
     order: orderData as TObject,
@@ -102,8 +110,10 @@ export const usePrepareOrderDetailPageData = () => {
   };
 
   const reviewResultData = {
-    participantData,
     participants,
+    participantData,
+    anonymous,
+    anonymousParticipantData,
     orderDetail,
   };
   const reviewCartData = {
@@ -112,7 +122,7 @@ export const usePrepareOrderDetailPageData = () => {
     promotion,
     serviceFee,
     totalPrice,
-    totalWithoutVAT,
+    // totalWithoutVAT,
     totalWithVAT,
     transportFee,
     VATFee,
@@ -123,6 +133,7 @@ export const usePrepareOrderDetailPageData = () => {
     reviewResultData,
     reviewCartData,
     foodOrderGroupedByDate,
+    transactionDataMap,
   };
 
   /* =============== Price quotation data =============== */

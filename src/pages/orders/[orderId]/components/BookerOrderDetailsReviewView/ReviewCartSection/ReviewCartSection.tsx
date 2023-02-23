@@ -1,7 +1,8 @@
 import Button from '@components/Button/Button';
 import { parseThousandNumber } from '@helpers/format';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderManagementThunks } from '@pages/orders/[orderId]/OrderManagement.slice';
+import { companyPaths } from '@src/paths';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -37,16 +38,26 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const isStartOrderInProgress = useAppSelector(
+    (state) => state.OrderManagement.isStartOrderInProgress,
+  );
 
   const {
     query: { orderId },
   } = router;
   const rootClasses = classNames(css.root, className);
 
-  const handleStartPickingOrder = () => {
-    dispatch(
+  const handleStartPickingOrder = async () => {
+    await dispatch(
       orderManagementThunks.bookerStartOrder({ orderId: orderId as string }),
     );
+
+    setTimeout(() => {
+      router.push({
+        pathname: companyPaths.ManageOrderDetail,
+        query: { orderId },
+      });
+    }, 1000);
   };
 
   return (
@@ -148,6 +159,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
         <Button
           variant="cta"
           className={css.makePaymentButton}
+          inProgress={isStartOrderInProgress}
           onClick={handleStartPickingOrder}>
           <div>
             {intl.formatMessage({

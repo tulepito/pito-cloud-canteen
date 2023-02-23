@@ -87,9 +87,10 @@ const ReviewOrderProcessSection: React.FC<
     endDate = 0,
   } = Listing(orderData as TListing).getMetadata();
 
-  const totalDays =
+  const totalDays = Math.round(
     DateTime.fromMillis(endDate).diff(DateTime.fromMillis(startDate), 'days')
-      .days + 1;
+      .days + 1,
+  );
 
   const activeIndex = findCurrentActiveIndex(orderStateHistory);
 

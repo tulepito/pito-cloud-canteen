@@ -2,7 +2,13 @@ import IconCancel from '@components/Icons/IconCancel/IconCancel';
 import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
 import IconDelivering from '@components/Icons/IconDelivering/IconDelivering';
 import IconFail from '@components/Icons/IconFail/IconFail';
-import { ETransactionState } from '@utils/transaction';
+import {
+  txIsCanceled,
+  txIsCompleted,
+  txIsDelivering,
+  txIsDeliveryFailed,
+  txIsInitiated,
+} from '@utils/transaction';
 import classNames from 'classnames';
 
 import css from './StateItem.module.scss';
@@ -11,31 +17,24 @@ import type { TTimeLineItemProps } from './types';
 type TStateItemProps = TTimeLineItemProps;
 
 const StateItem: React.FC<TStateItemProps> = ({
-  data: { date, state },
+  data: { date, tx },
   rootClassName,
   className,
 }) => {
   const rootClasses = classNames(rootClassName || css.root, className);
 
-  let stateComponent;
+  let stateComponent = <div className={classNames(css.icon, css.iconEmpty)} />;
 
-  switch (state) {
-    case ETransactionState.INITIAL:
-    case ETransactionState.INITIATED:
-      stateComponent = <div className={classNames(css.icon, css.iconEmpty)} />;
-      break;
-    case ETransactionState.DELIVERING:
-      stateComponent = <IconDelivering className={css.icon} />;
-      break;
-    case ETransactionState.FAILED_DELIVERY:
-      stateComponent = <IconFail className={css.icon} />;
-      break;
-    case ETransactionState.CANCELED:
-      stateComponent = <IconCancel className={css.icon} />;
-      break;
-    default:
-      stateComponent = <IconCheckWithBackground className={css.icon} />;
-      break;
+  if (txIsInitiated(tx)) {
+    //
+  } else if (txIsCompleted(tx)) {
+    stateComponent = <IconCheckWithBackground className={css.icon} />;
+  } else if (txIsDelivering(tx)) {
+    stateComponent = <IconDelivering className={css.icon} />;
+  } else if (txIsDeliveryFailed(tx)) {
+    stateComponent = <IconFail className={css.icon} />;
+  } else if (txIsCanceled(tx)) {
+    stateComponent = <IconCancel className={css.icon} />;
   }
 
   return (

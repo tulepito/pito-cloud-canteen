@@ -51,9 +51,9 @@ const ManageDeletedListFormComponent: React.FC<
   const memberOptions = useMemo(
     () =>
       deletedTabData?.map((item) => {
-        const {
-          memberData: { id: memberId },
-        } = item;
+        const { memberData } = item;
+        const { id: memberId } = memberData || {};
+
         return { key: memberId, value: memberId, data: item };
       }),
     [deletedTabData],

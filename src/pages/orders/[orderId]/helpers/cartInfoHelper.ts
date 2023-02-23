@@ -106,7 +106,7 @@ export const calculatePriceQuotationInfo = ({
   const transportFee = 0;
   const promotion = 0;
   const totalWithoutVAT = totalPrice + serviceFee + transportFee - promotion;
-  const totalWithVAT = VATFee + totalWithoutVAT;
+  const totalWithVAT = /* VATFee + */ totalWithoutVAT;
   const overflow = isOverflowPackage
     ? totalWithVAT - totalDishes * packagePerMember
     : 0;

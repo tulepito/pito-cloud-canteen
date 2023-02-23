@@ -41,6 +41,7 @@ const ReviewOrdersResultSection: React.FC<TReviewOrdersResultSectionProps> = (
   const intl = useIntl();
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
   const { participants, orderDetail } = data;
+
   const rootClasses = classNames(css.root, className);
 
   const completedPickFoodParticipants = participants.filter((pid: string) =>
