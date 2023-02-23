@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
+import { EOrderStates } from '@utils/enums';
+import type { TPlan } from '@utils/orderTypes';
 import type { TObject } from '@utils/types';
 import isEmpty from 'lodash/isEmpty';
 
@@ -16,6 +19,7 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
     participants = [],
     anonymous = [],
     bookerId = '',
+    orderState,
   } = Listing(orderListing).getMetadata();
 
   const companyResponse = await integrationSdk.users.show({
@@ -58,6 +62,36 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
     );
 
     data = { ...data, planListing };
+
+    const { orderDetail } = Listing(planListing).getMetadata();
+
+    if (orderState === EOrderStates.inProgress) {
+      const transactionIdMap = Object.entries<
+        TPlan['orderDetail'][keyof TPlan['orderDetail']]
+      >(orderDetail).reduce<{ timestamp: string; transactionId: string }[]>(
+        (prev, [timestamp, { transactionId }]) => {
+          if (transactionId) return prev.concat([{ timestamp, transactionId }]);
+
+          return prev;
+        },
+        [],
+      );
+
+      const transactionDataMap: TObject = {};
+      await Promise.all(
+        transactionIdMap.map(async ({ timestamp, transactionId }) => {
+          const [tx] = denormalisedResponseEntities(
+            await integrationSdk.transactions.show({
+              id: transactionId,
+            }),
+          );
+
+          transactionDataMap[timestamp] = tx;
+        }),
+      );
+
+      data = { ...data, transactionDataMap };
+    }
   }
 
   if (!isEmpty(bookerId)) {

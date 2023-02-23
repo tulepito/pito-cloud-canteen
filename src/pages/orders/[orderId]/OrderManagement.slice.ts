@@ -14,7 +14,13 @@ import { createSlice } from '@reduxjs/toolkit';
 import { Listing } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import { storableError } from '@utils/errors';
-import type { TCompany, TListing, TObject, TUser } from '@utils/types';
+import type {
+  TCompany,
+  TListing,
+  TObject,
+  TTransaction,
+  TUser,
+} from '@utils/types';
 import omit from 'lodash/omit';
 
 // ================ Initial states ================ //
@@ -40,6 +46,9 @@ type TOrderManagementState = {
   bookerData: TUser | null;
   participantData: Array<TUser>;
   anonymousParticipantData: Array<TUser>;
+  transactionDataMap: {
+    [date: number]: TTransaction;
+  };
 };
 
 const initialState: TOrderManagementState = {
@@ -57,6 +66,7 @@ const initialState: TOrderManagementState = {
   bookerData: null,
   participantData: [],
   anonymousParticipantData: [],
+  transactionDataMap: {},
 };
 
 // ================ Thunk types ================ //
