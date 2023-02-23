@@ -129,9 +129,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
                     <div className={css.contact}>
                       <div className={css.row}>
                         <IconPhone />
-                        <span>
-                          {User(booker).getProtectedData().phoneNumber}
-                        </span>
+                        <div>{User(booker).getProtectedData().phoneNumber}</div>
                       </div>
                       <div className={css.row}>
                         <IconMail />
