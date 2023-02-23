@@ -1,3 +1,7 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
 .root {
   margin-top: 72px;
 
@@ -8,5 +12,9 @@
 
   &.hasHeader {
     margin-top: 130px;
+
+    @include viewportLarge {
+      margin-top: 145px;
+    }
   }
 }

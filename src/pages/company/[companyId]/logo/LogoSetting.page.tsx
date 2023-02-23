@@ -16,7 +16,7 @@ const LogoSettingPage = () => {
     dispatch(resetImage());
   }, [dispatch]);
   const onSubmit = async () => {
-    await dispatch(BookerManageCompany.updateCompanyAccount());
+    await dispatch(BookerManageCompany.updateCompanyAccount({}));
     dispatch(resetImage());
   };
   return (
