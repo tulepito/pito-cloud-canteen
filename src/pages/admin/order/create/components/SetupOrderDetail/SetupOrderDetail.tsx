@@ -1,4 +1,4 @@
-import Badge from '@components/Badge/Badge';
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/components/AddMorePlan';
@@ -380,7 +380,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
                   </span>
                 )}
 
-                <Badge label={`Đơn hàng tuần • ${partnerName}`} />
+                <Badge
+                  label={`Đơn hàng tuần • ${partnerName}`}
+                  type={EBadgeType.PROCESSING}
+                />
               </div>
               <div
                 className={classNames(css.row, css.settingBtn)}
