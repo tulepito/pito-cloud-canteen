@@ -19,15 +19,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         break;
       case HttpMethod.PUT:
         {
-          const { orderId, planId } = req.body;
+          const { orderId, planId } = req.query;
 
           if (isEmpty(orderId) || isEmpty(planId)) {
             res.status(400).json({ error: 'Missing orderId or planId' });
             return;
           }
 
-          await startOrder(orderId);
-          await initiateTransaction({ orderId, planId });
+          await startOrder(orderId as string);
+          await initiateTransaction({
+            orderId: orderId as string,
+            planId: planId as string,
+          });
 
           res.status(200).json({
             message: `Successfully finish picking order`,
