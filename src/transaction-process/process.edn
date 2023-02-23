@@ -4,7 +4,7 @@
                {
                 :name        :transition/initiate-transaction,
                 :actor       :actor.role/customer,
-                :actions     [],
+                :actions     [{:name :action/create-booking} {:name :action/privileged-update-metadata}],
                 :to          :state/initiated
                 :privileged? true
                 }
@@ -18,49 +18,49 @@
                 :to      :state/failed-delivery
                 }
                {
-                :name        :transition/start-delivery,
-                :actor       :actor.role/operator,
-                :actions     [],
-                :from        :state/initiated
-                :to          :state/delivering
+                :name    :transition/start-delivery,
+                :actor   :actor.role/operator,
+                :actions [{:name :action/accept-booking}],
+                :from    :state/initiated
+                :to      :state/delivering
                 }
                {
                 :name    :transition/expired-delivery,
                 :at      {:fn/plus [
                                     {:fn/timepoint [:time/booking-start]}
                                     {:fn/period ["PT1M"]}]}
-                :actions [],
+                :actions [{:name :action/decline-booking}],
                 :from    :state/delivering
                 :to      :state/failed-delivery
                 }
                {
-                :name        :transition/operator-cancel-plan,
-                :actor       :actor.role/operator,
-                :actions     [],
-                :from        :state/initiated
-                :to          :state/canceled
+                :name    :transition/operator-cancel-plan,
+                :actor   :actor.role/operator,
+                :actions [{:name :action/cancel-booking}],
+                :from    :state/initiated
+                :to      :state/canceled
                 }
                {
-                :name        :transition/cancel-delivery,
-                :actor       :actor.role/operator,
-                :actions     [],
-                :from        :state/delivering
-                :to          :state/failed-delivery
+                :name    :transition/cancel-delivery,
+                :actor   :actor.role/operator,
+                :actions [{:name :action/cancel-booking}],
+                :from    :state/delivering
+                :to      :state/failed-delivery
                 }
                {
-                :name        :transition/complete-delivery,
-                :actor       :actor.role/operator,
-                :actions     [],
-                :from        :state/delivering
-                :to          :state/completed
+                :name    :transition/complete-delivery,
+                :actor   :actor.role/operator,
+                :actions [],
+                :from    :state/delivering
+                :to      :state/completed
                 }
                {
-                :name        :transition/review-restaurant,
-                :actor       :actor.role/operator,
-                :actions     [{:name :action/post-review-by-customer}
-                              {:name :action/publish-reviews}],
-                :from        :state/completed
-                :to          :state/reviewed
+                :name    :transition/review-restaurant,
+                :actor   :actor.role/operator,
+                :actions [{:name :action/post-review-by-customer}
+                          {:name :action/publish-reviews}],
+                :from    :state/completed
+                :to      :state/reviewed
                 }
                {
                 :name    :transition/expired-review-time,
@@ -72,12 +72,12 @@
                 :to      :state/expired-review
                 }
                {
-                :name        :transition/review-restaurant-after-expire-time,
-                :actor       :actor.role/operator,
-                :actions     [{:name :action/post-review-by-customer}
-                              {:name :action/publish-reviews}],
-                :from        :state/expired-review
-                :to          :state/reviewed
+                :name    :transition/review-restaurant-after-expire-time,
+                :actor   :actor.role/operator,
+                :actions [{:name :action/post-review-by-customer}
+                          {:name :action/publish-reviews}],
+                :from    :state/expired-review
+                :to      :state/reviewed
                 }
                ]
  }
