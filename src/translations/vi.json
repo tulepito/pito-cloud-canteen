@@ -1150,5 +1150,7 @@
   "booker.orders.draft.resultDetailModal.keyword.placeholder": "Tìm kiếm",
   "booker.orders.draft.foodDetailModal.back": "Quay lại",
   "booker.orders.draft.foodDetailModal.addDish": "Chọn món này",
-  "booker.orders.draft.resultDetailModal.addRestaurant": "Xác nhận chọn {numberDish} món"
+  "booker.orders.draft.resultDetailModal.addRestaurant": "Xác nhận chọn {numberDish} món",
+  "CreateOrderForm.company.loading": "Đang tải...",
+  "Booker.CreateOrder.Form.group.scrollDownNote": "Nếu danh sách dài hãy cuộn xuống để xem thêm"
 }

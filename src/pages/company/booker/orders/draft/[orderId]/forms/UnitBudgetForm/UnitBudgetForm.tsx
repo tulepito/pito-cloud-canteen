@@ -28,6 +28,12 @@ const validate = (values: TUnitBudgetFormValues) => {
   if (!values.packagePerMember) {
     errors.packagePerMember = 'Required';
   }
+  if (
+    values.packagePerMember &&
+    +`${values.packagePerMember}`.replaceAll(',', '') < 40000
+  ) {
+    errors.packagePerMember = 'Min price is 40,000đ';
+  }
   return errors;
 };
 

@@ -26,7 +26,7 @@ function BookerDraftOrderPage() {
     (state) => state.Order.updateOrderDetailInProgress,
   );
 
-  const { order, fetchOrderInProgress } = useLoadData({
+  const { order, fetchOrderInProgress, companyAccount } = useLoadData({
     orderId: orderId as string,
   });
 
@@ -70,7 +70,7 @@ function BookerDraftOrderPage() {
         `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date}&restaurantId=${restaurantId}&menuId=${menuId}`,
       );
     },
-    [orderId],
+    [orderId, router],
   );
 
   const calendarExtraResources = useMemo(() => {
@@ -99,24 +99,30 @@ function BookerDraftOrderPage() {
     setCollapse(!collapse);
   };
 
-  const handleAddMeal = () => (date: Date) => {
-    router.push(
-      `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date.getTime()}`,
-    );
-  };
+  const handleAddMeal = useCallback(
+    () => (date: Date) => {
+      router.push(
+        `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date.getTime()}`,
+      );
+    },
+    [orderId, router],
+  );
 
-  const handleRemoveMeal = (id: string) => (resourceId: string) => {
-    dispatch(
-      orderAsyncActions.updatePlanDetail({
-        orderId,
-        planId: id,
-        orderDetail: {
-          [resourceId]: null,
-        },
-        updateMode: 'merge',
-      }),
-    );
-  };
+  const handleRemoveMeal = useCallback(
+    (id: string) => (resourceId: string) => {
+      dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId: id,
+          orderDetail: {
+            [resourceId]: null,
+          },
+          updateMode: 'merge',
+        }),
+      );
+    },
+    [dispatch, orderId],
+  );
 
   const toolbarComponent = useCallback(
     (props: any) => (
@@ -155,7 +161,7 @@ function BookerDraftOrderPage() {
         logo={<span></span>}
         collapse={collapse}
         onCollapse={handleCollapse}>
-        <SidebarContent order={order} />
+        <SidebarContent order={order} companyAccount={companyAccount} />
       </LayoutSidebar>
       <LayoutMain>
         <div className={css.main}>

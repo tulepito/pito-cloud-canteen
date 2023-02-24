@@ -13,6 +13,9 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
   const fetchOrderError = useAppSelector(
     (state) => state.Order.fetchOrderError,
   );
+  const companyAccount = useAppSelector(
+    (state) => state.BookerDraftOrderPage.companyAccount,
+  );
 
   const dispatch = useAppDispatch();
 
@@ -27,6 +30,7 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
     order,
     fetchOrderInProgress,
     fetchOrderError,
+    companyAccount,
   };
 };
 
