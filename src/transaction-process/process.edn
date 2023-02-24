@@ -11,7 +11,7 @@
                {
                 :name    :transition/expired-start-delivery,
                 :at      {:fn/plus [
-                                    {:fn/timepoint [:time/booking-start]}
+                                    {:fn/timepoint [:time/booking-display-start]}
                                     {:fn/period ["PT1M"]}]}
                 :actions [],
                 :from    :state/initiated
