@@ -60,9 +60,6 @@ type TOrderInitialState = {
   initiateTransactionsInProgress: boolean;
   initiateTransactionsError: any;
 
-  updateOrderDetailInProgress: boolean;
-  updateOrderDetailError: any;
-
   // Manage Orders Page
   queryParams: TObject;
   orders: TListing[];
@@ -155,9 +152,6 @@ const initialState: TOrderInitialState = {
     [EOrderStates.canceled]: 0,
     all: 0,
   },
-
-  updateOrderDetailInProgress: false,
-  updateOrderDetailError: null,
 
   restaurantCoverImageList: {},
   fetchRestaurantCoverImageInProgress: false,
