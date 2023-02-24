@@ -7,23 +7,21 @@
 
 .fields {
   display: flex;
-  margin-bottom: 20px;
-  flex-direction: column;
-  row-gap: 20px;
-
-  @include viewportLarge {
-    flex-direction: row;
-    column-gap: 20px;
-  }
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .field {
-  flex: 1;
+  width: calc(50% - 20px);
 }
 
 .formTitle {
   margin: 40px 0 40px 0;
   text-transform: uppercase;
+}
+
+.textareaField {
+  margin-top: 20px;
 }
 
 .textareaField input {
