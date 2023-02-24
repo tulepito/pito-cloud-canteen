@@ -106,4 +106,45 @@ const denormalisedResponseEntities = (sdkResponse) => {
   return denormalisedEntities(entities, resources);
 };
 
-module.exports = { denormalisedResponseEntities };
+const FlexEvent = (event) => {
+  const id = event?.id?.uuid;
+  const attributes = event?.attributes;
+  const {
+    auditData,
+    previousValues,
+    resource,
+    resourceId,
+    sequenceId,
+    resourceType,
+  } = attributes || {};
+
+  return {
+    getId: () => {
+      return id;
+    },
+    getSequenceId: () => {
+      return sequenceId;
+    },
+    getFullData: () => {
+      return event || {};
+    },
+    getAttributes: () => {
+      return attributes || {};
+    },
+    getResource: () => {
+      return {
+        data: resource || {},
+        resourceId: resourceId?.uuid,
+        resourceType,
+      };
+    },
+    getPreviousValues: () => {
+      return previousValues || {};
+    },
+    getAuditData: () => {
+      return auditData || {};
+    },
+  };
+};
+
+module.exports = { denormalisedResponseEntities, FlexEvent };

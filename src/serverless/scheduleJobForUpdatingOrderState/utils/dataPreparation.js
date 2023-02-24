@@ -1,13 +1,13 @@
 const lodashGet = require('lodash/get');
 const { integrationSdk } = require('./sdk');
 const { eventTriggerUserId } = require('../configs');
+const { denormalisedResponseEntities } = require('./data');
 
 const getLatestSequenceId = async () => {
   const res = await integrationSdk.users.show({ id: eventTriggerUserId });
   const result = lodashGet(
     res,
     'data.data.attributes.profile.privateData.latestSequenceIdForUpdateOrderState',
-    null,
   );
   return result;
 };
@@ -25,14 +25,23 @@ const queryEventsByEventType = async (eventTypes) => {
   const startAfterSequenceId = await getLatestSequenceId();
 
   return startAfterSequenceId
-    ? integrationSdk.events.query({
+    ? await integrationSdk.events.query({
         eventTypes,
         startAfterSequenceId,
       })
-    : integrationSdk.events.query({
+    : await integrationSdk.events.query({
         eventTypes,
         createdAtStart: new Date(),
       });
+};
+
+const showTransaction = async (id) => {
+  return denormalisedResponseEntities(
+    await integrationSdk.transactions.show({
+      id,
+      include: ['listing', 'booking'],
+    }),
+  );
 };
 
 const verifyTx = (tx, requiredTransitions) =>
@@ -44,6 +53,7 @@ const verifyTx = (tx, requiredTransitions) =>
 const removeDuplicatedId = (originList) => [...new Set(originList)];
 
 module.exports = {
+  showTransaction,
   queryEventsByEventType,
   verifyTx,
   removeDuplicatedId,

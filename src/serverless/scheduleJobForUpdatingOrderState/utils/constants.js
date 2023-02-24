@@ -1,4 +1,14 @@
 /* eslint-disable import/prefer-default-export */
+const OrderStates = {
+  canceled: 'canceled',
+  canceledByBooker: 'canceledByBooker',
+  picking: 'picking',
+  inProgress: 'inProgress',
+  pendingPayment: 'pendingPayment',
+  completed: 'completed',
+  reviewed: 'reviewed',
+};
+
 const Transitions = {
   initiateTransaction: 'transition/initiate-transaction',
   expiredDelivery: 'transition/expired-delivery',
@@ -23,4 +33,4 @@ const reviewedTransitions = [
   Transitions.reviewRestaurantAfterExpireTime,
 ];
 
-module.exports = { reviewedTransitions, Transitions, EventTypes };
+module.exports = { reviewedTransitions, OrderStates, Transitions, EventTypes };
