@@ -732,3 +732,18 @@ export const MENU_MEAL_TYPE_OPTIONS = [
     label: 'Ăn xế',
   },
 ];
+
+export const COMPANY_NUTRITION_TYPE_OPTIONS = [
+  {
+    key: 'vegeterian',
+    label: 'Ăn chay',
+  },
+  {
+    key: 'keto',
+    label: 'Keto',
+  },
+  {
+    key: 'non-glucoten',
+    label: 'Không chứa glucoten',
+  },
+];

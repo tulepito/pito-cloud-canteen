@@ -1,0 +1,16 @@
+@use '/src/styles/vars.scss' as *;
+
+.actionButtons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.boldText {
+  font-weight: $fontWeightBold;
+}
+
+.removeContent {
+  color: $neutralGray6;
+  margin: 0;
+}

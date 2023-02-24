@@ -471,6 +471,10 @@ export type TIntegrationOrderListing = {
 export type TCompanyMemberWithDetails = {
   permission: string;
   groups: string[];
+  email: string;
+  expireTime: Date;
+  id: null;
+  inviteStatus: string;
 } & TUser;
 
 export type TCompanyGroup = {

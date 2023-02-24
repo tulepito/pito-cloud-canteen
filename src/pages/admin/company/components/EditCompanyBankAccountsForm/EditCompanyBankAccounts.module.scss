@@ -1,0 +1,14 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+.label {
+  font-size: 20px;
+  font-weight: $fontWeightMedium;
+}
+
+.description {
+  font-size: 14px;
+  font-style: italic;
+  @include viewportLarge {
+    width: 40%;
+  }
+}

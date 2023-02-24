@@ -1,4 +1,5 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .companyLogoField {
   height: 206px;
@@ -23,4 +24,30 @@
   width: 20px;
   height: 20px;
   border-radius: 5px;
+}
+
+.updateModalContainer {
+  @include viewportLarge {
+    min-width: 1024px;
+  }
+}
+
+.checkboxGroup {
+  display: flex;
+  gap: 54px;
+}
+
+.line {
+  height: 1px;
+  width: 100%;
+  background-color: $neutralGray4;
+  margin: 48px 0;
+}
+
+.largeTitle {
+  font-size: 24px;
+}
+
+.smallTitle {
+  font-size: 16px;
 }

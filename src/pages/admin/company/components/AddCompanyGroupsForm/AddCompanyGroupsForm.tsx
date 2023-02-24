@@ -1,10 +1,27 @@
+import Button from '@components/Button/Button';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import type { TCompanyMemberWithDetails } from '@utils/types';
+import { required } from '@utils/validators';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
 
-export type TAddCompanyGroupsFormValues = {};
+import FieldCompanyMemberCheckbox from '../FieldCompanyMemberCheckbox/FieldCompanyMemberCheckbox';
+import css from './AddCompanyGroupsForm.module.scss';
 
-type TExtraProps = {};
+export type TAddCompanyGroupsFormValues = {
+  groupName: string;
+  members: TCompanyMemberWithDetails[];
+};
+
+type TExtraProps = {
+  inProgress: boolean;
+  handleCancel: () => void;
+  formError: any;
+  companyMembers: TCompanyMemberWithDetails[];
+};
 type TAddCompanyGroupsFormComponentProps =
   FormRenderProps<TAddCompanyGroupsFormValues> & Partial<TExtraProps>;
 type TAddCompanyGroupsFormProps = FormProps<TAddCompanyGroupsFormValues> &
@@ -13,11 +30,55 @@ type TAddCompanyGroupsFormProps = FormProps<TAddCompanyGroupsFormValues> &
 const AddCompanyGroupsFormComponent: React.FC<
   TAddCompanyGroupsFormComponentProps
 > = (props) => {
-  const { handleSubmit } = props;
+  const { handleSubmit, inProgress, handleCancel, formError, companyMembers } =
+    props;
+  const intl = useIntl();
 
   return (
     <Form onSubmit={handleSubmit}>
-      <></>
+      <div className={css.formWrapper}>
+        <FieldTextInput
+          className={css.groupName}
+          name="groupName"
+          id="groupName"
+          label={intl.formatMessage({
+            id: 'AddCompanyGroupsFormComponent.groupNameLabel',
+          })}
+          placeholder={intl.formatMessage({
+            id: 'AddCompanyGroupsFormComponent.groupNamePlaceholder',
+          })}
+          validate={required(
+            intl.formatMessage({
+              id: 'AddCompanyGroupsFormComponent.groupNameRequired',
+            }),
+          )}
+        />
+      </div>
+      <div className={css.members}>
+        {companyMembers?.map((member) => (
+          <FieldCompanyMemberCheckbox
+            key={member.id.uuid}
+            className={css.checkbox}
+            member={member}
+          />
+        ))}
+      </div>
+      <div className={css.actionBtn}>
+        <Button
+          disabled={inProgress}
+          inProgress={inProgress}
+          className={css.submitButton}>
+          {intl.formatMessage({ id: 'AddCompanyGroupsForm.submitButton' })}
+        </Button>
+        <Button
+          disabled={inProgress}
+          onClick={handleCancel}
+          className={css.lightButton}
+          type="button">
+          {intl.formatMessage({ id: 'AddCompanyGroupsForm.cancelButton' })}
+        </Button>
+      </div>
+      {formError && <ErrorMessage message={formError.message} />}
     </Form>
   );
 };

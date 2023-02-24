@@ -1,0 +1,47 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.formWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.members {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: 20px;
+  .checkbox {
+    flex: 50%;
+  }
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  margin-top: 40px;
+  flex-direction: column;
+  gap: 16px;
+  .lightButton {
+    @include buttonColorSecondary;
+    outline: none;
+  }
+  .submitButton {
+    width: 400px;
+  }
+}
+
+.inputMemberWrapper {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: flex-end;
+  .emailInput {
+    width: 90%;
+  }
+}
+
+.groupName {
+  margin-bottom: 24px;
+}

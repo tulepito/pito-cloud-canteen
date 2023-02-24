@@ -386,7 +386,7 @@ const updateCompanyAccount = createAsyncThunk(
 
 const adminDeleteGroup = createAsyncThunk(
   ADMIN_DELETE_GROUP,
-  async (params: { companyId: string; groupId: string }, { dispatch }) => {
+  async (params: { companyId: string; groupId: string }) => {
     const { companyId, groupId } = params;
     const apiData: DeleteGroupApiData = {
       groupId,

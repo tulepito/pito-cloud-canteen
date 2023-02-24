@@ -1,16 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-shadow */
 import { InlineTextButton } from '@components/Button/Button';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
-import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import AlertModal from '@components/Modal/AlertModal';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
-import { User } from '@utils/data';
-import type {
-  TCompany,
-  TCompanyGroup,
-  TCompanyMemberWithDetails,
-} from '@utils/types';
+import { UserPermission } from '@src/types/UserPermission';
+import type { TCompanyGroup, TCompanyMemberWithDetails } from '@utils/types';
 import type { ReactNode } from 'react';
-import React from 'react';
+import React, { useState } from 'react';
+import type { IntlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
 
 import css from './ManageCompanyMembersTable.module.scss';
 
@@ -46,15 +46,46 @@ const TABLE_COLUMN: TColumn[] &
   {
     key: 'role',
     label: 'Vai trò',
-    render: ({ permission }) => {
-      return <span>{permission}</span>;
+    render: ({ permission, handleToUpdateMemberPermission, intl }) => {
+      if (!handleToUpdateMemberPermission) {
+        return (
+          <span>
+            {intl.formatMessage({ id: `UserPermission.${permission}` })}
+          </span>
+        );
+      }
+
+      return (
+        <select
+          onChange={handleToUpdateMemberPermission}
+          defaultValue={permission}
+          className={css.fieldSelect}>
+          {Object.keys(UserPermission).map((key) => (
+            <option
+              key={UserPermission[key as keyof typeof UserPermission]}
+              value={UserPermission[key as keyof typeof UserPermission]}>
+              {intl.formatMessage({
+                id: `UserPermission.${
+                  UserPermission[key as keyof typeof UserPermission]
+                }`,
+              })}
+            </option>
+          ))}
+        </select>
+      );
     },
   },
   {
     key: 'groupName',
     label: 'Nhóm',
-    render: ({ groupName }) => {
-      return <span>{groupName}</span>;
+    render: ({ groups = [] }) => {
+      const groupNames = groups.reduce((prev: string, cur: TCompanyGroup) => {
+        if (!prev) {
+          return cur.name;
+        }
+        return `${prev}, ${cur.name}`;
+      }, '');
+      return <span>{groupNames}</span>;
     },
   },
   {
@@ -74,13 +105,10 @@ const TABLE_COLUMN: TColumn[] &
   {
     key: 'action',
     label: '',
-    render: () => {
+    render: ({ handleToRemoveMember }) => {
       return (
         <div className={css.actionButtons}>
-          <InlineTextButton>
-            <IconEdit />
-          </InlineTextButton>
-          <InlineTextButton>
+          <InlineTextButton type="button" onClick={handleToRemoveMember}>
             <IconDelete />
           </InlineTextButton>
         </div>
@@ -92,26 +120,80 @@ const TABLE_COLUMN: TColumn[] &
 type TManageCompanyMembersTable = {
   className?: string;
   companyMembers: TCompanyMemberWithDetails[];
-  company: TCompany;
+  companyGroups: TCompanyGroup[];
+  onRemoveMember: (email: string) => void;
+  deleteMemberInProgress?: boolean;
+  deleteMemberError?: any;
+  hideRemoveConfirmModal?: boolean;
+  onUpdateMemberPermission?: (params: {
+    memberEmail: string;
+    permission: string;
+  }) => void;
 };
 
 const parseEntitiesToTableData = (
-  company: TCompany,
+  intl: IntlShape,
+  companyGroups: TCompanyGroup[],
+  openRemoveModal: (member: TCompanyMemberWithDetails) => void,
+  onUpdateMemberPermission?: (params: {
+    memberEmail: string;
+    permission: string;
+  }) => void,
   companyMembers: TCompanyMemberWithDetails[] = [],
 ) => {
   return companyMembers.map((companyMember) => {
-    const companyGroup = User(company).getMetadata().groups || [];
-    const groupName = companyGroup.find(
-      (group: TCompanyGroup) => group.id === companyMember.id,
+    const groups = companyGroups.filter((group: TCompanyGroup) =>
+      companyMember.groups.includes(group.id),
     );
+    const hasAttributes = companyMember?.attributes;
+
+    const handleToRemove = () => {
+      openRemoveModal(companyMember);
+    };
+
+    const handleToUpdateMemberPermission = (
+      e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+      const { value } = e.target;
+      if (!onUpdateMemberPermission) return;
+
+      return onUpdateMemberPermission({
+        memberEmail: companyMember.email,
+        permission: value,
+      });
+    };
+
+    if (!hasAttributes) {
+      return {
+        key: companyMember.id,
+        data: {
+          id: companyMember.id,
+          permission: companyMember.permission,
+          name: '------',
+          email: companyMember.email,
+          groups,
+          handleToRemoveMember: handleToRemove,
+          ...(typeof onUpdateMemberPermission !== 'undefined'
+            ? { handleToUpdateMemberPermission }
+            : {}),
+          intl,
+        },
+      };
+    }
 
     return {
-      key: companyMember.id.uuid,
+      key: companyMember.id,
       data: {
+        id: companyMember.id,
         permission: companyMember.permission,
         name: companyMember.attributes.profile.displayName,
         email: companyMember.attributes.email,
-        groupName,
+        groups,
+        handleToRemoveMember: handleToRemove,
+        ...(typeof onUpdateMemberPermission !== 'undefined'
+          ? { handleToUpdateMemberPermission }
+          : {}),
+        intl,
       },
     };
   });
@@ -120,11 +202,79 @@ const parseEntitiesToTableData = (
 const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
   props,
 ) => {
-  const { companyMembers, company } = props;
-  const tableData = parseEntitiesToTableData(company, companyMembers);
+  const {
+    companyMembers,
+    companyGroups,
+    onRemoveMember,
+    deleteMemberInProgress,
+    hideRemoveConfirmModal,
+    onUpdateMemberPermission,
+  } = props;
+  const intl = useIntl();
+  const [memberToRemove, setMemberToRemove] =
+    useState<TCompanyMemberWithDetails | null>(null);
+
+  const openRemoveModal = (member: TCompanyMemberWithDetails) => {
+    if (!hideRemoveConfirmModal) {
+      setMemberToRemove(member);
+    } else {
+      onRemoveMember(member.email);
+    }
+  };
+
+  const tableData = parseEntitiesToTableData(
+    intl,
+    companyGroups,
+    openRemoveModal,
+    onUpdateMemberPermission,
+    companyMembers,
+  );
+
+  const handleCloseModal = () => {
+    setMemberToRemove(null);
+  };
+
+  const handleRemoveMember = async () => {
+    const email = memberToRemove?.email;
+    if (email) {
+      const { error } = (await onRemoveMember(email)) as any;
+      !error && handleCloseModal();
+    }
+  };
+
   return (
     <div className={css.root}>
       <Table columns={TABLE_COLUMN} data={tableData} />
+      <AlertModal
+        isOpen={!!memberToRemove}
+        handleClose={handleCloseModal}
+        confirmDisabled={deleteMemberInProgress}
+        cancelDisabled={deleteMemberInProgress}
+        onCancel={handleCloseModal}
+        onConfirm={handleRemoveMember}
+        confirmInProgress={deleteMemberInProgress}
+        confirmLabel={intl.formatMessage({
+          id: 'ManageCompanyMembersTable.memberRemoveConfirm',
+        })}
+        cancelLabel={intl.formatMessage({
+          id: 'ManageCompanyMembersTable.memberRemoveCancel',
+        })}
+        title={intl.formatMessage({
+          id: 'ManageCompanyMembersTable.memberRemoveTitle',
+        })}>
+        <p className={css.removeContent}>
+          {intl.formatMessage(
+            {
+              id: 'ManageCompanyMembersTable.memberRemoveContent',
+            },
+            {
+              email: (
+                <span className={css.boldText}>{memberToRemove?.email}</span>
+              ),
+            },
+          )}
+        </p>
+      </AlertModal>
     </div>
   );
 };

@@ -1,5 +1,22 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
 .actionButtons {
   display: flex;
   align-items: center;
   gap: 23px;
+}
+
+.boldText {
+  font-weight: $fontWeightBold;
+}
+
+.removeContent {
+  color: $neutralGray6;
+  margin: 0;
+}
+
+.fieldSelect {
+  background-color: transparent;
+  outline: none;
 }

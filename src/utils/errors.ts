@@ -157,7 +157,7 @@ export const storableAxiosError = (error: any): TError => {
   const errorData = error?.response?.data;
   const err = errorData || {};
   const { name, status, message, statusText, data } = err;
-  const { message: messageInData } = data;
+  const { message: messageInData } = data || {};
   // Status, statusText, and data.errors are (possibly) added to the error object by SDK
   const apiErrors = responseAPIErrors(err);
 

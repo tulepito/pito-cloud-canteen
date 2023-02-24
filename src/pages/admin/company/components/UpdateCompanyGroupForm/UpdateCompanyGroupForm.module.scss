@@ -1,0 +1,65 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.formWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  margin-top: 40px;
+  flex-direction: column;
+  gap: 16px;
+  .lightButton {
+    @include buttonColorSecondary;
+    outline: none;
+  }
+  .submitButton {
+    width: 400px;
+  }
+}
+
+.addMemberButton {
+  background-color: transparent;
+  color: $neutralGray5;
+  text-align: left;
+  padding: 10px 20px;
+  font-weight: $fontWeightBold;
+  color: $neutralGray6;
+  border-radius: 10px;
+  &:hover {
+    background-color: $neutralGray3;
+  }
+}
+
+.iconAdd {
+  margin-right: 20px;
+  text-align: left;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  margin-top: 40px;
+  flex-direction: column;
+  gap: 16px;
+  .lightButton {
+    @include buttonColorSecondary;
+    outline: none;
+  }
+  .submitButton {
+    width: 260px;
+  }
+}
+
+.companyWrapper {
+  display: flex;
+  margin: 40px 0;
+  justify-content: space-between;
+  .checkbox {
+    flex: 1;
+  }
+}

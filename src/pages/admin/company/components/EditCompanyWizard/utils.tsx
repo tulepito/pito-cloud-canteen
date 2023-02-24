@@ -1,6 +1,7 @@
 import { ECompanyStates } from '@utils/enums';
-import type { TCompany } from '@utils/types';
+import type { TCompany, TObject } from '@utils/types';
 
+import type { TEditCompanyBankAccountsFormValues } from '../EditCompanyBankAccountsForm/EditCompanyBankAccountsForm';
 import type { TEditCompanyInformationFormValues } from '../EditCompanyInformationForm/EditCompanyInformationForm';
 import type { TEditCompanySettingsInformationFormValues } from '../EditCompanySettingsInformationForm/EditCompanySettingsInformationForm';
 
@@ -11,6 +12,11 @@ export const EDIT_COMPANY_WIZARD_TABS = [
   COMPANY_INFORMATION_TAB,
   COMPANY_SETTINGS_TAB,
 ];
+
+export const COMPANY_SETTING_INFORMATION_TAB_ID = 'companySettingsInformation';
+export const COMPANY_SETTING_PAYMENT_TAB_ID = 'companySettingsPayment';
+export const COMPANY_SETTING_SUBSCRIPTION_TAB_ID =
+  'companySettingsSubscription';
 
 export const createSubmitCreateCompanyValues = (
   values: TEditCompanyInformationFormValues &
@@ -53,27 +59,26 @@ export const createSubmitCreateCompanyValues = (
     default:
       return {};
   }
-
-  return {};
 };
 
 export const createSubmitUpdateCompanyValues = (
-  values: TEditCompanyInformationFormValues & TEditCompanySettingsFormValues,
+  values: TEditCompanyInformationFormValues &
+    TEditCompanySettingsInformationFormValues &
+    TEditCompanyBankAccountsFormValues,
   tab: string,
 ) => {
-  const { name, phone, location, note, tax } = values;
-  const {
-    selectedPlace: { address, origin },
-  } = location || {};
-
   switch (tab) {
-    case COMPANY_INFORMATION_TAB:
+    case COMPANY_INFORMATION_TAB: {
+      const { name, phoneNumber, location, note, tax } = values;
+      const {
+        selectedPlace: { address, origin },
+      } = location || {};
       return {
         firstName: name,
         lastName: ' ',
         displayName: name,
         publicData: {
-          phoneNumber: phone,
+          phoneNumber,
           note,
           location: {
             address,
@@ -90,13 +95,40 @@ export const createSubmitUpdateCompanyValues = (
           userState: ECompanyStates.draft,
         },
       };
-    case COMPANY_SETTINGS_TAB:
-      return {};
+    }
+    case COMPANY_SETTINGS_TAB: {
+      const {
+        companyLogo = {},
+        companyNutritions = [],
+        tabValue,
+        bankAccounts = [],
+      } = values;
+      const { imageId } = companyLogo;
+      switch (tabValue) {
+        case COMPANY_SETTING_INFORMATION_TAB_ID: {
+          return {
+            profileImageId: imageId?.uuid,
+            publicData: {
+              companyNutritions,
+            },
+          };
+        }
+
+        case COMPANY_SETTING_PAYMENT_TAB_ID: {
+          return {
+            privateData: { bankAccounts },
+          };
+        }
+        case COMPANY_SETTING_SUBSCRIPTION_TAB_ID: {
+          return {};
+        }
+        default:
+          return {};
+      }
+    }
     default:
       return {};
   }
-
-  return {};
 };
 
 export const getInitialLocationValues = (company: TCompany) => {
@@ -115,4 +147,12 @@ export const getInitialLocationValues = (company: TCompany) => {
         selectedPlace: { address, origin },
       }
     : {};
+};
+
+export const createSubmitAddMembersToCompanyValues = (values: TObject) => {
+  const { userIdList = [], noAccountEmailList = [] } = values;
+  return {
+    userIdList,
+    noAccountEmailList,
+  };
 };
