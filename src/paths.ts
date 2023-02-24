@@ -36,9 +36,11 @@ export const IgnoredAuthCheckRoutes = [generalPaths.StyleGuide];
 export const IgnoredPermissionCheckRoutes = [
   generalPaths.SignIn,
   generalPaths.SignUp,
+  generalPaths.RecoveryPassword,
   generalPaths.StyleGuide,
   enGeneralPaths.SignIn,
   enGeneralPaths.SignUp,
+  enGeneralPaths.RecoveryPassword,
   generalPaths.OrderManageMent,
 ];
 
