@@ -1,5 +1,6 @@
 import ActivityItem from '@components/TimeLine/ActivityItem';
 import VerticalTimeLine from '@components/TimeLine/VerticalTimeLine';
+import { countCompletedTransactions } from '@helpers/transactionHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@utils/data';
 import {
@@ -8,9 +9,9 @@ import {
   EOrderStates,
 } from '@utils/enums';
 import type { TListing, TOrderStateHistory } from '@utils/types';
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './ReviewOrderProcessSection.module.scss';
@@ -51,6 +52,7 @@ const prepareItemData = (orderStateHistory: TOrderStateHistory[] = []) => {
 
     switch (state) {
       case EOrderDraftStates.pendingApproval:
+      case EBookerOrderDraftStates.bookerDraft:
         parsedCreateOrderTime = formattedTime;
         break;
       case EOrderStates.picking:
@@ -77,21 +79,15 @@ const ReviewOrderProcessSection: React.FC<
   TReviewOrderProcessSectionProps
 > = () => {
   const intl = useIntl();
-  const [totalCompletedDates] = useState(0);
+  const [totalCompletedDates, setTotalCompletedDates] = useState(0);
 
-  const { orderData } = useAppSelector((state) => state.OrderManagement);
-
-  const {
-    orderStateHistory,
-    startDate = 0,
-    endDate = 0,
-  } = Listing(orderData as TListing).getMetadata();
-
-  const totalDays = Math.round(
-    DateTime.fromMillis(endDate).diff(DateTime.fromMillis(startDate), 'days')
-      .days + 1,
+  const orderData = useAppSelector((state) => state.OrderManagement.orderData);
+  const transactionDataMap = useAppSelector(
+    (state) => state.OrderManagement.transactionDataMap,
   );
-
+  const transactionDataList = Object.values(transactionDataMap);
+  const { orderStateHistory } = Listing(orderData as TListing).getMetadata();
+  const totalDays = transactionDataList.length;
   const activeIndex = findCurrentActiveIndex(orderStateHistory);
 
   const sectionTitle = intl.formatMessage({
@@ -111,6 +107,10 @@ const ReviewOrderProcessSection: React.FC<
     },
     { label: 'Đã hoàn thành' },
   ];
+
+  useEffect(() => {
+    setTotalCompletedDates(countCompletedTransactions(transactionDataList));
+  }, [totalDays]);
 
   return (
     <div className={css.root}>

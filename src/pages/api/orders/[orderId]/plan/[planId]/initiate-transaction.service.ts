@@ -35,24 +35,22 @@ type TNormalizedOrderDetail = {
     bookingDisplayStart: Date;
   };
 
-  shouldCancel?: boolean;
   date: string;
 };
 
 const normalizeOrderDetail = ({
+  orderId,
+  planId,
   planOrderDetail,
   deliveryHour = '6:30',
 }: {
+  orderId: string;
+  planId: string;
   planOrderDetail: TPlanOrderDetail;
   deliveryHour: string;
 }) => {
   return Object.entries(planOrderDetail).reduce<TNormalizedOrderDetail[]>(
-    (
-      prev,
-      [date, orderOfDate]: [string, TOrderOfDate],
-      currIndex,
-      allItems,
-    ) => {
+    (prev, [date, orderOfDate]: [string, TOrderOfDate]) => {
       const {
         restaurant: { id: restaurantId, foodList = {} },
         memberOrders: memberOrdersMap,
@@ -98,21 +96,23 @@ const normalizeOrderDetail = ({
         metadata: {
           participantIds,
           bookingInfo,
-          isLastTxOfPlan: currIndex === allItems.length - 1,
+          orderId,
+          planId,
         },
       };
 
-      return prev.concat({
-        params: {
-          listingId: restaurantId,
-          extendedData,
-          bookingStart,
-          bookingEnd,
-          bookingDisplayStart,
-        },
-        shouldCancel: isEmpty(participantIds),
-        date,
-      });
+      return isEmpty(participantIds)
+        ? prev
+        : prev.concat({
+            params: {
+              listingId: restaurantId,
+              extendedData,
+              bookingStart,
+              bookingEnd,
+              bookingDisplayStart,
+            },
+            date,
+          });
     },
     [],
   );
@@ -157,11 +157,8 @@ export const initiateTransaction = async ({
     }),
   );
 
-  const {
-    companyId,
-    deliveryHour,
-    plans = [],
-  } = Listing(orderListing).getMetadata();
+  const orderData = Listing(orderListing);
+  const { companyId, deliveryHour, plans = [] } = orderData.getMetadata();
 
   if (plans.length === 0 || !plans.includes(planId)) {
     throw new Error(`Invalid planId, ${planId}`);
@@ -175,33 +172,26 @@ export const initiateTransaction = async ({
 
   // Normalize order detail
   const normalizedOrderDetail = normalizeOrderDetail({
+    orderId,
+    planId,
     planOrderDetail,
     deliveryHour,
   });
-  console.log(
-    '🚀 ~ normalizedOrderDetail:',
-    JSON.stringify(normalizedOrderDetail, null, 2),
-  );
 
   const transactionMap: TObject = {};
   // Initiate transaction for each date
   await Promise.all(
-    normalizedOrderDetail.map(async (item) => {
+    normalizedOrderDetail.map(async (item, index) => {
       const {
         params: {
           listingId,
           bookingStart,
           bookingEnd,
           bookingDisplayStart,
-          extendedData,
+          extendedData: { metadata },
         },
-        shouldCancel,
         date,
       } = item;
-
-      if (shouldCancel) {
-        return;
-      }
 
       const createTxResponse = await subAccountTrustedSdk.transactions.initiate(
         {
@@ -213,7 +203,10 @@ export const initiateTransaction = async ({
             bookingEnd,
             bookingDisplayStart,
             bookingDisplayEnd: bookingEnd,
-            ...extendedData,
+            metadata: {
+              ...metadata,
+              isLastTxOfPlan: index === normalizedOrderDetail.length - 1,
+            },
           },
         },
       );
@@ -227,12 +220,10 @@ export const initiateTransaction = async ({
   );
 
   // Update new order detail of plan listing
-  console.time('update new order detail of plan listing');
   await integrationSdk.listings.update({
     id: planId,
     metadata: {
       orderDetail: prepareNewPlanOrderDetail(planOrderDetail, transactionMap),
     },
   });
-  console.timeEnd('update new order detail of plan listing');
 };

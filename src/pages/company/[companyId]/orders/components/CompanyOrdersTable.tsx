@@ -4,11 +4,9 @@ import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { TableForm } from '@components/Table/Table';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
-import { getCompanyIdFromBookerUser } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { createDeepEqualSelector } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { currentUserSelector } from '@redux/slices/user.slice';
 import type { RootState } from '@redux/store';
 import { companyPaths } from '@src/paths';
 import {
@@ -123,12 +121,10 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const { query, isReady, replace } = useRouter();
   const dispatch = useAppDispatch();
   const orders = useAppSelector((state) => state.Order.orders) || [];
-  const currentUser = useAppSelector(currentUserSelector);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   let currDebounceRef = debounceRef.current;
 
-  const { page = 1, keywords = '' } = query;
-  const companyId = getCompanyIdFromBookerUser(currentUser);
+  const { page = 1, keywords = '', companyId = '' } = query;
   const tableData = parseEntitiesToTableData(orders, Number(page));
   const tabItems = prepareTabItems({
     intl,
