@@ -8,7 +8,7 @@ import { useIntl } from 'react-intl';
 
 import css from './Modal.module.scss';
 
-type TModalProps = PropsWithChildren<{
+export type TModalProps = PropsWithChildren<{
   className?: string;
   containerClassName?: string;
   contentClassName?: string;

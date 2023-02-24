@@ -1,20 +1,11 @@
 import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';
 
+import type { TModalProps } from '../Modal';
 import Modal from '../Modal';
 import css from './BackdropModal.module.scss';
 
-type TBackdropModal = {
-  isOpen: boolean;
-  title?: string;
-  className?: string;
-  handleClose: () => void;
-  scrollLayerClassName?: string;
-  actionsClassName?: string;
-  cancelClassName?: string;
-  confirmClassName?: string;
-  containerClassName?: string;
-};
+type TBackdropModal = {} & TModalProps;
 
 const BackdropModal: React.FC<PropsWithChildren<TBackdropModal>> = ({
   isOpen,
