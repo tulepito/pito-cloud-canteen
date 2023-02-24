@@ -183,7 +183,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
         },
       };
     });
-    form.change('foodsByDate', newFoodsByDate);
+    form.change('foodsByDate', { ...foodsByDate, ...newFoodsByDate });
     form.change('rowCheckbox', []);
     form.change('checkAll', []);
     handleCloseModal();
@@ -250,6 +250,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
               tableHeadCellClassName={css.tableHeadCell}
               tableBodyCellClassName={css.tableBodyCell}
               afterCheckboxChangeHandler={afterCheckboxChangeHandler}
+              tableWrapperClassName={css.tableWrapper}
             />
             {pagination && pagination.totalPages > 1 && (
               <Pagination

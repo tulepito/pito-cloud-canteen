@@ -164,7 +164,8 @@ const GroupSettingPage = () => {
         </Button>
       </div>
       <div className={css.tableContainer}>
-        {formattedGroupList && formattedGroupList.length > 0 ? (
+        {(formattedGroupList && formattedGroupList.length > 0) ||
+        fetchCompanyInfoInProgress ? (
           <Table
             columns={TABLE_COLUMN}
             data={formattedGroupList}

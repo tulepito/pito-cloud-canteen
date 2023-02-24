@@ -31,7 +31,7 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
     shallowEqual,
   );
   useEffect(() => {
-    if (companyId) {
+    if (companyId && companyId !== 'personal') {
       const currentCompany = companyRefs.find(
         (_company) => User(_company).getId() === companyId,
       );

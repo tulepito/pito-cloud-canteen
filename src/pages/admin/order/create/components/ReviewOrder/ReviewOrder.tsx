@@ -72,10 +72,9 @@ const MENU_TABLE_COLUMN: TColumn[] = [
 ];
 
 const ReviewContent: React.FC<any> = (props) => {
-  const { deliveryHour, deliveryAddress = {}, restaurant } = props;
+  const { restaurant } = props;
   const { restaurantName, phoneNumber, foodList = {} } = restaurant;
 
-  const { address } = deliveryAddress;
   const intl = useIntl();
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
     return {
@@ -90,55 +89,6 @@ const ReviewContent: React.FC<any> = (props) => {
 
   return (
     <div>
-      <Collapsible
-        label={intl.formatMessage({ id: 'ReviewOrder.generalInfo' })}>
-        <div className={css.contentBox}>
-          <div className={css.flexChild}>
-            <span className={css.boxTitle}>
-              {intl.formatMessage({ id: 'ReviewOrder.deliveryTime' })}
-            </span>
-            <span className={css.boxContent}>{deliveryHour}</span>
-          </div>
-          <div className={css.flexChild}>
-            <span className={css.boxTitle}>
-              {intl.formatMessage({ id: 'ReviewOrder.address' })}
-            </span>
-            <span className={css.boxContent}>{address}</span>
-          </div>
-          <div className={css.flexChild}>
-            <span className={css.boxTitle}>
-              {intl.formatMessage({ id: 'ReviewOrder.staffNameLabel' })}
-            </span>
-            <FieldTextInput
-              className={css.staffInput}
-              name="staffName"
-              id="staffName"
-              placeholder={intl.formatMessage({
-                id: 'ReviewOrder.staffNamePlaceholder',
-              })}
-              validate={required(
-                intl.formatMessage({ id: 'ReviewOrder.staffNameRequired' }),
-              )}
-            />
-          </div>
-          <div className={css.flexChild}>
-            <span className={css.boxTitle}>
-              {intl.formatMessage({ id: 'ReviewOrder.shipperName.label' })}
-            </span>
-            <FieldTextInput
-              className={css.staffInput}
-              name="shipperName"
-              id="shipperName"
-              placeholder={intl.formatMessage({
-                id: 'ReviewOrder.shipperName.placeholder',
-              })}
-              validate={required(
-                intl.formatMessage({ id: 'ReviewOrder.shipperName.required' }),
-              )}
-            />
-          </div>
-        </div>
-      </Collapsible>
       <Collapsible
         label={intl.formatMessage({
           id: 'ReviewOrder.providerLabel',
@@ -214,11 +164,12 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     setFalse: closeSuccessModal,
   } = useBoolean();
   useEffect(() => {
-    dispatch(orderAsyncActions.fetchOrderDetail());
-  }, []);
+    dispatch(orderAsyncActions.fetchOrderDetail(order as TListing));
+  }, [dispatch, order]);
   const { staffName, deliveryHour, deliveryAddress, shipperName } = Listing(
     order as TListing,
   ).getMetadata();
+  const { address } = deliveryAddress || {};
   const { renderedOrderDetail } =
     useMemo(() => {
       return {
@@ -267,6 +218,61 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
           const { handleSubmit, goBack, invalid } = fieldRenderProps;
           return (
             <Form onSubmit={handleSubmit}>
+              <Collapsible
+                label={intl.formatMessage({ id: 'ReviewOrder.generalInfo' })}>
+                <div className={css.contentBox}>
+                  <div className={css.flexChild}>
+                    <span className={css.boxTitle}>
+                      {intl.formatMessage({ id: 'ReviewOrder.deliveryTime' })}
+                    </span>
+                    <span className={css.boxContent}>{deliveryHour}</span>
+                  </div>
+                  <div className={css.flexChild}>
+                    <span className={css.boxTitle}>
+                      {intl.formatMessage({ id: 'ReviewOrder.address' })}
+                    </span>
+                    <span className={css.boxContent}>{address}</span>
+                  </div>
+                  <div className={css.flexChild}>
+                    <span className={css.boxTitle}>
+                      {intl.formatMessage({ id: 'ReviewOrder.staffNameLabel' })}
+                    </span>
+                    <FieldTextInput
+                      className={css.staffInput}
+                      name="staffName"
+                      id="staffName"
+                      placeholder={intl.formatMessage({
+                        id: 'ReviewOrder.staffNamePlaceholder',
+                      })}
+                      validate={required(
+                        intl.formatMessage({
+                          id: 'ReviewOrder.staffNameRequired',
+                        }),
+                      )}
+                    />
+                  </div>
+                  <div className={css.flexChild}>
+                    <span className={css.boxTitle}>
+                      {intl.formatMessage({
+                        id: 'ReviewOrder.shipperName.label',
+                      })}
+                    </span>
+                    <FieldTextInput
+                      className={css.staffInput}
+                      name="shipperName"
+                      id="shipperName"
+                      placeholder={intl.formatMessage({
+                        id: 'ReviewOrder.shipperName.placeholder',
+                      })}
+                      validate={required(
+                        intl.formatMessage({
+                          id: 'ReviewOrder.shipperName.required',
+                        }),
+                      )}
+                    />
+                  </div>
+                </div>
+              </Collapsible>
               <Tabs items={renderedOrderDetail as any} showNavigation />
               <NavigateButtons
                 goBack={goBack}
