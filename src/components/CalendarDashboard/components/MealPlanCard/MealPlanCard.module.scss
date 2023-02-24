@@ -73,6 +73,11 @@
   align-items: center;
   @include textTemplate(12px, 600, 16px, '');
   margin-bottom: 4px;
+
+  span {
+    display: block;
+    @include lineClamp(3);
+  }
 }
 
 .restaurant > span {

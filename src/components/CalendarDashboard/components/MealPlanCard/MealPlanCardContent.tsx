@@ -29,7 +29,7 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
         />
       </div>
       <div className={css.restaurant}>
-        <span>{restaurantName}</span>
+        <span title={restaurantName}>{restaurantName}</span>
         <IconRefreshing className={css.recommendRestaurant} />
       </div>
     </div>

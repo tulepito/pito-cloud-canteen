@@ -30,21 +30,16 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
 
   return (
     <div className={css.footer}>
-      {foodList.length > 0 ? (
-        <Button
-          className={css.actionButton}
-          onClick={onPickFoodModal}
-          inProgress={onPickFoodInProgress}>
+      <Button
+        className={css.actionButton}
+        onClick={onPickFoodModal}
+        inProgress={onPickFoodInProgress}>
+        {foodList.length > 0 ? (
           <FormattedMessage id="MealPlanCard.footer.modify" />
-        </Button>
-      ) : (
-        <Button
-          className={css.actionButton}
-          onClick={onPickFoodModal}
-          inProgress={onPickFoodInProgress}>
+        ) : (
           <FormattedMessage id="MealPlanCard.footer.selectDish" />
-        </Button>
-      )}
+        )}
+      </Button>
       <div
         className={css.applyForOtherDays}
         onClick={handleOpenApplyOtherDaysModal}>

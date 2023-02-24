@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -17,6 +18,7 @@ import MealPlanSetup from '../../../StepScreen/MealPlanSetup/MealPlanSetup';
 import ReviewOrder from '../ReviewOrder/ReviewOrder';
 // eslint-disable-next-line import/no-cycle
 import SetupOrderDetail from '../SetupOrderDetail/SetupOrderDetail';
+import { isGeneralInfoSetupCompleted } from './CreateOrderWizard.helper';
 import css from './CreateOrderWizard.module.scss';
 
 export const CLIENT_SELECT_TAB = 'clientSelect';
@@ -35,25 +37,28 @@ export const TABS = [
 export const CREATE_ORDER_STEP_LOCAL_STORAGE_NAME = 'orderStep';
 
 const tabCompleted = (order: any, tab: string, orderDetail: any) => {
+  console.log('🚀 ~ tabCompleted ~ order:', order);
+  console.log('🚀 ~ tabCompleted ~ orderDetail:', orderDetail);
   const orderId = Listing(order).getId();
-  const {
-    deliveryAddress,
-    staffName,
-    plans = [],
-  } = Listing(order).getMetadata();
-  const missingSelectedFood = Object.keys(orderDetail).filter(
-    (dateTime) => orderDetail[dateTime].restaurant.foodList.length === 0,
+  const { staffName, plans = [] } = Listing(order).getMetadata();
+
+  const missingSelectedFood = Object.keys(orderDetail).filter((dateTime) =>
+    isEmpty(orderDetail[dateTime].restaurant.foodList),
   );
   const isMealPlanTabCompleted =
-    plans.length > 0 && missingSelectedFood.length === 0;
+    !isEmpty(plans) && isEmpty(missingSelectedFood);
 
   switch (tab) {
     case CLIENT_SELECT_TAB:
-      return orderId;
+      return !isEmpty(orderId);
     case MEAL_PLAN_SETUP:
-      return deliveryAddress;
+      return isGeneralInfoSetupCompleted(order as TListing);
     case CREATE_MEAL_PLAN_TAB:
-      return isMealPlanTabCompleted;
+      return (
+        !isEmpty(orderId) &&
+        isMealPlanTabCompleted &&
+        isGeneralInfoSetupCompleted(order as TListing)
+      );
     case REVIEW_TAB:
       return !!staffName;
     default:
@@ -145,24 +150,23 @@ const CreateOrderWizard = () => {
 
   useEffect(() => {
     if (order) {
-      const { plans = [], staffName } = Listing(
-        order as TListing,
-      ).getMetadata();
+      const { staffName } = Listing(order as TListing).getMetadata();
       if (staffName) {
         setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, REVIEW_TAB);
         return setCurrentStep(REVIEW_TAB);
       }
-      if (plans.length > 0) {
+      if (isGeneralInfoSetupCompleted(order as TListing)) {
         setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, CREATE_MEAL_PLAN_TAB);
         return setCurrentStep(CREATE_MEAL_PLAN_TAB);
       }
       setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, MEAL_PLAN_SETUP);
       return setCurrentStep(MEAL_PLAN_SETUP);
     }
-  }, [order]);
+  }, [JSON.stringify(order)]);
+
   useEffect(() => {
-    // If selectedTab is not active, redirect to the beginning of wizard
     if (!tabsStatus[currentStep as string]) {
+      // If selectedTab is not active, redirect to the beginning of wizard
       const currentTabIndex = TABS.indexOf(currentStep as string);
       const nearestActiveTab = TABS.slice(0, currentTabIndex)
         .reverse()
