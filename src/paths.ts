@@ -177,6 +177,7 @@ export const companyPaths = {
   MembersDetail: '/company/[companyId]/members/[memberEmail]',
   CreateNewOrder: '/company/booker/orders/new',
   EditDraftOrder: '/company/booker/orders/draft/[orderId]',
+  OrderSelectRestaurant: '/company/booker/orders/draft/[orderId]/restaurants',
   GroupDetail: '/company/[companyId]/group-setting',
   GroupMemberDetail:
     '/company/[companyId]/group-setting/[groupId]/member/[memberId]',
