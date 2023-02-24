@@ -35,10 +35,12 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
 ) => {
   const intl = useIntl();
 
-  const { foodOptions, memberOptions, handleSubmit } = props;
+  const { foodOptions, memberOptions, handleSubmit, values } = props;
   const fieldSelectMemberDisable = memberOptions?.length === 0;
   const fieldSelectFoodDisable =
     fieldSelectMemberDisable || foodOptions?.length === 0;
+  const submitDisabled =
+    fieldSelectFoodDisable || !values?.participantId || !values?.foodId;
 
   const showRequirementText = intl.formatMessage({
     id: 'AddOrderForm.addRequirement.show',
@@ -117,9 +119,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
             {selectFoodOptions}
           </FieldSelect>
         </div>
-        <Button
-          disabled={fieldSelectMemberDisable}
-          className={css.submitButton}>
+        <Button disabled={submitDisabled} className={css.submitButton}>
           {intl.formatMessage({
             id: 'AddOrderForm.submitButtonText',
           })}
