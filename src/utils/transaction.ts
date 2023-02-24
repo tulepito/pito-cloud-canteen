@@ -144,6 +144,12 @@ export const txIsCompleted = (tx: TTransaction) => {
   return [ETransition.COMPLETE_DELIVERY].includes(txLastTransition(tx));
 };
 
+export const txIsReviewed = (tx: TTransaction) => {
+  return getTransitionsToState(ETransactionState.REVIEWED).includes(
+    txLastTransition(tx),
+  );
+};
+
 export const txIsExpiredReview = (tx: TTransaction) => {
   return [ETransition.EXPIRED_REVIEW_TIME].includes(txLastTransition(tx));
 };
