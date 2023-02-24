@@ -6,6 +6,7 @@ import useBoolean from './useBoolean';
 
 const useQueryUsers = () => {
   const [users, setUsers] = useState<TUser[]>([]);
+  const [notFoundUsers, setNotFoundUsers] = useState<string[]>([]);
   const [queryError, setQueryError] = useState<any>([]);
 
   const {
@@ -14,14 +15,19 @@ const useQueryUsers = () => {
     setFalse: turnOffUsersInProgress,
   } = useBoolean(false);
 
-  const queryUsersByEmail = async (emailList: string[]) => {
+  const queryUsersByEmail = async (
+    emailList: string[],
+    reset: boolean = false,
+  ) => {
     try {
       turnOnUsersInProgress();
       const { data } = await queryMembersByEmailAdminApi(emailList);
-      setUsers(data);
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      reset ? setUsers(data) : setUsers([...users, ...data]);
       turnOffUsersInProgress();
     } catch (error) {
       console.error(error);
+      setNotFoundUsers([...emailList, ...notFoundUsers]);
       turnOffUsersInProgress();
       setQueryError(error);
     }
@@ -32,12 +38,21 @@ const useQueryUsers = () => {
     setUsers(newUsersList.filter((user) => user.id.uuid !== id));
   };
 
+  const removeNotFoundUserByEmail = (email: string) => {
+    const newNotFoundUsers = [...notFoundUsers];
+    setNotFoundUsers(
+      newNotFoundUsers.filter((userEmail) => userEmail !== email),
+    );
+  };
+
   return {
     users,
     queryUsersInProgress,
     queryUsersByEmail,
     queryError,
     removeUserById,
+    notFoundUsers,
+    removeNotFoundUserByEmail,
   };
 };
 

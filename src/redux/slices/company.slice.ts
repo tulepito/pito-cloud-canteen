@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import type {
   CreateGroupApiBody,
   DeleteGroupApiData,
@@ -6,6 +7,9 @@ import type {
   UpdateGroupApiBody,
 } from '@apis/companyApi';
 import {
+  adminCreateGroupApi,
+  adminDeleteGroupApi,
+  adminUpdateGroupApi,
   createGroupApi,
   deleteGroupApi,
   getAllCompanyMembersApi,
@@ -14,15 +18,15 @@ import {
   updateGroupApi,
 } from '@apis/companyApi';
 import {
+  adminUpdateCompanyApi,
   createCompanyApi,
   showCompanyApi,
-  updateCompanyApi,
 } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
-import { storableError } from '@utils/errors';
+import { storableAxiosError, storableError } from '@utils/errors';
 import type { TImage, TObject, TUser } from '@utils/types';
 
 import { userThunks } from './user.slice';
@@ -96,6 +100,9 @@ const SHOW_COMPANY = 'app/UpdateCompanyPage/SHOW_COMPANY';
 const ADMIN_UPDATE_COMPANY = 'app/UpdateCompanyPage/ADMIN_UPDATE_COMPANY';
 const REQUEST_UPLOAD_COMPANY_LOGO =
   'app/UpdateCompanyPage/REQUEST_UPLOAD_COMPANY_LOGO';
+const ADMIN_DELETE_GROUP = 'app/Company/ADMIN_DELETE_GROUP';
+const ADMIN_CREATE_GROUP = 'app/Company/ADMIN_CREATE_GROUP';
+const ADMIN_UPDATE_GROUP = 'app/Company/ADMIN_UPDATE_GROUP';
 
 const initialState: TCompanyState = {
   groupList: [],
@@ -193,20 +200,19 @@ const showCompany = createAsyncThunk(
 
 const adminUpdateCompany = createAsyncThunk(
   ADMIN_UPDATE_COMPANY,
-  async (userData: any, { fulfillWithValue, rejectWithValue }) => {
-    try {
-      const { data } = await updateCompanyApi({
-        dataParams: userData,
-        queryParams: {
-          expand: true,
-        },
-      });
-      const [company] = denormalisedResponseEntities(data);
-      return fulfillWithValue(company);
-    } catch (error: any) {
-      console.error(`Error : ${ADMIN_UPDATE_COMPANY}`, error);
-      return rejectWithValue(storableError(error.response.data));
-    }
+  async (params: any) => {
+    const { data } = await adminUpdateCompanyApi({
+      dataParams: params,
+      queryParams: {
+        include: ['profileImage'],
+        expand: true,
+      },
+    });
+    const [company] = denormalisedResponseEntities(data);
+    return company;
+  },
+  {
+    serializeError: storableAxiosError,
   },
 );
 
@@ -378,6 +384,53 @@ const updateCompanyAccount = createAsyncThunk(
   },
 );
 
+const adminDeleteGroup = createAsyncThunk(
+  ADMIN_DELETE_GROUP,
+  async (params: { companyId: string; groupId: string }, { dispatch }) => {
+    const { companyId, groupId } = params;
+    const apiData: DeleteGroupApiData = {
+      groupId,
+      companyId,
+    };
+    const { data } = await adminDeleteGroupApi(apiData);
+    return data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
+const adminCreateGroup = createAsyncThunk(
+  ADMIN_CREATE_GROUP,
+  async (params: CreateGroupApiBody) => {
+    const { data: newCompanyAccount } = await adminCreateGroupApi(params);
+    return newCompanyAccount;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
+const adminUpdateGroup = createAsyncThunk(
+  ADMIN_UPDATE_GROUP,
+  async (params: UpdateGroupApiBody) => {
+    const { addedMembers, deletedMembers, groupId, companyId, groupInfo } =
+      params;
+    const apiBody: UpdateGroupApiBody = {
+      addedMembers,
+      deletedMembers,
+      groupId,
+      companyId,
+      groupInfo,
+    };
+    const { data } = await adminUpdateGroupApi(apiBody);
+    return data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
 export const companyThunks = {
   companyInfo,
   groupInfo,
@@ -391,6 +444,9 @@ export const companyThunks = {
   adminUpdateCompany,
   showCompany,
   requestUploadCompanyLogo,
+  adminCreateGroup,
+  adminUpdateGroup,
+  adminDeleteGroup,
 };
 
 export const companySlice = createSlice({
@@ -411,6 +467,10 @@ export const companySlice = createSlice({
     removeCompanyLogo: (state) => ({
       ...state,
       uploadedCompanyLogo: null,
+    }),
+    renewCompanyState: (state, { payload }) => ({
+      ...state,
+      company: payload,
     }),
   },
   extraReducers: (builder) => {
@@ -654,7 +714,76 @@ export const companySlice = createSlice({
         ...state,
         uploadingCompanyLogo: false,
         uploadCompanyLogoError: payload,
-      }));
+      }))
+      .addCase(adminDeleteGroup.pending, (state, { meta }) => {
+        const { groupId } = meta.arg;
+        return {
+          ...state,
+          deleteGroupInProgress: true,
+          deleteGroupError: null,
+          deletingGroupId: groupId,
+        };
+      })
+      .addCase(adminDeleteGroup.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          deleteGroupInProgress: false,
+          deleteGroupError: null,
+          deletingGroupId: '',
+          company: payload,
+        };
+      })
+      .addCase(adminDeleteGroup.rejected, (state, { error }) => {
+        return {
+          ...state,
+          deleteGroupInProgress: false,
+          deleteGroupError: error.message,
+          deletingGroupId: '',
+        };
+      })
+      .addCase(adminCreateGroup.pending, (state) => {
+        return {
+          ...state,
+          createGroupInProgress: true,
+          createGroupError: null,
+        };
+      })
+      .addCase(adminCreateGroup.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          createGroupInProgress: false,
+          createGroupError: null,
+          company: payload,
+        };
+      })
+      .addCase(adminCreateGroup.rejected, (state, { error }) => {
+        return {
+          ...state,
+          createGroupInProgress: false,
+          createGroupError: error.message,
+        };
+      })
+      .addCase(adminUpdateGroup.pending, (state) => {
+        return {
+          ...state,
+          updateGroupInProgress: true,
+          updateGroupError: null,
+        };
+      })
+      .addCase(adminUpdateGroup.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          updateGroupInProgress: false,
+          company: payload,
+        };
+      })
+      .addCase(adminUpdateGroup.rejected, (state, { error }) => {
+        return {
+          ...state,
+          updateGroupInProgress: false,
+          updateGroupError: error.message,
+        };
+      });
   },
 });
 

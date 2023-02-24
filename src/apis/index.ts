@@ -4,15 +4,24 @@ import { getApi, postApi, putApi } from './configs';
 
 export const getCompaniesApi = () => getApi('/admin/users/company');
 
-export const updateCompanyApi = (body: TObject) =>
+export const adminUpdateCompanyApi = (body: TObject) =>
   putApi('/admin/users/company/update', body);
 
 export const createCompanyApi = (body: TObject) =>
   postApi('/admin/users/company/create', body);
 
-export const queryCompanyMembersApi = (id: string, roles?: string[]) => {
-  const rolesAsString = roles ? roles.join(',') : '';
-  return getApi(`/admin/users/company/${id}/members?roles=${rolesAsString}`);
+export const queryCompanyMembersApi = ({
+  id,
+  page = 1,
+  perPage = 10,
+}: {
+  id: string;
+  page: number;
+  perPage: number;
+}) => {
+  return getApi(
+    `/admin/users/company/${id}/members?page=${page}&perPage=${perPage}`,
+  );
 };
 
 export const showCompanyApi = (id: string) =>

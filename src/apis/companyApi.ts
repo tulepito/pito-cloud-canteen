@@ -20,6 +20,14 @@ export type DeleteMemberApiBody = {
 export const deleteMemberApi = (body: DeleteMemberApiBody) =>
   deleteApi('/company/members/delete-member', body);
 
+export const adminDeleteMemberApi = ({
+  memberEmail,
+  companyId,
+}: DeleteMemberApiBody) =>
+  deleteApi(`/admin/users/company/${companyId}/members/delete`, {
+    memberEmail,
+  });
+
 export type UpdateCompanyApiBody = {
   companyId: string;
   dataParams: {
@@ -108,9 +116,52 @@ export const queryMembersByEmailAdminApi = (
   emails: string[],
   queryParams?: TObject,
 ) => {
-  const emailAsString = emails.join(',');
-  return getApi(
-    `/admin/users/query-users-by-email?emails=${emailAsString}`,
+  return getApi(`/admin/users/query-users-by-email`, {
+    dataParams: { emails },
     queryParams,
-  );
+  });
 };
+
+export const adminAddMembersToCompanyApi = (
+  companyId: string,
+  dataParams?: TObject,
+  queryParams?: TObject,
+) => {
+  return postApi(`/admin/users/company/${companyId}/members/add`, {
+    dataParams,
+    queryParams,
+  });
+};
+
+export const adminDeleteGroupApi = ({
+  companyId,
+  groupId,
+}: DeleteGroupApiData) =>
+  deleteApi(`/admin/users/company/${companyId}/groups/delete`, {
+    companyId,
+    groupId,
+  });
+
+export const adminCreateGroupApi = ({
+  companyId,
+  ...rest
+}: CreateGroupApiBody) =>
+  postApi(`/admin/users/company/${companyId}/groups/create`, rest);
+
+export const adminUpdateGroupApi = ({
+  companyId,
+  ...rest
+}: UpdateGroupApiBody) =>
+  postApi(`/admin/users/company/${companyId}/groups/update`, rest);
+
+export type TUpdateMemberPermissionApiParams = {
+  companyId: string;
+  memberEmail: string;
+  permission: string;
+};
+
+export const adminUpdateMemberPermissionApi = ({
+  companyId,
+  ...rest
+}: TUpdateMemberPermissionApiParams) =>
+  putApi(`/admin/users/company/${companyId}/members/update-permission`, rest);

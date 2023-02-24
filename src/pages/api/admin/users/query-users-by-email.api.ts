@@ -7,16 +7,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
-    const { emails = '', queryParams = {} } = req.query as unknown as {
-      emails: string;
-      queryParams: Record<string, string>;
+    const { JSONParams } = req.query as unknown as {
+      JSONParams: string;
     };
-    const emailsSplitted = emails.split(',');
+    const { dataParams = {}, queryParams = {} } = JSON.parse(JSONParams);
 
-    const emailsAsArray = Array.isArray(emailsSplitted)
-      ? emailsSplitted
-      : [emailsSplitted];
+    const { emails } = dataParams;
 
+    const emailsAsArray = Array.isArray(emails) ? emails : [emails];
     const intergrationSdk = getIntegrationSdk();
 
     const users = await Promise.all(

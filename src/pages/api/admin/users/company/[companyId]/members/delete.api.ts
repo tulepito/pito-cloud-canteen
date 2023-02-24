@@ -1,20 +1,21 @@
 import { deleteMemberFromCompanyFn } from '@pages/api/api-utils/deleteMemberFromCompanyFn';
 import cookies from '@services/cookie';
-import companyChecker from '@services/permissionChecker/company';
+import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    const { memberEmail = '', companyId = '' } = req.body;
-    const updatedBookerAccount = await deleteMemberFromCompanyFn({
+    const { companyId } = req.query;
+    const { memberEmail } = req.body;
+    const updatedCompanyAccount = await deleteMemberFromCompanyFn({
       memberEmail,
-      companyId,
+      companyId: companyId as string,
     });
-    res.json(updatedBookerAccount);
+    res.json(updatedCompanyAccount);
   } catch (error) {
     handleError(res, error);
   }
 };
 
-export default cookies(companyChecker(handler));
+export default cookies(adminChecker(handler));

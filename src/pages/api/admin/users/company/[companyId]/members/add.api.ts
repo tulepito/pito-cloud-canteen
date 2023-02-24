@@ -1,17 +1,19 @@
 import addMembersToCompanyFn from '@pages/api/api-utils/addMembersToCompanyFn';
 import cookies from '@services/cookie';
-import companyChecker from '@services/permissionChecker/company';
+import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
+    const { companyId } = req.query;
     const { dataParams } = req.body;
-    const { companyId, userIdList, noAccountEmailList } = dataParams;
+    const { userIdList, noAccountEmailList } = dataParams;
+
     const updatedCompanyAccount = await addMembersToCompanyFn({
       userIdList,
       noAccountEmailList,
-      companyId,
+      companyId: companyId as string,
     });
     res.json(updatedCompanyAccount);
   } catch (error) {
@@ -19,4 +21,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default cookies(companyChecker(handler));
+export default cookies(adminChecker(handler));
