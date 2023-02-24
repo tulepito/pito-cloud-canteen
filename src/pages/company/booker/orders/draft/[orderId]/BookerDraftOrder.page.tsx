@@ -7,7 +7,8 @@ import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { shallowEqual } from 'react-redux';
 
 import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
@@ -30,7 +31,23 @@ function BookerDraftOrderPage() {
     orderId: orderId as string,
   });
 
-  const { orderDetail = [], fetchOrderDetailInProgress } = useLoadPlanDetails();
+  const restaurantCoverImageList = useAppSelector(
+    (state) => state.Order.restaurantCoverImageList,
+    shallowEqual,
+  );
+
+  const { orderDetail = [], fetchOrderDetailInProgress } = useLoadPlanDetails({
+    coverImageList: restaurantCoverImageList,
+  });
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (orderDetail && orderDetail.length > 0) {
+      dispatch(orderAsyncActions.fetchRestaurantCoverImages());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, JSON.stringify(orderDetail)]);
 
   const orderData = Listing(order as TListing);
   const {
@@ -92,8 +109,6 @@ function BookerDraftOrderPage() {
     updatePlanDetailInprogress,
     handleEditFood,
   ]);
-
-  const dispatch = useAppDispatch();
 
   const handleCollapse = () => {
     setCollapse(!collapse);
