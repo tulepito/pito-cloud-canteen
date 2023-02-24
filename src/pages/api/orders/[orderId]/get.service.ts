@@ -65,7 +65,14 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
 
     const { orderDetail } = Listing(planListing).getMetadata();
 
-    if (orderState === EOrderStates.inProgress) {
+    if (
+      [
+        EOrderStates.inProgress,
+        EOrderStates.pendingPayment,
+        EOrderStates.completed,
+        EOrderStates.reviewed,
+      ].includes(orderState)
+    ) {
       const transactionIdMap = Object.entries<
         TPlan['orderDetail'][keyof TPlan['orderDetail']]
       >(orderDetail).reduce<{ timestamp: string; transactionId: string }[]>(
