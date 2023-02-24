@@ -123,9 +123,10 @@ bottom of the container.
 
 .labelRoot {
   @include inputLabelStyles;
+}
 
-  &.labelRequiredRedStar {
-    margin-left: 2px;
-    display: inline-flex;
-  }
+.labelRequiredRedStar {
+  margin-left: 2px;
+  color: $sematicRed2;
+  display: inline-flex;
 }

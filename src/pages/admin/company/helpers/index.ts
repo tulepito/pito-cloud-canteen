@@ -1,4 +1,3 @@
-import { RESULT_PAGE_SIZE } from '@redux/slices/ManageCompaniesPage.slice';
 import { User } from '@utils/data';
 import { ECompanyStatus } from '@utils/enums';
 import type { TCompany, TUser } from '@utils/types';
@@ -12,13 +11,14 @@ type TExtraDataMapToCompanyTable = {
   updateStatus: (e: TUpdateStatus) => void;
 };
 
-export const sliceCompanies = (companies: TCompany[], page: any) => {
+export const sliceCompanies = (
+  companies: TCompany[],
+  page: any,
+  perPage: number,
+) => {
   const pageAsNum = Number(page);
 
-  return companies.slice(
-    (pageAsNum - 1) * RESULT_PAGE_SIZE,
-    pageAsNum * RESULT_PAGE_SIZE,
-  );
+  return companies.slice((pageAsNum - 1) * perPage, pageAsNum * perPage);
 };
 
 export const filterCompanies = (companies: TCompany[], filterValues: any) => {

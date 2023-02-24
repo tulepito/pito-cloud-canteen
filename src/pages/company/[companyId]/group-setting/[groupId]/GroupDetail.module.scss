@@ -127,3 +127,14 @@
     border-bottom: 1px solid $neutralGray5;
   }
 }
+
+.plusIcon {
+  width: 40px;
+  height: 40px;
+  path:not(:nth-child(3)) {
+    fill: $neutralGray6;
+  }
+  path:nth-child(3) {
+    fill: transparent;
+  }
+}

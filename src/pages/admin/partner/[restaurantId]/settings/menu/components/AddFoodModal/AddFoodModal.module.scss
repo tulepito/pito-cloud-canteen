@@ -80,10 +80,15 @@
   display: flex;
   font-size: 12px;
   align-items: unset !important;
-  height: 20px;
-
+  span {
+    height: 20px !important;
+  }
   svg {
     width: 12px !important;
     height: 12px !important;
   }
+}
+
+.tableWrapper {
+  max-width: 600px !important;
 }

@@ -24,6 +24,7 @@ const EditPartnerFoodPage = () => {
     showFoodError,
     updateFoodInProgress,
     updateFoodError,
+    uploadingImages,
   } = useAppSelector((state) => state.foods, shallowEqual);
 
   const handleSubmit = (values: TEditPartnerFoodFormValues) =>
@@ -72,6 +73,7 @@ const EditPartnerFoodPage = () => {
       <EditPartnerFoodForm
         onSubmit={handleSubmit}
         inProgress={updateFoodInProgress}
+        disabled={uploadingImages || updateFoodInProgress}
         formError={updateFoodError}
         initialValues={initialValues}
         isEditting

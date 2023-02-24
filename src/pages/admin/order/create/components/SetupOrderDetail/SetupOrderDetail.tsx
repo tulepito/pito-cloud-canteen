@@ -1,4 +1,4 @@
-import Badge from '@components/Badge/Badge';
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/components/AddMorePlan';
@@ -40,6 +40,7 @@ import css from './SetupOrderDetail.module.scss';
 const renderResourcesForCalendar = (
   orderDetail: TObject,
   deliveryHour: string,
+  coverImageList: any,
 ) => {
   const entries = Object.entries<TObject>(orderDetail);
   const resources = entries.map((item) => {
@@ -56,9 +57,9 @@ const renderResourcesForCalendar = (
         restaurant: {
           id: restaurant.id,
           name: restaurant.restaurantName,
+          coverImage: coverImageList[restaurant.id],
         },
         foodList: Object.keys(foodList),
-        // expiredTime: new Date(2023, 11, 29, 16, 0, 0),
       },
       start: DateTime.fromMillis(Number(date)).toJSDate(),
       end: DateTime.fromMillis(Number(date)).plus({ hour: 1 }).toJSDate(),
@@ -121,9 +122,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     setTrue: openPickFoodModal,
     setFalse: closePickFoodModal,
   } = useBoolean();
-  const updateOrderInProgress = useAppSelector(
-    (state) => state.Order.updateOrderInProgress,
-  );
+
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
     shallowEqual,
@@ -142,6 +141,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     deadlineHour,
     memberAmount,
   } = Listing(order as TListing).getMetadata();
+
   const { title: orderTitle } = Listing(order as TListing).getAttributes();
   const companies = useAppSelector(
     (state) => state.ManageCompaniesPage.companyRefs,
@@ -165,6 +165,16 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     (state) => state.SelectRestaurantPage.foodList,
     shallowEqual,
   );
+  const restaurantCoverImageList = useAppSelector(
+    (state) => state.Order.restaurantCoverImageList,
+    shallowEqual,
+  );
+
+  const restaurants = useAppSelector(
+    (state) => state.SelectRestaurantPage.restaurants,
+    shallowEqual,
+  );
+
   const suitableStartDate = useMemo(() => {
     const temp = findSuitableStartDate({
       selectedDate,
@@ -175,6 +185,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
     return temp instanceof Date ? temp : new Date(temp);
   }, [selectedDate, startDate, endDate, orderDetail]);
+  const updateOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.updateOrderDetailInProgress,
+  );
 
   const { address } = deliveryAddress || {};
   const currentClient = companies.find(
@@ -184,6 +197,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const resourcesForCalender = renderResourcesForCalendar(
     orderDetail,
     deliveryHour,
+    restaurantCoverImageList,
   );
 
   const showPickFoodModal = isPickFoodModalOpen && !fetchFoodInProgress;
@@ -205,6 +219,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         restaurantName: restaurant.restaurantName,
         dateTimestamp: (selectedDate as Date).getTime(),
         foodList: selectedFoodList,
+        menuId: restaurant.menuId,
+        phoneNumber: restaurant.phoneNumber,
       },
     };
 
@@ -275,21 +291,32 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     endDate,
   };
 
-  const disabledSubmit = Object.keys(orderDetail).length === 0;
-  const initialFoodList =
-    orderDetail[selectedDate?.getTime()]?.restaurant?.foodList;
+  const missingSelectedFood = Object.keys(orderDetail).filter(
+    (dateTime) => orderDetail[dateTime].restaurant.foodList.length === 0,
+  );
 
-  const onSubmit = () => {
-    dispatch(orderAsyncActions.updateOrder({ orderDetail }))
-      .then(() => {
-        nextTab();
-      })
-      .catch(() => {});
+  const disabledSubmit =
+    Object.keys(orderDetail).length === 0 || missingSelectedFood.length > 0;
+  const initialFoodList = isPickFoodModalOpen
+    ? orderDetail[selectedDate?.getTime()]?.restaurant?.foodList
+    : {};
+
+  const onSubmit = async () => {
+    const orderId = Listing(order as TListing).getId();
+    const planId = Listing(order as TListing).getMetadata()?.plans?.[0];
+    const { meta } = await dispatch(
+      orderAsyncActions.updatePlanDetail({ orderId, orderDetail, planId }),
+    );
+    if (meta.requestStatus !== 'rejected') nextTab();
   };
 
   useEffect(() => {
-    dispatch(orderAsyncActions.fetchOrderDetail());
+    dispatch(orderAsyncActions.fetchOrderDetail(order as TListing));
   }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(orderAsyncActions.fetchRestaurantCoverImages());
+  }, [dispatch, orderDetail]);
 
   const handleSelectFood = (values: TSelectFoodFormValues) => {
     const { food: foodIds } = values;
@@ -314,6 +341,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       id: currRestaurantId,
       restaurantName: currentRestaurant?.attributes?.title,
       phoneNumber: currentRestaurant?.attributes?.publicData?.phoneNumber,
+      menuId: restaurants?.find(
+        (restaurant) => restaurant.restaurantInfo.id.uuid === currRestaurantId,
+      ).menu.id.uuid,
     };
 
     handleSubmitRestaurant({
@@ -325,10 +355,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   const handlePickFoodModalOpen = () => {
     openPickFoodModal();
-  };
-
-  const eventExtraProps = {
-    onPickFoodModal: handlePickFoodModalOpen,
   };
 
   return (
@@ -354,7 +380,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
                   </span>
                 )}
 
-                <Badge label={`Đơn hàng tuần • ${partnerName}`} />
+                <Badge
+                  label={`Đơn hàng tuần • ${partnerName}`}
+                  type={EBadgeType.PROCESSING}
+                />
               </div>
               <div
                 className={classNames(css.row, css.settingBtn)}
@@ -369,10 +398,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               anchorDate={suitableStartDate}
               events={resourcesForCalender}
               renderEvent={MealPlanCard}
-              eventExtraProps={eventExtraProps}
               companyLogo="Company"
               startDate={new Date(startDate)}
               endDate={new Date(endDate)}
+              resources={{
+                startDate,
+                endDate,
+                onPickFoodModal: handlePickFoodModalOpen,
+              }}
               components={{
                 contentEnd: (props) => (
                   <AddMorePlan {...props} {...addMorePlanExtraProps} />
@@ -394,7 +427,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               goBack={goBack}
               onNextClick={onSubmit}
               submitDisabled={disabledSubmit}
-              inProgress={updateOrderInProgress}
+              inProgress={updateOrderDetailInProgress}
             />
           </div>
           <OrderSettingModal

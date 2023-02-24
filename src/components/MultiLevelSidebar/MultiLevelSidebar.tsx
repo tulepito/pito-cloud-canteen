@@ -102,7 +102,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     );
 
   const childIsActive = nestedCheckChildrenActive(childMenus);
-
+  const isChildMenu = !isFirstLevel;
   const shouldShowMenuesOnActiveOnly =
     (childIsActive && showOnActiveChildrenMenus) ||
     (!showOnActiveChildrenMenus && childMenus.length > 0);
@@ -116,6 +116,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
   const subMenuWrapperClasses = classNames(
     css.subMenu,
     subMenuWrapperClassName,
+    isChildMenu && css.subChildMenu,
   );
 
   const activeWithHighlightRefLinksLinks =
@@ -130,6 +131,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
       [css.isOpen]:
         isFirstLevel &&
         ((isOpen && childIsActive) || (!hasChildrenMenus && isActive)),
+      [css.childActive]: !isOpen && hasChildrenMenus && childIsActive,
     },
   );
 
@@ -152,15 +154,14 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
 
   return (
     <div className={subMenuWrapperClasses}>
-      <div className={subMenuLayoutClasses}>
+      <div className={subMenuLayoutClasses} onClick={handleMenuClick}>
         <div className={css.subMenuItem}>
           {Icon && <Icon className={css.entityIcon} />}
           <div
-            onClick={handleMenuClick}
             className={classNames(
               css.label,
               menuLabelClassName,
-              { [css.labelOpen]: isOpen },
+              isChildMenu && css.isChildMenu,
               { [css.active]: isActive },
             )}>
             {intl.formatMessage({

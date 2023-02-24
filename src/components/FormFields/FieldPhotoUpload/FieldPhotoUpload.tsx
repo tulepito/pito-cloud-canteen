@@ -96,7 +96,7 @@ type TFieldPhotoUpload = {
   disabled?: boolean;
   className?: string;
   variants: string[];
-  uploadImageError: any;
+  uploadImageError?: any;
   name: string;
   id: string;
   validate: any;

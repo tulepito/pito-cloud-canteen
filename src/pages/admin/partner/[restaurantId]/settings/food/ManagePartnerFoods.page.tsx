@@ -68,7 +68,11 @@ const TABLE_COLUMN: TColumn[] = [
       if (data.isDeleted) {
         return <div></div>;
       }
-      return <div title={data.title}>{data.title}</div>;
+      return (
+        <div className={css.titleRow} title={data.title}>
+          {data.title}
+        </div>
+      );
     },
   },
   {
@@ -401,7 +405,7 @@ const ManagePartnerFoods = () => {
             filename={`${parseTimestampToFormat(
               new Date().getTime(),
             )}_donhang.csv`}
-            className="hidden"
+            className={css.hidden}
             ref={csvLinkRef}
             target="_blank"
           />
@@ -438,8 +442,11 @@ const ManagePartnerFoods = () => {
           isLoading={queryFoodsInProgress}
           hasCheckbox
           exposeValues={getExposeValues}
+          tableBodyCellClassName={css.tableBodyCell}
           pagination={managePartnerFoodPagination}
           paginationPath={`/admin/partner/${restaurantId}/settings/food`}
+          tableWrapperClassName={css.tableWrapper}
+          tableClassName={css.table}
         />
       )}
       <AlertModal
@@ -493,6 +500,7 @@ const ManagePartnerFoods = () => {
         </div>
       </AlertModal>
       <AlertModal
+        title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}
         isOpen={foodToRemove || removeCheckedModalOpen}
         handleClose={
           removeCheckedModalOpen ? closeRemoveCheckedModal : onClearFoodToRemove
@@ -508,10 +516,8 @@ const ManagePartnerFoods = () => {
         cancelLabel="Hủy"
         confirmLabel="Xóa món ăn"
         confirmInProgress={removeFoodInProgress}
+        childrenClassName={css.removeModalContent}
         confirmDisabled={removeFoodInProgress}>
-        <div className={css.removeTitle}>
-          <FormattedMessage id="ManagePartnerFoods.removeTitle" />
-        </div>
         <p className={css.removeContent}>
           <FormattedMessage
             id="ManagePartnerFoods.removeContent"

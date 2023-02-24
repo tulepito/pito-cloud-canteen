@@ -274,6 +274,15 @@ const EditPartnerMenuWizard = () => {
     shallowEqual,
   );
 
+  const isCheckingMenuUnConflicted = useAppSelector(
+    (state) => state.menus.isCheckingMenuUnConflicted,
+    shallowEqual,
+  );
+  const checkingMenuUnConflictedError = useAppSelector(
+    (state) => state.menus.checkingMenuUnConflictedError,
+    shallowEqual,
+  );
+
   const isNew =
     !currentMenu ||
     (currentMenu &&
@@ -413,8 +422,14 @@ const EditPartnerMenuWizard = () => {
           </Button>
         )}
         <Button
-          inProgress={createOrUpdateMenuInProgress}
-          disabled={createOrUpdateMenuInProgress}
+          inProgress={
+            createOrUpdateMenuInProgress || isCheckingMenuUnConflicted
+          }
+          disabled={
+            createOrUpdateMenuInProgress ||
+            isCheckingMenuUnConflicted ||
+            !!checkingMenuUnConflictedError
+          }
           onClick={handleSubmit}
           ready={submitReady}>
           <FormattedMessage

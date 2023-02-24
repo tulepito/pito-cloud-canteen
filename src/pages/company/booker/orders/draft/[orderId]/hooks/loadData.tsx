@@ -48,7 +48,7 @@ export const useLoadPlanDetails = () => {
 
   useEffect(() => {
     if (order) {
-      dispatch(orderAsyncActions.fetchOrderDetail());
+      dispatch(orderAsyncActions.fetchOrderDetail(order));
     }
   }, [dispatch, order]);
 

@@ -1,6 +1,4 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
 
 import { createSdkInstance } from '../sharetribe/sdk';
 import * as globalReducers from './slices';
@@ -9,20 +7,15 @@ const combinedReducer = combineReducers({
   ...globalReducers,
 });
 
-const persistConfig = {
-  key: 'root',
-  version: 1,
-  storage,
-  whitelist: ['Order', 'ManageCompaniesPage'],
+const rootReducer: typeof combinedReducer = (state, action) => {
+  return combinedReducer(state, action);
 };
-
-const persistedReducer = persistReducer(persistConfig, combinedReducer);
 
 export const makeStore = () => {
   const sdk = createSdkInstance();
 
   return configureStore({
-    reducer: persistedReducer,
+    reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: false,

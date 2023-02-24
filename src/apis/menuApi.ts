@@ -1,3 +1,5 @@
+import type { TCheckUnconflictedParams } from '@helpers/apiHelpers';
+
 import type { TBodyParams } from './configs';
 import { getApi, postApi } from './configs';
 
@@ -27,3 +29,6 @@ export const queryAllMenusApi = (body: TBodyParams) => {
 export const checkMenuInTransactionProgressApi = (id: string) => {
   return getApi(`/admin/listings/menus/${id}/isInTransactionProgress`);
 };
+
+export const checkMenuUnconflictedApi = (body: TCheckUnconflictedParams) =>
+  postApi(`/admin/listings/menus/isUnconflicted`, body);

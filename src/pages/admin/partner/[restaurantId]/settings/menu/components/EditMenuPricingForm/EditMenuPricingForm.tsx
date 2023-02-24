@@ -180,6 +180,9 @@ const EditMenuPricingFormComponent: React.FC<
   return (
     <>
       <Form onSubmit={handleSubmit}>
+        <h2 className={css.title}>
+          <FormattedMessage id="EditMenuPricingForm.pricingTitle" />
+        </h2>
         {currentMenu && (
           <CalendarDashboard
             renderEvent={FoodEventCard}
