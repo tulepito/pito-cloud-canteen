@@ -73,6 +73,10 @@ const Tabs: React.FC<ITabsProps> = (props) => {
     onChangeTab(Number(defaultActiveKey || 1))();
   }, [defaultActiveKey]);
 
+  useEffect(() => {
+    onChange(items[Number(activeTabKey) - 1]);
+  }, [activeTabKey]);
+
   const tabHeader = items.map((item, index) => {
     const { label } = item;
 
