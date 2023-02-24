@@ -49,13 +49,13 @@ const EditPartnerFoodPage = () => {
   }, [currentFoodListing]) as TEditPartnerFoodFormValues;
 
   useEffect(() => {
+    dispatch(foodSliceAction.setInitialStates());
+  }, []);
+
+  useEffect(() => {
     if (!foodId) return;
     dispatch(foodSliceThunks.showPartnerFoodListing(foodId));
   }, [dispatch, foodId]);
-
-  useEffect(() => {
-    dispatch(foodSliceAction.setInitialStates());
-  }, []);
 
   if (showFoodInProgress) {
     return <LoadingContainer />;

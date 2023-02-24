@@ -281,14 +281,9 @@ const deletePartnerMenu = createAsyncThunk(
 
 const queryMenuOptionsToDuplicate = createAsyncThunk(
   QUERY_MENU_OPTIONS_TO_DUPLICATE,
-  async (payload: any, { rejectWithValue }) => {
+  async ({ restaurantId }: { restaurantId: string }, { rejectWithValue }) => {
     try {
-      const { data } = await queryAllMenusApi({
-        dataParams: {
-          ...payload,
-        },
-        queryParams: {},
-      });
+      const { data } = await queryAllMenusApi({ restaurantId });
       return data;
     } catch (error) {
       console.error(`${QUERY_MENU_OPTIONS_TO_DUPLICATE} error: `, error);

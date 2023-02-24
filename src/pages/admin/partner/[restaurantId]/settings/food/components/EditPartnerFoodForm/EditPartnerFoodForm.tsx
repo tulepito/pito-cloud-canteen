@@ -92,7 +92,7 @@ const EditPartnerFoodFormComponent: React.FC<
   const { handleSubmit } = props;
 
   const intl = useIntl();
-  console.log({ disabled });
+
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
       <div className={css.fieldPhotos}>

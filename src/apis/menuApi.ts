@@ -22,8 +22,12 @@ export const showPartnerMenuApi = (
   return postApi(`/admin/listings/menus/${id}`, queryParams);
 };
 
-export const queryAllMenusApi = (body: TBodyParams) => {
-  return postApi(`/admin/listings/menus/queryAll`, body);
+export const queryAllMenusApi = ({
+  restaurantId,
+}: {
+  restaurantId: string;
+}) => {
+  return postApi(`/admin/listings/menus/queryAll`, { restaurantId });
 };
 
 export const checkMenuInTransactionProgressApi = (id: string) => {

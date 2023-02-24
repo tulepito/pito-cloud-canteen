@@ -69,7 +69,9 @@
 }
 
 .titleRow {
-  max-width: 150px;
+  min-width: 200px;
+  display: block;
+  color: $neutralGray6;
 }
 
 .addButton {
