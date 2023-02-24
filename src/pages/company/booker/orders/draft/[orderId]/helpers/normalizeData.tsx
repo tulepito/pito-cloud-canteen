@@ -2,7 +2,11 @@ import { Listing } from '@utils/data';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
-export const normalizePlanDetailsToEvent = (planDetails: any, order: any) => {
+export const normalizePlanDetailsToEvent = (
+  planDetails: any,
+  order: any,
+  coverImageList: any,
+) => {
   const dateList = Object.keys(planDetails);
   const { plans = [] } = Listing(order).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
@@ -22,6 +26,7 @@ export const normalizePlanDetailsToEvent = (planDetails: any, order: any) => {
       id: planData?.restaurant?.id,
       name: planData?.restaurant?.restaurantName,
       menuId: planData?.restaurant?.menuId,
+      coverImage: coverImageList[planData?.restaurant?.id],
     };
 
     return {

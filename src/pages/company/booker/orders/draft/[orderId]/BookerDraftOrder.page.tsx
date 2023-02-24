@@ -37,11 +37,26 @@ function BookerDraftOrderPage() {
   const bookerPublishOrderInProgress = useAppSelector(
     (state) => state.Order.bookerPublishOrderInProgress,
   );
-  const { order, fetchOrderInProgress } = useLoadData({
+  const { order, fetchOrderInProgress, companyAccount } = useLoadData({
     orderId: orderId as string,
   });
 
-  const { orderDetail = [], fetchOrderDetailInProgress } = useLoadPlanDetails();
+  const restaurantCoverImageList = useAppSelector(
+    (state) => state.Order.restaurantCoverImageList,
+  );
+
+  const { orderDetail = [], fetchOrderDetailInProgress } = useLoadPlanDetails({
+    coverImageList: restaurantCoverImageList,
+  });
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (orderDetail && orderDetail.length > 0) {
+      dispatch(orderAsyncActions.fetchRestaurantCoverImages());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, JSON.stringify(orderDetail)]);
 
   const orderData = Listing(order as TListing);
   const {
@@ -85,7 +100,7 @@ function BookerDraftOrderPage() {
         `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date}&restaurantId=${restaurantId}&menuId=${menuId}`,
       );
     },
-    [orderId],
+    [orderId, router],
   );
 
   const calendarExtraResources = useMemo(() => {
@@ -110,34 +125,38 @@ function BookerDraftOrderPage() {
     handleEditFood,
   ]);
 
-  const dispatch = useAppDispatch();
-
   const handleCollapse = () => {
     setCollapse(!collapse);
   };
 
-  const handleAddMeal = () => (date: Date) => {
-    router.push({
-      pathname: companyPaths.OrderSelectRestaurant,
-      query: {
-        orderId,
-        timestamp: date.getTime(),
-      },
-    });
-  };
-
-  const handleRemoveMeal = (id: string) => (resourceId: string) => {
-    dispatch(
-      orderAsyncActions.updatePlanDetail({
-        orderId,
-        planId: id,
-        orderDetail: {
-          [resourceId]: null,
+  const handleAddMeal = useCallback(
+    () => (date: Date) => {
+      router.push({
+        pathname: companyPaths.OrderSelectRestaurant,
+        query: {
+          orderId,
+          timestamp: date.getTime(),
         },
-        updateMode: 'merge',
-      }),
-    );
-  };
+      });
+    },
+    [orderId, router],
+  );
+
+  const handleRemoveMeal = useCallback(
+    (id: string) => (resourceId: string) => {
+      dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId: id,
+          orderDetail: {
+            [resourceId]: null,
+          },
+          updateMode: 'merge',
+        }),
+      );
+    },
+    [dispatch, orderId],
+  );
 
   const handleFinishOrder = async () => {
     await dispatch(orderAsyncActions.bookerPublishOrder({ orderId, planId }));
@@ -148,6 +167,40 @@ function BookerDraftOrderPage() {
       });
     }, 1000);
   };
+
+  const toolbarComponent = useCallback(
+    (props: any) => (
+      <Toolbar
+        {...props}
+        startDate={startDate.getTime()}
+        endDate={endDate.getTime()}
+        finishDisabled={!isDoneSetupPlan}
+        finishInProgress={bookerPublishOrderInProgress}
+        onFinishOrder={handleFinishOrder}
+      />
+    ),
+    [startDate, endDate, isDoneSetupPlan, bookerPublishOrderInProgress],
+  );
+
+  const contentEndComponent = useCallback(
+    (props: any) => (
+      <AddMorePlan
+        {...props}
+        onClick={handleAddMeal()}
+        startDate={props?.resources?.startDate?.getTime()}
+        endDate={props?.resources?.endDate?.getTime()}
+        loading={props?.resources?.fetchPlanDetailInProgress}
+      />
+    ),
+    [handleAddMeal],
+  );
+
+  const componentsProps = useMemo(() => {
+    return {
+      toolbar: toolbarComponent,
+      contentEnd: contentEndComponent,
+    };
+  }, [toolbarComponent, contentEndComponent]);
 
   useEffect(() => {
     if (!isEmpty(orderState)) {
@@ -168,7 +221,7 @@ function BookerDraftOrderPage() {
         logo={<span></span>}
         collapse={collapse}
         onCollapse={handleCollapse}>
-        <SidebarContent order={order} />
+        <SidebarContent order={order} companyAccount={companyAccount} />
       </LayoutSidebar>
       <LayoutMain>
         <div className={css.main}>
@@ -188,29 +241,7 @@ function BookerDraftOrderPage() {
             companyLogo="Company"
             hideMonthView
             resources={calendarExtraResources}
-            components={{
-              contentEnd: (props: any) => (
-                <AddMorePlan
-                  {...props}
-                  onClick={handleAddMeal()}
-                  startDate={props?.resources?.startDate?.getTime()}
-                  endDate={props?.resources?.endDate?.getTime()}
-                  loading={props?.resources?.fetchPlanDetailInProgress}
-                />
-              ),
-              toolbar: (props) => {
-                const newProps = {
-                  ...props,
-                  startDate,
-                  endDate,
-                  finishDisabled: !isDoneSetupPlan,
-                  finishInProgress: bookerPublishOrderInProgress,
-                  onFinishOrder: handleFinishOrder,
-                };
-
-                return <Toolbar {...newProps} />;
-              },
-            }}
+            components={componentsProps}
           />
         </div>
       </LayoutMain>

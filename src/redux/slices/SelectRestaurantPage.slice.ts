@@ -53,6 +53,8 @@ const getRestaurants = createAsyncThunk(
       deliveryHour = '6:30',
       nutritions = [],
       title = '',
+      page = 1,
+      perPage = 10,
     } = params || {};
     const dayOfWeek = convertWeekDay(dateTime.weekday).key;
     const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
@@ -63,7 +65,7 @@ const getRestaurants = createAsyncThunk(
       meta_listingType: ListingTypes.MENU,
       pub_startDate: `,${dateTime.toMillis()}`,
       pub_daysOfWeek: `has_any:${dayOfWeek}`,
-      pub_mealTypes: `has_any:${mealType}`,
+      pub_mealType: mealType,
       ...(nutritions.length > 0
         ? { [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(',')}` }
         : {}),
@@ -80,6 +82,8 @@ const getRestaurants = createAsyncThunk(
           }
         : {}),
       [`pub_${dayOfWeek}AverageFoodPrice`]: `,${packagePerMember}`,
+      page,
+      perPage,
     });
 
     const { meta } = response?.data || {};
@@ -90,6 +94,11 @@ const getRestaurants = createAsyncThunk(
         const { restaurantId } = Listing(menu).getMetadata();
         const restaurantResponse = await sdk.listings.show({
           id: restaurantId,
+          include: ['images'],
+          'fields.image': [
+            'variants.landscape-crop',
+            'variants.landscape-crop2x',
+          ],
         });
         return {
           restaurantInfo: denormalisedResponseEntities(restaurantResponse)[0],

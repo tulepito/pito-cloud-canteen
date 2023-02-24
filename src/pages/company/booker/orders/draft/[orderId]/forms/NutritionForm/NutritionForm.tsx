@@ -1,21 +1,11 @@
 import Button from '@components/Button/Button';
 import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import { SPECIAL_DIET_OPTIONS } from '@utils/enums';
 import type { ChangeEventHandler } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './NutritionForm.module.scss';
-
-const NUTRITION_LIST = [
-  {
-    value: 'anchay',
-    label: 'Ăn chay',
-  },
-  {
-    value: 'anItBeo',
-    label: 'Ăn ít béo',
-  },
-];
 
 type TNutritionFormProps = {
   onSubmit: (values: TNutritionFormValues) => void;
@@ -51,14 +41,14 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
       form.change(
         'nutritions',
         (Array.isArray(nutritions.input.value)
-          ? Array.from(new Set([...nutritions.input.value, data.value]))
-          : [data.value]) as any,
+          ? Array.from(new Set([...nutritions.input.value, data.key]))
+          : [data.key]) as any,
       );
     } else {
       form.change(
         'nutritions',
         (Array.isArray(nutritions.input.value)
-          ? nutritions.input.value.filter((item) => item !== data.value)
+          ? nutritions.input.value.filter((item) => item !== data.key)
           : []) as any,
       );
     }
@@ -74,18 +64,18 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
             })}
           </span>
         </div>
-        {NUTRITION_LIST.map((data: any) => (
-          <div className={css.checkboxItem} key={data.value}>
+        {SPECIAL_DIET_OPTIONS.map((data: any) => (
+          <div className={css.checkboxItem} key={data.key}>
             <input
               className={css.input}
-              id={`nutritions-${data.value}`}
+              id={`nutritions-${data.key}`}
               {...nutritions.input}
               onChange={handleChangeCheckboxGroup(data)}
-              checked={(nutritions.input.value || []).includes(data.value)}
+              checked={(nutritions.input.value || []).includes(data.key)}
               type="checkbox"
-              value={data.value}
+              value={data.key}
             />
-            <label className={css.label} htmlFor={`nutritions-${data.value}`}>
+            <label className={css.label} htmlFor={`nutritions-${data.key}`}>
               <span className={css.checkboxWrapper}>
                 <IconCheckbox
                   checkedClassName={css.checked}

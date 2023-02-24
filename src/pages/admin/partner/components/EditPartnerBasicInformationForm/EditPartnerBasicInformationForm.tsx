@@ -13,6 +13,7 @@ import { LocationAutocompleteInputField } from '@components/LocationAutocomplete
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useViewport } from '@hooks/useViewport';
 import { EImageVariants, OTHER_OPTION, PACKAGING_OPTIONS } from '@utils/enums';
+import { isUploadImageOverLimitError } from '@utils/errors';
 import type { TImage } from '@utils/types';
 import {
   autocompletePlaceSelected,
@@ -192,44 +193,62 @@ const EditPartnerBasicInformationForm: React.FC<
         } = fieldRenderProps;
 
         const ready = !formError && isEqual(submittedValues, values);
+        const uploadImageError = uploadAvatarError || uploadCoverError;
+        const uploadOverLimit = isUploadImageOverLimitError(uploadImageError);
+
+        let uploadImageFailed = null;
+
+        if (uploadOverLimit) {
+          uploadImageFailed = intl.formatMessage({
+            id: 'FieldPhotoUpload.imageUploadFailed.uploadOverLimit',
+          });
+        } else if (uploadImageError) {
+          uploadImageFailed = intl.formatMessage({
+            id: 'FieldPhotoUpload.imageUploadFailed.uploadFailed',
+          });
+        }
+
         return (
           <Form className={css.root} onSubmit={handleSubmit}>
             <div className={css.mediaFields}>
               <h3 className={css.mediaTitle}>
                 <FormattedMessage id="EditPartnerForm.partnerCoverAndAvatar" />
               </h3>
-              <FieldPhotoUpload
-                name="cover"
-                accept={ACCEPT_IMAGES}
-                id="cover"
-                className={css.fieldCover}
-                image={uploadedCovers?.[0]}
-                variants={COVER_VARIANTS}
-                onImageUpload={onCoverUpload}
-                onRemoveImage={onRemoveCover}
-                uploadImageError={uploadCoverError}
-                validate={nonEmptyImage(
-                  intl.formatMessage({
-                    id: 'EditPartnerBasicInformationForm.coverRequired',
-                  }),
+              <div className={css.mediaFieldGroup}>
+                <FieldPhotoUpload
+                  name="cover"
+                  accept={ACCEPT_IMAGES}
+                  id="cover"
+                  className={css.fieldCover}
+                  image={uploadedCovers?.[0]}
+                  variants={COVER_VARIANTS}
+                  onImageUpload={onCoverUpload}
+                  onRemoveImage={onRemoveCover}
+                  validate={nonEmptyImage(
+                    intl.formatMessage({
+                      id: 'EditPartnerBasicInformationForm.coverRequired',
+                    }),
+                  )}
+                />
+                <FieldPhotoUpload
+                  name="avatar"
+                  image={uploadedAvatars?.[0]}
+                  accept={ACCEPT_IMAGES}
+                  id="avatar"
+                  className={css.fieldAvatar}
+                  onImageUpload={onAvatarUpload}
+                  onRemoveImage={onRemoveAvatar}
+                  variants={AVATAR_VARIANTS}
+                  validate={nonEmptyImage(
+                    intl.formatMessage({
+                      id: 'EditPartnerBasicInformationForm.avatarRequired',
+                    }),
+                  )}
+                />
+                {uploadImageFailed && (
+                  <ErrorMessage message={uploadImageFailed} />
                 )}
-              />
-              <FieldPhotoUpload
-                name="avatar"
-                image={uploadedAvatars?.[0]}
-                accept={ACCEPT_IMAGES}
-                id="avatar"
-                className={css.fieldAvatar}
-                onImageUpload={onAvatarUpload}
-                onRemoveImage={onRemoveAvatar}
-                uploadImageError={uploadAvatarError}
-                variants={AVATAR_VARIANTS}
-                validate={nonEmptyImage(
-                  intl.formatMessage({
-                    id: 'EditPartnerBasicInformationForm.avatarRequired',
-                  }),
-                )}
-              />
+              </div>
             </div>
             <div className={css.fields}>
               <FieldTextInput

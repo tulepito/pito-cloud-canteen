@@ -1,12 +1,20 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
 .root {
   margin-top: 72px;
 
   &.hasSideBar {
-    margin-left: 360px;
-    width: calc(100% - 360px);
+    margin-left: 292px;
+    width: calc(100% - 292px);
   }
 
   &.hasHeader {
-    margin-top: 162px;
+    margin-top: 130px;
+
+    @include viewportLarge {
+      margin-top: 145px;
+    }
   }
 }

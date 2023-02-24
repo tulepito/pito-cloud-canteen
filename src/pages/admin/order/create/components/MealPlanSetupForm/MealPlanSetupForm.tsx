@@ -8,6 +8,7 @@ import { useIntl } from 'react-intl';
 
 import DayInWeekField from '../DayInWeekField/DayInWeekField';
 import DeliveryAddressField from '../DeliveryAddressField/DeliveryAddressField';
+import DurationForNextOrderField from '../DurationForNextOrderField/DurationForNextOrderField';
 import FoodPickingField from '../FoodPickingField/FoodPickingField';
 import MealPlanDateField from '../MealPlanDateField/MealPlanDateField';
 import MemberAmountField from '../MemberAmountField/MemberAmountField';
@@ -21,6 +22,7 @@ import css from './MealPlanSetupForm.module.scss';
 
 export type TMealPlanSetupFormValues = {
   pickAllow: boolean;
+  displayedDurationTime: string;
 };
 
 type TExtraProps = {
@@ -88,6 +90,13 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
         />
         <div className={css.verticalSpace}>
           <DayInWeekField form={form} values={values} />
+        </div>
+
+        <div className={css.verticalSpace}>
+          <DurationForNextOrderField
+            form={form}
+            displayedDurationTimeValue={values.displayedDurationTime}
+          />
         </div>
       </div>
 

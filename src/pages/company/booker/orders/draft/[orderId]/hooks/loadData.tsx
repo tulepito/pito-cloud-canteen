@@ -1,6 +1,9 @@
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { useEffect } from 'react';
+import { Listing } from '@utils/data';
+import type { TListing } from '@utils/types';
+import { useEffect, useMemo } from 'react';
+import { shallowEqual } from 'react-redux';
 
 import { BookerDraftOrderPageThunks } from '../BookerDraftOrderPage.slice';
 import { normalizePlanDetailsToEvent } from '../helpers/normalizeData';
@@ -12,6 +15,9 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
   );
   const fetchOrderError = useAppSelector(
     (state) => state.Order.fetchOrderError,
+  );
+  const companyAccount = useAppSelector(
+    (state) => state.BookerDraftOrderPage.companyAccount,
   );
 
   const dispatch = useAppDispatch();
@@ -27,12 +33,20 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
     order,
     fetchOrderInProgress,
     fetchOrderError,
+    companyAccount,
   };
 };
 
-export const useLoadPlanDetails = () => {
-  const order = useAppSelector((state) => state.Order.order);
-  const orderDetail = useAppSelector((state) => state.Order.orderDetail);
+export const useLoadPlanDetails = ({
+  coverImageList,
+}: {
+  coverImageList: any;
+}) => {
+  const order = useAppSelector((state) => state.Order.order, shallowEqual);
+  const orderDetail = useAppSelector(
+    (state) => state.Order.orderDetail,
+    shallowEqual,
+  );
   const fetchOrderDetailInProgress = useAppSelector(
     (state) => state.Order.fetchOrderDetailInProgress,
   );
@@ -42,13 +56,19 @@ export const useLoadPlanDetails = () => {
 
   const dispatch = useAppDispatch();
 
+  const { plans = [] } = Listing(order as TListing).getMetadata();
+
   useEffect(() => {
     if (order) {
-      dispatch(orderAsyncActions.fetchOrderDetail());
+      dispatch(orderAsyncActions.fetchOrderDetail(plans));
     }
-  }, [dispatch, order]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, JSON.stringify(order)]);
 
-  const normalizeData = normalizePlanDetailsToEvent(orderDetail, order);
+  const normalizeData = useMemo(() => {
+    return normalizePlanDetailsToEvent(orderDetail, order, coverImageList);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coverImageList, JSON.stringify(order), JSON.stringify(orderDetail)]);
 
   return {
     rawOrderDetail: orderDetail,

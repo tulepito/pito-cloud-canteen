@@ -35,6 +35,12 @@ const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
     }
   }, [initialFoodList]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      setFoodCount(0);
+    }
+  }, [isOpen]);
+
   const handleFormChange = (food: string[] | undefined) => {
     setFoodCount(food?.length || 0);
   };

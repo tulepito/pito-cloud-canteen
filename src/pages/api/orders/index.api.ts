@@ -12,12 +12,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (apiMethod) {
     case HTTP_METHODS.POST:
       try {
-        const { companyId, bookerId, isCreatedByAdmin } = req.body;
+        const { companyId, bookerId, isCreatedByAdmin, generalInfo } = req.body;
 
         const orderListing = await createOrder({
           companyId,
           bookerId,
           isCreatedByAdmin,
+          generalInfo,
         });
         await createPlan({ orderId: orderListing?.id?.uuid, orderDetail: {} });
 

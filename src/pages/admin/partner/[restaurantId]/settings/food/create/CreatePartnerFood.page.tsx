@@ -26,19 +26,17 @@ const CreatePartnerFoodPage = () => {
     currentFoodListing,
     showFoodInProgress,
     showFoodError,
+    uploadingImages,
   } = useAppSelector((state) => state.foods, shallowEqual);
   const redirectToEditPage = (listing: TIntegrationListing) => {
-    setTimeout(() => {
-      const foodId = listing?.id?.uuid;
-      if (foodId)
-        return router.push({
-          pathname: adminRoutes.EditPartnerFood.path,
-          query: {
-            foodId,
-            restaurantId,
-          },
-        });
-    }, 1000);
+    const foodId = listing?.id?.uuid;
+    if (foodId)
+      return router.push({
+        pathname: adminRoutes.ManagePartnerFoods.path,
+        query: {
+          restaurantId,
+        },
+      });
   };
   const handleSubmit = async (values: TEditPartnerFoodFormValues) => {
     if (duplicateId) {
@@ -108,6 +106,7 @@ const CreatePartnerFoodPage = () => {
         onSubmit={handleSubmit}
         initialValues={initialValues}
         inProgress={createFoodInProgress}
+        disabled={uploadingImages || createFoodInProgress}
         formError={createFoodError}
       />
     </>

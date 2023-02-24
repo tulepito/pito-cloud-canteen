@@ -2,6 +2,7 @@ import type { TDefaultProps, TIconProps } from '@utils/types';
 import classNames from 'classnames';
 import type { PaginationProps as RCPaginationProps } from 'rc-pagination';
 import ExternalPagination from 'rc-pagination';
+import Select from 'rc-select';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
@@ -51,6 +52,10 @@ const PreviousIcon: React.FC<TIconProps> = (props) => {
       />
     </svg>
   );
+};
+
+const localeVi = {
+  items_per_page: '/ trang',
 };
 
 type TPaginationProps = TDefaultProps &
@@ -114,6 +119,8 @@ const Pagination: React.FC<TPaginationProps> = (props) => {
     showTotal: customShowTotal,
     nextIcon,
     prevIcon,
+    selectComponentClass: Select,
+    locale: localeVi,
   };
   return <ExternalPagination {...paginationProps} />;
 };

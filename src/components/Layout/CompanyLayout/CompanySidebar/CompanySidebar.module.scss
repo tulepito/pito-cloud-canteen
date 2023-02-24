@@ -1,8 +1,9 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  min-width: 360px;
+  min-width: 296px;
   position: fixed;
   height: 100vh;
   z-index: 1;
@@ -15,4 +16,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.companyName {
+  @include textTemplate(24px, $fontWeightBold, 32px);
+  color: $neutralGray6;
+  padding: 32px 24px 0;
 }

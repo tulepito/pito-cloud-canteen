@@ -1,3 +1,4 @@
+import IconMenu from '@components/Icons/IconMenu/IconMenu';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useFetchSearchFilters from '@hooks/useFetchSearchFilters';
 import KeywordSearchForm from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
@@ -265,7 +266,7 @@ function BookerSelectRestaurant() {
             [css.filterMobileMenuOpened]: filterMobileMenuOpen,
           })}
           onClick={handleFilterMobileMenuClick}>
-          Menu
+          <IconMenu />
         </div>
         <div
           className={classNames(css.sidebar, {

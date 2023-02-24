@@ -32,6 +32,8 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   onBack,
 }) => {
   const [currentRestaurant, setCurrentRestaurant] = useState<any>();
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
   const intl = useIntl();
   const { value: isModalOpen, setValue: setModalOpen } = useBoolean();
   const dispatch = useAppDispatch();
@@ -61,13 +63,9 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     nutritions = [],
   } = Listing(order as TListing).getMetadata();
   const shouldShowRestaurantPagination =
-    !!restaurants && restaurants?.length > 0 && fetchRestaurantsPending;
-  const {
-    totalItems: total,
-    page: current,
-    perPage: pageSize = 100,
-  } = pagination || {};
-  const paginationProps = { total, current, pageSize };
+    !!restaurants && restaurants?.length > 0 && !fetchRestaurantsPending;
+  const { totalItems: total } = pagination || {};
+  const paginationProps = { total, current: page, pageSize: perPage };
   const showModalCondition = isModalOpen && !fetchFoodPending;
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
@@ -84,15 +82,26 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     },
   );
 
-  const handlePageChange = (page: number) => {
-    const params = {
-      page,
-      dateTime,
-      packagePerMember,
-      deliveryHour,
-      nutritions,
-    };
-    dispatch(selectRestaurantPageThunks.getRestaurants(params));
+  useEffect(() => {
+    dispatch(
+      selectRestaurantPageThunks.getRestaurants({
+        dateTime,
+        packagePerMember,
+        deliveryHour,
+        nutritions,
+        page,
+        perPage,
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [packagePerMember, deliveryHour, nutritions, dispatch, page, perPage]);
+
+  const handlePageChange = (pageValue: number) => {
+    setPage(pageValue);
+  };
+
+  const handlePerPageChange = (pageValue: number, perPageValue: number) => {
+    setPerPage(perPageValue);
   };
 
   const handleCloseModal = () => {
@@ -141,6 +150,9 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       id: currRestaurantId,
       restaurantName: currentRestaurant?.attributes?.title,
       phoneNumber: currentRestaurant?.attributes?.publicData?.phoneNumber,
+      menuId: restaurants?.find(
+        (restaurant) => restaurant.restaurantInfo.id.uuid === currRestaurantId,
+      ).menu.id.uuid,
     };
 
     onSubmitRestaurant({
@@ -162,17 +174,6 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     setCurrentRestaurant(restaurantInfo);
     setModalOpen(true);
   };
-
-  useEffect(() => {
-    dispatch(
-      selectRestaurantPageThunks.getRestaurants({
-        dateTime,
-        packagePerMember,
-        deliveryHour,
-        nutritions,
-      }),
-    );
-  }, [deliveryHour, dispatch, nutritions, packagePerMember]);
 
   return (
     <section className={css.root}>
@@ -197,7 +198,12 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       />
       {shouldShowRestaurantPagination && (
         <div className={css.paginationContainer}>
-          <Pagination {...paginationProps} onChange={handlePageChange} />
+          <Pagination
+            showSizeChanger
+            {...paginationProps}
+            onChange={handlePageChange}
+            onShowSizeChange={handlePerPageChange}
+          />
         </div>
       )}
       <SelectFoodModal

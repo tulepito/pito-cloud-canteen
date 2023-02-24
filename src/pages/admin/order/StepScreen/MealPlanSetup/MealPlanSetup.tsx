@@ -40,6 +40,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     deadlineDate,
     deadlineHour,
     memberAmount,
+    displayedDurationTime,
+    durationTimeMode,
   } = Listing(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const companies = useAppSelector(
@@ -81,7 +83,23 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
         ...rest,
       };
-      await dispatch(orderAsyncActions.updateOrder({ generalInfo }));
+      const { payload }: { payload: any } = await dispatch(
+        orderAsyncActions.updateOrder({ generalInfo }),
+      );
+      const { orderListing } = payload || {};
+      const orderId = Listing(orderListing as TListing).getId();
+      const { plans = [] } = Listing(orderListing as TListing).getMetadata();
+      const planId = plans[0];
+      const { payload: recommendOrderDetail }: any = await dispatch(
+        orderAsyncActions.recommendRestaurants(),
+      );
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId,
+          orderDetail: recommendOrderDetail,
+        }),
+      );
       nextTab();
     },
     [dispatch, nextTab],
@@ -118,6 +136,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       deadlineDate: deadlineDate || null,
       deadlineHour: deadlineHour || '07:00',
       memberAmount: allMembersAmount,
+      durationTimeMode: durationTimeMode || 'week',
+      displayedDurationTime: displayedDurationTime || 1,
     }),
     [
       dayInWeek,
@@ -139,6 +159,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       deadlineDate,
       deadlineHour,
       allMembersAmount,
+      displayedDurationTime,
+      durationTimeMode,
     ],
   );
   return (

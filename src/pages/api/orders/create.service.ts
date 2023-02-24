@@ -8,6 +8,7 @@ import {
   EListingStates,
   EOrderDraftStates,
 } from '@utils/enums';
+import type { TObject } from '@utils/types';
 
 const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 
@@ -15,10 +16,12 @@ const createOrder = async ({
   companyId,
   bookerId,
   isCreatedByAdmin,
+  generalInfo = {},
 }: {
   companyId: string;
   bookerId: string;
   isCreatedByAdmin: boolean;
+  generalInfo?: TObject;
 }) => {
   const integrationSdk = getIntegrationSdk();
   const updatedAt = new Date().getTime();
@@ -53,6 +56,16 @@ const createOrder = async ({
     },
   ];
 
+  // Prepare general info
+  const {
+    deliveryAddress,
+    deliveryHour,
+    deadlineHour,
+    nutritions,
+    selectedGroups,
+    packagePerMember,
+  } = generalInfo;
+
   // Call api to create order listing
   const orderListingResponse = await integrationSdk.listings.create(
     {
@@ -67,6 +80,12 @@ const createOrder = async ({
           ? EOrderDraftStates.draft
           : EBookerOrderDraftStates.bookerDraft,
         orderStateHistory,
+        deliveryAddress,
+        deliveryHour,
+        deadlineHour,
+        nutritions,
+        selectedGroups,
+        packagePerMember,
       },
     },
     { expand: true },
