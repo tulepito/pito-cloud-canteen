@@ -20,7 +20,7 @@
 }
 
 .customInput {
-  width: 300px;
+  width: 100%;
   input {
     @include inputStyles;
     width: 100%;
@@ -35,9 +35,9 @@
 }
 
 .fieldSelect {
-  width: 300px;
+  width: 100%;
 }
 
 .inputField {
-  width: 300px;
+  width: 100%;
 }

@@ -1,0 +1,35 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.fieldContainer {
+  margin: 0 auto;
+  width: fit-content;
+}
+
+.separatorLine {
+  border-bottom: 1px solid $neutralGray4;
+  margin-top: 28px;
+}
+
+.datePickersWrapper {
+  width: fit-content;
+  margin: 0 auto;
+
+  .planDurationFieldContainer {
+    margin-top: 24px;
+  }
+
+  .deadlineFieldContainer {
+    width: 100%;
+  }
+
+  .deadlineFieldLayout {
+    gap: 24px;
+    margin-top: 24px;
+  }
+}
+
+.dateLayout {
+  gap: 24px;
+}

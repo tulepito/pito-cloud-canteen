@@ -3,6 +3,11 @@
 @use '/src/styles/mixins.scss' as *;
 
 .container {
+  .fieldLabel {
+    @include textTemplate(14px, $fontWeightRegular, 20px);
+    color: $neutralGray6;
+    margin-bottom: 4px;
+  }
   .durationTimeInput {
     width: 44px;
     margin-right: 20px;
@@ -24,15 +29,14 @@
   margin-right: 20px;
 }
 .viewMode {
-  height: 44px;
-  min-height: 44px;
+  height: 36px;
+  min-height: 36px;
 
   padding: 6px 24px;
   text-align: center;
   background: transparent;
   border-radius: 24px;
   -webkit-tap-highlight-color: transparent;
-
   @include textTemplate(16px, $fontWeightBold, 24px, '');
   color: $neutralGray5;
 

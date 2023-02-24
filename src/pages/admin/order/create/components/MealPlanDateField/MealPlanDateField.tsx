@@ -23,6 +23,8 @@ type MealPlanDateFieldProps = {
   values: Record<string, any>;
   columnLayout?: boolean;
   title?: string;
+  layoutClassName?: string;
+  containerClassName?: string;
   onCustomStartDateChange?: (date: number) => void;
 };
 
@@ -79,6 +81,8 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
     form,
     title,
     onCustomStartDateChange,
+    layoutClassName,
+    containerClassName,
   } = props;
   const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
     values;
@@ -107,9 +111,13 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
     id: 'MealPlanDateField.deliveryHourRequired',
   });
 
-  const fieldGroupLayout = classNames(css.fieldGroups, {
-    [css.column]: columnLayout,
-  });
+  const fieldGroupLayout = classNames(
+    css.fieldGroups,
+    {
+      [css.column]: columnLayout,
+    },
+    layoutClassName,
+  );
   const maxEndDate = startDate ? addDays(startDate, 6) : undefined;
   const handleStartDateChange = (value: any, prevValue: any) => {
     if (endDateInitialValue && value !== prevValue) {
@@ -132,8 +140,9 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
     !endDate && css.placeholder,
   );
 
+  const containerClasses = classNames(css.container, containerClassName);
   return (
-    <div className={css.container}>
+    <div className={containerClasses}>
       {title && <div className={css.fieldTitle}>{title}</div>}
       <OnChange name="startDate">{handleStartDateChange}</OnChange>
       <div className={fieldGroupLayout}>

@@ -20,9 +20,11 @@ const DAY_IN_WEEK = [
 type DayInWeekFieldProps = {
   form: any;
   values: Record<string, any>;
+  title?: string;
+  containerClassName?: string;
 };
 const DayInWeekField: React.FC<DayInWeekFieldProps> = (props) => {
-  const { form, values } = props;
+  const { form, values, title, containerClassName } = props;
   const intl = useIntl();
   const { dayInWeek = [], startDate, endDate } = values;
   const [selectedDays, setSelectedDays] = useState<string[]>(dayInWeek);
@@ -38,11 +40,11 @@ const DayInWeekField: React.FC<DayInWeekFieldProps> = (props) => {
   useEffect(() => {
     form.change('dayInWeek', selectedDays);
   }, [form, selectedDays, selectedDays.length]);
+
+  const containerClasses = classNames(css.container, containerClassName);
   return (
-    <div className={css.container}>
-      <div className={css.fieldLabel}>
-        {intl.formatMessage({ id: 'DayInWeekField.label' })}
-      </div>
+    <div className={containerClasses}>
+      {title && <div className={css.title}>{title}</div>}
       <FieldTextInput id="dayInWeek" name="dayInWeek" type="hidden" />
       <div className={css.fieldGroups}>
         {DAY_IN_WEEK.map((day) => {

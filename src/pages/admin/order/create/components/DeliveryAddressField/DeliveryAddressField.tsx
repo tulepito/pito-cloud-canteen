@@ -1,21 +1,24 @@
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import { addressRequired } from '@utils/validators';
+import classNames from 'classnames';
 import { useIntl } from 'react-intl';
 
 import css from './DeliveryAddressField.module.scss';
 
 type DeliveryAddressFieldProps = {
   title?: string;
+  containerClassName?: string;
 };
 const DeliveryAddressField: React.FC<DeliveryAddressFieldProps> = (props) => {
-  const { title } = props;
+  const { title, containerClassName } = props;
   const intl = useIntl();
   const deliveryAddressRequiredMessage = intl.formatMessage({
     id: 'DeliveryAddressField.title',
   });
+  const containerClasses = classNames(css.container, containerClassName);
   return (
-    <div className={css.container}>
+    <div className={containerClasses}>
       {title && <div className={css.fieldTitle}>{title}</div>}
       <LocationAutocompleteInputField
         id="deliveryAddress"
