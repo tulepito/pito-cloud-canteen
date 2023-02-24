@@ -154,7 +154,7 @@ const companyInfo = createAsyncThunk(
       groupList: groups,
       company: companyAccount,
       originCompanyMembers: members,
-      companyMembers: [...allEmployeesData.data.data],
+      companyMembers: allEmployeesData,
       favoriteRestaurants,
       favoriteFood,
     };
