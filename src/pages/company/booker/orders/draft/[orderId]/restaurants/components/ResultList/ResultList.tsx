@@ -46,7 +46,7 @@ const ResultList: React.FC<TResultListProps> = ({
 
   const dispatch = useAppDispatch();
 
-  const onRestaurantClick = (id: string) => () => {
+  const onRestaurantClick = (id: string) => {
     detailModal.setTrue();
     setSelectedRestaurantId(id);
     dispatch(
@@ -96,7 +96,7 @@ const ResultList: React.FC<TResultListProps> = ({
         {!isLoading &&
           restaurants.map((restaurant) => (
             <RestaurantCard
-              onClick={onRestaurantClick(restaurant?.id.uuid)}
+              onClick={onRestaurantClick}
               key={restaurant?.id.uuid}
               className={css.card}
               restaurant={restaurant}

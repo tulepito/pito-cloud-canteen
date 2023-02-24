@@ -13,11 +13,9 @@ import {
   PACKAGING_OPTIONS,
 } from '@utils/enums';
 import classNames from 'classnames';
-import Image from 'next/image';
 import React from 'react';
 
 import css from './RestaurantCard.module.scss';
-import coverImg from './restaurantPlaceholder.png';
 
 type TRestaurantCardProps = {
   className?: string;
@@ -59,8 +57,9 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
     totalRatings.find(
       (_restaurant) => _restaurant.restaurantId === restaurantId,
     )?.totalReviews || 0;
+
   const handleClickCard = () => {
-    onClick('123');
+    onClick(restaurantId);
   };
 
   return (
@@ -75,7 +74,6 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
           image={restaurantCoverImage}
           variants={[EImageVariants.default]}
         />
-        <Image src={coverImg} alt="card" onClick={handleClickCard} />
       </div>
       <div className={css.header}>
         <p className={css.restaurantName} onClick={handleClickCard}>
