@@ -30,8 +30,9 @@ type TNormalizedOrderDetail = {
         }[];
       };
     };
-    bookingStart: number;
-    bookingEnd: number;
+    bookingStart: Date;
+    bookingEnd: Date;
+    bookingDisplayStart: Date;
   };
 
   shouldCancel?: boolean;
@@ -57,10 +58,13 @@ const normalizeOrderDetail = ({
         memberOrders: memberOrdersMap,
       } = orderOfDate;
       const startDate = DateTime.fromMillis(Number(date));
-      const bookingStart = startDate
-        .plus({ ...convertHHmmStringToTimeParts(deliveryHour) })
-        .toMillis();
-      const bookingEnd = startDate.plus({ days: 1 }).toMillis();
+      const bookingStart = startDate.toJSDate();
+      const bookingEnd = startDate.plus({ days: 1 }).toJSDate();
+      const bookingDisplayStart = startDate
+        .plus({
+          ...convertHHmmStringToTimeParts(deliveryHour),
+        })
+        .toJSDate();
 
       const { participantIds, bookingInfo } = Object.entries(
         memberOrdersMap,
@@ -104,6 +108,7 @@ const normalizeOrderDetail = ({
           extendedData,
           bookingStart,
           bookingEnd,
+          bookingDisplayStart,
         },
         shouldCancel: isEmpty(participantIds),
         date,
@@ -173,14 +178,23 @@ export const initiateTransaction = async ({
     planOrderDetail,
     deliveryHour,
   });
+  console.log(
+    '🚀 ~ normalizedOrderDetail:',
+    JSON.stringify(normalizedOrderDetail, null, 2),
+  );
 
   const transactionMap: TObject = {};
-
   // Initiate transaction for each date
   await Promise.all(
     normalizedOrderDetail.map(async (item) => {
       const {
-        params: { listingId, bookingStart, bookingEnd, extendedData },
+        params: {
+          listingId,
+          bookingStart,
+          bookingEnd,
+          bookingDisplayStart,
+          extendedData,
+        },
         shouldCancel,
         date,
       } = item;
@@ -197,6 +211,8 @@ export const initiateTransaction = async ({
             listingId,
             bookingStart,
             bookingEnd,
+            bookingDisplayStart,
+            bookingDisplayEnd: bookingEnd,
             ...extendedData,
           },
         },
@@ -211,10 +227,12 @@ export const initiateTransaction = async ({
   );
 
   // Update new order detail of plan listing
+  console.time('update new order detail of plan listing');
   await integrationSdk.listings.update({
     id: planId,
     metadata: {
       orderDetail: prepareNewPlanOrderDetail(planOrderDetail, transactionMap),
     },
   });
+  console.timeEnd('update new order detail of plan listing');
 };

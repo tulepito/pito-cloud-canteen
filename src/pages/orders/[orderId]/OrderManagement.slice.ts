@@ -168,12 +168,13 @@ const addOrUpdateMemberOrder = createAsyncThunk(
     } = getState().OrderManagement.orderData!;
     const {
       id: { uuid: planId },
-      attributes: { metadata },
+      attributes: { metadata = {} },
     } = getState().OrderManagement.planData!;
 
     const memberOrderDetailOnUpdateDate =
-      metadata?.orderDetail[currentViewDate].memberOrders[memberId];
-    const { foodId: oldFoodId, status } = memberOrderDetailOnUpdateDate;
+      metadata?.orderDetail[currentViewDate.toString()].memberOrders[memberId];
+    const { foodId: oldFoodId, status = EParticipantOrderStatus.empty } =
+      memberOrderDetailOnUpdateDate || {};
 
     if (foodId === '' || oldFoodId === foodId) {
       return;
@@ -415,7 +416,7 @@ const deleteParticipant = createAsyncThunk(
           ...result,
           [date]: {
             ...(orderDetailOnDate as TObject),
-            memberOrders: omit(memberOrders, participantId),
+            memberOrders: omit(memberOrders, [participantId]),
           },
         };
       },

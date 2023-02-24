@@ -1,10 +1,11 @@
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { Listing } from '@utils/data';
 import { renderDateRange } from '@utils/dates';
 import { EParticipantOrderStatus } from '@utils/enums';
-import type { TObject, TUser } from '@utils/types';
-import get from 'lodash/get';
+import type { TListing, TObject, TUser } from '@utils/types';
+import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -30,11 +31,12 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const [currentViewDate, setCurrentViewDate] = useState(startDate);
-  const { planData, participantData } = useAppSelector(
+  const { planData, participantData, orderData } = useAppSelector(
     (state) => state.OrderManagement,
   );
 
-  const orderDetail = get(planData, 'attributes.metadata.orderDetail', {});
+  const { participants = [] } = Listing(orderData as TListing).getMetadata();
+  const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
   const dateList = renderDateRange(startDate, endDate);
 
   const { restaurant = {}, memberOrders = {} } =
@@ -51,22 +53,21 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
   );
 
   // Available member IDs to add order details
-  const availableMemberIds = Object.entries<TObject>(memberOrders).reduce<
-    string[]
-  >((result, current) => {
-    const [memberId, order] = current;
-    const { status } = order;
+  const availableMemberIds = isEmpty(memberOrders)
+    ? participants
+    : (participants as string[]).reduce<string[]>((result, participantId) => {
+        const { status = EParticipantOrderStatus.empty } =
+          memberOrders[participantId] || {};
 
-    if (
-      status === EParticipantOrderStatus.empty ||
-      status === EParticipantOrderStatus.notJoined
-    ) {
-      return [...result, memberId];
-    }
-    return result;
-  }, []);
+        return [
+          EParticipantOrderStatus.empty,
+          EParticipantOrderStatus.notJoined,
+        ].includes(status)
+          ? result.concat(participantId)
+          : result;
+      }, []);
 
-  const memberOptions = availableMemberIds.map((memberId) => {
+  const memberOptions = availableMemberIds.map((memberId: string) => {
     const participant = participantData.find(
       (p: TUser) => p.id.uuid === memberId,
     );
