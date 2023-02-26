@@ -15,6 +15,7 @@ const IconDelivering: React.FC<TIconProps> = (props) => {
       height="28"
       viewBox="0 0 29 28"
       fill="none"
+      preserveAspectRatio="none"
       xmlns="http://www.w3.org/2000/svg">
       <rect x="0.5" width="28" height="28" rx="14" fill="#171760" />
       <g clipPath="url(#clip0_6183_5093)">

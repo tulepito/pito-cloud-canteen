@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
@@ -316,11 +317,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   useEffect(() => {
     dispatch(orderAsyncActions.fetchOrderDetail(plans));
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     dispatch(orderAsyncActions.fetchRestaurantCoverImages());
-  }, [dispatch, orderDetail]);
+  }, []);
 
   const handleSelectFood = (values: TSelectFoodFormValues) => {
     const { food: foodIds } = values;

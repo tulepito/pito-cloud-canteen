@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { getCompanyIdFromBookerUser } from '@helpers/company';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
@@ -47,7 +48,11 @@ const ManageCompanyOrdersPage: React.FC<TManageCompanyOrdersPageProps> = () => {
       const companyId = getCompanyIdFromBookerUser(currentUser);
       replace({ pathname: companyPaths.ManageOrders, query: { companyId } });
     }
-  }, [isReady, companyIdFormQuery, replace, currentUser, router]);
+  }, [
+    isReady,
+    JSON.stringify(companyIdFormQuery as string),
+    JSON.stringify(currentUser),
+  ]);
 
   return (
     <div className={css.root}>

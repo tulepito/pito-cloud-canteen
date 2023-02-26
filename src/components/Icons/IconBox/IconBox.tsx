@@ -15,6 +15,7 @@ const IconBox: React.FC<TIconProps> = (props) => {
       height={16}
       viewBox="0 0 17 16"
       fill="none"
+      preserveAspectRatio="none"
       xmlns="http://www.w3.org/2000/svg">
       <g clipPath="url(#clip0_6095_3875)">
         <path

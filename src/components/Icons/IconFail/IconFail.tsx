@@ -15,6 +15,7 @@ const IconFail: React.FC<TIconProps> = (props) => {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
+      preserveAspectRatio="none"
       xmlns="http://www.w3.org/2000/svg">
       <g clipPath="url(#clip0_6183_3411)">
         <path

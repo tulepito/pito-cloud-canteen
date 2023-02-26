@@ -16,7 +16,7 @@ const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
     className,
     items,
     itemComponent: ItemComponent,
-    // itemClassName,
+
     haveNavigators = false,
   } = props;
   const containerRef = useRef(null);
@@ -24,9 +24,6 @@ const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
   const currentCtnRef = containerRef.current as any;
 
   const rootClasses = classNames(rootClassName || css.root, className);
-  // const itemClasses = (isActive: boolean) =>
-  // classNames(css.item, { [css.isActive]: isActive }, itemClassName);
-
   const totalItems = items.length;
 
   const itemsToRender = items.reduce<ReactNode[]>(
