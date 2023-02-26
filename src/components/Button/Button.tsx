@@ -9,11 +9,13 @@ import css from './Button.module.scss';
 
 export type TButtonSize = 'large' | 'medium' | 'small';
 export type TButtonVariant = 'primary' | 'secondary' | 'cta' | 'inline';
+export type TButtonLoadingMode = 'replace' | 'extend';
 
 type TButtonProps = PropsWithChildren<
   TDefaultProps & {
     spinnerClassName?: string;
     inProgress?: boolean;
+    loadingMode?: TButtonLoadingMode;
     ready?: boolean;
     disabled?: boolean;
     checkmarkClassName?: string;
@@ -44,6 +46,7 @@ const Button: React.FC<TButtonProps> = (props) => {
     className,
     spinnerClassName,
     inProgress = false,
+    loadingMode = 'replace',
     ready = false,
     disabled = false,
     children,
@@ -60,7 +63,21 @@ const Button: React.FC<TButtonProps> = (props) => {
 
   let content;
   if (inProgress) {
-    content = <IconSpinner rootClassName={spinnerClassName || css.spinner} />;
+    if (loadingMode === 'replace') {
+      content = <IconSpinner className={spinnerClassName || css.spinner} />;
+    } else {
+      content = (
+        <>
+          {children}
+          <IconSpinner
+            className={classNames(
+              spinnerClassName || css.spinner,
+              css.extendSpinner,
+            )}
+          />
+        </>
+      );
+    }
   } else if (ready) {
     content = (
       <IconCheckmark rootClassName={checkmarkClassName || css.checkmark} />

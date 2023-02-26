@@ -58,9 +58,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   const createOrderError = useAppSelector(
     (state) => state.Order.createOrderError,
   );
-  // const fetchBookersError = useAppSelector(
-  //   (state) => state.Order.fetchBookersError,
-  // );
+
   const {
     value: createOrderFailingModalOpen,
     setTrue: openCreateOrderFailingModal,
@@ -80,17 +78,17 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
       openCreateOrderFailingModal();
     }
   }, [createOrderError, openCreateOrderFailingModal]);
-  const updateStatus = useCallback(
-    (updateData: TUpdateStatus) => {
-      dispatch(
-        manageCompaniesThunks.updateCompanyStatus({
-          dataParams: updateData,
-          queryParams: { expand: true },
-        }),
-      );
-    },
-    [dispatch, manageCompaniesThunks],
-  );
+
+  const updateStatus = useCallback((updateData: TUpdateStatus) => {
+    dispatch(
+      manageCompaniesThunks.updateCompanyStatus({
+        dataParams: updateData,
+        queryParams: { expand: true },
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const filteredCompanies = useMemo(
     () => filterCompanies(companyRefs, queryParams),
     [queryParams, companyRefs],

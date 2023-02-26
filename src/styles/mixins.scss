@@ -43,13 +43,14 @@ $buttonBorderRadius: 8px;
 }
 
 @mixin buttonBorders {
-  border: none;
+  border: 1px solid transparent;
   border-radius: $buttonBorderRadius;
 }
 
 @mixin buttonColorPrimary {
   background: $neutralGray6;
   color: $neutralGray1;
+
   .spinner {
     width: 24px;
     height: 24px;
@@ -60,8 +61,7 @@ $buttonBorderRadius: 8px;
   &:focus,
   &:hover {
     background: $neutralGray1;
-    outline: 1px solid $neutralGray6;
-    outline-offset: -1px;
+    border-color: $neutralGray6;
     color: $neutralGray6;
 
     .spinner {
@@ -72,8 +72,7 @@ $buttonBorderRadius: 8px;
   &:disabled {
     background: $neutralGray2;
     color: $neutralGray4;
-    outline: 1px solid $neutralGray4;
-    outline-offset: -1px;
+    border-color: $neutralGray4;
     cursor: not-allowed;
   }
 }
@@ -81,8 +80,7 @@ $buttonBorderRadius: 8px;
 @mixin buttonColorSecondary {
   background-color: $neutralGray1;
   color: $neutralGray6;
-  outline: 1px solid $neutralGray6;
-  outline-offset: -1px;
+  border: 1px solid $neutralGray4;
 
   .spinner {
     stroke: $neutralGray6;
@@ -92,7 +90,7 @@ $buttonBorderRadius: 8px;
   &:hover {
     background-color: $neutralGray6;
     color: $neutralGray1;
-    outline: 1px solid $neutralGray1;
+    border-color: $neutralGray1;
 
     .spinner {
       stroke: $neutralGray1;
@@ -102,7 +100,7 @@ $buttonBorderRadius: 8px;
   &:disabled {
     background-color: $neutralGray2;
     color: $neutralGray4;
-    outline: 1px solid $neutralGray4;
+    border-color: $neutralGray4;
   }
 }
 
@@ -115,12 +113,10 @@ $buttonBorderRadius: 8px;
   &:focus,
   &:hover {
     background-color: $neutralGray2;
-    outline: none;
   }
 
   &:disabled {
     color: $neutralGray4;
-    outline: none;
     background-color: $neutralGray1;
   }
 }
@@ -129,16 +125,16 @@ $buttonBorderRadius: 8px;
   background-color: $primaryPri2;
   color: $neutralGray1;
   outline: none;
-  border: none;
+
   .spinner {
     stroke: $neutralGray1;
   }
 
   &:focus,
   &:hover {
-    outline: none;
     background-color: $buttonCTAHoverColor;
     color: $neutralGray1;
+    border-color: transparent;
 
     .spinner {
       stroke: $primaryPri2;
@@ -148,8 +144,7 @@ $buttonBorderRadius: 8px;
   &:disabled {
     background: $neutralGray2;
     color: $neutralGray4;
-    outline: 1px solid $neutralGray4;
-    outline-offset: -1px;
+    border: 1px solid $neutralGray4;
   }
 }
 

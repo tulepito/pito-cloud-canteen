@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
@@ -6,7 +7,6 @@ import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import IconEye from '@components/Icons/IconEye/IconEye';
 import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
-import Meta from '@components/Layout/Meta';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
@@ -175,13 +175,17 @@ const TABLE_COLUMN: TColumn[] = [
       return (
         <div className={css.tableActions}>
           <Link href={`/admin/company/${data.id}/edit`}>
-            <Button className={classNames(css.actionButton, css.editButton)}>
-              <IconEdit />
+            <Button
+              variant="inline"
+              className={classNames(css.actionButton, css.editButton)}>
+              <IconEdit className={css.icon} />
             </Button>
           </Link>
           <Link href={`/admin/company/${data.id}`}>
-            <Button className={classNames(css.actionButton, css.editButton)}>
-              <IconEye />
+            <Button
+              variant="inline"
+              className={classNames(css.actionButton, css.editButton)}>
+              <IconEye className={css.icon} />
             </Button>
           </Link>
         </div>
@@ -199,19 +203,16 @@ const TABLE_COLUMN: TColumn[] = [
 
 export default function ManageCompanies() {
   const intl = useIntl();
-  const { value: mounted, setValue: setMounted } = useBoolean(false);
   const router = useRouter();
+  const { value: mounted, setValue: setMounted } = useBoolean(false);
+  const [pageSize] = useState<number>(10);
+
   const { query, pathname } = router;
   const { page = 1, ...queryParams } = query;
-  const [pageSize] = useState<number>(10);
+
   const title = intl.formatMessage({
     id: 'ManageCompanies.title',
   });
-
-  const description = intl.formatMessage({
-    id: 'ManageCompanies.description',
-  });
-
   const { companyRefs, queryCompaniesInProgress, queryCompaniesError } =
     useAppSelector((state) => state.ManageCompaniesPage);
 
@@ -234,17 +235,14 @@ export default function ManageCompanies() {
     totalItems: filteredCompanies.length,
   };
 
-  const updateStatus = useCallback(
-    (updateData: TUpdateStatus) => {
-      dispatch(
-        manageCompaniesThunks.updateCompanyStatus({
-          dataParams: updateData,
-          queryParams: { expand: true },
-        }),
-      );
-    },
-    [dispatch, manageCompaniesThunks],
-  );
+  const updateStatus = useCallback((updateData: TUpdateStatus) => {
+    dispatch(
+      manageCompaniesThunks.updateCompanyStatus({
+        dataParams: updateData,
+        queryParams: { expand: true },
+      }),
+    );
+  }, []);
 
   const companiesTableData = useMemo(
     () =>
@@ -280,7 +278,6 @@ export default function ManageCompanies() {
 
   return (
     <div className={css.root}>
-      <Meta title={title} description={description} />
       <div className={css.top}>
         <h1 className={css.title}>{title}</h1>
         <Link href={`${pathname}/create`}>

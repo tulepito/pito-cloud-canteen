@@ -28,6 +28,7 @@ const UpdateMenuModal: React.FC<TUpdateMenuModalProps> = (props) => {
     return {
       ...(menuToUpdate || {}),
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(menuToUpdate)]);
 
   const formRef = useRef<FormApi>();

@@ -53,7 +53,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   );
 
   const {
-    location: { address: defaultAddress = '', origin: defautlOrigin = {} } = {},
+    location: { address: defaultAddress = '', origin: defaultOrigin = {} } = {},
     location,
   } = currentClient?.attributes.profile.publicData || {};
 
@@ -126,7 +126,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
               search: address || defaultAddress,
               selectedPlace: {
                 address: address || defaultAddress,
-                origin: origin || defautlOrigin,
+                origin: origin || defaultOrigin,
               },
             }
           : null,
@@ -152,7 +152,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       defaultAddress,
       detailAddress,
       address,
-      defautlOrigin,
+      defaultOrigin,
       origin,
       startDate,
       endDate,

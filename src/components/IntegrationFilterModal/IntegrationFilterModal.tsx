@@ -34,7 +34,11 @@ const IntegrationFilterModal = (props: any) => {
 
   return (
     <div className={css.root}>
-      <Button onClick={onOpen} type="button" className={css.filterButton}>
+      <Button
+        onClick={onOpen}
+        type="button"
+        variant="secondary"
+        className={css.filterButton}>
         <IconFilter className={css.filterIcon} />
         <FormattedMessage id="IntegrationFilterModal.filterMessage" />
       </Button>

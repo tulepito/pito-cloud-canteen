@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import FormWizard from '@components/FormWizard/FormWizard';
 import { getItem, setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -37,8 +38,6 @@ export const TABS = [
 export const CREATE_ORDER_STEP_LOCAL_STORAGE_NAME = 'orderStep';
 
 const tabCompleted = (order: any, tab: string, orderDetail: any) => {
-  console.log('🚀 ~ tabCompleted ~ order:', order);
-  console.log('🚀 ~ tabCompleted ~ orderDetail:', orderDetail);
   const orderId = Listing(order).getId();
   const { staffName, plans = [] } = Listing(order).getMetadata();
 
@@ -70,9 +69,9 @@ const tabsActive = (order: any, orderDetail: any) => {
   return TABS.reduce((acc, tab) => {
     const previousTabIndex = TABS.findIndex((t) => t === tab) - 1;
     const isActive =
-      previousTabIndex >= 0
-        ? tabCompleted(order, TABS[previousTabIndex], orderDetail)
-        : true;
+      previousTabIndex < 0 ||
+      tabCompleted(order, TABS[previousTabIndex], orderDetail);
+
     return { ...acc, [tab]: isActive };
   }, {});
 };

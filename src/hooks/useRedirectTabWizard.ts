@@ -12,9 +12,10 @@ const tabsActive = (
   return tabs.reduce((acc, tab) => {
     const previousTabIndex = tabs.findIndex((t) => t === tab) - 1;
     const isActive =
-      previousTabIndex >= 0
-        ? !isNew || tabCompleted(tabs[previousTabIndex], listing)
-        : true;
+      previousTabIndex < 0 ||
+      !isNew ||
+      tabCompleted(tabs[previousTabIndex], listing);
+
     return { ...acc, [tab]: isActive };
   }, {});
 };
@@ -61,7 +62,13 @@ const useRedirectTabWizard = ({
         listingRef.current = listing;
       }
     }
-  }, [tabsStatus, selectedTab, tabs, handleRedirect, JSON.stringify(listing)]);
+  }, [
+    tabsStatus,
+    selectedTab,
+    JSON.stringify(tabs),
+    handleRedirect,
+    JSON.stringify(listing),
+  ]);
 };
 
 export default useRedirectTabWizard;

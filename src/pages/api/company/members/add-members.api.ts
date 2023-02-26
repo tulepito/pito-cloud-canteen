@@ -16,6 +16,7 @@ const defaultExpireTime =
   parseInt(process.env.DEFAUTL_INVITATION_EMAIL_EXPIRE_TIME as string, 10) || 7;
 const baseUrl = process.env.NEXT_PUBLIC_CANONICAL_URL;
 const systemSenderEmail = process.env.AWS_SES_SENDER_EMAIL;
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const integrationSdk = getIntegrationSdk();
   try {

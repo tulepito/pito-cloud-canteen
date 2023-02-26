@@ -13,6 +13,7 @@
   min-width: 50px;
   max-width: 200px;
   word-wrap: break-word;
+  @include lineClamp(3);
 }
 
 .badge {
@@ -52,11 +53,19 @@
   justify-content: center;
   border-radius: 50%;
   background-color: transparent;
+
   svg {
     width: 20px;
+    height: 20px;
   }
+
+  &:focus,
   &:hover {
-    background-color: $neutralGray5;
+    background-color: $neutralGray4;
+
+    svg * {
+      fill: $neutralGray1;
+    }
   }
 }
 

@@ -97,6 +97,7 @@ export const shoppingCartSlice = createSlice({
         state.orders?.[currentUserId]?.[planId] || {},
       );
       const mappingData = orderDays.reduce((acc: any, currDay: any) => {
+        // eslint-disable-next-line no-param-reassign
         acc[currDay] = null;
         return acc;
       }, {});

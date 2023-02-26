@@ -58,14 +58,25 @@
   .actionButton {
     display: flex;
     align-items: center;
-    width: 50px;
-    min-height: 50px;
     justify-content: center;
+
+    min-width: 50px;
+    min-height: 50px;
+    padding: 13px;
     border-radius: 50%;
     background-color: transparent;
 
+    .icon {
+      width: 24px;
+      height: 24px;
+    }
+
     &:hover {
-      background-color: $neutralGray5;
+      background-color: $neutralGray4;
+
+      .icon * {
+        fill: $neutralGray1;
+      }
     }
   }
 }
