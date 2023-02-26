@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
-import type { TListing, TPagination } from '@utils/types';
+import type { TListing, TObject, TPagination } from '@utils/types';
 
 type TSelectRestaurantPageSliceInitialState = {
   fetchRestaurantsPending: boolean;
@@ -39,8 +39,8 @@ const QUERY_RESTAURANT_FOOD = 'app/SelectRestaurantPage/QUERY_RESTAURANT_FOOD';
 // ================ Thunks ================ //
 const getRestaurants = createAsyncThunk(
   QUERY_RESTAURANTS,
-  async (params: Record<string, any> | undefined, { extra: sdk }) => {
-    const queryParams: Record<string, any> = {};
+  async (params: TObject | undefined, { extra: sdk }) => {
+    const queryParams: TObject = {};
 
     if (params) {
       queryParams.keywords = params.title;

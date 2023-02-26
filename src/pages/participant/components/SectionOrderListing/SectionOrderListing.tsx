@@ -32,7 +32,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
   const cartList = useAppSelector((state) => {
     const { currentUser } = state.user;
     const currUserId = currentUser?.id?.uuid;
-    return state.shopingCart.orders?.[currUserId]?.[`${planId}` || 1];
+    return state.shoppingCart.orders?.[currUserId]?.[`${planId}` || 1];
   });
   const order = useAppSelector((state) => state.ParticipantPlanPage.order);
 

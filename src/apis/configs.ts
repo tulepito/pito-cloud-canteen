@@ -4,7 +4,9 @@ import axios from 'axios';
 export const apiBaseUrl = () => {
   const port = process.env.NEXT_PUBLIC_PORT || 3000;
   const useDevApiServer =
-    process.env.NEXT_PUBLIC_ENV === 'development' && !!port;
+    (process.env.NODE_ENV === 'development' ||
+      process.env.ENVIRONMENT === 'development') &&
+    !!port;
 
   // In development, the dev API server is running in a different port
   if (useDevApiServer) {

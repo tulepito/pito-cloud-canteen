@@ -1,3 +1,4 @@
+import type { TObject } from '@utils/types';
 /**
  * Serialise given object into a string that can be used in a
  * URL. Encode SDK types into a format that can be parsed with `parse`
@@ -10,7 +11,7 @@
  * values, `undefined` and `null` values are removed
  */
 
-export const urlSerialize = (obj: Record<any, string> = {}) => {
+export const urlSerialize = (obj: TObject = {}) => {
   const str: Array<string> = [];
   Object.keys(obj).forEach((p: any) => {
     str.push(`${encodeURIComponent(p)}=${encodeURIComponent(obj[p])}`);

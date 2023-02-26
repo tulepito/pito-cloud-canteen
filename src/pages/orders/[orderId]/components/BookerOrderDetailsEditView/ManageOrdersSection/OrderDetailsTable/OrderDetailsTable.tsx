@@ -120,6 +120,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
 
   const tableHeads = useMemo(
     () => SELECTED_TABLE_HEAD_IDS.map((id) => intl.formatMessage({ id })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 

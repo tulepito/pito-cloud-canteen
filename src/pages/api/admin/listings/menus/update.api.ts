@@ -1,20 +1,18 @@
-/* eslint-disable no-console */
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import {
-  checkUnconflictedMenuMiddleware,
+  checkUnConflictedMenuMiddleware,
   updateMenuIdListAndMenuWeekDayListForFood,
 } from './apiHelpers';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const { dataParams, queryParams = {} } = req.body;
-    const intergrationSdk = getIntegrationSdk();
-    const response = await intergrationSdk.listings.update(
+    const integrationSdk = getIntegrationSdk();
+    const response = await integrationSdk.listings.update(
       dataParams,
       queryParams,
     );
@@ -42,7 +40,7 @@ const handlerWithCustomParams = (req: NextApiRequest, res: NextApiResponse) => {
     daysOfWeek,
     id,
   };
-  return checkUnconflictedMenuMiddleware(handler)(req, res, dataToCheck);
+  return checkUnConflictedMenuMiddleware(handler)(req, res, dataToCheck);
 };
 
 export default cookies(handlerWithCustomParams);

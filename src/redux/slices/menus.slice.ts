@@ -1,13 +1,13 @@
 import {
   checkMenuInTransactionProgressApi,
-  checkMenuUnconflictedApi,
+  checkMenuUnConflictedApi,
   createPartnerMenuApi,
   deletePartnerMenuApi,
   queryAllMenusApi,
   showPartnerMenuApi,
   updatePartnerMenuApi,
 } from '@apis/menuApi';
-import type { TCheckUnconflictedParams } from '@helpers/apiHelpers';
+import type { TCheckUnConflictedParams } from '@helpers/apiHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
@@ -123,8 +123,8 @@ const CHECK_MENU_IS_UN_CONFLICTED =
 
 const checkMenuUnconflicted = createAsyncThunk(
   CHECK_MENU_IS_UN_CONFLICTED,
-  async (payload: TCheckUnconflictedParams) => {
-    const { data } = await checkMenuUnconflictedApi(payload);
+  async (payload: TCheckUnConflictedParams) => {
+    const { data } = await checkMenuUnConflictedApi(payload);
     return data;
   },
   {

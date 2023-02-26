@@ -3,7 +3,7 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import {
   shoppingCartActions,
   shoppingCartThunks,
-} from '@redux/slices/shopingCart.slice';
+} from '@redux/slices/shoppingCart.slice';
 import { createSlice } from '@reduxjs/toolkit';
 import { EParticipantOrderStatus } from '@utils/enums';
 import { storableError } from '@utils/errors';
@@ -108,7 +108,7 @@ const updateOrder = createAsyncThunk(
     const { orderId, planId } = data;
     const { currentUser } = getState().user;
     const currentUserId = currentUser?.id?.uuid;
-    const { orders } = getState().shopingCart;
+    const { orders } = getState().shoppingCart;
     const planData = orders?.[currentUserId]?.[planId];
     const orderDays = Object.keys(planData);
 

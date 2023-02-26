@@ -211,7 +211,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     dispatch(unSelectRestaurant());
   };
 
-  const handleSubmitRestaurant = (values: Record<string, any>) => {
+  const handleSubmitRestaurant = (values: TObject) => {
     const { restaurant, selectedFoodList } = values;
     const updateOrderDetail = {
       orderDetail: {

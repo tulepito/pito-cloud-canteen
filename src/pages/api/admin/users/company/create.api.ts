@@ -1,4 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import cookies from '@services/cookie';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
@@ -12,7 +11,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const sdk = getSdk(req, res);
 
-    const intergrationSdk = getIntegrationSdk();
+    const integrationSdk = getIntegrationSdk();
 
     // Create company account
     const companyResponse = await sdk.currentUser.create(dataParams);
@@ -32,7 +31,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     // Add sub master account to master account
     const masterAccountAfterUpdateResponse =
-      await intergrationSdk.users.updateProfile(
+      await integrationSdk.users.updateProfile(
         {
           id: companyAccount.id,
           privateData: {
@@ -52,7 +51,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     ).toString();
 
     // Update sub master account password
-    await intergrationSdk.users.updateProfile({
+    await integrationSdk.users.updateProfile({
       id: subAccount.id,
       privateData: {
         accountPassword: encryptedPassword,

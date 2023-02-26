@@ -1,5 +1,6 @@
 import ValidationError from '@components/ValidationError/ValidationError';
 import { EDayOfWeek } from '@utils/enums';
+import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 import type { FieldArrayProps } from 'react-final-form-arrays';
@@ -13,7 +14,7 @@ const daysOfWeek = Object.keys(EDayOfWeek);
 
 type TFieldDaysOfWeekCheckboxGroup = {
   name: string;
-  values: Record<any, any>;
+  values: TObject;
   label?: string;
   rootClassName?: string;
   className?: string;

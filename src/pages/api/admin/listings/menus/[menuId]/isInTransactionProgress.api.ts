@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { EListingType, EOrderStates } from '@utils/enums';
@@ -9,8 +7,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const { queryParams = {} } = req.body;
     const { menuId } = req.query;
-    const intergrationSdk = getIntegrationSdk();
-    const response = await intergrationSdk.listings.query(
+    const integrationSdk = getIntegrationSdk();
+    const response = await integrationSdk.listings.query(
       {
         meta_menuIds: menuId,
         meta_listingType: EListingType.transaction,

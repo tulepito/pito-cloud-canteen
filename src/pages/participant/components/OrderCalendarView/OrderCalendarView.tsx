@@ -1,10 +1,8 @@
-// eslint-disable no-restricted-syntax
-// eslint-disable-next-line import/no-named-as-default
 import Avatar from '@components/Avatar/Avatar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
 import { CurrentUser, Listing, User } from '@utils/data';
-import type { TCurrentUser, TListing, TUser } from '@utils/types';
+import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
 import React, { useState } from 'react';
@@ -22,7 +20,7 @@ type TOrderCalendarView = {
   loadDataInProgress?: boolean;
 };
 
-type TPlanItem = Record<string, any>;
+type TPlanItem = TObject;
 
 const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
   const { company, order, subOrders, currentUser, plans, loadDataInProgress } =
@@ -129,4 +127,5 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
     </div>
   );
 };
+
 export default OrderCalendarView;

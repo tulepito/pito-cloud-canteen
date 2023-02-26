@@ -40,7 +40,8 @@ const useQueryMenuPickedFoods = ({
       }
     };
     queryMenuPickedFoods();
-  }, [dispatch, JSON.stringify(ids), restaurantId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(ids), restaurantId]);
   return { menuPickedFoods, queryMenuPickedFoodsInProgress };
 };
 

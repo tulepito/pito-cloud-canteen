@@ -55,7 +55,7 @@ export const queryAllListings = async ({ query, include = [] }: any = {}) => {
   });
 };
 
-export type TCheckUnconflictedParams = {
+export type TCheckUnConflictedParams = {
   mealType: EMenuMealType;
   daysOfWeek: string[];
   restaurantId: string;

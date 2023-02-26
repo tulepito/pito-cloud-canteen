@@ -12,7 +12,7 @@ import { foodSliceThunks } from '@redux/slices/foods.slice';
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { IntegrationListing } from '@utils/data';
 import { getLabelByKey, SIDE_DISH_OPTIONS } from '@utils/enums';
-import type { TIntegrationListing } from '@utils/types';
+import type { TIntegrationListing, TObject } from '@utils/types';
 import { parsePrice } from '@utils/validators';
 import type { FormApi } from 'final-form';
 import { useRouter } from 'next/router';
@@ -143,7 +143,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
   const savePickedFoods = () => {
     const { rowCheckbox = [], foodsByDate = {} } = values;
 
-    const newFoodsByDate: Record<any, any> = {};
+    const newFoodsByDate: TObject = {};
 
     if (!currentDate || !form) return;
 

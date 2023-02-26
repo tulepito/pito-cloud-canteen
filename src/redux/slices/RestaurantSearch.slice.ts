@@ -2,14 +2,14 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
-import type { TListing, TPagination } from '@utils/types';
+import type { TListing, TObject, TPagination } from '@utils/types';
 
 const RESTAURANT_PER_PAGE = 10;
 const SEARCH_RESTAURANT = 'app/RestaurantSearch/SEARCH_RESTAURANT';
 
 type TRestaurantSearchInitialState = {
   pagination: TPagination | null;
-  searchParams: Record<string, any> | null;
+  searchParams: TObject | null;
   searchInProgress: boolean;
   searchError: any;
   searchResults: TListing[];

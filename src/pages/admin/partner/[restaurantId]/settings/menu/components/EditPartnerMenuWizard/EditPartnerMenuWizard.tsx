@@ -11,7 +11,7 @@ import { menusSliceAction, menusSliceThunks } from '@redux/slices/menus.slice';
 import { adminRoutes } from '@src/paths';
 import { IntegrationMenuListing } from '@utils/data';
 import { EListingStates, EMenuMealType, EMenuTypes } from '@utils/enums';
-import type { TIntegrationListing } from '@utils/types';
+import type { TIntegrationListing, TObject } from '@utils/types';
 import classNames from 'classnames';
 import type { FormApi } from 'final-form';
 import isEqual from 'lodash/isEqual';
@@ -37,7 +37,7 @@ import {
 } from './utils';
 
 export type TFormRefObject = React.MutableRefObject<
-  FormApi<Record<string, any>, Partial<Record<string, any>>> | undefined
+  FormApi<TObject, Partial<TObject>> | undefined
 >;
 
 type TEditPartnerMenuTabProps = {

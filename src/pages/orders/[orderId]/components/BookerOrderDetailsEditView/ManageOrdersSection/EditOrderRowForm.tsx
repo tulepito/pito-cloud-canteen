@@ -72,6 +72,7 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
     } else {
       setCurrentRequirementFieldActionText(showRequirementText);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRequirementInputShow]);
 
   return (

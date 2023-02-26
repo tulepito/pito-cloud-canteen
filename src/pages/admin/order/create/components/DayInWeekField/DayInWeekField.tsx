@@ -1,5 +1,6 @@
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { convertWeekDay, getDayInWeekFromPeriod } from '@utils/dates';
+import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import differenceBy from 'lodash/differenceBy';
 import { useEffect, useState } from 'react';
@@ -17,11 +18,12 @@ const DAY_IN_WEEK = [
   { key: 'sun', label: 'DayInWeekField.sun' },
 ];
 
-type DayInWeekFieldProps = {
+type TDayInWeekFieldProps = {
   form: any;
-  values: Record<string, any>;
+  values: TObject;
 };
-const DayInWeekField: React.FC<DayInWeekFieldProps> = (props) => {
+
+const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
   const { form, values } = props;
   const intl = useIntl();
   const { dayInWeek = [], startDate, endDate } = values;

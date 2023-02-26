@@ -1,4 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { handleError } from '@services/sdk';

@@ -1,5 +1,5 @@
 import { errorMessages } from '@apis/errors';
-import type { TCheckUnconflictedParams } from '@helpers/apiHelpers';
+import type { TCheckUnConflictedParams } from '@helpers/apiHelpers';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import {
@@ -58,12 +58,14 @@ export const updateMenuIdListAndMenuWeekDayListForFood = async (
     ...satFoodIdList,
     ...sunFoodIdList,
   ]);
-  const intergrationSdk = getIntegrationSdk();
-  let updatedFoods: Record<any, any>[] = [];
+  const integrationSdk = getIntegrationSdk();
+
+  let updatedFoods: TObject[] = [];
+
   if (foodIds.length > 0) {
     updatedFoods = await Promise.all(
       foodIds.map(async (id) => {
-        const foodResponse = await intergrationSdk.listings.show(
+        const foodResponse = await integrationSdk.listings.show(
           {
             id,
           },
@@ -78,23 +80,20 @@ export const updateMenuIdListAndMenuWeekDayListForFood = async (
           ...getWeekDayFromListId(menu, id),
         ]);
 
-        await intergrationSdk.listings.update(
-          {
-            id,
-            publicData: {
-              menuIdList: newMenuIdList,
-              menuWeekDay: newMenuWeekDay,
-            },
+        await integrationSdk.listings.update({
+          id,
+          publicData: {
+            menuIdList: newMenuIdList,
+            menuWeekDay: newMenuWeekDay,
           },
-          { expand: true },
-        );
+        });
 
         return { id, menuIdList: newMenuIdList, menuWeekDay: newMenuWeekDay };
       }),
     );
   }
 
-  const response = await intergrationSdk.listings.query(
+  const response = await integrationSdk.listings.query(
     {
       pub_menuIdList: menuId,
     },
@@ -120,12 +119,13 @@ export const updateMenuIdListAndMenuWeekDayListForFood = async (
 
       await Promise.all(
         menuWeekDay.map(async (day: string) => {
-          const menuResponse = await intergrationSdk.listings.query({
+          const menuResponse = await integrationSdk.listings.query({
             page: 1,
             perPage: 1,
             [`meta_${day}FoodIdList`]: addedFoodId,
           });
           const foods = denormalisedResponseEntities(menuResponse);
+
           if (foods.length === 0) {
             newMenuWeekDay = newMenuWeekDay.filter((mDay) => mDay !== day);
             needToUpdateMenuWeekDay = true;
@@ -134,7 +134,7 @@ export const updateMenuIdListAndMenuWeekDayListForFood = async (
       );
 
       const newMenuIdList = menuIdList.filter((id: string) => id !== menuId);
-      await intergrationSdk.listings.update({
+      await integrationSdk.listings.update({
         id: addedFoodId,
         publicData: {
           ...(alreadyRemoved ? { menuIdList: newMenuIdList } : {}),
@@ -145,12 +145,12 @@ export const updateMenuIdListAndMenuWeekDayListForFood = async (
   );
 };
 
-export const checkUnconflictedMenuMiddleware =
+export const checkUnConflictedMenuMiddleware =
   (handler: NextApiHandler) =>
   async (
     req: NextApiRequest,
     res: NextApiResponse,
-    params: TCheckUnconflictedParams,
+    params: TCheckUnConflictedParams,
   ) => {
     try {
       const integrationSdk = getIntegrationSdk();

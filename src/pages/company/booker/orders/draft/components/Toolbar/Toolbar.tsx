@@ -1,8 +1,9 @@
 /* eslint-disable no-nested-ternary */
 import Button from '@components/Button/Button';
-import { NAVIGATE } from '@components/CalendarDashboard/helpers/constant';
+import { ENavigate } from '@components/CalendarDashboard/helpers/constant';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
+import type { TObject } from '@utils/types';
 import type { ReactNode } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -12,7 +13,7 @@ export type TToolbarProps = {
   view: string;
   views: string[];
   label: ReactNode;
-  localizer: Record<string, any>;
+  localizer: TObject;
   onNavigate: (action: string) => void;
   onView: (name: string) => void;
   companyLogo?: ReactNode;
@@ -32,11 +33,11 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
         <div className={css.toolbarNavigation}>
           <div
             className={css.arrowBtn}
-            onClick={navigateFunc(NAVIGATE.PREVIOUS)}>
+            onClick={navigateFunc(ENavigate.PREVIOUS)}>
             <IconArrow className={css.arrowIcon} direction="left" />
           </div>
           {label}
-          <div className={css.arrowBtn} onClick={navigateFunc(NAVIGATE.NEXT)}>
+          <div className={css.arrowBtn} onClick={navigateFunc(ENavigate.NEXT)}>
             <IconArrow className={css.arrowIcon} direction="right" />
           </div>
         </div>

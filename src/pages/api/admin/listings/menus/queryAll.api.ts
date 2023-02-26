@@ -1,4 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { queryAllListings } from '@helpers/apiHelpers';
 import cookies from '@services/cookie';
 import { handleError } from '@services/sdk';

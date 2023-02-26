@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { Listing } from '@utils/data';
-import type { TListing } from '@utils/types';
+import type { TListing, TObject } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -21,7 +21,7 @@ import css from './SelectRestaurantPage.module.scss';
 const DEBOUNCE_TIME = 500;
 
 type TSelectRestaurantPageProps = {
-  onSubmitRestaurant: (values: Record<string, any>) => void;
+  onSubmitRestaurant: (values: TObject) => void;
   selectedDate: Date;
   onBack: () => void;
 };

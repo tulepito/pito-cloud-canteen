@@ -32,14 +32,14 @@ export const DAY_IN_WEEK: TDayInWeek[] = [
   'sunday',
 ];
 
-export const NAVIGATE: Record<string, string> = {
-  PREVIOUS: 'PREV',
-  NEXT: 'NEXT',
-  TODAY: 'TODAY',
-  DATE: 'DATE',
-};
+export enum ENavigate {
+  PREVIOUS = 'PREV',
+  NEXT = 'NEXT',
+  TODAY = 'TODAY',
+  DATE = 'DATE',
+}
 
-export const VIEW_MODES: Record<string, string> = {
-  MONTH: 'month',
-  WEEK: 'week',
-};
+export enum EViewMode {
+  MONTH = 'month',
+  WEEK = 'week',
+}

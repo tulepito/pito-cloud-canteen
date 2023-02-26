@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -7,7 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const { dataParams, queryParams = {} } = req.body;
-    const intergrationSdk = getIntegrationSdk();
+    const integrationSdk = getIntegrationSdk();
 
     const { ids = [], id } = dataParams;
 
@@ -16,7 +14,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     if (ids && ids.length > 0) {
       response = await Promise.all(
         ids.map(async (i: string) => {
-          return intergrationSdk.listings.update(
+          return integrationSdk.listings.update(
             {
               id: i,
               metadata: {
@@ -28,7 +26,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         }),
       );
     } else {
-      response = await intergrationSdk.listings.update(
+      response = await integrationSdk.listings.update(
         {
           id,
           metadata: {

@@ -5,6 +5,7 @@ import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { findValidRangeForDeadlineDate } from '@helpers/orderHelper';
 import { generateTimeOptions } from '@utils/dates';
+import type { TObject } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import format from 'date-fns/format';
@@ -18,7 +19,7 @@ import css from './OrderDeadlineField.module.scss';
 const TIME_OPTIONS = generateTimeOptions();
 type TOrderDeadlineFieldProps = {
   form: any;
-  values: Record<string, any>;
+  values: TObject;
   columnLayout?: boolean;
   title?: string;
 };

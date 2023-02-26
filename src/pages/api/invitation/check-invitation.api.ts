@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { getSdk, handleError } from '@services/sdk';

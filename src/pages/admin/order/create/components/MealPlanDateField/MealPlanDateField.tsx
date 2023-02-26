@@ -5,6 +5,7 @@ import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { findMinStartDate } from '@helpers/orderHelper';
 import { generateTimeOptions } from '@utils/dates';
+import type { TObject } from '@utils/types';
 import { composeValidators, nonSatOrSunDay, required } from '@utils/validators';
 import classNames from 'classnames';
 import addDays from 'date-fns/addDays';
@@ -20,7 +21,7 @@ const TIME_OPTIONS = generateTimeOptions();
 
 type MealPlanDateFieldProps = {
   form: any;
-  values: Record<string, any>;
+  values: TObject;
   columnLayout?: boolean;
   title?: string;
   onCustomStartDateChange?: (date: number) => void;
