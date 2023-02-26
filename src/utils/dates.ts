@@ -5,6 +5,7 @@ import {
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
 import jstz from 'jstimezonedetect';
+import type { LocaleOptions } from 'luxon';
 import { DateTime, Interval } from 'luxon';
 
 import { EDayOfWeek } from './enums';
@@ -107,9 +108,13 @@ export const weekDayFormatFromDateTime = (dateTime: DateTime) => {
   return formattedWeekDay;
 };
 
-export const parseTimestampToFormat = (date: number, format?: string) => {
+export const parseTimestampToFormat = (
+  date = new Date().getTime(),
+  format?: string,
+  locale: LocaleOptions['locale'] = 'vi',
+) => {
   return DateTime.fromMillis(date).toFormat(format || 'dd/MM/yyyy', {
-    locale: 'vi',
+    locale,
   });
 };
 
