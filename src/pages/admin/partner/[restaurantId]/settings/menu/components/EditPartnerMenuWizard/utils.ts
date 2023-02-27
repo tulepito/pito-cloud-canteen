@@ -11,6 +11,7 @@ import {
 import type { EDayOfWeek } from '@utils/enums';
 import { EListingStates, EMenuTypes } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
+import { DateTime } from 'luxon';
 
 export const MENU_INFORMATION_TAB = 'information';
 export const MENU_PRICING_TAB = 'pricing';
@@ -332,7 +333,13 @@ export const createSubmitMenuValues = (
     }
     case MENU_COMPLETE_TAB: {
       return {
+        publicData: {
+          ...createAvaragePriceByFoodsByDate(foodsByDate),
+          foodsByDate: createSubmitFoodsByDate(foodsByDate),
+        },
         metadata: {
+          ...createListFoodIdsByFoodsByDate(foodsByDate),
+          ...createListFoodNutritionByFoodsByDate(foodsByDate),
           listingState: EListingStates.published,
         },
       };
@@ -495,38 +502,19 @@ export const createDuplicateSubmitMenuValues = (
       return {
         title: titleFromMenu,
         publicData: {
-          monAverageFoodPrice: monAverageFoodPriceFromMenu,
-          tueAverageFoodPrice: tueAverageFoodPriceFromMenu,
-          wedAverageFoodPrice: wedAverageFoodPriceFromMenu,
-          thuAverageFoodPrice: thuAverageFoodPriceFromMenu,
-          friAverageFoodPrice: friAverageFoodPriceFromMenu,
-          satAverageFoodPrice: satAverageFoodPriceFromMenu,
-          sunAverageFoodPrice: sunAverageFoodPriceFromMenu,
+          ...createAvaragePriceByFoodsByDate(foodsByDate),
+          foodsByDate: createSubmitFoodsByDate(foodsByDate),
           daysOfWeek: daysOfWeekFromMenu,
           mealType: mealTyperFromMenu,
           startDate: startDateFromMenu,
-          foodsByDate: foodsByDateFromMenu,
           endDate: endDateFromMenu,
           ...(menuTypeFromMenu === EMenuTypes.cycleMenu
             ? { numberOfCycles: numberOfCyclesFromMenu }
             : {}),
         },
         metadata: {
-          monFoodIdList: monFoodIdListFromMenu,
-          tueFoodIdList: tueFoodIdListFromMenu,
-          wedFoodIdList: wedFoodIdListFromMenu,
-          thuFoodIdList: thuFoodIdListFromMenu,
-          friFoodIdList: friFoodIdListFromMenu,
-          satFoodIdList: satFoodIdListFromMenu,
-          sunFoodIdList: sunFoodIdListFromMenu,
-          /// /
-          monNutritions: monNutritionsFromMenu,
-          tueNutritions: tueNutritionsFromMenu,
-          wedNutritions: wedNutritionsFromMenu,
-          thuNutritions: thuNutritionsFromMenu,
-          friNutritions: friNutritionsFromMenu,
-          satNutritions: satNutritionsFromMenu,
-          sunNutritions: sunNutritionsFromMenu,
+          ...createListFoodIdsByFoodsByDate(foodsByDate),
+          ...createListFoodNutritionByFoodsByDate(foodsByDate),
           /// /
           listingState: EListingStates.published,
           menuType: menuTypeFromMenu,
@@ -687,4 +675,36 @@ export const renderValuesForFoodsByDate = (
   });
 
   return initialValue;
+};
+
+export const renderResourcesForCalendar = (
+  foodsByDate: any = {},
+  extraData: {
+    onRemovePickedFood: (id: string, date: Date) => void;
+    daysOfWeek: string[];
+  },
+) => {
+  const resourses: {
+    resource: TEditMenuPricingCalendarResources;
+    start: Date;
+    end: Date;
+  }[] = [];
+
+  Object.keys(foodsByDate).forEach((key) => {
+    Object.keys(foodsByDate[key]).forEach((foodKey) => {
+      resourses.push({
+        resource: {
+          id: foodsByDate[key][foodKey]?.id,
+          title: foodsByDate[key][foodKey]?.title,
+          sideDishes: foodsByDate[key][foodKey]?.sideDishes || [],
+          price: foodsByDate[key][foodKey]?.price || 0,
+          foodNote: foodsByDate[key][foodKey]?.foodNote || '',
+          ...extraData,
+        },
+        start: DateTime.fromMillis(Number(key)).toJSDate(),
+        end: DateTime.fromMillis(Number(key)).plus({ hour: 1 }).toJSDate(),
+      });
+    });
+  });
+  return resourses;
 };

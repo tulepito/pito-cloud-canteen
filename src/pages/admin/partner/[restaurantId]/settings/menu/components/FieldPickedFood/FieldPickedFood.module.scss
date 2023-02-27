@@ -8,13 +8,17 @@
   display: flex;
   align-items: center;
   width: 100%;
+  margin-bottom: 10px;
   justify-content: space-between;
+}
+
+.iconCloseButton {
+  min-height: 15px;
 }
 
 .labelLeft {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
 }
 
 .iconClose {
@@ -24,14 +28,17 @@
 }
 
 .title {
+  font-size: 14px;
   max-width: 70%;
 }
 
 .price {
   font-weight: $fontWeightBold;
+  font-size: 14px;
 }
 
 .field input {
+  font-size: 14px !important;
   padding: 5px 0 !important;
   outline: none !important;
 }
