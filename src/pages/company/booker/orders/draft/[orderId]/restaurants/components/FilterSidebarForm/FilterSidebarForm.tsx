@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm, FormSpy } from 'react-final-form';
 
-import CollapseFilter from '../CollapseFilter/CollapseFilter';
+import CollapseFilter from '../../../components/CollapseFilter/CollapseFilter';
 import css from './FilterSidebarForm.module.scss';
 
 export type TFilterSidebarFormValues = {};

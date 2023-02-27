@@ -1,24 +1,46 @@
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import useBoolean from '@hooks/useBoolean';
 import classNames from 'classnames';
+import { useMemo } from 'react';
+import { useIntl } from 'react-intl';
 
 import css from './SortingDropdown.module.scss';
 
 type SortingDropdownProps = {
-  options: {
-    label: string;
-    value: string;
-  }[];
   selectedValue: any;
   onOptionChange: (value: any) => void;
 };
 const SortingDropdown: React.FC<SortingDropdownProps> = (props) => {
-  const { options, onOptionChange, selectedValue } = props;
+  const { onOptionChange, selectedValue } = props;
   const {
     value: isDropdownOpen,
     setTrue: onDropdownOpen,
     setFalse: onDropdowClose,
   } = useBoolean();
+
+  const intl = useIntl();
+  const sortingOptions = useMemo(() => {
+    return [
+      {
+        label: intl.formatMessage({
+          id: 'BookerSelectRestaurant.sortOption.favorite',
+        }),
+        value: 'favorite',
+      },
+      {
+        label: intl.formatMessage({
+          id: 'BookerSelectRestaurant.sortOption.newest',
+        }),
+        value: 'newest',
+      },
+      {
+        label: intl.formatMessage({
+          id: 'BookerSelectRestaurant.sortOption.mostOrder',
+        }),
+        value: 'mostOrder',
+      },
+    ];
+  }, [intl]);
 
   const dropdownClasses = classNames(css.optionsWrapper, {
     [css.open]: isDropdownOpen,
@@ -39,7 +61,7 @@ const SortingDropdown: React.FC<SortingDropdownProps> = (props) => {
         <IconArrow direction="down" />
       </div>
       <div className={dropdownClasses}>
-        {options.map((option) => (
+        {sortingOptions.map((option) => (
           <div
             className={css.option}
             onClick={onOptionClick(option.value)}

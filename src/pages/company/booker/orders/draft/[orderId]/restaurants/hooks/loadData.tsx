@@ -2,7 +2,6 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 import { useEffect } from 'react';
-import { shallowEqual } from 'react-redux';
 
 import { BookerSelectRestaurantThunks } from '../BookerSelectRestaurant.slice';
 
@@ -15,38 +14,16 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
     (state) => state.Order.fetchOrderError,
   );
 
-  const companyAccount = useAppSelector(
-    (state) => state.BookerSelectRestaurant.companyAccount,
-    shallowEqual,
-  );
-  const fetchCompanyAccountInProgress = useAppSelector(
-    (state) => state.BookerSelectRestaurant.fetchCompanyAccountInProgress,
-    shallowEqual,
-  );
-  const fetchCompanyAccountError = useAppSelector(
-    (state) => state.BookerSelectRestaurant.fetchCompanyAccountError,
-    shallowEqual,
-  );
-
-  const { companyId } = Listing((order || {}) as TListing).getMetadata();
-
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(BookerSelectRestaurantThunks.fetchOrder(orderId));
   }, [dispatch, orderId]);
 
-  useEffect(() => {
-    dispatch(BookerSelectRestaurantThunks.fetchCompanyAccount(companyId));
-  }, [dispatch, companyId]);
-
   return {
     order,
     fetchOrderInProgress,
     fetchOrderError,
-    companyAccount,
-    fetchCompanyAccountInProgress,
-    fetchCompanyAccountError,
   };
 };
 
