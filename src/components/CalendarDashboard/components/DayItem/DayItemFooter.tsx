@@ -5,6 +5,7 @@ import css from './DayItem.module.scss';
 type TDayItemFooterProps = {
   isCurrentDay: boolean;
   date: Date;
+  resources?: any;
 };
 
 const DayItemFooter: React.FC<TDayItemFooterProps> = ({

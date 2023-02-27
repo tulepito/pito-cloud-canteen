@@ -1,9 +1,10 @@
+import { deliveryDaySessionAdapter } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { ListingTypes } from '@src/types/listingTypes';
-import { denormalisedResponseEntities, LISTING } from '@utils/data';
-import { convertWeekDay } from '@utils/dates';
-import type { TListing, TPagination } from '@utils/types';
+import { denormalisedResponseEntities, Listing } from '@utils/data';
+import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
+import type { TListing, TObject, TPagination } from '@utils/types';
 
 type TSelectRestaurantPageSliceInitialState = {
   fetchRestaurantsPending: boolean;
@@ -15,6 +16,8 @@ type TSelectRestaurantPageSliceInitialState = {
   foodList: any[];
   fetchFoodPending: boolean;
   fetchFoodError: any;
+
+  selectedRestaurant: TListing | null;
 };
 
 const initialState: TSelectRestaurantPageSliceInitialState = {
@@ -26,6 +29,7 @@ const initialState: TSelectRestaurantPageSliceInitialState = {
   foodList: [],
   fetchFoodPending: false,
   fetchFoodError: null,
+  selectedRestaurant: null,
 };
 
 // ================ Thunk types ================ //
@@ -35,18 +39,51 @@ const QUERY_RESTAURANT_FOOD = 'app/SelectRestaurantPage/QUERY_RESTAURANT_FOOD';
 // ================ Thunks ================ //
 const getRestaurants = createAsyncThunk(
   QUERY_RESTAURANTS,
-  async (params: Record<string, any> | undefined, { extra: sdk }) => {
-    const queryParams: Record<string, any> = {};
+  async (params: TObject | undefined, { extra: sdk }) => {
+    const queryParams: TObject = {};
 
     if (params) {
       queryParams.keywords = params.title;
     }
-    const { dateTime } = params || {};
+    const {
+      dateTime,
+      favoriteRestaurantIdList = [],
+      favoriteFoodIdList = [],
+      packagePerMember,
+      deliveryHour,
+      nutritions = [],
+      title = '',
+      page = 1,
+      perPage = 10,
+    } = params || {};
     const dayOfWeek = convertWeekDay(dateTime.weekday).key;
+    const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
+    const mealType = deliveryDaySessionAdapter(deliveryDaySession);
     const response = await sdk.listings.query({
+      keywords: title,
+      meta_listingState: 'published',
       meta_listingType: ListingTypes.MENU,
       pub_startDate: `,${dateTime.toMillis()}`,
       pub_daysOfWeek: `has_any:${dayOfWeek}`,
+      pub_mealType: mealType,
+      ...(nutritions.length > 0
+        ? { [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(',')}` }
+        : {}),
+      ...(favoriteRestaurantIdList.length > 0
+        ? {
+            meta_restaurantId: favoriteRestaurantIdList.join(','),
+          }
+        : {}),
+      ...(favoriteFoodIdList.length > 0
+        ? {
+            [`meta_${dayOfWeek}FoodIdList`]: `has_any:${favoriteFoodIdList.join(
+              ',',
+            )}`,
+          }
+        : {}),
+      [`pub_${dayOfWeek}AverageFoodPrice`]: `,${packagePerMember}`,
+      page,
+      perPage,
     });
 
     const { meta } = response?.data || {};
@@ -54,9 +91,14 @@ const getRestaurants = createAsyncThunk(
     const menuList = denormalisedResponseEntities(response);
     const restaurantList = await Promise.all(
       menuList.map(async (menu: TListing) => {
-        const { restaurantId } = LISTING(menu).getMetadata();
+        const { restaurantId } = Listing(menu).getMetadata();
         const restaurantResponse = await sdk.listings.show({
           id: restaurantId,
+          include: ['images'],
+          'fields.image': [
+            'variants.landscape-crop',
+            'variants.landscape-crop2x',
+          ],
         });
         return {
           restaurantInfo: denormalisedResponseEntities(restaurantResponse)[0],
@@ -70,13 +112,31 @@ const getRestaurants = createAsyncThunk(
 
 const getRestaurantFood = createAsyncThunk(
   QUERY_RESTAURANT_FOOD,
-  async (restaurantId: string, { extra: sdk }) => {
+  async (
+    { menuId, dateTime, favoriteFoodIdList = [] }: any,
+    { extra: sdk, getState },
+  ) => {
+    const { order } = getState().Order;
+    const { packagePerMember, nutritions = [] } = Listing(
+      order as TListing,
+    ).getMetadata();
+    const dayOfWeek = convertWeekDay(dateTime.weekday).key;
     const response = await sdk.listings.query({
-      meta_restaurantId: restaurantId,
+      pub_menuIdList: `has_any:${menuId}`,
       meta_listingType: ListingTypes.FOOD,
+      pub_menuWeekDay: `has_any:${dayOfWeek}`,
+      price: `,${packagePerMember}`,
+      ...(nutritions.length > 0
+        ? { pub_nutritions: `has_any:${nutritions.join(',')}` }
+        : {}),
+      ...(favoriteFoodIdList.length > 0
+        ? {
+            ids: favoriteFoodIdList.join(','),
+          }
+        : {}),
     });
     const result = denormalisedResponseEntities(response);
-    return { foodOfRestaurant: restaurantId, foodList: result };
+    return { foodList: result };
   },
 );
 
@@ -88,7 +148,12 @@ export const selectRestaurantPageThunks = {
 const SelectRestaurantPageSlice = createSlice({
   name: 'SelectRestaurantPage',
   initialState,
-  reducers: {},
+  reducers: {
+    setSelectedRestaurant: (state, { payload }) => ({
+      ...state,
+      selectedRestaurant: payload,
+    }),
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getRestaurants.pending, (state) => {
@@ -120,7 +185,6 @@ const SelectRestaurantPageSlice = createSlice({
       .addCase(getRestaurantFood.fulfilled, (state, { payload }) => {
         state.fetchFoodPending = false;
         state.foodList = payload.foodList;
-        state.foodOfRestaurant = payload.foodOfRestaurant;
       })
       .addCase(getRestaurantFood.rejected, (state, { error }) => {
         state.fetchFoodPending = false;
@@ -129,5 +193,7 @@ const SelectRestaurantPageSlice = createSlice({
       });
   },
 });
+
+export const { setSelectedRestaurant } = SelectRestaurantPageSlice.actions;
 
 export default SelectRestaurantPageSlice.reducer;

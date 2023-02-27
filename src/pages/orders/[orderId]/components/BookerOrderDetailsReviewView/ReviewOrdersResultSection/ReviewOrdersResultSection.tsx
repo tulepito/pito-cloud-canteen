@@ -30,7 +30,7 @@ const isCompletePickFood = ({
 
 type TReviewOrdersResultSectionProps = {
   className?: string;
-  goBackToEditMode: () => void;
+  goBackToEditMode?: () => void;
   data: TObject;
 };
 
@@ -80,7 +80,7 @@ const ReviewOrdersResultSection: React.FC<TReviewOrdersResultSectionProps> = (
       </Button>
       <ReviewOrdersResultModal
         data={data}
-        goBackToEditMode={goBackToEditMode}
+        goBackToEditMode={goBackToEditMode || handleCloseModal}
         isOpen={isResultModalOpen}
         onClose={handleCloseModal}
       />

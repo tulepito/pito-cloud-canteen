@@ -24,6 +24,7 @@ const EditPartnerFoodPage = () => {
     showFoodError,
     updateFoodInProgress,
     updateFoodError,
+    uploadingImages,
   } = useAppSelector((state) => state.foods, shallowEqual);
 
   const handleSubmit = (values: TEditPartnerFoodFormValues) =>
@@ -48,13 +49,13 @@ const EditPartnerFoodPage = () => {
   }, [currentFoodListing]) as TEditPartnerFoodFormValues;
 
   useEffect(() => {
+    dispatch(foodSliceAction.setInitialStates());
+  }, []);
+
+  useEffect(() => {
     if (!foodId) return;
     dispatch(foodSliceThunks.showPartnerFoodListing(foodId));
   }, [dispatch, foodId]);
-
-  useEffect(() => {
-    dispatch(foodSliceAction.setInitialStates());
-  }, []);
 
   if (showFoodInProgress) {
     return <LoadingContainer />;
@@ -72,6 +73,7 @@ const EditPartnerFoodPage = () => {
       <EditPartnerFoodForm
         onSubmit={handleSubmit}
         inProgress={updateFoodInProgress}
+        disabled={uploadingImages || updateFoodInProgress}
         formError={updateFoodError}
         initialValues={initialValues}
         isEditting

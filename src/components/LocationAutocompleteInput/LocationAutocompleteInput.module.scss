@@ -85,6 +85,8 @@ bottom of the container.
 .predictions {
   margin: 0;
   padding: 14px 0;
+  max-height: 300px;
+  overflow-y: scroll;
 
   & li {
     color: $neutralGray6;
@@ -121,9 +123,10 @@ bottom of the container.
 
 .labelRoot {
   @include inputLabelStyles;
+}
 
-  &.labelRequiredRedStar {
-    margin-left: 2px;
-    display: inline-flex;
-  }
+.labelRequiredRedStar {
+  margin-left: 2px;
+  color: $sematicRed2;
+  display: inline-flex;
 }

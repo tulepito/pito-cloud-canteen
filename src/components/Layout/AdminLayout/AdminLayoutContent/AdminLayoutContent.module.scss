@@ -4,10 +4,13 @@
 .root {
   margin-top: $adminTopbarHeight;
   min-height: calc(100vh - $adminTopbarHeight);
+  width: calc(100vw - $adminSidebarLeftPartWidth);
   transition: all 0.5s;
   margin-left: $adminSidebarLeftPartWidth;
+
   @include viewportLarge {
     margin-left: $adminSidebarWidth;
+    width: calc(100vw - $adminSidebarWidth);
   }
 }
 
@@ -15,4 +18,9 @@
   background-color: $neutralGray1;
   border-radius: 6px;
   padding: 19px 40px 40px 40px;
+  width: calc(100vw - $adminSidebarLeftPartWidth);
+
+  @include viewportLarge {
+    width: calc(100vw - $adminSidebarWidth);
+  }
 }

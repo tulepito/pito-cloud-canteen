@@ -1,10 +1,8 @@
-/* eslint-disable no-console */
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { getSdk, handleError } from '@services/sdk';
 import { UserInviteStatus } from '@src/types/UserPermission';
-import { denormalisedResponseEntities, USER } from '@utils/data';
+import { denormalisedResponseEntities, User } from '@utils/data';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -20,7 +18,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     )[0];
     const userEmail = currentUser.attributes.email;
     const companyAccount = await fetchUser(companyId);
-    const { members = {} } = USER(companyAccount).getMetadata();
+    const { members = {} } = User(companyAccount).getMetadata();
     const userMember = members[userEmail];
 
     // Case user access to an invalid invitation

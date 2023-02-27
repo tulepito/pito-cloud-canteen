@@ -11,7 +11,6 @@
   .title {
     @include textTemplate(24px, 700, 32px, '');
     max-width: 240px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    @include lineClamp(2);
   }
 }

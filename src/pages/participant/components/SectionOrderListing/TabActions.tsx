@@ -1,8 +1,8 @@
-import { InlineTextButton } from '@components/Button/Button';
+import Button from '@components/Button/Button';
 import IconBanned from '@components/Icons/IconBanned/IconBanned';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import { useAppDispatch } from '@hooks/reduxHooks';
-import { shoppingCartThunks } from '@redux/slices/shopingCart.slice';
+import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
 import classNames from 'classnames';
 import { FormattedMessage } from 'react-intl';
 
@@ -12,17 +12,18 @@ type TTabActionsProps = {
   className?: string;
   planId: string;
   orderDay: string;
+  isOrderDeadlineOver: boolean;
 };
 
 const TabActions: React.FC<TTabActionsProps> = ({
   className,
   planId,
   orderDay,
+  isOrderDeadlineOver,
 }) => {
   const dispatch = useAppDispatch();
 
   const handleAutoSelect = () => {};
-
   const handleNotJoinDay = () => {
     dispatch(
       shoppingCartThunks.addToCart({
@@ -35,16 +36,22 @@ const TabActions: React.FC<TTabActionsProps> = ({
 
   return (
     <div className={classNames(css.tabActions, className)}>
-      <InlineTextButton onClick={handleAutoSelect} className={css.autoSelect}>
+      <Button
+        variant="secondary"
+        disabled={isOrderDeadlineOver}
+        onClick={handleAutoSelect}
+        className={css.autoSelect}>
         <IconRefreshing className={css.iconRefresh} />
         <FormattedMessage id="SectionOrderListing.selectForMeBtn" />
-      </InlineTextButton>
-      <InlineTextButton
+      </Button>
+      <Button
+        variant="inline"
+        disabled={isOrderDeadlineOver}
         onClick={handleNotJoinDay}
         className={css.notJoinThisDay}>
         <IconBanned className={css.iconNotJoined} />
         <FormattedMessage id="SectionOrderListing.notJoinThisDay" />
-      </InlineTextButton>
+      </Button>
     </div>
   );
 };

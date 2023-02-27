@@ -49,7 +49,7 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
       <DeleteMealModal
         isOpen={isOpenDeleteModal}
         onClose={handleCloseDeleteModal}
-        handleDelete={handleDelete}
+        onDelete={handleDelete}
       />
     </div>
   );

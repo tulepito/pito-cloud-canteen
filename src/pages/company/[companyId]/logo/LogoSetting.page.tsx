@@ -1,6 +1,8 @@
 import { useAppDispatch } from '@hooks/reduxHooks';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { BookerManageCompany } from '@redux/slices/company.slice';
+import { resetImage } from '@redux/slices/uploadImage.slice';
+import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
 import UploadImageForm from './components/UploadImageForm/UploadImageForm';
@@ -10,8 +12,12 @@ const LogoSettingPage = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   useFetchCompanyInfo();
-  const onSubmit = () => {
-    dispatch(BookerManageCompany.updateCompanyAccount());
+  useEffect(() => {
+    dispatch(resetImage());
+  }, [dispatch]);
+  const onSubmit = async () => {
+    await dispatch(BookerManageCompany.updateCompanyAccount({}));
+    dispatch(resetImage());
   };
   return (
     <div className={css.container}>

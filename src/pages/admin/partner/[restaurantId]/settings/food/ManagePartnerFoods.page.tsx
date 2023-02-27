@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
 import Button, { InlineTextButton } from '@components/Button/Button';
@@ -19,7 +20,6 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
-import { makeCsv } from '@utils/csv';
 import { parseTimestampToFormat } from '@utils/dates';
 import {
   CATEGORY_OPTIONS,
@@ -30,7 +30,8 @@ import {
 import type { TIntegrationListing } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { CSVLink } from 'react-csv';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -40,34 +41,20 @@ const fileUrl = process.env.NEXT_PUBLIC_IMPORT_FOOD_GUIDE_FILE_URL;
 
 const TABLE_COLUMN: TColumn[] = [
   {
-    key: 'id',
-    label: 'ID',
-    render: (data: any) => {
-      if (data.isDeleted) {
-        return (
-          <div className={css.deletedFood}>
-            <FormattedMessage id="ManagePartnerFoods.deletedFood" />
-          </div>
-        );
-      }
-      return (
-        <NamedLink
-          path={`/admin/partner/${data.restaurantId}/settings/food/${data.id}`}
-          className={css.idRow}
-          title={data.id}>
-          {data.id}
-        </NamedLink>
-      );
-    },
-  },
-  {
     key: 'title',
     label: 'Tên món',
     render: (data: any) => {
       if (data.isDeleted) {
         return <div></div>;
       }
-      return <div title={data.title}>{data.title}</div>;
+      return (
+        <NamedLink
+          path={`/admin/partner/${data.restaurantId}/settings/food/${data.id}`}
+          className={css.titleRow}
+          title={data.id}>
+          {data.title}
+        </NamedLink>
+      );
     },
   },
   {
@@ -175,19 +162,29 @@ const parseEntitiesToExportCsv = (
         category,
         foodType,
         menuType,
-        ...rest
+        ingredients,
+        maxMember,
+        minOrderHourInAdvance,
+        minQuantity,
+        notes,
+        unit,
       } = publicData;
       return {
-        title,
-        description,
-        id: food.id.uuid,
-        ...rest,
-        category: getLabelByKey(CATEGORY_OPTIONS, category),
-        foodType: getLabelByKey(FOOD_TYPE_OPTIONS, foodType),
-        menuType: getLabelByKey(MENU_OPTIONS, menuType),
-        sideDishes: sideDishes.join(','),
-        specialDiets: specialDiets.join(','),
-        images: food.images?.map(
+        'Mã món': food.id.uuid,
+        'Tên món ăn': title,
+        'Mô tả': description,
+        'Thành phần chính': ingredients,
+        'Phong cách ẩm thực': getLabelByKey(CATEGORY_OPTIONS, category),
+        'Loại món ăn': getLabelByKey(FOOD_TYPE_OPTIONS, foodType),
+        'Loại menu': getLabelByKey(MENU_OPTIONS, menuType),
+        'Món ăn kèm': sideDishes.join(','),
+        'Chế độ dinh dưỡng đặc biệt': specialDiets.join(','),
+        'Số nguời tối đa': maxMember,
+        'Giờ đặt trước tối thiểu': minOrderHourInAdvance,
+        'Số lượng tối thiểu': minQuantity,
+        'Ghi chú': notes,
+        'Đơn vị tính': unit,
+        'Hình ảnh': food.images?.map(
           (image) => image.attributes.variants['square-small2x'].url,
         ),
       };
@@ -202,7 +199,7 @@ const ManagePartnerFoods = () => {
   const [idsToAction, setIdsToAction] = useState<string[]>([]);
   const [foodToRemove, setFoodToRemove] = useState<any>(null);
   const [file, setFile] = useState<File | null>();
-
+  const csvLinkRef = useRef<any>();
   const {
     value: isImportModalOpen,
     setTrue: openImportModal,
@@ -324,6 +321,10 @@ const ManagePartnerFoods = () => {
     }
   };
 
+  const makeCsv = () => {
+    csvLinkRef.current?.link?.click();
+  };
+
   return (
     <div className={css.root}>
       <h1 className={css.title}>
@@ -381,13 +382,17 @@ const ManagePartnerFoods = () => {
             <IconUploadFile className={css.buttonIcon} />
             Tải món
           </Button>
+          <CSVLink
+            data={parseEntitiesToExportCsv(foods, idsToAction)}
+            filename={`${parseTimestampToFormat(
+              new Date().getTime(),
+            )}_donhang.csv`}
+            className={css.hidden}
+            ref={csvLinkRef}
+            target="_blank"
+          />
           <Button
-            onClick={() =>
-              makeCsv(
-                parseEntitiesToExportCsv(foods, idsToAction),
-                `${parseTimestampToFormat(new Date().getTime())}_donhang.csv`,
-              )
-            }
+            onClick={makeCsv}
             disabled={idsToAction.length === 0}
             className={css.lightButton}>
             <IconPrint
@@ -419,8 +424,11 @@ const ManagePartnerFoods = () => {
           isLoading={queryFoodsInProgress}
           hasCheckbox
           exposeValues={getExposeValues}
+          tableBodyCellClassName={css.tableBodyCell}
           pagination={managePartnerFoodPagination}
           paginationPath={`/admin/partner/${restaurantId}/settings/food`}
+          tableWrapperClassName={css.tableWrapper}
+          tableClassName={css.table}
         />
       )}
       <AlertModal
@@ -474,6 +482,7 @@ const ManagePartnerFoods = () => {
         </div>
       </AlertModal>
       <AlertModal
+        title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}
         isOpen={foodToRemove || removeCheckedModalOpen}
         handleClose={
           removeCheckedModalOpen ? closeRemoveCheckedModal : onClearFoodToRemove
@@ -489,10 +498,8 @@ const ManagePartnerFoods = () => {
         cancelLabel="Hủy"
         confirmLabel="Xóa món ăn"
         confirmInProgress={removeFoodInProgress}
+        childrenClassName={css.removeModalContent}
         confirmDisabled={removeFoodInProgress}>
-        <div className={css.removeTitle}>
-          <FormattedMessage id="ManagePartnerFoods.removeTitle" />
-        </div>
         <p className={css.removeContent}>
           <FormattedMessage
             id="ManagePartnerFoods.removeContent"

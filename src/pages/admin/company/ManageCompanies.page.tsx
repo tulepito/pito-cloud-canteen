@@ -1,8 +1,9 @@
 import Badge, { EBadgeType } from '@components/Badge/Badge';
+/* eslint-disable react-hooks/exhaustive-deps */
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
-import Meta from '@components/Layout/Meta';
+import IconEye from '@components/Icons/IconEye/IconEye';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
@@ -10,17 +11,14 @@ import { TableForm } from '@components/Table/Table';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import {
-  manageCompaniesThunks,
-  RESULT_PAGE_SIZE,
-} from '@redux/slices/ManageCompaniesPage.slice';
+import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
 import { adminRoutes } from '@src/paths';
 import { ECompanyStatus } from '@utils/enums';
 import type { TUser } from '@utils/types';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -91,7 +89,7 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'address',
     label: 'Địa chỉ',
     render: (data: any) => {
-      return <div>{data.address}</div>;
+      return <div className={css.row}>{data.address}</div>;
     },
   },
   {
@@ -131,8 +129,17 @@ const TABLE_COLUMN: TColumn[] = [
       return (
         <div className={css.tableActions}>
           <Link href={`/admin/company/${data.id}/edit`}>
-            <Button className={classNames(css.actionButton, css.editButton)}>
-              <IconEdit className={css.iconEdit} />
+            <Button
+              variant="inline"
+              className={classNames(css.actionButton, css.editButton)}>
+              <IconEdit className={css.icon} />
+            </Button>
+          </Link>
+          <Link href={`/admin/company/${data.id}`}>
+            <Button
+              variant="inline"
+              className={classNames(css.actionButton, css.editButton)}>
+              <IconEye className={css.icon} />
             </Button>
           </Link>
           <ToggleButton
@@ -150,16 +157,15 @@ const TABLE_COLUMN: TColumn[] = [
 
 export default function ManageCompanies() {
   const intl = useIntl();
-  const { value: mounted, setValue: setMounted } = useBoolean(false);
   const router = useRouter();
+  const { value: mounted, setValue: setMounted } = useBoolean(false);
+  const [pageSize] = useState<number>(10);
+
   const { query, pathname } = router;
   const { page = 1, ...queryParams } = query;
+
   const title = intl.formatMessage({
     id: 'ManageCompanies.title',
-  });
-
-  const description = intl.formatMessage({
-    id: 'ManageCompanies.description',
   });
 
   const {
@@ -177,28 +183,25 @@ export default function ManageCompanies() {
   );
 
   const slicesCompanies = useMemo(
-    () => sliceCompanies(filteredCompanies, page),
-    [filteredCompanies, page],
+    () => sliceCompanies(filteredCompanies, page, pageSize),
+    [filteredCompanies, page, pageSize],
   );
 
   const pagination = {
     page: Number(page),
-    perPage: RESULT_PAGE_SIZE,
-    totalPages: Math.ceil(filteredCompanies.length / RESULT_PAGE_SIZE),
+    perPage: pageSize,
+    totalPages: Math.ceil(filteredCompanies.length / pageSize),
     totalItems: filteredCompanies.length,
   };
 
-  const updateStatus = useCallback(
-    (updateData: TUpdateStatus) => {
-      dispatch(
-        manageCompaniesThunks.updateCompanyStatus({
-          dataParams: updateData,
-          queryParams: { expand: true },
-        }),
-      );
-    },
-    [dispatch, manageCompaniesThunks],
-  );
+  const updateStatus = useCallback((updateData: TUpdateStatus) => {
+    dispatch(
+      manageCompaniesThunks.updateCompanyStatus({
+        dataParams: updateData,
+        queryParams: { expand: true },
+      }),
+    );
+  }, []);
 
   const companiesTableData = useMemo(
     () =>
@@ -246,7 +249,6 @@ export default function ManageCompanies() {
 
   return (
     <div className={css.root}>
-      <Meta title={title} description={description} />
       <div className={css.top}>
         <h1 className={css.title}>{title}</h1>
         <Link href={`${pathname}/create`}>
@@ -276,6 +278,8 @@ export default function ManageCompanies() {
           pagination={pagination}
           pageSearchParams={query}
           paginationPath="/admin/company"
+          tableWrapperClassName={css.tableWrapper}
+          tableClassName={css.table}
         />
       )}
       {queryCompaniesError && (

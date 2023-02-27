@@ -1,4 +1,7 @@
-import { LISTING } from '@utils/data';
+import { isOrderOverDeadline } from '@helpers/orderHelper';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { Listing } from '@utils/data';
+import type { TObject } from '@utils/types';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { useIntl } from 'react-intl';
@@ -7,7 +10,7 @@ import CartItem from './CartItem';
 
 type TCartItemList = {
   className?: string;
-  cartList: Record<string, any>;
+  cartList: TObject;
   cartListKeys: string[];
   plan: any;
   handleRemoveItem: (dayId: string) => void;
@@ -20,6 +23,9 @@ const CartItemList: React.FC<TCartItemList> = ({
   handleRemoveItem,
 }) => {
   const intl = useIntl();
+  const order = useAppSelector((state) => state.ParticipantPlanPage.order);
+
+  const isOrderDeadlineOver = isOrderOverDeadline(order);
 
   const onRemoveItem = (dayId: string) => () => {
     handleRemoveItem(dayId);
@@ -39,7 +45,7 @@ const CartItemList: React.FC<TCartItemList> = ({
         ? null
         : foodList.find((food: any) => food?.id?.uuid === item);
     const dishAttributes =
-      item === 'notJoined' ? null : LISTING(selectedDish).getAttributes();
+      item === 'notJoined' ? null : Listing(selectedDish).getAttributes();
     const dishTitle =
       item === 'notJoined'
         ? intl.formatMessage({ id: 'SectionOrderPanel.notJoined' })
@@ -50,6 +56,7 @@ const CartItemList: React.FC<TCartItemList> = ({
         key={key}
         label={itemLabel}
         value={dishTitle}
+        removeDisabled={isOrderDeadlineOver}
         onRemove={onRemoveItem(key)}
       />
     );

@@ -1,7 +1,6 @@
 import Button from '@components/Button/Button';
-import IconModalClose from '@components/Icons/IconModalClose/IconModalClose';
+import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
-import classNames from 'classnames';
 
 import css from './ConfirmationModal.module.scss';
 
@@ -20,7 +19,6 @@ type ConfirmationModalProps = {
 };
 const ConfirmationModal: React.FC<ConfirmationModalProps> = (props) => {
   const {
-    id,
     isOpen,
     onClose,
     title,
@@ -32,44 +30,37 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = (props) => {
     isConfirmButtonLoading,
     hasError,
   } = props;
-  const modalClasses = classNames(css.modal, {
-    [css.open]: isOpen,
-  });
-  if (!isOpen) {
-    return null;
-  }
+
   return (
-    <div id={id} className={modalClasses}>
-      <div className={css.overlay}>
-        <OutsideClickHandler onOutsideClick={onClose}>
-          <div className={css.modalContainer}>
-            <div className={css.modalHeader}>
-              <span className={css.modalTitle}>{title}</span>
-              <IconModalClose onClick={onClose} />
-            </div>
-            <div className={css.modalContent}>
-              <p>{description}</p>
-              {hasError && <p className={css.error}>{hasError}</p>}
-            </div>
-            <div className={css.modalFooter}>
-              {cancelText && (
-                <Button className={css.cancelBtn} onClick={onCancel}>
-                  {cancelText}
-                </Button>
-              )}
-              {confirmText && (
-                <Button
-                  inProgress={isConfirmButtonLoading}
-                  className={css.confirmBtn}
-                  onClick={onConfirm}>
-                  {confirmText}
-                </Button>
-              )}
-            </div>
+    <Modal
+      isOpen={isOpen}
+      handleClose={onClose}
+      title={title}
+      containerClassName={css.modalContainer}>
+      <OutsideClickHandler onOutsideClick={onClose}>
+        <div className={css.modalContainer}>
+          <div className={css.modalContent}>
+            <p>{description}</p>
+            {hasError && <p className={css.error}>{hasError}</p>}
           </div>
-        </OutsideClickHandler>
-      </div>
-    </div>
+          <div className={css.modalFooter}>
+            {cancelText && (
+              <Button className={css.cancelBtn} onClick={onCancel}>
+                {cancelText}
+              </Button>
+            )}
+            {confirmText && (
+              <Button
+                inProgress={isConfirmButtonLoading}
+                className={css.confirmBtn}
+                onClick={onConfirm}>
+                {confirmText}
+              </Button>
+            )}
+          </div>
+        </div>
+      </OutsideClickHandler>
+    </Modal>
   );
 };
 

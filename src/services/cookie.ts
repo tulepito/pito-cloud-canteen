@@ -21,6 +21,7 @@ const cookie = (
  */
 const cookies =
   (handler: NextApiHandler) => (req: NextApiRequest, res: any) => {
+    // eslint-disable-next-line no-param-reassign
     res.cookie = (
       name: string,
       value: string,

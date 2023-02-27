@@ -2,7 +2,7 @@ import Avatar from '@components/Avatar/Avatar';
 import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import { getGroupNames } from '@helpers/companyMembers';
+import { getGroupNames } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
@@ -10,7 +10,7 @@ import {
   BookerManageCompany,
 } from '@redux/slices/company.slice';
 import { companyMemberThunks } from '@redux/slices/companyMember.slice';
-import { ensureUser, USER } from '@utils/data';
+import { ensureUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -69,7 +69,7 @@ const MemberDetailPage: React.FC<MemberDetailPageProps> = () => {
   })}`;
 
   const memberName = checkMemberHasFlexAccount
-    ? USER(companyMember).getProfile()?.displayName || '---'
+    ? User(companyMember).getProfile()?.displayName || '---'
     : notAcceptInvitationText;
   useEffect(() => {
     const fetchData = async () => {
@@ -125,7 +125,7 @@ const MemberDetailPage: React.FC<MemberDetailPageProps> = () => {
           </span>
           <span className={css.content}>
             {getGroupNames(
-              USER(companyMember).getMetadata()?.groups || [],
+              User(companyMember).getMetadata()?.groups || [],
               groupList,
             )}
           </span>
@@ -142,14 +142,14 @@ const MemberDetailPage: React.FC<MemberDetailPageProps> = () => {
         </div>
         <div className={css.tableBody}>
           <div className={css.bodyCol}>
-            {USER(companyMember)
+            {User(companyMember)
               .getPublicData()
               ?.allergies?.map((allergyItem: string) => (
                 <div key={allergyItem}>{allergyItem}</div>
               ))}
           </div>
           <div className={css.bodyCol}>
-            {USER(companyMember)
+            {User(companyMember)
               .getPublicData()
               ?.nutritions?.map((nutritionItem: string) => (
                 <div key={nutritionItem}>{nutritionItem}</div>

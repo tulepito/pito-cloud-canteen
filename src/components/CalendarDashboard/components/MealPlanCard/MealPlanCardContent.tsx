@@ -1,10 +1,8 @@
-import Button from '@components/Button/Button';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
-import Image from 'next/image';
+import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import { EImageVariants } from '@utils/enums';
 import type { Event } from 'react-big-calendar';
-import { FormattedMessage } from 'react-intl';
 
-import coverImg from '../../../../assets/mealPlanCover.png';
 import css from './MealPlanCard.module.scss';
 
 type TMealPlanCardContentProps = {
@@ -14,22 +12,26 @@ type TMealPlanCardContentProps = {
 
 const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
   event,
-  onEditMeal,
 }) => {
   const restaurantName = event.resource?.restaurant?.name;
+  const restaurantCoverImage = event.resource?.restaurant?.coverImage;
 
   return (
     <div className={css.content}>
-      <Image className={css.coverImg} alt={`${event.title}`} src={coverImg} />
+      <div className={css.coverImg}>
+        <ResponsiveImage
+          alt={`${event.title}`}
+          image={restaurantCoverImage}
+          variants={[
+            EImageVariants.landscapeCrop,
+            EImageVariants.landscapeCrop2x,
+          ]}
+        />
+      </div>
       <div className={css.restaurant}>
-        <span>{restaurantName}</span>
+        <span title={restaurantName}>{restaurantName}</span>
         <IconRefreshing className={css.recommendRestaurant} />
       </div>
-      <Button
-        className={css.editFood}
-        onClick={() => onEditMeal(event?.start!)}>
-        <FormattedMessage id="MealPlanCard.content.viewMenu" />
-      </Button>
     </div>
   );
 };

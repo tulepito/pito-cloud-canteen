@@ -1,32 +1,39 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .root {
   flex: 1;
   min-height: 100vh;
   background-color: $neutralGray1;
   min-width: 100%;
-  padding: 10px;
+  padding: 0 24px 0;
 
   .subMenu {
-    margin: 10px 0;
+    margin-top: 32px;
     cursor: pointer;
     list-style: none;
+    @include textTemplate(16px, $fontWeightBold, 24px);
+
+    &.subChildMenu {
+      margin-top: 16px;
+    }
+
     .subMenuLayout {
       display: flex;
       align-items: center;
-      padding: 0 8px;
       &.isOpen {
-        background-color: $primaryPri1;
         border-radius: 9px;
         .label {
-          color: $primaryPri2 !important;
           font-weight: $fontWeightBold;
         }
         .entityIcon {
           fill: $primaryPri2;
         }
-        .menuArrowIcon {
-          fill: $primaryPri2;
+      }
+      &.childActive {
+        .label {
+          color: $primaryPri2 !important;
+          font-weight: $fontWeightBold;
         }
       }
       .subMenuItem {
@@ -35,13 +42,19 @@
         width: 100%;
 
         .label {
-          font-size: 14px;
-          font-weight: $fontWeightMedium;
-          color: $neutralGray5;
+          @include textTemplate(16px, $fontWeightBold, 24px);
+          color: $neutralGray6;
           padding-bottom: 3px;
           &.active {
             color: $primaryPri2;
             font-weight: $fontWeightBold;
+          }
+          &.isChildMenu {
+            @include textTemplate(14px, $fontWeightRegular, 24px);
+
+            &.label.active {
+              font-weight: $fontWeightBold;
+            }
           }
         }
         .entityIcon {
@@ -56,7 +69,7 @@
       }
     }
     .menuWrapper {
-      margin-left: 32px;
+      margin-left: 16px;
       padding-bottom: 0;
     }
   }

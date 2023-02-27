@@ -55,12 +55,14 @@ const ImageFromFile: React.FC<TImageFromFileProps> = (props) => {
           <div className={classes}>
             <div className={css.threeToTwoWrapper}>
               <div className={aspectRatioClasses}>
-                <Image
-                  src={dataURL}
-                  fill={true}
-                  alt={file.name}
-                  className={css.rootForImage}
-                />
+                {dataURL && (
+                  <Image
+                    src={dataURL}
+                    fill={true}
+                    alt={file.name}
+                    className={css.rootForImage}
+                  />
+                )}
               </div>
             </div>
             {children}

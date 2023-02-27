@@ -1,14 +1,12 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .root {
 }
 
 .title {
-  font-weight: $fontWeightBold;
-  font-size: 24px;
-  line-height: 32px;
-  text-transform: capitalize;
+  @include pageTitle;
 }
 
 .top {
@@ -60,14 +58,25 @@
   .actionButton {
     display: flex;
     align-items: center;
-    width: 50px;
-    min-height: 50px;
     justify-content: center;
+
+    min-width: 50px;
+    min-height: 50px;
+    padding: 13px;
     border-radius: 50%;
     background-color: transparent;
 
+    .icon {
+      width: 24px;
+      height: 24px;
+    }
+
     &:hover {
-      background-color: $neutralGray5;
+      background-color: $neutralGray4;
+
+      .icon * {
+        fill: $neutralGray1;
+      }
     }
 
     .iconEdit {
@@ -141,7 +150,7 @@
 .badgeContainer {
   border-radius: 100px;
   background-color: $neutralGray3 !important;
-  min-width: 93px;
+  max-width: 93px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -152,7 +161,7 @@
     color: $neutralGray5 !important;
   }
   &.badgeContainerActive {
-    min-width: 77px !important;
+    max-width: 77px !important;
     background-color: $singleUseBadgeGreen1 !important;
     .badgeLabel {
       color: $singleUseBadgeGreen2 !important;
@@ -173,4 +182,22 @@
 .memberEmail,
 .memberPhoneNumber {
   color: $neutralGray5;
+}
+
+.tableWrapper {
+  @include viewportMedium {
+    max-width: calc(100vw - 350px);
+    overflow-x: scroll;
+    position: relative;
+  }
+}
+
+.table {
+  @include viewportMedium {
+    min-width: 1440px;
+  }
+}
+
+.row {
+  max-width: 200px;
 }

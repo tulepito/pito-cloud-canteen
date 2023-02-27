@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import FormWizard from '@components/FormWizard/FormWizard';
+import useRedirectTabWizard from '@hooks/useRedirectTabWizard';
 import { adminRoutes } from '@src/paths';
 import { EListingStates } from '@utils/enums';
+import type { TIntegrationListing } from '@utils/types';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useIntl } from 'react-intl';
 
 // eslint-disable-next-line import/no-cycle
@@ -133,6 +136,7 @@ const EditPartnerWizard = (props: any) => {
     onDiscardDraftPartner,
     onSetAuthorized,
     onSetUnsatisfactory,
+    uploadingImage,
   } = props;
   const intl = useIntl();
   const router = useRouter();
@@ -171,66 +175,72 @@ const EditPartnerWizard = (props: any) => {
     });
   };
 
-  useEffect(() => {
-    // If selectedTab is not active, redirect to the beginning of wizard
-    if (!tabsStatus[selectedTab as string]) {
-      const currentTabIndex = TABS.indexOf(selectedTab as string);
-      const nearestActiveTab = TABS.slice(0, currentTabIndex)
-        .reverse()
-        .find((t) => tabsStatus[t]);
+  const handleRedirectOnSwitchTab = (nearestActiveTab: string) => {
+    const id = partnerListingRef?.id?.uuid;
+    !partnerListingRef
+      ? router.push(`/admin/partner/create`)
+      : router.push(`/admin/partner/${id}/edit?tab=${nearestActiveTab}`);
+  };
 
-      const id = partnerListingRef?.id?.uuid;
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      !partnerListingRef
-        ? router.push(`/admin/partner/create`)
-        : router.push(`/admin/partner/${id}/edit?tab=${nearestActiveTab}`);
-    }
-  }, [tabsStatus, selectedTab, partnerListingRef, router]);
+  useRedirectTabWizard({
+    isNew,
+    listing: partnerListingRef,
+    selectedTab: selectedTab as string,
+    tabs: TABS,
+    tabCompleted,
+    handleRedirect: handleRedirectOnSwitchTab,
+  });
 
   return (
     <FormWizard className={css.formWizard} formTabNavClassName={css.tabNav}>
-      {TABS.map((tab: string) => (
-        <EditPartnerWizardTab
-          key={tab}
-          tab={tab}
-          tabs={TABS}
-          tabId={`${tab}`}
-          tabLabel={tabLabel(intl, tab)}
-          tabLinkProps={tabLink(tab)}
-          selected={selectedTab === tab}
-          uploadedAvatars={uploadedAvatars}
-          uploadedCovers={uploadedCovers}
-          onAvatarUpload={onAvatarUpload}
-          onCoverUpload={onCoverUpload}
-          onRemoveCover={onRemoveCover}
-          onRemoveAvatar={onRemoveAvatar}
-          uploadAvatarError={uploadAvatarError}
-          uploadCoverError={uploadCoverError}
-          inProgress={inProgress}
-          formError={formError}
-          partnerListingRef={partnerListingRef}
-          onUpdatePartnerListing={onUpdatePartnerListing}
-          onCreateDraftPartner={onCreateDraftPartner}
-          uploadedBusinessLicense={uploadedBusinessLicense}
-          onBusinessLicenseUpload={onBusinessLicenseUpload}
-          uploadBusinessLicenseError={uploadBusinessLicenseError}
-          onRemoveBusinessLicense={onRemoveBusinessLicense}
-          uploadedFoodCertificate={uploadedFoodCertificate}
-          onFoodCertificateUpload={onFoodCertificateUpload}
-          uploadFoodCertificateError={uploadFoodCertificateError}
-          onRemoveFoodCertificate={onRemoveFoodCertificate}
-          uploadedPartyInsurance={uploadedPartyInsurance}
-          onPartyInsuranceUpload={onPartyInsuranceUpload}
-          uploadPartyInsuranceError={uploadPartyInsuranceError}
-          onRemovePartyInsurance={onRemovePartyInsurance}
-          onPublishDraftPartner={onPublishDraftPartner}
-          onDiscardDraftPartner={onDiscardDraftPartner}
-          onSetAuthorized={onSetAuthorized}
-          onSetUnsatisfactory={onSetUnsatisfactory}
-          goBack={handleGoBack(tab)}
-        />
-      ))}
+      {TABS.map((tab: string, index: number) => {
+        const disabled = !tabCompleted(
+          TABS[index - 1],
+          partnerListingRef as TIntegrationListing,
+        );
+        return (
+          <EditPartnerWizardTab
+            key={tab}
+            tab={tab}
+            tabs={TABS}
+            tabId={`${tab}`}
+            tabLabel={tabLabel(intl, tab)}
+            tabLinkProps={tabLink(tab)}
+            selected={selectedTab === tab}
+            uploadedAvatars={uploadedAvatars}
+            uploadedCovers={uploadedCovers}
+            onAvatarUpload={onAvatarUpload}
+            onCoverUpload={onCoverUpload}
+            onRemoveCover={onRemoveCover}
+            onRemoveAvatar={onRemoveAvatar}
+            uploadAvatarError={uploadAvatarError}
+            uploadCoverError={uploadCoverError}
+            inProgress={inProgress}
+            formError={formError}
+            partnerListingRef={partnerListingRef}
+            onUpdatePartnerListing={onUpdatePartnerListing}
+            onCreateDraftPartner={onCreateDraftPartner}
+            uploadedBusinessLicense={uploadedBusinessLicense}
+            onBusinessLicenseUpload={onBusinessLicenseUpload}
+            uploadBusinessLicenseError={uploadBusinessLicenseError}
+            onRemoveBusinessLicense={onRemoveBusinessLicense}
+            uploadedFoodCertificate={uploadedFoodCertificate}
+            onFoodCertificateUpload={onFoodCertificateUpload}
+            uploadFoodCertificateError={uploadFoodCertificateError}
+            onRemoveFoodCertificate={onRemoveFoodCertificate}
+            uploadedPartyInsurance={uploadedPartyInsurance}
+            onPartyInsuranceUpload={onPartyInsuranceUpload}
+            uploadPartyInsuranceError={uploadPartyInsuranceError}
+            onRemovePartyInsurance={onRemovePartyInsurance}
+            onPublishDraftPartner={onPublishDraftPartner}
+            onDiscardDraftPartner={onDiscardDraftPartner}
+            onSetAuthorized={onSetAuthorized}
+            onSetUnsatisfactory={onSetUnsatisfactory}
+            goBack={handleGoBack(tab)}
+            disabled={uploadingImage || disabled}
+          />
+        );
+      })}
     </FormWizard>
   );
 };

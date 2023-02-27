@@ -3,6 +3,7 @@ import IconCheckmarkTabTitle from '@components/Icons/IconCheckmark/IconCheckmark
 import ListingCard from '@components/ListingCard/ListingCard';
 import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
+import { isOrderOverDeadline as isOverDeadline } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
@@ -31,8 +32,10 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
   const cartList = useAppSelector((state) => {
     const { currentUser } = state.user;
     const currUserId = currentUser?.id?.uuid;
-    return state.shopingCart.orders?.[currUserId]?.[`${planId}` || 1];
+    return state.shoppingCart.orders?.[currUserId]?.[`${planId}` || 1];
   });
+  const order = useAppSelector((state) => state.ParticipantPlanPage.order);
+
   const loadDataInProgress = useAppSelector(
     (state) => state.ParticipantPlanPage.loadDataInProgress,
   );
@@ -42,6 +45,8 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
   const submitDataInprogress = useAppSelector(
     (state) => state.ParticipantPlanPage.submitDataInprogress,
   );
+
+  const isOrderDeadlineOver = isOverDeadline(order);
 
   const convertDataToTabItem = () => {
     if (loadDataInProgress) {
@@ -77,6 +82,12 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
         </div>
       );
 
+      const selectDisabled =
+        isOrderDeadlineOver ||
+        !!hasDishInCart ||
+        reloadDataInProgress ||
+        submitDataInprogress;
+
       const childrenList = foodList.map((dish, index) => (
         <ListingCard
           key={dish?.id?.uuid || index}
@@ -85,9 +96,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
           dayId={item}
           planId={`${planId}`}
           isSelected={hasDishInCart === dish?.id?.uuid}
-          selectDisabled={
-            !!hasDishInCart || reloadDataInProgress || submitDataInprogress
-          }
+          selectDisabled={selectDisabled}
         />
       ));
 
@@ -121,7 +130,11 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
           headerClassName={css.sectionMainOrderHeader}
           onChange={onSelectTab}
           actionsComponent={
-            <TabActions orderDay={orderDay} planId={`${planId}`} />
+            <TabActions
+              orderDay={orderDay}
+              planId={`${planId}`}
+              isOrderDeadlineOver={isOrderDeadlineOver}
+            />
           }
         />
       </div>

@@ -1,12 +1,19 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .root {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   min-height: calc(100vh - (calc($adminTopbarHeight + 70px)));
+
   .loadingIcon {
     stroke: $primaryPri2;
+  }
+
+  .loadingText {
+    @include textTemplate(20px, 700, 24px);
   }
 }

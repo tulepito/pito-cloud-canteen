@@ -2,8 +2,8 @@ import ButtonIcon from '@components/ButtonIcon/ButtonIcon';
 import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import Modal from '@components/Modal/Modal';
 import Tooltip from '@components/Tooltip/Tooltip';
-import { DateTime } from 'luxon';
-import React, { useMemo, useState } from 'react';
+import { parseTimestampToFormat } from '@utils/dates';
+import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import type { TSendNotificationFormValues } from './SendNotificationForm';
@@ -26,20 +26,12 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
     onSubmit,
   } = props;
 
-  const defaultCopyText = useMemo(
-    () =>
-      intl.formatMessage({
-        id: 'SendNotificationModal.copyToClipboardTooltip.default',
-      }),
-    [],
-  );
-  const copiedCopyText = useMemo(
-    () =>
-      intl.formatMessage({
-        id: 'SendNotificationModal.copyToClipboardTooltip.copied',
-      }),
-    [],
-  );
+  const defaultCopyText = intl.formatMessage({
+    id: 'SendNotificationModal.copyToClipboardTooltip.default',
+  });
+  const copiedCopyText = intl.formatMessage({
+    id: 'SendNotificationModal.copyToClipboardTooltip.copied',
+  });
 
   const [copyToClipboardTooltip, setCopyToClipboardTooltip] =
     useState(defaultCopyText);
@@ -52,8 +44,7 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
       id: 'SendNotificationModal.alert',
     },
     {
-      dateTime:
-        DateTime.fromMillis(orderDeadline).toFormat('dd/MM/yyyy  HH:mm'),
+      dateTime: parseTimestampToFormat(orderDeadline, 'dd/MM/yyyy  HH:mm'),
     },
   );
   const sendNotificationModalLinkLabel = intl.formatMessage({

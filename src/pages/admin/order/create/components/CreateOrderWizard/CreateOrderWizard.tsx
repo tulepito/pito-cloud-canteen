@@ -1,14 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import FormWizard from '@components/FormWizard/FormWizard';
 import { getItem, setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
-import {
-  OrderAsyncAction,
-  removeBookerList,
-  resetOrder,
-} from '@redux/slices/Order.slice';
-import { LISTING } from '@utils/data';
+import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
+import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -22,6 +19,7 @@ import MealPlanSetup from '../../../StepScreen/MealPlanSetup/MealPlanSetup';
 import ReviewOrder from '../ReviewOrder/ReviewOrder';
 // eslint-disable-next-line import/no-cycle
 import SetupOrderDetail from '../SetupOrderDetail/SetupOrderDetail';
+import { isGeneralInfoSetupCompleted } from './CreateOrderWizard.helper';
 import css from './CreateOrderWizard.module.scss';
 
 export const CLIENT_SELECT_TAB = 'clientSelect';
@@ -39,22 +37,27 @@ export const TABS = [
 
 export const CREATE_ORDER_STEP_LOCAL_STORAGE_NAME = 'orderStep';
 
-const tabCompleted = (order: any, tab: string) => {
-  const orderId = LISTING(order).getId();
-  const {
-    deliveryAddress,
-    staffName,
-    plans = [],
-  } = LISTING(order).getMetadata();
-  const isMealPlanTabCompleted = plans.length > 0;
+const tabCompleted = (order: any, tab: string, orderDetail: any) => {
+  const orderId = Listing(order).getId();
+  const { staffName, plans = [] } = Listing(order).getMetadata();
+
+  const missingSelectedFood = Object.keys(orderDetail).filter((dateTime) =>
+    isEmpty(orderDetail[dateTime].restaurant.foodList),
+  );
+  const isMealPlanTabCompleted =
+    !isEmpty(plans) && isEmpty(missingSelectedFood);
 
   switch (tab) {
     case CLIENT_SELECT_TAB:
-      return orderId;
+      return !isEmpty(orderId);
     case MEAL_PLAN_SETUP:
-      return deliveryAddress;
+      return isGeneralInfoSetupCompleted(order as TListing);
     case CREATE_MEAL_PLAN_TAB:
-      return isMealPlanTabCompleted;
+      return (
+        !isEmpty(orderId) &&
+        isMealPlanTabCompleted &&
+        isGeneralInfoSetupCompleted(order as TListing)
+      );
     case REVIEW_TAB:
       return !!staffName;
     default:
@@ -62,13 +65,13 @@ const tabCompleted = (order: any, tab: string) => {
   }
 };
 
-const tabsActive = (order: any) => {
+const tabsActive = (order: any, orderDetail: any) => {
   return TABS.reduce((acc, tab) => {
     const previousTabIndex = TABS.findIndex((t) => t === tab) - 1;
     const isActive =
-      previousTabIndex >= 0
-        ? tabCompleted(order, TABS[previousTabIndex])
-        : true;
+      previousTabIndex < 0 ||
+      tabCompleted(order, TABS[previousTabIndex], orderDetail);
+
     return { ...acc, [tab]: isActive };
   }, {});
 };
@@ -101,15 +104,8 @@ const CreateOrderWizard = () => {
   );
 
   useEffect(() => {
-    if (currentStep === CLIENT_SELECT_TAB) {
-      dispatch(manageCompaniesThunks.queryCompanies());
-      dispatch(removeBookerList());
-    }
-  }, [currentStep, dispatch]);
-
-  useEffect(() => {
     if (orderId) {
-      dispatch(OrderAsyncAction.fetchOrder(orderId as string));
+      dispatch(orderAsyncActions.fetchOrder(orderId as string));
     }
   }, [dispatch, orderId]);
 
@@ -145,25 +141,31 @@ const CreateOrderWizard = () => {
   };
 
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
-  const tabsStatus = tabsActive(order) as any;
+  const orderDetail = useAppSelector(
+    (state) => state.Order.orderDetail,
+    shallowEqual,
+  );
+  const tabsStatus = tabsActive(order, orderDetail) as any;
 
   useEffect(() => {
     if (order) {
-      const { plans = [], staffName } = LISTING(
-        order as TListing,
-      ).getMetadata();
+      const { staffName } = Listing(order as TListing).getMetadata();
       if (staffName) {
+        setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, REVIEW_TAB);
         return setCurrentStep(REVIEW_TAB);
       }
-      if (plans.length > 0) {
+      if (isGeneralInfoSetupCompleted(order as TListing)) {
+        setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, CREATE_MEAL_PLAN_TAB);
         return setCurrentStep(CREATE_MEAL_PLAN_TAB);
       }
+      setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, MEAL_PLAN_SETUP);
       return setCurrentStep(MEAL_PLAN_SETUP);
     }
-  }, [order]);
+  }, [JSON.stringify(order)]);
+
   useEffect(() => {
-    // If selectedTab is not active, redirect to the beginning of wizard
     if (!tabsStatus[currentStep as string]) {
+      // If selectedTab is not active, redirect to the beginning of wizard
       const currentTabIndex = TABS.indexOf(currentStep as string);
       const nearestActiveTab = TABS.slice(0, currentTabIndex)
         .reverse()
@@ -178,7 +180,7 @@ const CreateOrderWizard = () => {
     <FormWizard formTabNavClassName={css.formTabNav}>
       {TABS.map((tab: string, index) => {
         const disabled =
-          !tabCompleted(order, TABS[index - 1]) ||
+          !tabCompleted(order, TABS[index - 1], orderDetail) ||
           (orderId && tab === CLIENT_SELECT_TAB);
 
         return (

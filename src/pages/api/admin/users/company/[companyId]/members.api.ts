@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
-import { denormalisedResponseEntities, USER } from '@utils/data';
+import { denormalisedResponseEntities, User } from '@utils/data';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -17,7 +17,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const [company] = denormalisedResponseEntities(response);
 
-    const { members = {} } = USER(company).getMetadata();
+    const { members = {} } = User(company).getMetadata();
 
     const roles = String(rolesAsString).split(',');
 

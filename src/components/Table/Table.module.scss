@@ -1,123 +1,115 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/defaults.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
-.root {
-  .table {
-    margin-bottom: 20px;
-    border-collapse: collapse;
-    width: 100%;
-    display: block;
+.table {
+  margin-bottom: 20px;
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+
+  @include viewportLarge {
+    display: table;
+  }
+  thead {
+    display: none;
     @include viewportLarge {
-      display: table;
+      display: table-header-group;
     }
-    thead {
-      display: none;
+    .headRow {
+      background-color: $neutralGray3;
+
+      .headCell {
+        padding: 14px 10px 14px 20px;
+        text-align: left;
+        color: $neutralGray6;
+        font-weight: $fontWeightBold;
+        font-size: 14px;
+        &:first-child {
+          border-top-left-radius: 8px;
+          border-bottom-left-radius: 8px;
+        }
+        &:last-child {
+          border-top-right-radius: 8px;
+          border-bottom-right-radius: 8px;
+        }
+        .headCellLabel {
+          display: inline-flex;
+          align-items: center;
+          .sortIcon {
+            margin-left: 5px;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
+
+  tbody {
+    .formHeadRow {
       @include viewportLarge {
-        display: table-header-group;
+        display: none;
       }
-      .headRow {
+      .formHeadCell {
+        text-align: center;
+        color: $neutralGray5;
         background-color: $neutralGray3;
-
-        .checkboxSvg {
-          background-color: $neutralGray1;
-          border-radius: 4px;
-        }
-
-        .headCell {
-          padding: 14px 10px 14px 20px;
-          text-align: left;
-          color: $neutralGray6;
-          font-weight: $fontWeightBold;
-          font-size: 14px;
-          &:first-child {
-            border-top-left-radius: 8px;
-            border-bottom-left-radius: 8px;
-          }
-          &:last-child {
-            border-top-right-radius: 8px;
-            border-bottom-right-radius: 8px;
-          }
-          .headCellLabel {
-            display: inline-flex;
-            align-items: center;
-            .sortIcon {
-              margin-left: 5px;
-              cursor: pointer;
-            }
-          }
-        }
+        font-size: 14px;
       }
     }
 
-    tbody {
-      .formHeadRow {
-        @include viewportLarge {
-          display: none;
-        }
-        .formHeadCell {
-          text-align: center;
-          color: $neutralGray5;
-          background-color: $neutralGray3;
-          font-size: 14px;
-        }
+    .formRow {
+      margin: 10px;
+      .formCell {
+        width: 200px;
       }
+    }
 
-      .formRow {
-        margin: 10px;
-        .formCell {
-          width: 200px;
-        }
-      }
+    display: block;
+    width: 100%;
+    @include viewportLarge {
+      display: table-row-group;
+    }
 
+    .bodyRow {
       display: block;
       width: 100%;
+      margin-bottom: 40px;
       @include viewportLarge {
-        display: table-row-group;
+        display: table-row;
+      }
+      transition: all 0.3s;
+      &:hover {
+        background-color: $neutralGray2;
       }
 
-      .bodyRow {
-        display: block;
+      .bodyCell {
+        display: flex;
+        justify-content: space-between;
         width: 100%;
-        margin-bottom: 40px;
-        @include viewportLarge {
-          display: table-row;
-        }
-        transition: all 0.3s;
-        &:hover {
-          background-color: $neutralGray2;
-        }
+        align-items: center;
+        text-align: right;
+        padding: 14px 10px 14px 20px;
+        color: #616161;
+        border-bottom: 1px solid $neutralGray3;
+        position: relative;
+        font-size: 14px;
 
-        .bodyCell {
-          display: flex;
-          justify-content: space-between;
-          width: 100%;
-          align-items: center;
-          text-align: right;
-          padding: 14px 10px 14px 20px;
-          color: #616161;
-          border-bottom: 1px solid $neutralGray3;
-          position: relative;
-          font-size: 14px;
-
-          span {
-            word-break: break-all;
-          }
-          &:before {
-            content: attr(data-label);
-            left: 0;
-            width: 50%;
-            padding-left: 15px;
-            text-align: left;
-            @include viewportLarge {
-              display: none;
-            }
-          }
+        &:before {
+          content: attr(data-label);
+          left: 0;
+          width: 50%;
+          padding-left: 15px;
+          text-align: left;
           @include viewportLarge {
-            display: table-cell;
-            width: unset;
-            text-align: left;
+            display: none;
           }
+        }
+        @include viewportLarge {
+          display: table-cell;
+          width: unset;
+          text-align: left;
         }
       }
     }

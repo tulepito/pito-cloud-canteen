@@ -2,7 +2,7 @@ import { fetchListing } from '@services/integrationHelper';
 import { getSdk, handleError } from '@services/sdk';
 import { HTTP_METHODS } from '@src/pages/api/helpers/constants';
 import { UserPermission } from '@src/types/UserPermission';
-import { denormalisedResponseEntities, LISTING, USER } from '@utils/data';
+import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 const orderChecker =
@@ -14,8 +14,8 @@ const orderChecker =
       const { companyId, orderId } = req.body;
       const apiMethod = req.method;
       const [currentUser] = denormalisedResponseEntities(currentUserResponse);
-      const { isAdmin = false } = USER(currentUser).getMetadata();
-      const { company = {} } = USER(currentUser).getMetadata();
+      const { isAdmin = false } = User(currentUser).getMetadata();
+      const { company = {} } = User(currentUser).getMetadata();
       switch (apiMethod) {
         case HTTP_METHODS.POST: {
           if (!companyId) {
@@ -23,10 +23,11 @@ const orderChecker =
               message: 'Missing required key',
             });
           }
-
           const userPermission = company[companyId]?.permission;
+
           if (
-            (userPermission && userPermission !== UserPermission.BOOKER) ||
+            userPermission &&
+            userPermission !== UserPermission.BOOKER &&
             !isAdmin
           ) {
             return res.status(403).json({
@@ -41,11 +42,13 @@ const orderChecker =
               message: 'Missing required key',
             });
           }
+
           const orderListing = await fetchListing(orderId);
-          const { clientId } = LISTING(orderListing).getMetadata();
+          const { clientId } = Listing(orderListing).getMetadata();
           const userPermission = company[clientId]?.permission;
           if (
-            (userPermission && userPermission !== UserPermission.BOOKER) ||
+            userPermission &&
+            userPermission !== UserPermission.BOOKER &&
             !isAdmin
           ) {
             return res.status(403).json({

@@ -11,6 +11,7 @@ type TMDayItemProps = {
   events?: Event[];
   renderEvent?: React.FC<any>;
   components?: TCalendarItemCardComponents;
+  resources?: any;
 };
 
 const MDayItem: React.FC<TMDayItemProps> = ({
@@ -18,6 +19,7 @@ const MDayItem: React.FC<TMDayItemProps> = ({
   events = [],
   renderEvent,
   components,
+  resources,
 }) => {
   const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
   const isCurrentDay =
@@ -31,10 +33,15 @@ const MDayItem: React.FC<TMDayItemProps> = ({
       <DayItemContent
         date={date}
         events={events}
+        resources={resources}
         renderEvent={renderEvent}
         components={components}
       />
-      <DayItemFooter date={date} isCurrentDay={isCurrentDay} />
+      <DayItemFooter
+        resources={resources}
+        date={date}
+        isCurrentDay={isCurrentDay}
+      />
     </div>
   );
 };

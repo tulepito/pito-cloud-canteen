@@ -4,10 +4,10 @@ import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import IconShare from '@components/Icons/IconShare/IconShare';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { parseTimestampToFormat } from '@utils/dates';
 import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
-import { DateTime } from 'luxon';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { orderManagementThunks } from '../../../OrderManagement.slice';
@@ -30,29 +30,20 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const { orderData } = useAppSelector((state) => state.OrderManagement);
+
   const orderLink = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderData?.id?.uuid}`;
-  const formattedOrderDeadline = DateTime.fromMillis(orderDeadline).toFormat(
+  const formattedOrderDeadline = parseTimestampToFormat(
+    orderDeadline,
     'HH:mm EEE,dd/MM/yyyy',
-    {
-      locale: 'vi',
-    },
   );
   const rootClasses = classNames(rootClassName || css.root, className);
 
-  const defaultCopyText = useMemo(
-    () =>
-      intl.formatMessage({
-        id: 'OrderLinkSection.copyToClipboardTooltip.default',
-      }),
-    [],
-  );
-  const copiedCopyText = useMemo(
-    () =>
-      intl.formatMessage({
-        id: 'OrderLinkSection.copyToClipboardTooltip.copied',
-      }),
-    [],
-  );
+  const defaultCopyText = intl.formatMessage({
+    id: 'OrderLinkSection.copyToClipboardTooltip.default',
+  });
+  const copiedCopyText = intl.formatMessage({
+    id: 'OrderLinkSection.copyToClipboardTooltip.copied',
+  });
 
   const [copyToClipboardTooltip, setCopyToClipboardTooltip] =
     useState(defaultCopyText);

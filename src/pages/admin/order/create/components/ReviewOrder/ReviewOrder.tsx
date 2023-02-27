@@ -8,8 +8,8 @@ import Tabs from '@components/Tabs/Tabs';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
-import { LISTING } from '@utils/data';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { Listing } from '@utils/data';
 import { parseTimestampToFormat } from '@utils/dates';
 import type { TListing } from '@utils/types';
 import { required } from '@utils/validators';
@@ -18,7 +18,7 @@ import arrayMutators from 'final-form-arrays';
 import React, { useEffect, useMemo } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-intl/src/utils';
+import { shallowEqual } from 'react-redux';
 
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../NavigateButtons/NavigateButtons';
@@ -64,124 +64,17 @@ const MENU_TABLE_COLUMN: TColumn[] = [
     render: (data: any) => {
       return (
         <span title={data.id} className={classNames(css.rowText, css.rowId)}>
-          {addCommas(data.foodPrice.amount)}đ
+          {addCommas(data.foodPrice)} đ
         </span>
       );
     },
   },
 ];
-
-const MEMBER_ORDER_TABLE_COLUMN: TColumn[] = [
-  {
-    key: 'stt',
-    label: 'STT',
-    render: (data) => {
-      return (
-        <span
-          title={data.index}
-          className={classNames({ [css.parentRow]: data.isParent })}>
-          {data.index}
-        </span>
-      );
-    },
-  },
-  {
-    key: 'label',
-    label: 'Hạng mục',
-    render: (data) => {
-      return (
-        <span
-          title={data.index}
-          className={classNames({ [css.parentRow]: data.isParent })}>
-          {data.label}
-        </span>
-      );
-    },
-  },
-  {
-    key: 'dvt',
-    label: 'DVT',
-    render: (data) => {
-      return (
-        <span
-          title={data.id}
-          className={classNames(css.rowText, css.rowId)}></span>
-      );
-    },
-  },
-  {
-    key: 'quantity',
-    label: 'SL',
-    render: (data) => {
-      return (
-        <span title={data.id} className={classNames(css.rowText, css.rowId)}>
-          {data.quantity}
-        </span>
-      );
-    },
-  },
-  {
-    key: 'price',
-    label: 'Đơn giá',
-    render: (data) => {
-      return (
-        <span title={data.id} className={classNames(css.rowText, css.rowId)}>
-          {data.price}đ
-        </span>
-      );
-    },
-  },
-];
-
-const generateOrderDetails = (orders: any[]) => {
-  let newData: any[] = [];
-  orders.forEach((data, index) => {
-    const { date, memberOrders = {}, foodList = {} } = data;
-    const memeberDetails = Object.keys(memberOrders).map(
-      (key: any, memberIndex: number) => {
-        return {
-          key: key + memberIndex + date,
-          data: {
-            label: foodList[memberOrders[key].foodId]?.foodName || 'Com ga',
-            price: foodList[memberOrders[key].foodId]?.foodPrice.amount || 0,
-            quantity: 1,
-          },
-        };
-      },
-    );
-
-    const totalDatePricing = memeberDetails.reduce((acc, cur) => {
-      return cur.data.price + acc;
-    }, 0);
-
-    newData.push({
-      key: date + index,
-      data: {
-        isParent: true,
-        index: index + 1,
-        label: parseTimestampToFormat(Number(date)),
-        quantity: memeberDetails.length,
-        price: totalDatePricing,
-      },
-    });
-    newData = [...newData, ...memeberDetails];
-  });
-
-  return newData;
-};
 
 const ReviewContent: React.FC<any> = (props) => {
-  const {
-    foodList,
-    deliveryHour,
-    deliveryAddress = {},
-    restaurant,
-    order,
-  } = props;
+  const { restaurant } = props;
+  const { restaurantName, phoneNumber, foodList = {} } = restaurant;
 
-  const { restaurantName, phoneNumber } = restaurant;
-
-  const { address } = deliveryAddress;
   const intl = useIntl();
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
     return {
@@ -194,68 +87,8 @@ const ReviewContent: React.FC<any> = (props) => {
     };
   }) as any;
 
-  const { orderDetail = {} } = order;
-
-  const orderDetailsAsArray = Object.keys(orderDetail).map((key) => {
-    return {
-      date: key,
-      ...orderDetail[key],
-    };
-  }) as any;
-
-  const parsedMemberOrders = generateOrderDetails(orderDetailsAsArray);
-
   return (
     <div>
-      <Collapsible
-        label={intl.formatMessage({ id: 'ReviewOrder.generalInfo' })}>
-        <div className={css.contentBox}>
-          <div className={css.flexChild}>
-            <span className={css.boxTitle}>
-              {intl.formatMessage({ id: 'ReviewOrder.deliveryTime' })}
-            </span>
-            <span className={css.boxContent}>{deliveryHour}</span>
-          </div>
-          <div className={css.flexChild}>
-            <span className={css.boxTitle}>
-              {intl.formatMessage({ id: 'ReviewOrder.address' })}
-            </span>
-            <span className={css.boxContent}>{address}</span>
-          </div>
-          <div className={css.flexChild}>
-            <span className={css.boxTitle}>
-              {intl.formatMessage({ id: 'ReviewOrder.staffNameLabel' })}
-            </span>
-            <FieldTextInput
-              className={css.staffInput}
-              name="staffName"
-              id="staffName"
-              placeholder={intl.formatMessage({
-                id: 'ReviewOrder.staffNamePlaceholder',
-              })}
-              validate={required(
-                intl.formatMessage({ id: 'ReviewOrder.staffNameRequired' }),
-              )}
-            />
-          </div>
-          <div className={css.flexChild}>
-            <span className={css.boxTitle}>
-              {intl.formatMessage({ id: 'ReviewOrder.shipperName.label' })}
-            </span>
-            <FieldTextInput
-              className={css.staffInput}
-              name="shipperName"
-              id="shipperName"
-              placeholder={intl.formatMessage({
-                id: 'ReviewOrder.shipperName.placeholder',
-              })}
-              validate={required(
-                intl.formatMessage({ id: 'ReviewOrder.shipperName.required' }),
-              )}
-            />
-          </div>
-        </div>
-      </Collapsible>
       <Collapsible
         label={intl.formatMessage({
           id: 'ReviewOrder.providerLabel',
@@ -289,26 +122,6 @@ const ReviewContent: React.FC<any> = (props) => {
           tableBodyCellClassName={css.tableBodyCell}
         />
       </Collapsible>
-      <Collapsible
-        label={intl.formatMessage({
-          id: 'ReviewOrder.memberOrder',
-        })}>
-        <Table
-          columns={MEMBER_ORDER_TABLE_COLUMN}
-          data={parsedMemberOrders}
-          tableClassName={css.tableRoot}
-          tableHeadClassName={classNames(
-            css.tableHead,
-            css.tableHeadMemberOrder,
-          )}
-          tableBodyClassName={css.tableBody}
-          tableBodyRowClassName={classNames(
-            css.tableBodyRow,
-            css.tableBodyRowMemberOrder,
-          )}
-          tableBodyCellClassName={css.tableBodyCell}
-        />
-      </Collapsible>
     </div>
   );
 };
@@ -333,10 +146,11 @@ const parseDataToReviewTab = (values: any) => {
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
-  const { orderDetail, order } = useAppSelector(
-    (state) => state.Order,
+  const orderDetail = useAppSelector(
+    (state) => state.Order.orderDetail,
     shallowEqual,
   );
+  const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const createOrderError = useAppSelector(
     (state) => state.Order.createOrderError,
   );
@@ -350,11 +164,12 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     setFalse: closeSuccessModal,
   } = useBoolean();
   useEffect(() => {
-    dispatch(OrderAsyncAction.fetchOrderDetail());
-  }, []);
-  const { staffName, deliveryHour, deliveryAddress, shipperName } = LISTING(
+    dispatch(orderAsyncActions.fetchOrderDetail(order as TListing));
+  }, [dispatch, order]);
+  const { staffName, deliveryHour, deliveryAddress, shipperName } = Listing(
     order as TListing,
   ).getMetadata();
+  const { address } = deliveryAddress || {};
   const { renderedOrderDetail } =
     useMemo(() => {
       return {
@@ -369,13 +184,14 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const onSubmit = async (values: any) => {
     const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
     const { error } = (await dispatch(
-      OrderAsyncAction.updateOrder({
+      orderAsyncActions.updateOrder({
         generalInfo: {
           staffName: staffNameValue,
           shipperName: shipperNameValue,
         },
       }),
     )) as any;
+
     if (!error) {
       openSuccessModal();
     }
@@ -399,12 +215,68 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         initialValues={initialValues}
         onSubmit={onSubmit}
         render={(fieldRenderProps: any) => {
-          const { handleSubmit, goBack } = fieldRenderProps;
+          const { handleSubmit, goBack, invalid } = fieldRenderProps;
           return (
             <Form onSubmit={handleSubmit}>
+              <Collapsible
+                label={intl.formatMessage({ id: 'ReviewOrder.generalInfo' })}>
+                <div className={css.contentBox}>
+                  <div className={css.flexChild}>
+                    <span className={css.boxTitle}>
+                      {intl.formatMessage({ id: 'ReviewOrder.deliveryTime' })}
+                    </span>
+                    <span className={css.boxContent}>{deliveryHour}</span>
+                  </div>
+                  <div className={css.flexChild}>
+                    <span className={css.boxTitle}>
+                      {intl.formatMessage({ id: 'ReviewOrder.address' })}
+                    </span>
+                    <span className={css.boxContent}>{address}</span>
+                  </div>
+                  <div className={css.flexChild}>
+                    <span className={css.boxTitle}>
+                      {intl.formatMessage({ id: 'ReviewOrder.staffNameLabel' })}
+                    </span>
+                    <FieldTextInput
+                      className={css.staffInput}
+                      name="staffName"
+                      id="staffName"
+                      placeholder={intl.formatMessage({
+                        id: 'ReviewOrder.staffNamePlaceholder',
+                      })}
+                      validate={required(
+                        intl.formatMessage({
+                          id: 'ReviewOrder.staffNameRequired',
+                        }),
+                      )}
+                    />
+                  </div>
+                  <div className={css.flexChild}>
+                    <span className={css.boxTitle}>
+                      {intl.formatMessage({
+                        id: 'ReviewOrder.shipperName.label',
+                      })}
+                    </span>
+                    <FieldTextInput
+                      className={css.staffInput}
+                      name="shipperName"
+                      id="shipperName"
+                      placeholder={intl.formatMessage({
+                        id: 'ReviewOrder.shipperName.placeholder',
+                      })}
+                      validate={required(
+                        intl.formatMessage({
+                          id: 'ReviewOrder.shipperName.required',
+                        }),
+                      )}
+                    />
+                  </div>
+                </div>
+              </Collapsible>
               <Tabs items={renderedOrderDetail as any} showNavigation />
               <NavigateButtons
                 goBack={goBack}
+                submitDisabled={invalid}
                 inProgress={updateOrderInProgress}
               />
               {createOrderError && (

@@ -145,13 +145,15 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
             </div>
           )}
           <input {...inputProps} />
-          <div
-            className={classNames(
-              css.rightIconContainer,
-              rightIconContainerClassName,
-            )}>
-            {rightIconElement}
-          </div>
+          {!!rightIcon && (
+            <div
+              className={classNames(
+                css.rightIconContainer,
+                rightIconContainerClassName,
+              )}>
+              {rightIconElement}
+            </div>
+          )}
         </div>
       )}
       <ValidationError fieldMeta={fieldMeta} />

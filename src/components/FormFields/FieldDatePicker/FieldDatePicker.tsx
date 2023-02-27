@@ -27,23 +27,27 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
     customErrorText,
     onChange: onDatePickerChange,
     customInput,
+    selected,
     ...rest
   } = props;
-  const { name, onChange } = input;
+  const { name, onChange, value, onBlur } = input;
   const onInputChange = (date: Date, event: any) => {
     if (typeof onDatePickerChange === 'function') {
       onDatePickerChange(date, event);
     }
     onChange(date?.getTime());
+    onBlur();
   };
-  const { invalid, touched, error } = meta;
+
+  const { invalid, error, touched } = meta;
   const errorText = customErrorText || error;
   const hasError = !!customErrorText || !!(touched && invalid && error);
   const fieldMeta = { touched: hasError, error: errorText };
   const labelClasses = classNames(css.labelRoot);
   const labelRequiredRedStar = fieldMeta.error ? css.labelRequiredRedStar : '';
+
   return (
-    <div className={className}>
+    <div className={classNames(css.root, className)}>
       {label && (
         <label className={labelClasses} htmlFor={id}>
           {label}
@@ -55,7 +59,9 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
         id={id}
         name={name}
         onChange={onInputChange}
+        className={css.input}
         customInput={customInput}
+        selected={value || selected}
         {...rest}
       />
       {!customInput && <ValidationError fieldMeta={fieldMeta} />}

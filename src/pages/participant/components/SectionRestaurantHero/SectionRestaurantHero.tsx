@@ -1,4 +1,4 @@
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { useIntl } from 'react-intl';
@@ -21,7 +21,7 @@ const SectionRestaurantHero: React.FC<TSectionRestaurantHeroProps> = ({
   const heroImage =
     listing?.images?.[0]?.attributes?.variants['landscape-crop2x']?.url;
 
-  const { title } = LISTING(listing).getAttributes();
+  const { title } = Listing(listing).getAttributes();
   const parsedOrderDay = DateTime.fromMillis(Number(orderDay));
   const weekDay = parsedOrderDay.get('day');
   const fullDay = parsedOrderDay.toFormat('dd/LL/yyyy');

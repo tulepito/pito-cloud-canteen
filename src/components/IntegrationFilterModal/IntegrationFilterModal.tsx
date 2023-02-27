@@ -51,7 +51,11 @@ const IntegrationFilterModal: React.FC<TIntegrationFilterModal> = (props) => {
 
   return (
     <div className={classNames(css.root, className)}>
-      <Button onClick={onOpen} type="button" className={css.filterButton}>
+      <Button
+        onClick={onOpen}
+        type="button"
+        variant="secondary"
+        className={css.filterButton}>
         <IconFilter className={css.filterIcon} />
         <FormattedMessage id="IntegrationFilterModal.filterMessage" />
       </Button>

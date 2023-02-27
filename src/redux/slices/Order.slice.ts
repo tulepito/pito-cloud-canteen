@@ -1,39 +1,29 @@
+import { companyApi } from '@apis/companyApi';
 import { fetchUserApi } from '@apis/index';
+import type { TUpdateOrderApiBody } from '@apis/orderApi';
 import {
-  createOrderApi,
-  initiateTransactionsApi,
+  bookerDeleteDraftOrderApi,
+  createBookerOrderApi,
   queryOrdersApi,
   updateOrderApi,
+  updatePlanDetailsApi,
 } from '@apis/orderApi';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
+import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { UserPermission } from '@src/types/UserPermission';
-import { denormalisedResponseEntities, LISTING, USER } from '@utils/data';
+import { denormalisedResponseEntities, Listing, User } from '@utils/data';
+import { convertWeekDay, getSeparatedDates } from '@utils/dates';
+import { EListingStates, EOrderStates } from '@utils/enums';
 import { storableError } from '@utils/errors';
-import type { TListing, TPagination } from '@utils/types';
-import cloneDeep from 'lodash/cloneDeep';
+import type { TListing, TObject, TPagination } from '@utils/types';
+import uniq from 'lodash/uniq';
+import { DateTime } from 'luxon';
+
+import { selectRestaurantPageThunks } from './SelectRestaurantPage.slice';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
-
-const updateSetUpPlan = ({
-  startDate,
-  endDate,
-  orderDetail,
-}: {
-  startDate: number;
-  endDate: number;
-  orderDetail: Record<string, any>;
-}) => {
-  const newOrderDetail = cloneDeep(orderDetail);
-
-  Object.keys(orderDetail).forEach((date) => {
-    if (Number(date) < startDate || Number(date) > endDate) {
-      delete newOrderDetail[date];
-    }
-  });
-
-  return newOrderDetail;
-};
 
 type TOrderInitialState = {
   order: TListing | null;
@@ -67,11 +57,33 @@ type TOrderInitialState = {
   initiateTransactionsInProgress: boolean;
   initiateTransactionsError: any;
 
+  updateOrderDetailInProgress: boolean;
+  updateOrderDetailError: any;
+
   // Manage Orders Page
+  queryParams: TObject;
   orders: TListing[];
   queryOrderInProgress: boolean;
   queryOrderError: any;
+  deleteDraftOrderInProgress: boolean;
+  deleteDraftOrderError: any;
+  totalItemMap: {
+    [EOrderStates.picking]: number;
+    [EOrderStates.completed]: number;
+    [EOrderStates.isNew]: number;
+    [EOrderStates.canceled]: number;
+    all: number;
+  };
   manageOrdersPagination: TPagination;
+
+  restaurantCoverImageList: {
+    [restaurantId: string]: any;
+  };
+  fetchRestaurantCoverImageInProgress: boolean;
+  fetchRestaurantCoverImageError: any;
+
+  recommendRestaurantInProgress: boolean;
+  recommendRestaurantError: any;
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -81,6 +93,9 @@ const FETCH_ORDER = 'app/Order/FETCH_ORDER';
 const FETCH_ORDER_DETAIL = 'app/Order/FETCH_ORDER_DETAIL';
 const INITIATE_TRANSACTIONS = 'app/Order/INITIATE_TRANSACTIONS';
 const QUERY_SUB_ORDERS = 'app/Order/QUERY_SUB_ORDERS';
+const UPDATE_PLAN_DETAIL = 'app/Order/UPDATE_PLAN_DETAIL';
+const FETCH_RESTAURANT_COVER_IMAGE = 'app/Order/FETCH_RESTAURANT_COVER_IMAGE';
+const RECOMMEND_RESTAURANT = 'app/Order/RECOMMEND_RESTAURANT';
 
 const initialState: TOrderInitialState = {
   order: null,
@@ -114,24 +129,45 @@ const initialState: TOrderInitialState = {
   initiateTransactionsError: null,
 
   // Manage Orders
+  queryParams: {},
   orders: [],
   queryOrderInProgress: false,
   queryOrderError: null,
+  deleteDraftOrderInProgress: false,
+  deleteDraftOrderError: null,
   manageOrdersPagination: {
     totalItems: 0,
     totalPages: 0,
     page: 0,
     perPage: 0,
   },
+  totalItemMap: {
+    [EOrderStates.picking]: 0,
+    [EOrderStates.completed]: 0,
+    [EOrderStates.isNew]: 0,
+    [EOrderStates.canceled]: 0,
+    all: 0,
+  },
+
+  updateOrderDetailInProgress: false,
+  updateOrderDetailError: null,
+
+  restaurantCoverImageList: {},
+  fetchRestaurantCoverImageInProgress: false,
+  fetchRestaurantCoverImageError: null,
+
+  recommendRestaurantInProgress: false,
+  recommendRestaurantError: null,
 };
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
-  const { clientId, bookerId } = params;
+  const { clientId, bookerId, isCreatedByAdmin = false } = params;
   const apiBody = {
     companyId: clientId,
     bookerId,
+    isCreatedByAdmin,
   };
-  const { data: orderListing } = await createOrderApi(apiBody);
+  const { data: orderListing } = await createBookerOrderApi(apiBody);
   return orderListing;
 });
 
@@ -139,23 +175,96 @@ const updateOrder = createAsyncThunk(
   UPDATE_ORDER,
   async (params: any, { getState }) => {
     const { order } = getState().Order;
-    const orderId = LISTING(order as TListing).getId();
-    const { data: orderListing } = await updateOrderApi({ ...params, orderId });
-    return orderListing;
+    const { generalInfo } = params;
+    const { deadlineDate, deadlineHour } = generalInfo || {};
+    const orderId = Listing(order as TListing).getId();
+
+    const parsedDeadlineDate = deadlineDate
+      ? DateTime.fromMillis(deadlineDate)
+          .startOf('day')
+          .plus({
+            ...convertHHmmStringToTimeParts(deadlineHour),
+          })
+          .toMillis()
+      : null;
+
+    const apiBody: TUpdateOrderApiBody = {
+      generalInfo: {
+        ...generalInfo,
+        ...(parsedDeadlineDate ? { deadlineDate: parsedDeadlineDate } : {}),
+      },
+    };
+    const { data: orderListing } = await updateOrderApi(orderId, apiBody);
+    return {
+      orderListing,
+    };
+  },
+);
+
+const recommendRestaurants = createAsyncThunk(
+  RECOMMEND_RESTAURANT,
+  async (_, { getState, dispatch }) => {
+    const { order } = getState().Order;
+    const orderDetail: any = {};
+    const {
+      packagePerMember,
+      deliveryHour,
+      nutritions = [],
+      dayInWeek = [],
+      startDate,
+      endDate,
+    } = Listing(order as TListing).getMetadata();
+    const totalDates = getSeparatedDates(startDate, endDate);
+    await Promise.all(
+      totalDates.map(async (dateTime) => {
+        if (
+          dayInWeek.includes(
+            convertWeekDay(DateTime.fromMillis(dateTime).weekday).key,
+          )
+        ) {
+          const { payload }: { payload: any } = await dispatch(
+            selectRestaurantPageThunks.getRestaurants({
+              dateTime: DateTime.fromMillis(dateTime),
+              packagePerMember,
+              deliveryHour,
+              nutritions,
+            }),
+          );
+          const { restaurants = [] } = payload || {};
+          if (restaurants.length > 0) {
+            const randomNumber = Math.floor(
+              Math.random() * (restaurants.length - 1),
+            );
+
+            orderDetail[dateTime] = {
+              restaurant: {
+                id: Listing(restaurants[randomNumber]?.restaurantInfo).getId(),
+                restaurantName: Listing(
+                  restaurants[randomNumber]?.restaurantInfo,
+                ).getAttributes().title,
+                foodList: [],
+                menuId: restaurants[randomNumber]?.menu.id.uuid,
+              },
+            };
+          }
+        }
+      }),
+    );
+    return orderDetail;
   },
 );
 
 const initiateTransactions = createAsyncThunk(
   INITIATE_TRANSACTIONS,
-  async (params: any) => {
-    await initiateTransactionsApi(params);
+  async (_) => {
+    // await initiateTransactionsApi(params);
     return '';
   },
 );
 
 const queryOrders = createAsyncThunk(
   QUERY_SUB_ORDERS,
-  async (payload: any = {}) => {
+  async (payload: TObject = {}) => {
     const params = {
       dataParams: {
         ...payload,
@@ -175,6 +284,36 @@ const queryOrders = createAsyncThunk(
   },
 );
 
+const queryCompanyOrders = createAsyncThunk(
+  'app/Orders/COMPANY_QUERY_ORDERS',
+  async (payload: TObject, { rejectWithValue }) => {
+    const { companyId = '', ...restPayload } = payload;
+
+    if (companyId === '') {
+      return rejectWithValue('Company ID is empty');
+    }
+    const params = {
+      dataParams: {
+        ...restPayload,
+        states: EListingStates.published,
+        perPage: MANAGE_ORDER_PAGE_SIZE,
+        meta_companyId: companyId,
+        meta_listingType: LISTING_TYPE.ORDER,
+      },
+      queryParams: {
+        expand: true,
+      },
+    };
+    const { data } = await companyApi.queryOrdersApi(companyId, params);
+    const { orders, pagination, totalItemMap } = data;
+
+    return { orders, pagination, totalItemMap, queryParams: payload };
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
 const fetchCompanyBookers = createAsyncThunk(
   FETCH_COMPANY_BOOKERS,
   async (companyId: string, { extra: sdk }) => {
@@ -186,7 +325,7 @@ const fetchCompanyBookers = createAsyncThunk(
         { expand: true },
       ),
     )[0];
-    const { members = {} } = USER(companyAccount).getMetadata();
+    const { members = {} } = User(companyAccount).getMetadata();
     const bookerEmails = Object.keys(members).filter(
       (email) => members[email].permission === UserPermission.BOOKER,
     );
@@ -202,19 +341,56 @@ const fetchCompanyBookers = createAsyncThunk(
 
 const fetchOrderDetail = createAsyncThunk(
   FETCH_ORDER_DETAIL,
-  async (_, { getState, extra: sdk }) => {
-    const { order } = getState().Order;
-
-    const { plans = [] } = LISTING(order as TListing).getMetadata();
+  async (order: TListing, { extra: sdk }) => {
+    const { plans = [] } = Listing(order as TListing).getMetadata();
     if (plans[0]) {
-      const response = denormalisedResponseEntities(
+      const response: any = denormalisedResponseEntities(
         await sdk.listings.show({
           id: plans[0],
         }),
       )[0];
-      return LISTING(response).getMetadata().orderDetail;
+
+      return Listing(response).getMetadata().orderDetail;
     }
     return {};
+  },
+);
+
+const fetchRestaurantCoverImages = createAsyncThunk(
+  FETCH_RESTAURANT_COVER_IMAGE,
+  async (_, { extra: sdk, getState }) => {
+    const { orderDetail } = getState().Order;
+    const restaurantIdList = uniq(
+      Object.values(orderDetail).map((item: any) => item.restaurant.id),
+    );
+    const restaurantCoverImageList = await Promise.all(
+      restaurantIdList.map(async (restaurantId) => {
+        const restaurantResponse = denormalisedResponseEntities(
+          await sdk.listings.show({
+            id: restaurantId,
+            include: ['images'],
+            'fields.image': [
+              'variants.landscape-crop',
+              'variants.landscape-crop2x',
+            ],
+          }),
+        )[0];
+        const { coverImageId } = Listing(restaurantResponse).getPublicData();
+        return {
+          [restaurantId]: Listing(restaurantResponse)
+            .getFullData()
+            .images.find((image: any) => image.id.uuid === coverImageId),
+        };
+      }),
+    );
+
+    return restaurantCoverImageList.reduce(
+      (result, item) => ({
+        ...result,
+        ...item,
+      }),
+      {},
+    );
   },
 );
 
@@ -227,7 +403,7 @@ const fetchOrder = createAsyncThunk(
       }),
     )[0];
 
-    const { bookerId } = LISTING(response).getMetadata();
+    const { bookerId } = Listing(response).getMetadata();
     const selectedBooker = denormalisedResponseEntities(
       await sdk.users.show({
         id: bookerId,
@@ -237,14 +413,41 @@ const fetchOrder = createAsyncThunk(
   },
 );
 
-export const OrderAsyncAction = {
+const updatePlanDetail = createAsyncThunk(
+  UPDATE_PLAN_DETAIL,
+  async ({ orderId, planId, orderDetail, updateMode }: any, _) => {
+    const { data: orderListing } = await updatePlanDetailsApi(orderId, {
+      orderDetail,
+      planId,
+      updateMode,
+    });
+    return orderListing;
+  },
+);
+
+const bookerDeleteDraftOrder = createAsyncThunk(
+  'app/Order/DELETE_DRAFT_ORDER',
+  async ({ orderId, companyId }: TObject, { getState, dispatch }) => {
+    const { queryParams } = getState().Order;
+
+    await bookerDeleteDraftOrderApi({ orderId, companyId });
+    await dispatch(queryCompanyOrders(queryParams));
+  },
+);
+
+export const orderAsyncActions = {
   createOrder,
   updateOrder,
+  bookerDeleteDraftOrder,
   fetchCompanyBookers,
-  fetchOrderDetail,
   fetchOrder,
+  fetchOrderDetail,
   initiateTransactions,
   queryOrders,
+  queryCompanyOrders,
+  updatePlanDetail,
+  fetchRestaurantCoverImages,
+  recommendRestaurants,
 };
 
 const orderSlice = createSlice({
@@ -266,26 +469,51 @@ const orderSlice = createSlice({
       selectedBooker: payload,
     }),
     updateDraftMealPlan: (state, { payload }) => {
-      const { orderDetail, ...restPayload } = payload;
-      const { startDate, endDate } = restPayload;
+      const { orderDetail } = payload;
+      const {
+        dateTimestamp,
+        restaurantId,
+        restaurantName,
+        foodList,
+        phoneNumber,
+      } = orderDetail;
       const { orderDetail: oldOrderDetail } = state;
-      const updatedOrderDetailData = { ...oldOrderDetail, ...orderDetail };
+      const existedOrderDetailDate = Object.keys(oldOrderDetail).includes(
+        dateTimestamp.toString(),
+      );
 
+      const updatedOrderDetailData = existedOrderDetailDate
+        ? {
+            ...oldOrderDetail,
+            [dateTimestamp]: {
+              ...oldOrderDetail[dateTimestamp],
+              restaurant: {
+                ...oldOrderDetail[dateTimestamp].restaurant,
+                id: restaurantId,
+                restaurantName,
+                foodList,
+                phoneNumber,
+              },
+            },
+          }
+        : {
+            ...oldOrderDetail,
+            [dateTimestamp]: {
+              restaurant: {
+                id: restaurantId,
+                foodList,
+                restaurantName,
+              },
+            },
+          };
       return {
         ...state,
-        orderDetail: updateSetUpPlan({
-          startDate,
-          endDate,
-          orderDetail: updatedOrderDetailData,
-        }),
+        orderDetail: updatedOrderDetailData,
       };
     },
     removeMealDay: (state, { payload }) => ({
       ...state,
-      draftOrder: {
-        ...state.draftOrder,
-        orderDetail: payload,
-      },
+      orderDetail: payload,
     }),
     selectCalendarDate: (state, { payload }) => ({
       ...state,
@@ -340,7 +568,7 @@ const orderSlice = createSlice({
       .addCase(updateOrder.fulfilled, (state, { payload }) => ({
         ...state,
         updateOrderInProgress: false,
-        order: payload,
+        order: payload.orderListing,
       }))
       .addCase(updateOrder.rejected, (state, { error }) => ({
         ...state,
@@ -429,6 +657,88 @@ const orderSlice = createSlice({
         ...state,
         fetchOrderDetailInProgress: false,
         fetchOrderDetailError: error.message,
+      }))
+      /* =============== queryCompanyOrders =============== */
+      .addCase(queryCompanyOrders.pending, (state) => {
+        state.queryOrderInProgress = true;
+        state.queryOrderError = null;
+      })
+      .addCase(
+        queryCompanyOrders.fulfilled,
+        (
+          state,
+          { payload: { orders, pagination, totalItemMap, queryParams } },
+        ) => ({
+          ...state,
+          queryParams,
+
+          queryOrderInProgress: false,
+          orders,
+          manageOrdersPagination: pagination,
+          totalItemMap,
+        }),
+      )
+      .addCase(queryCompanyOrders.rejected, (state, { payload }) => {
+        state.queryOrderInProgress = false;
+        state.queryOrderError = payload;
+      })
+      /* =============== bookerDeleteDraftOrder =============== */
+      .addCase(bookerDeleteDraftOrder.pending, (state) => {
+        state.deleteDraftOrderInProgress = false;
+        state.queryOrderError = null;
+      })
+      .addCase(bookerDeleteDraftOrder.fulfilled, (state) => {
+        state.deleteDraftOrderInProgress = true;
+      })
+      .addCase(bookerDeleteDraftOrder.rejected, (state, { payload }) => {
+        state.deleteDraftOrderInProgress = false;
+        state.queryOrderError = payload;
+      })
+      .addCase(updatePlanDetail.pending, (state) => ({
+        ...state,
+        updateOrderDetailInProgress: true,
+        updateOrderDetailError: null,
+      }))
+      .addCase(updatePlanDetail.fulfilled, (state, { payload }) => ({
+        ...state,
+        updateOrderDetailInProgress: false,
+        orderDetail: Listing(payload).getMetadata().orderDetail || {},
+      }))
+      .addCase(updatePlanDetail.rejected, (state, { error }) => ({
+        ...state,
+        updateOrderDetailInProgress: false,
+        updateOrderDetailError: error.message,
+      }))
+
+      .addCase(fetchRestaurantCoverImages.pending, (state) => ({
+        ...state,
+        fetchRestaurantCoverImageInProgress: true,
+        fetchRestaurantCoverImageError: null,
+      }))
+      .addCase(fetchRestaurantCoverImages.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchRestaurantCoverImageInProgress: false,
+        restaurantCoverImageList: payload,
+      }))
+      .addCase(fetchRestaurantCoverImages.rejected, (state, { error }) => ({
+        ...state,
+        fetchRestaurantCoverImageInProgress: false,
+        fetchRestaurantCoverImageError: error.message,
+      }))
+
+      .addCase(recommendRestaurants.pending, (state) => ({
+        ...state,
+        recommendRestaurantInProgress: true,
+        recommendRestaurantError: null,
+      }))
+      .addCase(recommendRestaurants.fulfilled, (state) => ({
+        ...state,
+        recommendRestaurantInProgress: false,
+      }))
+      .addCase(recommendRestaurants.rejected, (state, { error }) => ({
+        ...state,
+        recommendRestaurantInProgress: false,
+        recommendRestaurantError: error.message,
       }));
   },
 });

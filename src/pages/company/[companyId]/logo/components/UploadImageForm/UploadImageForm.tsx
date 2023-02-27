@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TImageActionPayload } from '@redux/slices/uploadImage.slice';
 import { uploadImageThunks } from '@redux/slices/uploadImage.slice';
 import { EImageVariants } from '@utils/enums';
-import { isUploadImageOverLimitError } from '@utils/errors';
+import { useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Field, Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -20,6 +20,7 @@ export type TUploadImageFormValues = {
 };
 
 const ACCEPT_IMAGES = 'image/*';
+const IMAGE_MAX_SIZE = 2 * 1024 * 1024; // MB
 type TExtraProps = {};
 type TUploadImageFormComponentProps = FormRenderProps<TUploadImageFormValues> &
   Partial<TExtraProps>;
@@ -31,6 +32,7 @@ const UploadImageFormComponent: React.FC<TUploadImageFormComponentProps> = (
   const { handleSubmit, form } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const [isLimitSize, setIsLimitSize] = useState<boolean>(false);
 
   const fileImageUploadInProgress = useAppSelector(
     (state) => state.uploadImage.uploadImageInProgress,
@@ -122,6 +124,11 @@ const UploadImageFormComponent: React.FC<TUploadImageFormComponentProps> = (
               form.change(`companyImage`, file);
               form.blur(`companyImage`);
               if (file != null) {
+                if (file.size >= IMAGE_MAX_SIZE) {
+                  setIsLimitSize(true);
+                  return;
+                }
+                setIsLimitSize(false);
                 const tempId = `${file.name}_${Date.now()}`;
                 await onImageUpload({ id: tempId, file });
               }
@@ -129,7 +136,7 @@ const UploadImageFormComponent: React.FC<TUploadImageFormComponentProps> = (
 
             let error = null;
 
-            if (isUploadImageOverLimitError(uploadImageError)) {
+            if (isLimitSize) {
               error = (
                 <div className={css.error}>
                   {intl.formatMessage({ id: 'UploadImageForm.limitImage' })}

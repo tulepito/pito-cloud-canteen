@@ -23,19 +23,28 @@ type TKeywordSearchForm = {
   inputClassName?: string;
   label?: ReactNode;
   buttonClassName?: string;
+  className?: string;
 };
 
 const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
   const intl = useIntl();
-  const { placeholder, hideButton, inputClassName, label, buttonClassName } =
-    props;
+  const {
+    placeholder,
+    hideButton,
+    inputClassName,
+    label,
+    buttonClassName,
+    className,
+  } = props;
   return (
     <FinalForm
       {...props}
       render={(fieldRenderProps) => {
         const { handleSubmit } = fieldRenderProps;
         return (
-          <Form onSubmit={handleSubmit} className={css.root}>
+          <Form
+            onSubmit={handleSubmit}
+            className={classNames(css.root, className)}>
             <FieldTextInput
               placeholder={
                 placeholder ||

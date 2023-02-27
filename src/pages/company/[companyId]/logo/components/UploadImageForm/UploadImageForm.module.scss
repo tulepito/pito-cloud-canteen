@@ -4,7 +4,7 @@
 .imageLabelWrapper {
   width: 480px;
   height: 160px;
-  border: 1px solid $neutral4;
+  border: 1px solid $neutralGray4;
   border-radius: 8px;
   @include flexAlign(center, center);
   flex-direction: column;
@@ -14,7 +14,7 @@
     font-weight: $fontWeightBold;
     color: $neutralGray6;
     padding: 6px 14px;
-    border: 1px solid $neutral4;
+    border: 1px solid $neutralGray4;
     border-radius: 8px;
   }
 
@@ -66,4 +66,8 @@
 .submitBtn {
   margin-top: 40px;
   width: 200px;
+}
+
+.error {
+  color: $primaryPri2;
 }

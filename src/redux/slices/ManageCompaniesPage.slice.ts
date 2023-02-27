@@ -115,13 +115,13 @@ export const manageCompaniesSlice = createSlice({
   initialState,
   reducers: {
     paginateCompanies: (state, action) => {
-      const { page, totalItems } = action.payload;
+      const { page, totalItems, perPage = 10 } = action.payload;
       return {
         ...state,
         pagination: {
           totalItems,
-          totalPages: Math.ceil(totalItems / RESULT_PAGE_SIZE),
-          perPage: RESULT_PAGE_SIZE,
+          totalPages: Math.ceil(totalItems / perPage),
+          perPage,
           page,
         },
       };

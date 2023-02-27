@@ -1,6 +1,6 @@
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-import type { TDefaultProps } from '@utils/types';
+import type { TDefaultProps, TObject } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
@@ -13,7 +13,10 @@ import createMonthViewWrapper from './components/MonthView/withMonthViewWrapper'
 import OrderEventCard from './components/OrderEventCard/OrderEventCard';
 import Toolbar from './components/Toolbar/Toolbar';
 import withWeekViewWrapper from './components/WeekView/withWeekViewWrapper';
-import type { TCalendarItemCardComponents } from './helpers/types';
+import type {
+  TCalendarItemCardComponents,
+  TDayColumnHeaderProps,
+} from './helpers/types';
 
 type TCalendarDashboardProps = TDefaultProps & {
   anchorDate?: Date;
@@ -28,6 +31,9 @@ type TCalendarDashboardProps = TDefaultProps & {
   recommendButton?: ReactNode;
   hideMonthView?: boolean;
   hideWeekView?: boolean;
+  headerComponent?: (params: TDayColumnHeaderProps) => ReactNode;
+  eventExtraProps?: TObject;
+  resources?: any;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
@@ -45,6 +51,9 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   endDate,
   hideMonthView,
   hideWeekView,
+  headerComponent,
+  eventExtraProps,
+  resources,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
 
@@ -63,6 +72,8 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
         inProgress,
         renderEvent,
         customComponents: components,
+        customHeader: headerComponent,
+        eventExtraProps,
       })
     : false;
 
@@ -114,6 +125,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
         localizer={localizer}
         events={events}
         views={views}
+        resources={resources}
         components={{
           toolbar: components?.toolbar || defaultToolbar,
         }}

@@ -1,0 +1,95 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  @include flexAlign(flex-start);
+
+  .avatar {
+    width: 128px;
+    height: 128px;
+    margin-right: 88px;
+
+    .uploadAvatarWrapper {
+      // height: 100%;
+      .label {
+        width: 100%;
+      }
+    }
+    .uploadAvatarInput {
+      display: none;
+    }
+    .avatarContainer {
+      // width: 128px;
+      // height: 128px;
+      border-radius: 100%;
+      position: relative;
+
+      .camera {
+        width: 44px;
+        height: 44px;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        cursor: pointer;
+        background-color: $neutralGray1;
+        @include flexAlign(center, center);
+        border-radius: 100%;
+        box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06),
+          0px 4px 8px -2px rgba(16, 24, 40, 0.1);
+      }
+    }
+
+    .avatarPlaceholder {
+      background-color: $neutralGray3;
+      width: 128px;
+      height: 128px;
+      border-radius: 100%;
+      @include flexAlign(center, center);
+      cursor: pointer;
+    }
+
+    .uploadingImage {
+      width: 128px;
+      height: 128px;
+
+      img {
+        border-radius: 100%;
+      }
+    }
+
+    .thumbnailLoading {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-color: rgba(211, 211, 211, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .profile {
+    @include flexAlign(flex-start);
+    gap: 32px;
+    flex-wrap: wrap;
+    width: 632px;
+
+    .fieldInput {
+      width: 300px;
+      input {
+        @include textTemplate(14px, $fontWeightMedium, 24px);
+      }
+
+      .label {
+        @include textTemplate(14px, $fontWeightMedium, 24px);
+      }
+    }
+  }
+}
+
+.avatarImg {
+  width: 128px;
+  height: 128px;
+}

@@ -1,6 +1,5 @@
 import type { TCompanyMembers } from '@redux/slices/ManageCompaniesPage.slice';
-import { RESULT_PAGE_SIZE } from '@redux/slices/ManageCompaniesPage.slice';
-import { USER } from '@utils/data';
+import { User } from '@utils/data';
 import { ECompanyStatus } from '@utils/enums';
 import { removeAccents } from '@utils/string';
 import type { TCompany } from '@utils/types';
@@ -14,13 +13,14 @@ type TExtraDataMapToCompanyTable = {
   updateStatus: (e: TUpdateStatus) => void;
 };
 
-export const sliceCompanies = (companies: TCompany[], page: any) => {
+export const sliceCompanies = (
+  companies: TCompany[],
+  page: any,
+  perPage: number,
+) => {
   const pageAsNum = Number(page);
 
-  return companies.slice(
-    (pageAsNum - 1) * RESULT_PAGE_SIZE,
-    pageAsNum * RESULT_PAGE_SIZE,
-  );
+  return companies.slice((pageAsNum - 1) * perPage, pageAsNum * perPage);
 };
 
 export const filterCompanies = (companies: TCompany[], filterValues: any) => {
@@ -73,25 +73,25 @@ export const sortCompanies = (
   return [...companies].sort((a, b) => {
     if (isSortAZ) {
       if (
-        USER(a).getPublicData().companyName.toLowerCase() <
-        USER(b).getPublicData().companyName.toLowerCase()
+        User(a).getPublicData()?.companyName?.toLowerCase() <
+        User(b).getPublicData()?.companyName?.toLowerCase()
       )
         return -1;
       if (
-        USER(a).getPublicData().companyName.toLowerCase() >
-        USER(b).getPublicData().companyName.toLowerCase()
+        User(a).getPublicData()?.companyName?.toLowerCase() >
+        User(b).getPublicData()?.companyName?.toLowerCase()
       )
         return 1;
       return 0;
     }
     if (
-      USER(b).getPublicData().companyName.toLowerCase() <
-      USER(a).getPublicData().companyName.toLowerCase()
+      User(b).getPublicData()?.companyName?.toLowerCase() <
+      User(a).getPublicData()?.companyName?.toLowerCase()
     )
       return -1;
     if (
-      USER(b).getPublicData().companyName.toLowerCase() >
-      USER(a).getPublicData().companyName.toLowerCase()
+      User(b).getPublicData()?.companyName?.toLowerCase() >
+      User(a).getPublicData()?.companyName?.toLowerCase()
     )
       return 1;
     return 0;

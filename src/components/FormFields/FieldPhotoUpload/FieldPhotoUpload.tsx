@@ -6,7 +6,12 @@ import IconUpload from '@components/Icons/IconUpload/IconUpload';
 import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { isUploadImageOverLimitError } from '@utils/errors';
-import type { TDefaultProps, TImage, TImageVariant } from '@utils/types';
+import type {
+  TDefaultProps,
+  TImage,
+  TImageVariant,
+  TObject,
+} from '@utils/types';
 import classNames from 'classnames';
 import type { ChangeEvent } from 'react';
 import React, { useState } from 'react';
@@ -82,7 +87,7 @@ const PhotoWithOverlay = (props: TPhotoWithOverlay) => {
 };
 
 type TImageUploadFnReturnValue = {
-  payload: Record<any, any>;
+  payload: TObject;
 };
 
 type TFieldPhotoUpload = {
@@ -96,7 +101,7 @@ type TFieldPhotoUpload = {
   disabled?: boolean;
   className?: string;
   variants: string[];
-  uploadImageError: any;
+  uploadImageError?: any;
   name: string;
   id: string;
   validate: any;
