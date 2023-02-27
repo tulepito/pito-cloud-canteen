@@ -1,6 +1,7 @@
 import Form from '@components/Form/Form';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { distanceOptions, ratingOptions } from '@src/marketplaceConfig';
+import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm, FormSpy } from 'react-final-form';
@@ -10,7 +11,9 @@ import css from './FilterSidebarForm.module.scss';
 
 export type TFilterSidebarFormValues = {};
 
-type TExtraProps = {};
+type TExtraProps = {
+  className?: string;
+};
 type TFilterSidebarFormComponentProps =
   FormRenderProps<TFilterSidebarFormValues> & Partial<TExtraProps>;
 type TFilterSidebarFormProps = FormProps<TFilterSidebarFormValues> &
@@ -19,7 +22,7 @@ type TFilterSidebarFormProps = FormProps<TFilterSidebarFormValues> &
 const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, form } = props;
+  const { handleSubmit, form, className } = props;
   const router = useRouter();
 
   const menuTypesOptions = useAppSelector(
@@ -55,8 +58,10 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
     });
   };
 
+  const classes = classNames(css.root, className);
+
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit} className={classes}>
       <FormSpy onChange={handleFormChange} subscription={{ values: true }} />
       <div className={css.header}>
         <div className={css.title}>Bộ lọc</div>

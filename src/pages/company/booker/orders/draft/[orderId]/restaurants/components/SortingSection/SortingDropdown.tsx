@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
-import css from './SortingDropdown.module.scss';
+import css from './SortingSection.module.scss';
 
 type SortingDropdownProps = {
   selectedValue: any;
@@ -19,6 +19,7 @@ const SortingDropdown: React.FC<SortingDropdownProps> = (props) => {
   } = useBoolean();
 
   const intl = useIntl();
+
   const sortingOptions = useMemo(() => {
     return [
       {

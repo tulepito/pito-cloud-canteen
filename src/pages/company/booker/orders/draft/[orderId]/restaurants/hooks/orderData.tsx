@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 
 import { BookerSelectRestaurantThunks } from '../BookerSelectRestaurant.slice';
 
-export const useLoadData = ({ orderId }: { orderId: string }) => {
+export const useGetOrder = ({ orderId }: { orderId: string }) => {
   const order = useAppSelector((state) => state.Order.order);
   const fetchOrderInProgress = useAppSelector(
     (state) => state.Order.fetchOrderInProgress,
@@ -27,7 +27,7 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
   };
 };
 
-export const useLoadPlanDetails = () => {
+export const useGetPlanDetails = () => {
   const order = useAppSelector((state) => state.BookerSelectRestaurant.order);
   const planDetail = useAppSelector(
     (state) => state.BookerSelectRestaurant.planDetail,

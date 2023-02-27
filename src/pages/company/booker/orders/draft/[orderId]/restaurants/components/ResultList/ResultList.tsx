@@ -1,11 +1,13 @@
 import RestaurantCard from '@components/RestaurantCard/RestaurantCard';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import type { TListing } from '@utils/types';
+import { User } from '@utils/data';
+import type { TUser } from '@utils/types';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { shallowEqual } from 'react-redux';
 
 import { BookerSelectRestaurantThunks } from '../../BookerSelectRestaurant.slice';
 import ResultDetailModal from '../ResultDetailModal/ResultDetailModal';
@@ -16,33 +18,37 @@ type TResultListProps = {
   className?: string;
   restaurants?: any[];
   isLoading?: boolean;
-  companyGeoOrigin: {
-    lat: number;
-    lng: number;
-  };
   totalRatings: any[];
-  timestamp: number;
-  restaurantFood: {
-    [restaurantId: string]: TListing[];
-  };
+  companyAccount: TUser | null;
 };
 
 const ResultList: React.FC<TResultListProps> = ({
   className,
   restaurants = [],
   isLoading,
-  companyGeoOrigin,
   totalRatings,
-  timestamp,
-  restaurantFood,
+  companyAccount,
 }) => {
   const router = useRouter();
-  const { restaurantId, orderId, menuId } = router.query;
+  const { timestamp: queryTs, restaurantId, orderId, menuId } = router.query;
+  const timestamp = +`${queryTs}`;
 
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<
     string | undefined
   >(`${restaurantId}`);
   const detailModal = useBoolean(!!restaurantId);
+
+  const restaurantFood = useAppSelector(
+    (state) => state.BookerSelectRestaurant.restaurantFood,
+    shallowEqual,
+  );
+
+  const companyGeoOrigin = useMemo(
+    () => ({
+      ...User(companyAccount as TUser).getPublicData()?.location?.origin,
+    }),
+    [companyAccount],
+  );
 
   const dispatch = useAppDispatch();
 

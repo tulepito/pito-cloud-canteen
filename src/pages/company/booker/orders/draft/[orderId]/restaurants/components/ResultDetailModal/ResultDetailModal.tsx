@@ -15,7 +15,7 @@ import { useIntl } from 'react-intl';
 
 import { BookerSelectRestaurantThunks } from '../../BookerSelectRestaurant.slice';
 import { getListingImageById } from '../../helpers';
-import { useLoadPlanDetails } from '../../hooks/loadData';
+import { useGetPlanDetails } from '../../hooks/orderData';
 import FoodDetailModal from '../FoodDetailModal/FoodDetailModal';
 import FoodListSection from './FoodListSection';
 import ResultDetailFilters from './ResultDetailFilters';
@@ -56,7 +56,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   const foodModal = useBoolean(false);
   const [selectedFood, setSelectedFood] = useState<TListing | null>(null);
 
-  const { orderId, planId, planDetail } = useLoadPlanDetails();
+  const { orderId, planId, planDetail } = useGetPlanDetails();
   const initFoodList = useMemo(() => {
     const detail =
       Listing(planDetail).getMetadata().orderDetail?.[`${timestamp}`];

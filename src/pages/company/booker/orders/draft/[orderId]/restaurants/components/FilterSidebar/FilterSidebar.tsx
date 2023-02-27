@@ -20,9 +20,11 @@ const FilterSidebar: React.FC = () => {
   }, [categories, distance, menuTypes, rating]);
 
   return (
-    <div className={css.container}>
-      <FilterSidebarForm onSubmit={() => {}} initialValues={initialValues} />
-    </div>
+    <FilterSidebarForm
+      className={css.container}
+      onSubmit={() => {}}
+      initialValues={initialValues}
+    />
   );
 };
 

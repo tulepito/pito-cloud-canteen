@@ -40,12 +40,12 @@
 .header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .restaurantName {
   @include textTemplate(16px, 700, 24px);
-  @include lineClamp(2);
+  @include lineClamp(1);
   color: $neutralGray6;
   margin-right: 20px;
   margin: 0 20px 0 0;
@@ -86,6 +86,7 @@
   margin-right: 10px;
   border-right: 1px solid $neutralGray3;
   @include textTemplate(14px, 400, 20px);
+  max-width: 100px;
 
   &:last-child {
     margin-right: 0;

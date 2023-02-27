@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useMemo } from 'react';
 
 import { convertQueryValueToArray } from '../../helpers/urlQuery';
-import css from './FilterLabelList.module.scss';
+import css from './FilterLabelsSection.module.scss';
 
 const FilterLabelList: React.FC = () => {
   const router = useRouter();
