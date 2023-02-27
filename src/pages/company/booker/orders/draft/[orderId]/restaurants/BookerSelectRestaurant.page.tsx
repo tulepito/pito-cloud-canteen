@@ -1,6 +1,5 @@
 import IconMenu from '@components/Icons/IconMenu/IconMenu';
 import { useAppSelector } from '@hooks/reduxHooks';
-import KeywordSearchForm from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 import classNames from 'classnames';
@@ -12,6 +11,7 @@ import { shallowEqual } from 'react-redux';
 import css from './BookerSelectRestaurant.module.scss';
 import FilterLabelList from './components/FilterLabelList/FilterLabelList';
 import FilterSidebar from './components/FilterSidebar/FilterSidebar';
+import KeywordSearchSection from './components/KeywordSearchSection/KeywordSearchSection';
 import ResultList from './components/ResultList/ResultList';
 import SortingDropdown from './components/SortingDropdown/SortingDropdown';
 import { useGetCompanyAccount } from './hooks/company';
@@ -22,7 +22,7 @@ function BookerSelectRestaurant() {
   const intl = useIntl();
 
   const router = useRouter();
-  const { timestamp, orderId, sortBy, keywords } = router.query;
+  const { timestamp, orderId, sortBy } = router.query;
 
   const [filterMobileMenuOpen, setFilterMobileMenuOpen] = useState(false);
   const [currentSortBy, setCurrentSortBy] = useState<string>(
@@ -63,27 +63,6 @@ function BookerSelectRestaurant() {
     [router],
   );
 
-  const keywordsInitialValue = useMemo(() => {
-    return {
-      keywords: (keywords as string) || '',
-    };
-  }, [keywords]);
-
-  const onSearchKeywordsSubmit = (values: any) => {
-    const newQuery = { ...router.query };
-    if (!values.keywords) {
-      delete newQuery.keywords;
-    } else {
-      newQuery.keywords = values.keywords;
-    }
-
-    router.push({
-      query: {
-        ...newQuery,
-      },
-    });
-  };
-
   return (
     <div className={css.root}>
       <div className={css.main}>
@@ -103,10 +82,7 @@ function BookerSelectRestaurant() {
         <div className={css.result}>
           <div className={css.resultHeaderWrapper}>
             <div className={css.searchAndSort}>
-              <KeywordSearchForm
-                onSubmit={onSearchKeywordsSubmit}
-                initialValues={keywordsInitialValue}
-              />
+              <KeywordSearchSection />
               <SortingDropdown
                 selectedValue={intl.formatMessage({
                   id: `BookerSelectRestaurant.sortOption.${currentSortBy}`,
