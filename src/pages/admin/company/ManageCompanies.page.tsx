@@ -3,7 +3,6 @@ import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
-import IconEye from '@components/Icons/IconEye/IconEye';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
@@ -133,13 +132,6 @@ const TABLE_COLUMN: TColumn[] = [
               variant="inline"
               className={classNames(css.actionButton, css.editButton)}>
               <IconEdit className={css.icon} />
-            </Button>
-          </Link>
-          <Link href={`/admin/company/${data.id}`}>
-            <Button
-              variant="inline"
-              className={classNames(css.actionButton, css.editButton)}>
-              <IconEye className={css.icon} />
             </Button>
           </Link>
           <ToggleButton
