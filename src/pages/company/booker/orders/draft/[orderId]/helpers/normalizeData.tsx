@@ -1,4 +1,5 @@
 import { Listing } from '@utils/data';
+import { getDaySessionFromDeliveryTime } from '@utils/dates';
 import { DateTime } from 'luxon';
 
 export const normalizePlanDetailsToEvent = (
@@ -7,7 +8,7 @@ export const normalizePlanDetailsToEvent = (
   coverImageList: any,
 ) => {
   const dateList = Object.keys(planDetails);
-  const { plans = [] } = Listing(order).getMetadata();
+  const { plans = [], deliveryHour } = Listing(order).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
 
   const normalizeData = dateList.map((timestamp) => {
@@ -25,7 +26,7 @@ export const normalizePlanDetailsToEvent = (
     return {
       resource: {
         id: timestamp,
-        daySession: 'MORNING_SESSION',
+        daySession: getDaySessionFromDeliveryTime(deliveryHour),
         isSelectedFood: foodList.length > 0,
         restaurant: {
           id: planData?.restaurant?.id,
