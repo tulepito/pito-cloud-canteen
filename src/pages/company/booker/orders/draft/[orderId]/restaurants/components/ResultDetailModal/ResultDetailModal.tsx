@@ -76,7 +76,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     (state) => state.BookerSelectRestaurant.updatePlanDetailInProgress,
   );
   const currentMenuId = useAppSelector(
-    (state) => state.BookerDraftOrderPage.currentMenuId,
+    (state) => state.BookerSelectRestaurant.currentMenuId,
   );
 
   const currentRestaurant = useMemo(

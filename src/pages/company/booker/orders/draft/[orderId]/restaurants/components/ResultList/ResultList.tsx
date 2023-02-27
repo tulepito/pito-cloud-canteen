@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 
-import { BookerDraftOrderPageThunks } from '../../../BookerDraftOrderPage.slice';
+import { BookerSelectRestaurantThunks } from '../../BookerSelectRestaurant.slice';
 import ResultDetailModal from '../ResultDetailModal/ResultDetailModal';
 import EmptyList from './EmptyList';
 import css from './ResultList.module.scss';
@@ -50,7 +50,7 @@ const ResultList: React.FC<TResultListProps> = ({
     detailModal.setTrue();
     setSelectedRestaurantId(id);
     dispatch(
-      BookerDraftOrderPageThunks.fetchFoodListFromRestaurant({
+      BookerSelectRestaurantThunks.fetchFoodListFromRestaurant({
         restaurantId: id,
         timestamp,
       }),
@@ -60,7 +60,7 @@ const ResultList: React.FC<TResultListProps> = ({
   useEffect(() => {
     if (detailModal.value && restaurantId) {
       dispatch(
-        BookerDraftOrderPageThunks.fetchFoodListFromRestaurant({
+        BookerSelectRestaurantThunks.fetchFoodListFromRestaurant({
           restaurantId: `${restaurantId}`,
           menuId: `${menuId}`,
           timestamp,

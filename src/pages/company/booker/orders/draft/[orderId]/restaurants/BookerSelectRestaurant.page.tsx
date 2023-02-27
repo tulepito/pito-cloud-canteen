@@ -11,9 +11,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
-import { BookerDraftOrderPageThunks } from '../BookerDraftOrderPage.slice';
 import FilterSidebar from '../components/FilterSidebar/FilterSidebar';
 import css from './BookerSelectRestaurant.module.scss';
+import { BookerSelectRestaurantThunks } from './BookerSelectRestaurant.slice';
 import FilterLabelList from './components/FilterLabelList/FilterLabelList';
 import ResultList from './components/ResultList/ResultList';
 import SortingDropdown from './components/SortingDropdown/SortingDropdown';
@@ -55,7 +55,7 @@ function BookerSelectRestaurant() {
 
   useEffect(() => {
     dispatch(
-      BookerDraftOrderPageThunks.searchRestaurants({
+      BookerSelectRestaurantThunks.searchRestaurants({
         timestamp: Number(timestamp),
         orderId,
         page,
@@ -88,34 +88,34 @@ function BookerSelectRestaurant() {
   );
 
   const restaurants = useAppSelector(
-    (state) => state.BookerDraftOrderPage.searchResult,
+    (state) => state.BookerSelectRestaurant.searchResult,
     shallowEqual,
   );
   const searchInProgress = useAppSelector(
-    (state) => state.BookerDraftOrderPage.searchInProgress,
+    (state) => state.BookerSelectRestaurant.searchInProgress,
   );
 
   const menuTypesOptions = useAppSelector(
-    (state) => state.BookerDraftOrderPage.menuTypes,
+    (state) => state.BookerSelectRestaurant.menuTypes,
     shallowEqual,
   );
 
   const categoriesOptions = useAppSelector(
-    (state) => state.BookerDraftOrderPage.categories,
+    (state) => state.BookerSelectRestaurant.categories,
     shallowEqual,
   );
 
   const totalResultItems = useAppSelector(
-    (state) => state.BookerDraftOrderPage.totalItems,
+    (state) => state.BookerSelectRestaurant.totalItems,
   );
 
   const totalRatings = useAppSelector(
-    (state) => state.BookerDraftOrderPage.totalRatings,
+    (state) => state.BookerSelectRestaurant.totalRatings,
     shallowEqual,
   );
 
   const restaurantFood = useAppSelector(
-    (state) => state.BookerDraftOrderPage.restaurantFood,
+    (state) => state.BookerSelectRestaurant.restaurantFood,
     shallowEqual,
   );
 

@@ -1,4 +1,4 @@
-import { BookerDraftOrderPageThunks } from '@pages/company/booker/orders/draft/[orderId]/BookerDraftOrderPage.slice';
+import { BookerSelectRestaurantThunks } from '@pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
@@ -11,7 +11,7 @@ const useFetchSearchFilters = () => {
   useEffect(() => {
     if (isReady) {
       (async () => {
-        await dispatch(BookerDraftOrderPageThunks.fetchSearchFilter());
+        await dispatch(BookerSelectRestaurantThunks.fetchSearchFilter());
       })();
     }
   }, [dispatch, isReady]);
