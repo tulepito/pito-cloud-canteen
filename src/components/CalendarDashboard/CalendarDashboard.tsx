@@ -4,7 +4,7 @@ import type { TDefaultProps, TObject } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Event, ViewsProps } from 'react-big-calendar';
 import { Calendar, luxonLocalizer, Views } from 'react-big-calendar';
 
@@ -92,30 +92,41 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
     [inProgress, propsDefaultDate],
   );
 
-  const anchorDateProps = anchorDate
-    ? {
-        date: calDate,
-        onNavigate: (newDate: Date) => {
-          setCalDate(newDate);
-        },
-      }
-    : { defaultDate };
+  const anchorDateProps = useMemo(() => {
+    return anchorDate
+      ? {
+          date: calDate,
+          onNavigate: (newDate: Date) => {
+            setCalDate(newDate);
+          },
+        }
+      : { defaultDate };
+  }, [anchorDate, calDate, defaultDate]);
 
-  const toolbarExtraProps = {
-    companyLogo,
-    recommendButton,
-    startDate,
-    endDate,
-    anchorDate: calDate,
-  };
+  const toolbarExtraProps = useMemo(() => {
+    return {
+      companyLogo,
+      recommendButton,
+      startDate,
+      endDate,
+      anchorDate: calDate,
+    };
+  }, [companyLogo, recommendButton, startDate, endDate, calDate]);
 
   useEffect(() => {
     setCalDate(anchorDate);
   }, [anchorDate]);
 
-  const defaultToolbar = (props: any) => (
-    <Toolbar {...props} {...toolbarExtraProps} />
+  const defaultToolbar = useCallback(
+    (props: any) => <Toolbar {...props} {...toolbarExtraProps} />,
+    [toolbarExtraProps],
   );
+
+  const componentsProps = useMemo(() => {
+    return {
+      toolbar: components?.toolbar || defaultToolbar,
+    };
+  }, [components?.toolbar, defaultToolbar]);
 
   return (
     <div className={classes}>
@@ -126,9 +137,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
         events={events}
         views={views}
         resources={resources}
-        components={{
-          toolbar: components?.toolbar || defaultToolbar,
-        }}
+        components={componentsProps}
       />
     </div>
   );

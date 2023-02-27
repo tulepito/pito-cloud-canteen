@@ -10,9 +10,11 @@ const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 const createOrder = async ({
   companyId,
   bookerId,
+  generalInfo = {},
 }: {
   companyId: string;
   bookerId: string;
+  generalInfo?: any;
 }) => {
   const integrationSdk = getIntegrationSdk();
 
@@ -34,6 +36,15 @@ const createOrder = async ({
     .toString()
     .padStart(5, '0')}`;
 
+  const {
+    deliveryAddress,
+    deliveryHour,
+    deadlineHour,
+    nutritions,
+    selectedGroups,
+    packagePerMember,
+  } = generalInfo;
+
   // Call api to create order listing
   const orderListingResponse = await integrationSdk.listings.create(
     {
@@ -45,6 +56,12 @@ const createOrder = async ({
         bookerId,
         listingType: ListingTypes.ORDER,
         orderState: EOrderStates.isNew,
+        deliveryAddress,
+        deliveryHour,
+        deadlineHour,
+        nutritions,
+        selectedGroups,
+        packagePerMember,
       },
     },
     { expand: true },

@@ -8,16 +8,16 @@ import css from './MealPlanCard.module.scss';
 
 type TMealPlanCardFooterProps = {
   event: Event;
-  onPickFoodModal?: () => void;
-  onPickFoodInProgress?: boolean;
+  onEditFood: (date: string, restaurantId: string, menuId: string) => void;
+  editFoodInprogress: boolean;
 };
 
 const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
   event,
-  onPickFoodModal,
-  onPickFoodInProgress,
+  onEditFood,
+  editFoodInprogress,
 }) => {
-  const foodList = event.resource.foodList || [];
+  const { id, isSelectedFood, restaurant = {} } = event.resource || {};
   const [isOpenApplyOtherDaysModal, setIsOpenApplyOtherDaysModal] =
     useState<boolean>(false);
 
@@ -28,18 +28,27 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
     setIsOpenApplyOtherDaysModal(false);
   };
 
+  const handleEditFood = () => {
+    onEditFood(id, restaurant.id, restaurant.menuId);
+  };
+
   return (
     <div className={css.footer}>
-      <Button
-        className={css.actionButton}
-        onClick={onPickFoodModal}
-        inProgress={onPickFoodInProgress}>
-        {foodList.length > 0 ? (
+      {isSelectedFood ? (
+        <Button
+          className={css.actionButton}
+          onClick={handleEditFood}
+          inProgress={editFoodInprogress}>
           <FormattedMessage id="MealPlanCard.footer.modify" />
-        ) : (
+        </Button>
+      ) : (
+        <Button
+          className={css.actionButton}
+          onClick={handleEditFood}
+          inProgress={editFoodInprogress}>
           <FormattedMessage id="MealPlanCard.footer.selectDish" />
-        )}
-      </Button>
+        </Button>
+      )}
       <div
         className={css.applyForOtherDays}
         onClick={handleOpenApplyOtherDaysModal}>

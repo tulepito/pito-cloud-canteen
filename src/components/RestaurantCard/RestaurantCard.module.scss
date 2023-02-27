@@ -1,0 +1,105 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  position: relative;
+  width: 295px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid $neutralGray3;
+}
+
+.bonusBadge {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 8px 14px;
+  border-radius: 12px 4px 4px 0px;
+  @include textTemplate(14px, 700, 24px);
+  color: $labelBlue2;
+  background-color: $labelBlue1;
+  z-index: 1;
+}
+
+.gift {
+  margin-right: 6px;
+}
+
+.coverImage {
+  width: 100%;
+  height: 140px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  position: relative;
+  cursor: pointer;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.restaurantName {
+  @include textTemplate(16px, 700, 24px);
+  @include lineClamp(2);
+  color: $neutralGray6;
+  margin-right: 20px;
+  margin: 0 20px 0 0;
+  cursor: pointer;
+}
+
+.favoriteIcon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  transition: 0.1s linear;
+
+  &:hover {
+    width: 21px;
+    height: 21px;
+  }
+}
+
+.nutritions {
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.badge {
+  border-radius: 20px;
+  margin-right: 8px;
+}
+
+.footer {
+  display: flex;
+}
+
+.footerItem {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  padding-right: 10px;
+  margin-right: 10px;
+  border-right: 1px solid $neutralGray3;
+  @include textTemplate(14px, 400, 20px);
+
+  &:last-child {
+    margin-right: 0;
+    padding-right: 0;
+    border-right: 0px solid transparent;
+  }
+}
+
+.footerItemIcon {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+
+  & > g > path {
+    fill: $neutralGray6;
+  }
+}

@@ -21,6 +21,7 @@ type TCreateOrderFormProps = {
   initialValues?: TCreateOrderFormValues;
   submitInprogress?: boolean;
   submitError?: any;
+  queryInprogress?: boolean;
 };
 
 export type TCreateOrderFormValues = {
@@ -47,6 +48,7 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
   onCancel,
   initialValues,
   submitInprogress,
+  queryInprogress,
 }) => {
   const intl = useIntl();
 
@@ -96,7 +98,9 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
         id={`company`}
         name="company">
         <option key={'empty'} disabled value={''}>
-          {intl.formatMessage({ id: 'CreateOrderForm.company.placeholder' })}
+          {queryInprogress
+            ? intl.formatMessage({ id: 'CreateOrderForm.company.loading' })
+            : intl.formatMessage({ id: 'CreateOrderForm.company.placeholder' })}
         </option>
         {companies.map((companyItem) => (
           <option key={companyItem.id} value={companyItem.id}>

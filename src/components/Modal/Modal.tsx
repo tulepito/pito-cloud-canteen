@@ -1,9 +1,11 @@
 import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import useLockBodyScroll from '@hooks/useDisableBodyScroll';
+import { UIActions } from '@redux/slices/UI.slice';
 import classNames from 'classnames';
 import type { PropsWithChildren, ReactNode } from 'react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './Modal.module.scss';
@@ -19,6 +21,7 @@ type TModalProps = PropsWithChildren<{
   handleClose: () => void;
   scrollLayerClassName?: string;
   customHeader?: ReactNode;
+  id?: string;
 }>;
 
 const Modal: React.FC<TModalProps> = (props) => {
@@ -34,9 +37,11 @@ const Modal: React.FC<TModalProps> = (props) => {
     handleClose,
     scrollLayerClassName,
     customHeader,
+    id,
   } = props;
 
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   const isOpenClass = isOpen
     ? classNames(css.isOpen, openClassName)
     : css.isClosed;
@@ -45,6 +50,16 @@ const Modal: React.FC<TModalProps> = (props) => {
   const scrollLayerClasses = classNames(css.scrollLayer, scrollLayerClassName);
   const hasTitle = !!title;
   const closeModalMessage = intl.formatMessage({ id: 'Modal.closeModal' });
+
+  useEffect(() => {
+    if (isOpen) {
+      dispatch(UIActions.disableScrollRequest(id));
+    }
+    return () => {
+      dispatch(UIActions.disableScrollRemove(id));
+    };
+  }, [dispatch, id, isOpen]);
+
   useLockBodyScroll({ isOpen });
 
   const closeBtn =
@@ -58,7 +73,7 @@ const Modal: React.FC<TModalProps> = (props) => {
     ) : null;
 
   return (
-    <div className={classes}>
+    <div id={id} className={classes}>
       <div className={scrollLayerClasses}>
         <div className={containerClasses}>
           {!customHeader && (

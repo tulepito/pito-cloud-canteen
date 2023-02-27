@@ -1,3 +1,5 @@
+import { EBadgeType } from '@components/Badge/Badge';
+
 export enum EImageVariants {
   default = 'default',
   landscapeCrop = 'landscape-crop',
@@ -392,94 +394,117 @@ export const CATEGORY_OPTIONS = [
   {
     key: 'vietnam-food',
     label: 'Thuần Việt',
+    badgeType: EBadgeType.PROCESSING,
   },
   {
     key: 'vietnam-north-food',
     label: 'Món Bắc',
+    badgeType: EBadgeType.DEFAULT,
   },
   {
     key: 'vietnam-centrel-food',
     label: 'Món Trung',
+    badgeType: EBadgeType.ERROR,
   },
   {
     key: 'vietnam-west-food',
     label: 'Món Miền Tây',
+    badgeType: EBadgeType.PROCESSING,
   },
   {
     key: 'chinese-food',
     label: 'Hoa',
+    badgeType: EBadgeType.WARNING,
   },
   {
     key: 'thai-food',
     label: 'Thái',
+    badgeType: EBadgeType.WARNING,
   },
   {
     key: 'korean-food',
     label: 'Hàn quốc',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'japanese-food',
     label: 'Nhật Bản',
+    badgeType: EBadgeType.WARNING,
   },
   {
     key: 'indian-food',
     label: 'Ấn độ',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'french-food',
     label: 'Pháp',
+    badgeType: EBadgeType.PROCESSING,
   },
   {
     key: 'mediterranean-food',
     label: 'Địa Trung Hải',
+    badgeType: EBadgeType.ERROR,
   },
   {
     key: 'italian-food',
     label: 'Ý',
+    badgeType: EBadgeType.DEFAULT,
   },
   {
     key: 'barbeque',
     label: 'BBQ',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'sea-food',
     label: 'Hải sản',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'international-food',
     label: 'Quốc Tế',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'europe-food',
     label: 'Âu',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'asian-food',
     label: 'Á',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'vegetarian-food',
     label: 'Chay',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'macrobiotic-food',
     label: 'Thực dưỡng',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'halal',
     label: 'Halal',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'keto',
     label: 'keto',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'dessert',
     label: 'Tráng miệng',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'snack',
     label: 'Ăn vặt',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: OTHER_OPTION,

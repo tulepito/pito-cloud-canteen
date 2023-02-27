@@ -44,4 +44,10 @@
     @include textTemplate(12px, 400, 16px, '');
     text-align: center;
   }
+
+  .spinner {
+    display: block;
+    stroke: $neutralGray6;
+    margin: 0 auto 10px;
+  }
 }

@@ -23,6 +23,15 @@ function BookerNewOrderPage() {
     (state) => state.Order.createOrderError,
   );
 
+  const { myCompanies = [], queryInprogress: queryCompanyInprogress } =
+    useLoadCompanies();
+
+  const normalizedCompanies = myCompanies.map((company) => ({
+    id: company?.id?.uuid,
+    name: User(company).getPublicData()?.companyName,
+    location: User(company).getPublicData()?.location,
+  }));
+
   const handleCancel = () => {
     route.push('/company/booker/orders');
   };
@@ -33,6 +42,16 @@ function BookerNewOrderPage() {
         orderAsyncActions.createOrder({
           clientId: values.company,
           bookerId: currentUser?.id?.uuid,
+          generalInfo: {
+            deliveryAddress: normalizedCompanies.find(
+              (company) => company.id === values.company,
+            )?.location,
+            deliveryHour: '07:00',
+            deadlineHour: '07:00',
+            nutritions: [],
+            selectedGroups: ['allMembers'],
+            packagePerMember: 40000,
+          },
         }),
       );
       const newOrderId = newOrder?.payload?.id?.uuid;
@@ -42,12 +61,6 @@ function BookerNewOrderPage() {
       console.log('error', error);
     }
   };
-
-  const { myCompanies = [] } = useLoadCompanies();
-  const normalizedCompanies = myCompanies.map((company) => ({
-    id: company?.id?.uuid,
-    name: User(company).getPublicData()?.companyName,
-  }));
 
   return (
     <div className={css.root}>
@@ -78,6 +91,7 @@ function BookerNewOrderPage() {
             initialValues={{
               company: '1235',
             }}
+            queryInprogress={queryCompanyInprogress}
             submitInprogress={createOrderInProcess}
             submitError={createOrderError}
           />

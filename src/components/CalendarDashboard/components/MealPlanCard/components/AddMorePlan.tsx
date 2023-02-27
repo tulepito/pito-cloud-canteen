@@ -10,14 +10,16 @@ export type TAddMorePlanProps = {
   className?: string;
   events: Event[];
   date: Date;
-  onClick: (date: Date) => void;
   resources: any;
+  loading?: boolean;
+  onClick: (date: Date) => void;
 };
 
 const AddMorePlan: React.FC<TAddMorePlanProps> = ({
   className,
   events = [],
   date,
+  loading,
   resources,
   onClick = () => null,
 }) => {
@@ -25,7 +27,8 @@ const AddMorePlan: React.FC<TAddMorePlanProps> = ({
   const { startDate, endDate } = resources;
   const isValidDate =
     dateInNumberType >= startDate && dateInNumberType <= endDate;
-  const showCondition = events.length < 1 && isValidDate;
+  const showCondition = !loading && events.length < 1 && isValidDate;
+
   const handleClick = () => {
     onClick(date);
   };
@@ -38,7 +41,7 @@ const AddMorePlan: React.FC<TAddMorePlanProps> = ({
             <IconPlus className={css.plusIcon} />
             <FormattedMessage id="AddMorePlan.addMore" />
           </Button>
-          {(!events || events.length === 0) && (
+          {!loading && (!events || events.length === 0) && (
             <div className={css.haveNoMeal}>
               <FormattedMessage id="AddMorePlan.haveNoMeal" />
             </div>
