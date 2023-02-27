@@ -10,6 +10,7 @@ import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { normalizePlanDetailsToEvent } from '@pages/company/booker/orders/draft/[orderId]/helpers/normalizeData';
 import {
   orderAsyncActions,
   selectCalendarDate,
@@ -17,8 +18,9 @@ import {
   unSelectRestaurant,
   updateDraftMealPlan,
 } from '@redux/slices/Order.slice';
+import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { Listing } from '@utils/data';
-import { getDaySessionFromDeliveryTime, renderDateRange } from '@utils/dates';
+import { renderDateRange } from '@utils/dates';
 import type { TListing, TObject } from '@utils/types';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
@@ -36,38 +38,6 @@ import type { TSelectFoodFormValues } from '../SelectFoodModal/components/Select
 import SelectFoodModal from '../SelectFoodModal/SelectFoodModal';
 import SelectRestaurantPage from '../SelectRestaurantPage/SelectRestaurant.page';
 import css from './SetupOrderDetail.module.scss';
-
-const renderResourcesForCalendar = (
-  orderDetail: TObject,
-  deliveryHour: string,
-  coverImageList: any,
-) => {
-  const entries = Object.entries<TObject>(orderDetail);
-  const resources = entries.map((item) => {
-    const [date, data] = item;
-    const { restaurant } = data;
-    const { foodList = {} } = restaurant;
-
-    return {
-      resource: {
-        id: date,
-        daySession: getDaySessionFromDeliveryTime(deliveryHour),
-        suitableAmount: 10,
-        type: 'dailyMeal',
-        restaurant: {
-          id: restaurant.id,
-          name: restaurant.restaurantName,
-          coverImage: coverImageList[restaurant.id],
-        },
-        foodList: Object.keys(foodList),
-      },
-      start: DateTime.fromMillis(Number(date)).toJSDate(),
-      end: DateTime.fromMillis(Number(date)).plus({ hour: 1 }).toJSDate(),
-    };
-  });
-
-  return resources;
-};
 
 const findSuitableStartDate = ({
   selectedDate,
@@ -163,7 +133,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   );
   const currentRestaurant = useAppSelector(
     (state) => state.SelectRestaurantPage.selectedRestaurant,
-    shallowEqual,
   );
   const foodList = useAppSelector(
     (state) => state.SelectRestaurantPage.foodList,
@@ -172,6 +141,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const restaurantCoverImageList = useAppSelector(
     (state) => state.Order.restaurantCoverImageList,
     shallowEqual,
+  );
+  const fetchRestaurantsInProgress = useAppSelector(
+    (state) => state.SelectRestaurantPage.fetchRestaurantsPending,
   );
 
   const restaurants = useAppSelector(
@@ -198,9 +170,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     (company) => company.id.uuid === clientId,
   );
   const partnerName = currentClient?.attributes.profile.displayName;
-  const resourcesForCalender = renderResourcesForCalendar(
+  const resourcesForCalender = normalizePlanDetailsToEvent(
     orderDetail,
-    deliveryHour,
+    order,
     restaurantCoverImageList,
   );
 
@@ -361,10 +333,30 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     closePickFoodModal();
   };
 
-  const handlePickFoodModalOpen = () => {
+  const onEditFoodInMealPlanCard = async (
+    dateTime: any,
+    restaurantId: string,
+    menuId: string,
+  ) => {
+    dispatch(selectCalendarDate(DateTime.fromMillis(+dateTime).toJSDate()));
+    await dispatch(
+      selectRestaurantPageThunks.fetchSelectedRestaurant(restaurantId),
+    );
+    await dispatch(
+      selectRestaurantPageThunks.getRestaurantFood({
+        menuId,
+        dateTime: DateTime.fromMillis(+dateTime),
+      }),
+    );
     openPickFoodModal();
   };
 
+  const onEditFoodInProgress = (timestamp: number) => {
+    return (
+      (fetchFoodInProgress || fetchRestaurantsInProgress) &&
+      selectedDate?.getTime() === timestamp
+    );
+  };
   return (
     <>
       {isSelectingRestaurant ? (
@@ -412,7 +404,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               resources={{
                 startDate,
                 endDate,
-                onPickFoodModal: handlePickFoodModalOpen,
+                onEditFood: onEditFoodInMealPlanCard,
+                onEditFoodInProgress,
               }}
               components={{
                 contentEnd: (props) => (
