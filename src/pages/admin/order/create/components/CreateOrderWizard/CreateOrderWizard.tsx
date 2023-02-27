@@ -55,6 +55,7 @@ const tabCompleted = (order: any, tab: string, orderDetail: any) => {
     case CREATE_MEAL_PLAN_TAB:
       return (
         !isEmpty(orderId) &&
+        !isEmpty(orderDetail) &&
         isMealPlanTabCompleted &&
         isGeneralInfoSetupCompleted(order as TListing)
       );

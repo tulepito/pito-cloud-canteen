@@ -51,6 +51,7 @@ type TOrderInitialState = {
   updateOrderError: any;
 
   orderDetail: any;
+  justDeletedMemberOrder: boolean;
   fetchOrderDetailInProgress: boolean;
   fetchOrderDetailError: any;
 
@@ -103,6 +104,7 @@ const initialState: TOrderInitialState = {
   fetchOrderError: null,
   plans: [],
   orderDetail: {},
+  justDeletedMemberOrder: false,
   createOrderInProcess: false,
   createOrderError: null,
 
@@ -523,6 +525,7 @@ const orderSlice = createSlice({
     },
     removeMealDay: (state, { payload }) => ({
       ...state,
+      justDeletedMemberOrder: true,
       orderDetail: payload,
     }),
     selectCalendarDate: (state, { payload }) => ({
@@ -556,6 +559,7 @@ const orderSlice = createSlice({
     builder
       .addCase(createOrder.pending, (state) => ({
         ...state,
+        justDeletedMemberOrder: false,
         createOrderInProcess: true,
         createOrderError: null,
       }))
@@ -638,6 +642,7 @@ const orderSlice = createSlice({
 
       .addCase(fetchOrder.pending, (state) => ({
         ...state,
+        justDeletedMemberOrder: false,
         fetchOrderInProgress: true,
         fetchOrderError: null,
       }))
@@ -706,6 +711,7 @@ const orderSlice = createSlice({
       })
       .addCase(updatePlanDetail.pending, (state) => ({
         ...state,
+        justDeletedMemberOrder: false,
         updateOrderDetailInProgress: true,
         updateOrderDetailError: null,
       }))
