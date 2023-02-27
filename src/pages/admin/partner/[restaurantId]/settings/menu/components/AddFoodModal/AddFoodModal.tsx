@@ -272,6 +272,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
       <KeywordSearchForm
         onSubmit={onSubmitSearchForm}
         className={css.keywordForm}
+        hideButton
       />
       {queryFoodsInProgress ? (
         <LoadingContainer />
