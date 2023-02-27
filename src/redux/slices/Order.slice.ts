@@ -168,6 +168,7 @@ const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
     isCreatedByAdmin,
   };
   const { data: orderListing } = await createBookerOrderApi(apiBody);
+
   return orderListing;
 });
 
@@ -195,6 +196,7 @@ const updateOrder = createAsyncThunk(
       },
     };
     const { data: orderListing } = await updateOrderApi(orderId, apiBody);
+
     return {
       orderListing,
     };
@@ -250,6 +252,7 @@ const recommendRestaurants = createAsyncThunk(
         }
       }),
     );
+
     return orderDetail;
   },
 );
@@ -332,9 +335,11 @@ const fetchCompanyBookers = createAsyncThunk(
     const bookers = await Promise.all(
       bookerEmails.map(async (email) => {
         const { data } = await fetchUserApi(members[email].id);
+
         return data;
       }),
     );
+
     return bookers;
   },
 );
@@ -352,6 +357,7 @@ const fetchOrderDetail = createAsyncThunk(
 
       return Listing(response).getMetadata().orderDetail;
     }
+
     return {};
   },
 );
@@ -376,6 +382,7 @@ const fetchRestaurantCoverImages = createAsyncThunk(
           }),
         )[0];
         const { coverImageId } = Listing(restaurantResponse).getPublicData();
+
         return {
           [restaurantId]: Listing(restaurantResponse)
             .getFullData()
@@ -409,6 +416,7 @@ const fetchOrder = createAsyncThunk(
         id: bookerId,
       }),
     )[0];
+
     return { order: response, selectedBooker };
   },
 );
@@ -421,6 +429,7 @@ const updatePlanDetail = createAsyncThunk(
       planId,
       updateMode,
     });
+
     return orderListing;
   },
 );
@@ -506,6 +515,7 @@ const orderSlice = createSlice({
               },
             },
           };
+
       return {
         ...state,
         orderDetail: updatedOrderDetailData,

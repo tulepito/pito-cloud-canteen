@@ -1,9 +1,7 @@
 import Button from '@components/Button/Button';
-import { useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
-import ApplyOtherDaysModal from './components/ApplyOtherDaysModal';
 import css from './MealPlanCard.module.scss';
 
 type TMealPlanCardFooterProps = {
@@ -18,19 +16,20 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
   onPickFoodInProgress,
 }) => {
   const foodList = event.resource.foodList || [];
-  const [isOpenApplyOtherDaysModal, setIsOpenApplyOtherDaysModal] =
-    useState<boolean>(false);
+  // const [isOpenApplyOtherDaysModal, setIsOpenApplyOtherDaysModal] =
+  //   useState<boolean>(false);
 
-  const handleOpenApplyOtherDaysModal = () => {
-    setIsOpenApplyOtherDaysModal(true);
-  };
-  const handleCloseApplyOtherDaysModal = () => {
-    setIsOpenApplyOtherDaysModal(false);
-  };
+  // const handleOpenApplyOtherDaysModal = () => {
+  //   setIsOpenApplyOtherDaysModal(true);
+  // };
+  // const handleCloseApplyOtherDaysModal = () => {
+  //   setIsOpenApplyOtherDaysModal(false);
+  // };
 
   return (
     <div className={css.footer}>
       <Button
+        variant="secondary"
         className={css.actionButton}
         onClick={onPickFoodModal}
         inProgress={onPickFoodInProgress}>
@@ -40,15 +39,15 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
           <FormattedMessage id="MealPlanCard.footer.selectDish" />
         )}
       </Button>
-      <div
+      {/* <div
         className={css.applyForOtherDays}
         onClick={handleOpenApplyOtherDaysModal}>
         <FormattedMessage id="MealPlanCard.footer.applyForOtherDays" />
-      </div>
-      <ApplyOtherDaysModal
+      </div> */}
+      {/* <ApplyOtherDaysModal
         isOpen={isOpenApplyOtherDaysModal}
         onClose={handleCloseApplyOtherDaysModal}
-      />
+      /> */}
     </div>
   );
 };
