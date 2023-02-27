@@ -48,6 +48,7 @@ const FOOD_TABLE_COLUMNS: TColumn[] = [
           {data.sideDishes.map((item: string) => (
             <FieldCheckbox
               className={css.sideDishiesCheckbox}
+              checkboxWrapperClassName={css.sideDishiesIconCheckboxWrapper}
               key={item}
               name={`${data.id}.sideDishes`}
               id={`${data.id}.${item}`}
@@ -65,7 +66,9 @@ const FOOD_TABLE_COLUMNS: TColumn[] = [
     key: 'price',
     label: 'Đơn giá',
     render: (data: any) => {
-      return <span>{parsePrice(data.price.amount)}đ</span>;
+      return (
+        <span className={css.priceRow}>{parsePrice(data.price.amount)}đ</span>
+      );
     },
   },
 ];

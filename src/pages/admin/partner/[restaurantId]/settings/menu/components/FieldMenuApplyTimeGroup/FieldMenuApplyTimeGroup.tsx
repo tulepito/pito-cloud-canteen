@@ -2,7 +2,7 @@ import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePic
 import FieldDaysOfWeekCheckboxGroup from '@components/FormFields/FieldDaysOfWeekCheckboxGroup/FieldDaysOfWeekCheckboxGroup';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { getWeekDayList } from '@utils/dates';
-import { EMenuTypes } from '@utils/enums';
+import { EDayOfWeek, EMenuTypes } from '@utils/enums';
 import {
   composeValidators,
   nonEmptyArray,
@@ -28,6 +28,9 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
   const { values, form, dateInputClassName, className, inputFieldsClassName } =
     props;
   const intl = useIntl();
+
+  const isCycleMenu = values.menuType === EMenuTypes.cycleMenu;
+
   const setStartDate = (date: Date) => {
     form.change('startDate', date);
     if (values.endDate <= date) {
@@ -42,7 +45,16 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
   const today = new Date();
   const startDateAsDate = new Date(values.startDate);
   const minEndDate = startDateAsDate.setDate(startDateAsDate.getDate() + 1);
-  const daysOfWeek = getWeekDayList(values.startDate, values.endDate);
+  const daysOfWeek = isCycleMenu
+    ? Object.keys(EDayOfWeek).map(
+        (k) => EDayOfWeek[k as keyof typeof EDayOfWeek],
+      )
+    : getWeekDayList(values.startDate, values.endDate);
+
+  const disabledDaysOfWeek = isCycleMenu
+    ? false
+    : !values.startDate || !values.endDate;
+
   return (
     <div className={classNames(css.root, className)}>
       <div className={classNames(css.fields, inputFieldsClassName)}>
@@ -87,7 +99,7 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
             )}
           />
         )}
-        {values.menuType === EMenuTypes.cycleMenu && (
+        {isCycleMenu && (
           <FieldTextInput
             defaultValue="1"
             id="numberOfCycles"
@@ -124,7 +136,7 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
         )}
       </div>
       <FieldDaysOfWeekCheckboxGroup
-        disabled={!values.startDate || !values.endDate}
+        disabled={disabledDaysOfWeek}
         daysOfWeek={daysOfWeek}
         label={intl.formatMessage({
           id: 'EditMenuInformationForm.daysOfWeekLabel',

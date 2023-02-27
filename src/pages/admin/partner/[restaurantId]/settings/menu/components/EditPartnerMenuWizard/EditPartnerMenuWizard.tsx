@@ -181,6 +181,13 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
             }
           : {};
       }
+      case MENU_COMPLETE_TAB: {
+        return currentMenu
+          ? {
+              foodsByDate: foodByDateToRender,
+            }
+          : {};
+      }
       default:
         break;
     }

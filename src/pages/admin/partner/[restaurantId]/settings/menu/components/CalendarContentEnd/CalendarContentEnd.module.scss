@@ -1,0 +1,7 @@
+@use '/src/styles/vars.scss' as *;
+
+.noFood {
+  font-size: 14px;
+  color: $neutralGray5;
+  text-align: center;
+}

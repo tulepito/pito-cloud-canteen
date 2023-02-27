@@ -22,9 +22,12 @@
 }
 
 .tableWrapper {
-  overflow-y: scroll;
+  overflow-y: auto;
   height: 500px;
   max-width: 600px !important;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .pickedFoodContainer {
@@ -36,6 +39,9 @@
   overflow-y: auto;
   position: relative;
   height: 500px;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .listChoosenFoods {
@@ -103,12 +109,17 @@
 .titleRow {
   font-weight: $fontWeightBold;
   color: $neutralGray6;
+  margin-top: 7px;
+}
+
+.sideDishiesIconCheckboxWrapper {
+  margin-right: 10px !important;
 }
 
 .sideDishiesCheckbox {
   label {
     &:nth-child(2) {
-      margin-top: 20px !important;
+      margin-top: 10px !important;
     }
   }
 }
@@ -132,8 +143,14 @@
   .tableHeadCell {
     color: $neutralGray5 !important;
     font-weight: $fontWeightRegular !important;
+    font-size: 12px !important;
     &:last-child {
       text-align: right !important;
     }
   }
+}
+
+.description {
+  font-size: 14px;
+  color: $neutralGray5;
 }
