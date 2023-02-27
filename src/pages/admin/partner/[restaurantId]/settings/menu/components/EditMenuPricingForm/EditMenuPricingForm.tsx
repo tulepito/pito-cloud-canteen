@@ -14,7 +14,6 @@ import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 
 import AddFoodModal from '../AddFoodModal/AddFoodModal';
-import DayOfWeekCalendarHeader from '../DayOfWeekCalendarHeader/DayOfWeekCalendarHeader';
 import type { TEditMenuPricingCalendarResources } from '../EditPartnerMenuWizard/utils';
 import FoodEventCard from '../FoodEventCard/FoodEventCard';
 import css from './EditMenuPricingForm.module.scss';
@@ -187,9 +186,6 @@ const EditMenuPricingFormComponent: React.FC<
           <CalendarDashboard
             renderEvent={FoodEventCard}
             events={resourcesForCalendar}
-            headerComponent={(headerProps) => (
-              <DayOfWeekCalendarHeader {...headerProps} />
-            )}
             components={{
               toolbar: () => <></>,
               contentStart: calendarContentStart,

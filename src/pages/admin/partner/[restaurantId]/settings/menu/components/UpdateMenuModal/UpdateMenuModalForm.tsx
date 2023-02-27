@@ -9,6 +9,7 @@ import css from './UpdateMenuModalForm.module.scss';
 
 export type TUpdateMenuModalFormValues = {
   startDate: Date;
+  endDate: Date;
   numberOfCycles: number;
   daysOfWeek: string[];
 };

@@ -41,27 +41,6 @@ const fileUrl = process.env.NEXT_PUBLIC_IMPORT_FOOD_GUIDE_FILE_URL;
 
 const TABLE_COLUMN: TColumn[] = [
   {
-    key: 'id',
-    label: 'ID',
-    render: (data: any) => {
-      if (data.isDeleted) {
-        return (
-          <div className={css.deletedMenu}>
-            <FormattedMessage id="ManagePartnerFoods.deletedMenu" />
-          </div>
-        );
-      }
-      return (
-        <NamedLink
-          path={`/admin/partner/${data.restaurantId}/settings/food/${data.id}`}
-          className={css.idRow}
-          title={data.id}>
-          {data.id}
-        </NamedLink>
-      );
-    },
-  },
-  {
     key: 'title',
     label: 'Tên món',
     render: (data: any) => {
@@ -69,9 +48,12 @@ const TABLE_COLUMN: TColumn[] = [
         return <div></div>;
       }
       return (
-        <div className={css.titleRow} title={data.title}>
+        <NamedLink
+          path={`/admin/partner/${data.restaurantId}/settings/food/${data.id}`}
+          className={css.titleRow}
+          title={data.id}>
           {data.title}
-        </div>
+        </NamedLink>
       );
     },
   },

@@ -60,4 +60,6 @@ export type TCheckUnConflictedParams = {
   daysOfWeek: string[];
   restaurantId: string;
   id: string;
+  startDate: number;
+  endDate: number;
 };

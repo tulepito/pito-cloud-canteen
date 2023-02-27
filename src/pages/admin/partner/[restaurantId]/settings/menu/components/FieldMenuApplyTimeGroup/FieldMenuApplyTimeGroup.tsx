@@ -1,6 +1,7 @@
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldDaysOfWeekCheckboxGroup from '@components/FormFields/FieldDaysOfWeekCheckboxGroup/FieldDaysOfWeekCheckboxGroup';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import { getWeekDayList } from '@utils/dates';
 import { EMenuTypes } from '@utils/enums';
 import {
   composeValidators,
@@ -29,10 +30,19 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
   const intl = useIntl();
   const setStartDate = (date: Date) => {
     form.change('startDate', date);
+    if (values.endDate <= date) {
+      form.change('endDate', undefined);
+    }
+  };
+
+  const setEndDate = (date: Date) => {
+    form.change('endDate', date);
   };
 
   const today = new Date();
-
+  const startDateAsDate = new Date(values.startDate);
+  const minEndDate = startDateAsDate.setDate(startDateAsDate.getDate() + 1);
+  const daysOfWeek = getWeekDayList(values.startDate, values.endDate);
   return (
     <div className={classNames(css.root, className)}>
       <div className={classNames(css.fields, inputFieldsClassName)}>
@@ -55,6 +65,28 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
             }),
           )}
         />
+        {values.menuType === EMenuTypes.fixedMenu && (
+          <FieldDatePicker
+            id="endDate"
+            name="endDate"
+            selected={values.endDate}
+            onChange={setEndDate}
+            disabled={!values.startDate}
+            minDate={minEndDate || today}
+            className={classNames(css.inputDate, dateInputClassName)}
+            dateFormat={'dd MMMM, yyyy'}
+            placeholderText={'Nhập ngày kết thúc'}
+            autoComplete="off"
+            label={intl.formatMessage({
+              id: 'EditMenuInformationForm.endDateLabel',
+            })}
+            validate={required(
+              intl.formatMessage({
+                id: 'EditMenuInformationForm.endDateRequired',
+              }),
+            )}
+          />
+        )}
         {values.menuType === EMenuTypes.cycleMenu && (
           <FieldTextInput
             defaultValue="1"
@@ -92,6 +124,8 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
         )}
       </div>
       <FieldDaysOfWeekCheckboxGroup
+        disabled={!values.startDate || !values.endDate}
+        daysOfWeek={daysOfWeek}
         label={intl.formatMessage({
           id: 'EditMenuInformationForm.daysOfWeekLabel',
         })}

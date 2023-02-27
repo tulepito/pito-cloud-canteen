@@ -10,10 +10,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       dataParams,
       queryParams,
     );
-    res.json(response);
+    return res.status(200).json(response);
   } catch (error) {
     console.error(error);
-    handleError(res, error);
+    return handleError(res, error);
   }
 }
 

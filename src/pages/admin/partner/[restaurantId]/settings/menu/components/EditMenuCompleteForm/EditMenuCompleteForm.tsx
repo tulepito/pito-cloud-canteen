@@ -2,20 +2,16 @@ import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import Form from '@components/Form/Form';
 import { IntegrationListing } from '@utils/data';
 import { parseTimestampToFormat } from '@utils/dates';
-import { EMenuTypes, getLabelByKey, MENU_OPTIONS } from '@utils/enums';
+import { getLabelByKey, MENU_OPTIONS } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 import { DateTime } from 'luxon';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 
-import DayOfWeekCalendarHeader from '../DayOfWeekCalendarHeader/DayOfWeekCalendarHeader';
 import useQueryMenuPickedFoods from '../EditPartnerMenuWizard/useQueryMenuPickedFoods';
 import type { TEditMenuPricingCalendarResources } from '../EditPartnerMenuWizard/utils';
-import {
-  createInitialValuesForFoodsByDate,
-  renderValuesForFoodsByDate,
-} from '../EditPartnerMenuWizard/utils';
+import { renderValuesForFoodsByDate } from '../EditPartnerMenuWizard/utils';
 import FoodEventCard from '../FoodEventCard/FoodEventCard';
 import css from './EditMenuCompleteForm.module.scss';
 
@@ -63,7 +59,7 @@ const EditMenuCompleteFormComponent: React.FC<
   formRef.current = form;
   const { title } = IntegrationListing(currentMenu).getAttributes();
   const { menuType } = IntegrationListing(currentMenu).getMetadata();
-  const { startDate, endDate } =
+  const { startDate, endDate, foodsByDate } =
     IntegrationListing(currentMenu).getPublicData();
 
   const {
@@ -93,24 +89,11 @@ const EditMenuCompleteFormComponent: React.FC<
     ids: getFoodsByDateIds(),
   });
 
-  const initialFoodsByDate = createInitialValuesForFoodsByDate({
-    monFoodIdList,
-    tueFoodIdList,
-    wedFoodIdList,
-    thuFoodIdList,
-    friFoodIdList,
-    satFoodIdList,
-    sunFoodIdList,
-  });
-
   const foodsByDateToRender = renderValuesForFoodsByDate(
-    initialFoodsByDate,
+    foodsByDate,
     menuPickedFoods,
   );
-
   const resourcesForCalendar = renderResourcesForCalendar(foodsByDateToRender);
-
-  const isFixedMenu = menuType === EMenuTypes.fixedMenu;
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -148,17 +131,15 @@ const EditMenuCompleteFormComponent: React.FC<
                   parseTimestampToFormat(startDate, 'EEE, dd MMMM, yyyy')}
               </div>
             </div>
-            {!isFixedMenu && (
-              <div className={css.titleGroup}>
-                <label className={css.label}>
-                  <FormattedMessage id="EditMenuCompleteForm.menuType" />
-                </label>
-                <div>
-                  {endDate &&
-                    parseTimestampToFormat(endDate, 'EEE, dd MMMM, yyyy')}
-                </div>
+            <div className={css.titleGroup}>
+              <label className={css.label}>
+                <FormattedMessage id="EditMenuCompleteForm.endDateLabel" />
+              </label>
+              <div>
+                {endDate &&
+                  parseTimestampToFormat(endDate, 'EEE, dd MMMM, yyyy')}
               </div>
-            )}
+            </div>
           </div>
         </div>
         <div className={css.devidedSection}>
@@ -166,9 +147,6 @@ const EditMenuCompleteFormComponent: React.FC<
             <FormattedMessage id="EditMenuCompleteForm.foodList" />
           </h3>
           <CalendarDashboard
-            headerComponent={(params) => (
-              <DayOfWeekCalendarHeader {...params} />
-            )}
             renderEvent={FoodEventCard}
             events={resourcesForCalendar}
             components={{

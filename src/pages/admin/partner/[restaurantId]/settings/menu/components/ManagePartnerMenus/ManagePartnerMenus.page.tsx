@@ -26,7 +26,7 @@ const ManagePartnerMenusPage: React.FC<TManagePartnerMenusPageProps> = (
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const router = useRouter();
   const formRef = useRef<FormApi>();
-  const { restaurantId, keywords = '', page = 1 } = router.query;
+  const { restaurantId, keywords = '', page = 1, mealType } = router.query;
 
   const onSubmit = ({
     keywords: newKeywords,
@@ -91,6 +91,7 @@ const ManagePartnerMenusPage: React.FC<TManagePartnerMenusPageProps> = (
         keywords={keywords as string}
         menuType={menuType as string}
         page={page as string}
+        mealType={mealType as string}
       />
       <AlertModal
         isOpen={isCreateModalOpen}
