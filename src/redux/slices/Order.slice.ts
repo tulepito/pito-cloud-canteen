@@ -162,11 +162,12 @@ const initialState: TOrderInitialState = {
 };
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
-  const { clientId, bookerId, isCreatedByAdmin = false } = params;
+  const { clientId, bookerId, isCreatedByAdmin = false, generalInfo } = params;
   const apiBody = {
     companyId: clientId,
     bookerId,
     isCreatedByAdmin,
+    generalInfo,
   };
   const { data: orderListing } = await createBookerOrderApi(apiBody);
   return orderListing;

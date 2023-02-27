@@ -10,17 +10,17 @@ export type TAddMorePlanProps = {
   className?: string;
   events: Event[];
   date: Date;
+  resources: any;
   loading?: boolean;
   onClick: (date: Date) => void;
-  resources: any;
 };
 
 const AddMorePlan: React.FC<TAddMorePlanProps> = ({
   className,
   events = [],
   date,
-  resources,
   loading,
+  resources,
   onClick = () => null,
 }) => {
   const dateInNumberType = Number(date);

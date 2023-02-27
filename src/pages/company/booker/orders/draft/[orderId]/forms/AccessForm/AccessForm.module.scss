@@ -4,6 +4,13 @@
 
 .fieldGroups {
   margin-bottom: 18px;
+  max-height: calc(100vh - 100px - 200px - 130px);
+  overflow-y: auto;
+}
+
+.note {
+  margin-bottom: 12px;
+  @include textTemplate(12px, 400, 18px);
 }
 
 .checkboxItem {
@@ -19,6 +26,8 @@
 .groupsSettings {
   @include textTemplate(14px, 700, 24px);
   margin-bottom: 24px;
+  color: $neutralGray6;
+  display: block;
   cursor: pointer;
 }
 

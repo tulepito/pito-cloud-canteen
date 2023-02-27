@@ -3,7 +3,8 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { getInitialLocationValues } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { Listing } from '@utils/data';
+import { Listing, User } from '@utils/data';
+import type { TUser } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import { useState } from 'react';
@@ -21,6 +22,7 @@ import css from './SidebarContent.module.scss';
 type TSidebarContentProps = {
   className?: string;
   order?: any;
+  companyAccount: TUser | null;
 };
 
 type TNavigationItemProps = {
@@ -47,6 +49,7 @@ const NavigationItem: React.FC<TNavigationItemProps> = ({
 const SidebarContent: React.FC<TSidebarContentProps> = ({
   className,
   order,
+  companyAccount,
 }) => {
   const classes = classNames(css.root, className);
 
@@ -83,21 +86,26 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     .endOf('day')
     .plus({ days: 7 })
     .toMillis();
+  const defaultDeadlineDate = DateTime.fromMillis(startDate || nextStartWeek)
+    .minus({ days: 2 })
+    .toMillis();
+
+  const groupList = User(companyAccount!).getMetadata().groups;
 
   const deliveryInitValues = {
     startDate: startDate || nextStartWeek,
     endDate: endDate || nextEndWeek,
-    deliveryHour,
+    deliveryHour: deliveryHour || '07:00',
   };
   const deadlineInitValues = {
-    deadlineDate,
-    deadlineHour,
+    deadlineDate: deadlineDate || defaultDeadlineDate,
+    deadlineHour: deadlineHour || '07:00',
   };
   const numberEmployeesInitValues = {
     memberAmount,
   };
   const nutritionsInitValues = {
-    nutritions,
+    nutritions: nutritions || [],
   };
   const selectedGroupsInitValues = {
     selectedGroups,
@@ -175,6 +183,8 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
             initialValues={selectedGroupsInitValues}
             onSubmit={handleSubmit}
             loading={updateOrderInProgress}
+            groupList={groupList}
+            companyId={companyAccount?.id?.uuid}
           />
         );
       case 'unitBudget':

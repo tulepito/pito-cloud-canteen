@@ -1187,5 +1187,7 @@
   "UploadImageForm.limitImage": "Dung lượng ảnh không được quá 2MB",
   "UploadImageForm.selectImage": "Chọn ảnh",
   "UploadImageForm.submit": "Lưu thay đổi",
+  "CreateOrderForm.company.loading": "Đang tải...",
+  "Booker.CreateOrder.Form.group.scrollDownNote": "Nếu danh sách dài hãy cuộn xuống để xem thêm",
   "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại."
 }

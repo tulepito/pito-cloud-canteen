@@ -16,9 +16,9 @@ import MealPlanCardHeader from './MealPlanCardHeader';
 type TMealPlanCardProps = {
   event: Event;
   index: number;
-  onRemove?: (id: string) => void;
-  resources?: any;
   removeInprogress: boolean;
+  onRemove?: (id: string) => void;
+  resources: any;
 };
 
 const MealPlanCard: React.FC<TMealPlanCardProps> = ({

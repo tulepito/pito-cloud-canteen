@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { shallowEqual } from 'react-redux';
 
 import { BookerDraftOrderPageThunks } from '../BookerDraftOrderPage.slice';
 import { normalizePlanDetailsToEvent } from '../helpers/normalizeData';
@@ -12,6 +14,9 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
   );
   const fetchOrderError = useAppSelector(
     (state) => state.Order.fetchOrderError,
+  );
+  const companyAccount = useAppSelector(
+    (state) => state.BookerDraftOrderPage.companyAccount,
   );
 
   const dispatch = useAppDispatch();
@@ -27,12 +32,16 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
     order,
     fetchOrderInProgress,
     fetchOrderError,
+    companyAccount,
   };
 };
 
 export const useLoadPlanDetails = () => {
-  const order = useAppSelector((state) => state.Order.order);
-  const orderDetail = useAppSelector((state) => state.Order.orderDetail);
+  const order = useAppSelector((state) => state.Order.order, shallowEqual);
+  const orderDetail = useAppSelector(
+    (state) => state.Order.orderDetail,
+    shallowEqual,
+  );
   const fetchOrderDetailInProgress = useAppSelector(
     (state) => state.Order.fetchOrderDetailInProgress,
   );
@@ -40,15 +49,36 @@ export const useLoadPlanDetails = () => {
     (state) => state.Order.fetchOrderDetailError,
   );
 
+  const restaurantCoverImageList = useAppSelector(
+    (state) => state.Order.restaurantCoverImageList,
+    shallowEqual,
+  );
+
   const dispatch = useAppDispatch();
+
+  const normalizeData = useMemo(() => {
+    return normalizePlanDetailsToEvent(
+      orderDetail,
+      order,
+      restaurantCoverImageList,
+    );
+  }, [
+    JSON.stringify(restaurantCoverImageList),
+    JSON.stringify(order),
+    JSON.stringify(orderDetail),
+  ]);
 
   useEffect(() => {
     if (order) {
       dispatch(orderAsyncActions.fetchOrderDetail(order));
     }
-  }, [dispatch, order]);
+  }, [dispatch, JSON.stringify(order)]);
 
-  const normalizeData = normalizePlanDetailsToEvent(orderDetail, order);
+  useEffect(() => {
+    if (normalizeData && normalizeData.length > 0) {
+      dispatch(orderAsyncActions.fetchRestaurantCoverImages());
+    }
+  }, [dispatch, JSON.stringify(normalizeData)]);
 
   return {
     rawOrderDetail: orderDetail,
