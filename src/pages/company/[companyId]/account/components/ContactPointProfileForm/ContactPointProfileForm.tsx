@@ -123,11 +123,12 @@ const ContactPointProfileFormComponent: React.FC<
       </div>
     ) : (
       <div className={css.avatarPlaceholder}>
-        <div className={css.avatarPlaceholderTextMobile}>
-          {intl.formatMessage({ id: 'ContactPointProfileForm.photo.noImage' })}
+        <div className={css.camera}>
+          <Icons.Camera />
         </div>
       </div>
     );
+
   const onImageUpload = async ({ id, file }: TImageActionPayload) => {
     await dispatch(uploadImageThunks.uploadImage({ id, file }));
   };

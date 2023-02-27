@@ -1,8 +1,13 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .searchInputContainer {
-  width: 360px;
+  width: 100%;
+
+  @include viewportLarge {
+    width: 360px;
+  }
 
   ::placeholder {
     color: $neutralGray5;
@@ -11,31 +16,51 @@
 
 .contentContainer {
   display: grid;
-  grid-template-columns: auto 360px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 100%));
+  overflow: hidden auto;
+
+  @include viewportMedium {
+    max-height: 70vh;
+  }
+
+  @include viewportLarge {
+    max-height: 80%;
+    grid-template-columns: auto 360px;
+  }
 
   .leftPart {
     padding: 16px;
     padding-top: 0;
-    max-height: calc(70vh);
-    overflow: hidden auto;
+
+    @include viewportLarge {
+      overflow: hidden auto;
+      max-height: calc(70vh);
+    }
   }
 
   .rightPart {
-    min-height: 413px;
-    padding: 24px 24px 0;
+    padding: 0 16px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     position: relative;
 
+    @include viewportLarge {
+      padding: 24px 24px 0;
+      min-height: 413px;
+    }
+
     &::before {
-      position: absolute;
-      left: 0;
-      top: 24px;
-      content: '';
-      height: calc(100% - 24px);
-      width: 1px;
-      background-color: $neutralGray3;
+      @include viewportLarge {
+        position: absolute;
+        left: 0;
+        height: 1px;
+        content: '';
+        background-color: $neutralGray3;
+        top: 24px;
+        height: calc(100% - 24px);
+        width: 1px;
+      }
     }
 
     .emptyIconContainer {
@@ -46,6 +71,11 @@
         text-align: center;
         color: $neutralGray5;
       }
+    }
+
+    .itemContainer {
+      // max-height: 450px;
+      // overflow: hidden scroll;
     }
 
     .partTitle {
@@ -103,8 +133,17 @@
     }
 
     .actionContainer {
-      width: calc(100% - 16px * 2);
-      margin: 32px auto 0 auto;
+      padding: 32px 8px 0;
+      background-color: $neutralGray1;
+
+      button {
+        margin: 0 auto;
+      }
+
+      @include viewportMedium {
+        position: sticky;
+        bottom: 0;
+      }
     }
   }
 }

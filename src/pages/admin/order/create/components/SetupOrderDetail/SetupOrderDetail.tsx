@@ -127,6 +127,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
+  const justDeletedMemberOrder = useAppSelector(
+    (state) => state.Order.justDeletedMemberOrder,
+  );
+
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const {
     companyId: clientId,
@@ -242,6 +246,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     if (groupId === 'allMembers') {
       return intl.formatMessage({ id: 'ParticipantSetupField.allMembers' });
     }
+
     return allCompanyGroups[groupId];
   });
   const pickingDeadline = parseDateFromTimestampAndHourString(
@@ -311,8 +316,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   };
 
   useEffect(() => {
-    dispatch(orderAsyncActions.fetchOrderDetail(order as TListing));
-  }, [dispatch]);
+    if (isEmpty(orderDetail) && !justDeletedMemberOrder) {
+      dispatch(orderAsyncActions.fetchOrderDetail(order as TListing));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(order), JSON.stringify(orderDetail)]);
 
   useEffect(() => {
     dispatch(orderAsyncActions.fetchRestaurantCoverImages());

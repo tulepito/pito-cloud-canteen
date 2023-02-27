@@ -34,6 +34,7 @@ export const calculateGroupMembers = (
 
   const allGroupMembers = groupList.map<string>((groupId: string) => {
     const currentGroup = groups.find((_group: any) => _group.id === groupId);
+
     return currentGroup?.members.map((member: any) => member.id);
   });
 
@@ -58,6 +59,7 @@ export const checkMemberBelongToCompany = (
   companyAccount: TUser,
 ) => {
   const { members = {} } = User(companyAccount).getMetadata();
+
   return !!members[memberEmail];
 };
 

@@ -51,6 +51,7 @@ type TOrderInitialState = {
   updateOrderError: any;
 
   orderDetail: any;
+  justDeletedMemberOrder: boolean;
   fetchOrderDetailInProgress: boolean;
   fetchOrderDetailError: any;
 
@@ -104,6 +105,7 @@ const initialState: TOrderInitialState = {
   fetchOrderError: null,
   plans: [],
   orderDetail: {},
+  justDeletedMemberOrder: false,
   createOrderInProcess: false,
   createOrderError: null,
 
@@ -170,6 +172,7 @@ const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
     generalInfo,
   };
   const { data: orderListing } = await createBookerOrderApi(apiBody);
+
   return orderListing;
 });
 
@@ -197,6 +200,7 @@ const updateOrder = createAsyncThunk(
       },
     };
     const { data: orderListing } = await updateOrderApi(orderId, apiBody);
+
     return {
       orderListing,
     };
@@ -252,6 +256,7 @@ const recommendRestaurants = createAsyncThunk(
         }
       }),
     );
+
     return orderDetail;
   },
 );
@@ -334,9 +339,11 @@ const fetchCompanyBookers = createAsyncThunk(
     const bookers = await Promise.all(
       bookerEmails.map(async (email) => {
         const { data } = await fetchUserApi(members[email].id);
+
         return data;
       }),
     );
+
     return bookers;
   },
 );
@@ -354,6 +361,7 @@ const fetchOrderDetail = createAsyncThunk(
 
       return Listing(response).getMetadata().orderDetail;
     }
+
     return {};
   },
 );
@@ -378,6 +386,7 @@ const fetchRestaurantCoverImages = createAsyncThunk(
           }),
         )[0];
         const { coverImageId } = Listing(restaurantResponse).getPublicData();
+
         return {
           [restaurantId]: Listing(restaurantResponse)
             .getFullData()
@@ -411,6 +420,7 @@ const fetchOrder = createAsyncThunk(
         id: bookerId,
       }),
     )[0];
+
     return { order: response, selectedBooker };
   },
 );
@@ -438,6 +448,7 @@ const updatePlanDetail = createAsyncThunk(
       planId,
       updateMode,
     });
+
     return orderListing;
   },
 );
@@ -524,6 +535,7 @@ const orderSlice = createSlice({
               },
             },
           };
+
       return {
         ...state,
         orderDetail: updatedOrderDetailData,
@@ -531,6 +543,7 @@ const orderSlice = createSlice({
     },
     removeMealDay: (state, { payload }) => ({
       ...state,
+      justDeletedMemberOrder: true,
       orderDetail: payload,
     }),
     selectCalendarDate: (state, { payload }) => ({
@@ -564,6 +577,7 @@ const orderSlice = createSlice({
     builder
       .addCase(createOrder.pending, (state) => ({
         ...state,
+        justDeletedMemberOrder: false,
         createOrderInProcess: true,
         createOrderError: null,
       }))
@@ -646,6 +660,7 @@ const orderSlice = createSlice({
 
       .addCase(fetchOrder.pending, (state) => ({
         ...state,
+        justDeletedMemberOrder: false,
         fetchOrderInProgress: true,
         fetchOrderError: null,
       }))
@@ -714,6 +729,7 @@ const orderSlice = createSlice({
       })
       .addCase(updatePlanDetail.pending, (state) => ({
         ...state,
+        justDeletedMemberOrder: false,
         updateOrderDetailInProgress: true,
         updateOrderDetailError: null,
       }))
