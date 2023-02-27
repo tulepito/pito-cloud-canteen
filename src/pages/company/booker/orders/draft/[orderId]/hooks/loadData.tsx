@@ -56,18 +56,6 @@ export const useLoadPlanDetails = () => {
 
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    if (order) {
-      dispatch(orderAsyncActions.fetchOrderDetail(order));
-    }
-  }, [dispatch, JSON.stringify(order)]);
-
-  useEffect(() => {
-    if (orderDetail && orderDetail.length > 0) {
-      dispatch(orderAsyncActions.fetchRestaurantCoverImages());
-    }
-  }, [dispatch, JSON.stringify(orderDetail)]);
-
   const normalizeData = useMemo(() => {
     return normalizePlanDetailsToEvent(
       orderDetail,
@@ -79,6 +67,18 @@ export const useLoadPlanDetails = () => {
     JSON.stringify(order),
     JSON.stringify(orderDetail),
   ]);
+
+  useEffect(() => {
+    if (order) {
+      dispatch(orderAsyncActions.fetchOrderDetail(order));
+    }
+  }, [dispatch, JSON.stringify(order)]);
+
+  useEffect(() => {
+    if (normalizeData && normalizeData.length > 0) {
+      dispatch(orderAsyncActions.fetchRestaurantCoverImages());
+    }
+  }, [dispatch, JSON.stringify(normalizeData)]);
 
   return {
     rawOrderDetail: orderDetail,
