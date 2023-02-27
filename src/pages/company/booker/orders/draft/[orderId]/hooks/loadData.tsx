@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { useEffect, useMemo } from 'react';
@@ -35,11 +36,7 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
   };
 };
 
-export const useLoadPlanDetails = ({
-  coverImageList,
-}: {
-  coverImageList: any;
-}) => {
+export const useLoadPlanDetails = () => {
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
@@ -52,19 +49,36 @@ export const useLoadPlanDetails = ({
     (state) => state.Order.fetchOrderDetailError,
   );
 
+  const restaurantCoverImageList = useAppSelector(
+    (state) => state.Order.restaurantCoverImageList,
+    shallowEqual,
+  );
+
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (order) {
       dispatch(orderAsyncActions.fetchOrderDetail(order));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, JSON.stringify(order)]);
 
+  useEffect(() => {
+    if (orderDetail && orderDetail.length > 0) {
+      dispatch(orderAsyncActions.fetchRestaurantCoverImages());
+    }
+  }, [dispatch, JSON.stringify(orderDetail)]);
+
   const normalizeData = useMemo(() => {
-    return normalizePlanDetailsToEvent(orderDetail, order, coverImageList);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [coverImageList, JSON.stringify(order), JSON.stringify(orderDetail)]);
+    return normalizePlanDetailsToEvent(
+      orderDetail,
+      order,
+      restaurantCoverImageList,
+    );
+  }, [
+    JSON.stringify(restaurantCoverImageList),
+    JSON.stringify(order),
+    JSON.stringify(orderDetail),
+  ]);
 
   return {
     rawOrderDetail: orderDetail,

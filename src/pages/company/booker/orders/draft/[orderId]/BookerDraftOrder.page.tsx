@@ -1,127 +1,46 @@
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
-import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/components/AddMorePlan';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { Listing } from '@utils/data';
-import type { TListing } from '@utils/types';
-import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { shallowEqual } from 'react-redux';
+import { useCallback, useState } from 'react';
 
 import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
 import LayoutSidebar from '../../components/Layout/LayoutSidebar';
 import css from './BookerDraftOrder.module.scss';
 import SidebarContent from './components/SidebarContent/SidebarContent';
-import Toolbar from './components/Toolbar/Toolbar';
 import { useLoadData, useLoadPlanDetails } from './hooks/loadData';
+import {
+  useGetCalendarCompononentProps,
+  useGetCalendarExtraResources,
+} from './restaurants/hooks/calendar';
+import { useGetBoundaryDates } from './restaurants/hooks/dateTime';
 
 function BookerDraftOrderPage() {
   const router = useRouter();
   const { orderId } = router.query;
   const [collapse, setCollapse] = useState(false);
 
-  const updatePlanDetailInprogress = useAppSelector(
-    (state) => state.Order.updateOrderDetailInProgress,
-  );
+  const dispatch = useAppDispatch();
 
-  const { order, fetchOrderInProgress, companyAccount } = useLoadData({
+  const { order, companyAccount } = useLoadData({
     orderId: orderId as string,
   });
 
-  const restaurantCoverImageList = useAppSelector(
-    (state) => state.Order.restaurantCoverImageList,
-    shallowEqual,
-  );
+  const { orderDetail = [] } = useLoadPlanDetails();
 
-  const { orderDetail = [], fetchOrderDetailInProgress } = useLoadPlanDetails({
-    coverImageList: restaurantCoverImageList,
+  const { startDate, endDate } = useGetBoundaryDates(order);
+
+  const calendarExtraResources = useGetCalendarExtraResources({
+    order,
+    startDate,
+    endDate,
   });
 
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (orderDetail && orderDetail.length > 0) {
-      dispatch(orderAsyncActions.fetchRestaurantCoverImages());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, JSON.stringify(orderDetail)]);
-
-  const orderData = Listing(order as TListing);
-  const {
-    startDate: startTimestamp,
-    endDate: endTimestamp,
-    plans = [],
-  } = orderData.getMetadata();
-  const planId = plans?.[0];
-
-  const startDate = useMemo(() => {
-    const nextStartWeek = DateTime.fromJSDate(new Date())
-      .startOf('week')
-      .startOf('day')
-      .plus({ days: 7 })
-      .toJSDate();
-
-    return startTimestamp
-      ? DateTime.fromMillis(Number(startTimestamp)).startOf('day').toJSDate()
-      : nextStartWeek;
-  }, [startTimestamp]);
-
-  const endDate = useMemo(() => {
-    const nextEndWeek = DateTime.fromJSDate(new Date())
-      .endOf('week')
-      .endOf('day')
-      .plus({ days: 7 })
-      .toJSDate();
-
-    return endTimestamp
-      ? DateTime.fromMillis(Number(endTimestamp)).endOf('day').toJSDate()
-      : nextEndWeek;
-  }, [endTimestamp]);
-
-  const handleEditFood = useCallback(
-    (date: string, restaurantId: string, menuId: string) => {
-      router.push(
-        `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date}&restaurantId=${restaurantId}&menuId=${menuId}`,
-      );
-    },
-    [orderId, router],
-  );
-
-  const calendarExtraResources = useMemo(() => {
-    return {
-      planId,
-      startDate,
-      endDate,
-      updatePlanDetailInprogress,
-      fetchPlanDetailInProgress:
-        fetchOrderDetailInProgress || fetchOrderInProgress,
-      onEditFood: handleEditFood,
-    };
-  }, [
-    planId,
-    endDate,
-    fetchOrderDetailInProgress,
-    fetchOrderInProgress,
-    startDate,
-    updatePlanDetailInprogress,
-    handleEditFood,
-  ]);
-
-  const handleCollapse = () => {
+  const handleCollapse = useCallback(() => {
     setCollapse(!collapse);
-  };
-
-  const handleAddMeal = useCallback(
-    () => (date: Date) => {
-      router.push(
-        `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date.getTime()}`,
-      );
-    },
-    [orderId, router],
-  );
+  }, [collapse]);
 
   const handleRemoveMeal = useCallback(
     (id: string) => (resourceId: string) => {
@@ -139,36 +58,10 @@ function BookerDraftOrderPage() {
     [dispatch, orderId],
   );
 
-  const toolbarComponent = useCallback(
-    (props: any) => (
-      <Toolbar
-        {...props}
-        startDate={startDate.getTime()}
-        endDate={endDate.getTime()}
-      />
-    ),
-    [startDate, endDate],
-  );
-
-  const contentEndComponent = useCallback(
-    (props: any) => (
-      <AddMorePlan
-        {...props}
-        onClick={handleAddMeal()}
-        startDate={props?.resources?.startDate?.getTime()}
-        endDate={props?.resources?.endDate?.getTime()}
-        loading={props?.resources?.fetchPlanDetailInProgress}
-      />
-    ),
-    [handleAddMeal],
-  );
-
-  const componentsProps = useMemo(() => {
-    return {
-      toolbar: toolbarComponent,
-      contentEnd: contentEndComponent,
-    };
-  }, [toolbarComponent, contentEndComponent]);
+  const componentsProps = useGetCalendarCompononentProps({
+    startDate,
+    endDate,
+  });
 
   return (
     <Layout className={css.root}>

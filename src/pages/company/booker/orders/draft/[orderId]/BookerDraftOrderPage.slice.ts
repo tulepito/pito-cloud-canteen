@@ -101,6 +101,7 @@ const searchRestaurants = createAsyncThunk(
       keywords = '',
       distance,
     } = params;
+
     await dispatch(orderAsyncActions.fetchOrder(orderId));
     const dateTime = DateTime.fromMillis(timestamp);
     const { order } = getState().Order;
