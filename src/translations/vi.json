@@ -302,6 +302,7 @@
   "EditCompanyPage.updateCompanyFailed": "Cập nhật tài khoản lỗi. Xin vui lòng thử lại.",
   "EditMenuCompleteForm.applyTime": "Thời gian áp dụng",
   "EditMenuCompleteForm.endDate": "Ngày kết thúc",
+  "EditMenuCompleteForm.endDateLabel": "Ngày kết thúc",
   "EditMenuCompleteForm.foodList": "Danh sách món ăn",
   "EditMenuCompleteForm.menuInformation": "Thông tin thực đơn",
   "EditMenuCompleteForm.menuName": "Tên thực đơn",
@@ -311,6 +312,8 @@
   "EditMenuInformationForm.cycleMenuLabel": "Menu theo chu kỳ",
   "EditMenuInformationForm.daysOfWeekLabel": "Chọn ngày trong tuần",
   "EditMenuInformationForm.daysOfWeekRequired": "Vui lòng chọn ngày trong tuần",
+  "EditMenuInformationForm.endDateLabel": "Ngày kết thúc",
+  "EditMenuInformationForm.endDateRequired": "Vui lòng nhập ngày kết thúc",
   "EditMenuInformationForm.fixedMenuLabel": "Menu cố định",
   "EditMenuInformationForm.mealTypeLabel": "Bữa phục vụ",
   "EditMenuInformationForm.mealTypeRequired": "Vui lòng chọn bữa phục vụ",
@@ -1162,8 +1165,5 @@
   "UploadImageForm.limitImage": "Dung lượng ảnh không được quá 2MB",
   "UploadImageForm.selectImage": "Chọn ảnh",
   "UploadImageForm.submit": "Lưu thay đổi",
-  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại.",
-  "EditMenuInformationForm.endDateLabel": "Ngày kết thúc",
-  "EditMenuInformationForm.endDateRequired": "Vui lòng nhập ngày kết thúc",
-  "EditMenuCompleteForm.endDateLabel": "Ngày kết thúc"
+  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại."
 }
