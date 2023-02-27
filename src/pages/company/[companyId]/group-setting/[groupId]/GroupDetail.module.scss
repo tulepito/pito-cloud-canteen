@@ -8,7 +8,6 @@
 
   .titleWrapper {
     flex-basis: 60%;
-    height: 108px;
   }
 }
 
@@ -43,6 +42,7 @@
   border-radius: 8px;
   padding-left: 12px;
   cursor: pointer;
+  width: 245px;
   @include textTemplate(16px, $fontWeightBold, 24px);
 }
 

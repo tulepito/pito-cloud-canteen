@@ -247,6 +247,7 @@ const GroupDetailPage = () => {
           <>
             <div className={css.titleWrapper}>
               <h2>{name || '---'}</h2>
+              <div>{description}</div>
             </div>
             <div className={css.actionBtns}>
               <Button onClick={onEditing} className={css.changeNameBtn}>
