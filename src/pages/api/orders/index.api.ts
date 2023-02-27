@@ -19,8 +19,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           bookerId,
           generalInfo,
         });
-        await createPlan({ orderId: orderListing?.id?.uuid, orderDetail: {} });
-
+        const planListing = await createPlan({
+          orderId: orderListing?.id?.uuid,
+          orderDetail: {},
+        });
+        orderListing.attributes.metadata.plans = [planListing.id.uuid];
         return res.json(orderListing);
       } catch (error) {
         handleError(res, error);

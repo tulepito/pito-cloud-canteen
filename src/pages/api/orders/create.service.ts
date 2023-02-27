@@ -43,6 +43,9 @@ const createOrder = async ({
     nutritions,
     selectedGroups,
     packagePerMember,
+    dayInWeek,
+    startDate,
+    endDate,
   } = generalInfo;
 
   // Call api to create order listing
@@ -62,6 +65,9 @@ const createOrder = async ({
         nutritions,
         selectedGroups,
         packagePerMember,
+        dayInWeek,
+        startDate,
+        endDate,
       },
     },
     { expand: true },
