@@ -105,7 +105,22 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
       IntegrationMenuListing(listing).getMetadata().listingState ===
       EListingStates.draft;
 
+    const isFixedMenu =
+      IntegrationMenuListing(listing).getMetadata().menuType ===
+      EMenuTypes.fixedMenu;
+
+    const { mealType } = IntegrationMenuListing(listing).getPublicData();
+
     !isDraft && !error && setSubmittedValues(values);
+
+    if (tab === MENU_COMPLETE_TAB) {
+      return router.push({
+        pathname: isFixedMenu
+          ? adminRoutes.ManagePartnerFixedMenus.path
+          : adminRoutes.ManagePartnerCycleMenus.path,
+        query: { mealType, restaurantId },
+      });
+    }
 
     if (isDraft && !error) {
       return redirectAfterDraftUpdate(
@@ -121,8 +136,14 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
 
   const { title } = IntegrationMenuListing(currentMenu).getAttributes();
   const { menuType } = IntegrationMenuListing(currentMenu).getMetadata();
-  const { mealType, startDate, daysOfWeek, numberOfCycles, foodsByDate } =
-    IntegrationMenuListing(currentMenu).getPublicData();
+  const {
+    mealType,
+    startDate,
+    endDate,
+    daysOfWeek,
+    numberOfCycles,
+    foodsByDate,
+  } = IntegrationMenuListing(currentMenu).getPublicData();
 
   const idsToQuery = IntegrationMenuListing(currentMenu).getListFoodIds();
 
@@ -147,6 +168,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
               startDate,
               daysOfWeek,
               numberOfCycles,
+              endDate,
             }
           : {
               menuType: EMenuTypes.fixedMenu,
@@ -416,6 +438,7 @@ const EditPartnerMenuWizard = () => {
         })}>
         {tab !== MENU_INFORMATION_TAB && (
           <Button
+            className={css.lightButton}
             disabled={createOrUpdateMenuInProgress}
             onClick={handleGoBack}>
             <FormattedMessage id="EditPartnerMenuWizard.back" />

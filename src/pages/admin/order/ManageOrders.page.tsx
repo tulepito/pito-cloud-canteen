@@ -27,6 +27,7 @@ import {
 import type {
   TIntegrationListing,
   TIntegrationOrderListing,
+  TTableSortValue,
 } from '@utils/types';
 import { parsePrice } from '@utils/validators';
 import classNames from 'classnames';
@@ -311,12 +312,7 @@ const parseEntitiesToTableData = (
   });
 };
 
-type TSortValue = {
-  columnName: string | number;
-  type: 'asc' | 'desc';
-};
-
-const sortOrders = ({ columnName, type }: TSortValue, data: any) => {
+const sortOrders = ({ columnName, type }: TTableSortValue, data: any) => {
   const isAsc = type === 'asc';
   // eslint-disable-next-line array-callback-return
   return data.sort((a: any, b: any) => {
@@ -348,7 +344,7 @@ const ManageOrdersPage = () => {
     meta_endDate,
     meta_startDate,
   } = router.query;
-  const [sortValue, setSortValue] = useState<TSortValue>();
+  const [sortValue, setSortValue] = useState<TTableSortValue>();
   const {
     queryOrderInProgress,
     queryOrderError,

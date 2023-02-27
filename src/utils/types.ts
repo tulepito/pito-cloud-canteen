@@ -467,3 +467,8 @@ export type TIntegrationOrderListing = {
   plan?: TListing;
   subOrders?: TIntegrationListing[];
 };
+
+export type TTableSortValue = {
+  columnName: string | number;
+  type: 'asc' | 'desc';
+};

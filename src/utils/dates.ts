@@ -7,6 +7,7 @@ import {
 import jstz from 'jstimezonedetect';
 import { DateTime, Interval } from 'luxon';
 
+import { getUniqueString } from './data';
 import { EDayOfWeek } from './enums';
 
 /**
@@ -237,6 +238,16 @@ export const DAY_AS_INDEX = {
   [EDayOfWeek.sat]: 5,
 };
 
+const DAYS_OF_WEEK_SORTER = {
+  [EDayOfWeek.sun]: 6,
+  [EDayOfWeek.mon]: 0,
+  [EDayOfWeek.tue]: 1,
+  [EDayOfWeek.wed]: 2,
+  [EDayOfWeek.thu]: 3,
+  [EDayOfWeek.fri]: 4,
+  [EDayOfWeek.sat]: 5,
+};
+
 export const getDayOfWeekAsIndex = (day: EDayOfWeek) => {
   return DAY_AS_INDEX[day] === -1 ? 6 : DAY_AS_INDEX[day];
 };
@@ -269,4 +280,66 @@ export const printHoursToString = (hours: number, minutes: number) => {
   const hoursToRender = hours < 10 ? `0${hours}` : hours;
   const hoursAndMinutes = `${hoursToRender}:${minutesToRender}`;
   return hoursAndMinutes;
+};
+
+const DAYS = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+const addDays = (d: Date, days: number) => {
+  const date = new Date(d);
+  date.setDate(date.getDate() + days);
+  return date;
+};
+
+const getDates = (startDate: Date, stopDate: Date) => {
+  const dateArray = [];
+  let currentDate = new Date(startDate);
+  while (currentDate <= stopDate) {
+    dateArray.push(new Date(currentDate));
+    currentDate = addDays(currentDate, 1);
+  }
+  return dateArray;
+};
+
+export const findClassDays = (
+  daysOfWeek: string[],
+  firstDay: Date,
+  lastDay: Date,
+) => {
+  let classDays = [];
+  const rangeDates = getDates(new Date(firstDay), new Date(lastDay));
+  classDays = rangeDates.filter((f) =>
+    daysOfWeek.some((d: string) => DAYS[d] == f.getDay()),
+  );
+  return classDays.map((d) => d.toDateString());
+};
+
+const sortDatesByDayOfWeek = (dates: Date[]) => {
+  return dates.sort((a, b) => {
+    const aDayOfWeek = getDayOfWeekByIndex(a.getDay() - 1);
+    const bDayOfWeek = getDayOfWeekByIndex(b.getDay() - 1);
+
+    const aDayOfWeekSorter = DAYS_OF_WEEK_SORTER[aDayOfWeek as EDayOfWeek];
+    const bDayOfWeekSorter = DAYS_OF_WEEK_SORTER[bDayOfWeek as EDayOfWeek];
+    return aDayOfWeekSorter - bDayOfWeekSorter;
+  });
+};
+
+export const getWeekDayList = (startDate: Date, endDate: Date) => {
+  const days = [];
+  const end = new Date(endDate);
+  for (
+    let start = new Date(startDate);
+    start <= end;
+    start.setDate(start.getDate() + 1)
+  ) {
+    days.push(new Date(start));
+  }
+
+  const sortedDates = sortDatesByDayOfWeek(days);
+
+  const results = sortedDates.map((day) =>
+    getDayOfWeekByIndex(new Date(day).getDay() - 1),
+  );
+
+  return getUniqueString(results);
 };

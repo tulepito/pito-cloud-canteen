@@ -24,6 +24,7 @@ const UpdateMenuModal: React.FC<TUpdateMenuModalProps> = (props) => {
     onUpdateMenuApplyTime,
     createOrUpdateMenuError,
   } = props;
+
   const initialValues = useMemo(() => {
     return {
       ...(menuToUpdate || {}),

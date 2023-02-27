@@ -12,10 +12,22 @@ type TToggleButtonProps = {
   onClick?: (e: boolean) => void;
   disabled?: boolean;
   label?: string;
+  uncontrolledValue?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 const ToggleButton: React.FC<TToggleButtonProps> = (props) => {
-  const { defaultValue, className, onClick, disabled, name, id, label } = props;
+  const {
+    defaultValue,
+    className,
+    onClick,
+    disabled,
+    name,
+    id,
+    label,
+    uncontrolledValue,
+    onChange,
+  } = props;
 
   const { value, toggle } = useBoolean(defaultValue);
 
@@ -31,15 +43,17 @@ const ToggleButton: React.FC<TToggleButtonProps> = (props) => {
     toggle();
   };
 
+  const isUncontrolled = typeof uncontrolledValue !== 'undefined';
+
   return (
     <div className={toggleClasses}>
       <div className={css.toggle}>
         <input
           type="checkbox"
-          checked={value}
+          checked={isUncontrolled ? uncontrolledValue : value}
           name={name}
           id={id}
-          onChange={onClickToggleButton}
+          onChange={isUncontrolled ? onChange : onClickToggleButton}
           disabled={disabled}
         />
         <label htmlFor={id} className={css.slider}></label>

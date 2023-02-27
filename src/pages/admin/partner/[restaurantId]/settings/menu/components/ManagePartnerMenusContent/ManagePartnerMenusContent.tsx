@@ -3,6 +3,7 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconDuplicate from '@components/Icons/IconDuplicate/IconDuplicate';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
@@ -13,10 +14,11 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TMenuMealTypeCount } from '@redux/slices/menus.slice';
 import { menusSliceThunks } from '@redux/slices/menus.slice';
 import { parseTimestampToFormat } from '@utils/dates';
-import { EListingStates, EMenuMealType, EMenuTypes } from '@utils/enums';
+import type { EMenuTypes } from '@utils/enums';
+import { EListingStates, EMenuMealType } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 import classNames from 'classnames';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -56,23 +58,16 @@ const TABLE_COLUNMS: TColumn[] = [
   {
     key: 'applyDates',
     label: 'Thời gian áp dụng',
-    render: ({ startDate, endDate, isDeleted, menuType }) => {
+    render: ({ startDate, endDate, isDeleted }) => {
       if (isDeleted) {
         return <></>;
       }
       return (
         <div className={css.row}>
-          {menuType === EMenuTypes.cycleMenu ? (
-            <div>
-              {parseTimestampToFormat(startDate)} -
-              {parseTimestampToFormat(endDate)}
-            </div>
-          ) : (
-            <div>
-              <span>Từ </span>
-              {parseTimestampToFormat(startDate)}
-            </div>
-          )}
+          <div>
+            {startDate && parseTimestampToFormat(startDate)} -
+            {endDate && parseTimestampToFormat(endDate)}
+          </div>
         </div>
       );
     },
@@ -83,70 +78,30 @@ const TABLE_COLUNMS: TColumn[] = [
     render: ({
       listingState,
       id,
-      onToggleStatus,
       isDeleted,
-      startDate,
-      endDate,
-      daysOfWeek,
-      numberOfCycles,
-      menuType,
       onSetMenuToUpdate,
-      monFoodIdList,
-      tueFoodIdList,
-      wedFoodIdList,
-      thuFoodIdList,
-      friFoodIdList,
-      satFoodIdList,
-      sunFoodIdList,
-      monAverageFoodPrice,
-      tueAverageFoodPrice,
-      wedAverageFoodPrice,
-      thuAverageFoodPrice,
-      friAverageFoodPrice,
-      satAverageFoodPrice,
-      sunAverageFoodPrice,
-      foodsByDate,
-      restaurantId,
-      mealType,
+      onToggleStatus,
+      toggleInProgress,
     }) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       if (isDeleted) {
         return <></>;
       }
-      const onClick = (checked: boolean) => {
-        const newStatus = checked
+      const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { checked } = e.target;
+        if (!checked) {
+          return onToggleStatus(id, EListingStates.closed);
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        const state = checked
           ? EListingStates.published
           : EListingStates.closed;
-
-        onToggleStatus(id, newStatus);
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        checked &&
-          onSetMenuToUpdate({
-            id,
-            startDate,
-            endDate,
-            daysOfWeek,
-            numberOfCycles,
-            menuType,
-            monFoodIdList,
-            tueFoodIdList,
-            wedFoodIdList,
-            thuFoodIdList,
-            friFoodIdList,
-            satFoodIdList,
-            sunFoodIdList,
-            monAverageFoodPrice,
-            tueAverageFoodPrice,
-            wedAverageFoodPrice,
-            thuAverageFoodPrice,
-            friAverageFoodPrice,
-            satAverageFoodPrice,
-            sunAverageFoodPrice,
-            foodsByDate,
-            restaurantId,
-            mealType,
-          });
+        onSetMenuToUpdate(state);
       };
 
+      if (toggleInProgress) {
+        return <IconSpinner className={css.loadingIcon} />;
+      }
       return listingState === EListingStates.draft ? (
         <></>
       ) : (
@@ -154,8 +109,8 @@ const TABLE_COLUNMS: TColumn[] = [
           name={id}
           className={css.toggleButton}
           id={id}
-          onClick={onClick}
-          defaultValue={listingState === EListingStates.published}
+          onChange={onChange}
+          uncontrolledValue={listingState === EListingStates.published}
         />
       );
     },
@@ -163,7 +118,7 @@ const TABLE_COLUNMS: TColumn[] = [
   {
     key: 'actions',
     label: '',
-    render: ({ id, restaurantId, onSetMenuToRemove, title, isDeleted }) => {
+    render: ({ id, restaurantId, onSetMenuToRemove, isDeleted }) => {
       if (isDeleted) {
         return <></>;
       }
@@ -181,7 +136,7 @@ const TABLE_COLUNMS: TColumn[] = [
           </NamedLink>
           <InlineTextButton
             type="button"
-            onClick={onSetMenuToRemove({ id, title })}
+            onClick={onSetMenuToRemove}
             className={css.actionBtn}>
             <IconDelete />
           </InlineTextButton>
@@ -193,7 +148,17 @@ const TABLE_COLUNMS: TColumn[] = [
 
 const parseEntitiesToTableData = (
   menues: TIntegrationListing[],
-  extraData: any = {},
+  {
+    onSetMenuToRemove,
+    onSetMenuToUpdate,
+    onToggleStatus,
+    toggleMenuStateInProgressId,
+  }: {
+    onSetMenuToRemove: (menu: any) => void;
+    onSetMenuToUpdate: (menu: any) => void;
+    onToggleStatus: (id: string, state: EListingStates) => void;
+    toggleMenuStateInProgressId: string | null;
+  },
 ) => {
   return menues.map((menu) => {
     const {
@@ -225,18 +190,14 @@ const parseEntitiesToTableData = (
       mealType,
     } = menu.attributes.publicData;
 
-    return {
-      key: menu.id.uuid,
-      data: {
-        menuType,
-        isDeleted,
-        title: menu.attributes.title,
+    const handleUpdateMenu = (listingStateToUpdate: EListingStates) => {
+      return onSetMenuToUpdate({
         id: menu.id.uuid,
-        listingState,
         startDate,
         endDate,
-        numberOfCycles,
         daysOfWeek,
+        numberOfCycles,
+        menuType,
         monFoodIdList,
         tueFoodIdList,
         wedFoodIdList,
@@ -254,7 +215,31 @@ const parseEntitiesToTableData = (
         foodsByDate,
         restaurantId,
         mealType,
-        ...extraData,
+        listingState: listingStateToUpdate,
+      });
+    };
+
+    const handleSetMenuToRemove = () => {
+      onSetMenuToRemove({ id: menu.id.uuid, title: menu.attributes.title });
+    };
+
+    return {
+      key: menu.id.uuid,
+      data: {
+        menuType,
+        isDeleted,
+        title: menu.attributes.title,
+        id: menu.id.uuid,
+        listingState,
+        startDate,
+        endDate,
+        numberOfCycles,
+        daysOfWeek,
+        restaurantId,
+        onSetMenuToRemove: handleSetMenuToRemove,
+        onSetMenuToUpdate: handleUpdateMenu,
+        onToggleStatus,
+        toggleInProgress: toggleMenuStateInProgressId === menu.id.uuid,
       },
     };
   });
@@ -301,13 +286,11 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
       );
   }, [menuType, restaurantId, dispatch, mealType, keywords, page]);
 
-  const onToggleStatus = (id: string, state: string) => {
+  const onToggleStatus = (id: string, listingState: EListingStates) => {
     dispatch(
-      menusSliceThunks.togglePartnerMenuListing({
+      menusSliceThunks.toggleMenuState({
         id,
-        metadata: {
-          listingState: state,
-        },
+        listingState,
       }),
     );
   };
@@ -328,7 +311,12 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
     shallowEqual,
   );
 
-  const onSetMenuToRemove = (menuData: any) => () => {
+  const toggleMenuStateInProgressId = useAppSelector(
+    (state) => state.menus.toggleMenuStateInProgressId,
+    shallowEqual,
+  );
+
+  const onSetMenuToRemove = (menuData: any) => {
     setMenuToRemove(menuData);
   };
 
@@ -376,7 +364,9 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
         createUpdateMenuApplyTimeValues({ ...menuToUpdate, ...values }),
       ),
     )) as any;
+
     if (!error) {
+      await onToggleStatus(menuToUpdate.id, EListingStates.published);
       onClearMenuToUpdate();
       dispatch(
         menusSliceThunks.queryPartnerMenus({
@@ -384,16 +374,17 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
           restaurantId,
           mealType,
           keywords,
+          page,
         }),
       );
     }
   };
 
   const menuData = parseEntitiesToTableData(menus, {
-    restaurantId,
-    onToggleStatus,
     onSetMenuToRemove,
     onSetMenuToUpdate,
+    onToggleStatus,
+    toggleMenuStateInProgressId,
   });
 
   if (queryMenusError)
@@ -430,6 +421,7 @@ type TManagePartnerMenusContent = {
   menuType: string;
   keywords: string;
   page: string;
+  mealType: string;
 };
 
 const ManagePartnerMenusContent: React.FC<TManagePartnerMenusContent> = ({
@@ -437,6 +429,7 @@ const ManagePartnerMenusContent: React.FC<TManagePartnerMenusContent> = ({
   menuType,
   keywords,
   page,
+  mealType,
 }) => {
   const menuMealTypeCount = useAppSelector(
     (state) => state.menus.menuMealTypeCount,
@@ -453,77 +446,94 @@ const ManagePartnerMenusContent: React.FC<TManagePartnerMenusContent> = ({
     );
   }, [restaurantId, menuType, dispatch]);
 
-  const menuLabel: React.FC<TTabsItem & { isActive: boolean }> = (
-    menuLabelProps,
-  ) => {
-    const { id, isActive } = menuLabelProps;
-    return (
-      <div className={css.menuContentTabLabel}>
-        <div className={css.menuContentTabText}>
-          <FormattedMessage id={`ManagePartnerMenusPage.${id}`} />
+  const menuLabel: React.FC<TTabsItem & { isActive: boolean }> = useCallback(
+    (menuLabelProps) => {
+      const { id, isActive } = menuLabelProps;
+      return (
+        <div className={css.menuContentTabLabel}>
+          <div className={css.menuContentTabText}>
+            <FormattedMessage id={`ManagePartnerMenusPage.${id}`} />
+          </div>
+          <div
+            className={classNames(css.menuContentTabBadge, {
+              [css.isActive]: isActive,
+            })}>
+            {menuMealTypeCount[id as keyof TMenuMealTypeCount]}
+          </div>
         </div>
-        <div
-          className={classNames(css.menuContentTabBadge, {
-            [css.isActive]: isActive,
-          })}>
-          {menuMealTypeCount[id as keyof TMenuMealTypeCount]}
-        </div>
-      </div>
-    );
-  };
-  const menuContent = [
-    {
-      id: EMenuMealType.breakfast as string,
-      label: menuLabel,
-      childrenFn: (childProps: TTabContentProps) => (
-        <TabContent {...childProps} />
-      ),
-      childrenProps: {
-        menuType,
-        restaurantId,
-        keywords,
-        page,
-      },
+      );
     },
-    {
-      id: EMenuMealType.lunch,
-      label: menuLabel,
-      childrenFn: (childProps: TTabContentProps) => (
-        <TabContent {...childProps} />
-      ),
-      childrenProps: {
-        menuType,
-        restaurantId,
-        keywords,
-        page,
+    [menuMealTypeCount],
+  );
+  const menuContent = useMemo(
+    () => [
+      {
+        id: EMenuMealType.breakfast as string,
+        label: menuLabel,
+        childrenFn: (childProps: TTabContentProps) => (
+          <TabContent {...childProps} />
+        ),
+        childrenProps: {
+          menuType,
+          restaurantId,
+          keywords,
+          page,
+        },
       },
-    },
-    {
-      id: EMenuMealType.dinner,
-      label: menuLabel,
-      childrenFn: (childProps: TTabContentProps) => (
-        <TabContent {...childProps} />
-      ),
-      childrenProps: {
-        menuType,
-        restaurantId,
-        keywords,
-        page,
+      {
+        id: EMenuMealType.lunch,
+        label: menuLabel,
+        childrenFn: (childProps: TTabContentProps) => (
+          <TabContent {...childProps} />
+        ),
+        childrenProps: {
+          menuType,
+          restaurantId,
+          keywords,
+          page,
+        },
       },
-    },
-    {
-      id: EMenuMealType.snack,
-      label: menuLabel,
-      childrenFn: (childProps: any) => <TabContent {...childProps} />,
-      childrenProps: {
-        menuType,
-        restaurantId,
-        keywords,
-        page,
+      {
+        id: EMenuMealType.dinner,
+        label: menuLabel,
+        childrenFn: (childProps: TTabContentProps) => (
+          <TabContent {...childProps} />
+        ),
+        childrenProps: {
+          menuType,
+          restaurantId,
+          keywords,
+          page,
+        },
       },
-    },
-  ];
-  return <Tabs items={menuContent as any} />;
+      {
+        id: EMenuMealType.snack,
+        label: menuLabel,
+        childrenFn: (childProps: any) => <TabContent {...childProps} />,
+        childrenProps: {
+          menuType,
+          restaurantId,
+          keywords,
+          page,
+        },
+      },
+    ],
+    [keywords, menuLabel, menuType, page, restaurantId],
+  );
+
+  const defaultIndex = useMemo(
+    () => menuContent.findIndex((m) => m.id === mealType),
+    [mealType, menuContent],
+  );
+
+  const defaultTabIndex = defaultIndex < 0 ? 0 : defaultIndex;
+
+  return (
+    <Tabs
+      items={menuContent as any}
+      defaultActiveKey={String(Number(defaultTabIndex) + 1)}
+    />
+  );
 };
 
 export default ManagePartnerMenusContent;

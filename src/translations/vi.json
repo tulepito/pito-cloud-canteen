@@ -1139,5 +1139,8 @@
   "UploadImageForm.limitImage": "Dung lượng ảnh không được quá 2MB",
   "UploadImageForm.selectImage": "Chọn ảnh",
   "UploadImageForm.submit": "Lưu thay đổi",
-  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại."
+  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại.",
+  "EditMenuInformationForm.endDateLabel": "Ngày kết thúc",
+  "EditMenuInformationForm.endDateRequired": "Vui lòng nhập ngày kết thúc",
+  "EditMenuCompleteForm.endDateLabel": "Ngày kết thúc"
 }
