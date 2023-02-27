@@ -1,3 +1,4 @@
+import { fetchUserApi } from '@apis/index';
 import { fetchSearchFilterApi } from '@apis/userApi';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
@@ -8,7 +9,7 @@ import {
   ERestaurantListingState,
   ERestaurantListingStatus,
 } from '@utils/enums';
-import type { TObject } from '@utils/types';
+import type { TListing, TObject, TUser } from '@utils/types';
 
 // ================ Initial states ================ //
 type TKeyValue<T = string> = {
@@ -17,19 +18,38 @@ type TKeyValue<T = string> = {
 };
 
 type TQuizState = {
+  selectedCompany: TUser;
+  fetchSelectedCompanyInProgress: boolean;
+  fetchSelectedCompanyError: any;
+
   quiz: TObject;
   categories: TKeyValue[];
   fetchFilterInProgress: boolean;
+
+  restaurants: TListing[];
+  fetchRestaurantsInProgress: boolean;
+  fetchRestaurantsError: any;
+
+  allowCreateOrder: boolean;
 };
 const initialState: TQuizState = {
+  selectedCompany: null!,
+  fetchSelectedCompanyInProgress: false,
+  fetchSelectedCompanyError: null,
   quiz: {},
   categories: [],
   fetchFilterInProgress: false,
+  restaurants: [],
+  fetchRestaurantsInProgress: false,
+  fetchRestaurantsError: null,
+
+  allowCreateOrder: false,
 };
 
 // ================ Thunk types ================ //
 const FETCH_SEARCH_FILTER = 'app/Quiz/FETCH_SEARCH_FILTER';
 const FETCH_RESTAURANTS = 'app/Quiz/FETCH_RESTAURANTS';
+const FETCH_SELECTED_COMPANY = 'app/Quiz/FETCH_SELECTED_COMPANY';
 
 // ================ Async thunks ================ //
 const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
@@ -58,9 +78,18 @@ const fetchRestaurants = createAsyncThunk(
     return restaurants;
   },
 );
+
+const fetchSelectedCompany = createAsyncThunk(
+  FETCH_SELECTED_COMPANY,
+  async (companyId: string) => {
+    const { data: companyAccount } = await fetchUserApi(companyId);
+    return companyAccount;
+  },
+);
 export const QuizThunks = {
   fetchSearchFilter,
   fetchRestaurants,
+  fetchSelectedCompany,
 };
 
 // ================ Slice ================ //
@@ -75,6 +104,12 @@ const QuizSlice = createSlice({
         ...payload,
       },
     }),
+    allowCreateOrder: (state) => {
+      state.allowCreateOrder = true;
+    },
+    disallowCreateOrder: (state) => {
+      state.allowCreateOrder = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -84,6 +119,32 @@ const QuizSlice = createSlice({
       .addCase(fetchSearchFilter.fulfilled, (state, action) => {
         state.fetchFilterInProgress = false;
         state.categories = action.payload;
+      })
+
+      .addCase(fetchRestaurants.pending, (state) => {
+        state.fetchRestaurantsInProgress = true;
+        state.fetchRestaurantsError = null;
+      })
+      .addCase(fetchRestaurants.fulfilled, (state, { payload }) => {
+        state.fetchRestaurantsInProgress = false;
+        state.restaurants = payload;
+      })
+      .addCase(fetchRestaurants.rejected, (state, { error }) => {
+        state.fetchRestaurantsInProgress = false;
+        state.fetchRestaurantsError = error.message;
+      })
+
+      .addCase(fetchSelectedCompany.pending, (state) => {
+        state.fetchSelectedCompanyInProgress = true;
+        state.fetchSelectedCompanyError = null;
+      })
+      .addCase(fetchSelectedCompany.fulfilled, (state, { payload }) => {
+        state.fetchSelectedCompanyInProgress = false;
+        state.selectedCompany = payload;
+      })
+      .addCase(fetchSelectedCompany.rejected, (state, { error }) => {
+        state.fetchSelectedCompanyInProgress = false;
+        state.fetchSelectedCompanyError = error.message;
       });
   },
 });

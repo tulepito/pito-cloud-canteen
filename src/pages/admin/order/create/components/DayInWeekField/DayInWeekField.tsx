@@ -29,8 +29,8 @@ const DayInWeekField: React.FC<DayInWeekFieldProps> = (props) => {
   const { dayInWeek = [], startDate, endDate } = values;
   const [selectedDays, setSelectedDays] = useState<string[]>(dayInWeek);
   const dayInWeekFromStartDateToEndDate = getDayInWeekFromPeriod(
-    parseInt(startDate, 10),
-    parseInt(endDate, 10),
+    startDate,
+    endDate,
   ).map((weekDay) => convertWeekDay(weekDay));
   const disableDayInWeekOptions = differenceBy(
     DAY_IN_WEEK,

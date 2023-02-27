@@ -183,3 +183,14 @@ export const companyPaths = {
     '/company/[companyId]/group-setting/[groupId]/member/[memberId]',
   Nutrition: '/company/[companyId]/nutrition',
 };
+
+export const quizPaths = {
+  Welcome: '/company/booker/orders/new/quiz/welcome',
+  SelectCompany: '/company/booker/orders/new/quiz/select-company',
+  PerpackMemberAmount: '/company/booker/orders/new/quiz/perpack-member-amount',
+  SpecialDemand: '/company/booker/orders/new/quiz/special-demand',
+  MealStyles: '/company/booker/orders/new/quiz/meal-styles',
+  Restaurants: '/company/booker/orders/new/quiz/restaurants',
+  MealDates: '/company/booker/orders/new/quiz/meal-date',
+  CreatingOrder: '/company/booker/orders/new/quiz/creating-order',
+};

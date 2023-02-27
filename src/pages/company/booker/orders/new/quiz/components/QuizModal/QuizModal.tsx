@@ -2,16 +2,20 @@ import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconCloseV2 from '@components/Icons/IconCloseV2/IconCloseV2';
 import Modal from '@components/Modal/Modal';
+import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';
 
 import css from './QuizModal.module.scss';
 
 type QuizModalProps = {
+  id: string;
   isOpen: boolean;
   modalTitle: string;
   submitText?: string;
   cancelText?: string;
   submitDisabled?: boolean;
+  modalContainerClassName?: string;
+  submitInProgress?: boolean;
   handleClose: () => void;
   onSubmit?: () => void;
   onCancel?: () => void;
@@ -20,23 +24,32 @@ type QuizModalProps = {
 
 const QuizModal: React.FC<QuizModalProps> = (props) => {
   const {
+    id,
     isOpen,
     handleClose,
     modalTitle,
     submitText,
     cancelText,
     submitDisabled,
+    modalContainerClassName,
+    submitInProgress = false,
     onSubmit,
     onCancel,
     onBack,
     children,
   } = props;
 
+  const modalContainerClasses = classNames(
+    css.modalContainer,
+    modalContainerClassName,
+  );
+
   return (
     <Modal
+      id={id}
       isOpen={isOpen}
       handleClose={handleClose}
-      containerClassName={css.modalContainer}
+      containerClassName={modalContainerClasses}
       shouldHideIconClose
       customHeader={<div></div>}>
       <div className={css.container}>
@@ -45,7 +58,7 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
             <IconCloseV2 className={css.closeIcon} />
           </div>
           {onBack && (
-            <div className={css.backBtn}>
+            <div className={css.backBtn} onClick={onBack}>
               <IconArrow direction="left" />
               <span>Quay lại</span>
             </div>
@@ -57,7 +70,8 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
           <Button
             className={css.submitBtn}
             onClick={onSubmit}
-            disabled={submitDisabled}>
+            disabled={submitDisabled}
+            inProgress={submitInProgress}>
             {submitText}
           </Button>
           {cancelText && (

@@ -1,4 +1,5 @@
 import Badge from '@components/Badge/Badge';
+import Button from '@components/Button/Button';
 import IconBox from '@components/Icons/IconBox/IconBox';
 import IconGift from '@components/Icons/IconGift/IconGift';
 import IconHeart from '@components/Icons/IconHeart/IconHeart';
@@ -15,6 +16,7 @@ import {
 import classNames from 'classnames';
 import Image from 'next/image';
 import React from 'react';
+import { useIntl } from 'react-intl';
 
 import css from './RestaurantCard.module.scss';
 import coverImg from './restaurantPlaceholder.png';
@@ -23,11 +25,15 @@ type TRestaurantCardProps = {
   className?: string;
   restaurant?: any;
   onClick?: (restaurantId: string) => void;
-  companyGeoOrigin: {
+  companyGeoOrigin?: {
     lat: number;
     lng: number;
   };
-  totalRatings: any[];
+  totalRatings?: any[];
+  hideFavoriteIcon?: boolean;
+  favoriteFunc?: (restaurantId: string) => void;
+  favoriteInProgress?: boolean;
+  alreadyFavorite?: boolean;
 };
 
 const RestaurantCard: React.FC<TRestaurantCardProps> = ({
@@ -35,8 +41,13 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
   onClick = () => null,
   restaurant,
   companyGeoOrigin,
-  totalRatings,
+  totalRatings = [],
+  hideFavoriteIcon,
+  favoriteFunc,
+  favoriteInProgress,
+  alreadyFavorite,
 }) => {
+  const intl = useIntl();
   const classes = classNames(css.root, className);
   const restaurantId = Listing(restaurant).getId();
   const { geolocation: origin } = Listing(restaurant).getAttributes();
@@ -44,7 +55,6 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
     Listing(restaurant).getPublicData();
   const { rating = 0 } = Listing(restaurant).getMetadata();
   const restaurantCoverImage = Listing(restaurant).getImages()[0];
-
   const mealStyles = categories
     .slice(0, 3)
     .map((category: string) =>
@@ -61,6 +71,10 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
     )?.totalReviews || 0;
   const handleClickCard = () => {
     onClick('123');
+  };
+
+  const handleFavoriteClick = () => {
+    if (typeof favoriteFunc === 'function') favoriteFunc(restaurantId);
   };
 
   return (
@@ -81,7 +95,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
         <p className={css.restaurantName} onClick={handleClickCard}>
           {Listing(restaurant).getAttributes().title}
         </p>
-        <IconHeart className={css.favoriteIcon} />
+        {!hideFavoriteIcon && <IconHeart className={css.favoriteIcon} />}
       </div>
       <div className={css.nutritions}>
         {mealStyles.map((style: any) => (
@@ -108,6 +122,17 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
           <span>{restaurantPackaging}</span>
         </div>
       </div>
+
+      {favoriteFunc && (
+        <Button
+          className={css.favoriteBtn}
+          variant="secondary"
+          inProgress={favoriteInProgress}
+          disabled={alreadyFavorite}
+          onClick={handleFavoriteClick}>
+          {intl.formatMessage({ id: 'RestaurantCard.favoriteBtn' })}
+        </Button>
+      )}
     </div>
   );
 };

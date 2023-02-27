@@ -1,20 +1,25 @@
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { parseThousandNumber } from '@helpers/format';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { QuizActions } from '@redux/slices/Quiz.slice';
+import { quizPaths } from '@src/paths';
 import {
   greaterThanOneThousand,
   greaterThanZero,
   required,
 } from '@utils/validators';
-import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useMemo } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
 
 import QuizModal from '../components/QuizModal/QuizModal';
 import css from './QuizPerPackMemberAmount.module.scss';
 
 type TQuizPerPackMemberAmountFormValues = {
-  packagePerMember: number;
-  memberAmount: number;
+  packagePerMember: string;
+  memberAmount: string;
 };
 
 const VNDIcon = () => {
@@ -27,13 +32,30 @@ const Amount = () => {
 
 const QuizPerPackMemberAmountPage = () => {
   const intl = useIntl();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+
+  const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
+
   const onSubmit = (values: any) => {
-    console.log(values);
+    const {
+      packagePerMember: packagePerMemberValue,
+      memberAmount: memberAmountValue,
+    } = values;
+    dispatch(
+      QuizActions.updateQuiz({
+        packagePerMember: +packagePerMemberValue.replace(/,/g, '') || 0,
+        memberAmount: +memberAmountValue || 0,
+      }),
+    );
   };
-  const initialValues = {
-    packagePerMember: 0,
-    memberAmount: 0,
-  };
+  const initialValues = useMemo(
+    () => ({
+      packagePerMember: quizData.packagePerMember?.toString(),
+      memberAmount: quizData.memberAmount?.toString(),
+    }),
+    [quizData.memberAmount, quizData.packagePerMember],
+  );
 
   const validate = (values: TQuizPerPackMemberAmountFormValues) => {
     const errors: any = {};
@@ -42,12 +64,12 @@ const QuizPerPackMemberAmountPage = () => {
         intl.formatMessage({
           id: 'QuizPerPackMemberAmountPage.packagePerMember.required',
         }),
-      )(values.packagePerMember.toString()) ||
+      )(values.packagePerMember?.toString()) ||
       greaterThanOneThousand(
         intl.formatMessage({
           id: 'QuizPerPackMemberAmountPage.packagePerMember.greaterThanOneThousand',
         }),
-      )(values.packagePerMember);
+      )(+values.packagePerMember);
 
     if (packagePerMemberError) {
       errors.packagePerMember = packagePerMemberError;
@@ -57,19 +79,19 @@ const QuizPerPackMemberAmountPage = () => {
         intl.formatMessage({
           id: 'QuizPerPackMemberAmountPage.memberAmount.required',
         }),
-      )(values.memberAmount.toString()) ||
+      )(values.memberAmount?.toString()) ||
       greaterThanZero(
         intl.formatMessage({
           id: 'QuizPerPackMemberAmountPage.memberAmount.greaterThanZero',
         }),
-      )(values.memberAmount);
+      )(+values.memberAmount);
     if (memberAmountError) {
       errors.memberAmount = memberAmountError;
     }
     return errors;
   };
 
-  const { form, hasValidationErrors } =
+  const { form, hasValidationErrors, handleSubmit } =
     useForm<TQuizPerPackMemberAmountFormValues>({
       onSubmit,
       validate,
@@ -80,15 +102,27 @@ const QuizPerPackMemberAmountPage = () => {
 
   useEffect(() => {
     if (packagePerMember.input.value) {
-      form.change(
-        'packagePerMember',
-        +parseThousandNumber(`${packagePerMember.input.value}`),
-      );
+      form.batch(() => {
+        form.change(
+          'packagePerMember',
+          parseThousandNumber(`${packagePerMember.input.value}`),
+        );
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [packagePerMember.input.value]);
+
+  const onFormSubmitClick = () => {
+    handleSubmit();
+    router.push(quizPaths.SpecialDemand);
+  };
+
+  const goBack = () => {
+    router.back();
+  };
   return (
     <QuizModal
+      id="QuizPerPackMemberAmountModal"
       isOpen
       handleClose={() => {}}
       modalTitle={intl.formatMessage({
@@ -96,7 +130,8 @@ const QuizPerPackMemberAmountPage = () => {
       })}
       submitText="Tiếp tục"
       submitDisabled={hasValidationErrors}
-      onBack={() => {}}>
+      onSubmit={onFormSubmitClick}
+      onBack={goBack}>
       <form className={css.formContainer}>
         <FieldTextInputComponent
           id="packagePerMember"
@@ -119,6 +154,7 @@ const QuizPerPackMemberAmountPage = () => {
           name="memberAmount"
           input={memberAmount.input}
           meta={memberAmount.meta}
+          placeholder="0"
           label={intl.formatMessage({
             id: 'QuizPerPackMemberAmountPage.memberAmount.label',
           })}

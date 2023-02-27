@@ -1,6 +1,7 @@
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { QuizThunks } from '@redux/slices/Quiz.slice';
+import { quizPaths } from '@src/paths';
 import { User } from '@utils/data';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
@@ -15,7 +16,6 @@ function BookerNewOrderPage() {
   const dispatch = useAppDispatch();
 
   // Redux
-  const currentUser = useAppSelector((state) => state.user.currentUser);
   const createOrderInProcess = useAppSelector(
     (state) => state.Order.createOrderInProcess,
   );
@@ -29,15 +29,9 @@ function BookerNewOrderPage() {
 
   const handleSubmit = async (values: any) => {
     try {
-      const newOrder = await dispatch(
-        orderAsyncActions.createOrder({
-          clientId: values.company,
-          bookerId: currentUser?.id?.uuid,
-        }),
-      );
-      const newOrderId = newOrder?.payload?.id?.uuid;
+      await dispatch(QuizThunks.fetchSelectedCompany(values.company));
 
-      route.push(`/company/booker/orders/draft/${newOrderId}`);
+      route.push(quizPaths.PerpackMemberAmount);
     } catch (error) {
       console.log('error', error);
     }

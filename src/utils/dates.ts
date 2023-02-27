@@ -5,9 +5,21 @@ import {
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
 import jstz from 'jstimezonedetect';
+import difference from 'lodash/difference';
+import differenceBy from 'lodash/differenceBy';
 import { DateTime, Interval } from 'luxon';
 
 import { EDayOfWeek } from './enums';
+
+const DAY_IN_WEEK = [
+  { key: 'mon', label: 'DayInWeekField.mon' },
+  { key: 'tue', label: 'DayInWeekField.tue' },
+  { key: 'wed', label: 'DayInWeekField.wed' },
+  { key: 'thu', label: 'DayInWeekField.thu' },
+  { key: 'fri', label: 'DayInWeekField.fri' },
+  { key: 'sat', label: 'DayInWeekField.sat' },
+  { key: 'sun', label: 'DayInWeekField.sun' },
+];
 
 /**
  * Check if the browser's DateTimeFormat API supports time zones.
@@ -269,4 +281,25 @@ export const printHoursToString = (hours: number, minutes: number) => {
   const hoursToRender = hours < 10 ? `0${hours}` : hours;
   const hoursAndMinutes = `${hoursToRender}:${minutesToRender}`;
   return hoursAndMinutes;
+};
+
+export const getSelectedDaysOfWeek = (
+  startDate: number,
+  endDate: number,
+  dayInWeek: string[],
+) => {
+  const dayInWeekFromStartDateToEndDate = getDayInWeekFromPeriod(
+    startDate,
+    endDate,
+  ).map((day) => convertWeekDay(day));
+  const disableDayInWeekOptions = differenceBy(
+    DAY_IN_WEEK,
+    dayInWeekFromStartDateToEndDate,
+    'key',
+  );
+  const selectedDays = difference(
+    dayInWeek,
+    disableDayInWeekOptions.map((day) => day.key),
+  );
+  return selectedDays;
 };
