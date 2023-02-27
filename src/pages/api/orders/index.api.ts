@@ -1,4 +1,4 @@
-import cookies from '@services/cookie';
+import { composeApiCheckers } from '@apis/configs';
 import orderChecker from '@services/permissionChecker/order';
 import { handleError } from '@services/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -12,11 +12,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (apiMethod) {
     case HTTP_METHODS.POST:
       try {
-        const { companyId, bookerId, generalInfo } = req.body;
+        const { companyId, bookerId, isCreatedByAdmin, generalInfo } = req.body;
 
         const orderListing = await createOrder({
           companyId,
           bookerId,
+          isCreatedByAdmin,
           generalInfo,
         });
         await createPlan({ orderId: orderListing?.id?.uuid, orderDetail: {} });
@@ -31,4 +32,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default cookies(orderChecker(handler));
+export default composeApiCheckers(orderChecker)(handler);

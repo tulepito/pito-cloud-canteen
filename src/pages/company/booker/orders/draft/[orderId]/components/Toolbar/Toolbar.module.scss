@@ -17,6 +17,12 @@
 .actions {
   display: flex;
   align-items: center;
+
+  .loadingIcon {
+    width: 18px;
+    height: 18px;
+    margin: 0 0 0 8px;
+  }
 }
 
 .arrowBtn {

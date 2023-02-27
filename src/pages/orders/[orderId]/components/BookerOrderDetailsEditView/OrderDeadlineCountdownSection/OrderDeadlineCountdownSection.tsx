@@ -1,6 +1,7 @@
 import Button from '@components/Button/Button';
 import CountdownTimer from '@components/CountdownTimer/CountdownTimer';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
@@ -66,17 +67,14 @@ const OrderDeadlineCountdownSection: React.FC<
       deadlineDate: deadlineDateFromSubmission,
       deadlineHour: deadlineHourFromSubmission,
     } = values;
-    const parsedDeadlineDate = DateTime.fromMillis(
-      deadlineDateFromSubmission,
-    ).toFormat('yyyy-MM-dd');
-    const newOrderDeadline = DateTime.fromISO(
-      `${parsedDeadlineDate}T${deadlineHourFromSubmission}:00`,
-    ).toMillis();
+    const parsedDeadlineDate = DateTime.fromMillis(deadlineDateFromSubmission)
+      .startOf('day')
+      .plus({ ...convertHHmmStringToTimeParts(deadlineHourFromSubmission) })
+      .toMillis();
 
     const updateData = {
-      deadlineDate: deadlineDateFromSubmission,
+      deadlineDate: parsedDeadlineDate,
       deadlineHour: deadlineHourFromSubmission,
-      orderDeadline: newOrderDeadline,
     };
 
     dispatch(orderManagementThunks.updateOrderGeneralInfo(updateData));

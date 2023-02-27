@@ -55,7 +55,7 @@ const getRestaurants = createAsyncThunk(
       favoriteRestaurantIdList = [],
       favoriteFoodIdList = [],
       packagePerMember,
-      deliveryHour,
+      deliveryHour = '6:30',
       nutritions = [],
       title = '',
       page = 1,

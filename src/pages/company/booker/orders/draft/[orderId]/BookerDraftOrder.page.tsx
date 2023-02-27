@@ -1,9 +1,15 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { companyPaths } from '@src/paths';
+import { Listing } from '@utils/data';
+import { EBookerOrderDraftStates, EOrderDraftStates } from '@utils/enums';
+import type { TListing } from '@utils/types';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
@@ -12,10 +18,15 @@ import css from './BookerDraftOrder.module.scss';
 import SidebarContent from './components/SidebarContent/SidebarContent';
 import { useLoadData, useLoadPlanDetails } from './hooks/loadData';
 import {
-  useGetCalendarCompononentProps,
+  useGetCalendarComponentProps,
   useGetCalendarExtraResources,
 } from './restaurants/hooks/calendar';
 import { useGetBoundaryDates } from './restaurants/hooks/dateTime';
+
+const EnableToAccessPageOrderStates = [
+  EOrderDraftStates.pendingApproval,
+  EBookerOrderDraftStates.bookerDraft,
+];
 
 function BookerDraftOrderPage() {
   const router = useRouter();
@@ -27,11 +38,9 @@ function BookerDraftOrderPage() {
   const { order, companyAccount } = useLoadData({
     orderId: orderId as string,
   });
-
+  const { orderState } = Listing(order as TListing).getMetadata();
   const { orderDetail = [] } = useLoadPlanDetails();
-
   const { startDate, endDate } = useGetBoundaryDates(order);
-
   const calendarExtraResources = useGetCalendarExtraResources({
     order,
     startDate,
@@ -58,10 +67,24 @@ function BookerDraftOrderPage() {
     [dispatch, orderId],
   );
 
-  const componentsProps = useGetCalendarCompononentProps({
+  const componentsProps = useGetCalendarComponentProps({
     startDate,
     endDate,
   });
+
+  useEffect(() => {
+    if (!isEmpty(orderState)) {
+      if (orderState === EOrderDraftStates.draft) {
+        router.push({ pathname: companyPaths.CreateNewOrder });
+      } else if (!EnableToAccessPageOrderStates.includes(orderState)) {
+        router.push({
+          pathname: '/orders/[orderId]',
+          query: { orderId: orderId as string },
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderId, orderState]);
 
   return (
     <Layout className={css.root}>

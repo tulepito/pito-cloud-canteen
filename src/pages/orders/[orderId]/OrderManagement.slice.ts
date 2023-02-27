@@ -1,6 +1,8 @@
 import {
   addParticipantToOrderApi,
   addUpdateMemberOrder,
+  bookerStartOrderApi,
+  cancelPickingOrderApi,
   deleteParticipantFromOrderApi,
   getBookerOrderDataApi,
   sendRemindEmailToMemberApi,
@@ -9,8 +11,16 @@ import {
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { createSlice } from '@reduxjs/toolkit';
+import { Listing } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
-import type { TCompany, TObject, TUser } from '@utils/types';
+import { storableError } from '@utils/errors';
+import type {
+  TCompany,
+  TListing,
+  TObject,
+  TTransaction,
+  TUser,
+} from '@utils/types';
 import omit from 'lodash/omit';
 
 // ================ Initial states ================ //
@@ -23,6 +33,11 @@ type TOrderManagementState = {
   isUpdatingOrderDetails: boolean;
   // Send email state
   isSendingRemindEmail: boolean;
+  // Cancel order state
+  cancelPickingOrderInProgress: boolean;
+  cancelPickingOrderError: any;
+  //
+  isStartOrderInProgress: boolean;
   // Data states
   companyId: string | null;
   companyData: TCompany | null;
@@ -30,6 +45,10 @@ type TOrderManagementState = {
   planData: TObject;
   bookerData: TUser | null;
   participantData: Array<TUser>;
+  anonymousParticipantData: Array<TUser>;
+  transactionDataMap: {
+    [date: number]: TTransaction;
+  };
 };
 
 const initialState: TOrderManagementState = {
@@ -37,12 +56,17 @@ const initialState: TOrderManagementState = {
   isDeletingParticipant: false,
   isUpdatingOrderDetails: false,
   isSendingRemindEmail: false,
+  cancelPickingOrderInProgress: false,
+  cancelPickingOrderError: null,
+  isStartOrderInProgress: false,
   companyId: null,
   companyData: null,
   orderData: {},
   planData: {},
   bookerData: null,
   participantData: [],
+  anonymousParticipantData: [],
+  transactionDataMap: {},
 };
 
 // ================ Thunk types ================ //
@@ -144,12 +168,13 @@ const addOrUpdateMemberOrder = createAsyncThunk(
     } = getState().OrderManagement.orderData!;
     const {
       id: { uuid: planId },
-      attributes: { metadata },
+      attributes: { metadata = {} },
     } = getState().OrderManagement.planData!;
 
     const memberOrderDetailOnUpdateDate =
-      metadata?.orderDetail[currentViewDate].memberOrders[memberId];
-    const { foodId: oldFoodId, status } = memberOrderDetailOnUpdateDate;
+      metadata?.orderDetail[currentViewDate.toString()].memberOrders[memberId];
+    const { foodId: oldFoodId, status = EParticipantOrderStatus.empty } =
+      memberOrderDetailOnUpdateDate || {};
 
     if (foodId === '' || oldFoodId === foodId) {
       return;
@@ -391,7 +416,7 @@ const deleteParticipant = createAsyncThunk(
           ...result,
           [date]: {
             ...(orderDetailOnDate as TObject),
-            memberOrders: omit(memberOrders, participantId),
+            memberOrders: omit(memberOrders, [participantId]),
           },
         };
       },
@@ -410,6 +435,30 @@ const deleteParticipant = createAsyncThunk(
   },
 );
 
+const bookerStartOrder = createAsyncThunk(
+  'app/OrderManagement/startOrder',
+  async ({ orderId }: TObject, { getState }) => {
+    const { plans } = Listing(
+      getState().OrderManagement.orderData! as TListing,
+    ).getMetadata();
+
+    await bookerStartOrderApi({
+      orderId,
+      planId: plans.length > 0 ? plans[0] : '',
+    });
+  },
+);
+
+const cancelPickingOrder = createAsyncThunk(
+  'app/OrderManagement/CANCEL_PICKING_ORDER',
+  async (orderId: string) => {
+    await cancelPickingOrderApi(orderId);
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
 export const orderManagementThunks = {
   loadData,
   updateOrderGeneralInfo,
@@ -420,6 +469,8 @@ export const orderManagementThunks = {
   deleteDisAllowedMember,
   addParticipant,
   deleteParticipant,
+  bookerStartOrder,
+  cancelPickingOrder,
 };
 
 // ================ Slice ================ //
@@ -482,7 +533,32 @@ const OrderManagementSlice = createSlice({
       })
       .addCase(sendRemindEmailToMember.rejected, (state) => {
         state.isSendingRemindEmail = false;
-      });
+      })
+      /* =============== startPickingOrder =============== */
+      .addCase(bookerStartOrder.pending, (state) => {
+        state.isStartOrderInProgress = true;
+      })
+      .addCase(bookerStartOrder.fulfilled, (state) => {
+        state.isStartOrderInProgress = false;
+      })
+      .addCase(bookerStartOrder.rejected, (state) => {
+        state.isStartOrderInProgress = false;
+      })
+      /* =============== cancelPickingOrder =============== */
+      .addCase(cancelPickingOrder.pending, (state) => ({
+        ...state,
+        cancelPickingOrderInProgress: true,
+        cancelPickingOrderError: null,
+      }))
+      .addCase(cancelPickingOrder.fulfilled, (state) => ({
+        ...state,
+        cancelPickingOrderInProgress: false,
+      }))
+      .addCase(cancelPickingOrder.rejected, (state, { payload }) => ({
+        ...state,
+        cancelPickingOrderInProgress: false,
+        cancelPickingOrderError: payload,
+      }));
   },
 });
 

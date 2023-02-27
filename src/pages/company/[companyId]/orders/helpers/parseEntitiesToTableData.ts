@@ -1,7 +1,6 @@
 import { calculatePriceQuotationInfo } from '@pages/orders/[orderId]/helpers/cartInfoHelper';
 import { Listing } from '@utils/data';
 import { parseTimestampToFormat } from '@utils/dates';
-import { EOrderStates } from '@utils/enums';
 import type { TIntegrationOrderListing, TListing } from '@utils/types';
 import uniq from 'lodash/uniq';
 
@@ -22,7 +21,7 @@ export const parseEntitiesToTableData = (
       endDate = 0,
       deliveryHour,
       deliveryAddress,
-      orderState = EOrderStates.isNew,
+      orderState,
     } = Listing(entity as TListing).getMetadata();
 
     const { totalWithVAT } = calculatePriceQuotationInfo({

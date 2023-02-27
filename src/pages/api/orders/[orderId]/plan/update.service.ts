@@ -1,7 +1,7 @@
+import { isEnableUpdateBookingInfo } from '@helpers/orderHelper';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
-import { EOrderStates } from '@utils/enums';
 import type { TObject } from '@utils/types';
 
 import { getInitMemberOrder } from './memberOrder.helper';
@@ -51,7 +51,8 @@ const updatePlan = async ({
     selectedGroups = [],
     orderState,
   } = Listing(orderListing).getMetadata();
-  const enabledToUpdateRelatedBookingInfo = orderState === EOrderStates.isNew;
+  const enabledToUpdateRelatedBookingInfo =
+    isEnableUpdateBookingInfo(orderState);
   const companyAccount = await fetchUser(companyId);
 
   const initialMemberOrder = getInitMemberOrder({

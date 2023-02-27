@@ -1,6 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { Listing } from '@utils/data';
+import type { TListing } from '@utils/types';
 import { useEffect, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 
@@ -67,10 +69,11 @@ export const useLoadPlanDetails = () => {
     JSON.stringify(order),
     JSON.stringify(orderDetail),
   ]);
+  const { plans = [] } = Listing(order as TListing).getMetadata();
 
   useEffect(() => {
     if (order) {
-      dispatch(orderAsyncActions.fetchOrderDetail(order));
+      dispatch(orderAsyncActions.fetchOrderDetail(plans));
     }
   }, [dispatch, JSON.stringify(order)]);
 

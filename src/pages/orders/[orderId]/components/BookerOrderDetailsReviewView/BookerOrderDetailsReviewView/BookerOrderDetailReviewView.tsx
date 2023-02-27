@@ -15,6 +15,7 @@ import css from './BookerOrderDetailReviewView.module.scss';
 type TBookerOrderDetailReviewViewProps = TDefaultProps & {
   canEditInfo?: boolean;
   canGoBackEditMode?: boolean;
+  showStartPickingOrderButton?: boolean;
   reviewViewData: ReturnType<
     typeof usePrepareOrderDetailPageData
   >['reviewViewData'];
@@ -31,6 +32,7 @@ const BookerOrderDetailReviewView: React.FC<
     rootClassName,
     canEditInfo = true,
     canGoBackEditMode = false,
+    showStartPickingOrderButton = false,
     reviewViewData,
     onGoBackToEditOrderPage,
     onSubmitEdit,
@@ -49,7 +51,9 @@ const BookerOrderDetailReviewView: React.FC<
         />
       )}
       <div className={css.leftPart}>
-        {!canGoBackEditMode && <ReviewOrderStatesSection />}
+        {!canGoBackEditMode && (
+          <ReviewOrderStatesSection data={reviewViewData.transactionDataMap} />
+        )}
         <ReviewInfoSection
           startSubmitReviewInfoForm
           canEdit={canEditInfo}
@@ -72,6 +76,7 @@ const BookerOrderDetailReviewView: React.FC<
         <ReviewCartSection
           className={css.cartRoot}
           data={reviewViewData.reviewCartData}
+          showStartPickingOrderButton={showStartPickingOrderButton}
           onClickDownloadPriceQuotation={onDownloadPriceQuotation}
         />
       </div>

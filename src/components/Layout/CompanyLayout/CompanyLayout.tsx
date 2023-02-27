@@ -85,7 +85,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       key: 'cart',
       icon: <FeatureIcons.Cart />,
       title: 'Đặt hàng',
-      pathname: '/',
+      pathname: companyPaths.CreateNewOrder,
     },
     {
       key: 'order',

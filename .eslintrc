@@ -5,6 +5,7 @@
     "next/core-web-vitals", // Needed to avoid warning in next.js build: 'The Next.js plugin was not detected in your ESLint configuration'
     "plugin:prettier/recommended"
   ],
+  "plugins": ["react-hooks"],
   "rules": {
     "consistent-return": "off",
     "no-param-reassign": [
@@ -12,7 +13,10 @@
       { "props": true, "ignorePropertyModificationsFor": ["state"] }
     ],
     "no-nested-ternary": "off",
-    "no-console": "off"
+    "no-console": "off",
+    "no-return-await": "off",
+    "react-hooks/rules-of-hooks": "warn", // Checks rules of Hooks
+    "react-hooks/exhaustive-deps": "off"
   },
   "overrides": [
     // Configuration for TypeScript files

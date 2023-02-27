@@ -66,7 +66,7 @@ export const useGetCalendarExtraResources = ({
   return calendarExtraResources;
 };
 
-export const useGetCalendarCompononentProps = ({
+export const useGetCalendarComponentProps = ({
   startDate,
   endDate,
 }: {

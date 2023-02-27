@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
@@ -92,7 +93,12 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     setTrue: openPickFoodModal,
     setFalse: closePickFoodModal,
   } = useBoolean();
-
+  const updateOrderInProgress = useAppSelector(
+    (state) => state.Order.updateOrderInProgress,
+  );
+  const updateOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.updateOrderDetailInProgress,
+  );
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
     shallowEqual,
@@ -114,8 +120,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     deadlineDate,
     deadlineHour,
     memberAmount,
+    plans = [],
   } = Listing(order as TListing).getMetadata();
-
   const { title: orderTitle } = Listing(order as TListing).getAttributes();
   const companies = useAppSelector(
     (state) => state.ManageCompaniesPage.companyRefs,
@@ -161,9 +167,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
     return temp instanceof Date ? temp : new Date(temp);
   }, [selectedDate, startDate, endDate, orderDetail]);
-  const updateOrderDetailInProgress = useAppSelector(
-    (state) => state.Order.updateOrderDetailInProgress,
-  );
 
   const { address } = deliveryAddress || {};
   const currentClient = companies.find(
@@ -268,6 +271,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     endDate,
   };
 
+  const inProgress = updateOrderInProgress || updateOrderDetailInProgress;
+
   const missingSelectedFood = Object.keys(orderDetail).filter(
     (dateTime) => orderDetail[dateTime].restaurant.foodList.length === 0,
   );
@@ -289,14 +294,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   useEffect(() => {
     if (isEmpty(orderDetail) && !justDeletedMemberOrder) {
-      dispatch(orderAsyncActions.fetchOrderDetail(order as TListing));
+      dispatch(orderAsyncActions.fetchOrderDetail(plans));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(order), JSON.stringify(orderDetail)]);
 
   useEffect(() => {
     dispatch(orderAsyncActions.fetchRestaurantCoverImages());
-  }, [dispatch, orderDetail]);
+  }, []);
 
   const handleSelectFood = (values: TSelectFoodFormValues) => {
     const { food: foodIds } = values;
@@ -428,7 +433,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               goBack={goBack}
               onNextClick={onSubmit}
               submitDisabled={disabledSubmit}
-              inProgress={updateOrderDetailInProgress}
+              inProgress={inProgress}
             />
           </div>
           <OrderSettingModal

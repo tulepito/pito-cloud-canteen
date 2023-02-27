@@ -1,23 +1,35 @@
 import HorizontalTimeLine from '@components/TimeLine/HorizontalTimeLine';
 import StateItem from '@components/TimeLine/StateItem';
+import { parseTimestampToFormat } from '@utils/dates';
+import type { TObject, TTransaction } from '@utils/types';
 
 import css from './ReviewOrderStatesSection.module.scss';
 
-type TReviewOrderStatesSectionProps = {};
+export const prepareItemFromData = (
+  transactionMap: TObject<number, TTransaction>,
+) => {
+  const items = Object.entries(transactionMap)
+    .map(([date, tx]) => {
+      return { date: Number(date), tx };
+    })
+    .sort((item) => item.date)
+    .map(({ date, tx }) => {
+      return { date: parseTimestampToFormat(Number(date)), tx };
+    });
 
-const ReviewOrderStatesSection: React.FC<
-  TReviewOrderStatesSectionProps
-> = () => {
-  const items = [
-    { state: '', date: '16/9/2022' },
-    { state: '', date: '17/9/2022' },
-    { state: '', date: '18/9/2022' },
-    { state: '', date: '19/9/2022' },
-    { state: '', date: '20/9/2022' },
-    { state: '', date: '20/9/2022' },
-    { state: '', date: '20/9/2022' },
-    { state: '', date: '20/9/2022' },
-  ];
+  return items;
+};
+
+type TReviewOrderStatesSectionProps = {
+  data: {
+    [date: number]: TTransaction;
+  };
+};
+
+const ReviewOrderStatesSection: React.FC<TReviewOrderStatesSectionProps> = ({
+  data,
+}) => {
+  const items = prepareItemFromData(data);
 
   return (
     <div className={css.root}>

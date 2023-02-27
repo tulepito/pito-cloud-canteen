@@ -5,7 +5,7 @@ import {
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
 import jstz from 'jstimezonedetect';
-import type { LocaleOptions } from 'luxon';
+import type { DurationUnits, LocaleOptions } from 'luxon';
 import { DateTime, Interval } from 'luxon';
 
 import { getUniqueString } from './data';
@@ -203,7 +203,7 @@ export const convertWeekDay = (weekDay: number) => {
   }
 };
 
-export const getDaySessionFromDeliveryTime = (time: string) => {
+export const getDaySessionFromDeliveryTime = (time: string = '6:30') => {
   const [hourStr, minuteStr] = time.split(':');
   const hour = parseInt(hourStr, 10);
   const minute = parseInt(minuteStr, 10);
@@ -263,21 +263,13 @@ export const getDayOfWeekByIndex = (index: number) => {
   ) as string;
 };
 
-export const getSeparatedDates = (
-  startDateTimestamp: number,
-  endDateTimestamp: number,
+export const diffDays = (
+  date1 = new Date().getTime(),
+  date2 = new Date().getTime(),
+  units: DurationUnits = ['days'],
 ) => {
-  let currentDateTimestamp = startDateTimestamp;
-  const separatedDates = [];
-  while (currentDateTimestamp <= endDateTimestamp) {
-    separatedDates.push(currentDateTimestamp);
-    currentDateTimestamp = DateTime.fromMillis(currentDateTimestamp)
-      .plus({
-        days: 1,
-      })
-      .toMillis();
-  }
-  return separatedDates;
+  return DateTime.fromMillis(date1).diff(DateTime.fromMillis(date2), units)
+    .days;
 };
 
 export const printHoursToString = (hours: number, minutes: number) => {

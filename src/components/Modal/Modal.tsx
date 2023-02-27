@@ -11,6 +11,7 @@ import { useIntl } from 'react-intl';
 import css from './Modal.module.scss';
 
 type TModalProps = PropsWithChildren<{
+  id?: string;
   className?: string;
   containerClassName?: string;
   contentClassName?: string;
@@ -21,11 +22,11 @@ type TModalProps = PropsWithChildren<{
   handleClose: () => void;
   scrollLayerClassName?: string;
   customHeader?: ReactNode;
-  id?: string;
 }>;
 
 const Modal: React.FC<TModalProps> = (props) => {
   const {
+    id,
     children,
     isOpen,
     title,
@@ -37,11 +38,11 @@ const Modal: React.FC<TModalProps> = (props) => {
     handleClose,
     scrollLayerClassName,
     customHeader,
-    id,
   } = props;
 
   const intl = useIntl();
   const dispatch = useAppDispatch();
+
   const isOpenClass = isOpen
     ? classNames(css.isOpen, openClassName)
     : css.isClosed;
@@ -50,6 +51,16 @@ const Modal: React.FC<TModalProps> = (props) => {
   const scrollLayerClasses = classNames(css.scrollLayer, scrollLayerClassName);
   const hasTitle = !!title;
   const closeModalMessage = intl.formatMessage({ id: 'Modal.closeModal' });
+
+  const closeBtn =
+    !shouldHideIconClose && isOpen ? (
+      <Button
+        onClick={handleClose}
+        rootClassName={css.close}
+        title={closeModalMessage}>
+        <IconClose rootClassName={css.closeIcon} />
+      </Button>
+    ) : null;
 
   useEffect(() => {
     if (isOpen) {
@@ -61,16 +72,6 @@ const Modal: React.FC<TModalProps> = (props) => {
   }, [dispatch, id, isOpen]);
 
   useLockBodyScroll({ isOpen });
-
-  const closeBtn =
-    !shouldHideIconClose && isOpen ? (
-      <Button
-        onClick={handleClose}
-        rootClassName={css.close}
-        title={closeModalMessage}>
-        <IconClose rootClassName={css.closeIcon} />
-      </Button>
-    ) : null;
 
   return (
     <div id={id} className={classes}>

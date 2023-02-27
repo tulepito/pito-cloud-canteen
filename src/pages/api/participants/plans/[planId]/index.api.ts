@@ -1,16 +1,14 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
+import { HTTP_METHODS } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
+import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import {
   CurrentUser,
   denormalisedResponseEntities,
   Listing,
 } from '@utils/data';
 import type { NextApiRequest, NextApiResponse } from 'next';
-
-import { getIntegrationSdk } from '../../../../services/integrationSdk';
-import { getSdk, handleError } from '../../../../services/sdk';
-import { HTTP_METHODS } from '../../helpers/constants';
 
 const fetchSubOrder = async (orderDetail: any, currentUserId: string) => {
   let orderDetailResult = {};

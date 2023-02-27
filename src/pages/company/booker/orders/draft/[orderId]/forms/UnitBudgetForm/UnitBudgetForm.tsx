@@ -1,6 +1,5 @@
 import Button from '@components/Button/Button';
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
-import Toggle from '@components/Toggle/Toggle';
 import { addCommas, removeNonNumeric } from '@helpers/format';
 import { useEffect } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
@@ -20,7 +19,7 @@ type TUnitBudgetFormProps = {
 
 export type TUnitBudgetFormValues = {
   packagePerMember: number | string;
-  vatAllow: boolean;
+  // vatAllow: boolean;
 };
 
 const validate = (values: TUnitBudgetFormValues) => {
@@ -45,7 +44,7 @@ const UnitBudgetForm: React.FC<TUnitBudgetFormProps> = ({
   const onSubmitInternal = (values: TUnitBudgetFormValues) => {
     onSubmit({
       packagePerMember: +`${values.packagePerMember}`.replace(/,/g, ''),
-      vatAllow: values.vatAllow,
+      // vatAllow: values.vatAllow,
     });
   };
   const { form, handleSubmit, submitting, hasValidationErrors } =
@@ -57,7 +56,7 @@ const UnitBudgetForm: React.FC<TUnitBudgetFormProps> = ({
   const intl = useIntl();
 
   const packagePerMember = useField('packagePerMember', form);
-  const vatAllow = useField('vatAllow', form);
+  // const vatAllow = useField('vatAllow', form);
   const submitInprogress = loading || submitting;
   const disabledSubmit = submitInprogress || hasValidationErrors;
 
@@ -96,7 +95,7 @@ const UnitBudgetForm: React.FC<TUnitBudgetFormProps> = ({
       <div className={css.minPriceNote}>
         <FormattedMessage id="Booker.CreateOrder.Form.field.price.minPrice" />
       </div>
-      <Toggle
+      {/* <Toggle
         label={intl.formatMessage({
           id: 'Booker.CreateOrder.Form.field.price.vat',
         })}
@@ -109,7 +108,7 @@ const UnitBudgetForm: React.FC<TUnitBudgetFormProps> = ({
           vatAllow.input.onBlur();
         }}
         className={css.toggle}
-      />
+      /> */}
       <Button
         className={css.submitBtn}
         inProgress={submitInprogress}

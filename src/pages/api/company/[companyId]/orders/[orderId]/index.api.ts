@@ -25,7 +25,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             }),
           );
 
-          const { companyId: orderCompanyId } =
+          const { companyId: orderCompanyId, plans = [] } =
             Listing(orderListing).getMetadata();
 
           if (companyId !== orderCompanyId) {
@@ -33,6 +33,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               error: `Order ${orderId} is not belong to company ${companyId}`,
             });
           }
+
+          await Promise.all(
+            plans.map(async (planId: string) => {
+              await integrationSdk.listings.close({
+                id: planId,
+              });
+            }),
+          );
 
           await integrationSdk.listings.close({
             id: orderId,

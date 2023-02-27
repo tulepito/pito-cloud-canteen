@@ -32,18 +32,17 @@ export const SELECTED_TABLE_HEAD_IDS = [
 ];
 
 export type TItemData = {
+  isAnonymous: boolean;
   memberData: {
     id: string;
     name: string;
     email: string;
   };
-  foodData:
-    | {
-        foodId: string;
-        foodName: string;
-        foodPrice: string;
-      }
-    | {};
+  foodData: {
+    foodId?: string;
+    foodName?: string;
+    foodPrice?: string;
+  };
   status: EParticipantOrderStatus;
 };
 

@@ -20,7 +20,7 @@ const prepareData = ({
       const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
 
       const { memberOrders = {}, restaurant = {} } = rawOrderDetailOfDate;
-      const { foodList: foodListOfDate } = restaurant;
+      const { foodList: foodListOfDate = {} } = restaurant;
 
       const orderData = Object.entries<TObject>(memberOrders).reduce<TObject[]>(
         (memberOrderResult, currentMemberOrderEntry) => {
@@ -68,26 +68,49 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
 
   const {
     orderDetail,
-    participantData: participantDataFromProps,
-    participants,
+    participants = [],
+    participantData: participantDataFromProps = [],
+    anonymous = [],
+    anonymousParticipantData: anonymousParticipantDataFromProps = [],
   } = data || {};
 
   const participantDataList = useMemo(
     () =>
-      participants.map((pid: string) => {
-        const participant = participantDataFromProps.find(
-          (p: TUser) => pid === p.id.uuid,
-        );
-        const { email } = participant?.attributes || {};
-        const { displayName } = participant?.attributes?.profile || {};
+      participants
+        .map((pid: string) => {
+          const participant = participantDataFromProps.find(
+            (p: TUser) => pid === p.id.uuid,
+          );
+          const { email } = participant?.attributes || {};
+          const { displayName } = participant?.attributes?.profile || {};
 
-        return {
-          id: pid,
-          email,
-          name: displayName,
-        };
-      }),
-    [participantDataFromProps, participants],
+          return {
+            id: pid,
+            email,
+            name: displayName,
+          };
+        })
+        .concat(
+          anonymous.map((pid: string) => {
+            const participant = anonymousParticipantDataFromProps.find(
+              (p: TUser) => pid === p.id.uuid,
+            );
+            const { email } = participant?.attributes || {};
+            const { displayName } = participant?.attributes?.profile || {};
+
+            return {
+              id: pid,
+              email,
+              name: displayName,
+            };
+          }),
+        ),
+    [
+      anonymous,
+      anonymousParticipantDataFromProps,
+      participantDataFromProps,
+      participants,
+    ],
   );
 
   const participantDataMap = useMemo(
@@ -147,9 +170,10 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                 </div>
                 {orderData.map((row: TObject) => {
                   const {
-                    memberData: { name: memberName, id: memberId },
+                    memberData,
                     foodData: { foodName, foodPrice },
                   } = row;
+                  const { name: memberName, id: memberId } = memberData || {};
 
                   return (
                     <div className={css.row} key={memberId}>
