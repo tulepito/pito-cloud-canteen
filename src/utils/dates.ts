@@ -308,7 +308,7 @@ export const findClassDays = (
   let classDays = [];
   const rangeDates = getDates(new Date(firstDay), new Date(lastDay));
   classDays = rangeDates.filter((f) =>
-    daysOfWeek.some((d: string) => DAYS[d] == f.getDay()),
+    daysOfWeek.some((d) => DAYS[d as keyof typeof DAYS] === f.getDay()),
   );
   return classDays.map((d) => d.toDateString());
 };

@@ -14,7 +14,6 @@ import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 
 import AddFoodModal from '../AddFoodModal/AddFoodModal';
-import DayOfWeekCalendarHeader from '../DayOfWeekCalendarHeader/DayOfWeekCalendarHeader';
 import type { TEditMenuPricingCalendarResources } from '../EditPartnerMenuWizard/utils';
 import FoodEventCard from '../FoodEventCard/FoodEventCard';
 import css from './EditMenuPricingForm.module.scss';

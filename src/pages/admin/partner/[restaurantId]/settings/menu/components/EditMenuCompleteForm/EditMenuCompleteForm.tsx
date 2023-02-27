@@ -9,7 +9,6 @@ import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 
-import DayOfWeekCalendarHeader from '../DayOfWeekCalendarHeader/DayOfWeekCalendarHeader';
 import useQueryMenuPickedFoods from '../EditPartnerMenuWizard/useQueryMenuPickedFoods';
 import type { TEditMenuPricingCalendarResources } from '../EditPartnerMenuWizard/utils';
 import { renderValuesForFoodsByDate } from '../EditPartnerMenuWizard/utils';
