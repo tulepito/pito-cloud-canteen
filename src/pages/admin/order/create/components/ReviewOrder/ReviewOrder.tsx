@@ -15,6 +15,7 @@ import type { TListing } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
+import isEmpty from 'lodash/isEmpty';
 import React, { useEffect, useMemo } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -76,6 +77,7 @@ const ReviewContent: React.FC<any> = (props) => {
   const { restaurantName, phoneNumber, foodList = {} } = restaurant;
 
   const intl = useIntl();
+
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
     return {
       key,
@@ -140,6 +142,7 @@ const parseDataToReviewTab = (values: any) => {
       childrenProps: { ...orderDetail[key], ...rest, order: values },
     };
   });
+
   return items;
 };
 
@@ -151,6 +154,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     shallowEqual,
   );
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
+
   const createOrderError = useAppSelector(
     (state) => state.Order.createOrderError,
   );
@@ -163,9 +167,18 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     setTrue: openSuccessModal,
     setFalse: closeSuccessModal,
   } = useBoolean();
+
+  const orderId = Listing(order as TListing).getId();
+  const { plans = [] } = Listing(order as TListing).getMetadata();
+  const planId = plans.length > 0 ? plans[0] : undefined;
+
   useEffect(() => {
-    dispatch(orderAsyncActions.fetchOrderDetail(order as TListing));
-  }, [dispatch, order]);
+    if (isEmpty(orderDetail)) {
+      dispatch(orderAsyncActions.fetchOrderDetail(order as TListing));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(order), JSON.stringify(orderDetail)]);
+
   const { staffName, deliveryHour, deliveryAddress, shipperName } = Listing(
     order as TListing,
   ).getMetadata();
@@ -183,6 +196,15 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
 
   const onSubmit = async (values: any) => {
     const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
+
+    if (planId && orderId) {
+      orderAsyncActions.updatePlanDetail({
+        orderId,
+        planId,
+        orderDetail,
+      });
+    }
+
     const { error } = (await dispatch(
       orderAsyncActions.updateOrder({
         generalInfo: {
@@ -216,6 +238,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         onSubmit={onSubmit}
         render={(fieldRenderProps: any) => {
           const { handleSubmit, goBack, invalid } = fieldRenderProps;
+
           return (
             <Form onSubmit={handleSubmit}>
               <Collapsible
