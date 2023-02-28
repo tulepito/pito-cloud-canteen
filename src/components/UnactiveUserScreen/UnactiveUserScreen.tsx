@@ -1,7 +1,28 @@
+import Button from '@components/Button/Button';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { authThunks } from '@redux/slices/auth.slice';
+import { userActions } from '@redux/slices/user.slice';
+import { generalPaths } from '@src/paths';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 const UnactiveUserScreen = () => {
-  return <div>404 Error</div>;
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await dispatch(authThunks.logout());
+    await dispatch(userActions.clearCurrentUser());
+    router.push(generalPaths.Home);
+  };
+  return (
+    <div>
+      <p>404 Error</p>
+      <Button type="button" onClick={handleLogout}>
+        Đăng xuất
+      </Button>
+    </div>
+  );
 };
 
 export default UnactiveUserScreen;

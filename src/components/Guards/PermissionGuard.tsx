@@ -15,14 +15,14 @@ const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
   const { children } = props;
   const { isIgnoredPermissionCheck, userPermission, isMatchedPermission } =
     useVerifyPermission();
-  const { isCompanyActive } = useActiveCompany();
+  const { isCompanyUnactive } = useActiveCompany();
 
   const renderComponent = () => {
     if (isIgnoredPermissionCheck) {
       return children;
     }
 
-    if (!isCompanyActive) {
+    if (isCompanyUnactive) {
       return <UnactiveUserScreen />;
     }
 
