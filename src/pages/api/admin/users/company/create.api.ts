@@ -39,7 +39,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
           metadata: {
             isCompany: true,
-            status: ECompanyStatus.unactive,
+            status: ECompanyStatus.active,
           },
         },
         queryParams,
