@@ -304,8 +304,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   }, [JSON.stringify(order), JSON.stringify(orderDetail)]);
 
   useEffect(() => {
-    dispatch(orderAsyncActions.fetchRestaurantCoverImages());
-  }, []);
+    if (!isEmpty(orderDetail)) {
+      dispatch(orderAsyncActions.fetchRestaurantCoverImages());
+    }
+  }, [JSON.stringify(orderDetail)]);
 
   const handleSelectFood = (values: TSelectFoodFormValues) => {
     const { food: foodIds } = values;
