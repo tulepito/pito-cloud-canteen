@@ -4,7 +4,10 @@ import { getApi, postApi, putApi } from './configs';
 
 export const getCompaniesApi = () => getApi('/admin/users/company');
 
-export const getCompanyMembersDetailsApi = (id: string, roles: string[]) => {
+export const getCompanyMembersDetailsApi = (
+  id: string,
+  roles: string[] = [],
+) => {
   const rolesAsString = roles.join(',');
   return getApi(`/admin/users/company/${id}/members?roles=${rolesAsString}`);
 };

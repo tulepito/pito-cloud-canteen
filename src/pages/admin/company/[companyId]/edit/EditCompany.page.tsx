@@ -5,6 +5,7 @@ import {
   clearError,
   updateCompanyPageThunks,
 } from '@redux/slices/EditCompanyPage.slice';
+import { ECompanyStatus } from '@utils/enums';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
@@ -116,6 +117,9 @@ export default function EditCompanyPage() {
       },
       privateData: {
         tax: values.tax,
+      },
+      metadata: {
+        status: ECompanyStatus.active,
       },
     };
 

@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
 import { adminRoutes } from '@src/paths';
+import { UserPermission } from '@src/types/UserPermission';
 import { ECompanyStatus } from '@utils/enums';
 import type { TUser } from '@utils/types';
 import classNames from 'classnames';
@@ -59,9 +60,12 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'representatives',
     label: 'Người đại diện',
     render: ({ members = [], id }: any) => {
+      const bookers = members.filter(
+        (m: any) => m.permission === UserPermission.BOOKER,
+      );
       return (
         <div>
-          {members.slice(0, 1).map((user: TUser) => {
+          {bookers.slice(0, 1).map((user: TUser) => {
             return (
               <div key={`${id}.${user.id.uuid}`}>
                 <div className={css.memberName}>
@@ -74,7 +78,7 @@ const TABLE_COLUMN: TColumn[] = [
               </div>
             );
           })}
-          {members.length > 1 && (
+          {bookers.length > 1 && (
             <div className={css.membersCount}>
               +{members.length - 1}
               <FormattedMessage id="ManageCompaniesPage.membersCount" />
