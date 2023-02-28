@@ -3,6 +3,7 @@ import {
   clearError,
   createCompanyPageThunks,
 } from '@redux/slices/CreateCompanyPage.slice';
+import { ECompanyStatus } from '@utils/enums';
 import { isSignUpEmailTakenError } from '@utils/errors';
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
@@ -56,6 +57,9 @@ export default function CreateCompanyPage() {
       },
       privateData: {
         tax: values.tax,
+      },
+      metadata: {
+        status: ECompanyStatus.active,
       },
     };
     return dispatch(
