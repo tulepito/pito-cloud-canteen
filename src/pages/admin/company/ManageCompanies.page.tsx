@@ -254,7 +254,6 @@ export default function ManageCompanies() {
         <KeywordSearchForm
           initialValues={{ keywords: keywords as string }}
           onSubmit={onSearchKeyword}
-          hideButton
           placeholder={intl.formatMessage({
             id: 'ManageCompanies.keywordsPlaceholder',
           })}
