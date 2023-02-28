@@ -89,13 +89,20 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
           title={intl.formatMessage({ id: 'MealPlanDateField.title' })}
         />
         <div className={css.verticalSpace}>
-          <DayInWeekField form={form} values={values} />
+          <DayInWeekField
+            form={form}
+            values={values}
+            title={intl.formatMessage({ id: 'DayInWeekField.label' })}
+          />
         </div>
 
         <div className={css.verticalSpace}>
           <DurationForNextOrderField
             form={form}
             displayedDurationTimeValue={values.displayedDurationTime}
+            title={intl.formatMessage({
+              id: 'DurationForNextOrderField.label',
+            })}
           />
         </div>
       </div>

@@ -64,6 +64,10 @@ const createOrder = async ({
     nutritions,
     selectedGroups,
     packagePerMember,
+    dayInWeek,
+    startDate,
+    endDate,
+    memberAmount,
   } = generalInfo;
 
   // Call api to create order listing
@@ -75,6 +79,7 @@ const createOrder = async ({
       metadata: {
         companyId,
         bookerId,
+        memberAmount,
         listingType: ListingTypes.ORDER,
         orderState: isCreatedByAdmin
           ? EOrderDraftStates.draft
@@ -86,6 +91,9 @@ const createOrder = async ({
         nutritions,
         selectedGroups,
         packagePerMember,
+        dayInWeek,
+        startDate,
+        endDate,
       },
     },
     { expand: true },

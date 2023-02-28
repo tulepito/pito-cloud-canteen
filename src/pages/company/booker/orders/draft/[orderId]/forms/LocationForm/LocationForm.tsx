@@ -44,7 +44,7 @@ const LocationForm: React.FC<TLocationFormProps> = ({
     });
   };
 
-  const { form, handleSubmit, submitting, hasValidationErrors } =
+  const { form, handleSubmit, submitting, hasValidationErrors, pristine } =
     useForm<TLocationFormValues>({
       onSubmit: onSubmitInside,
       validate,
@@ -55,7 +55,8 @@ const LocationForm: React.FC<TLocationFormProps> = ({
 
   const deliveryAddress = useField('deliveryAddress', form);
   const submitInprogress = loading || submitting;
-  const disabledSubmit = loading || submitting || hasValidationErrors;
+  const disabledSubmit =
+    pristine || loading || submitting || hasValidationErrors;
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>

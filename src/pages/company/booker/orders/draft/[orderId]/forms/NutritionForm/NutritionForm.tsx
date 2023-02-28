@@ -22,7 +22,7 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
   initialValues,
   loading,
 }) => {
-  const { form, handleSubmit, submitting, hasValidationErrors } =
+  const { form, handleSubmit, submitting, hasValidationErrors, pristine } =
     useForm<TNutritionFormValues>({
       onSubmit,
       initialValues,
@@ -31,7 +31,7 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
 
   const nutritions = useField('nutritions', form);
   const submitInprogress = loading || submitting;
-  const disabledSubmit = submitInprogress || hasValidationErrors;
+  const disabledSubmit = pristine || submitInprogress || hasValidationErrors;
 
   const handleChangeCheckboxGroup: (data: {
     value: string;

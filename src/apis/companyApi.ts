@@ -103,3 +103,12 @@ export const companyApi = {
 
 export const getAllCompanyMembersApi = (companyId: string) =>
   getApi(`/company/all-employees?companyId=${companyId}`);
+
+export const favoriteRestaurantApi = (
+  companyId: string,
+  restaurantId: string,
+) =>
+  postApi(`/company/${companyId}/favorite-restaurant/${restaurantId}`, {
+    companyId,
+    restaurantId,
+  });

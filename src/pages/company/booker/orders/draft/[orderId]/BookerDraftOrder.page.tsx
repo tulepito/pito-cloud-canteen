@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
+import { isEnableSubmitPublishOrder } from '@helpers/orderHelper';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { companyPaths } from '@src/paths';
@@ -38,15 +39,31 @@ function BookerDraftOrderPage() {
   const { order, companyAccount } = useLoadData({
     orderId: orderId as string,
   });
-  const { orderState } = Listing(order as TListing).getMetadata();
-  const { orderDetail = [] } = useGetPlanDetails();
+  const { orderState, plans = [] } = Listing(order as TListing).getMetadata();
+  const planId = plans.length > 0 ? plans[0] : undefined;
 
+  const { orderDetail = [] } = useGetPlanDetails();
   const { startDate, endDate } = useGetBoundaryDates(order);
   const calendarExtraResources = useGetCalendarExtraResources({
     order,
     startDate,
     endDate,
   });
+
+  const isFinishOrderDisabled = isEnableSubmitPublishOrder(
+    order as TListing,
+    orderDetail,
+  );
+
+  const handleFinishOrder = async () => {
+    await dispatch(orderAsyncActions.bookerPublishOrder({ orderId, planId }));
+    setTimeout(() => {
+      router.push({
+        pathname: '/orders/[orderId]',
+        query: { orderId: orderId as string },
+      });
+    }, 1000);
+  };
 
   const handleCollapse = useCallback(() => {
     setCollapse(!collapse);
@@ -71,6 +88,8 @@ function BookerDraftOrderPage() {
   const componentsProps = useGetCalendarComponentProps({
     startDate,
     endDate,
+    isFinishOrderDisabled,
+    handleFinishOrder,
   });
 
   useEffect(() => {

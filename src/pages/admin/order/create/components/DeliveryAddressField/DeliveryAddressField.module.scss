@@ -2,8 +2,12 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
-.field {
+.container {
   width: 400px;
+}
+
+.field {
+  width: 100%;
   margin-top: 16px;
 }
 

@@ -16,6 +16,9 @@ const ResultDetailHeader: React.FC<TResultDetailHeaderProps> = ({
   numberSelectedDish = 0,
 }) => {
   const intl = useIntl();
+
+  const restaurantName = Listing(restaurant!).getAttributes().title;
+
   const selectedDishText = intl.formatMessage(
     {
       id: 'booker.orders.draft.resultDetailModal.selectedDish',
@@ -27,8 +30,8 @@ const ResultDetailHeader: React.FC<TResultDetailHeaderProps> = ({
 
   return (
     <div className={css.header}>
-      <div className={css.title}>
-        {Listing(restaurant!).getAttributes().title}
+      <div className={css.title} title={restaurantName}>
+        {restaurantName}
       </div>
       <Badge
         className={css.modalBadge}

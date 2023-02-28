@@ -461,6 +461,10 @@ export const greaterThanOneThousand = (message: string) => (value: number) => {
   return value < 1000 ? message : VALID;
 };
 
+export const greaterThanZero = (message: string) => (value: number) => {
+  return value <= 0 ? message : VALID;
+};
+
 export const parseAvailabilityEntries = (time: Date) => {
   const minutes = time.getMinutes();
   const hours = time.getHours();

@@ -30,7 +30,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         return res.json(updatedOrderListing);
       } catch (error) {
         // Return error
-        console.log('update order error : ', error);
+        console.error('update order error : ', error);
         handleError(res, error);
       }
       break;

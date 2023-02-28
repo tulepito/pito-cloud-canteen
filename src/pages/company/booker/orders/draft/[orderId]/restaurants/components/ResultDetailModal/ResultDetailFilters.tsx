@@ -27,9 +27,7 @@ const ResultDetailFilters: React.FC<TResultDetailFiltersProps> = ({
 }) => {
   const intl = useIntl();
 
-  const handleSearch = () => {
-    console.log('submit');
-  };
+  const handleSearch = () => {};
 
   const { form, handleSubmit } = useForm<TResultDetailFiltersValues>({
     onSubmit: handleSearch,

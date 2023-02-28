@@ -47,7 +47,7 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
   initialValues,
   loading,
 }) => {
-  const { form, handleSubmit, submitting, hasValidationErrors } =
+  const { form, handleSubmit, submitting, hasValidationErrors, pristine } =
     useForm<TDeliveryTimeFormValues>({
       onSubmit,
       validate,
@@ -60,7 +60,7 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
   const endDate = useField('endDate', form);
   const deliveryHour = useField('deliveryHour', form);
   const submitInprogress = loading || submitting;
-  const disabledSubmit = submitInprogress || hasValidationErrors;
+  const disabledSubmit = pristine || submitInprogress || hasValidationErrors;
 
   const minStartDate = findMinStartDate();
   const selectedStartDate = startDate.input.value
