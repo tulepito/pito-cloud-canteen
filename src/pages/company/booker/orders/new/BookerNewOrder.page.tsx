@@ -75,9 +75,6 @@ function BookerNewOrderPage() {
             ]}
             onSubmit={handleSubmit}
             onCancel={handleCancel}
-            initialValues={{
-              company: '1235',
-            }}
             submitInprogress={createOrderInProcess}
             submitError={createOrderError}
           />
