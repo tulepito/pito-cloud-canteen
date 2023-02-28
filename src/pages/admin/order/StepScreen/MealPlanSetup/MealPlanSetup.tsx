@@ -1,7 +1,10 @@
 import { calculateGroupMembersAmount } from '@helpers/company';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { orderAsyncActions } from '@redux/slices/Order.slice';
+import {
+  changeStep2SubmitStatus,
+  orderAsyncActions,
+} from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 import isEmpty from 'lodash/isEmpty';
@@ -83,6 +86,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
         ...rest,
       };
+      dispatch(changeStep2SubmitStatus(true));
       const { payload }: { payload: any } = await dispatch(
         orderAsyncActions.updateOrder({ generalInfo }),
       );
@@ -100,6 +104,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
           orderDetail: recommendOrderDetail,
         }),
       );
+      dispatch(changeStep2SubmitStatus(false));
       nextTab();
     },
     [dispatch, nextTab],
