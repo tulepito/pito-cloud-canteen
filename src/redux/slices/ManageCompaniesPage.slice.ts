@@ -6,7 +6,6 @@ import {
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
-import { ECompanyMemberPermission } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TCompany, TPagination, TUser } from '@utils/types';
 
@@ -57,9 +56,7 @@ const getCompanyMemberDetails = createAsyncThunk(
           if (!allMembers[id]) {
             allMembers[id] = [];
           }
-          const { data: members = [] } = await getCompanyMembersDetailsApi(id, [
-            ECompanyMemberPermission.owner,
-          ]);
+          const { data: members = [] } = await getCompanyMembersDetailsApi(id);
           allMembers = {
             ...allMembers,
             [id]: [...allMembers[id], ...members],
