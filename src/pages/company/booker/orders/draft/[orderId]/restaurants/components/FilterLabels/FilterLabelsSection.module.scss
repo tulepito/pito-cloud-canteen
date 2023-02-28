@@ -1,0 +1,13 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  margin-top: 28px;
+  @include flexAlign(baseline, flex-start);
+
+  .resultNumber {
+    margin-right: 32px;
+    color: $neutralGray5;
+    min-width: 80px;
+  }
+}

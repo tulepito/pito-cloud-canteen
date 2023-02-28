@@ -16,7 +16,7 @@ import LayoutMain from '../../components/Layout/LayoutMain';
 import LayoutSidebar from '../../components/Layout/LayoutSidebar';
 import css from './BookerDraftOrder.module.scss';
 import SidebarContent from './components/SidebarContent/SidebarContent';
-import { useLoadData, useLoadPlanDetails } from './hooks/loadData';
+import { useGetPlanDetails, useLoadData } from './hooks/loadData';
 import {
   useGetCalendarComponentProps,
   useGetCalendarExtraResources,
@@ -39,7 +39,8 @@ function BookerDraftOrderPage() {
     orderId: orderId as string,
   });
   const { orderState } = Listing(order as TListing).getMetadata();
-  const { orderDetail = [] } = useLoadPlanDetails();
+  const { orderDetail = [] } = useGetPlanDetails();
+
   const { startDate, endDate } = useGetBoundaryDates(order);
   const calendarExtraResources = useGetCalendarExtraResources({
     order,

@@ -38,7 +38,7 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
   };
 };
 
-export const useLoadPlanDetails = () => {
+export const useGetPlanDetails = () => {
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
