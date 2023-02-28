@@ -69,11 +69,19 @@ export const useGetCalendarExtraResources = ({
 export const useGetCalendarComponentProps = ({
   startDate,
   endDate,
+  isFinishOrderDisabled,
+  handleFinishOrder,
 }: {
   startDate: Date;
   endDate: Date;
+  isFinishOrderDisabled: boolean;
+  handleFinishOrder: () => Promise<void>;
 }) => {
   const router = useRouter();
+  const bookerPublishOrderInProgress = useAppSelector(
+    (state) => state.Order.bookerPublishOrderInProgress,
+  );
+
   const { orderId } = router.query;
 
   const handleAddMeal = useCallback(
@@ -91,9 +99,13 @@ export const useGetCalendarComponentProps = ({
         {...props}
         startDate={startDate.getTime()}
         endDate={endDate.getTime()}
+        finishDisabled={isFinishOrderDisabled}
+        finishInProgress={bookerPublishOrderInProgress}
+        onFinishOrder={handleFinishOrder}
       />
     ),
-    [startDate, endDate],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [startDate, endDate, isFinishOrderDisabled, bookerPublishOrderInProgress],
   );
 
   const contentEndComponent = useCallback(

@@ -9,13 +9,16 @@ import css from './DurationForNextOrderField.module.scss';
 type DurationForNextOrderFieldProps = {
   form: any;
   displayedDurationTimeValue: string;
+  title?: string;
+  containerClassName?: string;
 };
 const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
   props,
 ) => {
-  const { form, displayedDurationTimeValue } = props;
+  const { form, displayedDurationTimeValue, title, containerClassName } = props;
   const intl = useIntl();
   const [timeMode, setTimeMode] = useState<'week' | 'month'>('week');
+  const containerClasses = classNames(css.container, containerClassName);
   const onTimeModeChange = (mode: 'week' | 'month') => () => {
     setTimeMode(mode);
     form.change('durationTimeMode', mode);
@@ -26,16 +29,15 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
     }
   };
   return (
-    <div className={css.container}>
-      <div className={css.fieldLabel}>
-        {intl.formatMessage({ id: 'DurationForNextOrderField.label' })}
-      </div>
+    <div className={containerClasses}>
+      {title && <div className={css.fieldLabel}>{title}</div>}
       <div className={css.fieldWrapper}>
         <FieldTextInput
           id="displayedDurationTime"
           name="displayedDurationTime"
           type="number"
           className={css.durationTimeInput}
+          placeholder="1"
         />
         <div className={css.timeModeBtnWrapper}>
           <Button

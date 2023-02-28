@@ -3,7 +3,6 @@ import Button from '@components/Button/Button';
 import { ENavigate } from '@components/CalendarDashboard/helpers/constant';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
-import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
@@ -36,8 +35,8 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
     startDate,
     endDate,
     date,
-    finishInProgress,
     finishDisabled,
+    finishInProgress,
     onFinishOrder,
   } = props;
   const intl = useIntl();
@@ -93,9 +92,13 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
             id: 'Booker.CreateOrder.Toolbar.suggestNewRestaurant',
           })}
         </Button>
-        <Button variant="cta" onClick={onFinishOrder} disabled={finishDisabled}>
+        <Button
+          variant="cta"
+          onClick={onFinishOrder}
+          disabled={finishDisabled}
+          loadingMode="extend"
+          inProgress={finishInProgress}>
           {intl.formatMessage({ id: 'Booker.CreateOrder.Toolbar.finish' })}
-          {finishInProgress && <IconSpinner className={css.loadingIcon} />}
         </Button>
       </div>
     </div>

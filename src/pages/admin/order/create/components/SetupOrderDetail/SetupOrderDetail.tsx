@@ -287,7 +287,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     const orderId = Listing(order as TListing).getId();
     const planId = Listing(order as TListing).getMetadata()?.plans?.[0];
     const { meta } = await dispatch(
-      orderAsyncActions.updatePlanDetail({ orderId, orderDetail, planId }),
+      orderAsyncActions.updatePlanDetail({
+        orderId,
+        orderDetail,
+        planId,
+      }),
     );
     if (meta.requestStatus !== 'rejected') nextTab();
   };
@@ -300,8 +304,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   }, [JSON.stringify(order), JSON.stringify(orderDetail)]);
 
   useEffect(() => {
-    dispatch(orderAsyncActions.fetchRestaurantCoverImages());
-  }, []);
+    if (!isEmpty(orderDetail)) {
+      dispatch(orderAsyncActions.fetchRestaurantCoverImages());
+    }
+  }, [JSON.stringify(orderDetail)]);
 
   const handleSelectFood = (values: TSelectFoodFormValues) => {
     const { food: foodIds } = values;

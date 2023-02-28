@@ -5,6 +5,7 @@ import {
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
 import { Listing } from '@utils/data';
+import { generateTimeOptions } from '@utils/dates';
 import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
@@ -12,6 +13,7 @@ import {
 } from '@utils/enums';
 import type { TListing } from '@utils/types';
 import { addDays, min, subDays } from 'date-fns';
+import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
 export const isJoinedPlan = (
@@ -83,4 +85,49 @@ export const isEnableUpdateBookingInfo = (
     EOrderDraftStates.draft,
     EOrderDraftStates.pendingApproval,
   ].includes(orderState);
+};
+
+export const orderDataCheckers = (order: TListing) => {
+  const {
+    plans = [],
+    startDate,
+    endDate,
+    deliveryHour,
+    deadlineHour,
+    deadlineDate,
+    packagePerMember,
+    deliveryAddress,
+  } = Listing(order).getMetadata();
+  const timeOptions = generateTimeOptions();
+
+  const checkers = {
+    isDeadlineDateValid: Number.isInteger(deadlineDate),
+    isDeliveryAddressValid:
+      !isEmpty(deliveryAddress?.address) && !isEmpty(deliveryAddress?.origin),
+    isStartDateValid: Number.isInteger(startDate),
+    isEndDateValid: Number.isInteger(endDate),
+    isDeliveryHourValid: timeOptions.includes(deliveryHour),
+    isDeadlineHourValid: timeOptions.includes(deadlineHour),
+    isPackagePerMemberValid: Number.isInteger(packagePerMember),
+    haveAnyPlans: !isEmpty(plans),
+  };
+
+  const isAllValid = Object.values(checkers).every((value) => value);
+
+  return { ...checkers, isAllValid };
+};
+
+export const isEnableSubmitPublishOrder = (
+  order: TListing,
+  orderDetail: any[],
+) => {
+  const isOrderValid = orderDataCheckers(order).isAllValid;
+
+  const isOrderDetailSetupCompleted = orderDetail.every(({ resource }) => {
+    const { isSelectedFood = false } = resource || {};
+
+    return isSelectedFood;
+  });
+
+  return isOrderValid && isOrderDetailSetupCompleted;
 };

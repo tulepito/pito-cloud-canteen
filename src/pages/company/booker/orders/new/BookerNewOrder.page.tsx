@@ -1,6 +1,7 @@
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { QuizThunks } from '@redux/slices/Quiz.slice';
+import { companyPaths, quizPaths } from '@src/paths';
 import { User } from '@utils/data';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
@@ -15,7 +16,6 @@ function BookerNewOrderPage() {
   const dispatch = useAppDispatch();
 
   // Redux
-  const currentUser = useAppSelector((state) => state.user.currentUser);
   const createOrderInProcess = useAppSelector(
     (state) => state.Order.createOrderInProcess,
   );
@@ -25,7 +25,6 @@ function BookerNewOrderPage() {
 
   const { myCompanies = [], queryInprogress: queryCompanyInprogress } =
     useLoadCompanies();
-  console.log('🚀 ~ BookerNewOrderPage ~ myCompanies:', myCompanies);
 
   const normalizedCompanies = myCompanies.map((company) => ({
     id: company?.id?.uuid,
@@ -34,32 +33,16 @@ function BookerNewOrderPage() {
   }));
 
   const handleCancel = () => {
-    route.push('/company/booker/orders');
+    route.push(companyPaths.Home);
   };
 
   const handleSubmit = async (values: any) => {
     try {
-      const newOrder = await dispatch(
-        orderAsyncActions.createOrder({
-          clientId: values.company,
-          bookerId: currentUser?.id?.uuid,
-          generalInfo: {
-            deliveryAddress: normalizedCompanies.find(
-              (company) => company.id === values.company,
-            )?.location,
-            deliveryHour: '07:00',
-            deadlineHour: '07:00',
-            nutritions: [],
-            selectedGroups: ['allMembers'],
-            packagePerMember: 40000,
-          },
-        }),
-      );
-      const newOrderId = newOrder?.payload?.id?.uuid;
+      await dispatch(QuizThunks.fetchSelectedCompany(values.company));
 
-      route.push(`/company/booker/orders/draft/${newOrderId}`);
+      route.push(quizPaths.PerpackMemberAmount);
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
     }
   };
 

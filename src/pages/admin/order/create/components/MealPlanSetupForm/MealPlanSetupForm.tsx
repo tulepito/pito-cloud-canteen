@@ -47,9 +47,10 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
     clientId,
   } = props;
   const intl = useIntl();
-  const updateOrderInProgress = useAppSelector(
-    (state) => state.Order.updateOrderInProgress,
+  const step2SubmitInProgress = useAppSelector(
+    (state) => state.Order.step2SubmitInProgress,
   );
+
   const { pickAllow: pickAllowValue = true } = values;
   return (
     <Form onSubmit={handleSubmit}>
@@ -89,13 +90,20 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
           title={intl.formatMessage({ id: 'MealPlanDateField.title' })}
         />
         <div className={css.verticalSpace}>
-          <DayInWeekField form={form} values={values} />
+          <DayInWeekField
+            form={form}
+            values={values}
+            title={intl.formatMessage({ id: 'DayInWeekField.label' })}
+          />
         </div>
 
         <div className={css.verticalSpace}>
           <DurationForNextOrderField
             form={form}
             displayedDurationTimeValue={values.displayedDurationTime}
+            title={intl.formatMessage({
+              id: 'DurationForNextOrderField.label',
+            })}
           />
         </div>
       </div>
@@ -126,7 +134,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
         )}
       </div>
 
-      <NavigateButtons inProgress={updateOrderInProgress} />
+      <NavigateButtons inProgress={step2SubmitInProgress} />
     </Form>
   );
 };

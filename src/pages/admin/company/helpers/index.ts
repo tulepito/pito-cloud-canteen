@@ -50,13 +50,14 @@ export const parseEntitiesToTableData = (
     const { profile = {} } = company.attributes || {};
     const { displayName, publicData = {}, metadata = {} } = profile as any;
     const { status } = metadata;
-    const { location = {} } = publicData;
+    const { location = {}, companyName } = publicData;
 
     return {
       key: company.id.uuid,
       data: {
         id: company.id.uuid,
         name: displayName,
+        companyName,
         address: location?.address,
         status: status || ECompanyStatus.unactive,
         ...(companyMembers ? { members: companyMembers[company.id.uuid] } : {}),

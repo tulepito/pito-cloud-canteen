@@ -59,6 +59,8 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   );
 
   const orderData = Listing(order);
+  const companyData = User(companyAccount!);
+  const { companyLocation } = companyData.getPublicData();
   const { title: orderCode } = orderData.getAttributes();
   const {
     deliveryAddress,
@@ -74,7 +76,9 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     vatAllow,
   } = orderData.getMetadata();
   const locationInitValues = {
-    deliveryAddress: getInitialLocationValues(deliveryAddress || {}),
+    deliveryAddress: getInitialLocationValues(
+      companyLocation || deliveryAddress || {},
+    ),
   };
 
   const nextStartWeek = DateTime.fromJSDate(new Date())
@@ -91,7 +95,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     .minus({ days: 2 })
     .toMillis();
 
-  const groupList = User(companyAccount!).getMetadata().groups;
+  const groupList = companyData.getMetadata().groups;
 
   const deliveryInitValues = {
     startDate: startDate || nextStartWeek,
@@ -185,7 +189,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
             onSubmit={handleSubmit}
             loading={updateOrderInProgress}
             groupList={groupList}
-            companyId={companyAccount?.id?.uuid}
+            companyId={companyData.getId()}
           />
         );
       case 'unitBudget':

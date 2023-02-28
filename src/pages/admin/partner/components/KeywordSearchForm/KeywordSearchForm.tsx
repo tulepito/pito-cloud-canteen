@@ -1,4 +1,3 @@
-import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
@@ -19,23 +18,14 @@ type TKeywordSearchForm = {
   initialValues?: TKeywordSearchFormValues;
   searchValue?: string;
   placeholder?: string;
-  hideButton?: boolean;
   inputClassName?: string;
   label?: ReactNode;
-  buttonClassName?: string;
   className?: string;
 };
 
 const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
   const intl = useIntl();
-  const {
-    placeholder,
-    hideButton,
-    inputClassName,
-    label,
-    buttonClassName,
-    className,
-  } = props;
+  const { placeholder, inputClassName, label, className } = props;
   return (
     <FinalForm
       {...props}
@@ -58,13 +48,6 @@ const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
               className={classNames(css.searchInput, inputClassName)}
               leftIcon={<IconMagnifier />}
             />
-            {!hideButton && (
-              <Button
-                className={classNames(css.searchButton, buttonClassName)}
-                onClick={handleSubmit}>
-                <IconMagnifier className={css.iconSearch} />
-              </Button>
-            )}
           </Form>
         );
       }}

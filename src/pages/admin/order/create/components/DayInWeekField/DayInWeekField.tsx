@@ -21,16 +21,19 @@ const DAY_IN_WEEK = [
 type TDayInWeekFieldProps = {
   form: any;
   values: TObject;
+  title?: string;
+  containerClassName?: string;
 };
 
 const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
-  const { form, values } = props;
+  const { form, values, title, containerClassName } = props;
   const intl = useIntl();
+
   const { dayInWeek = [], startDate, endDate } = values;
   const [selectedDays, setSelectedDays] = useState<string[]>(dayInWeek);
   const dayInWeekFromStartDateToEndDate = getDayInWeekFromPeriod(
-    parseInt(startDate, 10),
-    parseInt(endDate, 10),
+    startDate,
+    endDate,
   ).map((weekDay) => convertWeekDay(weekDay));
   const disableDayInWeekOptions = differenceBy(
     DAY_IN_WEEK,
@@ -40,11 +43,11 @@ const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
   useEffect(() => {
     form.change('dayInWeek', selectedDays);
   }, [form, selectedDays, selectedDays.length]);
+
+  const containerClasses = classNames(css.container, containerClassName);
   return (
-    <div className={css.container}>
-      <div className={css.fieldLabel}>
-        {intl.formatMessage({ id: 'DayInWeekField.label' })}
-      </div>
+    <div className={containerClasses}>
+      {title && <div className={css.title}>{title}</div>}
       <FieldTextInput id="dayInWeek" name="dayInWeek" type="hidden" />
       <div className={css.fieldGroups}>
         {DAY_IN_WEEK.map((day) => {

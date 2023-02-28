@@ -1,8 +1,12 @@
 import { calculateGroupMembersAmount } from '@helpers/company';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { orderAsyncActions } from '@redux/slices/Order.slice';
+import {
+  changeStep2SubmitStatus,
+  orderAsyncActions,
+} from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
+import { getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
 import isEmpty from 'lodash/isEmpty';
 import { useCallback, useMemo } from 'react';
@@ -71,6 +75,11 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       const {
         selectedPlace: { address: addressValue, origin: originValue },
       } = deliveryAddressValues;
+      const selectedDayInWeek = getSelectedDaysOfWeek(
+        values.startDate,
+        values.endDate,
+        values.dayInWeek,
+      );
       const generalInfo = {
         deliveryAddress: {
           address: addressValue,
@@ -81,8 +90,10 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         selectedGroups: pickAllowSubmitValue ? selectedGroupsSubmitValue : [],
         deadlineDate: pickAllowSubmitValue ? deadlineDateSubmitValue : null,
         deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
+        dayInWeek: selectedDayInWeek,
         ...rest,
       };
+      dispatch(changeStep2SubmitStatus(true));
       const { payload }: { payload: any } = await dispatch(
         orderAsyncActions.updateOrder({ generalInfo }),
       );
@@ -100,6 +111,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
           orderDetail: recommendOrderDetail,
         }),
       );
+      dispatch(changeStep2SubmitStatus(false));
       nextTab();
     },
     [dispatch, nextTab],

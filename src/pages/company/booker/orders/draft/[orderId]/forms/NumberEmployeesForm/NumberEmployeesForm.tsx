@@ -34,7 +34,7 @@ const NumberEmployeesForm: React.FC<TNumberEmployeesFormProps> = ({
     });
   };
 
-  const { form, handleSubmit, submitting, hasValidationErrors } =
+  const { form, handleSubmit, submitting, hasValidationErrors, pristine } =
     useForm<TNumberEmployeesFormValues>({
       onSubmit: onSubmitInternal,
       validate,
@@ -45,7 +45,7 @@ const NumberEmployeesForm: React.FC<TNumberEmployeesFormProps> = ({
 
   const memberAmount = useField('memberAmount', form);
   const submitInprogress = loading || submitting;
-  const disabledSubmit = submitInprogress || hasValidationErrors;
+  const disabledSubmit = pristine || submitInprogress || hasValidationErrors;
 
   const rightIcon = (
     <span>

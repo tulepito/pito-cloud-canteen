@@ -1,0 +1,29 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.formContainer {
+  margin: 0 auto;
+}
+
+.container {
+  text-align: center;
+}
+
+.initialOrderText {
+  @include textTemplate(24px, $fontWeightBold, 32px);
+  margin-top: 32px;
+}
+
+.orderTitle {
+  margin-top: 32px;
+}
+
+.orderDateWrapper {
+  margin-top: 4px;
+
+  .orderDateRange {
+    @include textTemplate(20px, $fontWeightBold, 32px);
+    margin-left: 8px;
+  }
+}

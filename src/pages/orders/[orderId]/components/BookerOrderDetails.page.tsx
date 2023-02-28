@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import AlertModal from '@components/Modal/AlertModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -190,8 +191,6 @@ const BookerOrderDetailsPage = () => {
           break;
         default:
           if (orderId) {
-            console.log('go default');
-
             router.push({
               pathname: companyPaths.ManageOrderDetail,
               query: { orderId },

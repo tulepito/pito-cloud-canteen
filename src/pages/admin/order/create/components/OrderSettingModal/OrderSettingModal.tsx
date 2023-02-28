@@ -191,6 +191,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
               form={form}
               values={values}
               onCustomStartDateChange={customStartDateChangeHandler}
+              containerClassName={css.fieldContainer}
             />
           </>
         );
@@ -204,7 +205,12 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
                 })}
               </div>
               <div className={css.fieldContent}>
-                <OrderDeadlineField columnLayout form={form} values={values} />
+                <OrderDeadlineField
+                  columnLayout
+                  form={form}
+                  values={values}
+                  containerClassName={css.fieldContainer}
+                />
               </div>
             </>
           )
@@ -310,6 +316,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
           orderId: Listing(order as TListing).getId(),
           orderDetail: newOrderDetail,
           planId,
+          updateMode: 'replace',
         }),
       );
     }

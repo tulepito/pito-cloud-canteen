@@ -35,7 +35,7 @@ const AccessForm: React.FC<TAccessFormProps> = ({
   groupList = [],
   companyId,
 }) => {
-  const { form, handleSubmit, submitting, hasValidationErrors } =
+  const { form, handleSubmit, submitting, hasValidationErrors, pristine } =
     useForm<TAccessFormValues>({
       onSubmit,
       validate,
@@ -46,7 +46,7 @@ const AccessForm: React.FC<TAccessFormProps> = ({
 
   const selectedGroups = useField('selectedGroups', form);
   const submitInprogress = loading || submitting;
-  const disabledSubmit = submitting || hasValidationErrors;
+  const disabledSubmit = pristine || submitting || hasValidationErrors;
 
   const finalizeGroupList = useMemo(() => {
     return [
