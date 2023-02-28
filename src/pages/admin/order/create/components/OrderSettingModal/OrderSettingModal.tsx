@@ -310,6 +310,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
           orderId: Listing(order as TListing).getId(),
           orderDetail: newOrderDetail,
           planId,
+          updateMode: 'replace',
         }),
       );
     }

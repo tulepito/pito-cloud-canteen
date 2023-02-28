@@ -142,6 +142,10 @@ const CreateOrderWizard = () => {
   };
 
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
+
+  const step2SubmitInProgress = useAppSelector(
+    (state) => state.Order.step2SubmitInProgress,
+  );
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
     shallowEqual,
@@ -149,7 +153,7 @@ const CreateOrderWizard = () => {
   const tabsStatus = tabsActive(order, orderDetail) as any;
 
   useEffect(() => {
-    if (order) {
+    if (order && !step2SubmitInProgress) {
       const { staffName } = Listing(order as TListing).getMetadata();
       if (staffName) {
         setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, REVIEW_TAB);
@@ -165,7 +169,7 @@ const CreateOrderWizard = () => {
 
       return setCurrentStep(MEAL_PLAN_SETUP);
     }
-  }, [JSON.stringify(order)]);
+  }, [JSON.stringify(order), step2SubmitInProgress]);
 
   useEffect(() => {
     if (!tabsStatus[currentStep as string]) {

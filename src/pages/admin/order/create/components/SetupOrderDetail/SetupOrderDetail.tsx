@@ -287,7 +287,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     const orderId = Listing(order as TListing).getId();
     const planId = Listing(order as TListing).getMetadata()?.plans?.[0];
     const { meta } = await dispatch(
-      orderAsyncActions.updatePlanDetail({ orderId, orderDetail, planId }),
+      orderAsyncActions.updatePlanDetail({
+        orderId,
+        orderDetail,
+        planId,
+      }),
     );
     if (meta.requestStatus !== 'rejected') nextTab();
   };
