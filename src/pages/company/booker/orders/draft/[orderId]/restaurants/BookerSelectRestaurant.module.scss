@@ -1,78 +1,7 @@
-@use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/vars.scss' as *;
 
-.root {
-  padding: 40px 24px;
-  width: 100%;
-  margin: auto;
-
-  @include viewportLarge {
-    max-width: 925px;
-    padding: 40px 0;
-  }
-
-  @include viewportSLarge {
-    max-width: 1240px;
-  }
-
-  @include viewportXLarge {
-    max-width: 1555px;
-  }
-}
-
-.main {
-  display: flex;
-  position: relative;
-}
-
-.sidebar {
-  position: fixed;
-  width: 295px;
-  z-index: 10;
-  top: 72px;
-  left: calc(-295px);
-  transition: 0.3s linear;
-
-  @include viewportLarge {
-    top: unset;
-    left: unset;
-    position: relative;
-  }
-}
-
-.sidebarOpened {
-  left: 0px;
-
-  @include viewportLarge {
-    left: unset;
-  }
-}
-
-.filterMobileMenu {
-  position: fixed;
-  z-index: 11;
-  top: 112px;
-  left: 0;
-  transition: 0.3s linear;
-
-  @include viewportLarge {
-    display: none;
-  }
-}
-
-.filterMobileMenuOpened {
-  left: 295px;
-}
-
 .result {
-  margin: auto;
-  flex-grow: 1;
-
-  @include viewportLarge {
-    margin: 0 0 0 20px;
-  }
-
   .resultHeaderWrapper {
     position: relative;
     z-index: 10;
@@ -91,7 +20,7 @@
     }
   }
 
-  .resultWrapper {
+  .resultList {
     position: relative;
     margin-top: 24px;
   }

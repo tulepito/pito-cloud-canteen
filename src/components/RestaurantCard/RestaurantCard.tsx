@@ -42,6 +42,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
     Listing(restaurant).getPublicData();
   const { rating = 0 } = Listing(restaurant).getMetadata();
   const restaurantCoverImage = Listing(restaurant).getImages()[0];
+  const restaurantName = Listing(restaurant).getAttributes().title;
 
   const mealStyles = categories
     .slice(0, 3)
@@ -76,8 +77,11 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
         />
       </div>
       <div className={css.header}>
-        <p className={css.restaurantName} onClick={handleClickCard}>
-          {Listing(restaurant).getAttributes().title}
+        <p
+          className={css.restaurantName}
+          onClick={handleClickCard}
+          title={restaurantName}>
+          {restaurantName}
         </p>
         <IconHeart className={css.favoriteIcon} />
       </div>
