@@ -11,7 +11,7 @@
   left: 0;
   transition: 0.3s linear;
   opacity: 1;
-  padding: 0 28px 28px;
+  padding: 0 24px 28px;
 }
 
 .hideMain {
@@ -91,4 +91,5 @@
 .detailsTitle {
   @include textTemplate(20px, 700, 32px);
   margin-bottom: 24px;
+  text-transform: capitalize;
 }

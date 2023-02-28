@@ -1,6 +1,7 @@
 import Button from '@components/Button/Button';
 import { FieldDatePickerComponent } from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
+import IconClock from '@components/Icons/IconClock/IconClock';
 import { findMinStartDate } from '@helpers/orderHelper';
 import { DateTime } from 'luxon';
 import { useField, useForm } from 'react-final-form-hooks';
@@ -120,6 +121,7 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
         label={intl.formatMessage({
           id: 'Booker.CreateOrder.Form.field.deliveryHour',
         })}
+        leftIcon={<IconClock />}
         meta={deliveryHour.meta}
         input={deliveryHour.input}>
         {TIME_OPTIONS.map((option) => (

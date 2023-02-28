@@ -59,6 +59,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   );
 
   const orderData = Listing(order);
+  const { title: orderCode } = orderData.getAttributes();
   const {
     deliveryAddress,
     deliveryHour,
@@ -207,7 +208,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
           [css.hideMain]: isOpenDetails,
         })}>
         <div className={css.header}>
-          <h2 className={css.title}>#PT1000</h2>
+          <h2 className={css.title}>#{orderCode}</h2>
           <Badge label="Đơn hàng tuần" type={EBadgeType.PROCESSING} />
         </div>
         <nav className={css.navigation}>

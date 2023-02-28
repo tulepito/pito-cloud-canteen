@@ -5,6 +5,10 @@
 .root {
   margin-top: 72px;
 
+  @include viewportLarge {
+    margin-top: 81px;
+  }
+
   &.hasSideBar {
     margin-left: 292px;
     width: calc(100% - 292px);

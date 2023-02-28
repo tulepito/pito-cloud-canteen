@@ -1,6 +1,7 @@
 import Button from '@components/Button/Button';
 import { FieldDatePickerComponent } from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
+import IconClock from '@components/Icons/IconClock/IconClock';
 import { DateTime } from 'luxon';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -102,6 +103,7 @@ const ExpiredTimeForm: React.FC<TExpiredTimeFormProps> = ({
         label={intl.formatMessage({
           id: 'Booker.CreateOrder.Form.field.deadlineHour',
         })}
+        leftIcon={<IconClock />}
         meta={deadlineHour.meta}
         input={deadlineHour.input}>
         {TIME_OPTIONS.map((option) => (
