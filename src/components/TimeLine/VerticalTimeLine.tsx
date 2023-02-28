@@ -13,7 +13,7 @@ const VerticalTimeLine: React.FC<TVerticalTimeLineProps> = (props) => {
     className,
     items,
     lastActiveItem,
-    itemComponent,
+    itemComponent: ItemComponent,
     itemClassName,
   } = props;
 
@@ -36,12 +36,17 @@ const VerticalTimeLine: React.FC<TVerticalTimeLineProps> = (props) => {
   return (
     <div className={rootClasses}>
       <div className={css.activeBar} style={rootStyles} />
-      {items.map((item, index) =>
-        itemComponent({
-          data: item,
-          className: itemClasses(index + 1 <= lastActiveItem),
-        }),
-      )}
+      {items.map((item, index) => {
+        const itemCpm = (
+          <ItemComponent
+            key={index}
+            data={item}
+            className={itemClasses(index + 1 <= lastActiveItem)}
+          />
+        );
+
+        return itemCpm;
+      })}
     </div>
   );
 };

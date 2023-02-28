@@ -2,9 +2,12 @@ import { companyApi } from '@apis/companyApi';
 import { fetchUserApi } from '@apis/index';
 import type { TUpdateOrderApiBody } from '@apis/orderApi';
 import {
+  bookerCancelPendingApprovalOrderApi,
   bookerDeleteDraftOrderApi,
+  bookerPublishOrderApi,
   createBookerOrderApi,
   queryOrdersApi,
+  requestApprovalOrderApi,
   updateOrderApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
@@ -14,8 +17,8 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
-import { convertWeekDay, getSeparatedDates } from '@utils/dates';
-import { EListingStates, EOrderStates } from '@utils/enums';
+import { convertWeekDay, renderDateRange } from '@utils/dates';
+import { EListingStates, EManageCompanyOrdersTab } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TPagination } from '@utils/types';
 import uniq from 'lodash/uniq';
@@ -50,16 +53,16 @@ type TOrderInitialState = {
   updateOrderInProgress: boolean;
   updateOrderError: any;
 
+  updateOrderDetailInProgress: boolean;
+  updateOrderDetailError: any;
+
   orderDetail: any;
   justDeletedMemberOrder: boolean;
   fetchOrderDetailInProgress: boolean;
   fetchOrderDetailError: any;
 
-  initiateTransactionsInProgress: boolean;
-  initiateTransactionsError: any;
-
-  updateOrderDetailInProgress: boolean;
-  updateOrderDetailError: any;
+  bookerPublishOrderInProgress: boolean;
+  bookerPublishOrderError: any;
 
   // Manage Orders Page
   queryParams: TObject;
@@ -68,14 +71,15 @@ type TOrderInitialState = {
   queryOrderError: any;
   deleteDraftOrderInProgress: boolean;
   deleteDraftOrderError: any;
-  totalItemMap: {
-    [EOrderStates.picking]: number;
-    [EOrderStates.completed]: number;
-    [EOrderStates.isNew]: number;
-    [EOrderStates.canceled]: number;
-    all: number;
-  };
   manageOrdersPagination: TPagination;
+
+  totalItemMap: {
+    [EManageCompanyOrdersTab.SCHEDULED]: number;
+    [EManageCompanyOrdersTab.CANCELED]: number;
+    [EManageCompanyOrdersTab.DRAFT]: number;
+    [EManageCompanyOrdersTab.COMPLETED]: number;
+    [EManageCompanyOrdersTab.ALL]: number;
+  };
 
   restaurantCoverImageList: {
     [restaurantId: string]: any;
@@ -87,22 +91,11 @@ type TOrderInitialState = {
   recommendRestaurantError: any;
 };
 
-const CREATE_ORDER = 'app/Order/CREATE_ORDER';
-const UPDATE_ORDER = 'app/Order/UPDATE_ORDER';
-const FETCH_COMPANY_BOOKERS = 'app/Order/FETCH_COMPANY_BOOKERS';
-const FETCH_ORDER = 'app/Order/FETCH_ORDER';
-const FETCH_ORDER_DETAIL = 'app/Order/FETCH_ORDER_DETAIL';
-const INITIATE_TRANSACTIONS = 'app/Order/INITIATE_TRANSACTIONS';
-const QUERY_SUB_ORDERS = 'app/Order/QUERY_SUB_ORDERS';
-const UPDATE_PLAN_DETAIL = 'app/Order/UPDATE_PLAN_DETAIL';
-const FETCH_RESTAURANT_COVER_IMAGE = 'app/Order/FETCH_RESTAURANT_COVER_IMAGE';
-const RECOMMEND_RESTAURANT = 'app/Order/RECOMMEND_RESTAURANT';
-
 const initialState: TOrderInitialState = {
   order: null,
   fetchOrderInProgress: false,
   fetchOrderError: null,
-  plans: [],
+  plans: [] as TListing[],
   orderDetail: {},
   justDeletedMemberOrder: false,
   createOrderInProcess: false,
@@ -118,6 +111,9 @@ const initialState: TOrderInitialState = {
   bookerList: [],
   selectedBooker: null,
 
+  updateOrderDetailInProgress: false,
+  updateOrderDetailError: null,
+
   selectedCalendarDate: undefined!,
   isSelectingRestaurant: false,
 
@@ -127,8 +123,8 @@ const initialState: TOrderInitialState = {
   fetchOrderDetailInProgress: false,
   fetchOrderDetailError: null,
 
-  initiateTransactionsInProgress: false,
-  initiateTransactionsError: null,
+  bookerPublishOrderInProgress: false,
+  bookerPublishOrderError: null,
 
   // Manage Orders
   queryParams: {},
@@ -144,15 +140,12 @@ const initialState: TOrderInitialState = {
     perPage: 0,
   },
   totalItemMap: {
-    [EOrderStates.picking]: 0,
-    [EOrderStates.completed]: 0,
-    [EOrderStates.isNew]: 0,
-    [EOrderStates.canceled]: 0,
-    all: 0,
+    [EManageCompanyOrdersTab.SCHEDULED]: 0,
+    [EManageCompanyOrdersTab.CANCELED]: 0,
+    [EManageCompanyOrdersTab.DRAFT]: 0,
+    [EManageCompanyOrdersTab.COMPLETED]: 0,
+    [EManageCompanyOrdersTab.ALL]: 0,
   },
-
-  updateOrderDetailInProgress: false,
-  updateOrderDetailError: null,
 
   restaurantCoverImageList: {},
   fetchRestaurantCoverImageInProgress: false,
@@ -162,12 +155,24 @@ const initialState: TOrderInitialState = {
   recommendRestaurantError: null,
 };
 
+const CREATE_ORDER = 'app/Order/CREATE_ORDER';
+const UPDATE_ORDER = 'app/Order/UPDATE_ORDER';
+const FETCH_COMPANY_BOOKERS = 'app/Order/FETCH_COMPANY_BOOKERS';
+const FETCH_ORDER = 'app/Order/FETCH_ORDER';
+const FETCH_ORDER_DETAIL = 'app/Order/FETCH_ORDER_DETAIL';
+const QUERY_SUB_ORDERS = 'app/Order/QUERY_SUB_ORDERS';
+const UPDATE_PLAN_DETAIL = 'app/Order/UPDATE_PLAN_DETAIL';
+const FETCH_PLAN_DETAIL = 'app/Order/FETCH_PLAN_DETAIL';
+const FETCH_RESTAURANT_COVER_IMAGE = 'app/Order/FETCH_RESTAURANT_COVER_IMAGE';
+const RECOMMEND_RESTAURANT = 'app/Order/RECOMMEND_RESTAURANT';
+
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
-  const { clientId, bookerId, isCreatedByAdmin = false } = params;
+  const { clientId, bookerId, isCreatedByAdmin = false, generalInfo } = params;
   const apiBody = {
     companyId: clientId,
     bookerId,
     isCreatedByAdmin,
+    generalInfo,
   };
   const { data: orderListing } = await createBookerOrderApi(apiBody);
 
@@ -181,7 +186,6 @@ const updateOrder = createAsyncThunk(
     const { generalInfo } = params;
     const { deadlineDate, deadlineHour } = generalInfo || {};
     const orderId = Listing(order as TListing).getId();
-
     const parsedDeadlineDate = deadlineDate
       ? DateTime.fromMillis(deadlineDate)
           .startOf('day')
@@ -218,7 +222,7 @@ const recommendRestaurants = createAsyncThunk(
       startDate,
       endDate,
     } = Listing(order as TListing).getMetadata();
-    const totalDates = getSeparatedDates(startDate, endDate);
+    const totalDates = renderDateRange(startDate, endDate);
     await Promise.all(
       totalDates.map(async (dateTime) => {
         if (
@@ -259,20 +263,13 @@ const recommendRestaurants = createAsyncThunk(
   },
 );
 
-const initiateTransactions = createAsyncThunk(
-  INITIATE_TRANSACTIONS,
-  async (_) => {
-    // await initiateTransactionsApi(params);
-    return '';
-  },
-);
-
 const queryOrders = createAsyncThunk(
   QUERY_SUB_ORDERS,
   async (payload: TObject = {}) => {
     const params = {
       dataParams: {
         ...payload,
+        states: EListingStates.published,
         perPage: MANAGE_ORDER_PAGE_SIZE,
       },
       queryParams: {
@@ -291,17 +288,23 @@ const queryOrders = createAsyncThunk(
 
 const queryCompanyOrders = createAsyncThunk(
   'app/Orders/COMPANY_QUERY_ORDERS',
-  async (payload: TObject, { rejectWithValue }) => {
+  async (payload: TObject, { rejectWithValue, extra: sdk }) => {
     const { companyId = '', ...restPayload } = payload;
 
     if (companyId === '') {
       return rejectWithValue('Company ID is empty');
     }
+
+    const bookerId = denormalisedResponseEntities(
+      await sdk.currentUser.show(),
+    )[0]?.id?.uuid;
+
     const params = {
       dataParams: {
         ...restPayload,
-        states: EListingStates.published,
         perPage: MANAGE_ORDER_PAGE_SIZE,
+        states: EListingStates.published,
+        meta_bookerId: bookerId,
         meta_companyId: companyId,
         meta_listingType: LISTING_TYPE.ORDER,
       },
@@ -348,9 +351,8 @@ const fetchCompanyBookers = createAsyncThunk(
 
 const fetchOrderDetail = createAsyncThunk(
   FETCH_ORDER_DETAIL,
-  async (order: TListing, { extra: sdk }) => {
-    const { plans = [] } = Listing(order as TListing).getMetadata();
-    if (plans[0]) {
+  async (plans: string[], { extra: sdk }) => {
+    if (plans?.length > 0) {
       const response: any = denormalisedResponseEntities(
         await sdk.listings.show({
           id: plans[0],
@@ -423,6 +425,21 @@ const fetchOrder = createAsyncThunk(
   },
 );
 
+const fetchPlanDetail = createAsyncThunk(
+  FETCH_PLAN_DETAIL,
+  async ({ planId }: { planId: string }, { extra: sdk }) => {
+    if (planId) {
+      const response = denormalisedResponseEntities(
+        await sdk.listings.show({
+          id: planId,
+        }),
+      )[0];
+      return response;
+    }
+    return {};
+  },
+);
+
 const updatePlanDetail = createAsyncThunk(
   UPDATE_PLAN_DETAIL,
   async ({ orderId, planId, orderDetail, updateMode }: any, _) => {
@@ -446,6 +463,36 @@ const bookerDeleteDraftOrder = createAsyncThunk(
   },
 );
 
+const requestApprovalOrder = createAsyncThunk(
+  'app/Order/REQUEST_APPROVAL_ORDER',
+  async ({ orderId }: TObject) => {
+    const { data: responseData } = await requestApprovalOrderApi(orderId);
+
+    return responseData.data;
+  },
+);
+
+const cancelPendingApprovalOrder = createAsyncThunk(
+  'app/Order/CANCEL_PENDING_APPROVAL_ORDER',
+  async ({ orderId }: TObject) => {
+    const { data: responseData } = await bookerCancelPendingApprovalOrderApi(
+      orderId,
+    );
+
+    return responseData.data;
+  },
+);
+
+const bookerPublishOrder = createAsyncThunk(
+  'app/Order/BOOKER_PUBLISH_ORDER',
+  async ({ orderId }: TObject) => {
+    await bookerPublishOrderApi(orderId as string);
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -453,10 +500,13 @@ export const orderAsyncActions = {
   fetchCompanyBookers,
   fetchOrder,
   fetchOrderDetail,
-  initiateTransactions,
   queryOrders,
   queryCompanyOrders,
+  fetchPlanDetail,
   updatePlanDetail,
+  requestApprovalOrder,
+  bookerPublishOrder,
+  cancelPendingApprovalOrder,
   fetchRestaurantCoverImages,
   recommendRestaurants,
 };
@@ -589,21 +639,6 @@ const orderSlice = createSlice({
         updateOrderInProgress: false,
         updateOrderError: error.message,
       }))
-
-      .addCase(initiateTransactions.pending, (state) => ({
-        ...state,
-        initiateTransactionsError: null,
-        initiateTransactionsInProgress: true,
-      }))
-      .addCase(initiateTransactions.fulfilled, (state) => ({
-        ...state,
-        initiateTransactionsInProgress: false,
-      }))
-      .addCase(initiateTransactions.rejected, (state, { payload }) => ({
-        ...state,
-        initiateTransactionsInProgress: false,
-        initiateTransactionsError: payload,
-      }))
       .addCase(queryOrders.pending, (state) => ({
         ...state,
         queryOrderInProgress: true,
@@ -725,6 +760,50 @@ const orderSlice = createSlice({
         updateOrderDetailInProgress: false,
         updateOrderDetailError: error.message,
       }))
+      /* =============== requestApprovalOrder =============== */
+      .addCase(requestApprovalOrder.pending, (state) => ({
+        ...state,
+        updateOrderInProgress: true,
+        updateOrderError: null,
+      }))
+      .addCase(requestApprovalOrder.fulfilled, (state, { payload }) => ({
+        ...state,
+        updateOrderInProgress: false,
+        order: payload,
+      }))
+      .addCase(requestApprovalOrder.rejected, (state, { error }) => ({
+        ...state,
+        updateOrderInProgress: false,
+        updateOrderError: error.message,
+      }))
+      /* =============== cancelNeedApprovalOrder =============== */
+      .addCase(cancelPendingApprovalOrder.pending, (state) => ({
+        ...state,
+        updateOrderInProgress: true,
+        updateOrderError: null,
+      }))
+      .addCase(cancelPendingApprovalOrder.fulfilled, (state, { payload }) => ({
+        ...state,
+        updateOrderInProgress: false,
+        order: payload,
+      }))
+      .addCase(cancelPendingApprovalOrder.rejected, (state, { error }) => ({
+        ...state,
+        updateOrderInProgress: false,
+        updateOrderError: error.message,
+      }))
+      /* =============== bookerPublishOrder =============== */
+      .addCase(bookerPublishOrder.pending, (state) => {
+        state.bookerPublishOrderError = null;
+        state.bookerPublishOrderInProgress = true;
+      })
+      .addCase(bookerPublishOrder.fulfilled, (state) => {
+        state.bookerPublishOrderInProgress = false;
+      })
+      .addCase(bookerPublishOrder.rejected, (state, { payload }) => {
+        state.bookerPublishOrderInProgress = false;
+        state.bookerPublishOrderError = payload;
+      })
 
       .addCase(fetchRestaurantCoverImages.pending, (state) => ({
         ...state,

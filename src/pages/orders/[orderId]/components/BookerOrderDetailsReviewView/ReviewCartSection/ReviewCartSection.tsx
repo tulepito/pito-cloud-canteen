@@ -1,8 +1,11 @@
-import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import { parseThousandNumber } from '@helpers/format';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { orderManagementThunks } from '@pages/orders/[orderId]/OrderManagement.slice';
+import { companyPaths } from '@src/paths';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
@@ -11,6 +14,7 @@ import css from './ReviewCartSection.module.scss';
 type TReviewCartSectionProps = {
   className?: string;
   data: TObject;
+  showStartPickingOrderButton: boolean;
   onClickDownloadPriceQuotation: () => void;
 };
 
@@ -26,13 +30,35 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
       totalWithoutVAT = 0,
       totalWithVAT = 0,
       transportFee = 0,
-      VATFee = 0,
+      // VATFee = 0,
     } = {},
+    showStartPickingOrderButton,
     onClickDownloadPriceQuotation,
   } = props;
   const intl = useIntl();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const isStartOrderInProgress = useAppSelector(
+    (state) => state.OrderManagement.isStartOrderInProgress,
+  );
 
+  const {
+    query: { orderId },
+  } = router;
   const rootClasses = classNames(css.root, className);
+
+  const handleStartPickingOrder = async () => {
+    await dispatch(
+      orderManagementThunks.bookerStartOrder({ orderId: orderId as string }),
+    );
+
+    setTimeout(() => {
+      router.push({
+        pathname: companyPaths.ManageOrderDetail,
+        query: { orderId },
+      });
+    }, 1000);
+  };
 
   return (
     <div className={rootClasses}>
@@ -92,7 +118,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
             </div>
           </div>
         </div>
-        <div className={css.feeItem}>
+        {/* <div className={css.feeItem}>
           <div
             className={classNames(css.feeItemContainer, css.VATItemContainer)}>
             <div className={css.label}>
@@ -103,7 +129,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
               {parseThousandNumber(VATFee.toString())}đ
             </div>
           </div>
-        </div>
+        </div> */}
         <div className={css.feeItem}>
           <div className={css.totalWithVATLabel}>
             {intl.formatMessage({ id: 'ReviewCardSection.totalWithVAT' })}
@@ -129,13 +155,19 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
         })}
       </div>
 
-      <Button variant="cta" className={css.makePaymentButton} disabled>
-        <div>
-          {intl.formatMessage({
-            id: 'ReviewCardSection.makePayment',
-          })}
-        </div>
-      </Button>
+      {showStartPickingOrderButton && (
+        <Button
+          variant="cta"
+          className={css.makePaymentButton}
+          inProgress={isStartOrderInProgress}
+          onClick={handleStartPickingOrder}>
+          <div>
+            {intl.formatMessage({
+              id: 'ReviewCardSection.makePayment',
+            })}
+          </div>
+        </Button>
+      )}
 
       {overflow > 0 && (
         <div className={css.overflowPackageInfo}>

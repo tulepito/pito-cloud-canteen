@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { InlineTextButton } from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import classNames from 'classnames';
@@ -72,6 +73,10 @@ const Tabs: React.FC<ITabsProps> = (props) => {
   useEffect(() => {
     onChangeTab(Number(defaultActiveKey || 1))();
   }, [defaultActiveKey]);
+
+  useEffect(() => {
+    onChange(items[Number(activeTabKey) - 1]);
+  }, [activeTabKey]);
 
   const tabHeader = items.map((item, index) => {
     const { label } = item;

@@ -3,12 +3,18 @@ import { User } from '@utils/data';
 import type { TCurrentUser, TObject, TUser } from '@utils/types';
 import filter from 'lodash/filter';
 import flatten from 'lodash/flatten';
+import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 
 export const getAllCompanyMembers = (companyAccount: TUser) => {
   const { members = {} } = User(companyAccount).getMetadata();
 
-  return Object.values<TObject>(members).map<string>(({ id }: TObject) => id);
+  return Object.values<TObject>(members).reduce<string[]>(
+    (previous, { id }) => {
+      return isEmpty(id) ? previous : previous.concat([id]);
+    },
+    [],
+  );
 };
 
 export const getCompanyIdFromBookerUser = (user: TUser | TCurrentUser) => {

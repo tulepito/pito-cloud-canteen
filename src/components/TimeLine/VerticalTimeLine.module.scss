@@ -29,6 +29,7 @@
 
   .item {
     padding-left: 34px;
+    min-height: 40px;
     position: relative;
 
     &::after {
@@ -45,6 +46,10 @@
 
     &.isActive::after {
       background-color: $neutralGray6;
+    }
+
+    &:last-child {
+      min-height: unset;
     }
   }
 }

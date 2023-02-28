@@ -18,6 +18,8 @@ type TSelectRestaurantPageSliceInitialState = {
   fetchFoodError: any;
 
   selectedRestaurant: TListing | null;
+  fetchSelectedRestaurantInProgress: boolean;
+  fetchSelectedRestaurantError: any;
 };
 
 const initialState: TSelectRestaurantPageSliceInitialState = {
@@ -30,12 +32,15 @@ const initialState: TSelectRestaurantPageSliceInitialState = {
   fetchFoodPending: false,
   fetchFoodError: null,
   selectedRestaurant: null,
+  fetchSelectedRestaurantInProgress: false,
+  fetchSelectedRestaurantError: null,
 };
 
 // ================ Thunk types ================ //
 const QUERY_RESTAURANTS = 'app/SelectRestaurantPage/QUERY_RESTAURANTS';
 const QUERY_RESTAURANT_FOOD = 'app/SelectRestaurantPage/QUERY_RESTAURANT_FOOD';
-
+const FETCH_SELECTED_RESTAURANT =
+  'app/SelectRestaurantPage/FETCH_SELECTED_RESTAURANT';
 // ================ Thunks ================ //
 const getRestaurants = createAsyncThunk(
   QUERY_RESTAURANTS,
@@ -50,7 +55,7 @@ const getRestaurants = createAsyncThunk(
       favoriteRestaurantIdList = [],
       favoriteFoodIdList = [],
       packagePerMember,
-      deliveryHour,
+      deliveryHour = '6:30',
       nutritions = [],
       title = '',
       page = 1,
@@ -140,9 +145,22 @@ const getRestaurantFood = createAsyncThunk(
   },
 );
 
+const fetchSelectedRestaurant = createAsyncThunk(
+  FETCH_SELECTED_RESTAURANT,
+  async (restaurantId: string, { extra: sdk }) => {
+    const response = await sdk.listings.show({
+      id: restaurantId,
+      include: ['images'],
+      'fields.image': ['variants.landscape-crop', 'variants.landscape-crop2x'],
+    });
+    return denormalisedResponseEntities(response)[0];
+  },
+);
+
 export const selectRestaurantPageThunks = {
   getRestaurants,
   getRestaurantFood,
+  fetchSelectedRestaurant,
 };
 
 const SelectRestaurantPageSlice = createSlice({
@@ -190,6 +208,19 @@ const SelectRestaurantPageSlice = createSlice({
         state.fetchFoodPending = false;
         state.fetchFoodError = error;
         state.foodList = [];
+      })
+
+      .addCase(fetchSelectedRestaurant.pending, (state) => {
+        state.fetchSelectedRestaurantInProgress = true;
+        state.fetchSelectedRestaurantError = null;
+      })
+      .addCase(fetchSelectedRestaurant.fulfilled, (state, { payload }) => {
+        state.fetchSelectedRestaurantInProgress = false;
+        state.selectedRestaurant = payload;
+      })
+      .addCase(fetchSelectedRestaurant.rejected, (state, { error }) => {
+        state.fetchSelectedRestaurantInProgress = false;
+        state.fetchSelectedRestaurantError = error;
       });
   },
 });

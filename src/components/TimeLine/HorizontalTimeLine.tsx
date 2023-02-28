@@ -15,8 +15,8 @@ const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
     rootClassName,
     className,
     items,
-    itemComponent,
-    // itemClassName,
+    itemComponent: ItemComponent,
+
     haveNavigators = false,
   } = props;
   const containerRef = useRef(null);
@@ -24,21 +24,20 @@ const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
   const currentCtnRef = containerRef.current as any;
 
   const rootClasses = classNames(rootClassName || css.root, className);
-  // const itemClasses = (isActive: boolean) =>
-  // classNames(css.item, { [css.isActive]: isActive }, itemClassName);
-
   const totalItems = items.length;
-
-  const connectionLine = <div className={css.connectionLine} />;
 
   const itemsToRender = items.reduce<ReactNode[]>(
     (previousList, itemData, currentIndex) => {
-      const nextItem = itemComponent({
-        data: itemData,
-      });
+      const nextItem = <ItemComponent key={currentIndex} data={itemData} />;
 
       return currentIndex !== totalItems - 1
-        ? previousList.concat([nextItem, connectionLine])
+        ? previousList.concat([
+            nextItem,
+            <div
+              key={`${currentIndex}separator`}
+              className={css.connectionLine}
+            />,
+          ])
         : previousList.concat([nextItem]);
     },
     [],

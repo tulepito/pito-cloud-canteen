@@ -348,23 +348,21 @@ const creataPartnerFoodFromCsv = createAsyncThunk(
 
 const showPartnerFoodListing = createAsyncThunk(
   SHOW_PARTNER_FOOD_LISTING,
-  async (id: any, { rejectWithValue, fulfillWithValue }) => {
-    try {
-      const { data } = await showPartnerFoodApi(id, {
-        dataParams: {
-          include: ['images'],
-          'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
-        },
-        queryParams: {
-          expand: true,
-        },
-      });
-      const [food] = denormalisedResponseEntities(data);
-      return fulfillWithValue(food);
-    } catch (error) {
-      console.error(`${SHOW_PARTNER_FOOD_LISTING} error: `, error);
-      return rejectWithValue(storableError(error));
-    }
+  async (id: any) => {
+    const { data } = await showPartnerFoodApi(id, {
+      dataParams: {
+        include: ['images'],
+        'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
+      },
+      queryParams: {
+        expand: true,
+      },
+    });
+    const [food] = denormalisedResponseEntities(data);
+    return food;
+  },
+  {
+    serializeError: storableError,
   },
 );
 
@@ -534,7 +532,7 @@ const foodSlice = createSlice({
       }))
       .addCase(showPartnerFoodListing.rejected, (state, { payload }) => ({
         ...state,
-        showFoodInProgress: true,
+        showFoodInProgress: false,
         showFoodError: payload,
       }))
       .addCase(updatePartnerFoodListing.pending, (state) => ({
@@ -577,7 +575,7 @@ const foodSlice = createSlice({
       }))
       .addCase(showDuplicateFood.rejected, (state, { payload }) => ({
         ...state,
-        showFoodInProgress: true,
+        showFoodInProgress: false,
         showFoodError: payload,
       }))
       .addCase(duplicateFood.pending, (state) => ({

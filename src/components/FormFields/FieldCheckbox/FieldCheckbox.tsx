@@ -62,6 +62,7 @@ type TFieldCheckboxProps = FieldProps<string, any> &
     useSuccessColor?: boolean;
     customOnChange?: (event: React.ChangeEvent | any) => void;
     label?: string | React.ReactNode;
+    checkboxWrapperClassName?: string;
   };
 
 const FieldCheckbox: React.FC<TFieldCheckboxProps> = (props) => {
@@ -78,6 +79,7 @@ const FieldCheckbox: React.FC<TFieldCheckboxProps> = (props) => {
     hasTextInput,
     textPlaceholder,
     labelClassName,
+    checkboxWrapperClassName,
     ...rest
   } = props;
 
@@ -124,7 +126,11 @@ const FieldCheckbox: React.FC<TFieldCheckboxProps> = (props) => {
                   <label
                     htmlFor={id}
                     className={classNames(css.label, labelClassName)}>
-                    <span className={css.checkboxWrapper}>
+                    <span
+                      className={classNames(
+                        css.checkboxWrapper,
+                        checkboxWrapperClassName,
+                      )}>
                       <IconCheckbox
                         className={svgClassName}
                         {...successColorVariantMaybe}

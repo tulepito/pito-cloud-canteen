@@ -5,7 +5,11 @@ import {
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
 import { Listing } from '@utils/data';
-import { EParticipantOrderStatus } from '@utils/enums';
+import {
+  EBookerOrderDraftStates,
+  EOrderDraftStates,
+  EParticipantOrderStatus,
+} from '@utils/enums';
 import type { TListing } from '@utils/types';
 import { addDays, min, subDays } from 'date-fns';
 import { DateTime } from 'luxon';
@@ -69,4 +73,14 @@ export const deliveryDaySessionAdapter = (daySession: string) => {
     default:
       break;
   }
+};
+
+export const isEnableUpdateBookingInfo = (
+  orderState: EBookerOrderDraftStates | EOrderDraftStates,
+) => {
+  return [
+    EBookerOrderDraftStates.bookerDraft,
+    EOrderDraftStates.draft,
+    EOrderDraftStates.pendingApproval,
+  ].includes(orderState);
 };

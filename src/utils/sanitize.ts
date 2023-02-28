@@ -68,6 +68,7 @@ export const sanitizeUser = (entity: TObject) => {
     metadata ? { metadata } : {};
 
   const sanitizedPrivateData = privateData ? { privateData } : {};
+
   const sanitizedProtectedData = protectedData ? { protectedData } : {};
 
   const profileMaybe = profile

@@ -21,9 +21,31 @@
     @include textTemplate(24px, 700, 4/3);
   }
 
-  .makeOrderBtn {
-    width: 160px;
-    align-self: center;
-    padding: 0;
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+
+    .makeOrderBtn,
+    .cancelOrderBtn {
+      width: 100px;
+      min-width: 48px;
+      align-self: center;
+      padding: 0;
+    }
+
+    @include viewportMedium {
+      flex-direction: row;
+
+      .makeOrderBtn,
+      .cancelOrderBtn {
+        width: 160px;
+      }
+
+      .makeOrderBtn {
+        order: 2;
+      }
+    }
   }
 }

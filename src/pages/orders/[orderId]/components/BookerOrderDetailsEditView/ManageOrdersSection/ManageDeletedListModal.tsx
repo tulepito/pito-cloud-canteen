@@ -42,6 +42,7 @@ const ManageDeletedListModal: React.FC<TManageDeletedListModalProps> = (
     (actionType: ManageDeletedListFormAction) => () => {
       setAction(actionType);
     };
+
   const handleSubmit = ({ memberIds }: TManageDeletedListFormValues) => {
     if (action === ManageDeletedListFormAction.RESTORE) {
       onRestoreMembers(memberIds);

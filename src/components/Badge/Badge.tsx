@@ -68,7 +68,6 @@ const Badge: React.FC<TBadgeProps> = (props) => {
     css.root,
     classesFormType,
     className,
-    labelClassName,
   );
   const labelClasses = classNames(css.label, classesFormType, labelClassName);
   const badgeCloseClasses = classNames(classesFormType, labelClassName);

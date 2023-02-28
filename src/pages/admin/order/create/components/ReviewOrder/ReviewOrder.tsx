@@ -11,6 +11,7 @@ import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import { parseTimestampToFormat } from '@utils/dates';
+import { EOrderDraftStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
 import { required } from '@utils/validators';
 import classNames from 'classnames';
@@ -149,6 +150,7 @@ const parseDataToReviewTab = (values: any) => {
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
+
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
     shallowEqual,
@@ -169,20 +171,24 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   } = useBoolean();
 
   const orderId = Listing(order as TListing).getId();
-  const { plans = [] } = Listing(order as TListing).getMetadata();
+  const {
+    staffName,
+    deliveryHour,
+    deliveryAddress,
+    shipperName,
+    orderState,
+    plans = [],
+  } = Listing(order as TListing).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
+  const { address } = deliveryAddress || {};
 
   useEffect(() => {
     if (isEmpty(orderDetail)) {
-      dispatch(orderAsyncActions.fetchOrderDetail(order as TListing));
+      dispatch(orderAsyncActions.fetchOrderDetail(plans));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(order), JSON.stringify(orderDetail)]);
 
-  const { staffName, deliveryHour, deliveryAddress, shipperName } = Listing(
-    order as TListing,
-  ).getMetadata();
-  const { address } = deliveryAddress || {};
   const { renderedOrderDetail } =
     useMemo(() => {
       return {
@@ -203,6 +209,9 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         planId,
         orderDetail,
       });
+    }
+    if (orderState === EOrderDraftStates.draft) {
+      await dispatch(orderAsyncActions.requestApprovalOrder({ orderId }));
     }
 
     const { error } = (await dispatch(
@@ -225,6 +234,10 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       shipperName,
     };
   }, [staffName, shipperName]);
+
+  useEffect(() => {
+    dispatch(orderAsyncActions.fetchOrderDetail(plans));
+  }, [dispatch, plans]);
 
   return (
     <div className={css.root}>

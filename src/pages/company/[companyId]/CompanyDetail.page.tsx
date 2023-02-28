@@ -20,7 +20,9 @@ const CompanyDetailPage = () => {
 
   useEffect(() => {
     if (isReady) dispatch(BookerManageCompany.companyInfo());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady]);
+
   if (isCompanyNotFound) {
     return <div>Khong tim thay cong ty nay, xin vui long thu lai.</div>;
   }

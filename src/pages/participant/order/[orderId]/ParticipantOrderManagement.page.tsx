@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import OrderCalendarView from '../../components/OrderCalendarView/OrderCalendarView';
-import OrderListView from '../../components/OrderListView/OrderListView';
 import SectionOrderHeader from '../../components/SectionOrderHeader/SectionOrderHeader';
 import { VIEWS } from '../../helpers/constants';
 
@@ -39,18 +38,14 @@ const ParticipantOrderManagement = () => {
         currentView={currentView}
         setViewFunction={setCurrentView}
       />
-      {currentView === VIEWS.CALENDAR ? (
-        <OrderCalendarView
-          company={company as TUser}
-          order={order as TListing}
-          plans={plans}
-          subOrders={subOrders}
-          currentUser={currentUser}
-          loadDataInProgress={loadDataInProgress}
-        />
-      ) : (
-        <OrderListView />
-      )}
+      <OrderCalendarView
+        company={company as TUser}
+        order={order as TListing}
+        plans={plans}
+        subOrders={subOrders}
+        currentUser={currentUser}
+        loadDataInProgress={loadDataInProgress}
+      />
     </ParticipantLayout>
   );
 };

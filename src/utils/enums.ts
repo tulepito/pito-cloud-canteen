@@ -1,3 +1,5 @@
+import { EBadgeType } from '@components/Badge/Badge';
+
 export enum EImageVariants {
   default = 'default',
   landscapeCrop = 'landscape-crop',
@@ -113,6 +115,10 @@ export enum EUserPermission {
   company = 'company',
   admin = 'admin',
   normal = 'normal',
+}
+
+export enum ECompanyMemberPermission {
+  owner = 'owner',
 }
 
 export const startRouteBaseOnPermission = {
@@ -388,94 +394,117 @@ export const CATEGORY_OPTIONS = [
   {
     key: 'vietnam-food',
     label: 'Thuần Việt',
+    badgeType: EBadgeType.PROCESSING,
   },
   {
     key: 'vietnam-north-food',
     label: 'Món Bắc',
+    badgeType: EBadgeType.DEFAULT,
   },
   {
     key: 'vietnam-centrel-food',
     label: 'Món Trung',
+    badgeType: EBadgeType.ERROR,
   },
   {
     key: 'vietnam-west-food',
     label: 'Món Miền Tây',
+    badgeType: EBadgeType.PROCESSING,
   },
   {
     key: 'chinese-food',
     label: 'Hoa',
+    badgeType: EBadgeType.WARNING,
   },
   {
     key: 'thai-food',
     label: 'Thái',
+    badgeType: EBadgeType.WARNING,
   },
   {
     key: 'korean-food',
     label: 'Hàn quốc',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'japanese-food',
     label: 'Nhật Bản',
+    badgeType: EBadgeType.WARNING,
   },
   {
     key: 'indian-food',
     label: 'Ấn độ',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'french-food',
     label: 'Pháp',
+    badgeType: EBadgeType.PROCESSING,
   },
   {
     key: 'mediterranean-food',
     label: 'Địa Trung Hải',
+    badgeType: EBadgeType.ERROR,
   },
   {
     key: 'italian-food',
     label: 'Ý',
+    badgeType: EBadgeType.DEFAULT,
   },
   {
     key: 'barbeque',
     label: 'BBQ',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'sea-food',
     label: 'Hải sản',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'international-food',
     label: 'Quốc Tế',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'europe-food',
     label: 'Âu',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'asian-food',
     label: 'Á',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'vegetarian-food',
     label: 'Chay',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'macrobiotic-food',
     label: 'Thực dưỡng',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'halal',
     label: 'Halal',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'keto',
     label: 'keto',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'dessert',
     label: 'Tráng miệng',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: 'snack',
     label: 'Ăn vặt',
+    badgeType: EBadgeType.SUCCESS,
   },
   {
     key: OTHER_OPTION,
@@ -598,13 +627,21 @@ export const MENU_OPTIONS = [
 ];
 
 export enum EOrderStates {
-  draft = 'draft',
-  isNew = 'isNew',
   canceled = 'canceled',
+  canceledByBooker = 'canceledByBooker',
   picking = 'picking',
   inProgress = 'inProgress',
+  pendingPayment = 'pendingPayment',
   completed = 'completed',
   reviewed = 'reviewed',
+}
+
+export enum EBookerOrderDraftStates {
+  bookerDraft = 'bookerDraft',
+}
+export enum EOrderDraftStates {
+  draft = 'draft',
+  pendingApproval = 'pendingApproval',
 }
 
 export const SPECIAL_DIET_OPTIONS = [
@@ -669,7 +706,19 @@ export const ORDER_STATES_OPTIONS = [
     label: 'Hủy',
   },
   {
-    key: EOrderStates.isNew,
+    key: EOrderStates.canceledByBooker,
+    label: 'Hủy',
+  },
+  {
+    key: EOrderDraftStates.pendingApproval,
+    label: 'Đơn mới',
+  },
+  {
+    key: EOrderDraftStates.draft,
+    label: 'Đơn nháp',
+  },
+  {
+    key: EBookerOrderDraftStates.bookerDraft,
     label: 'Đơn nháp',
   },
   {
@@ -727,3 +776,36 @@ export const MENU_MEAL_TYPE_OPTIONS = [
     label: 'Ăn xế',
   },
 ];
+
+export enum EManageCompanyOrdersTab {
+  ALL = 'all',
+  SCHEDULED = 'scheduled',
+  COMPLETED = 'completed',
+  DRAFT = 'draft',
+  CANCELED = 'canceled',
+}
+
+export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
+  [EManageCompanyOrdersTab.ALL]: [
+    EOrderDraftStates.pendingApproval,
+    EBookerOrderDraftStates.bookerDraft,
+    EOrderStates.picking,
+    EOrderStates.inProgress,
+    EOrderStates.completed,
+    EOrderStates.reviewed,
+    EOrderStates.canceled,
+  ],
+  [EManageCompanyOrdersTab.SCHEDULED]: [
+    EOrderStates.picking,
+    EOrderStates.inProgress,
+  ],
+  [EManageCompanyOrdersTab.COMPLETED]: [
+    EOrderStates.completed,
+    EOrderStates.reviewed,
+  ],
+  [EManageCompanyOrdersTab.DRAFT]: [
+    EOrderDraftStates.pendingApproval,
+    EBookerOrderDraftStates.bookerDraft,
+  ],
+  [EManageCompanyOrdersTab.CANCELED]: [EOrderStates.canceled],
+};

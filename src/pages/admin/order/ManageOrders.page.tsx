@@ -20,6 +20,7 @@ import { adminRoutes } from '@src/paths';
 import { parseTimestampToFormat } from '@utils/dates';
 import {
   EOrderDetailsStatus,
+  EOrderDraftStates,
   EOrderStates,
   getLabelByKey,
   ORDER_STATES_OPTIONS,
@@ -27,6 +28,7 @@ import {
 import type {
   TIntegrationListing,
   TIntegrationOrderListing,
+  TTableSortValue,
 } from '@utils/types';
 import { parsePrice } from '@utils/validators';
 import classNames from 'classnames';
@@ -44,24 +46,28 @@ const uniqueStrings = (array: string[]) => {
   });
 };
 
-export const BADGE_TYPE_BASE_ON_ORDER_STATE = {
+const BADGE_TYPE_BASE_ON_ORDER_STATE = {
+  [EOrderDraftStates.draft]: EBadgeType.DEFAULT,
+  [EOrderDraftStates.pendingApproval]: EBadgeType.PROCESSING,
+  [EOrderStates.canceled]: EBadgeType.DEFAULT,
+  [EOrderStates.canceledByBooker]: EBadgeType.DEFAULT,
+  [EOrderStates.completed]: EBadgeType.WARNING,
   [EOrderStates.inProgress]: EBadgeType.PROCESSING,
-  [EOrderStates.isNew]: EBadgeType.PROCESSING,
+  [EOrderStates.pendingPayment]: EBadgeType.PROCESSING,
   [EOrderStates.picking]: EBadgeType.WARNING,
   [EOrderStates.reviewed]: EBadgeType.WARNING,
-  [EOrderStates.completed]: EBadgeType.WARNING,
-  [EOrderStates.canceled]: EBadgeType.DEFAULT,
-  [EOrderStates.draft]: EBadgeType.DEFAULT,
 };
 
-export const BADGE_CLASSNAME_BASE_ON_ORDER_STATE = {
-  [EOrderStates.isNew]: css.badgeProcessing,
-  [EOrderStates.inProgress]: css.badgeInProgress,
+const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
+  [EOrderDraftStates.draft]: css.badgeDefault,
+  [EOrderDraftStates.pendingApproval]: css.badgeProcessing,
+  [EOrderStates.canceled]: css.badgeDefault,
+  [EOrderStates.canceledByBooker]: css.badgeDefault,
   [EOrderStates.completed]: css.badgeSuccess,
+  [EOrderStates.inProgress]: css.badgeInProgress,
+  [EOrderStates.pendingPayment]: css.badgeProcessing,
   [EOrderStates.picking]: css.badgeWarning,
   [EOrderStates.reviewed]: css.badgeWarning,
-  [EOrderStates.canceled]: css.badgeDefault,
-  [EOrderStates.draft]: css.badgeDefault,
 };
 
 const OrderDetailTooltip = ({
@@ -223,16 +229,12 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'state',
     label: 'Trạng thái',
-    render: ({
-      state,
-    }: {
-      state: Exclude<EOrderStates, EOrderStates.draft>;
-    }) => {
+    render: ({ state }: { state: EOrderStates | EOrderDraftStates }) => {
       return (
         <Badge
           containerClassName={classNames(
             css.badge,
-            BADGE_CLASSNAME_BASE_ON_ORDER_STATE[state],
+            BADGE_CLASS_NAME_BASE_ON_ORDER_STATE[state],
           )}
           labelClassName={css.badgeLabel}
           type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.DEFAULT}
@@ -300,7 +302,7 @@ const parseEntitiesToTableData = (
         startDate: startDate && parseTimestampToFormat(startDate),
         endDate: endDate && parseTimestampToFormat(endDate),
         staffName,
-        state: orderState || EOrderStates.isNew,
+        state: orderState || EOrderDraftStates.pendingApproval,
         orderId: entity?.id?.uuid,
         restaurants,
         subOrders,
@@ -311,12 +313,7 @@ const parseEntitiesToTableData = (
   });
 };
 
-type TSortValue = {
-  columnName: string | number;
-  type: 'asc' | 'desc';
-};
-
-const sortOrders = ({ columnName, type }: TSortValue, data: any) => {
+const sortOrders = ({ columnName, type }: TTableSortValue, data: any) => {
   const isAsc = type === 'asc';
   // eslint-disable-next-line array-callback-return
   return data.sort((a: any, b: any) => {
@@ -348,7 +345,7 @@ const ManageOrdersPage = () => {
     meta_endDate,
     meta_startDate,
   } = router.query;
-  const [sortValue, setSortValue] = useState<TSortValue>();
+  const [sortValue, setSortValue] = useState<TTableSortValue>();
   const {
     queryOrderInProgress,
     queryOrderError,

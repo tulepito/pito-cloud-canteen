@@ -36,7 +36,6 @@ $buttonBorderRadius: 8px;
   text-align: center;
   text-decoration: none;
 
-  &:focus,
   &:hover {
     text-decoration: none;
   }
@@ -58,13 +57,13 @@ $buttonBorderRadius: 8px;
     stroke-width: 3px;
   }
 
-  &:focus,
   &:hover {
     background: $neutralGray1;
     border-color: $neutralGray6;
     color: $neutralGray6;
 
-    .spinner {
+    .spinner,
+    svg {
       stroke: $neutralGray6;
     }
   }
@@ -86,7 +85,6 @@ $buttonBorderRadius: 8px;
     stroke: $neutralGray6;
   }
 
-  &:focus,
   &:hover {
     background-color: $neutralGray6;
     color: $neutralGray1;
@@ -110,7 +108,6 @@ $buttonBorderRadius: 8px;
   border: none;
   outline: none;
 
-  &:focus,
   &:hover {
     background-color: $neutralGray2;
   }
@@ -130,7 +127,6 @@ $buttonBorderRadius: 8px;
     stroke: $neutralGray1;
   }
 
-  &:focus,
   &:hover {
     background-color: $buttonCTAHoverColor;
     color: $neutralGray1;

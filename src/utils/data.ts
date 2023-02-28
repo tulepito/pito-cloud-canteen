@@ -475,11 +475,12 @@ export const User = (user: TUser | TCurrentUser) => {
   };
 };
 
-export const Listing = (listing: TListing) => {
+export const Listing = (listing: TListing | null) => {
   const ensuredListing = ensureListing(listing);
   const id = ensuredListing?.id?.uuid;
   const attributes = ensuredListing?.attributes;
   const { privateData, publicData, protectedData, metadata } = attributes || {};
+  const images = ensuredListing?.images;
 
   return {
     getId: () => {
@@ -502,6 +503,9 @@ export const Listing = (listing: TListing) => {
     },
     getPublicData: (): TObject => {
       return publicData || {};
+    },
+    getImages: () => {
+      return images || [];
     },
   };
 };

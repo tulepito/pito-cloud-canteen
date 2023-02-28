@@ -12,7 +12,11 @@ import { foodSliceThunks } from '@redux/slices/foods.slice';
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { IntegrationListing } from '@utils/data';
 import { getLabelByKey, SIDE_DISH_OPTIONS } from '@utils/enums';
-import type { TIntegrationListing, TObject } from '@utils/types';
+import type {
+  TIntegrationListing,
+  TObject,
+  TTableSortValue,
+} from '@utils/types';
 import { parsePrice } from '@utils/validators';
 import type { FormApi } from 'final-form';
 import { useRouter } from 'next/router';
@@ -44,6 +48,7 @@ const FOOD_TABLE_COLUMNS: TColumn[] = [
           {data.sideDishes.map((item: string) => (
             <FieldCheckbox
               className={css.sideDishiesCheckbox}
+              checkboxWrapperClassName={css.sideDishiesIconCheckboxWrapper}
               key={item}
               name={`${data.id}.sideDishes`}
               id={`${data.id}.${item}`}
@@ -55,12 +60,15 @@ const FOOD_TABLE_COLUMNS: TColumn[] = [
         </div>
       );
     },
+    sortable: true,
   },
   {
     key: 'price',
     label: 'Đơn giá',
     render: (data: any) => {
-      return <span>{parsePrice(data.price.amount)}đ</span>;
+      return (
+        <span className={css.priceRow}>{parsePrice(data.price.amount)}đ</span>
+      );
     },
   },
 ];
@@ -85,14 +93,41 @@ const renderPickedFoods = (ids: string[], foods: TIntegrationListing[]) => {
   });
 };
 
+const sortFoods = ({ columnName, type }: TTableSortValue, data: any) => {
+  const isAsc = type === 'asc';
+  // eslint-disable-next-line array-callback-return
+  return data.sort((a: any, b: any) => {
+    if (typeof a.data[columnName] === 'number') {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      isAsc
+        ? b.data[columnName] - a.data[columnName]
+        : a.data[columnName] - b.data[columnName];
+    } else if (typeof a.data[columnName] === 'string') {
+      if (a.data[columnName] < b.data[columnName]) {
+        return isAsc ? -1 : 1;
+      }
+      if (a.data[columnName] > b.data[columnName]) {
+        return isAsc ? 1 : -1;
+      }
+      return 0;
+    }
+  });
+};
+
 const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
   const { isOpen, handleClose, currentMenu, values, form, currentDate } = props;
   const dispatch = useAppDispatch();
   const [page, setPage] = useState<number>(1);
   const [keywords, setKeywords] = useState<string>('');
+  const [sortValue, setSortValue] = useState<TTableSortValue>();
   const intl = useIntl();
   const foods = useAppSelector((state) => state.foods.foods, shallowEqual);
-
+  const handleSort = (columnName: string | number) => {
+    setSortValue({
+      columnName,
+      type: sortValue?.type === 'asc' ? 'desc' : 'asc',
+    });
+  };
   const queryFoodsInProgress = useAppSelector(
     (state) => state.foods.queryFoodsInProgress,
     shallowEqual,
@@ -104,6 +139,9 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
   );
 
   const tableData = parseEntitiesToTableData(foods);
+
+  const sortedData = sortValue ? sortFoods(sortValue, tableData) : tableData;
+
   const router = useRouter();
   const { restaurantId } = router.query;
 
@@ -223,18 +261,18 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
 
   return (
     <Modal
+      contentClassName={css.modalContent}
       containerClassName={css.modal}
       isOpen={isOpen}
+      title={<FormattedMessage id="AddFoodModal.title" />}
       handleClose={handleCloseModal}>
-      <h2 className={css.title}>
-        <FormattedMessage id="AddFoodModal.title" />
-      </h2>
       <p className={css.description}>
         <FormattedMessage id="AddFoodModal.description" />
       </p>
       <KeywordSearchForm
         onSubmit={onSubmitSearchForm}
         className={css.keywordForm}
+        hideButton
       />
       {queryFoodsInProgress ? (
         <LoadingContainer />
@@ -242,8 +280,9 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
         <div className={css.foodPickContainer}>
           <div className={css.tableContainer}>
             <Table
+              tableHeadRowClassName={css.tableHeadRow}
               columns={FOOD_TABLE_COLUMNS}
-              data={tableData}
+              data={sortedData}
               hasCheckbox
               values={values}
               form={form as FormApi}
@@ -251,6 +290,8 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
               tableBodyCellClassName={css.tableBodyCell}
               afterCheckboxChangeHandler={afterCheckboxChangeHandler}
               tableWrapperClassName={css.tableWrapper}
+              tableClassName={css.table}
+              handleSort={handleSort}
             />
             {pagination && pagination.totalPages > 1 && (
               <Pagination
@@ -264,39 +305,43 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
           </div>
           <div className={css.pickedFoodContainer}>
             <div className={css.title}>Món đã chọn</div>
-            <div className={css.foodsByDate}>
-              {queryMenuPickedFoodsInProgress ? (
-                <LoadingContainer className={css.loadingContainer} />
-              ) : (
-                foodsByDate.map((f) => {
-                  return (
-                    <FieldPickedFood
-                      id={f?.id?.uuid}
-                      title={f?.attributes.title}
-                      key={f?.id?.uuid}
-                      price={f?.attributes?.price?.amount}
-                      onRemovePickedFood={onRemovePickedFood}
-                    />
-                  );
-                })
-              )}
-            </div>
-            <div className={css.modalButton}>
-              {foodsByDate.length > 10 && (
-                <ErrorMessage
-                  message={intl.formatMessage({
-                    id: 'AddFoodModal.maxFood',
-                  })}
-                />
-              )}
-              <div className={css.buttonWrapper}>
-                <Button
-                  type="button"
-                  disabled={foodsByDate.length > 10}
-                  onClick={savePickedFoods}
-                  className={css.button}>
-                  <FormattedMessage id="AddFoodModal.modalButton" />
-                </Button>
+            <div className={css.pickedFoodWrapper}>
+              <div className={css.listChoosenFoods}>
+                {queryMenuPickedFoodsInProgress ? (
+                  <LoadingContainer className={css.loadingContainer} />
+                ) : foodsByDate.length > 0 ? (
+                  foodsByDate.map((f) => {
+                    return (
+                      <FieldPickedFood
+                        id={f?.id?.uuid}
+                        title={f?.attributes.title}
+                        key={f?.id?.uuid}
+                        price={f?.attributes?.price?.amount}
+                        onRemovePickedFood={onRemovePickedFood}
+                      />
+                    );
+                  })
+                ) : (
+                  <p>Bạn chưa chọn món nào</p>
+                )}
+              </div>
+              <div className={css.modalButton}>
+                {foodsByDate.length > 10 && (
+                  <ErrorMessage
+                    message={intl.formatMessage({
+                      id: 'AddFoodModal.maxFood',
+                    })}
+                  />
+                )}
+                <div className={css.buttonWrapper}>
+                  <Button
+                    type="button"
+                    disabled={foodsByDate.length > 10}
+                    onClick={savePickedFoods}
+                    className={css.button}>
+                    <FormattedMessage id="AddFoodModal.modalButton" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

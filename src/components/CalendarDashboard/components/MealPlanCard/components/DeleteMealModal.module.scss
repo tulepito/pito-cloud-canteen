@@ -24,3 +24,17 @@
     max-width: 400px;
   }
 }
+
+.confirmBtnWrapper {
+  display: flex;
+  align-items: center;
+
+  span {
+    margin-right: 8px;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}

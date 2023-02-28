@@ -2,24 +2,33 @@ import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import Form from '@components/Form/Form';
 import { IntegrationListing } from '@utils/data';
 import { parseTimestampToFormat } from '@utils/dates';
-import { EMenuTypes, getLabelByKey, MENU_OPTIONS } from '@utils/enums';
+import { getLabelByKey, MENU_OPTIONS } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
-import { DateTime } from 'luxon';
+import type { FormApi } from 'final-form';
+import { useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 
-import DayOfWeekCalendarHeader from '../DayOfWeekCalendarHeader/DayOfWeekCalendarHeader';
-import useQueryMenuPickedFoods from '../EditPartnerMenuWizard/useQueryMenuPickedFoods';
-import type { TEditMenuPricingCalendarResources } from '../EditPartnerMenuWizard/utils';
-import {
-  createInitialValuesForFoodsByDate,
-  renderValuesForFoodsByDate,
-} from '../EditPartnerMenuWizard/utils';
+import AddFoodModal from '../AddFoodModal/AddFoodModal';
+import CalendarContentEnd from '../CalendarContentEnd/CalendarContentEnd';
+import CalendarContentStart from '../CalendarContentStart/CalendarContentStart';
+import { renderResourcesForCalendar } from '../EditPartnerMenuWizard/utils';
 import FoodEventCard from '../FoodEventCard/FoodEventCard';
 import css from './EditMenuCompleteForm.module.scss';
 
-export type TEditMenuCompleteFormValues = {};
+export type TEditMenuCompleteFormValues = {
+  rowCheckbox: string[];
+  [id: string]: any;
+};
+
+type TFoodResource = {
+  title: string;
+  sideDishes: string[];
+  id: string;
+  price: number;
+  foodNote?: string;
+};
 
 type TExtraProps = {
   currentMenu?: TIntegrationListing | null;
@@ -31,161 +40,149 @@ type TEditMenuCompleteFormComponentProps =
 type TEditMenuCompleteFormProps = FormProps<TEditMenuCompleteFormValues> &
   TExtraProps;
 
-const renderResourcesForCalendar = (foodsByDate: any) => {
-  const resourses: {
-    resource: TEditMenuPricingCalendarResources;
-    start: Date;
-    end: Date;
-  }[] = [];
-
-  if (!foodsByDate) return;
-  Object.keys(foodsByDate).forEach((key) => {
-    Object.keys(foodsByDate[key]).forEach((foodKey) => {
-      resourses.push({
-        resource: {
-          id: foodsByDate[key][foodKey]?.id,
-          title: foodsByDate[key][foodKey]?.title,
-          hideRemoveButton: true,
-          sideDishes: foodsByDate[key][foodKey]?.sideDishes || [],
-        },
-        start: DateTime.fromMillis(Number(key)).toJSDate(),
-        end: DateTime.fromMillis(Number(key)).plus({ hour: 1 }).toJSDate(),
-      });
-    });
-  });
-  return resourses;
-};
-
 const EditMenuCompleteFormComponent: React.FC<
   TEditMenuCompleteFormComponentProps
 > = (props) => {
-  const { handleSubmit, currentMenu, formRef, form, restaurantId } = props;
+  const { handleSubmit, currentMenu, formRef, form, values } = props;
   formRef.current = form;
+  const [currentDate, setCurrentDate] = useState<number | null>();
   const { title } = IntegrationListing(currentMenu).getAttributes();
   const { menuType } = IntegrationListing(currentMenu).getMetadata();
   const { startDate, endDate } =
     IntegrationListing(currentMenu).getPublicData();
 
-  const {
-    monFoodIdList = [],
-    tueFoodIdList = [],
-    wedFoodIdList = [],
-    thuFoodIdList = [],
-    friFoodIdList = [],
-    satFoodIdList = [],
-    sunFoodIdList = [],
-  } = IntegrationListing(currentMenu).getMetadata();
+  const { daysOfWeek } = IntegrationListing(currentMenu).getPublicData();
+  const { foodsByDate } = values;
+  const onRemovePickedFood = (removeId: string, date: Date) => {
+    const currentDateAsTimestamp = date.getTime();
+    const pickedFoodsOnDate = { ...values.foodsByDate[currentDateAsTimestamp] };
+    Object.keys(pickedFoodsOnDate).forEach((keyId: string) => {
+      if (removeId === keyId) {
+        delete pickedFoodsOnDate[removeId];
+        const newFoodsByDate = {
+          ...values.foodsByDate,
+          [currentDateAsTimestamp]: {
+            ...pickedFoodsOnDate,
+          },
+        };
 
-  const getFoodsByDateIds = () => {
-    return [
-      ...monFoodIdList,
-      ...tueFoodIdList,
-      ...wedFoodIdList,
-      ...thuFoodIdList,
-      ...friFoodIdList,
-      ...satFoodIdList,
-      ...sunFoodIdList,
-    ];
+        form.change('foodsByDate', newFoodsByDate);
+      }
+    });
   };
 
-  const { menuPickedFoods } = useQueryMenuPickedFoods({
-    restaurantId: restaurantId as string,
-    ids: getFoodsByDateIds(),
+  const resourcesForCalendar = renderResourcesForCalendar(foodsByDate, {
+    onRemovePickedFood,
+    daysOfWeek,
   });
+  const onSetCurrentDate = (params: any) => () => {
+    const { date, events } = params;
+    const dateAsTimeStaimp = new Date(date).getTime();
+    setCurrentDate(dateAsTimeStaimp);
+    const currentDayEvents = events.filter(
+      (e: any) => new Date(e.start).getTime() === new Date(date).getTime(),
+    );
+    const listIds = currentDayEvents.map((e: any) => e.resource.id);
+    const listIdsWithSideDishes = currentDayEvents.map((e: any) => e.resource);
+    form.change('rowCheckbox', listIds);
+    listIdsWithSideDishes.forEach(
+      ({ id, sideDishes = [], foodNote }: TFoodResource) => {
+        form.change(`${id}.foodNote`, foodNote);
+        return form.change(`${id}.sideDishes`, sideDishes);
+      },
+    );
+  };
 
-  const initialFoodsByDate = createInitialValuesForFoodsByDate({
-    monFoodIdList,
-    tueFoodIdList,
-    wedFoodIdList,
-    thuFoodIdList,
-    friFoodIdList,
-    satFoodIdList,
-    sunFoodIdList,
-  });
-
-  const foodsByDateToRender = renderValuesForFoodsByDate(
-    initialFoodsByDate,
-    menuPickedFoods,
-  );
-
-  const resourcesForCalendar = renderResourcesForCalendar(foodsByDateToRender);
-
-  const isFixedMenu = menuType === EMenuTypes.fixedMenu;
+  const onCloseModal = () => {
+    setCurrentDate(null);
+  };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <div className={css.root}>
-        <div className={css.devidedSection}>
-          <h3 className={css.sectionTitle}>
-            <FormattedMessage id="EditMenuCompleteForm.menuInformation" />
-          </h3>
-          <div className={css.content}>
-            <div className={css.titleGroup}>
-              <label className={css.label}>
-                <FormattedMessage id="EditMenuCompleteForm.menuName" />
-              </label>
-              <div className={css.title}>{title}</div>
-            </div>
-            <div className={css.titleGroup}>
-              <label className={css.label}>
-                <FormattedMessage id="EditMenuCompleteForm.menuType" />
-              </label>
-              <div>{getLabelByKey(MENU_OPTIONS, menuType)}</div>
-            </div>
-          </div>
-        </div>
-        <div className={css.devidedSection}>
-          <h3 className={css.sectionTitle}>
-            <FormattedMessage id="EditMenuCompleteForm.applyTime" />
-          </h3>
-          <div className={css.content}>
-            <div className={css.titleGroup}>
-              <label className={css.label}>
-                <FormattedMessage id="EditMenuCompleteForm.startDate" />
-              </label>
-              <div className={css.title}>
-                {startDate &&
-                  parseTimestampToFormat(startDate, 'EEE, dd MMMM, yyyy')}
+    <>
+      <Form onSubmit={handleSubmit}>
+        <div className={css.root}>
+          <div className={css.devidedSection}>
+            <h3 className={css.sectionTitle}>
+              <FormattedMessage id="EditMenuCompleteForm.menuInformation" />
+            </h3>
+            <div className={css.content}>
+              <div className={css.titleGroup}>
+                <label className={css.label}>
+                  <FormattedMessage id="EditMenuCompleteForm.menuName" />
+                </label>
+                <div className={css.title}>{title}</div>
               </div>
-            </div>
-            {!isFixedMenu && (
               <div className={css.titleGroup}>
                 <label className={css.label}>
                   <FormattedMessage id="EditMenuCompleteForm.menuType" />
+                </label>
+                <div>{getLabelByKey(MENU_OPTIONS, menuType)}</div>
+              </div>
+            </div>
+          </div>
+          <div className={css.devidedSection}>
+            <h3 className={css.sectionTitle}>
+              <FormattedMessage id="EditMenuCompleteForm.applyTime" />
+            </h3>
+            <div className={css.content}>
+              <div className={css.titleGroup}>
+                <label className={css.label}>
+                  <FormattedMessage id="EditMenuCompleteForm.startDate" />
+                </label>
+                <div className={css.title}>
+                  {startDate &&
+                    parseTimestampToFormat(startDate, 'EEE, dd MMMM, yyyy')}
+                </div>
+              </div>
+              <div className={css.titleGroup}>
+                <label className={css.label}>
+                  <FormattedMessage id="EditMenuCompleteForm.endDateLabel" />
                 </label>
                 <div>
                   {endDate &&
                     parseTimestampToFormat(endDate, 'EEE, dd MMMM, yyyy')}
                 </div>
               </div>
+            </div>
+          </div>
+          <div className={css.devidedSection}>
+            <h3 className={css.sectionTitle}>
+              <FormattedMessage id="EditMenuCompleteForm.foodList" />
+            </h3>
+            {currentMenu && (
+              <CalendarDashboard
+                renderEvent={FoodEventCard}
+                events={resourcesForCalendar}
+                components={{
+                  toolbar: () => <></>,
+                  contentEnd: (contentProps: any) => (
+                    <CalendarContentEnd
+                      {...contentProps}
+                      currentMenu={currentMenu}
+                    />
+                  ),
+                  contentStart: (contentProps: any) => (
+                    <CalendarContentStart
+                      {...contentProps}
+                      currentMenu={currentMenu}
+                      onSetCurrentDate={onSetCurrentDate}
+                    />
+                  ),
+                }}
+              />
             )}
           </div>
         </div>
-        <div className={css.devidedSection}>
-          <h3 className={css.sectionTitle}>
-            <FormattedMessage id="EditMenuCompleteForm.foodList" />
-          </h3>
-          <CalendarDashboard
-            headerComponent={(params) => (
-              <DayOfWeekCalendarHeader {...params} />
-            )}
-            renderEvent={FoodEventCard}
-            events={resourcesForCalendar}
-            components={{
-              toolbar: () => <></>,
-              contentEnd: ({ events = [] }) => {
-                const noFood = events.length === 0;
-                return noFood ? (
-                  <div className={css.noFood}>Chưa có món ăn</div>
-                ) : (
-                  <></>
-                );
-              },
-            }}
-          />
-        </div>
-      </div>
-    </Form>
+      </Form>
+      <AddFoodModal
+        isOpen={!!currentDate}
+        handleClose={onCloseModal}
+        currentMenu={currentMenu as TIntegrationListing}
+        values={values}
+        form={form as unknown as FormApi}
+        currentDate={currentDate}
+      />
+    </>
   );
 };
 

@@ -10,7 +10,7 @@
 }
 
 .top {
-  margin: 20px 0 10px 0;
+  margin: 0 0 10px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -78,6 +78,11 @@
         fill: $neutralGray1;
       }
     }
+
+    .iconEdit {
+      width: 17px;
+      height: auto;
+    }
   }
 }
 
@@ -120,6 +125,11 @@
   overflow: hidden;
 }
 
+.boldTextRow {
+  font-weight: $fontWeightBold;
+  color: #2f54eb;
+}
+
 .keywordInput {
   width: 100%;
 }
@@ -131,4 +141,63 @@
     height: auto;
     fill: $neutralGray1;
   }
+}
+
+.filterWrapper {
+  margin-bottom: 24px;
+}
+
+.badgeContainer {
+  border-radius: 100px;
+  background-color: $neutralGray3 !important;
+  max-width: 93px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .badgeLabel {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600 !important;
+    color: $neutralGray5 !important;
+  }
+  &.badgeContainerActive {
+    max-width: 77px !important;
+    background-color: $singleUseBadgeGreen1 !important;
+    .badgeLabel {
+      color: $singleUseBadgeGreen2 !important;
+    }
+  }
+}
+
+.memberName {
+  font-weight: $fontWeightBold;
+  margin-bottom: 2px;
+}
+
+.membersCount {
+  font-weight: $fontWeightBold;
+  margin-top: 4px;
+}
+
+.memberEmail,
+.memberPhoneNumber {
+  color: $neutralGray5;
+}
+
+.tableWrapper {
+  @include viewportMedium {
+    max-width: calc(100vw - 350px);
+    overflow-x: scroll;
+    position: relative;
+  }
+}
+
+.table {
+  @include viewportMedium {
+    min-width: 1440px;
+  }
+}
+
+.row {
+  max-width: 200px;
 }

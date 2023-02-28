@@ -171,7 +171,7 @@ export const companyPaths = {
   Home: '/company',
   Detail: '/company/[companyId]',
   Account: '/company/[companyId]/account',
-  ManageOrders: '/company/orders',
+  ManageOrders: '/company/[companyId]/orders',
   ManageOrderDetail: '/company/orders/[orderId]',
   GroupSetting: '/company/[companyId]/group-setting',
   Logo: '/company/[companyId]/logo',
@@ -179,6 +179,7 @@ export const companyPaths = {
   MembersDetail: '/company/[companyId]/members/[memberEmail]',
   CreateNewOrder: '/company/booker/orders/new',
   EditDraftOrder: '/company/booker/orders/draft/[orderId]',
+  OrderSelectRestaurant: '/company/booker/orders/draft/[orderId]/restaurants',
   GroupDetail: '/company/[companyId]/group-setting',
   GroupMemberDetail:
     '/company/[companyId]/group-setting/[groupId]/member/[memberId]',

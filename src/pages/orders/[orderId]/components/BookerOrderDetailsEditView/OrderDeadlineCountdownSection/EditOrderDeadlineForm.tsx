@@ -29,13 +29,14 @@ type TEditOrderDeadlineFormProps = FormProps<TEditOrderDeadlineFormValues> &
 const EditOrderDeadlineFormComponent: React.FC<
   TEditOrderDeadlineFormComponentProps
 > = (props) => {
-  const intl = useIntl();
   const { handleSubmit, startDate, values, form } = props;
+
+  const intl = useIntl();
+
   const today = new Date();
   const maxSelectedDate = DateTime.fromMillis(startDate!)
     .minus({ day: 2 })
     .toJSDate();
-
   const buttonDisabled = today.getTime() >= values.deadlineDate;
 
   const handleDeadlineDateChange = (date: number) => {

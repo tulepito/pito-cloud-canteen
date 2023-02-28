@@ -16,6 +16,7 @@ const orderChecker =
       const [currentUser] = denormalisedResponseEntities(currentUserResponse);
       const { isAdmin = false } = User(currentUser).getMetadata();
       const { company = {} } = User(currentUser).getMetadata();
+
       switch (apiMethod) {
         case HTTP_METHODS.POST: {
           if (!companyId) {
