@@ -47,9 +47,10 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
     clientId,
   } = props;
   const intl = useIntl();
-  const updateOrderInProgress = useAppSelector(
-    (state) => state.Order.updateOrderInProgress,
+  const step2SubmitInProgress = useAppSelector(
+    (state) => state.Order.step2SubmitInProgress,
   );
+
   const { pickAllow: pickAllowValue = true } = values;
   return (
     <Form onSubmit={handleSubmit}>
@@ -133,7 +134,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
         )}
       </div>
 
-      <NavigateButtons inProgress={updateOrderInProgress} />
+      <NavigateButtons inProgress={step2SubmitInProgress} />
     </Form>
   );
 };
