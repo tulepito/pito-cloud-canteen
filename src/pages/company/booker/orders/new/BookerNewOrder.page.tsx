@@ -25,6 +25,7 @@ function BookerNewOrderPage() {
 
   const { myCompanies = [], queryInprogress: queryCompanyInprogress } =
     useLoadCompanies();
+  console.log('🚀 ~ BookerNewOrderPage ~ myCompanies:', myCompanies);
 
   const normalizedCompanies = myCompanies.map((company) => ({
     id: company?.id?.uuid,
@@ -76,21 +77,9 @@ function BookerNewOrderPage() {
         <div className={css.modalContent}>
           <CreateOrderForm
             companies={normalizedCompanies}
-            previousOrders={[
-              {
-                id: '1234',
-                name: 'Chu Tuan',
-              },
-              {
-                id: '1235',
-                name: 'Journey Horizon',
-              },
-            ]}
+            previousOrders={[]}
             onSubmit={handleSubmit}
             onCancel={handleCancel}
-            initialValues={{
-              company: '1235',
-            }}
             queryInprogress={queryCompanyInprogress}
             submitInprogress={createOrderInProcess}
             submitError={createOrderError}
