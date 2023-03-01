@@ -161,7 +161,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       : 'Tài khoản cá nhân';
   return (
     <>
-      <CompanyHeader />
+      <CompanyHeader showBottomLine={!showFeatureHeader} />
       {showFeatureHeader && <FeaturesHeader headerData={featureHeaderData} />}
       {showSidebar && <CompanySidebar companyName={companyName!} />}
       <CompanyMainContent

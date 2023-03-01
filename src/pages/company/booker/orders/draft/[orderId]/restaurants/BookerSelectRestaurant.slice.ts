@@ -61,6 +61,8 @@ type TOrderInitialState = {
   fetchRestaurantFoodError: any;
 
   currentMenuId?: string;
+  searchFoodInRestaurantInProgress: boolean;
+  searchFoodInRestaurantError: any;
 };
 
 const initialState: TOrderInitialState = {
@@ -96,6 +98,8 @@ const initialState: TOrderInitialState = {
   fetchRestaurantFoodError: null,
 
   currentMenuId: undefined,
+  searchFoodInRestaurantInProgress: false,
+  searchFoodInRestaurantError: null,
 };
 
 // ================ Thunk types ================ //
@@ -108,6 +112,8 @@ const FETCH_PLAN_DETAIL = 'app/BookerSelectRestaurant/FETCH_PLAN_DETAIL';
 const UPDATE_PLAN_DETAIL = 'app/BookerSelectRestaurant/UPDATE_PLAN_DETAIL';
 const FETCH_COMPANY_FROM_ORDER =
   'app/BookerSelectRestaurant/FETCH_COMPANY_FROM_ORDER';
+const SEARCH_FOOD_IN_RESTAURANT =
+  'app/BookerSelectRestaurant/SEARCH_FOOD_IN_RESTAURANT';
 
 // ================ Async thunks ================ //
 const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
@@ -267,6 +273,27 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
   },
 );
 
+const searchFoodInRestaurant = createAsyncThunk(
+  SEARCH_FOOD_IN_RESTAURANT,
+  async (params: any, { extra: sdk, getState }) => {
+    const { restaurantFood = {} } = getState().BookerSelectRestaurant;
+    const { restaurantId, keywords } = params;
+    const response = await sdk.listings.query({
+      meta_listingType: ListingTypes.FOOD,
+      meta_restaurantId: restaurantId,
+      include: ['images'],
+      'fields.image': ['variants.default'],
+      keywords,
+    });
+    const result = denormalisedResponseEntities(response);
+    const newRestaurantFoodList = {
+      ...restaurantFood,
+      [restaurantId]: result,
+    };
+    return newRestaurantFoodList;
+  },
+);
+
 export const BookerSelectRestaurantThunks = {
   fetchSearchFilter,
   searchRestaurants,
@@ -277,6 +304,7 @@ export const BookerSelectRestaurantThunks = {
   updatePlanDetail,
 
   fetchCompanyAccount,
+  searchFoodInRestaurant,
 };
 
 const BookerSelectRestaurantSlice = createSlice({
@@ -383,6 +411,19 @@ const BookerSelectRestaurantSlice = createSlice({
       .addCase(fetchFoodListFromRestaurant.rejected, (state, { payload }) => {
         state.fetchRestaurantFoodInProgress = false;
         state.fetchRestaurantFoodError = payload;
+      })
+
+      .addCase(searchFoodInRestaurant.pending, (state) => {
+        state.searchFoodInRestaurantInProgress = true;
+        state.searchFoodInRestaurantError = null;
+      })
+      .addCase(searchFoodInRestaurant.fulfilled, (state, { payload }) => {
+        state.restaurantFood = payload;
+        state.searchFoodInRestaurantInProgress = false;
+      })
+      .addCase(searchFoodInRestaurant.rejected, (state, { error }) => {
+        state.searchFoodInRestaurantInProgress = false;
+        state.searchFoodInRestaurantError = error.message;
       });
   },
 });

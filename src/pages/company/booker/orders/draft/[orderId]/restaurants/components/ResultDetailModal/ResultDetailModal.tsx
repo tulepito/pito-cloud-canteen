@@ -36,6 +36,7 @@ type TResultDetailModalProps = {
     lng: number;
   };
   totalRatings: any[];
+  onSearchSubmit?: (value: string, restaurantId: string) => void;
 };
 
 const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
@@ -46,6 +47,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   restaurants,
   companyGeoOrigin,
   totalRatings,
+  onSearchSubmit,
 }) => {
   const intl = useIntl();
 
@@ -205,6 +207,13 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     }
   }, [isOpen]);
 
+  const onCustomSearchSubmit = useCallback(
+    (keyword: string) => {
+      onSearchSubmit?.(keyword, selectedRestaurantId!);
+    },
+    [onSearchSubmit, selectedRestaurantId],
+  );
+
   return (
     <>
       <Modal
@@ -244,6 +253,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
               onSelectAllFood={handleSelectFoods}
               selectedFoodIds={selectedFoods}
               originFoodIdList={originFoodIdList}
+              onSearchSubmit={onCustomSearchSubmit}
             />
             <FoodListSection
               foodList={foodList}

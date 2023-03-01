@@ -28,7 +28,7 @@ const CollapseFilter: React.FC<CollapseFilterProps> = (props) => {
       <div className={css.header}>
         <div className={css.title}>{title}</div>
         <div onClick={toggleOptionsCollapse}>
-          <IconArrow direction="down" className={iconClasses} />
+          <IconArrow direction="up" className={iconClasses} />
         </div>
       </div>
       <div className={optionsClasses}>

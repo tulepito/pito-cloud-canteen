@@ -86,6 +86,15 @@ const ResultList: React.FC<TResultListProps> = ({
     }
   };
 
+  const onSearchSubmit = (keywords: string, _restaurantId: string) => {
+    dispatch(
+      BookerSelectRestaurantThunks.searchFoodInRestaurant({
+        keywords,
+        restaurantId: _restaurantId,
+      }),
+    );
+  };
+
   const classes = classNames(css.root, className);
 
   return (
@@ -119,6 +128,7 @@ const ResultList: React.FC<TResultListProps> = ({
         restaurants={restaurants}
         companyGeoOrigin={companyGeoOrigin}
         totalRatings={totalRatings}
+        onSearchSubmit={onSearchSubmit}
       />
     </>
   );

@@ -11,10 +11,14 @@
   top: 0;
   left: 0;
   background-color: $neutralGray1;
-  z-index: 49;
+  z-index: 101;
 
   @include viewportLarge {
     height: 81px;
+  }
+
+  &.bottomLine {
+    border-bottom: 1px solid $neutralGray5;
   }
 
   .headerRight {

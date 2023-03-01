@@ -12,6 +12,7 @@ type TResultDetailFiltersProps = {
   originFoodIdList: string[];
   initialValues?: TResultDetailFiltersValues;
   onSelectAllFood?: (foodIds: string[]) => void;
+  onSearchSubmit?: (values: string) => void;
 };
 
 export type TResultDetailFiltersValues = {
@@ -24,10 +25,13 @@ const ResultDetailFilters: React.FC<TResultDetailFiltersProps> = ({
   originFoodIdList,
   initialValues,
   onSelectAllFood = () => null,
+  onSearchSubmit,
 }) => {
   const intl = useIntl();
 
-  const handleSearch = () => {};
+  const handleSearch = (values: TResultDetailFiltersValues) => {
+    onSearchSubmit?.(values.keyword!);
+  };
 
   const { form, handleSubmit } = useForm<TResultDetailFiltersValues>({
     onSubmit: handleSearch,
