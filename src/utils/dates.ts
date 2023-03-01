@@ -174,6 +174,8 @@ export const generateTimeOptions = () => {
   return options;
 };
 
+export const TimeOptions = generateTimeOptions();
+
 export const getDayInWeekFromPeriod = (start: number, end: number) => {
   if (!start || !end) return [];
   const startDateObj = new Date(start);

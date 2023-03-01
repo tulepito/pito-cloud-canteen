@@ -50,7 +50,7 @@ function BookerDraftOrderPage() {
     endDate,
   });
 
-  const isFinishOrderDisabled = isEnableSubmitPublishOrder(
+  const isFinishOrderDisabled = !isEnableSubmitPublishOrder(
     order as TListing,
     orderDetail,
   );
