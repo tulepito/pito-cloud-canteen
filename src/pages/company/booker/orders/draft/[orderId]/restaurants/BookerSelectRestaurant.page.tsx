@@ -27,7 +27,7 @@ function BookerSelectRestaurant() {
     useSearchRestaurants();
   const onGoBack = () => {
     router.push({
-      pathname: companyPaths.ManageOrderDetail,
+      pathname: companyPaths.EditDraftOrder,
       query: {
         orderId,
       },

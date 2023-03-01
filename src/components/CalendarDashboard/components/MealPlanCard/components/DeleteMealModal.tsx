@@ -7,6 +7,7 @@ import css from './DeleteMealModal.module.scss';
 type TDeleteMealModalProps = {
   isOpen: boolean;
   removeInprogress?: boolean;
+  deleteDate: string;
   onClose?: () => void;
   onDelete: () => void;
 };
@@ -16,6 +17,7 @@ const DeleteMealModal: React.FC<TDeleteMealModalProps> = ({
   removeInprogress,
   onClose = () => null,
   onDelete,
+  deleteDate,
 }) => {
   const intl = useIntl();
 
@@ -54,7 +56,12 @@ const DeleteMealModal: React.FC<TDeleteMealModalProps> = ({
         title={intl.formatMessage({
           id: 'MealPlanCard.DeleteMealModal.title',
         })}>
-        <div className={css.modalContent}></div>
+        <div className={css.modalContent}>
+          {intl.formatMessage(
+            { id: 'DeleteMealModal.content' },
+            { deleteDate },
+          )}
+        </div>
       </AlertModal>
     </div>
   );
