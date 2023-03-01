@@ -442,7 +442,7 @@ export const CurrentUser = (user: TCurrentUser) => {
 export const User = (user: TUser | TCurrentUser) => {
   const ensuredUser = ensureUser(user);
   const id = ensuredUser?.id?.uuid;
-  const { attributes } = ensuredUser;
+  const { attributes, profileImage } = ensuredUser;
   const { profile } = attributes;
   const { privateData, publicData, protectedData, metadata } =
     profile as TObject;
@@ -471,6 +471,9 @@ export const User = (user: TUser | TCurrentUser) => {
     },
     getPublicData: (): TObject => {
       return publicData || {};
+    },
+    getProfileImage: () => {
+      return profileImage || null;
     },
   };
 };

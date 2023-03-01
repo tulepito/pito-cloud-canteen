@@ -14,12 +14,32 @@
   z-index: 1;
   color: $neutralGray6;
   background-color: $neutralGray1;
+  border-radius: 8px;
 
   .item {
     padding: 8px 16px;
-
+    @include flexAlign(center);
+    gap: 12px;
     &:hover {
-      background-color: $neutralGray4;
+      background-color: $neutralGray2;
+    }
+    &:first-child {
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+    &:last-child {
+      &:hover {
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
     }
   }
+}
+
+.logo {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  border-radius: 100%;
+  overflow: hidden;
 }
