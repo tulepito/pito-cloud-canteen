@@ -7,6 +7,7 @@ import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TImageActionPayload } from '@redux/slices/uploadImage.slice';
 import { uploadImageThunks } from '@redux/slices/uploadImage.slice';
+import { User } from '@utils/data';
 import { isUploadImageOverLimitError } from '@utils/errors';
 import type { TCurrentUser, TUser } from '@utils/types';
 import {
@@ -123,6 +124,9 @@ const ContactPointProfileFormComponent: React.FC<
       </div>
     ) : (
       <div className={css.avatarPlaceholder}>
+        <div className={css.textLabel}>
+          {User(bookerAccount as TUser).getProfile().abbreviatedName}
+        </div>
         <div className={css.camera}>
           <Icons.Camera />
         </div>
