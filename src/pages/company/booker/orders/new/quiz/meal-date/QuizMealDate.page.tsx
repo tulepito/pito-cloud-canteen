@@ -72,9 +72,11 @@ const QuizMealDate = () => {
         generalInfo: {
           ...quiz,
           ...formValues,
-          deadlineDate: DateTime.fromMillis(deadlineDate).plus({
-            ...convertHHmmStringToTimeParts(deadlineHour),
-          }),
+          deadlineDate: DateTime.fromMillis(deadlineDate)
+            .plus({
+              ...convertHHmmStringToTimeParts(deadlineHour),
+            })
+            .toMillis(),
           deliveryAddress: User(selectedCompany).getPublicData().location || {},
           dayInWeek: selectedDays,
         },
