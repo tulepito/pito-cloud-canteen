@@ -90,6 +90,11 @@
     font-weight: $fontWeightBold;
   }
 }
+
+.tabDisabled {
+  cursor: not-allowed;
+}
+
 .tabPanel {
   margin: 0;
 }

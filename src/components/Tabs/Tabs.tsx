@@ -32,6 +32,7 @@ type ITabsProps = {
   className?: string;
   navigationStartClassName?: string;
   navigationEndClassName?: string;
+  disabled?: boolean;
 };
 
 const Tabs: React.FC<ITabsProps> = (props) => {
@@ -49,10 +50,14 @@ const Tabs: React.FC<ITabsProps> = (props) => {
     middleLabel,
     navigationStartClassName,
     navigationEndClassName,
+    disabled = false,
   } = props;
   const [activeTabKey, setActiveTabKey] = useState(defaultActiveKey || 1);
 
   const onChangeTab = (tabKey: number) => () => {
+    if (disabled) {
+      return;
+    }
     setActiveTabKey(tabKey);
     onChange(items[Number(tabKey) - 1]);
   };
@@ -85,6 +90,7 @@ const Tabs: React.FC<ITabsProps> = (props) => {
 
     const tabItemClasses = classNames(css.tabHeaderItem, {
       [css.tabActive]: isActiveClass,
+      [css.tabDisabled]: disabled,
     });
 
     return (
