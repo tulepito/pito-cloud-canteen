@@ -93,11 +93,15 @@ export const CompanyOrdersTableColumns: TColumn[] = [
   {
     key: 'deliveryTime',
     label: 'Thời gian',
-    render: (data: TObject) => {
+    render: ({ startDate, endDate, deliveryHour }: TObject) => {
       return (
         <div className={css.deliveryTime}>
-          <div className={css.deliveryHour}>{data.deliveryHour}</div>
-          {data.startDate} - {data.endDate}
+          <div className={css.deliveryHour}>{deliveryHour}</div>
+          {startDate && endDate && (
+            <span>
+              {startDate} - {endDate}
+            </span>
+          )}
         </div>
       );
     },
@@ -197,6 +201,9 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       const updateOrderInProgress = useAppSelector(
         (state) => state.Order.updateOrderInProgress,
       );
+      const deleteDraftOrderInProgress = useAppSelector(
+        (state) => state.Order.deleteDraftOrderInProgress,
+      );
 
       const navigateToDraftOrderDetailPage = () => {
         router.push({
@@ -249,7 +256,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
 
       const deleteDraftButton = (
         <Button
-          key={'deleteDraftButton'}
+          key={`${orderId}-deleteDraftButton`}
           {...secondaryButtonProps}
           onClick={confirmDeleteDraftOrderActions.setTrue}>
           {intl.formatMessage({
@@ -259,7 +266,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       );
       const cancelPickingOrderButton = (
         <Button
-          key={'cancelPickingOrderButton'}
+          key={`${orderId}-cancelPickingOrderButton`}
           {...secondaryButtonProps}
           onClick={navigateToBookerManageOrderDetailPage}>
           {intl.formatMessage({
@@ -269,7 +276,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       );
       const cancelPendingApprovalOrderButton = (
         <Button
-          key={'cancelPendingApprovalOrderButton'}
+          key={`${orderId}-cancelPendingApprovalOrderButton`}
           {...secondaryButtonProps}
           onClick={handleCancelNeedApprovalOrder}>
           {intl.formatMessage({
@@ -279,7 +286,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       );
       const updatePlanOrderDetailButton = (
         <Button
-          key={'updatePlanOrderDetailButton'}
+          key={`${orderId}-updatePlanOrderDetailButton`}
           {...secondaryButtonProps}
           onClick={navigateToBookerManageOrderDetailPage}>
           {intl.formatMessage({
@@ -289,7 +296,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       );
       const viewDetailButton = (
         <Button
-          key={'viewDetailButton'}
+          key={`${orderId}-viewDetailButton`}
           {...secondaryButtonProps}
           onClick={navigateToOrderDetailPage}>
           {intl.formatMessage({
@@ -299,7 +306,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       );
       const completeOrderButton = (
         <Button
-          key={'completeOrderButton'}
+          key={`${orderId}-completeOrderButton`}
           {...secondaryButtonProps}
           onClick={navigateToDraftOrderDetailPage}>
           {intl.formatMessage({
@@ -309,7 +316,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       );
       const copyLinkButton = (
         <Button
-          key={'copyLinkButton'}
+          key={`${orderId}-copyLinkButton`}
           {...secondaryButtonProps}
           onClick={handleCopyOrderLink}>
           {intl.formatMessage({
@@ -318,14 +325,20 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         </Button>
       );
       const reviewOrderButton = (
-        <Button key={'reviewOrderButton'} {...secondaryButtonProps} disabled>
+        <Button
+          key={`${orderId}-reviewOrderButton`}
+          {...secondaryButtonProps}
+          disabled>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.reviewOrder',
           })}
         </Button>
       );
       const reorderButton = (
-        <Button key={'reorderButton'} {...secondaryButtonProps} disabled>
+        <Button
+          key={`${orderId}-reorderButton`}
+          {...secondaryButtonProps}
+          disabled>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.reorder',
           })}
@@ -372,6 +385,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
           isOpen={confirmDeleteDraftOrderActions.value}
           onCancel={confirmDeleteDraftOrderActions.setFalse}
           onConfirm={handleDeleteDraftOrder}
+          confirmInProgress={deleteDraftOrderInProgress}
           handleClose={confirmDeleteDraftOrderActions.setFalse}
           title={intl.formatMessage({
             id: 'ManageCompanyOrdersPage.deleteDraftOrderModal.title',

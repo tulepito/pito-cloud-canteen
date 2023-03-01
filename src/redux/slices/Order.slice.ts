@@ -464,6 +464,9 @@ const bookerDeleteDraftOrder = createAsyncThunk(
     await bookerDeleteDraftOrderApi({ orderId, companyId });
     await dispatch(queryCompanyOrders(queryParams));
   },
+  {
+    serializeError: storableError,
+  },
 );
 
 const requestApprovalOrder = createAsyncThunk(
@@ -477,11 +480,14 @@ const requestApprovalOrder = createAsyncThunk(
 
 const cancelPendingApprovalOrder = createAsyncThunk(
   'app/Order/CANCEL_PENDING_APPROVAL_ORDER',
-  async ({ orderId }: TObject) => {
+  async ({ orderId }: TObject, { getState, dispatch }) => {
+    const { queryParams } = getState().Order;
+
     const { data: responseData } = await bookerCancelPendingApprovalOrderApi(
       orderId,
     );
 
+    await dispatch(queryCompanyOrders(queryParams));
     return responseData.data;
   },
 );
@@ -741,11 +747,11 @@ const orderSlice = createSlice({
       })
       /* =============== bookerDeleteDraftOrder =============== */
       .addCase(bookerDeleteDraftOrder.pending, (state) => {
-        state.deleteDraftOrderInProgress = false;
+        state.deleteDraftOrderInProgress = true;
         state.queryOrderError = null;
       })
       .addCase(bookerDeleteDraftOrder.fulfilled, (state) => {
-        state.deleteDraftOrderInProgress = true;
+        state.deleteDraftOrderInProgress = false;
       })
       .addCase(bookerDeleteDraftOrder.rejected, (state, { payload }) => {
         state.deleteDraftOrderInProgress = false;

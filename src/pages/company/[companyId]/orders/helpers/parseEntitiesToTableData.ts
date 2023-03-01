@@ -16,9 +16,9 @@ export const parseEntitiesToTableData = (
     ).getMetadata();
 
     const {
-      startDate = 0,
+      startDate,
       companyId = '',
-      endDate = 0,
+      endDate,
       deliveryHour,
       deliveryAddress,
       orderState,
@@ -36,8 +36,8 @@ export const parseEntitiesToTableData = (
         title: entity.attributes.title,
         orderNumber: (page - 1) * 10 + index + 1,
         location: deliveryAddress?.address,
-        startDate: formatTimestamp(startDate),
-        endDate: formatTimestamp(endDate),
+        startDate: startDate ? formatTimestamp(startDate) : '',
+        endDate: endDate ? formatTimestamp(endDate) : '',
         state: orderState,
         orderId,
         companyId,

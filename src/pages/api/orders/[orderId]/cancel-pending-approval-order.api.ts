@@ -24,7 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           if (orderState !== EOrderDraftStates.pendingApproval) {
             throw new Error(
-              'You can cancel pending approval order (with orderState is "pendingApproval") only',
+              `You can cancel pending approval order (with orderState is "pendingApproval") only oderState:${orderState}`,
             );
           }
 
