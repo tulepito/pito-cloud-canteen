@@ -117,7 +117,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
           <span>{`${calculateDistance(companyGeoOrigin, origin)}km`}</span>
         </div>
         <div className={css.footerItem}>
-          <IconStar className={css.footerItemIcon} />
+          <IconStar className={css.littleStarIcon} />
           <span>{`${rating} (${totalReviewsOfRestaurant})`}</span>
         </div>
         <div className={css.footerItem}>

@@ -57,6 +57,7 @@
   height: 20px;
   cursor: pointer;
   transition: 0.1s linear;
+  flex-shrink: 0;
 
   &:hover {
     width: 21px;
@@ -95,11 +96,15 @@
   }
 }
 
+.littleStarIcon,
 .footerItemIcon {
   width: 16px;
   height: 16px;
   margin-right: 6px;
+  flex-shrink: 0;
+}
 
+.footerItemIcon {
   & > g > path {
     fill: $neutralGray6;
   }

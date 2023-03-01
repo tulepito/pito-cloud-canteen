@@ -1,6 +1,7 @@
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
 import IconUser from '@components/Icons/IconUser/IconUser';
+import { formatTimestamp } from '@utils/dates';
 import { useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
@@ -53,6 +54,7 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
         onClose={handleCloseDeleteModal}
         onDelete={handleDelete}
         removeInprogress={removeInprogress}
+        deleteDate={formatTimestamp(event.start?.getTime(), 'dd MMMM')}
       />
     </div>
   );
