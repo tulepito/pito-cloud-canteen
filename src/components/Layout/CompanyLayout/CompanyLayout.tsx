@@ -52,6 +52,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       {
         value: User(cur).getId(),
         label: User(cur).getPublicData()?.companyName,
+        logo: User(cur).getProfileImage(),
       },
     ];
   }, []);

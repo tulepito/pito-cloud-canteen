@@ -9,11 +9,13 @@ import css from './ResultDetailModal.module.scss';
 type TResultDetailHeaderProps = {
   restaurant?: TListing;
   numberSelectedDish?: number;
+  hideBadge?: boolean;
 };
 
 const ResultDetailHeader: React.FC<TResultDetailHeaderProps> = ({
   restaurant,
   numberSelectedDish = 0,
+  hideBadge = false,
 }) => {
   const intl = useIntl();
 
@@ -33,14 +35,16 @@ const ResultDetailHeader: React.FC<TResultDetailHeaderProps> = ({
       <div className={css.title} title={restaurantName}>
         {restaurantName}
       </div>
-      <Badge
-        className={css.modalBadge}
-        label={selectedDishText}
-        type={
-          numberSelectedDish > 0 ? EBadgeType.PROCESSING : EBadgeType.WARNING
-        }
-        hasDotIcon={true}
-      />
+      {!hideBadge && (
+        <Badge
+          className={css.modalBadge}
+          label={selectedDishText}
+          type={
+            numberSelectedDish > 0 ? EBadgeType.PROCESSING : EBadgeType.WARNING
+          }
+          hasDotIcon={true}
+        />
+      )}
     </div>
   );
 };

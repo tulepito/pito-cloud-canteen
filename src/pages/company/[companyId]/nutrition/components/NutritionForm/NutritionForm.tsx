@@ -4,15 +4,20 @@ import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { customPristine } from '@helpers/form';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import NutritionField from '@pages/admin/order/create/components/NutritionField/NutritionField';
-import { Listing } from '@utils/data';
+import { Listing, User } from '@utils/data';
+import { CATEGORY_OPTIONS } from '@utils/enums';
+import type { TUser } from '@utils/types';
 import { useMemo, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
+import { NutritionThunks } from '../../Nutrition.slice';
+import RestaurantModal from '../RestaurantModal/RestaurantModal';
 import css from './NutritionForm.module.scss';
 
 export type TNutritionFormValues = {
@@ -26,24 +31,20 @@ type TNutritionFormComponentProps = FormRenderProps<TNutritionFormValues> &
   Partial<TExtraProps>;
 type TNutritionFormProps = FormProps<TNutritionFormValues> & TExtraProps;
 
-const setRestaurantCategoryNames = (intl: any, categories: string[] = []) => {
-  return categories
-    .map((category) =>
-      intl.formatMessage({ id: `Restaurant.category.${category}` }),
-    )
-    .join(', ');
-};
 const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
   props,
 ) => {
   const { handleSubmit, form, values, isPersonal, initialValues } = props;
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   const [removedFavoriteRestaurantIds, setRemovedFavoriteRestaurantIds] =
     useState<string[]>([]);
 
   const [removedFavoriteFoodIds, setRemovedFavoriteFoodIds] = useState<
     string[]
   >([]);
+
+  const restaurantModalControl = useBoolean();
 
   const favoriteRestaurants = useAppSelector(
     (state) => state.company.favoriteRestaurants,
@@ -65,6 +66,28 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
   const updateCompanyAccountInProgress = useAppSelector(
     (state) => state.company.updateCompanyInProgress,
   );
+  const selectedRestaurant = useAppSelector(
+    (state) => state.Nutrition.selectedRestaurant,
+    shallowEqual,
+  );
+  const restaurantFoodList = useAppSelector(
+    (state) => state.Nutrition.restaurantFoodList,
+    shallowEqual,
+  );
+  const restaurantTotalRating = useAppSelector(
+    (state) => state.Nutrition.restaurantTotalRating,
+  );
+  const companyAccount = useAppSelector(
+    (state) => state.company.company,
+    shallowEqual,
+  );
+
+  const companyGeoOrigin = useMemo(
+    () => ({
+      ...User(companyAccount as TUser).getPublicData()?.location?.origin,
+    }),
+    [companyAccount],
+  );
   const favoriteRestaurantTableData = useMemo<TRowData[]>(
     () =>
       (isPersonal ? personalFavoriteRestaurants : favoriteRestaurants).reduce(
@@ -80,10 +103,15 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
                   data: {
                     id: Listing(restaurant).getId(),
                     title: Listing(restaurant).getAttributes()?.title,
-                    category: setRestaurantCategoryNames(
-                      intl,
-                      Listing(restaurant).getPublicData()?.categories,
-                    ),
+                    category: Listing(restaurant)
+                      .getPublicData()
+                      ?.categories?.slice(0, 3)
+                      .map(
+                        (category: string) =>
+                          CATEGORY_OPTIONS.find((item) => item.key === category)
+                            ?.label,
+                      )
+                      .join(', '),
                   },
                 },
               ];
@@ -92,7 +120,6 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
       ),
     [
       favoriteRestaurants,
-      intl,
       isPersonal,
       personalFavoriteRestaurants,
       removedFavoriteRestaurantIds,
@@ -143,13 +170,33 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
     form.change('favoriteFoodList', newFavoriteFoodList);
   };
 
+  const handleOpenRestaurantModal = (restaurantId: string) => () => {
+    restaurantModalControl.setTrue();
+    if (restaurantId !== selectedRestaurant?.id.uuid) {
+      dispatch(NutritionThunks.fetchSelectedRestaurant(restaurantId));
+      dispatch(NutritionThunks.fetchTotalRating(restaurantId));
+      dispatch(NutritionThunks.fetchFoodFromRestaurant(restaurantId));
+    }
+  };
+
+  const onSearchFoodNameInRestaurant = (
+    keywords: string,
+    restaurantId: string,
+  ) => {
+    dispatch(
+      NutritionThunks.searchFoodInRestaurant({ restaurantId, keywords }),
+    );
+  };
   const favoriteRestaurantColumns: TColumn[] = [
     {
       key: 'restaurantName',
       label: 'TÊN NHÀ HÀNG',
-      render: ({ title }: any) => {
+      render: ({ title, id }: any) => {
         return (
-          <span title={title} className={css.boldText}>
+          <span
+            onClick={handleOpenRestaurantModal(id)}
+            title={title}
+            className={css.restaurantName}>
             {title}
           </span>
         );
@@ -180,11 +227,7 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
       key: 'foodName',
       label: 'TÊN MÓN ĂN',
       render: ({ title }: any) => {
-        return (
-          <span title={title} className={css.boldText}>
-            {title}
-          </span>
-        );
+        return <span title={title}>{title}</span>;
       },
     },
     {
@@ -201,51 +244,64 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
     },
   ];
   return (
-    <Form className={css.container} onSubmit={handleSubmit}>
-      <div className={css.fieldSection}>
-        <NutritionField
-          title={intl.formatMessage({ id: 'NutritionForm.nutrition.title' })}
-        />
-      </div>
-      <div className={css.fieldSection}>
-        <div className={css.fieldLabel}>
-          {intl.formatMessage({ id: 'NutritionForm.favoriteRestaurant.title' })}
+    <>
+      <Form className={css.container} onSubmit={handleSubmit}>
+        <div className={css.fieldSection}>
+          <NutritionField
+            title={intl.formatMessage({ id: 'NutritionForm.nutrition.title' })}
+          />
         </div>
-        <Table
-          columns={favoriteRestaurantColumns}
-          data={favoriteRestaurantTableData}
-          tableClassName={css.tableRoot}
-          tableHeadClassName={css.tableHead}
-          tableHeadCellClassName={css.tableHeadCell}
-          tableBodyClassName={css.tableBody}
-          tableBodyRowClassName={css.tableBodyRow}
-          tableBodyCellClassName={css.tableBodyCell}
-        />
-      </div>
-      <div className={css.fieldSection}>
-        <div className={css.fieldLabel}>
-          {intl.formatMessage({ id: 'NutritionForm.favoriteFood.title' })}
+        <div className={css.fieldSection}>
+          <div className={css.fieldLabel}>
+            {intl.formatMessage({
+              id: 'NutritionForm.favoriteRestaurant.title',
+            })}
+          </div>
+          <Table
+            columns={favoriteRestaurantColumns}
+            data={favoriteRestaurantTableData}
+            tableClassName={css.tableRoot}
+            tableHeadClassName={css.tableHead}
+            tableHeadCellClassName={css.tableHeadCell}
+            tableBodyClassName={css.tableBody}
+            tableBodyRowClassName={css.tableBodyRow}
+            tableBodyCellClassName={css.tableBodyCell}
+          />
         </div>
-        <Table
-          columns={favoriteFoodColumns}
-          data={favoriteFoodTableData}
-          tableClassName={css.tableRoot}
-          tableHeadClassName={css.tableHead}
-          tableHeadCellClassName={css.tableHeadCell}
-          tableBodyClassName={css.tableBody}
-          tableBodyRowClassName={css.tableBodyRow}
-          tableBodyCellClassName={css.tableBodyCell}
-        />
-      </div>
-      <div className={css.submitChangeBtn}>
-        <Button
-          type="submit"
-          disabled={submitDisabled}
-          inProgress={updateCompanyAccountInProgress}>
-          {intl.formatMessage({ id: 'NutritionForm.submit' })}
-        </Button>
-      </div>
-    </Form>
+        <div className={css.fieldSection}>
+          <div className={css.fieldLabel}>
+            {intl.formatMessage({ id: 'NutritionForm.favoriteFood.title' })}
+          </div>
+          <Table
+            columns={favoriteFoodColumns}
+            data={favoriteFoodTableData}
+            tableClassName={css.tableRoot}
+            tableHeadClassName={css.tableHead}
+            tableHeadCellClassName={css.tableHeadCell}
+            tableBodyClassName={css.tableBody}
+            tableBodyRowClassName={css.tableBodyRow}
+            tableBodyCellClassName={css.tableBodyCell}
+          />
+        </div>
+        <div className={css.submitChangeBtn}>
+          <Button
+            type="submit"
+            disabled={submitDisabled}
+            inProgress={updateCompanyAccountInProgress}>
+            {intl.formatMessage({ id: 'NutritionForm.submit' })}
+          </Button>
+        </div>
+      </Form>
+      <RestaurantModal
+        isOpen={restaurantModalControl.value}
+        onClose={restaurantModalControl.setFalse}
+        currentRestaurant={selectedRestaurant!}
+        totalRatings={restaurantTotalRating}
+        companyGeoOrigin={companyGeoOrigin}
+        restaurantFoodList={restaurantFoodList}
+        onSearchFoodName={onSearchFoodNameInRestaurant}
+      />
+    </>
   );
 };
 

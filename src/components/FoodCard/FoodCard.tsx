@@ -17,6 +17,7 @@ type TFoodCardProps = {
   onClick?: (foodId: string) => void;
   onSelect?: (foodId: string) => void;
   onRemove?: (foodId: string) => void;
+  hideSelection?: boolean;
 };
 
 const FoodCard: React.FC<TFoodCardProps> = ({
@@ -26,6 +27,7 @@ const FoodCard: React.FC<TFoodCardProps> = ({
   onSelect = () => null,
   onRemove = () => null,
   onClick = () => null,
+  hideSelection = false,
 }) => {
   const classes = classNames(css.root, className);
 
@@ -40,6 +42,11 @@ const FoodCard: React.FC<TFoodCardProps> = ({
   const handleRemove = () => {
     onRemove(Listing(food!).getId());
   };
+  const selection = isSelected ? (
+    <IconCheckmarkWithCircle onClick={handleRemove} className={css.checkIcon} />
+  ) : (
+    <IconPlusCircle onClick={handleSelect} className={css.plusIcon} />
+  );
   return (
     <div className={classes}>
       <div className={css.coverImage} onClick={handleClickFood}>
@@ -65,14 +72,7 @@ const FoodCard: React.FC<TFoodCardProps> = ({
         } ₫ / Phần`}</div>
         <div className={css.vatIncludedNotice}>(đã bao gồm VAT)</div>
       </div>
-      {isSelected ? (
-        <IconCheckmarkWithCircle
-          onClick={handleRemove}
-          className={css.checkIcon}
-        />
-      ) : (
-        <IconPlusCircle onClick={handleSelect} className={css.plusIcon} />
-      )}
+      {!hideSelection && selection}
     </div>
   );
 };

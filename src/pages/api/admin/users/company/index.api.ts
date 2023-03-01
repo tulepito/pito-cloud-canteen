@@ -8,6 +8,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const response = (await queryAllUsers({
       query: {
         meta_isCompany: true,
+        include: ['profileImage'],
+        'fields.image': ['variants.square-small', 'variants.square-small2x'],
       },
     })) as any;
     res.json(response);
