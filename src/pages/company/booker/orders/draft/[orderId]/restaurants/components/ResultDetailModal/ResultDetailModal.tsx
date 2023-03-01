@@ -36,6 +36,7 @@ type TResultDetailModalProps = {
     lng: number;
   };
   totalRatings: any[];
+  fetchFoodInProgress: boolean;
   onSearchSubmit?: (value: string, restaurantId: string) => void;
 };
 
@@ -48,6 +49,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   companyGeoOrigin,
   totalRatings,
   onSearchSubmit,
+  fetchFoodInProgress,
 }) => {
   const intl = useIntl();
 
@@ -262,6 +264,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
               onRemoveFood={handleRemoveFood}
               onClickFood={handleOpenFoodDetail}
               selectedFoodIds={selectedFoods}
+              fetchFoodInProgress={fetchFoodInProgress}
             />
           </div>
         </div>
