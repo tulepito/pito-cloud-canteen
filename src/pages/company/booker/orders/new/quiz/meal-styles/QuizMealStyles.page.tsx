@@ -8,6 +8,7 @@ import { useField, useForm } from 'react-final-form-hooks';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
+import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
 import css from './QuizMealStyles.module.scss';
 
@@ -18,6 +19,8 @@ const QuizMealStyles = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const router = useRouter();
+
+  useRedirectAfterReloadPage();
   const mealStyles = useAppSelector(
     (state) => state.Quiz.categories,
     shallowEqual,

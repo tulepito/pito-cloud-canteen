@@ -6,6 +6,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
+import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
 import css from './QuizSpecialDemand.module.scss';
 import type { TSpecialDemandFormValues } from './SpecialDemandForm/SpecialDemandForm';
@@ -15,6 +16,7 @@ const QuizSpecialDemand = () => {
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
+  useRedirectAfterReloadPage();
   const formSubmitRef = useRef<any>();
   const [formValues, setFormValues] = useState<TSpecialDemandFormValues>();
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);

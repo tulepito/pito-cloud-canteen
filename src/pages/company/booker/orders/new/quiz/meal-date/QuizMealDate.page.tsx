@@ -16,6 +16,7 @@ import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
+import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
 import type { TMealDateFormValues } from './MealDateForm/MealDateForm';
 import MealDateForm from './MealDateForm/MealDateForm';
@@ -30,6 +31,7 @@ const QuizMealDate = () => {
   const [formValues, setFormValues] = useState<TMealDateFormValues>(null!);
   const [formInvalid, setFormInvalid] = useState<boolean>(false);
 
+  useRedirectAfterReloadPage();
   const selectedCompany = useAppSelector(
     (state) => state.Quiz.selectedCompany,
     shallowEqual,

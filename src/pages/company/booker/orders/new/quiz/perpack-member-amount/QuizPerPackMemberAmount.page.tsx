@@ -14,6 +14,7 @@ import { useField, useForm } from 'react-final-form-hooks';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
+import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
 import css from './QuizPerPackMemberAmount.module.scss';
 
@@ -35,6 +36,7 @@ const QuizPerPackMemberAmountPage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
+  useRedirectAfterReloadPage();
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
 
   const onSubmit = (values: any) => {
