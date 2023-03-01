@@ -335,3 +335,26 @@
     }
   }
 }
+
+.ratingWrapper {
+  position: relative;
+  width: fit-content;
+
+  .basicStars {
+    @include flexAlign(flex-start, flex-start);
+  }
+
+  .ratingStars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .ratingStar {
+    width: 20px;
+    height: 20px;
+    margin-right: 2px;
+  }
+}

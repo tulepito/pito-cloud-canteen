@@ -247,6 +247,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
               avatar={restaurantAvatar}
               restaurantName={restaurantName}
               rating={`${rating} (${totalReviewsOfRestaurant})`}
+              ratingNumber={rating}
               distance={`${distance}km`}
             />
             <ResultDetailFilters

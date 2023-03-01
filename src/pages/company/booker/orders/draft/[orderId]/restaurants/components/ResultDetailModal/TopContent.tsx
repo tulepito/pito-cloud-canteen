@@ -1,3 +1,4 @@
+import IconBorderStar from '@components/Icons/IconBorderStar/IconBorderStar';
 import IconGift from '@components/Icons/IconGift/IconGift';
 import IconHeart from '@components/Icons/IconHeart/IconHeart';
 import IconStar from '@components/Icons/IconStar/IconStar';
@@ -13,9 +14,14 @@ type TopContentProps = {
   restaurantName: string;
   rating: string;
   distance: string;
+  ratingNumber: number;
 };
 const TopContent: React.FC<TopContentProps> = (props) => {
-  const { avatar, restaurantName, rating, distance } = props;
+  const { avatar, restaurantName, rating, ratingNumber, distance } = props;
+  const ratingStarsInlineStyle = {
+    width: `${(ratingNumber / 5) * 100}%`,
+  };
+
   return (
     <div className={css.topContent}>
       <div className={css.profileImageWrapper}>
@@ -36,14 +42,23 @@ const TopContent: React.FC<TopContentProps> = (props) => {
             <IconTruck className={css.moreInfoItemIcon} />
             <span>{distance}</span>
           </div>
-          <div className={css.moreInfoItem}>
-            <IconStar className={css.ratingStar} />
-            <IconStar className={css.ratingStar} />
-            <IconStar className={css.ratingStar} />
-            <IconStar className={css.ratingStar} />
-            <IconStar className={css.ratingStar} />
-            <span>{rating}</span>
+          <div className={css.ratingWrapper}>
+            <div className={css.basicStars}>
+              <IconBorderStar className={css.ratingStar} />
+              <IconBorderStar className={css.ratingStar} />
+              <IconBorderStar className={css.ratingStar} />
+              <IconBorderStar className={css.ratingStar} />
+              <IconBorderStar className={css.ratingStar} />
+            </div>
+            <div style={ratingStarsInlineStyle} className={css.ratingStars}>
+              <IconStar className={css.ratingStar} />
+              <IconStar className={css.ratingStar} />
+              <IconStar className={css.ratingStar} />
+              <IconStar className={css.ratingStar} />
+              <IconStar className={css.ratingStar} />
+            </div>
           </div>
+          <div className={css.moreInfoItem}>{rating}</div>
           <div className={css.moreInfoItem}>
             <IconGift className={css.moreInfoItemIcon} />
             <span>x3 điểm PITO Club</span>
