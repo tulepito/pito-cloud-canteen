@@ -93,6 +93,7 @@ const RestaurantModal: React.FC<TRestaurantModalProps> = (props) => {
           <TopContent
             avatar={restaurantAvatar}
             restaurantName={restaurantName}
+            ratingNumber={rating}
             rating={`${rating} (${totalRatings})`}
             distance={`${distance}km`}
           />

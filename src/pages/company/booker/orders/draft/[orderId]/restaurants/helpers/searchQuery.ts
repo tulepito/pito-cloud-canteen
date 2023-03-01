@@ -18,7 +18,6 @@ export const getMenuQuery = ({
   const {
     timestamp,
     menuTypes = [],
-    categories = [],
     favoriteRestaurantIdList = [],
     favoriteFoodIdList = [],
   } = params;
@@ -39,7 +38,6 @@ export const getMenuQuery = ({
     pub_daysOfWeek: `has_any:${dayOfWeek}`,
     pub_mealType: mealType,
     ...(menuTypes.length > 0 ? { meta_menuType: menuTypes.join(',') } : {}),
-    ...(categories.length > 0 ? { pub_category: categories.join(',') } : {}),
     ...(nutritions.length > 0
       ? {
           [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(',')}`,
@@ -74,7 +72,13 @@ export const getRestaurantQuery = ({
   companyAccount: TUser | null;
   params: any;
 }) => {
-  const { rating = '', page = 1, keywords = '', distance } = params;
+  const {
+    rating = '',
+    page = 1,
+    keywords = '',
+    distance,
+    categories = [],
+  } = params;
 
   let newRestaurantIds = [...restaurantIds];
 
@@ -92,6 +96,9 @@ export const getRestaurantQuery = ({
     keywords,
     page,
     ...(distance ? { bounds } : {}),
+    ...(categories.length > 0
+      ? { pub_categories: `has_all:${categories.join(',')}` }
+      : {}),
     include: ['images'],
     'fields.image': [
       `variants.${EImageVariants.default}`,

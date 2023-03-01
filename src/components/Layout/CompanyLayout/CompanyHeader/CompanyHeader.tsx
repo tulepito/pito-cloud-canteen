@@ -12,12 +12,17 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
 import { currentUserSelector, userActions } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
+import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import React from 'react';
 
 import css from './CompanyHeader.module.scss';
 
-const CompanyHeader = () => {
+type CompanyHeaderProps = {
+  showBottomLine?: boolean;
+};
+
+const CompanyHeader: React.FC<CompanyHeaderProps> = ({ showBottomLine }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector(currentUserSelector);
@@ -29,8 +34,10 @@ const CompanyHeader = () => {
     router.push('/');
   };
 
+  const classes = classNames(css.root, showBottomLine && css.bottomLine);
+
   return (
-    <div className={css.root}>
+    <div className={classes}>
       <NamedLink className={css.headerLeft} path={companyPaths.Home}>
         <PitoLogo />
       </NamedLink>

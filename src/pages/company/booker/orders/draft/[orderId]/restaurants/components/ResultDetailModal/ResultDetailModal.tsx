@@ -36,6 +36,8 @@ type TResultDetailModalProps = {
     lng: number;
   };
   totalRatings: any[];
+  fetchFoodInProgress: boolean;
+  onSearchSubmit?: (value: string, restaurantId: string) => void;
 };
 
 const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
@@ -46,6 +48,8 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   restaurants,
   companyGeoOrigin,
   totalRatings,
+  onSearchSubmit,
+  fetchFoodInProgress,
 }) => {
   const intl = useIntl();
 
@@ -205,6 +209,13 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     }
   }, [isOpen]);
 
+  const onCustomSearchSubmit = useCallback(
+    (keyword: string) => {
+      onSearchSubmit?.(keyword, selectedRestaurantId!);
+    },
+    [onSearchSubmit, selectedRestaurantId],
+  );
+
   return (
     <>
       <Modal
@@ -238,12 +249,14 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
               avatar={restaurantAvatar}
               restaurantName={restaurantName}
               rating={`${rating} (${totalReviewsOfRestaurant})`}
+              ratingNumber={rating}
               distance={`${distance}km`}
             />
             <ResultDetailFilters
               onSelectAllFood={handleSelectFoods}
               selectedFoodIds={selectedFoods}
               originFoodIdList={originFoodIdList}
+              onSearchSubmit={onCustomSearchSubmit}
             />
             <FoodListSection
               foodList={foodList}
@@ -251,6 +264,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
               onRemoveFood={handleRemoveFood}
               onClickFood={handleOpenFoodDetail}
               selectedFoodIds={selectedFoods}
+              fetchFoodInProgress={fetchFoodInProgress}
             />
           </div>
         </div>

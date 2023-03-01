@@ -1,15 +1,17 @@
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .layout {
   padding: 40px 24px;
   width: 100%;
   margin: auto;
   display: flex;
+  flex-direction: column;
   position: relative;
 
   @include viewportLarge {
     max-width: 925px;
-    padding: 40px 0;
+    padding: 0;
   }
 
   @include viewportSLarge {
@@ -19,6 +21,15 @@
   @include viewportXLarge {
     max-width: 1555px;
   }
+}
+
+.top {
+  margin-top: 41px;
+}
+
+.mainContainer {
+  @include flexAlign(flex-start, flex-start);
+  margin-top: 32px;
 }
 
 .sidebar {

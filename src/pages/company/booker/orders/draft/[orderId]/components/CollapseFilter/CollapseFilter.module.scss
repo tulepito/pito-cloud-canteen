@@ -26,6 +26,7 @@
   .optionsContainer {
     transition: max-height 0.3s ease-in-out, opacity 0.5s ease-in-out;
     max-height: 500px;
+    font-size: 14px;
 
     &.collapse {
       max-height: 0;

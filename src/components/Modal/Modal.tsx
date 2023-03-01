@@ -71,7 +71,7 @@ const Modal: React.FC<TModalProps> = (props) => {
     };
   }, [dispatch, id, isOpen]);
 
-  useLockBodyScroll({ isOpen });
+  useLockBodyScroll();
 
   return (
     <div id={id} className={classes}>
