@@ -1,6 +1,6 @@
 import { calculatePriceQuotationInfo } from '@pages/orders/[orderId]/helpers/cartInfoHelper';
 import { Listing } from '@utils/data';
-import { parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp } from '@utils/dates';
 import type { TIntegrationOrderListing, TListing } from '@utils/types';
 import uniq from 'lodash/uniq';
 
@@ -36,8 +36,8 @@ export const parseEntitiesToTableData = (
         title: entity.attributes.title,
         orderNumber: (page - 1) * 10 + index + 1,
         location: deliveryAddress?.address,
-        startDate: parseTimestampToFormat(startDate),
-        endDate: parseTimestampToFormat(endDate),
+        startDate: formatTimestamp(startDate),
+        endDate: formatTimestamp(endDate),
         state: orderState,
         orderId,
         companyId,

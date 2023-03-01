@@ -11,12 +11,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const integrationSdk = getIntegrationSdk();
 
     switch (apiMethod) {
-      case HttpMethod.GET:
-        break;
-      case HttpMethod.POST:
-        break;
-      case HttpMethod.DELETE:
-        break;
       case HttpMethod.PUT:
         {
           const orderId = req.query.orderId as string;

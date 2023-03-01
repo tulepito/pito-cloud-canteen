@@ -36,9 +36,7 @@ const ResultDetailHeader: React.FC<TResultDetailHeaderProps> = ({
       <Badge
         className={css.modalBadge}
         label={selectedDishText}
-        type={
-          numberSelectedDish > 0 ? EBadgeType.PROCESSING : EBadgeType.WARNING
-        }
+        type={numberSelectedDish > 0 ? EBadgeType.info : EBadgeType.warning}
         hasDotIcon={true}
       />
     </div>

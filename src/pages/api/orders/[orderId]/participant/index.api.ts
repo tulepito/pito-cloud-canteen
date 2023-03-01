@@ -12,8 +12,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
   const apiMethod = req.method;
   switch (apiMethod) {
-    case 'GET':
-      break;
     case 'POST':
       try {
         const {
@@ -107,8 +105,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       } catch (error) {
         handleError(res, error);
       }
-      break;
-    case 'PUT':
       break;
     case 'DELETE':
       try {

@@ -393,7 +393,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
                 <Badge
                   label={`Đơn hàng tuần • ${partnerName}`}
-                  type={EBadgeType.PROCESSING}
+                  type={EBadgeType.info}
                 />
               </div>
               <div

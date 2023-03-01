@@ -34,7 +34,7 @@ export const calculateGroupMembers = (
 ) => {
   const { groups = [] } = User(companyAccount).getMetadata();
 
-  if (groupList.includes('allMembers')) {
+  if (isEmpty(groupList) || groupList.includes('allMembers')) {
     return getAllCompanyMembers(companyAccount);
   }
 

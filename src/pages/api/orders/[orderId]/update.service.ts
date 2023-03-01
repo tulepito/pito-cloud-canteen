@@ -2,7 +2,7 @@ import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
-import { parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp } from '@utils/dates';
 import isEmpty from 'lodash/isEmpty';
 
 const updateOrder = async ({
@@ -26,7 +26,7 @@ const updateOrder = async ({
 
     const participants: string[] = isEmpty(newSelectedGroup)
       ? getAllCompanyMembers(companyAccount)
-      : calculateGroupMembers(companyAccount, selectedGroups);
+      : calculateGroupMembers(companyAccount, newSelectedGroup);
     const { startDate, endDate } = generalInfo;
     const companyDisplayName = companyAccount.attributes.profile.displayName;
 
@@ -41,9 +41,9 @@ const updateOrder = async ({
                 publicData: {
                   orderName: `${
                     companyAccount.attributes.profile.displayName
-                  } PCC_${parseTimestampToFormat(
+                  } PCC_${formatTimestamp(
                     generalInfo.startDate,
-                  )} - ${parseTimestampToFormat(generalInfo.endDate)}`,
+                  )} - ${formatTimestamp(generalInfo.endDate)}`,
                 },
               }
             : {}),

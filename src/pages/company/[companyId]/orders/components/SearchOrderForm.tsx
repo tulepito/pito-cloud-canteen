@@ -21,7 +21,7 @@ const SearchOrderFormComponent: React.FC<TSearchOrderFormComponentProps> = (
   const intl = useIntl();
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit} className={css.root}>
       <div className={css.fieldContainer}>
         <FieldTextInput
           className={css.fieldKeywords}

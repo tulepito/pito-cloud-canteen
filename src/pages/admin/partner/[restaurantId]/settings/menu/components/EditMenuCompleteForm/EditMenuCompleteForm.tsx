@@ -1,7 +1,7 @@
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import Form from '@components/Form/Form';
 import { IntegrationListing } from '@utils/data';
-import { parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp } from '@utils/dates';
 import { getLabelByKey, MENU_OPTIONS } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 import type { FormApi } from 'final-form';
@@ -131,7 +131,7 @@ const EditMenuCompleteFormComponent: React.FC<
                 </label>
                 <div className={css.title}>
                   {startDate &&
-                    parseTimestampToFormat(startDate, 'EEE, dd MMMM, yyyy')}
+                    formatTimestamp(startDate, 'EEE, dd MMMM, yyyy')}
                 </div>
               </div>
               <div className={css.titleGroup}>
@@ -139,8 +139,7 @@ const EditMenuCompleteFormComponent: React.FC<
                   <FormattedMessage id="EditMenuCompleteForm.endDateLabel" />
                 </label>
                 <div>
-                  {endDate &&
-                    parseTimestampToFormat(endDate, 'EEE, dd MMMM, yyyy')}
+                  {endDate && formatTimestamp(endDate, 'EEE, dd MMMM, yyyy')}
                 </div>
               </div>
             </div>

@@ -20,7 +20,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
-import { parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp } from '@utils/dates';
 import {
   CATEGORY_OPTIONS,
   FOOD_TYPE_OPTIONS,
@@ -384,9 +384,7 @@ const ManagePartnerFoods = () => {
           </Button>
           <CSVLink
             data={parseEntitiesToExportCsv(foods, idsToAction)}
-            filename={`${parseTimestampToFormat(
-              new Date().getTime(),
-            )}_donhang.csv`}
+            filename={`${formatTimestamp(new Date().getTime())}_donhang.csv`}
             className={css.hidden}
             ref={csvLinkRef}
             target="_blank"

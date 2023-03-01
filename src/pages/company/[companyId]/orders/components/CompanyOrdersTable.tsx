@@ -172,14 +172,20 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
 
   return (
     <div className={css.root}>
-      <SearchOrderForm
-        onSubmit={handleSubmitSearch}
-        initialValues={{ keywords: keywords as string }}
-      />
       <Tabs
         items={tabItems}
         onChange={handleTabChange}
         defaultActiveKey={'5'}
+        className={css.tabContainer}
+        headerClassName={css.tabHeader}
+        headerWrapperClassName={css.headerWrapper}
+        actionsClassName={css.searchForm}
+        actionsComponent={
+          <SearchOrderForm
+            onSubmit={handleSubmitSearch}
+            initialValues={{ keywords: keywords as string }}
+          />
+        }
       />
     </div>
   );

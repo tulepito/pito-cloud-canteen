@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing, User } from '@utils/data';
-import { getSelectedDaysOfWeek, parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp, getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
@@ -46,10 +46,8 @@ const QuizMealDate = () => {
   const { dayInWeek, startDate, endDate } = formValues || {};
 
   const selectedDays = getSelectedDaysOfWeek(startDate, endDate, dayInWeek);
-  const formattedStartDate =
-    startDate && parseTimestampToFormat(startDate, 'dd MMMM');
-  const formattedEndDate =
-    endDate && parseTimestampToFormat(endDate, 'dd MMMM');
+  const formattedStartDate = startDate && formatTimestamp(startDate, 'dd MMMM');
+  const formattedEndDate = endDate && formatTimestamp(endDate, 'dd MMMM');
   const initialValues = useMemo(
     () => ({
       dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri'],
@@ -65,6 +63,7 @@ const QuizMealDate = () => {
         generalInfo: {
           ...quiz,
           ...formValues,
+          deliveryAddress: User(selectedCompany).getPublicData().location || {},
           dayInWeek: selectedDays,
         },
       }),

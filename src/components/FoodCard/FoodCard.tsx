@@ -54,11 +54,7 @@ const FoodCard: React.FC<TFoodCardProps> = ({
           {Listing(food!).getAttributes().title}
         </div>
         <div className={css.badges}>
-          <Badge
-            className={css.badge}
-            type={EBadgeType.PROCESSING}
-            label="Keto"
-          />
+          <Badge className={css.badge} type={EBadgeType.info} label="Keto" />
         </div>
         <div className={css.price}>{`${
           Listing(food!).getAttributes()?.price?.amount
