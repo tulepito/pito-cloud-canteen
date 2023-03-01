@@ -10,6 +10,7 @@ type TFoodsListSectionProps = {
   onRemoveFood?: (foodId: string) => void;
   selectedFoodIds?: string[];
   foodList?: TListing[];
+  hideSelection?: boolean;
 };
 
 const FoodListSection: React.FC<TFoodsListSectionProps> = ({
@@ -18,6 +19,7 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
   onRemoveFood = () => null,
   selectedFoodIds = [],
   foodList = [],
+  hideSelection = false,
 }) => {
   return (
     <section className={css.foodSection}>
@@ -34,8 +36,12 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
                 onRemove={onRemoveFood}
                 onClick={onClickFood}
                 className={css.foodItem}
+                hideSelection={hideSelection}
               />
             ))}
+            {foodList.length === 0 && (
+              <div className={css.emptyFoodList}>Không có món ăn nào</div>
+            )}
           </div>
         </div>
       </div>
