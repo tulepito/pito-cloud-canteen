@@ -1,4 +1,4 @@
-import { calculatePriceQuotationInfo } from '@pages/orders/[orderId]/helpers/cartInfoHelper';
+import { calculatePriceQuotationInfo } from '@pages/company/orders/[orderId]/picking/helpers/cartInfoHelper';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import type { TIntegrationOrderListing, TListing } from '@utils/types';

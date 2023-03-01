@@ -4,7 +4,7 @@ import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePic
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
-import config from '@src/configs';
+import { TimeOptions } from '@utils/dates';
 import { addDays } from 'date-fns';
 import { DateTime } from 'luxon';
 import type { FormProps, FormRenderProps } from 'react-final-form';
@@ -70,7 +70,7 @@ const EditOrderDeadlineFormComponent: React.FC<
         })}
         className={css.fieldSelect}
         leftIcon={<IconClock className={css.clockIcon} />}>
-        {config.deadlineTimeOptions.map((option) => (
+        {TimeOptions.map((option) => (
           <option key={option}>{option}</option>
         ))}
       </FieldSelect>

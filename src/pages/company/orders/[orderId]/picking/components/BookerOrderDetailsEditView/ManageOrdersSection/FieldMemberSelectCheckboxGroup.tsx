@@ -1,4 +1,6 @@
 import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { User } from '@utils/data';
 import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';
@@ -22,6 +24,13 @@ const FieldMemberSelectCheckbox = (props: any) => {
     },
     ...rest
   } = props;
+
+  const participantData = useAppSelector(
+    (state) => state.OrderManagement.participantData,
+  );
+  const participant = participantData.find(
+    (p) => User(p).getAttributes().email === email,
+  );
 
   const handleOnChange = (
     input: FieldInputProps<string, HTMLInputElement>,
@@ -70,7 +79,12 @@ const FieldMemberSelectCheckbox = (props: any) => {
             boxClassName={boxClasses}
           />
         </span>
-        <ParticipantCard hasDeleteIcon={false} email={email} name={name} />
+        <ParticipantCard
+          hasDeleteIcon={false}
+          email={email}
+          name={name}
+          participant={participant}
+        />
       </label>
     </div>
   );

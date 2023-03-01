@@ -76,7 +76,9 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       }
       if ([EOrderStates.picking].includes(state)) {
         return (
-          <NamedLink path={'/orders/[orderId]'} params={{ orderId: id }}>
+          <NamedLink
+            path={companyPaths.ManageOrderPicking}
+            params={{ orderId: id }}>
             {titleContent}
           </NamedLink>
         );
@@ -221,7 +223,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
 
       const navigateToBookerManageOrderDetailPage = () => {
         router.push({
-          pathname: '/orders/[orderId]',
+          pathname: companyPaths.ManageOrderPicking,
           query: { orderId },
         });
       };

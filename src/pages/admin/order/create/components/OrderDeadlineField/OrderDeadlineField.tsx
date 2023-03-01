@@ -17,6 +17,7 @@ import { useIntl } from 'react-intl';
 import css from './OrderDeadlineField.module.scss';
 
 const TIME_OPTIONS = generateTimeOptions();
+
 type TOrderDeadlineFieldProps = {
   form: any;
   values: TObject;

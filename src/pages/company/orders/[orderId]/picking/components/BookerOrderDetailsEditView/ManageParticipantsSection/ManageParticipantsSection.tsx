@@ -34,6 +34,7 @@ export const renderParticipantCards = (
         name={displayName}
         email={email}
         key={uuid}
+        participant={item}
         onClickDeleteIcon={handleClickDeleteParticipant(uuid)}
       />
     );

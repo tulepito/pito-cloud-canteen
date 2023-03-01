@@ -12,8 +12,8 @@
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      width: 16px;
-      height: 16px;
+      width: 24px;
+      height: 24px;
       @include textTemplate(12px, 600, 16px);
 
       color: $neutralGray5;
@@ -26,6 +26,10 @@
     flex-direction: column;
     row-gap: 12px;
     cursor: default;
+  }
+
+  .confirmModal {
+    z-index: 2;
   }
 
   .viewDetailBtn {

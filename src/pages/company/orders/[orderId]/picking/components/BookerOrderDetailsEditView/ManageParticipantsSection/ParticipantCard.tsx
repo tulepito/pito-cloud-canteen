@@ -1,7 +1,8 @@
+import Avatar from '@components/Avatar/Avatar';
 import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import { shortenString } from '@utils/string';
-import type { TDefaultProps } from '@utils/types';
+import type { TDefaultProps, TUser } from '@utils/types';
 import classNames from 'classnames';
 import React from 'react';
 
@@ -17,6 +18,7 @@ type TParticipantCardProps = TDefaultProps & {
   hasDeleteIcon?: boolean;
   name?: string;
   email?: string;
+  participant?: TUser;
   onClickDeleteIcon?: () => void;
 };
 
@@ -30,6 +32,7 @@ const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
     onClickDeleteIcon,
     hasDeleteIcon = true,
     hasCheckIcon,
+    participant,
   } = props;
   const rootClasses = classNames(rootClassName || css.root, className);
 
@@ -39,7 +42,12 @@ const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
   return (
     <div className={rootClasses}>
       <div className={css.avatarContainer}>
-        <img src={avatar} alt="Avatar" className={css.avatar} />
+        {participant ? (
+          <Avatar disableProfileLink user={participant} />
+        ) : (
+          <img src={avatar} alt="Avatar" className={css.avatar} />
+        )}
+
         {hasCheckIcon && <IconCheckWithBackground className={css.checkIcon} />}
       </div>
       <div className={css.infoContainer}>
