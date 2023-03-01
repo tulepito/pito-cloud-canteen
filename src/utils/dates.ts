@@ -5,6 +5,7 @@ import {
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
 import jstz from 'jstimezonedetect';
+import { capitalize } from 'lodash';
 import difference from 'lodash/difference';
 import differenceBy from 'lodash/differenceBy';
 import type { DurationUnits, LocaleOptions } from 'luxon';
@@ -241,8 +242,8 @@ export const addDaysToDate = (date: Date, daysToAdd: number = 0) => {
   return DateTime.fromJSDate(date).plus({ days: daysToAdd }).toJSDate();
 };
 
-export const getStartOfWeek = () => {
-  return DateTime.now().startOf('week').toJSDate();
+export const getStartOfWeek = (anchorDate: number) => {
+  return DateTime.fromMillis(anchorDate).startOf('week').toJSDate();
 };
 
 export const DAY_AS_INDEX = {
@@ -315,11 +316,15 @@ export const findClassDays = (
   lastDay: Date,
 ) => {
   let classDays = [];
-  const rangeDates = getDates(new Date(firstDay), new Date(lastDay));
+  const rangeDates = getDates(new Date(firstDay), new Date(lastDay)) || [];
+  const daysOfWeekUpperCase = daysOfWeek.map((d) => capitalize(d));
+
   classDays = rangeDates.filter((f) =>
-    daysOfWeek.some((d) => DAYS[d as keyof typeof DAYS] === f.getDay()),
+    daysOfWeekUpperCase.some(
+      (d) => DAYS[d as keyof typeof DAYS] === f.getDay(),
+    ),
   );
-  return classDays.map((d) => d.toDateString());
+  return classDays.map((d) => d.getTime());
 };
 
 const sortDatesByDayOfWeek = (dates: Date[]) => {

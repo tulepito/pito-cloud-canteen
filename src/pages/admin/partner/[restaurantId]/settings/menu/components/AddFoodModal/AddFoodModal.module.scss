@@ -18,7 +18,7 @@
 .tableContainer {
   flex: 1;
   padding-right: 24px;
-  border-right: 1px solid $neutralGray4;
+  border-right: 1px solid $neutralGray2;
 }
 
 .tableWrapper {
@@ -71,9 +71,14 @@
 }
 
 .tableBodyCell {
+  padding-left: 0 !important;
   vertical-align: top;
   &:last-child {
     text-align: right !important;
+  }
+  svg {
+    width: 16px;
+    height: 16px;
   }
 }
 
@@ -144,6 +149,12 @@
     color: $neutralGray5 !important;
     font-weight: $fontWeightRegular !important;
     font-size: 12px !important;
+    padding-left: 0 !important;
+    padding-bottom: 0 !important;
+    svg {
+      width: 16px;
+      height: 16px;
+    }
     &:last-child {
       text-align: right !important;
     }

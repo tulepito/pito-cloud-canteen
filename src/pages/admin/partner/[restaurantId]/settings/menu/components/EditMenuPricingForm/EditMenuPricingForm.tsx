@@ -27,6 +27,7 @@ type TExtraProps = {
   currentMenu: TIntegrationListing;
   formRef: any;
   restaurantId: string;
+  anchorDate: Date;
 };
 type TEditMenuPricingFormComponentProps =
   FormRenderProps<TEditMenuPricingFormValues> & Partial<TExtraProps>;
@@ -45,7 +46,8 @@ const EditMenuPricingFormComponent: React.FC<
   TEditMenuPricingFormComponentProps
 > = (props) => {
   const [currentDate, setCurrentDate] = useState<number | null>();
-  const { handleSubmit, currentMenu, values, form, formRef } = props;
+  const { handleSubmit, currentMenu, values, form, formRef, anchorDate } =
+    props;
 
   useImperativeHandle(formRef, () => form);
 
@@ -67,7 +69,7 @@ const EditMenuPricingFormComponent: React.FC<
     });
   };
 
-  const { daysOfWeek } = IntegrationListing(currentMenu).getPublicData();
+  const { daysOfWeek = [] } = IntegrationListing(currentMenu).getPublicData();
 
   const resourcesForCalendar = renderResourcesForCalendar(values.foodsByDate, {
     onRemovePickedFood,
@@ -106,6 +108,7 @@ const EditMenuPricingFormComponent: React.FC<
           <CalendarDashboard
             renderEvent={FoodEventCard}
             events={resourcesForCalendar}
+            anchorDate={anchorDate}
             components={{
               toolbar: () => <></>,
               contentStart: (contentProps: any) => (

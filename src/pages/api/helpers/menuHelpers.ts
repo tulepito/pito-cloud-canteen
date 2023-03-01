@@ -10,7 +10,6 @@ import {
 import { findClassDays } from '@utils/dates';
 import { EListingStates, EListingType } from '@utils/enums';
 import type { TIntegrationListing, TObject } from '@utils/types';
-import { capitalize } from 'lodash';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 const getWeekDayFromListId = (menu: TIntegrationListing, foodId: string) => {
@@ -191,13 +190,13 @@ export const checkUnConflictedMenuMiddleware =
         } = IntegrationListing(l).getPublicData();
 
         const daysOfWeekInRange = findClassDays(
-          daysOfWeek.map((d: string) => capitalize(d)),
+          daysOfWeek,
           new Date(startDate),
           new Date(endDate),
         );
 
         const listingDaysOfWeekInRange = findClassDays(
-          listingDayOfWeek.map((d: string) => capitalize(d)),
+          listingDayOfWeek,
           new Date(listingStartDate),
           new Date(listingEndDate),
         );
