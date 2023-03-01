@@ -1,20 +1,20 @@
 import HorizontalTimeLine from '@components/TimeLine/HorizontalTimeLine';
 import StateItem from '@components/TimeLine/StateItem';
-import { parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp } from '@utils/dates';
 import type { TObject, TTransaction } from '@utils/types';
+import isEmpty from 'lodash/isEmpty';
+import { useMemo } from 'react';
 
 import css from './ReviewOrderStatesSection.module.scss';
 
-export const prepareItemFromData = (
-  transactionMap: TObject<number, TTransaction>,
-) => {
+const prepareItemFromData = (transactionMap: TObject<number, TTransaction>) => {
   const items = Object.entries(transactionMap)
     .map(([date, tx]) => {
       return { date: Number(date), tx };
     })
     .sort((item) => item.date)
     .map(({ date, tx }) => {
-      return { date: parseTimestampToFormat(Number(date)), tx };
+      return { date: formatTimestamp(Number(date)), tx };
     });
 
   return items;
@@ -29,16 +29,24 @@ type TReviewOrderStatesSectionProps = {
 const ReviewOrderStatesSection: React.FC<TReviewOrderStatesSectionProps> = ({
   data,
 }) => {
-  const items = prepareItemFromData(data);
+  const items = useMemo(
+    () => prepareItemFromData(data),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(data)],
+  );
 
   return (
-    <div className={css.root}>
-      <HorizontalTimeLine
-        items={items}
-        itemComponent={StateItem}
-        haveNavigators
-      />
-    </div>
+    <>
+      {!isEmpty(items) && (
+        <div className={css.root}>
+          <HorizontalTimeLine
+            items={items}
+            itemComponent={StateItem}
+            haveNavigators
+          />
+        </div>
+      )}
+    </>
   );
 };
 

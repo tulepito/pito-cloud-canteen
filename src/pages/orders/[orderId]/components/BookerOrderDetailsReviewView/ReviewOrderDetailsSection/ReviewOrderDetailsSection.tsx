@@ -1,8 +1,9 @@
 import Collapsible from '@components/Collapsible/Collapsible';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import { parseThousandNumber } from '@helpers/format';
+import { formatTimestamp } from '@utils/dates';
 import type { TObject } from '@utils/types';
 import classNames from 'classnames';
-import { DateTime } from 'luxon';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -42,6 +43,7 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
 
   useEffect(() => {
     setIsCollapsed(initialCollapseStates);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialCollapseStates.length]);
 
   return (
@@ -89,10 +91,7 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
               restaurantName,
               index,
             } = dateData;
-            const formattedDate = DateTime.fromMillis(Number(date)).toFormat(
-              'EEE, dd/MM/yyyy',
-              { locale: 'vi' },
-            );
+            const formattedDate = formatTimestamp(date, 'EEE, dd/MM/yyyy');
 
             const groupTitleClasses = classNames(css.groupTitle, {
               [css.collapsed]: isCollapsed[index],
@@ -111,7 +110,7 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
                   </div>
                   <div>{''}</div>
                   <div>{totalDishes}</div>
-                  <div>{totalPrice}đ</div>
+                  <div>{parseThousandNumber(totalPrice || 0)}đ</div>
                   <div
                     className={css.actionCell}
                     onClick={handleClickGroupTitle(index)}>
@@ -128,7 +127,7 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
                         <div>{foodName}</div>
                         <div>{''}</div>
                         <div>{frequency}</div>
-                        <div>{foodPrice}đ</div>
+                        <div>{parseThousandNumber(foodPrice || 0)}đ</div>
                         <div>{''}</div>
                       </div>
                     );

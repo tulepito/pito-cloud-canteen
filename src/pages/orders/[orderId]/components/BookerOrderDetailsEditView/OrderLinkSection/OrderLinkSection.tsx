@@ -4,7 +4,7 @@ import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import IconShare from '@components/Icons/IconShare/IconShare';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp } from '@utils/dates';
 import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 import React, { useState } from 'react';
@@ -32,7 +32,7 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const { orderData } = useAppSelector((state) => state.OrderManagement);
 
   const orderLink = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderData?.id?.uuid}`;
-  const formattedOrderDeadline = parseTimestampToFormat(
+  const formattedOrderDeadline = formatTimestamp(
     orderDeadline,
     'HH:mm EEE,dd/MM/yyyy',
   );

@@ -2,7 +2,7 @@ import ButtonIcon from '@components/ButtonIcon/ButtonIcon';
 import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import Modal from '@components/Modal/Modal';
 import Tooltip from '@components/Tooltip/Tooltip';
-import { parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp } from '@utils/dates';
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -44,7 +44,7 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
       id: 'SendNotificationModal.alert',
     },
     {
-      dateTime: parseTimestampToFormat(orderDeadline, 'dd/MM/yyyy  HH:mm'),
+      dateTime: formatTimestamp(orderDeadline, 'dd/MM/yyyy  HH:mm'),
     },
   );
   const sendNotificationModalLinkLabel = intl.formatMessage({

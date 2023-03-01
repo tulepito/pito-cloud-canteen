@@ -17,7 +17,7 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { adminRoutes } from '@src/paths';
-import { parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp } from '@utils/dates';
 import {
   EOrderDetailsStatus,
   EOrderDraftStates,
@@ -47,15 +47,15 @@ const uniqueStrings = (array: string[]) => {
 };
 
 const BADGE_TYPE_BASE_ON_ORDER_STATE = {
-  [EOrderDraftStates.draft]: EBadgeType.DEFAULT,
-  [EOrderDraftStates.pendingApproval]: EBadgeType.PROCESSING,
-  [EOrderStates.canceled]: EBadgeType.DEFAULT,
-  [EOrderStates.canceledByBooker]: EBadgeType.DEFAULT,
-  [EOrderStates.completed]: EBadgeType.WARNING,
-  [EOrderStates.inProgress]: EBadgeType.PROCESSING,
-  [EOrderStates.pendingPayment]: EBadgeType.PROCESSING,
-  [EOrderStates.picking]: EBadgeType.WARNING,
-  [EOrderStates.reviewed]: EBadgeType.WARNING,
+  [EOrderDraftStates.draft]: EBadgeType.default,
+  [EOrderDraftStates.pendingApproval]: EBadgeType.info,
+  [EOrderStates.canceled]: EBadgeType.default,
+  [EOrderStates.canceledByBooker]: EBadgeType.default,
+  [EOrderStates.completed]: EBadgeType.warning,
+  [EOrderStates.inProgress]: EBadgeType.info,
+  [EOrderStates.pendingPayment]: EBadgeType.info,
+  [EOrderStates.picking]: EBadgeType.warning,
+  [EOrderStates.reviewed]: EBadgeType.warning,
 };
 
 const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
@@ -117,7 +117,7 @@ const OrderDetailTooltip = ({
             <OrderIcon />
             <span>
               <span className={css.orderDate}>
-                {parseTimestampToFormat(Number(key))}
+                {formatTimestamp(Number(key))}
               </span>
               : {parsePrice(String(totalPrice))}đ
             </span>
@@ -237,7 +237,7 @@ const TABLE_COLUMN: TColumn[] = [
             BADGE_CLASS_NAME_BASE_ON_ORDER_STATE[state],
           )}
           labelClassName={css.badgeLabel}
-          type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.DEFAULT}
+          type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.default}
           label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
         />
       );
@@ -252,7 +252,7 @@ const TABLE_COLUMN: TColumn[] = [
         <Badge
           containerClassName={css.badge}
           labelClassName={css.badgeLabel}
-          type={isPaid ? EBadgeType.SUCCESS : EBadgeType.WARNING}
+          type={isPaid ? EBadgeType.success : EBadgeType.warning}
           label={isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}
         />
       );
@@ -299,8 +299,8 @@ const parseEntitiesToTableData = (
         location: deliveryAddress?.address,
         companyName: company?.attributes.profile.displayName,
         bookerName: booker?.attributes.profile.displayName,
-        startDate: startDate && parseTimestampToFormat(startDate),
-        endDate: endDate && parseTimestampToFormat(endDate),
+        startDate: startDate && formatTimestamp(startDate),
+        endDate: endDate && formatTimestamp(endDate),
         staffName,
         state: orderState || EOrderDraftStates.pendingApproval,
         orderId: entity?.id?.uuid,

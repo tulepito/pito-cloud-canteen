@@ -7,15 +7,16 @@
   align-items: center;
   justify-content: flex-start;
   border-radius: 4px;
+  color: $neutralGray6;
 
   /* ===============  background =============== */
   &.default {
     background-color: $neutralGray2;
   }
-  &.processing {
+  &.info {
     background-color: $labelBlue1;
   }
-  &.error {
+  &.danger {
     background-color: $sematicRed1;
   }
   &.success {
@@ -24,6 +25,9 @@
   &.warning {
     background-color: $labelOrange1;
   }
+  &.caution {
+    background-color: $labelYellow1;
+  }
   /* ===============  =============== */
 
   /* =============== label =============== */
@@ -31,22 +35,6 @@
     font-size: 12px;
     font-weight: $fontWeightRegular;
     line-height: 17px;
-
-    &.default {
-      color: $neutralGray6;
-    }
-    &.processing {
-      color: $labelBlue2;
-    }
-    &.error {
-      color: $primaryPri2;
-    }
-    &.success {
-      color: $sematicGreen2;
-    }
-    &.warning {
-      color: $labelOrange2;
-    }
   }
   /* ===============  =============== */
 
@@ -70,7 +58,7 @@
     }
     & .error {
       path {
-        fill: $primaryPri2;
+        fill: $sematicRed2;
       }
     }
     & .success {
@@ -81,6 +69,11 @@
     & .warning {
       path {
         fill: $labelOrange2;
+      }
+    }
+    & .caution {
+      path {
+        fill: $labelYellow2;
       }
     }
     /* ===============  =============== */
@@ -97,17 +90,20 @@
     &.default {
       background: $neutralGray6;
     }
-    &.processing {
+    &.info {
       background: $labelBlue2;
     }
-    &.error {
-      background: $primaryPri1;
+    &.danger {
+      background: $sematicRed2;
     }
     &.success {
       background: $sematicGreen2;
     }
     &.warning {
       background: $labelOrange2;
+    }
+    &.caution {
+      background: $labelYellow2;
     }
     /* ===============  =============== */
   }

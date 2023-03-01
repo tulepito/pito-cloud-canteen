@@ -101,7 +101,7 @@ const TABLE_COLUMN: TColumn[] = [
     render: (data: any) => {
       const isActive = data.status === ECompanyStatus.active;
       const label = isActive ? 'Đã active' : 'Chưa active';
-      const badgeType = isActive ? EBadgeType.SUCCESS : EBadgeType.DEFAULT;
+      const badgeType = isActive ? EBadgeType.success : EBadgeType.default;
       return (
         <Badge
           label={label}

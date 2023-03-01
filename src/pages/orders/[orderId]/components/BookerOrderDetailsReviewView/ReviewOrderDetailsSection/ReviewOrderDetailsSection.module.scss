@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 @mixin tableColumnsLayout {
   display: flex;
@@ -17,7 +18,16 @@
     flex-basis: 30px;
   }
   & > div:nth-of-type(2) {
+    max-width: 200px;
     flex-grow: 1;
+
+    @include viewportLargeWithPaddings {
+      max-width: 250px;
+    }
+
+    @include viewportSLarge {
+      max-width: 280px;
+    }
   }
   & > div:nth-of-type(3) {
     flex-basis: 50px;
@@ -81,6 +91,8 @@
           .restaurantName {
             @include textTemplate(14px, 400, 20px);
             color: $neutralGray5;
+            max-width: 100%;
+            @include lineClamp(1);
           }
 
           .actionCell {

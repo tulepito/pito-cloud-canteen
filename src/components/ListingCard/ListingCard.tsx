@@ -52,7 +52,7 @@ const ListingCard: React.FC<TListCardProps> = ({
         <div className={css.listingCardInfo}>
           <h6 className={css.title}>{title}</h6>
           <div className={css.categories}>
-            <Badge label="Keto" type={EBadgeType.PROCESSING} />
+            <Badge label="Keto" type={EBadgeType.info} />
           </div>
           <p className={css.description}>{description}</p>
         </div>
