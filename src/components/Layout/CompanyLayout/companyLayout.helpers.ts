@@ -6,6 +6,7 @@ export const shouldShowFeatureHeader = (pathName: string) => {
     companyPaths.EditDraftOrder,
     companyPaths.OrderSelectRestaurant,
     companyPaths.ManageOrderDetail,
+    companyPaths.ManageOrderPicking,
   ].concat(Object.values(quizPaths));
 
   if (hideList.includes(pathName)) {
@@ -22,6 +23,7 @@ export const shouldShowSidebar = (pathName: string) => {
     companyPaths.OrderSelectRestaurant,
     companyPaths.ManageOrders,
     companyPaths.ManageOrderDetail,
+    companyPaths.ManageOrderPicking,
   ].concat(Object.values(quizPaths));
 
   if (hideList.includes(pathName)) {

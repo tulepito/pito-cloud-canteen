@@ -23,7 +23,13 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
   props,
 ) => {
   const intl = useIntl();
-  const { isOpen, onClose, handleClickDeleteParticipant, data } = props;
+  const {
+    isOpen,
+    onClose,
+    onSubmitAddParticipant,
+    handleClickDeleteParticipant,
+    data,
+  } = props;
   const count = 0;
 
   const modalTitle = intl.formatMessage(
@@ -47,7 +53,7 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
       containerClassName={css.modalContainer}
       title={modalTitle}>
       <div className={css.subTitle}>{modalSubTitle}</div>
-      <AddParticipantForm onSubmit={() => {}} hasSubmitButton />
+      <AddParticipantForm onSubmit={onSubmitAddParticipant} hasSubmitButton />
       <div className={css.participantsContainer}>
         <RawParticipants
           data={data}

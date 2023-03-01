@@ -59,7 +59,7 @@ function BookerDraftOrderPage() {
     await dispatch(orderAsyncActions.bookerPublishOrder({ orderId, planId }));
     setTimeout(() => {
       router.push({
-        pathname: '/orders/[orderId]',
+        pathname: companyPaths.ManageOrderPicking,
         query: { orderId: orderId as string },
       });
     }, 1000);
@@ -98,7 +98,7 @@ function BookerDraftOrderPage() {
         router.push({ pathname: companyPaths.CreateNewOrder });
       } else if (!EnableToAccessPageOrderStates.includes(orderState)) {
         router.push({
-          pathname: '/orders/[orderId]',
+          pathname: companyPaths.ManageOrderPicking,
           query: { orderId: orderId as string },
         });
       }

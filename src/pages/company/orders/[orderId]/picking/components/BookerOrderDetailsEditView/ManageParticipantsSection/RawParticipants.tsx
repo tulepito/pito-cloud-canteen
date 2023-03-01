@@ -43,6 +43,7 @@ export const RawParticipants: React.FC<TRawParticipantsProps> = ({
             className={css.participantCard}
             onClickDeleteIcon={handleClickDeleteParticipant(uuid)}
             key={uuid}
+            participant={item}
             hasCheckIcon={isSelectedFood}
           />
         );

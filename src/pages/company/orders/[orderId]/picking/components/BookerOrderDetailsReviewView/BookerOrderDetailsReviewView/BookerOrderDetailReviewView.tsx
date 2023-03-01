@@ -1,7 +1,7 @@
-import type { usePrepareOrderDetailPageData } from '@pages/orders/[orderId]/hooks/usePrepareData';
 import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 
+import type { usePrepareOrderDetailPageData } from '../../../hooks/usePrepareData';
 import ReviewCartSection from '../ReviewCartSection/ReviewCartSection';
 import type { TReviewInfoFormValues } from '../ReviewInfoSection/ReviewInfoForm';
 import ReviewInfoSection from '../ReviewInfoSection/ReviewInfoSection';

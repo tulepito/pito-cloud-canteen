@@ -1,12 +1,12 @@
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { orderManagementThunks } from '@pages/orders/[orderId]/OrderManagement.slice';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
+import { orderManagementThunks } from '../../../../OrderManagement.slice';
 import type { TEditOrderRowFormValues } from '../EditOrderRowForm';
 import EditOrderRowModal from '../EditOrderRowModal';
 import { prepareDataForTabs } from './OrderDetailsTable.helpers';

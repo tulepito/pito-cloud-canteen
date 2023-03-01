@@ -25,5 +25,5 @@ export { default as walkthrough } from './walkthrough.slice';
 export { default as BookerDraftOrderPage } from '@pages/company/booker/orders/draft/[orderId]/BookerDraftOrderPage.slice';
 export { default as BookerSelectRestaurant } from '@pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
 export { default as BookerNewOrderPage } from '@pages/company/booker/orders/new/BookerNewOrder.slice';
-export { default as OrderManagement } from '@pages/orders/[orderId]/OrderManagement.slice';
+export { default as OrderManagement } from '@pages/company/orders/[orderId]/picking/OrderManagement.slice';
 export { default as ParticipantPlanPage } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';
