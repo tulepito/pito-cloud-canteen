@@ -25,18 +25,20 @@ function BookerSelectRestaurant() {
   const { companyAccount } = useGetCompanyAccount();
   const { restaurants, searchInProgress, totalResultItems, totalRatings } =
     useSearchRestaurants();
-  const onGoBack = () => {
+
+  const handleGoBack = () => {
     router.push({
-      pathname: companyPaths.ManageOrderDetail,
+      pathname: companyPaths.EditDraftOrder,
       query: {
         orderId,
       },
     });
   };
+
   return (
     <Layout>
       <LayoutTop>
-        <div className={css.goBackBtn} onClick={onGoBack}>
+        <div className={css.goBackBtn} onClick={handleGoBack}>
           <IconArrow direction="left" />
           Quay lại
         </div>
