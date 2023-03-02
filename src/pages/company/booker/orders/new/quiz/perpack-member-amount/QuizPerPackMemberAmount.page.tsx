@@ -14,6 +14,7 @@ import { useField, useForm } from 'react-final-form-hooks';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
+import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
 import css from './QuizPerPackMemberAmount.module.scss';
 
@@ -35,6 +36,7 @@ const QuizPerPackMemberAmountPage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
+  useRedirectAfterReloadPage();
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
 
   const onSubmit = (values: any) => {
@@ -111,6 +113,18 @@ const QuizPerPackMemberAmountPage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [packagePerMember.input.value]);
+
+  useEffect(() => {
+    if (memberAmount.input.value) {
+      form.batch(() => {
+        form.change(
+          'memberAmount',
+          parseThousandNumber(`${memberAmount.input.value}`),
+        );
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [memberAmount.input.value]);
 
   const onFormSubmitClick = () => {
     handleSubmit();
