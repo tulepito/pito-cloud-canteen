@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { BookerSelectRestaurantThunks } from '../BookerSelectRestaurant.slice';
 
 export const useGetOrder = ({ orderId }: { orderId: string }) => {
-  const order = useAppSelector((state) => state.Order.order);
+  const order = useAppSelector((state) => state.BookerSelectRestaurant.order);
   const fetchOrderInProgress = useAppSelector(
     (state) => state.Order.fetchOrderInProgress,
   );

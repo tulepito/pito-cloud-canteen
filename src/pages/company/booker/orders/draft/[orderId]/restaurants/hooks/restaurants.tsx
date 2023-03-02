@@ -19,7 +19,6 @@ export const useSearchRestaurants = () => {
     distance,
     rating,
     keywords,
-    packaging,
   } = router.query;
 
   const restaurants = useAppSelector(
@@ -62,9 +61,6 @@ export const useSearchRestaurants = () => {
           : {}),
         ...(distance ? { distance: convertQueryValueToArray(distance) } : {}),
         ...(rating ? { rating: convertQueryValueToArray(rating) } : {}),
-        ...(packaging
-          ? { packaging: convertQueryValueToArray(packaging) }
-          : {}),
         ...(keywords ? { keywords: keywords as string } : {}),
       }),
     );
@@ -78,7 +74,6 @@ export const useSearchRestaurants = () => {
     rating,
     timestamp,
     keywords,
-    packaging,
   ]);
 
   return {
@@ -87,4 +82,24 @@ export const useSearchRestaurants = () => {
     totalResultItems,
     totalRatings,
   };
+};
+
+export const useGetRestaurant = () => {
+  const router = useRouter();
+  const { restaurantId } = router.query;
+
+  const dispatch = useAppDispatch();
+
+  const restaurant = useAppSelector(
+    (state) => state.BookerSelectRestaurant.restaurant,
+    shallowEqual,
+  );
+
+  useEffect(() => {
+    dispatch(
+      BookerSelectRestaurantThunks.fetchRestaurant(restaurantId as string),
+    );
+  }, [restaurantId, dispatch]);
+
+  return { restaurant };
 };

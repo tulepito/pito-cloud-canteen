@@ -7,6 +7,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { convertWeekDay } from '@utils/dates';
+import { EImageVariants } from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
 import { DateTime } from 'luxon';
 
@@ -21,6 +22,8 @@ type TKeyValue<T = string> = {
 };
 
 type TOrderInitialState = {
+  restaurant: TListing | null;
+
   menuTypes: TKeyValue[];
   categories: TKeyValue[];
   packaging: TKeyValue[];
@@ -65,6 +68,8 @@ type TOrderInitialState = {
 };
 
 const initialState: TOrderInitialState = {
+  restaurant: null,
+
   menuTypes: [],
   categories: [],
   packaging: [],
@@ -101,10 +106,11 @@ const initialState: TOrderInitialState = {
 };
 
 // ================ Thunk types ================ //
-const FETCH_SEARCH_FILTER = 'app/BookerSelectRestaurant/FETCH_SEARCH_FILTER';
-const SEARCH_RESTAURANT = 'app/BookerSelectRestaurant/SEARCH_RESTAURANT';
+const FETCH_RESTAURANT = 'app/BookerDraftOrderPage/FETCH_RESTAURANT';
+const FETCH_SEARCH_FILTER = 'app/BookerDraftOrderPage/FETCH_SEARCH_FILTER';
+const SEARCH_RESTAURANT = 'app/BookerDraftOrderPage/SEARCH_RESTAURANT';
 const FETCH_FOOD_LIST_FROM_RESTAURANT =
-  'app/BookerSelectRestaurant/FETCH_FOOD_LIST_FROM_RESTAURANT';
+  'app/BookerDraftOrderPage/FETCH_FOOD_LIST_FROM_RESTAURANT';
 const FETCH_ORDER = 'app/BookerSelectRestaurant/FETCH_ORDER';
 const FETCH_PLAN_DETAIL = 'app/BookerSelectRestaurant/FETCH_PLAN_DETAIL';
 const UPDATE_PLAN_DETAIL = 'app/BookerSelectRestaurant/UPDATE_PLAN_DETAIL';
@@ -112,6 +118,28 @@ const FETCH_COMPANY_FROM_ORDER =
   'app/BookerSelectRestaurant/FETCH_COMPANY_FROM_ORDER';
 
 // ================ Async thunks ================ //
+const fetchRestaurant = createAsyncThunk(
+  FETCH_RESTAURANT,
+  async (restaurantId: string, { extra: sdk }) => {
+    if (restaurantId) {
+      const response = denormalisedResponseEntities(
+        await sdk.listings.show({
+          id: restaurantId,
+          include: ['images'],
+          'fields.image': [
+            `variants.${EImageVariants.default}`,
+            `variants.${EImageVariants.squareSmall}`,
+            `variants.${EImageVariants.landscapeCrop}`,
+            `variants.${EImageVariants.landscapeCrop2x}`,
+          ],
+        }),
+      )[0];
+      return response;
+    }
+    return null;
+  },
+);
+
 const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
   const { data: searchFiltersResponse } = await fetchSearchFilterApi();
   return searchFiltersResponse;
@@ -231,12 +259,7 @@ const fetchCompanyAccount = createAsyncThunk(
 const fetchFoodListFromRestaurant = createAsyncThunk(
   FETCH_FOOD_LIST_FROM_RESTAURANT,
   async (params: Record<string, any>, { getState, dispatch, extra: sdk }) => {
-    const {
-      restaurantId,
-      menuId: menuIdParam,
-      timestamp,
-      keywords = '',
-    } = params;
+    const { restaurantId, menuId: menuIdParam, timestamp } = params;
     const { combinedRestaurantMenuData = [], restaurantFood = {} } =
       getState().BookerSelectRestaurant;
     const dateTime = DateTime.fromMillis(timestamp);
@@ -246,14 +269,7 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
       combinedRestaurantMenuData.find(
         (item) => item.restaurantId === restaurantId,
       )?.menuId;
-    const menuListing = denormalisedResponseEntities(
-      await sdk.listings.show({
-        id: menuId,
-      }),
-    )[0];
-    const foodIdList =
-      Listing(menuListing).getMetadata()?.[`${dayOfWeek}FoodIdList`];
-    const { order } = getState().Order;
+    const { order } = getState().BookerSelectRestaurant;
     const { nutritions = [], packagePerMember } = Listing(
       order as TListing,
     ).getMetadata();
@@ -266,9 +282,7 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
       ...(nutritions.length > 0
         ? { pub_nutritions: `has_any:${nutritions.join(',')}` }
         : {}),
-      ids: foodIdList.join(','),
       include: ['images'],
-      ...(keywords && { keywords }),
     });
     const foodList = denormalisedResponseEntities(response);
 
@@ -284,6 +298,8 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
 );
 
 export const BookerSelectRestaurantThunks = {
+  fetchRestaurant,
+
   fetchSearchFilter,
   searchRestaurants,
   fetchFoodListFromRestaurant,
@@ -312,7 +328,6 @@ const BookerSelectRestaurantSlice = createSlice({
         state.fetchFilterInProgress = false;
         state.menuTypes = action.payload.menuTypes;
         state.categories = action.payload.categories;
-        state.packaging = action.payload.packaging;
       })
       .addCase(searchRestaurants.pending, (state) => {
         state.searchInProgress = true;
@@ -400,7 +415,22 @@ const BookerSelectRestaurantSlice = createSlice({
       .addCase(fetchFoodListFromRestaurant.rejected, (state, { payload }) => {
         state.fetchRestaurantFoodInProgress = false;
         state.fetchRestaurantFoodError = payload;
-      });
+      })
+      .addCase(fetchRestaurant.pending, (state) => ({
+        ...state,
+        fetchRestaurantInProgress: true,
+        fetchRestaurantError: null,
+      }))
+      .addCase(fetchRestaurant.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchRestaurantInProgress: false,
+        restaurant: payload,
+      }))
+      .addCase(fetchRestaurant.rejected, (state, { error }) => ({
+        ...state,
+        fetchRestaurantInProgress: false,
+        fetchRestaurantError: error,
+      }));
   },
 });
 
