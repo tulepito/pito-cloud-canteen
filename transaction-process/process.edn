@@ -4,7 +4,7 @@
                {
                 :name        :transition/initiate-transaction,
                 :actor       :actor.role/customer,
-                :actions     [{:name :action/create-booking} {:name :action/privileged-update-metadata}],
+                :actions     [{:name :action/create-pending-booking} {:name :action/privileged-update-metadata}],
                 :to          :state/initiated
                 :privileged? true
                 }
