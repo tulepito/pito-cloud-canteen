@@ -23,6 +23,7 @@ type TKeyValue<T = string> = {
 type TOrderInitialState = {
   menuTypes: TKeyValue[];
   categories: TKeyValue[];
+  packaging: TKeyValue[];
   restaurantIdList: string[];
 
   searchResult: TListing[];
@@ -66,6 +67,7 @@ type TOrderInitialState = {
 const initialState: TOrderInitialState = {
   menuTypes: [],
   categories: [],
+  packaging: [],
   restaurantIdList: [],
 
   searchResult: [],
@@ -302,6 +304,7 @@ const BookerSelectRestaurantSlice = createSlice({
         state.fetchFilterInProgress = false;
         state.menuTypes = action.payload.menuTypes;
         state.categories = action.payload.categories;
+        state.packaging = action.payload.packaging;
       })
       .addCase(searchRestaurants.pending, (state) => {
         state.searchInProgress = true;

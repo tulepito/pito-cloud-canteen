@@ -79,6 +79,7 @@ export const getRestaurantQuery = ({
     keywords = '',
     distance,
     categories = [],
+    packaging = [],
   } = params;
 
   let newRestaurantIds = [...restaurantIds];
@@ -93,13 +94,16 @@ export const getRestaurantQuery = ({
   const bounds = distance ? calculateBounds(origin, distance) : '';
   const query = {
     ids: newRestaurantIds.join(','),
-    meta_rating: rating,
     keywords,
     page,
+    ...(rating && { meta_rating: `${rating},` }),
     ...(distance ? { bounds } : {}),
     ...(categories.length > 0
       ? { pub_categories: `has_all:${categories.join(',')}` }
       : {}),
+    ...(packaging.length > 0 && {
+      pub_packaging: `has_any:${packaging.join(',')}`,
+    }),
     include: ['images'],
     'fields.image': [
       `variants.${EImageVariants.default}`,

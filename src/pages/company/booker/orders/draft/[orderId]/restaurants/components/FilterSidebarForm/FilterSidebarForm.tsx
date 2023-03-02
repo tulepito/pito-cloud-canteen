@@ -31,6 +31,9 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
   const categoriesOptions = useAppSelector(
     (state) => state.BookerSelectRestaurant.categories,
   );
+  const packagingOptions = useAppSelector(
+    (state) => state.BookerSelectRestaurant.packaging,
+  );
 
   const onResetAllFilters = () => {
     form.reset({
@@ -38,6 +41,7 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
       categories: [],
       distance: [],
       rating: [],
+      packaging: [],
     });
   };
   const handleFormChange = async (values: any) => {
@@ -96,6 +100,13 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
             title="Đánh giá"
             name="rating"
             options={ratingOptions}
+          />
+        </div>
+        <div className={css.filterWrapper}>
+          <CollapseFilter
+            title="Bao bì"
+            name="packaging"
+            options={packagingOptions}
           />
         </div>
       </div>

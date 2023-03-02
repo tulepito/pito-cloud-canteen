@@ -84,7 +84,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
         <IconGift className={css.gift} />
         <span>x2</span>
       </div>
-      <div className={css.coverImage}>
+      <div className={css.coverImage} onClick={handleClickCard}>
         <ResponsiveImage
           alt="card"
           image={restaurantCoverImage}

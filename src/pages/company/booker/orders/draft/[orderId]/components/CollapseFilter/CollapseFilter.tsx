@@ -34,7 +34,7 @@ const CollapseFilter: React.FC<CollapseFilterProps> = (props) => {
       <div className={optionsClasses}>
         {options.map(({ key, label }) => (
           <FieldCheckbox
-            id={key}
+            id={`${name}-${key}`}
             key={`${name}-${key}`}
             name={name}
             value={key}
