@@ -254,6 +254,7 @@
   "DayInWeekField.thu": "Thứ 5",
   "DayInWeekField.tue": "Thứ 3",
   "DayInWeekField.wed": "Thứ 4",
+  "DeleteMealModal.content": "Bạn có chắc chắn muốn xoá bữa ăn ngày {deleteDate} không?",
   "DayOfWeekCalendarHeader.fri": "Thứ 6",
   "DayOfWeekCalendarHeader.mon": "Thứ 2",
   "DayOfWeekCalendarHeader.sat": "Thứ 7",

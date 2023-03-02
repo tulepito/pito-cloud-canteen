@@ -37,6 +37,7 @@ export const getMenuQuery = ({
     pub_startDate: `,${dateTime.toMillis()}`,
     pub_daysOfWeek: `has_any:${dayOfWeek}`,
     pub_mealType: mealType,
+    meta_isDeleted: false,
     ...(menuTypes.length > 0 ? { meta_menuType: menuTypes.join(',') } : {}),
     ...(nutritions.length > 0
       ? {
