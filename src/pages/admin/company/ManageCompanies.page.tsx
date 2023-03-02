@@ -33,17 +33,6 @@ import css from './ManageCompanies.module.scss';
 
 const TABLE_COLUMN: TColumn[] = [
   {
-    key: 'id',
-    label: 'ID',
-    render: (data: any) => {
-      return (
-        <div className={css.rowId} title={data.id}>
-          {data.id}
-        </div>
-      );
-    },
-  },
-  {
     key: 'name',
     label: 'Tên công ty',
     render: ({ id, name }: any) => {
