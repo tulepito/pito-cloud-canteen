@@ -18,7 +18,7 @@ export type TNumberEmployeesFormValues = {
 const validate = (values: TNumberEmployeesFormValues) => {
   const errors: any = {};
   if (!values.memberAmount) {
-    errors.memberAmount = 'Required';
+    errors.memberAmount = 'Vui lòng chọn số lượng nhân viên';
   }
   return errors;
 };

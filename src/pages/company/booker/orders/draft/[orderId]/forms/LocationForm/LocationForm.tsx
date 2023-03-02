@@ -18,7 +18,7 @@ export type TLocationFormValues = {
 const validate = (values: TLocationFormValues) => {
   const errors: any = {};
   if (!values.deliveryAddress) {
-    errors.deliveryAddress = 'Required';
+    errors.deliveryAddress = 'Vui lòng chọn địa chỉ giao hàng';
   }
   return errors;
 };
