@@ -21,7 +21,7 @@ function BookerSelectRestaurant() {
   const router = useRouter();
   const { orderId } = router.query;
 
-  useGetOrder({ orderId: orderId as string });
+  const { order } = useGetOrder({ orderId: orderId as string });
   const { companyAccount } = useGetCompanyAccount();
   const { restaurants, searchInProgress, totalResultItems, totalRatings } =
     useSearchRestaurants();
@@ -57,6 +57,7 @@ function BookerSelectRestaurant() {
             <FilterLabelsSection totalResultItems={totalResultItems} />
           </div>
           <ResultList
+            order={order}
             className={css.resultList}
             restaurants={restaurants}
             isLoading={searchInProgress}

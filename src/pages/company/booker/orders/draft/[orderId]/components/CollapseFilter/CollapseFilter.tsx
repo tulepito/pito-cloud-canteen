@@ -12,7 +12,7 @@ type CollapseFilterProps = {
 };
 
 const CollapseFilter: React.FC<CollapseFilterProps> = (props) => {
-  const { title, options, name } = props;
+  const { title, options = [], name } = props;
   const { value: isOptionsCollapse, toggle: toggleOptionsCollapse } =
     useBoolean(false);
 

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
@@ -16,6 +17,7 @@ import { useIntl } from 'react-intl';
 import { BookerSelectRestaurantThunks } from '../../BookerSelectRestaurant.slice';
 import { getListingImageById } from '../../helpers';
 import { useGetPlanDetails } from '../../hooks/orderData';
+import { useGetRestaurant } from '../../hooks/restaurants';
 import FoodDetailModal from '../FoodDetailModal/FoodDetailModal';
 import FoodListSection from './FoodListSection';
 import ResultDetailFilters from './ResultDetailFilters';
@@ -60,6 +62,8 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   const foodModal = useBoolean(false);
   const [selectedFood, setSelectedFood] = useState<TListing | null>(null);
 
+  const { restaurant: preselectedRestaurant } = useGetRestaurant();
+
   const { orderId, planId, planDetail } = useGetPlanDetails();
   const initFoodList = useMemo(() => {
     const detail =
@@ -87,11 +91,14 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
 
   const currentRestaurant = useMemo(
     () =>
+      preselectedRestaurant ||
       restaurants.find(
         (restaurant) => restaurant.id?.uuid === selectedRestaurantId,
-      ) || null,
-    [restaurants, selectedRestaurantId],
+      ) ||
+      null,
+    [restaurants, selectedRestaurantId, JSON.stringify(preselectedRestaurant)],
   );
+
   const { geolocation: restaurantOrigin } = Listing(
     currentRestaurant!,
   ).getAttributes();
