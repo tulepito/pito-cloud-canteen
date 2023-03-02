@@ -46,7 +46,7 @@ export const prepareDataForTabs = ({
       } = result;
 
       const [memberId, orderItemData] = currentOrderItem;
-      const { status, foodId } = orderItemData;
+      const { status, foodId, requirement = '' } = orderItemData;
       const memberData = memberInfoMap[memberId];
 
       const itemData: TItemData = {
@@ -55,7 +55,7 @@ export const prepareDataForTabs = ({
         status,
         foodData:
           foodId?.length > 0 && foodList[foodId]
-            ? { ...foodList[foodId], foodId }
+            ? { ...foodList[foodId], foodId, requirement }
             : {},
       };
 

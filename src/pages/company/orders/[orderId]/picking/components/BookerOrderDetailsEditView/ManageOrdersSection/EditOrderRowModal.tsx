@@ -29,6 +29,7 @@ const EditOrderRowModal: React.FC<TEditOrderRowModalProps> = (props) => {
   const { memberData, foodData } = currentMemberOrderData || {};
   const initialValues = {
     foodId: foodData?.foodId || '',
+    requirement: foodData?.requirement || '',
     memberName: memberData?.name || {},
   };
 

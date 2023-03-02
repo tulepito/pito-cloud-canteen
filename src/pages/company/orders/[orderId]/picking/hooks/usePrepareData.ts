@@ -139,7 +139,7 @@ export const usePrepareOrderDetailPageData = () => {
   /* =============== Price quotation data =============== */
   const priceQuotationData = {
     customerData: {
-      ...(reviewInfoValues || {}),
+      ...(reviewInfoValues || reviewInfoData),
       email: bookerEmail,
     },
     orderData: {
