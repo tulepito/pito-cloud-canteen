@@ -5,9 +5,9 @@ import {
   showPartnerFoodApi,
   updatePartnerFoodApi,
 } from '@apis/foodApi';
+import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
-import { getImportDataFromCsv } from '@src/pages/admin/partner/[restaurantId]/settings/food/utils';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants, EListingType } from '@utils/enums';
 import { storableError } from '@utils/errors';
@@ -273,7 +273,7 @@ const updatePartnerFoodListing = createAsyncThunk(
   },
 );
 
-const creataPartnerFoodFromCsv = createAsyncThunk(
+const createPartnerFoodFromCsv = createAsyncThunk(
   CREATE_FOOD_FROM_FILE,
   async (
     { file, restaurantId }: { file: File; restaurantId: string },
@@ -286,54 +286,19 @@ const creataPartnerFoodFromCsv = createAsyncThunk(
         async complete({ data }: any) {
           const response = await Promise.all(
             data.map(async (l: any) => {
-              const { images, title } = l;
-              const imagesAsArray = images ? images.split(',') : [];
-              const imageAsFiles = await Promise.all(
-                imagesAsArray
-                  .map(async (src: string) => {
-                    try {
-                      const response = await fetch(src);
-                      const blobData = await response.blob();
-                      const metadata = {
-                        type: 'image/jpeg',
-                      };
-                      const file = new File(
-                        [blobData],
-                        `${`${title}_${new Date().getTime()}`}.jpg`,
-                        metadata,
-                      );
-                      return file;
-                    } catch (error) {
-                      console.error(error);
-                      return null;
-                    }
-                  })
-                  .filter((file: File) => !!file),
-              );
-              // upload image to Flex
-              const uploadRes = await Promise.all(
-                imageAsFiles.map(async (file) =>
-                  sdk.images.upload({
-                    image: file,
-                  }),
-                ),
-              );
-
-              const newImages = uploadRes.map((res) => res.data.data.id);
-
               const dataParams = getImportDataFromCsv({
                 ...l,
                 restaurantId,
-                images: newImages,
               });
-              const queryParams = {
-                expand: true,
-              };
-              const { data } = await createPartnerFoodApi({
-                dataParams,
-                queryParams,
-              });
-              return denormalisedResponseEntities(data)[0];
+              console.log({ dataParams });
+              // const queryParams = {
+              //   expand: true,
+              // };
+              // const { data } = await createPartnerFoodApi({
+              //   dataParams,
+              //   queryParams,
+              // });
+              // return denormalisedResponseEntities(data)[0];
             }),
           );
           resolve(response as any);
@@ -415,7 +380,7 @@ export const foodSliceThunks = {
   removePartnerFood,
   showDuplicateFood,
   duplicateFood,
-  creataPartnerFoodFromCsv,
+  createPartnerFoodFromCsv,
   queryMenuPickedFoods,
 };
 
@@ -592,13 +557,13 @@ const foodSlice = createSlice({
         createFoodInProgress: false,
         createFoodError: payload,
       }))
-      .addCase(creataPartnerFoodFromCsv.pending, (state) => ({
+      .addCase(createPartnerFoodFromCsv.pending, (state) => ({
         ...state,
         createPartnerFoodFromCsvInProgress: true,
         createPartnerFoodFromCsvError: null,
       }))
       .addCase(
-        creataPartnerFoodFromCsv.fulfilled,
+        createPartnerFoodFromCsv.fulfilled,
         (state, { payload = [] }) => ({
           ...state,
           createPartnerFoodFromCsvInProgress: false,
@@ -609,7 +574,7 @@ const foodSlice = createSlice({
           ],
         }),
       )
-      .addCase(creataPartnerFoodFromCsv.rejected, (state, { payload }) => ({
+      .addCase(createPartnerFoodFromCsv.rejected, (state, { payload }) => ({
         ...state,
         createPartnerFoodFromCsvInProgress: false,
         createPartnerFoodFromCsvError: payload,

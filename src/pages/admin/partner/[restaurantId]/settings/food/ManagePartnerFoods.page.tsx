@@ -308,7 +308,7 @@ const ManagePartnerFoods = () => {
   const onImportFoodFromCsv = async () => {
     if (file) {
       const { error } = (await dispatch(
-        foodSliceThunks.creataPartnerFoodFromCsv({
+        foodSliceThunks.createPartnerFoodFromCsv({
           file,
           restaurantId: restaurantId as string,
         }),
@@ -455,7 +455,7 @@ const ManagePartnerFoods = () => {
         </p>
         <div className={css.inputWrapper}>
           <input
-            accept=".csv"
+            accept=".xlsx, .xls, .csv"
             onChange={({ target }) => setFile(target?.files?.[0])}
             type="file"
             className={css.inputFile}
