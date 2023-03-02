@@ -1,5 +1,6 @@
 import Button from '@components/Button/Button';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import { parseThousandNumber } from '@helpers/format';
 import classNames from 'classnames';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -38,6 +39,7 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
           type="number"
           className={css.durationTimeInput}
           placeholder="1"
+          parse={parseThousandNumber}
         />
         <div className={css.timeModeBtnWrapper}>
           <Button

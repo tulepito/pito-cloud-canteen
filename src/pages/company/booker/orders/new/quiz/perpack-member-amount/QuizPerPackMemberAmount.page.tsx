@@ -114,6 +114,18 @@ const QuizPerPackMemberAmountPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [packagePerMember.input.value]);
 
+  useEffect(() => {
+    if (memberAmount.input.value) {
+      form.batch(() => {
+        form.change(
+          'memberAmount',
+          parseThousandNumber(`${memberAmount.input.value}`),
+        );
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [memberAmount.input.value]);
+
   const onFormSubmitClick = () => {
     handleSubmit();
     router.push(quizPaths.SpecialDemand);

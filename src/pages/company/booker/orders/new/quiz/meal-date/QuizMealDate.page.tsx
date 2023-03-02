@@ -4,11 +4,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing, User } from '@utils/data';
-import {
-  formatTimestamp,
-  getSelectedDaysOfWeek,
-  TimeOptions,
-} from '@utils/dates';
+import { formatTimestamp, getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
@@ -60,8 +56,6 @@ const QuizMealDate = () => {
   const initialValues = useMemo(
     () => ({
       dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri'],
-      deliveryHour: TimeOptions[0],
-      deadlineHour: TimeOptions[0],
     }),
     [],
   );
@@ -110,7 +104,7 @@ const QuizMealDate = () => {
       isOpen={!creatingOrderModalControl.value}
       handleClose={() => {}}
       modalTitle={intl.formatMessage({ id: 'QuizMealDate.title' })}
-      submitText="Tiếp tục"
+      submitText="Tạo đơn"
       onSubmit={onFormSubmitClick}
       submitDisabled={formInvalid}
       onBack={goBack}>
