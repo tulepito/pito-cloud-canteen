@@ -12,7 +12,7 @@ const prepareItemFromData = (transactionMap: TObject<number, TTransaction>) => {
     .map(([date, tx]) => {
       return { date: Number(date), tx };
     })
-    .sort((item) => item.date)
+    .sort((item, item2) => item.date - item2.date)
     .map(({ date, tx }) => {
       return { date: formatTimestamp(Number(date)), tx };
     });

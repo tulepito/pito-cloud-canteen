@@ -1,8 +1,8 @@
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@utils/data';
-import { renderDateRange } from '@utils/dates';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TListing, TObject, TUser } from '@utils/types';
 import isEmpty from 'lodash/isEmpty';
@@ -25,7 +25,7 @@ type TManageOrdersSectionProps = {
 
 const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
   const {
-    data: { startDate, endDate },
+    data: { startDate },
   } = props;
 
   const dispatch = useAppDispatch();
@@ -37,7 +37,14 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
 
   const { participants = [] } = Listing(orderData as TListing).getMetadata();
   const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
-  const dateList = renderDateRange(startDate, endDate);
+  const dateList = Object.entries(orderDetail).reduce<number[]>(
+    (prev, [date, orderOnDate]) => {
+      const { restaurant } = orderOnDate as TObject;
+
+      return !isEmpty(restaurant?.foodList) ? prev.concat(Number(date)) : prev;
+    },
+    [],
+  );
 
   const { restaurant = {}, memberOrders = {} } =
     orderDetail[currentViewDate.toString()] || {};
@@ -139,14 +146,18 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
   };
 
   return (
-    <div className={css.root}>
-      <Tabs
-        items={items}
-        onChange={handleDateTabChange}
-        showNavigation
-        middleLabel
-      />
-    </div>
+    <RenderWhen condition={!isEmpty(dateList)}>
+      <RenderWhen.True>
+        <div className={css.root}>
+          <Tabs
+            items={items}
+            onChange={handleDateTabChange}
+            showNavigation
+            middleLabel
+          />
+        </div>
+      </RenderWhen.True>
+    </RenderWhen>
   );
 };
 
