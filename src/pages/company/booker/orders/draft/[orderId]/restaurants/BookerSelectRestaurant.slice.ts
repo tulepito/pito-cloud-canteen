@@ -23,6 +23,7 @@ type TKeyValue<T = string> = {
 type TOrderInitialState = {
   menuTypes: TKeyValue[];
   categories: TKeyValue[];
+  packaging: TKeyValue[];
   restaurantIdList: string[];
 
   searchResult: TListing[];
@@ -66,6 +67,7 @@ type TOrderInitialState = {
 const initialState: TOrderInitialState = {
   menuTypes: [],
   categories: [],
+  packaging: [],
   restaurantIdList: [],
 
   searchResult: [],
@@ -99,10 +101,10 @@ const initialState: TOrderInitialState = {
 };
 
 // ================ Thunk types ================ //
-const FETCH_SEARCH_FILTER = 'app/BookerDraftOrderPage/FETCH_SEARCH_FILTER';
-const SEARCH_RESTAURANT = 'app/BookerDraftOrderPage/SEARCH_RESTAURANT';
+const FETCH_SEARCH_FILTER = 'app/BookerSelectRestaurant/FETCH_SEARCH_FILTER';
+const SEARCH_RESTAURANT = 'app/BookerSelectRestaurant/SEARCH_RESTAURANT';
 const FETCH_FOOD_LIST_FROM_RESTAURANT =
-  'app/BookerDraftOrderPage/FETCH_FOOD_LIST_FROM_RESTAURANT';
+  'app/BookerSelectRestaurant/FETCH_FOOD_LIST_FROM_RESTAURANT';
 const FETCH_ORDER = 'app/BookerSelectRestaurant/FETCH_ORDER';
 const FETCH_PLAN_DETAIL = 'app/BookerSelectRestaurant/FETCH_PLAN_DETAIL';
 const UPDATE_PLAN_DETAIL = 'app/BookerSelectRestaurant/UPDATE_PLAN_DETAIL';
@@ -229,7 +231,12 @@ const fetchCompanyAccount = createAsyncThunk(
 const fetchFoodListFromRestaurant = createAsyncThunk(
   FETCH_FOOD_LIST_FROM_RESTAURANT,
   async (params: Record<string, any>, { getState, dispatch, extra: sdk }) => {
-    const { restaurantId, menuId: menuIdParam, timestamp } = params;
+    const {
+      restaurantId,
+      menuId: menuIdParam,
+      timestamp,
+      keywords = '',
+    } = params;
     const { combinedRestaurantMenuData = [], restaurantFood = {} } =
       getState().BookerSelectRestaurant;
     const dateTime = DateTime.fromMillis(timestamp);
@@ -239,6 +246,13 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
       combinedRestaurantMenuData.find(
         (item) => item.restaurantId === restaurantId,
       )?.menuId;
+    const menuListing = denormalisedResponseEntities(
+      await sdk.listings.show({
+        id: menuId,
+      }),
+    )[0];
+    const foodIdList =
+      Listing(menuListing).getMetadata()?.[`${dayOfWeek}FoodIdList`];
     const { order } = getState().Order;
     const { nutritions = [], packagePerMember } = Listing(
       order as TListing,
@@ -252,7 +266,9 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
       ...(nutritions.length > 0
         ? { pub_nutritions: `has_any:${nutritions.join(',')}` }
         : {}),
+      ids: foodIdList.join(','),
       include: ['images'],
+      ...(keywords && { keywords }),
     });
     const foodList = denormalisedResponseEntities(response);
 
@@ -296,6 +312,7 @@ const BookerSelectRestaurantSlice = createSlice({
         state.fetchFilterInProgress = false;
         state.menuTypes = action.payload.menuTypes;
         state.categories = action.payload.categories;
+        state.packaging = action.payload.packaging;
       })
       .addCase(searchRestaurants.pending, (state) => {
         state.searchInProgress = true;

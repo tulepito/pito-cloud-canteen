@@ -1,6 +1,7 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+
 .root {
   @include flexAlign(center, space-between);
   flex: 1;
@@ -11,10 +12,14 @@
   top: 0;
   left: 0;
   background-color: $neutralGray1;
-  z-index: 49;
+  z-index: 101;
 
   @include viewportLarge {
     height: 81px;
+  }
+
+  &.bottomLine {
+    border-bottom: 1px solid $neutralGray4;
   }
 
   .headerRight {

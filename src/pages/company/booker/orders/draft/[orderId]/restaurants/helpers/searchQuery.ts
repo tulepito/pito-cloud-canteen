@@ -18,7 +18,6 @@ export const getMenuQuery = ({
   const {
     timestamp,
     menuTypes = [],
-    categories = [],
     favoriteRestaurantIdList = [],
     favoriteFoodIdList = [],
   } = params;
@@ -38,8 +37,8 @@ export const getMenuQuery = ({
     pub_startDate: `,${dateTime.toMillis()}`,
     pub_daysOfWeek: `has_any:${dayOfWeek}`,
     pub_mealType: mealType,
+    meta_isDeleted: false,
     ...(menuTypes.length > 0 ? { meta_menuType: menuTypes.join(',') } : {}),
-    ...(categories.length > 0 ? { pub_category: categories.join(',') } : {}),
     ...(nutritions.length > 0
       ? {
           [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(',')}`,
@@ -57,7 +56,7 @@ export const getMenuQuery = ({
           )}`,
         }
       : {}),
-    [`pub_${dayOfWeek}AverageFoodPrice`]: `,${packagePerMember}`,
+    [`pub_${dayOfWeek}AverageFoodPrice`]: `1000,${packagePerMember}`,
   };
 
   return query;
@@ -74,7 +73,14 @@ export const getRestaurantQuery = ({
   companyAccount: TUser | null;
   params: any;
 }) => {
-  const { rating = '', page = 1, keywords = '', distance } = params;
+  const {
+    rating = '',
+    page = 1,
+    keywords = '',
+    distance,
+    categories = [],
+    packaging = [],
+  } = params;
 
   let newRestaurantIds = [...restaurantIds];
 
@@ -88,10 +94,16 @@ export const getRestaurantQuery = ({
   const bounds = distance ? calculateBounds(origin, distance) : '';
   const query = {
     ids: newRestaurantIds.join(','),
-    meta_rating: rating,
     keywords,
     page,
+    ...(rating && { meta_rating: `${rating},` }),
     ...(distance ? { bounds } : {}),
+    ...(categories.length > 0
+      ? { pub_categories: `has_all:${categories.join(',')}` }
+      : {}),
+    ...(packaging.length > 0 && {
+      pub_packaging: `has_any:${packaging.join(',')}`,
+    }),
     include: ['images'],
     'fields.image': [
       `variants.${EImageVariants.default}`,

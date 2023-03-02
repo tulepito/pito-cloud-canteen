@@ -30,8 +30,8 @@ const OptionSelectionForm: React.FC<TOptionSelectionFormProps> = ({
           <span className={css.notice}>Bắt buộc, tối đa 1 món</span>
         </div>
         {[
-          { key: 'sizeM', value: 'Size vừa' },
-          { key: 'sizeL', value: 'Size lớn' },
+          { key: 'sizeM', value: 'Size bé' },
+          { key: 'sizeL', value: 'Size to' },
         ].map((dish, index) => (
           <label
             key={index}

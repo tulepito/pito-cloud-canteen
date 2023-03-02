@@ -27,25 +27,26 @@ import { useIntl } from 'react-intl';
 import css from './CompanyOrdersTable.module.scss';
 
 const BADGE_TYPE_BASE_ON_ORDER_STATE = {
-  [EBookerOrderDraftStates.bookerDraft]: EBadgeType.DEFAULT,
-  [EOrderStates.canceled]: EBadgeType.DEFAULT,
-  [EOrderStates.canceledByBooker]: EBadgeType.DEFAULT,
-  [EOrderStates.completed]: EBadgeType.WARNING,
-  [EOrderStates.inProgress]: EBadgeType.PROCESSING,
-  [EOrderStates.pendingPayment]: EBadgeType.PROCESSING,
-  [EOrderStates.picking]: EBadgeType.WARNING,
-  [EOrderStates.reviewed]: EBadgeType.WARNING,
+  [EBookerOrderDraftStates.bookerDraft]: EBadgeType.caution,
+  [EOrderDraftStates.pendingApproval]: EBadgeType.caution,
+  [EOrderStates.canceled]: EBadgeType.default,
+  [EOrderStates.canceledByBooker]: EBadgeType.default,
+  [EOrderStates.picking]: EBadgeType.warning,
+  [EOrderStates.inProgress]: EBadgeType.info,
+  [EOrderStates.pendingPayment]: EBadgeType.danger,
+  [EOrderStates.completed]: EBadgeType.success,
+  [EOrderStates.reviewed]: EBadgeType.success,
 };
 
 const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
   [EBookerOrderDraftStates.bookerDraft]: css.badgeDefault,
   [EOrderStates.canceled]: css.badgeDefault,
   [EOrderStates.canceledByBooker]: css.badgeDefault,
-  [EOrderStates.completed]: css.badgeSuccess,
-  [EOrderStates.inProgress]: css.badgeInProgress,
-  [EOrderStates.pendingPayment]: css.badgeProcessing,
-  [EOrderStates.picking]: css.badgeWarning,
-  [EOrderStates.reviewed]: css.badgeWarning,
+  [EOrderStates.completed]: css.badgeDefault,
+  [EOrderStates.inProgress]: css.badgeDefault,
+  [EOrderStates.pendingPayment]: css.badgeDefault,
+  [EOrderStates.picking]: css.badgeDefault,
+  [EOrderStates.reviewed]: css.badgeDefault,
 };
 
 export const CompanyOrdersTableColumns: TColumn[] = [
@@ -53,11 +54,40 @@ export const CompanyOrdersTableColumns: TColumn[] = [
     key: 'title',
     label: 'Đơn hàng',
     render: (data: TObject) => {
+      const { id, title, state } = data;
+      const titleContent = <div className={css.title}>#{title}</div>;
+
+      if ([EOrderDraftStates.draft].includes(state)) {
+        return <>{titleContent}</>;
+      }
+      if (
+        [
+          EOrderDraftStates.pendingApproval,
+          EBookerOrderDraftStates.bookerDraft,
+        ].includes(state)
+      ) {
+        return (
+          <NamedLink
+            path={companyPaths.EditDraftOrder}
+            params={{ orderId: id }}>
+            {titleContent}
+          </NamedLink>
+        );
+      }
+      if ([EOrderStates.picking].includes(state)) {
+        return (
+          <NamedLink
+            path={companyPaths.ManageOrderPicking}
+            params={{ orderId: id }}>
+            {titleContent}
+          </NamedLink>
+        );
+      }
       return (
         <NamedLink
           path={companyPaths.ManageOrderDetail}
-          params={{ orderId: data.id }}>
-          <div className={css.title}>#{data.title}</div>
+          params={{ orderId: id }}>
+          {titleContent}
         </NamedLink>
       );
     },
@@ -65,11 +95,15 @@ export const CompanyOrdersTableColumns: TColumn[] = [
   {
     key: 'deliveryTime',
     label: 'Thời gian',
-    render: (data: TObject) => {
+    render: ({ startDate, endDate, deliveryHour }: TObject) => {
       return (
         <div className={css.deliveryTime}>
-          <div className={css.deliveryHour}>{data.deliveryHour}</div>
-          {data.startDate} - {data.endDate}
+          <div className={css.deliveryHour}>{deliveryHour}</div>
+          {startDate && endDate && (
+            <span>
+              {startDate} - {endDate}
+            </span>
+          )}
         </div>
       );
     },
@@ -92,7 +126,12 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       return (
         <div className={css.restaurantName}>
           {restaurants.slice(0, 2).map((restaurantName: string) => (
-            <div key={restaurantName}>{restaurantName}</div>
+            <div
+              key={restaurantName}
+              className={css.name}
+              title={restaurantName}>
+              {restaurantName}
+            </div>
           ))}
           {moreThanTwo && (
             <div className={css.remainText}>+ {remainLength} đối tác </div>
@@ -105,7 +144,11 @@ export const CompanyOrdersTableColumns: TColumn[] = [
     key: 'address',
     label: 'Địa điểm giao hàng',
     render: ({ location }: TObject) => {
-      return <div className={css.location}>{location}</div>;
+      return (
+        <div className={css.location} title={location}>
+          {location}
+        </div>
+      );
     },
   },
   {
@@ -124,15 +167,17 @@ export const CompanyOrdersTableColumns: TColumn[] = [
     label: 'Trạng thái',
     render: ({ state }: { state: EOrderStates }) => {
       return (
-        <Badge
-          containerClassName={classNames(
-            css.badge,
-            BADGE_CLASS_NAME_BASE_ON_ORDER_STATE[state],
-          )}
-          labelClassName={css.badgeLabel}
-          type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.DEFAULT}
-          label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
-        />
+        <div className={css.state}>
+          <Badge
+            containerClassName={classNames(
+              css.badge,
+              BADGE_CLASS_NAME_BASE_ON_ORDER_STATE[state],
+            )}
+            labelClassName={css.badgeLabel}
+            type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.default}
+            label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
+          />
+        </div>
       );
     },
   },
@@ -158,6 +203,9 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       const updateOrderInProgress = useAppSelector(
         (state) => state.Order.updateOrderInProgress,
       );
+      const deleteDraftOrderInProgress = useAppSelector(
+        (state) => state.Order.deleteDraftOrderInProgress,
+      );
 
       const navigateToDraftOrderDetailPage = () => {
         router.push({
@@ -175,7 +223,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
 
       const navigateToBookerManageOrderDetailPage = () => {
         router.push({
-          pathname: '/orders/[orderId]',
+          pathname: companyPaths.ManageOrderPicking,
           query: { orderId },
         });
       };
@@ -210,7 +258,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
 
       const deleteDraftButton = (
         <Button
-          key={'deleteDraftButton'}
+          key={`${orderId}-deleteDraftButton`}
           {...secondaryButtonProps}
           onClick={confirmDeleteDraftOrderActions.setTrue}>
           {intl.formatMessage({
@@ -220,7 +268,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       );
       const cancelPickingOrderButton = (
         <Button
-          key={'cancelPickingOrderButton'}
+          key={`${orderId}-cancelPickingOrderButton`}
           {...secondaryButtonProps}
           onClick={navigateToBookerManageOrderDetailPage}>
           {intl.formatMessage({
@@ -230,7 +278,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       );
       const cancelPendingApprovalOrderButton = (
         <Button
-          key={'cancelPendingApprovalOrderButton'}
+          key={`${orderId}-cancelPendingApprovalOrderButton`}
           {...secondaryButtonProps}
           onClick={handleCancelNeedApprovalOrder}>
           {intl.formatMessage({
@@ -240,7 +288,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       );
       const updatePlanOrderDetailButton = (
         <Button
-          key={'updatePlanOrderDetailButton'}
+          key={`${orderId}-updatePlanOrderDetailButton`}
           {...secondaryButtonProps}
           onClick={navigateToBookerManageOrderDetailPage}>
           {intl.formatMessage({
@@ -250,7 +298,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       );
       const viewDetailButton = (
         <Button
-          key={'viewDetailButton'}
+          key={`${orderId}-viewDetailButton`}
           {...secondaryButtonProps}
           onClick={navigateToOrderDetailPage}>
           {intl.formatMessage({
@@ -260,7 +308,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       );
       const completeOrderButton = (
         <Button
-          key={'completeOrderButton'}
+          key={`${orderId}-completeOrderButton`}
           {...secondaryButtonProps}
           onClick={navigateToDraftOrderDetailPage}>
           {intl.formatMessage({
@@ -270,7 +318,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       );
       const copyLinkButton = (
         <Button
-          key={'copyLinkButton'}
+          key={`${orderId}-copyLinkButton`}
           {...secondaryButtonProps}
           onClick={handleCopyOrderLink}>
           {intl.formatMessage({
@@ -279,14 +327,20 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         </Button>
       );
       const reviewOrderButton = (
-        <Button key={'reviewOrderButton'} {...secondaryButtonProps} disabled>
+        <Button
+          key={`${orderId}-reviewOrderButton`}
+          {...secondaryButtonProps}
+          disabled>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.reviewOrder',
           })}
         </Button>
       );
       const reorderButton = (
-        <Button key={'reorderButton'} {...secondaryButtonProps} disabled>
+        <Button
+          key={`${orderId}-reorderButton`}
+          {...secondaryButtonProps}
+          disabled>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.reorder',
           })}
@@ -333,6 +387,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
           isOpen={confirmDeleteDraftOrderActions.value}
           onCancel={confirmDeleteDraftOrderActions.setFalse}
           onConfirm={handleDeleteDraftOrder}
+          confirmInProgress={deleteDraftOrderInProgress}
           handleClose={confirmDeleteDraftOrderActions.setFalse}
           title={intl.formatMessage({
             id: 'ManageCompanyOrdersPage.deleteDraftOrderModal.title',

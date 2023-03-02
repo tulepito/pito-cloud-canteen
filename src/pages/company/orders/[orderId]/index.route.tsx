@@ -1,9 +1,5 @@
 import Meta from '@components/Layout/Meta';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import {
-  orderDetailsAnyActionsInProgress,
-  orderManagementThunks,
-} from '@pages/orders/[orderId]/OrderManagement.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
 import { UserPermission } from '@src/types/UserPermission';
@@ -14,6 +10,10 @@ import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
 import CompanyOrderDetailPage from './components/CompanyOrderDetail.page';
+import {
+  orderDetailsAnyActionsInProgress,
+  orderManagementThunks,
+} from './picking/OrderManagement.slice';
 
 const CompanyOrderDetailRoute = () => {
   const intl = useIntl();

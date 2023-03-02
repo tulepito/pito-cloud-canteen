@@ -44,6 +44,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
 }) => {
   return (
     <Modal
+      openClassName={css.isOpen}
       className={css.modalRoot}
       title={title}
       isOpen={isOpen}

@@ -8,6 +8,7 @@ import updateOrder from './update.service';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const apiMethod = req.method;
+
   switch (apiMethod) {
     case HTTP_METHODS.GET:
       try {

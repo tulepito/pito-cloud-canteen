@@ -1,3 +1,4 @@
+import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
 import getAdminAccount from '@services/getAdminAccount';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -9,6 +10,7 @@ import {
   EOrderDraftStates,
 } from '@utils/enums';
 import type { TObject } from '@utils/types';
+import { isEmpty } from 'lodash';
 
 const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 
@@ -68,7 +70,12 @@ const createOrder = async ({
     startDate,
     endDate,
     memberAmount,
+    deadlineDate,
   } = generalInfo;
+
+  const participants: string[] = isEmpty(selectedGroups)
+    ? getAllCompanyMembers(companyAccount)
+    : calculateGroupMembers(companyAccount, selectedGroups);
 
   // Call api to create order listing
   const orderListingResponse = await integrationSdk.listings.create(
@@ -87,6 +94,7 @@ const createOrder = async ({
         orderStateHistory,
         deliveryAddress,
         deliveryHour,
+        deadlineDate,
         deadlineHour,
         nutritions,
         selectedGroups,
@@ -94,6 +102,7 @@ const createOrder = async ({
         dayInWeek,
         startDate,
         endDate,
+        participants,
       },
     },
     { expand: true },

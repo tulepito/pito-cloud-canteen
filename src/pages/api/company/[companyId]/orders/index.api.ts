@@ -31,8 +31,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         handleError(res, error);
       }
       break;
-    case 'POST':
-      break;
+
     default:
       break;
   }

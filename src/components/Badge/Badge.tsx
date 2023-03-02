@@ -27,11 +27,12 @@ const IconCloseBadge: React.FC<TIconProps> = (props) => {
 };
 
 export enum EBadgeType {
-  DEFAULT = 'default',
-  PROCESSING = 'processing',
-  ERROR = 'error',
-  SUCCESS = 'success',
-  WARNING = 'warning',
+  default = 'default',
+  info = 'info',
+  danger = 'danger',
+  success = 'success',
+  warning = 'warning',
+  caution = 'caution',
 }
 
 type TBadgeProps = {
@@ -47,7 +48,7 @@ type TBadgeProps = {
 
 const Badge: React.FC<TBadgeProps> = (props) => {
   const {
-    type = EBadgeType.DEFAULT,
+    type = EBadgeType.default,
     hasCloseIcon = false,
     hasDotIcon = false,
     onCloseIcon,
@@ -57,11 +58,12 @@ const Badge: React.FC<TBadgeProps> = (props) => {
   } = props;
 
   const classesFormType = {
-    [css.default]: type === EBadgeType.DEFAULT,
-    [css.processing]: type === EBadgeType.PROCESSING,
-    [css.error]: type === EBadgeType.ERROR,
-    [css.success]: type === EBadgeType.SUCCESS,
-    [css.warning]: type === EBadgeType.WARNING,
+    [css.default]: type === EBadgeType.default,
+    [css.info]: type === EBadgeType.info,
+    [css.danger]: type === EBadgeType.danger,
+    [css.success]: type === EBadgeType.success,
+    [css.warning]: type === EBadgeType.warning,
+    [css.caution]: type === EBadgeType.caution,
   };
 
   const badgeContainerClassName = classNames(

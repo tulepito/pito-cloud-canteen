@@ -3,8 +3,8 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  padding: 24px 48px;
-  max-width: 1440px;
+  padding: 33px 48px 24px;
+  max-width: 1180px;
   margin: 0 auto;
 
   .titleSection {

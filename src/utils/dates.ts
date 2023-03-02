@@ -121,12 +121,12 @@ export const weekDayFormatFromDateTime = (dateTime: DateTime) => {
   return formattedWeekDay;
 };
 
-export const parseTimestampToFormat = (
+export const formatTimestamp = (
   date = new Date().getTime(),
   format?: string,
   locale: LocaleOptions['locale'] = 'vi',
 ) => {
-  return DateTime.fromMillis(date).toFormat(format || 'dd/MM/yyyy', {
+  return DateTime.fromMillis(Number(date)).toFormat(format || 'dd/MM/yyyy', {
     locale,
   });
 };
@@ -173,6 +173,8 @@ export const generateTimeOptions = () => {
   options.push('23:00');
   return options;
 };
+
+export const TimeOptions = generateTimeOptions();
 
 export const getDayInWeekFromPeriod = (start: number, end: number) => {
   if (!start || !end) return [];

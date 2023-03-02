@@ -18,8 +18,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const apiMethod = req.method;
 
     switch (apiMethod) {
-      case HttpMethod.GET:
-        break;
       case HttpMethod.POST:
         {
           const { orderId } = req.query;
@@ -86,10 +84,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           });
         }
         break;
-      case HttpMethod.DELETE:
-        break;
-      case HttpMethod.PUT:
-        break;
+
       default:
         break;
     }

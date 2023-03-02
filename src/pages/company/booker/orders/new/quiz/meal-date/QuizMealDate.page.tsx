@@ -1,10 +1,16 @@
 import Modal from '@components/Modal/Modal';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing, User } from '@utils/data';
-import { getSelectedDaysOfWeek, parseTimestampToFormat } from '@utils/dates';
+import {
+  formatTimestamp,
+  getSelectedDaysOfWeek,
+  TimeOptions,
+} from '@utils/dates';
 import type { TListing } from '@utils/types';
+import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -43,16 +49,17 @@ const QuizMealDate = () => {
   );
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
 
-  const { dayInWeek, startDate, endDate } = formValues || {};
+  const { dayInWeek, startDate, endDate, deadlineDate, deadlineHour } =
+    formValues || {};
 
   const selectedDays = getSelectedDaysOfWeek(startDate, endDate, dayInWeek);
-  const formattedStartDate =
-    startDate && parseTimestampToFormat(startDate, 'dd MMMM');
-  const formattedEndDate =
-    endDate && parseTimestampToFormat(endDate, 'dd MMMM');
+  const formattedStartDate = startDate && formatTimestamp(startDate, 'dd MMMM');
+  const formattedEndDate = endDate && formatTimestamp(endDate, 'dd MMMM');
   const initialValues = useMemo(
     () => ({
       dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri'],
+      deliveryHour: TimeOptions[0],
+      deadlineHour: TimeOptions[0],
     }),
     [],
   );
@@ -65,6 +72,12 @@ const QuizMealDate = () => {
         generalInfo: {
           ...quiz,
           ...formValues,
+          deadlineDate: DateTime.fromMillis(deadlineDate)
+            .plus({
+              ...convertHHmmStringToTimeParts(deadlineHour),
+            })
+            .toMillis(),
+          deliveryAddress: User(selectedCompany).getPublicData().location || {},
           dayInWeek: selectedDays,
         },
       }),

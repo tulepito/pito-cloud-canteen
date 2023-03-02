@@ -213,7 +213,11 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
         })}>
         <div className={css.header}>
           <h2 className={css.title}>#{orderCode}</h2>
-          <Badge label="Đơn hàng tuần" type={EBadgeType.PROCESSING} />
+          <Badge
+            label="Đơn hàng tuần"
+            type={EBadgeType.info}
+            className={css.badge}
+          />
         </div>
         <nav className={css.navigation}>
           <NavigationItem onOpen={handleOpenDetails} messageId="location" />

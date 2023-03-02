@@ -13,7 +13,7 @@ import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TMenuMealTypeCount } from '@redux/slices/menus.slice';
 import { menusSliceThunks } from '@redux/slices/menus.slice';
-import { parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp } from '@utils/dates';
 import type { EMenuTypes } from '@utils/enums';
 import { EListingStates, EMenuMealType } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
@@ -65,8 +65,8 @@ const TABLE_COLUNMS: TColumn[] = [
       return (
         <div className={css.row}>
           <div>
-            {startDate && parseTimestampToFormat(startDate)} -
-            {endDate && parseTimestampToFormat(endDate)}
+            {startDate && formatTimestamp(startDate)} -
+            {endDate && formatTimestamp(endDate)}
           </div>
         </div>
       );

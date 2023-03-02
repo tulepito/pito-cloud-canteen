@@ -9,12 +9,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const integrationSdk = getIntegrationSdk();
 
   switch (apiMethod) {
-    case HTTP_METHODS.GET: {
-      return res.json({
-        msg: 'Hello babe',
-      });
-      break;
-    }
     case HTTP_METHODS.POST: {
       try {
         const { restaurantId, title, description } = req.body;

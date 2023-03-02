@@ -4,6 +4,16 @@
 .root {
   position: relative;
   padding-top: 10px;
+
+  .header {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+
+    .badge {
+      color: $labelBlue2;
+    }
+  }
 }
 
 .main {
@@ -18,12 +28,6 @@
   position: absolute;
   left: -240px;
   opacity: 0;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  margin: 10px 0;
 }
 
 .title {

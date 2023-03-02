@@ -2,26 +2,12 @@ import Button from '@components/Button/Button';
 import { FieldDatePickerComponent } from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
 import IconClock from '@components/Icons/IconClock/IconClock';
+import { TimeOptions } from '@utils/dates';
 import { DateTime } from 'luxon';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './ExpiredTimeForm.module.scss';
-
-const TIME_OPTIONS = [
-  '07:00',
-  '08:00',
-  '09:00',
-  '10:00',
-  '11:00',
-  '12:00',
-  '13:00',
-  '14:00',
-  '15:00',
-  '16:00',
-  '17:00',
-  '18:00',
-];
 
 type TExpiredTimeFormProps = {
   onSubmit: (values: TExpiredTimeFormValues) => void;
@@ -106,7 +92,7 @@ const ExpiredTimeForm: React.FC<TExpiredTimeFormProps> = ({
         leftIcon={<IconClock />}
         meta={deadlineHour.meta}
         input={deadlineHour.input}>
-        {TIME_OPTIONS.map((option) => (
+        {TimeOptions.map((option) => (
           <option key={option} value={option}>
             {option}
           </option>

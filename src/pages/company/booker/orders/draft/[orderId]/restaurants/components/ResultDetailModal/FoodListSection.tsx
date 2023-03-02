@@ -1,4 +1,5 @@
 import FoodCard from '@components/FoodCard/FoodCard';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import type { TListing } from '@utils/types';
 import React from 'react';
 
@@ -11,6 +12,7 @@ type TFoodsListSectionProps = {
   selectedFoodIds?: string[];
   foodList?: TListing[];
   hideSelection?: boolean;
+  fetchFoodInProgress?: boolean;
 };
 
 const FoodListSection: React.FC<TFoodsListSectionProps> = ({
@@ -20,29 +22,36 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
   selectedFoodIds = [],
   foodList = [],
   hideSelection = false,
+  fetchFoodInProgress = false,
 }) => {
   return (
     <section className={css.foodSection}>
       <div className={css.categories}>
         <div className={css.category}>
           <h3 className={css.categoryTitle}>Món ăn</h3>
-          <div className={css.foodList}>
-            {foodList.map((item) => (
-              <FoodCard
-                key={`${item?.id.uuid}`}
-                food={item}
-                isSelected={selectedFoodIds?.includes(`${item?.id.uuid}`)}
-                onSelect={onSelectFood}
-                onRemove={onRemoveFood}
-                onClick={onClickFood}
-                className={css.foodItem}
-                hideSelection={hideSelection}
-              />
-            ))}
-            {foodList.length === 0 && (
-              <div className={css.emptyFoodList}>Không có món ăn nào</div>
-            )}
-          </div>
+          {fetchFoodInProgress ? (
+            <div className={css.loading}>
+              <IconSpinner />
+            </div>
+          ) : (
+            <div className={css.foodList}>
+              {foodList.map((item) => (
+                <FoodCard
+                  key={`${item?.id.uuid}`}
+                  food={item}
+                  isSelected={selectedFoodIds?.includes(`${item?.id.uuid}`)}
+                  onSelect={onSelectFood}
+                  onRemove={onRemoveFood}
+                  onClick={onClickFood}
+                  className={css.foodItem}
+                  hideSelection={hideSelection}
+                />
+              ))}
+              {foodList.length === 0 && (
+                <div className={css.emptyFoodList}>Không có món ăn nào</div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </section>

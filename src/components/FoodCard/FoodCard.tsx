@@ -2,6 +2,7 @@ import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import IconPlusCircle from '@components/Icons/IconPlusCircle/IconPlusCircle';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import { addCommas } from '@helpers/format';
 import { Listing } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
@@ -61,15 +62,11 @@ const FoodCard: React.FC<TFoodCardProps> = ({
           {Listing(food!).getAttributes().title}
         </div>
         <div className={css.badges}>
-          <Badge
-            className={css.badge}
-            type={EBadgeType.PROCESSING}
-            label="Keto"
-          />
+          <Badge className={css.badge} type={EBadgeType.info} label="Keto" />
         </div>
-        <div className={css.price}>{`${
-          Listing(food!).getAttributes()?.price?.amount
-        } ₫ / Phần`}</div>
+        <div className={css.price}>{`${addCommas(
+          Listing(food!).getAttributes()?.price?.amount,
+        )} ₫ / Phần`}</div>
         <div className={css.vatIncludedNotice}>(đã bao gồm VAT)</div>
       </div>
       {!hideSelection && selection}

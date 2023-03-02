@@ -28,13 +28,13 @@ const CollapseFilter: React.FC<CollapseFilterProps> = (props) => {
       <div className={css.header}>
         <div className={css.title}>{title}</div>
         <div onClick={toggleOptionsCollapse}>
-          <IconArrow direction="down" className={iconClasses} />
+          <IconArrow direction="up" className={iconClasses} />
         </div>
       </div>
       <div className={optionsClasses}>
         {options.map(({ key, label }) => (
           <FieldCheckbox
-            id={key}
+            id={`${name}-${key}`}
             key={`${name}-${key}`}
             name={name}
             value={key}

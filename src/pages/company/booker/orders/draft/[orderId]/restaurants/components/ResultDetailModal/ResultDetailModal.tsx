@@ -36,6 +36,8 @@ type TResultDetailModalProps = {
     lng: number;
   };
   totalRatings: any[];
+  fetchFoodInProgress: boolean;
+  onSearchSubmit?: (value: string, restaurantId: string) => void;
 };
 
 const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
@@ -46,6 +48,8 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   restaurants,
   companyGeoOrigin,
   totalRatings,
+  onSearchSubmit,
+  fetchFoodInProgress,
 }) => {
   const intl = useIntl();
 
@@ -61,10 +65,12 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     const detail =
       Listing(planDetail).getMetadata().orderDetail?.[`${timestamp}`];
     const savedRestaurantId = detail?.restaurant?.id;
+
     if (selectedRestaurantId === savedRestaurantId) {
       const foodListObj = detail?.restaurant?.foodList || {};
       return Object.keys(foodListObj) || [];
     }
+
     return [];
   }, [planDetail, timestamp, isOpen]);
 
@@ -130,7 +136,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   // Method
   const dispatch = useAppDispatch();
 
-  const handleSelecFood = useCallback(
+  const handleSelectFood = useCallback(
     (foodId: string) => {
       setSelectedFoods([...selectedFoods, foodId]);
       if (foodModal.value) {
@@ -195,8 +201,8 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
         updateMode: 'merge',
       }),
     );
-    router.push(`/company/booker/orders/draft/${orderId}`);
     onClose();
+    router.push(`/company/booker/orders/draft/${orderId}`);
   };
 
   useEffect(() => {
@@ -204,6 +210,13 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
       setSelectedFoods([]);
     }
   }, [isOpen]);
+
+  const onCustomSearchSubmit = useCallback(
+    (keyword: string) => {
+      onSearchSubmit?.(keyword, selectedRestaurantId!);
+    },
+    [onSearchSubmit, selectedRestaurantId],
+  );
 
   return (
     <>
@@ -238,19 +251,22 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
               avatar={restaurantAvatar}
               restaurantName={restaurantName}
               rating={`${rating} (${totalReviewsOfRestaurant})`}
+              ratingNumber={rating}
               distance={`${distance}km`}
             />
             <ResultDetailFilters
               onSelectAllFood={handleSelectFoods}
               selectedFoodIds={selectedFoods}
               originFoodIdList={originFoodIdList}
+              onSearchSubmit={onCustomSearchSubmit}
             />
             <FoodListSection
               foodList={foodList}
-              onSelectFood={handleSelecFood}
+              onSelectFood={handleSelectFood}
               onRemoveFood={handleRemoveFood}
               onClickFood={handleOpenFoodDetail}
               selectedFoodIds={selectedFoods}
+              fetchFoodInProgress={fetchFoodInProgress}
             />
           </div>
         </div>
@@ -276,7 +292,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
         isOpen={foodModal.value}
         food={selectedFood!}
         onClose={foodModal.setFalse}
-        onSelect={handleSelecFood}
+        onSelect={handleSelectFood}
       />
     </>
   );

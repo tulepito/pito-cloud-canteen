@@ -1,3 +1,5 @@
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import { companyPaths } from '@src/paths';
 import { useRouter } from 'next/router';
 
 import css from './BookerSelectRestaurant.module.scss';
@@ -6,7 +8,9 @@ import FilterSidebar from './components/FilterSidebar/FilterSidebar';
 import KeywordSearchSection from './components/KeywordSearchSection/KeywordSearchSection';
 import Layout from './components/Layout/Layout';
 import LayoutContent from './components/Layout/LayoutContent';
+import LayoutMain from './components/Layout/LayoutMain';
 import LayoutSidebar from './components/Layout/LayoutSidebar';
+import LayoutTop from './components/Layout/LayoutTop';
 import ResultList from './components/ResultList/ResultList';
 import SortingSection from './components/SortingSection/SortingSection';
 import { useGetCompanyAccount } from './hooks/company';
@@ -22,27 +26,45 @@ function BookerSelectRestaurant() {
   const { restaurants, searchInProgress, totalResultItems, totalRatings } =
     useSearchRestaurants();
 
+  const handleGoBack = () => {
+    router.push({
+      pathname: companyPaths.EditDraftOrder,
+      query: {
+        orderId,
+      },
+    });
+  };
+
   return (
     <Layout>
-      <LayoutSidebar>
-        <FilterSidebar />
-      </LayoutSidebar>
-      <LayoutContent className={css.result}>
-        <div className={css.resultHeaderWrapper}>
-          <div className={css.searchAndSort}>
-            <KeywordSearchSection />
-            <SortingSection />
-          </div>
-          <FilterLabelsSection totalResultItems={totalResultItems} />
+      <LayoutTop>
+        <div className={css.goBackBtn} onClick={handleGoBack}>
+          <IconArrow direction="left" />
+          Quay lại
         </div>
-        <ResultList
-          className={css.resultList}
-          restaurants={restaurants}
-          isLoading={searchInProgress}
-          totalRatings={totalRatings}
-          companyAccount={companyAccount}
-        />
-      </LayoutContent>
+        <div className={css.pageTilte}>danh sách nhà hàng</div>
+      </LayoutTop>
+      <LayoutMain>
+        <LayoutSidebar>
+          <FilterSidebar />
+        </LayoutSidebar>
+        <LayoutContent className={css.result}>
+          <div className={css.resultHeaderWrapper}>
+            <div className={css.searchAndSort}>
+              <KeywordSearchSection />
+              <SortingSection />
+            </div>
+            <FilterLabelsSection totalResultItems={totalResultItems} />
+          </div>
+          <ResultList
+            className={css.resultList}
+            restaurants={restaurants}
+            isLoading={searchInProgress}
+            totalRatings={totalRatings}
+            companyAccount={companyAccount}
+          />
+        </LayoutContent>
+      </LayoutMain>
     </Layout>
   );
 }

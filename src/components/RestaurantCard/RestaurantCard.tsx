@@ -84,7 +84,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
         <IconGift className={css.gift} />
         <span>x2</span>
       </div>
-      <div className={css.coverImage}>
+      <div className={css.coverImage} onClick={handleClickCard}>
         <ResponsiveImage
           alt="card"
           image={restaurantCoverImage}
@@ -117,7 +117,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
           <span>{`${calculateDistance(companyGeoOrigin, origin)}km`}</span>
         </div>
         <div className={css.footerItem}>
-          <IconStar className={css.footerItemIcon} />
+          <IconStar className={css.littleStarIcon} />
           <span>{`${rating} (${totalReviewsOfRestaurant})`}</span>
         </div>
         <div className={css.footerItem}>

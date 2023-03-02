@@ -11,12 +11,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const integrationSdk = getIntegrationSdk();
 
     switch (apiMethod) {
-      case HttpMethod.GET:
-        break;
-      case HttpMethod.POST:
-        break;
-      case HttpMethod.DELETE:
-        break;
       case HttpMethod.PUT:
         {
           const orderId = req.query.orderId as string;
@@ -30,7 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           if (orderState !== EOrderDraftStates.pendingApproval) {
             throw new Error(
-              'You can cancel pending approval order (with orderState is "pendingApproval") only',
+              `You can cancel pending approval order (with orderState is "pendingApproval") only oderState:${orderState}`,
             );
           }
 

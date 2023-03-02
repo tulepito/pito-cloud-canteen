@@ -10,7 +10,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
-import { parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp } from '@utils/dates';
 import { EOrderDraftStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
 import { required } from '@utils/validators';
@@ -138,7 +138,7 @@ const parseDataToReviewTab = (values: any) => {
   const items = Object.keys(orderDetail).map((key: any) => {
     return {
       key,
-      label: parseTimestampToFormat(Number(key)),
+      label: formatTimestamp(Number(key)),
       childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
       childrenProps: { ...orderDetail[key], ...rest, order: values },
     };

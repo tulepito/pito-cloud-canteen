@@ -3,6 +3,7 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import Modal from '@components/Modal/Modal';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import { addCommas } from '@helpers/format';
 import { Listing } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
@@ -65,9 +66,9 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
           <div className={css.foodTitle}>
             {Listing(food!).getAttributes().title}
           </div>
-          <div className={css.price}>{`${
-            Listing(food!).getAttributes()?.price?.amount
-          } ₫ / Phần`}</div>
+          <div className={css.price}>{`${addCommas(
+            Listing(food!).getAttributes()?.price?.amount,
+          )} ₫ / Phần`}</div>
         </div>
         <p className={css.description}>
           {Listing(food!).getAttributes().description || 'Không có mô tả'}

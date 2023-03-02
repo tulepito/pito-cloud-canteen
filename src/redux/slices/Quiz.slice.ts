@@ -104,6 +104,9 @@ const QuizSlice = createSlice({
         ...payload,
       },
     }),
+    clearQuizData: (state) => {
+      state.quiz = {};
+    },
     allowCreateOrder: (state) => {
       state.allowCreateOrder = true;
     },

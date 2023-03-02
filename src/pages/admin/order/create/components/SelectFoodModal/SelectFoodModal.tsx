@@ -51,7 +51,7 @@ const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
         {title}
       </div>
       <Badge
-        type={EBadgeType.WARNING}
+        type={EBadgeType.warning}
         label={intl.formatMessage(
           {
             id: 'SelectFoodModal.selectedTitle',

@@ -4,11 +4,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
   const integrationSdk = getIntegrationSdk();
+
   switch (apiMethod) {
-    case 'GET':
-      break;
-    case 'POST':
-      break;
     case 'PUT':
       try {
         const { planId, orderDetail } = req.body;
@@ -27,8 +24,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       } catch (error) {
         handleError(res, error);
       }
-      break;
-    case 'DELETE':
       break;
 
     default:

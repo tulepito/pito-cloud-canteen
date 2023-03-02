@@ -42,6 +42,9 @@ const ResultList: React.FC<TResultListProps> = ({
     (state) => state.BookerSelectRestaurant.restaurantFood,
     shallowEqual,
   );
+  const fetchRestaurantFoodInProgress = useAppSelector(
+    (state) => state.BookerSelectRestaurant.fetchRestaurantFoodInProgress,
+  );
 
   const companyGeoOrigin = useMemo(
     () => ({
@@ -86,6 +89,17 @@ const ResultList: React.FC<TResultListProps> = ({
     }
   };
 
+  const onSearchSubmit = (keywords: string, _restaurantId: string) => {
+    dispatch(
+      BookerSelectRestaurantThunks.fetchFoodListFromRestaurant({
+        keywords,
+        restaurantId: selectedRestaurantId,
+        menuId,
+        timestamp,
+      }),
+    );
+  };
+
   const classes = classNames(css.root, className);
 
   return (
@@ -119,6 +133,8 @@ const ResultList: React.FC<TResultListProps> = ({
         restaurants={restaurants}
         companyGeoOrigin={companyGeoOrigin}
         totalRatings={totalRatings}
+        onSearchSubmit={onSearchSubmit}
+        fetchFoodInProgress={fetchRestaurantFoodInProgress}
       />
     </>
   );
