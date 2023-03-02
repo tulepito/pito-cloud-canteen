@@ -23,7 +23,7 @@ export type TDeliveryTimeFormValues = {
 const validate = (values: TDeliveryTimeFormValues) => {
   const errors: any = {};
   if (!values.deliveryHour) {
-    errors.deliveryHour = 'Required';
+    errors.deliveryHour = 'Vui lòng chọn giờ giao hàng';
   }
   return errors;
 };

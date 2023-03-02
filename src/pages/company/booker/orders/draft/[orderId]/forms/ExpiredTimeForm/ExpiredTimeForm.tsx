@@ -24,10 +24,10 @@ export type TExpiredTimeFormValues = {
 const validate = (values: TExpiredTimeFormValues) => {
   const errors: any = {};
   if (!values.deadlineDate) {
-    errors.deadlineDate = 'Required';
+    errors.deadlineDate = 'Vui lòng chọn ngày cho hạn chọn món';
   }
   if (!values.deadlineHour) {
-    errors.deadlineHour = 'Required';
+    errors.deadlineHour = 'Vui lòng chọn giờ cho hạn chọn món';
   }
   return errors;
 };
