@@ -3,26 +3,12 @@ import { FieldDatePickerComponent } from '@components/FormFields/FieldDatePicker
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { findMinStartDate } from '@helpers/orderHelper';
+import { TimeOptions } from '@utils/dates';
 import { DateTime } from 'luxon';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './DeliveryTimeForm.module.scss';
-
-const TIME_OPTIONS = [
-  '07:00',
-  '08:00',
-  '09:00',
-  '10:00',
-  '11:00',
-  '12:00',
-  '13:00',
-  '14:00',
-  '15:00',
-  '16:00',
-  '17:00',
-  '18:00',
-];
 
 type TDeliveryTimeFormProps = {
   onSubmit: (values: TDeliveryTimeFormValues) => void;
@@ -124,7 +110,7 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
         leftIcon={<IconClock />}
         meta={deliveryHour.meta}
         input={deliveryHour.input}>
-        {TIME_OPTIONS.map((option) => (
+        {TimeOptions.map((option) => (
           <option key={option} value={option}>
             {option}
           </option>

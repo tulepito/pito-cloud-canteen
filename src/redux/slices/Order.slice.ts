@@ -11,7 +11,9 @@ import {
   updateOrderApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
+import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
+import { getMenuQuery } from '@helpers/listingSearchQuery';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
@@ -21,10 +23,10 @@ import { convertWeekDay, renderDateRange } from '@utils/dates';
 import { EListingStates, EManageCompanyOrdersTab } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TPagination } from '@utils/types';
+import isNumber from 'lodash/isNumber';
+import isString from 'lodash/isString';
 import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
-
-import { selectRestaurantPageThunks } from './SelectRestaurantPage.slice';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
 
@@ -189,14 +191,21 @@ const updateOrder = createAsyncThunk(
     const { generalInfo } = params;
     const { deadlineDate, deadlineHour } = generalInfo || {};
     const orderId = Listing(order as TListing).getId();
-    const parsedDeadlineDate = deadlineDate
+    const parsedDeadlineDate = isNumber(deadlineDate)
       ? DateTime.fromMillis(deadlineDate)
           .startOf('day')
           .plus({
             ...convertHHmmStringToTimeParts(deadlineHour),
           })
           .toMillis()
-      : null;
+      : isString(deadlineDate)
+      ? DateTime.fromISO(deadlineDate)
+          .startOf('day')
+          .plus({
+            ...convertHHmmStringToTimeParts(deadlineHour),
+          })
+          .toMillis()
+      : undefined;
 
     const apiBody: TUpdateOrderApiBody = {
       generalInfo: {
@@ -214,13 +223,10 @@ const updateOrder = createAsyncThunk(
 
 const recommendRestaurants = createAsyncThunk(
   RECOMMEND_RESTAURANT,
-  async (_, { getState, dispatch }) => {
+  async (_, { getState, extra: sdk }) => {
     const { order } = getState().Order;
     const orderDetail: any = {};
     const {
-      packagePerMember,
-      deliveryHour,
-      nutritions = [],
       dayInWeek = [],
       startDate,
       endDate,
@@ -233,15 +239,32 @@ const recommendRestaurants = createAsyncThunk(
             convertWeekDay(DateTime.fromMillis(dateTime).weekday).key,
           )
         ) {
-          const { payload }: { payload: any } = await dispatch(
-            selectRestaurantPageThunks.getRestaurants({
-              dateTime: DateTime.fromMillis(dateTime),
-              packagePerMember,
-              deliveryHour,
-              nutritions,
+          const menuQueryParams = {
+            timestamp: dateTime,
+          };
+          const menuQuery = getMenuQuery({ order, params: menuQueryParams });
+          const allMenus = await queryAllPages({
+            sdkModel: sdk.listings,
+            query: menuQuery,
+          });
+          const restaurants = await Promise.all(
+            allMenus.map(async (menu: TListing) => {
+              const { restaurantId } = Listing(menu).getMetadata();
+              const restaurantResponse = await sdk.listings.show({
+                id: restaurantId,
+                include: ['images'],
+                'fields.image': [
+                  'variants.landscape-crop',
+                  'variants.landscape-crop2x',
+                ],
+              });
+              return {
+                restaurantInfo:
+                  denormalisedResponseEntities(restaurantResponse)[0],
+                menu,
+              };
             }),
           );
-          const { restaurants = [] } = payload || {};
           if (restaurants.length > 0) {
             const randomNumber = Math.floor(
               Math.random() * (restaurants.length - 1),

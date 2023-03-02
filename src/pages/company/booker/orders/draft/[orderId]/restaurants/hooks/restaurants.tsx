@@ -51,8 +51,8 @@ export const useSearchRestaurants = () => {
     dispatch(
       BookerSelectRestaurantThunks.searchRestaurants({
         timestamp: Number(timestamp),
-        orderId,
-        page,
+        orderId: orderId as string,
+        page: Number(page),
         ...(menuTypes
           ? { menuTypes: convertQueryValueToArray(menuTypes) }
           : {}),

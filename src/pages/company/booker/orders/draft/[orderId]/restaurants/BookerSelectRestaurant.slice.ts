@@ -1,6 +1,8 @@
 import { updatePlanDetailsApi } from '@apis/orderApi';
 import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
+import type { TMenuQueryParams } from '@helpers/listingSearchQuery';
+import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { createSlice } from '@reduxjs/toolkit';
@@ -10,8 +12,6 @@ import { convertWeekDay } from '@utils/dates';
 import { EImageVariants } from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
 import { DateTime } from 'luxon';
-
-import { getMenuQuery, getRestaurantQuery } from './helpers/searchQuery';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
 
@@ -147,10 +147,10 @@ const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
 
 const searchRestaurants = createAsyncThunk(
   SEARCH_RESTAURANT,
-  async (params: Record<string, any>, { extra: sdk, getState, dispatch }) => {
+  async (params: TMenuQueryParams, { extra: sdk, getState, dispatch }) => {
     const { orderId } = params;
 
-    await dispatch(orderAsyncActions.fetchOrder(orderId));
+    await dispatch(orderAsyncActions.fetchOrder(orderId!));
     const { order } = getState().Order;
     const { restaurantIdList = [], companyAccount } =
       getState().BookerSelectRestaurant;

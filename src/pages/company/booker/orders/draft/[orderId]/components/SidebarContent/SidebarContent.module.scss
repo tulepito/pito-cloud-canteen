@@ -12,6 +12,7 @@
 
     .badge {
       color: $labelBlue2;
+      flex-shrink: 0;
     }
   }
 }

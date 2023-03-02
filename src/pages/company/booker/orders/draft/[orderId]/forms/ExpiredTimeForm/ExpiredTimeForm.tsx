@@ -17,7 +17,7 @@ type TExpiredTimeFormProps = {
 };
 
 export type TExpiredTimeFormValues = {
-  deadlineDate: string;
+  deadlineDate: string | number;
   deadlineHour: string;
 };
 
