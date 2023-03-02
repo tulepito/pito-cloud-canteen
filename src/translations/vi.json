@@ -937,6 +937,8 @@
   "OrderDeadlineField.deadlineDateRequired": "Vui lòng nhập ngày",
   "OrderDeadlineField.deadlineHourRequired": "Vui lòng nhập giờ",
   "OrderDeadlineField.deliveryHourLabel": "Chọn giờ",
+  "OrderDeadlineField.deliveryHour.placeholder": "Chọn giờ giao hàng",
+  "OrderDeadlineField.deadlineHour.placeholder": "Chọn hạn chọn món",
   "OrderDeadlineField.title": "Thời hạn kết thúc chọn món",
   "OrderDealineField.deadlineDateLabel": "Chọn ngày",
   "OrderDealineField.deadlineDateRequired": "Vui lòng nhập ngày",

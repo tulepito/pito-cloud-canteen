@@ -4,11 +4,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing, User } from '@utils/data';
-import {
-  formatTimestamp,
-  getSelectedDaysOfWeek,
-  TimeOptions,
-} from '@utils/dates';
+import { formatTimestamp, getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
@@ -16,6 +12,7 @@ import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
+import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
 import type { TMealDateFormValues } from './MealDateForm/MealDateForm';
 import MealDateForm from './MealDateForm/MealDateForm';
@@ -30,6 +27,7 @@ const QuizMealDate = () => {
   const [formValues, setFormValues] = useState<TMealDateFormValues>(null!);
   const [formInvalid, setFormInvalid] = useState<boolean>(false);
 
+  useRedirectAfterReloadPage();
   const selectedCompany = useAppSelector(
     (state) => state.Quiz.selectedCompany,
     shallowEqual,
@@ -53,13 +51,11 @@ const QuizMealDate = () => {
     formValues || {};
 
   const selectedDays = getSelectedDaysOfWeek(startDate, endDate, dayInWeek);
-  const formattedStartDate = startDate && formatTimestamp(startDate, 'dd MMMM');
-  const formattedEndDate = endDate && formatTimestamp(endDate, 'dd MMMM');
+  const formattedStartDate = startDate && formatTimestamp(startDate, 'd MMMM');
+  const formattedEndDate = endDate && formatTimestamp(endDate, 'd MMMM');
   const initialValues = useMemo(
     () => ({
       dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri'],
-      deliveryHour: TimeOptions[0],
-      deadlineHour: TimeOptions[0],
     }),
     [],
   );
@@ -108,7 +104,7 @@ const QuizMealDate = () => {
       isOpen={!creatingOrderModalControl.value}
       handleClose={() => {}}
       modalTitle={intl.formatMessage({ id: 'QuizMealDate.title' })}
-      submitText="Tiếp tục"
+      submitText="Tạo đơn"
       onSubmit={onFormSubmitClick}
       submitDisabled={formInvalid}
       onBack={goBack}>

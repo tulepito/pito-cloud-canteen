@@ -3,6 +3,7 @@ import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { findValidRangeForDeadlineDate } from '@helpers/orderHelper';
 import { generateTimeOptions } from '@utils/dates';
 import type { TObject } from '@utils/types';
@@ -46,7 +47,16 @@ const CustomDeadlineFieldInput = forwardRef((props, ref) => {
               locale: viLocale,
             });
       }}
-      leftIcon={<IconCalendar />}
+      leftIcon={
+        <Tooltip
+          overlayClassName={css.tooltipOverlay}
+          tooltipContent={<span>Hạn dành cho người tham gia chọn món</span>}
+          placement="bottomLeft">
+          <div className={css.iconWrapper}>
+            <IconCalendar />
+          </div>
+        </Tooltip>
+      }
       inputRef={ref}
     />
   );
@@ -143,8 +153,15 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
           className={css.fieldSelect}
           leftIcon={<IconClock />}
           validate={required(deadlineHourRequired)}>
+          <option value="" disabled selected>
+            {intl.formatMessage({
+              id: 'OrderDeadlineField.deadlineHour.placeholder',
+            })}
+          </option>
           {TIME_OPTIONS.map((option) => (
-            <option key={option}>{option}</option>
+            <option key={option} value={option}>
+              {option}
+            </option>
           ))}
         </FieldSelect>
       </div>

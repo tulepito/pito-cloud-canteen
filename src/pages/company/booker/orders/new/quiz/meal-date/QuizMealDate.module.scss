@@ -13,6 +13,7 @@
 .initialOrderText {
   @include textTemplate(24px, $fontWeightBold, 32px);
   margin-top: 32px;
+  text-transform: capitalize;
 }
 
 .orderTitle {
@@ -25,5 +26,6 @@
   .orderDateRange {
     @include textTemplate(20px, $fontWeightBold, 32px);
     margin-left: 8px;
+    text-transform: capitalize;
   }
 }
