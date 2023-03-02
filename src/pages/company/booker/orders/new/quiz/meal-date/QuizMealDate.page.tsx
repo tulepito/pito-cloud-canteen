@@ -51,8 +51,8 @@ const QuizMealDate = () => {
     formValues || {};
 
   const selectedDays = getSelectedDaysOfWeek(startDate, endDate, dayInWeek);
-  const formattedStartDate = startDate && formatTimestamp(startDate, 'dd MMMM');
-  const formattedEndDate = endDate && formatTimestamp(endDate, 'dd MMMM');
+  const formattedStartDate = startDate && formatTimestamp(startDate, 'd MMMM');
+  const formattedEndDate = endDate && formatTimestamp(endDate, 'd MMMM');
   const initialValues = useMemo(
     () => ({
       dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri'],
