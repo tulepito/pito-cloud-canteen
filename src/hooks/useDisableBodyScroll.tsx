@@ -1,24 +1,20 @@
 import { useLayoutEffect } from 'react';
+import { shallowEqual } from 'react-redux';
 
-type TUseLockBodyScroll = {
-  isOpen: boolean;
-};
+import { useAppSelector } from './reduxHooks';
 
-const useLockBodyScroll = ({ isOpen }: TUseLockBodyScroll) => {
+const useLockBodyScroll = () => {
+  const openingModalIdList = useAppSelector(
+    (state) => state.UI.openingModalIdList,
+    shallowEqual,
+  );
   useLayoutEffect(() => {
-    // Get original value of body overflow
-    const originalStyle = window.getComputedStyle(document.body).overflow;
-
-    if (isOpen) {
-      // Prevent scrolling on mount
+    if (openingModalIdList.length > 0) {
       document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
-
-    return () => {
-      // Re-enable scrolling when component unmounts
-      document.body.style.overflow = originalStyle;
-    };
-  }, [isOpen]);
+  }, [openingModalIdList]);
 };
 
 export default useLockBodyScroll;

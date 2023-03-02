@@ -1,5 +1,6 @@
 import { getIntegrationSdk } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
+import type { EMenuMealType } from '@utils/enums';
 
 // query all page
 const calculateRemainPages = (meta: any) => {
@@ -44,4 +45,21 @@ export const queryAllUsers = async ({ query, include = [] }: any = {}) => {
     include,
     query,
   });
+};
+
+export const queryAllListings = async ({ query, include = [] }: any = {}) => {
+  return queryAllPages({
+    sdkModel: getIntegrationSdk().listings,
+    include,
+    query,
+  });
+};
+
+export type TCheckUnConflictedParams = {
+  mealType: EMenuMealType;
+  daysOfWeek: string[];
+  restaurantId: string;
+  id: string;
+  startDate: number;
+  endDate: number;
 };

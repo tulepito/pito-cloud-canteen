@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 @use '/src/styles/defaults.scss' as *;
 
 .filterForm {
@@ -16,11 +17,7 @@
 }
 
 .title {
-  font-weight: $fontWeightBold;
-  font-size: 24px;
-  margin: 0;
-  line-height: 32px;
-  text-transform: capitalize;
+  @include pageTitle;
 }
 
 .rowState {
@@ -37,7 +34,12 @@
 
 .boldText {
   font-weight: $fontWeightBold;
-  color: #2f54eb;
+  color: $labelBlue2;
+}
+
+.companyName {
+  font-weight: $fontWeightBold;
+  margin-bottom: 5px;
 }
 
 .bodyCell:nth-child(3) {
@@ -157,5 +159,18 @@
   background-color: $neutralGray1;
   &:global.rc-tooltip {
     opacity: 1 !important;
+  }
+}
+
+.tableWrapper {
+  @include viewportMedium {
+    max-width: calc(100vw - 350px);
+    overflow-x: scroll;
+    position: relative;
+  }
+  .table {
+    @include viewportMedium {
+      min-width: 1440px;
+    }
   }
 }

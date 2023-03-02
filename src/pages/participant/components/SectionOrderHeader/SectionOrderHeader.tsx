@@ -1,6 +1,4 @@
-import Button from '@components/Button/Button';
-import classNames from 'classnames';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useIntl } from 'react-intl';
 
 import { VIEWS } from '../../helpers/constants';
@@ -11,6 +9,7 @@ type TSectionOrderHeaderProps = {
   currentView: string;
 };
 
+// eslint-disable-next-line unused-imports/no-unused-vars
 const LIST_VIEW = [
   {
     key: VIEWS.LIST,
@@ -22,8 +21,8 @@ const LIST_VIEW = [
   },
 ];
 
-const SectionOrderHeader: React.FC<TSectionOrderHeaderProps> = (props) => {
-  const { currentView, setViewFunction } = props;
+const SectionOrderHeader: React.FC<TSectionOrderHeaderProps> = () => {
+  // const { currentView, setViewFunction } = props;
 
   const intl = useIntl();
   const title = intl.formatMessage({
@@ -33,23 +32,23 @@ const SectionOrderHeader: React.FC<TSectionOrderHeaderProps> = (props) => {
     id: 'SectionOrderHeader.contactNotification',
   });
 
-  const viewNamesGroupFn = useCallback(() => {
-    return LIST_VIEW.map((view) => {
-      const { key, label } = view;
-      return (
-        <Button
-          key={key}
-          onClick={() => {
-            setViewFunction(key);
-          }}
-          className={classNames(css.viewMode, {
-            [css.activeViewMode]: currentView === key,
-          })}>
-          {intl.formatMessage({ id: label })}
-        </Button>
-      );
-    });
-  }, [currentView]);
+  // const viewNamesGroupFn = useCallback(() => {
+  //   return LIST_VIEW.map((view) => {
+  //     const { key, label } = view;
+  //     return (
+  //       <Button
+  //         key={key}
+  //         onClick={() => {
+  //           setViewFunction(key);
+  //         }}
+  //         className={classNames(css.viewMode, {
+  //           [css.activeViewMode]: currentView === key,
+  //         })}>
+  //         {intl.formatMessage({ id: label })}
+  //       </Button>
+  //     );
+  //   });
+  // }, [currentView]);
 
   return (
     <div className={css.root}>
@@ -58,7 +57,7 @@ const SectionOrderHeader: React.FC<TSectionOrderHeaderProps> = (props) => {
         <p>{contactNotification}</p>
       </div>
       <div className={css.sectionRight}>
-        <div className={css.viewModeGroup}>{viewNamesGroupFn()}</div>
+        {/* <div className={css.viewModeGroup}>{viewNamesGroupFn()}</div> */}
       </div>
     </div>
   );

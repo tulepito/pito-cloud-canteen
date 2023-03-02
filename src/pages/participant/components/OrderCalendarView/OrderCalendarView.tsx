@@ -1,11 +1,11 @@
 import Avatar from '@components/Avatar/Avatar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
-import { CURRENT_USER, LISTING, USER } from '@utils/data';
+import { CurrentUser, Listing, User } from '@utils/data';
 import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
-import React from 'react';
+import React, { useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import Skeleton from 'react-loading-skeleton';
 
@@ -26,36 +26,48 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const { company, order, subOrders, currentUser, plans, loadDataInProgress } =
     props;
 
-  const companyTitle = USER(company).getPublicData().displayName;
-  const ensureCompanyUser = USER(company).getFullData();
-  const orderObj = LISTING(order);
+  const companyTitle = User(company).getPublicData().displayName;
+  const ensureCompanyUser = User(company).getFullData();
+  const orderObj = Listing(order);
   const orderId = orderObj.getId();
   const orderTile = orderObj.getAttributes().title;
-  const currentUserId = CURRENT_USER(currentUser).getId();
+  const currentUserId = CurrentUser(currentUser).getId();
 
-  const { orderDeadline, deliveryHour, startDate } =
-    orderObj.getMetadata().generalInfo || {};
+  const { deadlineDate, deliveryHour, startDate } = orderObj.getMetadata();
+  const [anchorTime, setAnchorTime] = useState<number | undefined>();
+
+  const anchorDate =
+    anchorTime || startDate ? new Date(anchorTime || startDate) : new Date();
+
   const events = subOrders.map((subOrder: any) => {
     const planKey = Object.keys(subOrder)[0];
     const planItem: TPlanItem = subOrder[planKey];
     const currentPlan = plans?.find(
-      (plan) => LISTING(plan).getId() === planKey,
+      (plan) => Listing(plan).getId() === planKey,
     ) as TListing;
 
     const listEvent: Event[] = [];
+    let isAnchorTimeChanged: any = false;
 
     Object.keys(planItem).forEach((planItemKey: string) => {
       const meal = planItem[planItemKey];
-      const { foodList, restaurant } = meal;
+      const { restaurant = {}, foodList = [] } = meal;
 
       const dishes = foodList.map((food: TListing) => ({
-        key: LISTING(food).getId(),
-        value: LISTING(food).getAttributes().title,
+        key: Listing(food).getId(),
+        value: Listing(food).getAttributes().title,
       }));
 
       const foodSelection =
-        LISTING(currentPlan).getMetadata().orderDetail[planItemKey]
+        Listing(currentPlan).getMetadata().orderDetail[planItemKey]
           .memberOrders[currentUserId] || {};
+
+      const pickFoodStatus = foodSelection?.status;
+
+      if (!pickFoodStatus && !anchorTime && !isAnchorTimeChanged) {
+        isAnchorTimeChanged = true;
+        setAnchorTime(+planItemKey);
+      }
 
       const event = {
         resource: {
@@ -63,19 +75,19 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           subOrderId: planKey,
           orderId,
           daySession: 'MORNING_SESSION',
-          status: foodSelection?.status,
+          status: pickFoodStatus,
           type: 'dailyMeal',
-          deliveryAddress: LISTING(restaurant).getPublicData().location,
+          deliveryAddress: Listing(restaurant).getPublicData().location,
           restaurant: {
-            name: LISTING(restaurant).getAttributes().title,
-            id: LISTING(restaurant).getId(),
+            name: Listing(restaurant).getAttributes().title,
+            id: Listing(restaurant).getId(),
           },
           meal: {
             dishes,
           },
-          expiredTime: orderDeadline
-            ? DateTime.fromMillis(+orderDeadline).toJSDate()
-            : DateTime.fromMillis(+planItemKey).minus({ day: 2 }).toJSDate(),
+          expiredTime: deadlineDate
+            ? DateTime.fromMillis(+deadlineDate)
+            : DateTime.fromMillis(+planItemKey).minus({ day: 2 }),
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
         },
@@ -106,7 +118,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   return (
     <div>
       <CalendarDashboard
-        anchorDate={DateTime.fromMillis(startDate || Date.now()).toJSDate()}
+        anchorDate={anchorDate}
         events={flattenEvents}
         companyLogo={sectionCompanyBranding}
         renderEvent={OrderEventCard}

@@ -1,0 +1,34 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px;
+  row-gap: 12px;
+  margin: 0;
+  border-radius: 8px;
+
+  &:hover {
+    background-color: $neutralGray3;
+  }
+
+  .stateContainer {
+    .icon {
+      display: block;
+      height: 28px;
+      width: 28px;
+
+      &.iconEmpty {
+        border-radius: 50%;
+        border: 1px solid $neutralGray4;
+        background-color: $neutralGray3;
+      }
+    }
+  }
+
+  .date {
+    @include textTemplate(16px, 600, 24px);
+  }
+}

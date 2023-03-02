@@ -5,7 +5,6 @@ export const generalPaths = {
   ResetPassword: '/dat-lai-mat-khau',
   StyleGuide: '/style-guide',
   Home: '/',
-  OrderManageMent: '/orders/[orderId]',
 };
 
 const enGeneralPaths = {
@@ -19,6 +18,7 @@ const enGeneralPaths = {
 
 export const personalPaths = {
   Account: '/company/personal/account',
+  Nutrition: '/company/personal/nutrition',
 };
 
 export const NonRequireAuthenticationRoutes = [
@@ -36,10 +36,11 @@ export const IgnoredAuthCheckRoutes = [generalPaths.StyleGuide];
 export const IgnoredPermissionCheckRoutes = [
   generalPaths.SignIn,
   generalPaths.SignUp,
+  generalPaths.RecoveryPassword,
   generalPaths.StyleGuide,
   enGeneralPaths.SignIn,
   enGeneralPaths.SignUp,
-  generalPaths.OrderManageMent,
+  enGeneralPaths.RecoveryPassword,
 ];
 
 export const adminPaths = {
@@ -53,6 +54,7 @@ export const adminPaths = {
   EditPartner: '/admin/partner/[partnerId]/edit',
   ManageOrders: '/admin/order',
   CreateOrder: '/admin/order/create',
+  UpdateDraftOrder: '/admin/order/create/[orderId]',
 };
 
 // Should be an object => path should has its label
@@ -127,23 +129,39 @@ export const adminRoutes = {
   },
   ManagePartnerMenus: {
     path: '/admin/partner/[restaurantId]/settings/menu',
-    label: 'Danh sách thực đơn',
+    label: 'Thực đơn',
   },
-  PartnerMenuDetails: {
-    path: '/admin/partner/[restaurantId]/settings/menu/[menuId]',
-    label: 'Danh sách thực đơn',
+  ManagePartnerFixedMenus: {
+    path: '/admin/partner/[restaurantId]/settings/menu/fixed-menu',
+    label: 'Thực đơn cố định',
+  },
+  ManagePartnerCycleMenus: {
+    path: '/admin/partner/[restaurantId]/settings/menu/cycle-menu',
+    label: 'Thực đơn theo chu kỳ',
+  },
+  PartnerMenuFixedDetails: {
+    path: '/admin/partner/[restaurantId]/settings/menu/fixed-menu/[menuId]',
+    label: 'Chi tiết thực đơn',
+  },
+  PartnerMenuCycleDetails: {
+    path: '/admin/partner/[restaurantId]/settings/menu/cycle-menu/[menuId]',
+    label: 'Chi tiết thực đơn',
   },
   CreatePartnerMenu: {
     path: '/admin/partner/[restaurantId]/settings/menu/create',
     label: 'Tạo thực đơn',
   },
   EditPartnerMenu: {
-    path: '/admin/partner/[restaurantId]/settings/menu/create',
+    path: '/admin/partner/[restaurantId]/settings/menu/[menuId]',
     label: 'Chỉnh sửa thực đơn',
   },
   EditOrder: {
     path: '/admin/order/[orderId]',
     label: 'Tạo đơn hàng',
+  },
+  UpdateDraftOrder: {
+    path: adminPaths.UpdateDraftOrder,
+    label: 'Chỉnh sửa',
   },
 } as const;
 
@@ -151,13 +169,29 @@ export const companyPaths = {
   Home: '/company',
   Detail: '/company/[companyId]',
   Account: '/company/[companyId]/account',
+  ManageOrders: '/company/[companyId]/orders',
+  ManageOrderDetail: '/company/orders/[orderId]',
+  ManageOrderPicking: '/company/orders/[orderId]/picking',
   GroupSetting: '/company/[companyId]/group-setting',
   Logo: '/company/[companyId]/logo',
   Members: '/company/[companyId]/members',
   MembersDetail: '/company/[companyId]/members/[memberEmail]',
   CreateNewOrder: '/company/booker/orders/new',
   EditDraftOrder: '/company/booker/orders/draft/[orderId]',
+  OrderSelectRestaurant: '/company/booker/orders/draft/[orderId]/restaurants',
   GroupDetail: '/company/[companyId]/group-setting',
   GroupMemberDetail:
     '/company/[companyId]/group-setting/[groupId]/member/[memberId]',
+  Nutrition: '/company/[companyId]/nutrition',
+};
+
+export const quizPaths = {
+  Welcome: '/company/booker/orders/new/quiz/welcome',
+  SelectCompany: '/company/booker/orders/new/quiz/select-company',
+  PerpackMemberAmount: '/company/booker/orders/new/quiz/perpack-member-amount',
+  SpecialDemand: '/company/booker/orders/new/quiz/special-demand',
+  MealStyles: '/company/booker/orders/new/quiz/meal-styles',
+  Restaurants: '/company/booker/orders/new/quiz/restaurants',
+  MealDates: '/company/booker/orders/new/quiz/meal-date',
+  CreatingOrder: '/company/booker/orders/new/quiz/creating-order',
 };

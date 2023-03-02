@@ -30,9 +30,13 @@ const Collapsible: React.FC<TCollapsibleProps> = (props) => {
 
   const { value: isOpen, toggle } = useBoolean(true);
 
-  const classes = classNames(rootClassName || css.root, className, {
-    [css.isOpen]: isOpen,
-  });
+  const classes = classNames(
+    rootClassName || css.root,
+    {
+      [css.isOpen]: isOpen,
+    },
+    className,
+  );
   const labelSectionClasses = classNames(
     labelSectionClassName,
     css.labelSection,
@@ -50,10 +54,7 @@ const Collapsible: React.FC<TCollapsibleProps> = (props) => {
         onClick={toggle}
         className={labelSectionClasses}>
         <div className={labelClasses}>{label}</div>
-        <IconArrow
-          direction={isOpen ? 'up' : 'down'}
-          className={css.arrowIcon}
-        />
+        <IconArrow direction={'down'} className={css.arrowIcon} />
       </InlineTextButton>
       <div className={contentClasses}>{children}</div>
     </div>

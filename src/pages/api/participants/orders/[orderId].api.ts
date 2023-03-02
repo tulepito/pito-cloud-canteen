@@ -4,9 +4,9 @@ import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import {
-  CURRENT_USER,
+  CurrentUser,
   denormalisedResponseEntities,
-  LISTING,
+  Listing,
 } from '@utils/data';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -19,8 +19,8 @@ const fetchSubOrder = async (orderDetail: any) => {
   const planKeys = Object.keys(orderDetail);
   for (const planKey of planKeys) {
     const planItem = orderDetail[planKey];
-    const { foodList, restaurant } = planItem;
-    const restaurantId = restaurant?.id;
+    const { restaurant = {} } = planItem;
+    const { foodList = {}, id: restaurantId } = restaurant;
 
     // Fetch restaurant data
     const restaurantData = denormalisedResponseEntities(
@@ -55,10 +55,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (apiMethod) {
     case HttpMethod.GET: {
       const { orderId } = req.query;
+
       if (!orderId) {
         return res.status(400).json({
           message: 'Missing required keys',
         });
+        return;
       }
 
       try {
@@ -95,8 +97,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         );
 
         const subOrderPromises = plans.map(async (plan: TListing) => {
-          const { orderDetail } = LISTING(plan).getMetadata();
-          const planId = LISTING(plan).getId();
+          const { orderDetail } = Listing(plan).getMetadata();
+          const planId = Listing(plan).getId();
           return {
             [planId]: await fetchSubOrder(orderDetail),
           };
@@ -116,24 +118,30 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         });
       } catch (error) {
         handleError(res, error);
-        console.log(error);
+        console.error(error);
       }
       break;
     }
 
     case HttpMethod.POST: {
+      const { orderId } = req.query;
       const { planId, memberOrders, orderDay, orderDays, planData } = req.body;
 
       try {
         const currentUser = denormalisedResponseEntities(
           await sdk.currentUser.show(),
         )[0];
-        const currentUserId = CURRENT_USER(currentUser).getId();
+        const currentUserId = CurrentUser(currentUser).getId();
+        const [orderListing] = denormalisedResponseEntities(
+          await integrationSdk.listings.show({ id: orderId }),
+        );
         const updatingPlan = denormalisedResponseEntities(
           await integrationSdk.listings.show({ id: planId }),
         )[0];
 
-        const orderDetail = LISTING(updatingPlan).getMetadata()?.orderDetail;
+        const { participants = [], anonymous = [] } =
+          Listing(orderListing).getMetadata();
+        const { orderDetail } = Listing(updatingPlan).getMetadata();
 
         if (orderDay && memberOrders) {
           orderDetail[orderDay].memberOrders[currentUserId] =
@@ -144,6 +152,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               planData?.[day]?.[currentUserId];
           });
         }
+
         await integrationSdk.listings.update({
           id: planId,
           metadata: {
@@ -151,10 +160,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           },
         });
 
-        return res.json({ message: 'Update successfully' });
+        if (
+          !participants.includes(currentUserId) &&
+          !anonymous.includes(currentUserId)
+        ) {
+          await integrationSdk.listings.update({
+            id: orderId,
+            metadata: {
+              anonymous: anonymous.concat(currentUserId),
+            },
+          });
+        }
+
+        return res.json({ message: 'Update picking successfully' });
       } catch (error) {
         handleError(res, error);
-        console.log(error);
+        console.error(error);
       }
       break;
     }

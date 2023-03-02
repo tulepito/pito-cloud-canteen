@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import cookies from '@services/cookie';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities } from '@utils/data';

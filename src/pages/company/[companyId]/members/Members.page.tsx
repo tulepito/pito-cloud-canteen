@@ -4,7 +4,7 @@ import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconPlus from '@components/Icons/IconPlus/IconPlus';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
-import { getGroupNames } from '@helpers/companyMembers';
+import { getGroupNames } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
@@ -15,7 +15,7 @@ import {
   companyMemberThunks,
   resetError,
 } from '@redux/slices/companyMember.slice';
-import { ensureUser, USER } from '@utils/data';
+import { ensureUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -164,9 +164,9 @@ const MembersPage = () => {
                 groupList,
               ),
               allergy:
-                USER(member).getPublicData()?.allergies?.join(', ') || [],
+                User(member).getPublicData()?.allergies?.join(', ') || [],
               nutrition:
-                USER(member).getPublicData()?.nutritions?.join(', ') || [],
+                User(member).getPublicData()?.nutritions?.join(', ') || [],
             },
           },
         ],

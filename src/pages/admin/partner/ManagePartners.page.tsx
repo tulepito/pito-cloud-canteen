@@ -7,7 +7,6 @@ import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
-import Meta from '@components/Layout/Meta';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
@@ -36,8 +35,8 @@ const TABLE_COLUMN: TColumn[] = [
     label: 'STT',
     render: (data: any) => {
       return (
-        <div title={data.id} className={css.rowId}>
-          {data.order}
+        <div title={data?.id} className={css.rowId}>
+          {data?.order}
         </div>
       );
     },
@@ -50,8 +49,8 @@ const TABLE_COLUMN: TColumn[] = [
         <NamedLink
           path={`/admin/partner/${data.id}/edit`}
           className={classNames(css.rowText, css.rowTitle)}>
-          <div>{data.title}</div>
-          {data.isDraft && (
+          <div title={data?.title}>{data?.title}</div>
+          {data?.isDraft && (
             <div className={css.draftBox}>
               <FormattedMessage id="ManagePartnersPage.draftState" />
             </div>
@@ -71,14 +70,18 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'email',
     label: 'Email',
     render: (data: any) => {
-      return <div className={css.rowText}>{data.email}</div>;
+      return <div className={css.rowText}>{data?.email}</div>;
     },
   },
   {
     key: 'address',
     label: 'Địa chỉ',
     render: (data: any) => {
-      return <div className={css.rowText}>{data.address}</div>;
+      return (
+        <div title={data?.address} className={css.rowText}>
+          {data?.address}
+        </div>
+      );
     },
   },
   {
@@ -86,10 +89,10 @@ const TABLE_COLUMN: TColumn[] = [
     label: 'Trạng thái',
     render: (data: any) => {
       const isUnsatisfactory =
-        data.status === ERestaurantListingStatus.unsatisfactory;
-      const isAuthorized = data.status === ERestaurantListingStatus.authorized;
+        data?.status === ERestaurantListingStatus.unsatisfactory;
+      const isAuthorized = data?.status === ERestaurantListingStatus.authorized;
       const isNew =
-        !data.status || data.status === ERestaurantListingStatus.new;
+        !data?.status || data?.status === ERestaurantListingStatus.new;
 
       const classses = classNames(css.rowText, css.badge, {
         [css.unsatisfactoryBox]: isUnsatisfactory,
@@ -100,7 +103,7 @@ const TABLE_COLUMN: TColumn[] = [
         <div className={classses}>
           <FormattedMessage
             id={`ManagePartnersPage.${
-              data.status || ERestaurantListingStatus.new
+              data?.status || ERestaurantListingStatus.new
             }Status`}
           />
         </div>
@@ -112,7 +115,7 @@ const TABLE_COLUMN: TColumn[] = [
     label: '',
     render: (data: any) => {
       return (
-        <Link href={`/admin/partner/${data.id}/edit`}>
+        <Link href={`/admin/partner/${data?.id}/edit`}>
           <InlineTextButton
             className={classNames(css.actionButton, css.editButton)}>
             <IconEdit className={css.iconEdit} />
@@ -126,29 +129,29 @@ const TABLE_COLUMN: TColumn[] = [
     label: '',
     render: (data: any) => {
       const setAuthorizeHandle = () => {
-        data.onSetAuthorized(data.id);
+        data?.onSetAuthorized(data?.id);
       };
 
       const setUnsatisfactoryHandle = () => {
-        data.onSetUnsatisfactory(data.id);
+        data?.onSetUnsatisfactory(data?.id);
       };
 
       const deleteHandle = () => {
-        data.onDeleteRestaurant({
-          partnerId: data.authorId,
-          restaurantId: data.id,
+        data?.onDeleteRestaurant({
+          partnerId: data?.authorId,
+          restaurantId: data?.id,
         });
       };
       const isUnsatisfactory =
-        data.status === ERestaurantListingStatus.unsatisfactory;
-      const isAuthorized = data.status === ERestaurantListingStatus.authorized;
+        data?.status === ERestaurantListingStatus.unsatisfactory;
+      const isAuthorized = data?.status === ERestaurantListingStatus.authorized;
       const isNew =
-        !data.status || data.status === ERestaurantListingStatus.new;
+        !data?.status || data?.status === ERestaurantListingStatus.new;
 
       return (
-        !data.isDraft && (
+        !data?.isDraft && (
           <div className={css.tableActions}>
-            {data.isLoading ? (
+            {data?.isLoading ? (
               <IconSpinner className={css.loadingIcon} />
             ) : (
               <>
@@ -192,19 +195,19 @@ const parseEntitiesToTableData = (
 ) => {
   if (entityRefs.length === 0) return [];
   return entityRefs.map((entity: any, index: number) => {
-    const isLoading = entity.id.uuid === extraData.loadingId;
+    const isLoading = entity.id.uuid === extraData?.loadingId;
     return {
       key: entity.id.uuid,
       data: {
         order: (page - 1) * 10 + index + 1,
         id: entity.id.uuid,
         isDraft:
-          entity.attributes.metadata.listingState === EListingStates.draft,
+          entity.attributes.metadata?.listingState === EListingStates.draft,
         title: entity.attributes.title,
-        phoneNumber: entity.attributes.publicData.phoneNumber,
+        phoneNumber: entity.attributes.publicData?.phoneNumber,
         email: entity.author.attributes.email,
-        address: entity.attributes.publicData.location.address,
-        status: entity.attributes.metadata.status,
+        address: entity.attributes.publicData?.location?.address,
+        status: entity.attributes.metadata?.status,
         authorId: entity.author.id.uuid,
         ...extraData,
         isLoading,
@@ -338,13 +341,8 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
     id: 'ManagePartners.title',
   });
 
-  const description = intl.formatMessage({
-    id: 'ManagePartners.description',
-  });
-
   return (
     <div className={css.root}>
-      <Meta title={title} description={description} />
       <div className={css.top}>
         <h1 className={css.title}>{title}</h1>
         <Link href={`/admin/partner/create`}>

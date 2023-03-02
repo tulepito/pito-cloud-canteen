@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { HttpMethod } from '@apis/configs';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import isEmpty from 'lodash/isEmpty';
@@ -24,9 +22,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           res.json(response);
         }
-        break;
-
-      case HttpMethod.POST:
         break;
 
       case HttpMethod.PUT:

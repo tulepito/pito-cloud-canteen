@@ -1,0 +1,21 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.fieldContainer {
+  display: flex;
+  justify-content: flex-end;
+
+  .fieldKeywords {
+    flex-basis: 100%;
+
+    @include viewportMedium {
+      flex-basis: min(100%, 50vw);
+    }
+
+    & > div input {
+      @include viewportLargeWithPaddings {
+        width: 350px !important;
+      }
+    }
+  }
+}

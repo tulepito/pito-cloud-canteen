@@ -37,7 +37,7 @@
     width: 60px;
     align-items: center;
     flex-direction: column;
-    padding: 32px 0 0 0;
+    padding: 16px 0 0 0;
     z-index: 2;
     background-color: $neutralGray2;
     border-right: 1px solid #f0f0f0;
@@ -84,6 +84,10 @@
     }
     .multiLevelMenu {
       padding: 0;
+      .menuItemLabel {
+        font-weight: $fontWeightRegular !important;
+        font-size: 14px !important;
+      }
     }
     .subMenuLayout {
       padding: 0;

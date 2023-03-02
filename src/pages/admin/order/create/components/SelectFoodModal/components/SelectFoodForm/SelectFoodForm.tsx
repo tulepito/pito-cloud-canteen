@@ -114,6 +114,7 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
         if (selectedFoodIds.includes(id) || currentFoodIds.includes(id)) {
           return [...result, id];
         }
+
         return result;
       }, []);
     } else {
@@ -166,7 +167,7 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
     } else {
       form.change('checkAll', true);
     }
-  }, [currentOptions.length, selectedFoodListLength, shouldCheckAll]);
+  }, [currentOptions.length, form, selectedFoodListLength, shouldCheckAll]);
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -211,7 +212,9 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
                   <FormattedMessage id="SelectFoodForm.selectedFood" />
                 </div>
                 <div className={css.divider} />
-                <div>{renderSelectedFoodList()}</div>
+                <div className={css.itemContainer}>
+                  {renderSelectedFoodList()}
+                </div>
               </div>
             )}
             <div className={css.actionContainer}>

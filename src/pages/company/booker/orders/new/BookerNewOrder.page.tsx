@@ -1,17 +1,19 @@
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { OrderAsyncAction } from '@redux/slices/Order.slice';
+import { QuizThunks } from '@redux/slices/Quiz.slice';
+import { companyPaths, quizPaths } from '@src/paths';
+import { User } from '@utils/data';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
 import css from './BookerNewOrder.module.scss';
 import CreateOrderForm from './CreateOrderForm';
+import useLoadCompanies from './hooks/loadCompanies';
 
 function BookerNewOrderPage() {
   const intl = useIntl();
   const route = useRouter();
   const dispatch = useAppDispatch();
-  const currentUser = useAppSelector((state) => state.user.currentUser);
 
   // Redux
   const createOrderInProcess = useAppSelector(
@@ -21,22 +23,26 @@ function BookerNewOrderPage() {
     (state) => state.Order.createOrderError,
   );
 
+  const { myCompanies = [], queryInprogress: queryCompanyInprogress } =
+    useLoadCompanies();
+
+  const normalizedCompanies = myCompanies.map((company) => ({
+    id: company?.id?.uuid,
+    name: User(company).getPublicData()?.companyName,
+    location: User(company).getPublicData()?.location,
+  }));
+
   const handleCancel = () => {
-    route.push('/company/booker/orders');
+    route.push(companyPaths.Home);
   };
 
   const handleSubmit = async (values: any) => {
     try {
-      const newOrder = await dispatch(
-        OrderAsyncAction.createOrder({
-          clientId: values.company,
-          bookerId: currentUser?.id?.uuid,
-        }),
-      );
-      const newOrderId = newOrder?.payload?.id?.uuid;
-      route.push(`/company/booker/orders/draft/${newOrderId}`);
+      await dispatch(QuizThunks.fetchSelectedCompany(values.company));
+
+      route.push(quizPaths.PerpackMemberAmount);
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
     }
   };
 
@@ -53,39 +59,11 @@ function BookerNewOrderPage() {
         })}>
         <div className={css.modalContent}>
           <CreateOrderForm
-            companies={[
-              {
-                id: '63c76be1-7dd8-40fd-9920-b087847943fd',
-                name: 'Chu Tuan',
-              },
-              {
-                id: '1235',
-                name: 'Journey Horizon',
-              },
-              {
-                id: '1236',
-                name: 'Shopee',
-              },
-              {
-                id: '1237',
-                name: 'Lazada',
-              },
-            ]}
-            previousOrders={[
-              {
-                id: '1234',
-                name: 'Chu Tuan',
-              },
-              {
-                id: '1235',
-                name: 'Journey Horizon',
-              },
-            ]}
+            companies={normalizedCompanies}
+            previousOrders={[]}
             onSubmit={handleSubmit}
             onCancel={handleCancel}
-            initialValues={{
-              company: '1235',
-            }}
+            queryInprogress={queryCompanyInprogress}
             submitInprogress={createOrderInProcess}
             submitError={createOrderError}
           />

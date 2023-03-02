@@ -18,22 +18,34 @@
 .header {
   @include flexAlign(center, space-between);
   padding: 24px;
+  padding-bottom: 6px;
 
   .profileWrapper {
     @include flexAlign(center);
     gap: 16px;
+
+    .avatar {
+      width: 64px;
+      height: 64px;
+    }
+
+    .name {
+      color: $neutralGray6;
+    }
   }
 }
 
 .profileInfo {
   @include flexAlign(flex-start);
   flex-direction: column;
-  padding-left: 80px;
+  padding-left: 104px;
+  gap: 8px;
 
   .row {
     @include flexAlign(center);
 
     .title {
+      color: $neutralGray6;
       width: 60px;
       margin-right: 16px;
       font-weight: $fontWeightSemiBold;
@@ -51,7 +63,7 @@
 }
 
 .restrictionTable {
-  border: 1px solid $neutral4;
+  border: 1px solid $neutralGray4;
   border-radius: 8px;
   overflow: hidden;
   margin-top: 30px;

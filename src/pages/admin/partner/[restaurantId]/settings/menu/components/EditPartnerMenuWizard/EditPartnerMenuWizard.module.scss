@@ -1,0 +1,32 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.formTabNav {
+  margin-bottom: 50px;
+}
+
+.title {
+  margin: 0 0 30px 0;
+  text-transform: capitalize;
+}
+
+.navigateButtons {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+  &.flexEnd {
+    justify-content: flex-end;
+  }
+  button {
+    width: 252px;
+    min-height: 48px;
+    font-size: 16px;
+  }
+  .lightButton {
+    @include buttonColorSecondary;
+  }
+}
+
+.loadingIcon {
+  stroke: $neutralGray6;
+}

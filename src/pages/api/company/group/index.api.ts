@@ -4,7 +4,7 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import companyChecker from '@services/permissionChecker/company';
 import { handleError } from '@services/sdk';
-import { denormalisedResponseEntities, USER } from '@utils/data';
+import { denormalisedResponseEntities, User } from '@utils/data';
 import { randomUUID } from 'crypto';
 import difference from 'lodash/difference';
 import differenceBy from 'lodash/differenceBy';
@@ -27,7 +27,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     case HttpMethod.POST:
       try {
         const { groups = [], members = {} } =
-          USER(companyAccount).getMetadata();
+          User(companyAccount).getMetadata();
         const newGroupId = randomUUID();
         const newGroup = {
           id: newGroupId,
@@ -38,7 +38,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         groupMembers.forEach(({ email }: TMemberApi) => {
           members[email] = {
             ...members[email],
-            groups: members[email].groups.concat(newGroupId),
+            groups: Array.from(new Set(members[email].groups).add(newGroupId)),
           };
         });
 
@@ -69,7 +69,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             await integrationSdk.users.updateProfile({
               id,
               metadata: {
-                groupList: groupList.concat(newGroupId),
+                groupList: Array.from(new Set(groupList).add(newGroupId)),
               },
             });
           }),
@@ -83,7 +83,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       {
         const { addedMembers = [], deletedMembers = [] } = req.body;
         const { groups = [], members = {} } =
-          USER(companyAccount).getMetadata();
+          User(companyAccount).getMetadata();
 
         const currentGroupIndex = groups.findIndex(
           (_group: any) => _group.id === groupId,
@@ -101,19 +101,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           ...(groupInfo || {}),
           members: newGroupMembers,
         };
-        if (addedMembers.length > 0) {
-          addedMembers.forEach(({ email }: TMemberApi) => {
-            members[email].groups = members[email].groups.concat(groupId);
-          });
-        }
 
-        if (deletedMembers.length > 0) {
-          deletedMembers.forEach(({ email }: TMemberApi) => {
-            members[email].groups = members[email].groups.filter(
-              (_groupId: string) => _groupId !== groupId,
-            );
-          });
-        }
+        addedMembers.forEach(({ email }: TMemberApi) => {
+          members[email].groups = Array.from(
+            new Set(members[email].groups).add(groupId),
+          );
+        });
+
+        deletedMembers.forEach(({ email }: TMemberApi) => {
+          members[email].groups = members[email].groups.filter(
+            (_groupId: string) => _groupId !== groupId,
+          );
+        });
 
         const updatedCompanyAccountResponse =
           await integrationSdk.users.updateProfile(
@@ -141,7 +140,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             await integrationSdk.users.updateProfile({
               id,
               metadata: {
-                groupList: groupList.concat(groupId),
+                groupList: Array.from(new Set(groupList).add(groupId)),
               },
             });
           }),
@@ -170,7 +169,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     case HttpMethod.DELETE:
       try {
         const { groups = [], members = {} } =
-          USER(companyAccount).getMetadata();
+          User(companyAccount).getMetadata();
 
         const onDeletingGroup = groups.find(
           (_group: any) => _group.id === groupId,

@@ -1,10 +1,16 @@
-import { companyPaths } from '@src/paths';
+import { companyPaths, quizPaths } from '@src/paths';
 
 export const shouldShowFeatureHeader = (pathName: string) => {
-  if (
-    pathName === companyPaths.CreateNewOrder ||
-    pathName === companyPaths.EditDraftOrder
-  ) {
+  const hideList = [
+    companyPaths.CreateNewOrder,
+    companyPaths.EditDraftOrder,
+    companyPaths.OrderSelectRestaurant,
+    companyPaths.ManageOrderDetail,
+    companyPaths.ManageOrderPicking,
+    ...Object.values(quizPaths),
+  ];
+
+  if (hideList.includes(pathName)) {
     return false;
   }
 
@@ -12,10 +18,17 @@ export const shouldShowFeatureHeader = (pathName: string) => {
 };
 
 export const shouldShowSidebar = (pathName: string) => {
-  if (
-    pathName === companyPaths.CreateNewOrder ||
-    pathName === companyPaths.EditDraftOrder
-  ) {
+  const hideList = [
+    companyPaths.CreateNewOrder,
+    companyPaths.EditDraftOrder,
+    companyPaths.OrderSelectRestaurant,
+    companyPaths.ManageOrders,
+    companyPaths.ManageOrderDetail,
+    companyPaths.ManageOrderPicking,
+    ...Object.values(quizPaths),
+  ];
+
+  if (hideList.includes(pathName)) {
     return false;
   }
 

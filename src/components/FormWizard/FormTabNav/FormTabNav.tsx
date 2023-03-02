@@ -32,6 +32,7 @@ const FormTab: React.FC<TFormTabProps> = (props) => {
     isLight,
     onClick,
   } = props;
+
   const linkClasses = classNames(css.link, {
     [css.selectedLink]: selected,
     [css.disabled]: disabled,
@@ -77,6 +78,7 @@ const FormTabNav: React.FC<TTabNavProps> = (props) => {
     <nav className={classes}>
       {tabs.map((tab, index) => {
         const id = typeof tab.id === 'string' ? tab.id : `${index}`;
+
         return (
           <FormTab
             order={index + 1}

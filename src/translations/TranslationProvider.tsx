@@ -20,9 +20,9 @@ const TranslationProvider = ({ children }: PropsWithChildren<{}>) => {
 
   return (
     <IntlProvider
+      textComponent={'span'}
       locale={locale}
       defaultLocale={defaultLocale}
-      textComponent="span"
       messages={message}>
       {children}
     </IntlProvider>

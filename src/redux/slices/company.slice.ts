@@ -8,16 +8,16 @@ import type {
 import {
   createGroupApi,
   deleteGroupApi,
+  getAllCompanyMembersApi,
   getGroupDetailApi,
   updateCompany,
   updateGroupApi,
 } from '@apis/companyApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
-import { denormalisedResponseEntities } from '@utils/data';
+import { denormalisedResponseEntities, User } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TObject, TUser } from '@utils/types';
-import axios from 'axios';
 
 import { userThunks } from './user.slice';
 
@@ -62,6 +62,9 @@ type TCompanyState = {
 
   updateBookerAccountInProgress: boolean;
   updateBookerAccountError: any;
+
+  favoriteRestaurants: any[];
+  favoriteFood: any[];
 };
 
 // ================ Thunk types ================ //
@@ -102,6 +105,9 @@ const initialState: TCompanyState = {
 
   updateBookerAccountInProgress: false,
   updateBookerAccountError: null,
+
+  favoriteRestaurants: [],
+  favoriteFood: [],
 };
 
 const companyInfo = createAsyncThunk(
@@ -116,11 +122,31 @@ const companyInfo = createAsyncThunk(
       companyAccountResponse,
     );
     const companyImageId = companyAccount.profileImage?.id;
-    const { data: allEmployeesData } = await axios.get(
-      `/api/company/all-employees?companyId=${workspaceCompanyId}`,
+    const { data: allEmployeesData } = await getAllCompanyMembersApi(
+      workspaceCompanyId,
     );
+    const { favoriteRestaurantList = [], favoriteFoodList = [] } =
+      User(companyAccount).getPublicData();
+
     const { groups = [], members = {} } =
       companyAccount.attributes.profile.metadata;
+    const favoriteRestaurants = await Promise.all(
+      favoriteRestaurantList.map(
+        async (restaurantId: string) =>
+          denormalisedResponseEntities(
+            await sdk.listings.show({ id: restaurantId }),
+          )[0],
+      ),
+    );
+
+    const favoriteFood = await Promise.all(
+      favoriteFoodList.map(
+        async (foodId: string) =>
+          denormalisedResponseEntities(
+            await sdk.listings.show({ id: foodId }),
+          )[0],
+      ),
+    );
     return {
       companyImage: {
         imageId: companyImageId || null,
@@ -128,7 +154,9 @@ const companyInfo = createAsyncThunk(
       groupList: groups,
       company: companyAccount,
       originCompanyMembers: members,
-      companyMembers: [...allEmployeesData.data.data],
+      companyMembers: allEmployeesData,
+      favoriteRestaurants,
+      favoriteFood,
     };
   },
 );
@@ -244,14 +272,15 @@ const updateBookerAccount = createAsyncThunk(
 
 const updateCompanyAccount = createAsyncThunk(
   UPDATE_COMPANY_ACCOUNT,
-  async (_, { getState, dispatch }) => {
+  async (params: any, { getState, dispatch }) => {
     const { workspaceCompanyId } = getState().company;
     const { image = {} } = getState().uploadImage;
-    const { imageId, file } = image;
+    const { imageId, file } = image || {};
     const apiBody: UpdateCompanyApiBody = {
       companyId: workspaceCompanyId,
       dataParams: {
         id: workspaceCompanyId,
+        ...params,
         ...(imageId && file ? { profileImageId: imageId.uuid } : {}),
       },
       queryParams: {
@@ -304,14 +333,22 @@ export const companySlice = createSlice({
         };
       })
       .addCase(companyInfo.fulfilled, (state, { payload }) => {
-        const { groupList, companyMembers, originCompanyMembers, company } =
-          payload;
+        const {
+          groupList,
+          companyMembers,
+          originCompanyMembers,
+          company,
+          favoriteRestaurants,
+          favoriteFood,
+        } = payload;
         return {
           ...state,
           groupList,
           companyMembers,
           company,
           originCompanyMembers,
+          favoriteRestaurants,
+          favoriteFood,
           isCompanyNotFound: false,
           fetchCompanyInfoInProgress: false,
         };

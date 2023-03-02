@@ -1,0 +1,19 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  @include mediumText;
+  background-color: $neutralGray1;
+  height: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid $neutralGray4;
+  padding: 4px;
+  cursor: pointer;
+  font-weight: $fontWeightBold;
+  &:hover {
+    background-color: $primaryPri1;
+  }
+}

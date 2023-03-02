@@ -1,20 +1,25 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
+  @include flexAlign(center, space-between);
   flex: 1;
   height: fit-content;
-  padding: 10px 40px;
+  padding: 10px 80px;
   position: fixed;
   width: 100%;
   top: 0;
   left: 0;
   background-color: $neutralGray1;
-  z-index: 49;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  z-index: 101;
 
-  .headerLeft {
+  @include viewportLarge {
+    height: 81px;
+  }
+
+  &.bottomLine {
+    border-bottom: 1px solid $neutralGray4;
   }
 
   .headerRight {

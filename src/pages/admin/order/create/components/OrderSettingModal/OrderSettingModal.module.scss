@@ -3,7 +3,8 @@
 @use 'src/styles/mixins.scss' as *;
 
 .container {
-  @include flexAlign(flex-start, space-betweeb);
+  @include flexAlign(flex-start, space-between);
+  margin-top: 40px;
 }
 
 .leftSide {
@@ -57,6 +58,10 @@
     @include text(20px, 32px);
     font-weight: $fontWeightBold;
     text-transform: capitalize;
+  }
+
+  .fieldContainer {
+    width: 400px;
   }
 
   .fieldContent {

@@ -1,10 +1,10 @@
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-import type { TDefaultProps } from '@utils/types';
+import type { TDefaultProps, TObject } from '@utils/types';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Event, ViewsProps } from 'react-big-calendar';
 import { Calendar, luxonLocalizer, Views } from 'react-big-calendar';
 
@@ -13,7 +13,10 @@ import createMonthViewWrapper from './components/MonthView/withMonthViewWrapper'
 import OrderEventCard from './components/OrderEventCard/OrderEventCard';
 import Toolbar from './components/Toolbar/Toolbar';
 import withWeekViewWrapper from './components/WeekView/withWeekViewWrapper';
-import type { TCalendarItemCardComponents } from './helpers/types';
+import type {
+  TCalendarItemCardComponents,
+  TDayColumnHeaderProps,
+} from './helpers/types';
 
 type TCalendarDashboardProps = TDefaultProps & {
   anchorDate?: Date;
@@ -28,6 +31,9 @@ type TCalendarDashboardProps = TDefaultProps & {
   recommendButton?: ReactNode;
   hideMonthView?: boolean;
   hideWeekView?: boolean;
+  headerComponent?: (params: TDayColumnHeaderProps) => ReactNode;
+  eventExtraProps?: TObject;
+  resources?: any;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
@@ -45,6 +51,9 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   endDate,
   hideMonthView,
   hideWeekView,
+  headerComponent,
+  eventExtraProps,
+  resources,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
 
@@ -63,6 +72,8 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
         inProgress,
         renderEvent,
         customComponents: components,
+        customHeader: headerComponent,
+        eventExtraProps,
       })
     : false;
 
@@ -81,30 +92,41 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
     [inProgress, propsDefaultDate],
   );
 
-  const anchorDateProps = anchorDate
-    ? {
-        date: calDate,
-        onNavigate: (newDate: Date) => {
-          setCalDate(newDate);
-        },
-      }
-    : { defaultDate };
+  const anchorDateProps = useMemo(() => {
+    return anchorDate
+      ? {
+          date: calDate,
+          onNavigate: (newDate: Date) => {
+            setCalDate(newDate);
+          },
+        }
+      : { defaultDate };
+  }, [anchorDate, calDate, defaultDate]);
 
-  const toolbarExtraProps = {
-    companyLogo,
-    recommendButton,
-    startDate,
-    endDate,
-    anchorDate: calDate,
-  };
+  const toolbarExtraProps = useMemo(() => {
+    return {
+      companyLogo,
+      recommendButton,
+      startDate,
+      endDate,
+      anchorDate: calDate,
+    };
+  }, [companyLogo, recommendButton, startDate, endDate, calDate]);
 
   useEffect(() => {
     setCalDate(anchorDate);
   }, [anchorDate]);
 
-  const defaultToolbar = (props: any) => (
-    <Toolbar {...props} {...toolbarExtraProps} />
+  const defaultToolbar = useCallback(
+    (props: any) => <Toolbar {...props} {...toolbarExtraProps} />,
+    [toolbarExtraProps],
   );
+
+  const componentsProps = useMemo(() => {
+    return {
+      toolbar: components?.toolbar || defaultToolbar,
+    };
+  }, [components?.toolbar, defaultToolbar]);
 
   return (
     <div className={classes}>
@@ -114,9 +136,8 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
         localizer={localizer}
         events={events}
         views={views}
-        components={{
-          toolbar: components?.toolbar || defaultToolbar,
-        }}
+        resources={resources}
+        components={componentsProps}
       />
     </div>
   );

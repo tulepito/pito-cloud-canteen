@@ -1,0 +1,144 @@
+/* eslint-disable @typescript-eslint/default-param-last */
+import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
+import Form from '@components/Form/Form';
+import { IntegrationListing } from '@utils/data';
+import type { TIntegrationListing } from '@utils/types';
+import type { FormApi } from 'final-form';
+import { useImperativeHandle, useState } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { FormattedMessage } from 'react-intl';
+
+import AddFoodModal from '../AddFoodModal/AddFoodModal';
+import CalendarContentEnd from '../CalendarContentEnd/CalendarContentEnd';
+import CalendarContentStart from '../CalendarContentStart/CalendarContentStart';
+import { renderResourcesForCalendar } from '../EditPartnerMenuWizard/utils';
+import FoodEventCard from '../FoodEventCard/FoodEventCard';
+import css from './EditMenuPricingForm.module.scss';
+
+export type TEditMenuPricingFormValues = {
+  foodsByDate: any;
+  checkAll: string[];
+  rowCheckbox: string[];
+  [id: string]: any;
+};
+
+type TExtraProps = {
+  currentMenu: TIntegrationListing;
+  formRef: any;
+  restaurantId: string;
+};
+type TEditMenuPricingFormComponentProps =
+  FormRenderProps<TEditMenuPricingFormValues> & Partial<TExtraProps>;
+type TEditMenuPricingFormProps = FormProps<TEditMenuPricingFormValues> &
+  TExtraProps;
+
+type TFoodResource = {
+  title: string;
+  sideDishes: string[];
+  id: string;
+  price: number;
+  foodNote?: string;
+};
+
+const EditMenuPricingFormComponent: React.FC<
+  TEditMenuPricingFormComponentProps
+> = (props) => {
+  const [currentDate, setCurrentDate] = useState<number | null>();
+  const { handleSubmit, currentMenu, values, form, formRef } = props;
+
+  useImperativeHandle(formRef, () => form);
+
+  const onRemovePickedFood = (removeId: string, date: Date) => {
+    const currentDateAsTimestamp = date.getTime();
+    const pickedFoodsOnDate = { ...values.foodsByDate[currentDateAsTimestamp] };
+    Object.keys(pickedFoodsOnDate).forEach((keyId: string) => {
+      if (removeId === keyId) {
+        delete pickedFoodsOnDate[removeId];
+        const newFoodsByDate = {
+          ...values.foodsByDate,
+          [currentDateAsTimestamp]: {
+            ...pickedFoodsOnDate,
+          },
+        };
+
+        form.change('foodsByDate', newFoodsByDate);
+      }
+    });
+  };
+
+  const { daysOfWeek } = IntegrationListing(currentMenu).getPublicData();
+
+  const resourcesForCalendar = renderResourcesForCalendar(values.foodsByDate, {
+    onRemovePickedFood,
+    daysOfWeek,
+  });
+
+  const onSetCurrentDate = (params: any) => () => {
+    const { date, events } = params;
+    const dateAsTimeStaimp = new Date(date).getTime();
+    setCurrentDate(dateAsTimeStaimp);
+    const currentDayEvents = events.filter(
+      (e: any) => new Date(e.start).getTime() === new Date(date).getTime(),
+    );
+    const listIds = currentDayEvents.map((e: any) => e.resource.id);
+    const listIdsWithSideDishes = currentDayEvents.map((e: any) => e.resource);
+    form.change('rowCheckbox', listIds);
+    listIdsWithSideDishes.forEach(
+      ({ id, sideDishes = [], foodNote }: TFoodResource) => {
+        form.change(`${id}.foodNote`, foodNote);
+        return form.change(`${id}.sideDishes`, sideDishes);
+      },
+    );
+  };
+
+  const onCloseModal = () => {
+    setCurrentDate(null);
+  };
+
+  return (
+    <>
+      <Form onSubmit={handleSubmit}>
+        <h2 className={css.title}>
+          <FormattedMessage id="EditMenuPricingForm.pricingTitle" />
+        </h2>
+        {currentMenu && (
+          <CalendarDashboard
+            renderEvent={FoodEventCard}
+            events={resourcesForCalendar}
+            components={{
+              toolbar: () => <></>,
+              contentStart: (contentProps: any) => (
+                <CalendarContentStart
+                  {...contentProps}
+                  currentMenu={currentMenu}
+                  onSetCurrentDate={onSetCurrentDate}
+                />
+              ),
+              contentEnd: (contentProps: any) => (
+                <CalendarContentEnd
+                  {...contentProps}
+                  currentMenu={currentMenu}
+                />
+              ),
+            }}
+          />
+        )}
+      </Form>
+      <AddFoodModal
+        isOpen={!!currentDate}
+        handleClose={onCloseModal}
+        currentMenu={currentMenu as TIntegrationListing}
+        values={values}
+        form={form as unknown as FormApi}
+        currentDate={currentDate}
+      />
+    </>
+  );
+};
+
+const EditMenuPricingForm: React.FC<TEditMenuPricingFormProps> = (props) => {
+  return <FinalForm {...props} component={EditMenuPricingFormComponent} />;
+};
+
+export default EditMenuPricingForm;

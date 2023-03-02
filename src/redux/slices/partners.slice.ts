@@ -399,7 +399,7 @@ const deleteRestaurant = createAsyncThunk(
       const { data } = await deletePartnerApi({ id });
       return fulfillWithValue(data);
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return rejectWithValue(storableError(error));
     }
   },
@@ -714,7 +714,7 @@ export const partnerSlice = createSlice({
           ...state.uploadedAvatars,
           [id]: { id, ...rest },
         };
-        return { ...state, uploadedAvatars, uploadingAvatar: false };
+        return { ...state, uploadedAvatars, uploadingAvatars: false };
       })
       .addCase(requestAvatarUpload.rejected, (state, action: any) => {
         const { id, error } = action.payload;
@@ -753,7 +753,7 @@ export const partnerSlice = createSlice({
           ...state.uploadedCovers,
           [id]: { id, ...rest },
         };
-        return { ...state, uploadedCovers, uploadingAvatar: false };
+        return { ...state, uploadedCovers, uploadingCovers: false };
       })
       .addCase(requestCoverUpload.rejected, (state, action: any) => {
         const { id, error } = action.payload;

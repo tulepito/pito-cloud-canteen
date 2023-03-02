@@ -48,6 +48,7 @@ export default function EditCompanyPage() {
   useEffect(() => {
     if (!companyId) return;
     dispatch(updateCompanyPageThunks.showCompany(companyId as string));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyId]);
 
   const initialValues = useMemo(() => {
@@ -132,10 +133,12 @@ export default function EditCompanyPage() {
 
   useEffect(() => {
     dispatch(clearError());
+
     return () => {
       dispatch(clearError());
     };
-  }, [clearError, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className={css.root}>

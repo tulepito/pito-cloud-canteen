@@ -1,5 +1,6 @@
 import toPairs from 'lodash/toPairs';
 
+import { printHoursToString } from './dates';
 import { EDayOfWeek } from './enums';
 import type { TAddress, TObject } from './types';
 
@@ -262,7 +263,7 @@ export const nonNegativeValue = (message: string) => (value: number) => {
   return value <= 0 ? message : VALID;
 };
 
-const timeToMinute = (timeInHour: string) => {
+export const timeToMinute = (timeInHour: string) => {
   if (!timeInHour) {
     return 0;
   }
@@ -454,4 +455,18 @@ export const maxTimeValidate =
 export const nonSatOrSunDay = (message: string) => (value: number) => {
   const dayOfWeek = new Date(value).getDay();
   return dayOfWeek === 6 || dayOfWeek === 0 ? message : VALID;
+};
+
+export const greaterThanOneThousand = (message: string) => (value: number) => {
+  return value < 1000 ? message : VALID;
+};
+
+export const greaterThanZero = (message: string) => (value: number) => {
+  return value <= 0 ? message : VALID;
+};
+
+export const parseAvailabilityEntries = (time: Date) => {
+  const minutes = time.getMinutes();
+  const hours = time.getHours();
+  return printHoursToString(hours, minutes);
 };

@@ -1,4 +1,4 @@
-import type { TDefaultProps } from '@utils/types';
+import type { TDefaultProps, TObject } from '@utils/types';
 import classNames from 'classnames';
 import type { ReactElement } from 'react';
 import React from 'react';
@@ -6,11 +6,20 @@ import React from 'react';
 import FormTabNav from '../FormTabNav/FormTabNav';
 import css from './FormTabs.module.scss';
 
+export type TFormTabChildrenProps = {
+  tabId: string;
+  tabLabel: string;
+  tabLinkProps?: TObject;
+  disabled: boolean;
+  selected: boolean;
+  onClick?: () => void;
+};
+
 type TFormTabsProps = TDefaultProps & {
   navRootClassName?: string;
   tabRootClassName?: string;
   formTabNavClassName?: string;
-  children: ReactElement[] & { props?: any };
+  children: ReactElement[] & { props?: TFormTabChildrenProps };
 };
 
 const FormTabs: React.FC<TFormTabsProps> = (props) => {

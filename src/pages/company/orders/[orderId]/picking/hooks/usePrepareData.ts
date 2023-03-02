@@ -1,0 +1,171 @@
+import { parseThousandNumber } from '@helpers/format';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import { Listing, User } from '@utils/data';
+import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
+import { useState } from 'react';
+
+import type { TReviewInfoFormValues } from '../components/BookerOrderDetailsReviewView/ReviewInfoSection/ReviewInfoForm';
+import { calculatePriceQuotationInfo } from '../helpers/cartInfoHelper';
+import { groupFoodOrderByDate } from '../helpers/orderDetailHelper';
+
+export const usePrepareOrderDetailPageData = () => {
+  const [reviewInfoValues, setReviewInfoValues] =
+    useState<TReviewInfoFormValues>();
+
+  const {
+    orderData,
+    planData,
+    participantData,
+    anonymousParticipantData,
+    companyData,
+    bookerData,
+    transactionDataMap,
+  } = useAppSelector((state) => state.OrderManagement);
+  const currentUser = useAppSelector(currentUserSelector);
+
+  const { title: orderTitle = '' } = Listing(
+    orderData as TListing,
+  ).getAttributes();
+  const constCurrUserAttributes = User(
+    currentUser as TCurrentUser,
+  ).getAttributes();
+
+  const { orderDetail } = Listing(planData as TListing).getMetadata();
+  const { companyName = '' } = User(companyData as TUser).getPublicData();
+
+  const {
+    email: bookerEmail,
+    profile: {
+      displayName: contactPeopleName = '',
+      protectedData: { phoneNumber: contactPhoneNumber = '' } = {},
+    },
+  } =
+    bookerData !== null
+      ? User(bookerData).getAttributes()
+      : constCurrUserAttributes;
+
+  const {
+    startDate = 0,
+    endDate = 0,
+    deliveryHour,
+    deliveryAddress,
+    deadlineDate = 0,
+    deadlineHour,
+    // packagePerMember = 0,
+    participants = [],
+    anonymous = [],
+    staffName = '',
+  } = Listing(orderData as TListing).getMetadata();
+
+  const titleSectionData = { deliveryHour, deliveryAddress };
+  const countdownSectionData = {
+    deadlineHour,
+    orderDeadline: deadlineDate,
+    startDate,
+  };
+  const linkSectionData = { orderDeadline: deadlineDate };
+  const manageParticipantData = {
+    planData,
+    participantData,
+  };
+  const manageOrdersData = {
+    startDate,
+    endDate,
+  };
+  /* =============== Edit data =============== */
+  const editViewData = {
+    titleSectionData,
+    countdownSectionData,
+    linkSectionData,
+    manageParticipantData,
+    manageOrdersData,
+  };
+  /* =============== Review data =============== */
+  const foodOrderGroupedByDate = groupFoodOrderByDate({ orderDetail });
+  const {
+    totalPrice,
+    PITOPoints,
+    VATFee,
+    totalWithVAT,
+    serviceFee,
+    transportFee,
+    promotion,
+    overflow,
+    // totalWithoutVAT,
+  } = calculatePriceQuotationInfo({
+    planOrderDetail: orderDetail,
+    order: orderData as TObject,
+  });
+
+  const reviewInfoData = {
+    reviewInfoValues,
+    deliveryHour,
+    deliveryAddress: deliveryAddress?.address || '',
+    staffName,
+    companyName,
+    contactPeopleName,
+    contactPeopleEmail: bookerEmail,
+    contactPhoneNumber,
+  };
+
+  const reviewResultData = {
+    participants,
+    participantData,
+    anonymous,
+    anonymousParticipantData,
+    orderDetail,
+  };
+  const reviewCartData = {
+    overflow,
+    PITOPoints,
+    promotion,
+    serviceFee,
+    totalPrice,
+    // totalWithoutVAT,
+    totalWithVAT,
+    transportFee,
+    VATFee,
+  };
+  const reviewViewData = {
+    orderTitle,
+    reviewInfoData,
+    reviewResultData,
+    reviewCartData,
+    foodOrderGroupedByDate,
+    transactionDataMap,
+  };
+
+  /* =============== Price quotation data =============== */
+  const priceQuotationData = {
+    customerData: {
+      ...(reviewInfoValues || {}),
+      email: bookerEmail,
+    },
+    orderData: {
+      orderTitle,
+      companyName,
+      startDate,
+      endDate,
+    },
+    cartData: {
+      serviceFee: `${parseThousandNumber(serviceFee)}đ`,
+      totalPrice: `${parseThousandNumber(totalPrice)}đ`,
+      promotion: `${parseThousandNumber(promotion)}đ`,
+      totalWithVAT: `${parseThousandNumber(totalWithVAT)}đ`,
+      transportFee: `${parseThousandNumber(transportFee)}đ`,
+      VATFee: `${parseThousandNumber(VATFee)}đ`,
+    },
+    orderDetailData: {
+      foodOrderGroupedByDate,
+    },
+  };
+
+  return {
+    orderTitle,
+    editViewData,
+    reviewViewData,
+    priceQuotationData,
+    setReviewInfoValues,
+  };
+};

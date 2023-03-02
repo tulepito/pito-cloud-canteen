@@ -10,5 +10,5 @@ export type ResponseToInvitationApiBody = {
   response: 'accept' | 'decline';
   companyId: string;
 };
-export const reponseToInvitationApi = (body: ResponseToInvitationApiBody) =>
+export const responseToInvitationApi = (body: ResponseToInvitationApiBody) =>
   postApi('/invitation/response', body);

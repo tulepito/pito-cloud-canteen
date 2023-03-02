@@ -11,7 +11,9 @@
       "off",
       { "props": true, "ignorePropertyModificationsFor": ["state"] }
     ],
-    "no-nested-ternary": "off"
+    "no-nested-ternary": "off",
+    "no-console": "off",
+    "no-return-await": "off"
   },
   "overrides": [
     // Configuration for TypeScript files
@@ -34,7 +36,27 @@
         "@typescript-eslint/comma-dangle": "off", // Avoid conflict rule between Eslint and Prettier
         "@typescript-eslint/consistent-type-imports": "error", // Ensure `import type` is used when it's necessary
         "import/prefer-default-export": "off", // Named export is easier to refactor automatically
-        "simple-import-sort/imports": "error", // Import configuration for `eslint-plugin-simple-import-sort`
+        "simple-import-sort/imports": [
+          // Import configuration for `eslint-plugin-simple-import-sort`
+          "error",
+          {
+            // "groups": [
+            //   // Packages `react` related packages come first.
+            //   ["^@?\\w"],
+            //   // [],
+            //   // Internal.
+            //   ["^(@[a-zA-Z])(/.*|$)"],
+            //   // Side effect imports.
+            //   ["^\\u0000"],
+            //   // Parent imports. Put `..` last.
+            //   ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+            //   // Other relative imports. Put same-folder imports and `.` last.
+            //   ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+            //   // Style imports.
+            //   ["^.+\\.?(scss)$"]
+            // ]
+          }
+        ],
         "simple-import-sort/exports": "error", // Export configuration for `eslint-plugin-simple-import-sort`
         "@typescript-eslint/no-unused-vars": "off",
         "unused-imports/no-unused-imports": "error",

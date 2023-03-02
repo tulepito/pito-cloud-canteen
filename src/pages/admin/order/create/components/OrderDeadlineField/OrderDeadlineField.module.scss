@@ -3,6 +3,10 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/defaults.scss' as *;
 
+.container {
+  width: 656px;
+}
+
 .fieldTitle {
   @include text(18px, 24px);
   font-weight: $fontWeightBold;
@@ -20,7 +24,7 @@
 }
 
 .customInput {
-  width: 300px;
+  width: 100%;
   input {
     @include inputStyles;
     width: 100%;
@@ -34,5 +38,10 @@
 }
 
 .fieldSelect {
-  width: 300px;
+  width: 100%;
+}
+
+.customInput {
+  outline: none !important;
+  padding: 0 !important;
 }

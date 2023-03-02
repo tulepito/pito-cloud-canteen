@@ -7,7 +7,7 @@ import Modal from './Modal';
 
 type TAlertModal = {
   isOpen: boolean;
-  title?: string;
+  title?: string | ReactNode;
   className?: string;
   cancelLabel?: ReactNode;
   confirmLabel?: ReactNode;
@@ -18,6 +18,10 @@ type TAlertModal = {
   confirmInProgress?: boolean;
   cancelDisabled?: boolean;
   containerClassName?: string;
+  actionsClassName?: string;
+  cancelClassName?: string;
+  confirmClassName?: string;
+  childrenClassName?: string;
 };
 
 const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
@@ -33,32 +37,43 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
   confirmDisabled = false,
   cancelDisabled = false,
   containerClassName,
+  actionsClassName,
+  cancelClassName,
+  confirmClassName,
+  childrenClassName,
 }) => {
   return (
     <Modal
+      openClassName={css.isOpen}
       className={css.modalRoot}
       title={title}
       isOpen={isOpen}
       handleClose={handleClose}
       containerClassName={classNames(css.container, containerClassName)}>
-      <div className={css.children}>{children}</div>
-      <div className={css.actions}>
-        <Button
-          disabled={cancelDisabled}
-          className={css.reject}
-          variant="secondary"
-          size="medium"
-          onClick={onCancel}>
-          {cancelLabel}
-        </Button>
-        <Button
-          disabled={confirmDisabled}
-          inProgress={confirmInProgress}
-          className={css.confirm}
-          size="medium"
-          onClick={onConfirm}>
-          {confirmLabel}
-        </Button>
+      <div className={classNames(css.children, childrenClassName)}>
+        {children}
+      </div>
+      <div className={classNames(css.actions, actionsClassName)}>
+        {cancelLabel && (
+          <Button
+            disabled={cancelDisabled}
+            className={classNames(css.reject, cancelClassName)}
+            variant="secondary"
+            size="medium"
+            onClick={onCancel}>
+            {cancelLabel}
+          </Button>
+        )}
+        {confirmLabel && (
+          <Button
+            disabled={confirmDisabled}
+            inProgress={confirmInProgress}
+            className={classNames(css.confirm, confirmClassName)}
+            size="medium"
+            onClick={onConfirm}>
+            {confirmLabel}
+          </Button>
+        )}
       </div>
     </Modal>
   );

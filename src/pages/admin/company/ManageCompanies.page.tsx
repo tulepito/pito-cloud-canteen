@@ -1,29 +1,28 @@
+import Badge, { EBadgeType } from '@components/Badge/Badge';
+/* eslint-disable react-hooks/exhaustive-deps */
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
-import IconEye from '@components/Icons/IconEye/IconEye';
-import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
-import Meta from '@components/Layout/Meta';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import {
-  manageCompaniesThunks,
-  RESULT_PAGE_SIZE,
-} from '@redux/slices/ManageCompaniesPage.slice';
+import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
+import { adminRoutes } from '@src/paths';
+import { UserPermission } from '@src/types/UserPermission';
 import { ECompanyStatus } from '@utils/enums';
+import type { TUser } from '@utils/types';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
 
+import KeywordSearchForm from '../partner/components/KeywordSearchForm/KeywordSearchForm';
 import type { TUpdateStatus } from './helpers';
 import {
   filterCompanies,
@@ -32,105 +31,92 @@ import {
 } from './helpers';
 import css from './ManageCompanies.module.scss';
 
-const companyStatusOptions = [
-  {
-    key: String(ECompanyStatus.active),
-    label: 'Active',
-  },
-  {
-    key: String(ECompanyStatus.unactive),
-    label: 'Unactive',
-  },
-];
-
 const TABLE_COLUMN: TColumn[] = [
   {
     key: 'id',
     label: 'ID',
     render: (data: any) => {
       return (
-        <span title={data.id} className={classNames(css.rowText, css.rowId)}>
+        <div className={css.rowId} title={data.id}>
           {data.id}
-        </span>
-      );
-    },
-    renderSearch: () => {
-      return (
-        <FieldTextInput
-          className={css.keywordInput}
-          name="searchId"
-          id="searchId"
-        />
+        </div>
       );
     },
   },
   {
     key: 'name',
-    label: 'Họ và tên',
-    render: (data: any) => {
-      return <span className={css.rowText}>{data.name}</span>;
-    },
-    renderSearch: () => {
-      return (
-        <FieldTextInput
-          className={css.keywordInput}
-          name="searchDisplayName"
-          id="searchDisplayName"
-        />
-      );
-    },
-  },
-  {
-    key: 'phone',
-    label: 'Số điện thoại',
-    render: (data: any) => {
-      return <span className={css.rowText}>{data.phone}</span>;
-    },
-    renderSearch: () => {
-      return (
-        <FieldTextInput
-          className={css.keywordInput}
-          name="searchPhone"
-          id="searchPhone"
-        />
-      );
-    },
-  },
-  {
-    key: 'email',
-    label: 'Email',
-    render: (data: any) => {
-      return <span className={css.rowText}>{data.email}</span>;
-    },
-    renderSearch: () => {
-      return (
-        <FieldTextInput
-          className={css.keywordInput}
-          name="searchEmail"
-          id="searchEmail"
-        />
-      );
-    },
-  },
-  {
-    key: 'companyName',
     label: 'Tên công ty',
-    render: (data: any) => {
-      return <span className={css.rowText}>{data.companyName}</span>;
-    },
-    renderSearch: () => {
+    render: ({ id, name }: any) => {
       return (
-        <FieldTextInput
-          className={css.keywordInput}
-          name="searchCompanyName"
-          id="searchCompanyName"
-        />
+        <NamedLink
+          path={`${adminRoutes.ManageCompanies.path}/${id}`}
+          className={css.boldTextRow}>
+          {name}
+        </NamedLink>
       );
+    },
+  },
+  {
+    key: 'representatives',
+    label: 'Người đại diện',
+    render: ({ members = [], id }: any) => {
+      const bookers = members.filter(
+        (m: any) => m.permission === UserPermission.BOOKER,
+      );
+      return (
+        <div>
+          {bookers.slice(0, 1).map((user: TUser) => {
+            return (
+              <div key={`${id}.${user.id.uuid}`}>
+                <div className={css.memberName}>
+                  {user.attributes.profile.displayName}
+                </div>
+                <div className={css.memberEmail}>{user.attributes.email}</div>
+                <div className={css.memberPhoneNumber}>
+                  {user.attributes.profile.protectedData?.phoneNumber}
+                </div>
+              </div>
+            );
+          })}
+          {bookers.length > 1 && (
+            <div className={css.membersCount}>
+              +{members.length - 1}
+              <FormattedMessage id="ManageCompaniesPage.membersCount" />
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    key: 'address',
+    label: 'Địa chỉ',
+    render: (data: any) => {
+      return <div className={css.row}>{data.address}</div>;
     },
   },
   {
     key: 'status',
     label: 'Trạng thái',
+    render: (data: any) => {
+      const isActive = data.status === ECompanyStatus.active;
+      const label = isActive ? 'Đã active' : 'Chưa active';
+      const badgeType = isActive ? EBadgeType.success : EBadgeType.default;
+      return (
+        <Badge
+          label={label}
+          type={badgeType}
+          labelClassName={css.badgeLabel}
+          className={classNames(css.badgeContainer, {
+            [css.badgeContainerActive]: isActive,
+          })}
+        />
+      );
+    },
+  },
+  {
+    key: 'action',
+    label: '',
     render: (data: any) => {
       const onClick = (checked: boolean) => {
         const status = checked
@@ -144,57 +130,22 @@ const TABLE_COLUMN: TColumn[] = [
       };
 
       return (
-        <ToggleButton
-          name={data.id}
-          className={css.toggleButton}
-          id={data.id}
-          onClick={onClick}
-          defaultValue={data.status === ECompanyStatus.active}
-        />
-      );
-    },
-    renderSearch: () => {
-      return (
-        <FieldSelect
-          className={css.keywordInput}
-          name="searchStatus"
-          id="searchStatus">
-          <option key="" value="">
-            <FormattedMessage id="ManageCompanies.searchStatusLabel" />
-          </option>
-          {companyStatusOptions.map((s: any) => (
-            <option key={s.key} value={s.key}>
-              {s.label}
-            </option>
-          ))}
-        </FieldSelect>
-      );
-    },
-  },
-  {
-    key: 'action',
-    label: '',
-    render: (data: any) => {
-      return (
         <div className={css.tableActions}>
           <Link href={`/admin/company/${data.id}/edit`}>
-            <Button className={classNames(css.actionButton, css.editButton)}>
-              <IconEdit />
+            <Button
+              variant="inline"
+              className={classNames(css.actionButton, css.editButton)}>
+              <IconEdit className={css.icon} />
             </Button>
           </Link>
-          <Link href={`/admin/company/${data.id}`}>
-            <Button className={classNames(css.actionButton, css.editButton)}>
-              <IconEye />
-            </Button>
-          </Link>
+          <ToggleButton
+            name={data.id}
+            className={css.toggleButton}
+            id={data.id}
+            onClick={onClick}
+            defaultValue={data.status === ECompanyStatus.active}
+          />
         </div>
-      );
-    },
-    renderSearch: () => {
-      return (
-        <Button className={css.searchButton}>
-          <IconMagnifier className={css.iconSearch} />
-        </Button>
       );
     },
   },
@@ -202,58 +153,62 @@ const TABLE_COLUMN: TColumn[] = [
 
 export default function ManageCompanies() {
   const intl = useIntl();
-  const { value: mounted, setValue: setMounted } = useBoolean(false);
   const router = useRouter();
+  const { value: mounted, setValue: setMounted } = useBoolean(false);
+  const [pageSize] = useState<number>(10);
+
   const { query, pathname } = router;
   const { page = 1, ...queryParams } = query;
+
   const title = intl.formatMessage({
     id: 'ManageCompanies.title',
   });
 
-  const description = intl.formatMessage({
-    id: 'ManageCompanies.description',
-  });
-
-  const { companyRefs, queryCompaniesInProgress, queryCompaniesError } =
-    useAppSelector((state) => state.ManageCompaniesPage);
+  const {
+    companyRefs,
+    queryCompaniesInProgress,
+    queryCompaniesError,
+    companyMembers,
+  } = useAppSelector((state) => state.ManageCompaniesPage, shallowEqual);
 
   const dispatch = useAppDispatch();
-
+  const { keywords } = queryParams;
   const filteredCompanies = useMemo(
     () => filterCompanies(companyRefs, queryParams),
     [queryParams, companyRefs],
   );
 
   const slicesCompanies = useMemo(
-    () => sliceCompanies(filteredCompanies, page),
-    [filteredCompanies, page],
+    () => sliceCompanies(filteredCompanies, page, pageSize),
+    [filteredCompanies, page, pageSize],
   );
 
   const pagination = {
     page: Number(page),
-    perPage: RESULT_PAGE_SIZE,
-    totalPages: Math.ceil(filteredCompanies.length / RESULT_PAGE_SIZE),
+    perPage: pageSize,
+    totalPages: Math.ceil(filteredCompanies.length / pageSize),
     totalItems: filteredCompanies.length,
   };
 
-  const updateStatus = useCallback(
-    (updateData: TUpdateStatus) => {
-      dispatch(
-        manageCompaniesThunks.updateCompanyStatus({
-          dataParams: updateData,
-          queryParams: { expand: true },
-        }),
-      );
-    },
-    [dispatch, manageCompaniesThunks],
-  );
+  const updateStatus = useCallback((updateData: TUpdateStatus) => {
+    dispatch(
+      manageCompaniesThunks.updateCompanyStatus({
+        dataParams: updateData,
+        queryParams: { expand: true },
+      }),
+    );
+  }, []);
 
   const companiesTableData = useMemo(
     () =>
-      parseEntitiesToTableData(slicesCompanies, {
-        updateStatus,
-      }),
-    [slicesCompanies, updateStatus],
+      parseEntitiesToTableData(
+        slicesCompanies,
+        {
+          updateStatus,
+        },
+        companyMembers,
+      ),
+    [slicesCompanies, updateStatus, JSON.stringify(companyMembers)],
   );
 
   useEffect(() => {
@@ -265,6 +220,19 @@ export default function ManageCompanies() {
     }
   }, [page, mounted]);
 
+  const companyIdsToGetMemberDetails = slicesCompanies.map(
+    (company) => company.id.uuid,
+  );
+
+  useEffect(() => {
+    if (companyIdsToGetMemberDetails.length === 0) return;
+    dispatch(
+      manageCompaniesThunks.getCompanyMemberDetails(
+        companyIdsToGetMemberDetails,
+      ),
+    );
+  }, [JSON.stringify(companyIdsToGetMemberDetails)]);
+
   const onSearchKeyword = (values: any) => {
     router.replace({
       pathname,
@@ -275,34 +243,38 @@ export default function ManageCompanies() {
     });
   };
 
-  const initialValues = useMemo(
-    () => queryParams,
-    [JSON.stringify(queryParams)],
-  );
-
   return (
     <div className={css.root}>
-      <Meta title={title} description={description} />
       <div className={css.top}>
         <h1 className={css.title}>{title}</h1>
         <Link href={`${pathname}/create`}>
           <Button className={css.addButton}>
-            <IconAdd className={css.addIcon} />
+            <FormattedMessage id="ManageCompanies.addCompany" />
           </Button>
         </Link>
+      </div>
+      <div className={css.filterWrapper}>
+        <div></div>
+        <KeywordSearchForm
+          initialValues={{ keywords: keywords as string }}
+          onSubmit={onSearchKeyword}
+          placeholder={intl.formatMessage({
+            id: 'ManageCompanies.keywordsPlaceholder',
+          })}
+        />
       </div>
       {queryCompaniesInProgress ? (
         <LoadingContainer />
       ) : (
         <TableForm
-          initialValues={initialValues}
           onSubmit={onSearchKeyword}
           columns={TABLE_COLUMN}
           data={companiesTableData}
           pagination={pagination}
           pageSearchParams={query}
           paginationPath="/admin/company"
-          showFilterFrom
+          tableWrapperClassName={css.tableWrapper}
+          tableClassName={css.table}
         />
       )}
       {queryCompaniesError && (

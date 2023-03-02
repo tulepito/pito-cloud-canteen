@@ -5,7 +5,7 @@ import useBoolean from '@hooks/useBoolean';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { BookerManageCompany } from '@redux/slices/company.slice';
 import { resetImage } from '@redux/slices/uploadImage.slice';
-import { USER } from '@utils/data';
+import { User } from '@utils/data';
 import type { TCurrentUser, TUser } from '@utils/types';
 import take from 'lodash/take';
 import takeRight from 'lodash/takeRight';
@@ -49,17 +49,17 @@ const AccountPage = () => {
     (state) => state.company.updateBookerAccountError,
   );
 
-  const { companyName = '', location = {} } = USER(
+  const { companyName = '', location = {} } = User(
     company as TUser,
   ).getPublicData();
-  const { email = '' } = USER(company as TUser).getAttributes();
+  const { email = '' } = User(company as TUser).getAttributes();
   const { address = '' } = location;
 
-  const { email: bookerEmail = '' } = USER(currentUser!).getAttributes();
-  const { displayName: bookerDisplayName = '' } = USER(
+  const { email: bookerEmail = '' } = User(currentUser!).getAttributes();
+  const { displayName: bookerDisplayName = '' } = User(
     currentUser!,
   ).getProfile();
-  const { phoneNumber: bookerPhoneNumber = '' } = USER(
+  const { phoneNumber: bookerPhoneNumber = '' } = User(
     currentUser!,
   ).getProtectedData();
   const initialFormValues = useMemo<TContactPointProfileFormValues>(

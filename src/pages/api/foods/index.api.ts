@@ -10,12 +10,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const integrationSdk = getIntegrationSdk();
 
   switch (apiMethod) {
-    case HttpMethod.GET: {
-      return res.json({
-        msg: 'Hello babe',
-      });
-      break;
-    }
     case HttpMethod.POST: {
       try {
         const { restaurantId, title, description } = req.body;
@@ -64,7 +58,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           message: 'Create food listing successfully',
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
         res.json(error);
       }
       break;

@@ -1,0 +1,37 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  margin-top: 28px;
+  @include flexAlign(baseline, flex-start);
+
+  .resultNumber {
+    margin-right: 32px;
+    color: $neutralGray5;
+    min-width: 80px;
+  }
+}
+
+.container {
+  @include flexAlign(baseline, flex-start);
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .filterLabel {
+    @include flexAlign(center, center);
+    gap: 12px;
+    border: 1px solid $neutralGray6;
+    border-radius: 20px;
+    padding: 6px 16px;
+
+    .closeIcon {
+      width: 10px;
+      height: 10px;
+      cursor: pointer;
+
+      path {
+        fill: $neutralGray6;
+      }
+    }
+  }
+}

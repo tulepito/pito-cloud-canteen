@@ -16,29 +16,50 @@ import MealPlanCardHeader from './MealPlanCardHeader';
 type TMealPlanCardProps = {
   event: Event;
   index: number;
+  removeInprogress: boolean;
+  onRemove?: (id: string) => void;
+  resources: any;
 };
 
-const MealPlanCard: React.FC<TMealPlanCardProps> = ({ event }) => {
+const MealPlanCard: React.FC<TMealPlanCardProps> = ({
+  event,
+  removeInprogress,
+  onRemove,
+  resources,
+}) => {
   const dispatch = useAppDispatch();
-  const { orderDetail } = useAppSelector(
-    (state) => state.Order.draftOrder,
+  const orderDetail = useAppSelector(
+    (state) => state.Order.orderDetail,
     shallowEqual,
   );
-  const removeEventItem = (resourceId: string) => {
-    const cloneOrderDetail = clone(orderDetail);
-    delete cloneOrderDetail[resourceId];
-    dispatch(removeMealDay(cloneOrderDetail));
-  };
+  const { onEditFood, editFoodInprogress } = resources;
+
+  const removeEventItem =
+    onRemove ||
+    ((resourceId: string) => {
+      const cloneOrderDetail = clone(orderDetail);
+      delete cloneOrderDetail[resourceId];
+      dispatch(removeMealDay(cloneOrderDetail));
+    });
 
   const onEditMeal = (date: Date) => {
     dispatch(selectCalendarDate(date));
     dispatch(selectRestaurant());
   };
+
   return (
     <div className={css.root}>
-      <MealPlanCardHeader event={event} removeEventItem={removeEventItem} />
+      <MealPlanCardHeader
+        event={event}
+        removeEventItem={removeEventItem}
+        removeInprogress={removeInprogress}
+      />
       <MealPlanCardContent event={event} onEditMeal={onEditMeal} />
-      <MealPlanCardFooter event={event} />
+      <MealPlanCardFooter
+        event={event}
+        onEditFood={onEditFood}
+        editFoodInprogress={editFoodInprogress}
+      />
     </div>
   );
 };

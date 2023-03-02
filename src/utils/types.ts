@@ -5,17 +5,21 @@ import type { NextPage } from 'next';
 
 import type {
   EAvailabilityPlans,
+  EBookerOrderDraftStates,
   EBookingStates,
   EDayOfWeek,
   EErrorCode,
   EImageVariants,
   EListingStates,
+  EOrderDraftStates,
+  EOrderStates,
   EReviewRatings,
   EReviewTypes,
   ETimeSlots,
   ETransactionRoles,
   ETxTransitionActors,
 } from './enums';
+import type { ETransition } from './transaction';
 
 const { UUID, LatLng, Money } = sdkLoader;
 
@@ -139,6 +143,13 @@ export type TCompanyAttributes = {
   profile: TCompanyProfile;
 };
 
+export type TBookerAttributes = {
+  banned: boolean;
+  deleted: boolean;
+  email: string;
+  profile: TCompanyProfile;
+};
+
 // Listing queries can include author.
 // Banned and deleted are not relevant then
 // since banned and deleted users can't have listings.
@@ -182,6 +193,16 @@ export type TCompany = {
     TBannedUserAttributes &
     TDeletedUserAttributes &
     TCompanyAttributes;
+  profileImage: TImage;
+};
+
+export type TBooker = {
+  id: typeof UUID;
+  type: 'user';
+  attributes: TAuthorAttributes &
+    TBannedUserAttributes &
+    TDeletedUserAttributes &
+    TBookerAttributes;
   profileImage: TImage;
 };
 
@@ -296,7 +317,7 @@ export type TTransition = {
   createdAt: Date;
   by: TTxTransitionActors;
   // Transition will define later
-  transition: string[];
+  transition: ETransition;
 };
 
 export type TReviewRating = EReviewRatings;
@@ -330,10 +351,18 @@ export type TLineItem = {
   reversal: boolean;
 };
 
+export type TTransactionReviews = {
+  [participantId: string]: {
+    reviewContent: string;
+    reviewRating: number;
+    authorId: string;
+  };
+};
+
 export type TTransactionAttributes = {
   createdAt?: Date;
   lastTransitionedAt: Date;
-  lastTransition: string;
+  lastTransition: ETransition;
 
   // An enquiry won't need a total sum nor a booking so these are
   // optional.
@@ -341,6 +370,12 @@ export type TTransactionAttributes = {
   payoutTotal?: typeof Money;
   lineItems: TLineItem[];
   transitions: TTransition[];
+  metadata: {
+    orderId: string;
+    planId: string;
+    participantIds?: string[];
+    reviews?: TTransactionReviews;
+  };
 };
 
 export type TTransaction = {
@@ -434,6 +469,9 @@ export type TIntegrationListing = {
   attributes: TAdminListingAttributes & TDeletedListingAttributes;
   author?: TUser;
   images?: TImage[];
+  company?: TCompany;
+  plan?: TListing;
+  order?: TOrderListing;
 };
 
 export type TIntegrationOrderListing = {
@@ -443,5 +481,17 @@ export type TIntegrationOrderListing = {
   author?: TUser;
   images?: TImage[];
   company?: TCompany;
+  booker?: TBooker;
+  plan?: TListing;
   subOrders?: TIntegrationListing[];
+};
+
+export type TTableSortValue = {
+  columnName: string | number;
+  type: 'asc' | 'desc';
+};
+
+export type TOrderStateHistory = {
+  state: EOrderStates | EOrderDraftStates | EBookerOrderDraftStates;
+  updatedAt: number;
 };

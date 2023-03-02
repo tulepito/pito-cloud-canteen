@@ -2,8 +2,8 @@ import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import IconPlusDish from '@components/Icons/IconPlusDish/IconPlusDish';
 import { useAppDispatch } from '@hooks/reduxHooks';
-import { shoppingCartThunks } from '@redux/slices/shopingCart.slice';
-import { LISTING } from '@utils/data';
+import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
+import { Listing } from '@utils/data';
 import classNames from 'classnames';
 import Image from 'next/image';
 
@@ -27,7 +27,7 @@ const ListingCard: React.FC<TListCardProps> = ({
   selectDisabled,
 }) => {
   const mealId = listing?.id?.uuid;
-  const { title, description } = LISTING(listing).getAttributes();
+  const { title, description } = Listing(listing).getAttributes();
   const dispatch = useAppDispatch();
 
   const handleAddToCard = () => {
@@ -52,7 +52,7 @@ const ListingCard: React.FC<TListCardProps> = ({
         <div className={css.listingCardInfo}>
           <h6 className={css.title}>{title}</h6>
           <div className={css.categories}>
-            <Badge label="Keto" type={EBadgeType.PROCESSING} />
+            <Badge label="Keto" type={EBadgeType.info} />
           </div>
           <p className={css.description}>{description}</p>
         </div>

@@ -1,3 +1,5 @@
+import type { TObject } from '@utils/types';
+
 import { deleteApi, getApi, postApi, putApi } from './configs';
 
 export const checkEmailExistedApi = (email: string) =>
@@ -12,10 +14,8 @@ export const addMembersApi = (body: AddMembersApiBody) =>
   postApi('/company/members/add-members', body);
 
 export type DeleteMemberApiBody = {
-  data: {
-    memberEmail: string;
-    companyId: string;
-  };
+  memberEmail: string;
+  companyId: string;
 };
 export const deleteMemberApi = (body: DeleteMemberApiBody) =>
   deleteApi('/company/members/delete-member', body);
@@ -92,3 +92,23 @@ export type DeleteGroupApiData = {
 };
 export const deleteGroupApi = (data: DeleteGroupApiData) =>
   deleteApi('/company/group', data);
+
+const queryOrdersApi = (companyId: string, params: TObject = {}) => {
+  return getApi(`/company/${companyId}/orders`, params);
+};
+
+export const companyApi = {
+  queryOrdersApi,
+};
+
+export const getAllCompanyMembersApi = (companyId: string) =>
+  getApi(`/company/all-employees?companyId=${companyId}`);
+
+export const favoriteRestaurantApi = (
+  companyId: string,
+  restaurantId: string,
+) =>
+  postApi(`/company/${companyId}/favorite-restaurant/${restaurantId}`, {
+    companyId,
+    restaurantId,
+  });

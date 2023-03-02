@@ -1,0 +1,28 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.title {
+  @include pageTitle;
+}
+
+.addButton {
+  float: right;
+}
+
+.createTitle {
+  font-size: 20px;
+  font-weight: $fontWeightBold;
+  color: $neutralGray6;
+  text-transform: capitalize;
+}
+
+.modalActions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+}

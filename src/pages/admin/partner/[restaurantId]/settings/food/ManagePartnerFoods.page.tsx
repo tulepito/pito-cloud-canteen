@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
 import Button, { InlineTextButton } from '@components/Button/Button';
@@ -19,7 +20,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
-import { parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp } from '@utils/dates';
 import {
   CATEGORY_OPTIONS,
   FOOD_TYPE_OPTIONS,
@@ -40,34 +41,20 @@ const fileUrl = process.env.NEXT_PUBLIC_IMPORT_FOOD_GUIDE_FILE_URL;
 
 const TABLE_COLUMN: TColumn[] = [
   {
-    key: 'id',
-    label: 'ID',
-    render: (data: any) => {
-      if (data.isDeleted) {
-        return (
-          <div className={css.deletedFood}>
-            <FormattedMessage id="ManagePartnerFoods.deletedFood" />
-          </div>
-        );
-      }
-      return (
-        <NamedLink
-          path={`/admin/partner/${data.restaurantId}/settings/food/${data.id}`}
-          className={css.idRow}
-          title={data.id}>
-          {data.id}
-        </NamedLink>
-      );
-    },
-  },
-  {
     key: 'title',
     label: 'Tên món',
     render: (data: any) => {
       if (data.isDeleted) {
         return <div></div>;
       }
-      return <div title={data.title}>{data.title}</div>;
+      return (
+        <NamedLink
+          path={`/admin/partner/${data.restaurantId}/settings/food/${data.id}`}
+          className={css.titleRow}
+          title={data.id}>
+          {data.title}
+        </NamedLink>
+      );
     },
   },
   {
@@ -321,7 +308,7 @@ const ManagePartnerFoods = () => {
   const onImportFoodFromCsv = async () => {
     if (file) {
       const { error } = (await dispatch(
-        foodSliceThunks.creataPartnerFoodFromCsv({
+        foodSliceThunks.createPartnerFoodFromCsv({
           file,
           restaurantId: restaurantId as string,
         }),
@@ -397,10 +384,8 @@ const ManagePartnerFoods = () => {
           </Button>
           <CSVLink
             data={parseEntitiesToExportCsv(foods, idsToAction)}
-            filename={`${parseTimestampToFormat(
-              new Date().getTime(),
-            )}_donhang.csv`}
-            className="hidden"
+            filename={`${formatTimestamp(new Date().getTime())}_donhang.csv`}
+            className={css.hidden}
             ref={csvLinkRef}
             target="_blank"
           />
@@ -437,8 +422,11 @@ const ManagePartnerFoods = () => {
           isLoading={queryFoodsInProgress}
           hasCheckbox
           exposeValues={getExposeValues}
+          tableBodyCellClassName={css.tableBodyCell}
           pagination={managePartnerFoodPagination}
           paginationPath={`/admin/partner/${restaurantId}/settings/food`}
+          tableWrapperClassName={css.tableWrapper}
+          tableClassName={css.table}
         />
       )}
       <AlertModal
@@ -492,6 +480,7 @@ const ManagePartnerFoods = () => {
         </div>
       </AlertModal>
       <AlertModal
+        title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}
         isOpen={foodToRemove || removeCheckedModalOpen}
         handleClose={
           removeCheckedModalOpen ? closeRemoveCheckedModal : onClearFoodToRemove
@@ -507,10 +496,8 @@ const ManagePartnerFoods = () => {
         cancelLabel="Hủy"
         confirmLabel="Xóa món ăn"
         confirmInProgress={removeFoodInProgress}
+        childrenClassName={css.removeModalContent}
         confirmDisabled={removeFoodInProgress}>
-        <div className={css.removeTitle}>
-          <FormattedMessage id="ManagePartnerFoods.removeTitle" />
-        </div>
         <p className={css.removeContent}>
           <FormattedMessage
             id="ManagePartnerFoods.removeContent"

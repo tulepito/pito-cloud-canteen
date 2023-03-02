@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { InlineTextButton } from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import classNames from 'classnames';
@@ -7,7 +8,10 @@ import React, { useEffect, useState } from 'react';
 import css from './Tabs.module.scss';
 
 export type TTabsItem = {
-  label: ReactNode;
+  label:
+    | ((e: TTabsItem & { isActive?: boolean }) => ReactNode)
+    | string
+    | ReactNode;
   id: string | number;
   children: ReactNode | string | number;
   childrenFn?: (e: any) => ReactNode;
@@ -28,6 +32,7 @@ type ITabsProps = {
   className?: string;
   navigationStartClassName?: string;
   navigationEndClassName?: string;
+  disabled?: boolean;
 };
 
 const Tabs: React.FC<ITabsProps> = (props) => {
@@ -45,10 +50,14 @@ const Tabs: React.FC<ITabsProps> = (props) => {
     middleLabel,
     navigationStartClassName,
     navigationEndClassName,
+    disabled = false,
   } = props;
   const [activeTabKey, setActiveTabKey] = useState(defaultActiveKey || 1);
 
   const onChangeTab = (tabKey: number) => () => {
+    if (disabled) {
+      return;
+    }
     setActiveTabKey(tabKey);
     onChange(items[Number(tabKey) - 1]);
   };
@@ -70,6 +79,10 @@ const Tabs: React.FC<ITabsProps> = (props) => {
     onChangeTab(Number(defaultActiveKey || 1))();
   }, [defaultActiveKey]);
 
+  useEffect(() => {
+    onChange(items[Number(activeTabKey) - 1]);
+  }, [activeTabKey]);
+
   const tabHeader = items.map((item, index) => {
     const { label } = item;
 
@@ -77,6 +90,7 @@ const Tabs: React.FC<ITabsProps> = (props) => {
 
     const tabItemClasses = classNames(css.tabHeaderItem, {
       [css.tabActive]: isActiveClass,
+      [css.tabDisabled]: disabled,
     });
 
     return (
@@ -88,7 +102,9 @@ const Tabs: React.FC<ITabsProps> = (props) => {
           className={classNames(css.tabItemContent, {
             [css.tabActive]: isActiveClass,
           })}>
-          {label}
+          {typeof label === 'function'
+            ? label({ ...item, isActive: isActiveClass })
+            : label}
         </span>
       </div>
     );
@@ -98,7 +114,10 @@ const Tabs: React.FC<ITabsProps> = (props) => {
 
   const tabContent =
     activeItem && activeItem.childrenFn
-      ? activeItem?.childrenFn(activeItem?.childrenProps)
+      ? activeItem?.childrenFn({
+          id: activeItem.id,
+          ...activeItem?.childrenProps,
+        })
       : activeItem?.children || '';
 
   // classes setup

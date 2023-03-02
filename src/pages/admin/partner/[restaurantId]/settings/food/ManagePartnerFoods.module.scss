@@ -3,22 +3,21 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .title {
-  font-weight: $fontWeightBold;
-  font-size: 24px;
-  line-height: 32px;
-  text-transform: capitalize;
-  margin: 0 0 46px 0;
+  @include pageTitle;
 }
 
 .descriptionRow {
   max-width: 250px;
 }
 
+.tableBodyCell:nth-child(2) {
+  width: 100px !important;
+}
+
 .idRow {
-  width: 150px;
-  word-break: break-all;
   font-weight: $fontWeightBold;
-  color: #2f54eb;
+  color: $labelBlue2;
+  @include lineClamp(3);
 }
 
 .actionBtn {
@@ -28,6 +27,7 @@
 .secondaryButton {
   @include buttonColorSecondary;
   background-color: $neutralGray2;
+  outline: 1px solid $neutralGray4;
 
   &:focus,
   &:hover {
@@ -68,10 +68,20 @@
   }
 }
 
+.titleRow {
+  min-width: 200px;
+  display: block;
+  color: $neutralGray6;
+}
+
 .addButton {
   composes: secondaryButton;
   background-color: #000000;
   color: $neutralGray1;
+}
+
+.hidden {
+  display: none;
 }
 
 .filterForm {
@@ -161,6 +171,7 @@
   font-size: 14px;
   font-weight: $fontWeightRegular;
   color: $neutralGray5;
+  margin: 0;
 }
 
 .removeButton {
@@ -184,6 +195,7 @@
   button {
     font-size: 14px;
     width: 100%;
+    outline: none;
     @include viewportLarge {
       width: unset;
     }
@@ -219,5 +231,23 @@
   a {
     color: $neutralGray6;
     font-weight: $fontWeightBold;
+  }
+}
+
+.removeModalContent {
+  padding: 5px 0 25px 0;
+}
+
+.tableWrapper {
+  @include viewportMedium {
+    max-width: calc(100vw - 350px);
+    overflow-x: scroll;
+    position: relative;
+  }
+}
+
+.table {
+  @include viewportMedium {
+    min-width: 1440px;
   }
 }

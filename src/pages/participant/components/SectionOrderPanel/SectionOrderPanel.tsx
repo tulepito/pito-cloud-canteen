@@ -1,6 +1,7 @@
-import { isOverDeadline } from '@helpers/orderHelper';
+import { isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { shoppingCartThunks } from '@redux/slices/shopingCart.slice';
+import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
+import type { RootState } from '@redux/store';
 import { useState } from 'react';
 
 import { ParticipantPlanThunks } from '../../plans/[planId]/ParticipantPlanPage.slice';
@@ -20,10 +21,10 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   planId,
   orderId,
 }) => {
-  const cartList = useAppSelector((state: any) => {
+  const cartList = useAppSelector((state: RootState) => {
     const { currentUser } = state.user;
     const currUserId = currentUser?.id?.uuid;
-    return state.shopingCart.orders?.[currUserId]?.[planId || 1];
+    return state.shoppingCart.orders?.[currUserId]?.[planId || 1];
   });
   const order = useAppSelector((state) => state.ParticipantPlanPage.order);
   const plan = useAppSelector((state) => state.ParticipantPlanPage.plan);
@@ -36,10 +37,10 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
 
   const orderDays = Object.keys(plan);
   const cartListKeys = Object.keys(cartList || []).filter(
-    (cartKey) => !!cartList[cartKey],
+    (cartKey) => !!cartList[Number(cartKey)],
   );
 
-  const isOrderDeadlineOver = isOverDeadline(order);
+  const isOrderDeadlineOver = isOrderOverDeadline(order);
 
   // Local state
   const [isOpenConfirmDeleteAll, setIsOpenConfirmDeleteAll] = useState(false);

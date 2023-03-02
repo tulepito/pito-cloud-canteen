@@ -4,8 +4,8 @@ import FeaturesHeader from '@components/FeaturesHeader/FeaturesHeader';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { companyPaths, personalPaths } from '@src/paths';
-import { CURRENT_USER, USER } from '@utils/data';
+import { companyPaths } from '@src/paths';
+import { CurrentUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 import filter from 'lodash/filter';
 import { useRouter } from 'next/router';
@@ -26,6 +26,7 @@ const companySettingPaths = [
   companyPaths.Members,
   companyPaths.GroupSetting,
   companyPaths.Logo,
+  companyPaths.Nutrition,
 ];
 const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
@@ -42,15 +43,16 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
     (state) => state.ManageCompaniesPage.companyRefs,
     shallowEqual,
   );
-  const { companyList = [] } = CURRENT_USER(currentUser).getMetadata();
+  const { companyList = [] } = CurrentUser(currentUser).getMetadata();
   const assignedCompanies = filter(companyRefs, (o: any) =>
     companyList.includes(o.id.uuid),
   ).reduce((result: any[], cur: TUser) => {
     return [
       ...result,
       {
-        value: USER(cur).getId(),
-        label: USER(cur).getPublicData()?.companyName,
+        value: User(cur).getId(),
+        label: User(cur).getPublicData()?.companyName,
+        logo: User(cur).getProfileImage(),
       },
     ];
   }, []);
@@ -59,7 +61,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
     label?: string;
   }>({});
   const accountOptions = [
-    { value: '', label: 'Cá nhân' },
+    { value: '', label: 'Tài khoản' },
     ...assignedCompanies,
   ];
 
@@ -84,13 +86,13 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       key: 'cart',
       icon: <FeatureIcons.Cart />,
       title: 'Đặt hàng',
-      pathname: '/',
+      pathname: companyPaths.CreateNewOrder,
     },
     {
       key: 'order',
       icon: <FeatureIcons.Box />,
       title: 'Đơn hàng',
-      pathname: '/',
+      pathname: companyPaths.ManageOrders,
     },
     {
       key: 'invoice',
@@ -102,6 +104,12 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       key: 'review',
       icon: <FeatureIcons.Star />,
       title: 'Đánh giá',
+      pathname: '/',
+    },
+    {
+      key: 'pitoClub',
+      icon: <FeatureIcons.Gift />,
+      title: 'PITO club',
       pathname: '/',
     },
     {
@@ -121,11 +129,11 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
         />
       ),
       query: {
-        ...(selectedAccount.value ? { companyId: selectedAccount.value } : {}),
+        ...(selectedAccount.value
+          ? { companyId: selectedAccount.value }
+          : { companyId: 'personal' }),
       },
-      pathname: selectedAccount.value
-        ? changePathnameByCompanyId()
-        : personalPaths.Account,
+      pathname: selectedAccount.value ? changePathnameByCompanyId() : pathname,
     },
   ];
 
@@ -134,22 +142,28 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (companyId) {
+    if (companyId && companyId !== 'personal') {
       const currentCompany = companyRefs.find(
-        (_company) => USER(_company).getId() === companyId,
+        (_company) => User(_company).getId() === companyId,
       );
       setSelectedAccount({
-        value: USER(currentCompany).getId(),
-        label: USER(currentCompany).getPublicData()?.companyName,
+        value: User(currentCompany).getId(),
+        label: User(currentCompany).getPublicData()?.companyName,
       });
     }
-  }, [companyId]);
+  }, [companyId, companyRefs]);
 
+  const companyName =
+    companyId && companyId !== 'personal'
+      ? User(
+          companyRefs.find((_company) => User(_company).getId() === companyId),
+        ).getPublicData()?.companyName
+      : 'Tài khoản cá nhân';
   return (
     <>
-      <CompanyHeader />
+      <CompanyHeader showBottomLine={!showFeatureHeader} />
       {showFeatureHeader && <FeaturesHeader headerData={featureHeaderData} />}
-      {showSidebar && <CompanySidebar />}
+      {showSidebar && <CompanySidebar companyName={companyName!} />}
       <CompanyMainContent
         hasHeader={showFeatureHeader}
         hasSideBar={showSidebar}>

@@ -2,6 +2,7 @@ import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
+import IconPlus from '@components/Icons/IconPlus/IconPlus';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
@@ -10,6 +11,7 @@ import useBoolean from '@hooks/useBoolean';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { companyPaths } from '@src/paths';
 import { BookerManageCompany } from '@src/redux/slices/company.slice';
+import { User } from '@utils/data';
 import type { TObject } from '@utils/types';
 import filter from 'lodash/filter';
 import isEmpty from 'lodash/isEmpty';
@@ -87,16 +89,14 @@ const GroupDetailPage = () => {
         (result: any, member: any) => [
           ...result,
           {
-            key: member.id.uuid,
+            key: User(member).getId(),
             data: {
-              id: member.id.uuid,
-              name: member.attributes.profile.displayName,
-              email: member.attributes.email,
-              group: getGroupNames(
-                member.attributes.profile.metadata.groupList,
-              ),
-              allergy: [],
-              nutrition: [],
+              id: User(member).getId(),
+              name: User(member).getProfile()?.displayName,
+              email: User(member).getAttributes()?.email,
+              group: getGroupNames(User(member).getMetadata()?.groupList),
+              allergy: User(member).getPublicData()?.allergies?.join(', '),
+              nutrition: User(member).getPublicData()?.nutritions?.join(', '),
             },
           },
         ],
@@ -193,17 +193,21 @@ const GroupDetailPage = () => {
     [name, description],
   );
 
-  const onConfirmDeleteMember = () => {
-    dispatch(
+  const onConfirmDeleteMember = async () => {
+    const { meta } = await dispatch(
       BookerManageCompany.updateGroup({
         groupId,
         deletedMembers: [deletingMemberInfo],
       }),
-    ).then(({ error }: any) => {
-      if (!error) {
-        closeDeleteMemberConfirmationModal();
-      }
-    });
+    );
+    if (meta.requestStatus !== 'rejected') {
+      closeDeleteMemberConfirmationModal();
+      await dispatch(
+        BookerManageCompany.groupDetailInfo({
+          groupId: groupId as string,
+        }),
+      );
+    }
   };
 
   const onConfirmDeleteGroup = () => {
@@ -243,6 +247,7 @@ const GroupDetailPage = () => {
           <>
             <div className={css.titleWrapper}>
               <h2>{name || '---'}</h2>
+              <div>{description}</div>
             </div>
             <div className={css.actionBtns}>
               <Button onClick={onEditing} className={css.changeNameBtn}>
@@ -270,6 +275,7 @@ const GroupDetailPage = () => {
           tableBodyCellClassName={css.tableBodyCell}
           extraRows={
             <td className={css.addMemberBtn} onClick={openAddNewMembersModal}>
+              <IconPlus className={css.plusIcon} />
               {intl.formatMessage({ id: 'GroupDetail.addGroupMember' })}
             </td>
           }

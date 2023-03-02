@@ -1,0 +1,42 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  display: flex;
+  /* Neutral/1 */
+
+  background: $neutralGray1;
+  /* Shadown/MD */
+
+  box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06),
+    0px 4px 8px -2px rgba(16, 24, 40, 0.1);
+  border-radius: 8px;
+  padding: 5px 10px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  justify-content: space-between;
+  .title {
+    font-size: 14px;
+    font-weight: $fontWeightBold;
+    line-height: 24px;
+  }
+  .sideDishesContent {
+    font-weight: $fontWeightRegular;
+    color: $neutralGray5;
+    .boldText {
+      font-weight: $fontWeightBold;
+    }
+  }
+
+  .buttonClose {
+    min-width: 20px;
+    min-height: 20px;
+    display: flex;
+    border-radius: 4px;
+    align-items: center;
+    justify-content: center;
+    .iconClose {
+      width: 12px;
+      height: 12px;
+    }
+  }
+}

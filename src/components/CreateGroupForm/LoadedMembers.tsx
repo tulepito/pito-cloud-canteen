@@ -47,9 +47,8 @@ const LoadedItem = ({ item, companyMembers, onDelete }: any) => {
 };
 const LoadedMembers: React.FC<LoadedMembersProps> = (props) => {
   const { formattedLoadedMembers, companyMembers } = props;
-  const onDeleteMember = (memberIndex: number) => () => {
-    console.log('memberIndex: ', memberIndex);
-  };
+  const onDeleteMember = (_memberIndex: number) => () => {};
+
   return (
     <div className={css.container}>
       {formattedLoadedMembers.map((item, index) => (

@@ -1,0 +1,37 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.wrapper {
+  .header {
+    @include flexAlign(center, space-between);
+    border-bottom: 1px solid $neutralGray4;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+
+    .directIcon {
+      transition: all 0.3s ease-in-out;
+      cursor: pointer;
+      &.collapse {
+        transform: rotate(-180deg);
+      }
+    }
+  }
+
+  .title {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+    color: $neutralGray6;
+  }
+
+  .optionsContainer {
+    transition: max-height 0.3s ease-in-out, opacity 0.5s ease-in-out;
+    max-height: 500px;
+    font-size: 14px;
+
+    &.collapse {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
+  }
+}

@@ -1,7 +1,8 @@
-import { RESULT_PAGE_SIZE } from '@redux/slices/ManageCompaniesPage.slice';
-import { USER } from '@utils/data';
+import type { TCompanyMembers } from '@redux/slices/ManageCompaniesPage.slice';
+import { User } from '@utils/data';
 import { ECompanyStatus } from '@utils/enums';
-import type { TCompany, TUser } from '@utils/types';
+import { removeAccents } from '@utils/string';
+import type { TCompany } from '@utils/types';
 
 export type TUpdateStatus = {
   id: string;
@@ -12,75 +13,58 @@ type TExtraDataMapToCompanyTable = {
   updateStatus: (e: TUpdateStatus) => void;
 };
 
-export const sliceCompanies = (companies: TCompany[], page: any) => {
+export const sliceCompanies = (
+  companies: TCompany[],
+  page: any,
+  perPage: number,
+) => {
   const pageAsNum = Number(page);
 
-  return companies.slice(
-    (pageAsNum - 1) * RESULT_PAGE_SIZE,
-    pageAsNum * RESULT_PAGE_SIZE,
-  );
+  return companies.slice((pageAsNum - 1) * perPage, pageAsNum * perPage);
 };
 
 export const filterCompanies = (companies: TCompany[], filterValues: any) => {
-  const {
-    searchId,
-    searchDisplayName,
-    searchCompanyName,
-    searchEmail,
-    searchPhone,
-    searchStatus,
-  } = filterValues;
+  const { keywords } = filterValues;
 
   if (Object.keys(filterValues).length === 0) return companies;
-  return companies.filter((company: any) => {
+  return companies.filter((company) => {
     return (
       // eslint-disable-next-line no-nested-ternary
-      (searchId ? company.id.uuid.includes(searchId) : true) &&
-      (searchDisplayName
-        ? company.attributes.profile?.displayName
-            .toLowerCase()
-            .includes(searchDisplayName.toLowerCase())
-        : true) &&
-      (searchCompanyName
-        ? company.attributes.profile.publicData?.companyName
-            ?.toLowerCase()
-            .includes(searchCompanyName?.toLowerCase())
-        : true) &&
-      (searchEmail
-        ? company.attributes.email
-            ?.toLowerCase()
-            .includes(searchEmail?.toLowerCase())
-        : true) &&
-      (searchPhone
-        ? company.attributes.profile.publicData?.phoneNumber
-            ?.toLowerCase()
-            .includes(searchPhone?.toLowerCase())
-        : true) &&
-      (searchStatus
-        ? company.attributes.profile.metadata?.status === Number(searchStatus)
-        : true)
+      removeAccents(company.attributes.profile.displayName)
+        ?.toLowerCase()
+        .includes(keywords?.toLowerCase()) ||
+      company.id.uuid?.toLowerCase().includes(keywords?.toLowerCase()) ||
+      removeAccents(company.attributes.profile.publicData?.location?.address)
+        ?.toLowerCase()
+        .includes(keywords?.toLowerCase())
     );
   });
 };
 
 export const parseEntitiesToTableData = (
-  companies: TUser[],
+  companies: TCompany[],
   extraData: TExtraDataMapToCompanyTable,
+  companyMembers?: TCompanyMembers | null,
 ) => {
-  return companies.map((company: any) => ({
-    key: company.id.uuid,
-    data: {
-      id: company.id.uuid,
-      name: company.attributes.profile.displayName,
-      phone: company.attributes.profile.publicData?.phoneNumber,
-      email: company.attributes.email,
-      companyName: company.attributes.profile.publicData?.companyName,
-      address: company.attributes.profile.publicData?.location?.address,
-      status:
-        company.attributes.profile.metadata.status || ECompanyStatus.unactive,
-      ...extraData,
-    },
-  }));
+  return companies.map((company) => {
+    const { profile = {} } = company.attributes || {};
+    const { displayName, publicData = {}, metadata = {} } = profile as any;
+    const { status } = metadata;
+    const { location = {}, companyName } = publicData;
+
+    return {
+      key: company.id.uuid,
+      data: {
+        id: company.id.uuid,
+        name: displayName,
+        companyName,
+        address: location?.address,
+        status: status || ECompanyStatus.unactive,
+        ...(companyMembers ? { members: companyMembers[company.id.uuid] } : {}),
+        ...extraData,
+      },
+    };
+  });
 };
 
 export const sortCompanies = (
@@ -90,25 +74,25 @@ export const sortCompanies = (
   return [...companies].sort((a, b) => {
     if (isSortAZ) {
       if (
-        USER(a).getPublicData().companyName.toLowerCase() <
-        USER(b).getPublicData().companyName.toLowerCase()
+        User(a).getPublicData()?.companyName?.toLowerCase() <
+        User(b).getPublicData()?.companyName?.toLowerCase()
       )
         return -1;
       if (
-        USER(a).getPublicData().companyName.toLowerCase() >
-        USER(b).getPublicData().companyName.toLowerCase()
+        User(a).getPublicData()?.companyName?.toLowerCase() >
+        User(b).getPublicData()?.companyName?.toLowerCase()
       )
         return 1;
       return 0;
     }
     if (
-      USER(b).getPublicData().companyName.toLowerCase() <
-      USER(a).getPublicData().companyName.toLowerCase()
+      User(b).getPublicData()?.companyName?.toLowerCase() <
+      User(a).getPublicData()?.companyName?.toLowerCase()
     )
       return -1;
     if (
-      USER(b).getPublicData().companyName.toLowerCase() >
-      USER(a).getPublicData().companyName.toLowerCase()
+      User(b).getPublicData()?.companyName?.toLowerCase() >
+      User(a).getPublicData()?.companyName?.toLowerCase()
     )
       return 1;
     return 0;

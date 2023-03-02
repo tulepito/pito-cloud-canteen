@@ -1,0 +1,6 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.title {
+  @include pageTitle;
+}

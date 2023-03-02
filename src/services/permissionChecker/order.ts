@@ -2,7 +2,7 @@ import { HttpMethod } from '@apis/configs';
 import { fetchListing } from '@services/integrationHelper';
 import { getSdk, handleError } from '@services/sdk';
 import { UserPermission } from '@src/types/UserPermission';
-import { denormalisedResponseEntities, LISTING, USER } from '@utils/data';
+import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 const orderChecker =
@@ -14,7 +14,7 @@ const orderChecker =
       const { companyId, orderId } = req.body;
       const apiMethod = req.method;
       const [currentUser] = denormalisedResponseEntities(currentUserResponse);
-      const { isAdmin = false, company = {} } = USER(currentUser).getMetadata();
+      const { isAdmin = false, company = {} } = User(currentUser).getMetadata();
 
       switch (apiMethod) {
         case HttpMethod.POST: {
@@ -44,7 +44,7 @@ const orderChecker =
           }
 
           const orderListing = await fetchListing(orderId);
-          const { clientId } = LISTING(orderListing).getMetadata();
+          const { clientId } = Listing(orderListing).getMetadata();
           const userPermission = company[clientId]?.permission;
           if (
             userPermission &&

@@ -1,7 +1,19 @@
-import { LISTING } from '@utils/data';
-import { EParticipantOrderStatus } from '@utils/enums';
+import {
+  AFTERNOON_SESSION,
+  DINNER_SESSION,
+  EVENING_SESSION,
+  MORNING_SESSION,
+} from '@components/CalendarDashboard/helpers/constant';
+import { Listing } from '@utils/data';
+import { generateTimeOptions } from '@utils/dates';
+import {
+  EBookerOrderDraftStates,
+  EOrderDraftStates,
+  EParticipantOrderStatus,
+} from '@utils/enums';
 import type { TListing } from '@utils/types';
 import { addDays, min, subDays } from 'date-fns';
+import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
 export const isJoinedPlan = (
@@ -11,11 +23,14 @@ export const isJoinedPlan = (
   return foodId !== '' && status === EParticipantOrderStatus.joined;
 };
 
-export const isOverDeadline = (order: TListing) => {
-  const currentTime = new Date().getTime();
-  const { deadlineDate = 0 } = LISTING(order).getMetadata();
+export const isOver = (deadline = 0) => {
+  return new Date().getTime() > deadline;
+};
 
-  return currentTime >= deadlineDate;
+export const isOrderOverDeadline = (order: TListing) => {
+  const { deadlineDate } = Listing(order).getMetadata();
+
+  return isOver(deadlineDate);
 };
 
 export const findMinStartDate = () => {
@@ -45,4 +60,74 @@ export const findValidRangeForDeadlineDate = (
   ]);
 
   return { minSelectedDate, maxSelectedDate };
+};
+
+export const deliveryDaySessionAdapter = (daySession: string) => {
+  switch (daySession) {
+    case MORNING_SESSION:
+      return 'breakfast';
+    case DINNER_SESSION:
+      return 'dinner';
+    case AFTERNOON_SESSION:
+      return 'lunch';
+    case EVENING_SESSION:
+      return 'brunch';
+    default:
+      break;
+  }
+};
+
+export const isEnableUpdateBookingInfo = (
+  orderState: EBookerOrderDraftStates | EOrderDraftStates,
+) => {
+  return [
+    EBookerOrderDraftStates.bookerDraft,
+    EOrderDraftStates.draft,
+    EOrderDraftStates.pendingApproval,
+  ].includes(orderState);
+};
+
+export const orderDataCheckers = (order: TListing) => {
+  const {
+    plans = [],
+    startDate,
+    endDate,
+    deliveryHour,
+    deadlineHour,
+    deadlineDate,
+    packagePerMember,
+    deliveryAddress,
+  } = Listing(order).getMetadata();
+  const timeOptions = generateTimeOptions();
+
+  const checkers = {
+    isDeadlineDateValid: Number.isInteger(deadlineDate),
+    isDeliveryAddressValid:
+      !isEmpty(deliveryAddress?.address) && !isEmpty(deliveryAddress?.origin),
+    isStartDateValid: Number.isInteger(startDate),
+    isEndDateValid: Number.isInteger(endDate),
+    isDeliveryHourValid: timeOptions.includes(deliveryHour),
+    isDeadlineHourValid: timeOptions.includes(deadlineHour),
+    isPackagePerMemberValid: Number.isInteger(packagePerMember),
+    haveAnyPlans: !isEmpty(plans),
+  };
+
+  const isAllValid = Object.values(checkers).every((value) => value);
+
+  return { ...checkers, isAllValid };
+};
+
+export const isEnableSubmitPublishOrder = (
+  order: TListing,
+  orderDetail: any[],
+) => {
+  const isOrderValid = orderDataCheckers(order).isAllValid;
+
+  const isOrderDetailSetupCompleted = orderDetail.every(({ resource }) => {
+    const { isSelectedFood = false } = resource || {};
+
+    return isSelectedFood;
+  });
+
+  return isOrderValid && isOrderDetailSetupCompleted;
 };

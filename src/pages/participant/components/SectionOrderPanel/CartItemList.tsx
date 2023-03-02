@@ -1,6 +1,6 @@
-import { isOverDeadline } from '@helpers/orderHelper';
+import { isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
-import { LISTING } from '@utils/data';
+import { Listing } from '@utils/data';
 import type { TObject } from '@utils/types';
 import { DateTime } from 'luxon';
 import React from 'react';
@@ -25,7 +25,7 @@ const CartItemList: React.FC<TCartItemList> = ({
   const intl = useIntl();
   const order = useAppSelector((state) => state.ParticipantPlanPage.order);
 
-  const isOrderDeadlineOver = isOverDeadline(order);
+  const isOrderDeadlineOver = isOrderOverDeadline(order);
 
   const onRemoveItem = (dayId: string) => () => {
     handleRemoveItem(dayId);
@@ -45,7 +45,7 @@ const CartItemList: React.FC<TCartItemList> = ({
         ? null
         : foodList.find((food: any) => food?.id?.uuid === item);
     const dishAttributes =
-      item === 'notJoined' ? null : LISTING(selectedDish).getAttributes();
+      item === 'notJoined' ? null : Listing(selectedDish).getAttributes();
     const dishTitle =
       item === 'notJoined'
         ? intl.formatMessage({ id: 'SectionOrderPanel.notJoined' })

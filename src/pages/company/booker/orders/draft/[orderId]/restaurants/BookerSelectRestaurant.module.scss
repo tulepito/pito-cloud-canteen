@@ -1,0 +1,41 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.pageTilte {
+  @include textTemplate(24px, $fontWeightBold, 32px);
+  text-transform: capitalize;
+  margin-top: 22px;
+}
+
+.goBackBtn {
+  @include flexAlign(center, flex-start);
+  gap: 12px;
+  width: 94px;
+  cursor: pointer;
+  @include textTemplate(16px, $fontWeightBold, 24px);
+}
+
+.result {
+  .resultHeaderWrapper {
+    position: relative;
+    z-index: 10;
+    .searchAndSort {
+      @include flexAlign(center, space-between);
+    }
+    .filterLabelWrapper {
+      margin-top: 28px;
+      @include flexAlign(baseline, flex-start);
+
+      .resultNumber {
+        margin-right: 32px;
+        color: $neutralGray5;
+        min-width: 80px;
+      }
+    }
+  }
+
+  .resultList {
+    position: relative;
+    margin-top: 24px;
+  }
+}

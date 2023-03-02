@@ -1,5 +1,11 @@
-import CreateCompany from './CreateCompany.page';
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
-export default function CreateCompanyRoute() {
-  return <CreateCompany />;
+import CreateCompanyPage from './CreateCompany.page';
+
+export default function AdminCreateCompanyRoute() {
+  return (
+    <MetaWrapper routeName="AdminCreateCompanyRoute">
+      <CreateCompanyPage />
+    </MetaWrapper>
+  );
 }

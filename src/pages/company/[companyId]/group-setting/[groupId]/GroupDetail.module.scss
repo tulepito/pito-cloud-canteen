@@ -8,7 +8,6 @@
 
   .titleWrapper {
     flex-basis: 60%;
-    height: 108px;
   }
 }
 
@@ -43,6 +42,7 @@
   border-radius: 8px;
   padding-left: 12px;
   cursor: pointer;
+  width: 245px;
   @include textTemplate(16px, $fontWeightBold, 24px);
 }
 
@@ -55,7 +55,7 @@
 
   .tableRoot {
     width: 100%;
-    border: 1px solid $neutral4;
+    border: 1px solid $neutralGray4;
     border-radius: 8px;
     border-spacing: 0;
 
@@ -71,6 +71,7 @@
       }
 
       .tableHeadCell {
+        text-transform: uppercase;
         &:first-child {
           border-top-left-radius: 8px;
         }
@@ -124,5 +125,16 @@
 
   &:hover {
     border-bottom: 1px solid $neutralGray5;
+  }
+}
+
+.plusIcon {
+  width: 40px;
+  height: 40px;
+  path:not(:nth-child(3)) {
+    fill: $neutralGray6;
+  }
+  path:nth-child(3) {
+    fill: transparent;
   }
 }

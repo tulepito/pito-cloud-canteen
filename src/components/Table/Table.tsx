@@ -17,8 +17,7 @@ import css from './Table.module.scss';
 export type TColumn = {
   key: string | number;
   label: string | ReactNode;
-  render: (data: any, index?: number) => ReactNode;
-  renderSearch?: () => ReactNode;
+  render: (data: any, isChecked: boolean) => ReactNode;
   sortable?: boolean;
 };
 
@@ -46,14 +45,16 @@ type TTableProps = TDefaultProps & {
   isLoading?: boolean;
   onSubmit?: (e: any) => void;
   initialValues?: any;
-  showFilterFrom?: boolean;
   hasCheckbox?: boolean;
   form?: FormApi;
   values?: any;
   exposeValues?: (e: any) => void;
   handleSort?: (columnName: string | number) => void;
   sortValue?: { columnName: string | number; type: 'asc' | 'desc' };
+  customCheckboxChange?: (e: any) => void;
+  afterCheckboxChangeHandler?: (e: any, rowCheckboxValues: any) => void;
   extraRows?: ReactNode;
+  tableWrapperClassName?: string;
 };
 
 const getUniqueString = (list: string[]) => {
@@ -75,7 +76,6 @@ const Table = (props: TTableProps) => {
     paginationLinksClassName,
     pagination,
     isLoading,
-    showFilterFrom,
     tableClassName,
     paginationPath,
     hasCheckbox,
@@ -83,11 +83,12 @@ const Table = (props: TTableProps) => {
     values,
     handleSort,
     sortValue,
+    afterCheckboxChangeHandler,
     extraRows,
+    tableWrapperClassName,
   } = props;
 
   const tableClasses = classNames(css.table, tableClassName);
-
   const router = useRouter();
 
   const onPageChange = (page: number) => {
@@ -100,7 +101,7 @@ const Table = (props: TTableProps) => {
     });
   };
 
-  const customOnChange = (e: any) => {
+  const customOnChangeCheckAllCheckbox = (e: any) => {
     const { checked, value, name } = e.target;
     form?.change(name, !checked ? [] : [value]);
     const { rowCheckbox = [] } = values;
@@ -109,6 +110,9 @@ const Table = (props: TTableProps) => {
       newValues.push(val.key);
     });
     form?.change('rowCheckbox', !checked ? [] : getUniqueString(newValues));
+    if (afterCheckboxChangeHandler) {
+      afterCheckboxChangeHandler(e, rowCheckbox);
+    }
   };
 
   const rowCheckboxChange = (e: any) => {
@@ -126,7 +130,11 @@ const Table = (props: TTableProps) => {
       form?.change('checkAll', ['checkAll']);
     }
     form?.change(name, newValues);
+    if (afterCheckboxChangeHandler) {
+      afterCheckboxChangeHandler(e, rowCheckbox);
+    }
   };
+
   const sortData = (key: string | number) => () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     handleSort && handleSort(key);
@@ -134,130 +142,112 @@ const Table = (props: TTableProps) => {
 
   return (
     <>
-      <table className={tableClasses}>
-        <thead className={tableHeadClassName}>
-          <tr className={classNames(tableHeadRowClassName, css.headRow)}>
-            {hasCheckbox && (
-              <td className={classNames(tableHeadCellClassName, css.headCell)}>
-                <FieldCheckbox
-                  labelClassName={css.checkboxLabel}
-                  svgClassName={css.checkboxSvg}
-                  customOnChange={customOnChange}
-                  name="checkAll"
-                  id="checkAll"
-                  value="checkAll"
-                  label=" "
-                />
-              </td>
-            )}
-            {columns.map((col: TColumn) => (
-              <td
-                className={classNames(tableHeadCellClassName, css.headCell)}
-                key={col.key}>
-                <div className={css.headCellLabel}>
-                  {col.label}
-                  {col.sortable && (
-                    <IconSort
-                      onClick={sortData(col.key)}
-                      className={css.sortIcon}
-                      type={
-                        col.key === sortValue?.columnName
-                          ? sortValue?.type
-                          : undefined
-                      }
-                    />
-                  )}
-                </div>
-              </td>
-            ))}
-          </tr>
-        </thead>
-        {isLoading ? (
-          <tbody>
-            <tr>
-              <td colSpan={columns.length} className={css.emptyCell}>
-                Loading...
-              </td>
-            </tr>
-          </tbody>
-        ) : data.length === 0 ? (
-          <tbody>
-            <tr>
-              <td colSpan={columns.length} className={css.emptyCell}>
-                <FormattedMessage id="Table.noResults" />
-              </td>
-            </tr>
-            {extraRows && <tr className={css.bodyRow}>{extraRows}</tr>}
-          </tbody>
-        ) : (
-          <tbody className={tableBodyClassName}>
-            {showFilterFrom && (
-              <>
-                <tr className={css.formHeadRow}>
-                  {columns.map(
-                    (col: TColumn) =>
-                      col.renderSearch && (
-                        <td key={col.key} className={css.formHeadCell}>
-                          {col.label}
-                        </td>
-                      ),
-                  )}
-                </tr>
-                <tr className={css.formRow}>
-                  {columns.map(
-                    (col: TColumn) =>
-                      col.renderSearch && (
-                        <td key={col.key} className={css.formCell}>
-                          {col.renderSearch()}
-                        </td>
-                      ),
-                  )}
-                </tr>
-              </>
-            )}
-
-            {data.map((row: TRowData) => (
-              <tr
-                className={classNames(tableBodyRowClassName, css.bodyRow)}
-                key={row.key}>
-                {hasCheckbox && (
-                  <td
-                    className={classNames(
-                      tableBodyCellClassName,
-                      css.bodyCell,
-                      {
-                        [css.isParent]: row.data.isParent,
-                      },
-                    )}>
-                    <FieldCheckbox
-                      labelClassName={css.checkboxLabel}
-                      svgClassName={css.checkboxSvg}
-                      name="rowCheckbox"
-                      id={`rowCheckbox.${row.key}`}
-                      value={row.key as any}
-                      label=" "
-                      customOnChange={rowCheckboxChange}
-                    />
-                  </td>
-                )}
-                {columns.map((col: TColumn) => (
-                  <td
-                    className={classNames(
-                      tableBodyCellClassName,
-                      css.bodyCell,
-                      { [css.isParent]: row.data.isParent },
+      <div className={classNames(css.tableWrapper, tableWrapperClassName)}>
+        <table className={tableClasses}>
+          <thead className={tableHeadClassName}>
+            <tr className={classNames(tableHeadRowClassName, css.headRow)}>
+              {hasCheckbox && (
+                <td
+                  className={classNames(tableHeadCellClassName, css.headCell)}>
+                  <FieldCheckbox
+                    labelClassName={css.checkboxLabel}
+                    svgClassName={css.checkboxSvg}
+                    customOnChange={customOnChangeCheckAllCheckbox}
+                    name="checkAll"
+                    id="checkAll"
+                    value="checkAll"
+                    label=" "
+                  />
+                </td>
+              )}
+              {columns.map((col: TColumn) => (
+                <td
+                  className={classNames(tableHeadCellClassName, css.headCell)}
+                  key={col.key}>
+                  <div className={css.headCellLabel}>
+                    {col.label}
+                    {col.sortable && (
+                      <IconSort
+                        onClick={sortData(col.key)}
+                        className={css.sortIcon}
+                        type={
+                          col.key === sortValue?.columnName
+                            ? sortValue?.type
+                            : undefined
+                        }
+                      />
                     )}
-                    data-label={col.label}
-                    key={col.key}>
-                    {col.render(row.data)}
-                  </td>
-                ))}
+                  </div>
+                </td>
+              ))}
+            </tr>
+          </thead>
+          {isLoading ? (
+            <tbody>
+              <tr>
+                <td colSpan={columns.length} className={css.emptyCell}>
+                  Loading...
+                </td>
               </tr>
-            ))}
-            {extraRows && <tr className={css.bodyRow}>{extraRows}</tr>}
-          </tbody>
-        )}
-      </table>
+            </tbody>
+          ) : data.length === 0 ? (
+            <tbody>
+              <tr>
+                <td colSpan={columns.length} className={css.emptyCell}>
+                  <FormattedMessage id="Table.noResults" />
+                </td>
+              </tr>
+              {extraRows && <tr className={css.bodyRow}>{extraRows}</tr>}
+            </tbody>
+          ) : (
+            <tbody className={tableBodyClassName}>
+              {data.map((row: TRowData) => (
+                <tr
+                  className={classNames(tableBodyRowClassName, css.bodyRow)}
+                  key={row.key}>
+                  {hasCheckbox && (
+                    <td
+                      className={classNames(
+                        tableBodyCellClassName,
+                        css.bodyCell,
+                        {
+                          [css.isParent]: row.data.isParent,
+                        },
+                      )}>
+                      <FieldCheckbox
+                        labelClassName={css.checkboxLabel}
+                        svgClassName={css.checkboxSvg}
+                        name="rowCheckbox"
+                        id={`rowCheckbox.${row.key}`}
+                        value={row.key as any}
+                        label=" "
+                        customOnChange={rowCheckboxChange}
+                      />
+                    </td>
+                  )}
+                  {columns.map((col: TColumn) => {
+                    const rowCheckbox = values?.rowCheckbox || [];
+                    const isChecked = rowCheckbox.includes(row.key);
+                    return (
+                      <td
+                        className={classNames(
+                          tableBodyCellClassName,
+                          css.bodyCell,
+                          { [css.isParent]: row.data.isParent },
+                        )}
+                        data-label={col.label}
+                        key={col.key}>
+                        {col.render(row.data, isChecked)}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+              {extraRows && <tr className={css.bodyRow}>{extraRows}</tr>}
+            </tbody>
+          )}
+        </table>
+      </div>
       {pagination && pagination.totalPages > 1 && (
         <Pagination
           className={paginationLinksClassName}

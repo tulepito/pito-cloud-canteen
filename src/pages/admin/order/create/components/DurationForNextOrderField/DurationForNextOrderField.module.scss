@@ -1,0 +1,72 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  .fieldLabel {
+    @include textTemplate(14px, $fontWeightRegular, 20px);
+    color: $neutralGray6;
+    margin-bottom: 4px;
+  }
+  .durationTimeInput {
+    width: 44px;
+    margin-right: 20px;
+    input {
+      text-align: center;
+    }
+  }
+}
+.fieldWrapper {
+  @include flexAlign(center, flex-start);
+  margin-top: 4px;
+}
+
+.timeModeBtnWrapper {
+  padding: 4px;
+  display: flex;
+  background: $neutralGray3;
+  border-radius: 24px;
+  margin-right: 20px;
+}
+.viewMode {
+  height: 36px;
+  min-height: 36px;
+
+  padding: 6px 24px;
+  text-align: center;
+  background: transparent;
+  border-radius: 24px;
+  -webkit-tap-highlight-color: transparent;
+  @include textTemplate(16px, $fontWeightBold, 24px, '');
+  color: $neutralGray5;
+
+  &:last-child {
+    border-right: 0px;
+  }
+
+  &:hover {
+    outline: none;
+    background-color: $neutralGray3;
+  }
+
+  &:active,
+  &:focus {
+    background-color: $neutralGray1;
+    color: $neutralGray6;
+    border: none;
+    outline: none;
+  }
+}
+
+.active {
+  background-color: $neutralGray1;
+  color: $neutralGray6;
+  box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06),
+    0px 4px 8px -2px rgba(16, 24, 40, 0.1);
+
+  &:active,
+  &:focus {
+    background-color: $neutralGray1;
+    color: $neutralGray6;
+  }
+}

@@ -70,10 +70,8 @@ const deleteMember = createAsyncThunk(
   async (email: string, { getState }) => {
     const { workspaceCompanyId } = getState().company;
     const { data: deleteMemberData } = await deleteMemberApi({
-      data: {
-        memberEmail: email,
-        companyId: workspaceCompanyId,
-      },
+      memberEmail: email,
+      companyId: workspaceCompanyId,
     });
     return deleteMemberData;
   },
