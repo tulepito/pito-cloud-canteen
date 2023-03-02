@@ -99,9 +99,9 @@ export const calculatePriceQuotationInfo = ({
     orderDetail: planOrderDetail,
   });
 
-  const PITOPoints = totalPrice / 100000;
+  const PITOPoints = Math.floor(totalPrice / 100000);
   const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
-  const VATFee = totalPrice * config.VATPercentage;
+  const VATFee = Math.round(totalPrice * config.VATPercentage);
   const serviceFee = 0;
   const transportFee = 0;
   const promotion = 0;

@@ -25,7 +25,7 @@ export const downloadPriceQuotation =
     await createNewPrint('priceQuotation').then((response) => {
       const { doc, id } = response as TObject;
       if (doc && id) {
-        const fileName = `${id}.pdf`;
+        const fileName = `${'Báo giá'}.pdf`;
         doc.save(fileName, { returnPromise: true }).then((_res: any) => {});
       }
     });

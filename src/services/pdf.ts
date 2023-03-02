@@ -11,7 +11,7 @@ export const createNewPrint = (id: string) => {
     const ele = document.querySelector(`#${id}`);
     if (ele !== null && typeof ele === 'object') {
       // eslint-disable-next-line new-cap
-      const doc = new jsPDF('p', 'mm', 'a4');
+      const doc = new jsPDF('p', 'mm', 'a7');
       const width = doc.internal.pageSize.getWidth();
       const height = doc.internal.pageSize.getHeight();
       return html2canvas(
