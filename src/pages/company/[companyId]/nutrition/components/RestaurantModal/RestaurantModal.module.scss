@@ -111,6 +111,10 @@
 .searchFormWrapper {
   @include flexAlign(center);
   flex-direction: row-reverse;
+
+  .searchInput {
+    width: 380px;
+  }
 }
 
 .profileImageWrapper {

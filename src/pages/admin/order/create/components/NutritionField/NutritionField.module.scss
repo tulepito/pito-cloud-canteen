@@ -5,6 +5,7 @@
 .fieldTitle {
   @include text(18px, 24px);
   font-weight: $fontWeightBold;
+  text-transform: capitalize;
 }
 
 .fieldGroups {
