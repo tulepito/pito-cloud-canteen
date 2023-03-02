@@ -98,7 +98,6 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
       null,
     [restaurants, selectedRestaurantId, JSON.stringify(preselectedRestaurant)],
   );
-
   const { geolocation: restaurantOrigin } = Listing(
     currentRestaurant!,
   ).getAttributes();
@@ -139,6 +138,8 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   }, [restaurantFood, selectedRestaurantId]);
 
   const foodList = restaurantFood?.[selectedRestaurantId!];
+
+  const submitFoodListDisabled = selectedFoods.length === 0;
 
   // Method
   const dispatch = useAppDispatch();
@@ -278,7 +279,10 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
           </div>
         </div>
         <div className={css.footer}>
-          <Button className={css.submitBtn} onClick={handleConfirmFoodList}>
+          <Button
+            className={css.submitBtn}
+            onClick={handleConfirmFoodList}
+            disabled={submitFoodListDisabled}>
             <span>
               {intl.formatMessage(
                 {

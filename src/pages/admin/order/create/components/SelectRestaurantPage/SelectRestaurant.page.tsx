@@ -85,7 +85,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   useEffect(() => {
     dispatch(
       selectRestaurantPageThunks.getRestaurants({
-        dateTime,
+        dateTime: dateTime.toMillis(),
         packagePerMember,
         deliveryHour,
         nutritions,
@@ -117,7 +117,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     currDebounceRef = setTimeout(() => {
       dispatch(
         selectRestaurantPageThunks.getRestaurants({
-          dateTime,
+          dateTime: dateTime.toMillis(),
           title,
           packagePerMember,
           deliveryHour,

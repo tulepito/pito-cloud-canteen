@@ -56,6 +56,13 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
   const updateOrderInProgress = useAppSelector(
     (state) => state.Order.updateOrderInProgress,
   );
+  const recommendRestaurantInProgress = useAppSelector(
+    (state) => state.Order.recommendRestaurantInProgress,
+  );
+  const updateOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.updateOrderDetailInProgress,
+  );
+
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
@@ -295,35 +302,41 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
       nutritions: nutritionsValue,
       ...rest,
     };
-    const { payload }: { payload: any } = await dispatch(
-      orderAsyncActions.updateOrder({ generalInfo }),
-    );
+    try {
+      await dispatch(orderAsyncActions.updateOrder({ generalInfo }));
 
-    const { plans = [] } = Listing(order as TListing).getMetadata();
-    const changedOrderDetailFactor =
-      startDate !== startDateValue ||
-      endDate !== endDateValue ||
-      difference(nutritions, nutritionsValue).length > 0 ||
-      getDaySessionFromDeliveryTime(deliveryHour) !==
-        getDaySessionFromDeliveryTime(deliveryHourValue) ||
-      packagePerMember !== +packagePerMemberValue.replace(/,/g, '');
-    const { orderDetail: newOrderDetail } = payload || {};
-
-    if (!isEqual(orderDetail, newOrderDetail) && changedOrderDetailFactor) {
-      const planId = plans[0];
-      await dispatch(
-        orderAsyncActions.updatePlanDetail({
-          orderId: Listing(order as TListing).getId(),
-          orderDetail: newOrderDetail,
-          planId,
-          updateMode: 'replace',
-        }),
+      const { plans = [] } = Listing(order as TListing).getMetadata();
+      const changedOrderDetailFactor =
+        startDate !== startDateValue ||
+        endDate !== endDateValue ||
+        difference(nutritions, nutritionsValue).length > 0 ||
+        getDaySessionFromDeliveryTime(deliveryHour) !==
+          getDaySessionFromDeliveryTime(deliveryHourValue) ||
+        packagePerMember !== +packagePerMemberValue.replace(/,/g, '');
+      const { payload: newOrderDetail } = await dispatch(
+        orderAsyncActions.recommendRestaurants(),
       );
+
+      if (!isEqual(orderDetail, newOrderDetail) && changedOrderDetailFactor) {
+        const planId = plans[0];
+        await dispatch(
+          orderAsyncActions.updatePlanDetail({
+            orderId: Listing(order as TListing).getId(),
+            orderDetail: newOrderDetail,
+            planId,
+          }),
+        );
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
   const hideSubmitButton = selectedField === OrderSettingField.COMPANY;
-
+  const submitInProgress =
+    updateOrderInProgress ||
+    recommendRestaurantInProgress ||
+    updateOrderDetailInProgress;
   return (
     <Modal
       isOpen={isOpen}
@@ -346,8 +359,8 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
                     {!hideSubmitButton && (
                       <Button
                         className={css.submitBtn}
-                        disabled={invalid || updateOrderInProgress}
-                        inProgress={updateOrderInProgress}
+                        disabled={invalid || submitInProgress}
+                        inProgress={submitInProgress}
                         type="submit">
                         {intl.formatMessage({
                           id: 'OrderSettingModal.saveChange',

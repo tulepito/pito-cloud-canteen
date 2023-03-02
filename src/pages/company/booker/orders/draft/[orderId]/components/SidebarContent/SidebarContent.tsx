@@ -4,11 +4,15 @@ import { getInitialLocationValues } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing, User } from '@utils/data';
-import type { TUser } from '@utils/types';
+import { getDaySessionFromDeliveryTime } from '@utils/dates';
+import type { TListing, TUser } from '@utils/types';
 import classNames from 'classnames';
+import difference from 'lodash/difference';
+import isEqual from 'lodash/isEqual';
 import { DateTime } from 'luxon';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import { shallowEqual } from 'react-redux';
 
 import AccessForm from '../../forms/AccessForm/AccessForm';
 import DeliveryTimeForm from '../../forms/DeliveryTimeForm/DeliveryTimeForm';
@@ -57,6 +61,10 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   const updateOrderInProgress = useAppSelector(
     (state) => state.Order.updateOrderInProgress,
   );
+  const orderDetail = useAppSelector(
+    (state) => state.Order.orderDetail,
+    shallowEqual,
+  );
 
   const orderData = Listing(order);
   const companyData = User(companyAccount!);
@@ -103,7 +111,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     deliveryHour: deliveryHour || '07:00',
   };
   const deadlineInitValues = {
-    deadlineDate: deadlineDate || defaultDeadlineDate,
+    deadlineDate: new Date(deadlineDate).getTime() || defaultDeadlineDate,
     deadlineHour: deadlineHour || '07:00',
   };
   const numberEmployeesInitValues = {
@@ -129,14 +137,42 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     setIsOpenDetails(false);
   };
 
-  const handleSubmit = (values: any) => {
-    dispatch(
+  const handleSubmit = async (values: any) => {
+    const {
+      packagePerMember: packagePerMemberValue,
+      startDate: startDateValue,
+      endDate: endDateValue,
+      deliveryHour: deliveryHourValue,
+      nutritions: nutritionsValue,
+    } = values;
+    await dispatch(
       orderAsyncActions.updateOrder({
         generalInfo: {
           ...values,
         },
       }),
     );
+    const { plans = [] } = Listing(order as TListing).getMetadata();
+    const changedOrderDetailFactor =
+      startDate !== startDateValue ||
+      endDate !== endDateValue ||
+      difference(nutritions, nutritionsValue).length > 0 ||
+      getDaySessionFromDeliveryTime(deliveryHour) !==
+        getDaySessionFromDeliveryTime(deliveryHourValue) ||
+      packagePerMember !== +packagePerMemberValue.replace(/,/g, '');
+    const { payload: newOrderDetail } = await dispatch(
+      orderAsyncActions.recommendRestaurants(),
+    );
+    if (!isEqual(orderDetail, newOrderDetail) && changedOrderDetailFactor) {
+      const planId = plans[0];
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId: Listing(order as TListing).getId(),
+          orderDetail: newOrderDetail,
+          planId,
+        }),
+      );
+    }
   };
 
   const renderForm = () => {
