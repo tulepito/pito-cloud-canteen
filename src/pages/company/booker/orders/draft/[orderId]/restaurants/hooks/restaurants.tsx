@@ -19,6 +19,7 @@ export const useSearchRestaurants = () => {
     distance,
     rating,
     keywords,
+    packaging,
   } = router.query;
 
   const restaurants = useAppSelector(
@@ -61,6 +62,9 @@ export const useSearchRestaurants = () => {
           : {}),
         ...(distance ? { distance: convertQueryValueToArray(distance) } : {}),
         ...(rating ? { rating: convertQueryValueToArray(rating) } : {}),
+        ...(packaging
+          ? { packaging: convertQueryValueToArray(packaging) }
+          : {}),
         ...(keywords ? { keywords: keywords as string } : {}),
       }),
     );
@@ -74,6 +78,7 @@ export const useSearchRestaurants = () => {
     rating,
     timestamp,
     keywords,
+    packaging,
   ]);
 
   return {

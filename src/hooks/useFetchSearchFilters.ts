@@ -19,6 +19,11 @@ const useFetchSearchFilters = () => {
     shallowEqual,
   );
 
+  const packagingOptions = useAppSelector(
+    (state) => state.BookerSelectRestaurant.packaging,
+    shallowEqual,
+  );
+
   useEffect(() => {
     if (isReady) {
       (async () => {
@@ -30,6 +35,7 @@ const useFetchSearchFilters = () => {
   return {
     menuTypesOptions,
     categoriesOptions,
+    packagingOptions,
   };
 };
 
