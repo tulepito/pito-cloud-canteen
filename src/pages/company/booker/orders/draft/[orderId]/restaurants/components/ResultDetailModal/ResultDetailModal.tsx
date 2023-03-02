@@ -65,10 +65,12 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     const detail =
       Listing(planDetail).getMetadata().orderDetail?.[`${timestamp}`];
     const savedRestaurantId = detail?.restaurant?.id;
+
     if (selectedRestaurantId === savedRestaurantId) {
       const foodListObj = detail?.restaurant?.foodList || {};
       return Object.keys(foodListObj) || [];
     }
+
     return [];
   }, [planDetail, timestamp, isOpen]);
 
@@ -134,7 +136,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   // Method
   const dispatch = useAppDispatch();
 
-  const handleSelecFood = useCallback(
+  const handleSelectFood = useCallback(
     (foodId: string) => {
       setSelectedFoods([...selectedFoods, foodId]);
       if (foodModal.value) {
@@ -199,8 +201,8 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
         updateMode: 'merge',
       }),
     );
-    router.push(`/company/booker/orders/draft/${orderId}`);
     onClose();
+    router.push(`/company/booker/orders/draft/${orderId}`);
   };
 
   useEffect(() => {
@@ -260,7 +262,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
             />
             <FoodListSection
               foodList={foodList}
-              onSelectFood={handleSelecFood}
+              onSelectFood={handleSelectFood}
               onRemoveFood={handleRemoveFood}
               onClickFood={handleOpenFoodDetail}
               selectedFoodIds={selectedFoods}
@@ -290,7 +292,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
         isOpen={foodModal.value}
         food={selectedFood!}
         onClose={foodModal.setFalse}
-        onSelect={handleSelecFood}
+        onSelect={handleSelectFood}
       />
     </>
   );
