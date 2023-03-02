@@ -33,6 +33,7 @@ type TNormalizedOrderDetail = {
     bookingStart: Date;
     bookingEnd: Date;
     bookingDisplayStart: Date;
+    bookingDisplayEnd: Date;
   };
 
   date: string;
@@ -63,6 +64,7 @@ const normalizeOrderDetail = ({
           ...convertHHmmStringToTimeParts(deliveryHour),
         })
         .toJSDate();
+      const bookingDisplayEnd = bookingEnd;
 
       const { participantIds, bookingInfo } = Object.entries(
         memberOrdersMap,
@@ -110,6 +112,7 @@ const normalizeOrderDetail = ({
               bookingStart,
               bookingEnd,
               bookingDisplayStart,
+              bookingDisplayEnd,
             },
             date,
           });
@@ -188,6 +191,7 @@ export const initiateTransaction = async ({
           bookingStart,
           bookingEnd,
           bookingDisplayStart,
+          bookingDisplayEnd,
           extendedData: { metadata },
         },
         date,
@@ -202,7 +206,7 @@ export const initiateTransaction = async ({
             bookingStart,
             bookingEnd,
             bookingDisplayStart,
-            bookingDisplayEnd: bookingEnd,
+            bookingDisplayEnd,
             metadata: {
               ...metadata,
               isLastTxOfPlan: index === normalizedOrderDetail.length - 1,

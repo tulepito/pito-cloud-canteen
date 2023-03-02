@@ -4,7 +4,9 @@
                {
                 :name        :transition/initiate-transaction,
                 :actor       :actor.role/customer,
-                :actions     [{:name :action/create-pending-booking} {:name :action/privileged-update-metadata}],
+                :actions     [{:name :action/create-booking} {:name :action/privileged-update-metadata}
+                              ],
+
                 :to          :state/initiated
                 :privileged? true
                 }
@@ -27,7 +29,7 @@
                {
                 :name    :transition/expired-delivery,
                 :at      {:fn/plus [
-                                    {:fn/timepoint [:time/booking-start]}
+                                    {:fn/timepoint [:time/booking-display-start]}
                                     {:fn/period ["PT1M"]}]}
                 :actions [{:name :action/decline-booking}],
                 :from    :state/delivering
@@ -36,7 +38,7 @@
                {
                 :name    :transition/operator-cancel-plan,
                 :actor   :actor.role/operator,
-                :actions [{:name :action/cancel-booking}],
+                :actions [{:name :action/decline-booking}],
                 :from    :state/initiated
                 :to      :state/canceled
                 }

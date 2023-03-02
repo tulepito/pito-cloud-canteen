@@ -56,13 +56,16 @@ function BookerDraftOrderPage() {
   );
 
   const handleFinishOrder = async () => {
-    await dispatch(orderAsyncActions.bookerPublishOrder({ orderId, planId }));
-    setTimeout(() => {
+    const { meta } = await dispatch(
+      orderAsyncActions.bookerPublishOrder({ orderId, planId }),
+    );
+
+    if (meta.requestStatus !== 'rejected') {
       router.push({
         pathname: companyPaths.ManageOrderPicking,
         query: { orderId: orderId as string },
       });
-    }, 1000);
+    }
   };
 
   const handleCollapse = useCallback(() => {

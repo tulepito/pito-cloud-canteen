@@ -48,16 +48,16 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   const rootClasses = classNames(css.root, className);
 
   const handleStartPickingOrder = async () => {
-    await dispatch(
+    const { meta } = await dispatch(
       orderManagementThunks.bookerStartOrder({ orderId: orderId as string }),
     );
 
-    setTimeout(() => {
+    if (meta.requestStatus !== 'rejected') {
       router.push({
         pathname: companyPaths.ManageOrderDetail,
         query: { orderId },
       });
-    }, 1000);
+    }
   };
 
   return (
