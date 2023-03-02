@@ -61,11 +61,11 @@ const ManageDeletedListModal: React.FC<TManageDeletedListModalProps> = (
           className={css.root}
           isOpen={isOpen}
           handleClose={onClose}
-          containerClassName={css.modalContainer}>
+          containerClassName={css.modalContainer}
+          contentClassName={css.modalContentContainer}>
           <ManageDeletedListForm
             setAction={handleChangeAction}
             deletedTabData={deletedTabData}
-            className={css.contentContainer}
             onSubmit={handleSubmit}
           />
         </Modal>

@@ -8,7 +8,6 @@
   margin: 0;
   padding: 0;
   border: none;
-  max-height: 268px;
   margin-bottom: 24px;
 
   .list {
@@ -20,8 +19,11 @@
     flex-wrap: wrap;
 
     @include viewportMedium {
+      max-height: 288px;
+      overflow: hidden auto;
       li {
         flex-basis: calc(50% - 8px);
+        max-width: calc(50% - 8px);
       }
     }
 
