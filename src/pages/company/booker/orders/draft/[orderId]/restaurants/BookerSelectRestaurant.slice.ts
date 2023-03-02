@@ -101,10 +101,10 @@ const initialState: TOrderInitialState = {
 };
 
 // ================ Thunk types ================ //
-const FETCH_SEARCH_FILTER = 'app/BookerDraftOrderPage/FETCH_SEARCH_FILTER';
-const SEARCH_RESTAURANT = 'app/BookerDraftOrderPage/SEARCH_RESTAURANT';
+const FETCH_SEARCH_FILTER = 'app/BookerSelectRestaurant/FETCH_SEARCH_FILTER';
+const SEARCH_RESTAURANT = 'app/BookerSelectRestaurant/SEARCH_RESTAURANT';
 const FETCH_FOOD_LIST_FROM_RESTAURANT =
-  'app/BookerDraftOrderPage/FETCH_FOOD_LIST_FROM_RESTAURANT';
+  'app/BookerSelectRestaurant/FETCH_FOOD_LIST_FROM_RESTAURANT';
 const FETCH_ORDER = 'app/BookerSelectRestaurant/FETCH_ORDER';
 const FETCH_PLAN_DETAIL = 'app/BookerSelectRestaurant/FETCH_PLAN_DETAIL';
 const UPDATE_PLAN_DETAIL = 'app/BookerSelectRestaurant/UPDATE_PLAN_DETAIL';
@@ -246,6 +246,13 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
       combinedRestaurantMenuData.find(
         (item) => item.restaurantId === restaurantId,
       )?.menuId;
+    const menuListing = denormalisedResponseEntities(
+      await sdk.listings.show({
+        id: menuId,
+      }),
+    )[0];
+    const foodIdList =
+      Listing(menuListing).getMetadata()?.[`${dayOfWeek}FoodIdList`];
     const { order } = getState().Order;
     const { nutritions = [], packagePerMember } = Listing(
       order as TListing,
@@ -259,6 +266,7 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
       ...(nutritions.length > 0
         ? { pub_nutritions: `has_any:${nutritions.join(',')}` }
         : {}),
+      ids: foodIdList.join(','),
       include: ['images'],
       ...(keywords && { keywords }),
     });
