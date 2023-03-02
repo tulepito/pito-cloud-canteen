@@ -34,10 +34,10 @@ export type TCreateOrderFormValues = {
 const validate = (values: TCreateOrderFormValues) => {
   const errors: any = {};
   if (!values.company) {
-    errors.company = 'Required';
+    errors.company = 'Vui lòng chọn công ty cần đặt đơn';
   }
   if (values.usePreviousData && !values.previousOrder) {
-    errors.previousOrder = 'Required';
+    errors.previousOrder = 'Vui lòng chọn đơn hàng cũ';
   }
   return errors;
 };

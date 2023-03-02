@@ -25,13 +25,7 @@ export type TUnitBudgetFormValues = {
 const validate = (values: TUnitBudgetFormValues) => {
   const errors: any = {};
   if (!values.packagePerMember) {
-    errors.packagePerMember = 'Required';
-  }
-  if (
-    values.packagePerMember &&
-    +`${values.packagePerMember}`.replaceAll(',', '') < 40000
-  ) {
-    errors.packagePerMember = 'Min price is 40,000đ';
+    errors.packagePerMember = 'Vui lòng nhập ngân sách';
   }
   return errors;
 };
@@ -92,9 +86,9 @@ const UnitBudgetForm: React.FC<TUnitBudgetFormProps> = ({
         className={css.numberInput}
         rightIcon={<VNDIcon />}
       />
-      <div className={css.minPriceNote}>
+      {/* <div className={css.minPriceNote}>
         <FormattedMessage id="Booker.CreateOrder.Form.field.price.minPrice" />
-      </div>
+      </div> */}
       {/* <Toggle
         label={intl.formatMessage({
           id: 'Booker.CreateOrder.Form.field.price.vat',
