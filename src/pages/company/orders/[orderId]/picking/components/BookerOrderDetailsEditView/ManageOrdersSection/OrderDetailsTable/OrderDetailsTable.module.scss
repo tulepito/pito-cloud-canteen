@@ -13,11 +13,12 @@
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      border-radius: 50%;
-      width: 16px;
-      height: 16px;
+      border-radius: 12px;
+      padding: 0 6px;
+      height: 24px;
       color: $neutralGray5;
       background-color: $neutralGray4;
+      line-height: 24px;
 
       &.numberActive {
         color: $neutralGray1;

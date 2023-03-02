@@ -4,50 +4,57 @@
 
 .modalRoot {
   .modalContentContainer {
-    margin-bottom: 24px;
+    @include viewportMedium {
+      max-height: 350px;
+      overflow: hidden auto;
+    }
 
-    .dateContainer {
-      padding-top: 12px;
-      position: relative;
+    .contentContainer {
+      margin-bottom: 24px;
 
-      &::after {
-        position: absolute;
-        content: '';
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 1px;
-        background-color: $neutralGray3;
-      }
+      .dateContainer {
+        padding-top: 12px;
+        position: relative;
 
-      .dateTitle {
-        @include textTemplate(14px, 700, 20px);
-      }
+        &::after {
+          position: absolute;
+          content: '';
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background-color: $neutralGray3;
+        }
 
-      .contentContainer {
-        padding: 12px 0;
-        display: flex;
-        flex-direction: column;
-        row-gap: 8px;
-        .row {
+        .dateTitle {
+          @include textTemplate(14px, 700, 20px);
+        }
+
+        .contentContainer {
+          padding: 12px 0;
           display: flex;
-          justify-content: space-between;
-          @include textTemplate(14px, 400, 20px);
+          flex-direction: column;
+          row-gap: 8px;
+          .row {
+            display: flex;
+            justify-content: space-between;
+            @include textTemplate(14px, 400, 20px);
 
-          & > div:nth-of-type(1) {
-            flex-basis: 30%;
-          }
-          & > div:nth-of-type(2) {
-            flex-basis: 45%;
-          }
-          & > div:nth-of-type(3) {
-            text-align: right;
-            flex-basis: 20%;
-          }
+            & > div:nth-of-type(1) {
+              flex-basis: 30%;
+            }
+            & > div:nth-of-type(2) {
+              flex-basis: 45%;
+            }
+            & > div:nth-of-type(3) {
+              text-align: right;
+              flex-basis: 20%;
+            }
 
-          .head {
-            color: $neutralGray5;
-            @include textTemplate(12px, 400, 16px);
+            .head {
+              color: $neutralGray5;
+              @include textTemplate(12px, 400, 16px);
+            }
           }
         }
       }

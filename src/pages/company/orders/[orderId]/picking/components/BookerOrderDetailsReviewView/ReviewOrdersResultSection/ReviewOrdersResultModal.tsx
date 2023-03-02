@@ -133,8 +133,9 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
       })}
       isOpen={isOpen}
       handleClose={onClose}
-      className={css.modalRoot}>
-      <div className={css.modalContentContainer}>
+      className={css.modalRoot}
+      contentClassName={css.modalContentContainer}>
+      <div className={css.contentContainer}>
         {preparedData.map((dateItem) => {
           const { date, orderData } = dateItem;
 
