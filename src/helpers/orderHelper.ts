@@ -11,6 +11,7 @@ import {
   EOrderDraftStates,
   EParticipantOrderStatus,
 } from '@utils/enums';
+import type { TPlan } from '@utils/orderTypes';
 import type { TListing } from '@utils/types';
 import { addDays, min, subDays } from 'date-fns';
 import isEmpty from 'lodash/isEmpty';
@@ -130,4 +131,21 @@ export const isEnableSubmitPublishOrder = (
   });
 
   return isOrderValid && isOrderDetailSetupCompleted && isOrderDetailHasData;
+};
+
+export const isEnableToStartOrder = (orderDetail: TPlan['orderDetail']) => {
+  return (
+    !isEmpty(orderDetail) &&
+    Object.values(orderDetail).some(({ restaurant, memberOrders }) => {
+      const { id, restaurantName, foodList } = restaurant;
+      const isSetupRestaurant =
+        !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
+
+      const hasAnyOrders = Object.values(memberOrders).some(
+        ({ foodId, status }) => isJoinedPlan(foodId, status),
+      );
+
+      return isSetupRestaurant && hasAnyOrders;
+    })
+  );
 };

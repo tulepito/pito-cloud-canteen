@@ -31,7 +31,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
 
   const dispatch = useAppDispatch();
   const {
-    query: { orderId, timestamp },
+    query: { timestamp },
   } = useRouter();
   const intl = useIntl();
   const [currentViewDate, setCurrentViewDate] = useState(
@@ -95,8 +95,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
 
   const handleDateTabChange = ({ id }: TTabsItem) => {
     setCurrentViewDate(Number(id));
-    if (orderId && timestamp?.toString() !== id.toString())
-      historyPushState('timestamp', id);
+    historyPushState('timestamp', id);
   };
 
   return (
