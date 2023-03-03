@@ -2,6 +2,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { checkUnConflictedMenuMiddleware } from '@pages/api/helpers/menuHelpers';
 import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -29,4 +30,4 @@ const handlerWithCustomParams = (req: NextApiRequest, res: NextApiResponse) => {
   return checkUnConflictedMenuMiddleware(handler)(req, res, dataToCheck);
 };
 
-export default cookies(handlerWithCustomParams);
+export default cookies(adminChecker(handlerWithCustomParams));

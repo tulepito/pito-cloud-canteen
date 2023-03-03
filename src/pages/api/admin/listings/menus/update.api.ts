@@ -5,6 +5,7 @@ import {
   updateMenuIdListAndMenuWeekDayListForFood,
 } from '@pages/api/helpers/menuHelpers';
 import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -46,4 +47,4 @@ const handlerWithCustomParams = (req: NextApiRequest, res: NextApiResponse) => {
   return checkUnConflictedMenuMiddleware(handler)(req, res, dataToCheck);
 };
 
-export default cookies(handlerWithCustomParams);
+export default cookies(adminChecker(handlerWithCustomParams));

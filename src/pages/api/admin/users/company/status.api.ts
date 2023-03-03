@@ -1,4 +1,5 @@
 import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk } from '@services/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -19,4 +20,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   res.json(response);
 }
 
-export default cookies(handler);
+export default cookies(adminChecker(handler));
