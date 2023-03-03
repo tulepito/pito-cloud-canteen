@@ -75,6 +75,7 @@ const Tabs: React.FC<ITabsProps> = (props) => {
     }
     setActiveTabKey(+activeTabKey + 1);
   };
+
   useEffect(() => {
     onChangeTab(Number(defaultActiveKey || 1))();
   }, [defaultActiveKey]);

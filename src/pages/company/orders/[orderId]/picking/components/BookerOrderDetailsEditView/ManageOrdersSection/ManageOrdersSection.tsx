@@ -1,18 +1,19 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { Listing } from '@utils/data';
-import { EParticipantOrderStatus } from '@utils/enums';
-import type { TListing, TObject, TUser } from '@utils/types';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { formatTimestamp } from '@utils/dates';
+import { historyPushState } from '@utils/history';
 import isEmpty from 'lodash/isEmpty';
-import { DateTime } from 'luxon';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { orderManagementThunks } from '../../../OrderManagement.slice';
 import type { TAddOrderFormValues } from './AddOrderForm';
 import AddOrderForm from './AddOrderForm';
+import { usePrepareManageOrdersSectionData } from './hooks/usePrepareManageOrdersSectionData';
 import css from './ManageOrdersSection.module.scss';
 import OrderDetailsTable from './OrderDetailsTable/OrderDetailsTable';
 
@@ -29,74 +30,25 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
   } = props;
 
   const dispatch = useAppDispatch();
+  const {
+    query: { orderId, timestamp },
+  } = useRouter();
   const intl = useIntl();
   const [currentViewDate, setCurrentViewDate] = useState(startDate);
-  const { planData, participantData, orderData } = useAppSelector(
-    (state) => state.OrderManagement,
-  );
-
-  const { participants = [] } = Listing(orderData as TListing).getMetadata();
-  const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
-  const dateList = Object.entries(orderDetail).reduce<number[]>(
-    (prev, [date, orderOnDate]) => {
-      const { restaurant } = orderOnDate as TObject;
-
-      return !isEmpty(restaurant?.foodList) ? prev.concat(Number(date)) : prev;
-    },
-    [],
-  );
-
-  const { restaurant = {}, memberOrders = {} } =
-    orderDetail[currentViewDate.toString()] || {};
-  const { foodList = {} } = restaurant;
-
-  const foodOptions = Object.entries<TObject>(foodList).map(
-    ([foodId, foodData]) => {
-      return {
-        foodId,
-        foodName: foodData?.foodName || '',
-      };
-    },
-  );
-
-  // Available member IDs to add order details
-  const availableMemberIds = isEmpty(memberOrders)
-    ? participants
-    : (participants as string[]).reduce<string[]>((result, participantId) => {
-        const { status = EParticipantOrderStatus.empty } =
-          memberOrders[participantId] || {};
-
-        return [
-          EParticipantOrderStatus.empty,
-          EParticipantOrderStatus.notJoined,
-        ].includes(status)
-          ? result.concat(participantId)
-          : result;
-      }, []);
-
-  const memberOptions = availableMemberIds.map((memberId: string) => {
-    const participant = participantData.find(
-      (p: TUser) => p.id.uuid === memberId,
-    );
-
-    const memberName =
-      participant?.attributes.profile.displayName ||
-      participant?.attributes.email ||
-      '';
-
-    return {
-      memberId,
-      memberName,
-    };
-  });
+  const {
+    dateList = [],
+    defaultActiveKey,
+    memberOptions,
+    foodOptions,
+  } = usePrepareManageOrdersSectionData(currentViewDate);
 
   const handleSubmitAddSelection = (values: TAddOrderFormValues) => {
-    const { participantId, requirement, foodId } = values;
+    const { participantId: memberId, requirement = '', foodId } = values;
 
     const updateValues = {
-      memberId: participantId,
+      memberId,
       foodId,
-      requirement: requirement || '',
+      requirement,
       currentViewDate,
     };
 
@@ -104,9 +56,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
   };
 
   const items = dateList.map((date) => {
-    const formattedDate = DateTime.fromMillis(date).toFormat('EEE, dd/MM', {
-      locale: 'vi',
-    });
+    const formattedDate = formatTimestamp(date, 'EEE, dd/MM');
 
     return {
       label: <div>{formattedDate}</div>,
@@ -143,20 +93,21 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
 
   const handleDateTabChange = ({ id }: TTabsItem) => {
     setCurrentViewDate(Number(id));
+    if (orderId && (timestamp as string) !== id.toString())
+      historyPushState('timestamp', id);
   };
 
   return (
     <RenderWhen condition={!isEmpty(dateList)}>
-      <RenderWhen.True>
-        <div className={css.root}>
-          <Tabs
-            items={items}
-            onChange={handleDateTabChange}
-            showNavigation
-            middleLabel
-          />
-        </div>
-      </RenderWhen.True>
+      <div className={css.root}>
+        <Tabs
+          items={items}
+          onChange={handleDateTabChange}
+          showNavigation
+          middleLabel
+          defaultActiveKey={defaultActiveKey.toString()}
+        />
+      </div>
     </RenderWhen>
   );
 };
