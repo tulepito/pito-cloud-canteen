@@ -497,7 +497,7 @@ const requestApprovalOrder = createAsyncThunk(
   async ({ orderId }: TObject) => {
     const { data: responseData } = await requestApprovalOrderApi(orderId);
 
-    return responseData.data;
+    return responseData;
   },
 );
 

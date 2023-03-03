@@ -63,9 +63,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             ),
           );
 
-          res.status(200).json({
-            order: updatedOrderListing,
-          });
+          res.status(200).json(updatedOrderListing);
         }
 
         break;

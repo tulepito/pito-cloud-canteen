@@ -163,6 +163,11 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const updateOrderInProgress = useAppSelector(
     (state) => state.Order.updateOrderInProgress,
   );
+  const updateOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.updateOrderDetailInProgress,
+  );
+
+  const submitInProgress = updateOrderInProgress || updateOrderDetailInProgress;
 
   const {
     value: isSuccessModalOpen,
@@ -204,11 +209,13 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
 
     if (planId && orderId) {
-      orderAsyncActions.updatePlanDetail({
-        orderId,
-        planId,
-        orderDetail,
-      });
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId,
+          orderDetail,
+        }),
+      );
     }
     if (orderState === EOrderDraftStates.draft) {
       await dispatch(orderAsyncActions.requestApprovalOrder({ orderId }));
@@ -313,7 +320,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
               <NavigateButtons
                 goBack={goBack}
                 submitDisabled={invalid}
-                inProgress={updateOrderInProgress}
+                inProgress={submitInProgress}
               />
               {createOrderError && (
                 <div className={css.error}>{createOrderError}</div>
