@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -113,20 +114,20 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
     [
       packagePerMember,
       vatAllow,
-      selectedGroups,
+      JSON.stringify(selectedGroups),
       deliveryHour,
       deadlineDate,
       deadlineHour,
-      deliveryAddress,
+      JSON.stringify(deliveryAddress),
       detailAddress,
       address,
-      origin,
+      JSON.stringify(origin),
       startDate,
       endDate,
       memberAmount,
-      initialFieldValues,
-      nutritions,
-      dayInWeek,
+      JSON.stringify(initialFieldValues),
+      JSON.stringify(nutritions),
+      JSON.stringify(dayInWeek),
     ],
   );
   const leftSideRenderer = () =>
