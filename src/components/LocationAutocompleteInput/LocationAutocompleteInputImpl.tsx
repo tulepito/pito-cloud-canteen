@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
-import classNames from 'classnames';
 import React, { useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
+
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 
 import config from '../../configs';
+
 import GeocoderGoogleMaps, {
   CURRENT_LOCATION_ID,
   GeocoderAttribution,
 } from './GeocoderGoogleMaps';
 import IconCurrentLocation from './IconCurrentLocation';
+
 import css from './LocationAutocompleteInput.module.scss';
 
 // A list of default predictions that can be shown when the user

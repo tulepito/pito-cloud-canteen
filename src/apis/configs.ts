@@ -1,7 +1,8 @@
-import cookies from '@services/cookie';
-import type { TObject } from '@utils/types';
 import axios from 'axios';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+
+import cookies from '@services/cookie';
+import type { TObject } from '@utils/types';
 
 export const apiBaseUrl = () => {
   const port = process.env.NEXT_PUBLIC_PORT || 3000;

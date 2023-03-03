@@ -1,12 +1,14 @@
+import React from 'react';
+import { useIntl } from 'react-intl';
+import { DateTime } from 'luxon';
+
 import CountdownTimer from '@components/CountdownTimer/CountdownTimer';
 import Toggle from '@components/Toggle/Toggle';
 import useBoolean from '@hooks/useBoolean';
-import { DateTime } from 'luxon';
-import React from 'react';
-import { useIntl } from 'react-intl';
 
 import type { TNotificationSelectionFormValues } from '../NotificationSelectionForm/NotificationSelectionForm';
 import NotificationSelectionForm from '../NotificationSelectionForm/NotificationSelectionForm';
+
 import css from './SectionCountdown.module.scss';
 
 type TSectionCountDownProps = {

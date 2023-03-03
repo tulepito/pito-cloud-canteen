@@ -1,6 +1,7 @@
+import { useIntl } from 'react-intl';
+
 import Button from '@components/Button/Button';
 import Modal from '@components/Modal/Modal';
-import { useIntl } from 'react-intl';
 
 import css from './ConfirmClientModal.module.scss';
 

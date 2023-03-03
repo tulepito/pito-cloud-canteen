@@ -1,16 +1,19 @@
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { QuizActions } from '@redux/slices/Quiz.slice';
-import { quizPaths } from '@src/paths';
-import { useRouter } from 'next/router';
 import { useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
+
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { QuizActions } from '@redux/slices/Quiz.slice';
+import { quizPaths } from '@src/paths';
 
 import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
-import css from './QuizSpecialDemand.module.scss';
+
 import type { TSpecialDemandFormValues } from './SpecialDemandForm/SpecialDemandForm';
 import SpecialDemandForm from './SpecialDemandForm/SpecialDemandForm';
+
+import css from './QuizSpecialDemand.module.scss';
 
 const QuizSpecialDemand = () => {
   const intl = useIntl();

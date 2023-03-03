@@ -1,28 +1,31 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
+import { useEffect, useState } from 'react';
+import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
+
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { historyPushState } from '@utils/history';
 import type { TObject } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
 
 import { orderManagementThunks } from '../../../../OrderManagement.slice';
 import type { TEditOrderRowFormValues } from '../EditOrderRowForm';
 import EditOrderRowModal from '../EditOrderRowModal';
 import { usePrepareOrderDetailTableData } from '../hooks/usePrepareOrderDetailTableData';
-import css from './OrderDetailsTable.module.scss';
+
 import { EOrderDetailsTableTab, TABLE_TABS } from './OrderDetailsTable.utils';
 import { usePrepareTabItems } from './usePrepareTabItems';
 
-const findTabById = (tabId: string) => {
-  const tableTabList = Object.values(TABLE_TABS);
+import css from './OrderDetailsTable.module.scss';
 
-  const index = tableTabList.findIndex((tab) => {
-    return tab.id === tabId;
-  });
+const tableTabList = Object.values(TABLE_TABS);
+
+const findTabByValueOrId = (tabId: string) => {
+  const index = tableTabList.findIndex(
+    ({ value, id }) => value === tabId || id === tabId,
+  );
 
   return index > -1 ? { tab: tableTabList[index], index } : { index };
 };
@@ -122,13 +125,16 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   });
 
   const handleTabChange = ({ id }: TTabsItem) => {
-    setCurrentTab(id as EOrderDetailsTableTab);
-    historyPushState('tab', id);
+    const { tab } = findTabByValueOrId(id as string);
+    const tabValue = tab?.value;
+
+    setCurrentTab(tabValue as EOrderDetailsTableTab);
+    historyPushState('tab', tabValue!);
   };
 
   useEffect(() => {
     if (!isEmpty(tabId)) {
-      const { tab, index } = findTabById(tabId as string);
+      const { tab, index } = findTabByValueOrId(tabId as string);
 
       if (index > -1) {
         setCurrentTab(tab?.value as EOrderDetailsTableTab);

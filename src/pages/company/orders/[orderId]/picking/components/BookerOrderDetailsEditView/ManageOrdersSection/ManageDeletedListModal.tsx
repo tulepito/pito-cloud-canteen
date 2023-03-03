@@ -1,13 +1,15 @@
-import Modal from '@components/Modal/Modal';
-import type { TObject } from '@utils/types';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
+
+import Modal from '@components/Modal/Modal';
+import type { TObject } from '@utils/types';
 
 import type { TManageDeletedListFormValues } from './ManageDeletedListForm';
 import {
   ManageDeletedListForm,
   ManageDeletedListFormAction,
 } from './ManageDeletedListForm';
+
 import css from './ManageDeletedListModal.module.scss';
 
 type TManageDeletedListModalProps = {

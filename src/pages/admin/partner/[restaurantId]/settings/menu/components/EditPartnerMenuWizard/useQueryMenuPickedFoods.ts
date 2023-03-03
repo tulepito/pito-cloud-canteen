@@ -1,8 +1,9 @@
+import { useEffect, useState } from 'react';
+
 import { useAppDispatch } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import type { TIntegrationListing } from '@utils/types';
-import { useEffect, useState } from 'react';
 
 const useQueryMenuPickedFoods = ({
   restaurantId,

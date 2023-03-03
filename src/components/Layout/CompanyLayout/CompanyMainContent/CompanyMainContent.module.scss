@@ -5,7 +5,7 @@
 .root {
   margin-top: 72px;
 
-  @include viewportLarge {
+  @include viewportMedium {
     margin-top: 81px;
   }
 

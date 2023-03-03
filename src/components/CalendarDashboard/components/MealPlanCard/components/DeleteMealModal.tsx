@@ -1,6 +1,7 @@
+import { useIntl } from 'react-intl';
+
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import AlertModal from '@components/Modal/AlertModal';
-import { useIntl } from 'react-intl';
 
 import css from './DeleteMealModal.module.scss';
 

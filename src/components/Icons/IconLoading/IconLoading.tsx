@@ -1,5 +1,6 @@
-import type { TIconProps } from '@utils/types';
 import classNames from 'classnames';
+
+import type { TIconProps } from '@utils/types';
 
 const IconLoading: React.FC<TIconProps> = (props) => {
   const { rootClassName, className } = props;

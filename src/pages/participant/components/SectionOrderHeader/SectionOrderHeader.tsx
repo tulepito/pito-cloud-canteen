@@ -2,6 +2,7 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 
 import { VIEWS } from '../../helpers/constants';
+
 import css from './SectionOrderHeader.module.scss';
 
 type TSectionOrderHeaderProps = {

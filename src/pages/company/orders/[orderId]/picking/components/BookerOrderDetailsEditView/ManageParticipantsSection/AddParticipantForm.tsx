@@ -1,10 +1,11 @@
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { emailFormatValid } from '@utils/validators';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import css from './AddParticipantForm.module.scss';
 

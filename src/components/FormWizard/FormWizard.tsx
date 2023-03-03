@@ -1,8 +1,9 @@
-import classNames from 'classnames';
 import type { ReactElement } from 'react';
 import React from 'react';
+import classNames from 'classnames';
 
 import FormTabs from './FormTabs/FormTabs';
+
 import css from './FormWizard.module.scss';
 
 type TFormWizardProps = {

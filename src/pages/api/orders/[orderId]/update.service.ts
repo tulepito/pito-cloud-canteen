@@ -1,9 +1,10 @@
+import isEmpty from 'lodash/isEmpty';
+
 import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
-import isEmpty from 'lodash/isEmpty';
 
 const updateOrder = async ({
   orderId,

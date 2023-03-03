@@ -1,11 +1,13 @@
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import { useAppSelector } from '@hooks/reduxHooks';
 import type { TDefaultProps, TObject } from '@utils/types';
-import classNames from 'classnames';
-import { useIntl } from 'react-intl';
 
 import { orderDetailsAnyActionsInProgress } from '../../../OrderManagement.slice';
+
 import css from './BookerOrderDetailsTitle.module.scss';
 
 type TBookerOrderDetailsTitleProps = TDefaultProps & {

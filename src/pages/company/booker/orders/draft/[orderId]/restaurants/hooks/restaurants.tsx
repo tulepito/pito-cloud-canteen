@@ -1,9 +1,10 @@
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { selectCalendarDate } from '@redux/slices/Order.slice';
-import { DateTime } from 'luxon';
-import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
+import { DateTime } from 'luxon';
+import { useRouter } from 'next/router';
+
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { selectCalendarDate } from '@redux/slices/Order.slice';
 
 import { BookerSelectRestaurantThunks } from '../BookerSelectRestaurant.slice';
 import { convertQueryValueToArray } from '../helpers/urlQuery';
@@ -21,6 +22,7 @@ export const useSearchRestaurants = () => {
     distance,
     rating,
     keywords,
+    packaging,
   } = router.query;
 
   const restaurants = useAppSelector(
@@ -69,6 +71,9 @@ export const useSearchRestaurants = () => {
           : {}),
         ...(distance ? { distance: convertQueryValueToArray(distance) } : {}),
         ...(rating ? { rating: convertQueryValueToArray(rating) } : {}),
+        ...(packaging
+          ? { packaging: convertQueryValueToArray(packaging) }
+          : {}),
         ...(keywords ? { keywords: keywords as string } : {}),
       }),
     );
@@ -82,6 +87,7 @@ export const useSearchRestaurants = () => {
     rating,
     timestamp,
     keywords,
+    packaging,
   ]);
 
   return {

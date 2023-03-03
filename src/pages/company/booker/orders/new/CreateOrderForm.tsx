@@ -1,10 +1,11 @@
+import { useField, useForm } from 'react-final-form-hooks';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
+
 import Button, { InlineTextButton } from '@components/Button/Button';
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
 import Toggle from '@components/Toggle/Toggle';
-import classNames from 'classnames';
-import isEmpty from 'lodash/isEmpty';
-import { useField, useForm } from 'react-final-form-hooks';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './BookerNewOrder.module.scss';
 

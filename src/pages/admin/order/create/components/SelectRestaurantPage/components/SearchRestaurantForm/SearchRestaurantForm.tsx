@@ -1,12 +1,13 @@
-import Form from '@components/Form/Form';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import IconSearch from '@components/Icons/IconSearch/IconSearch';
-import type { TDefaultProps } from '@utils/types';
 import type { ReactNode } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
+
+import Form from '@components/Form/Form';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconSearch from '@components/Icons/IconSearch/IconSearch';
+import type { TDefaultProps } from '@utils/types';
 
 import css from './SearchRestaurantForm.module.scss';
 

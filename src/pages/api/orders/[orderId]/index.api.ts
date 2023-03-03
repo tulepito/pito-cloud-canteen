@@ -1,7 +1,8 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { HTTP_METHODS } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
 import { handleError } from '@services/sdk';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 import getOrder from './get.service';
 import updateOrder from './update.service';

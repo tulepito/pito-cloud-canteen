@@ -1,4 +1,8 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
+
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
 import {
@@ -11,14 +15,11 @@ import { companyPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 import { EBookerOrderDraftStates, EOrderDraftStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
 import LayoutSidebar from '../../components/Layout/LayoutSidebar';
-import css from './BookerDraftOrder.module.scss';
+
 import SidebarContent from './components/SidebarContent/SidebarContent';
 import { useGetPlanDetails, useLoadData } from './hooks/loadData';
 import {
@@ -26,6 +27,8 @@ import {
   useGetCalendarExtraResources,
 } from './restaurants/hooks/calendar';
 import { useGetBoundaryDates } from './restaurants/hooks/dateTime';
+
+import css from './BookerDraftOrder.module.scss';
 
 const EnableToAccessPageOrderStates = [
   EOrderDraftStates.pendingApproval,

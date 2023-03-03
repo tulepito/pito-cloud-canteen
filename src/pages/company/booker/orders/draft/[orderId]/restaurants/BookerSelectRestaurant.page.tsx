@@ -1,8 +1,8 @@
-import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import { companyPaths } from '@src/paths';
 import { useRouter } from 'next/router';
 
-import css from './BookerSelectRestaurant.module.scss';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import { companyPaths } from '@src/paths';
+
 import FilterLabelsSection from './components/FilterLabels/FilterLabelsSection';
 import FilterSidebar from './components/FilterSidebar/FilterSidebar';
 import KeywordSearchSection from './components/KeywordSearchSection/KeywordSearchSection';
@@ -16,6 +16,8 @@ import SortingSection from './components/SortingSection/SortingSection';
 import { useGetCompanyAccount } from './hooks/company';
 import { useGetOrder } from './hooks/orderData';
 import { useSearchRestaurants } from './hooks/restaurants';
+
+import css from './BookerSelectRestaurant.module.scss';
 
 function BookerSelectRestaurant() {
   const router = useRouter();

@@ -1,6 +1,7 @@
 import { FormattedMessage } from 'react-intl';
 
 import CreateOrderWizard from './components/CreateOrderWizard/CreateOrderWizard';
+
 import css from './CreateOrder.module.scss';
 
 const CreateOrderPage = () => {

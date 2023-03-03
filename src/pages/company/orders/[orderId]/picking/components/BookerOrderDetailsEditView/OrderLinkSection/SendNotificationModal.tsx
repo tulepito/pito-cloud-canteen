@@ -1,13 +1,15 @@
+import React, { useState } from 'react';
+import { useIntl } from 'react-intl';
+
 import ButtonIcon from '@components/ButtonIcon/ButtonIcon';
 import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import Modal from '@components/Modal/Modal';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { formatTimestamp } from '@utils/dates';
-import React, { useState } from 'react';
-import { useIntl } from 'react-intl';
 
 import type { TSendNotificationFormValues } from './SendNotificationForm';
 import SendNotificationForm from './SendNotificationForm';
+
 import css from './SendNotificationModal.module.scss';
 
 type SendNotificationModalProps = {

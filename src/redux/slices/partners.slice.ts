@@ -1,3 +1,6 @@
+import { createSlice } from '@reduxjs/toolkit';
+import omit from 'lodash/omit';
+
 import {
   createDraftPartnerApi,
   deletePartnerApi,
@@ -8,7 +11,6 @@ import {
   updateRestaurantStatusApi,
 } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
 import {
   EImageVariants,
@@ -17,7 +19,6 @@ import {
 } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TObject, TPagination } from '@utils/types';
-import omit from 'lodash/omit';
 
 export const MANAGE_PARTNER_RESULT_PAGE_SIZE = 10;
 

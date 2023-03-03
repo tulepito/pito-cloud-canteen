@@ -4,7 +4,6 @@
   @include textTemplate(14px, 400, 24px);
 
   .breadCrumb {
-    margin-top: 32px;
     padding: 0 16px;
     display: flex;
     column-gap: 8px;
@@ -18,6 +17,10 @@
 
     .orderName {
       font-weight: 700;
+    }
+
+    .orderNameSkeleton {
+      width: 160px;
     }
   }
 

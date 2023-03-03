@@ -1,5 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { HTTP_METHODS } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
@@ -8,7 +10,6 @@ import {
   denormalisedResponseEntities,
   Listing,
 } from '@utils/data';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 const fetchSubOrder = async (orderDetail: any, currentUserId: string) => {
   let orderDetailResult = {};

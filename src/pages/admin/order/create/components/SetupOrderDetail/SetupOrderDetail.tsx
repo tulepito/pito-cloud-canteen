@@ -1,4 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useCallback, useEffect, useMemo } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
+import { DateTime } from 'luxon';
+
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
@@ -23,12 +30,6 @@ import {
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
-import classNames from 'classnames';
-import isEmpty from 'lodash/isEmpty';
-import { DateTime } from 'luxon';
-import { useCallback, useEffect, useMemo } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../NavigateButtons/NavigateButtons';
@@ -38,6 +39,7 @@ import OrderSettingModal, {
 import type { TSelectFoodFormValues } from '../SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
 import SelectFoodModal from '../SelectFoodModal/SelectFoodModal';
 import SelectRestaurantPage from '../SelectRestaurantPage/SelectRestaurant.page';
+
 import css from './SetupOrderDetail.module.scss';
 
 type TSetupOrderDetailProps = {

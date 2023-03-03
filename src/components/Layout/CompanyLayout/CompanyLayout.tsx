@@ -1,3 +1,9 @@
+import type { PropsWithChildren } from 'react';
+import { useEffect, useState } from 'react';
+import { shallowEqual } from 'react-redux';
+import filter from 'lodash/filter';
+import { useRouter } from 'next/router';
+
 import Dropdown from '@components/CompanyLayout/Dropdown/Dropdown';
 import FeatureIcons from '@components/FeatureIcons/FeatureIcons';
 import FeaturesHeader from '@components/FeaturesHeader/FeaturesHeader';
@@ -7,19 +13,14 @@ import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
 import { CurrentUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
-import filter from 'lodash/filter';
-import { useRouter } from 'next/router';
-import type { PropsWithChildren } from 'react';
-import { useEffect, useState } from 'react';
-import { shallowEqual } from 'react-redux';
 
 import CompanyHeader from './CompanyHeader/CompanyHeader';
+import CompanyMainContent from './CompanyMainContent/CompanyMainContent';
+import CompanySidebar from './CompanySidebar/CompanySidebar';
 import {
   shouldShowFeatureHeader,
   shouldShowSidebar,
 } from './companyLayout.helpers';
-import CompanyMainContent from './CompanyMainContent/CompanyMainContent';
-import CompanySidebar from './CompanySidebar/CompanySidebar';
 
 const companySettingPaths = [
   companyPaths.Account,

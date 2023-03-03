@@ -1,6 +1,7 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import { createCompanyApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
 
 type TCreateCompanyState = {

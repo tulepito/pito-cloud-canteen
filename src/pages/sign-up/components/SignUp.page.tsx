@@ -1,9 +1,10 @@
+import { FormattedMessage } from 'react-intl';
+
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
 import { currentUserSelector, userThunks } from '@redux/slices/user.slice';
 import { isSignUpEmailTakenError } from '@utils/errors';
 import { splitNameFormFullName } from '@utils/string';
-import { FormattedMessage } from 'react-intl';
 
 import EmailVerification from './EmailVerification';
 import type { TSignUpFormValues } from './SignUpForm';

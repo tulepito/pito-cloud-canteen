@@ -1,4 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
@@ -7,24 +11,22 @@ import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { calculateDistance } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import useLockBodyScroll from '@hooks/useDisableBodyScroll';
 import { Listing } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
-import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
 
 import { BookerSelectRestaurantThunks } from '../../BookerSelectRestaurant.slice';
 import { getListingImageById } from '../../helpers';
 import { useGetPlanDetails } from '../../hooks/orderData';
 import { useGetRestaurant } from '../../hooks/restaurants';
 import FoodDetailModal from '../FoodDetailModal/FoodDetailModal';
+
 import FoodListSection from './FoodListSection';
 import ResultDetailFilters from './ResultDetailFilters';
 import ResultDetailHeader from './ResultDetailHeader';
-import css from './ResultDetailModal.module.scss';
 import TopContent from './TopContent';
+
+import css from './ResultDetailModal.module.scss';
 
 type TResultDetailModalProps = {
   isOpen?: boolean;
@@ -55,7 +57,6 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   fetchFoodInProgress,
 }) => {
   const intl = useIntl();
-  useLockBodyScroll();
   const router = useRouter();
   const { timestamp } = router.query;
 

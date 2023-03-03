@@ -1,6 +1,7 @@
-import type { TObject } from '@utils/types';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+
+import type { TObject } from '@utils/types';
 
 type TRedirectLinkProps = { pathname: string; query?: TObject };
 

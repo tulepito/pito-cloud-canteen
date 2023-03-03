@@ -1,8 +1,9 @@
+import React from 'react';
+import { useRouter } from 'next/router';
+
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import { companyPaths, personalPaths } from '@src/paths';
-import { useRouter } from 'next/router';
-import React from 'react';
 
 import css from './CompanySidebar.module.scss';
 

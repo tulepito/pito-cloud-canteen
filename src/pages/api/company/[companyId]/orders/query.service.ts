@@ -1,3 +1,5 @@
+import { isEmpty } from 'lodash';
+
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import {
@@ -6,7 +8,6 @@ import {
 } from '@utils/enums';
 import type { TPlan } from '@utils/orderTypes';
 import type { TCompany, TIntegrationOrderListing, TObject } from '@utils/types';
-import { isEmpty } from 'lodash';
 
 export const queryCompanyOrders = async ({
   companyId,

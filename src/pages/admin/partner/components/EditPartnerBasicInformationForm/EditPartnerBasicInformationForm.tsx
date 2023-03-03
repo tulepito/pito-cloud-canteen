@@ -1,3 +1,9 @@
+import React, { useMemo, useRef, useState } from 'react';
+import { Field, Form as FinalForm } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import arrayMutators from 'final-form-arrays';
+import isEqual from 'lodash/isEqual';
+
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
@@ -31,11 +37,6 @@ import {
   validFacebookUrl,
   validURL,
 } from '@utils/validators';
-import arrayMutators from 'final-form-arrays';
-import isEqual from 'lodash/isEqual';
-import React, { useMemo, useRef, useState } from 'react';
-import { Field, Form as FinalForm } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import {
   createAvailabilityPlanInitialValues,
@@ -44,6 +45,7 @@ import {
   getLocationInitialValues,
 } from '../EditPartnerWizardTab/utils';
 import FieldBankAccounts from '../FieldBankAccounts/FieldBankAccounts';
+
 import css from './EditPartnerBasicInformationForm.module.scss';
 
 // const identity = (v: any) => v;

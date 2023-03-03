@@ -1,9 +1,10 @@
+import React from 'react';
+import { Field } from 'react-final-form';
+import classNames from 'classnames';
+
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import useBoolean from '@hooks/useBoolean';
-import classNames from 'classnames';
-import React from 'react';
-import { Field } from 'react-final-form';
 
 import css from './FieldMultipleSelect.module.scss';
 

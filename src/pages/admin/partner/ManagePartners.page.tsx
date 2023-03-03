@@ -1,4 +1,10 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import React, { useEffect, useMemo } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldMultipleSelect from '@components/FormFields/FieldMultipleSelect/FieldMultipleSelect';
@@ -19,11 +25,6 @@ import {
   ERestaurantListingStatus,
   RESTAURANT_STATUS_OPTIONS,
 } from '@utils/enums';
-import classNames from 'classnames';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import React, { useEffect, useMemo } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './ManagePartners.module.scss';
 

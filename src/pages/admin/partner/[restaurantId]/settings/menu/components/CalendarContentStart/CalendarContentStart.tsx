@@ -1,9 +1,10 @@
+import React from 'react';
+import { FormattedMessage } from 'react-intl';
+
 import { InlineTextButton } from '@components/Button/Button';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import { IntegrationListing } from '@utils/data';
 import { getDayOfWeekByIndex } from '@utils/dates';
-import React from 'react';
-import { FormattedMessage } from 'react-intl';
 
 import css from './CalendarContentStart.module.scss';
 

@@ -1,3 +1,7 @@
+import React, { useEffect, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+
 import IconDanger from '@components/Icons/IconDanger/IconDanger';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import AlertModal from '@components/Modal/AlertModal';
@@ -5,9 +9,6 @@ import NamedLink from '@components/NamedLink/NamedLink';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { menusSliceThunks } from '@redux/slices/menus.slice';
 import { adminRoutes } from '@src/paths';
-import React, { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import css from './RemoveMenuConfirmModal.module.scss';
 

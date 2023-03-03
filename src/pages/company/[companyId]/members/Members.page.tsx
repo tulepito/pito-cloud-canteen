@@ -1,3 +1,8 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
@@ -17,12 +22,9 @@ import {
 } from '@redux/slices/companyMember.slice';
 import { ensureUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import AddCompanyMembersModal from './components/AddCompanyMembersModal/AddCompanyMembersModal';
+
 import css from './Members.module.scss';
 
 const MembersPage = () => {

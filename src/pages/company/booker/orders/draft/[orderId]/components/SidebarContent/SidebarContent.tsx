@@ -1,3 +1,11 @@
+import { useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import difference from 'lodash/difference';
+import isEqual from 'lodash/isEqual';
+import { DateTime } from 'luxon';
+
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { getInitialLocationValues } from '@helpers/mapHelpers';
@@ -6,13 +14,6 @@ import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing, User } from '@utils/data';
 import { getDaySessionFromDeliveryTime } from '@utils/dates';
 import type { TListing, TUser } from '@utils/types';
-import classNames from 'classnames';
-import difference from 'lodash/difference';
-import isEqual from 'lodash/isEqual';
-import { DateTime } from 'luxon';
-import { useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import AccessForm from '../../forms/AccessForm/AccessForm';
 import DeliveryTimeForm from '../../forms/DeliveryTimeForm/DeliveryTimeForm';
@@ -21,6 +22,7 @@ import LocationForm from '../../forms/LocationForm/LocationForm';
 import NumberEmployeesForm from '../../forms/NumberEmployeesForm/NumberEmployeesForm';
 import NutritionForm from '../../forms/NutritionForm/NutritionForm';
 import UnitBudgetForm from '../../forms/UnitBudgetForm/UnitBudgetForm';
+
 import css from './SidebarContent.module.scss';
 
 type TSidebarContentProps = {

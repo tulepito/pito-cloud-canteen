@@ -1,12 +1,13 @@
+import React from 'react';
+import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
+
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import useBoolean from '@hooks/useBoolean';
 import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
-import React from 'react';
-import { FormattedMessage } from 'react-intl';
 
 import css from './SelectSingleFilterPopup.module.scss';
 

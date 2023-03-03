@@ -1,10 +1,11 @@
-import Button from '@components/Button/Button';
-import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
-import NamedLink from '@components/NamedLink/NamedLink';
 import type { ChangeEventHandler } from 'react';
 import { useMemo } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
+
+import Button from '@components/Button/Button';
+import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import NamedLink from '@components/NamedLink/NamedLink';
 
 import css from './AccessForm.module.scss';
 

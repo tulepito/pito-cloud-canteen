@@ -1,17 +1,19 @@
+import { useImperativeHandle } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import type { FormApi } from 'final-form';
+import arrayMutators from 'final-form-arrays';
+
 import Form from '@components/Form/Form';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { MENU_MEAL_TYPE_OPTIONS, MENU_OPTIONS } from '@utils/enums';
 import { required } from '@utils/validators';
-import type { FormApi } from 'final-form';
-import arrayMutators from 'final-form-arrays';
-import { useImperativeHandle } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { TEditMenuInformationFormValues } from '../EditPartnerMenuWizard/utils';
 import FieldMenuApplyTimeGroup from '../FieldMenuApplyTimeGroup/FieldMenuApplyTimeGroup';
+
 import css from './EditMenuInformationForm.module.scss';
 
 type TExtraProps = {

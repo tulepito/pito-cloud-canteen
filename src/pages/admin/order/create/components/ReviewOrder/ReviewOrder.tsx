@@ -1,3 +1,11 @@
+import React, { useEffect, useMemo } from 'react';
+import { Form as FinalForm } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import arrayMutators from 'final-form-arrays';
+import isEmpty from 'lodash/isEmpty';
+
 import Collapsible from '@components/Collapsible/Collapsible';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import Form from '@components/Form/Form';
@@ -14,16 +22,10 @@ import { formatTimestamp } from '@utils/dates';
 import { EOrderDraftStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
 import { required } from '@utils/validators';
-import classNames from 'classnames';
-import arrayMutators from 'final-form-arrays';
-import isEmpty from 'lodash/isEmpty';
-import React, { useEffect, useMemo } from 'react';
-import { Form as FinalForm } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../NavigateButtons/NavigateButtons';
+
 import css from './ReviewOrder.module.scss';
 
 const MENU_TABLE_COLUMN: TColumn[] = [
@@ -163,6 +165,11 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const updateOrderInProgress = useAppSelector(
     (state) => state.Order.updateOrderInProgress,
   );
+  const updateOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.updateOrderDetailInProgress,
+  );
+
+  const submitInProgress = updateOrderInProgress || updateOrderDetailInProgress;
 
   const {
     value: isSuccessModalOpen,
@@ -204,11 +211,13 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
 
     if (planId && orderId) {
-      orderAsyncActions.updatePlanDetail({
-        orderId,
-        planId,
-        orderDetail,
-      });
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId,
+          orderDetail,
+        }),
+      );
     }
     if (orderState === EOrderDraftStates.draft) {
       await dispatch(orderAsyncActions.requestApprovalOrder({ orderId }));
@@ -313,7 +322,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
               <NavigateButtons
                 goBack={goBack}
                 submitDisabled={invalid}
-                inProgress={updateOrderInProgress}
+                inProgress={submitInProgress}
               />
               {createOrderError && (
                 <div className={css.error}>{createOrderError}</div>

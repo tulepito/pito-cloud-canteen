@@ -1,10 +1,11 @@
-import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import { adminRoutes } from '@src/paths';
-import type { AdminRouteKey } from '@utils/types';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import { adminRoutes } from '@src/paths';
+import type { AdminRouteKey } from '@utils/types';
 
 import css from './AdminBreadCrumbs.module.scss';
 

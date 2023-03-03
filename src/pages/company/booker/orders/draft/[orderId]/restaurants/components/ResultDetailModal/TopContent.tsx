@@ -1,3 +1,5 @@
+import React from 'react';
+
 import IconBorderStar from '@components/Icons/IconBorderStar/IconBorderStar';
 import IconGift from '@components/Icons/IconGift/IconGift';
 import IconHeart from '@components/Icons/IconHeart/IconHeart';
@@ -5,7 +7,6 @@ import IconStar from '@components/Icons/IconStar/IconStar';
 import IconTruck from '@components/Icons/IconTruck/IconTruck';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { EImageVariants } from '@utils/enums';
-import React from 'react';
 
 import css from './ResultDetailModal.module.scss';
 

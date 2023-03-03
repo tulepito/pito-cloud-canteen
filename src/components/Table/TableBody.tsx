@@ -1,6 +1,7 @@
+import React from 'react';
+
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
-import React from 'react';
 
 import css from './Table.module.scss';
 

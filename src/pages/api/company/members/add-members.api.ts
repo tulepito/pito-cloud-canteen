@@ -1,3 +1,8 @@
+import compact from 'lodash/compact';
+import difference from 'lodash/difference';
+import { DateTime } from 'luxon';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { createEmailParams, sendEmail } from '@services/awsSES';
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
@@ -7,10 +12,6 @@ import { handleError } from '@services/sdk';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import { companyInvitation } from '@utils/emailTemplate/companyInvitation';
-import compact from 'lodash/compact';
-import difference from 'lodash/difference';
-import { DateTime } from 'luxon';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 const defaultExpireTime =
   parseInt(process.env.DEFAUTL_INVITATION_EMAIL_EXPIRE_TIME as string, 10) || 7;

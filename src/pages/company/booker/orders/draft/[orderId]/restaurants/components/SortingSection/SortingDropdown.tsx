@@ -1,8 +1,9 @@
-import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import useBoolean from '@hooks/useBoolean';
-import classNames from 'classnames';
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import useBoolean from '@hooks/useBoolean';
 
 import css from './SortingSection.module.scss';
 

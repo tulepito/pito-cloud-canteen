@@ -1,12 +1,14 @@
-import Button from '@components/Button/Button';
-import Form from '@components/Form/Form';
-import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
-import { useAppSelector } from '@hooks/reduxHooks';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
+import Button from '@components/Button/Button';
+import Form from '@components/Form/Form';
+import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
+import { useAppSelector } from '@hooks/reduxHooks';
+
 import { orderDetailsAnyActionsInProgress } from '../../../OrderManagement.slice';
+
 import css from './SendNotificationForm.module.scss';
 
 export type TSendNotificationFormValues = {

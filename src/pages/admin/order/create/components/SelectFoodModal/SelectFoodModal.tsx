@@ -1,10 +1,12 @@
-import Badge, { EBadgeType } from '@components/Badge/Badge';
-import Modal from '@components/Modal/Modal';
 import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
+import Badge, { EBadgeType } from '@components/Badge/Badge';
+import Modal from '@components/Modal/Modal';
+
 import type { TSelectFoodFormValues } from './components/SelectFoodForm/SelectFoodForm';
 import SelectFoodForm from './components/SelectFoodForm/SelectFoodForm';
+
 import css from './SelectFoodModal.module.scss';
 
 type TSelectFoodModalProps = {

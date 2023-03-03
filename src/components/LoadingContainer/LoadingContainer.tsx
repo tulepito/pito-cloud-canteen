@@ -1,6 +1,7 @@
-import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
-import classNames from 'classnames';
 import React from 'react';
+import classNames from 'classnames';
+
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 
 import css from './LoadingContainer.module.scss';
 

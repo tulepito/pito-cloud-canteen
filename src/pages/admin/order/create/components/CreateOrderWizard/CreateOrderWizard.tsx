@@ -1,15 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
+
 import FormWizard from '@components/FormWizard/FormWizard';
 import { getItem, setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import ClientSelector from '../../../StepScreen/ClientSelector/ClientSelector';
 // eslint-disable-next-line import/no-cycle, import/no-named-as-default
@@ -19,7 +20,9 @@ import MealPlanSetup from '../../../StepScreen/MealPlanSetup/MealPlanSetup';
 import ReviewOrder from '../ReviewOrder/ReviewOrder';
 // eslint-disable-next-line import/no-cycle
 import SetupOrderDetail from '../SetupOrderDetail/SetupOrderDetail';
+
 import { isGeneralInfoSetupCompleted } from './CreateOrderWizard.helper';
+
 import css from './CreateOrderWizard.module.scss';
 
 export const CLIENT_SELECT_TAB = 'clientSelect';

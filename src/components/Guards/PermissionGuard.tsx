@@ -1,8 +1,9 @@
-import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
-import UnactiveUserScreen from '@components/UnactiveUserScreen/UnactiveUserScreen';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 import { useIntl } from 'react-intl';
+
+import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import UnactiveUserScreen from '@components/UnactiveUserScreen/UnactiveUserScreen';
 
 import { getLayoutBaseOnPermission } from './Guards.helper';
 import useActiveCompany from './useActiveCompany';

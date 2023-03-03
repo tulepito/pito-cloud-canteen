@@ -1,4 +1,12 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import type { ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { OnChange } from 'react-final-form-listeners';
+import { FormattedMessage, useIntl } from 'react-intl';
+import arrayMutators from 'final-form-arrays';
+
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
@@ -8,16 +16,10 @@ import IconSearch from '@components/Icons/IconSearch/IconSearch';
 import { addCommas } from '@helpers/format';
 import { toNonAccentVietnamese } from '@utils/nonAccentVietnamese';
 import type { TDefaultProps } from '@utils/types';
-import arrayMutators from 'final-form-arrays';
-import type { ReactNode } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { OnChange } from 'react-final-form-listeners';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import FieldFoodSelectCheckboxGroup from './components/FieldFoodSelect/FieldFoodSelectCheckboxGroup';
 import FieldFoodSelectAll from './components/FieldFoodSelectAll/FieldFoodSelectAll';
+
 import css from './SelectFoodForm.module.scss';
 
 const DELAY_UPDATE_TIME = 300;

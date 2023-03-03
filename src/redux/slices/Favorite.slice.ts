@@ -1,6 +1,7 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import { favoriteRestaurantApi } from '@apis/companyApi';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 
 import { QuizThunks } from './Quiz.slice';
 

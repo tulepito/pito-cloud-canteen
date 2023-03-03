@@ -1,4 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useMemo, useState } from 'react';
+import type { FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import arrayMutators from 'final-form-arrays';
+import difference from 'lodash/difference';
+import isEqual from 'lodash/isEqual';
+import { DateTime } from 'luxon';
+
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -10,16 +21,6 @@ import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import { getDaySessionFromDeliveryTime } from '@utils/dates';
 import type { TListing } from '@utils/types';
-import classNames from 'classnames';
-import arrayMutators from 'final-form-arrays';
-import difference from 'lodash/difference';
-import isEqual from 'lodash/isEqual';
-import { DateTime } from 'luxon';
-import { useMemo, useState } from 'react';
-import type { FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import DeliveryAddressField from '../DeliveryAddressField/DeliveryAddressField';
 import MealPlanDateField from '../MealPlanDateField/MealPlanDateField';
@@ -28,6 +29,7 @@ import NutritionField from '../NutritionField/NutritionField';
 import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
 import ParticipantSetupField from '../ParticipantSetupField/ParticipantSetupField';
 import PerPackageField from '../PerPackageField/PerPackageField';
+
 import css from './OrderSettingModal.module.scss';
 
 type TOrderSettingModalProps = {

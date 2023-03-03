@@ -1,6 +1,7 @@
-import { DownloadInvoice } from '@components/Icons/Icons';
-import Papa from 'papaparse';
 import { useIntl } from 'react-intl';
+import Papa from 'papaparse';
+
+import { DownloadInvoice } from '@components/Icons/Icons';
 
 import css from './CSVFieldInput.module.scss';
 

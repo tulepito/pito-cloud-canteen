@@ -1,9 +1,10 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { LISTING_TYPE } from '@src/pages/api/helpers/constants';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { TIntegrationOrderListing } from '@utils/types';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {

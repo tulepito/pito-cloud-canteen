@@ -1,8 +1,9 @@
-import { useAppSelector } from '@hooks/reduxHooks';
-import { companyPaths } from '@src/paths';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
+
+import { useAppSelector } from '@hooks/reduxHooks';
+import { companyPaths } from '@src/paths';
 
 const useRedirectAfterReloadPage = () => {
   const router = useRouter();

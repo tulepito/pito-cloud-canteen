@@ -1,4 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { memo, useCallback, useMemo } from 'react';
+import { shallowEqual } from 'react-redux';
+import isEmpty from 'lodash/isEmpty';
+
 import { calculateGroupMembersAmount } from '@helpers/company';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -9,9 +13,6 @@ import {
 import { Listing } from '@utils/data';
 import { getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
-import { memo, useCallback, useMemo } from 'react';
-import { shallowEqual } from 'react-redux';
 
 // eslint-disable-next-line import/no-cycle
 import MealPlanSetupForm from '../../create/components/MealPlanSetupForm/MealPlanSetupForm';

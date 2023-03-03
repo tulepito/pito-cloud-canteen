@@ -1,6 +1,7 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import { queryMyCompaniesApi } from '@apis/userApi';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
 
 // ================ Initial states ================ //

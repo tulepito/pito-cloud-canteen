@@ -7,13 +7,14 @@
  *
  */
 
-import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
-import ValidationError from '@components/ValidationError/ValidationError';
-import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
 import type { ReactNode } from 'react';
 import React from 'react';
 import { FieldArray } from 'react-final-form-arrays';
+import classNames from 'classnames';
+
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import ValidationError from '@components/ValidationError/ValidationError';
+import type { TDefaultProps } from '@utils/types';
 
 import css from './FieldCheckboxGroup.module.scss';
 

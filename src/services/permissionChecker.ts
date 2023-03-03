@@ -1,5 +1,6 @@
-import { UserPermission } from '@src/types/UserPermission';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+
+import { UserPermission } from '@src/types/UserPermission';
 
 import { denormalisedResponseEntities } from './data';
 import { getSdk } from './sdk';

@@ -1,7 +1,8 @@
-import Button from '@components/Button/Button';
-import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
+
+import Button from '@components/Button/Button';
+import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
 
 import css from './NumberEmployeesForm.module.scss';
 

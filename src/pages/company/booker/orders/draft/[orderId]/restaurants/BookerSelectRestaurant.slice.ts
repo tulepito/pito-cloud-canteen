@@ -1,3 +1,6 @@
+import { createSlice } from '@reduxjs/toolkit';
+import { DateTime } from 'luxon';
+
 import { updatePlanDetailsApi } from '@apis/orderApi';
 import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
@@ -5,13 +8,11 @@ import type { TMenuQueryParams } from '@helpers/listingSearchQuery';
 import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { createSlice } from '@reduxjs/toolkit';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { convertWeekDay } from '@utils/dates';
 import { EImageVariants } from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
-import { DateTime } from 'luxon';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
 
@@ -329,6 +330,7 @@ const BookerSelectRestaurantSlice = createSlice({
         state.fetchFilterInProgress = false;
         state.menuTypes = action.payload.menuTypes;
         state.categories = action.payload.categories;
+        state.packaging = action.payload.packaging;
       })
       .addCase(searchRestaurants.pending, (state) => {
         state.searchInProgress = true;

@@ -1,10 +1,11 @@
-import Button from '@components/Button/Button';
-import Form from '@components/Form/Form';
-import Link from 'next/link';
 import React from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Field, Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
+import Link from 'next/link';
+
+import Button from '@components/Button/Button';
+import Form from '@components/Form/Form';
 
 import css from './EmailVerificationForm.module.scss';
 

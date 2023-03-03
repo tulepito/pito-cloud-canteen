@@ -1,10 +1,12 @@
-import Tooltip from '@components/Tooltip/Tooltip';
-import type { TObject, TUser } from '@utils/types';
 import get from 'lodash/get';
 
-import css from './ManageParticipantsModal.module.scss';
+import Tooltip from '@components/Tooltip/Tooltip';
+import type { TObject, TUser } from '@utils/types';
+
 import { isParticipantCompletedPickFood } from './ManageParticipantsSection.helper';
 import ParticipantCard from './ParticipantCard';
+
+import css from './ManageParticipantsModal.module.scss';
 
 type TRawParticipantsProps = {
   data: {

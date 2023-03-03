@@ -1,17 +1,19 @@
+import type { Event } from 'react-big-calendar';
+import { shallowEqual } from 'react-redux';
+import clone from 'lodash/clone';
+
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   removeMealDay,
   selectCalendarDate,
   selectRestaurant,
 } from '@redux/slices/Order.slice';
-import clone from 'lodash/clone';
-import type { Event } from 'react-big-calendar';
-import { shallowEqual } from 'react-redux';
 
-import css from './MealPlanCard.module.scss';
 import MealPlanCardContent from './MealPlanCardContent';
 import MealPlanCardFooter from './MealPlanCardFooter';
 import MealPlanCardHeader from './MealPlanCardHeader';
+
+import css from './MealPlanCard.module.scss';
 
 type TMealPlanCardProps = {
   event: Event;

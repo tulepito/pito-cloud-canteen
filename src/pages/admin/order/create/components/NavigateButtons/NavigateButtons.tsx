@@ -1,13 +1,15 @@
-import Button from '@components/Button/Button';
-import { getItem } from '@helpers/localStorageHelpers';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
+
+import Button from '@components/Button/Button';
+import { getItem } from '@helpers/localStorageHelpers';
 
 // eslint-disable-next-line import/no-cycle
 import {
   CREATE_ORDER_STEP_LOCAL_STORAGE_NAME,
   REVIEW_TAB,
 } from '../CreateOrderWizard/CreateOrderWizard';
+
 import css from './NavigateButtons.module.scss';
 
 type TNavigateButtons = {

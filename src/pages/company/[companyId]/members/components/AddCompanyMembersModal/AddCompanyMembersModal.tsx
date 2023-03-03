@@ -1,3 +1,7 @@
+import { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+
 import Button from '@components/Button/Button';
 import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
@@ -8,11 +12,9 @@ import {
 } from '@redux/slices/companyMember.slice';
 import { User } from '@utils/data';
 import type { TCurrentUser, TUser } from '@utils/types';
-import { useEffect, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import AddCompanyMembersForm from '../AddCompanyMembersForm/AddCompanyMembersForm';
+
 import css from './AddCompanyMembersModal.module.scss';
 
 type CreateGroupModalProps = {

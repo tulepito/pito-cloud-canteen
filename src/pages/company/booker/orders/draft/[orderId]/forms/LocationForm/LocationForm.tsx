@@ -1,7 +1,8 @@
-import Button from '@components/Button/Button';
-import { LocationAutocompleteInputComponent } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
+
+import Button from '@components/Button/Button';
+import { LocationAutocompleteInputComponent } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 
 import css from './LocationForm.module.scss';
 

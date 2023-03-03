@@ -1,6 +1,7 @@
-import Button from '@components/Button/Button';
-import classNames from 'classnames';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import Button from '@components/Button/Button';
 
 import css from './InvitationNotiModal.module.scss';
 

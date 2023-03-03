@@ -1,3 +1,6 @@
+import React from 'react';
+import classNames from 'classnames';
+
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import IconPlusCircle from '@components/Icons/IconPlusCircle/IconPlusCircle';
@@ -6,8 +9,6 @@ import { addCommas } from '@helpers/format';
 import { Listing } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
-import classNames from 'classnames';
-import React from 'react';
 
 import css from './FoodCard.module.scss';
 

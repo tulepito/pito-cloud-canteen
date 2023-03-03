@@ -1,17 +1,19 @@
+import React, { useEffect, useMemo } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
+
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
-import { useRouter } from 'next/router';
-import React, { useEffect, useMemo } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import EditPartnerFoodForm from '../components/EditPartnerFoodForm/EditPartnerFoodForm';
 import type { TEditPartnerFoodFormValues } from '../utils';
 import { getUpdateFoodData } from '../utils';
+
 import css from './EditPartnerFood.module.scss';
 
 const EditPartnerFoodPage = () => {

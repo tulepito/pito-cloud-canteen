@@ -1,3 +1,9 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
+
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -16,13 +22,9 @@ import {
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { adminPaths } from '@src/paths';
 import { Listing } from '@utils/data';
-import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import ClientTable from '../../create/components/ClientTable/ClientTable';
+
 import css from './ClientSelector.module.scss';
 
 type TClientSelector = {

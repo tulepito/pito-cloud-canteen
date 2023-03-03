@@ -1,14 +1,19 @@
-import Button from '@components/Button/Button';
-import { parseThousandNumber } from '@helpers/format';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { companyPaths } from '@src/paths';
-import type { TObject } from '@utils/types';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
 import React from 'react';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
+import Button from '@components/Button/Button';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { parseThousandNumber } from '@helpers/format';
+import { isEnableToStartOrder } from '@helpers/orderHelper';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { companyPaths } from '@src/paths';
+import { Listing } from '@utils/data';
+import type { TListing, TObject } from '@utils/types';
 
 import { orderManagementThunks } from '../../../OrderManagement.slice';
+
 import css from './ReviewCartSection.module.scss';
 
 type TReviewCartSectionProps = {
@@ -41,11 +46,14 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   const isStartOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.isStartOrderInProgress,
   );
+  const planData = useAppSelector((state) => state.OrderManagement.planData);
 
   const {
     query: { orderId },
   } = router;
   const rootClasses = classNames(css.root, className);
+  const { orderDetail } = Listing(planData as TListing).getMetadata();
+  const isStartOrderDisabled = !isEnableToStartOrder(orderDetail);
 
   const handleStartPickingOrder = async () => {
     const { meta } = await dispatch(
@@ -162,6 +170,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
           variant="cta"
           className={css.makePaymentButton}
           inProgress={isStartOrderInProgress}
+          disabled={isStartOrderDisabled}
           onClick={handleStartPickingOrder}>
           <div>
             {intl.formatMessage({
@@ -171,7 +180,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
         </Button>
       )}
 
-      {overflow > 0 && (
+      <RenderWhen condition={overflow > 0}>
         <div className={css.overflowPackageInfo}>
           {intl.formatMessage(
             {
@@ -182,7 +191,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
             },
           )}
         </div>
-      )}
+      </RenderWhen>
     </div>
   );
 };

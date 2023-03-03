@@ -1,6 +1,6 @@
-import { useRouter } from 'next/router';
 import React, { useCallback, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { useRouter } from 'next/router';
 
 import SortingDropdown from './SortingDropdown';
 

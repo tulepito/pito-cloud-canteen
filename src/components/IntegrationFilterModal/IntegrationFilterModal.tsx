@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-shadow */
+import type { ReactNode } from 'react';
+import React, { useRef } from 'react';
+import { Form as FinalForm } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+import type { FormApi } from 'final-form';
+
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import AlertModal from '@components/Modal/AlertModal';
 import useBoolean from '@hooks/useBoolean';
 import type { TObject } from '@utils/types';
-import classNames from 'classnames';
-import type { FormApi } from 'final-form';
-import type { ReactNode } from 'react';
-import React, { useRef } from 'react';
-import { Form as FinalForm } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './IntegrationFilterModal.module.scss';
 

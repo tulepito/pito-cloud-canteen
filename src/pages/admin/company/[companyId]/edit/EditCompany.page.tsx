@@ -1,3 +1,7 @@
+import { useEffect, useMemo } from 'react';
+import { useIntl } from 'react-intl';
+import { useRouter } from 'next/router';
+
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -5,12 +9,10 @@ import {
   clearError,
   updateCompanyPageThunks,
 } from '@redux/slices/EditCompanyPage.slice';
-import { useRouter } from 'next/router';
-import { useEffect, useMemo } from 'react';
-import { useIntl } from 'react-intl';
 
 import type { TEditCompanyFormValues } from '../../components/EditCompanyForm/EditCompanyForm';
 import EditCompanyForm from '../../components/EditCompanyForm/EditCompanyForm';
+
 import css from './EditCompany.module.scss';
 
 const getInitialLocationValues = (location: any) => {

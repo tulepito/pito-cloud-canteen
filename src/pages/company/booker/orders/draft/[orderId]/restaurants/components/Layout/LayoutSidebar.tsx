@@ -1,7 +1,8 @@
-import IconMenu from '@components/Icons/IconMenu/IconMenu';
-import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';
 import React, { useCallback, useState } from 'react';
+import classNames from 'classnames';
+
+import IconMenu from '@components/Icons/IconMenu/IconMenu';
 
 import css from './Layout.module.scss';
 

@@ -1,11 +1,12 @@
+import classNames from 'classnames';
+import Image from 'next/image';
+
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import IconPlusDish from '@components/Icons/IconPlusDish/IconPlusDish';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
 import { Listing } from '@utils/data';
-import classNames from 'classnames';
-import Image from 'next/image';
 
 import css from './ListingCard.module.scss';
 

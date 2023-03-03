@@ -1,8 +1,9 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { createEmailParams, sendEmail } from '@services/awsSES';
 import cookies from '@services/cookie';
 import { handleError } from '@services/sdk';
 import { memberOrderRemind } from '@utils/emailTemplate/memberOrderRemind';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 const systemSenderEmail = process.env.AWS_SES_SENDER_EMAIL;
 

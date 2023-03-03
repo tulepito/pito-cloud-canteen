@@ -1,10 +1,11 @@
+import { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import differenceBy from 'lodash/differenceBy';
+
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { convertWeekDay, getDayInWeekFromPeriod } from '@utils/dates';
 import type { TObject } from '@utils/types';
-import classNames from 'classnames';
-import differenceBy from 'lodash/differenceBy';
-import { useEffect, useState } from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './DayInWeekField.module.scss';
 

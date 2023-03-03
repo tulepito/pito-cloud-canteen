@@ -1,7 +1,8 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import { loadOrderDataApi, updateParticipantOrderApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { userThunks } from '@redux/slices/user.slice';
-import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TUser } from '@utils/types';
 

@@ -1,10 +1,11 @@
+import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
+
 import Button from '@components/Button/Button';
 import IconBanned from '@components/Icons/IconBanned/IconBanned';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
-import classNames from 'classnames';
-import { FormattedMessage } from 'react-intl';
 
 import css from './SectionOrderListing.module.scss';
 

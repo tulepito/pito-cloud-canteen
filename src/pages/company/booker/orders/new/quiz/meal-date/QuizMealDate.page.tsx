@@ -1,3 +1,9 @@
+import { useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import { DateTime } from 'luxon';
+import { useRouter } from 'next/router';
+
 import Modal from '@components/Modal/Modal';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -7,18 +13,15 @@ import { QuizActions } from '@redux/slices/Quiz.slice';
 import { Listing, User } from '@utils/data';
 import { formatTimestamp, getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
-import { DateTime } from 'luxon';
-import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
+
 import type { TMealDateFormValues } from './MealDateForm/MealDateForm';
 import MealDateForm from './MealDateForm/MealDateForm';
-import css from './QuizMealDate.module.scss';
 import Spinner from './Spinner';
+
+import css from './QuizMealDate.module.scss';
 
 const QuizMealDate = () => {
   const intl = useIntl();

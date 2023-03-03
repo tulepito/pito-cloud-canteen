@@ -1,5 +1,5 @@
-import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
+import { DateTime } from 'luxon';
 
 import {
   AFTERNOON_SESSION,

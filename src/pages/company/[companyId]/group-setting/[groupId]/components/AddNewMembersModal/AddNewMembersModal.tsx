@@ -1,9 +1,11 @@
+import { useIntl } from 'react-intl';
+
 import Button from '@components/Button/Button';
 import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
-import { useIntl } from 'react-intl';
 
 import AddNewMembersForm from '../AddNewMembersForm/AddNewMembersForm';
+
 import css from './AddNewMembersModal.module.scss';
 
 type AddNewMembersModalProps = {

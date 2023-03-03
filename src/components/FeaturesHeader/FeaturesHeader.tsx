@@ -1,9 +1,10 @@
-import type { TObject } from '@utils/types';
+import type { ReactNode } from 'react';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
+
+import type { TObject } from '@utils/types';
 
 import css from './FeaturesHeader.module.scss';
 

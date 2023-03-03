@@ -1,15 +1,17 @@
-import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
-import { useAppSelector } from '@hooks/reduxHooks';
-import { User } from '@utils/data';
-import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
 import type { ReactNode } from 'react';
 import React from 'react';
 import type { FieldInputProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
+import classNames from 'classnames';
+
+import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { User } from '@utils/data';
+import type { TDefaultProps } from '@utils/types';
 
 import ParticipantCard from '../ManageParticipantsSection/ParticipantCard';
+
 import css from './FieldMemberSelectCheckboxGroup.module.scss';
 
 const FieldMemberSelectCheckbox = (props: any) => {

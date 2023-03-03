@@ -1,5 +1,6 @@
-import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
+
+import { createAsyncThunk } from '@redux/redux.helper';
 import { EImageVariants } from '@utils/enums';
 
 // ================ Initial states ================ //

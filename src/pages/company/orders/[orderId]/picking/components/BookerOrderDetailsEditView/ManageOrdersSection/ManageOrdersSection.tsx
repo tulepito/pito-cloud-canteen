@@ -1,21 +1,24 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useState } from 'react';
+import { useIntl } from 'react-intl';
+import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
+
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { formatTimestamp } from '@utils/dates';
 import { historyPushState } from '@utils/history';
-import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
-import { useIntl } from 'react-intl';
 
 import { orderManagementThunks } from '../../../OrderManagement.slice';
+
+import { usePrepareManageOrdersSectionData } from './hooks/usePrepareManageOrdersSectionData';
+import OrderDetailsTable from './OrderDetailsTable/OrderDetailsTable';
 import type { TAddOrderFormValues } from './AddOrderForm';
 import AddOrderForm from './AddOrderForm';
-import { usePrepareManageOrdersSectionData } from './hooks/usePrepareManageOrdersSectionData';
+
 import css from './ManageOrdersSection.module.scss';
-import OrderDetailsTable from './OrderDetailsTable/OrderDetailsTable';
 
 type TManageOrdersSectionProps = {
   data: {
@@ -31,16 +34,18 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
 
   const dispatch = useAppDispatch();
   const {
-    query: { orderId, timestamp },
+    query: { timestamp },
   } = useRouter();
   const intl = useIntl();
-  const [currentViewDate, setCurrentViewDate] = useState(startDate);
+  const [currentViewDate, setCurrentViewDate] = useState(
+    timestamp ? Number(timestamp) : startDate,
+  );
   const {
     dateList = [],
     defaultActiveKey,
     memberOptions,
     foodOptions,
-  } = usePrepareManageOrdersSectionData(currentViewDate);
+  } = usePrepareManageOrdersSectionData(currentViewDate, setCurrentViewDate);
 
   const handleSubmitAddSelection = (values: TAddOrderFormValues) => {
     const { participantId: memberId, requirement = '', foodId } = values;
@@ -93,8 +98,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
 
   const handleDateTabChange = ({ id }: TTabsItem) => {
     setCurrentViewDate(Number(id));
-    if (orderId && (timestamp as string) !== id.toString())
-      historyPushState('timestamp', id);
+    historyPushState('timestamp', id);
   };
 
   return (

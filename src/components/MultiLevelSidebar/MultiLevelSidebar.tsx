@@ -1,9 +1,10 @@
-import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import type { TDefaultProps, TIconProps } from '@utils/types';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import type { TDefaultProps, TIconProps } from '@utils/types';
 
 import css from './MultiLevelSidebar.module.scss';
 

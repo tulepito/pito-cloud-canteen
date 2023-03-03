@@ -1,5 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import cookies from '@services/cookie';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import {
@@ -7,7 +9,6 @@ import {
   denormalisedResponseEntities,
   Listing,
 } from '@utils/data';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 import type { TListing } from '../../../../utils/types';
 import { HTTP_METHODS, LISTING_TYPE } from '../../helpers/constants';

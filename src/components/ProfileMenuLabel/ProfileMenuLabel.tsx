@@ -2,11 +2,12 @@
  * MenuLabel is the only always visible part of Menu.
  * Clicking it toggles visibility of MenuContent.
  */
-import useBoolean from '@hooks/useBoolean';
-import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
 import type { MouseEvent, PropsWithChildren } from 'react';
 import React from 'react';
+import classNames from 'classnames';
+
+import useBoolean from '@hooks/useBoolean';
+import type { TDefaultProps } from '@utils/types';
 
 import css from './ProfileMenuLabel.module.scss';
 

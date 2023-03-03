@@ -1,11 +1,12 @@
-import Form from '@components/Form/Form';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
-import classNames from 'classnames';
 import type { ReactNode } from 'react';
 import React from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import Form from '@components/Form/Form';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
 
 import css from './KeywordSearchForm.module.scss';
 

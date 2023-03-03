@@ -1,4 +1,9 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import { useEffect, useRef, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { TableForm } from '@components/Table/Table';
@@ -14,16 +19,14 @@ import {
   MANAGE_COMPANY_ORDERS_TAB_MAP,
 } from '@utils/enums';
 import type { TObject } from '@utils/types';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import { parseEntitiesToTableData } from '../helpers/parseEntitiesToTableData';
-import css from './CompanyOrdersTable.module.scss';
+
 import { CompanyOrdersTableColumns } from './CompanyOrdersTableColumns';
 import type { TSearchOrderFormValues } from './SearchOrderForm';
 import SearchOrderForm from './SearchOrderForm';
+
+import css from './CompanyOrdersTable.module.scss';
 
 const DEBOUNCE_TIME = 300;
 

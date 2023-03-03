@@ -1,11 +1,12 @@
+import { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import type { Duration } from 'luxon';
 import { DateTime } from 'luxon';
-import { useEffect, useState } from 'react';
 
 import CountdownItem from './CountdownItem';
-import css from './CountdownTimer.module.scss';
 import { getStopTime } from './helpers';
+
+import css from './CountdownTimer.module.scss';
 
 type TStopAt = {
   day: number;

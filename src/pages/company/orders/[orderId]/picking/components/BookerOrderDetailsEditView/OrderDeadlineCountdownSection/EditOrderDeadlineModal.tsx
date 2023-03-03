@@ -1,9 +1,11 @@
-import Modal from '@components/Modal/Modal';
-import { DateTime } from 'luxon';
 import { useIntl } from 'react-intl';
+import { DateTime } from 'luxon';
+
+import Modal from '@components/Modal/Modal';
 
 import type { TEditOrderDeadlineFormValues } from './EditOrderDeadlineForm';
 import EditOrderDeadlineForm from './EditOrderDeadlineForm';
+
 import css from './EditOrderDeadlineModal.module.scss';
 
 type TEditOrderDeadlineModalProps = {

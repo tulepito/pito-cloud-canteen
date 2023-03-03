@@ -1,6 +1,7 @@
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { useRouter } from 'next/router';
 import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/router';
+
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 
 import { ParticipantPlanThunks } from '../ParticipantPlanPage.slice';
 

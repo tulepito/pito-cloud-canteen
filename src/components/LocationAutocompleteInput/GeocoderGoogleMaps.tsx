@@ -1,4 +1,7 @@
 /* eslint-disable class-methods-use-this */
+import React from 'react';
+import classNames from 'classnames';
+
 import {
   getPlaceDetails,
   getPlacePredictions,
@@ -6,10 +9,9 @@ import {
 } from '@utils/googleMaps';
 import { userLocation } from '@utils/maps';
 import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
-import React from 'react';
 
 import config from '../../configs';
+
 import css from './LocationAutocompleteInput.module.scss';
 
 export const CURRENT_LOCATION_ID = 'current-location';

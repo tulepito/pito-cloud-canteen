@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
+import React, { useEffect, useRef, useState } from 'react';
+import { CSVLink } from 'react-csv';
+import { FormattedMessage } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldMultipleSelect from '@components/FormFields/FieldMultipleSelect/FieldMultipleSelect';
@@ -28,12 +35,6 @@ import {
   MENU_OPTIONS,
 } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
-import { CSVLink } from 'react-csv';
-import { FormattedMessage } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import css from './ManagePartnerFoods.module.scss';
 

@@ -1,7 +1,7 @@
-import classNames from 'classnames';
-import RCToolTip from 'rc-tooltip';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
+import classNames from 'classnames';
+import RCToolTip from 'rc-tooltip';
 
 import css from './Tooltip.module.scss';
 

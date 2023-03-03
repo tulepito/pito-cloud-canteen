@@ -1,13 +1,12 @@
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-
-import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
-import { useViewport } from '@hooks/useViewport';
-import type { TObject } from '@utils/types';
-import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo } from 'react';
 import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
 import { Navigate } from 'react-big-calendar';
+import { DateTime } from 'luxon';
+
+import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
+import { useViewport } from '@hooks/useViewport';
+import type { TObject } from '@utils/types';
 
 import type {
   TCalendarItemCardComponents,
@@ -15,6 +14,8 @@ import type {
 } from '../../helpers/types';
 import WDayItem from '../DayItem/WDayItem';
 import IconCalendarToolbar from '../Icons/IconCalendar';
+
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import css from './WeekView.module.scss';
 
 const WEEK_DAYS_NUMBER = 7;

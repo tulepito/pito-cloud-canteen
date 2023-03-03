@@ -1,8 +1,9 @@
+import uniq from 'lodash/uniq';
+
 import { calculatePriceQuotationInfo } from '@pages/company/orders/[orderId]/picking/helpers/cartInfoHelper';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import type { TIntegrationOrderListing, TListing } from '@utils/types';
-import uniq from 'lodash/uniq';
 
 export const parseEntitiesToTableData = (
   orders: TIntegrationOrderListing[],

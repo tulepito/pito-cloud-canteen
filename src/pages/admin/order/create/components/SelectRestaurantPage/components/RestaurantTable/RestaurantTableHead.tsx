@@ -1,6 +1,7 @@
-import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import type { TDefaultProps } from '@utils/types';
 
 import css from './RestaurantTable.module.scss';
 

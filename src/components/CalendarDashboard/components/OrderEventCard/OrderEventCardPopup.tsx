@@ -1,19 +1,22 @@
+import React from 'react';
+import type { Event } from 'react-big-calendar';
+import { FormattedMessage } from 'react-intl';
+import { useRouter } from 'next/router';
+
 import { InlineTextButton } from '@components/Button/Button';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { CurrentUser } from '@utils/data';
-import { useRouter } from 'next/router';
-import React from 'react';
-import type { Event } from 'react-big-calendar';
-import { FormattedMessage } from 'react-intl';
 
 import type { TEventStatus } from '../../helpers/types';
+
 import type { TDishSelectionFormValues } from './DishSelectionForm';
 import DishSelectionForm from './DishSelectionForm';
 import OrderEventCardContentItems from './OrderEventCardContentItems';
-import css from './OrderEventCardPopup.module.scss';
 import OrderEventCardStatus from './OrderEventCardStatus';
+
+import css from './OrderEventCardPopup.module.scss';
 
 type TOrderEventCardPopupProps = {
   event: Event;

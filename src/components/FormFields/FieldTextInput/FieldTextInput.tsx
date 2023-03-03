@@ -1,9 +1,10 @@
-import ValidationError from '@components/ValidationError/ValidationError';
-import type { TDefaultProps, TIconProps } from '@utils/types';
-import classNames from 'classnames';
 import React from 'react';
 import type { FieldProps, FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
+import classNames from 'classnames';
+
+import ValidationError from '@components/ValidationError/ValidationError';
+import type { TDefaultProps, TIconProps } from '@utils/types';
 
 import css from './FieldTextInput.module.scss';
 

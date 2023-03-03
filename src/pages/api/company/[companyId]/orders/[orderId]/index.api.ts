@@ -1,10 +1,11 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import { Listing } from '@utils/data';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {

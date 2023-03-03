@@ -1,10 +1,12 @@
-import Button from '@components/Button/Button';
-import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
-import classNames from 'classnames';
 import { FormattedMessage } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
+import classNames from 'classnames';
+
+import Button from '@components/Button/Button';
+import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 
 import CartItemList from './CartItemList';
+
 import css from './SectionOrderPanel.module.scss';
 
 type TOrderPanelBody = {

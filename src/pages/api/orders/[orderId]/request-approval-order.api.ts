@@ -1,5 +1,8 @@
 /* eslint-disable no-console */
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import isEmpty from 'lodash/isEmpty';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -7,8 +10,6 @@ import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
 import { Listing } from '@utils/data';
 import { EOrderDraftStates } from '@utils/enums';
-import isEmpty from 'lodash/isEmpty';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -63,9 +64,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             ),
           );
 
-          res.status(200).json({
-            order: updatedOrderListing,
-          });
+          res.status(200).json(updatedOrderListing);
         }
 
         break;

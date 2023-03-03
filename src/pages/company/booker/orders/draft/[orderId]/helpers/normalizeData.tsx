@@ -1,7 +1,8 @@
-import { Listing } from '@utils/data';
-import { getDaySessionFromDeliveryTime } from '@utils/dates';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
+
+import { Listing } from '@utils/data';
+import { getDaySessionFromDeliveryTime } from '@utils/dates';
 
 export const normalizePlanDetailsToEvent = (
   planDetails: any,

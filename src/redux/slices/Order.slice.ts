@@ -1,3 +1,9 @@
+import { createSlice } from '@reduxjs/toolkit';
+import isNumber from 'lodash/isNumber';
+import isString from 'lodash/isString';
+import uniq from 'lodash/uniq';
+import { DateTime } from 'luxon';
+
 import { companyApi } from '@apis/companyApi';
 import { fetchUserApi } from '@apis/index';
 import type { TUpdateOrderApiBody } from '@apis/orderApi';
@@ -16,17 +22,12 @@ import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { getMenuQuery } from '@helpers/listingSearchQuery';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import { convertWeekDay, renderDateRange } from '@utils/dates';
 import { EListingStates, EManageCompanyOrdersTab } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TPagination } from '@utils/types';
-import isNumber from 'lodash/isNumber';
-import isString from 'lodash/isString';
-import uniq from 'lodash/uniq';
-import { DateTime } from 'luxon';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
 
@@ -497,7 +498,7 @@ const requestApprovalOrder = createAsyncThunk(
   async ({ orderId }: TObject) => {
     const { data: responseData } = await requestApprovalOrderApi(orderId);
 
-    return responseData.data;
+    return responseData;
   },
 );
 

@@ -1,6 +1,7 @@
-import Toggle from '@components/Toggle/Toggle';
 import { Field } from 'react-final-form';
 import { useIntl } from 'react-intl';
+
+import Toggle from '@components/Toggle/Toggle';
 
 import css from './FoodPickingField.module.scss';
 

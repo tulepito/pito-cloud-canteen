@@ -1,11 +1,12 @@
+import type { PropsWithChildren, ReactNode } from 'react';
+import React, { useEffect } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { UIActions } from '@redux/slices/UI.slice';
-import classNames from 'classnames';
-import type { PropsWithChildren, ReactNode } from 'react';
-import React, { useEffect } from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './Modal.module.scss';
 

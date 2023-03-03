@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useMemo } from 'react';
+import { useIntl } from 'react-intl';
+
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
-import { useMemo } from 'react';
-import { useIntl } from 'react-intl';
 
 import { prepareDataForTabs } from '../OrderDetailsTable/OrderDetailsTable.helpers';
 import type { TAllTabData } from '../OrderDetailsTable/OrderDetailsTable.utils';

@@ -1,5 +1,6 @@
-import { types as sdkTypes } from '@sharetribe/sdk';
 import queryString from 'query-string';
+
+import { types as sdkTypes } from '@sharetribe/sdk';
 
 import type { TObject } from './types';
 

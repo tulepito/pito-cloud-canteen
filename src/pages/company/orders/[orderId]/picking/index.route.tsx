@@ -1,13 +1,14 @@
+import { useEffect } from 'react';
+import { useIntl } from 'react-intl';
+import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
+
 import Meta from '@components/Layout/Meta';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
 import { UserPermission } from '@src/types/UserPermission';
 import { CurrentUser } from '@utils/data';
-import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import { useIntl } from 'react-intl';
 
 import BookerOrderDetailsPage from './components/BookerOrderDetails.page';
 import {

@@ -1,3 +1,7 @@
+import { useEffect } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { useRouter } from 'next/router';
+
 import {
   useAppDispatch,
   useAppSelector,
@@ -6,12 +10,10 @@ import {
 import { emailVerificationThunks } from '@redux/slices/emailVerification.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import type { TObject } from '@utils/types';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import { FormattedMessage } from 'react-intl';
+
+import EmailVerificationForm from './EmailVerificationForm';
 
 import css from './EmailVerification.module.scss';
-import EmailVerificationForm from './EmailVerificationForm';
 
 const EmailVerificationPage = () => {
   const router = useRouter();

@@ -1,3 +1,9 @@
+import { useEffect, useRef } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Field, Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+
 import { AvatarLarge } from '@components/Avatar/Avatar';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
@@ -15,11 +21,6 @@ import {
   phoneNumberFormatValid,
   required,
 } from '@utils/validators';
-import { useEffect, useRef } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Field, Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import css from './ContactPointProfileForm.module.scss';
 

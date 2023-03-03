@@ -1,17 +1,19 @@
+import { useMemo } from 'react';
+import { useField, useForm } from 'react-final-form-hooks';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import filter from 'lodash/filter';
+import { useRouter } from 'next/router';
+
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { QuizThunks } from '@redux/slices/Quiz.slice';
 import { quizPaths } from '@src/paths';
 import { User } from '@utils/data';
 import type { TCurrentUser, TUser } from '@utils/types';
-import filter from 'lodash/filter';
-import { useRouter } from 'next/router';
-import { useMemo } from 'react';
-import { useField, useForm } from 'react-final-form-hooks';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import QuizModal from '../components/QuizModal/QuizModal';
+
 import css from './QuizSelectCompany.module.scss';
 
 type TCreateOrderFormValues = {

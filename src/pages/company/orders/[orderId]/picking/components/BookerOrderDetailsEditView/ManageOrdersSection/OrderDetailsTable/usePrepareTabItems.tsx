@@ -1,10 +1,11 @@
-import classNames from 'classnames';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 
-import css from './OrderDetailsTable.module.scss';
 import type { TAllTabData, TItemData } from './OrderDetailsTable.utils';
 import { EOrderDetailsTableTab, TABLE_TABS } from './OrderDetailsTable.utils';
 import { OrderDetailsTableComponent } from './OrderDetailsTableComponent';
+
+import css from './OrderDetailsTable.module.scss';
 
 type TUsePrepareTabItemsParams = {
   allTabData: TAllTabData;
@@ -37,7 +38,7 @@ export const usePrepareTabItems = ({
     const tabData = allTabData[tabValue];
 
     const numberClasses = classNames(css.number, {
-      [css.numberActive]: tabId === currentTab,
+      [css.numberActive]: tabValue === currentTab,
     });
 
     const label = (

@@ -1,3 +1,10 @@
+import { useState } from 'react';
+import type { FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import difference from 'lodash/difference';
+import fill from 'lodash/fill';
+
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
@@ -6,12 +13,6 @@ import useBoolean from '@hooks/useBoolean';
 import { User } from '@utils/data';
 import type { TCurrentUser, TUser } from '@utils/types';
 import { emailFormatValid } from '@utils/validators';
-import difference from 'lodash/difference';
-import fill from 'lodash/fill';
-import { useState } from 'react';
-import type { FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import css from './AddCompanyMembersForm.module.scss';
 

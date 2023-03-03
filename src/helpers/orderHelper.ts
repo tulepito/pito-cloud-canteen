@@ -1,3 +1,7 @@
+import { addDays, min, subDays } from 'date-fns';
+import isEmpty from 'lodash/isEmpty';
+import { DateTime } from 'luxon';
+
 import {
   AFTERNOON_SESSION,
   DINNER_SESSION,
@@ -11,10 +15,8 @@ import {
   EOrderDraftStates,
   EParticipantOrderStatus,
 } from '@utils/enums';
+import type { TPlan } from '@utils/orderTypes';
 import type { TListing, TObject } from '@utils/types';
-import { addDays, min, subDays } from 'date-fns';
-import isEmpty from 'lodash/isEmpty';
-import { DateTime } from 'luxon';
 
 export const isJoinedPlan = (
   foodId: string,
@@ -132,6 +134,22 @@ export const isEnableSubmitPublishOrder = (
   return isOrderValid && isOrderDetailSetupCompleted && isOrderDetailHasData;
 };
 
+export const isEnableToStartOrder = (orderDetail: TPlan['orderDetail']) => {
+  return (
+    !isEmpty(orderDetail) &&
+    Object.values(orderDetail).some(({ restaurant, memberOrders }) => {
+      const { id, restaurantName, foodList } = restaurant;
+      const isSetupRestaurant =
+        !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
+
+      const hasAnyOrders = Object.values(memberOrders).some(
+        ({ foodId, status }) => isJoinedPlan(foodId, status),
+      );
+
+      return isSetupRestaurant && hasAnyOrders;
+    })
+  );
+};
 export const findSuitableStartDate = ({
   selectedDate,
   startDate = new Date().getTime(),

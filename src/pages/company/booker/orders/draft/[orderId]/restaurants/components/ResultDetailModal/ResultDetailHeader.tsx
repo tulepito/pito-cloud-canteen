@@ -1,8 +1,9 @@
+import React from 'react';
+import { useIntl } from 'react-intl';
+
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
-import React from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './ResultDetailModal.module.scss';
 

@@ -1,3 +1,7 @@
+import { useEffect, useState } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import type { TObject } from '@utils/types';
@@ -6,9 +10,6 @@ import {
   phoneNumberFormatValid,
   required,
 } from '@utils/validators';
-import { useEffect, useState } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
 
 import css from './ReviewInfoForm.module.scss';
 

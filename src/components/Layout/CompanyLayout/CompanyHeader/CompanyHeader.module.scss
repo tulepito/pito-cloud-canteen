@@ -23,6 +23,13 @@
     border-bottom: 1px solid $neutralGray4;
   }
 
+  .headerLeft {
+    .logo {
+      width: 68.14px;
+      height: 36px;
+    }
+  }
+
   .headerRight {
     display: flex;
     align-items: center;
@@ -40,9 +47,12 @@
     .profileMenuWrapper {
       display: flex;
       align-items: center;
+      height: 40px;
 
       .avatar {
         margin-right: 10px;
+        width: 40px;
+        height: 40px;
         background-color: $primaryPri2;
         color: $neutralGray1;
         border-radius: 50%;

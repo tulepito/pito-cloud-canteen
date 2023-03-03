@@ -1,3 +1,8 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+
 import { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
@@ -17,10 +22,6 @@ import { formatTimestamp } from '@utils/dates';
 import type { EMenuTypes } from '@utils/enums';
 import { EListingStates, EMenuMealType } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
-import classNames from 'classnames';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import {
   createUpdateMenuApplyTimeValues,
@@ -29,6 +30,7 @@ import {
 import RemoveMenuConfirmModal from '../RemoveMenuConfirmModal/RemoveMenuConfirmModal';
 import UpdateMenuModal from '../UpdateMenuModal/UpdateMenuModal';
 import type { TUpdateMenuModalFormValues } from '../UpdateMenuModal/UpdateMenuModalForm';
+
 import css from './ManagePartnerMenusContent.module.scss';
 
 const TABLE_COLUNMS: TColumn[] = [

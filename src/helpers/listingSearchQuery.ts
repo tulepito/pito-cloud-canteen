@@ -1,3 +1,6 @@
+import uniqBy from 'lodash/uniqBy';
+import { DateTime } from 'luxon';
+
 import { calculateBounds } from '@helpers/mapHelpers';
 import { deliveryDaySessionAdapter } from '@helpers/orderHelper';
 import { ListingTypes } from '@src/types/listingTypes';
@@ -5,8 +8,6 @@ import { Listing, User } from '@utils/data';
 import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
 import { EImageVariants } from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
-import uniqBy from 'lodash/uniqBy';
-import { DateTime } from 'luxon';
 
 export type TMenuQueryParams = {
   timestamp: number;

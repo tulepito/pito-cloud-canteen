@@ -1,9 +1,11 @@
-import Button from '@components/Button/Button';
-import classNames from 'classnames';
 import type { PropsWithChildren, ReactNode } from 'react';
+import classNames from 'classnames';
+
+import Button from '@components/Button/Button';
+
+import Modal from './Modal';
 
 import css from './AlertModal.module.scss';
-import Modal from './Modal';
 
 type TAlertModal = {
   id?: string;

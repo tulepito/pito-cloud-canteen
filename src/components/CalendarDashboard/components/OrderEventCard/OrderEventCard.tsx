@@ -1,14 +1,17 @@
+import type { Event } from 'react-big-calendar';
+import classNames from 'classnames';
+
 import Tooltip from '@components/Tooltip/Tooltip';
 import { isOver } from '@helpers/orderHelper';
-import classNames from 'classnames';
-import type { Event } from 'react-big-calendar';
 
 import { EVENT_STATUS } from '../../helpers/constant';
-import css from './OrderEventCard.module.scss';
+
 import OrderEventCardContentItems from './OrderEventCardContentItems';
 import OrderEventCardHeader from './OrderEventCardHeader';
 import OrderEventCardPopup from './OrderEventCardPopup';
 import OrderEventCardStatus from './OrderEventCardStatus';
+
+import css from './OrderEventCard.module.scss';
 
 export type TOrderEventCardProps = {
   event: Event;
