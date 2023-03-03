@@ -12,12 +12,12 @@ import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { normalizePlanDetailsToEvent } from '@pages/company/booker/orders/draft/[orderId]/helpers/normalizeData';
+import { useGetCalendarExtraResources } from '@pages/company/booker/orders/draft/[orderId]/restaurants/hooks/calendar';
 import {
   orderAsyncActions,
   selectCalendarDate,
   selectRestaurant,
   unSelectRestaurant,
-  updateDraftMealPlan,
 } from '@redux/slices/Order.slice';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { Listing } from '@utils/data';
@@ -26,7 +26,7 @@ import type { TListing, TObject } from '@utils/types';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -157,6 +157,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     shallowEqual,
   );
 
+  const orderId = Listing(order as TListing).getId();
+  const planId = Listing(order as TListing).getMetadata()?.plans?.[0];
+
   const suitableStartDate = useMemo(() => {
     const temp = findSuitableStartDate({
       selectedDate,
@@ -190,20 +193,27 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     dispatch(unSelectRestaurant());
   };
 
-  const handleSubmitRestaurant = (values: TObject) => {
+  const handleSubmitRestaurant = async (values: TObject) => {
     const { restaurant, selectedFoodList } = values;
-    const updateOrderDetail = {
-      orderDetail: {
-        restaurantId: restaurant.id,
-        restaurantName: restaurant.restaurantName,
-        dateTimestamp: (selectedDate as Date).getTime(),
-        foodList: selectedFoodList,
-        menuId: restaurant.menuId,
-        phoneNumber: restaurant.phoneNumber,
-      },
-    };
 
-    dispatch(updateDraftMealPlan(updateOrderDetail));
+    await dispatch(
+      orderAsyncActions.updatePlanDetail({
+        orderId,
+        orderDetail: {
+          [(selectedDate as Date).getTime()]: {
+            restaurant: {
+              id: restaurant.id,
+              restaurantName: restaurant.restaurantName,
+              menuId: restaurant.menuId,
+              phoneNumber: restaurant.phoneNumber,
+              foodList: selectedFoodList,
+            },
+          },
+        },
+        planId,
+        updateMode: 'merge',
+      }),
+    );
     dispatch(unSelectRestaurant());
   };
 
@@ -283,17 +293,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     ? orderDetail[selectedDate?.getTime()]?.restaurant?.foodList
     : {};
 
-  const onSubmit = async () => {
-    const orderId = Listing(order as TListing).getId();
-    const planId = Listing(order as TListing).getMetadata()?.plans?.[0];
-    const { meta } = await dispatch(
-      orderAsyncActions.updatePlanDetail({
-        orderId,
-        orderDetail,
-        planId,
-      }),
-    );
-    if (meta.requestStatus !== 'rejected') nextTab();
+  const calendarExtraResources = useGetCalendarExtraResources({
+    order,
+    startDate,
+    endDate,
+  });
+
+  const onSubmit = () => {
+    nextTab();
   };
 
   useEffect(() => {
@@ -309,7 +316,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     }
   }, [JSON.stringify(orderDetail)]);
 
-  const handleSelectFood = (values: TSelectFoodFormValues) => {
+  const handleSelectFood = async (values: TSelectFoodFormValues) => {
     const { food: foodIds } = values;
 
     const currRestaurantId = currentRestaurant?.id?.uuid;
@@ -337,7 +344,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       ).menu.id.uuid,
     };
 
-    handleSubmitRestaurant({
+    await handleSubmitRestaurant({
       restaurant: submitRestaurantData,
       selectedFoodList: submitFoodListData,
     });
@@ -368,6 +375,23 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       selectedDate?.getTime() === timestamp
     );
   };
+
+  const handleRemoveMeal = useCallback(
+    (id: string) => (resourceId: string) => {
+      dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId: id,
+          orderDetail: {
+            [resourceId]: null,
+          },
+          updateMode: 'merge',
+        }),
+      );
+    },
+    [dispatch, orderId],
+  );
+
   return (
     <>
       {isSelectingRestaurant ? (
@@ -375,6 +399,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           onSubmitRestaurant={handleSubmitRestaurant}
           selectedDate={selectedDate as Date}
           onBack={handleGoBackWhenSelectingRestaurant}
+          selectFoodInProgress={updateOrderDetailInProgress}
         />
       ) : (
         <div>
@@ -408,13 +433,20 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
             <CalendarDashboard
               anchorDate={suitableStartDate}
               events={resourcesForCalender}
-              renderEvent={MealPlanCard}
+              renderEvent={(props: any) => (
+                <MealPlanCard
+                  {...props}
+                  removeInprogress={
+                    props?.resources?.updatePlanDetailInprogress
+                  }
+                  onRemove={handleRemoveMeal(props?.resources?.planId)}
+                />
+              )}
               companyLogo="Company"
               startDate={new Date(startDate)}
               endDate={new Date(endDate)}
               resources={{
-                startDate,
-                endDate,
+                ...calendarExtraResources,
                 onEditFood: onEditFoodInMealPlanCard,
                 onEditFoodInProgress,
               }}
@@ -455,6 +487,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         isOpen={showPickFoodModal}
         initialFoodList={initialFoodList}
         handleClose={closePickFoodModal}
+        selectFoodInProgress={updateOrderDetailInProgress}
         handleSelectFood={handleSelectFood}
       />
     </>

@@ -24,12 +24,14 @@ type TSelectRestaurantPageProps = {
   onSubmitRestaurant: (values: TObject) => void;
   selectedDate: Date;
   onBack: () => void;
+  selectFoodInProgress: boolean;
 };
 
 const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   onSubmitRestaurant,
   selectedDate,
   onBack,
+  selectFoodInProgress,
 }) => {
   const [currentRestaurant, setCurrentRestaurant] = useState<any>();
   const [page, setPage] = useState(1);
@@ -127,7 +129,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     }, DEBOUNCE_TIME);
   };
 
-  const handleSelectFood = (values: TSelectFoodFormValues) => {
+  const handleSelectFood = async (values: TSelectFoodFormValues) => {
     const { food: foodIds } = values;
 
     const currRestaurantId = currentRestaurant?.id?.uuid;
@@ -155,7 +157,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       ).menu.id.uuid,
     };
 
-    onSubmitRestaurant({
+    await onSubmitRestaurant({
       restaurant: submitRestaurantData,
       selectedFoodList: submitFoodListData,
     });
@@ -212,6 +214,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
         isOpen={showModalCondition}
         handleClose={handleCloseModal}
         handleSelectFood={handleSelectFood}
+        selectFoodInProgress={selectFoodInProgress}
       />
     </section>
   );

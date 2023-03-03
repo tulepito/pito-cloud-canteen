@@ -13,6 +13,7 @@ type TSelectFoodModalProps = {
   items: any[];
   restaurant: any;
   initialFoodList?: any;
+  selectFoodInProgress?: boolean;
   handleSelectFood: (values: TSelectFoodFormValues) => void;
 };
 
@@ -25,6 +26,7 @@ const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
     restaurant,
     handleSelectFood,
     initialFoodList = {},
+    selectFoodInProgress,
   } = props;
   const restaurantId = restaurant?.id?.uuid;
   const { title } = restaurant?.attributes || {};
@@ -80,6 +82,7 @@ const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
           items={items}
           handleFormChange={handleFormChange}
           initialValues={initialValues}
+          selectFoodInProgress={selectFoodInProgress}
         />
       )}
     </Modal>
