@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+import React from 'react';
+import { useIntl } from 'react-intl';
+import { useRouter } from 'next/router';
+
 import FormWizard from '@components/FormWizard/FormWizard';
 import useRedirectTabWizard from '@hooks/useRedirectTabWizard';
 import { adminRoutes } from '@src/paths';
 import { EListingStates } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
-import { useRouter } from 'next/router';
-import React from 'react';
-import { useIntl } from 'react-intl';
 
 // eslint-disable-next-line import/no-cycle
 import EditPartnerWizardTab from '../EditPartnerWizardTab/EditPartnerWizardTab';
+
 import css from './EditPartnerWizard.module.scss';
 
 export const BASIC_INFORMATION_TAB = 'basic-information';

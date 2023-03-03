@@ -1,9 +1,10 @@
+import { useState } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import Button from '@components/Button/Button';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { parseThousandNumber } from '@helpers/format';
-import classNames from 'classnames';
-import { useState } from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './DurationForNextOrderField.module.scss';
 

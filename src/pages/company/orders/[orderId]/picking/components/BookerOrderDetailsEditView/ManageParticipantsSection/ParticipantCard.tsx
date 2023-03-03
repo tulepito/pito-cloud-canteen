@@ -1,10 +1,11 @@
+import React from 'react';
+import classNames from 'classnames';
+
 import Avatar from '@components/Avatar/Avatar';
 import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import { shortenString } from '@utils/string';
 import type { TDefaultProps, TUser } from '@utils/types';
-import classNames from 'classnames';
-import React from 'react';
 
 import css from './ParticipantCard.module.scss';
 

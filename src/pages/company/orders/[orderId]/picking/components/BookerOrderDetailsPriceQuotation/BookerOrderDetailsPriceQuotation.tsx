@@ -1,11 +1,13 @@
+import { useIntl } from 'react-intl';
+import type { LocaleOptions } from 'luxon';
+import { DateTime } from 'luxon';
+
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import { formatTimestamp } from '@utils/dates';
 import type { TObject } from '@utils/types';
-import type { LocaleOptions } from 'luxon';
-import { DateTime } from 'luxon';
-import { useIntl } from 'react-intl';
 
 import type { TReviewInfoFormValues } from '../BookerOrderDetailsReviewView/ReviewInfoSection/ReviewInfoForm';
+
 import css from './BookerOrderDetailsPriceQuotation.module.scss';
 
 const formatDate = (

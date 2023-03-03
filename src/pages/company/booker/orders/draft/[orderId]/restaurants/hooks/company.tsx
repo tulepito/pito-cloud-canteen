@@ -1,8 +1,9 @@
+import { useEffect } from 'react';
+import { shallowEqual } from 'react-redux';
+
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
-import { useEffect } from 'react';
-import { shallowEqual } from 'react-redux';
 
 import { BookerSelectRestaurantThunks } from '../BookerSelectRestaurant.slice';
 

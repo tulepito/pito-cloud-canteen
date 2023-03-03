@@ -1,9 +1,10 @@
+import type { PropsWithChildren } from 'react';
+import React, { useEffect, useState } from 'react';
+import classNames from 'classnames';
+
 import IconCheckmark from '@components/Icons/IconCheckmark/IconCheckmark';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
-import type { PropsWithChildren } from 'react';
-import React, { useEffect, useState } from 'react';
 
 import css from './Button.module.scss';
 

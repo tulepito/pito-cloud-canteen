@@ -1,3 +1,5 @@
+import { useIntl } from 'react-intl';
+
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { addCommas, removeNonNumeric } from '@helpers/format';
 import {
@@ -5,7 +7,6 @@ import {
   nonNegativeValue,
   required,
 } from '@utils/validators';
-import { useIntl } from 'react-intl';
 
 import css from './MemberAmountField.module.scss';
 

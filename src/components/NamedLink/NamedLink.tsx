@@ -1,8 +1,9 @@
-import type { TDefaultProps, TObject } from '@utils/types';
+import React from 'react';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import Link from 'next/link';
-import React from 'react';
+
+import type { TDefaultProps, TObject } from '@utils/types';
 
 import css from './NamedLink.module.scss';
 

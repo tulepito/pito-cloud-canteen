@@ -1,15 +1,17 @@
+import { useMemo } from 'react';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
+
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { BookerManageCompany } from '@redux/slices/company.slice';
 import { CurrentUser, Listing, User } from '@utils/data';
 import type { TUser } from '@utils/types';
-import { useRouter } from 'next/router';
-import { useMemo } from 'react';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import type { TNutritionFormValues } from './components/NutritionForm/NutritionForm';
 import NutritionForm from './components/NutritionForm/NutritionForm';
+
 import css from './Nutrition.module.scss';
 
 const NutritionPage = () => {

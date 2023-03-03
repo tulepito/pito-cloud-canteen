@@ -1,3 +1,10 @@
+import { useEffect } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
+
 import Form from '@components/Form/Form';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
@@ -5,12 +12,6 @@ import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { menusSliceThunks } from '@redux/slices/menus.slice';
 import type { TIntegrationListing } from '@utils/types';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import css from './CreateMenuOptionForm.module.scss';
 

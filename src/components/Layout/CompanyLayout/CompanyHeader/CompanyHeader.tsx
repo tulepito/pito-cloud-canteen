@@ -1,3 +1,7 @@
+import React from 'react';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
 import Avatar from '@components/Avatar/Avatar';
 import { InlineTextButton } from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -12,9 +16,6 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
 import { currentUserSelector, userActions } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import React from 'react';
 
 import css from './CompanyHeader.module.scss';
 

@@ -1,8 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities, User } from '@utils/data';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 const ADMIN_FLEX_ID = process.env.PITO_ADMIN_ID;
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {

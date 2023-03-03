@@ -2,14 +2,16 @@
  * LayoutSingleColumn needs to have 2-3 children:
  * LayoutWrapperTopbar, LayoutWrapperMain, and possibly LayoutWrapperFooter.
  */
-import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
 import type { ReactElement } from 'react';
 import React from 'react';
+import classNames from 'classnames';
+
+import type { TDefaultProps } from '@utils/types';
 
 import AdminLayoutContent from '../AdminLayoutContent/AdminLayoutContent';
 import AdminLayoutSidebar from '../AdminLayoutSidebar/AdminLayoutSidebar';
 import AdminLayoutTopbar from '../AdminLayoutTopbar/AdminLayoutTopbar';
+
 import css from './AdminLayoutWrapper.module.scss';
 
 const prepareChildren = (children: ReactElement[]) => {

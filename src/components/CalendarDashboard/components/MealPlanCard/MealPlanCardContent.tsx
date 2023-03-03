@@ -1,7 +1,8 @@
+import type { Event } from 'react-big-calendar';
+
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { EImageVariants } from '@utils/enums';
-import type { Event } from 'react-big-calendar';
 
 import css from './MealPlanCard.module.scss';
 

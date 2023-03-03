@@ -1,3 +1,9 @@
+import type { ChangeEvent } from 'react';
+import React, { useState } from 'react';
+import { Field } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconClose from '@components/Icons/IconClose/IconClose';
@@ -12,11 +18,6 @@ import type {
   TImageVariant,
   TObject,
 } from '@utils/types';
-import classNames from 'classnames';
-import type { ChangeEvent } from 'react';
-import React, { useState } from 'react';
-import { Field } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './FieldPhotoUpload.module.scss';
 

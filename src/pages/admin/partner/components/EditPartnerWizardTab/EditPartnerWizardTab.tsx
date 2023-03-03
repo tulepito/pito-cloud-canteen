@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import React, { useMemo } from 'react';
+import { useRouter } from 'next/router';
+
 import { adminRoutes } from '@src/paths';
 import { EListingStates, OTHER_OPTION } from '@utils/enums';
 import { parsePrice } from '@utils/validators';
-import { useRouter } from 'next/router';
-import React, { useMemo } from 'react';
 
 import EditPartnerBasicInformationForm from '../EditPartnerBasicInformationForm/EditPartnerBasicInformationForm';
 import EditPartnerLicenseForm from '../EditPartnerLicenseForm/EditPartnerLicenseForm';
@@ -17,6 +18,7 @@ import {
   MENU_TAB,
   PREVIEW_TAB,
 } from '../EditPartnerWizard/EditPartnerWizard';
+
 import {
   createSubmitCreatePartnerValues,
   createSubmitLicenseTabValues,

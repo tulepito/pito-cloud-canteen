@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import classNames from 'classnames';
-import isEmpty from 'lodash/isEmpty';
-import { DateTime } from 'luxon';
 import { useCallback, useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
+import { DateTime } from 'luxon';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';

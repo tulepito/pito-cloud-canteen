@@ -1,8 +1,9 @@
-import classNames from 'classnames';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import type { TTimeLineItemProps } from './types';
 
 import css from './ActivityItem.module.scss';
-import type { TTimeLineItemProps } from './types';
 
 type TActivityItemProps = TTimeLineItemProps;
 

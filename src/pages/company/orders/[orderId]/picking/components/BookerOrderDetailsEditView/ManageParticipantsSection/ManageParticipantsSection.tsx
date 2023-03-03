@@ -1,20 +1,23 @@
+import { useState } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import Button from '@components/Button/Button';
 import AlertModal from '@components/Modal/AlertModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TDefaultProps, TObject, TUser } from '@utils/types';
-import classNames from 'classnames';
-import { useState } from 'react';
-import { useIntl } from 'react-intl';
 
 import {
   orderDetailsAnyActionsInProgress,
   orderManagementThunks,
 } from '../../../OrderManagement.slice';
+
 import type { TAddParticipantFormValues } from './AddParticipantForm';
 import AddParticipantForm from './AddParticipantForm';
 import ManageParticipantsModal from './ManageParticipantsModal';
-import css from './ManageParticipantsSection.module.scss';
 import ParticipantCard from './ParticipantCard';
+
+import css from './ManageParticipantsSection.module.scss';
 
 export const renderParticipantCards = (
   items: Array<TUser>,

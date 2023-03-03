@@ -1,10 +1,11 @@
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   addWorkspaceCompanyId,
   BookerManageCompany,
 } from '@redux/slices/company.slice';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 
 const CompanyDetailPage = () => {
   const router = useRouter();

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';

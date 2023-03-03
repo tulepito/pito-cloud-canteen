@@ -1,10 +1,11 @@
-import type { TDefaultProps, TIconProps } from '@utils/types';
+import React from 'react';
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import type { PaginationProps as RCPaginationProps } from 'rc-pagination';
 import ExternalPagination from 'rc-pagination';
 import Select from 'rc-select';
-import React from 'react';
-import { useIntl } from 'react-intl';
+
+import type { TDefaultProps, TIconProps } from '@utils/types';
 
 import css from './Pagination.module.scss';
 

@@ -1,10 +1,11 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import type { ResponseToInvitationApiBody } from '@apis/companyInvitationApi';
 import {
   checkInvitationApi,
   responseToInvitationApi,
 } from '@apis/companyInvitationApi';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 
 type CheckInvitationResponse = {
   message: string;

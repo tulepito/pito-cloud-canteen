@@ -1,6 +1,7 @@
+import classNames from 'classnames';
+
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
 
 import type { usePrepareOrderDetailPageData } from '../../../hooks/usePrepareData';
 import ReviewCartSection from '../ReviewCartSection/ReviewCartSection';
@@ -11,6 +12,7 @@ import ReviewOrderProcessSection from '../ReviewOrderProcessSection/ReviewOrderP
 import ReviewOrdersResultSection from '../ReviewOrdersResultSection/ReviewOrdersResultSection';
 import ReviewOrderStatesSection from '../ReviewOrderStatesSection/ReviewOrderStatesSection';
 import ReviewTitleSection from '../ReviewTitleSection/ReviewTitleSection';
+
 import css from './BookerOrderDetailReviewView.module.scss';
 
 type TBookerOrderDetailReviewViewProps = TDefaultProps & {

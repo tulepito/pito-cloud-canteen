@@ -1,14 +1,16 @@
+import { useIntl } from 'react-intl';
+import { useRouter } from 'next/router';
+
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { QuizThunks } from '@redux/slices/Quiz.slice';
 import { companyPaths, quizPaths } from '@src/paths';
 import { User } from '@utils/data';
-import { useRouter } from 'next/router';
-import { useIntl } from 'react-intl';
+
+import useLoadCompanies from './hooks/loadCompanies';
+import CreateOrderForm from './CreateOrderForm';
 
 import css from './BookerNewOrder.module.scss';
-import CreateOrderForm from './CreateOrderForm';
-import useLoadCompanies from './hooks/loadCompanies';
 
 function BookerNewOrderPage() {
   const intl = useIntl();

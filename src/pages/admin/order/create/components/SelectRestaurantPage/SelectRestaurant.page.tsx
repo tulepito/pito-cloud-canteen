@@ -1,3 +1,8 @@
+import { useEffect, useRef, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import { DateTime } from 'luxon';
+
 import Badge from '@components/Badge/Badge';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Pagination from '@components/Pagination/Pagination';
@@ -6,16 +11,14 @@ import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
-import { DateTime } from 'luxon';
-import { useEffect, useRef, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 // eslint-disable-next-line import/no-cycle
 import type { TSelectFoodFormValues } from '../SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
 import SelectFoodModal from '../SelectFoodModal/SelectFoodModal';
+
 import RestaurantTable from './components/RestaurantTable/RestaurantTable';
 import SearchRestaurantForm from './components/SearchRestaurantForm/SearchRestaurantForm';
+
 import css from './SelectRestaurantPage.module.scss';
 
 const DEBOUNCE_TIME = 500;

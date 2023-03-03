@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import IconClose from '@components/Icons/IconClose/IconClose';
 import Modal from '@components/Modal/Modal';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
@@ -10,7 +12,6 @@ import { getListingImageById } from '@pages/company/booker/orders/draft/[orderId
 import { Listing } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
-import { useMemo } from 'react';
 
 import css from './RestaurantModal.module.scss';
 

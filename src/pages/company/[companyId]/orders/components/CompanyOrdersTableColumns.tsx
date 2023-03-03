@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-hooks/rules-of-hooks */
+import type { ReactNode } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import type { TButtonVariant } from '@components/Button/Button';
 import Button from '@components/Button/Button';
@@ -19,10 +24,6 @@ import {
   ORDER_STATES_OPTIONS,
 } from '@utils/enums';
 import type { TObject } from '@utils/types';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './CompanyOrdersTable.module.scss';
 

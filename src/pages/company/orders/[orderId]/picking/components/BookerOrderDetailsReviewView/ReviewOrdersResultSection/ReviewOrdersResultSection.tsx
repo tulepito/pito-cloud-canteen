@@ -1,11 +1,13 @@
+import React, { useState } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import Button from '@components/Button/Button';
 import { isJoinedPlan } from '@helpers/orderHelper';
 import type { TObject } from '@utils/types';
-import classNames from 'classnames';
-import React, { useState } from 'react';
-import { useIntl } from 'react-intl';
 
 import ReviewOrdersResultModal from './ReviewOrdersResultModal';
+
 import css from './ReviewOrdersResultSection.module.scss';
 
 const isCompletePickFood = ({

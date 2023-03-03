@@ -1,8 +1,9 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import { fetchUserApi } from '@apis/index';
 import { fetchSearchFilterApi } from '@apis/userApi';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
 import {
   EImageVariants,

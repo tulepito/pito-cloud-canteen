@@ -1,7 +1,8 @@
+import React from 'react';
+
 import FoodCard from '@components/FoodCard/FoodCard';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import type { TListing } from '@utils/types';
-import React from 'react';
 
 import css from './ResultDetailModal.module.scss';
 

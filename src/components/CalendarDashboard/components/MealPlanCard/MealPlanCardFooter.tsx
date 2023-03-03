@@ -1,6 +1,7 @@
-import Button from '@components/Button/Button';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
+
+import Button from '@components/Button/Button';
 
 import css from './MealPlanCard.module.scss';
 

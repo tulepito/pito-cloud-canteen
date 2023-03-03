@@ -1,7 +1,8 @@
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import { nutritionOptions } from '@src/marketplaceConfig';
-import classNames from 'classnames';
-import { useIntl } from 'react-intl';
 
 import css from './NutritionField.module.scss';
 

@@ -1,5 +1,6 @@
-import type { TObject } from '@utils/types';
 import isEqual from 'lodash/isEqual';
+
+import type { TObject } from '@utils/types';
 
 const sortArrayInObject = (obj: TObject) => {
   if (typeof obj !== 'object') return obj;

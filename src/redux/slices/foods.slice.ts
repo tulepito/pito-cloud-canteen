@@ -1,4 +1,8 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import { createSlice } from '@reduxjs/toolkit';
+import omit from 'lodash/omit';
+import Papa from 'papaparse';
+
 import {
   createPartnerFoodApi,
   deletePartnerFoodApi,
@@ -6,7 +10,6 @@ import {
   updatePartnerFoodApi,
 } from '@apis/foodApi';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import { getImportDataFromCsv } from '@src/pages/admin/partner/[restaurantId]/settings/food/utils';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants, EListingType } from '@utils/enums';
@@ -17,8 +20,6 @@ import type {
   TListing,
   TPagination,
 } from '@utils/types';
-import omit from 'lodash/omit';
-import Papa from 'papaparse';
 
 export const MANAGE_FOOD_PAGE_SIZE = 10;
 

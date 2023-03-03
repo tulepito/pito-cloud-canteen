@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
+import React, { useEffect, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import addDays from 'date-fns/addDays';
+import { useRouter } from 'next/router';
+
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
@@ -31,12 +38,6 @@ import type {
   TTableSortValue,
 } from '@utils/types';
 import { parsePrice } from '@utils/validators';
-import classNames from 'classnames';
-import addDays from 'date-fns/addDays';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import css from './ManageOrders.module.scss';
 

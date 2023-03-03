@@ -1,10 +1,11 @@
+import { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
+
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { passwordThunks } from '@redux/slices/password.slice';
 import type { AppDispatch } from '@redux/store';
 import type { TObject } from '@utils/types';
-import { useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 import PasswordRecoveryForm from './PasswordRecoveryForm';
 

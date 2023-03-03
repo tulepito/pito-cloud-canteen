@@ -1,14 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import classNames from 'classnames';
-import arrayMutators from 'final-form-arrays';
-import difference from 'lodash/difference';
-import isEqual from 'lodash/isEqual';
-import { DateTime } from 'luxon';
 import { useMemo, useState } from 'react';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import arrayMutators from 'final-form-arrays';
+import difference from 'lodash/difference';
+import isEqual from 'lodash/isEqual';
+import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';

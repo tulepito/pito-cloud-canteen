@@ -1,16 +1,17 @@
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-
-import { DAY_IN_WEEK } from '@components/CalendarDashboard/helpers/constant';
-import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
-import { DateTime } from 'luxon';
 import { useMemo } from 'react';
 import type { NavigateAction, TimeGridProps } from 'react-big-calendar';
 import { Navigate } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
+import { DateTime } from 'luxon';
+
+import { DAY_IN_WEEK } from '@components/CalendarDashboard/helpers/constant';
+import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
 
 import type { TCalendarItemCardComponents } from '../../helpers/types';
 import MDayItem from '../DayItem/MDayItem';
 import IconCalendarToolbar from '../Icons/IconCalendar';
+
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import css from './MonthView.module.scss';
 
 type TMonthViewProps = {

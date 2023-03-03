@@ -1,8 +1,9 @@
-import Button from '@components/Button/Button';
-import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import classNames from 'classnames';
 import React from 'react';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import Button from '@components/Button/Button';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 
 import css from './ReviewTitleSection.module.scss';
 

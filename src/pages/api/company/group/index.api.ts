@@ -1,3 +1,8 @@
+import { randomUUID } from 'crypto';
+import difference from 'lodash/difference';
+import differenceBy from 'lodash/differenceBy';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { HTTP_METHODS } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
@@ -5,10 +10,6 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import companyChecker from '@services/permissionChecker/company';
 import { handleError } from '@services/sdk';
 import { denormalisedResponseEntities, User } from '@utils/data';
-import { randomUUID } from 'crypto';
-import difference from 'lodash/difference';
-import differenceBy from 'lodash/differenceBy';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 const { UUID } = require('sharetribe-flex-sdk').types;
 

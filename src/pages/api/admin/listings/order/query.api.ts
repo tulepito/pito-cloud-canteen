@@ -1,3 +1,5 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { LISTING_TYPE } from '@src/pages/api/helpers/constants';
@@ -9,7 +11,6 @@ import {
   EOrderStates,
 } from '@utils/enums';
 import type { TCompany, TIntegrationOrderListing } from '@utils/types';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 const AdminOrderStatesEnableToQuery = [
   ...Object.values(EOrderStates),

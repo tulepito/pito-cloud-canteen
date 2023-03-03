@@ -1,8 +1,10 @@
-import Collapsible from '@components/Collapsible/Collapsible';
 import { FormattedMessage } from 'react-intl';
 
-import css from './ManageParticipantsModal.module.scss';
+import Collapsible from '@components/Collapsible/Collapsible';
+
 import ParticipantCard from './ParticipantCard';
+
+import css from './ManageParticipantsModal.module.scss';
 
 // const groupedMockupData = [
 //   { name: 'Group A', participants: [1, 3, 4, 5] },

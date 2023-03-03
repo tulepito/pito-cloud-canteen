@@ -1,7 +1,8 @@
+import classNames from 'classnames';
+
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import useBoolean from '@hooks/useBoolean';
-import classNames from 'classnames';
 
 import css from './CollapseFilter.module.scss';
 

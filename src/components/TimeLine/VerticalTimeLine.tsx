@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 
 import type { TTimeLineProps } from './types';
+
 import css from './VerticalTimeLine.module.scss';
 
 type TVerticalTimeLineProps = TTimeLineProps & {

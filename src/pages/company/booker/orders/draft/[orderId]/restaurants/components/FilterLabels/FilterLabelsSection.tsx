@@ -2,6 +2,7 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 
 import FilterLabelList from './FilterLabelList';
+
 import css from './FilterLabelsSection.module.scss';
 
 type TFilterLabelsSectionProps = {

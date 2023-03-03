@@ -1,3 +1,8 @@
+import type { PropsWithChildren } from 'react';
+import React, { useCallback, useEffect } from 'react';
+import { useIntl } from 'react-intl';
+import { useRouter } from 'next/router';
+
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
@@ -8,10 +13,6 @@ import {
   IgnoredAuthCheckRoutes,
   NonRequireAuthenticationRoutes,
 } from '@src/paths';
-import { useRouter } from 'next/router';
-import type { PropsWithChildren } from 'react';
-import React, { useCallback, useEffect } from 'react';
-import { useIntl } from 'react-intl';
 
 type TAuthGuardProps = PropsWithChildren<{}>;
 

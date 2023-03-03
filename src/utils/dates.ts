@@ -1,14 +1,15 @@
+import jstz from 'jstimezonedetect';
+import difference from 'lodash/difference';
+import differenceBy from 'lodash/differenceBy';
+import type { DurationUnits, LocaleOptions } from 'luxon';
+import { DateTime, Interval } from 'luxon';
+
 import {
   AFTERNOON_SESSION,
   DINNER_SESSION,
   EVENING_SESSION,
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
-import jstz from 'jstimezonedetect';
-import difference from 'lodash/difference';
-import differenceBy from 'lodash/differenceBy';
-import type { DurationUnits, LocaleOptions } from 'luxon';
-import { DateTime, Interval } from 'luxon';
 
 import { getUniqueString } from './data';
 import { EDayOfWeek } from './enums';

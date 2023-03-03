@@ -1,11 +1,13 @@
+import { useIntl } from 'react-intl';
+
 import Modal from '@components/Modal/Modal';
 import type { TObject, TUser } from '@utils/types';
-import { useIntl } from 'react-intl';
 
 import type { TAddParticipantFormValues } from './AddParticipantForm';
 import AddParticipantForm from './AddParticipantForm';
-import css from './ManageParticipantsModal.module.scss';
 import { RawParticipants } from './RawParticipants';
+
+import css from './ManageParticipantsModal.module.scss';
 
 type ManageParticipantsModalProps = {
   isOpen: boolean;

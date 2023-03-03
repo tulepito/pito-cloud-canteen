@@ -1,3 +1,7 @@
+import React, { useState } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import Button from '@components/Button/Button';
 import ButtonIcon from '@components/ButtonIcon/ButtonIcon';
 import IconCopy from '@components/Icons/IconCopy/IconCopy';
@@ -6,14 +10,13 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { formatTimestamp } from '@utils/dates';
 import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
-import React, { useState } from 'react';
-import { useIntl } from 'react-intl';
 
 import { orderManagementThunks } from '../../../OrderManagement.slice';
-import css from './OrderLinkSection.module.scss';
+
 import type { TSendNotificationFormValues } from './SendNotificationForm';
 import SendNotificationModal from './SendNotificationModal';
+
+import css from './OrderLinkSection.module.scss';
 
 type TOrderLinkSectionProps = TDefaultProps & {
   data: {

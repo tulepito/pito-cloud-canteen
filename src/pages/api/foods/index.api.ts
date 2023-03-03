@@ -1,5 +1,6 @@
-import { getIntegrationSdk } from '@services/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+import { getIntegrationSdk } from '@services/sdk';
 
 import { denormalisedResponseEntities } from '../../../utils/data';
 import { HTTP_METHODS, LISTING_TYPE } from '../helpers/constants';

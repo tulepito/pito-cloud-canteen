@@ -1,6 +1,7 @@
+import isEmpty from 'lodash/isEmpty';
+
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject, TUser } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
 
 import type { TAllTabData, TItemData } from './OrderDetailsTable.utils';
 import { EOrderDetailsTableTab } from './OrderDetailsTable.utils';

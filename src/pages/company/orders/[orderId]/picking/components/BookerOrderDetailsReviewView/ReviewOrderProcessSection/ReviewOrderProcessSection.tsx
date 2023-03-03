@@ -1,4 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
+import isEmpty from 'lodash/isEmpty';
+import { DateTime } from 'luxon';
+
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ActivityItem from '@components/TimeLine/ActivityItem';
 import VerticalTimeLine from '@components/TimeLine/VerticalTimeLine';
@@ -11,11 +17,6 @@ import {
   EOrderStates,
 } from '@utils/enums';
 import type { TListing, TOrderStateHistory } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
-import { DateTime } from 'luxon';
-import { useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
-import Skeleton from 'react-loading-skeleton';
 
 import css from './ReviewOrderProcessSection.module.scss';
 

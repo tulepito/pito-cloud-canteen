@@ -1,3 +1,5 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import type {
   CreateGroupApiBody,
   DeleteGroupApiData,
@@ -14,7 +16,6 @@ import {
   updateGroupApi,
 } from '@apis/companyApi';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TObject, TUser } from '@utils/types';

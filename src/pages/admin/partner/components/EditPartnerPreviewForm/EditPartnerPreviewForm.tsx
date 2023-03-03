@@ -1,4 +1,10 @@
 /* eslint-disable import/no-cycle */
+import React from 'react';
+import { Field, Form as FinalForm } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+import arrayMutators from 'final-form-arrays';
+
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
@@ -18,11 +24,6 @@ import {
   MEAL_OPTIONS,
   PACKAGING_OPTIONS,
 } from '@utils/enums';
-import classNames from 'classnames';
-import arrayMutators from 'final-form-arrays';
-import React from 'react';
-import { Field, Form as FinalForm } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import {
   BASIC_INFORMATION_TAB,
@@ -30,6 +31,7 @@ import {
   MENU_TAB,
 } from '../EditPartnerWizard/EditPartnerWizard';
 import { createAvailabilityPlanInitialValues } from '../EditPartnerWizardTab/utils';
+
 import css from './EditPartnerPreviewForm.module.scss';
 
 const getLabelByKey = (list: any[], key: any) => {

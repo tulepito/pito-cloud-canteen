@@ -1,8 +1,10 @@
-import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
+import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
+
 import OrderEventCard from '../OrderEventCard/OrderEventCard';
+
 import css from './DaySession.module.scss';
 
 type TDaySessionProps = {

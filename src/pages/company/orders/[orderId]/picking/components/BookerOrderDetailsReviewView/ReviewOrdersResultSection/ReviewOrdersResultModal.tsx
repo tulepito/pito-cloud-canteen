@@ -1,10 +1,11 @@
+import { useMemo } from 'react';
+import { useIntl } from 'react-intl';
+import { DateTime } from 'luxon';
+
 import Button from '@components/Button/Button';
 import Modal from '@components/Modal/Modal';
 import { isJoinedPlan } from '@helpers/orderHelper';
 import type { TObject, TUser } from '@utils/types';
-import { DateTime } from 'luxon';
-import { useMemo } from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './ReviewOrdersResultModal.module.scss';
 

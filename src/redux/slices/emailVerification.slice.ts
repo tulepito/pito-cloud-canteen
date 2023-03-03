@@ -1,5 +1,6 @@
-import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
+
+import { createAsyncThunk } from '@redux/redux.helper';
 import { storableError } from '@utils/errors';
 import type { TObject } from '@utils/types';
 

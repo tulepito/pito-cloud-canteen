@@ -1,3 +1,8 @@
+import type { PropsWithChildren } from 'react';
+import { useState } from 'react';
+import { Form as FinalForm } from 'react-final-form';
+import classNames from 'classnames';
+
 import Accordion from '@components/Accordion/Accordion';
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
@@ -18,10 +23,6 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import useBoolean from '@hooks/useBoolean';
 import type { TIconProps } from '@utils/types';
 import { required } from '@utils/validators';
-import classNames from 'classnames';
-import type { PropsWithChildren } from 'react';
-import { useState } from 'react';
-import { Form as FinalForm } from 'react-final-form';
 
 import css from './StyleGuide.module.scss';
 

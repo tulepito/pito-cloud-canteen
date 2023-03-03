@@ -1,15 +1,18 @@
+import { useState } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
-import classNames from 'classnames';
-import { useState } from 'react';
-import { useIntl } from 'react-intl';
 
 import ManageDeletedListModal from '../ManageDeletedListModal';
-import css from './OrderDetailsTable.module.scss';
+
 import type { TItemData } from './OrderDetailsTable.utils';
 import { EOrderDetailsTableTab } from './OrderDetailsTable.utils';
+
+import css from './OrderDetailsTable.module.scss';
 
 type TOrderDetailsTableComponentProps = {
   tab: EOrderDetailsTableTab;

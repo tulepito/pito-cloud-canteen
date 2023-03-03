@@ -1,11 +1,12 @@
+import { useMemo } from 'react';
+import Skeleton from 'react-loading-skeleton';
+import isEmpty from 'lodash/isEmpty';
+
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import HorizontalTimeLine from '@components/TimeLine/HorizontalTimeLine';
 import StateItem from '@components/TimeLine/StateItem';
 import { formatTimestamp } from '@utils/dates';
 import type { TObject, TTransaction } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
-import { useMemo } from 'react';
-import Skeleton from 'react-loading-skeleton';
 
 import css from './ReviewOrderStatesSection.module.scss';
 

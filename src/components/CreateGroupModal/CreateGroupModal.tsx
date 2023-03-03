@@ -1,8 +1,9 @@
+import { useIntl } from 'react-intl';
+
 import Button from '@components/Button/Button';
 import CreateGroupForm from '@components/CreateGroupForm/CreateGroupForm';
 import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
-import { useIntl } from 'react-intl';
 
 import css from './CreateGroupModal.module.scss';
 

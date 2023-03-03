@@ -1,18 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useMemo, useState } from 'react';
+import Skeleton from 'react-loading-skeleton';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
 import RestaurantCard from '@components/RestaurantCard/RestaurantCard';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { User } from '@utils/data';
 import type { TListing, TUser } from '@utils/types';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import React, { useEffect, useMemo, useState } from 'react';
-import Skeleton from 'react-loading-skeleton';
-import { shallowEqual } from 'react-redux';
 
 import { BookerSelectRestaurantThunks } from '../../BookerSelectRestaurant.slice';
 import ResultDetailModal from '../ResultDetailModal/ResultDetailModal';
+
 import EmptyList from './EmptyList';
+
 import css from './ResultList.module.scss';
 
 type TResultListProps = {

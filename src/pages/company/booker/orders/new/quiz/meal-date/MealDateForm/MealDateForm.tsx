@@ -1,12 +1,13 @@
+import { useEffect } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+
 import Form from '@components/Form/Form';
 import DayInWeekField from '@pages/admin/order/create/components/DayInWeekField/DayInWeekField';
 import DurationForNextOrderField from '@pages/admin/order/create/components/DurationForNextOrderField/DurationForNextOrderField';
 import MealPlanDateField from '@pages/admin/order/create/components/MealPlanDateField/MealPlanDateField';
 import OrderDeadlineField from '@pages/admin/order/create/components/OrderDeadlineField/OrderDeadlineField';
-import { useEffect } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import css from './MealDateForm.module.scss';
 

@@ -40,21 +40,23 @@
           // Import configuration for `eslint-plugin-simple-import-sort`
           "error",
           {
-            // "groups": [
-            //   // Packages `react` related packages come first.
-            //   ["^@?\\w"],
-            //   // [],
-            //   // Internal.
-            //   ["^(@[a-zA-Z])(/.*|$)"],
-            //   // Side effect imports.
-            //   ["^\\u0000"],
-            //   // Parent imports. Put `..` last.
-            //   ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
-            //   // Other relative imports. Put same-folder imports and `.` last.
-            //   ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
-            //   // Style imports.
-            //   ["^.+\\.?(scss)$"]
-            // ]
+            "groups": [
+              // Packages `react` related packages come first.
+              ["^react", "^@?\\w"],
+              // [],
+              // Internal.
+              [
+                "(@(apis|components|configs|forms|helpers|hooks|pages|redux|services|sharetribe|src|styles|translations|utils))(/.*|$)"
+              ],
+              // Side effect imports.
+              ["^\\u0000"],
+              // Parent imports. Put `..` last.
+              ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+              // Other relative imports. Put same-folder imports and `.` last.
+              ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+              // Style imports.
+              ["^.+\\.?(scss|css)$"]
+            ]
           }
         ],
         "simple-import-sort/exports": "error", // Export configuration for `eslint-plugin-simple-import-sort`

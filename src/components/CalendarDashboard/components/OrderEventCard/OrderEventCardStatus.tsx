@@ -1,9 +1,10 @@
-import classNames from 'classnames';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
 
 import { EVENT_STATUS } from '../../helpers/constant';
 import type { TEventStatus } from '../../helpers/types';
+
 import css from './OrderEventCard.module.scss';
 
 type TOrderEventCardStatusProps = {

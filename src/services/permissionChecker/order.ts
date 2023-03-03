@@ -1,9 +1,10 @@
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+
 import { fetchListing } from '@services/integrationHelper';
 import { getSdk, handleError } from '@services/sdk';
 import { HTTP_METHODS } from '@src/pages/api/helpers/constants';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 const orderChecker =
   (handler: NextApiHandler) =>

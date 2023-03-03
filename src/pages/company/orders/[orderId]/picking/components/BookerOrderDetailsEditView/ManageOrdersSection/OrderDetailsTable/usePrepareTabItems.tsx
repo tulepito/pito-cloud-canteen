@@ -1,10 +1,11 @@
-import classNames from 'classnames';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 
-import css from './OrderDetailsTable.module.scss';
 import type { TAllTabData, TItemData } from './OrderDetailsTable.utils';
 import { EOrderDetailsTableTab, TABLE_TABS } from './OrderDetailsTable.utils';
 import { OrderDetailsTableComponent } from './OrderDetailsTableComponent';
+
+import css from './OrderDetailsTable.module.scss';
 
 type TUsePrepareTabItemsParams = {
   allTabData: TAllTabData;

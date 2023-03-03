@@ -1,17 +1,19 @@
+import React, { useRef, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+import type { FormApi } from 'final-form';
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import AlertModal from '@components/Modal/AlertModal';
 import type { TSecondaryKeywordSearchFormValues } from '@components/SecondaryKeywordSearchForm/SecondaryKeywordSearchForm';
 import SecondaryKeywordSearchForm from '@components/SecondaryKeywordSearchForm/SecondaryKeywordSearchForm';
 import { adminRoutes } from '@src/paths';
 import { EMenuTypes } from '@utils/enums';
-import type { FormApi } from 'final-form';
-import { useRouter } from 'next/router';
-import React, { useRef, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
 
 import type { TCreateMenuOptionFormValues } from '../CreateMenuOptionForm/CreateMenuOptionForm';
 import CreateMenuOptionForm from '../CreateMenuOptionForm/CreateMenuOptionForm';
 import ManagePartnerMenusContent from '../ManagePartnerMenusContent/ManagePartnerMenusContent';
+
 import css from './ManagePartnerMenus.module.scss';
 
 type TManagePartnerMenusPageProps = {

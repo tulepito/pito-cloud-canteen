@@ -1,7 +1,8 @@
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+
 import { getSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import { checkUserIsAdmin } from '@utils/permissions';
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 const adminChecker =
   (handler: NextApiHandler) =>

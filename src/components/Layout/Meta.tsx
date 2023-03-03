@@ -1,5 +1,5 @@
-import { NextSeo } from 'next-seo';
 import { useIntl } from 'react-intl';
+import { NextSeo } from 'next-seo';
 
 import configs from '../../configs';
 

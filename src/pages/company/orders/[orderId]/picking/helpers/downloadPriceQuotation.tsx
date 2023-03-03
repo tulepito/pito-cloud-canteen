@@ -1,7 +1,8 @@
+import ReactDOM from 'react-dom';
+
 import { createNewPrint } from '@services/pdf';
 import TranslationProvider from '@translations/TranslationProvider';
 import type { TObject } from '@utils/types';
-import ReactDOM from 'react-dom';
 
 import BookerOrderDetailsPriceQuotation from '../components/BookerOrderDetailsPriceQuotation/BookerOrderDetailsPriceQuotation';
 import type { usePrepareOrderDetailPageData } from '../hooks/usePrepareData';

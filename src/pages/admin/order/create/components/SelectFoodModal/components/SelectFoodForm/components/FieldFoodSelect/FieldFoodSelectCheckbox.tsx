@@ -1,8 +1,9 @@
-import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
-import { addCommas } from '@helpers/format';
-import classNames from 'classnames';
 import type { FieldInputProps } from 'react-final-form';
 import { Field } from 'react-final-form';
+import classNames from 'classnames';
+
+import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import { addCommas } from '@helpers/format';
 
 import css from './FieldFoodSelectCheckbox.module.scss';
 

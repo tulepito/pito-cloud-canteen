@@ -1,19 +1,21 @@
 /* eslint-disable @typescript-eslint/default-param-last */
-import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
-import Form from '@components/Form/Form';
-import { IntegrationListing } from '@utils/data';
-import type { TIntegrationListing } from '@utils/types';
-import type { FormApi } from 'final-form';
 import { useImperativeHandle, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
+import type { FormApi } from 'final-form';
+
+import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
+import Form from '@components/Form/Form';
+import { IntegrationListing } from '@utils/data';
+import type { TIntegrationListing } from '@utils/types';
 
 import AddFoodModal from '../AddFoodModal/AddFoodModal';
 import CalendarContentEnd from '../CalendarContentEnd/CalendarContentEnd';
 import CalendarContentStart from '../CalendarContentStart/CalendarContentStart';
 import { renderResourcesForCalendar } from '../EditPartnerMenuWizard/utils';
 import FoodEventCard from '../FoodEventCard/FoodEventCard';
+
 import css from './EditMenuPricingForm.module.scss';
 
 export type TEditMenuPricingFormValues = {

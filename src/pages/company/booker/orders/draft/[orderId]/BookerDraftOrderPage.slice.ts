@@ -1,5 +1,6 @@
-import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
+
+import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import type { TListing, TUser } from '@utils/types';
 

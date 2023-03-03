@@ -1,10 +1,12 @@
-import Form from '@components/Form/Form';
-import type { FormApi } from 'final-form';
-import arrayMutators from 'final-form-arrays';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import type { FormApi } from 'final-form';
+import arrayMutators from 'final-form-arrays';
+
+import Form from '@components/Form/Form';
 
 import FieldMenuApplyTimeGroup from '../FieldMenuApplyTimeGroup/FieldMenuApplyTimeGroup';
+
 import css from './UpdateMenuModalForm.module.scss';
 
 export type TUpdateMenuModalFormValues = {

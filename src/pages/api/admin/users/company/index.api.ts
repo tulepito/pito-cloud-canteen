@@ -1,7 +1,8 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { queryAllUsers } from '@helpers/apiHelpers';
 import cookies from '@services/cookie';
 import { handleError } from '@services/sdk';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {

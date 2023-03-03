@@ -1,3 +1,7 @@
+import { useEffect } from 'react';
+import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
+
 import RedirectLink from '@components/RedirectLink/RedirectLink';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
@@ -10,13 +14,11 @@ import { generalPaths } from '@src/paths';
 import { UserInviteResponse } from '@src/types/UserPermission';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import { shallowEqual } from 'react-redux';
 
-import css from './CompanyInvitation.module.scss';
 import InvitationCard from './components/InvitationCard/InvitationCard';
 import InvitationNotiModal from './components/InvitationNotiModal/InvitationNotiModal';
+
+import css from './CompanyInvitation.module.scss';
 
 const CompanyInvitationPage = () => {
   const router = useRouter();

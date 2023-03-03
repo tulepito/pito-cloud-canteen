@@ -1,8 +1,9 @@
-import { useRouter } from 'next/router';
 import { useMemo } from 'react';
+import { useRouter } from 'next/router';
 
 import { convertQueryValueToArray } from '../../helpers/urlQuery';
 import FilterSidebarForm from '../FilterSidebarForm/FilterSidebarForm';
+
 import css from './FilterSidebar.module.scss';
 
 const FilterSidebar: React.FC = () => {

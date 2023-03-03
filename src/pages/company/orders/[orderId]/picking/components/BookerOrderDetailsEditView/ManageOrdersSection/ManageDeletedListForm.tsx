@@ -1,13 +1,15 @@
-import Button from '@components/Button/Button';
-import Form from '@components/Form/Form';
-import type { TObject } from '@utils/types';
-import arrayMutators from 'final-form-arrays';
 import { useMemo } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import arrayMutators from 'final-form-arrays';
+
+import Button from '@components/Button/Button';
+import Form from '@components/Form/Form';
+import type { TObject } from '@utils/types';
 
 import FieldMemberSelectCheckboxGroup from './FieldMemberSelectCheckboxGroup';
+
 import css from './ManageDeletedListForm.module.scss';
 
 export enum ManageDeletedListFormAction {

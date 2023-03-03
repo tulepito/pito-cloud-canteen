@@ -1,11 +1,12 @@
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import type { TDefaultProps, TFormEvent, TIconProps } from '@utils/types';
-import { required } from '@utils/validators';
-import classNames from 'classnames';
 import React from 'react';
 import type { FieldProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import type { TDefaultProps, TFormEvent, TIconProps } from '@utils/types';
+import { required } from '@utils/validators';
 
 import css from './FieldCheckbox.module.scss';
 

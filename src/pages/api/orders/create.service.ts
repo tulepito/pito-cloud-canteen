@@ -1,3 +1,5 @@
+import { isEmpty } from 'lodash';
+
 import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
 import getAdminAccount from '@services/getAdminAccount';
 import { fetchUser } from '@services/integrationHelper';
@@ -10,7 +12,6 @@ import {
   EOrderDraftStates,
 } from '@utils/enums';
 import type { TObject } from '@utils/types';
-import { isEmpty } from 'lodash';
 
 const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 

@@ -1,3 +1,6 @@
+import { DateTime } from 'luxon';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -8,8 +11,6 @@ import {
   UserPermission,
 } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, User } from '@utils/data';
-import { DateTime } from 'luxon';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const sdk = getSdk(req, res);

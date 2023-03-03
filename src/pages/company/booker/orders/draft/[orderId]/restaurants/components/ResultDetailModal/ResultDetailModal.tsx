@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';

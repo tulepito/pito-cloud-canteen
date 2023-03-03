@@ -1,10 +1,12 @@
+import { useIntl } from 'react-intl';
+
 import Modal from '@components/Modal/Modal';
 import { parseThousandNumber } from '@helpers/format';
 import type { TObject } from '@utils/types';
-import { useIntl } from 'react-intl';
 
 import type { TEditOrderRowFormValues } from './EditOrderRowForm';
 import EditOrderRowForm from './EditOrderRowForm';
+
 import css from './EditOrderRowModal.module.scss';
 
 type TEditOrderRowModalProps = {

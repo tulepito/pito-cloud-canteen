@@ -1,10 +1,11 @@
+import React from 'react';
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
 import { userActions } from '@redux/slices/user.slice';
 import { generalPaths } from '@src/paths';
-import { useRouter } from 'next/router';
-import React from 'react';
 
 const UnactiveUserScreen = () => {
   const dispatch = useAppDispatch();

@@ -1,3 +1,7 @@
+import React from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconBox from '@components/Icons/IconBox/IconBox';
@@ -13,9 +17,6 @@ import {
   EImageVariants,
   PACKAGING_OPTIONS,
 } from '@utils/enums';
-import classNames from 'classnames';
-import React from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './RestaurantCard.module.scss';
 

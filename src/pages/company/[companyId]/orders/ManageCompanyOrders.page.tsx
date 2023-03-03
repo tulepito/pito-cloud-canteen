@@ -1,13 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect } from 'react';
+import { useIntl } from 'react-intl';
+import { useRouter } from 'next/router';
+
 import { getCompanyIdFromBookerUser } from '@helpers/company';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import { useIntl } from 'react-intl';
 
 import CompanyOrdersTable from './components/CompanyOrdersTable';
+
 import css from './ManageCompanyOrdersPage.module.scss';
 
 type TManageCompanyOrdersPageProps = {};

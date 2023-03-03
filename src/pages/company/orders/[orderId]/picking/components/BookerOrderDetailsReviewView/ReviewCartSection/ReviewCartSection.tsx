@@ -1,3 +1,8 @@
+import React from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
@@ -6,12 +11,9 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { companyPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import React from 'react';
-import { useIntl } from 'react-intl';
 
 import { orderManagementThunks } from '../../../OrderManagement.slice';
+
 import css from './ReviewCartSection.module.scss';
 
 type TReviewCartSectionProps = {

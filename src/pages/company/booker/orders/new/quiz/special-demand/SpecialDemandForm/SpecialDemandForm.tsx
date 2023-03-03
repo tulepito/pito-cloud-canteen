@@ -1,9 +1,10 @@
-import Form from '@components/Form/Form';
-import NutritionField from '@pages/admin/order/create/components/NutritionField/NutritionField';
 import { useEffect, useImperativeHandle } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+
+import Form from '@components/Form/Form';
+import NutritionField from '@pages/admin/order/create/components/NutritionField/NutritionField';
 
 import css from './SpecialDemandForm.module.scss';
 

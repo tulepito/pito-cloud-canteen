@@ -1,15 +1,17 @@
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+
 import Button from '@components/Button/Button';
 import { calculateGroupMembersAmount } from '@helpers/company';
 import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import CalendarPage from '@src/pages/calendar/CalendarPage.page';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import OrderSettingModal, {
   OrderSettingField,
 } from '../../create/components/OrderSettingModal/OrderSettingModal';
+
 import css from './MealPlanCreator.module.scss';
 
 type MealPlanCreatorProps = {

@@ -1,6 +1,7 @@
-import useBoolean from '@hooks/useBoolean';
-import classNames from 'classnames';
 import React from 'react';
+import classNames from 'classnames';
+
+import useBoolean from '@hooks/useBoolean';
 
 import css from './ToggleButton.module.scss';
 

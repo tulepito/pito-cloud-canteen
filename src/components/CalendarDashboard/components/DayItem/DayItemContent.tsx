@@ -1,7 +1,9 @@
-import type { TObject } from '@utils/types';
 import type { Event } from 'react-big-calendar';
 
+import type { TObject } from '@utils/types';
+
 import type { TCalendarItemCardComponents } from '../../helpers/types';
+
 import css from './DayItem.module.scss';
 
 type TDayColumnContentProps = {

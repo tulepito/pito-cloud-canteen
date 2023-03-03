@@ -1,3 +1,9 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import take from 'lodash/take';
+import takeRight from 'lodash/takeRight';
+
 import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -7,15 +13,11 @@ import { BookerManageCompany } from '@redux/slices/company.slice';
 import { resetImage } from '@redux/slices/uploadImage.slice';
 import { User } from '@utils/data';
 import type { TCurrentUser, TUser } from '@utils/types';
-import take from 'lodash/take';
-import takeRight from 'lodash/takeRight';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
-import css from './Account.module.scss';
 import type { TContactPointProfileFormValues } from './components/ContactPointProfileForm/ContactPointProfileForm';
 import ContactPointProfileForm from './components/ContactPointProfileForm/ContactPointProfileForm';
+
+import css from './Account.module.scss';
 
 const AccountPage = () => {
   const dispatch = useAppDispatch();

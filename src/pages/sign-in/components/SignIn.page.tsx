@@ -1,10 +1,11 @@
+import { useEffect } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { useRouter } from 'next/router';
+
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
 import { userThunks } from '@redux/slices/user.slice';
 import { generalPaths } from '@src/paths';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import { FormattedMessage } from 'react-intl';
 
 import type { TSignInFormValues } from './SignInForm';
 import SignInForm from './SignInForm';

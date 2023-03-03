@@ -1,4 +1,10 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import React, { useEffect, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import type { FormApi } from 'final-form';
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
@@ -18,14 +24,10 @@ import type {
   TTableSortValue,
 } from '@utils/types';
 import { parsePrice } from '@utils/validators';
-import type { FormApi } from 'final-form';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import useQueryMenuPickedFoods from '../EditPartnerMenuWizard/useQueryMenuPickedFoods';
 import FieldPickedFood from '../FieldPickedFood/FieldPickedFood';
+
 import css from './AddFoodModal.module.scss';
 
 type TAddFoodModal = {

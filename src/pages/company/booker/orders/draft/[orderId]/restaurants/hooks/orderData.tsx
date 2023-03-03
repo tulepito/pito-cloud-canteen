@@ -1,7 +1,8 @@
+import { useEffect } from 'react';
+
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
-import { useEffect } from 'react';
 
 import { BookerSelectRestaurantThunks } from '../BookerSelectRestaurant.slice';
 

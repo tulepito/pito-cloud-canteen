@@ -1,8 +1,9 @@
+import get from 'lodash/get';
+import Link from 'next/link';
+
 import PITOLogo from '@components/PitoLogo/PitoLogo';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import get from 'lodash/get';
-import Link from 'next/link';
 
 import css from './GeneralLayoutTopBar.module.scss';
 

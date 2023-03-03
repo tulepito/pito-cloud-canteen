@@ -1,12 +1,13 @@
+import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
+import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
+
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { companyPaths } from '@src/paths';
 import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
-import isEmpty from 'lodash/isEmpty';
-import { useIntl } from 'react-intl';
-import Skeleton from 'react-loading-skeleton';
 
 import css from './TitleSection.module.scss';
 

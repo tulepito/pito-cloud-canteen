@@ -1,4 +1,7 @@
 // eslint-disable-next-line import/no-named-as-default
+import React from 'react';
+import { useRouter } from 'next/router';
+
 import Avatar from '@components/Avatar/Avatar';
 import { InlineTextButton } from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -11,8 +14,6 @@ import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
 import { currentUserSelector, userActions } from '@redux/slices/user.slice';
-import { useRouter } from 'next/router';
-import React from 'react';
 
 import css from './AdminHeader.module.scss';
 

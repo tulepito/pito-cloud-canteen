@@ -1,5 +1,9 @@
 /* eslint-disable no-console */
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { merge } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
@@ -7,9 +11,6 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import { getSdk, handleError } from '@services/sdk';
 import { CurrentUser, Listing, TransactionWithExtendedData } from '@utils/data';
 import { txIsCompleted } from '@utils/transaction';
-import { merge } from 'lodash';
-import isEmpty from 'lodash/isEmpty';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { summarizeReviews } from './summarize-reviews.service';
 

@@ -1,10 +1,11 @@
-import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
-import { useAppSelector } from '@hooks/reduxHooks';
-import difference from 'lodash/difference';
-import Link from 'next/link';
 import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import difference from 'lodash/difference';
+import Link from 'next/link';
+
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import { useAppSelector } from '@hooks/reduxHooks';
 
 import css from './ParticipantSetupField.module.scss';
 

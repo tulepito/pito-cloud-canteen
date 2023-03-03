@@ -1,10 +1,11 @@
+import React from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import range from 'lodash/range';
+
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import NamedLink from '@components/NamedLink/NamedLink';
 import { stringify } from '@helpers/urlHelpers';
-import classNames from 'classnames';
-import range from 'lodash/range';
-import React from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './PaginationLinks.module.scss';
 

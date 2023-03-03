@@ -1,3 +1,6 @@
+import { createSlice } from '@reduxjs/toolkit';
+import omit from 'lodash/omit';
+
 import {
   addParticipantToOrderApi,
   addUpdateMemberOrder,
@@ -10,7 +13,6 @@ import {
 } from '@apis/orderApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
-import { createSlice } from '@reduxjs/toolkit';
 import { Listing } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import { storableError } from '@utils/errors';
@@ -21,7 +23,6 @@ import type {
   TTransaction,
   TUser,
 } from '@utils/types';
-import omit from 'lodash/omit';
 
 // ================ Initial states ================ //
 type TOrderManagementState = {

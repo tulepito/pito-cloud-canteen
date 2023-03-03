@@ -1,3 +1,9 @@
+import { useState } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Field, Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
@@ -7,11 +13,6 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TImageActionPayload } from '@redux/slices/uploadImage.slice';
 import { uploadImageThunks } from '@redux/slices/uploadImage.slice';
 import { EImageVariants } from '@utils/enums';
-import { useState } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Field, Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import css from './UploadImageForm.module.scss';
 

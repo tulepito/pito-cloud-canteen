@@ -1,17 +1,18 @@
-import '@src/styles/globals.scss';
-import '@src/styles/nprogress.scss';
-import 'react-loading-skeleton/dist/skeleton.css';
+import { Provider } from 'react-redux';
+import type { AppProps } from 'next/app';
+import { Router } from 'next/router';
+import Script from 'next/script';
+import nProgress from 'nprogress';
 
 import AuthGuard from '@components/Guards/AuthGuard';
 import PermissionGuard from '@components/Guards/PermissionGuard';
 import store from '@redux/store';
 import TranslationProvider from '@translations/TranslationProvider';
 import type { NextApplicationPage } from '@utils/types';
-import type { AppProps } from 'next/app';
-import { Router } from 'next/router';
-import Script from 'next/script';
-import nProgress from 'nprogress';
-import { Provider } from 'react-redux';
+
+import '@src/styles/globals.scss';
+import '@src/styles/nprogress.scss';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 Router.events.on('routeChangeStart', nProgress.start);
 Router.events.on('routeChangeError', nProgress.done);

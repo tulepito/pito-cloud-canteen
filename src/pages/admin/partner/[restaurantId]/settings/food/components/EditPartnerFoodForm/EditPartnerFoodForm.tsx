@@ -1,3 +1,12 @@
+import { useState } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import arrayMutators from 'final-form-arrays';
+import isEqual from 'lodash/isEqual';
+
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
@@ -28,16 +37,9 @@ import {
   parsePrice,
   required,
 } from '@utils/validators';
-import classNames from 'classnames';
-import arrayMutators from 'final-form-arrays';
-import isEqual from 'lodash/isEqual';
-import { useState } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import type { TEditPartnerFoodFormValues } from '../../utils';
+
 import css from './EditPartnerFoodForm.module.scss';
 
 type TExtraProps = {

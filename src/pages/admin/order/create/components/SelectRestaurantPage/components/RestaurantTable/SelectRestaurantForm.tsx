@@ -1,9 +1,10 @@
-import Form from '@components/Form/Form';
-import type { FormState } from 'final-form';
 import type { PropsWithChildren } from 'react';
 import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm, FormSpy } from 'react-final-form';
+import type { FormState } from 'final-form';
+
+import Form from '@components/Form/Form';
 
 export type TSelectRestaurantFormValues = { restaurant: any };
 type TExtraProps = {

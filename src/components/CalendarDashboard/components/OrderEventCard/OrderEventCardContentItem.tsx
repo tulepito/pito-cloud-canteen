@@ -1,6 +1,6 @@
-import classNames from 'classnames';
 import type { PropsWithChildren, ReactElement, ReactNode } from 'react';
 import React from 'react';
+import classNames from 'classnames';
 
 import css from './OrderEventCard.module.scss';
 

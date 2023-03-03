@@ -1,12 +1,14 @@
-import ButtonIcon from '@components/ButtonIcon/ButtonIcon';
-import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import classNames from 'classnames';
-import isEmpty from 'lodash/isEmpty';
 import type { ReactNode } from 'react';
 import { useRef } from 'react';
+import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
+
+import ButtonIcon from '@components/ButtonIcon/ButtonIcon';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+
+import type { TTimeLineProps } from './types';
 
 import css from './HorizontalTimeLine.module.scss';
-import type { TTimeLineProps } from './types';
 
 type THorizontalTimeLineProps = TTimeLineProps & { haveNavigators?: boolean };
 

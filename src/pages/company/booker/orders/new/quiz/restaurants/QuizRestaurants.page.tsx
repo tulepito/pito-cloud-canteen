@@ -1,4 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
+import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
+
 import RestaurantCard from '@components/RestaurantCard/RestaurantCard';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { FavoriteThunks } from '@redux/slices/Favorite.slice';
@@ -6,15 +12,11 @@ import { QuizThunks } from '@redux/slices/Quiz.slice';
 import { quizPaths } from '@src/paths';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
-import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
-import Skeleton from 'react-loading-skeleton';
-import { shallowEqual } from 'react-redux';
 
 import EmptyList from '../../../draft/[orderId]/restaurants/components/ResultList/EmptyList';
 import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
+
 import css from './QuizRestaurants.module.scss';
 
 const QuizRestaurants = () => {

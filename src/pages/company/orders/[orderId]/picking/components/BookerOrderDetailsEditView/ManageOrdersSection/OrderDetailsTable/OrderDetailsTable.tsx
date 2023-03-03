@@ -1,21 +1,24 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
+import { useEffect, useState } from 'react';
+import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
+
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { historyPushState } from '@utils/history';
 import type { TObject } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
 
 import { orderManagementThunks } from '../../../../OrderManagement.slice';
 import type { TEditOrderRowFormValues } from '../EditOrderRowForm';
 import EditOrderRowModal from '../EditOrderRowModal';
 import { usePrepareOrderDetailTableData } from '../hooks/usePrepareOrderDetailTableData';
-import css from './OrderDetailsTable.module.scss';
+
 import { EOrderDetailsTableTab, TABLE_TABS } from './OrderDetailsTable.utils';
 import { usePrepareTabItems } from './usePrepareTabItems';
+
+import css from './OrderDetailsTable.module.scss';
 
 const tableTabList = Object.values(TABLE_TABS);
 

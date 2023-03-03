@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/default-param-last */
+import { DateTime } from 'luxon';
+
 import { ListingTypes } from '@src/types/listingTypes';
 import { getUniqueString, IntegrationListing } from '@utils/data';
 import {
@@ -11,7 +13,6 @@ import {
 import type { EDayOfWeek } from '@utils/enums';
 import { EListingStates, EMenuTypes } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
-import { DateTime } from 'luxon';
 
 export const MENU_INFORMATION_TAB = 'information';
 export const MENU_PRICING_TAB = 'pricing';

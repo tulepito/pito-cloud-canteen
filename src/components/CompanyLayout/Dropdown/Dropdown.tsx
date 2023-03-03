@@ -1,13 +1,14 @@
+import { useEffect, useRef } from 'react';
+import { shallowEqual } from 'react-redux';
+import capitalize from 'lodash/capitalize';
+import { useRouter } from 'next/router';
+
 import Avatar from '@components/Avatar/Avatar';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
-import capitalize from 'lodash/capitalize';
-import { useRouter } from 'next/router';
-import { useEffect, useRef } from 'react';
-import { shallowEqual } from 'react-redux';
 
 import css from './Dropdown.module.scss';
 

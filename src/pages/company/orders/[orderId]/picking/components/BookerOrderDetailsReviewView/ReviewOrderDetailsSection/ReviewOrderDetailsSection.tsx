@@ -1,11 +1,12 @@
+import React, { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import Collapsible from '@components/Collapsible/Collapsible';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { parseThousandNumber } from '@helpers/format';
 import { formatTimestamp } from '@utils/dates';
 import type { TObject } from '@utils/types';
-import classNames from 'classnames';
-import React, { useEffect, useState } from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './ReviewOrderDetailsSection.module.scss';
 

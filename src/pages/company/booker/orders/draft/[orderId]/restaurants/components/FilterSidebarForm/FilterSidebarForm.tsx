@@ -1,12 +1,14 @@
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm, FormSpy } from 'react-final-form';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
 import Form from '@components/Form/Form';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { distanceOptions, ratingOptions } from '@src/marketplaceConfig';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm, FormSpy } from 'react-final-form';
 
 import CollapseFilter from '../../../components/CollapseFilter/CollapseFilter';
+
 import css from './FilterSidebarForm.module.scss';
 
 export type TFilterSidebarFormValues = {};

@@ -1,11 +1,12 @@
+import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
-import get from 'lodash/get';
-import isEmpty from 'lodash/isEmpty';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const integrationSdk = getIntegrationSdk();

@@ -1,5 +1,6 @@
-import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 import React from 'react';
+
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
 import ManagePartnerFoods from './ManagePartnerFoods.page';
 

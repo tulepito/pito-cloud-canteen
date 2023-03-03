@@ -1,9 +1,10 @@
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
 import { userActions } from '@redux/slices/user.slice';
 import { generalPaths } from '@src/paths';
-import { useRouter } from 'next/router';
 
 import css from './index.module.scss';
 

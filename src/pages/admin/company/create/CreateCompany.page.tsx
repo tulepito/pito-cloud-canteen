@@ -1,14 +1,16 @@
+import { useEffect } from 'react';
+import { useIntl } from 'react-intl';
+
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   clearError,
   createCompanyPageThunks,
 } from '@redux/slices/CreateCompanyPage.slice';
 import { isSignUpEmailTakenError } from '@utils/errors';
-import { useEffect } from 'react';
-import { useIntl } from 'react-intl';
 
 import type { TEditCompanyFormValues } from '../components/EditCompanyForm/EditCompanyForm';
 import EditCompanyForm from '../components/EditCompanyForm/EditCompanyForm';
+
 import css from './CreateCompany.module.scss';
 
 export default function CreateCompanyPage() {
