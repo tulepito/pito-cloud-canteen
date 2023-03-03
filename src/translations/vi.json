@@ -417,8 +417,10 @@
   "EditPartnerFoodForm.notePriceDescription": "Chú thích: Đơn giá không bắt buộc đối với các món thuộc thực đơn có giá tính theo đầu người hoặc theo bàn.",
   "EditPartnerFoodForm.notesLabel": "Ghi chú từ đối tác",
   "EditPartnerFoodForm.notesPlaceholder": "Nhập ghi chú",
+  "EditPartnerFoodForm.numberOfMainDishesInvalid": "Số món chính không hợp lệ",
   "EditPartnerFoodForm.numberOfMainDishesLabel": "Số món chính",
   "EditPartnerFoodForm.numberOfMainDishesPlaceholder": "Nhập số món chính",
+  "EditPartnerFoodForm.numberOfMainDishesRequired": "Vui lòng nhập số món chính",
   "EditPartnerFoodForm.orderHourInAdvanceLabel": "Đặt tối thiểu trước",
   "EditPartnerFoodForm.orderHourInAdvancePlaceholder": "Nhập số giờ",
   "EditPartnerFoodForm.packagingLabel": "Chất liệu bao bì",
@@ -433,6 +435,8 @@
   "EditPartnerFoodForm.specialDietsLabel": "Chế độ dinh dưỡng đặc biệt",
   "EditPartnerFoodForm.specialDietsRequired": "Vui lòng nhập chế độ dinh dưỡng đặc biệt",
   "EditPartnerFoodForm.submitBtn": "Thêm món",
+  "EditPartnerFoodForm.titleInValid": "Tên món không được có kí tự đặc biệt",
+  "EditPartnerFoodForm.titleMaxLength": "Tên món ăn không được quá 150 ký tự",
   "EditPartnerFoodForm.titleRequired": "Vui lòng nhập tên món ăn",
   "EditPartnerFoodForm.unitLabel": "Đơn vị tính",
   "EditPartnerFoodForm.unitMinLength": "Đơn vị tính không hợp lệ",
@@ -1234,9 +1238,5 @@
   "UploadImageForm.limitImage": "Dung lượng ảnh không được quá 2MB",
   "UploadImageForm.selectImage": "Chọn ảnh",
   "UploadImageForm.submit": "Lưu thay đổi",
-  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại.",
-  "EditPartnerFoodForm.numberOfMainDishesRequired": "Vui lòng nhập số món chính",
-  "EditPartnerFoodForm.numberOfMainDishesInvalid": "Số món chính không hợp lệ",
-  "EditPartnerFoodForm.titleMaxLength": "Tên món ăn không được quá 150 ký tự",
-  "EditPartnerFoodForm.titleInValid": "Tên món không được có kí tự đặc biệt"
+  "UploadImageForm.uploadImageError": "Có lỗi xảy ra trong quá trình tải ảnh lên. Vui lòng thử lại."
 }
