@@ -147,6 +147,7 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
       <Button
         className={css.submitBtn}
         type="submit"
+        loadingMode="extend"
         disabled={disabledSubmit}
         inProgress={isSubmitting}
         spinnerClassName={css.spinnerClassName}>

@@ -4,6 +4,7 @@ import { QuizThunks } from '@redux/slices/Quiz.slice';
 import { companyPaths, quizPaths } from '@src/paths';
 import { User } from '@utils/data';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import css from './BookerNewOrder.module.scss';
@@ -14,6 +15,9 @@ function BookerNewOrderPage() {
   const intl = useIntl();
   const route = useRouter();
   const dispatch = useAppDispatch();
+
+  // Local state
+  const [isSubmitting, setiIsSubmitting] = useState(false);
 
   // Redux
   const createOrderInProcess = useAppSelector(
@@ -37,11 +41,13 @@ function BookerNewOrderPage() {
   };
 
   const handleSubmit = async (values: any) => {
+    setiIsSubmitting(true);
     try {
       await dispatch(QuizThunks.fetchSelectedCompany(values.company));
-
+      setiIsSubmitting(false);
       route.push(quizPaths.PerpackMemberAmount);
     } catch (error) {
+      setiIsSubmitting(false);
       console.error('error', error);
     }
   };
@@ -64,7 +70,7 @@ function BookerNewOrderPage() {
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             queryInprogress={queryCompanyInprogress}
-            submitInprogress={createOrderInProcess}
+            submitInprogress={createOrderInProcess || isSubmitting}
             submitError={createOrderError}
           />
         </div>

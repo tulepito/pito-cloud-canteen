@@ -337,3 +337,15 @@
     margin-right: 2px;
   }
 }
+
+.foodItem {
+  width: 100%;
+
+  @include viewportLarge {
+    width: calc((100% - 20px) / 2);
+  }
+
+  @include viewportSLarge {
+    width: calc((100% - 40px) / 3);
+  }
+}
