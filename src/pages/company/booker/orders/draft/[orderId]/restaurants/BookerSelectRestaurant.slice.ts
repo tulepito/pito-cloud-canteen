@@ -330,6 +330,7 @@ const BookerSelectRestaurantSlice = createSlice({
         state.fetchFilterInProgress = false;
         state.menuTypes = action.payload.menuTypes;
         state.categories = action.payload.categories;
+        state.packaging = action.payload.packaging;
       })
       .addCase(searchRestaurants.pending, (state) => {
         state.searchInProgress = true;
