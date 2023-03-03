@@ -17,6 +17,14 @@
 .fieldSection {
   margin-top: 40px;
 
+  .customTitle {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+  }
+
+  .customField {
+    @include textTemplate(14px, $fontWeightRegular, 24px);
+  }
+
   &:first-child {
     margin-top: 0;
   }
@@ -31,6 +39,7 @@
   .fieldLabel {
     @include textTemplate(16px, $fontWeightBold, 24px);
     margin-bottom: 12px;
+    text-transform: capitalize;
   }
 
   .tableRoot {
@@ -111,6 +120,7 @@
 .submitChangeBtn {
   margin-top: 40px;
   padding-top: 40px;
+  padding-bottom: 80px;
   border-top: 1px solid $neutralGray4;
   @include flexAlign(flex-start, flex-end);
 }

@@ -98,7 +98,10 @@ const RestaurantModal: React.FC<TRestaurantModalProps> = (props) => {
             distance={`${distance}km`}
           />
           <div className={css.searchFormWrapper}>
-            <KeywordSearchForm onSubmit={onSearchFormSubmit} />
+            <KeywordSearchForm
+              onSubmit={onSearchFormSubmit}
+              inputClassName={css.searchInput}
+            />
           </div>
           <FoodListSection foodList={foodList} hideSelection />
         </div>
