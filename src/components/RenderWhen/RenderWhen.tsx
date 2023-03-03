@@ -8,9 +8,11 @@ const RenderWhen = ({ condition = true, children }: TWhenProps) => {
   const list: React.ReactNode[] = [];
 
   React.Children.forEach(children, (child: any) => {
+    const isTypeRenderWhenFalse = child.props.type === 'RenderWhenFalse';
+
     if (
-      (condition && child.props.type === 'true') ||
-      (!condition && child.props.type === 'false')
+      (condition && !isTypeRenderWhenFalse) ||
+      (!condition && isTypeRenderWhenFalse)
     ) {
       list.push(child);
     }
@@ -19,20 +21,14 @@ const RenderWhen = ({ condition = true, children }: TWhenProps) => {
   return <>{list}</>;
 };
 
-const RenderWhenTrue = ({ children }: React.PropsWithChildren) => (
-  <>{children}</>
-);
-RenderWhenTrue.defaultProps = {
-  type: 'true',
+const RenderWhenFalse = ({ children }: React.PropsWithChildren) => {
+  return <>{children}</>;
 };
-RenderWhen.True = RenderWhenTrue;
 
-const RenderWhenFalse = ({ children }: React.PropsWithChildren) => (
-  <>{children}</>
-);
 RenderWhenFalse.defaultProps = {
-  type: 'false',
+  type: 'RenderWhenFalse',
 };
+
 RenderWhen.False = RenderWhenFalse;
 
 export default RenderWhen;
