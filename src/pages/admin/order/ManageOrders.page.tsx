@@ -15,7 +15,7 @@ import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { adminRoutes } from '@src/paths';
 import { formatTimestamp } from '@utils/dates';
 import {
@@ -418,6 +418,10 @@ const ManageOrdersPage = () => {
       }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(resetOrder());
   }, [dispatch]);
 
   const onClearFilter = () => {
