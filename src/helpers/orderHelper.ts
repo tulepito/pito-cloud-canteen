@@ -5,13 +5,13 @@ import {
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
 import { Listing } from '@utils/data';
-import { generateTimeOptions } from '@utils/dates';
+import { generateTimeOptions, renderDateRange } from '@utils/dates';
 import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
   EParticipantOrderStatus,
 } from '@utils/enums';
-import type { TListing } from '@utils/types';
+import type { TListing, TObject } from '@utils/types';
 import { addDays, min, subDays } from 'date-fns';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
@@ -130,4 +130,36 @@ export const isEnableSubmitPublishOrder = (
   });
 
   return isOrderValid && isOrderDetailSetupCompleted && isOrderDetailHasData;
+};
+
+export const findSuitableStartDate = ({
+  selectedDate,
+  startDate = new Date().getTime(),
+  endDate = new Date().getTime(),
+  orderDetail = {},
+}: {
+  selectedDate?: Date;
+  startDate?: number;
+  endDate?: number;
+  orderDetail: TObject;
+}) => {
+  if (selectedDate && selectedDate instanceof Date) {
+    return selectedDate;
+  }
+
+  const dateRange = renderDateRange(startDate, endDate);
+  const setUpDates = Object.keys(orderDetail);
+
+  if (isEmpty(setUpDates)) {
+    return startDate;
+  }
+
+  const suitableDateList = dateRange.filter(
+    (date) => !setUpDates.includes(date.toString()),
+  );
+  const suitableStartDate = !isEmpty(suitableDateList)
+    ? suitableDateList[0]
+    : endDate;
+
+  return suitableStartDate;
 };

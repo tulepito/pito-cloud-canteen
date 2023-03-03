@@ -6,6 +6,7 @@ import css from './AlertModal.module.scss';
 import Modal from './Modal';
 
 type TAlertModal = {
+  id?: string;
   isOpen: boolean;
   title?: string | ReactNode;
   className?: string;
@@ -25,6 +26,7 @@ type TAlertModal = {
 };
 
 const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
+  id,
   isOpen,
   title,
   children,
@@ -44,6 +46,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
 }) => {
   return (
     <Modal
+      id={id}
       openClassName={css.isOpen}
       className={css.modalRoot}
       title={title}

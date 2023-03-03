@@ -32,6 +32,10 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
     onSelect(food?.id?.uuid);
   };
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <Modal
       id="FoodDetailModal"

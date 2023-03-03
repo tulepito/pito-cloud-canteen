@@ -1,14 +1,12 @@
-import { useLayoutEffect } from 'react';
-import { shallowEqual } from 'react-redux';
+import { useEffect } from 'react';
 
 import { useAppSelector } from './reduxHooks';
 
 const useLockBodyScroll = () => {
   const openingModalIdList = useAppSelector(
     (state) => state.UI.openingModalIdList,
-    shallowEqual,
   );
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (openingModalIdList.length > 0) {
       document.body.style.overflow = 'hidden';
     } else {

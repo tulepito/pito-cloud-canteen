@@ -9,6 +9,7 @@ import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import { calculateGroupMembersAmount } from '@helpers/company';
 import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
 import { addCommas } from '@helpers/format';
+import { findSuitableStartDate } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { normalizePlanDetailsToEvent } from '@pages/company/booker/orders/draft/[orderId]/helpers/normalizeData';
@@ -21,7 +22,6 @@ import {
 } from '@redux/slices/Order.slice';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { Listing } from '@utils/data';
-import { renderDateRange } from '@utils/dates';
 import type { TListing, TObject } from '@utils/types';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
@@ -39,38 +39,6 @@ import type { TSelectFoodFormValues } from '../SelectFoodModal/components/Select
 import SelectFoodModal from '../SelectFoodModal/SelectFoodModal';
 import SelectRestaurantPage from '../SelectRestaurantPage/SelectRestaurant.page';
 import css from './SetupOrderDetail.module.scss';
-
-const findSuitableStartDate = ({
-  selectedDate,
-  startDate = new Date().getTime(),
-  endDate = new Date().getTime(),
-  orderDetail = {},
-}: {
-  selectedDate?: Date;
-  startDate?: number;
-  endDate?: number;
-  orderDetail: TObject;
-}) => {
-  if (selectedDate && selectedDate instanceof Date) {
-    return selectedDate;
-  }
-
-  const dateRange = renderDateRange(startDate, endDate);
-  const setUpDates = Object.keys(orderDetail);
-
-  if (isEmpty(setUpDates)) {
-    return startDate;
-  }
-
-  const suitableDateList = dateRange.filter(
-    (date) => !setUpDates.includes(date.toString()),
-  );
-  const suitableStartDate = !isEmpty(suitableDateList)
-    ? suitableDateList[0]
-    : endDate;
-
-  return suitableStartDate;
-};
 
 type TSetupOrderDetailProps = {
   goBack: () => void;

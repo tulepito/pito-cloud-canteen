@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
-import { isEnableSubmitPublishOrder } from '@helpers/orderHelper';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import {
+  findSuitableStartDate,
+  isEnableSubmitPublishOrder,
+} from '@helpers/orderHelper';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { companyPaths } from '@src/paths';
 import { Listing } from '@utils/data';
@@ -10,7 +13,7 @@ import { EBookerOrderDraftStates, EOrderDraftStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
@@ -39,9 +42,17 @@ function BookerDraftOrderPage() {
   const { order, companyAccount } = useLoadData({
     orderId: orderId as string,
   });
-  const { orderState, plans = [] } = Listing(order as TListing).getMetadata();
+  const {
+    orderState,
+    plans = [],
+    startDate: startDateTimestamp,
+    endDate: endDateTimestamp,
+  } = Listing(order as TListing).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
 
+  const selectedDate = useAppSelector(
+    (state) => state.Order.selectedCalendarDate,
+  );
   const { orderDetail = [] } = useGetPlanDetails();
   const { startDate, endDate } = useGetBoundaryDates(order);
   const calendarExtraResources = useGetCalendarExtraResources({
@@ -54,6 +65,17 @@ function BookerDraftOrderPage() {
     order as TListing,
     orderDetail,
   );
+
+  const suitableStartDate = useMemo(() => {
+    const temp = findSuitableStartDate({
+      selectedDate,
+      startDate: startDateTimestamp,
+      endDate: endDateTimestamp,
+      orderDetail,
+    });
+
+    return temp instanceof Date ? temp : new Date(temp);
+  }, [selectedDate, startDateTimestamp, endDateTimestamp, orderDetail]);
 
   const handleFinishOrder = async () => {
     const { meta } = await dispatch(
@@ -121,7 +143,7 @@ function BookerDraftOrderPage() {
         <div className={css.main}>
           <CalendarDashboard
             className={css.calendar}
-            anchorDate={startDate}
+            anchorDate={suitableStartDate}
             startDate={startDate}
             endDate={endDate}
             events={orderDetail}

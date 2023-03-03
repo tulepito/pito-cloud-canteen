@@ -8,11 +8,13 @@ type TDeleteMealModalProps = {
   isOpen: boolean;
   removeInprogress?: boolean;
   deleteDate: string;
+  id: string;
   onClose?: () => void;
   onDelete: () => void;
 };
 
 const DeleteMealModal: React.FC<TDeleteMealModalProps> = ({
+  id,
   isOpen,
   removeInprogress,
   onClose = () => null,
@@ -32,10 +34,12 @@ const DeleteMealModal: React.FC<TDeleteMealModalProps> = ({
   const handleClose = () => {
     onClose();
   };
+  if (!isOpen) return null;
 
   return (
     <div className={css.root}>
       <AlertModal
+        id={id}
         isOpen={isOpen}
         confirmLabel={
           <div className={css.confirmBtnWrapper}>

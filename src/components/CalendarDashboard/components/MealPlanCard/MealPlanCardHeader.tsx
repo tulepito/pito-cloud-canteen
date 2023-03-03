@@ -50,6 +50,7 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
         <IconMagnifier className={css.searchIcon} />
       </div>
       <DeleteMealModal
+        id="DeleteMealModal"
         isOpen={isOpenDeleteModal}
         onClose={handleCloseDeleteModal}
         onDelete={handleDelete}

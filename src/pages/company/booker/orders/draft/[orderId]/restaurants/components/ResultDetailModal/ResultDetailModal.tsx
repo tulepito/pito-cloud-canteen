@@ -7,6 +7,7 @@ import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { calculateDistance } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import useLockBodyScroll from '@hooks/useDisableBodyScroll';
 import { Listing } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
@@ -54,7 +55,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   fetchFoodInProgress,
 }) => {
   const intl = useIntl();
-
+  useLockBodyScroll();
   const router = useRouter();
   const { timestamp } = router.query;
 
@@ -225,6 +226,10 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     },
     [onSearchSubmit, selectedRestaurantId],
   );
+
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <>
