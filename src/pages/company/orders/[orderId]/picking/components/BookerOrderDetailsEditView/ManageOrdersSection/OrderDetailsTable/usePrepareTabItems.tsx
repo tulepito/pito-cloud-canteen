@@ -37,7 +37,7 @@ export const usePrepareTabItems = ({
     const tabData = allTabData[tabValue];
 
     const numberClasses = classNames(css.number, {
-      [css.numberActive]: tabId === currentTab,
+      [css.numberActive]: tabValue === currentTab,
     });
 
     const label = (

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Meta from '@components/Layout/Meta';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
@@ -12,6 +13,7 @@ import { useIntl } from 'react-intl';
 import CompanyOrderDetailPage from './components/CompanyOrderDetail.page';
 import {
   orderDetailsAnyActionsInProgress,
+  OrderManagementsAction,
   orderManagementThunks,
 } from './picking/OrderManagement.slice';
 
@@ -45,6 +47,12 @@ const CompanyOrderDetailRoute = () => {
       }
     }
   }, [pageDataLoading, companyId, companyData, push]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(OrderManagementsAction.clearOrderData());
+    };
+  }, []);
 
   return (
     <>

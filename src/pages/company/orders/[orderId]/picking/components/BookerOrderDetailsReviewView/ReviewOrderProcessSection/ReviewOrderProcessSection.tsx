@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ActivityItem from '@components/TimeLine/ActivityItem';
 import VerticalTimeLine from '@components/TimeLine/VerticalTimeLine';
 import { countCompletedTransactions } from '@helpers/transactionHelper';
@@ -13,6 +15,7 @@ import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 
 import css from './ReviewOrderProcessSection.module.scss';
 
@@ -94,19 +97,20 @@ const ReviewOrderProcessSection: React.FC<
     id: 'ReviewOrderProcessSection.title',
   });
 
-  const initItems = useMemo(
-    () => prepareItemData(orderStateHistory),
-    [orderStateHistory],
+  const items = useMemo(
+    () =>
+      prepareItemData(orderStateHistory).concat([
+        {
+          label: 'Đang triển khai',
+          description: `(${totalCompletedDates}/${totalDays} ngày hoàn thành)`,
+        },
+        { label: 'Đã hoàn thành', description: '' },
+      ]),
+    [JSON.stringify(orderStateHistory), totalCompletedDates, totalDays],
   );
 
-  const items = [
-    ...initItems,
-    {
-      label: 'Đang triển khai',
-      description: `(${totalCompletedDates}/${totalDays} ngày hoàn thành)`,
-    },
-    { label: 'Đã hoàn thành' },
-  ];
+  const isItemsValid =
+    items[0].description !== '' && items[1].description !== '';
 
   useEffect(() => {
     setTotalCompletedDates(countCompletedTransactions(transactionDataList));
@@ -116,11 +120,23 @@ const ReviewOrderProcessSection: React.FC<
     <div className={css.root}>
       <div className={css.sectionTitle}>{sectionTitle}</div>
       <div className={css.activityContainer}>
-        <VerticalTimeLine
-          itemComponent={ActivityItem}
-          items={items}
-          lastActiveItem={activeIndex}
-        />
+        <RenderWhen condition={isItemsValid}>
+          <VerticalTimeLine
+            itemComponent={ActivityItem}
+            items={items}
+            lastActiveItem={activeIndex}
+          />
+          <RenderWhen.False>
+            <div className={css.skeletonContainer}>
+              <Skeleton className={css.skeletonCol} />
+              <Skeleton className={css.skeletonRow} />
+              <Skeleton className={css.skeletonRow} />
+              <Skeleton className={css.skeletonRow} />
+              <Skeleton className={css.skeletonRow} />
+              <Skeleton className={css.skeletonRow} />
+            </div>
+          </RenderWhen.False>
+        </RenderWhen>
       </div>
     </div>
   );

@@ -17,12 +17,12 @@ import css from './OrderDetailsTable.module.scss';
 import { EOrderDetailsTableTab, TABLE_TABS } from './OrderDetailsTable.utils';
 import { usePrepareTabItems } from './usePrepareTabItems';
 
-const findTabById = (tabId: string) => {
-  const tableTabList = Object.values(TABLE_TABS);
+const tableTabList = Object.values(TABLE_TABS);
 
-  const index = tableTabList.findIndex((tab) => {
-    return tab.id === tabId;
-  });
+const findTabByValueOrId = (tabId: string) => {
+  const index = tableTabList.findIndex(
+    ({ value, id }) => value === tabId || id === tabId,
+  );
 
   return index > -1 ? { tab: tableTabList[index], index } : { index };
 };
@@ -122,13 +122,16 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   });
 
   const handleTabChange = ({ id }: TTabsItem) => {
-    setCurrentTab(id as EOrderDetailsTableTab);
-    historyPushState('tab', id);
+    const { tab } = findTabByValueOrId(id as string);
+    const tabValue = tab?.value;
+
+    setCurrentTab(tabValue as EOrderDetailsTableTab);
+    historyPushState('tab', tabValue!);
   };
 
   useEffect(() => {
     if (!isEmpty(tabId)) {
-      const { tab, index } = findTabById(tabId as string);
+      const { tab, index } = findTabByValueOrId(tabId as string);
 
       if (index > -1) {
         setCurrentTab(tab?.value as EOrderDetailsTableTab);

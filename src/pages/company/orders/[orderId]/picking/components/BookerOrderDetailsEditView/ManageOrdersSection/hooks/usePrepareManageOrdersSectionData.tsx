@@ -1,13 +1,16 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TListing, TObject, TUser } from '@utils/types';
 import { isEmpty } from 'lodash';
 import { useRouter } from 'next/router';
+import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 export const usePrepareManageOrdersSectionData = (
   currentViewDate: number | string,
+  setCurrentViewDate: Dispatch<SetStateAction<number>>,
 ) => {
   const {
     query: { timestamp },
@@ -28,7 +31,10 @@ export const usePrepareManageOrdersSectionData = (
     },
     [],
   );
-  const indexOfTimestamp = dateList.indexOf(Number(timestamp));
+  const indexOfTimestamp = useMemo(
+    () => dateList.indexOf(Number(timestamp)),
+    [timestamp],
+  );
 
   const { restaurant = {}, memberOrders = {} } =
     orderDetail[currentViewDate.toString()] || {};
@@ -74,13 +80,15 @@ export const usePrepareManageOrdersSectionData = (
           memberName,
         };
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(availableMemberIds)],
   );
 
   useEffect(() => {
-    setDefaultActiveKey(indexOfTimestamp > -1 ? indexOfTimestamp + 1 : 1);
-  }, [indexOfTimestamp]);
+    if (indexOfTimestamp > -1 && dateList.length > 0) {
+      setDefaultActiveKey(indexOfTimestamp + 1);
+      setCurrentViewDate(dateList[indexOfTimestamp]);
+    }
+  }, [indexOfTimestamp, JSON.stringify(dateList)]);
 
   return {
     dateList,

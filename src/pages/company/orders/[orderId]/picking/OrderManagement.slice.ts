@@ -477,7 +477,21 @@ export const orderManagementThunks = {
 const OrderManagementSlice = createSlice({
   name: 'OrderManagement',
   initialState,
-  reducers: {},
+  reducers: {
+    clearOrderData: (state) => {
+      return {
+        ...state,
+        companyId: null,
+        companyData: null,
+        orderData: {},
+        planData: {},
+        bookerData: null,
+        participantData: [],
+        anonymousParticipantData: [],
+        transactionDataMap: {},
+      };
+    },
+  },
   extraReducers: (builder) => {
     builder
       /* =============== loadData =============== */

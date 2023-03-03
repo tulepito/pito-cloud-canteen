@@ -1,3 +1,4 @@
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TDefaultProps } from '@utils/types';
 import classNames from 'classnames';
 
@@ -51,9 +52,10 @@ const BookerOrderDetailReviewView: React.FC<
         />
       )}
       <div className={css.leftPart}>
-        {!canGoBackEditMode && (
+        <RenderWhen condition={!canGoBackEditMode}>
           <ReviewOrderStatesSection data={reviewViewData.transactionDataMap} />
-        )}
+        </RenderWhen>
+
         <ReviewInfoSection
           startSubmitReviewInfoForm
           canEdit={canEditInfo}
@@ -72,7 +74,9 @@ const BookerOrderDetailReviewView: React.FC<
         />
       </div>
       <div className={css.rightPart}>
-        {!canGoBackEditMode && <ReviewOrderProcessSection />}
+        <RenderWhen condition={!canGoBackEditMode}>
+          <ReviewOrderProcessSection />
+        </RenderWhen>
         <ReviewCartSection
           className={css.cartRoot}
           data={reviewViewData.reviewCartData}

@@ -39,7 +39,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({ showBottomLine }) => {
   return (
     <div className={classes}>
       <NamedLink className={css.headerLeft} path={companyPaths.Home}>
-        <PitoLogo />
+        <PitoLogo className={css.logo} />
       </NamedLink>
       <div className={css.headerRight}>
         <IconBell className={css.iconBell} />

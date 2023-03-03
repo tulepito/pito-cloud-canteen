@@ -34,13 +34,15 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     query: { orderId, timestamp },
   } = useRouter();
   const intl = useIntl();
-  const [currentViewDate, setCurrentViewDate] = useState(startDate);
+  const [currentViewDate, setCurrentViewDate] = useState(
+    timestamp ? Number(timestamp) : startDate,
+  );
   const {
     dateList = [],
     defaultActiveKey,
     memberOptions,
     foodOptions,
-  } = usePrepareManageOrdersSectionData(currentViewDate);
+  } = usePrepareManageOrdersSectionData(currentViewDate, setCurrentViewDate);
 
   const handleSubmitAddSelection = (values: TAddOrderFormValues) => {
     const { participantId: memberId, requirement = '', foodId } = values;
@@ -93,7 +95,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
 
   const handleDateTabChange = ({ id }: TTabsItem) => {
     setCurrentViewDate(Number(id));
-    if (orderId && (timestamp as string) !== id.toString())
+    if (orderId && timestamp?.toString() !== id.toString())
       historyPushState('timestamp', id);
   };
 
