@@ -1,14 +1,4 @@
-import Button from '@components/Button/Button';
-import Form from '@components/Form/Form';
-import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import Modal from '@components/Modal/Modal';
-import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
-import { addCommas } from '@helpers/format';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { Listing } from '@utils/data';
-import { getDaySessionFromDeliveryTime } from '@utils/dates';
-import type { TListing } from '@utils/types';
+/* eslint-disable react-hooks/exhaustive-deps */
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
 import difference from 'lodash/difference';
@@ -20,6 +10,18 @@ import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
+import Button from '@components/Button/Button';
+import Form from '@components/Form/Form';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import Modal from '@components/Modal/Modal';
+import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
+import { addCommas } from '@helpers/format';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { Listing } from '@utils/data';
+import { getDaySessionFromDeliveryTime } from '@utils/dates';
+import type { TListing } from '@utils/types';
+
 import DeliveryAddressField from '../DeliveryAddressField/DeliveryAddressField';
 import MealPlanDateField from '../MealPlanDateField/MealPlanDateField';
 import MemberAmountField from '../MemberAmountField/MemberAmountField';
@@ -27,6 +29,7 @@ import NutritionField from '../NutritionField/NutritionField';
 import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
 import ParticipantSetupField from '../ParticipantSetupField/ParticipantSetupField';
 import PerPackageField from '../PerPackageField/PerPackageField';
+
 import css from './OrderSettingModal.module.scss';
 
 type TOrderSettingModalProps = {
@@ -113,20 +116,20 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
     [
       packagePerMember,
       vatAllow,
-      selectedGroups,
+      JSON.stringify(selectedGroups),
       deliveryHour,
       deadlineDate,
       deadlineHour,
-      deliveryAddress,
+      JSON.stringify(deliveryAddress),
       detailAddress,
       address,
-      origin,
+      JSON.stringify(origin),
       startDate,
       endDate,
       memberAmount,
-      initialFieldValues,
-      nutritions,
-      dayInWeek,
+      JSON.stringify(initialFieldValues),
+      JSON.stringify(nutritions),
+      JSON.stringify(dayInWeek),
     ],
   );
   const leftSideRenderer = () =>

@@ -1,3 +1,6 @@
+import React from 'react';
+import { useIntl } from 'react-intl';
+
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconClose from '@components/Icons/IconClose/IconClose';
@@ -7,11 +10,10 @@ import { addCommas } from '@helpers/format';
 import { Listing } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
-import React from 'react';
-import { useIntl } from 'react-intl';
+
+import OptionSelectionForm from './OptionSelectionForm';
 
 import css from './FoodDetailModal.module.scss';
-import OptionSelectionForm from './OptionSelectionForm';
 
 type TFoodDetailModalProps = {
   isOpen?: boolean;
@@ -31,6 +33,10 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
   const handleSelectFood = () => {
     onSelect(food?.id?.uuid);
   };
+
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <Modal

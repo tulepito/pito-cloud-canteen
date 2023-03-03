@@ -1,7 +1,10 @@
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
+
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { selectCalendarDate } from '@redux/slices/Order.slice';
 
 import { BookerSelectRestaurantThunks } from '../BookerSelectRestaurant.slice';
 import { convertQueryValueToArray } from '../helpers/urlQuery';
@@ -46,6 +49,12 @@ export const useSearchRestaurants = () => {
       ),
     [page, restaurants],
   );
+
+  useEffect(() => {
+    dispatch(
+      selectCalendarDate(DateTime.fromMillis(Number(timestamp)).toJSDate()),
+    );
+  }, [dispatch, timestamp]);
 
   useEffect(() => {
     dispatch(
