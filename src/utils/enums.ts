@@ -646,12 +646,45 @@ export enum EOrderDraftStates {
 
 export const SPECIAL_DIET_OPTIONS = [
   {
+    key: 'low-carb',
+    label: 'Low-carb',
+  },
+
+  {
+    key: 'keto',
+    label: 'Keto',
+  },
+  {
+    key: 'mediterranean-diet',
+    label: 'Mediterranean Diet',
+  },
+  {
+    key: 'plant-based',
+    label: 'Plant-based',
+  },
+  {
     key: 'halal',
     label: 'Halal',
   },
   {
-    key: 'keto',
-    label: 'Keto',
+    key: 'intermittent-fasting',
+    label: 'Intermittent Fasting',
+  },
+  {
+    key: 'carnivore-diet',
+    label: 'Carnivore Diet',
+  },
+  {
+    key: 'healthy',
+    label: 'Healthy',
+  },
+  {
+    key: 'paleo-diet',
+    label: 'Paleo Diet',
+  },
+  {
+    key: 'gluten-free',
+    label: 'Gluten free',
   },
   {
     key: OTHER_OPTION,

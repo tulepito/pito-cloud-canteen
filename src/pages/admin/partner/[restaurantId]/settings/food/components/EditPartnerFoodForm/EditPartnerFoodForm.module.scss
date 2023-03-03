@@ -35,9 +35,19 @@
 
 .flexField {
   display: flex;
+  width: 100%;
   margin-bottom: 40px;
   flex-direction: column;
-  gap: 20px;
+  gap: 30px;
+
+  &.innerFlexfield {
+    margin-bottom: 0;
+  }
+
+  &.flexColumn {
+    flex-direction: column;
+  }
+
   .field {
     width: 100%;
   }
@@ -55,19 +65,18 @@
 }
 
 .inputSuffixed {
-  padding: 0 10px;
-  border-left: 1px solid $neutralGray4;
   color: $neutralGray5;
-}
-
-.inputSuffixedContainer {
-  right: 20px !important;
+  padding: 0 10px;
+  width: unset !important;
+  flex-direction: row !important;
+  justify-content: flex-end !important;
+  border-left: 1px solid $neutralGray3;
 }
 
 .specialDietsList {
-  display: flex;
-  gap: 30px;
-  align-items: center;
+  display: grid;
+  gap: 15px;
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .specialDietsCheckbox {
@@ -86,6 +95,10 @@
 
 .specialDietsItem {
   padding: 0;
+
+  &:last-child {
+    grid-column-start: span 3;
+  }
 }
 
 .submitButtons {
@@ -144,4 +157,9 @@
       flex: 1;
     }
   }
+}
+
+.sideDishesList {
+  display: flex;
+  gap: 24px;
 }
