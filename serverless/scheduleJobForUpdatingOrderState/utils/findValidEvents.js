@@ -18,7 +18,13 @@ const findValidEvents = (events) => {
     return (
       !isEmpty(orderId) &&
       isLastTxOfPlan &&
-      lastTransition === Transitions.completeDelivery
+      [
+        Transitions.expiredDelivery,
+        Transitions.cancelDelivery,
+        Transitions.expireStartDelivery,
+        Transitions.operatorCancelPlan,
+        Transitions.completeDelivery,
+      ].includes(lastTransition)
     );
   });
 };
