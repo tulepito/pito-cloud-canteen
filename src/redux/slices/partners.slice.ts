@@ -10,11 +10,7 @@ import {
 import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
-import {
-  EImageVariants,
-  EListingType,
-  ERestaurantListingState,
-} from '@utils/enums';
+import { EImageVariants, EListingStates, EListingType } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TObject, TPagination } from '@utils/types';
 import omit from 'lodash/omit';
@@ -29,6 +25,9 @@ type TPartnerStates = {
   pagination: TPagination;
   restaurantTableActionInProgress: any;
   restaurantTableActionError: any;
+
+  deletePartnerInProgress: any;
+  deletePartnerError: any;
 
   // Create or edit partner slice
   createDraftPartnerInProgress: boolean;
@@ -411,11 +410,9 @@ const queryRestaurants = createAsyncThunk(
     try {
       const dataParams = {
         ...params,
-        meta_listingState: [
-          ERestaurantListingState.draft,
-          ERestaurantListingState.published,
-        ],
+        meta_listingState: [EListingStates.draft, EListingStates.published],
         meta_listingType: EListingType.restaurant,
+        meta_isDeleted: false,
         perPage: MANAGE_PARTNER_RESULT_PAGE_SIZE,
         include: ['author'],
         'fields.listing': [
@@ -468,6 +465,8 @@ const initialState: TPartnerStates = {
   restaurantTableActionInProgress: null,
   restaurantTableActionError: null,
 
+  deletePartnerInProgress: false,
+  deletePartnerError: null,
   // handle create partner
   createDraftPartnerInProgress: false,
   createDraftPartnerError: null,
@@ -680,18 +679,18 @@ export const partnerSlice = createSlice({
       .addCase(deleteRestaurant.pending, (state, action) => {
         return {
           ...state,
-          restaurantTableActionInProgress: action.meta.arg.restaurantId,
-          restaurantTableActionError: null,
+          deletePartnerInProgress: action.meta.arg.restaurantId,
+          deletePartnerError: null,
         };
       })
       .addCase(deleteRestaurant.fulfilled, (state) => ({
         ...state,
-        restaurantTableActionInProgress: null,
+        deletePartnerInProgress: null,
       }))
       .addCase(deleteRestaurant.rejected, (state, action) => ({
         ...state,
-        restaurantTableActionInProgress: null,
-        restaurantTableActionError: action.payload,
+        deletePartnerInProgress: null,
+        deletePartnerError: action.payload,
       }))
       .addCase(requestAvatarUpload.pending, (state, action) => {
         const { id } = action.meta.arg;

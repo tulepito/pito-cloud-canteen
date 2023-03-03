@@ -126,12 +126,6 @@ export const startRouteBaseOnPermission = {
   [EUserPermission.admin]: '/admin',
 };
 
-export enum ERestaurantListingState {
-  draft = 'draft',
-  published = 'published',
-  deleted = 'deleted',
-}
-
 export enum ERestaurantListingStatus {
   new = 'new',
   authorized = 'authorized',
