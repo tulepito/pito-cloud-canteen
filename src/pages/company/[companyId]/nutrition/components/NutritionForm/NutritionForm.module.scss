@@ -55,7 +55,7 @@
         td {
           background-color: $neutralGray2;
           padding: 0 16px;
-          font-size: 16px;
+          @include textTemplate(14px, $fontWeightRegular, 24px);
           color: $neutralGray5;
         }
       }
