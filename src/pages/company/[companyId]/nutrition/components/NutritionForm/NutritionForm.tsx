@@ -249,6 +249,8 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
         <div className={css.fieldSection}>
           <NutritionField
             title={intl.formatMessage({ id: 'NutritionForm.nutrition.title' })}
+            titleClassName={css.customTitle}
+            fieldClassName={css.customField}
           />
         </div>
         <div className={css.fieldSection}>

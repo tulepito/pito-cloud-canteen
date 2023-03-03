@@ -122,12 +122,12 @@ export const isEnableSubmitPublishOrder = (
   orderDetail: any[],
 ) => {
   const isOrderValid = orderDataCheckers(order).isAllValid;
-
+  const isOrderDetailHasData = !isEmpty(orderDetail);
   const isOrderDetailSetupCompleted = orderDetail.every(({ resource }) => {
     const { isSelectedFood = false } = resource || {};
 
     return isSelectedFood;
   });
 
-  return isOrderValid && isOrderDetailSetupCompleted;
+  return isOrderValid && isOrderDetailSetupCompleted && isOrderDetailHasData;
 };

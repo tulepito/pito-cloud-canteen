@@ -259,7 +259,7 @@ const fetchCompanyAccount = createAsyncThunk(
 const fetchFoodListFromRestaurant = createAsyncThunk(
   FETCH_FOOD_LIST_FROM_RESTAURANT,
   async (params: Record<string, any>, { getState, dispatch, extra: sdk }) => {
-    const { restaurantId, menuId: menuIdParam, timestamp } = params;
+    const { restaurantId, menuId: menuIdParam, timestamp, keywords } = params;
     const { combinedRestaurantMenuData = [], restaurantFood = {} } =
       getState().BookerSelectRestaurant;
     const dateTime = DateTime.fromMillis(timestamp);
@@ -283,6 +283,7 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
         ? { pub_nutritions: `has_any:${nutritions.join(',')}` }
         : {}),
       include: ['images'],
+      ...(keywords && { keywords }),
     });
     const foodList = denormalisedResponseEntities(response);
 

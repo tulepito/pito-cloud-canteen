@@ -57,6 +57,7 @@ type TExtraProps = TDefaultProps & {
   errorMessage?: ReactNode;
   inProgress?: boolean;
   items: any[];
+  selectFoodInProgress?: boolean;
   handleFormChange: (food: string[] | undefined) => void;
 };
 type TSelectFoodFormProps = FormProps<TSelectFoodFormValues> & TExtraProps;
@@ -73,6 +74,7 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
     values: { food: selectedFoodIds = [] },
     form,
     handleFormChange,
+    selectFoodInProgress,
   } = props;
   const selectedFoodListLength = selectedFoodIds?.length;
   const intl = useIntl();
@@ -218,7 +220,10 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
               </div>
             )}
             <div className={css.actionContainer}>
-              <Button fullWidth disabled={submitDisable}>
+              <Button
+                fullWidth
+                disabled={submitDisable}
+                inProgress={selectFoodInProgress}>
                 <FormattedMessage id="SelectFoodForm.saveResult" />
               </Button>
             </div>
