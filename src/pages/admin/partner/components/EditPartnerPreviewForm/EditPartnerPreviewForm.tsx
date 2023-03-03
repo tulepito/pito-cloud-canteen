@@ -325,15 +325,39 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                       }}
                     </Field>
                     <FieldTextInput
-                      disabled
                       name="minPrice"
                       className={css.minPrice}
                       id="minPrice"
                       label={intl.formatMessage({
                         id: 'EditPartnerForm.minPrice',
                       })}
+                      rightIconContainerClassName={css.inputSuffixed}
                       rightIcon={<div className={css.currency}>đ</div>}
                     />
+                    <div className={css.flexField}>
+                      <FieldTextInput
+                        name="minQuantity"
+                        className={css.minQuantity}
+                        id="minQuantity"
+                        type="number"
+                        label={intl.formatMessage({
+                          id: 'EditPartnerForm.minQuantityLabel',
+                        })}
+                        rightIconContainerClassName={css.inputSuffixed}
+                        rightIcon={<div className={css.currency}>phần</div>}
+                      />
+                      <FieldTextInput
+                        name="maxQuantity"
+                        className={css.maxQuantity}
+                        id="maxQuantity"
+                        type="number"
+                        label={intl.formatMessage({
+                          id: 'EditPartnerBasicInformationForm.maxQuantityLabel',
+                        })}
+                        rightIconContainerClassName={css.inputSuffixed}
+                        rightIcon={<div className={css.currency}>phần</div>}
+                      />
+                    </div>
                     <div>
                       <div className={css.label}>
                         {intl.formatMessage({

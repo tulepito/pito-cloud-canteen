@@ -275,6 +275,8 @@ const EditPartnerWizardTab = (props: any) => {
         categories = [],
         extraServices,
         businessType,
+        minQuantity,
+        maxQuantity,
       } = partnerListingRef?.attributes?.publicData || {};
 
       const { bankAccounts = [] } =
@@ -315,6 +317,8 @@ const EditPartnerWizardTab = (props: any) => {
           packagingOther,
           status,
           businessType: businessType || '-',
+          minQuantity,
+          maxQuantity,
         };
       }, [JSON.stringify(partnerListingRef)]);
 

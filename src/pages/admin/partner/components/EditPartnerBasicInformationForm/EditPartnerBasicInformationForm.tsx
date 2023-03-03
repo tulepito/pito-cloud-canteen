@@ -21,6 +21,7 @@ import {
   composeValidators,
   composeValidatorsWithAllValues,
   emailFormatValid,
+  minLength,
   minPriceLength,
   nonEmptyImage,
   parsePrice,
@@ -116,6 +117,8 @@ const EditPartnerBasicInformationForm: React.FC<
     phoneNumber,
     allWeekAvailabilityEntries,
     packagingOther,
+    minQuantity,
+    maxQuantity,
   } = publicData;
   const { bankAccounts } = privateData;
   const defaultBankAccounts = [
@@ -154,6 +157,8 @@ const EditPartnerBasicInformationForm: React.FC<
       minPrice: parsePrice(minPrice),
       bankAccounts: bankAccounts || defaultBankAccounts,
       packagingOther,
+      minQuantity,
+      maxQuantity,
     }),
     [],
   );
@@ -531,8 +536,59 @@ const EditPartnerBasicInformationForm: React.FC<
                       ),
                     )}
                     parse={parsePrice}
+                    rightIconContainerClassName={css.inputSuffixed}
                     rightIcon={<div className={css.currency}>đ</div>}
                   />
+                  <div className={css.flexField}>
+                    <FieldTextInput
+                      name="minQuantity"
+                      className={css.minQuantity}
+                      id="minQuantity"
+                      type="number"
+                      label={intl.formatMessage({
+                        id: 'EditPartnerForm.minQuantityLabel',
+                      })}
+                      validate={composeValidators(
+                        required(
+                          intl.formatMessage({
+                            id: 'EditPartnerBasicInformationForm.minQuantityRequired',
+                          }),
+                        ),
+                        minLength(
+                          intl.formatMessage({
+                            id: 'EditPartnerBasicInformationForm.minQuantityInvalid',
+                          }),
+                          1,
+                        ),
+                      )}
+                      rightIconContainerClassName={css.inputSuffixed}
+                      rightIcon={<div className={css.currency}>phần</div>}
+                    />
+                    <FieldTextInput
+                      name="maxQuantity"
+                      className={css.maxQuantity}
+                      id="maxQuantity"
+                      type="number"
+                      label={intl.formatMessage({
+                        id: 'EditPartnerBasicInformationForm.maxQuantityLabel',
+                      })}
+                      validate={composeValidators(
+                        required(
+                          intl.formatMessage({
+                            id: 'EditPartnerBasicInformationForm.maxQuantityRequired',
+                          }),
+                        ),
+                        minLength(
+                          intl.formatMessage({
+                            id: 'EditPartnerBasicInformationForm.maxQuantityInvalid',
+                          }),
+                          1,
+                        ),
+                      )}
+                      rightIconContainerClassName={css.inputSuffixed}
+                      rightIcon={<div className={css.currency}>phần</div>}
+                    />
+                  </div>
                   <p className={css.packagingLabel}>
                     {intl.formatMessage({
                       id: 'EditPartnerBasicInformationForm.packagingLabel',
