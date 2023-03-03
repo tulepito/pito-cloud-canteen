@@ -29,6 +29,7 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
       form.change('durationTime', +displayedDurationTimeValue);
     }
   };
+
   return (
     <div className={containerClasses}>
       {title && <div className={css.fieldLabel}>{title}</div>}
@@ -36,7 +37,7 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
         <FieldTextInput
           id="displayedDurationTime"
           name="displayedDurationTime"
-          type="number"
+          type="text"
           className={css.durationTimeInput}
           placeholder="1"
           parse={parseThousandNumber}

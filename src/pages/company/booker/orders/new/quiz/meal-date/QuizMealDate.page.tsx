@@ -3,6 +3,7 @@ import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { QuizActions } from '@redux/slices/Quiz.slice';
 import { Listing, User } from '@utils/data';
 import { formatTimestamp, getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
@@ -91,6 +92,7 @@ const QuizMealDate = () => {
         orderDetail: recommendOrderDetail,
       }),
     );
+    dispatch(QuizActions.clearQuizData());
     router.push(`/company/booker/orders/draft/${orderId}`);
   };
 
