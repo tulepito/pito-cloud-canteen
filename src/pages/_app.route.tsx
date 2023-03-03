@@ -4,6 +4,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 import AuthGuard from '@components/Guards/AuthGuard';
 import PermissionGuard from '@components/Guards/PermissionGuard';
+import UIProvider from '@components/UIProvider/UIProvider';
 import store from '@redux/store';
 import TranslationProvider from '@translations/TranslationProvider';
 import type { NextApplicationPage } from '@utils/types';
@@ -34,11 +35,13 @@ const MyApp = ({
         src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&callback=Function.prototype`}
       />
       <Provider store={store}>
-        <AuthGuard>
-          <PermissionGuard>
-            <Component {...restProps.pageProps} key={router.asPath} />
-          </PermissionGuard>
-        </AuthGuard>
+        <UIProvider>
+          <AuthGuard>
+            <PermissionGuard>
+              <Component {...restProps.pageProps} key={router.asPath} />
+            </PermissionGuard>
+          </AuthGuard>
+        </UIProvider>
       </Provider>
     </TranslationProvider>
   );
