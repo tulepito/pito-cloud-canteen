@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
 import Modal from '@components/Modal/Modal';
+import { parseThousandNumber } from '@helpers/format';
 import { isJoinedPlan } from '@helpers/orderHelper';
 import type { TObject, TUser } from '@utils/types';
 
@@ -129,9 +130,13 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
 
   return (
     <Modal
-      title={intl.formatMessage({
-        id: 'ReviewOrdersResultModal.title',
-      })}
+      title={
+        <span className={css.modalTitle}>
+          {intl.formatMessage({
+            id: 'ReviewOrdersResultModal.title',
+          })}
+        </span>
+      }
       isOpen={isOpen}
       handleClose={onClose}
       className={css.modalRoot}
@@ -173,7 +178,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                 {orderData.map((row: TObject) => {
                   const {
                     memberData,
-                    foodData: { foodName, foodPrice },
+                    foodData: { foodName, foodPrice = 0 },
                   } = row;
                   const { name: memberName, id: memberId } = memberData || {};
 
@@ -181,7 +186,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                     <div className={css.row} key={memberId}>
                       <div>{memberName}</div>
                       <div>{foodName}</div>
-                      <div>{`${foodPrice}đ`}</div>
+                      <div>{`${parseThousandNumber(foodPrice)}đ`}</div>
                     </div>
                   );
                 })}

@@ -8,6 +8,8 @@ import Form from '@components/Form/Form';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
+import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 
 import css from './AddOrderForm.module.scss';
 
@@ -66,6 +68,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     } else {
       setCurrentRequirementFieldActionText(showRequirementText);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRequirementInputShow]);
 
   const selectMemberOptions = (
@@ -134,7 +137,12 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
           disabled={fieldSelectFoodDisable}
           onClick={handleToggleShowHideRequirementField}>
           <div className={css.buttonContent}>
-            <IconMinus />
+            <RenderWhen condition={isRequirementInputShow}>
+              <IconMinus />
+              <RenderWhen.False>
+                <IconPlusWithoutBorder />
+              </RenderWhen.False>
+            </RenderWhen>
             <div>{currentRequirementFieldActionText}</div>
           </div>
         </Button>

@@ -25,6 +25,26 @@ export const isJoinedPlan = (
   return foodId !== '' && status === EParticipantOrderStatus.joined;
 };
 
+export const isCompletePickFood = ({
+  participantId,
+  orderDetail,
+}: {
+  participantId: string;
+  orderDetail: TObject;
+}) => {
+  const allOrderDetails = Object.values<TObject>(orderDetail);
+  const totalDates = allOrderDetails.length;
+
+  const completedDates = allOrderDetails.reduce((result: number, current) => {
+    const { memberOrders } = current;
+    const { status, foodId } = memberOrders[participantId] || {};
+
+    return result + +isJoinedPlan(foodId, status);
+  }, 0);
+
+  return completedDates === totalDates;
+};
+
 export const isOver = (deadline = 0) => {
   return new Date().getTime() > deadline;
 };
@@ -150,6 +170,7 @@ export const isEnableToStartOrder = (orderDetail: TPlan['orderDetail']) => {
     })
   );
 };
+
 export const findSuitableStartDate = ({
   selectedDate,
   startDate = new Date().getTime(),

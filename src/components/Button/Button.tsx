@@ -12,7 +12,7 @@ export type TButtonSize = 'large' | 'medium' | 'small';
 export type TButtonVariant = 'primary' | 'secondary' | 'cta' | 'inline';
 export type TButtonLoadingMode = 'replace' | 'extend';
 
-type TButtonProps = PropsWithChildren<
+export type TButtonProps = PropsWithChildren<
   TDefaultProps & {
     spinnerClassName?: string;
     inProgress?: boolean;

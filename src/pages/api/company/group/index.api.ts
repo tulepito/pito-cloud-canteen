@@ -38,7 +38,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         groupMembers.forEach(({ email }: TMemberApi) => {
           members[email] = {
             ...members[email],
-            groups: Array.from(new Set(members[email].groups).add(newGroupId)),
+            groups: Array.from(
+              new Set(members[email]?.groups || []).add(newGroupId),
+            ),
           };
         });
 

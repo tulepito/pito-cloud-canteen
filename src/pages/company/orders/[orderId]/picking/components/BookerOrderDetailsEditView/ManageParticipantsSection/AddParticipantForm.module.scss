@@ -6,6 +6,12 @@
   column-gap: 20px;
   order: 4;
 
+  &.formWithSubmitButton {
+    .emailField input {
+      text-align: left;
+    }
+  }
+
   .emailField {
     flex-grow: 1;
 

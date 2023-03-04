@@ -9,6 +9,8 @@ import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
+import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 
 import css from './EditOrderRowForm.module.scss';
 
@@ -91,7 +93,12 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
         onClick={handleToggleShowHideRequirementField}
         className={css.buttonContainer}>
         <div className={css.buttonContent}>
-          <IconMinus />
+          <RenderWhen condition={isRequirementInputShow}>
+            <IconMinus />
+            <RenderWhen.False>
+              <IconPlusWithoutBorder />
+            </RenderWhen.False>
+          </RenderWhen>
           <div>{currentRequirementFieldActionText}</div>
         </div>
       </Button>

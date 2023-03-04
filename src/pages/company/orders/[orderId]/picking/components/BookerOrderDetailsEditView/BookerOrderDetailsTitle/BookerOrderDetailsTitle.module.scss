@@ -18,6 +18,7 @@
   .titleText {
     padding-bottom: 7px;
     color: $neutralGray6;
+    text-transform: capitalize;
     @include textTemplate(24px, 700, 4/3);
   }
 

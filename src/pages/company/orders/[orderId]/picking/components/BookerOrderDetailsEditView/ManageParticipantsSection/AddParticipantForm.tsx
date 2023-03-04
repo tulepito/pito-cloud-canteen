@@ -1,6 +1,7 @@
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
@@ -26,9 +27,12 @@ const AddParticipantFormComponent: React.FC<
 > = (props) => {
   const intl = useIntl();
   const { handleSubmit, hasSubmitButton } = props;
+  const formClasses = classNames(css.formContainer, {
+    [css.formWithSubmitButton]: hasSubmitButton,
+  });
 
   return (
-    <Form onSubmit={handleSubmit} className={css.formContainer}>
+    <Form onSubmit={handleSubmit} className={formClasses}>
       <FieldTextInput
         className={css.emailField}
         name="email"

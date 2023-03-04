@@ -38,9 +38,13 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
   const [copyToClipboardTooltip, setCopyToClipboardTooltip] =
     useState(defaultCopyText);
 
-  const sendNotificationModalTitle = intl.formatMessage({
-    id: 'SendNotificationModal.title',
-  });
+  const sendNotificationModalTitle = (
+    <span className={css.title}>
+      {intl.formatMessage({
+        id: 'SendNotificationModal.title',
+      })}
+    </span>
+  );
   const sendNotificationModalAlert = intl.formatMessage(
     {
       id: 'SendNotificationModal.alert',

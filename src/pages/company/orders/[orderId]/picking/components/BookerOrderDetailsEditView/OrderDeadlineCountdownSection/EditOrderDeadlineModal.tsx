@@ -43,9 +43,13 @@ const EditOrderDeadlineModal: React.FC<TEditOrderDeadlineModalProps> = (
       containerClassName={css.modalContainer}
       handleClose={onClose}
       isOpen={isOpen}
-      title={intl.formatMessage({
-        id: 'EditOrderDeadlineModal.title',
-      })}>
+      title={
+        <span className={css.title}>
+          {intl.formatMessage({
+            id: 'EditOrderDeadlineModal.title',
+          })}
+        </span>
+      }>
       <EditOrderDeadlineForm
         onSubmit={onSubmit}
         startDate={orderStartDate}

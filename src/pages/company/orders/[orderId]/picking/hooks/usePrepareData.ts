@@ -68,6 +68,7 @@ export const usePrepareOrderDetailPageData = () => {
   const linkSectionData = { orderDeadline: deadlineDate };
   const manageParticipantData = {
     planData,
+    participants,
     participantData,
   };
   const manageOrdersData = {

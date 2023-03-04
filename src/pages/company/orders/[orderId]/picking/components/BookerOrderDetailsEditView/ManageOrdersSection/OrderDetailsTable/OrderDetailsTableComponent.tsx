@@ -4,6 +4,8 @@ import classNames from 'classnames';
 
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import { parseThousandNumber } from '@helpers/format';
+import { shortenString } from '@src/utils/string';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
 
@@ -13,6 +15,9 @@ import type { TItemData } from './OrderDetailsTable.utils';
 import { EOrderDetailsTableTab } from './OrderDetailsTable.utils';
 
 import css from './OrderDetailsTable.module.scss';
+
+const MAX_LENGTH_NAME = 16;
+const MAX_LENGTH_EMAIL = 20;
 
 type TOrderDetailsTableComponentProps = {
   tab: EOrderDetailsTableTab;
@@ -96,53 +101,67 @@ export const OrderDetailsTableComponent: React.FC<
           </tr>
         </thead>
         <tbody>
-          {data.map((item) => {
-            const { isAnonymous, memberData, foodData, status } = item;
-            const { foodName = '', foodPrice = 0 } = foodData;
+          <tr>
+            <td colSpan={5}>
+              <div className={css.scrollContainer}>
+                <table>
+                  {data.map((item) => {
+                    const { isAnonymous, memberData, foodData, status } = item;
+                    const { foodName = '', foodPrice = 0 } = foodData;
 
-            const {
-              id: memberId,
-              name: memberName,
-              email: memberEmail,
-            } = memberData || {};
-            const formattedFoodPrice = `${foodPrice}đ`;
+                    const {
+                      id: memberId,
+                      name: memberName,
+                      email: memberEmail,
+                    } = memberData || {};
+                    const formattedFoodPrice = `${parseThousandNumber(
+                      foodPrice,
+                    )}đ`;
 
-            const rowClasses = classNames({
-              [css.notAllowed]: status === EParticipantOrderStatus.notAllowed,
-            });
+                    const rowClasses = classNames({
+                      [css.notAllowed]:
+                        status === EParticipantOrderStatus.notAllowed,
+                    });
 
-            return (
-              <tr key={memberId} className={rowClasses}>
-                <td title={memberName}>
-                  <div>{memberName}</div>
-                  {/* <div>Người dùng</div> */}
-                  {isAnonymous && (
-                    <div className={css.stranger}>
-                      {intl.formatMessage({
-                        id: 'OrderDetailsTableComponent.strangerText',
-                      })}
-                    </div>
-                  )}
-                </td>
-                <td title={memberEmail}>{memberEmail}</td>
-                <td title={foodName}>{foodName}</td>
-                <td title={formattedFoodPrice}>{formattedFoodPrice}</td>
-                <td>
-                  <div>
-                    <IconEdit
-                      className={css.icon}
-                      onClick={onClickEditOrderItem(tab, memberId)}
-                    />
-                    <IconDelete
-                      className={css.icon}
-                      onClick={onClickDeleteOrderItem(memberId)}
-                    />
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-
+                    return (
+                      <tr key={memberId} className={rowClasses}>
+                        <td title={memberName}>
+                          <div>
+                            {shortenString(memberName, MAX_LENGTH_NAME)}
+                          </div>
+                          {/* <div>Người dùng</div> */}
+                          {isAnonymous && (
+                            <div className={css.stranger}>
+                              {intl.formatMessage({
+                                id: 'OrderDetailsTableComponent.strangerText',
+                              })}
+                            </div>
+                          )}
+                        </td>
+                        <td title={memberEmail}>
+                          {shortenString(memberEmail, MAX_LENGTH_EMAIL)}
+                        </td>
+                        <td title={foodName}>{foodName}</td>
+                        <td title={formattedFoodPrice}>{formattedFoodPrice}</td>
+                        <td>
+                          <div className={css.actionCell}>
+                            <IconEdit
+                              className={css.icon}
+                              onClick={onClickEditOrderItem(tab, memberId)}
+                            />
+                            <IconDelete
+                              className={css.icon}
+                              onClick={onClickDeleteOrderItem(memberId)}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </table>
+              </div>
+            </td>
+          </tr>
           <tr className={css.totalRow}>
             <td>{totalText}</td>
             <td>{data?.length}</td>
@@ -151,7 +170,9 @@ export const OrderDetailsTableComponent: React.FC<
               colSpan={2}
               onClick={handleClickViewDeletedList}
               className={actionTdClasses}>
-              {intl.formatMessage({ id: 'OrderDetailsTable.viewDeletedList' })}
+              {intl.formatMessage({
+                id: 'OrderDetailsTable.viewDeletedList',
+              })}
             </td>
           </tr>
         </tbody>

@@ -41,10 +41,14 @@ const EditOrderRowModal: React.FC<TEditOrderRowModalProps> = (props) => {
       containerClassName={css.modalContainer}
       handleClose={onClose}
       isOpen={isOpen}
-      title={intl.formatMessage({
-        id: 'EditOrderRowModal.title',
-      })}>
-      <div>
+      title={
+        <span className={css.title}>
+          {intl.formatMessage({
+            id: 'EditOrderRowModal.title',
+          })}
+        </span>
+      }>
+      <div className={css.subTitle}>
         {intl.formatMessage(
           { id: 'EditOrderRowModal.subtitle' },
           {

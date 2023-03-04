@@ -3,14 +3,21 @@
 @use '/src/styles/mixins.scss' as *;
 
 .modalRoot {
-  .modalContentContainer {
-    @include viewportMedium {
-      max-height: 350px;
-      overflow: hidden auto;
-    }
+  .modalTitle {
+    text-transform: capitalize;
+  }
 
-    .contentContainer {
+  .modalContentContainer {
+    & > .contentContainer {
       margin-bottom: 24px;
+      max-height: 70vh;
+      overflow: hidden auto;
+
+      @include viewportMedium {
+        margin-bottom: 56px;
+        max-height: 600px;
+        padding-right: 18px;
+      }
 
       .dateContainer {
         padding-top: 12px;

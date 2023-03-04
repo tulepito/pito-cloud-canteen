@@ -46,6 +46,7 @@ export const renderParticipantCards = (
 
 type TManageParticipantsSectionProps = TDefaultProps & {
   data: {
+    participants: string[];
     participantData: Array<TUser>;
     planData: TObject;
   };
