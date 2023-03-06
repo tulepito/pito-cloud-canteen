@@ -150,7 +150,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     order,
     restaurantCoverImageList,
   );
-  console.log('resourcesForCalender :>> ', resourcesForCalender);
 
   const showPickFoodModal = isPickFoodModalOpen && !fetchFoodInProgress;
 
@@ -262,7 +261,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const initialFoodList = isPickFoodModalOpen
     ? orderDetail[selectedDate?.getTime()]?.restaurant?.foodList
     : {};
-  console.log('initialFoodList: ', initialFoodList);
 
   const calendarExtraResources = useGetCalendarExtraResources({
     order,
@@ -275,11 +273,17 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   };
 
   useEffect(() => {
-    if (isEmpty(orderDetail) && !justDeletedMemberOrder) {
+    if (isEmpty(orderDetail) && !justDeletedMemberOrder && !isEmpty(plans)) {
+      console.log('fetch order detail');
+      console.log('plan: ', plans);
       dispatch(orderAsyncActions.fetchOrderDetail(plans));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(order), JSON.stringify(orderDetail)]);
+  }, [
+    JSON.stringify(order),
+    JSON.stringify(orderDetail),
+    JSON.stringify(plans),
+  ]);
 
   useEffect(() => {
     if (!isEmpty(orderDetail)) {

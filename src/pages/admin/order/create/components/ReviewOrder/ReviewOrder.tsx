@@ -244,10 +244,6 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     };
   }, [staffName, shipperName]);
 
-  useEffect(() => {
-    dispatch(orderAsyncActions.fetchOrderDetail(plans));
-  }, [dispatch, plans]);
-
   return (
     <div className={css.root}>
       <h1 className={css.title}>

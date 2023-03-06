@@ -49,6 +49,7 @@ export const getMenuQuery = ({
     meta_listingState: 'published',
     meta_listingType: ListingTypes.MENU,
     pub_startDate: `,${dateTime.toMillis()}`,
+    pub_endDate: `${dateTime.toMillis()},`,
     pub_daysOfWeek: `has_any:${dayOfWeek}`,
     pub_mealType: mealType,
     meta_isDeleted: false,
