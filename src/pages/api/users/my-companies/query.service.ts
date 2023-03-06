@@ -9,6 +9,8 @@ const queryCompanies = async ({
   const integrationSdk = getIntegrationSdk();
   const companyListRes = await integrationSdk.users.query({
     meta_id: companyIdList.join(','),
+    include: ['profileImage'],
+    'fields.image': ['variants.square-small', 'variants.square-small2x'],
   });
   const companyList = denormalisedResponseEntities(companyListRes);
 
