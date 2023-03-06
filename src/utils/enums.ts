@@ -353,15 +353,11 @@ export const PACKAGING_OPTIONS = [
   },
   {
     key: EPackagingMaterials.PLASTIC_BOX,
-    label: 'Hộp nhựa',
+    label: 'Nhựa xốp',
   },
   {
     key: EPackagingMaterials.BAGASSE_BOX,
     label: 'Hộp bã mía',
-  },
-  {
-    key: EPackagingMaterials.PLASTIC_STYROFOAM,
-    label: 'Nhựa, xốp',
   },
   {
     key: EPackagingMaterials.HEAT_RETAINING_ALUMINUM_XBOX,
