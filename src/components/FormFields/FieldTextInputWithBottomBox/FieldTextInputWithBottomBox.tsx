@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { FieldProps, FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 import classNames from 'classnames';
@@ -32,10 +32,10 @@ const FieldTextInputWithBottomBoxComponent: React.FC<
     form,
     ...rest
   } = props;
-  const [tempValue, setTempValue] = useState<number | string>();
   if (label && !id) {
     throw Error('id required when a label is given');
   }
+  const { tempValue } = form.getState().values;
 
   const { valid, invalid, touched, error } = meta;
   const errorText = customErrorText || error;
@@ -87,14 +87,14 @@ const FieldTextInputWithBottomBoxComponent: React.FC<
       };
 
   const onChangeTempValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTempValue(e.target.value);
+    form.change('tempValue', e.target.value);
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.key === 'Enter') {
-      form.change(input.name, [tempValue]);
+      form.change(input.name, tempValue || '');
     }
   };
 
