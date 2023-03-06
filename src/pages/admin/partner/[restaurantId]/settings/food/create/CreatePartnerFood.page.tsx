@@ -7,7 +7,9 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
+import { partnerThunks } from '@redux/slices/partners.slice';
 import { adminRoutes } from '@src/paths';
+import { IntegrationListing } from '@utils/data';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 import type { TIntegrationListing, TObject } from '@utils/types';
@@ -30,6 +32,13 @@ const CreatePartnerFoodPage = () => {
     showFoodError,
     uploadingImages,
   } = useAppSelector((state) => state.foods, shallowEqual);
+
+  const {
+    partnerListingRef,
+    showPartnerListingInProgress,
+    showPartnerListingError,
+  } = useAppSelector((state) => state.partners, shallowEqual);
+
   const redirectToEditPage = (listing: TIntegrationListing) => {
     const foodId = listing?.id?.uuid;
     if (foodId)
@@ -65,6 +74,9 @@ const CreatePartnerFoodPage = () => {
     return response;
   };
 
+  const { minQuantity, maxQuantity } =
+    IntegrationListing(partnerListingRef).getPublicData();
+
   const initialValues = useMemo(() => {
     const attributes = currentFoodListing?.attributes || {};
     const {
@@ -81,27 +93,42 @@ const CreatePartnerFoodPage = () => {
       price: price?.amount,
       menuType: menuType || EMenuTypes.cycleMenu,
       foodType: foodType || EFoodTypes.vegetarianDish,
+      minOrderHourInAdvance: 24,
+      minQuantity,
+      maxQuantity,
       ...rest,
     };
-  }, [currentFoodListing]) as TEditPartnerFoodFormValues;
+  }, [
+    currentFoodListing,
+    minQuantity,
+    maxQuantity,
+  ]) as TEditPartnerFoodFormValues;
 
   useEffect(() => {
     if (!duplicateId) {
       dispatch(foodSliceAction.setInitialStates());
     }
-  }, [duplicateId]);
+  }, [duplicateId, dispatch]);
 
   useEffect(() => {
     if (!duplicateId) return;
     dispatch(foodSliceThunks.showDuplicateFood(duplicateId));
-  }, [duplicateId]);
+  }, [duplicateId, dispatch]);
 
-  if (showFoodInProgress) {
+  useEffect(() => {
+    if (restaurantId) {
+      dispatch(partnerThunks.showPartnerRestaurantListing(restaurantId));
+    }
+  }, [restaurantId, dispatch]);
+
+  if (showFoodInProgress || showPartnerListingInProgress) {
     return <LoadingContainer />;
   }
 
-  if (showFoodError) {
-    return <ErrorMessage message={showFoodError.message} />;
+  const showError = showPartnerListingError || showFoodError;
+
+  if (showError) {
+    return <ErrorMessage message={showError.message} />;
   }
 
   return (
