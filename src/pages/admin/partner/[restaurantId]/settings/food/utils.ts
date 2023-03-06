@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 import { types as sdkTypes } from '@helpers/sdkLoader';
 import { ListingTypes } from '@src/types/listingTypes';
 import type { EMenuTypes } from '@utils/enums';
@@ -11,7 +12,7 @@ const getNumberOnly = (price: string) => {
 };
 
 const parsePriceToMoneyFormat = (price: string) => {
-  const formattedPrice = getNumberOnly(price);
+  const formattedPrice = getNumberOnly(String(price));
   const parsedPrice = Number(formattedPrice);
   return new Money(Number(parsedPrice), 'VND');
 };
@@ -36,6 +37,7 @@ export type TEditPartnerFoodFormValues = {
   notes: string;
   restaurantId?: string;
   unit?: string;
+  tempValue?: string;
 };
 
 export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
@@ -44,8 +46,8 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
     title,
     description,
     price,
-    // eslint-disable-next-line unused-imports/no-unused-vars
     addImages,
+    tempValue,
     restaurantId,
     ...rest
   } = values;
@@ -74,10 +76,11 @@ export const getUpdateFoodData = (values: TEditPartnerFoodFormValues) => {
     title,
     description,
     price,
-    // eslint-disable-next-line unused-imports/no-unused-vars
     addImages,
+    tempValue,
     ...rest
   } = values;
+
   return {
     ...(id ? { id } : {}),
     images: getUniqueImages([...getSubmitImageId(images)]),
@@ -96,8 +99,8 @@ export const getDuplicateData = (values: TEditPartnerFoodFormValues) => {
     title,
     description,
     price,
-    // eslint-disable-next-line unused-imports/no-unused-vars
     addImages,
+    tempValue,
     restaurantId,
     ...rest
   } = values;

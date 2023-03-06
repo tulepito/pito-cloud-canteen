@@ -39,6 +39,7 @@ import {
   parsePrice,
   required,
   upperCaseFirstLetter,
+  validateNonEnterInputField,
   validFoodTitle,
 } from '@utils/validators';
 
@@ -400,6 +401,11 @@ const EditPartnerFoodFormComponent: React.FC<
             id: 'EditPartnerFoodForm.allergicIngredientLabel',
           })}
           form={form}
+          validate={validateNonEnterInputField(
+            intl.formatMessage({
+              id: 'EditPartnerFoodForm.allergicIngredientValid',
+            }),
+          )}
         />
         <FieldTextInput
           className={css.field}

@@ -27,9 +27,10 @@ import {
   composeValidators,
   composeValidatorsWithAllValues,
   emailFormatValid,
-  minLength,
   minPriceLength,
   nonEmptyImage,
+  numberMinLength,
+  parseNum,
   parsePrice,
   passwordFormatValid,
   passwordMatchConfirmPassword,
@@ -37,6 +38,8 @@ import {
   required,
   validFacebookUrl,
   validURL,
+  valueGreaterThanMin,
+  valueLessThanMax,
 } from '@utils/validators';
 
 import {
@@ -548,20 +551,33 @@ const EditPartnerBasicInformationForm: React.FC<
                       inputClassName={css.inputWithSuffix}
                       id="minQuantity"
                       type="number"
+                      parse={parseNum as any}
                       label={intl.formatMessage({
                         id: 'EditPartnerForm.minQuantityLabel',
                       })}
-                      validate={composeValidators(
+                      validate={composeValidatorsWithAllValues(
                         required(
                           intl.formatMessage({
                             id: 'EditPartnerBasicInformationForm.minQuantityRequired',
                           }),
                         ),
-                        minLength(
+                        numberMinLength(
                           intl.formatMessage({
                             id: 'EditPartnerBasicInformationForm.minQuantityInvalid',
                           }),
                           1,
+                        ),
+                        valueLessThanMax(
+                          intl.formatMessage({
+                            id: 'EditPartnerBasicInformationForm.minQuantityLessThanMax',
+                          }),
+                          'maxQuantity',
+                        ),
+                        valueGreaterThanMin(
+                          intl.formatMessage({
+                            id: 'EditPartnerBasicInformationForm.minQuantityLessThanMax',
+                          }),
+                          'minQuantity',
                         ),
                       )}
                       rightIconContainerClassName={css.inputSuffixed}
@@ -576,13 +592,14 @@ const EditPartnerBasicInformationForm: React.FC<
                       label={intl.formatMessage({
                         id: 'EditPartnerBasicInformationForm.maxQuantityLabel',
                       })}
-                      validate={composeValidators(
+                      parse={parseNum as any}
+                      validate={composeValidatorsWithAllValues(
                         required(
                           intl.formatMessage({
                             id: 'EditPartnerBasicInformationForm.maxQuantityRequired',
                           }),
                         ),
-                        minLength(
+                        numberMinLength(
                           intl.formatMessage({
                             id: 'EditPartnerBasicInformationForm.maxQuantityInvalid',
                           }),
