@@ -543,6 +543,7 @@ const EditPartnerBasicInformationForm: React.FC<
                     <FieldTextInput
                       name="minQuantity"
                       className={css.minQuantity}
+                      inputClassName={css.inputWithSuffix}
                       id="minQuantity"
                       type="number"
                       label={intl.formatMessage({
@@ -567,6 +568,7 @@ const EditPartnerBasicInformationForm: React.FC<
                     <FieldTextInput
                       name="maxQuantity"
                       className={css.maxQuantity}
+                      inputClassName={css.inputWithSuffix}
                       id="maxQuantity"
                       type="number"
                       label={intl.formatMessage({
