@@ -29,6 +29,10 @@
         flex-direction: row;
         justify-content: space-between;
         gap: 12px;
+
+        .cardWrapper {
+          flex-basis: calc(50% - 6px);
+        }
       }
 
       .groupContainer {
@@ -63,13 +67,15 @@
   }
 }
 
-.tooltipOverlay {
-  opacity: 1;
-}
+.tooltipContent {
+  @include textTemplate(10px, 400, 1.6);
+  color: $neutralGray4;
 
-.tooltipOverlay :global(.rc-tooltip-inner) {
-  opacity: 1;
-  background-color: $neutralGray6;
+  .title {
+    @include textTemplate(12px, 700, 1.6);
+    color: $neutralGray1;
+    padding-bottom: 2px;
+  }
 }
 
 .tooltipOverlay :global(.rc-tooltip-arrow) {

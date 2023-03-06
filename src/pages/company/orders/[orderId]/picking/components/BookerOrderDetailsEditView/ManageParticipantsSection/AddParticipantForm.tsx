@@ -41,15 +41,15 @@ const AddParticipantFormComponent: React.FC<
     (state) => state.OrderManagement.updateParticipantsInProgress,
   );
 
-  const formClasses = classNames(css.root, {
+  const formClasses = classNames(css.formContainer, {
     [css.withSubmitButton]: hasSubmitButton,
   });
 
   useEffect(() => {}, []);
 
   return (
-    <Form onSubmit={handleSubmit} className={formClasses}>
-      <div className={css.formContainer}>
+    <Form onSubmit={handleSubmit} className={css.root}>
+      <div className={formClasses}>
         <FieldTextInput
           className={css.emailField}
           name="email"
