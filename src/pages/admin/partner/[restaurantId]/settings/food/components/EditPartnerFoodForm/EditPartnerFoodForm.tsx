@@ -153,6 +153,7 @@ const EditPartnerFoodFormComponent: React.FC<
             <FieldTextInput
               className={css.minOrderField}
               type="number"
+              inputClassName={css.inputWithSuffix}
               name="minOrderHourInAdvance"
               id="minOrderHourInAdvance"
               placeholder={intl.formatMessage({
@@ -183,6 +184,7 @@ const EditPartnerFoodFormComponent: React.FC<
                 id: 'EditPartnerFoodForm.minQuantityPerOrderPlaceholder',
               })}
               rightIcon={<div>phần</div>}
+              inputClassName={css.inputWithSuffix}
               rightIconContainerClassName={css.inputSuffixed}
               validate={composeValidators(
                 required(
@@ -211,6 +213,7 @@ const EditPartnerFoodFormComponent: React.FC<
           label={intl.formatMessage({
             id: 'EditPartnerFoodForm.maxMemberLabel',
           })}
+          inputClassName={css.inputWithSuffix}
           rightIcon={<div>người</div>}
           rightIconContainerClassName={css.inputSuffixed}
           validate={composeValidators(
@@ -284,6 +287,7 @@ const EditPartnerFoodFormComponent: React.FC<
             placeholder={intl.formatMessage({
               id: 'EditPartnerFoodForm.pricePlaceholder',
             })}
+            inputClassName={css.inputWithSuffix}
             rightIcon={<div className={css.inputSuffixed}>đ</div>}
             validate={composeValidators(
               required(
@@ -408,6 +412,7 @@ const EditPartnerFoodFormComponent: React.FC<
           label={intl.formatMessage({
             id: 'EditPartnerFoodForm.numberOfMainDishesLabel',
           })}
+          inputClassName={css.inputWithSuffix}
           rightIconContainerClassName={css.inputSuffixed}
           rightIcon={<div>món</div>}
           validate={composeValidators(
