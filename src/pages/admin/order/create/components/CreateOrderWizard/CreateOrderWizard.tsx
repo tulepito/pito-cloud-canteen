@@ -6,7 +6,7 @@ import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import FormWizard from '@components/FormWizard/FormWizard';
-import { getItem, setItem } from '@helpers/localStorageHelpers';
+import { setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
@@ -98,14 +98,11 @@ const CreateOrderTab: React.FC<any> = (props) => {
 };
 
 const CreateOrderWizard = () => {
-  const stepFromLocal = getItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME);
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { orderId } = router.query;
-  const [currentStep, setCurrentStep] = useState<string>(
-    stepFromLocal || CLIENT_SELECT_TAB,
-  );
+  const [currentStep, setCurrentStep] = useState<string>(CLIENT_SELECT_TAB);
 
   useEffect(() => {
     if (orderId) {
@@ -172,7 +169,11 @@ const CreateOrderWizard = () => {
 
       return setCurrentStep(MEAL_PLAN_SETUP);
     }
-  }, [JSON.stringify(order), step2SubmitInProgress]);
+  }, [
+    JSON.stringify(order),
+    step2SubmitInProgress,
+    JSON.stringify(orderDetail),
+  ]);
 
   useEffect(() => {
     if (!tabsStatus[currentStep as string]) {
