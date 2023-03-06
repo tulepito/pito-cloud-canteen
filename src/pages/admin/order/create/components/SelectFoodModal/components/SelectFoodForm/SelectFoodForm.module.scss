@@ -18,6 +18,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 100%));
   overflow: hidden auto;
+  margin-top: 4px;
 
   @include viewportMedium {
     max-height: 70vh;

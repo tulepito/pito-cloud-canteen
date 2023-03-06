@@ -21,7 +21,7 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
     <div className={css.content}>
       <div className={css.coverImg}>
         <ResponsiveImage
-          alt={`${event.title}`}
+          alt={`${restaurantName}`}
           image={restaurantCoverImage}
           variants={[
             EImageVariants.landscapeCrop,

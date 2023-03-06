@@ -94,6 +94,7 @@ type TOrderInitialState = {
   recommendRestaurantError: any;
 
   step2SubmitInProgress: boolean;
+  currentSelectedMenuId: string;
 };
 
 const initialState: TOrderInitialState = {
@@ -159,6 +160,7 @@ const initialState: TOrderInitialState = {
   recommendRestaurantInProgress: false,
   recommendRestaurantError: null,
   step2SubmitInProgress: false,
+  currentSelectedMenuId: '',
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -641,6 +643,10 @@ const orderSlice = createSlice({
       ...state,
       step2SubmitInProgress: payload,
     }),
+    addCurrentSelectedMenuId: (state, { payload }) => ({
+      ...state,
+      currentSelectedMenuId: payload,
+    }),
   },
   extraReducers: (builder) => {
     builder
@@ -887,6 +893,7 @@ export const {
   unSelectRestaurant,
   resetOrder,
   changeStep2SubmitStatus,
+  addCurrentSelectedMenuId,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

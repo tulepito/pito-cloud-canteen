@@ -22,6 +22,7 @@ import useBoolean from '@hooks/useBoolean';
 import { normalizePlanDetailsToEvent } from '@pages/company/booker/orders/draft/[orderId]/helpers/normalizeData';
 import { useGetCalendarExtraResources } from '@pages/company/booker/orders/draft/[orderId]/restaurants/hooks/calendar';
 import {
+  addCurrentSelectedMenuId,
   orderAsyncActions,
   selectCalendarDate,
   selectRestaurant,
@@ -121,10 +122,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const fetchRestaurantsInProgress = useAppSelector(
     (state) => state.SelectRestaurantPage.fetchRestaurantsPending,
   );
-
-  const restaurants = useAppSelector(
-    (state) => state.SelectRestaurantPage.restaurants,
-    shallowEqual,
+  const currentSelectedMenuId = useAppSelector(
+    (state) => state.Order.currentSelectedMenuId,
   );
 
   const orderId = Listing(order as TListing).getId();
@@ -151,6 +150,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     order,
     restaurantCoverImageList,
   );
+  console.log('resourcesForCalender :>> ', resourcesForCalender);
 
   const showPickFoodModal = isPickFoodModalOpen && !fetchFoodInProgress;
 
@@ -262,6 +262,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const initialFoodList = isPickFoodModalOpen
     ? orderDetail[selectedDate?.getTime()]?.restaurant?.foodList
     : {};
+  console.log('initialFoodList: ', initialFoodList);
 
   const calendarExtraResources = useGetCalendarExtraResources({
     order,
@@ -309,9 +310,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       id: currRestaurantId,
       restaurantName: currentRestaurant?.attributes?.title,
       phoneNumber: currentRestaurant?.attributes?.publicData?.phoneNumber,
-      menuId: restaurants?.find(
-        (restaurant) => restaurant.restaurantInfo.id.uuid === currRestaurantId,
-      ).menu.id.uuid,
+      menuId: currentSelectedMenuId,
     };
 
     await handleSubmitRestaurant({
@@ -327,6 +326,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     menuId: string,
   ) => {
     dispatch(selectCalendarDate(DateTime.fromMillis(+dateTime).toJSDate()));
+    dispatch(addCurrentSelectedMenuId(menuId));
     await dispatch(
       selectRestaurantPageThunks.fetchSelectedRestaurant(restaurantId),
     );
