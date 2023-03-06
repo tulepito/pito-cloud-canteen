@@ -14,6 +14,7 @@ import { createDeepEqualSelector } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import type { RootState } from '@redux/store';
 import { companyPaths } from '@src/paths';
+import { historyPushState } from '@src/utils/history';
 import {
   EManageCompanyOrdersTab,
   MANAGE_COMPANY_ORDERS_TAB_MAP,
@@ -124,6 +125,12 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const { query, isReady, replace } = useRouter();
   const dispatch = useAppDispatch();
   const orders = useAppSelector((state) => state.Order.orders) || [];
+  const queryOrderInProgress = useAppSelector(
+    (state) => state.Order.queryOrderInProgress,
+  );
+  const { totalPages = 1 } = useAppSelector(
+    (state) => state.Order.manageOrdersPagination,
+  );
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   let currDebounceRef = debounceRef.current;
 
@@ -158,6 +165,12 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   };
 
   useEffect(() => {
+    if (Number(page) > totalPages) {
+      historyPushState('page', totalPages.toString());
+    }
+  }, [page, totalPages]);
+
+  useEffect(() => {
     let params: TObject = {
       page,
       keywords,
@@ -176,6 +189,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   return (
     <div className={css.root}>
       <Tabs
+        disabled={queryOrderInProgress}
         items={tabItems}
         onChange={handleTabChange}
         defaultActiveKey={'5'}

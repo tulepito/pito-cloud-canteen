@@ -163,8 +163,10 @@ export const OrderDetailsTableComponent: React.FC<
             </td>
           </tr>
           <tr className={css.totalRow}>
-            <td>{totalText}</td>
-            <td>{data?.length}</td>
+            <td colSpan={2}>
+              <span className={css.totalText}>{totalText}</span>
+              <span>{data?.length}</span>
+            </td>
             <td></td>
             <td
               colSpan={2}

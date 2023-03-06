@@ -140,9 +140,9 @@ const initialState: TOrderInitialState = {
   deleteDraftOrderError: null,
   manageOrdersPagination: {
     totalItems: 0,
-    totalPages: 0,
-    page: 0,
-    perPage: 0,
+    totalPages: 1,
+    page: 1,
+    perPage: 10,
   },
   totalItemMap: {
     [EManageCompanyOrdersTab.SCHEDULED]: 0,
@@ -641,6 +641,28 @@ const orderSlice = createSlice({
       ...state,
       step2SubmitInProgress: payload,
     }),
+    resetCompanyOrdersStates: (state) => ({
+      ...state,
+      queryParams: {},
+      orders: [],
+      queryOrderInProgress: false,
+      queryOrderError: null,
+      deleteDraftOrderInProgress: false,
+      deleteDraftOrderError: null,
+      manageOrdersPagination: {
+        totalItems: 0,
+        totalPages: 1,
+        page: 1,
+        perPage: 10,
+      },
+      totalItemMap: {
+        [EManageCompanyOrdersTab.SCHEDULED]: 0,
+        [EManageCompanyOrdersTab.CANCELED]: 0,
+        [EManageCompanyOrdersTab.DRAFT]: 0,
+        [EManageCompanyOrdersTab.COMPLETED]: 0,
+        [EManageCompanyOrdersTab.ALL]: 0,
+      },
+    }),
   },
   extraReducers: (builder) => {
     builder
@@ -758,7 +780,6 @@ const orderSlice = createSlice({
         ) => ({
           ...state,
           queryParams,
-
           queryOrderInProgress: false,
           orders,
           manageOrdersPagination: pagination,
@@ -887,6 +908,7 @@ export const {
   unSelectRestaurant,
   resetOrder,
   changeStep2SubmitStatus,
+  resetCompanyOrdersStates,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

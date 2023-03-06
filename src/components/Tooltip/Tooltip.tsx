@@ -38,7 +38,7 @@ const Tooltip: React.FC<TTooltipProps> = (props) => {
     showArrow = true,
     overlayInnerStyle,
   } = props;
-  const overlayClasses = classNames(css.overlayClassName, overlayClassName);
+  const overlayClasses = classNames(css.overlay, overlayClassName);
 
   const tooltipProps = {
     placement,

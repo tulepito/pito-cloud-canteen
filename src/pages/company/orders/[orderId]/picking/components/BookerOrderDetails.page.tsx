@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import AlertModal from '@components/Modal/AlertModal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { companyPaths } from '@src/paths';
@@ -204,7 +205,12 @@ const BookerOrderDetailsPage = () => {
     }
   }, [isRouterReady, orderState]);
 
-  return <>{inProgress ? <LoadingContainer /> : renderView()}</>;
+  return (
+    <RenderWhen condition={inProgress}>
+      <LoadingContainer />
+      <RenderWhen.False>{renderView()}</RenderWhen.False>
+    </RenderWhen>
+  );
 };
 
 export default BookerOrderDetailsPage;

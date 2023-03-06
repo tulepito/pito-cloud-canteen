@@ -1,7 +1,6 @@
-import get from 'lodash/get';
-
 import Tooltip from '@components/Tooltip/Tooltip';
-import type { TObject, TUser } from '@utils/types';
+import { Listing } from '@src/utils/data';
+import type { TListing, TObject, TUser } from '@utils/types';
 
 import { isParticipantCompletedPickFood } from './ManageParticipantsSection.helper';
 import ParticipantCard from './ParticipantCard';
@@ -21,7 +20,9 @@ export const RawParticipants: React.FC<TRawParticipantsProps> = ({
   handleClickDeleteParticipant,
 }) => {
   const { participantData, planData } = data;
-  const planOrderDetails = get(planData, 'attributes.metadata.orderDetail');
+  const { orderDetail: planOrderDetails } = Listing(
+    planData as TListing,
+  ).getMetadata();
 
   return (
     <div className={css.rawParticipants}>
@@ -51,14 +52,15 @@ export const RawParticipants: React.FC<TRawParticipantsProps> = ({
         );
 
         return isSelectedFood ? (
-          cardComponent
-        ) : (
           <Tooltip
+            overlayClassName={css.tooltipOverlay}
             tooltipContent={'Đã chọn món xong'}
             placement="topRight"
             key={uuid}>
             {cardComponent}
           </Tooltip>
+        ) : (
+          cardComponent
         );
       })}
     </div>

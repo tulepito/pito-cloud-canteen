@@ -75,7 +75,7 @@
       }
 
       .orderType {
-        max-width: 100px;
+        max-width: 95px;
       }
 
       .location {
@@ -85,7 +85,7 @@
 
       .restaurantName {
         @include textTemplate(14px, 400, 20px);
-        max-width: 150px;
+        max-width: 130px;
 
         .remainText {
           font-weight: 700;

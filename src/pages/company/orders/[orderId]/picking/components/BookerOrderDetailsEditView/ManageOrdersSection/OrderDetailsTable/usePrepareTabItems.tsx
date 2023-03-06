@@ -1,6 +1,8 @@
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+
 import type { TAllTabData, TItemData } from './OrderDetailsTable.utils';
 import { EOrderDetailsTableTab, TABLE_TABS } from './OrderDetailsTable.utils';
 import { OrderDetailsTableComponent } from './OrderDetailsTableComponent';
@@ -63,15 +65,14 @@ export const usePrepareTabItems = ({
     switch (tabValue) {
       case EOrderDetailsTableTab.chose:
         children = (
-          <>
-            {tabData.length > 0 ? (
-              <OrderDetailsTableComponent {...initialParams} />
-            ) : (
+          <RenderWhen condition={tabData.length > 0}>
+            <OrderDetailsTableComponent {...initialParams} />
+            <RenderWhen.False>
               <p className={css.noChoices}>
                 {intl.formatMessage({ id: 'OrderDetailsTable.noChoices' })}
               </p>
-            )}
-          </>
+            </RenderWhen.False>
+          </RenderWhen>
         );
         break;
       case EOrderDetailsTableTab.notChoose:

@@ -142,6 +142,10 @@
           & > td {
             @include textTemplate(14px, 700, 20px);
 
+            .totalText {
+              padding-right: 8px;
+            }
+
             &.actionTd {
               text-align: right;
               text-decoration: underline;

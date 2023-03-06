@@ -3,11 +3,7 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  margin-top: 72px;
-
-  @include viewportMedium {
-    margin-top: 81px;
-  }
+  margin-top: 82px;
 
   &.hasSideBar {
     margin-left: 292px;

@@ -25,6 +25,7 @@ export const queryCompanyOrders = async ({
   const {
     meta_orderState: orderStateFromParams,
     currentTab = EManageCompanyOrdersTab.ALL,
+    page,
   } = dataParams;
 
   const queryOrdersResponse = await integrationSdk.listings.query(
@@ -37,6 +38,7 @@ export const queryCompanyOrders = async ({
     queryParams,
   );
   const queryOrdersPagination = queryOrdersResponse.data.meta;
+  const { totalItems = 0, totalPages = 1 } = queryOrdersResponse.data.meta;
 
   const [company] = denormalisedResponseEntities(
     await integrationSdk.users.show({
@@ -70,7 +72,7 @@ export const queryCompanyOrders = async ({
   );
 
   const totalItemMap: TObject = {
-    [currentTab]: queryOrdersPagination.totalItems,
+    [currentTab]: page > totalPages ? 0 : totalItems,
   };
 
   const queryStates = Object.entries(MANAGE_COMPANY_ORDERS_TAB_MAP).reduce<
@@ -100,8 +102,10 @@ export const queryCompanyOrders = async ({
     paramList.map(async (params) => {
       const { tab, ...restParams } = params;
       const orderResponse = await integrationSdk.listings.query(restParams);
+      const { totalPages: resTotalPages = 1, totalItems: resTotalItems = 0 } =
+        orderResponse.data.meta;
 
-      totalItemMap[tab] = orderResponse.data.meta.totalItems;
+      totalItemMap[tab] = page > resTotalPages ? 0 : resTotalItems;
     }),
   );
 

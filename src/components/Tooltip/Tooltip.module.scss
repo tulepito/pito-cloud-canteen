@@ -1,1 +1,10 @@
-@use '/src/styles/vars.scss';
+@use '/src/styles/vars.scss' as *;
+
+.overlay {
+  opacity: 1;
+}
+
+.overlay :global(.rc-tooltip-inner) {
+  opacity: 1;
+  background-color: $neutralGray6;
+}

@@ -1,6 +1,16 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
+  padding-top: 16px;
+
+  @include viewportMedium {
+    padding-top: 24px;
+  }
+
+  @include viewportLarge {
+    padding-top: 33px;
+  }
+
   .titleSection {
     padding: 0 8px;
 
@@ -9,13 +19,13 @@
     }
 
     @include viewportMedium {
-      padding: 24px;
+      padding: 0 24px;
       margin: 0 auto;
     }
 
     @include viewportLarge {
       max-width: 1252px;
-      padding: 32px 36px 0;
+      padding: 0 36px;
     }
 
     @include viewportSLarge {

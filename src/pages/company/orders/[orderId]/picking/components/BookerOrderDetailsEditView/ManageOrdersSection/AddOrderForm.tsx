@@ -10,6 +10,7 @@ import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
 import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { shortenString } from '@src/utils/string';
 
 import css from './AddOrderForm.module.scss';
 
@@ -81,7 +82,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
 
       {memberOptions?.map(({ memberId, memberName }) => (
         <option key={memberId} value={memberId}>
-          {memberName}
+          {shortenString(memberName, 18)}
         </option>
       ))}
     </>

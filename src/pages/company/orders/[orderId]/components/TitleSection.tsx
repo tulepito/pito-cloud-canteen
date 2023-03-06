@@ -3,6 +3,7 @@ import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 
+import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
@@ -57,19 +58,31 @@ const TitleSection: React.FC<TTitleSectionProps> = ({
     { contactNumber, chatLink },
   );
 
+  const reviewText = intl.formatMessage(
+    {
+      id: 'CompanyOrderDetailPage.titleSection.reviewButtonText',
+    },
+    { contactNumber, chatLink },
+  );
+
   return (
     <div className={rootClasses}>
-      <div className={css.breadCrumb}>
-        <div>{orderText}</div>
-        <IconArrow direction="right" className={css.arrowIcon} />
-        <RenderWhen condition={!isEmpty(orderTitle)}>
-          <div className={css.orderName}>{orderName}</div>
-          <RenderWhen.False>
-            <Skeleton containerClassName={css.orderNameSkeleton} />
-          </RenderWhen.False>
-        </RenderWhen>
+      <div>
+        <div className={css.breadCrumb}>
+          <div>{orderText}</div>
+          <IconArrow direction="right" className={css.arrowIcon} />
+          <RenderWhen condition={!isEmpty(orderTitle)}>
+            <div className={css.orderName}>{orderName}</div>
+            <RenderWhen.False>
+              <Skeleton containerClassName={css.orderNameSkeleton} />
+            </RenderWhen.False>
+          </RenderWhen>
+        </div>
+        <div className={css.subtitle}>{subtitle}</div>
       </div>
-      <div className={css.subtitle}>{subtitle}</div>
+      <Button variant="secondary" className={css.reviewButton} disabled>
+        {reviewText}
+      </Button>
     </div>
   );
 };

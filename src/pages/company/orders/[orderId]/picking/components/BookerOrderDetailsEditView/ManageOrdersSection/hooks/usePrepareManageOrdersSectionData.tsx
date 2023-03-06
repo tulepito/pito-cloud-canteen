@@ -24,14 +24,14 @@ export const usePrepareManageOrdersSectionData = (
   const { participants = [] } = Listing(orderData as TListing).getMetadata();
   const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
 
-  const dateList = Object.entries(orderDetail).reduce<number[]>(
-    (prev, [date, orderOnDate]) => {
+  const dateList = Object.entries(orderDetail)
+    .reduce<number[]>((prev, [date, orderOnDate]) => {
       const { restaurant } = orderOnDate as TObject;
 
       return !isEmpty(restaurant?.foodList) ? prev.concat(Number(date)) : prev;
-    },
-    [],
-  );
+    }, [])
+    .sort((x, y) => x - y);
+
   const indexOfTimestamp = useMemo(
     () => dateList.indexOf(Number(timestamp)),
     [timestamp],
