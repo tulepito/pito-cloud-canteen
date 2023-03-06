@@ -70,13 +70,14 @@
       color: #616161;
       .tableActions {
         display: flex;
+        min-width: 70px;
         align-items: center;
         width: 100%;
         justify-content: space-evenly;
         .addButton {
           .iconClose {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
           }
         }
       }

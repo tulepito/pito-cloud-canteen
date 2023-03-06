@@ -27,6 +27,7 @@ type InputComponentProps = FieldRenderProps<string, any> &
     required?: boolean;
     showText?: boolean;
     placeholder?: string;
+    inputClassName?: string;
   };
 
 export const FieldTextInputComponent: React.FC<InputComponentProps> = (
@@ -52,6 +53,7 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
     showText = false,
     leftIconContainerClassName,
     rightIconContainerClassName,
+    inputClassName,
     ...rest
   } = props;
 
@@ -90,7 +92,7 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
   // Classes
   const inputClasses =
     inputRootClass ||
-    classNames(css.input, {
+    classNames(css.input, inputClassName, {
       [css.inputSuccess]: valid,
       [css.inputError]: hasError,
       [css.inputDisabled]: disabled,
