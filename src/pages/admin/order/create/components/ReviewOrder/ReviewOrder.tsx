@@ -190,11 +190,15 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const { address } = deliveryAddress || {};
 
   useEffect(() => {
-    if (isEmpty(orderDetail)) {
+    if (isEmpty(orderDetail) && !isEmpty(plans)) {
       dispatch(orderAsyncActions.fetchOrderDetail(plans));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(order), JSON.stringify(orderDetail)]);
+  }, [
+    JSON.stringify(order),
+    JSON.stringify(orderDetail),
+    JSON.stringify(plans),
+  ]);
 
   const { renderedOrderDetail } =
     useMemo(() => {

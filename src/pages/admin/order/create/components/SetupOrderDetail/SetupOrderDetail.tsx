@@ -274,8 +274,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   useEffect(() => {
     if (isEmpty(orderDetail) && !justDeletedMemberOrder && !isEmpty(plans)) {
-      console.log('fetch order detail');
-      console.log('plan: ', plans);
       dispatch(orderAsyncActions.fetchOrderDetail(plans));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
