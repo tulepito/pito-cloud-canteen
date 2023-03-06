@@ -5,7 +5,7 @@ import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
-import type { TIntegrationListing } from '@utils/types';
+import type { TIntegrationListing, TObject } from '@utils/types';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -65,7 +65,12 @@ const CreatePartnerFoodPage = () => {
 
   const initialValues = useMemo(() => {
     const attributes = currentFoodListing?.attributes || {};
-    const { publicData = {}, price, title, description } = attributes || {};
+    const {
+      publicData = {},
+      price,
+      title,
+      description,
+    } = attributes || ({} as TObject);
     const { foodType, menuType, ...rest } = publicData;
     return {
       images: getInitialAddImages(currentFoodListing?.images || []),
