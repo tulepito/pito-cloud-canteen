@@ -21,7 +21,7 @@ export const RawParticipants: React.FC<TRawParticipantsProps> = ({
   handleClickDeleteParticipant,
 }) => {
   const { participantData, planData } = data;
-  const { orderDetail: planOrderDetails } = Listing(
+  const { orderDetail: planOrderDetails = {} } = Listing(
     planData as TListing,
   ).getMetadata();
 
