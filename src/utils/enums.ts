@@ -342,21 +342,43 @@ export const LIST_BANKS = [
   },
 ];
 
+export const EPackagingMaterials = {
+  PAPER_BOX: 'paper-box',
+  PLASTIC_BOX: 'plastic-box',
+  BAGASSE_BOX: 'bagasse-box',
+  PLASTIC_STYROFOAM: 'plastic-styrofoam',
+  HEAT_RETAINING_ALUMINUM_XBOX: 'heat-retaining-aluminum-xbox',
+  DEGRADABLE_PLASTIC: 'degradable-plastic',
+  REUSABLE_BOX: 'reusable-box',
+};
+
 export const PACKAGING_OPTIONS = [
   {
-    key: 'paper-box',
+    key: EPackagingMaterials.PAPER_BOX,
     label: 'Hộp giấy',
   },
   {
-    key: 'plastic-box',
+    key: EPackagingMaterials.PLASTIC_BOX,
     label: 'Hộp nhựa',
   },
   {
-    key: 'bagasse-box',
+    key: EPackagingMaterials.BAGASSE_BOX,
     label: 'Hộp bã mía',
   },
   {
-    key: 'reusable-box',
+    key: EPackagingMaterials.PLASTIC_STYROFOAM,
+    label: 'Nhựa, xốp',
+  },
+  {
+    key: EPackagingMaterials.HEAT_RETAINING_ALUMINUM_XBOX,
+    label: 'Hộp nhôm giữ nhiệt',
+  },
+  {
+    key: EPackagingMaterials.DEGRADABLE_PLASTIC,
+    label: 'Nhựa có thể phân hủy',
+  },
+  {
+    key: EPackagingMaterials.REUSABLE_BOX,
     label: 'Hộp ăn tái sử dụng',
   },
   {

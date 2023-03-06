@@ -7,6 +7,7 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
+import type { TObject } from '@src/utils/types';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 
@@ -37,7 +38,12 @@ const EditPartnerFoodPage = () => {
     );
   const initialValues = useMemo(() => {
     const attributes = currentFoodListing?.attributes || {};
-    const { publicData = {}, price, title, description } = attributes || {};
+    const {
+      publicData = {},
+      price,
+      title,
+      description,
+    } = attributes || ({} as TObject);
     const { menuType, foodType } = publicData;
     return {
       images: getInitialAddImages(currentFoodListing?.images || []),

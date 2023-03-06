@@ -235,10 +235,16 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
     form.change('rowCheckbox', newRowCheckedBox);
     form.change('checkAll', []);
   };
-
   const afterCheckboxChangeHandler = (e: any, rowCheckbox: string[]) => {
     const { name, checked, value } = e.target;
-    if (checked || !form) return;
+    const food = menuPickedFoods.find(
+      (item: TIntegrationListing) => item?.id?.uuid === value,
+    );
+    if (!form) return;
+    if (checked) {
+      const sideDishes = food?.attributes?.publicData?.sideDishes || [];
+      return form.change(`${value}.sideDishes`, sideDishes);
+    }
 
     if (name === 'rowCheckbox') {
       form.change(value, null);

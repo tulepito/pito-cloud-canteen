@@ -6,10 +6,13 @@ import type { TImage } from '@utils/types';
 
 const { Money } = sdkTypes;
 
+const getNumberOnly = (price: string) => {
+  return price.replace(/\D/g, '');
+};
+
 const parsePriceToMoneyFormat = (price: string) => {
-  const priceRemoveComma = price.toString().split(',');
-  const mergeWithoutComma = priceRemoveComma.join('');
-  const parsedPrice = Number(mergeWithoutComma);
+  const formattedPrice = getNumberOnly(price);
+  const parsedPrice = Number(formattedPrice);
   return new Money(Number(parsedPrice), 'VND');
 };
 
