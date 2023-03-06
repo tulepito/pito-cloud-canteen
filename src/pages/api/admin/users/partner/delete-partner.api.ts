@@ -4,7 +4,7 @@ import cookies from '@services/cookie';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
-import { ERestaurantListingState } from '@utils/enums';
+import { EListingStates } from '@utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -17,7 +17,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       {
         id,
         metadata: {
-          userState: 'deleted',
+          isDeleted: true,
         },
       },
       {
@@ -34,15 +34,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     let restaurantListingResponse = null;
     if (listingId) {
-      await integrationSdk.listings.close({
-        id: listingId,
-      });
-
       restaurantListingResponse = await integrationSdk.listings.update(
         {
           id: listingId,
           metadata: {
-            listingState: ERestaurantListingState.deleted,
+            listingState: EListingStates.closed,
+            isDeleted: true,
           },
         },
         { expand: true },
