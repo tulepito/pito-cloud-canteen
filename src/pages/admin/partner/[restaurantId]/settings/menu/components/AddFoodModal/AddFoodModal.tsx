@@ -283,33 +283,38 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
       />
       {queryFoodsInProgress ? (
         <LoadingContainer />
-      ) : tableData.length > 0 ? (
+      ) : (
         <div className={css.foodPickContainer}>
-          <div className={css.tableContainer}>
-            <Table
-              tableHeadRowClassName={css.tableHeadRow}
-              columns={FOOD_TABLE_COLUMNS}
-              data={sortedData}
-              hasCheckbox
-              values={values}
-              form={form as FormApi}
-              tableHeadCellClassName={css.tableHeadCell}
-              tableBodyCellClassName={css.tableBodyCell}
-              afterCheckboxChangeHandler={afterCheckboxChangeHandler}
-              tableWrapperClassName={css.tableWrapper}
-              tableClassName={css.table}
-              handleSort={handleSort}
-            />
-            {pagination && pagination.totalPages > 1 && (
-              <Pagination
-                className={css.pagination}
-                total={pagination.totalItems}
-                pageSize={pagination.perPage}
-                current={pagination.page}
-                onChange={onPageChange}
+          {tableData.length > 0 ? (
+            <div className={css.tableContainer}>
+              <Table
+                tableHeadRowClassName={css.tableHeadRow}
+                columns={FOOD_TABLE_COLUMNS}
+                data={sortedData}
+                hasCheckbox
+                values={values}
+                form={form as FormApi}
+                tableHeadCellClassName={css.tableHeadCell}
+                tableBodyCellClassName={css.tableBodyCell}
+                afterCheckboxChangeHandler={afterCheckboxChangeHandler}
+                tableWrapperClassName={css.tableWrapper}
+                tableClassName={css.table}
+                handleSort={handleSort}
               />
-            )}
-          </div>
+              {pagination && pagination.totalPages > 1 && (
+                <Pagination
+                  className={css.pagination}
+                  total={pagination.totalItems}
+                  pageSize={pagination.perPage}
+                  current={pagination.page}
+                  onChange={onPageChange}
+                />
+              )}
+            </div>
+          ) : (
+            <div className={css.tableContainer}>Không có kết quả trả về</div>
+          )}
+
           <div className={css.pickedFoodContainer}>
             <div className={css.title}>Món đã chọn</div>
             <div className={css.pickedFoodWrapper}>
@@ -353,8 +358,6 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
             </div>
           </div>
         </div>
-      ) : (
-        <div>Không có kết quả trả về</div>
       )}
     </Modal>
   );

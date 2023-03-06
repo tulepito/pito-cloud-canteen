@@ -134,7 +134,8 @@ export const formatTimestamp = (
 };
 
 export const addWeeksToDate = (dateObj: Date, numberOfWeeks: number) => {
-  dateObj.setDate(dateObj.getDate() + numberOfWeeks * 7);
+  const weekToAdd = numberOfWeeks * 7 - 1;
+  dateObj.setDate(dateObj.getDate() + weekToAdd);
   return dateObj;
 };
 
@@ -342,6 +343,7 @@ const sortDatesByDayOfWeek = (dates: Date[]) => {
 };
 
 export const getWeekDayList = (startDate: Date, endDate: Date) => {
+  console.log({ startDate, endDate });
   const days = [];
   const end = new Date(endDate);
   for (
