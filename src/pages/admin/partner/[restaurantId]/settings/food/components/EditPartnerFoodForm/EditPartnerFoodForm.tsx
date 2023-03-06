@@ -450,6 +450,12 @@ const EditPartnerFoodFormComponent: React.FC<
           label={intl.formatMessage({
             id: 'EditPartnerFoodForm.descriptionLabel',
           })}
+          validate={maxLength(
+            intl.formatMessage({
+              id: 'EditPartnerFoodForm.descriptionMaxLength',
+            }),
+            200,
+          )}
         />
         <div className={css.field}>
           <FieldTextArea
@@ -461,6 +467,12 @@ const EditPartnerFoodFormComponent: React.FC<
             label={intl.formatMessage({
               id: 'EditPartnerFoodForm.notesLabel',
             })}
+            validate={maxLength(
+              intl.formatMessage({
+                id: 'EditPartnerFoodForm.notesMaxLength',
+              }),
+              200,
+            )}
           />
         </div>
       </div>

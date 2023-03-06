@@ -50,7 +50,7 @@ type TFoodSliceState = {
   removeFoodError: any;
 
   createPartnerFoodFromCsvInProgress: boolean;
-  creataPartnerFoodFromCsvError: any;
+  createPartnerFoodFromCsvError: any;
 
   menuPickedFoods: TIntegrationListing[];
   queryMenuPickedFoodsInProgress: boolean;
@@ -88,7 +88,7 @@ const initialState: TFoodSliceState = {
   removeFoodError: null,
 
   createPartnerFoodFromCsvInProgress: false,
-  creataPartnerFoodFromCsvError: null,
+  createPartnerFoodFromCsvError: null,
 
   // query food for menu picked food
   menuPickedFoods: [],

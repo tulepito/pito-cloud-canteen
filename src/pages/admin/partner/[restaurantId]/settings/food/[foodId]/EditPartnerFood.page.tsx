@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
+import type { TObject } from '@utils/types';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -35,7 +36,12 @@ const EditPartnerFoodPage = () => {
     );
   const initialValues = useMemo(() => {
     const attributes = currentFoodListing?.attributes || {};
-    const { publicData = {}, price, title, description } = attributes || {};
+    const {
+      publicData = {},
+      price,
+      title,
+      description,
+    } = attributes || ({} as TObject);
     const { menuType, foodType } = publicData;
     return {
       images: getInitialAddImages(currentFoodListing?.images || []),

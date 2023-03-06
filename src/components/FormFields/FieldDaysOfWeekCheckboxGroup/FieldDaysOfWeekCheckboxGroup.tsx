@@ -18,7 +18,7 @@ type TFieldDaysOfWeekCheckboxGroup = {
   label?: string;
   rootClassName?: string;
   className?: string;
-  daysOfWeek?: typeof EDayOfWeek[];
+  daysOfWeek?: (typeof EDayOfWeek)[];
   disabled?: boolean;
 } & FieldArrayProps<any, any>;
 
