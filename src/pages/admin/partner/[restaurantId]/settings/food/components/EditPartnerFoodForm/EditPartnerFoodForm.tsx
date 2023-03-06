@@ -32,6 +32,7 @@ import {
 import { pickRenderableImages } from '@utils/images';
 import {
   composeValidators,
+  composeValidatorsWithAllValues,
   maxLength,
   minPriceLength,
   nonEmptyImageArray,
@@ -401,10 +402,12 @@ const EditPartnerFoodFormComponent: React.FC<
             id: 'EditPartnerFoodForm.allergicIngredientLabel',
           })}
           form={form}
-          validate={validateNonEnterInputField(
-            intl.formatMessage({
-              id: 'EditPartnerFoodForm.allergicIngredientValid',
-            }),
+          validate={composeValidatorsWithAllValues(
+            validateNonEnterInputField(
+              intl.formatMessage({
+                id: 'EditPartnerFoodForm.allergicIngredientValid',
+              }),
+            ),
           )}
         />
         <FieldTextInput
