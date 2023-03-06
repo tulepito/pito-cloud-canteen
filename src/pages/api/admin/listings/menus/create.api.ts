@@ -15,7 +15,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const { dataParams, queryParams = {} } = req.body;
     const integrationSdk = getIntegrationSdk();
-    const { metadata } = dataParams;
+    const { metadata, publicData } = dataParams;
     const { restaurantId } = metadata;
 
     const restaurantRes = await integrationSdk.listings.show({
@@ -29,9 +29,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const response = await integrationSdk.listings.create(
       {
         ...dataParams,
+        publicData: {
+          ...publicData,
+          restaurantName: restaurant.attributes.title,
+        },
         metadata: {
           ...metadata,
-          restaurantName: restaurant.attributes.title,
         },
         ...(geolocation ? { geolocation } : {}),
         state: 'published',
