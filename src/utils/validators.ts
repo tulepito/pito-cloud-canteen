@@ -480,3 +480,23 @@ export const validFoodTitle = (message: string) => (value: string) => {
 export const upperCaseFirstLetter = (value: string) => {
   return value.charAt(0).toUpperCase() + value.slice(1);
 };
+
+export const validateNonEnterInputField =
+  (message: string) => (value: string, allValues: TObject) => {
+    const { tempValue } = allValues;
+    return tempValue && tempValue !== value ? message : VALID;
+  };
+
+export const valueLessThanMax =
+  (message: string, maxNameField: string) =>
+  (value: string, allValues: TObject) => {
+    const maxFieldValue = allValues?.[maxNameField] || 0;
+    return value > maxFieldValue ? message : VALID;
+  };
+
+export const valueGreaterThanMin =
+  (message: string, minNameField: string) =>
+  (value: string, allValues: TObject) => {
+    const maxFieldValue = allValues?.[minNameField] || 0;
+    return value < maxFieldValue ? message : VALID;
+  };

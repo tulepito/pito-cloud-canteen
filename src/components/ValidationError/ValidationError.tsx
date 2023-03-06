@@ -8,7 +8,7 @@ import css from './ValidationError.module.scss';
 
 type TFieldMeta = {
   touched?: boolean;
-  error?: boolean;
+  error?: any;
 };
 type ValidationErrorProps = TDefaultProps & {
   fieldMeta: TFieldMeta;

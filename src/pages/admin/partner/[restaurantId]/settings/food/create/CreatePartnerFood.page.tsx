@@ -59,7 +59,9 @@ const CreatePartnerFoodPage = () => {
           }),
         ),
       );
-      redirectToEditPage(response.payload);
+      setTimeout(() => {
+        redirectToEditPage(response.payload);
+      }, 1000);
       return response;
     }
     const response = await dispatch(
