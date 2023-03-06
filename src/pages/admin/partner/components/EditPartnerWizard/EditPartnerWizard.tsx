@@ -194,10 +194,11 @@ const EditPartnerWizard = (props: any) => {
   return (
     <FormWizard className={css.formWizard} formTabNavClassName={css.tabNav}>
       {TABS.map((tab: string, index: number) => {
-        const disabled = !tabCompleted(
-          TABS[index - 1],
-          partnerListingRef as TIntegrationListing,
-        );
+        const disabled =
+          !tabCompleted(
+            TABS[index - 1],
+            partnerListingRef as TIntegrationListing,
+          ) && index > 0;
         return (
           <EditPartnerWizardTab
             key={tab}
