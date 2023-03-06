@@ -239,7 +239,6 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
   const afterCheckboxChangeHandler = (e: any, rowCheckbox: string[]) => {
     const { name, checked, value } = e.target;
     const food = sortedData.find((item: any) => item?.key === value);
-    console.log({ food, sortedData });
     if (!form) return;
     if (checked) {
       if (name === 'checkAll') {
