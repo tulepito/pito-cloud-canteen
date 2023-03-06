@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import {
-  getCompaniesApi,
+  getCompaniesAdminApi,
   getCompanyMembersDetailsApi,
   updateCompanyStatusApi,
 } from '@apis/index';
@@ -38,7 +38,7 @@ const queryCompanies = createAsyncThunk(
   QUERY_COMPANIES,
   async (page: number | undefined, { fulfillWithValue, rejectWithValue }) => {
     try {
-      const { data: companies } = await getCompaniesApi();
+      const { data: companies } = await getCompaniesAdminApi();
       return fulfillWithValue({ companies, page });
     } catch (error: any) {
       console.error('Query company error : ', error);
