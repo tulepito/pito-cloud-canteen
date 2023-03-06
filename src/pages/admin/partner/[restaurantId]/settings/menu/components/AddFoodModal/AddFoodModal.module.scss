@@ -7,7 +7,7 @@
 
 .modal {
   flex-basis: 1100px !important;
-  max-height: 887px !important;
+  max-height: 700px !important;
   position: relative;
 }
 
@@ -23,7 +23,7 @@
 
 .tableWrapper {
   overflow-y: auto;
-  height: 500px;
+  height: 430px;
   max-width: 600px !important;
   &::-webkit-scrollbar {
     display: none;
@@ -38,7 +38,7 @@
 .pickedFoodWrapper {
   overflow-y: auto;
   position: relative;
-  height: 500px;
+  height: 400px;
   &::-webkit-scrollbar {
     display: none;
   }
@@ -71,7 +71,7 @@
 }
 
 .tableBodyCell {
-  padding-left: 0 !important;
+  padding-left: 5px !important;
   vertical-align: top;
   &:last-child {
     text-align: right !important;
@@ -149,7 +149,7 @@
     color: $neutralGray5 !important;
     font-weight: $fontWeightRegular !important;
     font-size: 12px !important;
-    padding-left: 0 !important;
+    padding-left: 5px !important;
     padding-bottom: 0 !important;
     svg {
       width: 16px;

@@ -286,19 +286,54 @@ const createPartnerFoodFromCsv = createAsyncThunk(
         async complete({ data }: any) {
           const response = await Promise.all(
             data.map(async (l: any) => {
+              const { images, title } = l;
+              const imagesAsArray = images ? images.split(',') : [];
+              const imageAsFiles = await Promise.all(
+                imagesAsArray
+                  .map(async (src: string) => {
+                    try {
+                      const response = await fetch(src);
+                      const blobData = await response.blob();
+                      const metadata = {
+                        type: 'image/jpeg',
+                      };
+                      const file = new File(
+                        [blobData],
+                        `${`${title}_${new Date().getTime()}`}.jpg`,
+                        metadata,
+                      );
+                      return file;
+                    } catch (error) {
+                      console.error(error);
+                      return null;
+                    }
+                  })
+                  .filter((file: File) => !!file),
+              );
+              // upload image to Flex
+              const uploadRes = await Promise.all(
+                imageAsFiles.map(async (file) =>
+                  sdk.images.upload({
+                    image: file,
+                  }),
+                ),
+              );
+
+              const newImages = uploadRes.map((res) => res.data.data.id);
+
               const dataParams = getImportDataFromCsv({
                 ...l,
                 restaurantId,
+                images: newImages,
               });
-              console.log({ dataParams });
-              // const queryParams = {
-              //   expand: true,
-              // };
-              // const { data } = await createPartnerFoodApi({
-              //   dataParams,
-              //   queryParams,
-              // });
-              // return denormalisedResponseEntities(data)[0];
+              const queryParams = {
+                expand: true,
+              };
+              const { data } = await createPartnerFoodApi({
+                dataParams,
+                queryParams,
+              });
+              return denormalisedResponseEntities(data)[0];
             }),
           );
           resolve(response as any);

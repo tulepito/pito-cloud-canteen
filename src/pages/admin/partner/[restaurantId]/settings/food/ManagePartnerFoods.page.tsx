@@ -455,7 +455,8 @@ const ManagePartnerFoods = () => {
         </p>
         <div className={css.inputWrapper}>
           <input
-            accept=".xlsx, .xls, .csv"
+            accept=".csv"
+            y
             onChange={({ target }) => setFile(target?.files?.[0])}
             type="file"
             className={css.inputFile}
