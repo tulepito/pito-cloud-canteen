@@ -8,10 +8,9 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import { orderManagementThunks } from '@pages/company/orders/[orderId]/OrderManagement.slice';
 import { formatTimestamp } from '@utils/dates';
 import { historyPushState } from '@utils/history';
-
-import { orderManagementThunks } from '../../../OrderManagement.slice';
 
 import { usePrepareManageOrdersSectionData } from './hooks/usePrepareManageOrdersSectionData';
 import OrderDetailsTable from './OrderDetailsTable/OrderDetailsTable';

@@ -10,11 +10,13 @@ import { companyPaths } from '@src/paths';
 import { UserPermission } from '@src/types/UserPermission';
 import { CurrentUser } from '@utils/data';
 
-import BookerOrderDetailsPage from './components/BookerOrderDetails.page';
 import {
   orderDetailsAnyActionsInProgress,
+  OrderManagementsAction,
   orderManagementThunks,
-} from './OrderManagement.slice';
+} from '../OrderManagement.slice';
+
+import BookerOrderDetailsPage from './components/BookerOrderDetails.page';
 
 const BookerOrderDetailsRoute = () => {
   const intl = useIntl();
@@ -45,6 +47,12 @@ const BookerOrderDetailsRoute = () => {
       }
     }
   }, [pageDataLoading, companyId, companyData, push]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(OrderManagementsAction.clearOrderData());
+    };
+  }, []);
 
   return (
     <>

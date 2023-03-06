@@ -8,10 +8,9 @@ import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import IconShare from '@components/Icons/IconShare/IconShare';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { orderManagementThunks } from '@pages/company/orders/[orderId]/OrderManagement.slice';
 import { formatTimestamp } from '@utils/dates';
 import type { TDefaultProps } from '@utils/types';
-
-import { orderManagementThunks } from '../../../OrderManagement.slice';
 
 import type { TSendNotificationFormValues } from './SendNotificationForm';
 import SendNotificationModal from './SendNotificationModal';

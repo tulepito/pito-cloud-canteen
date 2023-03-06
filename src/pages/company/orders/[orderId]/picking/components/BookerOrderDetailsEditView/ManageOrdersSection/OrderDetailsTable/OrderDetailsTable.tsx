@@ -7,10 +7,10 @@ import { useRouter } from 'next/router';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import { orderManagementThunks } from '@pages/company/orders/[orderId]/OrderManagement.slice';
 import { historyPushState } from '@utils/history';
 import type { TObject } from '@utils/types';
 
-import { orderManagementThunks } from '../../../../OrderManagement.slice';
 import type { TEditOrderRowFormValues } from '../EditOrderRowForm';
 import EditOrderRowModal from '../EditOrderRowModal';
 import { usePrepareOrderDetailTableData } from '../hooks/usePrepareOrderDetailTableData';

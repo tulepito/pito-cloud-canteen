@@ -1,11 +1,15 @@
+import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { emailFormatValid } from '@utils/validators';
 
 import css from './AddParticipantForm.module.scss';
@@ -26,28 +30,47 @@ const AddParticipantFormComponent: React.FC<
   TAddParticipantFormComponentProps
 > = (props) => {
   const intl = useIntl();
-  const { handleSubmit, hasSubmitButton } = props;
-  const formClasses = classNames(css.formContainer, {
-    [css.formWithSubmitButton]: hasSubmitButton,
+  const {
+    handleSubmit,
+    hasSubmitButton,
+    dirtySinceLastSubmit,
+    submitErrors = {},
+  } = props;
+
+  const updateParticipantsInProgress = useAppSelector(
+    (state) => state.OrderManagement.updateParticipantsInProgress,
+  );
+
+  const formClasses = classNames(css.root, {
+    [css.withSubmitButton]: hasSubmitButton,
   });
+
+  useEffect(() => {}, []);
 
   return (
     <Form onSubmit={handleSubmit} className={formClasses}>
-      <FieldTextInput
-        className={css.emailField}
-        name="email"
-        placeholder={intl.formatMessage({
-          id: 'AddParticipantForm.email.placeholder',
-        })}
-        validate={emailFormatValid(
-          intl.formatMessage({ id: 'AddParticipantForm.email.invalid' }),
+      <div className={css.formContainer}>
+        <FieldTextInput
+          className={css.emailField}
+          name="email"
+          disabled={updateParticipantsInProgress}
+          placeholder={intl.formatMessage({
+            id: 'AddParticipantForm.email.placeholder',
+          })}
+          validate={emailFormatValid(
+            intl.formatMessage({ id: 'AddParticipantForm.email.invalid' }),
+          )}
+        />
+        {hasSubmitButton && (
+          <Button className={css.submitButton}>
+            {intl.formatMessage({ id: 'AddParticipantForm.submitButtonText' })}
+          </Button>
         )}
-      />
-      {hasSubmitButton && (
-        <Button className={css.submitButton}>
-          {intl.formatMessage({ id: 'AddParticipantForm.submitButtonText' })}
-        </Button>
-      )}
+      </div>
+      <RenderWhen
+        condition={!dirtySinceLastSubmit && !isEmpty(submitErrors?.email)}>
+        <div className={css.error}>{submitErrors?.email}</div>
+      </RenderWhen>
     </Form>
   );
 };

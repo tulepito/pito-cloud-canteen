@@ -8,9 +8,8 @@ import CountdownTimer from '@components/CountdownTimer/CountdownTimer';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import { orderManagementThunks } from '@pages/company/orders/[orderId]/OrderManagement.slice';
 import type { TDefaultProps } from '@utils/types';
-
-import { orderManagementThunks } from '../../../OrderManagement.slice';
 
 import type { TEditOrderDeadlineFormValues } from './EditOrderDeadlineForm';
 import EditOrderDeadlineModal from './EditOrderDeadlineModal';
