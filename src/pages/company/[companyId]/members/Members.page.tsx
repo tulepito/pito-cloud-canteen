@@ -20,6 +20,7 @@ import {
   companyMemberThunks,
   resetError,
 } from '@redux/slices/companyMember.slice';
+import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
 import { ensureUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
@@ -68,6 +69,18 @@ const MembersPage = () => {
   );
   const { deleteMemberInProgress, deleteMemberError } = useAppSelector(
     (state) => state.companyMember,
+  );
+  const bookerMemberEmails = Object.values(originCompanyMembers).reduce(
+    (result, _member) => {
+      if (
+        _member.permission === UserPermission.BOOKER &&
+        _member.inviteStatus === UserInviteStatus.ACCEPTED
+      ) {
+        return [...result, _member.email];
+      }
+      return result;
+    },
+    [],
   );
 
   const [deletingMemberEmail, setDeletingMemberEmail] = useState<string>();
@@ -143,9 +156,11 @@ const MembersPage = () => {
           setDeletingMemberEmail(email);
           openDeleteMemberConfirmationModal();
         };
-        return (
+        const showDeleteBtn =
+          bookerMemberEmails.length > 0 && !bookerMemberEmails.includes(email);
+        return showDeleteBtn ? (
           <IconDelete className={css.deleteBtn} onClick={onDeleteMember} />
-        );
+        ) : null;
       },
     },
   ];

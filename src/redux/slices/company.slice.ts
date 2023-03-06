@@ -10,6 +10,7 @@ import type {
 import {
   createGroupApi,
   deleteGroupApi,
+  fetchCompanyInfo,
   getAllCompanyMembersApi,
   getGroupDetailApi,
   updateCompany,
@@ -115,13 +116,7 @@ const companyInfo = createAsyncThunk(
   COMPANY_INFO,
   async (_, { getState, extra: sdk }) => {
     const { workspaceCompanyId } = getState().company;
-    const companyAccountResponse = await sdk.users.show({
-      id: workspaceCompanyId,
-      include: ['profileImage'],
-    });
-    const [companyAccount] = denormalisedResponseEntities(
-      companyAccountResponse,
-    );
+    const { data: companyAccount } = await fetchCompanyInfo(workspaceCompanyId);
     const companyImageId = companyAccount.profileImage?.id;
     const { data: allEmployeesData } = await getAllCompanyMembersApi(
       workspaceCompanyId,

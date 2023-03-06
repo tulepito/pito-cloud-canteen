@@ -8,6 +8,7 @@
   "AccountPage.confirmationModal.title": "Thông báo",
   "AccountPage.contactPoint": "Người liên hệ",
   "AccountPage.email": "Email",
+  "AccountPage.loading": "Đang tải dữ liệu...",
   "AccountPage.submitBtn": "Lưu thay đổi",
   "AccountPage.taxCode": "Mã số thuế",
   "ActivityItem.defaultLabel": "Tên hoạt động",
