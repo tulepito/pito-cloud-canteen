@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import type { PropsWithChildren } from 'react';
 import React, { useCallback, useEffect } from 'react';
 import { useIntl } from 'react-intl';
@@ -100,7 +101,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
 
   useEffect(() => {
     dispatch(authThunks.authInfo());
-  }, [dispatch, pathname]);
+  }, [pathname]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -108,7 +109,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
       const isVerified = isUserEmailVerified;
       dispatch(emailVerificationActions.updateVerificationState(isVerified));
     }
-  }, [dispatch, isAuthenticated, isUserEmailVerified]);
+  }, [isAuthenticated, isUserEmailVerified]);
 
   useEffect(() => {
     verifyAuthentication();

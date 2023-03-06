@@ -10,11 +10,16 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldMultipleSelect from '@components/FormFields/FieldMultipleSelect/FieldMultipleSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
+import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
+import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
+import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
+import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
+import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -46,6 +51,10 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'title',
     label: 'Tên thương hiệu',
     render: (data: any) => {
+      if (data?.isDeleted) {
+        return <>Đối tác đã bị xóa</>;
+      }
+
       return (
         <NamedLink
           path={`/admin/partner/${data.id}/edit`}
@@ -64,6 +73,9 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'phoneNumber',
     label: 'Số điện thoại',
     render: (data: any) => {
+      if (data?.isDeleted) {
+        return <></>;
+      }
       return <div className={css.rowText}>{data.phoneNumber}</div>;
     },
   },
@@ -71,6 +83,9 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'email',
     label: 'Email',
     render: (data: any) => {
+      if (data?.isDeleted) {
+        return <></>;
+      }
       return <div className={css.rowText}>{data?.email}</div>;
     },
   },
@@ -78,6 +93,9 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'address',
     label: 'Địa chỉ',
     render: (data: any) => {
+      if (data?.isDeleted) {
+        return <></>;
+      }
       return (
         <div title={data?.address} className={css.rowText}>
           {data?.address}
@@ -89,6 +107,9 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'status',
     label: 'Trạng thái',
     render: (data: any) => {
+      if (data?.isDeleted) {
+        return <></>;
+      }
       const isUnsatisfactory =
         data?.status === ERestaurantListingStatus.unsatisfactory;
       const isAuthorized = data?.status === ERestaurantListingStatus.authorized;
@@ -112,23 +133,53 @@ const TABLE_COLUMN: TColumn[] = [
     },
   },
   {
-    key: 'view',
+    key: 'editAndDelete',
     label: '',
     render: (data: any) => {
+      if (data?.isDeleted) {
+        return <></>;
+      }
+      const deleteHandle = () => {
+        data?.onDeleteRestaurant({
+          partnerId: data?.authorId,
+          restaurantId: data?.id,
+        });
+      };
+      const isAuthorized = data?.status === ERestaurantListingStatus.authorized;
       return (
-        <Link href={`/admin/partner/${data?.id}/edit`}>
-          <InlineTextButton
-            className={classNames(css.actionButton, css.editButton)}>
-            <IconEdit className={css.iconEdit} />
-          </InlineTextButton>
-        </Link>
+        <div className={css.viewAndEdit}>
+          {data?.deleteLoading ? (
+            <IconSpinner className={css.loadingIcon} />
+          ) : (
+            <>
+              <Link href={`/admin/partner/${data?.id}/edit`}>
+                <InlineTextButton
+                  className={classNames(css.actionButton, css.editButton)}>
+                  <IconEdit className={css.iconEdit} />
+                </InlineTextButton>
+              </Link>
+              {!isAuthorized && (
+                <InlineTextButton
+                  type="button"
+                  onClick={deleteHandle}
+                  className={classNames(css.actionButton, css.editButton)}>
+                  <IconDelete className={css.iconEdit} />
+                </InlineTextButton>
+              )}
+            </>
+          )}
+        </div>
       );
     },
   },
+
   {
     key: 'action',
     label: '',
     render: (data: any) => {
+      if (data?.isDeleted) {
+        return <></>;
+      }
       const setAuthorizeHandle = () => {
         data?.onSetAuthorized(data?.id);
       };
@@ -137,12 +188,6 @@ const TABLE_COLUMN: TColumn[] = [
         data?.onSetUnsatisfactory(data?.id);
       };
 
-      const deleteHandle = () => {
-        data?.onDeleteRestaurant({
-          partnerId: data?.authorId,
-          restaurantId: data?.id,
-        });
-      };
       const isUnsatisfactory =
         data?.status === ERestaurantListingStatus.unsatisfactory;
       const isAuthorized = data?.status === ERestaurantListingStatus.authorized;
@@ -152,35 +197,40 @@ const TABLE_COLUMN: TColumn[] = [
       return (
         !data?.isDraft && (
           <div className={css.tableActions}>
-            {data?.isLoading ? (
+            {data?.setStatusLoading ? (
               <IconSpinner className={css.loadingIcon} />
             ) : (
-              <>
-                {(isNew || isUnsatisfactory) && (
-                  <InlineTextButton
-                    type="button"
-                    onClick={setAuthorizeHandle}
-                    className={css.actionBtn}>
-                    <FormattedMessage id="ManagePartners.authorizeBtn" />
-                  </InlineTextButton>
-                )}
-                {(isNew || isAuthorized) && (
-                  <InlineTextButton
-                    type="button"
-                    onClick={setUnsatisfactoryHandle}
-                    className={css.actionBtn}>
-                    <FormattedMessage id="ManagePartners.unsatisfactoryBtn" />
-                  </InlineTextButton>
-                )}
-                {!isAuthorized && (
-                  <InlineTextButton
-                    type="button"
-                    onClick={deleteHandle}
-                    className={css.actionBtn}>
-                    <FormattedMessage id="ManagePartners.deleteBtn" />
-                  </InlineTextButton>
-                )}
-              </>
+              <ProfileMenu>
+                <ProfileMenuLabel className={css.profileMenuWrapper}>
+                  <div>...</div>
+                </ProfileMenuLabel>
+                <ProfileMenuContent className={css.profileMenuContent}>
+                  {(isNew || isUnsatisfactory) && (
+                    <ProfileMenuItem
+                      key="authorizineBtn"
+                      className={css.profileMenuItem}>
+                      <InlineTextButton
+                        type="button"
+                        onClick={setAuthorizeHandle}
+                        className={css.actionBtn}>
+                        <FormattedMessage id="ManagePartners.authorizeBtn" />
+                      </InlineTextButton>
+                    </ProfileMenuItem>
+                  )}
+                  {(isNew || isAuthorized) && (
+                    <ProfileMenuItem
+                      key="unsatisfactoryBtn"
+                      className={css.profileMenuItem}>
+                      <InlineTextButton
+                        type="button"
+                        onClick={setUnsatisfactoryHandle}
+                        className={css.actionBtn}>
+                        <FormattedMessage id="ManagePartners.unsatisfactoryBtn" />
+                      </InlineTextButton>
+                    </ProfileMenuItem>
+                  )}
+                </ProfileMenuContent>
+              </ProfileMenu>
             )}
           </div>
         )
@@ -196,7 +246,9 @@ const parseEntitiesToTableData = (
 ) => {
   if (entityRefs.length === 0) return [];
   return entityRefs.map((entity: any, index: number) => {
-    const isLoading = entity.id.uuid === extraData?.loadingId;
+    const setStatusLoading = entity.id.uuid === extraData?.setStatusLoading;
+    const deleteLoading = entity.id.uuid === extraData?.deleteLoading;
+
     return {
       key: entity.id.uuid,
       data: {
@@ -211,7 +263,9 @@ const parseEntitiesToTableData = (
         status: entity.attributes.metadata?.status,
         authorId: entity.author.id.uuid,
         ...extraData,
-        isLoading,
+        setStatusLoading,
+        deleteLoading,
+        isDeleted: entity.attributes.metadata.isDeleted,
       },
     };
   });
@@ -224,6 +278,7 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
     queryRestaurantsInProgress,
     queryRestaurantsError,
     restaurantTableActionInProgress,
+    deletePartnerInProgress,
   } = useAppSelector((state) => state.partners);
   const router = useRouter();
   const { query, pathname } = router;
@@ -288,10 +343,16 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
       parseEntitiesToTableData(restaurantRefs, Number(page), {
         onSetUnsatisfactory,
         onSetAuthorized,
-        loadingId: restaurantTableActionInProgress,
+        setStatusLoading: restaurantTableActionInProgress,
+        deleteLoading: deletePartnerInProgress,
         onDeleteRestaurant,
       }),
-    [restaurantRefs, restaurantTableActionInProgress, page],
+    [
+      restaurantRefs,
+      page,
+      restaurantTableActionInProgress,
+      deletePartnerInProgress,
+    ],
   );
 
   const onSubmit = ({ keywords, meta_status }: any) => {

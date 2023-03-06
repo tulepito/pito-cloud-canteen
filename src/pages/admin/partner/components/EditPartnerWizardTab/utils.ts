@@ -151,6 +151,8 @@ export const createSubmitUpdatePartnerValues = (
     allWeekAvailabilityEntries,
     daysToApply,
     packagingOther,
+    minQuantity,
+    maxQuantity,
   } = values;
 
   const oldPackagingOtherValue =
@@ -203,6 +205,8 @@ export const createSubmitUpdatePartnerValues = (
       availabilityApplyType,
       phoneNumber,
       allWeekAvailabilityEntries,
+      minQuantity,
+      maxQuantity,
     },
     privateData: {
       bankAccounts: createSubmitBankAccount(bankAccounts),
@@ -234,6 +238,8 @@ export const createSubmitCreatePartnerValues = (values: any) => {
     allWeekAvailabilityEntries,
     daysToApply,
     packagingOther,
+    minQuantity,
+    maxQuantity,
   } = values;
   const {
     selectedPlace: { address, origin },
@@ -279,6 +285,8 @@ export const createSubmitCreatePartnerValues = (values: any) => {
       availabilityApplyType,
       phoneNumber,
       allWeekAvailabilityEntries,
+      minQuantity,
+      maxQuantity,
     },
     privateData: {
       bankAccounts: createSubmitBankAccount(bankAccounts),

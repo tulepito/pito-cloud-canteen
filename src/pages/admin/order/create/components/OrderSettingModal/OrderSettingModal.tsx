@@ -340,8 +340,14 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
     updateOrderInProgress ||
     recommendRestaurantInProgress ||
     updateOrderDetailInProgress;
+
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <Modal
+      id="OrderSettingModal"
       isOpen={isOpen}
       handleClose={onClose}
       title={intl.formatMessage({ id: 'OrderSettingModal.title' })}>

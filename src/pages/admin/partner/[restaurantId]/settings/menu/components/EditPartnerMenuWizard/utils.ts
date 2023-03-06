@@ -638,10 +638,11 @@ export const createInitialValuesForFoodsByDate = (
 
 export const renderValuesForFoodsByDate = (
   foodsByDate: any = {},
+  anchorDate: Date,
   menuPickedFoods: TIntegrationListing[] = [],
 ) => {
   let initialValue = {};
-  const startDayOfWeek = getStartOfWeek();
+  const startDayOfWeek = getStartOfWeek(anchorDate.getTime());
   Object.keys(foodsByDate).forEach((dayOfWeeks) => {
     const dayOfWeekAsNumber = getDayOfWeekAsIndex(dayOfWeeks as EDayOfWeek);
     const daysOfCurrentWeek = addDaysToDate(startDayOfWeek, dayOfWeekAsNumber);

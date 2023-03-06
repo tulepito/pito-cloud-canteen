@@ -309,7 +309,7 @@ const ManagePartnerFoods = () => {
   const onImportFoodFromCsv = async () => {
     if (file) {
       const { error } = (await dispatch(
-        foodSliceThunks.creataPartnerFoodFromCsv({
+        foodSliceThunks.createPartnerFoodFromCsv({
           file,
           restaurantId: restaurantId as string,
         }),

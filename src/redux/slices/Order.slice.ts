@@ -94,6 +94,7 @@ type TOrderInitialState = {
   recommendRestaurantError: any;
 
   step2SubmitInProgress: boolean;
+  currentSelectedMenuId: string;
 };
 
 const initialState: TOrderInitialState = {
@@ -159,6 +160,7 @@ const initialState: TOrderInitialState = {
   recommendRestaurantInProgress: false,
   recommendRestaurantError: null,
   step2SubmitInProgress: false,
+  currentSelectedMenuId: '',
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -663,6 +665,10 @@ const orderSlice = createSlice({
         [EManageCompanyOrdersTab.ALL]: 0,
       },
     }),
+    addCurrentSelectedMenuId: (state, { payload }) => ({
+      ...state,
+      currentSelectedMenuId: payload,
+    }),
   },
   extraReducers: (builder) => {
     builder
@@ -909,6 +915,7 @@ export const {
   resetOrder,
   changeStep2SubmitStatus,
   resetCompanyOrdersStates,
+  addCurrentSelectedMenuId,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

@@ -1,38 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { FieldProps, FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 import classNames from 'classnames';
 
+import IconClose from '@components/Icons/IconClose/IconClose';
 import ValidationError from '@components/ValidationError/ValidationError';
-import type { TDefaultProps, TIconProps } from '@utils/types';
 
-import css from './FieldTextInput.module.scss';
+import css from './FieldTextInputWithBottomBox.module.scss';
 
-type TIconComponent = React.ReactElement<TIconProps>;
-type InputComponentProps = FieldRenderProps<string, any> &
-  TDefaultProps & {
-    id: string;
-    label?: string;
-    inputRootClass?: string;
-    disabled?: boolean;
-    labelClassName?: string;
-    customErrorText?: string;
-    isUncontrolled?: boolean;
-    input: any;
-    meta: any;
-    inputRef?: any;
-    fullWidth?: boolean;
-    leftIcon?: TIconComponent;
-    rightIcon?: TIconComponent;
-    required?: boolean;
-    showText?: boolean;
-    placeholder?: string;
-    inputClassName?: string;
-  };
-
-export const FieldTextInputComponent: React.FC<InputComponentProps> = (
-  props,
-) => {
+const FieldTextInputWithBottomBoxComponent: React.FC<
+  FieldRenderProps<string, any>
+> = (props) => {
   const {
     label,
     id,
@@ -51,12 +29,10 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
     rightIcon,
     required,
     showText = false,
-    leftIconContainerClassName,
-    rightIconContainerClassName,
-    inputClassName,
+    form,
     ...rest
   } = props;
-
+  const [tempValue, setTempValue] = useState<number | string>();
   if (label && !id) {
     throw Error('id required when a label is given');
   }
@@ -77,22 +53,10 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
   // Use inputRef if it is passed as prop.
   const refMaybe = inputRef ? { ref: inputRef } : {};
 
-  // Handle Icon
-  const leftIconElement = leftIcon
-    ? React.cloneElement(leftIcon, {
-        className: css.leftIcon,
-      })
-    : undefined;
-  const rightIconElement = rightIcon
-    ? React.cloneElement(rightIcon, {
-        className: css.rightIcon,
-      })
-    : undefined;
-
   // Classes
   const inputClasses =
     inputRootClass ||
-    classNames(css.input, inputClassName, {
+    classNames(css.input, {
       [css.inputSuccess]: valid,
       [css.inputError]: hasError,
       [css.inputDisabled]: disabled,
@@ -122,11 +86,26 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
         ...(disabled ? { disabled } : ''),
       };
 
+  const onChangeTempValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTempValue(e.target.value);
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.key === 'Enter') {
+      form.change(input.name, [tempValue]);
+    }
+  };
+
+  const removeValue = () => {
+    form.change(input.name, null);
+  };
+
   const classes = classNames(rootClassName || css.root, className);
   const inputContainerClasses = classNames(css.inputContainer);
   const labelClasses = classNames(css.labelRoot, labelClassName);
   const labelRequiredRedStar = required ? css.labelRequiredRedStar : '';
-
   return (
     <div className={classes}>
       {label && (
@@ -139,25 +118,19 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
         <p className={css.textValue}>{input.value}</p>
       ) : (
         <div className={inputContainerClasses}>
-          {!!leftIcon && (
-            <div
-              className={classNames(
-                css.leftIconContainer,
-                leftIconContainerClassName,
-              )}>
-              {leftIconElement}
-            </div>
-          )}
-          <input {...inputProps} />
-          {!!rightIcon && (
-            <div
-              className={classNames(
-                css.rightIconContainer,
-                rightIconContainerClassName,
-              )}>
-              {rightIconElement}
-            </div>
-          )}
+          <input
+            {...inputProps}
+            value={tempValue}
+            id={id}
+            onChange={onChangeTempValue}
+            onKeyUp={onKeyDown}
+          />
+        </div>
+      )}
+      {input.value && (
+        <div className={css.boxValue}>
+          <span>{input.value}</span>
+          <IconClose onClick={removeValue} className={css.iconClose} />
         </div>
       )}
       <ValidationError fieldMeta={fieldMeta} />
@@ -165,8 +138,10 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
   );
 };
 
-const FieldTextInput = (props: FieldProps<string, any>) => {
-  return <Field component={FieldTextInputComponent} {...props} />;
+const FieldTextInputWithBottomBox: React.FC<FieldProps<string, any>> = (
+  props,
+) => {
+  return <Field {...props} component={FieldTextInputWithBottomBoxComponent} />;
 };
 
-export default FieldTextInput;
+export default FieldTextInputWithBottomBox;

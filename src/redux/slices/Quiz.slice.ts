@@ -7,7 +7,7 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@utils/data';
 import {
   EImageVariants,
-  ERestaurantListingState,
+  EListingStates,
   ERestaurantListingStatus,
 } from '@utils/enums';
 import type { TListing, TObject, TUser } from '@utils/types';
@@ -64,7 +64,7 @@ const fetchRestaurants = createAsyncThunk(
     const query = {
       meta_listingType: LISTING_TYPE.RESTAURANT,
       meta_status: ERestaurantListingStatus.authorized,
-      meta_listingState: ERestaurantListingState.published,
+      meta_listingState: EListingStates.published,
       include: ['images'],
       'fields.image': [
         `variants.${EImageVariants.default}`,

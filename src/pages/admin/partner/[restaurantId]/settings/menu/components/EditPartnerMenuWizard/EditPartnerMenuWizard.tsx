@@ -18,6 +18,7 @@ import useRedirectTabWizard from '@hooks/useRedirectTabWizard';
 import { menusSliceAction, menusSliceThunks } from '@redux/slices/menus.slice';
 import { adminRoutes } from '@src/paths';
 import { IntegrationMenuListing } from '@utils/data';
+import { findClassDays } from '@utils/dates';
 import { EListingStates, EMenuMealType, EMenuTypes } from '@utils/enums';
 import type { TIntegrationListing, TObject } from '@utils/types';
 
@@ -143,7 +144,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
     mealType,
     startDate,
     endDate,
-    daysOfWeek,
+    daysOfWeek = [],
     numberOfCycles,
     foodsByDate,
   } = IntegrationMenuListing(currentMenu).getPublicData();
@@ -155,8 +156,24 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
     ids: idsToQuery,
   });
 
+  const listDates = useMemo(
+    () => findClassDays(daysOfWeek, startDate, endDate),
+    [daysOfWeek, startDate, endDate],
+  );
+
+  const minDate = useMemo(
+    () =>
+      listDates.reduce((prev, curDate) => {
+        return prev < curDate && prev >= new Date().getTime() ? prev : curDate;
+      }, listDates[0]),
+    [JSON.stringify(listDates)],
+  );
+
+  const anchorDate = new Date(minDate);
+
   const foodByDateToRender = renderValuesForFoodsByDate(
     foodsByDate,
+    anchorDate,
     menuPickedFoods,
   );
 
@@ -212,6 +229,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
     case MENU_PRICING_TAB: {
       return (
         <EditMenuPricingForm
+          anchorDate={anchorDate}
           formRef={formRef}
           initialValues={initialValues}
           onSubmit={onSubmit}
@@ -224,6 +242,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
     case MENU_COMPLETE_TAB: {
       return (
         <EditMenuCompleteForm
+          anchorDate={anchorDate}
           onSubmit={onSubmit}
           formRef={formRef}
           initialValues={initialValues}

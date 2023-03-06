@@ -1,4 +1,3 @@
-import { capitalize } from 'lodash';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 import { errorMessages } from '@apis/errors';
@@ -192,13 +191,13 @@ export const checkUnConflictedMenuMiddleware =
         } = IntegrationListing(l).getPublicData();
 
         const daysOfWeekInRange = findClassDays(
-          daysOfWeek.map((d: string) => capitalize(d)),
+          daysOfWeek,
           new Date(startDate),
           new Date(endDate),
         );
 
         const listingDaysOfWeekInRange = findClassDays(
-          listingDayOfWeek.map((d: string) => capitalize(d)),
+          listingDayOfWeek,
           new Date(listingStartDate),
           new Date(listingEndDate),
         );

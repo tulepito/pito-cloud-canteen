@@ -75,8 +75,14 @@ const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
     [JSON.stringify(initialFoodList)],
   );
 
+  if (!isOpen) return null;
+
   return (
-    <Modal title={titlePart} isOpen={isOpen} handleClose={handleClose}>
+    <Modal
+      title={titlePart}
+      isOpen={isOpen}
+      handleClose={handleClose}
+      id="SelectFoodModal">
       {isOpen && (
         <SelectFoodForm
           formId={restaurantId}

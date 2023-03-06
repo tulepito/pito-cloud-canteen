@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import toPairs from 'lodash/toPairs';
 
 import { printHoursToString } from './dates';
@@ -469,4 +470,13 @@ export const parseAvailabilityEntries = (time: Date) => {
   const minutes = time.getMinutes();
   const hours = time.getHours();
   return printHoursToString(hours, minutes);
+};
+
+export const validFoodTitle = (message: string) => (value: string) => {
+  const format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+  return format.test(value) ? message : VALID;
+};
+
+export const upperCaseFirstLetter = (value: string) => {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 };
