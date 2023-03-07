@@ -154,6 +154,11 @@ export const isEnableSubmitPublishOrder = (
   return isOrderValid && isOrderDetailSetupCompleted && isOrderDetailHasData;
 };
 
+export const isOrderDetailDatePickedFood = (date: any) => {
+  const { foodList = [] } = date || {};
+  return isEmpty(foodList);
+};
+
 export const isEnableToStartOrder = (orderDetail: TPlan['orderDetail']) => {
   return (
     !isEmpty(orderDetail) &&
@@ -169,6 +174,22 @@ export const isEnableToStartOrder = (orderDetail: TPlan['orderDetail']) => {
       return isSetupRestaurant && hasAnyOrders;
     })
   );
+};
+
+export const getRestaurantListFromOrderDetail = (
+  orderDetail: TPlan['orderDetail'],
+) => {
+  return Object.values(orderDetail).reduce((result: any, current) => {
+    const { restaurant } = current;
+    const { restaurantName } = restaurant;
+
+    if (!result[restaurantName]) {
+      // eslint-disable-next-line no-param-reassign
+      result[restaurantName] = true;
+    }
+
+    return result;
+  }, {});
 };
 
 export const findSuitableStartDate = ({
@@ -187,18 +208,35 @@ export const findSuitableStartDate = ({
   }
 
   const dateRange = renderDateRange(startDate, endDate);
-  const setUpDates = Object.keys(orderDetail);
 
-  if (isEmpty(setUpDates)) {
+  if (isEmpty(orderDetail)) {
     return startDate;
   }
 
-  const suitableDateList = dateRange.filter(
-    (date) => !setUpDates.includes(date.toString()),
+  const suitableStartDate = dateRange.find((date) =>
+    isOrderDetailDatePickedFood(orderDetail[date.toString()]),
   );
-  const suitableStartDate = !isEmpty(suitableDateList)
-    ? suitableDateList[0]
-    : endDate;
 
   return suitableStartDate;
+};
+
+export const isOrderDetailFullDatePickingRestaurant = ({
+  startDate = new Date().getTime(),
+  endDate = new Date().getTime(),
+  orderDetail = {},
+}: {
+  startDate?: number;
+  endDate?: number;
+  orderDetail: TObject;
+}) => {
+  const dateRange = renderDateRange(startDate, endDate);
+  const selectedDate = Object.keys(orderDetail);
+  return dateRange.length === selectedDate.length;
+};
+
+export const isOrderDetailFullDatePickingFood = (orderDetail: TObject) => {
+  return Object.values(orderDetail).every((date) => {
+    const { foodList = [] } = date || {};
+    return !isEmpty(foodList);
+  });
 };

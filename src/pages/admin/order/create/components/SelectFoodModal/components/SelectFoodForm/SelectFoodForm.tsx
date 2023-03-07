@@ -189,18 +189,24 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
         </div>
         <div className={css.contentContainer}>
           <div className={css.leftPart}>
-            <div>
-              <FieldFoodSelectAll
-                id={`${formId}.food.checkAll`}
-                customOnChange={handleCheckAllFieldChange}
-                name="checkAll"
-              />
-              <FieldFoodSelectCheckboxGroup
-                id="food"
-                name="food"
-                options={currentOptions}
-              />
-            </div>
+            {currentOptions.length === 0 ? (
+              <div className={css.noResult}>
+                <FormattedMessage id="SelectFoodForm.noFoodOption" />
+              </div>
+            ) : (
+              <div>
+                <FieldFoodSelectAll
+                  id={`${formId}.food.checkAll`}
+                  customOnChange={handleCheckAllFieldChange}
+                  name="checkAll"
+                />
+                <FieldFoodSelectCheckboxGroup
+                  id="food"
+                  name="food"
+                  options={currentOptions}
+                />
+              </div>
+            )}
           </div>
           <div className={css.rightPart}>
             {selectedFoodIds?.length === 0 ? (

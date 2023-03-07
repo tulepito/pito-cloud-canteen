@@ -16,7 +16,10 @@ import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import { calculateGroupMembersAmount } from '@helpers/company';
 import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
 import { addCommas } from '@helpers/format';
-import { findSuitableStartDate } from '@helpers/orderHelper';
+import {
+  findSuitableStartDate,
+  getRestaurantListFromOrderDetail,
+} from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { normalizePlanDetailsToEvent } from '@pages/company/booker/orders/draft/[orderId]/helpers/normalizeData';
@@ -137,7 +140,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       orderDetail,
     });
 
-    return temp instanceof Date ? temp : new Date(temp);
+    return temp instanceof Date ? temp : new Date(temp!);
   }, [selectedDate, startDate, endDate, orderDetail]);
 
   const { address } = deliveryAddress || {};
@@ -283,11 +286,15 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     JSON.stringify(plans),
   ]);
 
+  const restaurantListFromOrder = Object.keys(
+    getRestaurantListFromOrderDetail(orderDetail),
+  );
+
   useEffect(() => {
-    if (!isEmpty(orderDetail)) {
+    if (!isEmpty(restaurantListFromOrder)) {
       dispatch(orderAsyncActions.fetchRestaurantCoverImages());
     }
-  }, [JSON.stringify(orderDetail)]);
+  }, [JSON.stringify(restaurantListFromOrder)]);
 
   const handleSelectFood = async (values: TSelectFoodFormValues) => {
     const { food: foodIds } = values;
