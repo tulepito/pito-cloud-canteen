@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
 import AlertModal from '@components/Modal/AlertModal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   orderDetailsAnyActionsInProgress,
@@ -141,9 +142,10 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
     <div className={rootClasses}>
       <div className={css.titleContainer}>
         {sectionTitle}
-        {participantData.length && (
+
+        <RenderWhen condition={participantData.length > 0}>
           <span className={css.participantCount}>{participantData.length}</span>
-        )}
+        </RenderWhen>
       </div>
 
       <AddParticipantForm

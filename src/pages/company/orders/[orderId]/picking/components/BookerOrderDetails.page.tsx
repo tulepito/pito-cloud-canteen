@@ -4,9 +4,7 @@ import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
-import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import AlertModal from '@components/Modal/AlertModal';
-import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { companyPaths } from '@src/paths';
@@ -14,10 +12,7 @@ import { Listing } from '@utils/data';
 import { EOrderDraftStates, EOrderStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
 
-import {
-  orderDetailsAnyActionsInProgress,
-  orderManagementThunks,
-} from '../../OrderManagement.slice';
+import { orderManagementThunks } from '../../OrderManagement.slice';
 import { downloadPriceQuotation } from '../helpers/downloadPriceQuotation';
 import { usePrepareOrderDetailPageData } from '../hooks/usePrepareData';
 
@@ -52,7 +47,6 @@ const BookerOrderDetailsPage = () => {
     isReady: isRouterReady,
   } = router;
 
-  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const cancelPickingOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.cancelPickingOrderInProgress,
   );
@@ -205,12 +199,7 @@ const BookerOrderDetailsPage = () => {
     }
   }, [isRouterReady, orderState]);
 
-  return (
-    <RenderWhen condition={inProgress}>
-      <LoadingContainer />
-      <RenderWhen.False>{renderView()}</RenderWhen.False>
-    </RenderWhen>
-  );
+  return renderView();
 };
 
 export default BookerOrderDetailsPage;

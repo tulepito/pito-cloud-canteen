@@ -63,14 +63,16 @@
     gap: 8px;
 
     .number {
+      @include textTemplate(8px, 700, 1);
+      min-width: 16px;
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      border-radius: 12px;
+      border-radius: 8px;
       padding: 0 6px;
-      height: 24px;
+      height: 16px;
       color: $neutralGray5;
-      background-color: $neutralGray4;
+      background-color: $neutralGray3;
       line-height: 24px;
 
       &.numberActive {

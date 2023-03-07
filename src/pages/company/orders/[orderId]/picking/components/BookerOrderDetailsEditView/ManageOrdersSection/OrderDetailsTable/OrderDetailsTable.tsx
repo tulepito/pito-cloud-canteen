@@ -6,8 +6,11 @@ import { useRouter } from 'next/router';
 
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
-import { useAppDispatch } from '@hooks/reduxHooks';
-import { orderManagementThunks } from '@pages/company/orders/[orderId]/OrderManagement.slice';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import {
+  orderDetailsAnyActionsInProgress,
+  orderManagementThunks,
+} from '@pages/company/orders/[orderId]/OrderManagement.slice';
 import { historyPushState } from '@utils/history';
 import type { TObject } from '@utils/types';
 
@@ -53,6 +56,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   );
   const [isEditSelectionModalOpen, setIsEditSelectionModalOpen] =
     useState(false);
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const { tableHeads, packagePerMember, allTabData, deletedTabData } =
     usePrepareOrderDetailTableData(currentViewDate);
 
@@ -147,6 +151,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
     <div className={css.root}>
       <div>
         <Tabs
+          disabled={inProgress}
           items={tabItems}
           onChange={handleTabChange}
           defaultActiveKey={defaultActiveKey.toString()}

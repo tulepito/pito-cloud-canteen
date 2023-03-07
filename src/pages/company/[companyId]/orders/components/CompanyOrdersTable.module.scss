@@ -9,6 +9,9 @@
     column-gap: 12px;
 
     .count {
+      @include textTemplate(8px, 700, 1);
+      min-width: 16px;
+      height: 16px;
       display: inline-block;
       padding: 4px;
       text-align: center;

@@ -7,8 +7,11 @@ import { useRouter } from 'next/router';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
-import { useAppDispatch } from '@hooks/reduxHooks';
-import { orderManagementThunks } from '@pages/company/orders/[orderId]/OrderManagement.slice';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import {
+  orderDetailsAnyActionsInProgress,
+  orderManagementThunks,
+} from '@pages/company/orders/[orderId]/OrderManagement.slice';
 import { formatTimestamp } from '@utils/dates';
 import { historyPushState } from '@utils/history';
 
@@ -36,6 +39,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     query: { timestamp },
   } = useRouter();
   const intl = useIntl();
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const [currentViewDate, setCurrentViewDate] = useState(
     timestamp ? Number(timestamp) : startDate,
   );
@@ -104,6 +108,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     <RenderWhen condition={!isEmpty(dateList)}>
       <div className={css.root}>
         <Tabs
+          disabled={inProgress}
           items={items}
           onChange={handleDateTabChange}
           showNavigation

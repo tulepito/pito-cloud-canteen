@@ -8,7 +8,10 @@ import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import IconShare from '@components/Icons/IconShare/IconShare';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { orderManagementThunks } from '@pages/company/orders/[orderId]/OrderManagement.slice';
+import {
+  orderDetailsAnyActionsInProgress,
+  orderManagementThunks,
+} from '@pages/company/orders/[orderId]/OrderManagement.slice';
 import { formatTimestamp } from '@utils/dates';
 import type { TDefaultProps } from '@utils/types';
 
@@ -34,6 +37,7 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const dispatch = useAppDispatch();
   const { orderData } = useAppSelector((state) => state.OrderManagement);
   const [isFirstTimeAccess, setIsFirstTimeAccess] = useState(true);
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const [isSendNotificationModalOpen, setIsSendNotificationModalOpen] =
     useState(false);
 
@@ -111,7 +115,9 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
         onSubmit={handleSubmitSendNotification}
         data={{ orderLink, orderDeadline, companyName }}
         isFirstTimeShow={isFirstTimeAccess}
-        isOpen={isFirstTimeAccess || isSendNotificationModalOpen}
+        isOpen={
+          !inProgress && (isFirstTimeAccess || isSendNotificationModalOpen)
+        }
         onClose={handleCloseSendNotificationModal}
       />
     </div>

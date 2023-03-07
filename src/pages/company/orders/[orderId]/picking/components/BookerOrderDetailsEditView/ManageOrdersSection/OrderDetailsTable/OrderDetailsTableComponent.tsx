@@ -6,6 +6,8 @@ import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { orderDetailsAnyActionsInProgress } from '@pages/company/orders/[orderId]/OrderManagement.slice';
 import { shortenString } from '@src/utils/string';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
@@ -47,7 +49,9 @@ export const OrderDetailsTableComponent: React.FC<
   const intl = useIntl();
   const [isManageDeletedModalOpen, setIsManageDeletedModalOpen] =
     useState(false);
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
+  const actionDisabled = inProgress;
   const isDataEmpty = deletedTabData?.length === 0;
   const actionTdClasses = classNames(css.actionTd, {
     [css.actionTdDisabled]: isDataEmpty,
@@ -81,6 +85,8 @@ export const OrderDetailsTableComponent: React.FC<
   const handleCloseDeletedList = () => {
     setIsManageDeletedModalOpen(false);
   };
+
+  const doNothing = () => {};
 
   return (
     <>
@@ -152,11 +158,19 @@ export const OrderDetailsTableComponent: React.FC<
                           <div className={css.actionCell}>
                             <IconEdit
                               className={css.icon}
-                              onClick={onClickEditOrderItem(tab, memberId)}
+                              onClick={
+                                actionDisabled
+                                  ? doNothing
+                                  : onClickEditOrderItem(tab, memberId)
+                              }
                             />
                             <IconDelete
                               className={css.icon}
-                              onClick={onClickDeleteOrderItem(memberId)}
+                              onClick={
+                                actionDisabled
+                                  ? doNothing
+                                  : onClickDeleteOrderItem(memberId)
+                              }
                             />
                           </div>
                         </td>
