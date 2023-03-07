@@ -165,7 +165,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   };
 
   useEffect(() => {
-    if (Number(page) > totalPages) {
+    if (Number(page) > totalPages && totalPages > 0) {
       historyPushState('page', totalPages.toString());
     }
   }, [page, totalPages]);

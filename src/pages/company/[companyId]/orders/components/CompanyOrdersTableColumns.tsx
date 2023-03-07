@@ -10,7 +10,9 @@ import type { TButtonVariant } from '@components/Button/Button';
 import Button from '@components/Button/Button';
 import AlertModal from '@components/Modal/AlertModal';
 import NamedLink from '@components/NamedLink/NamedLink';
+import OrderDetailTooltip from '@components/OrderDetailTooltip/OrderDetailTooltip';
 import type { TColumn } from '@components/Table/Table';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -23,7 +25,7 @@ import {
   getLabelByKey,
   ORDER_STATES_OPTIONS,
 } from '@utils/enums';
-import type { TObject } from '@utils/types';
+import type { TIntegrationListing, TObject } from '@utils/types';
 
 import css from './CompanyOrdersTable.module.scss';
 
@@ -55,12 +57,14 @@ export const CompanyOrdersTableColumns: TColumn[] = [
     key: 'title',
     label: 'Đơn hàng',
     render: (data: TObject) => {
-      const { id, title, state } = data;
+      const { id, title, state, plan } = data;
       const titleContent = <div className={css.title}>#{title}</div>;
+      let returnComponent;
 
       if ([EOrderDraftStates.draft].includes(state)) {
-        return <>{titleContent}</>;
+        return titleContent;
       }
+
       if (
         [
           EOrderDraftStates.pendingApproval,
@@ -75,8 +79,9 @@ export const CompanyOrdersTableColumns: TColumn[] = [
           </NamedLink>
         );
       }
+
       if ([EOrderStates.picking].includes(state)) {
-        return (
+        returnComponent = (
           <NamedLink
             path={companyPaths.ManageOrderPicking}
             params={{ orderId: id }}>
@@ -84,12 +89,26 @@ export const CompanyOrdersTableColumns: TColumn[] = [
           </NamedLink>
         );
       }
-      return (
+
+      returnComponent = (
         <NamedLink
           path={companyPaths.ManageOrderDetail}
           params={{ orderId: id }}>
           {titleContent}
         </NamedLink>
+      );
+
+      const subOrders = [].concat(plan) as TIntegrationListing[];
+
+      return (
+        <Tooltip
+          overlayClassName={css.orderDetailTooltip}
+          overlayInnerStyle={{ backgroundColor: '#ffffff' }}
+          showArrow={false}
+          tooltipContent={<OrderDetailTooltip subOrders={subOrders} />}
+          placement="bottomLeft">
+          <div>{returnComponent}</div>
+        </Tooltip>
       );
     },
   },

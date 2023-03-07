@@ -16,7 +16,7 @@ import { EOrderDetailsTableTab } from './OrderDetailsTable.utils';
 
 import css from './OrderDetailsTable.module.scss';
 
-const MAX_LENGTH_NAME = 16;
+const MAX_LENGTH_NAME = 15;
 const MAX_LENGTH_EMAIL = 20;
 
 type TOrderDetailsTableComponentProps = {

@@ -393,7 +393,6 @@ const addParticipant = createAsyncThunk(
 
     const response = await addParticipantToOrderApi(orderId, bodyParams);
     const { data } = response || {};
-    console.log('🚀 ~ data:', data);
 
     if (data?.errorCode) {
       return rejectWithValue(data?.message);

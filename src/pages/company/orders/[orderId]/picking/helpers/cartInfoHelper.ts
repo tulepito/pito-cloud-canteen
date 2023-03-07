@@ -1,63 +1,7 @@
-import { isJoinedPlan } from '@helpers/orderHelper';
+import { getFoodDataMap, getTotalInfo } from '@helpers/orderHelper';
 import config from '@src/configs';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
-
-type TFoodDataValue = {
-  foodId: string;
-  foodName: string;
-  foodPrice: number;
-  frequency: number;
-};
-
-type TFoodDataMap = TObject<string, TFoodDataValue>;
-
-const getFoodDataMap = ({ foodListOfDate = {}, memberOrders }: any) => {
-  return Object.entries(memberOrders).reduce<TFoodDataMap>(
-    (foodFrequencyResult, currentMemberOrderEntry) => {
-      const [, memberOrderData] = currentMemberOrderEntry;
-      const { foodId, status } = memberOrderData as TObject;
-      const { foodName, foodPrice } = foodListOfDate[foodId] || {};
-
-      if (isJoinedPlan(foodId, status)) {
-        const data = foodFrequencyResult[foodId] as TObject;
-        const { frequency } = data || {};
-
-        return {
-          ...foodFrequencyResult,
-          [foodId]: data
-            ? { ...data, frequency: frequency + 1 }
-            : { foodId, foodName, foodPrice, frequency: 1 },
-        };
-      }
-
-      return foodFrequencyResult;
-    },
-    {},
-  );
-};
-
-const getTotalInfo = (foodDataList: TFoodDataValue[]) => {
-  return foodDataList.reduce<{
-    totalPrice: number;
-    totalDishes: number;
-  }>(
-    (previousResult, current: TObject) => {
-      const { totalPrice, totalDishes } = previousResult;
-      const { frequency, foodPrice } = current;
-
-      return {
-        ...previousResult,
-        totalDishes: totalDishes + frequency,
-        totalPrice: totalPrice + foodPrice * frequency,
-      };
-    },
-    {
-      totalDishes: 0,
-      totalPrice: 0,
-    },
-  );
-};
 
 export const calculateTotalPriceAndDishes = ({
   orderDetail = {},

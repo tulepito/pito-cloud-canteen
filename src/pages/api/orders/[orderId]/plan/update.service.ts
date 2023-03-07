@@ -17,7 +17,8 @@ export enum EApiUpdateMode {
 
 const getMenuListFromOrderDetail = (orderDetail: TPlan['orderDetail']) => {
   const menuIds = Object.values(orderDetail).reduce<string[]>(
-    (prev, { restaurant }) => {
+    (prev, current) => {
+      const { restaurant } = current || {};
       const { menuId } = restaurant || {};
 
       if (isEmpty(menuId)) {

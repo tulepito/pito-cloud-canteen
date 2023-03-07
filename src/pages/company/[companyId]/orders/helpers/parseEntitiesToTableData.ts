@@ -1,5 +1,6 @@
 import uniq from 'lodash/uniq';
 
+import { combineOrderDetailWithPriceInfo } from '@helpers/orderHelper';
 import { calculatePriceQuotationInfo } from '@pages/company/orders/[orderId]/picking/helpers/cartInfoHelper';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
@@ -10,7 +11,7 @@ export const parseEntitiesToTableData = (
   page: number,
 ) => {
   return orders.map((entity, index) => {
-    const { plan } = entity;
+    const { plan = {} } = entity;
     const orderId = entity?.id?.uuid;
     const { orderDetail: planOrderDetail = {} } = Listing(
       plan as TListing,
@@ -42,6 +43,18 @@ export const parseEntitiesToTableData = (
         state: orderState,
         orderId,
         companyId,
+        plan: {
+          ...plan,
+          attributes: {
+            ...(plan as TListing).attributes,
+            metadata: {
+              ...(plan as TListing).attributes.metadata,
+              orderDetail: combineOrderDetailWithPriceInfo({
+                orderDetail: planOrderDetail,
+              }),
+            },
+          },
+        },
         restaurants: uniq(
           Object.keys(planOrderDetail).map((key) => {
             return planOrderDetail[key]?.restaurant?.restaurantName;

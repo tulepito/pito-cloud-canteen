@@ -183,9 +183,9 @@ export const getRestaurantListFromOrderDetail = (
     const { restaurant } = current;
     const { restaurantName } = restaurant;
 
-    if (!result[restaurantName]) {
+    if (!result[restaurantName as string]) {
       // eslint-disable-next-line no-param-reassign
-      result[restaurantName] = true;
+      result[restaurantName as string] = true;
     }
 
     return result;
@@ -239,4 +239,88 @@ export const isOrderDetailFullDatePickingFood = (orderDetail: TObject) => {
     const { foodList = [] } = date || {};
     return !isEmpty(foodList);
   });
+};
+
+type TFoodDataValue = {
+  foodId: string;
+  foodName: string;
+  foodPrice: number;
+  frequency: number;
+};
+
+type TFoodDataMap = TObject<string, TFoodDataValue>;
+
+export const getFoodDataMap = ({ foodListOfDate = {}, memberOrders }: any) => {
+  return Object.entries(memberOrders).reduce<TFoodDataMap>(
+    (foodFrequencyResult, currentMemberOrderEntry) => {
+      const [, memberOrderData] = currentMemberOrderEntry;
+      const { foodId, status } = memberOrderData as TObject;
+      const { foodName, foodPrice } = foodListOfDate[foodId] || {};
+
+      if (isJoinedPlan(foodId, status)) {
+        const data = foodFrequencyResult[foodId] as TObject;
+        const { frequency } = data || {};
+
+        return {
+          ...foodFrequencyResult,
+          [foodId]: data
+            ? { ...data, frequency: frequency + 1 }
+            : { foodId, foodName, foodPrice, frequency: 1 },
+        };
+      }
+
+      return foodFrequencyResult;
+    },
+    {},
+  );
+};
+
+export const getTotalInfo = (foodDataList: TFoodDataValue[]) => {
+  return foodDataList.reduce<{
+    totalPrice: number;
+    totalDishes: number;
+  }>(
+    (previousResult, current: TObject) => {
+      const { totalPrice, totalDishes } = previousResult;
+      const { frequency, foodPrice } = current;
+
+      return {
+        ...previousResult,
+        totalDishes: totalDishes + frequency,
+        totalPrice: totalPrice + foodPrice * frequency,
+      };
+    },
+    {
+      totalDishes: 0,
+      totalPrice: 0,
+    },
+  );
+};
+
+export const combineOrderDetailWithPriceInfo = ({
+  orderDetail = {},
+}: {
+  orderDetail: TObject;
+}) => {
+  return Object.entries<TObject>(orderDetail).reduce<TObject>(
+    (result, currentOrderDetailEntry) => {
+      const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
+      const { memberOrders, restaurant = {} } = rawOrderDetailOfDate;
+      const { foodList: foodListOfDate } = restaurant;
+
+      const foodDataMap = getFoodDataMap({ foodListOfDate, memberOrders });
+      const foodDataList = Object.values(foodDataMap);
+      const totalInfo = getTotalInfo(foodDataList);
+
+      return {
+        ...result,
+        [date]: {
+          ...rawOrderDetailOfDate,
+          totalPrice: totalInfo.totalPrice,
+          totalDishes: totalInfo.totalDishes,
+        },
+      };
+    },
+    {},
+  );
 };

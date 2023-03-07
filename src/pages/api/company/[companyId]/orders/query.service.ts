@@ -1,13 +1,18 @@
 import { isEmpty } from 'lodash';
 
 import { getIntegrationSdk } from '@services/integrationSdk';
-import { denormalisedResponseEntities } from '@utils/data';
+import { denormalisedResponseEntities, Listing } from '@utils/data';
 import {
   EManageCompanyOrdersTab,
+  EOrderStates,
   MANAGE_COMPANY_ORDERS_TAB_MAP,
 } from '@utils/enums';
-import type { TPlan } from '@utils/orderTypes';
-import type { TCompany, TIntegrationOrderListing, TObject } from '@utils/types';
+import type {
+  TCompany,
+  TIntegrationOrderListing,
+  TListing,
+  TObject,
+} from '@utils/types';
 
 export const queryCompanyOrders = async ({
   companyId,
@@ -47,15 +52,53 @@ export const queryCompanyOrders = async ({
   ) as TCompany[];
   const orders = denormalisedResponseEntities(queryOrdersResponse);
 
-  const orderWithCompany = await Promise.all(
+  const orderWithOthersData = await Promise.all(
     orders.map(async (order: TIntegrationOrderListing) => {
-      const { plans = [] } = order.attributes.metadata;
+      const { plans = [], orderState } = Listing(
+        order as TListing,
+      ).getMetadata();
 
       if (plans.length > 0) {
         const [planId] = plans;
         const [plan] = denormalisedResponseEntities(
           await integrationSdk.listings.show({ id: planId }),
-        ) as TPlan[];
+        );
+
+        const { orderDetail: planOrderDetail } = Listing(
+          plan as TListing,
+        ).getMetadata();
+
+        const orderDetailsWithTransaction = planOrderDetail;
+
+        if (
+          [
+            EOrderStates.inProgress,
+            EOrderStates.pendingPayment,
+            EOrderStates.completed,
+            EOrderStates.reviewed,
+          ].includes(orderState)
+        ) {
+          await Promise.all(
+            Object.keys(planOrderDetail).map(async (key) => {
+              const { transactionId } = planOrderDetail[key];
+              const txResponse =
+                transactionId &&
+                (await integrationSdk.transactions.show({
+                  id: transactionId,
+                }));
+              const [transaction] = txResponse
+                ? denormalisedResponseEntities(txResponse)
+                : [{}];
+
+              orderDetailsWithTransaction[key] = {
+                ...planOrderDetail[key],
+                transaction,
+              };
+            }),
+          );
+        }
+
+        plan.attributes.metadata.orderDetail = orderDetailsWithTransaction;
 
         return {
           ...order,
@@ -109,5 +152,9 @@ export const queryCompanyOrders = async ({
     }),
   );
 
-  return { orderWithCompany, totalItemMap, queryOrdersPagination };
+  return {
+    orderWithCompany: orderWithOthersData,
+    totalItemMap,
+    queryOrdersPagination,
+  };
 };
