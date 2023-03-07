@@ -1,14 +1,21 @@
+import filter from 'lodash/filter';
+import flatten from 'lodash/flatten';
+import isEmpty from 'lodash/isEmpty';
+import uniq from 'lodash/uniq';
+
 import { UserPermission } from '@src/types/UserPermission';
 import { User } from '@utils/data';
 import type { TCurrentUser, TObject, TUser } from '@utils/types';
-import filter from 'lodash/filter';
-import flatten from 'lodash/flatten';
-import uniq from 'lodash/uniq';
 
 export const getAllCompanyMembers = (companyAccount: TUser) => {
   const { members = {} } = User(companyAccount).getMetadata();
 
-  return Object.values<TObject>(members).map<string>(({ id }: TObject) => id);
+  return Object.values<TObject>(members).reduce<string[]>(
+    (previous, { id }) => {
+      return isEmpty(id) ? previous : previous.concat([id]);
+    },
+    [],
+  );
 };
 
 export const getCompanyIdFromBookerUser = (user: TUser | TCurrentUser) => {
@@ -28,12 +35,13 @@ export const calculateGroupMembers = (
 ) => {
   const { groups = [] } = User(companyAccount).getMetadata();
 
-  if (groupList.includes('allMembers')) {
+  if (isEmpty(groupList) || groupList.includes('allMembers')) {
     return getAllCompanyMembers(companyAccount);
   }
 
   const allGroupMembers = groupList.map<string>((groupId: string) => {
     const currentGroup = groups.find((_group: any) => _group.id === groupId);
+
     return currentGroup?.members.map((member: any) => member.id);
   });
 
@@ -58,6 +66,7 @@ export const checkMemberBelongToCompany = (
   companyAccount: TUser,
 ) => {
   const { members = {} } = User(companyAccount).getMetadata();
+
   return !!members[memberEmail];
 };
 

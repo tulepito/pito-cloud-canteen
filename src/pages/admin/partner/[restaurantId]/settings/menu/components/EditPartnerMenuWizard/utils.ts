@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/default-param-last */
+import { DateTime } from 'luxon';
+
 import { ListingTypes } from '@src/types/listingTypes';
 import { getUniqueString, IntegrationListing } from '@utils/data';
 import {
@@ -29,6 +31,7 @@ export type TEditMenuInformationFormValues = {
   mealType: string;
   daysOfWeek: string[];
   numberOfCycles: number;
+  endDate: Date;
 };
 
 export type TEditMenuPricingFormValues = {
@@ -211,6 +214,7 @@ export const createSubmitMenuValues = (
     foodsByDate,
     title,
     numberOfCycles,
+    endDate,
   } = values;
   const isCycleMenu = menuType === EMenuTypes.cycleMenu;
 
@@ -245,9 +249,9 @@ export const createSubmitMenuValues = (
   } = IntegrationListing(menu).getMetadata();
 
   const alreadyPublished = listingState === EListingStates.published;
-  const endDate =
-    isCycleMenu &&
-    addWeeksToDate(new Date(startDate), numberOfCycles).getTime();
+  const endDateToSubmit = isCycleMenu
+    ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()
+    : endDate;
 
   switch (tab) {
     case MENU_INFORMATION_TAB: {
@@ -257,7 +261,7 @@ export const createSubmitMenuValues = (
           daysOfWeek,
           mealType,
           startDate,
-          ...(endDate ? { endDate } : {}),
+          endDate: endDateToSubmit,
           ...(isCycleMenu ? { numberOfCycles } : {}),
           ...(restaurantId
             ? {
@@ -330,7 +334,13 @@ export const createSubmitMenuValues = (
     }
     case MENU_COMPLETE_TAB: {
       return {
+        publicData: {
+          ...createAvaragePriceByFoodsByDate(foodsByDate),
+          foodsByDate: createSubmitFoodsByDate(foodsByDate),
+        },
         metadata: {
+          ...createListFoodIdsByFoodsByDate(foodsByDate),
+          ...createListFoodNutritionByFoodsByDate(foodsByDate),
           listingState: EListingStates.published,
         },
       };
@@ -354,6 +364,7 @@ export const createDuplicateSubmitMenuValues = (
     foodsByDate,
     title,
     numberOfCycles,
+    endDate,
   } = values;
   const isCycleMenu = menuType === EMenuTypes.cycleMenu;
 
@@ -401,9 +412,9 @@ export const createDuplicateSubmitMenuValues = (
       numberOfCyclesFromMenu,
     ).getTime();
 
-  const endDate =
-    isCycleMenu &&
-    addWeeksToDate(new Date(startDate), numberOfCycles).getTime();
+  const endDateToSubmit = isCycleMenu
+    ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()
+    : endDate;
 
   switch (tab) {
     case MENU_INFORMATION_TAB: {
@@ -413,7 +424,7 @@ export const createDuplicateSubmitMenuValues = (
           daysOfWeek,
           mealType,
           startDate,
-          ...(endDate ? { endDate } : {}),
+          endDate: endDateToSubmit,
           ...(isCycleMenu ? { numberOfCycles } : {}),
           foodsByDate: createFoodByDateByDaysOfWeekField(
             foodsByDateFromMenu,
@@ -473,7 +484,7 @@ export const createDuplicateSubmitMenuValues = (
           daysOfWeek: daysOfWeekFromMenu,
           mealType: mealTyperFromMenu,
           startDate: startDateFromMenu,
-          ...(endDateFromMenu ? { endDateFromMenu } : {}),
+          endDate: endDateFromMenu,
           ...(menuTypeFromMenu === EMenuTypes.cycleMenu
             ? { numberOfCycles: numberOfCyclesFromMenu }
             : {}),
@@ -492,38 +503,19 @@ export const createDuplicateSubmitMenuValues = (
       return {
         title: titleFromMenu,
         publicData: {
-          monAverageFoodPrice: monAverageFoodPriceFromMenu,
-          tueAverageFoodPrice: tueAverageFoodPriceFromMenu,
-          wedAverageFoodPrice: wedAverageFoodPriceFromMenu,
-          thuAverageFoodPrice: thuAverageFoodPriceFromMenu,
-          friAverageFoodPrice: friAverageFoodPriceFromMenu,
-          satAverageFoodPrice: satAverageFoodPriceFromMenu,
-          sunAverageFoodPrice: sunAverageFoodPriceFromMenu,
+          ...createAvaragePriceByFoodsByDate(foodsByDate),
+          foodsByDate: createSubmitFoodsByDate(foodsByDate),
           daysOfWeek: daysOfWeekFromMenu,
           mealType: mealTyperFromMenu,
           startDate: startDateFromMenu,
-          foodsByDate: foodsByDateFromMenu,
-          ...(endDateFromMenu ? { endDateFromMenu } : {}),
+          endDate: endDateFromMenu,
           ...(menuTypeFromMenu === EMenuTypes.cycleMenu
             ? { numberOfCycles: numberOfCyclesFromMenu }
             : {}),
         },
         metadata: {
-          monFoodIdList: monFoodIdListFromMenu,
-          tueFoodIdList: tueFoodIdListFromMenu,
-          wedFoodIdList: wedFoodIdListFromMenu,
-          thuFoodIdList: thuFoodIdListFromMenu,
-          friFoodIdList: friFoodIdListFromMenu,
-          satFoodIdList: satFoodIdListFromMenu,
-          sunFoodIdList: sunFoodIdListFromMenu,
-          /// /
-          monNutritions: monNutritionsFromMenu,
-          tueNutritions: tueNutritionsFromMenu,
-          wedNutritions: wedNutritionsFromMenu,
-          thuNutritions: thuNutritionsFromMenu,
-          friNutritions: friNutritionsFromMenu,
-          satNutritions: satNutritionsFromMenu,
-          sunNutritions: sunNutritionsFromMenu,
+          ...createListFoodIdsByFoodsByDate(foodsByDate),
+          ...createListFoodNutritionByFoodsByDate(foodsByDate),
           /// /
           listingState: EListingStates.published,
           menuType: menuTypeFromMenu,
@@ -541,6 +533,7 @@ export const createUpdateMenuApplyTimeValues = (values: any) => {
   const {
     menuType,
     startDate,
+    endDate,
     daysOfWeek,
     id,
     numberOfCycles,
@@ -564,16 +557,16 @@ export const createUpdateMenuApplyTimeValues = (values: any) => {
   } = values;
 
   const isCycleMenu = menuType === EMenuTypes.cycleMenu;
-  const endDate =
-    isCycleMenu &&
-    addWeeksToDate(new Date(startDate), numberOfCycles).getTime();
+  const endDateToSubmit = isCycleMenu
+    ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()
+    : endDate;
   return {
     id,
     publicData: {
       startDate,
       daysOfWeek,
       mealType,
-      ...(endDate ? { endDate } : {}),
+      endDate: endDateToSubmit,
       ...(isCycleMenu ? { numberOfCycles } : {}),
       foodsByDate: createFoodByDateByDaysOfWeekField(foodsByDate, daysOfWeek),
       ...createFoodAveragePriceByDaysOfWeekField(
@@ -645,10 +638,11 @@ export const createInitialValuesForFoodsByDate = (
 
 export const renderValuesForFoodsByDate = (
   foodsByDate: any = {},
+  anchorDate: Date,
   menuPickedFoods: TIntegrationListing[] = [],
 ) => {
   let initialValue = {};
-  const startDayOfWeek = getStartOfWeek();
+  const startDayOfWeek = getStartOfWeek(anchorDate.getTime());
   Object.keys(foodsByDate).forEach((dayOfWeeks) => {
     const dayOfWeekAsNumber = getDayOfWeekAsIndex(dayOfWeeks as EDayOfWeek);
     const daysOfCurrentWeek = addDaysToDate(startDayOfWeek, dayOfWeekAsNumber);
@@ -656,7 +650,8 @@ export const renderValuesForFoodsByDate = (
     let newFoodByDate = {};
     Object.keys(foodByDate).forEach((idAsKey) => {
       const food = foodByDate[idAsKey];
-      const { sideDishes = [], id, foodNote } = food;
+
+      const { id } = food;
       const foodFromDuck = menuPickedFoods.find((m) => m.id.uuid === id);
       const title = foodFromDuck?.attributes.title;
       const price = foodFromDuck?.attributes.price?.amount || 0;
@@ -666,12 +661,12 @@ export const renderValuesForFoodsByDate = (
         [idAsKey]: {
           title,
           id,
-          sideDishes,
           price,
-          foodNote,
+          ...food,
         },
       };
     });
+
     const dateInTimeStaimp = daysOfCurrentWeek.getTime();
     initialValue = {
       ...initialValue,
@@ -680,5 +675,38 @@ export const renderValuesForFoodsByDate = (
       },
     };
   });
+
   return initialValue;
+};
+
+export const renderResourcesForCalendar = (
+  foodsByDate: any = {},
+  extraData: {
+    onRemovePickedFood: (id: string, date: Date) => void;
+    daysOfWeek: string[];
+  },
+) => {
+  const resourses: {
+    resource: TEditMenuPricingCalendarResources;
+    start: Date;
+    end: Date;
+  }[] = [];
+
+  Object.keys(foodsByDate).forEach((key) => {
+    Object.keys(foodsByDate[key]).forEach((foodKey) => {
+      resourses.push({
+        resource: {
+          id: foodsByDate[key][foodKey]?.id,
+          title: foodsByDate[key][foodKey]?.title,
+          sideDishes: foodsByDate[key][foodKey]?.sideDishes || [],
+          price: foodsByDate[key][foodKey]?.price || 0,
+          foodNote: foodsByDate[key][foodKey]?.foodNote || '',
+          ...extraData,
+        },
+        start: DateTime.fromMillis(Number(key)).toJSDate(),
+        end: DateTime.fromMillis(Number(key)).plus({ hour: 1 }).toJSDate(),
+      });
+    });
+  });
+  return resourses;
 };

@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+import React from 'react';
+import { useIntl } from 'react-intl';
+import { useRouter } from 'next/router';
+
 import FormWizard from '@components/FormWizard/FormWizard';
 import useRedirectTabWizard from '@hooks/useRedirectTabWizard';
 import { adminRoutes } from '@src/paths';
 import { EListingStates } from '@utils/enums';
-import { useRouter } from 'next/router';
-import React from 'react';
-import { useIntl } from 'react-intl';
+import type { TIntegrationListing } from '@utils/types';
 
 // eslint-disable-next-line import/no-cycle
 import EditPartnerWizardTab from '../EditPartnerWizardTab/EditPartnerWizardTab';
+
 import css from './EditPartnerWizard.module.scss';
 
 export const BASIC_INFORMATION_TAB = 'basic-information';
@@ -137,6 +140,7 @@ const EditPartnerWizard = (props: any) => {
     onSetUnsatisfactory,
     uploadingImage,
   } = props;
+
   const intl = useIntl();
   const router = useRouter();
   const { query, pathname } = router;
@@ -192,48 +196,56 @@ const EditPartnerWizard = (props: any) => {
 
   return (
     <FormWizard className={css.formWizard} formTabNavClassName={css.tabNav}>
-      {TABS.map((tab: string) => (
-        <EditPartnerWizardTab
-          key={tab}
-          tab={tab}
-          tabs={TABS}
-          tabId={`${tab}`}
-          tabLabel={tabLabel(intl, tab)}
-          tabLinkProps={tabLink(tab)}
-          selected={selectedTab === tab}
-          uploadedAvatars={uploadedAvatars}
-          uploadedCovers={uploadedCovers}
-          onAvatarUpload={onAvatarUpload}
-          onCoverUpload={onCoverUpload}
-          onRemoveCover={onRemoveCover}
-          onRemoveAvatar={onRemoveAvatar}
-          uploadAvatarError={uploadAvatarError}
-          uploadCoverError={uploadCoverError}
-          inProgress={inProgress}
-          formError={formError}
-          partnerListingRef={partnerListingRef}
-          onUpdatePartnerListing={onUpdatePartnerListing}
-          onCreateDraftPartner={onCreateDraftPartner}
-          uploadedBusinessLicense={uploadedBusinessLicense}
-          onBusinessLicenseUpload={onBusinessLicenseUpload}
-          uploadBusinessLicenseError={uploadBusinessLicenseError}
-          onRemoveBusinessLicense={onRemoveBusinessLicense}
-          uploadedFoodCertificate={uploadedFoodCertificate}
-          onFoodCertificateUpload={onFoodCertificateUpload}
-          uploadFoodCertificateError={uploadFoodCertificateError}
-          onRemoveFoodCertificate={onRemoveFoodCertificate}
-          uploadedPartyInsurance={uploadedPartyInsurance}
-          onPartyInsuranceUpload={onPartyInsuranceUpload}
-          uploadPartyInsuranceError={uploadPartyInsuranceError}
-          onRemovePartyInsurance={onRemovePartyInsurance}
-          onPublishDraftPartner={onPublishDraftPartner}
-          onDiscardDraftPartner={onDiscardDraftPartner}
-          onSetAuthorized={onSetAuthorized}
-          onSetUnsatisfactory={onSetUnsatisfactory}
-          goBack={handleGoBack(tab)}
-          disabled={uploadingImage}
-        />
-      ))}
+      {TABS.map((tab: string, index: number) => {
+        const disabled =
+          !tabCompleted(
+            TABS[index - 1],
+            partnerListingRef as TIntegrationListing,
+          ) && index > 0;
+        return (
+          <EditPartnerWizardTab
+            key={tab}
+            tab={tab}
+            tabs={TABS}
+            tabId={`${tab}`}
+            tabLabel={tabLabel(intl, tab)}
+            tabLinkProps={tabLink(tab)}
+            selected={selectedTab === tab}
+            uploadedAvatars={uploadedAvatars}
+            uploadedCovers={uploadedCovers}
+            onAvatarUpload={onAvatarUpload}
+            onCoverUpload={onCoverUpload}
+            onRemoveCover={onRemoveCover}
+            onRemoveAvatar={onRemoveAvatar}
+            uploadAvatarError={uploadAvatarError}
+            uploadCoverError={uploadCoverError}
+            inProgress={inProgress}
+            formError={formError}
+            partnerListingRef={partnerListingRef}
+            onUpdatePartnerListing={onUpdatePartnerListing}
+            onCreateDraftPartner={onCreateDraftPartner}
+            uploadedBusinessLicense={uploadedBusinessLicense}
+            onBusinessLicenseUpload={onBusinessLicenseUpload}
+            uploadBusinessLicenseError={uploadBusinessLicenseError}
+            onRemoveBusinessLicense={onRemoveBusinessLicense}
+            uploadedFoodCertificate={uploadedFoodCertificate}
+            onFoodCertificateUpload={onFoodCertificateUpload}
+            uploadFoodCertificateError={uploadFoodCertificateError}
+            onRemoveFoodCertificate={onRemoveFoodCertificate}
+            uploadedPartyInsurance={uploadedPartyInsurance}
+            onPartyInsuranceUpload={onPartyInsuranceUpload}
+            uploadPartyInsuranceError={uploadPartyInsuranceError}
+            onRemovePartyInsurance={onRemovePartyInsurance}
+            onPublishDraftPartner={onPublishDraftPartner}
+            onDiscardDraftPartner={onDiscardDraftPartner}
+            onSetAuthorized={onSetAuthorized}
+            onSetUnsatisfactory={onSetUnsatisfactory}
+            goBack={handleGoBack(tab)}
+            disabled={uploadingImage || disabled}
+            uploadingImage={uploadingImage}
+          />
+        );
+      })}
     </FormWizard>
   );
 };

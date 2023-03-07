@@ -1,17 +1,21 @@
+import React, { useEffect, useMemo } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
+
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
+import { IntegrationListing } from '@src/utils/data';
+import type { TObject } from '@src/utils/types';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
-import { useRouter } from 'next/router';
-import React, { useEffect, useMemo } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import EditPartnerFoodForm from '../components/EditPartnerFoodForm/EditPartnerFoodForm';
 import type { TEditPartnerFoodFormValues } from '../utils';
 import { getUpdateFoodData } from '../utils';
+
 import css from './EditPartnerFood.module.scss';
 
 const EditPartnerFoodPage = () => {
@@ -24,7 +28,16 @@ const EditPartnerFoodPage = () => {
     showFoodError,
     updateFoodInProgress,
     updateFoodError,
+    uploadingImages,
   } = useAppSelector((state) => state.foods, shallowEqual);
+
+  const {
+    partnerListingRef,
+    showPartnerListingInProgress,
+    showPartnerListingError,
+  } = useAppSelector((state) => state.partners, shallowEqual);
+
+  const { packaging } = IntegrationListing(partnerListingRef).getPublicData();
 
   const handleSubmit = (values: TEditPartnerFoodFormValues) =>
     dispatch(
@@ -34,7 +47,12 @@ const EditPartnerFoodPage = () => {
     );
   const initialValues = useMemo(() => {
     const attributes = currentFoodListing?.attributes || {};
-    const { publicData = {}, price, title, description } = attributes || {};
+    const {
+      publicData = {},
+      price,
+      title,
+      description,
+    } = attributes || ({} as TObject);
     const { menuType, foodType } = publicData;
     return {
       images: getInitialAddImages(currentFoodListing?.images || []),
@@ -48,20 +66,22 @@ const EditPartnerFoodPage = () => {
   }, [currentFoodListing]) as TEditPartnerFoodFormValues;
 
   useEffect(() => {
+    dispatch(foodSliceAction.setInitialStates());
+  }, []);
+
+  useEffect(() => {
     if (!foodId) return;
     dispatch(foodSliceThunks.showPartnerFoodListing(foodId));
   }, [dispatch, foodId]);
 
-  useEffect(() => {
-    dispatch(foodSliceAction.setInitialStates());
-  }, []);
-
-  if (showFoodInProgress) {
+  if (showFoodInProgress || showPartnerListingInProgress) {
     return <LoadingContainer />;
   }
 
-  if (showFoodError) {
-    return <ErrorMessage message={showFoodError.message} />;
+  const showError = showFoodError || showPartnerListingError;
+
+  if (showError) {
+    return <ErrorMessage message={showError.message} />;
   }
 
   return (
@@ -72,9 +92,11 @@ const EditPartnerFoodPage = () => {
       <EditPartnerFoodForm
         onSubmit={handleSubmit}
         inProgress={updateFoodInProgress}
+        disabled={uploadingImages || updateFoodInProgress}
         formError={updateFoodError}
         initialValues={initialValues}
         isEditting
+        partnerPackagingList={packaging}
       />
     </>
   );

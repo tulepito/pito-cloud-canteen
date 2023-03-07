@@ -8,6 +8,7 @@
   border-collapse: collapse;
   width: 100%;
   display: block;
+
   @include viewportLarge {
     display: table;
   }
@@ -90,7 +91,7 @@
         align-items: center;
         text-align: right;
         padding: 14px 10px 14px 20px;
-        color: #616161;
+        color: $neutralGray6;
         border-bottom: 1px solid $neutralGray3;
         position: relative;
         font-size: 14px;

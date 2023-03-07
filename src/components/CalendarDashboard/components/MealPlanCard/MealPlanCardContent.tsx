@@ -1,8 +1,9 @@
-import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
-import Image from 'next/image';
 import type { Event } from 'react-big-calendar';
 
-import coverImg from '../../../../assets/mealPlanCover.png';
+import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
+import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import { EImageVariants } from '@utils/enums';
+
 import css from './MealPlanCard.module.scss';
 
 type TMealPlanCardContentProps = {
@@ -14,12 +15,22 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
   event,
 }) => {
   const restaurantName = event.resource?.restaurant?.name;
+  const restaurantCoverImage = event.resource?.restaurant?.coverImage;
 
   return (
     <div className={css.content}>
-      <Image className={css.coverImg} alt={`${event.title}`} src={coverImg} />
+      <div className={css.coverImg}>
+        <ResponsiveImage
+          alt={`${restaurantName}`}
+          image={restaurantCoverImage}
+          variants={[
+            EImageVariants.landscapeCrop,
+            EImageVariants.landscapeCrop2x,
+          ]}
+        />
+      </div>
       <div className={css.restaurant}>
-        <span>{restaurantName}</span>
+        <span title={restaurantName}>{restaurantName}</span>
         <IconRefreshing className={css.recommendRestaurant} />
       </div>
     </div>

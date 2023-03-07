@@ -1,8 +1,9 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+import { composeApiCheckers } from '@apis/configs';
 import { deleteMemberFromCompanyFn } from '@pages/api/api-utils/deleteMemberFromCompanyFn';
-import cookies from '@services/cookie';
 import companyChecker from '@services/permissionChecker/company';
 import { handleError } from '@services/sdk';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -17,4 +18,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default cookies(companyChecker(handler));
+export default composeApiCheckers(companyChecker)(handler);

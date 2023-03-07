@@ -1,10 +1,16 @@
-import { EMenuTypes } from '@utils/enums';
 import React from 'react';
+
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
+import { EMenuTypes } from '@utils/enums';
 
 import ManagePartnerMenusPage from '../components/ManagePartnerMenus/ManagePartnerMenus.page';
 
-const ManagePartnerCycleMenuRoute = () => {
-  return <ManagePartnerMenusPage menuType={EMenuTypes.cycleMenu} />;
+const AdminManagePartnerCycleMenuRoute = () => {
+  return (
+    <MetaWrapper routeName="AdminManagePartnerCycleMenuRoute">
+      <ManagePartnerMenusPage menuType={EMenuTypes.cycleMenu} />
+    </MetaWrapper>
+  );
 };
 
-export default ManagePartnerCycleMenuRoute;
+export default AdminManagePartnerCycleMenuRoute;

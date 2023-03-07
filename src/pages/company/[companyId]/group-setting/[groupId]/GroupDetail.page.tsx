@@ -1,3 +1,10 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import filter from 'lodash/filter';
+import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -13,15 +20,10 @@ import { companyPaths } from '@src/paths';
 import { companyThunks } from '@src/redux/slices/company.slice';
 import { User } from '@utils/data';
 import type { TObject } from '@utils/types';
-import filter from 'lodash/filter';
-import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import AddNewMembersModal from './components/AddNewMembersModal/AddNewMembersModal';
 import GroupInfoForm from './components/GroupInfoForm/GroupInfoForm';
+
 import css from './GroupDetail.module.scss';
 
 const GroupDetailPage = () => {
@@ -247,6 +249,7 @@ const GroupDetailPage = () => {
           <>
             <div className={css.titleWrapper}>
               <h2>{name || '---'}</h2>
+              <div>{description}</div>
             </div>
             <div className={css.actionBtns}>
               <Button onClick={onEditing} className={css.changeNameBtn}>

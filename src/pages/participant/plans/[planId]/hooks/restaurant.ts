@@ -1,6 +1,7 @@
-import { useAppSelector } from '@hooks/reduxHooks';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+
+import { useAppSelector } from '@hooks/reduxHooks';
 
 export const useSelectRestaurant = () => {
   // Router

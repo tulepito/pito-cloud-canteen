@@ -1,7 +1,8 @@
 /* eslint-disable unused-imports/no-unused-vars */
+import { createSlice } from '@reduxjs/toolkit';
+
 import { createAsyncThunk, createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
-import { createSlice } from '@reduxjs/toolkit';
 import {
   CurrentUser,
   denormalisedResponseEntities,
@@ -61,6 +62,8 @@ type TUserState = {
   userPermission: EUserPermission;
   sendVerificationEmailInProgress: boolean;
   sendVerificationEmailError: any;
+  favoriteRestaurants: any[];
+  favoriteFood: any[];
 };
 
 const initialState: TUserState = {
@@ -69,6 +72,8 @@ const initialState: TUserState = {
   userPermission: EUserPermission.normal,
   sendVerificationEmailInProgress: false,
   sendVerificationEmailError: null,
+  favoriteRestaurants: [],
+  favoriteFood: [],
 };
 
 // ================ Thunks ================ //
@@ -97,7 +102,26 @@ const fetchCurrentUser = createAsyncThunk(
 
     const currentUser = entities[0];
 
-    return currentUser;
+    const { favoriteRestaurantList = [], favoriteFoodList = [] } =
+      CurrentUser(currentUser).getPublicData();
+    const favoriteRestaurants = await Promise.all(
+      favoriteRestaurantList.map(
+        async (restaurantId: string) =>
+          denormalisedResponseEntities(
+            await sdk.listings.show({ id: restaurantId }),
+          )[0],
+      ),
+    );
+
+    const favoriteFood = await Promise.all(
+      favoriteFoodList.map(
+        async (foodId: string) =>
+          denormalisedResponseEntities(
+            await sdk.listings.show({ id: foodId }),
+          )[0],
+      ),
+    );
+    return { currentUser, favoriteRestaurants, favoriteFood };
   },
   {
     serializeError: storableError,
@@ -140,10 +164,13 @@ const userSlice = createSlice({
         state.currentUserShowError = null;
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
-        const currentUser = action.payload;
+        const { currentUser, favoriteRestaurants, favoriteFood } =
+          action.payload;
 
         state.currentUser = mergeCurrentUser(state.currentUser, currentUser);
         state.userPermission = detectUserPermission(currentUser);
+        state.favoriteRestaurants = favoriteRestaurants;
+        state.favoriteFood = favoriteFood;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
         state.currentUserShowError = action.payload;

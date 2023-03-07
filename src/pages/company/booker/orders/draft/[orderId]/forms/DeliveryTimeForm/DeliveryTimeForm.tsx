@@ -1,0 +1,130 @@
+import { useField, useForm } from 'react-final-form-hooks';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { DateTime } from 'luxon';
+
+import Button from '@components/Button/Button';
+import { FieldDatePickerComponent } from '@components/FormFields/FieldDatePicker/FieldDatePicker';
+import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
+import IconClock from '@components/Icons/IconClock/IconClock';
+import { findMinStartDate } from '@helpers/orderHelper';
+import { TimeOptions } from '@utils/dates';
+
+import css from './DeliveryTimeForm.module.scss';
+
+type TDeliveryTimeFormProps = {
+  onSubmit: (values: TDeliveryTimeFormValues) => void;
+  initialValues?: TDeliveryTimeFormValues;
+  loading?: boolean;
+};
+
+export type TDeliveryTimeFormValues = {
+  deliveryHour: string;
+};
+
+const validate = (values: TDeliveryTimeFormValues) => {
+  const errors: any = {};
+  if (!values.deliveryHour) {
+    errors.deliveryHour = 'Vui lòng chọn giờ giao hàng';
+  }
+  return errors;
+};
+
+const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
+  onSubmit,
+  initialValues,
+  loading,
+}) => {
+  const { form, handleSubmit, submitting, hasValidationErrors, pristine } =
+    useForm<TDeliveryTimeFormValues>({
+      onSubmit,
+      validate,
+      initialValues,
+    });
+
+  const intl = useIntl();
+
+  const startDate = useField('startDate', form);
+  const endDate = useField('endDate', form);
+  const deliveryHour = useField('deliveryHour', form);
+  const submitInprogress = loading || submitting;
+  const disabledSubmit = pristine || submitInprogress || hasValidationErrors;
+
+  const minStartDate = findMinStartDate();
+  const selectedStartDate = startDate.input.value
+    ? new Date(Number(startDate.input.value))
+    : minStartDate;
+
+  const selectedEndDate = DateTime.fromJSDate(selectedStartDate)
+    .plus({ days: 1 })
+    .toJSDate();
+  const minEndDate = DateTime.fromJSDate(selectedStartDate)
+    .plus({ days: 1 })
+    .toJSDate();
+  const maxEndDate = DateTime.fromJSDate(selectedStartDate)
+    .plus({ days: 6 })
+    .toJSDate();
+
+  return (
+    <form className={css.root} onSubmit={handleSubmit}>
+      <FieldDatePickerComponent
+        id="startDate"
+        name="startDate"
+        input={startDate.input}
+        meta={startDate.meta}
+        selected={selectedStartDate}
+        label={intl.formatMessage({
+          id: 'Booker.CreateOrder.Form.field.orderStartDate',
+        })}
+        minDate={minStartDate}
+        dateFormat={'EEE, dd MMMM, yyyy'}
+        placeholderText={intl.formatMessage({
+          id: 'Booker.CreateOrder.Form.field.datePlaceholder',
+        })}
+        className={css.dateInput}
+        autoComplete="off"
+      />
+      <FieldDatePickerComponent
+        id="endDate"
+        name="endDate"
+        input={endDate.input}
+        meta={endDate.meta}
+        selected={selectedEndDate}
+        label={intl.formatMessage({
+          id: 'Booker.CreateOrder.Form.field.orderEndDate',
+        })}
+        minDate={minEndDate}
+        maxDate={maxEndDate}
+        dateFormat={'EEE, dd MMMM, yyyy'}
+        placeholderText={intl.formatMessage({
+          id: 'Booker.CreateOrder.Form.field.datePlaceholder',
+        })}
+        className={css.dateInput}
+        autoComplete="off"
+      />
+      <FieldSelectComponent
+        id="deliveryHour"
+        name="deliveryHour"
+        className={css.fieldSelect}
+        label={intl.formatMessage({
+          id: 'Booker.CreateOrder.Form.field.deliveryHour',
+        })}
+        leftIcon={<IconClock />}
+        meta={deliveryHour.meta}
+        input={deliveryHour.input}>
+        {TimeOptions.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </FieldSelectComponent>
+      <Button
+        className={css.submitBtn}
+        inProgress={submitInprogress}
+        disabled={disabledSubmit}>
+        <FormattedMessage id="Booker.CreateOrder.Form.saveChange" />
+      </Button>
+    </form>
+  );
+};
+
+export default DeliveryTimeForm;

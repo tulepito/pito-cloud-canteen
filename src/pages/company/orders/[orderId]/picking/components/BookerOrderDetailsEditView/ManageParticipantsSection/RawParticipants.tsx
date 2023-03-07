@@ -1,0 +1,80 @@
+import Tooltip from '@components/Tooltip/Tooltip';
+import { Listing } from '@src/utils/data';
+import type { TPlan } from '@src/utils/orderTypes';
+import type { TListing, TObject, TUser } from '@utils/types';
+
+import { isParticipantCompletedPickFood } from './ManageParticipantsSection.helper';
+import ParticipantCard from './ParticipantCard';
+
+import css from './ManageParticipantsModal.module.scss';
+
+type TRawParticipantsProps = {
+  data: {
+    participantData: Array<TUser>;
+    planData: TObject;
+  };
+  handleClickDeleteParticipant: (id: string) => () => void;
+};
+
+export const RawParticipants: React.FC<TRawParticipantsProps> = ({
+  data,
+  handleClickDeleteParticipant,
+}) => {
+  const { participantData, planData } = data;
+  const { orderDetail: planOrderDetails = {} } = Listing(
+    planData as TListing,
+  ).getMetadata();
+
+  const orderDetailList = Object.values(
+    planOrderDetails as TPlan['orderDetail'],
+  );
+
+  return (
+    <div className={css.rawParticipants}>
+      {participantData.map((item) => {
+        const {
+          id: { uuid },
+          attributes: {
+            email,
+            profile: { displayName },
+          },
+        } = item;
+        const isSelectedFood = isParticipantCompletedPickFood(
+          uuid,
+          planOrderDetails,
+        );
+
+        const cardComponent = (
+          <ParticipantCard
+            name={displayName}
+            email={email}
+            className={css.participantCard}
+            onClickDeleteIcon={handleClickDeleteParticipant(uuid)}
+            key={uuid}
+            participant={item}
+            hasCheckIcon={isSelectedFood}
+          />
+        );
+
+        const tooltipContent = (
+          <div className={css.tooltipContent}>
+            <div className={css.title}>Đã chọn món xong</div>
+            {orderDetailList.length} bữa
+          </div>
+        );
+
+        return isSelectedFood ? (
+          <Tooltip
+            overlayClassName={css.tooltipOverlay}
+            tooltipContent={tooltipContent}
+            placement="bottomLeft"
+            key={uuid}>
+            <div className={css.cardWrapper}>{cardComponent}</div>
+          </Tooltip>
+        ) : (
+          cardComponent
+        );
+      })}
+    </div>
+  );
+};

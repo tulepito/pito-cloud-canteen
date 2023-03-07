@@ -1,10 +1,11 @@
 /**
  * This is a wrapper component for different Layouts. Main content should be added to this wrapper.
  */
-import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
+import classNames from 'classnames';
+
+import type { TDefaultProps } from '@utils/types';
 
 import css from './CompanyMainContent.module.scss';
 

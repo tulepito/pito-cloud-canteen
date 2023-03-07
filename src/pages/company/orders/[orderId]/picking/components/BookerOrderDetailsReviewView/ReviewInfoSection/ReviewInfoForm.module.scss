@@ -1,0 +1,44 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.formContainer {
+  display: flex;
+  row-gap: 20px;
+  flex-direction: column;
+
+  @include viewportLarge {
+    row-gap: 16px;
+  }
+
+  .fieldContainer {
+    display: flex;
+    flex-direction: column;
+    // padding-top: 20px;
+
+    width: 100%;
+
+    @include viewportLarge {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .fieldLabel {
+      display: inline-block;
+      margin-bottom: 8px;
+
+      @include viewportLarge {
+        padding-top: 10px;
+      }
+    }
+
+    .fieldInput {
+      @include viewportLarge {
+        width: calc(100% - 180px);
+      }
+
+      input {
+        width: 100%;
+      }
+    }
+  }
+}

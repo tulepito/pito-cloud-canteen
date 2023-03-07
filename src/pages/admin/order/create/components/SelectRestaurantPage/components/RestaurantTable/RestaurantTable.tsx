@@ -1,10 +1,12 @@
-import Tooltip from '@components/Tooltip/Tooltip';
-import { useAppSelector } from '@hooks/reduxHooks';
 import { FormattedMessage } from 'react-intl';
 
+import Tooltip from '@components/Tooltip/Tooltip';
+import { useAppSelector } from '@hooks/reduxHooks';
+
 import RestaurantRow from './RestaurantRow';
-import css from './RestaurantTable.module.scss';
 import RestaurantTableHead from './RestaurantTableHead';
+
+import css from './RestaurantTable.module.scss';
 
 type TRestaurantTableProps = {
   restaurants: any;

@@ -1,31 +1,31 @@
+import type { PropsWithChildren } from 'react';
+import { useEffect, useState } from 'react';
+import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
+
 import Dropdown from '@components/CompanyLayout/Dropdown/Dropdown';
 import FeatureIcons from '@components/FeatureIcons/FeatureIcons';
 import FeaturesHeader from '@components/FeaturesHeader/FeaturesHeader';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
-import { currentUserSelector } from '@redux/slices/user.slice';
-import { companyPaths, personalPaths } from '@src/paths';
-import { CurrentUser, User } from '@utils/data';
+import { BookerCompaniesThunks } from '@redux/slices/BookerCompanies.slice';
+import { companyPaths } from '@src/paths';
+import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
-import filter from 'lodash/filter';
-import { useRouter } from 'next/router';
-import type { PropsWithChildren } from 'react';
-import { useEffect, useState } from 'react';
-import { shallowEqual } from 'react-redux';
 
 import CompanyHeader from './CompanyHeader/CompanyHeader';
+import CompanyMainContent from './CompanyMainContent/CompanyMainContent';
+import CompanySidebar from './CompanySidebar/CompanySidebar';
 import {
   shouldShowFeatureHeader,
   shouldShowSidebar,
 } from './companyLayout.helpers';
-import CompanyMainContent from './CompanyMainContent/CompanyMainContent';
-import CompanySidebar from './CompanySidebar/CompanySidebar';
 
 const companySettingPaths = [
   companyPaths.Account,
   companyPaths.Members,
   companyPaths.GroupSetting,
   companyPaths.Logo,
+  companyPaths.Nutrition,
 ];
 const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
@@ -37,29 +37,27 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const showFeatureHeader = shouldShowFeatureHeader(router.pathname);
   const showSidebar = shouldShowSidebar(pathname);
 
-  const currentUser = useAppSelector(currentUserSelector);
-  const companyRefs = useAppSelector(
-    (state) => state.ManageCompaniesPage.companyRefs,
+  const companyList = useAppSelector(
+    (state) => state.BookerCompanies.companies,
     shallowEqual,
   );
-  const { companyList = [] } = CurrentUser(currentUser).getMetadata();
-  const assignedCompanies = filter(companyRefs, (o: any) =>
-    companyList.includes(o.id.uuid),
-  ).reduce((result: any[], cur: TUser) => {
+  const assignedCompanies = companyList.reduce((result: any[], cur: TUser) => {
     return [
       ...result,
       {
         value: User(cur).getId(),
         label: User(cur).getPublicData()?.companyName,
+        logo: User(cur).getProfileImage(),
       },
     ];
   }, []);
+
   const [selectedAccount, setSelectedAccount] = useState<{
     value?: string;
     label?: string;
   }>({});
   const accountOptions = [
-    { value: '', label: 'Cá nhân' },
+    { value: '', label: 'Tài khoản' },
     ...assignedCompanies,
   ];
 
@@ -84,7 +82,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       key: 'cart',
       icon: <FeatureIcons.Cart />,
       title: 'Đặt hàng',
-      pathname: '/',
+      pathname: companyPaths.CreateNewOrder,
     },
     {
       key: 'order',
@@ -105,6 +103,12 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       pathname: '/',
     },
     {
+      key: 'pitoClub',
+      icon: <FeatureIcons.Gift />,
+      title: 'PITO club',
+      pathname: '/',
+    },
+    {
       key: 'introduce',
       icon: <FeatureIcons.UserCirclePlus />,
       title: 'Giới thiệu',
@@ -121,35 +125,43 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
         />
       ),
       query: {
-        ...(selectedAccount.value ? { companyId: selectedAccount.value } : {}),
+        ...(selectedAccount.value
+          ? { companyId: selectedAccount.value }
+          : { companyId: 'personal' }),
       },
-      pathname: selectedAccount.value
-        ? changePathnameByCompanyId()
-        : personalPaths.Account,
+      pathname: selectedAccount.value ? changePathnameByCompanyId() : pathname,
     },
   ];
 
   useEffect(() => {
-    dispatch(manageCompaniesThunks.queryCompanies());
+    dispatch(BookerCompaniesThunks.fetchBookerCompanies());
   }, [dispatch]);
 
   useEffect(() => {
-    if (companyId) {
-      const currentCompany = companyRefs.find(
+    if (companyId && companyId !== 'personal') {
+      const currentCompany = companyList.find(
         (_company) => User(_company).getId() === companyId,
       );
       setSelectedAccount({
-        value: User(currentCompany).getId(),
-        label: User(currentCompany).getPublicData()?.companyName,
+        value: User(currentCompany!).getId(),
+        label: User(currentCompany!).getPublicData()?.companyName,
       });
     }
-  }, [companyId]);
+  }, [companyId, companyList]);
 
+  const companyName =
+    companyId && companyId !== 'personal'
+      ? User(
+          companyList.find(
+            (_company) => User(_company!).getId() === companyId,
+          )!,
+        ).getPublicData()?.companyName
+      : 'Tài khoản cá nhân';
   return (
     <>
-      <CompanyHeader />
+      <CompanyHeader showBottomLine={!showFeatureHeader} />
       {showFeatureHeader && <FeaturesHeader headerData={featureHeaderData} />}
-      {showSidebar && <CompanySidebar />}
+      {showSidebar && <CompanySidebar companyName={companyName!} />}
       <CompanyMainContent
         hasHeader={showFeatureHeader}
         hasSideBar={showSidebar}>

@@ -1,15 +1,17 @@
-import FieldPhotoUpload from '@components/FormFields/FieldPhotoUpload/FieldPhotoUpload';
-import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
-import { nonEmptyImage } from '@utils/validators';
-import classNames from 'classnames';
 import type { ReactNode } from 'react';
 import React from 'react';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import FieldPhotoUpload from '@components/FormFields/FieldPhotoUpload/FieldPhotoUpload';
+import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
+import type { TObject } from '@utils/types';
+import { nonEmptyImage } from '@utils/validators';
 
 import css from './FieldRadioButtonPhoto.module.scss';
 
 type TImageUploadFnReturnValue = {
-  payload: Record<any, any>;
+  payload: TObject;
 };
 
 type TFieldRadioButtonPhoto = {

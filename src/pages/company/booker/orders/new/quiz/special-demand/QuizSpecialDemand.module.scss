@@ -1,0 +1,12 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.formContainer {
+  width: 400px;
+  margin: 0 auto;
+}
+
+.loading {
+  text-align: center;
+}

@@ -1,7 +1,9 @@
-import Modal from '@components/Modal/Modal';
 import { useIntl } from 'react-intl';
 
+import Modal from '@components/Modal/Modal';
+
 import ApplyOtherDaysForm from '../forms/ApplyOtherDaysForm';
+
 import css from './ApplyOtherDaysModal.module.scss';
 
 type TApplyOtherDaysModalProps = {

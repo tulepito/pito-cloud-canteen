@@ -1,7 +1,8 @@
-import type { TCompany, TIntegrationListing, TListing } from '@utils/types';
-import { isEqual } from 'lodash';
 import type { MutableRefObject } from 'react';
 import { useEffect, useRef } from 'react';
+import isEqual from 'lodash/isEqual';
+
+import type { TCompany, TIntegrationListing, TListing } from '@utils/types';
 
 const tabsActive = (
   isNew: boolean,
@@ -15,9 +16,10 @@ const tabsActive = (
   return tabs.reduce((acc, tab) => {
     const previousTabIndex = tabs.findIndex((t) => t === tab) - 1;
     const isActive =
-      previousTabIndex >= 0
-        ? !isNew || tabCompleted(tabs[previousTabIndex], entity)
-        : true;
+      previousTabIndex < 0 ||
+      !isNew ||
+      tabCompleted(tabs[previousTabIndex], entity);
+
     return { ...acc, [tab]: isActive };
   }, {});
 };

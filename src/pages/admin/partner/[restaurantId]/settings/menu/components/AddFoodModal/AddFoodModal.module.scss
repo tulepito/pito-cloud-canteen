@@ -7,13 +7,27 @@
 
 .modal {
   flex-basis: 1100px !important;
-  height: 80vh !important;
+  max-height: 700px !important;
+  position: relative;
+}
+
+.modalContent {
+  overflow: hidden;
 }
 
 .tableContainer {
   flex: 1;
   padding-right: 24px;
-  border-right: 1px solid $neutralGray4;
+  border-right: 1px solid $neutralGray2;
+}
+
+.tableWrapper {
+  overflow-y: auto;
+  height: 430px;
+  max-width: 600px !important;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .pickedFoodContainer {
@@ -21,26 +35,24 @@
   padding-left: 24px;
 }
 
-.keywordForm {
-  margin-bottom: 26px;
+.pickedFoodWrapper {
+  overflow-y: auto;
+  position: relative;
+  height: 400px;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-.tableBodyCell {
-  vertical-align: top;
-}
-
-.tableHeadCell:nth-child(1) {
-  width: 30px;
-}
-
-.title {
-  font-size: 16px;
-  margin-bottom: 30px;
-  font-weight: $fontWeightBold;
+.listChoosenFoods {
+  min-height: 100%;
 }
 
 .modalButton {
   display: flex;
+  background-color: $neutralGray1;
+  position: sticky;
+  bottom: 0px;
   justify-content: center;
   flex-direction: column;
 }
@@ -52,6 +64,42 @@
 
 .button {
   width: 252px;
+}
+
+.keywordForm {
+  margin-bottom: 26px;
+}
+
+.tableBodyCell {
+  padding-left: 5px !important;
+  vertical-align: top;
+  &:last-child {
+    text-align: right !important;
+  }
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.tableHeadCell:nth-child(1) {
+  width: 30px;
+}
+
+.title {
+  font-size: 16px;
+  margin-bottom: 40px;
+  font-weight: $fontWeightBold;
+  position: relative;
+  &::after {
+    content: '';
+    width: 37px;
+    height: 2px;
+    left: 0;
+    bottom: -8px;
+    position: absolute;
+    background-color: $neutralGray6;
+  }
 }
 
 .pagination {
@@ -66,12 +114,17 @@
 .titleRow {
   font-weight: $fontWeightBold;
   color: $neutralGray6;
+  margin-top: 7px;
+}
+
+.sideDishiesIconCheckboxWrapper {
+  margin-right: 10px !important;
 }
 
 .sideDishiesCheckbox {
   label {
     &:nth-child(2) {
-      margin-top: 20px !important;
+      margin-top: 10px !important;
     }
   }
 }
@@ -87,4 +140,28 @@
     width: 12px !important;
     height: 12px !important;
   }
+}
+
+.tableHeadRow {
+  background-color: transparent !important;
+
+  .tableHeadCell {
+    color: $neutralGray5 !important;
+    font-weight: $fontWeightRegular !important;
+    font-size: 12px !important;
+    padding-left: 5px !important;
+    padding-bottom: 0 !important;
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+    &:last-child {
+      text-align: right !important;
+    }
+  }
+}
+
+.description {
+  font-size: 14px;
+  color: $neutralGray5;
 }

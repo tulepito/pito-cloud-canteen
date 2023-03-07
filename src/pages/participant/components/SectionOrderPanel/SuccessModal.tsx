@@ -1,9 +1,11 @@
-import Button from '@components/Button/Button';
-import Modal from '@components/Modal/Modal';
 import { useIntl } from 'react-intl';
 
-import css from './SectionOrderPanel.module.scss';
+import Button from '@components/Button/Button';
+import Modal from '@components/Modal/Modal';
+
 import SuccessImage from './SuccessImage';
+
+import css from './SectionOrderPanel.module.scss';
 
 type TSuccessModal = {
   isOpen: boolean;

@@ -65,7 +65,7 @@
       @include flexAlign(flex-start);
       flex-direction: column;
       width: 100%;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+      border-bottom: 1px solid $neutralGray3;
       padding-left: 12px;
 
       .bodyCell {
@@ -115,12 +115,14 @@
         gap: 24px;
         .bookerCard {
           padding: 12px 20px;
-          border: 2px solid $neutralGray3;
+          border: 1px solid $neutralGray3;
           border-radius: 12px;
           cursor: pointer;
 
           &.selected {
-            border-color: $neutralGray5;
+            border-color: $neutralGray6;
+            border-width: 1.5px;
+            background-color: $neutralGray2;
           }
 
           .profile {
@@ -149,7 +151,7 @@
               }
 
               div {
-                color: $neutralGray4;
+                color: $neutralGray5;
                 margin-left: 8px;
                 @include text(12px, 16px);
                 width: 160px;

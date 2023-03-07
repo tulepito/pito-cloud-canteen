@@ -1,12 +1,15 @@
-import type { TObject } from '@utils/types';
 import type { ReactNode } from 'react';
 import Skeleton from 'react-loading-skeleton';
+
+import type { TObject } from '@utils/types';
 
 import type {
   TCalendarItemCardComponents,
   TDayColumnHeaderProps,
 } from '../../helpers/types';
+
 import WeekView from './WeekView';
+
 import css from './WeekView.module.scss';
 
 const withWeekViewWrapper = ({

@@ -1,3 +1,9 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
+
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -5,10 +11,10 @@ import {
   manageCompaniesThunks,
   paginateCompanies,
 } from '@redux/slices/ManageCompaniesPage.slice';
-import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { orderAsyncActions, removeBookerList } from '@redux/slices/Order.slice';
 import type { TUpdateStatus } from '@src/pages/admin/company/helpers';
 import {
-  filterCompanies,
+  filterCompaniesByCompanyName,
   parseEntitiesToTableData,
   sliceCompanies,
   sortCompanies,
@@ -16,13 +22,9 @@ import {
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { adminPaths } from '@src/paths';
 import { Listing } from '@utils/data';
-import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import ClientTable from '../../create/components/ClientTable/ClientTable';
+
 import css from './ClientSelector.module.scss';
 
 type TClientSelector = {
@@ -33,8 +35,9 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   const { nextTab } = props;
   const router = useRouter();
   const intl = useIntl();
-  const [queryParams, setQueryParams] = useState({});
+  const [queryParams, setQueryParams] = useState<any>({});
   const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
   const { value: isSortAZ, toggle: toggleSort } = useBoolean(true);
   const dispatch = useAppDispatch();
   const { companyRefs, totalItems } = useAppSelector(
@@ -57,35 +60,39 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   const createOrderError = useAppSelector(
     (state) => state.Order.createOrderError,
   );
-  // const fetchBookersError = useAppSelector(
-  //   (state) => state.Order.fetchBookersError,
-  // );
+
   const {
     value: createOrderFailingModalOpen,
     setTrue: openCreateOrderFailingModal,
     setFalse: closeCreateOrderFailingModal,
   } = useBoolean(!!createOrderError);
+
   useEffect(() => {
-    dispatch(paginateCompanies({ page }));
-  }, [dispatch, page]);
+    dispatch(manageCompaniesThunks.queryCompanies());
+    dispatch(removeBookerList());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(paginateCompanies({ page, perPage: pageSize }));
+  }, [dispatch, page, pageSize]);
   useEffect(() => {
     if (createOrderError) {
       openCreateOrderFailingModal();
     }
   }, [createOrderError, openCreateOrderFailingModal]);
-  const updateStatus = useCallback(
-    (updateData: TUpdateStatus) => {
-      dispatch(
-        manageCompaniesThunks.updateCompanyStatus({
-          dataParams: updateData,
-          queryParams: { expand: true },
-        }),
-      );
-    },
-    [dispatch, manageCompaniesThunks],
-  );
+
+  const updateStatus = useCallback((updateData: TUpdateStatus) => {
+    dispatch(
+      manageCompaniesThunks.updateCompanyStatus({
+        dataParams: updateData,
+        queryParams: { expand: true },
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const filteredCompanies = useMemo(
-    () => filterCompanies(companyRefs, queryParams),
+    () => filterCompaniesByCompanyName(companyRefs, queryParams?.companyName),
     [queryParams, companyRefs],
   );
   const sortedCompanies = useMemo(
@@ -93,8 +100,8 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
     [filteredCompanies, isSortAZ],
   );
   const slicesCompanies = useMemo(
-    () => sliceCompanies(sortedCompanies, page),
-    [sortedCompanies, page],
+    () => sliceCompanies(sortedCompanies, page, pageSize),
+    [sortedCompanies, page, pageSize],
   );
   const companiesTableData = useMemo(
     () =>
@@ -113,6 +120,9 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   }, [filteredCompanies.length, queryParams, totalItems]);
   const onPageChange = (value: number) => {
     setPage(value);
+  };
+  const onPageSizeChange = (value: number, pageSizeValue: number) => {
+    setPageSize(pageSizeValue);
   };
   const onItemClick = (id: string) => {
     dispatch(orderAsyncActions.fetchCompanyBookers(id));
@@ -154,9 +164,10 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
           placeholder={intl.formatMessage({
             id: 'ClientSelector.keywordFieldPlaceholder',
           })}
-          searchValue="searchCompanyName"
+          searchValue="companyName"
           onSubmit={(values: any) => {
             setQueryParams(values);
+            setPage(1);
           }}
         />
       </div>
@@ -164,8 +175,10 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
         <ClientTable
           data={companiesTableData}
           page={page}
+          pageSize={pageSize}
           totalItems={totalItemsPagination}
           onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
           onItemClick={onItemClick}
           onSubmit={onSubmit}
           bookerList={bookerList}

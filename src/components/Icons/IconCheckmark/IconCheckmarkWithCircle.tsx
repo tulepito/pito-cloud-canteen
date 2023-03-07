@@ -1,14 +1,16 @@
-import type { TIconProps } from '@utils/types';
 import React from 'react';
 
+import type { TIconProps } from '@utils/types';
+
 const IconCheckmarkWithCircle: React.FC<TIconProps> = (props) => {
-  const { className, width, height } = props;
+  const { className, onClick } = props;
   return (
     <svg
       preserveAspectRatio="none"
       className={className}
-      width={width}
-      height={height}
+      width={26}
+      height={26}
+      onClick={onClick}
       viewBox="0 0 26 26"
       fill="none"
       xmlns="http://www.w3.org/2000/svg">

@@ -1,8 +1,9 @@
-import Button from '@components/Button/Button';
-import { useAppSelector } from '@hooks/reduxHooks';
 import { useState } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage } from 'react-intl';
+
+import Button from '@components/Button/Button';
+import { useAppSelector } from '@hooks/reduxHooks';
 
 import css from './DishSelectionForm.module.scss';
 

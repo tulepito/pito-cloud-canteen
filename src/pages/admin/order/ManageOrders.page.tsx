@@ -1,25 +1,30 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
+import React, { useEffect, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import addDays from 'date-fns/addDays';
+import { useRouter } from 'next/router';
+
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import IconTick from '@components/Icons/IconTick/IconTick';
-import IconTruck from '@components/Icons/IconTruck/IconTruck';
-import IconWarning from '@components/Icons/IconWarning/IconWarning';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
+import StateItem from '@components/TimeLine/StateItem';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { adminRoutes } from '@src/paths';
-import { parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp } from '@utils/dates';
 import {
-  EOrderDetailsStatus,
+  EOrderDraftStates,
   EOrderStates,
   getLabelByKey,
   ORDER_STATES_OPTIONS,
@@ -27,14 +32,9 @@ import {
 import type {
   TIntegrationListing,
   TIntegrationOrderListing,
+  TTableSortValue,
 } from '@utils/types';
 import { parsePrice } from '@utils/validators';
-import classNames from 'classnames';
-import addDays from 'date-fns/addDays';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import css from './ManageOrders.module.scss';
 
@@ -44,24 +44,28 @@ const uniqueStrings = (array: string[]) => {
   });
 };
 
-export const BADGE_TYPE_BASE_ON_ORDER_STATE = {
-  [EOrderStates.inProgress]: EBadgeType.PROCESSING,
-  [EOrderStates.isNew]: EBadgeType.PROCESSING,
-  [EOrderStates.picking]: EBadgeType.WARNING,
-  [EOrderStates.reviewed]: EBadgeType.WARNING,
-  [EOrderStates.completed]: EBadgeType.WARNING,
-  [EOrderStates.canceled]: EBadgeType.DEFAULT,
-  [EOrderStates.draft]: EBadgeType.DEFAULT,
+const BADGE_TYPE_BASE_ON_ORDER_STATE = {
+  [EOrderDraftStates.draft]: EBadgeType.default,
+  [EOrderDraftStates.pendingApproval]: EBadgeType.info,
+  [EOrderStates.canceled]: EBadgeType.default,
+  [EOrderStates.canceledByBooker]: EBadgeType.default,
+  [EOrderStates.completed]: EBadgeType.warning,
+  [EOrderStates.inProgress]: EBadgeType.info,
+  [EOrderStates.pendingPayment]: EBadgeType.info,
+  [EOrderStates.picking]: EBadgeType.warning,
+  [EOrderStates.reviewed]: EBadgeType.warning,
 };
 
-export const BADGE_CLASSNAME_BASE_ON_ORDER_STATE = {
-  [EOrderStates.isNew]: css.badgeProcessing,
-  [EOrderStates.inProgress]: css.badgeInProgress,
+const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
+  [EOrderDraftStates.draft]: css.badgeDefault,
+  [EOrderDraftStates.pendingApproval]: css.badgeProcessing,
+  [EOrderStates.canceled]: css.badgeDefault,
+  [EOrderStates.canceledByBooker]: css.badgeDefault,
   [EOrderStates.completed]: css.badgeSuccess,
+  [EOrderStates.inProgress]: css.badgeInProgress,
+  [EOrderStates.pendingPayment]: css.badgeProcessing,
   [EOrderStates.picking]: css.badgeWarning,
   [EOrderStates.reviewed]: css.badgeWarning,
-  [EOrderStates.canceled]: css.badgeDefault,
-  [EOrderStates.draft]: css.badgeDefault,
 };
 
 const OrderDetailTooltip = ({
@@ -73,48 +77,20 @@ const OrderDetailTooltip = ({
     (prev: any, subOrder: TIntegrationListing) => {
       const { orderDetail = {} } = subOrder.attributes.metadata || {};
       const subOrderDetails = Object.keys(orderDetail).map((key) => {
-        const { foodList = {}, status } = orderDetail[key];
+        const { transaction, restaurant = {} } = orderDetail[key];
+        const { foodList = {} } = restaurant;
         const totalPrice = Object.keys(foodList).reduce((prev, cur) => {
           const price = foodList[cur].foodPrice;
           return prev + price;
         }, 0);
-        const OrderIcon = () => {
-          switch (status) {
-            case EOrderDetailsStatus.cancelled:
-              return (
-                <div className={classNames(css.orderIcon, css.cancelledIcon)}>
-                  <IconWarning />
-                </div>
-              );
-            case EOrderDetailsStatus.delivered:
-              return (
-                <div className={classNames(css.orderIcon, css.deliveredIcon)}>
-                  <IconTruck />
-                </div>
-              );
-            case EOrderDetailsStatus.received:
-              return (
-                <div className={classNames(css.orderIcon, css.receivedIcon)}>
-                  <IconTick />
-                </div>
-              );
-            default:
-              return (
-                <div
-                  className={classNames(css.orderIcon, css.pendingIcon)}></div>
-              );
-          }
-        };
 
         return (
           <div key={key} className={css.orderDetailTooltipItem}>
-            <OrderIcon />
-            <span>
-              <span className={css.orderDate}>
-                {parseTimestampToFormat(Number(key))}
-              </span>
-              : {parsePrice(String(totalPrice))}đ
-            </span>
+            <StateItem
+              className={css.stateItem}
+              data={{ tx: transaction, date: formatTimestamp(Number(key)) }}
+            />
+            <span>{parsePrice(String(totalPrice))}đ</span>
           </div>
         );
       });
@@ -223,19 +199,15 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'state',
     label: 'Trạng thái',
-    render: ({
-      state,
-    }: {
-      state: Exclude<EOrderStates, EOrderStates.draft>;
-    }) => {
+    render: ({ state }: { state: EOrderStates | EOrderDraftStates }) => {
       return (
         <Badge
           containerClassName={classNames(
             css.badge,
-            BADGE_CLASSNAME_BASE_ON_ORDER_STATE[state],
+            BADGE_CLASS_NAME_BASE_ON_ORDER_STATE[state],
           )}
           labelClassName={css.badgeLabel}
-          type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.DEFAULT}
+          type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.default}
           label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
         />
       );
@@ -250,7 +222,7 @@ const TABLE_COLUMN: TColumn[] = [
         <Badge
           containerClassName={css.badge}
           labelClassName={css.badgeLabel}
-          type={isPaid ? EBadgeType.SUCCESS : EBadgeType.WARNING}
+          type={isPaid ? EBadgeType.success : EBadgeType.warning}
           label={isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}
         />
       );
@@ -297,10 +269,10 @@ const parseEntitiesToTableData = (
         location: deliveryAddress?.address,
         companyName: company?.attributes.profile.displayName,
         bookerName: booker?.attributes.profile.displayName,
-        startDate: startDate && parseTimestampToFormat(startDate),
-        endDate: endDate && parseTimestampToFormat(endDate),
+        startDate: startDate && formatTimestamp(startDate),
+        endDate: endDate && formatTimestamp(endDate),
         staffName,
-        state: orderState || EOrderStates.isNew,
+        state: orderState || EOrderDraftStates.pendingApproval,
         orderId: entity?.id?.uuid,
         restaurants,
         subOrders,
@@ -311,12 +283,7 @@ const parseEntitiesToTableData = (
   });
 };
 
-type TSortValue = {
-  columnName: string | number;
-  type: 'asc' | 'desc';
-};
-
-const sortOrders = ({ columnName, type }: TSortValue, data: any) => {
+const sortOrders = ({ columnName, type }: TTableSortValue, data: any) => {
   const isAsc = type === 'asc';
   // eslint-disable-next-line array-callback-return
   return data.sort((a: any, b: any) => {
@@ -348,7 +315,7 @@ const ManageOrdersPage = () => {
     meta_endDate,
     meta_startDate,
   } = router.query;
-  const [sortValue, setSortValue] = useState<TSortValue>();
+  const [sortValue, setSortValue] = useState<TTableSortValue>();
   const {
     queryOrderInProgress,
     queryOrderError,
@@ -383,6 +350,8 @@ const ManageOrdersPage = () => {
           tableBodyCellClassName={css.bodyCell}
           handleSort={handleSort}
           sortValue={sortValue}
+          tableWrapperClassName={css.tableWrapper}
+          tableClassName={css.table}
         />
       </>
     );
@@ -419,6 +388,10 @@ const ManageOrdersPage = () => {
       }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(resetOrder());
   }, [dispatch]);
 
   const onClearFilter = () => {
@@ -505,7 +478,6 @@ const ManageOrdersPage = () => {
                     name="meta_startDate"
                     selected={values.meta_startDate}
                     onChange={setStartDate}
-                    className={css.inputDate}
                     dateFormat={'dd MMMM, yyyy'}
                     placeholderText={'Nhập ngày bắt đầu'}
                     autoComplete="off"
@@ -515,7 +487,6 @@ const ManageOrdersPage = () => {
                     name="meta_endDate"
                     onChange={setEndDate}
                     selected={values.meta_endDate}
-                    className={css.inputDate}
                     dateFormat={'dd MMMM, yyyy'}
                     placeholderText={'Nhập ngày kết thúc'}
                     autoComplete="off"

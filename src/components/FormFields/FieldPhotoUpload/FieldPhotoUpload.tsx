@@ -1,3 +1,9 @@
+import type { ChangeEvent } from 'react';
+import React, { useState } from 'react';
+import { Field } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconClose from '@components/Icons/IconClose/IconClose';
@@ -6,12 +12,12 @@ import IconUpload from '@components/Icons/IconUpload/IconUpload';
 import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { isUploadImageOverLimitError } from '@utils/errors';
-import type { TDefaultProps, TImage, TImageVariant } from '@utils/types';
-import classNames from 'classnames';
-import type { ChangeEvent } from 'react';
-import React, { useState } from 'react';
-import { Field } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
+import type {
+  TDefaultProps,
+  TImage,
+  TImageVariant,
+  TObject,
+} from '@utils/types';
 
 import css from './FieldPhotoUpload.module.scss';
 
@@ -81,8 +87,8 @@ const PhotoWithOverlay = (props: TPhotoWithOverlay) => {
   );
 };
 
-export type TImageUploadFnReturnValue = {
-  payload: Record<any, any>;
+type TImageUploadFnReturnValue = {
+  payload: TObject;
 };
 
 type TFieldPhotoUpload = {
@@ -96,7 +102,7 @@ type TFieldPhotoUpload = {
   disabled?: boolean;
   className?: string;
   variants: string[];
-  uploadImageError: any;
+  uploadImageError?: any;
   name: string;
   id: string;
   validate?: any;

@@ -1,15 +1,19 @@
-import { isOrderOverDeadline } from '@helpers/orderHelper';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { shoppingCartThunks } from '@redux/slices/shopingCart.slice';
 import { useState } from 'react';
 
+import { isOrderOverDeadline } from '@helpers/orderHelper';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
+import type { RootState } from '@redux/store';
+
 import { ParticipantPlanThunks } from '../../plans/[planId]/ParticipantPlanPage.slice';
+
 import DeleteCartModal from './DeleteCartModal';
 import OrderPanelBody from './OrderPanelBody';
 import OrderPanelFooter from './OrderPanelFooter';
 import OrderPanelHeader from './OrderPanelHeader';
-import css from './SectionOrderPanel.module.scss';
 import SuccessModal from './SuccessModal';
+
+import css from './SectionOrderPanel.module.scss';
 
 type TSectionOrderPanelProps = {
   planId: string;
@@ -20,10 +24,10 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   planId,
   orderId,
 }) => {
-  const cartList = useAppSelector((state: any) => {
+  const cartList = useAppSelector((state: RootState) => {
     const { currentUser } = state.user;
     const currUserId = currentUser?.id?.uuid;
-    return state.shopingCart.orders?.[currUserId]?.[planId || 1];
+    return state.shoppingCart.orders?.[currUserId]?.[planId || 1];
   });
   const order = useAppSelector((state) => state.ParticipantPlanPage.order);
   const plan = useAppSelector((state) => state.ParticipantPlanPage.plan);
@@ -36,7 +40,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
 
   const orderDays = Object.keys(plan);
   const cartListKeys = Object.keys(cartList || []).filter(
-    (cartKey) => !!cartList[cartKey],
+    (cartKey) => !!cartList[Number(cartKey)],
   );
 
   const isOrderDeadlineOver = isOrderOverDeadline(order);

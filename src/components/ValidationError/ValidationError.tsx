@@ -1,13 +1,14 @@
-import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
 import type { FC } from 'react';
 import React from 'react';
+import classNames from 'classnames';
+
+import type { TDefaultProps } from '@utils/types';
 
 import css from './ValidationError.module.scss';
 
 type TFieldMeta = {
   touched?: boolean;
-  error?: boolean;
+  error?: any;
 };
 type ValidationErrorProps = TDefaultProps & {
   fieldMeta: TFieldMeta;

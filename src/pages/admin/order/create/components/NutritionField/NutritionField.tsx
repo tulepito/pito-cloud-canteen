@@ -1,31 +1,37 @@
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import { nutritionOptions } from '@src/marketplaceConfig';
-import { useIntl } from 'react-intl';
 
 import css from './NutritionField.module.scss';
 
 type NutritionFieldProps = {
   title?: string;
+  titleClassName?: string;
+  fieldClassName?: string;
+  options?: { key: string; label: string }[];
 };
 
 const NutritionField: React.FC<NutritionFieldProps> = (props) => {
-  const { title } = props;
+  const { title, titleClassName, fieldClassName, options } = props;
   const intl = useIntl();
   return (
     <div className={css.container}>
       {title && (
-        <div className={css.fieldTitle}>
+        <div className={classNames(css.fieldTitle, titleClassName)}>
           {intl.formatMessage({ id: 'NutritionField.title' })}
         </div>
       )}
-      <div className={css.fieldGroups}>
-        {nutritionOptions.map(({ key, label }) => (
+      <div className={classNames(css.fieldGroups, fieldClassName)}>
+        {(options || nutritionOptions).map(({ key, label }) => (
           <FieldCheckbox
             key={key}
             id={`nutritions-${key}`}
             name="nutritions"
             value={key}
             label={intl.formatMessage({ id: label })}
+            className={css.field}
           />
         ))}
       </div>

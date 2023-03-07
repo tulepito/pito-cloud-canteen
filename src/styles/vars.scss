@@ -3,13 +3,14 @@
 $primaryPri1: #ffecea;
 $primaryPri2: #ef3d2a;
 $buttonCTAHoverColor: #ff9f95;
+$black: #000000;
 
 /* =============== Neutral =============== */
 
 $neutralGray1: #ffffff;
 $neutralGray2: #fafafa;
 $neutralGray3: #f0f0f0;
-$neutralGray4: #d9d9d9;
+$neutralGray4: #bfbfbf;
 $neutralGray5: #8c8c8c;
 $neutralGray6: #262626;
 
@@ -17,15 +18,18 @@ $neutralGray6: #262626;
 
 $sematicRed1: #fff1f0;
 $sematicRed2: #cf1322;
-$sematicGreen1: #f0ffe0;
-$sematicGreen2: #027a48;
+$sematicGreen1: #ebffd6;
+$sematicGreen2: #65db63;
 
 /* =============== Label =============== */
 
 $labelBlue1: #f0f5ff;
 $labelBlue2: #2f54eb;
+$labelDarkBlue: #171760;
 $labelOrange1: #fff4db;
-$labelOrange2: #d46b08;
+$labelOrange2: #ffb13d;
+$labelYellow1: #feffdb;
+$labelYellow2: #fadb14;
 
 /* ===============  =============== */
 
@@ -79,3 +83,8 @@ $adminSidebarLeftPartWidth: 60px;
 $adminSidebarRightPartWidth: 220px;
 
 $marketplaceButtonSmallDesktopPadding: 9px 16px 9px 16px;
+
+$singleUseTabRed: #db4a37;
+$singleUseTableTanColor: #fbefd2;
+$singleUseBadgeGreen1: #ebffd6;
+$singleUseBadgeGreen2: #65db63;

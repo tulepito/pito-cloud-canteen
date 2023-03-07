@@ -1,10 +1,11 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import CryptoJS from 'crypto-js';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import { ECompanyStatus } from '@utils/enums';
-import CryptoJS from 'crypto-js';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -12,7 +13,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const sdk = getSdk(req, res);
 
-    const intergrationSdk = getIntegrationSdk();
+    const integrationSdk = getIntegrationSdk();
     const { metadata, ...dataParamsWithoutMetadata } = dataParams;
     // Create company account
     const companyResponse = await sdk.currentUser.create(
@@ -34,7 +35,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     // Add sub master account to master account
     const masterAccountAfterUpdateResponse =
-      await intergrationSdk.users.updateProfile(
+      await integrationSdk.users.updateProfile(
         {
           id: companyAccount.id,
           privateData: {
@@ -42,7 +43,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
           metadata: {
             isCompany: true,
-            status: ECompanyStatus.unactive,
+            status: ECompanyStatus.active,
             ...metadata,
           },
         },
@@ -55,7 +56,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     ).toString();
 
     // Update sub master account password
-    await intergrationSdk.users.updateProfile({
+    await integrationSdk.users.updateProfile({
       id: subAccount.id,
       privateData: {
         accountPassword: encryptedPassword,
@@ -69,4 +70,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   }
 }
 
-export default cookies(handler);
+export default cookies(adminChecker(handler));

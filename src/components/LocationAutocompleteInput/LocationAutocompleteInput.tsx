@@ -1,11 +1,13 @@
-import ValidationError from '@components/ValidationError/ValidationError';
-import classNames from 'classnames';
 import React from 'react';
 import { Field } from 'react-final-form';
+import classNames from 'classnames';
 
-import css from './LocationAutocompleteInput.module.scss';
+import ValidationError from '@components/ValidationError/ValidationError';
+
 // eslint-disable-next-line import/extensions
 import LocationAutocompleteInputImpl from './LocationAutocompleteInputImpl.tsx';
+
+import css from './LocationAutocompleteInput.module.scss';
 
 export const LocationAutocompleteInputComponent: React.FC<any> = (props) => {
   /* eslint-disable no-unused-vars */

@@ -1,9 +1,10 @@
+import React from 'react';
+
 import AdminLayout from '@components/Layout/AdminLayout/AdminLayout';
 import CompanyLayout from '@components/Layout/CompanyLayout/CompanyLayout';
 import GeneralLayout from '@components/Layout/GeneralLayout/Layout';
 import { adminPaths, companyPaths, generalPaths } from '@src/paths';
 import { EUserPermission, startRouteBaseOnPermission } from '@utils/enums';
-import React from 'react';
 
 export const getLayoutBaseOnPermission = (permission: EUserPermission) => {
   switch (permission) {

@@ -7,9 +7,9 @@
   .toggle {
     position: relative;
     display: inline-flex;
-    min-width: 40px;
-    width: 40px;
-    height: 24px;
+    min-width: 36px;
+    width: 36px;
+    height: 18px;
     -webkit-tap-highlight-color: transparent;
     & input {
       opacity: 0;
@@ -18,17 +18,17 @@
       height: 0;
 
       &:checked + .slider {
-        background-color: $primaryPri2;
+        background-color: $neutralGray6;
       }
 
       &:focus + .slider {
-        box-shadow: 0 0 1px $primaryPri2;
+        box-shadow: 0 0 1px $neutralGray6;
       }
 
       &:checked + .slider:before {
-        -webkit-transform: translateX(16px);
-        -ms-transform: translateX(16px);
-        transform: translateX(16px);
+        -webkit-transform: translateX(18px);
+        -ms-transform: translateX(18px);
+        transform: translateX(18px);
       }
     }
   }
@@ -49,10 +49,10 @@
   &:before {
     position: absolute;
     content: '';
-    height: 16px;
-    width: 16px;
-    left: 4px;
-    bottom: 4px;
+    height: 14px;
+    width: 14px;
+    left: 2px;
+    bottom: 2px;
     background-color: $neutralGray1;
     -webkit-transition: 0.4s;
     transition: 0.4s;

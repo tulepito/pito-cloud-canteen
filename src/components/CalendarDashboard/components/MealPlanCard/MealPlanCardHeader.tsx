@@ -1,20 +1,25 @@
-import IconClose from '@components/Icons/IconClose/IconClose';
-import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
-import IconUser from '@components/Icons/IconUser/IconUser';
 import { useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
+import IconClose from '@components/Icons/IconClose/IconClose';
+import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
+import IconUser from '@components/Icons/IconUser/IconUser';
+import { formatTimestamp } from '@utils/dates';
+
 import DeleteMealModal from './components/DeleteMealModal';
+
 import css from './MealPlanCard.module.scss';
 
 type TMealPlanCardHeaderProps = {
   event: Event;
+  removeInprogress?: boolean;
   removeEventItem?: (resourceId: string) => void;
 };
 
 const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
   event,
+  removeInprogress,
   removeEventItem,
 }) => {
   const session = event.resource?.daySession;
@@ -47,9 +52,12 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
         <IconMagnifier className={css.searchIcon} />
       </div>
       <DeleteMealModal
+        id="DeleteMealModal"
         isOpen={isOpenDeleteModal}
         onClose={handleCloseDeleteModal}
         onDelete={handleDelete}
+        removeInprogress={removeInprogress}
+        deleteDate={formatTimestamp(event.start?.getTime(), 'dd MMMM')}
       />
     </div>
   );

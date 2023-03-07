@@ -1,8 +1,8 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { handleError } from '@services/sdk';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const { userId } = req.query;

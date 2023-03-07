@@ -1,3 +1,9 @@
+import React, { Fragment, useEffect, useState } from 'react';
+import { Field } from 'react-final-form';
+import { FieldArray } from 'react-final-form-arrays';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import { InlineTextButton } from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
@@ -7,11 +13,6 @@ import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import ValidationError from '@components/ValidationError/ValidationError';
 import { isUploadImageOverLimitError } from '@utils/errors';
 import { getInitialAddImages } from '@utils/images';
-import classNames from 'classnames';
-import React, { Fragment, useEffect, useState } from 'react';
-import { Field } from 'react-final-form';
-import { FieldArray } from 'react-final-form-arrays';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './FieldMultiplePhotos.module.scss';
 

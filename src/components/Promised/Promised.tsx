@@ -7,8 +7,9 @@
  */
 
 /* eslint-disable no-underscore-dangle */
-import useBoolean from '@hooks/useBoolean';
 import { useEffect, useState } from 'react';
+
+import useBoolean from '@hooks/useBoolean';
 
 type TPromised = {
   promise: Promise<any>;

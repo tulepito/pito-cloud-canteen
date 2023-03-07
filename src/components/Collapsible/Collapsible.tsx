@@ -1,10 +1,11 @@
+import type { PropsWithChildren, ReactNode } from 'react';
+import React from 'react';
+import classNames from 'classnames';
+
 import { InlineTextButton } from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import useBoolean from '@hooks/useBoolean';
 import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
-import type { PropsWithChildren, ReactNode } from 'react';
-import React from 'react';
 
 import css from './Collapsible.module.scss';
 

@@ -1,21 +1,26 @@
-import { types as sdkLoader } from '@sharetribe/sdk';
-import type { adminRoutes } from '@src/paths';
 import type Decimal from 'decimal.js';
 import type { NextPage } from 'next';
 
+import { types as sdkLoader } from '@sharetribe/sdk';
+import type { adminRoutes } from '@src/paths';
+
 import type {
   EAvailabilityPlans,
+  EBookerOrderDraftStates,
   EBookingStates,
   EDayOfWeek,
   EErrorCode,
   EImageVariants,
   EListingStates,
+  EOrderDraftStates,
+  EOrderStates,
   EReviewRatings,
   EReviewTypes,
   ETimeSlots,
   ETransactionRoles,
   ETxTransitionActors,
 } from './enums';
+import type { ETransition } from './transaction';
 
 const { UUID, LatLng, Money } = sdkLoader;
 
@@ -313,7 +318,7 @@ export type TTransition = {
   createdAt: Date;
   by: TTxTransitionActors;
   // Transition will define later
-  transition: string[];
+  transition: ETransition;
 };
 
 export type TReviewRating = EReviewRatings;
@@ -347,10 +352,18 @@ export type TLineItem = {
   reversal: boolean;
 };
 
+export type TTransactionReviews = {
+  [participantId: string]: {
+    reviewContent: string;
+    reviewRating: number;
+    authorId: string;
+  };
+};
+
 export type TTransactionAttributes = {
   createdAt?: Date;
   lastTransitionedAt: Date;
-  lastTransition: string;
+  lastTransition: ETransition;
 
   // An enquiry won't need a total sum nor a booking so these are
   // optional.
@@ -358,6 +371,12 @@ export type TTransactionAttributes = {
   payoutTotal?: typeof Money;
   lineItems: TLineItem[];
   transitions: TTransition[];
+  metadata: {
+    orderId: string;
+    planId: string;
+    participantIds?: string[];
+    reviews?: TTransactionReviews;
+  };
 };
 
 export type TTransaction = {
@@ -485,4 +504,14 @@ export type TCompanyGroup = {
     id: string | null;
     email: string;
   }[];
+};
+
+export type TTableSortValue = {
+  columnName: string | number;
+  type: 'asc' | 'desc';
+};
+
+export type TOrderStateHistory = {
+  state: EOrderStates | EOrderDraftStates | EBookerOrderDraftStates;
+  updatedAt: number;
 };

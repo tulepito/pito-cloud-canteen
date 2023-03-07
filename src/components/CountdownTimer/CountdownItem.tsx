@@ -1,5 +1,5 @@
-import type { Duration } from 'luxon';
 import { FormattedMessage } from 'react-intl';
+import type { Duration } from 'luxon';
 
 import css from './CountdownTimer.module.scss';
 

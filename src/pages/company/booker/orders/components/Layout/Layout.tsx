@@ -1,5 +1,5 @@
-import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';
+import classNames from 'classnames';
 
 import css from './Layout.module.scss';
 

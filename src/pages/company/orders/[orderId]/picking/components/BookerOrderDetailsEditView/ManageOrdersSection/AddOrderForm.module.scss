@@ -1,0 +1,51 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  margin-top: 8px;
+  order: 4;
+
+  .fieldsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 12px;
+    align-items: center;
+    .fieldContainer {
+      display: inline-block;
+      flex: 1 1 100%;
+
+      @include viewportMedium {
+        flex: unset;
+      }
+
+      .fieldSelect {
+        display: inline-block;
+        width: 100%;
+
+        @include viewportMedium {
+          width: 240px;
+        }
+      }
+    }
+
+    .submitButton {
+      display: inline-block;
+      min-height: unset;
+      height: 44px;
+      flex: 1 1 100%;
+
+      @include viewportMedium {
+        flex: unset;
+        flex-basis: 80px;
+      }
+    }
+  }
+
+  .addRequirementContainer {
+    .buttonContent {
+      display: flex;
+      column-gap: 8px;
+      align-items: center;
+    }
+  }
+}

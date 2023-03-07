@@ -1,8 +1,9 @@
-import { Listing } from '@utils/data';
-import { DateTime } from 'luxon';
 import React from 'react';
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
+import { DateTime } from 'luxon';
+
+import { Listing } from '@utils/data';
 
 import css from './SectionRestaurantHero.module.scss';
 

@@ -1,35 +1,42 @@
-import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
-import IconDelivering from '@components/Icons/IconDelivering/IconDelivering';
-import IconPending from '@components/Icons/IconPending/IconPending';
 import classNames from 'classnames';
 
-import css from './StateItem.module.scss';
+import IconCancel from '@components/Icons/IconCancel/IconCancel';
+import IconDelivering from '@components/Icons/IconDelivering/IconDelivering';
+import IconFail from '@components/Icons/IconFail/IconFail';
+import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
+import {
+  txIsCanceled,
+  txIsCompleted,
+  txIsDelivering,
+  txIsDeliveryFailed,
+  txIsInitiated,
+} from '@utils/transaction';
+
 import type { TTimeLineItemProps } from './types';
+
+import css from './StateItem.module.scss';
 
 type TStateItemProps = TTimeLineItemProps;
 
 const StateItem: React.FC<TStateItemProps> = ({
-  data: { date, state },
+  data: { date, tx },
   rootClassName,
   className,
 }) => {
   const rootClasses = classNames(rootClassName || css.root, className);
 
-  let stateComponent;
+  let stateComponent = <div className={classNames(css.icon, css.iconEmpty)} />;
 
-  switch (state) {
-    case 'pending':
-      stateComponent = <IconCheckWithBackground className={css.state} />;
-      break;
-    case 'delivering':
-      stateComponent = <IconDelivering className={css.state} />;
-      break;
-    case 'completed':
-      stateComponent = <IconPending className={css.state} />;
-      break;
-    default:
-      stateComponent = <div className={classNames(css.icon, css.iconEmpty)} />;
-      break;
+  if (txIsInitiated(tx)) {
+    //
+  } else if (txIsCompleted(tx)) {
+    stateComponent = <IconTickWithBackground className={css.icon} />;
+  } else if (txIsDelivering(tx)) {
+    stateComponent = <IconDelivering className={css.icon} />;
+  } else if (txIsDeliveryFailed(tx)) {
+    stateComponent = <IconFail className={css.icon} />;
+  } else if (txIsCanceled(tx)) {
+    stateComponent = <IconCancel className={css.icon} />;
   }
 
   return (

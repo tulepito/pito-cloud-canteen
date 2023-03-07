@@ -1,8 +1,9 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -51,4 +52,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   }
 }
 
-export default cookies(handler);
+export default cookies(adminChecker(handler));

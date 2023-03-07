@@ -1,9 +1,11 @@
-import { InlineTextButton } from '@components/Button/Button';
-import IconClose from '@components/Icons/IconClose/IconClose';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import { InlineTextButton } from '@components/Button/Button';
+import IconClose from '@components/Icons/IconClose/IconClose';
+
 import type { TEditMenuPricingCalendarResources } from '../EditPartnerMenuWizard/utils';
+
 import css from './FoodEventCard.module.scss';
 
 const FoodEventCard = ({
@@ -12,12 +14,7 @@ const FoodEventCard = ({
   event: { resource: TEditMenuPricingCalendarResources; start: Date };
 }) => {
   const { resource, start } = event;
-  const {
-    title,
-    onRemovePickedFood,
-    hideRemoveButton,
-    sideDishes = [],
-  } = resource;
+  const { title, onRemovePickedFood, sideDishes = [] } = resource;
   return (
     <div className={css.root}>
       <div className={css.title}>
@@ -37,16 +34,14 @@ const FoodEventCard = ({
           </div>
         )}
       </div>
-      {!hideRemoveButton && (
-        <InlineTextButton
-          type="button"
-          onClick={() =>
-            onRemovePickedFood && onRemovePickedFood(resource.id, start)
-          }
-          className={css.buttonClose}>
-          <IconClose rootClassName={css.iconClose} />
-        </InlineTextButton>
-      )}
+      <InlineTextButton
+        type="button"
+        onClick={() =>
+          onRemovePickedFood && onRemovePickedFood(resource.id, start)
+        }
+        className={css.buttonClose}>
+        <IconClose rootClassName={css.iconClose} />
+      </InlineTextButton>
     </div>
   );
 };

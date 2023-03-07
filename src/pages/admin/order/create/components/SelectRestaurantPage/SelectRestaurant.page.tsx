@@ -1,3 +1,8 @@
+import { useEffect, useRef, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import { DateTime } from 'luxon';
+
 import Badge from '@components/Badge/Badge';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Pagination from '@components/Pagination/Pagination';
@@ -5,33 +10,35 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { Listing } from '@utils/data';
-import type { TListing } from '@utils/types';
-import { DateTime } from 'luxon';
-import { useEffect, useRef, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
+import type { TListing, TObject } from '@utils/types';
 
 // eslint-disable-next-line import/no-cycle
 import type { TSelectFoodFormValues } from '../SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
 import SelectFoodModal from '../SelectFoodModal/SelectFoodModal';
+
 import RestaurantTable from './components/RestaurantTable/RestaurantTable';
 import SearchRestaurantForm from './components/SearchRestaurantForm/SearchRestaurantForm';
+
 import css from './SelectRestaurantPage.module.scss';
 
 const DEBOUNCE_TIME = 500;
 
 type TSelectRestaurantPageProps = {
-  onSubmitRestaurant: (values: Record<string, any>) => void;
+  onSubmitRestaurant: (values: TObject) => void;
   selectedDate: Date;
   onBack: () => void;
+  selectFoodInProgress: boolean;
 };
 
 const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   onSubmitRestaurant,
   selectedDate,
   onBack,
+  selectFoodInProgress,
 }) => {
   const [currentRestaurant, setCurrentRestaurant] = useState<any>();
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
   const intl = useIntl();
   const { value: isModalOpen, setValue: setModalOpen } = useBoolean();
   const dispatch = useAppDispatch();
@@ -61,13 +68,9 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     nutritions = [],
   } = Listing(order as TListing).getMetadata();
   const shouldShowRestaurantPagination =
-    !!restaurants && restaurants?.length > 0 && fetchRestaurantsPending;
-  const {
-    totalItems: total,
-    page: current,
-    perPage: pageSize = 100,
-  } = pagination || {};
-  const paginationProps = { total, current, pageSize };
+    !!restaurants && restaurants?.length > 0 && !fetchRestaurantsPending;
+  const { totalItems: total } = pagination || {};
+  const paginationProps = { total, current: page, pageSize: perPage };
   const showModalCondition = isModalOpen && !fetchFoodPending;
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
@@ -84,15 +87,33 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     },
   );
 
-  const handlePageChange = (page: number) => {
-    const params = {
-      page,
-      dateTime,
-      packagePerMember,
-      deliveryHour,
-      nutritions,
-    };
-    dispatch(selectRestaurantPageThunks.getRestaurants(params));
+  useEffect(() => {
+    dispatch(
+      selectRestaurantPageThunks.getRestaurants({
+        dateTime: dateTime.toMillis(),
+        packagePerMember,
+        deliveryHour,
+        nutritions,
+        page,
+        perPage,
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    packagePerMember,
+    deliveryHour,
+    JSON.stringify(nutritions),
+    dispatch,
+    page,
+    perPage,
+  ]);
+
+  const handlePageChange = (pageValue: number) => {
+    setPage(pageValue);
+  };
+
+  const handlePerPageChange = (pageValue: number, perPageValue: number) => {
+    setPerPage(perPageValue);
   };
 
   const handleCloseModal = () => {
@@ -108,7 +129,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     currDebounceRef = setTimeout(() => {
       dispatch(
         selectRestaurantPageThunks.getRestaurants({
-          dateTime,
+          dateTime: dateTime.toMillis(),
           title,
           packagePerMember,
           deliveryHour,
@@ -118,7 +139,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     }, DEBOUNCE_TIME);
   };
 
-  const handleSelectFood = (values: TSelectFoodFormValues) => {
+  const handleSelectFood = async (values: TSelectFoodFormValues) => {
     const { food: foodIds } = values;
 
     const currRestaurantId = currentRestaurant?.id?.uuid;
@@ -141,9 +162,12 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       id: currRestaurantId,
       restaurantName: currentRestaurant?.attributes?.title,
       phoneNumber: currentRestaurant?.attributes?.publicData?.phoneNumber,
+      menuId: restaurants?.find(
+        (restaurant) => restaurant.restaurantInfo.id.uuid === currRestaurantId,
+      ).menu.id.uuid,
     };
 
-    onSubmitRestaurant({
+    await onSubmitRestaurant({
       restaurant: submitRestaurantData,
       selectedFoodList: submitFoodListData,
     });
@@ -162,17 +186,6 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     setCurrentRestaurant(restaurantInfo);
     setModalOpen(true);
   };
-
-  useEffect(() => {
-    dispatch(
-      selectRestaurantPageThunks.getRestaurants({
-        dateTime,
-        packagePerMember,
-        deliveryHour,
-        nutritions,
-      }),
-    );
-  }, [deliveryHour, dispatch, nutritions, packagePerMember]);
 
   return (
     <section className={css.root}>
@@ -197,7 +210,12 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       />
       {shouldShowRestaurantPagination && (
         <div className={css.paginationContainer}>
-          <Pagination {...paginationProps} onChange={handlePageChange} />
+          <Pagination
+            showSizeChanger
+            {...paginationProps}
+            onChange={handlePageChange}
+            onShowSizeChange={handlePerPageChange}
+          />
         </div>
       )}
       <SelectFoodModal
@@ -206,6 +224,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
         isOpen={showModalCondition}
         handleClose={handleCloseModal}
         handleSelectFood={handleSelectFood}
+        selectFoodInProgress={selectFoodInProgress}
       />
     </section>
   );

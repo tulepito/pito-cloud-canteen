@@ -1,11 +1,13 @@
+import { useEffect } from 'react';
+import { useIntl } from 'react-intl';
+
 import { useAppDispatch } from '@hooks/reduxHooks';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { companyThunks } from '@redux/slices/company.slice';
 import { resetImage } from '@redux/slices/uploadImage.slice';
-import { useEffect } from 'react';
-import { useIntl } from 'react-intl';
 
 import UploadImageForm from './components/UploadImageForm/UploadImageForm';
+
 import css from './LogoSetting.module.scss';
 
 const LogoSettingPage = () => {

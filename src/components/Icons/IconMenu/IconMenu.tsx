@@ -1,11 +1,12 @@
-import type { TIconProps } from '@utils/types';
-import classNames from 'classnames';
 import React from 'react';
+import classNames from 'classnames';
+
+import type { TIconProps } from '@utils/types';
 
 import css from './IconMenu.module.scss';
 
 const IconMenu: React.FC<TIconProps> = (props) => {
-  const { rootClassName, className } = props;
+  const { rootClassName, className, onClick } = props;
   const classes = classNames(rootClassName || css.root, className);
 
   return (
@@ -14,6 +15,7 @@ const IconMenu: React.FC<TIconProps> = (props) => {
       viewBox="0 0 20 20"
       fill="none"
       className={classes}
+      onClick={onClick}
       xmlns="http://www.w3.org/2000/svg">
       <mask
         id="mask0_3330_1008"

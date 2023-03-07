@@ -1,22 +1,22 @@
-/* eslint-disable no-console */
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import cookies from '@services/cookie';
-import { getIntegrationSdk, handleError } from '@services/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
+import { getIntegrationSdk, handleError } from '@services/sdk';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const { dataParams, queryParams = {} } = req.body;
-    const intergrationSdk = getIntegrationSdk();
-    const response = await intergrationSdk.listings.update(
+    const integrationSdk = getIntegrationSdk();
+    const response = await integrationSdk.listings.update(
       dataParams,
       queryParams,
     );
-    res.json(response);
+    return res.status(200).json(response);
   } catch (error) {
     console.error(error);
-    handleError(res, error);
+    return handleError(res, error);
   }
 }
 
-export default cookies(handler);
+export default cookies(adminChecker(handler));

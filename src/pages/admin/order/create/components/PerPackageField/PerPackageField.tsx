@@ -1,13 +1,14 @@
+import { Field } from 'react-final-form';
+import { useIntl } from 'react-intl';
+
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import Toggle from '@components/Toggle/Toggle';
 import { parseThousandNumber } from '@helpers/format';
 import {
   composeValidators,
-  nonNegativeValue,
+  greaterThanOneThousand,
   required,
 } from '@utils/validators';
-import { Field } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import css from './PerPackageField.module.scss';
 
@@ -25,8 +26,8 @@ const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
   const perPackRequiredMessage = intl.formatMessage({
     id: 'PerPackageField.perPackRequired',
   });
-  const perPackNonNegativeMessage = intl.formatMessage({
-    id: 'PerPackageField.perPackNonNegative',
+  const perPackGreaterThanOneThousandMessage = intl.formatMessage({
+    id: 'PerPackageField.perPackGreaterThanOneThousand',
   });
 
   return (
@@ -48,7 +49,7 @@ const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
           rightIcon={<VNDIcon />}
           validate={composeValidators(
             required(perPackRequiredMessage),
-            nonNegativeValue(perPackNonNegativeMessage),
+            greaterThanOneThousand(perPackGreaterThanOneThousandMessage),
           )}
         />
 

@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import React, { useMemo } from 'react';
+import { useRouter } from 'next/router';
+
 import { adminRoutes } from '@src/paths';
 import { EListingStates, OTHER_OPTION } from '@utils/enums';
 import { parsePrice } from '@utils/validators';
-import { useRouter } from 'next/router';
-import React, { useMemo } from 'react';
 
 import EditPartnerBasicInformationForm from '../EditPartnerBasicInformationForm/EditPartnerBasicInformationForm';
 import EditPartnerLicenseForm from '../EditPartnerLicenseForm/EditPartnerLicenseForm';
@@ -17,6 +18,7 @@ import {
   MENU_TAB,
   PREVIEW_TAB,
 } from '../EditPartnerWizard/EditPartnerWizard';
+
 import {
   createSubmitCreatePartnerValues,
   createSubmitLicenseTabValues,
@@ -70,6 +72,7 @@ const EditPartnerWizardTab = (props: any) => {
     onSetAuthorized,
     onSetUnsatisfactory,
     goBack,
+    uploadingImage,
   } = props;
 
   const router = useRouter();
@@ -126,6 +129,7 @@ const EditPartnerWizardTab = (props: any) => {
           uploadCoverError={uploadCoverError}
           inProgress={inProgress}
           formError={formError}
+          uploadingImage={uploadingImage}
         />
       );
     }
@@ -190,6 +194,7 @@ const EditPartnerWizardTab = (props: any) => {
           formError={formError}
           initialValues={initialValues}
           goBack={goBack}
+          uploadingImage={uploadingImage}
         />
       );
     }
@@ -275,6 +280,8 @@ const EditPartnerWizardTab = (props: any) => {
         categories = [],
         extraServices,
         businessType,
+        minQuantity,
+        maxQuantity,
       } = partnerListingRef?.attributes?.publicData || {};
 
       const { bankAccounts = [] } =
@@ -315,6 +322,8 @@ const EditPartnerWizardTab = (props: any) => {
           packagingOther,
           status,
           businessType: businessType || '-',
+          minQuantity,
+          maxQuantity,
         };
       }, [JSON.stringify(partnerListingRef)]);
 

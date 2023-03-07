@@ -1,7 +1,12 @@
+import React from 'react';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
 import Avatar from '@components/Avatar/Avatar';
 import { InlineTextButton } from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconBell from '@components/Icons/IconBell/IconBell';
+import NamedLink from '@components/NamedLink/NamedLink';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
@@ -10,12 +15,15 @@ import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
 import { currentUserSelector, userActions } from '@redux/slices/user.slice';
-import { useRouter } from 'next/router';
-import React from 'react';
+import { companyPaths } from '@src/paths';
 
 import css from './CompanyHeader.module.scss';
 
-const CompanyHeader = () => {
+type CompanyHeaderProps = {
+  showBottomLine?: boolean;
+};
+
+const CompanyHeader: React.FC<CompanyHeaderProps> = ({ showBottomLine }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector(currentUserSelector);
@@ -27,11 +35,13 @@ const CompanyHeader = () => {
     router.push('/');
   };
 
+  const classes = classNames(css.root, showBottomLine && css.bottomLine);
+
   return (
-    <div className={css.root}>
-      <div className={css.headerLeft}>
-        <PitoLogo />
-      </div>
+    <div className={classes}>
+      <NamedLink className={css.headerLeft} path={companyPaths.Home}>
+        <PitoLogo className={css.logo} />
+      </NamedLink>
       <div className={css.headerRight}>
         <IconBell className={css.iconBell} />
         <ProfileMenu>

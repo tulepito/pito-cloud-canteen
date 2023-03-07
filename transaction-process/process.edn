@@ -1,0 +1,85 @@
+{
+ :format      :v3
+ :transitions [
+               {
+                :name        :transition/initiate-transaction,
+                :actor       :actor.role/customer,
+                :actions     [{:name :action/create-booking} {:name :action/privileged-update-metadata}
+                              ],
+
+                :to          :state/initiated
+                :privileged? true
+                }
+               {
+                :name    :transition/expired-start-delivery,
+                :at      {:fn/plus [
+                                    {:fn/timepoint [:time/booking-display-start]}
+                                    {:fn/period ["PT1M"]}]}
+                :actions [],
+                :from    :state/initiated
+                :to      :state/failed-delivery
+                }
+               {
+                :name    :transition/start-delivery,
+                :actor   :actor.role/operator,
+                :actions [{:name :action/accept-booking}],
+                :from    :state/initiated
+                :to      :state/delivering
+                }
+               {
+                :name    :transition/expired-delivery,
+                :at      {:fn/plus [
+                                    {:fn/timepoint [:time/booking-display-start]}
+                                    {:fn/period ["PT1M"]}]}
+                :actions [{:name :action/decline-booking}],
+                :from    :state/delivering
+                :to      :state/failed-delivery
+                }
+               {
+                :name    :transition/operator-cancel-plan,
+                :actor   :actor.role/operator,
+                :actions [{:name :action/decline-booking}],
+                :from    :state/initiated
+                :to      :state/canceled
+                }
+               {
+                :name    :transition/cancel-delivery,
+                :actor   :actor.role/operator,
+                :actions [{:name :action/cancel-booking}],
+                :from    :state/delivering
+                :to      :state/failed-delivery
+                }
+               {
+                :name    :transition/complete-delivery,
+                :actor   :actor.role/operator,
+                :actions [],
+                :from    :state/delivering
+                :to      :state/completed
+                }
+               {
+                :name    :transition/review-restaurant,
+                :actor   :actor.role/operator,
+                :actions [{:name :action/post-review-by-customer}
+                          {:name :action/publish-reviews}],
+                :from    :state/completed
+                :to      :state/reviewed
+                }
+               {
+                :name    :transition/expired-review-time,
+                :at      {:fn/plus [
+                                    {:fn/timepoint [:time/first-entered-state :state/completed]}
+                                    {:fn/period ["P14D"]}]}
+                :actions [],
+                :from    :state/completed
+                :to      :state/expired-review
+                }
+               {
+                :name    :transition/review-restaurant-after-expire-time,
+                :actor   :actor.role/operator,
+                :actions [{:name :action/post-review-by-customer}
+                          {:name :action/publish-reviews}],
+                :from    :state/expired-review
+                :to      :state/reviewed
+                }
+               ]
+ }

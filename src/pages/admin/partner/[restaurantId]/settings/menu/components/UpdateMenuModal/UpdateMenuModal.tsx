@@ -1,12 +1,14 @@
-import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import AlertModal from '@components/Modal/AlertModal';
-import type { FormApi } from 'final-form';
 import React, { useMemo, useRef } from 'react';
 import { FormattedMessage } from 'react-intl';
+import type { FormApi } from 'final-form';
 
-import css from './UpdateMenuModal.module.scss';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
+import AlertModal from '@components/Modal/AlertModal';
+
 import type { TUpdateMenuModalFormValues } from './UpdateMenuModalForm';
 import UpdateMenuModalForm from './UpdateMenuModalForm';
+
+import css from './UpdateMenuModal.module.scss';
 
 type TUpdateMenuModalProps = {
   menuToUpdate: any;
@@ -24,10 +26,12 @@ const UpdateMenuModal: React.FC<TUpdateMenuModalProps> = (props) => {
     onUpdateMenuApplyTime,
     createOrUpdateMenuError,
   } = props;
+
   const initialValues = useMemo(() => {
     return {
       ...(menuToUpdate || {}),
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(menuToUpdate)]);
 
   const formRef = useRef<FormApi>();

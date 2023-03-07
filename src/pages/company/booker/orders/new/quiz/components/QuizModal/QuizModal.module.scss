@@ -1,0 +1,55 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.modalContainer {
+  padding: 36px 36px 40px;
+}
+
+.modalTop {
+  @include flexAlign(center, space-between);
+  flex-direction: row-reverse;
+  margin-top: 36px;
+
+  .backBtn {
+    @include flexAlign(center, center);
+    cursor: pointer;
+    text-transform: capitalize;
+
+    span {
+      @include textTemplate(16px, $fontWeightBold, 24px);
+    }
+  }
+
+  .closeBtn {
+    cursor: pointer;
+  }
+}
+
+.modalHeader {
+  @include flexAlign(center, center);
+  @include textTemplate(24px, $fontWeightBold, 32px);
+  margin-top: 20px;
+  text-transform: capitalize;
+}
+
+.modalContent {
+  margin-top: 32px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-bottom: 4px;
+}
+
+.modalFooter {
+  margin-top: 40px;
+  @include flexAlign(center, center);
+  flex-direction: column;
+
+  .submitBtn {
+    width: 400px;
+  }
+
+  .cancelBtn {
+    width: 400px;
+    margin-top: 8px;
+  }
+}

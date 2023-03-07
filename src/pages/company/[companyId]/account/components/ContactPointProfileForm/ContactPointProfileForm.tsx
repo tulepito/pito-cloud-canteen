@@ -1,3 +1,9 @@
+import { useEffect, useRef } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Field, Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+
 import { AvatarLarge } from '@components/Avatar/Avatar';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
@@ -7,6 +13,7 @@ import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TImageActionPayload } from '@redux/slices/uploadImage.slice';
 import { uploadImageThunks } from '@redux/slices/uploadImage.slice';
+import { User } from '@utils/data';
 import { isUploadImageOverLimitError } from '@utils/errors';
 import type { TCurrentUser, TUser } from '@utils/types';
 import {
@@ -14,11 +21,6 @@ import {
   phoneNumberFormatValid,
   required,
 } from '@utils/validators';
-import { useEffect, useRef } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Field, Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import css from './ContactPointProfileForm.module.scss';
 
@@ -123,11 +125,15 @@ const ContactPointProfileFormComponent: React.FC<
       </div>
     ) : (
       <div className={css.avatarPlaceholder}>
-        <div className={css.avatarPlaceholderTextMobile}>
-          {intl.formatMessage({ id: 'ContactPointProfileForm.photo.noImage' })}
+        <div className={css.textLabel}>
+          {User(bookerAccount as TUser).getProfile().abbreviatedName}
+        </div>
+        <div className={css.camera}>
+          <Icons.Camera />
         </div>
       </div>
     );
+
   const onImageUpload = async ({ id, file }: TImageActionPayload) => {
     await dispatch(uploadImageThunks.uploadImage({ id, file }));
   };

@@ -1,8 +1,11 @@
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
-type RedirectLinkProps = { pathname: string; query?: Record<string, string> };
-const RedirectLink: React.FC<RedirectLinkProps> = ({ pathname, query }) => {
+import type { TObject } from '@utils/types';
+
+type TRedirectLinkProps = { pathname: string; query?: TObject };
+
+const RedirectLink: React.FC<TRedirectLinkProps> = ({ pathname, query }) => {
   const router = useRouter();
   useEffect(() => {
     router.push({

@@ -1,11 +1,19 @@
 import React from 'react';
 
-const IconTruck = () => {
+import type { TIconProps } from '@utils/types';
+
+const IconTruck: React.FC<TIconProps> = ({
+  className,
+  width = 24,
+  height = 24,
+}) => {
   return (
     <svg
-      width="24"
-      height="24"
+      className={className}
+      width={width}
+      height={height}
       viewBox="0 0 24 24"
+      preserveAspectRatio="none"
       fill="none"
       xmlns="http://www.w3.org/2000/svg">
       <g clipPath="url(#clip0_4490_121849)">

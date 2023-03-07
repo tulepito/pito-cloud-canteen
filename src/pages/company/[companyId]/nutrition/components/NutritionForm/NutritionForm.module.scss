@@ -1,0 +1,126 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  padding: 40px 24px 0;
+}
+
+.boldText {
+  font-weight: $fontWeightBold;
+}
+
+.restaurantName {
+  font-weight: $fontWeightBold;
+  cursor: pointer;
+}
+
+.fieldSection {
+  margin-top: 40px;
+
+  .customTitle {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+  }
+
+  .customField {
+    @include textTemplate(14px, $fontWeightRegular, 24px);
+  }
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  &:nth-child(2) {
+    max-width: 532px;
+  }
+
+  &:nth-child(3) {
+    max-width: 532px;
+  }
+  .fieldLabel {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+    margin-bottom: 12px;
+    text-transform: capitalize;
+  }
+
+  .tableRoot {
+    width: 100%;
+    border: 1px solid $neutralGray4;
+    border-radius: 8px;
+    border-spacing: 0;
+    border-collapse: unset;
+
+    .tableHead {
+      height: 40px;
+      tr {
+        td {
+          background-color: $neutralGray2;
+          padding: 0 16px;
+          @include textTemplate(14px, $fontWeightRegular, 24px);
+          color: $neutralGray5;
+        }
+      }
+
+      .tableHeadCell {
+        &:first-child {
+          border-top-left-radius: 8px;
+        }
+
+        &:last-child {
+          border-top-right-radius: 8px;
+        }
+      }
+    }
+
+    .tableHeadMemberOrder {
+      :nth-child(4),
+      :nth-child(5) {
+        text-align: right;
+      }
+    }
+
+    .tableBody {
+      .tableBodyRow {
+        box-shadow: none;
+        border-bottom: 1px solid $neutralGray3;
+        height: 64px;
+
+        :nth-child(3),
+        :nth-child(4) {
+          text-align: left;
+        }
+
+        .tableBodyCell {
+          padding: 9px 16px;
+          font-size: 16px;
+          color: $neutralGray6;
+          border-bottom: 1px solid $neutralGray3;
+
+          &.foodCell {
+            font-weight: $fontWeightRegular;
+          }
+        }
+        &:last-child .tableBodyCell {
+          border-bottom: none;
+        }
+      }
+      .tableBodyRowMemberOrder {
+        :nth-child(4),
+        :nth-child(5) {
+          text-align: right;
+        }
+      }
+    }
+  }
+}
+
+.deleteIcon {
+  cursor: pointer;
+}
+
+.submitChangeBtn {
+  margin-top: 40px;
+  padding-top: 40px;
+  padding-bottom: 80px;
+  border-top: 1px solid $neutralGray4;
+  @include flexAlign(flex-start, flex-end);
+}

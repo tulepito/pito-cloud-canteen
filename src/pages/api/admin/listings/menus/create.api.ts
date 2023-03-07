@@ -1,24 +1,25 @@
 /* eslint-disable no-console */
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import cookies from '@services/cookie';
-import { getIntegrationSdk, handleError } from '@services/sdk';
-import { denormalisedResponseEntities } from '@utils/data';
-import type { TIntegrationListing } from '@utils/types';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import {
-  checkUnconflictedMenuMiddleware,
+  checkUnConflictedMenuMiddleware,
   updateMenuIdListAndMenuWeekDayListForFood,
-} from './apiHelpers';
+} from '@pages/api/helpers/menuHelpers';
+import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
+import { getIntegrationSdk, handleError } from '@services/sdk';
+import { denormalisedResponseEntities } from '@utils/data';
+import type { TIntegrationListing } from '@utils/types';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const { dataParams, queryParams = {} } = req.body;
-    const intergrationSdk = getIntegrationSdk();
-    const { metadata } = dataParams;
+    const integrationSdk = getIntegrationSdk();
+    const { metadata, publicData } = dataParams;
     const { restaurantId } = metadata;
 
-    const restaurantRes = await intergrationSdk.listings.show({
+    const restaurantRes = await integrationSdk.listings.show({
       id: restaurantId,
       include: ['author'],
     });
@@ -26,12 +27,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const { geolocation } = restaurant.attributes;
 
-    const response = await intergrationSdk.listings.create(
+    const response = await integrationSdk.listings.create(
       {
         ...dataParams,
+        publicData: {
+          ...publicData,
+          restaurantName: restaurant.attributes.title,
+        },
         metadata: {
           ...metadata,
-          restaurantName: restaurant.attributes.title,
         },
         ...(geolocation ? { geolocation } : {}),
         state: 'published',
@@ -57,15 +61,17 @@ const handlerWithCustomParams = (req: NextApiRequest, res: NextApiResponse) => {
   const { dataParams = {} } = req.body;
 
   const { publicData = {}, metadata = {}, id } = dataParams || {};
-  const { mealType, daysOfWeek = [] } = publicData;
+  const { mealType, daysOfWeek = [], startDate, endDate } = publicData;
   const { restaurantId } = metadata;
   const dataToCheck = {
     mealType,
     restaurantId,
     daysOfWeek,
     id,
+    startDate,
+    endDate,
   };
-  return checkUnconflictedMenuMiddleware(handler)(req, res, dataToCheck);
+  return checkUnConflictedMenuMiddleware(handler)(req, res, dataToCheck);
 };
 
-export default cookies(handlerWithCustomParams);
+export default cookies(adminChecker(handlerWithCustomParams));

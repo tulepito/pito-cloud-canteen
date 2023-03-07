@@ -1,6 +1,7 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import { createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
-import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedEntities, updatedEntities } from '@utils/data';
 import type { TObject } from '@utils/types';
 

@@ -1,10 +1,11 @@
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   addWorkspaceCompanyId,
   companyThunks,
 } from '@redux/slices/company.slice';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 
 const CompanyDetailPage = () => {
   const router = useRouter();
@@ -21,6 +22,7 @@ const CompanyDetailPage = () => {
   useEffect(() => {
     if (isReady) dispatch(companyThunks.companyInfo());
   }, [isReady]);
+
   if (isCompanyNotFound) {
     return <div>Khong tim thay cong ty nay, xin vui long thu lai.</div>;
   }

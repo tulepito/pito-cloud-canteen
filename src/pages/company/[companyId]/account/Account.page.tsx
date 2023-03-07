@@ -1,3 +1,9 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import take from 'lodash/take';
+import takeRight from 'lodash/takeRight';
+
 import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -7,15 +13,11 @@ import { companyThunks } from '@redux/slices/company.slice';
 import { resetImage } from '@redux/slices/uploadImage.slice';
 import { User } from '@utils/data';
 import type { TCurrentUser, TUser } from '@utils/types';
-import take from 'lodash/take';
-import takeRight from 'lodash/takeRight';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
-import css from './Account.module.scss';
 import type { TContactPointProfileFormValues } from './components/ContactPointProfileForm/ContactPointProfileForm';
 import ContactPointProfileForm from './components/ContactPointProfileForm/ContactPointProfileForm';
+
+import css from './Account.module.scss';
 
 const AccountPage = () => {
   const dispatch = useAppDispatch();
@@ -48,12 +50,16 @@ const AccountPage = () => {
   const updateBookerError = useAppSelector(
     (state) => state.company.updateBookerAccountError,
   );
+  const fetchCompanyInfoInProgress = useAppSelector(
+    (state) => state.company.fetchCompanyInfoInProgress,
+  );
 
   const { companyName = '', location = {} } = User(
     company as TUser,
   ).getPublicData();
   const { email = '' } = User(company as TUser).getAttributes();
   const { address = '' } = location;
+  const { tax } = User(company as TUser).getPrivateData();
 
   const { email: bookerEmail = '' } = User(currentUser!).getAttributes();
   const { displayName: bookerDisplayName = '' } = User(
@@ -125,34 +131,42 @@ const AccountPage = () => {
         <div className={css.sectionTitle}>
           {intl.formatMessage({ id: 'AccountPage.companyInfo' })}
         </div>
-        <div className={css.row}>
-          <div className={css.info}>
-            <div className={css.title}>
-              {intl.formatMessage({ id: 'AccountPage.companyName' })}
-            </div>
-            <div className={css.content}>{companyName}</div>
+        {fetchCompanyInfoInProgress ? (
+          <div className={css.loading}>
+            {intl.formatMessage({ id: 'AccountPage.loading' })}
           </div>
-          <div className={css.info}>
-            <div className={css.title}>
-              {intl.formatMessage({ id: 'AccountPage.address' })}
+        ) : (
+          <>
+            <div className={css.row}>
+              <div className={css.info}>
+                <div className={css.title}>
+                  {intl.formatMessage({ id: 'AccountPage.companyName' })}
+                </div>
+                <div className={css.content}>{companyName}</div>
+              </div>
+              <div className={css.info}>
+                <div className={css.title}>
+                  {intl.formatMessage({ id: 'AccountPage.address' })}
+                </div>
+                <div className={css.content}>{address}</div>
+              </div>
             </div>
-            <div className={css.content}>{address}</div>
-          </div>
-        </div>
-        <div className={css.row}>
-          <div className={css.info}>
-            <div className={css.title}>
-              {intl.formatMessage({ id: 'AccountPage.taxCode' })}
+            <div className={css.row}>
+              <div className={css.info}>
+                <div className={css.title}>
+                  {intl.formatMessage({ id: 'AccountPage.taxCode' })}
+                </div>
+                <div className={css.content}>{tax}</div>
+              </div>
+              <div className={css.info}>
+                <div className={css.title}>
+                  {intl.formatMessage({ id: 'AccountPage.email' })}
+                </div>
+                <div className={css.content}>{email}</div>
+              </div>
             </div>
-            <div className={css.content}></div>
-          </div>
-          <div className={css.info}>
-            <div className={css.title}>
-              {intl.formatMessage({ id: 'AccountPage.email' })}
-            </div>
-            <div className={css.content}>{email}</div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
       <div className={css.submitBtn}>
         <Button

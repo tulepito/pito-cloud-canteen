@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
+import React, { useEffect, useRef, useState } from 'react';
+import { CSVLink } from 'react-csv';
+import { FormattedMessage } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldMultipleSelect from '@components/FormFields/FieldMultipleSelect/FieldMultipleSelect';
@@ -20,20 +27,17 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
-import { parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp } from '@utils/dates';
 import {
   CATEGORY_OPTIONS,
   FOOD_TYPE_OPTIONS,
   getLabelByKey,
   MENU_OPTIONS,
+  PACKAGING_OPTIONS,
+  SIDE_DISH_OPTIONS,
+  SPECIAL_DIET_OPTIONS,
 } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
-import { CSVLink } from 'react-csv';
-import { FormattedMessage } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import css from './ManagePartnerFoods.module.scss';
 
@@ -41,34 +45,20 @@ const fileUrl = process.env.NEXT_PUBLIC_IMPORT_FOOD_GUIDE_FILE_URL;
 
 const TABLE_COLUMN: TColumn[] = [
   {
-    key: 'id',
-    label: 'ID',
-    render: (data: any) => {
-      if (data.isDeleted) {
-        return (
-          <div className={css.deletedMenu}>
-            <FormattedMessage id="ManagePartnerFoods.deletedMenu" />
-          </div>
-        );
-      }
-      return (
-        <NamedLink
-          path={`/admin/partner/${data.restaurantId}/settings/food/${data.id}`}
-          className={css.idRow}
-          title={data.id}>
-          {data.id}
-        </NamedLink>
-      );
-    },
-  },
-  {
     key: 'title',
     label: 'Tên món',
     render: (data: any) => {
       if (data.isDeleted) {
         return <div></div>;
       }
-      return <div title={data.title}>{data.title}</div>;
+      return (
+        <NamedLink
+          path={`/admin/partner/${data.restaurantId}/settings/food/${data.id}`}
+          className={css.titleRow}
+          title={data.id}>
+          {data.title}
+        </NamedLink>
+      );
     },
   },
   {
@@ -169,35 +159,50 @@ const parseEntitiesToExportCsv = (
   const foodsToExport = foods
     .filter((food) => ids.includes(food.id.uuid))
     .map((food) => {
-      const { publicData = {}, description, title } = food.attributes || {};
+      const {
+        publicData = {},
+        description,
+        title,
+        price,
+      } = food.attributes || {};
       const {
         sideDishes = [],
         specialDiets = [],
         category,
         foodType,
         menuType,
-        ingredients,
-        maxMember,
+        allergicIngredient,
+        maxQuantity,
         minOrderHourInAdvance,
         minQuantity,
         notes,
         unit,
+        numberOfMainDishes,
+        packaging,
       } = publicData;
+
       return {
         'Mã món': food.id.uuid,
         'Tên món ăn': title,
         'Mô tả': description,
-        'Thành phần chính': ingredients,
+        'Đơn giá': `${price?.amount} VND`,
+        'Thành phần dị ứng': allergicIngredient,
+        'Chất liệu bao bì': getLabelByKey(PACKAGING_OPTIONS, packaging),
         'Phong cách ẩm thực': getLabelByKey(CATEGORY_OPTIONS, category),
         'Loại món ăn': getLabelByKey(FOOD_TYPE_OPTIONS, foodType),
         'Loại menu': getLabelByKey(MENU_OPTIONS, menuType),
-        'Món ăn kèm': sideDishes.join(','),
-        'Chế độ dinh dưỡng đặc biệt': specialDiets.join(','),
-        'Số nguời tối đa': maxMember,
+        'Món ăn kèm': sideDishes
+          .map((key: string) => getLabelByKey(SIDE_DISH_OPTIONS, key))
+          .join(','),
+        'Chế độ dinh dưỡng đặc biệt': specialDiets
+          .map((key: string) => getLabelByKey(SPECIAL_DIET_OPTIONS, key))
+          .join(','),
+        'Số nguời tối đa': maxQuantity,
         'Giờ đặt trước tối thiểu': minOrderHourInAdvance,
         'Số lượng tối thiểu': minQuantity,
         'Ghi chú': notes,
         'Đơn vị tính': unit,
+        'Số món chính': numberOfMainDishes,
         'Hình ảnh': food.images?.map(
           (image) => image.attributes.variants['square-small2x'].url,
         ),
@@ -322,7 +327,7 @@ const ManagePartnerFoods = () => {
   const onImportFoodFromCsv = async () => {
     if (file) {
       const { error } = (await dispatch(
-        foodSliceThunks.creataPartnerFoodFromCsv({
+        foodSliceThunks.createPartnerFoodFromCsv({
           file,
           restaurantId: restaurantId as string,
         }),
@@ -398,10 +403,8 @@ const ManagePartnerFoods = () => {
           </Button>
           <CSVLink
             data={parseEntitiesToExportCsv(foods, idsToAction)}
-            filename={`${parseTimestampToFormat(
-              new Date().getTime(),
-            )}_donhang.csv`}
-            className="hidden"
+            filename={`${formatTimestamp(new Date().getTime())}_donhang.csv`}
+            className={css.hidden}
             ref={csvLinkRef}
             target="_blank"
           />
@@ -438,8 +441,11 @@ const ManagePartnerFoods = () => {
           isLoading={queryFoodsInProgress}
           hasCheckbox
           exposeValues={getExposeValues}
+          tableBodyCellClassName={css.tableBodyCell}
           pagination={managePartnerFoodPagination}
           paginationPath={`/admin/partner/${restaurantId}/settings/food`}
+          tableWrapperClassName={css.tableWrapper}
+          tableClassName={css.table}
         />
       )}
       <AlertModal
@@ -493,6 +499,7 @@ const ManagePartnerFoods = () => {
         </div>
       </AlertModal>
       <AlertModal
+        title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}
         isOpen={foodToRemove || removeCheckedModalOpen}
         handleClose={
           removeCheckedModalOpen ? closeRemoveCheckedModal : onClearFoodToRemove
@@ -508,10 +515,8 @@ const ManagePartnerFoods = () => {
         cancelLabel="Hủy"
         confirmLabel="Xóa món ăn"
         confirmInProgress={removeFoodInProgress}
+        childrenClassName={css.removeModalContent}
         confirmDisabled={removeFoodInProgress}>
-        <div className={css.removeTitle}>
-          <FormattedMessage id="ManagePartnerFoods.removeTitle" />
-        </div>
         <p className={css.removeContent}>
           <FormattedMessage
             id="ManagePartnerFoods.removeContent"

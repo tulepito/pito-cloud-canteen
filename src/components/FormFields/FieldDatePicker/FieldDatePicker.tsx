@@ -1,12 +1,12 @@
-import 'react-datepicker/dist/react-datepicker.css';
-
-import ValidationError from '@components/ValidationError/ValidationError';
-import classNames from 'classnames';
-import viLocale from 'date-fns/locale/vi';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import type { FieldProps, FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
+import classNames from 'classnames';
+import viLocale from 'date-fns/locale/vi';
 
+import ValidationError from '@components/ValidationError/ValidationError';
+
+import 'react-datepicker/dist/react-datepicker.css';
 import css from './FieldDatePicker.module.scss';
 
 registerLocale('vi', viLocale);
@@ -30,20 +30,22 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
     selected,
     ...rest
   } = props;
-  const { name, onChange, value } = input;
+  const { name, onChange, value, onBlur } = input;
   const onInputChange = (date: Date, event: any) => {
     if (typeof onDatePickerChange === 'function') {
       onDatePickerChange(date, event);
     }
     onChange(date?.getTime());
+    onBlur();
   };
 
-  const { invalid, touched, error } = meta;
+  const { invalid, error, touched } = meta;
   const errorText = customErrorText || error;
   const hasError = !!customErrorText || !!(touched && invalid && error);
   const fieldMeta = { touched: hasError, error: errorText };
   const labelClasses = classNames(css.labelRoot);
   const labelRequiredRedStar = fieldMeta.error ? css.labelRequiredRedStar : '';
+
   return (
     <div className={classNames(css.root, className)}>
       {label && (

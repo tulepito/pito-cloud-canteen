@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import { createSlice } from '@reduxjs/toolkit';
+import omit from 'lodash/omit';
+import Papa from 'papaparse';
+
 import {
   createPartnerFoodApi,
   deletePartnerFoodApi,
   showPartnerFoodApi,
   updatePartnerFoodApi,
 } from '@apis/foodApi';
+import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
-import { getImportDataFromCsv } from '@src/pages/admin/partner/[restaurantId]/settings/food/utils';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants, EListingType } from '@utils/enums';
 import { storableError } from '@utils/errors';
@@ -17,8 +20,6 @@ import type {
   TListing,
   TPagination,
 } from '@utils/types';
-import omit from 'lodash/omit';
-import Papa from 'papaparse';
 
 export const MANAGE_FOOD_PAGE_SIZE = 10;
 
@@ -50,7 +51,7 @@ type TFoodSliceState = {
   removeFoodError: any;
 
   createPartnerFoodFromCsvInProgress: boolean;
-  creataPartnerFoodFromCsvError: any;
+  createPartnerFoodFromCsvError: any;
 
   menuPickedFoods: TIntegrationListing[];
   queryMenuPickedFoodsInProgress: boolean;
@@ -88,7 +89,7 @@ const initialState: TFoodSliceState = {
   removeFoodError: null,
 
   createPartnerFoodFromCsvInProgress: false,
-  creataPartnerFoodFromCsvError: null,
+  createPartnerFoodFromCsvError: null,
 
   // query food for menu picked food
   menuPickedFoods: [],
@@ -273,7 +274,7 @@ const updatePartnerFoodListing = createAsyncThunk(
   },
 );
 
-const creataPartnerFoodFromCsv = createAsyncThunk(
+const createPartnerFoodFromCsv = createAsyncThunk(
   CREATE_FOOD_FROM_FILE,
   async (
     { file, restaurantId }: { file: File; restaurantId: string },
@@ -348,23 +349,21 @@ const creataPartnerFoodFromCsv = createAsyncThunk(
 
 const showPartnerFoodListing = createAsyncThunk(
   SHOW_PARTNER_FOOD_LISTING,
-  async (id: any, { rejectWithValue, fulfillWithValue }) => {
-    try {
-      const { data } = await showPartnerFoodApi(id, {
-        dataParams: {
-          include: ['images'],
-          'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
-        },
-        queryParams: {
-          expand: true,
-        },
-      });
-      const [food] = denormalisedResponseEntities(data);
-      return fulfillWithValue(food);
-    } catch (error) {
-      console.error(`${SHOW_PARTNER_FOOD_LISTING} error: `, error);
-      return rejectWithValue(storableError(error));
-    }
+  async (id: any) => {
+    const { data } = await showPartnerFoodApi(id, {
+      dataParams: {
+        include: ['images'],
+        'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
+      },
+      queryParams: {
+        expand: true,
+      },
+    });
+    const [food] = denormalisedResponseEntities(data);
+    return food;
+  },
+  {
+    serializeError: storableError,
   },
 );
 
@@ -417,7 +416,7 @@ export const foodSliceThunks = {
   removePartnerFood,
   showDuplicateFood,
   duplicateFood,
-  creataPartnerFoodFromCsv,
+  createPartnerFoodFromCsv,
   queryMenuPickedFoods,
 };
 
@@ -534,7 +533,7 @@ const foodSlice = createSlice({
       }))
       .addCase(showPartnerFoodListing.rejected, (state, { payload }) => ({
         ...state,
-        showFoodInProgress: true,
+        showFoodInProgress: false,
         showFoodError: payload,
       }))
       .addCase(updatePartnerFoodListing.pending, (state) => ({
@@ -577,7 +576,7 @@ const foodSlice = createSlice({
       }))
       .addCase(showDuplicateFood.rejected, (state, { payload }) => ({
         ...state,
-        showFoodInProgress: true,
+        showFoodInProgress: false,
         showFoodError: payload,
       }))
       .addCase(duplicateFood.pending, (state) => ({
@@ -594,13 +593,13 @@ const foodSlice = createSlice({
         createFoodInProgress: false,
         createFoodError: payload,
       }))
-      .addCase(creataPartnerFoodFromCsv.pending, (state) => ({
+      .addCase(createPartnerFoodFromCsv.pending, (state) => ({
         ...state,
         createPartnerFoodFromCsvInProgress: true,
         createPartnerFoodFromCsvError: null,
       }))
       .addCase(
-        creataPartnerFoodFromCsv.fulfilled,
+        createPartnerFoodFromCsv.fulfilled,
         (state, { payload = [] }) => ({
           ...state,
           createPartnerFoodFromCsvInProgress: false,
@@ -611,7 +610,7 @@ const foodSlice = createSlice({
           ],
         }),
       )
-      .addCase(creataPartnerFoodFromCsv.rejected, (state, { payload }) => ({
+      .addCase(createPartnerFoodFromCsv.rejected, (state, { payload }) => ({
         ...state,
         createPartnerFoodFromCsvInProgress: false,
         createPartnerFoodFromCsvError: payload,

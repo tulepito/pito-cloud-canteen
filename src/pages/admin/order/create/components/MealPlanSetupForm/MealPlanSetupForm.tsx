@@ -1,13 +1,15 @@
-import Form from '@components/Form/Form';
-import { useAppSelector } from '@hooks/reduxHooks';
-import { User } from '@utils/data';
-import type { TUser } from '@utils/types';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
+import Form from '@components/Form/Form';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { User } from '@utils/data';
+import type { TUser } from '@utils/types';
+
 import DayInWeekField from '../DayInWeekField/DayInWeekField';
 import DeliveryAddressField from '../DeliveryAddressField/DeliveryAddressField';
+import DurationForNextOrderField from '../DurationForNextOrderField/DurationForNextOrderField';
 import FoodPickingField from '../FoodPickingField/FoodPickingField';
 import MealPlanDateField from '../MealPlanDateField/MealPlanDateField';
 import MemberAmountField from '../MemberAmountField/MemberAmountField';
@@ -17,10 +19,12 @@ import NutritionField from '../NutritionField/NutritionField';
 import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
 import ParticipantSetupField from '../ParticipantSetupField/ParticipantSetupField';
 import PerPackageField from '../PerPackageField/PerPackageField';
+
 import css from './MealPlanSetupForm.module.scss';
 
 export type TMealPlanSetupFormValues = {
   pickAllow: boolean;
+  displayedDurationTime: string;
 };
 
 type TExtraProps = {
@@ -45,9 +49,10 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
     clientId,
   } = props;
   const intl = useIntl();
-  const updateOrderInProgress = useAppSelector(
-    (state) => state.Order.updateOrderInProgress,
+  const step2SubmitInProgress = useAppSelector(
+    (state) => state.Order.step2SubmitInProgress,
   );
+
   const { pickAllow: pickAllowValue = true } = values;
   return (
     <Form onSubmit={handleSubmit}>
@@ -87,7 +92,21 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
           title={intl.formatMessage({ id: 'MealPlanDateField.title' })}
         />
         <div className={css.verticalSpace}>
-          <DayInWeekField form={form} values={values} />
+          <DayInWeekField
+            form={form}
+            values={values}
+            title={intl.formatMessage({ id: 'DayInWeekField.label' })}
+          />
+        </div>
+
+        <div className={css.verticalSpace}>
+          <DurationForNextOrderField
+            form={form}
+            displayedDurationTimeValue={values.displayedDurationTime}
+            title={intl.formatMessage({
+              id: 'DurationForNextOrderField.label',
+            })}
+          />
         </div>
       </div>
 
@@ -117,7 +136,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
         )}
       </div>
 
-      <NavigateButtons inProgress={updateOrderInProgress} />
+      <NavigateButtons inProgress={step2SubmitInProgress} />
     </Form>
   );
 };

@@ -34,7 +34,7 @@
 
 .boldText {
   font-weight: $fontWeightBold;
-  color: #2f54eb;
+  color: $labelBlue2;
 }
 
 .companyName {
@@ -160,4 +160,25 @@
   &:global.rc-tooltip {
     opacity: 1 !important;
   }
+}
+
+.tableWrapper {
+  @include viewportMedium {
+    max-width: calc(100vw - 350px);
+    overflow-x: scroll;
+    position: relative;
+  }
+  .table {
+    @include viewportMedium {
+      min-width: 1440px;
+    }
+  }
+}
+
+.stateItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 12px;
 }

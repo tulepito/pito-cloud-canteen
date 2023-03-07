@@ -1,8 +1,9 @@
-import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
-import useBoolean from '@hooks/useBoolean';
-import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect, useRef, useState } from 'react';
+import classNames from 'classnames';
+
+import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
+import useBoolean from '@hooks/useBoolean';
 
 import css from './Accordion.module.scss';
 

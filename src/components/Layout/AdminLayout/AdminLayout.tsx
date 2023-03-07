@@ -1,5 +1,6 @@
-import useBoolean from '@hooks/useBoolean';
 import type { PropsWithChildren } from 'react';
+
+import useBoolean from '@hooks/useBoolean';
 
 import AdminHeader from './AdminHeader/AdminHeader';
 import AdminLayoutContent from './AdminLayoutContent/AdminLayoutContent';

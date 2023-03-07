@@ -1,19 +1,18 @@
-/* eslint-disable no-console */
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { EListingType, EOrderStates } from '@utils/enums';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const { queryParams = {} } = req.body;
     const { menuId } = req.query;
-    const intergrationSdk = getIntegrationSdk();
-    const response = await intergrationSdk.listings.query(
+    const integrationSdk = getIntegrationSdk();
+    const response = await integrationSdk.listings.query(
       {
-        meta_menuIds: menuId,
-        meta_listingType: EListingType.transaction,
+        meta_menuIds: `has_any:${menuId}`,
+        meta_listingType: EListingType.subOrder,
         meta_orderState: [EOrderStates.inProgress, EOrderStates.picking],
       },
       queryParams,

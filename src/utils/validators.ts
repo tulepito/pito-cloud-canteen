@@ -1,5 +1,7 @@
+/* eslint-disable no-useless-escape */
 import toPairs from 'lodash/toPairs';
 
+import { printHoursToString } from './dates';
 import { EDayOfWeek } from './enums';
 import type { TAddress, TObject } from './types';
 
@@ -262,7 +264,7 @@ export const nonNegativeValue = (message: string) => (value: number) => {
   return value <= 0 ? message : VALID;
 };
 
-const timeToMinute = (timeInHour: string) => {
+export const timeToMinute = (timeInHour: string) => {
   if (!timeInHour) {
     return 0;
   }
@@ -455,3 +457,46 @@ export const nonSatOrSunDay = (message: string) => (value: number) => {
   const dayOfWeek = new Date(value).getDay();
   return dayOfWeek === 6 || dayOfWeek === 0 ? message : VALID;
 };
+
+export const greaterThanOneThousand = (message: string) => (value: number) => {
+  return value < 1000 ? message : VALID;
+};
+
+export const greaterThanZero = (message: string) => (value: number) => {
+  return value <= 0 ? message : VALID;
+};
+
+export const parseAvailabilityEntries = (time: Date) => {
+  const minutes = time.getMinutes();
+  const hours = time.getHours();
+  return printHoursToString(hours, minutes);
+};
+
+export const validFoodTitle = (message: string) => (value: string) => {
+  const format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+  return format.test(value) ? message : VALID;
+};
+
+export const upperCaseFirstLetter = (value: string) => {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+};
+
+export const validateNonEnterInputField =
+  (message: string) => (value: string, allValues: TObject) => {
+    const { tempValue } = allValues;
+    return tempValue && tempValue !== value ? message : VALID;
+  };
+
+export const valueLessThanMax =
+  (message: string, maxNameField: string) =>
+  (value: string, allValues: TObject) => {
+    const maxFieldValue = allValues?.[maxNameField] || 0;
+    return value > maxFieldValue ? message : VALID;
+  };
+
+export const valueGreaterThanMin =
+  (message: string, minNameField: string) =>
+  (value: string, allValues: TObject) => {
+    const maxFieldValue = allValues?.[minNameField] || 0;
+    return value < maxFieldValue ? message : VALID;
+  };

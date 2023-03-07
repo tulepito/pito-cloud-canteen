@@ -1,11 +1,12 @@
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import type { TDefaultProps, TFormEvent, TIconProps } from '@utils/types';
-import { required } from '@utils/validators';
-import classNames from 'classnames';
 import React from 'react';
 import type { FieldProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import type { TDefaultProps, TFormEvent, TIconProps } from '@utils/types';
+import { required } from '@utils/validators';
 
 import css from './FieldCheckbox.module.scss';
 
@@ -62,6 +63,7 @@ type TFieldCheckboxProps = FieldProps<string, any> &
     useSuccessColor?: boolean;
     customOnChange?: (event: React.ChangeEvent | any) => void;
     label?: string | React.ReactNode;
+    checkboxWrapperClassName?: string;
   };
 
 const FieldCheckbox: React.FC<TFieldCheckboxProps> = (props) => {
@@ -78,6 +80,7 @@ const FieldCheckbox: React.FC<TFieldCheckboxProps> = (props) => {
     hasTextInput,
     textPlaceholder,
     labelClassName,
+    checkboxWrapperClassName,
     ...rest
   } = props;
 
@@ -124,7 +127,11 @@ const FieldCheckbox: React.FC<TFieldCheckboxProps> = (props) => {
                   <label
                     htmlFor={id}
                     className={classNames(css.label, labelClassName)}>
-                    <span className={css.checkboxWrapper}>
+                    <span
+                      className={classNames(
+                        css.checkboxWrapper,
+                        checkboxWrapperClassName,
+                      )}>
                       <IconCheckbox
                         className={svgClassName}
                         {...successColorVariantMaybe}

@@ -1,8 +1,9 @@
-import Button, { InlineTextButton } from '@components/Button/Button';
-import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import type { ChangeEventHandler } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage } from 'react-intl';
+
+import Button, { InlineTextButton } from '@components/Button/Button';
+import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 
 import css from './ApplyOtherDaysForm.module.scss';
 

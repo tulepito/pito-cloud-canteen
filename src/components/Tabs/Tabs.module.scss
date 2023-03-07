@@ -4,7 +4,7 @@
 
 .headerWrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   width: 100%;
 }
@@ -80,9 +80,7 @@
 
 .tabItemContent {
   color: $neutralGray5;
-  font-size: 14px;
-  font-weight: $fontWeightRegular;
-  line-height: 24px;
+  @include textTemplate(14px, 400, 20px);
 
   &.tabActive {
     color: $neutralGray6;
@@ -90,6 +88,11 @@
     font-weight: $fontWeightBold;
   }
 }
+
+.tabDisabled {
+  cursor: not-allowed;
+}
+
 .tabPanel {
   margin: 0;
 }
@@ -122,4 +125,10 @@
 .fadeIn {
   -webkit-animation-name: fadeIn;
   animation-name: fadeIn;
+}
+
+.navigateBtn {
+  padding: 0;
+  margin-top: 4px;
+  min-height: unset;
 }

@@ -1,11 +1,14 @@
-import Button from '@components/Button/Button';
-import classNames from 'classnames';
 import type { PropsWithChildren, ReactNode } from 'react';
+import classNames from 'classnames';
 
-import css from './AlertModal.module.scss';
+import Button from '@components/Button/Button';
+
 import Modal from './Modal';
 
+import css from './AlertModal.module.scss';
+
 type TAlertModal = {
+  id?: string;
   isOpen: boolean;
   title?: string | ReactNode;
   className?: string;
@@ -25,6 +28,7 @@ type TAlertModal = {
 };
 
 const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
+  id,
   isOpen,
   title,
   children,
@@ -44,6 +48,8 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
 }) => {
   return (
     <Modal
+      id={id}
+      openClassName={css.isOpen}
       className={css.modalRoot}
       title={title}
       isOpen={isOpen}

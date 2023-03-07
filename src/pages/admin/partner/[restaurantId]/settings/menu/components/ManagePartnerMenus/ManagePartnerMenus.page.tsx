@@ -1,17 +1,19 @@
+import React, { useRef, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+import type { FormApi } from 'final-form';
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import AlertModal from '@components/Modal/AlertModal';
 import type { TSecondaryKeywordSearchFormValues } from '@components/SecondaryKeywordSearchForm/SecondaryKeywordSearchForm';
 import SecondaryKeywordSearchForm from '@components/SecondaryKeywordSearchForm/SecondaryKeywordSearchForm';
 import { adminRoutes } from '@src/paths';
 import { EMenuTypes } from '@utils/enums';
-import type { FormApi } from 'final-form';
-import { useRouter } from 'next/router';
-import React, { useRef, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
 
 import type { TCreateMenuOptionFormValues } from '../CreateMenuOptionForm/CreateMenuOptionForm';
 import CreateMenuOptionForm from '../CreateMenuOptionForm/CreateMenuOptionForm';
 import ManagePartnerMenusContent from '../ManagePartnerMenusContent/ManagePartnerMenusContent';
+
 import css from './ManagePartnerMenus.module.scss';
 
 type TManagePartnerMenusPageProps = {
@@ -26,7 +28,7 @@ const ManagePartnerMenusPage: React.FC<TManagePartnerMenusPageProps> = (
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const router = useRouter();
   const formRef = useRef<FormApi>();
-  const { restaurantId, keywords = '', page = 1 } = router.query;
+  const { restaurantId, keywords = '', page = 1, mealType } = router.query;
 
   const onSubmit = ({
     keywords: newKeywords,
@@ -91,6 +93,7 @@ const ManagePartnerMenusPage: React.FC<TManagePartnerMenusPageProps> = (
         keywords={keywords as string}
         menuType={menuType as string}
         page={page as string}
+        mealType={mealType as string}
       />
       <AlertModal
         isOpen={isCreateModalOpen}

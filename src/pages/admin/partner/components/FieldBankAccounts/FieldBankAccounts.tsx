@@ -1,3 +1,8 @@
+import React, { Fragment } from 'react';
+import { FieldArray } from 'react-final-form-arrays';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import { InlineTextButton } from '@components/Button/Button';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
@@ -10,10 +15,6 @@ import {
   numberMinLength,
   required,
 } from '@utils/validators';
-import classNames from 'classnames';
-import React, { Fragment } from 'react';
-import { FieldArray } from 'react-final-form-arrays';
-import { useIntl } from 'react-intl';
 
 import css from './FieldBankAccounts.module.scss';
 

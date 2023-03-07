@@ -1,10 +1,12 @@
-import Form from '@components/Form/Form';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import IconSearch from '@components/Icons/IconSearch/IconSearch';
-import classNames from 'classnames';
+import type { ReactNode } from 'react';
 import React from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import Form from '@components/Form/Form';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
 
 import css from './KeywordSearchForm.module.scss';
 
@@ -17,12 +19,14 @@ type TKeywordSearchForm = {
   initialValues?: TKeywordSearchFormValues;
   searchValue?: string;
   placeholder?: string;
+  inputClassName?: string;
+  label?: ReactNode;
   className?: string;
 };
 
 const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
   const intl = useIntl();
-  const { placeholder, className } = props;
+  const { placeholder, inputClassName, label, className } = props;
   return (
     <FinalForm
       {...props}
@@ -40,9 +44,10 @@ const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
                 })
               }
               name={props?.searchValue || 'keywords'}
+              label={label}
               id={props?.searchValue || 'keywords'}
-              className={css.searchInput}
-              leftIcon={<IconSearch />}
+              className={classNames(css.searchInput, inputClassName)}
+              leftIcon={<IconMagnifier />}
             />
           </Form>
         );

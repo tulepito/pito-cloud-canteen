@@ -1,9 +1,11 @@
+import { useField, useForm } from 'react-final-form-hooks';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
+
 import Button, { InlineTextButton } from '@components/Button/Button';
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
 import Toggle from '@components/Toggle/Toggle';
-import classNames from 'classnames';
-import { useField, useForm } from 'react-final-form-hooks';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './BookerNewOrder.module.scss';
 
@@ -21,6 +23,7 @@ type TCreateOrderFormProps = {
   initialValues?: TCreateOrderFormValues;
   submitInprogress?: boolean;
   submitError?: any;
+  queryInprogress?: boolean;
 };
 
 export type TCreateOrderFormValues = {
@@ -32,21 +35,22 @@ export type TCreateOrderFormValues = {
 const validate = (values: TCreateOrderFormValues) => {
   const errors: any = {};
   if (!values.company) {
-    errors.company = 'Required';
+    errors.company = 'Vui lòng chọn công ty cần đặt đơn';
   }
   if (values.usePreviousData && !values.previousOrder) {
-    errors.previousOrder = 'Required';
+    errors.previousOrder = 'Vui lòng chọn đơn hàng cũ';
   }
   return errors;
 };
 
 const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
-  companies,
+  companies = [],
   previousOrders = [],
   onSubmit,
   onCancel,
   initialValues,
   submitInprogress,
+  queryInprogress,
 }) => {
   const intl = useIntl();
 
@@ -65,8 +69,14 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
   const company = useField('company', form);
   const usePreviousData = useField('usePreviousData', form);
   const previousOrder = useField('previousOrder', form);
-  const disabledSubmit = submitting || hasValidationErrors;
 
+  const companyValue = company.input.value;
+  const isCompanyListEmpty = isEmpty(companies);
+  const disabledSubmit =
+    isCompanyListEmpty ||
+    isEmpty(companyValue) ||
+    submitting ||
+    hasValidationErrors;
   const isSubmitting = submitting || submitInprogress;
 
   const companyLabel = intl.formatMessage({
@@ -94,9 +104,12 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
         input={company.input}
         meta={company.meta}
         id={`company`}
-        name="company">
+        name="company"
+        disabled={isCompanyListEmpty}>
         <option key={'empty'} disabled value={''}>
-          {intl.formatMessage({ id: 'CreateOrderForm.company.placeholder' })}
+          {queryInprogress
+            ? intl.formatMessage({ id: 'CreateOrderForm.company.loading' })
+            : intl.formatMessage({ id: 'CreateOrderForm.company.placeholder' })}
         </option>
         {companies.map((companyItem) => (
           <option key={companyItem.id} value={companyItem.id}>
@@ -135,6 +148,7 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
       <Button
         className={css.submitBtn}
         type="submit"
+        loadingMode="extend"
         disabled={disabledSubmit}
         inProgress={isSubmitting}
         spinnerClassName={css.spinnerClassName}>

@@ -1,8 +1,9 @@
-import viMessage from '@translations/vi.json';
-import mockRouter from 'next-router-mock';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 import { IntlProvider } from 'react-intl';
+import mockRouter from 'next-router-mock';
+
+import viMessage from '@translations/vi.json';
 
 export const DEFAULT_LOCALE = 'vi';
 

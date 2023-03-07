@@ -1,14 +1,16 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import cookies from '@services/cookie';
-import { getIntegrationSdk } from '@services/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
+import { getIntegrationSdk } from '@services/sdk';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const { dataParams, queryParams = {} } = req.body;
 
   const { id, status } = dataParams;
-  const intergrationSdk = getIntegrationSdk();
-  const response = await intergrationSdk.users.updateProfile(
+  const integrationSdk = getIntegrationSdk();
+  const response = await integrationSdk.users.updateProfile(
     {
       id,
       metadata: {
@@ -20,4 +22,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   res.json(response);
 }
 
-export default cookies(handler);
+export default cookies(adminChecker(handler));

@@ -1,50 +1,66 @@
+import React from 'react';
+import { useRouter } from 'next/router';
+
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import { companyPaths, personalPaths } from '@src/paths';
-import { useRouter } from 'next/router';
-import React from 'react';
 
 import css from './CompanySidebar.module.scss';
 
-const CompanySidebar = () => {
+type CompanySidebarProps = {
+  companyName: string;
+};
+
+const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyName }) => {
   const router = useRouter();
   const { companyId } = router.query;
+
+  const companyMenuOptions =
+    companyId && companyId !== 'personal'
+      ? [
+          {
+            id: 'user',
+            label: 'CompanySidebar.members',
+            isFirstLevel: true,
+            childrenMenus: [
+              {
+                id: 'memberList',
+                label: 'CompanySidebar.memberList',
+                nameLink: companyPaths.Members,
+              },
+              {
+                id: 'groupList',
+                label: 'CompanySidebar.groupList',
+                nameLink: companyPaths.GroupSetting,
+              },
+            ],
+          },
+          {
+            id: 'logo',
+            label: 'CompanySidebar.logo',
+            nameLink: companyPaths.Logo,
+            isFirstLevel: true,
+          },
+        ]
+      : [];
   const SIDEBAR_MENUS: TSidebarMenu[] = [
     {
       id: 'home',
       label: 'CompanySidebar.account',
       nameLink: companyId ? companyPaths.Account : personalPaths.Account,
+      isFirstLevel: true,
+    },
+    ...companyMenuOptions,
+    {
+      id: 'nutrition',
+      label: 'CompanySidebar.nutrition',
+      nameLink: companyId ? companyPaths.Nutrition : personalPaths.Nutrition,
+      isFirstLevel: true,
     },
   ];
-  if (companyId) {
-    SIDEBAR_MENUS.push(
-      ...[
-        {
-          id: 'user',
-          label: 'CompanySidebar.members',
-          childrenMenus: [
-            {
-              id: 'memberList',
-              label: 'CompanySidebar.memberList',
-              nameLink: companyPaths.Members,
-            },
-            {
-              id: 'groupList',
-              label: 'CompanySidebar.groupList',
-              nameLink: companyPaths.GroupSetting,
-            },
-          ],
-        },
-        {
-          id: 'logo',
-          label: 'CompanySidebar.logo',
-          nameLink: companyPaths.Logo,
-        },
-      ],
-    );
-  }
   return (
     <div className={css.root}>
+      <div className={css.companyName}>{companyName}</div>
       <MultiLevelSidebar menus={SIDEBAR_MENUS} />
     </div>
   );

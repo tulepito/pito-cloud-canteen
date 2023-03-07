@@ -66,3 +66,9 @@
     }
   }
 }
+
+.error {
+  @include textTemplate(12px, 400, 16px);
+  color: $primaryPri2;
+  margin-top: 8px;
+}

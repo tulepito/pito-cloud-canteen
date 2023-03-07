@@ -1,0 +1,41 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  .titleContainer {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+
+    .participantCount {
+      border-radius: 50%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 24px;
+      height: 24px;
+      @include textTemplate(12px, 600, 16px);
+
+      color: $neutralGray5;
+      background-color: $neutralGray3;
+    }
+  }
+
+  .participantContainer {
+    display: flex;
+    flex-direction: column;
+    row-gap: 12px;
+    cursor: default;
+  }
+
+  .confirmModal {
+    z-index: 2;
+  }
+
+  .viewDetailBtn {
+    padding: 0;
+    margin-top: 12px;
+    height: fit-content;
+    min-height: unset;
+  }
+}

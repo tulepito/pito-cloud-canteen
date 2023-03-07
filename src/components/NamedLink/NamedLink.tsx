@@ -1,8 +1,9 @@
-import type { TDefaultProps, TObject } from '@utils/types';
+import React from 'react';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import Link from 'next/link';
-import React from 'react';
+
+import type { TDefaultProps, TObject } from '@utils/types';
 
 import css from './NamedLink.module.scss';
 
@@ -16,6 +17,7 @@ type TNameLinkProps = TDefaultProps & {
   title?: string;
   path?: string;
   replace?: boolean;
+  target?: string;
 };
 
 const NamedLink: React.FC<TNameLinkProps> = ({
@@ -28,6 +30,7 @@ const NamedLink: React.FC<TNameLinkProps> = ({
   path,
   params,
   replace = false,
+  target,
 }) => {
   const classes = classNames(rootClassName || css.root, className);
   const queryString = to?.search ? `?${to.search}` : '';
@@ -43,7 +46,8 @@ const NamedLink: React.FC<TNameLinkProps> = ({
       title={title}
       href={href}
       replace={replace}
-      passHref={passHref}>
+      passHref={passHref}
+      target={target}>
       {children}
     </Link>
   );

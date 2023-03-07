@@ -1,0 +1,80 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.layout {
+  padding: 40px 24px;
+  width: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  @include viewportLarge {
+    max-width: 925px;
+    padding: 0;
+  }
+
+  @include viewportSLarge {
+    max-width: 1240px;
+  }
+
+  @include viewportXLarge {
+    max-width: 1555px;
+  }
+}
+
+.top {
+  margin-top: 41px;
+}
+
+.mainContainer {
+  @include flexAlign(flex-start, flex-start);
+  margin-top: 32px;
+}
+
+.sidebar {
+  position: fixed;
+  width: 295px;
+  z-index: 100;
+  top: 72px;
+  left: calc(-295px);
+  transition: 0.3s linear;
+
+  @include viewportLarge {
+    top: unset;
+    left: unset;
+    position: relative;
+  }
+}
+
+.sidebarOpened {
+  left: 0px;
+
+  @include viewportLarge {
+    left: unset;
+  }
+}
+
+.filterMobileMenu {
+  position: fixed;
+  z-index: 11;
+  top: 112px;
+  left: 0;
+  transition: 0.3s linear;
+
+  @include viewportLarge {
+    display: none;
+  }
+}
+
+.filterMobileMenuOpened {
+  left: 295px;
+}
+
+.content {
+  flex-grow: 1;
+
+  @include viewportLarge {
+    margin: 0 0 0 20px;
+  }
+}

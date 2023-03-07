@@ -1,12 +1,11 @@
-/* eslint-disable no-console */
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import { Listing } from '@utils/data';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -14,10 +13,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const integrationSdk = getIntegrationSdk();
 
     switch (apiMethod) {
-      case HttpMethod.GET:
-        break;
-      case HttpMethod.POST:
-        break;
       case HttpMethod.DELETE:
         {
           const { companyId, orderId } = req.query;
@@ -27,7 +22,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             }),
           );
 
-          const { companyId: orderCompanyId } =
+          const { companyId: orderCompanyId, plans = [] } =
             Listing(orderListing).getMetadata();
 
           if (companyId !== orderCompanyId) {
@@ -35,6 +30,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               error: `Order ${orderId} is not belong to company ${companyId}`,
             });
           }
+
+          await Promise.all(
+            plans.map(async (planId: string) => {
+              await integrationSdk.listings.close({
+                id: planId,
+              });
+            }),
+          );
 
           await integrationSdk.listings.close({
             id: orderId,

@@ -1,3 +1,8 @@
+import type { FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import Avatar from '@components/Avatar/Avatar';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
@@ -8,10 +13,6 @@ import { companyThunks } from '@src/redux/slices/company.slice';
 import { User } from '@utils/data';
 import type { TObject } from '@utils/types';
 import { required } from '@utils/validators';
-import classNames from 'classnames';
-import type { FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import css from './CreateGroupForm.module.scss';
 

@@ -40,12 +40,37 @@
     }
 
     .avatarPlaceholder {
-      background-color: $neutralGray3;
       width: 128px;
       height: 128px;
       border-radius: 100%;
-      @include flexAlign(center, center);
-      cursor: pointer;
+      position: relative;
+      background-image: linear-gradient(-180deg, #ef3d2a 0%, #ef3d2a 100%);
+
+      .camera {
+        width: 44px;
+        height: 44px;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        cursor: pointer;
+        background-color: $neutralGray1;
+        @include flexAlign(center, center);
+        border-radius: 100%;
+        box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06),
+          0px 4px 8px -2px rgba(16, 24, 40, 0.1);
+      }
+
+      .textLabel {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        display: grid;
+        place-items: center;
+        @include textTemplate(28px, $fontWeightBold, 36px);
+        color: $neutralGray1;
+      }
     }
 
     .uploadingImage {
@@ -78,6 +103,9 @@
 
     .fieldInput {
       width: 300px;
+      input {
+        @include textTemplate(14px, $fontWeightMedium, 24px);
+      }
 
       .label {
         @include textTemplate(14px, $fontWeightMedium, 24px);

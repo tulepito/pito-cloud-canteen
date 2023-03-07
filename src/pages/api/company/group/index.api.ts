@@ -1,3 +1,5 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { createCompanyGroupFn } from '@pages/api/api-utils/createCompanyGroupFn';
 import { deleteCompanyGroupFn } from '@pages/api/api-utils/deleteCompanyGroupFn';
 import { updateCompanyGroupFn } from '@pages/api/api-utils/updateCompanyGroupFn';
@@ -5,7 +7,6 @@ import { HTTP_METHODS } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
 import companyChecker from '@services/permissionChecker/company';
 import { handleError } from '@services/sdk';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const { companyId, groupId, groupInfo, groupMembers } = req.body;

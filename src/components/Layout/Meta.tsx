@@ -1,9 +1,9 @@
-import { NextSeo } from 'next-seo';
 import { useIntl } from 'react-intl';
+import { NextSeo } from 'next-seo';
 
 import configs from '../../configs';
 
-type TMetaProps = {
+export type TMetaProps = {
   title?: string;
   description?: string;
   canonical?: string;

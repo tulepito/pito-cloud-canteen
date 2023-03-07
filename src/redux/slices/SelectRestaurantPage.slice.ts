@@ -1,10 +1,11 @@
-import { deliveryDaySessionAdapter } from '@helpers/orderHelper';
-import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
+
+import { getMenuQuery } from '@helpers/listingSearchQuery';
+import { createAsyncThunk } from '@redux/redux.helper';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
-import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
-import type { TListing, TPagination } from '@utils/types';
+import { convertWeekDay } from '@utils/dates';
+import type { TListing, TObject, TPagination } from '@utils/types';
 
 type TSelectRestaurantPageSliceInitialState = {
   fetchRestaurantsPending: boolean;
@@ -18,6 +19,8 @@ type TSelectRestaurantPageSliceInitialState = {
   fetchFoodError: any;
 
   selectedRestaurant: TListing | null;
+  fetchSelectedRestaurantInProgress: boolean;
+  fetchSelectedRestaurantError: any;
 };
 
 const initialState: TSelectRestaurantPageSliceInitialState = {
@@ -30,57 +33,40 @@ const initialState: TSelectRestaurantPageSliceInitialState = {
   fetchFoodPending: false,
   fetchFoodError: null,
   selectedRestaurant: null,
+  fetchSelectedRestaurantInProgress: false,
+  fetchSelectedRestaurantError: null,
 };
 
 // ================ Thunk types ================ //
 const QUERY_RESTAURANTS = 'app/SelectRestaurantPage/QUERY_RESTAURANTS';
 const QUERY_RESTAURANT_FOOD = 'app/SelectRestaurantPage/QUERY_RESTAURANT_FOOD';
-
+const FETCH_SELECTED_RESTAURANT =
+  'app/SelectRestaurantPage/FETCH_SELECTED_RESTAURANT';
 // ================ Thunks ================ //
 const getRestaurants = createAsyncThunk(
   QUERY_RESTAURANTS,
-  async (params: Record<string, any> | undefined, { extra: sdk }) => {
-    const queryParams: Record<string, any> = {};
-
-    if (params) {
-      queryParams.keywords = params.title;
-    }
+  async (params: TObject | undefined, { extra: sdk, getState }) => {
+    const { order } = getState().Order;
     const {
       dateTime,
       favoriteRestaurantIdList = [],
       favoriteFoodIdList = [],
-      packagePerMember,
-      deliveryHour,
-      nutritions = [],
       title = '',
+      page = 1,
+      perPage = 10,
     } = params || {};
-    const dayOfWeek = convertWeekDay(dateTime.weekday).key;
-    const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
-    const mealType = deliveryDaySessionAdapter(deliveryDaySession);
-    const response = await sdk.listings.query({
-      keywords: title,
-      meta_listingState: 'published',
-      meta_listingType: ListingTypes.MENU,
-      pub_startDate: `,${dateTime.toMillis()}`,
-      pub_daysOfWeek: `has_any:${dayOfWeek}`,
-      pub_mealTypes: `has_any:${mealType}`,
-      ...(nutritions.length > 0
-        ? { [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(',')}` }
-        : {}),
-      ...(favoriteRestaurantIdList.length > 0
-        ? {
-            meta_restaurantId: favoriteRestaurantIdList.join(','),
-          }
-        : {}),
-      ...(favoriteFoodIdList.length > 0
-        ? {
-            [`meta_${dayOfWeek}FoodIdList`]: `has_any:${favoriteFoodIdList.join(
-              ',',
-            )}`,
-          }
-        : {}),
-      [`pub_${dayOfWeek}AverageFoodPrice`]: `,${packagePerMember}`,
+    const menuQuery = getMenuQuery({
+      order,
+      params: {
+        favoriteRestaurantIdList,
+        favoriteFoodIdList,
+        page,
+        perPage,
+        timestamp: dateTime,
+        keywords: title,
+      },
     });
+    const response = await sdk.listings.query(menuQuery);
 
     const { meta } = response?.data || {};
 
@@ -90,6 +76,11 @@ const getRestaurants = createAsyncThunk(
         const { restaurantId } = Listing(menu).getMetadata();
         const restaurantResponse = await sdk.listings.show({
           id: restaurantId,
+          include: ['images'],
+          'fields.image': [
+            'variants.landscape-crop',
+            'variants.landscape-crop2x',
+          ],
         });
         return {
           restaurantInfo: denormalisedResponseEntities(restaurantResponse)[0],
@@ -118,7 +109,7 @@ const getRestaurantFood = createAsyncThunk(
       pub_menuWeekDay: `has_any:${dayOfWeek}`,
       price: `,${packagePerMember}`,
       ...(nutritions.length > 0
-        ? { pub_nutritions: `has_any:${nutritions.join(',')}` }
+        ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
         : {}),
       ...(favoriteFoodIdList.length > 0
         ? {
@@ -131,9 +122,22 @@ const getRestaurantFood = createAsyncThunk(
   },
 );
 
+const fetchSelectedRestaurant = createAsyncThunk(
+  FETCH_SELECTED_RESTAURANT,
+  async (restaurantId: string, { extra: sdk }) => {
+    const response = await sdk.listings.show({
+      id: restaurantId,
+      include: ['images'],
+      'fields.image': ['variants.landscape-crop', 'variants.landscape-crop2x'],
+    });
+    return denormalisedResponseEntities(response)[0];
+  },
+);
+
 export const selectRestaurantPageThunks = {
   getRestaurants,
   getRestaurantFood,
+  fetchSelectedRestaurant,
 };
 
 const SelectRestaurantPageSlice = createSlice({
@@ -181,6 +185,19 @@ const SelectRestaurantPageSlice = createSlice({
         state.fetchFoodPending = false;
         state.fetchFoodError = error;
         state.foodList = [];
+      })
+
+      .addCase(fetchSelectedRestaurant.pending, (state) => {
+        state.fetchSelectedRestaurantInProgress = true;
+        state.fetchSelectedRestaurantError = null;
+      })
+      .addCase(fetchSelectedRestaurant.fulfilled, (state, { payload }) => {
+        state.fetchSelectedRestaurantInProgress = false;
+        state.selectedRestaurant = payload;
+      })
+      .addCase(fetchSelectedRestaurant.rejected, (state, { error }) => {
+        state.fetchSelectedRestaurantInProgress = false;
+        state.fetchSelectedRestaurantError = error;
       });
   },
 });

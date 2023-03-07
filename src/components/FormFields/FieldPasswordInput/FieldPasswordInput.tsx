@@ -1,13 +1,14 @@
+import type { DetailedHTMLProps, InputHTMLAttributes } from 'react';
+import React from 'react';
+import type { FieldRenderProps } from 'react-final-form';
+import { Field } from 'react-final-form';
+import classNames from 'classnames';
+
 import IconHidePassword from '@components/Icons/IconHidePassword/IconHidePassword';
 import IconShowPassword from '@components/Icons/IconShowPassword/IconShowPassword';
 import ValidationError from '@components/ValidationError/ValidationError';
 import useBoolean from '@hooks/useBoolean';
 import type { TDefaultProps, TIconProps } from '@utils/types';
-import classNames from 'classnames';
-import type { DetailedHTMLProps, InputHTMLAttributes } from 'react';
-import React from 'react';
-import type { FieldRenderProps } from 'react-final-form';
-import { Field } from 'react-final-form';
 
 import css from './FieldPasswordInput.module.scss';
 

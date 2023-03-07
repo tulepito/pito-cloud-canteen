@@ -1,7 +1,8 @@
-import type { TDayColumnHeaderProps } from '@components/CalendarDashboard/helpers/types';
-import { getDayOfWeekByIndex } from '@utils/dates';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
+
+import type { TDayColumnHeaderProps } from '@components/CalendarDashboard/helpers/types';
+import { getDayOfWeekByIndex } from '@utils/dates';
 
 import css from './DayOfWeekCalendarHeader.module.scss';
 

@@ -1,10 +1,12 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import { loadPlanDataApi, updateParticipantOrderApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import {
   shoppingCartActions,
   shoppingCartThunks,
-} from '@redux/slices/shopingCart.slice';
-import { createSlice } from '@reduxjs/toolkit';
+} from '@redux/slices/shoppingCart.slice';
+import { EParticipantOrderStatus } from '@utils/enums';
 import { storableError } from '@utils/errors';
 
 const LOAD_DATA = 'app/ParticipantPlanPage/LOAD_DATA';
@@ -107,30 +109,32 @@ const updateOrder = createAsyncThunk(
     const { orderId, planId } = data;
     const { currentUser } = getState().user;
     const currentUserId = currentUser?.id?.uuid;
-    const { orders } = getState().shopingCart;
+    const { orders } = getState().shoppingCart;
     const planData = orders?.[currentUserId]?.[planId];
     const orderDays = Object.keys(planData);
 
     const updatedPlan = orderDays.reduce((acc: any, curr: any) => {
-      acc[curr] = {
-        [currentUserId]:
-          // eslint-disable-next-line no-nested-ternary
-          planData[curr] === 'notJoined'
-            ? {
-                status: 'notJoined',
-                foodId: '',
-              }
-            : planData[curr]
-            ? {
-                status: 'joined',
-                foodId: planData[curr],
-              }
-            : {
-                status: 'empty',
-                foodId: '',
-              },
+      return {
+        ...acc,
+        [curr]: {
+          [currentUserId]:
+            // eslint-disable-next-line no-nested-ternary
+            planData[curr] === EParticipantOrderStatus.notJoined
+              ? {
+                  status: EParticipantOrderStatus.notJoined,
+                  foodId: '',
+                }
+              : planData[curr]
+              ? {
+                  status: EParticipantOrderStatus.joined,
+                  foodId: planData[curr],
+                }
+              : {
+                  status: EParticipantOrderStatus.empty,
+                  foodId: '',
+                },
+        },
       };
-      return acc;
     }, {});
 
     const updateValues = {

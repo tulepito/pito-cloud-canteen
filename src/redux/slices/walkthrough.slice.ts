@@ -1,5 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit';
 import type { Step } from 'react-joyride';
+import { createSlice } from '@reduxjs/toolkit';
 
 // ================ Initial states ================ //
 type TWalkthroughState = {

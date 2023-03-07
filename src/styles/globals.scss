@@ -7,8 +7,8 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: Manrope, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-    Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: 'Manrope', Helvetica, Arial, sans-serif;
+  color: $neutralGray6;
 }
 
 a {
@@ -22,6 +22,11 @@ a {
 
 button {
   border: 0;
+  font-family: inherit;
+}
+
+table {
+  overflow: hidden;
 }
 /* User interaction (https://html.spec.whatwg.org/multipage/interaction.html#editing)
     ========================================================================== */

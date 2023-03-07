@@ -1,6 +1,7 @@
-import { sanitizeEntity } from '@utils/sanitize';
 import merge from 'lodash/merge';
 import reduce from 'lodash/reduce';
+
+import { sanitizeEntity } from '@utils/sanitize';
 
 import type {
   TAvailabilityException,
@@ -444,7 +445,7 @@ export const CurrentUser = (user: TCurrentUser) => {
 export const User = (user: TUser | TCurrentUser | TCompany) => {
   const ensuredUser = ensureUser(user);
   const id = ensuredUser?.id?.uuid;
-  const { attributes } = ensuredUser;
+  const { attributes, profileImage } = ensuredUser;
   const { profile } = attributes;
   const { privateData, publicData, protectedData, metadata } =
     profile as TObject;
@@ -474,14 +475,18 @@ export const User = (user: TUser | TCurrentUser | TCompany) => {
     getPublicData: (): TObject => {
       return publicData || {};
     },
+    getProfileImage: () => {
+      return profileImage || null;
+    },
   };
 };
 
-export const Listing = (listing: TListing) => {
+export const Listing = (listing: TListing | null) => {
   const ensuredListing = ensureListing(listing);
   const id = ensuredListing?.id?.uuid;
   const attributes = ensuredListing?.attributes;
   const { privateData, publicData, protectedData, metadata } = attributes || {};
+  const images = ensuredListing?.images;
 
   return {
     getId: () => {
@@ -504,6 +509,9 @@ export const Listing = (listing: TListing) => {
     },
     getPublicData: (): TObject => {
       return publicData || {};
+    },
+    getImages: () => {
+      return images || [];
     },
   };
 };

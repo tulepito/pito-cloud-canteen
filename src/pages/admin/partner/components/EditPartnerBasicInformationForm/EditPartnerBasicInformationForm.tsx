@@ -1,3 +1,9 @@
+import React, { useMemo, useRef, useState } from 'react';
+import { Field, Form as FinalForm } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import arrayMutators from 'final-form-arrays';
+import isEqual from 'lodash/isEqual';
+
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
@@ -13,6 +19,7 @@ import { LocationAutocompleteInputField } from '@components/LocationAutocomplete
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useViewport } from '@hooks/useViewport';
 import { EImageVariants, OTHER_OPTION, PACKAGING_OPTIONS } from '@utils/enums';
+import { isUploadImageOverLimitError } from '@utils/errors';
 import type { TImage } from '@utils/types';
 import {
   autocompletePlaceSelected,
@@ -22,6 +29,8 @@ import {
   emailFormatValid,
   minPriceLength,
   nonEmptyImage,
+  numberMinLength,
+  parseNum,
   parsePrice,
   passwordFormatValid,
   passwordMatchConfirmPassword,
@@ -29,12 +38,9 @@ import {
   required,
   validFacebookUrl,
   validURL,
+  valueGreaterThanMin,
+  valueLessThanMax,
 } from '@utils/validators';
-import arrayMutators from 'final-form-arrays';
-import isEqual from 'lodash/isEqual';
-import React, { useMemo, useRef, useState } from 'react';
-import { Field, Form as FinalForm } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import {
   createAvailabilityPlanInitialValues,
@@ -43,6 +49,7 @@ import {
   getLocationInitialValues,
 } from '../EditPartnerWizardTab/utils';
 import FieldBankAccounts from '../FieldBankAccounts/FieldBankAccounts';
+
 import css from './EditPartnerBasicInformationForm.module.scss';
 
 // const identity = (v: any) => v;
@@ -68,6 +75,8 @@ type TEditPartnerBasicInformationForm = {
   uploadAvatarError?: any;
 
   partnerListingRef?: any;
+
+  uploadingImage?: boolean;
 };
 
 const ACCEPT_IMAGES = 'image/png, image/gif, image/jpeg';
@@ -115,6 +124,8 @@ const EditPartnerBasicInformationForm: React.FC<
     phoneNumber,
     allWeekAvailabilityEntries,
     packagingOther,
+    minQuantity,
+    maxQuantity,
   } = publicData;
   const { bankAccounts } = privateData;
   const defaultBankAccounts = [
@@ -153,6 +164,8 @@ const EditPartnerBasicInformationForm: React.FC<
       minPrice: parsePrice(minPrice),
       bankAccounts: bankAccounts || defaultBankAccounts,
       packagingOther,
+      minQuantity,
+      maxQuantity,
     }),
     [],
   );
@@ -189,47 +202,67 @@ const EditPartnerBasicInformationForm: React.FC<
 
           formError,
           inProgress,
+
+          uploadingImage,
         } = fieldRenderProps;
 
         const ready = !formError && isEqual(submittedValues, values);
+        const uploadImageError = uploadAvatarError || uploadCoverError;
+        const uploadOverLimit = isUploadImageOverLimitError(uploadImageError);
+
+        let uploadImageFailed = null;
+
+        if (uploadOverLimit) {
+          uploadImageFailed = intl.formatMessage({
+            id: 'FieldPhotoUpload.imageUploadFailed.uploadOverLimit',
+          });
+        } else if (uploadImageError) {
+          uploadImageFailed = intl.formatMessage({
+            id: 'FieldPhotoUpload.imageUploadFailed.uploadFailed',
+          });
+        }
+
         return (
           <Form className={css.root} onSubmit={handleSubmit}>
             <div className={css.mediaFields}>
               <h3 className={css.mediaTitle}>
                 <FormattedMessage id="EditPartnerForm.partnerCoverAndAvatar" />
               </h3>
-              <FieldPhotoUpload
-                name="cover"
-                accept={ACCEPT_IMAGES}
-                id="cover"
-                className={css.fieldCover}
-                image={uploadedCovers?.[0]}
-                variants={COVER_VARIANTS}
-                onImageUpload={onCoverUpload}
-                onRemoveImage={onRemoveCover}
-                uploadImageError={uploadCoverError}
-                validate={nonEmptyImage(
-                  intl.formatMessage({
-                    id: 'EditPartnerBasicInformationForm.coverRequired',
-                  }),
+              <div className={css.mediaFieldGroup}>
+                <FieldPhotoUpload
+                  name="cover"
+                  accept={ACCEPT_IMAGES}
+                  id="cover"
+                  className={css.fieldCover}
+                  image={uploadedCovers?.[0]}
+                  variants={COVER_VARIANTS}
+                  onImageUpload={onCoverUpload}
+                  onRemoveImage={onRemoveCover}
+                  validate={nonEmptyImage(
+                    intl.formatMessage({
+                      id: 'EditPartnerBasicInformationForm.coverRequired',
+                    }),
+                  )}
+                />
+                <FieldPhotoUpload
+                  name="avatar"
+                  image={uploadedAvatars?.[0]}
+                  accept={ACCEPT_IMAGES}
+                  id="avatar"
+                  className={css.fieldAvatar}
+                  onImageUpload={onAvatarUpload}
+                  onRemoveImage={onRemoveAvatar}
+                  variants={AVATAR_VARIANTS}
+                  validate={nonEmptyImage(
+                    intl.formatMessage({
+                      id: 'EditPartnerBasicInformationForm.avatarRequired',
+                    }),
+                  )}
+                />
+                {uploadImageFailed && (
+                  <ErrorMessage message={uploadImageFailed} />
                 )}
-              />
-              <FieldPhotoUpload
-                name="avatar"
-                image={uploadedAvatars?.[0]}
-                accept={ACCEPT_IMAGES}
-                id="avatar"
-                className={css.fieldAvatar}
-                onImageUpload={onAvatarUpload}
-                onRemoveImage={onRemoveAvatar}
-                uploadImageError={uploadAvatarError}
-                variants={AVATAR_VARIANTS}
-                validate={nonEmptyImage(
-                  intl.formatMessage({
-                    id: 'EditPartnerBasicInformationForm.avatarRequired',
-                  }),
-                )}
-              />
+              </div>
             </div>
             <div className={css.fields}>
               <FieldTextInput
@@ -512,8 +545,75 @@ const EditPartnerBasicInformationForm: React.FC<
                       ),
                     )}
                     parse={parsePrice}
+                    rightIconContainerClassName={css.inputSuffixed}
                     rightIcon={<div className={css.currency}>đ</div>}
                   />
+                  <div className={css.flexField}>
+                    <FieldTextInput
+                      name="minQuantity"
+                      className={css.minQuantity}
+                      inputClassName={css.inputWithSuffix}
+                      id="minQuantity"
+                      type="number"
+                      parse={parseNum as any}
+                      label={intl.formatMessage({
+                        id: 'EditPartnerForm.minQuantityLabel',
+                      })}
+                      validate={composeValidatorsWithAllValues(
+                        required(
+                          intl.formatMessage({
+                            id: 'EditPartnerBasicInformationForm.minQuantityRequired',
+                          }),
+                        ),
+                        numberMinLength(
+                          intl.formatMessage({
+                            id: 'EditPartnerBasicInformationForm.minQuantityInvalid',
+                          }),
+                          1,
+                        ),
+                        valueLessThanMax(
+                          intl.formatMessage({
+                            id: 'EditPartnerBasicInformationForm.minQuantityLessThanMax',
+                          }),
+                          'maxQuantity',
+                        ),
+                        valueGreaterThanMin(
+                          intl.formatMessage({
+                            id: 'EditPartnerBasicInformationForm.minQuantityLessThanMax',
+                          }),
+                          'minQuantity',
+                        ),
+                      )}
+                      rightIconContainerClassName={css.inputSuffixed}
+                      rightIcon={<div className={css.currency}>phần</div>}
+                    />
+                    <FieldTextInput
+                      name="maxQuantity"
+                      className={css.maxQuantity}
+                      inputClassName={css.inputWithSuffix}
+                      id="maxQuantity"
+                      type="number"
+                      label={intl.formatMessage({
+                        id: 'EditPartnerBasicInformationForm.maxQuantityLabel',
+                      })}
+                      parse={parseNum as any}
+                      validate={composeValidatorsWithAllValues(
+                        required(
+                          intl.formatMessage({
+                            id: 'EditPartnerBasicInformationForm.maxQuantityRequired',
+                          }),
+                        ),
+                        numberMinLength(
+                          intl.formatMessage({
+                            id: 'EditPartnerBasicInformationForm.maxQuantityInvalid',
+                          }),
+                          1,
+                        ),
+                      )}
+                      rightIconContainerClassName={css.inputSuffixed}
+                      rightIcon={<div className={css.currency}>phần</div>}
+                    />
+                  </div>
                   <p className={css.packagingLabel}>
                     {intl.formatMessage({
                       id: 'EditPartnerBasicInformationForm.packagingLabel',
@@ -550,7 +650,7 @@ const EditPartnerBasicInformationForm: React.FC<
               </div>
               <Button
                 ready={ready}
-                disabled={inProgress}
+                disabled={inProgress || uploadingImage}
                 inProgress={inProgress}
                 className={css.submitButton}>
                 {intl.formatMessage({

@@ -1,5 +1,6 @@
-import { useAppSelector } from '@hooks/reduxHooks';
 import Joyride from 'react-joyride';
+
+import { useAppSelector } from '@hooks/reduxHooks';
 
 type TWalkthroughProps = {};
 

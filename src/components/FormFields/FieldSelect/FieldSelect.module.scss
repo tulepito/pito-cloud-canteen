@@ -21,6 +21,7 @@
 .select {
   @include inputStyles;
   width: 100%;
+  color: $neutralGray4;
 }
 
 .selectedColor {
@@ -35,6 +36,7 @@
 
 .selectContainer {
   position: relative;
+  z-index: 0;
 
   .leftIcon {
     position: absolute;

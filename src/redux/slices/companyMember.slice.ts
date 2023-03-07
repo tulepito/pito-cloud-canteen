@@ -1,3 +1,5 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import type { TUpdateMemberPermissionApiParams } from '@apis/companyApi';
 import {
   addMembersApi,
@@ -9,7 +11,6 @@ import {
 } from '@apis/companyApi';
 import { queryCompanyMembersApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import { storableAxiosError } from '@utils/errors';
 import type { TUser } from '@utils/types';
 

@@ -1,10 +1,11 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import type { ResponseToInvitationApiBody } from '@apis/companyInvitationApi';
 import {
   checkInvitationApi,
-  reponseToInvitationApi,
+  responseToInvitationApi,
 } from '@apis/companyInvitationApi';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 
 type CheckInvitationResponse = {
   message: string;
@@ -51,7 +52,7 @@ const responseToInvitation = createAsyncThunk(
   RESPONSE_TO_INVITATION,
   async (params: ResponseToInvitationApiBody) => {
     const { data: response }: { data: ResponseToInvitationResult } =
-      await reponseToInvitationApi(params);
+      await responseToInvitationApi(params);
     return response.message;
   },
 );

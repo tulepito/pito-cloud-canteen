@@ -1,15 +1,18 @@
-import type { TObject } from '@utils/types';
-import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
 import type { Event } from 'react-big-calendar';
+import { DateTime } from 'luxon';
+
+import type { TObject } from '@utils/types';
 
 import type {
   TCalendarItemCardComponents,
   TDayColumnHeaderProps,
 } from '../../helpers/types';
-import css from './DayItem.module.scss';
+
 import DayItemContent from './DayItemContent';
 import DayItemHeader from './DayItemHeader';
+
+import css from './DayItem.module.scss';
 
 type TWDayItemProps = {
   date: Date;

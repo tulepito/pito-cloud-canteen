@@ -1,0 +1,19 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  .modalContainer {
+    overflow: unset;
+
+    @include viewportMedium {
+      flex-basis: 700px;
+    }
+
+    @include viewportLarge {
+      flex-basis: 700px;
+    }
+
+    .title {
+      text-transform: capitalize;
+    }
+  }
+}

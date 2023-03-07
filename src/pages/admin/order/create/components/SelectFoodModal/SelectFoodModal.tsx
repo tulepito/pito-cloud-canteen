@@ -1,10 +1,12 @@
-import Badge, { EBadgeType } from '@components/Badge/Badge';
-import Modal from '@components/Modal/Modal';
 import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
+import Badge, { EBadgeType } from '@components/Badge/Badge';
+import Modal from '@components/Modal/Modal';
+
 import type { TSelectFoodFormValues } from './components/SelectFoodForm/SelectFoodForm';
 import SelectFoodForm from './components/SelectFoodForm/SelectFoodForm';
+
 import css from './SelectFoodModal.module.scss';
 
 type TSelectFoodModalProps = {
@@ -13,6 +15,7 @@ type TSelectFoodModalProps = {
   items: any[];
   restaurant: any;
   initialFoodList?: any;
+  selectFoodInProgress?: boolean;
   handleSelectFood: (values: TSelectFoodFormValues) => void;
 };
 
@@ -25,6 +28,7 @@ const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
     restaurant,
     handleSelectFood,
     initialFoodList = {},
+    selectFoodInProgress,
   } = props;
   const restaurantId = restaurant?.id?.uuid;
   const { title } = restaurant?.attributes || {};
@@ -34,6 +38,12 @@ const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
       setFoodCount(Object.keys(initialFoodList).length);
     }
   }, [initialFoodList]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setFoodCount(0);
+    }
+  }, [isOpen]);
 
   const handleFormChange = (food: string[] | undefined) => {
     setFoodCount(food?.length || 0);
@@ -45,7 +55,7 @@ const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
         {title}
       </div>
       <Badge
-        type={EBadgeType.WARNING}
+        type={EBadgeType.warning}
         label={intl.formatMessage(
           {
             id: 'SelectFoodModal.selectedTitle',
@@ -65,8 +75,14 @@ const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
     [JSON.stringify(initialFoodList)],
   );
 
+  if (!isOpen) return null;
+
   return (
-    <Modal title={titlePart} isOpen={isOpen} handleClose={handleClose}>
+    <Modal
+      title={titlePart}
+      isOpen={isOpen}
+      handleClose={handleClose}
+      id="SelectFoodModal">
       {isOpen && (
         <SelectFoodForm
           formId={restaurantId}
@@ -74,6 +90,7 @@ const SelectFoodModal: React.FC<TSelectFoodModalProps> = (props) => {
           items={items}
           handleFormChange={handleFormChange}
           initialValues={initialValues}
+          selectFoodInProgress={selectFoodInProgress}
         />
       )}
     </Modal>

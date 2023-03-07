@@ -1,9 +1,10 @@
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+
 import { fetchListing } from '@services/integrationHelper';
 import { getSdk, handleError } from '@services/sdk';
 import { HTTP_METHODS } from '@src/pages/api/helpers/constants';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 const orderChecker =
   (handler: NextApiHandler) =>
@@ -16,6 +17,7 @@ const orderChecker =
       const [currentUser] = denormalisedResponseEntities(currentUserResponse);
       const { isAdmin = false } = User(currentUser).getMetadata();
       const { company = {} } = User(currentUser).getMetadata();
+
       switch (apiMethod) {
         case HTTP_METHODS.POST: {
           if (!companyId) {

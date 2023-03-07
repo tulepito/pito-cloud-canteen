@@ -1,16 +1,18 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import {
   checkMenuInTransactionProgressApi,
-  checkMenuUnconflictedApi,
+  checkMenuUnConflictedApi,
   createPartnerMenuApi,
   deletePartnerMenuApi,
   queryAllMenusApi,
   showPartnerMenuApi,
   updatePartnerMenuApi,
 } from '@apis/menuApi';
-import type { TCheckUnconflictedParams } from '@helpers/apiHelpers';
+import type { TCheckUnConflictedParams } from '@helpers/apiHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
+import type { EListingStates } from '@utils/enums';
 import { EListingType, EMenuMealType } from '@utils/enums';
 import { storableAxiosError, storableError } from '@utils/errors';
 import type { TIntegrationListing, TListing, TPagination } from '@utils/types';
@@ -54,6 +56,9 @@ type TMenusSliceState = {
 
   isCheckingMenuUnConflicted: boolean;
   checkingMenuUnConflictedError: any;
+
+  toggleMenuStateInProgressId: string | null;
+  toggleMenuStateError: any;
 };
 const initialState: TMenusSliceState = {
   menus: [],
@@ -88,6 +93,9 @@ const initialState: TMenusSliceState = {
 
   isCheckingMenuUnConflicted: false,
   checkingMenuUnConflictedError: null,
+
+  toggleMenuStateInProgressId: null,
+  toggleMenuStateError: null,
 };
 
 // ================ Thunk types ================ //
@@ -123,8 +131,8 @@ const CHECK_MENU_IS_UN_CONFLICTED =
 
 const checkMenuUnconflicted = createAsyncThunk(
   CHECK_MENU_IS_UN_CONFLICTED,
-  async (payload: TCheckUnconflictedParams) => {
-    const { data } = await checkMenuUnconflictedApi(payload);
+  async (payload: TCheckUnConflictedParams) => {
+    const { data } = await checkMenuUnConflictedApi(payload);
     return data;
   },
   {
@@ -224,21 +232,30 @@ const updatePartnerMenuListing = createAsyncThunk(
   },
 );
 
-const togglePartnerMenuListing = createAsyncThunk(
+const toggleMenuState = createAsyncThunk(
   TOGGLE_PARTNER_MENU_LISTING,
-  async (payload: any, { rejectWithValue }) => {
-    try {
-      const { data } = await updatePartnerMenuApi({
-        dataParams: payload,
-        queryParams: {
-          expand: true,
+  async ({
+    id,
+    listingState,
+  }: {
+    id: string;
+    listingState: EListingStates;
+  }) => {
+    const { data } = await updatePartnerMenuApi({
+      dataParams: {
+        id,
+        metadata: {
+          listingState,
         },
-      });
-      return denormalisedResponseEntities(data)[0];
-    } catch (error) {
-      console.error(`${CREATE_PARTNER_MENU_LISTING} error: `, error);
-      return rejectWithValue(storableAxiosError(error));
-    }
+      },
+      queryParams: {
+        expand: true,
+      },
+    });
+    return denormalisedResponseEntities(data)[0];
+  },
+  {
+    serializeError: storableAxiosError,
   },
 );
 
@@ -281,14 +298,9 @@ const deletePartnerMenu = createAsyncThunk(
 
 const queryMenuOptionsToDuplicate = createAsyncThunk(
   QUERY_MENU_OPTIONS_TO_DUPLICATE,
-  async (payload: any, { rejectWithValue }) => {
+  async ({ restaurantId }: { restaurantId: string }, { rejectWithValue }) => {
     try {
-      const { data } = await queryAllMenusApi({
-        dataParams: {
-          ...payload,
-        },
-        queryParams: {},
-      });
+      const { data } = await queryAllMenusApi({ restaurantId });
       return data;
     } catch (error) {
       console.error(`${QUERY_MENU_OPTIONS_TO_DUPLICATE} error: `, error);
@@ -320,7 +332,7 @@ export const menusSliceThunks = {
   deletePartnerMenu,
   queryMenuOptionsToDuplicate,
   checkingMenuInTransactionProgress,
-  togglePartnerMenuListing,
+  toggleMenuState,
   checkMenuUnconflicted,
 };
 
@@ -477,6 +489,34 @@ const menusSliceSlice = createSlice({
           ...state,
           isCheckingMenuUnConflicted: false,
           checkingMenuUnConflictedError: error,
+        };
+      })
+      .addCase(toggleMenuState.pending, (state, { meta }) => {
+        const { id } = meta.arg;
+        return {
+          ...state,
+          toggleMenuStateInProgressId: id,
+          toggleMenuStateError: null,
+        };
+      })
+      .addCase(toggleMenuState.fulfilled, (state, { payload }) => {
+        const { menus } = state;
+        const newMenus = [...menus].map((m) =>
+          m.id.uuid === payload.id.uuid ? payload : m,
+        );
+
+        return {
+          ...state,
+          toggleMenuStateInProgressId: null,
+          toggleMenuStateError: null,
+          menus: newMenus,
+        };
+      })
+      .addCase(toggleMenuState.rejected, (state, { error }) => {
+        return {
+          ...state,
+          toggleMenuStateInProgressId: null,
+          toggleMenuStateError: error,
         };
       });
   },

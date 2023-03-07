@@ -56,6 +56,7 @@ export const sanitizeUser = (entity: TObject) => {
     privateData,
     firstName,
     lastName,
+    protectedData,
   } = profile || {};
 
   // TODO: If you add public data, you should probably sanitize it here.
@@ -68,6 +69,8 @@ export const sanitizeUser = (entity: TObject) => {
 
   const sanitizedPrivateData = privateData ? { privateData } : {};
 
+  const sanitizedProtectedData = protectedData ? { protectedData } : {};
+
   const profileMaybe = profile
     ? {
         profile: {
@@ -79,6 +82,7 @@ export const sanitizeUser = (entity: TObject) => {
           ...sanitizedPublicData,
           ...sanitizedMetadata,
           ...sanitizedPrivateData,
+          ...sanitizedProtectedData,
         },
       }
     : {};

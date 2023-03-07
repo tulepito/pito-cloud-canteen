@@ -1,3 +1,8 @@
+import { useEffect, useMemo, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import CreateGroupModal from '@components/CreateGroupModal/CreateGroupModal';
@@ -14,10 +19,6 @@ import {
   addWorkspaceCompanyId,
   companyThunks,
 } from '@src/redux/slices/company.slice';
-import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import css from './GroupSetting.module.scss';
 
@@ -164,7 +165,8 @@ const GroupSettingPage = () => {
         </Button>
       </div>
       <div className={css.tableContainer}>
-        {formattedGroupList && formattedGroupList.length > 0 ? (
+        {(formattedGroupList && formattedGroupList.length > 0) ||
+        fetchCompanyInfoInProgress ? (
           <Table
             columns={TABLE_COLUMN}
             data={formattedGroupList}

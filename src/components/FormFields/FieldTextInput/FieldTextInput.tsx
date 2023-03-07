@@ -1,9 +1,10 @@
-import ValidationError from '@components/ValidationError/ValidationError';
-import type { TDefaultProps, TIconProps } from '@utils/types';
-import classNames from 'classnames';
 import React from 'react';
 import type { FieldProps, FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
+import classNames from 'classnames';
+
+import ValidationError from '@components/ValidationError/ValidationError';
+import type { TDefaultProps, TIconProps } from '@utils/types';
 
 import css from './FieldTextInput.module.scss';
 
@@ -25,6 +26,8 @@ type InputComponentProps = FieldRenderProps<string, any> &
     rightIcon?: TIconComponent;
     required?: boolean;
     showText?: boolean;
+    placeholder?: string;
+    inputClassName?: string;
   };
 
 export const FieldTextInputComponent: React.FC<InputComponentProps> = (
@@ -50,6 +53,7 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
     showText = false,
     leftIconContainerClassName,
     rightIconContainerClassName,
+    inputClassName,
     ...rest
   } = props;
 
@@ -76,19 +80,19 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
   // Handle Icon
   const leftIconElement = leftIcon
     ? React.cloneElement(leftIcon, {
-        rootClassName: css.leftIcon,
+        className: css.leftIcon,
       })
     : undefined;
   const rightIconElement = rightIcon
     ? React.cloneElement(rightIcon, {
-        rootClassName: css.rightIcon,
+        className: css.rightIcon,
       })
     : undefined;
 
   // Classes
   const inputClasses =
     inputRootClass ||
-    classNames(css.input, {
+    classNames(css.input, inputClassName, {
       [css.inputSuccess]: valid,
       [css.inputError]: hasError,
       [css.inputDisabled]: disabled,
@@ -145,13 +149,15 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
             </div>
           )}
           <input {...inputProps} />
-          <div
-            className={classNames(
-              css.rightIconContainer,
-              rightIconContainerClassName,
-            )}>
-            {rightIconElement}
-          </div>
+          {!!rightIcon && (
+            <div
+              className={classNames(
+                css.rightIconContainer,
+                rightIconContainerClassName,
+              )}>
+              {rightIconElement}
+            </div>
+          )}
         </div>
       )}
       <ValidationError fieldMeta={fieldMeta} />

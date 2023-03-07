@@ -1,3 +1,5 @@
+import { EBadgeType } from '@components/Badge/Badge';
+
 export enum EImageVariants {
   default = 'default',
   landscapeCrop = 'landscape-crop',
@@ -107,7 +109,6 @@ export enum ECompanyStates {
 
 export enum EListingType {
   restaurant = 'restaurant',
-  transaction = 'transaction',
   food = 'food',
   menu = 'menu',
   subOrder = 'sub-order',
@@ -120,16 +121,14 @@ export enum EUserPermission {
   normal = 'normal',
 }
 
+export enum ECompanyMemberPermission {
+  owner = 'owner',
+}
+
 export const startRouteBaseOnPermission = {
   [EUserPermission.company]: '/company',
   [EUserPermission.admin]: '/admin',
 };
-
-export enum ERestaurantListingState {
-  draft = 'draft',
-  published = 'published',
-  deleted = 'deleted',
-}
 
 export enum ERestaurantListingStatus {
   new = 'new',
@@ -341,21 +340,39 @@ export const LIST_BANKS = [
   },
 ];
 
+export const EPackagingMaterials = {
+  PAPER_BOX: 'paper-box',
+  PLASTIC_BOX: 'plastic-box',
+  BAGASSE_BOX: 'bagasse-box',
+  PLASTIC_STYROFOAM: 'plastic-styrofoam',
+  HEAT_RETAINING_ALUMINUM_XBOX: 'heat-retaining-aluminum-xbox',
+  DEGRADABLE_PLASTIC: 'degradable-plastic',
+  REUSABLE_BOX: 'reusable-box',
+};
+
 export const PACKAGING_OPTIONS = [
   {
-    key: 'paper-box',
+    key: EPackagingMaterials.PAPER_BOX,
     label: 'Hộp giấy',
   },
   {
-    key: 'plastic-box',
-    label: 'Hộp nhựa',
+    key: EPackagingMaterials.PLASTIC_BOX,
+    label: 'Nhựa xốp',
   },
   {
-    key: 'bagasse-box',
+    key: EPackagingMaterials.BAGASSE_BOX,
     label: 'Hộp bã mía',
   },
   {
-    key: 'reusable-box',
+    key: EPackagingMaterials.HEAT_RETAINING_ALUMINUM_XBOX,
+    label: 'Hộp nhôm giữ nhiệt',
+  },
+  {
+    key: EPackagingMaterials.DEGRADABLE_PLASTIC,
+    label: 'Nhựa có thể phân hủy',
+  },
+  {
+    key: EPackagingMaterials.REUSABLE_BOX,
     label: 'Hộp ăn tái sử dụng',
   },
   {
@@ -393,94 +410,117 @@ export const CATEGORY_OPTIONS = [
   {
     key: 'vietnam-food',
     label: 'Thuần Việt',
+    badgeType: EBadgeType.info,
   },
   {
     key: 'vietnam-north-food',
     label: 'Món Bắc',
+    badgeType: EBadgeType.default,
   },
   {
     key: 'vietnam-centrel-food',
     label: 'Món Trung',
+    badgeType: EBadgeType.danger,
   },
   {
     key: 'vietnam-west-food',
     label: 'Món Miền Tây',
+    badgeType: EBadgeType.info,
   },
   {
     key: 'chinese-food',
     label: 'Hoa',
+    badgeType: EBadgeType.warning,
   },
   {
     key: 'thai-food',
     label: 'Thái',
+    badgeType: EBadgeType.warning,
   },
   {
     key: 'korean-food',
     label: 'Hàn quốc',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'japanese-food',
     label: 'Nhật Bản',
+    badgeType: EBadgeType.warning,
   },
   {
     key: 'indian-food',
     label: 'Ấn độ',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'french-food',
     label: 'Pháp',
+    badgeType: EBadgeType.info,
   },
   {
     key: 'mediterranean-food',
     label: 'Địa Trung Hải',
+    badgeType: EBadgeType.danger,
   },
   {
     key: 'italian-food',
     label: 'Ý',
+    badgeType: EBadgeType.default,
   },
   {
     key: 'barbeque',
     label: 'BBQ',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'sea-food',
     label: 'Hải sản',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'international-food',
     label: 'Quốc Tế',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'europe-food',
     label: 'Âu',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'asian-food',
     label: 'Á',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'vegetarian-food',
     label: 'Chay',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'macrobiotic-food',
     label: 'Thực dưỡng',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'halal',
     label: 'Halal',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'keto',
     label: 'keto',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'dessert',
     label: 'Tráng miệng',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'snack',
     label: 'Ăn vặt',
+    badgeType: EBadgeType.success,
   },
   {
     key: OTHER_OPTION,
@@ -603,23 +643,64 @@ export const MENU_OPTIONS = [
 ];
 
 export enum EOrderStates {
-  draft = 'draft',
-  isNew = 'isNew',
   canceled = 'canceled',
+  canceledByBooker = 'canceledByBooker',
   picking = 'picking',
   inProgress = 'inProgress',
+  pendingPayment = 'pendingPayment',
   completed = 'completed',
   reviewed = 'reviewed',
 }
 
+export enum EBookerOrderDraftStates {
+  bookerDraft = 'bookerDraft',
+}
+export enum EOrderDraftStates {
+  draft = 'draft',
+  pendingApproval = 'pendingApproval',
+}
+
 export const SPECIAL_DIET_OPTIONS = [
+  {
+    key: 'low-carb',
+    label: 'Low-carb',
+  },
+
+  {
+    key: 'keto',
+    label: 'Keto',
+  },
+  {
+    key: 'mediterranean-diet',
+    label: 'Mediterranean Diet',
+  },
+  {
+    key: 'plant-based',
+    label: 'Plant-based',
+  },
   {
     key: 'halal',
     label: 'Halal',
   },
   {
-    key: 'keto',
-    label: 'Keto',
+    key: 'intermittent-fasting',
+    label: 'Intermittent Fasting',
+  },
+  {
+    key: 'carnivore-diet',
+    label: 'Carnivore Diet',
+  },
+  {
+    key: 'healthy',
+    label: 'Healthy',
+  },
+  {
+    key: 'paleo-diet',
+    label: 'Paleo Diet',
+  },
+  {
+    key: 'gluten-free',
+    label: 'Gluten free',
   },
   {
     key: OTHER_OPTION,
@@ -674,7 +755,19 @@ export const ORDER_STATES_OPTIONS = [
     label: 'Hủy',
   },
   {
-    key: EOrderStates.isNew,
+    key: EOrderStates.canceledByBooker,
+    label: 'Hủy',
+  },
+  {
+    key: EOrderDraftStates.pendingApproval,
+    label: 'Đơn mới',
+  },
+  {
+    key: EOrderDraftStates.draft,
+    label: 'Đơn nháp',
+  },
+  {
+    key: EBookerOrderDraftStates.bookerDraft,
     label: 'Đơn nháp',
   },
   {
@@ -747,3 +840,36 @@ export const COMPANY_NUTRITION_TYPE_OPTIONS = [
     label: 'Không chứa glucoten',
   },
 ];
+
+export enum EManageCompanyOrdersTab {
+  ALL = 'all',
+  SCHEDULED = 'scheduled',
+  COMPLETED = 'completed',
+  DRAFT = 'draft',
+  CANCELED = 'canceled',
+}
+
+export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
+  [EManageCompanyOrdersTab.ALL]: [
+    EOrderDraftStates.pendingApproval,
+    EBookerOrderDraftStates.bookerDraft,
+    EOrderStates.picking,
+    EOrderStates.inProgress,
+    EOrderStates.completed,
+    EOrderStates.reviewed,
+    EOrderStates.canceled,
+  ],
+  [EManageCompanyOrdersTab.SCHEDULED]: [
+    EOrderStates.picking,
+    EOrderStates.inProgress,
+  ],
+  [EManageCompanyOrdersTab.COMPLETED]: [
+    EOrderStates.completed,
+    EOrderStates.reviewed,
+  ],
+  [EManageCompanyOrdersTab.DRAFT]: [
+    EOrderDraftStates.pendingApproval,
+    EBookerOrderDraftStates.bookerDraft,
+  ],
+  [EManageCompanyOrdersTab.CANCELED]: [EOrderStates.canceled],
+};

@@ -1,9 +1,10 @@
-import BookerOrderDetailReviewView from '@pages/orders/[orderId]/components/BookerOrderDetailsReviewView/BookerOrderDetailsReviewView/BookerOrderDetailReviewView';
-import { downloadPriceQuotation } from '@pages/orders/[orderId]/helpers/downloadPriceQuotation';
-import { usePrepareOrderDetailPageData } from '@pages/orders/[orderId]/hooks/usePrepareData';
+import BookerOrderDetailReviewView from '../picking/components/BookerOrderDetailsReviewView/BookerOrderDetailsReviewView/BookerOrderDetailReviewView';
+import { downloadPriceQuotation } from '../picking/helpers/downloadPriceQuotation';
+import { usePrepareOrderDetailPageData } from '../picking/hooks/usePrepareData';
+
+import TitleSection from './TitleSection';
 
 import css from './CompanyOrderDetailPage.module.scss';
-import TitleSection from './TitleSection';
 
 type TCompanyOrderDetailPageProps = {};
 

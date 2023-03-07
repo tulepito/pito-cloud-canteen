@@ -1,15 +1,17 @@
+import React from 'react';
+import { useIntl } from 'react-intl';
+import { DateTime } from 'luxon';
+
 import { isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@utils/data';
-import { DateTime } from 'luxon';
-import React from 'react';
-import { useIntl } from 'react-intl';
+import type { TObject } from '@utils/types';
 
 import CartItem from './CartItem';
 
 type TCartItemList = {
   className?: string;
-  cartList: Record<string, any>;
+  cartList: TObject;
   cartListKeys: string[];
   plan: any;
   handleRemoveItem: (dayId: string) => void;

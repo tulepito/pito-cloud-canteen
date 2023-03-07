@@ -1,31 +1,31 @@
+import { useState } from 'react';
+import type { FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import Avatar from '@components/Avatar/Avatar';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import IconMail from '@components/Icons/IconMail/IconMail';
 import IconPhone from '@components/Icons/IconPhone/IconPhone';
-import IconSort from '@components/Icons/IconSort/IconSort';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import Pagination from '@components/Pagination/Pagination';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { addBooker } from '@redux/slices/Order.slice';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
-import classNames from 'classnames';
-import { useState } from 'react';
-import type { FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
 
-import css from './ClientTable.module.scss';
 import IconNoClientsFound from './IconNoClientsFound';
 
-const PAGE_SIZE = 10;
+import css from './ClientTable.module.scss';
 
 type ClientTableProps = {
   data: any[];
   totalItems: number;
   page: number;
+  pageSize: number;
   bookerList: TUser[];
   fetchBookersInProgress: boolean;
   createOrderInProgress: boolean;
@@ -33,6 +33,7 @@ type ClientTableProps = {
   onItemClick?: (value: string) => void;
   onSubmit: (values: any) => void;
   toggleSort: () => void;
+  onPageSizeChange?: (value: number, perPageValue: number) => void;
 };
 
 const ClientTable: React.FC<ClientTableProps> = (props) => {
@@ -47,8 +48,10 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
     onSubmit,
     bookerList,
     fetchBookersInProgress,
-    toggleSort,
+    // toggleSort,
     createOrderInProgress,
+    onPageSizeChange,
+    pageSize,
   } = props;
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
   const [selectedBookerId, setSelectedBookerId] = useState<string>('');
@@ -78,7 +81,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
         !fetchBookersInProgress;
       const showLoading =
         selectedCompanyId === itemData.id && fetchBookersInProgress;
-      const currentIdx = (page - 1) * 10 + (index + 1);
+      const currentIdx = (page - 1) * pageSize + (index + 1);
 
       return (
         <div key={key} className={css.bodyRow}>
@@ -128,9 +131,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
                     <div className={css.contact}>
                       <div className={css.row}>
                         <IconPhone />
-                        <span>
-                          {User(booker).getProtectedData().phoneNumber}
-                        </span>
+                        <div>{User(booker).getProtectedData().phoneNumber}</div>
                       </div>
                       <div className={css.row}>
                         <IconMail />
@@ -182,7 +183,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
                   <span>{intl.formatMessage({ id: 'ClientTable.id' })}</span>
                   <span className={css.companyNameHeaderCol}>
                     {intl.formatMessage({ id: 'ClientTable.companyName' })}
-                    <IconSort className={css.sortIcon} onClick={toggleSort} />
+                    {/* <IconSort className={css.sortIcon} onClick={toggleSort} /> */}
                   </span>
                   <span>
                     {intl.formatMessage({ id: 'ClientTable.address' })}
@@ -202,9 +203,11 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
                 <div className={css.paginationContainer}>
                   <Pagination
                     total={totalItems}
-                    pageSize={PAGE_SIZE}
+                    pageSize={pageSize}
                     current={page}
                     onChange={onPageChange}
+                    showSizeChanger
+                    onShowSizeChange={onPageSizeChange}
                   />
                 </div>
               )}

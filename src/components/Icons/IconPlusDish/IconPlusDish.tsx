@@ -1,8 +1,11 @@
 import React from 'react';
 
-const IconPlusDish = () => {
+import type { TIconProps } from '@utils/types';
+
+const IconPlusDish: React.FC<TIconProps> = ({ className }) => {
   return (
     <svg
+      className={className}
       preserveAspectRatio="none"
       width={12}
       height={12}

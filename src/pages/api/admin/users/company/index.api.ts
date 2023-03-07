@@ -1,14 +1,17 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { queryAllUsers } from '@helpers/apiHelpers';
 import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const response = (await queryAllUsers({
       query: {
         meta_isCompany: true,
+        include: ['profileImage'],
+        'fields.image': ['variants.square-small', 'variants.square-small2x'],
       },
     })) as any;
     res.json(response);
@@ -18,4 +21,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   }
 }
 
-export default cookies(handler);
+export default cookies(adminChecker(handler));

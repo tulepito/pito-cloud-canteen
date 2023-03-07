@@ -1,3 +1,11 @@
+import React, { useEffect, useMemo } from 'react';
+import { Form as FinalForm } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import arrayMutators from 'final-form-arrays';
+import isEmpty from 'lodash/isEmpty';
+
 import Collapsible from '@components/Collapsible/Collapsible';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import Form from '@components/Form/Form';
@@ -8,20 +16,19 @@ import Tabs from '@components/Tabs/Tabs';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { orderAsyncActions } from '@redux/slices/Order.slice';
+import {
+  changeStep4SubmitStatus,
+  orderAsyncActions,
+} from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
-import { parseTimestampToFormat } from '@utils/dates';
+import { formatTimestamp } from '@utils/dates';
+import { EOrderDraftStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
 import { required } from '@utils/validators';
-import classNames from 'classnames';
-import arrayMutators from 'final-form-arrays';
-import React, { useEffect, useMemo } from 'react';
-import { Form as FinalForm } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../NavigateButtons/NavigateButtons';
+
 import css from './ReviewOrder.module.scss';
 
 const MENU_TABLE_COLUMN: TColumn[] = [
@@ -72,11 +79,11 @@ const MENU_TABLE_COLUMN: TColumn[] = [
 ];
 
 const ReviewContent: React.FC<any> = (props) => {
-  const { deliveryHour, deliveryAddress = {}, restaurant } = props;
+  const { restaurant } = props;
   const { restaurantName, phoneNumber, foodList = {} } = restaurant;
 
-  const { address } = deliveryAddress;
   const intl = useIntl();
+
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
     return {
       key,
@@ -90,55 +97,6 @@ const ReviewContent: React.FC<any> = (props) => {
 
   return (
     <div>
-      <Collapsible
-        label={intl.formatMessage({ id: 'ReviewOrder.generalInfo' })}>
-        <div className={css.contentBox}>
-          <div className={css.flexChild}>
-            <span className={css.boxTitle}>
-              {intl.formatMessage({ id: 'ReviewOrder.deliveryTime' })}
-            </span>
-            <span className={css.boxContent}>{deliveryHour}</span>
-          </div>
-          <div className={css.flexChild}>
-            <span className={css.boxTitle}>
-              {intl.formatMessage({ id: 'ReviewOrder.address' })}
-            </span>
-            <span className={css.boxContent}>{address}</span>
-          </div>
-          <div className={css.flexChild}>
-            <span className={css.boxTitle}>
-              {intl.formatMessage({ id: 'ReviewOrder.staffNameLabel' })}
-            </span>
-            <FieldTextInput
-              className={css.staffInput}
-              name="staffName"
-              id="staffName"
-              placeholder={intl.formatMessage({
-                id: 'ReviewOrder.staffNamePlaceholder',
-              })}
-              validate={required(
-                intl.formatMessage({ id: 'ReviewOrder.staffNameRequired' }),
-              )}
-            />
-          </div>
-          <div className={css.flexChild}>
-            <span className={css.boxTitle}>
-              {intl.formatMessage({ id: 'ReviewOrder.shipperName.label' })}
-            </span>
-            <FieldTextInput
-              className={css.staffInput}
-              name="shipperName"
-              id="shipperName"
-              placeholder={intl.formatMessage({
-                id: 'ReviewOrder.shipperName.placeholder',
-              })}
-              validate={required(
-                intl.formatMessage({ id: 'ReviewOrder.shipperName.required' }),
-              )}
-            />
-          </div>
-        </div>
-      </Collapsible>
       <Collapsible
         label={intl.formatMessage({
           id: 'ReviewOrder.providerLabel',
@@ -185,40 +143,66 @@ const parseDataToReviewTab = (values: any) => {
   const items = Object.keys(orderDetail).map((key: any) => {
     return {
       key,
-      label: parseTimestampToFormat(Number(key)),
+      label: formatTimestamp(Number(key)),
       childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
       childrenProps: { ...orderDetail[key], ...rest, order: values },
     };
   });
+
   return items;
 };
 
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
+
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
+
   const createOrderError = useAppSelector(
     (state) => state.Order.createOrderError,
   );
   const updateOrderInProgress = useAppSelector(
     (state) => state.Order.updateOrderInProgress,
   );
+  const updateOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.updateOrderDetailInProgress,
+  );
+
+  const submitInProgress = updateOrderInProgress || updateOrderDetailInProgress;
 
   const {
     value: isSuccessModalOpen,
     setTrue: openSuccessModal,
     setFalse: closeSuccessModal,
   } = useBoolean();
+
+  const orderId = Listing(order as TListing).getId();
+  const {
+    staffName,
+    deliveryHour,
+    deliveryAddress,
+    shipperName,
+    orderState,
+    plans = [],
+  } = Listing(order as TListing).getMetadata();
+  const planId = plans.length > 0 ? plans[0] : undefined;
+  const { address } = deliveryAddress || {};
+
   useEffect(() => {
-    dispatch(orderAsyncActions.fetchOrderDetail());
-  }, []);
-  const { staffName, deliveryHour, deliveryAddress, shipperName } = Listing(
-    order as TListing,
-  ).getMetadata();
+    if (isEmpty(orderDetail) && !isEmpty(plans)) {
+      dispatch(orderAsyncActions.fetchOrderDetail(plans));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    JSON.stringify(order),
+    JSON.stringify(orderDetail),
+    JSON.stringify(plans),
+  ]);
+
   const { renderedOrderDetail } =
     useMemo(() => {
       return {
@@ -232,6 +216,20 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
 
   const onSubmit = async (values: any) => {
     const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
+    dispatch(changeStep4SubmitStatus(true));
+    if (planId && orderId) {
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId,
+          orderDetail,
+        }),
+      );
+    }
+    if (orderState === EOrderDraftStates.draft) {
+      await dispatch(orderAsyncActions.requestApprovalOrder({ orderId }));
+    }
+
     const { error } = (await dispatch(
       orderAsyncActions.updateOrder({
         generalInfo: {
@@ -244,6 +242,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     if (!error) {
       openSuccessModal();
     }
+    dispatch(changeStep4SubmitStatus(false));
   };
 
   const initialValues = useMemo(() => {
@@ -265,13 +264,69 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         onSubmit={onSubmit}
         render={(fieldRenderProps: any) => {
           const { handleSubmit, goBack, invalid } = fieldRenderProps;
+
           return (
             <Form onSubmit={handleSubmit}>
+              <Collapsible
+                label={intl.formatMessage({ id: 'ReviewOrder.generalInfo' })}>
+                <div className={css.contentBox}>
+                  <div className={css.flexChild}>
+                    <span className={css.boxTitle}>
+                      {intl.formatMessage({ id: 'ReviewOrder.deliveryTime' })}
+                    </span>
+                    <span className={css.boxContent}>{deliveryHour}</span>
+                  </div>
+                  <div className={css.flexChild}>
+                    <span className={css.boxTitle}>
+                      {intl.formatMessage({ id: 'ReviewOrder.address' })}
+                    </span>
+                    <span className={css.boxContent}>{address}</span>
+                  </div>
+                  <div className={css.flexChild}>
+                    <span className={css.boxTitle}>
+                      {intl.formatMessage({ id: 'ReviewOrder.staffNameLabel' })}
+                    </span>
+                    <FieldTextInput
+                      className={css.staffInput}
+                      name="staffName"
+                      id="staffName"
+                      placeholder={intl.formatMessage({
+                        id: 'ReviewOrder.staffNamePlaceholder',
+                      })}
+                      validate={required(
+                        intl.formatMessage({
+                          id: 'ReviewOrder.staffNameRequired',
+                        }),
+                      )}
+                    />
+                  </div>
+                  <div className={css.flexChild}>
+                    <span className={css.boxTitle}>
+                      {intl.formatMessage({
+                        id: 'ReviewOrder.shipperName.label',
+                      })}
+                    </span>
+                    <FieldTextInput
+                      className={css.staffInput}
+                      name="shipperName"
+                      id="shipperName"
+                      placeholder={intl.formatMessage({
+                        id: 'ReviewOrder.shipperName.placeholder',
+                      })}
+                      validate={required(
+                        intl.formatMessage({
+                          id: 'ReviewOrder.shipperName.required',
+                        }),
+                      )}
+                    />
+                  </div>
+                </div>
+              </Collapsible>
               <Tabs items={renderedOrderDetail as any} showNavigation />
               <NavigateButtons
                 goBack={goBack}
                 submitDisabled={invalid}
-                inProgress={updateOrderInProgress}
+                inProgress={submitInProgress}
               />
               {createOrderError && (
                 <div className={css.error}>{createOrderError}</div>

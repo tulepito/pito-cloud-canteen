@@ -1,8 +1,11 @@
-import { InlineTextButton } from '@components/Button/Button';
-import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import classNames from 'classnames';
+/* eslint-disable react-hooks/exhaustive-deps */
 import type { ReactNode } from 'react';
 import React, { useEffect, useState } from 'react';
+import classNames from 'classnames';
+
+import type { TButtonProps } from '@components/Button/Button';
+import Button from '@components/Button/Button';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 
 import css from './Tabs.module.scss';
 
@@ -31,6 +34,7 @@ type ITabsProps = {
   className?: string;
   navigationStartClassName?: string;
   navigationEndClassName?: string;
+  disabled?: boolean;
 };
 
 const Tabs: React.FC<ITabsProps> = (props) => {
@@ -48,10 +52,14 @@ const Tabs: React.FC<ITabsProps> = (props) => {
     middleLabel,
     navigationStartClassName,
     navigationEndClassName,
+    disabled = false,
   } = props;
   const [activeTabKey, setActiveTabKey] = useState(defaultActiveKey || 1);
 
   const onChangeTab = (tabKey: number) => () => {
+    if (disabled) {
+      return;
+    }
     setActiveTabKey(tabKey);
     onChange(items[Number(tabKey) - 1]);
   };
@@ -69,9 +77,14 @@ const Tabs: React.FC<ITabsProps> = (props) => {
     }
     setActiveTabKey(+activeTabKey + 1);
   };
+
   useEffect(() => {
     onChangeTab(Number(defaultActiveKey || 1))();
   }, [defaultActiveKey]);
+
+  useEffect(() => {
+    onChange(items[Number(activeTabKey) - 1]);
+  }, [activeTabKey]);
 
   const tabHeader = items.map((item, index) => {
     const { label } = item;
@@ -80,6 +93,7 @@ const Tabs: React.FC<ITabsProps> = (props) => {
 
     const tabItemClasses = classNames(css.tabHeaderItem, {
       [css.tabActive]: isActiveClass,
+      [css.tabDisabled]: disabled,
     });
 
     return (
@@ -133,27 +147,33 @@ const Tabs: React.FC<ITabsProps> = (props) => {
     navigationEndClassName,
   );
 
+  const navButtonProps = {
+    variant: 'inline',
+    type: 'button',
+    className: css.navigateBtn,
+  } as Partial<TButtonProps>;
+
   return (
     <div className={classes}>
       <div className={headerWrapperClasses}>
         {showNavigation && middleLabel && (
           <div className={navigationStartClasses}>
-            <InlineTextButton type="button" onClick={goLeft}>
-              <IconArrow direction="left" />
-            </InlineTextButton>
+            <Button {...navButtonProps} onClick={goLeft}>
+              <IconArrow direction="left" className={css.arrowIcon} />
+            </Button>
           </div>
         )}
         <div className={headerClasses}>{tabHeader}</div>
         {showNavigation && (
           <div className={navigationEndClasses}>
             {!middleLabel && (
-              <InlineTextButton type="button" onClick={goLeft}>
-                <IconArrow direction="left" />
-              </InlineTextButton>
+              <Button {...navButtonProps} onClick={goLeft}>
+                <IconArrow direction="left" className={css.arrowIcon} />
+              </Button>
             )}
-            <InlineTextButton type="button" onClick={goRight}>
-              <IconArrow direction="right" />
-            </InlineTextButton>
+            <Button {...navButtonProps} onClick={goRight}>
+              <IconArrow direction="right" className={css.arrowIcon} />
+            </Button>
           </div>
         )}
       </div>

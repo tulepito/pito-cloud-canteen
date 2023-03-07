@@ -1,0 +1,48 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars' as *;
+
+.root {
+  margin: 16px 0;
+  order: 4;
+
+  .formContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    column-gap: 20px;
+
+    &.withSubmitButton {
+      .emailField input {
+        text-align: left;
+      }
+    }
+
+    .emailField {
+      flex-grow: 1;
+
+      input {
+        text-align: center;
+      }
+    }
+
+    .submitButton {
+      width: 87px;
+      height: 44px;
+      min-height: unset;
+    }
+  }
+
+  .error {
+    margin-top: 6px;
+    margin-bottom: 12px;
+    color: $sematicRed2;
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: $fontWeightRegular;
+
+    @include viewportMedium {
+      margin-top: 6px;
+      margin-bottom: 10px;
+    }
+  }
+}

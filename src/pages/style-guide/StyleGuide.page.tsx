@@ -1,3 +1,8 @@
+import type { PropsWithChildren } from 'react';
+import { useState } from 'react';
+import { Form as FinalForm } from 'react-final-form';
+import classNames from 'classnames';
+
 import Accordion from '@components/Accordion/Accordion';
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
@@ -18,10 +23,6 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import useBoolean from '@hooks/useBoolean';
 import type { TIconProps } from '@utils/types';
 import { required } from '@utils/validators';
-import classNames from 'classnames';
-import type { PropsWithChildren } from 'react';
-import { useState } from 'react';
-import { Form as FinalForm } from 'react-final-form';
 
 import css from './StyleGuide.module.scss';
 
@@ -400,25 +401,22 @@ const StyleGuidePage = (props: any) => {
         <p className={css.title}>Single label</p>
         <div className={css.badgeContainer}>
           <Badge label="Label" />
-          <Badge label="Label" type={EBadgeType.WARNING} />
-          <Badge label="Đang xác nhận" type={EBadgeType.PROCESSING} />
-          <Badge label="Thành công" type={EBadgeType.SUCCESS} />
-          <Badge label="Thanh toán thất bại" type={EBadgeType.ERROR} />
+          <Badge label="Đang xác nhận" type={EBadgeType.info} />
+          <Badge label="Thành công" type={EBadgeType.success} />
+          <Badge label="Thanh toán thất bại" type={EBadgeType.danger} />
+          <Badge label="Label" type={EBadgeType.warning} />
+          <Badge label="Thanh toán thất bại" type={EBadgeType.caution} />
         </div>
 
         <p className={css.title}>Single label with dot status</p>
         <div className={css.badgeContainer}>
           <Badge label="Label" hasDotIcon />
-          <Badge label="Label" type={EBadgeType.WARNING} hasDotIcon />
-          <Badge
-            label="Đang xác nhận"
-            hasDotIcon
-            type={EBadgeType.PROCESSING}
-          />
-          <Badge label="Thành công" hasDotIcon type={EBadgeType.SUCCESS} />
+          <Badge label="Label" type={EBadgeType.warning} hasDotIcon />
+          <Badge label="Đang xác nhận" hasDotIcon type={EBadgeType.info} />
+          <Badge label="Thành công" hasDotIcon type={EBadgeType.success} />
           <Badge
             label="Thanh toán thất bại"
-            type={EBadgeType.ERROR}
+            type={EBadgeType.danger}
             hasDotIcon
           />
         </div>
@@ -427,25 +425,31 @@ const StyleGuidePage = (props: any) => {
           <Badge label="Label" hasDotIcon hasCloseIcon />
           <Badge
             label="Label"
-            type={EBadgeType.WARNING}
+            type={EBadgeType.warning}
+            hasDotIcon
+            hasCloseIcon
+          />{' '}
+          <Badge
+            label="Label"
+            type={EBadgeType.caution}
             hasDotIcon
             hasCloseIcon
           />
           <Badge
             label="Đang xác nhận"
             hasDotIcon
-            type={EBadgeType.PROCESSING}
+            type={EBadgeType.info}
             hasCloseIcon
           />
           <Badge
             label="Thành công"
             hasDotIcon
-            type={EBadgeType.SUCCESS}
+            type={EBadgeType.success}
             hasCloseIcon
           />
           <Badge
             label="Thanh toán thất bại"
-            type={EBadgeType.ERROR}
+            type={EBadgeType.danger}
             hasDotIcon
             hasCloseIcon
           />

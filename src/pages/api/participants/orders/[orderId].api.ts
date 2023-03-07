@@ -1,5 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import cookies from '@services/cookie';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import {
@@ -7,7 +9,6 @@ import {
   denormalisedResponseEntities,
   Listing,
 } from '@utils/data';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 import type { TListing } from '../../../../utils/types';
 import { HTTP_METHODS, LISTING_TYPE } from '../../helpers/constants';
@@ -54,10 +55,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (apiMethod) {
     case HTTP_METHODS.GET: {
       const { orderId } = req.query;
+
       if (!orderId) {
         return res.status(400).json({
           message: 'Missing required keys',
         });
+        return;
       }
 
       try {
@@ -121,6 +124,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     case HTTP_METHODS.POST: {
+      const { orderId } = req.query;
       const { planId, memberOrders, orderDay, orderDays, planData } = req.body;
 
       try {
@@ -128,11 +132,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           await sdk.currentUser.show(),
         )[0];
         const currentUserId = CurrentUser(currentUser).getId();
+        const [orderListing] = denormalisedResponseEntities(
+          await integrationSdk.listings.show({ id: orderId }),
+        );
         const updatingPlan = denormalisedResponseEntities(
           await integrationSdk.listings.show({ id: planId }),
         )[0];
 
-        const orderDetail = Listing(updatingPlan).getMetadata()?.orderDetail;
+        const { participants = [], anonymous = [] } =
+          Listing(orderListing).getMetadata();
+        const { orderDetail } = Listing(updatingPlan).getMetadata();
 
         if (orderDay && memberOrders) {
           orderDetail[orderDay].memberOrders[currentUserId] =
@@ -143,6 +152,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               planData?.[day]?.[currentUserId];
           });
         }
+
         await integrationSdk.listings.update({
           id: planId,
           metadata: {
@@ -150,7 +160,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           },
         });
 
-        return res.json({ message: 'Update successfully' });
+        if (
+          !participants.includes(currentUserId) &&
+          !anonymous.includes(currentUserId)
+        ) {
+          await integrationSdk.listings.update({
+            id: orderId,
+            metadata: {
+              anonymous: anonymous.concat(currentUserId),
+            },
+          });
+        }
+
+        return res.json({ message: 'Update picking successfully' });
       } catch (error) {
         handleError(res, error);
         console.error(error);

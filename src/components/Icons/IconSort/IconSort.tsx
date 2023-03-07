@@ -1,5 +1,6 @@
-import type { TIconProps } from '@utils/types';
 import React from 'react';
+
+import type { TIconProps } from '@utils/types';
 
 import css from './IconSort.module.scss';
 

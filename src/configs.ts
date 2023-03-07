@@ -10,6 +10,8 @@ const appCdnAssets = {
   translations: 'content/translations.json',
 };
 
+const bookingProcessAlias = 'sub-order-transaction-process/release-1';
+
 // If you want to change the language, remember to also change the
 // locale data and the messages in the app.js file.
 const locale = 'vi';
@@ -162,6 +164,7 @@ const config = {
   env,
   dev,
   appCdnAssets,
+  bookingProcessAlias,
   locale,
   i18n,
   deadlineTimeOptions,

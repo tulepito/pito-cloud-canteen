@@ -1,16 +1,18 @@
-import Button from '@components/Button/Button';
-import Form from '@components/Form/Form';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import IconClose from '@components/Icons/IconClose/IconClose';
-import { User } from '@utils/data';
-import type { TCurrentUser, TUser } from '@utils/types';
-import { emailFormatValid } from '@utils/validators';
-import difference from 'lodash/difference';
-import fill from 'lodash/fill';
 import { useState } from 'react';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import difference from 'lodash/difference';
+import fill from 'lodash/fill';
+
+import Button from '@components/Button/Button';
+import Form from '@components/Form/Form';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconClose from '@components/Icons/IconClose/IconClose';
+import useBoolean from '@hooks/useBoolean';
+import { User } from '@utils/data';
+import type { TCurrentUser, TUser } from '@utils/types';
+import { emailFormatValid } from '@utils/validators';
 
 import css from './AddCompanyMembersForm.module.scss';
 
@@ -45,6 +47,7 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
   } = props;
   const intl = useIntl();
   const [loadingRow, setLoadingRow] = useState<number>(0);
+  const invalidEmailControl = useBoolean();
   const { members: originCompanyMembers = {} } =
     User(companyAccount).getMetadata();
   const restrictEmailList = [
@@ -72,12 +75,23 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
           }
           const rawEmailListValue = value
             .trim()
-            .split(', ')
+            .split(' ')
             .map((email: string) => email.trim());
           const emailListValue = difference(
             rawEmailListValue,
             restrictEmailList,
           );
+          let invalidEmail = false;
+          emailListValue.forEach((email: string) => {
+            if (emailFormatValid(emailInvalidMessage)(email)) {
+              invalidEmailControl.setTrue();
+              invalidEmail = true;
+            }
+          });
+          if (invalidEmail) {
+            return;
+          }
+          invalidEmailControl.setFalse();
 
           setLoadingRow(emailListValue.length);
           const formatListEmailValue = emailListValue.reduce(
@@ -101,7 +115,7 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
           );
         };
         const handleKeyDown = (event: any) => {
-          if (event.key === 'Enter' || event.keyCode === 32) {
+          if (event.key === 'Enter') {
             event.preventDefault();
             handleEmailFieldBlur(event);
           }
@@ -118,6 +132,9 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
               onBlur={handleEmailFieldBlur}
               onKeyDown={handleKeyDown}
             />
+            {invalidEmailControl.value && (
+              <div className={css.error}>{emailInvalidMessage}</div>
+            )}
             <div className={css.loadedResult}>
               {loadedResult.map((record, index: number) => {
                 const hasNoAccount = record.response?.statusCode === 404;

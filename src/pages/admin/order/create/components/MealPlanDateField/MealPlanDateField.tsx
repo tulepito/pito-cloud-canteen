@@ -1,16 +1,20 @@
-import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
-import IconClock from '@components/Icons/IconClock/IconClock';
-import { findMinStartDate } from '@helpers/orderHelper';
-import { generateTimeOptions } from '@utils/dates';
-import { composeValidators, nonSatOrSunDay, required } from '@utils/validators';
+import { forwardRef, useState } from 'react';
+import { OnChange } from 'react-final-form-listeners';
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import addDays from 'date-fns/addDays';
 import format from 'date-fns/format';
 import viLocale from 'date-fns/locale/vi';
-import { useState } from 'react';
-import { OnChange } from 'react-final-form-listeners';
-import { useIntl } from 'react-intl';
+
+import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
+import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconCalendar from '@components/Icons/IconCalender/IconCalender';
+import IconClock from '@components/Icons/IconClock/IconClock';
+import { findMinStartDate } from '@helpers/orderHelper';
+import { generateTimeOptions } from '@utils/dates';
+import type { TObject } from '@utils/types';
+import { composeValidators, nonSatOrSunDay, required } from '@utils/validators';
 
 import css from './MealPlanDateField.module.scss';
 
@@ -18,11 +22,59 @@ const TIME_OPTIONS = generateTimeOptions();
 
 type MealPlanDateFieldProps = {
   form: any;
-  values: Record<string, any>;
+  values: TObject;
   columnLayout?: boolean;
   title?: string;
+  layoutClassName?: string;
+  containerClassName?: string;
   onCustomStartDateChange?: (date: number) => void;
 };
+
+// eslint-disable-next-line react/display-name
+const CustomStartDateFieldInput = forwardRef((props, ref) => {
+  return (
+    <FieldTextInput
+      {...props}
+      id="startDate"
+      name="startDate"
+      className={css.customInput}
+      format={(value) => {
+        return value
+          ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
+              locale: viLocale,
+            })
+          : format(new Date(), 'EEE, dd MMMM, yyyy', {
+              locale: viLocale,
+            });
+      }}
+      leftIcon={<IconCalendar />}
+      inputRef={ref}
+    />
+  );
+});
+
+// eslint-disable-next-line react/display-name
+const CustomEndDateFieldInput = forwardRef((props, ref) => {
+  return (
+    <FieldTextInput
+      {...props}
+      id="endDate"
+      name="endDate"
+      className={css.customInput}
+      format={(value) => {
+        return value
+          ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
+              locale: viLocale,
+            })
+          : format(new Date(), 'EEE, dd MMMM, yyyy', {
+              locale: viLocale,
+            });
+      }}
+      leftIcon={<IconCalendar />}
+      inputRef={ref}
+    />
+  );
+});
 
 const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
   const {
@@ -31,6 +83,8 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
     form,
     title,
     onCustomStartDateChange,
+    layoutClassName,
+    containerClassName,
   } = props;
   const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
     values;
@@ -59,9 +113,13 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
     id: 'MealPlanDateField.deliveryHourRequired',
   });
 
-  const fieldGroupLayout = classNames(css.fieldGroups, {
-    [css.column]: columnLayout,
-  });
+  const fieldGroupLayout = classNames(
+    css.fieldGroups,
+    {
+      [css.column]: columnLayout,
+    },
+    layoutClassName,
+  );
   const maxEndDate = startDate ? addDays(startDate, 6) : undefined;
   const handleStartDateChange = (value: any, prevValue: any) => {
     if (endDateInitialValue && value !== prevValue) {
@@ -84,8 +142,9 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
     !endDate && css.placeholder,
   );
 
+  const containerClasses = classNames(css.container, containerClassName);
   return (
-    <div className={css.container}>
+    <div className={containerClasses}>
       {title && <div className={css.fieldTitle}>{title}</div>}
       <OnChange name="startDate">{handleStartDateChange}</OnChange>
       <div className={fieldGroupLayout}>
@@ -108,6 +167,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
             required(startDateRequiredMessage),
             nonSatOrSunDay(startDateNonSatOrSunDayMessage),
           )}
+          customInput={<CustomStartDateFieldInput />}
         />
         <FieldDatePicker
           id="endDate"
@@ -125,6 +185,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           placeholderText={format(new Date(), 'EEE, dd MMMM, yyyy', {
             locale: viLocale,
           })}
+          customInput={<CustomEndDateFieldInput />}
         />
         <FieldSelect
           id="deliveryHour"
@@ -135,6 +196,11 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           className={css.fieldSelect}
           leftIcon={<IconClock />}
           validate={required(deliveryHourRequiredMessage)}>
+          <option value="" disabled>
+            {intl.formatMessage({
+              id: 'OrderDeadlineField.deliveryHour.placeholder',
+            })}
+          </option>
           {TIME_OPTIONS.map((option) => (
             <option key={option} value={option}>
               {option}

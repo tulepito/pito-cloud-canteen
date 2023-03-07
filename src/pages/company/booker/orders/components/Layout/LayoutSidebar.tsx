@@ -1,6 +1,7 @@
-import IconSidebarMenu from '@components/Icons/IconMenu/IconSidebarMenu';
-import classNames from 'classnames';
 import type { PropsWithChildren, ReactNode } from 'react';
+import classNames from 'classnames';
+
+import IconSidebarMenu from '@components/Icons/IconMenu/IconSidebarMenu';
 
 import css from './LayoutSidebar.module.scss';
 

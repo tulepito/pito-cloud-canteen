@@ -5,7 +5,6 @@ export const generalPaths = {
   ResetPassword: '/dat-lai-mat-khau',
   StyleGuide: '/style-guide',
   Home: '/',
-  OrderManageMent: '/orders/[orderId]',
 };
 
 const enGeneralPaths = {
@@ -19,6 +18,7 @@ const enGeneralPaths = {
 
 export const personalPaths = {
   Account: '/company/personal/account',
+  Nutrition: '/company/personal/nutrition',
 };
 
 export const NonRequireAuthenticationRoutes = [
@@ -36,10 +36,11 @@ export const IgnoredAuthCheckRoutes = [generalPaths.StyleGuide];
 export const IgnoredPermissionCheckRoutes = [
   generalPaths.SignIn,
   generalPaths.SignUp,
+  generalPaths.RecoveryPassword,
   generalPaths.StyleGuide,
   enGeneralPaths.SignIn,
   enGeneralPaths.SignUp,
-  generalPaths.OrderManageMent,
+  enGeneralPaths.RecoveryPassword,
 ];
 
 export const adminPaths = {
@@ -168,15 +169,29 @@ export const companyPaths = {
   Home: '/company',
   Detail: '/company/[companyId]',
   Account: '/company/[companyId]/account',
-  ManageOrders: '/company/orders',
+  ManageOrders: '/company/[companyId]/orders',
   ManageOrderDetail: '/company/orders/[orderId]',
+  ManageOrderPicking: '/company/orders/[orderId]/picking',
   GroupSetting: '/company/[companyId]/group-setting',
   Logo: '/company/[companyId]/logo',
   Members: '/company/[companyId]/members',
   MembersDetail: '/company/[companyId]/members/[memberEmail]',
   CreateNewOrder: '/company/booker/orders/new',
   EditDraftOrder: '/company/booker/orders/draft/[orderId]',
+  OrderSelectRestaurant: '/company/booker/orders/draft/[orderId]/restaurants',
   GroupDetail: '/company/[companyId]/group-setting',
   GroupMemberDetail:
     '/company/[companyId]/group-setting/[groupId]/member/[memberId]',
+  Nutrition: '/company/[companyId]/nutrition',
+};
+
+export const quizPaths = {
+  Welcome: '/company/booker/orders/new/quiz/welcome',
+  SelectCompany: '/company/booker/orders/new/quiz/select-company',
+  PerpackMemberAmount: '/company/booker/orders/new/quiz/perpack-member-amount',
+  SpecialDemand: '/company/booker/orders/new/quiz/special-demand',
+  MealStyles: '/company/booker/orders/new/quiz/meal-styles',
+  Restaurants: '/company/booker/orders/new/quiz/restaurants',
+  MealDates: '/company/booker/orders/new/quiz/meal-date',
+  CreatingOrder: '/company/booker/orders/new/quiz/creating-order',
 };

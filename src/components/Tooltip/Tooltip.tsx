@@ -1,7 +1,7 @@
-import classNames from 'classnames';
-import RCToolTip from 'rc-tooltip';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
+import classNames from 'classnames';
+import RCToolTip from 'rc-tooltip';
 
 import css from './Tooltip.module.scss';
 
@@ -38,7 +38,7 @@ const Tooltip: React.FC<TTooltipProps> = (props) => {
     showArrow = true,
     overlayInnerStyle,
   } = props;
-  const overlayClasses = classNames(css.overlayClassName, overlayClassName);
+  const overlayClasses = classNames(css.overlay, overlayClassName);
 
   const tooltipProps = {
     placement,

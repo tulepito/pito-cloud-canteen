@@ -1,3 +1,8 @@
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
@@ -7,10 +12,6 @@ import {
   passwordFormatValid,
   required,
 } from '@utils/validators';
-import classNames from 'classnames';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './ResetPasswordForm.module.scss';
 

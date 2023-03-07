@@ -6,7 +6,9 @@
 }
 
 .modalRoot {
-  z-index: 101;
+  &.isOpen {
+    z-index: 201;
+  }
 
   .container {
     width: 100%;

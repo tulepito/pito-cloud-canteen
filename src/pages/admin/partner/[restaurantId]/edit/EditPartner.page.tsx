@@ -1,3 +1,6 @@
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
+
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -15,10 +18,9 @@ import {
   pickRenderableLicenseImagesByProperty,
 } from '@utils/images';
 import type { TObject } from '@utils/types';
-import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
 
 import EditPartnerWizard from '../../components/EditPartnerWizard/EditPartnerWizard';
+
 import css from './EditPartner.module.scss';
 
 const EditPartnerPage = () => {
@@ -143,14 +145,6 @@ const EditPartnerPage = () => {
     if (!restaurantId) return;
     dispatch(partnerThunks.showPartnerRestaurantListing(restaurantId));
   }, [restaurantId]);
-
-  console.log({
-    uploadingAvatars,
-    uploadingCovers,
-    uploadingBusinessLicenses,
-    uploadingFoodCertificates,
-    uploadingPartyInsurances,
-  });
 
   let content;
   if (showPartnerListingInProgress) {

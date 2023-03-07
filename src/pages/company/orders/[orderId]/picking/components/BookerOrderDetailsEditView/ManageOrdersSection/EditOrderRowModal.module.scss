@@ -1,0 +1,17 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  .title {
+    text-transform: capitalize;
+  }
+
+  .subTitle {
+    @include textTemplate(14px, 400, 20px);
+    color: $neutralGray5;
+
+    b {
+      color: $neutralGray6;
+    }
+  }
+}

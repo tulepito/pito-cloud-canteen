@@ -1,19 +1,22 @@
-import Meta from '@components/Layout/Meta';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import {
-  orderDetailsAnyActionsInProgress,
-  orderManagementThunks,
-} from '@pages/orders/[orderId]/OrderManagement.slice';
-import { currentUserSelector } from '@redux/slices/user.slice';
-import { companyPaths } from '@src/paths';
-import { UserPermission } from '@src/types/UserPermission';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect } from 'react';
+import { useIntl } from 'react-intl';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import { useIntl } from 'react-intl';
+
+import Meta from '@components/Layout/Meta';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import { companyPaths } from '@src/paths';
+import { UserPermission } from '@src/types/UserPermission';
 
 import CompanyOrderDetailPage from './components/CompanyOrderDetail.page';
+import {
+  orderDetailsAnyActionsInProgress,
+  OrderManagementsAction,
+  orderManagementThunks,
+} from './OrderManagement.slice';
 
 const CompanyOrderDetailRoute = () => {
   const intl = useIntl();
@@ -45,6 +48,12 @@ const CompanyOrderDetailRoute = () => {
       }
     }
   }, [pageDataLoading, companyId, companyData, push]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(OrderManagementsAction.clearOrderData());
+    };
+  }, []);
 
   return (
     <>

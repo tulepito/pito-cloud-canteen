@@ -1,19 +1,22 @@
 /* eslint-disable no-nested-ternary */
-import Button from '@components/Button/Button';
-import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import classNames from 'classnames';
-import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+import { DateTime } from 'luxon';
 
-import { NAVIGATE } from '../../helpers/constant';
+import Button from '@components/Button/Button';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import type { TObject } from '@utils/types';
+
+import { ENavigate } from '../../helpers/constant';
+
 import css from './Toolbar.module.scss';
 
 export type TToolbarProps = {
   view: string;
   views: string[];
   label: ReactNode;
-  localizer: Record<string, any>;
+  localizer: TObject;
   onNavigate: (action: string) => void;
   onView: (name: string) => void;
   companyLogo?: ReactNode;
@@ -81,20 +84,20 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
         {shouldShowNavigateToday && (
           <Button
             className={css.todayBtn}
-            onClick={navigateFunc(NAVIGATE.TODAY)}>
+            onClick={navigateFunc(ENavigate.TODAY)}>
             <FormattedMessage id="Toolbar.action.today" />
           </Button>
         )}
         <div className={css.toolbarNavigation}>
           <div
             className={classNames(css.arrowBtn, !showPrevBtn && css.disabled)}
-            onClick={navigateFunc(NAVIGATE.PREVIOUS)}>
+            onClick={navigateFunc(ENavigate.PREVIOUS)}>
             <IconArrow className={css.arrowIcon} direction="left" />
           </div>
           {label}
           <div
             className={classNames(css.arrowBtn, !showNextBtn && css.disabled)}
-            onClick={navigateFunc(NAVIGATE.NEXT)}>
+            onClick={navigateFunc(ENavigate.NEXT)}>
             <IconArrow className={css.arrowIcon} direction="right" />
           </div>
         </div>

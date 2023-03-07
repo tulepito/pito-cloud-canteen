@@ -165,3 +165,15 @@ export const adminUpdateMemberPermissionApi = ({
   ...rest
 }: TUpdateMemberPermissionApiParams) =>
   putApi(`/admin/users/company/${companyId}/members/update-permission`, rest);
+
+export const favoriteRestaurantApi = (
+  companyId: string,
+  restaurantId: string,
+) =>
+  postApi(`/company/${companyId}/favorite-restaurant/${restaurantId}`, {
+    companyId,
+    restaurantId,
+  });
+
+export const fetchCompanyInfo = (companyId: string) =>
+  getApi(`/company/${companyId}`);
