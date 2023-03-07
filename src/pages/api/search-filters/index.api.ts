@@ -21,11 +21,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       menuTypes = [],
       categories = [],
       packaging = [],
+      nutritions = [],
     } = User(response).getMetadata();
     res.json({
       menuTypes,
       categories,
       packaging,
+      nutritions,
     });
   } catch (error) {
     handleError(res, error);

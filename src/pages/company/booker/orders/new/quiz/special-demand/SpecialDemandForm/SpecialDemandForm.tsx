@@ -14,6 +14,7 @@ export type TSpecialDemandFormValues = {
 
 type TExtraProps = {
   formRef: any;
+  nutritionsOptions?: { key: string; label: string }[];
   setFormValues: (values: TSpecialDemandFormValues) => void;
 };
 type TSpecialDemandFormComponentProps =
@@ -24,7 +25,14 @@ type TSpecialDemandFormProps = FormProps<TSpecialDemandFormValues> &
 const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, formRef, form, values, setFormValues } = props;
+  const {
+    handleSubmit,
+    formRef,
+    form,
+    values,
+    setFormValues,
+    nutritionsOptions,
+  } = props;
   const intl = useIntl();
 
   useImperativeHandle(formRef, () => ({
@@ -43,7 +51,7 @@ const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
       <div className={css.label}>
         {intl.formatMessage({ id: 'Booker.CreateOrder.Form.field.nutritions' })}
       </div>
-      <NutritionField />
+      <NutritionField options={nutritionsOptions} />
     </Form>
   );
 };

@@ -21,6 +21,7 @@
 .select {
   @include inputStyles;
   width: 100%;
+  color: $neutralGray4;
 }
 
 .selectedColor {
