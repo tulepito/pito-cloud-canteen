@@ -1,14 +1,16 @@
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import type { TCompanyMemberWithDetails } from '@utils/types';
 import { required } from '@utils/validators';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import FieldCompanyMemberCheckbox from '../FieldCompanyMemberCheckbox/FieldCompanyMemberCheckbox';
+
 import css from './AddCompanyGroupsForm.module.scss';
 
 export type TAddCompanyGroupsFormValues = {

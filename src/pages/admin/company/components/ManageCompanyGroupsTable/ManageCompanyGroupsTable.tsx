@@ -1,3 +1,7 @@
+import type { ReactNode } from 'react';
+import React, { useState } from 'react';
+import { useIntl } from 'react-intl';
+
 import { InlineTextButton } from '@components/Button/Button';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
@@ -5,9 +9,6 @@ import AlertModal from '@components/Modal/AlertModal';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import type { TCompanyGroup } from '@utils/types';
-import type { ReactNode } from 'react';
-import React, { useState } from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './ManageCompanyGroupsTable.module.scss';
 

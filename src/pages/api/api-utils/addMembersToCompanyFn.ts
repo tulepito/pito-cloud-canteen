@@ -1,12 +1,13 @@
+import compact from 'lodash/compact';
+import difference from 'lodash/difference';
+import { DateTime } from 'luxon';
+
 import { createEmailParams, sendEmail } from '@services/awsSES';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import { companyInvitation } from '@utils/emailTemplate/companyInvitation';
-import compact from 'lodash/compact';
-import difference from 'lodash/difference';
-import { DateTime } from 'luxon';
 
 const defaultExpireTime =
   parseInt(process.env.DEFAUTL_INVITATION_EMAIL_EXPIRE_TIME as string, 10) || 7;

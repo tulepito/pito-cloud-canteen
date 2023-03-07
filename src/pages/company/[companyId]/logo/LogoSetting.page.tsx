@@ -18,7 +18,7 @@ const LogoSettingPage = () => {
     dispatch(resetImage());
   }, [dispatch]);
   const onSubmit = async () => {
-    await dispatch(companyThunks.updateCompanyAccount());
+    await dispatch(companyThunks.updateCompanyAccount({}));
     dispatch(resetImage());
   };
   return (

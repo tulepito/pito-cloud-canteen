@@ -1,4 +1,9 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import { useMemo } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+
 import Button, { InlineTextButton } from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
@@ -6,13 +11,10 @@ import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import BackdropModal from '@components/Modal/BackdropModal/BackdropModal';
 import useBoolean from '@hooks/useBoolean';
 import type { TCompanyGroup, TCompanyMemberWithDetails } from '@utils/types';
-import { useMemo } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import FieldCompanyMemberCheckbox from '../FieldCompanyMemberCheckbox/FieldCompanyMemberCheckbox';
 import ManageCompanyMembersTable from '../ManageCompanyMembersTable/ManageCompanyMembersTable';
+
 import css from './UpdateCompanyGroupForm.module.scss';
 
 export type TUpdateCompanyGroupFormValues = {

@@ -1,12 +1,14 @@
-import Form from '@components/Form/Form';
-import FieldBankAccounts from '@pages/admin/partner/components/FieldBankAccounts/FieldBankAccounts';
-import arrayMutators from 'final-form-arrays';
 import { useImperativeHandle } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import arrayMutators from 'final-form-arrays';
+
+import Form from '@components/Form/Form';
+import FieldBankAccounts from '@pages/admin/partner/components/FieldBankAccounts/FieldBankAccounts';
 
 import { COMPANY_SETTING_PAYMENT_TAB_ID } from '../EditCompanyWizard/utils';
+
 import css from './EditCompanyBankAccounts.module.scss';
 
 export type TEditCompanyBankAccountsFormValues = {

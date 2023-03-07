@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-shadow */
+import type { ReactNode } from 'react';
+import React, { useState } from 'react';
+import type { IntlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
+
 import { InlineTextButton } from '@components/Button/Button';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import AlertModal from '@components/Modal/AlertModal';
@@ -7,10 +12,6 @@ import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { UserPermission } from '@src/types/UserPermission';
 import type { TCompanyGroup, TCompanyMemberWithDetails } from '@utils/types';
-import type { ReactNode } from 'react';
-import React, { useState } from 'react';
-import type { IntlShape } from 'react-intl';
-import { useIntl } from 'react-intl';
 
 import css from './ManageCompanyMembersTable.module.scss';
 

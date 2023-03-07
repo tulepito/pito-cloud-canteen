@@ -1,14 +1,16 @@
-import Button from '@components/Button/Button';
-import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import Form from '@components/Form/Form';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import type { TCompanyMemberWithDetails, TUser } from '@utils/types';
 import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
+import Button from '@components/Button/Button';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
+import Form from '@components/Form/Form';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import type { TCompanyMemberWithDetails, TUser } from '@utils/types';
+
 import FieldCompanyMember from '../FieldCompanyMember/FieldCompanyMember';
+
 import css from './AddCompanyMembersForm.module.scss';
 
 export type TAddCompanyMembersFormValues = {

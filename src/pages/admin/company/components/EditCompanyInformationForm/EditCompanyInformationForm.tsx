@@ -1,3 +1,11 @@
+import type { MutableRefObject } from 'react';
+import { useImperativeHandle } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import type { FormApi } from 'final-form';
+
 import Form from '@components/Form/Form';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
@@ -14,13 +22,6 @@ import {
   phoneNumberFormatValid,
   required,
 } from '@utils/validators';
-import classNames from 'classnames';
-import type { FormApi } from 'final-form';
-import type { MutableRefObject } from 'react';
-import { useImperativeHandle } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import css from './EditCompanyInformationForm.module.scss';
 

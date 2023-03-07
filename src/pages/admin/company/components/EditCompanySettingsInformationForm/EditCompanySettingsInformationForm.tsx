@@ -1,4 +1,10 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import { useImperativeHandle, useMemo, useState } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import arrayMutators from 'final-form-arrays';
+
 import { InlineTextButton } from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
@@ -19,11 +25,6 @@ import type {
   TObject,
 } from '@utils/types';
 import { nonEmptyImage } from '@utils/validators';
-import arrayMutators from 'final-form-arrays';
-import { useImperativeHandle, useMemo, useState } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { TAddCompanyGroupsFormValues } from '../AddCompanyGroupsForm/AddCompanyGroupsForm';
 import AddCompanyGroupsForm from '../AddCompanyGroupsForm/AddCompanyGroupsForm';
@@ -33,6 +34,7 @@ import ManageCompanyGroupsTable from '../ManageCompanyGroupsTable/ManageCompanyG
 import ManageCompanyMembersTable from '../ManageCompanyMembersTable/ManageCompanyMembersTable';
 import type { TUpdateCompanyGroupFormValues } from '../UpdateCompanyGroupForm/UpdateCompanyGroupForm';
 import UpdateCompanyGroupForm from '../UpdateCompanyGroupForm/UpdateCompanyGroupForm';
+
 import css from './EditCompanySettingsInformation.module.scss';
 
 export type TEditCompanySettingsInformationFormValues = {

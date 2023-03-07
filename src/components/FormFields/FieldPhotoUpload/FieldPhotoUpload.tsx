@@ -87,11 +87,11 @@ const PhotoWithOverlay = (props: TPhotoWithOverlay) => {
   );
 };
 
-type TImageUploadFnReturnValue = {
+export type TImageUploadFnReturnValue = {
   payload: TObject;
 };
 
-type TFieldPhotoUpload = {
+export type TFieldPhotoUpload = {
   onImageUpload: (params: {
     id: string;
     file: File;

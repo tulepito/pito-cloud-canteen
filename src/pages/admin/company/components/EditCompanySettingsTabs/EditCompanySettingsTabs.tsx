@@ -1,3 +1,7 @@
+import React from 'react';
+import type { FormProps } from 'react-final-form';
+import { FormattedMessage } from 'react-intl';
+
 import Tabs from '@components/Tabs/Tabs';
 import type {
   TCompany,
@@ -5,9 +9,6 @@ import type {
   TImage,
   TObject,
 } from '@utils/types';
-import React from 'react';
-import type { FormProps } from 'react-final-form';
-import { FormattedMessage } from 'react-intl';
 
 import type { TAddCompanyGroupsFormValues } from '../AddCompanyGroupsForm/AddCompanyGroupsForm';
 import EditCompanyBankAccountsForm from '../EditCompanyBankAccountsForm/EditCompanyBankAccountsForm';
@@ -19,6 +20,7 @@ import {
   COMPANY_SETTING_SUBSCRIPTION_TAB_ID,
 } from '../EditCompanyWizard/utils';
 import type { TUpdateCompanyGroupFormValues } from '../UpdateCompanyGroupForm/UpdateCompanyGroupForm';
+
 import css from './EditCompanySettingsTabs.module.scss';
 
 type TExtraProps = {

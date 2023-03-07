@@ -1,8 +1,9 @@
+import { compact, difference } from 'lodash';
+
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import type { TCompanyGroup } from '@utils/types';
-import { compact, difference } from 'lodash';
 
 export const deleteMemberFromCompanyFn = async ({
   memberEmail,

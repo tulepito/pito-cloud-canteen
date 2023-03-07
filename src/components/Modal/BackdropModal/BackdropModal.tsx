@@ -1,8 +1,9 @@
-import classNames from 'classnames';
 import type { PropsWithChildren } from 'react';
+import classNames from 'classnames';
 
 import type { TModalProps } from '../Modal';
 import Modal from '../Modal';
+
 import css from './BackdropModal.module.scss';
 
 type TBackdropModal = {} & TModalProps;

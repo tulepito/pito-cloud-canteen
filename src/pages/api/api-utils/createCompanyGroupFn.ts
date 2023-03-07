@@ -1,8 +1,9 @@
+import { randomUUID } from 'crypto';
+
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import type { TObject } from '@utils/types';
-import { randomUUID } from 'crypto';
 
 const { UUID } = require('sharetribe-flex-sdk').types;
 
@@ -35,7 +36,7 @@ export const createCompanyGroupFn = async ({
   groupMembers.forEach(({ email }: TMemberApi) => {
     members[email] = {
       ...members[email],
-      groups: Array.from(new Set(members[email].groups).add(newGroupId)),
+      groups: Array.from(new Set(members[email].groups || []).add(newGroupId)),
     };
   });
 

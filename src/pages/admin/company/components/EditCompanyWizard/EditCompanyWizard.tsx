@@ -1,4 +1,11 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import type { MutableRefObject } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import type { FormApi } from 'final-form';
+import { useRouter } from 'next/router';
+
 import type { CreateGroupApiBody } from '@apis/companyApi';
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
@@ -18,12 +25,6 @@ import type {
   TImage,
   TObject,
 } from '@utils/types';
-import type { FormApi } from 'final-form';
-import { useRouter } from 'next/router';
-import type { MutableRefObject } from 'react';
-import React, { useEffect, useMemo, useRef } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import type { TAddCompanyGroupsFormValues } from '../AddCompanyGroupsForm/AddCompanyGroupsForm';
 import type { TEditCompanyBankAccountsFormValues } from '../EditCompanyBankAccountsForm/EditCompanyBankAccountsForm';
@@ -32,7 +33,7 @@ import EditInformationCompanyForm from '../EditCompanyInformationForm/EditCompan
 import type { TEditCompanySettingsInformationFormValues } from '../EditCompanySettingsInformationForm/EditCompanySettingsInformationForm';
 import EditCompanySettingsTabs from '../EditCompanySettingsTabs/EditCompanySettingsTabs';
 import type { TUpdateCompanyGroupFormValues } from '../UpdateCompanyGroupForm/UpdateCompanyGroupForm';
-import css from './EditCompanyWizard.module.scss';
+
 import {
   COMPANY_INFORMATION_TAB,
   COMPANY_SETTINGS_TAB,
@@ -42,6 +43,8 @@ import {
   EDIT_COMPANY_WIZARD_TABS,
   getInitialLocationValues,
 } from './utils';
+
+import css from './EditCompanyWizard.module.scss';
 
 type TEditCompanyWizardTab = {
   tab: string;

@@ -1,8 +1,9 @@
+import { difference, differenceBy } from 'lodash';
+
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import type { TObject } from '@utils/types';
-import { difference, differenceBy } from 'lodash';
 
 const { UUID } = require('sharetribe-flex-sdk').types;
 

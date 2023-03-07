@@ -1,9 +1,10 @@
 /* eslint-disable no-unsafe-optional-chaining */
+import React from 'react';
+import classNames from 'classnames';
+
 import Avatar from '@components/Avatar/Avatar';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import type { TCompanyMemberWithDetails } from '@utils/types';
-import classNames from 'classnames';
-import React from 'react';
 
 import css from './FieldCompanyMemberCheckbox.module.scss';
 

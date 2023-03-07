@@ -1,10 +1,11 @@
 /* eslint-disable no-unsafe-optional-chaining */
+import React from 'react';
+import classNames from 'classnames';
+
 import Avatar from '@components/Avatar/Avatar';
 import { InlineTextButton } from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import type { TCompanyMemberWithDetails } from '@utils/types';
-import classNames from 'classnames';
-import React from 'react';
 
 import css from './FieldCompanyMember.module.scss';
 
