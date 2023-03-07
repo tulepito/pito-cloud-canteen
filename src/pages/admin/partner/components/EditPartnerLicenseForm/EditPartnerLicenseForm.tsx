@@ -160,9 +160,10 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
           onRemovePartyInsurance,
           inProgress,
           goBack,
+          uploadingImage,
         } = fieldRenderProps;
         const ready = !formError && isEqual(submittedValues, values);
-
+        const disabled = inProgress || uploadingImage;
         return (
           <Form onSubmit={handleSubmit}>
             <div className={css.fields}>
@@ -237,10 +238,10 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
                 })}
               />
             </div>
+            <div>
+              {formError && <ErrorMessage message={formError.message} />}
+            </div>
             <div className={css.buttonWrapper}>
-              <div>
-                {formError && <ErrorMessage message={formError.message} />}
-              </div>
               <div className={css.buttons}>
                 {goBack && (
                   <Button
@@ -255,7 +256,7 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
                 )}
                 <Button
                   inProgress={inProgress}
-                  disabled={inProgress}
+                  disabled={disabled}
                   ready={ready}
                   className={css.submitButton}>
                   {intl.formatMessage({
