@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import { shortenString } from '@src/utils/string';
 import { EParticipantOrderStatus } from '@utils/enums';
@@ -142,7 +143,11 @@ export const OrderDetailsTableComponent: React.FC<
                           {shortenString(memberEmail, MAX_LENGTH_EMAIL)}
                         </td>
                         <td title={foodName}>{foodName}</td>
-                        <td title={formattedFoodPrice}>{formattedFoodPrice}</td>
+                        <td>
+                          <RenderWhen condition={Number(foodPrice) > 0}>
+                            <>{formattedFoodPrice}</>
+                          </RenderWhen>
+                        </td>
                         <td>
                           <div className={css.actionCell}>
                             <IconEdit

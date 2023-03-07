@@ -146,7 +146,10 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
         )}
       </div>
 
-      <AddParticipantForm onSubmit={handleSubmitAddParticipant} />
+      <AddParticipantForm
+        id="ManageParticipantsSection.AddParticipantForm"
+        onSubmit={handleSubmitAddParticipant}
+      />
       <div className={css.participantContainer}>
         {renderParticipantCards(
           participantData.slice(0, 4),

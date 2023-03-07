@@ -70,7 +70,11 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
       containerClassName={css.modalContainer}
       title={modalTitle}>
       <div className={css.subTitle}>{modalSubTitle}</div>
-      <AddParticipantForm onSubmit={onSubmitAddParticipant} hasSubmitButton />
+      <AddParticipantForm
+        id="ManageParticipantsModal.AddParticipantForm"
+        onSubmit={onSubmitAddParticipant}
+        hasSubmitButton
+      />
       <div className={css.participantsContainer}>
         <RawParticipants
           data={data}

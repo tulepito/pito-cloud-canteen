@@ -19,6 +19,7 @@ export type TAddParticipantFormValues = {
 };
 
 type TExtraProps = {
+  id: string;
   hasSubmitButton?: boolean;
 };
 type TAddParticipantFormComponentProps =
@@ -31,6 +32,7 @@ const AddParticipantFormComponent: React.FC<
 > = (props) => {
   const intl = useIntl();
   const {
+    id,
     handleSubmit,
     hasSubmitButton,
     dirtySinceLastSubmit,
@@ -48,7 +50,7 @@ const AddParticipantFormComponent: React.FC<
   useEffect(() => {}, []);
 
   return (
-    <Form onSubmit={handleSubmit} className={css.root}>
+    <Form id={id} onSubmit={handleSubmit} className={css.root}>
       <div className={formClasses}>
         <FieldTextInput
           className={css.emailField}
