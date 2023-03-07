@@ -14,12 +14,12 @@ import { Listing } from '@utils/data';
 import { EOrderDraftStates, EOrderStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
 
-import { downloadPriceQuotation } from '../helpers/downloadPriceQuotation';
-import { usePrepareOrderDetailPageData } from '../hooks/usePrepareData';
 import {
   orderDetailsAnyActionsInProgress,
   orderManagementThunks,
-} from '../OrderManagement.slice';
+} from '../../OrderManagement.slice';
+import { downloadPriceQuotation } from '../helpers/downloadPriceQuotation';
+import { usePrepareOrderDetailPageData } from '../hooks/usePrepareData';
 
 import BookerOrderDetailsTitle from './BookerOrderDetailsEditView/BookerOrderDetailsTitle/BookerOrderDetailsTitle';
 import ManageOrdersSection from './BookerOrderDetailsEditView/ManageOrdersSection/ManageOrdersSection';

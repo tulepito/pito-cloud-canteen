@@ -1,17 +1,15 @@
 import type { PropsWithChildren } from 'react';
 import { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
-import filter from 'lodash/filter';
 import { useRouter } from 'next/router';
 
 import Dropdown from '@components/CompanyLayout/Dropdown/Dropdown';
 import FeatureIcons from '@components/FeatureIcons/FeatureIcons';
 import FeaturesHeader from '@components/FeaturesHeader/FeaturesHeader';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
-import { currentUserSelector } from '@redux/slices/user.slice';
+import { BookerCompaniesThunks } from '@redux/slices/BookerCompanies.slice';
 import { companyPaths } from '@src/paths';
-import { CurrentUser, User } from '@utils/data';
+import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
 import CompanyHeader from './CompanyHeader/CompanyHeader';
@@ -39,15 +37,11 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const showFeatureHeader = shouldShowFeatureHeader(router.pathname);
   const showSidebar = shouldShowSidebar(pathname);
 
-  const currentUser = useAppSelector(currentUserSelector);
-  const companyRefs = useAppSelector(
-    (state) => state.ManageCompaniesPage.companyRefs,
+  const companyList = useAppSelector(
+    (state) => state.BookerCompanies.companies,
     shallowEqual,
   );
-  const { companyList = [] } = CurrentUser(currentUser).getMetadata();
-  const assignedCompanies = filter(companyRefs, (o: any) =>
-    companyList.includes(o.id.uuid),
-  ).reduce((result: any[], cur: TUser) => {
+  const assignedCompanies = companyList.reduce((result: any[], cur: TUser) => {
     return [
       ...result,
       {
@@ -57,6 +51,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       },
     ];
   }, []);
+
   const [selectedAccount, setSelectedAccount] = useState<{
     value?: string;
     label?: string;
@@ -139,25 +134,27 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   ];
 
   useEffect(() => {
-    dispatch(manageCompaniesThunks.queryCompanies());
+    dispatch(BookerCompaniesThunks.fetchBookerCompanies());
   }, [dispatch]);
 
   useEffect(() => {
     if (companyId && companyId !== 'personal') {
-      const currentCompany = companyRefs.find(
+      const currentCompany = companyList.find(
         (_company) => User(_company).getId() === companyId,
       );
       setSelectedAccount({
-        value: User(currentCompany).getId(),
-        label: User(currentCompany).getPublicData()?.companyName,
+        value: User(currentCompany!).getId(),
+        label: User(currentCompany!).getPublicData()?.companyName,
       });
     }
-  }, [companyId, companyRefs]);
+  }, [companyId, companyList]);
 
   const companyName =
     companyId && companyId !== 'personal'
       ? User(
-          companyRefs.find((_company) => User(_company).getId() === companyId),
+          companyList.find(
+            (_company) => User(_company!).getId() === companyId,
+          )!,
         ).getPublicData()?.companyName
       : 'Tài khoản cá nhân';
   return (

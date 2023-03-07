@@ -142,20 +142,26 @@ const CreateOrderWizard = () => {
   };
 
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
-
+  const { staffName } = Listing(order as TListing).getMetadata();
   const step2SubmitInProgress = useAppSelector(
     (state) => state.Order.step2SubmitInProgress,
+  );
+  const step4SubmitInProgress = useAppSelector(
+    (state) => state.Order.step4SubmitInProgress,
   );
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
+  const canNotGoToStep4 = useAppSelector(
+    (state) => state.Order.canNotGoToStep4,
+  );
+
   const tabsStatus = tabsActive(order, orderDetail) as any;
 
   useEffect(() => {
-    if (order && !step2SubmitInProgress) {
-      const { staffName } = Listing(order as TListing).getMetadata();
-      if (staffName) {
+    if (order && !step2SubmitInProgress && !step4SubmitInProgress) {
+      if (staffName && !canNotGoToStep4) {
         setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, REVIEW_TAB);
 
         return setCurrentStep(REVIEW_TAB);
@@ -173,6 +179,8 @@ const CreateOrderWizard = () => {
     JSON.stringify(order),
     step2SubmitInProgress,
     JSON.stringify(orderDetail),
+    step4SubmitInProgress,
+    canNotGoToStep4,
   ]);
 
   useEffect(() => {

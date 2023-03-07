@@ -94,7 +94,11 @@ type TOrderInitialState = {
   recommendRestaurantError: any;
 
   step2SubmitInProgress: boolean;
+  step4SubmitInProgress: boolean;
   currentSelectedMenuId: string;
+
+  canNotGoToStep4: boolean;
+  onRecommendRestaurantInProgress: boolean;
 };
 
 const initialState: TOrderInitialState = {
@@ -160,7 +164,10 @@ const initialState: TOrderInitialState = {
   recommendRestaurantInProgress: false,
   recommendRestaurantError: null,
   step2SubmitInProgress: false,
+  step4SubmitInProgress: false,
   currentSelectedMenuId: '',
+  canNotGoToStep4: false,
+  onRecommendRestaurantInProgress: false,
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -633,11 +640,8 @@ const orderSlice = createSlice({
       ...state,
       bookerList: [],
     }),
-    resetOrder: (state) => ({
-      ...state,
-      order: null,
-      orderDetail: {},
-      selectedBooker: null,
+    resetOrder: () => ({
+      ...initialState,
     }),
     changeStep2SubmitStatus: (state, { payload }) => ({
       ...state,
@@ -665,10 +669,21 @@ const orderSlice = createSlice({
         [EManageCompanyOrdersTab.ALL]: 0,
       },
     }),
+    changeStep4SubmitStatus: (state, { payload }) => ({
+      ...state,
+      step4SubmitInProgress: payload,
+    }),
     addCurrentSelectedMenuId: (state, { payload }) => ({
       ...state,
       currentSelectedMenuId: payload,
     }),
+    setCanNotGoToStep4: (state, { payload }) => ({
+      ...state,
+      canNotGoToStep4: payload,
+    }),
+    setOnRecommendRestaurantInProcess: (state, { payload }) => {
+      state.onRecommendRestaurantInProgress = payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -915,7 +930,10 @@ export const {
   resetOrder,
   changeStep2SubmitStatus,
   resetCompanyOrdersStates,
+  changeStep4SubmitStatus,
   addCurrentSelectedMenuId,
+  setCanNotGoToStep4,
+  setOnRecommendRestaurantInProcess,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

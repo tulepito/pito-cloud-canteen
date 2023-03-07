@@ -6,8 +6,7 @@ import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import { useAppSelector } from '@hooks/reduxHooks';
-
-import { orderDetailsAnyActionsInProgress } from '../../../OrderManagement.slice';
+import { orderDetailsAnyActionsInProgress } from '@pages/company/orders/[orderId]/OrderManagement.slice';
 
 import css from './SendNotificationForm.module.scss';
 

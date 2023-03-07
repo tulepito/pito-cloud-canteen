@@ -16,7 +16,10 @@ import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import { calculateGroupMembersAmount } from '@helpers/company';
 import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
 import { addCommas } from '@helpers/format';
-import { findSuitableStartDate } from '@helpers/orderHelper';
+import {
+  findSuitableStartDate,
+  getRestaurantListFromOrderDetail,
+} from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { normalizePlanDetailsToEvent } from '@pages/company/booker/orders/draft/[orderId]/helpers/normalizeData';
@@ -26,6 +29,8 @@ import {
   orderAsyncActions,
   selectCalendarDate,
   selectRestaurant,
+  setCanNotGoToStep4,
+  setOnRecommendRestaurantInProcess,
   unSelectRestaurant,
 } from '@redux/slices/Order.slice';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
@@ -125,6 +130,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const currentSelectedMenuId = useAppSelector(
     (state) => state.Order.currentSelectedMenuId,
   );
+  const onRecommendRestaurantInProgress = useAppSelector(
+    (state) => state.Order.onRecommendRestaurantInProgress,
+  );
 
   const orderId = Listing(order as TListing).getId();
   const planId = Listing(order as TListing).getMetadata()?.plans?.[0];
@@ -137,7 +145,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       orderDetail,
     });
 
-    return temp instanceof Date ? temp : new Date(temp);
+    return temp instanceof Date ? temp : new Date(temp!);
   }, [selectedDate, startDate, endDate, orderDetail]);
 
   const { address } = deliveryAddress || {};
@@ -164,7 +172,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   const handleSubmitRestaurant = async (values: TObject) => {
     const { restaurant, selectedFoodList } = values;
-
+    dispatch(setCanNotGoToStep4(true));
     await dispatch(
       orderAsyncActions.updatePlanDetail({
         orderId,
@@ -250,7 +258,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     endDate,
   };
 
-  const inProgress = updateOrderInProgress || updateOrderDetailInProgress;
+  const inProgress =
+    (updateOrderInProgress || updateOrderDetailInProgress) &&
+    !onRecommendRestaurantInProgress;
 
   const missingSelectedFood = Object.keys(orderDetail).filter(
     (dateTime) => orderDetail[dateTime].restaurant.foodList.length === 0,
@@ -269,6 +279,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   });
 
   const onSubmit = () => {
+    dispatch(setCanNotGoToStep4(false));
     nextTab();
   };
 
@@ -283,11 +294,15 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     JSON.stringify(plans),
   ]);
 
+  const restaurantListFromOrder = Object.keys(
+    getRestaurantListFromOrderDetail(orderDetail),
+  );
+
   useEffect(() => {
-    if (!isEmpty(orderDetail)) {
+    if (!isEmpty(restaurantListFromOrder)) {
       dispatch(orderAsyncActions.fetchRestaurantCoverImages());
     }
-  }, [JSON.stringify(orderDetail)]);
+  }, [JSON.stringify(restaurantListFromOrder)]);
 
   const handleSelectFood = async (values: TSelectFoodFormValues) => {
     const { food: foodIds } = values;
@@ -350,6 +365,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   const handleRemoveMeal = useCallback(
     (id: string) => (resourceId: string) => {
+      dispatch(setCanNotGoToStep4(true));
       dispatch(
         orderAsyncActions.updatePlanDetail({
           orderId,
@@ -363,6 +379,21 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     },
     [dispatch, orderId],
   );
+
+  const onRecommendNewRestaurants = useCallback(async () => {
+    dispatch(setOnRecommendRestaurantInProcess(true));
+    const { payload: recommendOrderDetail }: any = await dispatch(
+      orderAsyncActions.recommendRestaurants(),
+    );
+    await dispatch(
+      orderAsyncActions.updatePlanDetail({
+        orderId,
+        planId,
+        orderDetail: recommendOrderDetail,
+      }),
+    );
+    dispatch(setOnRecommendRestaurantInProcess(false));
+  }, []);
 
   return (
     <>
@@ -430,8 +461,13 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               hideMonthView
               recommendButton={
                 <div className={css.buttonContainer}>
-                  <Button disabled className={css.recommendNewRestaurantBtn}>
-                    <IconRefreshing />
+                  <Button
+                    onClick={onRecommendNewRestaurants}
+                    variant="secondary"
+                    className={css.recommendNewRestaurantBtn}>
+                    <IconRefreshing
+                      inProgress={onRecommendRestaurantInProgress}
+                    />
                     <FormattedMessage id="SetupOrderDetail.recommendNewRestaurant" />
                   </Button>
                 </div>

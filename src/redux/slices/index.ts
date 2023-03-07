@@ -1,4 +1,5 @@
 export { default as auth } from './auth.slice';
+export { default as BookerCompanies } from './BookerCompanies.slice';
 export { default as company } from './company.slice';
 export { default as companyInvitation } from './companyInvitation.slice';
 export { default as companyMember } from './companyMember.slice';
@@ -26,5 +27,5 @@ export { default as Nutrition } from '@pages/company/[companyId]/nutrition/Nutri
 export { default as BookerDraftOrderPage } from '@pages/company/booker/orders/draft/[orderId]/BookerDraftOrderPage.slice';
 export { default as BookerSelectRestaurant } from '@pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
 export { default as BookerNewOrderPage } from '@pages/company/booker/orders/new/BookerNewOrder.slice';
-export { default as OrderManagement } from '@pages/company/orders/[orderId]/picking/OrderManagement.slice';
+export { default as OrderManagement } from '@pages/company/orders/[orderId]/OrderManagement.slice';
 export { default as ParticipantPlanPage } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';

@@ -38,6 +38,9 @@ type TOrderManagementState = {
   cancelPickingOrderInProgress: boolean;
   cancelPickingOrderError: any;
   //
+  updateParticipantsInProgress: boolean;
+  updateParticipantsError: any;
+
   isStartOrderInProgress: boolean;
   // Data states
   companyId: string | null;
@@ -59,6 +62,8 @@ const initialState: TOrderManagementState = {
   isSendingRemindEmail: false,
   cancelPickingOrderInProgress: false,
   cancelPickingOrderError: null,
+  updateParticipantsInProgress: false,
+  updateParticipantsError: null,
   isStartOrderInProgress: false,
   companyId: null,
   companyData: null,
@@ -360,7 +365,7 @@ const deleteDisAllowedMember = createAsyncThunk(
 
 const addParticipant = createAsyncThunk(
   'app/OrderManagement/ADD_PARTICIPANT',
-  async (params: TObject, { getState, dispatch }) => {
+  async (params: TObject, { getState, dispatch, rejectWithValue }) => {
     const { email } = params;
     const { companyId } = getState().OrderManagement;
 
@@ -386,53 +391,67 @@ const addParticipant = createAsyncThunk(
       orderDetail,
     };
 
-    await addParticipantToOrderApi(orderId, bodyParams);
+    const response = await addParticipantToOrderApi(orderId, bodyParams);
+    const { data } = response || {};
+    console.log('🚀 ~ data:', data);
+
+    if (data?.errorCode) {
+      return rejectWithValue(data?.message);
+    }
+
     await dispatch(loadData(orderId));
+    return {};
   },
 );
 
 const deleteParticipant = createAsyncThunk(
   'app/OrderManagement/DELETE_PARTICIPANT',
-  async (params: TObject, { getState, dispatch }) => {
-    const { participantId } = params;
-    const {
-      id: { uuid: orderId },
-      attributes: {
-        metadata: { participants = [] },
-      },
-    } = getState().OrderManagement.orderData!;
-    const {
-      id: { uuid: planId },
-      attributes: {
-        metadata: { orderDetail },
-      },
-    } = getState().OrderManagement.planData!;
+  async (params: TObject, { getState, dispatch, rejectWithValue }) => {
+    try {
+      const { participantId } = params;
+      const {
+        id: { uuid: orderId },
+        attributes: {
+          metadata: { participants = [] },
+        },
+      } = getState().OrderManagement.orderData!;
+      const {
+        id: { uuid: planId },
+        attributes: {
+          metadata: { orderDetail },
+        },
+      } = getState().OrderManagement.planData!;
 
-    const newOrderDetail = Object.entries(orderDetail).reduce(
-      (result, current) => {
-        const [date, orderDetailOnDate] = current;
-        const { memberOrders } = orderDetailOnDate as TObject;
+      const newOrderDetail = Object.entries(orderDetail).reduce(
+        (result, current) => {
+          const [date, orderDetailOnDate] = current;
+          const { memberOrders } = orderDetailOnDate as TObject;
 
-        return {
-          ...result,
-          [date]: {
-            ...(orderDetailOnDate as TObject),
-            memberOrders: omit(memberOrders, [participantId]),
-          },
-        };
-      },
-      {},
-    );
+          return {
+            ...result,
+            [date]: {
+              ...(orderDetailOnDate as TObject),
+              memberOrders: omit(memberOrders, [participantId]),
+            },
+          };
+        },
+        {},
+      );
 
-    const bodyParams = {
-      participantId,
-      participants: participants.filter((pId: string) => pId !== participantId),
-      newOrderDetail,
-      planId,
-    };
+      const bodyParams = {
+        participantId,
+        participants: participants.filter(
+          (pId: string) => pId !== participantId,
+        ),
+        newOrderDetail,
+        planId,
+      };
 
-    await deleteParticipantFromOrderApi(orderId, bodyParams);
-    await dispatch(loadData(orderId));
+      await deleteParticipantFromOrderApi(orderId, bodyParams);
+      await dispatch(loadData(orderId));
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   },
 );
 
@@ -490,6 +509,7 @@ const OrderManagementSlice = createSlice({
         participantData: [],
         anonymousParticipantData: [],
         transactionDataMap: {},
+        isFetchingOrderDetails: false,
       };
     },
   },
@@ -519,16 +539,7 @@ const OrderManagementSlice = createSlice({
       .addCase(loadData.rejected, (state) => {
         state.isFetchingOrderDetails = false;
       })
-      /* =============== deleteParticipant =============== */
-      .addCase(deleteParticipant.pending, (state) => {
-        state.isDeletingParticipant = true;
-      })
-      .addCase(deleteParticipant.fulfilled, (state) => {
-        state.isDeletingParticipant = false;
-      })
-      .addCase(deleteParticipant.rejected, (state) => {
-        state.isDeletingParticipant = false;
-      })
+
       /* =============== updateOrderGeneralInfo =============== */
       .addCase(updateOrderGeneralInfo.pending, (state) => {
         state.isUpdatingOrderDetails = true;
@@ -573,7 +584,29 @@ const OrderManagementSlice = createSlice({
         ...state,
         cancelPickingOrderInProgress: false,
         cancelPickingOrderError: payload,
-      }));
+      }))
+      /* =============== addParticipant =============== */
+      .addCase(addParticipant.pending, (state) => {
+        state.updateParticipantsInProgress = true;
+        state.updateParticipantsError = null;
+      })
+      .addCase(addParticipant.fulfilled, (state) => {
+        state.updateParticipantsInProgress = false;
+      })
+      .addCase(addParticipant.rejected, (state, { payload }) => {
+        state.updateParticipantsInProgress = false;
+        state.updateParticipantsError = payload;
+      })
+      /* =============== deleteParticipant =============== */
+      .addCase(deleteParticipant.pending, (state) => {
+        state.isDeletingParticipant = true;
+      })
+      .addCase(deleteParticipant.fulfilled, (state) => {
+        state.isDeletingParticipant = false;
+      })
+      .addCase(deleteParticipant.rejected, (state) => {
+        state.isDeletingParticipant = false;
+      });
   },
 });
 

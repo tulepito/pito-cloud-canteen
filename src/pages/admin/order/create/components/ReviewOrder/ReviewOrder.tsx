@@ -16,7 +16,10 @@ import Tabs from '@components/Tabs/Tabs';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { orderAsyncActions } from '@redux/slices/Order.slice';
+import {
+  changeStep4SubmitStatus,
+  orderAsyncActions,
+} from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import { EOrderDraftStates } from '@utils/enums';
@@ -213,7 +216,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
 
   const onSubmit = async (values: any) => {
     const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
-
+    dispatch(changeStep4SubmitStatus(true));
     if (planId && orderId) {
       await dispatch(
         orderAsyncActions.updatePlanDetail({
@@ -239,6 +242,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     if (!error) {
       openSuccessModal();
     }
+    dispatch(changeStep4SubmitStatus(false));
   };
 
   const initialValues = useMemo(() => {

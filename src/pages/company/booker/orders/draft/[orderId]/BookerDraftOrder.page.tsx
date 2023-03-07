@@ -77,7 +77,7 @@ function BookerDraftOrderPage() {
       orderDetail,
     });
 
-    return temp instanceof Date ? temp : new Date(temp);
+    return temp instanceof Date ? temp : new Date(temp!);
   }, [selectedDate, startDateTimestamp, endDateTimestamp, orderDetail]);
 
   const handleFinishOrder = async () => {

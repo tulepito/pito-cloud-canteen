@@ -16,7 +16,7 @@ import {
   orderDetailsAnyActionsInProgress,
   OrderManagementsAction,
   orderManagementThunks,
-} from './picking/OrderManagement.slice';
+} from './OrderManagement.slice';
 
 const CompanyOrderDetailRoute = () => {
   const intl = useIntl();

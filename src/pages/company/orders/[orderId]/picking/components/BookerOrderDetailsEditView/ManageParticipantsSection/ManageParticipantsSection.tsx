@@ -5,12 +5,11 @@ import classNames from 'classnames';
 import Button from '@components/Button/Button';
 import AlertModal from '@components/Modal/AlertModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import type { TDefaultProps, TObject, TUser } from '@utils/types';
-
 import {
   orderDetailsAnyActionsInProgress,
   orderManagementThunks,
-} from '../../../OrderManagement.slice';
+} from '@pages/company/orders/[orderId]/OrderManagement.slice';
+import type { TDefaultProps, TObject, TUser } from '@utils/types';
 
 import type { TAddParticipantFormValues } from './AddParticipantForm';
 import AddParticipantForm from './AddParticipantForm';
@@ -63,11 +62,14 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
     useState(false);
   const [isManageParticipantsModalOpen, setIsManageParticipantsModalOpen] =
     useState(false);
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
+  const updateParticipantsInProgress = useAppSelector(
+    (state) => state.OrderManagement.updateParticipantsInProgress,
+  );
 
   const rootClasses = classNames(rootClassName || css.root, className);
 
   const { participantData } = data;
-  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const disableButton = inProgress;
 
   const sectionTitle = intl.formatMessage({
@@ -119,8 +121,20 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
     setIsManageParticipantsModalOpen(false);
   };
 
-  const handleSubmitAddParticipant = ({ email }: TAddParticipantFormValues) => {
-    dispatch(orderManagementThunks.addParticipant({ email }));
+  const handleSubmitAddParticipant = async ({
+    email,
+  }: TAddParticipantFormValues) => {
+    if (updateParticipantsInProgress) {
+      return;
+    }
+
+    const { meta, payload } = (await dispatch(
+      orderManagementThunks.addParticipant({ email }),
+    )) as any;
+
+    if (meta.requestStatus === 'rejected') {
+      return { email: payload };
+    }
   };
 
   return (

@@ -14,7 +14,7 @@ import {
 import { orderAsyncActions, removeBookerList } from '@redux/slices/Order.slice';
 import type { TUpdateStatus } from '@src/pages/admin/company/helpers';
 import {
-  filterCompanies,
+  filterCompaniesByCompanyName,
   parseEntitiesToTableData,
   sliceCompanies,
   sortCompanies,
@@ -35,7 +35,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   const { nextTab } = props;
   const router = useRouter();
   const intl = useIntl();
-  const [queryParams, setQueryParams] = useState({});
+  const [queryParams, setQueryParams] = useState<any>({});
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const { value: isSortAZ, toggle: toggleSort } = useBoolean(true);
@@ -92,7 +92,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   }, []);
 
   const filteredCompanies = useMemo(
-    () => filterCompanies(companyRefs, queryParams),
+    () => filterCompaniesByCompanyName(companyRefs, queryParams?.companyName),
     [queryParams, companyRefs],
   );
   const sortedCompanies = useMemo(
@@ -164,7 +164,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
           placeholder={intl.formatMessage({
             id: 'ClientSelector.keywordFieldPlaceholder',
           })}
-          searchValue="searchCompanyName"
+          searchValue="companyName"
           onSubmit={(values: any) => {
             setQueryParams(values);
             setPage(1);

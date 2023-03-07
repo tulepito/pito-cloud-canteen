@@ -1,5 +1,6 @@
 import Tooltip from '@components/Tooltip/Tooltip';
 import { Listing } from '@src/utils/data';
+import type { TPlan } from '@src/utils/orderTypes';
 import type { TListing, TObject, TUser } from '@utils/types';
 
 import { isParticipantCompletedPickFood } from './ManageParticipantsSection.helper';
@@ -20,9 +21,13 @@ export const RawParticipants: React.FC<TRawParticipantsProps> = ({
   handleClickDeleteParticipant,
 }) => {
   const { participantData, planData } = data;
-  const { orderDetail: planOrderDetails } = Listing(
+  const { orderDetail: planOrderDetails = {} } = Listing(
     planData as TListing,
   ).getMetadata();
+
+  const orderDetailList = Object.values(
+    planOrderDetails as TPlan['orderDetail'],
+  );
 
   return (
     <div className={css.rawParticipants}>
@@ -51,13 +56,20 @@ export const RawParticipants: React.FC<TRawParticipantsProps> = ({
           />
         );
 
+        const tooltipContent = (
+          <div className={css.tooltipContent}>
+            <div className={css.title}>Đã chọn món xong</div>
+            {orderDetailList.length} bữa
+          </div>
+        );
+
         return isSelectedFood ? (
           <Tooltip
             overlayClassName={css.tooltipOverlay}
-            tooltipContent={'Đã chọn món xong'}
-            placement="topRight"
+            tooltipContent={tooltipContent}
+            placement="bottomLeft"
             key={uuid}>
-            {cardComponent}
+            <div className={css.cardWrapper}>{cardComponent}</div>
           </Tooltip>
         ) : (
           cardComponent

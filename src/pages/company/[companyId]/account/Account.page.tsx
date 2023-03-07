@@ -50,12 +50,16 @@ const AccountPage = () => {
   const updateBookerError = useAppSelector(
     (state) => state.company.updateBookerAccountError,
   );
+  const fetchCompanyInfoInProgress = useAppSelector(
+    (state) => state.company.fetchCompanyInfoInProgress,
+  );
 
   const { companyName = '', location = {} } = User(
     company as TUser,
   ).getPublicData();
   const { email = '' } = User(company as TUser).getAttributes();
   const { address = '' } = location;
+  const { tax } = User(company as TUser).getPrivateData();
 
   const { email: bookerEmail = '' } = User(currentUser!).getAttributes();
   const { displayName: bookerDisplayName = '' } = User(
@@ -127,34 +131,42 @@ const AccountPage = () => {
         <div className={css.sectionTitle}>
           {intl.formatMessage({ id: 'AccountPage.companyInfo' })}
         </div>
-        <div className={css.row}>
-          <div className={css.info}>
-            <div className={css.title}>
-              {intl.formatMessage({ id: 'AccountPage.companyName' })}
-            </div>
-            <div className={css.content}>{companyName}</div>
+        {fetchCompanyInfoInProgress ? (
+          <div className={css.loading}>
+            {intl.formatMessage({ id: 'AccountPage.loading' })}
           </div>
-          <div className={css.info}>
-            <div className={css.title}>
-              {intl.formatMessage({ id: 'AccountPage.address' })}
+        ) : (
+          <>
+            <div className={css.row}>
+              <div className={css.info}>
+                <div className={css.title}>
+                  {intl.formatMessage({ id: 'AccountPage.companyName' })}
+                </div>
+                <div className={css.content}>{companyName}</div>
+              </div>
+              <div className={css.info}>
+                <div className={css.title}>
+                  {intl.formatMessage({ id: 'AccountPage.address' })}
+                </div>
+                <div className={css.content}>{address}</div>
+              </div>
             </div>
-            <div className={css.content}>{address}</div>
-          </div>
-        </div>
-        <div className={css.row}>
-          <div className={css.info}>
-            <div className={css.title}>
-              {intl.formatMessage({ id: 'AccountPage.taxCode' })}
+            <div className={css.row}>
+              <div className={css.info}>
+                <div className={css.title}>
+                  {intl.formatMessage({ id: 'AccountPage.taxCode' })}
+                </div>
+                <div className={css.content}>{tax}</div>
+              </div>
+              <div className={css.info}>
+                <div className={css.title}>
+                  {intl.formatMessage({ id: 'AccountPage.email' })}
+                </div>
+                <div className={css.content}>{email}</div>
+              </div>
             </div>
-            <div className={css.content}></div>
-          </div>
-          <div className={css.info}>
-            <div className={css.title}>
-              {intl.formatMessage({ id: 'AccountPage.email' })}
-            </div>
-            <div className={css.content}>{email}</div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
       <div className={css.submitBtn}>
         <Button

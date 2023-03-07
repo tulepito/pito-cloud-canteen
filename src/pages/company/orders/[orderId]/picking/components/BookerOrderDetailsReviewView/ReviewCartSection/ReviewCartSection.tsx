@@ -8,11 +8,10 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import { isEnableToStartOrder } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { orderManagementThunks } from '@pages/company/orders/[orderId]/OrderManagement.slice';
 import { companyPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
-
-import { orderManagementThunks } from '../../../OrderManagement.slice';
 
 import css from './ReviewCartSection.module.scss';
 

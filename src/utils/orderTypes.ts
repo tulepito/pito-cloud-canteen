@@ -22,9 +22,10 @@ export type TPlan = {
     [date: string]: {
       transactionId?: string;
       restaurant: {
-        id: string; // restaurant listing id
-        restaurantName: string;
-        foodList: {
+        id?: string; // restaurant listing id
+        menuId?: string;
+        restaurantName?: string;
+        foodList?: {
           [foodId: string]: {
             foodName: string;
             foodPrice: number;
