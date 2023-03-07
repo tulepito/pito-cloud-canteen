@@ -29,6 +29,7 @@ import {
   orderAsyncActions,
   selectCalendarDate,
   selectRestaurant,
+  setCanNotGoToStep4,
   unSelectRestaurant,
 } from '@redux/slices/Order.slice';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
@@ -167,7 +168,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   const handleSubmitRestaurant = async (values: TObject) => {
     const { restaurant, selectedFoodList } = values;
-
+    dispatch(setCanNotGoToStep4(true));
     await dispatch(
       orderAsyncActions.updatePlanDetail({
         orderId,
@@ -272,6 +273,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   });
 
   const onSubmit = () => {
+    dispatch(setCanNotGoToStep4(false));
     nextTab();
   };
 
@@ -357,6 +359,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   const handleRemoveMeal = useCallback(
     (id: string) => (resourceId: string) => {
+      dispatch(setCanNotGoToStep4(true));
       dispatch(
         orderAsyncActions.updatePlanDetail({
           orderId,

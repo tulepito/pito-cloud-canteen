@@ -96,6 +96,8 @@ type TOrderInitialState = {
   step2SubmitInProgress: boolean;
   step4SubmitInProgress: boolean;
   currentSelectedMenuId: string;
+
+  canNotGoToStep4: boolean;
 };
 
 const initialState: TOrderInitialState = {
@@ -163,6 +165,7 @@ const initialState: TOrderInitialState = {
   step2SubmitInProgress: false,
   step4SubmitInProgress: false,
   currentSelectedMenuId: '',
+  canNotGoToStep4: false,
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -672,6 +675,10 @@ const orderSlice = createSlice({
       ...state,
       currentSelectedMenuId: payload,
     }),
+    setCanNotGoToStep4: (state, { payload }) => ({
+      ...state,
+      canNotGoToStep4: payload,
+    }),
   },
   extraReducers: (builder) => {
     builder
@@ -920,6 +927,7 @@ export const {
   resetCompanyOrdersStates,
   changeStep4SubmitStatus,
   addCurrentSelectedMenuId,
+  setCanNotGoToStep4,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

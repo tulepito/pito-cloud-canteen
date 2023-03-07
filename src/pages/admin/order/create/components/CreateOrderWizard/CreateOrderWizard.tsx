@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 
 import FormWizard from '@components/FormWizard/FormWizard';
 import { setItem } from '@helpers/localStorageHelpers';
-import { isOrderDetailFullDatePickingRestaurant } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
@@ -143,9 +142,7 @@ const CreateOrderWizard = () => {
   };
 
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
-  const { staffName, startDate, endDate } = Listing(
-    order as TListing,
-  ).getMetadata();
+  const { staffName } = Listing(order as TListing).getMetadata();
   const step2SubmitInProgress = useAppSelector(
     (state) => state.Order.step2SubmitInProgress,
   );
@@ -156,18 +153,15 @@ const CreateOrderWizard = () => {
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
+  const canNotGoToStep4 = useAppSelector(
+    (state) => state.Order.canNotGoToStep4,
+  );
 
-  const isOrderDetailFullDateRestaurantPicking =
-    isOrderDetailFullDatePickingRestaurant({
-      orderDetail,
-      startDate,
-      endDate,
-    });
   const tabsStatus = tabsActive(order, orderDetail) as any;
 
   useEffect(() => {
     if (order && !step2SubmitInProgress && !step4SubmitInProgress) {
-      if (staffName && isOrderDetailFullDateRestaurantPicking) {
+      if (staffName && !canNotGoToStep4) {
         setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, REVIEW_TAB);
 
         return setCurrentStep(REVIEW_TAB);
@@ -186,6 +180,7 @@ const CreateOrderWizard = () => {
     step2SubmitInProgress,
     JSON.stringify(orderDetail),
     step4SubmitInProgress,
+    canNotGoToStep4,
   ]);
 
   useEffect(() => {
