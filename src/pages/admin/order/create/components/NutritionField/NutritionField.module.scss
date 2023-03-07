@@ -10,6 +10,7 @@
 
 .fieldGroups {
   @include flexAlign(center);
-  gap: 36px;
+  gap: 16px;
   margin-top: 16px;
+  flex-wrap: wrap;
 }
