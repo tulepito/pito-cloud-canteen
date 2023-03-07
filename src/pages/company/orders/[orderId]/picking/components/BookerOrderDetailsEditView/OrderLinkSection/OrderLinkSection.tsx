@@ -20,6 +20,7 @@ import css from './OrderLinkSection.module.scss';
 type TOrderLinkSectionProps = TDefaultProps & {
   data: {
     orderDeadline: number;
+    companyName: string;
   };
 };
 
@@ -27,11 +28,14 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const {
     rootClassName,
     className,
-    data: { orderDeadline },
+    data: { orderDeadline, companyName },
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const { orderData } = useAppSelector((state) => state.OrderManagement);
+  const [isFirstTimeAccess, setIsFirstTimeAccess] = useState(true);
+  const [isSendNotificationModalOpen, setIsSendNotificationModalOpen] =
+    useState(false);
 
   const orderLink = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderData?.id?.uuid}`;
   const formattedOrderDeadline = formatTimestamp(
@@ -49,8 +53,6 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
 
   const [copyToClipboardTooltip, setCopyToClipboardTooltip] =
     useState(defaultCopyText);
-  const [isSendNotificationModalOpen, setIsSendNotificationModalOpen] =
-    useState(false);
 
   const sectionTitle = intl.formatMessage({
     id: 'OrderLinkSection.title',
@@ -66,6 +68,10 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   };
   const handleCloseSendNotificationModal = () => {
     setIsSendNotificationModalOpen(false);
+
+    if (isFirstTimeAccess) {
+      setIsFirstTimeAccess(false);
+    }
   };
 
   const handleSubmitSendNotification = async (
@@ -103,8 +109,9 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
 
       <SendNotificationModal
         onSubmit={handleSubmitSendNotification}
-        data={{ orderLink, orderDeadline }}
-        isOpen={isSendNotificationModalOpen}
+        data={{ orderLink, orderDeadline, companyName }}
+        isFirstTimeShow={isFirstTimeAccess}
+        isOpen={isFirstTimeAccess || isSendNotificationModalOpen}
         onClose={handleCloseSendNotificationModal}
       />
     </div>
