@@ -11,7 +11,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const integrationSdk = getIntegrationSdk();
     const response = await integrationSdk.listings.query(
       {
-        meta_menuIds: menuId,
+        meta_menuIds: `has_any:${menuId}`,
         meta_listingType: EListingType.subOrder,
         meta_orderState: [EOrderStates.inProgress, EOrderStates.picking],
       },
