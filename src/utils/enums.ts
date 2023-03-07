@@ -104,7 +104,6 @@ export enum ECompanyStatus {
 
 export enum EListingType {
   restaurant = 'restaurant',
-  transaction = 'transaction',
   food = 'food',
   menu = 'menu',
   subOrder = 'sub-order',
