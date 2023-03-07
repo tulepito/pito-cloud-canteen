@@ -103,9 +103,9 @@ export const createSubmitUpdateCompanyValues = (
         tabValue,
         bankAccounts = [],
       } = values;
-      const { imageId } = companyLogo;
       switch (tabValue) {
         case COMPANY_SETTING_INFORMATION_TAB_ID: {
+          const { imageId } = companyLogo || {};
           return {
             profileImageId: imageId?.uuid,
             publicData: {
