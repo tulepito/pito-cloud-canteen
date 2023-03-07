@@ -108,7 +108,7 @@ const normalizeOrderDetail = ({
         ? prev
         : prev.concat({
             params: {
-              listingId: restaurantId,
+              listingId: restaurantId as string,
               extendedData,
               bookingStart,
               bookingEnd,
