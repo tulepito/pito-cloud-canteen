@@ -356,7 +356,7 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
   );
 
   const onSubmit = ({ keywords, meta_status }: any) => {
-    router.replace({
+    router.push({
       pathname,
       query: {
         meta_status: meta_status.join(','),
@@ -367,7 +367,7 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
   };
 
   const onClear = () => {
-    router.replace({
+    router.push({
       pathname,
       query: {
         page: 1,
