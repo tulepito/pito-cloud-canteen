@@ -41,6 +41,22 @@ export const filterCompanies = (companies: TCompany[], filterValues: any) => {
   });
 };
 
+export const filterCompaniesByCompanyName = (
+  companies: TCompany[],
+  companyName: string,
+) => {
+  return companies.filter((company: any) => {
+    return (
+      // eslint-disable-next-line no-nested-ternary
+      companyName
+        ? company.attributes.profile.publicData?.companyName
+            ?.toLowerCase()
+            .includes(companyName?.toLowerCase())
+        : true
+    );
+  });
+};
+
 export const parseEntitiesToTableData = (
   companies: TCompany[],
   extraData: TExtraDataMapToCompanyTable,
