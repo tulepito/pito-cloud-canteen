@@ -196,7 +196,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           className={css.fieldSelect}
           leftIcon={<IconClock />}
           validate={required(deliveryHourRequiredMessage)}>
-          <option value="" disabled selected>
+          <option value="" disabled>
             {intl.formatMessage({
               id: 'OrderDeadlineField.deliveryHour.placeholder',
             })}

@@ -25,6 +25,7 @@ type TQuizState = {
 
   quiz: TObject;
   categories: TKeyValue[];
+  nutritions: TKeyValue[];
   fetchFilterInProgress: boolean;
 
   restaurants: TListing[];
@@ -39,6 +40,7 @@ const initialState: TQuizState = {
   fetchSelectedCompanyError: null,
   quiz: {},
   categories: [],
+  nutritions: [],
   fetchFilterInProgress: false,
   restaurants: [],
   fetchRestaurantsInProgress: false,
@@ -55,7 +57,7 @@ const FETCH_SELECTED_COMPANY = 'app/Quiz/FETCH_SELECTED_COMPANY';
 // ================ Async thunks ================ //
 const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
   const { data: searchFiltersResponse } = await fetchSearchFilterApi();
-  return searchFiltersResponse.categories;
+  return searchFiltersResponse;
 });
 
 const fetchRestaurants = createAsyncThunk(
@@ -122,7 +124,8 @@ const QuizSlice = createSlice({
       })
       .addCase(fetchSearchFilter.fulfilled, (state, action) => {
         state.fetchFilterInProgress = false;
-        state.categories = action.payload;
+        state.categories = action.payload.categories;
+        state.nutritions = action.payload.nutritions;
       })
 
       .addCase(fetchRestaurants.pending, (state) => {

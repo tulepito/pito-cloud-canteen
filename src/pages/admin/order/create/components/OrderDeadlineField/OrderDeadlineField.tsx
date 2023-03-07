@@ -154,7 +154,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
           className={css.fieldSelect}
           leftIcon={<IconClock />}
           validate={required(deadlineHourRequired)}>
-          <option value="" disabled selected>
+          <option value="" disabled>
             {intl.formatMessage({
               id: 'OrderDeadlineField.deadlineHour.placeholder',
             })}

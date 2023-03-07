@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { QuizActions, QuizThunks } from '@redux/slices/Quiz.slice';
+import { QuizActions } from '@redux/slices/Quiz.slice';
 import { quizPaths } from '@src/paths';
 
 import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
@@ -34,9 +34,6 @@ const QuizMealStyles = () => {
   const [selectedMealStyles, setSelectedMealStyles] = useState<string[]>(
     quizData.mealStyles || [],
   );
-  useEffect(() => {
-    dispatch(QuizThunks.fetchSearchFilter());
-  }, [dispatch]);
 
   const validate = (values: QuizMealStylesFormValues) => {
     const errors: any = {};
