@@ -28,7 +28,10 @@ export type TNutritionFormValues = {
   nutritions: string[];
 };
 
-type TExtraProps = { isPersonal: boolean };
+type TExtraProps = {
+  isPersonal: boolean;
+  nutritionsOptions: { key: string; label: string }[];
+};
 type TNutritionFormComponentProps = FormRenderProps<TNutritionFormValues> &
   Partial<TExtraProps>;
 type TNutritionFormProps = FormProps<TNutritionFormValues> & TExtraProps;
@@ -36,7 +39,14 @@ type TNutritionFormProps = FormProps<TNutritionFormValues> & TExtraProps;
 const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, form, values, isPersonal, initialValues } = props;
+  const {
+    handleSubmit,
+    form,
+    values,
+    isPersonal,
+    initialValues,
+    nutritionsOptions,
+  } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [removedFavoriteRestaurantIds, setRemovedFavoriteRestaurantIds] =
@@ -253,6 +263,7 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
             title={intl.formatMessage({ id: 'NutritionForm.nutrition.title' })}
             titleClassName={css.customTitle}
             fieldClassName={css.customField}
+            options={nutritionsOptions}
           />
         </div>
         <div className={css.fieldSection}>
