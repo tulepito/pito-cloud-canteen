@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -55,6 +55,7 @@ type TExtraProps = {
   isEditting?: boolean;
   disabled?: boolean;
   handleSubmitOnClick?: (values: TEditPartnerFoodFormValues) => any;
+  partnerPackagingList: string[];
 };
 type TEditPartnerFoodFormComponentProps =
   FormRenderProps<TEditPartnerFoodFormValues> & Partial<TExtraProps>;
@@ -74,6 +75,7 @@ const EditPartnerFoodFormComponent: React.FC<
     form,
     handleSubmitOnClick,
     invalid,
+    partnerPackagingList,
   } = props;
   const dispatch = useAppDispatch();
   const ready = isEqual(submittedValues, values);
@@ -111,6 +113,14 @@ const EditPartnerFoodFormComponent: React.FC<
     }
     return handleSubmitOnClick && handleSubmitOnClick(values);
   };
+
+  const packagingToRender = useMemo(
+    () =>
+      PACKAGING_OPTIONS.filter((option) =>
+        partnerPackagingList?.includes(option.key),
+      ),
+    [JSON.stringify(partnerPackagingList)],
+  );
 
   return (
     <Form className={css.root}>
@@ -321,13 +331,13 @@ const EditPartnerFoodFormComponent: React.FC<
                 id: 'EditPartnerFoodForm.packagingPlaceholder',
               })}
             </option>
-            {PACKAGING_OPTIONS.filter((cate) => cate.key !== OTHER_OPTION).map(
-              (cat) => (
+            {packagingToRender
+              .filter((cate) => cate.key !== OTHER_OPTION)
+              .map((cat) => (
                 <option key={cat.key} value={cat.key}>
                   {cat.label}
                 </option>
-              ),
-            )}
+              ))}
           </FieldSelect>
         </div>
       </div>

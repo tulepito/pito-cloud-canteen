@@ -7,6 +7,7 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
+import { IntegrationListing } from '@src/utils/data';
 import type { TObject } from '@src/utils/types';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
@@ -29,6 +30,14 @@ const EditPartnerFoodPage = () => {
     updateFoodError,
     uploadingImages,
   } = useAppSelector((state) => state.foods, shallowEqual);
+
+  const {
+    partnerListingRef,
+    showPartnerListingInProgress,
+    showPartnerListingError,
+  } = useAppSelector((state) => state.partners, shallowEqual);
+
+  const { packaging } = IntegrationListing(partnerListingRef).getPublicData();
 
   const handleSubmit = (values: TEditPartnerFoodFormValues) =>
     dispatch(
@@ -65,12 +74,14 @@ const EditPartnerFoodPage = () => {
     dispatch(foodSliceThunks.showPartnerFoodListing(foodId));
   }, [dispatch, foodId]);
 
-  if (showFoodInProgress) {
+  if (showFoodInProgress || showPartnerListingInProgress) {
     return <LoadingContainer />;
   }
 
-  if (showFoodError) {
-    return <ErrorMessage message={showFoodError.message} />;
+  const showError = showFoodError || showPartnerListingError;
+
+  if (showError) {
+    return <ErrorMessage message={showError.message} />;
   }
 
   return (
@@ -85,6 +96,7 @@ const EditPartnerFoodPage = () => {
         formError={updateFoodError}
         initialValues={initialValues}
         isEditting
+        partnerPackagingList={packaging}
       />
     </>
   );

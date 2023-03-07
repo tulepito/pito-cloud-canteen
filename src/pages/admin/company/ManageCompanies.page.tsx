@@ -226,7 +226,7 @@ export default function ManageCompanies() {
   }, [JSON.stringify(companyIdsToGetMemberDetails)]);
 
   const onSearchKeyword = (values: any) => {
-    router.replace({
+    router.push({
       pathname,
       query: {
         ...values,
