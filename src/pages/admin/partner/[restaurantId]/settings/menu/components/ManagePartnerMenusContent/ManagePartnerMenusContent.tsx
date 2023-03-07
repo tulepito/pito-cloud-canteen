@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 
@@ -18,16 +18,17 @@ import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TMenuMealTypeCount } from '@redux/slices/menus.slice';
 import { menusSliceThunks } from '@redux/slices/menus.slice';
+import { adminRoutes } from '@src/paths';
 import { formatTimestamp } from '@utils/dates';
 import type { EMenuTypes } from '@utils/enums';
 import { EListingStates, EMenuMealType } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 
+import DisableMenuConfirmModal from '../DisableMenuConfirmModal/DisableMenuConfirmModal';
 import {
   createUpdateMenuApplyTimeValues,
   MENU_INFORMATION_TAB,
 } from '../EditPartnerMenuWizard/utils';
-import RemoveMenuConfirmModal from '../RemoveMenuConfirmModal/RemoveMenuConfirmModal';
 import UpdateMenuModal from '../UpdateMenuModal/UpdateMenuModal';
 import type { TUpdateMenuModalFormValues } from '../UpdateMenuModal/UpdateMenuModalForm';
 
@@ -82,8 +83,8 @@ const TABLE_COLUNMS: TColumn[] = [
       id,
       isDeleted,
       onSetMenuToUpdate,
-      onToggleStatus,
       toggleInProgress,
+      onSetMenuToDisable,
     }) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       if (isDeleted) {
@@ -92,7 +93,7 @@ const TABLE_COLUNMS: TColumn[] = [
       const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { checked } = e.target;
         if (!checked) {
-          return onToggleStatus(id, EListingStates.closed);
+          return onSetMenuToDisable();
         }
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         const state = checked
@@ -153,11 +154,13 @@ const parseEntitiesToTableData = (
   {
     onSetMenuToRemove,
     onSetMenuToUpdate,
+    onSetMenuToDisable,
     onToggleStatus,
     toggleMenuStateInProgressId,
   }: {
     onSetMenuToRemove: (menu: any) => void;
     onSetMenuToUpdate: (menu: any) => void;
+    onSetMenuToDisable: (meny: any) => void;
     onToggleStatus: (id: string, state: EListingStates) => void;
     toggleMenuStateInProgressId: string | null;
   },
@@ -225,6 +228,10 @@ const parseEntitiesToTableData = (
       onSetMenuToRemove({ id: menu.id.uuid, title: menu.attributes.title });
     };
 
+    const handleSetMenuToDisable = () => {
+      onSetMenuToDisable({ id: menu.id.uuid, title: menu.attributes.title });
+    };
+
     return {
       key: menu.id.uuid,
       data: {
@@ -240,6 +247,7 @@ const parseEntitiesToTableData = (
         restaurantId,
         onSetMenuToRemove: handleSetMenuToRemove,
         onSetMenuToUpdate: handleUpdateMenu,
+        onSetMenuToDisable: handleSetMenuToDisable,
         onToggleStatus,
         toggleInProgress: toggleMenuStateInProgressId === menu.id.uuid,
       },
@@ -258,7 +266,10 @@ type TTabContentProps = {
 const TabContent: React.FC<TTabContentProps> = (props) => {
   const { menuType, restaurantId, id: mealType, keywords, page } = props;
   const dispatch = useAppDispatch();
+  const intl = useIntl();
   const [menuToRemove, setMenuToRemove] = useState<any>();
+  const [menuToDisable, setMenuToDisable] = useState<any>();
+
   const [menuToUpdate, setMenuToUpdate] = useState<any>();
 
   const manageMenusPagination = useAppSelector(
@@ -289,12 +300,22 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
   }, [menuType, restaurantId, dispatch, mealType, keywords, page]);
 
   const onToggleStatus = (id: string, listingState: EListingStates) => {
-    dispatch(
+    return dispatch(
       menusSliceThunks.toggleMenuState({
         id,
         listingState,
       }),
     );
+  };
+
+  const onDisableMenu = async () => {
+    const { error } = (await onToggleStatus(
+      menuToDisable.id,
+      EListingStates.closed,
+    )) as any;
+    if (!error) {
+      setMenuToDisable(null);
+    }
   };
 
   const menus = useAppSelector((state) => state.menus.menus, shallowEqual);
@@ -320,6 +341,14 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
 
   const onSetMenuToRemove = (menuData: any) => {
     setMenuToRemove(menuData);
+  };
+
+  const onSetMenuToDisable = (menuData: any) => {
+    setMenuToDisable(menuData);
+  };
+
+  const onClearMenuToDisable = () => {
+    setMenuToDisable(null);
   };
 
   const onClearMenuToRemove = () => {
@@ -385,6 +414,7 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
   const menuData = parseEntitiesToTableData(menus, {
     onSetMenuToRemove,
     onSetMenuToUpdate,
+    onSetMenuToDisable,
     onToggleStatus,
     toggleMenuStateInProgressId,
   });
@@ -401,11 +431,87 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
         pagination={manageMenusPagination}
         isLoading={queryMenusInProgress}
       />
-      <RemoveMenuConfirmModal
-        menuToRemove={menuToRemove}
-        onClearMenuToRemove={onClearMenuToRemove}
-        onDeleteMenu={onDeleteMenu}
-        removeMenuInProgress={removeMenuInProgress}
+      <DisableMenuConfirmModal
+        content={intl.formatMessage(
+          {
+            id: 'ManagePartnerMenu.removeContent',
+          },
+          {
+            menuTitle: (
+              <div className={css.menuTitle}>
+                {menuToRemove && menuToRemove.title}
+              </div>
+            ),
+          },
+        )}
+        inProgressContent={intl.formatMessage(
+          {
+            id: 'ManagePartnerMenu.preventRemoveContent',
+          },
+          {
+            link: (
+              <NamedLink
+                className={css.link}
+                path={adminRoutes.ManageOrders.path}>
+                <FormattedMessage id="ManagePartnerMenu.preventRemoveLink" />
+              </NamedLink>
+            ),
+          },
+        )}
+        menuToDisable={menuToRemove}
+        onClearMenuToDisable={onClearMenuToRemove}
+        onDisabledMenu={onDeleteMenu}
+        disableMenuInProgress={removeMenuInProgress}
+        inProgressTitle={intl.formatMessage({
+          id: 'ManagePartnerMenu.preventRemoveTitle',
+        })}
+        title={intl.formatMessage({
+          id: 'ManagePartnerMenu.removeTitle',
+        })}
+        confirmLabel={intl.formatMessage({
+          id: 'ManagePartnerMenu.removeMenu',
+        })}
+      />
+      <DisableMenuConfirmModal
+        content={intl.formatMessage(
+          {
+            id: 'ManagePartnerMenu.disableContent',
+          },
+          {
+            menuTitle: (
+              <div className={css.menuTitle}>
+                {menuToDisable && menuToDisable.title}
+              </div>
+            ),
+          },
+        )}
+        inProgressContent={intl.formatMessage(
+          {
+            id: 'ManagePartnerMenu.preventDisableContent',
+          },
+          {
+            link: (
+              <NamedLink
+                className={css.link}
+                path={adminRoutes.ManageOrders.path}>
+                <FormattedMessage id="ManagePartnerMenu.preventDisableLink" />
+              </NamedLink>
+            ),
+          },
+        )}
+        menuToDisable={menuToDisable}
+        confirmLabel={intl.formatMessage({
+          id: 'ManagePartnerMenu.disableMenu',
+        })}
+        onClearMenuToDisable={onClearMenuToDisable}
+        onDisabledMenu={onDisableMenu}
+        disableMenuInProgress={!!toggleMenuStateInProgressId}
+        inProgressTitle={intl.formatMessage({
+          id: 'ManagePartnerMenu.preventDisableTitle',
+        })}
+        title={intl.formatMessage({
+          id: 'ManagePartnerMenu.disableTitle',
+        })}
       />
       <UpdateMenuModal
         menuToUpdate={menuToUpdate}

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
@@ -11,6 +11,7 @@ import type { TUser } from '@utils/types';
 
 import type { TNutritionFormValues } from './components/NutritionForm/NutritionForm';
 import NutritionForm from './components/NutritionForm/NutritionForm';
+import { NutritionThunks } from './Nutrition.slice';
 
 import css from './Nutrition.module.scss';
 
@@ -49,6 +50,10 @@ const NutritionPage = () => {
   const fetchCompanyInfoInProgress = useAppSelector(
     (state) => state.company.fetchCompanyInfoInProgress,
   );
+  const nutritionsOptions = useAppSelector(
+    (state) => state.Nutrition.nutritions,
+    shallowEqual,
+  );
   const { nutritions: personalNutritions = [] } = CurrentUser(
     currentUser!,
   ).getPublicData();
@@ -84,6 +89,10 @@ const NutritionPage = () => {
     ],
   );
 
+  useEffect(() => {
+    dispatch(NutritionThunks.fetchSearchFilter());
+  }, [dispatch]);
+
   const onSubmit = (values: TNutritionFormValues) => {
     const publicData = {
       ...values,
@@ -106,6 +115,7 @@ const NutritionPage = () => {
             initialValues={initialValues}
             onSubmit={onSubmit}
             isPersonal={isPersonal}
+            nutritionsOptions={nutritionsOptions}
           />
         </div>
       )}

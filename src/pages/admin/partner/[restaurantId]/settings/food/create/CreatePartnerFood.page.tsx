@@ -76,7 +76,7 @@ const CreatePartnerFoodPage = () => {
     return response;
   };
 
-  const { minQuantity, maxQuantity } =
+  const { minQuantity, maxQuantity, packaging } =
     IntegrationListing(partnerListingRef).getPublicData();
 
   const initialValues = useMemo(() => {
@@ -94,7 +94,7 @@ const CreatePartnerFoodPage = () => {
       description,
       price: price?.amount,
       menuType: menuType || EMenuTypes.cycleMenu,
-      foodType: foodType || EFoodTypes.vegetarianDish,
+      foodType: foodType || EFoodTypes.savoryDish,
       minOrderHourInAdvance: 24,
       minQuantity,
       maxQuantity,
@@ -144,6 +144,7 @@ const CreatePartnerFoodPage = () => {
         inProgress={createFoodInProgress}
         disabled={uploadingImages || createFoodInProgress}
         formError={createFoodError}
+        partnerPackagingList={packaging}
       />
     </>
   );

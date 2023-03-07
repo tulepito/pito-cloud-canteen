@@ -1,0 +1,13 @@
+@use '/src/styles/vars.scss' as *;
+
+.modalCancelButton {
+  flex-basis: 100%;
+}
+
+.loading {
+  min-height: 200px;
+}
+
+.modalChildren {
+  padding-bottom: 28px;
+}
