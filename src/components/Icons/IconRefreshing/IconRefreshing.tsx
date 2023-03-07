@@ -1,14 +1,20 @@
+import classNames from 'classnames';
+
 import type { TIconProps } from '@utils/types';
 
-type TIconRefreshingProps = TIconProps;
+import css from './IconRefreshing.module.scss';
+
+type TIconRefreshingProps = TIconProps & {
+  inProgress?: boolean;
+};
 
 const IconRefreshing: React.FC<TIconRefreshingProps> = (props) => {
-  const { className, width = 16, height = 16 } = props;
-
+  const { className, width = 16, height = 16, inProgress = false } = props;
+  const classes = classNames(className, inProgress && css.rotate);
   return (
     <svg
       preserveAspectRatio="none"
-      className={className}
+      className={classes}
       width={width}
       height={height}
       viewBox="0 0 17 16"

@@ -98,6 +98,7 @@ type TOrderInitialState = {
   currentSelectedMenuId: string;
 
   canNotGoToStep4: boolean;
+  onRecommendRestaurantInProgress: boolean;
 };
 
 const initialState: TOrderInitialState = {
@@ -166,6 +167,7 @@ const initialState: TOrderInitialState = {
   step4SubmitInProgress: false,
   currentSelectedMenuId: '',
   canNotGoToStep4: false,
+  onRecommendRestaurantInProgress: false,
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -679,6 +681,9 @@ const orderSlice = createSlice({
       ...state,
       canNotGoToStep4: payload,
     }),
+    setOnRecommendRestaurantInProcess: (state, { payload }) => {
+      state.onRecommendRestaurantInProgress = payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -928,6 +933,7 @@ export const {
   changeStep4SubmitStatus,
   addCurrentSelectedMenuId,
   setCanNotGoToStep4,
+  setOnRecommendRestaurantInProcess,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;
