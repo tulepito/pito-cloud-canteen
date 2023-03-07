@@ -1172,6 +1172,7 @@
   "SectionOrderPanel.successModal.title": "Đăng Ký Thành Công",
   "SectionRestaurantHero.orderDayMessage": "Thứ {weekDay}, {fullDay}",
   "SelectFoodForm.findFoodByName": "Tìm kiếm món ăn",
+  "SelectFoodForm.noFoodOption": "Không có kết quả",
   "SelectFoodForm.noSelectedItems": "Bạn chưa chọn thực đơn!",
   "SelectFoodForm.saveResult": "Lưu kết quả",
   "SelectFoodForm.selectedFood": "Món đã chọn",

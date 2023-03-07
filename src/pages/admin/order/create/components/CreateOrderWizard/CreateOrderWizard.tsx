@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 
 import FormWizard from '@components/FormWizard/FormWizard';
 import { setItem } from '@helpers/localStorageHelpers';
+import { isOrderDetailFullDatePickingRestaurant } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
@@ -142,20 +143,31 @@ const CreateOrderWizard = () => {
   };
 
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
-
+  const { staffName, startDate, endDate } = Listing(
+    order as TListing,
+  ).getMetadata();
   const step2SubmitInProgress = useAppSelector(
     (state) => state.Order.step2SubmitInProgress,
+  );
+  const step4SubmitInProgress = useAppSelector(
+    (state) => state.Order.step4SubmitInProgress,
   );
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
+
+  const isOrderDetailFullDateRestaurantPicking =
+    isOrderDetailFullDatePickingRestaurant({
+      orderDetail,
+      startDate,
+      endDate,
+    });
   const tabsStatus = tabsActive(order, orderDetail) as any;
 
   useEffect(() => {
-    if (order && !step2SubmitInProgress) {
-      const { staffName } = Listing(order as TListing).getMetadata();
-      if (staffName) {
+    if (order && !step2SubmitInProgress && !step4SubmitInProgress) {
+      if (staffName && isOrderDetailFullDateRestaurantPicking) {
         setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, REVIEW_TAB);
 
         return setCurrentStep(REVIEW_TAB);
@@ -173,6 +185,7 @@ const CreateOrderWizard = () => {
     JSON.stringify(order),
     step2SubmitInProgress,
     JSON.stringify(orderDetail),
+    step4SubmitInProgress,
   ]);
 
   useEffect(() => {

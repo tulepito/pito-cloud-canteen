@@ -37,6 +37,12 @@
       overflow: hidden auto;
       max-height: calc(70vh);
     }
+
+    .noResult {
+      padding: 16px;
+      text-align: center;
+      color: $neutralGray5;
+    }
   }
 
   .rightPart {
