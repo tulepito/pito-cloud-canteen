@@ -138,6 +138,7 @@ const EditPartnerWizard = (props: any) => {
     onSetUnsatisfactory,
     uploadingImage,
   } = props;
+
   const intl = useIntl();
   const router = useRouter();
   const { query, pathname } = router;
@@ -239,6 +240,7 @@ const EditPartnerWizard = (props: any) => {
             onSetUnsatisfactory={onSetUnsatisfactory}
             goBack={handleGoBack(tab)}
             disabled={uploadingImage || disabled}
+            uploadingImage={uploadingImage}
           />
         );
       })}

@@ -70,6 +70,8 @@ type TEditPartnerBasicInformationForm = {
   uploadAvatarError?: any;
 
   partnerListingRef?: any;
+
+  uploadingImage?: boolean;
 };
 
 const ACCEPT_IMAGES = 'image/png, image/gif, image/jpeg';
@@ -195,6 +197,8 @@ const EditPartnerBasicInformationForm: React.FC<
 
           formError,
           inProgress,
+
+          uploadingImage,
         } = fieldRenderProps;
 
         const ready = !formError && isEqual(submittedValues, values);
@@ -627,7 +631,7 @@ const EditPartnerBasicInformationForm: React.FC<
               </div>
               <Button
                 ready={ready}
-                disabled={inProgress}
+                disabled={inProgress || uploadingImage}
                 inProgress={inProgress}
                 className={css.submitButton}>
                 {intl.formatMessage({
