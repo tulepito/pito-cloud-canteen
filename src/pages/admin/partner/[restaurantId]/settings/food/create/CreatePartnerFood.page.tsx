@@ -41,13 +41,15 @@ const CreatePartnerFoodPage = () => {
 
   const redirectToEditPage = (listing: TIntegrationListing) => {
     const foodId = listing?.id?.uuid;
-    if (foodId)
-      return router.push({
-        pathname: adminRoutes.ManagePartnerFoods.path,
-        query: {
-          restaurantId,
-        },
-      });
+    setTimeout(() => {
+      if (foodId)
+        return router.push({
+          pathname: adminRoutes.ManagePartnerFoods.path,
+          query: {
+            restaurantId,
+          },
+        });
+    }, 1000);
   };
   const handleSubmit = async (values: TEditPartnerFoodFormValues) => {
     if (duplicateId) {
@@ -59,9 +61,7 @@ const CreatePartnerFoodPage = () => {
           }),
         ),
       );
-      setTimeout(() => {
-        redirectToEditPage(response.payload);
-      }, 1000);
+      redirectToEditPage(response.payload);
       return response;
     }
     const response = await dispatch(
