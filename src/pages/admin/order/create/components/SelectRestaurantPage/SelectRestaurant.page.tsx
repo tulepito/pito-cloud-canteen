@@ -99,7 +99,14 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [packagePerMember, deliveryHour, nutritions, dispatch, page, perPage]);
+  }, [
+    packagePerMember,
+    deliveryHour,
+    JSON.stringify(nutritions),
+    dispatch,
+    page,
+    perPage,
+  ]);
 
   const handlePageChange = (pageValue: number) => {
     setPage(pageValue);
