@@ -34,7 +34,13 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
-  const { onEditFood, editFoodInprogress } = resources;
+  const {
+    onEditFood,
+    editFoodInprogress,
+    onApplyOtherDays,
+    dayInWeek,
+    onApplyOtherDaysInProgress,
+  } = resources;
 
   const removeEventItem =
     onRemove ||
@@ -61,6 +67,9 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
         event={event}
         onEditFood={onEditFood}
         editFoodInprogress={editFoodInprogress}
+        onApplyOtherDays={onApplyOtherDays}
+        dayInWeek={dayInWeek}
+        onApplyOtherDaysInProgress={onApplyOtherDaysInProgress}
       />
     </div>
   );

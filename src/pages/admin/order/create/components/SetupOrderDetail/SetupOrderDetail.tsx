@@ -34,6 +34,7 @@ import {
   unSelectRestaurant,
 } from '@redux/slices/Order.slice';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
+import { convertWeekDay, renderDateRange } from '@src/utils/dates';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
 
@@ -97,6 +98,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     deadlineHour,
     memberAmount,
     plans = [],
+    dayInWeek,
   } = Listing(order as TListing).getMetadata();
   const { title: orderTitle } = Listing(order as TListing).getAttributes();
   const companies = useAppSelector(
@@ -277,6 +279,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     startDate,
     endDate,
   });
+  const onApplyOtherDaysInProgress = updateOrderDetailInProgress;
 
   const onSubmit = () => {
     dispatch(setCanNotGoToStep4(false));
@@ -395,6 +398,37 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     dispatch(setOnRecommendRestaurantInProcess(false));
   }, []);
 
+  const onApplyOtherDays = useCallback(
+    async (date: string, selectedDates: string[]) => {
+      const totalDates = renderDateRange(startDate, endDate);
+      const newOrderDetail = totalDates.reduce(
+        (result, curr) => {
+          if (
+            selectedDates.includes(
+              convertWeekDay(DateTime.fromMillis(curr).weekday).key,
+            )
+          ) {
+            return {
+              ...result,
+              [curr]: { ...orderDetail[date] },
+            };
+          }
+          return result;
+        },
+        { [date]: orderDetail[date] },
+      );
+      dispatch(setCanNotGoToStep4(true));
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId,
+          orderDetail: newOrderDetail,
+        }),
+      );
+    },
+    [dispatch, orderId, orderDetail, planId, selectedDate],
+  );
+
   return (
     <>
       {isSelectingRestaurant ? (
@@ -452,6 +486,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
                 ...calendarExtraResources,
                 onEditFood: onEditFoodInMealPlanCard,
                 onEditFoodInProgress,
+                onApplyOtherDays,
+                dayInWeek,
+                onApplyOtherDaysInProgress,
               }}
               components={{
                 contentEnd: (props) => (
