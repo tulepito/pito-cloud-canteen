@@ -180,7 +180,6 @@ const CreateOrderWizard = () => {
     step2SubmitInProgress,
     JSON.stringify(orderDetail),
     step4SubmitInProgress,
-    canNotGoToStep4,
   ]);
 
   useEffect(() => {
