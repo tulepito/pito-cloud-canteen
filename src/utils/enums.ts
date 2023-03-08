@@ -770,6 +770,10 @@ export const ORDER_STATES_OPTIONS = [
     label: 'Chưa đánh giá',
   },
   {
+    key: EOrderStates.pendingPayment,
+    label: 'Chưa thanh toán',
+  },
+  {
     key: EOrderStates.reviewed,
     label: 'Đã đánh giá',
   },
@@ -835,6 +839,7 @@ export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
     EBookerOrderDraftStates.bookerDraft,
     EOrderStates.picking,
     EOrderStates.inProgress,
+    EOrderStates.pendingPayment,
     EOrderStates.completed,
     EOrderStates.reviewed,
     EOrderStates.canceled,
@@ -846,6 +851,7 @@ export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
   [EManageCompanyOrdersTab.COMPLETED]: [
     EOrderStates.completed,
     EOrderStates.reviewed,
+    EOrderStates.pendingPayment,
   ],
   [EManageCompanyOrdersTab.DRAFT]: [
     EOrderDraftStates.pendingApproval,
