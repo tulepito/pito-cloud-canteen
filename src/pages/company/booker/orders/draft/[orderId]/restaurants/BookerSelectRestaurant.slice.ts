@@ -281,7 +281,7 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
       pub_menuWeekDay: `has_any:${dayOfWeek}`,
       price: `,${packagePerMember}`,
       ...(nutritions.length > 0
-        ? { pub_nutritions: `has_any:${nutritions.join(',')}` }
+        ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
         : {}),
       include: ['images'],
       ...(keywords && { keywords }),
