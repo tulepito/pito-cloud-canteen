@@ -21,7 +21,7 @@ import StateItem from '@components/TimeLine/StateItem';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
-import { adminRoutes } from '@src/paths';
+import { adminPaths, adminRoutes } from '@src/paths';
 import { formatTimestamp } from '@utils/dates';
 import {
   EOrderDraftStates,
@@ -105,9 +105,19 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'title',
     label: 'ID',
-    render: ({ id, title, subOrders }: any) => {
+    render: ({ id: orderId, title, state, subOrders }: any) => {
+      const titleComponent = <div className={css.boldText}>#{title}</div>;
+
+      if ([EOrderDraftStates.draft].includes(state)) {
+        return (
+          <NamedLink path={adminPaths.UpdateDraftOrder} params={{ orderId }}>
+            {titleComponent}
+          </NamedLink>
+        );
+      }
+
       return (
-        <NamedLink path={`${adminRoutes.ManageOrders.path}/${id}`}>
+        <NamedLink path={adminPaths.OrderDetail} params={{ orderId }}>
           {subOrders.length > 0 ? (
             <Tooltip
               overlayClassName={css.orderDetailTooltip}
@@ -115,10 +125,10 @@ const TABLE_COLUMN: TColumn[] = [
               showArrow={false}
               tooltipContent={<OrderDetailTooltip subOrders={subOrders} />}
               placement="bottomLeft">
-              <div className={css.boldText}>#{title}</div>
+              {titleComponent}
             </Tooltip>
           ) : (
-            <div className={css.boldText}>#{title}</div>
+            titleComponent
           )}
         </NamedLink>
       );
@@ -177,7 +187,9 @@ const TABLE_COLUMN: TColumn[] = [
       return length > 0 ? (
         <div className={css.rowText}>
           {restaurants.slice(0, 2).map((restaurantName: string) => (
-            <div key={restaurantName}>{restaurantName}</div>
+            <div key={restaurantName} className={css.restaurantName}>
+              {restaurantName}
+            </div>
           ))}
           {moreThanTwo && (
             <div className={css.remainText}>+ {remainLength} đối tác </div>

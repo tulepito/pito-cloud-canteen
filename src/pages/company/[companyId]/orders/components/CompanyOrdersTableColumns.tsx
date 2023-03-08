@@ -88,15 +88,15 @@ export const CompanyOrdersTableColumns: TColumn[] = [
             {titleContent}
           </NamedLink>
         );
+      } else {
+        returnComponent = (
+          <NamedLink
+            path={companyPaths.ManageOrderDetail}
+            params={{ orderId: id }}>
+            {titleContent}
+          </NamedLink>
+        );
       }
-
-      returnComponent = (
-        <NamedLink
-          path={companyPaths.ManageOrderDetail}
-          params={{ orderId: id }}>
-          {titleContent}
-        </NamedLink>
-      );
 
       const subOrders = [].concat(plan) as TIntegrationListing[];
 

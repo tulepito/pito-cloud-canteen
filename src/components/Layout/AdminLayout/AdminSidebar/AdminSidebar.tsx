@@ -25,7 +25,7 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
   {
     id: 'order',
     Icon: IconOrderManagement,
-    nameLink: adminRoutes.CreateOrder.path,
+    nameLink: adminRoutes.ManageOrders.path,
     label: 'AdminSidebar.orderLabel',
     isFirstLevel: true,
     childrenMenus: [
