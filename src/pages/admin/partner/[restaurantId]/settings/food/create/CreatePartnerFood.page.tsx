@@ -87,7 +87,7 @@ const CreatePartnerFoodPage = () => {
       title,
       description,
     } = attributes || ({} as TObject);
-    const { foodType, menuType, ...rest } = publicData;
+    const { foodType, menuType, allergicIngredients, ...rest } = publicData;
     return {
       images: getInitialAddImages(currentFoodListing?.images || []),
       title,
@@ -98,6 +98,7 @@ const CreatePartnerFoodPage = () => {
       minOrderHourInAdvance: 24,
       minQuantity,
       maxQuantity,
+      allergicIngredients: allergicIngredients || [],
       ...rest,
     };
   }, [

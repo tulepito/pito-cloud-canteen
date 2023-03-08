@@ -484,7 +484,7 @@ export const upperCaseFirstLetter = (value: string) => {
 export const validateNonEnterInputField =
   (message: string) => (value: string, allValues: TObject) => {
     const { tempValue } = allValues;
-    return tempValue && tempValue !== value ? message : VALID;
+    return tempValue ? message : VALID;
   };
 
 export const valueLessThanMax =
