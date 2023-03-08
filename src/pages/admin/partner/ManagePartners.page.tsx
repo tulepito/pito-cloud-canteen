@@ -416,6 +416,7 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
       <div className={css.filterWrapper}>
         <IntegrationFilterModal
           onSubmit={onSubmit}
+          title={<FormattedMessage id="ManagePartners.filterModal.title" />}
           onClear={onClear}
           initialValues={{ keywords, meta_status: groupStatus }}>
           {() => (
