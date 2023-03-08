@@ -26,6 +26,8 @@
   "AddNewMembersForm.submit": "Thêm thành viên",
   "AddNewMembersModal.cancel": "Huỷ",
   "AddNewMembersModal.modalTitle": "Thêm Thành Viên",
+  "ApplyOtherDaysForm.submit": "Áp dụng",
+  "ApplyOtherDaysForm.cancel": "Huỷ",
   "AddOrderForm.addRequirement.hide": "Ẩn yêu cầu",
   "AddOrderForm.addRequirement.show": "Thêm yêu cầu",
   "AddOrderForm.foodIdField.placeholder": "Chọn món",
