@@ -198,13 +198,17 @@ const EditCompanyWizardTab: React.FC<TEditCompanyWizardTab> = (props) => {
         ) as TEditCompanyInformationFormValues;
       }
       case COMPANY_SETTINGS_TAB: {
-        return {
-          companyLogo: company?.profileImage,
-          companyNutritions: User(company).getPublicData().companyNutritions,
-          bankAccounts:
-            User(company).getPrivateData().bankAccounts || defaultBankAccounts,
-        } as TEditCompanySettingsInformationFormValues &
-          TEditCompanyBankAccountsFormValues;
+        return company
+          ? ({
+              companyLogo: company?.profileImage,
+              companyNutritions:
+                User(company).getPublicData().companyNutritions,
+              bankAccounts:
+                User(company).getPrivateData().bankAccounts ||
+                defaultBankAccounts,
+            } as TEditCompanySettingsInformationFormValues &
+              TEditCompanyBankAccountsFormValues)
+          : {};
       }
       default:
         return {};
@@ -545,6 +549,7 @@ const EditCompanyWizard = () => {
               deleteGroupError={deleteGroupError}
               disabled={!completed}
               onUpdateMemberPermission={onUpdateMemberPermission}
+              isEditting={!!companyId}
             />
           );
         })}

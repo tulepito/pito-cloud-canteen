@@ -16,7 +16,7 @@ type TMemberApi = {
   email: string;
 };
 
-export const deleteCompanyGroupFn = async ({
+const deleteCompanyGroupFn = async ({
   companyId,
   groupId,
 }: TDeleteCompanyGroupFn) => {
@@ -69,3 +69,5 @@ export const deleteCompanyGroupFn = async ({
   );
   return updatedCompanyAccount;
 };
+
+export default deleteCompanyGroupFn;

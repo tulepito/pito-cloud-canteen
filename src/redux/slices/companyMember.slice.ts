@@ -72,7 +72,7 @@ const ADMIN_UPDATE_MEMBER_PERMISSION =
 const queryCompanyMembers = createAsyncThunk(
   QUERY_COMPANY_MEMBERS,
   async (id: string) => {
-    const { data } = await queryCompanyMembersApi({ id, page: 1, perPage: 10 });
+    const { data } = await queryCompanyMembersApi(id);
     return data;
   },
   {

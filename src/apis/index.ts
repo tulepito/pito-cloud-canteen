@@ -19,18 +19,8 @@ export const adminUpdateCompanyApi = (body: TObject) =>
 export const createCompanyApi = (body: TObject) =>
   postApi('/admin/users/company/create', body);
 
-export const queryCompanyMembersApi = ({
-  id,
-  page = 1,
-  perPage = 10,
-}: {
-  id: string;
-  page: number;
-  perPage: number;
-}) => {
-  return getApi(
-    `/admin/users/company/${id}/members?page=${page}&perPage=${perPage}`,
-  );
+export const queryCompanyMembersApi = (companyId: string) => {
+  return getApi(`/admin/users/company/${companyId}/members`);
 };
 
 export const showCompanyApi = (id: string) =>

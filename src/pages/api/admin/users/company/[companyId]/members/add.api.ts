@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import addMembersToCompanyFn from '@pages/api/api-utils/addMembersToCompanyFn';
+import addMembersToCompanyFn from '@pages/api/apiServices/company/addMembersToCompanyFn.service';
 import cookies from '@services/cookie';
 import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';

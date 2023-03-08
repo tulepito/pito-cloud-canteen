@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { createCompanyGroupFn } from '@pages/api/api-utils/createCompanyGroupFn';
+import createCompanyGroupFn from '@pages/api/apiServices/company/createCompanyGroupFn.service';
 import cookies from '@services/cookie';
 import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';

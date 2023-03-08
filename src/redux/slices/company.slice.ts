@@ -491,9 +491,14 @@ export const companySlice = createSlice({
       ...state,
       uploadedCompanyLogo: null,
     }),
-    renewCompanyState: (state, { payload }) => ({
-      ...state,
-      company: payload,
+    renewCompanyState: (state, { payload }) => {
+      return {
+        ...state,
+        company: payload,
+      };
+    },
+    resetCompanySliceStates: () => ({
+      ...initialState,
     }),
   },
   extraReducers: (builder) => {
@@ -818,6 +823,7 @@ export const companySlice = createSlice({
   },
 });
 
-export const { addWorkspaceCompanyId } = companySlice.actions;
+export const { addWorkspaceCompanyId, resetCompanySliceStates } =
+  companySlice.actions;
 
 export default companySlice.reducer;

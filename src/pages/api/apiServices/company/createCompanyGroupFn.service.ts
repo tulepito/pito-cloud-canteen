@@ -18,7 +18,7 @@ type TMemberApi = {
   email: string;
 };
 
-export const createCompanyGroupFn = async ({
+const createCompanyGroupFn = async ({
   companyId,
   groupInfo,
   groupMembers,
@@ -73,3 +73,5 @@ export const createCompanyGroupFn = async ({
   );
   return updatedCompanyAccount;
 };
+
+export default createCompanyGroupFn;

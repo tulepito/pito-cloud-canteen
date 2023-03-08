@@ -34,6 +34,7 @@ const TABLE_COLUMN: TColumn[] &
     label: 'Tên',
     render: (data) => {
       const { name } = data;
+      if (!name) return <span className={css.boldText}>Chưa xác nhận</span>;
       return <span>{name}</span>;
     },
   },
@@ -170,7 +171,6 @@ const parseEntitiesToTableData = (
         data: {
           id: companyMember.id,
           permission: companyMember.permission,
-          name: '------',
           email: companyMember.email,
           groups,
           handleToRemoveMember: handleToRemove,

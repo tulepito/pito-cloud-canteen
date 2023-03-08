@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { deleteCompanyGroupFn } from '@pages/api/api-utils/deleteCompanyGroupFn';
+import deleteCompanyGroupFn from '@pages/api/apiServices/company/deleteCompanyGroupFn.service';
 import cookies from '@services/cookie';
 import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';

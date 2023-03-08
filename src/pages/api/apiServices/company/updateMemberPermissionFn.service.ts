@@ -4,7 +4,7 @@ import type { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import type { TCompany, TObject } from '@utils/types';
 
-export const updateMemberPermissionFn = async ({
+const updateMemberPermissionFn = async ({
   companyId,
   memberEmail,
   permission,
@@ -48,3 +48,5 @@ export const updateMemberPermissionFn = async ({
   const [newCompany] = denormalisedResponseEntities(response);
   return newCompany;
 };
+
+export default updateMemberPermissionFn;

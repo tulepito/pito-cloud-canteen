@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { createCompanyGroupFn } from '@pages/api/api-utils/createCompanyGroupFn';
-import { deleteCompanyGroupFn } from '@pages/api/api-utils/deleteCompanyGroupFn';
-import { updateCompanyGroupFn } from '@pages/api/api-utils/updateCompanyGroupFn';
+import createCompanyGroupFn from '@pages/api/apiServices/company/createCompanyGroupFn.service';
+import deleteCompanyGroupFn from '@pages/api/apiServices/company/deleteCompanyGroupFn.service';
+import updateCompanyGroupFn from '@pages/api/apiServices/company/updateCompanyGroupFn.service';
 import { HTTP_METHODS } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
 import companyChecker from '@services/permissionChecker/company';

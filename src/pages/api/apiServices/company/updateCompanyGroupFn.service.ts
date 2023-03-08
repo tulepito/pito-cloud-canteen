@@ -20,7 +20,7 @@ type TMemberApi = {
   email: string;
 };
 
-export const updateCompanyGroupFn = async ({
+const updateCompanyGroupFn = async ({
   companyId,
   groupInfo,
   groupId,
@@ -107,3 +107,5 @@ export const updateCompanyGroupFn = async ({
 
   return updatedCompanyAccount;
 };
+
+export default updateCompanyGroupFn;

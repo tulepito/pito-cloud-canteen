@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { composeApiCheckers } from '@apis/configs';
-import { deleteMemberFromCompanyFn } from '@pages/api/api-utils/deleteMemberFromCompanyFn';
+import deleteMemberFromCompanyFn from '@pages/api/apiServices/company/deleteMemberFromCompanyFn.service';
 import companyChecker from '@services/permissionChecker/company';
 import { handleError } from '@services/sdk';
 

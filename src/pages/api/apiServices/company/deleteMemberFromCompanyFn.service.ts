@@ -5,7 +5,7 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import type { TCompanyGroup } from '@utils/types';
 
-export const deleteMemberFromCompanyFn = async ({
+const deleteMemberFromCompanyFn = async ({
   memberEmail,
   companyId,
 }: {
@@ -90,3 +90,5 @@ export const deleteMemberFromCompanyFn = async ({
   );
   return updatedCompanyAccount;
 };
+
+export default deleteMemberFromCompanyFn;

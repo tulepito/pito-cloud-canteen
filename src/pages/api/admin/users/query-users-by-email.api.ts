@@ -1,10 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import queryUserByEmail from '@pages/api/apiServices/user/queryUserByEmail.service';
 import cookies from '@services/cookie';
-import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
-import { denormalisedResponseEntities } from '@utils/data';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -12,24 +11,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       JSONParams: string;
     };
     const { dataParams = {}, queryParams = {} } = JSON.parse(JSONParams);
-
     const { emails } = dataParams;
-
-    const emailsAsArray = Array.isArray(emails) ? emails : [emails];
-    const intergrationSdk = getIntegrationSdk();
-
-    const users = await Promise.all(
-      emailsAsArray.map(async (email: string) => {
-        const response = await intergrationSdk.users.show(
-          { email },
-          queryParams,
-        );
-        const [user] = denormalisedResponseEntities(response);
-        return user;
-      }),
-    );
-
-    return res.send(users);
+    const users = await queryUserByEmail(emails, queryParams);
+    return res.status(200).json(users);
   } catch (error) {
     console.error(error);
     handleError(res, error);
