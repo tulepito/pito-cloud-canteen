@@ -4,6 +4,7 @@ import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
+import type { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import isEqual from 'lodash/isEqual';
 
@@ -247,7 +248,7 @@ const EditPartnerFoodFormComponent: React.FC<
         <div className={classNames(css.field, css.titleFields)}>
           <FieldTextInput
             name="title"
-            className={css.titleField}
+            className={css.field}
             id="title"
             placeholder={intl.formatMessage({
               id: 'EditPartnerFoodForm.foodTitlePlaceholder',
@@ -403,15 +404,15 @@ const EditPartnerFoodFormComponent: React.FC<
       <div className={css.flexField}>
         <FieldTextInputWithBottomBox
           className={css.field}
-          name="allergicIngredient"
-          id="allergicIngredient"
+          name="allergicIngredients"
+          id="allergicIngredients"
           placeholder={intl.formatMessage({
             id: 'EditPartnerFoodForm.allergicIngredientPlaceholder',
           })}
           label={intl.formatMessage({
             id: 'EditPartnerFoodForm.allergicIngredientLabel',
           })}
-          form={form}
+          form={form as unknown as FormApi}
           validate={composeValidatorsWithAllValues(
             validateNonEnterInputField(
               intl.formatMessage({
