@@ -28,10 +28,18 @@ type TIntegrationFilterModal = {
   initialValues: Record<any, any>;
   onClear: () => void;
   className?: string;
+  title?: string | ReactNode;
 };
 
 const IntegrationFilterModal: React.FC<TIntegrationFilterModal> = (props) => {
-  const { onSubmit, children, initialValues = {}, onClear, className } = props;
+  const {
+    onSubmit,
+    children,
+    initialValues = {},
+    onClear,
+    className,
+    title,
+  } = props;
   const formRef = useRef<FormApi>();
   const {
     value: isOpen,
@@ -61,6 +69,7 @@ const IntegrationFilterModal: React.FC<TIntegrationFilterModal> = (props) => {
         <FormattedMessage id="IntegrationFilterModal.filterMessage" />
       </Button>
       <AlertModal
+        title={title}
         onCancel={handleCancel}
         onConfirm={handleSubmit}
         isOpen={isOpen}

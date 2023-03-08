@@ -50,8 +50,10 @@ const FieldTextInputWithBottomBox: React.FC<TFieldTextInputWithBottomBox> = (
     e.preventDefault();
     e.stopPropagation();
     if (e.key === 'Enter') {
-      fieldsArrayRef.current.push(tempValue);
-      form.change('tempValue', '');
+      if (tempValue && tempValue.replace(/\s/g, '').length) {
+        fieldsArrayRef.current.push(tempValue.trim());
+        form.change('tempValue', '');
+      }
     }
   };
 
