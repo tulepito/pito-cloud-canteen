@@ -92,8 +92,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         selectedGroups: pickAllowSubmitValue ? selectedGroupsSubmitValue : [],
         deadlineDate: pickAllowSubmitValue ? deadlineDateSubmitValue : null,
         deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
-        dayInWeek: selectedDayInWeek,
         ...rest,
+        dayInWeek: selectedDayInWeek,
       };
       dispatch(changeStep2SubmitStatus(true));
       const { payload }: { payload: any } = await dispatch(
