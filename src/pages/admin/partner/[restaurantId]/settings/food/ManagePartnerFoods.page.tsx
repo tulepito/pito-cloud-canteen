@@ -353,6 +353,7 @@ const ManagePartnerFoods = () => {
         <IntegrationFilterModal
           onSubmit={handleSubmitFilter}
           onClear={handleClearFilter}
+          title={<FormattedMessage id="ManagePartnerFoods.filterModal.title" />}
           initialValues={{
             keywords,
             pub_category: groupPubCategory,
