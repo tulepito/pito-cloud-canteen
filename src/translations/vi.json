@@ -1188,6 +1188,7 @@
   "SelectRestaurantPage.subtitle": "Cho ngày {date} ({hour})- tại {address}",
   "SelectRestaurantPage.title": "Danh sách Nhà hàng",
   "SelectSingleFilter.popupClear": "Clear",
+  "SendNotificationForm.firstTimeSubmitButtonText": "Gửi email thông báo",
   "SendNotificationForm.submitButtonText": "Gửi email",
   "SendNotificationModal.alert": "Vui lòng hoàn tất chọn món trước ngày {dateTime}",
   "SendNotificationModal.copyToClipboardTooltip.copied": "Đã sao chép",
