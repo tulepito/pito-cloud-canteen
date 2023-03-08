@@ -10,6 +10,8 @@ import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
 import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { orderDetailsAnyActionsInProgress } from '@pages/company/orders/[orderId]/OrderManagement.slice';
 import { shortenString } from '@src/utils/string';
 
 import css from './AddOrderForm.module.scss';
@@ -38,13 +40,20 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   props,
 ) => {
   const intl = useIntl();
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
+  const addOrUpdateMemberOrderInProgress = useAppSelector(
+    (state) => state.OrderManagement.addOrUpdateMemberOrderInProgress,
+  );
 
-  const { foodOptions, memberOptions, handleSubmit, values } = props;
-  const fieldSelectMemberDisable = memberOptions?.length === 0;
+  const { foodOptions, memberOptions, handleSubmit, form, values } = props;
+  const fieldSelectMemberDisable = inProgress || memberOptions?.length === 0;
   const fieldSelectFoodDisable =
     fieldSelectMemberDisable || foodOptions?.length === 0;
   const submitDisabled =
-    fieldSelectFoodDisable || !values?.participantId || !values?.foodId;
+    addOrUpdateMemberOrderInProgress ||
+    fieldSelectFoodDisable ||
+    !values?.participantId ||
+    !values?.foodId;
 
   const showRequirementText = intl.formatMessage({
     id: 'AddOrderForm.addRequirement.show',
@@ -103,8 +112,15 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     </>
   );
 
+  const customHandleSubmit = (event: any) => {
+    return handleSubmit(event)?.then((submitResult) => {
+      form.reset();
+      return { submitResult };
+    });
+  };
+
   return (
-    <Form onSubmit={handleSubmit} className={css.root}>
+    <Form onSubmit={customHandleSubmit} className={css.root}>
       <div className={css.fieldsContainer}>
         <div className={css.fieldContainer}>
           <FieldSelect
@@ -124,7 +140,10 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
             {selectFoodOptions}
           </FieldSelect>
         </div>
-        <Button disabled={submitDisabled} className={css.submitButton}>
+        <Button
+          disabled={submitDisabled}
+          inProgress={addOrUpdateMemberOrderInProgress}
+          className={css.submitButton}>
           {intl.formatMessage({
             id: 'AddOrderForm.submitButtonText',
           })}

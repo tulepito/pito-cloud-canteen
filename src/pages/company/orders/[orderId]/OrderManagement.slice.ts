@@ -40,6 +40,9 @@ type TOrderManagementState = {
   //
   updateParticipantsInProgress: boolean;
   updateParticipantsError: any;
+  //
+  addOrUpdateMemberOrderInProgress: boolean;
+  addOrUpdateMemberOrderError: any;
 
   isStartOrderInProgress: boolean;
   // Data states
@@ -64,6 +67,8 @@ const initialState: TOrderManagementState = {
   cancelPickingOrderError: null,
   updateParticipantsInProgress: false,
   updateParticipantsError: null,
+  addOrUpdateMemberOrderInProgress: false,
+  addOrUpdateMemberOrderError: null,
   isStartOrderInProgress: false,
   companyId: null,
   companyData: null,
@@ -156,7 +161,7 @@ const sendRemindEmailToMember = createAsyncThunk(
       return participant?.attributes.email;
     });
 
-    sendRemindEmailToMemberApi(orderId, {
+    await sendRemindEmailToMemberApi(orderId, {
       orderLink,
       deadline,
       description,
@@ -605,6 +610,17 @@ const OrderManagementSlice = createSlice({
       })
       .addCase(deleteParticipant.rejected, (state) => {
         state.isDeletingParticipant = false;
+      })
+      /* =============== addOrUpdateMemberOrder =============== */
+      .addCase(addOrUpdateMemberOrder.pending, (state) => {
+        state.addOrUpdateMemberOrderError = null;
+        state.addOrUpdateMemberOrderInProgress = true;
+      })
+      .addCase(addOrUpdateMemberOrder.fulfilled, (state) => {
+        state.addOrUpdateMemberOrderInProgress = false;
+      })
+      .addCase(addOrUpdateMemberOrder.rejected, (state) => {
+        state.addOrUpdateMemberOrderInProgress = false;
       });
   },
 });
@@ -619,13 +635,9 @@ export const orderDetailsAnyActionsInProgress = (state: RootState) => {
     isFetchingOrderDetails,
     isDeletingParticipant,
     isUpdatingOrderDetails,
-    isSendingRemindEmail,
   } = state.OrderManagement;
 
   return (
-    isFetchingOrderDetails ||
-    isDeletingParticipant ||
-    isUpdatingOrderDetails ||
-    isSendingRemindEmail
+    isFetchingOrderDetails || isDeletingParticipant || isUpdatingOrderDetails
   );
 };

@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
@@ -50,7 +51,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     foodOptions,
   } = usePrepareManageOrdersSectionData(currentViewDate, setCurrentViewDate);
 
-  const handleSubmitAddSelection = (values: TAddOrderFormValues) => {
+  const handleSubmitAddSelection = async (values: TAddOrderFormValues) => {
     const { participantId: memberId, requirement = '', foodId } = values;
 
     const updateValues = {
@@ -60,7 +61,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
       currentViewDate,
     };
 
-    dispatch(orderManagementThunks.addOrUpdateMemberOrder(updateValues));
+    await dispatch(orderManagementThunks.addOrUpdateMemberOrder(updateValues));
   };
 
   const items = dateList.map((date) => {
@@ -116,6 +117,10 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
           defaultActiveKey={defaultActiveKey.toString()}
         />
       </div>
+
+      <RenderWhen.False>
+        <Skeleton className={css.rootSkeleton} />
+      </RenderWhen.False>
     </RenderWhen>
   );
 };

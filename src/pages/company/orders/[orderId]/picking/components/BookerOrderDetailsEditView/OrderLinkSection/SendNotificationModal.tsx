@@ -113,7 +113,10 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
             {sendNotificationModalDescriptionLabel}
           </div>
         </div>
-        <SendNotificationForm onSubmit={onSubmit} />
+        <SendNotificationForm
+          isFirstTimeShow={isFirstTimeShow}
+          onSubmit={onSubmit}
+        />
       </div>
     </Modal>
   );
