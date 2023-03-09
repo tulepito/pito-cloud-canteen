@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { composeApiCheckers } from '@apis/configs';
 import orderChecker from '@services/permissionChecker/order';
+import validOrderParams from '@services/permissionChecker/validOrderParams';
 import { handleError } from '@services/sdk';
 
 import { HTTP_METHODS } from '../helpers/constants';
@@ -37,4 +38,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default composeApiCheckers(orderChecker)(handler);
+export default composeApiCheckers(orderChecker, validOrderParams)(handler);

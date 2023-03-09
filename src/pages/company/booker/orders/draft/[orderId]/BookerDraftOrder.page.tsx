@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
@@ -11,6 +12,7 @@ import {
 } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { QuizActions } from '@redux/slices/Quiz.slice';
 import { companyPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 import { EBookerOrderDraftStates, EOrderDraftStates } from '@utils/enums';
@@ -122,6 +124,10 @@ function BookerDraftOrderPage() {
   });
 
   useEffect(() => {
+    dispatch(QuizActions.clearQuizData());
+  }, []);
+
+  useEffect(() => {
     if (!isEmpty(orderState)) {
       if (orderState === EOrderDraftStates.draft) {
         router.push({ pathname: companyPaths.CreateNewOrder });
@@ -132,7 +138,6 @@ function BookerDraftOrderPage() {
         });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, orderState]);
 
   return (

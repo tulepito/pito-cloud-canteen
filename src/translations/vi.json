@@ -1033,6 +1033,7 @@
   "PerPackageField.placeholder": "100.000",
   "PerPackageField.title": "Thiết lập ngân sách 1 người",
   "PerPackageField.vat": "Tính thuế VAT",
+  "QuizCreatingOrderPage.initializeOrderError": "Có lỗi trong quá trình tạo đơn",
   "QuizCreatingOrderPage.initializingOrder": "Đang tạo đơn cho bạn",
   "QuizCreatingOrderPage.initializingOrderDetail": "Đang khởi tạo danh sách nhà hàng",
   "QuizCreatingOrderPage.orderTimeRange": "Từ ngày",

@@ -109,6 +109,7 @@ const QuizSlice = createSlice({
     }),
     clearQuizData: (state) => {
       state.quiz = {};
+      state.selectedCompany = null!;
     },
     allowCreateOrder: (state) => {
       state.allowCreateOrder = true;
