@@ -50,7 +50,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     });
 
   const onRecommendMealInProgress =
-    onRecommendRestaurantForSpecificDayInProgress(event?.start?.getTime());
+    onRecommendRestaurantForSpecificDayInProgress?.(event?.start?.getTime());
 
   return (
     <div className={css.root}>

@@ -118,6 +118,7 @@ function BookerDraftOrderPage() {
     endDate,
     isFinishOrderDisabled,
     handleFinishOrder,
+    order,
   });
 
   useEffect(() => {
