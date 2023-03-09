@@ -27,6 +27,8 @@ export type TToolbarProps = {
   finishInProgress: boolean;
   finishDisabled: boolean;
   onFinishOrder: () => void;
+  onRecommendRestaurantInProgress: boolean;
+  onRecommendNewRestaurants: () => void;
 };
 
 const Toolbar: React.FC<TToolbarProps> = (props) => {
@@ -39,6 +41,8 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
     finishDisabled,
     finishInProgress,
     onFinishOrder,
+    onRecommendRestaurantInProgress,
+    onRecommendNewRestaurants,
   } = props;
   const intl = useIntl();
   const startDateDateTime = useMemo(
@@ -87,8 +91,11 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
         </div>
       </div>
       <div className={css.actions}>
-        <Button variant="secondary" className={css.secondaryBtn}>
-          <IconRefreshing />
+        <Button
+          variant="secondary"
+          className={css.secondaryBtn}
+          onClick={onRecommendNewRestaurants}>
+          <IconRefreshing inProgress={onRecommendRestaurantInProgress} />
           {intl.formatMessage({
             id: 'Booker.CreateOrder.Toolbar.suggestNewRestaurant',
           })}

@@ -1,11 +1,19 @@
 import { useCallback, useMemo } from 'react';
+import { shallowEqual } from 'react-redux';
+import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
 import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/components/AddMorePlan';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import {
+  orderAsyncActions,
+  setOnRecommendRestaurantInProcess,
+} from '@redux/slices/Order.slice';
+import { convertWeekDay, renderDateRange } from '@src/utils/dates';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 
+import { BookerDraftOrderPageActions } from '../../BookerDraftOrderPage.slice';
 import Toolbar from '../../components/Toolbar/Toolbar';
 
 export const useGetCalendarExtraResources = ({
@@ -18,10 +26,15 @@ export const useGetCalendarExtraResources = ({
   endDate: Date;
 }) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const { orderId } = router.query;
 
   const fetchOrderInProgress = useAppSelector(
     (state) => state.Order.fetchOrderInProgress,
+  );
+  const orderDetail = useAppSelector(
+    (state) => state.Order.orderDetail,
+    shallowEqual,
   );
 
   const fetchOrderDetailInProgress = useAppSelector(
@@ -31,9 +44,20 @@ export const useGetCalendarExtraResources = ({
   const updatePlanDetailInprogress = useAppSelector(
     (state) => state.Order.updateOrderDetailInProgress,
   );
+  const selectedDate = useAppSelector(
+    (state) => state.BookerDraftOrderPage.selectedCalendarDate,
+  );
+  const onRescommendRestaurantForSpecificDateInProgress = useAppSelector(
+    (state) => state.Order.onRescommendRestaurantForSpecificDateInProgress,
+  );
+  const updateOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.updateOrderDetailInProgress,
+  );
 
   const orderData = Listing(order as TListing);
   const planId = orderData.getMetadata().plans?.[0];
+  const { dayInWeek = [] } = orderData.getMetadata();
+  const onApplyOtherDaysInProgress = updateOrderDetailInProgress;
 
   const handleEditFood = useCallback(
     (date: string, restaurantId: string, menuId: string) => {
@@ -42,6 +66,70 @@ export const useGetCalendarExtraResources = ({
       );
     },
     [orderId, router],
+  );
+
+  const onSearchRestaurant = useCallback(
+    (date: Date) => {
+      router.push(
+        `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date.getTime()}`,
+      );
+    },
+    [orderId, router],
+  );
+
+  const onApplyOtherDays = useCallback(
+    async (date: string, selectedDates: string[]) => {
+      const totalDates = renderDateRange(
+        startDate.getTime(),
+        endDate.getTime(),
+      );
+      const newOrderDetail = totalDates.reduce(
+        (result, curr) => {
+          if (
+            selectedDates.includes(
+              convertWeekDay(DateTime.fromMillis(curr).weekday).key,
+            )
+          ) {
+            return {
+              ...result,
+              [curr]: { ...orderDetail?.[date] },
+            };
+          }
+          return result;
+        },
+        { [date]: orderDetail?.[date] },
+      );
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId,
+          orderDetail: newOrderDetail,
+        }),
+      );
+    },
+    [startDate, endDate, orderDetail, dispatch, orderId, planId],
+  );
+
+  const onRecommendRestaurantForSpecificDay = useCallback(
+    (date: number) => {
+      dispatch(
+        BookerDraftOrderPageActions.selectCalendarDate(
+          DateTime.fromMillis(date).toJSDate(),
+        ),
+      );
+      dispatch(orderAsyncActions.recommendRestaurantForSpecificDay(date));
+    },
+    [dispatch],
+  );
+
+  const onRecommendRestaurantForSpecificDayInProgress = useCallback(
+    (timestamp: number) => {
+      return (
+        onRescommendRestaurantForSpecificDateInProgress &&
+        selectedDate?.getTime() === timestamp
+      );
+    },
+    [onRescommendRestaurantForSpecificDateInProgress, selectedDate],
   );
 
   const calendarExtraResources = useMemo(() => {
@@ -53,6 +141,12 @@ export const useGetCalendarExtraResources = ({
       fetchPlanDetailInProgress:
         fetchOrderDetailInProgress || fetchOrderInProgress,
       onEditFood: handleEditFood,
+      onSearchRestaurant,
+      dayInWeek,
+      onApplyOtherDays,
+      onRecommendRestaurantForSpecificDay,
+      onRecommendRestaurantForSpecificDayInProgress,
+      onApplyOtherDaysInProgress,
     };
   }, [
     planId,
@@ -62,6 +156,12 @@ export const useGetCalendarExtraResources = ({
     startDate,
     updatePlanDetailInprogress,
     handleEditFood,
+    onSearchRestaurant,
+    dayInWeek,
+    onApplyOtherDays,
+    onRecommendRestaurantForSpecificDay,
+    onRecommendRestaurantForSpecificDayInProgress,
+    onApplyOtherDaysInProgress,
   ]);
 
   return calendarExtraResources;
@@ -72,19 +172,25 @@ export const useGetCalendarComponentProps = ({
   endDate,
   isFinishOrderDisabled,
   handleFinishOrder,
+  order,
 }: {
   startDate: Date;
   endDate: Date;
   isFinishOrderDisabled: boolean;
   handleFinishOrder: () => Promise<void>;
+  order: TListing | null;
 }) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const bookerPublishOrderInProgress = useAppSelector(
     (state) => state.Order.bookerPublishOrderInProgress,
   );
+  const onRecommendRestaurantInProgress = useAppSelector(
+    (state) => state.Order.onRecommendRestaurantInProgress,
+  );
 
   const { orderId } = router.query;
-
+  const { plans = [] } = Listing(order).getMetadata();
   const handleAddMeal = useCallback(
     () => (date: Date) => {
       router.push(
@@ -93,6 +199,21 @@ export const useGetCalendarComponentProps = ({
     },
     [orderId, router],
   );
+
+  const onRecommendNewRestaurants = useCallback(async () => {
+    dispatch(setOnRecommendRestaurantInProcess(true));
+    const { payload: recommendOrderDetail }: any = await dispatch(
+      orderAsyncActions.recommendRestaurants(),
+    );
+    await dispatch(
+      orderAsyncActions.updatePlanDetail({
+        orderId,
+        planId: plans[0],
+        orderDetail: recommendOrderDetail,
+      }),
+    );
+    dispatch(setOnRecommendRestaurantInProcess(false));
+  }, [dispatch, orderId, plans]);
 
   const toolbarComponent = useCallback(
     (props: any) => (
@@ -103,10 +224,18 @@ export const useGetCalendarComponentProps = ({
         finishDisabled={isFinishOrderDisabled}
         finishInProgress={bookerPublishOrderInProgress}
         onFinishOrder={handleFinishOrder}
+        onRecommendRestaurantInProgress={onRecommendRestaurantInProgress}
+        onRecommendNewRestaurants={onRecommendNewRestaurants}
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [startDate, endDate, isFinishOrderDisabled, bookerPublishOrderInProgress],
+    [
+      startDate,
+      endDate,
+      isFinishOrderDisabled,
+      bookerPublishOrderInProgress,
+      onRecommendRestaurantInProgress,
+    ],
   );
 
   const contentEndComponent = useCallback(
