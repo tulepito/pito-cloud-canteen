@@ -60,6 +60,9 @@ const QuizMealDate = () => {
   const initialValues = useMemo(
     () => ({
       dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri'],
+      displayedDurationTime: '1',
+      durationTime: '1',
+      durationTimeMode: 'week',
     }),
     [],
   );
