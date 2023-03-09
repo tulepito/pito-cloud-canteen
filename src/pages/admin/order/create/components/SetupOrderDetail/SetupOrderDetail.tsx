@@ -411,22 +411,19 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const onApplyOtherDays = useCallback(
     async (date: string, selectedDates: string[]) => {
       const totalDates = renderDateRange(startDate, endDate);
-      const newOrderDetail = totalDates.reduce(
-        (result, curr) => {
-          if (
-            selectedDates.includes(
-              convertWeekDay(DateTime.fromMillis(curr).weekday).key,
-            )
-          ) {
-            return {
-              ...result,
-              [curr]: { ...orderDetail[date] },
-            };
-          }
-          return result;
-        },
-        { [date]: orderDetail[date] },
-      );
+      const newOrderDetail = totalDates.reduce((result, curr) => {
+        if (
+          selectedDates.includes(
+            convertWeekDay(DateTime.fromMillis(curr).weekday).key,
+          )
+        ) {
+          return {
+            ...result,
+            [curr]: { ...orderDetail[date] },
+          };
+        }
+        return result;
+      }, orderDetail);
       dispatch(setCanNotGoToStep4(true));
       await dispatch(
         orderAsyncActions.updatePlanDetail({

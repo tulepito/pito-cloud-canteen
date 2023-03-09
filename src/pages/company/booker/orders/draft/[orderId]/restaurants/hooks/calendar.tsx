@@ -83,22 +83,19 @@ export const useGetCalendarExtraResources = ({
         startDate.getTime(),
         endDate.getTime(),
       );
-      const newOrderDetail = totalDates.reduce(
-        (result, curr) => {
-          if (
-            selectedDates.includes(
-              convertWeekDay(DateTime.fromMillis(curr).weekday).key,
-            )
-          ) {
-            return {
-              ...result,
-              [curr]: { ...orderDetail?.[date] },
-            };
-          }
-          return result;
-        },
-        { [date]: orderDetail?.[date] },
-      );
+      const newOrderDetail = totalDates.reduce((result, curr) => {
+        if (
+          selectedDates.includes(
+            convertWeekDay(DateTime.fromMillis(curr).weekday).key,
+          )
+        ) {
+          return {
+            ...result,
+            [curr]: { ...orderDetail?.[date] },
+          };
+        }
+        return result;
+      }, orderDetail);
       await dispatch(
         orderAsyncActions.updatePlanDetail({
           orderId,

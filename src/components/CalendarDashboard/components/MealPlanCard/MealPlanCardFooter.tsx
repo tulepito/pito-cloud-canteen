@@ -45,8 +45,9 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
     onEditFood(id, restaurant.id, restaurant.menuId);
   };
 
-  const handleApplyOtherDays = (selectedDates: string[]) => {
-    onApplyOtherDays?.(`${event?.start?.getTime()}`, selectedDates);
+  const handleApplyOtherDays = async (selectedDates: string[]) => {
+    await onApplyOtherDays?.(`${event?.start?.getTime()}`, selectedDates);
+    setIsOpenApplyOtherDaysModal(false);
   };
 
   return (

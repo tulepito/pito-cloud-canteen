@@ -340,14 +340,34 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
 
     if (restaurants.length > 0) {
       const randomNumber = Math.floor(Math.random() * (restaurants.length - 1));
-      const newRestaurantData = {
-        id: Listing(restaurants[randomNumber]?.restaurantInfo).getId(),
-        restaurantName: Listing(
-          restaurants[randomNumber]?.restaurantInfo,
-        ).getAttributes().title,
-        foodList: [],
-        menuId: restaurants[randomNumber]?.menu.id.uuid,
-      };
+      const shouldUpdateRestaurantId = Listing(
+        restaurants[randomNumber]?.restaurantInfo,
+      ).getId();
+
+      const newRestaurantData =
+        shouldUpdateRestaurantId !== orderDetail[dateTime]?.restaurant?.id
+          ? {
+              id: Listing(restaurants[randomNumber]?.restaurantInfo).getId(),
+              restaurantName: Listing(
+                restaurants[randomNumber]?.restaurantInfo,
+              ).getAttributes().title,
+              foodList: [],
+              menuId: restaurants[randomNumber]?.menu.id.uuid,
+            }
+          : {
+              id: Listing(
+                restaurants[Math.abs(randomNumber - restaurants.length + 1)]
+                  ?.restaurantInfo,
+              ).getId(),
+              restaurantName: Listing(
+                restaurants[Math.abs(randomNumber - restaurants.length + 1)]
+                  ?.restaurantInfo,
+              ).getAttributes().title,
+              foodList: [],
+              menuId:
+                restaurants[Math.abs(randomNumber - restaurants.length + 1)]
+                  ?.menu.id.uuid,
+            };
       const newOrderDetail = {
         ...orderDetail,
         [dateTime]: {
