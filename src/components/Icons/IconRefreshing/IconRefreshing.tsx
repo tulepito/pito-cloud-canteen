@@ -9,10 +9,17 @@ type TIconRefreshingProps = TIconProps & {
 };
 
 const IconRefreshing: React.FC<TIconRefreshingProps> = (props) => {
-  const { className, width = 16, height = 16, inProgress = false } = props;
+  const {
+    className,
+    width = 16,
+    height = 16,
+    inProgress = false,
+    onClick,
+  } = props;
   const classes = classNames(className, inProgress && css.rotate);
   return (
     <svg
+      onClick={onClick}
       preserveAspectRatio="none"
       className={classes}
       width={width}

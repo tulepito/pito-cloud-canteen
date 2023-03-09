@@ -99,6 +99,8 @@ type TOrderInitialState = {
 
   canNotGoToStep4: boolean;
   onRecommendRestaurantInProgress: boolean;
+  onRescommendRestaurantForSpecificDateInProgress: boolean;
+  onRescommendRestaurantForSpecificDateError: any;
 };
 
 const initialState: TOrderInitialState = {
@@ -168,6 +170,9 @@ const initialState: TOrderInitialState = {
   currentSelectedMenuId: '',
   canNotGoToStep4: false,
   onRecommendRestaurantInProgress: false,
+
+  onRescommendRestaurantForSpecificDateInProgress: false,
+  onRescommendRestaurantForSpecificDateError: null,
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -180,6 +185,8 @@ const UPDATE_PLAN_DETAIL = 'app/Order/UPDATE_PLAN_DETAIL';
 const FETCH_PLAN_DETAIL = 'app/Order/FETCH_PLAN_DETAIL';
 const FETCH_RESTAURANT_COVER_IMAGE = 'app/Order/FETCH_RESTAURANT_COVER_IMAGE';
 const RECOMMEND_RESTAURANT = 'app/Order/RECOMMEND_RESTAURANT';
+const RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY =
+  'app/Order/RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY';
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
   const { clientId, bookerId, isCreatedByAdmin = false, generalInfo } = params;
@@ -295,6 +302,66 @@ const recommendRestaurants = createAsyncThunk(
       }),
     );
 
+    return orderDetail;
+  },
+);
+
+const recommendRestaurantForSpecificDay = createAsyncThunk(
+  RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY,
+  async (dateTime: number, { getState, extra: sdk }) => {
+    const { order, orderDetail } = getState().Order;
+    const orderId = Listing(order as TListing).getId();
+    const { plans = [] } = Listing(order as TListing).getMetadata();
+    const menuQueryParams = {
+      timestamp: dateTime,
+    };
+    const menuQuery = getMenuQuery({ order, params: menuQueryParams });
+    const allMenus = await queryAllPages({
+      sdkModel: sdk.listings,
+      query: menuQuery,
+    });
+    const restaurants = await Promise.all(
+      allMenus.map(async (menu: TListing) => {
+        const { restaurantId } = Listing(menu).getMetadata();
+        const restaurantResponse = await sdk.listings.show({
+          id: restaurantId,
+          include: ['images'],
+          'fields.image': [
+            'variants.landscape-crop',
+            'variants.landscape-crop2x',
+          ],
+        });
+        return {
+          restaurantInfo: denormalisedResponseEntities(restaurantResponse)[0],
+          menu,
+        };
+      }),
+    );
+
+    if (restaurants.length > 0) {
+      const randomNumber = Math.floor(Math.random() * (restaurants.length - 1));
+      const newRestaurantData = {
+        id: Listing(restaurants[randomNumber]?.restaurantInfo).getId(),
+        restaurantName: Listing(
+          restaurants[randomNumber]?.restaurantInfo,
+        ).getAttributes().title,
+        foodList: [],
+        menuId: restaurants[randomNumber]?.menu.id.uuid,
+      };
+      const newOrderDetail = {
+        ...orderDetail,
+        [dateTime]: {
+          ...orderDetail[dateTime],
+          restaurant: newRestaurantData,
+        },
+      };
+      await updatePlanDetailsApi(orderId, {
+        orderDetail: newOrderDetail,
+        planId: plans[0],
+      });
+
+      return newOrderDetail;
+    }
     return orderDetail;
   },
 );
@@ -551,6 +618,7 @@ export const orderAsyncActions = {
   cancelPendingApprovalOrder,
   fetchRestaurantCoverImages,
   recommendRestaurants,
+  recommendRestaurantForSpecificDay,
 };
 
 const orderSlice = createSlice({
@@ -913,7 +981,29 @@ const orderSlice = createSlice({
         ...state,
         recommendRestaurantInProgress: false,
         recommendRestaurantError: error.message,
-      }));
+      }))
+
+      .addCase(recommendRestaurantForSpecificDay.pending, (state) => ({
+        ...state,
+        onRescommendRestaurantForSpecificDateInProgress: true,
+        onRescommendRestaurantForSpecificDateError: null,
+      }))
+      .addCase(
+        recommendRestaurantForSpecificDay.fulfilled,
+        (state, { payload }) => ({
+          ...state,
+          onRescommendRestaurantForSpecificDateInProgress: false,
+          orderDetail: payload,
+        }),
+      )
+      .addCase(
+        recommendRestaurantForSpecificDay.rejected,
+        (state, { error }) => ({
+          ...state,
+          onRescommendRestaurantForSpecificDateInProgress: false,
+          onRescommendRestaurantForSpecificDateError: error.message,
+        }),
+      );
   },
 });
 

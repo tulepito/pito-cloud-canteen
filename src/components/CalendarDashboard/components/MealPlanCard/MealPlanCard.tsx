@@ -3,11 +3,7 @@ import { shallowEqual } from 'react-redux';
 import clone from 'lodash/clone';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import {
-  removeMealDay,
-  selectCalendarDate,
-  selectRestaurant,
-} from '@redux/slices/Order.slice';
+import { removeMealDay } from '@redux/slices/Order.slice';
 
 import MealPlanCardContent from './MealPlanCardContent';
 import MealPlanCardFooter from './MealPlanCardFooter';
@@ -40,6 +36,9 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     onApplyOtherDays,
     dayInWeek,
     onApplyOtherDaysInProgress,
+    onRecommendRestaurantForSpecificDay,
+    onRecommendRestaurantForSpecificDayInProgress,
+    onSearchRestaurant,
   } = resources;
 
   const removeEventItem =
@@ -50,10 +49,8 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
       dispatch(removeMealDay(cloneOrderDetail));
     });
 
-  const onEditMeal = (date: Date) => {
-    dispatch(selectCalendarDate(date));
-    dispatch(selectRestaurant());
-  };
+  const onRecommendMealInProgress =
+    onRecommendRestaurantForSpecificDayInProgress(event?.start?.getTime());
 
   return (
     <div className={css.root}>
@@ -61,8 +58,13 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
         event={event}
         removeEventItem={removeEventItem}
         removeInprogress={removeInprogress}
+        onSearchRestaurant={onSearchRestaurant}
       />
-      <MealPlanCardContent event={event} onEditMeal={onEditMeal} />
+      <MealPlanCardContent
+        event={event}
+        onRecommendMeal={onRecommendRestaurantForSpecificDay}
+        onRecommendMealInProgress={onRecommendMealInProgress}
+      />
       <MealPlanCardFooter
         event={event}
         onEditFood={onEditFood}
