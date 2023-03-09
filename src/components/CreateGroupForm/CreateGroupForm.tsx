@@ -96,7 +96,9 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
                           <div className={css.name}>
                             {User(member).getProfile().displayName}
                           </div>
-                          <div className={css.email}>
+                          <div
+                            className={css.email}
+                            title={User(member).getAttributes().email}>
                             {User(member).getAttributes().email}
                           </div>
                         </div>

@@ -37,7 +37,6 @@
 
 .addMemberBtn {
   @include flexAlign(center);
-  @include buttonColorInline;
   min-height: 64px;
   border-radius: 8px;
   padding-left: 12px;

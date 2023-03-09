@@ -54,6 +54,9 @@
     .email {
       @include text(12px, 16px);
       color: $neutralGray5;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .name {
