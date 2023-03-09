@@ -135,6 +135,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const onRecommendRestaurantInProgress = useAppSelector(
     (state) => state.Order.onRecommendRestaurantInProgress,
   );
+  const onRescommendRestaurantForSpecificDateInProgress = useAppSelector(
+    (state) => state.Order.onRescommendRestaurantForSpecificDateInProgress,
+  );
 
   const orderId = Listing(order as TListing).getId();
   const planId = Listing(order as TListing).getMetadata()?.plans?.[0];
@@ -366,6 +369,13 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     );
   };
 
+  const onRecommendRestaurantForSpecificDayInProgress = (timestamp: number) => {
+    return (
+      onRescommendRestaurantForSpecificDateInProgress &&
+      selectedDate?.getTime() === timestamp
+    );
+  };
+
   const handleRemoveMeal = useCallback(
     (id: string) => (resourceId: string) => {
       dispatch(setCanNotGoToStep4(true));
@@ -429,6 +439,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     [dispatch, orderId, orderDetail, planId, selectedDate],
   );
 
+  const onRecommendRestaurantForSpecificDay = (date: number) => {
+    dispatch(selectCalendarDate(DateTime.fromMillis(date).toJSDate()));
+    dispatch(orderAsyncActions.recommendRestaurantForSpecificDay(date));
+  };
+
   return (
     <>
       {isSelectingRestaurant ? (
@@ -485,10 +500,13 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               resources={{
                 ...calendarExtraResources,
                 onEditFood: onEditFoodInMealPlanCard,
+                onSearchRestaurant: handleAddMorePlanClick,
                 onEditFoodInProgress,
                 onApplyOtherDays,
                 dayInWeek,
                 onApplyOtherDaysInProgress,
+                onRecommendRestaurantForSpecificDay,
+                onRecommendRestaurantForSpecificDayInProgress,
               }}
               components={{
                 contentEnd: (props) => (

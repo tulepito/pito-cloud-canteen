@@ -8,15 +8,21 @@ import css from './MealPlanCard.module.scss';
 
 type TMealPlanCardContentProps = {
   event: Event;
-  onEditMeal: (date: Date) => void;
+  onRecommendMeal?: (date: number) => void;
+  onRecommendMealInProgress?: boolean;
 };
 
 const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
   event,
+  onRecommendMeal,
+  onRecommendMealInProgress,
 }) => {
   const restaurantName = event.resource?.restaurant?.name;
   const restaurantCoverImage = event.resource?.restaurant?.coverImage;
 
+  const handleRefreshIconClick = () => {
+    onRecommendMeal?.(event?.start?.getTime()!);
+  };
   return (
     <div className={css.content}>
       <div className={css.coverImg}>
@@ -31,7 +37,11 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
       </div>
       <div className={css.restaurant}>
         <span title={restaurantName}>{restaurantName}</span>
-        <IconRefreshing className={css.recommendRestaurant} />
+        <IconRefreshing
+          className={css.recommendRestaurant}
+          onClick={handleRefreshIconClick}
+          inProgress={onRecommendMealInProgress}
+        />
       </div>
     </div>
   );
