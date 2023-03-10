@@ -17,6 +17,7 @@ import {
   updateOrderApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
+import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { getMenuQuery } from '@helpers/listingSearchQuery';
@@ -101,6 +102,11 @@ type TOrderInitialState = {
   onRecommendRestaurantInProgress: boolean;
   onRescommendRestaurantForSpecificDateInProgress: boolean;
   onRescommendRestaurantForSpecificDateError: any;
+
+  nutritions: {
+    key: string;
+    label: string;
+  }[];
 };
 
 const initialState: TOrderInitialState = {
@@ -173,6 +179,8 @@ const initialState: TOrderInitialState = {
 
   onRescommendRestaurantForSpecificDateInProgress: false,
   onRescommendRestaurantForSpecificDateError: null,
+
+  nutritions: [],
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -187,6 +195,7 @@ const FETCH_RESTAURANT_COVER_IMAGE = 'app/Order/FETCH_RESTAURANT_COVER_IMAGE';
 const RECOMMEND_RESTAURANT = 'app/Order/RECOMMEND_RESTAURANT';
 const RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY =
   'app/Order/RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY';
+const FETCH_NUTRITIONS = 'app/Order/FETCH_NUTRITIONS';
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
   const { clientId, bookerId, isCreatedByAdmin = false, generalInfo } = params;
@@ -622,6 +631,11 @@ const bookerPublishOrder = createAsyncThunk(
   },
 );
 
+const fetchNutritions = createAsyncThunk(FETCH_NUTRITIONS, async () => {
+  const { data: searchFiltersResponse } = await fetchSearchFilterApi();
+  return searchFiltersResponse.nutritions;
+});
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -639,6 +653,7 @@ export const orderAsyncActions = {
   fetchRestaurantCoverImages,
   recommendRestaurants,
   recommendRestaurantForSpecificDay,
+  fetchNutritions,
 };
 
 const orderSlice = createSlice({
@@ -1023,7 +1038,12 @@ const orderSlice = createSlice({
           onRescommendRestaurantForSpecificDateInProgress: false,
           onRescommendRestaurantForSpecificDateError: error.message,
         }),
-      );
+      )
+
+      .addCase(fetchNutritions.fulfilled, (state, { payload }) => ({
+        ...state,
+        nutritions: payload,
+      }));
   },
 });
 

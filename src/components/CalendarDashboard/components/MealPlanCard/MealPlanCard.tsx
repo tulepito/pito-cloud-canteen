@@ -31,10 +31,11 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     shallowEqual,
   );
   const {
+    startDate,
+    endDate,
     onEditFood,
     editFoodInprogress,
     onApplyOtherDays,
-    dayInWeek,
     onApplyOtherDaysInProgress,
     onRecommendRestaurantForSpecificDay,
     onRecommendRestaurantForSpecificDayInProgress,
@@ -70,7 +71,8 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
         onEditFood={onEditFood}
         editFoodInprogress={editFoodInprogress}
         onApplyOtherDays={onApplyOtherDays}
-        dayInWeek={dayInWeek}
+        startDate={startDate}
+        endDate={endDate}
         onApplyOtherDaysInProgress={onApplyOtherDaysInProgress}
       />
     </div>

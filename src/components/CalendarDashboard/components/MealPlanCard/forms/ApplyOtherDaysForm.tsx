@@ -2,8 +2,10 @@ import { useMemo } from 'react';
 import { useForm } from 'react-final-form-hooks';
 import { FormattedMessage } from 'react-intl';
 import difference from 'lodash/difference';
+import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
+import { convertWeekDay, renderDateRange } from '@src/utils/dates';
 
 import BasicDayInWeekField from '../../BasicDayInWeekField/BasicDayInWeekField';
 
@@ -15,6 +17,8 @@ type TApplyOtherDaysFormProps = {
   initialValues?: TApplyOtherDaysFormValues;
   dayInWeek?: string[];
   inProgress?: boolean;
+  startDate?: Date | number;
+  endDate?: Date | number;
 };
 
 export type TApplyOtherDaysFormValues = {
@@ -33,8 +37,9 @@ const ApplyOtherDaysForm: React.FC<TApplyOtherDaysFormProps> = ({
   onSubmit,
   onCancel,
   initialValues,
-  dayInWeek = [],
   inProgress,
+  startDate,
+  endDate,
 }) => {
   const { form, handleSubmit, submitting, hasValidationErrors, values } =
     useForm<TApplyOtherDaysFormValues>({
@@ -44,10 +49,20 @@ const ApplyOtherDaysForm: React.FC<TApplyOtherDaysFormProps> = ({
     });
 
   const disabledSubmit = submitting || hasValidationErrors;
+  const usableStartDate =
+    typeof startDate === 'number' ? startDate : startDate?.getTime();
+  const usableEndDate =
+    typeof endDate === 'number' ? endDate : endDate?.getTime();
+  const visibleDayInWeek = renderDateRange(usableStartDate, usableEndDate).map(
+    (_day) => convertWeekDay(DateTime.fromMillis(_day).weekday).key,
+  );
   const disabledDates = useMemo(
     () =>
-      difference(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], dayInWeek),
-    [dayInWeek],
+      difference(
+        ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+        visibleDayInWeek,
+      ),
+    [visibleDayInWeek],
   );
   return (
     <form className={css.root} onSubmit={handleSubmit}>

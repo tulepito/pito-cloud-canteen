@@ -17,6 +17,8 @@ type TMealPlanCardFooterProps = {
   editFoodInprogress: boolean;
   dayInWeek?: string[];
   onApplyOtherDaysInProgress?: boolean;
+  startDate?: Date | number;
+  endDate?: Date | number;
 };
 
 const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
@@ -26,6 +28,8 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
   editFoodInprogress,
   dayInWeek,
   onApplyOtherDaysInProgress,
+  startDate,
+  endDate,
 }) => {
   const { id, isSelectedFood, restaurant = {} } = event.resource || {};
   const [isOpenApplyOtherDaysModal, setIsOpenApplyOtherDaysModal] =
@@ -76,6 +80,8 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
         onSubmit={handleApplyOtherDays}
         dayInWeek={dayInWeek}
         inProgress={onApplyOtherDaysInProgress}
+        startDate={startDate}
+        endDate={endDate}
       />
     </div>
   );

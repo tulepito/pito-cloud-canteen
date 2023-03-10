@@ -12,6 +12,8 @@ type TApplyOtherDaysModalProps = {
   currentDayInWeek: string;
   dayInWeek?: string[];
   inProgress?: boolean;
+  startDate?: Date | number;
+  endDate?: Date | number;
   onSubmit?: (params: any) => void;
   onClose?: () => void;
 };
@@ -23,6 +25,8 @@ const ApplyOtherDaysModal: React.FC<TApplyOtherDaysModalProps> = ({
   currentDayInWeek,
   dayInWeek,
   inProgress,
+  startDate,
+  endDate,
 }) => {
   const intl = useIntl();
 
@@ -64,6 +68,8 @@ const ApplyOtherDaysModal: React.FC<TApplyOtherDaysModalProps> = ({
             initialValues={initialValues}
             dayInWeek={dayInWeek}
             inProgress={inProgress}
+            startDate={startDate}
+            endDate={endDate}
           />
         </div>
       </Modal>
