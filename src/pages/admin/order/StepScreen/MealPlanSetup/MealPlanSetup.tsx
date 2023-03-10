@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 
@@ -30,6 +30,14 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     shallowEqual,
   );
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
+  const nutritionsOptions = useAppSelector(
+    (state) => state.Order.nutritions,
+    shallowEqual,
+  );
+
+  useEffect(() => {
+    dispatch(orderAsyncActions.fetchNutritions());
+  }, []);
   const {
     companyId: clientId,
     dayInWeek,
@@ -184,6 +192,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       currentClient={currentClient}
       selectedBooker={selectedBooker}
       clientId={clientId}
+      nutritionsOptions={nutritionsOptions}
     />
   );
 };

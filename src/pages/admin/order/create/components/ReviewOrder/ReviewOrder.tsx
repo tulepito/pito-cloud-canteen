@@ -5,6 +5,7 @@ import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
 import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
 
 import Collapsible from '@components/Collapsible/Collapsible';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
@@ -20,6 +21,7 @@ import {
   changeStep4SubmitStatus,
   orderAsyncActions,
 } from '@redux/slices/Order.slice';
+import { adminPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import { EOrderDraftStates } from '@utils/enums';
@@ -155,6 +157,7 @@ const parseDataToReviewTab = (values: any) => {
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
+  const router = useRouter();
 
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
@@ -243,6 +246,11 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       openSuccessModal();
     }
     dispatch(changeStep4SubmitStatus(false));
+  };
+
+  const onConfirm = () => {
+    closeSuccessModal();
+    router.push(adminPaths.ManageOrders);
   };
 
   const initialValues = useMemo(() => {
@@ -346,7 +354,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         description={intl.formatMessage({
           id: 'ReviewOrder.successModal.description',
         })}
-        onConfirm={closeSuccessModal}
+        onConfirm={onConfirm}
       />
     </div>
   );
