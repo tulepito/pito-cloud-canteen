@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, { useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';

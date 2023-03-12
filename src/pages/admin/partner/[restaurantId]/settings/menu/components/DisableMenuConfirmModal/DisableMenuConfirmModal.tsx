@@ -56,6 +56,7 @@ const DisableMenuConfirmModal: React.FC<TDisableMenuConfirmModal> = (props) => {
       setIsInTransactionProgress(payload);
     };
     checkShouldRemoveMenu();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(menuToDisable)]);
 
   const renderContent = () => {

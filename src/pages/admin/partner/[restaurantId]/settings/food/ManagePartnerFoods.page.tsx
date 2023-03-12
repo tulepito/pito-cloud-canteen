@@ -330,6 +330,7 @@ const ManagePartnerFoods = () => {
 
       ...(keywords ? { keywords } : {}),
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, restaurantId, keywords, categoryString]);
 
   const onImportFoodFromCsv = async () => {

@@ -29,6 +29,7 @@ const OutsideClickHandler: React.FC<PropsWithChildren<TOutsideClickHandler>> = (
     return () => {
       document.removeEventListener('mousedown', handleClick, false);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const classes = classNames(rootClassName || css.root, className);

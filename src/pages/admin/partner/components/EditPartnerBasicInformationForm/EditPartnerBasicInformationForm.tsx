@@ -167,6 +167,7 @@ const EditPartnerBasicInformationForm: React.FC<
       minQuantity,
       maxQuantity,
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 

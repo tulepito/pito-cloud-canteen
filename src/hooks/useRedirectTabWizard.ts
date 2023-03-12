@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import type { MutableRefObject } from 'react';
 import { useEffect, useRef } from 'react';
 import { isEqual } from 'lodash';

@@ -39,6 +39,7 @@ const Promised: React.FC<TPromised | any> = (props) => {
       });
 
     return () => setMounted(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [promise]);
 
   return error ? renderRejected(error) : renderFulfilled(value);

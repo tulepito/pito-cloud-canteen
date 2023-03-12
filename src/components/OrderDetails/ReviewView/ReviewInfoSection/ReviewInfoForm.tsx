@@ -57,6 +57,7 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
     if (isMounted && (modifiedSinceLastSubmit || startSubmit)) {
       form.submit();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startSubmit, modifiedSinceLastSubmit, isMounted]);
 
   useEffect(() => {

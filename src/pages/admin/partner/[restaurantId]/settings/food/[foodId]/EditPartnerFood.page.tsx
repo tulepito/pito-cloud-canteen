@@ -68,6 +68,7 @@ const EditPartnerFoodPage = () => {
 
   useEffect(() => {
     dispatch(foodSliceAction.setInitialStates());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
