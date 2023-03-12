@@ -11,6 +11,7 @@ const placeOrigin = (place: any) => {
       place.geometry.location.lng(),
     );
   }
+
   return null;
 };
 
@@ -18,11 +19,13 @@ const placeBounds = (place: any) => {
   if (place && place.geometry && place.geometry.viewport) {
     const ne = place.geometry.viewport.getNorthEast();
     const sw = place.geometry.viewport.getSouthWest();
+
     return new SDKLatLngBounds(
       new SDKLatLng(ne.lat(), ne.lng()),
       new SDKLatLng(sw.lat(), sw.lng()),
     );
   }
+
   return null;
 };
 
@@ -75,6 +78,7 @@ export const getPlaceDetails = (placeId: any, sessionToken: any) =>
 const predictionSuccessful = (status: any) => {
   const { maps } = (window as any).google;
   const { OK, ZERO_RESULTS } = maps.places.PlacesServiceStatus;
+
   return status === OK || status === ZERO_RESULTS;
 };
 
@@ -155,6 +159,7 @@ export const hasSameSDKBounds = (sdkBounds1: any, sdkBounds2: any) => {
   ) {
     return false;
   }
+
   return (
     sdkBounds1.ne.lat === sdkBounds2.ne.lat &&
     sdkBounds1.ne.lng === sdkBounds2.ne.lng &&
@@ -210,6 +215,7 @@ export const getOffsetOverride = (containerElement: any, props: TObject) => {
       containerElement.offsetHeight,
     );
   }
+
   return {};
 };
 
@@ -238,6 +244,7 @@ const getLayoutStylesByBounds = (
       height: `${sw.y - ne.y - offset.y}px`,
     };
   }
+
   return {
     left: `-9999px`,
     top: `-9999px`,
@@ -262,11 +269,13 @@ const getLayoutStylesByPosition = (
   const point = mapCanvasProjection.fromLatLngToDivPixel(position);
   if (point) {
     const { x, y } = point;
+
     return {
       left: `${x + offset.x}px`,
       top: `${y + offset.y}px`,
     };
   }
+
   return {
     left: `-9999px`,
     top: `-9999px`,
@@ -305,6 +314,7 @@ export const getLayoutStyles = (
     if (inst instanceof type) {
       return inst;
     }
+
     return factory(inst, type);
   };
 
@@ -314,8 +324,10 @@ export const getLayoutStyles = (
       maps.LatLngBounds,
       createLatLngBounds,
     );
+
     return getLayoutStylesByBounds(mapCanvasProjection, offset, bounds);
   }
   const position = ensureOfType(props.position, maps.LatLng, createLatLng);
+
   return getLayoutStylesByPosition(mapCanvasProjection, offset, position);
 };

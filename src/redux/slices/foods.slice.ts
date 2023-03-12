@@ -129,6 +129,7 @@ const queryMenuPickedFoods = createAsyncThunk(
     });
 
     const foods = denormalisedResponseEntities(response);
+
     return foods;
   },
   {
@@ -150,6 +151,7 @@ const queryPartnerFoods = createAsyncThunk(
       'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
     });
     const foods = denormalisedResponseEntities(response);
+
     return { foods, managePartnerFoodPagination: response.data.meta };
   },
   {
@@ -172,9 +174,11 @@ const requestUploadFoodImages = createAsyncThunk(
         },
       );
       const img = response.data.data;
+
       return { ...img, id, imageId: img.id };
     } catch (error) {
       console.error(`${REQUEST_UPLOAD_IMAGE_FOOD} error: `, error);
+
       return rejectWithValue({ error, id });
     }
   },
@@ -188,9 +192,11 @@ const createPartnerFoodListing = createAsyncThunk(
         dataParams: payload,
         queryParams: {},
       });
+
       return denormalisedResponseEntities(data)[0];
     } catch (error) {
       console.error(`${CREATE_PARTNER_FOOD_LISTING} error: `, error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -218,9 +224,11 @@ const duplicateFood = createAsyncThunk(
                 `${`${title}_${new Date().getTime()}`}.jpg`,
                 metadata,
               );
+
               return file;
             } catch (error) {
               console.error(error);
+
               return null;
             }
           })
@@ -240,9 +248,11 @@ const duplicateFood = createAsyncThunk(
         dataParams: { ...payload, images: newImages },
         queryParams: {},
       });
+
       return denormalisedResponseEntities(data)[0];
     } catch (error) {
       console.error(`${CREATE_PARTNER_FOOD_LISTING} error: `, error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -265,9 +275,11 @@ const updatePartnerFoodListing = createAsyncThunk(
         queryParams,
       });
       const [food] = denormalisedResponseEntities(data);
+
       return food;
     } catch (error) {
       console.error(`${UPDATE_PARTNER_FOOD_LISTING} error: `, error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -302,9 +314,11 @@ const createPartnerFoodFromCsv = createAsyncThunk(
                         `${`${title}_${new Date().getTime()}`}.jpg`,
                         metadata,
                       );
+
                       return file;
                     } catch (error) {
                       console.error(error);
+
                       return null;
                     }
                   })
@@ -333,6 +347,7 @@ const createPartnerFoodFromCsv = createAsyncThunk(
                 dataParams,
                 queryParams,
               });
+
               return denormalisedResponseEntities(data)[0];
             }),
           );
@@ -360,9 +375,11 @@ const showPartnerFoodListing = createAsyncThunk(
         },
       });
       const [food] = denormalisedResponseEntities(data);
+
       return fulfillWithValue(food);
     } catch (error) {
       console.error(`${SHOW_PARTNER_FOOD_LISTING} error: `, error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -383,6 +400,7 @@ const removePartnerFood = createAsyncThunk(
       return data;
     } catch (error) {
       console.error(`${REMOVE_PARTNER_FOOD_LISTING} error: `, error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -403,6 +421,7 @@ const showDuplicateFood = createAsyncThunk(
       });
 
       const [food] = denormalisedResponseEntities(data);
+
       return food;
     } catch (error) {
       return storableError(error);
@@ -480,6 +499,7 @@ const foodSlice = createSlice({
           ...state.uploadedImages,
           [id]: { ...action.meta.arg },
         };
+
         return {
           ...state,
           uploadedImages,
@@ -494,6 +514,7 @@ const foodSlice = createSlice({
           ...state.uploadedImages,
           [id]: { id, ...rest },
         };
+
         return { ...state, uploadedImages, uploadingImages: false };
       })
       .addCase(requestUploadFoodImages.rejected, (state, action: any) => {
@@ -502,6 +523,7 @@ const foodSlice = createSlice({
           (i: any) => i !== id,
         );
         const uploadedImages = omit(state.uploadedImages, id);
+
         return {
           ...state,
           uploadedImagesOrder,

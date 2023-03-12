@@ -22,6 +22,7 @@ type TSelectSingleFilterPopup = TDefaultProps & {
 
 const optionLabel = (options: any[], key: any) => {
   const option = options.find((o) => o.key === key);
+
   return option ? option.label : key;
 };
 

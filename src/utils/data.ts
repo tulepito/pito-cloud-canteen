@@ -28,6 +28,7 @@ export const combinedRelationships = (oldRels: any, newRels: any) => {
     // none of the resource objects had any relationships.
     return null;
   }
+
   return { ...oldRels, ...newRels };
 };
 
@@ -55,6 +56,7 @@ export const combinedResourceObjects = (oldRes: any, newRes: any) => {
     newRes.relationships,
   );
   const rels = relationships ? { relationships } : null;
+
   return { id, type, ...attrs, ...rels };
 };
 
@@ -114,6 +116,7 @@ export const denormalisedEntities = (
           `Entity with type "${type}" and id "${id ? id.uuid : id}" not found`,
         );
       }
+
       return null;
     }
     const entity = entities[type][id.uuid];
@@ -140,13 +143,16 @@ export const denormalisedEntities = (
 
             entData[relName] = hasMultipleRefs ? rels : rels[0];
           }
+
           return entData;
         },
         entityData,
       );
     }
+
     return entityData;
   });
+
   return denormalised.filter((e: any) => !!e);
 };
 
@@ -168,6 +174,7 @@ export const denormalisedResponseEntities = (sdkResponse: any) => {
   }
 
   const entities = updatedEntities({}, apiResponse);
+
   return denormalisedEntities(entities, resources);
 };
 
@@ -190,6 +197,7 @@ export const ensureTransaction = (
     listing,
     provider,
   };
+
   return { ...empty, ...transaction };
 };
 
@@ -200,6 +208,7 @@ export const ensureTransaction = (
  */
 export const ensureBooking = (booking: any) => {
   const empty = { id: null, type: 'booking', attributes: {} };
+
   return { ...empty, ...booking };
 };
 
@@ -215,6 +224,7 @@ export const ensureListing = (listing: any) => {
     attributes: { publicData: {} },
     images: [],
   };
+
   return { ...empty, ...listing };
 };
 
@@ -230,6 +240,7 @@ export const ensureOwnListing = (listing: any) => {
     attributes: { publicData: {} },
     images: [],
   };
+
   return { ...empty, ...listing };
 };
 
@@ -240,6 +251,7 @@ export const ensureOwnListing = (listing: any) => {
  */
 export const ensureUser = (user: any) => {
   const empty = { id: null, type: 'user', attributes: { profile: {} } };
+
   return merge(empty, user);
 };
 
@@ -260,6 +272,7 @@ export const ensureCurrentUser = (user: any) => {
     },
     profileImage: {},
   };
+
   return { ...empty, ...user };
 };
 
@@ -270,6 +283,7 @@ export const ensureCurrentUser = (user: any) => {
  */
 export const ensureTimeSlot = (timeSlot: TTimeSlot) => {
   const empty = { id: null, type: 'timeSlot', attributes: {} };
+
   return { ...empty, ...timeSlot };
 };
 
@@ -282,6 +296,7 @@ export const ensureDayAvailabilityPlan = (
   availabilityPlan: TAvailabilityPlan,
 ) => {
   const empty = { type: 'availability-plan/day', entries: [] };
+
   return { ...empty, ...availabilityPlan };
 };
 
@@ -294,6 +309,7 @@ export const ensureAvailabilityException = (
   availabilityException: TAvailabilityException,
 ) => {
   const empty = { id: null, type: 'availabilityException', attributes: {} };
+
   return { ...empty, ...availabilityException };
 };
 
@@ -320,6 +336,7 @@ export const userDisplayNameAsString = (
   if (hasDisplayName) {
     return user.attributes.profile.displayName;
   }
+
   return defaultUserDisplayName || '';
 };
 
@@ -347,6 +364,7 @@ export const userAbbreviatedName = (
   if (hasDisplayName) {
     return user.attributes.profile.abbreviatedName;
   }
+
   return defaultUserAbbreviatedName || '';
 };
 
@@ -383,6 +401,7 @@ export const getListingsById = (state: any, listingIds: any[]) => {
     type: 'listing',
   }));
   const throwIfNotFound = false;
+
   return denormalisedEntities(entities, resources, throwIfNotFound);
 };
 
@@ -400,6 +419,7 @@ export const getListingsById = (state: any, listingIds: any[]) => {
 export const getMarketplaceEntities = (state: any, entityRefs: any[]) => {
   const { entities } = state.marketplaceData;
   const throwIfNotFound = false;
+
   return denormalisedEntities(entities, entityRefs, throwIfNotFound);
 };
 
@@ -579,6 +599,7 @@ export const Transaction = (transaction: TTransaction) => {
 export const TransactionWithExtendedData = (transaction: TTransaction) => {
   const originTransaction = Transaction(transaction);
   const { listing, provider, booking, customer } = transaction;
+
   return {
     ...originTransaction,
     getListing: () => {
@@ -607,6 +628,7 @@ export const getArrayByUuid = (items: any[]) => {
       resArr.push(item);
     }
   });
+
   return resArr;
 };
 
@@ -668,6 +690,7 @@ export const IntegrationMenuListing = (
     ...satFoodIdList,
     ...sunFoodIdList,
   ];
+
   return {
     ...IntegrationListing(listing),
     getListFoodIds: () => {

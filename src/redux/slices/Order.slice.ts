@@ -284,6 +284,7 @@ const recommendRestaurants = createAsyncThunk(
                   'variants.landscape-crop2x',
                 ],
               });
+
               return {
                 restaurantInfo:
                   denormalisedResponseEntities(restaurantResponse)[0],
@@ -340,6 +341,7 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
             'variants.landscape-crop2x',
           ],
         });
+
         return {
           restaurantInfo: denormalisedResponseEntities(restaurantResponse)[0],
           menu,
@@ -391,6 +393,7 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
 
       return newOrderDetail;
     }
+
     return orderDetail;
   },
 );
@@ -566,8 +569,10 @@ const fetchPlanDetail = createAsyncThunk(
           id: planId,
         }),
       )[0];
+
       return response;
     }
+
     return {};
   },
 );
@@ -617,6 +622,7 @@ const cancelPendingApprovalOrder = createAsyncThunk(
     );
 
     await dispatch(queryCompanyOrders(queryParams));
+
     return responseData.data;
   },
 );
@@ -633,6 +639,7 @@ const bookerPublishOrder = createAsyncThunk(
 
 const fetchNutritions = createAsyncThunk(FETCH_NUTRITIONS, async () => {
   const { data: searchFiltersResponse } = await fetchSearchFilterApi();
+
   return searchFiltersResponse.nutritions;
 });
 

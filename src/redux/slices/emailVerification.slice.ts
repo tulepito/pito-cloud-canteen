@@ -35,6 +35,7 @@ const verify = createAsyncThunk(
     const { verificationToken } = params;
     await sdk.currentUser.verifyEmail({ verificationToken });
     dispatch(userThunks.fetchCurrentUser());
+
     return undefined;
   },
   {

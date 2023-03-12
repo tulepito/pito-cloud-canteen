@@ -14,6 +14,7 @@ const getNumberOnly = (price: string) => {
 const parsePriceToMoneyFormat = (price: string) => {
   const formattedPrice = getNumberOnly(String(price));
   const parsedPrice = Number(formattedPrice);
+
   return new Money(Number(parsedPrice), 'VND');
 };
 
@@ -54,6 +55,7 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
   const priceRemoveComma = price.toString().split(',');
   const mergeWithoutComma = priceRemoveComma.join('');
   const parsePrice = Number(mergeWithoutComma);
+
   return {
     images: getUniqueImages([...getSubmitImageId(images)]),
     title,
@@ -104,6 +106,7 @@ export const getDuplicateData = (values: TEditPartnerFoodFormValues) => {
     restaurantId,
     ...rest
   } = values;
+
   return {
     ...(images ? { images: images.filter((i: TImage) => !!i) } : {}),
     title,
@@ -132,6 +135,7 @@ export const getImportDataFromCsv = (values: any) => {
     sideDishes,
     ...rest
   } = values;
+
   return {
     ...(images ? { images: images.filter((i: TImage) => !!i) } : {}),
     title,

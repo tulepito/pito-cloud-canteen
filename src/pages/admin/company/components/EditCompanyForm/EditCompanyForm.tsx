@@ -68,6 +68,7 @@ const EditCompanyForm: React.FC<TEditCompanyForm> = (props) => {
       // don't do any thing
     }
   };
+
   return (
     <FinalForm
       {...rest}

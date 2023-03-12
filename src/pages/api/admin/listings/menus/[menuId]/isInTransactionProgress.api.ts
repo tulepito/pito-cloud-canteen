@@ -19,6 +19,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     );
     const { totalItems } = response.data.meta;
     const isInTransactionProgress = totalItems.length > 0;
+
     return res.json({ isInTransactionProgress });
   } catch (error) {
     console.log(error);

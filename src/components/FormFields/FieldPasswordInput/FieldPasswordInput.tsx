@@ -125,6 +125,7 @@ const FieldPasswordInputComponent: React.FC<InputComponentProps> = (props) => {
   const inputContainerClasses = classNames(css.inputContainer);
   const labelClasses = classNames(css.labelRoot, labelClassName);
   const labelRequiredRedStar = required ? css.labelRequiredRedStar : '';
+
   return (
     <div className={classes}>
       {label && (

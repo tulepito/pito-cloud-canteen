@@ -25,6 +25,7 @@ const OutsideClickHandler: React.FC<PropsWithChildren<TOutsideClickHandler>> = (
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClick, false);
+
     return () => {
       document.removeEventListener('mousedown', handleClick, false);
     };

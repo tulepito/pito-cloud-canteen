@@ -30,6 +30,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             res.status(EHttpStatusCode.BadRequest).json({
               error: 'Missing orderId',
             });
+
             return;
           }
 
@@ -46,6 +47,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             res.status(EHttpStatusCode.BadRequest).json({
               error: `Cannot review order, order state: ${orderState}`,
             });
+
             return;
           }
 

@@ -17,6 +17,7 @@ const CalendarContentEnd = (props: any) => {
     return <></>;
   }
   const noFood = events.length === 0;
+
   return noFood ? (
     <div className={css.noFood}>
       <FormattedMessage id="EditMenuPricingForm.noFoods" />

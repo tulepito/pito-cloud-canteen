@@ -44,6 +44,7 @@ const checkInvitation = createAsyncThunk(
       await checkInvitationApi({
         companyId,
       });
+
     return checkInvitationResponse;
   },
 );
@@ -53,6 +54,7 @@ const responseToInvitation = createAsyncThunk(
   async (params: ResponseToInvitationApiBody) => {
     const { data: response }: { data: ResponseToInvitationResult } =
       await responseToInvitationApi(params);
+
     return response.message;
   },
 );

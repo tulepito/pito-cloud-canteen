@@ -19,6 +19,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = (props) => {
   if (!isOpen) {
     return null;
   }
+
   return (
     <Modal
       isOpen={isOpen}

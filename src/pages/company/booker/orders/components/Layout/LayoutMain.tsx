@@ -9,6 +9,7 @@ type TLayoutMainProps = PropsWithChildren<{
 
 const LayoutMain: React.FC<TLayoutMainProps> = ({ className, children }) => {
   const classes = classNames(css.layoutMain, className);
+
   return <div className={classes}>{children}</div>;
 };
 

@@ -99,6 +99,7 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
               const isEmailInValid = emailFormatValid(emailInvalidMessage)(
                 separatedEmail.trim(),
               );
+
               return isEmailInValid
                 ? result
                 : new Set([...result, separatedEmail.trim().toLowerCase()]);
@@ -120,6 +121,7 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
             handleEmailFieldBlur(event);
           }
         };
+
         return (
           <Form onSubmit={handleSubmit}>
             <FieldTextInput
@@ -141,6 +143,7 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
                 const onDeleteUser = () => {
                   removeEmailValue(record.email);
                 };
+
                 return (
                   <div key={index} className={css.memberItem}>
                     <div className={css.memberWrapper}>

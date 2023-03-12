@@ -784,6 +784,7 @@ export const getLabelByKey = (
   key: any,
 ) => {
   const item = list?.find((l: any) => l.key === key);
+
   return item && item.label ? item.label : key;
 };
 

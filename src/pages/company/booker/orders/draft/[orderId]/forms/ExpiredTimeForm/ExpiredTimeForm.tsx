@@ -30,6 +30,7 @@ const validate = (values: TExpiredTimeFormValues) => {
   if (!values.deadlineHour) {
     errors.deadlineHour = 'Vui lòng chọn giờ cho hạn chọn món';
   }
+
   return errors;
 };
 

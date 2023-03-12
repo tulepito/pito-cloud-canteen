@@ -7,6 +7,7 @@ import css from './FoodPickingField.module.scss';
 
 const FoodPickingField = () => {
   const intl = useIntl();
+
   return (
     <div className={css.container}>
       <div className={css.fieldTitle}>
@@ -16,6 +17,7 @@ const FoodPickingField = () => {
         <Field id="pickAllow" name="pickAllow">
           {(props) => {
             const { id, input } = props;
+
             return (
               <Toggle
                 label={intl.formatMessage({

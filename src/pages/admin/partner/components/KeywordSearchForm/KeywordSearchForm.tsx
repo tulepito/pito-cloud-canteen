@@ -27,11 +27,13 @@ type TKeywordSearchForm = {
 const KeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
   const intl = useIntl();
   const { placeholder, inputClassName, label, className } = props;
+
   return (
     <FinalForm
       {...props}
       render={(fieldRenderProps) => {
         const { handleSubmit } = fieldRenderProps;
+
         return (
           <Form
             onSubmit={handleSubmit}

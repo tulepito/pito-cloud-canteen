@@ -21,6 +21,7 @@ const InvitationCard: React.FC<InvitationCardProps> = (props) => {
   } = props;
   const intl = useIntl();
   const modalClasses = classNames(css.modal, css.open);
+
   return (
     <div className={modalClasses}>
       <div className={css.overlay}>

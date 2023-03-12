@@ -92,6 +92,7 @@ export const FieldTextAreaComponent: React.FC<InputComponentProps> = (
 
   const labelClasses = classNames(css.labelRoot, labelClassName);
   const labelRequiredRedStar = fieldMeta.error ? css.labelRequiredRedStar : '';
+
   return (
     <div className={classes}>
       {label && (

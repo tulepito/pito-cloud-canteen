@@ -22,9 +22,11 @@ const updateCompany = createAsyncThunk(
     try {
       const { data } = await updateCompanyApi(userData);
       const [company] = denormalisedResponseEntities(data);
+
       return fulfillWithValue(company);
     } catch (error: any) {
       console.error('update company error', error);
+
       return rejectWithValue(storableError(error.response.data));
     }
   },
@@ -36,9 +38,11 @@ const showCompany = createAsyncThunk(
     try {
       const { data } = await showCompanyApi(id);
       const [company] = denormalisedResponseEntities(data);
+
       return fulfillWithValue(company);
     } catch (error: any) {
       console.error('show company error', error);
+
       return rejectWithValue(storableError(error.response.data));
     }
   },

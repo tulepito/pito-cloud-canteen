@@ -17,6 +17,7 @@ const IconRefreshing: React.FC<TIconRefreshingProps> = (props) => {
     onClick,
   } = props;
   const classes = classNames(className, inProgress && css.rotate);
+
   return (
     <svg
       onClick={onClick}

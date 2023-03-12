@@ -16,6 +16,7 @@ const UnactiveUserScreen = () => {
     await dispatch(userActions.clearCurrentUser());
     router.push(generalPaths.Home);
   };
+
   return (
     <div>
       <p>404 Error</p>

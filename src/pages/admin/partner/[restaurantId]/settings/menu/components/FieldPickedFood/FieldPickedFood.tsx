@@ -16,6 +16,7 @@ type TFieldPickedFood = {
 
 const FieldPickedFood: React.FC<TFieldPickedFood> = (props) => {
   const { price, title, id, onRemovePickedFood } = props;
+
   return (
     <div className={css.root}>
       <div className={css.label}>

@@ -14,6 +14,7 @@ const InvitationNotiModal: React.FC<InvitationNotiModalProps> = (props) => {
   const { status, goToHomePage } = props;
   const intl = useIntl();
   const modalClasses = classNames(css.modal, css.open);
+
   return (
     <div className={modalClasses}>
       <div className={css.overlay}>

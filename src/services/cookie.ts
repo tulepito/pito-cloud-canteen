@@ -35,8 +35,10 @@ const convertCookieStringToObject = (cookieString: string) => {
       ...acc,
       [name]: value,
     };
+
     return newValues;
   }, {});
+
   return output;
 };
 
@@ -70,6 +72,7 @@ const cookies =
     const output = convertCookieStringToObject(req.headers.cookie || '');
 
     req.headers.cookie = convertObjectToCookieString(output);
+
     return handler(req, res);
   };
 

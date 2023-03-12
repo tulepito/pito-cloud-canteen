@@ -103,6 +103,7 @@ const ProfileMenu: React.FC<TProfileMenuProps> = (props) => {
       // If state is handled inside of Menu component, set state
       setOpen((isOpen: boolean) => {
         const isMenuOpen = enforcedState != null ? enforcedState : !isOpen;
+
         return isMenuOpen;
       });
     }
@@ -152,10 +153,12 @@ const ProfileMenu: React.FC<TProfileMenuProps> = (props) => {
   const positionStyleForArrow = (isPositionedRight: boolean) => {
     if (menuRef.current) {
       const menuWidth = menuRef.current.offsetWidth;
+
       return isPositionedRight
         ? Math.floor(menuWidth / 2) - contentPlacementOffset
         : Math.floor(menuWidth / 2);
     }
+
     return 0;
   };
 

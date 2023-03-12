@@ -91,6 +91,7 @@ const EditMenuPricingFormComponent: React.FC<
     listIdsWithSideDishes.forEach(
       ({ id, sideDishes = [], foodNote }: TFoodResource) => {
         form.change(`${id}.foodNote`, foodNote);
+
         return form.change(`${id}.sideDishes`, sideDishes);
       },
     );

@@ -143,6 +143,7 @@ const companyInfo = createAsyncThunk(
           )[0],
       ),
     );
+
     return {
       companyImage: {
         imageId: companyImageId || null,
@@ -164,6 +165,7 @@ const groupInfo = createAsyncThunk(
     const response = await sdk.users.show({ id: workspaceCompanyId });
     const groupsResponse =
       response.data.data?.attributes?.profile?.metadata?.groups;
+
     return groupsResponse;
   },
 );
@@ -194,6 +196,7 @@ const groupDetailInfo = createAsyncThunk(
       name,
       description,
     };
+
     return {
       groupInfo: groupInfoState,
       groupMembers: allMembers,
@@ -214,6 +217,7 @@ const createGroup = createAsyncThunk(
     };
     const { data: newCompanyAccount } = await createGroupApi(apiBody);
     const { groups } = newCompanyAccount.attributes.profile.metadata;
+
     return groups;
   },
 );
@@ -233,6 +237,7 @@ const updateGroup = createAsyncThunk(
       companyId: workspaceCompanyId,
     };
     await updateGroupApi(apiBody);
+
     return [dispatch(groupDetailInfo({ groupId })), dispatch(groupInfo())];
   },
 );
@@ -247,6 +252,7 @@ const deleteGroup = createAsyncThunk(
     };
     const { data: newCompanyAccount } = await deleteGroupApi(apiData);
     const { groups } = newCompanyAccount.attributes.profile.metadata;
+
     return groups;
   },
 );
@@ -262,6 +268,7 @@ const updateBookerAccount = createAsyncThunk(
 
     await sdk.currentUser.updateProfile(params, queryParams);
     await dispatch(userThunks.fetchCurrentUser());
+
     return '';
   },
 );
@@ -291,6 +298,7 @@ const updateCompanyAccount = createAsyncThunk(
     };
     const { data: companyAccount } = await updateCompany(apiBody);
     dispatch(companyInfo());
+
     return {
       company: companyAccount,
     };
@@ -337,6 +345,7 @@ export const companySlice = createSlice({
           favoriteRestaurants,
           favoriteFood,
         } = payload;
+
         return {
           ...state,
           groupList,
@@ -405,6 +414,7 @@ export const companySlice = createSlice({
       })
       .addCase(deleteGroup.pending, (state, { meta }) => {
         const { arg } = meta;
+
         return {
           ...state,
           deleteGroupInProgress: true,
@@ -457,6 +467,7 @@ export const companySlice = createSlice({
       })
       .addCase(updateCompanyAccount.fulfilled, (state, { payload }) => {
         const { company } = payload;
+
         return {
           ...state,
           updateCompanyInProgress: false,

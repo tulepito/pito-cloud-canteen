@@ -25,6 +25,7 @@ export const required = (message: string) => (value: string) => {
     // string must be nonempty when trimmed
     return isNonEmptyString(value) ? VALID : message;
   }
+
   return VALID;
 };
 
@@ -33,6 +34,7 @@ export const addressRequired = (message: string) => (value: TAddress) => {
     // undefined or null values are invalid
     return message;
   }
+
   return isNonEmptyString(value.search) ? VALID : message;
 };
 
@@ -48,12 +50,14 @@ export const requiredFieldArrayCheckbox =
 
     const entries = toPairs(value);
     const hasSelectedValues = entries.filter((e: any) => !!e[1]).length > 0;
+
     return hasSelectedValues ? VALID : message;
   };
 
 export const minLength =
   (message: string, minimumLength: number) => (value: string) => {
     const hasLength = value && typeof value.length === 'number';
+
     return hasLength && value.length >= minimumLength ? VALID : message;
   };
 
@@ -68,6 +72,7 @@ export const taxLengthRequired = (message: string) => (value: string) => {
     return message;
   }
   const hasLength = value && typeof value.length === 'number';
+
   return hasLength && (value.length === 13 || value.length === 10)
     ? VALID
     : message;
@@ -79,6 +84,7 @@ export const maxLength =
       return VALID;
     }
     const hasLength = value && typeof value.length === 'number';
+
     return hasLength && value.length <= maximumLength ? VALID : message;
   };
 
@@ -93,6 +99,7 @@ export const autocompleteSearchRequired = (message: string) => (value: any) => {
 export const autocompletePlaceSelected = (message: string) => (value: any) => {
   const selectedPlaceIsValid =
     value && value.selectedPlace && value.selectedPlace.address;
+
   return selectedPlaceIsValid ? VALID : message;
 };
 
@@ -130,6 +137,7 @@ export const passwordMatchConfirmPassword =
 
 export const parseNum = (str: string) => {
   const num = Number.parseInt(str, 10);
+
   return Number.isNaN(num) ? null : num;
 };
 
@@ -153,6 +161,7 @@ export const validBusinessURL = (message: string) => (value: string) => {
   const isLocalhost = !!value.match(
     /^(https?:\/\/localhost($|:|\/)|localhost($|:|\/))/,
   );
+
   return invalidCharacters || invalidProtocol || isExampleDotCom || isLocalhost
     ? message
     : VALID;
@@ -169,6 +178,7 @@ export const numberMaxLength =
       return VALID;
     }
     const isNumber = typeof parsedValue === 'number';
+
     return isNumber && parsedValue <= maximumLength ? VALID : message;
   };
 
@@ -176,6 +186,7 @@ export const numberMinLength =
   (message: string, minimumLength: number) => (value: number) => {
     const parsedValue = Number(value);
     const isNumber = typeof parsedValue === 'number';
+
     return isNumber && parsedValue >= minimumLength ? VALID : message;
   };
 
@@ -221,6 +232,7 @@ export const validFacebookUrl = (message: string) => (value: string) => {
   if (pattern.test(value)) {
     return VALID;
   }
+
   return message;
 };
 
@@ -238,6 +250,7 @@ export const validURL = (message: string) => (str: string) => {
   if (pattern.test(str)) {
     return VALID;
   }
+
   return message;
 };
 
@@ -247,6 +260,7 @@ export const minPriceLength =
     const mergeWithoutComma = removeComma.join('');
     const parsedValue = Number(mergeWithoutComma);
     const isNumber = typeof parsedValue === 'number';
+
     return isNumber && parsedValue >= minimumLength ? VALID : message;
   };
 
@@ -256,6 +270,7 @@ export const parsePrice = (value: string = '') => {
   const parseNumber = Number(mergeWithoutComma);
   const isNotANumber =
     Number.isNaN(parseNumber) || typeof parseNumber !== 'number';
+
   return !isNotANumber ? parseNumber.toLocaleString() : value;
 };
 
@@ -268,6 +283,7 @@ export const timeToMinute = (timeInHour: string) => {
     return 0;
   }
   const timeParts = timeInHour.split(':');
+
   return Number(timeParts[0]) * 60 + Number(timeParts[1]);
 };
 
@@ -334,6 +350,7 @@ export const validAvailabilityPlanEntries =
     if (time && Number(time) % 5 === 0) {
       return VALID;
     }
+
     return message;
   };
 
@@ -454,6 +471,7 @@ export const maxTimeValidate =
   };
 export const nonSatOrSunDay = (message: string) => (value: number) => {
   const dayOfWeek = new Date(value).getDay();
+
   return dayOfWeek === 6 || dayOfWeek === 0 ? message : VALID;
 };
 
@@ -468,11 +486,13 @@ export const greaterThanZero = (message: string) => (value: number) => {
 export const parseAvailabilityEntries = (time: Date) => {
   const minutes = time.getMinutes();
   const hours = time.getHours();
+
   return printHoursToString(hours, minutes);
 };
 
 export const validFoodTitle = (message: string) => (value: string) => {
   const format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+
   return format.test(value) ? message : VALID;
 };
 
@@ -483,6 +503,7 @@ export const upperCaseFirstLetter = (value: string) => {
 export const validateNonEnterInputField =
   (message: string) => (value: string, allValues: TObject) => {
     const { tempValue } = allValues;
+
     return tempValue ? message : VALID;
   };
 
@@ -490,6 +511,7 @@ export const valueLessThanMax =
   (message: string, maxNameField: string) =>
   (value: string, allValues: TObject) => {
     const maxFieldValue = allValues?.[maxNameField] || 0;
+
     return value > maxFieldValue ? message : VALID;
   };
 
@@ -497,5 +519,6 @@ export const valueGreaterThanMin =
   (message: string, minNameField: string) =>
   (value: string, allValues: TObject) => {
     const maxFieldValue = allValues?.[minNameField] || 0;
+
     return value < maxFieldValue ? message : VALID;
   };

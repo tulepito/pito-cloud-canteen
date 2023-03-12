@@ -25,6 +25,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const newGroupMembers = group.members.filter(
         (member) => member.email !== memberEmail,
       );
+
       return {
         ...group,
         members: newGroupMembers,
@@ -37,6 +38,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const newGroupMembers = group.members.filter(
           (member) => member.email === memberEmail,
         );
+
         return newGroupMembers.length > 0 && group.id;
       }),
     );

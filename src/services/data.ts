@@ -6,6 +6,7 @@ const combinedRelationships = (oldRels: any, newRels: any) => {
     // none of the resource objects had any relationships.
     return null;
   }
+
   return { ...oldRels, ...newRels };
 };
 
@@ -23,6 +24,7 @@ const combinedResourceObjects = (oldRes: any, newRes: any) => {
     newRes.relationships,
   );
   const rels = relationships ? { relationships } : null;
+
   return { id, type, ...attrs, ...rels };
 };
 
@@ -41,6 +43,7 @@ const updatedEntities = (oldEntities: any, apiResponse: any) => {
     entities[type][id.uuid] = entity
       ? combinedResourceObjects(entity, curr)
       : curr;
+
     return entities;
   }, oldEntities);
 
@@ -76,6 +79,7 @@ const denormalisedEntities = (
           `Entity with type "${type}" and id "${id ? id.uuid : id}" not found`,
         );
       }
+
       return null;
     }
     const entity = entities[type][id.uuid || id];
@@ -101,13 +105,16 @@ const denormalisedEntities = (
 
             ent[relName] = hasMultipleRefs ? rels : rels[0];
           }
+
           return ent;
         },
         entityData,
       );
     }
+
     return entityData;
   });
+
   return denormalised.filter((e: any) => !!e);
 };
 
@@ -129,5 +136,6 @@ export const denormalisedResponseEntities = (sdkResponse: any) => {
   }
 
   const entities = updatedEntities({}, apiResponse);
+
   return denormalisedEntities(entities, resources);
 };

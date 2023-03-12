@@ -55,6 +55,7 @@ const TABLE_COLUMN: TColumn[] = [
       const bookers = members.filter(
         (m: any) => m.permission === UserPermission.BOOKER,
       );
+
       return (
         <div>
           {bookers.slice(0, 1).map((user: TUser) => {
@@ -94,6 +95,7 @@ const TABLE_COLUMN: TColumn[] = [
       const isActive = data.status === ECompanyStatus.active;
       const label = isActive ? 'Đã active' : 'Chưa active';
       const badgeType = isActive ? EBadgeType.success : EBadgeType.default;
+
       return (
         <Badge
           label={label}

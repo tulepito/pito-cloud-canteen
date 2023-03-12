@@ -34,6 +34,7 @@ exports.handler = async (_event, _context) => {
 
     if (isEmpty(orderList)) {
       console.info('No order need to update state ...');
+
       return;
     }
     //

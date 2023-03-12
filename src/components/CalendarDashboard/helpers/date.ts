@@ -16,6 +16,7 @@ const getEndOfDate = (date: Date) =>
 export const getEventsInDate = (date: Date, events: Event[]) => {
   const startOfDate = getStartOfDate(date);
   const endOfDate = getEndOfDate(date);
+
   return events.filter((event: Event) => {
     if (event.start && event.end) {
       return (
@@ -38,6 +39,7 @@ export const getEventsInPeriod = ({ events }: { events: Event[] }) => {
   const groupedEvents = events.reduce(
     (groupData: any, event: Event) => {
       groupData[event.resource?.daySession].push(event);
+
       return groupData;
     },
     {
@@ -46,5 +48,6 @@ export const getEventsInPeriod = ({ events }: { events: Event[] }) => {
       [EVENING_SESSION]: [],
     },
   );
+
   return groupedEvents;
 };

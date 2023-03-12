@@ -23,6 +23,7 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
   const handleRefreshIconClick = () => {
     onRecommendMeal?.(event?.start?.getTime()!);
   };
+
   return (
     <div className={css.content}>
       <div className={css.coverImg}>

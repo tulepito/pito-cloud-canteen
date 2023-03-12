@@ -135,14 +135,17 @@ const fetchRestaurant = createAsyncThunk(
           ],
         }),
       )[0];
+
       return response;
     }
+
     return null;
   },
 );
 
 const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
   const { data: searchFiltersResponse } = await fetchSearchFilterApi();
+
   return searchFiltersResponse;
 });
 
@@ -186,6 +189,7 @@ const searchRestaurants = createAsyncThunk(
           type: 'ofCustomer',
         });
         const { meta: reviewMeta } = reviewsResponse.data;
+
         return {
           restaurantId,
           totalReviews: reviewMeta.totalItems,
@@ -213,6 +217,7 @@ const fetchOrder = createAsyncThunk(
         id: orderId,
       }),
     )[0];
+
     return response;
   },
 );
@@ -226,8 +231,10 @@ const fetchPlanDetail = createAsyncThunk(
           id: planId,
         }),
       )[0];
+
       return response;
     }
+
     return {};
   },
 );
@@ -240,6 +247,7 @@ const updatePlanDetail = createAsyncThunk(
       planId,
       updateMode,
     });
+
     return planListing;
   },
 );
@@ -295,6 +303,7 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
       ...restaurantFood,
       [restaurantId]: foodList,
     };
+
     return newRestaurantFood;
   },
 );

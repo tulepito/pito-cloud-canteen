@@ -35,6 +35,7 @@ const getWeekDayFromListId = (menu: TIntegrationListing, foodId: string) => {
   const keys = Object.keys(listIds).filter((key: string) => {
     return listIds[key].includes(foodId);
   });
+
   return keys.map((k) => String(k).substring(0, 3));
 };
 
@@ -226,6 +227,7 @@ export const checkUnConflictedMenuMiddleware =
           },
         });
       }
+
       return handler(req, res);
     } catch (error) {
       console.error('error', error);

@@ -108,6 +108,7 @@ const AccountPage = () => {
     if (typeof formSubmitInputRef?.current === 'function')
       formSubmitInputRef.current(e);
   };
+
   return (
     <div className={css.container}>
       <div className={css.header}>

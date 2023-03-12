@@ -32,6 +32,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             res.status(EHttpStatusCode.BadRequest).json({
               error: 'Transaction ID is empty',
             });
+
             return;
           }
 

@@ -92,6 +92,7 @@ const QuizPerPackMemberAmountPage = () => {
     if (memberAmountError) {
       errors.memberAmount = memberAmountError;
     }
+
     return errors;
   };
 
@@ -136,6 +137,7 @@ const QuizPerPackMemberAmountPage = () => {
   const goBack = () => {
     router.back();
   };
+
   return (
     <QuizModal
       id="QuizPerPackMemberAmountModal"

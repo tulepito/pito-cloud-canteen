@@ -143,6 +143,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       const { length } = restaurants;
       const moreThanTwo = restaurants.length > 2;
       const remainLength = length - 2;
+
       return (
         <div className={css.restaurantName}>
           {restaurants.slice(0, 2).map((restaurantName: string) => (

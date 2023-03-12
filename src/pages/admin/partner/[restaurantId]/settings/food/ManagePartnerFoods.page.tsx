@@ -51,6 +51,7 @@ const TABLE_COLUMN: TColumn[] = [
       if (data.isDeleted) {
         return <div></div>;
       }
+
       return (
         <NamedLink
           path={`/admin/partner/${data.restaurantId}/settings/food/${data.id}`}
@@ -68,6 +69,7 @@ const TABLE_COLUMN: TColumn[] = [
       if (data.isDeleted) {
         return <div></div>;
       }
+
       return <div className={css.descriptionRow}>{data.menuType}</div>;
     },
   },
@@ -78,6 +80,7 @@ const TABLE_COLUMN: TColumn[] = [
       if (data.isDeleted) {
         return <div></div>;
       }
+
       return <div className={css.descriptionRow}>{data.foodType}</div>;
     },
   },
@@ -88,6 +91,7 @@ const TABLE_COLUMN: TColumn[] = [
       if (data.isDeleted) {
         return <div></div>;
       }
+
       return <div className={css.descriptionRow}>{data.category}</div>;
     },
   },
@@ -98,6 +102,7 @@ const TABLE_COLUMN: TColumn[] = [
       if (data.isDeleted) {
         return <div></div>;
       }
+
       return (
         <div>
           <NamedLink
@@ -208,6 +213,7 @@ const parseEntitiesToExportCsv = (
         ),
       };
     });
+
   return foodsToExport;
 };
 
@@ -285,6 +291,7 @@ const ManagePartnerFoods = () => {
     )) as any;
     if (!error) {
       onClearFoodToRemove();
+
       return onQueryPartnerFood({ page: 1, restaurantId });
     }
   };
@@ -296,6 +303,7 @@ const ManagePartnerFoods = () => {
     if (!error) {
       setIdsToAction([]);
       closeRemoveCheckedModal();
+
       return onQueryPartnerFood({ page: 1, restaurantId });
     }
   };

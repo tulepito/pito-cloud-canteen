@@ -168,6 +168,7 @@ const GroupDetailPage = () => {
           setDeletingMemberInfo({ id, email });
           openDeleteMemberConfirmationModal();
         };
+
         return updateGroupInProgress ? (
           <IconSpinner className={css.loading} />
         ) : (

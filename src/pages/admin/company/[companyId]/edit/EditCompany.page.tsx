@@ -67,6 +67,7 @@ export default function EditCompanyPage() {
       location,
     } = profile.publicData;
     const { tax } = profile.privateData;
+
     return {
       firstName: profile.firstName,
       lastName: profile.lastName,

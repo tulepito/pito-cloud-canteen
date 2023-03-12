@@ -24,6 +24,7 @@ const validOrderParams =
           throw new Error('Missing general info params');
         }
       }
+
       return handler(req, res);
     } catch (error) {
       handleError(res, error);

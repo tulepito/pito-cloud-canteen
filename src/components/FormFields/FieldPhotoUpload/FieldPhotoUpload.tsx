@@ -63,6 +63,7 @@ const PhotoWithOverlay = (props: TPhotoWithOverlay) => {
     );
   }
   const classes = classNames(css.thumbnail, className);
+
   return (
     <div onClick={onClick} className={css.previewImage}>
       <div className={classes}>

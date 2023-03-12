@@ -50,6 +50,7 @@ const Toggle: React.FC<TToggleProps> = (props) => {
     [css.disabled]: disabled,
   });
   const classes = classNames(css.root, className);
+
   return (
     <div className={classes}>
       {label && <div className={css.toggleLabel}>{label}</div>}

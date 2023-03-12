@@ -54,6 +54,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           members: newMembers,
         },
       });
+
       return res.json({
         message: 'userDecline',
       });
@@ -84,6 +85,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         },
       },
     });
+
     return res.json({
       message: 'userAccept',
     });

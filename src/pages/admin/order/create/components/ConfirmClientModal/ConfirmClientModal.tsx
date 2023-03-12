@@ -14,6 +14,7 @@ type ConfirmClientModalProps = {
 const ConfirmClientModal: React.FC<ConfirmClientModalProps> = (props) => {
   const { isOpen, onClose, onCancel, onConfirm } = props;
   const intl = useIntl();
+
   return (
     <Modal
       title={intl.formatMessage({ id: 'ConfirmClientModal.title' })}

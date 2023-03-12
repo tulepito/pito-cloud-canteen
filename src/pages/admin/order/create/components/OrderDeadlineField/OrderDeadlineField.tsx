@@ -86,7 +86,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
   const initialDeadlineDate = deadlineDateInitialValue
     ? new Date(deadlineDateInitialValue)
     : null;
-  const [dealineDate, setDeadlineDate] = useState<Date>(initialDeadlineDate!);
+  const [deadlineDate, setDeadlineDate] = useState<Date>(initialDeadlineDate!);
   const deadlineDateRequired = intl.formatMessage({
     id: 'OrderDeadlineField.deadlineDateRequired',
   });
@@ -114,8 +114,9 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
 
   const deadlineDateClasses = classNames(
     css.customInput,
-    !dealineDate && css.placeholder,
+    !deadlineDate && css.placeholder,
   );
+
   return (
     <div className={containerClasses}>
       {title && <div className={css.fieldTitle}>{title}</div>}
@@ -124,7 +125,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
         <FieldDatePicker
           id="deadlineDate"
           name="deadlineDate"
-          selected={dealineDate}
+          selected={deadlineDate}
           onChange={(date: Date) => setDeadlineDate(date)}
           className={deadlineDateClasses}
           label={

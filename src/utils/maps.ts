@@ -16,6 +16,7 @@ const degToRadians = (latlng: any) => {
   const { lat, lng } = latlng;
   const latR = lat * DEG_TO_RAD;
   const lngR = lng * DEG_TO_RAD;
+
   return { lat: latR, lng: lngR };
 };
 
@@ -23,6 +24,7 @@ const radToDegrees = (latlngInRadians: any) => {
   const { lat: latR, lng: lngR } = latlngInRadians;
   const lat = latR / DEG_TO_RAD;
   const lng = lngR / DEG_TO_RAD;
+
   return { lat, lng };
 };
 
@@ -66,6 +68,7 @@ const obfuscatedCoordinatesImpl = (latlng: any, cacheKey: any) => {
   const newLngNormalized = ((newLng + THREE_PI) % TWO_PI) - Math.PI;
 
   const result = radToDegrees({ lat: newLat, lng: newLngNormalized });
+
   return new LatLng(result.lat, result.lng);
 };
 
@@ -105,6 +108,7 @@ export const userLocation = () =>
 
     if (!geolocationAvailable) {
       reject(new Error('Geolocation not available in browser'));
+
       return;
     }
 
@@ -206,6 +210,7 @@ export const hasSameSDKBounds = (sdkBounds1: any, sdkBounds2: any) => {
   ) {
     return false;
   }
+
   return (
     sdkBounds1.ne.lat === sdkBounds2.ne.lat &&
     sdkBounds1.ne.lng === sdkBounds2.ne.lng &&

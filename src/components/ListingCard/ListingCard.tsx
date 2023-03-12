@@ -38,6 +38,7 @@ const ListingCard: React.FC<TListCardProps> = ({
   };
 
   const classes = classNames(css.root, className);
+
   return (
     <div className={classes}>
       <div className={css.listingImage}>

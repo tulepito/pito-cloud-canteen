@@ -37,6 +37,7 @@ const companyChecker =
           message: "You don't have permission to access this api!",
         });
       }
+
       return handler(req, res);
     } catch (error) {
       handleError(res, error);

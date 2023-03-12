@@ -62,6 +62,7 @@ const FieldCheckboxRenderer: React.FC<TFieldCheckboxRenderer> = (props) => {
       <ul className={listClasses}>
         {options.map((option: any) => {
           const fieldId = `${id}.${option.key}`;
+
           return (
             <li key={fieldId} className={classNames(css.item, itemClassName)}>
               <FieldCheckbox

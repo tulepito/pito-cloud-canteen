@@ -14,6 +14,7 @@ const CreatePartnerMenuRoute = () => {
       dispatch(menusSliceAction.setInitialStates());
     }
   }, [duplicateId]);
+
   return <EditPartnerMenuWizard />;
 };
 

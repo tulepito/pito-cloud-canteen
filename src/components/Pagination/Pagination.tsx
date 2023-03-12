@@ -93,6 +93,7 @@ const Pagination: React.FC<TPaginationProps> = (props) => {
         total,
       },
     );
+
     return showInfo ? (
       <div className={paginationInfoClasses}>
         <span className={css.paginationInfo}>{info}</span>
@@ -123,6 +124,7 @@ const Pagination: React.FC<TPaginationProps> = (props) => {
     selectComponentClass: Select,
     locale: localeVi,
   };
+
   return <ExternalPagination {...paginationProps} />;
 };
 

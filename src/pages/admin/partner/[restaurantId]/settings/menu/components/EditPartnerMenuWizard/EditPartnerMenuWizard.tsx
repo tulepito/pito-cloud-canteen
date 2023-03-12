@@ -64,6 +64,7 @@ const redirectAfterDraftUpdate = (
 ) => {
   const tabIndex = tabs.findIndex((cur) => cur === tab);
   const nextTab = tabs[tabIndex + 1];
+
   return router.push(
     `${pathname}/${restaurantId}/settings/menu/${id}/?tab=${nextTab}`,
   );

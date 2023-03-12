@@ -40,6 +40,7 @@ const loadData = createAsyncThunk(
   async (orderId: string, { dispatch }) => {
     const response = await loadOrderDataApi(orderId);
     await dispatch(userThunks.fetchCurrentUser({}));
+
     return response?.data.data;
   },
   {
@@ -52,6 +53,7 @@ const reloadData = createAsyncThunk(
   async (orderId: string, { dispatch }) => {
     const response = await loadOrderDataApi(orderId);
     await dispatch(userThunks.fetchCurrentUser({}));
+
     return response?.data.data;
   },
   {

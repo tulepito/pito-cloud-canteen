@@ -185,6 +185,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       durationTimeMode,
     ],
   );
+
   return (
     <MealPlanSetupForm
       initialValues={initialValues}

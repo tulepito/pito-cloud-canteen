@@ -115,6 +115,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   const customHandleSubmit = (event: any) => {
     return handleSubmit(event)?.then((submitResult) => {
       form.reset();
+
       return { submitResult };
     });
   };

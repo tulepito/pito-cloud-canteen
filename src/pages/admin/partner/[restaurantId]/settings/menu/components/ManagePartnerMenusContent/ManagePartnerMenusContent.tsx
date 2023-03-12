@@ -46,6 +46,7 @@ const TABLE_COLUNMS: TColumn[] = [
           </div>
         );
       }
+
       return (
         <div className={css.row}>
           {title}
@@ -65,6 +66,7 @@ const TABLE_COLUNMS: TColumn[] = [
       if (isDeleted) {
         return <></>;
       }
+
       return (
         <div className={css.row}>
           <div>
@@ -106,6 +108,7 @@ const TABLE_COLUNMS: TColumn[] = [
       if (toggleInProgress) {
         return <IconSpinner className={css.loadingIcon} />;
       }
+
       return listingState === EListingStates.draft ? (
         <></>
       ) : (
@@ -126,6 +129,7 @@ const TABLE_COLUNMS: TColumn[] = [
       if (isDeleted) {
         return <></>;
       }
+
       return (
         <div>
           <NamedLink
@@ -558,6 +562,7 @@ const ManagePartnerMenusContent: React.FC<TManagePartnerMenusContent> = ({
   const menuLabel: React.FC<TTabsItem & { isActive: boolean }> = useCallback(
     (menuLabelProps) => {
       const { id, isActive } = menuLabelProps;
+
       return (
         <div className={css.menuContentTabLabel}>
           <div className={css.menuContentTabText}>

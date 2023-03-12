@@ -30,6 +30,7 @@ const baseUrlMaybe = process.env.NEXT_PUBLIC_SHARETRIBE_SDK_BASE_URL
 const memoryStore = (token: string) => {
   const store = sharetribeSdk.tokenStore.memoryStore();
   store.setToken(token);
+
   return store;
 };
 
@@ -40,6 +41,7 @@ const getUserToken = (req: NextApiRequest) => {
     req,
     secure: USING_SSL,
   });
+
   return cookieTokenStore.getToken();
 };
 

@@ -8,6 +8,7 @@ import css from './DayOfWeekCalendarHeader.module.scss';
 
 const DayOfWeekCalendarHeader: React.FC<TDayColumnHeaderProps> = ({ date }) => {
   const dayOfWeek = getDayOfWeekByIndex(date.getDay() - 1);
+
   return (
     <div className={css.root}>
       <FormattedMessage id={`DayOfWeekCalendarHeader.${dayOfWeek}`} />

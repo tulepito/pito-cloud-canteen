@@ -32,6 +32,7 @@ const AdminHeader: React.FC<TAdminHeaderProps> = () => {
 
     router.push('/');
   };
+
   return (
     <div className={css.root}>
       <div className={css.headerRight}>

@@ -157,6 +157,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
           )!,
         ).getPublicData()?.companyName
       : 'Tài khoản cá nhân';
+
   return (
     <>
       <CompanyHeader showBottomLine={!showFeatureHeader} />

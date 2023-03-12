@@ -43,6 +43,7 @@ const uploadImage = createAsyncThunk(
       queryParams,
     );
     const uploadedImage = uploadImageResponse.data.data;
+
     return {
       id,
       uploadedImage,
@@ -79,6 +80,7 @@ const uploadImageSlice = createSlice({
           file,
           uploadedImage,
         };
+
         return {
           ...state,
           uploadImageInProgress: false,

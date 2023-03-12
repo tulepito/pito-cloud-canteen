@@ -62,6 +62,7 @@ const CreatePartnerFoodPage = () => {
         ),
       );
       redirectToEditPage(response.payload);
+
       return response;
     }
     const response = await dispatch(
@@ -73,6 +74,7 @@ const CreatePartnerFoodPage = () => {
       ),
     );
     redirectToEditPage(response.payload);
+
     return response;
   };
 
@@ -88,6 +90,7 @@ const CreatePartnerFoodPage = () => {
       description,
     } = attributes || ({} as TObject);
     const { foodType, menuType, allergicIngredients, ...rest } = publicData;
+
     return {
       images: getInitialAddImages(currentFoodListing?.images || []),
       title,

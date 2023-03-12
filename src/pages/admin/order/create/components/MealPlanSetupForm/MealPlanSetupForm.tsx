@@ -59,6 +59,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
   );
 
   const { pickAllow: pickAllowValue = true } = values;
+
   return (
     <Form onSubmit={handleSubmit}>
       <div className={css.headerLabel}>

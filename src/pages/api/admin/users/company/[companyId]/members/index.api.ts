@@ -34,6 +34,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       const key = Object.keys(members).find(
         (email) => email === user.attributes.email,
       );
+
       return { ...user, ...(key ? { ...members[key] } : {}) };
     });
 

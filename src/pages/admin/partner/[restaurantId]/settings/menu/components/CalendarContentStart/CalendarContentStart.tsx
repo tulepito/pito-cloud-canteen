@@ -18,6 +18,7 @@ const CalendarContentStart = (props: any) => {
   if (!daysOfWeekFromMenu.includes(dayOfWeekToCompare)) {
     return <></>;
   }
+
   return (
     <InlineTextButton
       onClick={onSetCurrentDate({ date, events })}

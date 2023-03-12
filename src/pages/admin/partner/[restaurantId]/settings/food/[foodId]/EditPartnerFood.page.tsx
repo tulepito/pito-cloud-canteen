@@ -54,6 +54,7 @@ const EditPartnerFoodPage = () => {
       description,
     } = attributes || ({} as TObject);
     const { menuType, foodType } = publicData;
+
     return {
       images: getInitialAddImages(currentFoodListing?.images || []),
       title,

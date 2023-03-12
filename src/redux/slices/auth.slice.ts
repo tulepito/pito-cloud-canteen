@@ -52,6 +52,7 @@ const LOGOUT = 'app/auth/LOGOUT';
 const authInfo = createAsyncThunk(AUTH_INFO, async (_, { extra: sdk }) => {
   try {
     const info = await sdk.authInfo();
+
     return info;
   } catch (error) {
     return null;

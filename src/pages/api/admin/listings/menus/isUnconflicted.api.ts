@@ -26,6 +26,7 @@ const handlerWithCustomParams = (req: NextApiRequest, res: NextApiResponse) => {
     startDate,
     endDate,
   };
+
   return checkUnConflictedMenuMiddleware(handler)(req, res, dataToCheck);
 };
 

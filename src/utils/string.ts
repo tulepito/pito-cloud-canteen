@@ -25,6 +25,7 @@ export const shortenString = (
   if (position === 'end') {
     return `${str.slice(0, maxLength)}...`;
   }
+
   return `${str.slice(0, maxLength / 2)}...${str.slice(
     length - maxLength / 2,
   )}`;
@@ -40,5 +41,6 @@ export const capitalize = (str: string) => {
     arr[i] = arr[i].charAt(0).toUpperCase() + arr[i].slice(1);
   }
   const str2 = arr.join(' ');
+
   return str2;
 };

@@ -43,6 +43,7 @@ const FieldDaysOfWeekCheckboxGroupComponent: React.FC<
   const classes = classNames(rootClassName || css.root, className);
   const daysOfWeekToRender =
     (daysOfWeek && daysOfWeek.length > 0 && daysOfWeek) || defaultDaysOfWeek;
+
   return (
     <div className={classes}>
       {label && <label className={css.label}>{label}</label>}

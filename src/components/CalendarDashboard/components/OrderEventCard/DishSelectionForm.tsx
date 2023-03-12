@@ -26,6 +26,7 @@ const validate = (values: TDishSelectionFormValues) => {
   if (!values.dishSelection) {
     errors.dishSelection = 'Required';
   }
+
   return errors;
 };
 

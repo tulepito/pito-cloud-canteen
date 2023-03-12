@@ -43,6 +43,7 @@ const prepareChildren = (children: ReactElement[]) => {
       );
     }
   });
+
   return childrenMap;
 };
 

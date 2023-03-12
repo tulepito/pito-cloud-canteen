@@ -9,6 +9,7 @@ const formatCellValue = (value: any) => {
   if (Array.isArray(value)) {
     return value.length === 0 ? '-' : value.join(', ');
   }
+
   return value;
 };
 
@@ -18,6 +19,7 @@ type TableBodyProps = {
 };
 const TableBody: React.FC<TableBodyProps> = (props) => {
   const { data, editItem } = props;
+
   return (
     <tbody className={css.tableBody}>
       {data.map((item: any, index: number) => (

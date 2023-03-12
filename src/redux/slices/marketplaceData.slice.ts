@@ -11,6 +11,7 @@ const initialState = {
 
 const merge = (entities: TObject, sdkResponse: any) => {
   const apiResponse = sdkResponse.data;
+
   return updatedEntities(entities, apiResponse);
 };
 
@@ -39,6 +40,7 @@ export const getMarketplaceEntitySelector = createDeepEqualSelector(
   (_: any, ref: any) => ref,
   (entities: any, ref: any) => {
     const [entity] = denormalisedEntities(entities, [ref], false);
+
     return entity;
   },
 );

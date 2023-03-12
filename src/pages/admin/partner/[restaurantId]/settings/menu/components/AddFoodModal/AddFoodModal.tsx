@@ -97,20 +97,22 @@ const renderPickedFoods = (ids: string[], foods: TIntegrationListing[]) => {
 
 const sortFoods = ({ columnName, type }: TTableSortValue, data: any) => {
   const isAsc = type === 'asc';
+
   // eslint-disable-next-line array-callback-return
   return data.sort((a: any, b: any) => {
     if (typeof a.data[columnName] === 'number') {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      isAsc
-        ? b.data[columnName] - a.data[columnName]
-        : a.data[columnName] - b.data[columnName];
-    } else if (typeof a.data[columnName] === 'string') {
+      const differenceOf = b.data[columnName] - a.data[columnName];
+
+      return isAsc ? differenceOf : -differenceOf;
+    }
+    if (typeof a.data[columnName] === 'string') {
       if (a.data[columnName] < b.data[columnName]) {
         return isAsc ? -1 : 1;
       }
       if (a.data[columnName] > b.data[columnName]) {
         return isAsc ? 1 : -1;
       }
+
       return 0;
     }
   });
@@ -244,10 +246,12 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
       if (name === 'checkAll') {
         return sortedData.forEach((food: any) => {
           const sideDishes = food?.data?.sideDishes || [];
+
           return form.change(`${food?.data?.id}.sideDishes`, sideDishes);
         });
       }
       const sideDishes = food?.data?.sideDishes || [];
+
       return form.change(`${value}.sideDishes`, sideDishes);
     }
 

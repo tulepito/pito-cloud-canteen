@@ -71,6 +71,7 @@ const QuizSelectCompany = () => {
     if (!values.company) {
       errors.company = 'Vui lòng chọn công ty';
     }
+
     return errors;
   };
 
@@ -89,6 +90,7 @@ const QuizSelectCompany = () => {
   const onFormSubmitClick = () => {
     handleSubmit();
   };
+
   return (
     <QuizModal
       id="QuizSelectCompanyModal"

@@ -8,6 +8,7 @@ import css from './IconBell.module.scss';
 const IconBell: React.FC<TIconProps> = (props) => {
   const { className } = props;
   const classes = classNames(css.root, className);
+
   return (
     <svg
       className={classes}

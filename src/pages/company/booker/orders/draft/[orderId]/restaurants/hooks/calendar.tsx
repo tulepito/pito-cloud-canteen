@@ -94,6 +94,7 @@ export const useGetCalendarExtraResources = ({
             [curr]: { ...orderDetail?.[date] },
           };
         }
+
         return result;
       }, orderDetail);
       await dispatch(

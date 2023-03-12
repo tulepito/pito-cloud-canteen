@@ -510,6 +510,7 @@ const EditPartnerBasicInformationForm: React.FC<
                   <Field name="vat" id="vat">
                     {(vatFieldProps: any) => {
                       const { input } = vatFieldProps;
+
                       return (
                         <ToggleButton
                           className={css.vatButton}

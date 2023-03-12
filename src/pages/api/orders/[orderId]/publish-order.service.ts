@@ -29,6 +29,7 @@ const normalizePlanDetailsData = (planDetails: TPlan['orderDetail']) => {
         [date]: planDataOnDate,
       };
     }
+
     return prev;
   }, {});
 };

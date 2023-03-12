@@ -46,9 +46,11 @@ const checkEmailExisted = createAsyncThunk(
     const response = await Promise.all(
       emailList.map(async (email) => {
         const { data: queryResponse } = await checkEmailExistedApi(email);
+
         return { email, response: queryResponse };
       }),
     );
+
     return response;
   },
 );
@@ -62,6 +64,7 @@ const addMembers = createAsyncThunk(
       companyId: workspaceCompanyId,
     });
     await dispatch(BookerManageCompany.companyInfo());
+
     return addMembersResponse;
   },
 );
@@ -74,6 +77,7 @@ const deleteMember = createAsyncThunk(
       memberEmail: email,
       companyId: workspaceCompanyId,
     });
+
     return deleteMemberData;
   },
 );

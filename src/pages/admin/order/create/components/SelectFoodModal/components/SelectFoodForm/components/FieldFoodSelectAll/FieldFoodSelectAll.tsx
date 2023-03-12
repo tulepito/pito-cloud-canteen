@@ -43,6 +43,7 @@ const FieldFoodSelectAll = (props: any) => {
         <Field type="checkbox" {...rest}>
           {(formRenderProps) => {
             const { input } = formRenderProps;
+
             return (
               <input
                 id={id}

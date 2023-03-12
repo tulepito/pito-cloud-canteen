@@ -156,6 +156,7 @@ export const isEnableSubmitPublishOrder = (
 
 export const isOrderDetailDatePickedFood = (date: any) => {
   const { foodList = [] } = date || {};
+
   return isEmpty(foodList);
 };
 
@@ -231,12 +232,14 @@ export const isOrderDetailFullDatePickingRestaurant = ({
 }) => {
   const dateRange = renderDateRange(startDate, endDate);
   const selectedDate = Object.keys(orderDetail);
+
   return dateRange.length === selectedDate.length;
 };
 
 export const isOrderDetailFullDatePickingFood = (orderDetail: TObject) => {
   return Object.values(orderDetail).every((date) => {
     const { foodList = [] } = date || {};
+
     return !isEmpty(foodList);
   });
 };

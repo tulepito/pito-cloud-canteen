@@ -74,6 +74,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
 
     if (selectedRestaurantId === savedRestaurantId) {
       const foodListObj = detail?.restaurant?.foodList || {};
+
       return Object.keys(foodListObj) || [];
     }
 
@@ -189,6 +190,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
           foodPrice: Listing(food).getAttributes().price?.amount,
         };
       }
+
       return acc;
     }, {});
 

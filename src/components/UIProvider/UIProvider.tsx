@@ -5,6 +5,7 @@ import useLockBodyScroll from '@hooks/useDisableBodyScroll';
 type TUIProviderProps = PropsWithChildren<{}>;
 const UIProvider: React.FC<TUIProviderProps> = ({ children }) => {
   useLockBodyScroll();
+
   return <>{children}</>;
 };
 

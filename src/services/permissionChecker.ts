@@ -35,6 +35,7 @@ const permissionChecker =
         message: "You don't have permission to access this api!",
       });
     }
+
     return handler(req, res);
   };
 

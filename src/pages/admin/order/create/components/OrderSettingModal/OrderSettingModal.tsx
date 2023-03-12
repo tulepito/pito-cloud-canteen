@@ -140,6 +140,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
       const onSelectField = () => {
         setSelectedField(field);
       };
+
       return (
         <div
           key={field}
@@ -362,6 +363,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
               initialValues={initialValues}
               render={(formRenderProps: FormRenderProps) => {
                 const { handleSubmit, form, values, invalid } = formRenderProps;
+
                 return (
                   <Form onSubmit={handleSubmit}>
                     {rightSideRenderer(form, values)}

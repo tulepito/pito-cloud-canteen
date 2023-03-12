@@ -22,11 +22,13 @@ type TKeywordSearchForm = {
 const SecondaryKeywordSearchForm: React.FC<TKeywordSearchForm> = (props) => {
   const intl = useIntl();
   const { placeholder } = props;
+
   return (
     <FinalForm
       {...props}
       render={(fieldRenderProps) => {
         const { handleSubmit } = fieldRenderProps;
+
         return (
           <Form onSubmit={handleSubmit} className={css.root}>
             <FieldTextInput

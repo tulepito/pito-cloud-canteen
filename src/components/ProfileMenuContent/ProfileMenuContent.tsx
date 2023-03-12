@@ -69,6 +69,7 @@ const ProfileMenuContent: React.FC<TProfileMenuContentProps> = (props) => {
       );
     }
   });
+
   return (
     <div className={classes} ref={contentRef} style={style || {}}>
       {arrow}

@@ -48,6 +48,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           },
         });
         const { email: userEmail } = User(userAccount).getAttributes();
+
         return {
           [userEmail]: {
             id: userId,

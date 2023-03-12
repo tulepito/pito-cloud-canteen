@@ -87,6 +87,7 @@ const IntegrationFilterModal: React.FC<TIntegrationFilterModal> = (props) => {
           render={(fieldRenderProps) => {
             const { handleSubmit, form, values } = fieldRenderProps;
             formRef.current = form;
+
             return (
               <Form className={css.filterForm} onSubmit={handleSubmit}>
                 <>{children({ values, form })}</>

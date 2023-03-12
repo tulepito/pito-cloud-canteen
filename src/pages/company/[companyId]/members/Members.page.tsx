@@ -46,12 +46,14 @@ const MembersPage = () => {
     const filteredResult = Object.keys(originCompanyMembers).filter(
       (memberEmail: any) => !originCompanyMembers[memberEmail].id,
     );
+
     return filteredResult.map((userEmail: string) => {
       const initialUser = {
         attributes: {
           email: userEmail,
         },
       } as TUser;
+
       return ensureUser(initialUser);
     });
   }, [originCompanyMembers]);
@@ -78,6 +80,7 @@ const MembersPage = () => {
       ) {
         return [...result, _member.email];
       }
+
       return result;
     },
     [],
@@ -158,6 +161,7 @@ const MembersPage = () => {
         };
         const showDeleteBtn =
           bookerMemberEmails.length > 0 && !bookerMemberEmails.includes(email);
+
         return showDeleteBtn ? (
           <IconDelete className={css.deleteBtn} onClick={onDeleteMember} />
         ) : null;
@@ -210,6 +214,7 @@ const MembersPage = () => {
       }
     });
   }, [deletingMemberEmail, dispatch, onDeleteMemberConfirmationModalClose]);
+
   return (
     <div className={css.container}>
       <div className={css.header}>

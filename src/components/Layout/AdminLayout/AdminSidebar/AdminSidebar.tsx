@@ -162,6 +162,7 @@ const AdminSidebar: React.FC<TAdminSidebarProps> = (props) => {
             const { Icon, id, nameLink } = item;
 
             const isActive = activeMenu?.id === item.id;
+
             return (
               <NamedLink
                 path={nameLink}

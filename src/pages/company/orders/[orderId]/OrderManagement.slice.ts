@@ -87,6 +87,7 @@ const loadData = createAsyncThunk(
   'app/OrderManagement/LOAD_DATA',
   async (orderId: string) => {
     const response: any = await getBookerOrderDataApi(orderId);
+
     return response.data;
   },
 );
@@ -140,6 +141,7 @@ const sendRemindEmailToMember = createAsyncThunk(
             ) {
               return [...ids, memberId as string];
             }
+
             return ids;
           },
           [],
@@ -158,6 +160,7 @@ const sendRemindEmailToMember = createAsyncThunk(
       const participant = participantList.find((p: TUser) => {
         return p.id.uuid === id;
       });
+
       return participant?.attributes.email;
     });
 
@@ -404,6 +407,7 @@ const addParticipant = createAsyncThunk(
     }
 
     await dispatch(loadData(orderId));
+
     return {};
   },
 );

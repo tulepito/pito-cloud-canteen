@@ -24,6 +24,7 @@ type TGeocoderAttributionProps = TDefaultProps & {};
 export const GeocoderAttribution = (props: TGeocoderAttributionProps) => {
   const { rootClassName, className } = props;
   const classes = classNames(rootClassName || css.poweredByGoogle, className);
+
   return <div className={classes} />;
 };
 
@@ -43,6 +44,7 @@ class GeocoderGoogleMaps {
 
     this.sessionToken =
       this.sessionToken || new maps.places.AutocompleteSessionToken();
+
     return this.sessionToken;
   }
 
@@ -88,6 +90,7 @@ class GeocoderGoogleMaps {
       // default prediction defined above
       return prediction.id;
     }
+
     // prediction from Google Maps Places API
     return prediction.place_id;
   }
@@ -100,6 +103,7 @@ class GeocoderGoogleMaps {
       // default prediction defined above
       return prediction.predictionPlace.address;
     }
+
     // prediction from Google Maps Places API
     return prediction.description;
   }
@@ -132,6 +136,7 @@ class GeocoderGoogleMaps {
     return getPlaceDetails(prediction.place_id, this.getSessionToken()).then(
       (place) => {
         this.sessionToken = null;
+
         return place;
       },
     );

@@ -102,6 +102,7 @@ const tabsActive = (isNew: boolean, listing: any) => {
       previousTabIndex >= 0
         ? !isNew || tabCompleted(TABS[previousTabIndex], listing)
         : true;
+
     return { ...acc, [tab]: isActive };
   }, {});
 };
@@ -204,6 +205,7 @@ const EditPartnerWizard = (props: any) => {
             TABS[index - 1],
             partnerListingRef as TIntegrationListing,
           ) && index > 0;
+
         return (
           <EditPartnerWizardTab
             key={tab}

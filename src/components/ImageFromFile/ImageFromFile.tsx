@@ -47,6 +47,7 @@ const ImageFromFile: React.FC<TImageFromFileProps> = (props) => {
   }, []);
   const classes = classNames(rootClassName || css.root, className);
   const aspectRatioClasses = aspectRatioClassName || css.aspectWrapper;
+
   return (
     <Promised
       key={id}

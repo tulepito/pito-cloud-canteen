@@ -29,6 +29,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         // Update order and return values
         const updatedOrderListing = await updateOrder({ orderId, generalInfo });
+
         return res.json(updatedOrderListing);
       } catch (error) {
         // Return error

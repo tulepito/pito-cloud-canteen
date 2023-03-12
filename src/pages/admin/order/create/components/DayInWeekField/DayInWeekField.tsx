@@ -46,6 +46,7 @@ const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
   }, [form, selectedDays, selectedDays.length]);
 
   const containerClasses = classNames(css.container, containerClassName);
+
   return (
     <div className={containerClasses}>
       {title && <div className={css.title}>{title}</div>}
@@ -57,6 +58,7 @@ const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
               setSelectedDays(selectedDays.filter((key) => key !== day.key));
             else setSelectedDays(selectedDays.concat(day.key));
           };
+
           return (
             <div
               key={day.key}

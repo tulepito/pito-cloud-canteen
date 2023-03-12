@@ -5,5 +5,6 @@ export const convertQueryValueToArray = (value?: string | string[]) => {
   if (!value) {
     return [];
   }
+
   return value.split(',');
 };

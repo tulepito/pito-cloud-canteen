@@ -45,6 +45,7 @@ const EditPartnerMenuForm: React.FC<TEditPartnerMenuForm> = (props) => {
       console.error(error);
     }
   };
+
   return (
     <FinalForm
       mutators={{ ...arrayMutators }}

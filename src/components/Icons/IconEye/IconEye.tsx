@@ -9,6 +9,7 @@ const IconEye: React.FC<TIconProps> = (props) => {
   const { rootClassName, className } = props;
 
   const classes = classNames(rootClassName || css.root, className);
+
   return (
     <svg
       preserveAspectRatio="none"

@@ -71,6 +71,7 @@ export const parseFloatNum = (str: string) => {
   // eslint-disable-next-line no-restricted-globals
   const isNumber = !isNaN(num);
   const isFullyParsedNum = isNumber && num.toString() === trimmed;
+
   return isFullyParsedNum ? num : null;
 };
 
@@ -101,6 +102,7 @@ export const decodeLatLng = (str: string) => {
   if (lat === null || lng === null) {
     return null;
   }
+
   return new LatLng(lat, lng);
 };
 
@@ -131,6 +133,7 @@ export const decodeLatLngBounds = (str: string) => {
   if (ne === null || sw === null) {
     return null;
   }
+
   return new LatLngBounds(ne, sw);
 };
 
@@ -172,6 +175,7 @@ export const stringify = (params: TObject) => {
 
     return result;
   }, {});
+
   return queryString.stringify(cleaned);
 };
 
@@ -229,5 +233,6 @@ export const twitterPageURL = (twitterHandle: string) => {
   if (twitterHandle) {
     return `https://twitter.com/${twitterHandle}`;
   }
+
   return null;
 };

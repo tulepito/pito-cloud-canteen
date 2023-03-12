@@ -62,6 +62,7 @@ const orderChecker =
         default:
           break;
       }
+
       return handler(req, res);
     } catch (error) {
       handleError(res, error);

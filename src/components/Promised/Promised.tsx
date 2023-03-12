@@ -37,6 +37,7 @@ const Promised: React.FC<TPromised | any> = (props) => {
           setError(e);
         }
       });
+
     return () => setMounted(false);
   }, [promise]);
 

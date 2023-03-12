@@ -60,6 +60,7 @@ export default function CreateCompanyPage() {
         tax: values.tax,
       },
     };
+
     return dispatch(
       createCompanyPageThunks.createCompany({
         dataParams: companyData,

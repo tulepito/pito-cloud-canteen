@@ -422,6 +422,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
             [curr]: { ...orderDetail[date] },
           };
         }
+
         return result;
       }, orderDetail);
       dispatch(setCanNotGoToStep4(true));

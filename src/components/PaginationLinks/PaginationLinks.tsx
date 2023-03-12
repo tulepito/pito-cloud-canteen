@@ -12,6 +12,7 @@ import css from './PaginationLinks.module.scss';
 let pgKey = 0;
 const paginationGapKey = () => {
   pgKey += 1;
+
   return pgKey;
 };
 
@@ -25,6 +26,7 @@ const paginationGapKey = () => {
 const getPageNumbersArray = (page: number, totalPages: number) => {
   // Create array of numbers: [1, 2, 3, 4, ..., totalPages]
   const numbersFrom1ToTotalPages = range(1, totalPages + 1);
+
   return numbersFrom1ToTotalPages
     .filter((v: any) => {
       // Filter numbers that are next to current page and pick also first and last page
@@ -36,6 +38,7 @@ const getPageNumbersArray = (page: number, totalPages: number) => {
       // E.g. [1, '…', 4, 5, 6, '…', 9], where current page = 5 and totalPages = 9.
       const isFirstPageOrNextToCurrentPage =
         p === 1 || newArray[newArray.length - 1] + 1 === p;
+
       return isFirstPageOrNextToCurrentPage
         ? newArray.concat([p])
         : newArray.concat(['\u2026', p]);
@@ -126,6 +129,7 @@ const PaginationLinks = (props: any) => {
       const pageClassNames = classNames(css.toPageLink, {
         [css.currentPage]: isCurrentPage,
       });
+
       return typeof v === 'number' ? (
         <NamedLink
           key={v}

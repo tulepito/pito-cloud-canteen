@@ -49,10 +49,13 @@ export const createNewPrint = (id: string) => {
             }
           }
         }
+
         return { doc, id };
       });
     }
+
     return promise;
   }
+
   return promise;
 };

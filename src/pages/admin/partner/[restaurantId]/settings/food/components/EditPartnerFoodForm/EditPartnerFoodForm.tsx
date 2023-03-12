@@ -112,6 +112,7 @@ const EditPartnerFoodFormComponent: React.FC<
       // rerun validation
       return form.submit();
     }
+
     return handleSubmitOnClick && handleSubmitOnClick(values);
   };
 
@@ -534,6 +535,7 @@ const EditPartnerFoodForm: React.FC<TEditPartnerFoodFormProps> = (props) => {
       setSubmittedValues(values);
     }
   };
+
   return (
     <FinalForm
       mutators={{ ...arrayMutators }}

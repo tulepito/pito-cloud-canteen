@@ -25,6 +25,7 @@ export const isPathMatchedPermission = (
 ) => {
   if (permission !== EUserPermission.normal) {
     const startPath = startRouteBaseOnPermission[permission];
+
     return pathName.startsWith(startPath);
   }
 

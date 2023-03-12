@@ -83,6 +83,7 @@ const DisableMenuConfirmModal: React.FC<TDisableMenuConfirmModal> = (props) => {
         </div>
       );
     }
+
     return (
       <>
         <p className={css.removeContent}>{content}</p>

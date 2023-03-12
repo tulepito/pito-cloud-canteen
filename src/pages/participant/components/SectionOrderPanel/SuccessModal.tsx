@@ -14,6 +14,7 @@ type TSuccessModal = {
 
 const SuccessModal: React.FC<TSuccessModal> = ({ isOpen, handleClose }) => {
   const intl = useIntl();
+
   return (
     <Modal
       isOpen={isOpen}

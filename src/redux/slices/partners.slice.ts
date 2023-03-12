@@ -154,9 +154,11 @@ const requestAvatarUpload = createAsyncThunk(
         },
       );
       const img = response.data.data;
+
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
       console.error('error', error);
+
       return rejectWithValue({ id, error: storableError(error) });
     }
   },
@@ -182,9 +184,11 @@ const requestCoverUpload = createAsyncThunk(
         },
       );
       const img = response.data.data;
+
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
       console.error(error);
+
       return rejectWithValue({ id, error: storableError(error) });
     }
   },
@@ -207,9 +211,11 @@ const requestBusinessLicenseUpload = createAsyncThunk(
         },
       );
       const img = response.data.data;
+
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
       console.error('error', error);
+
       return rejectWithValue({ id, error: storableError(error) });
     }
   },
@@ -232,9 +238,11 @@ const requestFoodCertificateUpload = createAsyncThunk(
         },
       );
       const img = response.data.data;
+
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
       console.error('error', error);
+
       return rejectWithValue({ id, error: storableError(error) });
     }
   },
@@ -257,9 +265,11 @@ const requestPartyInsuranceUpload = createAsyncThunk(
         },
       );
       const img = response.data.data;
+
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
       console.error('error', error);
+
       return rejectWithValue({ id, error: storableError(error) });
     }
   },
@@ -273,9 +283,11 @@ const publishDraftPartner = createAsyncThunk(
       const { user, listing } = data;
       const [partner] = denormalisedResponseEntities(user);
       const [restaurant] = denormalisedResponseEntities(listing);
+
       return fulfillWithValue({ restaurant, partner });
     } catch (error) {
       console.error('error', error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -289,9 +301,11 @@ const discardDraftPartner = createAsyncThunk(
       const { user, listing } = data;
       const [partner] = denormalisedResponseEntities(user);
       const [restaurant] = denormalisedResponseEntities(listing);
+
       return fulfillWithValue({ restaurant, partner });
     } catch (error) {
       console.error('error', error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -321,9 +335,11 @@ const createDraftPartner = createAsyncThunk(
       const { listing: listingRes, user: userRes } = data;
       const [listing] = denormalisedResponseEntities(listingRes);
       const [user] = denormalisedResponseEntities(userRes);
+
       return fulfillWithValue({ listing, user });
     } catch (error: any) {
       console.error(error);
+
       return rejectWithValue(storableError(error.response.data));
     }
   },
@@ -343,9 +359,11 @@ const showPartnerRestaurantListing = createAsyncThunk(
         },
       });
       const [partner] = denormalisedResponseEntities(data);
+
       return fulfillWithValue(partner);
     } catch (error) {
       console.error(error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -363,9 +381,11 @@ const updatePartnerRestaurantListing = createAsyncThunk(
         },
       });
       const [restaurant] = denormalisedResponseEntities(data);
+
       return fulfillWithValue(restaurant);
     } catch (error) {
       console.error(error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -383,9 +403,11 @@ const setRestaurantStatus = createAsyncThunk(
         },
       });
       const [restaurant] = denormalisedResponseEntities(data);
+
       return fulfillWithValue(restaurant);
     } catch (error: any) {
       console.error('Query company error : ', error);
+
       return rejectWithValue(storableError(error.response.data));
     }
   },
@@ -397,9 +419,11 @@ const deleteRestaurant = createAsyncThunk(
     try {
       const { partnerId: id } = params;
       const { data } = await deletePartnerApi({ id });
+
       return fulfillWithValue(data);
     } catch (error) {
       console.error('error', error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -429,9 +453,11 @@ const queryRestaurants = createAsyncThunk(
         queryParams: { expand: true },
       });
       const restaurantRefs = denormalisedResponseEntities(data);
+
       return fulfillWithValue({ restaurantRefs, response: data });
     } catch (error: any) {
       console.error('Query company error : ', error);
+
       return rejectWithValue(storableError(error.response.data));
     }
   },
@@ -648,6 +674,7 @@ export const partnerSlice = createSlice({
       }))
       .addCase(queryRestaurants.fulfilled, (state, action) => {
         const { restaurantRefs, response } = action.payload || {};
+
         return {
           ...state,
           restaurantRefs,
@@ -700,6 +727,7 @@ export const partnerSlice = createSlice({
           ...state.uploadedAvatars,
           [id]: { ...action.meta.arg },
         };
+
         return {
           ...state,
           uploadedAvatars,
@@ -714,6 +742,7 @@ export const partnerSlice = createSlice({
           ...state.uploadedAvatars,
           [id]: { id, ...rest },
         };
+
         return { ...state, uploadedAvatars, uploadingAvatars: false };
       })
       .addCase(requestAvatarUpload.rejected, (state, action: any) => {
@@ -722,6 +751,7 @@ export const partnerSlice = createSlice({
           (i: any) => i !== id,
         );
         const uploadedAvatars = omit(state.uploadedAvatars, id);
+
         return {
           ...state,
           uploadedAvatarsOrder,
@@ -738,6 +768,7 @@ export const partnerSlice = createSlice({
           ...state.uploadedCovers,
           [id]: { ...action.meta.arg },
         };
+
         return {
           ...state,
           uploadedCovers,
@@ -753,6 +784,7 @@ export const partnerSlice = createSlice({
           ...state.uploadedCovers,
           [id]: { id, ...rest },
         };
+
         return { ...state, uploadedCovers, uploadingCovers: false };
       })
       .addCase(requestCoverUpload.rejected, (state, action: any) => {
@@ -761,6 +793,7 @@ export const partnerSlice = createSlice({
           (i: any) => i !== id,
         );
         const uploadedCovers = omit(state.uploadedCovers, id);
+
         return {
           ...state,
           uploadedCoversOrder,
@@ -840,6 +873,7 @@ export const partnerSlice = createSlice({
           ...state.uploadedBusinessLicense,
           [id]: { ...action.meta.arg },
         };
+
         return {
           ...state,
           uploadedBusinessLicense,
@@ -856,6 +890,7 @@ export const partnerSlice = createSlice({
           ...state.uploadedBusinessLicense,
           [id]: { id, ...rest },
         };
+
         return {
           ...state,
           uploadedBusinessLicense,
@@ -884,6 +919,7 @@ export const partnerSlice = createSlice({
           ...state.uploadedFoodCertificate,
           [id]: { ...action.meta.arg },
         };
+
         return {
           ...state,
           uploadedFoodCertificate,
@@ -900,6 +936,7 @@ export const partnerSlice = createSlice({
           ...state.uploadedFoodCertificate,
           [id]: { id, ...rest },
         };
+
         return {
           ...state,
           uploadedFoodCertificate,
@@ -911,6 +948,7 @@ export const partnerSlice = createSlice({
         const uploadedFoodCertificatesOrder =
           state.uploadedFoodCertificatesOrder.filter((i: any) => i !== id);
         const uploadedFoodCertificate = omit(state.uploadedFoodCertificate, id);
+
         return {
           ...state,
           uploadedFoodCertificatesOrder,
@@ -927,6 +965,7 @@ export const partnerSlice = createSlice({
           ...state.uploadedPartyInsurance,
           [id]: { ...action.meta.arg },
         };
+
         return {
           ...state,
           uploadedPartyInsurance,
@@ -943,6 +982,7 @@ export const partnerSlice = createSlice({
           ...state.uploadedPartyInsurance,
           [id]: { id, ...rest },
         };
+
         return {
           ...state,
           uploadedPartyInsurance,
@@ -954,6 +994,7 @@ export const partnerSlice = createSlice({
         const uploadedPartyInsurancesOrder =
           state.uploadedPartyInsurancesOrder.filter((i: any) => i !== id);
         const uploadedPartyInsurance = omit(state.uploadedPartyInsurance, id);
+
         return {
           ...state,
           uploadedPartyInsurancesOrder,

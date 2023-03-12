@@ -27,6 +27,7 @@ export const filterCompanies = (companies: TCompany[], filterValues: any) => {
   const { keywords } = filterValues;
 
   if (Object.keys(filterValues).length === 0) return companies;
+
   return companies.filter((company) => {
     return (
       // eslint-disable-next-line no-nested-ternary
@@ -99,6 +100,7 @@ export const sortCompanies = (
         User(b).getPublicData()?.companyName?.toLowerCase()
       )
         return 1;
+
       return 0;
     }
     if (
@@ -111,6 +113,7 @@ export const sortCompanies = (
       User(a).getPublicData()?.companyName?.toLowerCase()
     )
       return 1;
+
     return 0;
   });
 };

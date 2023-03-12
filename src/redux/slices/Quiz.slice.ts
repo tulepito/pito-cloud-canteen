@@ -57,6 +57,7 @@ const FETCH_SELECTED_COMPANY = 'app/Quiz/FETCH_SELECTED_COMPANY';
 // ================ Async thunks ================ //
 const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
   const { data: searchFiltersResponse } = await fetchSearchFilterApi();
+
   return searchFiltersResponse;
 });
 
@@ -78,6 +79,7 @@ const fetchRestaurants = createAsyncThunk(
     const restaurants = denormalisedResponseEntities(
       await sdk.listings.query(query),
     );
+
     return restaurants;
   },
 );
@@ -86,6 +88,7 @@ const fetchSelectedCompany = createAsyncThunk(
   FETCH_SELECTED_COMPANY,
   async (companyId: string) => {
     const { data: companyAccount } = await fetchUserApi(companyId);
+
     return companyAccount;
   },
 );

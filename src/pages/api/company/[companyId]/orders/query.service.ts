@@ -126,6 +126,7 @@ export const queryCompanyOrders = async ({
 
       return prev.concat([newList]);
     }
+
     return prev;
   }, []);
 

@@ -16,6 +16,7 @@ type NutritionFieldProps = {
 const NutritionField: React.FC<NutritionFieldProps> = (props) => {
   const { title, titleClassName, fieldClassName, options } = props;
   const intl = useIntl();
+
   return (
     <div className={css.container}>
       {title && (

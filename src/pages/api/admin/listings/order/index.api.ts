@@ -42,6 +42,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               const [company] = denormalisedResponseEntities(
                 companyUserResponse,
               ) as TCompany[];
+
               return {
                 ...order,
                 company,

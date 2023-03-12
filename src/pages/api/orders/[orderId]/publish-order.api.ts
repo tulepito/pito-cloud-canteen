@@ -17,6 +17,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           if (isEmpty(orderId)) {
             res.status(400).json({ error: 'Missing orderId' });
+
             return;
           }
 

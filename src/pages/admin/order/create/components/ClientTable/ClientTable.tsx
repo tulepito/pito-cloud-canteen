@@ -117,6 +117,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
                   css.bookerCard,
                   selectedBookerId === User(booker).getId() && css.selected,
                 );
+
                 return (
                   <div
                     key={User(booker).getId()}
@@ -174,6 +175,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
           data?.length > 0 ? renderTableRowFn(data, form) : noClientsFound;
         const disabled =
           !bookerValue || !clientIdValue || createOrderInProgress;
+
         return (
           <Form onSubmit={handleSubmit}>
             <div className={css.container}>

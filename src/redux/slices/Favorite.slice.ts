@@ -33,6 +33,7 @@ const favoriteRestaurant = createAsyncThunk(
   ) => {
     await favoriteRestaurantApi(companyId, restaurantId);
     await dispatch(QuizThunks.fetchSelectedCompany(companyId));
+
     return '';
   },
 );

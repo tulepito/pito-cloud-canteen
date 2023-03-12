@@ -81,6 +81,7 @@ const OrderDetailTooltip = ({
         const { foodList = {} } = restaurant;
         const totalPrice = Object.keys(foodList).reduce((prev, cur) => {
           const price = foodList[cur].foodPrice;
+
           return prev + price;
         }, 0);
 
@@ -94,10 +95,12 @@ const OrderDetailTooltip = ({
           </div>
         );
       });
+
       return [...prev, ...subOrderDetails];
     },
     [],
   );
+
   return <div className={css.tooltip}>{orderDetails}</div>;
 };
 
@@ -166,6 +169,7 @@ const TABLE_COLUMN: TColumn[] = [
     label: 'Thời gian',
     render: (data: any) => {
       const { startDate, endDate } = data;
+
       return startDate && endDate ? (
         <div className={css.rowText}>
           <div className={css.deliveryHour}>{data.deliveryHour}</div>
@@ -184,6 +188,7 @@ const TABLE_COLUMN: TColumn[] = [
       const { length } = restaurants;
       const moreThanTwo = restaurants.length > 2;
       const remainLength = length - 2;
+
       return length > 0 ? (
         <div className={css.rowText}>
           {restaurants.slice(0, 2).map((restaurantName: string) => (
@@ -259,6 +264,7 @@ const parseEntitiesToTableData = (
             return orderDetail[key]?.restaurant?.restaurantName;
           }),
         );
+
         return [...prevSubOrders, ...listRestaurantName];
       },
       [],
@@ -297,20 +303,22 @@ const parseEntitiesToTableData = (
 
 const sortOrders = ({ columnName, type }: TTableSortValue, data: any) => {
   const isAsc = type === 'asc';
+
   // eslint-disable-next-line array-callback-return
   return data.sort((a: any, b: any) => {
     if (typeof a.data[columnName] === 'number') {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      isAsc
+      return isAsc
         ? b.data[columnName] - a.data[columnName]
         : a.data[columnName] - b.data[columnName];
-    } else if (typeof a.data[columnName] === 'string') {
+    }
+    if (typeof a.data[columnName] === 'string') {
       if (a.data[columnName] < b.data[columnName]) {
         return isAsc ? -1 : 1;
       }
       if (a.data[columnName] > b.data[columnName]) {
         return isAsc ? 1 : -1;
       }
+
       return 0;
     }
   });

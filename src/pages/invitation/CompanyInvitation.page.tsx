@@ -112,6 +112,7 @@ const CompanyInvitationPage = () => {
   if (responseToInvitationResult === 'userAccept') {
     return <RedirectLink pathname={generalPaths.Home} />;
   }
+
   return <div className={css.foodBackground}></div>;
 };
 

@@ -22,6 +22,7 @@ export const getSubAccountSdk = async (subAccount: TUser) => {
     username: subAccountEmail,
     password,
   });
+
   return newSdk;
 };
 

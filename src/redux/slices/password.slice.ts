@@ -38,6 +38,7 @@ const recoverPassword = createAsyncThunk(
 
     try {
       sdk.passwordReset.request({ email });
+
       return fulfillWithValue({ email });
     } catch (error) {
       return rejectWithValue({ error: storableError(error), email });

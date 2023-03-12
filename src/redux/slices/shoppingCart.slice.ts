@@ -41,6 +41,7 @@ export const shoppingCartSlice = createSlice({
       },
     ) => {
       const { currentUserId, planId, dayId, mealId } = payload || {};
+
       return {
         ...state,
         orders: {
@@ -68,6 +69,7 @@ export const shoppingCartSlice = createSlice({
       },
     ) => {
       const { currentUserId, planId, dayId } = payload || {};
+
       return {
         ...state,
         orders: {
@@ -100,6 +102,7 @@ export const shoppingCartSlice = createSlice({
       const mappingData = orderDays.reduce((acc: any, currDay: any) => {
         // eslint-disable-next-line no-param-reassign
         acc[currDay] = null;
+
         return acc;
       }, {});
 
@@ -148,6 +151,7 @@ const removeFromCartThunk = createAsyncThunk(
     { getState, dispatch },
   ) => {
     const { currentUser } = getState().user;
+
     return dispatch(
       shoppingCartSlice.actions.removeToCart({
         currentUserId: (currentUser as TCurrentUser).id.uuid,
@@ -162,6 +166,7 @@ const removeAllFromPlanCartThunk = createAsyncThunk(
   REMOVE_ALL_FROM_PLAN_CART,
   async ({ planId }: { planId: string }, { getState, dispatch }) => {
     const { currentUser } = getState().user;
+
     return dispatch(
       shoppingCartSlice.actions.removeAllFromPlanCart({
         currentUserId: (currentUser as TCurrentUser).id.uuid,

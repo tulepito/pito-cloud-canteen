@@ -28,6 +28,7 @@ export const createEmailParams = (
       Data: content,
     },
   };
+
   return {
     Destination: {
       ToAddresses: toAddresses,

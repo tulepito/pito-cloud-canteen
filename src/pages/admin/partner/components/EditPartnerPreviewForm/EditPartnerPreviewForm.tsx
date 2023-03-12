@@ -36,11 +36,13 @@ import css from './EditPartnerPreviewForm.module.scss';
 
 const getLabelByKey = (list: any[], key: any) => {
   const item = list?.find((l: any) => l.key === key);
+
   return item && item.label ? item.label : key;
 };
 
 const EditPartnerPreviewForm: React.FC<any> = (props) => {
   const intl = useIntl();
+
   return (
     <FinalForm
       {...props}
@@ -91,6 +93,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
           status === ERestaurantListingStatus.unsatisfactory;
         const isAuthorized = status === ERestaurantListingStatus.authorized;
         const isNew = !status || status === ERestaurantListingStatus.new;
+
         return (
           <Form onSubmit={handleSubmit}>
             {isDraftFlow ? (
@@ -280,6 +283,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                       <tbody>
                         {Object.keys(entries).map((day: any) => {
                           const isEntries = Array.isArray(entries[day]);
+
                           return isEntries ? (
                             entries[day]?.map((e: any, eIndx: number) => (
                               <tr key={`${e.startTime}.${eIndx}`}>
@@ -311,6 +315,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                     <Field name="vat" id="vat">
                       {(vatFieldProps: any) => {
                         const { input } = vatFieldProps;
+
                         return (
                           <ToggleButton
                             disabled

@@ -16,6 +16,7 @@ const completeOrder = async (orderId) => {
 
   if (orderState !== OrderStates.inProgress) {
     console.error('Order is not in progress, skip complete order');
+
     return;
   }
 

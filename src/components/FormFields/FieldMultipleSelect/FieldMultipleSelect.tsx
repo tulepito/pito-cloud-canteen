@@ -10,6 +10,7 @@ import css from './FieldMultipleSelect.module.scss';
 
 const getLabelByKey = (list: any[], key: any) => {
   const item = list?.find((l: any) => l.key === key);
+
   return item && item.label ? item.label : key;
 };
 
@@ -23,6 +24,7 @@ const FieldMultipleSelectComponent = (props: any) => {
     e.stopPropagation();
     input.onChange(value.filter((val: string) => val !== newVal));
   };
+
   return (
     <OutsideClickHandler onOutsideClick={onClose}>
       <div className={classNames(css.root, className)}>

@@ -44,6 +44,7 @@ function MonthView({
   const firstDay = currRange[0];
   const totalEmptyDays = (firstDay.getDay() || 7) - 1;
   const emptyDayEls = Array.from(Array(totalEmptyDays).keys());
+
   return (
     <div className={css.root}>
       <div className={css.scrollContainer}>

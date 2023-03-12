@@ -133,6 +133,7 @@ const checkMenuUnconflicted = createAsyncThunk(
   CHECK_MENU_IS_UN_CONFLICTED,
   async (payload: TCheckUnConflictedParams) => {
     const { data } = await checkMenuUnConflictedApi(payload);
+
     return data;
   },
   {
@@ -155,6 +156,7 @@ const queryPartnerMenus = createAsyncThunk(
       perPage: MANAGE_MENU_PAGE_SIZE,
     });
     const menus = denormalisedResponseEntities(response);
+
     return { menus, pagination: response.data.meta };
   },
   {
@@ -185,9 +187,11 @@ const getNumberOfMenuByMealType = createAsyncThunk(
             ...menuMealTypeCount,
             [key]: totalItems,
           };
+
           return response;
         }),
       );
+
       return menuMealTypeCount as TMenuMealTypeCount;
     } catch (error) {
       return storableError(error);
@@ -206,9 +210,11 @@ const createPartnerMenuListing = createAsyncThunk(
         },
       });
       const [menu] = denormalisedResponseEntities(data);
+
       return menu;
     } catch (error) {
       console.error(`${CREATE_PARTNER_MENU_LISTING} error: `, error);
+
       return rejectWithValue(storableAxiosError(error));
     }
   },
@@ -224,9 +230,11 @@ const updatePartnerMenuListing = createAsyncThunk(
           expand: true,
         },
       });
+
       return denormalisedResponseEntities(data)[0];
     } catch (error) {
       console.error(`${CREATE_PARTNER_MENU_LISTING} error: `, error);
+
       return rejectWithValue(storableAxiosError(error));
     }
   },
@@ -252,6 +260,7 @@ const toggleMenuState = createAsyncThunk(
         expand: true,
       },
     });
+
     return denormalisedResponseEntities(data)[0];
   },
   {
@@ -270,9 +279,11 @@ const showPartnerMenuListing = createAsyncThunk(
         },
       });
       const [food] = denormalisedResponseEntities(data);
+
       return fulfillWithValue(food);
     } catch (error) {
       console.error(`${SHOW_PARTNER_MENU_LISTING} error: `, error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -288,9 +299,11 @@ const deletePartnerMenu = createAsyncThunk(
         },
         queryParams: {},
       });
+
       return data;
     } catch (error) {
       console.error(`${DELETE_PARTNER_MENU_LISTING} error: `, error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -301,9 +314,11 @@ const queryMenuOptionsToDuplicate = createAsyncThunk(
   async ({ restaurantId }: { restaurantId: string }, { rejectWithValue }) => {
     try {
       const { data } = await queryAllMenusApi({ restaurantId });
+
       return data;
     } catch (error) {
       console.error(`${QUERY_MENU_OPTIONS_TO_DUPLICATE} error: `, error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -315,9 +330,11 @@ const checkingMenuInTransactionProgress = createAsyncThunk(
     try {
       const { data } = await checkMenuInTransactionProgressApi(id);
       const { isInTransactionProgress } = data;
+
       return fulfillWithValue(isInTransactionProgress);
     } catch (error) {
       console.error(`${SHOW_PARTNER_MENU_LISTING} error: `, error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -493,6 +510,7 @@ const menusSliceSlice = createSlice({
       })
       .addCase(toggleMenuState.pending, (state, { meta }) => {
         const { id } = meta.arg;
+
         return {
           ...state,
           toggleMenuStateInProgressId: id,

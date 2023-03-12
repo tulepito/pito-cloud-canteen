@@ -30,6 +30,7 @@ const validate = (values: TApplyOtherDaysFormValues) => {
   if (!values.selectedDays) {
     errors.selectedDays = 'Required';
   }
+
   return errors;
 };
 
@@ -64,6 +65,7 @@ const ApplyOtherDaysForm: React.FC<TApplyOtherDaysFormProps> = ({
       ),
     [visibleDayInWeek],
   );
+
   return (
     <form className={css.root} onSubmit={handleSubmit}>
       <BasicDayInWeekField

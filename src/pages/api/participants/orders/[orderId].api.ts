@@ -61,6 +61,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(400).json({
           message: 'Missing required keys',
         });
+
         return;
       }
 
@@ -100,6 +101,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const subOrderPromises = plans.map(async (plan: TListing) => {
           const { orderDetail } = Listing(plan).getMetadata();
           const planId = Listing(plan).getId();
+
           return {
             [planId]: await fetchSubOrder(orderDetail),
           };

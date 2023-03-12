@@ -66,6 +66,7 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
       }),
     );
   };
+
   return (
     <FinalForm
       initialValues={initialValues}
@@ -74,6 +75,7 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
         const { handleSubmit, values } = formRenderProps;
         const { members = [] } = values;
         const submitDisabled = updateGroupInProgress || members.length === 0;
+
         return (
           <Form onSubmit={handleSubmit}>
             <div className={classNames(css.fieldInput, css.flexWrap)}>

@@ -44,6 +44,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             errorCode: 'user_not_found',
             message: `Email ${email} chưa có tài khoản`,
           });
+
           return;
         }
 
@@ -59,6 +60,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             errorCode: 'user_already_in_list',
             message: `Đã tồn tại trong danh sách thành viên`,
           });
+
           return;
         }
 
@@ -67,6 +69,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             errorCode: 'user_not_belong_to_company',
             message: `Thanh viên không thuộc công ty`,
           });
+
           return;
         }
 

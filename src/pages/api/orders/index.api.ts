@@ -27,6 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           orderDetail: {},
         });
         orderListing.attributes.metadata.plans = [planListing.id.uuid];
+
         return res.json(orderListing);
       } catch (error) {
         handleError(res, error);

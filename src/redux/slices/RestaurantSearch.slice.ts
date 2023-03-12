@@ -45,6 +45,7 @@ const searchRestaurant = createAsyncThunk(
     const response = await sdk.listings.query(searchParams);
     const { meta } = response.data;
     const results = denormalisedResponseEntities(response);
+
     return {
       pagination: meta,
       results,

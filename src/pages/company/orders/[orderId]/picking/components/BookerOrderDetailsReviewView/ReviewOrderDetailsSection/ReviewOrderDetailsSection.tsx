@@ -36,6 +36,7 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
       if (currIdx !== index) {
         return i;
       }
+
       return changeValue;
     });
 

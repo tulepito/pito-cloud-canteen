@@ -28,6 +28,7 @@ const validate = (values: TUnitBudgetFormValues) => {
   if (!values.packagePerMember) {
     errors.packagePerMember = 'Vui lòng nhập ngân sách';
   }
+
   return errors;
 };
 

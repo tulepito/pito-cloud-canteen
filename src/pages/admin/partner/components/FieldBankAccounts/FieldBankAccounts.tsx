@@ -21,6 +21,7 @@ import css from './FieldBankAccounts.module.scss';
 const FieldBankAccounts: React.FC<any> = (props) => {
   const { id, name, className } = props;
   const intl = useIntl();
+
   return (
     <FieldArray name={name} id={id}>
       {({ fields }: any) => {

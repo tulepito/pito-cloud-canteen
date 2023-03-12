@@ -52,6 +52,7 @@ const isPropValuesEqual = (subject: any, target: any, propNames: string[]) =>
 
 const getUniqueItemsByProperties = (items: any[], propNames: string[]) => {
   const propNamesArray = Array.from(propNames);
+
   return items.filter(
     (item, index, array) =>
       index ===
@@ -81,6 +82,7 @@ const renderListExcludedTimes = (startTime: string, endTime: string) => {
       `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`,
     );
   }
+
   return result;
 };
 
@@ -93,8 +95,10 @@ const renderRangeByStartTime = (
     (prev: string[], cur: TAvailabilityEntry, curIndex: number) => {
       if (curIndex !== index) {
         const listTimes = renderListExcludedTimes(cur.startTime, cur.endTime);
+
         return [...prev, ...listTimes];
       }
+
       return prev;
     },
     [],
@@ -120,6 +124,7 @@ const renderRangeByStartTime = (
           : renderListExcludedTimes(newEndTime, '23:00')),
       ]
     : [];
+
   return result;
 };
 
@@ -140,12 +145,14 @@ const renderExculdedTimes = (
     (prev: string[], cur: TAvailabilityEntry, curIndex: number) => {
       if (curIndex !== index) {
         const listTimes = renderListExcludedTimes(cur.startTime, cur.endTime);
+
         return [...prev, ...listTimes] as string[];
       }
       const listTimes =
         timeType === 'endTime'
           ? renderRangeByStartTime(cur.startTime, timeRanges, index)
           : [];
+
       return [...prev, ...listTimes] as string[];
     },
     [],
@@ -153,8 +160,10 @@ const renderExculdedTimes = (
 
   const result = listTimeRanges.map((time: string) => {
     const [hours, minutes] = time.split(':');
+
     return setHours(setMinutes(new Date(), Number(minutes)), Number(hours));
   });
+
   return result;
 };
 
@@ -249,6 +258,7 @@ const getNewValuesOnDayToApplyChange = ({
   } else {
     newDayToApplyValues = [ALL_WEEK_APPLY];
   }
+
   return { newAvailabilityPlan, newDayToApplyValues };
 };
 
@@ -442,6 +452,7 @@ const DailyPlan: React.FC<any> = (props) => {
             fields.name.split('.');
           const timeRanges =
             values?.[availabilityFieldName]?.[dayOfWeekFieldName] || [];
+
           return (
             <>
               <tr key={`${name}.${index + 1}`} className={css.dailyPlanWrapper}>

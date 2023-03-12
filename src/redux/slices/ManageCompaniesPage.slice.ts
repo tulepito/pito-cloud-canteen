@@ -39,9 +39,11 @@ const queryCompanies = createAsyncThunk(
   async (page: number | undefined, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { data: companies } = await getCompaniesAdminApi();
+
       return fulfillWithValue({ companies, page });
     } catch (error: any) {
       console.error('Query company error : ', error);
+
       return rejectWithValue(storableError(error.response.data));
     }
   },
@@ -62,6 +64,7 @@ const getCompanyMemberDetails = createAsyncThunk(
             ...allMembers,
             [id]: [...allMembers[id], ...members],
           };
+
           return allMembers;
         }),
       );
@@ -69,6 +72,7 @@ const getCompanyMemberDetails = createAsyncThunk(
       return fulfillWithValue(allMembers);
     } catch (error: any) {
       console.error('Query company error : ', error);
+
       return rejectWithValue(storableError(error.response.data));
     }
   },
@@ -80,9 +84,11 @@ const updateCompanyStatus = createAsyncThunk(
     try {
       const { data } = await updateCompanyStatusApi(updateData);
       const [company] = denormalisedResponseEntities(data);
+
       return fulfillWithValue(company);
     } catch (error: any) {
       console.error('Update company status error : ', error);
+
       return rejectWithValue(storableError(error.response.data));
     }
   },
@@ -114,6 +120,7 @@ export const manageCompaniesSlice = createSlice({
   reducers: {
     paginateCompanies: (state, action) => {
       const { page, totalItems, perPage = 10 } = action.payload;
+
       return {
         ...state,
         pagination: {
@@ -134,6 +141,7 @@ export const manageCompaniesSlice = createSlice({
       }))
       .addCase(queryCompanies.fulfilled, (state, action) => {
         const { companies } = action.payload;
+
         return {
           ...state,
           companyRefs: companies,
@@ -159,6 +167,7 @@ export const manageCompaniesSlice = createSlice({
           return company.id.uuid === newCompany.id.uuid;
         });
         companies[index] = newCompany;
+
         return {
           ...state,
           companyRefs: companies,

@@ -20,6 +20,7 @@ const getDynamicPathParamsName = (pathname: string) => {
       paramNames.push(paramsName);
     }
   });
+
   return paramNames;
 };
 
@@ -91,6 +92,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     if (paramNames.includes(key)) {
       return { ...acc, [key]: query[key] };
     }
+
     return acc;
   }, {});
 
@@ -150,6 +152,7 @@ const SubMenu: React.FC<TSubMenuProps> = (props) => {
     ) {
       return router.push({ pathname: nameLink, query: newQueryParams });
     }
+
     return setIsOpen(!isOpen);
   };
 
@@ -231,6 +234,7 @@ const MultiLevelSidebar: React.FC<TMultiLevelSidebarProps> = (props) => {
     menuLabelClassName,
   } = props;
   const rootClasses = classNames(css.root, rootClassName);
+
   return (
     <div className={rootClasses}>
       <Menu

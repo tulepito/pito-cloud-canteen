@@ -40,6 +40,7 @@ const QuizMealStyles = () => {
     if (!values.mealStyles || values.mealStyles.length < 5) {
       errors.mealStyles = intl.formatMessage({ id: 'QuizMealStyles.error' });
     }
+
     return errors;
   };
   const initialValues = useMemo(

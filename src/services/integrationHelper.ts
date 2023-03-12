@@ -10,6 +10,7 @@ export const fetchListing = async (listingId: string) => {
     },
     { expand: true },
   );
+
   return denormalisedResponseEntities(response)[0];
 };
 
@@ -22,5 +23,6 @@ export const fetchUser = async (userId: string) => {
     },
     { expand: true },
   );
+
   return denormalisedResponseEntities(response)[0];
 };

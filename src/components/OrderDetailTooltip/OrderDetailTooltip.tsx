@@ -38,6 +38,7 @@ const OrderDetailTooltip = ({
     },
     [],
   );
+
   return <div className={css.tooltip}>{orderDetails}</div>;
 };
 

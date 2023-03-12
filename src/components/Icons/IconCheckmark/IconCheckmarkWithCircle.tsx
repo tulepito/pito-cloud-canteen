@@ -4,6 +4,7 @@ import type { TIconProps } from '@utils/types';
 
 const IconCheckmarkWithCircle: React.FC<TIconProps> = (props) => {
   const { className, onClick } = props;
+
   return (
     <svg
       preserveAspectRatio="none"

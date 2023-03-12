@@ -24,6 +24,7 @@ const CollapseFilter: React.FC<CollapseFilterProps> = (props) => {
   const iconClasses = classNames(css.directIcon, {
     [css.collapse]: isOptionsCollapse,
   });
+
   return (
     <div className={css.wrapper}>
       <div className={css.header}>

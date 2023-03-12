@@ -102,12 +102,14 @@ const FieldTextInputWithBottomBox: React.FC<TFieldTextInputWithBottomBox> = (
       <FieldArray name={name}>
         {({ fields }) => {
           fieldsArrayRef.current = fields;
+
           return (
             <div className={css.fieldList}>
               {fields.map((_name, index) => {
                 const removeValue = () => {
                   fields.remove(index);
                 };
+
                 return (
                   <div
                     key={`${fields.name}[${index}]`}

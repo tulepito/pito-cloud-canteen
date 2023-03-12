@@ -13,6 +13,7 @@ const FilterLabelsSection: React.FC<TFilterLabelsSectionProps> = ({
   totalResultItems,
 }) => {
   const intl = useIntl();
+
   return (
     <div className={css.root}>
       <div className={css.resultNumber}>

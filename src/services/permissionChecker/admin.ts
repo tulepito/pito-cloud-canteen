@@ -21,6 +21,7 @@ const adminChecker =
           message: 'Forbidden',
         });
       }
+
       return handler(req, res);
     } catch (error) {
       console.error('error', error);

@@ -15,6 +15,7 @@ const combineAccumulatively = (segments: string[], isAdminRoute: boolean) => {
       const last = curIndex > 1 ? acc[curIndex - 1] : '';
       const newPath = `${last}/${cur}`;
       acc.push(newPath);
+
       return acc;
     },
     [],
@@ -23,6 +24,7 @@ const combineAccumulatively = (segments: string[], isAdminRoute: boolean) => {
   if (isAdminRoute) {
     return links.filter((l: string) => l !== '/');
   }
+
   return links;
 };
 
@@ -53,14 +55,17 @@ export const BreadCrumbs = () => {
         route,
         label: adminRoutes?.[activeKey]?.label,
       };
+
       return crumb;
     });
     setCrumbs(newCrumbs);
   }, [asPath, pathname, route]);
+
   return (
     <div className={css.root}>
       {crumbs.map((c: TCrumb, i: number) => {
         const isActive = pathname === c.link;
+
         return (
           <div className={css.crumb} key={i}>
             {i > 0 && i < crumbs.length - 1 && (

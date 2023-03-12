@@ -62,6 +62,7 @@ const MemberDetailPage: React.FC<MemberDetailPageProps> = () => {
         email: memberEmail,
       },
     } as TUser;
+
     return ensureUser(initialUser);
   }, [checkMemberHasFlexAccount, hasFlexAccountCompanyMembers, memberEmail]);
 
@@ -94,6 +95,7 @@ const MemberDetailPage: React.FC<MemberDetailPageProps> = () => {
       },
     );
   }, [dispatch, memberEmail, onDeleteMemberConfirmationModalClose, router]);
+
   return (
     <div className={css.container}>
       <div className={css.backBtn} onClick={handleGoBack}>

@@ -16,9 +16,11 @@ const createCompany = createAsyncThunk(
   async (userData: any, { fulfillWithValue, rejectWithValue }) => {
     try {
       const { data } = await createCompanyApi(userData);
+
       return fulfillWithValue(data);
     } catch (error: any) {
       console.error(error);
+
       return rejectWithValue(storableError(error.response.data));
     }
   },

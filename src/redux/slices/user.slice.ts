@@ -121,6 +121,7 @@ const fetchCurrentUser = createAsyncThunk(
           )[0],
       ),
     );
+
     return { currentUser, favoriteRestaurants, favoriteFood };
   },
   {

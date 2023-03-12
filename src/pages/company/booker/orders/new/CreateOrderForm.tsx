@@ -40,6 +40,7 @@ const validate = (values: TCreateOrderFormValues) => {
   if (values.usePreviousData && !values.previousOrder) {
     errors.previousOrder = 'Vui lòng chọn đơn hàng cũ';
   }
+
   return errors;
 };
 

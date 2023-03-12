@@ -64,8 +64,10 @@ const createFoodByDateByDaysOfWeekField = (
     if (daysOfWeek.includes(key)) {
       return { ...prev, [key]: foodByDate[key] };
     }
+
     return { ...prev };
   }, {});
+
   return newFoodByDates;
 };
 
@@ -78,8 +80,10 @@ const createFoodAveragePriceByDaysOfWeekField = (
     if (daysOfWeek.includes(substringKey)) {
       return { ...prev, [key]: fieldsData[key] };
     }
+
     return { ...prev, [key]: 0 };
   }, {});
+
   return newData;
 };
 
@@ -92,8 +96,10 @@ const createFoodListIdByDaysOfWeekField = (
     if (daysOfWeek.includes(substringKey)) {
       return { ...prev, [key]: fieldsData[key] };
     }
+
     return { ...prev, [key]: [] };
   }, {});
+
   return newData;
 };
 
@@ -106,8 +112,10 @@ const createNutritionsByDaysOfWeekField = (
     if (daysOfWeek.includes(substringKey)) {
       return { ...prev, [key]: fieldsData[key] };
     }
+
     return { ...prev, [key]: [] };
   }, {});
+
   return newData;
 };
 
@@ -129,6 +137,7 @@ export const createAvaragePriceByFoodsByDate = (foodsByDate: any) => {
       [`${dayOfWeek}AverageFoodPrice`]: priceAverage || 0,
     };
   });
+
   return avaragePriceByDayOfWeek;
 };
 
@@ -146,6 +155,7 @@ export const createListFoodIdsByFoodsByDate = (foodsByDate: any) => {
       [`${dayOfWeek}FoodIdList`]: listFoodIds,
     };
   });
+
   return foodIdsByDayOfWeek;
 };
 
@@ -167,6 +177,7 @@ export const createListFoodNutritionByFoodsByDate = (foodsByDate: any) => {
       [`${dayOfWeek}Nutritions`]: nutritionListByDate,
     };
   });
+
   return nutritionsByDayOfWeek;
 };
 
@@ -197,6 +208,7 @@ export const createSubmitFoodsByDate = (foodsByDate: any) => {
       },
     };
   });
+
   return submitValues;
 };
 
@@ -560,6 +572,7 @@ export const createUpdateMenuApplyTimeValues = (values: any) => {
   const endDateToSubmit = isCycleMenu
     ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()
     : endDate;
+
   return {
     id,
     publicData: {
@@ -627,6 +640,7 @@ export const createInitialValuesForFoodsByDate = (
           },
         };
       }, {});
+
       return {
         ...prev,
         [dayOfWeek]: listIdsAsMap,
@@ -708,5 +722,6 @@ export const renderResourcesForCalendar = (
       });
     });
   });
+
   return resourses;
 };

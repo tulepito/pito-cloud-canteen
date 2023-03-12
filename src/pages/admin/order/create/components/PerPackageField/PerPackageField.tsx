@@ -56,6 +56,7 @@ const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
         <Field id="vatAllow" name="vatAllow">
           {(fieldProps) => {
             const { id, input } = fieldProps;
+
             return (
               <Toggle
                 label={intl.formatMessage({

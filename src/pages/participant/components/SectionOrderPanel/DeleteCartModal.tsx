@@ -16,6 +16,7 @@ const DeleteCartModal: React.FC<TDeleteCartModal> = ({
   onConfirm,
 }) => {
   const intl = useIntl();
+
   return (
     <AlertModal
       isOpen={isOpen}
