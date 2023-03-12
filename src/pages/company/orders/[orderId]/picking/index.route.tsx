@@ -1,25 +1,23 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
-import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
-import Meta from '@components/Layout/Meta';
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import {
+  orderDetailsAnyActionsInProgress,
+  OrderManagementsAction,
+  orderManagementThunks,
+} from '@redux/slices/OrderManagement.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
 import { UserPermission } from '@src/types/UserPermission';
 import { CurrentUser } from '@utils/data';
 
-import {
-  orderDetailsAnyActionsInProgress,
-  OrderManagementsAction,
-  orderManagementThunks,
-} from '../OrderManagement.slice';
-
-import BookerOrderDetailsPage from './components/BookerOrderDetails.page';
+import OrderDetailPage from './OrderDetail.page';
 
 const BookerOrderDetailsRoute = () => {
-  const intl = useIntl();
   const dispatch = useAppDispatch();
   const pageDataLoading = useAppSelector(orderDetailsAnyActionsInProgress);
   const { companyId } = useAppSelector((state) => state.OrderManagement);
@@ -46,7 +44,7 @@ const BookerOrderDetailsRoute = () => {
         push(companyPaths.Home);
       }
     }
-  }, [pageDataLoading, companyId, companyData, push]);
+  }, [pageDataLoading, companyId, companyData]);
 
   useEffect(() => {
     return () => {
@@ -55,12 +53,9 @@ const BookerOrderDetailsRoute = () => {
   }, []);
 
   return (
-    <>
-      <Meta
-        title={intl.formatMessage({ id: 'BookerOrderDetailsRoute.title' })}
-      />
-      <BookerOrderDetailsPage />
-    </>
+    <MetaWrapper routeName="BookerOrderDetailsRoute">
+      <OrderDetailPage />
+    </MetaWrapper>
   );
 };
 

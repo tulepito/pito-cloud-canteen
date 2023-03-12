@@ -14,6 +14,7 @@ import OrderDetailTooltip from '@components/OrderDetailTooltip/OrderDetailToolti
 import type { TColumn } from '@components/Table/Table';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
+import { getParticipantPickingLink } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
@@ -228,6 +229,8 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         (state) => state.Order.deleteDraftOrderInProgress,
       );
 
+      const orderLink = getParticipantPickingLink(orderId);
+
       const navigateToDraftOrderDetailPage = () => {
         router.push({
           pathname: companyPaths.EditDraftOrder,
@@ -267,7 +270,6 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       };
 
       const handleCopyOrderLink = () => {
-        const orderLink = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderId}`;
         navigator.clipboard.writeText(orderLink);
       };
 
