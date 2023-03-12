@@ -6,11 +6,11 @@ import type { TUser } from '@utils/types';
 const useActiveCompany = () => {
   const { userPermission, currentUser } = useAppSelector((state) => state.user);
   const { status } = User(currentUser as unknown as TUser).getMetadata();
-  const isCompanyUnactive =
+  const isInactiveCompany =
     userPermission === EUserPermission.company &&
     status === ECompanyStatus.unactive;
 
-  return { isCompanyUnactive };
+  return { isInactiveCompany };
 };
 
 export default useActiveCompany;
