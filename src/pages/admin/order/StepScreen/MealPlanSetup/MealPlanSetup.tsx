@@ -1,3 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { memo, useCallback, useEffect, useMemo } from 'react';
+import { shallowEqual } from 'react-redux';
+import isEmpty from 'lodash/isEmpty';
+
 import { calculateGroupMembersAmount } from '@helpers/company';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -8,9 +13,6 @@ import {
 import { Listing } from '@utils/data';
 import { getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
-import { useCallback, useMemo } from 'react';
-import { shallowEqual } from 'react-redux';
 
 // eslint-disable-next-line import/no-cycle
 import MealPlanSetupForm from '../../create/components/MealPlanSetupForm/MealPlanSetupForm';
@@ -28,6 +30,14 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     shallowEqual,
   );
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
+  const nutritionsOptions = useAppSelector(
+    (state) => state.Order.nutritions,
+    shallowEqual,
+  );
+
+  useEffect(() => {
+    dispatch(orderAsyncActions.fetchNutritions());
+  }, []);
   const {
     companyId: clientId,
     dayInWeek,
@@ -90,8 +100,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         selectedGroups: pickAllowSubmitValue ? selectedGroupsSubmitValue : [],
         deadlineDate: pickAllowSubmitValue ? deadlineDateSubmitValue : null,
         deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
-        dayInWeek: selectedDayInWeek,
         ...rest,
+        dayInWeek: selectedDayInWeek,
       };
       dispatch(changeStep2SubmitStatus(true));
       const { payload }: { payload: any } = await dispatch(
@@ -152,20 +162,20 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       displayedDurationTime: displayedDurationTime || 1,
     }),
     [
-      dayInWeek,
+      JSON.stringify(dayInWeek),
       packagePerMember,
       vatAllow,
       pickAllow,
-      nutritions,
-      selectedGroups,
+      JSON.stringify(nutritions),
+      JSON.stringify(selectedGroups),
       deliveryHour,
       location,
-      deliveryAddress,
+      JSON.stringify(deliveryAddress),
       defaultAddress,
       detailAddress,
       address,
-      defaultOrigin,
-      origin,
+      JSON.stringify(defaultOrigin),
+      JSON.stringify(origin),
       startDate,
       endDate,
       deadlineDate,
@@ -182,8 +192,9 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       currentClient={currentClient}
       selectedBooker={selectedBooker}
       clientId={clientId}
+      nutritionsOptions={nutritionsOptions}
     />
   );
 };
 
-export default MealPlanSetup;
+export default memo(MealPlanSetup);

@@ -1,8 +1,9 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { getSdk, handleError } from '@services/sdk';
 import { CurrentUser, denormalisedResponseEntities } from '@utils/data';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 import queryCompanies from './query.service';
 

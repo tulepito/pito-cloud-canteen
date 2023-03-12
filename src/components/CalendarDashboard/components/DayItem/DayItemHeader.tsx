@@ -1,6 +1,7 @@
-import type { TDayColumnHeaderProps } from '@components/CalendarDashboard/helpers/types';
-import classNames from 'classnames';
 import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
+
+import type { TDayColumnHeaderProps } from '@components/CalendarDashboard/helpers/types';
 
 import css from './DayItem.module.scss';
 

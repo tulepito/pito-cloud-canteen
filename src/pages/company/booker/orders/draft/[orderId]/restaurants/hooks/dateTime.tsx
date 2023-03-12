@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
+
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
-import { useMemo } from 'react';
 
 import { getEndDate, getStartDate } from '../helpers/datetime';
 

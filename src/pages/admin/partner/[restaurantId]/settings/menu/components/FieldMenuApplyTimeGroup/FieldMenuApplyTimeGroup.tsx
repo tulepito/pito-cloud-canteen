@@ -1,3 +1,8 @@
+import React from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import type { FormApi } from 'final-form';
+
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldDaysOfWeekCheckboxGroup from '@components/FormFields/FieldDaysOfWeekCheckboxGroup/FieldDaysOfWeekCheckboxGroup';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
@@ -9,10 +14,6 @@ import {
   numberMinLength,
   required,
 } from '@utils/validators';
-import classNames from 'classnames';
-import type { FormApi } from 'final-form';
-import React from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './FieldMenuApplyTimeGroup.module.scss';
 

@@ -1,4 +1,10 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import React, { useEffect, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import type { FormApi } from 'final-form';
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
@@ -18,14 +24,10 @@ import type {
   TTableSortValue,
 } from '@utils/types';
 import { parsePrice } from '@utils/validators';
-import type { FormApi } from 'final-form';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import useQueryMenuPickedFoods from '../EditPartnerMenuWizard/useQueryMenuPickedFoods';
 import FieldPickedFood from '../FieldPickedFood/FieldPickedFood';
+
 import css from './AddFoodModal.module.scss';
 
 type TAddFoodModal = {
@@ -236,7 +238,18 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
 
   const afterCheckboxChangeHandler = (e: any, rowCheckbox: string[]) => {
     const { name, checked, value } = e.target;
-    if (checked || !form) return;
+    const food = sortedData.find((item: any) => item?.key === value);
+    if (!form) return;
+    if (checked) {
+      if (name === 'checkAll') {
+        return sortedData.forEach((food: any) => {
+          const sideDishes = food?.data?.sideDishes || [];
+          return form.change(`${food?.data?.id}.sideDishes`, sideDishes);
+        });
+      }
+      const sideDishes = food?.data?.sideDishes || [];
+      return form.change(`${value}.sideDishes`, sideDishes);
+    }
 
     if (name === 'rowCheckbox') {
       form.change(value, null);
@@ -275,33 +288,38 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
       />
       {queryFoodsInProgress ? (
         <LoadingContainer />
-      ) : tableData.length > 0 ? (
+      ) : (
         <div className={css.foodPickContainer}>
-          <div className={css.tableContainer}>
-            <Table
-              tableHeadRowClassName={css.tableHeadRow}
-              columns={FOOD_TABLE_COLUMNS}
-              data={sortedData}
-              hasCheckbox
-              values={values}
-              form={form as FormApi}
-              tableHeadCellClassName={css.tableHeadCell}
-              tableBodyCellClassName={css.tableBodyCell}
-              afterCheckboxChangeHandler={afterCheckboxChangeHandler}
-              tableWrapperClassName={css.tableWrapper}
-              tableClassName={css.table}
-              handleSort={handleSort}
-            />
-            {pagination && pagination.totalPages > 1 && (
-              <Pagination
-                className={css.pagination}
-                total={pagination.totalItems}
-                pageSize={pagination.perPage}
-                current={pagination.page}
-                onChange={onPageChange}
+          {tableData.length > 0 ? (
+            <div className={css.tableContainer}>
+              <Table
+                tableHeadRowClassName={css.tableHeadRow}
+                columns={FOOD_TABLE_COLUMNS}
+                data={sortedData}
+                hasCheckbox
+                values={values}
+                form={form as FormApi}
+                tableHeadCellClassName={css.tableHeadCell}
+                tableBodyCellClassName={css.tableBodyCell}
+                afterCheckboxChangeHandler={afterCheckboxChangeHandler}
+                tableWrapperClassName={css.tableWrapper}
+                tableClassName={css.table}
+                handleSort={handleSort}
               />
-            )}
-          </div>
+              {pagination && pagination.totalPages > 1 && (
+                <Pagination
+                  className={css.pagination}
+                  total={pagination.totalItems}
+                  pageSize={pagination.perPage}
+                  current={pagination.page}
+                  onChange={onPageChange}
+                />
+              )}
+            </div>
+          ) : (
+            <div className={css.tableContainer}>Không có kết quả trả về</div>
+          )}
+
           <div className={css.pickedFoodContainer}>
             <div className={css.title}>Món đã chọn</div>
             <div className={css.pickedFoodWrapper}>
@@ -345,8 +363,6 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
             </div>
           </div>
         </div>
-      ) : (
-        <div>Không có kết quả trả về</div>
       )}
     </Modal>
   );

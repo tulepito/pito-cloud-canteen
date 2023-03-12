@@ -1,7 +1,8 @@
-import Button from '@components/Button/Button';
-import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
+
+import Button from '@components/Button/Button';
+import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
 
 import css from './NumberEmployeesForm.module.scss';
 
@@ -18,7 +19,7 @@ export type TNumberEmployeesFormValues = {
 const validate = (values: TNumberEmployeesFormValues) => {
   const errors: any = {};
   if (!values.memberAmount) {
-    errors.memberAmount = 'Required';
+    errors.memberAmount = 'Vui lòng chọn số lượng nhân viên';
   }
   return errors;
 };

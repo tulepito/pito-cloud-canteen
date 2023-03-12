@@ -1,9 +1,11 @@
-import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
-import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
-import IconSearch from '@components/Icons/IconSearch/IconSearch';
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { useIntl } from 'react-intl';
+
+import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconSearch from '@components/Icons/IconSearch/IconSearch';
 
 import css from './ResultDetailModal.module.scss';
 
@@ -45,7 +47,6 @@ const ResultDetailFilters: React.FC<TResultDetailFiltersProps> = ({
     if (selectAllField.input.value && originFoodIdList.length !== 0) {
       onSelectAllFood(originFoodIdList);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [originFoodIdList, selectAllField.input.value]);
 
   useEffect(() => {
@@ -60,7 +61,6 @@ const ResultDetailFilters: React.FC<TResultDetailFiltersProps> = ({
     ) {
       form.change('selectAll', false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFoodIds, originFoodIdList]);
 
   return (

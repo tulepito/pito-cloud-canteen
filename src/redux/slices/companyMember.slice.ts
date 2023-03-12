@@ -1,10 +1,11 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import {
   addMembersApi,
   checkEmailExistedApi,
   deleteMemberApi,
 } from '@apis/companyApi';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import type { TUser } from '@utils/types';
 
 import { BookerManageCompany } from './company.slice';

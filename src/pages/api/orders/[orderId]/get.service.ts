@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import isEmpty from 'lodash/isEmpty';
+
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { EImageVariants, EOrderStates } from '@utils/enums';
 import type { TPlan } from '@utils/orderTypes';
 import type { TObject } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
 
 const getOrder = async ({ orderId }: { orderId: string }) => {
   const integrationSdk = getIntegrationSdk();

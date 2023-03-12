@@ -1,8 +1,10 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { queryAllListings } from '@helpers/apiHelpers';
 import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
 import { EListingType } from '@utils/enums';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const { restaurantId } = req.body;
@@ -22,4 +24,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   }
 }
 
-export default cookies(handler);
+export default cookies(adminChecker(handler));

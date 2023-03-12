@@ -1,6 +1,7 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { HttpMethod } from '@apis/configs';
 import { handleError } from '@services/sdk';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 import createPlan from './create.service';
 import updatePlan from './update.service';

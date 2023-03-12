@@ -43,7 +43,8 @@
     text-align: center;
   }
   & > div:nth-of-type(2) {
-    flex-grow: 1;
+    flex-basis: 250px;
+    @include lineClamp(2);
   }
   & > div:nth-of-type(3) {
     flex-basis: 50px;
@@ -58,7 +59,7 @@
 .root {
   padding: 32px 48px;
   margin: 0 auto;
-  max-width: 600px;
+  max-width: 500px;
 
   .titleContainer {
     display: flex;
@@ -165,6 +166,9 @@
         .tableRowGroup {
           &:last-of-type {
             border-radius: 0 0 8px 8px;
+            .row {
+              border-bottom: none;
+            }
           }
 
           .groupTitle,
@@ -185,6 +189,7 @@
           .row {
             @include textTemplate(12px, 400, 16px);
             transition: 0.25s linear;
+            border-bottom: 1px solid $neutralGray3;
           }
         }
       }

@@ -1,21 +1,27 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
+
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
-import { isEnableSubmitPublishOrder } from '@helpers/orderHelper';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import {
+  findSuitableStartDate,
+  isEnableSubmitPublishOrder,
+} from '@helpers/orderHelper';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { QuizActions } from '@redux/slices/Quiz.slice';
 import { companyPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 import { EBookerOrderDraftStates, EOrderDraftStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
 
 import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
 import LayoutSidebar from '../../components/Layout/LayoutSidebar';
-import css from './BookerDraftOrder.module.scss';
+
 import SidebarContent from './components/SidebarContent/SidebarContent';
 import { useGetPlanDetails, useLoadData } from './hooks/loadData';
 import {
@@ -23,6 +29,8 @@ import {
   useGetCalendarExtraResources,
 } from './restaurants/hooks/calendar';
 import { useGetBoundaryDates } from './restaurants/hooks/dateTime';
+
+import css from './BookerDraftOrder.module.scss';
 
 const EnableToAccessPageOrderStates = [
   EOrderDraftStates.pendingApproval,
@@ -39,9 +47,17 @@ function BookerDraftOrderPage() {
   const { order, companyAccount } = useLoadData({
     orderId: orderId as string,
   });
-  const { orderState, plans = [] } = Listing(order as TListing).getMetadata();
+  const {
+    orderState,
+    plans = [],
+    startDate: startDateTimestamp,
+    endDate: endDateTimestamp,
+  } = Listing(order as TListing).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
 
+  const selectedDate = useAppSelector(
+    (state) => state.Order.selectedCalendarDate,
+  );
   const { orderDetail = [] } = useGetPlanDetails();
   const { startDate, endDate } = useGetBoundaryDates(order);
   const calendarExtraResources = useGetCalendarExtraResources({
@@ -55,14 +71,28 @@ function BookerDraftOrderPage() {
     orderDetail,
   );
 
+  const suitableStartDate = useMemo(() => {
+    const temp = findSuitableStartDate({
+      selectedDate,
+      startDate: startDateTimestamp,
+      endDate: endDateTimestamp,
+      orderDetail,
+    });
+
+    return temp instanceof Date ? temp : new Date(temp!);
+  }, [selectedDate, startDateTimestamp, endDateTimestamp, orderDetail]);
+
   const handleFinishOrder = async () => {
-    await dispatch(orderAsyncActions.bookerPublishOrder({ orderId, planId }));
-    setTimeout(() => {
+    const { meta } = await dispatch(
+      orderAsyncActions.bookerPublishOrder({ orderId, planId }),
+    );
+
+    if (meta.requestStatus !== 'rejected') {
       router.push({
         pathname: companyPaths.ManageOrderPicking,
         query: { orderId: orderId as string },
       });
-    }, 1000);
+    }
   };
 
   const handleCollapse = useCallback(() => {
@@ -90,7 +120,12 @@ function BookerDraftOrderPage() {
     endDate,
     isFinishOrderDisabled,
     handleFinishOrder,
+    order,
   });
+
+  useEffect(() => {
+    dispatch(QuizActions.clearQuizData());
+  }, []);
 
   useEffect(() => {
     if (!isEmpty(orderState)) {
@@ -103,7 +138,6 @@ function BookerDraftOrderPage() {
         });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, orderState]);
 
   return (
@@ -118,7 +152,7 @@ function BookerDraftOrderPage() {
         <div className={css.main}>
           <CalendarDashboard
             className={css.calendar}
-            anchorDate={startDate}
+            anchorDate={suitableStartDate}
             startDate={startDate}
             endDate={endDate}
             events={orderDetail}

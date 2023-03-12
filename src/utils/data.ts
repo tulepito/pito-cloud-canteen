@@ -1,6 +1,7 @@
-import { sanitizeEntity } from '@utils/sanitize';
 import merge from 'lodash/merge';
 import reduce from 'lodash/reduce';
+
+import { sanitizeEntity } from '@utils/sanitize';
 
 import type {
   TAvailabilityException,

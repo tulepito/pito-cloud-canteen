@@ -1,7 +1,8 @@
-import type { TIntegrationListing, TListing } from '@utils/types';
-import { isEqual } from 'lodash';
 import type { MutableRefObject } from 'react';
 import { useEffect, useRef } from 'react';
+import { isEqual } from 'lodash';
+
+import type { TIntegrationListing, TListing } from '@utils/types';
 
 const tabsActive = (
   isNew: boolean,

@@ -1,9 +1,10 @@
-import Button from '@components/Button/Button';
-import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
-import { SPECIAL_DIET_OPTIONS } from '@utils/enums';
 import type { ChangeEventHandler } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
+
+import Button from '@components/Button/Button';
+import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import { SPECIAL_DIET_OPTIONS } from '@utils/enums';
 
 import css from './NutritionForm.module.scss';
 

@@ -1,13 +1,14 @@
+import { useEffect, useRef } from 'react';
+import { shallowEqual } from 'react-redux';
+import capitalize from 'lodash/capitalize';
+import { useRouter } from 'next/router';
+
 import Avatar from '@components/Avatar/Avatar';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
-import capitalize from 'lodash/capitalize';
-import { useRouter } from 'next/router';
-import { useEffect, useRef } from 'react';
-import { shallowEqual } from 'react-redux';
 
 import css from './Dropdown.module.scss';
 
@@ -36,22 +37,22 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
     setFalse: onDropdowClose,
   } = useBoolean();
   const titleRef = useRef(selectedValue.label || options[0].label);
-  const companyRefs = useAppSelector(
-    (state) => state.ManageCompaniesPage.companyRefs,
+  const companyList = useAppSelector(
+    (state) => state.BookerCompanies.companies,
     shallowEqual,
   );
   useEffect(() => {
     if (companyId && companyId !== 'personal') {
-      const currentCompany = companyRefs.find(
+      const currentCompany = companyList.find(
         (_company) => User(_company).getId() === companyId,
       );
       setSelectedValue({
-        value: User(currentCompany).getId(),
-        label: User(currentCompany).getPublicData()?.companyName,
+        value: User(currentCompany!).getId(),
+        label: User(currentCompany!).getPublicData()?.companyName,
       });
-      titleRef.current = User(currentCompany).getPublicData()?.companyName;
+      titleRef.current = User(currentCompany!).getPublicData()?.companyName;
     }
-  }, [companyId, companyRefs, setSelectedValue]);
+  }, [companyId, companyList, setSelectedValue]);
 
   return (
     <OutsideClickHandler

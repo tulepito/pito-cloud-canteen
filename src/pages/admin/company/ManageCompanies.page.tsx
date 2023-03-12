@@ -1,3 +1,10 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 /* eslint-disable react-hooks/exhaustive-deps */
 import Button from '@components/Button/Button';
@@ -15,34 +22,19 @@ import { adminRoutes } from '@src/paths';
 import { UserPermission } from '@src/types/UserPermission';
 import { ECompanyStatus } from '@utils/enums';
 import type { TUser } from '@utils/types';
-import classNames from 'classnames';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import KeywordSearchForm from '../partner/components/KeywordSearchForm/KeywordSearchForm';
+
 import type { TUpdateStatus } from './helpers';
 import {
   filterCompanies,
   parseEntitiesToTableData,
   sliceCompanies,
 } from './helpers';
+
 import css from './ManageCompanies.module.scss';
 
 const TABLE_COLUMN: TColumn[] = [
-  {
-    key: 'id',
-    label: 'ID',
-    render: (data: any) => {
-      return (
-        <div className={css.rowId} title={data.id}>
-          {data.id}
-        </div>
-      );
-    },
-  },
   {
     key: 'name',
     label: 'Tên công ty',
@@ -234,7 +226,7 @@ export default function ManageCompanies() {
   }, [JSON.stringify(companyIdsToGetMemberDetails)]);
 
   const onSearchKeyword = (values: any) => {
-    router.replace({
+    router.push({
       pathname,
       query: {
         ...values,

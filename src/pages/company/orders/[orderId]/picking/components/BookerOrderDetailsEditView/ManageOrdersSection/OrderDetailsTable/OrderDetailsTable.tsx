@@ -1,23 +1,37 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-shadow */
+import { useEffect, useState } from 'react';
+import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
+
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { Listing } from '@utils/data';
-import type { TListing, TObject } from '@utils/types';
-import { useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
+import {
+  orderDetailsAnyActionsInProgress,
+  orderManagementThunks,
+} from '@pages/company/orders/[orderId]/OrderManagement.slice';
+import { historyPushState } from '@utils/history';
+import type { TObject } from '@utils/types';
 
-import { orderManagementThunks } from '../../../../OrderManagement.slice';
 import type { TEditOrderRowFormValues } from '../EditOrderRowForm';
 import EditOrderRowModal from '../EditOrderRowModal';
-import { prepareDataForTabs } from './OrderDetailsTable.helpers';
-import css from './OrderDetailsTable.module.scss';
-import type { TAllTabData } from './OrderDetailsTable.utils';
-import {
-  EOrderDetailsTableTab,
-  SELECTED_TABLE_HEAD_IDS,
-  TABLE_TABS,
-} from './OrderDetailsTable.utils';
+import { usePrepareOrderDetailTableData } from '../hooks/usePrepareOrderDetailTableData';
+
+import { EOrderDetailsTableTab, TABLE_TABS } from './OrderDetailsTable.utils';
 import { usePrepareTabItems } from './usePrepareTabItems';
+
+import css from './OrderDetailsTable.module.scss';
+
+const tableTabList = Object.values(TABLE_TABS);
+
+const findTabByValueOrId = (tabId: string) => {
+  const index = tableTabList.findIndex(
+    ({ value, id }) => value === tabId || id === tabId,
+  );
+
+  return index > -1 ? { tab: tableTabList[index], index } : { index };
+};
 
 type TOrderDetailsTableProps = {
   currentViewDate: number;
@@ -29,8 +43,11 @@ type TOrderDetailsTableProps = {
 
 const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   const { currentViewDate, foodOptions } = props;
-  const intl = useIntl();
+  const {
+    query: { tab: tabId },
+  } = useRouter();
   const dispatch = useAppDispatch();
+  const [defaultActiveKey, setDefaultActiveKey] = useState(1);
   const [currentTab, setCurrentTab] = useState(
     TABLE_TABS[EOrderDetailsTableTab.chose].value,
   );
@@ -39,26 +56,9 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   );
   const [isEditSelectionModalOpen, setIsEditSelectionModalOpen] =
     useState(false);
-  const { planData, participantData, anonymousParticipantData, orderData } =
-    useAppSelector((state) => state.OrderManagement);
-  const { packagePerMember = 0 } = Listing(orderData as TListing).getMetadata();
-  const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
-
-  const { restaurant = {}, memberOrders = {} } =
-    orderDetail[currentViewDate.toString()] || {};
-  const { foodList = {} } = restaurant;
-
-  const allTabData: TAllTabData = useMemo(
-    () =>
-      prepareDataForTabs({
-        anonymousParticipantData,
-        participantData,
-        memberOrders,
-        foodList,
-      }),
-    [anonymousParticipantData, participantData, memberOrders, foodList],
-  );
-  const deletedTabData = allTabData[EOrderDetailsTableTab.deleted];
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
+  const { tableHeads, packagePerMember, allTabData, deletedTabData } =
+    usePrepareOrderDetailTableData(currentViewDate);
 
   const handleClickEditOrderItem =
     (tab: EOrderDetailsTableTab, memberId: string) => () => {
@@ -117,12 +117,6 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
     );
   };
 
-  const tableHeads = useMemo(
-    () => SELECTED_TABLE_HEAD_IDS.map((id) => intl.formatMessage({ id })),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
   const tabItems = usePrepareTabItems({
     allTabData,
     tableHeads,
@@ -135,13 +129,33 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   });
 
   const handleTabChange = ({ id }: TTabsItem) => {
-    setCurrentTab(id as EOrderDetailsTableTab);
+    const { tab } = findTabByValueOrId(id as string);
+    const tabValue = tab?.value;
+
+    setCurrentTab(tabValue as EOrderDetailsTableTab);
+    historyPushState('tab', tabValue!);
   };
+
+  useEffect(() => {
+    if (!isEmpty(tabId)) {
+      const { tab, index } = findTabByValueOrId(tabId as string);
+
+      if (index > -1) {
+        setCurrentTab(tab?.value as EOrderDetailsTableTab);
+        setDefaultActiveKey(index + 1);
+      }
+    }
+  }, [JSON.stringify(tabId)]);
 
   return (
     <div className={css.root}>
       <div>
-        <Tabs items={tabItems} onChange={handleTabChange} />
+        <Tabs
+          disabled={inProgress}
+          items={tabItems}
+          onChange={handleTabChange}
+          defaultActiveKey={defaultActiveKey.toString()}
+        />
         <EditOrderRowModal
           isOpen={isEditSelectionModalOpen}
           onClose={handleCloseEditSelectionModal}

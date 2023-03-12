@@ -1,3 +1,6 @@
+import { createSlice } from '@reduxjs/toolkit';
+import omit from 'lodash/omit';
+
 import {
   addParticipantToOrderApi,
   addUpdateMemberOrder,
@@ -10,7 +13,6 @@ import {
 } from '@apis/orderApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
-import { createSlice } from '@reduxjs/toolkit';
 import { Listing } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import { storableError } from '@utils/errors';
@@ -21,7 +23,6 @@ import type {
   TTransaction,
   TUser,
 } from '@utils/types';
-import omit from 'lodash/omit';
 
 // ================ Initial states ================ //
 type TOrderManagementState = {
@@ -37,6 +38,12 @@ type TOrderManagementState = {
   cancelPickingOrderInProgress: boolean;
   cancelPickingOrderError: any;
   //
+  updateParticipantsInProgress: boolean;
+  updateParticipantsError: any;
+  //
+  addOrUpdateMemberOrderInProgress: boolean;
+  addOrUpdateMemberOrderError: any;
+
   isStartOrderInProgress: boolean;
   // Data states
   companyId: string | null;
@@ -58,6 +65,10 @@ const initialState: TOrderManagementState = {
   isSendingRemindEmail: false,
   cancelPickingOrderInProgress: false,
   cancelPickingOrderError: null,
+  updateParticipantsInProgress: false,
+  updateParticipantsError: null,
+  addOrUpdateMemberOrderInProgress: false,
+  addOrUpdateMemberOrderError: null,
   isStartOrderInProgress: false,
   companyId: null,
   companyData: null,
@@ -150,7 +161,7 @@ const sendRemindEmailToMember = createAsyncThunk(
       return participant?.attributes.email;
     });
 
-    sendRemindEmailToMemberApi(orderId, {
+    await sendRemindEmailToMemberApi(orderId, {
       orderLink,
       deadline,
       description,
@@ -359,7 +370,7 @@ const deleteDisAllowedMember = createAsyncThunk(
 
 const addParticipant = createAsyncThunk(
   'app/OrderManagement/ADD_PARTICIPANT',
-  async (params: TObject, { getState, dispatch }) => {
+  async (params: TObject, { getState, dispatch, rejectWithValue }) => {
     const { email } = params;
     const { companyId } = getState().OrderManagement;
 
@@ -385,53 +396,66 @@ const addParticipant = createAsyncThunk(
       orderDetail,
     };
 
-    await addParticipantToOrderApi(orderId, bodyParams);
+    const response = await addParticipantToOrderApi(orderId, bodyParams);
+    const { data } = response || {};
+
+    if (data?.errorCode) {
+      return rejectWithValue(data?.message);
+    }
+
     await dispatch(loadData(orderId));
+    return {};
   },
 );
 
 const deleteParticipant = createAsyncThunk(
   'app/OrderManagement/DELETE_PARTICIPANT',
-  async (params: TObject, { getState, dispatch }) => {
-    const { participantId } = params;
-    const {
-      id: { uuid: orderId },
-      attributes: {
-        metadata: { participants = [] },
-      },
-    } = getState().OrderManagement.orderData!;
-    const {
-      id: { uuid: planId },
-      attributes: {
-        metadata: { orderDetail },
-      },
-    } = getState().OrderManagement.planData!;
+  async (params: TObject, { getState, dispatch, rejectWithValue }) => {
+    try {
+      const { participantId } = params;
+      const {
+        id: { uuid: orderId },
+        attributes: {
+          metadata: { participants = [] },
+        },
+      } = getState().OrderManagement.orderData!;
+      const {
+        id: { uuid: planId },
+        attributes: {
+          metadata: { orderDetail },
+        },
+      } = getState().OrderManagement.planData!;
 
-    const newOrderDetail = Object.entries(orderDetail).reduce(
-      (result, current) => {
-        const [date, orderDetailOnDate] = current;
-        const { memberOrders } = orderDetailOnDate as TObject;
+      const newOrderDetail = Object.entries(orderDetail).reduce(
+        (result, current) => {
+          const [date, orderDetailOnDate] = current;
+          const { memberOrders } = orderDetailOnDate as TObject;
 
-        return {
-          ...result,
-          [date]: {
-            ...(orderDetailOnDate as TObject),
-            memberOrders: omit(memberOrders, [participantId]),
-          },
-        };
-      },
-      {},
-    );
+          return {
+            ...result,
+            [date]: {
+              ...(orderDetailOnDate as TObject),
+              memberOrders: omit(memberOrders, [participantId]),
+            },
+          };
+        },
+        {},
+      );
 
-    const bodyParams = {
-      participantId,
-      participants: participants.filter((pId: string) => pId !== participantId),
-      newOrderDetail,
-      planId,
-    };
+      const bodyParams = {
+        participantId,
+        participants: participants.filter(
+          (pId: string) => pId !== participantId,
+        ),
+        newOrderDetail,
+        planId,
+      };
 
-    await deleteParticipantFromOrderApi(orderId, bodyParams);
-    await dispatch(loadData(orderId));
+      await deleteParticipantFromOrderApi(orderId, bodyParams);
+      await dispatch(loadData(orderId));
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   },
 );
 
@@ -477,7 +501,22 @@ export const orderManagementThunks = {
 const OrderManagementSlice = createSlice({
   name: 'OrderManagement',
   initialState,
-  reducers: {},
+  reducers: {
+    clearOrderData: (state) => {
+      return {
+        ...state,
+        companyId: null,
+        companyData: null,
+        orderData: {},
+        planData: {},
+        bookerData: null,
+        participantData: [],
+        anonymousParticipantData: [],
+        transactionDataMap: {},
+        isFetchingOrderDetails: false,
+      };
+    },
+  },
   extraReducers: (builder) => {
     builder
       /* =============== loadData =============== */
@@ -504,16 +543,7 @@ const OrderManagementSlice = createSlice({
       .addCase(loadData.rejected, (state) => {
         state.isFetchingOrderDetails = false;
       })
-      /* =============== deleteParticipant =============== */
-      .addCase(deleteParticipant.pending, (state) => {
-        state.isDeletingParticipant = true;
-      })
-      .addCase(deleteParticipant.fulfilled, (state) => {
-        state.isDeletingParticipant = false;
-      })
-      .addCase(deleteParticipant.rejected, (state) => {
-        state.isDeletingParticipant = false;
-      })
+
       /* =============== updateOrderGeneralInfo =============== */
       .addCase(updateOrderGeneralInfo.pending, (state) => {
         state.isUpdatingOrderDetails = true;
@@ -558,7 +588,40 @@ const OrderManagementSlice = createSlice({
         ...state,
         cancelPickingOrderInProgress: false,
         cancelPickingOrderError: payload,
-      }));
+      }))
+      /* =============== addParticipant =============== */
+      .addCase(addParticipant.pending, (state) => {
+        state.updateParticipantsInProgress = true;
+        state.updateParticipantsError = null;
+      })
+      .addCase(addParticipant.fulfilled, (state) => {
+        state.updateParticipantsInProgress = false;
+      })
+      .addCase(addParticipant.rejected, (state, { payload }) => {
+        state.updateParticipantsInProgress = false;
+        state.updateParticipantsError = payload;
+      })
+      /* =============== deleteParticipant =============== */
+      .addCase(deleteParticipant.pending, (state) => {
+        state.isDeletingParticipant = true;
+      })
+      .addCase(deleteParticipant.fulfilled, (state) => {
+        state.isDeletingParticipant = false;
+      })
+      .addCase(deleteParticipant.rejected, (state) => {
+        state.isDeletingParticipant = false;
+      })
+      /* =============== addOrUpdateMemberOrder =============== */
+      .addCase(addOrUpdateMemberOrder.pending, (state) => {
+        state.addOrUpdateMemberOrderError = null;
+        state.addOrUpdateMemberOrderInProgress = true;
+      })
+      .addCase(addOrUpdateMemberOrder.fulfilled, (state) => {
+        state.addOrUpdateMemberOrderInProgress = false;
+      })
+      .addCase(addOrUpdateMemberOrder.rejected, (state) => {
+        state.addOrUpdateMemberOrderInProgress = false;
+      });
   },
 });
 
@@ -572,13 +635,9 @@ export const orderDetailsAnyActionsInProgress = (state: RootState) => {
     isFetchingOrderDetails,
     isDeletingParticipant,
     isUpdatingOrderDetails,
-    isSendingRemindEmail,
   } = state.OrderManagement;
 
   return (
-    isFetchingOrderDetails ||
-    isDeletingParticipant ||
-    isUpdatingOrderDetails ||
-    isSendingRemindEmail
+    isFetchingOrderDetails || isDeletingParticipant || isUpdatingOrderDetails
   );
 };

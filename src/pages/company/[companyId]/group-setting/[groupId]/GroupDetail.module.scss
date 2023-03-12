@@ -37,7 +37,6 @@
 
 .addMemberBtn {
   @include flexAlign(center);
-  @include buttonColorInline;
   min-height: 64px;
   border-radius: 8px;
   padding-left: 12px;
@@ -58,6 +57,7 @@
     border: 1px solid $neutralGray4;
     border-radius: 8px;
     border-spacing: 0;
+    border-collapse: unset;
 
     .tableHead {
       height: 40px;
@@ -104,7 +104,6 @@
           padding: 9px 16px;
           font-size: 16px;
           color: $neutralGray6;
-          border-bottom: 1px solid $neutralGray4;
         }
         &:last-child .tableBodyCell {
           border-bottom: none;

@@ -1,12 +1,13 @@
-import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 import React from 'react';
 
-import CreateOrderPage from '../create/CreateOrder.page';
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
+
+import OrderDetailPage from './OrderDetail.page';
 
 export default function CreateOrderRoute() {
   return (
     <MetaWrapper routeName="CreateOrderRoute">
-      <CreateOrderPage />
+      <OrderDetailPage />
     </MetaWrapper>
   );
 }

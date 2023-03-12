@@ -1,10 +1,11 @@
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+
 import Form from '@components/Form/Form';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import DayInWeekField from '../DayInWeekField/DayInWeekField';
 import DeliveryAddressField from '../DeliveryAddressField/DeliveryAddressField';
@@ -18,6 +19,7 @@ import NutritionField from '../NutritionField/NutritionField';
 import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
 import ParticipantSetupField from '../ParticipantSetupField/ParticipantSetupField';
 import PerPackageField from '../PerPackageField/PerPackageField';
+
 import css from './MealPlanSetupForm.module.scss';
 
 export type TMealPlanSetupFormValues = {
@@ -29,6 +31,10 @@ type TExtraProps = {
   currentClient: TUser;
   selectedBooker: TUser;
   clientId: string;
+  nutritionsOptions: {
+    label: string;
+    key: string;
+  }[];
 };
 type TMealPlanSetupFormComponentProps =
   FormRenderProps<TMealPlanSetupFormValues> & Partial<TExtraProps>;
@@ -45,6 +51,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
     values,
     form,
     clientId,
+    nutritionsOptions,
   } = props;
   const intl = useIntl();
   const step2SubmitInProgress = useAppSelector(
@@ -81,6 +88,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
       <div className={css.fieldSection}>
         <NutritionField
           title={intl.formatMessage({ id: 'NutritionField.title' })}
+          options={nutritionsOptions}
         />
       </div>
       <div className={css.fieldSection}>

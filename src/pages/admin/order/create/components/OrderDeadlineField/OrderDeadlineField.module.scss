@@ -45,3 +45,26 @@
   outline: none !important;
   padding: 0 !important;
 }
+
+.tooltipOverlay {
+  opacity: 1;
+}
+
+.tooltipOverlay :global(.rc-tooltip-inner) {
+  opacity: 1;
+  background-color: $neutralGray6;
+}
+
+.tooltipOverlay :global(.rc-tooltip-arrow) {
+  border-color: $neutralGray6;
+  border-right-color: $neutralGray1;
+  border-left-color: $neutralGray1;
+}
+
+.iconWrapper {
+  display: inline-flex;
+}
+
+.optionPlaceholder {
+  color: $neutralGray4;
+}

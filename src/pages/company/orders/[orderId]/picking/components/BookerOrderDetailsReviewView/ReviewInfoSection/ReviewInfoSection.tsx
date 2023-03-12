@@ -1,10 +1,12 @@
-import Collapsible from '@components/Collapsible/Collapsible';
-import classNames from 'classnames';
 import React from 'react';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import Collapsible from '@components/Collapsible/Collapsible';
 
 import type { TReviewInfoFormValues } from './ReviewInfoForm';
 import ReviewInfoForm from './ReviewInfoForm';
+
 import css from './ReviewInfoSection.module.scss';
 
 type TReviewInfoSectionProps = {

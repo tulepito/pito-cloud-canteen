@@ -1,4 +1,9 @@
-/* eslint-disable no-plusplus */
+import React from 'react';
+import { FieldArray } from 'react-final-form-arrays';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+import { setHours, setMinutes } from 'date-fns';
+
 import { InlineTextButton } from '@components/Button/Button';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
@@ -20,14 +25,10 @@ import {
   timeToMinute,
   validAvailabilityPlanEntries,
 } from '@utils/validators';
-import classNames from 'classnames';
-import { setHours, setMinutes } from 'date-fns';
-import React from 'react';
-import { FieldArray } from 'react-final-form-arrays';
-import { FormattedMessage, useIntl } from 'react-intl';
+
+import FieldEntryTime from './FieldEntryTime';
 
 import css from './FieldAvailability.module.scss';
-import FieldEntryTime from './FieldEntryTime';
 
 type TAvailabilityEntry = {
   startTime: string;

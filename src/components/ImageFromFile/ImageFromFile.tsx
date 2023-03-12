@@ -1,9 +1,10 @@
-import Promised from '@components/Promised/Promised';
-import classNames from 'classnames';
-import Image from 'next/image';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
+import Image from 'next/image';
+
+import Promised from '@components/Promised/Promised';
 
 import css from './ImageFromFile.module.scss';
 

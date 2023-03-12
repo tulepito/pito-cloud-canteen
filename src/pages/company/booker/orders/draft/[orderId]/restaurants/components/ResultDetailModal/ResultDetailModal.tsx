@@ -1,3 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
@@ -9,19 +14,19 @@ import useBoolean from '@hooks/useBoolean';
 import { Listing } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
-import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
 
 import { BookerSelectRestaurantThunks } from '../../BookerSelectRestaurant.slice';
 import { getListingImageById } from '../../helpers';
 import { useGetPlanDetails } from '../../hooks/orderData';
+import { useGetRestaurant } from '../../hooks/restaurants';
 import FoodDetailModal from '../FoodDetailModal/FoodDetailModal';
+
 import FoodListSection from './FoodListSection';
 import ResultDetailFilters from './ResultDetailFilters';
 import ResultDetailHeader from './ResultDetailHeader';
-import css from './ResultDetailModal.module.scss';
 import TopContent from './TopContent';
+
+import css from './ResultDetailModal.module.scss';
 
 type TResultDetailModalProps = {
   isOpen?: boolean;
@@ -52,7 +57,6 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   fetchFoodInProgress,
 }) => {
   const intl = useIntl();
-
   const router = useRouter();
   const { timestamp } = router.query;
 
@@ -60,15 +64,19 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   const foodModal = useBoolean(false);
   const [selectedFood, setSelectedFood] = useState<TListing | null>(null);
 
+  const { restaurant: preselectedRestaurant } = useGetRestaurant();
+
   const { orderId, planId, planDetail } = useGetPlanDetails();
   const initFoodList = useMemo(() => {
     const detail =
       Listing(planDetail).getMetadata().orderDetail?.[`${timestamp}`];
     const savedRestaurantId = detail?.restaurant?.id;
+
     if (selectedRestaurantId === savedRestaurantId) {
       const foodListObj = detail?.restaurant?.foodList || {};
       return Object.keys(foodListObj) || [];
     }
+
     return [];
   }, [planDetail, timestamp, isOpen]);
 
@@ -85,10 +93,12 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
 
   const currentRestaurant = useMemo(
     () =>
+      preselectedRestaurant ||
       restaurants.find(
         (restaurant) => restaurant.id?.uuid === selectedRestaurantId,
-      ) || null,
-    [restaurants, selectedRestaurantId],
+      ) ||
+      null,
+    [restaurants, selectedRestaurantId, JSON.stringify(preselectedRestaurant)],
   );
   const { geolocation: restaurantOrigin } = Listing(
     currentRestaurant!,
@@ -131,17 +141,18 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
 
   const foodList = restaurantFood?.[selectedRestaurantId!];
 
+  const submitFoodListDisabled = selectedFoods.length === 0;
+
   // Method
   const dispatch = useAppDispatch();
 
-  const handleSelecFood = useCallback(
+  const handleSelectFood = useCallback(
     (foodId: string) => {
       setSelectedFoods([...selectedFoods, foodId]);
       if (foodModal.value) {
         foodModal.setFalse();
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedFoods, foodModal.value],
   );
 
@@ -199,8 +210,8 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
         updateMode: 'merge',
       }),
     );
-    router.push(`/company/booker/orders/draft/${orderId}`);
     onClose();
+    router.push(`/company/booker/orders/draft/${orderId}`);
   };
 
   useEffect(() => {
@@ -215,6 +226,10 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     },
     [onSearchSubmit, selectedRestaurantId],
   );
+
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <>
@@ -260,7 +275,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
             />
             <FoodListSection
               foodList={foodList}
-              onSelectFood={handleSelecFood}
+              onSelectFood={handleSelectFood}
               onRemoveFood={handleRemoveFood}
               onClickFood={handleOpenFoodDetail}
               selectedFoodIds={selectedFoods}
@@ -269,7 +284,10 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
           </div>
         </div>
         <div className={css.footer}>
-          <Button className={css.submitBtn} onClick={handleConfirmFoodList}>
+          <Button
+            className={css.submitBtn}
+            onClick={handleConfirmFoodList}
+            disabled={submitFoodListDisabled}>
             <span>
               {intl.formatMessage(
                 {
@@ -290,7 +308,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
         isOpen={foodModal.value}
         food={selectedFood!}
         onClose={foodModal.setFalse}
-        onSelect={handleSelecFood}
+        onSelect={handleSelectFood}
       />
     </>
   );

@@ -1,12 +1,12 @@
-import 'react-datepicker/dist/react-datepicker.css';
-
-import ValidationError from '@components/ValidationError/ValidationError';
-import classNames from 'classnames';
-import viLocale from 'date-fns/locale/vi';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import type { FieldProps, FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
+import classNames from 'classnames';
+import viLocale from 'date-fns/locale/vi';
 
+import ValidationError from '@components/ValidationError/ValidationError';
+
+import 'react-datepicker/dist/react-datepicker.css';
 import css from './FieldDatePicker.module.scss';
 
 registerLocale('vi', viLocale);

@@ -1,5 +1,6 @@
-import AlertModal from '@components/Modal/AlertModal';
 import { useIntl } from 'react-intl';
+
+import AlertModal from '@components/Modal/AlertModal';
 
 type TDeleteCartModal = {
   isOpen: boolean;

@@ -1,3 +1,7 @@
+import React from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconBox from '@components/Icons/IconBox/IconBox';
@@ -13,9 +17,6 @@ import {
   EImageVariants,
   PACKAGING_OPTIONS,
 } from '@utils/enums';
-import classNames from 'classnames';
-import React from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './RestaurantCard.module.scss';
 
@@ -84,7 +85,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
         <IconGift className={css.gift} />
         <span>x2</span>
       </div>
-      <div className={css.coverImage}>
+      <div className={css.coverImage} onClick={handleClickCard}>
         <ResponsiveImage
           alt="card"
           image={restaurantCoverImage}

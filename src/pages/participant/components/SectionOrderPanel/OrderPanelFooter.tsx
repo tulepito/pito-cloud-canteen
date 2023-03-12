@@ -1,5 +1,6 @@
-import Button, { InlineTextButton } from '@components/Button/Button';
 import { useIntl } from 'react-intl';
+
+import Button, { InlineTextButton } from '@components/Button/Button';
 
 import css from './SectionOrderPanel.module.scss';
 

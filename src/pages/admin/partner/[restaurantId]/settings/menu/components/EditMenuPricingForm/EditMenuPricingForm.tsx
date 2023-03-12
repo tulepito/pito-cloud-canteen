@@ -1,19 +1,21 @@
 /* eslint-disable @typescript-eslint/default-param-last */
-import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
-import Form from '@components/Form/Form';
-import { IntegrationListing } from '@utils/data';
-import type { TIntegrationListing } from '@utils/types';
-import type { FormApi } from 'final-form';
 import { useImperativeHandle, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
+import type { FormApi } from 'final-form';
+
+import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
+import Form from '@components/Form/Form';
+import { IntegrationListing } from '@utils/data';
+import type { TIntegrationListing } from '@utils/types';
 
 import AddFoodModal from '../AddFoodModal/AddFoodModal';
 import CalendarContentEnd from '../CalendarContentEnd/CalendarContentEnd';
 import CalendarContentStart from '../CalendarContentStart/CalendarContentStart';
 import { renderResourcesForCalendar } from '../EditPartnerMenuWizard/utils';
 import FoodEventCard from '../FoodEventCard/FoodEventCard';
+
 import css from './EditMenuPricingForm.module.scss';
 
 export type TEditMenuPricingFormValues = {
@@ -27,6 +29,7 @@ type TExtraProps = {
   currentMenu: TIntegrationListing;
   formRef: any;
   restaurantId: string;
+  anchorDate: Date;
 };
 type TEditMenuPricingFormComponentProps =
   FormRenderProps<TEditMenuPricingFormValues> & Partial<TExtraProps>;
@@ -45,7 +48,8 @@ const EditMenuPricingFormComponent: React.FC<
   TEditMenuPricingFormComponentProps
 > = (props) => {
   const [currentDate, setCurrentDate] = useState<number | null>();
-  const { handleSubmit, currentMenu, values, form, formRef } = props;
+  const { handleSubmit, currentMenu, values, form, formRef, anchorDate } =
+    props;
 
   useImperativeHandle(formRef, () => form);
 
@@ -67,7 +71,7 @@ const EditMenuPricingFormComponent: React.FC<
     });
   };
 
-  const { daysOfWeek } = IntegrationListing(currentMenu).getPublicData();
+  const { daysOfWeek = [] } = IntegrationListing(currentMenu).getPublicData();
 
   const resourcesForCalendar = renderResourcesForCalendar(values.foodsByDate, {
     onRemovePickedFood,
@@ -106,6 +110,7 @@ const EditMenuPricingFormComponent: React.FC<
           <CalendarDashboard
             renderEvent={FoodEventCard}
             events={resourcesForCalendar}
+            anchorDate={anchorDate}
             components={{
               toolbar: () => <></>,
               contentStart: (contentProps: any) => (

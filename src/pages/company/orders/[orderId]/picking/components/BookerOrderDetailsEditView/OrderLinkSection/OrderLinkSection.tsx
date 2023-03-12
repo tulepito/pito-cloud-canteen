@@ -1,23 +1,29 @@
+import React, { useState } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import Button from '@components/Button/Button';
 import ButtonIcon from '@components/ButtonIcon/ButtonIcon';
 import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import IconShare from '@components/Icons/IconShare/IconShare';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import {
+  orderDetailsAnyActionsInProgress,
+  orderManagementThunks,
+} from '@pages/company/orders/[orderId]/OrderManagement.slice';
 import { formatTimestamp } from '@utils/dates';
 import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
-import React, { useState } from 'react';
-import { useIntl } from 'react-intl';
 
-import { orderManagementThunks } from '../../../OrderManagement.slice';
-import css from './OrderLinkSection.module.scss';
 import type { TSendNotificationFormValues } from './SendNotificationForm';
 import SendNotificationModal from './SendNotificationModal';
+
+import css from './OrderLinkSection.module.scss';
 
 type TOrderLinkSectionProps = TDefaultProps & {
   data: {
     orderDeadline: number;
+    companyName: string;
   };
 };
 
@@ -25,11 +31,15 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const {
     rootClassName,
     className,
-    data: { orderDeadline },
+    data: { orderDeadline, companyName },
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const { orderData } = useAppSelector((state) => state.OrderManagement);
+  const [isFirstTimeAccess, setIsFirstTimeAccess] = useState(true);
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
+  const [isSendNotificationModalOpen, setIsSendNotificationModalOpen] =
+    useState(false);
 
   const orderLink = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderData?.id?.uuid}`;
   const formattedOrderDeadline = formatTimestamp(
@@ -47,8 +57,6 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
 
   const [copyToClipboardTooltip, setCopyToClipboardTooltip] =
     useState(defaultCopyText);
-  const [isSendNotificationModalOpen, setIsSendNotificationModalOpen] =
-    useState(false);
 
   const sectionTitle = intl.formatMessage({
     id: 'OrderLinkSection.title',
@@ -64,6 +72,10 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   };
   const handleCloseSendNotificationModal = () => {
     setIsSendNotificationModalOpen(false);
+
+    if (isFirstTimeAccess) {
+      setIsFirstTimeAccess(false);
+    }
   };
 
   const handleSubmitSendNotification = async (
@@ -101,8 +113,11 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
 
       <SendNotificationModal
         onSubmit={handleSubmitSendNotification}
-        data={{ orderLink, orderDeadline }}
-        isOpen={isSendNotificationModalOpen}
+        data={{ orderLink, orderDeadline, companyName }}
+        isFirstTimeShow={isFirstTimeAccess}
+        isOpen={
+          !inProgress && (isFirstTimeAccess || isSendNotificationModalOpen)
+        }
         onClose={handleCloseSendNotificationModal}
       />
     </div>

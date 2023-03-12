@@ -1,7 +1,8 @@
-import Button from '@components/Button/Button';
-import { LocationAutocompleteInputComponent } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
+
+import Button from '@components/Button/Button';
+import { LocationAutocompleteInputComponent } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 
 import css from './LocationForm.module.scss';
 
@@ -18,7 +19,7 @@ export type TLocationFormValues = {
 const validate = (values: TLocationFormValues) => {
   const errors: any = {};
   if (!values.deliveryAddress) {
-    errors.deliveryAddress = 'Required';
+    errors.deliveryAddress = 'Vui lòng chọn địa chỉ giao hàng';
   }
   return errors;
 };

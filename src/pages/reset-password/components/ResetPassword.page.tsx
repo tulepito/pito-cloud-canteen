@@ -1,15 +1,17 @@
+import { useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { passwordThunks } from '@redux/slices/password.slice';
 import { generalPaths } from '@src/paths';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
-import { FormattedMessage } from 'react-intl';
 
-import css from './ResetPassword.module.scss';
 import type { TResetPasswordFormValues } from './ResetPasswordForm';
 import ResetPasswordForm from './ResetPasswordForm';
+
+import css from './ResetPassword.module.scss';
 
 const ResetPasswordPage = () => {
   const router = useRouter();

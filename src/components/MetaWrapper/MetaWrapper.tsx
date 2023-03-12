@@ -1,7 +1,8 @@
-import type { TMetaProps } from '@components/Layout/Meta';
-import Meta from '@components/Layout/Meta';
 import type { PropsWithChildren } from 'react';
 import { useIntl } from 'react-intl';
+
+import type { TMetaProps } from '@components/Layout/Meta';
+import Meta from '@components/Layout/Meta';
 
 type TMetaWrapperProps = PropsWithChildren<
   TMetaProps & {

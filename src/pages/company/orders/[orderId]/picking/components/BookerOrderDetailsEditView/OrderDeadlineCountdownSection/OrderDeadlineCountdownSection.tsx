@@ -1,17 +1,19 @@
+import { useState } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import { DateTime } from 'luxon';
+
 import Button from '@components/Button/Button';
 import CountdownTimer from '@components/CountdownTimer/CountdownTimer';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import { orderManagementThunks } from '@pages/company/orders/[orderId]/OrderManagement.slice';
 import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
-import { DateTime } from 'luxon';
-import { useState } from 'react';
-import { useIntl } from 'react-intl';
 
-import { orderManagementThunks } from '../../../OrderManagement.slice';
 import type { TEditOrderDeadlineFormValues } from './EditOrderDeadlineForm';
 import EditOrderDeadlineModal from './EditOrderDeadlineModal';
+
 import css from './OrderDeadlineCountdownSection.module.scss';
 
 type TOrderDeadlineCountdownSectionProps = TDefaultProps & {

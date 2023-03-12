@@ -4,7 +4,7 @@
 
 .root {
   padding: 33px 48px 24px;
-  max-width: 1180px;
+  max-width: calc(1180px + 48px * 2);
   margin: 0 auto;
 
   .titleSection {

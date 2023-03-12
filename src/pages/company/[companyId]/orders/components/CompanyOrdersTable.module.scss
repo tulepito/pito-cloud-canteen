@@ -9,6 +9,9 @@
     column-gap: 12px;
 
     .count {
+      @include textTemplate(8px, 700, 1);
+      min-width: 16px;
+      height: 16px;
       display: inline-block;
       padding: 4px;
       text-align: center;
@@ -75,7 +78,7 @@
       }
 
       .orderType {
-        max-width: 100px;
+        max-width: 95px;
       }
 
       .location {
@@ -85,7 +88,7 @@
 
       .restaurantName {
         @include textTemplate(14px, 400, 20px);
-        max-width: 150px;
+        max-width: 130px;
 
         .remainText {
           font-weight: 700;
@@ -137,7 +140,7 @@
 
     .searchForm {
       right: 0;
-      top: 0;
+      top: -8px;
       padding-bottom: 16px;
 
       @include viewportLargeWithPaddings {

@@ -1,9 +1,10 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { HttpMethod } from '@apis/configs';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { EOrderDraftStates, EOrderStates } from '@utils/enums';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {

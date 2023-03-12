@@ -1,12 +1,13 @@
+import { useEffect } from 'react';
+
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
-import { useEffect } from 'react';
 
 import { BookerSelectRestaurantThunks } from '../BookerSelectRestaurant.slice';
 
 export const useGetOrder = ({ orderId }: { orderId: string }) => {
-  const order = useAppSelector((state) => state.Order.order);
+  const order = useAppSelector((state) => state.BookerSelectRestaurant.order);
   const fetchOrderInProgress = useAppSelector(
     (state) => state.Order.fetchOrderInProgress,
   );

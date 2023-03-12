@@ -1,3 +1,6 @@
+import React, { useEffect } from 'react';
+import { useIntl } from 'react-intl';
+
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   partnerThunks,
@@ -8,8 +11,6 @@ import {
 import { isSignUpEmailTakenError } from '@utils/errors';
 import { pickRenderableImages } from '@utils/images';
 import type { TObject } from '@utils/types';
-import React, { useEffect } from 'react';
-import { useIntl } from 'react-intl';
 
 import EditPartnerWizard from '../components/EditPartnerWizard/EditPartnerWizard';
 

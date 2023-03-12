@@ -2,6 +2,7 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 
 import { VIEWS } from '../../helpers/constants';
+
 import css from './SectionOrderHeader.module.scss';
 
 type TSectionOrderHeaderProps = {
@@ -9,8 +10,7 @@ type TSectionOrderHeaderProps = {
   currentView: string;
 };
 
-// eslint-disable-next-line unused-imports/no-unused-vars
-const LIST_VIEW = [
+export const LIST_VIEW = [
   {
     key: VIEWS.LIST,
     label: 'SectionOrderHeader.list',

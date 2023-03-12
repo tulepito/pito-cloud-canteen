@@ -1,9 +1,11 @@
-import { InlineTextButton } from '@components/Button/Button';
-import IconClose from '@components/Icons/IconClose/IconClose';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import { InlineTextButton } from '@components/Button/Button';
+import IconClose from '@components/Icons/IconClose/IconClose';
+
 import type { TEditMenuPricingCalendarResources } from '../EditPartnerMenuWizard/utils';
+
 import css from './FoodEventCard.module.scss';
 
 const FoodEventCard = ({

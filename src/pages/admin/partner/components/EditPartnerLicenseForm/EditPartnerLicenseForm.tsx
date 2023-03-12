@@ -1,3 +1,8 @@
+import React, { useState } from 'react';
+import { Form as FinalForm } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import isEqual from 'lodash/isEqual';
+
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
@@ -11,12 +16,9 @@ import {
   PARTY_INSURANCE_RADIO_OPTIONS,
   YES,
 } from '@utils/enums';
-import isEqual from 'lodash/isEqual';
-import React, { useState } from 'react';
-import { Form as FinalForm } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import FieldRadioButtonPhoto from '../FieldRadioButtonPhoto/FieldRadioButtonPhoto';
+
 import css from './EditPartnerLicenseForm.module.scss';
 
 const ACCEPT_IMAGES = 'image/png, image/gif, image/jpeg';
@@ -158,9 +160,10 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
           onRemovePartyInsurance,
           inProgress,
           goBack,
+          uploadingImage,
         } = fieldRenderProps;
         const ready = !formError && isEqual(submittedValues, values);
-
+        const disabled = inProgress || uploadingImage;
         return (
           <Form onSubmit={handleSubmit}>
             <div className={css.fields}>
@@ -235,10 +238,10 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
                 })}
               />
             </div>
+            <div>
+              {formError && <ErrorMessage message={formError.message} />}
+            </div>
             <div className={css.buttonWrapper}>
-              <div>
-                {formError && <ErrorMessage message={formError.message} />}
-              </div>
               <div className={css.buttons}>
                 {goBack && (
                   <Button
@@ -253,7 +256,7 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
                 )}
                 <Button
                   inProgress={inProgress}
-                  disabled={inProgress}
+                  disabled={disabled}
                   ready={ready}
                   className={css.submitButton}>
                   {intl.formatMessage({

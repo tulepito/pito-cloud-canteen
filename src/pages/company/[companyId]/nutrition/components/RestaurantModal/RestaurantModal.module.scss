@@ -111,6 +111,10 @@
 .searchFormWrapper {
   @include flexAlign(center);
   flex-direction: row-reverse;
+
+  .searchInput {
+    width: 380px;
+  }
 }
 
 .profileImageWrapper {
@@ -281,31 +285,10 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
+        gap: 20px;
 
         @include viewportLarge {
           justify-content: flex-start;
-        }
-
-        .foodItem {
-          margin-bottom: 20px;
-
-          @include viewportLarge {
-            margin-right: 20px;
-
-            &:nth-child(2n) {
-              margin-right: 0;
-            }
-          }
-
-          @include viewportSLarge {
-            &:nth-child(2n) {
-              margin-right: 20px;
-            }
-
-            &:nth-child(3n) {
-              margin-right: 0;
-            }
-          }
         }
       }
     }

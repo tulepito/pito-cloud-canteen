@@ -1,9 +1,10 @@
-import ValidationError from '@components/ValidationError/ValidationError';
-import type { TDefaultProps, TIconProps } from '@utils/types';
-import classNames from 'classnames';
 import React from 'react';
 import type { FieldProps, FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
+import classNames from 'classnames';
+
+import ValidationError from '@components/ValidationError/ValidationError';
+import type { TDefaultProps, TIconProps } from '@utils/types';
 
 import css from './FieldTextInput.module.scss';
 
@@ -26,6 +27,7 @@ type InputComponentProps = FieldRenderProps<string, any> &
     required?: boolean;
     showText?: boolean;
     placeholder?: string;
+    inputClassName?: string;
   };
 
 export const FieldTextInputComponent: React.FC<InputComponentProps> = (
@@ -51,6 +53,7 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
     showText = false,
     leftIconContainerClassName,
     rightIconContainerClassName,
+    inputClassName,
     ...rest
   } = props;
 
@@ -89,7 +92,7 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
   // Classes
   const inputClasses =
     inputRootClass ||
-    classNames(css.input, {
+    classNames(css.input, inputClassName, {
       [css.inputSuccess]: valid,
       [css.inputError]: hasError,
       [css.inputDisabled]: disabled,

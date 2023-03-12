@@ -1,7 +1,10 @@
-import { HttpMethod } from '@apis/configs';
-import { getIntegrationSdk, handleError } from '@services/sdk';
 import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+import { HttpMethod } from '@apis/configs';
+import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
+import { getIntegrationSdk, handleError } from '@services/sdk';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -70,4 +73,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   }
 }
 
-export default handler;
+export default cookies(adminChecker(handler));

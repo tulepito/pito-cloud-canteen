@@ -1,8 +1,9 @@
+import React from 'react';
+
 import { InlineTextButton } from '@components/Button/Button';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import { parsePrice } from '@utils/validators';
-import React from 'react';
 
 import css from './FieldPickedFood.module.scss';
 

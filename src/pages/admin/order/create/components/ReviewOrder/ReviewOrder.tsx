@@ -1,3 +1,12 @@
+import React, { useEffect, useMemo } from 'react';
+import { Form as FinalForm } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import arrayMutators from 'final-form-arrays';
+import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
+
 import Collapsible from '@components/Collapsible/Collapsible';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import Form from '@components/Form/Form';
@@ -8,22 +17,20 @@ import Tabs from '@components/Tabs/Tabs';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { orderAsyncActions } from '@redux/slices/Order.slice';
+import {
+  changeStep4SubmitStatus,
+  orderAsyncActions,
+} from '@redux/slices/Order.slice';
+import { adminPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import { EOrderDraftStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
 import { required } from '@utils/validators';
-import classNames from 'classnames';
-import arrayMutators from 'final-form-arrays';
-import isEmpty from 'lodash/isEmpty';
-import React, { useEffect, useMemo } from 'react';
-import { Form as FinalForm } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../NavigateButtons/NavigateButtons';
+
 import css from './ReviewOrder.module.scss';
 
 const MENU_TABLE_COLUMN: TColumn[] = [
@@ -150,6 +157,7 @@ const parseDataToReviewTab = (values: any) => {
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
+  const router = useRouter();
 
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
@@ -163,6 +171,11 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const updateOrderInProgress = useAppSelector(
     (state) => state.Order.updateOrderInProgress,
   );
+  const updateOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.updateOrderDetailInProgress,
+  );
+
+  const submitInProgress = updateOrderInProgress || updateOrderDetailInProgress;
 
   const {
     value: isSuccessModalOpen,
@@ -183,11 +196,15 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const { address } = deliveryAddress || {};
 
   useEffect(() => {
-    if (isEmpty(orderDetail)) {
+    if (isEmpty(orderDetail) && !isEmpty(plans)) {
       dispatch(orderAsyncActions.fetchOrderDetail(plans));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(order), JSON.stringify(orderDetail)]);
+  }, [
+    JSON.stringify(order),
+    JSON.stringify(orderDetail),
+    JSON.stringify(plans),
+  ]);
 
   const { renderedOrderDetail } =
     useMemo(() => {
@@ -202,13 +219,15 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
 
   const onSubmit = async (values: any) => {
     const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
-
+    dispatch(changeStep4SubmitStatus(true));
     if (planId && orderId) {
-      orderAsyncActions.updatePlanDetail({
-        orderId,
-        planId,
-        orderDetail,
-      });
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId,
+          orderDetail,
+        }),
+      );
     }
     if (orderState === EOrderDraftStates.draft) {
       await dispatch(orderAsyncActions.requestApprovalOrder({ orderId }));
@@ -226,6 +245,12 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     if (!error) {
       openSuccessModal();
     }
+    dispatch(changeStep4SubmitStatus(false));
+  };
+
+  const onConfirm = () => {
+    closeSuccessModal();
+    router.push(adminPaths.ManageOrders);
   };
 
   const initialValues = useMemo(() => {
@@ -234,10 +259,6 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       shipperName,
     };
   }, [staffName, shipperName]);
-
-  useEffect(() => {
-    dispatch(orderAsyncActions.fetchOrderDetail(plans));
-  }, [dispatch, plans]);
 
   return (
     <div className={css.root}>
@@ -313,7 +334,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
               <NavigateButtons
                 goBack={goBack}
                 submitDisabled={invalid}
-                inProgress={updateOrderInProgress}
+                inProgress={submitInProgress}
               />
               {createOrderError && (
                 <div className={css.error}>{createOrderError}</div>
@@ -333,7 +354,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         description={intl.formatMessage({
           id: 'ReviewOrder.successModal.description',
         })}
-        onConfirm={closeSuccessModal}
+        onConfirm={onConfirm}
       />
     </div>
   );

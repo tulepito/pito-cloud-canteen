@@ -1,9 +1,10 @@
+import type { PropsWithChildren } from 'react';
+import classNames from 'classnames';
+
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconCloseV2 from '@components/Icons/IconCloseV2/IconCloseV2';
 import Modal from '@components/Modal/Modal';
-import classNames from 'classnames';
-import type { PropsWithChildren } from 'react';
 
 import css from './QuizModal.module.scss';
 

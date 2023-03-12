@@ -1,13 +1,23 @@
+import { useMemo, useState } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import type { FormApi } from 'final-form';
+import arrayMutators from 'final-form-arrays';
+import isEqual from 'lodash/isEqual';
+
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
 import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldMutiplePhotos from '@components/FormFields/FieldMultiplePhotos/FieldMultiplePhotos';
-import FieldMultipleSelect from '@components/FormFields/FieldMultipleSelect/FieldMultipleSelect';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import FieldTextInputWithBottomBox from '@components/FormFields/FieldTextInputWithBottomBox/FieldTextInputWithBottomBox';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
 import {
@@ -16,28 +26,27 @@ import {
   FOOD_TYPE_OPTIONS,
   MENU_OPTIONS,
   OTHER_OPTION,
+  PACKAGING_OPTIONS,
   SIDE_DISH_OPTIONS,
   SPECIAL_DIET_OPTIONS,
 } from '@utils/enums';
 import { pickRenderableImages } from '@utils/images';
 import {
   composeValidators,
+  composeValidatorsWithAllValues,
+  maxLength,
   minPriceLength,
   nonEmptyImageArray,
   numberMinLength,
   parsePrice,
   required,
+  upperCaseFirstLetter,
+  validateNonEnterInputField,
+  validFoodTitle,
 } from '@utils/validators';
-import classNames from 'classnames';
-import arrayMutators from 'final-form-arrays';
-import isEqual from 'lodash/isEqual';
-import { useState } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import type { TEditPartnerFoodFormValues } from '../../utils';
+
 import css from './EditPartnerFoodForm.module.scss';
 
 type TExtraProps = {
@@ -46,6 +55,8 @@ type TExtraProps = {
   formError?: any;
   isEditting?: boolean;
   disabled?: boolean;
+  handleSubmitOnClick?: (values: TEditPartnerFoodFormValues) => any;
+  partnerPackagingList: string[];
 };
 type TEditPartnerFoodFormComponentProps =
   FormRenderProps<TEditPartnerFoodFormValues> & Partial<TExtraProps>;
@@ -62,6 +73,10 @@ const EditPartnerFoodFormComponent: React.FC<
     formError,
     isEditting,
     disabled,
+    form,
+    handleSubmitOnClick,
+    invalid,
+    partnerPackagingList,
   } = props;
   const dispatch = useAppDispatch();
   const ready = isEqual(submittedValues, values);
@@ -89,12 +104,27 @@ const EditPartnerFoodFormComponent: React.FC<
   const onRemoveImage = (id: string) => {
     return dispatch(foodSliceAction.removeImage(id));
   };
-  const { handleSubmit } = props;
 
   const intl = useIntl();
 
+  const handleSubmitForm = () => {
+    if (invalid) {
+      // rerun validation
+      return form.submit();
+    }
+    return handleSubmitOnClick && handleSubmitOnClick(values);
+  };
+
+  const packagingToRender = useMemo(
+    () =>
+      PACKAGING_OPTIONS.filter((option) =>
+        partnerPackagingList?.includes(option.key),
+      ),
+    [JSON.stringify(partnerPackagingList)],
+  );
+
   return (
-    <Form onSubmit={handleSubmit} className={css.root}>
+    <Form className={css.root}>
       <div className={css.fieldPhotos}>
         <FieldMutiplePhotos
           name="images"
@@ -126,7 +156,7 @@ const EditPartnerFoodFormComponent: React.FC<
         ))}
       </div>
       <div className={css.flexField}>
-        <div className={css.field}>
+        <div className={classNames(css.field, css.minOrderFieldWrapper)}>
           <label className={css.label}>
             {intl.formatMessage({
               id: 'EditPartnerFoodForm.minQuantityPerOrderLabel',
@@ -136,12 +166,14 @@ const EditPartnerFoodFormComponent: React.FC<
             <FieldTextInput
               className={css.minOrderField}
               type="number"
+              inputClassName={css.inputWithSuffix}
               name="minOrderHourInAdvance"
               id="minOrderHourInAdvance"
               placeholder={intl.formatMessage({
                 id: 'EditPartnerFoodForm.orderHourInAdvancePlaceholder',
               })}
-              rightIcon={<div className={css.inputSuffixed}>h</div>}
+              rightIcon={<div>h</div>}
+              rightIconContainerClassName={css.inputSuffixed}
               validate={composeValidators(
                 required(
                   intl.formatMessage({
@@ -164,8 +196,9 @@ const EditPartnerFoodFormComponent: React.FC<
               placeholder={intl.formatMessage({
                 id: 'EditPartnerFoodForm.minQuantityPerOrderPlaceholder',
               })}
-              rightIcon={<div className={css.inputSuffixed}>phần</div>}
-              rightIconContainerClassName={css.inputSuffixedContainer}
+              rightIcon={<div>phần</div>}
+              inputClassName={css.inputWithSuffix}
+              rightIconContainerClassName={css.inputSuffixed}
               validate={composeValidators(
                 required(
                   intl.formatMessage({
@@ -183,18 +216,19 @@ const EditPartnerFoodFormComponent: React.FC<
           </div>
         </div>
         <FieldTextInput
-          className={css.field}
-          name="maxMember"
+          className={classNames(css.field, css.maxQuantityField)}
+          name="maxQuantity"
           type="number"
-          id="maxMember"
+          id="maxQuantity"
           placeholder={intl.formatMessage({
             id: 'EditPartnerFoodForm.maxMemberPlaceholder',
           })}
           label={intl.formatMessage({
             id: 'EditPartnerFoodForm.maxMemberLabel',
           })}
-          rightIcon={<div className={css.inputSuffixed}>người</div>}
-          rightIconContainerClassName={css.inputSuffixedContainer}
+          inputClassName={css.inputWithSuffix}
+          rightIcon={<div>người</div>}
+          rightIconContainerClassName={css.inputSuffixed}
           validate={composeValidators(
             required(
               intl.formatMessage({
@@ -214,7 +248,7 @@ const EditPartnerFoodFormComponent: React.FC<
         <div className={classNames(css.field, css.titleFields)}>
           <FieldTextInput
             name="title"
-            className={css.titleField}
+            className={css.field}
             id="title"
             placeholder={intl.formatMessage({
               id: 'EditPartnerFoodForm.foodTitlePlaceholder',
@@ -222,8 +256,22 @@ const EditPartnerFoodFormComponent: React.FC<
             label={intl.formatMessage({
               id: 'EditPartnerFoodForm.foodTitleLabel',
             })}
-            validate={required(
-              intl.formatMessage({ id: 'EditPartnerFoodForm.titleRequired' }),
+            parse={upperCaseFirstLetter}
+            validate={composeValidators(
+              required(
+                intl.formatMessage({ id: 'EditPartnerFoodForm.titleRequired' }),
+              ),
+              maxLength(
+                intl.formatMessage({
+                  id: 'EditPartnerFoodForm.titleMaxLength',
+                }),
+                150,
+              ),
+              validFoodTitle(
+                intl.formatMessage({
+                  id: 'EditPartnerFoodForm.titleInValid',
+                }),
+              ),
             )}
           />
           <FieldTextInput
@@ -243,32 +291,56 @@ const EditPartnerFoodFormComponent: React.FC<
             )}
           />
         </div>
-        <FieldSelect
-          className={css.field}
-          name="category"
-          id="category"
-          placeholder={intl.formatMessage({
-            id: 'EditPartnerFoodForm.foodCategoryPlaceholder',
-          })}
-          label={intl.formatMessage({
-            id: 'EditPartnerFoodForm.foodCategoryLabel',
-          })}
-          validate={required(
-            intl.formatMessage({ id: 'EditPartnerFoodForm.categoryRequired' }),
-          )}>
-          <option value="" disabled>
-            {intl.formatMessage({
-              id: 'EditPartnerFoodForm.categoryPlaceholder',
+        <div className={classNames(css.flexField, css.innerFlexfield)}>
+          <FieldTextInput
+            className={classNames(css.field, css.priceField)}
+            name="price"
+            id="price"
+            label={intl.formatMessage({ id: 'EditPartnerFoodForm.priceLabel' })}
+            placeholder={intl.formatMessage({
+              id: 'EditPartnerFoodForm.pricePlaceholder',
             })}
-          </option>
-          {CATEGORY_OPTIONS.filter((cate) => cate.key !== OTHER_OPTION).map(
-            (cat) => (
-              <option key={cat.key} value={cat.key}>
-                {cat.label}
-              </option>
-            ),
-          )}
-        </FieldSelect>
+            inputClassName={css.inputWithSuffix}
+            rightIcon={<div className={css.inputSuffixed}>đ</div>}
+            validate={composeValidators(
+              required(
+                intl.formatMessage({ id: 'EditPartnerFoodForm.priceRequired' }),
+              ),
+              minPriceLength(
+                intl.formatMessage({
+                  id: 'EditPartnerFoodForm.priceMinLength',
+                }),
+                1000,
+              ),
+            )}
+            parse={parsePrice}
+          />
+          <FieldSelect
+            className={css.field}
+            name="packaging"
+            id="packaging"
+            label={intl.formatMessage({
+              id: 'EditPartnerFoodForm.packagingLabel',
+            })}
+            validate={required(
+              intl.formatMessage({
+                id: 'EditPartnerFoodForm.packagingRequired',
+              }),
+            )}>
+            <option value="" disabled>
+              {intl.formatMessage({
+                id: 'EditPartnerFoodForm.packagingPlaceholder',
+              })}
+            </option>
+            {packagingToRender
+              .filter((cate) => cate.key !== OTHER_OPTION)
+              .map((cat) => (
+                <option key={cat.key} value={cat.key}>
+                  {cat.label}
+                </option>
+              ))}
+          </FieldSelect>
+        </div>
       </div>
       <div className={css.flexField}>
         <FieldCheckboxGroup
@@ -284,60 +356,104 @@ const EditPartnerFoodFormComponent: React.FC<
           labelClassName={css.specialDietsLabel}
           itemClassName={css.specialDietsItem}
         />
-        <div className={css.field}>
-          <label className={css.label}>
-            {intl.formatMessage({ id: 'EditPartnerFoodForm.foodTypeLabel' })}
-          </label>
-          {FOOD_TYPE_OPTIONS.map((option) => (
-            <FieldRadioButton
-              key={option.key}
-              name="foodType"
-              id={option.key}
-              value={option.key}
-              label={option.label}
-            />
-          ))}
+        <div className={classNames(css.flexField, css.flexColumn)}>
+          <div className={css.field}>
+            <label className={css.label}>
+              {intl.formatMessage({ id: 'EditPartnerFoodForm.foodTypeLabel' })}
+            </label>
+            {FOOD_TYPE_OPTIONS.map((option) => (
+              <FieldRadioButton
+                key={option.key}
+                name="foodType"
+                id={option.key}
+                value={option.key}
+                label={option.label}
+              />
+            ))}
+          </div>
+          <FieldSelect
+            className={css.field}
+            name="category"
+            id="category"
+            placeholder={intl.formatMessage({
+              id: 'EditPartnerFoodForm.foodCategoryPlaceholder',
+            })}
+            label={intl.formatMessage({
+              id: 'EditPartnerFoodForm.foodCategoryLabel',
+            })}
+            validate={required(
+              intl.formatMessage({
+                id: 'EditPartnerFoodForm.categoryRequired',
+              }),
+            )}>
+            <option value="" disabled>
+              {intl.formatMessage({
+                id: 'EditPartnerFoodForm.categoryPlaceholder',
+              })}
+            </option>
+            {CATEGORY_OPTIONS.filter((cate) => cate.key !== OTHER_OPTION).map(
+              (cat) => (
+                <option key={cat.key} value={cat.key}>
+                  {cat.label}
+                </option>
+              ),
+            )}
+          </FieldSelect>
         </div>
       </div>
       <div className={css.flexField}>
-        <FieldTextInput
+        <FieldTextInputWithBottomBox
           className={css.field}
-          name="ingredients"
-          id="ingredients"
+          name="allergicIngredients"
+          id="allergicIngredients"
           placeholder={intl.formatMessage({
-            id: 'EditPartnerFoodForm.ingredientsPlaceholder',
+            id: 'EditPartnerFoodForm.allergicIngredientPlaceholder',
           })}
           label={intl.formatMessage({
-            id: 'EditPartnerFoodForm.ingredientsLabel',
+            id: 'EditPartnerFoodForm.allergicIngredientLabel',
           })}
-        />
-
-        <FieldTextInput
-          className={classNames(css.field, css.priceField)}
-          name="price"
-          id="price"
-          label={intl.formatMessage({ id: 'EditPartnerFoodForm.priceLabel' })}
-          placeholder={intl.formatMessage({
-            id: 'EditPartnerFoodForm.pricePlaceholder',
-          })}
-          rightIcon={<div className={css.inputSuffixed}>đ</div>}
-          validate={composeValidators(
-            required(
-              intl.formatMessage({ id: 'EditPartnerFoodForm.priceRequired' }),
-            ),
-            minPriceLength(
+          form={form as unknown as FormApi}
+          validate={composeValidatorsWithAllValues(
+            validateNonEnterInputField(
               intl.formatMessage({
-                id: 'EditPartnerFoodForm.priceMinLength',
+                id: 'EditPartnerFoodForm.allergicIngredientValid',
               }),
-              1000,
             ),
           )}
-          parse={parsePrice}
+        />
+        <FieldTextInput
+          className={css.field}
+          name="numberOfMainDishes"
+          type="number"
+          id="numberOfMainDishes"
+          placeholder={intl.formatMessage({
+            id: 'EditPartnerFoodForm.numberOfMainDishesPlaceholder',
+          })}
+          label={intl.formatMessage({
+            id: 'EditPartnerFoodForm.numberOfMainDishesLabel',
+          })}
+          inputClassName={css.inputWithSuffix}
+          rightIconContainerClassName={css.inputSuffixed}
+          rightIcon={<div>món</div>}
+          validate={composeValidators(
+            required(
+              intl.formatMessage({
+                id: 'EditPartnerFoodForm.numberOfMainDishesRequired',
+              }),
+            ),
+            numberMinLength(
+              intl.formatMessage({
+                id: 'EditPartnerFoodForm.numberOfMainDishesInvalid',
+              }),
+              1,
+            ),
+          )}
         />
       </div>
       <div className={css.flexField}>
-        <FieldMultipleSelect
+        <FieldCheckboxGroup
           className={css.field}
+          listClassName={css.sideDishesList}
           name="sideDishes"
           id="sideDishes"
           placeholder={intl.formatMessage({
@@ -361,6 +477,12 @@ const EditPartnerFoodFormComponent: React.FC<
           label={intl.formatMessage({
             id: 'EditPartnerFoodForm.descriptionLabel',
           })}
+          validate={maxLength(
+            intl.formatMessage({
+              id: 'EditPartnerFoodForm.descriptionMaxLength',
+            }),
+            200,
+          )}
         />
         <div className={css.field}>
           <FieldTextArea
@@ -372,17 +494,20 @@ const EditPartnerFoodFormComponent: React.FC<
             label={intl.formatMessage({
               id: 'EditPartnerFoodForm.notesLabel',
             })}
+            validate={maxLength(
+              intl.formatMessage({
+                id: 'EditPartnerFoodForm.notesMaxLength',
+              }),
+              200,
+            )}
           />
-          <p className={css.notePriceDescription}>
-            {intl.formatMessage({
-              id: 'EditPartnerFoodForm.notePriceDescription',
-            })}
-          </p>
         </div>
       </div>
       <div className={css.submitButtons}>
         <ErrorMessage message={formError?.message} />
         <Button
+          onClick={handleSubmitForm}
+          type="button"
           ready={ready}
           inProgress={inProgress}
           disabled={disabled}
@@ -413,7 +538,7 @@ const EditPartnerFoodForm: React.FC<TEditPartnerFoodFormProps> = (props) => {
     <FinalForm
       mutators={{ ...arrayMutators }}
       {...props}
-      onSubmit={handleSubmit}
+      handleSubmitOnClick={handleSubmit}
       submittedValues={submittedValues}
       component={EditPartnerFoodFormComponent}
     />

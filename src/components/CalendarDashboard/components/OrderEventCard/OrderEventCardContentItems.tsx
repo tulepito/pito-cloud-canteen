@@ -1,10 +1,11 @@
+import type { Event } from 'react-big-calendar';
+import { FormattedMessage } from 'react-intl';
+import { DateTime } from 'luxon';
+
 import IconClockWithExclamation from '@components/Icons/IconClock/IconClockWithExclamation';
 import IconLocation from '@components/Icons/IconLocation/IconLocation';
 import IconShop from '@components/Icons/IconShop/IconShop';
 import { isOver } from '@helpers/orderHelper';
-import { DateTime } from 'luxon';
-import type { Event } from 'react-big-calendar';
-import { FormattedMessage } from 'react-intl';
 
 import OrderEventCardContentItem from './OrderEventCardContentItem';
 

@@ -1,8 +1,9 @@
-import { createEmailParams, sendEmail } from '@services/awsSES';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+import { sendIndividualEmail } from '@services/awsSES';
 import cookies from '@services/cookie';
 import { handleError } from '@services/sdk';
 import { memberOrderRemind } from '@utils/emailTemplate/memberOrderRemind';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 const systemSenderEmail = process.env.AWS_SES_SENDER_EMAIL;
 
@@ -23,15 +24,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       sender: systemSenderEmail as string,
     };
 
-    const hasFlexAccountEmailParams = createEmailParams(
-      hasFlexAccountEmailParamsData.receiver,
-      hasFlexAccountEmailParamsData.subject,
-      hasFlexAccountEmailParamsData.content,
-      hasFlexAccountEmailParamsData.sender,
-    );
+    const hasFlexAccountEmailParams = {
+      receiver: hasFlexAccountEmailParamsData.receiver,
+      subject: hasFlexAccountEmailParamsData.subject,
+      content: hasFlexAccountEmailParamsData.content,
+      sender: hasFlexAccountEmailParamsData.sender,
+    };
 
     if (emailList?.length > 0) {
-      sendEmail(hasFlexAccountEmailParams);
+      sendIndividualEmail(hasFlexAccountEmailParams);
     }
 
     res.json({

@@ -1,9 +1,11 @@
-import Modal from '@components/Modal/Modal';
-import { DateTime } from 'luxon';
 import { useIntl } from 'react-intl';
+import { DateTime } from 'luxon';
+
+import Modal from '@components/Modal/Modal';
 
 import type { TEditOrderDeadlineFormValues } from './EditOrderDeadlineForm';
 import EditOrderDeadlineForm from './EditOrderDeadlineForm';
+
 import css from './EditOrderDeadlineModal.module.scss';
 
 type TEditOrderDeadlineModalProps = {
@@ -41,9 +43,13 @@ const EditOrderDeadlineModal: React.FC<TEditOrderDeadlineModalProps> = (
       containerClassName={css.modalContainer}
       handleClose={onClose}
       isOpen={isOpen}
-      title={intl.formatMessage({
-        id: 'EditOrderDeadlineModal.title',
-      })}>
+      title={
+        <span className={css.title}>
+          {intl.formatMessage({
+            id: 'EditOrderDeadlineModal.title',
+          })}
+        </span>
+      }>
       <EditOrderDeadlineForm
         onSubmit={onSubmit}
         startDate={orderStartDate}

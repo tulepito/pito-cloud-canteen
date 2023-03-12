@@ -1,15 +1,16 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
+import React from 'react';
+import { useIntl } from 'react-intl';
+import { useRouter } from 'next/router';
+
 import FormWizard from '@components/FormWizard/FormWizard';
 import useRedirectTabWizard from '@hooks/useRedirectTabWizard';
 import { adminRoutes } from '@src/paths';
 import { EListingStates } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
-import { useRouter } from 'next/router';
-import React from 'react';
-import { useIntl } from 'react-intl';
 
 // eslint-disable-next-line import/no-cycle
 import EditPartnerWizardTab from '../EditPartnerWizardTab/EditPartnerWizardTab';
+
 import css from './EditPartnerWizard.module.scss';
 
 export const BASIC_INFORMATION_TAB = 'basic-information';
@@ -138,6 +139,7 @@ const EditPartnerWizard = (props: any) => {
     onSetUnsatisfactory,
     uploadingImage,
   } = props;
+
   const intl = useIntl();
   const router = useRouter();
   const { query, pathname } = router;
@@ -177,9 +179,12 @@ const EditPartnerWizard = (props: any) => {
 
   const handleRedirectOnSwitchTab = (nearestActiveTab: string) => {
     const id = partnerListingRef?.id?.uuid;
-    !partnerListingRef
-      ? router.push(`/admin/partner/create`)
-      : router.push(`/admin/partner/${id}/edit?tab=${nearestActiveTab}`);
+
+    if (!partnerListingRef) {
+      router.push(`/admin/partner/create`);
+    } else {
+      router.push(`/admin/partner/${id}/edit?tab=${nearestActiveTab}`);
+    }
   };
 
   useRedirectTabWizard({
@@ -194,10 +199,11 @@ const EditPartnerWizard = (props: any) => {
   return (
     <FormWizard className={css.formWizard} formTabNavClassName={css.tabNav}>
       {TABS.map((tab: string, index: number) => {
-        const disabled = !tabCompleted(
-          TABS[index - 1],
-          partnerListingRef as TIntegrationListing,
-        );
+        const disabled =
+          !tabCompleted(
+            TABS[index - 1],
+            partnerListingRef as TIntegrationListing,
+          ) && index > 0;
         return (
           <EditPartnerWizardTab
             key={tab}
@@ -238,6 +244,7 @@ const EditPartnerWizard = (props: any) => {
             onSetUnsatisfactory={onSetUnsatisfactory}
             goBack={handleGoBack(tab)}
             disabled={uploadingImage || disabled}
+            uploadingImage={uploadingImage}
           />
         );
       })}

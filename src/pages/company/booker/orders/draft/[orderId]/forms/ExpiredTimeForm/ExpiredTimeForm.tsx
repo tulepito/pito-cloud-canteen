@@ -1,27 +1,14 @@
+import { useField, useForm } from 'react-final-form-hooks';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { DateTime } from 'luxon';
+
 import Button from '@components/Button/Button';
 import { FieldDatePickerComponent } from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
 import IconClock from '@components/Icons/IconClock/IconClock';
-import { DateTime } from 'luxon';
-import { useField, useForm } from 'react-final-form-hooks';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { TimeOptions } from '@utils/dates';
 
 import css from './ExpiredTimeForm.module.scss';
-
-const TIME_OPTIONS = [
-  '07:00',
-  '08:00',
-  '09:00',
-  '10:00',
-  '11:00',
-  '12:00',
-  '13:00',
-  '14:00',
-  '15:00',
-  '16:00',
-  '17:00',
-  '18:00',
-];
 
 type TExpiredTimeFormProps = {
   onSubmit: (values: TExpiredTimeFormValues) => void;
@@ -31,17 +18,17 @@ type TExpiredTimeFormProps = {
 };
 
 export type TExpiredTimeFormValues = {
-  deadlineDate: string;
+  deadlineDate: string | number;
   deadlineHour: string;
 };
 
 const validate = (values: TExpiredTimeFormValues) => {
   const errors: any = {};
   if (!values.deadlineDate) {
-    errors.deadlineDate = 'Required';
+    errors.deadlineDate = 'Vui lòng chọn ngày cho hạn chọn món';
   }
   if (!values.deadlineHour) {
-    errors.deadlineHour = 'Required';
+    errors.deadlineHour = 'Vui lòng chọn giờ cho hạn chọn món';
   }
   return errors;
 };
@@ -106,7 +93,7 @@ const ExpiredTimeForm: React.FC<TExpiredTimeFormProps> = ({
         leftIcon={<IconClock />}
         meta={deadlineHour.meta}
         input={deadlineHour.input}>
-        {TIME_OPTIONS.map((option) => (
+        {TimeOptions.map((option) => (
           <option key={option} value={option}>
             {option}
           </option>

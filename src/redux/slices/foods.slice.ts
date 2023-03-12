@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import { partnerFoodApi } from '@apis/foodApi';
-import { createAsyncThunk } from '@redux/redux.helper';
 import { createSlice } from '@reduxjs/toolkit';
-import { getImportDataFromCsv } from '@src/pages/admin/partner/[restaurantId]/settings/food/utils';
+import omit from 'lodash/omit';
+import Papa from 'papaparse';
+
+import { partnerFoodApi } from '@apis/foodApi';
+import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
+import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants, EListingType } from '@utils/enums';
 import { storableError } from '@utils/errors';
@@ -13,8 +16,6 @@ import type {
   TObject,
   TPagination,
 } from '@utils/types';
-import omit from 'lodash/omit';
-import Papa from 'papaparse';
 
 export const MANAGE_FOOD_PAGE_SIZE = 10;
 
@@ -46,7 +47,7 @@ type TFoodSliceState = {
   removeFoodError: any;
 
   createPartnerFoodFromCsvInProgress: boolean;
-  creataPartnerFoodFromCsvError: any;
+  createPartnerFoodFromCsvError: any;
 
   menuPickedFoods: TIntegrationListing[];
   queryMenuPickedFoodsInProgress: boolean;
@@ -84,7 +85,7 @@ const initialState: TFoodSliceState = {
   removeFoodError: null,
 
   createPartnerFoodFromCsvInProgress: false,
-  creataPartnerFoodFromCsvError: null,
+  createPartnerFoodFromCsvError: null,
 
   // query food for menu picked food
   menuPickedFoods: [],

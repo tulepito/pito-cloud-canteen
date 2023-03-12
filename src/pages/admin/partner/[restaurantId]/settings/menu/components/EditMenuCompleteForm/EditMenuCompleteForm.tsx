@@ -1,20 +1,22 @@
+import { useState } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { FormattedMessage } from 'react-intl';
+import type { FormApi } from 'final-form';
+
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import Form from '@components/Form/Form';
 import { IntegrationListing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import { getLabelByKey, MENU_OPTIONS } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
-import type { FormApi } from 'final-form';
-import { useState } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { FormattedMessage } from 'react-intl';
 
 import AddFoodModal from '../AddFoodModal/AddFoodModal';
 import CalendarContentEnd from '../CalendarContentEnd/CalendarContentEnd';
 import CalendarContentStart from '../CalendarContentStart/CalendarContentStart';
 import { renderResourcesForCalendar } from '../EditPartnerMenuWizard/utils';
 import FoodEventCard from '../FoodEventCard/FoodEventCard';
+
 import css from './EditMenuCompleteForm.module.scss';
 
 export type TEditMenuCompleteFormValues = {
@@ -34,6 +36,7 @@ type TExtraProps = {
   currentMenu?: TIntegrationListing | null;
   formRef: any;
   restaurantId: string;
+  anchorDate: Date;
 };
 type TEditMenuCompleteFormComponentProps =
   FormRenderProps<TEditMenuCompleteFormValues> & Partial<TExtraProps>;
@@ -43,7 +46,8 @@ type TEditMenuCompleteFormProps = FormProps<TEditMenuCompleteFormValues> &
 const EditMenuCompleteFormComponent: React.FC<
   TEditMenuCompleteFormComponentProps
 > = (props) => {
-  const { handleSubmit, currentMenu, formRef, form, values } = props;
+  const { handleSubmit, currentMenu, formRef, form, values, anchorDate } =
+    props;
   formRef.current = form;
   const [currentDate, setCurrentDate] = useState<number | null>();
   const { title } = IntegrationListing(currentMenu).getAttributes();
@@ -75,6 +79,7 @@ const EditMenuCompleteFormComponent: React.FC<
     onRemovePickedFood,
     daysOfWeek,
   });
+
   const onSetCurrentDate = (params: any) => () => {
     const { date, events } = params;
     const dateAsTimeStaimp = new Date(date).getTime();
@@ -150,6 +155,7 @@ const EditMenuCompleteFormComponent: React.FC<
             </h3>
             {currentMenu && (
               <CalendarDashboard
+                anchorDate={anchorDate}
                 renderEvent={FoodEventCard}
                 events={resourcesForCalendar}
                 components={{

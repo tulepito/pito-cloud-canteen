@@ -1,7 +1,8 @@
-import { IntegrationListing } from '@utils/data';
-import { getDayOfWeekByIndex } from '@utils/dates';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
+
+import { IntegrationListing } from '@utils/data';
+import { getDayOfWeekByIndex } from '@utils/dates';
 
 import css from './CalendarContentEnd.module.scss';
 

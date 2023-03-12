@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 const reduce = require('lodash/reduce');
 
 const combinedRelationships = (oldRels: any, newRels: any) => {

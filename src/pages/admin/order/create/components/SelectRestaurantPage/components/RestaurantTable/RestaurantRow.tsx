@@ -1,8 +1,9 @@
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import { Listing } from '@utils/data';
 import { CATEGORY_OPTIONS } from '@utils/enums';
 import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
-import { useIntl } from 'react-intl';
 
 import css from './RestaurantTable.module.scss';
 

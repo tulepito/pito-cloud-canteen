@@ -1,3 +1,9 @@
+import React, { useState } from 'react';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import isEqual from 'lodash/isEqual';
+
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
@@ -14,11 +20,6 @@ import {
   phoneNumberFormatValid,
   required,
 } from '@utils/validators';
-import classNames from 'classnames';
-import isEqual from 'lodash/isEqual';
-import React, { useState } from 'react';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import css from './EditCompanyForm.module.scss';
 

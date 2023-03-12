@@ -1,13 +1,14 @@
+import React, { useState } from 'react';
+import type { Event } from 'react-big-calendar';
+import Skeleton from 'react-loading-skeleton';
+import flatten from 'lodash/flatten';
+import { DateTime } from 'luxon';
+
 import Avatar from '@components/Avatar/Avatar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
 import { CurrentUser, Listing, User } from '@utils/data';
 import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
-import flatten from 'lodash/flatten';
-import { DateTime } from 'luxon';
-import React, { useState } from 'react';
-import type { Event } from 'react-big-calendar';
-import Skeleton from 'react-loading-skeleton';
 
 import css from './OrderCalendarView.module.scss';
 

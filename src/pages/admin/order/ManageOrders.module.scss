@@ -74,6 +74,11 @@
 }
 
 .locationRow {
+  @include lineClamp(4);
+}
+
+.restaurantName {
+  @include lineClamp(1);
 }
 
 .tooltip {
@@ -173,4 +178,12 @@
       min-width: 1440px;
     }
   }
+}
+
+.stateItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 12px;
 }

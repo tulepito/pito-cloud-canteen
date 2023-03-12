@@ -1,6 +1,7 @@
-import { types as sdkTypes } from '@helpers/sdkLoader';
 import memoize from 'lodash/memoize';
 import seedrandom from 'seedrandom';
+
+import { types as sdkTypes } from '@helpers/sdkLoader';
 
 import config from '../configs';
 

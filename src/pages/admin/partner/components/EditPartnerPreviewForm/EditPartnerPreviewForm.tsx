@@ -1,4 +1,10 @@
 /* eslint-disable import/no-cycle */
+import React from 'react';
+import { Field, Form as FinalForm } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+import arrayMutators from 'final-form-arrays';
+
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
@@ -18,11 +24,6 @@ import {
   MEAL_OPTIONS,
   PACKAGING_OPTIONS,
 } from '@utils/enums';
-import classNames from 'classnames';
-import arrayMutators from 'final-form-arrays';
-import React from 'react';
-import { Field, Form as FinalForm } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import {
   BASIC_INFORMATION_TAB,
@@ -30,6 +31,7 @@ import {
   MENU_TAB,
 } from '../EditPartnerWizard/EditPartnerWizard';
 import { createAvailabilityPlanInitialValues } from '../EditPartnerWizardTab/utils';
+
 import css from './EditPartnerPreviewForm.module.scss';
 
 const getLabelByKey = (list: any[], key: any) => {
@@ -325,15 +327,39 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                       }}
                     </Field>
                     <FieldTextInput
-                      disabled
                       name="minPrice"
                       className={css.minPrice}
                       id="minPrice"
                       label={intl.formatMessage({
                         id: 'EditPartnerForm.minPrice',
                       })}
+                      rightIconContainerClassName={css.inputSuffixed}
                       rightIcon={<div className={css.currency}>đ</div>}
                     />
+                    <div className={css.flexField}>
+                      <FieldTextInput
+                        name="minQuantity"
+                        className={css.minQuantity}
+                        id="minQuantity"
+                        type="number"
+                        label={intl.formatMessage({
+                          id: 'EditPartnerForm.minQuantityLabel',
+                        })}
+                        rightIconContainerClassName={css.inputSuffixed}
+                        rightIcon={<div className={css.currency}>phần</div>}
+                      />
+                      <FieldTextInput
+                        name="maxQuantity"
+                        className={css.maxQuantity}
+                        id="maxQuantity"
+                        type="number"
+                        label={intl.formatMessage({
+                          id: 'EditPartnerBasicInformationForm.maxQuantityLabel',
+                        })}
+                        rightIconContainerClassName={css.inputSuffixed}
+                        rightIcon={<div className={css.currency}>phần</div>}
+                      />
+                    </div>
                     <div>
                       <div className={css.label}>
                         {intl.formatMessage({

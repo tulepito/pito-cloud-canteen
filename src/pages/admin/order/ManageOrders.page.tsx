@@ -1,25 +1,29 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
+import React, { useEffect, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import addDays from 'date-fns/addDays';
+import { useRouter } from 'next/router';
+
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import IconTick from '@components/Icons/IconTick/IconTick';
-import IconTruck from '@components/Icons/IconTruck/IconTruck';
-import IconWarning from '@components/Icons/IconWarning/IconWarning';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
+import StateItem from '@components/TimeLine/StateItem';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { adminRoutes } from '@src/paths';
+import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
+import { adminPaths, adminRoutes } from '@src/paths';
 import { formatTimestamp } from '@utils/dates';
 import {
-  EOrderDetailsStatus,
   EOrderDraftStates,
   EOrderStates,
   getLabelByKey,
@@ -31,12 +35,6 @@ import type {
   TTableSortValue,
 } from '@utils/types';
 import { parsePrice } from '@utils/validators';
-import classNames from 'classnames';
-import addDays from 'date-fns/addDays';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import css from './ManageOrders.module.scss';
 
@@ -79,48 +77,20 @@ const OrderDetailTooltip = ({
     (prev: any, subOrder: TIntegrationListing) => {
       const { orderDetail = {} } = subOrder.attributes.metadata || {};
       const subOrderDetails = Object.keys(orderDetail).map((key) => {
-        const { foodList = {}, status } = orderDetail[key];
+        const { transaction, restaurant = {} } = orderDetail[key];
+        const { foodList = {} } = restaurant;
         const totalPrice = Object.keys(foodList).reduce((prev, cur) => {
           const price = foodList[cur].foodPrice;
           return prev + price;
         }, 0);
-        const OrderIcon = () => {
-          switch (status) {
-            case EOrderDetailsStatus.cancelled:
-              return (
-                <div className={classNames(css.orderIcon, css.cancelledIcon)}>
-                  <IconWarning />
-                </div>
-              );
-            case EOrderDetailsStatus.delivered:
-              return (
-                <div className={classNames(css.orderIcon, css.deliveredIcon)}>
-                  <IconTruck />
-                </div>
-              );
-            case EOrderDetailsStatus.received:
-              return (
-                <div className={classNames(css.orderIcon, css.receivedIcon)}>
-                  <IconTick />
-                </div>
-              );
-            default:
-              return (
-                <div
-                  className={classNames(css.orderIcon, css.pendingIcon)}></div>
-              );
-          }
-        };
 
         return (
           <div key={key} className={css.orderDetailTooltipItem}>
-            <OrderIcon />
-            <span>
-              <span className={css.orderDate}>
-                {formatTimestamp(Number(key))}
-              </span>
-              : {parsePrice(String(totalPrice))}đ
-            </span>
+            <StateItem
+              className={css.stateItem}
+              data={{ tx: transaction, date: formatTimestamp(Number(key)) }}
+            />
+            <span>{parsePrice(String(totalPrice))}đ</span>
           </div>
         );
       });
@@ -135,9 +105,19 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'title',
     label: 'ID',
-    render: ({ id, title, subOrders }: any) => {
+    render: ({ id: orderId, title, state, subOrders }: any) => {
+      const titleComponent = <div className={css.boldText}>#{title}</div>;
+
+      if ([EOrderDraftStates.draft].includes(state)) {
+        return (
+          <NamedLink path={adminPaths.UpdateDraftOrder} params={{ orderId }}>
+            {titleComponent}
+          </NamedLink>
+        );
+      }
+
       return (
-        <NamedLink path={`${adminRoutes.ManageOrders.path}/${id}`}>
+        <NamedLink path={adminPaths.OrderDetail} params={{ orderId }}>
           {subOrders.length > 0 ? (
             <Tooltip
               overlayClassName={css.orderDetailTooltip}
@@ -145,10 +125,10 @@ const TABLE_COLUMN: TColumn[] = [
               showArrow={false}
               tooltipContent={<OrderDetailTooltip subOrders={subOrders} />}
               placement="bottomLeft">
-              <div className={css.boldText}>#{title}</div>
+              {titleComponent}
             </Tooltip>
           ) : (
-            <div className={css.boldText}>#{title}</div>
+            titleComponent
           )}
         </NamedLink>
       );
@@ -207,7 +187,9 @@ const TABLE_COLUMN: TColumn[] = [
       return length > 0 ? (
         <div className={css.rowText}>
           {restaurants.slice(0, 2).map((restaurantName: string) => (
-            <div key={restaurantName}>{restaurantName}</div>
+            <div key={restaurantName} className={css.restaurantName}>
+              {restaurantName}
+            </div>
           ))}
           {moreThanTwo && (
             <div className={css.remainText}>+ {remainLength} đối tác </div>
@@ -418,6 +400,10 @@ const ManageOrdersPage = () => {
       }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(resetOrder());
   }, [dispatch]);
 
   const onClearFilter = () => {

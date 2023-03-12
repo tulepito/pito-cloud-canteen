@@ -1,6 +1,6 @@
-import classNames from 'classnames';
 import React from 'react';
 import { Field } from 'react-final-form';
+import classNames from 'classnames';
 
 import css from './FieldRadioButton.module.scss';
 

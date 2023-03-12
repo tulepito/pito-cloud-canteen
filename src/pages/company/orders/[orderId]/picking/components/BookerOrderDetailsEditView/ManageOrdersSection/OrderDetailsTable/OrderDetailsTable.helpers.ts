@@ -1,6 +1,7 @@
+import isEmpty from 'lodash/isEmpty';
+
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject, TUser } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
 
 import type { TAllTabData, TItemData } from './OrderDetailsTable.utils';
 import { EOrderDetailsTableTab } from './OrderDetailsTable.utils';
@@ -46,7 +47,7 @@ export const prepareDataForTabs = ({
       } = result;
 
       const [memberId, orderItemData] = currentOrderItem;
-      const { status, foodId } = orderItemData;
+      const { status, foodId, requirement = '' } = orderItemData;
       const memberData = memberInfoMap[memberId];
 
       const itemData: TItemData = {
@@ -55,7 +56,7 @@ export const prepareDataForTabs = ({
         status,
         foodData:
           foodId?.length > 0 && foodList[foodId]
-            ? { ...foodList[foodId], foodId }
+            ? { ...foodList[foodId], foodId, requirement }
             : {},
       };
 

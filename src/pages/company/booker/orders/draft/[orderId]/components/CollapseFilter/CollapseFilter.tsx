@@ -1,7 +1,8 @@
+import classNames from 'classnames';
+
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import useBoolean from '@hooks/useBoolean';
-import classNames from 'classnames';
 
 import css from './CollapseFilter.module.scss';
 
@@ -12,7 +13,7 @@ type CollapseFilterProps = {
 };
 
 const CollapseFilter: React.FC<CollapseFilterProps> = (props) => {
-  const { title, options, name } = props;
+  const { title, options = [], name } = props;
   const { value: isOptionsCollapse, toggle: toggleOptionsCollapse } =
     useBoolean(false);
 
@@ -34,7 +35,7 @@ const CollapseFilter: React.FC<CollapseFilterProps> = (props) => {
       <div className={optionsClasses}>
         {options.map(({ key, label }) => (
           <FieldCheckbox
-            id={key}
+            id={`${name}-${key}`}
             key={`${name}-${key}`}
             name={name}
             value={key}

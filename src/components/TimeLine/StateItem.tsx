@@ -1,7 +1,9 @@
+import classNames from 'classnames';
+
 import IconCancel from '@components/Icons/IconCancel/IconCancel';
-import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
 import IconDelivering from '@components/Icons/IconDelivering/IconDelivering';
 import IconFail from '@components/Icons/IconFail/IconFail';
+import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
 import {
   txIsCanceled,
   txIsCompleted,
@@ -9,10 +11,10 @@ import {
   txIsDeliveryFailed,
   txIsInitiated,
 } from '@utils/transaction';
-import classNames from 'classnames';
+
+import type { TTimeLineItemProps } from './types';
 
 import css from './StateItem.module.scss';
-import type { TTimeLineItemProps } from './types';
 
 type TStateItemProps = TTimeLineItemProps;
 
@@ -28,7 +30,7 @@ const StateItem: React.FC<TStateItemProps> = ({
   if (txIsInitiated(tx)) {
     //
   } else if (txIsCompleted(tx)) {
-    stateComponent = <IconCheckWithBackground className={css.icon} />;
+    stateComponent = <IconTickWithBackground className={css.icon} />;
   } else if (txIsDelivering(tx)) {
     stateComponent = <IconDelivering className={css.icon} />;
   } else if (txIsDeliveryFailed(tx)) {

@@ -91,6 +91,13 @@ $buttonBorderRadius: 8px;
     color: $neutralGray1;
     border-color: $neutralGray1;
 
+    svg {
+      stroke: $neutralGray1;
+
+      path {
+        stroke: $neutralGray1;
+      }
+    }
     .spinner {
       stroke: $neutralGray1;
     }

@@ -4,13 +4,13 @@
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
 
   .itemsContainer {
+    flex-basis: calc(100% - 24px * 2);
     display: flex;
-    padding: 0 16px;
-    column-gap: 28px;
-    max-width: calc(100% - 80px);
+    padding: 0 24px;
+    column-gap: 20px;
+
     overflow: auto hidden;
     scroll-behavior: smooth;
 
@@ -23,8 +23,16 @@
   }
 
   .navigatorBtn {
+    flex-basis: 24px;
     background-color: transparent;
     border: none;
-    width: 32px;
+    width: fit-content;
+    min-width: unset;
+    padding: 0;
+
+    .navigatorIcon {
+      width: 24px;
+      height: 24px;
+    }
   }
 }

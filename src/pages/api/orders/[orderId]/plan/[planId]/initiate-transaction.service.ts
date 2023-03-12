@@ -1,3 +1,6 @@
+import isEmpty from 'lodash/isEmpty';
+import { DateTime } from 'luxon';
+
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { isJoinedPlan } from '@helpers/orderHelper';
 import { denormalisedResponseEntities } from '@services/data';
@@ -9,8 +12,6 @@ import { Listing, Transaction } from '@utils/data';
 import type { TPlan } from '@utils/orderTypes';
 import { ETransition } from '@utils/transaction';
 import type { TObject } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
-import { DateTime } from 'luxon';
 
 type TPlanOrderDetail = TPlan['orderDetail'];
 type TOrderOfDate = TPlanOrderDetail[keyof TPlanOrderDetail];
@@ -33,6 +34,7 @@ type TNormalizedOrderDetail = {
     bookingStart: Date;
     bookingEnd: Date;
     bookingDisplayStart: Date;
+    bookingDisplayEnd: Date;
   };
 
   date: string;
@@ -63,6 +65,7 @@ const normalizeOrderDetail = ({
           ...convertHHmmStringToTimeParts(deliveryHour),
         })
         .toJSDate();
+      const bookingDisplayEnd = bookingEnd;
 
       const { participantIds, bookingInfo } = Object.entries(
         memberOrdersMap,
@@ -105,11 +108,12 @@ const normalizeOrderDetail = ({
         ? prev
         : prev.concat({
             params: {
-              listingId: restaurantId,
+              listingId: restaurantId as string,
               extendedData,
               bookingStart,
               bookingEnd,
               bookingDisplayStart,
+              bookingDisplayEnd,
             },
             date,
           });
@@ -188,6 +192,7 @@ export const initiateTransaction = async ({
           bookingStart,
           bookingEnd,
           bookingDisplayStart,
+          bookingDisplayEnd,
           extendedData: { metadata },
         },
         date,
@@ -202,7 +207,7 @@ export const initiateTransaction = async ({
             bookingStart,
             bookingEnd,
             bookingDisplayStart,
-            bookingDisplayEnd: bookingEnd,
+            bookingDisplayEnd,
             metadata: {
               ...metadata,
               isLastTxOfPlan: index === normalizedOrderDetail.length - 1,

@@ -1,3 +1,15 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useMemo, useState } from 'react';
+import type { FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import arrayMutators from 'final-form-arrays';
+import difference from 'lodash/difference';
+import isEqual from 'lodash/isEqual';
+import { DateTime } from 'luxon';
+
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -9,16 +21,6 @@ import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import { getDaySessionFromDeliveryTime } from '@utils/dates';
 import type { TListing } from '@utils/types';
-import classNames from 'classnames';
-import arrayMutators from 'final-form-arrays';
-import difference from 'lodash/difference';
-import isEqual from 'lodash/isEqual';
-import { DateTime } from 'luxon';
-import { useMemo, useState } from 'react';
-import type { FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import DeliveryAddressField from '../DeliveryAddressField/DeliveryAddressField';
 import MealPlanDateField from '../MealPlanDateField/MealPlanDateField';
@@ -27,6 +29,7 @@ import NutritionField from '../NutritionField/NutritionField';
 import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
 import ParticipantSetupField from '../ParticipantSetupField/ParticipantSetupField';
 import PerPackageField from '../PerPackageField/PerPackageField';
+
 import css from './OrderSettingModal.module.scss';
 
 type TOrderSettingModalProps = {
@@ -56,6 +59,13 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
   const updateOrderInProgress = useAppSelector(
     (state) => state.Order.updateOrderInProgress,
   );
+  const recommendRestaurantInProgress = useAppSelector(
+    (state) => state.Order.recommendRestaurantInProgress,
+  );
+  const updateOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.updateOrderDetailInProgress,
+  );
+
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
@@ -106,20 +116,20 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
     [
       packagePerMember,
       vatAllow,
-      selectedGroups,
+      JSON.stringify(selectedGroups),
       deliveryHour,
       deadlineDate,
       deadlineHour,
-      deliveryAddress,
+      JSON.stringify(deliveryAddress),
       detailAddress,
       address,
-      origin,
+      JSON.stringify(origin),
       startDate,
       endDate,
       memberAmount,
-      initialFieldValues,
-      nutritions,
-      dayInWeek,
+      JSON.stringify(initialFieldValues),
+      JSON.stringify(nutritions),
+      JSON.stringify(dayInWeek),
     ],
   );
   const leftSideRenderer = () =>
@@ -295,37 +305,49 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
       nutritions: nutritionsValue,
       ...rest,
     };
-    const { payload }: { payload: any } = await dispatch(
-      orderAsyncActions.updateOrder({ generalInfo }),
-    );
+    try {
+      await dispatch(orderAsyncActions.updateOrder({ generalInfo }));
 
-    const { plans = [] } = Listing(order as TListing).getMetadata();
-    const changedOrderDetailFactor =
-      startDate !== startDateValue ||
-      endDate !== endDateValue ||
-      difference(nutritions, nutritionsValue).length > 0 ||
-      getDaySessionFromDeliveryTime(deliveryHour) !==
-        getDaySessionFromDeliveryTime(deliveryHourValue) ||
-      packagePerMember !== +packagePerMemberValue.replace(/,/g, '');
-    const { orderDetail: newOrderDetail } = payload || {};
-
-    if (!isEqual(orderDetail, newOrderDetail) && changedOrderDetailFactor) {
-      const planId = plans[0];
-      await dispatch(
-        orderAsyncActions.updatePlanDetail({
-          orderId: Listing(order as TListing).getId(),
-          orderDetail: newOrderDetail,
-          planId,
-          updateMode: 'replace',
-        }),
+      const { plans = [] } = Listing(order as TListing).getMetadata();
+      const changedOrderDetailFactor =
+        startDate !== startDateValue ||
+        endDate !== endDateValue ||
+        difference(nutritions, nutritionsValue).length > 0 ||
+        getDaySessionFromDeliveryTime(deliveryHour) !==
+          getDaySessionFromDeliveryTime(deliveryHourValue) ||
+        packagePerMember !== +packagePerMemberValue.replace(/,/g, '');
+      const { payload: newOrderDetail } = await dispatch(
+        orderAsyncActions.recommendRestaurants(),
       );
+
+      if (!isEqual(orderDetail, newOrderDetail) && changedOrderDetailFactor) {
+        const planId = plans[0];
+        await dispatch(
+          orderAsyncActions.updatePlanDetail({
+            orderId: Listing(order as TListing).getId(),
+            orderDetail: newOrderDetail,
+            planId,
+          }),
+        );
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
   const hideSubmitButton = selectedField === OrderSettingField.COMPANY;
+  const submitInProgress =
+    updateOrderInProgress ||
+    recommendRestaurantInProgress ||
+    updateOrderDetailInProgress;
+
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <Modal
+      id="OrderSettingModal"
       isOpen={isOpen}
       handleClose={onClose}
       title={intl.formatMessage({ id: 'OrderSettingModal.title' })}>
@@ -346,8 +368,8 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
                     {!hideSubmitButton && (
                       <Button
                         className={css.submitBtn}
-                        disabled={invalid || updateOrderInProgress}
-                        inProgress={updateOrderInProgress}
+                        disabled={invalid || submitInProgress}
+                        inProgress={submitInProgress}
                         type="submit">
                         {intl.formatMessage({
                           id: 'OrderSettingModal.saveChange',

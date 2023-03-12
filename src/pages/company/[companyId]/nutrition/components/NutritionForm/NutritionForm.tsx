@@ -1,3 +1,9 @@
+import { useMemo, useState } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
@@ -10,14 +16,10 @@ import NutritionField from '@pages/admin/order/create/components/NutritionField/
 import { Listing, User } from '@utils/data';
 import { CATEGORY_OPTIONS } from '@utils/enums';
 import type { TUser } from '@utils/types';
-import { useMemo, useState } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import { NutritionThunks } from '../../Nutrition.slice';
 import RestaurantModal from '../RestaurantModal/RestaurantModal';
+
 import css from './NutritionForm.module.scss';
 
 export type TNutritionFormValues = {
@@ -26,7 +28,10 @@ export type TNutritionFormValues = {
   nutritions: string[];
 };
 
-type TExtraProps = { isPersonal: boolean };
+type TExtraProps = {
+  isPersonal: boolean;
+  nutritionsOptions: { key: string; label: string }[];
+};
 type TNutritionFormComponentProps = FormRenderProps<TNutritionFormValues> &
   Partial<TExtraProps>;
 type TNutritionFormProps = FormProps<TNutritionFormValues> & TExtraProps;
@@ -34,7 +39,14 @@ type TNutritionFormProps = FormProps<TNutritionFormValues> & TExtraProps;
 const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, form, values, isPersonal, initialValues } = props;
+  const {
+    handleSubmit,
+    form,
+    values,
+    isPersonal,
+    initialValues,
+    nutritionsOptions,
+  } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [removedFavoriteRestaurantIds, setRemovedFavoriteRestaurantIds] =
@@ -249,6 +261,9 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
         <div className={css.fieldSection}>
           <NutritionField
             title={intl.formatMessage({ id: 'NutritionForm.nutrition.title' })}
+            titleClassName={css.customTitle}
+            fieldClassName={css.customField}
+            options={nutritionsOptions}
           />
         </div>
         <div className={css.fieldSection}>

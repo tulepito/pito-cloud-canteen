@@ -1,3 +1,10 @@
+import { useMemo } from 'react';
+import type { FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import differenceBy from 'lodash/differenceBy';
+
 import Avatar from '@components/Avatar/Avatar';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
@@ -6,12 +13,6 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { BookerManageCompany } from '@redux/slices/company.slice';
 import { User } from '@utils/data';
 import type { TObject } from '@utils/types';
-import classNames from 'classnames';
-import differenceBy from 'lodash/differenceBy';
-import { useMemo } from 'react';
-import type { FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import css from './AddNewMembersForm.module.scss';
 
@@ -97,7 +98,9 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
                           <div className={css.name}>
                             {User(member).getProfile().displayName}
                           </div>
-                          <div className={css.email}>
+                          <div
+                            className={css.email}
+                            title={User(member).getAttributes().email}>
                             {User(member).getAttributes().email}
                           </div>
                         </div>

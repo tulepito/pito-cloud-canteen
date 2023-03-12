@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 const OrderStates = {
   canceled: 'canceled',
   canceledByBooker: 'canceledByBooker',
@@ -12,6 +11,7 @@ const OrderStates = {
 const Transitions = {
   initiateTransaction: 'transition/initiate-transaction',
   expiredDelivery: 'transition/expired-delivery',
+  expireStartDelivery: 'transition/expired-start-delivery',
   startDelivery: 'transition/start-delivery',
   operatorCancelPlan: 'transition/operator-cancel-plan',
   cancelDelivery: 'transition/cancel-delivery',

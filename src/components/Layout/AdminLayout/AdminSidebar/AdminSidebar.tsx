@@ -1,3 +1,8 @@
+import React, { useMemo } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
 import IconHome from '@components/Icons/IconHome/IconHome';
 import IconOrderManagement from '@components/Icons/IconOrderManagement/IconOrderManagement';
 import IconUserManagement from '@components/Icons/IconUserManagement/IconUserManagement';
@@ -6,10 +11,6 @@ import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import NamedLink from '@components/NamedLink/NamedLink';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import { adminRoutes } from '@src/paths';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import React, { useMemo } from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './AdminSidebar.module.scss';
 
@@ -24,7 +25,7 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
   {
     id: 'order',
     Icon: IconOrderManagement,
-    nameLink: adminRoutes.CreateOrder.path,
+    nameLink: adminRoutes.ManageOrders.path,
     label: 'AdminSidebar.orderLabel',
     isFirstLevel: true,
     childrenMenus: [

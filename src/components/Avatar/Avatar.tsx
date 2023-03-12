@@ -1,3 +1,8 @@
+import React from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import Link from 'next/link';
+
 import IconBannedUser from '@components/Icons/IconBannedUser/IconBannedUser';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import {
@@ -8,10 +13,6 @@ import {
 } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TCurrentUser, TDefaultProps, TUser } from '@utils/types';
-import classNames from 'classnames';
-import Link from 'next/link';
-import React from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './Avatar.module.scss';
 

@@ -1,12 +1,13 @@
+import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
-import get from 'lodash/get';
-import isEmpty from 'lodash/isEmpty';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const integrationSdk = getIntegrationSdk();
@@ -26,16 +27,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
         } = req;
 
-        const user = denormalisedResponseEntities(
-          await integrationSdk.users.show({
-            email,
-          }),
-        )[0];
+        let user;
+
+        try {
+          [user] = denormalisedResponseEntities(
+            await integrationSdk.users.show({
+              email,
+            }),
+          );
+        } catch (errorFetchUser: any) {
+          console.error(errorFetchUser?.data?.errors[0]);
+        }
 
         if (!user) {
           res.json({
-            statusCode: 401,
-            message: `The email ${email} is not belong any account`,
+            errorCode: 'user_not_found',
+            message: `Email ${email} chưa có tài khoản`,
           });
           return;
         }
@@ -49,16 +56,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         if (participants.includes(userId)) {
           res.json({
-            statusCode: 400,
-            message: `Participant is already in accessible list`,
+            errorCode: 'user_already_in_list',
+            message: `Đã tồn tại trong danh sách thành viên`,
           });
           return;
         }
 
         if (!isUserInCompany) {
           res.json({
-            statusCode: 400,
-            message: `Participant is not belong to company ${companyId}`,
+            errorCode: 'user_not_belong_to_company',
+            message: `Thanh viên không thuộc công ty`,
           });
           return;
         }
@@ -100,7 +107,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         });
 
         res.status(200).json({
-          statusCode: 200,
           message: `Successfully add participant, email: ${email}`,
         });
       } catch (error) {

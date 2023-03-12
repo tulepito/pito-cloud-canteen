@@ -1,9 +1,10 @@
-import Form from '@components/Form/Form';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import IconSearch from '@components/Icons/IconSearch/IconSearch';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+
+import Form from '@components/Form/Form';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconSearch from '@components/Icons/IconSearch/IconSearch';
 
 import css from './SearchOrderForm.module.scss';
 

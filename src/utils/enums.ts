@@ -104,7 +104,6 @@ export enum ECompanyStatus {
 
 export enum EListingType {
   restaurant = 'restaurant',
-  transaction = 'transaction',
   food = 'food',
   menu = 'menu',
   subOrder = 'sub-order',
@@ -125,12 +124,6 @@ export const startRouteBaseOnPermission = {
   [EUserPermission.company]: '/company',
   [EUserPermission.admin]: '/admin',
 };
-
-export enum ERestaurantListingState {
-  draft = 'draft',
-  published = 'published',
-  deleted = 'deleted',
-}
 
 export enum ERestaurantListingStatus {
   new = 'new',
@@ -342,21 +335,39 @@ export const LIST_BANKS = [
   },
 ];
 
+export const EPackagingMaterials = {
+  PAPER_BOX: 'paper-box',
+  PLASTIC_BOX: 'plastic-box',
+  BAGASSE_BOX: 'bagasse-box',
+  PLASTIC_STYROFOAM: 'plastic-styrofoam',
+  HEAT_RETAINING_ALUMINUM_XBOX: 'heat-retaining-aluminum-xbox',
+  DEGRADABLE_PLASTIC: 'degradable-plastic',
+  REUSABLE_BOX: 'reusable-box',
+};
+
 export const PACKAGING_OPTIONS = [
   {
-    key: 'paper-box',
+    key: EPackagingMaterials.PAPER_BOX,
     label: 'Hộp giấy',
   },
   {
-    key: 'plastic-box',
-    label: 'Hộp nhựa',
+    key: EPackagingMaterials.PLASTIC_BOX,
+    label: 'Nhựa xốp',
   },
   {
-    key: 'bagasse-box',
+    key: EPackagingMaterials.BAGASSE_BOX,
     label: 'Hộp bã mía',
   },
   {
-    key: 'reusable-box',
+    key: EPackagingMaterials.HEAT_RETAINING_ALUMINUM_XBOX,
+    label: 'Hộp nhôm giữ nhiệt',
+  },
+  {
+    key: EPackagingMaterials.DEGRADABLE_PLASTIC,
+    label: 'Nhựa có thể phân hủy',
+  },
+  {
+    key: EPackagingMaterials.REUSABLE_BOX,
     label: 'Hộp ăn tái sử dụng',
   },
   {
@@ -646,12 +657,45 @@ export enum EOrderDraftStates {
 
 export const SPECIAL_DIET_OPTIONS = [
   {
+    key: 'low-carb',
+    label: 'Low-carb',
+  },
+
+  {
+    key: 'keto',
+    label: 'Keto',
+  },
+  {
+    key: 'mediterranean-diet',
+    label: 'Mediterranean Diet',
+  },
+  {
+    key: 'plant-based',
+    label: 'Plant-based',
+  },
+  {
     key: 'halal',
     label: 'Halal',
   },
   {
-    key: 'keto',
-    label: 'Keto',
+    key: 'intermittent-fasting',
+    label: 'Intermittent Fasting',
+  },
+  {
+    key: 'carnivore-diet',
+    label: 'Carnivore Diet',
+  },
+  {
+    key: 'healthy',
+    label: 'Healthy',
+  },
+  {
+    key: 'paleo-diet',
+    label: 'Paleo Diet',
+  },
+  {
+    key: 'gluten-free',
+    label: 'Gluten free',
   },
   {
     key: OTHER_OPTION,
@@ -726,6 +770,10 @@ export const ORDER_STATES_OPTIONS = [
     label: 'Chưa đánh giá',
   },
   {
+    key: EOrderStates.pendingPayment,
+    label: 'Chưa thanh toán',
+  },
+  {
     key: EOrderStates.reviewed,
     label: 'Đã đánh giá',
   },
@@ -791,6 +839,7 @@ export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
     EBookerOrderDraftStates.bookerDraft,
     EOrderStates.picking,
     EOrderStates.inProgress,
+    EOrderStates.pendingPayment,
     EOrderStates.completed,
     EOrderStates.reviewed,
     EOrderStates.canceled,
@@ -802,6 +851,7 @@ export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
   [EManageCompanyOrdersTab.COMPLETED]: [
     EOrderStates.completed,
     EOrderStates.reviewed,
+    EOrderStates.pendingPayment,
   ],
   [EManageCompanyOrdersTab.DRAFT]: [
     EOrderDraftStates.pendingApproval,

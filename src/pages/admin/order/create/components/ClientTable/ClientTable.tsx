@@ -1,3 +1,9 @@
+import { useState } from 'react';
+import type { FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import Avatar from '@components/Avatar/Avatar';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
@@ -10,14 +16,10 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { addBooker } from '@redux/slices/Order.slice';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
-import classNames from 'classnames';
-import { useState } from 'react';
-import type { FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
+
+import IconNoClientsFound from './IconNoClientsFound';
 
 import css from './ClientTable.module.scss';
-import IconNoClientsFound from './IconNoClientsFound';
 
 type ClientTableProps = {
   data: any[];

@@ -1,9 +1,12 @@
+import { useMemo } from 'react';
+import Skeleton from 'react-loading-skeleton';
+import isEmpty from 'lodash/isEmpty';
+
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import HorizontalTimeLine from '@components/TimeLine/HorizontalTimeLine';
 import StateItem from '@components/TimeLine/StateItem';
 import { formatTimestamp } from '@utils/dates';
 import type { TObject, TTransaction } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
-import { useMemo } from 'react';
 
 import css from './ReviewOrderStatesSection.module.scss';
 
@@ -12,9 +15,9 @@ const prepareItemFromData = (transactionMap: TObject<number, TTransaction>) => {
     .map(([date, tx]) => {
       return { date: Number(date), tx };
     })
-    .sort((item) => item.date)
+    .sort((item, item2) => item.date - item2.date)
     .map(({ date, tx }) => {
-      return { date: formatTimestamp(Number(date)), tx };
+      return { date: formatTimestamp(Number(date), 'dd/M/yyyy'), tx };
     });
 
   return items;
@@ -36,17 +39,18 @@ const ReviewOrderStatesSection: React.FC<TReviewOrderStatesSectionProps> = ({
   );
 
   return (
-    <>
-      {!isEmpty(items) && (
-        <div className={css.root}>
-          <HorizontalTimeLine
-            items={items}
-            itemComponent={StateItem}
-            haveNavigators
-          />
-        </div>
-      )}
-    </>
+    <RenderWhen condition={!isEmpty(items)}>
+      <div className={css.root}>
+        <HorizontalTimeLine
+          items={items}
+          itemComponent={StateItem}
+          haveNavigators
+        />
+      </div>
+      <RenderWhen.False>
+        <Skeleton className={css.loadingSkeleton} />
+      </RenderWhen.False>
+    </RenderWhen>
   );
 };
 

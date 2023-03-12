@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import type { ReactNode } from 'react';
+import React from 'react';
+import { Form as FinalForm, FormSpy } from 'react-final-form';
+import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
+import type { FormApi } from 'final-form';
+import { useRouter } from 'next/router';
+
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import IconSort from '@components/Icons/IconSort/IconSort';
 import Pagination from '@components/Pagination/Pagination';
 import type { TDefaultProps, TPagination } from '@utils/types';
-import classNames from 'classnames';
-import type { FormApi } from 'final-form';
-import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
-import React from 'react';
-import { Form as FinalForm, FormSpy } from 'react-final-form';
-import { FormattedMessage } from 'react-intl';
 
 import css from './Table.module.scss';
 

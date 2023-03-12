@@ -1,12 +1,14 @@
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm, FormSpy } from 'react-final-form';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
 import Form from '@components/Form/Form';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { distanceOptions, ratingOptions } from '@src/marketplaceConfig';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm, FormSpy } from 'react-final-form';
 
 import CollapseFilter from '../../../components/CollapseFilter/CollapseFilter';
+
 import css from './FilterSidebarForm.module.scss';
 
 export type TFilterSidebarFormValues = {};
@@ -31,6 +33,9 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
   const categoriesOptions = useAppSelector(
     (state) => state.BookerSelectRestaurant.categories,
   );
+  const packagingOptions = useAppSelector(
+    (state) => state.BookerSelectRestaurant.packaging,
+  );
 
   const onResetAllFilters = () => {
     form.reset({
@@ -38,6 +43,7 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
       categories: [],
       distance: [],
       rating: [],
+      packaging: [],
     });
   };
   const handleFormChange = async (values: any) => {
@@ -96,6 +102,13 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
             title="Đánh giá"
             name="rating"
             options={ratingOptions}
+          />
+        </div>
+        <div className={css.filterWrapper}>
+          <CollapseFilter
+            title="Bao bì"
+            name="packaging"
+            options={packagingOptions}
           />
         </div>
       </div>

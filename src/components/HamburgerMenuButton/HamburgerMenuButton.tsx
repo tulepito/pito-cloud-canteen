@@ -1,6 +1,7 @@
-import { InlineTextButton } from '@components/Button/Button';
-import classNames from 'classnames';
 import React from 'react';
+import classNames from 'classnames';
+
+import { InlineTextButton } from '@components/Button/Button';
 
 import css from './HamburgerMenuButton.module.scss';
 

@@ -1,6 +1,8 @@
-import cookies from '@services/cookie';
-import { getIntegrationSdk } from '@services/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
+import { getIntegrationSdk } from '@services/sdk';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const { dataParams, queryParams = {} } = req.body;
@@ -19,4 +21,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   res.json(response);
 }
 
-export default cookies(handler);
+export default cookies(adminChecker(handler));

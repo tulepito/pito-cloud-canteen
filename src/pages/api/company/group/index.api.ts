@@ -1,14 +1,16 @@
+import { randomUUID } from 'crypto';
+import difference from 'lodash/difference';
+import differenceBy from 'lodash/differenceBy';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { HttpMethod } from '@apis/configs';
+import { EHttpStatusCode } from '@apis/errors';
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import companyChecker from '@services/permissionChecker/company';
 import { handleError } from '@services/sdk';
 import { denormalisedResponseEntities, User } from '@utils/data';
-import { randomUUID } from 'crypto';
-import difference from 'lodash/difference';
-import differenceBy from 'lodash/differenceBy';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 const { UUID } = require('sharetribe-flex-sdk').types;
 
@@ -38,7 +40,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         groupMembers.forEach(({ email }: TMemberApi) => {
           members[email] = {
             ...members[email],
-            groups: Array.from(new Set(members[email].groups).add(newGroupId)),
+            groups: Array.from(
+              new Set(members[email]?.groups || []).add(newGroupId),
+            ),
           };
         });
 
@@ -74,7 +78,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             });
           }),
         );
-        res.status(200).json(updatedCompanyAccount);
+        res.status(EHttpStatusCode.Ok).json(updatedCompanyAccount);
       } catch (error) {
         handleError(res, error);
       }
@@ -163,7 +167,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           }),
         );
 
-        res.status(200).json(updatedCompanyAccount);
+        res.status(EHttpStatusCode.Ok).json(updatedCompanyAccount);
       }
       break;
     case HttpMethod.DELETE:
@@ -219,7 +223,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             });
           }),
         );
-        res.status(200).json(updatedCompanyAccount);
+        res.status(EHttpStatusCode.Ok).json(updatedCompanyAccount);
       } catch (error) {
         handleError(res, error);
       }

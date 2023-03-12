@@ -1,10 +1,12 @@
-import { DateTime } from 'luxon';
 import type { Event } from 'react-big-calendar';
+import { DateTime } from 'luxon';
 
 import type { TCalendarItemCardComponents } from '../../helpers/types';
-import css from './DayItem.module.scss';
+
 import DayItemContent from './DayItemContent';
 import DayItemFooter from './DayItemFooter';
+
+import css from './DayItem.module.scss';
 
 type TMDayItemProps = {
   date: Date;

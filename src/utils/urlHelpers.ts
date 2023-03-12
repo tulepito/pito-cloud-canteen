@@ -1,5 +1,6 @@
-import { types as sdkTypes } from '@sharetribe/sdk';
 import queryString from 'query-string';
+
+import { types as sdkTypes } from '@sharetribe/sdk';
 
 import type { TObject } from './types';
 
@@ -137,7 +138,7 @@ export const decodeLatLngBounds = (str: string) => {
 const serialiseSdkTypes = (obj: any) =>
   Object.keys(obj).reduce((result: TObject, key) => {
     const val = obj[key];
-    /* eslint-disable no-param-reassign */
+
     if (val instanceof LatLngBounds) {
       result[key] = encodeLatLngBounds(val);
     } else if (val instanceof LatLng) {
@@ -145,7 +146,7 @@ const serialiseSdkTypes = (obj: any) =>
     } else {
       result[key] = val;
     }
-    /* eslint-enable no-param-reassign */
+
     return result;
   }, {});
 
@@ -164,11 +165,11 @@ export const stringify = (params: TObject) => {
   const serialised = serialiseSdkTypes(params);
   const cleaned = Object.keys(serialised).reduce((result: TObject, key) => {
     const val = serialised[key];
-    /* eslint-disable no-param-reassign */
+
     if (val !== null) {
       result[key] = val;
     }
-    /* eslint-enable no-param-reassign */
+
     return result;
   }, {});
   return queryString.stringify(cleaned);
@@ -194,9 +195,9 @@ export const stringify = (params: TObject) => {
 export const parse = (search: any, options: TObject = {}) => {
   const { latlng = [], latlngBounds = [] } = options;
   const params = queryString.parse(search);
+
   return Object.keys(params).reduce((result: TObject, key) => {
     const val = params[key] as string;
-    /* eslint-disable no-param-reassign */
     if (latlng.includes(key)) {
       result[key] = decodeLatLng(val);
     } else if (latlngBounds.includes(key)) {
@@ -209,7 +210,7 @@ export const parse = (search: any, options: TObject = {}) => {
       const num = parseFloatNum(val);
       result[key] = num === null ? val : num;
     }
-    /* eslint-enable no-param-reassign */
+
     return result;
   }, {});
 };

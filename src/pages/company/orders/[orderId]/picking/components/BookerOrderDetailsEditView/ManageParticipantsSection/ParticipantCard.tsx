@@ -1,16 +1,17 @@
+import React from 'react';
+import classNames from 'classnames';
+
 import Avatar from '@components/Avatar/Avatar';
 import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import { shortenString } from '@utils/string';
 import type { TDefaultProps, TUser } from '@utils/types';
-import classNames from 'classnames';
-import React from 'react';
 
 import css from './ParticipantCard.module.scss';
 
 const DEFAULT_AVATAR_PATH = '/images/default_avatar.png';
 const MAXLENGTH_NAME = 26;
-const MAXLENGTH_EMAIL = 30;
+const MAXLENGTH_EMAIL = 26;
 
 type TParticipantCardProps = TDefaultProps & {
   avatar?: any;
@@ -43,7 +44,11 @@ const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
     <div className={rootClasses}>
       <div className={css.avatarContainer}>
         {participant ? (
-          <Avatar disableProfileLink user={participant} />
+          <Avatar
+            disableProfileLink
+            user={participant}
+            className={css.avatar}
+          />
         ) : (
           <img src={avatar} alt="Avatar" className={css.avatar} />
         )}

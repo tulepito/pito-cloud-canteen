@@ -1,8 +1,10 @@
-import Button from '@components/Button/Button';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import classNames from 'classnames';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import Button from '@components/Button/Button';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import { parseThousandNumber } from '@helpers/format';
 
 import css from './DurationForNextOrderField.module.scss';
 
@@ -28,6 +30,7 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
       form.change('durationTime', +displayedDurationTimeValue);
     }
   };
+
   return (
     <div className={containerClasses}>
       {title && <div className={css.fieldLabel}>{title}</div>}
@@ -35,9 +38,10 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
         <FieldTextInput
           id="displayedDurationTime"
           name="displayedDurationTime"
-          type="number"
+          type="text"
           className={css.durationTimeInput}
           placeholder="1"
+          parse={parseThousandNumber}
         />
         <div className={css.timeModeBtnWrapper}>
           <Button

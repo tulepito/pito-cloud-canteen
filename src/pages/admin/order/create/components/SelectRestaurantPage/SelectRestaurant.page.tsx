@@ -1,3 +1,8 @@
+import { useEffect, useRef, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import { DateTime } from 'luxon';
+
 import Badge from '@components/Badge/Badge';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Pagination from '@components/Pagination/Pagination';
@@ -6,16 +11,14 @@ import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
-import { DateTime } from 'luxon';
-import { useEffect, useRef, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 // eslint-disable-next-line import/no-cycle
 import type { TSelectFoodFormValues } from '../SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
 import SelectFoodModal from '../SelectFoodModal/SelectFoodModal';
+
 import RestaurantTable from './components/RestaurantTable/RestaurantTable';
 import SearchRestaurantForm from './components/SearchRestaurantForm/SearchRestaurantForm';
+
 import css from './SelectRestaurantPage.module.scss';
 
 const DEBOUNCE_TIME = 500;
@@ -24,12 +27,14 @@ type TSelectRestaurantPageProps = {
   onSubmitRestaurant: (values: TObject) => void;
   selectedDate: Date;
   onBack: () => void;
+  selectFoodInProgress: boolean;
 };
 
 const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   onSubmitRestaurant,
   selectedDate,
   onBack,
+  selectFoodInProgress,
 }) => {
   const [currentRestaurant, setCurrentRestaurant] = useState<any>();
   const [page, setPage] = useState(1);
@@ -85,7 +90,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   useEffect(() => {
     dispatch(
       selectRestaurantPageThunks.getRestaurants({
-        dateTime,
+        dateTime: dateTime.toMillis(),
         packagePerMember,
         deliveryHour,
         nutritions,
@@ -94,7 +99,14 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [packagePerMember, deliveryHour, nutritions, dispatch, page, perPage]);
+  }, [
+    packagePerMember,
+    deliveryHour,
+    JSON.stringify(nutritions),
+    dispatch,
+    page,
+    perPage,
+  ]);
 
   const handlePageChange = (pageValue: number) => {
     setPage(pageValue);
@@ -117,7 +129,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     currDebounceRef = setTimeout(() => {
       dispatch(
         selectRestaurantPageThunks.getRestaurants({
-          dateTime,
+          dateTime: dateTime.toMillis(),
           title,
           packagePerMember,
           deliveryHour,
@@ -127,7 +139,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     }, DEBOUNCE_TIME);
   };
 
-  const handleSelectFood = (values: TSelectFoodFormValues) => {
+  const handleSelectFood = async (values: TSelectFoodFormValues) => {
     const { food: foodIds } = values;
 
     const currRestaurantId = currentRestaurant?.id?.uuid;
@@ -155,7 +167,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       ).menu.id.uuid,
     };
 
-    onSubmitRestaurant({
+    await onSubmitRestaurant({
       restaurant: submitRestaurantData,
       selectedFoodList: submitFoodListData,
     });
@@ -212,6 +224,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
         isOpen={showModalCondition}
         handleClose={handleCloseModal}
         handleSelectFood={handleSelectFood}
+        selectFoodInProgress={selectFoodInProgress}
       />
     </section>
   );

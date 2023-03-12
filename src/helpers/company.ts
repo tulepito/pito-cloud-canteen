@@ -1,10 +1,11 @@
-import { UserPermission } from '@src/types/UserPermission';
-import { User } from '@utils/data';
-import type { TCurrentUser, TObject, TUser } from '@utils/types';
 import filter from 'lodash/filter';
 import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
+
+import { UserPermission } from '@src/types/UserPermission';
+import { User } from '@utils/data';
+import type { TCurrentUser, TObject, TUser } from '@utils/types';
 
 export const getAllCompanyMembers = (companyAccount: TUser) => {
   const { members = {} } = User(companyAccount).getMetadata();

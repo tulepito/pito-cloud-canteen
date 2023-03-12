@@ -1,6 +1,7 @@
+import classNames from 'classnames';
+
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
-import classNames from 'classnames';
 
 import css from './CartItem.module.scss';
 

@@ -1,7 +1,9 @@
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+
+import { EHttpStatusCode } from '@apis/errors';
 import { getSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import { checkUserIsAdmin } from '@utils/permissions';
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 const adminChecker =
   (handler: NextApiHandler) =>
@@ -15,7 +17,7 @@ const adminChecker =
       const isAdmin = checkUserIsAdmin(currentUser);
 
       if (!isAdmin) {
-        return res.status(403).json({
+        return res.status(EHttpStatusCode.Forbidden).json({
           message: 'Forbidden',
         });
       }

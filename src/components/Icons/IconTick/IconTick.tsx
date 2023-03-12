@@ -1,12 +1,18 @@
 import React from 'react';
 
-const IconTick = () => {
+import type { TIconProps } from '@src/utils/types';
+
+const IconTick: React.FC<TIconProps> = (props) => {
+  const { className } = props;
+
   return (
     <svg
       width="24"
       height="24"
       viewBox="0 0 24 24"
       fill="none"
+      preserveAspectRatio="none"
+      className={className}
       xmlns="http://www.w3.org/2000/svg">
       <path
         d="M19.6282 6.37154C19.1332 5.87584 18.3293 5.87615 17.8336 6.37154L9.75659 14.4489L6.1667 10.859C5.671 10.3633 4.86748 10.3633 4.37178 10.859C3.87607 11.3547 3.87607 12.1582 4.37178 12.6539L8.85894 17.1411C9.10663 17.3888 9.43143 17.513 9.75625 17.513C10.0811 17.513 10.4062 17.3891 10.6539 17.1411L19.6282 8.16643C20.1239 7.67108 20.1239 6.86721 19.6282 6.37154Z"

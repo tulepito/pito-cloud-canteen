@@ -1,14 +1,15 @@
-import { useRouter } from 'next/router';
 import { useMemo } from 'react';
+import { useRouter } from 'next/router';
 
 import { convertQueryValueToArray } from '../../helpers/urlQuery';
 import FilterSidebarForm from '../FilterSidebarForm/FilterSidebarForm';
+
 import css from './FilterSidebar.module.scss';
 
 const FilterSidebar: React.FC = () => {
   const router = useRouter();
 
-  const { menuTypes, categories, distance, rating } = router.query;
+  const { menuTypes, categories, distance, rating, packaging } = router.query;
 
   const initialValues = useMemo(() => {
     return {
@@ -16,8 +17,9 @@ const FilterSidebar: React.FC = () => {
       categories: convertQueryValueToArray(categories),
       distance: convertQueryValueToArray(distance),
       rating: convertQueryValueToArray(rating),
+      packaging: convertQueryValueToArray(packaging),
     };
-  }, [categories, distance, menuTypes, rating]);
+  }, [categories, distance, menuTypes, rating, packaging]);
 
   return (
     <FilterSidebarForm

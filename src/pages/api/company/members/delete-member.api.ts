@@ -1,3 +1,7 @@
+import compact from 'lodash/compact';
+import difference from 'lodash/difference';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { composeApiCheckers } from '@apis/configs';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -5,9 +9,6 @@ import companyChecker from '@services/permissionChecker/company';
 import { handleError } from '@services/sdk';
 import type { TCompanyGroup } from '@src/types/companyGroup';
 import { denormalisedResponseEntities, User } from '@utils/data';
-import compact from 'lodash/compact';
-import difference from 'lodash/difference';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const integrationSdk = getIntegrationSdk();

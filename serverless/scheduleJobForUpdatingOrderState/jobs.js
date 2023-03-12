@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-return */
 const { OrderStates } = require('./utils/constants');
 const { denormalisedResponseEntities } = require('./utils/data');
 const { integrationSdk } = require('./utils/sdk');

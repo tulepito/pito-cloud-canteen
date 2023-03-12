@@ -1,12 +1,12 @@
-import Button from '@components/Button/Button';
-import IconClose from '@components/Icons/IconClose/IconClose';
-import { useAppDispatch } from '@hooks/reduxHooks';
-import useLockBodyScroll from '@hooks/useDisableBodyScroll';
-import { UIActions } from '@redux/slices/UI.slice';
-import classNames from 'classnames';
 import type { PropsWithChildren, ReactNode } from 'react';
 import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import Button from '@components/Button/Button';
+import IconClose from '@components/Icons/IconClose/IconClose';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { UIActions } from '@redux/slices/UI.slice';
 
 import css from './Modal.module.scss';
 
@@ -42,7 +42,6 @@ const Modal: React.FC<TModalProps> = (props) => {
 
   const intl = useIntl();
   const dispatch = useAppDispatch();
-
   const isOpenClass = isOpen
     ? classNames(css.isOpen, openClassName)
     : css.isClosed;
@@ -70,8 +69,6 @@ const Modal: React.FC<TModalProps> = (props) => {
       dispatch(UIActions.disableScrollRemove(id));
     };
   }, [dispatch, id, isOpen]);
-
-  useLockBodyScroll();
 
   return (
     <div id={id} className={classes}>

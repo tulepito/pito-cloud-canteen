@@ -1,12 +1,12 @@
-import 'react-datepicker/dist/react-datepicker.css';
-
-import Tooltip from '@components/Tooltip/Tooltip';
-import classNames from 'classnames';
-import viLocale from 'date-fns/locale/vi';
 import React from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { Field } from 'react-final-form';
+import classNames from 'classnames';
+import viLocale from 'date-fns/locale/vi';
 
+import Tooltip from '@components/Tooltip/Tooltip';
+
+import 'react-datepicker/dist/react-datepicker.css';
 import css from './FieldEntryTime.module.scss';
 
 registerLocale('vi', viLocale);

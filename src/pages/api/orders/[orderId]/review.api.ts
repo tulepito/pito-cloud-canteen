@@ -1,11 +1,13 @@
+import isEmpty from 'lodash/isEmpty';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { HttpMethod } from '@apis/configs';
+import { EHttpStatusCode } from '@apis/errors';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import { Listing } from '@utils/data';
 import { EOrderStates } from '@utils/enums';
-import isEmpty from 'lodash/isEmpty';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 const ValidOrderStates = [EOrderStates.pendingPayment, EOrderStates.completed];
 
@@ -25,7 +27,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const integrationSdk = getIntegrationSdk();
 
           if (isEmpty(orderId)) {
-            res.status(400).json({
+            res.status(EHttpStatusCode.BadRequest).json({
               error: 'Missing orderId',
             });
             return;
@@ -41,7 +43,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             Listing(orderListing).getMetadata();
 
           if (!isEnableToReviewOrder(orderState)) {
-            res.status(400).json({
+            res.status(EHttpStatusCode.BadRequest).json({
               error: `Cannot review order, order state: ${orderState}`,
             });
             return;
@@ -79,7 +81,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             },
           });
 
-          res.status(400).json({
+          res.status(EHttpStatusCode.BadRequest).json({
             error: `Cannot review order, order state: ${orderState}`,
           });
         }

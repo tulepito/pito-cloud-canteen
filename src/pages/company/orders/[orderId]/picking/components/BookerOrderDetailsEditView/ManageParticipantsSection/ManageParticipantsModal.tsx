@@ -1,17 +1,22 @@
-import Modal from '@components/Modal/Modal';
-import type { TObject, TUser } from '@utils/types';
 import { useIntl } from 'react-intl';
+
+import Modal from '@components/Modal/Modal';
+import { isCompletePickFood } from '@helpers/orderHelper';
+import { Listing } from '@src/utils/data';
+import type { TListing, TObject, TUser } from '@utils/types';
 
 import type { TAddParticipantFormValues } from './AddParticipantForm';
 import AddParticipantForm from './AddParticipantForm';
-import css from './ManageParticipantsModal.module.scss';
 import { RawParticipants } from './RawParticipants';
+
+import css from './ManageParticipantsModal.module.scss';
 
 type ManageParticipantsModalProps = {
   isOpen: boolean;
   onClose: () => void;
   handleClickDeleteParticipant: (id: string) => () => void;
   data: {
+    participants: string[];
     participantData: Array<TUser>;
     planData: TObject;
   };
@@ -30,17 +35,29 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
     handleClickDeleteParticipant,
     data,
   } = props;
-  const count = 0;
 
-  const modalTitle = intl.formatMessage(
-    { id: 'ManageParticipantModal.title' },
-    { count: 0 },
+  const { participants = [] } = data;
+  const { orderDetail } = Listing(data.planData as TListing).getMetadata();
+  const numberOfCompletedPickings = participants.filter((participantId) =>
+    isCompletePickFood({ participantId, orderDetail }),
+  ).length;
+
+  const modalTitle = (
+    <span className={css.modalTitle}>
+      {intl.formatMessage(
+        { id: 'ManageParticipantModal.title' },
+        { count: participants.length },
+      )}
+    </span>
   );
   const modalSubTitle =
-    count > 0
-      ? intl.formatMessage({
-          id: 'ManageParticipantModal.subTitle.hasChoices',
-        })
+    numberOfCompletedPickings > 0
+      ? intl.formatMessage(
+          {
+            id: 'ManageParticipantModal.subTitle.hasChoices',
+          },
+          { count: numberOfCompletedPickings },
+        )
       : intl.formatMessage({
           id: 'ManageParticipantModal.subTitle.noChoices',
         });
@@ -53,7 +70,11 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
       containerClassName={css.modalContainer}
       title={modalTitle}>
       <div className={css.subTitle}>{modalSubTitle}</div>
-      <AddParticipantForm onSubmit={onSubmitAddParticipant} hasSubmitButton />
+      <AddParticipantForm
+        id="ManageParticipantsModal.AddParticipantForm"
+        onSubmit={onSubmitAddParticipant}
+        hasSubmitButton
+      />
       <div className={css.participantsContainer}>
         <RawParticipants
           data={data}

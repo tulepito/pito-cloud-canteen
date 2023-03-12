@@ -1,6 +1,7 @@
-import type { TIconProps } from '@utils/types';
-import classNames from 'classnames';
 import React from 'react';
+import classNames from 'classnames';
+
+import type { TIconProps } from '@utils/types';
 
 const IconNoClientsFound: React.FC<TIconProps> = (props) => {
   const { className, rootClassName } = props;

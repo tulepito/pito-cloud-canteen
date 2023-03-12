@@ -30,7 +30,6 @@ const findReplaceCharacter = (ch: string) => {
 // An example how you could sanitize text content.
 // This swaps some coding related characters to less dangerous ones
 const sanitizeText = (str: any) =>
-  // eslint-disable-next-line no-nested-ternary
   str === null
     ? str
     : typeof str === 'string'

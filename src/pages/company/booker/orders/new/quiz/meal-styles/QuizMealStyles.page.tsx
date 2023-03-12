@@ -1,14 +1,17 @@
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { QuizActions, QuizThunks } from '@redux/slices/Quiz.slice';
-import { quizPaths } from '@src/paths';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
 
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { QuizActions } from '@redux/slices/Quiz.slice';
+import { quizPaths } from '@src/paths';
+
+import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
+
 import css from './QuizMealStyles.module.scss';
 
 type QuizMealStylesFormValues = {
@@ -18,6 +21,8 @@ const QuizMealStyles = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const router = useRouter();
+
+  useRedirectAfterReloadPage();
   const mealStyles = useAppSelector(
     (state) => state.Quiz.categories,
     shallowEqual,
@@ -29,9 +34,6 @@ const QuizMealStyles = () => {
   const [selectedMealStyles, setSelectedMealStyles] = useState<string[]>(
     quizData.mealStyles || [],
   );
-  useEffect(() => {
-    dispatch(QuizThunks.fetchSearchFilter());
-  }, [dispatch]);
 
   const validate = (values: QuizMealStylesFormValues) => {
     const errors: any = {};

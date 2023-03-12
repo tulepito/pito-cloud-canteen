@@ -1,3 +1,10 @@
+import type { ReactNode } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
@@ -14,12 +21,6 @@ import {
   phoneNumberFormatValid,
   required,
 } from '@utils/validators';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import css from './SignUpForm.module.scss';
 

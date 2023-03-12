@@ -1,6 +1,7 @@
+import { useIntl } from 'react-intl';
+
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import AlertModal from '@components/Modal/AlertModal';
-import { useIntl } from 'react-intl';
 
 import css from './DeleteMealModal.module.scss';
 
@@ -8,11 +9,13 @@ type TDeleteMealModalProps = {
   isOpen: boolean;
   removeInprogress?: boolean;
   deleteDate: string;
+  id: string;
   onClose?: () => void;
   onDelete: () => void;
 };
 
 const DeleteMealModal: React.FC<TDeleteMealModalProps> = ({
+  id,
   isOpen,
   removeInprogress,
   onClose = () => null,
@@ -32,10 +35,12 @@ const DeleteMealModal: React.FC<TDeleteMealModalProps> = ({
   const handleClose = () => {
     onClose();
   };
+  if (!isOpen) return null;
 
   return (
     <div className={css.root}>
       <AlertModal
+        id={id}
         isOpen={isOpen}
         confirmLabel={
           <div className={css.confirmBtnWrapper}>

@@ -1,12 +1,14 @@
-import ButtonIcon from '@components/ButtonIcon/ButtonIcon';
-import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import classNames from 'classnames';
-import isEmpty from 'lodash/isEmpty';
 import type { ReactNode } from 'react';
 import { useRef } from 'react';
+import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
+
+import Button from '@components/Button/Button';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+
+import type { TTimeLineProps } from './types';
 
 import css from './HorizontalTimeLine.module.scss';
-import type { TTimeLineProps } from './types';
 
 type THorizontalTimeLineProps = TTimeLineProps & { haveNavigators?: boolean };
 
@@ -59,17 +61,23 @@ const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
   return (
     <div className={rootClasses}>
       {haveNavigators && (
-        <ButtonIcon className={css.navigatorBtn} onClick={handleNavigator(-1)}>
-          <IconArrow direction="left" />
-        </ButtonIcon>
+        <Button
+          variant="inline"
+          className={css.navigatorBtn}
+          onClick={handleNavigator(-1)}>
+          <IconArrow direction="left" className={css.navigatorIcon} />
+        </Button>
       )}
       <div ref={containerRef} className={css.itemsContainer}>
         {itemsToRender}
       </div>
       {haveNavigators && (
-        <ButtonIcon className={css.navigatorBtn} onClick={handleNavigator(+1)}>
-          <IconArrow direction="right" />
-        </ButtonIcon>
+        <Button
+          variant="inline"
+          className={css.navigatorBtn}
+          onClick={handleNavigator(+1)}>
+          <IconArrow direction="right" className={css.navigatorIcon} />
+        </Button>
       )}
     </div>
   );

@@ -1,26 +1,28 @@
+import { useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import { DateTime } from 'luxon';
+import { useRouter } from 'next/router';
+
 import Modal from '@components/Modal/Modal';
+import NamedLink from '@components/NamedLink/NamedLink';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { companyPaths } from '@src/paths';
 import { Listing, User } from '@utils/data';
-import {
-  formatTimestamp,
-  getSelectedDaysOfWeek,
-  TimeOptions,
-} from '@utils/dates';
+import { formatTimestamp, getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
-import { DateTime } from 'luxon';
-import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
+import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
+
 import type { TMealDateFormValues } from './MealDateForm/MealDateForm';
 import MealDateForm from './MealDateForm/MealDateForm';
-import css from './QuizMealDate.module.scss';
 import Spinner from './Spinner';
+
+import css from './QuizMealDate.module.scss';
 
 const QuizMealDate = () => {
   const intl = useIntl();
@@ -29,7 +31,9 @@ const QuizMealDate = () => {
   const creatingOrderModalControl = useBoolean();
   const [formValues, setFormValues] = useState<TMealDateFormValues>(null!);
   const [formInvalid, setFormInvalid] = useState<boolean>(false);
+  const submittingErrorControl = useBoolean();
 
+  useRedirectAfterReloadPage();
   const selectedCompany = useAppSelector(
     (state) => state.Quiz.selectedCompany,
     shallowEqual,
@@ -53,47 +57,59 @@ const QuizMealDate = () => {
     formValues || {};
 
   const selectedDays = getSelectedDaysOfWeek(startDate, endDate, dayInWeek);
-  const formattedStartDate = startDate && formatTimestamp(startDate, 'dd MMMM');
-  const formattedEndDate = endDate && formatTimestamp(endDate, 'dd MMMM');
+  const formattedStartDate = startDate && formatTimestamp(startDate, 'd MMMM');
+  const formattedEndDate = endDate && formatTimestamp(endDate, 'd MMMM');
   const initialValues = useMemo(
     () => ({
       dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri'],
-      deliveryHour: TimeOptions[0],
-      deadlineHour: TimeOptions[0],
+      displayedDurationTime: '1',
+      durationTime: '1',
+      durationTimeMode: 'week',
     }),
     [],
   );
   const onFormSubmitClick = async () => {
     creatingOrderModalControl.setTrue();
-    const { payload: orderListing }: { payload: any } = await dispatch(
-      orderAsyncActions.createOrder({
-        clientId: User(selectedCompany).getId(),
-        bookerId: currentUser?.id?.uuid,
-        generalInfo: {
-          ...quiz,
-          ...formValues,
-          deadlineDate: DateTime.fromMillis(deadlineDate).plus({
-            ...convertHHmmStringToTimeParts(deadlineHour),
-          }),
-          deliveryAddress: User(selectedCompany).getPublicData().location || {},
-          dayInWeek: selectedDays,
-        },
-      }),
-    );
-    const orderId = Listing(orderListing as TListing).getId();
-    const { plans = [] } = Listing(orderListing as TListing).getMetadata();
-    const planId = plans[0];
-    const { payload: recommendOrderDetail }: any = await dispatch(
-      orderAsyncActions.recommendRestaurants(),
-    );
-    await dispatch(
-      orderAsyncActions.updatePlanDetail({
-        orderId,
-        planId,
-        orderDetail: recommendOrderDetail,
-      }),
-    );
-    router.push(`/company/booker/orders/draft/${orderId}`);
+    try {
+      const { payload: orderListing }: { payload: any } = await dispatch(
+        orderAsyncActions.createOrder({
+          clientId: User(selectedCompany).getId(),
+          bookerId: currentUser?.id?.uuid,
+          generalInfo: {
+            ...quiz,
+            ...formValues,
+            deadlineDate: DateTime.fromMillis(deadlineDate)
+              .plus({
+                ...convertHHmmStringToTimeParts(deadlineHour),
+              })
+              .toMillis(),
+            deliveryAddress:
+              User(selectedCompany).getPublicData().location || {},
+            dayInWeek: selectedDays,
+          },
+        }),
+      );
+      const orderId = Listing(orderListing as TListing).getId();
+      const { plans = [] } = Listing(orderListing as TListing).getMetadata();
+      const planId = plans[0];
+      const { payload: recommendOrderDetail }: any = await dispatch(
+        orderAsyncActions.recommendRestaurants(),
+      );
+      const { meta } = await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId,
+          orderDetail: recommendOrderDetail,
+        }),
+      );
+      if (meta.requestStatus !== 'rejected') {
+        router.push(`/company/booker/orders/draft/${orderId}`);
+      } else {
+        return submittingErrorControl.setFalse();
+      }
+    } catch (error) {
+      return submittingErrorControl.setFalse();
+    }
   };
 
   const goBack = () => {
@@ -106,7 +122,7 @@ const QuizMealDate = () => {
       isOpen={!creatingOrderModalControl.value}
       handleClose={() => {}}
       modalTitle={intl.formatMessage({ id: 'QuizMealDate.title' })}
-      submitText="Tiếp tục"
+      submitText="Tạo đơn"
       onSubmit={onFormSubmitClick}
       submitDisabled={formInvalid}
       onBack={goBack}>
@@ -120,9 +136,11 @@ const QuizMealDate = () => {
   ) : (
     <Modal isOpen handleClose={() => {}} shouldHideIconClose>
       <div className={css.container}>
-        <div>
-          <Spinner />
-        </div>
+        {!submittingErrorControl.value && (
+          <div>
+            <Spinner />
+          </div>
+        )}
         <div className={css.initialOrderText}>
           {createOrderInProcess &&
             intl.formatMessage({
@@ -132,14 +150,27 @@ const QuizMealDate = () => {
             intl.formatMessage({
               id: 'QuizCreatingOrderPage.initializingOrderDetail',
             })}
+          {submittingErrorControl.value &&
+            intl.formatMessage({
+              id: 'QuizCreatingOrderPage.initializeOrderError',
+            })}
         </div>
-        {Listing(order as TListing).getAttributes()?.title && (
-          <div className={css.orderTitle}>
-            {`#${Listing(order as TListing).getAttributes()?.title}`}
+        {submittingErrorControl.value && (
+          <div className={css.error}>
+            <NamedLink
+              title={'Thử lại lần nữa'}
+              params={{ pathanme: companyPaths.CreateNewOrder }}
+            />
           </div>
         )}
+        {Listing(order as TListing).getAttributes()?.title &&
+          !submittingErrorControl.value && (
+            <div className={css.orderTitle}>
+              {`#${Listing(order as TListing).getAttributes()?.title}`}
+            </div>
+          )}
 
-        {startDate && endDate && (
+        {startDate && endDate && !submittingErrorControl.value && (
           <div className={css.orderDateWrapper}>
             <span>
               {intl.formatMessage({

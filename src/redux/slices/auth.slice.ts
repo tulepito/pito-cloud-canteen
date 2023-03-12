@@ -1,9 +1,10 @@
+import { createSlice } from '@reduxjs/toolkit';
+import isEmpty from 'lodash/isEmpty';
+
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
-import { createSlice } from '@reduxjs/toolkit';
 import { storableError } from '@utils/errors';
 import type { TObject } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
 
 const authenticated = (authInfo: TObject) => {
   return authInfo && authInfo.isAnonymous === false;

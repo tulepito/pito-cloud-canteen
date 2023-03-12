@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useMemo } from 'react';
+import { shallowEqual } from 'react-redux';
+
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
-import { useEffect, useMemo } from 'react';
-import { shallowEqual } from 'react-redux';
 
 import { BookerDraftOrderPageThunks } from '../BookerDraftOrderPage.slice';
 import { normalizePlanDetailsToEvent } from '../helpers/normalizeData';

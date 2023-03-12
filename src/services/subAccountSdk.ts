@@ -1,6 +1,7 @@
+import CryptoJS from 'crypto-js';
+
 import { createSdkInstance } from '@sharetribe/sdk';
 import type { TUser } from '@utils/types';
-import CryptoJS from 'crypto-js';
 
 import { getTrustedSdkWithSubAccountToken } from './sdk';
 

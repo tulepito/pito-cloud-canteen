@@ -1,8 +1,9 @@
-import { HttpMethod } from '@apis/configs';
-import { getIntegrationSdk } from '@services/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { denormalisedResponseEntities } from '../../../utils/data';
+import { HttpMethod } from '@apis/configs';
+import { denormalisedResponseEntities } from '@services/data';
+import { getIntegrationSdk } from '@services/sdk';
+
 import { LISTING_TYPE } from '../helpers/constants';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

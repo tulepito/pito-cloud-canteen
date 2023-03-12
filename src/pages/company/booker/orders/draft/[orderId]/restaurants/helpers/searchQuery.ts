@@ -1,3 +1,6 @@
+import uniqBy from 'lodash/uniqBy';
+import { DateTime } from 'luxon';
+
 import { calculateBounds } from '@helpers/mapHelpers';
 import { deliveryDaySessionAdapter } from '@helpers/orderHelper';
 import { ListingTypes } from '@src/types/listingTypes';
@@ -5,8 +8,6 @@ import { Listing, User } from '@utils/data';
 import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
 import { EImageVariants } from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
-import uniqBy from 'lodash/uniqBy';
-import { DateTime } from 'luxon';
 
 export const getMenuQuery = ({
   order,
@@ -56,7 +57,7 @@ export const getMenuQuery = ({
           )}`,
         }
       : {}),
-    [`pub_${dayOfWeek}AverageFoodPrice`]: `,${packagePerMember}`,
+    [`pub_${dayOfWeek}AverageFoodPrice`]: `1000,${packagePerMember}`,
   };
 
   return query;
@@ -79,6 +80,7 @@ export const getRestaurantQuery = ({
     keywords = '',
     distance,
     categories = [],
+    packaging = [],
   } = params;
 
   let newRestaurantIds = [...restaurantIds];
@@ -93,13 +95,16 @@ export const getRestaurantQuery = ({
   const bounds = distance ? calculateBounds(origin, distance) : '';
   const query = {
     ids: newRestaurantIds.join(','),
-    meta_rating: rating,
     keywords,
     page,
+    ...(rating && { meta_rating: `${rating},` }),
     ...(distance ? { bounds } : {}),
     ...(categories.length > 0
       ? { pub_categories: `has_all:${categories.join(',')}` }
       : {}),
+    ...(packaging.length > 0 && {
+      pub_packaging: `has_any:${packaging.join(',')}`,
+    }),
     include: ['images'],
     'fields.image': [
       `variants.${EImageVariants.default}`,

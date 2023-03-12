@@ -1,3 +1,5 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import {
   checkMenuInTransactionProgressApi,
   checkMenuUnConflictedApi,
@@ -9,7 +11,6 @@ import {
 } from '@apis/menuApi';
 import type { TCheckUnConflictedParams } from '@helpers/apiHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { EListingStates } from '@utils/enums';
 import { EListingType, EMenuMealType } from '@utils/enums';

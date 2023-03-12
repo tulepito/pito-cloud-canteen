@@ -1,24 +1,28 @@
-import IconClose from '@components/Icons/IconClose/IconClose';
-import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
-import IconUser from '@components/Icons/IconUser/IconUser';
-import { formatTimestamp } from '@utils/dates';
 import { useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
+import IconClose from '@components/Icons/IconClose/IconClose';
+import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
+import IconUser from '@components/Icons/IconUser/IconUser';
+import { formatTimestamp } from '@utils/dates';
+
 import DeleteMealModal from './components/DeleteMealModal';
+
 import css from './MealPlanCard.module.scss';
 
 type TMealPlanCardHeaderProps = {
   event: Event;
   removeInprogress?: boolean;
   removeEventItem?: (resourceId: string) => void;
+  onSearchRestaurant?: (date: Date) => void;
 };
 
 const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
   event,
   removeInprogress,
   removeEventItem,
+  onSearchRestaurant,
 }) => {
   const session = event.resource?.daySession;
   const resourceId = event.resource?.id;
@@ -37,6 +41,10 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
     setIsOpenDeleteModal(false);
   };
 
+  const handleSearchRestaurant = () => {
+    onSearchRestaurant?.(event?.start!);
+  };
+
   return (
     <div className={css.header}>
       <div className={css.planTitle}>
@@ -47,9 +55,13 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
         <IconUser />
         <div className={css.suitableAmount}>{''}</div>
         <div className={css.verticalDivider} />
-        <IconMagnifier className={css.searchIcon} />
+        <IconMagnifier
+          className={css.searchIcon}
+          onClick={handleSearchRestaurant}
+        />
       </div>
       <DeleteMealModal
+        id="DeleteMealModal"
         isOpen={isOpenDeleteModal}
         onClose={handleCloseDeleteModal}
         onDelete={handleDelete}

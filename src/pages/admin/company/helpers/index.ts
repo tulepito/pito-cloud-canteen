@@ -32,11 +32,27 @@ export const filterCompanies = (companies: TCompany[], filterValues: any) => {
       // eslint-disable-next-line no-nested-ternary
       removeAccents(company.attributes.profile.displayName)
         ?.toLowerCase()
-        .includes(keywords?.toLowerCase()) ||
+        .includes(removeAccents(keywords?.toLowerCase())) ||
       company.id.uuid?.toLowerCase().includes(keywords?.toLowerCase()) ||
       removeAccents(company.attributes.profile.publicData?.location?.address)
         ?.toLowerCase()
-        .includes(keywords?.toLowerCase())
+        .includes(removeAccents(keywords?.toLowerCase()))
+    );
+  });
+};
+
+export const filterCompaniesByCompanyName = (
+  companies: TCompany[],
+  companyName: string,
+) => {
+  return companies.filter((company: any) => {
+    return (
+      // eslint-disable-next-line no-nested-ternary
+      companyName
+        ? company.attributes.profile.publicData?.companyName
+            ?.toLowerCase()
+            .includes(companyName?.toLowerCase())
+        : true
     );
   });
 };

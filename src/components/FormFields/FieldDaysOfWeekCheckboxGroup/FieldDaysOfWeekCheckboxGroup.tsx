@@ -1,13 +1,15 @@
-import ValidationError from '@components/ValidationError/ValidationError';
-import { EDayOfWeek } from '@utils/enums';
-import type { TObject } from '@utils/types';
-import classNames from 'classnames';
 import React from 'react';
 import type { FieldArrayProps } from 'react-final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import ValidationError from '@components/ValidationError/ValidationError';
+import { EDayOfWeek } from '@utils/enums';
+import type { TObject } from '@utils/types';
 
 import FieldCheckbox from '../FieldCheckbox/FieldCheckbox';
+
 import css from './FieldDaysOfWeekCheckboxGroup.module.scss';
 
 const defaultDaysOfWeek = Object.keys(EDayOfWeek);
@@ -18,7 +20,7 @@ type TFieldDaysOfWeekCheckboxGroup = {
   label?: string;
   rootClassName?: string;
   className?: string;
-  daysOfWeek?: typeof EDayOfWeek[];
+  daysOfWeek?: EDayOfWeek[];
   disabled?: boolean;
 } & FieldArrayProps<any, any>;
 

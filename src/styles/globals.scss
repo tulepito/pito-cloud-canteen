@@ -22,6 +22,11 @@ a {
 
 button {
   border: 0;
+  font-family: inherit;
+}
+
+table {
+  overflow: hidden;
 }
 /* User interaction (https://html.spec.whatwg.org/multipage/interaction.html#editing)
     ========================================================================== */

@@ -1,10 +1,11 @@
+import { useField, useForm } from 'react-final-form-hooks';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
+
 import Button, { InlineTextButton } from '@components/Button/Button';
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
 import Toggle from '@components/Toggle/Toggle';
-import classNames from 'classnames';
-import isEmpty from 'lodash/isEmpty';
-import { useField, useForm } from 'react-final-form-hooks';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import css from './BookerNewOrder.module.scss';
 
@@ -34,10 +35,10 @@ export type TCreateOrderFormValues = {
 const validate = (values: TCreateOrderFormValues) => {
   const errors: any = {};
   if (!values.company) {
-    errors.company = 'Required';
+    errors.company = 'Vui lòng chọn công ty cần đặt đơn';
   }
   if (values.usePreviousData && !values.previousOrder) {
-    errors.previousOrder = 'Required';
+    errors.previousOrder = 'Vui lòng chọn đơn hàng cũ';
   }
   return errors;
 };
@@ -147,6 +148,7 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
       <Button
         className={css.submitBtn}
         type="submit"
+        loadingMode="extend"
         disabled={disabledSubmit}
         inProgress={isSubmitting}
         spinnerClassName={css.spinnerClassName}>

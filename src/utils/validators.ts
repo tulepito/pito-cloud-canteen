@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import toPairs from 'lodash/toPairs';
 
 import { printHoursToString } from './dates';
@@ -216,7 +217,6 @@ export const composeValidators =
 export const validFacebookUrl = (message: string) => (value: string) => {
   if (!value) return VALID;
   const pattern =
-    // eslint-disable-next-line no-useless-escape
     /^(?:(?:http|https):\/\/)?(?:www.)?facebook.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[?\w\-]*\/)?(?:profile.php\?id=(?=\d.*))?([\w\-]*)?$/;
   if (pattern.test(value)) {
     return VALID;
@@ -470,3 +470,32 @@ export const parseAvailabilityEntries = (time: Date) => {
   const hours = time.getHours();
   return printHoursToString(hours, minutes);
 };
+
+export const validFoodTitle = (message: string) => (value: string) => {
+  const format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+  return format.test(value) ? message : VALID;
+};
+
+export const upperCaseFirstLetter = (value: string) => {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+};
+
+export const validateNonEnterInputField =
+  (message: string) => (value: string, allValues: TObject) => {
+    const { tempValue } = allValues;
+    return tempValue ? message : VALID;
+  };
+
+export const valueLessThanMax =
+  (message: string, maxNameField: string) =>
+  (value: string, allValues: TObject) => {
+    const maxFieldValue = allValues?.[maxNameField] || 0;
+    return value > maxFieldValue ? message : VALID;
+  };
+
+export const valueGreaterThanMin =
+  (message: string, minNameField: string) =>
+  (value: string, allValues: TObject) => {
+    const maxFieldValue = allValues?.[minNameField] || 0;
+    return value < maxFieldValue ? message : VALID;
+  };

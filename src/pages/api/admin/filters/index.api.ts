@@ -1,8 +1,10 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities, User } from '@utils/data';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 const ADMIN_FLEX_ID = process.env.PITO_ADMIN_ID;
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -16,14 +18,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         { expand: true },
       ),
     )[0];
-    const { menuTypes = [], categories = [] } = User(response).getMetadata();
+    const {
+      menuTypes = [],
+      categories = [],
+      packaging = [],
+    } = User(response).getMetadata();
     res.json({
       menuTypes,
       categories,
+      packaging,
     });
   } catch (error) {
     handleError(res, error);
   }
 }
 
-export default cookies(handler);
+export default cookies(adminChecker(handler));

@@ -1,13 +1,17 @@
+import { useEffect, useState } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
-import { useEffect, useState } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
+import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { shortenString } from '@src/utils/string';
 
 import css from './EditOrderRowForm.module.scss';
 
@@ -56,7 +60,7 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
 
       {foodOptions?.map(({ foodId, foodName }) => (
         <option key={foodId} value={foodId}>
-          {foodName}
+          {shortenString(foodName, 16)}
         </option>
       ))}
     </>
@@ -90,7 +94,12 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
         onClick={handleToggleShowHideRequirementField}
         className={css.buttonContainer}>
         <div className={css.buttonContent}>
-          <IconMinus />
+          <RenderWhen condition={isRequirementInputShow}>
+            <IconMinus />
+            <RenderWhen.False>
+              <IconPlusWithoutBorder />
+            </RenderWhen.False>
+          </RenderWhen>
           <div>{currentRequirementFieldActionText}</div>
         </div>
       </Button>

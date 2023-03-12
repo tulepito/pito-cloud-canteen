@@ -1,6 +1,7 @@
-import type { TIconProps } from '@utils/types';
-import classNames from 'classnames';
 import React from 'react';
+import classNames from 'classnames';
+
+import type { TIconProps } from '@utils/types';
 
 import css from './IconMagnifier.module.scss';
 
@@ -9,6 +10,7 @@ const IconMagnifier: React.FC<TIconProps> = ({
   className,
   width = 24,
   height = 24,
+  onClick,
 }) => {
   const classes = classNames(rootClassName, css.root, className);
 
@@ -18,6 +20,7 @@ const IconMagnifier: React.FC<TIconProps> = ({
       className={classes}
       width={width}
       height={height}
+      onClick={onClick}
       clipRule="evenodd"
       fillRule="evenodd"
       strokeLinejoin="round"

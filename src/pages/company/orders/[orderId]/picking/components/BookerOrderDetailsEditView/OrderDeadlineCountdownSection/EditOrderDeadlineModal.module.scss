@@ -11,5 +11,9 @@
     @include viewportLarge {
       flex-basis: 700px;
     }
+
+    .title {
+      text-transform: capitalize;
+    }
   }
 }

@@ -1,7 +1,8 @@
-import { BookerSelectRestaurantThunks } from '@pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
+
+import { BookerSelectRestaurantThunks } from '@pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
 
 import { useAppDispatch, useAppSelector } from './reduxHooks';
 
@@ -19,6 +20,11 @@ const useFetchSearchFilters = () => {
     shallowEqual,
   );
 
+  const packagingOptions = useAppSelector(
+    (state) => state.BookerSelectRestaurant.packaging,
+    shallowEqual,
+  );
+
   useEffect(() => {
     if (isReady) {
       (async () => {
@@ -30,6 +36,7 @@ const useFetchSearchFilters = () => {
   return {
     menuTypesOptions,
     categoriesOptions,
+    packagingOptions,
   };
 };
 

@@ -1,3 +1,7 @@
+import { addDays, min, subDays } from 'date-fns';
+import isEmpty from 'lodash/isEmpty';
+import { DateTime } from 'luxon';
+
 import {
   AFTERNOON_SESSION,
   DINNER_SESSION,
@@ -5,22 +9,40 @@ import {
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
 import { Listing } from '@utils/data';
-import { generateTimeOptions } from '@utils/dates';
+import { generateTimeOptions, renderDateRange } from '@utils/dates';
 import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
   EParticipantOrderStatus,
 } from '@utils/enums';
-import type { TListing } from '@utils/types';
-import { addDays, min, subDays } from 'date-fns';
-import isEmpty from 'lodash/isEmpty';
-import { DateTime } from 'luxon';
+import type { TPlan } from '@utils/orderTypes';
+import type { TListing, TObject } from '@utils/types';
 
 export const isJoinedPlan = (
   foodId: string,
   status: EParticipantOrderStatus,
 ) => {
   return foodId !== '' && status === EParticipantOrderStatus.joined;
+};
+
+export const isCompletePickFood = ({
+  participantId,
+  orderDetail,
+}: {
+  participantId: string;
+  orderDetail: TObject;
+}) => {
+  const allOrderDetails = Object.values<TObject>(orderDetail);
+  const totalDates = allOrderDetails.length;
+
+  const completedDates = allOrderDetails.reduce((result: number, current) => {
+    const { memberOrders } = current;
+    const { status, foodId } = memberOrders[participantId] || {};
+
+    return result + +isJoinedPlan(foodId, status);
+  }, 0);
+
+  return completedDates === totalDates;
 };
 
 export const isOver = (deadline = 0) => {
@@ -122,12 +144,183 @@ export const isEnableSubmitPublishOrder = (
   orderDetail: any[],
 ) => {
   const isOrderValid = orderDataCheckers(order).isAllValid;
-
+  const isOrderDetailHasData = !isEmpty(orderDetail);
   const isOrderDetailSetupCompleted = orderDetail.every(({ resource }) => {
     const { isSelectedFood = false } = resource || {};
 
     return isSelectedFood;
   });
 
-  return isOrderValid && isOrderDetailSetupCompleted;
+  return isOrderValid && isOrderDetailSetupCompleted && isOrderDetailHasData;
+};
+
+export const isOrderDetailDatePickedFood = (date: any) => {
+  const { foodList = [] } = date || {};
+  return isEmpty(foodList);
+};
+
+export const isEnableToStartOrder = (orderDetail: TPlan['orderDetail']) => {
+  return (
+    !isEmpty(orderDetail) &&
+    Object.values(orderDetail).some(({ restaurant, memberOrders }) => {
+      const { id, restaurantName, foodList } = restaurant;
+      const isSetupRestaurant =
+        !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
+
+      const hasAnyOrders = Object.values(memberOrders).some(
+        ({ foodId, status }) => isJoinedPlan(foodId, status),
+      );
+
+      return isSetupRestaurant && hasAnyOrders;
+    })
+  );
+};
+
+export const getRestaurantListFromOrderDetail = (
+  orderDetail: TPlan['orderDetail'],
+) => {
+  return Object.values(orderDetail).reduce((result: any, current) => {
+    const { restaurant } = current;
+    const { restaurantName } = restaurant;
+
+    if (!result[restaurantName as string]) {
+      // eslint-disable-next-line no-param-reassign
+      result[restaurantName as string] = true;
+    }
+
+    return result;
+  }, {});
+};
+
+export const findSuitableStartDate = ({
+  selectedDate,
+  startDate = new Date().getTime(),
+  endDate = new Date().getTime(),
+  orderDetail = {},
+}: {
+  selectedDate?: Date;
+  startDate?: number;
+  endDate?: number;
+  orderDetail: TObject;
+}) => {
+  if (selectedDate && selectedDate instanceof Date) {
+    return selectedDate;
+  }
+
+  const dateRange = renderDateRange(startDate, endDate);
+
+  if (isEmpty(orderDetail)) {
+    return startDate;
+  }
+
+  const suitableStartDate = dateRange.find((date) =>
+    isOrderDetailDatePickedFood(orderDetail[date.toString()]),
+  );
+
+  return suitableStartDate;
+};
+
+export const isOrderDetailFullDatePickingRestaurant = ({
+  startDate = new Date().getTime(),
+  endDate = new Date().getTime(),
+  orderDetail = {},
+}: {
+  startDate?: number;
+  endDate?: number;
+  orderDetail: TObject;
+}) => {
+  const dateRange = renderDateRange(startDate, endDate);
+  const selectedDate = Object.keys(orderDetail);
+  return dateRange.length === selectedDate.length;
+};
+
+export const isOrderDetailFullDatePickingFood = (orderDetail: TObject) => {
+  return Object.values(orderDetail).every((date) => {
+    const { foodList = [] } = date || {};
+    return !isEmpty(foodList);
+  });
+};
+
+type TFoodDataValue = {
+  foodId: string;
+  foodName: string;
+  foodPrice: number;
+  frequency: number;
+};
+
+type TFoodDataMap = TObject<string, TFoodDataValue>;
+
+export const getFoodDataMap = ({ foodListOfDate = {}, memberOrders }: any) => {
+  return Object.entries(memberOrders).reduce<TFoodDataMap>(
+    (foodFrequencyResult, currentMemberOrderEntry) => {
+      const [, memberOrderData] = currentMemberOrderEntry;
+      const { foodId, status } = memberOrderData as TObject;
+      const { foodName, foodPrice } = foodListOfDate[foodId] || {};
+
+      if (isJoinedPlan(foodId, status)) {
+        const data = foodFrequencyResult[foodId] as TObject;
+        const { frequency } = data || {};
+
+        return {
+          ...foodFrequencyResult,
+          [foodId]: data
+            ? { ...data, frequency: frequency + 1 }
+            : { foodId, foodName, foodPrice, frequency: 1 },
+        };
+      }
+
+      return foodFrequencyResult;
+    },
+    {},
+  );
+};
+
+export const getTotalInfo = (foodDataList: TFoodDataValue[]) => {
+  return foodDataList.reduce<{
+    totalPrice: number;
+    totalDishes: number;
+  }>(
+    (previousResult, current: TObject) => {
+      const { totalPrice, totalDishes } = previousResult;
+      const { frequency, foodPrice } = current;
+
+      return {
+        ...previousResult,
+        totalDishes: totalDishes + frequency,
+        totalPrice: totalPrice + foodPrice * frequency,
+      };
+    },
+    {
+      totalDishes: 0,
+      totalPrice: 0,
+    },
+  );
+};
+
+export const combineOrderDetailWithPriceInfo = ({
+  orderDetail = {},
+}: {
+  orderDetail: TObject;
+}) => {
+  return Object.entries<TObject>(orderDetail).reduce<TObject>(
+    (result, currentOrderDetailEntry) => {
+      const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
+      const { memberOrders, restaurant = {} } = rawOrderDetailOfDate;
+      const { foodList: foodListOfDate } = restaurant;
+
+      const foodDataMap = getFoodDataMap({ foodListOfDate, memberOrders });
+      const foodDataList = Object.values(foodDataMap);
+      const totalInfo = getTotalInfo(foodDataList);
+
+      return {
+        ...result,
+        [date]: {
+          ...rawOrderDetailOfDate,
+          totalPrice: totalInfo.totalPrice,
+          totalDishes: totalInfo.totalDishes,
+        },
+      };
+    },
+    {},
+  );
 };

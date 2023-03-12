@@ -1,16 +1,19 @@
+import { useCallback, useMemo } from 'react';
+import { useRouter } from 'next/router';
+
 import IconClose from '@components/Icons/IconClose/IconClose';
 import useFetchSearchFilters from '@hooks/useFetchSearchFilters';
 import { distanceOptions, ratingOptions } from '@src/marketplaceConfig';
-import { useRouter } from 'next/router';
-import { useCallback, useMemo } from 'react';
 
 import { convertQueryValueToArray } from '../../helpers/urlQuery';
+
 import css from './FilterLabelsSection.module.scss';
 
 const FilterLabelList: React.FC = () => {
   const router = useRouter();
-  const { menuTypes, categories, distance, rating } = router.query;
-  const { menuTypesOptions, categoriesOptions } = useFetchSearchFilters();
+  const { menuTypes, categories, distance, rating, packaging } = router.query;
+  const { menuTypesOptions, categoriesOptions, packagingOptions } =
+    useFetchSearchFilters();
 
   const filterLabels = useMemo(
     () => [
@@ -45,14 +48,24 @@ const FilterLabelList: React.FC = () => {
           value: _rating,
         };
       }),
+      ...convertQueryValueToArray(packaging).map((_packaging: string) => {
+        return {
+          filter: 'packaging',
+          label: packagingOptions.find((option) => option.key === _packaging)
+            ?.label,
+          value: _packaging,
+        };
+      }),
     ],
     [
       menuTypes,
       categories,
       distance,
       rating,
+      packaging,
       menuTypesOptions,
       categoriesOptions,
+      packagingOptions,
     ],
   );
 

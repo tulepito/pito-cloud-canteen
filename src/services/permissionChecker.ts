@@ -1,5 +1,7 @@
-import { UserPermission } from '@src/types/UserPermission';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+
+import { EHttpStatusCode } from '@apis/errors';
+import { UserPermission } from '@src/types/UserPermission';
 
 import { denormalisedResponseEntities } from './data';
 import { getSdk } from './sdk';
@@ -14,8 +16,9 @@ const permissionChecker =
     const sdk = getSdk(req, res);
     const currentUserResponse = await sdk.currentUser.show();
     const [currentUser] = denormalisedResponseEntities(currentUserResponse);
+
     if (!companyId && needCheckingRequestBodyMethod.includes(apiMethod)) {
-      return res.status(403).json({
+      return res.status(EHttpStatusCode.Forbidden).json({
         message: 'Missing required key',
       });
     }
@@ -28,7 +31,7 @@ const permissionChecker =
       userPermission !== UserPermission.BOOKER ||
       !isPITOAdmin
     ) {
-      return res.status(403).json({
+      return res.status(EHttpStatusCode.Forbidden).json({
         message: "You don't have permission to access this api!",
       });
     }

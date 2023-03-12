@@ -1,0 +1,49 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.inputContainer {
+  @include inputContainerStyles;
+  margin-bottom: 10px;
+}
+
+.labelRoot {
+  @include inputLabelStyles;
+}
+
+.textValue {
+  word-break: break-all;
+  border: 1px solid $neutralGray6;
+  padding: 7px;
+  border-radius: 5px;
+}
+
+.boxValue {
+  padding: 4px 9px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background-color: $neutralGray3;
+  span {
+    font-size: 12px;
+  }
+}
+
+.iconClose {
+  cursor: pointer;
+
+  width: 6px;
+  height: 6px;
+}
+
+.input {
+  width: 100% !important;
+}
+
+.fieldList {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}

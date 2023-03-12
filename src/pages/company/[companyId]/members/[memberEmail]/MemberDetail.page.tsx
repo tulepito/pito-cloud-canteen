@@ -1,3 +1,8 @@
+import { useCallback, useEffect, useMemo } from 'react';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
+
 import Avatar from '@components/Avatar/Avatar';
 import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
@@ -12,10 +17,6 @@ import {
 import { companyMemberThunks } from '@redux/slices/companyMember.slice';
 import { ensureUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo } from 'react';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import css from './MemberDetail.module.scss';
 

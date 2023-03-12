@@ -1,9 +1,11 @@
-import type { TDefaultProps, TObject } from '@utils/types';
-import classNames from 'classnames';
 import type { ReactElement } from 'react';
 import React from 'react';
+import classNames from 'classnames';
+
+import type { TDefaultProps, TObject } from '@utils/types';
 
 import FormTabNav from '../FormTabNav/FormTabNav';
+
 import css from './FormTabs.module.scss';
 
 export type TFormTabChildrenProps = {

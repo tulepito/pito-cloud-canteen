@@ -134,7 +134,7 @@ export const getSubmitImageId = (images: any) => {
 export const getInitialAddImages = (images: any[] = []) => {
   const newImages = [...images];
   const missingLength = 5 - newImages.length;
-  // eslint-disable-next-line no-plusplus
+
   for (let i: number = 0; i < missingLength; i++) {
     newImages.push('');
   }

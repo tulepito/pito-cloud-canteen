@@ -1,3 +1,6 @@
+import { Field } from 'react-final-form';
+import { useIntl } from 'react-intl';
+
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import Toggle from '@components/Toggle/Toggle';
 import { parseThousandNumber } from '@helpers/format';
@@ -6,8 +9,6 @@ import {
   greaterThanOneThousand,
   required,
 } from '@utils/validators';
-import { Field } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import css from './PerPackageField.module.scss';
 

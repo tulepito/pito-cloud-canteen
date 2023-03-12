@@ -1,11 +1,13 @@
-import PitoLogo from '@components/PitoLogo/PitoLogo';
-import config from '@src/configs';
-import type { TObject } from '@utils/types';
+import { useIntl } from 'react-intl';
 import type { LocaleOptions } from 'luxon';
 import { DateTime } from 'luxon';
-import { useIntl } from 'react-intl';
+
+import PitoLogo from '@components/PitoLogo/PitoLogo';
+import { formatTimestamp } from '@utils/dates';
+import type { TObject } from '@utils/types';
 
 import type { TReviewInfoFormValues } from '../BookerOrderDetailsReviewView/ReviewInfoSection/ReviewInfoForm';
+
 import css from './BookerOrderDetailsPriceQuotation.module.scss';
 
 const formatDate = (
@@ -60,7 +62,7 @@ const BookerOrderDetailsPriceQuotation: React.FC<
       promotion,
       totalWithVAT,
       transportFee,
-      VATFee,
+      // VATFee,
     },
     orderDetailData: { foodOrderGroupedByDate },
   } = data;
@@ -217,7 +219,7 @@ const BookerOrderDetailsPriceQuotation: React.FC<
               </div>
               <div>{promotion}</div>
             </div>
-            <div className={css.tableRow}>
+            {/* <div className={css.tableRow}>
               <div>5</div>
               <div>
                 {intl.formatMessage(
@@ -228,7 +230,7 @@ const BookerOrderDetailsPriceQuotation: React.FC<
                 )}
               </div>
               <div>{VATFee}</div>
-            </div>
+            </div> */}
             <div className={css.tableRow}>
               <div> </div>
               <div>
@@ -279,10 +281,7 @@ const BookerOrderDetailsPriceQuotation: React.FC<
                 restaurantName,
                 index,
               } = dateData;
-              const formattedDate = DateTime.fromMillis(Number(date)).toFormat(
-                'EEE, dd/MM/yyyy',
-                { locale: 'vi' },
-              );
+              const formattedDate = formatTimestamp(date, 'EEE, dd/MM/yyyy');
 
               return (
                 <div className={css.tableRowGroup} key={date}>
@@ -290,7 +289,11 @@ const BookerOrderDetailsPriceQuotation: React.FC<
                     <div>{index + 1}</div>
                     <div>
                       {formattedDate}
-                      <div className={css.restaurantName}>{restaurantName}</div>
+                      <div
+                        className={css.restaurantName}
+                        title={restaurantName}>
+                        {restaurantName}
+                      </div>
                     </div>
                     <div>{totalDishes}</div>
                     <div>{totalPriceOfDate}đ</div>

@@ -1,14 +1,15 @@
 /* eslint-disable no-nested-ternary */
+import type { ReactNode } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import { DateTime } from 'luxon';
+
 import Button from '@components/Button/Button';
 import { ENavigate } from '@components/CalendarDashboard/helpers/constant';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import type { TObject } from '@utils/types';
-import classNames from 'classnames';
-import { DateTime } from 'luxon';
-import type { ReactNode } from 'react';
-import { useCallback, useMemo } from 'react';
-import { useIntl } from 'react-intl';
 
 import css from './Toolbar.module.scss';
 
@@ -26,6 +27,8 @@ export type TToolbarProps = {
   finishInProgress: boolean;
   finishDisabled: boolean;
   onFinishOrder: () => void;
+  onRecommendRestaurantInProgress: boolean;
+  onRecommendNewRestaurants: () => void;
 };
 
 const Toolbar: React.FC<TToolbarProps> = (props) => {
@@ -38,6 +41,8 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
     finishDisabled,
     finishInProgress,
     onFinishOrder,
+    onRecommendRestaurantInProgress,
+    onRecommendNewRestaurants,
   } = props;
   const intl = useIntl();
   const startDateDateTime = useMemo(
@@ -86,8 +91,11 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
         </div>
       </div>
       <div className={css.actions}>
-        <Button variant="secondary" className={css.secondaryBtn}>
-          <IconRefreshing />
+        <Button
+          variant="secondary"
+          className={css.secondaryBtn}
+          onClick={onRecommendNewRestaurants}>
+          <IconRefreshing inProgress={onRecommendRestaurantInProgress} />
           {intl.formatMessage({
             id: 'Booker.CreateOrder.Toolbar.suggestNewRestaurant',
           })}

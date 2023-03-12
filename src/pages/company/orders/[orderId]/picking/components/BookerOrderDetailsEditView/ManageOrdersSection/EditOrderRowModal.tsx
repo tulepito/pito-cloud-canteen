@@ -1,10 +1,12 @@
+import { useIntl } from 'react-intl';
+
 import Modal from '@components/Modal/Modal';
 import { parseThousandNumber } from '@helpers/format';
 import type { TObject } from '@utils/types';
-import { useIntl } from 'react-intl';
 
 import type { TEditOrderRowFormValues } from './EditOrderRowForm';
 import EditOrderRowForm from './EditOrderRowForm';
+
 import css from './EditOrderRowModal.module.scss';
 
 type TEditOrderRowModalProps = {
@@ -29,6 +31,7 @@ const EditOrderRowModal: React.FC<TEditOrderRowModalProps> = (props) => {
   const { memberData, foodData } = currentMemberOrderData || {};
   const initialValues = {
     foodId: foodData?.foodId || '',
+    requirement: foodData?.requirement || '',
     memberName: memberData?.name || {},
   };
 
@@ -38,10 +41,14 @@ const EditOrderRowModal: React.FC<TEditOrderRowModalProps> = (props) => {
       containerClassName={css.modalContainer}
       handleClose={onClose}
       isOpen={isOpen}
-      title={intl.formatMessage({
-        id: 'EditOrderRowModal.title',
-      })}>
-      <div>
+      title={
+        <span className={css.title}>
+          {intl.formatMessage({
+            id: 'EditOrderRowModal.title',
+          })}
+        </span>
+      }>
+      <div className={css.subTitle}>
         {intl.formatMessage(
           { id: 'EditOrderRowModal.subtitle' },
           {

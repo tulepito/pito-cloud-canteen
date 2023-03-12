@@ -1,9 +1,10 @@
+import { useState } from 'react';
+
 import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { Listing, User } from '@utils/data';
 import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
-import { useState } from 'react';
 
 import type { TReviewInfoFormValues } from '../components/BookerOrderDetailsReviewView/ReviewInfoSection/ReviewInfoForm';
 import { calculatePriceQuotationInfo } from '../helpers/cartInfoHelper';
@@ -64,9 +65,10 @@ export const usePrepareOrderDetailPageData = () => {
     orderDeadline: deadlineDate,
     startDate,
   };
-  const linkSectionData = { orderDeadline: deadlineDate };
+  const linkSectionData = { orderDeadline: deadlineDate, companyName };
   const manageParticipantData = {
     planData,
+    participants,
     participantData,
   };
   const manageOrdersData = {
@@ -139,7 +141,7 @@ export const usePrepareOrderDetailPageData = () => {
   /* =============== Price quotation data =============== */
   const priceQuotationData = {
     customerData: {
-      ...(reviewInfoValues || {}),
+      ...(reviewInfoValues || reviewInfoData),
       email: bookerEmail,
     },
     orderData: {

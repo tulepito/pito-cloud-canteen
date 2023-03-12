@@ -1,32 +1,14 @@
-import Button from '@components/Button/Button';
-import { isJoinedPlan } from '@helpers/orderHelper';
-import type { TObject } from '@utils/types';
-import classNames from 'classnames';
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import Button from '@components/Button/Button';
+import { isCompletePickFood } from '@helpers/orderHelper';
+import type { TObject } from '@utils/types';
 
 import ReviewOrdersResultModal from './ReviewOrdersResultModal';
+
 import css from './ReviewOrdersResultSection.module.scss';
-
-const isCompletePickFood = ({
-  participantId,
-  orderDetail,
-}: {
-  participantId: string;
-  orderDetail: TObject;
-}) => {
-  const allOrderDetails = Object.values<TObject>(orderDetail);
-  const totalDates = allOrderDetails.length;
-
-  const completedDates = allOrderDetails.reduce((result: number, current) => {
-    const { memberOrders } = current;
-    const { status, foodId } = memberOrders[participantId] || {};
-
-    return result + +isJoinedPlan(foodId, status);
-  }, 0);
-
-  return completedDates === totalDates;
-};
 
 type TReviewOrdersResultSectionProps = {
   className?: string;

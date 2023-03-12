@@ -112,3 +112,6 @@ export const favoriteRestaurantApi = (
     companyId,
     restaurantId,
   });
+
+export const fetchCompanyInfo = (companyId: string) =>
+  getApi(`/company/${companyId}`);

@@ -31,6 +31,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = (props) => {
     hasError,
   } = props;
 
+  if (!isOpen) return null;
+
   return (
     <Modal
       isOpen={isOpen}

@@ -18,6 +18,7 @@ export const fetchUser = async (userId: string) => {
   const response = await integrationSdk.users.show(
     {
       id: userId,
+      include: ['profileImage'],
     },
     { expand: true },
   );

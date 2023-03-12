@@ -1,12 +1,18 @@
+import { useEffect, useState } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
-import { useEffect, useState } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
+import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { orderDetailsAnyActionsInProgress } from '@pages/company/orders/[orderId]/OrderManagement.slice';
+import { shortenString } from '@src/utils/string';
 
 import css from './AddOrderForm.module.scss';
 
@@ -34,13 +40,20 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   props,
 ) => {
   const intl = useIntl();
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
+  const addOrUpdateMemberOrderInProgress = useAppSelector(
+    (state) => state.OrderManagement.addOrUpdateMemberOrderInProgress,
+  );
 
-  const { foodOptions, memberOptions, handleSubmit, values } = props;
-  const fieldSelectMemberDisable = memberOptions?.length === 0;
+  const { foodOptions, memberOptions, handleSubmit, form, values } = props;
+  const fieldSelectMemberDisable = inProgress || memberOptions?.length === 0;
   const fieldSelectFoodDisable =
     fieldSelectMemberDisable || foodOptions?.length === 0;
   const submitDisabled =
-    fieldSelectFoodDisable || !values?.participantId || !values?.foodId;
+    addOrUpdateMemberOrderInProgress ||
+    fieldSelectFoodDisable ||
+    !values?.participantId ||
+    !values?.foodId;
 
   const showRequirementText = intl.formatMessage({
     id: 'AddOrderForm.addRequirement.show',
@@ -65,6 +78,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     } else {
       setCurrentRequirementFieldActionText(showRequirementText);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRequirementInputShow]);
 
   const selectMemberOptions = (
@@ -77,7 +91,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
 
       {memberOptions?.map(({ memberId, memberName }) => (
         <option key={memberId} value={memberId}>
-          {memberName}
+          {shortenString(memberName, 18)}
         </option>
       ))}
     </>
@@ -92,14 +106,21 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
 
       {foodOptions?.map(({ foodId, foodName }) => (
         <option key={foodId} value={foodId}>
-          {foodName}
+          {shortenString(foodName, 18)}
         </option>
       ))}
     </>
   );
 
+  const customHandleSubmit = (event: any) => {
+    return handleSubmit(event)?.then((submitResult) => {
+      form.reset();
+      return { submitResult };
+    });
+  };
+
   return (
-    <Form onSubmit={handleSubmit} className={css.root}>
+    <Form onSubmit={customHandleSubmit} className={css.root}>
       <div className={css.fieldsContainer}>
         <div className={css.fieldContainer}>
           <FieldSelect
@@ -119,7 +140,10 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
             {selectFoodOptions}
           </FieldSelect>
         </div>
-        <Button disabled={submitDisabled} className={css.submitButton}>
+        <Button
+          disabled={submitDisabled}
+          inProgress={addOrUpdateMemberOrderInProgress}
+          className={css.submitButton}>
           {intl.formatMessage({
             id: 'AddOrderForm.submitButtonText',
           })}
@@ -133,7 +157,12 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
           disabled={fieldSelectFoodDisable}
           onClick={handleToggleShowHideRequirementField}>
           <div className={css.buttonContent}>
-            <IconMinus />
+            <RenderWhen condition={isRequirementInputShow}>
+              <IconMinus />
+              <RenderWhen.False>
+                <IconPlusWithoutBorder />
+              </RenderWhen.False>
+            </RenderWhen>
             <div>{currentRequirementFieldActionText}</div>
           </div>
         </Button>

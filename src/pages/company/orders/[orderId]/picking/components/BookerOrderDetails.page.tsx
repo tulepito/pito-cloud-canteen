@@ -1,5 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
+import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
+
 import AlertModal from '@components/Modal/AlertModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -7,18 +11,11 @@ import { companyPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 import { EOrderDraftStates, EOrderStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
-import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { useIntl } from 'react-intl';
 
+import { orderManagementThunks } from '../../OrderManagement.slice';
 import { downloadPriceQuotation } from '../helpers/downloadPriceQuotation';
 import { usePrepareOrderDetailPageData } from '../hooks/usePrepareData';
-import {
-  orderDetailsAnyActionsInProgress,
-  orderManagementThunks,
-} from '../OrderManagement.slice';
-import css from './BookerOrderDetails.module.scss';
+
 import BookerOrderDetailsTitle from './BookerOrderDetailsEditView/BookerOrderDetailsTitle/BookerOrderDetailsTitle';
 import ManageOrdersSection from './BookerOrderDetailsEditView/ManageOrdersSection/ManageOrdersSection';
 import ManageParticipantsSection from './BookerOrderDetailsEditView/ManageParticipantsSection/ManageParticipantsSection';
@@ -27,6 +24,8 @@ import OrderLinkSection from './BookerOrderDetailsEditView/OrderLinkSection/Orde
 import BookerOrderDetailsPriceQuotation from './BookerOrderDetailsPriceQuotation/BookerOrderDetailsPriceQuotation';
 import BookerOrderDetailReviewView from './BookerOrderDetailsReviewView/BookerOrderDetailsReviewView/BookerOrderDetailReviewView';
 import type { TReviewInfoFormValues } from './BookerOrderDetailsReviewView/ReviewInfoSection/ReviewInfoForm';
+
+import css from './BookerOrderDetails.module.scss';
 
 enum EPageViewMode {
   edit = 'edit',
@@ -48,7 +47,6 @@ const BookerOrderDetailsPage = () => {
     isReady: isRouterReady,
   } = router;
 
-  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const cancelPickingOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.cancelPickingOrderInProgress,
   );
@@ -201,7 +199,7 @@ const BookerOrderDetailsPage = () => {
     }
   }, [isRouterReady, orderState]);
 
-  return <>{inProgress ? <LoadingContainer /> : renderView()}</>;
+  return renderView();
 };
 
 export default BookerOrderDetailsPage;

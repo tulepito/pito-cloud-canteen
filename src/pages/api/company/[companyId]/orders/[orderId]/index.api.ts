@@ -1,10 +1,12 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { HttpMethod } from '@apis/configs';
+import { EHttpStatusCode } from '@apis/errors';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import { Listing } from '@utils/data';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -25,7 +27,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             Listing(orderListing).getMetadata();
 
           if (companyId !== orderCompanyId) {
-            res.status(403).json({
+            res.status(EHttpStatusCode.Forbidden).json({
               error: `Order ${orderId} is not belong to company ${companyId}`,
             });
           }

@@ -1,5 +1,6 @@
-import Meta from '@components/Layout/Meta';
 import { useIntl } from 'react-intl';
+
+import Meta from '@components/Layout/Meta';
 
 import ManageCompanyOrdersPage from './ManageCompanyOrders.page';
 

@@ -1,9 +1,10 @@
+import { useCallback, useEffect } from 'react';
+import type { NextRouter } from 'next/router';
+import { useRouter } from 'next/router';
+
 import { useAppSelector } from '@hooks/reduxHooks';
 import { IgnoredPermissionCheckRoutes } from '@src/paths';
 import type { EUserPermission } from '@utils/enums';
-import type { NextRouter } from 'next/router';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect } from 'react';
 
 import {
   getHomePageRouteBaseOnPermission,

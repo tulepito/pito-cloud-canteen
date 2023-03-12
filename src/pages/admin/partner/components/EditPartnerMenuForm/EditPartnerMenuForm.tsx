@@ -1,3 +1,9 @@
+import React, { useState } from 'react';
+import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
+import arrayMutators from 'final-form-arrays';
+import isEqual from 'lodash/isEqual';
+
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
@@ -8,11 +14,6 @@ import {
   EXTRA_SERVICE_OPTIONS,
   MEAL_OPTIONS,
 } from '@utils/enums';
-import arrayMutators from 'final-form-arrays';
-import isEqual from 'lodash/isEqual';
-import React, { useState } from 'react';
-import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
 
 import css from './EditPartnerMenuForm.module.scss';
 

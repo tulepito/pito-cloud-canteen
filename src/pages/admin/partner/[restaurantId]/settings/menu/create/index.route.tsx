@@ -1,7 +1,8 @@
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
+
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { menusSliceAction } from '@redux/slices/menus.slice';
-import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
 
 import EditPartnerMenuWizard from '../components/EditPartnerMenuWizard/EditPartnerMenuWizard';
 

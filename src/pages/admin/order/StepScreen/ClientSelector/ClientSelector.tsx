@@ -1,3 +1,9 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
+
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -8,7 +14,7 @@ import {
 import { orderAsyncActions, removeBookerList } from '@redux/slices/Order.slice';
 import type { TUpdateStatus } from '@src/pages/admin/company/helpers';
 import {
-  filterCompanies,
+  filterCompaniesByCompanyName,
   parseEntitiesToTableData,
   sliceCompanies,
   sortCompanies,
@@ -16,13 +22,9 @@ import {
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { adminPaths } from '@src/paths';
 import { Listing } from '@utils/data';
-import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import ClientTable from '../../create/components/ClientTable/ClientTable';
+
 import css from './ClientSelector.module.scss';
 
 type TClientSelector = {
@@ -33,7 +35,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   const { nextTab } = props;
   const router = useRouter();
   const intl = useIntl();
-  const [queryParams, setQueryParams] = useState({});
+  const [queryParams, setQueryParams] = useState<any>({});
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const { value: isSortAZ, toggle: toggleSort } = useBoolean(true);
@@ -90,7 +92,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   }, []);
 
   const filteredCompanies = useMemo(
-    () => filterCompanies(companyRefs, queryParams),
+    () => filterCompaniesByCompanyName(companyRefs, queryParams?.companyName),
     [queryParams, companyRefs],
   );
   const sortedCompanies = useMemo(
@@ -162,7 +164,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
           placeholder={intl.formatMessage({
             id: 'ClientSelector.keywordFieldPlaceholder',
           })}
-          searchValue="searchCompanyName"
+          searchValue="companyName"
           onSubmit={(values: any) => {
             setQueryParams(values);
             setPage(1);

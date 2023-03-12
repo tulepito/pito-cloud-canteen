@@ -2,11 +2,12 @@
  * MenuContent is a immediate child of Menu component sibling to MenuLabel.
  * Clicking MenuLabel toggles visibility of MenuContent.
  */
-import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
-import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
 import type { CSSProperties, PropsWithChildren } from 'react';
 import React, { Children } from 'react';
+import classNames from 'classnames';
+
+import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
+import type { TDefaultProps } from '@utils/types';
 
 import css from './ProfileMenuContent.module.scss';
 

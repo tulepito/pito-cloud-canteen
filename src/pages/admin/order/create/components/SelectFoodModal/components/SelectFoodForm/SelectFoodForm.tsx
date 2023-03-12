@@ -1,4 +1,12 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import type { ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
+import { OnChange } from 'react-final-form-listeners';
+import { FormattedMessage, useIntl } from 'react-intl';
+import arrayMutators from 'final-form-arrays';
+
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
@@ -8,16 +16,10 @@ import IconSearch from '@components/Icons/IconSearch/IconSearch';
 import { addCommas } from '@helpers/format';
 import { toNonAccentVietnamese } from '@utils/nonAccentVietnamese';
 import type { TDefaultProps } from '@utils/types';
-import arrayMutators from 'final-form-arrays';
-import type { ReactNode } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { OnChange } from 'react-final-form-listeners';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import FieldFoodSelectCheckboxGroup from './components/FieldFoodSelect/FieldFoodSelectCheckboxGroup';
 import FieldFoodSelectAll from './components/FieldFoodSelectAll/FieldFoodSelectAll';
+
 import css from './SelectFoodForm.module.scss';
 
 const DELAY_UPDATE_TIME = 300;
@@ -57,6 +59,7 @@ type TExtraProps = TDefaultProps & {
   errorMessage?: ReactNode;
   inProgress?: boolean;
   items: any[];
+  selectFoodInProgress?: boolean;
   handleFormChange: (food: string[] | undefined) => void;
 };
 type TSelectFoodFormProps = FormProps<TSelectFoodFormValues> & TExtraProps;
@@ -73,6 +76,7 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
     values: { food: selectedFoodIds = [] },
     form,
     handleFormChange,
+    selectFoodInProgress,
   } = props;
   const selectedFoodListLength = selectedFoodIds?.length;
   const intl = useIntl();
@@ -185,18 +189,24 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
         </div>
         <div className={css.contentContainer}>
           <div className={css.leftPart}>
-            <div>
-              <FieldFoodSelectAll
-                id={`${formId}.food.checkAll`}
-                customOnChange={handleCheckAllFieldChange}
-                name="checkAll"
-              />
-              <FieldFoodSelectCheckboxGroup
-                id="food"
-                name="food"
-                options={currentOptions}
-              />
-            </div>
+            {currentOptions.length === 0 ? (
+              <div className={css.noResult}>
+                <FormattedMessage id="SelectFoodForm.noFoodOption" />
+              </div>
+            ) : (
+              <div>
+                <FieldFoodSelectAll
+                  id={`${formId}.food.checkAll`}
+                  customOnChange={handleCheckAllFieldChange}
+                  name="checkAll"
+                />
+                <FieldFoodSelectCheckboxGroup
+                  id="food"
+                  name="food"
+                  options={currentOptions}
+                />
+              </div>
+            )}
           </div>
           <div className={css.rightPart}>
             {selectedFoodIds?.length === 0 ? (
@@ -218,7 +228,10 @@ const SelectFoodFormComponent: React.FC<TSelectFoodFormComponentProps> = (
               </div>
             )}
             <div className={css.actionContainer}>
-              <Button fullWidth disabled={submitDisable}>
+              <Button
+                fullWidth
+                disabled={submitDisable}
+                inProgress={selectFoodInProgress}>
                 <FormattedMessage id="SelectFoodForm.saveResult" />
               </Button>
             </div>

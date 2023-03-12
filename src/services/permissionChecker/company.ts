@@ -1,7 +1,9 @@
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+
+import { EHttpStatusCode } from '@apis/errors';
 import { getSdk, handleError } from '@services/sdk';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities } from '@utils/data';
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 const needCheckingRequestBodyMethod = ['POST', 'PUT', 'DELETE'];
 
@@ -19,7 +21,7 @@ const companyChecker =
       const [currentUser] = denormalisedResponseEntities(currentUserResponse);
 
       if (!companyId && needCheckingRequestBodyMethod.includes(apiMethod)) {
-        return res.status(403).json({
+        return res.status(EHttpStatusCode.Forbidden).json({
           message: 'Missing required key',
         });
       }
@@ -31,7 +33,7 @@ const companyChecker =
         !userPermission ||
         (userPermission && userPermission !== UserPermission.BOOKER)
       ) {
-        return res.status(403).json({
+        return res.status(EHttpStatusCode.Forbidden).json({
           message: "You don't have permission to access this api!",
         });
       }

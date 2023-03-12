@@ -1,13 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { getCompanyIdFromBookerUser } from '@helpers/company';
-import { useAppSelector } from '@hooks/reduxHooks';
-import { currentUserSelector } from '@redux/slices/user.slice';
-import { companyPaths } from '@src/paths';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
+import { useRouter } from 'next/router';
+
+import { getCompanyIdFromBookerUser } from '@helpers/company';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { resetCompanyOrdersStates } from '@redux/slices/Order.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import { companyPaths } from '@src/paths';
 
 import CompanyOrdersTable from './components/CompanyOrdersTable';
+
 import css from './ManageCompanyOrdersPage.module.scss';
 
 type TManageCompanyOrdersPageProps = {};
@@ -15,6 +18,7 @@ type TManageCompanyOrdersPageProps = {};
 const ManageCompanyOrdersPage: React.FC<TManageCompanyOrdersPageProps> = () => {
   const intl = useIntl();
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const currentUser = useAppSelector(currentUserSelector);
 
   const {
@@ -53,6 +57,12 @@ const ManageCompanyOrdersPage: React.FC<TManageCompanyOrdersPageProps> = () => {
     JSON.stringify(companyIdFormQuery as string),
     JSON.stringify(currentUser),
   ]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetCompanyOrdersStates());
+    };
+  }, []);
 
   return (
     <div className={css.root}>

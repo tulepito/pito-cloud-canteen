@@ -1,10 +1,12 @@
-import Button from '@components/Button/Button';
-import IconPhone from '@components/Icons/IconPhone/IconPhone';
-import Image from 'next/image';
 import React from 'react';
 import { useIntl } from 'react-intl';
+import Image from 'next/image';
+
+import Button from '@components/Button/Button';
+import IconPhone from '@components/Icons/IconPhone/IconPhone';
 
 import emptyResultImg from './assets/emptyResult.png';
+
 import css from './ResultList.module.scss';
 
 const EmptyList: React.FC = () => {

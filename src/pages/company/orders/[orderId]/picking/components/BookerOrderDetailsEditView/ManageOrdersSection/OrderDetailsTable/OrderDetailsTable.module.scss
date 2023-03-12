@@ -1,6 +1,59 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/vars.scss' as *;
 
+@mixin tableBodyLayout {
+  height: fit-content;
+  padding: 8px 8px 8px 0;
+  text-align: left;
+  vertical-align: middle;
+  @include textTemplate(14px, 400, 20px);
+
+  @include lineClamp(1);
+  display: table-cell;
+  word-break: break-word;
+
+  .icon {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+
+    &:last-of-type {
+      margin-left: 12px;
+    }
+  }
+
+  &:nth-child(1) {
+    width: 20%;
+    max-width: 20%;
+
+    padding-left: 16px;
+  }
+  &:nth-child(2) {
+    width: 25%;
+    max-width: 25%;
+  }
+  &:nth-child(3) {
+    width: 25%;
+    max-width: 25%;
+  }
+  &:nth-child(4) {
+    width: 15%;
+    max-width: 15%;
+  }
+  &:nth-child(5) {
+    width: 15%;
+    max-width: 15%;
+
+    padding-right: 16px;
+    text-align: right;
+  }
+
+  & .actionCell {
+    height: 20px;
+  }
+}
+
 .root {
   .tabItemContainer {
     display: flex;
@@ -10,14 +63,17 @@
     gap: 8px;
 
     .number {
+      @include textTemplate(8px, 700, 1);
+      min-width: 16px;
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      border-radius: 50%;
-      width: 16px;
+      border-radius: 8px;
+      padding: 0 6px;
       height: 16px;
       color: $neutralGray5;
-      background-color: $neutralGray4;
+      background-color: $neutralGray3;
+      line-height: 24px;
 
       &.numberActive {
         color: $neutralGray1;
@@ -72,22 +128,25 @@
       }
     }
 
-    tbody {
-      tr {
-        border-bottom: 1px solid $neutralGray3;
-
+    & > tbody {
+      & > tr {
         .stranger {
           @include textTemplate(12px, 600, 16px);
           color: $neutralGray5;
         }
 
-        &:last-of-type {
+        &:nth-child(2) > td {
           border: none;
+          @include tableBodyLayout;
         }
 
         &.totalRow {
-          td {
+          & > td {
             @include textTemplate(14px, 700, 20px);
+
+            .totalText {
+              padding-right: 8px;
+            }
 
             &.actionTd {
               text-align: right;
@@ -114,54 +173,30 @@
             background-color: $neutralGray5;
           }
         }
+      }
 
-        td {
-          height: fit-content;
-          padding: 8px 8px 8px 0;
-          text-align: left;
-          vertical-align: middle;
-          @include textTemplate(14px, 400, 20px);
+      & .scrollContainer {
+        max-height: calc(36px * 6);
+        overflow-x: auto;
 
-          @include lineClamp(1);
-          display: table-cell;
-          word-break: break-word;
+        & > table {
+          width: 100%;
+          border-spacing: 0;
 
-          .icon {
-            width: 20px;
-            height: 20px;
-            margin: 0;
-            cursor: pointer;
+          tr {
+            position: relative;
 
-            &:last-of-type {
-              margin-left: 12px;
+            &::after {
+              @include absolute(100%, 1px);
+              bottom: 0;
+              left: 0;
+              background-color: $neutralGray3;
+            }
+
+            & > td {
+              @include tableBodyLayout;
             }
           }
-        }
-
-        td:nth-child(1) {
-          width: 20%;
-          max-width: 20%;
-
-          padding-left: 16px;
-        }
-        td:nth-child(2) {
-          width: 25%;
-          max-width: 25%;
-        }
-        td:nth-child(3) {
-          width: 25%;
-          max-width: 25%;
-        }
-        td:nth-child(4) {
-          width: 15%;
-          max-width: 15%;
-        }
-        td:nth-child(5) {
-          width: 15%;
-          max-width: 15%;
-
-          padding-right: 16px;
-          text-align: right;
         }
       }
     }

@@ -1,9 +1,11 @@
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+
 import { HttpMethod } from '@apis/configs';
+import { EHttpStatusCode } from '@apis/errors';
 import { fetchListing } from '@services/integrationHelper';
 import { getSdk, handleError } from '@services/sdk';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 const orderChecker =
   (handler: NextApiHandler) =>
@@ -19,7 +21,7 @@ const orderChecker =
       switch (apiMethod) {
         case HttpMethod.POST: {
           if (!companyId) {
-            return res.status(403).json({
+            return res.status(EHttpStatusCode.Forbidden).json({
               message: 'Missing required key',
             });
           }
@@ -30,7 +32,7 @@ const orderChecker =
             userPermission !== UserPermission.BOOKER &&
             !isAdmin
           ) {
-            return res.status(403).json({
+            return res.status(EHttpStatusCode.Forbidden).json({
               message: "You don't have permission to access this api!",
             });
           }
@@ -38,7 +40,7 @@ const orderChecker =
         }
         case HttpMethod.PUT: {
           if (!orderId) {
-            return res.status(403).json({
+            return res.status(EHttpStatusCode.Forbidden).json({
               message: 'Missing required key',
             });
           }
@@ -51,7 +53,7 @@ const orderChecker =
             userPermission !== UserPermission.BOOKER &&
             !isAdmin
           ) {
-            return res.status(403).json({
+            return res.status(EHttpStatusCode.Forbidden).json({
               message: "You don't have permission to access this api!",
             });
           }

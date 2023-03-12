@@ -1,8 +1,9 @@
-import Button from '@components/Button/Button';
-import IconPlus from '@components/Icons/IconPlus/IconPlus';
-import classNames from 'classnames';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
+
+import Button from '@components/Button/Button';
+import IconPlus from '@components/Icons/IconPlus/IconPlus';
 
 import css from './AddMorePlan.module.scss';
 

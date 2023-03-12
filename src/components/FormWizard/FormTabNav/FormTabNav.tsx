@@ -1,8 +1,9 @@
+import React from 'react';
+import classNames from 'classnames';
+
 import { InlineTextButton } from '@components/Button/Button';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
-import React from 'react';
 
 import css from './FormTabNav.module.scss';
 

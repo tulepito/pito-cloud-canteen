@@ -1,14 +1,12 @@
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-
-import type { TDefaultProps, TObject } from '@utils/types';
-import classNames from 'classnames';
-import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Event, ViewsProps } from 'react-big-calendar';
 import { Calendar, luxonLocalizer, Views } from 'react-big-calendar';
+import classNames from 'classnames';
+import { DateTime } from 'luxon';
 
-import css from './CalendarDashboard.module.scss';
+import type { TDefaultProps, TObject } from '@utils/types';
+
 import createMonthViewWrapper from './components/MonthView/withMonthViewWrapper';
 import OrderEventCard from './components/OrderEventCard/OrderEventCard';
 import Toolbar from './components/Toolbar/Toolbar';
@@ -17,6 +15,9 @@ import type {
   TCalendarItemCardComponents,
   TDayColumnHeaderProps,
 } from './helpers/types';
+
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import css from './CalendarDashboard.module.scss';
 
 type TCalendarDashboardProps = TDefaultProps & {
   anchorDate?: Date;

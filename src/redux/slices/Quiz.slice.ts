@@ -1,12 +1,13 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import { fetchUserApi } from '@apis/index';
 import { fetchSearchFilterApi } from '@apis/userApi';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { createSlice } from '@reduxjs/toolkit';
 import { denormalisedResponseEntities } from '@utils/data';
 import {
   EImageVariants,
-  ERestaurantListingState,
+  EListingStates,
   ERestaurantListingStatus,
 } from '@utils/enums';
 import type { TListing, TObject, TUser } from '@utils/types';
@@ -24,6 +25,7 @@ type TQuizState = {
 
   quiz: TObject;
   categories: TKeyValue[];
+  nutritions: TKeyValue[];
   fetchFilterInProgress: boolean;
 
   restaurants: TListing[];
@@ -38,6 +40,7 @@ const initialState: TQuizState = {
   fetchSelectedCompanyError: null,
   quiz: {},
   categories: [],
+  nutritions: [],
   fetchFilterInProgress: false,
   restaurants: [],
   fetchRestaurantsInProgress: false,
@@ -54,7 +57,7 @@ const FETCH_SELECTED_COMPANY = 'app/Quiz/FETCH_SELECTED_COMPANY';
 // ================ Async thunks ================ //
 const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
   const { data: searchFiltersResponse } = await fetchSearchFilterApi();
-  return searchFiltersResponse.categories;
+  return searchFiltersResponse;
 });
 
 const fetchRestaurants = createAsyncThunk(
@@ -63,7 +66,7 @@ const fetchRestaurants = createAsyncThunk(
     const query = {
       meta_listingType: LISTING_TYPE.RESTAURANT,
       meta_status: ERestaurantListingStatus.authorized,
-      meta_listingState: ERestaurantListingState.published,
+      meta_listingState: EListingStates.published,
       include: ['images'],
       'fields.image': [
         `variants.${EImageVariants.default}`,
@@ -104,6 +107,10 @@ const QuizSlice = createSlice({
         ...payload,
       },
     }),
+    clearQuizData: (state) => {
+      state.quiz = {};
+      state.selectedCompany = null!;
+    },
     allowCreateOrder: (state) => {
       state.allowCreateOrder = true;
     },
@@ -118,7 +125,8 @@ const QuizSlice = createSlice({
       })
       .addCase(fetchSearchFilter.fulfilled, (state, action) => {
         state.fetchFilterInProgress = false;
-        state.categories = action.payload;
+        state.categories = action.payload.categories;
+        state.nutritions = action.payload.nutritions;
       })
 
       .addCase(fetchRestaurants.pending, (state) => {

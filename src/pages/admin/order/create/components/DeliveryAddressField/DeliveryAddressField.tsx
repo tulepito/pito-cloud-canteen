@@ -1,8 +1,9 @@
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import { addressRequired } from '@utils/validators';
-import classNames from 'classnames';
-import { useIntl } from 'react-intl';
 
 import css from './DeliveryAddressField.module.scss';
 

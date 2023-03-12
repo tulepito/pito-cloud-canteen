@@ -1,7 +1,9 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import orderChecker from '@services/permissionChecker/order';
+import validOrderParams from '@services/permissionChecker/validOrderParams';
 import { handleError } from '@services/sdk';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 import createPlan from './[orderId]/plan/create.service';
 import createOrder from './create.service';
@@ -35,4 +37,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default composeApiCheckers(orderChecker)(handler);
+export default composeApiCheckers(orderChecker, validOrderParams)(handler);

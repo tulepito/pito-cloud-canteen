@@ -1,6 +1,7 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { HttpMethod } from '@apis/configs';
 import { getIntegrationSdk, handleError } from '@services/sdk';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
@@ -31,4 +32,5 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       break;
   }
 };
+
 export default handler;

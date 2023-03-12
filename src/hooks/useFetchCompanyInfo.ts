@@ -1,9 +1,10 @@
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+
 import {
   addWorkspaceCompanyId,
   BookerManageCompany,
 } from '@redux/slices/company.slice';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 
 import { useAppDispatch, useAppSelector } from './reduxHooks';
 

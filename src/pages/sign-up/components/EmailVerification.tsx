@@ -1,9 +1,10 @@
+import { FormattedMessage } from 'react-intl';
+import { useDispatch } from 'react-redux';
+import Link from 'next/link';
+
 import { userThunks } from '@redux/slices/user.slice';
 import type { AppDispatch } from '@redux/store';
 import { isTooManyEmailVerificationRequestsError } from '@utils/errors';
-import Link from 'next/link';
-import { FormattedMessage } from 'react-intl';
-import { useDispatch } from 'react-redux';
 
 import css from './EmailVerification.module.scss';
 

@@ -1,7 +1,8 @@
 /* eslint-disable unused-imports/no-unused-vars */
+import { createSlice } from '@reduxjs/toolkit';
+
 import { createAsyncThunk, createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
-import { createSlice } from '@reduxjs/toolkit';
 import {
   CurrentUser,
   denormalisedResponseEntities,

@@ -1,20 +1,20 @@
-/* eslint-disable no-console */
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import {
   checkUnConflictedMenuMiddleware,
   updateMenuIdListAndMenuWeekDayListForFood,
 } from '@pages/api/helpers/menuHelpers';
 import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { TIntegrationListing } from '@utils/types';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const { dataParams, queryParams = {} } = req.body;
     const integrationSdk = getIntegrationSdk();
-    const { metadata } = dataParams;
+    const { metadata, publicData } = dataParams;
     const { restaurantId } = metadata;
 
     const restaurantRes = await integrationSdk.listings.show({
@@ -28,9 +28,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const response = await integrationSdk.listings.create(
       {
         ...dataParams,
+        publicData: {
+          ...publicData,
+          restaurantName: restaurant.attributes.title,
+        },
         metadata: {
           ...metadata,
-          restaurantName: restaurant.attributes.title,
         },
         ...(geolocation ? { geolocation } : {}),
         state: 'published',
@@ -69,4 +72,4 @@ const handlerWithCustomParams = (req: NextApiRequest, res: NextApiResponse) => {
   return checkUnConflictedMenuMiddleware(handler)(req, res, dataToCheck);
 };
 
-export default cookies(handlerWithCustomParams);
+export default cookies(adminChecker(handlerWithCustomParams));

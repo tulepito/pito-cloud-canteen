@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
 import { createSdkInstance } from '../sharetribe/sdk';
+
 import * as globalReducers from './slices';
 
 const combinedReducer = combineReducers({

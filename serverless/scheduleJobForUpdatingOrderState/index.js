@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unresolved */
 /* eslint-disable no-unused-vars */
 const get = require('lodash/get');
 const isEmpty = require('lodash/isEmpty');

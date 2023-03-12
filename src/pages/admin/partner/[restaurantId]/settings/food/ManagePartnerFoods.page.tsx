@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
+import React, { useEffect, useRef, useState } from 'react';
+import { CSVLink } from 'react-csv';
+import { FormattedMessage } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldMultipleSelect from '@components/FormFields/FieldMultipleSelect/FieldMultipleSelect';
@@ -26,14 +33,11 @@ import {
   FOOD_TYPE_OPTIONS,
   getLabelByKey,
   MENU_OPTIONS,
+  PACKAGING_OPTIONS,
+  SIDE_DISH_OPTIONS,
+  SPECIAL_DIET_OPTIONS,
 } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
-import { CSVLink } from 'react-csv';
-import { FormattedMessage } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import css from './ManagePartnerFoods.module.scss';
 
@@ -155,35 +159,50 @@ const parseEntitiesToExportCsv = (
   const foodsToExport = foods
     .filter((food) => ids.includes(food.id.uuid))
     .map((food) => {
-      const { publicData = {}, description, title } = food.attributes || {};
+      const {
+        publicData = {},
+        description,
+        title,
+        price,
+      } = food.attributes || {};
       const {
         sideDishes = [],
         specialDiets = [],
         category,
         foodType,
         menuType,
-        ingredients,
-        maxMember,
+        allergicIngredients = [],
+        maxQuantity,
         minOrderHourInAdvance,
         minQuantity,
         notes,
         unit,
+        numberOfMainDishes,
+        packaging,
       } = publicData;
+
       return {
         'Mã món': food.id.uuid,
         'Tên món ăn': title,
         'Mô tả': description,
-        'Thành phần chính': ingredients,
+        'Đơn giá': `${price?.amount} VND`,
+        'Thành phần dị ứng': allergicIngredients.join(','),
+        'Chất liệu bao bì': getLabelByKey(PACKAGING_OPTIONS, packaging),
         'Phong cách ẩm thực': getLabelByKey(CATEGORY_OPTIONS, category),
         'Loại món ăn': getLabelByKey(FOOD_TYPE_OPTIONS, foodType),
         'Loại menu': getLabelByKey(MENU_OPTIONS, menuType),
-        'Món ăn kèm': sideDishes.join(','),
-        'Chế độ dinh dưỡng đặc biệt': specialDiets.join(','),
-        'Số nguời tối đa': maxMember,
+        'Món ăn kèm': sideDishes
+          .map((key: string) => getLabelByKey(SIDE_DISH_OPTIONS, key))
+          .join(','),
+        'Chế độ dinh dưỡng đặc biệt': specialDiets
+          .map((key: string) => getLabelByKey(SPECIAL_DIET_OPTIONS, key))
+          .join(','),
+        'Số nguời tối đa': maxQuantity,
         'Giờ đặt trước tối thiểu': minOrderHourInAdvance,
         'Số lượng tối thiểu': minQuantity,
         'Ghi chú': notes,
         'Đơn vị tính': unit,
+        'Số món chính': numberOfMainDishes,
         'Hình ảnh': food.images?.map(
           (image) => image.attributes.variants['square-small2x'].url,
         ),
@@ -334,6 +353,7 @@ const ManagePartnerFoods = () => {
         <IntegrationFilterModal
           onSubmit={handleSubmitFilter}
           onClear={handleClearFilter}
+          title={<FormattedMessage id="ManagePartnerFoods.filterModal.title" />}
           initialValues={{
             keywords,
             pub_category: groupPubCategory,

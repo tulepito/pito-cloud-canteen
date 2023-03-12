@@ -1,20 +1,23 @@
-import Button from '@components/Button/Button';
-import AlertModal from '@components/Modal/AlertModal';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import type { TDefaultProps, TObject, TUser } from '@utils/types';
-import classNames from 'classnames';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 
+import Button from '@components/Button/Button';
+import AlertModal from '@components/Modal/AlertModal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   orderDetailsAnyActionsInProgress,
   orderManagementThunks,
-} from '../../../OrderManagement.slice';
+} from '@pages/company/orders/[orderId]/OrderManagement.slice';
+import type { TDefaultProps, TObject, TUser } from '@utils/types';
+
 import type { TAddParticipantFormValues } from './AddParticipantForm';
 import AddParticipantForm from './AddParticipantForm';
 import ManageParticipantsModal from './ManageParticipantsModal';
-import css from './ManageParticipantsSection.module.scss';
 import ParticipantCard from './ParticipantCard';
+
+import css from './ManageParticipantsSection.module.scss';
 
 export const renderParticipantCards = (
   items: Array<TUser>,
@@ -43,6 +46,7 @@ export const renderParticipantCards = (
 
 type TManageParticipantsSectionProps = TDefaultProps & {
   data: {
+    participants: string[];
     participantData: Array<TUser>;
     planData: TObject;
   };
@@ -59,11 +63,14 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
     useState(false);
   const [isManageParticipantsModalOpen, setIsManageParticipantsModalOpen] =
     useState(false);
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
+  const updateParticipantsInProgress = useAppSelector(
+    (state) => state.OrderManagement.updateParticipantsInProgress,
+  );
 
   const rootClasses = classNames(rootClassName || css.root, className);
 
   const { participantData } = data;
-  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const disableButton = inProgress;
 
   const sectionTitle = intl.formatMessage({
@@ -115,20 +122,36 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
     setIsManageParticipantsModalOpen(false);
   };
 
-  const handleSubmitAddParticipant = ({ email }: TAddParticipantFormValues) => {
-    dispatch(orderManagementThunks.addParticipant({ email }));
+  const handleSubmitAddParticipant = async ({
+    email,
+  }: TAddParticipantFormValues) => {
+    if (updateParticipantsInProgress) {
+      return;
+    }
+
+    const { meta, payload } = (await dispatch(
+      orderManagementThunks.addParticipant({ email }),
+    )) as any;
+
+    if (meta.requestStatus === 'rejected') {
+      return { email: payload };
+    }
   };
 
   return (
     <div className={rootClasses}>
       <div className={css.titleContainer}>
         {sectionTitle}
-        {participantData.length && (
+
+        <RenderWhen condition={participantData.length > 0}>
           <span className={css.participantCount}>{participantData.length}</span>
-        )}
+        </RenderWhen>
       </div>
 
-      <AddParticipantForm onSubmit={handleSubmitAddParticipant} />
+      <AddParticipantForm
+        id="ManageParticipantsSection.AddParticipantForm"
+        onSubmit={handleSubmitAddParticipant}
+      />
       <div className={css.participantContainer}>
         {renderParticipantCards(
           participantData.slice(0, 4),

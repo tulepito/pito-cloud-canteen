@@ -1,4 +1,9 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import { useEffect, useRef, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import classNames from 'classnames';
+import { useRouter } from 'next/router';
+
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { TableForm } from '@components/Table/Table';
@@ -9,21 +14,20 @@ import { createDeepEqualSelector } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import type { RootState } from '@redux/store';
 import { companyPaths } from '@src/paths';
+import { historyPushState } from '@src/utils/history';
 import {
   EManageCompanyOrdersTab,
   MANAGE_COMPANY_ORDERS_TAB_MAP,
 } from '@utils/enums';
 import type { TObject } from '@utils/types';
-import classNames from 'classnames';
-import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
 
 import { parseEntitiesToTableData } from '../helpers/parseEntitiesToTableData';
-import css from './CompanyOrdersTable.module.scss';
+
 import { CompanyOrdersTableColumns } from './CompanyOrdersTableColumns';
 import type { TSearchOrderFormValues } from './SearchOrderForm';
 import SearchOrderForm from './SearchOrderForm';
+
+import css from './CompanyOrdersTable.module.scss';
 
 const DEBOUNCE_TIME = 300;
 
@@ -121,6 +125,12 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const { query, isReady, replace } = useRouter();
   const dispatch = useAppDispatch();
   const orders = useAppSelector((state) => state.Order.orders) || [];
+  const queryOrderInProgress = useAppSelector(
+    (state) => state.Order.queryOrderInProgress,
+  );
+  const { totalPages = 1 } = useAppSelector(
+    (state) => state.Order.manageOrdersPagination,
+  );
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   let currDebounceRef = debounceRef.current;
 
@@ -155,6 +165,12 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   };
 
   useEffect(() => {
+    if (Number(page) > totalPages && totalPages > 0) {
+      historyPushState('page', totalPages.toString());
+    }
+  }, [page, totalPages]);
+
+  useEffect(() => {
     let params: TObject = {
       page,
       keywords,
@@ -173,6 +189,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   return (
     <div className={css.root}>
       <Tabs
+        disabled={queryOrderInProgress}
         items={tabItems}
         onChange={handleTabChange}
         defaultActiveKey={'5'}

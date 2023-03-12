@@ -16,13 +16,14 @@
  *
  */
 
+import type { FocusEvent, KeyboardEvent, PropsWithChildren } from 'react';
+import React, { Children, cloneElement, useEffect, useRef } from 'react';
+import classNames from 'classnames';
+
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import useBoolean from '@hooks/useBoolean';
 import type { TDefaultProps } from '@utils/types';
-import classNames from 'classnames';
-import type { FocusEvent, KeyboardEvent, PropsWithChildren } from 'react';
-import React, { Children, cloneElement, useEffect, useRef } from 'react';
 
 import css from './ProfileMenu.module.scss';
 

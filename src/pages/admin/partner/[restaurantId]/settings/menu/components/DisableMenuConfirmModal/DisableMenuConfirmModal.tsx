@@ -1,3 +1,8 @@
+import type { ReactNode } from 'react';
+import React, { useEffect, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+
 import IconDanger from '@components/Icons/IconDanger/IconDanger';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import AlertModal from '@components/Modal/AlertModal';
@@ -5,25 +10,32 @@ import NamedLink from '@components/NamedLink/NamedLink';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { menusSliceThunks } from '@redux/slices/menus.slice';
 import { adminRoutes } from '@src/paths';
-import React, { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
-import css from './RemoveMenuConfirmModal.module.scss';
+import css from './DisableMenuConfirmModal.module.scss';
 
-type TRemoveMenuConfirmModal = {
-  menuToRemove: any;
-  onClearMenuToRemove: () => void;
-  onDeleteMenu: () => void;
-  removeMenuInProgress: boolean;
+type TDisableMenuConfirmModal = {
+  menuToDisable: any;
+  onClearMenuToDisable: () => void;
+  onDisabledMenu: () => void;
+  disableMenuInProgress: boolean;
+  inProgressTitle: string | ReactNode;
+  title: string | ReactNode;
+  confirmLabel?: string;
+  inProgressContent: string | ReactNode;
+  content: string | ReactNode;
 };
 
-const RemoveMenuConfirmModal: React.FC<TRemoveMenuConfirmModal> = (props) => {
+const DisableMenuConfirmModal: React.FC<TDisableMenuConfirmModal> = (props) => {
   const {
-    menuToRemove,
-    onClearMenuToRemove,
-    onDeleteMenu,
-    removeMenuInProgress,
+    menuToDisable,
+    onClearMenuToDisable,
+    onDisabledMenu,
+    disableMenuInProgress,
+    inProgressTitle,
+    title,
+    confirmLabel,
+    inProgressContent,
+    content,
   } = props;
   const dispatch = useAppDispatch();
 
@@ -36,15 +48,15 @@ const RemoveMenuConfirmModal: React.FC<TRemoveMenuConfirmModal> = (props) => {
     useState<boolean>(false);
 
   useEffect(() => {
-    if (!menuToRemove) return;
+    if (!menuToDisable) return;
     const checkShouldRemoveMenu = async () => {
       const { payload } = (await dispatch(
-        menusSliceThunks.checkingMenuInTransactionProgress(menuToRemove.id),
+        menusSliceThunks.checkingMenuInTransactionProgress(menuToDisable.id),
       )) as any;
       setIsInTransactionProgress(payload);
     };
     checkShouldRemoveMenu();
-  }, [JSON.stringify(menuToRemove)]);
+  }, [JSON.stringify(menuToDisable)]);
 
   const renderContent = () => {
     if (isCheckingMenuInTransactionProgress) {
@@ -62,7 +74,7 @@ const RemoveMenuConfirmModal: React.FC<TRemoveMenuConfirmModal> = (props) => {
                   <NamedLink
                     className={css.link}
                     path={adminRoutes.ManageOrders.path}>
-                    <FormattedMessage id="ManagePartnerMenu.preventRemoveLink" />
+                    {inProgressContent}
                   </NamedLink>
                 ),
               }}
@@ -73,47 +85,32 @@ const RemoveMenuConfirmModal: React.FC<TRemoveMenuConfirmModal> = (props) => {
     }
     return (
       <>
-        <p className={css.removeContent}>
-          <FormattedMessage
-            id="ManagePartnerMenu.removeContent"
-            values={{
-              menuTitle: (
-                <div className={css.menuTitle}>
-                  {menuToRemove && menuToRemove.title}
-                </div>
-              ),
-            }}
-          />
-        </p>
+        <p className={css.removeContent}>{content}</p>
       </>
     );
   };
 
   return (
     <AlertModal
-      isOpen={menuToRemove}
-      handleClose={onClearMenuToRemove}
+      isOpen={!!menuToDisable}
+      handleClose={onClearMenuToDisable}
       title={
         isInTransactionProgress ? (
-          <span className={css.removeTitle}>
-            <FormattedMessage id="ManagePartnerMenu.preventRemoveTitle" />
-          </span>
+          <span className={css.removeTitle}>{inProgressTitle}</span>
         ) : (
-          <span className={css.removeTitle}>
-            <FormattedMessage id="ManagePartnerMenu.removeTitle" />
-          </span>
+          <span className={css.removeTitle}>{title}</span>
         )
       }
-      onCancel={onClearMenuToRemove}
-      onConfirm={onDeleteMenu}
+      onCancel={onClearMenuToDisable}
+      onConfirm={onDisabledMenu}
       cancelLabel={isCheckingMenuInTransactionProgress ? '' : 'Hủy'}
       confirmLabel={
         !isInTransactionProgress && isCheckingMenuInTransactionProgress
           ? ''
-          : 'Xóa Menu'
+          : confirmLabel
       }
-      confirmInProgress={removeMenuInProgress}
-      confirmDisabled={removeMenuInProgress}
+      confirmInProgress={disableMenuInProgress}
+      confirmDisabled={disableMenuInProgress}
       childrenClassName={css.modalChildren}
       cancelClassName={
         !isInTransactionProgress || isCheckingMenuInTransactionProgress
@@ -125,4 +122,4 @@ const RemoveMenuConfirmModal: React.FC<TRemoveMenuConfirmModal> = (props) => {
   );
 };
 
-export default RemoveMenuConfirmModal;
+export default DisableMenuConfirmModal;

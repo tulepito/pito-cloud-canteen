@@ -39,14 +39,16 @@
   -webkit-tap-highlight-color: transparent;
   @include textTemplate(16px, $fontWeightBold, 24px, '');
   color: $neutralGray5;
+  border: none;
 
   &:last-child {
-    border-right: 0px;
+    border: none;
   }
 
   &:hover {
     outline: none;
     background-color: $neutralGray3;
+    border: none;
   }
 
   &:active,
