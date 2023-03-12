@@ -7,15 +7,14 @@ const sortArrayInObject = (obj: TObject) => {
   if (Array.isArray(obj)) return obj.sort();
 
   return Object.keys(obj).reduce((acc: TObject, key) => {
-    // eslint-disable-next-line no-param-reassign
     acc[key] = sortArrayInObject(obj[key]);
 
     return acc;
   }, {});
 };
 
-export const customPristine = (intitialValues: TObject, values: TObject) => {
-  const newInitialValues = sortArrayInObject(intitialValues);
+export const customPristine = (initialValues: TObject, values: TObject) => {
+  const newInitialValues = sortArrayInObject(initialValues);
   const newValues = sortArrayInObject(values);
 
   return isEqual(newInitialValues, newValues);

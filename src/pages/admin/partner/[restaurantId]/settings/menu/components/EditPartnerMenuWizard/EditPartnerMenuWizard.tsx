@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -468,7 +469,7 @@ const EditPartnerMenuWizard = () => {
         })}>
         {tab !== MENU_INFORMATION_TAB && (
           <Button
-            className={css.lightButton}
+            variant="secondary"
             disabled={createOrUpdateMenuInProgress}
             onClick={handleGoBack}>
             <FormattedMessage id="EditPartnerMenuWizard.back" />

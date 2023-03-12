@@ -24,23 +24,6 @@
   margin: 0 10px;
 }
 
-.secondaryButton {
-  @include buttonColorSecondary;
-  background-color: $neutralGray2;
-  outline: 1px solid $neutralGray4;
-
-  &:focus,
-  &:hover {
-    background-color: $neutralGray3;
-    color: unset;
-    border-color: unset;
-  }
-}
-
-.filterButton {
-  composes: secondaryButton;
-}
-
 .filterIcon {
   fill: $neutralGray6;
   width: 20px;
@@ -72,6 +55,23 @@
   min-width: 200px;
   display: block;
   color: $neutralGray6;
+}
+
+.secondaryButton {
+  @include buttonColorSecondary;
+  background-color: $neutralGray2;
+  outline: 1px solid $neutralGray4;
+
+  &:focus,
+  &:hover {
+    background-color: $neutralGray3;
+    color: unset;
+    border-color: unset;
+  }
+}
+
+.filterButton {
+  composes: secondaryButton;
 }
 
 .addButton {

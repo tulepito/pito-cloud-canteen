@@ -1,4 +1,3 @@
-@use '/src/styles/mixins.scss' as *;
 @use '/src/styles/vars.scss' as *;
 
 .modalContainer {
@@ -9,17 +8,6 @@
 .filterIcon {
   margin-right: 10px;
   fill: $neutralGray6;
-}
-
-.secondaryButton {
-  @include buttonColorSecondary;
-  &:focus,
-  &:hover {
-    background-color: $neutralGray4;
-    color: $neutralGray6;
-    border: 1px solid $neutralGray4 !important;
-    outline: 1px solid $neutralGray4 !important;
-  }
 }
 
 .filterButton {

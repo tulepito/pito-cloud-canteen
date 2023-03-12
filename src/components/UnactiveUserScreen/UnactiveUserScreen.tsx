@@ -7,7 +7,7 @@ import { authThunks } from '@redux/slices/auth.slice';
 import { userActions } from '@redux/slices/user.slice';
 import { generalPaths } from '@src/paths';
 
-const UnactiveUserScreen = () => {
+const UnActiveUserScreen = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -27,4 +27,4 @@ const UnactiveUserScreen = () => {
   );
 };
 
-export default UnactiveUserScreen;
+export default UnActiveUserScreen;

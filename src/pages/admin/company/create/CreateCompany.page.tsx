@@ -83,7 +83,8 @@ export default function CreateCompanyPage() {
     return () => {
       dispatch(clearError());
     };
-  }, [clearError, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className={css.root}>

@@ -52,6 +52,7 @@ const InvitationCard: React.FC<InvitationCardProps> = (props) => {
           </div>
           <div className={css.modalFooter}>
             <Button
+              variant="secondary"
               className={css.declineBtn}
               onClick={onDecline}
               inProgress={responseToInvitationInProgress}

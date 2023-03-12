@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -199,7 +200,6 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     if (isEmpty(orderDetail) && !isEmpty(plans)) {
       dispatch(orderAsyncActions.fetchOrderDetail(plans));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     JSON.stringify(order),
     JSON.stringify(orderDetail),

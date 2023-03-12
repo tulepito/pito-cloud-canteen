@@ -23,7 +23,6 @@
 }
 
 .rejectBtn {
-  @include buttonColorSecondary;
   @include textTemplate(12px, 700, 20px, '');
   display: block;
   width: calc((100% - 8px) / 2);

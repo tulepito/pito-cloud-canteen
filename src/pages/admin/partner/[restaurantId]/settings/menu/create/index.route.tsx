@@ -13,6 +13,7 @@ const CreatePartnerMenuRoute = () => {
     if (!duplicateId) {
       dispatch(menusSliceAction.setInitialStates());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duplicateId]);
 
   return <EditPartnerMenuWizard />;

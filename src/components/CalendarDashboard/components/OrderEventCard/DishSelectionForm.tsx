@@ -90,6 +90,7 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
       <div className={css.actions}>
         <Button
           type="button"
+          variant="secondary"
           className={css.rejectBtn}
           onClick={handleReject}
           disabled={disabledRejectButton}

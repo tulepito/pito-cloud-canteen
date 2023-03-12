@@ -61,17 +61,6 @@ export const handleError = (res: NextApiResponse, error: any) => {
   }
 };
 
-export const serialize = (data: any) => {
-  return sharetribeSdk.transit.write(data, {
-    typeHandlers,
-    verbose: TRANSIT_VERBOSE,
-  });
-};
-
-export const deserialize = (str: string) => {
-  return sharetribeSdk.transit.read(str, { typeHandlers });
-};
-
 export const getSdk = (req: NextApiRequest | NextRequest, res: any) => {
   return sharetribeSdk.createInstance({
     transitVerbose: TRANSIT_VERBOSE,

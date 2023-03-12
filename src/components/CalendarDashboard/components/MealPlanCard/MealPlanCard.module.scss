@@ -117,10 +117,3 @@
   text-align: center;
   cursor: pointer;
 }
-
-.editFood {
-  @include buttonColorSecondary;
-  margin: 20px auto 0;
-  width: 90%;
-  min-height: 36px;
-}

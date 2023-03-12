@@ -246,11 +246,7 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
             <div className={css.buttonWrapper}>
               <div className={css.buttons}>
                 {goBack && (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    // className={css.secondaryButton}
-                    onClick={goBack}>
+                  <Button type="button" variant="secondary" onClick={goBack}>
                     {intl.formatMessage({
                       id: 'EditPartnerForms.goBack',
                     })}

@@ -21,7 +21,7 @@ const ConfirmClientModal: React.FC<ConfirmClientModalProps> = (props) => {
       isOpen={isOpen}
       handleClose={onClose}>
       <div className={css.modalContainer}>
-        <Button onClick={onCancel} className={css.cancel}>
+        <Button variant="secondary" onClick={onCancel}>
           {intl.formatMessage({ id: 'ConfirmClientModal.cancel' })}
         </Button>
         <Button onClick={onConfirm}>

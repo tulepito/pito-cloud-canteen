@@ -60,6 +60,7 @@ const GroupInfoForm: React.FC<GroupInfoFormProps> = (props) => {
             </div>
             <div className={css.buttonsWrapper}>
               <Button
+                variant="secondary"
                 className={css.cancelBtn}
                 type="button"
                 onClick={onCallback}>
