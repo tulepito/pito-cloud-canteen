@@ -23,11 +23,20 @@ type TDayInWeekFieldProps = {
   form: any;
   values: TObject;
   title?: string;
+  titleClassName?: string;
   containerClassName?: string;
+  fieldGroupClassName?: string;
 };
 
 const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
-  const { form, values, title, containerClassName } = props;
+  const {
+    form,
+    values,
+    title,
+    containerClassName,
+    titleClassName,
+    fieldGroupClassName,
+  } = props;
   const intl = useIntl();
 
   const { dayInWeek = [], startDate, endDate } = values;
@@ -46,11 +55,13 @@ const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
   }, [form, selectedDays, selectedDays.length]);
 
   const containerClasses = classNames(css.container, containerClassName);
+  const titleClasses = classNames(css.title, titleClassName);
+  const fieldGroupsClasses = classNames(css.fieldGroups, fieldGroupClassName);
   return (
     <div className={containerClasses}>
-      {title && <div className={css.title}>{title}</div>}
+      {title && <div className={titleClasses}>{title}</div>}
       <FieldTextInput id="dayInWeek" name="dayInWeek" type="hidden" />
-      <div className={css.fieldGroups}>
+      <div className={fieldGroupsClasses}>
         {DAY_IN_WEEK.map((day) => {
           const onDaySelect = () => {
             if (selectedDays.includes(day.key))
