@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 const get = require('lodash/get');
 const isEmpty = require('lodash/isEmpty');
+// eslint-disable-next-line import/no-unresolved
 const mapLimit = require('async/mapLimit');
 const {
   queryEventsByEventType,

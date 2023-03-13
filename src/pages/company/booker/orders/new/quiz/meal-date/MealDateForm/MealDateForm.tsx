@@ -46,18 +46,22 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
 
   return (
     <Form onSubmit={handleSubmit}>
-      <DayInWeekField
-        form={form}
-        values={values}
-        containerClassName={css.fieldContainer}
-      />
-      <div className={css.separatorLine}></div>
       <div className={css.datePickersWrapper}>
         <MealPlanDateField
           form={form}
           values={values}
           columnLayout
           layoutClassName={css.dateLayout}
+        />
+        <DayInWeekField
+          form={form}
+          values={values}
+          containerClassName={css.fieldContainer}
+          titleClassName={css.fieldTitle}
+          fieldGroupClassName={css.fieldGroups}
+          title={intl.formatMessage({
+            id: 'MealDateForm.dayInWeekField.title',
+          })}
         />
         <DurationForNextOrderField
           containerClassName={css.planDurationFieldContainer}

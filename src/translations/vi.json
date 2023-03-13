@@ -888,6 +888,7 @@
   "ManagePartnersPage.draftState": " Nháp",
   "ManagePartnersPage.newStatus": "Mới",
   "ManagePartnersPage.unsatisfactoryStatus": "Không đạt yêu cầu",
+  "MealDateForm.dayInWeekField.title": "Chọn ngày ăn trong tuần",
   "MealDateForm.durationForNextOrderField.label": "Kế hoạch bữa ăn của bạn kéo dài trong bao lâu?",
   "MealDateForm.OrderDeadlineField.label.date": "Chọn ngày kết thúc chọn món",
   "MealDateForm.OrderDeadlineField.label.hour": "Chọn giờ kết thúc chọn món",
