@@ -27,13 +27,13 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     className,
     data: {
       overflow = 0,
-      PITOPoints = 0,
       promotion = 0,
       serviceFee = 0,
       totalPrice = 0,
       totalWithoutVAT = 0,
       totalWithVAT = 0,
-      transportFee = 0,
+      // PITOPoints = 0,
+      // transportFee = 0,
       // VATFee = 0,
     } = {},
     showStartPickingOrderButton,
@@ -94,7 +94,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
             </div>
           </div>
         </div>
-        <div className={css.feeItem}>
+        {/* <div className={css.feeItem}>
           <div className={css.feeItemContainer}>
             <div className={css.label}>
               {intl.formatMessage({ id: 'ReviewCardSection.transportFee' })}
@@ -103,7 +103,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
               {parseThousandNumber(transportFee.toString())}đ
             </div>
           </div>
-        </div>
+        </div> */}
         <div className={css.feeItem}>
           <div className={css.feeItemContainer}>
             <div className={css.label}>
@@ -144,12 +144,12 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
           <div className={css.totalWithVAT}>
             {parseThousandNumber(totalWithVAT.toString())}đ
           </div>
-          <div className={css.PITOPoints}>
+          {/* <div className={css.PITOPoints}>
             {intl.formatMessage(
               { id: 'ReviewCardSection.PITOPoints' },
               { PITOPoints },
             )}
-          </div>
+          </div> */}
           <div className={css.totalDescription}>
             {intl.formatMessage({ id: 'ReviewCardSection.totalDescription' })}
           </div>

@@ -17,7 +17,7 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
     totalPrice,
     promotion,
     totalWithVAT,
-    transportFee,
+    // transportFee,
     // VATFee,
   } = props;
   const intl = useIntl();
@@ -65,7 +65,7 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
           </div>
           <div>{serviceFee}</div>
         </div>
-        <div className={css.tableRow}>
+        {/* <div className={css.tableRow}>
           <div>3</div>
           <div>
             {intl.formatMessage({
@@ -73,7 +73,7 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
             })}
           </div>
           <div>{transportFee}</div>
-        </div>
+        </div> */}
         <div className={css.tableRow}>
           <div>4</div>
           <div>

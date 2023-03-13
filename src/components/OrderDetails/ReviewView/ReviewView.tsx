@@ -79,7 +79,6 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           <ReviewOrderProcessSection />
         </RenderWhen>
         <ReviewCartSection
-          className={css.cartRoot}
           data={reviewViewData.reviewCartData}
           showStartPickingOrderButton={showStartPickingOrderButton}
           onClickDownloadPriceQuotation={onDownloadPriceQuotation}
