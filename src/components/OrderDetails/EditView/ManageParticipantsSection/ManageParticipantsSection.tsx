@@ -3,7 +3,6 @@ import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
-import AlertModal from '@components/Modal/AlertModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
@@ -14,6 +13,7 @@ import type { TDefaultProps, TObject, TUser } from '@utils/types';
 
 import type { TAddParticipantFormValues } from './AddParticipantForm';
 import AddParticipantForm from './AddParticipantForm';
+import AlertConfirmDeleteParticipant from './AlertConfirmDeleteParticipant';
 import ManageParticipantsModal from './ManageParticipantsModal';
 import ParticipantCard from './ParticipantCard';
 
@@ -75,19 +75,6 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
 
   const sectionTitle = intl.formatMessage({
     id: 'ManageParticipantsSection.title',
-  });
-
-  const deleteParticipantPopupTitle = intl.formatMessage({
-    id: 'ManageParticipantsSection.deleteParticipantPopup.title',
-  });
-  const deleteParticipantPopupQuestion = intl.formatMessage({
-    id: 'ManageParticipantsSection.deleteParticipantPopup.confirmQuestion',
-  });
-  const cancelDeleteParticipantText = intl.formatMessage({
-    id: 'ManageParticipantsSection.deleteParticipantPopup.cancel',
-  });
-  const confirmDeleteParticipantText = intl.formatMessage({
-    id: 'ManageParticipantsSection.deleteParticipantPopup.confirm',
   });
 
   const viewDetailText = intl.formatMessage({
@@ -165,18 +152,14 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
         {viewDetailText}
       </Button>
 
-      <AlertModal
+      <AlertConfirmDeleteParticipant
         cancelDisabled={disableButton}
         confirmDisabled={disableButton}
-        title={deleteParticipantPopupTitle}
         isOpen={isDeleteParticipantModalOpen}
-        handleClose={handleCloseDeleteParticipantModal}
-        cancelLabel={cancelDeleteParticipantText}
-        confirmLabel={confirmDeleteParticipantText}
+        onClose={handleCloseDeleteParticipantModal}
         onCancel={handleCancelDeleteParticipant}
-        onConfirm={handleConfirmDeleteParticipant}>
-        <div>{deleteParticipantPopupQuestion}</div>
-      </AlertModal>
+        onConfirm={handleConfirmDeleteParticipant}
+      />
 
       <ManageParticipantsModal
         isOpen={isManageParticipantsModalOpen}

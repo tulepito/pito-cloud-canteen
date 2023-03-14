@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import {
   orderDetailsAnyActionsInProgress,
   orderManagementThunks,
@@ -14,6 +15,7 @@ import {
 import { historyPushState } from '@utils/history';
 import type { TObject } from '@utils/types';
 
+import AlertConfirmDeleteParticipant from '../../ManageParticipantsSection/AlertConfirmDeleteParticipant';
 import type { TEditOrderRowFormValues } from '../AddOrEditOrderDetail/EditOrderRowForm';
 import EditOrderRowModal from '../AddOrEditOrderDetail/EditOrderRowModal';
 import { usePrepareOrderDetailTableData } from '../hooks/usePrepareOrderDetailTableData';
@@ -56,6 +58,12 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   );
   const [isEditSelectionModalOpen, setIsEditSelectionModalOpen] =
     useState(false);
+  const [wannaDeleteMemberId, setWannaDeleteMemberId] = useState<string>('');
+  const {
+    value: isDeleteParticipantModalOpen,
+    setFalse: turnOffDeleteParticipantModalOpen,
+    setTrue: turnOnDeleteParticipantModalOpen,
+  } = useBoolean();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const { tableHeads, packagePerMember, allTabData, deletedTabData } =
     usePrepareOrderDetailTableData(currentViewDate);
@@ -72,8 +80,17 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
     };
 
   const handleClickDeleteOrderItem = (memberId: string) => () => {
+    turnOnDeleteParticipantModalOpen();
+    setWannaDeleteMemberId(memberId);
+  };
+  const handleCancelDeleteOrderItem = () => {
+    turnOffDeleteParticipantModalOpen();
+  };
+  const handleConfirmDeleteOrderItem = () => {
+    turnOffDeleteParticipantModalOpen();
+
     const updateValues = {
-      memberId,
+      memberId: wannaDeleteMemberId,
       currentViewDate,
     };
 
@@ -155,6 +172,14 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
           items={tabItems}
           onChange={handleTabChange}
           defaultActiveKey={defaultActiveKey.toString()}
+        />
+        <AlertConfirmDeleteParticipant
+          // cancelDisabled={disableButton}
+          // confirmDisabled={disableButton}
+          isOpen={isDeleteParticipantModalOpen}
+          onClose={turnOffDeleteParticipantModalOpen}
+          onCancel={handleCancelDeleteOrderItem}
+          onConfirm={handleConfirmDeleteOrderItem}
         />
         <EditOrderRowModal
           isOpen={isEditSelectionModalOpen}
