@@ -5,6 +5,7 @@
   background-color: $neutralGray1;
   padding: 12px;
   width: 300px;
+  border-radius: 8px;
 }
 
 .header {
@@ -23,18 +24,22 @@
   flex: 1;
 }
 
+.regularText {
+  color: $neutralGray6;
+}
+
 .mealType {
   @include textTemplate(12px, 400, 20px, '');
   color: $neutralGray5;
 }
 
 .eventTime {
-  @include textTemplate(12px, 400, 20px, '');
+  @include textTemplate(12px, $fontWeightSemiBold, 20px, '');
   color: $neutralGray6;
 }
 
 .divider {
-  @include fullWidthDivider($neutralGray5, 1px);
+  @include fullWidthDivider($neutralGray3, 1px);
   margin: 12px 0;
 }
 

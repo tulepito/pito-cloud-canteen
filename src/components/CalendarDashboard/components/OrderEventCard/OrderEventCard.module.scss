@@ -71,8 +71,12 @@
   @include textTemplate(12px, 400, 20px, '');
 }
 
+.orderId {
+  @include textTemplate(12px, 400, 16px, '');
+}
+
 .mealType {
-  @include textTemplate(12px, 400, 20px, '');
+  @include textTemplate(12px, 400, 16px, '');
 }
 
 .eventCardContentWrapper {
@@ -147,7 +151,8 @@
 .tooltipOverlay :global(.rc-tooltip-inner) {
   box-shadow: 0px 8px 8px -4px rgba(16, 24, 40, 0.04),
     0px 20px 24px -4px rgba(16, 24, 40, 0.1);
-  border: 1px solid $neutralGray4;
+  border: 1px solid $neutralGray3;
+  border-radius: 8px;
   padding: 0;
 }
 

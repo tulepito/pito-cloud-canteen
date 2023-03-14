@@ -26,8 +26,9 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
 
   const remainTime = DateTime.fromJSDate(new Date()).diff(
     DateTime.fromMillis(+expiredTime),
-    ['hour', 'minute', 'second'],
+    ['day', 'hour', 'minute', 'second'],
   );
+  const remainDays = remainTime.get('day');
   const remainHours = remainTime.get('hour');
   const remainMinutes = remainTime.get('minute');
 
@@ -40,8 +41,9 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
           <FormattedMessage
             id="EventCard.remainTime"
             values={{
-              hour: Math.abs(remainHours),
-              minute: Math.abs(remainMinutes),
+              day: Math.abs(remainDays).toString().padStart(2, '0'),
+              hour: Math.abs(remainHours).toString().padStart(2, '0'),
+              minute: Math.abs(remainMinutes).toString().padStart(2, '0'),
             }}
           />
         </OrderEventCardContentItem>
