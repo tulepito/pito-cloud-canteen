@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
   padding: 16px;
@@ -7,6 +8,11 @@
   background-color: $neutralGray1;
   box-shadow: 0px 8px 8px -4px rgba(16, 24, 40, 0.04),
     0px 20px 24px -4px rgba(16, 24, 40, 0.1);
+
+  @include viewportMedium {
+    position: sticky;
+    top: 85px;
+  }
 
   .title {
     @include textTemplate(20px, 700, 32px);
