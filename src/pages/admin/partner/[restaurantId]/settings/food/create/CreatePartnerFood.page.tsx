@@ -78,7 +78,7 @@ const CreatePartnerFoodPage = () => {
     return response;
   };
 
-  const { minQuantity, maxQuantity, packaging } =
+  const { minQuantity, maxQuantity } =
     IntegrationListing(partnerListingRef).getPublicData();
 
   const initialValues = useMemo(() => {
@@ -148,7 +148,6 @@ const CreatePartnerFoodPage = () => {
         inProgress={createFoodInProgress}
         disabled={uploadingImages || createFoodInProgress}
         formError={createFoodError}
-        partnerPackagingList={packaging}
       />
     </>
   );
