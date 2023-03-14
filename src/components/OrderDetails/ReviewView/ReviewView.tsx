@@ -1,9 +1,8 @@
 import classNames from 'classnames';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import type { usePrepareOrderDetailPageData } from '@pages/company/orders/[orderId]/picking/hooks/usePrepareData';
 import type { TDefaultProps } from '@utils/types';
-
-import type { usePrepareOrderDetailPageData } from '../../../hooks/usePrepareData';
 
 import ReviewCartSection from './ReviewCartSection/ReviewCartSection';
 import type { TReviewInfoFormValues } from './ReviewInfoSection/ReviewInfoForm';
@@ -54,7 +53,12 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
       )}
       <div className={css.leftPart}>
         <RenderWhen condition={!canGoBackEditMode}>
-          <ReviewOrderStatesSection data={reviewViewData.transactionDataMap} />
+          <ReviewOrderStatesSection
+            data={{
+              transactionDataMap: reviewViewData?.transactionDataMap || {},
+              isCanceledOrder: reviewViewData?.isCanceledOrder || false,
+            }}
+          />
         </RenderWhen>
 
         <ReviewInfoSection

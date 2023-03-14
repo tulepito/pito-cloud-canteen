@@ -48,7 +48,7 @@ const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
 
   const rootClasses = classNames(
     css.root,
-    { [css.isCollapsible]: canEdit },
+    { [css.isCollapsible]: canEdit, [css.hasPadding]: !canEdit },
     className,
   );
   const sectionTitle = intl.formatMessage({ id: 'ReviewInfoSection.title' });

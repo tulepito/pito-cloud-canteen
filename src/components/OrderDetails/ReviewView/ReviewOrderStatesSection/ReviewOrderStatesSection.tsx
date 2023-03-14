@@ -25,31 +25,36 @@ const prepareItemFromData = (transactionMap: TObject<number, TTransaction>) => {
 
 type TReviewOrderStatesSectionProps = {
   data: {
-    [date: number]: TTransaction;
+    transactionDataMap: {
+      [date: number]: TTransaction;
+    };
+    isCanceledOrder: boolean;
   };
 };
 
 const ReviewOrderStatesSection: React.FC<TReviewOrderStatesSectionProps> = ({
-  data,
+  data: { transactionDataMap, isCanceledOrder },
 }) => {
   const items = useMemo(
-    () => prepareItemFromData(data),
+    () => prepareItemFromData(transactionDataMap),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(data)],
+    [JSON.stringify(transactionDataMap)],
   );
 
   return (
-    <RenderWhen condition={!isEmpty(items)}>
-      <div className={css.root}>
-        <HorizontalTimeLine
-          items={items}
-          itemComponent={StateItem}
-          haveNavigators
-        />
-      </div>
-      <RenderWhen.False>
-        <Skeleton className={css.loadingSkeleton} />
-      </RenderWhen.False>
+    <RenderWhen condition={!isCanceledOrder}>
+      <RenderWhen condition={!isEmpty(items)}>
+        <div className={css.root}>
+          <HorizontalTimeLine
+            items={items}
+            itemComponent={StateItem}
+            haveNavigators
+          />
+        </div>
+        <RenderWhen.False>
+          <Skeleton className={css.loadingSkeleton} />
+        </RenderWhen.False>
+      </RenderWhen>
     </RenderWhen>
   );
 };

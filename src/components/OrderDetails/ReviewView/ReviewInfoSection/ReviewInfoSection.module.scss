@@ -6,6 +6,10 @@
   margin: 0;
   border-bottom: 1px solid $neutralGray4;
 
+  &.hasPadding {
+    padding: 16px;
+  }
+
   &.isCollapsible {
     border: 1px solid $neutralGray3;
     border-radius: 16px;
