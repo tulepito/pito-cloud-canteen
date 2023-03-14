@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import { updateMenuAfterFoodDeleted } from '@pages/api/helpers/foodHelpers';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 
@@ -26,6 +27,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           queryParams,
         ),
       ),
+    );
+
+    await Promise.all(
+      ids.map((id: string) => {
+        return updateMenuAfterFoodDeleted(id);
+      }),
     );
 
     return res.status(200).json(responses);

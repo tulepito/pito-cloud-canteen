@@ -31,11 +31,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         return res.status(200).json(response);
       }
-      case HttpMethod.DELETE:
-      case HttpMethod.GET:
-      case HttpMethod.PUT:
       default:
-        break;
+        return res.status(400).json({ message: 'Bad request' });
     }
   } catch (error) {
     console.log(error);
