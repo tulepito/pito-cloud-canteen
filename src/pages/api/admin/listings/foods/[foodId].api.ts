@@ -1,4 +1,3 @@
-import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
@@ -12,60 +11,48 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const integrationSdk = getIntegrationSdk();
 
     switch (apiMethod) {
-      case HttpMethod.GET:
-        {
-          const { foodId, JSONParams } = req.query;
-          const { dataParams = {}, queryParams = {} } = JSON.parse(
-            JSONParams as string,
-          );
-          const response = await integrationSdk.listings.show(
-            { id: foodId, ...dataParams },
-            queryParams,
-          );
+      case HttpMethod.GET: {
+        const { foodId, JSONParams } = req.query;
+        const { dataParams = {}, queryParams = {} } = JSON.parse(
+          JSONParams as string,
+        );
+        const response = await integrationSdk.listings.show(
+          { id: foodId, ...dataParams },
+          queryParams,
+        );
 
-          res.json(response);
-        }
-        break;
+        return res.json(response);
+      }
 
-      case HttpMethod.PUT:
-        {
-          const { dataParams = {}, queryParams = {} } = req.body;
-          const response = await integrationSdk.listings.update(
-            dataParams,
-            queryParams,
-          );
+      case HttpMethod.PUT: {
+        const { dataParams = {}, queryParams = {} } = req.body;
+        const response = await integrationSdk.listings.update(
+          dataParams,
+          queryParams,
+        );
 
-          res.json(response);
-        }
-        break;
+        return res.status(200).json(response);
+      }
 
-      case HttpMethod.DELETE:
-        {
-          const { foodId } = req.query;
-          const { dataParams = {}, queryParams = {} } = req.body;
-          const { ids = [] } = dataParams;
+      case HttpMethod.DELETE: {
+        const { foodId } = req.query;
+        const { queryParams = {} } = req.body;
 
-          const updateFoodFn = (_id: string) =>
-            integrationSdk.listings.update(
-              {
-                id: _id,
-                metadata: {
-                  isDeleted: true,
-                },
-              },
-              queryParams,
-            );
+        const response = await integrationSdk.listings.update(
+          {
+            id: foodId,
+            metadata: {
+              isDeleted: true,
+            },
+          },
+          queryParams,
+        );
 
-          const response = isEmpty(ids)
-            ? await updateFoodFn(foodId as string)
-            : await Promise.all(ids.map(updateFoodFn));
-
-          res.json(response);
-        }
-        break;
+        return res.status(200).json(response);
+      }
 
       default:
-        break;
+        return res.status(400).json({ message: 'Bad request' });
     }
   } catch (error) {
     console.error(error);
