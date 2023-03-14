@@ -61,7 +61,7 @@ const QuizMealDate = () => {
   const formattedEndDate = endDate && formatTimestamp(endDate, 'd MMMM');
   const initialValues = useMemo(
     () => ({
-      dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri'],
+      dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
       displayedDurationTime: '1',
       durationTime: '1',
       durationTimeMode: 'week',
