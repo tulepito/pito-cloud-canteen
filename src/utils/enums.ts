@@ -352,7 +352,7 @@ export const PACKAGING_OPTIONS = [
   },
   {
     key: EPackagingMaterials.PLASTIC_BOX,
-    label: 'Nhựa xốp',
+    label: 'Nhựa, xốp',
   },
   {
     key: EPackagingMaterials.BAGASSE_BOX,
@@ -368,7 +368,7 @@ export const PACKAGING_OPTIONS = [
   },
   {
     key: EPackagingMaterials.REUSABLE_BOX,
-    label: 'Hộp ăn tái sử dụng',
+    label: 'Bao bì có thể tái sử dụng',
   },
   {
     key: OTHER_OPTION,
@@ -717,6 +717,10 @@ export const SIDE_DISH_OPTIONS = [
   {
     key: 'dessert',
     label: 'Món tráng miệng',
+  },
+  {
+    key: 'drink',
+    label: 'Nước uống',
   },
 ];
 
