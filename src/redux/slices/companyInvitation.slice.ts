@@ -6,6 +6,8 @@ import {
   responseToInvitationApi,
 } from '@apis/companyInvitationApi';
 import { createAsyncThunk } from '@redux/redux.helper';
+import type { TUser } from '@src/utils/types';
+import { denormalisedResponseEntities } from '@utils/data';
 
 type CheckInvitationResponse = {
   message: string;
@@ -18,6 +20,8 @@ type TCompanyInvitationState = {
   checkInvitationResult: any;
   checkInvitationInProgress: boolean;
   checkInvitationError: any;
+  company: TUser | null;
+  fetchCompanyInfoInProgress: boolean;
 
   responseToInvitationResult: string;
   responseToInvitationInProgress: boolean;
@@ -27,6 +31,8 @@ const initialState: TCompanyInvitationState = {
   checkInvitationResult: null,
   checkInvitationInProgress: false,
   checkInvitationError: null,
+  company: null,
+  fetchCompanyInfoInProgress: false,
 
   responseToInvitationResult: null!,
   responseToInvitationInProgress: false,
@@ -36,6 +42,8 @@ const initialState: TCompanyInvitationState = {
 // ================ Thunk types ================ //
 const CHECK_INVITATION = 'app/companyInvitation/CHECK_INVITATION';
 const RESPONSE_TO_INVITATION = 'app/companyInvitation/RESPONSE_TO_INVITATION';
+const FETCH_COMPANY_INFO = 'app/companyInvitation/FETCH_COMPANY_INFO';
+
 // ================ Async thunks ================ //
 const checkInvitation = createAsyncThunk(
   CHECK_INVITATION,
@@ -58,9 +66,24 @@ const responseToInvitation = createAsyncThunk(
     return response.message;
   },
 );
+
+const fetchCompanyInfo = createAsyncThunk(
+  FETCH_COMPANY_INFO,
+  async (companyId: string, { extra: sdk }) => {
+    const companyInfo = denormalisedResponseEntities(
+      await sdk.users.show({
+        id: companyId,
+      }),
+    )[0];
+
+    return companyInfo;
+  },
+);
+
 export const companyInvitationThunks = {
   checkInvitation,
   responseToInvitation,
+  fetchCompanyInfo,
 };
 
 // ================ Slice ================ //
@@ -94,6 +117,17 @@ const companyInvitationSlice = createSlice({
       .addCase(responseToInvitation.rejected, (state, { error }) => {
         state.responseToInvitationInProgress = false;
         state.responseToInvitationError = error.message;
+      })
+
+      .addCase(fetchCompanyInfo.pending, (state) => {
+        state.fetchCompanyInfoInProgress = true;
+      })
+      .addCase(fetchCompanyInfo.fulfilled, (state, { payload }) => {
+        state.fetchCompanyInfoInProgress = false;
+        state.company = payload;
+      })
+      .addCase(fetchCompanyInfo.rejected, (state) => {
+        state.fetchCompanyInfoInProgress = false;
       });
   },
 });

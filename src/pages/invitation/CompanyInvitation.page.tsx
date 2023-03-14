@@ -4,10 +4,6 @@ import { useRouter } from 'next/router';
 
 import RedirectLink from '@components/RedirectLink/RedirectLink';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import {
-  addWorkspaceCompanyId,
-  BookerManageCompany,
-} from '@redux/slices/company.slice';
 import { companyInvitationThunks } from '@redux/slices/companyInvitation.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { generalPaths } from '@src/paths';
@@ -27,7 +23,7 @@ const CompanyInvitationPage = () => {
   const { companyId = '' } = router.query;
   const currentUser = useAppSelector(currentUserSelector);
   const company = useAppSelector(
-    (state) => state.company.company,
+    (state) => state.companyInvitation.company,
     shallowEqual,
   );
   const {
@@ -38,8 +34,9 @@ const CompanyInvitationPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      dispatch(addWorkspaceCompanyId(companyId));
-      await dispatch(BookerManageCompany.companyInfo());
+      await dispatch(
+        companyInvitationThunks.fetchCompanyInfo(companyId as string),
+      );
       dispatch(companyInvitationThunks.checkInvitation(companyId as string));
     };
     if (isReady) {
