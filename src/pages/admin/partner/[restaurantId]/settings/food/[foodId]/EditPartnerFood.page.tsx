@@ -7,7 +7,6 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
-import { IntegrationListing } from '@src/utils/data';
 import type { TObject } from '@src/utils/types';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
@@ -31,13 +30,8 @@ const EditPartnerFoodPage = () => {
     uploadingImages,
   } = useAppSelector((state) => state.foods, shallowEqual);
 
-  const {
-    partnerListingRef,
-    showPartnerListingInProgress,
-    showPartnerListingError,
-  } = useAppSelector((state) => state.partners, shallowEqual);
-
-  const { packaging } = IntegrationListing(partnerListingRef).getPublicData();
+  const { showPartnerListingInProgress, showPartnerListingError } =
+    useAppSelector((state) => state.partners, shallowEqual);
 
   const handleSubmit = (values: TEditPartnerFoodFormValues) =>
     dispatch(
@@ -98,7 +92,6 @@ const EditPartnerFoodPage = () => {
         formError={updateFoodError}
         initialValues={initialValues}
         isEditting
-        partnerPackagingList={packaging}
       />
     </>
   );
