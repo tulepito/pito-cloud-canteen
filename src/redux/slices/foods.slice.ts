@@ -293,23 +293,27 @@ const createPartnerFoodFromCsv = createAsyncThunk(
         header: true,
         skipEmptyLines: true,
         async complete({ data = [] }: { data: any[] }) {
+          const isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
+          const dataLengthToImport = isProduction ? data.length : 1;
           const response = await Promise.all(
-            data.slice(0, 1).map(async (food: any) => {
-              const { title } = food;
-              if (!title) return;
+            data.slice(0, dataLengthToImport).map(async (foodData: any) => {
               const dataParams = getImportDataFromCsv({
-                ...food,
+                ...foodData,
                 restaurantId,
               });
+
               const queryParams = {
                 expand: true,
               };
+
               const { data } = await partnerFoodApi.createFood({
                 dataParams,
                 queryParams,
               });
 
-              return denormalisedResponseEntities(data)[0];
+              const [food] = denormalisedResponseEntities(data);
+
+              return food;
             }),
           );
           resolve(response as any);
