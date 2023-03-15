@@ -294,7 +294,7 @@ const createPartnerFoodFromCsv = createAsyncThunk(
         skipEmptyLines: true,
         async complete({ data = [] }: { data: any[] }) {
           const isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
-          const dataLengthToImport = isProduction ? data.length : 1;
+          const dataLengthToImport = isProduction ? data.length : 3;
           const response = await Promise.all(
             data.slice(0, dataLengthToImport).map(async (foodData: any) => {
               const dataParams = getImportDataFromCsv({
