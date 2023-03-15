@@ -23,14 +23,14 @@ const CartItem: React.FC<TCartItemProps> = ({
   return (
     <div className={classNames(css.root, className)}>
       <div className={css.label}>
-        <IconRefreshing className={css.icon} />
         <span>{label}</span>
-      </div>
-      <div className={css.value}>
-        <span>{value}</span>
         {!removeDisabled && (
           <IconClose onClick={onRemove} className={css.iconClose} />
         )}
+      </div>
+      <div className={css.value}>
+        <IconRefreshing className={css.icon} />
+        <span>{value}</span>
       </div>
     </div>
   );

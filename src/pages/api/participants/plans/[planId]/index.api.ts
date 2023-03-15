@@ -42,6 +42,11 @@ const fetchSubOrder = async (orderDetail: any, currentUserId: string) => {
       await integrationSdk.listings.query({
         ids: foodListIds.join(','),
         meta_listingType: 'food',
+        include: ['images'],
+        'fields.image': [
+          'variants.landscape-crop',
+          'variants.landscape-crop2x',
+        ],
       }),
     );
 

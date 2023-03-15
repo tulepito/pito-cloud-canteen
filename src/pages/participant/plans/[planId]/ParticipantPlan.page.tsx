@@ -1,7 +1,10 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import NamedLink from '@components/NamedLink/NamedLink';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
+import { participantPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 
 import SectionCountdown from '../../components/SectionCountdown/SectionCountdown';
@@ -37,6 +40,15 @@ const ParticipantPlan = () => {
             orderDay={Number(orderDayState)}
             inProgress={loadDataInProgress}
           />
+          <div>
+            <NamedLink
+              path={participantPaths.Order}
+              params={{ orderId }}
+              className={css.goBackBtn}>
+              <IconArrow direction="left" />
+              Quay lại
+            </NamedLink>
+          </div>
           <SectionOrderListing
             plan={plan}
             onSelectTab={handleSelectRestaurant}

@@ -18,17 +18,18 @@
     background: $neutralGray4;
     border-radius: 9px;
     transition: background-color 0.25s linear;
+    transform: matrix(1, 0, 0, -1, 0, 0);
 
     &::after {
       content: '';
       position: absolute;
       width: 14px;
       height: 14px;
-      border-radius: 14px;
+      border-radius: 100%;
       background-color: $neutralGray1;
       top: 2px;
       left: 2px;
-      transition: background-color 0.25s linear, transform 0.25s linear;
+      transition: background-color 0.25s linear;
     }
   }
 

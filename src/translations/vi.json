@@ -1186,6 +1186,7 @@
   "SectionOrderPanel.sectionTitle": "Thực đơn của bạn",
   "SectionOrderPanel.successModal.confirmBtn": "Tiếp tục chọn món",
   "SectionOrderPanel.successModal.description": "Vui lòng liên hệ người tạo đơn để biết thêm chi tiết.",
+  "SectionOrderPanel.successModal.goToHomePage": "Về trang chủ",
   "SectionOrderPanel.successModal.title": "Đăng Ký Thành Công",
   "SectionRestaurantHero.orderDayMessage": "Thứ {weekDay}, {fullDay}",
   "SelectFoodForm.findFoodByName": "Tìm kiếm món ăn",
