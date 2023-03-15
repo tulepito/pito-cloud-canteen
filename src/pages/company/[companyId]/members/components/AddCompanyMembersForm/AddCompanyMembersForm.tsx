@@ -132,7 +132,7 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
                 id: 'AddCompanyMembersForm.emailListPlaceholder',
               })}
               onBlur={handleEmailFieldBlur}
-              onKeyDown={handleKeyDown}
+              onKeyUp={handleKeyDown}
             />
             {invalidEmailControl.value && (
               <div className={css.error}>{emailInvalidMessage}</div>
