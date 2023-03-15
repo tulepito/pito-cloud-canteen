@@ -464,12 +464,10 @@ const ManagePartnerFoods = () => {
         confirmLabel="Nhập"
         onCancel={closeImportModal}
         onConfirm={onImportFoodFromCsv}
+        title={<FormattedMessage id="ManagePartnerFoods.importTitle" />}
         cancelLabel="Hủy"
         confirmInProgress={createPartnerFoodFromCsvInProgress}
         confirmDisabled={createPartnerFoodFromCsvInProgress}>
-        <h2 className={css.importTitle}>
-          <FormattedMessage id="ManagePartnerFoods.importTitle" />
-        </h2>
         <p className={css.downloadFileHere}>
           <FormattedMessage
             id="ManagePartnerFoods.downloadFileHere"
