@@ -14,6 +14,10 @@
   width: 100px !important;
 }
 
+.tableBodyCell:nth-child(5) {
+  width: 250px !important;
+}
+
 .idRow {
   font-weight: $fontWeightBold;
   color: $labelBlue2;

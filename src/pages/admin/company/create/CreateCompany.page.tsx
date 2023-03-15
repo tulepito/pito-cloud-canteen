@@ -33,9 +33,11 @@ export default function CreateCompanyPage() {
     const companyData = {
       email: values.email,
       password: values.password,
-      firstName: values.firstName,
-      lastName: values.lastName,
-      displayName: `${values.lastName} ${values.firstName}`,
+      firstName: String(values.firstName).trim(),
+      lastName: String(values.lastName).trim(),
+      displayName: `${String(values.lastName).trim()} ${String(
+        values.firstName,
+      ).trim()}`,
       publicData: {
         companyLocation: {
           address: companyAddress,

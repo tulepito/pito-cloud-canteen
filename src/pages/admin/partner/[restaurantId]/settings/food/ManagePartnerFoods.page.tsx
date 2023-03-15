@@ -92,7 +92,7 @@ const TABLE_COLUMN: TColumn[] = [
         return <div></div>;
       }
 
-      return <div className={css.descriptionRow}>{data.category}</div>;
+      return <div className={css.categoryRow}>{data.category}</div>;
     },
   },
   {
