@@ -68,9 +68,16 @@ const ParticipantOrderManagement = () => {
   const tabOptions = [
     {
       id: 'personal',
-      label: intl.formatMessage({
-        id: 'ParticipantOrderManagement.tab.personal',
-      }),
+      label: (
+        <div className={css.companyTab}>
+          <div className={css.fakeAvatar}></div>
+          <span>
+            {intl.formatMessage({
+              id: 'ParticipantOrderManagement.tab.personal',
+            })}
+          </span>
+        </div>
+      ),
       childrenFn: () => <div></div>,
     },
     {
