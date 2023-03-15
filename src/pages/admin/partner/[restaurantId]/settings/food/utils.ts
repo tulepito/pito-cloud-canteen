@@ -3,7 +3,7 @@ import { types as sdkTypes } from '@helpers/sdkLoader';
 import { ListingTypes } from '@src/types/listingTypes';
 import type { EMenuTypes } from '@utils/enums';
 import { getSubmitImageId, getUniqueImages } from '@utils/images';
-import { toLowerCaseNonAccentVietnamese } from '@utils/string';
+import { toNonAccentVietnamese } from '@utils/string';
 import type { TImage } from '@utils/types';
 
 import {
@@ -214,9 +214,7 @@ export const getImportDataFromCsv = (values: any) => {
 
   const sideDishes = Object.keys(sideDishesValues || {}).reduce(
     (acc: string[], key: string) => {
-      if (
-        toLowerCaseNonAccentVietnamese(sideDishesValues[key]).trim() === 'co'
-      ) {
+      if (toNonAccentVietnamese(sideDishesValues[key], true).trim() === 'co') {
         return [...acc, key];
       }
 
@@ -227,20 +225,20 @@ export const getImportDataFromCsv = (values: any) => {
 
   const packagingArray = PACKAGING_OPTIONS.find(
     (item) =>
-      toLowerCaseNonAccentVietnamese(item.label).trim() ===
-      toLowerCaseNonAccentVietnamese(packaging).trim(),
+      toNonAccentVietnamese(item.label, true).trim() ===
+      toNonAccentVietnamese(packaging, true).trim(),
   )?.key;
 
   const foodTypeValue = FOOD_TYPE_OPTIONS.find(
     (item) =>
-      toLowerCaseNonAccentVietnamese(item.label).trim() ===
-      toLowerCaseNonAccentVietnamese(foodType).trim(),
+      toNonAccentVietnamese(item.label, true).trim() ===
+      toNonAccentVietnamese(foodType, true).trim(),
   )?.key;
 
   const menuTypeValue = MENU_OPTIONS.find(
     (item) =>
-      toLowerCaseNonAccentVietnamese(item.label).trim() ===
-      toLowerCaseNonAccentVietnamese(menuType).trim(),
+      toNonAccentVietnamese(item.label, true).trim() ===
+      toNonAccentVietnamese(menuType, true).trim(),
   )?.key;
 
   return {
@@ -249,7 +247,7 @@ export const getImportDataFromCsv = (values: any) => {
     price: parsePriceToMoneyFormat(price),
     publicData: {
       ...(allergicIngredients ||
-      toLowerCaseNonAccentVietnamese(allergicIngredients) !== 'khong'
+      toNonAccentVietnamese(allergicIngredients, true) !== 'khong'
         ? {
             allergicIngredients: String(allergicIngredients).trim().split(','),
           }
