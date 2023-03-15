@@ -39,7 +39,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         }
         break;
 
-      case HttpMethod.POST:
+      case HttpMethod.DELETE:
         {
           const { foodId } = req.query;
           const { dataParams = {}, queryParams = {} } = req.body;
