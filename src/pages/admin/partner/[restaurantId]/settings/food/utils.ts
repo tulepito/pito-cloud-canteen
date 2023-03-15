@@ -3,7 +3,14 @@ import { types as sdkTypes } from '@helpers/sdkLoader';
 import { ListingTypes } from '@src/types/listingTypes';
 import type { EMenuTypes } from '@utils/enums';
 import { getSubmitImageId, getUniqueImages } from '@utils/images';
+import { toNonAccentVietnamese } from '@utils/string';
 import type { TImage } from '@utils/types';
+
+import {
+  FOOD_TYPE_OPTIONS,
+  MENU_OPTIONS,
+  PACKAGING_OPTIONS,
+} from '../../../../../../utils/enums';
 
 const { Money } = sdkTypes;
 
@@ -122,29 +129,137 @@ export const getDuplicateData = (values: TEditPartnerFoodFormValues) => {
   };
 };
 
+const EXCEL_FILE_COLUMN_NAME_AS_ENGLISH = [
+  {
+    columnIndex: 4,
+    key: 'packaging',
+  },
+  {
+    columnIndex: 12,
+    key: 'notes',
+  },
+  {
+    columnIndex: 1,
+    key: 'menuType',
+  },
+  {
+    columnIndex: 8,
+    key: 'soup',
+  },
+  {
+    columnIndex: 7,
+    key: 'stir-fried-meal',
+  },
+  {
+    columnIndex: 3,
+    key: 'description',
+  },
+  {
+    columnIndex: 10,
+    key: 'drink',
+  },
+  {
+    columnIndex: 2,
+    key: 'foodType',
+  },
+  {
+    columnIndex: 6,
+    key: 'numberOfMainDishes',
+  },
+  {
+    columnIndex: 11,
+    key: 'allergicIngredients',
+  },
+  {
+    columnIndex: 9,
+    key: 'dessert',
+  },
+  {
+    columnIndex: 0,
+    key: 'title',
+  },
+  {
+    columnIndex: 5,
+    key: 'price',
+  },
+];
+
 export const getImportDataFromCsv = (values: any) => {
+  const valuesInEnglish = Object.keys(values).reduce((acc, key, index) => {
+    const headerInEnglish = EXCEL_FILE_COLUMN_NAME_AS_ENGLISH.find((item) => {
+      return item.columnIndex === index;
+    });
+
+    const keyWordInEnglish = headerInEnglish?.key;
+
+    return {
+      ...acc,
+      [keyWordInEnglish || key]: values[key],
+    };
+  }, {});
+
   const {
-    images = [],
     title,
     description,
     price,
-    // eslint-disable-next-line unused-imports/no-unused-vars
-    addImages,
+    allergicIngredients = '',
     restaurantId,
-    specialDiets,
-    sideDishes,
-    ...rest
-  } = values;
+    foodType,
+    numberOfMainDishes = 0,
+    menuType,
+    packaging,
+    notes,
+    ...sideDishesValues
+  } = valuesInEnglish as any;
+
+  const sideDishes = Object.keys(sideDishesValues || {}).reduce(
+    (acc: string[], key: string) => {
+      if (toNonAccentVietnamese(sideDishesValues[key], true).trim() === 'co') {
+        return [...acc, key];
+      }
+
+      return acc;
+    },
+    [],
+  );
+
+  const packagingArray = PACKAGING_OPTIONS.find(
+    (item) =>
+      toNonAccentVietnamese(item.label, true).trim() ===
+      toNonAccentVietnamese(packaging, true).trim(),
+  )?.key;
+
+  const foodTypeValue = FOOD_TYPE_OPTIONS.find(
+    (item) =>
+      toNonAccentVietnamese(item.label, true).trim() ===
+      toNonAccentVietnamese(foodType, true).trim(),
+  )?.key;
+
+  const menuTypeValue = MENU_OPTIONS.find(
+    (item) =>
+      toNonAccentVietnamese(item.label, true).trim() ===
+      toNonAccentVietnamese(menuType, true).trim(),
+  )?.key;
 
   return {
-    ...(images ? { images: images.filter((i: TImage) => !!i) } : {}),
     title,
     description,
     price: parsePriceToMoneyFormat(price),
     publicData: {
-      specialDiets: specialDiets.split(','),
-      sideDishes: sideDishes.split(','),
-      ...rest,
+      ...(allergicIngredients ||
+      toNonAccentVietnamese(allergicIngredients, true) !== 'khong'
+        ? {
+            allergicIngredients: String(allergicIngredients).trim().split(','),
+          }
+        : {}),
+      ...(foodTypeValue ? { foodType: foodTypeValue } : {}),
+      ...(menuTypeValue ? { menuType: menuTypeValue } : {}),
+      numberOfMainDishes: Number(numberOfMainDishes),
+      ...(packagingArray?.length && packagingArray.length > 0
+        ? { packaging: packagingArray }
+        : {}),
+      sideDishes,
+      ...(notes ? { notes } : {}),
     },
     metadata: {
       restaurantId,

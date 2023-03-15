@@ -287,58 +287,19 @@ const updatePartnerFoodListing = createAsyncThunk(
 
 const createPartnerFoodFromCsv = createAsyncThunk(
   CREATE_FOOD_FROM_FILE,
-  async (
-    { file, restaurantId }: { file: File; restaurantId: string },
-    { extra: sdk },
-  ) => {
+  async ({ file, restaurantId }: { file: File; restaurantId: string }) => {
     return new Promise((resolve, reject) => {
       Papa.parse(file, {
         header: true,
         skipEmptyLines: true,
-        async complete({ data }: any) {
+        async complete({ data = [] }: { data: any[] }) {
           const response = await Promise.all(
-            data.map(async (l: any) => {
-              const { images, title } = l;
-              const imagesAsArray = images ? images.split(',') : [];
-              const imageAsFiles = await Promise.all(
-                imagesAsArray
-                  .map(async (src: string) => {
-                    try {
-                      const response = await fetch(src);
-                      const blobData = await response.blob();
-                      const metadata = {
-                        type: 'image/jpeg',
-                      };
-                      const file = new File(
-                        [blobData],
-                        `${`${title}_${new Date().getTime()}`}.jpg`,
-                        metadata,
-                      );
-
-                      return file;
-                    } catch (error) {
-                      console.error(error);
-
-                      return null;
-                    }
-                  })
-                  .filter((file: File) => !!file),
-              );
-              // upload image to Flex
-              const uploadRes = await Promise.all(
-                imageAsFiles.map(async (file) =>
-                  sdk.images.upload({
-                    image: file,
-                  }),
-                ),
-              );
-
-              const newImages = uploadRes.map((res) => res.data.data.id);
-
+            data.slice(0, 1).map(async (food: any) => {
+              const { title } = food;
+              if (!title) return;
               const dataParams = getImportDataFromCsv({
-                ...l,
+                ...food,
                 restaurantId,
-                images: newImages,
               });
               const queryParams = {
                 expand: true,
