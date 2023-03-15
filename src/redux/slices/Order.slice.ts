@@ -442,6 +442,7 @@ const queryCompanyOrders = createAsyncThunk(
         meta_bookerId: bookerId,
         meta_companyId: companyId,
         meta_listingType: LISTING_TYPE.ORDER,
+        sort: 'createdAt',
       },
       queryParams: {
         expand: true,
