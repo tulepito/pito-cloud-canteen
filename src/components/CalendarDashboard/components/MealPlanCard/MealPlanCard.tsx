@@ -53,6 +53,8 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   const onRecommendMealInProgress =
     onRecommendRestaurantForSpecificDayInProgress?.(event?.start?.getTime());
 
+  const onEditFoodInProgress = editFoodInprogress?.(event?.start?.getTime());
+
   return (
     <div className={css.root}>
       <MealPlanCardHeader
@@ -69,7 +71,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
       <MealPlanCardFooter
         event={event}
         onEditFood={onEditFood}
-        editFoodInprogress={editFoodInprogress}
+        editFoodInprogress={onEditFoodInProgress}
         onApplyOtherDays={onApplyOtherDays}
         startDate={startDate}
         endDate={endDate}
