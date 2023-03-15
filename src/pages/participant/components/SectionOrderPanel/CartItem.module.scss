@@ -3,28 +3,25 @@
 
 .root {
   padding: 10px 18px 20px;
-  border-bottom: 1px solid $neutralGray5;
+  border-bottom: 1px solid $neutralGray3;
 }
 
 .label {
   @include textTemplate(14px, 700, 24px, '');
   color: $neutralGray6;
   margin-bottom: 12px;
-  display: flex;
-  align-items: center;
+  @include flexAlign(center, space-between);
 }
 
 .value {
   @include textTemplate(14px, 400, 24px, '');
   color: $neutralGray6;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  @include flexAlign(center);
+  gap: 8px;
 }
 
 .icon {
   cursor: pointer;
-  margin-right: 12px;
   width: 20px;
   height: 20px;
 }

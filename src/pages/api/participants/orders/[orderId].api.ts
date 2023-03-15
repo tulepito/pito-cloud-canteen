@@ -61,8 +61,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(400).json({
           message: 'Missing required keys',
         });
-
-        return;
       }
 
       try {
@@ -77,14 +75,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const companyId = order?.attributes.metadata?.companyId || '';
         const company = denormalisedResponseEntities(
           await integrationSdk.users.show(
-            { id: companyId },
             {
-              expand: true,
+              id: companyId,
               include: ['profileImage'],
               'fields.image': [
                 'variants.square-small',
                 'variants.square-small2x',
               ],
+            },
+            {
+              expand: true,
             },
           ),
         )[0];

@@ -35,6 +35,7 @@ type TCalendarDashboardProps = TDefaultProps & {
   headerComponent?: (params: TDayColumnHeaderProps) => ReactNode;
   eventExtraProps?: TObject;
   resources?: any;
+  exposeAnchorDate?: (date?: Date) => void;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
@@ -55,6 +56,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   headerComponent,
   eventExtraProps,
   resources,
+  exposeAnchorDate,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
 
@@ -116,6 +118,9 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
 
   useEffect(() => {
     setCalDate(anchorDate);
+    if (typeof exposeAnchorDate === 'function') {
+      exposeAnchorDate(calDate);
+    }
   }, [anchorDate]);
 
   const defaultToolbar = useCallback(

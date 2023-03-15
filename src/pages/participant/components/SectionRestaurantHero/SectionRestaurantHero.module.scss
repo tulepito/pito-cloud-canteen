@@ -31,6 +31,7 @@
     bottom: 24px;
     left: 32px;
     z-index: 1;
+    width: 100%;
 
     .heroOrderDay {
       margin: 0;
@@ -42,6 +43,10 @@
       @include textTemplate(34px, 700, 44px, '');
       color: $neutralGray1;
       text-transform: capitalize;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: calc(100% - 40px);
     }
   }
 

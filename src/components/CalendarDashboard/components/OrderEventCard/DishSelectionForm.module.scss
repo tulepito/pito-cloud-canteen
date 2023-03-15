@@ -18,8 +18,10 @@
 
 .actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   padding-top: 2px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .rejectBtn {
@@ -34,7 +36,16 @@
 .acceptBtn {
   @include textTemplate(12px, 700, 20px, '');
   display: block;
-  width: calc((100% - 8px) / 2);
+  width: 148px;
+  height: 36px;
+  min-height: 36px;
+  padding: 8px 4px;
+}
+
+.pickForMeBtn {
+  @include textTemplate(12px, 700, 20px, '');
+  display: block;
+  width: 120px;
   height: 36px;
   min-height: 36px;
   padding: 8px 4px;

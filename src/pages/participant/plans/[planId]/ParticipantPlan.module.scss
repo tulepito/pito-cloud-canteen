@@ -17,3 +17,9 @@
     column-gap: 32px;
   }
 }
+
+.goBackBtn {
+  @include textTemplate(16px, $fontWeightBold, 24px);
+  color: $neutralGray6;
+  @include flexAlign(center);
+}

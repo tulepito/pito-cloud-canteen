@@ -91,11 +91,9 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
         <Button
           type="button"
           variant="secondary"
-          className={css.rejectBtn}
-          onClick={handleReject}
-          disabled={disabledRejectButton}
-          inProgress={rejectSubmitting}>
-          <FormattedMessage id="DishSelectionForm.reject" />
+          className={css.pickForMeBtn}
+          onClick={() => {}}>
+          <FormattedMessage id="DishSelectionForm.pickForMe" />
         </Button>
         <Button
           className={css.acceptBtn}
@@ -104,6 +102,15 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
           inProgress={confirmSubmitting}
           spinnerClassName={css.spinnerClassName}>
           <FormattedMessage id="DishSelectionForm.accept" />
+        </Button>
+        <Button
+          type="button"
+          variant="inline"
+          className={css.rejectBtn}
+          onClick={handleReject}
+          disabled={disabledRejectButton}
+          inProgress={rejectSubmitting}>
+          <FormattedMessage id="DishSelectionForm.reject" />
         </Button>
       </div>
     </form>

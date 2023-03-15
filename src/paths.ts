@@ -196,3 +196,7 @@ export const quizPaths = {
   MealDates: '/company/booker/orders/new/quiz/meal-date',
   CreatingOrder: '/company/booker/orders/new/quiz/creating-order',
 };
+
+export const participantPaths = {
+  Order: '/participant/order/[orderId]',
+};

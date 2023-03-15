@@ -91,7 +91,7 @@
 
   .successModalContainer {
     width: 100%;
-    max-width: 418px;
+    max-width: 500px;
     padding: 24px;
 
     & > div {
@@ -109,16 +109,21 @@
   }
 
   .successModalImage {
-    width: 192px;
-    height: 196px;
     margin: 32px auto 0;
+    @include flexAlign(center, center);
   }
 
   .successModalDescription {
     margin: 32px 0;
+    text-align: center;
   }
 
   .successModalConfirmBtn {
     margin: auto;
+    width: calc(100% - 80px);
+
+    &:last-child {
+      margin-top: 8px;
+    }
   }
 }

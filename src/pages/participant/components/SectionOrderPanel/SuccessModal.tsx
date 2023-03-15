@@ -1,9 +1,9 @@
 import { useIntl } from 'react-intl';
+import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
+import IconTickWithCircle from '@components/Icons/IconTickWithCircle/IconTickWithCircle';
 import Modal from '@components/Modal/Modal';
-
-import SuccessImage from './SuccessImage';
 
 import css from './SectionOrderPanel.module.scss';
 
@@ -14,9 +14,15 @@ type TSuccessModal = {
 
 const SuccessModal: React.FC<TSuccessModal> = ({ isOpen, handleClose }) => {
   const intl = useIntl();
+  const router = useRouter();
+
+  const goToHomePage = () => {
+    router.push('/');
+  };
 
   return (
     <Modal
+      id="ParticipantOrderSuccessModal"
       isOpen={isOpen}
       handleClose={handleClose}
       containerClassName={css.successModalContainer}
@@ -29,7 +35,7 @@ const SuccessModal: React.FC<TSuccessModal> = ({ isOpen, handleClose }) => {
       }>
       <div>
         <div className={css.successModalImage}>
-          <SuccessImage />
+          <IconTickWithCircle />
         </div>
         <p className={css.successModalDescription}>
           {intl.formatMessage({
@@ -39,6 +45,14 @@ const SuccessModal: React.FC<TSuccessModal> = ({ isOpen, handleClose }) => {
         <Button className={css.successModalConfirmBtn} onClick={handleClose}>
           {intl.formatMessage({
             id: 'SectionOrderPanel.successModal.confirmBtn',
+          })}
+        </Button>
+        <Button
+          className={css.successModalConfirmBtn}
+          variant="inline"
+          onClick={goToHomePage}>
+          {intl.formatMessage({
+            id: 'SectionOrderPanel.successModal.goToHomePage',
           })}
         </Button>
       </div>

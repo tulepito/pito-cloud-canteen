@@ -1,22 +1,60 @@
-import get from 'lodash/get';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 
-import PITOLogo from '@components/PitoLogo/PitoLogo';
-import { useAppSelector } from '@hooks/reduxHooks';
-import { currentUserSelector } from '@redux/slices/user.slice';
+import Avatar from '@components/Avatar/Avatar';
+import { InlineTextButton } from '@components/Button/Button';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import IconBell from '@components/Icons/IconBell/IconBell';
+import NamedLink from '@components/NamedLink/NamedLink';
+import PitoLogo from '@components/PitoLogo/PitoLogo';
+import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
+import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
+import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
+import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { authThunks } from '@redux/slices/auth.slice';
+import { currentUserSelector, userActions } from '@redux/slices/user.slice';
+import { companyPaths } from '@src/paths';
 
 import css from './GeneralLayoutTopBar.module.scss';
 
 const GeneralLayoutTopBar = () => {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
   const currentUser = useAppSelector(currentUserSelector);
-  const email = get(currentUser, 'attributes.email');
+
+  const onLogout = async () => {
+    await dispatch(authThunks.logout());
+    await dispatch(userActions.clearCurrentUser());
+
+    router.push('/');
+  };
 
   return (
     <div className={css.root}>
-      <Link href="/">
-        <PITOLogo className={css.logo} />
-      </Link>
-      {currentUser && currentUser !== null ? <div>{email}</div> : null}
+      <NamedLink className={css.headerLeft} path={companyPaths.Home}>
+        <PitoLogo className={css.logo} />
+      </NamedLink>
+      <div className={css.headerRight}>
+        <IconBell className={css.iconBell} />
+        <ProfileMenu>
+          <ProfileMenuLabel className={css.profileMenuWrapper}>
+            <div className={css.avatar}>
+              <Avatar disableProfileLink user={currentUser} />
+            </div>
+            <p className={css.displayName}>
+              {currentUser?.attributes?.profile?.displayName}
+            </p>
+            <IconArrow direction="down" />
+          </ProfileMenuLabel>
+          <ProfileMenuContent className={css.profileMenuContent}>
+            <ProfileMenuItem key="AccountSettingsPage">
+              <InlineTextButton type="button" onClick={onLogout}>
+                <p>Đăng xuất</p>
+              </InlineTextButton>
+            </ProfileMenuItem>
+          </ProfileMenuContent>
+        </ProfileMenu>
+      </div>
     </div>
   );
 };
