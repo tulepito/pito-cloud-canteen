@@ -279,15 +279,12 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
         (item) => item.restaurantId === restaurantId,
       )?.menuId;
     const { order } = getState().BookerSelectRestaurant;
-    const { nutritions = [], packagePerMember } = Listing(
-      order as TListing,
-    ).getMetadata();
+    const { nutritions = [] } = Listing(order as TListing).getMetadata();
 
     const response = await sdk.listings.query({
       pub_menuIdList: `has_any:${menuId}`,
       meta_listingType: ListingTypes.FOOD,
       pub_menuWeekDay: `has_any:${dayOfWeek}`,
-      price: `,${packagePerMember}`,
       ...(nutritions.length > 0
         ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
         : {}),
