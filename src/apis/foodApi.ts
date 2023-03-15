@@ -1,7 +1,7 @@
 import type { TObject } from '@utils/types';
 
 import type { TBodyParams } from './configs';
-import { deleteApi, getApi, postApi } from './configs';
+import { deleteApi, getApi, postApi, putApi } from './configs';
 
 const baseUrl = '/admin/listings/foods';
 
@@ -14,7 +14,7 @@ const createFood = (body: TBodyParams) => {
 };
 
 const updateFood = (foodId: string, body: TBodyParams) => {
-  return postApi(`${baseUrl}/${foodId}`, body);
+  return putApi(`${baseUrl}/${foodId}`, body);
 };
 
 const deleteFood = (foodId: string, body: TBodyParams) => {

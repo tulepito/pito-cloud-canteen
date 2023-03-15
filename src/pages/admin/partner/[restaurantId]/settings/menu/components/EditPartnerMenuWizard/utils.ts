@@ -123,9 +123,12 @@ export const createMinPriceByDayOfWeek = (foodsByDate: any) => {
   let avaragePriceByDayOfWeek = {};
   Object.keys(foodsByDate).forEach((keyAsDate) => {
     let minPriceByDate = 0;
-    Object.keys(foodsByDate[keyAsDate]).forEach((foodId) => {
+    Object.keys(foodsByDate[keyAsDate]).forEach((foodId, index) => {
       const { price = 0 } = foodsByDate[keyAsDate][foodId];
-      minPriceByDate = price < minPriceByDate ? price : minPriceByDate;
+      if (index === 0) minPriceByDate = price;
+      else {
+        minPriceByDate = price < minPriceByDate ? price : minPriceByDate;
+      }
     });
     const dayAsIndex = new Date(Number(keyAsDate)).getDay() - 1;
     const dayOfWeek = getDayOfWeekByIndex(dayAsIndex);

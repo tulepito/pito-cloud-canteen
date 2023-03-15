@@ -40,11 +40,59 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
         const day = EDayOfWeek[key as keyof typeof EDayOfWeek];
         const foodIdList =
           IntegrationListing(menu).getMetadata()[`${day}FoodIdList`];
+
+        const currentMinFoodPrice =
+          IntegrationListing(menu).getPublicData()[`${day}MinFoodPrice`];
+
+        const foodsByDate =
+          IntegrationListing(menu).getPublicData()?.foodsByDate;
+
+        const foodsByDay = foodsByDate?.[day];
+
+        delete foodsByDay?.[deletedFoodId];
+
         const newFoodIdList = foodIdList.filter(
           (foodId: string) => foodId !== deletedFoodId,
         );
+
+        let newMinFoodPrice;
+
+        if (foodIdList.includes(deletedFoodId)) {
+          const listFoodResponse = await integrationSdk.listings.query({
+            ids: newFoodIdList,
+          });
+
+          const foods = denormalisedResponseEntities(listFoodResponse);
+
+          newMinFoodPrice = foods.reduce(
+            (min: number, food: TIntegrationListing, index: number) => {
+              const { price = {} } = IntegrationListing(food).getAttributes();
+              const { amount = 0 } = price;
+              if (index === 0) {
+                return amount;
+              }
+
+              return amount < min ? amount : min;
+            },
+            0,
+          );
+        }
+        const minPriceChanged = newMinFoodPrice !== currentMinFoodPrice;
+
         await integrationSdk.listings.update({
           id: menu.id.uuid,
+
+          publicData: {
+            ...(minPriceChanged
+              ? {
+                  [`${day}MinFoodPrice`]: newMinFoodPrice,
+                }
+              : {}),
+            foodsByDate: {
+              ...foodsByDate,
+              [day]: foodsByDay,
+            },
+          },
           metadata: {
             [`${day}FoodIdList`]: newFoodIdList,
           },
@@ -82,18 +130,21 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
           const foods = denormalisedResponseEntities(listFoodResponse);
 
           const newMinFoodPrice = foods.reduce(
-            (min: number, food: TIntegrationListing) => {
+            (min: number, food: TIntegrationListing, index: number) => {
               const { price = {} } = IntegrationListing(food).getAttributes();
               const { amount = 0 } = price;
+              if (index === 0) {
+                return amount;
+              }
 
-              return amount < min ? price : min;
+              return amount < min ? amount : min;
             },
             0,
           );
 
           return integrationSdk.listings.update({
             id: menu.id.uuid,
-            metadata: {
+            publicData: {
               [`${day}MinFoodPrice`]: newMinFoodPrice,
             },
           });
