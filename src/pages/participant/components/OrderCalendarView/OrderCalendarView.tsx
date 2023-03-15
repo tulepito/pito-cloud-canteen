@@ -120,6 +120,10 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     </div>
   );
 
+  const handleAnchorDateChange = (date?: Date) => {
+    setAnchorTime(date?.getTime());
+  };
+
   return (
     <div className={css.container}>
       <CalendarDashboard
@@ -128,12 +132,14 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         companyLogo={sectionCompanyBranding}
         renderEvent={OrderEventCard}
         inProgress={loadDataInProgress}
+        exposeAnchorDate={handleAnchorDateChange}
         components={{
           toolbar: (toolBarProps: any) => (
             <ParticipantToolbar
               {...toolBarProps}
               startDate={new Date(startDate)}
               endDate={new Date(endDate)}
+              anchorDate={anchorDate}
             />
           ),
         }}
