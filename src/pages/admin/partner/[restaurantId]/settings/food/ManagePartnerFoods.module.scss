@@ -265,4 +265,9 @@
 
 .radioButton {
   margin-bottom: 20px;
+  .inputWrapper {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+  }
 }

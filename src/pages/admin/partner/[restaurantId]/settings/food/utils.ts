@@ -203,7 +203,6 @@ export const getImportDataFromCsv = (values: any) => {
     description,
     price,
     allergicIngredients = '',
-    restaurantId,
     foodType,
     numberOfMainDishes = 0,
     menuType,
@@ -211,6 +210,8 @@ export const getImportDataFromCsv = (values: any) => {
     notes,
     ...sideDishesValues
   } = valuesInEnglish as any;
+
+  const { restaurantId } = values;
 
   const sideDishes = Object.keys(sideDishesValues || {}).reduce(
     (acc: string[], key: string) => {

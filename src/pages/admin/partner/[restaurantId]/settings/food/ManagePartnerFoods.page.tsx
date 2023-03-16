@@ -226,7 +226,7 @@ const ManagePartnerFoods = () => {
   const [foodToRemove, setFoodToRemove] = useState<any>(null);
   const [file, setFile] = useState<File | null>();
   const [googleSheetUrl, setGoogleSheetUrl] = useState<string>();
-  const [importType, setImportType] = useState<string>(GOOGLE_SHEET_LINK);
+  const [importType, setImportType] = useState<string>(IMPORT_FILE);
 
   const csvLinkRef = useRef<any>();
   const {
@@ -475,22 +475,17 @@ const ManagePartnerFoods = () => {
         cancelLabel="Hủy"
         confirmInProgress={createPartnerFoodFromCsvInProgress}
         confirmDisabled={createPartnerFoodFromCsvInProgress}>
-        <p className={css.downloadFileHere}>
-          <FormattedMessage
-            id="ManagePartnerFoods.downloadFileHere"
-            values={{
-              link: (
-                <NamedLink
-                  target="_blank"
-                  path={process.env.NEXT_PUBLIC_IMPORT_FOOD_TEMPLATE}>
-                  <FormattedMessage id="ManagePartnerFoods.templateLink" />
-                </NamedLink>
-              ),
-            }}
-          />
-        </p>
         <div className={css.radioButton}>
-          <div>
+          <div className={css.inputWrapper}>
+            <input
+              id="importFile"
+              type="radio"
+              checked={importType === IMPORT_FILE}
+              onChange={() => setImportType(IMPORT_FILE)}
+            />
+            <label htmlFor="importFile">Nhập file</label>
+          </div>
+          <div className={css.inputWrapper}>
             <input
               id="googleSheetLink"
               type="radio"
@@ -499,18 +494,36 @@ const ManagePartnerFoods = () => {
             />
             <label htmlFor="googleSheetLink">Link Google Sheet</label>
           </div>
-          <div>
-            <input
-              id="importFile"
-              type="radio"
-              checked={importType === IMPORT_FILE}
-              placeholder="Hello"
-              onChange={() => setImportType(IMPORT_FILE)}
-            />
-            <label htmlFor="importFile">Nhập file</label>
-          </div>
         </div>
-
+        <p className={css.downloadFileHere}>
+          {importType !== GOOGLE_SHEET_LINK ? (
+            <FormattedMessage
+              id="ManagePartnerFoods.downloadFileHere"
+              values={{
+                link: (
+                  <NamedLink
+                    target="_blank"
+                    path={process.env.NEXT_PUBLIC_IMPORT_FOOD_GUIDE_FILE_URL}>
+                    <FormattedMessage id="ManagePartnerFoods.templateLink" />
+                  </NamedLink>
+                ),
+              }}
+            />
+          ) : (
+            <FormattedMessage
+              id="ManagePartnerFoods.sampleFileHere"
+              values={{
+                link: (
+                  <NamedLink
+                    target="_blank"
+                    path={process.env.NEXT_PUBLIC_IMPORT_FOOD_TEMPLATE}>
+                    <FormattedMessage id="ManagePartnerFoods.templateLink" />
+                  </NamedLink>
+                ),
+              }}
+            />
+          )}
+        </p>
         {importType === GOOGLE_SHEET_LINK ? (
           <div>
             <input
@@ -531,7 +544,7 @@ const ManagePartnerFoods = () => {
         ) : (
           <div className={css.inputWrapper}>
             <input
-              accept=".csv"
+              accept=".xlsx,.xls"
               onChange={({ target }) => setFile(target?.files?.[0])}
               type="file"
               className={css.inputFile}
