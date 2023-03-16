@@ -41,8 +41,6 @@ import type { TIntegrationListing } from '@utils/types';
 
 import css from './ManagePartnerFoods.module.scss';
 
-const fileUrl = process.env.NEXT_PUBLIC_IMPORT_FOOD_GUIDE_FILE_URL;
-
 const TABLE_COLUMN: TColumn[] = [
   {
     key: 'title',
@@ -217,6 +215,9 @@ const parseEntitiesToExportCsv = (
   return foodsToExport;
 };
 
+const IMPORT_FILE = 'IMPORT_FILE';
+const GOOGLE_SHEET_LINK = 'GOOGLE_SHEET_LINK';
+
 const ManagePartnerFoods = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -224,6 +225,9 @@ const ManagePartnerFoods = () => {
   const [idsToAction, setIdsToAction] = useState<string[]>([]);
   const [foodToRemove, setFoodToRemove] = useState<any>(null);
   const [file, setFile] = useState<File | null>();
+  const [googleSheetUrl, setGoogleSheetUrl] = useState<string>();
+  const [importType, setImportType] = useState<string>(GOOGLE_SHEET_LINK);
+
   const csvLinkRef = useRef<any>();
   const {
     value: isImportModalOpen,
@@ -334,10 +338,13 @@ const ManagePartnerFoods = () => {
   }, [page, restaurantId, keywords, categoryString]);
 
   const onImportFoodFromCsv = async () => {
-    if (file) {
+    const hasValue = importType === IMPORT_FILE ? file : googleSheetUrl;
+    if (hasValue) {
       const { error } = (await dispatch(
         foodSliceThunks.createPartnerFoodFromCsv({
-          file,
+          ...(importType === IMPORT_FILE
+            ? { ...(file ? { file } : {}) }
+            : { googleSheetUrl }),
           restaurantId: restaurantId as string,
         }),
       )) as any;
@@ -473,38 +480,81 @@ const ManagePartnerFoods = () => {
             id="ManagePartnerFoods.downloadFileHere"
             values={{
               link: (
-                <NamedLink path={fileUrl}>
+                <NamedLink
+                  target="_blank"
+                  path={process.env.NEXT_PUBLIC_IMPORT_FOOD_TEMPLATE}>
                   <FormattedMessage id="ManagePartnerFoods.templateLink" />
                 </NamedLink>
               ),
             }}
           />
         </p>
-        <div className={css.inputWrapper}>
-          <input
-            accept=".csv"
-            onChange={({ target }) => setFile(target?.files?.[0])}
-            type="file"
-            className={css.inputFile}
-            name="file"
-            id="file"
-          />
-          <label className={css.importLabel}>
-            <FormattedMessage id="ManagePartnerFoods.importLabel" />
-          </label>
-          <label htmlFor="file">
-            <div className={css.fileLabel}>
-              {file ? (
-                file.name
-              ) : (
-                <FormattedMessage id="ManagePartnerFoods.inputFile" />
-              )}
-            </div>
-          </label>
-          {createPartnerFoodFromCsvError && (
-            <ErrorMessage message={createPartnerFoodFromCsvError.message} />
-          )}
+        <div className={css.radioButton}>
+          <div>
+            <input
+              id="googleSheetLink"
+              type="radio"
+              checked={importType === GOOGLE_SHEET_LINK}
+              onChange={() => setImportType(GOOGLE_SHEET_LINK)}
+            />
+            <label htmlFor="googleSheetLink">Link Google Sheet</label>
+          </div>
+          <div>
+            <input
+              id="importFile"
+              type="radio"
+              checked={importType === IMPORT_FILE}
+              placeholder="Hello"
+              onChange={() => setImportType(IMPORT_FILE)}
+            />
+            <label htmlFor="importFile">Nhập file</label>
+          </div>
         </div>
+
+        {importType === GOOGLE_SHEET_LINK ? (
+          <div>
+            <input
+              onChange={({ target }) => setGoogleSheetUrl(target.value)}
+              type="text"
+              name="file"
+              value={googleSheetUrl}
+              id="file"
+              placeholder="Nhập link google sheet"
+              className={css.googleSheetInput}
+            />
+            <p>
+              {
+                'Vào Google Sheet -> chọn File -> chọn Share -> chọn Publish to the web -> Chọn dạng publish là CSV -> Publish'
+              }
+            </p>
+          </div>
+        ) : (
+          <div className={css.inputWrapper}>
+            <input
+              accept=".csv"
+              onChange={({ target }) => setFile(target?.files?.[0])}
+              type="file"
+              className={css.inputFile}
+              name="file"
+              id="file"
+            />
+            <label className={css.importLabel}>
+              <FormattedMessage id="ManagePartnerFoods.importLabel" />
+            </label>
+            <label htmlFor="file">
+              <div className={css.fileLabel}>
+                {file ? (
+                  file.name
+                ) : (
+                  <FormattedMessage id="ManagePartnerFoods.inputFile" />
+                )}
+              </div>
+            </label>
+            {createPartnerFoodFromCsvError && (
+              <ErrorMessage message={createPartnerFoodFromCsvError.message} />
+            )}
+          </div>
+        )}
       </AlertModal>
       <AlertModal
         title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}
