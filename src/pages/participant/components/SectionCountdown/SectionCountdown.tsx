@@ -65,7 +65,7 @@ const SectionCountdown: React.FC<TSectionCountDownProps> = ({
       <div className={css.toggleNotification}>
         <span>
           <Toggle
-            status="off"
+            status={receiveNotificationControl.value ? 'on' : 'off'}
             label={toggleNotificationTitle}
             onClick={onReceiveNotification}
           />

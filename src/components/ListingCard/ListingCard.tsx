@@ -1,11 +1,12 @@
 import classNames from 'classnames';
-import Image from 'next/image';
 
-import Badge, { EBadgeType } from '@components/Badge/Badge';
+import Badge from '@components/Badge/Badge';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import IconPlusDish from '@components/Icons/IconPlusDish/IconPlusDish';
+import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
+import { EImageVariants, SPECIAL_DIET_OPTIONS } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 
 import css from './ListingCard.module.scss';
@@ -29,6 +30,9 @@ const ListingCard: React.FC<TListCardProps> = ({
 }) => {
   const mealId = listing?.id?.uuid;
   const { title, description } = Listing(listing).getAttributes();
+  const { specialDiets = [], allergicIngredients = [] } =
+    Listing(listing).getPublicData();
+  const listingImage = Listing(listing).getImages()[0];
   const dispatch = useAppDispatch();
 
   const handleAddToCard = () => {
@@ -36,30 +40,39 @@ const ListingCard: React.FC<TListCardProps> = ({
       dispatch(shoppingCartThunks.addToCart({ planId, dayId, mealId }));
     }
   };
+  const badges = specialDiets
+    .slice(0, 3)
+    .map((diet: string) =>
+      SPECIAL_DIET_OPTIONS.find((item) => item.key === diet),
+    );
 
   const classes = classNames(css.root, className);
 
   return (
     <div className={classes}>
       <div className={css.listingImage}>
-        <Image
-          alt="Listing Card "
-          src={
-            'https://res.cloudinary.com/eventors/image/upload/f_auto/v1584529827/eventors/hero-back_lbofw9.png'
-          }
-          fill={true}
+        <ResponsiveImage
+          image={listingImage}
+          alt={title}
+          variants={[EImageVariants.landscapeCrop]}
         />
       </div>
       <div className={css.listingCardContent}>
         <div className={css.listingCardInfo}>
           <h6 className={css.title}>{title}</h6>
           <div className={css.categories}>
-            <Badge label="Keto" type={EBadgeType.info} />
+            {badges.map((badge: any) => (
+              <Badge
+                key={badge?.key}
+                label={badge?.label}
+                type={badge?.badgeType}
+              />
+            ))}
           </div>
           <p className={css.description}>{description}</p>
         </div>
         <div className={css.listingCardFooter}>
-          <p className={css.allergiesLabel}>Có hải sản</p>
+          <p className={css.allergiesLabel}>{allergicIngredients.join(', ')}</p>
           {isSelected ? (
             <span className={css.removeDish}>
               <IconCheckmarkWithCircle />

@@ -659,47 +659,57 @@ export const SPECIAL_DIET_OPTIONS = [
   {
     key: 'low-carb',
     label: 'Low-carb',
+    badgeType: EBadgeType.default,
   },
-
   {
     key: 'keto',
     label: 'Keto',
+    badgeType: EBadgeType.info,
   },
   {
     key: 'mediterranean-diet',
     label: 'Mediterranean Diet',
+    badgeType: EBadgeType.danger,
   },
   {
     key: 'plant-based',
     label: 'Plant-based',
+    badgeType: EBadgeType.warning,
   },
   {
     key: 'halal',
     label: 'Halal',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'intermittent-fasting',
     label: 'Intermittent Fasting',
+    badgeType: EBadgeType.danger,
   },
   {
     key: 'carnivore-diet',
     label: 'Carnivore Diet',
+    badgeType: EBadgeType.default,
   },
   {
     key: 'healthy',
     label: 'Healthy',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'paleo-diet',
     label: 'Paleo Diet',
+    badgeType: EBadgeType.info,
   },
   {
     key: 'gluten-free',
     label: 'Gluten free',
+    badgeType: EBadgeType.success,
   },
   {
     key: OTHER_OPTION,
     label: 'Khác',
+    badgeType: EBadgeType.success,
     hasTextInput: true,
     textPlaceholder: 'Nhập chế độ dinh dưỡng',
   },

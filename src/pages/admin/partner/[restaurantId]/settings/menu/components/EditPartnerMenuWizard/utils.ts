@@ -119,22 +119,22 @@ const createNutritionsByDaysOfWeekField = (
   return newData;
 };
 
-export const createAvaragePriceByFoodsByDate = (foodsByDate: any) => {
+export const createMinPriceByDayOfWeek = (foodsByDate: any) => {
   let avaragePriceByDayOfWeek = {};
   Object.keys(foodsByDate).forEach((keyAsDate) => {
-    let totalPriceByDate = 0;
-    let totalFoodLengthByDate = 0;
-    Object.keys(foodsByDate[keyAsDate]).forEach((foodId) => {
+    let minPriceByDate = 0;
+    Object.keys(foodsByDate[keyAsDate]).forEach((foodId, index) => {
       const { price = 0 } = foodsByDate[keyAsDate][foodId];
-      totalPriceByDate = price + totalPriceByDate;
-      totalFoodLengthByDate += 1;
+      if (index === 0) minPriceByDate = price;
+      else {
+        minPriceByDate = price < minPriceByDate ? price : minPriceByDate;
+      }
     });
-    const priceAverage = totalPriceByDate / totalFoodLengthByDate;
     const dayAsIndex = new Date(Number(keyAsDate)).getDay() - 1;
     const dayOfWeek = getDayOfWeekByIndex(dayAsIndex);
     avaragePriceByDayOfWeek = {
       ...avaragePriceByDayOfWeek,
-      [`${dayOfWeek}AverageFoodPrice`]: priceAverage || 0,
+      [`${dayOfWeek}MinFoodPrice`]: minPriceByDate || 0,
     };
   });
 
@@ -232,13 +232,13 @@ export const createSubmitMenuValues = (
 
   const {
     foodsByDate: foodsByDateFromMenu = {},
-    monAverageFoodPrice: monAverageFoodPriceFromMenu = 0,
-    tueAverageFoodPrice: tueAverageFoodPriceFromMenu = 0,
-    wedAverageFoodPrice: wedAverageFoodPriceFromMenu = 0,
-    thuAverageFoodPrice: thuAverageFoodPriceFromMenu = 0,
-    friAverageFoodPrice: friAverageFoodPriceFromMenu = 0,
-    satAverageFoodPrice: satAverageFoodPriceFromMenu = 0,
-    sunAverageFoodPrice: sunAverageFoodPriceFromMenu = 0,
+    monMinFoodPrice: monMinFoodPriceFromMenu = 0,
+    tueMinFoodPrice: tueMinFoodPriceFromMenu = 0,
+    wedMinFoodPrice: wedMinFoodPriceFromMenu = 0,
+    thuMinFoodPrice: thuMinFoodPriceFromMenu = 0,
+    friMinFoodPrice: friMinFoodPriceFromMenu = 0,
+    satMinFoodPrice: satMinFoodPriceFromMenu = 0,
+    sunMinFoodPrice: sunMinFoodPriceFromMenu = 0,
   } = IntegrationListing(menu).getPublicData();
 
   const { listingState } = IntegrationListing(menu).getMetadata();
@@ -283,13 +283,13 @@ export const createSubmitMenuValues = (
                 ),
                 ...createFoodAveragePriceByDaysOfWeekField(
                   {
-                    monAverageFoodPrice: monAverageFoodPriceFromMenu,
-                    tueAverageFoodPrice: tueAverageFoodPriceFromMenu,
-                    wedAverageFoodPrice: wedAverageFoodPriceFromMenu,
-                    thuAverageFoodPrice: thuAverageFoodPriceFromMenu,
-                    friAverageFoodPrice: friAverageFoodPriceFromMenu,
-                    satAverageFoodPrice: satAverageFoodPriceFromMenu,
-                    sunAverageFoodPrice: sunAverageFoodPriceFromMenu,
+                    monMinFoodPrice: monMinFoodPriceFromMenu,
+                    tueMinFoodPrice: tueMinFoodPriceFromMenu,
+                    wedMinFoodPrice: wedMinFoodPriceFromMenu,
+                    thuMinFoodPrice: thuMinFoodPriceFromMenu,
+                    friMinFoodPrice: friMinFoodPriceFromMenu,
+                    satMinFoodPrice: satMinFoodPriceFromMenu,
+                    sunMinFoodPrice: sunMinFoodPriceFromMenu,
                   },
                   daysOfWeek,
                 ),
@@ -335,7 +335,7 @@ export const createSubmitMenuValues = (
     case MENU_PRICING_TAB: {
       return {
         publicData: {
-          ...createAvaragePriceByFoodsByDate(foodsByDate),
+          ...createMinPriceByDayOfWeek(foodsByDate),
           foodsByDate: createSubmitFoodsByDate(foodsByDate),
         },
         metadata: {
@@ -347,7 +347,7 @@ export const createSubmitMenuValues = (
     case MENU_COMPLETE_TAB: {
       return {
         publicData: {
-          ...createAvaragePriceByFoodsByDate(foodsByDate),
+          ...createMinPriceByDayOfWeek(foodsByDate),
           foodsByDate: createSubmitFoodsByDate(foodsByDate),
         },
         metadata: {
@@ -386,13 +386,13 @@ export const createDuplicateSubmitMenuValues = (
     mealType: mealTyperFromMenu,
     startDate: startDateFromMenu,
     numberOfCycles: numberOfCyclesFromMenu,
-    monAverageFoodPrice: monAverageFoodPriceFromMenu,
-    tueAverageFoodPrice: tueAverageFoodPriceFromMenu,
-    wedAverageFoodPrice: wedAverageFoodPriceFromMenu,
-    thuAverageFoodPrice: thuAverageFoodPriceFromMenu,
-    friAverageFoodPrice: friAverageFoodPriceFromMenu,
-    satAverageFoodPrice: satAverageFoodPriceFromMenu,
-    sunAverageFoodPrice: sunAverageFoodPriceFromMenu,
+    monMinFoodPrice: monMinFoodPriceFromMenu,
+    tueMinFoodPrice: tueMinFoodPriceFromMenu,
+    wedMinFoodPrice: wedMinFoodPriceFromMenu,
+    thuMinFoodPrice: thuMinFoodPriceFromMenu,
+    friMinFoodPrice: friMinFoodPriceFromMenu,
+    satMinFoodPrice: satMinFoodPriceFromMenu,
+    sunMinFoodPrice: sunMinFoodPriceFromMenu,
     daysOfWeek: daysOfWeekFromMenu,
     foodsByDate: foodsByDateFromMenu,
   } = IntegrationListing(menu).getPublicData();
@@ -444,13 +444,13 @@ export const createDuplicateSubmitMenuValues = (
           ),
           ...createFoodAveragePriceByDaysOfWeekField(
             {
-              monAverageFoodPrice: monAverageFoodPriceFromMenu,
-              tueAverageFoodPrice: tueAverageFoodPriceFromMenu,
-              wedAverageFoodPrice: wedAverageFoodPriceFromMenu,
-              thuAverageFoodPrice: thuAverageFoodPriceFromMenu,
-              friAverageFoodPrice: friAverageFoodPriceFromMenu,
-              satAverageFoodPrice: satAverageFoodPriceFromMenu,
-              sunAverageFoodPrice: sunAverageFoodPriceFromMenu,
+              monMinFoodPrice: monMinFoodPriceFromMenu,
+              tueMinFoodPrice: tueMinFoodPriceFromMenu,
+              wedMinFoodPrice: wedMinFoodPriceFromMenu,
+              thuMinFoodPrice: thuMinFoodPriceFromMenu,
+              friMinFoodPrice: friMinFoodPriceFromMenu,
+              satMinFoodPrice: satMinFoodPriceFromMenu,
+              sunMinFoodPrice: sunMinFoodPriceFromMenu,
             },
             daysOfWeek,
           ),
@@ -491,7 +491,7 @@ export const createDuplicateSubmitMenuValues = (
       return {
         title: titleFromMenu,
         publicData: {
-          ...createAvaragePriceByFoodsByDate(foodsByDate),
+          ...createMinPriceByDayOfWeek(foodsByDate),
           foodsByDate: createSubmitFoodsByDate(foodsByDate),
           daysOfWeek: daysOfWeekFromMenu,
           mealType: mealTyperFromMenu,
@@ -515,7 +515,7 @@ export const createDuplicateSubmitMenuValues = (
       return {
         title: titleFromMenu,
         publicData: {
-          ...createAvaragePriceByFoodsByDate(foodsByDate),
+          ...createMinPriceByDayOfWeek(foodsByDate),
           foodsByDate: createSubmitFoodsByDate(foodsByDate),
           daysOfWeek: daysOfWeekFromMenu,
           mealType: mealTyperFromMenu,
@@ -549,13 +549,13 @@ export const createUpdateMenuApplyTimeValues = (values: any) => {
     daysOfWeek,
     id,
     numberOfCycles,
-    monAverageFoodPrice = 0,
-    tueAverageFoodPrice = 0,
-    wedAverageFoodPrice = 0,
-    thuAverageFoodPrice = 0,
-    friAverageFoodPrice = 0,
-    satAverageFoodPrice = 0,
-    sunAverageFoodPrice = 0,
+    monMinFoodPrice = 0,
+    tueMinFoodPrice = 0,
+    wedMinFoodPrice = 0,
+    thuMinFoodPrice = 0,
+    friMinFoodPrice = 0,
+    satMinFoodPrice = 0,
+    sunMinFoodPrice = 0,
     monFoodIdList = [],
     tueFoodIdList = [],
     wedFoodIdList = [],
@@ -584,13 +584,13 @@ export const createUpdateMenuApplyTimeValues = (values: any) => {
       foodsByDate: createFoodByDateByDaysOfWeekField(foodsByDate, daysOfWeek),
       ...createFoodAveragePriceByDaysOfWeekField(
         {
-          monAverageFoodPrice,
-          tueAverageFoodPrice,
-          wedAverageFoodPrice,
-          thuAverageFoodPrice,
-          friAverageFoodPrice,
-          satAverageFoodPrice,
-          sunAverageFoodPrice,
+          monMinFoodPrice,
+          tueMinFoodPrice,
+          wedMinFoodPrice,
+          thuMinFoodPrice,
+          friMinFoodPrice,
+          satMinFoodPrice,
+          sunMinFoodPrice,
         },
         daysOfWeek,
       ),

@@ -11,32 +11,28 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const integrationSdk = getIntegrationSdk();
 
     switch (apiMethod) {
-      case HttpMethod.POST:
-        {
-          const { dataParams, queryParams = {} } = req.body;
-          const { restaurantId } = dataParams.metadata;
+      case HttpMethod.POST: {
+        const { dataParams, queryParams = {} } = req.body;
+        const { restaurantId } = dataParams.metadata;
 
-          const restaurantRes = await integrationSdk.listings.show({
-            id: restaurantId,
-            include: ['author'],
-          });
-          const [restaurant] = denormalisedResponseEntities(restaurantRes);
-          const response = await integrationSdk.listings.create(
-            {
-              ...dataParams,
-              state: 'published',
-              authorId: restaurant.author.id.uuid,
-            },
-            queryParams,
-          );
-          res.json(response);
-        }
-        break;
-      case HttpMethod.DELETE:
-      case HttpMethod.GET:
-      case HttpMethod.PUT:
+        const restaurantRes = await integrationSdk.listings.show({
+          id: restaurantId,
+          include: ['author'],
+        });
+        const [restaurant] = denormalisedResponseEntities(restaurantRes);
+        const response = await integrationSdk.listings.create(
+          {
+            ...dataParams,
+            state: 'published',
+            authorId: restaurant.author.id.uuid,
+          },
+          queryParams,
+        );
+
+        return res.status(200).json(response);
+      }
       default:
-        break;
+        return res.status(400).json({ message: 'Bad request' });
     }
   } catch (error) {
     console.log(error);

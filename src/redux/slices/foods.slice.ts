@@ -8,7 +8,7 @@ import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settin
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants, EListingType } from '@utils/enums';
-import { storableError } from '@utils/errors';
+import { storableAxiosError, storableError } from '@utils/errors';
 import type {
   TImage,
   TIntegrationListing,
@@ -354,26 +354,34 @@ const removePartnerFood = createAsyncThunk(
   REMOVE_PARTNER_FOOD_LISTING,
   async (payload: TObject, { rejectWithValue }) => {
     try {
-      const { id = '' } = payload;
-      const { data } = await partnerFoodApi.deleteFood(id, {
-        dataParams: {
-          ...payload,
-        },
-        queryParams: {},
-      });
+      const { id = '', ids = [] } = payload;
+      const isDeletingListIds = ids.length > 0;
+      const { data } = isDeletingListIds
+        ? await partnerFoodApi.deleteFoodByIds({
+            dataParams: {
+              ids,
+            },
+            queryParams: {},
+          })
+        : await partnerFoodApi.deleteFood(id, {
+            dataParams: {
+              ...payload,
+            },
+            queryParams: {},
+          });
 
       return data;
     } catch (error) {
       console.error(`${REMOVE_PARTNER_FOOD_LISTING} error: `, error);
 
-      return rejectWithValue(storableError(error));
+      return rejectWithValue(storableAxiosError(error));
     }
   },
 );
 
 const showDuplicateFood = createAsyncThunk(
   SHOW_DUPLICATE_FOOD,
-  async (id: any) => {
+  async (id: any, { rejectWithValue }) => {
     try {
       const { data } = await partnerFoodApi.showFood(id, {
         dataParams: {
@@ -389,7 +397,7 @@ const showDuplicateFood = createAsyncThunk(
 
       return food;
     } catch (error) {
-      return storableError(error);
+      return rejectWithValue(storableAxiosError(error));
     }
   },
 );
