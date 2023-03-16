@@ -287,12 +287,22 @@ const updatePartnerFoodListing = createAsyncThunk(
 
 const createPartnerFoodFromCsv = createAsyncThunk(
   CREATE_FOOD_FROM_FILE,
-  async ({ file, restaurantId }: { file: File; restaurantId: string }) => {
+  async ({
+    file,
+    googleSheetUrl,
+    restaurantId,
+  }: {
+    file?: File;
+    googleSheetUrl?: string;
+    restaurantId: string;
+  }) => {
     return new Promise((resolve, reject) => {
-      Papa.parse(file, {
+      Papa.parse(googleSheetUrl || file, {
+        download: true,
         header: true,
         skipEmptyLines: true,
         async complete({ data = [] }: { data: any[] }) {
+          console.log({ data });
           const isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
           const dataLengthToImport = isProduction ? data.length : 3;
           const response = await Promise.all(
