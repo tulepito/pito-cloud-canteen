@@ -115,7 +115,9 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
 
   const menus = await queryMenuByIdList(menuIdList);
 
-  return Promise.all(
+  let updateMap: any = {};
+
+  await Promise.all(
     menus.map(async (menu: TIntegrationListing) => {
       Object.keys(EDayOfWeek).map(async (key) => {
         const day = EDayOfWeek[key as keyof typeof EDayOfWeek];
@@ -142,12 +144,14 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
             0,
           );
 
-          return integrationSdk.listings.update({
-            id: menu.id.uuid,
-            publicData: {
+          const menuId = menu.id.uuid;
+
+          updateMap = {
+            [menu.id.uuid]: {
+              ...(updateMap[menuId as keyof typeof updateMap] || {}),
               [`${day}MinFoodPrice`]: newMinFoodPrice,
             },
-          });
+          };
         }
       });
     }),
