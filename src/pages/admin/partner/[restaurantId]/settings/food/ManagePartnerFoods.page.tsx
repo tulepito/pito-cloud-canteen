@@ -524,7 +524,7 @@ const ManagePartnerFoods = () => {
             />
             <p>
               {
-                'Vào Google Sheet -> chọn File -> chọn Share -> chọn Publish to the web -> Chọn dạng publish là CSV -> Publish'
+                'Vào Google Sheet -> chọn File -> chọn Share -> chọn Publish to the web -> Chọn dạng publish là CSV -> Publish -> Copy pubished link -> Paste vào ô nhập'
               }
             </p>
           </div>
