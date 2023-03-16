@@ -10,6 +10,7 @@ import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
 import { partnerThunks } from '@redux/slices/partners.slice';
 import { IntegrationListing } from '@src/utils/data';
 import type { TObject } from '@src/utils/types';
+import { parsePrice } from '@src/utils/validators';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 
@@ -71,7 +72,7 @@ const EditPartnerFoodPage = () => {
       images: getInitialAddImages(currentFoodListing?.images || []),
       title,
       description,
-      price: price?.amount,
+      price: parsePrice(price?.amount || 0),
       ...publicData,
       menuType: menuType || EMenuTypes.fixedMenu,
       foodType: foodType || EFoodTypes.savoryDish,

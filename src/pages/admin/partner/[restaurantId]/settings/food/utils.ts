@@ -246,10 +246,10 @@ export const getImportDataFromCsv = (values: any) => {
     description,
     price: parsePriceToMoneyFormat(price),
     publicData: {
-      ...(allergicIngredients ||
-      toNonAccentVietnamese(allergicIngredients, true) !== 'khong'
+      ...(allergicIngredients &&
+      toNonAccentVietnamese(allergicIngredients, true).trim() !== 'khong'
         ? {
-            allergicIngredients: String(allergicIngredients).trim().split(','),
+            allergicIngredients: allergicIngredients.trim().split(','),
           }
         : {}),
       ...(foodTypeValue ? { foodType: foodTypeValue } : {}),
