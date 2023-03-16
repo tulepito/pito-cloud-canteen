@@ -6,7 +6,7 @@ import { deliveryDaySessionAdapter } from '@helpers/orderHelper';
 import { ListingTypes } from '@src/types/listingTypes';
 import { Listing, User } from '@utils/data';
 import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
-import { EImageVariants } from '@utils/enums';
+import { EImageVariants, ERestaurantListingStatus } from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
 
 export type TMenuQueryParams = {
@@ -122,6 +122,7 @@ export const getRestaurantQuery = ({
     ...(packaging.length > 0 && {
       pub_packaging: `has_any:${packaging.join(',')}`,
     }),
+    meta_status: ERestaurantListingStatus.authorized,
     include: ['images'],
     'fields.image': [
       `variants.${EImageVariants.default}`,
