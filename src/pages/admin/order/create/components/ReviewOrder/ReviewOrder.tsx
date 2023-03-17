@@ -82,8 +82,8 @@ const MENU_TABLE_COLUMN: TColumn[] = [
 ];
 
 const ReviewContent: React.FC<any> = (props) => {
-  const { restaurant } = props;
-  const { restaurantName, phoneNumber, foodList = {} } = restaurant;
+  const { restaurant, notes } = props;
+  const { restaurantName, phoneNumber, foodList = {}, id } = restaurant;
 
   const intl = useIntl();
 
@@ -132,6 +132,14 @@ const ReviewContent: React.FC<any> = (props) => {
           tableBodyRowClassName={css.tableBodyRow}
           tableBodyCellClassName={css.tableBodyCell}
         />
+      </Collapsible>
+      <Collapsible
+        label={intl.formatMessage({
+          id: 'ReviewOrder.note',
+        })}>
+        <div className={classNames(css.contentBox, css.spaceStart)}>
+          {notes?.[id]}
+        </div>
       </Collapsible>
     </div>
   );
@@ -192,6 +200,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     shipperName,
     orderState,
     plans = [],
+    notes = {},
   } = Listing(order as TListing).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
   const { address } = deliveryAddress || {};
@@ -213,6 +222,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
           orderDetail,
           deliveryHour,
           deliveryAddress,
+          notes,
         }),
       };
     }, [deliveryAddress, deliveryHour, orderDetail]) || {};
