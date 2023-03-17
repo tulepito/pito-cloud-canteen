@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
-import React, { useEffect, useRef, useState } from 'react';
-import { CSVLink } from 'react-csv';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
+import * as XLSX from 'xlsx';
 
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
@@ -27,7 +27,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
-import { formatTimestamp } from '@utils/dates';
+import { formatTimestamp } from '@src/utils/dates';
 import {
   CATEGORY_OPTIONS,
   FOOD_TYPE_OPTIONS,
@@ -228,7 +228,6 @@ const ManagePartnerFoods = () => {
   const [googleSheetUrl, setGoogleSheetUrl] = useState<string>();
   const [importType, setImportType] = useState<string>(IMPORT_FILE);
 
-  const csvLinkRef = useRef<any>();
   const {
     value: isImportModalOpen,
     setTrue: openImportModal,
@@ -356,8 +355,12 @@ const ManagePartnerFoods = () => {
     }
   };
 
-  const makeCsv = () => {
-    csvLinkRef.current?.link?.click();
+  const makeExcelFile = () => {
+    const foodsToExport = parseEntitiesToExportCsv(foods, idsToAction);
+    const ws = XLSX.utils.json_to_sheet(foodsToExport);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'SheetJS');
+    XLSX.writeFile(wb, `${formatTimestamp(new Date().getTime())}_Món_Ăn.xlsx`);
   };
 
   const onChangeFile = (e: any) => {
@@ -432,15 +435,8 @@ const ManagePartnerFoods = () => {
             <IconUploadFile className={css.buttonIcon} />
             Tải món
           </Button>
-          <CSVLink
-            data={parseEntitiesToExportCsv(foods, idsToAction)}
-            filename={`${formatTimestamp(new Date().getTime())}_donhang.csv`}
-            className={css.hidden}
-            ref={csvLinkRef}
-            target="_blank"
-          />
           <Button
-            onClick={makeCsv}
+            onClick={makeExcelFile}
             disabled={idsToAction.length === 0}
             className={css.lightButton}>
             <IconPrint
