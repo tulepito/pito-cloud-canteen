@@ -137,3 +137,38 @@ export const getRestaurantQuery = ({
     restaurantIds: newRestaurantIds,
   };
 };
+
+export const getMenuQueryInSpecificDay = ({
+  order,
+  timestamp,
+}: {
+  order: TListing | null;
+  timestamp: number;
+}) => {
+  const {
+    deliveryHour,
+    nutritions = [],
+    packagePerMember,
+  } = Listing(order as TListing).getMetadata();
+  const dateTime = DateTime.fromMillis(timestamp);
+  const dayOfWeek = convertWeekDay(dateTime.weekday).key;
+  const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
+  const mealType = deliveryDaySessionAdapter(deliveryDaySession);
+  const query = {
+    meta_listingState: 'published',
+    meta_listingType: ListingTypes.MENU,
+    pub_startDate: `,${dateTime.toMillis()}`,
+    pub_endDate: `${dateTime.toMillis()},`,
+    pub_daysOfWeek: `has_any:${dayOfWeek}`,
+    pub_mealType: mealType,
+    meta_isDeleted: false,
+    ...(nutritions.length > 0
+      ? {
+          [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(',')}`,
+        }
+      : {}),
+    [`pub_${dayOfWeek}minFoodPrice`]: `,${packagePerMember}`,
+  };
+
+  return query;
+};

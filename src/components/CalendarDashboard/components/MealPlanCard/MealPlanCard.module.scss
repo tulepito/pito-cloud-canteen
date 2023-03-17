@@ -54,6 +54,11 @@
 
 .content {
   margin-bottom: 12px;
+
+  &.disable {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 
 .coverImg {
@@ -108,6 +113,11 @@
     @include textTemplate(14px, 700, 20px, '');
     color: $neutralGray6;
     margin-bottom: 12px;
+  }
+
+  .editNotAvailable {
+    @include textTemplate(12px, $fontWeightRegular, 16px);
+    color: $primaryPri2;
   }
 }
 

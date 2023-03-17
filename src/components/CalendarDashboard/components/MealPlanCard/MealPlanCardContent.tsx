@@ -1,4 +1,5 @@
 import type { Event } from 'react-big-calendar';
+import classNames from 'classnames';
 
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
@@ -10,12 +11,14 @@ type TMealPlanCardContentProps = {
   event: Event;
   onRecommendMeal?: (date: number) => void;
   onRecommendMealInProgress?: boolean;
+  restaurantAvailable?: boolean;
 };
 
 const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
   event,
   onRecommendMeal,
   onRecommendMealInProgress,
+  restaurantAvailable = true,
 }) => {
   const restaurantName = event.resource?.restaurant?.name;
   const restaurantCoverImage = event.resource?.restaurant?.coverImage;
@@ -25,7 +28,8 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
   };
 
   return (
-    <div className={css.content}>
+    <div
+      className={classNames(css.content, !restaurantAvailable && css.disable)}>
       <div className={css.coverImg}>
         <ResponsiveImage
           alt={`${restaurantName}`}

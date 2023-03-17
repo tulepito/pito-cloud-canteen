@@ -138,6 +138,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const onRescommendRestaurantForSpecificDateInProgress = useAppSelector(
     (state) => state.Order.onRescommendRestaurantForSpecificDateInProgress,
   );
+  const availableOrderDetailCheckList = useAppSelector(
+    (state) => state.Order.availableOrderDetailCheckList,
+    shallowEqual,
+  );
 
   const orderId = Listing(order as TListing).getId();
   const planId = Listing(order as TListing).getMetadata()?.plans?.[0];
@@ -299,6 +303,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     JSON.stringify(orderDetail),
     JSON.stringify(plans),
   ]);
+
+  useEffect(() => {
+    dispatch(orderAsyncActions.checkRestaurantStillAvailable());
+  }, [dispatch]);
 
   const restaurantListFromOrder = Object.keys(
     getRestaurantListFromOrderDetail(orderDetail),
@@ -505,6 +513,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
                 onApplyOtherDaysInProgress,
                 onRecommendRestaurantForSpecificDay,
                 onRecommendRestaurantForSpecificDayInProgress,
+                availableOrderDetailCheckList,
               }}
               components={{
                 contentEnd: (props) => (
