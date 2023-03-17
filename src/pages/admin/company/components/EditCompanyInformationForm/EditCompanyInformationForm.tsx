@@ -7,7 +7,6 @@ import classNames from 'classnames';
 import type { FormApi } from 'final-form';
 
 import Form from '@components/Form/Form';
-import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import type { TObject } from '@utils/types';
@@ -58,23 +57,40 @@ const EditCompanyInformationFormComponent: React.FC<
     <Form onSubmit={handleSubmit} className={css.form}>
       <p className={css.formTitle}>
         {intl.formatMessage({
-          id: 'EditCompanyForm.companyInformation',
+          id: 'EditCompanyForm.personalInformation',
         })}
       </p>
       <div className={css.fields}>
         <FieldTextInput
-          id="name"
-          name="name"
+          id="lastName"
+          className={css.field}
+          name="lastName"
           label={intl.formatMessage({
-            id: 'EditCompanyForm.companyNameLabel',
+            id: 'EditCompanyForm.lastNameLabel',
           })}
           placeholder={intl.formatMessage({
-            id: 'EditCompanyForm.companyNamePlaceholder',
+            id: 'EditCompanyForm.lastNamePlaceholder',
           })}
-          className={css.field}
           validate={required(
             intl.formatMessage({
-              id: 'EditCompanyForm.companyNameLabelRequired',
+              id: 'EditCompanyForm.lastNameRequired',
+            }),
+          )}
+          required
+        />
+        <FieldTextInput
+          id="firstName"
+          className={css.field}
+          name="firstName"
+          label={intl.formatMessage({
+            id: 'EditCompanyForm.firstNameLabel',
+          })}
+          placeholder={intl.formatMessage({
+            id: 'EditCompanyForm.firstNamePlaceholder',
+          })}
+          validate={required(
+            intl.formatMessage({
+              id: 'EditCompanyForm.firstNameRequired',
             }),
           )}
           required
@@ -85,26 +101,50 @@ const EditCompanyInformationFormComponent: React.FC<
             name="email"
             className={css.field}
             label={intl.formatMessage({
-              id: 'EditCompanyForm.companyEmailLabel',
+              id: 'EditCompanyForm.emailLabel',
             })}
             placeholder={intl.formatMessage({
-              id: 'EditCompanyForm.companyEmailPlaceholder',
+              id: 'EditCompanyForm.emailPlaceholder',
             })}
             validate={composeValidators(
               required(
                 intl.formatMessage({
-                  id: 'EditCompanyForm.companyEmailRequired',
+                  id: 'EditCompanyForm.emailRequired',
                 }),
               ),
               emailFormatValid(
                 intl.formatMessage({
-                  id: 'EditCompanyForm.companyEmailInvalid',
+                  id: 'EditCompanyForm.emailInvalid',
                 }),
               ),
             )}
             required
           />
         )}
+        <FieldTextInput
+          id="phone"
+          className={css.field}
+          name="phone"
+          label={intl.formatMessage({
+            id: 'EditCompanyForm.phoneLabel',
+          })}
+          placeholder={intl.formatMessage({
+            id: 'EditCompanyForm.phonePlaceholder',
+          })}
+          validate={composeValidators(
+            required(
+              intl.formatMessage({
+                id: 'EditCompanyForm.phoneRequired',
+              }),
+            ),
+            phoneNumberFormatValid(
+              intl.formatMessage({
+                id: 'EditCompanyForm.phoneInValid',
+              }),
+            ),
+          )}
+          required
+        />
         <LocationAutocompleteInputField
           id="location"
           name="location"
@@ -126,23 +166,6 @@ const EditCompanyInformationFormComponent: React.FC<
                 id: 'EditCompanyForm.validLocation',
               }),
             ),
-          )}
-          required
-        />
-        <FieldTextInput
-          id="tax"
-          name="tax"
-          className={css.field}
-          label={intl.formatMessage({
-            id: 'EditCompanyForm.taxLabel',
-          })}
-          placeholder={intl.formatMessage({
-            id: 'EditCompanyForm.taxPlaceholder',
-          })}
-          validate={required(
-            intl.formatMessage({
-              id: 'EditCompanyForm.taxRequired',
-            }),
           )}
           required
         />
@@ -201,40 +224,105 @@ const EditCompanyInformationFormComponent: React.FC<
             />
           </>
         )}
+      </div>
+      <p className={css.formTitle}>
+        {intl.formatMessage({
+          id: 'EditCompanyForm.companyInformation',
+        })}
+      </p>
+      <div className={css.fields}>
         <FieldTextInput
-          id="phoneNumber"
-          name="phoneNumber"
-          className={css.field}
+          id="companyName"
+          name="companyName"
           label={intl.formatMessage({
-            id: 'EditCompanyForm.phoneLabel',
+            id: 'EditCompanyForm.companyNameLabel',
           })}
           placeholder={intl.formatMessage({
-            id: 'EditCompanyForm.phonePlaceholder',
+            id: 'EditCompanyForm.companyNamePlaceholder',
+          })}
+          className={css.field}
+          validate={required(
+            intl.formatMessage({
+              id: 'EditCompanyForm.companyNameLabelRequired',
+            }),
+          )}
+          required
+        />
+        <FieldTextInput
+          id="companyEmail"
+          name="companyEmail"
+          className={css.field}
+          label={intl.formatMessage({
+            id: 'EditCompanyForm.companyEmailLabel',
+          })}
+          placeholder={intl.formatMessage({
+            id: 'EditCompanyForm.companyEmailPlaceholder',
           })}
           validate={composeValidators(
             required(
               intl.formatMessage({
-                id: 'EditCompanyForm.phoneRequired',
+                id: 'EditCompanyForm.companyEmailRequired',
               }),
             ),
-            phoneNumberFormatValid(
+            emailFormatValid(
               intl.formatMessage({
-                id: 'EditCompanyForm.phoneInValid',
+                id: 'EditCompanyForm.companyEmailInvalid',
               }),
             ),
           )}
           required
         />
+        <LocationAutocompleteInputField
+          id="companyLocation"
+          name="companyLocation"
+          rootClassName={css.field}
+          label={intl.formatMessage({
+            id: 'EditCompanyForm.addressLabel',
+          })}
+          placeholder={intl.formatMessage({
+            id: 'EditCompanyForm.addressPlaceholder',
+          })}
+          validate={composeValidators(
+            autocompleteSearchRequired(
+              intl.formatMessage({
+                id: 'EditCompanyForm.locationRequried',
+              }),
+            ),
+            autocompletePlaceSelected(
+              intl.formatMessage({
+                id: 'EditCompanyForm.validLocation',
+              }),
+            ),
+          )}
+          required
+        />
+        <FieldTextInput
+          id="tax"
+          name="tax"
+          className={css.field}
+          label={intl.formatMessage({
+            id: 'EditCompanyForm.taxLabel',
+          })}
+          placeholder={intl.formatMessage({
+            id: 'EditCompanyForm.taxPlaceholder',
+          })}
+          validate={required(
+            intl.formatMessage({
+              id: 'EditCompanyForm.taxRequired',
+            }),
+          )}
+          required
+        />
+        <FieldTextInput
+          id="note"
+          className={classNames(css.field, css.textareaField)}
+          name="note"
+          type="textarea"
+          label={intl.formatMessage({
+            id: 'EditCompanyForm.noteLabel',
+          })}
+        />
       </div>
-      <FieldTextArea
-        id="note"
-        className={classNames(css.textareaField)}
-        name="note"
-        type="textarea"
-        label={intl.formatMessage({
-          id: 'EditCompanyForm.noteLabel',
-        })}
-      />
     </Form>
   );
 };
