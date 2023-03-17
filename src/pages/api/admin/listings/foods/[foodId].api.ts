@@ -6,10 +6,8 @@ import {
   updateMenuAfterFoodUpdated,
 } from '@pages/api/helpers/foodHelpers';
 import cookies from '@services/cookie';
-import { denormalisedResponseEntities } from '@services/data';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
-import { IntegrationListing } from '@src/utils/data';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -31,15 +29,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       }
 
       case HttpMethod.PUT: {
+        const { foodId } = req.query;
         const { dataParams = {}, queryParams = {} } = req.body;
         const response = await integrationSdk.listings.update(
           dataParams,
           queryParams,
         );
 
-        const [food] = denormalisedResponseEntities(response);
-
-        await updateMenuAfterFoodUpdated(IntegrationListing(food).getId());
+        updateMenuAfterFoodUpdated(foodId as string);
 
         return res.status(200).json(response);
       }
@@ -58,7 +55,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           queryParams,
         );
 
-        await updateMenuAfterFoodDeleted(foodId as string);
+        updateMenuAfterFoodDeleted(foodId as string);
 
         return res.status(200).json(response);
       }

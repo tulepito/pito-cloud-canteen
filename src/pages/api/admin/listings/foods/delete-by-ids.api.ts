@@ -29,11 +29,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       ),
     );
 
-    await Promise.all(
-      ids.map((id: string) => {
-        return updateMenuAfterFoodDeleted(id);
-      }),
-    );
+    ids.map((id: string) => {
+      return updateMenuAfterFoodDeleted(id);
+    });
 
     return res.status(200).json(responses);
   } catch (error) {
