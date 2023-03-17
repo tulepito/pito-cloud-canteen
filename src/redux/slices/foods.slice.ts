@@ -306,36 +306,42 @@ const createPartnerFoodFromCsv = createAsyncThunk(
           const workbook = XLSX.read(data, { type: 'array' });
           // organize xlsx data into desired format
           workbook.SheetNames.forEach(async (sheet) => {
-            try {
-              const worksheet = workbook.Sheets[sheet];
+            if (sheet === 'Template') {
+              try {
+                const worksheet = workbook.Sheets[sheet];
 
-              const data = XLSX.utils.sheet_to_json(worksheet);
-              const isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
-              const dataLengthToImport = isProduction ? data.length : 3;
-              const response = await Promise.all(
-                data.slice(0, dataLengthToImport).map(async (foodData: any) => {
-                  const dataParams = getImportDataFromCsv({
-                    ...foodData,
-                    restaurantId,
-                  });
+                const data = XLSX.utils.sheet_to_json(worksheet);
 
-                  const queryParams = {
-                    expand: true,
-                  };
-                  const { data } = await partnerFoodApi.createFood({
-                    dataParams,
-                    queryParams,
-                  });
+                const isProduction =
+                  process.env.NEXT_PUBLIC_ENV === 'production';
+                const dataLengthToImport = isProduction ? data.length : 3;
+                const response = await Promise.all(
+                  data
+                    .slice(0, dataLengthToImport)
+                    .map(async (foodData: any) => {
+                      const dataParams = getImportDataFromCsv({
+                        ...foodData,
+                        restaurantId,
+                      });
 
-                  const [food] = denormalisedResponseEntities(data);
+                      const queryParams = {
+                        expand: true,
+                      };
+                      const { data } = await partnerFoodApi.createFood({
+                        dataParams,
+                        queryParams,
+                      });
 
-                  return food;
-                }),
-              );
-              resolve(response as any);
-            } catch (error) {
-              console.log('error', error);
-              reject(error);
+                      const [food] = denormalisedResponseEntities(data);
+
+                      return food;
+                    }),
+                );
+                resolve(response as any);
+              } catch (error) {
+                console.log('error', error);
+                reject(error);
+              }
             }
           });
         };
