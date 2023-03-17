@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import {
+  updateMenuAfterFoodDeleted,
+  updateMenuAfterFoodUpdated,
+} from '@pages/api/helpers/foodHelpers';
 import cookies from '@services/cookie';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
@@ -25,11 +29,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       }
 
       case HttpMethod.PUT: {
+        const { foodId } = req.query;
         const { dataParams = {}, queryParams = {} } = req.body;
         const response = await integrationSdk.listings.update(
           dataParams,
           queryParams,
         );
+
+        updateMenuAfterFoodUpdated(foodId as string);
 
         return res.status(200).json(response);
       }
@@ -47,6 +54,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
           queryParams,
         );
+
+        updateMenuAfterFoodDeleted(foodId as string);
 
         return res.status(200).json(response);
       }
