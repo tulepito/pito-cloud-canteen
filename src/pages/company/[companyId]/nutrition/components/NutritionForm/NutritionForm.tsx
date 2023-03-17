@@ -255,6 +255,7 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
       },
     },
   ];
+
   return (
     <>
       <Form className={css.container} onSubmit={handleSubmit}>

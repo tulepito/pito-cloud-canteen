@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { HTTP_METHODS } from '@pages/api/helpers/constants';
+import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { handleError } from '@services/sdk';
 
@@ -11,7 +11,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const apiMethod = req.method;
 
   switch (apiMethod) {
-    case HTTP_METHODS.GET:
+    case HttpMethod.GET:
       try {
         const orderId = req.query.orderId as string;
         const data = await getOrder({ orderId });
@@ -21,7 +21,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         handleError(res, error);
       }
       break;
-    case HTTP_METHODS.PUT:
+    case HttpMethod.PUT:
       try {
         // Get query and params
         const orderId = req.query.orderId as string;
@@ -29,6 +29,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         // Update order and return values
         const updatedOrderListing = await updateOrder({ orderId, generalInfo });
+
         return res.json(updatedOrderListing);
       } catch (error) {
         // Return error

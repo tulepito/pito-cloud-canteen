@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
+import { Field, Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 import type { FormApi } from 'final-form';
 
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import Form from '@components/Form/Form';
+import ValidationError from '@components/ValidationError/ValidationError';
+import { foodByDatesAtLeastOneDayHasFood } from '@src/utils/validators';
 import { IntegrationListing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import { getLabelByKey, MENU_OPTIONS } from '@utils/enums';
@@ -22,6 +24,17 @@ import css from './EditMenuCompleteForm.module.scss';
 export type TEditMenuCompleteFormValues = {
   rowCheckbox: string[];
   [id: string]: any;
+};
+
+const HiddenField = (hiddenProps: any) => {
+  const { input, meta: fieldMeta } = hiddenProps;
+
+  return (
+    <div className={css.imageRequiredWrapper}>
+      <input {...input} />
+      <ValidationError fieldMeta={fieldMeta} />
+    </div>
+  );
 };
 
 type TFoodResource = {
@@ -93,6 +106,7 @@ const EditMenuCompleteFormComponent: React.FC<
     listIdsWithSideDishes.forEach(
       ({ id, sideDishes = [], foodNote }: TFoodResource) => {
         form.change(`${id}.foodNote`, foodNote);
+
         return form.change(`${id}.sideDishes`, sideDishes);
       },
     );
@@ -177,6 +191,14 @@ const EditMenuCompleteFormComponent: React.FC<
               />
             )}
           </div>
+          <Field
+            component={HiddenField}
+            name="foodsByDate"
+            type="hidden"
+            validate={foodByDatesAtLeastOneDayHasFood(
+              'Chọn ít nhất một món cho một ngày',
+            )}
+          />
         </div>
       </Form>
       <AddFoodModal

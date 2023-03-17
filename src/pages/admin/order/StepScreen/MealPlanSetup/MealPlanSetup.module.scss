@@ -23,10 +23,6 @@
   @include flexAlign(center, space-between);
   margin-top: 32px;
 
-  .backBtn {
-    @include buttonColorSecondary;
-  }
-
   .submitBtn {
     width: 252px;
   }

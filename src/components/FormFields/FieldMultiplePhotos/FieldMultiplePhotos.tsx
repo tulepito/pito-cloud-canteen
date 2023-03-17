@@ -59,6 +59,7 @@ const PhotoWithOverlay = (props: any) => {
     );
   }
   const classes = classNames(css.thumbnail, className);
+
   return (
     <div className={css.previewImage}>
       <div className={classes}>
@@ -86,6 +87,7 @@ const PhotoWithOverlay = (props: any) => {
 const FieldMutiplePhotos = (props: any) => {
   const [triggerFlag, setTriggerFlag] = useState<string>('');
   const intl = useIntl();
+
   return (
     <FieldArray {...props}>
       {({
@@ -179,6 +181,7 @@ const FieldMutiplePhotos = (props: any) => {
                           multiple,
                         };
                         const image = images[index];
+
                         return (
                           <div
                             className={classNames(css.input, inputClassName)}>

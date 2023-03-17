@@ -1,6 +1,7 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/defaults.scss' as *;
 
 .title {
   @include pageTitle;
@@ -14,6 +15,10 @@
   width: 100px !important;
 }
 
+.tableBodyCell:nth-child(5) {
+  width: 250px !important;
+}
+
 .idRow {
   font-weight: $fontWeightBold;
   color: $labelBlue2;
@@ -22,23 +27,6 @@
 
 .actionBtn {
   margin: 0 10px;
-}
-
-.secondaryButton {
-  @include buttonColorSecondary;
-  background-color: $neutralGray2;
-  outline: 1px solid $neutralGray4;
-
-  &:focus,
-  &:hover {
-    background-color: $neutralGray3;
-    color: unset;
-    border-color: unset;
-  }
-}
-
-.filterButton {
-  composes: secondaryButton;
 }
 
 .filterIcon {
@@ -72,6 +60,23 @@
   min-width: 200px;
   display: block;
   color: $neutralGray6;
+}
+
+.secondaryButton {
+  @include buttonColorSecondary;
+  background-color: $neutralGray2;
+  outline: 1px solid $neutralGray4;
+
+  &:focus,
+  &:hover {
+    background-color: $neutralGray3;
+    color: unset;
+    border-color: unset;
+  }
+}
+
+.filterButton {
+  composes: secondaryButton;
 }
 
 .addButton {
@@ -202,8 +207,15 @@
   }
 }
 
+.inputWrapper {
+  position: relative;
+}
+
 .inputFile {
-  display: none;
+  opacity: 0;
+  position: absolute;
+  height: 100%;
+  width: 100%;
 }
 
 .fileLabel {
@@ -249,5 +261,21 @@
 .table {
   @include viewportMedium {
     min-width: 1440px;
+  }
+}
+
+.googleSheetInput {
+  @include inputStyles;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.radioButton {
+  margin-bottom: 20px;
+  .inputWrapper {
+    margin-bottom: 10px;
+    display: flex;
+    overflow: hidden;
+    align-items: center;
   }
 }

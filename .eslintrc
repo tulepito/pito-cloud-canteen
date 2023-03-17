@@ -1,5 +1,14 @@
 {
   // Configuration for JavaScript files
+  "ignorePatterns": [
+    "node_modules/",
+    "build/",
+    "dist/",
+    ".next/",
+    "coverage/",
+    "public/",
+    "next.config.js"
+  ],
   "extends": [
     "airbnb-base",
     "next/core-web-vitals", // Needed to avoid warning in next.js build: 'The Next.js plugin was not detected in your ESLint configuration'
@@ -8,12 +17,14 @@
   "rules": {
     "consistent-return": "off",
     "no-param-reassign": [
-      "warn",
+      "off",
       { "props": true, "ignorePropertyModificationsFor": ["state"] }
     ],
     "no-nested-ternary": "off",
     "no-console": "off",
-    "no-return-await": "off"
+    "no-return-await": "off",
+    "no-plusplus": "off",
+    "newline-before-return": "error"
   },
   "overrides": [
     // Configuration for TypeScript files

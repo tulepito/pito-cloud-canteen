@@ -65,6 +65,7 @@ const Modal: React.FC<TModalProps> = (props) => {
     if (isOpen) {
       dispatch(UIActions.disableScrollRequest(id));
     }
+
     return () => {
       dispatch(UIActions.disableScrollRemove(id));
     };

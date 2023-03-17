@@ -27,6 +27,7 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   const cartList = useAppSelector((state: RootState) => {
     const { currentUser } = state.user;
     const currUserId = currentUser?.id?.uuid;
+
     return state.shoppingCart.orders?.[currUserId]?.[planId || 1];
   });
   const order = useAppSelector((state) => state.ParticipantPlanPage.order);

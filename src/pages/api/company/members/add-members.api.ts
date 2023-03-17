@@ -14,6 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       noAccountEmailList,
       companyId,
     });
+
     res.json(updatedCompanyAccount);
   } catch (error) {
     handleError(res, error);

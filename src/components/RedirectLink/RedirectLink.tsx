@@ -13,6 +13,7 @@ const RedirectLink: React.FC<TRedirectLinkProps> = ({ pathname, query }) => {
       query,
     });
   }, [pathname, query, router]);
+
   return <></>;
 };
 

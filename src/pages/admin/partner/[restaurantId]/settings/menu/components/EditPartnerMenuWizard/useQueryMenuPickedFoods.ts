@@ -43,6 +43,7 @@ const useQueryMenuPickedFoods = ({
     queryMenuPickedFoods();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(ids), restaurantId]);
+
   return { menuPickedFoods, queryMenuPickedFoodsInProgress };
 };
 

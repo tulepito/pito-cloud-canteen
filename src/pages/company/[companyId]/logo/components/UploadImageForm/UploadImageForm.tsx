@@ -104,6 +104,7 @@ const UploadImageFormComponent: React.FC<TUploadImageFormComponentProps> = (
   const onImageUpload = async ({ id, file }: TImageActionPayload) => {
     await dispatch(uploadImageThunks.uploadImage({ id, file }));
   };
+
   return (
     <Form onSubmit={handleSubmit}>
       <div>
@@ -127,6 +128,7 @@ const UploadImageFormComponent: React.FC<TUploadImageFormComponentProps> = (
               if (file != null) {
                 if (file.size >= IMAGE_MAX_SIZE) {
                   setIsLimitSize(true);
+
                   return;
                 }
                 setIsLimitSize(false);

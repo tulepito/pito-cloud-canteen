@@ -143,6 +143,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
   );
 
   const containerClasses = classNames(css.container, containerClassName);
+
   return (
     <div className={containerClasses}>
       {title && <div className={css.fieldTitle}>{title}</div>}

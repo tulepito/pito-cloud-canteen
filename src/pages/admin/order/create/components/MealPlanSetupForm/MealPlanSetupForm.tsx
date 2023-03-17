@@ -31,6 +31,10 @@ type TExtraProps = {
   currentClient: TUser;
   selectedBooker: TUser;
   clientId: string;
+  nutritionsOptions: {
+    label: string;
+    key: string;
+  }[];
 };
 type TMealPlanSetupFormComponentProps =
   FormRenderProps<TMealPlanSetupFormValues> & Partial<TExtraProps>;
@@ -47,6 +51,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
     values,
     form,
     clientId,
+    nutritionsOptions,
   } = props;
   const intl = useIntl();
   const step2SubmitInProgress = useAppSelector(
@@ -54,6 +59,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
   );
 
   const { pickAllow: pickAllowValue = true } = values;
+
   return (
     <Form onSubmit={handleSubmit}>
       <div className={css.headerLabel}>
@@ -83,6 +89,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
       <div className={css.fieldSection}>
         <NutritionField
           title={intl.formatMessage({ id: 'NutritionField.title' })}
+          options={nutritionsOptions}
         />
       </div>
       <div className={css.fieldSection}>

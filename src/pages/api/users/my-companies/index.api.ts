@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { HTTP_METHODS } from '@pages/api/helpers/constants';
+import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { getSdk, handleError } from '@services/sdk';
 import { CurrentUser, denormalisedResponseEntities } from '@utils/data';
@@ -12,7 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const sdk = getSdk(req, res);
 
   switch (apiMethod) {
-    case HTTP_METHODS.GET: {
+    case HttpMethod.GET: {
       try {
         const currentUserRes = await sdk.currentUser.show();
         const [currentUser] = denormalisedResponseEntities(currentUserRes);

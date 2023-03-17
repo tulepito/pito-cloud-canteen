@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { HTTP_METHODS } from '@pages/api/helpers/constants';
+import { HttpMethod } from '@apis/configs';
 import { handleError } from '@services/sdk';
 
 import createPlan from './create.service';
@@ -9,7 +9,7 @@ import updatePlan from './update.service';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
   switch (apiMethod) {
-    case HTTP_METHODS.POST:
+    case HttpMethod.POST:
       try {
         const orderId = req.query.orderId as string;
         const { orderDetail } = req.body;
@@ -21,7 +21,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         handleError(res, error);
       }
       break;
-    case HTTP_METHODS.PUT:
+    case HttpMethod.PUT:
       try {
         const orderId = req.query.orderId as string;
         const { planId, orderDetail, updateMode = 'replace' } = req.body;

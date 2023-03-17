@@ -67,7 +67,7 @@ export const sendRemindEmailToMemberApi = (orderId: string, body: TObject) =>
   postApi(`/orders/${orderId}/remind-member`, body);
 
 export const queryOrdersApi = (body: TBodyParams) => {
-  return postApi(`/admin/listings/order/query`, body);
+  return getApi(`/admin/listings/order`, body);
 };
 
 // Delete draft own draft order

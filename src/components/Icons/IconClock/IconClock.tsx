@@ -9,6 +9,7 @@ type TIconClockProps = TIconProps;
 const IconClock: React.FC<TIconClockProps> = (props) => {
   const { className, width = 24, height = 24, rootClassName } = props;
   const classes = classNames(rootClassName || css.root, className);
+
   return (
     <svg
       preserveAspectRatio="none"

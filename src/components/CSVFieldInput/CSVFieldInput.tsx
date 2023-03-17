@@ -20,6 +20,7 @@ const CSVFieldInput: React.FC<CSVFieldInputProps> = ({ setData }) => {
       },
     });
   };
+
   return (
     <div>
       <label className={css.label} htmlFor="csvReaderField">

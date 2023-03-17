@@ -5,11 +5,12 @@ import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
 import Modal from '@components/Modal/Modal';
+import NamedLink from '@components/NamedLink/NamedLink';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { QuizActions } from '@redux/slices/Quiz.slice';
+import { companyPaths } from '@src/paths';
 import { Listing, User } from '@utils/data';
 import { formatTimestamp, getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
@@ -30,6 +31,7 @@ const QuizMealDate = () => {
   const creatingOrderModalControl = useBoolean();
   const [formValues, setFormValues] = useState<TMealDateFormValues>(null!);
   const [formInvalid, setFormInvalid] = useState<boolean>(false);
+  const submittingErrorControl = useBoolean();
 
   useRedirectAfterReloadPage();
   const selectedCompany = useAppSelector(
@@ -59,44 +61,55 @@ const QuizMealDate = () => {
   const formattedEndDate = endDate && formatTimestamp(endDate, 'd MMMM');
   const initialValues = useMemo(
     () => ({
-      dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri'],
+      dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+      displayedDurationTime: '1',
+      durationTime: '1',
+      durationTimeMode: 'week',
     }),
     [],
   );
   const onFormSubmitClick = async () => {
     creatingOrderModalControl.setTrue();
-    const { payload: orderListing }: { payload: any } = await dispatch(
-      orderAsyncActions.createOrder({
-        clientId: User(selectedCompany).getId(),
-        bookerId: currentUser?.id?.uuid,
-        generalInfo: {
-          ...quiz,
-          ...formValues,
-          deadlineDate: DateTime.fromMillis(deadlineDate)
-            .plus({
-              ...convertHHmmStringToTimeParts(deadlineHour),
-            })
-            .toMillis(),
-          deliveryAddress: User(selectedCompany).getPublicData().location || {},
-          dayInWeek: selectedDays,
-        },
-      }),
-    );
-    const orderId = Listing(orderListing as TListing).getId();
-    const { plans = [] } = Listing(orderListing as TListing).getMetadata();
-    const planId = plans[0];
-    const { payload: recommendOrderDetail }: any = await dispatch(
-      orderAsyncActions.recommendRestaurants(),
-    );
-    await dispatch(
-      orderAsyncActions.updatePlanDetail({
-        orderId,
-        planId,
-        orderDetail: recommendOrderDetail,
-      }),
-    );
-    dispatch(QuizActions.clearQuizData());
-    router.push(`/company/booker/orders/draft/${orderId}`);
+    try {
+      const { payload: orderListing }: { payload: any } = await dispatch(
+        orderAsyncActions.createOrder({
+          clientId: User(selectedCompany).getId(),
+          bookerId: currentUser?.id?.uuid,
+          generalInfo: {
+            ...quiz,
+            ...formValues,
+            deadlineDate: DateTime.fromMillis(deadlineDate)
+              .plus({
+                ...convertHHmmStringToTimeParts(deadlineHour),
+              })
+              .toMillis(),
+            deliveryAddress:
+              User(selectedCompany).getPublicData().location || {},
+            dayInWeek: selectedDays,
+          },
+        }),
+      );
+      const orderId = Listing(orderListing as TListing).getId();
+      const { plans = [] } = Listing(orderListing as TListing).getMetadata();
+      const planId = plans[0];
+      const { payload: recommendOrderDetail }: any = await dispatch(
+        orderAsyncActions.recommendRestaurants(),
+      );
+      const { meta } = await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId,
+          orderDetail: recommendOrderDetail,
+        }),
+      );
+      if (meta.requestStatus !== 'rejected') {
+        router.push(`/company/booker/orders/draft/${orderId}`);
+      } else {
+        return submittingErrorControl.setFalse();
+      }
+    } catch (error) {
+      return submittingErrorControl.setFalse();
+    }
   };
 
   const goBack = () => {
@@ -123,9 +136,11 @@ const QuizMealDate = () => {
   ) : (
     <Modal isOpen handleClose={() => {}} shouldHideIconClose>
       <div className={css.container}>
-        <div>
-          <Spinner />
-        </div>
+        {!submittingErrorControl.value && (
+          <div>
+            <Spinner />
+          </div>
+        )}
         <div className={css.initialOrderText}>
           {createOrderInProcess &&
             intl.formatMessage({
@@ -135,14 +150,27 @@ const QuizMealDate = () => {
             intl.formatMessage({
               id: 'QuizCreatingOrderPage.initializingOrderDetail',
             })}
+          {submittingErrorControl.value &&
+            intl.formatMessage({
+              id: 'QuizCreatingOrderPage.initializeOrderError',
+            })}
         </div>
-        {Listing(order as TListing).getAttributes()?.title && (
-          <div className={css.orderTitle}>
-            {`#${Listing(order as TListing).getAttributes()?.title}`}
+        {submittingErrorControl.value && (
+          <div className={css.error}>
+            <NamedLink
+              title={'Thử lại lần nữa'}
+              params={{ pathanme: companyPaths.CreateNewOrder }}
+            />
           </div>
         )}
+        {Listing(order as TListing).getAttributes()?.title &&
+          !submittingErrorControl.value && (
+            <div className={css.orderTitle}>
+              {`#${Listing(order as TListing).getAttributes()?.title}`}
+            </div>
+          )}
 
-        {startDate && endDate && (
+        {startDate && endDate && !submittingErrorControl.value && (
           <div className={css.orderDateWrapper}>
             <span>
               {intl.formatMessage({

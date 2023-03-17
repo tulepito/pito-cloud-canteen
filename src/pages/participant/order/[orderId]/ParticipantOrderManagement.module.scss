@@ -1,0 +1,19 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.companyTab {
+  @include flexAlign(center, space-between);
+
+  .companyAvatar {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    font-size: 8px;
+  }
+
+  .fakeAvatar {
+    width: 0px;
+    height: 20px;
+  }
+}

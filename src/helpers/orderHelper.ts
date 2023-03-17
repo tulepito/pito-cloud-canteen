@@ -18,6 +18,9 @@ import {
 import type { TPlan } from '@utils/orderTypes';
 import type { TListing, TObject } from '@utils/types';
 
+export const getParticipantPickingLink = (orderId: string) =>
+  `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderId}`;
+
 export const isJoinedPlan = (
   foodId: string,
   status: EParticipantOrderStatus,
@@ -156,6 +159,7 @@ export const isEnableSubmitPublishOrder = (
 
 export const isOrderDetailDatePickedFood = (date: any) => {
   const { foodList = [] } = date || {};
+
   return isEmpty(foodList);
 };
 
@@ -231,12 +235,14 @@ export const isOrderDetailFullDatePickingRestaurant = ({
 }) => {
   const dateRange = renderDateRange(startDate, endDate);
   const selectedDate = Object.keys(orderDetail);
+
   return dateRange.length === selectedDate.length;
 };
 
 export const isOrderDetailFullDatePickingFood = (orderDetail: TObject) => {
   return Object.values(orderDetail).every((date) => {
     const { foodList = [] } = date || {};
+
     return !isEmpty(foodList);
   });
 };

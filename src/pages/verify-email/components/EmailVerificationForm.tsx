@@ -133,7 +133,7 @@ const EmailVerificationFormComponent: React.FC<
 
   const anyPendingEmailHasBeenVerifiedForCurrentUser =
     emailVerified && !pendingEmail;
-  // eslint-disable-next-line no-nested-ternary
+
   return anyPendingEmailHasBeenVerifiedForCurrentUser && verificationError
     ? alreadyVerifiedButErrorReturned
     : anyPendingEmailHasBeenVerifiedForCurrentUser

@@ -1,13 +1,10 @@
+import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
 import clone from 'lodash/clone';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import {
-  removeMealDay,
-  selectCalendarDate,
-  selectRestaurant,
-} from '@redux/slices/Order.slice';
+import { removeMealDay } from '@redux/slices/Order.slice';
 
 import MealPlanCardContent from './MealPlanCardContent';
 import MealPlanCardFooter from './MealPlanCardFooter';
@@ -34,7 +31,18 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
-  const { onEditFood, editFoodInprogress } = resources;
+  const {
+    startDate,
+    endDate,
+    onEditFood,
+    editFoodInprogress,
+    onApplyOtherDays,
+    onApplyOtherDaysInProgress,
+    onRecommendRestaurantForSpecificDay,
+    onRecommendRestaurantForSpecificDayInProgress,
+    onSearchRestaurant,
+    availableOrderDetailCheckList,
+  } = resources;
 
   const removeEventItem =
     onRemove ||
@@ -44,10 +52,16 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
       dispatch(removeMealDay(cloneOrderDetail));
     });
 
-  const onEditMeal = (date: Date) => {
-    dispatch(selectCalendarDate(date));
-    dispatch(selectRestaurant());
-  };
+  const onRecommendMealInProgress = useMemo(
+    () =>
+      onRecommendRestaurantForSpecificDayInProgress?.(event?.start?.getTime()),
+    [event?.start, onRecommendRestaurantForSpecificDayInProgress],
+  );
+
+  const onEditFoodInProgress = useMemo(
+    () => editFoodInprogress?.(event?.start?.getTime()),
+    [editFoodInprogress, event?.start],
+  );
 
   return (
     <div className={css.root}>
@@ -55,12 +69,27 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
         event={event}
         removeEventItem={removeEventItem}
         removeInprogress={removeInprogress}
+        onSearchRestaurant={onSearchRestaurant}
       />
-      <MealPlanCardContent event={event} onEditMeal={onEditMeal} />
+      <MealPlanCardContent
+        event={event}
+        onRecommendMeal={onRecommendRestaurantForSpecificDay}
+        onRecommendMealInProgress={onRecommendMealInProgress}
+        restaurantAvailable={
+          availableOrderDetailCheckList?.[event?.start?.getTime()!]
+        }
+      />
       <MealPlanCardFooter
         event={event}
         onEditFood={onEditFood}
-        editFoodInprogress={editFoodInprogress}
+        editFoodInprogress={onEditFoodInProgress}
+        onApplyOtherDays={onApplyOtherDays}
+        startDate={startDate}
+        endDate={endDate}
+        onApplyOtherDaysInProgress={onApplyOtherDaysInProgress}
+        editAvailable={
+          availableOrderDetailCheckList?.[event?.start?.getTime()!]
+        }
       />
     </div>
   );

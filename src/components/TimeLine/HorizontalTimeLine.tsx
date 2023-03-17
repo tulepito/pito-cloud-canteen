@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { useRef } from 'react';
 import classNames from 'classnames';
-import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -23,16 +22,16 @@ const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
   } = props;
   const containerRef = useRef(null);
 
-  const currentCtnRef = containerRef.current as any;
-
   const rootClasses = classNames(rootClassName || css.root, className);
   const totalItems = items.length;
 
   const itemsToRender = items.reduce<ReactNode[]>(
     (previousList, itemData, currentIndex) => {
+      const isLastItem = currentIndex === totalItems - 1;
+
       const nextItem = <ItemComponent key={currentIndex} data={itemData} />;
 
-      return currentIndex !== totalItems - 1
+      return !isLastItem
         ? previousList.concat([
             nextItem,
             <div
@@ -45,18 +44,27 @@ const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
     [],
   );
 
-  const handleNavigator =
-    (direction: number = 1) =>
-    () => {
-      if (isEmpty(currentCtnRef)) {
-        return;
-      }
-      if (direction > 0) {
-        currentCtnRef.scrollLeft += currentCtnRef?.clientWidth || 0;
-      } else {
-        currentCtnRef.scrollLeft -= currentCtnRef?.clientWidth || 0;
-      }
-    };
+  const handleHorizontalScrollToEnd = () => {
+    requestAnimationFrame(() => {
+      const current = containerRef.current as any;
+      const itemWidth = parseInt(
+        getComputedStyle(containerRef?.current!).width,
+        10,
+      );
+      current.scrollLeft += itemWidth;
+    });
+  };
+
+  const handleHorizontalScrollToStart = () => {
+    requestAnimationFrame(() => {
+      const current = containerRef.current as any;
+      const itemWidth = parseInt(
+        getComputedStyle(containerRef?.current!).width,
+        10,
+      );
+      current.scrollLeft -= itemWidth;
+    });
+  };
 
   return (
     <div className={rootClasses}>
@@ -64,7 +72,7 @@ const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
         <Button
           variant="inline"
           className={css.navigatorBtn}
-          onClick={handleNavigator(-1)}>
+          onClick={handleHorizontalScrollToStart}>
           <IconArrow direction="left" className={css.navigatorIcon} />
         </Button>
       )}
@@ -75,7 +83,7 @@ const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
         <Button
           variant="inline"
           className={css.navigatorBtn}
-          onClick={handleNavigator(+1)}>
+          onClick={handleHorizontalScrollToEnd}>
           <IconArrow direction="right" className={css.navigatorIcon} />
         </Button>
       )}

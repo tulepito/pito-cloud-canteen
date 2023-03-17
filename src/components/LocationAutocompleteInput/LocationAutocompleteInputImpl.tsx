@@ -42,6 +42,7 @@ const getTouchCoordinates = (nativeEvent: any) => {
     nativeEvent && nativeEvent.changedTouches
       ? nativeEvent.changedTouches[0]
       : null;
+
   return touch ? { x: touch.screenX, y: touch.screenY } : null;
 };
 
@@ -67,6 +68,7 @@ const LocationPredictionsList = (props: any) => {
     const isHighlighted = index === highlightedIndex;
     const predictionId = geocoder.getPredictionId(prediction);
     const itemClasses = isHighlighted ? { className: css.highlighted } : {};
+
     return (
       <li
         {...itemClasses}
@@ -117,6 +119,7 @@ const LocationPredictionsList = (props: any) => {
 // LocationAutocompleteInput props.
 const currentValue = (value: any) => {
   const { search = '', predictions = [], selectedPlace = null } = value || {};
+
   return { search, predictions, selectedPlace };
 };
 
@@ -175,6 +178,7 @@ const LocationAutocompleteInputImpl = (props: any) => {
 
   useEffect(() => {
     setIsMounted(true);
+
     return () => {
       window.clearTimeout(shortQueryTimeoutRef.current);
       setIsMounted(false);
@@ -186,6 +190,7 @@ const LocationAutocompleteInputImpl = (props: any) => {
     if (!geocoderRef.current) {
       geocoderRef.current = new (GeocoderGoogleMaps as any)();
     }
+
     return geocoderRef.current as any;
   };
 
@@ -234,6 +239,7 @@ const LocationAutocompleteInputImpl = (props: any) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const predict = (search: any) => {
     setFetchingPredictions(true);
+
     return getGeocoder()
       .getPlacePredictions(search)
       .then((results: any) => {
@@ -285,6 +291,7 @@ const LocationAutocompleteInputImpl = (props: any) => {
       if (shortQueryTimeoutRef.current) {
         window.clearTimeout(shortQueryTimeoutRef.current);
       }
+
       return;
     }
 
@@ -331,6 +338,7 @@ const LocationAutocompleteInputImpl = (props: any) => {
     });
 
     setFetchingPlaceDetails(true);
+
     return getGeocoder()
       .getPlaceDetails(prediction)
       .then((place: any) => {

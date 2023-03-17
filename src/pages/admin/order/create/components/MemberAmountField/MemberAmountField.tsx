@@ -30,6 +30,7 @@ const MemberAmountField: React.FC<MemberAmountFieldProps> = (props) => {
   const parseNumber = (value: string) => {
     return addCommas(removeNonNumeric(value));
   };
+
   return (
     <div className={css.container}>
       {title && <div className={css.fieldTitle}>{title}</div>}

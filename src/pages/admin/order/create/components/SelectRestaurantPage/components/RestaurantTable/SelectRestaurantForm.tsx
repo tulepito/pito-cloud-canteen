@@ -37,7 +37,8 @@ const SelectRestaurantFormComponent: React.FC<
     if (!!currentRestaurant && isSelectedRestaurant) {
       form.change('restaurant', currentRestaurant?.id?.uuid);
     }
-  }, [currentRestaurant, isSelectedRestaurant]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(currentRestaurant), isSelectedRestaurant]);
 
   return (
     <Form onSubmit={handleSubmit}>

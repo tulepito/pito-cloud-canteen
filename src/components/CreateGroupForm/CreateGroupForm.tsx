@@ -39,6 +39,7 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
         id,
         email: member.attributes.email,
       };
+
       return !members.includes(id) ? result : result.concat([newItem]);
     }, []);
     dispatch(
@@ -52,6 +53,7 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
       onModalClose();
     });
   };
+
   return (
     <FinalForm
       onSubmit={onSubmit}
@@ -60,6 +62,7 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
         const groupNameRequireMessage = required(
           intl.formatMessage({ id: 'CreateGroupForm.groupNameRequireMessage' }),
         );
+
         return (
           <Form onSubmit={handleSubmit}>
             <FieldTextInput
@@ -96,7 +99,9 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
                           <div className={css.name}>
                             {User(member).getProfile().displayName}
                           </div>
-                          <div className={css.email}>
+                          <div
+                            className={css.email}
+                            title={User(member).getAttributes().email}>
                             {User(member).getAttributes().email}
                           </div>
                         </div>

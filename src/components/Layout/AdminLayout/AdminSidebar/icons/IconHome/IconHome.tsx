@@ -8,6 +8,7 @@ import css from './IconHome.module.scss';
 const IconHome: React.FC<TIconProps> = (props) => {
   const { className } = props;
   const classes = classNames(css.root, className);
+
   return (
     <svg
       className={classes}

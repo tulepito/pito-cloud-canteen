@@ -81,6 +81,7 @@ const GroupMemberDetailPage: React.FC<GroupMemberDetailPageProps> = () => {
       }
     });
   }, [dispatch, companyMember, onDeleteMemberConfirmationModalClose, router]);
+
   return (
     <div className={css.container}>
       <div className={css.backBtn} onClick={handleGoBack}>

@@ -1,10 +1,9 @@
-/* eslint-disable no-console */
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { merge } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import { EHttpStatusCode } from '@apis/errors';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -30,9 +29,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const { txId, reviewContent, reviewRating, time } = req.body;
 
           if (isEmpty(txId)) {
-            res.status(400).json({
+            res.status(EHttpStatusCode.BadRequest).json({
               error: 'Transaction ID is empty',
             });
+
             return;
           }
 
@@ -54,7 +54,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           // Check permission
           if (!participantIds.includes(participantId)) {
-            res.status(400).json({
+            res.status(EHttpStatusCode.BadRequest).json({
               error: `Participant ${participantId} cannot review order ${orderId}`,
             });
 
@@ -66,7 +66,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const totalEnableReviewParticipants = participantIds.length;
 
           if (totalReviews === totalEnableReviewParticipants) {
-            res.status(400).json({
+            res.status(EHttpStatusCode.BadRequest).json({
               error: `Order completed review process`,
             });
 
@@ -75,7 +75,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           // Check if user reviewed or not
           if (isEmpty(reviewsAtTime[participantId])) {
-            res.status(400).json({
+            res.status(EHttpStatusCode.BadRequest).json({
               error: `Participant ${participantId} has already reviewed`,
             });
 
@@ -106,7 +106,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             await summarizeReviews({ tx, restaurantId, reviews: newReviews });
           }
 
-          res.status(400).json({
+          res.status(EHttpStatusCode.BadRequest).json({
             message: `Successfully reviewed tx ${txId} by participant ${participantId}`,
             data: { reviewContent, reviewRating },
           });

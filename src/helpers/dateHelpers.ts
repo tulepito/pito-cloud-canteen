@@ -8,6 +8,7 @@ export const parseDateFromTimestampAndHourString = (
   const parsedDate = DateTime.fromMillis(Number(timestamp)).toFormat(
     'yyyy-MM-dd',
   );
+
   return DateTime.fromISO(`${parsedDate}T${hourStr}:00`).toFormat(formatStr);
 };
 

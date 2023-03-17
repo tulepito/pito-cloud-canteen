@@ -21,7 +21,7 @@ import StateItem from '@components/TimeLine/StateItem';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
-import { adminRoutes } from '@src/paths';
+import { adminPaths, adminRoutes } from '@src/paths';
 import { formatTimestamp } from '@utils/dates';
 import {
   EOrderDraftStates,
@@ -81,6 +81,7 @@ const OrderDetailTooltip = ({
         const { foodList = {} } = restaurant;
         const totalPrice = Object.keys(foodList).reduce((prev, cur) => {
           const price = foodList[cur].foodPrice;
+
           return prev + price;
         }, 0);
 
@@ -94,10 +95,12 @@ const OrderDetailTooltip = ({
           </div>
         );
       });
+
       return [...prev, ...subOrderDetails];
     },
     [],
   );
+
   return <div className={css.tooltip}>{orderDetails}</div>;
 };
 
@@ -105,9 +108,19 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'title',
     label: 'ID',
-    render: ({ id, title, subOrders }: any) => {
+    render: ({ id: orderId, title, state, subOrders }: any) => {
+      const titleComponent = <div className={css.boldText}>#{title}</div>;
+
+      if ([EOrderDraftStates.draft].includes(state)) {
+        return (
+          <NamedLink path={adminPaths.UpdateDraftOrder} params={{ orderId }}>
+            {titleComponent}
+          </NamedLink>
+        );
+      }
+
       return (
-        <NamedLink path={`${adminRoutes.ManageOrders.path}/${id}`}>
+        <NamedLink path={adminPaths.OrderDetail} params={{ orderId }}>
           {subOrders.length > 0 ? (
             <Tooltip
               overlayClassName={css.orderDetailTooltip}
@@ -115,10 +128,10 @@ const TABLE_COLUMN: TColumn[] = [
               showArrow={false}
               tooltipContent={<OrderDetailTooltip subOrders={subOrders} />}
               placement="bottomLeft">
-              <div className={css.boldText}>#{title}</div>
+              {titleComponent}
             </Tooltip>
           ) : (
-            <div className={css.boldText}>#{title}</div>
+            titleComponent
           )}
         </NamedLink>
       );
@@ -156,6 +169,7 @@ const TABLE_COLUMN: TColumn[] = [
     label: 'Thời gian',
     render: (data: any) => {
       const { startDate, endDate } = data;
+
       return startDate && endDate ? (
         <div className={css.rowText}>
           <div className={css.deliveryHour}>{data.deliveryHour}</div>
@@ -174,10 +188,13 @@ const TABLE_COLUMN: TColumn[] = [
       const { length } = restaurants;
       const moreThanTwo = restaurants.length > 2;
       const remainLength = length - 2;
+
       return length > 0 ? (
         <div className={css.rowText}>
           {restaurants.slice(0, 2).map((restaurantName: string) => (
-            <div key={restaurantName}>{restaurantName}</div>
+            <div key={restaurantName} className={css.restaurantName}>
+              {restaurantName}
+            </div>
           ))}
           {moreThanTwo && (
             <div className={css.remainText}>+ {remainLength} đối tác </div>
@@ -247,6 +264,7 @@ const parseEntitiesToTableData = (
             return orderDetail[key]?.restaurant?.restaurantName;
           }),
         );
+
         return [...prevSubOrders, ...listRestaurantName];
       },
       [],
@@ -285,20 +303,22 @@ const parseEntitiesToTableData = (
 
 const sortOrders = ({ columnName, type }: TTableSortValue, data: any) => {
   const isAsc = type === 'asc';
+
   // eslint-disable-next-line array-callback-return
   return data.sort((a: any, b: any) => {
     if (typeof a.data[columnName] === 'number') {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      isAsc
+      return isAsc
         ? b.data[columnName] - a.data[columnName]
         : a.data[columnName] - b.data[columnName];
-    } else if (typeof a.data[columnName] === 'string') {
+    }
+    if (typeof a.data[columnName] === 'string') {
       if (a.data[columnName] < b.data[columnName]) {
         return isAsc ? -1 : 1;
       }
       if (a.data[columnName] > b.data[columnName]) {
         return isAsc ? 1 : -1;
       }
+
       return 0;
     }
   });

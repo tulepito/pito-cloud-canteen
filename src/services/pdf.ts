@@ -32,11 +32,20 @@ export const createNewPrint = (id: string) => {
         let position = 0;
         // a4 paper size [595.28, 841.89], html page generated canvas in pdf picture width
         const imgWidth = 595.28;
-        const imgHeight = (592.28 / contentWidth) * contentHeight;
+        const imgHeight = (imgWidth / contentWidth) * contentHeight;
         const pageData = canvas.toDataURL('image/jpeg', 1.0);
         // There are two heights to distinguish, one is the actual height of the html page, and the page height of the generated pdf (841.89)
         // When the content does not exceed the range of pdf page display, there is no need to paginate
         if (leftHeight < pageHeight) {
+          /* addImage explained below:
+              param 1 -> image in code format
+              param 2 -> type of the image. SVG not supported. needs to be either PNG or JPEG.
+              all params are specified in integer
+              param 3 -> X axis margin from left
+              param 4 -> Y axis margin from top
+              param 5 -> width of the image
+              param 6 -> height of the image
+          */
           doc.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight);
         } else {
           while (leftHeight > 0) {
@@ -49,10 +58,13 @@ export const createNewPrint = (id: string) => {
             }
           }
         }
+
         return { doc, id };
       });
     }
+
     return promise;
   }
+
   return promise;
 };

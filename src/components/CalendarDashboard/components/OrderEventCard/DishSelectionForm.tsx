@@ -26,6 +26,7 @@ const validate = (values: TDishSelectionFormValues) => {
   if (!values.dishSelection) {
     errors.dishSelection = 'Required';
   }
+
   return errors;
 };
 
@@ -89,11 +90,10 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
       <div className={css.actions}>
         <Button
           type="button"
-          className={css.rejectBtn}
-          onClick={handleReject}
-          disabled={disabledRejectButton}
-          inProgress={rejectSubmitting}>
-          <FormattedMessage id="DishSelectionForm.reject" />
+          variant="secondary"
+          className={css.pickForMeBtn}
+          onClick={() => {}}>
+          <FormattedMessage id="DishSelectionForm.pickForMe" />
         </Button>
         <Button
           className={css.acceptBtn}
@@ -102,6 +102,15 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
           inProgress={confirmSubmitting}
           spinnerClassName={css.spinnerClassName}>
           <FormattedMessage id="DishSelectionForm.accept" />
+        </Button>
+        <Button
+          type="button"
+          variant="inline"
+          className={css.rejectBtn}
+          onClick={handleReject}
+          disabled={disabledRejectButton}
+          inProgress={rejectSubmitting}>
+          <FormattedMessage id="DishSelectionForm.reject" />
         </Button>
       </div>
     </form>

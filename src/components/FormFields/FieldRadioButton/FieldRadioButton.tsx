@@ -12,6 +12,7 @@ type TIconRadioButton = {
 
 export const IconRadioButton: React.FC<TIconRadioButton> = (props) => {
   const { checkedClassName, className } = props;
+
   return (
     <div>
       <svg

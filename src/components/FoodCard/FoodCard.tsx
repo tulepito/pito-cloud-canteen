@@ -49,6 +49,7 @@ const FoodCard: React.FC<TFoodCardProps> = ({
   ) : (
     <IconPlusCircle onClick={handleSelect} className={css.plusIcon} />
   );
+
   return (
     <div className={classes}>
       <div className={css.coverImage} onClick={handleClickFood}>

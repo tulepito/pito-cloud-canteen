@@ -10,6 +10,7 @@ export const getCompanyMembersDetailsApi = (
   roles: string[] = [],
 ) => {
   const rolesAsString = roles.join(',');
+
   return getApi(`/admin/users/company/${id}/members?roles=${rolesAsString}`);
 };
 

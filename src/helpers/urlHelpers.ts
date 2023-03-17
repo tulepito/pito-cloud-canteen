@@ -30,9 +30,11 @@ export const stringify = (params: {
         // eslint-disable-next-line no-param-reassign
         result[key] = val;
       }
+
       return result;
     },
     {},
   );
+
   return urlSerialize(cleaned);
 };

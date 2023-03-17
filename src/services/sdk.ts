@@ -30,6 +30,7 @@ const baseUrlMaybe = process.env.NEXT_PUBLIC_SHARETRIBE_SDK_BASE_URL
 const memoryStore = (token: string) => {
   const store = sharetribeSdk.tokenStore.memoryStore();
   store.setToken(token);
+
   return store;
 };
 
@@ -40,6 +41,7 @@ const getUserToken = (req: NextApiRequest) => {
     req,
     secure: USING_SSL,
   });
+
   return cookieTokenStore.getToken();
 };
 
@@ -57,17 +59,6 @@ export const handleError = (res: NextApiResponse, error: any) => {
   } else {
     res.status(500).json({ error: error.message });
   }
-};
-
-export const serialize = (data: any) => {
-  return sharetribeSdk.transit.write(data, {
-    typeHandlers,
-    verbose: TRANSIT_VERBOSE,
-  });
-};
-
-export const deserialize = (str: string) => {
-  return sharetribeSdk.transit.read(str, { typeHandlers });
 };
 
 export const getSdk = (req: NextApiRequest | NextRequest, res: any) => {

@@ -13,8 +13,3 @@
   min-width: 252px;
   height: 48px;
 }
-
-.backButton {
-  @include buttonColorSecondary;
-  outline-color: $neutralGray4;
-}

@@ -112,6 +112,7 @@ const GroupSettingPage = () => {
           setSelectingDeleteGroupId(id);
           openDeleteGroupConfirmationModal();
         };
+
         return (
           <>
             <IconEdit className={css.editBtn} onClick={onEditGroup} />

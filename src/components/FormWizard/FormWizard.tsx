@@ -15,6 +15,7 @@ type TFormWizardProps = {
 const FormWizard: React.FC<TFormWizardProps> = (props) => {
   const { className, children, formTabNavClassName } = props;
   const classes = classNames(css.root, className);
+
   return (
     <div className={classes}>
       <FormTabs

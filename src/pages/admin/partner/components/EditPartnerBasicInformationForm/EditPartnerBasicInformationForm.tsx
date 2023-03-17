@@ -167,6 +167,7 @@ const EditPartnerBasicInformationForm: React.FC<
       minQuantity,
       maxQuantity,
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
@@ -510,6 +511,7 @@ const EditPartnerBasicInformationForm: React.FC<
                   <Field name="vat" id="vat">
                     {(vatFieldProps: any) => {
                       const { input } = vatFieldProps;
+
                       return (
                         <ToggleButton
                           className={css.vatButton}

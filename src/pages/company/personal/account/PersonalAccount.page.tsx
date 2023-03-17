@@ -8,6 +8,7 @@ const PersonalAccountPage = () => {
   useEffect(() => {
     dispatch(manageCompaniesThunks.queryCompanies());
   }, [dispatch]);
+
   return <div></div>;
 };
 

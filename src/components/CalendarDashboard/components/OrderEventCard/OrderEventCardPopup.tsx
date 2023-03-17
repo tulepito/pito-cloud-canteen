@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Event } from 'react-big-calendar';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
 import { InlineTextButton } from '@components/Button/Button';
@@ -30,10 +30,11 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   isExpired = false,
 }) => {
   const router = useRouter();
+  const intl = useIntl();
   const user = useAppSelector(currentUserSelector);
 
   const dispatch = useAppDispatch();
-  const mealType = event.resource?.type;
+  const daySession = event.resource?.daySession;
   const startTime = event.resource?.deliveryHour;
   const dishes: any[] = event.resource?.meal?.dishes || [];
   const {
@@ -71,11 +72,14 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   return (
     <div className={css.root}>
       <div className={css.header}>
-        <div className={css.title}>#{event.title}</div>
+        <div className={css.title}>
+          {intl.formatMessage({ id: `DayColumn.Session.${daySession}` })}
+        </div>
         {status && <OrderEventCardStatus status={status} />}
       </div>
       <div className={css.mealType}>
-        <FormattedMessage id={`EventCard.mealType.${mealType}`} />
+        <span className={css.regularText}>#{event.title}</span> |{' '}
+        {intl.formatMessage({ id: 'EventCard.PCC' })}
       </div>
       <div className={css.eventTime}>{startTime}</div>
       <div className={css.divider} />

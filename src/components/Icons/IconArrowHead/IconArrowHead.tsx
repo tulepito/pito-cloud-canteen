@@ -161,6 +161,7 @@ const IconArrowHead: React.FC<TIconArrowHeadProps> = (props) => {
       </svg>
     );
   }
+
   return null;
 };
 

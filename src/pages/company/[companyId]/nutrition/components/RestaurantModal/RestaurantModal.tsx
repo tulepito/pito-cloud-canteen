@@ -68,6 +68,7 @@ const RestaurantModal: React.FC<TRestaurantModalProps> = (props) => {
   const onSearchFormSubmit = (values: any) => {
     onSearchFoodName(values?.keywords, restaurantId!);
   };
+
   return (
     <Modal
       id="RestaurantModal"

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import type { PropsWithChildren } from 'react';
-import React, { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
@@ -9,11 +9,10 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
 import { emailVerificationActions } from '@redux/slices/emailVerification.slice';
 import { currentUserSelector, userThunks } from '@redux/slices/user.slice';
-import {
-  generalPaths,
-  IgnoredAuthCheckRoutes,
-  NonRequireAuthenticationRoutes,
-} from '@src/paths';
+import { generalPaths } from '@src/paths';
+
+import { usePathChecker } from './Guards.helper';
+import useVerifyAuthentication from './useVerifyAuthentication';
 
 type TAuthGuardProps = PropsWithChildren<{}>;
 
@@ -24,22 +23,16 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   const { isAuthenticated, authInfoLoaded } = useAppSelector(
     (state) => state.auth,
   );
-  const user = useAppSelector(currentUserSelector);
+  const currentUser = useAppSelector(currentUserSelector);
 
-  const {
-    pathname,
-    asPath: fullPath,
-    query: { from: fromUrl },
-  } = router;
+  const { pathname } = router;
   const {
     id: userId,
     attributes: { emailVerified: isUserEmailVerified },
-  } = user;
+  } = currentUser;
 
-  const isNonRequireAuthenticationRoute =
-    NonRequireAuthenticationRoutes.includes(pathname);
-
-  const isIgnoredAuthCheckRoute = IgnoredAuthCheckRoutes.includes(pathname);
+  const { isIgnoredAuthCheckRoute, isNonRequireAuthenticationRoute } =
+    usePathChecker(pathname);
 
   // TODO: check sign up path and consider showing verification email form or not
   const isSignUpPath = pathname === generalPaths.SignUp;
@@ -47,36 +40,11 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   const shouldNavigateInSignUpFlow =
     isSignUpPath && !shouldShowEmailVerification;
 
+  // TODO: check home page navigate condition (non-require authentication route)
   const homePageNavigateCondition =
     isAuthenticated &&
     isNonRequireAuthenticationRoute &&
     (!isSignUpPath || shouldNavigateInSignUpFlow);
-
-  const verifyAuthentication = useCallback(() => {
-    if (isIgnoredAuthCheckRoute || !authInfoLoaded) {
-      return;
-    }
-
-    if (isNonRequireAuthenticationRoute) {
-      if (homePageNavigateCondition) {
-        router.push(fromUrl ? (fromUrl as string) : generalPaths.Home);
-      }
-    } else if (!isAuthenticated) {
-      router.push({
-        pathname: generalPaths.SignIn,
-        query: { from: fullPath },
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    authInfoLoaded,
-    homePageNavigateCondition,
-    isAuthenticated,
-    isIgnoredAuthCheckRoute,
-    isNonRequireAuthenticationRoute,
-    pathname,
-    fullPath,
-  ]);
 
   const renderComponent = () => {
     if (isIgnoredAuthCheckRoute) {
@@ -85,7 +53,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
 
     const loadingCondition =
       !authInfoLoaded ||
-      (isNonRequireAuthenticationRoute && homePageNavigateCondition) ||
+      homePageNavigateCondition ||
       (!isNonRequireAuthenticationRoute && !isAuthenticated);
 
     if (loadingCondition) {
@@ -99,10 +67,12 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     return children;
   };
 
+  // TODO: load authentication info
   useEffect(() => {
     dispatch(authThunks.authInfo());
   }, [pathname]);
 
+  // TODO: fetch current user if authenticated
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(userThunks.fetchCurrentUser(undefined));
@@ -111,9 +81,8 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     }
   }, [isAuthenticated, isUserEmailVerified]);
 
-  useEffect(() => {
-    verifyAuthentication();
-  }, [verifyAuthentication]);
+  // TODO: verify authentication
+  useVerifyAuthentication(homePageNavigateCondition);
 
   return <>{renderComponent()}</>;
 };

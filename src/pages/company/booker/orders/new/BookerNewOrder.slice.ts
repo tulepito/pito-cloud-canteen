@@ -25,6 +25,7 @@ const queryMyCompanies = createAsyncThunk(
   async (_) => {
     // call api
     const companyList = await queryMyCompaniesApi();
+
     return companyList.data;
   },
   {

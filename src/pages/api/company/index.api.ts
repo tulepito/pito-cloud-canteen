@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import companyChecker from '@services/permissionChecker/company';
@@ -9,7 +10,7 @@ import { denormalisedResponseEntities } from '@utils/data';
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const apiMethod = req.method;
   switch (apiMethod) {
-    case 'PUT':
+    case HttpMethod.PUT:
       try {
         const { dataParams, queryParams } = req.body;
         const integrationSdk = getIntegrationSdk();

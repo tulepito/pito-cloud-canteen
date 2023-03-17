@@ -9,6 +9,7 @@ type TLayoutProps = PropsWithChildren<{
 
 const Layout: React.FC<TLayoutProps> = ({ className, children }) => {
   const classes = classNames(css.root, className);
+
   return <div className={classes}>{children}</div>;
 };
 

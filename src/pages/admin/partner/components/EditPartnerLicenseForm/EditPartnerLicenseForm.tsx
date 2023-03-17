@@ -113,6 +113,7 @@ const partyInsuranceOptions = () => {
         ),
       };
     }
+
     return {
       ...value,
       label: (
@@ -164,6 +165,7 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
         } = fieldRenderProps;
         const ready = !formError && isEqual(submittedValues, values);
         const disabled = inProgress || uploadingImage;
+
         return (
           <Form onSubmit={handleSubmit}>
             <div className={css.fields}>
@@ -244,11 +246,7 @@ const EditPartnerLicenseForm: React.FC<any> = (props) => {
             <div className={css.buttonWrapper}>
               <div className={css.buttons}>
                 {goBack && (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    // className={css.secondaryButton}
-                    onClick={goBack}>
+                  <Button type="button" variant="secondary" onClick={goBack}>
                     {intl.formatMessage({
                       id: 'EditPartnerForms.goBack',
                     })}

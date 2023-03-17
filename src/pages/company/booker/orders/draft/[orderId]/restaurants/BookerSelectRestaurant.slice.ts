@@ -135,14 +135,17 @@ const fetchRestaurant = createAsyncThunk(
           ],
         }),
       )[0];
+
       return response;
     }
+
     return null;
   },
 );
 
 const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
   const { data: searchFiltersResponse } = await fetchSearchFilterApi();
+
   return searchFiltersResponse;
 });
 
@@ -186,6 +189,7 @@ const searchRestaurants = createAsyncThunk(
           type: 'ofCustomer',
         });
         const { meta: reviewMeta } = reviewsResponse.data;
+
         return {
           restaurantId,
           totalReviews: reviewMeta.totalItems,
@@ -213,6 +217,7 @@ const fetchOrder = createAsyncThunk(
         id: orderId,
       }),
     )[0];
+
     return response;
   },
 );
@@ -226,8 +231,10 @@ const fetchPlanDetail = createAsyncThunk(
           id: planId,
         }),
       )[0];
+
       return response;
     }
+
     return {};
   },
 );
@@ -240,6 +247,7 @@ const updatePlanDetail = createAsyncThunk(
       planId,
       updateMode,
     });
+
     return planListing;
   },
 );
@@ -271,17 +279,14 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
         (item) => item.restaurantId === restaurantId,
       )?.menuId;
     const { order } = getState().BookerSelectRestaurant;
-    const { nutritions = [], packagePerMember } = Listing(
-      order as TListing,
-    ).getMetadata();
+    const { nutritions = [] } = Listing(order as TListing).getMetadata();
 
     const response = await sdk.listings.query({
       pub_menuIdList: `has_any:${menuId}`,
       meta_listingType: ListingTypes.FOOD,
       pub_menuWeekDay: `has_any:${dayOfWeek}`,
-      price: `,${packagePerMember}`,
       ...(nutritions.length > 0
-        ? { pub_nutritions: `has_any:${nutritions.join(',')}` }
+        ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
         : {}),
       include: ['images'],
       ...(keywords && { keywords }),
@@ -295,6 +300,7 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
       ...restaurantFood,
       [restaurantId]: foodList,
     };
+
     return newRestaurantFood;
   },
 );

@@ -25,6 +25,7 @@ const getWeekDayFromListId = (menu: TIntegrationListing, foodId: string) => {
   const keys = Object.keys(listIds).filter((key: string) => {
     return listIds[key].includes(foodId);
   });
+
   return keys.map((k) => String(k).substring(0, 3));
 };
 

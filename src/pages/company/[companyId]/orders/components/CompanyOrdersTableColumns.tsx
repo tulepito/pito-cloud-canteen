@@ -14,6 +14,7 @@ import OrderDetailTooltip from '@components/OrderDetailTooltip/OrderDetailToolti
 import type { TColumn } from '@components/Table/Table';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
+import { getParticipantPickingLink } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
@@ -88,15 +89,15 @@ export const CompanyOrdersTableColumns: TColumn[] = [
             {titleContent}
           </NamedLink>
         );
+      } else {
+        returnComponent = (
+          <NamedLink
+            path={companyPaths.ManageOrderDetail}
+            params={{ orderId: id }}>
+            {titleContent}
+          </NamedLink>
+        );
       }
-
-      returnComponent = (
-        <NamedLink
-          path={companyPaths.ManageOrderDetail}
-          params={{ orderId: id }}>
-          {titleContent}
-        </NamedLink>
-      );
 
       const subOrders = [].concat(plan) as TIntegrationListing[];
 
@@ -143,6 +144,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       const { length } = restaurants;
       const moreThanTwo = restaurants.length > 2;
       const remainLength = length - 2;
+
       return (
         <div className={css.restaurantName}>
           {restaurants.slice(0, 2).map((restaurantName: string) => (
@@ -227,6 +229,8 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         (state) => state.Order.deleteDraftOrderInProgress,
       );
 
+      const orderLink = getParticipantPickingLink(orderId);
+
       const navigateToDraftOrderDetailPage = () => {
         router.push({
           pathname: companyPaths.EditDraftOrder,
@@ -266,7 +270,6 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       };
 
       const handleCopyOrderLink = () => {
-        const orderLink = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderId}`;
         navigator.clipboard.writeText(orderLink);
       };
 

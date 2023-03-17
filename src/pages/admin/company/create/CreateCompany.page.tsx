@@ -10,5 +10,6 @@ export default function CreateCompanyPage() {
   useEffect(() => {
     dispatch(resetCompanySliceStates());
   }, [dispatch]);
+
   return <EditCompanyWizard />;
 }

@@ -104,7 +104,8 @@ const GroupDetailPage = () => {
         ],
         [],
       ),
-    [groupMembers],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(groupMembers)],
   );
 
   const goToGroupMemberDetailPage = (memberId: string) => () => {
@@ -168,6 +169,7 @@ const GroupDetailPage = () => {
           setDeletingMemberInfo({ id, email });
           openDeleteMemberConfirmationModal();
         };
+
         return updateGroupInProgress ? (
           <IconSpinner className={css.loading} />
         ) : (

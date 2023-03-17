@@ -17,6 +17,7 @@ const TableHeader: React.FC<TableHeaderProps> = (props) => {
     css.tableHeader,
     css[`column${columnNumber}`],
   );
+
   return (
     <thead className={tableHeaderClasses}>
       <tr>

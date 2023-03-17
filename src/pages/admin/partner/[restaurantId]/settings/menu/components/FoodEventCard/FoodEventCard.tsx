@@ -15,6 +15,7 @@ const FoodEventCard = ({
 }) => {
   const { resource, start } = event;
   const { title, onRemovePickedFood, sideDishes = [] } = resource;
+
   return (
     <div className={css.root}>
       <div className={css.title}>

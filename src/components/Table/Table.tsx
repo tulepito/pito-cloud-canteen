@@ -229,6 +229,7 @@ const Table = (props: TTableProps) => {
                   {columns.map((col: TColumn) => {
                     const rowCheckbox = values?.rowCheckbox || [];
                     const isChecked = rowCheckbox.includes(row.key);
+
                     return (
                       <td
                         className={classNames(
@@ -266,12 +267,14 @@ export const TableForm: React.FC<TTableProps> = (props) => {
   const { rootClassName, onSubmit, initialValues, exposeValues, ...rest } =
     props;
   const rootClasses = classNames(css.root, rootClassName);
+
   return (
     <FinalForm
       onSubmit={onSubmit || (() => {})}
       initialValues={initialValues}
       render={(fieldRenderProps) => {
         const { handleSubmit, form, values } = fieldRenderProps;
+
         return (
           <Form onSubmit={handleSubmit} className={rootClasses}>
             <FormSpy

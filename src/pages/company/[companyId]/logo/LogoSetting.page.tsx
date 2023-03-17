@@ -21,6 +21,7 @@ const LogoSettingPage = () => {
     await dispatch(companyThunks.updateCompanyAccount({}));
     dispatch(resetImage());
   };
+
   return (
     <div className={css.container}>
       <div className={css.header}>

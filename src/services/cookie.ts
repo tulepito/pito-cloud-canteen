@@ -16,7 +16,7 @@ const cookie = (
   res.setHeader('Set-Cookie', serialize(name, String(stringValue), options));
 };
 
-const converCookieStringToObject = (cookieString: string) => {
+const convertCookieStringToObject = (cookieString: string) => {
   const output = cookieString?.split(/\s*;\s*/).reduce((acc, pair) => {
     const newPair = pair.split(/\s*=\s*/);
     const name = decodeURIComponent(newPair[0]);
@@ -35,12 +35,14 @@ const converCookieStringToObject = (cookieString: string) => {
       ...acc,
       [name]: value,
     };
+
     return newValues;
   }, {});
+
   return output;
 };
 
-const converObjectToCookieString = (object: any) => {
+const convertObjectToCookieString = (object: any) => {
   const output = JSON.stringify(object);
   const cookieString = output
     .slice(1, output.length - 2)
@@ -61,16 +63,16 @@ const converObjectToCookieString = (object: any) => {
  */
 const cookies =
   (handler: NextApiHandler) => (req: NextApiRequest, res: any) => {
-    // eslint-disable-next-line no-param-reassign
     res.cookie = (
       name: string,
       value: string,
       options: CookieSerializeOptions,
     ) => cookie(res, name, value, options);
 
-    const output = converCookieStringToObject(req.headers.cookie || '');
+    const output = convertCookieStringToObject(req.headers.cookie || '');
 
-    req.headers.cookie = converObjectToCookieString(output);
+    req.headers.cookie = convertObjectToCookieString(output);
+
     return handler(req, res);
   };
 

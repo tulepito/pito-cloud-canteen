@@ -9,6 +9,7 @@ const getLatestSequenceId = async () => {
     res,
     'data.data.attributes.profile.privateData.latestSequenceIdForUpdateOrderState',
   );
+
   return result;
 };
 

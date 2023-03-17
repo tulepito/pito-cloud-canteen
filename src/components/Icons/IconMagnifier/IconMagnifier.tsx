@@ -10,6 +10,7 @@ const IconMagnifier: React.FC<TIconProps> = ({
   className,
   width = 24,
   height = 24,
+  onClick,
 }) => {
   const classes = classNames(rootClassName, css.root, className);
 
@@ -19,6 +20,7 @@ const IconMagnifier: React.FC<TIconProps> = ({
       className={classes}
       width={width}
       height={height}
+      onClick={onClick}
       clipRule="evenodd"
       fillRule="evenodd"
       strokeLinejoin="round"

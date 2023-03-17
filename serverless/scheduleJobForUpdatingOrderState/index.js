@@ -1,7 +1,7 @@
-/* eslint-disable import/no-unresolved */
 /* eslint-disable no-unused-vars */
 const get = require('lodash/get');
 const isEmpty = require('lodash/isEmpty');
+// eslint-disable-next-line import/no-unresolved
 const mapLimit = require('async/mapLimit');
 const {
   queryEventsByEventType,
@@ -35,6 +35,7 @@ exports.handler = async (_event, _context) => {
 
     if (isEmpty(orderList)) {
       console.info('No order need to update state ...');
+
       return;
     }
     //

@@ -10,6 +10,7 @@ export { default as ManageCompaniesPage } from './ManageCompaniesPage.slice';
 export { default as marketplaceData } from './marketplaceData.slice';
 export { default as menus } from './menus.slice';
 export { default as Order } from './Order.slice';
+export { default as OrderManagement } from './OrderManagement.slice';
 export { default as ParticipantOrderManagementPage } from './ParticipantOrderManagementPage.slice';
 export { default as partners } from './partners.slice';
 export { default as password } from './password.slice';
@@ -25,5 +26,4 @@ export { default as Nutrition } from '@pages/company/[companyId]/nutrition/Nutri
 export { default as BookerDraftOrderPage } from '@pages/company/booker/orders/draft/[orderId]/BookerDraftOrderPage.slice';
 export { default as BookerSelectRestaurant } from '@pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
 export { default as BookerNewOrderPage } from '@pages/company/booker/orders/new/BookerNewOrder.slice';
-export { default as OrderManagement } from '@pages/company/orders/[orderId]/OrderManagement.slice';
 export { default as ParticipantPlanPage } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';

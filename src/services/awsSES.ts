@@ -28,6 +28,7 @@ export const createEmailParams = (
       Data: content,
     },
   };
+
   return {
     Destination: {
       ToAddresses: toAddresses,
@@ -45,4 +46,21 @@ export const createEmailParams = (
 
 export const sendEmail = (params: SendEmailRequest) => {
   return new AWS.SES({ apiVersion: '2010-12-01' }).sendEmail(params).promise();
+};
+
+export const sendIndividualEmail = ({
+  receiver,
+  subject,
+  content,
+  sender,
+}: {
+  receiver: AddressList;
+  subject: MessageData;
+  content: MessageData;
+  sender: Address;
+}) => {
+  receiver.forEach((email) => {
+    const params = createEmailParams([email], subject, content, sender);
+    sendEmail(params);
+  });
 };

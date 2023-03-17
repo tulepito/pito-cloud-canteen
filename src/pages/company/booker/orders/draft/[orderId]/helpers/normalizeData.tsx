@@ -46,5 +46,6 @@ export const normalizePlanDetailsToEvent = (
       end: DateTime.fromMillis(Number(timestamp)).endOf('day').toJSDate(),
     };
   });
+
   return normalizeData;
 };

@@ -12,13 +12,11 @@ import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { findValidRangeForDeadlineDate } from '@helpers/orderHelper';
-import { generateTimeOptions } from '@utils/dates';
+import { TimeOptions } from '@utils/dates';
 import type { TObject } from '@utils/types';
 import { required } from '@utils/validators';
 
 import css from './OrderDeadlineField.module.scss';
-
-const TIME_OPTIONS = generateTimeOptions();
 
 type TOrderDeadlineFieldProps = {
   form: any;
@@ -88,7 +86,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
   const initialDeadlineDate = deadlineDateInitialValue
     ? new Date(deadlineDateInitialValue)
     : null;
-  const [dealineDate, setDeadlineDate] = useState<Date>(initialDeadlineDate!);
+  const [deadlineDate, setDeadlineDate] = useState<Date>(initialDeadlineDate!);
   const deadlineDateRequired = intl.formatMessage({
     id: 'OrderDeadlineField.deadlineDateRequired',
   });
@@ -116,8 +114,9 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
 
   const deadlineDateClasses = classNames(
     css.customInput,
-    !dealineDate && css.placeholder,
+    !deadlineDate && css.placeholder,
   );
+
   return (
     <div className={containerClasses}>
       {title && <div className={css.fieldTitle}>{title}</div>}
@@ -126,7 +125,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
         <FieldDatePicker
           id="deadlineDate"
           name="deadlineDate"
-          selected={dealineDate}
+          selected={deadlineDate}
           onChange={(date: Date) => setDeadlineDate(date)}
           className={deadlineDateClasses}
           label={
@@ -159,7 +158,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
               id: 'OrderDeadlineField.deadlineHour.placeholder',
             })}
           </option>
-          {TIME_OPTIONS.map((option) => (
+          {TimeOptions.map((option) => (
             <option key={option} value={option}>
               {option}
             </option>

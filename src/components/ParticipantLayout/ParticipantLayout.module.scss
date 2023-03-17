@@ -3,13 +3,13 @@
 .root {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 24px 24px 0;
+  padding: 0 24px;
 
   @include viewportMedium {
-    padding: 40px 48px;
+    padding: 0 48px;
   }
 
   @include viewportLarge {
-    padding: 40px 60px;
+    padding: 0 60px;
   }
 }

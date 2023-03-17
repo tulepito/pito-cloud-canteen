@@ -71,6 +71,7 @@ const fetchSelectedRestaurant = createAsyncThunk(
         'variants.square-small2x',
       ],
     });
+
     return denormalisedResponseEntities(response)[0];
   },
 );
@@ -90,6 +91,7 @@ const fetchFoodFromRestaurant = createAsyncThunk(
       ...restaurantFoodList,
       [restaurantId]: result,
     };
+
     return newRestaurantFoodList;
   },
 );
@@ -102,6 +104,7 @@ const fetchTotalRating = createAsyncThunk(
       type: 'ofCustomer',
     });
     const result = denormalisedResponseEntities(response);
+
     return result.length;
   },
 );
@@ -123,12 +126,14 @@ const searchFoodInRestaurant = createAsyncThunk(
       ...restaurantFoodList,
       [restaurantId]: result,
     };
+
     return newRestaurantFoodList;
   },
 );
 
 const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
   const { data: searchFiltersResponse } = await fetchSearchFilterApi();
+
   return searchFiltersResponse;
 });
 

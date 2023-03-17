@@ -144,6 +144,7 @@ const EditPartnerPage = () => {
   useEffect(() => {
     if (!restaurantId) return;
     dispatch(partnerThunks.showPartnerRestaurantListing(restaurantId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurantId]);
 
   let content;

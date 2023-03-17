@@ -47,6 +47,7 @@ const tabItems = [
 const IconVoucher: React.FC<TIconProps> = (props) => {
   const { rootClassName, className, ...rest } = props;
   const classes = classNames(rootClassName, className);
+
   return (
     <svg
       width={22}

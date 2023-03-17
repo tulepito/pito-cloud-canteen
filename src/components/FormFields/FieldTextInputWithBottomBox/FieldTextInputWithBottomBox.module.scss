@@ -4,6 +4,7 @@
 
 .inputContainer {
   @include inputContainerStyles;
+  margin-bottom: 10px;
 }
 
 .labelRoot {
@@ -20,8 +21,7 @@
 .boxValue {
   padding: 4px 9px;
   border-radius: 4px;
-  display: inline-flex;
-  margin-top: 8px;
+  display: flex;
   align-items: center;
   gap: 11px;
   background-color: $neutralGray3;
@@ -35,4 +35,15 @@
 
   width: 6px;
   height: 6px;
+}
+
+.input {
+  width: 100% !important;
+}
+
+.fieldList {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
 }

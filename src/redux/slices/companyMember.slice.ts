@@ -73,6 +73,7 @@ const queryCompanyMembers = createAsyncThunk(
   QUERY_COMPANY_MEMBERS,
   async (id: string) => {
     const { data } = await queryCompanyMembersApi(id);
+
     return data;
   },
   {
@@ -86,9 +87,11 @@ const checkEmailExisted = createAsyncThunk(
     const response = await Promise.all(
       emailList.map(async (email) => {
         const { data: queryResponse } = await checkEmailExistedApi(email);
+
         return { email, response: queryResponse };
       }),
     );
+
     return response;
   },
 );
@@ -102,6 +105,7 @@ const addMembers = createAsyncThunk(
       companyId: workspaceCompanyId,
     });
     await dispatch(companyThunks.companyInfo());
+
     return addMembersResponse;
   },
 );
@@ -118,6 +122,7 @@ const adminAddMembers = createAsyncThunk(
     });
     await dispatch(queryCompanyMembers(companyId));
     dispatch(companySlice.actions.renewCompanyState(data));
+
     return data;
   },
   {
@@ -133,6 +138,7 @@ const deleteMember = createAsyncThunk(
       memberEmail: email,
       companyId: workspaceCompanyId,
     });
+
     return deleteMemberData;
   },
 );
@@ -149,6 +155,7 @@ const adminDeleteMember = createAsyncThunk(
     });
     await dispatch(queryCompanyMembers(companyId));
     dispatch(companySlice.actions.renewCompanyState(data));
+
     return data;
   },
   { serializeError: storableAxiosError },
@@ -160,6 +167,7 @@ const adminUpdateMemberPermission = createAsyncThunk(
     const { data } = await adminUpdateMemberPermissionApi(params);
     await dispatch(queryCompanyMembers(params.companyId));
     dispatch(companySlice.actions.renewCompanyState(data));
+
     return data;
   },
   { serializeError: storableAxiosError },

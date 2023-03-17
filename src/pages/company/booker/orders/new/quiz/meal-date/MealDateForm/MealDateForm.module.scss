@@ -3,8 +3,18 @@
 @use '/src/styles/mixins.scss' as *;
 
 .fieldContainer {
-  margin: 0 auto;
+  margin: 24px auto 0;
   width: fit-content;
+}
+
+.fieldTitle {
+  @include textTemplate(14px, $fontWeightRegular, 20px);
+}
+
+.fieldGroups {
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
 }
 
 .separatorLine {

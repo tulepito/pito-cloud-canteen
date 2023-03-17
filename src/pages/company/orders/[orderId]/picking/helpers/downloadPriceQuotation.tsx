@@ -1,10 +1,10 @@
 import ReactDOM from 'react-dom';
 
+import PriceQuotation from '@components/OrderDetails/PriceQuotation/PriceQuotation';
 import { createNewPrint } from '@services/pdf';
 import TranslationProvider from '@translations/TranslationProvider';
 import type { TObject } from '@utils/types';
 
-import BookerOrderDetailsPriceQuotation from '../components/BookerOrderDetailsPriceQuotation/BookerOrderDetailsPriceQuotation';
 import type { usePrepareOrderDetailPageData } from '../hooks/usePrepareData';
 
 export const downloadPriceQuotation =
@@ -16,7 +16,7 @@ export const downloadPriceQuotation =
   async () => {
     const ele = (
       <TranslationProvider>
-        <BookerOrderDetailsPriceQuotation data={priceQuotationData} />
+        <PriceQuotation data={priceQuotationData} />
       </TranslationProvider>
     );
     const div = document.createElement('div');

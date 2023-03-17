@@ -1,0 +1,60 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+@mixin cartColumnsLayout {
+  padding: 8px 16px;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  flex-direction: row;
+  column-gap: 2%;
+
+  & > div {
+    word-break: break-word;
+  }
+
+  & > div:nth-of-type(1) {
+    flex-basis: 30px;
+    text-align: center;
+  }
+  & > div:nth-of-type(2) {
+    flex-grow: 1;
+  }
+  & > div:nth-of-type(3) {
+    flex-basis: 140px;
+    text-align: right;
+  }
+}
+
+.cartSection {
+  padding-top: 20px;
+
+  .sectionTitle {
+    @include textTemplate(12px, 700, 16px);
+    margin-bottom: 16px;
+  }
+
+  .sectionContentContainer {
+    border: 1px solid $neutralGray3;
+    border-radius: 8px;
+    overflow: hidden;
+
+    .tableHead {
+      @include cartColumnsLayout;
+      background-color: $neutralGray2;
+      @include textTemplate(10px, 700, 16px);
+      border-bottom: 1px solid $neutralGray4;
+    }
+
+    .tableRow {
+      @include cartColumnsLayout;
+      @include textTemplate(12px, 400, 16px);
+      border-bottom: 1px solid $neutralGray3;
+
+      &:last-of-type {
+        border-bottom: none;
+        @include textTemplate(14px, 700, 20px);
+      }
+    }
+  }
+}

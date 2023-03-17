@@ -22,7 +22,7 @@ export const apiBaseUrl = () => {
 
 export const getApi = (path: string, params: TObject = {}) => {
   // get 'JSONParams' in req.query, remember using JSON.parse()
-  // to convert JSONParams in to params
+  // to convert JSONParams into params
 
   return axios.get(`${apiBaseUrl()}${path}`, {
     ...(params ? { params: { JSONParams: JSON.stringify(params) } } : {}),
@@ -52,6 +52,7 @@ export enum HttpMethod {
   POST = 'POST',
   PUT = 'PUT',
   DELETE = 'DELETE',
+  OPTIONS = 'OPTIONS',
 }
 
 type TApiCheckerFunction = (

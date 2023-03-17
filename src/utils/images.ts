@@ -24,6 +24,7 @@ export const pickRenderableImages = (
       imgs.imageEntities.push(img);
       imgs.imageIds.push(imgId);
     }
+
     return imgs;
   };
 
@@ -64,6 +65,7 @@ export const pickRenderableImagesByProperty = (
       imgs.imageEntities.push(img);
       imgs.imageIds.push(imgId);
     }
+
     return imgs;
   };
 
@@ -105,6 +107,7 @@ export const pickRenderableLicenseImagesByProperty = (
       imgs.imageEntities.push(img);
       imgs.imageIds.push(imgId);
     }
+
     return imgs;
   };
 
@@ -124,6 +127,7 @@ export const getUniqueImages = (images: any[]) => {
       resArr.push(item);
     }
   });
+
   return resArr;
 };
 
@@ -134,7 +138,7 @@ export const getSubmitImageId = (images: any) => {
 export const getInitialAddImages = (images: any[] = []) => {
   const newImages = [...images];
   const missingLength = 5 - newImages.length;
-  // eslint-disable-next-line no-plusplus
+
   for (let i: number = 0; i < missingLength; i++) {
     newImages.push('');
   }

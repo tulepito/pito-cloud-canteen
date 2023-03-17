@@ -8,7 +8,6 @@
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
-    "source.fixAll.fortmat": true
+    "source.fixAll": true
   }
 }

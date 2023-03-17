@@ -57,7 +57,7 @@ export const getMenuQuery = ({
           )}`,
         }
       : {}),
-    [`pub_${dayOfWeek}AverageFoodPrice`]: `1000,${packagePerMember}`,
+    [`pub_${dayOfWeek}MinFoodPrice`]: `,${packagePerMember}`,
   };
 
   return query;

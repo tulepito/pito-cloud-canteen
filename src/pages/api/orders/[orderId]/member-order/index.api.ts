@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { HttpMethod } from '@apis/configs';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -7,7 +8,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const integrationSdk = getIntegrationSdk();
 
   switch (apiMethod) {
-    case 'PUT':
+    case HttpMethod.PUT:
       try {
         const { planId, orderDetail } = req.body;
 
@@ -31,4 +32,5 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       break;
   }
 };
+
 export default handler;

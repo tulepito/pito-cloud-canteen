@@ -25,7 +25,7 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
   {
     id: 'order',
     Icon: IconOrderManagement,
-    nameLink: adminRoutes.CreateOrder.path,
+    nameLink: adminRoutes.ManageOrders.path,
     label: 'AdminSidebar.orderLabel',
     isFirstLevel: true,
     childrenMenus: [
@@ -162,6 +162,7 @@ const AdminSidebar: React.FC<TAdminSidebarProps> = (props) => {
             const { Icon, id, nameLink } = item;
 
             const isActive = activeMenu?.id === item.id;
+
             return (
               <NamedLink
                 path={nameLink}

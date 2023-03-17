@@ -1,5 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
@@ -10,11 +12,13 @@ import {
   isEnableSubmitPublishOrder,
 } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useRestaurantDetailModal from '@hooks/useRestaurantDetailModal';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { QuizActions } from '@redux/slices/Quiz.slice';
 import { companyPaths } from '@src/paths';
-import { Listing } from '@utils/data';
+import { Listing, User } from '@utils/data';
 import { EBookerOrderDraftStates, EOrderDraftStates } from '@utils/enums';
-import type { TListing } from '@utils/types';
+import type { TListing, TUser } from '@utils/types';
 
 import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
@@ -22,11 +26,14 @@ import LayoutSidebar from '../../components/Layout/LayoutSidebar';
 
 import SidebarContent from './components/SidebarContent/SidebarContent';
 import { useGetPlanDetails, useLoadData } from './hooks/loadData';
+import { BookerSelectRestaurantThunks } from './restaurants/BookerSelectRestaurant.slice';
+import ResultDetailModal from './restaurants/components/ResultDetailModal/ResultDetailModal';
 import {
   useGetCalendarComponentProps,
   useGetCalendarExtraResources,
 } from './restaurants/hooks/calendar';
 import { useGetBoundaryDates } from './restaurants/hooks/dateTime';
+import { useGetOrder } from './restaurants/hooks/orderData';
 
 import css from './BookerDraftOrder.module.scss';
 
@@ -39,12 +46,42 @@ function BookerDraftOrderPage() {
   const router = useRouter();
   const { orderId } = router.query;
   const [collapse, setCollapse] = useState(false);
-
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>('');
+  const [selectedTimestamp, setSelectedTimestamp] = useState<number>(0);
   const dispatch = useAppDispatch();
 
   const { order, companyAccount } = useLoadData({
     orderId: orderId as string,
   });
+  useGetOrder({ orderId: orderId as string });
+
+  const restaurantFood = useAppSelector(
+    (state) => state.BookerSelectRestaurant.restaurantFood,
+    shallowEqual,
+  );
+  const fetchRestaurantFoodInProgress = useAppSelector(
+    (state) => state.BookerSelectRestaurant.fetchRestaurantFoodInProgress,
+  );
+  const searchInProgress = useAppSelector(
+    (state) => state.BookerSelectRestaurant.searchInProgress,
+  );
+
+  const {
+    isRestaurantDetailModalOpen,
+    openRestaurantDetailModal,
+    closeRestaurantDetailModal,
+    menuId,
+    totalRatings,
+    restaurants,
+  } = useRestaurantDetailModal();
+
+  const companyGeoOrigin = useMemo(
+    () => ({
+      ...User(companyAccount as TUser).getPublicData()?.location?.origin,
+    }),
+    [companyAccount],
+  );
+
   const {
     orderState,
     plans = [],
@@ -118,7 +155,12 @@ function BookerDraftOrderPage() {
     endDate,
     isFinishOrderDisabled,
     handleFinishOrder,
+    order,
   });
+
+  useEffect(() => {
+    dispatch(QuizActions.clearQuizData());
+  }, []);
 
   useEffect(() => {
     if (!isEmpty(orderState)) {
@@ -131,8 +173,47 @@ function BookerDraftOrderPage() {
         });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, orderState]);
+
+  const onOpenPickFoodModal = async (
+    dateTime: any,
+    restaurantId: string,
+    menuId: string,
+  ) => {
+    setSelectedRestaurantId(restaurantId);
+    setSelectedTimestamp(+dateTime);
+    await dispatch(
+      BookerSelectRestaurantThunks.searchRestaurants({
+        timestamp: +dateTime,
+        orderId: orderId as string,
+      }),
+    );
+    await dispatch(
+      BookerSelectRestaurantThunks.fetchFoodListFromRestaurant({
+        restaurantId,
+        menuId,
+        timestamp: +dateTime,
+      }),
+    );
+    openRestaurantDetailModal();
+  };
+  const onEditFoodInProgress = (timestamp: number) => {
+    return (
+      (searchInProgress || fetchRestaurantFoodInProgress) &&
+      selectedTimestamp === timestamp
+    );
+  };
+
+  const onSearchSubmit = (keywords: string, _restaurantId: string) => {
+    dispatch(
+      BookerSelectRestaurantThunks.fetchFoodListFromRestaurant({
+        keywords,
+        restaurantId: selectedRestaurantId,
+        menuId,
+        timestamp: selectedTimestamp,
+      }),
+    );
+  };
 
   return (
     <Layout className={css.root}>
@@ -159,10 +240,27 @@ function BookerDraftOrderPage() {
             )}
             companyLogo="Company"
             hideMonthView
-            resources={calendarExtraResources}
+            resources={{
+              ...calendarExtraResources,
+              onEditFood: onOpenPickFoodModal,
+              editFoodInprogress: onEditFoodInProgress,
+            }}
             components={componentsProps}
           />
         </div>
+        <ResultDetailModal
+          isOpen={isRestaurantDetailModalOpen}
+          onClose={closeRestaurantDetailModal}
+          restaurantFood={restaurantFood}
+          selectedRestaurantId={selectedRestaurantId}
+          restaurants={restaurants}
+          companyGeoOrigin={companyGeoOrigin}
+          totalRatings={totalRatings}
+          onSearchSubmit={onSearchSubmit}
+          fetchFoodInProgress={fetchRestaurantFoodInProgress}
+          openFromCalendar
+          timestamp={selectedTimestamp}
+        />
       </LayoutMain>
     </Layout>
   );

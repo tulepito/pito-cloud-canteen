@@ -26,6 +26,7 @@ const CompanyDetailPage = () => {
   if (isCompanyNotFound) {
     return <div>Khong tim thay cong ty nay, xin vui long thu lai.</div>;
   }
+
   return <div>Thong tin tai khoan</div>;
 };
 

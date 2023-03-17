@@ -12,6 +12,8 @@
     "check-lint": "eslint . --ext ts --ext tsx --ext js",
     "format": "prettier --write .",
     "test-all": "yarn check-format && yarn check-lint && yarn check-types && yarn build",
+    "fix-lint": "eslint . --fix --ext ts --ext tsx --ext js",
+    "fix-all": "prettier --write . && eslint . --fix --ext ts --ext tsx --ext js",
     "prepare": "husky install"
   },
   "dependencies": {
@@ -36,7 +38,6 @@
     "luxon": "^3.2.0",
     "memoize": "^0.1.1",
     "next": "13.0.6",
-    "next-redux-wrapper": "^8.0.0",
     "next-router-mock": "^0.9.1-beta.0",
     "next-seo": "^5.15.0",
     "nprogress": "^0.2.0",
@@ -47,7 +48,6 @@
     "rc-tooltip": "^5.2.2",
     "react": "^18.2.0",
     "react-big-calendar": "^1.5.2",
-    "react-csv": "^2.2.2",
     "react-datepicker": "^4.8.0",
     "react-dates": "^21.8.0",
     "react-dom": "18.2.0",
@@ -64,7 +64,7 @@
     "sharetribe-flex-integration-sdk": "^1.9.0",
     "sharetribe-flex-sdk": "^1.17.0",
     "shelljs": "^0.8.5",
-    "uuid": "^9.0.0"
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/cookie": "^0.5.1",

@@ -11,6 +11,7 @@ type TErrorMessageProps = {
 const ErrorMessage: React.FC<TErrorMessageProps> = (props) => {
   const { className, message } = props;
   const classes = classNames(css.root, className);
+
   return <p className={classes}>{message}</p>;
 };
 

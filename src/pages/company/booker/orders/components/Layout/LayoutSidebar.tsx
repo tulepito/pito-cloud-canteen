@@ -22,6 +22,7 @@ const LayoutSidebar: React.FC<TLayoutSidebarProps> = ({
   const classes = classNames(css.root, className, {
     [css.collapse]: collapse,
   });
+
   return (
     <div className={classes}>
       <div className={css.header}>

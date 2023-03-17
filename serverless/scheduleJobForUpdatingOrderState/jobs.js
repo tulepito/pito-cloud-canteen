@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-return */
 const { OrderStates } = require('./utils/constants');
 const { denormalisedResponseEntities } = require('./utils/data');
 const { integrationSdk } = require('./utils/sdk');
@@ -17,6 +16,7 @@ const completeOrder = async (orderId) => {
 
   if (orderState !== OrderStates.inProgress) {
     console.error('Order is not in progress, skip complete order');
+
     return;
   }
 

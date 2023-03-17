@@ -2,7 +2,7 @@ import compact from 'lodash/compact';
 import difference from 'lodash/difference';
 import { DateTime } from 'luxon';
 
-import { createEmailParams, sendEmail } from '@services/awsSES';
+import { sendIndividualEmail } from '@services/awsSES';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
@@ -49,6 +49,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
         },
       });
       const { email: userEmail } = User(userAccount).getAttributes();
+
       return {
         [userEmail]: {
           id: userId,
@@ -124,14 +125,8 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     content: newParticipantMembersEmailTemplate,
     sender: systemSenderEmail as string,
   };
-  const hasFlexAccountEmailParams = createEmailParams(
-    hasFlexAccountEmailParamsData.receiver,
-    hasFlexAccountEmailParamsData.subject,
-    hasFlexAccountEmailParamsData.content,
-    hasFlexAccountEmailParamsData.sender,
-  );
   if (hasFlexAccountEmailParamsData.receiver.length > 0) {
-    sendEmail(hasFlexAccountEmailParams);
+    sendIndividualEmail(hasFlexAccountEmailParamsData);
   }
   // Step handle send email for new no account members
 
@@ -141,15 +136,10 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     content: newParticipantMembersEmailTemplate,
     sender: systemSenderEmail as string,
   };
-  const noFlexAccountEmailParams = createEmailParams(
-    noFlexAccountEmailParamsData.receiver,
-    noFlexAccountEmailParamsData.subject,
-    noFlexAccountEmailParamsData.content,
-    noFlexAccountEmailParamsData.sender,
-  );
   if (noFlexAccountEmailParamsData.receiver.length > 0) {
-    sendEmail(noFlexAccountEmailParams);
+    sendIndividualEmail(noFlexAccountEmailParamsData);
   }
+
   return updatedCompanyAccount;
 };
 

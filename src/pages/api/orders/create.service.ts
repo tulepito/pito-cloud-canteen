@@ -5,6 +5,7 @@ import getAdminAccount from '@services/getAdminAccount';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { ListingTypes } from '@src/types/listingTypes';
+import { formatTimestamp } from '@src/utils/dates';
 import { denormalisedResponseEntities } from '@utils/data';
 import {
   EBookerOrderDraftStates,
@@ -44,6 +45,7 @@ const createOrder = async ({
   const companyAccount = await fetchUser(companyId);
 
   const { subAccountId } = companyAccount.attributes.profile.privateData;
+  const companyDisplayName = companyAccount.attributes.profile.displayName;
 
   const generatedOrderId = `PT${(currentOrderNumber + 1)
     .toString()
@@ -73,6 +75,8 @@ const createOrder = async ({
     memberAmount,
     deadlineDate,
   } = generalInfo;
+
+  const shouldUpdateOrderName = companyDisplayName && startDate && endDate;
 
   const participants: string[] = isEmpty(selectedGroups)
     ? getAllCompanyMembers(companyAccount)
@@ -105,6 +109,15 @@ const createOrder = async ({
         endDate,
         participants,
       },
+      ...(shouldUpdateOrderName
+        ? {
+            publicData: {
+              orderName: `${companyDisplayName} PCC_${formatTimestamp(
+                generalInfo.startDate,
+              )} - ${formatTimestamp(generalInfo.endDate)}`,
+            },
+          }
+        : {}),
     },
     { expand: true },
   );

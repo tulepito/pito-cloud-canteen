@@ -2,8 +2,8 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
+import InActiveUserScreen from '@components/InActiveUserScreen/InActiveUserScreen';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
-import UnactiveUserScreen from '@components/UnactiveUserScreen/UnactiveUserScreen';
 
 import { getLayoutBaseOnPermission } from './Guards.helper';
 import useActiveCompany from './useActiveCompany';
@@ -16,15 +16,15 @@ const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
   const { children } = props;
   const { isIgnoredPermissionCheck, userPermission, isMatchedPermission } =
     useVerifyPermission();
-  const { isCompanyUnactive } = useActiveCompany();
+  const { isInactiveCompany } = useActiveCompany();
 
   const renderComponent = () => {
     if (isIgnoredPermissionCheck) {
       return children;
     }
 
-    if (isCompanyUnactive) {
-      return <UnactiveUserScreen />;
+    if (isInactiveCompany) {
+      return <InActiveUserScreen />;
     }
 
     const LayoutWrapper = getLayoutBaseOnPermission(userPermission);

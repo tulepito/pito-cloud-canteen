@@ -137,6 +137,7 @@ const ContactPointProfileFormComponent: React.FC<
   const onImageUpload = async ({ id, file }: TImageActionPayload) => {
     await dispatch(uploadImageThunks.uploadImage({ id, file }));
   };
+
   return (
     <Form className={css.container} onSubmit={handleSubmit}>
       <div className={css.avatar}>

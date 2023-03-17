@@ -22,7 +22,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       await sdk.currentUser.show(),
     )[0];
     const { email: userEmail } = User(currentUser).getAttributes();
-    const { company: userCompany = {} } = User(currentUser).getMetadata();
+    const { company: userCompany = {}, companyList = [] } =
+      User(currentUser).getMetadata();
     const userId = User(currentUser).getId();
 
     const companyAccount = await fetchUser(companyId);
@@ -54,6 +55,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           members: newMembers,
         },
       });
+
       return res.json({
         message: 'userDecline',
       });
@@ -73,9 +75,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         members: newMembers,
       },
     });
+    const newCompanyList = Array.from(new Set(companyList).add(companyId));
     await integrationSdk.users.updateProfile({
       id: userId,
       metadata: {
+        companyList: newCompanyList,
         company: {
           ...userCompany,
           [companyId]: {
@@ -84,6 +88,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         },
       },
     });
+
     return res.json({
       message: 'userAccept',
     });

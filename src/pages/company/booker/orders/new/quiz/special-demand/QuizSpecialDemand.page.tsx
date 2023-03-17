@@ -67,6 +67,7 @@ const QuizSpecialDemand = () => {
     }),
     [JSON.stringify(quizData.nutritions), JSON.stringify(nutritions)],
   );
+
   return (
     <QuizModal
       id="QuizSpecialDemand"

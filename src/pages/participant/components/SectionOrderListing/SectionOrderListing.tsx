@@ -34,6 +34,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
   const cartList = useAppSelector((state) => {
     const { currentUser } = state.user;
     const currUserId = currentUser?.id?.uuid;
+
     return state.shoppingCart.orders?.[currUserId]?.[`${planId}` || 1];
   });
   const order = useAppSelector((state) => state.ParticipantPlanPage.order);
@@ -117,6 +118,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
   const defaultActiveKey = tabItems.findIndex(
     (item: any) => item.id === orderDay,
   );
+
   return (
     <div className={css.root}>
       <div className={css.sectionOrderNotify}>

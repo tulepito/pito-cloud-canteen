@@ -9,11 +9,13 @@ type TBookerDraftOrderPageState = {
   companyAccount: TUser | null;
   fetchCompanyAccountInProgress: boolean;
   fetchCompanyAccountError: any;
+  selectedCalendarDate: Date;
 };
 const initialState: TBookerDraftOrderPageState = {
   companyAccount: null,
   fetchCompanyAccountInProgress: false,
   fetchCompanyAccountError: null,
+  selectedCalendarDate: undefined!,
 };
 
 // ================ Thunk types ================ //
@@ -46,7 +48,12 @@ export const BookerDraftOrderPageThunks = {
 const BookerDraftOrderPageSlice = createSlice({
   name: 'BookerDraftOrderPage',
   initialState,
-  reducers: {},
+  reducers: {
+    selectCalendarDate: (state, { payload }) => ({
+      ...state,
+      selectedCalendarDate: payload,
+    }),
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCompanyAccount.pending, (state) => {

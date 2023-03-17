@@ -9,6 +9,7 @@ const ParticipantLayout: React.FC<PropsWithChildren<TParticipantLayout>> = (
   props,
 ) => {
   const { children } = props;
+
   return <div className={css.root}>{children}</div>;
 };
 

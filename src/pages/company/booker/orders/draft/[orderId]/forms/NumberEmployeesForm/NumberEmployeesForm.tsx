@@ -21,6 +21,7 @@ const validate = (values: TNumberEmployeesFormValues) => {
   if (!values.memberAmount) {
     errors.memberAmount = 'Vui lòng chọn số lượng nhân viên';
   }
+
   return errors;
 };
 

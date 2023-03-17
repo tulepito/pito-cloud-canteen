@@ -15,12 +15,14 @@ type TMealPlanCardHeaderProps = {
   event: Event;
   removeInprogress?: boolean;
   removeEventItem?: (resourceId: string) => void;
+  onSearchRestaurant?: (date: Date) => void;
 };
 
 const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
   event,
   removeInprogress,
   removeEventItem,
+  onSearchRestaurant,
 }) => {
   const session = event.resource?.daySession;
   const resourceId = event.resource?.id;
@@ -39,6 +41,10 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
     setIsOpenDeleteModal(false);
   };
 
+  const handleSearchRestaurant = () => {
+    onSearchRestaurant?.(event?.start!);
+  };
+
   return (
     <div className={css.header}>
       <div className={css.planTitle}>
@@ -49,7 +55,10 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
         <IconUser />
         <div className={css.suitableAmount}>{''}</div>
         <div className={css.verticalDivider} />
-        <IconMagnifier className={css.searchIcon} />
+        <IconMagnifier
+          className={css.searchIcon}
+          onClick={handleSearchRestaurant}
+        />
       </div>
       <DeleteMealModal
         id="DeleteMealModal"

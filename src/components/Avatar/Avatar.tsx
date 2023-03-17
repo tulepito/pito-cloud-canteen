@@ -72,6 +72,7 @@ const Avatar: React.FC<TAvatarProps> = (props) => {
   const defaultUserDisplayNameFn = () => {
     if (isBannedUser) return bannedUserDisplayName;
     if (isDeletedUser) return deletedUserDisplayName;
+
     return '';
   };
 
@@ -137,6 +138,7 @@ const Avatar: React.FC<TAvatarProps> = (props) => {
       </Link>
     );
   }
+
   // Placeholder avatar (initials)
   return (
     <div {...rootProps}>

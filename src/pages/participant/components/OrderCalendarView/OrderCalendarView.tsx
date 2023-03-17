@@ -7,12 +7,15 @@ import { DateTime } from 'luxon';
 import Avatar from '@components/Avatar/Avatar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
+import { getDaySessionFromDeliveryTime } from '@src/utils/dates';
 import { CurrentUser, Listing, User } from '@utils/data';
 import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 
+import ParticipantToolbar from '../ParticipantToolbar/ParticipantToolbar';
+
 import css from './OrderCalendarView.module.scss';
 
-type TOrderCalendarView = {
+type TOrderCalendarViewProps = {
   company: TUser;
   order: TListing;
   plans?: TListing[];
@@ -23,7 +26,7 @@ type TOrderCalendarView = {
 
 type TPlanItem = TObject;
 
-const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
+const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const { company, order, subOrders, currentUser, plans, loadDataInProgress } =
     props;
 
@@ -34,7 +37,8 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
   const orderTile = orderObj.getAttributes().title;
   const currentUserId = CurrentUser(currentUser).getId();
 
-  const { deadlineDate, deliveryHour, startDate } = orderObj.getMetadata();
+  const { deadlineDate, deliveryHour, startDate, endDate } =
+    orderObj.getMetadata();
   const [anchorTime, setAnchorTime] = useState<number | undefined>();
 
   const anchorDate =
@@ -75,7 +79,7 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
           id: `${planItemKey}`,
           subOrderId: planKey,
           orderId,
-          daySession: 'MORNING_SESSION',
+          daySession: getDaySessionFromDeliveryTime(deliveryHour),
           status: pickFoodStatus,
           type: 'dailyMeal',
           deliveryAddress: Listing(restaurant).getPublicData().location,
@@ -116,14 +120,29 @@ const OrderCalendarView: React.FC<TOrderCalendarView> = (props) => {
     </div>
   );
 
+  const handleAnchorDateChange = (date?: Date) => {
+    setAnchorTime(date?.getTime());
+  };
+
   return (
-    <div>
+    <div className={css.container}>
       <CalendarDashboard
         anchorDate={anchorDate}
         events={flattenEvents}
         companyLogo={sectionCompanyBranding}
         renderEvent={OrderEventCard}
         inProgress={loadDataInProgress}
+        exposeAnchorDate={handleAnchorDateChange}
+        components={{
+          toolbar: (toolBarProps: any) => (
+            <ParticipantToolbar
+              {...toolBarProps}
+              startDate={new Date(startDate)}
+              endDate={new Date(endDate)}
+              anchorDate={anchorDate}
+            />
+          ),
+        }}
       />
     </div>
   );

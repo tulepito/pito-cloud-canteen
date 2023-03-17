@@ -1,18 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { composeApiCheckers } from '@apis/configs';
+import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import orderChecker from '@services/permissionChecker/order';
+import validOrderParams from '@services/permissionChecker/validOrderParams';
 import { handleError } from '@services/sdk';
-
-import { HTTP_METHODS } from '../helpers/constants';
 
 import createPlan from './[orderId]/plan/create.service';
 import createOrder from './create.service';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
+
   switch (apiMethod) {
-    case HTTP_METHODS.POST:
+    case HttpMethod.POST:
       try {
         const { companyId, bookerId, isCreatedByAdmin, generalInfo } = req.body;
 
@@ -27,6 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           orderDetail: {},
         });
         orderListing.attributes.metadata.plans = [planListing.id.uuid];
+
         return res.json(orderListing);
       } catch (error) {
         handleError(res, error);
@@ -37,4 +38,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default composeApiCheckers(orderChecker)(handler);
+export default composeApiCheckers(orderChecker, validOrderParams)(handler);

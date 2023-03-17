@@ -54,6 +54,7 @@ const ParticipantSetupField: React.FC<ParticipantSetupFieldProps> = (props) => {
       });
     }
   };
+
   return (
     <div className={css.container}>
       {title && <div className={css.fieldTitle}>{title}</div>}

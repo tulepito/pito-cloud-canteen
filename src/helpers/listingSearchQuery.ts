@@ -6,7 +6,7 @@ import { deliveryDaySessionAdapter } from '@helpers/orderHelper';
 import { ListingTypes } from '@src/types/listingTypes';
 import { Listing, User } from '@utils/data';
 import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
-import { EImageVariants } from '@utils/enums';
+import { EImageVariants, ERestaurantListingStatus } from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
 
 export type TMenuQueryParams = {
@@ -71,7 +71,7 @@ export const getMenuQuery = ({
           )}`,
         }
       : {}),
-    [`pub_${dayOfWeek}AverageFoodPrice`]: `1000,${packagePerMember}`,
+    [`pub_${dayOfWeek}minFoodPrice`]: `,${packagePerMember}`,
     ...(keywords && { keywords }),
     ...(page && { page }),
     ...(perPage && { perPage }),
@@ -122,6 +122,7 @@ export const getRestaurantQuery = ({
     ...(packaging.length > 0 && {
       pub_packaging: `has_any:${packaging.join(',')}`,
     }),
+    meta_status: ERestaurantListingStatus.authorized,
     include: ['images'],
     'fields.image': [
       `variants.${EImageVariants.default}`,
@@ -135,4 +136,39 @@ export const getRestaurantQuery = ({
     query,
     restaurantIds: newRestaurantIds,
   };
+};
+
+export const getMenuQueryInSpecificDay = ({
+  order,
+  timestamp,
+}: {
+  order: TListing | null;
+  timestamp: number;
+}) => {
+  const {
+    deliveryHour,
+    nutritions = [],
+    packagePerMember,
+  } = Listing(order as TListing).getMetadata();
+  const dateTime = DateTime.fromMillis(timestamp);
+  const dayOfWeek = convertWeekDay(dateTime.weekday).key;
+  const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
+  const mealType = deliveryDaySessionAdapter(deliveryDaySession);
+  const query = {
+    meta_listingState: 'published',
+    meta_listingType: ListingTypes.MENU,
+    pub_startDate: `,${dateTime.toMillis()}`,
+    pub_endDate: `${dateTime.toMillis()},`,
+    pub_daysOfWeek: `has_any:${dayOfWeek}`,
+    pub_mealType: mealType,
+    meta_isDeleted: false,
+    ...(nutritions.length > 0
+      ? {
+          [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(',')}`,
+        }
+      : {}),
+    [`pub_${dayOfWeek}minFoodPrice`]: `,${packagePerMember}`,
+  };
+
+  return query;
 };

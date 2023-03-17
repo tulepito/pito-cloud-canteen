@@ -2,6 +2,7 @@ import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
@@ -13,7 +14,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
   const apiMethod = req.method;
   switch (apiMethod) {
-    case 'POST':
+    case HttpMethod.POST:
       try {
         const {
           query: { orderId = '' },
@@ -43,6 +44,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             errorCode: 'user_not_found',
             message: `Email ${email} chưa có tài khoản`,
           });
+
           return;
         }
 
@@ -58,6 +60,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             errorCode: 'user_already_in_list',
             message: `Đã tồn tại trong danh sách thành viên`,
           });
+
           return;
         }
 
@@ -66,6 +69,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             errorCode: 'user_not_belong_to_company',
             message: `Thanh viên không thuộc công ty`,
           });
+
           return;
         }
 
@@ -112,7 +116,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         handleError(res, error);
       }
       break;
-    case 'DELETE':
+    case HttpMethod.DELETE:
       try {
         const {
           query: { orderId = '' },

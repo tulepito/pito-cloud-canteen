@@ -357,7 +357,7 @@ export const PACKAGING_OPTIONS = [
   },
   {
     key: EPackagingMaterials.PLASTIC_BOX,
-    label: 'Nhựa xốp',
+    label: 'Nhựa, xốp',
   },
   {
     key: EPackagingMaterials.BAGASSE_BOX,
@@ -373,7 +373,7 @@ export const PACKAGING_OPTIONS = [
   },
   {
     key: EPackagingMaterials.REUSABLE_BOX,
-    label: 'Hộp ăn tái sử dụng',
+    label: 'Bao bì có thể tái sử dụng',
   },
   {
     key: OTHER_OPTION,
@@ -664,47 +664,57 @@ export const SPECIAL_DIET_OPTIONS = [
   {
     key: 'low-carb',
     label: 'Low-carb',
+    badgeType: EBadgeType.default,
   },
-
   {
     key: 'keto',
     label: 'Keto',
+    badgeType: EBadgeType.info,
   },
   {
     key: 'mediterranean-diet',
     label: 'Mediterranean Diet',
+    badgeType: EBadgeType.danger,
   },
   {
     key: 'plant-based',
     label: 'Plant-based',
+    badgeType: EBadgeType.warning,
   },
   {
     key: 'halal',
     label: 'Halal',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'intermittent-fasting',
     label: 'Intermittent Fasting',
+    badgeType: EBadgeType.danger,
   },
   {
     key: 'carnivore-diet',
     label: 'Carnivore Diet',
+    badgeType: EBadgeType.default,
   },
   {
     key: 'healthy',
     label: 'Healthy',
+    badgeType: EBadgeType.success,
   },
   {
     key: 'paleo-diet',
     label: 'Paleo Diet',
+    badgeType: EBadgeType.info,
   },
   {
     key: 'gluten-free',
     label: 'Gluten free',
+    badgeType: EBadgeType.success,
   },
   {
     key: OTHER_OPTION,
     label: 'Khác',
+    badgeType: EBadgeType.success,
     hasTextInput: true,
     textPlaceholder: 'Nhập chế độ dinh dưỡng',
   },
@@ -722,6 +732,10 @@ export const SIDE_DISH_OPTIONS = [
   {
     key: 'dessert',
     label: 'Món tráng miệng',
+  },
+  {
+    key: 'drink',
+    label: 'Nước uống',
   },
 ];
 
@@ -775,6 +789,10 @@ export const ORDER_STATES_OPTIONS = [
     label: 'Chưa đánh giá',
   },
   {
+    key: EOrderStates.pendingPayment,
+    label: 'Chưa thanh toán',
+  },
+  {
     key: EOrderStates.reviewed,
     label: 'Đã đánh giá',
   },
@@ -785,6 +803,7 @@ export const getLabelByKey = (
   key: any,
 ) => {
   const item = list?.find((l: any) => l.key === key);
+
   return item && item.label ? item.label : key;
 };
 
@@ -855,6 +874,7 @@ export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
     EBookerOrderDraftStates.bookerDraft,
     EOrderStates.picking,
     EOrderStates.inProgress,
+    EOrderStates.pendingPayment,
     EOrderStates.completed,
     EOrderStates.reviewed,
     EOrderStates.canceled,
@@ -866,6 +886,7 @@ export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
   [EManageCompanyOrdersTab.COMPLETED]: [
     EOrderStates.completed,
     EOrderStates.reviewed,
+    EOrderStates.pendingPayment,
   ],
   [EManageCompanyOrdersTab.DRAFT]: [
     EOrderDraftStates.pendingApproval,

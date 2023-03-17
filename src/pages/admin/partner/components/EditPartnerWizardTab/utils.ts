@@ -14,6 +14,7 @@ const getUniqueImages = (images: any[]) => {
       resArr.push(item);
     }
   });
+
   return resArr;
 };
 
@@ -26,6 +27,7 @@ export const createEntriesFromSubmitValues = (values: any) =>
     const dayValues = values[dayOfWeek] || [];
     const dayEntries = dayValues.map((dayValue: any) => {
       const { startTime, endTime } = dayValue;
+
       // Note: This template doesn't support seats yet.
       return startTime && endTime
         ? {
@@ -55,8 +57,10 @@ const createSubmitBankAccount = (bankAccounts: any[]) => {
   if (bankAccounts.length === 1 && !bankAccounts[0].isDefault) {
     const newBankAccounts = [...bankAccounts];
     newBankAccounts[0].isDefault = true;
+
     return newBankAccounts;
   }
+
   return bankAccounts;
 };
 
@@ -82,6 +86,7 @@ const createAvailabilityPlanFromAllWeekEntries = (
     }),
     {},
   );
+
   return createAvailabilityPlan(availabilityPlan);
 };
 
@@ -96,6 +101,7 @@ const getListWithNewOtherValues = (
   const oldOtherItemIndex = newList.indexOf(oldOtherValue);
   if (!hasOtherValueInList && oldOtherItemIndex >= 0) {
     newList.splice(oldOtherItemIndex, 1);
+
     return newList;
   }
 
@@ -118,6 +124,7 @@ const getListWithNewOtherValues = (
   } else {
     newList.push(newOtherValue);
   }
+
   return newList;
 };
 
@@ -212,6 +219,7 @@ export const createSubmitUpdatePartnerValues = (
       bankAccounts: createSubmitBankAccount(bankAccounts),
     },
   };
+
   return submittedValues;
 };
 
@@ -292,6 +300,7 @@ export const createSubmitCreatePartnerValues = (values: any) => {
       bankAccounts: createSubmitBankAccount(bankAccounts),
     },
   };
+
   return { userData, listingData };
 };
 
@@ -332,6 +341,7 @@ export const createSubmitLicenseTabValues = (values: any) => {
       ...getSubmitImageId(oldImages),
     ]),
   };
+
   return submitValues;
 };
 
@@ -385,6 +395,7 @@ export const createSubmitMenuTabValues = (
       hasOutsideMenuAndService,
     },
   };
+
   return submitValues;
 };
 
@@ -392,6 +403,7 @@ const createEntryDayGroups = (entries = [{}]) =>
   entries.reduce((groupedEntries: any, entry: any) => {
     const { startTime, endTime: endHour, dayOfWeek } = entry;
     const dayGroup = groupedEntries[dayOfWeek] || [];
+
     return {
       ...groupedEntries,
       [dayOfWeek]: [
@@ -410,6 +422,7 @@ export const createAvailabilityPlanInitialValues = (
 ) => {
   const { timezone, entries } = availabilityPlan || {};
   const tz = timezone || defaultTimeZone();
+
   return {
     timezone: tz,
     ...createEntryDayGroups(entries),
@@ -420,6 +433,7 @@ export const createDayToApplyInitialValues = (
   availabilityPlan: TAvailabilityPlan,
 ) => {
   const { entries } = availabilityPlan;
+
   return entries.map((entry: any) => entry.dayOfWeek);
 };
 

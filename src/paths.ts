@@ -55,6 +55,7 @@ export const adminPaths = {
   ManageOrders: '/admin/order',
   CreateOrder: '/admin/order/create',
   UpdateDraftOrder: '/admin/order/create/[orderId]',
+  OrderDetail: '/admin/order/[orderId]',
 };
 
 // Should be an object => path should has its label
@@ -194,4 +195,8 @@ export const quizPaths = {
   Restaurants: '/company/booker/orders/new/quiz/restaurants',
   MealDates: '/company/booker/orders/new/quiz/meal-date',
   CreatingOrder: '/company/booker/orders/new/quiz/creating-order',
+};
+
+export const participantPaths = {
+  Order: '/participant/order/[orderId]',
 };

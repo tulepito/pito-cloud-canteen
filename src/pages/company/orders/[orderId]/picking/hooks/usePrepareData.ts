@@ -1,12 +1,13 @@
 import { useState } from 'react';
 
+import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { Listing, User } from '@utils/data';
+import { EOrderStates } from '@utils/enums';
 import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 
-import type { TReviewInfoFormValues } from '../components/BookerOrderDetailsReviewView/ReviewInfoSection/ReviewInfoForm';
 import { calculatePriceQuotationInfo } from '../helpers/cartInfoHelper';
 import { groupFoodOrderByDate } from '../helpers/orderDetailHelper';
 
@@ -57,7 +58,11 @@ export const usePrepareOrderDetailPageData = () => {
     participants = [],
     anonymous = [],
     staffName = '',
+    orderState,
   } = Listing(orderData as TListing).getMetadata();
+  const isCanceledOrder = [
+    EOrderStates.canceled || EOrderStates.canceledByBooker,
+  ].includes(orderState);
 
   const titleSectionData = { deliveryHour, deliveryAddress };
   const countdownSectionData = {
@@ -135,6 +140,7 @@ export const usePrepareOrderDetailPageData = () => {
     reviewResultData,
     reviewCartData,
     foodOrderGroupedByDate,
+    isCanceledOrder,
     transactionDataMap,
   };
 

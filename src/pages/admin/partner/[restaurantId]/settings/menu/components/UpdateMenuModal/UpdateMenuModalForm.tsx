@@ -29,6 +29,7 @@ const UpdateMenuModalFormComponent: React.FC<
 > = (props) => {
   const { handleSubmit, values, form, formRef } = props;
   formRef.current = form;
+
   return (
     <Form onSubmit={handleSubmit}>
       <FieldMenuApplyTimeGroup

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
@@ -35,6 +36,7 @@ const redirectAfterDraftUpdate = (
 ) => {
   const tabIndex = tabs.findIndex((cur) => cur === tab);
   const nextTab = tabs[tabIndex + 1];
+
   return router.push(`${pathname}/${id}/edit/?tab=${nextTab}`);
 };
 
@@ -112,6 +114,7 @@ const EditPartnerWizardTab = (props: any) => {
             adminRoutes.ManagePartners.path,
           );
         }
+
         return listing;
       };
 
@@ -342,6 +345,7 @@ const EditPartnerWizardTab = (props: any) => {
         const response = await onDiscardDraftPartner(params);
         if (!response.error) router.push(adminRoutes.ManagePartners.path);
       };
+
       return (
         <EditPartnerPreviewForm
           inProgress={inProgress}

@@ -4,7 +4,3 @@
 .modalContainer {
   @include flexAlign(center, space-between);
 }
-
-.cancel {
-  @include buttonColorSecondary;
-}

@@ -14,13 +14,14 @@ type ConfirmClientModalProps = {
 const ConfirmClientModal: React.FC<ConfirmClientModalProps> = (props) => {
   const { isOpen, onClose, onCancel, onConfirm } = props;
   const intl = useIntl();
+
   return (
     <Modal
       title={intl.formatMessage({ id: 'ConfirmClientModal.title' })}
       isOpen={isOpen}
       handleClose={onClose}>
       <div className={css.modalContainer}>
-        <Button onClick={onCancel} className={css.cancel}>
+        <Button variant="secondary" onClick={onCancel}>
           {intl.formatMessage({ id: 'ConfirmClientModal.cancel' })}
         </Button>
         <Button onClick={onConfirm}>

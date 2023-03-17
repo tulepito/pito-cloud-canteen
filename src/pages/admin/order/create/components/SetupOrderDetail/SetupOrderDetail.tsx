@@ -34,6 +34,7 @@ import {
   unSelectRestaurant,
 } from '@redux/slices/Order.slice';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
+import { convertWeekDay, renderDateRange } from '@src/utils/dates';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
 
@@ -97,6 +98,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     deadlineHour,
     memberAmount,
     plans = [],
+    dayInWeek,
   } = Listing(order as TListing).getMetadata();
   const { title: orderTitle } = Listing(order as TListing).getAttributes();
   const companies = useAppSelector(
@@ -132,6 +134,13 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   );
   const onRecommendRestaurantInProgress = useAppSelector(
     (state) => state.Order.onRecommendRestaurantInProgress,
+  );
+  const onRescommendRestaurantForSpecificDateInProgress = useAppSelector(
+    (state) => state.Order.onRescommendRestaurantForSpecificDateInProgress,
+  );
+  const availableOrderDetailCheckList = useAppSelector(
+    (state) => state.Order.availableOrderDetailCheckList,
+    shallowEqual,
   );
 
   const orderId = Listing(order as TListing).getId();
@@ -277,6 +286,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     startDate,
     endDate,
   });
+  const onApplyOtherDaysInProgress = updateOrderDetailInProgress;
 
   const onSubmit = () => {
     dispatch(setCanNotGoToStep4(false));
@@ -293,6 +303,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     JSON.stringify(orderDetail),
     JSON.stringify(plans),
   ]);
+
+  useEffect(() => {
+    dispatch(orderAsyncActions.checkRestaurantStillAvailable());
+  }, [dispatch]);
 
   const restaurantListFromOrder = Object.keys(
     getRestaurantListFromOrderDetail(orderDetail),
@@ -363,6 +377,13 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     );
   };
 
+  const onRecommendRestaurantForSpecificDayInProgress = (timestamp: number) => {
+    return (
+      onRescommendRestaurantForSpecificDateInProgress &&
+      selectedDate?.getTime() === timestamp
+    );
+  };
+
   const handleRemoveMeal = useCallback(
     (id: string) => (resourceId: string) => {
       dispatch(setCanNotGoToStep4(true));
@@ -394,6 +415,40 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     );
     dispatch(setOnRecommendRestaurantInProcess(false));
   }, []);
+
+  const onApplyOtherDays = useCallback(
+    async (date: string, selectedDates: string[]) => {
+      const totalDates = renderDateRange(startDate, endDate);
+      const newOrderDetail = totalDates.reduce((result, curr) => {
+        if (
+          selectedDates.includes(
+            convertWeekDay(DateTime.fromMillis(curr).weekday).key,
+          )
+        ) {
+          return {
+            ...result,
+            [curr]: { ...orderDetail[date] },
+          };
+        }
+
+        return result;
+      }, orderDetail);
+      dispatch(setCanNotGoToStep4(true));
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId,
+          orderDetail: newOrderDetail,
+        }),
+      );
+    },
+    [dispatch, orderId, orderDetail, planId, selectedDate],
+  );
+
+  const onRecommendRestaurantForSpecificDay = (date: number) => {
+    dispatch(selectCalendarDate(DateTime.fromMillis(date).toJSDate()));
+    dispatch(orderAsyncActions.recommendRestaurantForSpecificDay(date));
+  };
 
   return (
     <>
@@ -451,7 +506,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               resources={{
                 ...calendarExtraResources,
                 onEditFood: onEditFoodInMealPlanCard,
+                onSearchRestaurant: handleAddMorePlanClick,
                 onEditFoodInProgress,
+                onApplyOtherDays,
+                dayInWeek,
+                onApplyOtherDaysInProgress,
+                onRecommendRestaurantForSpecificDay,
+                onRecommendRestaurantForSpecificDayInProgress,
+                availableOrderDetailCheckList,
               }}
               components={{
                 contentEnd: (props) => (

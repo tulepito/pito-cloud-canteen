@@ -17,6 +17,7 @@ const OrderEventCardContentItem: React.FC<TEventCardContentItemProps> = ({
   const iconElement = React.cloneElement(icon as ReactElement, {
     ...(isHighlight ? { className: css.highLightIcon } : {}),
   });
+
   return (
     <div className={css.eventContentItem}>
       <div className={css.eventContentItemIcon}>{iconElement}</div>

@@ -32,12 +32,14 @@ const GroupInfoForm: React.FC<GroupInfoFormProps> = (props) => {
       }),
     ).then(() => onCallback());
   };
+
   return (
     <FinalForm
       initialValues={initialValues}
       onSubmit={onSubmit}
       render={(formRenderProps: FormRenderProps) => {
         const { handleSubmit, pristine } = formRenderProps;
+
         return (
           <Form className={css.formContainer} onSubmit={handleSubmit}>
             <div className={css.fieldWrapper}>
@@ -58,6 +60,7 @@ const GroupInfoForm: React.FC<GroupInfoFormProps> = (props) => {
             </div>
             <div className={css.buttonsWrapper}>
               <Button
+                variant="secondary"
                 className={css.cancelBtn}
                 type="button"
                 onClick={onCallback}>

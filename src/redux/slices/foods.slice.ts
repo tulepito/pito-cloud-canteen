@@ -2,22 +2,19 @@
 import { createSlice } from '@reduxjs/toolkit';
 import omit from 'lodash/omit';
 import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 
-import {
-  createPartnerFoodApi,
-  deletePartnerFoodApi,
-  showPartnerFoodApi,
-  updatePartnerFoodApi,
-} from '@apis/foodApi';
+import { partnerFoodApi } from '@apis/foodApi';
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants, EListingType } from '@utils/enums';
-import { storableError } from '@utils/errors';
+import { storableAxiosError, storableError } from '@utils/errors';
 import type {
   TImage,
   TIntegrationListing,
   TListing,
+  TObject,
   TPagination,
 } from '@utils/types';
 
@@ -133,6 +130,7 @@ const queryMenuPickedFoods = createAsyncThunk(
     });
 
     const foods = denormalisedResponseEntities(response);
+
     return foods;
   },
   {
@@ -154,6 +152,7 @@ const queryPartnerFoods = createAsyncThunk(
       'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
     });
     const foods = denormalisedResponseEntities(response);
+
     return { foods, managePartnerFoodPagination: response.data.meta };
   },
   {
@@ -176,9 +175,11 @@ const requestUploadFoodImages = createAsyncThunk(
         },
       );
       const img = response.data.data;
+
       return { ...img, id, imageId: img.id };
     } catch (error) {
       console.error(`${REQUEST_UPLOAD_IMAGE_FOOD} error: `, error);
+
       return rejectWithValue({ error, id });
     }
   },
@@ -188,13 +189,15 @@ const createPartnerFoodListing = createAsyncThunk(
   CREATE_PARTNER_FOOD_LISTING,
   async (payload: any, { rejectWithValue }) => {
     try {
-      const { data } = await createPartnerFoodApi({
+      const { data } = await partnerFoodApi.createFood({
         dataParams: payload,
         queryParams: {},
       });
+
       return denormalisedResponseEntities(data)[0];
     } catch (error) {
       console.error(`${CREATE_PARTNER_FOOD_LISTING} error: `, error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -222,9 +225,11 @@ const duplicateFood = createAsyncThunk(
                 `${`${title}_${new Date().getTime()}`}.jpg`,
                 metadata,
               );
+
               return file;
             } catch (error) {
               console.error(error);
+
               return null;
             }
           })
@@ -240,13 +245,15 @@ const duplicateFood = createAsyncThunk(
       );
 
       const newImages = uploadRes.map((res) => res.data.data.id);
-      const { data } = await createPartnerFoodApi({
+      const { data } = await partnerFoodApi.createFood({
         dataParams: { ...payload, images: newImages },
         queryParams: {},
       });
+
       return denormalisedResponseEntities(data)[0];
     } catch (error) {
       console.error(`${CREATE_PARTNER_FOOD_LISTING} error: `, error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -254,7 +261,7 @@ const duplicateFood = createAsyncThunk(
 
 const updatePartnerFoodListing = createAsyncThunk(
   UPDATE_PARTNER_FOOD_LISTING,
-  async (payload: any, { rejectWithValue }) => {
+  async (payload: TObject, { rejectWithValue }) => {
     try {
       const dataParams = {
         ...payload,
@@ -264,11 +271,16 @@ const updatePartnerFoodListing = createAsyncThunk(
         'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
         expand: true,
       };
-      const { data } = await updatePartnerFoodApi({ dataParams, queryParams });
+      const { data } = await partnerFoodApi.updateFood(dataParams.id, {
+        dataParams,
+        queryParams,
+      });
       const [food] = denormalisedResponseEntities(data);
+
       return food;
     } catch (error) {
       console.error(`${UPDATE_PARTNER_FOOD_LISTING} error: `, error);
+
       return rejectWithValue(storableError(error));
     }
   },
@@ -276,68 +288,102 @@ const updatePartnerFoodListing = createAsyncThunk(
 
 const createPartnerFoodFromCsv = createAsyncThunk(
   CREATE_FOOD_FROM_FILE,
-  async (
-    { file, restaurantId }: { file: File; restaurantId: string },
-    { extra: sdk },
-  ) => {
+  async ({
+    file,
+    googleSheetUrl,
+    restaurantId,
+  }: {
+    file?: File;
+    googleSheetUrl?: string;
+    restaurantId: string;
+  }) => {
+    if (file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          const data = e?.target?.result;
+
+          const workbook = XLSX.read(data, { type: 'array' });
+          // organize xlsx data into desired format
+          workbook.SheetNames.forEach(async (sheet) => {
+            if (sheet === 'Template') {
+              try {
+                const worksheet = workbook.Sheets[sheet];
+
+                const data = XLSX.utils.sheet_to_json(worksheet);
+
+                const isProduction =
+                  process.env.NEXT_PUBLIC_ENV === 'production';
+                const dataLengthToImport = isProduction ? data.length : 3;
+                const response = await Promise.all(
+                  data
+                    .slice(0, dataLengthToImport)
+                    .map(async (foodData: any) => {
+                      const dataParams = getImportDataFromCsv({
+                        ...foodData,
+                        restaurantId,
+                      });
+
+                      const queryParams = {
+                        expand: true,
+                      };
+                      const { data } = await partnerFoodApi.createFood({
+                        dataParams,
+                        queryParams,
+                      });
+
+                      const [food] = denormalisedResponseEntities(data);
+
+                      return food;
+                    }),
+                );
+                resolve(response as any);
+              } catch (error) {
+                console.log('error', error);
+                reject(error);
+              }
+            }
+          });
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
     return new Promise((resolve, reject) => {
-      Papa.parse(file, {
+      Papa.parse(googleSheetUrl, {
+        download: true,
         header: true,
         skipEmptyLines: true,
-        async complete({ data }: any) {
-          const response = await Promise.all(
-            data.map(async (l: any) => {
-              const { images, title } = l;
-              const imagesAsArray = images ? images.split(',') : [];
-              const imageAsFiles = await Promise.all(
-                imagesAsArray
-                  .map(async (src: string) => {
-                    try {
-                      const response = await fetch(src);
-                      const blobData = await response.blob();
-                      const metadata = {
-                        type: 'image/jpeg',
-                      };
-                      const file = new File(
-                        [blobData],
-                        `${`${title}_${new Date().getTime()}`}.jpg`,
-                        metadata,
-                      );
-                      return file;
-                    } catch (error) {
-                      console.error(error);
-                      return null;
-                    }
-                  })
-                  .filter((file: File) => !!file),
-              );
-              // upload image to Flex
-              const uploadRes = await Promise.all(
-                imageAsFiles.map(async (file) =>
-                  sdk.images.upload({
-                    image: file,
-                  }),
-                ),
-              );
+        async complete({ data = [] }: { data: any[] }) {
+          try {
+            const isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
+            const dataLengthToImport = isProduction ? data.length : 3;
+            const response = await Promise.all(
+              data.slice(0, dataLengthToImport).map(async (foodData: any) => {
+                const dataParams = getImportDataFromCsv({
+                  ...foodData,
+                  restaurantId,
+                });
 
-              const newImages = uploadRes.map((res) => res.data.data.id);
+                const queryParams = {
+                  expand: true,
+                };
 
-              const dataParams = getImportDataFromCsv({
-                ...l,
-                restaurantId,
-                images: newImages,
-              });
-              const queryParams = {
-                expand: true,
-              };
-              const { data } = await createPartnerFoodApi({
-                dataParams,
-                queryParams,
-              });
-              return denormalisedResponseEntities(data)[0];
-            }),
-          );
-          resolve(response as any);
+                const { data } = await partnerFoodApi.createFood({
+                  dataParams,
+                  queryParams,
+                });
+
+                const [food] = denormalisedResponseEntities(data);
+
+                return food;
+              }),
+            );
+            resolve(response as any);
+          } catch (error) {
+            console.log('error', error);
+            reject(error);
+          }
         },
         error(err: any) {
           reject(err);
@@ -349,47 +395,62 @@ const createPartnerFoodFromCsv = createAsyncThunk(
 
 const showPartnerFoodListing = createAsyncThunk(
   SHOW_PARTNER_FOOD_LISTING,
-  async (id: any) => {
-    const { data } = await showPartnerFoodApi(id, {
-      dataParams: {
-        include: ['images'],
-        'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
-      },
-      queryParams: {
-        expand: true,
-      },
-    });
-    const [food] = denormalisedResponseEntities(data);
-    return food;
-  },
-  {
-    serializeError: storableError,
+  async (id: any, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await partnerFoodApi.showFood(id, {
+        dataParams: {
+          include: ['images'],
+          'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
+        },
+        queryParams: {
+          expand: true,
+        },
+      });
+      const [food] = denormalisedResponseEntities(data);
+
+      return fulfillWithValue(food);
+    } catch (error) {
+      console.error(`${SHOW_PARTNER_FOOD_LISTING} error: `, error);
+
+      return rejectWithValue(storableError(error));
+    }
   },
 );
 
 const removePartnerFood = createAsyncThunk(
   REMOVE_PARTNER_FOOD_LISTING,
-  async (payload: any, { rejectWithValue }) => {
+  async (payload: TObject, { rejectWithValue }) => {
     try {
-      const { data } = await deletePartnerFoodApi({
-        dataParams: {
-          ...payload,
-        },
-        queryParams: {},
-      });
+      const { id = '', ids = [] } = payload;
+      const isDeletingListIds = ids.length > 0;
+      const { data } = isDeletingListIds
+        ? await partnerFoodApi.deleteFoodByIds({
+            dataParams: {
+              ids,
+            },
+            queryParams: {},
+          })
+        : await partnerFoodApi.deleteFood(id, {
+            dataParams: {
+              ...payload,
+            },
+            queryParams: {},
+          });
+
       return data;
     } catch (error) {
       console.error(`${REMOVE_PARTNER_FOOD_LISTING} error: `, error);
-      return rejectWithValue(storableError(error));
+
+      return rejectWithValue(storableAxiosError(error));
     }
   },
 );
 
 const showDuplicateFood = createAsyncThunk(
   SHOW_DUPLICATE_FOOD,
-  async (id: any) => {
+  async (id: any, { rejectWithValue }) => {
     try {
-      const { data } = await showPartnerFoodApi(id, {
+      const { data } = await partnerFoodApi.showFood(id, {
         dataParams: {
           include: ['images'],
           'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
@@ -400,9 +461,10 @@ const showDuplicateFood = createAsyncThunk(
       });
 
       const [food] = denormalisedResponseEntities(data);
+
       return food;
     } catch (error) {
-      return storableError(error);
+      return rejectWithValue(storableAxiosError(error));
     }
   },
 );
@@ -477,6 +539,7 @@ const foodSlice = createSlice({
           ...state.uploadedImages,
           [id]: { ...action.meta.arg },
         };
+
         return {
           ...state,
           uploadedImages,
@@ -491,6 +554,7 @@ const foodSlice = createSlice({
           ...state.uploadedImages,
           [id]: { id, ...rest },
         };
+
         return { ...state, uploadedImages, uploadingImages: false };
       })
       .addCase(requestUploadFoodImages.rejected, (state, action: any) => {
@@ -499,6 +563,7 @@ const foodSlice = createSlice({
           (i: any) => i !== id,
         );
         const uploadedImages = omit(state.uploadedImages, id);
+
         return {
           ...state,
           uploadedImagesOrder,

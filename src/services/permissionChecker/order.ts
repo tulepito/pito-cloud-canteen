@@ -1,8 +1,9 @@
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
+import { HttpMethod } from '@apis/configs';
+import { EHttpStatusCode } from '@apis/errors';
 import { fetchListing } from '@services/integrationHelper';
 import { getSdk, handleError } from '@services/sdk';
-import { HTTP_METHODS } from '@src/pages/api/helpers/constants';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 
@@ -15,13 +16,12 @@ const orderChecker =
       const { companyId, orderId } = req.body;
       const apiMethod = req.method;
       const [currentUser] = denormalisedResponseEntities(currentUserResponse);
-      const { isAdmin = false } = User(currentUser).getMetadata();
-      const { company = {} } = User(currentUser).getMetadata();
+      const { isAdmin = false, company = {} } = User(currentUser).getMetadata();
 
       switch (apiMethod) {
-        case HTTP_METHODS.POST: {
+        case HttpMethod.POST: {
           if (!companyId) {
-            return res.status(403).json({
+            return res.status(EHttpStatusCode.Forbidden).json({
               message: 'Missing required key',
             });
           }
@@ -32,15 +32,15 @@ const orderChecker =
             userPermission !== UserPermission.BOOKER &&
             !isAdmin
           ) {
-            return res.status(403).json({
+            return res.status(EHttpStatusCode.Forbidden).json({
               message: "You don't have permission to access this api!",
             });
           }
           break;
         }
-        case HTTP_METHODS.PUT: {
+        case HttpMethod.PUT: {
           if (!orderId) {
-            return res.status(403).json({
+            return res.status(EHttpStatusCode.Forbidden).json({
               message: 'Missing required key',
             });
           }
@@ -53,7 +53,7 @@ const orderChecker =
             userPermission !== UserPermission.BOOKER &&
             !isAdmin
           ) {
-            return res.status(403).json({
+            return res.status(EHttpStatusCode.Forbidden).json({
               message: "You don't have permission to access this api!",
             });
           }
@@ -62,6 +62,7 @@ const orderChecker =
         default:
           break;
       }
+
       return handler(req, res);
     } catch (error) {
       handleError(res, error);

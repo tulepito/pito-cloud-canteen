@@ -23,6 +23,7 @@ const LoadedItem = ({ item, companyMembers, onDelete }: any) => {
   ) : (
     <div className={css.fullRowEmail}>{email}</div>
   );
+
   return (
     <div className={css.memberItem}>
       <div className={css.memberWrapper}>

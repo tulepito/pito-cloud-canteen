@@ -146,6 +146,7 @@ const updateOrder = createAsyncThunk(
 
     await updateParticipantOrderApi(orderId, updateValues);
     await dispatch(reloadData(planId));
+
     return true;
   },
   {

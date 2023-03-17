@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import React from 'react';
 import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
@@ -103,6 +102,7 @@ const tabsActive = (isNew: boolean, listing: any) => {
       previousTabIndex >= 0
         ? !isNew || tabCompleted(TABS[previousTabIndex], listing)
         : true;
+
     return { ...acc, [tab]: isActive };
   }, {});
 };
@@ -180,9 +180,12 @@ const EditPartnerWizard = (props: any) => {
 
   const handleRedirectOnSwitchTab = (nearestActiveTab: string) => {
     const id = partnerListingRef?.id?.uuid;
-    !partnerListingRef
-      ? router.push(`/admin/partner/create`)
-      : router.push(`/admin/partner/${id}/edit?tab=${nearestActiveTab}`);
+
+    if (!partnerListingRef) {
+      router.push(`/admin/partner/create`);
+    } else {
+      router.push(`/admin/partner/${id}/edit?tab=${nearestActiveTab}`);
+    }
   };
 
   useRedirectTabWizard({
@@ -202,6 +205,7 @@ const EditPartnerWizard = (props: any) => {
             TABS[index - 1],
             partnerListingRef as TIntegrationListing,
           ) && index > 0;
+
         return (
           <EditPartnerWizardTab
             key={tab}

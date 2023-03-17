@@ -54,6 +54,11 @@
 
 .content {
   margin-bottom: 12px;
+
+  &.disable {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 
 .coverImg {
@@ -87,7 +92,7 @@
 
 .recommendRestaurant {
   cursor: pointer;
-  flex-basis: 20px;
+  flex-basis: 18px;
 }
 
 .viewMenu {
@@ -109,6 +114,11 @@
     color: $neutralGray6;
     margin-bottom: 12px;
   }
+
+  .editNotAvailable {
+    @include textTemplate(12px, $fontWeightRegular, 16px);
+    color: $primaryPri2;
+  }
 }
 
 .applyForOtherDays {
@@ -116,11 +126,4 @@
   color: $neutralGray6;
   text-align: center;
   cursor: pointer;
-}
-
-.editFood {
-  @include buttonColorSecondary;
-  margin: 20px auto 0;
-  width: 90%;
-  min-height: 36px;
 }

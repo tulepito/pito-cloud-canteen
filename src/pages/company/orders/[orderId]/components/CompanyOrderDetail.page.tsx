@@ -1,4 +1,5 @@
-import BookerOrderDetailReviewView from '../picking/components/BookerOrderDetailsReviewView/BookerOrderDetailsReviewView/BookerOrderDetailReviewView';
+import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
+
 import { downloadPriceQuotation } from '../picking/helpers/downloadPriceQuotation';
 import { usePrepareOrderDetailPageData } from '../picking/hooks/usePrepareData';
 
@@ -15,7 +16,7 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
   return (
     <div className={css.root}>
       <TitleSection className={css.titleSection} orderTitle={orderTitle} />
-      <BookerOrderDetailReviewView
+      <ReviewView
         className={css.reviewInfoContainer}
         onDownloadPriceQuotation={downloadPriceQuotation(priceQuotationData)}
         canEditInfo={false}

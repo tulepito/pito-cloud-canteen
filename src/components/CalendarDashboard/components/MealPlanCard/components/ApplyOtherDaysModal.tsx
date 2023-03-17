@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
 import Modal from '@components/Modal/Modal';
@@ -8,6 +9,11 @@ import css from './ApplyOtherDaysModal.module.scss';
 
 type TApplyOtherDaysModalProps = {
   isOpen: boolean;
+  currentDayInWeek: string;
+  dayInWeek?: string[];
+  inProgress?: boolean;
+  startDate?: Date | number;
+  endDate?: Date | number;
   onSubmit?: (params: any) => void;
   onClose?: () => void;
 };
@@ -16,20 +22,37 @@ const ApplyOtherDaysModal: React.FC<TApplyOtherDaysModalProps> = ({
   isOpen,
   onSubmit = () => null,
   onClose = () => null,
+  currentDayInWeek,
+  dayInWeek,
+  inProgress,
+  startDate,
+  endDate,
 }) => {
   const intl = useIntl();
+
+  const initialValues = useMemo(
+    () => ({
+      selectedDays: [currentDayInWeek],
+    }),
+    [currentDayInWeek],
+  );
 
   const handleClose = () => {
     onClose();
   };
 
   const handleSubmit = (values: any) => {
-    onSubmit(values);
+    onSubmit(values.selectedDays);
   };
+
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className={css.root}>
       <Modal
+        id="ApplyOtherDaysModal"
         isOpen={isOpen}
         handleClose={handleClose}
         containerClassName={css.modalContainer}
@@ -39,7 +62,15 @@ const ApplyOtherDaysModal: React.FC<TApplyOtherDaysModalProps> = ({
           id: 'ApplyOtherDaysModal.title',
         })}>
         <div className={css.modalContent}>
-          <ApplyOtherDaysForm onSubmit={handleSubmit} onCancel={handleClose} />
+          <ApplyOtherDaysForm
+            onSubmit={handleSubmit}
+            onCancel={handleClose}
+            initialValues={initialValues}
+            dayInWeek={dayInWeek}
+            inProgress={inProgress}
+            startDate={startDate}
+            endDate={endDate}
+          />
         </div>
       </Modal>
     </div>

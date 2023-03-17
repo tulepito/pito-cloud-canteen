@@ -74,6 +74,11 @@
 }
 
 .locationRow {
+  @include lineClamp(4);
+}
+
+.restaurantName {
+  @include lineClamp(1);
 }
 
 .tooltip {

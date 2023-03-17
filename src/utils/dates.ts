@@ -46,6 +46,7 @@ export const isTimeZoneSupported = () => {
   ) {
     return false;
   }
+
   return !!dtf.resolvedOptions().timeZone;
 };
 /**
@@ -136,6 +137,7 @@ export const formatTimestamp = (
 export const addWeeksToDate = (dateObj: Date, numberOfWeeks: number) => {
   const weekToAdd = numberOfWeeks * 7 - 1;
   dateObj.setDate(dateObj.getDate() + weekToAdd);
+
   return dateObj;
 };
 
@@ -174,6 +176,7 @@ export const generateTimeOptions = () => {
     }
   }
   options.push('23:00');
+
   return options;
 };
 
@@ -183,6 +186,7 @@ export const getDayInWeekFromPeriod = (start: number, end: number) => {
   if (!start || !end) return [];
   const startDateObj = new Date(start);
   const endDateObj = new Date(end);
+
   return Interval.fromDateTimes(
     DateTime.fromJSDate(startDateObj).startOf('day'),
     DateTime.fromJSDate(endDateObj).endOf('day'),
@@ -293,6 +297,7 @@ export const printHoursToString = (hours: number, minutes: number) => {
   const minutesToRender = minutes < 10 ? `0${minutes}` : minutes;
   const hoursToRender = hours < 10 ? `0${hours}` : hours;
   const hoursAndMinutes = `${hoursToRender}:${minutesToRender}`;
+
   return hoursAndMinutes;
 };
 
@@ -301,6 +306,7 @@ const DAYS = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
 const addDays = (d: Date, days: number) => {
   const date = new Date(d);
   date.setDate(date.getDate() + days);
+
   return date;
 };
 
@@ -311,6 +317,7 @@ const getDates = (startDate: Date, stopDate: Date) => {
     dateArray.push(new Date(currentDate));
     currentDate = addDays(currentDate, 1);
   }
+
   return dateArray;
 };
 
@@ -328,6 +335,7 @@ export const findClassDays = (
       (d) => DAYS[d as keyof typeof DAYS] === f.getDay(),
     ),
   );
+
   return classDays.map((d) => d.getTime());
 };
 
@@ -338,6 +346,7 @@ const sortDatesByDayOfWeek = (dates: Date[]) => {
 
     const aDayOfWeekSorter = DAYS_OF_WEEK_SORTER[aDayOfWeek as EDayOfWeek];
     const bDayOfWeekSorter = DAYS_OF_WEEK_SORTER[bDayOfWeek as EDayOfWeek];
+
     return aDayOfWeekSorter - bDayOfWeekSorter;
   });
 };
@@ -381,5 +390,6 @@ export const getSelectedDaysOfWeek = (
     dayInWeek,
     disableDayInWeekOptions.map((day) => day.key),
   );
+
   return selectedDays;
 };

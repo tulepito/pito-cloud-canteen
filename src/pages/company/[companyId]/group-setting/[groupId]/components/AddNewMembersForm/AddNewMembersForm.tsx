@@ -36,16 +36,15 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
 
   const memberOptions = useMemo(
     () => differenceBy(companyMembers, groupMembers, 'id.uuid'),
-    [companyMembers, groupMembers],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(companyMembers), JSON.stringify(groupMembers)],
   );
 
-  const initialValues = useMemo(
-    () => ({
-      members: [],
-    }),
-    [groupMembers],
-  );
-  const onSubmit = async (values: TObject) => {
+  const initialValues = {
+    members: [],
+  };
+
+  const handleSubmit = async (values: TObject) => {
     const { members } = values;
     const addedMembers = companyMembers
       .filter((member) => members.includes(member.id.uuid))
@@ -66,14 +65,17 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
       }),
     );
   };
+
   return (
     <FinalForm
       initialValues={initialValues}
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit}
       render={(formRenderProps: FormRenderProps) => {
+        // eslint-disable-next-line @typescript-eslint/no-shadow
         const { handleSubmit, values } = formRenderProps;
         const { members = [] } = values;
         const submitDisabled = updateGroupInProgress || members.length === 0;
+
         return (
           <Form onSubmit={handleSubmit}>
             <div className={classNames(css.fieldInput, css.flexWrap)}>
@@ -98,7 +100,9 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
                           <div className={css.name}>
                             {User(member).getProfile().displayName}
                           </div>
-                          <div className={css.email}>
+                          <div
+                            className={css.email}
+                            title={User(member).getAttributes().email}>
                             {User(member).getAttributes().email}
                           </div>
                         </div>

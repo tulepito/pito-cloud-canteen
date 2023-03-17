@@ -58,6 +58,7 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyName }) => {
       isFirstLevel: true,
     },
   ];
+
   return (
     <div className={css.root}>
       <div className={css.companyName}>{companyName}</div>

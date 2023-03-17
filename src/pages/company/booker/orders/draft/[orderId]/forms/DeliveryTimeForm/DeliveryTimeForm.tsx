@@ -26,6 +26,7 @@ const validate = (values: TDeliveryTimeFormValues) => {
   if (!values.deliveryHour) {
     errors.deliveryHour = 'Vui lòng chọn giờ giao hàng';
   }
+
   return errors;
 };
 

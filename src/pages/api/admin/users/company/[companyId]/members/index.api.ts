@@ -10,6 +10,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const { companyId } = req.query;
     const members = await queryCompanyMembers(companyId as string);
+
     return res.json(members);
   } catch (error) {
     return handleError(res, error);

@@ -220,6 +220,7 @@ export const initiateTransaction = async ({
       const txId = Transaction(tx).getId() as string;
 
       transactionMap[date] = txId;
+
       return txId;
     }),
   );

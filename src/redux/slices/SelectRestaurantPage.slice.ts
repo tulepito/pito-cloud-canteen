@@ -82,12 +82,14 @@ const getRestaurants = createAsyncThunk(
             'variants.landscape-crop2x',
           ],
         });
+
         return {
           restaurantInfo: denormalisedResponseEntities(restaurantResponse)[0],
           menu,
         };
       }),
     );
+
     return { restaurants: restaurantList, pagination: meta };
   },
 );
@@ -99,15 +101,12 @@ const getRestaurantFood = createAsyncThunk(
     { extra: sdk, getState },
   ) => {
     const { order } = getState().Order;
-    const { packagePerMember, nutritions = [] } = Listing(
-      order as TListing,
-    ).getMetadata();
+    const { nutritions = [] } = Listing(order as TListing).getMetadata();
     const dayOfWeek = convertWeekDay(dateTime.weekday).key;
     const response = await sdk.listings.query({
       pub_menuIdList: `has_any:${menuId}`,
       meta_listingType: ListingTypes.FOOD,
       pub_menuWeekDay: `has_any:${dayOfWeek}`,
-      price: `,${packagePerMember}`,
       ...(nutritions.length > 0
         ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
         : {}),
@@ -118,6 +117,7 @@ const getRestaurantFood = createAsyncThunk(
         : {}),
     });
     const result = denormalisedResponseEntities(response);
+
     return { foodList: result };
   },
 );
@@ -130,6 +130,7 @@ const fetchSelectedRestaurant = createAsyncThunk(
       include: ['images'],
       'fields.image': ['variants.landscape-crop', 'variants.landscape-crop2x'],
     });
+
     return denormalisedResponseEntities(response)[0];
   },
 );

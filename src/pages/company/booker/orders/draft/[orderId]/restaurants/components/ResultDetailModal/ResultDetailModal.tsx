@@ -11,6 +11,7 @@ import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { calculateDistance } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
@@ -42,6 +43,8 @@ type TResultDetailModalProps = {
   };
   totalRatings: any[];
   fetchFoodInProgress: boolean;
+  openFromCalendar?: boolean;
+  timestamp?: number;
   onSearchSubmit?: (value: string, restaurantId: string) => void;
 };
 
@@ -55,6 +58,8 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   totalRatings,
   onSearchSubmit,
   fetchFoodInProgress,
+  openFromCalendar,
+  timestamp: propTimestamp,
 }) => {
   const intl = useIntl();
   const router = useRouter();
@@ -69,16 +74,19 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   const { orderId, planId, planDetail } = useGetPlanDetails();
   const initFoodList = useMemo(() => {
     const detail =
-      Listing(planDetail).getMetadata().orderDetail?.[`${timestamp}`];
+      Listing(planDetail).getMetadata().orderDetail?.[
+        `${openFromCalendar ? propTimestamp : timestamp}`
+      ];
     const savedRestaurantId = detail?.restaurant?.id;
 
     if (selectedRestaurantId === savedRestaurantId) {
       const foodListObj = detail?.restaurant?.foodList || {};
+
       return Object.keys(foodListObj) || [];
     }
 
     return [];
-  }, [planDetail, timestamp, isOpen]);
+  }, [planDetail, timestamp, isOpen, propTimestamp]);
 
   useEffect(() => {
     setSelectedFoods(initFoodList);
@@ -153,7 +161,6 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
         foodModal.setFalse();
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedFoods, foodModal.value],
   );
 
@@ -190,11 +197,12 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
           foodPrice: Listing(food).getAttributes().price?.amount,
         };
       }
+
       return acc;
     }, {});
 
     const updatedValues = {
-      [`${timestamp}`]: {
+      [`${openFromCalendar ? propTimestamp : timestamp}`]: {
         restaurant: {
           foodList: updatedFoodList,
           id: selectedRestaurantId,
@@ -211,8 +219,14 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
         updateMode: 'merge',
       }),
     );
-    onClose();
-    router.push(`/company/booker/orders/draft/${orderId}`);
+
+    if (!openFromCalendar) {
+      onClose();
+      router.push(`/company/booker/orders/draft/${orderId}`);
+    } else {
+      await dispatch(orderAsyncActions.fetchOrderDetail([planId]));
+      onClose();
+    }
   };
 
   useEffect(() => {

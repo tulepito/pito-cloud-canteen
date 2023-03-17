@@ -21,6 +21,7 @@ const InvitationCard: React.FC<InvitationCardProps> = (props) => {
   } = props;
   const intl = useIntl();
   const modalClasses = classNames(css.modal, css.open);
+
   return (
     <div className={modalClasses}>
       <div className={css.overlay}>
@@ -51,6 +52,7 @@ const InvitationCard: React.FC<InvitationCardProps> = (props) => {
           </div>
           <div className={css.modalFooter}>
             <Button
+              variant="secondary"
               className={css.declineBtn}
               onClick={onDecline}
               inProgress={responseToInvitationInProgress}

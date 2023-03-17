@@ -36,7 +36,10 @@ const AddNewMembersModal: React.FC<AddNewMembersModalProps> = (props) => {
             />
           </div>
           <div className={css.modalFooter}>
-            <Button className={css.cancelBtn} onClick={onClose}>
+            <Button
+              variant="secondary"
+              className={css.cancelBtn}
+              onClick={onClose}>
               {intl.formatMessage({ id: 'AddNewMembersModal.cancel' })}
             </Button>
           </div>

@@ -62,6 +62,7 @@ const CreatePartnerFoodPage = () => {
         ),
       );
       redirectToEditPage(response.payload);
+
       return response;
     }
     const response = await dispatch(
@@ -73,10 +74,11 @@ const CreatePartnerFoodPage = () => {
       ),
     );
     redirectToEditPage(response.payload);
+
     return response;
   };
 
-  const { minQuantity, maxQuantity, packaging } =
+  const { minQuantity, maxQuantity } =
     IntegrationListing(partnerListingRef).getPublicData();
 
   const initialValues = useMemo(() => {
@@ -87,7 +89,8 @@ const CreatePartnerFoodPage = () => {
       title,
       description,
     } = attributes || ({} as TObject);
-    const { foodType, menuType, ...rest } = publicData;
+    const { foodType, menuType, allergicIngredients, ...rest } = publicData;
+
     return {
       images: getInitialAddImages(currentFoodListing?.images || []),
       title,
@@ -98,6 +101,7 @@ const CreatePartnerFoodPage = () => {
       minOrderHourInAdvance: 24,
       minQuantity,
       maxQuantity,
+      allergicIngredients: allergicIngredients || [],
       ...rest,
     };
   }, [
@@ -144,7 +148,6 @@ const CreatePartnerFoodPage = () => {
         inProgress={createFoodInProgress}
         disabled={uploadingImages || createFoodInProgress}
         formError={createFoodError}
-        partnerPackagingList={packaging}
       />
     </>
   );

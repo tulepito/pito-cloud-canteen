@@ -50,6 +50,7 @@ const getNormalizeDetail = ({
         },
       };
     }
+
     return acc;
   }, {});
 };
@@ -120,8 +121,10 @@ const updatePlan = async ({
     );
 
     const planListing = denormalisedResponseEntities(planListingResponse)[0];
+
     return planListing;
   }
+
   return {};
 };
 

@@ -3,8 +3,22 @@ import React from 'react';
 import AdminLayout from '@components/Layout/AdminLayout/AdminLayout';
 import CompanyLayout from '@components/Layout/CompanyLayout/CompanyLayout';
 import GeneralLayout from '@components/Layout/GeneralLayout/Layout';
-import { adminPaths, companyPaths, generalPaths } from '@src/paths';
+import {
+  adminPaths,
+  companyPaths,
+  generalPaths,
+  IgnoredAuthCheckRoutes,
+  NonRequireAuthenticationRoutes,
+} from '@src/paths';
 import { EUserPermission, startRouteBaseOnPermission } from '@utils/enums';
+
+export const usePathChecker = (pathname: string) => {
+  return {
+    isNonRequireAuthenticationRoute:
+      NonRequireAuthenticationRoutes.includes(pathname),
+    isIgnoredAuthCheckRoute: IgnoredAuthCheckRoutes.includes(pathname),
+  };
+};
 
 export const getLayoutBaseOnPermission = (permission: EUserPermission) => {
   switch (permission) {
@@ -25,6 +39,7 @@ export const isPathMatchedPermission = (
 ) => {
   if (permission !== EUserPermission.normal) {
     const startPath = startRouteBaseOnPermission[permission];
+
     return pathName.startsWith(startPath);
   }
 

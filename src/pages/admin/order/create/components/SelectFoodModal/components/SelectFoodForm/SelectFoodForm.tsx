@@ -14,7 +14,7 @@ import IconClose from '@components/Icons/IconClose/IconClose';
 import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
 import IconSearch from '@components/Icons/IconSearch/IconSearch';
 import { addCommas } from '@helpers/format';
-import { toNonAccentVietnamese } from '@utils/nonAccentVietnamese';
+import { toNonAccentVietnamese } from '@src/utils/string';
 import type { TDefaultProps } from '@utils/types';
 
 import FieldFoodSelectCheckboxGroup from './components/FieldFoodSelect/FieldFoodSelectCheckboxGroup';

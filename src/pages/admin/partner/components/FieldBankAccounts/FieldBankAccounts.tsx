@@ -27,6 +27,7 @@ type TFieldBankAccounts = {
 const FieldBankAccounts: React.FC<TFieldBankAccounts> = (props) => {
   const { id, name, className } = props;
   const intl = useIntl();
+
   return (
     <FieldArray name={name} id={id}>
       {({ fields }: any) => {

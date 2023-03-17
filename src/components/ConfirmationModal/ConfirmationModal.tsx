@@ -47,7 +47,10 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = (props) => {
           </div>
           <div className={css.modalFooter}>
             {cancelText && (
-              <Button className={css.cancelBtn} onClick={onCancel}>
+              <Button
+                variant="secondary"
+                className={css.cancelBtn}
+                onClick={onCancel}>
                 {cancelText}
               </Button>
             )}

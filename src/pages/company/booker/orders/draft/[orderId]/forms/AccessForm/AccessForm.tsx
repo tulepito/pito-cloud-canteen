@@ -26,6 +26,7 @@ const validate = (values: TAccessFormValues) => {
   if (!values.selectedGroups) {
     errors.selectedGroups = 'Required';
   }
+
   return errors;
 };
 

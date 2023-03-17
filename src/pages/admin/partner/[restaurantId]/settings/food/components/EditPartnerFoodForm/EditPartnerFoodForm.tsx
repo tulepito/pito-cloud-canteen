@@ -1,9 +1,11 @@
-import { useMemo, useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
+import type { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import isEqual from 'lodash/isEqual';
 
@@ -55,7 +57,6 @@ type TExtraProps = {
   isEditting?: boolean;
   disabled?: boolean;
   handleSubmitOnClick?: (values: TEditPartnerFoodFormValues) => any;
-  partnerPackagingList: string[];
 };
 type TEditPartnerFoodFormComponentProps =
   FormRenderProps<TEditPartnerFoodFormValues> & Partial<TExtraProps>;
@@ -75,7 +76,6 @@ const EditPartnerFoodFormComponent: React.FC<
     form,
     handleSubmitOnClick,
     invalid,
-    partnerPackagingList,
   } = props;
   const dispatch = useAppDispatch();
   const ready = isEqual(submittedValues, values);
@@ -111,16 +111,9 @@ const EditPartnerFoodFormComponent: React.FC<
       // rerun validation
       return form.submit();
     }
+
     return handleSubmitOnClick && handleSubmitOnClick(values);
   };
-
-  const packagingToRender = useMemo(
-    () =>
-      PACKAGING_OPTIONS.filter((option) =>
-        partnerPackagingList?.includes(option.key),
-      ),
-    [JSON.stringify(partnerPackagingList)],
-  );
 
   return (
     <Form className={css.root}>
@@ -247,7 +240,7 @@ const EditPartnerFoodFormComponent: React.FC<
         <div className={classNames(css.field, css.titleFields)}>
           <FieldTextInput
             name="title"
-            className={css.titleField}
+            className={css.field}
             id="title"
             placeholder={intl.formatMessage({
               id: 'EditPartnerFoodForm.foodTitlePlaceholder',
@@ -331,13 +324,13 @@ const EditPartnerFoodFormComponent: React.FC<
                 id: 'EditPartnerFoodForm.packagingPlaceholder',
               })}
             </option>
-            {packagingToRender
-              .filter((cate) => cate.key !== OTHER_OPTION)
-              .map((cat) => (
+            {PACKAGING_OPTIONS.filter((cate) => cate.key !== OTHER_OPTION).map(
+              (cat) => (
                 <option key={cat.key} value={cat.key}>
                   {cat.label}
                 </option>
-              ))}
+              ),
+            )}
           </FieldSelect>
         </div>
       </div>
@@ -403,15 +396,15 @@ const EditPartnerFoodFormComponent: React.FC<
       <div className={css.flexField}>
         <FieldTextInputWithBottomBox
           className={css.field}
-          name="allergicIngredient"
-          id="allergicIngredient"
+          name="allergicIngredients"
+          id="allergicIngredients"
           placeholder={intl.formatMessage({
             id: 'EditPartnerFoodForm.allergicIngredientPlaceholder',
           })}
           label={intl.formatMessage({
             id: 'EditPartnerFoodForm.allergicIngredientLabel',
           })}
-          form={form}
+          form={form as unknown as FormApi}
           validate={composeValidatorsWithAllValues(
             validateNonEnterInputField(
               intl.formatMessage({
@@ -533,6 +526,7 @@ const EditPartnerFoodForm: React.FC<TEditPartnerFoodFormProps> = (props) => {
       setSubmittedValues(values);
     }
   };
+
   return (
     <FinalForm
       mutators={{ ...arrayMutators }}

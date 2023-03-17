@@ -75,6 +75,7 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
     const noImageMessageText = noImageMessage || (
       <FormattedMessage id="ResponsiveImage.noImage" />
     );
+
     return (
       <div className={noImageClasses}>
         <div className={css.noImageWrapper}>
@@ -95,6 +96,7 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
         // Variant not available (most like just not loaded yet)
         return null;
       }
+
       return `${variant.url} ${variant.width}w`;
     })
     .filter((v) => v != null)[0];

@@ -75,6 +75,7 @@ const FormTabNav: React.FC<TTabNavProps> = (props) => {
   const { className, rootClassName, tabRootClassName, tabs = [] } = props;
   const classes = classNames(rootClassName || css.root, className);
   const tabClasses = tabRootClassName || css.tab;
+
   return (
     <nav className={classes}>
       {tabs.map((tab, index) => {

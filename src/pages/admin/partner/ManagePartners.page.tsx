@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, { useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -76,6 +77,7 @@ const TABLE_COLUMN: TColumn[] = [
       if (data?.isDeleted) {
         return <></>;
       }
+
       return <div className={css.rowText}>{data.phoneNumber}</div>;
     },
   },
@@ -86,6 +88,7 @@ const TABLE_COLUMN: TColumn[] = [
       if (data?.isDeleted) {
         return <></>;
       }
+
       return <div className={css.rowText}>{data?.email}</div>;
     },
   },
@@ -96,6 +99,7 @@ const TABLE_COLUMN: TColumn[] = [
       if (data?.isDeleted) {
         return <></>;
       }
+
       return (
         <div title={data?.address} className={css.rowText}>
           {data?.address}
@@ -121,6 +125,7 @@ const TABLE_COLUMN: TColumn[] = [
         [css.authorizedBox]: isAuthorized,
         [css.newBox]: isNew,
       });
+
       return (
         <div className={classses}>
           <FormattedMessage
@@ -146,6 +151,7 @@ const TABLE_COLUMN: TColumn[] = [
         });
       };
       const isAuthorized = data?.status === ERestaurantListingStatus.authorized;
+
       return (
         <div className={css.viewAndEdit}>
           {data?.deleteLoading ? (
@@ -245,6 +251,7 @@ const parseEntitiesToTableData = (
   extraData: any = {},
 ) => {
   if (entityRefs.length === 0) return [];
+
   return entityRefs.map((entity: any, index: number) => {
     const setStatusLoading = entity.id.uuid === extraData?.setStatusLoading;
     const deleteLoading = entity.id.uuid === extraData?.deleteLoading;
@@ -416,6 +423,7 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
       <div className={css.filterWrapper}>
         <IntegrationFilterModal
           onSubmit={onSubmit}
+          title={<FormattedMessage id="ManagePartners.filterModal.title" />}
           onClear={onClear}
           initialValues={{ keywords, meta_status: groupStatus }}>
           {() => (

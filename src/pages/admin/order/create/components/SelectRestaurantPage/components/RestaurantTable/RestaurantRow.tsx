@@ -18,6 +18,7 @@ const prepareDataForRestaurant = (restaurant: any) => {
   const { title } = Listing(restaurantInfo).getAttributes();
   const { categories = [] } = Listing(restaurantInfo).getPublicData();
   const { menuType } = Listing(menu).getMetadata();
+
   return { restaurantId, title, categories, menuType };
 };
 
@@ -30,6 +31,7 @@ const RestaurantRow: React.FC<TRestaurantRowProps> = (props) => {
     ? categories
         .map((cat: string) => {
           const category = CATEGORY_OPTIONS.find((item) => item.key === cat);
+
           return category?.label || undefined;
         })
         .filter((item: string | undefined) => item)

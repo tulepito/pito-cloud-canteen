@@ -59,6 +59,7 @@ const MealPlanCreator: React.FC<MealPlanCreatorProps> = () => {
     if (groupId === 'allMembers') {
       return intl.formatMessage({ id: 'ParticipantSetupField.allMembers' });
     }
+
     return allCompanyGroups[groupId];
   });
   const pickingDeadline = parseDateFromTimestampAndHourString(
@@ -80,6 +81,7 @@ const MealPlanCreator: React.FC<MealPlanCreatorProps> = () => {
     [OrderSettingField.ACCESS_SETTING]: selectedGroupsName?.join(', '),
     [OrderSettingField.PER_PACK]: packagePerMember,
   };
+
   return (
     <div className={css.container}>
       <Button onClick={onOrderSettingModalOpen}>Setting</Button>

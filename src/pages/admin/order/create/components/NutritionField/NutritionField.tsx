@@ -16,6 +16,7 @@ type NutritionFieldProps = {
 const NutritionField: React.FC<NutritionFieldProps> = (props) => {
   const { title, titleClassName, fieldClassName, options } = props;
   const intl = useIntl();
+
   return (
     <div className={css.container}>
       {title && (
@@ -30,7 +31,7 @@ const NutritionField: React.FC<NutritionFieldProps> = (props) => {
             id={`nutritions-${key}`}
             name="nutritions"
             value={key}
-            label={intl.formatMessage({ id: label })}
+            label={label}
             className={css.field}
           />
         ))}

@@ -78,6 +78,7 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
                 profile: { abbreviatedName: getAbbreviatedName(label) },
               },
             };
+
             return (
               <div
                 className={css.item}

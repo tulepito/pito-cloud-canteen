@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
-import React, { useEffect, useRef, useState } from 'react';
-import { CSVLink } from 'react-csv';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
+import * as XLSX from 'xlsx';
 
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
@@ -27,7 +27,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
-import { formatTimestamp } from '@utils/dates';
+import { formatTimestamp } from '@src/utils/dates';
 import {
   CATEGORY_OPTIONS,
   FOOD_TYPE_OPTIONS,
@@ -41,8 +41,6 @@ import type { TIntegrationListing } from '@utils/types';
 
 import css from './ManagePartnerFoods.module.scss';
 
-const fileUrl = process.env.NEXT_PUBLIC_IMPORT_FOOD_GUIDE_FILE_URL;
-
 const TABLE_COLUMN: TColumn[] = [
   {
     key: 'title',
@@ -51,6 +49,7 @@ const TABLE_COLUMN: TColumn[] = [
       if (data.isDeleted) {
         return <div></div>;
       }
+
       return (
         <NamedLink
           path={`/admin/partner/${data.restaurantId}/settings/food/${data.id}`}
@@ -68,6 +67,7 @@ const TABLE_COLUMN: TColumn[] = [
       if (data.isDeleted) {
         return <div></div>;
       }
+
       return <div className={css.descriptionRow}>{data.menuType}</div>;
     },
   },
@@ -78,6 +78,7 @@ const TABLE_COLUMN: TColumn[] = [
       if (data.isDeleted) {
         return <div></div>;
       }
+
       return <div className={css.descriptionRow}>{data.foodType}</div>;
     },
   },
@@ -88,7 +89,8 @@ const TABLE_COLUMN: TColumn[] = [
       if (data.isDeleted) {
         return <div></div>;
       }
-      return <div className={css.descriptionRow}>{data.category}</div>;
+
+      return <div className={css.categoryRow}>{data.category}</div>;
     },
   },
   {
@@ -98,6 +100,7 @@ const TABLE_COLUMN: TColumn[] = [
       if (data.isDeleted) {
         return <div></div>;
       }
+
       return (
         <div>
           <NamedLink
@@ -171,7 +174,7 @@ const parseEntitiesToExportCsv = (
         category,
         foodType,
         menuType,
-        allergicIngredient,
+        allergicIngredients = [],
         maxQuantity,
         minOrderHourInAdvance,
         minQuantity,
@@ -186,7 +189,7 @@ const parseEntitiesToExportCsv = (
         'Tên món ăn': title,
         'Mô tả': description,
         'Đơn giá': `${price?.amount} VND`,
-        'Thành phần dị ứng': allergicIngredient,
+        'Thành phần dị ứng': allergicIngredients.join(','),
         'Chất liệu bao bì': getLabelByKey(PACKAGING_OPTIONS, packaging),
         'Phong cách ẩm thực': getLabelByKey(CATEGORY_OPTIONS, category),
         'Loại món ăn': getLabelByKey(FOOD_TYPE_OPTIONS, foodType),
@@ -208,8 +211,12 @@ const parseEntitiesToExportCsv = (
         ),
       };
     });
+
   return foodsToExport;
 };
+
+const IMPORT_FILE = 'IMPORT_FILE';
+const GOOGLE_SHEET_LINK = 'GOOGLE_SHEET_LINK';
 
 const ManagePartnerFoods = () => {
   const dispatch = useAppDispatch();
@@ -218,7 +225,9 @@ const ManagePartnerFoods = () => {
   const [idsToAction, setIdsToAction] = useState<string[]>([]);
   const [foodToRemove, setFoodToRemove] = useState<any>(null);
   const [file, setFile] = useState<File | null>();
-  const csvLinkRef = useRef<any>();
+  const [googleSheetUrl, setGoogleSheetUrl] = useState<string>();
+  const [importType, setImportType] = useState<string>(IMPORT_FILE);
+
   const {
     value: isImportModalOpen,
     setTrue: openImportModal,
@@ -285,6 +294,7 @@ const ManagePartnerFoods = () => {
     )) as any;
     if (!error) {
       onClearFoodToRemove();
+
       return onQueryPartnerFood({ page: 1, restaurantId });
     }
   };
@@ -296,6 +306,7 @@ const ManagePartnerFoods = () => {
     if (!error) {
       setIdsToAction([]);
       closeRemoveCheckedModal();
+
       return onQueryPartnerFood({ page: 1, restaurantId });
     }
   };
@@ -322,13 +333,17 @@ const ManagePartnerFoods = () => {
 
       ...(keywords ? { keywords } : {}),
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, restaurantId, keywords, categoryString]);
 
   const onImportFoodFromCsv = async () => {
-    if (file) {
+    const hasValue = importType === IMPORT_FILE ? file : googleSheetUrl;
+    if (hasValue) {
       const { error } = (await dispatch(
         foodSliceThunks.createPartnerFoodFromCsv({
-          file,
+          ...(importType === IMPORT_FILE
+            ? { ...(file ? { file } : {}) }
+            : { googleSheetUrl }),
           restaurantId: restaurantId as string,
         }),
       )) as any;
@@ -340,8 +355,26 @@ const ManagePartnerFoods = () => {
     }
   };
 
-  const makeCsv = () => {
-    csvLinkRef.current?.link?.click();
+  const makeExcelFile = () => {
+    const foodsToExport = parseEntitiesToExportCsv(foods, idsToAction);
+    const ws = XLSX.utils.json_to_sheet(foodsToExport);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'SheetJS');
+    XLSX.writeFile(wb, `${formatTimestamp(new Date().getTime())}_Món_Ăn.xlsx`);
+  };
+
+  const onChangeFile = (e: any) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const files =
+      e.dataTransfer && e.dataTransfer.files.length > 0
+        ? [...e.dataTransfer.files]
+        : [...e.target.files];
+
+    if (files[0]) {
+      setFile(files[0]);
+      e.target.value = '';
+    }
   };
 
   return (
@@ -353,6 +386,7 @@ const ManagePartnerFoods = () => {
         <IntegrationFilterModal
           onSubmit={handleSubmitFilter}
           onClear={handleClearFilter}
+          title={<FormattedMessage id="ManagePartnerFoods.filterModal.title" />}
           initialValues={{
             keywords,
             pub_category: groupPubCategory,
@@ -401,15 +435,8 @@ const ManagePartnerFoods = () => {
             <IconUploadFile className={css.buttonIcon} />
             Tải món
           </Button>
-          <CSVLink
-            data={parseEntitiesToExportCsv(foods, idsToAction)}
-            filename={`${formatTimestamp(new Date().getTime())}_donhang.csv`}
-            className={css.hidden}
-            ref={csvLinkRef}
-            target="_blank"
-          />
           <Button
-            onClick={makeCsv}
+            onClick={makeExcelFile}
             disabled={idsToAction.length === 0}
             className={css.lightButton}>
             <IconPrint
@@ -454,49 +481,103 @@ const ManagePartnerFoods = () => {
         confirmLabel="Nhập"
         onCancel={closeImportModal}
         onConfirm={onImportFoodFromCsv}
+        title={<FormattedMessage id="ManagePartnerFoods.importTitle" />}
         cancelLabel="Hủy"
         confirmInProgress={createPartnerFoodFromCsvInProgress}
         confirmDisabled={createPartnerFoodFromCsvInProgress}>
-        <h2 className={css.importTitle}>
-          <FormattedMessage id="ManagePartnerFoods.importTitle" />
-        </h2>
-        <p className={css.downloadFileHere}>
-          <FormattedMessage
-            id="ManagePartnerFoods.downloadFileHere"
-            values={{
-              link: (
-                <NamedLink path={fileUrl}>
-                  <FormattedMessage id="ManagePartnerFoods.templateLink" />
-                </NamedLink>
-              ),
-            }}
-          />
-        </p>
-        <div className={css.inputWrapper}>
-          <input
-            accept=".csv"
-            onChange={({ target }) => setFile(target?.files?.[0])}
-            type="file"
-            className={css.inputFile}
-            name="file"
-            id="file"
-          />
-          <label className={css.importLabel}>
-            <FormattedMessage id="ManagePartnerFoods.importLabel" />
-          </label>
-          <label htmlFor="file">
-            <div className={css.fileLabel}>
-              {file ? (
-                file.name
-              ) : (
-                <FormattedMessage id="ManagePartnerFoods.inputFile" />
-              )}
-            </div>
-          </label>
-          {createPartnerFoodFromCsvError && (
-            <ErrorMessage message={createPartnerFoodFromCsvError.message} />
-          )}
+        <div className={css.radioButton}>
+          <div className={css.inputWrapper}>
+            <input
+              id="importFile"
+              type="radio"
+              checked={importType === IMPORT_FILE}
+              onChange={() => setImportType(IMPORT_FILE)}
+            />
+            <label htmlFor="importFile">Nhập file</label>
+          </div>
+          <div className={css.inputWrapper}>
+            <input
+              id="googleSheetLink"
+              type="radio"
+              checked={importType === GOOGLE_SHEET_LINK}
+              onChange={() => setImportType(GOOGLE_SHEET_LINK)}
+            />
+            <label htmlFor="googleSheetLink">Link Google Sheet</label>
+          </div>
         </div>
+        <p className={css.downloadFileHere}>
+          {importType !== GOOGLE_SHEET_LINK ? (
+            <FormattedMessage
+              id="ManagePartnerFoods.downloadFileHere"
+              values={{
+                link: (
+                  <NamedLink
+                    target="_blank"
+                    path={process.env.NEXT_PUBLIC_IMPORT_FOOD_GUIDE_FILE_URL}>
+                    <FormattedMessage id="ManagePartnerFoods.templateLink" />
+                  </NamedLink>
+                ),
+              }}
+            />
+          ) : (
+            <FormattedMessage
+              id="ManagePartnerFoods.sampleFileHere"
+              values={{
+                link: (
+                  <NamedLink
+                    target="_blank"
+                    path={process.env.NEXT_PUBLIC_IMPORT_FOOD_TEMPLATE}>
+                    <FormattedMessage id="ManagePartnerFoods.templateLink" />
+                  </NamedLink>
+                ),
+              }}
+            />
+          )}
+        </p>
+        {importType === GOOGLE_SHEET_LINK ? (
+          <div>
+            <input
+              onChange={({ target }) => setGoogleSheetUrl(target.value)}
+              type="text"
+              name="file"
+              value={googleSheetUrl}
+              id="file"
+              placeholder="Nhập link google sheet"
+              className={css.googleSheetInput}
+            />
+            <p>
+              {
+                'Vào Google Sheet -> chọn File -> chọn Share -> chọn Publish to the web -> Chọn dạng publish là CSV -> Publish -> Copy pubished link -> Paste vào ô nhập'
+              }
+            </p>
+          </div>
+        ) : (
+          <div className={css.inputWrapper}>
+            <input
+              accept=".xlsx,.xls"
+              onChange={onChangeFile}
+              type="file"
+              className={css.inputFile}
+              name="file"
+              id="file"
+            />
+            <label className={css.importLabel}>
+              <FormattedMessage id="ManagePartnerFoods.importLabel" />
+            </label>
+            <label htmlFor="file">
+              <div className={css.fileLabel}>
+                {file ? (
+                  file.name
+                ) : (
+                  <FormattedMessage id="ManagePartnerFoods.inputFile" />
+                )}
+              </div>
+            </label>
+            {createPartnerFoodFromCsvError && (
+              <ErrorMessage message={createPartnerFoodFromCsvError.message} />
+            )}
+          </div>
+        )}
       </AlertModal>
       <AlertModal
         title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}

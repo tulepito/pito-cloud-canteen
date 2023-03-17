@@ -21,6 +21,7 @@ const validate = (values: TLocationFormValues) => {
   if (!values.deliveryAddress) {
     errors.deliveryAddress = 'Vui lòng chọn địa chỉ giao hàng';
   }
+
   return errors;
 };
 
