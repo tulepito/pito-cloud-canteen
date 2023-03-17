@@ -360,6 +360,20 @@ const ManagePartnerFoods = () => {
     csvLinkRef.current?.link?.click();
   };
 
+  const onChangeFile = (e: any) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const files =
+      e.dataTransfer && e.dataTransfer.files.length > 0
+        ? [...e.dataTransfer.files]
+        : [...e.target.files];
+
+    if (files[0]) {
+      setFile(files[0]);
+      e.target.value = '';
+    }
+  };
+
   return (
     <div className={css.root}>
       <h1 className={css.title}>
@@ -545,7 +559,7 @@ const ManagePartnerFoods = () => {
           <div className={css.inputWrapper}>
             <input
               accept=".xlsx,.xls"
-              onChange={({ target }) => setFile(target?.files?.[0])}
+              onChange={onChangeFile}
               type="file"
               className={css.inputFile}
               name="file"
