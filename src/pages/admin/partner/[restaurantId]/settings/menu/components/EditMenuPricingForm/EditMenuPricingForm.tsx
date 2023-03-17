@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/default-param-last */
 import { useImperativeHandle, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
+import { Field, Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 import type { FormApi } from 'final-form';
 
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import Form from '@components/Form/Form';
+import ValidationError from '@components/ValidationError/ValidationError';
+import { foodByDatesAtLeastOneDayHasFood } from '@src/utils/validators';
 import { IntegrationListing } from '@utils/data';
 import type { TIntegrationListing } from '@utils/types';
 
@@ -42,6 +44,17 @@ type TFoodResource = {
   id: string;
   price: number;
   foodNote?: string;
+};
+
+const HiddenField = (hiddenProps: any) => {
+  const { input, meta: fieldMeta } = hiddenProps;
+
+  return (
+    <div className={css.imageRequiredWrapper}>
+      <input {...input} />
+      <ValidationError fieldMeta={fieldMeta} />
+    </div>
+  );
 };
 
 const EditMenuPricingFormComponent: React.FC<
@@ -130,6 +143,14 @@ const EditMenuPricingFormComponent: React.FC<
             }}
           />
         )}
+        <Field
+          component={HiddenField}
+          name="foodsByDate"
+          type="hidden"
+          validate={foodByDatesAtLeastOneDayHasFood(
+            'Chọn ít nhất một món cho một ngày',
+          )}
+        />
       </Form>
       <AddFoodModal
         isOpen={!!currentDate}
