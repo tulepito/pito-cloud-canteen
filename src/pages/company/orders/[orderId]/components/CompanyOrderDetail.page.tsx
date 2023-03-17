@@ -18,7 +18,10 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
       <TitleSection className={css.titleSection} orderTitle={orderTitle} />
       <ReviewView
         className={css.reviewInfoContainer}
-        onDownloadPriceQuotation={downloadPriceQuotation(priceQuotationData)}
+        onDownloadPriceQuotation={downloadPriceQuotation(
+          orderTitle,
+          priceQuotationData,
+        )}
         canEditInfo={false}
         reviewViewData={reviewViewData}
       />

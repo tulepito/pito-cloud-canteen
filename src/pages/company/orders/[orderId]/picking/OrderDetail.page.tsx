@@ -51,6 +51,7 @@ const OrderDetailPage = () => {
   );
   const { orderData } = useAppSelector((state) => state.OrderManagement);
   const {
+    orderTitle,
     editViewData,
     reviewViewData,
     priceQuotationData,
@@ -136,7 +137,10 @@ const OrderDetailPage = () => {
       canGoBackEditMode
       reviewViewData={reviewViewData}
       onSubmitEdit={handleSubmitReviewInfoForm}
-      onDownloadPriceQuotation={downloadPriceQuotation(priceQuotationData)}
+      onDownloadPriceQuotation={downloadPriceQuotation(
+        orderTitle,
+        priceQuotationData,
+      )}
       onGoBackToEditOrderPage={handleGoBackFromReviewMode}
       showStartPickingOrderButton
     />
