@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
 import clone from 'lodash/clone';
@@ -40,6 +41,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     onRecommendRestaurantForSpecificDay,
     onRecommendRestaurantForSpecificDayInProgress,
     onSearchRestaurant,
+    availableOrderDetailCheckList,
   } = resources;
 
   const removeEventItem =
@@ -50,8 +52,16 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
       dispatch(removeMealDay(cloneOrderDetail));
     });
 
-  const onRecommendMealInProgress =
-    onRecommendRestaurantForSpecificDayInProgress?.(event?.start?.getTime());
+  const onRecommendMealInProgress = useMemo(
+    () =>
+      onRecommendRestaurantForSpecificDayInProgress?.(event?.start?.getTime()),
+    [event?.start, onRecommendRestaurantForSpecificDayInProgress],
+  );
+
+  const onEditFoodInProgress = useMemo(
+    () => editFoodInprogress?.(event?.start?.getTime()),
+    [editFoodInprogress, event?.start],
+  );
 
   return (
     <div className={css.root}>
@@ -65,15 +75,21 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
         event={event}
         onRecommendMeal={onRecommendRestaurantForSpecificDay}
         onRecommendMealInProgress={onRecommendMealInProgress}
+        restaurantAvailable={
+          availableOrderDetailCheckList?.[event?.start?.getTime()!]
+        }
       />
       <MealPlanCardFooter
         event={event}
         onEditFood={onEditFood}
-        editFoodInprogress={editFoodInprogress}
+        editFoodInprogress={onEditFoodInProgress}
         onApplyOtherDays={onApplyOtherDays}
         startDate={startDate}
         endDate={endDate}
         onApplyOtherDaysInProgress={onApplyOtherDaysInProgress}
+        editAvailable={
+          availableOrderDetailCheckList?.[event?.start?.getTime()!]
+        }
       />
     </div>
   );

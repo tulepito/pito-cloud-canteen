@@ -20,7 +20,10 @@ import {
 import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
-import { getMenuQuery } from '@helpers/listingSearchQuery';
+import {
+  getMenuQuery,
+  getMenuQueryInSpecificDay,
+} from '@helpers/listingSearchQuery';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { UserPermission } from '@src/types/UserPermission';
@@ -107,6 +110,9 @@ type TOrderInitialState = {
     key: string;
     label: string;
   }[];
+  availableOrderDetailCheckList: {
+    [timestamp: string]: boolean;
+  };
 };
 
 const initialState: TOrderInitialState = {
@@ -181,6 +187,7 @@ const initialState: TOrderInitialState = {
   onRescommendRestaurantForSpecificDateError: null,
 
   nutritions: [],
+  availableOrderDetailCheckList: {},
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -196,6 +203,8 @@ const RECOMMEND_RESTAURANT = 'app/Order/RECOMMEND_RESTAURANT';
 const RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY =
   'app/Order/RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY';
 const FETCH_NUTRITIONS = 'app/Order/FETCH_NUTRITIONS';
+const CHECK_RESTAURANT_STILL_AVAILABLE =
+  'app/Order/CHECK_RESTAURANT_STILL_AVAILABLE';
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
   const { clientId, bookerId, isCreatedByAdmin = false, generalInfo } = params;
@@ -644,6 +653,41 @@ const fetchNutritions = createAsyncThunk(FETCH_NUTRITIONS, async () => {
   return searchFiltersResponse.nutritions;
 });
 
+const checkRestaurantStillAvailable = createAsyncThunk(
+  CHECK_RESTAURANT_STILL_AVAILABLE,
+  async (_, { getState, extra: sdk }) => {
+    const { order, orderDetail } = getState().Order;
+    const availableOrderDetailCheckList = await Promise.all(
+      Object.keys(orderDetail).map(async (timestamp) => {
+        const { restaurant } = orderDetail[timestamp];
+        const { menuId } = restaurant;
+        const menuQuery = getMenuQueryInSpecificDay({
+          order,
+          timestamp: +timestamp,
+        });
+        const allMenus = await queryAllPages({
+          sdkModel: sdk.listings,
+          query: menuQuery,
+        });
+
+        return {
+          [timestamp]:
+            allMenus.findIndex((menu: TListing) => menu.id.uuid === menuId) !==
+            -1,
+        };
+      }),
+    );
+
+    return availableOrderDetailCheckList.reduce(
+      (result, item) => ({
+        ...result,
+        ...item,
+      }),
+      {},
+    );
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -662,6 +706,7 @@ export const orderAsyncActions = {
   recommendRestaurants,
   recommendRestaurantForSpecificDay,
   fetchNutritions,
+  checkRestaurantStillAvailable,
 };
 
 const orderSlice = createSlice({
@@ -1051,7 +1096,19 @@ const orderSlice = createSlice({
       .addCase(fetchNutritions.fulfilled, (state, { payload }) => ({
         ...state,
         nutritions: payload,
-      }));
+      }))
+
+      .addCase(checkRestaurantStillAvailable.pending, () => {})
+      .addCase(
+        checkRestaurantStillAvailable.fulfilled,
+        (state, { payload }) => ({
+          ...state,
+          availableOrderDetailCheckList: payload,
+        }),
+      )
+      .addCase(checkRestaurantStillAvailable.rejected, (state, { payload }) => {
+        state.fetchOrderDetailError = payload;
+      });
   },
 });
 

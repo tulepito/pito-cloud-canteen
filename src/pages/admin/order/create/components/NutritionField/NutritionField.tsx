@@ -31,7 +31,7 @@ const NutritionField: React.FC<NutritionFieldProps> = (props) => {
             id={`nutritions-${key}`}
             name="nutritions"
             value={key}
-            label={intl.formatMessage({ id: label })}
+            label={label}
             className={css.field}
           />
         ))}

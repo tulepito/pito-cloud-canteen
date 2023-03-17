@@ -115,10 +115,17 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
             difference(Array.from(formatListEmailValue), emailList),
           );
         };
-        const handleKeyDown = (event: any) => {
+        const handleKeyUp = (event: any) => {
           if (event.key === 'Enter') {
             event.preventDefault();
             handleEmailFieldBlur(event);
+          }
+        };
+
+        // To prevent form submit when user press enter key
+        const handleKeyDown = (event: any) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
           }
         };
 
@@ -132,6 +139,7 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
                 id: 'AddCompanyMembersForm.emailListPlaceholder',
               })}
               onBlur={handleEmailFieldBlur}
+              onKeyUp={handleKeyUp}
               onKeyDown={handleKeyDown}
             />
             {invalidEmailControl.value && (

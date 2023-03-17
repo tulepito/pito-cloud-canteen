@@ -855,6 +855,7 @@
   "ManagePartnerFoods.inputFile": "Click chọn file hoặc kéo thả",
   "ManagePartnerFoods.removeContent": "Bạn có chắc chắn muốn xóa {foodName} không?",
   "ManagePartnerFoods.removeTitle": "Xóa món ăn",
+  "ManagePartnerFoods.sampleFileHere": "Xem bản mẫu tại {link}",
   "ManagePartnerFoods.templateLink": "đây.",
   "ManagePartnerFoods.title": "Danh sách món ăn",
   "ManagePartnerMenu.cancelLabel": "Hủy",

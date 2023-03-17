@@ -203,7 +203,6 @@ export const getImportDataFromCsv = (values: any) => {
     description,
     price,
     allergicIngredients = '',
-    restaurantId,
     foodType,
     numberOfMainDishes = 0,
     menuType,
@@ -211,6 +210,8 @@ export const getImportDataFromCsv = (values: any) => {
     notes,
     ...sideDishesValues
   } = valuesInEnglish as any;
+
+  const { restaurantId } = values;
 
   const sideDishes = Object.keys(sideDishesValues || {}).reduce(
     (acc: string[], key: string) => {
@@ -246,10 +247,10 @@ export const getImportDataFromCsv = (values: any) => {
     description,
     price: parsePriceToMoneyFormat(price),
     publicData: {
-      ...(allergicIngredients ||
-      toNonAccentVietnamese(allergicIngredients, true) !== 'khong'
+      ...(allergicIngredients &&
+      toNonAccentVietnamese(allergicIngredients, true).trim() !== 'khong'
         ? {
-            allergicIngredients: String(allergicIngredients).trim().split(','),
+            allergicIngredients: allergicIngredients.trim().split(','),
           }
         : {}),
       ...(foodTypeValue ? { foodType: foodTypeValue } : {}),

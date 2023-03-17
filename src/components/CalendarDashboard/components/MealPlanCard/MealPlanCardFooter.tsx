@@ -19,6 +19,7 @@ type TMealPlanCardFooterProps = {
   onApplyOtherDaysInProgress?: boolean;
   startDate?: Date | number;
   endDate?: Date | number;
+  editAvailable?: boolean;
 };
 
 const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
@@ -30,6 +31,7 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
   onApplyOtherDaysInProgress,
   startDate,
   endDate,
+  editAvailable = true,
 }) => {
   const { id, isSelectedFood, restaurant = {} } = event.resource || {};
   const [isOpenApplyOtherDaysModal, setIsOpenApplyOtherDaysModal] =
@@ -56,23 +58,30 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
 
   return (
     <div className={css.footer}>
-      <Button
-        variant="secondary"
-        className={css.actionButton}
-        onClick={handleEditFood}
-        inProgress={editFoodInprogress}>
-        {isSelectedFood ? (
-          <FormattedMessage id="MealPlanCard.footer.modify" />
-        ) : (
-          <FormattedMessage id="MealPlanCard.footer.selectDish" />
-        )}
-      </Button>
+      {!editAvailable ? (
+        <div className={css.editNotAvailable}>Nhà hàng không còn phù hợp</div>
+      ) : (
+        <>
+          <Button
+            variant="secondary"
+            className={css.actionButton}
+            onClick={handleEditFood}
+            inProgress={editFoodInprogress}>
+            {isSelectedFood ? (
+              <FormattedMessage id="MealPlanCard.footer.modify" />
+            ) : (
+              <FormattedMessage id="MealPlanCard.footer.selectDish" />
+            )}
+          </Button>
 
-      <div
-        className={css.applyForOtherDays}
-        onClick={handleOpenApplyOtherDaysModal}>
-        <FormattedMessage id="MealPlanCard.footer.applyForOtherDays" />
-      </div>
+          <div
+            className={css.applyForOtherDays}
+            onClick={handleOpenApplyOtherDaysModal}>
+            <FormattedMessage id="MealPlanCard.footer.applyForOtherDays" />
+          </div>
+        </>
+      )}
+
       <ApplyOtherDaysModal
         isOpen={isOpenApplyOtherDaysModal}
         onClose={handleCloseApplyOtherDaysModal}

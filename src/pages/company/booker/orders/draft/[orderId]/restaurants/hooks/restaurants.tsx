@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { shallowEqual } from 'react-redux';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
@@ -42,15 +42,6 @@ export const useSearchRestaurants = () => {
     shallowEqual,
   );
 
-  const restaurantInPage = useMemo(
-    () =>
-      restaurants.slice(
-        parseInt(page as string, 10) - 1,
-        parseInt(page as string, 10) + 9,
-      ),
-    [page, restaurants],
-  );
-
   useEffect(() => {
     dispatch(
       selectCalendarDate(DateTime.fromMillis(Number(timestamp)).toJSDate()),
@@ -91,7 +82,7 @@ export const useSearchRestaurants = () => {
   ]);
 
   return {
-    restaurants: restaurantInPage,
+    restaurants,
     searchInProgress,
     totalResultItems,
     totalRatings,

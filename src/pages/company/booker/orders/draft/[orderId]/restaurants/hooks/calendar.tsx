@@ -59,15 +59,6 @@ export const useGetCalendarExtraResources = ({
   const { dayInWeek = [] } = orderData.getMetadata();
   const onApplyOtherDaysInProgress = updateOrderDetailInProgress;
 
-  const handleEditFood = useCallback(
-    (date: string, restaurantId: string, menuId: string) => {
-      router.push(
-        `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date}&restaurantId=${restaurantId}&menuId=${menuId}`,
-      );
-    },
-    [orderId, router],
-  );
-
   const onSearchRestaurant = useCallback(
     (date: Date) => {
       router.push(
@@ -138,7 +129,6 @@ export const useGetCalendarExtraResources = ({
       updatePlanDetailInprogress,
       fetchPlanDetailInProgress:
         fetchOrderDetailInProgress || fetchOrderInProgress,
-      onEditFood: handleEditFood,
       onSearchRestaurant,
       dayInWeek,
       onApplyOtherDays,
@@ -153,7 +143,6 @@ export const useGetCalendarExtraResources = ({
     fetchOrderInProgress,
     startDate,
     updatePlanDetailInprogress,
-    handleEditFood,
     onSearchRestaurant,
     dayInWeek,
     onApplyOtherDays,

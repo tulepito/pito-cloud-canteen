@@ -35,11 +35,6 @@ const ParticipantPlan = () => {
     <ParticipantLayout>
       <div className={css.root}>
         <div className={css.leftSection}>
-          <SectionRestaurantHero
-            listing={selectedRestaurant}
-            orderDay={Number(orderDayState)}
-            inProgress={loadDataInProgress}
-          />
           <div>
             <NamedLink
               path={participantPaths.Order}
@@ -49,6 +44,11 @@ const ParticipantPlan = () => {
               Quay lại
             </NamedLink>
           </div>
+          <SectionRestaurantHero
+            listing={selectedRestaurant}
+            orderDay={Number(orderDayState)}
+            inProgress={loadDataInProgress}
+          />
           <SectionOrderListing
             plan={plan}
             onSelectTab={handleSelectRestaurant}

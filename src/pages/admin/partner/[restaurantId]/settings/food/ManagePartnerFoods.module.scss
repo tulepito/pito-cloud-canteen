@@ -1,6 +1,7 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/defaults.scss' as *;
 
 .title {
   @include pageTitle;
@@ -206,8 +207,15 @@
   }
 }
 
+.inputWrapper {
+  position: relative;
+}
+
 .inputFile {
-  display: none;
+  opacity: 0;
+  position: absolute;
+  height: 100%;
+  width: 100%;
 }
 
 .fileLabel {
@@ -253,5 +261,21 @@
 .table {
   @include viewportMedium {
     min-width: 1440px;
+  }
+}
+
+.googleSheetInput {
+  @include inputStyles;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.radioButton {
+  margin-bottom: 20px;
+  .inputWrapper {
+    margin-bottom: 10px;
+    display: flex;
+    overflow: hidden;
+    align-items: center;
   }
 }

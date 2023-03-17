@@ -522,3 +522,16 @@ export const valueGreaterThanMin =
 
     return value < maxFieldValue ? message : VALID;
   };
+
+export const foodByDatesAtLeastOneDayHasFood =
+  (message: string) => (value: TObject) => {
+    let hasFood = false;
+    Object.keys(value || {}).forEach((k) => {
+      if (Object.keys(value[k] || {}).length > 0) {
+        hasFood = true;
+      }
+    });
+    console.log({ hasFood, value });
+
+    return hasFood ? VALID : message;
+  };

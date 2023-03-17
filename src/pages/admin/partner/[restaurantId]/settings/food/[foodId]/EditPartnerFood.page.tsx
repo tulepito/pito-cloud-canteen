@@ -7,7 +7,10 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
+import { partnerThunks } from '@redux/slices/partners.slice';
+import { IntegrationListing } from '@src/utils/data';
 import type { TObject } from '@src/utils/types';
+import { parsePrice } from '@src/utils/validators';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 
@@ -18,7 +21,7 @@ import { getUpdateFoodData } from '../utils';
 import css from './EditPartnerFood.module.scss';
 
 const EditPartnerFoodPage = () => {
-  const { foodId = '' } = useRouter().query;
+  const { foodId = '', restaurantId = '' } = useRouter().query;
   const dispatch = useAppDispatch();
 
   const {
@@ -30,8 +33,11 @@ const EditPartnerFoodPage = () => {
     uploadingImages,
   } = useAppSelector((state) => state.foods, shallowEqual);
 
-  const { showPartnerListingInProgress, showPartnerListingError } =
-    useAppSelector((state) => state.partners, shallowEqual);
+  const {
+    showPartnerListingInProgress,
+    showPartnerListingError,
+    partnerListingRef,
+  } = useAppSelector((state) => state.partners, shallowEqual);
 
   const handleSubmit = (values: TEditPartnerFoodFormValues) =>
     dispatch(
@@ -39,26 +45,52 @@ const EditPartnerFoodPage = () => {
         getUpdateFoodData({ ...values, id: foodId as string }),
       ),
     );
+
+  const {
+    minQuantity: minQuantityFromPartner,
+    maxQuantity: maxQuantityFromPartner,
+  } = IntegrationListing(partnerListingRef).getPublicData();
+
   const initialValues = useMemo(() => {
     const attributes = currentFoodListing?.attributes || {};
+
     const {
       publicData = {},
       price,
       title,
       description,
     } = attributes || ({} as TObject);
-    const { menuType, foodType } = publicData;
+    const {
+      menuType,
+      foodType,
+      minQuantity,
+      maxQuantity,
+      minOrderHourInAdvance,
+    } = publicData;
 
     return {
       images: getInitialAddImages(currentFoodListing?.images || []),
       title,
       description,
-      price: price?.amount,
+      price: parsePrice(price?.amount || 0),
       ...publicData,
       menuType: menuType || EMenuTypes.fixedMenu,
       foodType: foodType || EFoodTypes.savoryDish,
+      minQuantity: minQuantity || minQuantityFromPartner,
+      maxQuantity: maxQuantity || maxQuantityFromPartner,
+      minOrderHourInAdvance: minOrderHourInAdvance || 24,
     };
-  }, [currentFoodListing]) as TEditPartnerFoodFormValues;
+  }, [
+    currentFoodListing,
+    maxQuantityFromPartner,
+    minQuantityFromPartner,
+  ]) as TEditPartnerFoodFormValues;
+
+  useEffect(() => {
+    if (restaurantId) {
+      dispatch(partnerThunks.showPartnerRestaurantListing(restaurantId));
+    }
+  }, [restaurantId, dispatch]);
 
   useEffect(() => {
     dispatch(foodSliceAction.setInitialStates());
