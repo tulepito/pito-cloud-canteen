@@ -1,5 +1,6 @@
 import { useIntl } from 'react-intl';
 
+import { parseThousandNumber } from '@helpers/format';
 import { formatTimestamp } from '@src/utils/dates';
 import type { TObject } from '@src/utils/types';
 
@@ -65,7 +66,7 @@ const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
                   </div>
                 </div>
                 <div>{totalDishes}</div>
-                <div>{totalPriceOfDate}đ</div>
+                <div>{parseThousandNumber(totalPriceOfDate || 0)}đ</div>
               </div>
               <div className={css.rows}>
                 {foodDataList.map((foodData: TObject) => {
@@ -76,7 +77,7 @@ const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
                       <div></div>
                       <div>{foodName}</div>
                       <div>{frequency}</div>
-                      <div>{foodPrice}đ</div>
+                      <div>{parseThousandNumber(foodPrice || 0)}đ</div>
                     </div>
                   );
                 })}

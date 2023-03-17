@@ -2,9 +2,9 @@
 @use '/src/styles/vars.scss' as *;
 
 .root {
-  padding: 32px 48px;
+  padding: 0 48px;
   margin: 0 auto;
-  max-width: 500px;
+  max-width: 600px;
 
   .titleContainer {
     display: flex;
