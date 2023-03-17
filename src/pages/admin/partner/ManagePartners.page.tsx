@@ -391,6 +391,7 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
     content = (
       <>
         <TableForm
+          tableClassName={css.table}
           columns={TABLE_COLUMN}
           data={dataTable}
           pagination={pagination}
