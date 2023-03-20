@@ -197,6 +197,7 @@ const EditMenuCompleteFormComponent: React.FC<
             type="hidden"
             validate={foodByDatesAtLeastOneDayHasFood(
               'Chọn ít nhất một món cho một ngày',
+              daysOfWeek,
             )}
           />
         </div>
