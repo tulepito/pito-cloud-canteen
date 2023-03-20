@@ -71,7 +71,7 @@ export const getMenuQuery = ({
           )}`,
         }
       : {}),
-    [`pub_${dayOfWeek}minFoodPrice`]: `,${packagePerMember}`,
+    [`pub_${dayOfWeek}MinFoodPrice`]: `,${packagePerMember}`,
     ...(keywords && { keywords }),
     ...(page && { page }),
     ...(perPage && { perPage }),
@@ -167,7 +167,7 @@ export const getMenuQueryInSpecificDay = ({
           [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(',')}`,
         }
       : {}),
-    [`pub_${dayOfWeek}minFoodPrice`]: `,${packagePerMember}`,
+    [`pub_${dayOfWeek}MinFoodPrice`]: `,${packagePerMember}`,
   };
 
   return query;
