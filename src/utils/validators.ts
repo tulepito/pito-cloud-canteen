@@ -524,14 +524,19 @@ export const valueGreaterThanMin =
   };
 
 export const foodByDatesAtLeastOneDayHasFood =
-  (message: string) => (value: TObject) => {
-    let hasFood = false;
+  (message: string, daysOfWeek: string[]) => (value: TObject) => {
+    let valid = true;
+
+    if (daysOfWeek.length !== Object.keys(value || {}).length) {
+      return message;
+    }
+
     Object.keys(value || {}).forEach((k) => {
-      if (Object.keys(value[k] || {}).length > 0) {
-        hasFood = true;
+      if (Object.keys(value[k]).length <= 0) {
+        valid = false;
       }
     });
-    console.log({ hasFood, value });
+    console.log({ valid });
 
-    return hasFood ? VALID : message;
+    return valid ? VALID : message;
   };

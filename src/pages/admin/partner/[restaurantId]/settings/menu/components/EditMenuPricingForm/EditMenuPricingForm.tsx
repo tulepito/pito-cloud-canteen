@@ -148,7 +148,8 @@ const EditMenuPricingFormComponent: React.FC<
           name="foodsByDate"
           type="hidden"
           validate={foodByDatesAtLeastOneDayHasFood(
-            'Chọn ít nhất một món cho một ngày',
+            'Mỗi ngày cần có ít nhất 1 món ăn',
+            daysOfWeek,
           )}
         />
       </Form>
