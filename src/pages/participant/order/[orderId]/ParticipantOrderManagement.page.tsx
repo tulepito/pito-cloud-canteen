@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useIntl } from 'react-intl';
+// import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import Avatar from '@components/Avatar/Avatar';
+import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -21,7 +22,7 @@ import css from './ParticipantOrderManagement.module.scss';
 
 const ParticipantOrderManagement = () => {
   const router = useRouter();
-  const intl = useIntl();
+  // const intl = useIntl();
   const dispatch = useAppDispatch();
 
   const { isReady, query } = router;
@@ -57,29 +58,29 @@ const ParticipantOrderManagement = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady]);
 
-  const onTabChange = (tabItem: any) => {
-    if (tabItem.id === 'personal') {
-      isOwnerControl.setTrue();
-    } else {
-      isOwnerControl.setFalse();
-    }
-  };
+  // const onTabChange = (tabItem: any) => {
+  //   if (tabItem.id === 'personal') {
+  //     isOwnerControl.setTrue();
+  //   } else {
+  //     isOwnerControl.setFalse();
+  //   }
+  // };
 
   const tabOptions = [
-    {
-      id: 'personal',
-      label: (
-        <div className={css.companyTab}>
-          <div className={css.fakeAvatar}></div>
-          <span>
-            {intl.formatMessage({
-              id: 'ParticipantOrderManagement.tab.personal',
-            })}
-          </span>
-        </div>
-      ),
-      childrenFn: () => <div></div>,
-    },
+    // {
+    //   id: 'personal',
+    //   label: (
+    //     <div className={css.companyTab}>
+    //       <div className={css.fakeAvatar}></div>
+    //       <span>
+    //         {intl.formatMessage({
+    //           id: 'ParticipantOrderManagement.tab.personal',
+    //         })}
+    //       </span>
+    //     </div>
+    //   ),
+    //   childrenFn: () => <div></div>,
+    // },
     {
       id: 'company',
       label: (
@@ -111,7 +112,16 @@ const ParticipantOrderManagement = () => {
         setViewFunction={setCurrentView}
         showToggle={isOwnerControl.value}
       />
-      <Tabs items={tabOptions as any} onChange={onTabChange} />
+      {loadDataInProgress ? (
+        <>
+          <CalendarDashboard
+            inProgress={loadDataInProgress}
+            components={{ toolbar: () => <></> }}
+          />
+        </>
+      ) : (
+        <Tabs items={tabOptions as any} />
+      )}
     </ParticipantLayout>
   );
 };

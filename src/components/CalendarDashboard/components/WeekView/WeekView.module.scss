@@ -18,6 +18,7 @@
 
   @include viewportMedium {
     width: 1440px;
+    height: calc(100vh - 350px);
   }
 
   @include viewportLargeWithPaddings {

@@ -91,12 +91,12 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
         ) : (
           <div />
         )}
-        <Button
+        {/* <Button
           className={css.todayBtn}
           variant="secondary"
           onClick={navigateFunc(ENavigate.TODAY)}>
           <FormattedMessage id="Toolbar.action.today" />
-        </Button>
+        </Button> */}
         <div className={css.toolbarNavigation}>
           <div
             className={classNames(css.arrowBtn, !showPrevBtn && css.disabled)}

@@ -40,6 +40,10 @@ const ListingCard: React.FC<TListCardProps> = ({
       dispatch(shoppingCartThunks.addToCart({ planId, dayId, mealId }));
     }
   };
+  const handleRemoveFromCard = () => {
+    dispatch(shoppingCartThunks.removeFromCart({ planId, dayId }));
+  };
+
   const badges = specialDiets
     .slice(0, 3)
     .map((diet: string) =>
@@ -72,9 +76,11 @@ const ListingCard: React.FC<TListCardProps> = ({
           <p className={css.description}>{description}</p>
         </div>
         <div className={css.listingCardFooter}>
-          <p className={css.allergiesLabel}>{allergicIngredients.join(', ')}</p>
+          <p className={css.allergiesLabel}>
+            {allergicIngredients.map((item: string) => `Có ${item}`).join(', ')}
+          </p>
           {isSelected ? (
-            <span className={css.removeDish}>
+            <span className={css.removeDish} onClick={handleRemoveFromCard}>
               <IconCheckmarkWithCircle />
             </span>
           ) : (
