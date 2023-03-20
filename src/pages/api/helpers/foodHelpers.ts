@@ -40,7 +40,7 @@ export const updateMenuAfterFoodDeletedByListId = async (foodIds: string[]) => {
 
     const { menuIdList = [] } = IntegrationListing(deletedFood).getPublicData();
 
-    const menus = await queryMenuByIdList(menuIdList);
+    const menus = (await queryMenuByIdList(menuIdList)) || [];
     menus.forEach((menu: TIntegrationListing) => {
       menuListWithFoodIds = {
         ...menuListWithFoodIds,
@@ -64,13 +64,14 @@ export const updateMenuAfterFoodDeletedByListId = async (foodIds: string[]) => {
         Object.keys(EDayOfWeek).map(async (dayKey) => {
           const day = EDayOfWeek[dayKey as keyof typeof EDayOfWeek];
           const foodIdList =
-            IntegrationListing(details).getMetadata()[`${day}FoodIdList`];
+            IntegrationListing(details).getMetadata()[`${day}FoodIdList`] || [];
 
           const currentMinFoodPrice =
-            IntegrationListing(details).getPublicData()[`${day}MinFoodPrice`];
+            IntegrationListing(details).getPublicData()[`${day}MinFoodPrice`] ||
+            0;
 
           const foodsByDate =
-            IntegrationListing(details).getPublicData()?.foodsByDate;
+            IntegrationListing(details).getPublicData()?.foodsByDate || {};
 
           const foodsByDay = foodsByDate?.[day];
 
@@ -175,10 +176,10 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
         Object.keys(EDayOfWeek).map(async (key) => {
           const day = EDayOfWeek[key as keyof typeof EDayOfWeek];
           const foodIdList =
-            IntegrationListing(menu).getMetadata()[`${day}FoodIdList`];
+            IntegrationListing(menu).getMetadata()[`${day}FoodIdList`] || [];
 
           const currentMinFoodPrice =
-            IntegrationListing(menu).getPublicData()[`${day}MinFoodPrice`];
+            IntegrationListing(menu).getPublicData()[`${day}MinFoodPrice`] || 0;
 
           const foodsByDate =
             IntegrationListing(menu).getPublicData()?.foodsByDate;
@@ -280,7 +281,7 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
         Object.keys(EDayOfWeek).map(async (key) => {
           const day = EDayOfWeek[key as keyof typeof EDayOfWeek];
           const foodIdList =
-            IntegrationListing(menu).getMetadata()[`${day}FoodIdList`];
+            IntegrationListing(menu).getMetadata()[`${day}FoodIdList`] || [];
 
           if (foodIdList.includes(updatedFoodId)) {
             const listFoodResponse = await integrationSdk.listings.query({
