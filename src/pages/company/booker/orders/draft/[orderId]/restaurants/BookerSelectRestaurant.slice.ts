@@ -107,11 +107,11 @@ const initialState: TOrderInitialState = {
 };
 
 // ================ Thunk types ================ //
-const FETCH_RESTAURANT = 'app/BookerDraftOrderPage/FETCH_RESTAURANT';
-const FETCH_SEARCH_FILTER = 'app/BookerDraftOrderPage/FETCH_SEARCH_FILTER';
-const SEARCH_RESTAURANT = 'app/BookerDraftOrderPage/SEARCH_RESTAURANT';
+const FETCH_RESTAURANT = 'app/BookerSelectRestaurant/FETCH_RESTAURANT';
+const FETCH_SEARCH_FILTER = 'app/BookerSelectRestaurant/FETCH_SEARCH_FILTER';
+const SEARCH_RESTAURANT = 'app/BookerSelectRestaurant/SEARCH_RESTAURANT';
 const FETCH_FOOD_LIST_FROM_RESTAURANT =
-  'app/BookerDraftOrderPage/FETCH_FOOD_LIST_FROM_RESTAURANT';
+  'app/BookerSelectRestaurant/FETCH_FOOD_LIST_FROM_RESTAURANT';
 const FETCH_ORDER = 'app/BookerSelectRestaurant/FETCH_ORDER';
 const FETCH_PLAN_DETAIL = 'app/BookerSelectRestaurant/FETCH_PLAN_DETAIL';
 const UPDATE_PLAN_DETAIL = 'app/BookerSelectRestaurant/UPDATE_PLAN_DETAIL';

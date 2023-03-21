@@ -65,6 +65,10 @@ function BookerDraftOrderPage() {
   const searchInProgress = useAppSelector(
     (state) => state.BookerSelectRestaurant.searchInProgress,
   );
+  const availableOrderDetailCheckList = useAppSelector(
+    (state) => state.Order.availableOrderDetailCheckList,
+    shallowEqual,
+  );
 
   const {
     isRestaurantDetailModalOpen,
@@ -159,6 +163,12 @@ function BookerDraftOrderPage() {
   });
 
   useEffect(() => {
+    if (!isEmpty(orderDetail)) {
+      dispatch(orderAsyncActions.checkRestaurantStillAvailable());
+    }
+  }, [dispatch, JSON.stringify(orderDetail)]);
+
+  useEffect(() => {
     dispatch(QuizActions.clearQuizData());
   }, []);
 
@@ -244,6 +254,7 @@ function BookerDraftOrderPage() {
               ...calendarExtraResources,
               onEditFood: onOpenPickFoodModal,
               editFoodInprogress: onEditFoodInProgress,
+              availableOrderDetailCheckList,
             }}
             components={componentsProps}
           />

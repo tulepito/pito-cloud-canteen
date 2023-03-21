@@ -305,8 +305,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   ]);
 
   useEffect(() => {
-    dispatch(orderAsyncActions.checkRestaurantStillAvailable());
-  }, [dispatch]);
+    if (!isEmpty(orderDetail)) {
+      dispatch(orderAsyncActions.checkRestaurantStillAvailable());
+    }
+  }, [dispatch, JSON.stringify(orderDetail)]);
 
   const restaurantListFromOrder = Object.keys(
     getRestaurantListFromOrderDetail(orderDetail),

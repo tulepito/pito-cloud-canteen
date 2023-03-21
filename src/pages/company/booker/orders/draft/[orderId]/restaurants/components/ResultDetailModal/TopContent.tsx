@@ -1,7 +1,5 @@
 import React from 'react';
 
-import IconBorderStar from '@components/Icons/IconBorderStar/IconBorderStar';
-import IconGift from '@components/Icons/IconGift/IconGift';
 import IconHeart from '@components/Icons/IconHeart/IconHeart';
 import IconStar from '@components/Icons/IconStar/IconStar';
 import IconTruck from '@components/Icons/IconTruck/IconTruck';
@@ -18,10 +16,7 @@ type TopContentProps = {
   ratingNumber: number;
 };
 const TopContent: React.FC<TopContentProps> = (props) => {
-  const { avatar, restaurantName, rating, ratingNumber, distance } = props;
-  const ratingStarsInlineStyle = {
-    width: `${(ratingNumber / 5) * 100}%`,
-  };
+  const { avatar, restaurantName, rating, distance } = props;
 
   return (
     <div className={css.topContent}>
@@ -44,26 +39,9 @@ const TopContent: React.FC<TopContentProps> = (props) => {
             <span>{distance}</span>
           </div>
           <div className={css.ratingWrapper}>
-            <div className={css.basicStars}>
-              <IconBorderStar className={css.ratingStar} />
-              <IconBorderStar className={css.ratingStar} />
-              <IconBorderStar className={css.ratingStar} />
-              <IconBorderStar className={css.ratingStar} />
-              <IconBorderStar className={css.ratingStar} />
-            </div>
-            <div style={ratingStarsInlineStyle} className={css.ratingStars}>
-              <IconStar className={css.ratingStar} />
-              <IconStar className={css.ratingStar} />
-              <IconStar className={css.ratingStar} />
-              <IconStar className={css.ratingStar} />
-              <IconStar className={css.ratingStar} />
-            </div>
+            <IconStar className={css.ratingStar} />
           </div>
           <div className={css.moreInfoItem}>{rating}</div>
-          <div className={css.moreInfoItem}>
-            <IconGift className={css.moreInfoItemIcon} />
-            <span>x3 điểm PITO Club</span>
-          </div>
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import compact from 'lodash/compact';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 import uniq from 'lodash/uniq';
@@ -29,7 +30,11 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import { convertWeekDay, renderDateRange } from '@utils/dates';
-import { EListingStates, EManageCompanyOrdersTab } from '@utils/enums';
+import {
+  EListingStates,
+  EManageCompanyOrdersTab,
+  ERestaurantListingStatus,
+} from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TPagination } from '@utils/types';
 
@@ -282,24 +287,32 @@ const recommendRestaurants = createAsyncThunk(
             sdkModel: sdk.listings,
             query: menuQuery,
           });
-          const restaurants = await Promise.all(
-            allMenus.map(async (menu: TListing) => {
-              const { restaurantId } = Listing(menu).getMetadata();
-              const restaurantResponse = await sdk.listings.show({
-                id: restaurantId,
-                include: ['images'],
-                'fields.image': [
-                  'variants.landscape-crop',
-                  'variants.landscape-crop2x',
-                ],
-              });
+          const restaurants = compact(
+            await Promise.all(
+              allMenus.map(async (menu: TListing) => {
+                const { restaurantId } = Listing(menu).getMetadata();
+                const restaurantResponse = denormalisedResponseEntities(
+                  await sdk.listings.show({
+                    id: restaurantId,
+                    include: ['images'],
+                    'fields.image': [
+                      'variants.landscape-crop',
+                      'variants.landscape-crop2x',
+                    ],
+                  }),
+                )[0];
+                const { status: restaurantStatus } =
+                  Listing(restaurantResponse).getMetadata();
 
-              return {
-                restaurantInfo:
-                  denormalisedResponseEntities(restaurantResponse)[0],
-                menu,
-              };
-            }),
+                if (restaurantStatus !== ERestaurantListingStatus.authorized)
+                  return null;
+
+                return {
+                  restaurantInfo: restaurantResponse,
+                  menu,
+                };
+              }),
+            ),
           );
           if (restaurants.length > 0) {
             const randomNumber = Math.floor(
