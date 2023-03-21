@@ -1,13 +1,13 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import Badge, { EBadgeType } from '@components/Badge/Badge';
+import Badge from '@components/Badge/Badge';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import IconPlusCircle from '@components/Icons/IconPlusCircle/IconPlusCircle';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { addCommas } from '@helpers/format';
 import { Listing } from '@utils/data';
-import { EImageVariants } from '@utils/enums';
+import { EImageVariants, SPECIAL_DIET_OPTIONS } from '@utils/enums';
 import type { TListing } from '@utils/types';
 
 import css from './FoodCard.module.scss';
@@ -32,6 +32,7 @@ const FoodCard: React.FC<TFoodCardProps> = ({
   hideSelection = false,
 }) => {
   const classes = classNames(css.root, className);
+  const { specialDiets = [] } = Listing(food!).getPublicData();
 
   const handleSelect = () => {
     onSelect(`${Listing(food!).getId()}`);
@@ -50,6 +51,12 @@ const FoodCard: React.FC<TFoodCardProps> = ({
     <IconPlusCircle onClick={handleSelect} className={css.plusIcon} />
   );
 
+  const badges = specialDiets
+    .slice(0, 2)
+    .map((diet: string) =>
+      SPECIAL_DIET_OPTIONS.find((item) => item.key === diet),
+    );
+
   return (
     <div className={classes}>
       <div className={css.coverImage} onClick={handleClickFood}>
@@ -64,12 +71,19 @@ const FoodCard: React.FC<TFoodCardProps> = ({
           {Listing(food!).getAttributes().title}
         </div>
         <div className={css.badges}>
-          <Badge className={css.badge} type={EBadgeType.info} label="Keto" />
+          {badges &&
+            badges.map((badge: any) => (
+              <Badge
+                key={badge?.key}
+                className={css.badge}
+                type={badge?.badgeType}
+                label={badge?.label}
+              />
+            ))}
         </div>
         <div className={css.price}>{`${addCommas(
           Listing(food!).getAttributes()?.price?.amount,
         )} ₫ / Phần`}</div>
-        <div className={css.vatIncludedNotice}>(đã bao gồm VAT)</div>
       </div>
       {!hideSelection && selection}
     </div>

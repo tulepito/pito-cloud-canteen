@@ -8,10 +8,8 @@ import Modal from '@components/Modal/Modal';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { addCommas } from '@helpers/format';
 import { Listing } from '@utils/data';
-import { EImageVariants } from '@utils/enums';
+import { EImageVariants, SIDE_DISH_OPTIONS } from '@utils/enums';
 import type { TListing } from '@utils/types';
-
-import OptionSelectionForm from './OptionSelectionForm';
 
 import css from './FoodDetailModal.module.scss';
 
@@ -30,6 +28,14 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
 }) => {
   const intl = useIntl();
 
+  const { sideDishes = [] } = Listing(food!).getPublicData();
+  const renderedSideDishes = sideDishes?.map(
+    (sideDish: string, index: number) => (
+      <div className={css.sideDish} key={`${index}-${sideDish}`}>
+        {SIDE_DISH_OPTIONS.find((option) => option.key === sideDish)?.label}
+      </div>
+    ),
+  );
   const handleSelectFood = () => {
     onSelect(food?.id?.uuid);
   };
@@ -79,8 +85,8 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
         <p className={css.description}>
           {Listing(food!).getAttributes().description || 'Không có mô tả'}
         </p>
-        <OptionSelectionForm onSubmit={() => null} />
       </div>
+      <div>{renderedSideDishes}</div>
       <div className={css.footer}>
         <Button className={css.submitBtn} onClick={handleSelectFood}>
           {intl.formatMessage({
