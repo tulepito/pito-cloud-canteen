@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { resetOrder } from '@redux/slices/Order.slice';
 import { QuizThunks } from '@redux/slices/Quiz.slice';
 import { companyPaths, quizPaths } from '@src/paths';
 import { User } from '@utils/data';
@@ -31,6 +32,10 @@ function BookerNewOrderPage() {
 
   const { myCompanies = [], queryInprogress: queryCompanyInprogress } =
     useLoadCompanies();
+
+  useEffect(() => {
+    dispatch(resetOrder());
+  }, [dispatch]);
 
   const normalizedCompanies = myCompanies.map((company) => ({
     id: company?.id?.uuid,

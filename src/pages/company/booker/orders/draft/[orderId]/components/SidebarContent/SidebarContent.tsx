@@ -147,24 +147,39 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       deliveryHour: deliveryHourValue,
       nutritions: nutritionsValue,
     } = values;
+    const finalStartDate = startDateValue || startDate;
+    const finalEndDate = endDateValue || endDate;
     await dispatch(
       orderAsyncActions.updateOrder({
         generalInfo: {
           ...values,
+          ...(startDate !== finalStartDate && {
+            deadlineDate: DateTime.fromMillis(finalStartDate)
+              .minus({ days: 3 })
+              .toMillis(),
+          }),
         },
       }),
     );
     const { plans = [] } = Listing(order as TListing).getMetadata();
+    const finalPackagePerMember = packagePerMemberValue
+      ? +packagePerMemberValue.replace(/,/g, '')
+      : packagePerMember;
+
+    const finalDeliveryHour = deliveryHourValue || deliveryHour;
+    const finalNutritions = nutritionsValue || nutritions;
     const changedOrderDetailFactor =
-      startDate !== startDateValue ||
-      endDate !== endDateValue ||
-      difference(nutritions, nutritionsValue).length > 0 ||
+      startDate !== finalStartDate ||
+      endDate !== finalEndDate ||
+      difference(nutritions, finalNutritions).length > 0 ||
       getDaySessionFromDeliveryTime(deliveryHour) !==
-        getDaySessionFromDeliveryTime(deliveryHourValue) ||
-      packagePerMember !== +packagePerMemberValue.replace(/,/g, '');
+        getDaySessionFromDeliveryTime(finalDeliveryHour) ||
+      packagePerMember !== +finalPackagePerMember;
+
     const { payload: newOrderDetail } = await dispatch(
       orderAsyncActions.recommendRestaurants(),
     );
+
     if (!isEqual(orderDetail, newOrderDetail) && changedOrderDetailFactor) {
       const planId = plans[0];
       await dispatch(
