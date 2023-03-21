@@ -118,6 +118,10 @@ type TOrderInitialState = {
   availableOrderDetailCheckList: {
     [timestamp: string]: boolean;
   };
+
+  orderRestaurantList: TListing[];
+  fetchOrderRestaurantListInProgress: boolean;
+  fetchOrderRestaurantListError: any;
 };
 
 const initialState: TOrderInitialState = {
@@ -193,6 +197,9 @@ const initialState: TOrderInitialState = {
 
   nutritions: [],
   availableOrderDetailCheckList: {},
+  orderRestaurantList: [],
+  fetchOrderRestaurantListInProgress: false,
+  fetchOrderRestaurantListError: null,
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -210,6 +217,7 @@ const RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY =
 const FETCH_NUTRITIONS = 'app/Order/FETCH_NUTRITIONS';
 const CHECK_RESTAURANT_STILL_AVAILABLE =
   'app/Order/CHECK_RESTAURANT_STILL_AVAILABLE';
+const FETCH_ORDER_RESTAURANTS = 'app/Order/FETCH_ORDER_RESTAURANTS';
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
   const { clientId, bookerId, isCreatedByAdmin = false, generalInfo } = params;
@@ -701,6 +709,29 @@ const checkRestaurantStillAvailable = createAsyncThunk(
   },
 );
 
+const fetchOrderRestaurants = createAsyncThunk(
+  FETCH_ORDER_RESTAURANTS,
+  async (_, { extra: sdk, getState }) => {
+    const { orderDetail } = getState().Order;
+    const restaurantIdList = uniq(
+      Object.values(orderDetail).map((item: any) => item.restaurant.id),
+    );
+    const restaurantList = await Promise.all(
+      restaurantIdList.map(async (restaurantId) => {
+        const restaurantResponse = denormalisedResponseEntities(
+          await sdk.listings.show({
+            id: restaurantId,
+          }),
+        )[0];
+
+        return restaurantResponse;
+      }),
+    );
+
+    return restaurantList;
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -720,6 +751,7 @@ export const orderAsyncActions = {
   recommendRestaurantForSpecificDay,
   fetchNutritions,
   checkRestaurantStillAvailable,
+  fetchOrderRestaurants,
 };
 
 const orderSlice = createSlice({
@@ -1121,7 +1153,23 @@ const orderSlice = createSlice({
       )
       .addCase(checkRestaurantStillAvailable.rejected, (state, { payload }) => {
         state.fetchOrderDetailError = payload;
-      });
+      })
+
+      .addCase(fetchOrderRestaurants.pending, (state) => ({
+        ...state,
+        fetchOrderRestaurantListInProgress: true,
+        fetchOrderRestaurantListError: null,
+      }))
+      .addCase(fetchOrderRestaurants.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchOrderRestaurantListInProgress: false,
+        orderRestaurantList: payload,
+      }))
+      .addCase(fetchOrderRestaurants.rejected, (state, { error }) => ({
+        ...state,
+        fetchOrderRestaurantListInProgress: false,
+        fetchOrderRestaurantListError: error.message,
+      }));
   },
 });
 

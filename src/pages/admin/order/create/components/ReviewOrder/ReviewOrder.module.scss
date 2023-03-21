@@ -64,6 +64,7 @@
     padding: 16px;
     background-color: $neutralGray2;
     row-gap: 20px;
+    white-space: pre-wrap;
     @include viewportLarge {
       flex-direction: row;
       row-gap: 0px;

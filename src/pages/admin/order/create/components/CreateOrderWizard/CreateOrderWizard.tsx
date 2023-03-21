@@ -8,6 +8,8 @@ import { useRouter } from 'next/router';
 import FormWizard from '@components/FormWizard/FormWizard';
 import { setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+// eslint-disable-next-line import/no-cycle
+import ServiceFeesAndNotes from '@pages/admin/order/StepScreen/ServiceFeesAndNotes/ServiceFeesAndNotes';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
@@ -35,6 +37,7 @@ export const TABS = [
   CLIENT_SELECT_TAB,
   MEAL_PLAN_SETUP,
   CREATE_MEAL_PLAN_TAB,
+  SERVICE_FEE_AND_NOTE_TAB,
   REVIEW_TAB,
 ];
 
@@ -42,7 +45,7 @@ export const CREATE_ORDER_STEP_LOCAL_STORAGE_NAME = 'orderStep';
 
 const tabCompleted = (order: any, tab: string, orderDetail: any) => {
   const orderId = Listing(order).getId();
-  const { staffName, plans = [] } = Listing(order).getMetadata();
+  const { staffName, plans = [], notes = {} } = Listing(order).getMetadata();
 
   const missingSelectedFood = Object.keys(orderDetail).filter((dateTime) =>
     isEmpty(orderDetail[dateTime].restaurant.foodList),
@@ -62,6 +65,8 @@ const tabCompleted = (order: any, tab: string, orderDetail: any) => {
         isMealPlanTabCompleted &&
         isGeneralInfoSetupCompleted(order as TListing)
       );
+    case SERVICE_FEE_AND_NOTE_TAB:
+      return !isEmpty(notes);
     case REVIEW_TAB:
       return !!staffName;
     default:
@@ -90,6 +95,8 @@ const CreateOrderTab: React.FC<any> = (props) => {
       return <MealPlanSetup goBack={goBack} nextTab={nextTab} />;
     case CREATE_MEAL_PLAN_TAB:
       return <SetupOrderDetail goBack={goBack} nextTab={nextTab} />;
+    case SERVICE_FEE_AND_NOTE_TAB:
+      return <ServiceFeesAndNotes goBack={goBack} nextTab={nextTab} />;
     case REVIEW_TAB:
       return <ReviewOrder goBack={goBack} />;
     default:
@@ -142,7 +149,7 @@ const CreateOrderWizard = () => {
   };
 
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
-  const { staffName } = Listing(order as TListing).getMetadata();
+  const { staffName, notes = {} } = Listing(order as TListing).getMetadata();
   const step2SubmitInProgress = useAppSelector(
     (state) => state.Order.step2SubmitInProgress,
   );
@@ -165,6 +172,11 @@ const CreateOrderWizard = () => {
         setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, REVIEW_TAB);
 
         return setCurrentStep(REVIEW_TAB);
+      }
+      if (!isEmpty(notes)) {
+        setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, SERVICE_FEE_AND_NOTE_TAB);
+
+        return setCurrentStep(SERVICE_FEE_AND_NOTE_TAB);
       }
       if (isGeneralInfoSetupCompleted(order as TListing)) {
         setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, CREATE_MEAL_PLAN_TAB);
