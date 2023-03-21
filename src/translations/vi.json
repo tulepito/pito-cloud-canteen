@@ -1214,6 +1214,7 @@
   "SendNotificationModal.title": "Chia sẻ liên kết đặt hàng",
   "ServiceFeesAndNotes.loading": "Đang tải dữ liệu...",
   "ServiceFeesAndNotes.PITOFee": "Phí PITO Cloud Canteen",
+  "ServiceFeesAndNotes.serviceFee": "Phí Dịch Vụ",
   "SetupOrderDetail.orderId.draft": "#Draft",
   "SetupOrderDetail.orderSettings": "Cài đặt bữa ăn",
   "SetupOrderDetail.perPack": "{value}đ/bữa",
