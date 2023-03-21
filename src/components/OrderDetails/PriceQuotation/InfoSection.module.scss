@@ -22,12 +22,12 @@
   }
 
   .sectionTitle {
-    @include textTemplate(12px, 700, 16px);
+    @include textTemplate(12px, 700, 1.5);
     margin-bottom: 8px;
   }
 
   .sectionContent {
-    @include textTemplate(12px, 400, 16px);
+    @include textTemplate(12px, 300, 1.5);
 
     & > div span:first-of-type {
       font-weight: 600;

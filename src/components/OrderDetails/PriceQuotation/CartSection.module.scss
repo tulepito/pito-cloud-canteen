@@ -30,7 +30,7 @@
   padding-top: 20px;
 
   .sectionTitle {
-    @include textTemplate(12px, 700, 16px);
+    @include textTemplate(12px, 700, 1.5);
     margin-bottom: 16px;
   }
 
@@ -42,18 +42,18 @@
     .tableHead {
       @include cartColumnsLayout;
       background-color: $neutralGray2;
-      @include textTemplate(10px, 700, 16px);
+      @include textTemplate(10px, 700, 1.6);
       border-bottom: 1px solid $neutralGray4;
     }
 
     .tableRow {
       @include cartColumnsLayout;
-      @include textTemplate(12px, 400, 16px);
+      @include textTemplate(12px, 400, 1.5);
       border-bottom: 1px solid $neutralGray3;
 
       &:last-of-type {
         border-bottom: none;
-        @include textTemplate(14px, 700, 20px);
+        @include textTemplate(14px, 700, 10/7);
       }
     }
   }

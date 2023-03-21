@@ -37,7 +37,7 @@ export const createNewPrint = async ({ id }: TCreateNewPrintParams) => {
       for (let i = 0; i < totalPages; i++) {
         // capture a screenshot of the component for the current page
         const canvas = await html2canvas(component, {
-          scale: 1,
+          scale: 3,
           width: pageWidth,
           height: contentHeight,
           x: 0,
@@ -68,8 +68,8 @@ export const createNewPrint = async ({ id }: TCreateNewPrintParams) => {
           paddingTop,
           pdfWidth,
           pdfHeight,
-          '',
-          'FAST',
+          // '',
+          // 'FAST',
         );
 
         // add a new page to the PDF document if there are more pages
