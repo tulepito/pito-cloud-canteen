@@ -34,7 +34,6 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
 
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const orderListing = Listing(order);
-  const listingId = orderListing.getId();
   const { notes } = orderListing.getMetadata();
   const restaurantList = useAppSelector(
     (state) => state.Order.orderRestaurantList,
@@ -48,8 +47,10 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
   );
 
   const restaurantOptions = restaurantList.map((restaurant: TListing) => (
-    <option key={listingId} value={listingId}>
-      {Listing(restaurant).getAttributes().title}
+    <option
+      key={Listing(restaurant).getId()}
+      value={Listing(restaurant).getId()}>
+      {`${Listing(restaurant).getAttributes().title}`}
     </option>
   ));
 
