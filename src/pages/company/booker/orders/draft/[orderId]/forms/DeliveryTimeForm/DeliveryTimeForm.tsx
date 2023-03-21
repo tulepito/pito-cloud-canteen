@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { DateTime } from 'luxon';
@@ -15,16 +16,23 @@ type TDeliveryTimeFormProps = {
   onSubmit: (values: TDeliveryTimeFormValues) => void;
   initialValues?: TDeliveryTimeFormValues;
   loading?: boolean;
+  onCustomStartDateChange?: (date: number) => void;
 };
 
 export type TDeliveryTimeFormValues = {
   deliveryHour: string;
+  startDate: number;
+  endDate: number;
 };
 
 const validate = (values: TDeliveryTimeFormValues) => {
   const errors: any = {};
   if (!values.deliveryHour) {
     errors.deliveryHour = 'Vui lòng chọn giờ giao hàng';
+  }
+
+  if (!values.endDate) {
+    errors.endDate = 'Vui lòng chọn ngày kết thúc';
   }
 
   return errors;
@@ -42,6 +50,8 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
       initialValues,
     });
 
+  const { endDate: endDateInitialValue } = initialValues || {};
+  const startDateValueRef = useRef<number>();
   const intl = useIntl();
 
   const startDate = useField('startDate', form);
@@ -55,15 +65,31 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
     ? new Date(Number(startDate.input.value))
     : minStartDate;
 
-  const selectedEndDate = DateTime.fromJSDate(selectedStartDate)
-    .plus({ days: 1 })
-    .toJSDate();
   const minEndDate = DateTime.fromJSDate(selectedStartDate)
     .plus({ days: 1 })
     .toJSDate();
   const maxEndDate = DateTime.fromJSDate(selectedStartDate)
     .plus({ days: 6 })
     .toJSDate();
+
+  const handleStartDateChange = useCallback(
+    (value: any, prevValue: any) => {
+      if (endDateInitialValue && value !== prevValue) {
+        form.batch(() => {
+          form.change('endDate', undefined);
+        });
+      }
+      startDateValueRef.current = startDate.input.value;
+    },
+    [endDateInitialValue, form, startDate.input.value],
+  );
+
+  useEffect(() => {
+    if (!form.getFieldState('startDate')?.pristine) {
+      handleStartDateChange(startDate.input.value, startDateValueRef?.current);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.getFieldState('startDate')?.pristine, startDate.input.value]);
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>
@@ -89,7 +115,6 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
         name="endDate"
         input={endDate.input}
         meta={endDate.meta}
-        selected={selectedEndDate}
         label={intl.formatMessage({
           id: 'Booker.CreateOrder.Form.field.orderEndDate',
         })}

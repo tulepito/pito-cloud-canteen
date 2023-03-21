@@ -20,6 +20,7 @@ export const fetchUser = async (userId: string) => {
     {
       id: userId,
       include: ['profileImage'],
+      'fields.image': ['variants.square-small', 'variants.square-small2x'],
     },
     { expand: true },
   );

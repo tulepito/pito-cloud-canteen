@@ -24,6 +24,7 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
   const restaurantCoverImage = event.resource?.restaurant?.coverImage;
 
   const handleRefreshIconClick = () => {
+    if (onRecommendMealInProgress) return;
     onRecommendMeal?.(event?.start?.getTime()!);
   };
 

@@ -59,6 +59,9 @@ const QuizMealDate = () => {
   const selectedDays = getSelectedDaysOfWeek(startDate, endDate, dayInWeek);
   const formattedStartDate = startDate && formatTimestamp(startDate, 'd MMMM');
   const formattedEndDate = endDate && formatTimestamp(endDate, 'd MMMM');
+  const orderTitle = Listing(order as TListing).getAttributes()?.title;
+  const initialOrderDetailInProgress =
+    recommendRestaurantInProgress || updateOrderDetailInProgress;
   const initialValues = useMemo(
     () => ({
       dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
@@ -146,9 +149,14 @@ const QuizMealDate = () => {
             intl.formatMessage({
               id: 'QuizCreatingOrderPage.initializingOrder',
             })}
-          {(recommendRestaurantInProgress || updateOrderDetailInProgress) &&
+          {initialOrderDetailInProgress &&
             intl.formatMessage({
               id: 'QuizCreatingOrderPage.initializingOrderDetail',
+            })}
+          {orderTitle &&
+            !initialOrderDetailInProgress &&
+            intl.formatMessage({
+              id: 'QuizCreatingOrderPage.redirectToCalendarPage',
             })}
           {submittingErrorControl.value &&
             intl.formatMessage({
@@ -163,12 +171,9 @@ const QuizMealDate = () => {
             />
           </div>
         )}
-        {Listing(order as TListing).getAttributes()?.title &&
-          !submittingErrorControl.value && (
-            <div className={css.orderTitle}>
-              {`#${Listing(order as TListing).getAttributes()?.title}`}
-            </div>
-          )}
+        {orderTitle && !submittingErrorControl.value && (
+          <div className={css.orderTitle}>{`#${orderTitle}`}</div>
+        )}
 
         {startDate && endDate && !submittingErrorControl.value && (
           <div className={css.orderDateWrapper}>

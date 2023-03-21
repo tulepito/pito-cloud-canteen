@@ -86,7 +86,14 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
           {Listing(food!).getAttributes().description || 'Không có mô tả'}
         </p>
       </div>
-      <div>{renderedSideDishes}</div>
+      <div className={css.sideDishesWrapper}>
+        <div className={css.sideDishesTitle}>
+          {intl.formatMessage({
+            id: 'booker.orders.draft.foodDetailModal.sideDishesTitle',
+          })}
+        </div>
+        {renderedSideDishes}
+      </div>
       <div className={css.footer}>
         <Button className={css.submitBtn} onClick={handleSelectFood}>
           {intl.formatMessage({

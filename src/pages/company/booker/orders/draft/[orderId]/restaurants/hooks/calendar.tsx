@@ -188,19 +188,21 @@ export const useGetCalendarComponentProps = ({
   );
 
   const onRecommendNewRestaurants = useCallback(async () => {
-    dispatch(setOnRecommendRestaurantInProcess(true));
-    const { payload: recommendOrderDetail }: any = await dispatch(
-      orderAsyncActions.recommendRestaurants(),
-    );
-    await dispatch(
-      orderAsyncActions.updatePlanDetail({
-        orderId,
-        planId: plans[0],
-        orderDetail: recommendOrderDetail,
-      }),
-    );
-    dispatch(setOnRecommendRestaurantInProcess(false));
-  }, [dispatch, orderId, plans]);
+    if (!onRecommendRestaurantInProgress) {
+      dispatch(setOnRecommendRestaurantInProcess(true));
+      const { payload: recommendOrderDetail }: any = await dispatch(
+        orderAsyncActions.recommendRestaurants(),
+      );
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId: plans[0],
+          orderDetail: recommendOrderDetail,
+        }),
+      );
+      dispatch(setOnRecommendRestaurantInProcess(false));
+    }
+  }, [dispatch, onRecommendRestaurantInProgress, orderId, plans]);
 
   const toolbarComponent = useCallback(
     (props: any) => (
