@@ -172,7 +172,7 @@ const EditCompanySettingsInformationFormComponent: React.FC<
       const { error } = ((await onAddMembersToCompany(values)) as any) || {};
       if (!error) {
         closeCreateMemberModal();
-        setInitialUsers([]);
+        setInitialUsers([], []);
       }
     }
   };

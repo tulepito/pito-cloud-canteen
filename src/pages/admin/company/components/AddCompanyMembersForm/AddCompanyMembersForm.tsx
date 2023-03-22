@@ -7,6 +7,13 @@ import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
+import {
+  composeValidators,
+  emailsWithCommasValid,
+  replaceSpaceByCommas,
+  required,
+} from '@src/utils/validators';
 import type { TCompanyMemberWithDetails, TUser } from '@utils/types';
 
 import FieldCompanyMember from '../FieldCompanyMember/FieldCompanyMember';
@@ -29,6 +36,7 @@ type TExtraProps = {
   handleCancel: () => void;
   inProgress: boolean;
   formError: any;
+  customSubmit?: (values: TAddCompanyMembersFormValues) => any;
 };
 type TAddCompanyMembersFormComponentProps =
   FormRenderProps<TAddCompanyMembersFormValues> & Partial<TExtraProps>;
@@ -39,7 +47,6 @@ const AddCompanyMembersFormComponent: React.FC<
   TAddCompanyMembersFormComponentProps
 > = (props) => {
   const {
-    handleSubmit,
     queryUsersByEmail,
     queryUserInProgress,
     users,
@@ -51,6 +58,7 @@ const AddCompanyMembersFormComponent: React.FC<
     form,
     inProgress,
     formError,
+    customSubmit,
   } = props;
   const intl = useIntl();
 
@@ -73,26 +81,49 @@ const AddCompanyMembersFormComponent: React.FC<
     form.change('noAccountEmailList', notFoundUsers);
   }, [JSON.stringify(users), JSON.stringify(notFoundUsers)]);
 
+  const onKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.key === 'Enter' && form.getState().valid) {
+      return addUserToFormState();
+    }
+  };
+
+  const handleSubmitOnClick = () => {
+    if (usersToRender.length > 0 && customSubmit)
+      return customSubmit(form.getState().values);
+  };
+
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form
+      onSubmit={(e) => {
+        e.preventDefault();
+      }}>
       <div>
         <div className={css.emailWrapper}>
           <FieldTextInput
+            onKeyUp={onKeyUp}
             className={css.emailField}
             id="email"
             name="email"
             placeholder={intl.formatMessage({
               id: 'AddCompanyMembersForm.emailPlaceholder',
             })}
+            parse={replaceSpaceByCommas}
+            validate={composeValidators(
+              required(
+                intl.formatMessage({
+                  id: 'AddCompanyMembersForm.emailRequired',
+                }),
+              ),
+              emailsWithCommasValid(
+                intl.formatMessage({
+                  id: 'AddCompanyMembersForm.emailInvalid',
+                }),
+              ),
+            )}
           />
-          <Button
-            onClick={addUserToFormState}
-            disabled={queryUserInProgress}
-            inProgress={queryUserInProgress}
-            className={css.addButton}
-            type="button">
-            {intl.formatMessage({ id: 'AddCompanyMembersForm.addButton' })}
-          </Button>
+          {queryUserInProgress && <IconSpinner className={css.loadingIcon} />}
         </div>
         <div className={css.fieldMember}>
           {usersToRender?.map((user) => (
@@ -107,6 +138,8 @@ const AddCompanyMembersFormComponent: React.FC<
         <div className={css.actionBtn}>
           <Button
             disabled={inProgress}
+            onClick={handleSubmitOnClick}
+            type="button"
             inProgress={inProgress}
             className={css.submitButton}>
             {intl.formatMessage({ id: 'AddCompanyMembersForm.submitButton' })}
@@ -128,7 +161,18 @@ const AddCompanyMembersFormComponent: React.FC<
 const AddCompanyMembersForm: React.FC<TAddCompanyMembersFormProps> = (
   props,
 ) => {
-  return <FinalForm {...props} component={AddCompanyMembersFormComponent} />;
+  const customSubmit = (values: TAddCompanyMembersFormValues) => {
+    return props.onSubmit(values, null as any);
+  };
+
+  return (
+    <FinalForm
+      {...props}
+      onSubmit={() => {}}
+      customSubmit={customSubmit}
+      component={AddCompanyMembersFormComponent}
+    />
+  );
 };
 
 export default AddCompanyMembersForm;

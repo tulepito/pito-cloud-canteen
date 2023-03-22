@@ -28,6 +28,7 @@
   "AddCompanyMembersForm.emailInvalid": "Địa chỉ email không hợp lệ",
   "AddCompanyMembersForm.emailListPlaceholder": "Nhập email để thêm thành viên",
   "AddCompanyMembersForm.emailPlaceholder": "Nhập email để thêm thành viên",
+  "AddCompanyMembersForm.emailRequired": "Vui lòng nhập email",
   "AddCompanyMembersForm.submitButton": "Thêm thành viên",
   "AddCompanyMembersModal.cancel": "Huỷ",
   "AddCompanyMembersModal.modalTitle": "Thêm Thành Viên",

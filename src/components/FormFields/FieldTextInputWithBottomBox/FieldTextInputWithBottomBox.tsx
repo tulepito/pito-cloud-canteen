@@ -46,7 +46,7 @@ const FieldTextInputWithBottomBox: React.FC<TFieldTextInputWithBottomBox> = (
   const value = form.getFieldState(name)?.value || [];
   const tempValue = form.getFieldState('tempValue')?.value || '';
 
-  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const onKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.key === 'Enter') {
@@ -89,7 +89,7 @@ const FieldTextInputWithBottomBox: React.FC<TFieldTextInputWithBottomBox> = (
                   <input
                     {...input}
                     className={css.input}
-                    onKeyUp={onKeyDown}
+                    onKeyUp={onKeyUp}
                     placeholder={placeholder}
                   />
                   <ValidationError fieldMeta={fieldMeta} />

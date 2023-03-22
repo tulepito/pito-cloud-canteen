@@ -6,23 +6,32 @@ import type { TObject } from '@src/utils/types';
 const queryMembersByEmail = async (emails: string[], queryParams: TObject) => {
   const emailsAsArray = Array.isArray(emails) ? emails : [emails];
   const intergrationSdk = getIntegrationSdk();
-
+  const noExistedUsers: string[] = [];
   const users = await Promise.all(
     emailsAsArray.map(async (email: string) => {
-      const response = await intergrationSdk.users.show({ email }, queryParams);
-      const [user] = denormalisedResponseEntities(response);
-      const memberIsAdmin = User(user).getMetadata().isAdmin;
-      const memberIsPartner = User(user).getMetadata().isPartner;
+      try {
+        const response = await intergrationSdk.users.show(
+          { email },
+          queryParams,
+        );
+        const [user] = denormalisedResponseEntities(response);
+        const memberIsAdmin = User(user).getMetadata().isAdmin;
+        const memberIsPartner = User(user).getMetadata().isPartner;
 
-      if (memberIsAdmin || memberIsPartner) return null;
+        if (memberIsAdmin || memberIsPartner) return null;
 
-      return user;
+        return user;
+      } catch (error) {
+        noExistedUsers.push(email);
+
+        return null;
+      }
     }),
   );
 
   const userNotNull = users.filter((user) => user !== null);
 
-  return userNotNull;
+  return { users: userNotNull, noExistedUsers };
 };
 
 export default queryMembersByEmail;

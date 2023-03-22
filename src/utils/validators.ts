@@ -533,7 +533,19 @@ export const foodByDatesAtLeastOneDayHasFood =
         hasFood = true;
       }
     });
-    console.log({ hasFood, value });
 
     return hasFood ? VALID : message;
   };
+
+export const replaceSpaceByCommas = (value: string) => {
+  return value.replace(/ /g, ',');
+};
+
+export const emailsWithCommasValid = (message: string) => (value: string) => {
+  const emails = value.split(',');
+  const validEmails = emails.filter((email) => {
+    return email.trim().match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);
+  });
+
+  return validEmails.length === emails.length ? VALID : message;
+};

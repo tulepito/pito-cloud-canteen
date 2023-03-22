@@ -729,3 +729,15 @@ export const getUniqueCompanyMemberByEmail = (
 
   return resArr;
 };
+
+export const getUniqueUsers = (users: TUser[]) => {
+  const userMap = users.reduce((acc, user) => {
+    const id = User(user).getId();
+    const newUserMap = { ...acc } as any;
+    newUserMap[id as any] = user;
+
+    return newUserMap;
+  }, {});
+
+  return Object.values(userMap) as TUser[];
+};
