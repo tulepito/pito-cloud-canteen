@@ -1,0 +1,38 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.emailWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 30px;
+  .emailField {
+    width: 100%;
+  }
+  .addButton {
+    border-radius: 5px;
+    border: 2px solid $neutralGray6;
+  }
+}
+.fieldMember {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 35px;
+  row-gap: 24px;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  margin-top: 40px;
+  flex-direction: column;
+  gap: 16px;
+  .lightButton {
+    @include buttonColorSecondary;
+    outline: none;
+  }
+  .submitButton {
+    width: 260px;
+  }
+}

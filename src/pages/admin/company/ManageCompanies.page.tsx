@@ -19,9 +19,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
 import { adminRoutes } from '@src/paths';
-import { UserPermission } from '@src/types/UserPermission';
 import { ECompanyStatus } from '@utils/enums';
-import type { TUser } from '@utils/types';
 
 import KeywordSearchForm from '../partner/components/KeywordSearchForm/KeywordSearchForm';
 
@@ -38,12 +36,12 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'name',
     label: 'Tên công ty',
-    render: ({ id, name }: any) => {
+    render: ({ id, companyName }: any) => {
       return (
         <NamedLink
           path={`${adminRoutes.ManageCompanies.path}/${id}`}
           className={css.boldTextRow}>
-          {name}
+          {companyName}
         </NamedLink>
       );
     },
@@ -51,32 +49,14 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'representatives',
     label: 'Người đại diện',
-    render: ({ members = [], id }: any) => {
-      const bookers = members.filter(
-        (m: any) => m.permission === UserPermission.BOOKER,
-      );
-
+    render: ({ displayName, email, phoneNumber }: any) => {
       return (
         <div>
-          {bookers.slice(0, 1).map((user: TUser) => {
-            return (
-              <div key={`${id}.${user.id.uuid}`}>
-                <div className={css.memberName}>
-                  {user.attributes.profile.displayName}
-                </div>
-                <div className={css.memberEmail}>{user.attributes.email}</div>
-                <div className={css.memberPhoneNumber}>
-                  {user.attributes.profile.protectedData?.phoneNumber}
-                </div>
-              </div>
-            );
-          })}
-          {bookers.length > 1 && (
-            <div className={css.membersCount}>
-              +{members.length - 1}
-              <FormattedMessage id="ManageCompaniesPage.membersCount" />
-            </div>
-          )}
+          <div>
+            <div className={css.memberName}>{displayName}</div>
+            <div className={css.memberEmail}>{email}</div>
+            <div className={css.memberPhoneNumber}>{phoneNumber}</div>
+          </div>
         </div>
       );
     },

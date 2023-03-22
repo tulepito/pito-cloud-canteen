@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
   addWorkspaceCompanyId,
-  BookerManageCompany,
+  companyThunks,
 } from '@redux/slices/company.slice';
 import {
   companyMemberThunks,
@@ -199,7 +199,7 @@ const MembersPage = () => {
     const fetchData = async () => {
       dispatch(resetError());
       dispatch(addWorkspaceCompanyId(companyId));
-      await dispatch(BookerManageCompany.companyInfo());
+      await dispatch(companyThunks.companyInfo());
     };
     fetchData();
   }, [companyId, dispatch, router]);
@@ -210,7 +210,7 @@ const MembersPage = () => {
     ).then(async ({ error }: any) => {
       if (!error) {
         onDeleteMemberConfirmationModalClose();
-        await dispatch(BookerManageCompany.companyInfo());
+        await dispatch(companyThunks.companyInfo());
       }
     });
   }, [deletingMemberEmail, dispatch, onDeleteMemberConfirmationModalClose]);

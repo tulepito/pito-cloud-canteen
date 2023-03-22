@@ -11,6 +11,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const response = await integrationSdk.users.show(
       {
         id: companyId,
+        include: ['profileImage'],
       },
       { expand: true },
     );

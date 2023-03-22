@@ -1,0 +1,38 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  height: fit-content;
+  gap: 23px;
+  &.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.boldText {
+  font-weight: $fontWeightBold;
+}
+
+.removeContent {
+  color: $neutralGray6;
+  margin: 0;
+}
+
+.fieldSelect {
+  min-width: 100px;
+  background-color: transparent;
+  outline: none;
+}
+
+.iconSpinner {
+  stroke: $neutralGray5;
+}
+
+.fieldSelectMember {
+  @include inputStyles;
+  width: 100%;
+  margin: 20px 0 0 0;
+}

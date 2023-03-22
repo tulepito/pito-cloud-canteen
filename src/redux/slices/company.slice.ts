@@ -1,13 +1,20 @@
+/* eslint-disable import/no-cycle */
+/* eslint-disable @typescript-eslint/no-shadow */
 import { createSlice } from '@reduxjs/toolkit';
 
 import type {
   CreateGroupApiBody,
   DeleteGroupApiData,
   GetGroupDetailApiParams,
+  TAdminTransferCompanyOwnerParams,
   UpdateCompanyApiBody,
   UpdateGroupApiBody,
 } from '@apis/companyApi';
 import {
+  adminCreateGroupApi,
+  adminDeleteGroupApi,
+  adminTransferCompanyOwnerApi,
+  adminUpdateGroupApi,
   createGroupApi,
   deleteGroupApi,
   fetchCompanyInfo,
@@ -16,12 +23,21 @@ import {
   updateCompany,
   updateGroupApi,
 } from '@apis/companyApi';
+import {
+  adminUpdateCompanyApi,
+  createCompanyApi,
+  showCompanyApi,
+} from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
-import type { TObject, TUser } from '@utils/types';
+import { storableAxiosError, storableError } from '@utils/errors';
+import type { TImage, TObject, TUser } from '@utils/types';
 
+import { companyMemberThunks } from './companyMember.slice';
 import { userThunks } from './user.slice';
+
+export const COMPANY_LOGO_VARIANTS = [EImageVariants.default];
 
 export type TCompanyImageActionPayload = {
   id: string;
@@ -54,6 +70,9 @@ type TCompanyState = {
   deletingGroupId: string;
 
   company: TUser | null;
+  showCompanyInProgress: boolean;
+  showCompanyError: any;
+
   updateGroupInProgress: boolean;
   updateGroupError: any;
   originCompanyMembers: TObject;
@@ -65,8 +84,17 @@ type TCompanyState = {
   updateBookerAccountInProgress: boolean;
   updateBookerAccountError: any;
 
+  createCompanyInProgress: boolean;
+  createCompanyError: any;
+
+  uploadedCompanyLogo: TImage | null | { id: string; file: File };
+  uploadingCompanyLogo: boolean;
+  uploadCompanyLogoError: any;
   favoriteRestaurants: any[];
   favoriteFood: any[];
+
+  transferCompanyOwnerInProgress: boolean;
+  transferCompanyOwnerError: any;
 };
 
 // ================ Thunk types ================ //
@@ -78,6 +106,15 @@ const UPDATE_GROUP = 'app/Company/UPDATE_GROUP';
 const DELETE_GROUP = 'app/Company/DELETE_GROUP';
 const UPDATE_COMPANY_ACCOUNT = 'app/Company/UPDATE_COMPANY_ACCOUNT';
 const UPDATE_BOOKER_ACCOUNT = 'app/Company/UPDATE_BOOKER_ACCOUNT';
+const ADMIN_CREATE_COMPANY = 'app/Company/ADMIN_CREATE_COMPANY';
+const SHOW_COMPANY = 'app/UpdateCompanyPage/SHOW_COMPANY';
+const ADMIN_UPDATE_COMPANY = 'app/UpdateCompanyPage/ADMIN_UPDATE_COMPANY';
+const REQUEST_UPLOAD_COMPANY_LOGO =
+  'app/UpdateCompanyPage/REQUEST_UPLOAD_COMPANY_LOGO';
+const ADMIN_DELETE_GROUP = 'app/Company/ADMIN_DELETE_GROUP';
+const ADMIN_CREATE_GROUP = 'app/Company/ADMIN_CREATE_GROUP';
+const ADMIN_UPDATE_GROUP = 'app/Company/ADMIN_UPDATE_GROUP';
+const ADMIN_TRANSFER_COMPANY_OWNER = 'app/Company/ADMIN_TRANSFER_COMPANY_OWNER';
 
 const initialState: TCompanyState = {
   groupList: [],
@@ -97,6 +134,9 @@ const initialState: TCompanyState = {
   deletingGroupId: '',
 
   company: null,
+  showCompanyInProgress: false,
+  showCompanyError: null,
+
   updateGroupInProgress: false,
   updateGroupError: null,
   originCompanyMembers: {},
@@ -108,9 +148,97 @@ const initialState: TCompanyState = {
   updateBookerAccountInProgress: false,
   updateBookerAccountError: null,
 
+  createCompanyInProgress: false,
+  createCompanyError: null,
+
+  uploadedCompanyLogo: null,
+  uploadCompanyLogoError: null,
+  uploadingCompanyLogo: false,
   favoriteRestaurants: [],
   favoriteFood: [],
+
+  transferCompanyOwnerInProgress: false,
+  transferCompanyOwnerError: null,
 };
+
+const requestUploadCompanyLogo = createAsyncThunk(
+  REQUEST_UPLOAD_COMPANY_LOGO,
+  async (payload: any, { extra: sdk, fulfillWithValue, rejectWithValue }) => {
+    const { file, id } = payload || {};
+    try {
+      const response = await sdk.images.upload(
+        { image: file },
+        {
+          expand: true,
+          'fields.image': [`variants.${EImageVariants.default}`],
+        },
+      );
+      const img = response.data.data;
+
+      return fulfillWithValue({ ...img, id, imageId: img.id });
+    } catch (error) {
+      console.error('error', error);
+
+      return rejectWithValue({ id, error: storableError(error) });
+    }
+  },
+);
+
+const adminCreateCompany = createAsyncThunk(
+  ADMIN_CREATE_COMPANY,
+  async (userData: any, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      const { data } = await createCompanyApi({
+        dataParams: userData,
+        queryParams: {
+          expand: true,
+        },
+      });
+      const [company] = denormalisedResponseEntities(data);
+
+      return fulfillWithValue(company);
+    } catch (error: any) {
+      console.error(error);
+
+      return rejectWithValue(storableError(error.response.data));
+    }
+  },
+);
+
+const showCompany = createAsyncThunk(
+  SHOW_COMPANY,
+  async (id: string, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      const { data } = await showCompanyApi(id);
+      const [company] = denormalisedResponseEntities(data);
+
+      return fulfillWithValue(company);
+    } catch (error: any) {
+      console.error('show company error', error);
+
+      return rejectWithValue(storableError(error.response.data));
+    }
+  },
+);
+
+const adminUpdateCompany = createAsyncThunk(
+  ADMIN_UPDATE_COMPANY,
+  async (params: any) => {
+    const { data } = await adminUpdateCompanyApi({
+      dataParams: params,
+      queryParams: {
+        include: ['profileImage'],
+        expand: true,
+      },
+    });
+    const [company] = denormalisedResponseEntities(data);
+
+    return company;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
 
 const companyInfo = createAsyncThunk(
   COMPANY_INFO,
@@ -305,7 +433,109 @@ const updateCompanyAccount = createAsyncThunk(
   },
 );
 
-export const BookerManageCompany = {
+const adminDeleteGroup = createAsyncThunk(
+  ADMIN_DELETE_GROUP,
+  async (params: { companyId: string; groupId: string }, { dispatch }) => {
+    const { companyId, groupId } = params;
+    const apiData: DeleteGroupApiData = {
+      groupId,
+      companyId,
+    };
+    const { data } = await adminDeleteGroupApi(apiData);
+
+    dispatch(companyMemberThunks.queryCompanyMembers(companyId));
+
+    return data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
+const adminCreateGroup = createAsyncThunk(
+  ADMIN_CREATE_GROUP,
+  async (params: CreateGroupApiBody, { dispatch }) => {
+    const { data: newCompanyAccount } = await adminCreateGroupApi(params);
+    dispatch(companyMemberThunks.queryCompanyMembers(params.companyId));
+
+    return newCompanyAccount;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
+const adminUpdateGroup = createAsyncThunk(
+  ADMIN_UPDATE_GROUP,
+  async (params: UpdateGroupApiBody, { dispatch }) => {
+    const { addedMembers, deletedMembers, groupId, companyId, groupInfo } =
+      params;
+    const apiBody: UpdateGroupApiBody = {
+      addedMembers,
+      deletedMembers,
+      groupId,
+      companyId,
+      groupInfo,
+    };
+    const { data } = await adminUpdateGroupApi(apiBody);
+    dispatch(companyMemberThunks.queryCompanyMembers(companyId));
+
+    return data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
+const adminTransferCompanyOwner = createAsyncThunk(
+  ADMIN_TRANSFER_COMPANY_OWNER,
+  async (
+    {
+      profileImage,
+      newOwnerEmail,
+      companyId,
+      permissionForOldOwner,
+    }: TAdminTransferCompanyOwnerParams & { profileImage?: TImage },
+    { dispatch, extra: sdk },
+  ) => {
+    let newOwnerProfileImageId;
+    if (profileImage) {
+      const response = await fetch(
+        profileImage?.attributes?.variants?.[EImageVariants.default]?.url,
+      );
+      const data = await response.blob();
+      const metadata = {
+        type: 'image/jpeg',
+      };
+      const file = new File(
+        [data],
+        `${`${companyId}_${new Date().getTime()}`}.jpg`,
+        metadata,
+      );
+
+      const uploadRes = await sdk.images.upload({
+        image: file,
+      });
+      newOwnerProfileImageId = uploadRes.data.data.id;
+    }
+
+    const { data: newCompany } = await adminTransferCompanyOwnerApi({
+      newOwnerEmail,
+      newOwnerProfileImageId,
+      permissionForOldOwner,
+      companyId,
+    });
+
+    dispatch(companyMemberThunks.queryCompanyMembers(companyId));
+
+    return newCompany;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
+export const companyThunks = {
   companyInfo,
   groupInfo,
   groupDetailInfo,
@@ -314,6 +544,14 @@ export const BookerManageCompany = {
   deleteGroup,
   updateCompanyAccount,
   updateBookerAccount,
+  adminCreateCompany,
+  adminUpdateCompany,
+  showCompany,
+  requestUploadCompanyLogo,
+  adminCreateGroup,
+  adminUpdateGroup,
+  adminDeleteGroup,
+  adminTransferCompanyOwner,
 };
 
 export const companySlice = createSlice({
@@ -326,6 +564,24 @@ export const companySlice = createSlice({
         workspaceCompanyId: payload,
       };
     },
+    clearError: (state) => ({
+      ...state,
+      createCompanyError: null,
+      updateCompanyError: null,
+    }),
+    removeCompanyLogo: (state) => ({
+      ...state,
+      uploadedCompanyLogo: null,
+    }),
+    renewCompanyState: (state, { payload }) => {
+      return {
+        ...state,
+        company: payload,
+      };
+    },
+    resetCompanySliceStates: () => ({
+      ...initialState,
+    }),
   },
   extraReducers: (builder) => {
     builder
@@ -501,10 +757,181 @@ export const companySlice = createSlice({
           updateBookerAccountInProgress: false,
           updateBookerAccountError: error.message,
         };
+      })
+      .addCase(adminCreateCompany.pending, (state) => ({
+        ...state,
+        createCompanyInProgress: true,
+        createCompanyError: null,
+      }))
+      .addCase(adminCreateCompany.fulfilled, (state, { payload }) => ({
+        ...state,
+        createCompanyInProgress: false,
+        company: payload,
+      }))
+      .addCase(adminCreateCompany.rejected, (state, action) => ({
+        ...state,
+        createCompanyInProgress: false,
+        createCompanyError: action.payload,
+      }))
+      .addCase(showCompany.pending, (state) => {
+        return {
+          ...state,
+          showCompanyInProgress: true,
+          showCom: null,
+        };
+      })
+      .addCase(showCompany.fulfilled, (state, action) => {
+        return {
+          ...state,
+          company: action.payload,
+          showCompanyInProgress: false,
+        };
+      })
+      .addCase(showCompany.rejected, (state, action) => {
+        return {
+          ...state,
+          showCompanyInProgress: false,
+          showCompanyError: action.payload,
+        };
+      })
+      .addCase(adminUpdateCompany.pending, (state) => {
+        return {
+          ...state,
+          updateCompanyInProgress: true,
+        };
+      })
+      .addCase(adminUpdateCompany.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          updateCompanyInProgress: false,
+          company: payload,
+        };
+      })
+      .addCase(adminUpdateCompany.rejected, (state, { error }) => {
+        return {
+          ...state,
+          updateCompanyInProgress: false,
+          updateCompanyError: error.message,
+        };
+      })
+      .addCase(requestUploadCompanyLogo.pending, (state, { meta }) => {
+        const { id, file } = meta.arg;
+
+        return {
+          ...state,
+          uploadedCompanyLogo: { id, file },
+          uploadingCompanyLogo: true,
+          uploadCompanyLogoError: null,
+        };
+      })
+      .addCase(requestUploadCompanyLogo.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          uploadingCompanyLogo: false,
+          uploadedCompanyLogo: payload,
+        };
+      })
+      .addCase(requestUploadCompanyLogo.rejected, (state, { payload }) => ({
+        ...state,
+        uploadingCompanyLogo: false,
+        uploadCompanyLogoError: payload,
+      }))
+      .addCase(adminDeleteGroup.pending, (state, { meta }) => {
+        const { groupId } = meta.arg;
+
+        return {
+          ...state,
+          deleteGroupInProgress: true,
+          deleteGroupError: null,
+          deletingGroupId: groupId,
+        };
+      })
+      .addCase(adminDeleteGroup.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          deleteGroupInProgress: false,
+          deleteGroupError: null,
+          deletingGroupId: '',
+          company: payload,
+        };
+      })
+      .addCase(adminDeleteGroup.rejected, (state, { error }) => {
+        return {
+          ...state,
+          deleteGroupInProgress: false,
+          deleteGroupError: error.message,
+          deletingGroupId: '',
+        };
+      })
+      .addCase(adminCreateGroup.pending, (state) => {
+        return {
+          ...state,
+          createGroupInProgress: true,
+          createGroupError: null,
+        };
+      })
+      .addCase(adminCreateGroup.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          createGroupInProgress: false,
+          createGroupError: null,
+          company: payload,
+        };
+      })
+      .addCase(adminCreateGroup.rejected, (state, { error }) => {
+        return {
+          ...state,
+          createGroupInProgress: false,
+          createGroupError: error.message,
+        };
+      })
+      .addCase(adminUpdateGroup.pending, (state) => {
+        return {
+          ...state,
+          updateGroupInProgress: true,
+          updateGroupError: null,
+        };
+      })
+      .addCase(adminUpdateGroup.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          updateGroupInProgress: false,
+          company: payload,
+        };
+      })
+      .addCase(adminUpdateGroup.rejected, (state, { error }) => {
+        return {
+          ...state,
+          updateGroupInProgress: false,
+          updateGroupError: error.message,
+        };
+      })
+      .addCase(adminTransferCompanyOwner.pending, (state) => {
+        return {
+          ...state,
+          transferCompanyOwnerInProgress: true,
+          transferCompanyOwnerError: null,
+        };
+      })
+      .addCase(adminTransferCompanyOwner.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          transferCompanyOwnerInProgress: false,
+          transferCompanyOwnerError: null,
+          company: payload,
+        };
+      })
+      .addCase(adminTransferCompanyOwner.rejected, (state, { error }) => {
+        return {
+          ...state,
+          transferCompanyOwnerInProgress: false,
+          transferCompanyOwnerError: error,
+        };
       });
   },
 });
 
-export const { addWorkspaceCompanyId } = companySlice.actions;
+export const { addWorkspaceCompanyId, resetCompanySliceStates } =
+  companySlice.actions;
 
 export default companySlice.reducer;

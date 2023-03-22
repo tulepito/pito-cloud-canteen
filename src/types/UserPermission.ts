@@ -1,7 +1,8 @@
 export enum UserPermission {
   BOOKER = 'booker',
-  ACCOUNTANT = 'accoutant',
+  ACCOUNTANT = 'accountant',
   PARTICIPANT = 'participant',
+  OWNER = 'owner',
 }
 
 export enum UserInviteStatus {

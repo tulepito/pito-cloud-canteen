@@ -161,7 +161,7 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'bookerName',
     label: 'Nguời đại diện',
     render: (data: any) => {
-      return <div>{data.bookerName}</div>;
+      return <div>{data.displayName}</div>;
     },
   },
   {
@@ -254,7 +254,7 @@ const parseEntitiesToTableData = (
   if (orders.length === 0) return [];
 
   return orders.map((entity, index) => {
-    const { company, subOrders = [], booker } = entity;
+    const { company, subOrders = [] } = entity;
     const restaurants = subOrders.reduce(
       // eslint-disable-next-line array-callback-return
       (prevSubOrders: any[], subOrder: TIntegrationListing) => {
@@ -285,8 +285,8 @@ const parseEntitiesToTableData = (
         title: entity.attributes.title,
         orderNumber: (page - 1) * 10 + index + 1,
         location: deliveryAddress?.address,
-        companyName: company?.attributes.profile.displayName,
-        bookerName: booker?.attributes.profile.displayName,
+        companyName: company?.attributes?.profile?.publicData?.companyName,
+        displayName: company?.attributes.profile?.displayName,
         startDate: startDate && formatTimestamp(startDate),
         endDate: endDate && formatTimestamp(endDate),
         staffName,

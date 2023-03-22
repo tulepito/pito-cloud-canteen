@@ -61,6 +61,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
       <div className={classNames(css.actions, actionsClassName)}>
         {cancelLabel && (
           <Button
+            type="button"
             disabled={cancelDisabled}
             className={classNames(css.reject, cancelClassName)}
             variant="secondary"
@@ -71,6 +72,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
         )}
         {confirmLabel && (
           <Button
+            type="button"
             disabled={confirmDisabled}
             inProgress={confirmInProgress}
             className={classNames(css.confirm, confirmClassName)}

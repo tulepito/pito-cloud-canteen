@@ -54,6 +54,12 @@
   }
 }
 
+.bodyCell:nth-child(6) {
+  @include viewportLarge {
+    max-width: 200px;
+  }
+}
+
 .remainText {
   margin: 5px 0 0 0;
   font-weight: $fontWeightBold;

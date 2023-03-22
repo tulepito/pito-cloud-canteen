@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 
 import {
   addWorkspaceCompanyId,
-  BookerManageCompany,
+  companyThunks,
 } from '@redux/slices/company.slice';
 
 import { useAppDispatch, useAppSelector } from './reduxHooks';
@@ -25,7 +25,7 @@ const useFetchCompanyInfo = () => {
     ) {
       (async () => {
         dispatch(addWorkspaceCompanyId(companyId));
-        await dispatch(BookerManageCompany.companyInfo());
+        await dispatch(companyThunks.companyInfo());
       })();
     }
   }, [companyId, currentWorkspaceCompanyId, dispatch, isReady]);

@@ -1,15 +1,27 @@
+/* eslint-disable import/no-cycle */
 import { createSlice } from '@reduxjs/toolkit';
 
+import type { TUpdateMemberPermissionApiParams } from '@apis/companyApi';
 import {
   addMembersApi,
+  adminAddMembersToCompanyApi,
+  adminDeleteMemberApi,
+  adminUpdateMemberPermissionApi,
   checkEmailExistedApi,
   deleteMemberApi,
 } from '@apis/companyApi';
+import { queryCompanyMembersApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
+import { storableAxiosError } from '@utils/errors';
 import type { TUser } from '@utils/types';
 
-import { BookerManageCompany } from './company.slice';
+import { companySlice, companyThunks } from './company.slice';
 
+export type TAddMembersToCompanyParams = {
+  companyId: string;
+  userIdList: string[];
+  noAccountEmailList: string[];
+};
 interface TCompanyMemberState {
   company: TUser | null;
   companyMembers: any[];
@@ -21,6 +33,12 @@ interface TCompanyMemberState {
 
   checkedEmailInputChunk: any[];
   checkEmailExistedInProgress: boolean;
+
+  queryMembersInProgress: boolean;
+  queryMembersError: any;
+
+  updatingMemberPermissionEmail: string | null;
+  updateMemberPermissionError: any;
 }
 
 const initialState: TCompanyMemberState = {
@@ -34,11 +52,35 @@ const initialState: TCompanyMemberState = {
 
   checkedEmailInputChunk: [],
   checkEmailExistedInProgress: false,
+
+  queryMembersInProgress: false,
+  queryMembersError: null,
+
+  updatingMemberPermissionEmail: null,
+  updateMemberPermissionError: null,
 };
 
 const CHECK_EMAILS_EXISTED = 'app/companyMember/CHECK_EMAILS_EXISTED';
 const ADD_MEMBERS = 'app/companyMember/ADD_MEMBERS';
 const DELETE_MEMBER = 'app/companyMember/DELETE_MEMBER';
+const QUERY_COMPANY_MEMBERS = 'app/companyMember/QUERY_COMPANY_MEMBERS';
+
+const ADMIN_DELETE_MEMBER = 'app/companyMember/ADMIN_DELETE_MEMBER';
+const ADMIN_ADD_MEMBERS = 'app/companyMember/ADMIN_ADD_MEMBERS';
+const ADMIN_UPDATE_MEMBER_PERMISSION =
+  'app/companyMember/ADMIN_UPDATE_MEMBER_PERMISSION';
+
+const queryCompanyMembers = createAsyncThunk(
+  QUERY_COMPANY_MEMBERS,
+  async (id: string) => {
+    const { data } = await queryCompanyMembersApi(id);
+
+    return data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
 
 const checkEmailExisted = createAsyncThunk(
   CHECK_EMAILS_EXISTED,
@@ -63,9 +105,29 @@ const addMembers = createAsyncThunk(
       ...params,
       companyId: workspaceCompanyId,
     });
-    await dispatch(BookerManageCompany.companyInfo());
+    await dispatch(companyThunks.companyInfo());
 
     return addMembersResponse;
+  },
+);
+
+const adminAddMembers = createAsyncThunk(
+  ADMIN_ADD_MEMBERS,
+  async (
+    { companyId, userIdList, noAccountEmailList }: TAddMembersToCompanyParams,
+    { dispatch },
+  ) => {
+    const { data } = await adminAddMembersToCompanyApi(companyId, {
+      userIdList,
+      noAccountEmailList,
+    });
+    await dispatch(queryCompanyMembers(companyId));
+    dispatch(companySlice.actions.renewCompanyState(data));
+
+    return data;
+  },
+  {
+    serializeError: storableAxiosError,
   },
 );
 
@@ -82,10 +144,44 @@ const deleteMember = createAsyncThunk(
   },
 );
 
+const adminDeleteMember = createAsyncThunk(
+  ADMIN_DELETE_MEMBER,
+  async (
+    { companyId, email }: { companyId: string; email: string },
+    { dispatch },
+  ) => {
+    const { data } = await adminDeleteMemberApi({
+      memberEmail: email,
+      companyId,
+    });
+    await dispatch(queryCompanyMembers(companyId));
+    dispatch(companySlice.actions.renewCompanyState(data));
+
+    return data;
+  },
+  { serializeError: storableAxiosError },
+);
+
+const adminUpdateMemberPermission = createAsyncThunk(
+  ADMIN_UPDATE_MEMBER_PERMISSION,
+  async (params: TUpdateMemberPermissionApiParams, { dispatch }) => {
+    const { data } = await adminUpdateMemberPermissionApi(params);
+    await dispatch(queryCompanyMembers(params.companyId));
+    dispatch(companySlice.actions.renewCompanyState(data));
+
+    return data;
+  },
+  { serializeError: storableAxiosError },
+);
+
 export const companyMemberThunks = {
   addMembers,
   deleteMember,
   checkEmailExisted,
+  queryCompanyMembers,
+  adminAddMembers,
+  adminDeleteMember,
+  adminUpdateMemberPermission,
 };
 
 export const companyMemberSlice = createSlice({
@@ -144,6 +240,63 @@ export const companyMemberSlice = createSlice({
         ...state,
         deleteMemberInProgress: false,
         deleteMemberError: error.message,
+      }))
+      .addCase(queryCompanyMembers.pending, (state) => ({
+        ...state,
+        queryMembersInProgress: true,
+        queryMembersError: null,
+      }))
+      .addCase(queryCompanyMembers.fulfilled, (state, { payload }) => ({
+        ...state,
+        queryMembersInProgress: false,
+        companyMembers: payload,
+      }))
+      .addCase(queryCompanyMembers.rejected, (state, { error }) => ({
+        ...state,
+        queryMembersError: error,
+        queryMembersInProgress: false,
+      }))
+      .addCase(adminAddMembers.pending, (state) => ({
+        ...state,
+        addMembersInProgress: true,
+        addMembersError: null,
+      }))
+      .addCase(adminAddMembers.fulfilled, (state) => ({
+        ...state,
+        addMembersInProgress: false,
+      }))
+      .addCase(adminAddMembers.rejected, (state, { error }) => ({
+        ...state,
+        addMembersInProgress: false,
+        addMembersError: error.message,
+      }))
+      .addCase(adminDeleteMember.pending, (state) => ({
+        ...state,
+        deleteMemberInProgress: true,
+        deleteMemberError: null,
+      }))
+      .addCase(adminDeleteMember.fulfilled, (state) => ({
+        ...state,
+        deleteMemberInProgress: false,
+      }))
+      .addCase(adminDeleteMember.rejected, (state, { error }) => ({
+        ...state,
+        deleteMemberInProgress: false,
+        deleteMemberError: error.message,
+      }))
+      .addCase(adminUpdateMemberPermission.pending, (state, { meta }) => ({
+        ...state,
+        updatingMemberPermissionEmail: meta?.arg?.memberEmail,
+        updateMemberPermissionError: null,
+      }))
+      .addCase(adminUpdateMemberPermission.fulfilled, (state) => ({
+        ...state,
+        updatingMemberPermissionEmail: null,
+      }))
+      .addCase(adminUpdateMemberPermission.rejected, (state, { error }) => ({
+        ...state,
+        updatingMemberPermissionEmail: null,
+        updateMemberPermissionError: error,
       }));
   },
 });

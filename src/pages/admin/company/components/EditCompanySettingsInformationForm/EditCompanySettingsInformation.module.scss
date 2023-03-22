@@ -1,0 +1,56 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.companyLogoField {
+  height: 206px;
+  max-width: 928px;
+  margin: auto;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.addButtonWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: $neutralGray6;
+}
+
+.addIconWrapper {
+  border: 2px solid $neutralGray6;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+}
+
+.updateModalContainer {
+  @include viewportLarge {
+    min-width: 1024px;
+  }
+}
+
+.checkboxGroup {
+  display: flex;
+  gap: 54px;
+}
+
+.line {
+  height: 1px;
+  width: 100%;
+  background-color: $neutralGray4;
+  margin: 48px 0;
+}
+
+.largeTitle {
+  font-size: 24px;
+}
+
+.smallTitle {
+  font-size: 16px;
+}

@@ -18,7 +18,13 @@ import {
 
 import css from './FieldBankAccounts.module.scss';
 
-const FieldBankAccounts: React.FC<any> = (props) => {
+type TFieldBankAccounts = {
+  id: string;
+  name: string;
+  className?: string;
+};
+
+const FieldBankAccounts: React.FC<TFieldBankAccounts> = (props) => {
   const { id, name, className } = props;
   const intl = useIntl();
 

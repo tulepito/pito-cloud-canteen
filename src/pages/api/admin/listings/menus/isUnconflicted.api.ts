@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { checkUnConflictedMenuMiddleware } from '@pages/api/helpers/menuHelpers';
+import checkUnConflictedMenuMiddleware from '@pages/api/apiServices/menu/checkUnConflictedMenuMiddleware.service';
 import cookies from '@services/cookie';
 import adminChecker from '@services/permissionChecker/admin';
 

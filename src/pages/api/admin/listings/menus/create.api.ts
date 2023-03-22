@@ -1,9 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import {
-  checkUnConflictedMenuMiddleware,
-  updateMenuIdListAndMenuWeekDayListForFood,
-} from '@pages/api/helpers/menuHelpers';
+import checkUnConflictedMenuMiddleware from '@pages/api/apiServices/menu/checkUnConflictedMenuMiddleware.service';
+import updateMenuIdListAndMenuWeekDayListForFood from '@pages/api/apiServices/menu/updateMenuIdListAndMenuWeekDayListForFood.service';
 import cookies from '@services/cookie';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';

@@ -2,33 +2,33 @@
 @use '/src/styles/vars.scss' as *;
 
 .form {
-  max-width: 1440px;
   margin: auto;
 }
 
 .fields {
   display: flex;
-  margin-bottom: 20px;
+  gap: 20px;
   flex-direction: column;
-  row-gap: 20px;
-
-  @include viewportLarge {
+  @include viewportMedium {
+    flex-wrap: wrap;
     flex-direction: row;
-    column-gap: 20px;
   }
 }
 
 .field {
-  flex: 1;
+  @include viewportMedium {
+    width: calc(50% - 20px);
+  }
 }
 
 .formTitle {
-  margin: 40px 0 40px 0;
+  margin: 45px 0 30px 0;
   text-transform: uppercase;
 }
 
 .textareaField input {
   padding-bottom: 150px;
+  min-height: 180px;
 }
 
 .buttonWrapper {

@@ -17,7 +17,7 @@ import useBoolean from '@hooks/useBoolean';
 import IconNoClientsFound from '@src/pages/admin/order/create/components/ClientTable/IconNoClientsFound';
 import {
   addWorkspaceCompanyId,
-  BookerManageCompany,
+  companyThunks,
 } from '@src/redux/slices/company.slice';
 
 import css from './GroupSetting.module.scss';
@@ -128,7 +128,7 @@ const GroupSettingPage = () => {
   ];
 
   const onConfirmDeleteGroup = () => {
-    dispatch(BookerManageCompany.deleteGroup(selectingDeleteGroupId)).then(() =>
+    dispatch(companyThunks.deleteGroup(selectingDeleteGroupId)).then(() =>
       onDeleteGroupConfirmationModalClose(),
     );
   };
@@ -140,7 +140,7 @@ const GroupSettingPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       dispatch(addWorkspaceCompanyId(companyId));
-      await dispatch(BookerManageCompany.companyInfo());
+      await dispatch(companyThunks.companyInfo());
     };
     fetchData();
   }, [companyId, dispatch, router]);

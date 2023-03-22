@@ -20,6 +20,14 @@ export type DeleteMemberApiBody = {
 export const deleteMemberApi = (body: DeleteMemberApiBody) =>
   deleteApi('/company/members/delete-member', body);
 
+export const adminDeleteMemberApi = ({
+  memberEmail,
+  companyId,
+}: DeleteMemberApiBody) =>
+  deleteApi(`/admin/users/company/${companyId}/members/delete`, {
+    memberEmail,
+  });
+
 export type UpdateCompanyApiBody = {
   companyId: string;
   dataParams: {
@@ -104,6 +112,60 @@ export const companyApi = {
 export const getAllCompanyMembersApi = (companyId: string) =>
   getApi(`/company/all-employees?companyId=${companyId}`);
 
+export const queryMembersByEmailAdminApi = (
+  emails: string[],
+  queryParams?: TObject,
+) => {
+  return getApi(`/admin/users/company/query-new-members-by-email`, {
+    dataParams: { emails },
+    queryParams,
+  });
+};
+
+export const adminAddMembersToCompanyApi = (
+  companyId: string,
+  dataParams?: TObject,
+  queryParams?: TObject,
+) => {
+  return postApi(`/admin/users/company/${companyId}/members/add`, {
+    dataParams,
+    queryParams,
+  });
+};
+
+export const adminDeleteGroupApi = ({
+  companyId,
+  groupId,
+}: DeleteGroupApiData) =>
+  deleteApi(`/admin/users/company/${companyId}/groups/delete`, {
+    companyId,
+    groupId,
+  });
+
+export const adminCreateGroupApi = ({
+  companyId,
+  ...rest
+}: CreateGroupApiBody) =>
+  postApi(`/admin/users/company/${companyId}/groups/create`, rest);
+
+export const adminUpdateGroupApi = ({
+  companyId,
+  ...rest
+}: UpdateGroupApiBody) =>
+  postApi(`/admin/users/company/${companyId}/groups/update`, rest);
+
+export type TUpdateMemberPermissionApiParams = {
+  companyId: string;
+  memberEmail: string;
+  permission: string;
+};
+
+export const adminUpdateMemberPermissionApi = ({
+  companyId,
+  ...rest
+}: TUpdateMemberPermissionApiParams) =>
+  putApi(`/admin/users/company/${companyId}/members/update-permission`, rest);
+
 export const favoriteRestaurantApi = (
   companyId: string,
   restaurantId: string,
@@ -115,3 +177,22 @@ export const favoriteRestaurantApi = (
 
 export const fetchCompanyInfo = (companyId: string) =>
   getApi(`/company/${companyId}`);
+
+export type TAdminTransferCompanyOwnerParams = {
+  companyId: string;
+  newOwnerEmail: string;
+  permissionForOldOwner?: string;
+  newOwnerProfileImageId?: string;
+};
+
+export const adminTransferCompanyOwnerApi = ({
+  companyId,
+  newOwnerEmail,
+  permissionForOldOwner,
+  newOwnerProfileImageId,
+}: TAdminTransferCompanyOwnerParams) =>
+  postApi(`/admin/users/company/${companyId}/transfer-owner`, {
+    newOwnerEmail,
+    newOwnerProfileImageId,
+    permissionForOldOwner,
+  });

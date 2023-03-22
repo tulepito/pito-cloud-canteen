@@ -10,7 +10,7 @@ import { UIActions } from '@redux/slices/UI.slice';
 
 import css from './Modal.module.scss';
 
-type TModalProps = PropsWithChildren<{
+export type TModalProps = PropsWithChildren<{
   id?: string;
   className?: string;
   containerClassName?: string;

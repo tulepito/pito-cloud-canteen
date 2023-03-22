@@ -1,0 +1,31 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+.label {
+  font-size: 20px;
+  font-weight: $fontWeightMedium;
+}
+
+.description {
+  font-size: 14px;
+  font-style: italic;
+  @include viewportLarge {
+    width: 40%;
+  }
+}
+
+.inputSuffixed {
+  color: $neutralGray5;
+  padding: 0 10px;
+  width: unset !important;
+  flex-direction: row !important;
+  justify-content: flex-end !important;
+  border-left: 1px solid $neutralGray3;
+}
+
+.input {
+  margin: 20px 0 50px 0;
+  @include viewportMedium {
+    width: 50%;
+    max-width: 334px;
+  }
+}

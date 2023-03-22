@@ -10,7 +10,7 @@ import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { BookerManageCompany } from '@redux/slices/company.slice';
+import { companyThunks } from '@redux/slices/company.slice';
 import { User } from '@utils/data';
 import type { TObject } from '@utils/types';
 
@@ -53,14 +53,14 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
         email: member.attributes.email,
       }));
     await dispatch(
-      BookerManageCompany.updateGroup({
+      companyThunks.updateGroup({
         groupId,
         addedMembers,
       }),
     );
     onModalClose();
     await dispatch(
-      BookerManageCompany.groupDetailInfo({
+      companyThunks.groupDetailInfo({
         groupId: groupId as string,
       }),
     );

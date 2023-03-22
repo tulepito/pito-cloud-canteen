@@ -6,6 +6,8 @@ import { sanitizeEntity } from '@utils/sanitize';
 import type {
   TAvailabilityException,
   TAvailabilityPlan,
+  TCompany,
+  TCompanyMemberWithDetails,
   TCurrentUser,
   TIntegrationListing,
   TLineItemCode,
@@ -460,7 +462,7 @@ export const CurrentUser = (user: TCurrentUser) => {
   };
 };
 
-export const User = (user: TUser | TCurrentUser) => {
+export const User = (user: TUser | TCurrentUser | TCompany) => {
   const ensuredUser = ensureUser(user);
   const id = ensuredUser?.id?.uuid;
   const { attributes, profileImage } = ensuredUser;
@@ -703,4 +705,27 @@ export const getUniqueString = (list: string[]) => {
   return list.filter((value, index, self) => {
     return self.indexOf(value) === index;
   });
+};
+
+export const getUniqueCompanyMemberByEmail = (
+  list: TCompanyMemberWithDetails[],
+) => {
+  const resArr: TCompanyMemberWithDetails[] = [];
+  list.forEach((item) => {
+    const i = resArr.findIndex((x) => {
+      if (x?.attributes?.email) {
+        return (
+          x?.attributes?.email === item?.attributes?.email ||
+          x?.attributes?.email === item?.email
+        );
+      }
+
+      return x?.email === item?.attributes?.email || x?.email === item?.email;
+    });
+    if (i <= -1) {
+      resArr.push(item);
+    }
+  });
+
+  return resArr;
 };

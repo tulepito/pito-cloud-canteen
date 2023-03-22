@@ -14,11 +14,15 @@ export const getCompanyMembersDetailsApi = (
   return getApi(`/admin/users/company/${id}/members?roles=${rolesAsString}`);
 };
 
-export const updateCompanyApi = (body: TObject) =>
+export const adminUpdateCompanyApi = (body: TObject) =>
   putApi('/admin/users/company/update', body);
 
 export const createCompanyApi = (body: TObject) =>
   postApi('/admin/users/company/create', body);
+
+export const queryCompanyMembersApi = (companyId: string) => {
+  return getApi(`/admin/users/company/${companyId}/members`);
+};
 
 export const showCompanyApi = (id: string) =>
   getApi(`/admin/users/company/${id}`);

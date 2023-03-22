@@ -487,6 +487,25 @@ export type TIntegrationOrderListing = {
   subOrders?: TIntegrationListing[];
 };
 
+export type TCompanyMemberWithDetails = {
+  permission: string;
+  groups: string[];
+  email: string;
+  expireTime: Date;
+  id: null;
+  inviteStatus: string;
+} & TUser;
+
+export type TCompanyGroup = {
+  id: string;
+  name: string;
+  description?: string;
+  members: {
+    id: string | null;
+    email: string;
+  }[];
+};
+
 export type TTableSortValue = {
   columnName: string | number;
   type: 'asc' | 'desc';

@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
-import { BookerManageCompany } from '@redux/slices/company.slice';
+import { companyThunks } from '@redux/slices/company.slice';
 import { CurrentUser, Listing, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
@@ -97,7 +97,7 @@ const NutritionPage = () => {
     const publicData = {
       ...values,
     };
-    dispatch(BookerManageCompany.updateCompanyAccount({ publicData }));
+    dispatch(companyThunks.updateCompanyAccount({ publicData }));
   };
 
   return (

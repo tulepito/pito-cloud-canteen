@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   addWorkspaceCompanyId,
-  BookerManageCompany,
+  companyThunks,
 } from '@redux/slices/company.slice';
 
 const CompanyDetailPage = () => {
@@ -20,8 +20,7 @@ const CompanyDetailPage = () => {
   }, [companyId, dispatch, isReady]);
 
   useEffect(() => {
-    if (isReady) dispatch(BookerManageCompany.companyInfo());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (isReady) dispatch(companyThunks.companyInfo());
   }, [isReady]);
 
   if (isCompanyNotFound) {

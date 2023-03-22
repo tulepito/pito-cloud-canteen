@@ -102,6 +102,11 @@ export enum ECompanyStatus {
   unactive = 0,
 }
 
+export enum ECompanyStates {
+  draft = 'draft',
+  published = 'published',
+}
+
 export enum EListingType {
   restaurant = 'restaurant',
   food = 'food',
@@ -837,6 +842,21 @@ export const MENU_MEAL_TYPE_OPTIONS = [
   {
     key: EMenuMealType.snack,
     label: 'Ăn xế',
+  },
+];
+
+export const COMPANY_NUTRITION_TYPE_OPTIONS = [
+  {
+    key: 'vegeterian',
+    label: 'Ăn chay',
+  },
+  {
+    key: 'keto',
+    label: 'Keto',
+  },
+  {
+    key: 'non-glucoten',
+    label: 'Không chứa glucoten',
   },
 ];
 
