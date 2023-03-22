@@ -13,9 +13,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     };
     const { dataParams = {}, queryParams = {} } = JSON.parse(JSONParams);
     const { emails } = dataParams;
-    const users = await queryMembersByEmail(emails, queryParams);
+    const { users, noExistedUsers } = await queryMembersByEmail(
+      emails,
+      queryParams,
+    );
 
-    return res.status(200).json(users);
+    return res.status(200).json({ users, noExistedUsers });
   } catch (error) {
     console.error(error);
     handleError(res, error);

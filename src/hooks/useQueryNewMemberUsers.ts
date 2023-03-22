@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { queryMembersByEmailAdminApi } from '@apis/companyApi';
+import { getUniqueString, getUniqueUsers } from '@src/utils/data';
 import type { TUser } from '@utils/types';
 
 import useBoolean from './useBoolean';
@@ -16,8 +17,12 @@ const useQueryNewMemberUsers = () => {
     setFalse: turnOffUsersInProgress,
   } = useBoolean(false);
 
-  const setInitialUsers = (newUsers: TUser[] = []) => {
+  const setInitialUsers = (
+    newUsers: TUser[] = [],
+    newNotFoundUsers: string[] = [],
+  ) => {
     setUsers(newUsers);
+    setNotFoundUsers(newNotFoundUsers);
   };
 
   const queryUsersByEmail = async (
@@ -27,12 +32,23 @@ const useQueryNewMemberUsers = () => {
     try {
       turnOnUsersInProgress();
       const { data } = await queryMembersByEmailAdminApi(emailList);
+      const { users: newUsers, noExistedUsers } = data;
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      reset ? setUsers(data) : setUsers([...users, ...data]);
+      const mergedUser = [...users, ...newUsers];
+      const nonDuplicatedUser = reset
+        ? getUniqueUsers(data)
+        : getUniqueUsers(mergedUser);
+      setUsers(nonDuplicatedUser);
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      reset
+        ? setNotFoundUsers(noExistedUsers)
+        : setNotFoundUsers(
+            getUniqueString([...notFoundUsers, ...noExistedUsers]),
+          );
       turnOffUsersInProgress();
     } catch (error) {
       console.error(error);
-      setNotFoundUsers([...emailList, ...notFoundUsers]);
+      setNotFoundUsers(getUniqueString([...emailList, ...notFoundUsers]));
       turnOffUsersInProgress();
       setQueryError(error);
     }
