@@ -319,6 +319,7 @@
   "EditCompanyForm.lastNameRequired": "Vui lòng nhập tên",
   "EditCompanyForm.locationRequried": "Vui lòng nhập địa chỉ",
   "EditCompanyForm.noteLabel": "Ghi chú",
+  "EditCompanyForm.notePlaceholder": "Nhập ghi chú",
   "EditCompanyForm.passwordInvalid": "Mật khẩu phải từ 8-16 kí tự, bao gồm chữ cái in hoa, chữ cái in thường, ký tự đặc biệt và chữ số.",
   "EditCompanyForm.passwordLabel": "Mật khẩu",
   "EditCompanyForm.passwordPlaceholder": "Nhập mật khẩu",
@@ -352,6 +353,7 @@
   "EditCompanySettingsTabs.subscriptionSetting": "Gói mua",
   "EditCompanyWizard.goBack": "Quay lại",
   "EditCompanyWizard.nextStep": "Tiếp theo",
+  "EditCompanyWizard.save": "Lưu",
   "EditMenuCompleteForm.applyTime": "Thời gian áp dụng",
   "EditMenuCompleteForm.endDate": "Ngày kết thúc",
   "EditMenuCompleteForm.endDateLabel": "Ngày kết thúc",
@@ -422,7 +424,9 @@
   "EditPartnerBasicInformationForm.passwordInvalid": "Mật khẩu phải từ 8-16 kí tự, bao gồm chữ cái in hoa, chữ cái in thường, ký tự đặc biệt và chữ số.",
   "EditPartnerBasicInformationForm.passwordRequired": "Vui lòng nhập mật khẩu",
   "EditPartnerBasicInformationForm.paymentDueDaysLabel": "Kì hạn thanh toán",
+  "EditPartnerBasicInformationForm.paymentDueDaysMinLength": "Kì hạn thanh toán lớn hơn 0",
   "EditPartnerBasicInformationForm.paymentDueDaysPlaceholder": "Nhập số",
+  "EditPartnerBasicInformationForm.paymentDueDaysRequired": "Vui lòng nhập kì hạn thanh toán",
   "EditPartnerBasicInformationForm.paymentDueDaysRightText": "ngày",
   "EditPartnerBasicInformationForm.phoneNumberRequired": "Vui lòng nhập số điện thoại",
   "EditPartnerBasicInformationForm.phoneNumberValid": "Số điện thoại không hợp lệ",
@@ -1329,9 +1333,5 @@
   "UserPermission.accountant": "Kế toán viên",
   "UserPermission.booker": "Booker",
   "UserPermission.owner": "Quản trị viên",
-  "UserPermission.participant": "Thành viên",
-  "EditCompanyForm.notePlaceholder": "Nhập ghi chú",
-  "EditPartnerBasicInformationForm.paymentDueDaysRequired": "Vui lòng nhập kì hạn thanh toán",
-  "EditPartnerBasicInformationForm.paymentDueDaysMinLength": "Kì hạn thanh toán lớn hơn 0",
-  "EditCompanyWizard.save": "Lưu"
+  "UserPermission.participant": "Thành viên"
 }
