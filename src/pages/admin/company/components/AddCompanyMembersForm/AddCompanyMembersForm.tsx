@@ -58,6 +58,7 @@ const AddCompanyMembersFormComponent: React.FC<
     if (!queryUsersByEmail) return;
     const { email } = values;
     const emailAsArray = email.split(',');
+
     return queryUsersByEmail(emailAsArray);
   };
 

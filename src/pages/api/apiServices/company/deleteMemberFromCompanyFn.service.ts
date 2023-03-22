@@ -25,6 +25,7 @@ const deleteMemberFromCompanyFn = async ({
     const newGroupMembers = group.members.filter(
       (member) => member.email !== memberEmail,
     );
+
     return {
       ...group,
       members: newGroupMembers,
@@ -37,6 +38,7 @@ const deleteMemberFromCompanyFn = async ({
       const newGroupMembers = group.members.filter(
         (member) => member.email === memberEmail,
       );
+
       return newGroupMembers.length > 0 && group.id;
     }),
   );
@@ -88,6 +90,7 @@ const deleteMemberFromCompanyFn = async ({
   const [updatedCompanyAccount] = denormalisedResponseEntities(
     updatedCompanyAccountResponse,
   );
+
   return updatedCompanyAccount;
 };
 

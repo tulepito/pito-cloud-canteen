@@ -12,3 +12,20 @@
     width: 40%;
   }
 }
+
+.inputSuffixed {
+  color: $neutralGray5;
+  padding: 0 10px;
+  width: unset !important;
+  flex-direction: row !important;
+  justify-content: flex-end !important;
+  border-left: 1px solid $neutralGray3;
+}
+
+.input {
+  margin: 20px 0 50px 0;
+  @include viewportMedium {
+    width: 50%;
+    max-width: 334px;
+  }
+}

@@ -29,10 +29,12 @@ const queryCompanyMembers = async (companyId: string) => {
     const key = Object.keys(members).find(
       (email) => email === user.attributes.email,
     );
+
     return { ...user, ...(key ? { ...members[key] } : {}) };
   });
 
   const mergedUsers = [...membersWithDetails, ...nonExistedUsers];
+
   return mergedUsers;
 };
 

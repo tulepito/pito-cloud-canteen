@@ -29,6 +29,7 @@ const TABLE_COLUMN: TColumn[] &
     label: 'Tên nhóm',
     render: (data) => {
       const { name } = data;
+
       return <span>{name}</span>;
     },
   },
@@ -83,6 +84,7 @@ const parseEntitiesToTableData = (
     const handleOpenRemoveModal = () => {
       onOpenRemoveModal(group);
     };
+
     return {
       key: group.id,
       data: {

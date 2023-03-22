@@ -67,6 +67,7 @@ const deleteCompanyGroupFn = async ({
       });
     }),
   );
+
   return updatedCompanyAccount;
 };
 

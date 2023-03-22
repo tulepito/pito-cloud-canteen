@@ -1,5 +1,5 @@
 import { ECompanyStates } from '@utils/enums';
-import type { TCompany, TObject } from '@utils/types';
+import type { TObject } from '@utils/types';
 
 import type { TEditCompanyBankAccountsFormValues } from '../EditCompanyBankAccountsForm/EditCompanyBankAccountsForm';
 import type { TEditCompanyInformationFormValues } from '../EditCompanyInformationForm/EditCompanyInformationForm';
@@ -21,44 +21,58 @@ export const COMPANY_SETTING_SUBSCRIPTION_TAB_ID =
 export const createSubmitCreateCompanyValues = (
   values: TEditCompanyInformationFormValues &
     TEditCompanySettingsInformationFormValues,
-  tab: string,
 ) => {
-  const { name, email, password, phoneNumber, location, note, tax } = values;
+  const {
+    firstName,
+    lastName,
+    companyName,
+    companyEmail,
+    companyLocation,
+    email,
+    password,
+    phoneNumber,
+    location,
+    note,
+    tax,
+  } = values;
   const {
     selectedPlace: { address, origin },
   } = location || {};
 
-  switch (tab) {
-    case COMPANY_INFORMATION_TAB:
-      return {
-        email,
-        password,
-        firstName: name,
-        lastName: ' ',
-        displayName: name,
-        publicData: {
-          phoneNumber,
-          note,
-          location: {
-            address,
-            origin: {
-              lat: origin.lat,
-              lng: origin.lng,
-            },
-          },
+  const {
+    selectedPlace: { address: companyAddress, origin: companyOrigin },
+  } = companyLocation || {};
+
+  return {
+    email,
+    password,
+    firstName,
+    lastName,
+    displayName: `${firstName} ${lastName}`,
+    publicData: {
+      companyName,
+      companyEmail,
+      phoneNumber,
+      note,
+      location: {
+        address,
+        origin: {
+          lat: origin.lat,
+          lng: origin.lng,
         },
-        privateData: {
-          tax,
+      },
+      companyLocation: {
+        address: companyAddress,
+        origin: {
+          lat: companyOrigin.lat,
+          lng: companyOrigin.lng,
         },
-        metadata: {
-          userState: ECompanyStates.draft,
-        },
-      };
-    case COMPANY_SETTINGS_TAB:
-      return {};
-    default:
-      return {};
-  }
+      },
+    },
+    privateData: {
+      tax,
+    },
+  };
 };
 
 export const createSubmitUpdateCompanyValues = (
@@ -69,22 +83,45 @@ export const createSubmitUpdateCompanyValues = (
 ) => {
   switch (tab) {
     case COMPANY_INFORMATION_TAB: {
-      const { name, phoneNumber, location, note, tax } = values;
+      const {
+        firstName,
+        lastName,
+        companyEmail,
+        companyLocation,
+        companyName,
+        phoneNumber,
+        location,
+        note,
+        tax,
+      } = values;
       const {
         selectedPlace: { address, origin },
       } = location || {};
+      const {
+        selectedPlace: { address: companyAddress, origin: companyOrigin },
+      } = companyLocation || {};
+
       return {
-        firstName: name,
-        lastName: ' ',
-        displayName: name,
+        firstName,
+        lastName,
+        displayName: `${firstName} ${lastName}`,
         publicData: {
           phoneNumber,
+          companyEmail,
+          companyName,
           note,
           location: {
             address,
             origin: {
               lat: origin.lat,
               lng: origin.lng,
+            },
+          },
+          companyLocation: {
+            address: companyAddress,
+            origin: {
+              lat: companyOrigin.lat,
+              lng: companyOrigin.lng,
             },
           },
         },
@@ -99,24 +136,26 @@ export const createSubmitUpdateCompanyValues = (
     case COMPANY_SETTINGS_TAB: {
       const {
         companyLogo = {},
-        companyNutritions = [],
+        nutritions = [],
         tabValue,
         bankAccounts = [],
+        paymentDueDays,
       } = values;
       switch (tabValue) {
         case COMPANY_SETTING_INFORMATION_TAB_ID: {
           const { imageId } = companyLogo || {};
+
           return {
             profileImageId: imageId?.uuid,
             publicData: {
-              companyNutritions,
+              nutritions,
             },
           };
         }
 
         case COMPANY_SETTING_PAYMENT_TAB_ID: {
           return {
-            privateData: { bankAccounts },
+            privateData: { bankAccounts, paymentDueDays },
           };
         }
         case COMPANY_SETTING_SUBSCRIPTION_TAB_ID: {
@@ -131,26 +170,9 @@ export const createSubmitUpdateCompanyValues = (
   }
 };
 
-export const getInitialLocationValues = (company: TCompany) => {
-  const { publicData = {} } = company.attributes.profile;
-  const { location = {} } = publicData;
-  // Only render current search if full place object is available in the URL params
-  // TODO bounds are missing - those need to be queried directly from Google Places
-  const locationFieldsPresent = location && location.address && location.origin;
-
-  const { address, origin } = location || {};
-
-  return locationFieldsPresent
-    ? {
-        predictions: [],
-        search: address,
-        selectedPlace: { address, origin },
-      }
-    : {};
-};
-
 export const createSubmitAddMembersToCompanyValues = (values: TObject) => {
   const { userIdList = [], noAccountEmailList = [] } = values;
+
   return {
     userIdList,
     noAccountEmailList,

@@ -33,6 +33,7 @@ type TExtraProps = {
   handleCancel: () => void;
   allCompanyMembers: TCompanyMemberWithDetails[];
   selectedCompanyMembers: TCompanyMemberWithDetails[];
+  companyId?: string;
 };
 type TUpdateCompanyGroupFormComponentProps =
   FormRenderProps<TUpdateCompanyGroupFormValues> & Partial<TExtraProps>;
@@ -51,6 +52,7 @@ const UpdateCompanyGroupFormComponent: React.FC<
     allCompanyMembers,
     selectedCompanyMembers,
     initialValues,
+    companyId,
   } = props;
   const {
     companyMemberEmails,
@@ -102,6 +104,7 @@ const UpdateCompanyGroupFormComponent: React.FC<
   );
 
   const intl = useIntl();
+
   return (
     <>
       <Form onSubmit={handleSubmit}>
@@ -123,6 +126,9 @@ const UpdateCompanyGroupFormComponent: React.FC<
             companyGroups={companyGroups}
             onRemoveMember={onRemoveMember}
             hideRemoveConfirmModal
+            companyId={companyId}
+            hiddenColumnNames={['groupName']}
+            canRemoveOwner
           />
           <InlineTextButton
             onClick={openAddMemberModal}

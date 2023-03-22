@@ -27,6 +27,7 @@ const updateMemberPermissionFn = async ({
           },
         };
       }
+
       return {
         ...prev,
         [emailAsKey]: members[emailAsKey],
@@ -46,6 +47,7 @@ const updateMemberPermissionFn = async ({
     },
   );
   const [newCompany] = denormalisedResponseEntities(response);
+
   return newCompany;
 };
 

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { createSlice } from '@reduxjs/toolkit';
 
@@ -5,12 +6,14 @@ import type {
   CreateGroupApiBody,
   DeleteGroupApiData,
   GetGroupDetailApiParams,
+  TAdminTransferCompanyOwnerParams,
   UpdateCompanyApiBody,
   UpdateGroupApiBody,
 } from '@apis/companyApi';
 import {
   adminCreateGroupApi,
   adminDeleteGroupApi,
+  adminTransferCompanyOwnerApi,
   adminUpdateGroupApi,
   createGroupApi,
   deleteGroupApi,
@@ -31,6 +34,7 @@ import { EImageVariants } from '@utils/enums';
 import { storableAxiosError, storableError } from '@utils/errors';
 import type { TImage, TObject, TUser } from '@utils/types';
 
+import { companyMemberThunks } from './companyMember.slice';
 import { userThunks } from './user.slice';
 
 export const COMPANY_LOGO_VARIANTS = [EImageVariants.default];
@@ -88,6 +92,9 @@ type TCompanyState = {
   uploadCompanyLogoError: any;
   favoriteRestaurants: any[];
   favoriteFood: any[];
+
+  transferCompanyOwnerInProgress: boolean;
+  transferCompanyOwnerError: any;
 };
 
 // ================ Thunk types ================ //
@@ -107,6 +114,7 @@ const REQUEST_UPLOAD_COMPANY_LOGO =
 const ADMIN_DELETE_GROUP = 'app/Company/ADMIN_DELETE_GROUP';
 const ADMIN_CREATE_GROUP = 'app/Company/ADMIN_CREATE_GROUP';
 const ADMIN_UPDATE_GROUP = 'app/Company/ADMIN_UPDATE_GROUP';
+const ADMIN_TRANSFER_COMPANY_OWNER = 'app/Company/ADMIN_TRANSFER_COMPANY_OWNER';
 
 const initialState: TCompanyState = {
   groupList: [],
@@ -148,6 +156,9 @@ const initialState: TCompanyState = {
   uploadingCompanyLogo: false,
   favoriteRestaurants: [],
   favoriteFood: [],
+
+  transferCompanyOwnerInProgress: false,
+  transferCompanyOwnerError: null,
 };
 
 const requestUploadCompanyLogo = createAsyncThunk(
@@ -163,9 +174,11 @@ const requestUploadCompanyLogo = createAsyncThunk(
         },
       );
       const img = response.data.data;
+
       return fulfillWithValue({ ...img, id, imageId: img.id });
     } catch (error) {
       console.error('error', error);
+
       return rejectWithValue({ id, error: storableError(error) });
     }
   },
@@ -182,9 +195,11 @@ const adminCreateCompany = createAsyncThunk(
         },
       });
       const [company] = denormalisedResponseEntities(data);
+
       return fulfillWithValue(company);
     } catch (error: any) {
       console.error(error);
+
       return rejectWithValue(storableError(error.response.data));
     }
   },
@@ -196,9 +211,11 @@ const showCompany = createAsyncThunk(
     try {
       const { data } = await showCompanyApi(id);
       const [company] = denormalisedResponseEntities(data);
+
       return fulfillWithValue(company);
     } catch (error: any) {
       console.error('show company error', error);
+
       return rejectWithValue(storableError(error.response.data));
     }
   },
@@ -215,6 +232,7 @@ const adminUpdateCompany = createAsyncThunk(
       },
     });
     const [company] = denormalisedResponseEntities(data);
+
     return company;
   },
   {
@@ -417,13 +435,16 @@ const updateCompanyAccount = createAsyncThunk(
 
 const adminDeleteGroup = createAsyncThunk(
   ADMIN_DELETE_GROUP,
-  async (params: { companyId: string; groupId: string }) => {
+  async (params: { companyId: string; groupId: string }, { dispatch }) => {
     const { companyId, groupId } = params;
     const apiData: DeleteGroupApiData = {
       groupId,
       companyId,
     };
     const { data } = await adminDeleteGroupApi(apiData);
+
+    dispatch(companyMemberThunks.queryCompanyMembers(companyId));
+
     return data;
   },
   {
@@ -433,8 +454,10 @@ const adminDeleteGroup = createAsyncThunk(
 
 const adminCreateGroup = createAsyncThunk(
   ADMIN_CREATE_GROUP,
-  async (params: CreateGroupApiBody) => {
+  async (params: CreateGroupApiBody, { dispatch }) => {
     const { data: newCompanyAccount } = await adminCreateGroupApi(params);
+    dispatch(companyMemberThunks.queryCompanyMembers(params.companyId));
+
     return newCompanyAccount;
   },
   {
@@ -444,7 +467,7 @@ const adminCreateGroup = createAsyncThunk(
 
 const adminUpdateGroup = createAsyncThunk(
   ADMIN_UPDATE_GROUP,
-  async (params: UpdateGroupApiBody) => {
+  async (params: UpdateGroupApiBody, { dispatch }) => {
     const { addedMembers, deletedMembers, groupId, companyId, groupInfo } =
       params;
     const apiBody: UpdateGroupApiBody = {
@@ -455,7 +478,57 @@ const adminUpdateGroup = createAsyncThunk(
       groupInfo,
     };
     const { data } = await adminUpdateGroupApi(apiBody);
+    dispatch(companyMemberThunks.queryCompanyMembers(companyId));
+
     return data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
+const adminTransferCompanyOwner = createAsyncThunk(
+  ADMIN_TRANSFER_COMPANY_OWNER,
+  async (
+    {
+      profileImage,
+      newOwnerEmail,
+      companyId,
+      permissionForOldOwner,
+    }: TAdminTransferCompanyOwnerParams & { profileImage?: TImage },
+    { dispatch, extra: sdk },
+  ) => {
+    let newOwnerProfileImageId;
+    if (profileImage) {
+      const response = await fetch(
+        profileImage?.attributes?.variants?.[EImageVariants.default]?.url,
+      );
+      const data = await response.blob();
+      const metadata = {
+        type: 'image/jpeg',
+      };
+      const file = new File(
+        [data],
+        `${`${companyId}_${new Date().getTime()}`}.jpg`,
+        metadata,
+      );
+
+      const uploadRes = await sdk.images.upload({
+        image: file,
+      });
+      newOwnerProfileImageId = uploadRes.data.data.id;
+    }
+
+    const { data: newCompany } = await adminTransferCompanyOwnerApi({
+      newOwnerEmail,
+      newOwnerProfileImageId,
+      permissionForOldOwner,
+      companyId,
+    });
+
+    dispatch(companyMemberThunks.queryCompanyMembers(companyId));
+
+    return newCompany;
   },
   {
     serializeError: storableAxiosError,
@@ -478,6 +551,7 @@ export const companyThunks = {
   adminCreateGroup,
   adminUpdateGroup,
   adminDeleteGroup,
+  adminTransferCompanyOwner,
 };
 
 export const companySlice = createSlice({
@@ -764,6 +838,7 @@ export const companySlice = createSlice({
       }))
       .addCase(adminDeleteGroup.pending, (state, { meta }) => {
         const { groupId } = meta.arg;
+
         return {
           ...state,
           deleteGroupInProgress: true,
@@ -829,6 +904,28 @@ export const companySlice = createSlice({
           ...state,
           updateGroupInProgress: false,
           updateGroupError: error.message,
+        };
+      })
+      .addCase(adminTransferCompanyOwner.pending, (state) => {
+        return {
+          ...state,
+          transferCompanyOwnerInProgress: true,
+          transferCompanyOwnerError: null,
+        };
+      })
+      .addCase(adminTransferCompanyOwner.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          transferCompanyOwnerInProgress: false,
+          transferCompanyOwnerError: null,
+          company: payload,
+        };
+      })
+      .addCase(adminTransferCompanyOwner.rejected, (state, { error }) => {
+        return {
+          ...state,
+          transferCompanyOwnerInProgress: false,
+          transferCompanyOwnerError: error,
         };
       });
   },

@@ -116,7 +116,7 @@ export const queryMembersByEmailAdminApi = (
   emails: string[],
   queryParams?: TObject,
 ) => {
-  return getApi(`/admin/users/query-users-by-email`, {
+  return getApi(`/admin/users/company/query-new-members-by-email`, {
     dataParams: { emails },
     queryParams,
   });
@@ -177,3 +177,22 @@ export const favoriteRestaurantApi = (
 
 export const fetchCompanyInfo = (companyId: string) =>
   getApi(`/company/${companyId}`);
+
+export type TAdminTransferCompanyOwnerParams = {
+  companyId: string;
+  newOwnerEmail: string;
+  permissionForOldOwner?: string;
+  newOwnerProfileImageId?: string;
+};
+
+export const adminTransferCompanyOwnerApi = ({
+  companyId,
+  newOwnerEmail,
+  permissionForOldOwner,
+  newOwnerProfileImageId,
+}: TAdminTransferCompanyOwnerParams) =>
+  postApi(`/admin/users/company/${companyId}/transfer-owner`, {
+    newOwnerEmail,
+    newOwnerProfileImageId,
+    permissionForOldOwner,
+  });

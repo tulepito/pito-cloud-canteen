@@ -14,6 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       memberEmail,
       permission,
     });
+
     return res.status(200).json(company);
   } catch (error) {
     return handleError(res, error);

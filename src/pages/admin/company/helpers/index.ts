@@ -31,7 +31,7 @@ export const filterCompanies = (companies: TCompany[], filterValues: any) => {
   return companies.filter((company) => {
     return (
       // eslint-disable-next-line no-nested-ternary
-      removeAccents(company.attributes.profile.displayName)
+      removeAccents(User(company).getPublicData().companyName)
         ?.toLowerCase()
         .includes(removeAccents(keywords?.toLowerCase())) ||
       company.id.uuid?.toLowerCase().includes(keywords?.toLowerCase()) ||
@@ -64,16 +64,18 @@ export const parseEntitiesToTableData = (
   companyMembers?: TCompanyMembers | null,
 ) => {
   return companies.map((company) => {
-    const { profile = {} } = company.attributes || {};
+    const { profile = {}, email } = company.attributes || {};
     const { displayName, publicData = {}, metadata = {} } = profile as any;
     const { status } = metadata;
-    const { location = {}, companyName } = publicData;
+    const { location = {}, companyName, phoneNumber } = publicData;
 
     return {
       key: company.id.uuid,
       data: {
         id: company.id.uuid,
-        name: displayName,
+        displayName,
+        phoneNumber,
+        email,
         companyName,
         address: location?.address,
         status: status || ECompanyStatus.unactive,

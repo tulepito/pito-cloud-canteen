@@ -5,6 +5,7 @@ import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import arrayMutators from 'final-form-arrays';
 
+import type { TAdminTransferCompanyOwnerParams } from '@apis/companyApi';
 import { InlineTextButton } from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
@@ -13,7 +14,7 @@ import FieldPhotoUpload from '@components/FormFields/FieldPhotoUpload/FieldPhoto
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import BackdropModal from '@components/Modal/BackdropModal/BackdropModal';
 import useBoolean from '@hooks/useBoolean';
-import useQueryUsers from '@hooks/useQueryUsers';
+import useQueryNewMemberUsers from '@hooks/useQueryNewMemberUsers';
 import { COMPANY_LOGO_VARIANTS } from '@redux/slices/company.slice';
 import type { TCompanyGroup } from '@src/types/companyGroup';
 import { User } from '@utils/data';
@@ -39,7 +40,7 @@ import css from './EditCompanySettingsInformation.module.scss';
 
 export type TEditCompanySettingsInformationFormValues = {
   companyLogo?: any;
-  companyNutritions?: string[];
+  nutritions?: string[];
   tabValue?: string;
 };
 
@@ -75,6 +76,14 @@ type TExtraProps = {
     memberEmail: string;
     permission: string;
   }) => void;
+  updatingMemberPermissionEmail: string | null;
+  updateMemberPermissionError: any;
+  onTransferCompanyOwner: (params: TAdminTransferCompanyOwnerParams) => void;
+  transferCompanyOwnerError: any;
+  transferCompanyOwnerInProgress: boolean;
+  queryMembersInProgress: boolean;
+  queryMembersError: any;
+  companyId: string;
 };
 type TEditCompanySettingsInformationFormComponentProps =
   FormRenderProps<TEditCompanySettingsInformationFormValues> &
@@ -112,6 +121,14 @@ const EditCompanySettingsInformationFormComponent: React.FC<
     deleteGroupInProgress,
     deleteGroupError,
     onUpdateMemberPermission,
+    updatingMemberPermissionEmail,
+    updateMemberPermissionError,
+    onTransferCompanyOwner,
+    transferCompanyOwnerError,
+    transferCompanyOwnerInProgress,
+    queryMembersInProgress,
+    queryMembersError,
+    companyId,
   } = props;
 
   useImperativeHandle(formRef, () => form);
@@ -125,7 +142,8 @@ const EditCompanySettingsInformationFormComponent: React.FC<
     removeUserById,
     notFoundUsers,
     removeNotFoundUserByEmail,
-  } = useQueryUsers();
+    setInitialUsers,
+  } = useQueryNewMemberUsers();
   const {
     value: isCreateMemberModalOpen,
     setTrue: openCreateMemberModal,
@@ -154,6 +172,7 @@ const EditCompanySettingsInformationFormComponent: React.FC<
       const { error } = ((await onAddMembersToCompany(values)) as any) || {};
       if (!error) {
         closeCreateMemberModal();
+        setInitialUsers([]);
       }
     }
   };
@@ -177,7 +196,7 @@ const EditCompanySettingsInformationFormComponent: React.FC<
     if (onUpdateGroup) {
       const { error } = ((await onUpdateGroup(values)) as any) || {};
       if (!error) {
-        closeCreateGroupModal();
+        setSelectedGroupId(null);
       }
     }
   };
@@ -194,6 +213,7 @@ const EditCompanySettingsInformationFormComponent: React.FC<
     const members = companyMembers?.filter((member) =>
       member.groups.includes(selectedGroupId as string),
     );
+
     return {
       companyMemberEmails: members?.map((member) => member.email),
       groupName: group?.name,
@@ -258,6 +278,16 @@ const EditCompanySettingsInformationFormComponent: React.FC<
               deleteMemberInProgress={deleteMemberInProgress as boolean}
               deleteMemberError={deleteMemberError}
               onUpdateMemberPermission={onUpdateMemberPermission as any}
+              updatingMemberPermissionEmail={
+                updatingMemberPermissionEmail as string
+              }
+              updateMemberPermissionError={updateMemberPermissionError}
+              onTransferCompanyOwner={onTransferCompanyOwner as any}
+              transferCompanyOwnerError={transferCompanyOwnerError}
+              transferCompanyOwnerInProgress={transferCompanyOwnerInProgress}
+              queryMembersInProgress={queryMembersInProgress}
+              queryMembersError={queryMembersError}
+              companyId={companyId as string}
             />
           </div>
           <div className={css.line}></div>
@@ -297,7 +327,7 @@ const EditCompanySettingsInformationFormComponent: React.FC<
                 listClassName={css.checkboxGroup}
                 id="EditCompanySettingsInformationForm.mealSetting"
                 options={COMPANY_NUTRITION_TYPE_OPTIONS}
-                name="companyNutritions"
+                name="nutritions"
                 label={intl.formatMessage({
                   id: 'EditCompanySettingsInformationForm.mealSetting',
                 })}

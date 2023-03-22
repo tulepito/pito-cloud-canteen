@@ -3,7 +3,6 @@ export enum UserPermission {
   ACCOUNTANT = 'accountant',
   PARTICIPANT = 'participant',
   OWNER = 'owner',
-  ADMIN = 'admin',
 }
 
 export enum UserInviteStatus {

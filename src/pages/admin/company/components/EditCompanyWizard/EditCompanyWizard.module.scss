@@ -11,4 +11,8 @@
   margin-top: 100px;
   align-items: center;
   justify-content: space-between;
+  .hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
 }

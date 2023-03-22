@@ -49,7 +49,7 @@ const createCompanyGroupFn = async ({
           members,
         },
       },
-      { expand: true },
+      { include: 'profileImage', expand: true },
     );
 
   const [updatedCompanyAccount] = denormalisedResponseEntities(
@@ -71,6 +71,7 @@ const createCompanyGroupFn = async ({
       });
     }),
   );
+
   return updatedCompanyAccount;
 };
 

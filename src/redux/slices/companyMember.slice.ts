@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { createSlice } from '@reduxjs/toolkit';
 
 import type { TUpdateMemberPermissionApiParams } from '@apis/companyApi';
@@ -34,9 +35,9 @@ interface TCompanyMemberState {
   checkEmailExistedInProgress: boolean;
 
   queryMembersInProgress: boolean;
-  queryMemberError: any;
+  queryMembersError: any;
 
-  updateMemberPermissionInProgress: boolean;
+  updatingMemberPermissionEmail: string | null;
   updateMemberPermissionError: any;
 }
 
@@ -53,9 +54,9 @@ const initialState: TCompanyMemberState = {
   checkEmailExistedInProgress: false,
 
   queryMembersInProgress: false,
-  queryMemberError: null,
+  queryMembersError: null,
 
-  updateMemberPermissionInProgress: false,
+  updatingMemberPermissionEmail: null,
   updateMemberPermissionError: null,
 };
 
@@ -243,7 +244,7 @@ export const companyMemberSlice = createSlice({
       .addCase(queryCompanyMembers.pending, (state) => ({
         ...state,
         queryMembersInProgress: true,
-        queryMemberError: null,
+        queryMembersError: null,
       }))
       .addCase(queryCompanyMembers.fulfilled, (state, { payload }) => ({
         ...state,
@@ -252,7 +253,7 @@ export const companyMemberSlice = createSlice({
       }))
       .addCase(queryCompanyMembers.rejected, (state, { error }) => ({
         ...state,
-        queryMemberError: error,
+        queryMembersError: error,
         queryMembersInProgress: false,
       }))
       .addCase(adminAddMembers.pending, (state) => ({
@@ -283,18 +284,18 @@ export const companyMemberSlice = createSlice({
         deleteMemberInProgress: false,
         deleteMemberError: error.message,
       }))
-      .addCase(adminUpdateMemberPermission.pending, (state) => ({
+      .addCase(adminUpdateMemberPermission.pending, (state, { meta }) => ({
         ...state,
-        updateMemberPermissionInProgress: true,
+        updatingMemberPermissionEmail: meta?.arg?.memberEmail,
         updateMemberPermissionError: null,
       }))
       .addCase(adminUpdateMemberPermission.fulfilled, (state) => ({
         ...state,
-        updateMemberPermissionInProgress: false,
+        updatingMemberPermissionEmail: null,
       }))
       .addCase(adminUpdateMemberPermission.rejected, (state, { error }) => ({
         ...state,
-        updateMemberPermissionInProgress: false,
+        updatingMemberPermissionEmail: null,
         updateMemberPermissionError: error,
       }));
   },

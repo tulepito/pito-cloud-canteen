@@ -111,6 +111,8 @@ const PWD_RE =
   /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,16}$/;
 
 export const emailFormatValid = (message: string) => (value: string) => {
+  if (!value) return VALID;
+
   return value && EMAIL_RE.test(value) ? VALID : message;
 };
 

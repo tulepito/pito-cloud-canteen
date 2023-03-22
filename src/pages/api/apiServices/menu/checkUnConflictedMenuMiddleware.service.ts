@@ -88,6 +88,7 @@ const checkUnConflictedMenuMiddleware =
           },
         });
       }
+
       return handler(req, res);
     } catch (error) {
       console.error('error', error);

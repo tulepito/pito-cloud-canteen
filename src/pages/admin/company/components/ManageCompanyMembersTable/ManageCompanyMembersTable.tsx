@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-shadow */
-import type { ReactNode } from 'react';
+import type { ChangeEvent, ReactNode } from 'react';
 import React, { useState } from 'react';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 
+import type { TAdminTransferCompanyOwnerParams } from '@apis/companyApi';
 import { InlineTextButton } from '@components/Button/Button';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import AlertModal from '@components/Modal/AlertModal';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
@@ -22,6 +25,30 @@ type ManageCompaniesMemberTableEntity = {
   groupName: string;
 };
 
+type TManageCompanyMembersTable = {
+  className?: string;
+  companyMembers: TCompanyMemberWithDetails[];
+  companyGroups: TCompanyGroup[];
+  onRemoveMember: (email: string) => void;
+  deleteMemberInProgress?: boolean;
+  deleteMemberError?: any;
+  hideRemoveConfirmModal?: boolean;
+  onUpdateMemberPermission?: (params: {
+    memberEmail: string;
+    permission: string;
+  }) => void;
+  updatingMemberPermissionEmail?: string | null;
+  updateMemberPermissionError?: any;
+  onTransferCompanyOwner?: (params: TAdminTransferCompanyOwnerParams) => void;
+  transferCompanyOwnerInProgress?: boolean;
+  transferCompanyOwnerError?: any;
+  queryMembersInProgress?: boolean;
+  queryMembersError?: any;
+  companyId?: string;
+  hiddenColumnNames?: any[];
+  canRemoveOwner?: boolean;
+};
+
 const TABLE_COLUMN: TColumn[] &
   Partial<{
     render: (
@@ -35,6 +62,7 @@ const TABLE_COLUMN: TColumn[] &
     render: (data) => {
       const { name } = data;
       if (!name) return <span className={css.boldText}>Chưa xác nhận</span>;
+
       return <span>{name}</span>;
     },
   },
@@ -48,7 +76,17 @@ const TABLE_COLUMN: TColumn[] &
   {
     key: 'role',
     label: 'Vai trò',
-    render: ({ permission, handleToUpdateMemberPermission, intl }) => {
+    render: ({
+      id,
+      permission,
+      handleToUpdateMemberPermission,
+      intl,
+      updatingPermission,
+    }) => {
+      if (updatingPermission) {
+        return <IconSpinner className={css.iconSpinner} />;
+      }
+
       if (!handleToUpdateMemberPermission) {
         return (
           <span>
@@ -56,13 +94,20 @@ const TABLE_COLUMN: TColumn[] &
           </span>
         );
       }
+      const permissionList = id
+        ? Object.keys(UserPermission)
+        : Object.keys(UserPermission).filter(
+            (permission) =>
+              UserPermission[permission as keyof typeof UserPermission] !==
+              UserPermission.OWNER,
+          );
 
       return (
         <select
           onChange={handleToUpdateMemberPermission}
-          defaultValue={permission}
+          value={permission}
           className={css.fieldSelect}>
-          {Object.keys(UserPermission).map((key) => (
+          {permissionList.map((key) => (
             <option
               key={UserPermission[key as keyof typeof UserPermission]}
               value={UserPermission[key as keyof typeof UserPermission]}>
@@ -85,8 +130,10 @@ const TABLE_COLUMN: TColumn[] &
         if (!prev) {
           return cur.name;
         }
+
         return `${prev}, ${cur.name}`;
       }, '');
+
       return <span>{groupNames}</span>;
     },
   },
@@ -107,9 +154,12 @@ const TABLE_COLUMN: TColumn[] &
   {
     key: 'action',
     label: '',
-    render: ({ handleToRemoveMember }) => {
+    render: ({ handleToRemoveMember, permission, canRemoveOwner }) => {
+      const isOwner = !canRemoveOwner && permission === UserPermission.OWNER;
+
       return (
-        <div className={css.actionButtons}>
+        <div
+          className={classNames(css.actionButtons, { [css.hidden]: isOwner })}>
           <InlineTextButton type="button" onClick={handleToRemoveMember}>
             <IconDelete />
           </InlineTextButton>
@@ -119,30 +169,33 @@ const TABLE_COLUMN: TColumn[] &
   },
 ];
 
-type TManageCompanyMembersTable = {
-  className?: string;
-  companyMembers: TCompanyMemberWithDetails[];
+const parseEntitiesToTableData = ({
+  intl,
+  companyGroups,
+  companyMembers = [],
+  openRemoveModal,
+  onUpdateMemberPermission,
+  updatingMemberPermissionEmail,
+  openTransferOwnerModal,
+  openUpgradeToOwnerModal,
+  canRemoveOwner,
+}: {
+  intl: IntlShape;
   companyGroups: TCompanyGroup[];
-  onRemoveMember: (email: string) => void;
-  deleteMemberInProgress?: boolean;
-  deleteMemberError?: any;
-  hideRemoveConfirmModal?: boolean;
+  openRemoveModal: (member: TCompanyMemberWithDetails) => void;
   onUpdateMemberPermission?: (params: {
     memberEmail: string;
     permission: string;
   }) => void;
-};
-
-const parseEntitiesToTableData = (
-  intl: IntlShape,
-  companyGroups: TCompanyGroup[],
-  openRemoveModal: (member: TCompanyMemberWithDetails) => void,
-  onUpdateMemberPermission?: (params: {
-    memberEmail: string;
-    permission: string;
-  }) => void,
-  companyMembers: TCompanyMemberWithDetails[] = [],
-) => {
+  companyMembers: TCompanyMemberWithDetails[];
+  updatingMemberPermissionEmail?: string | null;
+  openTransferOwnerModal: (
+    member: TCompanyMemberWithDetails,
+    permission: UserPermission,
+  ) => void;
+  openUpgradeToOwnerModal: (member: TCompanyMemberWithDetails) => void;
+  canRemoveOwner?: boolean;
+}) => {
   return companyMembers.map((companyMember) => {
     const groups = companyGroups.filter((group: TCompanyGroup) =>
       companyMember.groups.includes(group.id),
@@ -157,6 +210,18 @@ const parseEntitiesToTableData = (
       e: React.ChangeEvent<HTMLInputElement>,
     ) => {
       const { value } = e.target;
+
+      if (
+        companyMember.permission !== UserPermission.OWNER &&
+        value === UserPermission.OWNER
+      ) {
+        return openUpgradeToOwnerModal(companyMember);
+      }
+
+      if (companyMember.permission === UserPermission.OWNER) {
+        return openTransferOwnerModal(companyMember, value as UserPermission);
+      }
+
       if (!onUpdateMemberPermission) return;
 
       return onUpdateMemberPermission({
@@ -178,6 +243,8 @@ const parseEntitiesToTableData = (
             ? { handleToUpdateMemberPermission }
             : {}),
           intl,
+          updatingPermission:
+            updatingMemberPermissionEmail === companyMember.email,
         },
       };
     }
@@ -185,6 +252,7 @@ const parseEntitiesToTableData = (
     return {
       key: companyMember.id,
       data: {
+        canRemoveOwner,
         id: companyMember.id,
         permission: companyMember.permission,
         name: companyMember.attributes.profile.displayName,
@@ -210,10 +278,32 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
     deleteMemberInProgress,
     hideRemoveConfirmModal,
     onUpdateMemberPermission,
+    updatingMemberPermissionEmail,
+    onTransferCompanyOwner,
+    transferCompanyOwnerInProgress,
+    queryMembersInProgress,
+    companyId,
+    hiddenColumnNames = [],
+    canRemoveOwner,
   } = props;
   const intl = useIntl();
   const [memberToRemove, setMemberToRemove] =
     useState<TCompanyMemberWithDetails | null>(null);
+
+  const [memberToTransferOwner, setMemberToTransferOwner] =
+    useState<TCompanyMemberWithDetails | null>(null);
+
+  const [memberToUpgradeToOwner, setMemberToUpgradeToOwner] =
+    useState<TCompanyMemberWithDetails | null>(null);
+
+  const [newOwnerEmail, setNewOwnerEmail] = useState<string | null>(null);
+
+  const [permissionForOldOwner, setPermissionForOldOwner] =
+    useState<UserPermission | null>(null);
+
+  const onChangeNewOwner = (e: ChangeEvent<HTMLSelectElement>) => {
+    setNewOwnerEmail(e.target.value);
+  };
 
   const openRemoveModal = (member: TCompanyMemberWithDetails) => {
     if (!hideRemoveConfirmModal) {
@@ -223,13 +313,62 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
     }
   };
 
-  const tableData = parseEntitiesToTableData(
+  const openTransferOwnerModal = (
+    member: TCompanyMemberWithDetails,
+    permission: UserPermission,
+  ) => {
+    setMemberToTransferOwner(member);
+    setPermissionForOldOwner(permission);
+  };
+
+  const openUpgradeToOwnerModal = (member: TCompanyMemberWithDetails) => {
+    setMemberToUpgradeToOwner(member);
+  };
+
+  const closeTransferOwnerModal = () => {
+    setMemberToTransferOwner(null);
+    setPermissionForOldOwner(null);
+  };
+
+  const closeUpgradeOwnerModal = () => {
+    setMemberToUpgradeToOwner(null);
+  };
+
+  const transferCompanyOwner = () => {
+    if (
+      newOwnerEmail &&
+      memberToTransferOwner &&
+      permissionForOldOwner &&
+      onTransferCompanyOwner
+    ) {
+      return onTransferCompanyOwner({
+        companyId: memberToTransferOwner.id,
+        newOwnerEmail,
+        permissionForOldOwner,
+      });
+    }
+  };
+
+  const upgradeCompanyOwner = () => {
+    if (memberToUpgradeToOwner && onTransferCompanyOwner && companyId) {
+      return onTransferCompanyOwner({
+        companyId,
+        newOwnerEmail: memberToUpgradeToOwner.email,
+      });
+    }
+  };
+
+  const tableData = parseEntitiesToTableData({
     intl,
     companyGroups,
     openRemoveModal,
     onUpdateMemberPermission,
     companyMembers,
-  );
+    updatingMemberPermissionEmail,
+    openTransferOwnerModal,
+    canRemoveOwner,
+    openUpgradeToOwnerModal,
+  });
 
   const handleCloseModal = () => {
     setMemberToRemove(null);
@@ -243,9 +382,18 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
     }
   };
 
+  const tableColumn = TABLE_COLUMN.filter(
+    (col) => !hiddenColumnNames?.includes(col.key),
+  );
+
   return (
     <div className={css.root}>
-      <Table columns={TABLE_COLUMN} data={tableData} />
+      <Table
+        columns={tableColumn}
+        data={tableData}
+        tableBodyCellClassName={css.tableBodyCell}
+        isLoading={queryMembersInProgress}
+      />
       <AlertModal
         isOpen={!!memberToRemove}
         handleClose={handleCloseModal}
@@ -271,6 +419,86 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
             {
               email: (
                 <span className={css.boldText}>{memberToRemove?.email}</span>
+              ),
+            },
+          )}
+        </p>
+      </AlertModal>
+      <AlertModal
+        onConfirm={transferCompanyOwner}
+        confirmInProgress={transferCompanyOwnerInProgress}
+        cancelDisabled={transferCompanyOwnerInProgress}
+        onCancel={closeTransferOwnerModal}
+        isOpen={!!memberToTransferOwner && !!permissionForOldOwner}
+        title={intl.formatMessage({
+          id: 'ManageCompanyMembersTable.updateOwnerTitle',
+        })}
+        handleClose={closeTransferOwnerModal}
+        cancelLabel={intl.formatMessage({
+          id: 'ManageCompanyMembersTable.memberRemoveCancel',
+        })}
+        confirmLabel={intl.formatMessage({
+          id: 'ManageCompanyMembersTable.tranferOwner',
+        })}>
+        <p className={css.removeContent}>
+          {intl.formatMessage(
+            {
+              id: 'ManageCompanyMembersTable.updateOwnerContent',
+            },
+            {
+              email: (
+                <span className={css.boldText}>
+                  {memberToTransferOwner?.email}
+                </span>
+              ),
+            },
+          )}
+        </p>
+        <select
+          defaultValue=""
+          onChange={onChangeNewOwner}
+          className={css.fieldSelectMember}>
+          <option disabled value="">
+            <option>Chọn thành viên thay thế</option>
+          </option>
+          {companyMembers
+            .filter(
+              (member) =>
+                member.permission !== UserPermission.OWNER && member.id,
+            )
+            .map((member) => (
+              <option key={member.email} value={member.email}>
+                {member?.attributes?.profile?.displayName || member.email}
+              </option>
+            ))}
+        </select>
+      </AlertModal>
+      <AlertModal
+        onConfirm={upgradeCompanyOwner}
+        confirmInProgress={transferCompanyOwnerInProgress}
+        cancelDisabled={transferCompanyOwnerInProgress}
+        onCancel={closeUpgradeOwnerModal}
+        isOpen={!!memberToUpgradeToOwner}
+        title={intl.formatMessage({
+          id: 'ManageCompanyMembersTable.upgradeToOwnerTitle',
+        })}
+        handleClose={closeUpgradeOwnerModal}
+        cancelLabel={intl.formatMessage({
+          id: 'ManageCompanyMembersTable.memberRemoveCancel',
+        })}
+        confirmLabel={intl.formatMessage({
+          id: 'ManageCompanyMembersTable.tranferOwner',
+        })}>
+        <p className={css.removeContent}>
+          {intl.formatMessage(
+            {
+              id: 'ManageCompanyMembersTable.upgradeToOwnerContent',
+            },
+            {
+              email: (
+                <span className={css.boldText}>
+                  {memberToUpgradeToOwner?.email}
+                </span>
               ),
             },
           )}

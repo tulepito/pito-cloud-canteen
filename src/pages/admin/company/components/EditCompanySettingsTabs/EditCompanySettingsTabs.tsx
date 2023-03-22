@@ -2,6 +2,7 @@ import React from 'react';
 import type { FormProps } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 
+import type { TAdminTransferCompanyOwnerParams } from '@apis/companyApi';
 import Tabs from '@components/Tabs/Tabs';
 import type {
   TCompany,
@@ -51,6 +52,14 @@ type TExtraProps = {
     memberEmail: string;
     permission: string;
   }) => void;
+  updatingMemberPermissionEmail: string | null;
+  updateMemberPermissionError: any;
+  onTransferCompanyOwner: (params: TAdminTransferCompanyOwnerParams) => void;
+  transferCompanyOwnerInProgress: boolean;
+  transferCompanyOwnerError: any;
+  queryMembersInProgress: boolean;
+  queryMembersError: any;
+  companyId: string;
 };
 
 type TEditCompanySettingsTabsProps =
@@ -80,6 +89,7 @@ const EditCompanySettingsTabs: React.FC<TEditCompanySettingsTabsProps> = (
       children: <></>,
     },
   ];
+
   return <Tabs className={css.root} items={menuContent as any} />;
 };
 

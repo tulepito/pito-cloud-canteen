@@ -5,7 +5,7 @@ import type { TUser } from '@utils/types';
 
 import useBoolean from './useBoolean';
 
-const useQueryUsers = () => {
+const useQueryNewMemberUsers = () => {
   const [users, setUsers] = useState<TUser[]>([]);
   const [notFoundUsers, setNotFoundUsers] = useState<string[]>([]);
   const [queryError, setQueryError] = useState<any>([]);
@@ -15,6 +15,10 @@ const useQueryUsers = () => {
     setTrue: turnOnUsersInProgress,
     setFalse: turnOffUsersInProgress,
   } = useBoolean(false);
+
+  const setInitialUsers = (newUsers: TUser[] = []) => {
+    setUsers(newUsers);
+  };
 
   const queryUsersByEmail = async (
     emailList: string[],
@@ -54,7 +58,8 @@ const useQueryUsers = () => {
     removeUserById,
     notFoundUsers,
     removeNotFoundUserByEmail,
+    setInitialUsers,
   };
 };
 
-export default useQueryUsers;
+export default useQueryNewMemberUsers;

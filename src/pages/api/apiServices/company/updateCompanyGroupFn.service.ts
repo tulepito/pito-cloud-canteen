@@ -67,7 +67,7 @@ const updateCompanyGroupFn = async ({
           groups: [...groups],
         },
       },
-      { expand: true },
+      { include: 'profileImage', expand: true },
     );
   const [updatedCompanyAccount] = denormalisedResponseEntities(
     updatedCompanyAccountResponse,

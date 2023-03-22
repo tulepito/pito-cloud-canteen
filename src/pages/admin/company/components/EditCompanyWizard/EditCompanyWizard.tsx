@@ -1,16 +1,22 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import type { MutableRefObject } from 'react';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
 import type { FormApi } from 'final-form';
 import { useRouter } from 'next/router';
 
-import type { CreateGroupApiBody } from '@apis/companyApi';
+import type {
+  CreateGroupApiBody,
+  TAdminTransferCompanyOwnerParams,
+} from '@apis/companyApi';
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import type { TFormTabChildrenProps } from '@components/FormWizard/FormTabs/FormTabs';
 import FormWizard from '@components/FormWizard/FormWizard';
+import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import { getInitialLocationValues } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useRedirectTabWizard from '@hooks/useRedirectTabWizard';
 import { companySlice, companyThunks } from '@redux/slices/company.slice';
@@ -41,7 +47,6 @@ import {
   createSubmitCreateCompanyValues,
   createSubmitUpdateCompanyValues,
   EDIT_COMPANY_WIZARD_TABS,
-  getInitialLocationValues,
 } from './utils';
 
 import css from './EditCompanyWizard.module.scss';
@@ -85,6 +90,14 @@ type TEditCompanyWizardTab = {
     memberEmail: string;
     permission: string;
   }) => void;
+  updatingMemberPermissionEmail: string | null;
+  updateMemberPermissionError: any;
+  onTransferCompanyOwner: (params: TAdminTransferCompanyOwnerParams) => void;
+  transferCompanyOwnerInProgress: boolean;
+  transferCompanyOwnerError: any;
+  queryMembersInProgress: boolean;
+  queryMembersError: any;
+  companyId: string;
 } & TFormTabChildrenProps;
 
 const defaultBankAccounts = [
@@ -106,6 +119,7 @@ const redirectAfterDraftUpdate = (
   const tabIndex = tabs.findIndex((cur) => cur === tab);
   const nextTab = tabs[tabIndex + 1];
   if (!nextTab) return;
+
   return router.push({
     pathname: `/admin/company/${companyId}/edit`,
     query: {
@@ -124,14 +138,13 @@ const tabCompleted = (tab: string, company: TCompany | null): boolean => {
     metadata = {},
   } = profile || {};
   const { location, phoneNumber } = publicData;
-  const { tax, bankAccounts } = privateData;
+  const { bankAccounts = [] } = privateData;
   const { members = {}, groups = [] } = metadata;
 
   const isCompanyInformationTabCompleted = !!(
     displayName &&
     location &&
-    phoneNumber &&
-    tax
+    phoneNumber
   );
 
   const isCompanySettingsTabCompleted = !!(
@@ -180,32 +193,47 @@ const EditCompanyWizardTab: React.FC<TEditCompanyWizardTab> = (props) => {
     deleteGroupError,
     onRemoveGroup,
     onUpdateMemberPermission,
+    updateMemberPermissionError,
+    updatingMemberPermissionEmail,
+    onTransferCompanyOwner,
+    transferCompanyOwnerInProgress,
+    transferCompanyOwnerError,
+    queryMembersInProgress,
+    queryMembersError,
+    companyId,
   } = props;
 
   const initialValues = useMemo(() => {
     switch (tab) {
       case COMPANY_INFORMATION_TAB: {
-        return (
-          company
-            ? {
-                name: User(company).getProfile().displayName,
-                location: getInitialLocationValues(company),
-                tax: User(company).getPrivateData().tax,
-                note: User(company).getPublicData().note,
-                phoneNumber: User(company).getPublicData().phoneNumber,
-              }
-            : {}
-        ) as TEditCompanyInformationFormValues;
+        return company
+          ? {
+              firstName: User(company).getProfile().firstName,
+              lastName: User(company).getProfile().lastName,
+              email: User(company).getProfile().email,
+              phoneNumber: User(company).getPublicData().phoneNumber,
+              companyName: User(company).getPublicData().companyName,
+              companyEmail: User(company).getPublicData().companyEmail,
+              companyLocation: getInitialLocationValues(
+                User(company).getPublicData().companyLocation,
+              ),
+              tax: User(company).getPrivateData().tax,
+              note: User(company).getPublicData().note,
+              location: getInitialLocationValues(
+                User(company).getPublicData().location,
+              ),
+            }
+          : {};
       }
       case COMPANY_SETTINGS_TAB: {
         return company
           ? ({
               companyLogo: company?.profileImage,
-              companyNutritions:
-                User(company).getPublicData().companyNutritions,
+              nutritions: User(company).getPublicData().nutritions || [],
               bankAccounts:
                 User(company).getPrivateData().bankAccounts ||
                 defaultBankAccounts,
+              paymentDueDays: User(company).getPrivateData().paymentDueDays,
             } as TEditCompanySettingsInformationFormValues &
               TEditCompanyBankAccountsFormValues)
           : {};
@@ -261,6 +289,14 @@ const EditCompanyWizardTab: React.FC<TEditCompanyWizardTab> = (props) => {
           deleteGroupError={deleteGroupError}
           onRemoveGroup={onRemoveGroup}
           onUpdateMemberPermission={onUpdateMemberPermission}
+          updatingMemberPermissionEmail={updatingMemberPermissionEmail}
+          updateMemberPermissionError={updateMemberPermissionError}
+          onTransferCompanyOwner={onTransferCompanyOwner}
+          transferCompanyOwnerInProgress={transferCompanyOwnerInProgress}
+          transferCompanyOwnerError={transferCompanyOwnerError}
+          queryMembersInProgress={queryMembersInProgress}
+          queryMembersError={queryMembersError}
+          companyId={companyId}
         />
       );
     default:
@@ -277,7 +313,7 @@ const EditCompanyWizard = () => {
       Partial<TEditCompanySettingsInformationFormValues>
     >
   >;
-
+  const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
   const router = useRouter();
   const { tab: selectedTab = COMPANY_INFORMATION_TAB, companyId } =
     router.query;
@@ -288,6 +324,7 @@ const EditCompanyWizard = () => {
     updateCompanyInProgress,
     updateCompanyError,
     company,
+    showCompanyInProgress,
     uploadedCompanyLogo,
     uploadingCompanyLogo,
     uploadCompanyLogoError,
@@ -297,15 +334,37 @@ const EditCompanyWizard = () => {
     updateGroupError,
     deleteGroupInProgress,
     deleteGroupError,
+    transferCompanyOwnerInProgress,
+    transferCompanyOwnerError,
   } = useAppSelector((state) => state.company, shallowEqual);
 
   const {
     companyMembers,
+    queryMembersInProgress,
+    queryMembersError,
     addMembersInProgress,
     addMembersError,
     deleteMemberInProgress,
     deleteMemberError,
+    updatingMemberPermissionEmail,
+    updateMemberPermissionError,
   } = useAppSelector((state) => state.companyMember, shallowEqual);
+
+  const onTransferCompanyOwner = async (
+    params: TAdminTransferCompanyOwnerParams,
+  ) => {
+    const { profileImage } = company || {};
+
+    const { error, payload } = (await dispatch(
+      companyThunks.adminTransferCompanyOwner({ ...params, profileImage }),
+    )) as any;
+
+    if (!error) {
+      const newCompanyId = User(payload).getId();
+
+      return router.push(`/admin/company/${newCompanyId}/edit/?tab=settings`);
+    }
+  };
 
   const onCompleteEditCompanyWizardTab = async (
     values: TEditCompanyInformationFormValues &
@@ -313,7 +372,7 @@ const EditCompanyWizard = () => {
   ) => {
     const submitValues = companyId
       ? createSubmitUpdateCompanyValues(values as any, selectedTab as string)
-      : createSubmitCreateCompanyValues(values, selectedTab as string);
+      : createSubmitCreateCompanyValues(values);
 
     const { payload, error } = (
       companyId
@@ -330,6 +389,13 @@ const EditCompanyWizard = () => {
       User(payload).getMetadata().userState === ECompanyStates.draft;
 
     const id = User(payload).getId();
+
+    if (!error) {
+      setSubmitSuccess(true);
+      setTimeout(() => {
+        setSubmitSuccess(false);
+      }, 3000);
+    }
 
     if (!error && isDraft) {
       return redirectAfterDraftUpdate(
@@ -430,6 +496,7 @@ const EditCompanyWizard = () => {
         id: companyMembers?.find((member) => member.email === memberEmail)?.id,
       })),
     };
+
     return dispatch(
       companyThunks.adminCreateGroup(params as unknown as CreateGroupApiBody),
     );
@@ -437,6 +504,7 @@ const EditCompanyWizard = () => {
 
   const onAddMembersToCompany = (values: TObject) => {
     const submitValues = createSubmitAddMembersToCompanyValues(values);
+
     return dispatch(
       companyMemberThunks.adminAddMembers({
         ...submitValues,
@@ -445,9 +513,10 @@ const EditCompanyWizard = () => {
     );
   };
 
-  const parseMemberEmail = (memberEmails: string[]) => {
+  const parseMemberEmail = (memberEmails: string[] = []) => {
     return memberEmails.map((email) => {
       const id = companyMembers.find((member) => member.email === email)?.id;
+
       return { email, id };
     });
   };
@@ -455,6 +524,7 @@ const EditCompanyWizard = () => {
   const onUpdateGroup = (values: TUpdateCompanyGroupFormValues) => {
     const { deletedMemberEmails, groupName, groupId, addedMemberEmails } =
       values;
+
     return dispatch(
       companyThunks.adminUpdateGroup({
         deletedMembers: parseMemberEmail(deletedMemberEmails) as any,
@@ -498,11 +568,25 @@ const EditCompanyWizard = () => {
     );
   };
 
+  const goBack = () => {
+    router.push({
+      pathname: adminRoutes.EditCompany.path,
+      query: {
+        tab: COMPANY_INFORMATION_TAB,
+        companyId,
+      },
+    });
+  };
+
   useEffect(() => {
     if (selectedTab === COMPANY_SETTINGS_TAB && companyId) {
       dispatch(companyMemberThunks.queryCompanyMembers(companyId as string));
     }
   }, [selectedTab, companyId, dispatch]);
+
+  if (showCompanyInProgress) {
+    return <LoadingContainer />;
+  }
 
   return (
     <>
@@ -512,6 +596,7 @@ const EditCompanyWizard = () => {
             EDIT_COMPANY_WIZARD_TABS[index - 1],
             company as TCompany,
           );
+
           return (
             <EditCompanyWizardTab
               key={tab}
@@ -549,21 +634,38 @@ const EditCompanyWizard = () => {
               deleteGroupError={deleteGroupError}
               disabled={!completed}
               onUpdateMemberPermission={onUpdateMemberPermission}
-              isEditting={!!companyId}
+              updatingMemberPermissionEmail={updatingMemberPermissionEmail}
+              updateMemberPermissionError={updateMemberPermissionError}
+              transferCompanyOwnerInProgress={transferCompanyOwnerInProgress}
+              transferCompanyOwnerError={transferCompanyOwnerError}
+              onTransferCompanyOwner={onTransferCompanyOwner}
+              queryMembersInProgress={queryMembersInProgress}
+              queryMembersError={queryMembersError}
+              companyId={companyId as string}
             />
           );
         })}
       </FormWizard>
       <div className={css.buttons}>
-        <Button className={css.goBack}>
+        <Button
+          variant="secondary"
+          onClick={goBack}
+          className={classNames(css.goBack, {
+            [css.hidden]: selectedTab === COMPANY_INFORMATION_TAB,
+          })}>
           <FormattedMessage id="EditCompanyWizard.goBack" />
         </Button>
         <Button
           inProgress={inProgress}
+          ready={submitSuccess}
           disabled={inProgress}
           onClick={onSubmitOutsideForm}
           type="button">
-          <FormattedMessage id="EditCompanyWizard.nextStep" />
+          {selectedTab === COMPANY_INFORMATION_TAB ? (
+            <FormattedMessage id="EditCompanyWizard.nextStep" />
+          ) : (
+            <FormattedMessage id="EditCompanyWizard.save" />
+          )}
         </Button>
       </div>
       {errorMessage && <ErrorMessage message={errorMessage} />}

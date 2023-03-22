@@ -3,7 +3,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk, getSdk } from '@services/sdk';
-import { ECompanyStatus } from '@src/utils/enums';
+import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
+import { ECompanyStates, ECompanyStatus } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 const createCompany = async ({
@@ -27,7 +28,6 @@ const createCompany = async ({
   );
 
   const [companyAccount] = denormalisedResponseEntities(companyResponse);
-
   // Create sub master account
   const splittedEmail = dataParams.email.split('@');
   const subResponse = await sdk.currentUser.create({
@@ -38,6 +38,16 @@ const createCompany = async ({
   });
 
   const [subAccount] = denormalisedResponseEntities(subResponse);
+
+  const members = {
+    [dataParams.email]: {
+      id: companyAccount.id.uuid,
+      email: dataParams.email,
+      permission: UserPermission.OWNER,
+      groups: [],
+      inviteStatus: UserInviteStatus.ACCEPTED,
+    },
+  };
 
   // Add sub master account to master account
   const masterAccountAfterUpdateResponse =
@@ -50,6 +60,9 @@ const createCompany = async ({
         metadata: {
           isCompany: true,
           status: ECompanyStatus.active,
+          members,
+          companyList: [companyAccount.id.uuid],
+          userState: ECompanyStates.draft,
           ...metadata,
         },
       },
@@ -68,6 +81,7 @@ const createCompany = async ({
       accountPassword: encryptedPassword,
     },
   });
+
   return masterAccountAfterUpdateResponse;
 };
 

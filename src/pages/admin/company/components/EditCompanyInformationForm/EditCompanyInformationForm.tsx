@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import type { FormApi } from 'final-form';
 
 import Form from '@components/Form/Form';
+import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import type { TObject } from '@utils/types';
@@ -25,7 +26,8 @@ import {
 import css from './EditCompanyInformationForm.module.scss';
 
 export type TEditCompanyInformationFormValues = {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   location: TObject;
   tax: string;
@@ -33,6 +35,9 @@ export type TEditCompanyInformationFormValues = {
   confirmPassword: string;
   note: string;
   phoneNumber: string;
+  companyName: string;
+  companyEmail: string;
+  companyLocation: TObject;
 };
 
 type TExtraProps = {
@@ -55,11 +60,11 @@ const EditCompanyInformationFormComponent: React.FC<
 
   return (
     <Form onSubmit={handleSubmit} className={css.form}>
-      <p className={css.formTitle}>
+      <h3 className={css.formTitle}>
         {intl.formatMessage({
           id: 'EditCompanyForm.personalInformation',
         })}
-      </p>
+      </h3>
       <div className={css.fields}>
         <FieldTextInput
           id="lastName"
@@ -122,9 +127,9 @@ const EditCompanyInformationFormComponent: React.FC<
           />
         )}
         <FieldTextInput
-          id="phone"
+          id="phoneNumber"
           className={css.field}
-          name="phone"
+          name="phoneNumber"
           label={intl.formatMessage({
             id: 'EditCompanyForm.phoneLabel',
           })}
@@ -155,19 +160,11 @@ const EditCompanyInformationFormComponent: React.FC<
           placeholder={intl.formatMessage({
             id: 'EditCompanyForm.addressPlaceholder',
           })}
-          validate={composeValidators(
-            autocompleteSearchRequired(
-              intl.formatMessage({
-                id: 'EditCompanyForm.locationRequried',
-              }),
-            ),
-            autocompletePlaceSelected(
-              intl.formatMessage({
-                id: 'EditCompanyForm.validLocation',
-              }),
-            ),
+          validate={autocompletePlaceSelected(
+            intl.formatMessage({
+              id: 'EditCompanyForm.validLocation',
+            }),
           )}
-          required
         />
         {!isEditting && (
           <>
@@ -225,11 +222,11 @@ const EditCompanyInformationFormComponent: React.FC<
           </>
         )}
       </div>
-      <p className={css.formTitle}>
+      <h3 className={css.formTitle}>
         {intl.formatMessage({
           id: 'EditCompanyForm.companyInformation',
         })}
-      </p>
+      </h3>
       <div className={css.fields}>
         <FieldTextInput
           id="companyName"
@@ -258,19 +255,11 @@ const EditCompanyInformationFormComponent: React.FC<
           placeholder={intl.formatMessage({
             id: 'EditCompanyForm.companyEmailPlaceholder',
           })}
-          validate={composeValidators(
-            required(
-              intl.formatMessage({
-                id: 'EditCompanyForm.companyEmailRequired',
-              }),
-            ),
-            emailFormatValid(
-              intl.formatMessage({
-                id: 'EditCompanyForm.companyEmailInvalid',
-              }),
-            ),
+          validate={emailFormatValid(
+            intl.formatMessage({
+              id: 'EditCompanyForm.companyEmailInvalid',
+            }),
           )}
-          required
         />
         <LocationAutocompleteInputField
           id="companyLocation"
@@ -306,20 +295,17 @@ const EditCompanyInformationFormComponent: React.FC<
           placeholder={intl.formatMessage({
             id: 'EditCompanyForm.taxPlaceholder',
           })}
-          validate={required(
-            intl.formatMessage({
-              id: 'EditCompanyForm.taxRequired',
-            }),
-          )}
-          required
         />
-        <FieldTextInput
+        <FieldTextArea
           id="note"
           className={classNames(css.field, css.textareaField)}
           name="note"
           type="textarea"
           label={intl.formatMessage({
             id: 'EditCompanyForm.noteLabel',
+          })}
+          placeholder={intl.formatMessage({
+            id: 'EditCompanyForm.notePlaceholder',
           })}
         />
       </div>

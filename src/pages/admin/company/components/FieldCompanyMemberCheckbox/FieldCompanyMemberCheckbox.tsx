@@ -36,6 +36,7 @@ const FieldCompanyMemberCheckbox: React.FC<TFieldCompanyMemberCheckbox> = (
       </>
     </div>
   );
+
   return (
     <div className={classNames(css.root, className)}>
       <FieldCheckbox

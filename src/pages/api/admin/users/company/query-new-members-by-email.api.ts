@@ -1,8 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import queryUserByEmail from '@pages/api/apiServices/user/queryUserByEmail.service';
+import queryMembersByEmail from '@pages/api/apiServices/company/queryMembersByEmail.service';
 import cookies from '@services/cookie';
+import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -12,7 +13,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     };
     const { dataParams = {}, queryParams = {} } = JSON.parse(JSONParams);
     const { emails } = dataParams;
-    const users = await queryUserByEmail(emails, queryParams);
+    const users = await queryMembersByEmail(emails, queryParams);
+
     return res.status(200).json(users);
   } catch (error) {
     console.error(error);
@@ -20,4 +22,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   }
 }
 
-export default cookies(handler);
+export default cookies(adminChecker(handler));

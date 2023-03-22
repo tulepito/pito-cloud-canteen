@@ -719,11 +719,13 @@ export const getUniqueCompanyMemberByEmail = (
           x?.attributes?.email === item?.email
         );
       }
+
       return x?.email === item?.attributes?.email || x?.email === item?.email;
     });
     if (i <= -1) {
       resArr.push(item);
     }
   });
+
   return resArr;
 };
