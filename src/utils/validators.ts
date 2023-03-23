@@ -97,6 +97,9 @@ export const autocompleteSearchRequired = (message: string) => (value: any) => {
 };
 
 export const autocompletePlaceSelected = (message: string) => (value: any) => {
+  if (!value || !value?.search) {
+    return VALID;
+  }
   const selectedPlaceIsValid =
     value && value.selectedPlace && value.selectedPlace.address;
 
