@@ -32,11 +32,15 @@ const AdminAttributesSettingPage = () => {
   const addAttributeModalControl = useBoolean();
   const deleteAttributesModalControl = useBoolean();
   const [submitError, setSubmitError] = useState<string>('');
+  const [searchKeywords, setSearchKeywords] = useState<string>('');
 
   const { rowCheckbox = [] } = currentTableFormValue;
 
   const getExposeValues = ({ values }: any) => {
-    setCurrentTableFormValue(values);
+    // need set timeout here to wait FormSpy render first to avoid React warning
+    setTimeout(() => {
+      setCurrentTableFormValue(values);
+    }, 0);
   };
   const mealStyles = useAppSelector(
     (state) => state.AdminAttributesSetting.categories,
@@ -101,6 +105,18 @@ const AdminAttributesSettingPage = () => {
     }));
   };
 
+  const filterTableData = (tableData: any, keywords: string) => {
+    if (!keywords) {
+      return tableData;
+    }
+
+    return tableData.filter((item: any) => {
+      const { value } = item.data;
+
+      return value.toLowerCase().includes(keywords.toLowerCase());
+    });
+  };
+
   const mealStylesTableData = parseEntitiesToTableData(
     mealStyles,
     EAttributeSetting.MEAL_STYLES,
@@ -118,6 +134,23 @@ const AdminAttributesSettingPage = () => {
     EAttributeSetting.PACKAGING,
   );
 
+  const mealStylesFilteredTableData = filterTableData(
+    mealStylesTableData,
+    searchKeywords,
+  );
+  const nutritionsFilteredTableData = filterTableData(
+    nutritionsTableData,
+    searchKeywords,
+  );
+  const daySessionsFilteredTableData = filterTableData(
+    daySessionsTableData,
+    searchKeywords,
+  );
+  const packagingFilteredTableData = filterTableData(
+    packagingTableData,
+    searchKeywords,
+  );
+
   const deleteButtonDisabled = useMemo(
     () =>
       rowCheckbox.reduce((result: string[], item: string) => {
@@ -128,6 +161,13 @@ const AdminAttributesSettingPage = () => {
         return result;
       }, []).length === 0,
     [activeTab, rowCheckbox],
+  );
+
+  const searchFormInitialValues = useMemo(
+    () => ({
+      keywords: searchKeywords,
+    }),
+    [searchKeywords],
   );
 
   useEffect(() => {
@@ -196,10 +236,11 @@ const AdminAttributesSettingPage = () => {
 
   const onTabChange = (tab: any) => {
     setActiveTab(tab?.key);
+    setSearchKeywords('');
   };
 
   const onKeywordSearch = (e: any) => {
-    console.log(e);
+    setSearchKeywords(e.keywords);
   };
 
   const daySessionsTimeColumn = [
@@ -324,10 +365,10 @@ const AdminAttributesSettingPage = () => {
       );
     },
     childrenProps: {
-      mealStyles: mealStylesTableData,
-      nutritions: nutritionsTableData,
-      daySessions: daySessionsTableData,
-      packaging: packagingTableData,
+      mealStyles: mealStylesFilteredTableData,
+      nutritions: nutritionsFilteredTableData,
+      daySessions: daySessionsFilteredTableData,
+      packaging: packagingFilteredTableData,
     },
   }));
 
@@ -337,7 +378,10 @@ const AdminAttributesSettingPage = () => {
         <h2>
           {intl.formatMessage({ id: 'AdminAttributesSettingPage.pageTitle' })}
         </h2>
-        <KeywordSearchForm onSubmit={onKeywordSearch} />
+        <KeywordSearchForm
+          onSubmit={onKeywordSearch}
+          initialValues={searchFormInitialValues}
+        />
       </div>
       <div>
         <div className={css.actionBtns}>
