@@ -30,7 +30,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { members = {} } = User(companyAccount).getMetadata();
     const userMember = members[userEmail];
 
-    const { expireTime = 0 } = userMember;
+    const { expireTime = 0, permission } = userMember;
     const todayTimestamp = DateTime.now()
       .setZone('Asia/Ho_Chi_Minh')
       .toMillis();
@@ -69,6 +69,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         id: userId,
       },
     };
+
     await integrationSdk.users.updateProfile({
       id: companyId,
       metadata: {
@@ -83,7 +84,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         company: {
           ...userCompany,
           [companyId]: {
-            permission: UserPermission.PARTICIPANT,
+            permission: permission || UserPermission.PARTICIPANT,
           },
         },
       },

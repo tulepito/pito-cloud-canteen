@@ -58,6 +58,7 @@ const createCompany = async ({
           subAccountId: subAccount.id.uuid,
         },
         metadata: {
+          id: companyAccount.id.uuid,
           isCompany: true,
           status: ECompanyStatus.active,
           members,
