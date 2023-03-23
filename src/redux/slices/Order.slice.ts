@@ -360,23 +360,32 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
       sdkModel: sdk.listings,
       query: menuQuery,
     });
-    const restaurants = await Promise.all(
-      allMenus.map(async (menu: TListing) => {
-        const { restaurantId } = Listing(menu).getMetadata();
-        const restaurantResponse = await sdk.listings.show({
-          id: restaurantId,
-          include: ['images'],
-          'fields.image': [
-            'variants.landscape-crop',
-            'variants.landscape-crop2x',
-          ],
-        });
+    const restaurants = compact(
+      await Promise.all(
+        allMenus.map(async (menu: TListing) => {
+          const { restaurantId } = Listing(menu).getMetadata();
+          const restaurantResponse = denormalisedResponseEntities(
+            await sdk.listings.show({
+              id: restaurantId,
+              include: ['images'],
+              'fields.image': [
+                'variants.landscape-crop',
+                'variants.landscape-crop2x',
+              ],
+            }),
+          )[0];
+          const { status: restaurantStatus } =
+            Listing(restaurantResponse).getMetadata();
 
-        return {
-          restaurantInfo: denormalisedResponseEntities(restaurantResponse)[0],
-          menu,
-        };
-      }),
+          if (restaurantStatus !== ERestaurantListingStatus.authorized)
+            return null;
+
+          return {
+            restaurantInfo: restaurantResponse,
+            menu,
+          };
+        }),
+      ),
     );
 
     if (restaurants.length > 0) {
