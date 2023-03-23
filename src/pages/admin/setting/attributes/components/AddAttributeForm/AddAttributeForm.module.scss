@@ -1,0 +1,31 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.formContainer {
+  margin-top: 24px;
+}
+
+.inputField {
+  margin-top: 32px;
+}
+
+.submitBtn {
+  margin: 40px auto 0;
+  width: 400px;
+}
+
+.error {
+  margin-top: 8px;
+  color: $primaryPri2;
+}
+
+.timeFieldsWrapper {
+  @include flexAlign(flex-start);
+  gap: 16px;
+  margin-top: 32px;
+
+  .fieldSelect {
+    flex-basis: 50%;
+  }
+}
