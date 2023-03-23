@@ -96,6 +96,7 @@ const transferCompanyOwner = async ({
         bankAccounts,
       },
       metadata: {
+        id: User(newCompanyAccount).getId(),
         isCompany: true,
         members: newMembers,
         groups,
@@ -159,6 +160,7 @@ const transferCompanyOwner = async ({
         },
         metadata: {
           ...(isOldCompany ? { isCompany: false } : {}),
+          ...(isOldCompany ? { id: '' } : {}),
           companyList: newMemberCompanyList,
           company: newMetaCompanyData,
         },
