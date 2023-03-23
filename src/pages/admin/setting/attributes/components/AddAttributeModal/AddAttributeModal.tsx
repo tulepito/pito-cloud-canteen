@@ -31,7 +31,6 @@ const AddAttributeModal: React.FC<TAddAttributeModalProps> = (props) => {
     activeTab,
   } = props;
   const onSubmit = (values: TAddAttributeFormValues) => {
-    console.log('values[values.attribute]: ', values[values.attribute]);
     onAddAttribute(values.attribute, values[values.attribute]!, {
       start: values.start!,
       end: values.end!,
