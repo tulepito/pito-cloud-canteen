@@ -145,6 +145,7 @@ export const orderDataCheckers = (order: TListing) => {
 export const isEnableSubmitPublishOrder = (
   order: TListing,
   orderDetail: any[],
+  availableOrderDetailCheckList: TObject,
 ) => {
   const isOrderValid = orderDataCheckers(order).isAllValid;
   const isOrderDetailHasData = !isEmpty(orderDetail);
@@ -153,8 +154,16 @@ export const isEnableSubmitPublishOrder = (
 
     return isSelectedFood;
   });
+  const isNoUnAvailableRestaurantInOrderDetail = Object.keys(
+    availableOrderDetailCheckList,
+  ).every((item) => availableOrderDetailCheckList[item]);
 
-  return isOrderValid && isOrderDetailSetupCompleted && isOrderDetailHasData;
+  return (
+    isOrderValid &&
+    isOrderDetailSetupCompleted &&
+    isOrderDetailHasData &&
+    isNoUnAvailableRestaurantInOrderDetail
+  );
 };
 
 export const isOrderDetailDatePickedFood = (date: any) => {

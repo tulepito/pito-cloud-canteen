@@ -36,3 +36,8 @@ export const ratingOptions = [
   { key: '4', label: '4 sao trở lên' },
   { key: '5', label: '5 sao' },
 ];
+
+export const mealTypeOptions = [
+  { key: 'vegetarian', label: 'Chay' },
+  { key: 'unVegetarian', label: 'Mặn' },
+];

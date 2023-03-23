@@ -108,6 +108,7 @@ function BookerDraftOrderPage() {
   const isFinishOrderDisabled = !isEnableSubmitPublishOrder(
     order as TListing,
     orderDetail,
+    availableOrderDetailCheckList,
   );
 
   const suitableStartDate = useMemo(() => {

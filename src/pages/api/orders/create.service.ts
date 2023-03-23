@@ -74,6 +74,7 @@ const createOrder = async ({
     endDate,
     memberAmount,
     deadlineDate,
+    mealType,
   } = generalInfo;
 
   const shouldUpdateOrderName = companyDisplayName && startDate && endDate;
@@ -108,6 +109,7 @@ const createOrder = async ({
         startDate,
         endDate,
         participants,
+        mealType,
       },
       ...(shouldUpdateOrderName
         ? {

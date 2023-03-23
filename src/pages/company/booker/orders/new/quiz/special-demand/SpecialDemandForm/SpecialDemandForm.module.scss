@@ -4,3 +4,7 @@
 .label {
   @include textTemplate(16px, $fontWeightBold, 24px);
 }
+
+.spacing {
+  margin-top: 32px;
+}

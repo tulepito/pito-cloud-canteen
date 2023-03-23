@@ -276,7 +276,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   );
 
   const disabledSubmit =
-    Object.keys(orderDetail).length === 0 || missingSelectedFood.length > 0;
+    Object.keys(orderDetail).length === 0 ||
+    missingSelectedFood.length > 0 ||
+    Object.keys(availableOrderDetailCheckList).some(
+      (item) => !availableOrderDetailCheckList[item],
+    );
   const initialFoodList = isPickFoodModalOpen
     ? orderDetail[selectedDate?.getTime()]?.restaurant?.foodList
     : {};

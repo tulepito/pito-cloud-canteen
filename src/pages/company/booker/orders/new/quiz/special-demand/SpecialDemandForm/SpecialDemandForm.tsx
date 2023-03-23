@@ -2,8 +2,10 @@ import { useEffect, useImperativeHandle } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 
 import Form from '@components/Form/Form';
+import MealTypeField from '@pages/admin/order/create/components/MealTypeField/MealTypeField';
 import NutritionField from '@pages/admin/order/create/components/NutritionField/NutritionField';
 
 import css from './SpecialDemandForm.module.scss';
@@ -51,6 +53,10 @@ const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
   return (
     <Form onSubmit={handleSubmit}>
       <div className={css.label}>
+        {intl.formatMessage({ id: 'Booker.CreateOrder.Form.field.mealType' })}
+      </div>
+      <MealTypeField />
+      <div className={classNames(css.label, css.spacing)}>
         {intl.formatMessage({ id: 'Booker.CreateOrder.Form.field.nutritions' })}
       </div>
       <NutritionField options={nutritionsOptions} />

@@ -1,0 +1,16 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.fieldTitle {
+  @include text(18px, 24px);
+  font-weight: $fontWeightBold;
+  text-transform: capitalize;
+}
+
+.fieldGroups {
+  @include flexAlign(center);
+  gap: 16px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
