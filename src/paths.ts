@@ -164,6 +164,14 @@ export const adminRoutes = {
     path: adminPaths.UpdateDraftOrder,
     label: 'Chỉnh sửa',
   },
+  Setting: {
+    path: '/admin/setting',
+    label: 'Cài đặt',
+  },
+  AttributesSetting: {
+    path: '/admin/setting/attributes',
+    label: 'Cài đặt món ăn',
+  },
 } as const;
 
 export const companyPaths = {

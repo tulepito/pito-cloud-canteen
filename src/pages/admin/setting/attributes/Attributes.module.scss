@@ -1,0 +1,61 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  .header {
+    @include flexAlign(center, space-between);
+  }
+
+  .tabLabel {
+    @include flexAlign(center);
+    gap: 12px;
+  }
+
+  .actionBtns {
+    @include flexAlign(center, flex-end);
+    gap: 12px;
+  }
+
+  .tableBodyCell {
+    &:nth-child(1) {
+      width: 50px !important;
+    }
+
+    &:nth-child(2) {
+      width: 300px !important;
+    }
+  }
+
+  .creator {
+    @include textTemplate(14px, $fontWeightSemiBold, 20px);
+    color: $labelBlue2;
+  }
+
+  .action {
+    @include flexAlign(center);
+    gap: 24px;
+
+    .actionBtn {
+      cursor: pointer;
+    }
+
+    .black {
+      path {
+        fill: $neutralGray6;
+      }
+    }
+
+    .loadingIcon {
+      width: 24px;
+      height: 24px;
+      circle {
+        stroke: $neutralGray6;
+      }
+    }
+
+    .disable {
+      pointer-events: none;
+    }
+  }
+}

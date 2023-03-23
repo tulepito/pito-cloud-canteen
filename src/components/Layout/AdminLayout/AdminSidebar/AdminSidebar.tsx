@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 
 import IconHome from '@components/Icons/IconHome/IconHome';
 import IconOrderManagement from '@components/Icons/IconOrderManagement/IconOrderManagement';
+import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import IconUserManagement from '@components/Icons/IconUserManagement/IconUserManagement';
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
@@ -112,6 +113,21 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
             ],
           },
         ],
+      },
+    ],
+  },
+  {
+    id: 'setting',
+    Icon: IconSetting,
+    nameLink: adminRoutes.AttributesSetting.path,
+    label: 'AdminSidebar.settingLabel',
+    isFirstLevel: true,
+    childrenMenus: [
+      {
+        id: 'attributesSetting',
+        label: 'AdminSidebar.attributesSettingLabel',
+        nameLink: adminRoutes.AttributesSetting.path,
+        highlightRefLinks: [adminRoutes.AttributesSetting.path],
       },
     ],
   },

@@ -894,3 +894,10 @@ export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
   ],
   [EManageCompanyOrdersTab.CANCELED]: [EOrderStates.canceled],
 };
+
+export enum EAttributeSetting {
+  MEAL_STYLES = 'mealStyles',
+  NUTRITIONS = 'nutritions',
+  DAY_SESSIONS = 'daySessions',
+  PACKAGING = 'packaging',
+}

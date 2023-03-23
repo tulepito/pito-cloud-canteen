@@ -53,6 +53,18 @@
   padding: 4px 0 8px;
   -webkit-tap-highlight-color: transparent;
   cursor: pointer;
+
+  div[data-number='true'] {
+    background-color: $neutralGray3;
+    border-radius: 100%;
+    color: $neutralGray5;
+    border-radius: 100%;
+    @include textTemplate(8px, $fontWeightBold, 8px);
+    width: 16px;
+    height: 16px;
+    @include flexAlign(center, center);
+  }
+
   &::after {
     position: absolute;
     content: '';
@@ -72,6 +84,13 @@
     bottom: 0;
     transition: width 0.3s;
     background-color: $neutralGray6;
+  }
+
+  &.tabActive {
+    div[data-number='true'] {
+      background-color: $neutralGray6;
+      color: $neutralGray1;
+    }
   }
 }
 

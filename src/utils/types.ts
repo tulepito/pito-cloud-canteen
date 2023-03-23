@@ -57,7 +57,7 @@ export type TDefaultProps = { className?: string; rootClassName?: string };
 export type TIconProps = TDefaultProps & {
   width?: number;
   height?: number;
-  onClick?: () => void;
+  onClick?: (e?: any) => void;
 };
 
 // Sharetribe Flex Entity Types
