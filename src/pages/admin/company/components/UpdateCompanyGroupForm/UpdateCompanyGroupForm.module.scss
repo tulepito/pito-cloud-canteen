@@ -56,10 +56,8 @@
 }
 
 .companyWrapper {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   margin: 40px 0;
-  justify-content: space-between;
-  .checkbox {
-    flex: 1;
-  }
+  gap: 20px;
 }

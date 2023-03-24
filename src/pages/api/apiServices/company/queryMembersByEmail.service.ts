@@ -1,6 +1,7 @@
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { User } from '@src/utils/data';
+import { EImageVariants } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 const queryMembersByEmail = async (emails: string[], queryParams: TObject) => {
@@ -11,7 +12,15 @@ const queryMembersByEmail = async (emails: string[], queryParams: TObject) => {
     emailsAsArray.map(async (email: string) => {
       try {
         const response = await intergrationSdk.users.show(
-          { email },
+          {
+            email,
+            include: 'profileImage',
+            'fields.image': [
+              `variants.${EImageVariants.squareSmall}`,
+              `variants.${EImageVariants.squareSmall2x}`,
+              `variants.${EImageVariants.scaledLarge}`,
+            ],
+          },
           queryParams,
         );
         const [user] = denormalisedResponseEntities(response);

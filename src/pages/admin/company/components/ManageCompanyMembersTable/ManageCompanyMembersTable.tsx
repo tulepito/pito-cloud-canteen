@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-shadow */
 import type { ChangeEvent, ReactNode } from 'react';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
@@ -11,6 +11,7 @@ import { InlineTextButton } from '@components/Button/Button';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import AlertModal from '@components/Modal/AlertModal';
+import Pagination from '@components/Pagination/Pagination';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { UserPermission } from '@src/types/UserPermission';
@@ -63,7 +64,7 @@ const TABLE_COLUMN: TColumn[] &
       const { name } = data;
       if (!name) return <span className={css.boldText}>Chưa xác nhận</span>;
 
-      return <span>{name}</span>;
+      return <span className={css.boldText}>{name}</span>;
     },
   },
   {
@@ -232,9 +233,8 @@ const parseEntitiesToTableData = ({
 
     if (!hasAttributes) {
       return {
-        key: companyMember.id,
+        key: companyMember.email,
         data: {
-          id: companyMember.id,
           permission: companyMember.permission,
           email: companyMember.email,
           groups,
@@ -250,10 +250,9 @@ const parseEntitiesToTableData = ({
     }
 
     return {
-      key: companyMember.id,
+      key: companyMember.email,
       data: {
         canRemoveOwner,
-        id: companyMember.id,
         permission: companyMember.permission,
         name: companyMember.attributes.profile.displayName,
         email: companyMember.attributes.email,
@@ -267,6 +266,18 @@ const parseEntitiesToTableData = ({
     };
   });
 };
+
+const sliceMembers = (
+  members: TCompanyMemberWithDetails[],
+  page: any,
+  perPage: number,
+) => {
+  const pageAsNum = Number(page);
+
+  return [...members].slice((pageAsNum - 1) * perPage, pageAsNum * perPage);
+};
+
+const MEMBER_PAGE_SIZE = 5;
 
 const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
   props,
@@ -300,6 +311,8 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
 
   const [permissionForOldOwner, setPermissionForOldOwner] =
     useState<UserPermission | null>(null);
+
+  const [page, setPage] = useState<number>(1);
 
   const onChangeNewOwner = (e: ChangeEvent<HTMLSelectElement>) => {
     setNewOwnerEmail(e.target.value);
@@ -358,18 +371,6 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
     }
   };
 
-  const tableData = parseEntitiesToTableData({
-    intl,
-    companyGroups,
-    openRemoveModal,
-    onUpdateMemberPermission,
-    companyMembers,
-    updatingMemberPermissionEmail,
-    openTransferOwnerModal,
-    canRemoveOwner,
-    openUpgradeToOwnerModal,
-  });
-
   const handleCloseModal = () => {
     setMemberToRemove(null);
   };
@@ -385,6 +386,40 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
   const tableColumn = TABLE_COLUMN.filter(
     (col) => !hiddenColumnNames?.includes(col.key),
   );
+  console.log({ companyMembers });
+  const members = useMemo(
+    () => sliceMembers(companyMembers, page, MEMBER_PAGE_SIZE),
+    [companyMembers, page],
+  );
+  console.log({ members });
+
+  const tableData = parseEntitiesToTableData({
+    intl,
+    companyGroups,
+    openRemoveModal,
+    onUpdateMemberPermission,
+    companyMembers: members,
+    updatingMemberPermissionEmail,
+    openTransferOwnerModal,
+    canRemoveOwner,
+    openUpgradeToOwnerModal,
+  });
+
+  const pagination = useMemo(
+    () => ({
+      page: Number(page),
+      perPage: MEMBER_PAGE_SIZE,
+      totalPages: Math.ceil(companyMembers.length / MEMBER_PAGE_SIZE),
+      totalItems: companyMembers.length,
+    }),
+    [page, companyMembers.length],
+  );
+
+  const onPageChange = (page: number) => {
+    setPage(page);
+  };
+
+  console.log({ tableData });
 
   return (
     <div className={css.root}>
@@ -393,6 +428,12 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
         data={tableData}
         tableBodyCellClassName={css.tableBodyCell}
         isLoading={queryMembersInProgress}
+      />
+      <Pagination
+        total={pagination.totalItems}
+        pageSize={pagination.perPage}
+        current={pagination.page}
+        onChange={onPageChange}
       />
       <AlertModal
         isOpen={!!memberToRemove}

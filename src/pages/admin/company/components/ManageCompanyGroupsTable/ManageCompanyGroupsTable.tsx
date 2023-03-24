@@ -30,7 +30,7 @@ const TABLE_COLUMN: TColumn[] &
     render: (data) => {
       const { name } = data;
 
-      return <span>{name}</span>;
+      return <span className={css.boldText}>{name}</span>;
     },
   },
   {

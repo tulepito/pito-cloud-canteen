@@ -9,6 +9,8 @@
 
 .members {
   display: flex;
+  max-height: 500px;
+  overflow-y: auto;
   justify-content: space-between;
   flex-wrap: wrap;
   row-gap: 20px;

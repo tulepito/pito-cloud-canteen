@@ -233,7 +233,7 @@ const EditCompanySettingsInformationFormComponent: React.FC<
       <Form onSubmit={handleSubmit}>
         <div className={css.root}>
           <div className={css.fieldSection}>
-            <h3>
+            <h3 className={css.largeTitle}>
               <FormattedMessage id="EditCompanySettingsInformationForm.logoSettingTitle" />
             </h3>
             <FieldPhotoUpload
@@ -292,9 +292,6 @@ const EditCompanySettingsInformationFormComponent: React.FC<
           </div>
           <div className={css.line}></div>
           <div className={css.fieldSection}>
-            <h3 className={css.largeTitle}>
-              <FormattedMessage id="EditCompanySettingsInformationForm.groupSettingMember" />
-            </h3>
             <div className={css.sectionHeader}>
               <h4 className={css.smallTitle}>
                 <FormattedMessage id="EditCompanySettingsInformationForm.groupList" />
@@ -319,7 +316,7 @@ const EditCompanySettingsInformationFormComponent: React.FC<
           </div>
           <div className={css.line}></div>
           <div className={css.fieldSection}>
-            <h3>
+            <h3 className={css.largeTitle}>
               <FormattedMessage id="EditCompanySettingsInformationForm.mealSettingTitle" />
             </h3>
             <div>
