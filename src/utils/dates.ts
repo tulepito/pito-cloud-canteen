@@ -13,7 +13,7 @@ import {
 } from '@components/CalendarDashboard/helpers/constant';
 
 import { getUniqueString } from './data';
-import { EDayOfWeek } from './enums';
+import { EDayOfWeek, EMenuMealType } from './enums';
 
 const DAY_IN_WEEK = [
   { key: 'mon', label: 'DayInWeekField.mon' },
@@ -246,6 +246,24 @@ export const getDaySessionFromDeliveryTime = (time: string = '6:30') => {
   return DINNER_SESSION;
 };
 
+export const getDeliveryTimeFromMealType = (mealType: EMenuMealType) => {
+  // 6:30 - 10:30
+  if (mealType === EMenuMealType.breakfast) {
+    return '06:30';
+  }
+  // 10:30 - 14:00
+  if (mealType === EMenuMealType.lunch) {
+    return '10:30';
+  }
+  // 14:00 - 16:30
+  if (mealType === EMenuMealType.snack) {
+    return '14:00';
+  }
+
+  // 16:30 - 23:00
+  return '16:30';
+};
+
 export const addDaysToDate = (date: Date, daysToAdd: number = 0) => {
   return DateTime.fromJSDate(date).plus({ days: daysToAdd }).toJSDate();
 };
@@ -352,7 +370,6 @@ const sortDatesByDayOfWeek = (dates: Date[]) => {
 };
 
 export const getWeekDayList = (startDate: Date, endDate: Date) => {
-  console.log({ startDate, endDate });
   const days = [];
   const end = new Date(endDate);
   for (
@@ -392,4 +409,30 @@ export const getSelectedDaysOfWeek = (
   );
 
   return selectedDays;
+};
+
+const units: Intl.RelativeTimeFormatUnit[] = [
+  'year',
+  'month',
+  'week',
+  'day',
+  'hour',
+  'minute',
+  'second',
+];
+
+export const timeAgo = (date: Date) => {
+  const dateTime = DateTime.fromJSDate(date);
+  const diff = dateTime.diffNow().shiftTo(...units);
+  const unit = units.find((u: any) => diff.get(u) !== 0) || 'second';
+
+  const relativeFormatter = new Intl.RelativeTimeFormat('vi', {
+    numeric: 'auto',
+  });
+
+  return relativeFormatter.format(Math.trunc(diff.as(unit)), unit);
+};
+
+export const minusDays = (date: Date, days: number) => {
+  return DateTime.fromJSDate(date).minus({ days }).toJSDate();
 };

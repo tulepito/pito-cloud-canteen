@@ -1,5 +1,7 @@
+import type { ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
 import capitalize from 'lodash/capitalize';
 import { useRouter } from 'next/router';
 
@@ -7,6 +9,7 @@ import Avatar from '@components/Avatar/Avatar';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
@@ -26,9 +29,15 @@ type DropdownProps = {
   }[];
   selectedValue: { value?: string; label?: string };
   setSelectedValue: (value: any) => void;
+  customTitle?: (params: {
+    title: string;
+    onMouseEnter: () => void;
+    isDropdownOpen: boolean;
+    isMobile?: boolean;
+  }) => ReactNode;
 };
 const Dropdown: React.FC<DropdownProps> = (props) => {
-  const { options, selectedValue, setSelectedValue } = props;
+  const { options, selectedValue, setSelectedValue, customTitle } = props;
   const router = useRouter();
   const { companyId } = router.query;
   const {
@@ -41,6 +50,9 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
     (state) => state.BookerCompanies.companies,
     shallowEqual,
   );
+
+  const { isMobileLayout, isTabletLayout } = useViewport();
+
   useEffect(() => {
     if (companyId && companyId !== 'personal') {
       const currentCompany = companyList.find(
@@ -54,16 +66,30 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
     }
   }, [companyId, companyList, setSelectedValue]);
 
+  const isNotDesktop = isMobileLayout || isTabletLayout;
+
   return (
     <OutsideClickHandler
       className={css.wrapper}
       onOutsideClick={onDropdowClose}>
-      <div className={css.selectedItem} onMouseEnter={onDropdownOpen}>
-        {titleRef.current}
-      </div>
+      {customTitle ? (
+        customTitle({
+          title: titleRef.current,
+          onMouseEnter: onDropdownOpen,
+          isDropdownOpen,
+          isMobile: isNotDesktop,
+        })
+      ) : (
+        <div className={css.selectedItem} onMouseEnter={onDropdownOpen}>
+          {titleRef.current}
+        </div>
+      )}
 
       {isDropdownOpen && (
-        <div className={css.dropdown}>
+        <div
+          className={classNames(css.dropdown, {
+            [css.isNotDesktop]: isNotDesktop,
+          })}>
           {options.map(({ label, value, logo }) => {
             const handleMouseEnter = () => {
               setSelectedValue({ value, label });

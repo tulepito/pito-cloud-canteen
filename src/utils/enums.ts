@@ -894,3 +894,10 @@ export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
   ],
   [EManageCompanyOrdersTab.CANCELED]: [EOrderStates.canceled],
 };
+
+export enum ENotificationTypes {
+  draftOrder = 'draftOrder',
+  completedOrder = 'completedOrder',
+  deadlineDueOrder = 'deadlineDueOrder',
+  pickingOrder = 'pickingOrder',
+}

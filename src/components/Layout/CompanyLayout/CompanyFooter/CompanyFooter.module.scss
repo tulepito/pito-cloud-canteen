@@ -1,0 +1,53 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  margin-top: 40px;
+  min-height: 132px;
+  background-color: $neutralGray2;
+  padding: 24px 16px;
+  @include flexAlign(center, center);
+  .container {
+    width: 100%;
+
+    @include viewportMedium {
+      display: flex;
+      align-items: center;
+      max-width: 1200px;
+      justify-content: space-between;
+    }
+    .logo {
+      display: none;
+      @include viewportMedium {
+        display: block;
+      }
+    }
+    .socials {
+      @include flexAlign(center);
+      gap: 20px;
+      margin-bottom: 20px;
+      @include viewportMedium {
+        order: 3;
+      }
+    }
+    .sloganWrapper {
+      @include viewportLarge {
+        order: 2;
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .slogan {
+        font-size: 14px;
+        margin: 0;
+        .minus {
+          display: none;
+          @include viewportLarge {
+            display: inline;
+            margin-left: 3px;
+          }
+        }
+      }
+    }
+  }
+}

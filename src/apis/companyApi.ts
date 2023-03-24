@@ -105,6 +105,14 @@ const queryOrdersApi = (companyId: string, params: TObject = {}) => {
   return getApi(`/company/${companyId}/orders`, params);
 };
 
+export const getCompanyNotificationsApi = (companyId: string) => {
+  return getApi(`/company/${companyId}/orders/notifications`);
+};
+
+export const getCompanyOrderSummaryApi = (companyId: string) => {
+  return getApi(`/company/${companyId}/orders/summary`);
+};
+
 export const companyApi = {
   queryOrdersApi,
 };

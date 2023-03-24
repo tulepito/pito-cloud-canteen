@@ -5,20 +5,23 @@ import { useRouter } from 'next/router';
 
 import Dropdown from '@components/CompanyLayout/Dropdown/Dropdown';
 import FeatureIcons from '@components/FeatureIcons/FeatureIcons';
-import FeaturesHeader from '@components/FeaturesHeader/FeaturesHeader';
+import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { BookerCompaniesThunks } from '@redux/slices/BookerCompanies.slice';
 import { companyPaths } from '@src/paths';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
-import CompanyHeader from './CompanyHeader/CompanyHeader';
+import CompanyFooter from './CompanyFooter/CompanyFooter';
+import CompanyHeaderWrapper from './CompanyHeaderWrapper/CompanyHeaderWrapper';
 import CompanyMainContent from './CompanyMainContent/CompanyMainContent';
 import CompanySidebar from './CompanySidebar/CompanySidebar';
 import {
   shouldShowFeatureHeader,
   shouldShowSidebar,
 } from './companyLayout.helpers';
+
+import css from './CompanyLayout.module.scss';
 
 const companySettingPaths = [
   companyPaths.Account,
@@ -80,45 +83,39 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const featureHeaderData = [
     {
       key: 'cart',
-      icon: <FeatureIcons.Cart />,
-      title: 'Đặt hàng',
+      title: (
+        <div className={css.headerTitle}>
+          <FeatureIcons.Cart />
+          <span>Đặt hàng</span>
+        </div>
+      ),
       pathname: companyPaths.CreateNewOrder,
     },
     {
       key: 'order',
-      icon: <FeatureIcons.Box />,
-      title: 'Đơn hàng',
+      title: (
+        <div className={css.headerTitle}>
+          <FeatureIcons.Box />
+          <span>Đơn hàng</span>
+        </div>
+      ),
       pathname: companyPaths.ManageOrders,
     },
     {
-      key: 'invoice',
-      icon: <FeatureIcons.Invoice />,
-      title: 'Hoá đơn',
-      pathname: '/',
-    },
-    {
-      key: 'review',
-      icon: <FeatureIcons.Star />,
-      title: 'Đánh giá',
-      pathname: '/',
-    },
-    {
-      key: 'pitoClub',
-      icon: <FeatureIcons.Gift />,
-      title: 'PITO club',
-      pathname: '/',
-    },
-    {
-      key: 'introduce',
-      icon: <FeatureIcons.UserCirclePlus />,
-      title: 'Giới thiệu',
-      pathname: '/',
-    },
-    {
       key: 'account',
-      icon: <FeatureIcons.User />,
       title: (
         <Dropdown
+          customTitle={({ title, onMouseEnter, isDropdownOpen, isMobile }) => (
+            <div onMouseEnter={onMouseEnter} className={css.headerTitleWrapper}>
+              <div className={css.headerTitle}>
+                <FeatureIcons.User />
+                {title}
+              </div>
+              {isMobile && (
+                <IconArrowHead direction={isDropdownOpen ? 'right' : 'down'} />
+              )}
+            </div>
+          )}
           options={accountOptions}
           selectedValue={selectedAccount}
           setSelectedValue={setSelectedAccount}
@@ -130,6 +127,29 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
           : { companyId: 'personal' }),
       },
       pathname: selectedAccount.value ? changePathnameByCompanyId() : pathname,
+    },
+  ];
+
+  const companyHeaderLinkData = [
+    {
+      key: 'partner',
+      path: '/',
+      label: 'Nhà hàng',
+    },
+    {
+      key: 'story',
+      path: '/our-story',
+      label: 'Câu chuyện',
+    },
+    {
+      key: 'pricing',
+      path: '/pricing',
+      label: 'Bảng giá',
+    },
+    {
+      key: 'aboutUs',
+      path: '/about-us',
+      label: 'Về chúng tôi',
     },
   ];
 
@@ -160,14 +180,19 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
 
   return (
     <>
-      <CompanyHeader showBottomLine={!showFeatureHeader} />
-      {showFeatureHeader && <FeaturesHeader headerData={featureHeaderData} />}
+      <CompanyHeaderWrapper
+        companyId={(selectedAccount?.value as string) || 'personal'}
+        showFeatureHeader={showFeatureHeader}
+        featureHeaderData={featureHeaderData}
+        companyHeaderLinkData={companyHeaderLinkData}
+      />
       {showSidebar && <CompanySidebar companyName={companyName!} />}
       <CompanyMainContent
         hasHeader={showFeatureHeader}
         hasSideBar={showSidebar}>
         {children}
       </CompanyMainContent>
+      <CompanyFooter />
     </>
   );
 };

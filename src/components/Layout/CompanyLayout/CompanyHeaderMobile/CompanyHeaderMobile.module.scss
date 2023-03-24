@@ -1,0 +1,80 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.root {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background-color: $neutralGray1;
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  width: 100%;
+
+  .iconClose {
+    stroke: $neutralGray5;
+    stroke-width: 0;
+    width: 15px;
+    height: 15px;
+    path {
+      fill: $neutralGray5;
+    }
+  }
+
+  .mobileMenuWrapper {
+    position: fixed;
+    width: 100%;
+    padding: 34px 26px;
+    height: 100vh;
+    top: 70px;
+    background-color: $neutralGray1;
+    left: 0;
+
+    .companyHeaderLinks {
+      display: flex;
+      gap: 20px;
+      flex-direction: column;
+      .companyHeaderLink {
+        padding-bottom: 8px;
+        font-size: 16px;
+        color: $neutralGray6;
+        width: fit-content;
+      }
+    }
+    .headerLinks {
+      display: flex;
+      gap: 25px;
+      flex-direction: column;
+      .headerItem {
+        @include flexAlign(flex-start);
+        gap: 18px;
+        color: $neutralGray5;
+        width: 100%;
+        padding-bottom: 10px;
+
+        .title {
+          width: 100%;
+        }
+      }
+    }
+    .separator {
+      margin: 28px 0;
+      width: 100%;
+      height: 1px;
+      background-color: $neutralGray3;
+    }
+    .headerBottoms {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      .headerBottomItem {
+        @include flexAlign(center);
+        gap: 12px;
+        .userDisplayName {
+          font-weight: $fontWeightBold;
+        }
+      }
+    }
+  }
+}

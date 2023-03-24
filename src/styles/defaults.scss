@@ -239,3 +239,23 @@
     font-weight: $fontWeightBold;
   }
 }
+
+@mixin linkHover {
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    left: 50%;
+    transition: 0.5s all;
+  }
+  &:hover {
+    &::before {
+      content: '';
+      width: 100%;
+      left: 0;
+      background-color: $neutralGray6;
+    }
+  }
+}

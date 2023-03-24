@@ -1,0 +1,40 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  .title {
+    font-size: 18px;
+    margin: 0 0 14px 0;
+  }
+  .loadingContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    .loading {
+      min-height: 40px;
+    }
+  }
+  .notificationList {
+    border: 1px solid $neutralGray3;
+    border-radius: 15px;
+    .notificationItem {
+      cursor: pointer;
+      padding: 16px 14px;
+      @include flexAlign(center);
+      gap: 18px;
+      &:not(:last-child) {
+        border-bottom: 1px solid $neutralGray3;
+      }
+      .label {
+        margin: 0;
+        font-size: 14px;
+        line-height: 20px;
+      }
+      .createdAt {
+        font-size: 12px;
+        line-height: 20px;
+        margin: 0;
+      }
+    }
+  }
+}

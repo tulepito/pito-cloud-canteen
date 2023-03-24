@@ -4,22 +4,17 @@
 
 .container {
   border-bottom: 1px solid $neutralGray4;
-  position: fixed;
-  top: 66px;
   z-index: 2;
   width: 100%;
   background-color: $neutralGray1;
-
-  @include viewportLarge {
-    top: 81px;
-  }
 }
 
 .navWrapper {
-  @include flexAlign(center, center);
+  @include flexAlign(center);
   margin: 0;
   list-style-type: none;
   gap: 24px;
+  padding-left: 94px;
 
   .headerItem {
     @include flexAlign(center);

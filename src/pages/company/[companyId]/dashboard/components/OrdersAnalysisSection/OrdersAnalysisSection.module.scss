@@ -1,0 +1,78 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  .title {
+    font-size: 18px;
+    margin: 0 0 14px 0;
+  }
+
+  .loadingContainer {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    flex-wrap: wrap;
+    .loading {
+      > span {
+        height: 168px;
+        width: 180px;
+      }
+    }
+  }
+
+  .content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    max-width: 100%;
+    @include viewportMedium {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .orderDetails {
+      border-radius: 8px;
+      min-height: 168px;
+      @include flexAlign(center, space-between);
+      flex-direction: column;
+      padding: 20px 20px 12px 20px;
+      text-align: center;
+      gap: 10px;
+      .orderCount {
+        line-height: 48px;
+        margin: 0;
+        font-size: 28px;
+        font-weight: $fontWeightBold;
+      }
+      .orderLabel {
+        font-weight: $fontWeightBold;
+        font-size: 16px;
+        margin: 0;
+        &.completedOrders {
+          color: #20851f;
+        }
+        &.inProgressOrders {
+          color: #0e2995;
+        }
+        &.draftOrders {
+          color: #bea504;
+        }
+      }
+      .orderLink {
+        font-weight: $fontWeightBold;
+        font-size: 14px;
+        color: $neutralGray6;
+        @include flexAlign(center);
+      }
+      &.completedOrders {
+        background-color: $sematicGreen1;
+      }
+      &.inProgressOrders {
+        background-color: $labelBlue1;
+      }
+      &.draftOrders {
+        background-color: $labelYellow1;
+      }
+    }
+  }
+}

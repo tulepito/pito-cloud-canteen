@@ -1,0 +1,40 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  .title {
+    font-size: 18px;
+    margin: 0 0 14px 0;
+  }
+  .reportList {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(1, 1fr);
+    @include viewportLarge {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .reportItem {
+      border: 1px solid $neutralGray3;
+      border-radius: 12px;
+      @include flexAlign(center, space-between);
+      padding: 20px;
+      .label {
+        font-size: 14px;
+        margin: 0 0 8px 0;
+      }
+      .count {
+        font-size: 20px;
+        margin: 0;
+      }
+      .icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: $neutralGray3;
+        @include flexAlign(center, center);
+      }
+    }
+  }
+}
