@@ -27,10 +27,11 @@ const AdminAttributesSettingPage = () => {
 
   const [activeTab, setActiveTab] = useState(EAttributeSetting.MEAL_STYLES);
   const [onEditingRow, setOnEditingRow] = useState();
-  const [onDeletingRow, setOnDeletingRow] = useState();
+  const [onDeletingRow, setOnDeletingRow] = useState<string>();
   const [currentTableFormValue, setCurrentTableFormValue] = useState<any>({});
   const addAttributeModalControl = useBoolean();
   const deleteAttributesModalControl = useBoolean();
+  const deleteAttributeModalControl = useBoolean();
   const [submitError, setSubmitError] = useState<string>('');
   const [searchKeywords, setSearchKeywords] = useState<string>('');
 
@@ -221,6 +222,12 @@ const AdminAttributesSettingPage = () => {
     );
   };
 
+  const onDeleteSingleAttribute = async () => {
+    await onDelete(activeTab, [onDeletingRow!]);
+    setOnDeletingRow(undefined);
+    deleteAttributeModalControl.setFalse();
+  };
+
   const onDeleteMultipleAttributes = async () => {
     const keys = rowCheckbox.reduce((result: string[], item: string) => {
       if (item.startsWith(activeTab)) {
@@ -231,6 +238,7 @@ const AdminAttributesSettingPage = () => {
     }, []);
 
     await onDelete(activeTab, keys);
+    setCurrentTableFormValue({ rowCheckbox: [] });
     deleteAttributesModalControl.setFalse();
   };
 
@@ -314,8 +322,7 @@ const AdminAttributesSettingPage = () => {
 
           const handleDeleteRow = async () => {
             setOnDeletingRow(key);
-            await onDelete(attribute, [key]);
-            setOnDeletingRow(undefined);
+            deleteAttributeModalControl.setTrue();
           };
 
           return (
@@ -416,6 +423,16 @@ const AdminAttributesSettingPage = () => {
         title="Xóa thuộc tính"
         description="Bạn có chắc chắn muốn xóa những thuộc tính này?"
         onConfirm={onDeleteMultipleAttributes}
+        confirmText="Xóa"
+        isConfirmButtonLoading={updateAttributeInProgress}
+      />
+      <ConfirmationModal
+        id="DeleteAttributeModal"
+        isOpen={deleteAttributeModalControl.value}
+        onClose={deleteAttributeModalControl.setFalse}
+        title="Xóa thuộc tính"
+        description="Bạn có chắc chắn muốn xóa thuộc tính này?"
+        onConfirm={onDeleteSingleAttribute}
         confirmText="Xóa"
         isConfirmButtonLoading={updateAttributeInProgress}
       />
