@@ -16,6 +16,7 @@ type TAddAttributeModalProps = {
     label: string,
     time: { start: string; end: string },
   ) => void;
+  setSubmitError: (error: string) => void;
   inProgress: boolean;
   submitErrorText?: string;
   activeTab: EAttributeSetting;
@@ -29,6 +30,7 @@ const AddAttributeModal: React.FC<TAddAttributeModalProps> = (props) => {
     inProgress,
     submitErrorText,
     activeTab,
+    setSubmitError,
   } = props;
   const onSubmit = (values: TAddAttributeFormValues) => {
     onAddAttribute(values.attribute, values[values.attribute]!, {
@@ -58,6 +60,7 @@ const AddAttributeModal: React.FC<TAddAttributeModalProps> = (props) => {
           initialValues={initialValues}
           inProgress={inProgress}
           submitErrorText={submitErrorText}
+          setSubmitError={setSubmitError}
         />
       </div>
     </Modal>
