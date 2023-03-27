@@ -4,6 +4,7 @@ import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 
 import { addCommas } from '@helpers/format';
+import { getPCCFeeByMemberAmount } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@src/utils/data';
@@ -36,8 +37,12 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
   const [partnerFormDisabled, setPartnerFormDisabled] = useState(false);
 
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
+  const orderDetail = useAppSelector(
+    (state) => state.Order.orderDetail,
+    shallowEqual,
+  );
   const orderListing = Listing(order);
-  const { notes, serviceFees } = orderListing.getMetadata();
+
   const restaurantList = useAppSelector(
     (state) => state.Order.orderRestaurantList,
     shallowEqual,
@@ -48,7 +53,9 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
   const updateOrderInProgress = useAppSelector(
     (state) => state.Order.updateOrderInProgress,
   );
-
+  const { notes, serviceFees, memberAmount = 0 } = orderListing.getMetadata();
+  const numberOfOrderDays = Object.keys(orderDetail).length;
+  const PITOFee = getPCCFeeByMemberAmount(memberAmount) * numberOfOrderDays;
   const restaurantOptions = restaurantList.map((restaurant: TListing) => (
     <option
       key={Listing(restaurant).getId()}
@@ -165,7 +172,7 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
                 <div className={css.feeRow}>
                   <div className={css.feeLabel}>PITO</div>
                   <div className={classNames(css.price, css.vnd)}>
-                    {addCommas('200000')}
+                    {addCommas(PITOFee.toString())}
                   </div>
                 </div>
               </div>

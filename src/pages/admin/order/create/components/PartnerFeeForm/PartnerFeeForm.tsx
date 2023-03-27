@@ -33,11 +33,10 @@ const PartnerFeeFormComponent: React.FC<TPartnerFeeFormComponentProps> = (
     handleSubmit,
     restaurantList,
     formSubmitRef,
-    pristine,
     invalid,
     setPartnerFormDisabled,
   } = props;
-  formSubmitRef.current = !pristine && handleSubmit;
+  formSubmitRef.current = handleSubmit;
 
   useEffect(() => {
     setPartnerFormDisabled?.(invalid);
