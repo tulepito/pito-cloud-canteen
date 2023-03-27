@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { queryMembersByEmailAdminApi } from '@apis/companyApi';
 import { getUniqueString, getUniqueUsers } from '@src/utils/data';
+import { storableAxiosError } from '@src/utils/errors';
 import type { TUser } from '@utils/types';
 
 import useBoolean from './useBoolean';
@@ -27,11 +28,15 @@ const useQueryNewMemberUsers = () => {
 
   const queryUsersByEmail = async (
     emailList: string[],
+    companyId: string,
     reset: boolean = false,
   ) => {
     try {
       turnOnUsersInProgress();
-      const { data } = await queryMembersByEmailAdminApi(emailList);
+      const { data } = await queryMembersByEmailAdminApi({
+        emails: emailList,
+        companyId,
+      });
       const { users: newUsers, noExistedUsers } = data;
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       const mergedUser = [...users, ...newUsers];
@@ -48,9 +53,8 @@ const useQueryNewMemberUsers = () => {
       turnOffUsersInProgress();
     } catch (error) {
       console.error(error);
-      setNotFoundUsers(getUniqueString([...emailList, ...notFoundUsers]));
       turnOffUsersInProgress();
-      setQueryError(error);
+      setQueryError(storableAxiosError(error));
     }
   };
 

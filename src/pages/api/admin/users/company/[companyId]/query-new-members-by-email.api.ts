@@ -8,15 +8,18 @@ import { handleError } from '@services/sdk';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
+    const { companyId } = req.query;
     const { JSONParams } = req.query as unknown as {
       JSONParams: string;
     };
     const { dataParams = {}, queryParams = {} } = JSON.parse(JSONParams);
     const { emails } = dataParams;
-    const { users, noExistedUsers } = await queryMembersByEmail(
+    const { users, noExistedUsers } = await queryMembersByEmail({
+      res,
       emails,
+      companyId: companyId as string,
       queryParams,
-    );
+    });
 
     return res.status(200).json({ users, noExistedUsers });
   } catch (error) {

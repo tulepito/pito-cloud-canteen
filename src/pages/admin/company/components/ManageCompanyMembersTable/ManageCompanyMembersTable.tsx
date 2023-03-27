@@ -14,7 +14,7 @@ import AlertModal from '@components/Modal/AlertModal';
 import Pagination from '@components/Pagination/Pagination';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
-import { UserPermission } from '@src/types/UserPermission';
+import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
 import type { TCompanyGroup, TCompanyMemberWithDetails } from '@utils/types';
 
 import css from './ManageCompanyMembersTable.module.scss';
@@ -78,7 +78,7 @@ const TABLE_COLUMN: TColumn[] &
     key: 'role',
     label: 'Vai trò',
     render: ({
-      id,
+      inviteStatus,
       permission,
       handleToUpdateMemberPermission,
       intl,
@@ -95,13 +95,15 @@ const TABLE_COLUMN: TColumn[] &
           </span>
         );
       }
-      const permissionList = id
-        ? Object.keys(UserPermission)
-        : Object.keys(UserPermission).filter(
-            (permission) =>
-              UserPermission[permission as keyof typeof UserPermission] !==
-              UserPermission.OWNER,
-          );
+
+      const permissionList =
+        inviteStatus === UserInviteStatus.ACCEPTED
+          ? Object.keys(UserPermission)
+          : Object.keys(UserPermission).filter(
+              (permission) =>
+                UserPermission[permission as keyof typeof UserPermission] !==
+                UserPermission.OWNER,
+            );
 
       return (
         <select
@@ -252,6 +254,7 @@ const parseEntitiesToTableData = ({
     return {
       key: companyMember.email,
       data: {
+        inviteStatus: companyMember.inviteStatus,
         canRemoveOwner,
         permission: companyMember.permission,
         name: companyMember.attributes.profile.displayName,
@@ -386,12 +389,11 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
   const tableColumn = TABLE_COLUMN.filter(
     (col) => !hiddenColumnNames?.includes(col.key),
   );
-  console.log({ companyMembers });
+
   const members = useMemo(
     () => sliceMembers(companyMembers, page, MEMBER_PAGE_SIZE),
     [companyMembers, page],
   );
-  console.log({ members });
 
   const tableData = parseEntitiesToTableData({
     intl,

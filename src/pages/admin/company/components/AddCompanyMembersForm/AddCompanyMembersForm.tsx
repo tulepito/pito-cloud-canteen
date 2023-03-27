@@ -62,12 +62,13 @@ const AddCompanyMembersFormComponent: React.FC<
   } = props;
   const intl = useIntl();
 
-  const addUserToFormState = () => {
+  const addUserToFormState = async () => {
     if (!queryUsersByEmail) return;
     const { email } = values;
     const emailAsArray = email.split(',');
 
-    return queryUsersByEmail(emailAsArray);
+    await queryUsersByEmail(emailAsArray);
+    form.change('email', '');
   };
 
   const usersToRender = [
@@ -93,6 +94,8 @@ const AddCompanyMembersFormComponent: React.FC<
     if (usersToRender.length > 0 && customSubmit)
       return customSubmit(form.getState().values);
   };
+
+  console.log({ formError });
 
   return (
     <Form
