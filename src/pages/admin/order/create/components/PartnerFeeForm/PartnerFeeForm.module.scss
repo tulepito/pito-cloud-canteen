@@ -12,6 +12,7 @@
 
   .input {
     width: 80px;
+    flex-shrink: 0;
 
     input {
       padding: 4px 8px;
