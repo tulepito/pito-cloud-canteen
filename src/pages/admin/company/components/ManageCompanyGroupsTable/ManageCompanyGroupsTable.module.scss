@@ -7,10 +7,14 @@
 }
 
 .boldText {
-  font-weight: $fontWeightBold;
+  font-weight: $fontWeightSemiBold;
 }
 
 .removeContent {
   color: $neutralGray6;
   margin: 0;
+}
+
+.tableBodyCell > * {
+  font-size: 16px;
 }
