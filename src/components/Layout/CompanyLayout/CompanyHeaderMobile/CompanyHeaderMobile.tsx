@@ -12,7 +12,6 @@ import HamburgerMenuButton from '@components/HamburgerMenuButton/HamburgerMenuBu
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconLogout from '@components/Icons/IconLogout/IconLogout';
 import IconPhone from '@components/Icons/IconPhone/IconPhone';
-import NamedLink from '@components/NamedLink/NamedLink';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -43,7 +42,7 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
   const { className, companyHeaderLinkData, headerData } = props;
   const { value: isOpen, toggle: onToggle } = useBoolean(false);
 
-  const { pathname: routerPathName } = useRouter();
+  const { pathname: routerPathName, push } = useRouter();
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -65,6 +64,16 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
 
   const classes = classNames(css.root, className);
 
+  const handleRedirect =
+    (path: string, query: TObject = {}) =>
+    () => {
+      push({
+        pathname: path,
+        query,
+      });
+      onToggle();
+    };
+
   return (
     <div className={classes}>
       <PitoLogo variant="secondary" />
@@ -79,12 +88,12 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
         <div className={css.mobileMenuWrapper}>
           <div className={css.companyHeaderLinks}>
             {companyHeaderLinkData.map((item) => (
-              <NamedLink
+              <InlineTextButton
+                onClick={handleRedirect(item.path)}
                 key={item.key}
-                className={css.companyHeaderLink}
-                path={item.path}>
+                className={css.companyHeaderLink}>
                 {item.label}
-              </NamedLink>
+              </InlineTextButton>
             ))}
           </div>
           <div className={css.separator}></div>
@@ -99,6 +108,7 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
 
               return (
                 <Link
+                  onClick={handleRedirect(pathname, query)}
                   key={key}
                   className={activeHeaderItemClasses}
                   href={hrefObject}>

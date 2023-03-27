@@ -36,7 +36,6 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const dispatch = useAppDispatch();
   const { companyId } = router.query;
   const { pathname } = router;
-
   const showFeatureHeader = shouldShowFeatureHeader(router.pathname);
   const showSidebar = shouldShowSidebar(pathname);
 
@@ -133,22 +132,22 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const companyHeaderLinkData = [
     {
       key: 'partner',
-      path: '/',
+      path: router.pathname,
       label: 'Nhà hàng',
     },
     {
       key: 'story',
-      path: '/our-story',
+      path: router.pathname,
       label: 'Câu chuyện',
     },
     {
       key: 'pricing',
-      path: '/pricing',
+      path: router.pathname,
       label: 'Bảng giá',
     },
     {
       key: 'aboutUs',
-      path: '/about-us',
+      path: router.pathname,
       label: 'Về chúng tôi',
     },
   ];
@@ -177,6 +176,18 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
           )!,
         ).getPublicData()?.companyName
       : 'Tài khoản cá nhân';
+
+  useEffect(() => {
+    if (!companyId || companyId === '[companyId]') {
+      router.replace({
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          companyId: 'personal',
+        },
+      });
+    }
+  }, [companyId, router]);
 
   return (
     <>

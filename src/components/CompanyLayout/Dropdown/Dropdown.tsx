@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import capitalize from 'lodash/capitalize';
@@ -45,12 +45,11 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
     setTrue: onDropdownOpen,
     setFalse: onDropdowClose,
   } = useBoolean();
-  const titleRef = useRef(selectedValue.label || options[0].label);
+  const [title, setTitle] = useState(selectedValue.label);
   const companyList = useAppSelector(
     (state) => state.BookerCompanies.companies,
     shallowEqual,
   );
-
   const { isMobileLayout, isTabletLayout } = useViewport();
 
   useEffect(() => {
@@ -62,11 +61,13 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
         value: User(currentCompany!).getId(),
         label: User(currentCompany!).getPublicData()?.companyName,
       });
-      titleRef.current = User(currentCompany!).getPublicData()?.companyName;
+      setTitle(User(currentCompany!).getPublicData()?.companyName);
     }
   }, [companyId, companyList, setSelectedValue]);
 
   const isNotDesktop = isMobileLayout || isTabletLayout;
+
+  const titleToUse = title || options[0]?.label;
 
   return (
     <OutsideClickHandler
@@ -74,14 +75,14 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
       onOutsideClick={onDropdowClose}>
       {customTitle ? (
         customTitle({
-          title: titleRef.current,
+          title: titleToUse,
           onMouseEnter: onDropdownOpen,
           isDropdownOpen,
           isMobile: isNotDesktop,
         })
       ) : (
         <div className={css.selectedItem} onMouseEnter={onDropdownOpen}>
-          {titleRef.current}
+          {titleToUse}
         </div>
       )}
 
@@ -95,7 +96,7 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
               setSelectedValue({ value, label });
             };
             const handleMouseClick = () => {
-              titleRef.current = label;
+              setTitle(label);
               onDropdowClose();
             };
             const ensuredUser = {
