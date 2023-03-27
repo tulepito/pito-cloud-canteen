@@ -37,11 +37,11 @@ export const createSubmitCreateCompanyValues = (
   } = values;
   const {
     selectedPlace: { address, origin },
-  } = location || {};
+  } = location || { selectedPlace: { origin: {} } };
 
   const {
     selectedPlace: { address: companyAddress, origin: companyOrigin },
-  } = companyLocation || {};
+  } = companyLocation || { selectedPlace: { origin: {} } };
 
   return {
     email,
@@ -96,10 +96,11 @@ export const createSubmitUpdateCompanyValues = (
       } = values;
       const {
         selectedPlace: { address, origin },
-      } = location || {};
+      } = location || { selectedPlace: { origin: {} } };
+
       const {
         selectedPlace: { address: companyAddress, origin: companyOrigin },
-      } = companyLocation || {};
+      } = companyLocation || { selectedPlace: { origin: {} } };
 
       return {
         firstName,
