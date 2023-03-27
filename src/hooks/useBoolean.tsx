@@ -5,8 +5,6 @@ const useBoolean = (defaultValue = false) => {
 
   const setTrue = useCallback(() => setValue(true), []);
   const setFalse = useCallback(() => {
-    console.log('setFalse');
-
     return setValue(false);
   }, []);
   const toggle = useCallback(() => setValue((x) => !x), []);

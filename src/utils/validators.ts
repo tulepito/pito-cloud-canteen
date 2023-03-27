@@ -545,6 +545,7 @@ export const replaceSpaceByCommas = (value: string) => {
 };
 
 export const emailsWithCommasValid = (message: string) => (value: string) => {
+  if (!value) return VALID;
   const emails = value.split(',');
   const validEmails = emails.filter((email) => {
     return email.trim().match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);

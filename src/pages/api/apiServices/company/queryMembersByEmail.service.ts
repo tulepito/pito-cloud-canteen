@@ -1,5 +1,3 @@
-import type { NextApiResponse } from 'next';
-
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { User } from '@src/utils/data';
@@ -9,12 +7,10 @@ import type { TCompanyMemberWithDetails, TObject } from '@src/utils/types';
 import queryCompanyMembers from './queryCompanyMembers.service';
 
 const queryMembersByEmail = async ({
-  res,
   emails,
   queryParams,
   companyId,
 }: {
-  res: NextApiResponse;
   emails: string[];
   queryParams: TObject;
   companyId: string;
@@ -47,22 +43,22 @@ const queryMembersByEmail = async ({
           (member: TCompanyMemberWithDetails) => member?.email === email,
         );
 
-        if (emailIsExisted)
-          return res
-            .status(409)
-            .json({ message: `Email ${email} đã được thêm vào công ty.` });
+        if (emailIsExisted) {
+          return null;
+        }
 
-        if (memberIsAdmin || memberIsPartner) return null;
+        if (memberIsAdmin || memberIsPartner) {
+          return null;
+        }
 
         return user;
       } catch (error) {
         const emailIsExisted = companyMembers.some(
           (member: TCompanyMemberWithDetails) => member?.email === email,
         );
+
         if (emailIsExisted) {
-          return res
-            .status(409)
-            .json({ message: `Email ${email} đã được thêm vào công ty.` });
+          return null;
         }
 
         noExistedUsers.push(email);
