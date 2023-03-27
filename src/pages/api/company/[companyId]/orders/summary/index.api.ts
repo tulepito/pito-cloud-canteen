@@ -9,7 +9,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
     const { companyId } = req.query;
-    console.log({ apiMethod });
+
     switch (apiMethod) {
       case HttpMethod.GET: {
         const response = await getCompanyOrderSummary(companyId as string);

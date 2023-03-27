@@ -276,13 +276,6 @@ export const parsePrice = (value: string = '') => {
   return !isNotANumber ? parseNumber.toLocaleString() : value;
 };
 
-export const numberWithDots = (x: number) => {
-  const parts = x.toString().split('.');
-  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-  return parts.join('.');
-};
-
 export const nonNegativeValue = (message: string) => (value: number) => {
   return value <= 0 ? message : VALID;
 };

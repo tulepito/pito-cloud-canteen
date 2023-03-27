@@ -4,8 +4,8 @@ import Skeleton from 'react-loading-skeleton';
 
 import IconDish from '@components/Icons/IconDish/IconDish';
 import IconDollar from '@components/Icons/IconDollar/IconDollar';
+import { numberWithDots } from '@src/utils/number';
 import type { TCompanyOrderSummary } from '@src/utils/types';
-import { numberWithDots } from '@src/utils/validators';
 
 import css from './ReportSection.module.scss';
 

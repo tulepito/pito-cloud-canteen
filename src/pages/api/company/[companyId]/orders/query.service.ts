@@ -106,7 +106,6 @@ export const queryCompanyOrders = async ({
           plan,
         };
       }
-      console.log({ order });
 
       return {
         ...order,
