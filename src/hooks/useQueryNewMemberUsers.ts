@@ -33,11 +33,21 @@ const useQueryNewMemberUsers = () => {
   ) => {
     try {
       turnOnUsersInProgress();
+      setQueryError(null);
       const { data } = await queryMembersByEmailAdminApi({
         emails: emailList,
         companyId,
       });
       const { users: newUsers, noExistedUsers } = data;
+
+      if (newUsers.length === 0 && noExistedUsers.length === 0) {
+        turnOffUsersInProgress();
+
+        return setQueryError({
+          message: 'Không thể thêm thành viên. Vui lòng thử lại',
+        });
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       const mergedUser = [...users, ...newUsers];
       const nonDuplicatedUser = reset

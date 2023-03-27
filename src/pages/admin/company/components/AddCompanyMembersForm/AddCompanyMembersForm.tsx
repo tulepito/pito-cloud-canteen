@@ -12,7 +12,6 @@ import {
   composeValidators,
   emailsWithCommasValid,
   replaceSpaceByCommas,
-  required,
 } from '@src/utils/validators';
 import type { TCompanyMemberWithDetails, TUser } from '@utils/types';
 
@@ -95,8 +94,6 @@ const AddCompanyMembersFormComponent: React.FC<
       return customSubmit(form.getState().values);
   };
 
-  console.log({ formError });
-
   return (
     <Form
       onSubmit={(e) => {
@@ -114,11 +111,6 @@ const AddCompanyMembersFormComponent: React.FC<
             })}
             parse={replaceSpaceByCommas}
             validate={composeValidators(
-              required(
-                intl.formatMessage({
-                  id: 'AddCompanyMembersForm.emailRequired',
-                }),
-              ),
               emailsWithCommasValid(
                 intl.formatMessage({
                   id: 'AddCompanyMembersForm.emailInvalid',

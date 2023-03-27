@@ -421,8 +421,6 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
     setPage(page);
   };
 
-  console.log({ tableData });
-
   return (
     <div className={css.root}>
       <Table

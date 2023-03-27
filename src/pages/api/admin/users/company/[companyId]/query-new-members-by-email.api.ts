@@ -15,7 +15,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { dataParams = {}, queryParams = {} } = JSON.parse(JSONParams);
     const { emails } = dataParams;
     const { users, noExistedUsers } = await queryMembersByEmail({
-      res,
       emails,
       companyId: companyId as string,
       queryParams,
