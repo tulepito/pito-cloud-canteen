@@ -12,6 +12,7 @@ import css from './SpecialDemandForm.module.scss';
 
 export type TSpecialDemandFormValues = {
   nutritions: string[];
+  mealType: string[];
 };
 
 type TExtraProps = {

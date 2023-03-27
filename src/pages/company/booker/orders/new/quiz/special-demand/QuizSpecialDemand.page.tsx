@@ -37,8 +37,8 @@ const QuizSpecialDemand = () => {
     (state) => state.Quiz.fetchFilterInProgress,
   );
   const submitDisabled = useMemo(() => {
-    return !formValues?.nutritions?.length;
-  }, [formValues?.nutritions]);
+    return !formValues?.nutritions?.length && !formValues?.mealType?.length;
+  }, [formValues?.nutritions, formValues?.mealType]);
 
   const { nutritions } = User(selectedCompany).getPublicData();
   const onFormSubmitClick = () => {
@@ -67,8 +67,13 @@ const QuizSpecialDemand = () => {
   const initialValues: TSpecialDemandFormValues = useMemo(
     () => ({
       nutritions: quizData.nutritions || nutritions || [],
+      mealType: quizData.mealType || [],
     }),
-    [JSON.stringify(quizData.nutritions), JSON.stringify(nutritions)],
+    [
+      JSON.stringify(quizData.nutritions),
+      JSON.stringify(quizData.mealType),
+      JSON.stringify(nutritions),
+    ],
   );
 
   return (
