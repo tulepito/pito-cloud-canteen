@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
@@ -11,6 +11,7 @@ import type { TListing } from '@src/utils/types';
 
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../../create/components/NavigateButtons/NavigateButtons';
+import PartnerFeeForm from '../../create/components/PartnerFeeForm/PartnerFeeForm';
 import ServiceFeeAndNoteForm from '../../create/components/ServiceFeeAndNoteForm/ServiceFeeAndNoteForm';
 
 import css from './ServiceFeesAndNotes.module.scss';
@@ -31,10 +32,12 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const formSubmitRef = useRef<any>();
+  const partnerFormSubmitRef = useRef<any>();
+  const [partnerFormDisabled, setPartnerFormDisabled] = useState(false);
 
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const orderListing = Listing(order);
-  const { notes } = orderListing.getMetadata();
+  const { notes, serviceFees } = orderListing.getMetadata();
   const restaurantList = useAppSelector(
     (state) => state.Order.orderRestaurantList,
     shallowEqual,
@@ -54,20 +57,19 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
     </option>
   ));
 
-  const serviceFees = useMemo(
-    () =>
-      restaurantList.map((restaurant: TListing) => (
-        <div className={css.feeRow} key={Listing(restaurant).getId()}>
-          <div className={css.feeLabel}>
-            {Listing(restaurant).getAttributes()?.title}
-          </div>
-          <div className={classNames(css.price, css.percentage)}>
-            {addCommas(Listing(restaurant).getMetadata()?.serviceFee || 0)}
-          </div>
-        </div>
-      )),
-    [restaurantList],
-  );
+  const partnerFormInitialValues = useMemo(() => {
+    return restaurantList.reduce((result, restaurant) => {
+      const restaurantListing = Listing(restaurant);
+
+      return {
+        ...result,
+        [`partnerFee-${restaurantListing.getId()}`]:
+          serviceFees?.[restaurantListing.getId()] ||
+          restaurantListing.getMetadata()?.serviceFee ||
+          0,
+      };
+    }, {});
+  }, [JSON.stringify(restaurantList), JSON.stringify(serviceFees)]);
 
   useEffect(() => {
     dispatch(orderAsyncActions.fetchOrderRestaurants());
@@ -93,8 +95,29 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
     );
   };
 
+  const handlePartnerFeeFormSubmit = async (values: any) => {
+    const newPartnerFees = Object.keys(values).reduce((result, fee) => {
+      if (fee.startsWith('partnerFee-')) {
+        return {
+          ...result,
+          [fee.replace('partnerFee-', '')]: +values[fee],
+        };
+      }
+
+      return result;
+    }, {});
+    await dispatch(
+      orderAsyncActions.updateOrder({
+        generalInfo: {
+          serviceFees: newPartnerFees,
+        },
+      }),
+    );
+  };
+
   const onSubmit = async () => {
     await formSubmitRef?.current();
+    await partnerFormSubmitRef?.current();
     nextTab();
   };
 
@@ -150,7 +173,13 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
                 <h3>
                   {intl.formatMessage({ id: 'ServiceFeesAndNotes.serviceFee' })}
                 </h3>
-                {serviceFees}
+                <PartnerFeeForm
+                  onSubmit={handlePartnerFeeFormSubmit}
+                  initialValues={partnerFormInitialValues}
+                  restaurantList={restaurantList}
+                  formSubmitRef={partnerFormSubmitRef}
+                  setPartnerFormDisabled={setPartnerFormDisabled}
+                />
               </div>
             </div>
           </div>
@@ -158,6 +187,7 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
             <NavigateButtons
               goBack={goBack}
               onNextClick={onSubmit}
+              submitDisabled={partnerFormDisabled}
               inProgress={updateOrderInProgress}
             />
           </div>
