@@ -1,0 +1,84 @@
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { CurrentUser } from '@src/utils/data';
+import type { TCurrentUser } from '@src/utils/types';
+
+import CompanyDashboardHeroSection from './components/CompanyDashboardHeroSection/CompanyDashboardHeroSection';
+import NewsSection from './components/NewsSection/NewsSection';
+import NotificationSection from './components/NotificationSection/NotificationSection';
+import OrdersAnalysisSection from './components/OrdersAnalysisSection/OrdersAnalysisSection';
+import ReportSection from './components/ReportSection/ReportSection';
+
+import css from './CompanyDashboard.module.scss';
+
+const CompanyDashboardPage = () => {
+  const dispatch = useAppDispatch();
+  const { companyId } = useRouter().query;
+  const currentUser = useAppSelector((state) => state.user.currentUser);
+  const currentUserId = CurrentUser(currentUser as TCurrentUser).getId();
+  const totalItemMap = useAppSelector((state) => state.Order.totalItemMap);
+  const companyOrderNotificationMap = useAppSelector(
+    (state) => state.Order.companyOrderNotificationMap,
+  );
+  const companyOrderSummary = useAppSelector(
+    (state) => state.Order.companyOrderSummary,
+  );
+
+  const queryOrderInProgress = useAppSelector(
+    (state) => state.Order.queryOrderInProgress,
+  );
+
+  const getCompanyOrderNotificationInProgress = useAppSelector(
+    (state) => state.Order.getOrderNotificationInProgress,
+  );
+
+  const getCompanyOrderSummaryInProgress = useAppSelector(
+    (state) => state.Order.getCompanyOrderSummaryInProgress,
+  );
+
+  useEffect(() => {
+    if (!companyId) return;
+
+    const isPersonal = companyId === 'personal';
+    const companyIdToQuery = isPersonal ? currentUserId : companyId;
+    dispatch(
+      orderAsyncActions.queryCompanyOrders({ companyId: companyIdToQuery }),
+    );
+    dispatch(
+      orderAsyncActions.getCompanyOrderNotification(companyIdToQuery as string),
+    );
+    dispatch(
+      orderAsyncActions.getCompanyOrderSummary(companyIdToQuery as string),
+    );
+  }, [dispatch, companyId, currentUserId]);
+
+  return (
+    <div className={css.root}>
+      <CompanyDashboardHeroSection />
+      <div className={css.container}>
+        <div className={css.groupSections}>
+          <OrdersAnalysisSection
+            totalItemMap={totalItemMap}
+            inProgress={queryOrderInProgress}
+          />
+          <NotificationSection
+            inProgress={getCompanyOrderNotificationInProgress}
+            companyOrderNotificationMap={companyOrderNotificationMap}
+          />
+        </div>
+        <div className={css.groupSections}>
+          <ReportSection
+            inProgress={getCompanyOrderSummaryInProgress}
+            companyOrderSummary={companyOrderSummary}
+          />
+          <NewsSection />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CompanyDashboardPage;

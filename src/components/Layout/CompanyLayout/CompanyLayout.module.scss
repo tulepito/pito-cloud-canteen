@@ -1,0 +1,9 @@
+@use '/src/styles/mixins.scss' as *;
+.headerTitle {
+  @include flexAlign(center);
+  gap: 13px;
+}
+
+.headerTitleWrapper {
+  @include flexAlign(center, space-between);
+}

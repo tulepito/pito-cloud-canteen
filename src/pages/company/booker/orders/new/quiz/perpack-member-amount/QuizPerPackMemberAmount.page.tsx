@@ -131,7 +131,10 @@ const QuizPerPackMemberAmountPage = () => {
 
   const onFormSubmitClick = () => {
     handleSubmit();
-    router.push(quizPaths.SpecialDemand);
+    router.push({
+      pathname: quizPaths.SpecialDemand,
+      query: router.query,
+    });
   };
 
   const goBack = () => {

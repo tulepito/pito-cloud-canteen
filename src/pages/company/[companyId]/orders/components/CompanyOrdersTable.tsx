@@ -134,7 +134,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   let currDebounceRef = debounceRef.current;
 
-  const { page = 1, keywords = '', companyId = '' } = query;
+  const { page = 1, keywords = '', companyId = '', defaultTab = '5' } = query;
   const tableData = parseEntitiesToTableData(orders, Number(page));
   const tabItems = prepareTabItems({
     intl,
@@ -192,7 +192,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
         disabled={queryOrderInProgress}
         items={tabItems}
         onChange={handleTabChange}
-        defaultActiveKey={'5'}
+        defaultActiveKey={defaultTab as string}
         className={css.tabContainer}
         headerClassName={css.tabHeader}
         headerWrapperClassName={css.headerWrapper}

@@ -160,6 +160,8 @@ const deadlineTimeOptions = [
 
 const VATPercentage = 0.1;
 
+const marketplacePhoneNumber = '1900 252 530';
+
 const config = {
   env,
   dev,
@@ -183,6 +185,7 @@ const config = {
   usingSSL,
   maps,
   VATPercentage,
+  marketplacePhoneNumber,
 };
 
 export default config;

@@ -3,18 +3,9 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  margin-top: 82px;
-
+  min-height: 80vh;
   &.hasSideBar {
     margin-left: 292px;
     width: calc(100% - 292px);
-  }
-
-  &.hasHeader {
-    margin-top: 130px;
-
-    @include viewportLarge {
-      margin-top: 145px;
-    }
   }
 }

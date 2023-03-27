@@ -43,7 +43,10 @@ const QuizSpecialDemand = () => {
   const { nutritions } = User(selectedCompany).getPublicData();
   const onFormSubmitClick = () => {
     formSubmitRef?.current.submit();
-    router.push(quizPaths.MealStyles);
+    router.push({
+      pathname: quizPaths.MealStyles,
+      query: { ...router.query },
+    });
   };
   const onFormSubmit = (values: TSpecialDemandFormValues) => {
     dispatch(QuizActions.updateQuiz({ ...values }));

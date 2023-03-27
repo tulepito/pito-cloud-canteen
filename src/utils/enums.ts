@@ -901,3 +901,10 @@ export enum EAttributeSetting {
   DAY_SESSIONS = 'daySessions',
   PACKAGING = 'packaging',
 }
+
+export enum ENotificationTypes {
+  draftOrder = 'draftOrder',
+  completedOrder = 'completedOrder',
+  deadlineDueOrder = 'deadlineDueOrder',
+  pickingOrder = 'pickingOrder',
+}

@@ -11,7 +11,6 @@ import css from './FeaturesHeader.module.scss';
 export type FeaturesHeaderProps = {
   headerData: {
     key: string;
-    icon: ReactNode;
     title: ReactNode;
     pathname: string;
     query?: TObject;
@@ -31,7 +30,7 @@ const FeaturesHeader: React.FC<FeaturesHeaderProps> = (props) => {
   return (
     <nav className={css.container}>
       <ul className={css.navWrapper}>
-        {headerData.map(({ key, icon, title, pathname, query }) => {
+        {headerData.map(({ key, title, pathname, query }) => {
           const activeHeaderItemClasses = classNames(css.headerItem, {
             [css.active]: key === activeKey,
           });
@@ -40,7 +39,6 @@ const FeaturesHeader: React.FC<FeaturesHeaderProps> = (props) => {
           return (
             <li key={key}>
               <Link className={activeHeaderItemClasses} href={hrefObject}>
-                {icon}
                 <span className={css.title}>{title}</span>
               </Link>
             </li>

@@ -175,7 +175,7 @@ export const adminRoutes = {
 } as const;
 
 export const companyPaths = {
-  Home: '/company',
+  Home: '/company/[companyId]/dashboard',
   Detail: '/company/[companyId]',
   Account: '/company/[companyId]/account',
   ManageOrders: '/company/[companyId]/orders',

@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
@@ -7,10 +8,10 @@
   flex: 1;
   height: fit-content;
   padding: 20px 16px;
-  position: fixed;
   width: 100%;
   top: 0;
   left: 0;
+
   background-color: $neutralGray1;
   z-index: 101;
 
@@ -24,9 +25,24 @@
   }
 
   .headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 40px;
     .logo {
       width: 68.14px;
       height: 36px;
+    }
+    .headerLinks {
+      display: flex;
+      gap: 24px;
+      .headerLink {
+        color: $neutralGray6;
+        font-weight: $fontWeightBold;
+        font-size: 16px;
+        position: relative;
+        padding: 10px 0;
+        @include linkHover;
+      }
     }
   }
 
@@ -34,6 +50,19 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
+
+    .headerPhoneNumber {
+      font-size: 16px;
+      font-weight: $fontWeightBold;
+      color: $neutralGray6;
+    }
+
+    .separator {
+      margin: 0 28px;
+      width: 1px;
+      height: 32px;
+      background-color: $neutralGray3;
+    }
 
     .profileMenuContent {
       width: 200px;

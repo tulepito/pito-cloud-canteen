@@ -70,7 +70,10 @@ const QuizMealStyles = () => {
   };
   const onFormSubmitClick = () => {
     handleSubmit();
-    router.push(quizPaths.MealDates);
+    router.push({
+      pathname: quizPaths.MealDates,
+      query: { ...router.query },
+    });
   };
 
   useEffect(() => {

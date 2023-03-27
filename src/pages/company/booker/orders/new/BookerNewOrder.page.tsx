@@ -18,7 +18,6 @@ function BookerNewOrderPage() {
   const intl = useIntl();
   const route = useRouter();
   const dispatch = useAppDispatch();
-
   // Local state
   const [isSubmitting, setiIsSubmitting] = useState(false);
 
@@ -52,7 +51,10 @@ function BookerNewOrderPage() {
     try {
       await dispatch(QuizThunks.fetchSelectedCompany(values.company));
       setiIsSubmitting(false);
-      route.push(quizPaths.PerpackMemberAmount);
+      route.push({
+        pathname: quizPaths.PerpackMemberAmount,
+        query: route.query,
+      });
     } catch (error) {
       setiIsSubmitting(false);
       console.error('error', error);

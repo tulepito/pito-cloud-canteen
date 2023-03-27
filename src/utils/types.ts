@@ -12,6 +12,8 @@ import type {
   EErrorCode,
   EImageVariants,
   EListingStates,
+  EManageCompanyOrdersTab,
+  ENotificationTypes,
   EOrderDraftStates,
   EOrderStates,
   EReviewRatings,
@@ -514,4 +516,24 @@ export type TTableSortValue = {
 export type TOrderStateHistory = {
   state: EOrderStates | EOrderDraftStates | EBookerOrderDraftStates;
   updatedAt: number;
+};
+
+export type TOrderStateCountMap = {
+  [EManageCompanyOrdersTab.SCHEDULED]: number;
+  [EManageCompanyOrdersTab.CANCELED]: number;
+  [EManageCompanyOrdersTab.DRAFT]: number;
+  [EManageCompanyOrdersTab.COMPLETED]: number;
+  [EManageCompanyOrdersTab.ALL]: number;
+};
+
+export type TCompanyOrderNoticationMap = {
+  [ENotificationTypes.completedOrder]: TListing | null;
+  [ENotificationTypes.deadlineDueOrder]: TListing | null;
+  [ENotificationTypes.draftOrder]: TListing | null;
+  [ENotificationTypes.pickingOrder]: TListing | null;
+};
+
+export type TCompanyOrderSummary = {
+  totalOrderDishes: number;
+  totalOrderCost: number;
 };

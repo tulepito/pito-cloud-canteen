@@ -5,20 +5,23 @@ import { useRouter } from 'next/router';
 
 import Dropdown from '@components/CompanyLayout/Dropdown/Dropdown';
 import FeatureIcons from '@components/FeatureIcons/FeatureIcons';
-import FeaturesHeader from '@components/FeaturesHeader/FeaturesHeader';
+import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { BookerCompaniesThunks } from '@redux/slices/BookerCompanies.slice';
 import { companyPaths } from '@src/paths';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
-import CompanyHeader from './CompanyHeader/CompanyHeader';
+import CompanyFooter from './CompanyFooter/CompanyFooter';
+import CompanyHeaderWrapper from './CompanyHeaderWrapper/CompanyHeaderWrapper';
 import CompanyMainContent from './CompanyMainContent/CompanyMainContent';
 import CompanySidebar from './CompanySidebar/CompanySidebar';
 import {
   shouldShowFeatureHeader,
   shouldShowSidebar,
 } from './companyLayout.helpers';
+
+import css from './CompanyLayout.module.scss';
 
 const companySettingPaths = [
   companyPaths.Account,
@@ -33,7 +36,6 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const dispatch = useAppDispatch();
   const { companyId } = router.query;
   const { pathname } = router;
-
   const showFeatureHeader = shouldShowFeatureHeader(router.pathname);
   const showSidebar = shouldShowSidebar(pathname);
 
@@ -80,45 +82,39 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const featureHeaderData = [
     {
       key: 'cart',
-      icon: <FeatureIcons.Cart />,
-      title: 'Đặt hàng',
+      title: (
+        <div className={css.headerTitle}>
+          <FeatureIcons.Cart />
+          <span>Đặt hàng</span>
+        </div>
+      ),
       pathname: companyPaths.CreateNewOrder,
     },
     {
       key: 'order',
-      icon: <FeatureIcons.Box />,
-      title: 'Đơn hàng',
+      title: (
+        <div className={css.headerTitle}>
+          <FeatureIcons.Box />
+          <span>Đơn hàng</span>
+        </div>
+      ),
       pathname: companyPaths.ManageOrders,
     },
     {
-      key: 'invoice',
-      icon: <FeatureIcons.Invoice />,
-      title: 'Hoá đơn',
-      pathname: '/',
-    },
-    {
-      key: 'review',
-      icon: <FeatureIcons.Star />,
-      title: 'Đánh giá',
-      pathname: '/',
-    },
-    {
-      key: 'pitoClub',
-      icon: <FeatureIcons.Gift />,
-      title: 'PITO club',
-      pathname: '/',
-    },
-    {
-      key: 'introduce',
-      icon: <FeatureIcons.UserCirclePlus />,
-      title: 'Giới thiệu',
-      pathname: '/',
-    },
-    {
       key: 'account',
-      icon: <FeatureIcons.User />,
       title: (
         <Dropdown
+          customTitle={({ title, onMouseEnter, isDropdownOpen, isMobile }) => (
+            <div onMouseEnter={onMouseEnter} className={css.headerTitleWrapper}>
+              <div className={css.headerTitle}>
+                <FeatureIcons.User />
+                {title}
+              </div>
+              {isMobile && (
+                <IconArrowHead direction={isDropdownOpen ? 'right' : 'down'} />
+              )}
+            </div>
+          )}
           options={accountOptions}
           selectedValue={selectedAccount}
           setSelectedValue={setSelectedAccount}
@@ -130,6 +126,29 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
           : { companyId: 'personal' }),
       },
       pathname: selectedAccount.value ? changePathnameByCompanyId() : pathname,
+    },
+  ];
+
+  const companyHeaderLinkData = [
+    {
+      key: 'partner',
+      path: router.pathname,
+      label: 'Nhà hàng',
+    },
+    {
+      key: 'story',
+      path: router.pathname,
+      label: 'Câu chuyện',
+    },
+    {
+      key: 'pricing',
+      path: router.pathname,
+      label: 'Bảng giá',
+    },
+    {
+      key: 'aboutUs',
+      path: router.pathname,
+      label: 'Về chúng tôi',
     },
   ];
 
@@ -158,16 +177,33 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
         ).getPublicData()?.companyName
       : 'Tài khoản cá nhân';
 
+  useEffect(() => {
+    if (!companyId || companyId === '[companyId]') {
+      router.replace({
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          companyId: 'personal',
+        },
+      });
+    }
+  }, [companyId, router]);
+
   return (
     <>
-      <CompanyHeader showBottomLine={!showFeatureHeader} />
-      {showFeatureHeader && <FeaturesHeader headerData={featureHeaderData} />}
+      <CompanyHeaderWrapper
+        companyId={(selectedAccount?.value as string) || 'personal'}
+        showFeatureHeader={showFeatureHeader}
+        featureHeaderData={featureHeaderData}
+        companyHeaderLinkData={companyHeaderLinkData}
+      />
       {showSidebar && <CompanySidebar companyName={companyName!} />}
       <CompanyMainContent
         hasHeader={showFeatureHeader}
         hasSideBar={showSidebar}>
         {children}
       </CompanyMainContent>
+      <CompanyFooter />
     </>
   );
 };

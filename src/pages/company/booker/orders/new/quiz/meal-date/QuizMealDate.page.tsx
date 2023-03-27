@@ -32,7 +32,7 @@ const QuizMealDate = () => {
   const [formValues, setFormValues] = useState<TMealDateFormValues>(null!);
   const [formInvalid, setFormInvalid] = useState<boolean>(false);
   const submittingErrorControl = useBoolean();
-
+  const { deliveryHour: deliveryHourFromQuery } = router.query;
   useRedirectAfterReloadPage();
   const selectedCompany = useAppSelector(
     (state) => state.Quiz.selectedCompany,
@@ -68,8 +68,9 @@ const QuizMealDate = () => {
       displayedDurationTime: '1',
       durationTime: '1',
       durationTimeMode: 'week',
+      deliveryHour: deliveryHourFromQuery as string,
     }),
-    [],
+    [deliveryHourFromQuery],
   );
   const onFormSubmitClick = async () => {
     creatingOrderModalControl.setTrue();
@@ -106,7 +107,10 @@ const QuizMealDate = () => {
         }),
       );
       if (meta.requestStatus !== 'rejected') {
-        router.push(`/company/booker/orders/draft/${orderId}`);
+        router.push({
+          pathname: `/company/booker/orders/draft/${orderId}`,
+          query: { ...router.query },
+        });
       } else {
         return submittingErrorControl.setFalse();
       }

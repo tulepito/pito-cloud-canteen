@@ -5,7 +5,11 @@ import isString from 'lodash/isString';
 import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
 
-import { companyApi } from '@apis/companyApi';
+import {
+  companyApi,
+  getCompanyNotificationsApi,
+  getCompanyOrderSummaryApi,
+} from '@apis/companyApi';
 import { fetchUserApi } from '@apis/index';
 import type { TUpdateOrderApiBody } from '@apis/orderApi';
 import {
@@ -33,10 +37,18 @@ import { convertWeekDay, renderDateRange } from '@utils/dates';
 import {
   EListingStates,
   EManageCompanyOrdersTab,
+  ENotificationTypes,
   ERestaurantListingStatus,
 } from '@utils/enums';
-import { storableError } from '@utils/errors';
-import type { TListing, TObject, TPagination } from '@utils/types';
+import { storableAxiosError, storableError } from '@utils/errors';
+import type {
+  TCompanyOrderNoticationMap,
+  TCompanyOrderSummary,
+  TListing,
+  TObject,
+  TOrderStateCountMap,
+  TPagination,
+} from '@utils/types';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
 
@@ -85,13 +97,11 @@ type TOrderInitialState = {
   deleteDraftOrderError: any;
   manageOrdersPagination: TPagination;
 
-  totalItemMap: {
-    [EManageCompanyOrdersTab.SCHEDULED]: number;
-    [EManageCompanyOrdersTab.CANCELED]: number;
-    [EManageCompanyOrdersTab.DRAFT]: number;
-    [EManageCompanyOrdersTab.COMPLETED]: number;
-    [EManageCompanyOrdersTab.ALL]: number;
-  };
+  totalItemMap: TOrderStateCountMap;
+
+  companyOrderNotificationMap: TCompanyOrderNoticationMap;
+  getOrderNotificationInProgress: boolean;
+  getOrderNotificationError: any;
 
   restaurantCoverImageList: {
     [restaurantId: string]: any;
@@ -122,6 +132,10 @@ type TOrderInitialState = {
   orderRestaurantList: TListing[];
   fetchOrderRestaurantListInProgress: boolean;
   fetchOrderRestaurantListError: any;
+
+  getCompanyOrderSummaryInProgress: boolean;
+  getCompanyOrderSummaryError: any;
+  companyOrderSummary: TCompanyOrderSummary;
 };
 
 const initialState: TOrderInitialState = {
@@ -179,6 +193,14 @@ const initialState: TOrderInitialState = {
     [EManageCompanyOrdersTab.COMPLETED]: 0,
     [EManageCompanyOrdersTab.ALL]: 0,
   },
+  getOrderNotificationInProgress: false,
+  getOrderNotificationError: null,
+  companyOrderNotificationMap: {
+    [ENotificationTypes.completedOrder]: null,
+    [ENotificationTypes.deadlineDueOrder]: null,
+    [ENotificationTypes.draftOrder]: null,
+    [ENotificationTypes.pickingOrder]: null,
+  },
 
   restaurantCoverImageList: {},
   fetchRestaurantCoverImageInProgress: false,
@@ -200,6 +222,13 @@ const initialState: TOrderInitialState = {
   orderRestaurantList: [],
   fetchOrderRestaurantListInProgress: false,
   fetchOrderRestaurantListError: null,
+
+  getCompanyOrderSummaryInProgress: false,
+  getCompanyOrderSummaryError: null,
+  companyOrderSummary: {
+    totalOrderDishes: 0,
+    totalOrderCost: 0,
+  },
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -218,6 +247,11 @@ const FETCH_NUTRITIONS = 'app/Order/FETCH_NUTRITIONS';
 const CHECK_RESTAURANT_STILL_AVAILABLE =
   'app/Order/CHECK_RESTAURANT_STILL_AVAILABLE';
 const FETCH_ORDER_RESTAURANTS = 'app/Order/FETCH_ORDER_RESTAURANTS';
+
+const GET_COMPANY_ORDER_NOTIFICATIONS =
+  'app/Order/GET_COMPANY_ORDER_NOTIFICATIONS';
+
+const GET_COMPANY_ORDER_SUMMARY = 'app/Order/GET_COMPANY_ORDER_SUMMARY';
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
   const { clientId, bookerId, isCreatedByAdmin = false, generalInfo } = params;
@@ -741,6 +775,30 @@ const fetchOrderRestaurants = createAsyncThunk(
   },
 );
 
+const getCompanyOrderNotification = createAsyncThunk(
+  GET_COMPANY_ORDER_NOTIFICATIONS,
+  async (companyId: string) => {
+    const { data } = await getCompanyNotificationsApi(companyId);
+
+    return data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
+const getCompanyOrderSummary = createAsyncThunk(
+  GET_COMPANY_ORDER_SUMMARY,
+  async (companyId: string) => {
+    const { data } = await getCompanyOrderSummaryApi(companyId);
+
+    return data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -761,6 +819,8 @@ export const orderAsyncActions = {
   fetchNutritions,
   checkRestaurantStillAvailable,
   fetchOrderRestaurants,
+  getCompanyOrderNotification,
+  getCompanyOrderSummary,
 };
 
 const orderSlice = createSlice({
@@ -1178,6 +1238,36 @@ const orderSlice = createSlice({
         ...state,
         fetchOrderRestaurantListInProgress: false,
         fetchOrderRestaurantListError: error.message,
+      }))
+      .addCase(getCompanyOrderNotification.pending, (state) => ({
+        ...state,
+        getCompanyOrderNotificationInProgress: true,
+        getCompanyOrderNotificationError: null,
+      }))
+      .addCase(getCompanyOrderNotification.fulfilled, (state, { payload }) => ({
+        ...state,
+        getCompanyOrderNotificationInProgress: false,
+        companyOrderNotificationMap: payload,
+      }))
+      .addCase(getCompanyOrderNotification.rejected, (state, { error }) => ({
+        ...state,
+        getOrderNotificationError: error,
+        getCompanyOrderNotificationInProgress: false,
+      }))
+      .addCase(getCompanyOrderSummary.pending, (state) => ({
+        ...state,
+        getCompanyOrderSummaryInProgress: true,
+        getCompanyOrderSummaryError: null,
+      }))
+      .addCase(getCompanyOrderSummary.fulfilled, (state, { payload }) => ({
+        ...state,
+        getCompanyOrderSummaryInProgress: false,
+        companyOrderSummary: payload,
+      }))
+      .addCase(getCompanyOrderSummary.rejected, (state, { error }) => ({
+        ...state,
+        getCompanyOrderSummaryError: error,
+        getCompanyOrderSummaryInProgress: false,
       }));
   },
 });
