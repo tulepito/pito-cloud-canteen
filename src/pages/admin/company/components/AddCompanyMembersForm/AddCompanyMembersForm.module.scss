@@ -31,6 +31,7 @@
   .lightButton {
     @include buttonColorSecondary;
     outline: none;
+    width: 260px;
   }
   .submitButton {
     width: 260px;

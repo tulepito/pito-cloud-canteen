@@ -175,7 +175,7 @@ const UpdateCompanyGroupFormComponent: React.FC<
             className={css.submitButton}>
             {intl.formatMessage({ id: 'AddCompanyMembersForm.submitButton' })}
           </Button>
-          <Button onClick={handleCancel} type="button">
+          <Button onClick={closeAddMemberModal} type="button">
             {intl.formatMessage({ id: 'AddCompanyMembersForm.cancelButton' })}
           </Button>
         </div>

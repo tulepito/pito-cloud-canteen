@@ -1,27 +1,70 @@
+import type { NextApiResponse } from 'next';
+
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { User } from '@src/utils/data';
-import type { TObject } from '@src/utils/types';
+import { EImageVariants } from '@src/utils/enums';
+import type { TCompanyMemberWithDetails, TObject } from '@src/utils/types';
 
-const queryMembersByEmail = async (emails: string[], queryParams: TObject) => {
+import queryCompanyMembers from './queryCompanyMembers.service';
+
+const queryMembersByEmail = async ({
+  res,
+  emails,
+  queryParams,
+  companyId,
+}: {
+  res: NextApiResponse;
+  emails: string[];
+  queryParams: TObject;
+  companyId: string;
+}) => {
   const emailsAsArray = Array.isArray(emails) ? emails : [emails];
   const intergrationSdk = getIntegrationSdk();
   const noExistedUsers: string[] = [];
+
+  const companyMembers = await queryCompanyMembers(companyId);
+
   const users = await Promise.all(
     emailsAsArray.map(async (email: string) => {
       try {
         const response = await intergrationSdk.users.show(
-          { email },
+          {
+            email,
+            include: 'profileImage',
+            'fields.image': [
+              `variants.${EImageVariants.squareSmall}`,
+              `variants.${EImageVariants.squareSmall2x}`,
+              `variants.${EImageVariants.scaledLarge}`,
+            ],
+          },
           queryParams,
         );
         const [user] = denormalisedResponseEntities(response);
         const memberIsAdmin = User(user).getMetadata().isAdmin;
         const memberIsPartner = User(user).getMetadata().isPartner;
+        const emailIsExisted = companyMembers.some(
+          (member: TCompanyMemberWithDetails) => member?.email === email,
+        );
+
+        if (emailIsExisted)
+          return res
+            .status(409)
+            .json({ message: `Email ${email} đã được thêm vào công ty.` });
 
         if (memberIsAdmin || memberIsPartner) return null;
 
         return user;
       } catch (error) {
+        const emailIsExisted = companyMembers.some(
+          (member: TCompanyMemberWithDetails) => member?.email === email,
+        );
+        if (emailIsExisted) {
+          return res
+            .status(409)
+            .json({ message: `Email ${email} đã được thêm vào công ty.` });
+        }
+
         noExistedUsers.push(email);
 
         return null;

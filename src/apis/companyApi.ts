@@ -112,14 +112,22 @@ export const companyApi = {
 export const getAllCompanyMembersApi = (companyId: string) =>
   getApi(`/company/all-employees?companyId=${companyId}`);
 
-export const queryMembersByEmailAdminApi = (
-  emails: string[],
-  queryParams?: TObject,
-) => {
-  return getApi(`/admin/users/company/query-new-members-by-email`, {
-    dataParams: { emails },
-    queryParams,
-  });
+export const queryMembersByEmailAdminApi = ({
+  emails,
+  companyId,
+  queryParams,
+}: {
+  emails: string[];
+  companyId: string;
+  queryParams?: TObject;
+}) => {
+  return getApi(
+    `/admin/users/company/${companyId}/query-new-members-by-email`,
+    {
+      dataParams: { emails },
+      queryParams,
+    },
+  );
 };
 
 export const adminAddMembersToCompanyApi = (

@@ -1,6 +1,7 @@
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/sdk';
 import { User } from '@src/utils/data';
+import { EImageVariants } from '@src/utils/enums';
 import type { TUser } from '@src/utils/types';
 
 const queryCompanyMembers = async (companyId: string) => {
@@ -18,6 +19,12 @@ const queryCompanyMembers = async (companyId: string) => {
 
   const existedUserQueryResponse = await intergrationSdk.users.query({
     meta_companyList: companyId,
+    include: 'profileImage',
+    'fields.image': [
+      `variants.${EImageVariants.squareSmall}`,
+      `variants.${EImageVariants.squareSmall2x}`,
+      `variants.${EImageVariants.scaledLarge}`,
+    ],
   });
 
   const nonExistedUsers = Object.keys(members)

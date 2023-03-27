@@ -143,6 +143,7 @@ const EditCompanySettingsInformationFormComponent: React.FC<
     notFoundUsers,
     removeNotFoundUserByEmail,
     setInitialUsers,
+    queryError,
   } = useQueryNewMemberUsers();
   const {
     value: isCreateMemberModalOpen,
@@ -228,12 +229,16 @@ const EditCompanySettingsInformationFormComponent: React.FC<
     JSON.stringify(companyGroups),
   ]);
 
+  const handleQueryNewMembers = (emails: string[]) => {
+    return queryUsersByEmail(emails, companyId as string);
+  };
+
   return (
     <>
       <Form onSubmit={handleSubmit}>
         <div className={css.root}>
           <div className={css.fieldSection}>
-            <h3>
+            <h3 className={css.largeTitle}>
               <FormattedMessage id="EditCompanySettingsInformationForm.logoSettingTitle" />
             </h3>
             <FieldPhotoUpload
@@ -292,9 +297,6 @@ const EditCompanySettingsInformationFormComponent: React.FC<
           </div>
           <div className={css.line}></div>
           <div className={css.fieldSection}>
-            <h3 className={css.largeTitle}>
-              <FormattedMessage id="EditCompanySettingsInformationForm.groupSettingMember" />
-            </h3>
             <div className={css.sectionHeader}>
               <h4 className={css.smallTitle}>
                 <FormattedMessage id="EditCompanySettingsInformationForm.groupList" />
@@ -319,7 +321,7 @@ const EditCompanySettingsInformationFormComponent: React.FC<
           </div>
           <div className={css.line}></div>
           <div className={css.fieldSection}>
-            <h3>
+            <h3 className={css.largeTitle}>
               <FormattedMessage id="EditCompanySettingsInformationForm.mealSettingTitle" />
             </h3>
             <div>
@@ -346,14 +348,14 @@ const EditCompanySettingsInformationFormComponent: React.FC<
           <AddCompanyMembersForm
             onSubmit={handleAddMemberModalSubmit}
             users={users}
-            queryUsersByEmail={queryUsersByEmail}
+            queryUsersByEmail={handleQueryNewMembers}
             queryUserInProgress={queryUsersInProgress}
             removeUserById={removeUserById}
             notFoundUsers={notFoundUsers}
             removeNotFoundUserByEmail={removeNotFoundUserByEmail}
-            handleCancel={closeCreateGroupModal}
+            handleCancel={closeCreateMemberModal}
             inProgress={addMembersInProgress as boolean}
-            formError={addMembersError}
+            formError={addMembersError || queryError}
           />
         )}
       </BackdropModal>

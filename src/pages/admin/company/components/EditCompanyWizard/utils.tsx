@@ -48,7 +48,7 @@ export const createSubmitCreateCompanyValues = (
     password,
     firstName,
     lastName,
-    displayName: `${firstName} ${lastName}`,
+    displayName: `${lastName} ${firstName}`,
     publicData: {
       companyName,
       companyEmail,
@@ -104,7 +104,7 @@ export const createSubmitUpdateCompanyValues = (
       return {
         firstName,
         lastName,
-        displayName: `${firstName} ${lastName}`,
+        displayName: `${lastName} ${firstName}`,
         publicData: {
           phoneNumber,
           companyEmail,
