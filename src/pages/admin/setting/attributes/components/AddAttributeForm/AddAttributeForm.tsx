@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -27,6 +28,7 @@ export type TAddAttributeFormValues = {
 type TExtraProps = {
   inProgress: boolean;
   submitErrorText?: string;
+  setSubmitError?: (error: string) => void;
 };
 type TAddAttributeFormComponentProps =
   FormRenderProps<TAddAttributeFormValues> & Partial<TExtraProps>;
@@ -54,8 +56,21 @@ const ATTRIBUTE_LIST = [
 const AddAttributeFormComponent: React.FC<TAddAttributeFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, values, inProgress, invalid, submitErrorText } = props;
+  const {
+    handleSubmit,
+    values,
+    inProgress,
+    invalid,
+    submitErrorText,
+    setSubmitError,
+  } = props;
   const intl = useIntl();
+
+  useEffect(() => {
+    if (!values?.[values?.attribute]) {
+      setSubmitError?.('');
+    }
+  }, [setSubmitError, values, values?.attribute]);
 
   const inputValueLabel = intl.formatMessage({
     id: `AddAttributeForm.${values?.attribute}.label`,

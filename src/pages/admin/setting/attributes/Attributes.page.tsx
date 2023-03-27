@@ -14,12 +14,22 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import KeywordSearchForm from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { EAttributeSetting } from '@src/utils/enums';
-import { required } from '@src/utils/validators';
+import { toNonAccentVietnamese } from '@src/utils/string';
+import { composeValidators, required } from '@src/utils/validators';
 
 import AddAttributeModal from './components/AddAttributeModal/AddAttributeModal';
 import { AdminAttributesSettingThunks } from './Attributes.slice';
 
 import css from './Attributes.module.scss';
+
+const existedLabel =
+  (attributes: any[], key: string, message: string) => (value: string) => {
+    return attributes.findIndex(
+      (item: any) => item.label === value && item.key !== key,
+    ) !== -1
+      ? message
+      : undefined;
+  };
 
 const AdminAttributesSettingPage = () => {
   const intl = useIntl();
@@ -62,7 +72,7 @@ const AdminAttributesSettingPage = () => {
     (state) => state.AdminAttributesSetting.fetchAttributesInProgress,
   );
 
-  const allAttributes = {
+  const allAttributes: any = {
     mealStyles,
     nutritions,
     daySessions,
@@ -114,7 +124,9 @@ const AdminAttributesSettingPage = () => {
     return tableData.filter((item: any) => {
       const { value } = item.data;
 
-      return value.toLowerCase().includes(keywords.toLowerCase());
+      return toNonAccentVietnamese(value)
+        .toLowerCase()
+        .includes(toNonAccentVietnamese(keywords).toLowerCase());
     });
   };
 
@@ -278,7 +290,14 @@ const AdminAttributesSettingPage = () => {
               id={`${attribute} - ${key}`}
               name={`${attribute} - ${key}`}
               defaultValue={value}
-              validate={required('Vui lòng nhập giá trị')}
+              validate={composeValidators(
+                required('Vui lòng nhập giá trị'),
+                existedLabel(
+                  allAttributes[attribute],
+                  key,
+                  'Giá trị đã tồn tại',
+                ),
+              )}
             />
           ) : (
             <div className={css.attributeName}>{value}</div>
@@ -309,7 +328,13 @@ const AdminAttributesSettingPage = () => {
             if (currentTableFormValue) {
               const { [`${attribute} - ${key}`]: label } =
                 currentTableFormValue;
-              if (label !== value) await onEdit(attribute, key, label);
+              const isLabelExisted =
+                allAttributes[attribute].findIndex(
+                  (item: any) => item.label === label && item.key !== key,
+                ) !== -1;
+
+              if (label !== value && !isLabelExisted)
+                await onEdit(attribute, key, label);
               setOnEditingRow(undefined);
             }
           };
@@ -414,6 +439,7 @@ const AdminAttributesSettingPage = () => {
         onAddAttribute={onAddNew}
         inProgress={updateAttributeInProgress}
         submitErrorText={submitError}
+        setSubmitError={setSubmitError}
         activeTab={activeTab}
       />
       <ConfirmationModal
