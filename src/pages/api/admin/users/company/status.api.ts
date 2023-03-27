@@ -8,13 +8,13 @@ import { getIntegrationSdk } from '@services/sdk';
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const { dataParams, queryParams = {} } = req.body;
 
-  const { id, status } = dataParams;
+  const { id, userState } = dataParams;
   const integrationSdk = getIntegrationSdk();
   const response = await integrationSdk.users.updateProfile(
     {
       id,
       metadata: {
-        status,
+        userState,
       },
     },
     queryParams,

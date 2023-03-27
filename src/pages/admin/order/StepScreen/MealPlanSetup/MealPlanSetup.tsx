@@ -59,7 +59,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   } = Listing(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const companies = useAppSelector(
-    (state) => state.ManageCompaniesPage.companyRefs,
+    (state) => state.company.companyRefs,
     shallowEqual,
   );
   const currentClient = companies.find(

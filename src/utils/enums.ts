@@ -105,6 +105,7 @@ export enum ECompanyStatus {
 export enum ECompanyStates {
   draft = 'draft',
   published = 'published',
+  unactive = 'unactive',
 }
 
 export enum EListingType {

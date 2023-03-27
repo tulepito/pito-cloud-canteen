@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 
 import { useAppDispatch } from '@hooks/reduxHooks';
-import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
+import { companyThunks } from '@redux/slices/company.slice';
 
 const PersonalAccountPage = () => {
   const dispatch = useAppDispatch();
   useEffect(() => {
-    dispatch(manageCompaniesThunks.queryCompanies());
+    dispatch(companyThunks.adminQueryCompanies({}));
   }, [dispatch]);
 
   return <div></div>;

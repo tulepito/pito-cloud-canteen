@@ -102,7 +102,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   } = Listing(order as TListing).getMetadata();
   const { title: orderTitle } = Listing(order as TListing).getAttributes();
   const companies = useAppSelector(
-    (state) => state.ManageCompaniesPage.companyRefs,
+    (state) => state.company.companyRefs,
     shallowEqual,
   );
   const selectedDate = useAppSelector(

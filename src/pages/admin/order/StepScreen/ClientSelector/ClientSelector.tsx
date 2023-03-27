@@ -7,10 +7,7 @@ import { useRouter } from 'next/router';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import {
-  manageCompaniesThunks,
-  paginateCompanies,
-} from '@redux/slices/ManageCompaniesPage.slice';
+import { companyThunks, paginateCompanies } from '@redux/slices/company.slice';
 import { orderAsyncActions, removeBookerList } from '@redux/slices/Order.slice';
 import type { TUpdateStatus } from '@src/pages/admin/company/helpers';
 import {
@@ -21,6 +18,7 @@ import {
 } from '@src/pages/admin/company/helpers';
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { adminPaths } from '@src/paths';
+import { ECompanyStates } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 
 import ClientTable from '../../create/components/ClientTable/ClientTable';
@@ -41,9 +39,10 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   const { value: isSortAZ, toggle: toggleSort } = useBoolean(true);
   const dispatch = useAppDispatch();
   const { companyRefs, totalItems } = useAppSelector(
-    (state) => state.ManageCompaniesPage,
+    (state) => state.company,
     shallowEqual,
   );
+
   const [totalItemsPagination, setTotalItemsPagination] =
     useState<number>(totalItems);
 
@@ -68,7 +67,13 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   } = useBoolean(!!createOrderError);
 
   useEffect(() => {
-    dispatch(manageCompaniesThunks.queryCompanies());
+    dispatch(
+      companyThunks.adminQueryCompanies({
+        queryParams: {
+          meta_userState: ECompanyStates.published,
+        },
+      }),
+    );
     dispatch(removeBookerList());
   }, [dispatch]);
 
@@ -83,7 +88,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
 
   const updateStatus = useCallback((updateData: TUpdateStatus) => {
     dispatch(
-      manageCompaniesThunks.updateCompanyStatus({
+      companyThunks.adminUpdateCompanyState({
         dataParams: updateData,
         queryParams: { expand: true },
       }),

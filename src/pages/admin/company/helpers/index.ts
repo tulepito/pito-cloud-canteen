@@ -1,12 +1,12 @@
-import type { TCompanyMembers } from '@redux/slices/ManageCompaniesPage.slice';
+import type { TCompanyMembersByCompanyId } from '@redux/slices/companyMember.slice';
 import { User } from '@utils/data';
-import { ECompanyStatus } from '@utils/enums';
+import { ECompanyStates } from '@utils/enums';
 import { removeAccents } from '@utils/string';
 import type { TCompany } from '@utils/types';
 
 export type TUpdateStatus = {
   id: string;
-  status: ECompanyStatus;
+  userState: ECompanyStates;
 };
 
 type TExtraDataMapToCompanyTable = {
@@ -61,24 +61,25 @@ export const filterCompaniesByCompanyName = (
 export const parseEntitiesToTableData = (
   companies: TCompany[],
   extraData: TExtraDataMapToCompanyTable,
-  companyMembers?: TCompanyMembers | null,
+  companyMembers?: TCompanyMembersByCompanyId | null,
 ) => {
   return companies.map((company) => {
     const { profile = {}, email } = company.attributes || {};
     const { displayName, publicData = {}, metadata = {} } = profile as any;
-    const { status } = metadata;
+    const { userState } = metadata;
     const { location = {}, companyName, phoneNumber } = publicData;
 
     return {
       key: company.id.uuid,
       data: {
+        userState,
+        isDraft: userState === ECompanyStates.draft,
         id: company.id.uuid,
         displayName,
         phoneNumber,
         email,
         companyName,
         address: location?.address,
-        status: status || ECompanyStatus.unactive,
         ...(companyMembers ? { members: companyMembers[company.id.uuid] } : {}),
         ...extraData,
       },
