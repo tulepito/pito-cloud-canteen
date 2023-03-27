@@ -17,7 +17,7 @@ type ParticipantSetupFieldProps = {
 const ParticipantSetupField: React.FC<ParticipantSetupFieldProps> = (props) => {
   const { clientId, title, form } = props;
   const companies = useAppSelector(
-    (state) => state.ManageCompaniesPage.companyRefs,
+    (state) => state.company.companyRefs,
     shallowEqual,
   );
   const currentClient = companies.find(

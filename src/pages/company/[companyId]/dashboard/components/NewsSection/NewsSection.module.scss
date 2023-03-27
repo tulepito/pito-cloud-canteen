@@ -23,6 +23,9 @@
       position: absolute;
       top: -50px;
       right: 0px;
+      @include viewportLarge {
+        top: -20px;
+      }
       .icon {
         width: 180.2px;
       }

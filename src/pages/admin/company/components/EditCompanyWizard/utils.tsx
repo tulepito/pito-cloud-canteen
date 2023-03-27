@@ -159,6 +159,9 @@ export const createSubmitUpdateCompanyValues = (
         case COMPANY_SETTING_PAYMENT_TAB_ID: {
           return {
             privateData: { bankAccounts, paymentDueDays },
+            metadata: {
+              userState: ECompanyStates.published,
+            },
           };
         }
         case COMPANY_SETTING_SUBSCRIPTION_TAB_ID: {

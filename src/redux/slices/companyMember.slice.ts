@@ -10,12 +10,17 @@ import {
   checkEmailExistedApi,
   deleteMemberApi,
 } from '@apis/companyApi';
-import { queryCompanyMembersApi } from '@apis/index';
+import {
+  getCompanyMembersDetailsApi,
+  queryCompanyMembersApi,
+} from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { storableAxiosError } from '@utils/errors';
 import type { TUser } from '@utils/types';
 
 import { companySlice, companyThunks } from './company.slice';
+
+export type TCompanyMembersByCompanyId = Record<string, TUser[]>;
 
 export type TAddMembersToCompanyParams = {
   companyId: string;
@@ -39,6 +44,10 @@ interface TCompanyMemberState {
 
   updatingMemberPermissionEmail: string | null;
   updateMemberPermissionError: any;
+
+  companyMembersByCompanyId: TCompanyMembersByCompanyId | null;
+  getCompanyMembersByCompanyIdInProgress: boolean;
+  getCompanyMembersByCompanyIdError: any;
 }
 
 const initialState: TCompanyMemberState = {
@@ -58,6 +67,10 @@ const initialState: TCompanyMemberState = {
 
   updatingMemberPermissionEmail: null,
   updateMemberPermissionError: null,
+
+  companyMembersByCompanyId: null,
+  getCompanyMembersByCompanyIdInProgress: false,
+  getCompanyMembersByCompanyIdError: null,
 };
 
 const CHECK_EMAILS_EXISTED = 'app/companyMember/CHECK_EMAILS_EXISTED';
@@ -69,6 +82,9 @@ const ADMIN_DELETE_MEMBER = 'app/companyMember/ADMIN_DELETE_MEMBER';
 const ADMIN_ADD_MEMBERS = 'app/companyMember/ADMIN_ADD_MEMBERS';
 const ADMIN_UPDATE_MEMBER_PERMISSION =
   'app/companyMember/ADMIN_UPDATE_MEMBER_PERMISSION';
+
+const GET_COMPANY_MEMBERS_BY_COMPANY_IDS =
+  'app/companyMember/GET_COMPANY_MEMBERS_BY_COMPANY_IDS';
 
 const queryCompanyMembers = createAsyncThunk(
   QUERY_COMPANY_MEMBERS,
@@ -174,6 +190,32 @@ const adminUpdateMemberPermission = createAsyncThunk(
   { serializeError: storableAxiosError },
 );
 
+const getCompanyMemberByCompanyIds = createAsyncThunk(
+  GET_COMPANY_MEMBERS_BY_COMPANY_IDS,
+  async (ids: string[], { fulfillWithValue }) => {
+    let allMembers: TCompanyMembersByCompanyId = {};
+    await Promise.all(
+      ids.map(async (id: string) => {
+        if (!allMembers[id]) {
+          allMembers[id] = [];
+        }
+        const { data: members = [] } = await getCompanyMembersDetailsApi(id);
+        allMembers = {
+          ...allMembers,
+          [id]: [...allMembers[id], ...members],
+        };
+
+        return allMembers;
+      }),
+    );
+
+    return fulfillWithValue(allMembers);
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
 export const companyMemberThunks = {
   addMembers,
   deleteMember,
@@ -182,6 +224,7 @@ export const companyMemberThunks = {
   adminAddMembers,
   adminDeleteMember,
   adminUpdateMemberPermission,
+  getCompanyMemberByCompanyIds,
 };
 
 export const companyMemberSlice = createSlice({
@@ -297,6 +340,24 @@ export const companyMemberSlice = createSlice({
         ...state,
         updatingMemberPermissionEmail: null,
         updateMemberPermissionError: error,
+      }))
+      .addCase(getCompanyMemberByCompanyIds.pending, (state) => ({
+        ...state,
+        getCompanyMembersByCompanyIdInProgress: true,
+        getCompanyMembersByCompanyIdError: null,
+      }))
+      .addCase(
+        getCompanyMemberByCompanyIds.fulfilled,
+        (state, { payload }) => ({
+          ...state,
+          companyMembersByCompanyId: payload,
+          getCompanyMembersByCompanyIdInProgress: false,
+        }),
+      )
+      .addCase(getCompanyMemberByCompanyIds.rejected, (state, { error }) => ({
+        ...state,
+        getCompanyMembersByCompanyIdInProgress: false,
+        getCompanyMembersByCompanyIdError: error,
       }));
   },
 });

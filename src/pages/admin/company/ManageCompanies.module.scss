@@ -201,3 +201,13 @@
 .row {
   max-width: 200px;
 }
+
+.draftBox {
+  padding: 3px 5px;
+  display: inline-flex;
+  background-color: $labelOrange1;
+  color: $labelOrange2;
+  font-size: 12px;
+  border-radius: 4px;
+  margin-left: 5px;
+}

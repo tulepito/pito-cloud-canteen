@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk, getSdk } from '@services/sdk';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
-import { ECompanyStates, ECompanyStatus } from '@src/utils/enums';
+import { ECompanyStates } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 const createCompany = async ({
@@ -60,7 +60,6 @@ const createCompany = async ({
         metadata: {
           id: companyAccount.id.uuid,
           isCompany: true,
-          status: ECompanyStatus.active,
           members,
           companyList: [companyAccount.id.uuid],
           userState: ECompanyStates.draft,

@@ -57,7 +57,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
   const [selectedBookerId, setSelectedBookerId] = useState<string>('');
   const shouldShowPagination = page && data?.length > 0;
   const queryCompaniesInProgress = useAppSelector(
-    (state) => state.ManageCompaniesPage.queryCompaniesInProgress,
+    (state) => state.company.queryCompaniesInProgress,
   );
   const renderTableRowFn = (tableData: any, form: any) => {
     return tableData.map(({ key, data: itemData }: any, index: number) => {

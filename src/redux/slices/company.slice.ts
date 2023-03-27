@@ -26,13 +26,21 @@ import {
 import {
   adminUpdateCompanyApi,
   createCompanyApi,
+  getCompaniesAdminApi,
   showCompanyApi,
+  updateCompanyStatusApi,
 } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import { storableAxiosError, storableError } from '@utils/errors';
-import type { TImage, TObject, TUser } from '@utils/types';
+import type {
+  TCompany,
+  TImage,
+  TObject,
+  TPagination,
+  TUser,
+} from '@utils/types';
 
 import { companyMemberThunks } from './companyMember.slice';
 import { userThunks } from './user.slice';
@@ -95,6 +103,15 @@ type TCompanyState = {
 
   transferCompanyOwnerInProgress: boolean;
   transferCompanyOwnerError: any;
+
+  companyRefs: any[];
+  queryCompaniesInProgress: boolean;
+  queryCompaniesError: any;
+  pagination?: TPagination | null;
+  totalItems: number;
+
+  adminUpdateCompanyStateInProgress: boolean;
+  adminUpdateCompanyStateError: any;
 };
 
 // ================ Thunk types ================ //
@@ -115,6 +132,10 @@ const ADMIN_DELETE_GROUP = 'app/Company/ADMIN_DELETE_GROUP';
 const ADMIN_CREATE_GROUP = 'app/Company/ADMIN_CREATE_GROUP';
 const ADMIN_UPDATE_GROUP = 'app/Company/ADMIN_UPDATE_GROUP';
 const ADMIN_TRANSFER_COMPANY_OWNER = 'app/Company/ADMIN_TRANSFER_COMPANY_OWNER';
+
+const ADMIN_QUERY_COMPANIES = 'app/ManageCompanies/ADMIN_QUERY_COMPANIES';
+const ADMIN_UPDATE_COMPANY_STATE =
+  'app/ManageCompanies/ADMIN_UPDATE_COMPANY_STATE';
 
 const initialState: TCompanyState = {
   groupList: [],
@@ -159,6 +180,12 @@ const initialState: TCompanyState = {
 
   transferCompanyOwnerInProgress: false,
   transferCompanyOwnerError: null,
+  companyRefs: [],
+  queryCompaniesInProgress: false,
+  queryCompaniesError: undefined,
+  adminUpdateCompanyStateInProgress: false,
+  adminUpdateCompanyStateError: undefined,
+  totalItems: 0,
 };
 
 const requestUploadCompanyLogo = createAsyncThunk(
@@ -535,6 +562,40 @@ const adminTransferCompanyOwner = createAsyncThunk(
   },
 );
 
+const adminQueryCompanies = createAsyncThunk(
+  ADMIN_QUERY_COMPANIES,
+  async (
+    { queryParams, page }: { queryParams?: TObject; page?: number },
+    { fulfillWithValue, rejectWithValue },
+  ) => {
+    try {
+      const { data: companies } = await getCompaniesAdminApi(queryParams);
+
+      return fulfillWithValue({ companies, page });
+    } catch (error: any) {
+      console.error('Query company error : ', error);
+
+      return rejectWithValue(storableError(error.response.data));
+    }
+  },
+);
+
+const adminUpdateCompanyState = createAsyncThunk(
+  ADMIN_UPDATE_COMPANY_STATE,
+  async (updateData: any, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      const { data } = await updateCompanyStatusApi(updateData);
+      const [company] = denormalisedResponseEntities(data);
+
+      return fulfillWithValue(company);
+    } catch (error: any) {
+      console.error('Update company status error : ', error);
+
+      return rejectWithValue(storableError(error.response.data));
+    }
+  },
+);
+
 export const companyThunks = {
   companyInfo,
   groupInfo,
@@ -552,6 +613,8 @@ export const companyThunks = {
   adminUpdateGroup,
   adminDeleteGroup,
   adminTransferCompanyOwner,
+  adminQueryCompanies,
+  adminUpdateCompanyState,
 };
 
 export const companySlice = createSlice({
@@ -582,6 +645,19 @@ export const companySlice = createSlice({
     resetCompanySliceStates: () => ({
       ...initialState,
     }),
+    paginateCompanies: (state, action) => {
+      const { page, totalItems, perPage = 10 } = action.payload;
+
+      return {
+        ...state,
+        pagination: {
+          totalItems,
+          totalPages: Math.ceil(totalItems / perPage),
+          perPage,
+          page,
+        },
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -927,11 +1003,59 @@ export const companySlice = createSlice({
           transferCompanyOwnerInProgress: false,
           transferCompanyOwnerError: error,
         };
-      });
+      })
+      .addCase(adminUpdateCompanyState.pending, (state) => ({
+        ...state,
+        adminUpdateCompanyStateInProgress: true,
+        adminUpdateCompanyStateError: null,
+      }))
+      .addCase(adminUpdateCompanyState.fulfilled, (state, action) => {
+        const { companyRefs } = state;
+        const companies = [...companyRefs];
+        const newCompany = action.payload;
+        const index = companyRefs.findIndex((company: TCompany) => {
+          return company.id.uuid === newCompany.id.uuid;
+        });
+        companies[index] = newCompany;
+
+        return {
+          ...state,
+          companyRefs: companies,
+          adminUpdateCompanyStateInProgress: false,
+        };
+      })
+      .addCase(adminUpdateCompanyState.rejected, (state, { error }) => ({
+        ...state,
+        adminUpdateCompanyStateInProgress: false,
+        adminUpdateCompanyStateError: error,
+      }))
+      .addCase(adminQueryCompanies.pending, (state) => ({
+        ...state,
+        queryCompaniesInProgress: true,
+        queryCompaniesError: null,
+      }))
+      .addCase(adminQueryCompanies.fulfilled, (state, action) => {
+        const { companies } = action.payload;
+
+        return {
+          ...state,
+          companyRefs: companies,
+          queryCompaniesInProgress: false,
+          totalItems: companies.length,
+        };
+      })
+      .addCase(adminQueryCompanies.rejected, (state, action) => ({
+        ...state,
+        queryCompaniesError: action.payload,
+        queryCompaniesInProgress: false,
+      }));
   },
 });
 
-export const { addWorkspaceCompanyId, resetCompanySliceStates } =
-  companySlice.actions;
+export const {
+  addWorkspaceCompanyId,
+  resetCompanySliceStates,
+  paginateCompanies,
+} = companySlice.actions;
 
 export default companySlice.reducer;

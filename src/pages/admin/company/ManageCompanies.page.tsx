@@ -17,9 +17,9 @@ import { TableForm } from '@components/Table/Table';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { manageCompaniesThunks } from '@redux/slices/ManageCompaniesPage.slice';
+import { companyThunks } from '@redux/slices/company.slice';
 import { adminRoutes } from '@src/paths';
-import { ECompanyStatus } from '@utils/enums';
+import { ECompanyStates } from '@utils/enums';
 
 import KeywordSearchForm from '../partner/components/KeywordSearchForm/KeywordSearchForm';
 
@@ -36,12 +36,17 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'name',
     label: 'Tên công ty',
-    render: ({ id, companyName }: any) => {
+    render: ({ id, companyName, isDraft }: any) => {
       return (
         <NamedLink
           path={`${adminRoutes.ManageCompanies.path}/${id}`}
           className={css.boldTextRow}>
           {companyName}
+          {isDraft && (
+            <div className={css.draftBox}>
+              <FormattedMessage id="ManagePartnersPage.draftState" />
+            </div>
+          )}
         </NamedLink>
       );
     },
@@ -71,8 +76,8 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'status',
     label: 'Trạng thái',
-    render: (data: any) => {
-      const isActive = data.status === ECompanyStatus.active;
+    render: ({ userState }: any) => {
+      const isActive = userState === ECompanyStates.published;
       const label = isActive ? 'Đã active' : 'Chưa active';
       const badgeType = isActive ? EBadgeType.success : EBadgeType.default;
 
@@ -91,34 +96,38 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'action',
     label: '',
-    render: (data: any) => {
+    render: ({ updateStatus, id, userState, isDraft }: any) => {
       const onClick = (checked: boolean) => {
-        const status = checked
-          ? ECompanyStatus.active
-          : ECompanyStatus.unactive;
+        const newUserState = checked
+          ? ECompanyStates.published
+          : ECompanyStates.unactive;
+
         const updateData = {
-          id: data.id,
-          status,
+          id,
+          userState: newUserState,
         };
-        data.updateStatus(updateData);
+
+        return updateStatus(updateData);
       };
 
       return (
         <div className={css.tableActions}>
-          <Link href={`/admin/company/${data.id}/edit`}>
+          <Link href={`/admin/company/${id}/edit`}>
             <Button
               variant="inline"
               className={classNames(css.actionButton, css.editButton)}>
               <IconEdit className={css.icon} />
             </Button>
           </Link>
-          <ToggleButton
-            name={data.id}
-            className={css.toggleButton}
-            id={data.id}
-            onClick={onClick}
-            defaultValue={data.status === ECompanyStatus.active}
-          />
+          {!isDraft && (
+            <ToggleButton
+              name={id}
+              className={css.toggleButton}
+              id={id}
+              onClick={onClick}
+              defaultValue={userState === ECompanyStates.published}
+            />
+          )}
         </div>
       );
     },
@@ -138,12 +147,13 @@ export default function ManageCompanies() {
     id: 'ManageCompanies.title',
   });
 
-  const {
-    companyRefs,
-    queryCompaniesInProgress,
-    queryCompaniesError,
-    companyMembers,
-  } = useAppSelector((state) => state.ManageCompaniesPage, shallowEqual);
+  const { companyRefs, queryCompaniesInProgress, queryCompaniesError } =
+    useAppSelector((state) => state.company, shallowEqual);
+
+  const { companyMembersByCompanyId } = useAppSelector(
+    (state) => state.companyMember,
+    shallowEqual,
+  );
 
   const dispatch = useAppDispatch();
   const { keywords } = queryParams;
@@ -166,7 +176,7 @@ export default function ManageCompanies() {
 
   const updateStatus = useCallback((updateData: TUpdateStatus) => {
     dispatch(
-      manageCompaniesThunks.updateCompanyStatus({
+      companyThunks.adminUpdateCompanyState({
         dataParams: updateData,
         queryParams: { expand: true },
       }),
@@ -180,32 +190,21 @@ export default function ManageCompanies() {
         {
           updateStatus,
         },
-        companyMembers,
+        companyMembersByCompanyId,
       ),
-    [slicesCompanies, updateStatus, JSON.stringify(companyMembers)],
+    [slicesCompanies, updateStatus, JSON.stringify(companyMembersByCompanyId)],
   );
 
   useEffect(() => {
     if (!!page && !mounted) {
       dispatch(
-        manageCompaniesThunks.queryCompanies(parseInt(page as string, 10)),
+        companyThunks.adminQueryCompanies({
+          page: parseInt(page as string, 10),
+        }),
       );
       setMounted(true);
     }
   }, [page, mounted]);
-
-  const companyIdsToGetMemberDetails = slicesCompanies.map(
-    (company) => company.id.uuid,
-  );
-
-  useEffect(() => {
-    if (companyIdsToGetMemberDetails.length === 0) return;
-    dispatch(
-      manageCompaniesThunks.getCompanyMemberDetails(
-        companyIdsToGetMemberDetails,
-      ),
-    );
-  }, [JSON.stringify(companyIdsToGetMemberDetails)]);
 
   const onSearchKeyword = (values: any) => {
     router.push({

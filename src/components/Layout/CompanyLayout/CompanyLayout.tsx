@@ -98,6 +98,11 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
           <span>Đơn hàng</span>
         </div>
       ),
+      query: {
+        ...(selectedAccount.value
+          ? { companyId: selectedAccount.value }
+          : { companyId: 'personal' }),
+      },
       pathname: companyPaths.ManageOrders,
     },
     {

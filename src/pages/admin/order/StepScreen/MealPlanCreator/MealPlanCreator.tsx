@@ -39,7 +39,7 @@ const MealPlanCreator: React.FC<MealPlanCreatorProps> = () => {
   } = useAppSelector((state) => state.Order, shallowEqual);
   const { address } = deliveryAddress || {};
   const companies = useAppSelector(
-    (state) => state.ManageCompaniesPage.companyRefs,
+    (state) => state.company.companyRefs,
     shallowEqual,
   );
   const currentClient = companies.find(
