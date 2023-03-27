@@ -13,7 +13,7 @@
 }
 
 .boldText {
-  font-weight: $fontWeightBold;
+  font-weight: $fontWeightSemiBold;
 }
 
 .removeContent {
@@ -35,4 +35,8 @@
   @include inputStyles;
   width: 100%;
   margin: 20px 0 0 0;
+}
+
+.tableBodyCell > * {
+  font-size: 16px;
 }

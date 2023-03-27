@@ -132,7 +132,11 @@ const ManageCompanyGroupsTable: React.FC<TManageCompanyGroupsTable> = (
 
   return (
     <div className={css.root}>
-      <Table columns={TABLE_COLUMN} data={tableData} />
+      <Table
+        columns={TABLE_COLUMN}
+        data={tableData}
+        tableBodyCellClassName={css.tableBodyCell}
+      />
       <AlertModal
         onConfirm={handleRemoveGroup}
         isOpen={!!groupToRemove}
