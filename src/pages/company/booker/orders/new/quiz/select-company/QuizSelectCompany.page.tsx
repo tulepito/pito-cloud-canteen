@@ -24,7 +24,7 @@ const QuizSelectCompany = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const companyList = useAppSelector(
-    (state) => state.ManageCompaniesPage.companyRefs,
+    (state) => state.company.companyRefs,
     shallowEqual,
   );
   const currentUser = useAppSelector(

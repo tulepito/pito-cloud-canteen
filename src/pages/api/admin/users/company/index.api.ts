@@ -6,10 +6,14 @@ import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+  const { JSONParams } = req.query;
+  const { queryParams = {} } = JSON.parse(JSONParams as string);
+
   try {
     const response = (await queryAllUsers({
       query: {
         meta_isCompany: true,
+        ...queryParams,
         include: ['profileImage'],
         'fields.image': ['variants.square-small', 'variants.square-small2x'],
       },

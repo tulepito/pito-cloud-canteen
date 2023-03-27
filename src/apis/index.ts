@@ -3,7 +3,8 @@ import type { TObject } from '@utils/types';
 import { getApi, postApi, putApi } from './configs';
 
 export const getCompaniesApi = () => getApi('/users/my-companies');
-export const getCompaniesAdminApi = () => getApi('/admin/users/company');
+export const getCompaniesAdminApi = (queryParams?: TObject) =>
+  getApi('/admin/users/company', { queryParams });
 
 export const getCompanyMembersDetailsApi = (
   id: string,
