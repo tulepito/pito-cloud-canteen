@@ -1,0 +1,70 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.feeRow {
+  @include flexAlign(center, space-between);
+  margin-top: 8px;
+  gap: 20px;
+
+  .feeLabel {
+    @include textTemplate(14px, $fontWeightRegular, 20px);
+  }
+
+  .input {
+    width: 80px;
+
+    input {
+      padding: 4px 8px;
+    }
+  }
+
+  .percentageIcon {
+    border-left: 1px solid $neutralGray4;
+    padding: 0 8px;
+    color: $neutralGray4;
+    font-size: 14px;
+  }
+
+  .price {
+    height: 32px;
+    border: 1px solid $neutralGray4;
+    border-radius: 8px;
+    @include flexAlign(center);
+    padding-left: 8px;
+    color: $neutralGray5;
+
+    &.vnd {
+      position: relative;
+      padding-right: 32px;
+
+      &::after {
+        content: 'đ';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 14px;
+        color: $neutralGray5;
+        padding: 0 8px;
+        border-left: 1px solid $neutralGray5;
+      }
+    }
+
+    &.percentage {
+      position: relative;
+      padding-right: 38px;
+
+      &::after {
+        content: '%';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 14px;
+        color: $neutralGray5;
+        padding: 0 8px;
+        border-left: 1px solid $neutralGray5;
+      }
+    }
+  }
+}
