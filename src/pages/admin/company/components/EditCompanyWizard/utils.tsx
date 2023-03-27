@@ -35,13 +35,14 @@ export const createSubmitCreateCompanyValues = (
     note,
     tax,
   } = values;
-  const {
-    selectedPlace: { address, origin },
-  } = location || { selectedPlace: { origin: {} } };
+  const { selectedPlace } = location;
 
-  const {
-    selectedPlace: { address: companyAddress, origin: companyOrigin },
-  } = companyLocation || { selectedPlace: { origin: {} } };
+  const address = selectedPlace?.address;
+  const origin = selectedPlace?.origin || {};
+
+  const { selectedPlace: companySelectedPlace } = companyLocation;
+  const companyAddress = companySelectedPlace?.address;
+  const companyOrigin = companySelectedPlace?.origin || {};
 
   return {
     email,
@@ -94,13 +95,14 @@ export const createSubmitUpdateCompanyValues = (
         note,
         tax,
       } = values;
-      const {
-        selectedPlace: { address, origin },
-      } = location || { selectedPlace: { origin: {} } };
+      const { selectedPlace } = location;
 
-      const {
-        selectedPlace: { address: companyAddress, origin: companyOrigin },
-      } = companyLocation || { selectedPlace: { origin: {} } };
+      const address = selectedPlace?.address;
+      const origin = selectedPlace?.origin || {};
+
+      const { selectedPlace: companySelectedPlace } = companyLocation;
+      const companyAddress = companySelectedPlace?.address;
+      const companyOrigin = companySelectedPlace?.origin || {};
 
       return {
         firstName,
