@@ -140,13 +140,12 @@ export const queryMembersByEmailAdminApi = ({
 
 export const adminAddMembersToCompanyApi = (
   companyId: string,
-  dataParams?: TObject,
-  queryParams?: TObject,
+  dataParams?: {
+    userIdList: string[];
+    noAccountEmailList: string[];
+  },
 ) => {
-  return postApi(`/admin/users/company/${companyId}/members/add`, {
-    dataParams,
-    queryParams,
-  });
+  return postApi(`/admin/users/company/${companyId}/members/add`, dataParams);
 };
 
 export const adminDeleteGroupApi = ({
