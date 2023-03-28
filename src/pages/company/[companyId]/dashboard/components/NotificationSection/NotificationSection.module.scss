@@ -1,11 +1,28 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
-
+@use '/src/styles/customMediaQueries.scss' as *;
 .root {
-  .title {
-    font-size: 18px;
+  .titleWrapper {
+    display: flex;
     margin: 0 0 14px 0;
+
+    justify-content: space-between;
+    .title {
+      font-size: 18px;
+      text-transform: capitalize;
+      margin: 0;
+      @include viewportMedium {
+        font-size: 20px;
+      }
+    }
+    .seeAll {
+      font-weight: $fontWeightBold;
+      margin: 0;
+      font-size: 14px;
+      color: $neutralGray6;
+    }
   }
+
   .loadingContainer {
     display: flex;
     flex-direction: column;

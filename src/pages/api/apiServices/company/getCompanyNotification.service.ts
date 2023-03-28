@@ -2,7 +2,6 @@ import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { minusDays } from '@src/utils/dates';
 import {
-  EBookerOrderDraftStates,
   ENotificationTypes,
   EOrderDraftStates,
   EOrderStates,
@@ -25,10 +24,7 @@ const ORDER_QUERY_PARAMS_BY_NOTIFICATION_TYPE = {
     sort: 'createdAt',
   },
   [ENotificationTypes.draftOrder]: {
-    meta_orderState: `has_any:${[
-      EOrderDraftStates.pendingApproval,
-      EBookerOrderDraftStates.bookerDraft,
-    ].join(',')}`,
+    meta_orderState: EOrderDraftStates.pendingApproval,
     sort: 'createdAt',
   },
   [ENotificationTypes.deadlineDueOrder]: {

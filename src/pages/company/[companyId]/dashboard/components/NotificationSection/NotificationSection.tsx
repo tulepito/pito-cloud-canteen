@@ -7,6 +7,7 @@ import IconCheckStatus from '@components/Icons/IconCheckStatus/IconCheckStatus';
 import IconReviewStar from '@components/Icons/IconReviewStar/IconReviewStar';
 import IconSharing from '@components/Icons/IconSharing/IconSharing';
 import IconTimer from '@components/Icons/IconTimer/IconTimer';
+import NamedLink from '@components/NamedLink/NamedLink';
 import { Listing } from '@src/utils/data';
 import { timeAgo } from '@src/utils/dates';
 import { ENotificationTypes } from '@src/utils/enums';
@@ -110,17 +111,38 @@ const NotificationSection: React.FC<TNotificationSectionProps> = (props) => {
     companyOrderNotificationMap,
   ) as unknown as TCompanyOrderNotification[];
   const router = useRouter();
-  const onNotificationClick = (order: TListing) => () => {
+  const { companyId } = router.query;
+  const onNotificationClick = (item: TCompanyOrderNotification) => () => {
+    const { order, key } = item;
+    if (
+      key === ENotificationTypes.deadlineDueOrder ||
+      key === ENotificationTypes.pickingOrder
+    ) {
+      return router.push({
+        pathname: `/company/orders/${order?.id?.uuid}/picking`,
+      });
+    }
+    if (key === ENotificationTypes.draftOrder) {
+      return router.push({
+        pathname: `/company/booker/orders/draft/${order?.id?.uuid}`,
+      });
+    }
+
     return router.push({
-      pathname: `/company/orders/${order.id.uuid}`,
+      pathname: `/company/orders/${order?.id?.uuid}`,
     });
   };
 
   return (
     <div className={css.root}>
-      <h3 className={css.title}>
-        <FormattedMessage id="NotificationSection.title" />
-      </h3>
+      <div className={css.titleWrapper}>
+        <h3 className={css.title}>
+          <FormattedMessage id="NotificationSection.title" />
+        </h3>
+        <NamedLink path={`/company/${companyId}/orders`} className={css.seeAll}>
+          <FormattedMessage id="NotificationSection.seeAll" />
+        </NamedLink>
+      </div>
       {inProgress ? (
         <div className={css.loadingContainer}>
           <Skeleton className={css.loading} />
@@ -133,7 +155,7 @@ const NotificationSection: React.FC<TNotificationSectionProps> = (props) => {
           {notifications.length > 0 ? (
             notifications.map((item: TCompanyOrderNotification) => (
               <div
-                onClick={onNotificationClick(item.order as TListing)}
+                onClick={onNotificationClick(item)}
                 key={item.key}
                 className={css.notificationItem}>
                 {item.icon}
