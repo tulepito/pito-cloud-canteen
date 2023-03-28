@@ -181,6 +181,7 @@ export const companyPaths = {
   ManageOrders: '/company/[companyId]/orders',
   ManageOrderDetail: '/company/orders/[orderId]',
   ManageOrderPicking: '/company/orders/[orderId]/picking',
+  OrderRating: '/company/orders/[orderId]/rating',
   GroupSetting: '/company/[companyId]/group-setting',
   Logo: '/company/[companyId]/logo',
   Members: '/company/[companyId]/members',

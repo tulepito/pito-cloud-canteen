@@ -1,0 +1,72 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  width: 364px;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+.uploadImageLabel {
+  @include flexAlign(center);
+  flex-direction: column;
+  border: 1px dashed $neutralGray4;
+  border-radius: 12px;
+  padding: 24px;
+
+  .firstText {
+    @include textTemplate(14px, $fontWeightRegular, 24px);
+    margin-top: 14px;
+  }
+
+  .secondText {
+    @include textTemplate(12px, $fontWeightRegular, 20px);
+    color: $neutralGray5;
+  }
+}
+
+.addImageInput {
+  display: none;
+}
+
+.imageList {
+  @include flexAlign(center);
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.imageWrapper {
+  position: relative;
+}
+
+.image {
+  width: 206px;
+  height: 123px;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+}
+
+.deleteImageBtn {
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  z-index: 1;
+  @include flexAlign(center, center);
+  background-color: $neutralGray2;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.deleteIcon {
+  width: 12px;
+  height: 12px;
+}

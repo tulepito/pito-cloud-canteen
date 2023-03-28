@@ -1,0 +1,27 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  @include viewportLarge {
+    width: 1180px;
+    margin: 0 auto;
+    padding-top: 32px;
+  }
+
+  .header {
+    .pageTitle {
+      @include textTemplate(24px, $fontWeightBold, 32px);
+      text-transform: capitalize;
+      margin-top: 20px;
+    }
+  }
+}
+
+.goBackBtn {
+  @include flexAlign(center, flex-start);
+  gap: 12px;
+  width: 94px;
+  cursor: pointer;
+  @include textTemplate(16px, $fontWeightBold, 24px);
+}

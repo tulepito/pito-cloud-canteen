@@ -196,3 +196,37 @@ export const adminTransferCompanyOwnerApi = ({
     newOwnerProfileImageId,
     permissionForOldOwner,
   });
+
+export type TBookerPostRatingApiBody = {
+  ratings: {
+    orderId: string;
+    restaurantId: string;
+    timestamp: number;
+    generalRating: number;
+    detailReview?: string;
+    detailRating?: {
+      food?: {
+        rating?: number;
+        optionalRating?: string[];
+      };
+      packaging?: {
+        rating?: number;
+        optionalRating?: string[];
+        optionalOtherReview?: string;
+      };
+    };
+  }[];
+  imageIdList?: string[];
+  detailTextRating?: string;
+  staff: {
+    rating: number;
+    optionalRating?: string[];
+  };
+  service: {
+    rating: number;
+    optionalRating?: string[];
+    optionalOtherReview?: string;
+  };
+};
+export const bookerPostRatingApi = (body: TBookerPostRatingApiBody) =>
+  postApi('/company/ratings', body);

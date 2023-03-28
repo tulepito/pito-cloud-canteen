@@ -25,6 +25,7 @@ export const shouldShowSidebar = (pathName: string) => {
     companyPaths.ManageOrders,
     companyPaths.ManageOrderDetail,
     companyPaths.ManageOrderPicking,
+    companyPaths.OrderRating,
     ...Object.values(quizPaths),
   ];
 

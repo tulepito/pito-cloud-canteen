@@ -10,7 +10,7 @@ import css from './ImageFromFile.module.scss';
 
 type TImageFromFileProps = PropsWithChildren<{
   className?: string;
-  rootClassName: string;
+  rootClassName?: string;
   aspectRatioClassName?: string;
   file: File;
   id: string;
