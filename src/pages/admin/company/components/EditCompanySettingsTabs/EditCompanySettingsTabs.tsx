@@ -60,6 +60,8 @@ type TExtraProps = {
   queryMembersInProgress: boolean;
   queryMembersError: any;
   companyId: string;
+  resetCompanyMemberSliceError: () => void;
+  resetTransferError: () => void;
 };
 
 type TEditCompanySettingsTabsProps =

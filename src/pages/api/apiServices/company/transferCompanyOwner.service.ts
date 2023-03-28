@@ -4,6 +4,8 @@ import { getIntegrationSdk } from '@services/sdk';
 import { UserPermission } from '@src/types/UserPermission';
 import { User } from '@src/utils/data';
 
+import isBookerInOrderProgress from './isBookerInOrderProgress.service';
+
 export type TChangeOwnerParams = {
   companyId: string;
   newOwnerEmail: string;
@@ -41,6 +43,8 @@ const transferCompanyOwner = async ({
     User(companyAccount).getPublicData();
 
   const newCompanyAccount = await fetchUserByEmail(newOwnerEmail);
+
+  await isBookerInOrderProgress({ members, memberEmail: newOwnerEmail });
 
   const { companyList: companyListOfNewCompany } =
     User(newCompanyAccount).getMetadata();

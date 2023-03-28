@@ -8,6 +8,7 @@ import classNames from 'classnames';
 
 import type { TAdminTransferCompanyOwnerParams } from '@apis/companyApi';
 import { InlineTextButton } from '@components/Button/Button';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import AlertModal from '@components/Modal/AlertModal';
@@ -48,6 +49,8 @@ type TManageCompanyMembersTable = {
   companyId?: string;
   hiddenColumnNames?: any[];
   canRemoveOwner?: boolean;
+  resetCompanyMemberSliceError?: () => void;
+  resetTransferError?: () => void;
 };
 
 const TABLE_COLUMN: TColumn[] &
@@ -232,7 +235,6 @@ const parseEntitiesToTableData = ({
         permission: value,
       });
     };
-
     if (!hasAttributes) {
       return {
         key: companyMember.email,
@@ -265,6 +267,8 @@ const parseEntitiesToTableData = ({
           ? { handleToUpdateMemberPermission }
           : {}),
         intl,
+        updatingPermission:
+          updatingMemberPermissionEmail === companyMember.email,
       },
     };
   });
@@ -299,7 +303,13 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
     companyId,
     hiddenColumnNames = [],
     canRemoveOwner,
+    updateMemberPermissionError,
+    deleteMemberError,
+    resetCompanyMemberSliceError,
+    transferCompanyOwnerError,
+    resetTransferError,
   } = props;
+
   const intl = useIntl();
   const [memberToRemove, setMemberToRemove] =
     useState<TCompanyMemberWithDetails | null>(null);
@@ -347,6 +357,7 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
   };
 
   const closeUpgradeOwnerModal = () => {
+    resetTransferError && resetTransferError();
     setMemberToUpgradeToOwner(null);
   };
 
@@ -375,6 +386,7 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
   };
 
   const handleCloseModal = () => {
+    resetCompanyMemberSliceError && resetCompanyMemberSliceError();
     setMemberToRemove(null);
   };
 
@@ -420,6 +432,7 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
   const onPageChange = (page: number) => {
     setPage(page);
   };
+  console.log({ transferCompanyOwnerError });
 
   return (
     <div className={css.root}>
@@ -435,6 +448,14 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
         current={pagination.page}
         onChange={onPageChange}
       />
+      {updateMemberPermissionError && (
+        <ErrorMessage
+          message={intl.formatMessage({
+            id: 'ManageCompanyMembersTable.updateMemberPermissionError',
+          })}
+        />
+      )}
+
       <AlertModal
         isOpen={!!memberToRemove}
         handleClose={handleCloseModal}
@@ -452,7 +473,7 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
         title={intl.formatMessage({
           id: 'ManageCompanyMembersTable.memberRemoveTitle',
         })}>
-        <p className={css.removeContent}>
+        <div className={css.removeContent}>
           {intl.formatMessage(
             {
               id: 'ManageCompanyMembersTable.memberRemoveContent',
@@ -463,7 +484,14 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
               ),
             },
           )}
-        </p>
+          {deleteMemberError && (
+            <ErrorMessage
+              message={intl.formatMessage({
+                id: 'ManageCompanyMembersTable.deleteMemberError',
+              })}
+            />
+          )}
+        </div>
       </AlertModal>
       <AlertModal
         onConfirm={transferCompanyOwner}
@@ -530,7 +558,7 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
         confirmLabel={intl.formatMessage({
           id: 'ManageCompanyMembersTable.tranferOwner',
         })}>
-        <p className={css.removeContent}>
+        <div className={css.removeContent}>
           {intl.formatMessage(
             {
               id: 'ManageCompanyMembersTable.upgradeToOwnerContent',
@@ -543,7 +571,14 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
               ),
             },
           )}
-        </p>
+          {transferCompanyOwnerError && (
+            <ErrorMessage
+              message={intl.formatMessage({
+                id: 'ManageCompanyMembersTable.updateMemberPermissionError',
+              })}
+            />
+          )}
+        </div>
       </AlertModal>
     </div>
   );
