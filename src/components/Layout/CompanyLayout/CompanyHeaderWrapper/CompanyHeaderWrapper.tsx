@@ -36,20 +36,26 @@ const CompanyHeaderWrapper: React.FC<TCompanyHeaderWrapperProps> = (props) => {
 
   const { isMobileLayout, isTabletLayout } = useViewport();
 
-  return isMobileLayout || isTabletLayout ? (
-    <CompanyHeaderMobile
-      companyHeaderLinkData={companyHeaderLinkData}
-      headerData={featureHeaderData}
-      companyId={companyId}
-    />
-  ) : (
-    <div className={css.desktopHeader}>
-      <CompanyHeader
-        companyId={companyId}
-        showBottomLine={!showFeatureHeader}
-        companyHeaderLinkData={companyHeaderLinkData}
-      />
-      {showFeatureHeader && <FeaturesHeader headerData={featureHeaderData} />}
+  return (
+    <div className={css.root}>
+      {isMobileLayout || isTabletLayout ? (
+        <CompanyHeaderMobile
+          companyHeaderLinkData={companyHeaderLinkData}
+          headerData={featureHeaderData}
+          companyId={companyId}
+        />
+      ) : (
+        <div className={css.desktopHeader}>
+          <CompanyHeader
+            companyId={companyId}
+            showBottomLine={!showFeatureHeader}
+            companyHeaderLinkData={companyHeaderLinkData}
+          />
+          {showFeatureHeader && (
+            <FeaturesHeader headerData={featureHeaderData} />
+          )}
+        </div>
+      )}
     </div>
   );
 };

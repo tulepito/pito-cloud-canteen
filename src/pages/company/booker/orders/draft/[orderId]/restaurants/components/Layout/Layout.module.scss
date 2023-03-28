@@ -1,5 +1,6 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
 
 .layout {
   padding: 40px 24px;
@@ -35,7 +36,7 @@
 .sidebar {
   position: fixed;
   width: 295px;
-  z-index: 100;
+  z-index: $zIndexSidebar;
   top: 72px;
   left: calc(-295px);
   transition: 0.3s linear;
