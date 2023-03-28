@@ -49,10 +49,14 @@ const siteTitle = 'PITO';
 const siteTwitterHandle = '@sharetribe';
 
 // Instagram page is used in SEO schema (http://schema.org/Organization)
-const siteInstagramPage = null;
+const siteInstagramPage = 'https://www.instagram.com/Sharetribe/';
 
 // Facebook page is used in SEO schema (http://schema.org/Organization)
 const siteFacebookPage = 'https://www.facebook.com/Sharetribe/';
+
+// LinkedIn page is used in SEO schema (http://schema.org/Organization)
+
+const siteLinkedInPage = 'https://www.linkedin.com/';
 
 // Note: Facebook app id is also used for tracking:
 // Facebook counts shares with app or page associated by this id
@@ -181,6 +185,7 @@ const config = {
   siteFacebookPage,
   siteInstagramPage,
   siteTwitterHandle,
+  siteLinkedInPage,
   facebookAppId,
   usingSSL,
   maps,

@@ -1,10 +1,11 @@
 import React from 'react';
+import Link from 'next/link';
 
 import IconFacebook from '@components/Icons/IconFacebook/IconFacebook';
 import IconInstagram from '@components/Icons/IconInstagram/IconInstagram';
 import IconLinkedIn from '@components/Icons/IconLinkedIn/IconLinkedIn';
-import NamedLink from '@components/NamedLink/NamedLink';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
+import config from '@src/configs';
 
 import css from './CompanyFooter.module.scss';
 
@@ -16,15 +17,15 @@ const CompanyFooter = () => {
           <PitoLogo variant="secondary" />
         </div>
         <div className={css.socials}>
-          <NamedLink>
+          <Link href={config.siteFacebookPage} target="_blank">
             <IconFacebook />
-          </NamedLink>
-          <NamedLink>
+          </Link>
+          <Link href={config.siteInstagramPage} target="_blank">
             <IconInstagram />
-          </NamedLink>
-          <NamedLink>
+          </Link>
+          <Link href={config.siteLinkedInPage} target="_blank">
             <IconLinkedIn />
-          </NamedLink>
+          </Link>
         </div>
         <div className={css.sloganWrapper}>
           <p className={css.slogan}>Ⓒ 2023 PITO Cloud Canteen</p>
