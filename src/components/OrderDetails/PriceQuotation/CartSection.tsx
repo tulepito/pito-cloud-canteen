@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import css from './CartSection.module.scss';
 
 type TCartSectionProps = {
+  id?: string;
   serviceFee: string;
   totalPrice: string;
   promotion: string;
@@ -13,6 +14,7 @@ type TCartSectionProps = {
 
 const CartSection: React.FC<TCartSectionProps> = (props) => {
   const {
+    id,
     serviceFee,
     totalPrice,
     promotion,
@@ -23,7 +25,7 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
   const intl = useIntl();
 
   return (
-    <div className={css.cartSection}>
+    <div className={css.cartSection} id={id}>
       <div className={css.sectionTitle}>
         {intl.formatMessage({
           id: 'BookerOrderDetailsPriceQuotation.cartSection.title',

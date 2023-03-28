@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import css from './InfoSection.module.scss';
 
 type TInfoSectionProps = {
+  id?: string;
   contactPhoneNumber?: string;
   contactPeopleName?: string;
   companyName: string;
@@ -14,6 +15,7 @@ type TInfoSectionProps = {
 
 const InfoSection: React.FC<TInfoSectionProps> = (props) => {
   const {
+    id,
     contactPhoneNumber,
     contactPeopleName,
     companyName,
@@ -25,7 +27,7 @@ const InfoSection: React.FC<TInfoSectionProps> = (props) => {
   const intl = useIntl();
 
   return (
-    <div className={css.infoContainer}>
+    <div className={css.infoContainer} id={id}>
       <div className={css.customerSection}>
         <div className={css.sectionTitle}>
           {intl.formatMessage({

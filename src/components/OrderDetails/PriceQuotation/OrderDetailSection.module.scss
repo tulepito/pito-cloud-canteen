@@ -19,7 +19,7 @@
   }
   & > div:nth-of-type(2) {
     flex-basis: 250px;
-    @include lineClamp(2);
+    // @include lineClamp(2);
   }
   & > div:nth-of-type(3) {
     flex-basis: 50px;

@@ -1,4 +1,5 @@
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 
 import { parseThousandNumber } from '@helpers/format';
 import { formatTimestamp } from '@src/utils/dates';
@@ -6,10 +7,14 @@ import type { TObject } from '@src/utils/types';
 
 import css from './OrderDetailSection.module.scss';
 
-type TOrderDetailSectionProps = { foodOrderGroupedByDate: TObject[] };
+type TOrderDetailSectionProps = {
+  foodOrderGroupedByDate: TObject[];
+  itemId: string;
+};
 
 const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
   foodOrderGroupedByDate,
+  itemId,
 }) => {
   const intl = useIntl();
 
@@ -44,7 +49,7 @@ const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
           </div>
         </div>
 
-        {foodOrderGroupedByDate.map((dateData) => {
+        {foodOrderGroupedByDate.map((dateData, parentIndex) => {
           const {
             date,
             totalDishes,
@@ -56,8 +61,13 @@ const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
           const formattedDate = formatTimestamp(date, 'EEE, dd/MM/yyyy');
 
           return (
-            <div className={css.tableRowGroup} key={date}>
-              <div className={css.groupTitle}>
+            <div
+              className={classNames(css.tableRowGroup, 'item-line')}
+              id={`${itemId}-root-${parentIndex}`}
+              key={date}>
+              <div
+                className={classNames(css.groupTitle, 'item-title')}
+                id={`${itemId}-${parentIndex}`}>
                 <div>{index + 1}</div>
                 <div>
                   {formattedDate}
@@ -69,11 +79,14 @@ const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
                 <div>{parseThousandNumber(totalPriceOfDate || 0)}đ</div>
               </div>
               <div className={css.rows}>
-                {foodDataList.map((foodData: TObject) => {
+                {foodDataList.map((foodData: TObject, childIndex: number) => {
                   const { foodId, foodPrice, foodName, frequency } = foodData;
 
                   return (
-                    <div className={css.row} key={foodId}>
+                    <div
+                      className={classNames(css.row, 'item-row')}
+                      key={foodId}
+                      id={`${itemId}-${parentIndex}-${childIndex}`}>
                       <div></div>
                       <div>{foodName}</div>
                       <div>{frequency}</div>

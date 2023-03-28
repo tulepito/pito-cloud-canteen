@@ -58,7 +58,7 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({ data }) => {
 
   return (
     <div className={css.root} id="priceQuotation">
-      <div className={css.titleContainer}>
+      <div className={css.titleContainer} id="header">
         <div>
           {intl.formatMessage(
             { id: 'BookerOrderDetailsPriceQuotation.title' },
@@ -68,9 +68,9 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({ data }) => {
         <PitoLogo className={css.PITOlogo} />
       </div>
       <div className={css.contentContainer}>
-        <InfoSection {...infoSectionData} />
-        <CartSection {...cartData} />
-        <OrderDetailSection {...orderDetailData} />
+        <InfoSection id={'infoSection'} {...infoSectionData} />
+        <CartSection id={'summaryPrice'} {...cartData} />
+        <OrderDetailSection itemId="quoteItem" {...orderDetailData} />
       </div>
     </div>
   );

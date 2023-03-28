@@ -12,10 +12,11 @@ const PITO_VARIANTS = {
 
 const PitoLogo: React.FC<
   TIconProps & {
+    id?: string;
     variant?: typeof PITO_VARIANTS.PRIMARY | typeof PITO_VARIANTS.SECONDARY;
   }
 > = (props) => {
-  const { rootClassName, className, variant } = props;
+  const { rootClassName, className, variant, id } = props;
   const primaryClasses = classNames(rootClassName || css.root, className);
   const secondaryClasses = classNames(
     rootClassName || css.rootSecondary,
@@ -25,6 +26,7 @@ const PitoLogo: React.FC<
   if (variant === PITO_VARIANTS.SECONDARY) {
     return (
       <svg
+        id={id}
         className={secondaryClasses}
         width="78.34"
         height="52"
