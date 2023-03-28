@@ -4,9 +4,9 @@ import { HttpMethod } from '@apis/configs';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
-import { denormalisedResponseEntities } from '@utils/data';
-import { EListingType } from '@utils/enums';
-import type { TCompany, TIntegrationOrderListing } from '@utils/types';
+import { denormalisedResponseEntities, Listing } from '@utils/data';
+import { EOrderStates } from '@utils/enums';
+import type { TIntegrationOrderListing, TListing } from '@utils/types';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -28,40 +28,82 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             queryParams,
           );
           const orders = denormalisedResponseEntities(response);
-          const orderWithCompanyAndSubOrders = await Promise.all(
+          const orderWithOthersData = await Promise.all(
             orders.map(async (order: TIntegrationOrderListing) => {
-              const { companyId } = order.attributes.metadata;
-              const companyUserResponse = await integrationSdk.users.show({
-                id: companyId,
-              });
-              const subOrderResponse = await integrationSdk.listings.query({
-                meta_orderId: order.id.uuid,
-                meta_listingType: EListingType.subOrder,
-              });
-              const subOrders = denormalisedResponseEntities(subOrderResponse);
+              const {
+                companyId,
+                plans = [],
+                orderState,
+              } = Listing(order as TListing).getMetadata();
               const [company] = denormalisedResponseEntities(
-                companyUserResponse,
-              ) as TCompany[];
+                (await integrationSdk.users.show({
+                  id: companyId,
+                })) || [{}],
+              );
+
+              if (plans.length > 0) {
+                const [planId] = plans;
+                const [plan] = denormalisedResponseEntities(
+                  await integrationSdk.listings.show({ id: planId }),
+                );
+
+                const { orderDetail: planOrderDetail } = Listing(
+                  plan as TListing,
+                ).getMetadata();
+
+                const orderDetailsWithTransaction = planOrderDetail;
+
+                if (
+                  [
+                    EOrderStates.inProgress,
+                    EOrderStates.pendingPayment,
+                    EOrderStates.completed,
+                    EOrderStates.reviewed,
+                  ].includes(orderState)
+                ) {
+                  await Promise.all(
+                    Object.keys(planOrderDetail).map(async (key) => {
+                      const { transactionId } = planOrderDetail[key];
+                      const txResponse =
+                        transactionId &&
+                        (await integrationSdk.transactions.show({
+                          id: transactionId,
+                        }));
+                      const [transaction] = txResponse
+                        ? denormalisedResponseEntities(txResponse)
+                        : [{}];
+
+                      orderDetailsWithTransaction[key] = {
+                        ...planOrderDetail[key],
+                        transaction,
+                      };
+                    }),
+                  );
+                }
+
+                plan.attributes.metadata.orderDetail =
+                  orderDetailsWithTransaction;
+
+                return {
+                  ...order,
+                  company,
+                  subOrders: [plan],
+                };
+              }
 
               return {
                 ...order,
                 company,
-                subOrders,
+                subOrders: [],
               };
             }),
           );
 
           res.json({
-            orders: orderWithCompanyAndSubOrders,
+            orders: orderWithOthersData,
             pagination: response.data.meta,
           });
         }
-        break;
-      case HttpMethod.POST:
-        break;
-      case HttpMethod.DELETE:
-        break;
-      case HttpMethod.PUT:
         break;
       default:
         break;
