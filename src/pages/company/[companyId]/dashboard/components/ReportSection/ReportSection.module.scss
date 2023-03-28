@@ -6,6 +6,10 @@
   .title {
     font-size: 18px;
     margin: 0 0 14px 0;
+    text-transform: capitalize;
+    @include viewportMedium {
+      font-size: 20px;
+    }
   }
   .reportList {
     display: grid;

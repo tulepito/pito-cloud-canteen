@@ -11,6 +11,11 @@
   padding-bottom: 40%;
   overflow: hidden;
   @include flexAlign(center, center);
+
+  @include viewportMedium {
+    padding-bottom: 20%;
+  }
+
   &::after {
     content: '';
     z-index: 0;
@@ -33,12 +38,16 @@
     @include viewportMedium {
       width: initial;
     }
+
     .title {
       z-index: 1;
       text-align: center;
       margin: 0 0 40px 0;
       color: $neutralGray1;
       height: 100%;
+      @include viewportMedium {
+        font-size: 48px;
+      }
     }
     .homePageMealLinks {
       display: flex;
@@ -79,6 +88,7 @@
           color: $neutralGray6;
           font-weight: $fontWeightBold;
           margin: 0;
+          font-size: 14px;
         }
       }
     }
