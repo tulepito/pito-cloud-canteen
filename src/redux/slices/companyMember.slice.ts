@@ -325,7 +325,7 @@ export const companyMemberSlice = createSlice({
       .addCase(adminDeleteMember.rejected, (state, { error }) => ({
         ...state,
         deleteMemberInProgress: false,
-        deleteMemberError: error.message,
+        deleteMemberError: error,
       }))
       .addCase(adminUpdateMemberPermission.pending, (state, { meta }) => ({
         ...state,

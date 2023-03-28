@@ -84,6 +84,8 @@ type TExtraProps = {
   queryMembersInProgress: boolean;
   queryMembersError: any;
   companyId: string;
+  resetCompanyMemberSliceError: () => void;
+  resetTransferError: () => void;
 };
 type TEditCompanySettingsInformationFormComponentProps =
   FormRenderProps<TEditCompanySettingsInformationFormValues> &
@@ -129,6 +131,8 @@ const EditCompanySettingsInformationFormComponent: React.FC<
     queryMembersInProgress,
     queryMembersError,
     companyId,
+    resetCompanyMemberSliceError,
+    resetTransferError,
   } = props;
 
   useImperativeHandle(formRef, () => form);
@@ -293,6 +297,8 @@ const EditCompanySettingsInformationFormComponent: React.FC<
               queryMembersInProgress={queryMembersInProgress}
               queryMembersError={queryMembersError}
               companyId={companyId as string}
+              resetCompanyMemberSliceError={resetCompanyMemberSliceError as any}
+              resetTransferError={resetTransferError as any}
             />
           </div>
           <div className={css.line}></div>

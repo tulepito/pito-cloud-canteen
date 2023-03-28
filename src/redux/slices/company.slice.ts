@@ -553,7 +553,7 @@ const adminTransferCompanyOwner = createAsyncThunk(
       companyId,
     });
 
-    dispatch(companyMemberThunks.queryCompanyMembers(companyId));
+    await dispatch(companyMemberThunks.queryCompanyMembers(companyId));
 
     return newCompany;
   },
@@ -621,6 +621,10 @@ export const companySlice = createSlice({
   name: 'company',
   initialState,
   reducers: {
+    clearTransferOwnerError: (state) => ({
+      ...state,
+      transferCompanyOwnerError: null,
+    }),
     addWorkspaceCompanyId: (state, { payload }) => {
       return {
         ...state,
@@ -1056,6 +1060,7 @@ export const {
   addWorkspaceCompanyId,
   resetCompanySliceStates,
   paginateCompanies,
+  clearTransferOwnerError,
 } = companySlice.actions;
 
 export default companySlice.reducer;

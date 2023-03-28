@@ -5,6 +5,8 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import type { TCompanyGroup } from '@utils/types';
 
+import isBookerInOrderProgress from './isBookerInOrderProgress.service';
+
 const deleteMemberFromCompanyFn = async ({
   memberEmail,
   companyId,
@@ -16,6 +18,8 @@ const deleteMemberFromCompanyFn = async ({
 
   const companyAccount = await fetchUser(companyId);
   const { members = {}, groups = [] } = User(companyAccount).getMetadata();
+
+  await isBookerInOrderProgress({ members, memberEmail });
 
   // Step delete email in members
   delete members[memberEmail];

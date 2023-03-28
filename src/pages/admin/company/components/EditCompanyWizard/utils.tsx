@@ -35,7 +35,7 @@ export const createSubmitCreateCompanyValues = (
     note,
     tax,
   } = values;
-  const { selectedPlace } = location;
+  const { selectedPlace } = location || {};
 
   const address = selectedPlace?.address;
   const origin = selectedPlace?.origin || {};
@@ -95,7 +95,7 @@ export const createSubmitUpdateCompanyValues = (
         note,
         tax,
       } = values;
-      const { selectedPlace } = location;
+      const { selectedPlace } = location || {};
 
       const address = selectedPlace?.address;
       const origin = selectedPlace?.origin || {};

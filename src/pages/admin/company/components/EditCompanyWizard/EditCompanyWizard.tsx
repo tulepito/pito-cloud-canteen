@@ -19,8 +19,15 @@ import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { getInitialLocationValues } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useRedirectTabWizard from '@hooks/useRedirectTabWizard';
-import { companySlice, companyThunks } from '@redux/slices/company.slice';
-import { companyMemberThunks } from '@redux/slices/companyMember.slice';
+import {
+  clearTransferOwnerError,
+  companySlice,
+  companyThunks,
+} from '@redux/slices/company.slice';
+import {
+  companyMemberThunks,
+  resetError,
+} from '@redux/slices/companyMember.slice';
 import { adminRoutes } from '@src/paths';
 import { User } from '@utils/data';
 import { ECompanyStates } from '@utils/enums';
@@ -98,6 +105,8 @@ type TEditCompanyWizardTab = {
   queryMembersInProgress: boolean;
   queryMembersError: any;
   companyId: string;
+  resetCompanyMemberSliceError: () => void;
+  resetTransferError: () => void;
 } & TFormTabChildrenProps;
 
 const defaultBankAccounts = [
@@ -201,6 +210,8 @@ const EditCompanyWizardTab: React.FC<TEditCompanyWizardTab> = (props) => {
     queryMembersInProgress,
     queryMembersError,
     companyId,
+    resetCompanyMemberSliceError,
+    resetTransferError,
   } = props;
 
   const initialValues = useMemo(() => {
@@ -297,6 +308,8 @@ const EditCompanyWizardTab: React.FC<TEditCompanyWizardTab> = (props) => {
           queryMembersInProgress={queryMembersInProgress}
           queryMembersError={queryMembersError}
           companyId={companyId}
+          resetCompanyMemberSliceError={resetCompanyMemberSliceError}
+          resetTransferError={resetTransferError}
         />
       );
     default:
@@ -578,6 +591,14 @@ const EditCompanyWizard = () => {
     });
   };
 
+  const resetCompanyMemberSliceError = () => {
+    dispatch(resetError());
+  };
+
+  const resetTransferError = () => {
+    dispatch(clearTransferOwnerError());
+  };
+
   useEffect(() => {
     if (selectedTab === COMPANY_SETTINGS_TAB && companyId) {
       dispatch(companyMemberThunks.queryCompanyMembers(companyId as string));
@@ -642,6 +663,8 @@ const EditCompanyWizard = () => {
               queryMembersInProgress={queryMembersInProgress}
               queryMembersError={queryMembersError}
               companyId={companyId as string}
+              resetCompanyMemberSliceError={resetCompanyMemberSliceError}
+              resetTransferError={resetTransferError}
             />
           );
         })}
