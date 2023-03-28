@@ -59,7 +59,7 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
       </option>
 
       {foodOptions?.map(({ foodId, foodName }) => (
-        <option key={foodId} value={foodId}>
+        <option title={foodName} key={foodId} value={foodId}>
           {shortenString(foodName, 16)}
         </option>
       ))}
