@@ -40,7 +40,7 @@ export const createSubmitCreateCompanyValues = (
   const address = selectedPlace?.address;
   const origin = selectedPlace?.origin || {};
 
-  const { selectedPlace: companySelectedPlace } = companyLocation;
+  const { selectedPlace: companySelectedPlace } = companyLocation || {};
   const companyAddress = companySelectedPlace?.address;
   const companyOrigin = companySelectedPlace?.origin || {};
 
@@ -100,7 +100,7 @@ export const createSubmitUpdateCompanyValues = (
       const address = selectedPlace?.address;
       const origin = selectedPlace?.origin || {};
 
-      const { selectedPlace: companySelectedPlace } = companyLocation;
+      const { selectedPlace: companySelectedPlace } = companyLocation || {};
       const companyAddress = companySelectedPlace?.address;
       const companyOrigin = companySelectedPlace?.origin || {};
 
