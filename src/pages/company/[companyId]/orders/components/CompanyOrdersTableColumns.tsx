@@ -58,8 +58,15 @@ export const CompanyOrdersTableColumns: TColumn[] = [
     key: 'title',
     label: 'Đơn hàng',
     render: (data: TObject) => {
-      const { id, title, state, plan } = data;
-      const titleContent = <div className={css.title}>#{title}</div>;
+      const { id, isCreatedByPitoAdmin, title, state, plan } = data;
+      const titleContent = (
+        <div className={css.title}>
+          #{title}
+          {isCreatedByPitoAdmin && (
+            <div className={css.createdByAmin}>{'Tạo bởi PITO'}</div>
+          )}
+        </div>
+      );
       let returnComponent;
 
       if ([EOrderDraftStates.draft].includes(state)) {
