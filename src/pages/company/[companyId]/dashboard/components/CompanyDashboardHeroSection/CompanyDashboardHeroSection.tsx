@@ -27,7 +27,7 @@ const HOMEPAGE_MEAL_LINKS = [
     label: <FormattedMessage id="MenuMealType.label.lunch" />,
     path: `/company/booker/orders/new/?deliveryHour=${getDeliveryTimeFromMealType(
       EMenuMealType.lunch,
-    )}}`,
+    )}`,
     image: miquangImage,
   },
   {
