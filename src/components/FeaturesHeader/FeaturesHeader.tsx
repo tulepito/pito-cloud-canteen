@@ -39,7 +39,7 @@ const FeaturesHeader: React.FC<FeaturesHeaderProps> = (props) => {
           return (
             <li key={key}>
               <Link className={activeHeaderItemClasses} href={hrefObject}>
-                <span className={css.title}>{title}</span>
+                <div className={css.title}>{title}</div>
               </Link>
             </li>
           );

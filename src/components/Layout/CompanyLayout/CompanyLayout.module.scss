@@ -2,6 +2,7 @@
 .headerTitle {
   @include flexAlign(center);
   gap: 13px;
+  line-height: 24px;
 }
 
 .headerTitleWrapper {

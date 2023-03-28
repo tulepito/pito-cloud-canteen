@@ -113,7 +113,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
             <div onMouseEnter={onMouseEnter} className={css.headerTitleWrapper}>
               <div className={css.headerTitle}>
                 <FeatureIcons.User />
-                {title}
+                <span>{title}</span>
               </div>
               {isMobile && (
                 <IconArrowHead direction={isDropdownOpen ? 'right' : 'down'} />
@@ -134,27 +134,27 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
     },
   ];
 
-  const companyHeaderLinkData = [
-    {
-      key: 'partner',
-      path: router.pathname,
-      label: 'Nhà hàng',
-    },
-    {
-      key: 'story',
-      path: router.pathname,
-      label: 'Câu chuyện',
-    },
-    {
-      key: 'pricing',
-      path: router.pathname,
-      label: 'Bảng giá',
-    },
-    {
-      key: 'aboutUs',
-      path: router.pathname,
-      label: 'Về chúng tôi',
-    },
+  const companyHeaderLinkData: any[] = [
+    // {
+    //   key: 'partner',
+    //   path: router.pathname,
+    //   label: 'Nhà hàng',
+    // },
+    // {
+    //   key: 'story',
+    //   path: router.pathname,
+    //   label: 'Câu chuyện',
+    // },
+    // {
+    //   key: 'pricing',
+    //   path: router.pathname,
+    //   label: 'Bảng giá',
+    // },
+    // {
+    //   key: 'aboutUs',
+    //   path: router.pathname,
+    //   label: 'Về chúng tôi',
+    // },
   ];
 
   useEffect(() => {

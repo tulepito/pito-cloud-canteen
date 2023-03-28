@@ -39,7 +39,7 @@
       min-height: 168px;
       @include flexAlign(center, space-between);
       flex-direction: column;
-      padding: 20px 20px 12px 20px;
+      padding: 20px 25px 12px 25px;
       text-align: center;
       gap: 10px;
       .orderCount {
