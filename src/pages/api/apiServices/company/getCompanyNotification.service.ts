@@ -32,7 +32,7 @@ const ORDER_QUERY_PARAMS_BY_NOTIFICATION_TYPE = {
     sort: 'createdAt',
   },
   [ENotificationTypes.deadlineDueOrder]: {
-    meta_orderState: `has_any:${[EOrderStates.picking].join(',')}`,
+    meta_orderState: `${EOrderStates.picking}`,
     meta_deadlineDate: `${minusDays(new Date(), 1).getTime()},`,
   },
 };
@@ -53,7 +53,6 @@ const getCompanyNotifications = async (companyId: string) => {
 
       const [responseOrder] =
         denormalisedResponseEntities(notificationResponse);
-
       if (!responseOrder) return null;
 
       return {
