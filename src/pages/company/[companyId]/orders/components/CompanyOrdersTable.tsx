@@ -43,6 +43,23 @@ const tabLabelMap = {
   [EManageCompanyOrdersTab.ALL]: 'ManageCompanyOrdersPage.tabSection.allLabel',
 };
 
+const findTabIndexById = (tabId: EManageCompanyOrdersTab) => {
+  switch (tabId) {
+    case EManageCompanyOrdersTab.SCHEDULED:
+      return 1;
+    case EManageCompanyOrdersTab.COMPLETED:
+      return 2;
+    case EManageCompanyOrdersTab.DRAFT:
+      return 3;
+    case EManageCompanyOrdersTab.CANCELED:
+      return 4;
+    case EManageCompanyOrdersTab.ALL:
+      return 5;
+    default:
+      return 5;
+  }
+};
+
 const statesSelector = createDeepEqualSelector(
   (state: RootState) => state.Order,
   ({
@@ -119,6 +136,7 @@ type TCompanyOrdersTableProps = {};
 
 const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const intl = useIntl();
+  const router = useRouter();
   const [currentTab, setCurrentTab] = useState<EManageCompanyOrdersTab>(
     EManageCompanyOrdersTab.ALL,
   );
@@ -144,6 +162,20 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
 
   const handleTabChange = ({ id }: TTabsItem) => {
     setCurrentTab(id as EManageCompanyOrdersTab);
+
+    const newDefaultTab = findTabIndexById(id as EManageCompanyOrdersTab);
+    let newQuery = {};
+
+    if (newDefaultTab.toString() !== defaultTab.toString()) {
+      newQuery = { companyId: companyId as string, defaultTab: newDefaultTab };
+    } else {
+      newQuery = { ...router.query, defaultTab: newDefaultTab.toString() };
+    }
+
+    router.push({
+      pathname: router.pathname,
+      query: newQuery,
+    });
   };
 
   const handleSubmitSearch = ({
