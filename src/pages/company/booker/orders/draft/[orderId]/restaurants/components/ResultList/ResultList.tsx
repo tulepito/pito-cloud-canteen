@@ -11,7 +11,10 @@ import useBoolean from '@hooks/useBoolean';
 import { User } from '@utils/data';
 import type { TListing, TUser } from '@utils/types';
 
-import { BookerSelectRestaurantThunks } from '../../BookerSelectRestaurant.slice';
+import {
+  BookerSelectRestaurantActions,
+  BookerSelectRestaurantThunks,
+} from '../../BookerSelectRestaurant.slice';
 import ResultDetailModal from '../ResultDetailModal/ResultDetailModal';
 
 import EmptyList from './EmptyList';
@@ -22,7 +25,6 @@ type TResultListProps = {
   className?: string;
   restaurants?: any[];
   isLoading?: boolean;
-  totalRatings: any[];
   companyAccount: TUser | null;
   order?: TListing | null;
 };
@@ -31,7 +33,6 @@ const ResultList: React.FC<TResultListProps> = ({
   className,
   restaurants = [],
   isLoading,
-  totalRatings,
   companyAccount,
   order,
 }) => {
@@ -64,6 +65,7 @@ const ResultList: React.FC<TResultListProps> = ({
   const onRestaurantClick = (id: string) => {
     detailModal.setTrue();
     setSelectedRestaurantId(id);
+    dispatch(BookerSelectRestaurantActions.setSelectedRestaurantId(id));
     dispatch(
       BookerSelectRestaurantThunks.fetchFoodListFromRestaurant({
         restaurantId: id,
@@ -127,7 +129,6 @@ const ResultList: React.FC<TResultListProps> = ({
               className={css.card}
               restaurant={restaurant}
               companyGeoOrigin={companyGeoOrigin}
-              totalRatings={totalRatings}
             />
           ))}
       </div>
@@ -138,7 +139,6 @@ const ResultList: React.FC<TResultListProps> = ({
         selectedRestaurantId={selectedRestaurantId}
         restaurants={restaurants}
         companyGeoOrigin={companyGeoOrigin}
-        totalRatings={totalRatings}
         onSearchSubmit={onSearchSubmit}
         fetchFoodInProgress={fetchRestaurantFoodInProgress}
       />

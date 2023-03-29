@@ -18,10 +18,6 @@ type TNutritionState = {
   fetchSelectedRestaurantInProgress: boolean;
   fetchSelectedRestaurantError: any;
 
-  restaurantTotalRating: number;
-  restaurantTotalRatingInProgress: boolean;
-  restaurantTotalRatingError: any;
-
   searchFoodInRestaurantInProgress: boolean;
   searchFoodInRestaurantError: any;
 
@@ -40,10 +36,6 @@ const initialState: TNutritionState = {
   fetchFoodFromRestaurantInProgress: false,
   fetchFoodFromRestaurantError: null,
 
-  restaurantTotalRating: 0,
-  restaurantTotalRatingInProgress: false,
-  restaurantTotalRatingError: null,
-
   searchFoodInRestaurantInProgress: false,
   searchFoodInRestaurantError: null,
 
@@ -54,7 +46,6 @@ const initialState: TNutritionState = {
 // ================ Thunk types ================ //
 const FETCH_SELECTED_RESTAURANT = 'app/Nutrition/FETCH_SELECTED_RESTAURANT';
 const FETCH_FOOD_FROM_RESTAURANT = 'app/Nutrition/FETCH_FOOD_FROM_RESTAURANT';
-const FETCH_TOTAL_RATING = 'app/Nutrition/FETCH_TOTAL_RATING';
 const SEARCH_FOOD_IN_RESTAURANT = 'app/Nutrition/SEARCH_FOOD_IN_RESTAURANT';
 const FETCH_SEARCH_FILTER = 'app/Nutrition/FETCH_SEARCH_FILTER';
 // ================ Async thunks ================ //
@@ -96,19 +87,6 @@ const fetchFoodFromRestaurant = createAsyncThunk(
   },
 );
 
-const fetchTotalRating = createAsyncThunk(
-  FETCH_TOTAL_RATING,
-  async (restaurantId: string, { extra: sdk }) => {
-    const response = await sdk.reviews.query({
-      listingId: restaurantId,
-      type: 'ofCustomer',
-    });
-    const result = denormalisedResponseEntities(response);
-
-    return result.length;
-  },
-);
-
 const searchFoodInRestaurant = createAsyncThunk(
   SEARCH_FOOD_IN_RESTAURANT,
   async (params: any, { extra: sdk, getState }) => {
@@ -140,7 +118,6 @@ const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
 export const NutritionThunks = {
   fetchSelectedRestaurant,
   fetchFoodFromRestaurant,
-  fetchTotalRating,
   searchFoodInRestaurant,
   fetchSearchFilter,
 };
@@ -176,19 +153,6 @@ const NutritionSlice = createSlice({
       .addCase(fetchFoodFromRestaurant.rejected, (state, { error }) => {
         state.fetchFoodFromRestaurantInProgress = false;
         state.fetchFoodFromRestaurantError = error;
-      })
-
-      .addCase(fetchTotalRating.pending, (state) => {
-        state.restaurantTotalRatingInProgress = true;
-        state.restaurantTotalRatingError = null;
-      })
-      .addCase(fetchTotalRating.fulfilled, (state, { payload }) => {
-        state.restaurantTotalRatingInProgress = false;
-        state.restaurantTotalRating = payload;
-      })
-      .addCase(fetchTotalRating.rejected, (state, { error }) => {
-        state.restaurantTotalRatingInProgress = false;
-        state.restaurantTotalRatingError = error;
       })
 
       .addCase(searchFoodInRestaurant.pending, (state) => {

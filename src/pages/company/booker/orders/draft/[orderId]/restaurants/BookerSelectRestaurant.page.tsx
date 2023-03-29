@@ -25,7 +25,7 @@ function BookerSelectRestaurant() {
 
   const { order } = useGetOrder({ orderId: orderId as string });
   const { companyAccount } = useGetCompanyAccount();
-  const { restaurants, searchInProgress, totalResultItems, totalRatings } =
+  const { restaurants, searchInProgress, totalResultItems } =
     useSearchRestaurants();
 
   const handleGoBack = () => {
@@ -63,7 +63,6 @@ function BookerSelectRestaurant() {
             className={css.resultList}
             restaurants={restaurants}
             isLoading={searchInProgress}
-            totalRatings={totalRatings}
             companyAccount={companyAccount}
           />
         </LayoutContent>

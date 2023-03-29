@@ -537,3 +537,22 @@ export type TCompanyOrderSummary = {
   totalOrderDishes: number;
   totalOrderCost: number;
 };
+
+export type TScenarioRating = {
+  rating: number;
+  optionalRating?: string[];
+  optionalOtherReview?: string;
+};
+
+export type TRestaurantRating = {
+  orderId: string;
+  restaurantId: string;
+  reviewerId: string;
+  timestamp: number;
+  generalRating: number;
+  detailReview?: string;
+  detailRating?: {
+    food?: TScenarioRating;
+    packaging?: TScenarioRating;
+  };
+};

@@ -28,7 +28,6 @@ type TRestaurantCardProps = {
     lat: number;
     lng: number;
   };
-  totalRatings?: any[];
   hideFavoriteIcon?: boolean;
   favoriteFunc?: (restaurantId: string) => void;
   favoriteInProgress?: boolean;
@@ -40,7 +39,6 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
   onClick = () => null,
   restaurant,
   companyGeoOrigin,
-  totalRatings = [],
   hideFavoriteIcon,
   favoriteFunc,
   favoriteInProgress,
@@ -52,7 +50,8 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
   const { geolocation: origin } = Listing(restaurant).getAttributes();
   const { categories = [], packaging = [] } =
     Listing(restaurant).getPublicData();
-  const { rating = 0 } = Listing(restaurant).getMetadata();
+  const { totalRating = 0, totalRatingNumber = 0 } =
+    Listing(restaurant).getMetadata();
   const restaurantCoverImage = Listing(restaurant).getImages()[0];
   const restaurantName = Listing(restaurant).getAttributes().title;
 
@@ -65,11 +64,6 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
   const restaurantPackaging = PACKAGING_OPTIONS.find(
     (item) => item.key === packaging[0],
   )?.label;
-
-  const totalReviewsOfRestaurant =
-    totalRatings.find(
-      (_restaurant) => _restaurant.restaurantId === restaurantId,
-    )?.totalReviews || 0;
 
   const handleClickCard = () => {
     onClick(restaurantId);
@@ -119,7 +113,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
         </div>
         <div className={css.footerItem}>
           <IconStar className={css.littleStarIcon} />
-          <span>{`${rating} (${totalReviewsOfRestaurant})`}</span>
+          <span>{`${totalRating} (${totalRatingNumber})`}</span>
         </div>
         <div className={css.footerItem}>
           <IconBox className={css.footerItemIcon} />
