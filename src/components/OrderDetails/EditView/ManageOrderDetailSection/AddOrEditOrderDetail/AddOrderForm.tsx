@@ -90,7 +90,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
       </option>
 
       {memberOptions?.map(({ memberId, memberName }) => (
-        <option key={memberId} value={memberId}>
+        <option title={memberName} key={memberId} value={memberId}>
           {shortenString(memberName, 18)}
         </option>
       ))}
@@ -105,7 +105,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
       </option>
 
       {foodOptions?.map(({ foodId, foodName }) => (
-        <option key={foodId} value={foodId}>
+        <option title={foodName} key={foodId} value={foodId}>
           {shortenString(foodName, 18)}
         </option>
       ))}

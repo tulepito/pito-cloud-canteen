@@ -4,6 +4,7 @@ import omit from 'lodash/omit';
 import {
   addParticipantToOrderApi,
   addUpdateMemberOrder,
+  bookerMarkInprogressPlanViewedApi,
   bookerStartOrderApi,
   cancelPickingOrderApi,
   deleteParticipantFromOrderApi,
@@ -50,6 +51,7 @@ type TOrderManagementState = {
   companyData: TCompany | null;
   orderData: TObject | null;
   planData: TObject;
+  planViewed: boolean;
   bookerData: TUser | null;
   participantData: Array<TUser>;
   anonymousParticipantData: Array<TUser>;
@@ -74,6 +76,7 @@ const initialState: TOrderManagementState = {
   companyData: null,
   orderData: {},
   planData: {},
+  planViewed: false,
   bookerData: null,
   participantData: [],
   anonymousParticipantData: [],
@@ -487,6 +490,13 @@ const cancelPickingOrder = createAsyncThunk(
   },
 );
 
+const bookerMarkInprogressPlanViewed = createAsyncThunk(
+  'app/OrderManagement/BOOKER_MARK_INPROGRESS_PLAN_VIEWED',
+  async ({ orderId, planId }: { orderId: string; planId: string }) => {
+    await bookerMarkInprogressPlanViewedApi({ orderId, planId });
+  },
+);
+
 export const orderManagementThunks = {
   loadData,
   updateOrderGeneralInfo,
@@ -499,6 +509,7 @@ export const orderManagementThunks = {
   deleteParticipant,
   bookerStartOrder,
   cancelPickingOrder,
+  bookerMarkInprogressPlanViewed,
 };
 
 // ================ Slice ================ //
@@ -625,6 +636,16 @@ const OrderManagementSlice = createSlice({
       })
       .addCase(addOrUpdateMemberOrder.rejected, (state) => {
         state.addOrUpdateMemberOrderInProgress = false;
+      })
+      /* =============== bookerMarkInprogressPlanViewed =============== */
+      .addCase(bookerMarkInprogressPlanViewed.pending, (state) => {
+        return state;
+      })
+      .addCase(bookerMarkInprogressPlanViewed.fulfilled, (state) => {
+        state.planViewed = true;
+      })
+      .addCase(bookerMarkInprogressPlanViewed.rejected, (state) => {
+        return state;
       });
   },
 });

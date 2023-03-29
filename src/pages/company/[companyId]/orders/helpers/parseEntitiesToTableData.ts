@@ -4,7 +4,8 @@ import { combineOrderDetailWithPriceInfo } from '@helpers/orderHelper';
 import { calculatePriceQuotationInfo } from '@pages/company/orders/[orderId]/picking/helpers/cartInfoHelper';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
-import type { TIntegrationOrderListing, TListing } from '@utils/types';
+import { EOrderDraftStates } from '@utils/enums';
+import type { TIntegrationOrderListing, TListing, TObject } from '@utils/types';
 
 export const parseEntitiesToTableData = (
   orders: TIntegrationOrderListing[],
@@ -24,12 +25,17 @@ export const parseEntitiesToTableData = (
       deliveryHour,
       deliveryAddress,
       orderState,
+      orderStateHistory = [],
     } = Listing(entity as TListing).getMetadata();
 
     const { totalWithVAT } = calculatePriceQuotationInfo({
       order: entity,
       planOrderDetail,
     });
+
+    const isCreatedByPitoAdmin = orderStateHistory.some(
+      ({ state }: TObject) => state === EOrderDraftStates.pendingApproval,
+    );
 
     return {
       key: orderId,
@@ -41,6 +47,7 @@ export const parseEntitiesToTableData = (
         startDate: startDate ? formatTimestamp(startDate) : '',
         endDate: endDate ? formatTimestamp(endDate) : '',
         state: orderState,
+        isCreatedByPitoAdmin,
         orderId,
         companyId,
         plan: {
