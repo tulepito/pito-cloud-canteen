@@ -48,7 +48,7 @@ export const getMenuQuery = ({
   const query = {
     meta_listingState: 'published',
     meta_listingType: ListingTypes.MENU,
-    pub_startDate: `,${dateTime.toMillis()}`,
+    pub_startDate: `,${dateTime.toMillis() + 1}`,
     pub_endDate: `${dateTime.toMillis()},`,
     pub_daysOfWeek: `has_any:${dayOfWeek}`,
     pub_mealType: mealType,
@@ -157,7 +157,7 @@ export const getMenuQueryInSpecificDay = ({
   const query = {
     meta_listingState: 'published',
     meta_listingType: ListingTypes.MENU,
-    pub_startDate: `,${dateTime.toMillis()}`,
+    pub_startDate: `,${dateTime.toMillis() + 1}`,
     pub_endDate: `${dateTime.toMillis()},`,
     pub_daysOfWeek: `has_any:${dayOfWeek}`,
     pub_mealType: mealType,
@@ -167,7 +167,7 @@ export const getMenuQueryInSpecificDay = ({
           [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(',')}`,
         }
       : {}),
-    [`pub_${dayOfWeek}MinFoodPrice`]: `,${packagePerMember}`,
+    [`pub_${dayOfWeek}MinFoodPrice`]: `,${packagePerMember + 1}`,
   };
 
   return query;
