@@ -16,12 +16,7 @@ const OrderDetailTooltip = ({
       const { orderDetail = {} } = subOrder?.attributes?.metadata || {};
 
       const subOrderDetails = Object.keys(orderDetail).map((key) => {
-        const { transaction, totalPrice } = orderDetail[key];
-        // const { foodList = {} } = restaurant;
-        // const totalPrice = Object.keys(foodList).reduce((prev, cur) => {
-        //   const price = foodList[cur].foodPrice;
-        //   return prev + price;
-        // }, 0);
+        const { transaction, totalPrice = 0 } = orderDetail[key];
 
         return (
           <div key={key} className={css.orderDetailTooltipItem}>

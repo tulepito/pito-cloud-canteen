@@ -19,9 +19,11 @@ import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import StateItem from '@components/TimeLine/StateItem';
 import Tooltip from '@components/Tooltip/Tooltip';
+import { combineOrderDetailWithPriceInfo } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { adminPaths, adminRoutes } from '@src/paths';
+import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@utils/dates';
 import {
   EOrderDraftStates,
@@ -32,6 +34,8 @@ import {
 import type {
   TIntegrationListing,
   TIntegrationOrderListing,
+  TListing,
+  TObject,
   TTableSortValue,
 } from '@utils/types';
 import { parsePrice } from '@utils/validators';
@@ -77,13 +81,7 @@ const OrderDetailTooltip = ({
     (prev: any, subOrder: TIntegrationListing) => {
       const { orderDetail = {} } = subOrder.attributes.metadata || {};
       const subOrderDetails = Object.keys(orderDetail).map((key) => {
-        const { transaction, restaurant = {} } = orderDetail[key];
-        const { foodList = {} } = restaurant;
-        const totalPrice = Object.keys(foodList).reduce((prev, cur) => {
-          const price = foodList[cur].foodPrice;
-
-          return prev + price;
-        }, 0);
+        const { transaction, totalPrice = 0 } = orderDetail[key];
 
         return (
           <div key={key} className={css.orderDetailTooltipItem}>
@@ -269,6 +267,26 @@ const parseEntitiesToTableData = (
       },
       [],
     );
+
+    const newSubOrders = subOrders.map((plan: TObject) => {
+      const { orderDetail: planOrderDetail = {} } = Listing(
+        plan as TListing,
+      ).getMetadata();
+
+      return {
+        ...plan,
+        attributes: {
+          ...(plan as TListing).attributes,
+          metadata: {
+            ...(plan as TListing).attributes.metadata,
+            orderDetail: combineOrderDetailWithPriceInfo({
+              orderDetail: planOrderDetail,
+            }),
+          },
+        },
+      };
+    });
+
     const {
       startDate,
       endDate,
@@ -293,7 +311,7 @@ const parseEntitiesToTableData = (
         state: orderState || EOrderDraftStates.pendingApproval,
         orderId: entity?.id?.uuid,
         restaurants,
-        subOrders,
+        subOrders: newSubOrders,
         orderName: entity.attributes.publicData.orderName,
         deliveryHour,
       },
