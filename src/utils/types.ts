@@ -515,3 +515,22 @@ export type TOrderStateHistory = {
   state: EOrderStates | EOrderDraftStates | EBookerOrderDraftStates;
   updatedAt: number;
 };
+
+export type TScenarioRating = {
+  rating: number;
+  optionalRating?: string[];
+  optionalOtherReview?: string;
+};
+
+export type TRestaurantRating = {
+  orderId: string;
+  restaurantId: string;
+  reviewerId: string;
+  timestamp: number;
+  generalRating: number;
+  detailReview?: string;
+  detailRating?: {
+    food?: TScenarioRating;
+    packaging?: TScenarioRating;
+  };
+};

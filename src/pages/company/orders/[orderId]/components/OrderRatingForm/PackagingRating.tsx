@@ -11,14 +11,19 @@ type TPackagingRatingProps = {
   values: any;
   restaurantsByDay: any;
 };
+
+const OPTIONAL_PACKAGING_RESTAURANT_SATISFACTED =
+  'optionalPackaging-restaurant-satifacted';
+const OPTIONAL_PACKAGING_RESTAURANT_UNSATISFACTED =
+  'optionalPackaging-restaurant-unsatifacted';
 const PackagingRating: React.FC<TPackagingRatingProps> = (props) => {
   const { values, restaurantsByDay } = props;
   const isPackagingSelected = values?.packaging;
   const isPackagingSatifactedSelected =
     values?.packaging && values?.packaging >= 3;
   const isPackagingRestaurantSelected =
-    values?.['optionalPackaging-restaurant-satifacted'] ||
-    values?.['optionalPackaging-restaurant-unsatifacted'];
+    values?.[OPTIONAL_PACKAGING_RESTAURANT_SATISFACTED] ||
+    values?.[OPTIONAL_PACKAGING_RESTAURANT_UNSATISFACTED];
 
   const basicOptionalUnsatifactedPackagingRatingOptions = [
     {
@@ -50,11 +55,11 @@ const PackagingRating: React.FC<TPackagingRatingProps> = (props) => {
   const optionalUnsatifactedPackagingRatingOptions = useMemo(() => {
     if (
       !isPackagingSatifactedSelected &&
-      values?.['optionalPackaging-restaurant-unsatifacted']
+      values?.[OPTIONAL_PACKAGING_RESTAURANT_UNSATISFACTED]
     ) {
       return basicOptionalUnsatifactedPackagingRatingOptions.map((option) => ({
         ...option,
-        key: `${values?.['optionalPackaging-restaurant-unsatifacted']} - ${option.key}`,
+        key: `${values?.[OPTIONAL_PACKAGING_RESTAURANT_UNSATISFACTED]} - ${option.key}`,
       }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -86,11 +91,11 @@ const PackagingRating: React.FC<TPackagingRatingProps> = (props) => {
   const optionalSatifactedPackagingRatingOptions = useMemo(() => {
     if (
       isPackagingSatifactedSelected &&
-      values?.['optionalPackaging-restaurant-satifacted']
+      values?.[OPTIONAL_PACKAGING_RESTAURANT_SATISFACTED]
     ) {
       return basicOptionalSatifactedPackagingRatingOptions.map((option) => ({
         ...option,
-        key: `${values?.['optionalPackaging-restaurant-satifacted']} - ${option.key}`,
+        key: `${values?.[OPTIONAL_PACKAGING_RESTAURANT_SATISFACTED]} - ${option.key}`,
       }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -156,20 +161,20 @@ const PackagingRating: React.FC<TPackagingRatingProps> = (props) => {
 
   const optionalPackagingOtherFieldId = `optionalPackaging-other - ${
     isPackagingSatifactedSelected
-      ? values?.['optionalPackaging-restaurant-satifacted']
-      : values?.['optionalPackaging-restaurant-unsatifacted']
+      ? values?.[OPTIONAL_PACKAGING_RESTAURANT_SATISFACTED]
+      : values?.[OPTIONAL_PACKAGING_RESTAURANT_UNSATISFACTED]
   }`;
 
   const shouldRenderOptionalPackagingOtherField = isPackagingSatifactedSelected
     ? (values?.['optionalPackaging-satifacted'] || []).findIndex(
         (item: string) =>
           item ===
-          `${values?.['optionalPackaging-restaurant-satifacted']} - other`,
+          `${values?.[OPTIONAL_PACKAGING_RESTAURANT_SATISFACTED]} - other`,
       ) !== -1
     : (values?.['optionalPackaging-unsatifacted'] || []).findIndex(
         (item: string) =>
           item ===
-          `${values?.['optionalPackaging-restaurant-unsatifacted']} - other`,
+          `${values?.[OPTIONAL_PACKAGING_RESTAURANT_UNSATISFACTED]} - other`,
       ) !== -1;
 
   const optionalPackagingOtherField =

@@ -1,4 +1,4 @@
-import type { TObject } from '@utils/types';
+import type { TObject, TRestaurantRating, TScenarioRating } from '@utils/types';
 
 import { deleteApi, getApi, postApi, putApi } from './configs';
 
@@ -198,36 +198,11 @@ export const adminTransferCompanyOwnerApi = ({
   });
 
 export type TBookerPostRatingApiBody = {
-  ratings: {
-    orderId: string;
-    restaurantId: string;
-    reviewerId: string;
-    timestamp: number;
-    generalRating: number;
-    detailReview?: string;
-    detailRating?: {
-      food?: {
-        rating?: number;
-        optionalRating?: string[];
-      };
-      packaging?: {
-        rating?: number;
-        optionalRating?: string[];
-        optionalOtherReview?: string;
-      };
-    };
-  }[];
+  ratings: TRestaurantRating[];
   imageIdList?: string[];
   detailTextRating?: string;
-  staff: {
-    rating: number;
-    optionalRating?: string[];
-  };
-  service: {
-    rating: number;
-    optionalRating?: string[];
-    optionalOtherReview?: string;
-  };
+  staff: TScenarioRating;
+  service: TScenarioRating;
 };
 export const bookerPostRatingApi = (body: TBookerPostRatingApiBody) =>
   postApi('/company/ratings', body);

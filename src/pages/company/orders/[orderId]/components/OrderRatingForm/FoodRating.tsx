@@ -16,6 +16,11 @@ type TFoodRatingProps = {
   restaurantsByDay: any;
 };
 
+const OPTIONAL_FOOD_RESTAURANT_SATISFACTED =
+  'optionalFood-restaurant-satifacted';
+const OPTIONAL_FOOD_RESTAURANT_UNSATISFACTED =
+  'optionalFood-restaurant-unsatifacted';
+
 const FoodRating: React.FC<TFoodRatingProps> = (props) => {
   const dispatch = useAppDispatch();
   const { values, restaurantsByDay } = props;
@@ -32,19 +37,19 @@ const FoodRating: React.FC<TFoodRatingProps> = (props) => {
   const isFoodSatifactedSelected = values?.food && values?.food >= 3;
   const isFoodListReadyToFetch =
     isFoodSelected &&
-    (values['optionalFood-restaurant-satifacted'] ||
-      values['optionalFood-restaurant-unsatifacted']);
+    (values[OPTIONAL_FOOD_RESTAURANT_SATISFACTED] ||
+      values[OPTIONAL_FOOD_RESTAURANT_UNSATISFACTED]);
 
   const optionalFoodRatingOptions = useMemo(() => {
     if (
       (isFoodSatifactedSelected &&
-        values['optionalFood-restaurant-satifacted']) ||
+        values[OPTIONAL_FOOD_RESTAURANT_SATISFACTED]) ||
       (!isFoodSatifactedSelected &&
-        values['optionalFood-restaurant-unsatifacted'])
+        values[OPTIONAL_FOOD_RESTAURANT_UNSATISFACTED])
     ) {
       const [restaurantId, timestamp] = isFoodSatifactedSelected
-        ? values['optionalFood-restaurant-satifacted'].split(' - ')
-        : values['optionalFood-restaurant-unsatifacted'].split(' - ');
+        ? values[OPTIONAL_FOOD_RESTAURANT_SATISFACTED].split(' - ')
+        : values[OPTIONAL_FOOD_RESTAURANT_UNSATISFACTED].split(' - ');
 
       return foodListByRestaurant[`${restaurantId} - ${timestamp}`]?.map(
         (item) => ({
@@ -57,20 +62,20 @@ const FoodRating: React.FC<TFoodRatingProps> = (props) => {
     foodListByRestaurant,
     isFoodSatifactedSelected,
     isFoodSelected,
-    values['optionalFood-restaurant-satifacted'],
-    values['optionalFood-restaurant-unsatifacted'],
+    values[OPTIONAL_FOOD_RESTAURANT_SATISFACTED],
+    values[OPTIONAL_FOOD_RESTAURANT_UNSATISFACTED],
   ]);
   useEffect(() => {
     if (isFoodSelected) {
       if (
         (isFoodSatifactedSelected &&
-          values['optionalFood-restaurant-satifacted']) ||
+          values[OPTIONAL_FOOD_RESTAURANT_SATISFACTED]) ||
         (!isFoodSatifactedSelected &&
-          values['optionalFood-restaurant-unsatifacted'])
+          values[OPTIONAL_FOOD_RESTAURANT_UNSATISFACTED])
       ) {
         const [restaurantId, timestamp] = isFoodSatifactedSelected
-          ? values['optionalFood-restaurant-satifacted'].split(' - ')
-          : values['optionalFood-restaurant-unsatifacted'].split(' - ');
+          ? values[OPTIONAL_FOOD_RESTAURANT_SATISFACTED].split(' - ')
+          : values[OPTIONAL_FOOD_RESTAURANT_UNSATISFACTED].split(' - ');
         dispatch(
           OrderRatingThunks.fetchFoodListByRestaurant({
             restaurantId,
@@ -83,15 +88,15 @@ const FoodRating: React.FC<TFoodRatingProps> = (props) => {
     dispatch,
     isFoodSatifactedSelected,
     isFoodSelected,
-    values['optionalFood-restaurant-satifacted'],
-    values['optionalFood-restaurant-unsatifacted'],
+    values[OPTIONAL_FOOD_RESTAURANT_SATISFACTED],
+    values[OPTIONAL_FOOD_RESTAURANT_UNSATISFACTED],
   ]);
 
   const optionalFoodRating = isFoodSatifactedSelected ? (
     <>
       <div className={css.optionalFieldTitle}>Món nào khiến bạn ấn tượng?</div>
       <FieldSelect
-        name="optionalFood-restaurant-satifacted"
+        name={OPTIONAL_FOOD_RESTAURANT_SATISFACTED}
         id="optionalFood-restaurant"
         className={css.optionalSelectField}>
         <option value="">Chọn nhà hàng bạn muốn đánh giá</option>
@@ -123,7 +128,7 @@ const FoodRating: React.FC<TFoodRatingProps> = (props) => {
         Món nào khiến không bạn ấn tượng?
       </div>
       <FieldSelect
-        name="optionalFood-restaurant-unsatifacted"
+        name={OPTIONAL_FOOD_RESTAURANT_UNSATISFACTED}
         id="optionalFood-restaurant">
         <option value="">Chọn nhà hàng bạn muốn đánh giá</option>
         {restaurantsByDay.map(
