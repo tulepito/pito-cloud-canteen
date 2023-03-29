@@ -37,11 +37,6 @@ export const useSearchRestaurants = () => {
     (state) => state.BookerSelectRestaurant.totalItems,
   );
 
-  const totalRatings = useAppSelector(
-    (state) => state.BookerSelectRestaurant.totalRatings,
-    shallowEqual,
-  );
-
   useEffect(() => {
     dispatch(
       selectCalendarDate(DateTime.fromMillis(Number(timestamp)).toJSDate()),
@@ -85,7 +80,6 @@ export const useSearchRestaurants = () => {
     restaurants,
     searchInProgress,
     totalResultItems,
-    totalRatings,
   };
 };
 

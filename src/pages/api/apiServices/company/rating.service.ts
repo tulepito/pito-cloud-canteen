@@ -3,8 +3,9 @@ import uniq from 'lodash/uniq';
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchListing } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/sdk';
+import { UserPermission } from '@src/types/UserPermission';
 import { Listing, User } from '@src/utils/data';
-import { EOrderStates } from '@src/utils/enums';
+import { EListingType, EOrderStates } from '@src/utils/enums';
 
 export const postRatingFn = async (ratings: any) => {
   const integrationSdk = getIntegrationSdk();
@@ -21,6 +22,8 @@ export const postRatingFn = async (ratings: any) => {
         state: 'published',
         metadata: {
           ...rating,
+          listingType: EListingType.rating,
+          reviewRole: UserPermission.BOOKER,
         },
       });
 

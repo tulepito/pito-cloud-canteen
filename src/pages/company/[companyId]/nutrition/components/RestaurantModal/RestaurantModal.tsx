@@ -19,7 +19,6 @@ type TRestaurantModalProps = {
   isOpen?: boolean;
   onClose?: () => void;
   currentRestaurant: TListing;
-  totalRatings: number;
   companyGeoOrigin: {
     lat: number;
     lng: number;
@@ -35,14 +34,15 @@ const RestaurantModal: React.FC<TRestaurantModalProps> = (props) => {
     isOpen = false,
     onClose = () => null,
     currentRestaurant,
-    totalRatings,
     companyGeoOrigin,
     restaurantFoodList,
     onSearchFoodName,
   } = props;
   const restaurantId = Listing(currentRestaurant).getId();
   const restaurantName = Listing(currentRestaurant!).getAttributes().title;
-  const { rating = 0 } = Listing(currentRestaurant!).getMetadata();
+  const { totalRating = 0, totalRatingNumber = 0 } = Listing(
+    currentRestaurant!,
+  ).getMetadata();
   const { avatarImageId, coverImageId } = Listing(
     currentRestaurant!,
   ).getPublicData();
@@ -95,8 +95,8 @@ const RestaurantModal: React.FC<TRestaurantModalProps> = (props) => {
           <TopContent
             avatar={restaurantAvatar}
             restaurantName={restaurantName}
-            ratingNumber={rating}
-            rating={`${rating} (${totalRatings})`}
+            ratingNumber={totalRating}
+            rating={`${totalRating} (${totalRatingNumber})`}
             distance={`${distance}km`}
           />
           <div className={css.searchFormWrapper}>

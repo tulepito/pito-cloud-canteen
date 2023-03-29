@@ -22,6 +22,11 @@ const OrderRatingPage = () => {
   const intl = useIntl();
   const ratingSuccessModalControl = useBoolean();
   const { orderId } = router.query;
+  const currentUser = useAppSelector(
+    (state) => state.user.currentUser,
+    shallowEqual,
+  );
+  const currentUserId = currentUser?.id.uuid;
 
   const order = useAppSelector(
     (state) => state.OrderRating.order,
@@ -77,6 +82,7 @@ const OrderRatingPage = () => {
         orderId: orderId as string,
         restaurantId,
         timestamp,
+        reviewerId: currentUserId,
         generalRating: +general,
         detailRating: {
           food: {

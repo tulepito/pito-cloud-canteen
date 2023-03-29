@@ -26,7 +26,10 @@ import LayoutSidebar from '../../components/Layout/LayoutSidebar';
 
 import SidebarContent from './components/SidebarContent/SidebarContent';
 import { useGetPlanDetails, useLoadData } from './hooks/loadData';
-import { BookerSelectRestaurantThunks } from './restaurants/BookerSelectRestaurant.slice';
+import {
+  BookerSelectRestaurantActions,
+  BookerSelectRestaurantThunks,
+} from './restaurants/BookerSelectRestaurant.slice';
 import ResultDetailModal from './restaurants/components/ResultDetailModal/ResultDetailModal';
 import {
   useGetCalendarComponentProps,
@@ -75,7 +78,6 @@ function BookerDraftOrderPage() {
     openRestaurantDetailModal,
     closeRestaurantDetailModal,
     menuId,
-    totalRatings,
     restaurants,
   } = useRestaurantDetailModal();
 
@@ -193,6 +195,9 @@ function BookerDraftOrderPage() {
   ) => {
     setSelectedRestaurantId(restaurantId);
     setSelectedTimestamp(+dateTime);
+    dispatch(
+      BookerSelectRestaurantActions.setSelectedRestaurantId(restaurantId),
+    );
     await dispatch(
       BookerSelectRestaurantThunks.searchRestaurants({
         timestamp: +dateTime,
@@ -267,7 +272,6 @@ function BookerDraftOrderPage() {
           selectedRestaurantId={selectedRestaurantId}
           restaurants={restaurants}
           companyGeoOrigin={companyGeoOrigin}
-          totalRatings={totalRatings}
           onSearchSubmit={onSearchSubmit}
           fetchFoodInProgress={fetchRestaurantFoodInProgress}
           openFromCalendar

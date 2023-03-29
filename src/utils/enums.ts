@@ -113,6 +113,7 @@ export enum EListingType {
   menu = 'menu',
   subOrder = 'sub-order',
   order = 'order',
+  rating = 'rating',
 }
 
 export enum EUserPermission {

@@ -201,6 +201,7 @@ export type TBookerPostRatingApiBody = {
   ratings: {
     orderId: string;
     restaurantId: string;
+    reviewerId: string;
     timestamp: number;
     generalRating: number;
     detailReview?: string;

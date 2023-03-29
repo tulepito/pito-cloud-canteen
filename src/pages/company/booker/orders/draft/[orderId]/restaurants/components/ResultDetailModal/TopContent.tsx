@@ -1,5 +1,6 @@
 import React from 'react';
 
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconHeart from '@components/Icons/IconHeart/IconHeart';
 import IconStar from '@components/Icons/IconStar/IconStar';
 import IconTruck from '@components/Icons/IconTruck/IconTruck';
@@ -14,9 +15,10 @@ type TopContentProps = {
   rating: string;
   distance: string;
   ratingNumber: number;
+  onOpenReviewModal?: () => void;
 };
 const TopContent: React.FC<TopContentProps> = (props) => {
-  const { avatar, restaurantName, rating, distance } = props;
+  const { avatar, restaurantName, rating, distance, onOpenReviewModal } = props;
 
   return (
     <div className={css.topContent}>
@@ -38,10 +40,13 @@ const TopContent: React.FC<TopContentProps> = (props) => {
             <IconTruck className={css.moreInfoItemIcon} />
             <span>{distance}</span>
           </div>
-          <div className={css.ratingWrapper}>
-            <IconStar className={css.ratingStar} />
+          <div className={css.ratingWrapper} onClick={onOpenReviewModal}>
+            <div className={css.moreInfoItem}>
+              <IconStar className={css.ratingStar} />
+              {rating}
+              <IconArrow direction="right" />
+            </div>
           </div>
-          <div className={css.moreInfoItem}>{rating}</div>
         </div>
       </div>
     </div>
