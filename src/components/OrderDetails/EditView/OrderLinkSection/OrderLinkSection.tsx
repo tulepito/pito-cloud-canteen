@@ -13,8 +13,9 @@ import {
   orderDetailsAnyActionsInProgress,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
+import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@utils/dates';
-import type { TDefaultProps } from '@utils/types';
+import type { TDefaultProps, TListing } from '@utils/types';
 
 import type { TSendNotificationFormValues } from './SendNotificationForm';
 import SendNotificationModal from './SendNotificationModal';
@@ -36,11 +37,21 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const { orderData } = useAppSelector((state) => state.OrderManagement);
-  const [isFirstTimeAccess, setIsFirstTimeAccess] = useState(true);
+  const orderData = useAppSelector((state) => state.OrderManagement.orderData);
+  const planData = useAppSelector((state) => state.OrderManagement.planData);
+  const planViewed = useAppSelector(
+    (state) => state.OrderManagement.planViewed,
+  );
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const [isSendNotificationModalOpen, setIsSendNotificationModalOpen] =
     useState(false);
+
+  const plan = Listing(planData as TListing);
+  const order = Listing(orderData as TListing);
+  const { viewed } = plan.getMetadata();
+  const orderId = order.getId();
+  const planId = plan.getId();
+  const isFirstTimeAccess = !(inProgress || viewed || planViewed);
 
   const orderLink = getParticipantPickingLink(orderData?.id?.uuid);
   const formattedOrderDeadline = formatTimestamp(
@@ -74,8 +85,13 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const handleCloseSendNotificationModal = () => {
     setIsSendNotificationModalOpen(false);
 
-    if (isFirstTimeAccess) {
-      setIsFirstTimeAccess(false);
+    if (!viewed && planId && orderId) {
+      dispatch(
+        orderManagementThunks.bookerMarkInprogressPlanViewed({
+          planId,
+          orderId,
+        }),
+      );
     }
   };
 
