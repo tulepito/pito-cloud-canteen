@@ -55,6 +55,8 @@
     @include viewportLarge {
       padding: 24px 24px 0;
       min-height: 413px;
+      max-height: 75vh;
+      overflow: hidden auto;
     }
 
     &::before {
