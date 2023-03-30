@@ -5,7 +5,64 @@ import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk, getSdk } from '@services/sdk';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
 import { ECompanyStates } from '@src/utils/enums';
-import type { TObject } from '@src/utils/types';
+import type { TCreateCompanyApiParams, TObject } from '@src/utils/types';
+
+const normalizeCreateCompanyParams = (dataParams: TCreateCompanyApiParams) => {
+  const {
+    password,
+    email,
+    firstName,
+    lastName,
+    companyEmail,
+    companyLocation,
+    companyName,
+    phoneNumber,
+    location,
+    note,
+    tax,
+  } = dataParams;
+
+  const { selectedPlace } = location || {};
+
+  const address = selectedPlace?.address;
+  const origin = selectedPlace?.origin || {};
+
+  const { selectedPlace: companySelectedPlace } = companyLocation || {};
+  const companyAddress = companySelectedPlace?.address;
+  const companyOrigin = companySelectedPlace?.origin || {};
+  const createParams = {
+    password,
+    email,
+    firstName,
+    lastName,
+    displayName: `${lastName} ${firstName}`,
+    publicData: {
+      phoneNumber,
+      companyEmail,
+      companyName,
+      note,
+      location: {
+        address,
+        origin: {
+          lat: origin.lat,
+          lng: origin.lng,
+        },
+      },
+      companyLocation: {
+        address: companyAddress,
+        origin: {
+          lat: companyOrigin.lat,
+          lng: companyOrigin.lng,
+        },
+      },
+    },
+    privateData: {
+      tax,
+    },
+  };
+
+  return createParams;
+};
 
 const createCompany = async ({
   req,
@@ -15,17 +72,15 @@ const createCompany = async ({
 }: {
   req: NextApiRequest;
   res: NextApiResponse;
-  dataParams: TObject;
+  dataParams: TCreateCompanyApiParams;
   queryParams: TObject;
 }) => {
   const sdk = getSdk(req, res);
 
   const integrationSdk = getIntegrationSdk();
-  const { metadata, ...dataParamsWithoutMetadata } = dataParams;
+  const createDataParams = normalizeCreateCompanyParams(dataParams);
   // Create company account
-  const companyResponse = await sdk.currentUser.create(
-    dataParamsWithoutMetadata,
-  );
+  const companyResponse = await sdk.currentUser.create(createDataParams);
 
   const [companyAccount] = denormalisedResponseEntities(companyResponse);
   // Create sub master account
@@ -63,7 +118,6 @@ const createCompany = async ({
           members,
           companyList: [companyAccount.id.uuid],
           userState: ECompanyStates.draft,
-          ...metadata,
         },
       },
       queryParams,

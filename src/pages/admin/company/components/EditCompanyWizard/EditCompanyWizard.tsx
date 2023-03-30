@@ -35,8 +35,10 @@ import { isSignUpEmailTakenError } from '@utils/errors';
 import type {
   TCompany,
   TCompanyMemberWithDetails,
+  TCreateCompanyApiParams,
   TImage,
   TObject,
+  TUpdateCompanyApiParams,
 } from '@utils/types';
 
 import type { TAddCompanyGroupsFormValues } from '../AddCompanyGroupsForm/AddCompanyGroupsForm';
@@ -242,7 +244,8 @@ const EditCompanyWizardTab: React.FC<TEditCompanyWizardTab> = (props) => {
               companyLogo: company?.profileImage,
               nutritions: User(company).getPublicData().nutritions || [],
               bankAccounts:
-                User(company).getPrivateData().bankAccounts ||
+                (User(company).getPrivateData().bankAccounts.length > 0 &&
+                  User(company).getPrivateData().bankAccounts) ||
                 defaultBankAccounts,
               paymentDueDays: User(company).getPrivateData().paymentDueDays,
             } as TEditCompanySettingsInformationFormValues &
@@ -393,9 +396,13 @@ const EditCompanyWizard = () => {
             companyThunks.adminUpdateCompany({
               id: companyId,
               ...submitValues,
-            }),
+            } as unknown as TUpdateCompanyApiParams),
           )
-        : await dispatch(companyThunks.adminCreateCompany(submitValues))
+        : await dispatch(
+            companyThunks.adminCreateCompany(
+              submitValues as TCreateCompanyApiParams,
+            ),
+          )
     ) as any;
 
     const isDraft =
