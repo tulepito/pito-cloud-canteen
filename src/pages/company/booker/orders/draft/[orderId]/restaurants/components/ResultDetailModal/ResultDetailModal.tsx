@@ -112,7 +112,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     currentRestaurant!,
   ).getAttributes();
 
-  const { totalRating = 0, totalRatingNumber } = Listing(
+  const { totalRating = 0, totalRatingNumber = 0 } = Listing(
     currentRestaurant!,
   ).getMetadata();
   const restaurantName = Listing(currentRestaurant!).getAttributes().title;
