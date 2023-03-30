@@ -70,6 +70,10 @@
     .subLabel {
       @include text(14px, 20px);
       color: $neutralGray5;
+
+      &:not(:first-child) {
+        margin-top: 20px;
+      }
     }
   }
   .submitBtn {

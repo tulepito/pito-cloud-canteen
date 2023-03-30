@@ -24,6 +24,7 @@ import type { TListing } from '@utils/types';
 
 import DeliveryAddressField from '../DeliveryAddressField/DeliveryAddressField';
 import MealPlanDateField from '../MealPlanDateField/MealPlanDateField';
+import MealTypeField from '../MealTypeField/MealTypeField';
 import MemberAmountField from '../MemberAmountField/MemberAmountField';
 import NutritionField from '../NutritionField/NutritionField';
 import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
@@ -65,6 +66,10 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
   const updateOrderDetailInProgress = useAppSelector(
     (state) => state.Order.updateOrderDetailInProgress,
   );
+  const nutritionsOptions = useAppSelector(
+    (state) => state.Order.nutritions,
+    shallowEqual,
+  );
 
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const orderDetail = useAppSelector(
@@ -89,6 +94,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
     memberAmount,
     nutritions = [],
     dayInWeek = ['mon', 'tue', 'wed', 'thu', 'fri'],
+    mealType,
   } = Listing(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const initialValues = useMemo(
@@ -112,6 +118,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
       memberAmount:
         memberAmount || initialFieldValues[OrderSettingField.EMPLOYEE_AMOUNT],
       dayInWeek,
+      mealType,
     }),
     [
       packagePerMember,
@@ -130,6 +137,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
       JSON.stringify(initialFieldValues),
       JSON.stringify(nutritions),
       JSON.stringify(dayInWeek),
+      JSON.stringify(mealType),
     ],
   );
   const leftSideRenderer = () =>
@@ -249,9 +257,14 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
             </div>
             <div className={css.fieldContent}>
               <div className={css.subLabel}>
+                {intl.formatMessage({ id: 'MealTypeField.title' })}
+              </div>
+              <MealTypeField />
+
+              <div className={css.subLabel}>
                 {intl.formatMessage({ id: 'NutritionField.title' })}
               </div>
-              <NutritionField />
+              <NutritionField options={nutritionsOptions} />
             </div>
           </>
         );
