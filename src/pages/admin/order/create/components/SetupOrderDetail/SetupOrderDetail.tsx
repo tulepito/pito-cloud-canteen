@@ -329,6 +329,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   }, []);
 
   const handleSelectFood = async (values: TSelectFoodFormValues) => {
+    dispatch(setCanNotGoToStep4(true));
     const { food: foodIds } = values;
 
     const currRestaurantId = currentRestaurant?.id?.uuid;
