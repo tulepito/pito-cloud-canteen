@@ -46,8 +46,8 @@ const CompanyInvitationPage = () => {
     }
   }, [companyId, currentUser, dispatch, isReady]);
 
-  const onResponseInvitation = (response: UserInviteResponse) => () => {
-    dispatch(
+  const onResponseInvitation = (response: UserInviteResponse) => async () => {
+    await dispatch(
       companyInvitationThunks.responseToInvitation({
         response,
         companyId: companyId as string,
