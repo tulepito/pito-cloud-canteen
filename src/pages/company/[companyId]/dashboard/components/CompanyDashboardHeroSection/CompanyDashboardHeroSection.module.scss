@@ -54,10 +54,13 @@
       height: 100%;
       gap: 20px;
       overflow: auto;
+      padding: 0 24px;
 
       @include viewportMedium {
         width: 100%;
+        padding: 0;
       }
+
       .homePageLink {
         background-color: $neutralGray1;
         padding: 16px;
