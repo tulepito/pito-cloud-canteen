@@ -114,6 +114,7 @@ export enum EListingType {
   menu = 'menu',
   subOrder = 'sub-order',
   order = 'order',
+  rating = 'rating',
 }
 
 export enum EUserPermission {
@@ -775,7 +776,7 @@ export const ORDER_STATES_OPTIONS = [
   },
   {
     key: EOrderDraftStates.pendingApproval,
-    label: 'Đơn mới',
+    label: 'Mới tạo',
   },
   {
     key: EOrderDraftStates.draft,

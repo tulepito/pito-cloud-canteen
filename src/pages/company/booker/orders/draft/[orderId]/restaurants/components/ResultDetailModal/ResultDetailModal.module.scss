@@ -318,6 +318,8 @@
 .ratingWrapper {
   position: relative;
   width: fit-content;
+  @include flexAlign(center);
+  cursor: pointer;
 
   .basicStars {
     @include flexAlign(flex-start, flex-start);

@@ -86,9 +86,7 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
     (state) => state.Nutrition.restaurantFoodList,
     shallowEqual,
   );
-  const restaurantTotalRating = useAppSelector(
-    (state) => state.Nutrition.restaurantTotalRating,
-  );
+
   const companyAccount = useAppSelector(
     (state) => state.company.company,
     shallowEqual,
@@ -186,7 +184,6 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
     restaurantModalControl.setTrue();
     if (restaurantId !== selectedRestaurant?.id.uuid) {
       dispatch(NutritionThunks.fetchSelectedRestaurant(restaurantId));
-      dispatch(NutritionThunks.fetchTotalRating(restaurantId));
       dispatch(NutritionThunks.fetchFoodFromRestaurant(restaurantId));
     }
   };
@@ -312,7 +309,6 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
         isOpen={restaurantModalControl.value}
         onClose={restaurantModalControl.setFalse}
         currentRestaurant={selectedRestaurant!}
-        totalRatings={restaurantTotalRating}
         companyGeoOrigin={companyGeoOrigin}
         restaurantFoodList={restaurantFoodList}
         onSearchFoodName={onSearchFoodNameInRestaurant}

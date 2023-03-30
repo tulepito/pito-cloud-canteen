@@ -1,11 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import { createAsyncThunk } from '@redux/redux.helper';
+import { denormalisedResponseEntities } from '@src/utils/data';
+import type { TObject } from '@src/utils/types';
 import { EImageVariants } from '@utils/enums';
 
 // ================ Initial states ================ //
 type TUploadImageState = {
   image: any;
+  images: TObject;
   uploadImageInProgress: boolean;
   uploadImageError: any;
 };
@@ -15,12 +18,14 @@ export type TImageActionPayload = {
 };
 const initialState: TUploadImageState = {
   image: null,
+  images: {},
   uploadImageInProgress: false,
   uploadImageError: null,
 };
 
 // ================ Thunk types ================ //
 const UPLOAD_IMAGE = 'app/uploadImage/UPLOAD_IMAGE';
+const UPLOAD_IMAGES = 'app/uploadImage/UPLOAD_IMAGES';
 
 // ================ Async thunks ================ //
 const uploadImage = createAsyncThunk(
@@ -50,7 +55,40 @@ const uploadImage = createAsyncThunk(
     };
   },
 );
-export const uploadImageThunks = { uploadImage };
+
+const uploadImages = createAsyncThunk(
+  UPLOAD_IMAGES,
+  async (payload: any, { extra: sdk }) => {
+    const queryParams = {
+      expand: true,
+      'fields.image': [
+        `variants.${EImageVariants.squareSmall}`,
+        `variants.${EImageVariants.squareSmall2x}`,
+        `variants.${EImageVariants.scaledLarge}`,
+      ],
+    };
+    const response = await Promise.all(
+      payload.map(async (image: any) => {
+        const bodyParams = {
+          image: image.file,
+        };
+        const uploadImageResponse = denormalisedResponseEntities(
+          await sdk.images.upload(bodyParams, queryParams),
+        )[0];
+
+        return {
+          id: image.id,
+          imageId: uploadImageResponse.id.uuid,
+          uploadedImage: uploadImageResponse,
+        };
+      }),
+    );
+
+    return response;
+  },
+);
+
+export const uploadImageThunks = { uploadImage, uploadImages };
 
 // ================ Slice ================ //
 const uploadImageSlice = createSlice({
@@ -60,6 +98,19 @@ const uploadImageSlice = createSlice({
     resetImage: (state) => ({
       ...state,
       ...initialState,
+    }),
+    removeImage: (state, { payload }) => ({
+      ...state,
+      images: Object.keys(state.images).reduce((result, image: any) => {
+        if (image !== payload) {
+          return {
+            ...result,
+            [image]: state.images[image],
+          };
+        }
+
+        return result;
+      }, {}),
     }),
   },
   extraReducers: (builder) => {
@@ -91,11 +142,60 @@ const uploadImageSlice = createSlice({
         state.image = null;
         state.uploadImageInProgress = false;
         state.uploadImageError = error.message;
+      })
+
+      .addCase(uploadImages.pending, (state, { meta }) => {
+        const { images } = state;
+
+        return {
+          ...state,
+          uploadImageInProgress: true,
+          uploadImageError: null,
+          images: {
+            ...images,
+            ...meta.arg.reduce((result: any, image: TImageActionPayload) => {
+              return {
+                ...result,
+                [image.id]: {
+                  ...image,
+                },
+              };
+            }, {}),
+          },
+        };
+      })
+      .addCase(uploadImages.fulfilled, (state, { payload }) => {
+        const { images = {} }: { images: TObject } = state;
+        const newImages = Object.keys(images).reduce(
+          (result: any, image: any) => {
+            const uploadedImage = payload.find((_image) => _image.id === image);
+
+            return {
+              ...result,
+              [image]: {
+                ...images[image],
+                ...uploadedImage,
+              },
+            };
+          },
+          {},
+        );
+
+        return {
+          ...state,
+          uploadImageInProgress: false,
+          images: newImages,
+        };
+      })
+      .addCase(uploadImages.rejected, (state, { error }) => {
+        state.images = {};
+        state.uploadImageInProgress = false;
+        state.uploadImageError = error.message;
       });
   },
 });
 
-export const { resetImage } = uploadImageSlice.actions;
+export const { resetImage, removeImage } = uploadImageSlice.actions;
 // ================ Actions ================ //
 export default uploadImageSlice.reducer;
 

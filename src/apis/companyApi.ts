@@ -1,4 +1,4 @@
-import type { TObject } from '@utils/types';
+import type { TObject, TRestaurantRating, TScenarioRating } from '@utils/types';
 
 import { deleteApi, getApi, postApi, putApi } from './configs';
 
@@ -211,3 +211,13 @@ export const adminTransferCompanyOwnerApi = ({
     newOwnerProfileImageId,
     permissionForOldOwner,
   });
+
+export type TBookerPostRatingApiBody = {
+  ratings: TRestaurantRating[];
+  imageIdList?: string[];
+  detailTextRating?: string;
+  staff: TScenarioRating;
+  service: TScenarioRating;
+};
+export const bookerPostRatingApi = (body: TBookerPostRatingApiBody) =>
+  postApi('/company/ratings', body);

@@ -1,4 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
+import keyBy from 'lodash/keyBy';
+import mapValue from 'lodash/mapValues';
 import { DateTime } from 'luxon';
 
 import { updatePlanDetailsApi } from '@apis/orderApi';
@@ -9,9 +11,10 @@ import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { ListingTypes } from '@src/types/listingTypes';
+import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { convertWeekDay } from '@utils/dates';
-import { EImageVariants } from '@utils/enums';
+import { EImageVariants, EListingType } from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
@@ -32,10 +35,6 @@ type TOrderInitialState = {
 
   searchResult: TListing[];
   totalItems: number;
-  totalRatings: {
-    restaurantId: string;
-    totalReviews: number;
-  }[];
   combinedRestaurantMenuData: {
     restaurantId: string;
     menuId: string;
@@ -66,6 +65,16 @@ type TOrderInitialState = {
   fetchRestaurantFoodError: any;
 
   currentMenuId?: string;
+  selectedRestaurantId: string;
+
+  restaurantBookerReviews: any;
+  restaurantBookerReviewers: any;
+
+  restaurantParticipantReviews: any;
+  restaurantParticipantReviewers: any;
+
+  fetchRestaurantReviewInProgress: boolean;
+  fetchRestaurantReviewError: any;
 };
 
 const initialState: TOrderInitialState = {
@@ -78,7 +87,6 @@ const initialState: TOrderInitialState = {
 
   searchResult: [],
   totalItems: 0,
-  totalRatings: [],
   combinedRestaurantMenuData: [],
 
   fetchFilterInProgress: false,
@@ -104,6 +112,17 @@ const initialState: TOrderInitialState = {
   fetchRestaurantFoodError: null,
 
   currentMenuId: undefined,
+
+  restaurantBookerReviews: [],
+  restaurantBookerReviewers: [],
+
+  restaurantParticipantReviews: [],
+  restaurantParticipantReviewers: [],
+
+  fetchRestaurantReviewInProgress: false,
+  fetchRestaurantReviewError: null,
+
+  selectedRestaurantId: '',
 };
 
 // ================ Thunk types ================ //
@@ -117,6 +136,8 @@ const FETCH_PLAN_DETAIL = 'app/BookerSelectRestaurant/FETCH_PLAN_DETAIL';
 const UPDATE_PLAN_DETAIL = 'app/BookerSelectRestaurant/UPDATE_PLAN_DETAIL';
 const FETCH_COMPANY_FROM_ORDER =
   'app/BookerSelectRestaurant/FETCH_COMPANY_FROM_ORDER';
+const FETCH_RESTAURANT_REVIEWS =
+  'app/BookerSelectRestaurant/FETCH_RESTAURAN_REVIEWS';
 
 // ================ Async thunks ================ //
 const fetchRestaurant = createAsyncThunk(
@@ -181,21 +202,6 @@ const searchRestaurants = createAsyncThunk(
     const { meta } = restaurantsResponse.data;
 
     const restaurants = denormalisedResponseEntities(restaurantsResponse);
-    const totalRatings = await Promise.all(
-      restaurants.map(async (restaurant: TListing) => {
-        const restaurantId = restaurant.id.uuid;
-        const reviewsResponse = await sdk.reviews.query({
-          listingId: restaurantId,
-          type: 'ofCustomer',
-        });
-        const { meta: reviewMeta } = reviewsResponse.data;
-
-        return {
-          restaurantId,
-          totalReviews: reviewMeta.totalItems,
-        };
-      }),
-    );
 
     return {
       ...(newRestaurantIds.length > 0 && {
@@ -204,7 +210,6 @@ const searchRestaurants = createAsyncThunk(
       searchResult: restaurants,
       combinedRestaurantMenuData,
       totalItems: meta.totalItems,
-      totalRatings,
     };
   },
 );
@@ -305,6 +310,60 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
   },
 );
 
+const fetchRestaurantReviews = createAsyncThunk(
+  FETCH_RESTAURANT_REVIEWS,
+  async ({ page = 1, reviewRole }: any, { extra: sdk, getState }) => {
+    const { selectedRestaurantId } = getState().BookerSelectRestaurant;
+    const response = denormalisedResponseEntities(
+      await sdk.listings.query({
+        meta_listingType: EListingType.rating,
+        meta_restaurantId: selectedRestaurantId,
+        page,
+        meta_reviewRole: reviewRole,
+      }),
+    );
+    const reviewerResponse = await Promise.all(
+      response
+        .map((item: TListing) => ({
+          reviewerId: Listing(item).getMetadata()?.reviewerId,
+          reviewId: Listing(item).getId(),
+        }))
+        .map(async ({ reviewerId, reviewId }: any) => {
+          const reviewer = await sdk.users.show({
+            id: reviewerId,
+            include: ['profileImage'],
+            'fields.image': [
+              'variants.square-small',
+              'variants.square-small2x',
+            ],
+          });
+
+          return {
+            id: reviewId,
+            value: denormalisedResponseEntities(reviewer)[0],
+          };
+        }),
+    );
+
+    return {
+      ...(reviewRole === UserPermission.BOOKER && {
+        restaurantBookerReviews: response,
+        restaurantBookerReviewers: mapValue(
+          keyBy(reviewerResponse, 'id'),
+          'value',
+        ),
+      }),
+      ...(reviewRole === UserPermission.PARTICIPANT && {
+        restaurantParticipantReviews: response,
+        restaurantParticipantReviewers: mapValue(
+          keyBy(reviewerResponse, 'id'),
+          'value',
+        ),
+      }),
+    };
+  },
+);
+
 export const BookerSelectRestaurantThunks = {
   fetchRestaurant,
 
@@ -317,6 +376,7 @@ export const BookerSelectRestaurantThunks = {
   updatePlanDetail,
 
   fetchCompanyAccount,
+  fetchRestaurantReviews,
 };
 
 const BookerSelectRestaurantSlice = createSlice({
@@ -325,6 +385,9 @@ const BookerSelectRestaurantSlice = createSlice({
   reducers: {
     setCurrentMenuId: (state, action) => {
       state.currentMenuId = action.payload;
+    },
+    setSelectedRestaurantId: (state, action) => {
+      state.selectedRestaurantId = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -346,7 +409,6 @@ const BookerSelectRestaurantSlice = createSlice({
         state.restaurantIdList = action.payload.restaurantIdList ?? [];
         state.searchResult = action.payload.searchResult ?? [];
         state.totalItems = action.payload.totalItems ?? 0;
-        state.totalRatings = action.payload.totalRatings ?? [];
         state.combinedRestaurantMenuData =
           action.payload.combinedRestaurantMenuData ?? [];
       })
@@ -439,6 +501,25 @@ const BookerSelectRestaurantSlice = createSlice({
         ...state,
         fetchRestaurantInProgress: false,
         fetchRestaurantError: error,
+      }))
+
+      .addCase(fetchRestaurantReviews.pending, (state) => ({
+        ...state,
+        fetchRestaurantReviewInProgress: true,
+        fetchRestaurantReviewError: null,
+      }))
+      .addCase(fetchRestaurantReviews.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchRestaurantReviewInProgress: false,
+        restaurantBookerReviews: payload?.restaurantBookerReviews,
+        restaurantBookerReviewers: payload?.restaurantBookerReviewers,
+        restaurantParticipantReviews: payload?.restaurantParticipantReviews,
+        restaurantParticipantReviewers: payload?.restaurantParticipantReviewers,
+      }))
+      .addCase(fetchRestaurantReviews.rejected, (state, { error }) => ({
+        ...state,
+        fetchRestaurantReviewInProgress: false,
+        fetchRestaurantReviewError: error,
       }));
   },
 });

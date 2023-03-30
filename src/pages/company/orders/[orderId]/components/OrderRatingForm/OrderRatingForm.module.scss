@@ -1,0 +1,121 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.generalRatingWrapper {
+  padding-bottom: 20px;
+  border-bottom: 1px solid $neutralGray4;
+
+  .generalRatingTitle {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+    text-align: center;
+  }
+
+  .generalRatingField {
+    width: 455px;
+    margin: 20px auto 0;
+  }
+}
+
+.detailRatingWrapper {
+  @include flexAlign(flex-start, space-between);
+  flex-direction: column;
+  flex-wrap: wrap;
+
+  .detailRatingTitle {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+  }
+
+  .detailRatingFieldWrapper {
+    width: 100%;
+    margin-bottom: 24px;
+    @include textTemplate(16px, $fontWeightBold, 24px);
+
+    .fieldContainer {
+      height: 84px;
+    }
+    .faceIcon {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .detailRatingOptionalField {
+    margin-top: 16px;
+
+    .optionalFieldTitle {
+      @include textTemplate(14px, $fontWeightSemiBold, 20px);
+      margin-bottom: 12px;
+    }
+
+    .optionalFieldContainer {
+      margin-top: 8px;
+    }
+
+    .optionalSelectField {
+      width: 346px;
+    }
+  }
+
+  .optionalOtherField {
+    margin-top: 8px;
+
+    textarea {
+      resize: none;
+    }
+  }
+}
+
+.detailTextRatingWrapper {
+  margin-top: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid $neutralGray4;
+
+  .detailTextRatingLabel {
+    @include textTemplate(18px, $fontWeightBold, 24px);
+  }
+
+  .textareaField {
+    textarea {
+      resize: none;
+    }
+  }
+}
+
+.imagesRatingWrapper {
+  margin-top: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid $neutralGray4;
+
+  .imagesRatingTitle {
+    @include textTemplate(18px, $fontWeightBold, 24px);
+  }
+}
+
+.submitBtnWrapper {
+  padding: 28px 0 100px;
+  @include flexAlign(center, flex-end);
+  .submitBtn {
+    width: 160px;
+  }
+}
+
+.detailRatingContainer {
+  @include flexAlign(flex-start, space-between);
+  gap: 64px;
+  padding-bottom: 20px;
+  margin-top: 20px;
+  border-bottom: 1px solid $neutralGray4;
+
+  .ratingSectionTitle {
+    @include textTemplate(18px, $fontWeightBold, 24px);
+  }
+
+  .pitoRating {
+    flex-basis: 50%;
+  }
+
+  .partnerRating {
+    flex-basis: 50%;
+  }
+}

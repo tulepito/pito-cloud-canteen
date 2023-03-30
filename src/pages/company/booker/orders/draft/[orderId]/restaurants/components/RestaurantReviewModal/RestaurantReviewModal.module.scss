@@ -1,0 +1,96 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.scrollLayer .modalContainer {
+  @include viewportLarge {
+    flex-basis: 700px;
+  }
+}
+
+.modalHeader {
+  padding-bottom: 24px;
+  border-bottom: 1px solid $neutralGray3;
+
+  .detailRatingContainer {
+    margin: 0 auto;
+    width: 323px;
+  }
+  .detailRatingRow {
+    display: grid;
+    grid-template-columns: 2fr 4fr 1fr;
+    align-items: center;
+
+    margin-top: 8px;
+  }
+
+  .scenarioLabel {
+    grid-column: 1 / span 1;
+    @include textTemplate(14px, $fontWeightSemiBold, 20px);
+    color: $neutralGray5;
+  }
+
+  .ratingBar {
+    grid-column: 2 / span 1;
+    height: 6px;
+    background-color: #ccc;
+    position: relative;
+    border-radius: 100px;
+  }
+
+  .activeBar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background-color: black;
+    border-radius: 100px;
+  }
+
+  .ratingPoint {
+    grid-column: 3 / span 1;
+    text-align: center;
+    @include textTemplate(14px, $fontWeightSemiBold, 20px);
+  }
+}
+
+.modalContent {
+  margin-top: 20px;
+
+  .contentHeader {
+    @include flexAlign(center, space-between);
+    height: 48px;
+
+    .totalComment {
+      @include textTemplate(18px, $fontWeightBold, 24px);
+    }
+
+    .seeAll {
+      @include flexAlign(center);
+      @include textTemplate(14px, $fontWeightBold, 24px);
+      gap: 12px;
+      cursor: pointer;
+    }
+  }
+}
+
+.tabLabel {
+  @include flexAlign(center);
+  gap: 12px;
+}
+
+.reviewItem {
+  margin-top: 20px;
+}
+
+.goBack {
+  @include textTemplate(16px, $fontWeightBold, 24px);
+  cursor: pointer;
+  @include flexAlign(center);
+  gap: 8px;
+}
+
+.noReview {
+  margin-top: 20px;
+  text-align: center;
+}

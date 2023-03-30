@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
@@ -21,6 +22,17 @@ const InvitationCard: React.FC<InvitationCardProps> = (props) => {
   } = props;
   const intl = useIntl();
   const modalClasses = classNames(css.modal, css.open);
+  const [actionLoading, setActionLoading] = useState<string>('');
+  const handleAccept = async () => {
+    setActionLoading('accept');
+    await onAccept();
+    setActionLoading('');
+  };
+  const handleDecline = async () => {
+    setActionLoading('decline');
+    await onDecline();
+    setActionLoading('');
+  };
 
   return (
     <div className={modalClasses}>
@@ -54,15 +66,19 @@ const InvitationCard: React.FC<InvitationCardProps> = (props) => {
             <Button
               variant="secondary"
               className={css.declineBtn}
-              onClick={onDecline}
-              inProgress={responseToInvitationInProgress}
+              onClick={handleDecline}
+              inProgress={
+                responseToInvitationInProgress && actionLoading === 'decline'
+              }
               disabled={responseToInvitationInProgress}>
               {intl.formatMessage({ id: 'InvitationCard.decline' })}
             </Button>
             <Button
               className={css.acceptBtn}
-              onClick={onAccept}
-              inProgress={responseToInvitationInProgress}
+              onClick={handleAccept}
+              inProgress={
+                responseToInvitationInProgress && actionLoading === 'accept'
+              }
               disabled={responseToInvitationInProgress}>
               {intl.formatMessage({ id: 'InvitationCard.accept' })}
             </Button>

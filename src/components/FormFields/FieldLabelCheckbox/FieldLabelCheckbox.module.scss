@@ -1,0 +1,44 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  @include flexAlign(center);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.label {
+  @include flexAlign(center);
+  gap: 8px;
+  flex-direction: column;
+  @include textTemplate(14px, $fontWeightSemiBold, 20px);
+  color: $neutralGray4;
+  cursor: pointer;
+  border: 1px solid $neutralGray4;
+  border-radius: 20px;
+  padding: 8px 16px;
+
+  &:hover {
+    svg {
+      path {
+        fill: $neutralGray6;
+      }
+    }
+
+    color: $neutralGray6;
+  }
+}
+
+.input {
+  display: none;
+
+  &:checked + label {
+    svg {
+      path {
+        fill: $neutralGray6;
+      }
+    }
+    color: $neutralGray6;
+    border-color: $neutralGray6;
+  }
+}

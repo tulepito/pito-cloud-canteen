@@ -21,6 +21,7 @@ import { getListingImageById } from '../../helpers';
 import { useGetPlanDetails } from '../../hooks/orderData';
 import { useGetRestaurant } from '../../hooks/restaurants';
 import FoodDetailModal from '../FoodDetailModal/FoodDetailModal';
+import RestaurantReviewModal from '../RestaurantReviewModal/RestaurantReviewModal';
 
 import FoodListSection from './FoodListSection';
 import ResultDetailFilters from './ResultDetailFilters';
@@ -41,7 +42,6 @@ type TResultDetailModalProps = {
     lat: number;
     lng: number;
   };
-  totalRatings: any[];
   fetchFoodInProgress: boolean;
   openFromCalendar?: boolean;
   timestamp?: number;
@@ -55,7 +55,6 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   selectedRestaurantId,
   restaurants,
   companyGeoOrigin,
-  totalRatings,
   onSearchSubmit,
   fetchFoodInProgress,
   openFromCalendar,
@@ -72,6 +71,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   const { restaurant: preselectedRestaurant } = useGetRestaurant();
 
   const { orderId, planId, planDetail } = useGetPlanDetails();
+  const restaurantReviewModalControl = useBoolean();
   const initFoodList = useMemo(() => {
     const detail =
       Listing(planDetail).getMetadata().orderDetail?.[
@@ -112,7 +112,9 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     currentRestaurant!,
   ).getAttributes();
 
-  const { rating = 0 } = Listing(currentRestaurant!).getMetadata();
+  const { totalRating = 0, totalRatingNumber = 0 } = Listing(
+    currentRestaurant!,
+  ).getMetadata();
   const restaurantName = Listing(currentRestaurant!).getAttributes().title;
   const { avatarImageId, coverImageId } = Listing(
     currentRestaurant!,
@@ -124,13 +126,6 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   const restaurantCover = getListingImageById(
     coverImageId,
     Listing(currentRestaurant!).getImages(),
-  );
-  const totalReviewsOfRestaurant = useMemo(
-    () =>
-      totalRatings.find(
-        (_restaurant) => _restaurant.restaurantId === selectedRestaurantId,
-      )?.totalReviews || 0,
-    [totalRatings, selectedRestaurantId],
   );
 
   const distance = useMemo(
@@ -242,6 +237,10 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     [onSearchSubmit, selectedRestaurantId],
   );
 
+  const onOpenReviewModal = useCallback(() => {
+    restaurantReviewModalControl.setTrue();
+  }, []);
+
   if (!isOpen) {
     return null;
   }
@@ -278,9 +277,10 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
             <TopContent
               avatar={restaurantAvatar}
               restaurantName={restaurantName}
-              rating={`${rating} (${totalReviewsOfRestaurant} đánh giá)`}
-              ratingNumber={rating}
+              rating={`${totalRating} (${totalRatingNumber} đánh giá)`}
+              ratingNumber={totalRating}
               distance={`${distance}km`}
+              onOpenReviewModal={onOpenReviewModal}
             />
             <ResultDetailFilters
               onSelectAllFood={handleSelectFoods}
@@ -324,6 +324,10 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
         food={selectedFood!}
         onClose={foodModal.setFalse}
         onSelect={handleSelectFood}
+      />
+      <RestaurantReviewModal
+        isOpen={restaurantReviewModalControl.value}
+        onClose={restaurantReviewModalControl.setFalse}
       />
     </>
   );

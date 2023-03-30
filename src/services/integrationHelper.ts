@@ -2,11 +2,15 @@ import { denormalisedResponseEntities } from '@utils/data';
 
 import { getIntegrationSdk } from './integrationSdk';
 
-export const fetchListing = async (listingId: string) => {
+export const fetchListing = async (
+  listingId: string,
+  include: string[] = [],
+) => {
   const integrationSdk = getIntegrationSdk();
   const response = await integrationSdk.listings.show(
     {
       id: listingId,
+      include,
     },
     { expand: true },
   );
@@ -20,7 +24,11 @@ export const fetchUser = async (userId: string) => {
     {
       id: userId,
       include: ['profileImage'],
-      'fields.image': ['variants.square-small', 'variants.square-small2x'],
+      'fields.image': [
+        'variants.square-small',
+        'variants.square-small2x',
+        'variants.default',
+      ],
     },
     { expand: true },
   );
