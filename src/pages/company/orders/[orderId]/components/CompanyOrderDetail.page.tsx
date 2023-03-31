@@ -10,12 +10,22 @@ import css from './CompanyOrderDetailPage.module.scss';
 type TCompanyOrderDetailPageProps = {};
 
 const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
-  const { orderTitle, reviewViewData, priceQuotationData } =
-    usePrepareOrderDetailPageData();
+  const {
+    orderTitle,
+    reviewViewData,
+    priceQuotationData,
+    canReview,
+    goToReviewPage,
+  } = usePrepareOrderDetailPageData();
 
   return (
     <div className={css.root}>
-      <TitleSection className={css.titleSection} orderTitle={orderTitle} />
+      <TitleSection
+        className={css.titleSection}
+        orderTitle={orderTitle}
+        canReview={canReview}
+        goToReviewPage={goToReviewPage}
+      />
       <ReviewView
         className={css.reviewInfoContainer}
         onDownloadPriceQuotation={downloadPriceQuotation(
