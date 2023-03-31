@@ -2,56 +2,41 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import checkUnConflictedMenuMiddleware from '@pages/api/apiServices/menu/checkUnConflictedMenuMiddleware.service';
-import updateMenu from '@pages/api/apiServices/menu/updateMenu.service';
+import createMenu from '@pages/api/apiServices/menu/createMenu.service';
 import cookies from '@services/cookie';
 import adminChecker from '@services/permissionChecker/admin';
-import { getIntegrationSdk, handleError } from '@services/sdk';
+import { handleError } from '@services/sdk';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
-    const { menuId } = req.query;
-    const integrationSdk = getIntegrationSdk();
-
-    switch (req.method) {
-      case HttpMethod.GET: {
-        const { JSONParams = '' } = req.query;
-
-        const { dataParams = {}, queryParams = {} } =
-          JSON.parse(JSONParams as string) || {};
-
-        const response = await integrationSdk.listings.show(
-          { id: menuId, ...dataParams },
-          queryParams,
-        );
-
-        return res.json(response);
-      }
-      case HttpMethod.PUT: {
-        const { dataParams, queryParams = {} } = req.body;
-        const menu = await updateMenu(
-          menuId as string,
-          dataParams,
-          queryParams,
-        );
+    const apiMethod = req.method;
+    const { dataParams, queryParams = {} } = req.body;
+    switch (apiMethod) {
+      case HttpMethod.GET:
+        break;
+      case HttpMethod.POST: {
+        const menu = await createMenu(dataParams, queryParams);
 
         return res.status(200).json(menu);
       }
-
+      case HttpMethod.DELETE:
+        break;
+      case HttpMethod.PUT:
+        break;
       default:
         break;
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     handleError(res, error);
   }
 }
 
 const handlerWrapper = (req: NextApiRequest, res: NextApiResponse) => {
-  const { menuId } = req.query;
-  const { dataParams = {} } = req.body;
-
   switch (req.method) {
-    case HttpMethod.PUT: {
+    case HttpMethod.POST: {
+      const { dataParams = {} } = req.body;
+
       const {
         mealType,
         daysOfWeek = [],
@@ -64,7 +49,6 @@ const handlerWrapper = (req: NextApiRequest, res: NextApiResponse) => {
         mealType,
         restaurantId,
         daysOfWeek,
-        id: menuId as string,
         startDate,
         endDate,
       };
@@ -72,9 +56,8 @@ const handlerWrapper = (req: NextApiRequest, res: NextApiResponse) => {
       return checkUnConflictedMenuMiddleware(handler)(req, res, dataToCheck);
     }
 
-    default: {
+    default:
       return handler(req, res);
-    }
   }
 };
 

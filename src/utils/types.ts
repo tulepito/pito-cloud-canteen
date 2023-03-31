@@ -13,6 +13,8 @@ import type {
   EImageVariants,
   EListingStates,
   EManageCompanyOrdersTab,
+  EMenuMealType,
+  EMenuTypes,
   ENotificationTypes,
   EOrderDraftStates,
   EOrderStates,
@@ -587,4 +589,41 @@ export type TUpdateCompanyApiParams = {
   bankAccounts: TObject[];
   paymentDueDays: number;
   include?: string[];
+};
+
+export type TCreateMenuApiParams = {
+  menuType: EMenuTypes;
+  mealType: EMenuMealType;
+  startDate: number;
+  daysOfWeek: EDayOfWeek[];
+  restaurantId: string;
+  title: string;
+  numberOfCycles: number;
+  endDate: number;
+};
+
+export type TUpdateMenuApiParams = {
+  id: string;
+  foodsByDate: TObject;
+  menuType: EMenuTypes;
+  mealType: EMenuMealType;
+  startDate: number;
+  daysOfWeek: EDayOfWeek[];
+  restaurantId: string;
+  title: string;
+  numberOfCycles: number;
+  endDate: number;
+};
+
+export type TDuplicateMenuApiParams = {
+  id: string;
+  foodsByDate: TObject;
+  menuType: EMenuTypes;
+  mealType: EMenuMealType;
+  startDate: number;
+  daysOfWeek: EDayOfWeek[];
+  restaurantId: string;
+  title: string;
+  numberOfCycles: number;
+  endDate: number;
 };

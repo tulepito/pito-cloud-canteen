@@ -228,7 +228,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       const intl = useIntl();
       const router = useRouter();
       const dispatch = useAppDispatch();
-      const confirmDeleteDraftOrderActions = useBoolean(false);
+      const confirmDeleteDraftOrderActions = useBoolean();
       const updateOrderInProgress = useAppSelector(
         (state) => state.Order.updateOrderInProgress,
       );
