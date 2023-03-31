@@ -82,7 +82,9 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
       ),
       childrenFn: (childProps: any) => <ReviewItemList {...childProps} />,
       childrenProps: {
-        reviewList: restaurantBookerReviews,
+        reviewList: viewAllReviewControl.value
+          ? restaurantBookerReviews
+          : restaurantBookerReviews.slice(0, 5),
         reviewerList: restaurantBookerReviewers,
       },
     },
@@ -98,7 +100,9 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
       ),
       childrenFn: (childProps: any) => <ReviewItemList {...childProps} />,
       childrenProps: {
-        reviewList: restaurantParticipantReviews,
+        reviewList: viewAllReviewControl.value
+          ? restaurantParticipantReviews
+          : restaurantParticipantReviews.slice(0, 5),
         reviewerList: restaurantParticipantReviewers,
       },
     },
@@ -131,23 +135,21 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
             <span className={css.scenarioLabel}>Món ăn:</span>
             <div className={css.ratingBar}>
               <div
-                style={{ width: calculateRatingPercent(food?.rating || 0) }}
+                style={{ width: calculateRatingPercent(food || 0) }}
                 className={css.activeBar}></div>
             </div>
-            <span className={css.ratingPoint}>{`${food?.rating || 0}/5`}</span>
+            <span className={css.ratingPoint}>{`${food || 0}/5`}</span>
           </div>
           <div className={css.detailRatingRow}>
             <span className={css.scenarioLabel}>Dụng cụ:</span>
             <div className={css.ratingBar}>
               <div
                 style={{
-                  width: calculateRatingPercent(packaging?.rating || 0),
+                  width: calculateRatingPercent(packaging || 0),
                 }}
                 className={css.activeBar}></div>
             </div>
-            <span className={css.ratingPoint}>{`${
-              packaging?.rating || 0
-            }/5`}</span>
+            <span className={css.ratingPoint}>{`${packaging || 0}/5`}</span>
           </div>
         </div>
       </div>

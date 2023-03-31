@@ -1,3 +1,4 @@
+import round from 'lodash/round';
 import uniq from 'lodash/uniq';
 
 import { denormalisedResponseEntities } from '@services/data';
@@ -79,19 +80,25 @@ export const updateRatingForRestaurantFn = async (ratings: any) => {
       } = restaurantListing.getMetadata();
       const newTotalRatingNumber =
         totalRatingNumber + pointOfRatings[restaurantId].totalNumber;
-      const newTotalRating =
+      const newTotalRating = round(
         (totalRating * totalRatingNumber +
           pointOfRatings[restaurantId].general) /
-        newTotalRatingNumber;
+          newTotalRatingNumber,
+        1,
+      );
       const newDetailRating = {
-        food:
+        food: round(
           ((detailRating?.food || 0) * totalRatingNumber +
             pointOfRatings[restaurantId].detail.food) /
-          newTotalRatingNumber,
-        packaging:
+            newTotalRatingNumber,
+          1,
+        ),
+        packaging: round(
           ((detailRating?.packaging || 0) * totalRatingNumber +
             pointOfRatings[restaurantId].detail.packaging) /
-          newTotalRatingNumber,
+            newTotalRatingNumber,
+          1,
+        ),
       };
 
       await integrationSdk.listings.update({
