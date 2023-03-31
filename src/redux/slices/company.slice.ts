@@ -27,18 +27,21 @@ import {
   adminUpdateCompanyApi,
   createCompanyApi,
   getCompaniesAdminApi,
+  publishCompanyApi,
   showCompanyApi,
-  updateCompanyStatusApi,
+  unActiveCompanyApi,
 } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities, User } from '@utils/data';
-import { EImageVariants } from '@utils/enums';
+import { ECompanyStates, EImageVariants } from '@utils/enums';
 import { storableAxiosError, storableError } from '@utils/errors';
 import type {
   TCompany,
+  TCreateCompanyApiParams,
   TImage,
   TObject,
   TPagination,
+  TUpdateCompanyApiParams,
   TUser,
 } from '@utils/types';
 
@@ -213,7 +216,10 @@ const requestUploadCompanyLogo = createAsyncThunk(
 
 const adminCreateCompany = createAsyncThunk(
   ADMIN_CREATE_COMPANY,
-  async (userData: any, { fulfillWithValue, rejectWithValue }) => {
+  async (
+    userData: TCreateCompanyApiParams,
+    { fulfillWithValue, rejectWithValue },
+  ) => {
     try {
       const { data } = await createCompanyApi({
         dataParams: userData,
@@ -250,7 +256,8 @@ const showCompany = createAsyncThunk(
 
 const adminUpdateCompany = createAsyncThunk(
   ADMIN_UPDATE_COMPANY,
-  async (params: any) => {
+  async (params: TUpdateCompanyApiParams) => {
+    const shouldPublish = params?.bankAccounts?.length > 0;
     const { data } = await adminUpdateCompanyApi({
       dataParams: params,
       queryParams: {
@@ -258,6 +265,17 @@ const adminUpdateCompany = createAsyncThunk(
         expand: true,
       },
     });
+
+    if (shouldPublish) {
+      const { data: newestData } = await publishCompanyApi(params.id, {
+        include: ['profileImage'],
+        expand: true,
+      });
+      const [company] = denormalisedResponseEntities(newestData);
+
+      return company;
+    }
+
     const [company] = denormalisedResponseEntities(data);
 
     return company;
@@ -584,7 +602,12 @@ const adminUpdateCompanyState = createAsyncThunk(
   ADMIN_UPDATE_COMPANY_STATE,
   async (updateData: any, { fulfillWithValue, rejectWithValue }) => {
     try {
-      const { data } = await updateCompanyStatusApi(updateData);
+      const { id, userState } = updateData;
+      const isPublish = userState === ECompanyStates.published;
+      const { data } = isPublish
+        ? await publishCompanyApi(id, { expand: true })
+        : await unActiveCompanyApi(id, { expand: true });
+
       const [company] = denormalisedResponseEntities(data);
 
       return fulfillWithValue(company);

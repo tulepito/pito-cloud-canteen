@@ -509,7 +509,7 @@ export type TCompanyGroup = {
 };
 
 export type TTableSortValue = {
-  columnName: string | number;
+  columnName: string;
   type: 'asc' | 'desc';
 };
 
@@ -555,4 +555,36 @@ export type TRestaurantRating = {
     food?: TScenarioRating;
     packaging?: TScenarioRating;
   };
+};
+
+export type TCreateCompanyApiParams = {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  companyEmail: string;
+  companyLocation: TObject;
+  companyName: string;
+  phoneNumber: string;
+  location: TObject;
+  note: string;
+  tax: string;
+};
+
+export type TUpdateCompanyApiParams = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  companyEmail: string;
+  companyLocation: TObject;
+  companyName: string;
+  phoneNumber: string;
+  location: TObject;
+  note: string;
+  tax: string;
+  profileImageId: string;
+  nutritions: string[];
+  bankAccounts: TObject[];
+  paymentDueDays: number;
+  include?: string[];
 };

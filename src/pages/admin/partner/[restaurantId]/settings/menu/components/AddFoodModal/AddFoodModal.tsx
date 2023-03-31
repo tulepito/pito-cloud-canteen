@@ -126,7 +126,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
   const [sortValue, setSortValue] = useState<TTableSortValue>();
   const intl = useIntl();
   const foods = useAppSelector((state) => state.foods.foods, shallowEqual);
-  const handleSort = (columnName: string | number) => {
+  const handleSort = (columnName: string) => {
     setSortValue({
       columnName,
       type: sortValue?.type === 'asc' ? 'desc' : 'asc',

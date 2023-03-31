@@ -365,7 +365,7 @@ const ManageOrdersPage = () => {
 
   const sortedData = sortValue ? sortOrders(sortValue, dataTable) : dataTable;
 
-  const handleSort = (columnName: string | number) => {
+  const handleSort = (columnName: string) => {
     setSortValue({
       columnName,
       type: sortValue?.type === 'asc' ? 'desc' : 'asc',

@@ -1,4 +1,8 @@
-import type { TObject } from '@utils/types';
+import type {
+  TCreateCompanyApiParams,
+  TObject,
+  TUpdateCompanyApiParams,
+} from '@utils/types';
 
 import { getApi, postApi, putApi } from './configs';
 
@@ -15,11 +19,22 @@ export const getCompanyMembersDetailsApi = (
   return getApi(`/admin/users/company/${id}/members?roles=${rolesAsString}`);
 };
 
-export const adminUpdateCompanyApi = (body: TObject) =>
-  putApi('/admin/users/company/update', body);
+export const adminUpdateCompanyApi = ({
+  dataParams,
+  queryParams,
+}: {
+  dataParams: TUpdateCompanyApiParams;
+  queryParams: TObject;
+}) =>
+  putApi(`/admin/users/company/${dataParams.id}`, { dataParams, queryParams });
 
-export const createCompanyApi = (body: TObject) =>
-  postApi('/admin/users/company/create', body);
+export const createCompanyApi = ({
+  dataParams,
+  queryParams,
+}: {
+  dataParams: TCreateCompanyApiParams;
+  queryParams: TObject;
+}) => postApi('/admin/users/company/create', { dataParams, queryParams });
 
 export const queryCompanyMembersApi = (companyId: string) => {
   return getApi(`/admin/users/company/${companyId}/members`);
@@ -30,6 +45,12 @@ export const showCompanyApi = (id: string) =>
 
 export const updateCompanyStatusApi = (body: TObject) =>
   putApi(`/admin/users/company/status`, body);
+
+export const publishCompanyApi = (companyId: string, queryParams?: TObject) =>
+  postApi(`/admin/users/company/${companyId}/publish`, { queryParams });
+
+export const unActiveCompanyApi = (companyId: string, queryParams?: TObject) =>
+  postApi(`/admin/users/company/${companyId}/unactive`, { queryParams });
 
 export const createDraftPartnerApi = (body: TObject) =>
   postApi('/admin/users/partner/create-draft', body);
