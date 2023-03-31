@@ -12,12 +12,18 @@ import type { TDefaultProps } from '@utils/types';
 
 import css from './TitleSection.module.scss';
 
-type TTitleSectionProps = TDefaultProps & { orderTitle: string };
+type TTitleSectionProps = TDefaultProps & {
+  orderTitle: string;
+  canReview: boolean;
+  goToReviewPage: () => void;
+};
 
 const TitleSection: React.FC<TTitleSectionProps> = ({
   rootClassName,
   className,
   orderTitle,
+  canReview,
+  goToReviewPage,
 }) => {
   const intl = useIntl();
 
@@ -80,9 +86,14 @@ const TitleSection: React.FC<TTitleSectionProps> = ({
         </div>
         <div className={css.subtitle}>{subtitle}</div>
       </div>
-      <Button variant="secondary" className={css.reviewButton} disabled>
-        {reviewText}
-      </Button>
+      <RenderWhen condition={canReview}>
+        <Button
+          variant="secondary"
+          className={css.reviewButton}
+          onClick={goToReviewPage}>
+          {reviewText}
+        </Button>
+      </RenderWhen>
     </div>
   );
 };

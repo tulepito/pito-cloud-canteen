@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
+import { companyPaths } from '@src/paths';
 import { Listing, User } from '@utils/data';
 import { EOrderStates } from '@utils/enums';
 import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
@@ -12,6 +14,7 @@ import { calculatePriceQuotationInfo } from '../helpers/cartInfoHelper';
 import { groupFoodOrderByDate } from '../helpers/orderDetailHelper';
 
 export const usePrepareOrderDetailPageData = () => {
+  const router = useRouter();
   const [reviewInfoValues, setReviewInfoValues] =
     useState<TReviewInfoFormValues>();
 
@@ -32,7 +35,6 @@ export const usePrepareOrderDetailPageData = () => {
   const constCurrUserAttributes = User(
     currentUser as TCurrentUser,
   ).getAttributes();
-
   const { orderDetail } = Listing(planData as TListing).getMetadata();
   const { companyName = '' } = User(companyData as TUser).getPublicData();
 
@@ -63,7 +65,9 @@ export const usePrepareOrderDetailPageData = () => {
   const isCanceledOrder = [
     EOrderStates.canceled || EOrderStates.canceledByBooker,
   ].includes(orderState);
-
+  const canReview =
+    orderState === EOrderStates.completed ||
+    orderState === EOrderStates.pendingPayment;
   const titleSectionData = { deliveryHour, deliveryAddress };
   const countdownSectionData = {
     deadlineHour,
@@ -169,7 +173,16 @@ export const usePrepareOrderDetailPageData = () => {
     },
   };
 
+  const goToReviewPage = () => {
+    router.push({
+      pathname: companyPaths.OrderRating,
+      query: { orderId: orderData?.id.uuid },
+    });
+  };
+
   return {
+    canReview,
+    goToReviewPage,
     orderTitle,
     editViewData,
     reviewViewData,
