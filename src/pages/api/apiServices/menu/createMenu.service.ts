@@ -44,21 +44,23 @@ const createMenu = async (
   const response = await integrationSdk.listings.create(
     {
       title,
+      state: EListingStates.published,
+      authorId: restaurant?.author?.id?.uuid,
       publicData: {
         daysOfWeek,
         mealType,
         startDate,
         endDate: endDateToSubmit,
         ...(isCycleMenu ? { numberOfCycles } : {}),
-        metadata: {
-          menuType,
-          listingType: ListingTypes.MENU,
-          restaurantId,
-          listingState: EListingStates.draft,
-          ...(geolocation ? { geolocation } : {}),
-          state: 'published',
-          authorId: restaurant?.author.id.uuid,
-        },
+      },
+      metadata: {
+        menuType,
+        listingType: ListingTypes.MENU,
+        restaurantId,
+        listingState: EListingStates.draft,
+        ...(geolocation ? { geolocation } : {}),
+        state: 'published',
+        authorId: restaurant?.author.id.uuid,
       },
     },
     queryParams,
