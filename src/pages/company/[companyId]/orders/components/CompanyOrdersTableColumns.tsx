@@ -53,6 +53,229 @@ const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
   [EOrderStates.reviewed]: css.badgeDefault,
 };
 
+const CompanyOrdersActionColumn = ({
+  state,
+  id: orderId,
+  companyId,
+}: {
+  state:
+    | EOrderStates
+    | EBookerOrderDraftStates
+    | EOrderDraftStates.pendingApproval;
+  id: string;
+  companyId: string;
+}) => {
+  const intl = useIntl();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const confirmDeleteDraftOrderActions = useBoolean();
+  const updateOrderInProgress = useAppSelector(
+    (state) => state.Order.updateOrderInProgress,
+  );
+  const deleteDraftOrderInProgress = useAppSelector(
+    (state) => state.Order.deleteDraftOrderInProgress,
+  );
+
+  const orderLink = getParticipantPickingLink(orderId);
+
+  const navigateToDraftOrderDetailPage = () => {
+    router.push({
+      pathname: companyPaths.EditDraftOrder,
+      query: { orderId },
+    });
+  };
+
+  const navigateToOrderDetailPage = () => {
+    router.push({
+      pathname: companyPaths.ManageOrderDetail,
+      query: { orderId },
+    });
+  };
+
+  const navigateToBookerManageOrderDetailPage = () => {
+    router.push({
+      pathname: companyPaths.ManageOrderPicking,
+      query: { orderId },
+    });
+  };
+
+  const handleDeleteDraftOrder = () => {
+    dispatch(
+      orderAsyncActions.bookerDeleteDraftOrder({
+        orderId,
+        companyId,
+      }),
+    );
+  };
+
+  const handleCancelNeedApprovalOrder = () => {
+    dispatch(
+      orderAsyncActions.cancelPendingApprovalOrder({
+        orderId,
+      }),
+    );
+  };
+
+  const handleCopyOrderLink = () => {
+    navigator.clipboard.writeText(orderLink);
+  };
+
+  const secondaryButtonProps = {
+    variant: 'inline' as TButtonVariant,
+    className: css.actionButton,
+    disabled: updateOrderInProgress,
+  };
+
+  const deleteDraftButton = (
+    <Button
+      key={`${orderId}-deleteDraftButton`}
+      {...secondaryButtonProps}
+      onClick={confirmDeleteDraftOrderActions.setTrue}>
+      {intl.formatMessage({
+        id: 'ManageCompanyOrdersPage.actionBtn.deleteDraft',
+      })}
+    </Button>
+  );
+  const cancelPickingOrderButton = (
+    <Button
+      key={`${orderId}-cancelPickingOrderButton`}
+      {...secondaryButtonProps}
+      onClick={navigateToBookerManageOrderDetailPage}>
+      {intl.formatMessage({
+        id: 'ManageCompanyOrdersPage.actionBtn.cancelPickingOrder',
+      })}
+    </Button>
+  );
+  const cancelPendingApprovalOrderButton = (
+    <Button
+      key={`${orderId}-cancelPendingApprovalOrderButton`}
+      {...secondaryButtonProps}
+      onClick={handleCancelNeedApprovalOrder}>
+      {intl.formatMessage({
+        id: 'ManageCompanyOrdersPage.actionBtn.cancelPendingApprovalOrder',
+      })}
+    </Button>
+  );
+  const updatePlanOrderDetailButton = (
+    <Button
+      key={`${orderId}-updatePlanOrderDetailButton`}
+      {...secondaryButtonProps}
+      onClick={navigateToBookerManageOrderDetailPage}>
+      {intl.formatMessage({
+        id: 'ManageCompanyOrdersPage.actionBtn.updatePlanOrderDetailButton',
+      })}
+    </Button>
+  );
+  const viewDetailButton = (
+    <Button
+      key={`${orderId}-viewDetailButton`}
+      {...secondaryButtonProps}
+      onClick={navigateToOrderDetailPage}>
+      {intl.formatMessage({
+        id: 'ManageCompanyOrdersPage.actionBtn.viewOrderDetail',
+      })}
+    </Button>
+  );
+  const completeOrderButton = (
+    <Button
+      key={`${orderId}-completeOrderButton`}
+      {...secondaryButtonProps}
+      onClick={navigateToDraftOrderDetailPage}>
+      {intl.formatMessage({
+        id: 'ManageCompanyOrdersPage.actionBtn.completeOrder',
+      })}
+    </Button>
+  );
+  const copyLinkButton = (
+    <Button
+      key={`${orderId}-copyLinkButton`}
+      {...secondaryButtonProps}
+      onClick={handleCopyOrderLink}>
+      {intl.formatMessage({
+        id: 'ManageCompanyOrdersPage.actionBtn.copyOrderLink',
+      })}
+    </Button>
+  );
+  const reviewOrderButton = (
+    <Button
+      key={`${orderId}-reviewOrderButton`}
+      {...secondaryButtonProps}
+      disabled>
+      {intl.formatMessage({
+        id: 'ManageCompanyOrdersPage.actionBtn.reviewOrder',
+      })}
+    </Button>
+  );
+  const reorderButton = (
+    <Button key={`${orderId}-reorderButton`} {...secondaryButtonProps} disabled>
+      {intl.formatMessage({
+        id: 'ManageCompanyOrdersPage.actionBtn.reorder',
+      })}
+    </Button>
+  );
+
+  let buttonList: Array<ReactNode> = [];
+
+  switch (state) {
+    case EBookerOrderDraftStates.bookerDraft:
+      buttonList = [completeOrderButton, deleteDraftButton];
+      break;
+    case EOrderDraftStates.pendingApproval:
+      buttonList = [completeOrderButton, cancelPendingApprovalOrderButton];
+      break;
+    case EOrderStates.picking:
+      buttonList = [
+        updatePlanOrderDetailButton,
+        cancelPickingOrderButton,
+        copyLinkButton,
+      ];
+      break;
+    case EOrderStates.canceled:
+      break;
+
+    case EOrderStates.inProgress:
+      buttonList = [viewDetailButton];
+      break;
+    case EOrderStates.pendingPayment:
+      buttonList = [reviewOrderButton, reorderButton];
+      break;
+    case EOrderStates.completed:
+      buttonList = [reorderButton];
+      break;
+    case EOrderStates.reviewed:
+      buttonList = [reorderButton];
+      break;
+    default:
+      break;
+  }
+
+  const confirmDeleteDraftOrderModal = (
+    <AlertModal
+      isOpen={confirmDeleteDraftOrderActions.value}
+      onCancel={confirmDeleteDraftOrderActions.setFalse}
+      onConfirm={handleDeleteDraftOrder}
+      confirmInProgress={deleteDraftOrderInProgress}
+      handleClose={confirmDeleteDraftOrderActions.setFalse}
+      title={intl.formatMessage({
+        id: 'ManageCompanyOrdersPage.deleteDraftOrderModal.title',
+      })}
+      confirmLabel={intl.formatMessage({
+        id: 'ManageCompanyOrdersPage.deleteDraftOrderModal.confirmBtn',
+      })}
+      cancelLabel={intl.formatMessage({
+        id: 'ManageCompanyOrdersPage.deleteDraftOrderModal.cancelBtn',
+      })}
+    />
+  );
+
+  return (
+    <div className={css.action}>
+      {buttonList}
+      {confirmDeleteDraftOrderModal}
+    </div>
+  );
+};
+
 export const CompanyOrdersTableColumns: TColumn[] = [
   {
     key: 'title',
@@ -213,230 +436,6 @@ export const CompanyOrdersTableColumns: TColumn[] = [
   {
     key: 'action',
     label: '',
-    render: ({
-      state,
-      id: orderId,
-      companyId,
-    }: {
-      state:
-        | EOrderStates
-        | EBookerOrderDraftStates
-        | EOrderDraftStates.pendingApproval;
-      id: string;
-      companyId: string;
-    }) => {
-      const intl = useIntl();
-      const router = useRouter();
-      const dispatch = useAppDispatch();
-      const confirmDeleteDraftOrderActions = useBoolean();
-      const updateOrderInProgress = useAppSelector(
-        (state) => state.Order.updateOrderInProgress,
-      );
-      const deleteDraftOrderInProgress = useAppSelector(
-        (state) => state.Order.deleteDraftOrderInProgress,
-      );
-
-      const orderLink = getParticipantPickingLink(orderId);
-
-      const navigateToDraftOrderDetailPage = () => {
-        router.push({
-          pathname: companyPaths.EditDraftOrder,
-          query: { orderId },
-        });
-      };
-
-      const navigateToOrderDetailPage = () => {
-        router.push({
-          pathname: companyPaths.ManageOrderDetail,
-          query: { orderId },
-        });
-      };
-
-      const navigateToBookerManageOrderDetailPage = () => {
-        router.push({
-          pathname: companyPaths.ManageOrderPicking,
-          query: { orderId },
-        });
-      };
-
-      const handleDeleteDraftOrder = () => {
-        dispatch(
-          orderAsyncActions.bookerDeleteDraftOrder({
-            orderId,
-            companyId,
-          }),
-        );
-      };
-
-      const handleCancelNeedApprovalOrder = () => {
-        dispatch(
-          orderAsyncActions.cancelPendingApprovalOrder({
-            orderId,
-          }),
-        );
-      };
-
-      const handleCopyOrderLink = () => {
-        navigator.clipboard.writeText(orderLink);
-      };
-
-      const secondaryButtonProps = {
-        variant: 'inline' as TButtonVariant,
-        className: css.actionButton,
-        disabled: updateOrderInProgress,
-      };
-
-      const deleteDraftButton = (
-        <Button
-          key={`${orderId}-deleteDraftButton`}
-          {...secondaryButtonProps}
-          onClick={confirmDeleteDraftOrderActions.setTrue}>
-          {intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.actionBtn.deleteDraft',
-          })}
-        </Button>
-      );
-      const cancelPickingOrderButton = (
-        <Button
-          key={`${orderId}-cancelPickingOrderButton`}
-          {...secondaryButtonProps}
-          onClick={navigateToBookerManageOrderDetailPage}>
-          {intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.actionBtn.cancelPickingOrder',
-          })}
-        </Button>
-      );
-      const cancelPendingApprovalOrderButton = (
-        <Button
-          key={`${orderId}-cancelPendingApprovalOrderButton`}
-          {...secondaryButtonProps}
-          onClick={handleCancelNeedApprovalOrder}>
-          {intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.actionBtn.cancelPendingApprovalOrder',
-          })}
-        </Button>
-      );
-      const updatePlanOrderDetailButton = (
-        <Button
-          key={`${orderId}-updatePlanOrderDetailButton`}
-          {...secondaryButtonProps}
-          onClick={navigateToBookerManageOrderDetailPage}>
-          {intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.actionBtn.updatePlanOrderDetailButton',
-          })}
-        </Button>
-      );
-      const viewDetailButton = (
-        <Button
-          key={`${orderId}-viewDetailButton`}
-          {...secondaryButtonProps}
-          onClick={navigateToOrderDetailPage}>
-          {intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.actionBtn.viewOrderDetail',
-          })}
-        </Button>
-      );
-      const completeOrderButton = (
-        <Button
-          key={`${orderId}-completeOrderButton`}
-          {...secondaryButtonProps}
-          onClick={navigateToDraftOrderDetailPage}>
-          {intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.actionBtn.completeOrder',
-          })}
-        </Button>
-      );
-      const copyLinkButton = (
-        <Button
-          key={`${orderId}-copyLinkButton`}
-          {...secondaryButtonProps}
-          onClick={handleCopyOrderLink}>
-          {intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.actionBtn.copyOrderLink',
-          })}
-        </Button>
-      );
-      const reviewOrderButton = (
-        <Button
-          key={`${orderId}-reviewOrderButton`}
-          {...secondaryButtonProps}
-          disabled>
-          {intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.actionBtn.reviewOrder',
-          })}
-        </Button>
-      );
-      const reorderButton = (
-        <Button
-          key={`${orderId}-reorderButton`}
-          {...secondaryButtonProps}
-          disabled>
-          {intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.actionBtn.reorder',
-          })}
-        </Button>
-      );
-
-      let buttonList: Array<ReactNode> = [];
-
-      switch (state) {
-        case EBookerOrderDraftStates.bookerDraft:
-          buttonList = [completeOrderButton, deleteDraftButton];
-          break;
-        case EOrderDraftStates.pendingApproval:
-          buttonList = [completeOrderButton, cancelPendingApprovalOrderButton];
-          break;
-        case EOrderStates.picking:
-          buttonList = [
-            updatePlanOrderDetailButton,
-            cancelPickingOrderButton,
-            copyLinkButton,
-          ];
-          break;
-        case EOrderStates.canceled:
-          break;
-
-        case EOrderStates.inProgress:
-          buttonList = [viewDetailButton];
-          break;
-        case EOrderStates.pendingPayment:
-          buttonList = [reviewOrderButton, reorderButton];
-          break;
-        case EOrderStates.completed:
-          buttonList = [reorderButton];
-          break;
-        case EOrderStates.reviewed:
-          buttonList = [reorderButton];
-          break;
-        default:
-          break;
-      }
-
-      const confirmDeleteDraftOrderModal = (
-        <AlertModal
-          isOpen={confirmDeleteDraftOrderActions.value}
-          onCancel={confirmDeleteDraftOrderActions.setFalse}
-          onConfirm={handleDeleteDraftOrder}
-          confirmInProgress={deleteDraftOrderInProgress}
-          handleClose={confirmDeleteDraftOrderActions.setFalse}
-          title={intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.deleteDraftOrderModal.title',
-          })}
-          confirmLabel={intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.deleteDraftOrderModal.confirmBtn',
-          })}
-          cancelLabel={intl.formatMessage({
-            id: 'ManageCompanyOrdersPage.deleteDraftOrderModal.cancelBtn',
-          })}
-        />
-      );
-
-      return (
-        <div className={css.action}>
-          {buttonList}
-          {confirmDeleteDraftOrderModal}
-        </div>
-      );
-    },
+    render: (data) => <CompanyOrdersActionColumn {...data} />,
   },
 ];
