@@ -33,7 +33,7 @@
   .ratingBar {
     grid-column: 2 / span 1;
     height: 6px;
-    background-color: #ccc;
+    background-color: $neutralGray3;
     position: relative;
     border-radius: 100px;
   }
@@ -43,7 +43,7 @@
     top: 0;
     bottom: 0;
     left: 0;
-    background-color: black;
+    background-color: $neutralGray6;
     border-radius: 100px;
   }
 
@@ -91,6 +91,16 @@
 }
 
 .noReview {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.reviewList {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.loading {
   margin-top: 20px;
   text-align: center;
 }

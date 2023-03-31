@@ -25,7 +25,7 @@ type ReviewItemProps = {
 
 const ReviewItem: React.FC<ReviewItemProps> = (props) => {
   const { generalRating, detailRating, user, timestamp } = props;
-  console.log('user: ', user);
+
   const { food, packaging } = detailRating;
   const reviewerUser = User(user);
 
