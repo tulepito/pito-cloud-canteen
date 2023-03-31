@@ -165,6 +165,8 @@ const transferCompanyOwner = async ({
         metadata: {
           ...(isOldCompany ? { isCompany: false } : {}),
           ...(isOldCompany ? { id: '' } : {}),
+          ...(isOldCompany ? { members: {} } : {}),
+          ...(isOldCompany ? { groups: {} } : {}),
           companyList: newMemberCompanyList,
           company: newMetaCompanyData,
         },
