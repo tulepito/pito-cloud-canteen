@@ -175,12 +175,7 @@ export default function ManageCompanies() {
   };
 
   const updateStatus = useCallback((updateData: TUpdateStatus) => {
-    dispatch(
-      companyThunks.adminUpdateCompanyState({
-        dataParams: updateData,
-        queryParams: { expand: true },
-      }),
-    );
+    dispatch(companyThunks.adminUpdateCompanyState(updateData));
   }, []);
 
   const companiesTableData = useMemo(

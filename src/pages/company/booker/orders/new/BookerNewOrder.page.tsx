@@ -65,7 +65,7 @@ function BookerNewOrderPage() {
     <div className={css.root}>
       <Modal
         isOpen={true}
-        handleClose={() => null}
+        handleClose={handleCancel}
         containerClassName={css.modalContainer}
         scrollLayerClassName={css.modalScrollLayer}
         openClassName={css.openModal}
