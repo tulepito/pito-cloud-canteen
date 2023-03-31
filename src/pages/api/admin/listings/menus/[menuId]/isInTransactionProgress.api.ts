@@ -1,24 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import checkIsInTransactionProgressMenu from '@pages/api/apiServices/menu/checkIsInTransactionProgressMenu.service';
 import cookies from '@services/cookie';
-import { getIntegrationSdk, handleError } from '@services/sdk';
-import { EListingType, EOrderStates } from '@utils/enums';
+import { handleError } from '@services/sdk';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
-    const { queryParams = {} } = req.body;
     const { menuId } = req.query;
-    const integrationSdk = getIntegrationSdk();
-    const response = await integrationSdk.listings.query(
-      {
-        meta_menuIds: `has_any:${menuId}`,
-        meta_listingType: EListingType.subOrder,
-        meta_orderState: [EOrderStates.inProgress, EOrderStates.picking],
-      },
+    const { queryParams = {} } = req.body;
+    const isInTransactionProgress = await checkIsInTransactionProgressMenu(
+      menuId as string,
       queryParams,
     );
-    const { totalItems } = response.data.meta;
-    const isInTransactionProgress = totalItems.length > 0;
 
     return res.json({ isInTransactionProgress });
   } catch (error) {
