@@ -244,7 +244,7 @@ const EditCompanyWizardTab: React.FC<TEditCompanyWizardTab> = (props) => {
               companyLogo: company?.profileImage,
               nutritions: User(company).getPublicData().nutritions || [],
               bankAccounts:
-                (User(company).getPrivateData().bankAccounts.length > 0 &&
+                (User(company).getPrivateData().bankAccounts?.length > 0 &&
                   User(company).getPrivateData().bankAccounts) ||
                 defaultBankAccounts,
               paymentDueDays: User(company).getPrivateData().paymentDueDays,
