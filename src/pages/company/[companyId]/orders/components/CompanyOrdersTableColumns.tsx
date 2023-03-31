@@ -231,6 +231,10 @@ export const CompanyOrdersTableColumns: TColumn[] = [
 
       const orderLink = getParticipantPickingLink(orderId);
 
+      const shouldShowReviewButton =
+        state === EOrderStates.pendingPayment ||
+        state === EOrderStates.completed;
+
       const navigateToDraftOrderDetailPage = () => {
         router.push({
           pathname: companyPaths.EditDraftOrder,
@@ -271,6 +275,13 @@ export const CompanyOrdersTableColumns: TColumn[] = [
 
       const handleCopyOrderLink = () => {
         navigator.clipboard.writeText(orderLink);
+      };
+
+      const handleReviewOrder = () => {
+        router.push({
+          pathname: companyPaths.OrderRating,
+          query: { orderId },
+        });
       };
 
       const secondaryButtonProps = {
@@ -349,16 +360,18 @@ export const CompanyOrdersTableColumns: TColumn[] = [
           })}
         </Button>
       );
-      const reviewOrderButton = (
+
+      const reviewOrderButton = shouldShowReviewButton ? (
         <Button
           key={`${orderId}-reviewOrderButton`}
           {...secondaryButtonProps}
-          disabled>
+          onClick={handleReviewOrder}>
           {intl.formatMessage({
             id: 'ManageCompanyOrdersPage.actionBtn.reviewOrder',
           })}
         </Button>
-      );
+      ) : null;
+
       const reorderButton = (
         <Button
           key={`${orderId}-reorderButton`}
