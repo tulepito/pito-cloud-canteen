@@ -21,7 +21,13 @@ import { adminRoutes } from '@src/paths';
 import { IntegrationMenuListing } from '@utils/data';
 import { findClassDays } from '@utils/dates';
 import { EListingStates, EMenuMealType, EMenuTypes } from '@utils/enums';
-import type { TIntegrationListing, TObject } from '@utils/types';
+import type {
+  TCreateMenuApiParams,
+  TDuplicateMenuApiParams,
+  TIntegrationListing,
+  TObject,
+  TUpdateMenuApiParams,
+} from '@utils/types';
 
 import EditMenuCompleteForm from '../EditMenuCompleteForm/EditMenuCompleteForm';
 import EditMenuInformationForm from '../EditMenuInformationForm/EditMenuInformationForm';
@@ -87,24 +93,32 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
 
   const onSubmit = async (values: any) => {
     const submitValues = !duplicateId
-      ? createSubmitMenuValues({ ...values, restaurantId }, tab, currentMenu)
-      : createDuplicateSubmitMenuValues(
-          { ...values, restaurantId },
-          currentMenu as TIntegrationListing,
-          tab,
-        );
+      ? createSubmitMenuValues({ ...values, restaurantId }, tab)
+      : createDuplicateSubmitMenuValues({ ...values, restaurantId }, tab);
 
     setSubmittedValues(null);
 
     const { payload: listing, error } = menuId
       ? ((await dispatch(
           menusSliceThunks.updatePartnerMenuListing({
-            ...submitValues,
-            id: menuId,
+            dataParams: {
+              ...(submitValues as unknown as TUpdateMenuApiParams),
+              id: menuId as string,
+            },
+            shouldPublish: tab === MENU_COMPLETE_TAB,
           }),
         )) as any)
+      : duplicateId
+      ? await dispatch(
+          menusSliceThunks.duplicatePartnerMenuListing({
+            ...(submitValues as unknown as TDuplicateMenuApiParams),
+            id: duplicateId,
+          }),
+        )
       : ((await dispatch(
-          menusSliceThunks.createPartnerMenuListing(submitValues),
+          menusSliceThunks.createPartnerMenuListing(
+            submitValues as unknown as TCreateMenuApiParams,
+          ),
         )) as any);
 
     const isDraft =
@@ -207,6 +221,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
         return currentMenu
           ? {
               foodsByDate: foodByDateToRender,
+              daysOfWeek,
             }
           : {};
       }
