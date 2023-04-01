@@ -36,7 +36,7 @@ const ORDER_ANALYSIS_DATA = [
     orderCount: 0,
     orderLabel: <FormattedMessage id="OrdersAnalysisSection.completedOrders" />,
     orderPath: (companyId: string) =>
-      `/company/${companyId}/orders/?defaultTab=2`,
+      `/company/${companyId}/orders/?currentTab=${EManageCompanyOrdersTab.COMPLETED}`,
   },
   {
     key: EManageCompanyOrdersTab.SCHEDULED,
@@ -45,14 +45,14 @@ const ORDER_ANALYSIS_DATA = [
       <FormattedMessage id="OrdersAnalysisSection.inProgressOrders" />
     ),
     orderPath: (companyId: string) =>
-      `/company/${companyId}/orders/?defaultTab=1`,
+      `/company/${companyId}/orders/?currentTab=${EManageCompanyOrdersTab.SCHEDULED}`,
   },
   {
     key: EManageCompanyOrdersTab.DRAFT,
     orderCount: 0,
     orderLabel: <FormattedMessage id="OrdersAnalysisSection.draftOrders" />,
     orderPath: (companyId: string) =>
-      `/company/${companyId}/orders/?defaultTab=3`,
+      `/company/${companyId}/orders/?currentTab=${EManageCompanyOrdersTab.DRAFT}`,
   },
 ];
 

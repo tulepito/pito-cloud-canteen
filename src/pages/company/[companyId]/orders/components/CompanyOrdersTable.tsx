@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -137,9 +137,7 @@ type TCompanyOrdersTableProps = {};
 const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const intl = useIntl();
   const router = useRouter();
-  const [currentTab, setCurrentTab] = useState<EManageCompanyOrdersTab>(
-    EManageCompanyOrdersTab.ALL,
-  );
+
   const { query, isReady, replace } = useRouter();
   const dispatch = useAppDispatch();
   const orders = useAppSelector((state) => state.Order.orders) || [];
@@ -152,7 +150,12 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   let currDebounceRef = debounceRef.current;
 
-  const { page = 1, keywords = '', companyId = '', defaultTab = '5' } = query;
+  const {
+    page = 1,
+    keywords = '',
+    companyId = '',
+    currentTab = EManageCompanyOrdersTab.ALL,
+  } = query;
   const tableData = parseEntitiesToTableData(orders, Number(page));
   const tabItems = prepareTabItems({
     intl,
@@ -160,16 +163,13 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
     tableData,
   });
 
-  const handleTabChange = ({ id }: TTabsItem) => {
-    setCurrentTab(id as EManageCompanyOrdersTab);
-
-    const newDefaultTab = findTabIndexById(id as EManageCompanyOrdersTab);
+  const handleTabChange = ({ id: newTab }: TTabsItem) => {
     let newQuery = {};
 
-    if (newDefaultTab.toString() !== defaultTab.toString()) {
-      newQuery = { companyId: companyId as string, defaultTab: newDefaultTab };
+    if (newTab.toString() !== currentTab.toString()) {
+      newQuery = { companyId: companyId as string, currentTab: newTab };
     } else {
-      newQuery = { ...router.query, defaultTab: newDefaultTab.toString() };
+      newQuery = { ...router.query, currentTab: newTab.toString() };
     }
 
     router.push({
@@ -203,6 +203,9 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   }, [page, totalPages]);
 
   useEffect(() => {
+    if (!currentTab || !isReady || !companyId || companyId === '[companyId]')
+      return;
+
     let params: TObject = {
       page,
       keywords,
@@ -210,13 +213,21 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
     };
 
     const parsedOrderState =
-      MANAGE_COMPANY_ORDERS_TAB_MAP[currentTab].join(',');
-    params = { ...params, meta_orderState: parsedOrderState, currentTab };
+      MANAGE_COMPANY_ORDERS_TAB_MAP[
+        currentTab as keyof typeof MANAGE_COMPANY_ORDERS_TAB_MAP
+      ].join(',');
 
-    if (isReady) {
-      dispatch(orderAsyncActions.queryCompanyOrders(params));
-    }
+    params = {
+      ...params,
+      meta_orderState: parsedOrderState,
+      currentTab,
+    };
+    dispatch(orderAsyncActions.queryCompanyOrders(params));
   }, [companyId, currentTab, dispatch, isReady, keywords, page]);
+
+  const currentTabIndex = findTabIndexById(
+    currentTab as EManageCompanyOrdersTab,
+  );
 
   return (
     <div className={css.root}>
@@ -224,7 +235,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
         disabled={queryOrderInProgress}
         items={tabItems}
         onChange={handleTabChange}
-        defaultActiveKey={defaultTab as string}
+        defaultActiveKey={String(currentTabIndex) as string}
         className={css.tabContainer}
         headerClassName={css.tabHeader}
         headerWrapperClassName={css.headerWrapper}
