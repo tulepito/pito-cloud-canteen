@@ -104,6 +104,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
           : { companyId: 'personal' }),
       },
       pathname: companyPaths.ManageOrders,
+      shouldActivePathname: [companyPaths.OrderRating],
     },
     {
       key: 'account',

@@ -26,6 +26,7 @@ export const parseEntitiesToTableData = (
       deliveryAddress,
       orderState,
       orderStateHistory = [],
+      ratings,
     } = Listing(entity as TListing).getMetadata();
 
     const { totalWithVAT } = calculatePriceQuotationInfo({
@@ -50,6 +51,7 @@ export const parseEntitiesToTableData = (
         isCreatedByPitoAdmin,
         orderId,
         companyId,
+        hasRating: !!ratings,
         plan: {
           ...plan,
           attributes: {

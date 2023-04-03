@@ -217,6 +217,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       state,
       id: orderId,
       companyId,
+      hasRating,
     }: {
       state:
         | EOrderStates
@@ -224,6 +225,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         | EOrderDraftStates.pendingApproval;
       id: string;
       companyId: string;
+      hasRating: boolean;
     }) => {
       const intl = useIntl();
       const router = useRouter();
@@ -239,7 +241,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       const orderLink = getParticipantPickingLink(orderId);
 
       const shouldShowReviewButton =
-        state === EOrderStates.pendingPayment ||
+        (state === EOrderStates.pendingPayment && !hasRating) ||
         state === EOrderStates.completed;
 
       const navigateToDraftOrderDetailPage = () => {

@@ -3,6 +3,7 @@
 @use '/src/styles/mixins.scss' as *;
 
 .container {
+  padding: 24px 24px;
   @include viewportLarge {
     width: 1180px;
     margin: 0 auto;

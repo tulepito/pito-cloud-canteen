@@ -4,8 +4,11 @@
 
 .container {
   width: 364px;
-  cursor: pointer;
   margin-top: 12px;
+
+  label {
+    cursor: pointer;
+  }
 }
 
 .uploadImageLabel {
@@ -34,6 +37,7 @@
   @include flexAlign(center);
   gap: 12px;
   margin-top: 24px;
+  overflow: auto;
 }
 
 .imageWrapper {
