@@ -96,7 +96,12 @@ const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
           return (
             <>
               {fieldDisabled ? null : (
-                <input {...inputProps} multiple className={css.addImageInput} />
+                <input
+                  {...inputProps}
+                  multiple
+                  className={css.addImageInput}
+                  key={new Date().getTime()}
+                />
               )}
               {!maxImages && (
                 <div
