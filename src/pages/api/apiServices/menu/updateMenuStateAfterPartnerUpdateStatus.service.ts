@@ -1,7 +1,7 @@
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import {
-  EListingStates,
+  EListingMenuStates,
   EListingType,
   ERestaurantListingStatus,
 } from '@src/utils/enums';
@@ -17,13 +17,13 @@ const updateMenuStateAfterPartnerUpdateStatus = async (
 
   const stateToQuery =
     status === ERestaurantListingStatus.unsatisfactory
-      ? EListingStates.published
-      : EListingStates.closed;
+      ? EListingMenuStates.published
+      : EListingMenuStates.pendingRestaurantApproval;
 
   const stateToUpdate =
     status === ERestaurantListingStatus.unsatisfactory
-      ? EListingStates.closed
-      : EListingStates.published;
+      ? EListingMenuStates.pendingRestaurantApproval
+      : EListingMenuStates.published;
 
   const response = await integrationSdk.listings.query({
     meta_restaurantId: restaurantId,
@@ -32,7 +32,7 @@ const updateMenuStateAfterPartnerUpdateStatus = async (
   });
 
   const menus = denormalisedResponseEntities(response);
-  console.log({ menus });
+
   await Promise.all(
     menus.map(async (menu: TIntegrationListing) => {
       const isMenuInTranactionProgress = await checkIsInTransactionProgressMenu(

@@ -21,7 +21,11 @@ import { menusSliceThunks } from '@redux/slices/menus.slice';
 import { adminRoutes } from '@src/paths';
 import { formatTimestamp } from '@utils/dates';
 import type { EMenuTypes } from '@utils/enums';
-import { EListingStates, EMenuMealType } from '@utils/enums';
+import {
+  EListingMenuStates,
+  EListingStates,
+  EMenuMealType,
+} from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 
 import DisableMenuConfirmModal from '../DisableMenuConfirmModal/DisableMenuConfirmModal';
@@ -50,6 +54,11 @@ const TABLE_COLUNMS: TColumn[] = [
           {listingState === EListingStates.draft && (
             <div className={css.draftBox}>
               <FormattedMessage id="ManagePartnersPage.draftState" />
+            </div>
+          )}
+          {listingState === EListingMenuStates.pendingRestaurantApproval && (
+            <div className={css.draftBox}>
+              <FormattedMessage id="ManagePartnersPage.pendingRestaurantApprovalState" />
             </div>
           )}
         </div>
@@ -106,7 +115,8 @@ const TABLE_COLUNMS: TColumn[] = [
         return <IconSpinner className={css.loadingIcon} />;
       }
 
-      return listingState === EListingStates.draft ? (
+      return listingState === EListingStates.draft ||
+        listingState === EListingMenuStates.pendingRestaurantApproval ? (
         <></>
       ) : (
         <ToggleButton

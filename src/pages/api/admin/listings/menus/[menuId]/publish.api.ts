@@ -1,9 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
-import { EListingStates } from '@src/utils/enums';
+import { IntegrationListing } from '@src/utils/data';
+import {
+  EListingMenuStates,
+  EListingStates,
+  ERestaurantListingStatus,
+} from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -12,6 +18,46 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     switch (apiMethod) {
       case HttpMethod.POST: {
         const { menuId } = req.query;
+
+        const menuResponse = await integrationSdk.listings.show(
+          {
+            id: menuId,
+          },
+          {
+            expand: true,
+          },
+        );
+
+        const [menu] = denormalisedResponseEntities(menuResponse);
+
+        const { restaurantId } = IntegrationListing(menu).getMetadata();
+
+        const restaurantResponse = await integrationSdk.listings.show(
+          {
+            id: restaurantId,
+          },
+          {
+            expand: true,
+          },
+        );
+
+        const [restaurant] = denormalisedResponseEntities(restaurantResponse);
+
+        const { status } = IntegrationListing(restaurant).getMetadata();
+
+        if (status !== ERestaurantListingStatus.authorized) {
+          await integrationSdk.listings.update({
+            id: menuId,
+            metadata: {
+              listingState: EListingMenuStates.pendingRestaurantApproval,
+            },
+          });
+
+          return res.json({
+            message: 'Restaurant is not authorized. Menu will not be published',
+          });
+        }
+
         const response = await integrationSdk.listings.update(
           {
             id: menuId,
