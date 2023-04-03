@@ -21,7 +21,7 @@ const ReviewItemList = ({ reviewList, reviewerList }: any) => {
   const noReview = reviewList.length === 0;
 
   return (
-    <div>
+    <div className={css.reviewList}>
       {noReview && <div className={css.noReview}>Chưa có đánh giá</div>}
       {reviewList.map((review: any) => {
         const reviewListing = Listing(review);

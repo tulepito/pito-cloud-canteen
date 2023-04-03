@@ -57,6 +57,7 @@ const CompanyOrdersActionColumn = ({
   state,
   id: orderId,
   companyId,
+  hasRating,
 }: {
   state:
     | EOrderStates
@@ -64,6 +65,7 @@ const CompanyOrdersActionColumn = ({
     | EOrderDraftStates.pendingApproval;
   id: string;
   companyId: string;
+  hasRating?: boolean;
 }) => {
   const intl = useIntl();
   const router = useRouter();
@@ -79,7 +81,8 @@ const CompanyOrdersActionColumn = ({
   const orderLink = getParticipantPickingLink(orderId);
 
   const shouldShowReviewButton =
-    state === EOrderStates.pendingPayment || state === EOrderStates.completed;
+    (state === EOrderStates.pendingPayment && !hasRating) ||
+    state === EOrderStates.completed;
 
   const navigateToDraftOrderDetailPage = () => {
     router.push({
