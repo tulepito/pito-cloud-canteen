@@ -14,17 +14,20 @@ export type FeaturesHeaderProps = {
     title: ReactNode;
     pathname: string;
     query?: TObject;
+    shouldActivePathname?: string[];
   }[];
 };
 
 const FeaturesHeader: React.FC<FeaturesHeaderProps> = (props) => {
   const { headerData } = props;
   const { pathname: routerPathName } = useRouter();
+
   const { key: activeKey } =
-    headerData.find(({ pathname }) =>
+    headerData.find(({ pathname, shouldActivePathname }) =>
       pathname === '/'
         ? routerPathName === pathname
-        : routerPathName.includes(pathname),
+        : routerPathName.includes(pathname) ||
+          shouldActivePathname?.includes(routerPathName),
     ) || {};
 
   return (

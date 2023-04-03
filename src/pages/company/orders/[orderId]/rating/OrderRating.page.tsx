@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -7,6 +8,7 @@ import { useRouter } from 'next/router';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { resetImage } from '@redux/slices/uploadImage.slice';
 import { Listing } from '@src/utils/data';
 
 import OrderRatingForm from '../components/OrderRatingForm/OrderRatingForm';
@@ -60,6 +62,10 @@ const OrderRatingPage = () => {
       dispatch(OrderRatingThunks.fetchOrder(orderId as string));
     }
   }, [orderId]);
+
+  useEffect(() => {
+    dispatch(resetImage());
+  }, []);
 
   const onSubmit = async (values: any) => {
     const { general, staff, food, packaging, service, detailTextRating } =

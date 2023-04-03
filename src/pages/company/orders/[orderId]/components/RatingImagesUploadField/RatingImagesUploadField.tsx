@@ -27,6 +27,7 @@ const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
 
   const allImages = Object.values(images);
 
+  const uploadedImagesLength = allImages.length;
   const maxImages = Object.keys(images).length === MAX_FILES;
   const onImagesUpload = async (params: TImageActionPayload[]) => {
     await dispatch(uploadImageThunks.uploadImages(params));
@@ -46,6 +47,19 @@ const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
       }
     }
   };
+  const processImageFilesBeforeUpload = (files: any[]) => {
+    const fileList = Array.from(files);
+    const canUploadImageLength = MAX_FILES - uploadedImagesLength;
+    const canUploadFileList =
+      fileList.length >= canUploadImageLength
+        ? fileList.slice(0, canUploadImageLength)
+        : fileList;
+    onImageUploadHandler(canUploadFileList);
+  };
+
+  const handleDrag = (e: any) => {
+    e.preventDefault();
+  };
 
   const onDeleteImage = (imageId: string) => () => {
     dispatch(removeImage(imageId));
@@ -64,8 +78,12 @@ const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
           const { name, type } = input;
           const onChange = (e: any) => {
             const { files } = e.target;
-            const fileList = Array.from(files);
-            onImageUploadHandler(fileList);
+            processImageFilesBeforeUpload(files);
+          };
+          const handleDrop = (e: any) => {
+            e.preventDefault();
+            const { files } = e.dataTransfer;
+            processImageFilesBeforeUpload(files);
           };
           const inputProps = {
             accept,
@@ -81,7 +99,11 @@ const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
                 <input {...inputProps} multiple className={css.addImageInput} />
               )}
               {!maxImages && (
-                <div className={css.container}>
+                <div
+                  className={css.container}
+                  onDrop={handleDrop}
+                  onDragOver={handleDrag}
+                  onDragEnter={handleDrag}>
                   <label htmlFor={name}>
                     <div className={css.uploadImageLabel}>
                       <IconImage />

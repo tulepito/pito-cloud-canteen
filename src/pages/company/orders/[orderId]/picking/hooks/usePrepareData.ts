@@ -61,13 +61,14 @@ export const usePrepareOrderDetailPageData = () => {
     anonymous = [],
     staffName = '',
     orderState,
+    ratings,
   } = Listing(orderData as TListing).getMetadata();
   const isCanceledOrder = [
     EOrderStates.canceled || EOrderStates.canceledByBooker,
   ].includes(orderState);
   const canReview =
     orderState === EOrderStates.completed ||
-    orderState === EOrderStates.pendingPayment;
+    (orderState === EOrderStates.pendingPayment && !ratings);
   const titleSectionData = { deliveryHour, deliveryAddress };
   const countdownSectionData = {
     deadlineHour,
