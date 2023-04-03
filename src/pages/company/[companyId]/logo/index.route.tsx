@@ -1,5 +1,11 @@
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
+
 import LogoSettingPage from './LogoSetting.page';
 
 export default function LogoSettingPageRoute() {
-  return <LogoSettingPage />;
+  return (
+    <MetaWrapper>
+      <LogoSettingPage />
+    </MetaWrapper>
+  );
 }

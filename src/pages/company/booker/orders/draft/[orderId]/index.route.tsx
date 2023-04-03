@@ -1,7 +1,13 @@
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
+
 import BookerDraftOrderPage from './BookerDraftOrder.page';
 
 function BookerOrderDetailsRoute() {
-  return <BookerDraftOrderPage />;
+  return (
+    <MetaWrapper>
+      <BookerDraftOrderPage />
+    </MetaWrapper>
+  );
 }
 
 export default BookerOrderDetailsRoute;

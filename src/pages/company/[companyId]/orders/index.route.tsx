@@ -1,16 +1,13 @@
-import { useIntl } from 'react-intl';
-
-import Meta from '@components/Layout/Meta';
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
 import ManageCompanyOrdersPage from './ManageCompanyOrders.page';
 
 const CompanyOrdersRoute = () => {
-  const intl = useIntl();
-
   return (
     <>
-      <Meta title={intl.formatMessage({ id: 'CompanyOrdersRoute.title' })} />
-      <ManageCompanyOrdersPage />
+      <MetaWrapper>
+        <ManageCompanyOrdersPage />
+      </MetaWrapper>
     </>
   );
 };

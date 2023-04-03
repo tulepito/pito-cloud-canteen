@@ -1,9 +1,15 @@
 import React from 'react';
 
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
+
 import CompanyDashboardPage from './CompanyDashboard.page';
 
 const CompanyDashboardRoute = () => {
-  return <CompanyDashboardPage />;
+  return (
+    <MetaWrapper>
+      <CompanyDashboardPage />;
+    </MetaWrapper>
+  );
 };
 
 export default CompanyDashboardRoute;
