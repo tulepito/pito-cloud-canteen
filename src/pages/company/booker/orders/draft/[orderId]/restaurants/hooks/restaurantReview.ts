@@ -1,12 +1,15 @@
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { UserPermission } from '@src/types/UserPermission';
 
 import { BookerSelectRestaurantThunks } from '../BookerSelectRestaurant.slice';
 
-const useRestaurantReview = () => {
+const useRestaurantReview = (
+  activeTab: 'booker' | 'participant',
+  isViewAll: boolean = false,
+  page: number = 1,
+) => {
   const dispatch = useAppDispatch();
 
   const restaurantBookerReviews = useAppSelector(
@@ -36,25 +39,36 @@ const useRestaurantReview = () => {
     shallowEqual,
   );
 
+  const bookerReviewPagination = useAppSelector(
+    (state) => state.BookerSelectRestaurant.bookerReviewPagination,
+  );
+
+  const participantReviewPagination = useAppSelector(
+    (state) => state.BookerSelectRestaurant.participantReviewPagination,
+  );
+
+  const fetchRestaurantReviewInProgress = useAppSelector(
+    (state) => state.BookerSelectRestaurant.fetchRestaurantReviewInProgress,
+  );
+
   const selectedRestaurant = useMemo(
     () => seachResult.find((item) => item.id.uuid === selectedRestaurantId),
     [seachResult, selectedRestaurantId],
   );
 
-  useEffect(() => {
+  const fetchingReview = useCallback(() => {
     dispatch(
       BookerSelectRestaurantThunks.fetchRestaurantReviews({
-        reviewRole: UserPermission.BOOKER,
+        reviewRole: activeTab,
+        isViewAll,
+        page,
       }),
     );
-  }, []);
+  }, [activeTab, dispatch, isViewAll, page]);
+
   useEffect(() => {
-    dispatch(
-      BookerSelectRestaurantThunks.fetchRestaurantReviews({
-        reviewRole: UserPermission.PARTICIPANT,
-      }),
-    );
-  }, []);
+    fetchingReview();
+  }, [fetchingReview]);
 
   return {
     restaurantBookerReviews,
@@ -62,6 +76,10 @@ const useRestaurantReview = () => {
     selectedRestaurant,
     restaurantBookerReviewers,
     restaurantParticipantReviewers,
+    fetchRestaurantReviewInProgress,
+    bookerReviewPagination,
+    participantReviewPagination,
+    fetchingReview,
   };
 };
 

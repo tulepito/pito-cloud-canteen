@@ -129,7 +129,8 @@ const FoodRating: React.FC<TFoodRatingProps> = (props) => {
       </div>
       <FieldSelect
         name={OPTIONAL_FOOD_RESTAURANT_UNSATISFACTED}
-        id="optionalFood-restaurant">
+        id="optionalFood-restaurant"
+        className={css.optionalSelectField}>
         <option value="">Chọn nhà hàng bạn muốn đánh giá</option>
         {restaurantsByDay.map(
           ({ restaurantId, restaurantName, timestamp }: any) => (

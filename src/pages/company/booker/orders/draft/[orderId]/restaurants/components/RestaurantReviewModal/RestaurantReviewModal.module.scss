@@ -96,11 +96,21 @@
 }
 
 .reviewList {
-  max-height: 500px;
+  max-height: 50vh;
   overflow-y: auto;
 }
 
 .loading {
   margin-top: 20px;
   text-align: center;
+}
+
+.loadMore {
+  margin: 20px auto;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
