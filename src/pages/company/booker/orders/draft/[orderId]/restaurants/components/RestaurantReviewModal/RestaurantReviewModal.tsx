@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import Modal from '@components/Modal/Modal';
@@ -17,12 +17,25 @@ type RestaurantReviewModalProps = {
   onClose: () => void;
 };
 
-const ReviewItemList = ({ reviewList, reviewerList }: any) => {
+const ReviewItemList = ({
+  isSeeAll,
+  reviewList,
+  reviewerList,
+  inProgress,
+  totalReview,
+  onFetching,
+}: any) => {
   const noReview = reviewList.length === 0;
+  const isShowAllReviews = reviewList.length === totalReview;
+
+  const shouldShowLoadMore =
+    isSeeAll && !inProgress && !isShowAllReviews && !noReview;
 
   return (
     <div className={css.reviewList}>
-      {noReview && <div className={css.noReview}>Chưa có đánh giá</div>}
+      {noReview && !inProgress && (
+        <div className={css.noReview}>Chưa có đánh giá</div>
+      )}
       {reviewList.map((review: any) => {
         const reviewListing = Listing(review);
         const { generalRating, detailRating, timestamp } =
@@ -39,6 +52,12 @@ const ReviewItemList = ({ reviewList, reviewerList }: any) => {
           </div>
         );
       })}
+      {inProgress && <div className={css.loading}>Đang tải...</div>}
+      {shouldShowLoadMore && (
+        <div className={css.loadMore} onClick={onFetching}>
+          Xem thêm
+        </div>
+      )}
     </div>
   );
 };
@@ -46,17 +65,20 @@ const ReviewItemList = ({ reviewList, reviewerList }: any) => {
 const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
   const { isOpen, onClose } = props;
   const viewAllReviewControl = useBoolean();
+  const [reviewPage, setReviewPage] = useState(1);
   const [activeTab, setActiveTab] = useState<'booker' | 'participant'>(
     'booker',
   );
-
   const {
     restaurantBookerReviews = [],
     restaurantParticipantReviews = [],
     selectedRestaurant,
     restaurantBookerReviewers,
     restaurantParticipantReviewers,
-  } = useRestaurantReview();
+    fetchRestaurantReviewInProgress,
+    bookerReviewPagination,
+    participantReviewPagination,
+  } = useRestaurantReview(activeTab, viewAllReviewControl.value, reviewPage);
   const selectedRestaurantListing = useMemo(
     () => Listing(selectedRestaurant as TListing),
     [selectedRestaurant],
@@ -76,16 +98,18 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
         <div className={css.tabLabel}>
           <span>Từ người đặt nhóm</span>
           <div data-number className={css.commentNumber}>
-            {bookerReviewNumber}
+            {!fetchRestaurantReviewInProgress ? bookerReviewNumber : 0}
           </div>
         </div>
       ),
       childrenFn: (childProps: any) => <ReviewItemList {...childProps} />,
       childrenProps: {
-        reviewList: viewAllReviewControl.value
-          ? restaurantBookerReviews
-          : restaurantBookerReviews.slice(0, 5),
+        isSeeAll: viewAllReviewControl.value,
+        reviewList: restaurantBookerReviews,
         reviewerList: restaurantBookerReviewers,
+        inProgress: fetchRestaurantReviewInProgress,
+        totalReview: bookerReviewPagination?.totalItems,
+        onFetching: () => setReviewPage(reviewPage + 1),
       },
     },
     {
@@ -94,16 +118,18 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
         <div className={css.tabLabel}>
           <span>Từ người tham gia</span>
           <div data-number className={css.commentNumber}>
-            {participantReviewNumber}
+            {!fetchRestaurantReviewInProgress ? participantReviewNumber : 0}
           </div>
         </div>
       ),
       childrenFn: (childProps: any) => <ReviewItemList {...childProps} />,
       childrenProps: {
-        reviewList: viewAllReviewControl.value
-          ? restaurantParticipantReviews
-          : restaurantParticipantReviews.slice(0, 5),
+        isSeeAll: viewAllReviewControl.value,
+        reviewList: restaurantParticipantReviews,
         reviewerList: restaurantParticipantReviewers,
+        inProgress: fetchRestaurantReviewInProgress,
+        totalReview: participantReviewPagination?.totalItems,
+        onFetching: () => setReviewPage(reviewPage + 1),
       },
     },
   ];
@@ -112,9 +138,9 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
     return `${(rating / 5) * 100}%`;
   };
 
-  const onTabChange = (tab: any) => {
+  const onTabChange = useCallback((tab: any) => {
     setActiveTab(tab?.key as any);
-  };
+  }, []);
 
   const onViewAllReview = () => {
     viewAllReviewControl.setTrue();
@@ -163,9 +189,6 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
             <IconArrow direction="right" />
           </div>
         </div>
-        <div className={css.content}>
-          <Tabs items={tabItems as any} onChange={onTabChange} />
-        </div>
       </div>
     </>
   );
@@ -174,9 +197,6 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
     <div className={css.modalContent}>
       <div className={css.contentHeader}>
         <div className={css.totalComment}>{`Bình luận (${totalComments})`}</div>
-      </div>
-      <div className={css.content}>
-        <Tabs items={tabItems as any} onChange={onTabChange} />
       </div>
     </div>
   );
@@ -190,6 +210,9 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
       scrollLayerClassName={css.scrollLayer}
       title={viewAllReviewControl.value ? goBackModalTitle : 'Đánh giá'}>
       {viewAllReviewControl.value ? detailView : generalView}
+      <div className={css.content}>
+        <Tabs items={tabItems as any} onChange={onTabChange} />
+      </div>
     </Modal>
   );
 };

@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import keyBy from 'lodash/keyBy';
 import mapValue from 'lodash/mapValues';
+import uniqBy from 'lodash/uniqBy';
 import { DateTime } from 'luxon';
 
 import { updatePlanDetailsApi } from '@apis/orderApi';
@@ -15,7 +16,7 @@ import { UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { convertWeekDay } from '@utils/dates';
 import { EImageVariants, EListingType } from '@utils/enums';
-import type { TListing, TUser } from '@utils/types';
+import type { TListing, TPagination, TUser } from '@utils/types';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
 
@@ -69,9 +70,11 @@ type TOrderInitialState = {
 
   restaurantBookerReviews: any;
   restaurantBookerReviewers: any;
+  bookerReviewPagination: TPagination;
 
   restaurantParticipantReviews: any;
   restaurantParticipantReviewers: any;
+  participantReviewPagination: TPagination;
 
   fetchRestaurantReviewInProgress: boolean;
   fetchRestaurantReviewError: any;
@@ -115,9 +118,11 @@ const initialState: TOrderInitialState = {
 
   restaurantBookerReviews: [],
   restaurantBookerReviewers: [],
+  bookerReviewPagination: null!,
 
   restaurantParticipantReviews: [],
   restaurantParticipantReviewers: [],
+  participantReviewPagination: null!,
 
   fetchRestaurantReviewInProgress: false,
   fetchRestaurantReviewError: null,
@@ -312,16 +317,26 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
 
 const fetchRestaurantReviews = createAsyncThunk(
   FETCH_RESTAURANT_REVIEWS,
-  async ({ page = 1, reviewRole }: any, { extra: sdk, getState }) => {
-    const { selectedRestaurantId } = getState().BookerSelectRestaurant;
-    const response = denormalisedResponseEntities(
-      await sdk.listings.query({
-        meta_listingType: EListingType.rating,
-        meta_restaurantId: selectedRestaurantId,
-        page,
-        meta_reviewRole: reviewRole,
-      }),
-    );
+  async (
+    { page = 1, reviewRole, isViewAll }: any,
+    { extra: sdk, getState },
+  ) => {
+    const {
+      selectedRestaurantId,
+      restaurantBookerReviews,
+      restaurantBookerReviewers,
+      restaurantParticipantReviews,
+      restaurantParticipantReviewers,
+    } = getState().BookerSelectRestaurant;
+    const rawResponse = await sdk.listings.query({
+      meta_listingType: EListingType.rating,
+      meta_restaurantId: selectedRestaurantId,
+      page,
+      perPage: isViewAll ? 10 : 5,
+      meta_reviewRole: reviewRole,
+    });
+    const { meta } = rawResponse;
+    const response = denormalisedResponseEntities(rawResponse);
     const reviewerResponse = await Promise.all(
       response
         .map((item: TListing) => ({
@@ -347,18 +362,28 @@ const fetchRestaurantReviews = createAsyncThunk(
 
     return {
       ...(reviewRole === UserPermission.BOOKER && {
-        restaurantBookerReviews: response,
-        restaurantBookerReviewers: mapValue(
-          keyBy(reviewerResponse, 'id'),
-          'value',
-        ),
+        restaurantBookerReviews: isViewAll
+          ? uniqBy([...restaurantBookerReviews, ...response], 'id.uuid')
+          : response,
+        restaurantBookerReviewers: isViewAll
+          ? {
+              ...restaurantBookerReviewers,
+              ...mapValue(keyBy(reviewerResponse, 'id'), 'value'),
+            }
+          : mapValue(keyBy(reviewerResponse, 'id'), 'value'),
+        bookerReviewPagination: meta,
       }),
       ...(reviewRole === UserPermission.PARTICIPANT && {
-        restaurantParticipantReviews: response,
-        restaurantParticipantReviewers: mapValue(
-          keyBy(reviewerResponse, 'id'),
-          'value',
-        ),
+        restaurantParticipantReviews: isViewAll
+          ? uniqBy([...restaurantParticipantReviews, ...response], 'id.uuid')
+          : response,
+        restaurantParticipantReviewers: isViewAll
+          ? {
+              ...restaurantParticipantReviewers,
+              ...mapValue(keyBy(reviewerResponse, 'id'), 'value'),
+            }
+          : mapValue(keyBy(reviewerResponse, 'id'), 'value'),
+        participantReviewPagination: meta,
       }),
     };
   },
@@ -515,6 +540,8 @@ const BookerSelectRestaurantSlice = createSlice({
         restaurantBookerReviewers: payload?.restaurantBookerReviewers,
         restaurantParticipantReviews: payload?.restaurantParticipantReviews,
         restaurantParticipantReviewers: payload?.restaurantParticipantReviewers,
+        bookerReviewPagination: payload?.bookerReviewPagination,
+        participantReviewPagination: payload?.participantReviewPagination,
       }))
       .addCase(fetchRestaurantReviews.rejected, (state, { error }) => ({
         ...state,
