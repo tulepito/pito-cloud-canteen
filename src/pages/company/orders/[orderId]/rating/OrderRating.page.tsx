@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { resetImage } from '@redux/slices/uploadImage.slice';
 import { Listing } from '@src/utils/data';
+import { EOrderStates } from '@src/utils/enums';
 
 import OrderRatingForm from '../components/OrderRatingForm/OrderRatingForm';
 import RatingSuccessModal from '../components/RatingSuccessModal/RatingSuccessModal';
@@ -49,6 +50,8 @@ const OrderRatingPage = () => {
 
   const orderListing = Listing(order);
 
+  const { orderStatus, ratings: orderRatings } = orderListing.getMetadata();
+  const isOrderRated = !!orderRatings || orderStatus === EOrderStates.reviewed;
   const pageTitle = intl.formatMessage(
     {
       id: 'OrderRatingPage.pageTitle',
@@ -57,6 +60,11 @@ const OrderRatingPage = () => {
       orderTitle: orderListing.getAttributes().title,
     },
   );
+  useEffect(() => {
+    if (isOrderRated) {
+      router.push(`/company/orders/${orderId}`);
+    }
+  }, [isOrderRated]);
   useEffect(() => {
     if (orderId) {
       dispatch(OrderRatingThunks.fetchOrder(orderId as string));
@@ -179,17 +187,18 @@ const OrderRatingPage = () => {
         optionalOtherReview: values?.['optionalService-other'],
       }),
     };
-
-    const { meta } = await dispatch(
-      OrderRatingThunks.postRating({
-        ratings,
-        detailTextRating,
-        staff: staffRating,
-        service: serviceRating,
-      }),
-    );
-    if (meta.requestStatus === 'fulfilled') {
-      ratingSuccessModalControl.setTrue();
+    if (!isOrderRated) {
+      const { meta } = await dispatch(
+        OrderRatingThunks.postRating({
+          ratings,
+          detailTextRating,
+          staff: staffRating,
+          service: serviceRating,
+        }),
+      );
+      if (meta.requestStatus === 'fulfilled') {
+        ratingSuccessModalControl.setTrue();
+      }
     }
   };
 
