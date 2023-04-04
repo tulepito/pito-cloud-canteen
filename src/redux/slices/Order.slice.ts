@@ -544,7 +544,9 @@ const fetchCompanyBookers = createAsyncThunk(
     )[0];
     const { members = {} } = User(companyAccount).getMetadata();
     const bookerEmails = Object.keys(members).filter(
-      (email) => members[email].permission === UserPermission.BOOKER,
+      (email) =>
+        members[email].permission === UserPermission.BOOKER ||
+        members[email].permission === UserPermission.OWNER,
     );
     const bookers = await Promise.all(
       bookerEmails.map(async (email) => {
