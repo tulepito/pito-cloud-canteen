@@ -75,6 +75,8 @@ const EditPartnerWizardTab = (props: any) => {
     onSetUnsatisfactory,
     goBack,
     uploadingImage,
+    packaging: packagingOptions,
+    categories: categoriesOptions,
   } = props;
 
   const router = useRouter();
@@ -133,6 +135,7 @@ const EditPartnerWizardTab = (props: any) => {
           inProgress={inProgress}
           formError={formError}
           uploadingImage={uploadingImage}
+          packaging={packagingOptions}
         />
       );
     }
@@ -256,6 +259,7 @@ const EditPartnerWizardTab = (props: any) => {
           formError={formError}
           initialValues={initialValues}
           goBack={goBack}
+          categories={categoriesOptions}
         />
       );
     }

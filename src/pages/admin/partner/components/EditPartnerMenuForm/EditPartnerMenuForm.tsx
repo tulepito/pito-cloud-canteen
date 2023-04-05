@@ -9,11 +9,7 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
 import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
-import {
-  CATEGORY_OPTIONS,
-  EXTRA_SERVICE_OPTIONS,
-  MEAL_OPTIONS,
-} from '@utils/enums';
+import { EXTRA_SERVICE_OPTIONS, MEAL_OPTIONS } from '@utils/enums';
 
 import css from './EditPartnerMenuForm.module.scss';
 
@@ -26,6 +22,7 @@ type TEditPartnerMenuForm = {
   formError?: any;
   initialValues?: any;
   goBack?: () => void;
+  categories: any[];
 };
 
 export const YES = 'yes';
@@ -33,7 +30,7 @@ export const NO = 'no';
 
 const EditPartnerMenuForm: React.FC<TEditPartnerMenuForm> = (props) => {
   const intl = useIntl();
-  const { onSubmit, ...rest } = props;
+  const { onSubmit, categories: categoriesOptions, ...rest } = props;
 
   const [submittedValues, setSubmittedValues] = useState<any>();
 
@@ -116,7 +113,7 @@ const EditPartnerMenuForm: React.FC<TEditPartnerMenuForm> = (props) => {
                   listClassName={css.categoryList}
                   id="categories"
                   name="categories"
-                  options={CATEGORY_OPTIONS}
+                  options={categoriesOptions || []}
                 />
               </div>
             </div>

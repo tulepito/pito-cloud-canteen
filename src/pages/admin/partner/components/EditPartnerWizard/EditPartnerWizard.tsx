@@ -139,6 +139,9 @@ const EditPartnerWizard = (props: any) => {
     onSetAuthorized,
     onSetUnsatisfactory,
     uploadingImage,
+    packaging,
+    categories,
+    daySessions,
   } = props;
 
   const intl = useIntl();
@@ -247,6 +250,9 @@ const EditPartnerWizard = (props: any) => {
             goBack={handleGoBack(tab)}
             disabled={uploadingImage || disabled}
             uploadingImage={uploadingImage}
+            packaging={packaging}
+            categories={categories}
+            daySessions={daySessions}
           />
         );
       })}

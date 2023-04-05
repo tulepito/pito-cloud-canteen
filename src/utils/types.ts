@@ -627,3 +627,12 @@ export type TDuplicateMenuApiParams = {
   numberOfCycles: number;
   endDate: number;
 };
+
+export type TKeyValue<T = string> = {
+  key: string;
+  label: T;
+  time?: {
+    start: string;
+    end: string;
+  };
+};

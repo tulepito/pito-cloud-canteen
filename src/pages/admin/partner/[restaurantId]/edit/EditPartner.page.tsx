@@ -73,6 +73,9 @@ const EditPartnerPage = () => {
 
     restaurantTableActionInProgress,
     restaurantTableActionError,
+    packaging,
+    categories,
+    daySessions,
   } = useAppSelector((state) => state.partners);
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -140,6 +143,10 @@ const EditPartnerPage = () => {
     };
     await dispatch(partnerThunks.setRestaurantStatus(params));
   };
+
+  useEffect(() => {
+    dispatch(partnerThunks.fetchAttributes());
+  }, []);
 
   useEffect(() => {
     if (!restaurantId) return;
@@ -236,6 +243,9 @@ const EditPartnerPage = () => {
           uploadingFoodCertificates ||
           uploadingPartyInsurances
         }
+        packaging={packaging}
+        categories={categories}
+        daySessions={daySessions}
       />
     );
   } else {
