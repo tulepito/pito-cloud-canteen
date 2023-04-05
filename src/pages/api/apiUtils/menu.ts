@@ -1,22 +1,19 @@
 import { getUniqueString } from '@src/utils/data';
-import { getDayOfWeekByIndex } from '@src/utils/dates';
 
 export const createMinPriceByDayOfWeek = (foodsByDate: any) => {
   let avaragePriceByDayOfWeek = {};
-  Object.keys(foodsByDate).forEach((keyAsDate) => {
+  Object.keys(foodsByDate).forEach((keyAsDayOfWeek) => {
     let minPriceByDate = 0;
-    Object.keys(foodsByDate[keyAsDate]).forEach((foodId, index) => {
-      const { price = 0 } = foodsByDate[keyAsDate][foodId];
+    Object.keys(foodsByDate[keyAsDayOfWeek]).forEach((foodId, index) => {
+      const { price = 0 } = foodsByDate[keyAsDayOfWeek][foodId];
       if (index === 0) minPriceByDate = price;
       else {
         minPriceByDate = price < minPriceByDate ? price : minPriceByDate;
       }
     });
-    const dayAsIndex = new Date(Number(keyAsDate)).getDay() - 1;
-    const dayOfWeek = getDayOfWeekByIndex(dayAsIndex);
     avaragePriceByDayOfWeek = {
       ...avaragePriceByDayOfWeek,
-      [`${dayOfWeek}MinFoodPrice`]: minPriceByDate || 0,
+      [`${keyAsDayOfWeek}MinFoodPrice`]: minPriceByDate || 0,
     };
   });
 
@@ -86,53 +83,20 @@ export const createNutritionsByDaysOfWeekField = (
   return newData;
 };
 
-export const createSubmitFoodsByDate = (foodsByDate: any) => {
-  let submitValues = {};
-  Object.keys(foodsByDate).forEach((keyAsDate) => {
-    const foodByDate = foodsByDate[keyAsDate];
-    let newFoodByDate = {};
-    Object.keys(foodByDate).forEach((k) => {
-      const food = foodByDate[k];
-      const { dayOfWeek, sideDishes = [], id, foodNote } = food;
-      newFoodByDate = {
-        ...newFoodByDate,
-        [k]: {
-          dayOfWeek,
-          id,
-          sideDishes,
-          foodNote,
-        },
-      };
-    });
-    const dayAsIndex = new Date(Number(keyAsDate)).getDay() - 1;
-    const dayOfWeek = getDayOfWeekByIndex(dayAsIndex);
-    submitValues = {
-      ...submitValues,
-      [dayOfWeek]: {
-        ...newFoodByDate,
-      },
-    };
-  });
-
-  return submitValues;
-};
-
 export const createListFoodNutritionByFoodsByDate = (foodsByDate: any) => {
   let nutritionsByDayOfWeek = {};
-  Object.keys(foodsByDate).forEach((keyAsDate) => {
+  Object.keys(foodsByDate).forEach((keyAsDayOfWeek) => {
     let nutritionListByDate: string[] = [];
-    Object.keys(foodsByDate[keyAsDate]).forEach((foodId) => {
-      const { nutritionsList = [] } = foodsByDate[keyAsDate][foodId];
+    Object.keys(foodsByDate[keyAsDayOfWeek]).forEach((foodId) => {
+      const { nutritionsList = [] } = foodsByDate[keyAsDayOfWeek][foodId];
       nutritionListByDate = getUniqueString([
         ...nutritionListByDate,
         ...nutritionsList,
       ]);
     });
-    const dayAsIndex = new Date(Number(keyAsDate)).getDay() - 1;
-    const dayOfWeek = getDayOfWeekByIndex(dayAsIndex);
     nutritionsByDayOfWeek = {
       ...nutritionsByDayOfWeek,
-      [`${dayOfWeek}Nutritions`]: nutritionListByDate,
+      [`${keyAsDayOfWeek}Nutritions`]: nutritionListByDate,
     };
   });
 
@@ -141,16 +105,14 @@ export const createListFoodNutritionByFoodsByDate = (foodsByDate: any) => {
 
 export const createListFoodIdsByFoodsByDate = (foodsByDate: any) => {
   let foodIdsByDayOfWeek = {};
-  Object.keys(foodsByDate).forEach((keyAsDate) => {
+  Object.keys(foodsByDate).forEach((keyAsDayOfWeek) => {
     const listFoodIds: string[] = [];
-    Object.keys(foodsByDate[keyAsDate]).forEach((foodId) => {
+    Object.keys(foodsByDate[keyAsDayOfWeek]).forEach((foodId) => {
       listFoodIds.push(foodId);
     });
-    const dayAsIndex = new Date(Number(keyAsDate)).getDay() - 1;
-    const dayOfWeek = getDayOfWeekByIndex(dayAsIndex);
     foodIdsByDayOfWeek = {
       ...foodIdsByDayOfWeek,
-      [`${dayOfWeek}FoodIdList`]: listFoodIds,
+      [`${keyAsDayOfWeek}FoodIdList`]: listFoodIds,
     };
   });
 

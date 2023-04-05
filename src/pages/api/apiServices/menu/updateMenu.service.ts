@@ -3,10 +3,8 @@ import {
   createFoodByDateByDaysOfWeekField,
   createFoodListIdByDaysOfWeekField,
   createListFoodIdsByFoodsByDate,
-  createListFoodNutritionByFoodsByDate,
   createMinPriceByDayOfWeek,
   createNutritionsByDaysOfWeekField,
-  createSubmitFoodsByDate,
 } from '@pages/api/apiUtils/menu';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/sdk';
@@ -92,38 +90,33 @@ const updateMenu = async (
         ...(isCycleMenu
           ? { ...(numberOfCycles ? { numberOfCycles } : {}) }
           : {}),
-        ...(restaurantId
+        ...(daysOfWeek
           ? {
-              ...(daysOfWeek
-                ? {
-                    foodsByDate: createFoodByDateByDaysOfWeekField(
-                      foodsByDateFromMenu,
-                      daysOfWeek,
-                    ),
-                  }
-                : {}),
-              ...(daysOfWeek
-                ? {
-                    ...createFoodAveragePriceByDaysOfWeekField(
-                      {
-                        monMinFoodPrice: monMinFoodPriceFromMenu,
-                        tueMinFoodPrice: tueMinFoodPriceFromMenu,
-                        wedMinFoodPrice: wedMinFoodPriceFromMenu,
-                        thuMinFoodPrice: thuMinFoodPriceFromMenu,
-                        friMinFoodPrice: friMinFoodPriceFromMenu,
-                        satMinFoodPrice: satMinFoodPriceFromMenu,
-                        sunMinFoodPrice: sunMinFoodPriceFromMenu,
-                      },
-                      daysOfWeek,
-                    ),
-                  }
-                : {}),
+              foodsByDate: createFoodByDateByDaysOfWeekField(
+                foodsByDateFromMenu,
+                daysOfWeek,
+              ),
+            }
+          : {
+              ...(foodsByDate ? { foodsByDate } : {}),
+            }),
+        ...(daysOfWeek
+          ? {
+              ...createFoodAveragePriceByDaysOfWeekField(
+                {
+                  monMinFoodPrice: monMinFoodPriceFromMenu,
+                  tueMinFoodPrice: tueMinFoodPriceFromMenu,
+                  wedMinFoodPrice: wedMinFoodPriceFromMenu,
+                  thuMinFoodPrice: thuMinFoodPriceFromMenu,
+                  friMinFoodPrice: friMinFoodPriceFromMenu,
+                  satMinFoodPrice: satMinFoodPriceFromMenu,
+                  sunMinFoodPrice: sunMinFoodPriceFromMenu,
+                },
+                daysOfWeek,
+              ),
             }
           : {}),
         ...(foodsByDate ? { ...createMinPriceByDayOfWeek(foodsByDate) } : {}),
-        ...(foodsByDate
-          ? { foodsByDate: createSubmitFoodsByDate(foodsByDate) }
-          : {}),
       },
       metadata: {
         ...(menuType ? { menuType } : {}),
@@ -166,9 +159,6 @@ const updateMenu = async (
           : {}),
         ...(foodsByDate
           ? { ...createListFoodIdsByFoodsByDate(foodsByDate) }
-          : {}),
-        ...(foodsByDate
-          ? { ...createListFoodNutritionByFoodsByDate(foodsByDate) }
           : {}),
       },
     },
