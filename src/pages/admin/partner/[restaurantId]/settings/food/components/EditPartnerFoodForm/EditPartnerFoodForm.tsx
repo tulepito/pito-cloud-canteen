@@ -29,7 +29,6 @@ import {
   OTHER_OPTION,
   PACKAGING_OPTIONS,
   SIDE_DISH_OPTIONS,
-  SPECIAL_DIET_OPTIONS,
 } from '@utils/enums';
 import { pickRenderableImages } from '@utils/images';
 import {
@@ -85,6 +84,7 @@ const EditPartnerFoodFormComponent: React.FC<
     removedImageIds,
     uploadImageError,
     currentFoodListing = {},
+    nutritions: nutritionsOptions,
   } = useAppSelector((state) => state.foods, shallowEqual);
 
   const images = pickRenderableImages(
@@ -337,7 +337,7 @@ const EditPartnerFoodFormComponent: React.FC<
       <div className={css.flexField}>
         <FieldCheckboxGroup
           className={css.field}
-          options={SPECIAL_DIET_OPTIONS}
+          options={nutritionsOptions || []}
           name="specialDiets"
           id="specialDiets"
           label={intl.formatMessage({

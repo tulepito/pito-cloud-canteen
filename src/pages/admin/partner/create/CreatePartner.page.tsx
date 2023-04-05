@@ -27,6 +27,8 @@ const CreatePartnerPage: React.FC<any> = () => {
     removedCoverIds,
     createDraftPartnerInProgress,
     createDraftPartnerError,
+    packaging,
+    categories,
   } = useAppSelector((state) => state.partners);
   const dispatch = useAppDispatch();
 
@@ -62,6 +64,10 @@ const CreatePartnerPage: React.FC<any> = () => {
     dispatch(resetInitialStates());
   }, [dispatch]);
 
+  useEffect(() => {
+    dispatch(partnerThunks.fetchAttributes());
+  }, []);
+
   return (
     <EditPartnerWizard
       uploadedAvatars={pickRenderableImages(
@@ -85,6 +91,8 @@ const CreatePartnerPage: React.FC<any> = () => {
       inProgress={createDraftPartnerInProgress}
       formError={formError}
       onCreateDraftPartner={onCreateDraftPartner}
+      packaging={packaging}
+      categories={categories}
     />
   );
 };

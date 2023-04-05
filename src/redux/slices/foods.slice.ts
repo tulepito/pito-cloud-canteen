@@ -4,6 +4,7 @@ import omit from 'lodash/omit';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 
+import { getAttributesApi } from '@apis/admin';
 import { partnerFoodApi } from '@apis/foodApi';
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
@@ -13,6 +14,7 @@ import { storableAxiosError, storableError } from '@utils/errors';
 import type {
   TImage,
   TIntegrationListing,
+  TKeyValue,
   TListing,
   TObject,
   TPagination,
@@ -53,6 +55,10 @@ type TFoodSliceState = {
   menuPickedFoods: TIntegrationListing[];
   queryMenuPickedFoodsInProgress: boolean;
   queryMenuPickedFoodsError: any;
+
+  nutritions: TKeyValue[];
+  fetchAttributesInProgress: boolean;
+  fetchAttributesError: any;
 };
 
 const initialState: TFoodSliceState = {
@@ -92,6 +98,10 @@ const initialState: TFoodSliceState = {
   menuPickedFoods: [],
   queryMenuPickedFoodsInProgress: false,
   queryMenuPickedFoodsError: null,
+
+  nutritions: [],
+  fetchAttributesInProgress: false,
+  fetchAttributesError: null,
 };
 
 // ================ Thunk types ================ //
@@ -115,6 +125,7 @@ const DUPLICATE_FOOD = 'app/ManageFoodsPage/DUPLICATE_FOOD';
 const CREATE_FOOD_FROM_FILE = 'app/ManageFoodsPage/CREATE_FOOD_FROM_FILE';
 
 const QUERY_MENU_PICKED_FOODS = 'app/ManageFoodsPage/QUERY_MENU_PICKED_FOODS';
+const FETCH_ATTRIBUTES = 'app/ManageFoodsPage/FETCH_ATTRIBUTES';
 
 // ================ Async thunks ================ //
 
@@ -469,6 +480,12 @@ const showDuplicateFood = createAsyncThunk(
   },
 );
 
+const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
+  const { data: response } = await getAttributesApi();
+
+  return response;
+});
+
 export const foodSliceThunks = {
   queryPartnerFoods,
   requestUploadFoodImages,
@@ -480,6 +497,7 @@ export const foodSliceThunks = {
   duplicateFood,
   createPartnerFoodFromCsv,
   queryMenuPickedFoods,
+  fetchAttributes,
 };
 
 // ================ Slice ================ //
@@ -679,7 +697,29 @@ const foodSlice = createSlice({
         ...state,
         createPartnerFoodFromCsvInProgress: false,
         createPartnerFoodFromCsvError: payload,
-      }));
+      }))
+
+      .addCase(fetchAttributes.pending, (state) => {
+        return {
+          ...state,
+          fetchAttributesInProgress: true,
+          fetchAttributesError: null,
+        };
+      })
+      .addCase(fetchAttributes.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          fetchAttributesInProgress: false,
+          nutritions: payload?.nutritions,
+        };
+      })
+      .addCase(fetchAttributes.rejected, (state, { error }) => {
+        return {
+          ...state,
+          fetchAttributesInProgress: false,
+          fetchAttributesError: error.message,
+        };
+      });
   },
 });
 

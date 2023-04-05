@@ -18,7 +18,7 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useViewport } from '@hooks/useViewport';
-import { EImageVariants, OTHER_OPTION, PACKAGING_OPTIONS } from '@utils/enums';
+import { EImageVariants, OTHER_OPTION } from '@utils/enums';
 import { isUploadImageOverLimitError } from '@utils/errors';
 import type { TImage } from '@utils/types';
 import {
@@ -77,6 +77,7 @@ type TEditPartnerBasicInformationForm = {
   partnerListingRef?: any;
 
   uploadingImage?: boolean;
+  packaging: any[];
 };
 
 const ACCEPT_IMAGES = 'image/png, image/gif, image/jpeg';
@@ -86,7 +87,12 @@ const AVATAR_VARIANTS = [EImageVariants.squareSmall2x];
 const EditPartnerBasicInformationForm: React.FC<
   TEditPartnerBasicInformationForm
 > = (props) => {
-  const { onSubmit, partnerListingRef, ...rest } = props;
+  const {
+    onSubmit,
+    partnerListingRef,
+    packaging: packagingOptions,
+    ...rest
+  } = props;
   const [submittedValues, setSubmittedValues] = useState<any>();
   const intl = useIntl();
   const { isMobileLayout } = useViewport();
@@ -624,7 +630,7 @@ const EditPartnerBasicInformationForm: React.FC<
                   <FieldCheckboxGroup
                     id="packaging"
                     name="packaging"
-                    options={PACKAGING_OPTIONS}
+                    options={packagingOptions || []}
                   />
                 </div>
               </div>
