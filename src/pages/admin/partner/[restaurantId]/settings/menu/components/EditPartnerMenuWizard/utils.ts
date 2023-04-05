@@ -122,7 +122,7 @@ export const createSubmitFoodsByDate = (foodsByDate: any) => {
     let newFoodByDate = {};
     Object.keys(foodByDate).forEach((k) => {
       const food = foodByDate[k];
-      const { dayOfWeek, sideDishes = [], id, foodNote } = food;
+      const { dayOfWeek, sideDishes = [], id, foodNote, price } = food;
       newFoodByDate = {
         ...newFoodByDate,
         [k]: {
@@ -130,6 +130,7 @@ export const createSubmitFoodsByDate = (foodsByDate: any) => {
           id,
           sideDishes,
           foodNote,
+          price,
         },
       };
     });
@@ -170,7 +171,6 @@ export const createSubmitMenuValues = (
         startDate,
         daysOfWeek,
         restaurantId,
-        foodsByDate,
         title,
         numberOfCycles,
         endDate,
@@ -178,12 +178,12 @@ export const createSubmitMenuValues = (
     }
     case MENU_PRICING_TAB: {
       return {
-        foodsByDate,
+        foodsByDate: createSubmitFoodsByDate(foodsByDate),
       };
     }
     case MENU_COMPLETE_TAB: {
       return {
-        foodsByDate,
+        foodsByDate: createSubmitFoodsByDate(foodsByDate),
       };
     }
     default:
@@ -219,12 +219,12 @@ export const createDuplicateSubmitMenuValues = (
     }
     case MENU_PRICING_TAB: {
       return {
-        foodsByDate,
+        foodsByDate: createSubmitFoodsByDate(foodsByDate),
       };
     }
     case MENU_COMPLETE_TAB: {
       return {
-        foodsByDate,
+        foodsByDate: createSubmitFoodsByDate(foodsByDate),
       };
     }
     default:

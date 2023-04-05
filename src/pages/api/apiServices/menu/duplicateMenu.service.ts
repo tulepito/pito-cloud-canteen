@@ -6,7 +6,6 @@ import {
   createListFoodNutritionByFoodsByDate,
   createMinPriceByDayOfWeek,
   createNutritionsByDaysOfWeekField,
-  createSubmitFoodsByDate,
 } from '@pages/api/apiUtils/menu';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -140,7 +139,7 @@ const duplicateMenu = async (
         : {}),
       ...(foodsByDate
         ? {
-            foodsByDate: createSubmitFoodsByDate(foodsByDate),
+            foodsByDate,
           }
         : {}),
     },
