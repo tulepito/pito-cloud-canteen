@@ -556,3 +556,11 @@ export type TRestaurantRating = {
     packaging?: TScenarioRating;
   };
 };
+export type TKeyValue<T = string> = {
+  key: string;
+  label: T;
+  time?: {
+    start: string;
+    end: string;
+  };
+};
