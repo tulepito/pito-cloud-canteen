@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import omit from 'lodash/omit';
 
+import { getAttributesApi } from '@apis/admin';
 import {
   createDraftPartnerApi,
   deletePartnerApi,
@@ -14,7 +15,7 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants, EListingStates, EListingType } from '@utils/enums';
 import { storableError } from '@utils/errors';
-import type { TObject, TPagination } from '@utils/types';
+import type { TKeyValue, TObject, TPagination } from '@utils/types';
 
 export const MANAGE_PARTNER_RESULT_PAGE_SIZE = 10;
 
@@ -77,6 +78,12 @@ type TPartnerStates = {
 
   discardDraftPartnerInProgress: boolean;
   discardDraftPartnerError: any;
+
+  packaging?: TKeyValue[];
+  categories?: TKeyValue[];
+  daySessions?: TKeyValue[];
+  fetchAttributesInProgress: boolean;
+  fetchAttributesError: any;
 };
 
 const QUERY_RESTAURANTS = 'app/ManagePartnersPage/QUERY_RESTAURANTS';
@@ -137,6 +144,8 @@ const SHOW_RESTAURANT_LISTING_PARAMS = {
     'variants.square-small2x',
   ],
 };
+
+const FETCH_ATTRIBUTES = 'app/CreateAndEditPartnerPage/FETCH_ATTRIBUTES';
 
 const requestAvatarUpload = createAsyncThunk(
   REQUEST_AVATAR_UPLOAD,
@@ -463,6 +472,12 @@ const queryRestaurants = createAsyncThunk(
   },
 );
 
+const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
+  const { data: response } = await getAttributesApi();
+
+  return response;
+});
+
 export const partnerThunks = {
   requestAvatarUpload,
   createDraftPartner,
@@ -477,6 +492,7 @@ export const partnerThunks = {
   queryRestaurants,
   setRestaurantStatus,
   deleteRestaurant,
+  fetchAttributes,
 };
 
 const initialState: TPartnerStates = {
@@ -544,6 +560,12 @@ const initialState: TPartnerStates = {
 
   discardDraftPartnerInProgress: false,
   discardDraftPartnerError: null,
+
+  packaging: [],
+  categories: [],
+  daySessions: [],
+  fetchAttributesInProgress: false,
+  fetchAttributesError: null,
 };
 
 export const partnerSlice = createSlice({
@@ -1041,6 +1063,30 @@ export const partnerSlice = createSlice({
           ...state,
           discardDraftPartnerInProgress: false,
           discardDraftPartnerError: action.payload,
+        };
+      })
+
+      .addCase(fetchAttributes.pending, (state) => {
+        return {
+          ...state,
+          fetchAttributesInProgress: true,
+          fetchAttributesError: null,
+        };
+      })
+      .addCase(fetchAttributes.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          fetchAttributesInProgress: false,
+          packaging: payload?.packaging,
+          categories: payload?.categories,
+          daySessions: payload?.daySessions,
+        };
+      })
+      .addCase(fetchAttributes.rejected, (state, { error }) => {
+        return {
+          ...state,
+          fetchAttributesInProgress: false,
+          fetchAttributesError: error.message,
         };
       });
   },
