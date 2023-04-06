@@ -16,7 +16,7 @@ import type { TDefaultProps, TPagination } from '@utils/types';
 import css from './Table.module.scss';
 
 export type TColumn = {
-  key: string | number;
+  key: string;
   label: string | ReactNode;
   render: (data: any, isChecked: boolean) => ReactNode;
   sortable?: boolean;
@@ -50,8 +50,8 @@ type TTableProps = TDefaultProps & {
   form?: FormApi;
   values?: any;
   exposeValues?: (e: any) => void;
-  handleSort?: (columnName: string | number) => void;
-  sortValue?: { columnName: string | number; type: 'asc' | 'desc' };
+  handleSort?: (columnName: string) => void;
+  sortValue?: { columnName: string; type: 'asc' | 'desc' };
   customCheckboxChange?: (e: any) => void;
   afterCheckboxChangeHandler?: (e: any, rowCheckboxValues: any) => void;
   extraRows?: ReactNode;
@@ -136,7 +136,7 @@ const Table = (props: TTableProps) => {
     }
   };
 
-  const sortData = (key: string | number) => () => {
+  const sortData = (key: string) => () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     handleSort && handleSort(key);
   };

@@ -87,12 +87,7 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   }, [createOrderError, openCreateOrderFailingModal]);
 
   const updateStatus = useCallback((updateData: TUpdateStatus) => {
-    dispatch(
-      companyThunks.adminUpdateCompanyState({
-        dataParams: updateData,
-        queryParams: { expand: true },
-      }),
-    );
+    dispatch(companyThunks.adminUpdateCompanyState(updateData));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -63,7 +63,7 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
   );
   const { detailRating } = selectedRestaurantListing.getMetadata();
 
-  const { food, packaging } = detailRating;
+  const { food, packaging } = detailRating || {};
   const bookerReviewNumber = restaurantBookerReviews.length;
   const participantReviewNumber = restaurantParticipantReviews.length;
   const totalComments =
@@ -131,19 +131,23 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
             <span className={css.scenarioLabel}>Món ăn:</span>
             <div className={css.ratingBar}>
               <div
-                style={{ width: calculateRatingPercent(food) }}
+                style={{ width: calculateRatingPercent(food?.rating || 0) }}
                 className={css.activeBar}></div>
             </div>
-            <span className={css.ratingPoint}>{`${food}/5`}</span>
+            <span className={css.ratingPoint}>{`${food?.rating || 0}/5`}</span>
           </div>
           <div className={css.detailRatingRow}>
             <span className={css.scenarioLabel}>Dụng cụ:</span>
             <div className={css.ratingBar}>
               <div
-                style={{ width: calculateRatingPercent(packaging) }}
+                style={{
+                  width: calculateRatingPercent(packaging?.rating || 0),
+                }}
                 className={css.activeBar}></div>
             </div>
-            <span className={css.ratingPoint}>{`${packaging}/5`}</span>
+            <span className={css.ratingPoint}>{`${
+              packaging?.rating || 0
+            }/5`}</span>
           </div>
         </div>
       </div>

@@ -1,4 +1,3 @@
-import { ECompanyStates } from '@utils/enums';
 import type { TObject } from '@utils/types';
 
 import type { TEditCompanyBankAccountsFormValues } from '../EditCompanyBankAccountsForm/EditCompanyBankAccountsForm';
@@ -35,44 +34,19 @@ export const createSubmitCreateCompanyValues = (
     note,
     tax,
   } = values;
-  const { selectedPlace } = location || {};
-
-  const address = selectedPlace?.address;
-  const origin = selectedPlace?.origin || {};
-
-  const { selectedPlace: companySelectedPlace } = companyLocation || {};
-  const companyAddress = companySelectedPlace?.address;
-  const companyOrigin = companySelectedPlace?.origin || {};
 
   return {
-    email,
-    password,
     firstName,
     lastName,
-    displayName: `${lastName} ${firstName}`,
-    publicData: {
-      companyName,
-      companyEmail,
-      phoneNumber,
-      note,
-      location: {
-        address,
-        origin: {
-          lat: origin.lat,
-          lng: origin.lng,
-        },
-      },
-      companyLocation: {
-        address: companyAddress,
-        origin: {
-          lat: companyOrigin.lat,
-          lng: companyOrigin.lng,
-        },
-      },
-    },
-    privateData: {
-      tax,
-    },
+    companyName,
+    companyEmail,
+    companyLocation,
+    email,
+    password,
+    phoneNumber,
+    location,
+    note,
+    tax,
   };
 };
 
@@ -95,45 +69,17 @@ export const createSubmitUpdateCompanyValues = (
         note,
         tax,
       } = values;
-      const { selectedPlace } = location || {};
-
-      const address = selectedPlace?.address;
-      const origin = selectedPlace?.origin || {};
-
-      const { selectedPlace: companySelectedPlace } = companyLocation || {};
-      const companyAddress = companySelectedPlace?.address;
-      const companyOrigin = companySelectedPlace?.origin || {};
 
       return {
         firstName,
         lastName,
-        displayName: `${lastName} ${firstName}`,
-        publicData: {
-          phoneNumber,
-          companyEmail,
-          companyName,
-          note,
-          location: {
-            address,
-            origin: {
-              lat: origin.lat,
-              lng: origin.lng,
-            },
-          },
-          companyLocation: {
-            address: companyAddress,
-            origin: {
-              lat: companyOrigin.lat,
-              lng: companyOrigin.lng,
-            },
-          },
-        },
-        privateData: {
-          tax,
-        },
-        metadata: {
-          userState: ECompanyStates.draft,
-        },
+        companyEmail,
+        companyLocation,
+        companyName,
+        phoneNumber,
+        location,
+        note,
+        tax,
       };
     }
     case COMPANY_SETTINGS_TAB: {
@@ -150,18 +96,14 @@ export const createSubmitUpdateCompanyValues = (
 
           return {
             profileImageId: imageId?.uuid,
-            publicData: {
-              nutritions,
-            },
+            nutritions,
           };
         }
 
         case COMPANY_SETTING_PAYMENT_TAB_ID: {
           return {
-            privateData: { bankAccounts, paymentDueDays },
-            metadata: {
-              userState: ECompanyStates.published,
-            },
+            bankAccounts,
+            paymentDueDays,
           };
         }
         case COMPANY_SETTING_SUBSCRIPTION_TAB_ID: {

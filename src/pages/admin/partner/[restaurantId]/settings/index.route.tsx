@@ -1,7 +1,9 @@
 import React from 'react';
 
+import EditPartnerPage from '../edit/EditPartner.page';
+
 const PartnerSettingsRoute = () => {
-  return <div>PartnerSettingsRoute</div>;
+  return <EditPartnerPage />;
 };
 
 export default PartnerSettingsRoute;

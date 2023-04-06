@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import updateMenuStateAfterPartnerUpdateStatus from '@pages/api/apiServices/menu/updateMenuStateAfterPartnerUpdateStatus.service';
 import cookies from '@services/cookie';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
@@ -18,7 +19,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       },
       queryParams,
     );
-    res.json(response);
+
+    updateMenuStateAfterPartnerUpdateStatus(id, status);
+
+    return res.status(200).json(response);
   } catch (error) {
     console.error(error);
     handleError(res, error);

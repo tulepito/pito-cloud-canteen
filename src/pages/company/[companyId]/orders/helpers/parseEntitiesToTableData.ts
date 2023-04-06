@@ -53,9 +53,9 @@ export const parseEntitiesToTableData = (
         plan: {
           ...plan,
           attributes: {
-            ...(plan as TListing).attributes,
+            ...((plan as TListing)?.attributes || {}),
             metadata: {
-              ...(plan as TListing).attributes.metadata,
+              ...((plan as TListing)?.attributes?.metadata || {}),
               orderDetail: combineOrderDetailWithPriceInfo({
                 orderDetail: planOrderDetail,
               }),

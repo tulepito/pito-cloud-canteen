@@ -18,6 +18,13 @@ export enum EImageVariants {
   twitter = 'twitter',
 }
 
+export enum EListingMenuStates {
+  draft = 'draft',
+  pendingRestaurantApproval = 'pendingRestaurantApproval',
+  published = 'published',
+  closed = 'closed',
+}
+
 export enum EListingStates {
   draft = 'draft',
   pendingApproval = 'pendingApproval',

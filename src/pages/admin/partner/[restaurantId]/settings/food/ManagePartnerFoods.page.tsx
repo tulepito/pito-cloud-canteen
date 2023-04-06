@@ -47,7 +47,11 @@ const TABLE_COLUMN: TColumn[] = [
     label: 'Tên món',
     render: (data: any) => {
       if (data.isDeleted) {
-        return <div></div>;
+        return (
+          <div className={css.deletedFood}>
+            <FormattedMessage id="ManagePartnerFoods.deletedFood" />
+          </div>
+        );
       }
 
       return (

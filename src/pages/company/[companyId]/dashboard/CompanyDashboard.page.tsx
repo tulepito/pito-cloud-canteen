@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
+import { getCompanyIdFromBookerUser } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { CurrentUser } from '@src/utils/data';
@@ -16,7 +18,13 @@ import css from './CompanyDashboard.module.scss';
 
 const CompanyDashboardPage = () => {
   const dispatch = useAppDispatch();
-  const { companyId } = useRouter().query;
+  const {
+    query: { companyId },
+    isReady,
+    pathname,
+    replace,
+  } = useRouter();
+
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const currentUserId = CurrentUser(currentUser as TCurrentUser).getId();
   const totalItemMap = useAppSelector((state) => state.Order.totalItemMap);
@@ -38,6 +46,22 @@ const CompanyDashboardPage = () => {
   const getCompanyOrderSummaryInProgress = useAppSelector(
     (state) => state.Order.getCompanyOrderSummaryInProgress,
   );
+
+  useEffect(() => {
+    if (
+      isReady &&
+      (!companyId || companyId === '[companyId]' || companyId === 'personal')
+    ) {
+      replace({
+        pathname,
+        query: { companyId: getCompanyIdFromBookerUser(currentUser!) },
+      });
+    }
+  }, [
+    isReady,
+    JSON.stringify(companyId as string),
+    JSON.stringify(currentUser),
+  ]);
 
   useEffect(() => {
     if (!companyId) return;

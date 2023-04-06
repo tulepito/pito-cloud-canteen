@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, { useEffect, useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import type { FormApi } from 'final-form';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
-import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import Modal from '@components/Modal/Modal';
@@ -124,9 +123,8 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
   const [page, setPage] = useState<number>(1);
   const [keywords, setKeywords] = useState<string>('');
   const [sortValue, setSortValue] = useState<TTableSortValue>();
-  const intl = useIntl();
   const foods = useAppSelector((state) => state.foods.foods, shallowEqual);
-  const handleSort = (columnName: string | number) => {
+  const handleSort = (columnName: string) => {
     setSortValue({
       columnName,
       type: sortValue?.type === 'asc' ? 'desc' : 'asc',
@@ -347,17 +345,9 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
                 )}
               </div>
               <div className={css.modalButton}>
-                {foodsByDate.length > 10 && (
-                  <ErrorMessage
-                    message={intl.formatMessage({
-                      id: 'AddFoodModal.maxFood',
-                    })}
-                  />
-                )}
                 <div className={css.buttonWrapper}>
                   <Button
                     type="button"
-                    disabled={foodsByDate.length > 10}
                     onClick={savePickedFoods}
                     className={css.button}>
                     <FormattedMessage id="AddFoodModal.modalButton" />

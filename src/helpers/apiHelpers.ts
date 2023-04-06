@@ -63,7 +63,7 @@ export type TCheckUnConflictedParams = {
   mealType: EMenuMealType;
   daysOfWeek: string[];
   restaurantId: string;
-  id: string;
+  id?: string;
   startDate: number;
   endDate: number;
 };

@@ -13,6 +13,8 @@ import type {
   EImageVariants,
   EListingStates,
   EManageCompanyOrdersTab,
+  EMenuMealType,
+  EMenuTypes,
   ENotificationTypes,
   EOrderDraftStates,
   EOrderStates,
@@ -509,7 +511,7 @@ export type TCompanyGroup = {
 };
 
 export type TTableSortValue = {
-  columnName: string | number;
+  columnName: string;
   type: 'asc' | 'desc';
 };
 
@@ -563,4 +565,73 @@ export type TKeyValue<T = string> = {
     start: string;
     end: string;
   };
+};
+
+export type TCreateCompanyApiParams = {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  companyEmail: string;
+  companyLocation: TObject;
+  companyName: string;
+  phoneNumber: string;
+  location: TObject;
+  note: string;
+  tax: string;
+};
+
+export type TUpdateCompanyApiParams = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  companyEmail: string;
+  companyLocation: TObject;
+  companyName: string;
+  phoneNumber: string;
+  location: TObject;
+  note: string;
+  tax: string;
+  profileImageId: string;
+  nutritions: string[];
+  bankAccounts: TObject[];
+  paymentDueDays: number;
+  include?: string[];
+};
+
+export type TCreateMenuApiParams = {
+  menuType: EMenuTypes;
+  mealType: EMenuMealType;
+  startDate: number;
+  daysOfWeek: EDayOfWeek[];
+  restaurantId: string;
+  title: string;
+  numberOfCycles: number;
+  endDate: number;
+};
+
+export type TUpdateMenuApiParams = {
+  id: string;
+  foodsByDate: TObject;
+  menuType: EMenuTypes;
+  mealType: EMenuMealType;
+  startDate: number;
+  daysOfWeek: EDayOfWeek[];
+  restaurantId: string;
+  title: string;
+  numberOfCycles: number;
+  endDate: number;
+};
+
+export type TDuplicateMenuApiParams = {
+  id: string;
+  foodsByDate: TObject;
+  menuType: EMenuTypes;
+  mealType: EMenuMealType;
+  startDate: number;
+  daysOfWeek: EDayOfWeek[];
+  restaurantId: string;
+  title: string;
+  numberOfCycles: number;
+  endDate: number;
 };

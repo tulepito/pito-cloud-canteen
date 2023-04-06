@@ -21,14 +21,15 @@ import { menusSliceThunks } from '@redux/slices/menus.slice';
 import { adminRoutes } from '@src/paths';
 import { formatTimestamp } from '@utils/dates';
 import type { EMenuTypes } from '@utils/enums';
-import { EListingStates, EMenuMealType } from '@utils/enums';
+import {
+  EListingMenuStates,
+  EListingStates,
+  EMenuMealType,
+} from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 
 import DisableMenuConfirmModal from '../DisableMenuConfirmModal/DisableMenuConfirmModal';
-import {
-  createUpdateMenuApplyTimeValues,
-  MENU_INFORMATION_TAB,
-} from '../EditPartnerMenuWizard/utils';
+import { MENU_INFORMATION_TAB } from '../EditPartnerMenuWizard/utils';
 import UpdateMenuModal from '../UpdateMenuModal/UpdateMenuModal';
 import type { TUpdateMenuModalFormValues } from '../UpdateMenuModal/UpdateMenuModalForm';
 
@@ -53,6 +54,11 @@ const TABLE_COLUNMS: TColumn[] = [
           {listingState === EListingStates.draft && (
             <div className={css.draftBox}>
               <FormattedMessage id="ManagePartnersPage.draftState" />
+            </div>
+          )}
+          {listingState === EListingMenuStates.pendingRestaurantApproval && (
+            <div className={css.draftBox}>
+              <FormattedMessage id="ManagePartnersPage.pendingRestaurantApprovalState" />
             </div>
           )}
         </div>
@@ -109,7 +115,8 @@ const TABLE_COLUNMS: TColumn[] = [
         return <IconSpinner className={css.loadingIcon} />;
       }
 
-      return listingState === EListingStates.draft ? (
+      return listingState === EListingStates.draft ||
+        listingState === EListingMenuStates.pendingRestaurantApproval ? (
         <></>
       ) : (
         <ToggleButton
@@ -160,45 +167,19 @@ const parseEntitiesToTableData = (
     onSetMenuToRemove,
     onSetMenuToUpdate,
     onSetMenuToDisable,
-    onToggleStatus,
     toggleMenuStateInProgressId,
   }: {
     onSetMenuToRemove: (menu: any) => void;
     onSetMenuToUpdate: (menu: any) => void;
     onSetMenuToDisable: (meny: any) => void;
-    onToggleStatus: (id: string, state: EListingStates) => void;
     toggleMenuStateInProgressId: string | null;
   },
 ) => {
   return menues.map((menu) => {
-    const {
-      isDeleted,
-      listingState,
-      menuType,
-      monFoodIdList,
-      tueFoodIdList,
-      wedFoodIdList,
-      thuFoodIdList,
-      friFoodIdList,
-      satFoodIdList,
-      sunFoodIdList,
-      restaurantId,
-    } = menu.attributes.metadata;
-    const {
-      startDate,
-      endDate,
-      numberOfCycles,
-      daysOfWeek,
-      foodsByDate,
-      monMinFoodPrice,
-      tueMinFoodPrice,
-      wedMinFoodPrice,
-      thuMinFoodPrice,
-      friMinFoodPrice,
-      satMinFoodPrice,
-      sunMinFoodPrice,
-      mealType,
-    } = menu.attributes.publicData;
+    const { isDeleted, listingState, menuType, restaurantId } =
+      menu.attributes.metadata;
+    const { startDate, endDate, numberOfCycles, daysOfWeek } =
+      menu.attributes.publicData;
 
     const handleUpdateMenu = (listingStateToUpdate: EListingStates) => {
       return onSetMenuToUpdate({
@@ -207,25 +188,7 @@ const parseEntitiesToTableData = (
         endDate,
         daysOfWeek,
         numberOfCycles,
-        menuType,
-        monFoodIdList,
-        tueFoodIdList,
-        wedFoodIdList,
-        thuFoodIdList,
-        friFoodIdList,
-        satFoodIdList,
-        sunFoodIdList,
-        monMinFoodPrice,
-        tueMinFoodPrice,
-        wedMinFoodPrice,
-        thuMinFoodPrice,
-        friMinFoodPrice,
-        satMinFoodPrice,
-        sunMinFoodPrice,
-        foodsByDate,
-        restaurantId,
-        mealType,
-        listingState: listingStateToUpdate,
+        listingStateToUpdate,
       });
     };
 
@@ -253,7 +216,7 @@ const parseEntitiesToTableData = (
         onSetMenuToRemove: handleSetMenuToRemove,
         onSetMenuToUpdate: handleUpdateMenu,
         onSetMenuToDisable: handleSetMenuToDisable,
-        onToggleStatus,
+
         toggleInProgress: toggleMenuStateInProgressId === menu.id.uuid,
       },
     };
@@ -304,19 +267,9 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
       );
   }, [menuType, restaurantId, dispatch, mealType, keywords, page]);
 
-  const onToggleStatus = (id: string, listingState: EListingStates) => {
-    return dispatch(
-      menusSliceThunks.toggleMenuState({
-        id,
-        listingState,
-      }),
-    );
-  };
-
   const onDisableMenu = async () => {
-    const { error } = (await onToggleStatus(
-      menuToDisable.id,
-      EListingStates.closed,
+    const { error } = (await dispatch(
+      menusSliceThunks.adminCloseMenu(menuToDisable.id),
     )) as any;
     if (!error) {
       setMenuToDisable(null);
@@ -339,8 +292,13 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
     shallowEqual,
   );
 
-  const toggleMenuStateInProgressId = useAppSelector(
-    (state) => state.menus.toggleMenuStateInProgressId,
+  const publishMenuInProgressId = useAppSelector(
+    (state) => state.menus.publishMenuInProgressId,
+    shallowEqual,
+  );
+
+  const closeMenuInProgressId = useAppSelector(
+    (state) => state.menus.closeMenuInProgressId,
     shallowEqual,
   );
 
@@ -395,14 +353,25 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
   };
 
   const onUpdateMenuApplyTime = async (values: TUpdateMenuModalFormValues) => {
+    const { startDate, daysOfWeek, endDate, numberOfCycles } = values;
+
     const { error } = (await dispatch(
-      menusSliceThunks.updatePartnerMenuListing(
-        createUpdateMenuApplyTimeValues({ ...menuToUpdate, ...values }),
-      ),
+      menusSliceThunks.updatePartnerMenuListing({
+        dataParams: {
+          startDate,
+          daysOfWeek,
+          mealType,
+          endDate,
+          numberOfCycles,
+          restaurantId,
+          id: menuToUpdate?.id,
+        },
+        shouldPublish:
+          menuToUpdate.listingStateToUpdate === EListingStates.published,
+      }),
     )) as any;
 
     if (!error) {
-      await onToggleStatus(menuToUpdate.id, EListingStates.published);
       onClearMenuToUpdate();
       dispatch(
         menusSliceThunks.queryPartnerMenus({
@@ -420,8 +389,8 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
     onSetMenuToRemove,
     onSetMenuToUpdate,
     onSetMenuToDisable,
-    onToggleStatus,
-    toggleMenuStateInProgressId,
+    toggleMenuStateInProgressId:
+      closeMenuInProgressId || publishMenuInProgressId,
   });
 
   if (queryMenusError)
@@ -510,7 +479,9 @@ const TabContent: React.FC<TTabContentProps> = (props) => {
         })}
         onClearMenuToDisable={onClearMenuToDisable}
         onDisabledMenu={onDisableMenu}
-        disableMenuInProgress={!!toggleMenuStateInProgressId}
+        disableMenuInProgress={
+          !!(closeMenuInProgressId || publishMenuInProgressId)
+        }
         inProgressTitle={intl.formatMessage({
           id: 'ManagePartnerMenu.preventDisableTitle',
         })}

@@ -43,7 +43,12 @@ export const TABS = [
 
 export const CREATE_ORDER_STEP_LOCAL_STORAGE_NAME = 'orderStep';
 
-const tabCompleted = (order: any, tab: string, orderDetail: any) => {
+const tabCompleted = (
+  order: any,
+  tab: string,
+  orderDetail: any,
+  availableOrderDetailCheckList: any,
+) => {
   const orderId = Listing(order).getId();
   const { staffName, plans = [], notes = {} } = Listing(order).getMetadata();
 
@@ -52,6 +57,9 @@ const tabCompleted = (order: any, tab: string, orderDetail: any) => {
   );
   const isMealPlanTabCompleted =
     !isEmpty(plans) && isEmpty(missingSelectedFood);
+  const hasInvalidMealDay = Object.keys(availableOrderDetailCheckList).some(
+    (item) => !availableOrderDetailCheckList[item],
+  );
 
   switch (tab) {
     case CLIENT_SELECT_TAB:
@@ -63,7 +71,8 @@ const tabCompleted = (order: any, tab: string, orderDetail: any) => {
         !isEmpty(orderId) &&
         !isEmpty(orderDetail) &&
         isMealPlanTabCompleted &&
-        isGeneralInfoSetupCompleted(order as TListing)
+        isGeneralInfoSetupCompleted(order as TListing) &&
+        !hasInvalidMealDay
       );
     case SERVICE_FEE_AND_NOTE_TAB:
       return !isEmpty(notes);
@@ -74,12 +83,21 @@ const tabCompleted = (order: any, tab: string, orderDetail: any) => {
   }
 };
 
-const tabsActive = (order: any, orderDetail: any) => {
+const tabsActive = (
+  order: any,
+  orderDetail: any,
+  availableOrderDetailCheckList: any,
+) => {
   return TABS.reduce((acc, tab) => {
     const previousTabIndex = TABS.findIndex((t) => t === tab) - 1;
     const isActive =
       previousTabIndex < 0 ||
-      tabCompleted(order, TABS[previousTabIndex], orderDetail);
+      tabCompleted(
+        order,
+        TABS[previousTabIndex],
+        orderDetail,
+        availableOrderDetailCheckList,
+      );
 
     return { ...acc, [tab]: isActive };
   }, {});
@@ -163,8 +181,16 @@ const CreateOrderWizard = () => {
   const canNotGoToStep4 = useAppSelector(
     (state) => state.Order.canNotGoToStep4,
   );
+  const availableOrderDetailCheckList = useAppSelector(
+    (state) => state.Order.availableOrderDetailCheckList,
+    shallowEqual,
+  );
 
-  const tabsStatus = tabsActive(order, orderDetail) as any;
+  const tabsStatus = tabsActive(
+    order,
+    orderDetail,
+    availableOrderDetailCheckList,
+  ) as any;
 
   useEffect(() => {
     if (order && !step2SubmitInProgress && !step4SubmitInProgress) {
@@ -173,7 +199,7 @@ const CreateOrderWizard = () => {
 
         return setCurrentStep(REVIEW_TAB);
       }
-      if (!isEmpty(notes)) {
+      if (!isEmpty(notes) && !canNotGoToStep4) {
         setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, SERVICE_FEE_AND_NOTE_TAB);
 
         return setCurrentStep(SERVICE_FEE_AND_NOTE_TAB);
@@ -211,7 +237,12 @@ const CreateOrderWizard = () => {
     <FormWizard formTabNavClassName={css.formTabNav}>
       {TABS.map((tab: string, index) => {
         const disabled =
-          !tabCompleted(order, TABS[index - 1], orderDetail) ||
+          !tabCompleted(
+            order,
+            TABS[index - 1],
+            orderDetail,
+            availableOrderDetailCheckList,
+          ) ||
           (orderId && tab === CLIENT_SELECT_TAB);
 
         return (

@@ -61,6 +61,7 @@
   border-collapse: collapse;
   width: 100%;
   padding: 10px;
+  overflow: visible !important;
   tr {
     td {
       border: 1px solid $neutralGray3;

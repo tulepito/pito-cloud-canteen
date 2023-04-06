@@ -1,17 +1,14 @@
 /* eslint-disable @typescript-eslint/default-param-last */
 import { DateTime } from 'luxon';
 
-import { ListingTypes } from '@src/types/listingTypes';
-import { getUniqueString, IntegrationListing } from '@utils/data';
+import { getUniqueString } from '@utils/data';
 import {
   addDaysToDate,
-  addWeeksToDate,
   getDayOfWeekAsIndex,
   getDayOfWeekByIndex,
   getStartOfWeek,
 } from '@utils/dates';
 import type { EDayOfWeek } from '@utils/enums';
-import { EListingStates, EMenuTypes } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 
 export const MENU_INFORMATION_TAB = 'information';
@@ -54,69 +51,6 @@ export type TEditMenuPricingCalendarResources = {
   sideDishes: string[];
   price?: number;
   foodNote?: string;
-};
-
-const createFoodByDateByDaysOfWeekField = (
-  foodByDate: any,
-  daysOfWeek: string[],
-) => {
-  const newFoodByDates = Object.keys(foodByDate).reduce((prev, key) => {
-    if (daysOfWeek.includes(key)) {
-      return { ...prev, [key]: foodByDate[key] };
-    }
-
-    return { ...prev };
-  }, {});
-
-  return newFoodByDates;
-};
-
-const createFoodAveragePriceByDaysOfWeekField = (
-  fieldsData: any,
-  daysOfWeek: string[],
-) => {
-  const newData = Object.keys(fieldsData).reduce((prev, key) => {
-    const substringKey = key.substring(0, 3);
-    if (daysOfWeek.includes(substringKey)) {
-      return { ...prev, [key]: fieldsData[key] };
-    }
-
-    return { ...prev, [key]: 0 };
-  }, {});
-
-  return newData;
-};
-
-const createFoodListIdByDaysOfWeekField = (
-  fieldsData: any,
-  daysOfWeek: string[],
-) => {
-  const newData = Object.keys(fieldsData).reduce((prev, key) => {
-    const substringKey = key.substring(0, 3);
-    if (daysOfWeek.includes(substringKey)) {
-      return { ...prev, [key]: fieldsData[key] };
-    }
-
-    return { ...prev, [key]: [] };
-  }, {});
-
-  return newData;
-};
-
-const createNutritionsByDaysOfWeekField = (
-  fieldsData: any,
-  daysOfWeek: string[],
-) => {
-  const newData = Object.keys(fieldsData).reduce((prev, key) => {
-    const substringKey = key.substring(0, 3);
-    if (daysOfWeek.includes(substringKey)) {
-      return { ...prev, [key]: fieldsData[key] };
-    }
-
-    return { ...prev, [key]: [] };
-  }, {});
-
-  return newData;
 };
 
 export const createMinPriceByDayOfWeek = (foodsByDate: any) => {
@@ -188,7 +122,7 @@ export const createSubmitFoodsByDate = (foodsByDate: any) => {
     let newFoodByDate = {};
     Object.keys(foodByDate).forEach((k) => {
       const food = foodByDate[k];
-      const { dayOfWeek, sideDishes = [], id, foodNote } = food;
+      const { dayOfWeek, sideDishes = [], id, foodNote, price } = food;
       newFoodByDate = {
         ...newFoodByDate,
         [k]: {
@@ -196,6 +130,7 @@ export const createSubmitFoodsByDate = (foodsByDate: any) => {
           id,
           sideDishes,
           foodNote,
+          price,
         },
       };
     });
@@ -215,7 +150,6 @@ export const createSubmitFoodsByDate = (foodsByDate: any) => {
 export const createSubmitMenuValues = (
   values: TCreateSubmitCreateMenuValues,
   tab: string,
-  menu?: TIntegrationListing | null,
 ) => {
   const {
     menuType,
@@ -228,133 +162,28 @@ export const createSubmitMenuValues = (
     numberOfCycles,
     endDate,
   } = values;
-  const isCycleMenu = menuType === EMenuTypes.cycleMenu;
-
-  const {
-    foodsByDate: foodsByDateFromMenu = {},
-    monMinFoodPrice: monMinFoodPriceFromMenu = 0,
-    tueMinFoodPrice: tueMinFoodPriceFromMenu = 0,
-    wedMinFoodPrice: wedMinFoodPriceFromMenu = 0,
-    thuMinFoodPrice: thuMinFoodPriceFromMenu = 0,
-    friMinFoodPrice: friMinFoodPriceFromMenu = 0,
-    satMinFoodPrice: satMinFoodPriceFromMenu = 0,
-    sunMinFoodPrice: sunMinFoodPriceFromMenu = 0,
-  } = IntegrationListing(menu).getPublicData();
-
-  const { listingState } = IntegrationListing(menu).getMetadata();
-  const {
-    monFoodIdList: monFoodIdListFromMenu = [],
-    tueFoodIdList: tueFoodIdListFromMenu = [],
-    wedFoodIdList: wedFoodIdListFromMenu = [],
-    thuFoodIdList: thuFoodIdListFromMenu = [],
-    friFoodIdList: friFoodIdListFromMenu = [],
-    satFoodIdList: satFoodIdListFromMenu = [],
-    sunFoodIdList: sunFoodIdListFromMenu = [],
-    /// //
-    monNutritions: monNutritionsFromMenu = [],
-    tueNutritions: tueNutritionsFromMenu = [],
-    wedNutritions: wedNutritionsFromMenu = [],
-    thuNutritions: thuNutritionsFromMenu = [],
-    friNutritions: friNutritionsFromMenu = [],
-    satNutritions: satNutritionsFromMenu = [],
-    sunNutritions: sunNutritionsFromMenu = [],
-  } = IntegrationListing(menu).getMetadata();
-
-  const alreadyPublished = listingState === EListingStates.published;
-  const endDateToSubmit = isCycleMenu
-    ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()
-    : endDate;
 
   switch (tab) {
     case MENU_INFORMATION_TAB: {
       return {
+        menuType,
+        mealType,
+        startDate,
+        daysOfWeek,
+        restaurantId,
         title,
-        publicData: {
-          daysOfWeek,
-          mealType,
-          startDate,
-          endDate: endDateToSubmit,
-          ...(isCycleMenu ? { numberOfCycles } : {}),
-          ...(restaurantId
-            ? {
-                foodsByDate: createFoodByDateByDaysOfWeekField(
-                  foodsByDateFromMenu,
-                  daysOfWeek,
-                ),
-                ...createFoodAveragePriceByDaysOfWeekField(
-                  {
-                    monMinFoodPrice: monMinFoodPriceFromMenu,
-                    tueMinFoodPrice: tueMinFoodPriceFromMenu,
-                    wedMinFoodPrice: wedMinFoodPriceFromMenu,
-                    thuMinFoodPrice: thuMinFoodPriceFromMenu,
-                    friMinFoodPrice: friMinFoodPriceFromMenu,
-                    satMinFoodPrice: satMinFoodPriceFromMenu,
-                    sunMinFoodPrice: sunMinFoodPriceFromMenu,
-                  },
-                  daysOfWeek,
-                ),
-              }
-            : {}),
-        },
-        metadata: {
-          menuType,
-          listingType: ListingTypes.MENU,
-          restaurantId,
-          ...(!alreadyPublished ? { listingState: EListingStates.draft } : {}),
-          ...(restaurantId
-            ? {
-                ...createFoodListIdByDaysOfWeekField(
-                  {
-                    monFoodIdList: monFoodIdListFromMenu,
-                    tueFoodIdList: tueFoodIdListFromMenu,
-                    wedFoodIdList: wedFoodIdListFromMenu,
-                    thuFoodIdList: thuFoodIdListFromMenu,
-                    friFoodIdList: friFoodIdListFromMenu,
-                    satFoodIdList: satFoodIdListFromMenu,
-                    sunFoodIdList: sunFoodIdListFromMenu,
-                  },
-                  daysOfWeek,
-                ),
-                ...createNutritionsByDaysOfWeekField(
-                  {
-                    monNutritions: monNutritionsFromMenu,
-                    tueNutritions: tueNutritionsFromMenu,
-                    wedNutritions: wedNutritionsFromMenu,
-                    thuNutritions: thuNutritionsFromMenu,
-                    friNutritions: friNutritionsFromMenu,
-                    satNutritions: satNutritionsFromMenu,
-                    sunNutritions: sunNutritionsFromMenu,
-                  },
-                  daysOfWeek,
-                ),
-              }
-            : {}),
-        },
+        numberOfCycles,
+        endDate,
       };
     }
     case MENU_PRICING_TAB: {
       return {
-        publicData: {
-          ...createMinPriceByDayOfWeek(foodsByDate),
-          foodsByDate: createSubmitFoodsByDate(foodsByDate),
-        },
-        metadata: {
-          ...createListFoodIdsByFoodsByDate(foodsByDate),
-          ...createListFoodNutritionByFoodsByDate(foodsByDate),
-        },
+        foodsByDate: createSubmitFoodsByDate(foodsByDate),
       };
     }
     case MENU_COMPLETE_TAB: {
       return {
-        publicData: {
-          ...createMinPriceByDayOfWeek(foodsByDate),
-          foodsByDate: createSubmitFoodsByDate(foodsByDate),
-        },
-        metadata: {
-          ...createListFoodIdsByFoodsByDate(foodsByDate),
-          ...createListFoodNutritionByFoodsByDate(foodsByDate),
-          listingState: EListingStates.published,
-        },
+        foodsByDate: createSubmitFoodsByDate(foodsByDate),
       };
     }
     default:
@@ -364,7 +193,6 @@ export const createSubmitMenuValues = (
 
 export const createDuplicateSubmitMenuValues = (
   values: TCreateSubmitCreateMenuValues,
-  menu: TIntegrationListing,
   tab: string,
 ) => {
   const {
@@ -372,257 +200,36 @@ export const createDuplicateSubmitMenuValues = (
     mealType,
     startDate,
     daysOfWeek,
-    restaurantId,
     foodsByDate,
     title,
     numberOfCycles,
     endDate,
   } = values;
-  const isCycleMenu = menuType === EMenuTypes.cycleMenu;
-
-  const { title: titleFromMenu } = IntegrationListing(menu).getAttributes();
-
-  const {
-    mealType: mealTyperFromMenu,
-    startDate: startDateFromMenu,
-    numberOfCycles: numberOfCyclesFromMenu,
-    monMinFoodPrice: monMinFoodPriceFromMenu,
-    tueMinFoodPrice: tueMinFoodPriceFromMenu,
-    wedMinFoodPrice: wedMinFoodPriceFromMenu,
-    thuMinFoodPrice: thuMinFoodPriceFromMenu,
-    friMinFoodPrice: friMinFoodPriceFromMenu,
-    satMinFoodPrice: satMinFoodPriceFromMenu,
-    sunMinFoodPrice: sunMinFoodPriceFromMenu,
-    daysOfWeek: daysOfWeekFromMenu,
-    foodsByDate: foodsByDateFromMenu,
-  } = IntegrationListing(menu).getPublicData();
-
-  const {
-    monFoodIdList: monFoodIdListFromMenu,
-    tueFoodIdList: tueFoodIdListFromMenu,
-    wedFoodIdList: wedFoodIdListFromMenu,
-    thuFoodIdList: thuFoodIdListFromMenu,
-    friFoodIdList: friFoodIdListFromMenu,
-    satFoodIdList: satFoodIdListFromMenu,
-    sunFoodIdList: sunFoodIdListFromMenu,
-    /// /
-    monNutritions: monNutritionsFromMenu = [],
-    tueNutritions: tueNutritionsFromMenu = [],
-    wedNutritions: wedNutritionsFromMenu = [],
-    thuNutritions: thuNutritionsFromMenu = [],
-    friNutritions: friNutritionsFromMenu = [],
-    satNutritions: satNutritionsFromMenu = [],
-    sunNutritions: sunNutritionsFromMenu = [],
-  } = IntegrationListing(menu).getMetadata();
-
-  const { menuType: menuTypeFromMenu } = IntegrationListing(menu).getMetadata();
-
-  const endDateFromMenu =
-    menuTypeFromMenu === EMenuTypes.cycleMenu &&
-    addWeeksToDate(
-      new Date(startDateFromMenu),
-      numberOfCyclesFromMenu,
-    ).getTime();
-
-  const endDateToSubmit = isCycleMenu
-    ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()
-    : endDate;
-
   switch (tab) {
     case MENU_INFORMATION_TAB: {
       return {
         title,
-        publicData: {
-          daysOfWeek,
-          mealType,
-          startDate,
-          endDate: endDateToSubmit,
-          ...(isCycleMenu ? { numberOfCycles } : {}),
-          foodsByDate: createFoodByDateByDaysOfWeekField(
-            foodsByDateFromMenu,
-            daysOfWeek,
-          ),
-          ...createFoodAveragePriceByDaysOfWeekField(
-            {
-              monMinFoodPrice: monMinFoodPriceFromMenu,
-              tueMinFoodPrice: tueMinFoodPriceFromMenu,
-              wedMinFoodPrice: wedMinFoodPriceFromMenu,
-              thuMinFoodPrice: thuMinFoodPriceFromMenu,
-              friMinFoodPrice: friMinFoodPriceFromMenu,
-              satMinFoodPrice: satMinFoodPriceFromMenu,
-              sunMinFoodPrice: sunMinFoodPriceFromMenu,
-            },
-            daysOfWeek,
-          ),
-        },
-        metadata: {
-          ...createFoodListIdByDaysOfWeekField(
-            {
-              monFoodIdList: monFoodIdListFromMenu,
-              tueFoodIdList: tueFoodIdListFromMenu,
-              wedFoodIdList: wedFoodIdListFromMenu,
-              thuFoodIdList: thuFoodIdListFromMenu,
-              friFoodIdList: friFoodIdListFromMenu,
-              satFoodIdList: satFoodIdListFromMenu,
-              sunFoodIdList: sunFoodIdListFromMenu,
-            },
-            daysOfWeek,
-          ),
-          ...createNutritionsByDaysOfWeekField(
-            {
-              monNutritions: monNutritionsFromMenu,
-              tueNutritions: tueNutritionsFromMenu,
-              wedNutritions: wedNutritionsFromMenu,
-              thuNutritions: thuNutritionsFromMenu,
-              friNutritions: friNutritionsFromMenu,
-              satNutritions: satNutritionsFromMenu,
-              sunNutritions: sunNutritionsFromMenu,
-            },
-            daysOfWeek,
-          ),
-          menuType,
-          listingType: ListingTypes.MENU,
-          restaurantId,
-          listingState: EListingStates.draft,
-        },
+        daysOfWeek,
+        mealType,
+        startDate,
+        endDate,
+        menuType,
+        numberOfCycles,
       };
     }
     case MENU_PRICING_TAB: {
       return {
-        title: titleFromMenu,
-        publicData: {
-          ...createMinPriceByDayOfWeek(foodsByDate),
-          foodsByDate: createSubmitFoodsByDate(foodsByDate),
-          daysOfWeek: daysOfWeekFromMenu,
-          mealType: mealTyperFromMenu,
-          startDate: startDateFromMenu,
-          endDate: endDateFromMenu,
-          ...(menuTypeFromMenu === EMenuTypes.cycleMenu
-            ? { numberOfCycles: numberOfCyclesFromMenu }
-            : {}),
-        },
-        metadata: {
-          ...createListFoodIdsByFoodsByDate(foodsByDate),
-          ...createListFoodNutritionByFoodsByDate(foodsByDate),
-          menuType: menuTypeFromMenu,
-          listingType: ListingTypes.MENU,
-          restaurantId,
-          listingState: EListingStates.draft,
-        },
+        foodsByDate: createSubmitFoodsByDate(foodsByDate),
       };
     }
     case MENU_COMPLETE_TAB: {
       return {
-        title: titleFromMenu,
-        publicData: {
-          ...createMinPriceByDayOfWeek(foodsByDate),
-          foodsByDate: createSubmitFoodsByDate(foodsByDate),
-          daysOfWeek: daysOfWeekFromMenu,
-          mealType: mealTyperFromMenu,
-          startDate: startDateFromMenu,
-          endDate: endDateFromMenu,
-          ...(menuTypeFromMenu === EMenuTypes.cycleMenu
-            ? { numberOfCycles: numberOfCyclesFromMenu }
-            : {}),
-        },
-        metadata: {
-          ...createListFoodIdsByFoodsByDate(foodsByDate),
-          ...createListFoodNutritionByFoodsByDate(foodsByDate),
-          /// /
-          listingState: EListingStates.published,
-          menuType: menuTypeFromMenu,
-          listingType: ListingTypes.MENU,
-          restaurantId,
-        },
+        foodsByDate: createSubmitFoodsByDate(foodsByDate),
       };
     }
     default:
       return {};
   }
-};
-
-export const createUpdateMenuApplyTimeValues = (values: any) => {
-  const {
-    menuType,
-    startDate,
-    endDate,
-    daysOfWeek,
-    id,
-    numberOfCycles,
-    monMinFoodPrice = 0,
-    tueMinFoodPrice = 0,
-    wedMinFoodPrice = 0,
-    thuMinFoodPrice = 0,
-    friMinFoodPrice = 0,
-    satMinFoodPrice = 0,
-    sunMinFoodPrice = 0,
-    monFoodIdList = [],
-    tueFoodIdList = [],
-    wedFoodIdList = [],
-    thuFoodIdList = [],
-    friFoodIdList = [],
-    satFoodIdList = [],
-    sunFoodIdList = [],
-    foodsByDate = {},
-    restaurantId,
-    mealType,
-  } = values;
-
-  const isCycleMenu = menuType === EMenuTypes.cycleMenu;
-  const endDateToSubmit = isCycleMenu
-    ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()
-    : endDate;
-
-  return {
-    id,
-    publicData: {
-      startDate,
-      daysOfWeek,
-      mealType,
-      endDate: endDateToSubmit,
-      ...(isCycleMenu ? { numberOfCycles } : {}),
-      foodsByDate: createFoodByDateByDaysOfWeekField(foodsByDate, daysOfWeek),
-      ...createFoodAveragePriceByDaysOfWeekField(
-        {
-          monMinFoodPrice,
-          tueMinFoodPrice,
-          wedMinFoodPrice,
-          thuMinFoodPrice,
-          friMinFoodPrice,
-          satMinFoodPrice,
-          sunMinFoodPrice,
-        },
-        daysOfWeek,
-      ),
-    },
-    metadata: {
-      restaurantId,
-      ...createFoodListIdByDaysOfWeekField(
-        {
-          monFoodIdList,
-          tueFoodIdList,
-          wedFoodIdList,
-          thuFoodIdList,
-          friFoodIdList,
-          satFoodIdList,
-          sunFoodIdList,
-        },
-        daysOfWeek,
-      ),
-      ...createNutritionsByDaysOfWeekField(
-        {
-          monFoodIdList,
-          tueFoodIdList,
-          wedFoodIdList,
-          thuFoodIdList,
-          friFoodIdList,
-          satFoodIdList,
-          sunFoodIdList,
-        },
-        daysOfWeek,
-      ),
-    },
-  };
 };
 
 export const createInitialValuesForFoodsByDate = (

@@ -68,7 +68,7 @@ const EditMenuCompleteFormComponent: React.FC<
   const { startDate, endDate } =
     IntegrationListing(currentMenu).getPublicData();
 
-  const { daysOfWeek } = IntegrationListing(currentMenu).getPublicData();
+  const { daysOfWeek = [] } = IntegrationListing(currentMenu).getPublicData();
   const { foodsByDate } = values;
   const onRemovePickedFood = (removeId: string, date: Date) => {
     const currentDateAsTimestamp = date.getTime();

@@ -89,6 +89,8 @@ export const toNonAccentVietnamese = (
   shouldLowCase = false,
   convertors = NON_ACCENT_VIETNAMESE_CONVERTERS,
 ) => {
+  if (!str || typeof str !== 'string') return '';
+
   let text = shouldLowCase ? str.toLowerCase() : str;
 
   convertors.forEach(({ from, to }) => {

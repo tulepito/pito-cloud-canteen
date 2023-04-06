@@ -279,3 +279,8 @@
     align-items: center;
   }
 }
+
+.deletedFood {
+  text-transform: uppercase;
+  font-weight: $fontWeightBold;
+}
