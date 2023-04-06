@@ -21,13 +21,12 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import FieldTextInputWithBottomBox from '@components/FormFields/FieldTextInputWithBottomBox/FieldTextInputWithBottomBox';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
+import type { TKeyValue } from '@src/utils/types';
 import {
-  CATEGORY_OPTIONS,
   EImageVariants,
   FOOD_TYPE_OPTIONS,
   MENU_OPTIONS,
   OTHER_OPTION,
-  PACKAGING_OPTIONS,
   SIDE_DISH_OPTIONS,
 } from '@utils/enums';
 import { pickRenderableImages } from '@utils/images';
@@ -85,6 +84,8 @@ const EditPartnerFoodFormComponent: React.FC<
     uploadImageError,
     currentFoodListing = {},
     nutritions: nutritionsOptions,
+    categories: categoriesOptions,
+    packaging: packagingOptions,
   } = useAppSelector((state) => state.foods, shallowEqual);
 
   const images = pickRenderableImages(
@@ -324,13 +325,13 @@ const EditPartnerFoodFormComponent: React.FC<
                 id: 'EditPartnerFoodForm.packagingPlaceholder',
               })}
             </option>
-            {PACKAGING_OPTIONS.filter((cate) => cate.key !== OTHER_OPTION).map(
-              (cat) => (
+            {packagingOptions
+              .filter((cate: TKeyValue) => cate.key !== OTHER_OPTION)
+              .map((cat: TKeyValue) => (
                 <option key={cat.key} value={cat.key}>
                   {cat.label}
                 </option>
-              ),
-            )}
+              ))}
           </FieldSelect>
         </div>
       </div>
@@ -383,13 +384,13 @@ const EditPartnerFoodFormComponent: React.FC<
                 id: 'EditPartnerFoodForm.categoryPlaceholder',
               })}
             </option>
-            {CATEGORY_OPTIONS.filter((cate) => cate.key !== OTHER_OPTION).map(
-              (cat) => (
+            {categoriesOptions
+              .filter((cate: TKeyValue) => cate.key !== OTHER_OPTION)
+              .map((cat: TKeyValue) => (
                 <option key={cat.key} value={cat.key}>
                   {cat.label}
                 </option>
-              ),
-            )}
+              ))}
           </FieldSelect>
         </div>
       </div>

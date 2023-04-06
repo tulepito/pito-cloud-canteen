@@ -29,14 +29,14 @@ export AWS_INSTANCE_DEPLOY_SCRIPT='./deploy.sh'
 if [ "$ENV" == "production" ] || [ "$CIRCLE_BRANCH" == "production" ]; then
   echo -e "${COLOR}:::::::::::::Setting environment for PRODUCTION::::::::::::::${NC}"
   # todo: REPLACE HERE: environment for Production instance
-  export AWS_ECR_REPO_NAME_PRODUCTION='REPLACE_YOUR_ECR_NAME_IN_TERRAFORM_HERE'
-  export AWS_ECR_REPO_URL="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_INSTANCE_REGION}.amazonaws.com/${AWS_ECR_REPO_NAME_PRODUCTION}:latest"
+  export AWS_ECR_REPO_NAME_PRODUCTION='pito-prod'
+  export AWS_ECR_REPO_URL="718926326971.dkr.ecr.ap-southeast-1.amazonaws.com/pito-prod:latest"
   # Production could be deployed on different region from test (Ex: client in Aus but marketplace is for US)
-  export AWS_INSTANCE_REGION='REPLACE_YOUR_CLIENT_AWS_REGION_HERE'
+  export AWS_INSTANCE_REGION='ap-southeast-1'
   export ENV_FILE_PATH='.env.prod'
   export ENV_NAME='PRODUCTION'
   # Remember to fill manually
-  export AWS_ENV_SECRET_NAME='REPLACE_YOUR_SECRETS_NAME_CREATED_IN_OUR_AWS_HERE'
+  export AWS_ENV_SECRET_NAME='pito/web/prod/Y0dsMGIzQnliMlE'
   
 else
   echo -e "${COLOR}:::::::::::::Setting environment for TEST::::::::::::::${NC}"
