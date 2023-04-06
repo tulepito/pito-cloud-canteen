@@ -57,6 +57,8 @@ type TFoodSliceState = {
   queryMenuPickedFoodsError: any;
 
   nutritions: TKeyValue[];
+  categories: TKeyValue[];
+  packaging: TKeyValue[];
   fetchAttributesInProgress: boolean;
   fetchAttributesError: any;
 };
@@ -100,6 +102,8 @@ const initialState: TFoodSliceState = {
   queryMenuPickedFoodsError: null,
 
   nutritions: [],
+  categories: [],
+  packaging: [],
   fetchAttributesInProgress: false,
   fetchAttributesError: null,
 };
@@ -711,6 +715,8 @@ const foodSlice = createSlice({
           ...state,
           fetchAttributesInProgress: false,
           nutritions: payload?.nutritions,
+          categories: payload?.categories,
+          packaging: payload?.packaging,
         };
       })
       .addCase(fetchAttributes.rejected, (state, { error }) => {
