@@ -102,6 +102,10 @@ const EditPartnerFoodPage = () => {
     dispatch(foodSliceThunks.showPartnerFoodListing(foodId));
   }, [dispatch, foodId]);
 
+  useEffect(() => {
+    dispatch(foodSliceThunks.fetchAttributes());
+  }, []);
+
   if (showFoodInProgress || showPartnerListingInProgress) {
     return <LoadingContainer />;
   }

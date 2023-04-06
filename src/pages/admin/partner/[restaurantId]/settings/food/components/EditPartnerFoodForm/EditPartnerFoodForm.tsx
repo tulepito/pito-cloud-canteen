@@ -83,9 +83,9 @@ const EditPartnerFoodFormComponent: React.FC<
     removedImageIds,
     uploadImageError,
     currentFoodListing = {},
-    nutritions: nutritionsOptions,
-    categories: categoriesOptions,
-    packaging: packagingOptions,
+    nutritions: nutritionsOptions = [],
+    categories: categoriesOptions = [],
+    packaging: packagingOptions = [],
   } = useAppSelector((state) => state.foods, shallowEqual);
 
   const images = pickRenderableImages(

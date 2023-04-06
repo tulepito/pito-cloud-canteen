@@ -15,7 +15,7 @@ const nextConfig = {
       { source: '/dang-nhap', destination: '/sign-in' },
       { source: '/quen-mat-khau', destination: '/forgot-password' },
       { source: '/dat-lai-mat-khau', destination: '/reset-password' },
-      { source: '/xac-nhan-emal', destination: '/verify-email' },
+      { source: '/xac-nhan-email', destination: '/verify-email' },
     ];
   },
   pageExtensions: ['route.tsx', 'route.jsx', 'api.ts', 'api.js'],
