@@ -41,13 +41,8 @@ const handlerWrapper = async (req: NextApiRequest, res: NextApiResponse) => {
       const { dataParams = {} } = req.body;
       const { menuId } = req.query;
 
-      const {
-        mealType,
-        daysOfWeek = [],
-        startDate,
-        endDate,
-        restaurantId,
-      } = dataParams;
+      const { mealType, daysOfWeek, startDate, endDate, restaurantId } =
+        dataParams;
 
       const integrationSdk = getIntegrationSdk();
 
@@ -77,7 +72,9 @@ const handlerWrapper = async (req: NextApiRequest, res: NextApiResponse) => {
         ...(restaurantId
           ? { restaurantId }
           : { restaurantId: restaurantIdFromMenu }),
-        ...(daysOfWeek ? { daysOfWeek } : { daysOfWeek: daysOfWeekFromMenu }),
+        ...(daysOfWeek
+          ? { daysOfWeek: daysOfWeek || [] }
+          : { daysOfWeek: daysOfWeekFromMenu || [] }),
         ...(startDate ? { startDate } : { startDate: startDateFromMenu }),
         ...(endDate ? { endDate } : { endDate: endDateFromMenu }),
       };
