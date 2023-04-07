@@ -261,7 +261,7 @@ export const validURL = (message: string) => (str: string) => {
 
 export const minPriceLength =
   (message: string, minimumLength: number) => (value: number | number) => {
-    const removeComma = value.toString().split(',');
+    const removeComma = value.toString().split('.');
     const mergeWithoutComma = removeComma.join('');
     const parsedValue = Number(mergeWithoutComma);
     const isNumber = typeof parsedValue === 'number';
@@ -270,11 +270,11 @@ export const minPriceLength =
   };
 
 export const numberWithCommas = (x: number) => {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 };
 
 export const parsePrice = (value: string = '') => {
-  const removeComma = value.toString().replace('.', ',').split(',');
+  const removeComma = value.toString().replace(',', '.').split('.');
   const mergeWithoutComma = removeComma.join('');
   const parseNumber = Number(mergeWithoutComma);
   const isNotANumber =
