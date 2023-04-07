@@ -558,6 +558,14 @@ export type TRestaurantRating = {
     packaging?: TScenarioRating;
   };
 };
+export type TKeyValue<T = string> = {
+  key: string;
+  label: T;
+  time?: {
+    start: string;
+    end: string;
+  };
+};
 
 export type TCreateCompanyApiParams = {
   email: string;
@@ -626,13 +634,4 @@ export type TDuplicateMenuApiParams = {
   title: string;
   numberOfCycles: number;
   endDate: number;
-};
-
-export type TKeyValue<T = string> = {
-  key: string;
-  label: T;
-  time?: {
-    start: string;
-    end: string;
-  };
 };
