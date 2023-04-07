@@ -269,14 +269,18 @@ export const minPriceLength =
     return isNumber && parsedValue >= minimumLength ? VALID : message;
   };
 
+export const numberWithCommas = (x: number) => {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
 export const parsePrice = (value: string = '') => {
-  const removeComma = value.toString().split(',');
+  const removeComma = value.toString().replace('.', ',').split(',');
   const mergeWithoutComma = removeComma.join('');
   const parseNumber = Number(mergeWithoutComma);
   const isNotANumber =
     Number.isNaN(parseNumber) || typeof parseNumber !== 'number';
 
-  return !isNotANumber ? parseNumber.toLocaleString() : value;
+  return !isNotANumber ? numberWithCommas(parseNumber) : value;
 };
 
 export const nonNegativeValue = (message: string) => (value: number) => {
