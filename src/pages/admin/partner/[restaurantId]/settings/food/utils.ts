@@ -59,7 +59,7 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
     restaurantId,
     ...rest
   } = values;
-  const priceRemoveComma = price.toString().split(',');
+  const priceRemoveComma = price.toString().split('.');
   const mergeWithoutComma = priceRemoveComma.join('');
   const parsePrice = Number(mergeWithoutComma);
 
