@@ -4,6 +4,7 @@ export const generalPaths = {
   RecoveryPassword: '/quen-mat-khau',
   ResetPassword: '/dat-lai-mat-khau',
   StyleGuide: '/style-guide',
+  EmailVerification: '/xac-nhan-email',
   Home: '/',
 };
 
@@ -13,6 +14,7 @@ const enGeneralPaths = {
   RecoveryPassword: '/forgot-password',
   ResetPassword: '/reset-password',
   StyleGuide: '/style-guide',
+  EmailVerification: '/verify-email',
   Home: '/',
 };
 
