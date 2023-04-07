@@ -35,7 +35,6 @@ import {
   composeValidatorsWithAllValues,
   maxLength,
   minPriceLength,
-  nonEmptyImageArray,
   numberMinLength,
   parsePrice,
   required,
@@ -129,9 +128,6 @@ const EditPartnerFoodFormComponent: React.FC<
           className={css.imageInputWrapper}
           inputClassName={css.imageInput}
           uploadImageError={uploadImageError}
-          validate={nonEmptyImageArray(
-            intl.formatMessage({ id: 'EditPartnerFoodForm.imageRequired' }),
-          )}
         />
       </div>
       <div className={css.radioFields}>
