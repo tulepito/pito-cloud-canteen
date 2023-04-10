@@ -13,12 +13,13 @@ import css from './ReviewOrderDetailsSection.module.scss';
 type TReviewOrderDetailsSectionProps = {
   className?: string;
   foodOrderGroupedByDate: TObject[];
+  outsideCollapsible?: boolean;
 };
 
 const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
   props,
 ) => {
-  const { className, foodOrderGroupedByDate } = props;
+  const { className, foodOrderGroupedByDate, outsideCollapsible } = props;
   const groupedFoodListLength = foodOrderGroupedByDate?.length;
   const initialCollapseStates = Array.from({
     length: groupedFoodListLength,
@@ -48,102 +49,110 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialCollapseStates.length]);
 
-  return (
-    <Collapsible
-      className={rootClasses}
-      label={intl.formatMessage({ id: 'ReviewOrderDetailsSection.title' })}>
-      <div className={css.tableContainer}>
-        <div className={css.tableHead}>
-          <div>
-            {intl.formatMessage({
-              id: 'ReviewOrderDetailsSection.tableHead.no',
-            })}
-          </div>
-          <div>
-            {intl.formatMessage({
-              id: 'ReviewOrderDetailsSection.tableHead.foodType',
-            })}
-          </div>
-          <div>
-            {intl.formatMessage({
-              id: 'ReviewOrderDetailsSection.tableHead.unit',
-            })}
-          </div>
-          <div>
-            {intl.formatMessage({
-              id: 'ReviewOrderDetailsSection.tableHead.quantity',
-            })}
-          </div>
-
-          <div>
-            {intl.formatMessage({
-              id: 'ReviewOrderDetailsSection.tableHead.price',
-            })}
-          </div>
-          <div></div>
-        </div>
-
-        <div className={css.tableBody}>
-          {foodOrderGroupedByDate.map((dateData) => {
-            const {
-              date,
-              totalDishes,
-              totalPrice,
-              foodDataList,
-              restaurantName,
-              index,
-            } = dateData;
-            const formattedDate = formatTimestamp(date, 'EEE, dd/MM/yyyy');
-
-            const groupTitleClasses = classNames(css.groupTitle, {
-              [css.collapsed]: isCollapsed[index],
-            });
-            const rowsClasses = classNames(css.rows, {
-              [css.collapsed]: isCollapsed[index],
-            });
-            const iconClasses = classNames({
-              [css.reversed]: isCollapsed[index],
-            });
-
-            return (
-              <div className={css.tableRowGroup} key={date}>
-                <div className={groupTitleClasses}>
-                  <div>{index + 1}</div>
-                  <div>
-                    {formattedDate}
-                    <div className={css.restaurantName}>{restaurantName}</div>
-                  </div>
-                  <div>{''}</div>
-                  <div>{totalDishes}</div>
-                  <div>{parseThousandNumber(totalPrice || 0)}đ</div>
-                  <div
-                    className={css.actionCell}
-                    onClick={handleClickGroupTitle(index)}>
-                    <IconArrow className={iconClasses} />
-                  </div>
-                </div>
-                <div className={rowsClasses}>
-                  {foodDataList.map((foodData: TObject) => {
-                    const { foodId, foodPrice, foodName, frequency } = foodData;
-
-                    return (
-                      <div className={css.row} key={foodId}>
-                        <div></div>
-                        <div>{foodName}</div>
-                        <div>{''}</div>
-                        <div>{frequency}</div>
-                        <div>{parseThousandNumber(foodPrice || 0)}đ</div>
-                        <div>{''}</div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
+  const dataTable = (
+    <div className={css.tableContainer}>
+      <div className={css.tableHead}>
+        <div>
+          {intl.formatMessage({
+            id: 'ReviewOrderDetailsSection.tableHead.no',
           })}
         </div>
+        <div>
+          {intl.formatMessage({
+            id: 'ReviewOrderDetailsSection.tableHead.foodType',
+          })}
+        </div>
+        <div>
+          {intl.formatMessage({
+            id: 'ReviewOrderDetailsSection.tableHead.unit',
+          })}
+        </div>
+        <div>
+          {intl.formatMessage({
+            id: 'ReviewOrderDetailsSection.tableHead.quantity',
+          })}
+        </div>
+
+        <div>
+          {intl.formatMessage({
+            id: 'ReviewOrderDetailsSection.tableHead.price',
+          })}
+        </div>
+        <div></div>
       </div>
+
+      <div className={css.tableBody}>
+        {foodOrderGroupedByDate.map((dateData) => {
+          const {
+            date,
+            totalDishes,
+            totalPrice,
+            foodDataList,
+            restaurantName = '',
+            index,
+          } = dateData;
+          const formattedDate = formatTimestamp(date, 'EEE, dd/MM/yyyy');
+
+          const groupTitleClasses = classNames(css.groupTitle, {
+            [css.collapsed]: isCollapsed[index],
+          });
+          const rowsClasses = classNames(css.rows, {
+            [css.collapsed]: isCollapsed[index],
+          });
+          const iconClasses = classNames({
+            [css.reversed]: isCollapsed[index],
+          });
+
+          return (
+            <div className={css.tableRowGroup} key={date}>
+              <div className={groupTitleClasses}>
+                <div>{index + 1}</div>
+                <div>
+                  {formattedDate}
+                  <div className={css.restaurantName}>{restaurantName}</div>
+                </div>
+                <div>{''}</div>
+                <div>{totalDishes}</div>
+                <div>{parseThousandNumber(totalPrice || 0)}đ</div>
+                <div
+                  className={css.actionCell}
+                  onClick={handleClickGroupTitle(index)}>
+                  <IconArrow className={iconClasses} />
+                </div>
+              </div>
+              <div className={rowsClasses}>
+                {foodDataList.map((foodData: TObject) => {
+                  const { foodId, foodPrice, foodName, frequency } = foodData;
+
+                  return (
+                    <div className={css.row} key={foodId}>
+                      <div></div>
+                      <div>{foodName}</div>
+                      <div>{''}</div>
+                      <div>{frequency}</div>
+                      <div>{parseThousandNumber(foodPrice || 0)}đ</div>
+                      <div>{''}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  return !outsideCollapsible ? (
+    <Collapsible
+      className={rootClasses}
+      label={intl.formatMessage({
+        id: 'ReviewOrderDetailsSection.title',
+      })}>
+      {dataTable}
     </Collapsible>
+  ) : (
+    dataTable
   );
 };
 

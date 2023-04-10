@@ -86,6 +86,8 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           data={reviewViewData.reviewCartData}
           showStartPickingOrderButton={showStartPickingOrderButton}
           onClickDownloadPriceQuotation={onDownloadPriceQuotation}
+          foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
+          target="client"
         />
       </div>
     </div>

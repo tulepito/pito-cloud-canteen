@@ -4,4 +4,5 @@ export enum ListingTypes {
   RESTAURANT = 'restaurant',
   FOOD = 'food',
   MENU = 'menu',
+  QUOTATION = 'quotation',
 }

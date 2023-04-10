@@ -56,7 +56,6 @@
       }
     }
   }
-
   .contentBox {
     display: flex;
     justify-content: space-between;
@@ -97,6 +96,50 @@
         @include viewportLarge {
           min-width: 244px;
         }
+      }
+    }
+  }
+}
+
+.contentBox {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  padding: 16px;
+  background-color: $neutralGray2;
+  row-gap: 20px;
+  white-space: pre-wrap;
+  @include viewportLarge {
+    flex-direction: row;
+    row-gap: 0px;
+  }
+
+  &.spaceStart {
+    justify-content: flex-start;
+    .flexChild {
+      margin-right: 100px;
+    }
+  }
+
+  .flexChild {
+    display: flex;
+    flex-direction: column;
+    .boxTitle {
+      font-size: 14px;
+      color: $neutralGray5;
+      margin-bottom: 16px;
+    }
+    .boxContent {
+      font-size: 16px;
+      color: $neutralGray6;
+      font-weight: $fontWeightBold;
+      max-width: 260px;
+    }
+    .staffInput {
+      max-width: 100%;
+      border-radius: 8px;
+      @include viewportLarge {
+        min-width: 244px;
       }
     }
   }

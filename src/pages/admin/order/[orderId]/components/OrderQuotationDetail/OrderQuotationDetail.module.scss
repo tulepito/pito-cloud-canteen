@@ -1,0 +1,18 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  margin-top: 24px;
+  @include flexAlign(flex-start);
+  gap: 20px;
+
+  .leftCol {
+    width: 100%;
+  }
+
+  .rightCol {
+    width: 300px;
+    flex-shrink: 0;
+    margin-top: 50px;
+  }
+}

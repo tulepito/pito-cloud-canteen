@@ -122,6 +122,7 @@ export enum EListingType {
   subOrder = 'sub-order',
   order = 'order',
   rating = 'rating',
+  quotation = 'quotation',
 }
 
 export enum EUserPermission {
@@ -916,4 +917,14 @@ export enum ENotificationTypes {
   completedOrder = 'completedOrder',
   deadlineDueOrder = 'deadlineDueOrder',
   pickingOrder = 'pickingOrder',
+}
+
+export enum EOrderDetailTabs {
+  ORDER_DETAIL = 'orderDetail',
+  QUOTATION = 'quotation',
+  PAYMENT_STATUS = 'paymentStatus',
+  CHANGE_HISTORY = 'changeHistory',
+  REVIEW = 'review',
+  CONTRACT = 'contract',
+  VAT = 'vat',
 }

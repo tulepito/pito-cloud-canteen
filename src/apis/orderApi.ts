@@ -123,3 +123,44 @@ export const bookerPublishOrderApi = (orderId: string) => {
 export const cancelPickingOrderApi = (orderId: string) => {
   return putApi(`/orders/${orderId}/cancel-picking-order`);
 };
+
+export const adminUpdateOrderStateApi = ({
+  orderId,
+  orderState,
+}: {
+  orderId: string;
+  orderState: string;
+}) => putApi(`/admin/listings/order/${orderId}/update-state`, { orderState });
+
+export type TCreateQuotationApiBody = {
+  orderId: string;
+  companyId: string;
+  partner: {
+    [restaurantId: string]: {
+      name: string;
+      quotation: {
+        [timestamp: string]: {
+          foodId: string;
+          foodName: string;
+          foodPrice: number;
+          frequency: number;
+        }[];
+      };
+    };
+  };
+  client: {
+    quotation: {
+      [timestamp: string]: {
+        foodId: string;
+        foodName: string;
+        foodPrice: number;
+        frequency: number;
+      }[];
+    };
+  };
+};
+
+export const createQuotationApi = (
+  orderId: string,
+  body: TCreateQuotationApiBody,
+) => postApi(`/orders/${orderId}/quotation`, body);

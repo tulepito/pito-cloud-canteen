@@ -1,0 +1,116 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.header {
+  @include flexAlign(center, center);
+  flex-direction: column;
+  gap: 16px;
+
+  .stateBtn {
+    width: 160px;
+    height: 48px;
+  }
+}
+.orderTitle {
+  @include flexAlign(center, center);
+  gap: 12px;
+
+  .titleLabel {
+    @include textTemplate(12px, $fontWeightRegular, 16px);
+  }
+
+  .orderId {
+    @include textTemplate(32px, $fontWeightBold, 48px);
+  }
+
+  .status {
+    @include textTemplate(14px, $fontWeightRegular, 20px);
+    padding: 8px 16px;
+    border-radius: 4px;
+    background-color: $labelBlue1;
+  }
+
+  .action {
+    cursor: pointer;
+  }
+}
+
+.orderInforWrapper {
+  padding: 24px 0;
+  border-bottom: 1px solid $neutralGray4;
+
+  .title {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+  }
+
+  .infor {
+    .inforRow {
+      display: grid;
+      grid-template-columns: 1fr 4fr;
+      margin-top: 12px;
+      align-items: center;
+
+      .inforValue {
+        font-weight: $fontWeightSemiBold;
+
+        &:last-child {
+          @include flexAlign(center);
+          gap: 12px;
+        }
+
+        .pitoStaffInput {
+          width: 400px;
+        }
+      }
+    }
+  }
+}
+
+.orderDetailWrapper {
+  margin-top: 40px;
+
+  .contentBox {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    padding: 16px;
+    background-color: $neutralGray2;
+    row-gap: 20px;
+    white-space: pre-wrap;
+    @include viewportLarge {
+      flex-direction: row;
+      row-gap: 0px;
+    }
+
+    &.spaceStart {
+      justify-content: flex-start;
+      .flexChild {
+        margin-right: 100px;
+      }
+    }
+
+    .flexChild {
+      display: flex;
+      flex-direction: column;
+      .boxTitle {
+        font-size: 14px;
+        color: $neutralGray5;
+        margin-bottom: 16px;
+      }
+      .boxContent {
+        font-size: 16px;
+        color: $neutralGray6;
+        font-weight: $fontWeightBold;
+        max-width: 260px;
+      }
+      .staffInput {
+        max-width: 100%;
+        border-radius: 8px;
+        @include viewportLarge {
+          min-width: 244px;
+        }
+      }
+    }
+  }
+}

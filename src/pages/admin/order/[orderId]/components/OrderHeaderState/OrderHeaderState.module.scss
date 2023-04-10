@@ -1,0 +1,37 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.header {
+  @include flexAlign(center, center);
+  flex-direction: column;
+  gap: 16px;
+
+  .stateBtn {
+    width: 160px;
+    height: 48px;
+  }
+}
+.orderTitle {
+  @include flexAlign(center, center);
+  gap: 12px;
+
+  .titleLabel {
+    @include textTemplate(12px, $fontWeightRegular, 16px);
+  }
+
+  .orderId {
+    @include textTemplate(32px, $fontWeightBold, 48px);
+  }
+
+  .status {
+    @include textTemplate(14px, $fontWeightRegular, 20px);
+    padding: 8px 16px;
+    border-radius: 4px;
+    background-color: $labelBlue1;
+  }
+
+  .action {
+    cursor: pointer;
+  }
+}
