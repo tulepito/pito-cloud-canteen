@@ -83,14 +83,13 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
     () => Listing(selectedRestaurant as TListing),
     [selectedRestaurant],
   );
-  const { detailRating } = selectedRestaurantListing.getMetadata();
+  const { detailRating, totalRatingNumber } =
+    selectedRestaurantListing.getMetadata();
 
   const { food, packaging } = detailRating || {};
   const bookerReviewNumber = restaurantBookerReviews.length;
   const participantReviewNumber = restaurantParticipantReviews.length;
-  const totalComments =
-    activeTab === 'booker' ? bookerReviewNumber : participantReviewNumber;
-
+  const totalComments = totalRatingNumber;
   const tabItems = [
     {
       key: 'booker',
