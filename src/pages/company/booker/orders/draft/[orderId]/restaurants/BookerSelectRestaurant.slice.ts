@@ -335,7 +335,8 @@ const fetchRestaurantReviews = createAsyncThunk(
       perPage: isViewAll ? 10 : 5,
       meta_reviewRole: reviewRole,
     });
-    const { meta } = rawResponse;
+    const { meta } = rawResponse.data;
+
     const response = denormalisedResponseEntities(rawResponse);
     const reviewerResponse = await Promise.all(
       response
