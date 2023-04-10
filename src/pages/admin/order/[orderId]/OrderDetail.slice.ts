@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+import { fetchUserApi } from '@apis/index';
 import { adminUpdateOrderStateApi, updateOrderApi } from '@apis/orderApi';
 import { getOrderQuotationsQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
@@ -71,11 +72,7 @@ const fetchOrder = createAsyncThunk(
       }),
     )[0];
 
-    const bookerResponse = denormalisedResponseEntities(
-      await sdk.users.show({
-        id: bookerId,
-      }),
-    )[0];
+    const { data: bookerResponse } = await fetchUserApi(bookerId);
 
     const planResponse = denormalisedResponseEntities(
       await sdk.listings.show({

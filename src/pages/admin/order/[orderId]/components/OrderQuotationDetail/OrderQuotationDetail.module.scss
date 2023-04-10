@@ -8,11 +8,16 @@
 
   .leftCol {
     width: 100%;
+
+    .clientTitle {
+      @include textTemplate(18px, $fontWeightBold, 24px);
+      height: 40px;
+    }
   }
 
   .rightCol {
     width: 300px;
     flex-shrink: 0;
-    margin-top: 50px;
+    margin-top: 40px;
   }
 }

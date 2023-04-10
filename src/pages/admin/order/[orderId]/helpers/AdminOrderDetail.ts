@@ -56,16 +56,10 @@ export const relatedOrderDataSource = ({
 
   const orderTitle = orderListing.getAttributes().title;
   const { companyName } = companyUser.getPublicData();
-  const { members = {} } = companyUser.getMetadata();
-  const bookerId = bookerUser.getId();
   const { displayName } = bookerUser.getProfile();
+  const { email: bookerEmail } = bookerUser.getAttributes();
   const { deliveryAddress, staffName, startDate, endDate } =
     orderListing.getMetadata();
-
-  const bookerMember: { email: string } = Object.values(members).find(
-    (_member: any) => _member.id === bookerId,
-  ) as any;
-  const bookerEmail = bookerMember?.email;
 
   return {
     orderTitle,
@@ -187,6 +181,7 @@ export const formatPriceQuotationDataPartner = ({
     promotion,
     totalWithVAT,
     VATFee,
+    serviceFeePrice,
   } = priceQuotation;
 
   const customerData = {
@@ -208,6 +203,7 @@ export const formatPriceQuotationDataPartner = ({
     },
     cartData: {
       serviceFee: `${parseThousandNumber(serviceFee)}đ`,
+      serviceFeePrice: `${parseThousandNumber(serviceFeePrice)}đ`,
       totalPrice: `${parseThousandNumber(totalPrice)}đ`,
       promotion: `${parseThousandNumber(promotion)}đ`,
       totalWithVAT: `${parseThousandNumber(totalWithVAT)}đ`,

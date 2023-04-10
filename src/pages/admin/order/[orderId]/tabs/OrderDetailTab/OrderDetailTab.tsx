@@ -50,12 +50,17 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     updateOrderState(EOrderStates.picking);
   };
 
+  const handleCancelOrder = () => {
+    updateOrderState(EOrderStates.canceled);
+  };
+
   return (
     <div className={css.container}>
       <OrderHeaderState
         order={order}
         handleUpdateOrderState={handleUpdateOrderState}
         updateOrderStateInProgress={updateOrderStateInProgress}
+        handleCancelOrder={handleCancelOrder}
       />
       <OrderHeaderInfor
         company={company}

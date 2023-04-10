@@ -7,20 +7,7 @@ import { fetchListing } from '@services/integrationHelper';
 import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
-import type {
-  EBookerOrderDraftStates,
-  EOrderDraftStates,
-  EOrderStates,
-} from '@src/utils/enums';
-
-type TOrderState =
-  | EOrderDraftStates.draft
-  | EBookerOrderDraftStates.bookerDraft
-  | EOrderDraftStates.pendingApproval
-  | EOrderStates.picking
-  | EOrderStates.inProgress
-  | EOrderStates.pendingPayment
-  | EOrderStates.completed;
+import type { TTransitionOrderState } from '@src/utils/types';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -30,7 +17,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const order = await fetchListing(orderId as string);
     const orderListing = Listing(order);
     const currentOrderState = orderListing.getMetadata()
-      ?.orderState as TOrderState;
+      ?.orderState as TTransitionOrderState;
 
     if (orderFlow?.[currentOrderState].includes(newOrderState)) {
       const generalInfo = {

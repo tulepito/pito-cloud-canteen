@@ -41,7 +41,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     Object.keys(quotationListing.getMetadata()?.partner || {})[0],
   );
   const partnerServiceFee =
-    Listing(order).getMetadata()?.serviceFee?.[currentPartnerId!];
+    Listing(order).getMetadata()?.serviceFees?.[currentPartnerId!];
 
   const priceQuotation = isPartner
     ? calculatePriceQuotationPartner({
@@ -110,12 +110,15 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
         {isPartner ? (
           <Tabs items={tabItems as any} onChange={handlePartnerChange} />
         ) : (
-          <ReviewOrderDetailsSection
-            outsideCollapsible
-            foodOrderGroupedByDate={groupFoodOrderByDate({
-              orderDetail: orderDetail!,
-            })}
-          />
+          <>
+            <div className={css.clientTitle}>Báo giá khách hàng</div>
+            <ReviewOrderDetailsSection
+              outsideCollapsible
+              foodOrderGroupedByDate={groupFoodOrderByDate({
+                orderDetail: orderDetail!,
+              })}
+            />
+          </>
         )}
       </div>
       <div className={css.rightCol}>

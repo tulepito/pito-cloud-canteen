@@ -44,19 +44,9 @@ const OrderHeaderInfor: React.FC<OrderHeaderInforProps> = (props) => {
   } = orderListing.getMetadata();
 
   const { companyName } = companyUser.getPublicData();
-  const { members = {} } = companyUser.getMetadata();
-  const bookerId = bookerUser.getId();
   const { displayName: bookerName } = bookerUser.getProfile();
   const { phoneNumber } = bookerUser.getProtectedData();
-  const bookerMember: { email: string } = useMemo(
-    () =>
-      Object.values(members).find(
-        (_member: any) => _member.id === bookerId,
-      ) as any,
-    [bookerId, members],
-  );
-
-  const bookerEmail = bookerMember?.email;
+  const { email: bookerEmail } = bookerUser.getAttributes();
 
   const formInitialValues = useMemo(
     () => ({

@@ -636,3 +636,12 @@ export type TQuotation = {
     frequency: number;
   }[];
 };
+
+export type TTransitionOrderState =
+  | EOrderDraftStates.draft
+  | EBookerOrderDraftStates.bookerDraft
+  | EOrderDraftStates.pendingApproval
+  | EOrderStates.picking
+  | EOrderStates.inProgress
+  | EOrderStates.pendingPayment
+  | EOrderStates.completed;

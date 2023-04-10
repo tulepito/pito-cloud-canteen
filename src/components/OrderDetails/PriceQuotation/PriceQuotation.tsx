@@ -25,6 +25,7 @@ type TPriceQuotationProps = {
     };
     cartData: {
       serviceFee: string;
+      serviceFeePrice?: string;
       totalPrice: string;
       PITOFee?: string;
       promotion: string;
