@@ -1,9 +1,12 @@
 /* eslint-disable no-bitwise */
+const DEFAULT_SALT = 'PitoCloudCanteen'; // Replace with your own secret salt
 
-const generateUncountableId = (countableId: number) => {
+const generateUncountableId = (
+  countableId: number,
+  salt: string = DEFAULT_SALT,
+) => {
   // Choose a hash function, such as SHA-256, from a library or implement your own
   // Here's an example using a simple hash function that concatenates the ID with a secret salt
-  const salt = 'PitoCloudCanteen'; // Replace with your own secret salt
   const combinedID = countableId + salt; // Concatenate the ID with the salt
   let hash = 0;
 
@@ -26,6 +29,14 @@ const generateUncountableId = (countableId: number) => {
   }
 
   return uncountableID;
+};
+
+export const generateUncountableIdForOrder = (countableId: number) => {
+  return generateUncountableId(countableId, 'PitoCloudCanteenOrder');
+};
+
+export const generateUncountableIdForQuotation = (countableId: number) => {
+  return generateUncountableId(countableId, 'PitoCloudCanteenQuotation');
 };
 
 export default generateUncountableId;

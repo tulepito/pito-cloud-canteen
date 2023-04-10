@@ -1,5 +1,5 @@
 import type { TCreateQuotationApiBody } from '@apis/orderApi';
-import generateUncountableId from '@helpers/generateUncountableId';
+import { generateUncountableIdForQuotation } from '@helpers/generateUncountableId';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, User } from '@src/utils/data';
@@ -23,7 +23,7 @@ const createQuotation = async (params: TCreateQuotationApiBody) => {
   const companyAccount = await fetchUser(companyId);
   const { subAccountId } = companyAccount.attributes.profile.privateData;
 
-  const quotationId = generateUncountableId(quotationIdNumber);
+  const quotationId = generateUncountableIdForQuotation(quotationIdNumber);
 
   const quotationResponse = await integrationSdk.listings.create(
     {
