@@ -4,7 +4,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
 import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
-import { SPECIAL_DIET_OPTIONS } from '@utils/enums';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { FOOD_TYPE_OPTIONS } from '@src/utils/enums';
 
 import css from './NutritionForm.module.scss';
 
@@ -28,35 +29,75 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
       onSubmit,
       initialValues,
     });
+
   const intl = useIntl();
+  const nutritionsOptions = useAppSelector(
+    (state) => state.BookerDraftOrderPage.nutritions,
+  );
 
   const nutritions = useField('nutritions', form);
+  const mealType = useField('mealType', form);
   const submitInprogress = loading || submitting;
   const disabledSubmit = pristine || submitInprogress || hasValidationErrors;
 
-  const handleChangeCheckboxGroup: (data: {
-    value: string;
-    label: string;
-  }) => ChangeEventHandler<HTMLInputElement> = (data: any) => (e) => {
-    if (e.target.checked) {
-      form.change(
-        'nutritions',
-        (Array.isArray(nutritions.input.value)
-          ? Array.from(new Set([...nutritions.input.value, data.key]))
-          : [data.key]) as any,
-      );
-    } else {
-      form.change(
-        'nutritions',
-        (Array.isArray(nutritions.input.value)
-          ? nutritions.input.value.filter((item) => item !== data.key)
-          : []) as any,
-      );
-    }
-  };
+  const handleChangeCheckboxGroup: (
+    data: {
+      value: string;
+      label: string;
+    },
+    inputField: any,
+  ) => ChangeEventHandler<HTMLInputElement> =
+    (data: any, inputField: any) => (e) => {
+      if (e.target.checked) {
+        form.change(
+          inputField.input.name,
+          (Array.isArray(inputField.input.value)
+            ? Array.from(new Set([...inputField.input.value, data.key]))
+            : [data.key]) as any,
+        );
+      } else {
+        form.change(
+          inputField.input.name,
+          (Array.isArray(inputField.input.value)
+            ? inputField.input.value.filter((item: string) => item !== data.key)
+            : []) as any,
+        );
+      }
+    };
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>
+      <div className={css.fieldGroups}>
+        <div className={css.groupLabel}>
+          <span>
+            {intl.formatMessage({
+              id: 'Booker.CreateOrder.Form.field.mealType',
+            })}
+          </span>
+        </div>
+        {FOOD_TYPE_OPTIONS.map((data: any) => (
+          <div className={css.checkboxItem} key={data.key}>
+            <input
+              className={css.input}
+              id={`mealType-${data.key}`}
+              {...mealType.input}
+              type="checkbox"
+              onChange={handleChangeCheckboxGroup(data, mealType)}
+              checked={(mealType.input.value || []).includes(data.key)}
+              value={data.key}
+            />
+            <label className={css.label} htmlFor={`mealType-${data.key}`}>
+              <span className={css.checkboxWrapper}>
+                <IconCheckbox
+                  checkedClassName={css.checked}
+                  boxClassName={css.box}
+                />
+              </span>
+              <span className={css.labelText}>{data.label}</span>
+            </label>
+          </div>
+        ))}
+      </div>
       <div className={css.fieldGroups}>
         <div className={css.groupLabel}>
           <span>
@@ -65,13 +106,13 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
             })}
           </span>
         </div>
-        {SPECIAL_DIET_OPTIONS.map((data: any) => (
+        {nutritionsOptions.map((data: any) => (
           <div className={css.checkboxItem} key={data.key}>
             <input
               className={css.input}
               id={`nutritions-${data.key}`}
               {...nutritions.input}
-              onChange={handleChangeCheckboxGroup(data)}
+              onChange={handleChangeCheckboxGroup(data, nutritions)}
               checked={(nutritions.input.value || []).includes(data.key)}
               type="checkbox"
               value={data.key}
