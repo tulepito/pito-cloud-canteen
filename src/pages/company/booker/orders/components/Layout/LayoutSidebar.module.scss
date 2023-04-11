@@ -9,6 +9,7 @@
   left: -220px;
   height: 48px;
   transition: linear 0.2s;
+  z-index: 1;
 
   @include viewportLargeWithPaddings {
     position: relative;

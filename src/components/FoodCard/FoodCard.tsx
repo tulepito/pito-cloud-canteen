@@ -1,13 +1,18 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import Badge from '@components/Badge/Badge';
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import IconPlusCircle from '@components/Icons/IconPlusCircle/IconPlusCircle';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { addCommas } from '@helpers/format';
 import { Listing } from '@utils/data';
-import { EImageVariants, SPECIAL_DIET_OPTIONS } from '@utils/enums';
+import {
+  EFoodTypes,
+  EImageVariants,
+  FOOD_TYPE_OPTIONS,
+  getLabelByKey,
+} from '@utils/enums';
 import type { TListing } from '@utils/types';
 
 import css from './FoodCard.module.scss';
@@ -32,7 +37,7 @@ const FoodCard: React.FC<TFoodCardProps> = ({
   hideSelection = false,
 }) => {
   const classes = classNames(css.root, className);
-  const { specialDiets = [] } = Listing(food!).getPublicData();
+  const { foodType } = Listing(food!).getPublicData();
 
   const handleSelect = () => {
     onSelect(`${Listing(food!).getId()}`);
@@ -50,12 +55,8 @@ const FoodCard: React.FC<TFoodCardProps> = ({
   ) : (
     <IconPlusCircle onClick={handleSelect} className={css.plusIcon} />
   );
-
-  const badges = specialDiets
-    .slice(0, 2)
-    .map((diet: string) =>
-      SPECIAL_DIET_OPTIONS.find((item) => item.key === diet),
-    );
+  const foodTypeLabel = getLabelByKey(FOOD_TYPE_OPTIONS, foodType);
+  const isVegetarian = foodType === EFoodTypes.vegetarianDish;
 
   return (
     <div className={classes}>
@@ -67,19 +68,17 @@ const FoodCard: React.FC<TFoodCardProps> = ({
         />
       </div>
       <div className={css.contentContainer}>
-        <div className={css.title} onClick={handleClickFood}>
-          {Listing(food!).getAttributes().title}
+        <div className={css.topInfor}>
+          <div className={css.title} onClick={handleClickFood}>
+            {Listing(food!).getAttributes().title}
+          </div>
         </div>
         <div className={css.badges}>
-          {badges &&
-            badges.map((badge: any) => (
-              <Badge
-                key={badge?.key}
-                className={css.badge}
-                type={badge?.badgeType}
-                label={badge?.label}
-              />
-            ))}
+          <Badge
+            className={css.badge}
+            type={isVegetarian ? EBadgeType.success : EBadgeType.default}
+            label={foodTypeLabel}
+          />
         </div>
         <div className={css.price}>{`${addCommas(
           Listing(food!).getAttributes()?.price?.amount,

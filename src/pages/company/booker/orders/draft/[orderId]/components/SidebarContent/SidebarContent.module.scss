@@ -75,6 +75,8 @@
   position: relative;
   left: 0px;
   opacity: 1;
+  overflow: scroll;
+  max-height: 80vh;
 }
 
 .goBack {
