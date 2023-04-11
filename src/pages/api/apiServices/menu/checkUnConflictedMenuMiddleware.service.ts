@@ -31,6 +31,7 @@ const checkUnConflictedMenuMiddleware =
       const listingStatesAsString = [
         EListingStates.published,
         EListingStates.draft,
+        EListingStates.pendingApproval,
       ].join(',');
       const response = await integrationSdk.listings.query({
         pub_mealType: mealType,
