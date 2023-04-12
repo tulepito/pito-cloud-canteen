@@ -6,7 +6,7 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import { denormalisedResponseEntities, IntegrationListing } from '@utils/data';
 import { findClassDays } from '@utils/dates';
-import { EListingStates, EListingType } from '@utils/enums';
+import { EListingMenuStates, EListingStates, EListingType } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 
 const checkUnConflictedMenuMiddleware =
@@ -31,7 +31,7 @@ const checkUnConflictedMenuMiddleware =
       const listingStatesAsString = [
         EListingStates.published,
         EListingStates.draft,
-        EListingStates.pendingApproval,
+        EListingMenuStates.pendingRestaurantApproval,
       ].join(',');
       const response = await integrationSdk.listings.query({
         pub_mealType: mealType,
