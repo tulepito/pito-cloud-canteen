@@ -133,7 +133,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
 
     !isDraft && !error && setSubmittedValues(values);
 
-    if ((!!duplicateId && !error) || (tab === MENU_COMPLETE_TAB && !error)) {
+    if (tab === MENU_COMPLETE_TAB && !error && !duplicateId) {
       return router.push({
         pathname: isFixedMenu
           ? adminRoutes.ManagePartnerFixedMenus.path

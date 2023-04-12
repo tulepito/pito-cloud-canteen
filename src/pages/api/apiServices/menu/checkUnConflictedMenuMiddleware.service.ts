@@ -73,7 +73,7 @@ const checkUnConflictedMenuMiddleware =
       const listingWithoutNewMenu = id
         ? inValidListings.filter((l) => l.id.uuid !== id)
         : inValidListings;
-      console.log({ listingWithoutNewMenu });
+
       if (listingWithoutNewMenu.length > 0 && daysOfWeek.length > 0) {
         return handleError(res, {
           status: errorMessages.VALIDATE_MENU_ERROR_CONFLICT.code,
