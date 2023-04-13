@@ -101,7 +101,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
             key={style?.key}
             className={css.badge}
             label={style?.label}
-            type={style.badgeType}
+            type={style?.badgeType}
           />
         ))}
       </div>
