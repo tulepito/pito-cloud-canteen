@@ -635,3 +635,21 @@ export type TDuplicateMenuApiParams = {
   numberOfCycles: number;
   endDate: number;
 };
+
+export type TQuotation = {
+  [timestamp: string]: {
+    foodId: string;
+    foodName: string;
+    foodPrice: number;
+    frequency: number;
+  }[];
+};
+
+export type TTransitionOrderState =
+  | EOrderDraftStates.draft
+  | EBookerOrderDraftStates.bookerDraft
+  | EOrderDraftStates.pendingApproval
+  | EOrderStates.picking
+  | EOrderStates.inProgress
+  | EOrderStates.pendingPayment
+  | EOrderStates.completed;

@@ -104,7 +104,8 @@ export const usePrepareOrderDetailPageData = () => {
     transportFee,
     promotion,
     overflow,
-    // totalWithoutVAT,
+    PITOFee,
+    totalWithoutVAT,
   } = calculatePriceQuotationInfo({
     planOrderDetail: orderDetail,
     order: orderData as TObject,
@@ -134,10 +135,11 @@ export const usePrepareOrderDetailPageData = () => {
     promotion,
     serviceFee,
     totalPrice,
-    // totalWithoutVAT,
+    totalWithoutVAT,
     totalWithVAT,
     transportFee,
     VATFee,
+    PITOFee,
   };
   const reviewViewData = {
     orderTitle,

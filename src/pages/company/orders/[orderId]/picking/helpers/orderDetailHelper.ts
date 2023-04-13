@@ -12,7 +12,7 @@ export const groupFoodOrderByDate = ({
 
       const {
         memberOrders,
-        restaurant: { restaurantName, foodList: foodListOfDate = {} },
+        restaurant: { id, restaurantName, foodList: foodListOfDate = {} },
       } = rawOrderDetailOfDate as TObject;
 
       const foodDataMap = Object.entries(memberOrders).reduce(
@@ -63,6 +63,7 @@ export const groupFoodOrderByDate = ({
           index,
           ...summary,
           foodDataList,
+          restaurantId: id,
         },
       ];
     },

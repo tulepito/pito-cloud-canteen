@@ -4,21 +4,24 @@ import css from './CartSection.module.scss';
 
 type TCartSectionProps = {
   id?: string;
-  serviceFee: string;
+  serviceFee?: string;
+  serviceFeePrice?: string;
   totalPrice: string;
   promotion: string;
   totalWithVAT: string;
   transportFee: string;
+  PITOFee?: string;
   // VATFee: string;
 };
 
 const CartSection: React.FC<TCartSectionProps> = (props) => {
   const {
     id,
-    serviceFee,
+    serviceFeePrice,
     totalPrice,
     promotion,
     totalWithVAT,
+    PITOFee,
     // transportFee,
     // VATFee,
   } = props;
@@ -62,10 +65,12 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
           <div>2</div>
           <div>
             {intl.formatMessage({
-              id: 'BookerOrderDetailsPriceQuotation.cartSection.rowLabel.serviceCost',
+              id: `BookerOrderDetailsPriceQuotation.cartSection.rowLabel.${
+                PITOFee ? 'PITOFee' : 'serviceCost'
+              }`,
             })}
           </div>
-          <div>{serviceFee}</div>
+          <div>{PITOFee || serviceFeePrice}</div>
         </div>
         {/* <div className={css.tableRow}>
           <div>3</div>

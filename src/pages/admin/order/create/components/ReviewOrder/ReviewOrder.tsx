@@ -81,7 +81,7 @@ const MENU_TABLE_COLUMN: TColumn[] = [
   },
 ];
 
-const ReviewContent: React.FC<any> = (props) => {
+export const ReviewContent: React.FC<any> = (props) => {
   const { restaurant, notes } = props;
   const { restaurantName, phoneNumber, foodList = {}, id } = restaurant;
 

@@ -172,3 +172,19 @@ export const getMenuQueryInSpecificDay = ({
 
   return query;
 };
+
+export const getOrderQuotationsQuery = ({
+  orderId,
+  status,
+}: {
+  orderId: string;
+  status?: 'active' | 'inactive';
+}) => {
+  const query = {
+    meta_listingType: ListingTypes.QUOTATION,
+    meta_orderId: orderId,
+    ...(status && { meta_status: status }),
+  };
+
+  return query;
+};
