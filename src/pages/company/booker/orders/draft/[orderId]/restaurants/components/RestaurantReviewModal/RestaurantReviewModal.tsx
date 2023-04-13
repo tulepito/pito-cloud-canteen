@@ -145,8 +145,13 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
     viewAllReviewControl.setTrue();
   };
 
+  const handleGoBack = () => {
+    viewAllReviewControl.setFalse();
+    setReviewPage(1);
+  };
+
   const goBackModalTitle = (
-    <div className={css.goBack} onClick={viewAllReviewControl.setFalse}>
+    <div className={css.goBack} onClick={handleGoBack}>
       <IconArrow direction="left" />
       <span>Quay lại</span>
     </div>
