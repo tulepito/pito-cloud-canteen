@@ -74,7 +74,8 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
           {
             id: 'editOrder',
             label: 'AdminSidebar.partnerDetailsLabel',
-            nameLink: adminRoutes.EditPartner.path,
+            nameLink: adminRoutes.PartnerDetails.path,
+            highlightRefLinks: [adminRoutes.EditPartner.path],
           },
           {
             id: 'partnerSettings',
