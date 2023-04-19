@@ -16,25 +16,33 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const order = await fetchListing(orderId as string);
     const orderListing = Listing(order);
-    const currentOrderState = orderListing.getMetadata()
-      ?.orderState as TTransitionOrderState;
+    const { orderState: currentOrderState, orderStateHistory = [] } =
+      orderListing.getMetadata();
 
-    if (orderFlow?.[currentOrderState].includes(newOrderState)) {
+    if (
+      orderFlow?.[currentOrderState as TTransitionOrderState].includes(
+        newOrderState,
+      )
+    ) {
       const generalInfo = {
         orderState: newOrderState,
+        orderStateHistory: orderStateHistory.concat({
+          state: newOrderState,
+          updatedAt: new Date().getTime(),
+        }),
       };
 
-      const { data: updatedOrder } = await updateOrder({
+      const updatedOrder = await updateOrder({
         orderId: orderId as string,
         generalInfo,
       });
 
-      res.status(200).json(updatedOrder);
-    } else {
-      res.status(500).json({
-        error: 'Invalid order state',
-      });
+      return res.status(200).json(updatedOrder);
     }
+
+    return res.status(500).json({
+      error: 'Invalid order state',
+    });
   } catch (error) {
     handleError(res, error);
   }
