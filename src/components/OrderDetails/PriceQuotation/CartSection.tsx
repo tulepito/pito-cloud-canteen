@@ -1,5 +1,7 @@
 import { useIntl } from 'react-intl';
 
+import config from '@src/configs';
+
 import css from './CartSection.module.scss';
 
 type TCartSectionProps = {
@@ -11,7 +13,7 @@ type TCartSectionProps = {
   totalWithVAT: string;
   transportFee: string;
   PITOFee?: string;
-  // VATFee: string;
+  VATFee: string;
 };
 
 const CartSection: React.FC<TCartSectionProps> = (props) => {
@@ -23,7 +25,7 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
     totalWithVAT,
     PITOFee,
     // transportFee,
-    // VATFee,
+    VATFee,
   } = props;
   const intl = useIntl();
 
@@ -82,7 +84,7 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
           <div>{transportFee}</div>
         </div> */}
         <div className={css.tableRow}>
-          <div>4</div>
+          <div>3</div>
           <div>
             {intl.formatMessage({
               id: 'BookerOrderDetailsPriceQuotation.cartSection.rowLabel.promotion',
@@ -90,18 +92,18 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
           </div>
           <div>{promotion}</div>
         </div>
-        {/* <div className={css.tableRow}>
-              <div>5</div>
-              <div>
-                {intl.formatMessage(
-                  {
-                    id: 'BookerOrderDetailsPriceQuotation.cartSection.rowLabel.VAT',
-                  },
-                  { percent: config.VATPercentage * 100 },
-                )}
-              </div>
-              <div>{VATFee}</div>
-            </div> */}
+        <div className={css.tableRow}>
+          <div>4</div>
+          <div>
+            {intl.formatMessage(
+              {
+                id: 'BookerOrderDetailsPriceQuotation.cartSection.rowLabel.VAT',
+              },
+              { percent: config.VATPercentage * 100 },
+            )}
+          </div>
+          <div>{VATFee}</div>
+        </div>
         <div className={css.tableRow}>
           <div> </div>
           <div>
