@@ -190,7 +190,7 @@ const duplicateMenu = async (
     authorId: menu.author.id.uuid,
     state: EListingStates.published,
   };
-  console.log({ createParams });
+
   const menuResponse = await integrationSdk.listings.create(
     createParams,
     queryParams,

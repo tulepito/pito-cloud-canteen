@@ -1,3 +1,11 @@
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
+
+import EditPartnerPage from './edit/EditPartner.page';
+
 export default function PartnerRoute() {
-  return <>Hello world</>;
+  return (
+    <MetaWrapper routeName="AdminEditPartnerRoute">
+      <EditPartnerPage />
+    </MetaWrapper>
+  );
 }

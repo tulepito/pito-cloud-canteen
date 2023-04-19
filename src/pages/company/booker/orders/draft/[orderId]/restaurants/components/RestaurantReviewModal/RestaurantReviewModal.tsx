@@ -83,14 +83,13 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
     () => Listing(selectedRestaurant as TListing),
     [selectedRestaurant],
   );
-  const { detailRating } = selectedRestaurantListing.getMetadata();
+  const { detailRating, totalRatingNumber } =
+    selectedRestaurantListing.getMetadata();
 
   const { food, packaging } = detailRating || {};
   const bookerReviewNumber = restaurantBookerReviews.length;
   const participantReviewNumber = restaurantParticipantReviews.length;
-  const totalComments =
-    activeTab === 'booker' ? bookerReviewNumber : participantReviewNumber;
-
+  const totalComments = totalRatingNumber;
   const tabItems = [
     {
       key: 'booker',
@@ -146,8 +145,13 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
     viewAllReviewControl.setTrue();
   };
 
+  const handleGoBack = () => {
+    viewAllReviewControl.setFalse();
+    setReviewPage(1);
+  };
+
   const goBackModalTitle = (
-    <div className={css.goBack} onClick={viewAllReviewControl.setFalse}>
+    <div className={css.goBack} onClick={handleGoBack}>
       <IconArrow direction="left" />
       <span>Quay lại</span>
     </div>

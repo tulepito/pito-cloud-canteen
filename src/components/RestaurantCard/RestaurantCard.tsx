@@ -11,6 +11,7 @@ import IconStar from '@components/Icons/IconStar/IconStar';
 import IconTruck from '@components/Icons/IconTruck/IconTruck';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { calculateDistance } from '@helpers/mapHelpers';
+import { getListingImageById } from '@pages/company/booker/orders/draft/[orderId]/restaurants/helpers';
 import { Listing } from '@utils/data';
 import {
   CATEGORY_OPTIONS,
@@ -48,11 +49,19 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
   const classes = classNames(css.root, className);
   const restaurantId = Listing(restaurant).getId();
   const { geolocation: origin } = Listing(restaurant).getAttributes();
-  const { categories = [], packaging = [] } =
-    Listing(restaurant).getPublicData();
+  const {
+    categories = [],
+    packaging = [],
+    coverImageId,
+  } = Listing(restaurant).getPublicData();
   const { totalRating = 0, totalRatingNumber = 0 } =
     Listing(restaurant).getMetadata();
-  const restaurantCoverImage = Listing(restaurant).getImages()[0];
+  const restaurantImages = Listing(restaurant).getImages();
+
+  const restaurantCoverImage = getListingImageById(
+    coverImageId,
+    restaurantImages,
+  );
   const restaurantName = Listing(restaurant).getAttributes().title;
 
   const mealStyles = categories
@@ -101,7 +110,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
             key={style?.key}
             className={css.badge}
             label={style?.label}
-            type={style.badgeType}
+            type={style?.badgeType}
           />
         ))}
       </div>

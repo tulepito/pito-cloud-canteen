@@ -6,7 +6,7 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import { denormalisedResponseEntities, IntegrationListing } from '@utils/data';
 import { findClassDays } from '@utils/dates';
-import { EListingStates, EListingType } from '@utils/enums';
+import { EListingMenuStates, EListingStates, EListingType } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 
 const checkUnConflictedMenuMiddleware =
@@ -31,6 +31,7 @@ const checkUnConflictedMenuMiddleware =
       const listingStatesAsString = [
         EListingStates.published,
         EListingStates.draft,
+        EListingMenuStates.pendingRestaurantApproval,
       ].join(',');
       const response = await integrationSdk.listings.query({
         pub_mealType: mealType,
@@ -72,7 +73,7 @@ const checkUnConflictedMenuMiddleware =
       const listingWithoutNewMenu = id
         ? inValidListings.filter((l) => l.id.uuid !== id)
         : inValidListings;
-      console.log({ listingWithoutNewMenu });
+
       if (listingWithoutNewMenu.length > 0 && daysOfWeek.length > 0) {
         return handleError(res, {
           status: errorMessages.VALIDATE_MENU_ERROR_CONFLICT.code,

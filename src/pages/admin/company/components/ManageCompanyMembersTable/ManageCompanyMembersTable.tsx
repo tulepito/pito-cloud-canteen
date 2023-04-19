@@ -432,7 +432,6 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
   const onPageChange = (page: number) => {
     setPage(page);
   };
-  console.log({ transferCompanyOwnerError });
 
   return (
     <div className={css.root}>
