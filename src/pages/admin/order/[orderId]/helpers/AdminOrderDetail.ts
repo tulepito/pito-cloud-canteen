@@ -58,6 +58,7 @@ export const relatedOrderDataSource = ({
   const { companyName } = companyUser.getPublicData();
   const { displayName } = bookerUser.getProfile();
   const { email: bookerEmail } = bookerUser.getAttributes();
+  const { phoneNumber: bookerPhoneNumber } = bookerUser.getProtectedData();
   const { deliveryAddress, staffName, startDate, endDate } =
     orderListing.getMetadata();
 
@@ -68,6 +69,7 @@ export const relatedOrderDataSource = ({
     endDate,
     bookerName: displayName,
     bookerEmail,
+    bookerPhoneNumber,
     staffName,
     deliveryAddress: deliveryAddress?.address,
   };
@@ -93,6 +95,7 @@ export const formatPriceQuotationData = ({
     endDate,
     bookerName,
     bookerEmail,
+    bookerPhoneNumber,
     staffName,
     deliveryAddress,
   } = relatedOrderDataSource({
@@ -114,7 +117,7 @@ export const formatPriceQuotationData = ({
   const customerData = {
     companyName,
     contactPeopleName: bookerName,
-    contactPhoneNumber: '',
+    contactPhoneNumber: bookerPhoneNumber || '',
     staffName,
     deliveryAddress,
     email: bookerEmail,
@@ -167,6 +170,7 @@ export const formatPriceQuotationDataPartner = ({
     endDate,
     bookerName,
     bookerEmail,
+    bookerPhoneNumber,
     staffName,
     deliveryAddress,
   } = relatedOrderDataSource({
@@ -187,7 +191,7 @@ export const formatPriceQuotationDataPartner = ({
   const customerData = {
     companyName,
     contactPeopleName: bookerName,
-    contactPhoneNumber: '',
+    contactPhoneNumber: bookerPhoneNumber || '',
     staffName,
     deliveryAddress,
     email: bookerEmail,
