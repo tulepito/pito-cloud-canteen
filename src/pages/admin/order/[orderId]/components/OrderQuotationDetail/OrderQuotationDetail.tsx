@@ -128,6 +128,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           showStartPickingOrderButton={false}
           title="Thực đơn phục vụ"
           target={target}
+          isAdminLayout
         />
       </div>
     </div>

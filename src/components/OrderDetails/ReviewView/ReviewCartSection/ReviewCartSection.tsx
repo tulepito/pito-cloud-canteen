@@ -24,6 +24,7 @@ type TReviewCartSectionProps = {
   foodOrderGroupedByDate?: TObject[];
   title?: string;
   target: 'client' | 'partner';
+  isAdminLayout?: boolean;
 };
 
 const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
@@ -47,6 +48,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     foodOrderGroupedByDate,
     title,
     target,
+    isAdminLayout = false,
   } = props;
 
   const intl = useIntl();
@@ -61,6 +63,9 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     query: { orderId },
   } = router;
   const rootClasses = classNames(css.root, className);
+  const titleClasses = classNames(css.title, {
+    [css.adminTitle]: isAdminLayout,
+  });
   const { orderDetail } = Listing(planData as TListing).getMetadata();
   const isStartOrderDisabled = !isEnableToStartOrder(orderDetail);
   const isPartner = target === 'partner';
@@ -83,7 +88,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
 
   return (
     <div className={rootClasses}>
-      <div className={css.title}>
+      <div className={titleClasses}>
         {title || intl.formatMessage({ id: 'ReviewCardSection.title' })}
       </div>
 
@@ -126,7 +131,11 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
         <div className={css.feeItem}>
           <div className={css.feeItemContainer}>
             <div className={css.label}>
-              {intl.formatMessage({ id: 'ReviewCardSection.promotion' })}
+              {intl.formatMessage({
+                id: isAdminLayout
+                  ? 'ReviewCardSection.adminPromotion'
+                  : 'ReviewCardSection.promotion',
+              })}
             </div>
             <div className={css.fee}>
               {parseThousandNumber(promotion.toString())}đ

@@ -67,6 +67,13 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
               <div className={css.actionItem} onClick={onCancelOrder}>
                 Huỷ đơn
               </div>
+              <RenderWhen condition={shouldShowUpdateOrderStateBtn}>
+                <div
+                  className={css.actionItem}
+                  onClick={handleUpdateOrderState}>
+                  Hoàn tất
+                </div>
+              </RenderWhen>
             </OutsideClickHandler>
           )}
         </div>
