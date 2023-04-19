@@ -128,6 +128,7 @@ export const ReviewContent: React.FC<any> = (props) => {
           data={parsedFoodList}
           tableClassName={css.tableRoot}
           tableHeadClassName={css.tableHead}
+          tableHeadRowClassName={css.tableHeadRow}
           tableBodyClassName={css.tableBody}
           tableBodyRowClassName={css.tableBodyRow}
           tableBodyCellClassName={css.tableBodyCell}

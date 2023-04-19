@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import Tabs from '@components/Tabs/Tabs';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
+import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderStates } from '@src/utils/enums';
 import type { TListing, TUser } from '@src/utils/types';
@@ -33,6 +34,8 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     updateOrderState,
     updateOrderStateInProgress,
   } = props;
+  const { notes } = Listing(order).getMetadata();
+
   const tabItems = useMemo(
     () =>
       Object.keys(orderDetail).map((key: any) => {
@@ -40,7 +43,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
           key,
           label: formatTimestamp(Number(key)),
           childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
-          childrenProps: { ...orderDetail[key] },
+          childrenProps: { ...orderDetail[key], notes },
         };
       }),
     [orderDetail],
