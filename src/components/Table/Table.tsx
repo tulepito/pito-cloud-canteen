@@ -146,7 +146,7 @@ const Table = (props: TTableProps) => {
       <div className={classNames(css.tableWrapper, tableWrapperClassName)}>
         <table className={tableClasses}>
           <thead className={tableHeadClassName}>
-            <tr className={classNames(tableHeadRowClassName, css.headRow)}>
+            <tr className={classNames(css.headRow, tableHeadRowClassName)}>
               {hasCheckbox && (
                 <td
                   className={classNames(tableHeadCellClassName, css.headCell)}>
