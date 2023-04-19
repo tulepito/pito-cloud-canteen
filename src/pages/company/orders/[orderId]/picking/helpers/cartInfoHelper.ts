@@ -51,7 +51,6 @@ export const calculatePriceQuotationInfo = ({
 
   const PITOPoints = Math.floor(totalPrice / 100000);
   const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
-  const VATFee = Math.round(totalPrice * config.VATPercentage);
   const serviceFee = 0;
   const transportFee = 0;
   const promotion = 0;
@@ -59,6 +58,7 @@ export const calculatePriceQuotationInfo = ({
   const PITOFee = getPCCFeeByMemberAmount(memberAmount) * numberOfOrderDays;
   const totalWithoutVAT =
     totalPrice + serviceFee + transportFee + PITOFee - promotion;
+  const VATFee = Math.round(totalWithoutVAT * config.VATPercentage);
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage
     ? totalWithVAT - totalDishes * packagePerMember
@@ -101,9 +101,9 @@ export const calculatePriceQuotationPartner = ({
     },
     0,
   );
-  const VATFee = Math.round(totalPrice * config.VATPercentage);
   const serviceFeePrice = Math.round((totalPrice * serviceFee) / 100);
   const totalWithoutVAT = totalPrice - promotion - serviceFeePrice;
+  const VATFee = Math.round(totalWithoutVAT * config.VATPercentage);
   const totalWithVAT = VATFee + totalWithoutVAT;
 
   return {

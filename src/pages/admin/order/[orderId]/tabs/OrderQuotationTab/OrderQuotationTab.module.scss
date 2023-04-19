@@ -12,6 +12,11 @@
   margin-top: 24px;
 }
 
+.orderName,
+.companyName {
+  font-weight: 700;
+}
+
 .orderHeaderInforContainer {
   // padding: 24px 0;
   border-bottom: 1px solid $neutralGray4;
