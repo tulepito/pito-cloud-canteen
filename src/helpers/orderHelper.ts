@@ -13,6 +13,7 @@ import { generateTimeOptions, renderDateRange } from '@utils/dates';
 import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
+  EOrderStates,
   EParticipantOrderStatus,
 } from '@utils/enums';
 import type { TPlan } from '@utils/orderTypes';
@@ -361,4 +362,21 @@ export const getPCCFeeByMemberAmount = (memberAmount: number) => {
   }
 
   return 500000;
+};
+
+export const orderFlow = {
+  [EOrderDraftStates.draft]: [
+    EOrderDraftStates.pendingApproval,
+    EOrderStates.canceled,
+  ],
+  [EBookerOrderDraftStates.bookerDraft]: [EOrderStates.canceled],
+  [EOrderDraftStates.pendingApproval]: [
+    EOrderStates.picking,
+    EOrderStates.canceledByBooker,
+    EOrderStates.canceled,
+  ],
+  [EOrderStates.picking]: [EOrderStates.inProgress],
+  [EOrderStates.inProgress]: [EOrderStates.pendingPayment],
+  [EOrderStates.pendingPayment]: [EOrderStates.completed],
+  [EOrderStates.completed]: [EOrderStates.reviewed],
 };

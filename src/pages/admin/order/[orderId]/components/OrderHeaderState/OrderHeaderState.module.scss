@@ -1,0 +1,58 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.header {
+  @include flexAlign(center, center);
+  flex-direction: column;
+  gap: 16px;
+
+  .stateBtn {
+    width: 160px;
+    height: 48px;
+  }
+}
+.orderTitle {
+  @include flexAlign(center, center);
+  gap: 12px;
+
+  .titleLabel {
+    @include textTemplate(12px, $fontWeightRegular, 16px);
+  }
+
+  .orderId {
+    @include textTemplate(32px, $fontWeightBold, 48px);
+  }
+
+  .status {
+    @include textTemplate(14px, $fontWeightRegular, 20px);
+    padding: 8px 16px;
+    border-radius: 4px;
+    background-color: $labelBlue1;
+  }
+
+  .action {
+    cursor: pointer;
+    position: relative;
+
+    .actionList {
+      position: absolute;
+      top: 24px;
+      left: 0;
+      width: 200px;
+      padding: 16px 0;
+      border-radius: 8px;
+      box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
+
+      .actionItem {
+        cursor: pointer;
+        padding: 4px 16px;
+        transition: all 0.1s ease-in-out;
+
+        &:hover {
+          background-color: $neutralGray3;
+        }
+      }
+    }
+  }
+}

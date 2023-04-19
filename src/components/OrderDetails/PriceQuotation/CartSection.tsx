@@ -1,26 +1,31 @@
 import { useIntl } from 'react-intl';
 
+import config from '@src/configs';
+
 import css from './CartSection.module.scss';
 
 type TCartSectionProps = {
   id?: string;
-  serviceFee: string;
+  serviceFee?: string;
+  serviceFeePrice?: string;
   totalPrice: string;
   promotion: string;
   totalWithVAT: string;
   transportFee: string;
-  // VATFee: string;
+  PITOFee?: string;
+  VATFee: string;
 };
 
 const CartSection: React.FC<TCartSectionProps> = (props) => {
   const {
     id,
-    serviceFee,
+    serviceFeePrice,
     totalPrice,
     promotion,
     totalWithVAT,
+    PITOFee,
     // transportFee,
-    // VATFee,
+    VATFee,
   } = props;
   const intl = useIntl();
 
@@ -62,10 +67,12 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
           <div>2</div>
           <div>
             {intl.formatMessage({
-              id: 'BookerOrderDetailsPriceQuotation.cartSection.rowLabel.serviceCost',
+              id: `BookerOrderDetailsPriceQuotation.cartSection.rowLabel.${
+                PITOFee ? 'PITOFee' : 'serviceCost'
+              }`,
             })}
           </div>
-          <div>{serviceFee}</div>
+          <div>{PITOFee || serviceFeePrice}</div>
         </div>
         {/* <div className={css.tableRow}>
           <div>3</div>
@@ -77,7 +84,7 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
           <div>{transportFee}</div>
         </div> */}
         <div className={css.tableRow}>
-          <div>4</div>
+          <div>3</div>
           <div>
             {intl.formatMessage({
               id: 'BookerOrderDetailsPriceQuotation.cartSection.rowLabel.promotion',
@@ -85,18 +92,18 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
           </div>
           <div>{promotion}</div>
         </div>
-        {/* <div className={css.tableRow}>
-              <div>5</div>
-              <div>
-                {intl.formatMessage(
-                  {
-                    id: 'BookerOrderDetailsPriceQuotation.cartSection.rowLabel.VAT',
-                  },
-                  { percent: config.VATPercentage * 100 },
-                )}
-              </div>
-              <div>{VATFee}</div>
-            </div> */}
+        <div className={css.tableRow}>
+          <div>4</div>
+          <div>
+            {intl.formatMessage(
+              {
+                id: 'BookerOrderDetailsPriceQuotation.cartSection.rowLabel.VAT',
+              },
+              { percent: config.VATPercentage * 100 },
+            )}
+          </div>
+          <div>{VATFee}</div>
+        </div>
         <div className={css.tableRow}>
           <div> </div>
           <div>

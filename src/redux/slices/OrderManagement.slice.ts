@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import groupBy from 'lodash/groupBy';
 import omit from 'lodash/omit';
 
 import {
@@ -7,6 +8,7 @@ import {
   bookerMarkInprogressPlanViewedApi,
   bookerStartOrderApi,
   cancelPickingOrderApi,
+  createQuotationApi,
   deleteParticipantFromOrderApi,
   getBookerOrderDataApi,
   sendRemindEmailToMemberApi,
@@ -468,8 +470,8 @@ const deleteParticipant = createAsyncThunk(
 
 const bookerStartOrder = createAsyncThunk(
   'app/OrderManagement/startOrder',
-  async ({ orderId }: TObject, { getState }) => {
-    const { plans } = Listing(
+  async ({ orderId, foodOrderGroupedByDate }: TObject, { getState }) => {
+    const { plans, companyId } = Listing(
       getState().OrderManagement.orderData! as TListing,
     ).getMetadata();
 
@@ -477,6 +479,50 @@ const bookerStartOrder = createAsyncThunk(
       orderId,
       planId: plans.length > 0 ? plans[0] : '',
     });
+
+    const clientQuotation = {
+      quotation: foodOrderGroupedByDate.reduce((result: any, item: any) => {
+        return {
+          ...result,
+          [item.date]: item.foodDataList,
+        };
+      }, {}),
+    };
+
+    const groupByRestaurantQuotationData = groupBy(
+      foodOrderGroupedByDate,
+      'restaurantId',
+    );
+
+    const partnerQuotation = Object.keys(groupByRestaurantQuotationData).reduce(
+      (result, item) => {
+        return {
+          ...result,
+          [item]: {
+            name: groupByRestaurantQuotationData[item][0].restaurantName,
+            quotation: groupByRestaurantQuotationData[item].reduce(
+              (quotationArrayResult: any, quotationItem: any) => {
+                return {
+                  ...quotationArrayResult,
+                  [quotationItem.date]: quotationItem.foodDataList,
+                };
+              },
+              {},
+            ),
+          },
+        };
+      },
+      {},
+    );
+
+    const apiBody = {
+      orderId,
+      companyId,
+      partner: partnerQuotation,
+      client: clientQuotation,
+    };
+
+    await createQuotationApi(orderId, apiBody);
   },
 );
 

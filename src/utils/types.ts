@@ -636,3 +636,21 @@ export type TKeyValue<T = string> = {
     end: string;
   };
 };
+
+export type TQuotation = {
+  [timestamp: string]: {
+    foodId: string;
+    foodName: string;
+    foodPrice: number;
+    frequency: number;
+  }[];
+};
+
+export type TTransitionOrderState =
+  | EOrderDraftStates.draft
+  | EBookerOrderDraftStates.bookerDraft
+  | EOrderDraftStates.pendingApproval
+  | EOrderStates.picking
+  | EOrderStates.inProgress
+  | EOrderStates.pendingPayment
+  | EOrderStates.completed;

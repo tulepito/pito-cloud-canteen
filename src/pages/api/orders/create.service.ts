@@ -1,6 +1,7 @@
 import { isEmpty } from 'lodash';
 
 import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
+import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
 import getAdminAccount from '@services/getAdminAccount';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -47,9 +48,8 @@ const createOrder = async ({
   const { subAccountId } = companyAccount.attributes.profile.privateData;
   const companyDisplayName = companyAccount.attributes.profile.displayName;
 
-  const generatedOrderId = `PT${(currentOrderNumber + 1)
-    .toString()
-    .padStart(5, '0')}`;
+  const orderId = generateUncountableIdForOrder(currentOrderNumber);
+  const generatedOrderId = `PT${orderId}`;
 
   // Prepare order state history
   const orderStateHistory = [

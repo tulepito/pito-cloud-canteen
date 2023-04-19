@@ -17,6 +17,11 @@
   .title {
     @include textTemplate(20px, 700, 32px);
     text-transform: capitalize;
+
+    &.adminTitle {
+      font-size: 18px;
+      text-transform: none;
+    }
   }
 
   .feeContainer {

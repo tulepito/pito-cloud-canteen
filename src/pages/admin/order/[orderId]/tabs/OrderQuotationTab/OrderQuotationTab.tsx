@@ -1,0 +1,313 @@
+import { useEffect, useMemo, useState } from 'react';
+
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import type { TColumn } from '@components/Table/Table';
+import Table from '@components/Table/Table';
+import Tabs from '@components/Tabs/Tabs';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { Listing, User } from '@src/utils/data';
+import { formatTimestamp } from '@src/utils/dates';
+import { EOrderStates } from '@src/utils/enums';
+import type { TListing, TPagination, TUser } from '@src/utils/types';
+
+import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
+import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
+import OrderQuotationDetail from '../../components/OrderQuotationDetail/OrderQuotationDetail';
+import { OrderDetailThunks } from '../../OrderDetail.slice';
+
+import css from './OrderQuotationTab.module.scss';
+
+type OrderQuotationTabProps = {
+  order: TListing;
+  orderDetail: any;
+  company: TUser;
+  booker: TUser;
+  updateOrderState: (newOrderState: string) => void;
+  updateOrderStateInProgress: boolean;
+  quotations: TListing[];
+  quotationsPagination: TPagination;
+};
+
+const TABLE_COLUMNS: TColumn[] = [
+  {
+    key: 'title',
+    label: 'ID',
+    render: ({ title, onQuotationDetail }: any) => {
+      return (
+        <div className={css.idLabel} onClick={onQuotationDetail}>
+          {`BG${title}`}
+        </div>
+      );
+    },
+    sortable: true,
+  },
+  {
+    key: 'orderName',
+    label: 'Tên đơn hàng',
+    render: ({ orderName }: any) => {
+      return <div className={css.orderName}>{orderName || <></>}</div>;
+    },
+  },
+  {
+    key: 'address',
+    label: 'Địa điểm giao hàng',
+    render: (data: any) => {
+      return (
+        <div className={css.locationRow}>
+          <div className={css.companyName}>{data.companyName}</div>
+          {data.location || <></>}
+        </div>
+      );
+    },
+  },
+  {
+    key: 'bookerName',
+    label: 'Nguời đại diện',
+    render: (data: any) => {
+      return <div>{data.displayName}</div>;
+    },
+  },
+  {
+    key: 'startDate',
+    label: 'Thời gian',
+    render: (data: any) => {
+      const { startDate, endDate } = data;
+
+      return startDate && endDate ? (
+        <div className={css.rowText}>
+          <div className={css.deliveryHour}>{data.deliveryHour}</div>
+          {data.startDate} - {data.endDate}
+        </div>
+      ) : (
+        <></>
+      );
+    },
+    sortable: true,
+  },
+  {
+    key: 'restaurantName',
+    label: 'Đối tác',
+    render: ({ restaurants = [] }: any) => {
+      const { length } = restaurants;
+      const moreThanTwo = restaurants.length > 2;
+      const remainLength = length - 2;
+
+      return length > 0 ? (
+        <div className={css.rowText}>
+          {restaurants.slice(0, 2).map((restaurantName: string) => (
+            <div key={restaurantName} className={css.restaurantName}>
+              {restaurantName}
+            </div>
+          ))}
+          {moreThanTwo && (
+            <div className={css.remainText}>+ {remainLength} đối tác </div>
+          )}
+        </div>
+      ) : (
+        <></>
+      );
+    },
+  },
+  {
+    key: 'staffName',
+    label: 'Nhân viên phụ trách',
+    render: ({ staffName }: any) => {
+      return staffName ? <div>{staffName}</div> : <></>;
+    },
+    sortable: true,
+  },
+];
+
+const parseEntitiesToTableData = ({
+  order,
+  quotations,
+  orderDetail,
+  company,
+  booker,
+  setSelectedQuotation,
+}: {
+  order: TListing;
+  quotations: TListing[];
+  orderDetail: any;
+  company: TUser;
+  booker: TUser;
+  setSelectedQuotation: (quotationId: string) => void;
+}) => {
+  if (quotations.length === 0) return [];
+  const orderListing = Listing(order);
+  const companyUser = User(company);
+  const bookerUser = User(booker);
+  const { startDate, endDate, staffName, deliveryAddress, deliveryHour } =
+    orderListing.getMetadata();
+  const { orderName } = orderListing.getPublicData();
+  const { companyName } = companyUser.getPublicData();
+  const { displayName } = bookerUser.getPublicData();
+  const restaurantsList = Object.values(orderDetail).reduce(
+    (result: string[], orderDate: any) => {
+      const { restaurant } = orderDate;
+
+      return Array.from(new Set(result).add(restaurant.restaurantName));
+    },
+    [],
+  );
+
+  return quotations.map((quotation) => {
+    const quotationListing = Listing(quotation);
+    const { title: quotationTitle } = quotationListing.getAttributes();
+    const quotationId = quotationListing.getId();
+
+    return {
+      key: quotationId,
+      data: {
+        id: quotationId,
+        title: quotationTitle,
+        orderName,
+        location: deliveryAddress?.address,
+        staffName,
+        companyName,
+        displayName,
+        restaurants: restaurantsList,
+        startDate: startDate && formatTimestamp(startDate),
+        endDate: endDate && formatTimestamp(endDate),
+        deliveryHour,
+        onQuotationDetail: () => setSelectedQuotation(quotationListing.getId()),
+      },
+    };
+  });
+};
+
+const getQuotationById = (quotations: TListing[], quotationId: string) => {
+  return quotations.find((quotation) => {
+    const quotationListing = Listing(quotation);
+
+    return quotationListing.getId() === quotationId;
+  });
+};
+const OrderQuotationTab: React.FC<OrderQuotationTabProps> = (props) => {
+  const {
+    order,
+    orderDetail,
+    updateOrderState,
+    updateOrderStateInProgress,
+    quotations,
+    quotationsPagination,
+    company,
+    booker,
+  } = props;
+  const dispatch = useAppDispatch();
+
+  const [selectedQuotation, setSelectedQuotation] = useState<any>(null);
+
+  const quotation = useMemo(
+    () => getQuotationById(quotations, selectedQuotation),
+    [quotations, selectedQuotation],
+  );
+
+  const dataTable = parseEntitiesToTableData({
+    order,
+    quotations,
+    orderDetail,
+    company,
+    booker,
+    setSelectedQuotation,
+  });
+
+  const handleUpdateOrderState = () => {
+    updateOrderState(EOrderStates.picking);
+  };
+  const handleGoBack = () => {
+    setSelectedQuotation(null);
+  };
+
+  useEffect(() => {
+    if (order?.id.uuid) {
+      dispatch(OrderDetailThunks.fetchQuotations(order?.id.uuid));
+    }
+  }, [dispatch, order?.id.uuid]);
+
+  const targetTabItems = [
+    {
+      key: 'client',
+      label: 'Báo giá khách hàng',
+      childrenFn: () => {
+        return (
+          <>
+            <OrderHeaderInfor
+              company={company}
+              booker={booker}
+              order={order}
+              updateStaffNameDisabled
+              containerClassName={css.orderHeaderInforContainer}
+            />
+            <OrderQuotationDetail
+              order={order}
+              orderDetail={orderDetail}
+              target="client"
+              quotation={quotation!}
+              company={company}
+              booker={booker}
+            />
+          </>
+        );
+      },
+    },
+    {
+      key: 'partner',
+      label: 'Báo giá đối tác',
+      childrenFn: () => {
+        return (
+          <>
+            <OrderHeaderInfor
+              company={company}
+              booker={booker}
+              order={order}
+              updateStaffNameDisabled
+              containerClassName={css.orderHeaderInforContainer}
+            />
+            <OrderQuotationDetail
+              quotation={quotation!}
+              orderDetail={orderDetail}
+              order={order}
+              target="partner"
+              company={company}
+              booker={booker}
+            />
+          </>
+        );
+      },
+    },
+  ];
+
+  return (
+    <div className={css.container}>
+      <OrderHeaderState
+        order={order}
+        handleUpdateOrderState={handleUpdateOrderState}
+        updateOrderStateInProgress={updateOrderStateInProgress}
+      />
+      <RenderWhen condition={!selectedQuotation}>
+        <div className={css.quotationWrapper}>
+          <Table
+            columns={TABLE_COLUMNS}
+            data={dataTable}
+            pagination={quotationsPagination}
+          />
+        </div>
+        <RenderWhen.False>
+          <div>
+            <div className={css.goBack} onClick={handleGoBack}>
+              <IconArrow direction="left" />
+              <span>Quay lại</span>
+            </div>
+            <div className={css.targetTabsWrapper}>
+              <Tabs items={targetTabItems as any} />
+            </div>
+          </div>
+        </RenderWhen.False>
+      </RenderWhen>
+    </div>
+  );
+};
+
+export default OrderQuotationTab;

@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
+import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
@@ -20,6 +21,10 @@ type TReviewCartSectionProps = {
   data: TObject;
   showStartPickingOrderButton: boolean;
   onClickDownloadPriceQuotation: () => void;
+  foodOrderGroupedByDate?: TObject[];
+  title?: string;
+  target: 'client' | 'partner';
+  isAdminLayout?: boolean;
 };
 
 const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
@@ -29,16 +34,23 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
       overflow = 0,
       promotion = 0,
       serviceFee = 0,
+      serviceFeePrice = 0,
       totalPrice = 0,
       totalWithoutVAT = 0,
       totalWithVAT = 0,
       // PITOPoints = 0,
       // transportFee = 0,
-      // VATFee = 0,
+      VATFee = 0,
+      PITOFee = 0,
     } = {},
     showStartPickingOrderButton,
     onClickDownloadPriceQuotation,
+    foodOrderGroupedByDate,
+    title,
+    target,
+    isAdminLayout = false,
   } = props;
+
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -51,12 +63,19 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     query: { orderId },
   } = router;
   const rootClasses = classNames(css.root, className);
+  const titleClasses = classNames(css.title, {
+    [css.adminTitle]: isAdminLayout,
+  });
   const { orderDetail } = Listing(planData as TListing).getMetadata();
   const isStartOrderDisabled = !isEnableToStartOrder(orderDetail);
+  const isPartner = target === 'partner';
 
   const handleStartPickingOrder = async () => {
     const { meta } = await dispatch(
-      orderManagementThunks.bookerStartOrder({ orderId: orderId as string }),
+      orderManagementThunks.bookerStartOrder({
+        orderId: orderId as string,
+        foodOrderGroupedByDate,
+      }),
     );
 
     if (meta.requestStatus !== 'rejected') {
@@ -69,8 +88,8 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
 
   return (
     <div className={rootClasses}>
-      <div className={css.title}>
-        {intl.formatMessage({ id: 'ReviewCardSection.title' })}
+      <div className={titleClasses}>
+        {title || intl.formatMessage({ id: 'ReviewCardSection.title' })}
       </div>
 
       <div className={css.feeContainer}>
@@ -84,30 +103,39 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
             </div>
           </div>
         </div>
+        {isPartner && (
+          <div className={css.feeItem}>
+            <div className={css.feeItemContainer}>
+              <div className={css.label}>
+                {intl.formatMessage({ id: 'ReviewCardSection.serviceFee' })}
+                <Badge label={`${serviceFee}%`} className={css.VATBadge} />
+              </div>
+              <div className={css.fee}>
+                {parseThousandNumber(serviceFeePrice.toString())}đ
+              </div>
+            </div>
+          </div>
+        )}
+        {!isPartner && (
+          <div className={css.feeItem}>
+            <div className={css.feeItemContainer}>
+              <div className={css.label}>
+                {intl.formatMessage({ id: 'ReviewCardSection.PITOFee' })}
+              </div>
+              <div className={css.fee}>
+                {parseThousandNumber(PITOFee.toString())}đ
+              </div>
+            </div>
+          </div>
+        )}
         <div className={css.feeItem}>
           <div className={css.feeItemContainer}>
             <div className={css.label}>
-              {intl.formatMessage({ id: 'ReviewCardSection.serviceFee' })}
-            </div>
-            <div className={css.fee}>
-              {parseThousandNumber(serviceFee.toString())}đ
-            </div>
-          </div>
-        </div>
-        {/* <div className={css.feeItem}>
-          <div className={css.feeItemContainer}>
-            <div className={css.label}>
-              {intl.formatMessage({ id: 'ReviewCardSection.transportFee' })}
-            </div>
-            <div className={css.fee}>
-              {parseThousandNumber(transportFee.toString())}đ
-            </div>
-          </div>
-        </div> */}
-        <div className={css.feeItem}>
-          <div className={css.feeItemContainer}>
-            <div className={css.label}>
-              {intl.formatMessage({ id: 'ReviewCardSection.promotion' })}
+              {intl.formatMessage({
+                id: isAdminLayout
+                  ? 'ReviewCardSection.adminPromotion'
+                  : 'ReviewCardSection.promotion',
+              })}
             </div>
             <div className={css.fee}>
               {parseThousandNumber(promotion.toString())}đ
@@ -125,7 +153,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
             </div>
           </div>
         </div>
-        {/* <div className={css.feeItem}>
+        <div className={css.feeItem}>
           <div
             className={classNames(css.feeItemContainer, css.VATItemContainer)}>
             <div className={css.label}>
@@ -136,7 +164,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
               {parseThousandNumber(VATFee.toString())}đ
             </div>
           </div>
-        </div> */}
+        </div>
         <div className={css.feeItem}>
           <div className={css.totalWithVATLabel}>
             {intl.formatMessage({ id: 'ReviewCardSection.totalWithVAT' })}
