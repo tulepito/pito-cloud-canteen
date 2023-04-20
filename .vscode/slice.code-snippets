@@ -1,7 +1,5 @@
 {
   "Add case snippet": {
-    "prefix": "addCase",
-    "scope": "typescript",
     "body": [
       "      /* =============== ${1:} =============== */",
       "      .addCase(${1:}.pending, (state) => {",
@@ -14,22 +12,37 @@
       "        return state;",
       "      })"
     ],
-    "description": "Add case snippet"
+    "description": "Add case snippet",
+    "prefix": "addCase",
+    "scope": "typescript"
   },
   "RTK slice snippet": {
-    "scope": "typescript",
-    "prefix": "slice",
     "body": [
       "import { createSlice } from '@reduxjs/toolkit';",
       "",
+      "import { createAsyncThunk } from '@redux/redux.helper';",
+      "",
       "// ================ Initial states ================ //",
-      "type T${TM_FILENAME_BASE/(^[a-z])/${1:/upcase}/}State = {};",
-      "const initialState: T${TM_FILENAME_BASE/(^[a-z])/${1:/upcase}/}State = {};",
+      "type T${1:${TM_FILENAME_BASE/(^[a-z])/${1:/upcase}/}}State = {};",
+      "const initialState: T${1:${TM_FILENAME_BASE/(^[a-z])/${1:/upcase}/}}State = {};",
       "",
       "// ================ Thunk types ================ //",
       "",
       "// ================ Async thunks ================ //",
-      "export const ${1:$TM_FILENAME_BASE}Thunks = {};",
+      "const demoPriceQuotationThunk = createAsyncThunk(",
+      "  'ACTION TYPE',",
+      "  async (_, { fulfillWithValue, rejectWithValue }) => {",
+      "    try {",
+      "      return fulfillWithValue(null);",
+      "    } catch (error) {",
+      "      return rejectWithValue(error);",
+      "    }",
+      "  },",
+      ");",
+      "",
+      "export const ${1:$TM_FILENAME_BASE}Thunks = {",
+      "  demo${1:$TM_FILENAME_BASE}Thunk,",
+      "};",
       "",
       "// ================ Slice ================ //",
       "const ${1:$TM_FILENAME_BASE}Slice = createSlice({",
@@ -46,6 +59,26 @@
       "// ================ Selectors ================ //",
       ""
     ],
-    "description": "Redux toolkit slice snippet"
+    "description": "Redux toolkit slice snippet",
+    "prefix": "slice",
+    "scope": "typescript"
+  },
+  "RTK thunks snippet": {
+    "body": [
+      "const demoPriceQuotationThunk = createAsyncThunk(",
+      "  'ACTION TYPE',",
+      "  async (_, { fulfillWithValue, rejectWithValue }) => {",
+      "    try {",
+      "      return fulfillWithValue(null);",
+      "    } catch (error) {",
+      "      return rejectWithValue(error);",
+      "    }",
+      "  },",
+      ");",
+      "",
+    ],
+    "description": "Redux toolkit thunk snippet",
+    "prefix": "thunk",
+    "scope": "typescript"
   }
 }
