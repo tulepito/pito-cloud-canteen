@@ -13,6 +13,7 @@ export { default as OrderManagement } from './OrderManagement.slice';
 export { default as ParticipantOrderManagementPage } from './ParticipantOrderManagementPage.slice';
 export { default as partners } from './partners.slice';
 export { default as password } from './password.slice';
+export { default as priceQuotation } from './priceQuotation.slice';
 export { default as Quiz } from './Quiz.slice';
 export { default as RestaurantSearch } from './RestaurantSearch.slice';
 export { default as SelectRestaurantPage } from './SelectRestaurantPage.slice';
