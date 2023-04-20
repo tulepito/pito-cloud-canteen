@@ -40,9 +40,11 @@ export const IgnoredPermissionCheckRoutes = [
   generalPaths.SignUp,
   generalPaths.RecoveryPassword,
   generalPaths.StyleGuide,
+  generalPaths.ResetPassword,
   enGeneralPaths.SignIn,
   enGeneralPaths.SignUp,
   enGeneralPaths.RecoveryPassword,
+  enGeneralPaths.ResetPassword,
 ];
 
 export const adminPaths = {
