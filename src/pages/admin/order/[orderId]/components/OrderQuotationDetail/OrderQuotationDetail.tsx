@@ -1,13 +1,14 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo, useState } from 'react';
 
 import ReviewCartSection from '@components/OrderDetails/ReviewView/ReviewCartSection/ReviewCartSection';
 import ReviewOrderDetailsSection from '@components/OrderDetails/ReviewView/ReviewOrderDetailsSection/ReviewOrderDetailsSection';
 import Tabs from '@components/Tabs/Tabs';
+import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import {
   calculatePriceQuotationInfo,
   calculatePriceQuotationPartner,
 } from '@pages/company/orders/[orderId]/picking/helpers/cartInfoHelper';
-import { downloadPriceQuotation } from '@pages/company/orders/[orderId]/picking/helpers/downloadPriceQuotation';
 import { groupFoodOrderByDate } from '@pages/company/orders/[orderId]/picking/helpers/orderDetailHelper';
 import { Listing } from '@src/utils/data';
 import type { TListing, TObject, TUser } from '@src/utils/types';
@@ -80,8 +81,8 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     [isPartner, quotationDetail],
   );
 
-  const onDownloadPriceQuotation = async () => {
-    const priceQuotationData = isPartner
+  const priceQuotationData = useMemo(() => {
+    return isPartner
       ? formatPriceQuotationDataPartner({
           order,
           booker,
@@ -97,12 +98,21 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           booker,
           priceQuotation,
         });
+  }, [
+    currentPartnerId,
+    JSON.stringify(order),
+    JSON.stringify(booker),
+    JSON.stringify(company),
+    JSON.stringify(priceQuotation),
+    JSON.stringify(quotationDetail),
+    JSON.stringify(company),
+    JSON.stringify(orderDetail),
+  ]);
 
-    await downloadPriceQuotation(
-      Listing(order).getAttributes().title,
-      priceQuotationData as any,
-    )();
-  };
+  const handleDownloadPriceQuotation = useDownloadPriceQuotation(
+    Listing(order).getAttributes().title,
+    priceQuotationData as any,
+  );
 
   return (
     <div className={css.container}>
@@ -124,7 +134,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
       <div className={css.rightCol}>
         <ReviewCartSection
           data={priceQuotation}
-          onClickDownloadPriceQuotation={onDownloadPriceQuotation}
+          onClickDownloadPriceQuotation={handleDownloadPriceQuotation}
           showStartPickingOrderButton={false}
           title="Thực đơn phục vụ"
           target={target}

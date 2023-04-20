@@ -54,6 +54,9 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const isDownloadingPriceQuotation = useAppSelector(
+    (state) => state.priceQuotation.isDownloading,
+  );
   const isStartOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.isStartOrderInProgress,
   );
@@ -66,6 +69,10 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   const titleClasses = classNames(css.title, {
     [css.adminTitle]: isAdminLayout,
   });
+  const downloadPriceQuotationClasses = classNames(css.downloadPriceQuotation, {
+    [css.downloadingPriceQuotation]: isDownloadingPriceQuotation,
+  });
+
   const { orderDetail } = Listing(planData as TListing).getMetadata();
   const isStartOrderDisabled = !isEnableToStartOrder(orderDetail);
   const isPartner = target === 'partner';
@@ -184,13 +191,15 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
         </div>
       </div>
 
-      <div
-        className={css.downloadPriceQuotation}
+      <Button
+        variant="inline"
+        className={downloadPriceQuotationClasses}
+        disabled={isDownloadingPriceQuotation}
         onClick={onClickDownloadPriceQuotation}>
         {intl.formatMessage({
           id: 'ReviewCardSection.downloadPriceQuotation',
         })}
-      </div>
+      </Button>
 
       {showStartPickingOrderButton && (
         <Button

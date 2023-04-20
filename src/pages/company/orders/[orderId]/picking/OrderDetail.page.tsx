@@ -15,13 +15,13 @@ import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { companyPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 import { EOrderDraftStates, EOrderStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
 
-import { downloadPriceQuotation } from './helpers/downloadPriceQuotation';
 import { usePrepareOrderDetailPageData } from './hooks/usePrepareData';
 
 import css from './OrderDetail.module.scss';
@@ -57,6 +57,10 @@ const OrderDetailPage = () => {
     priceQuotationData,
     setReviewInfoValues,
   } = usePrepareOrderDetailPageData();
+  const handleDownloadPriceQuotation = useDownloadPriceQuotation(
+    orderTitle,
+    priceQuotationData,
+  );
 
   const { orderState } = Listing(orderData as TListing).getMetadata();
 
@@ -137,10 +141,7 @@ const OrderDetailPage = () => {
       canGoBackEditMode
       reviewViewData={reviewViewData}
       onSubmitEdit={handleSubmitReviewInfoForm}
-      onDownloadPriceQuotation={downloadPriceQuotation(
-        orderTitle,
-        priceQuotationData,
-      )}
+      onDownloadPriceQuotation={handleDownloadPriceQuotation}
       onGoBackToEditOrderPage={handleGoBackFromReviewMode}
       showStartPickingOrderButton
     />

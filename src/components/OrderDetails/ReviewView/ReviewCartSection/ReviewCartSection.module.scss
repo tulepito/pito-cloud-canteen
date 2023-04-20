@@ -95,10 +95,22 @@
 
   .downloadPriceQuotation {
     cursor: pointer;
+    display: block;
     margin-top: 20px;
+    padding: 0;
+    width: 100%;
+    min-height: unset;
     text-align: right;
     color: $labelBlue2;
     @include textTemplate(14px, 700, 24px);
+
+    &:hover {
+      background-color: transparent;
+    }
+
+    &.downloadingPriceQuotation {
+      cursor: not-allowed;
+    }
   }
 
   .makePaymentButton {

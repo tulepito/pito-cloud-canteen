@@ -1,6 +1,6 @@
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
+import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 
-import { downloadPriceQuotation } from '../picking/helpers/downloadPriceQuotation';
 import { usePrepareOrderDetailPageData } from '../picking/hooks/usePrepareData';
 
 import TitleSection from './TitleSection';
@@ -18,6 +18,11 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
     goToReviewPage,
   } = usePrepareOrderDetailPageData();
 
+  const handleDownloadPriceQuotation = useDownloadPriceQuotation(
+    orderTitle,
+    priceQuotationData,
+  );
+
   return (
     <div className={css.root}>
       <TitleSection
@@ -28,10 +33,7 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
       />
       <ReviewView
         className={css.reviewInfoContainer}
-        onDownloadPriceQuotation={downloadPriceQuotation(
-          orderTitle,
-          priceQuotationData,
-        )}
+        onDownloadPriceQuotation={handleDownloadPriceQuotation}
         canEditInfo={false}
         reviewViewData={reviewViewData}
       />
