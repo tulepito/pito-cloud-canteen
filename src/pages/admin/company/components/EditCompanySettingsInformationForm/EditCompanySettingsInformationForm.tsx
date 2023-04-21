@@ -215,8 +215,9 @@ const EditCompanySettingsInformationFormComponent: React.FC<
     const group = companyGroups.find(
       (group: TCompanyGroup) => group.id === selectedGroupId,
     );
+
     const members = companyMembers?.filter((member) =>
-      member.groups.includes(selectedGroupId as string),
+      (member.groups || []).includes(selectedGroupId as string),
     );
 
     return {
