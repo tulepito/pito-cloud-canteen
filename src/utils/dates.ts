@@ -436,3 +436,16 @@ export const timeAgo = (date: Date) => {
 export const minusDays = (date: Date, days: number) => {
   return DateTime.fromJSDate(date).minus({ days }).toJSDate();
 };
+
+export const calculateRemainTime = (futureTimestamp: number) => {
+  const futureTime = DateTime.fromMillis(futureTimestamp);
+
+  // Get the current time as a DateTime object
+  const currentTime = DateTime.local();
+
+  // Calculate the remaining time as a Duration object
+  const remainingTime = currentTime.diff(futureTime);
+
+  // Format the remaining time as a string
+  return remainingTime.toFormat('hh:mm:ss');
+};
