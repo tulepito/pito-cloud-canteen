@@ -30,7 +30,7 @@
       "",
       "// ================ Async thunks ================ //",
       "const demoPriceQuotationThunk = createAsyncThunk(",
-      "  'ACTION TYPE',",
+      "  'ACTION_TYPE',",
       "  async (_, { fulfillWithValue, rejectWithValue }) => {",
       "    try {",
       "      return fulfillWithValue(null);",
@@ -65,8 +65,8 @@
   },
   "RTK thunks snippet": {
     "body": [
-      "const demoPriceQuotationThunk = createAsyncThunk(",
-      "  'ACTION TYPE',",
+      "const ${1:} = createAsyncThunk(",
+      "  'ACTION_TYPE',",
       "  async (_, { fulfillWithValue, rejectWithValue }) => {",
       "    try {",
       "      return fulfillWithValue(null);",
