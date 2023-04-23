@@ -1,11 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { fetchUserApi } from '@apis/index';
-import { adminUpdateOrderStateApi, updateOrderApi } from '@apis/orderApi';
+import { transitPlanApi } from '@apis/admin';
+import {
+  adminUpdateOrderStateApi,
+  getBookerOrderDataApi,
+  updateOrderApi,
+} from '@apis/orderApi';
 import { getOrderQuotationsQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities, Listing } from '@src/utils/data';
-import type { TListing, TPagination, TUser } from '@src/utils/types';
+import type {
+  TListing,
+  TObject,
+  TPagination,
+  TTransaction,
+  TUser,
+} from '@src/utils/types';
 
 // ================ Initial states ================ //
 type TOrderDetailState = {
@@ -13,8 +23,16 @@ type TOrderDetailState = {
   orderDetail: any;
   company: TUser;
   booker: TUser;
+  participantData: Array<TUser>;
+  anonymousParticipantData: Array<TUser>;
+  transactionDataMap: {
+    [date: number]: TTransaction;
+  };
   fetchOrderInProgress: boolean;
   fetchOrderError: any;
+
+  transitInProgress: boolean;
+  transitError: any;
 
   updateOrderStaffNameInProgress: boolean;
   updateOrderStaffNameError: any;
@@ -32,8 +50,14 @@ const initialState: TOrderDetailState = {
   orderDetail: {},
   company: null!,
   booker: null!,
+  participantData: [],
+  anonymousParticipantData: [],
+  transactionDataMap: {},
   fetchOrderInProgress: false,
   fetchOrderError: null,
+
+  transitInProgress: false,
+  transitError: null,
 
   updateOrderStaffNameInProgress: false,
   updateOrderStaffNameError: null,
@@ -54,40 +78,30 @@ const UPDATE_ORDER_STATE = 'app/OrderDetail/UPDATE_ORDER_STATE';
 const FETCH_QUOTATIONS = 'app/OrderDetail/FETCH_QUOTATIONS';
 
 // ================ Async thunks ================ //
-const fetchOrder = createAsyncThunk(
-  FETCH_ORDER,
-  async (orderId: string, { extra: sdk }) => {
-    const response = denormalisedResponseEntities(
-      await sdk.listings.show({
-        id: orderId,
-      }),
-    )[0];
+const fetchOrder = createAsyncThunk(FETCH_ORDER, async (orderId: string) => {
+  const response = await getBookerOrderDataApi(orderId);
 
-    const { plans = [], companyId, bookerId } = Listing(response).getMetadata();
-    const planId = plans[0];
+  const {
+    bookerData: booker,
+    companyData: company,
+    planListing,
+    transactionDataMap,
+    orderListing: order,
+    participantData,
+    anonymousParticipantData,
+  } = response?.data || {};
+  const { orderDetail } = Listing(planListing).getMetadata();
 
-    const companyResponse = denormalisedResponseEntities(
-      await sdk.users.show({
-        id: companyId,
-      }),
-    )[0];
-
-    const { data: bookerResponse } = await fetchUserApi(bookerId);
-
-    const planResponse = denormalisedResponseEntities(
-      await sdk.listings.show({
-        id: planId,
-      }),
-    )[0];
-
-    return {
-      order: response,
-      orderDetail: Listing(planResponse).getMetadata().orderDetail,
-      company: companyResponse,
-      booker: bookerResponse,
-    };
-  },
-);
+  return {
+    order,
+    orderDetail,
+    company,
+    booker,
+    transactionDataMap,
+    participantData,
+    anonymousParticipantData,
+  };
+});
 
 const updateStaffName = createAsyncThunk(
   UPDATE_STAFF_NAME,
@@ -117,6 +131,29 @@ const updateOrderState = createAsyncThunk(
   },
 );
 
+const transit = createAsyncThunk(
+  'app/OrderDetail/TRANSIT',
+  async (
+    { transactionId, transition }: TObject,
+    { dispatch, getState, rejectWithValue },
+  ) => {
+    try {
+      await transitPlanApi({
+        transactionId,
+        transition,
+      });
+
+      const orderId = Listing(getState().OrderDetail.order).getId();
+
+      if (orderId) {
+        await dispatch(fetchOrder(orderId));
+      }
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
 const fetchQuotations = createAsyncThunk(
   FETCH_QUOTATIONS,
   async (orderId: string, { extra: sdk }) => {
@@ -138,6 +175,7 @@ export const OrderDetailThunks = {
   updateStaffName,
   updateOrderState,
   fetchQuotations,
+  transit,
 };
 
 // ================ Slice ================ //
@@ -155,10 +193,7 @@ const OrderDetailSlice = createSlice({
       .addCase(fetchOrder.fulfilled, (state, { payload }) => ({
         ...state,
         fetchOrderInProgress: false,
-        order: payload.order,
-        orderDetail: payload.orderDetail,
-        company: payload.company,
-        booker: payload.booker,
+        ...payload,
       }))
       .addCase(fetchOrder.rejected, (state, { error }) => ({
         ...state,
@@ -213,7 +248,19 @@ const OrderDetailSlice = createSlice({
         ...state,
         fetchQuotationsInProgress: false,
         fetchQuotationsError: error.message,
-      }));
+      }))
+      /* =============== transit =============== */
+      .addCase(transit.pending, (state) => {
+        state.transitInProgress = true;
+        state.transitError = null;
+      })
+      .addCase(transit.fulfilled, (state) => {
+        state.transitInProgress = false;
+      })
+      .addCase(transit.rejected, (state, { error }) => {
+        state.transitInProgress = false;
+        state.transitError = error.message;
+      });
   },
 });
 
