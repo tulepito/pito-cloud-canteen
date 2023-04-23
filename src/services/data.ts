@@ -1,5 +1,23 @@
 const reduce = require('lodash/reduce');
 
+export const ensureTransaction = (
+  transaction: any,
+  booking = null,
+  listing = null,
+  provider = null,
+) => {
+  const empty = {
+    id: null,
+    type: 'transaction',
+    attributes: {},
+    booking,
+    listing,
+    provider,
+  };
+
+  return { ...empty, ...transaction };
+};
+
 const combinedRelationships = (oldRels: any, newRels: any) => {
   if (!oldRels && !newRels) {
     // Special case to avoid adding an empty relationships object when
