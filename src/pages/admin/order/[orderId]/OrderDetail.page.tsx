@@ -2,6 +2,7 @@ import React, { useCallback, useEffect } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
+import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { EOrderDetailTabs } from '@src/utils/enums';
@@ -33,6 +34,10 @@ const OrderDetailPage = () => {
   const booker = useAppSelector(
     (state) => state.OrderDetail.booker,
     shallowEqual,
+  );
+
+  const transactionDataMap = useAppSelector(
+    (state) => state.OrderDetail.transactionDataMap,
   );
 
   const fetchOrderInProgress = useAppSelector(
@@ -81,13 +86,14 @@ const OrderDetailPage = () => {
       }),
     );
   };
+
   const tabItems = [
     {
       key: EOrderDetailTabs.ORDER_DETAIL,
       label: 'Chi tiết đơn hàng',
       childrenFn: (childProps: any) =>
         fetchOrderInProgress ? (
-          <div className={css.loading}>Đang tải dữ liệu...</div>
+          <LoadingContainer loadingText="Đang tải dữ liệu..." />
         ) : (
           <OrderDetailTab {...childProps} />
         ),
@@ -96,6 +102,7 @@ const OrderDetailPage = () => {
         order,
         company,
         booker,
+        transactionDataMap,
         updateStaffName,
         updateOrderStaffNameInProgress,
         updateOrderState,

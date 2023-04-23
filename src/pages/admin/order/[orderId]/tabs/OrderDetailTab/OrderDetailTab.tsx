@@ -1,11 +1,13 @@
 import { useMemo } from 'react';
 
+import ReviewOrderStatesSection from '@components/OrderDetails/ReviewView/ReviewOrderStatesSection/ReviewOrderStatesSection';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderStates } from '@src/utils/enums';
-import type { TListing, TUser } from '@src/utils/types';
+import type { TListing, TTransaction, TUser } from '@src/utils/types';
 
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
@@ -17,6 +19,9 @@ type OrderDetailTabProps = {
   orderDetail: any;
   company: TUser;
   booker: TUser;
+  transactionDataMap: {
+    [date: string]: TTransaction;
+  };
   updateStaffName: (staffName: string) => void;
   updateOrderStaffNameInProgress: boolean;
   updateOrderState: (newOrderState: string) => void;
@@ -33,8 +38,14 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     updateOrderStaffNameInProgress,
     updateOrderState,
     updateOrderStateInProgress,
+    transactionDataMap,
   } = props;
-  const { notes } = Listing(order).getMetadata();
+
+  const { notes, orderStateHistory } = Listing(order).getMetadata();
+  const showStateSectionCondition =
+    orderStateHistory.findIndex(({ state }: { state: EOrderStates }) => {
+      return state === EOrderStates.inProgress;
+    }) > 0;
 
   const tabItems = useMemo(
     () =>
@@ -46,7 +57,8 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
           childrenProps: { ...orderDetail[key], notes },
         };
       }),
-    [orderDetail],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(order), JSON.stringify(orderDetail)],
   );
 
   const handleUpdateOrderState = () => {
@@ -65,6 +77,12 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
         updateOrderStateInProgress={updateOrderStateInProgress}
         handleCancelOrder={handleCancelOrder}
       />
+      <RenderWhen condition={showStateSectionCondition}>
+        <ReviewOrderStatesSection
+          data={{ transactionDataMap, isCanceledOrder: false }}
+          isAdminLayout
+        />
+      </RenderWhen>
       <OrderHeaderInfor
         company={company}
         booker={booker}
