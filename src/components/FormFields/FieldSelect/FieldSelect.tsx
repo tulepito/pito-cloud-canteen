@@ -18,7 +18,7 @@ type TFieldSelect = PropsWithChildren<
       selectClassName?: string;
       input: any;
       meta: any;
-      onChange?: () => void;
+      onChange?: (value: any) => void;
       leftIcon?: React.ReactElement<TIconProps>;
     }
 >;

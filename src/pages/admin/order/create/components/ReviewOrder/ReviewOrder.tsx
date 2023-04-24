@@ -91,7 +91,7 @@ type TFormDeliveryInfoValues = {
 };
 
 export const ReviewContent: React.FC<any> = (props) => {
-  const { restaurant, notes, deliveryManInfo = {} } = props;
+  const { restaurant, notes, deliveryManInfo = {}, updatePlanDetail } = props;
   const { key: deliveryManKey, phoneNumber: deliveryManPhoneNumber } =
     deliveryManInfo;
   const intl = useIntl();
@@ -126,7 +126,6 @@ export const ReviewContent: React.FC<any> = (props) => {
     },
   });
   const deliveryMan = useField('deliveryMan', form);
-  const deliveryManInfoValue = deliveryMan.input.value;
 
   const {
     participants = [],
@@ -147,12 +146,17 @@ export const ReviewContent: React.FC<any> = (props) => {
     };
   }) as any;
 
-  useEffect(() => {
+  const handleFieldDeliveryManChange = (value: string) => {
     const currDeliveryInfoOption = deliveryManOptions.find(
-      ({ key }) => key === deliveryManInfoValue,
+      ({ key }) => key === value,
     );
+
+    updatePlanDetail({
+      deliveryManInfo: currDeliveryInfoOption,
+    });
+
     setCurrDeliveryManPhoneNumber(currDeliveryInfoOption?.phoneNumber);
-  }, [JSON.stringify(deliveryManInfoValue)]);
+  };
 
   return (
     <div>
@@ -183,7 +187,8 @@ export const ReviewContent: React.FC<any> = (props) => {
                 name="deliveryMan"
                 className={css.selectBoxContent}
                 meta={deliveryMan.meta}
-                input={deliveryMan.input}>
+                input={deliveryMan.input}
+                onChange={handleFieldDeliveryManChange}>
                 {deliveryManOptions.map(({ key, name }) => (
                   <option key={key} value={key}>
                     {name}
