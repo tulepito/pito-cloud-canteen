@@ -5,6 +5,7 @@ import {
   adminUpdateOrderStateApi,
   getBookerOrderDataApi,
   updateOrderApi,
+  updatePlanDetailsApi,
 } from '@apis/orderApi';
 import { getOrderQuotationsQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
@@ -170,12 +171,36 @@ const fetchQuotations = createAsyncThunk(
   },
 );
 
+const updatePlanDetail = createAsyncThunk(
+  'app/OrderDetail/UPDATE_PLAN_DETAIL',
+  async (
+    { orderId, planId, orderDetail }: TObject,
+    { dispatch, fulfillWithValue, rejectWithValue },
+  ) => {
+    try {
+      await updatePlanDetailsApi(orderId, {
+        orderDetail,
+        planId,
+      });
+
+      if (orderId) {
+        await dispatch(fetchOrder(orderId));
+      }
+
+      return fulfillWithValue(null);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
 export const OrderDetailThunks = {
   fetchOrder,
   updateStaffName,
   updateOrderState,
   fetchQuotations,
   transit,
+  updatePlanDetail,
 };
 
 // ================ Slice ================ //
