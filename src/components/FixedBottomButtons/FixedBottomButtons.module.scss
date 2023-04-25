@@ -1,0 +1,14 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.fixedBottomWrapper {
+  position: fixed;
+  bottom: 16px;
+  left: 0;
+  width: 100%;
+
+  @include viewportMedium {
+    display: none;
+  }
+}
