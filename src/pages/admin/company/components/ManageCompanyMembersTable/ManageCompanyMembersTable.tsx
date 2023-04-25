@@ -204,7 +204,7 @@ const parseEntitiesToTableData = ({
 }) => {
   return companyMembers.map((companyMember) => {
     const groups = companyGroups.filter((group: TCompanyGroup) =>
-      companyMember.groups.includes(group.id),
+      (companyMember.groups || []).includes(group.id),
     );
     const hasAttributes = companyMember?.attributes;
 

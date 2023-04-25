@@ -39,14 +39,16 @@ const createQuotation = async (params: TCreateQuotationApiBody) => {
     { expand: true },
   );
 
+  const quotation = denormalisedResponseEntities(quotationResponse)[0];
+
   await integrationSdk.listings.update({
     id: orderId,
     metadata: {
-      quotationId,
+      quotationId: quotation.id.uuid,
     },
   });
 
-  return denormalisedResponseEntities(quotationResponse)[0];
+  return quotation;
 };
 
 export default createQuotation;

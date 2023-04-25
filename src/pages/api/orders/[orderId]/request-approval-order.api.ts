@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import { denormalisedResponseEntities } from '@services/data';
+import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
@@ -60,6 +61,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               },
               { expand: true },
             ),
+          );
+          await emailSendingFactory(
+            EmailTemplateTypes.BOOKER.BOOKER_ORDER_CREATED,
+            { orderId },
           );
 
           res.status(200).json(updatedOrderListing);

@@ -1,5 +1,11 @@
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
+
 import GroupMemberDetailPage from './GroupMemberDetail.page';
 
 export default function GroupMemberDetailPageRoute() {
-  return <GroupMemberDetailPage />;
+  return (
+    <MetaWrapper>
+      <GroupMemberDetailPage />
+    </MetaWrapper>
+  );
 }

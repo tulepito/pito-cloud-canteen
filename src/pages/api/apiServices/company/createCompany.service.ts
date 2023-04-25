@@ -2,8 +2,10 @@ import CryptoJS from 'crypto-js';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { denormalisedResponseEntities } from '@services/data';
+import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { getIntegrationSdk, getSdk } from '@services/sdk';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
+import { User } from '@src/utils/data';
 import { ECompanyStates } from '@src/utils/enums';
 import type { TCreateCompanyApiParams, TObject } from '@src/utils/types';
 
@@ -80,11 +82,15 @@ const createCompany = async ({
   const integrationSdk = getIntegrationSdk();
   const createDataParams = normalizeCreateCompanyParams(dataParams);
   // Create company account
-  const companyResponse = await sdk.currentUser.create(createDataParams);
+  const companyResponse = await sdk.currentUser.create(createDataParams, {
+    expand: true,
+  });
 
   const [companyAccount] = denormalisedResponseEntities(companyResponse);
+  const companyEmail = User(companyAccount).getAttributes().email;
+
   // Create sub master account
-  const splittedEmail = dataParams.email.split('@');
+  const splittedEmail = companyEmail.split('@');
   const subResponse = await sdk.currentUser.create({
     firstName: `Sub account for ${companyAccount.id.uuid}`,
     lastName: ' ',
@@ -95,9 +101,9 @@ const createCompany = async ({
   const [subAccount] = denormalisedResponseEntities(subResponse);
 
   const members = {
-    [dataParams.email]: {
+    [companyEmail]: {
       id: companyAccount.id.uuid,
-      email: dataParams.email,
+      email: companyEmail,
       permission: UserPermission.OWNER,
       groups: [],
       inviteStatus: UserInviteStatus.ACCEPTED,
@@ -134,6 +140,10 @@ const createCompany = async ({
     privateData: {
       accountPassword: encryptedPassword,
     },
+  });
+
+  await emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ACCOUNT_CREATED, {
+    password: dataParams.password,
   });
 
   return masterAccountAfterUpdateResponse;

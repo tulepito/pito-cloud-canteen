@@ -1,4 +1,5 @@
 import { denormalisedResponseEntities } from '@services/data';
+import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { Listing } from '@utils/data';
 import { EOrderStates } from '@utils/enums';
@@ -35,4 +36,8 @@ export const startOrder = async (orderId: string) => {
     },
     { expand: true },
   );
+
+  await emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ORDER_SUCCESS, {
+    orderId,
+  });
 };
