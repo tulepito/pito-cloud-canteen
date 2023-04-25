@@ -144,6 +144,7 @@ const createCompany = async ({
 
   await emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ACCOUNT_CREATED, {
     password: dataParams.password,
+    companyId: companyAccount.id.uuid,
   });
 
   return masterAccountAfterUpdateResponse;
