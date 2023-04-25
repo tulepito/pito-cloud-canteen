@@ -6,10 +6,15 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
+import FixedBottomButtons from '@components/FixedBottomButtons/FixedBottomButtons';
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconLock from '@components/Icons/IconLock/IconLock';
+import IconMail from '@components/Icons/IconMail/IconMail';
+import IconPhone2 from '@components/Icons/IconPhone2/IconPhone2';
+import IconUser2 from '@components/Icons/IconUser2/IconUser2';
 import { generalPaths } from '@src/paths';
 import type { TDefaultProps } from '@utils/types';
 import {
@@ -66,17 +71,34 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
   const namePlaceholder = intl.formatMessage({
     id: 'SignUpForm.name.placeholder',
   });
+  const nameLabel = intl.formatMessage({
+    id: 'SignUpForm.name.label',
+  });
   const emailPlaceholder = intl.formatMessage({
     id: 'SignUpForm.email.placeholder',
+  });
+  const emailLabel = intl.formatMessage({
+    id: 'SignUpForm.email.label',
   });
   const passwordPlaceholder = intl.formatMessage({
     id: 'SignUpForm.password.placeholder',
   });
+  const passwordLabel = intl.formatMessage({
+    id: 'SignUpForm.password.label',
+  });
+
   const confirmPasswordPlaceholder = intl.formatMessage({
     id: 'SignUpForm.confirmPassword.placeholder',
   });
+  const confirmPasswordLabel = intl.formatMessage({
+    id: 'SignUpForm.confirmPassword.label',
+  });
+
   const phoneNumberPlaceholder = intl.formatMessage({
     id: 'SignUpForm.phoneNumber.placeholder',
+  });
+  const phoneNumberLabel = intl.formatMessage({
+    id: 'SignUpForm.phoneNumber.label',
   });
 
   const privacyPolicyPartA = intl.formatMessage({
@@ -132,13 +154,23 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
   return (
     <Form className={classes} onSubmit={handleSubmit}>
       <div className={css.formContainer}>
-        <h2 className={css.formTitle}>{formTitle}</h2>
-
+        <div className={css.formTitle}>{formTitle}</div>
+        <div className={css.haveAccountContainer}>
+          <div>
+            {haveAnAccountText}{' '}
+            <span className={css.toSignIn} onClick={navigateToSignInPage}>
+              {' '}
+              {toSignIn}
+            </span>
+          </div>
+        </div>
         <FieldTextInput
           id={formId ? `${formId}.name` : 'name'}
           name="name"
           placeholder={namePlaceholder}
           validate={nameValidators}
+          label={nameLabel}
+          leftIcon={<IconUser2 />}
         />
 
         <FieldTextInput
@@ -146,6 +178,8 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
           name="email"
           placeholder={emailPlaceholder}
           validate={emailValidators}
+          label={emailLabel}
+          leftIcon={<IconMail />}
         />
 
         <FieldPasswordInput
@@ -153,6 +187,8 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
           name="password"
           placeholder={passwordPlaceholder}
           validate={passwordValidators}
+          label={passwordLabel}
+          leftIcon={<IconLock />}
         />
 
         <FieldPasswordInput
@@ -160,6 +196,8 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
           name="confirmPassword"
           placeholder={confirmPasswordPlaceholder}
           validate={confirmPasswordValidators}
+          label={confirmPasswordLabel}
+          leftIcon={<IconLock />}
         />
 
         <FieldTextInput
@@ -167,36 +205,43 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
           name="phoneNumber"
           placeholder={phoneNumberPlaceholder}
           validate={phoneNumberValidators}
+          label={phoneNumberLabel}
+          leftIcon={<IconPhone2 />}
         />
 
         <FieldCheckbox
           id={formId ? `${formId}.privacyAndPolicy` : 'privacyAndPolicy'}
           name="privacyAndPolicy"
           label={
-            <div>
+            <div className={css.policyText}>
               {privacyPolicyPartA}
               <u className={css.privacyPolicyText}>{privacyPolicyPartB}</u>
             </div>
           }
         />
 
-        {errorMessage && <div className={css.errorSignUp}>{errorMessage}</div>}
-        <Button
-          inProgress={inProgress}
-          className={css.submitButton}
-          type="submit"
-          disabled={submitDisable}>
-          {submitButtonText}
-        </Button>
-      </div>
-      <div className={css.haveAccountContainer}>
-        <div>
-          {haveAnAccountText}{' '}
-          <span className={css.toSignIn} onClick={navigateToSignInPage}>
-            {' '}
-            {toSignIn}
-          </span>
+        <div className={css.desktopView}>
+          <Button
+            inProgress={inProgress}
+            className={css.submitButton}
+            type="submit"
+            disabled={submitDisable}>
+            {submitButtonText}
+          </Button>
         </div>
+
+        {errorMessage && <div className={css.errorSignUp}>{errorMessage}</div>}
+        <FixedBottomButtons
+          FirstButton={
+            <Button
+              inProgress={inProgress}
+              className={css.submitButton}
+              type="submit"
+              disabled={submitDisable}>
+              {submitButtonText}
+            </Button>
+          }
+        />
       </div>
     </Form>
   );
