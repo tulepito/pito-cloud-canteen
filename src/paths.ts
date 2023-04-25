@@ -212,4 +212,7 @@ export const quizPaths = {
 
 export const participantPaths = {
   Order: '/participant/order/[orderId]',
+  OrderList: '/participant/orders',
+  SubOrderList: '/participant/sub-orders',
+  Account: '/participant/account',
 };

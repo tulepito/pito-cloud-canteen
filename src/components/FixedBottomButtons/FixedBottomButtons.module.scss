@@ -12,3 +12,14 @@
     display: none;
   }
 }
+
+.absoluteWrapper {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  width: 100%;
+
+  @include viewportMedium {
+    display: none;
+  }
+}

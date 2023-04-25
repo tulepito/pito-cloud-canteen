@@ -29,4 +29,5 @@ export { default as BookerDraftOrderPage } from '@pages/company/booker/orders/dr
 export { default as BookerSelectRestaurant } from '@pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
 export { default as BookerNewOrderPage } from '@pages/company/booker/orders/new/BookerNewOrder.slice';
 export { default as OrderRating } from '@pages/company/orders/[orderId]/rating/OrderRating.slice';
+export { default as ParticipantAccount } from '@pages/participant/account/Account.slice';
 export { default as ParticipantPlanPage } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';

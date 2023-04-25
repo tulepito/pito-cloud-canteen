@@ -928,3 +928,26 @@ export enum EOrderDetailTabs {
   CONTRACT = 'contract',
   VAT = 'vat',
 }
+
+export const ALLERGIES_OPTIONS = [
+  {
+    key: 'egg',
+    label: 'Trứng',
+  },
+  {
+    key: 'shrimp',
+    label: 'Tôm',
+  },
+  {
+    key: 'seafood',
+    label: 'Hải sản',
+  },
+  {
+    key: 'msg',
+    label: 'Bột ngọt',
+  },
+  {
+    key: 'soy',
+    label: 'Đậu nành',
+  },
+];
