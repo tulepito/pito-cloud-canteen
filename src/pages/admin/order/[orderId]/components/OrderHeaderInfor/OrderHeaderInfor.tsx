@@ -109,7 +109,7 @@ const OrderHeaderInfor: React.FC<OrderHeaderInforProps> = (props) => {
         </li>
         <li>
           <div className={css.inforRow}>
-            <div className={css.inforTitle}>Số điện thoại liên hệ</div>
+            <div className={css.inforTitle}>Số điện thoại liên hệ*</div>
             <div className={css.inforValue}>{phoneNumber}</div>
           </div>
         </li>

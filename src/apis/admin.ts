@@ -9,3 +9,15 @@ export const updateAttributesApi = (body: TObject) =>
   putApi('/admin/filters', body);
 export const deleteAttributesApi = (body: TObject) =>
   deleteApi('/admin/filters', body);
+
+export const transitPlanApi = ({
+  transactionId,
+  transition,
+}: {
+  transactionId: string;
+  transition: string;
+}) =>
+  postApi('/admin/plan/transit', {
+    txId: transactionId,
+    transition,
+  });

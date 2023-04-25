@@ -83,6 +83,7 @@
 
     &.spaceStart {
       justify-content: flex-start;
+
       .flexChild {
         margin-right: 100px;
       }
@@ -102,6 +103,7 @@
         font-weight: $fontWeightBold;
         max-width: 260px;
       }
+
       .staffInput {
         max-width: 100%;
         border-radius: 8px;
@@ -128,6 +130,8 @@
 
   &.spaceStart {
     justify-content: flex-start;
+    word-break: break-all;
+
     .flexChild {
       margin-right: 100px;
     }
@@ -159,4 +163,40 @@
 
 .error {
   color: $sematicRed2;
+}
+
+.reviewOrderResult {
+  margin-bottom: 24px;
+}
+
+.selectBoxContent {
+  font-size: 16px;
+  color: $neutralGray6;
+  font-weight: $fontWeightBold;
+  min-width: 160px;
+  max-width: 240px;
+
+  @include viewportSLarge {
+    max-width: 160px;
+  }
+}
+
+.infoSection {
+  display: flex;
+  flex-direction: column;
+
+  @include viewportSLarge {
+    flex-direction: row;
+    column-gap: 24px;
+    align-items: flex-start;
+
+    & > * {
+      flex-basis: calc(50% - 12px);
+    }
+  }
+  .contentBox {
+    @include viewportSLarge {
+      min-height: 111px;
+    }
+  }
 }

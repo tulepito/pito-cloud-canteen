@@ -68,7 +68,7 @@ export enum EHttpStatusCode {
 
 export class CustomError extends Error {
   // code
-  statusCode: number;
+  status: number;
 
   // message
   statusText: string;
@@ -78,11 +78,11 @@ export class CustomError extends Error {
 
   constructor(
     statusText = 'Internal server error',
-    statusCode: number = EHttpStatusCode.InternalServerError,
+    status: number = EHttpStatusCode.InternalServerError,
     data: TObject = {},
   ) {
     super(statusText);
-    this.statusCode = statusCode;
+    this.status = status;
     this.statusText = statusText;
     this.data = data;
   }

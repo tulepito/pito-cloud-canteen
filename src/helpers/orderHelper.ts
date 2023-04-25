@@ -110,6 +110,8 @@ export const isEnableUpdateBookingInfo = (
     EBookerOrderDraftStates.bookerDraft,
     EOrderDraftStates.draft,
     EOrderDraftStates.pendingApproval,
+    EOrderStates.picking,
+    EOrderStates.inProgress,
   ].includes(orderState);
 };
 
