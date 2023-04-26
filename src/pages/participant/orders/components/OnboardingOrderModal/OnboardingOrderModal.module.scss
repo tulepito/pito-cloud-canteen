@@ -1,0 +1,163 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.slideModalContainer.slideModalContainer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  border-radius: 16px 16px 0px 0px;
+  background-color: #ffffff;
+  width: 100%;
+  padding: 20px 16px 40px;
+  transition: bottom 0.5s ease-in-out;
+  animation: slideIn 0.3s ease-in-out;
+  // transform: translateY(0);
+}
+
+.slideModalOpen {
+  .slideModalScrollLayer {
+    transition: opacity 0.3s ease-in-out;
+  }
+}
+.slideModalClose {
+  .slideModalScrollLayer {
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    background-image: none;
+  }
+
+  .slideModalContainer {
+    bottom: -100%;
+    // animation: slideOut 0.3s ease-in-out;
+  }
+}
+
+.modalHeader {
+  @include textTemplate(20px, $fontWeightBold, 32px);
+  @include flexAlign(center, space-between);
+  .closeIcon {
+    width: 12px;
+    height: 12px;
+  }
+  .secondRow {
+    color: $primaryPri2;
+  }
+}
+
+.modalContent {
+  .horizontalLine {
+    border-bottom: 1px solid $neutralGray4;
+  }
+  .sectionWrapper {
+    padding: 16px 0;
+
+    svg {
+      margin-right: 4px;
+    }
+
+    .row {
+      @include flexAlign(center, space-between);
+      gap: 8px;
+    }
+
+    .orderTitle {
+      @include textTemplate(12px, $fontWeightRegular, 16px);
+    }
+
+    .orderHour {
+      @include textTemplate(12px, $fontWeightRegular, 16px);
+    }
+
+    .daySession {
+      @include textTemplate(16px, $fontWeightBold, 24px);
+    }
+
+    .greyText {
+      color: $neutralGray4;
+    }
+
+    .orderDeadline {
+      @include textTemplate(12px, $fontWeightSemiBold, 16px);
+      color: $primaryPri2;
+
+      svg {
+        path {
+          fill: $primaryPri2;
+        }
+      }
+    }
+
+    .deliveryAddress {
+      margin-top: 8px;
+      @include textTemplate(12px, $fontWeightRegular, 16px);
+    }
+
+    .restaurantName {
+      margin-top: 8px;
+      @include textTemplate(12px, $fontWeightRegular, 16px);
+    }
+
+    .pickingTitle {
+      @include textTemplate(14px, $fontWeightSemiBold, 24px);
+    }
+
+    .viewDetail {
+      @include textTemplate(12px, $fontWeightSemiBold, 24px);
+      color: $labelBlue2;
+    }
+
+    .fieldGroup {
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 8px;
+      row-gap: 4px;
+      width: 100%;
+
+      .checkboxItem {
+        @include flexAlign(center);
+
+        .radioInput {
+          margin: 0;
+          margin-right: 8px;
+        }
+
+        label {
+          @include textTemplate(12px, $fontWeightRegular, 16px);
+        }
+      }
+    }
+
+    .btn {
+      @include textTemplate(14px, $fontWeightBold, 24px);
+      width: 100%;
+      min-height: 36px;
+      padding: 6px 12px;
+    }
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOut {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
