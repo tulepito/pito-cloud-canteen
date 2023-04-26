@@ -96,7 +96,10 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
           origin: originValue,
         },
         pickAllow: pickAllowSubmitValue,
-        packagePerMember: +packagePerMemberValue.replace(/,/g, '') || 0,
+        packagePerMember: parseInt(
+          packagePerMemberValue?.replace(/,/g, '') || 0,
+          10,
+        ),
         selectedGroups: pickAllowSubmitValue ? selectedGroupsSubmitValue : [],
         deadlineDate: pickAllowSubmitValue ? deadlineDateSubmitValue : null,
         deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
