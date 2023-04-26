@@ -1,0 +1,36 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.modalContainer.modalContainer {
+  flex-basis: calc(100% - 32px);
+  padding: 16px;
+  height: 80vh;
+  overflow-y: initial;
+}
+
+.modalHeader {
+  @include textTemplate(20px, $fontWeightBold, 32px);
+  @include flexAlign(center, space-between);
+  .closeIcon {
+    width: 12px;
+    height: 12px;
+  }
+  .secondRow {
+    color: $primaryPri2;
+  }
+}
+
+.modalContent {
+  @include textTemplate(14px, $fontWeightMedium, 24px);
+  text-align: center;
+  margin-top: 24px;
+}
+
+.modalFooter {
+  margin-top: 24px;
+
+  .startBtn {
+    width: 100%;
+  }
+}

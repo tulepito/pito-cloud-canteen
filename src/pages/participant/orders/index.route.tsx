@@ -1,9 +1,10 @@
-import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
+
+import OrderListPage from './OrderList.page';
 
 const ParticipantDashboardRoute = () => (
   <MetaWrapper>
-    <BottomNavigationBar />
+    <OrderListPage />
   </MetaWrapper>
 );
 

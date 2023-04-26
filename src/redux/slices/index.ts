@@ -30,4 +30,5 @@ export { default as BookerSelectRestaurant } from '@pages/company/booker/orders/
 export { default as BookerNewOrderPage } from '@pages/company/booker/orders/new/BookerNewOrder.slice';
 export { default as OrderRating } from '@pages/company/orders/[orderId]/rating/OrderRating.slice';
 export { default as ParticipantAccount } from '@pages/participant/account/Account.slice';
+export { default as ParticipantOrderList } from '@pages/participant/orders/OrderList.slice';
 export { default as ParticipantPlanPage } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';
