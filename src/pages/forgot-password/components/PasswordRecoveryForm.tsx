@@ -6,8 +6,11 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
+import FixedBottomButtons from '@components/FixedBottomButtons/FixedBottomButtons';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
+import IconMail from '@components/Icons/IconMail/IconMail';
 import { generalPaths } from '@src/paths';
 import type { TDefaultProps } from '@utils/types';
 import {
@@ -51,6 +54,9 @@ const PasswordRecoveryFormComponent: React.FC<
   const emailPlaceholder = intl.formatMessage({
     id: 'PasswordRecoveryForm.email.placeholder',
   });
+  const emailLabel = intl.formatMessage({
+    id: 'PasswordRecoveryForm.email.label',
+  });
 
   const submitButtonText = intl.formatMessage({
     id: 'PasswordRecoveryForm.submitButtonText',
@@ -61,9 +67,6 @@ const PasswordRecoveryFormComponent: React.FC<
 
   const goBackText = intl.formatMessage({
     id: 'PasswordRecoveryForm.goBack',
-  });
-  const toSignInText = intl.formatMessage({
-    id: 'PasswordRecoveryForm.toSignInText',
   });
 
   const emailValidators = composeValidators(
@@ -85,8 +88,13 @@ const PasswordRecoveryFormComponent: React.FC<
   return (
     <Form className={classes} onSubmit={handleSubmit}>
       <div className={css.formContainer}>
+        <div className={css.goBackContainer} onClick={navigateToSignInPage}>
+          <IconArrowHead direction="left" />
+          <span className={css.goBack}></span>
+          {goBackText}
+        </div>
         <div className={css.formTitleContainer}>
-          <h2 className={css.formTitle}>{formTitle}</h2>
+          <div className={css.formTitle}>{formTitle}</div>
           <div className={css.formDescription}>{formDescription}</div>
         </div>
 
@@ -95,30 +103,43 @@ const PasswordRecoveryFormComponent: React.FC<
           name="email"
           placeholder={emailPlaceholder}
           validate={emailValidators}
+          label={emailLabel}
+          leftIcon={<IconMail />}
         />
 
         {recoveryError && <div className={css.error}>{recoveryError}</div>}
-        <Button
-          className={css.submitButton}
-          type="submit"
-          disabled={submitDisable}>
-          {inProgress ? (
-            <>
-              {submitButtonLoadingText}
-              {timeLeft}
-            </>
-          ) : (
-            <> {submitButtonText}</>
-          )}
-        </Button>
-      </div>
-      <div className={css.toSignIn}>
-        <div>
-          {goBackText}{' '}
-          <span className={css.toSignInText} onClick={navigateToSignInPage}>
-            {toSignInText}
-          </span>
+        <div className={css.desktopView}>
+          <Button
+            className={css.submitButton}
+            type="submit"
+            disabled={submitDisable}>
+            {inProgress ? (
+              <>
+                {submitButtonLoadingText}
+                {timeLeft}
+              </>
+            ) : (
+              <> {submitButtonText}</>
+            )}
+          </Button>
         </div>
+        <FixedBottomButtons
+          FirstButton={
+            <Button
+              className={css.submitButton}
+              type="submit"
+              disabled={submitDisable}>
+              {inProgress ? (
+                <>
+                  {submitButtonLoadingText}
+                  {timeLeft}
+                </>
+              ) : (
+                <> {submitButtonText}</>
+              )}
+            </Button>
+          }
+        />
       </div>
     </Form>
   );
