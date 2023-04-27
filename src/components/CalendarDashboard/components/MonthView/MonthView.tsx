@@ -50,7 +50,7 @@ function MonthView({
       <div className={css.scrollContainer}>
         {DAY_IN_WEEK.map((item) => (
           <div key={item} className={css.dayInWeekHeader}>
-            <FormattedMessage id={`MonthView.dayInWeekHeader.${item}`} />
+            <FormattedMessage id={`MonthView.dayInWeekHeader.short.${item}`} />
           </div>
         ))}
         {emptyDayEls.map((item) => (
