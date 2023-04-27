@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@next/font": "^13.1.1",
+    "@reactour/tour": "^3.3.0",
     "@reduxjs/toolkit": "^1.9.1",
     "autosize": "^5.0.2",
     "aws-sdk": "^2.1293.0",
@@ -59,11 +60,13 @@
     "react-joyride": "^2.5.3",
     "react-loading-skeleton": "^3.1.0",
     "react-redux": "^8.0.5",
+    "reactour": "^1.19.0",
     "reselect": "^4.1.7",
     "seedrandom": "^3.0.5",
     "sharetribe-flex-integration-sdk": "^1.9.0",
     "sharetribe-flex-sdk": "^1.17.0",
     "shelljs": "^0.8.5",
+    "styled-components": "^5.3.10",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

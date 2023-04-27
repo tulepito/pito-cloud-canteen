@@ -4,8 +4,10 @@ import { useEffect } from 'react';
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { CurrentUser } from '@src/utils/data';
 
 import OnboardingOrderModal from './components/OnboardingOrderModal/OnboardingOrderModal';
+import OnboardingTour from './components/OnboardingTour/OnboardingTour';
 import UpdateProfileModal from './components/UpdateProfileModal/UpdateProfileModal';
 import WelcomeModal from './components/WelcomeModal/WelcomeModal';
 import { OrderListThunks } from './OrderList.slice';
@@ -14,8 +16,12 @@ const OrderListPage = () => {
   const dispatch = useAppDispatch();
   const welcomeModalControl = useBoolean();
   const updateProfileModalControl = useBoolean();
-  const slideModalControl = useBoolean(true);
+  const onBoardingModal = useBoolean();
+  const tourControl = useBoolean();
   const currentUser = useAppSelector((state) => state.user.currentUser);
+  const currentUserGetter = CurrentUser(currentUser!);
+  const currentUserId = currentUserGetter.getId();
+  const { walkthroughEnable = true } = currentUserGetter.getMetadata();
   useEffect(() => {
     dispatch(OrderListThunks.fetchAttributes());
   }, []);
@@ -23,9 +29,21 @@ const OrderListPage = () => {
     updateProfileModalControl.setTrue();
   };
 
+  const handleOnBoardingModalOpen = () => {
+    onBoardingModal.setTrue();
+    setTimeout(() => {
+      tourControl.setTrue();
+    }, 1000);
+  };
+  const handleCloseWalkThrough = () => {
+    tourControl.setFalse();
+    onBoardingModal.setFalse();
+    dispatch(OrderListThunks.disableWalkthrough(currentUserId));
+  };
+
   return (
     <>
-      <div onClick={slideModalControl.setTrue}>Open</div>
+      <div onClick={handleOnBoardingModalOpen}>Open</div>
       <WelcomeModal
         isOpen={welcomeModalControl.value}
         onClose={welcomeModalControl.setFalse}
@@ -36,10 +54,19 @@ const OrderListPage = () => {
         onClose={updateProfileModalControl.setFalse}
         currentUser={currentUser!}
       />
-      <OnboardingOrderModal
-        isOpen={slideModalControl.value}
-        onClose={slideModalControl.setFalse}
-      />
+      {walkthroughEnable && (
+        <>
+          <OnboardingOrderModal
+            isOpen={onBoardingModal.value}
+            onClose={onBoardingModal.setFalse}
+            isDuringTour={tourControl.value}
+          />
+          <OnboardingTour
+            isTourOpen={tourControl.value}
+            closeTour={handleCloseWalkThrough}
+          />
+        </>
+      )}
       <BottomNavigationBar />
     </>
   );

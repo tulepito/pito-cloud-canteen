@@ -20,6 +20,7 @@ export default function Document() {
       </Head>
       <body>
         <Main />
+        <div id="redDot" style={{ position: 'fixed', zIndex: 1000000 }}></div>
         <NextScript />
       </body>
     </Html>

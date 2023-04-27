@@ -2,6 +2,28 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 
+@mixin redDot {
+  position: absolute;
+  top: -18px;
+  right: -12px;
+  width: 24px;
+  height: 24px;
+  background-color: $pink;
+  border-radius: 100%;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    border-radius: 100%;
+    background: rgba(255, 186, 179, 0.3);
+    animation: pulseRing 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  }
+}
+
 .slideModalContainer.slideModalContainer {
   position: fixed;
   bottom: 0;
@@ -141,6 +163,22 @@
       min-height: 36px;
       padding: 6px 12px;
     }
+
+    .lastBtn {
+      margin-top: 12px;
+
+      span {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.redDotWrapper {
+  position: fixed;
+  z-index: 1000;
+  .redDot {
+    @include redDot;
   }
 }
 
@@ -159,5 +197,15 @@
   }
   100% {
     transform: translateY(100%);
+  }
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.33);
+  }
+  80%,
+  100% {
+    opacity: 0;
   }
 }
