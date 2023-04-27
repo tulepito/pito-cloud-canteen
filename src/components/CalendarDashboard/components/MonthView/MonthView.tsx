@@ -6,6 +6,7 @@ import { DateTime } from 'luxon';
 
 import { DAY_IN_WEEK } from '@components/CalendarDashboard/helpers/constant';
 import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
+import { MAX_MOBILE_SCREEN_WIDTH, useViewport } from '@hooks/useViewport';
 
 import type { TCalendarItemCardComponents } from '../../helpers/types';
 import MDayItem from '../DayItem/MDayItem';
@@ -44,13 +45,21 @@ function MonthView({
   const firstDay = currRange[0];
   const totalEmptyDays = (firstDay.getDay() || 7) - 1;
   const emptyDayEls = Array.from(Array(totalEmptyDays).keys());
+  const {
+    viewport: { width },
+  } = useViewport();
+  const isMobile = width < MAX_MOBILE_SCREEN_WIDTH;
 
   return (
     <div className={css.root}>
       <div className={css.scrollContainer}>
         {DAY_IN_WEEK.map((item) => (
           <div key={item} className={css.dayInWeekHeader}>
-            <FormattedMessage id={`MonthView.dayInWeekHeader.short.${item}`} />
+            <FormattedMessage
+              id={`MonthView.dayInWeekHeader.${
+                isMobile ? 'short.' : ''
+              }${item}`}
+            />
           </div>
         ))}
         {emptyDayEls.map((item) => (

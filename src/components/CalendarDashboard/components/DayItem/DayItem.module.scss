@@ -1,17 +1,24 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .weekDay {
   display: flex;
   flex-direction: column;
-  flex: 1;
   // border-top: 1px solid $neutralGray5;
   // border-bottom: 1px solid $neutralGray5;
-  border-right: 1px solid $neutralGray5;
-  min-height: 200px;
+
+  min-height: 54px;
+  flex-basis: calc((100vw - 32px) / 7);
 
   &:last-child {
     border-right: 0px solid transparent;
+  }
+
+  @include viewportMedium {
+    min-height: 200px;
+    flex: 1;
+    border-right: 1px solid $neutralGray5;
   }
 }
 
@@ -37,7 +44,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid $neutralGray5;
+  border-bottom: 1px solid $neutralGray4;
   padding: 4px;
 
   &.hover {
@@ -73,8 +80,14 @@
 
 .dayContent {
   flex-grow: 1;
-  padding: 12px 8px;
   background-color: $neutralGray1;
+  @include flexAlign(flex-end, flex-end);
+  padding: 0 8px;
+  gap: 4px;
+
+  @include viewportMedium {
+    padding: 12px 8px;
+  }
 }
 
 .dayFooter {

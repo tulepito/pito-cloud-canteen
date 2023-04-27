@@ -36,21 +36,24 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event, index }) => {
       placement="rightTop"
       trigger="click"
       overlayInnerStyle={{ backgroundColor: '#fff' }}>
-      <div
-        className={classNames(css.root, {
-          [css.rootExpired]: isExpired,
-          [css.rootBlue]: !isExpired && index % 2 === 1,
-          [css.rootOrange]: !isExpired && index % 2 === 0,
-        })}>
-        <OrderEventCardHeader event={event} />
-        <div className={css.eventCardContentWrapper}>
-          <OrderEventCardStatus
-            className={css.cardStatus}
-            status={eventStatus}
-          />
-          <OrderEventCardContentItems event={event} />
+      <>
+        <div
+          className={classNames(css.root, {
+            [css.rootExpired]: isExpired,
+            [css.rootBlue]: !isExpired && index % 2 === 1,
+            [css.rootOrange]: !isExpired && index % 2 === 0,
+          })}>
+          <OrderEventCardHeader event={event} />
+          <div className={css.eventCardContentWrapper}>
+            <OrderEventCardStatus
+              className={css.cardStatus}
+              status={eventStatus}
+            />
+            <OrderEventCardContentItems event={event} />
+          </div>
         </div>
-      </div>
+        <div className={css.dot}></div>
+      </>
     </Tooltip>
   );
 };

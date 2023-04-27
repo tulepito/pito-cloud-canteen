@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { Event } from 'react-big-calendar';
 import { DateTime } from 'luxon';
 
+import { MAX_MOBILE_SCREEN_WIDTH, useViewport } from '@hooks/useViewport';
 import type { TObject } from '@utils/types';
 
 import type {
@@ -33,6 +34,10 @@ const WDayItem: React.FC<TWDayItemProps> = ({
   customHeader,
   eventExtraProps,
 }) => {
+  const {
+    viewport: { width },
+  } = useViewport();
+  const isMobile = width < MAX_MOBILE_SCREEN_WIDTH;
   const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
   const isCurrentDay =
     DateTime.fromJSDate(date)
@@ -54,14 +59,16 @@ const WDayItem: React.FC<TWDayItemProps> = ({
           isCurrentDay={isCurrentDay}
         />
       )}
-      <DayItemContent
-        date={date}
-        events={events}
-        resources={resources}
-        renderEvent={renderEvent}
-        eventExtraProps={eventExtraProps}
-        components={components}
-      />
+      {!isMobile && (
+        <DayItemContent
+          date={date}
+          events={events}
+          resources={resources}
+          renderEvent={renderEvent}
+          eventExtraProps={eventExtraProps}
+          components={components}
+        />
+      )}
     </div>
   );
 };

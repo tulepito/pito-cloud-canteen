@@ -1,8 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import { disableWalkthroughApi, fetchSearchFilterApi } from '@apis/userApi';
+import { getParticipantOrdersQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { userThunks } from '@redux/slices/user.slice';
+import { denormalisedResponseEntities } from '@src/utils/data';
 import type { TKeyValue } from '@src/utils/types';
 
 // ================ Initial states ================ //
@@ -17,6 +19,10 @@ type TOrderListState = {
   walkthroughCurrentStep: number;
   disableWalkthroughInProgress: boolean;
   disableWalkthroughError: any;
+
+  orders: any[];
+  fetchOrdersInProgress: boolean;
+  fetchOrdersError: any;
 };
 const initialState: TOrderListState = {
   nutritions: [],
@@ -29,12 +35,17 @@ const initialState: TOrderListState = {
   walkthroughCurrentStep: 0,
   disableWalkthroughInProgress: false,
   disableWalkthroughError: null,
+
+  orders: [],
+  fetchOrdersInProgress: false,
+  fetchOrdersError: null,
 };
 
 // ================ Thunk types ================ //
 const FETCH_ATTRIBUTES = 'app/ParticipantOrderList/FETCH_ATTRIBUTES';
 const UPDATE_PROFILE = 'app/ParticipantOrderList/UPDATE_PROFILE';
 const DISABLE_WALKTHROUGH = 'app/ParticipantOrderList/DISABLE_WALKTHROUGH';
+const FETCH_ORDERS = 'app/ParticipantOrderList/FETCH_ORDERS';
 // ================ Async thunks ================ //
 const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
   const { data: response } = await fetchSearchFilterApi();
@@ -58,10 +69,23 @@ const disableWalkthrough = createAsyncThunk(
   },
 );
 
+const fetchOrders = createAsyncThunk(
+  FETCH_ORDERS,
+  async (userId: string, { extra: sdk }) => {
+    const query = getParticipantOrdersQuery({ userId });
+    const response = await sdk.listings.query(query);
+    const orders = denormalisedResponseEntities(response);
+    console.log('orders: ', orders);
+
+    return orders;
+  },
+);
+
 export const OrderListThunks = {
   fetchAttributes,
   updateProfile,
   disableWalkthrough,
+  fetchOrders,
 };
 
 // ================ Slice ================ //
@@ -111,6 +135,19 @@ const OrderListSlice = createSlice({
       .addCase(disableWalkthrough.rejected, (state) => {
         state.disableWalkthroughInProgress = false;
         state.disableWalkthroughError = true;
+      })
+
+      .addCase(fetchOrders.pending, (state) => {
+        state.fetchOrdersInProgress = true;
+        state.fetchOrdersError = false;
+      })
+      .addCase(fetchOrders.fulfilled, (state, { payload }) => {
+        state.fetchOrdersInProgress = false;
+        state.orders = payload.orders;
+      })
+      .addCase(fetchOrders.rejected, (state) => {
+        state.fetchOrdersInProgress = false;
+        state.fetchOrdersError = true;
       });
   },
 });
