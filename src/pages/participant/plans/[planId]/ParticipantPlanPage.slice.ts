@@ -50,14 +50,15 @@ const loadData = createAsyncThunk(
 
     orderDays.forEach((day) => {
       const userOder = plan?.[day]?.memberOrder?.[currentUserId];
-      const status = userOder?.status;
+      const { status, foodId, requirement } = userOder || {};
       if (status === 'joined' || status === 'notJoined') {
         dispatch(
           shoppingCartActions.addToCart({
             currentUserId,
             planId,
             dayId: day,
-            mealId: status === 'notJoined' ? 'notJoined' : userOder?.foodId,
+            mealId: status === 'notJoined' ? 'notJoined' : foodId,
+            requirement,
           }),
         );
       }
@@ -114,24 +115,26 @@ const updateOrder = createAsyncThunk(
     const orderDays = Object.keys(planData);
 
     const updatedPlan = orderDays.reduce((acc: any, curr: any) => {
+      const { foodId = '', requirement = '' } = planData[curr] || {};
+
       return {
         ...acc,
         [curr]: {
           [currentUserId]:
             // eslint-disable-next-line no-nested-ternary
-            planData[curr] === EParticipantOrderStatus.notJoined
+            foodId === EParticipantOrderStatus.notJoined
               ? {
                   status: EParticipantOrderStatus.notJoined,
                   foodId: '',
-                }
-              : planData[curr]
-              ? {
-                  status: EParticipantOrderStatus.joined,
-                  foodId: planData[curr],
+                  requirement,
                 }
               : {
-                  status: EParticipantOrderStatus.empty,
-                  foodId: '',
+                  status:
+                    foodId?.length > 0
+                      ? EParticipantOrderStatus.joined
+                      : EParticipantOrderStatus.empty,
+                  foodId,
+                  requirement,
                 },
         },
       };
