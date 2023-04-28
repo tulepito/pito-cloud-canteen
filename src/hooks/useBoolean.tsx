@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
 const useBoolean = (defaultValue = false) => {
-  const [value, setValue] = useState<boolean>(!!defaultValue);
+  const [value, setValue] = useState<boolean>(defaultValue);
 
   const setTrue = useCallback(() => setValue(true), []);
   const setFalse = useCallback(() => {
