@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
 }
@@ -22,41 +23,6 @@
   margin-right: 10px;
 }
 
-.actions {
-  display: flex;
-  justify-content: center;
-  padding-top: 2px;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.rejectBtn {
-  @include textTemplate(12px, 700, 20px, '');
-  display: block;
-  width: calc((100% - 8px) / 2);
-  height: 36px;
-  min-height: 36px;
-  padding: 8px 4px;
-}
-
-.acceptBtn {
-  @include textTemplate(12px, 700, 20px, '');
-  display: block;
-  width: 148px;
-  height: 36px;
-  min-height: 36px;
-  padding: 8px 4px;
-}
-
-.pickForMeBtn {
-  @include textTemplate(12px, 700, 20px, '');
-  display: block;
-  width: 120px;
-  height: 36px;
-  min-height: 36px;
-  padding: 8px 4px;
-}
-
 .spinnerClassName {
   stroke: $primaryPri2;
   width: 24px;
@@ -77,6 +43,11 @@
   width: 100%;
   min-height: 36px;
   padding: 6px 12px;
+
+  @include viewportMedium {
+    font-size: 12px;
+    padding: 0;
+  }
 }
 
 .lastBtn {

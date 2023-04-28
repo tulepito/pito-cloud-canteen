@@ -40,7 +40,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event, index }) => {
       placement="rightTop"
       trigger="click"
       overlayInnerStyle={{ backgroundColor: '#fff' }}>
-      <>
+      <div>
         <div
           className={classNames(css.root, {
             [css.rootExpired]: isExpired,
@@ -57,7 +57,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event, index }) => {
           </div>
         </div>
         <div className={css.dot} style={dotStyles}></div>
-      </>
+      </div>
     </Tooltip>
   );
 };
