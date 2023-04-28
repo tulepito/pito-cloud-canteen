@@ -14,6 +14,8 @@ import type { NextApplicationPage } from '@utils/types';
 import '@src/styles/globals.scss';
 import '@src/styles/nprogress.scss';
 import 'react-loading-skeleton/dist/skeleton.css';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 Router.events.on('routeChangeStart', nProgress.start);
 Router.events.on('routeChangeError', nProgress.done);
