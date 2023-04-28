@@ -108,15 +108,14 @@
   width: 87px;
   height: 36px;
   min-height: 36px;
-  padding: 8px;
   margin-right: 28px;
   text-align: center;
   border: 1px solid $neutralGray4;
   background-color: $neutralGray1;
   @include textTemplate(14px, 700, 36px, '');
   color: $neutralGray6;
-  border-radius: 40px;
-
+  border-radius: 8px;
+  @include flexCenter;
   @include viewportMedium {
     display: none;
   }

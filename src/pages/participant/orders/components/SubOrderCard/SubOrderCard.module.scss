@@ -1,0 +1,153 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.container {
+  border-radius: 8px;
+  border: 1px solid $neutralGray3;
+  box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06),
+    0px 4px 8px -2px rgba(16, 24, 40, 0.1);
+}
+
+.header {
+  border-radius: 8px;
+  color: $neutralGray1;
+  padding: 4px 8px 8px;
+
+  .daySession {
+    @include textTemplate(14px, $fontWeightBold, 24px);
+  }
+
+  .orderHour {
+    @include textTemplate(12px, $fontWeightRegular, 16px);
+  }
+
+  .PCCText {
+    @include textTemplate(12px, $fontWeightRegular, 16px);
+  }
+}
+
+.body {
+  padding: 8px;
+
+  .orderInfo {
+    margin-top: 8px;
+
+    svg {
+      margin-right: 4px;
+    }
+  }
+}
+.row {
+  @include flexAlign(center, space-between);
+  gap: 8px;
+}
+
+.orderTitle {
+  @include textTemplate(12px, $fontWeightRegular, 16px);
+}
+
+.greyText {
+  color: $neutralGray4;
+}
+
+.orderDeadline {
+  @include textTemplate(12px, $fontWeightSemiBold, 16px);
+  color: $primaryPri2;
+  @include flexAlign(center);
+
+  svg {
+    path {
+      fill: $primaryPri2;
+    }
+  }
+}
+.selectedFood {
+  @include flexAlign(center);
+  @include textTemplate(12px, $fontWeightRegular, 16px);
+  gap: 4px;
+  margin-top: 8px;
+
+  svg {
+    width: 16px;
+    height: 16px;
+
+    path {
+      fill: $neutralGray5;
+    }
+  }
+}
+
+.deliveryAddress {
+  margin-top: 8px;
+  @include textTemplate(12px, $fontWeightRegular, 16px);
+  @include flexAlign(center);
+}
+
+.restaurantName {
+  margin-top: 8px;
+  @include textTemplate(12px, $fontWeightRegular, 16px);
+  @include flexAlign(center);
+}
+
+.pickingTitle {
+  @include textTemplate(14px, $fontWeightSemiBold, 24px);
+}
+
+.viewDetail {
+  @include textTemplate(12px, $fontWeightSemiBold, 24px);
+  color: $labelBlue2;
+}
+
+.noPickThisDay {
+  @include flexAlign(center);
+  gap: 4px;
+  margin-top: 8px;
+  @include textTemplate(12px, $fontWeightRegular, 16px);
+
+  svg {
+    width: 11px;
+    height: 11px;
+
+    path {
+      fill: $neutralGray5;
+    }
+  }
+}
+
+.fieldGroup {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 8px;
+  row-gap: 4px;
+  width: 100%;
+
+  .checkboxItem {
+    @include flexAlign(center);
+
+    .radioInput {
+      margin: 0;
+      margin-right: 8px;
+    }
+
+    label {
+      @include textTemplate(12px, $fontWeightRegular, 16px);
+    }
+  }
+}
+
+.btn {
+  @include textTemplate(14px, $fontWeightBold, 24px);
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 12px;
+}
+
+.lastBtn {
+  margin-top: 12px;
+
+  span {
+    width: 100%;
+  }
+}

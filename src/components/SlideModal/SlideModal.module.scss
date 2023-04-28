@@ -8,10 +8,10 @@
   left: 0;
   border-radius: 16px 16px 0px 0px;
   background-color: #ffffff;
-  padding: 0 24px 24px;
+  width: 100%;
+  padding: 20px 16px 40px;
   transition: bottom 0.5s ease-in-out;
   animation: slideIn 0.3s ease-in-out;
-  // transform: translateY(0);
 }
 
 .slideModalOpen {
@@ -34,21 +34,22 @@
 
   .slideModalContainer {
     bottom: -100%;
-    // animation: slideOut 0.3s ease-in-out;
   }
 }
 
-.calendarContainer {
-  margin-top: 28px;
+.modalHeader {
+  @include textTemplate(20px, $fontWeightBold, 32px);
+  @include flexAlign(center, space-between);
+  flex-direction: row-reverse;
+  .closeIcon {
+    width: 12px;
+    height: 12px;
+  }
+  .secondRow {
+    color: $primaryPri2;
+  }
 }
 
-.subOrderContainer {
-  @include flexAlign(unset);
-  flex-direction: column;
-  width: 100%;
-  gap: 16px;
-  margin-top: 18px;
-}
 @keyframes slideIn {
   0% {
     transform: translateY(100%);

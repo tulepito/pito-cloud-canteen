@@ -22,6 +22,10 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event, index }) => {
   const status = event.resource?.status;
   const isExpired = isOver(event.resource?.expiredTime);
   const eventStatus = isExpired ? EVENT_STATUS.EXPIRED_STATUS : status;
+  const { orderColor } = event?.resource || {};
+  const dotStyles = {
+    backgroundColor: orderColor,
+  };
 
   return (
     <Tooltip
@@ -52,7 +56,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event, index }) => {
             <OrderEventCardContentItems event={event} />
           </div>
         </div>
-        <div className={css.dot}></div>
+        <div className={css.dot} style={dotStyles}></div>
       </>
     </Tooltip>
   );

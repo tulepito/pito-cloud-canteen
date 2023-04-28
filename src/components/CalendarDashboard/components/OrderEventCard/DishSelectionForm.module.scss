@@ -4,6 +4,11 @@
 .root {
 }
 
+.fieldGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
 .radioLabel {
   @include textTemplate(12px, 400, 16px, '');
   color: $neutralGray6;
@@ -13,6 +18,7 @@
 }
 
 .radioInput {
+  margin: 0;
   margin-right: 10px;
 }
 
@@ -56,4 +62,27 @@
   width: 24px;
   height: 24px;
   stroke-width: 3px;
+}
+
+.sectionWrapper {
+  margin-top: 16px;
+}
+
+.row {
+  @include flexAlign(center, space-between);
+  gap: 8px;
+}
+.btn {
+  @include textTemplate(14px, $fontWeightBold, 24px);
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 12px;
+}
+
+.lastBtn {
+  margin-top: 12px;
+
+  span {
+    width: 100%;
+  }
 }
