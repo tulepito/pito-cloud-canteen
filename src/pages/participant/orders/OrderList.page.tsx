@@ -156,11 +156,9 @@ const OrderListPage = () => {
   });
 
   const flattenEvents = flatten<Event>(events);
-  console.log('flattenEvents: ', flattenEvents);
   const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) =>
     isSameDate(_event.start, selectedDay),
   );
-  console.log('subOrdersFromSelectedDay: ', subOrdersFromSelectedDay);
 
   const openUpdateProfileModal = () => {
     updateProfileModalControl.setTrue();
@@ -200,7 +198,7 @@ const OrderListPage = () => {
           events={flattenEvents}
           // companyLogo={sectionCompanyBranding}
           renderEvent={OrderEventCard}
-          // inProgress={loadDataInProgress}
+          inProgress={fetchOrdersInProgress}
           // exposeAnchorDate={handleAnchorDateChange}
           components={{
             toolbar: (toolBarProps: any) => (

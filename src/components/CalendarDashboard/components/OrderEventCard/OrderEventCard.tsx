@@ -18,13 +18,16 @@ export type TOrderEventCardProps = {
   index: number;
 };
 
-const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event, index }) => {
+const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
   const status = event.resource?.status;
   const isExpired = isOver(event.resource?.expiredTime);
   const eventStatus = isExpired ? EVENT_STATUS.EXPIRED_STATUS : status;
   const { orderColor } = event?.resource || {};
   const dotStyles = {
-    backgroundColor: orderColor,
+    backgroundColor: isExpired ? '#FAFAFA' : orderColor,
+  };
+  const cardStyles = {
+    borderColor: isExpired ? '#FAFAFA' : orderColor,
   };
 
   return (
@@ -44,9 +47,8 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event, index }) => {
         <div
           className={classNames(css.root, {
             [css.rootExpired]: isExpired,
-            [css.rootBlue]: !isExpired && index % 2 === 1,
-            [css.rootOrange]: !isExpired && index % 2 === 0,
-          })}>
+          })}
+          style={cardStyles}>
           <OrderEventCardHeader event={event} />
           <div className={css.eventCardContentWrapper}>
             <OrderEventCardStatus

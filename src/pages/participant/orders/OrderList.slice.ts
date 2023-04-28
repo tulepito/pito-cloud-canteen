@@ -128,8 +128,6 @@ const fetchOrders = createAsyncThunk(
       },
       {},
     );
-    console.log('mappingSubOrderToOrder: ', mappingSubOrderToOrder);
-    console.log('orders: ', orders);
     const allPlansData: Event[] = await Promise.all(
       orders.map(async (order: TListing) => {
         const orderListing = Listing(order);
@@ -144,8 +142,6 @@ const fetchOrders = createAsyncThunk(
       (planData: any) => planData.subOrders,
     );
     const allPlans = allPlansData.map((planData: any) => planData.plans);
-    console.log('allSubOrders: ', flatten(allSubOrders));
-    console.log('allPlans: ', flatten(allPlans));
 
     return {
       orders,
@@ -161,8 +157,6 @@ const fetchTransactionBySubOrder = createAsyncThunk(
   async (txId: string) => {
     if (!txId) return null;
     const txResponse = await fetchTxApi(txId);
-    console.log('txResponse: ', txResponse);
-    console.log('txResponse data: ', txResponse.data);
 
     return txResponse.data;
   },

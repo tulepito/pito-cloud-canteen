@@ -9,9 +9,17 @@
 
 .scrollLayer.scrollLayer {
   background-color: rgba(0, 0, 0, 0.5);
+
+  @include viewportMedium {
+    display: none;
+  }
 }
 
 .container.container {
   background-color: rgba(0, 0, 0, 0.5);
   border-radius: 0;
+
+  @include viewportMedium {
+    display: none;
+  }
 }

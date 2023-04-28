@@ -9,6 +9,7 @@ import IconFood from '@components/Icons/IconFood/IconFood';
 import IconLocation from '@components/Icons/IconLocation/IconLocation';
 import IconShop from '@components/Icons/IconShop/IconShop';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { isOver } from '@helpers/orderHelper';
 import { calculateRemainTime } from '@src/utils/dates';
 
 import css from './SubOrderCard.module.scss';
@@ -45,15 +46,15 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
   const { address } = deliveryAddress;
   const { name: restaurantName } = restaurant;
   const orderTitle = event?.title || '';
+  const isExpired = isOver(event.resource?.expiredTime);
   const headerStyles = {
-    backgroundColor: orderColor,
+    backgroundColor: isExpired ? '#FAFAFA' : orderColor,
   };
   const remainTime = calculateRemainTime(deadlineDate);
 
   const selectionFoodName = meal?.dishes.find(
     (item: any) => item.key === dishSelection?.dishSelection,
   )?.value;
-  console.log('selectionFoodName: ', selectionFoodName);
   const shouldShowRejectButton = status === EVENT_STATUS.EMPTY_STATUS;
 
   const onCardClick = () => {

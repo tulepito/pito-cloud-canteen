@@ -2,7 +2,6 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
-import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { Transaction } from '@src/utils/data';
 import { ETransition, txIsInitiated } from '@src/utils/transaction';
 import type { TTransaction } from '@src/utils/types';
@@ -55,15 +54,16 @@ const OrderEventCardStatus: React.FC<TOrderEventCardStatusProps> = ({
   const { lastTransition } = subOrderTxGetter.getAttributes();
 
   return (
-    <RenderWhen condition={subOrderTx && !isSubOrderTxInitial}>
-      <Badge
-        className={css.badge}
-        type={lastTransition}
-        label={intl.formatMessage({
-          id: txStateToLabelMapper(lastTransition!),
-        })}
-      />
-      <RenderWhen.False>
+    <>
+      {subOrderTx && !isSubOrderTxInitial ? (
+        <Badge
+          className={css.badge}
+          type={lastTransition}
+          label={intl.formatMessage({
+            id: txStateToLabelMapper(lastTransition!),
+          })}
+        />
+      ) : (
         <Badge
           className={css.badge}
           type={StatusToBadgeTypeMap[status]}
@@ -71,8 +71,8 @@ const OrderEventCardStatus: React.FC<TOrderEventCardStatusProps> = ({
             id: `DayColumn.Status.${status || 'empty'}`,
           })}
         />
-      </RenderWhen.False>
-    </RenderWhen>
+      )}
+    </>
   );
 };
 
