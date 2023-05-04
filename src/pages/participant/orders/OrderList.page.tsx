@@ -14,7 +14,7 @@ import { OrderListThunks } from './OrderList.slice';
 
 const OrderListPage = () => {
   const dispatch = useAppDispatch();
-  const welcomeModalControl = useBoolean();
+
   const updateProfileModalControl = useBoolean();
   const onBoardingModal = useBoolean();
   const tourControl = useBoolean();
@@ -22,6 +22,7 @@ const OrderListPage = () => {
   const currentUserGetter = CurrentUser(currentUser!);
   const currentUserId = currentUserGetter.getId();
   const { walkthroughEnable = true } = currentUserGetter.getMetadata();
+  const welcomeModalControl = useBoolean(walkthroughEnable);
   useEffect(() => {
     dispatch(OrderListThunks.fetchAttributes());
   }, []);
@@ -44,18 +45,20 @@ const OrderListPage = () => {
   return (
     <>
       <div onClick={handleOnBoardingModalOpen}>Open</div>
-      <WelcomeModal
-        isOpen={welcomeModalControl.value}
-        onClose={welcomeModalControl.setFalse}
-        openUpdateProfileModal={openUpdateProfileModal}
-      />
-      <UpdateProfileModal
-        isOpen={updateProfileModalControl.value}
-        onClose={updateProfileModalControl.setFalse}
-        currentUser={currentUser!}
-      />
+
       {walkthroughEnable && (
         <>
+          <WelcomeModal
+            isOpen={welcomeModalControl.value}
+            onClose={welcomeModalControl.setFalse}
+            openUpdateProfileModal={openUpdateProfileModal}
+          />
+          <UpdateProfileModal
+            isOpen={updateProfileModalControl.value}
+            onClose={updateProfileModalControl.setFalse}
+            currentUser={currentUser!}
+            handleOnBoardingModalOpen={handleOnBoardingModalOpen}
+          />
           <OnboardingOrderModal
             isOpen={onBoardingModal.value}
             onClose={onBoardingModal.setFalse}

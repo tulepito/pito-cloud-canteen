@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -22,10 +20,7 @@ const ChangePasswordModal: React.FC<TChangePasswordModalProps> = (props) => {
     (state) => state.ParticipantAccount.changePasswordInProgress,
   );
 
-  const initialValues = useMemo(
-    () => ({ password: '', newPassword: '', confirmPassword: '' }),
-    [],
-  );
+  const initialValues = { password: '', newPassword: '', confirmPassword: '' };
 
   const handleSubmit = async (values: TChangePasswordFormValues) => {
     const { password, newPassword } = values;
