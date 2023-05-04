@@ -25,7 +25,8 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
   } = useViewport();
   const isMobile = width < MAX_MOBILE_SCREEN_WIDTH;
   const status = event.resource?.status;
-  const isExpired = isOver(event.resource?.expiredTime);
+  const isFoodPicked = !!event.resource?.dishSelection?.dishSelection;
+  const isExpired = isOver(event.resource?.expiredTime) && !isFoodPicked;
   const eventStatus = isExpired ? EVENT_STATUS.EXPIRED_STATUS : status;
   const { orderColor } = event?.resource || {};
   const dotStyles = {
