@@ -3,6 +3,7 @@ import classNames from 'classnames';
 
 import Tooltip from '@components/Tooltip/Tooltip';
 import { isOver } from '@helpers/orderHelper';
+import { MAX_MOBILE_SCREEN_WIDTH, useViewport } from '@hooks/useViewport';
 
 import { EVENT_STATUS } from '../../helpers/constant';
 
@@ -19,6 +20,10 @@ export type TOrderEventCardProps = {
 };
 
 const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
+  const {
+    viewport: { width },
+  } = useViewport();
+  const isMobile = width < MAX_MOBILE_SCREEN_WIDTH;
   const status = event.resource?.status;
   const isExpired = isOver(event.resource?.expiredTime);
   const eventStatus = isExpired ? EVENT_STATUS.EXPIRED_STATUS : status;
@@ -41,7 +46,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
         />
       }
       placement="rightTop"
-      trigger="click"
+      trigger={isMobile ? '' : 'click'}
       overlayInnerStyle={{ backgroundColor: '#fff' }}>
       <div>
         <div
