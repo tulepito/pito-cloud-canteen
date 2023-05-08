@@ -18,7 +18,7 @@ const participantCompanyInvitation = ({
 
   const companyId = companyUser.getId();
 
-  const invitationUrl = `${BASE_URL}/invitation/${companyId}`;
+  const invitationUrl = `${BASE_URL}/participant/invitation/${companyId}`;
 
   return `
   <!DOCTYPE html
