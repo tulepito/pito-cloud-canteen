@@ -13,6 +13,10 @@
   box-shadow: 0px -1px 25px rgba(16, 24, 40, 0.05);
   border-radius: 12px 12px 0px 0px;
 
+  @include viewportMedium {
+    display: none;
+  }
+
   .itemWrapper {
     flex-basis: calc(100% / 3);
   }

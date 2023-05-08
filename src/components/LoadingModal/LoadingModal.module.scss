@@ -1,0 +1,25 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.content {
+  @include flexAlign(center, center);
+  height: calc(100vh - 64px);
+}
+
+.scrollLayer.scrollLayer {
+  background-color: rgba(0, 0, 0, 0.5);
+
+  @include viewportMedium {
+    display: none;
+  }
+}
+
+.container.container {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 0;
+
+  @include viewportMedium {
+    display: none;
+  }
+}

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
@@ -45,9 +46,12 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
   const startDateDateTime = DateTime.fromJSDate(startDate);
   const endDateDateTime = DateTime.fromJSDate(endDate);
   const anchorDateDateTime = DateTime.fromJSDate(anchorDate);
-  const navigateFunc = (action: string) => () => {
-    onNavigate(action);
-  };
+  const navigateFunc = useCallback(
+    (action: string) => () => {
+      onNavigate(action);
+    },
+    [onNavigate],
+  );
   const showPrevBtn =
     startDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
   const showNextBtn =
@@ -86,17 +90,17 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
         <FormattedMessage id="Toolbar.action.pickForMe" />
       </Button>
       <div className={css.actions}>
-        {views.length > 1 ? (
-          <div className={css.viewModeGroup}>{viewNamesGroupFunc()}</div>
-        ) : (
-          <div />
-        )}
-        {/* <Button
-          className={css.todayBtn}
-          variant="secondary"
-          onClick={navigateFunc(ENavigate.TODAY)}>
-          <FormattedMessage id="Toolbar.action.today" />
-        </Button> */}
+        <div className={css.btnGroup}>
+          {views.length > 1 ? (
+            <div className={css.viewModeGroup}>{viewNamesGroupFunc()}</div>
+          ) : (
+            <div />
+          )}
+
+          <div className={css.todayBtn} onClick={navigateFunc(ENavigate.TODAY)}>
+            <FormattedMessage id="Toolbar.action.today" />
+          </div>
+        </div>
         <div className={css.toolbarNavigation}>
           <div
             className={classNames(css.arrowBtn, !showPrevBtn && css.disabled)}

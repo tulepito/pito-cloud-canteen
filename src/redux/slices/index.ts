@@ -1,5 +1,6 @@
 export { default as auth } from './auth.slice';
 export { default as BookerCompanies } from './BookerCompanies.slice';
+export { default as Calendar } from './Calendar.slice';
 export { default as company } from './company.slice';
 export { default as companyInvitation } from './companyInvitation.slice';
 export { default as companyMember } from './companyMember.slice';
