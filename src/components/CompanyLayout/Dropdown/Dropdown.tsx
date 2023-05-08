@@ -117,7 +117,9 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
                   disableProfileLink
                   className={css.logo}
                 />
-                {label}
+                <div className={css.label} title={label}>
+                  {label}
+                </div>
               </div>
             );
           })}
