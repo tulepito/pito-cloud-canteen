@@ -2,7 +2,7 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 
 import type { TDayColumnHeaderProps } from '@components/CalendarDashboard/helpers/types';
-import { MAX_MOBILE_SCREEN_WIDTH, useViewport } from '@hooks/useViewport';
+import { useViewport } from '@hooks/useViewport';
 
 import css from './DayItem.module.scss';
 
@@ -11,10 +11,7 @@ const DayColumnHeader: React.FC<TDayColumnHeaderProps> = ({
   date,
   className,
 }) => {
-  const {
-    viewport: { width },
-  } = useViewport();
-  const isMobile = width < MAX_MOBILE_SCREEN_WIDTH;
+  const { isMobileLayout } = useViewport();
 
   return (
     <div
@@ -29,7 +26,7 @@ const DayColumnHeader: React.FC<TDayColumnHeaderProps> = ({
       <div className={css.dayText}>
         <FormattedMessage
           id={`Calendar.week.dayHeader.${
-            isMobile ? 'short.' : ''
+            isMobileLayout ? 'short.' : ''
           }${date.getDay()}`}
           values={{ date: date.getDate(), month: date.getMonth() + 1 }}
         />

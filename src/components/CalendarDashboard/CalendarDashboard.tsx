@@ -5,6 +5,7 @@ import { Calendar, luxonLocalizer, Views } from 'react-big-calendar';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 
+import { useViewport } from '@hooks/useViewport';
 import type { TDefaultProps, TObject } from '@utils/types';
 
 import createMonthViewWrapper from './components/MonthView/withMonthViewWrapper';
@@ -59,6 +60,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   exposeAnchorDate,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
+  const { isMobileLayout } = useViewport();
 
   const localizer = luxonLocalizer(DateTime) as any;
 
@@ -138,7 +140,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
     <div className={classes}>
       <Calendar
         {...anchorDateProps}
-        defaultView={Views.WEEK}
+        defaultView={isMobileLayout ? Views.MONTH : Views.WEEK}
         localizer={localizer}
         events={events}
         views={views}

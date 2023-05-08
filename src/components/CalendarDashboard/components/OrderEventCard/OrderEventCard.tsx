@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 import Tooltip from '@components/Tooltip/Tooltip';
 import { isOver } from '@helpers/orderHelper';
-import { MAX_MOBILE_SCREEN_WIDTH, useViewport } from '@hooks/useViewport';
+import { useViewport } from '@hooks/useViewport';
 
 import { EVENT_STATUS } from '../../helpers/constant';
 
@@ -20,20 +20,17 @@ export type TOrderEventCardProps = {
 };
 
 const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
-  const {
-    viewport: { width },
-  } = useViewport();
-  const isMobile = width < MAX_MOBILE_SCREEN_WIDTH;
+  const { isMobileLayout } = useViewport();
   const status = event.resource?.status;
   const isFoodPicked = !!event.resource?.dishSelection?.dishSelection;
   const isExpired = isOver(event.resource?.expiredTime) && !isFoodPicked;
   const eventStatus = isExpired ? EVENT_STATUS.EXPIRED_STATUS : status;
   const { orderColor } = event?.resource || {};
   const dotStyles = {
-    backgroundColor: isExpired ? '#FAFAFA' : orderColor,
+    backgroundColor: isExpired ? '#262626' : orderColor,
   };
   const cardStyles = {
-    borderColor: isExpired ? '#FAFAFA' : orderColor,
+    borderColor: isExpired ? '#262626' : orderColor,
   };
 
   return (
@@ -47,7 +44,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
         />
       }
       placement="rightTop"
-      trigger={isMobile ? '' : 'click'}
+      trigger={isMobileLayout ? '' : 'click'}
       overlayInnerStyle={{ backgroundColor: '#fff' }}>
       <div>
         <div

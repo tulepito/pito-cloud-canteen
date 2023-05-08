@@ -3,7 +3,7 @@ import type { Event } from 'react-big-calendar';
 import { DateTime } from 'luxon';
 
 import { useAppDispatch } from '@hooks/reduxHooks';
-import { MAX_MOBILE_SCREEN_WIDTH, useViewport } from '@hooks/useViewport';
+import { useViewport } from '@hooks/useViewport';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
 import type { TObject } from '@utils/types';
 
@@ -37,10 +37,7 @@ const WDayItem: React.FC<TWDayItemProps> = ({
   eventExtraProps,
 }) => {
   const dispatch = useAppDispatch();
-  const {
-    viewport: { width },
-  } = useViewport();
-  const isMobile = width < MAX_MOBILE_SCREEN_WIDTH;
+  const { isMobileLayout } = useViewport();
   const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
   const isCurrentDay =
     DateTime.fromJSDate(date)
@@ -69,7 +66,7 @@ const WDayItem: React.FC<TWDayItemProps> = ({
           isCurrentDay={isCurrentDay}
         />
       )}
-      {!isMobile && (
+      {!isMobileLayout && (
         <DayItemContent
           date={date}
           events={events}

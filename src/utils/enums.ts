@@ -138,6 +138,7 @@ export enum ECompanyMemberPermission {
 export const startRouteBaseOnPermission = {
   [EUserPermission.company]: '/company',
   [EUserPermission.admin]: '/admin',
+  [EUserPermission.normal]: '/participant',
 };
 
 export enum ERestaurantListingStatus {

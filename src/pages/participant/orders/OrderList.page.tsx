@@ -11,11 +11,13 @@ import OrderEventCard from '@components/CalendarDashboard/components/OrderEventC
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { CurrentUser, Listing } from '@src/utils/data';
 import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
+import { EParticipantOrderStatus } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
 
 import ParticipantToolbar from '../components/ParticipantToolbar/ParticipantToolbar';
@@ -112,8 +114,13 @@ const OrderListPage = () => {
         currentPlanListing.getMetadata().orderDetail[planItemKey].memberOrders[
           currentUserId
         ] || {};
+      const expiredTime = deadlineDate
+        ? DateTime.fromMillis(+deadlineDate)
+        : DateTime.fromMillis(+planItemKey).minus({ day: 2 });
 
-      const pickFoodStatus = foodSelection?.status;
+      const pickFoodStatus = isOver(expiredTime.toMillis())
+        ? EParticipantOrderStatus.expired
+        : foodSelection?.status;
 
       const event = {
         resource: {
@@ -135,9 +142,7 @@ const OrderListPage = () => {
           },
           deadlineDate,
           orderColor: colorOrderMap[orderId],
-          expiredTime: deadlineDate
-            ? DateTime.fromMillis(+deadlineDate)
-            : DateTime.fromMillis(+planItemKey).minus({ day: 2 }),
+          expiredTime: expiredTime.toMillis(),
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
           transactionId:
