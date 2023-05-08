@@ -189,6 +189,7 @@ export const ReviewContent: React.FC<any> = (props) => {
                 meta={deliveryMan.meta}
                 input={deliveryMan.input}
                 onChange={handleFieldDeliveryManChange}>
+                <option value={''}>Chọn nhân viên</option>
                 {deliveryManOptions.map(({ key, name }) => (
                   <option key={key} value={key}>
                     {name}
