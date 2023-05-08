@@ -11,7 +11,6 @@ import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import IconMail from '@components/Icons/IconMail/IconMail';
-import { generalPaths } from '@src/paths';
 import type { TDefaultProps } from '@utils/types';
 import {
   composeValidators,
@@ -77,7 +76,7 @@ const PasswordRecoveryFormComponent: React.FC<
   );
 
   const navigateToSignInPage = () => {
-    router.push(generalPaths.SignIn);
+    router.back();
   };
 
   const { rootClassName, className, formId, handleSubmit, invalid } = props;
