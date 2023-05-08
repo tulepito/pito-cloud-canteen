@@ -11,6 +11,7 @@ import {
   removeCover,
   removeFoodCertificate,
   removePartyInsurance,
+  resetInitialStates,
 } from '@redux/slices/partners.slice';
 import { ERestaurantListingStatus } from '@utils/enums';
 import {
@@ -143,6 +144,11 @@ const EditPartnerPage = () => {
     };
     await dispatch(partnerThunks.setRestaurantStatus(params));
   };
+
+  useEffect(() => {
+    // should reset initial states
+    dispatch(resetInitialStates());
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(partnerThunks.fetchAttributes());
