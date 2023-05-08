@@ -6,6 +6,7 @@ import IconCancel from '@components/Icons/IconCancel/IconCancel';
 import IconDelivering from '@components/Icons/IconDelivering/IconDelivering';
 import IconFail from '@components/Icons/IconFail/IconFail';
 import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
+import AlertModal from '@components/Modal/AlertModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { OrderDetailThunks } from '@pages/admin/order/[orderId]/OrderDetail.slice';
@@ -31,6 +32,7 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({ tx }) => {
   const deliveringController = useBoolean();
   const deliveredController = useBoolean();
   const failedController = useBoolean();
+  const confirmCancelController = useBoolean();
   const canceledController = useBoolean();
 
   const transactionId = Transaction(tx).getId();
@@ -42,6 +44,18 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({ tx }) => {
         transition,
       }),
     );
+  };
+
+  const handleCancelPlan = () => {
+    confirmCancelController.setTrue();
+  };
+
+  const handleConfirmCancel = () => {
+    transitTx(ETransition.OPERATOR_CANCEL_PLAN)();
+  };
+
+  const handleCancelCancelingProcess = () => {
+    confirmCancelController.setFalse();
   };
 
   useEffect(() => {
@@ -66,6 +80,18 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({ tx }) => {
           <FormattedMessage id="StateItemToolTip.stateInitiated" />
         </div>
       </div>
+      <AlertModal
+        isOpen={confirmCancelController.value}
+        title={<div className={css.modalTitle}>Huỷ đơn hàng</div>}
+        cancelLabel={'Không huỷ'}
+        confirmLabel={'Huỷ đơn hàng'}
+        cancelDisabled={transitInProgress}
+        confirmDisabled={transitInProgress}
+        handleClose={handleCancelCancelingProcess}
+        onCancel={handleCancelCancelingProcess}
+        onConfirm={handleConfirmCancel}>
+        Bạn có chắc chắn muốn huỷ đơn không?
+      </AlertModal>
       <Button
         variant="inline"
         className={css.row}
@@ -99,7 +125,7 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({ tx }) => {
         variant="inline"
         className={css.row}
         disabled={!canceledController.value}
-        onClick={transitTx(ETransition.OPERATOR_CANCEL_PLAN)}>
+        onClick={handleCancelPlan}>
         <IconCancel className={css.icon} />
         <div className={css.stateText}>
           <FormattedMessage id="StateItemToolTip.stateCanceled" />
