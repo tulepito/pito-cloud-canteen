@@ -17,6 +17,7 @@
 .sectionTitle {
   @include textTemplate(16px, $fontWeightBold, 24px);
   margin-bottom: 12px;
+  text-transform: capitalize;
 }
 .profileInforSection {
   .fieldWrapper {

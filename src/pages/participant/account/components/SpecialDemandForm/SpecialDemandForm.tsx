@@ -68,7 +68,6 @@ const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
         </div>
       </div>
       <FixedBottomButtons
-        isAbsolute
         FirstButton={
           <Button
             type="submit"
