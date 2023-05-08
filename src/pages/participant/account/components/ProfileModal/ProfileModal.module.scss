@@ -42,6 +42,7 @@
   .modalTitle {
     @include textTemplate(24px, $fontWeightBold, 32px);
     margin-top: 28px;
+    text-transform: capitalize;
   }
 }
 

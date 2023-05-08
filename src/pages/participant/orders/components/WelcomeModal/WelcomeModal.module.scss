@@ -10,6 +10,7 @@
 .modalHeader {
   text-align: center;
   @include textTemplate(24px, $fontWeightBold, 32px);
+  text-transform: capitalize;
   .secondRow {
     color: $primaryPri2;
   }

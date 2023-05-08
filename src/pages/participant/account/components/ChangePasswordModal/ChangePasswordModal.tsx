@@ -47,7 +47,7 @@ const ChangePasswordModal: React.FC<TChangePasswordModalProps> = (props) => {
           <span className={css.goBack}></span>
           Quay lại
         </div>
-        <div className={css.modalTitle}>Tài khoản cá nhân</div>
+        <div className={css.modalTitle}>Đổi mật khẩu</div>
       </div>
       <div className={css.modalContent}>
         <ChangePasswordForm
