@@ -33,6 +33,37 @@ export const postRatingFn = async (ratings: any) => {
   );
 };
 
+export const postParticipantRatingFn = async ({
+  rating,
+  detailTextRating,
+  imageIdList,
+}: {
+  rating: any;
+  detailTextRating: string;
+  imageIdList: string[];
+}) => {
+  const integrationSdk = getIntegrationSdk();
+  const { restaurantId, ...rest } = rating;
+  const { orderId, timestamp } = rest;
+  const restaurantListing = await fetchListing(restaurantId, ['author']);
+  const listingAuthorUser = User(restaurantListing.author);
+  const authorId = listingAuthorUser.getId();
+  const response = await integrationSdk.listings.create({
+    title: `Review for ${restaurantListing.attributes.title} - ${orderId} - ${timestamp}`,
+    authorId,
+    state: 'published',
+    images: imageIdList,
+    metadata: {
+      ...rating,
+      detailTextRating,
+      listingType: EListingType.rating,
+      reviewRole: UserPermission.PARTICIPANT,
+    },
+  });
+
+  return denormalisedResponseEntities(response)[0];
+};
+
 export const updateRatingForRestaurantFn = async (ratings: any) => {
   const integrationSdk = getIntegrationSdk();
   const pointOfRatings = ratings.reduce((result: any, rating: any) => {

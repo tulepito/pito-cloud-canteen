@@ -27,8 +27,10 @@ import ParticipantToolbar from '../components/ParticipantToolbar/ParticipantTool
 import OnboardingOrderModal from './components/OnboardingOrderModal/OnboardingOrderModal';
 import OnboardingTour from './components/OnboardingTour/OnboardingTour';
 import OrderListHeaderSection from './components/OrderListHeaderSection/OrderListHeaderSection';
+import RatingSubOrderModal from './components/RatingSubOrderModal/RatingSubOrderModal';
 import SubOrderCard from './components/SubOrderCard/SubOrderCard';
 import SubOrderDetailModal from './components/SubOrderDetailModal/SubOrderDetailModal';
+import SuccessRatingModal from './components/SuccessRatingModal/SuccessRatingModal';
 import UpdateProfileModal from './components/UpdateProfileModal/UpdateProfileModal';
 import WelcomeModal from './components/WelcomeModal/WelcomeModal';
 import { OrderListActions, OrderListThunks } from './OrderList.slice';
@@ -41,9 +43,11 @@ const OrderListPage = () => {
   const updateProfileModalControl = useBoolean();
   const onBoardingModal = useBoolean();
   const tourControl = useBoolean();
+  const ratingSubOrderModalControl = useBoolean();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const subOrderDetailModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
+  const successRatingModalControl = useBoolean();
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const orders = useAppSelector(
     (state) => state.ParticipantOrderList.orders,
@@ -204,6 +208,10 @@ const OrderListPage = () => {
     }, 1000);
   };
 
+  const openRatingSubOrderModal = () => {
+    ratingSubOrderModalControl.setTrue();
+  };
+
   return (
     <ParticipantLayout>
       <OrderListHeaderSection />
@@ -268,8 +276,20 @@ const OrderListPage = () => {
           isOpen={subOrderDetailModalControl.value}
           onClose={subOrderDetailModalControl.setFalse}
           event={selectedEvent!}
+          openRatingSubOrderModal={openRatingSubOrderModal}
         />
       </RenderWhen>
+      <RatingSubOrderModal
+        isOpen={ratingSubOrderModalControl.value}
+        onClose={ratingSubOrderModalControl.setFalse}
+        selectedEvent={selectedEvent}
+        currentUserId={currentUserId}
+        openSuccessRatingModal={successRatingModalControl.setTrue}
+      />
+      <SuccessRatingModal
+        isOpen={successRatingModalControl.value}
+        onClose={successRatingModalControl.setFalse}
+      />
 
       <BottomNavigationBar />
       <LoadingModal isOpen={showLoadingModal} />

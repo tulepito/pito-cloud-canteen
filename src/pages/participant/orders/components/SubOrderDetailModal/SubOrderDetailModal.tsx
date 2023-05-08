@@ -28,10 +28,11 @@ type TSubOrderDetailModalProps = {
   isOpen: boolean;
   onClose: () => void;
   event: Event;
+  openRatingSubOrderModal: () => void;
 };
 
 const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
-  const { isOpen, onClose, event } = props;
+  const { isOpen, onClose, event, openRatingSubOrderModal } = props;
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -157,7 +158,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
           </RenderWhen>
         </RenderWhen>
         <RenderWhen condition={txIsDelivered(subOrderTx)}>
-          <Button className={css.ratingBtn} onClick={() => {}}>
+          <Button className={css.ratingBtn} onClick={openRatingSubOrderModal}>
             Đánh giá
           </Button>
         </RenderWhen>
