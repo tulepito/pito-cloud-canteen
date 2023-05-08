@@ -96,7 +96,7 @@ const deleteAttributes = createAsyncThunk(
   },
 );
 
-export const AdminAttributesSettingThunks = {
+export const AdminAttributesThunks = {
   fetchAttributes,
   addAttributes,
   updateAttributes,

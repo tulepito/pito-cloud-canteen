@@ -14,15 +14,14 @@ import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import NamedLink from '@components/NamedLink/NamedLink';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import ToggleButton from '@components/ToggleButton/ToggleButton';
+import { useAppSelector } from '@hooks/reduxHooks';
 import {
   BUSINESS_TYPE_OPTIONS,
-  CATEGORY_OPTIONS,
   EImageVariants,
   ERestaurantListingStatus,
   EXTRA_SERVICE_OPTIONS,
   LIST_BANKS,
   MEAL_OPTIONS,
-  PACKAGING_OPTIONS,
 } from '@utils/enums';
 
 import {
@@ -42,6 +41,13 @@ const getLabelByKey = (list: any[], key: any) => {
 
 const EditPartnerPreviewForm: React.FC<any> = (props) => {
   const intl = useIntl();
+
+  const packagingOptions = useAppSelector(
+    (state) => state.AdminAttributes.packaging,
+  );
+  const categoryOptions = useAppSelector(
+    (state) => state.AdminAttributes.categories,
+  );
 
   return (
     <FinalForm
@@ -375,7 +381,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                         id="packaging"
                         name="packaging"
                         disabled
-                        options={PACKAGING_OPTIONS}
+                        options={packagingOptions}
                       />
                     </div>
                   </div>
@@ -514,7 +520,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                   <div className={css.content}>
                     {categories.map((category: string) => (
                       <div key={category} className={css.categoryBox}>
-                        {getLabelByKey(CATEGORY_OPTIONS, category)}
+                        {getLabelByKey(categoryOptions, category)}
                       </div>
                     ))}
                   </div>
