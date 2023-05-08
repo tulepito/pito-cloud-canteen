@@ -81,7 +81,7 @@ type TEditPartnerBasicInformationForm = {
 };
 
 const ACCEPT_IMAGES = 'image/png, image/gif, image/jpeg';
-const COVER_VARIANTS = [EImageVariants.scaledMedium];
+const COVER_VARIANTS = [EImageVariants.scaledXLarge];
 const AVATAR_VARIANTS = [EImageVariants.squareSmall2x];
 
 const EditPartnerBasicInformationForm: React.FC<

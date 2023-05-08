@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
-import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
 
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -8,40 +8,31 @@ import IconFood from '@components/Icons/IconFood/IconFood';
 import IconLock from '@components/Icons/IconLock/IconLock';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import useBoolean from '@hooks/useBoolean';
+import { participantPaths } from '@src/paths';
 
 import AvatarForm from './components/AvatarForm/AvatarForm';
-import ChangePasswordModal from './components/ChangePasswordModal/ChangePasswordModal';
-import ProfileModal from './components/ProfileModal/ProfileModal';
-import SpecialDemandModal from './components/SpecialDemandModal/SpecialDemandModal';
 import { AccountThunks } from './Account.slice';
 
 import css from './Account.module.scss';
 
 const AccountPage = () => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const currentUser = useAppSelector((state) => state.user.currentUser);
-  const profileModalControl = useBoolean();
-  const changePasswordModalControl = useBoolean();
-  const specialDemandModalControl = useBoolean();
-  const nutritionOptions = useAppSelector(
-    (state) => state.ParticipantAccount.nutritions,
-    shallowEqual,
-  );
   useEffect(() => {
     dispatch(AccountThunks.fetchAttributes());
   }, []);
 
   const openProfileModal = () => {
-    profileModalControl.setTrue();
+    router.push(participantPaths.AccountProfile);
   };
 
   const openChangePasswordModal = () => {
-    changePasswordModalControl.setTrue();
+    router.push(participantPaths.AccountChangePassword);
   };
 
   const openSpecialDemandModal = () => {
-    specialDemandModalControl.setTrue();
+    router.push(participantPaths.AccountSpecialDemand);
   };
 
   return (
@@ -73,21 +64,6 @@ const AccountPage = () => {
           <IconArrow direction="right" />
         </div>
       </div>
-      <ProfileModal
-        isOpen={profileModalControl.value}
-        onClose={profileModalControl.setFalse}
-        currentUser={currentUser!}
-      />
-      <ChangePasswordModal
-        isOpen={changePasswordModalControl.value}
-        onClose={changePasswordModalControl.setFalse}
-      />
-      <SpecialDemandModal
-        isOpen={specialDemandModalControl.value}
-        onClose={specialDemandModalControl.setFalse}
-        nutritionOptions={nutritionOptions}
-        currentUser={currentUser!}
-      />
       <BottomNavigationBar />
     </div>
   );

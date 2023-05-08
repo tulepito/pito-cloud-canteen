@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import type { Event } from 'react-big-calendar';
+import { Views } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
@@ -14,6 +15,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { CurrentUser, Listing } from '@src/utils/data';
 import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
@@ -41,6 +43,7 @@ const OrderListPage = () => {
   const tourControl = useBoolean();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const subOrderDetailModalControl = useBoolean();
+  const { isMobileLayout } = useViewport();
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const orders = useAppSelector(
     (state) => state.ParticipantOrderList.orders,
@@ -212,6 +215,7 @@ const OrderListPage = () => {
           // companyLogo={sectionCompanyBranding}
           renderEvent={OrderEventCard}
           inProgress={fetchOrdersInProgress}
+          defautlView={isMobileLayout ? Views.MONTH : Views.WEEK}
           // exposeAnchorDate={handleAnchorDateChange}
           components={{
             toolbar: (toolBarProps: any) => (
