@@ -23,14 +23,16 @@ type InputComponentProps = FieldRenderProps<string, HTMLInputElement> &
     labelClassName?: string;
     customErrorText?: string;
     isUncontrolled?: boolean;
-    inputRef: any;
-    leftIcon: TIconComponent;
+    inputRef?: any;
+    leftIcon?: TIconComponent;
     fullWidth?: boolean;
     required?: boolean;
     shouldHideEyeIcon?: boolean;
   };
 
-const FieldPasswordInputComponent: React.FC<InputComponentProps> = (props) => {
+export const FieldPasswordInputComponent: React.FC<InputComponentProps> = (
+  props,
+) => {
   const showPasswordControl = useBoolean(false);
   const {
     label,

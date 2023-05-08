@@ -20,7 +20,7 @@ const fetchSubOrder = async (orderDetail: any) => {
   const planKeys = Object.keys(orderDetail);
   for (const planKey of planKeys) {
     const planItem = orderDetail[planKey];
-    const { restaurant = {} } = planItem;
+    const { restaurant = {}, transactionId } = planItem;
     const { foodList = {}, id: restaurantId } = restaurant;
 
     // Fetch restaurant data
@@ -41,6 +41,7 @@ const fetchSubOrder = async (orderDetail: any) => {
       [planKey]: {
         foodList: foodListData,
         restaurant: restaurantData,
+        transactionId,
       },
     };
   }

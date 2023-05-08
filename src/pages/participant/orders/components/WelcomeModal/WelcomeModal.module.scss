@@ -1,0 +1,30 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.modalContainer.modalContainer {
+  flex-basis: calc(100% - 32px);
+  padding: 32px;
+}
+
+.modalHeader {
+  text-align: center;
+  @include textTemplate(24px, $fontWeightBold, 32px);
+  .secondRow {
+    color: $primaryPri2;
+  }
+}
+
+.modalContent {
+  @include textTemplate(14px, $fontWeightMedium, 24px);
+  text-align: center;
+  margin-top: 24px;
+}
+
+.modalFooter {
+  margin-top: 24px;
+
+  .startBtn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,24 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.formContainer {
+  padding-bottom: 80px;
+}
+
+.fieldWrapper {
+  margin-bottom: 16px;
+
+  .title {
+    @include textTemplate(14px, $fontWeightSemiBold, 24px);
+  }
+
+  .fieldGroup {
+    margin-top: 14px;
+  }
+}
+
+.submitBtn {
+  width: calc(100% - 32px);
+  margin: 0 auto;
+}

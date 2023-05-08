@@ -1,5 +1,8 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .main {
-  margin-top: 82px;
+  @include viewportMedium {
+    margin-top: 82px;
+  }
 }

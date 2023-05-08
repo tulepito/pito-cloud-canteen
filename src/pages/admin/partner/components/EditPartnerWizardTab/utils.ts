@@ -432,7 +432,7 @@ export const createAvailabilityPlanInitialValues = (
 export const createDayToApplyInitialValues = (
   availabilityPlan: TAvailabilityPlan,
 ) => {
-  const { entries } = availabilityPlan;
+  const { entries = [] } = availabilityPlan || {};
 
   return entries.map((entry: any) => entry.dayOfWeek);
 };

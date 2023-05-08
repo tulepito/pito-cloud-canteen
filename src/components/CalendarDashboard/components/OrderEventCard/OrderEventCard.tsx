@@ -3,6 +3,7 @@ import classNames from 'classnames';
 
 import Tooltip from '@components/Tooltip/Tooltip';
 import { isOver } from '@helpers/orderHelper';
+import { useViewport } from '@hooks/useViewport';
 
 import { EVENT_STATUS } from '../../helpers/constant';
 
@@ -18,10 +19,19 @@ export type TOrderEventCardProps = {
   index: number;
 };
 
-const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event, index }) => {
+const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
+  const { isMobileLayout } = useViewport();
   const status = event.resource?.status;
-  const isExpired = isOver(event.resource?.expiredTime);
+  const isFoodPicked = !!event.resource?.dishSelection?.dishSelection;
+  const isExpired = isOver(event.resource?.expiredTime) && !isFoodPicked;
   const eventStatus = isExpired ? EVENT_STATUS.EXPIRED_STATUS : status;
+  const { orderColor } = event?.resource || {};
+  const dotStyles = {
+    backgroundColor: isExpired ? '#262626' : orderColor,
+  };
+  const cardStyles = {
+    borderColor: isExpired ? '#262626' : orderColor,
+  };
 
   return (
     <Tooltip
@@ -34,22 +44,24 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event, index }) => {
         />
       }
       placement="rightTop"
-      trigger="click"
+      trigger={isMobileLayout ? '' : 'click'}
       overlayInnerStyle={{ backgroundColor: '#fff' }}>
-      <div
-        className={classNames(css.root, {
-          [css.rootExpired]: isExpired,
-          [css.rootBlue]: !isExpired && index % 2 === 1,
-          [css.rootOrange]: !isExpired && index % 2 === 0,
-        })}>
-        <OrderEventCardHeader event={event} />
-        <div className={css.eventCardContentWrapper}>
-          <OrderEventCardStatus
-            className={css.cardStatus}
-            status={eventStatus}
-          />
-          <OrderEventCardContentItems event={event} />
+      <div>
+        <div
+          className={classNames(css.root, {
+            [css.rootExpired]: isExpired,
+          })}
+          style={cardStyles}>
+          <OrderEventCardHeader event={event} />
+          <div className={css.eventCardContentWrapper}>
+            <OrderEventCardStatus
+              className={css.cardStatus}
+              status={eventStatus}
+            />
+            <OrderEventCardContentItems event={event} />
+          </div>
         </div>
+        <div className={css.dot} style={dotStyles}></div>
       </div>
     </Tooltip>
   );

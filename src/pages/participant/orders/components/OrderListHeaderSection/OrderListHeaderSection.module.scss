@@ -1,0 +1,34 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.sectionWrapper {
+  @include flexAlign(center, space-between);
+
+  .sectionTitle {
+    @include textTemplate(18px, $fontWeightBold, 24px);
+  }
+
+  .iconWrapper {
+    @include flexCenter;
+    width: 40px;
+    height: 40px;
+    background-color: $neutralGray3;
+    border-radius: 100%;
+    position: relative;
+
+    .notiNumber {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 18px;
+      height: 18px;
+      border: 2px solid $neutralGray1;
+      border-radius: 100%;
+      background-color: $primaryPri2;
+      color: $neutralGray1;
+      @include flexCenter;
+      @include textTemplate(10px, $fontWeightRegular, 12px);
+    }
+  }
+}

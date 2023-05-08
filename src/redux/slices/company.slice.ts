@@ -227,7 +227,13 @@ const adminCreateCompany = createAsyncThunk(
           expand: true,
         },
       });
+
       const [company] = denormalisedResponseEntities(data);
+      const companyId = User(company).getId();
+
+      unActiveCompanyApi(companyId, {
+        expand: true,
+      });
 
       return fulfillWithValue(company);
     } catch (error: any) {
@@ -257,7 +263,6 @@ const showCompany = createAsyncThunk(
 const adminUpdateCompany = createAsyncThunk(
   ADMIN_UPDATE_COMPANY,
   async (params: TUpdateCompanyApiParams) => {
-    const shouldPublish = params?.bankAccounts?.length > 0;
     const { data } = await adminUpdateCompanyApi({
       dataParams: params,
       queryParams: {
@@ -265,16 +270,6 @@ const adminUpdateCompany = createAsyncThunk(
         expand: true,
       },
     });
-
-    if (shouldPublish) {
-      const { data: newestData } = await publishCompanyApi(params.id, {
-        include: ['profileImage'],
-        expand: true,
-      });
-      const [company] = denormalisedResponseEntities(newestData);
-
-      return company;
-    }
 
     const [company] = denormalisedResponseEntities(data);
 

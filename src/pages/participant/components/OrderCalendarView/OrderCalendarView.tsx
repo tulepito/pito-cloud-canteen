@@ -7,7 +7,9 @@ import { DateTime } from 'luxon';
 import Avatar from '@components/Avatar/Avatar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
+import { markColorForOrder } from '@helpers/orderHelper';
 import { getDaySessionFromDeliveryTime } from '@src/utils/dates';
+import { convertStringToNumber } from '@src/utils/number';
 import { CurrentUser, Listing, User } from '@utils/data';
 import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 
@@ -34,7 +36,8 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const ensureCompanyUser = User(company).getFullData();
   const orderObj = Listing(order);
   const orderId = orderObj.getId();
-  const orderTile = orderObj.getAttributes().title;
+  const orderTile = orderObj.getAttributes()?.title;
+  const orderColor = markColorForOrder(convertStringToNumber(orderTile || ''));
   const currentUserId = CurrentUser(currentUser).getId();
 
   const { deadlineDate, deliveryHour, startDate, endDate } =
@@ -95,6 +98,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
             : DateTime.fromMillis(+planItemKey).minus({ day: 2 }),
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
+          orderColor,
         },
         title: orderTile,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
