@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable unused-imports/no-unused-vars */
 import { types as sdkTypes } from '@helpers/sdkLoader';
-import { useAppSelector } from '@hooks/reduxHooks';
 import { ListingTypes } from '@src/types/listingTypes';
 import type { EMenuTypes } from '@utils/enums';
 import { getSubmitImageId, getUniqueImages } from '@utils/images';
@@ -182,10 +181,10 @@ const EXCEL_FILE_COLUMN_NAME_AS_ENGLISH = [
   },
 ];
 
-export const getImportDataFromCsv = (values: any) => {
-  const packagingOptions = useAppSelector(
-    (state) => state.AdminAttributes.packaging,
-  );
+export const getImportDataFromCsv = (
+  values: any,
+  packagingOptions: any[] = [],
+) => {
   const valuesInEnglish = Object.keys(values).reduce((acc, key, index) => {
     const headerInEnglish = EXCEL_FILE_COLUMN_NAME_AS_ENGLISH.find((item) => {
       return item.columnIndex === index;
