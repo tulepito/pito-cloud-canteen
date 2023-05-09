@@ -2,9 +2,12 @@ import { useField, useForm } from 'react-final-form-hooks';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import FixedBottomButtons from '@components/FixedBottomButtons/FixedBottomButtons';
 import Form from '@components/Form/Form';
 import { FieldPasswordInputComponent } from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { generalPaths } from '@src/paths';
 import { passwordFormatValid } from '@src/utils/validators';
 
@@ -57,6 +60,10 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
   inProgress,
 }) => {
   const router = useRouter();
+  const changePasswordError = useAppSelector(
+    (state) => state.ParticipantAccount.changePasswordError,
+  );
+
   const { form, handleSubmit, submitting, hasValidationErrors } =
     useForm<TChangePasswordFormValues>({
       onSubmit,
@@ -108,6 +115,10 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
           className={css.fieldInput}
         />
       </div>
+
+      <RenderWhen condition={changePasswordError !== null}>
+        <ErrorMessage message="Đổi mật khẩu không thành công, vui lòng kiểm tra và thử lại" />
+      </RenderWhen>
       <FixedBottomButtons
         isAbsolute
         FirstButton={
