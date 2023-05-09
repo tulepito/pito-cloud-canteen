@@ -31,7 +31,7 @@ const isBookerInOrderProgress = async ({
     const inProgressOrders = denormalisedResponseEntities(response);
     if (inProgressOrders.length > 0) {
       throw new CustomError('Conflict', 409, {
-        message: 'Cannot process this function. Member has in progress orders.',
+        message: 'Không thể xoá, booker đang tham gia order',
       });
     }
   }

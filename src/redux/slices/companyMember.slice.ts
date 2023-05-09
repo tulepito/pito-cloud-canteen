@@ -285,7 +285,7 @@ export const companyMemberSlice = createSlice({
       .addCase(deleteMember.rejected, (state, { payload }) => ({
         ...state,
         deleteMemberInProgress: false,
-        deleteMemberError: (payload as TObject).message,
+        deleteMemberError: (payload as TObject)?.message,
       }))
       .addCase(queryCompanyMembers.pending, (state) => ({
         ...state,
