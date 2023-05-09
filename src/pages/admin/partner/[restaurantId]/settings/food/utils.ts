@@ -1,16 +1,14 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable unused-imports/no-unused-vars */
 import { types as sdkTypes } from '@helpers/sdkLoader';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { ListingTypes } from '@src/types/listingTypes';
 import type { EMenuTypes } from '@utils/enums';
 import { getSubmitImageId, getUniqueImages } from '@utils/images';
 import { toNonAccentVietnamese } from '@utils/string';
 import type { TImage } from '@utils/types';
 
-import {
-  FOOD_TYPE_OPTIONS,
-  MENU_OPTIONS,
-  PACKAGING_OPTIONS,
-} from '../../../../../../utils/enums';
+import { FOOD_TYPE_OPTIONS, MENU_OPTIONS } from '../../../../../../utils/enums';
 
 const { Money } = sdkTypes;
 
@@ -185,6 +183,9 @@ const EXCEL_FILE_COLUMN_NAME_AS_ENGLISH = [
 ];
 
 export const getImportDataFromCsv = (values: any) => {
+  const packagingOptions = useAppSelector(
+    (state) => state.AdminAttributes.packaging,
+  );
   const valuesInEnglish = Object.keys(values).reduce((acc, key, index) => {
     const headerInEnglish = EXCEL_FILE_COLUMN_NAME_AS_ENGLISH.find((item) => {
       return item.columnIndex === index;
@@ -224,7 +225,7 @@ export const getImportDataFromCsv = (values: any) => {
     [],
   );
 
-  const packagingArray = PACKAGING_OPTIONS.find(
+  const packagingArray = packagingOptions.find(
     (item) =>
       toNonAccentVietnamese(item.label, true).trim() ===
       toNonAccentVietnamese(packaging, true).trim(),

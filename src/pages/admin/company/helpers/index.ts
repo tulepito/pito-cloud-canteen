@@ -67,7 +67,7 @@ export const parseEntitiesToTableData = (
     const { profile = {}, email } = company.attributes || {};
     const { displayName, publicData = {}, metadata = {} } = profile as any;
     const { userState } = metadata;
-    const { location = {}, companyName, phoneNumber } = publicData;
+    const { companyLocation = {}, companyName, phoneNumber } = publicData;
 
     return {
       key: company.id.uuid,
@@ -79,7 +79,7 @@ export const parseEntitiesToTableData = (
         phoneNumber,
         email,
         companyName,
-        address: location?.address,
+        address: companyLocation?.address,
         ...(companyMembers ? { members: companyMembers[company.id.uuid] } : {}),
         ...extraData,
       },
