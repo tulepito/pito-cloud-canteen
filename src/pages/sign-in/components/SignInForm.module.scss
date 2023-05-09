@@ -3,7 +3,7 @@
 @use '/src/styles/mixins.scss' as *;
 
 .root {
-  padding: 32px 16px 0;
+  padding: 32px 16px 168px;
   width: 100%;
 }
 .formContainer {
@@ -21,6 +21,7 @@
 .formTitle {
   color: $neutralGray6;
   @include textTemplate(24px, $fontWeightBold, 32px);
+  text-transform: capitalize;
 
   @include viewportMedium {
     font-size: 32px;
