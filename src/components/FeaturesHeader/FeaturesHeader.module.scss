@@ -22,6 +22,7 @@
     height: 64px;
     padding: 20px 12px;
     position: relative;
+    max-width: 240px;
 
     &::before {
       content: '';

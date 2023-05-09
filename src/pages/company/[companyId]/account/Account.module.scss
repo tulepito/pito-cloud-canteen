@@ -42,12 +42,12 @@
       flex-basis: 306px;
 
       .title {
-        @include text(14px);
+        @include textTemplate(14px, 400, 20px);
         color: $neutralGray5;
       }
 
       .content {
-        @include text(14px);
+        @include textTemplate(14px, 400, 20px);
         margin-top: 8px;
       }
     }
