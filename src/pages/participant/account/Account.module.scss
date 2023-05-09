@@ -1,0 +1,51 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.container {
+  padding: 80px 16px;
+  position: relative;
+  overflow: hidden;
+
+  @include viewportMedium {
+    padding: 0 24px;
+  }
+}
+
+.greyCircle {
+  position: absolute;
+  width: 613px;
+  height: 613px;
+  background-color: $neutralGray2;
+  border-radius: 100%;
+  top: -480px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: -1;
+}
+
+.navigationWrapper {
+  margin-top: 28px;
+  @include flexAlign(unset, center);
+  flex-direction: column;
+  gap: 24px;
+
+  .navigationItem {
+    @include flexAlign(center, space-between);
+    padding-bottom: 16px;
+    border-bottom: 1px solid $neutralGray3;
+  }
+  .iconGroup {
+    @include flexAlign(center);
+    gap: 16px;
+
+    svg {
+      path {
+        fill: $neutralGray5;
+      }
+    }
+    span {
+      @include textTemplate(16px, $fontWeightSemiBold, 24px);
+    }
+  }
+}
