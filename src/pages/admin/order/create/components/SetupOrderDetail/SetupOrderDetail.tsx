@@ -23,6 +23,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { normalizePlanDetailsToEvent } from '@pages/company/booker/orders/draft/[orderId]/helpers/normalizeData';
+import { BookerSelectRestaurantThunks } from '@pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
 import { useGetCalendarExtraResources } from '@pages/company/booker/orders/draft/[orderId]/restaurants/hooks/calendar';
 import {
   addCurrentSelectedMenuId,
@@ -326,6 +327,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   useEffect(() => {
     dispatch(orderAsyncActions.fetchNutritions());
+    dispatch(BookerSelectRestaurantThunks.fetchSearchFilter());
   }, []);
 
   const handleSelectFood = async (values: TSelectFoodFormValues) => {
