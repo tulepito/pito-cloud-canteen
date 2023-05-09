@@ -120,7 +120,6 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
         <ErrorMessage message="Đổi mật khẩu không thành công, vui lòng kiểm tra và thử lại" />
       </RenderWhen>
       <FixedBottomButtons
-        isAbsolute
         FirstButton={
           <Button
             type="submit"
