@@ -61,3 +61,18 @@ export const updateUserMetadata = async (userId: string, metadata: any) => {
 
   return denormalisedResponseEntities(response)[0];
 };
+
+export const fetchTransaction = async (transactionId: string) => {
+  const integrationSdk = getIntegrationSdk();
+
+  const response = await integrationSdk.transactions.show(
+    {
+      id: transactionId,
+    },
+    {
+      expand: true,
+    },
+  );
+
+  return denormalisedResponseEntities(response)[0];
+};

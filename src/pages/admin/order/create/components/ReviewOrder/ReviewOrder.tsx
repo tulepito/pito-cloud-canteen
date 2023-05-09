@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Form as FinalForm } from 'react-final-form';
+import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
@@ -11,7 +12,10 @@ import { useRouter } from 'next/router';
 import Collapsible from '@components/Collapsible/Collapsible';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import Form from '@components/Form/Form';
+import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import ReviewOrdersResultSection from '@components/OrderDetails/ReviewView/ReviewOrdersResultSection/ReviewOrdersResultSection';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
@@ -22,10 +26,11 @@ import {
   changeStep4SubmitStatus,
   orderAsyncActions,
 } from '@redux/slices/Order.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { adminPaths } from '@src/paths';
-import { Listing } from '@utils/data';
+import { CurrentUser, Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
-import { EOrderDraftStates } from '@utils/enums';
+import { EOrderDraftStates, EOrderStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
 import { required } from '@utils/validators';
 
@@ -81,11 +86,54 @@ const MENU_TABLE_COLUMN: TColumn[] = [
   },
 ];
 
-export const ReviewContent: React.FC<any> = (props) => {
-  const { restaurant, notes } = props;
-  const { restaurantName, phoneNumber, foodList = {}, id } = restaurant;
+type TFormDeliveryInfoValues = {
+  deliveryMan: string;
+};
 
+export const ReviewContent: React.FC<any> = (props) => {
+  const { restaurant, notes, deliveryManInfo = {}, updatePlanDetail } = props;
+  const { key: deliveryManKey, phoneNumber: deliveryManPhoneNumber } =
+    deliveryManInfo;
   const intl = useIntl();
+
+  const [currDeliveryPhoneNumber, setCurrDeliveryManPhoneNumber] = useState<
+    string | undefined
+  >(deliveryManPhoneNumber);
+
+  const currentUser = useAppSelector(currentUserSelector);
+  const order = useAppSelector((state) => state.OrderDetail.order);
+  const orderDetail = useAppSelector((state) => state.OrderDetail.orderDetail);
+  const participantData = useAppSelector(
+    (state) => state.OrderDetail.participantData,
+  );
+  const anonymousParticipantData = useAppSelector(
+    (state) => state.OrderDetail.anonymousParticipantData,
+  );
+
+  const deliveryManOptions: {
+    key: string;
+    name: string;
+    phoneNumber: string;
+  }[] = useMemo(() => {
+    const { deliveryPeople = [] } = CurrentUser(currentUser).getMetadata();
+
+    return deliveryPeople;
+  }, []);
+  const { form } = useForm<TFormDeliveryInfoValues>({
+    onSubmit: () => {},
+    initialValues: {
+      deliveryMan: deliveryManKey,
+    },
+  });
+  const deliveryMan = useField('deliveryMan', form);
+
+  const {
+    participants = [],
+    anonymous = [],
+    orderState,
+  } = Listing(order as TListing).getMetadata();
+  const { restaurantName, phoneNumber, foodList = {}, id } = restaurant;
+  const isInProgressOrder = orderState === EOrderStates.inProgress;
 
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
     return {
@@ -98,27 +146,89 @@ export const ReviewContent: React.FC<any> = (props) => {
     };
   }) as any;
 
+  const handleFieldDeliveryManChange = (value: string) => {
+    const currDeliveryInfoOption = deliveryManOptions.find(
+      ({ key }) => key === value,
+    );
+
+    updatePlanDetail({
+      deliveryManInfo: currDeliveryInfoOption,
+    });
+
+    setCurrDeliveryManPhoneNumber(currDeliveryInfoOption?.phoneNumber);
+  };
+
   return (
     <div>
-      <Collapsible
-        label={intl.formatMessage({
-          id: 'ReviewOrder.providerLabel',
-        })}>
-        <div className={classNames(css.contentBox, css.spaceStart)}>
-          <div className={css.flexChild}>
-            <span className={css.boxTitle}>
-              {intl.formatMessage({ id: 'ReviewOrder.providerName' })}
-            </span>
-            <span className={css.boxContent}>{restaurantName}</span>
+      <RenderWhen condition={isInProgressOrder}>
+        <ReviewOrdersResultSection
+          className={css.reviewOrderResult}
+          data={{
+            participants,
+            participantData,
+            anonymous,
+            anonymousParticipantData,
+            orderDetail,
+          }}
+        />
+      </RenderWhen>
+      <div className={css.infoSection}>
+        <Collapsible
+          label={intl.formatMessage({
+            id: 'ReviewOrder.deliveryManInfoLabel',
+          })}>
+          <div className={classNames(css.contentBox, css.spaceStart)}>
+            <div className={css.flexChild}>
+              <span className={css.boxTitle}>
+                {intl.formatMessage({ id: 'ReviewOrder.deliveryManName' })}
+              </span>
+              <FieldSelectComponent
+                id="deliveryMan"
+                name="deliveryMan"
+                className={css.selectBoxContent}
+                meta={deliveryMan.meta}
+                input={deliveryMan.input}
+                onChange={handleFieldDeliveryManChange}>
+                {deliveryManOptions.map(({ key, name }) => (
+                  <option key={key} value={key}>
+                    {name}
+                  </option>
+                ))}
+              </FieldSelectComponent>
+            </div>
+            <div className={css.flexChild}>
+              <span className={css.boxTitle}>
+                {intl.formatMessage({ id: 'ReviewOrder.phoneNumberLabel' })}
+              </span>
+              <RenderWhen condition={!isEmpty(currDeliveryPhoneNumber)}>
+                <span className={css.boxContent}>
+                  {currDeliveryPhoneNumber}
+                </span>
+              </RenderWhen>
+            </div>
           </div>
-          <div className={css.flexChild}>
-            <span className={css.boxTitle}>
-              {intl.formatMessage({ id: 'ReviewOrder.phoneNumberLabel' })}
-            </span>
-            <span className={css.boxContent}>{phoneNumber}</span>
+        </Collapsible>
+
+        <Collapsible
+          label={intl.formatMessage({
+            id: 'ReviewOrder.providerLabel',
+          })}>
+          <div className={classNames(css.contentBox, css.spaceStart)}>
+            <div className={css.flexChild}>
+              <span className={css.boxTitle}>
+                {intl.formatMessage({ id: 'ReviewOrder.providerName' })}
+              </span>
+              <span className={css.boxContent}>{restaurantName}</span>
+            </div>
+            <div className={css.flexChild}>
+              <span className={css.boxTitle}>
+                {intl.formatMessage({ id: 'ReviewOrder.phoneNumberLabel' })}
+              </span>
+              <span className={css.boxContent}>{phoneNumber}</span>
+            </div>
           </div>
-        </div>
-      </Collapsible>
+        </Collapsible>
+      </div>
       <Collapsible
         label={intl.formatMessage({
           id: 'ReviewOrder.menuLabel',

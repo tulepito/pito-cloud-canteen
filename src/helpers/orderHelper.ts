@@ -110,6 +110,8 @@ export const isEnableUpdateBookingInfo = (
     EBookerOrderDraftStates.bookerDraft,
     EOrderDraftStates.draft,
     EOrderDraftStates.pendingApproval,
+    EOrderStates.picking,
+    EOrderStates.inProgress,
   ].includes(orderState);
 };
 
@@ -379,4 +381,10 @@ export const orderFlow = {
   [EOrderStates.inProgress]: [EOrderStates.pendingPayment],
   [EOrderStates.pendingPayment]: [EOrderStates.completed],
   [EOrderStates.completed]: [EOrderStates.reviewed],
+};
+
+export const markColorForOrder = (orderNumber: number) => {
+  const colorList = ['#65DB63', '#CF1332', '#FFB13D', '#2F54EB', '#171760'];
+
+  return colorList[orderNumber % colorList.length];
 };

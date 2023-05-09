@@ -158,6 +158,10 @@ export const txIsDelivering = (tx: TTransaction) => {
   return [ETransition.START_DELIVERY].includes(txLastTransition(tx));
 };
 
+export const txIsDelivered = (tx: TTransaction) => {
+  return [ETransition.COMPLETE_DELIVERY].includes(txLastTransition(tx));
+};
+
 export const txIsDeliveryFailed = (tx: TTransaction) => {
   return getTransitionsToState(ETransactionState.FAILED_DELIVERY).includes(
     txLastTransition(tx),

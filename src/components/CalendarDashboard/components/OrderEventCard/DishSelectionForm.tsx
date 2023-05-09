@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
-import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
+import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
 import { useAppSelector } from '@hooks/reduxHooks';
 
 import css from './DishSelectionForm.module.scss';
@@ -15,6 +16,7 @@ type TDishSelectionFormProps = {
   onSubmit: (values: TDishSelectionFormValues, reject?: boolean) => void;
   initialValues: TDishSelectionFormValues;
   actionsDisabled: boolean;
+  subOrderStatus?: string;
 };
 
 export type TDishSelectionFormValues = {
@@ -35,6 +37,7 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
   onSubmit,
   initialValues,
   actionsDisabled = false,
+  subOrderStatus = EVENT_STATUS.EMPTY_STATUS,
 }) => {
   const [clickedType, setClickedType] = useState<
     'reject' | 'submit' | undefined
@@ -52,6 +55,7 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
     useForm<TDishSelectionFormValues>({
       onSubmit: handleCustomSubmit,
       validate,
+      initialValues,
     });
 
   const handleReject = () => {
@@ -69,49 +73,51 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>
-      {dishes.map((dish, index) => (
-        <label
-          key={index}
-          className={css.radioLabel}
-          htmlFor={`dishSelection-${index}`}>
-          <input
-            {...dishSelection.input}
-            className={css.radioInput}
-            disabled={actionsDisabled}
-            type={'radio'}
-            value={dish.key}
-            defaultChecked={dish.key === initialValues.dishSelection}
-            id={`dishSelection-${index}`}
-            name="dishSelection"
-          />
-          {dish.value}
-        </label>
-      ))}
-      <div className={css.actions}>
-        <Button
-          type="button"
-          variant="secondary"
-          className={css.pickForMeBtn}
-          onClick={() => {}}>
-          <FormattedMessage id="DishSelectionForm.pickForMe" />
-        </Button>
-        <Button
-          className={css.acceptBtn}
-          type="submit"
-          disabled={disabledSubmit}
-          inProgress={confirmSubmitting}
-          spinnerClassName={css.spinnerClassName}>
-          <FormattedMessage id="DishSelectionForm.accept" />
-        </Button>
-        <Button
-          type="button"
-          variant="inline"
-          className={css.rejectBtn}
-          onClick={handleReject}
-          disabled={disabledRejectButton}
-          inProgress={rejectSubmitting}>
-          <FormattedMessage id="DishSelectionForm.reject" />
-        </Button>
+      <div className={css.fieldGroup}>
+        {dishes.map((dish, index) => (
+          <label
+            key={index}
+            className={css.radioLabel}
+            htmlFor={`dishSelection-${index}`}>
+            <input
+              {...dishSelection.input}
+              className={css.radioInput}
+              disabled={actionsDisabled}
+              type={'radio'}
+              value={dish.key}
+              defaultChecked={dish.key === initialValues.dishSelection}
+              id={`dishSelection-${index}`}
+              name="dishSelection"
+            />
+            {dish.value}
+          </label>
+        ))}
+      </div>
+      <div className={css.sectionWrapper}>
+        <div className={css.row}>
+          <Button className={css.btn} variant="secondary">
+            Chọn giúp tôi
+          </Button>
+          <Button
+            className={css.btn}
+            type="submit"
+            disabled={disabledSubmit}
+            inProgress={confirmSubmitting}>
+            {subOrderStatus === EVENT_STATUS.JOINED_STATUS
+              ? 'Chọn món mới'
+              : 'Xác nhận chọn món'}
+          </Button>
+        </div>
+        <div className={css.row}>
+          <Button
+            className={classNames(css.btn, css.lastBtn)}
+            variant="inline"
+            onClick={handleReject}
+            disabled={disabledRejectButton}
+            inProgress={rejectSubmitting}>
+            <span>Không tham gia</span>
+          </Button>
+        </div>
       </div>
     </form>
   );

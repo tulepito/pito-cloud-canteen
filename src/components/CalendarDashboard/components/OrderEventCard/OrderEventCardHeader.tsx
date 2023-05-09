@@ -2,6 +2,7 @@ import type { Event } from 'react-big-calendar';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { MORNING_SESSION } from '@components/CalendarDashboard/helpers/constant';
+import { isOver } from '@helpers/orderHelper';
 
 import css from './OrderEventCard.module.scss';
 
@@ -15,9 +16,14 @@ const OrderEventCardHeader: React.FC<TOrderEventCardHeaderProps> = ({
   const intl = useIntl();
   const startTime = event.resource.deliveryHour;
   const { daySession = MORNING_SESSION } = event.resource;
+  const { orderColor } = event?.resource || {};
+  const isExpired = isOver(event.resource?.expiredTime);
+  const headerStyles = {
+    backgroundColor: isExpired ? '#262626' : orderColor,
+  };
 
   return (
-    <div className={css.eventCardHeader}>
+    <div className={css.eventCardHeader} style={headerStyles}>
       <div className={css.eventCardTitleWrapper}>
         <div className={css.eventTitle}>
           {intl.formatMessage({ id: `DayColumn.Session.${daySession}` })}

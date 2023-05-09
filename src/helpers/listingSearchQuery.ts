@@ -188,3 +188,12 @@ export const getOrderQuotationsQuery = ({
 
   return query;
 };
+
+export const getParticipantOrdersQuery = ({ userId }: { userId: string }) => {
+  const query = {
+    meta_listingType: ListingTypes.ORDER,
+    meta_participants: `has_any:${userId}`,
+  };
+
+  return query;
+};

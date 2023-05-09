@@ -38,6 +38,17 @@
   }
 }
 
+.calendarContainer {
+  margin-top: 28px;
+}
+
+.subOrderContainer {
+  @include flexAlign(unset);
+  flex-direction: column;
+  width: 100%;
+  gap: 16px;
+  margin-top: 18px;
+}
 @keyframes slideIn {
   0% {
     transform: translateY(100%);

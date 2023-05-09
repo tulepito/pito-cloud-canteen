@@ -5,13 +5,13 @@
 .root {
   width: 100%;
   height: 100%;
-  overflow-x: scroll;
+  // overflow-x: scroll;
 }
 
 .scrollContainer {
-  display: flex;
-  flex-wrap: wrap;
-  width: calc((100vw - 66px) * 7);
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  width: calc((100vw - 32px));
   height: 100%;
 
   @include viewportMedium {
@@ -24,7 +24,7 @@
 }
 
 .dayInWeekHeader {
-  flex-basis: calc(100% / 7);
+  // flex-basis: calc((100% - 32px) / 7);
   padding: 4px 8px;
   @include textTemplate(12px, 600, 20px, '');
   color: $neutralGray6;
@@ -34,11 +34,16 @@
 
   &:first-child {
     border-left: 1px solid $neutralGray4;
-    border-top-left-radius: 9px;
+
+    @include viewportMedium {
+      border-top-left-radius: 9px;
+    }
   }
 
   &:nth-child(7) {
-    border-top-right-radius: 9px;
+    @include viewportMedium {
+      border-top-right-radius: 9px;
+    }
   }
 }
 
@@ -49,13 +54,13 @@
 }
 
 .emptyDay {
-  flex-basis: calc(100% / 7);
-  border-bottom: 1px solid $neutralGray5;
-  border-right: 1px solid $neutralGray5;
-  min-height: 150px;
+  // flex-basis: calc((100% - 32px) / 7);
+  border-bottom: 1px solid $neutralGray4;
+  border-right: 1px solid $neutralGray4;
+  min-height: 76px;
 
   &:nth-child(7n + 1) {
-    border-left: 1px solid $neutralGray5;
+    border-left: 1px solid $neutralGray4;
   }
 }
 

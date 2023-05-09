@@ -2,6 +2,9 @@ import type { ReactNode } from 'react';
 import type { Event } from 'react-big-calendar';
 import { DateTime } from 'luxon';
 
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
+import { CalendarActions } from '@redux/slices/Calendar.slice';
 import type { TObject } from '@utils/types';
 
 import type {
@@ -33,6 +36,8 @@ const WDayItem: React.FC<TWDayItemProps> = ({
   customHeader,
   eventExtraProps,
 }) => {
+  const dispatch = useAppDispatch();
+  const { isMobileLayout } = useViewport();
   const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
   const isCurrentDay =
     DateTime.fromJSDate(date)
@@ -40,8 +45,15 @@ const WDayItem: React.FC<TWDayItemProps> = ({
       .diff(currentDate, ['day', 'hour'])
       .get('day') === 0;
 
+  const onClick = () => {
+    dispatch(CalendarActions.setSelectedDay(date));
+  };
+
   return (
-    <div className={css.weekDay} id={`dayHeader-${date.getDay()}`}>
+    <div
+      className={css.weekDay}
+      id={`dayHeader-${date.getDay()}`}
+      onClick={onClick}>
       {customHeader ? (
         customHeader({
           date,
@@ -54,14 +66,16 @@ const WDayItem: React.FC<TWDayItemProps> = ({
           isCurrentDay={isCurrentDay}
         />
       )}
-      <DayItemContent
-        date={date}
-        events={events}
-        resources={resources}
-        renderEvent={renderEvent}
-        eventExtraProps={eventExtraProps}
-        components={components}
-      />
+      {!isMobileLayout && (
+        <DayItemContent
+          date={date}
+          events={events}
+          resources={resources}
+          renderEvent={renderEvent}
+          eventExtraProps={eventExtraProps}
+          components={components}
+        />
+      )}
     </div>
   );
 };

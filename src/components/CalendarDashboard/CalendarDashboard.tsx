@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Event, ViewsProps } from 'react-big-calendar';
+import type { Event, View, ViewsProps } from 'react-big-calendar';
 import { Calendar, luxonLocalizer, Views } from 'react-big-calendar';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
@@ -36,6 +36,7 @@ type TCalendarDashboardProps = TDefaultProps & {
   eventExtraProps?: TObject;
   resources?: any;
   exposeAnchorDate?: (date?: Date) => void;
+  defautlView?: View;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
@@ -57,6 +58,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   eventExtraProps,
   resources,
   exposeAnchorDate,
+  defautlView = Views.WEEK,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
 
@@ -138,7 +140,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
     <div className={classes}>
       <Calendar
         {...anchorDateProps}
-        defaultView={Views.WEEK}
+        defaultView={defautlView}
         localizer={localizer}
         events={events}
         views={views}
