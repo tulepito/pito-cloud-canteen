@@ -1,8 +1,8 @@
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
+import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@utils/data';
-import { CATEGORY_OPTIONS } from '@utils/enums';
 import type { TDefaultProps } from '@utils/types';
 
 import css from './RestaurantTable.module.scss';
@@ -25,12 +25,16 @@ const prepareDataForRestaurant = (restaurant: any) => {
 const RestaurantRow: React.FC<TRestaurantRowProps> = (props) => {
   const intl = useIntl();
   const { rootClassName, className, restaurant, onItemClick } = props;
+  const categoryOptions = useAppSelector(
+    (state) => state.BookerSelectRestaurant.categories,
+  );
+
   const itemClasses = classNames(rootClassName || css.item, className);
   const { title, categories, menuType } = prepareDataForRestaurant(restaurant);
   const categoriesContent = categories
     ? categories
         .map((cat: string) => {
-          const category = CATEGORY_OPTIONS.find((item) => item.key === cat);
+          const category = categoryOptions.find((item) => item.key === cat);
 
           return category?.label || undefined;
         })

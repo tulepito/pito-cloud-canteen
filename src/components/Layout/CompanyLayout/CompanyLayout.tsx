@@ -85,7 +85,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       title: (
         <div className={css.headerTitle}>
           <FeatureIcons.Cart />
-          <span>Đặt hàng</span>
+          <div className={css.title}>Đặt hàng</div>
         </div>
       ),
       pathname: companyPaths.CreateNewOrder,
@@ -95,7 +95,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       title: (
         <div className={css.headerTitle}>
           <FeatureIcons.Box />
-          <span>Đơn hàng</span>
+          <div className={css.title}>Đơn hàng</div>
         </div>
       ),
       query: {
@@ -114,7 +114,9 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
             <div onMouseEnter={onMouseEnter} className={css.headerTitleWrapper}>
               <div className={css.headerTitle}>
                 <FeatureIcons.User />
-                <span>{title}</span>
+                <div className={css.title} title={title}>
+                  {title}
+                </div>
               </div>
               {isMobile && (
                 <IconArrowHead direction={isDropdownOpen ? 'right' : 'down'} />

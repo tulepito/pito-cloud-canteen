@@ -57,7 +57,7 @@
   :nth-child(3),
   :nth-child(4) {
     flex-basis: calc((100% - 16px * 3) / 5);
-    word-break: break-all;
+    word-break: break-word;
     @include lineClamp(4);
   }
 
