@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import last from 'lodash/last';
 import { useRouter } from 'next/router';
 
 import Button, { InlineTextButton } from '@components/Button/Button';
@@ -75,12 +76,15 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     router.push(to);
   };
 
-  const onSelectDish = (values: TDishSelectionFormValues, reject?: boolean) => {
+  const onSelectDish = async (
+    values: TDishSelectionFormValues,
+    reject?: boolean,
+  ) => {
     const currentUserId = CurrentUser(user).getId();
     const payload = {
       updateValues: {
         orderId,
-        orderDay,
+        orderDay: last(orderDay.split(' - ')),
         planId,
         memberOrders: {
           [currentUserId]: {
@@ -94,7 +98,9 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
       orderId,
     };
 
-    dispatch(participantOrderManagementThunks.updateOrder(payload));
+    await dispatch(participantOrderManagementThunks.updateOrder(payload));
+    await dispatch(OrderListThunks.fetchOrders(currentUserId));
+    onClose();
   };
 
   return (

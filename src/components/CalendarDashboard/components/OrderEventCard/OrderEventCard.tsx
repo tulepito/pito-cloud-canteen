@@ -27,10 +27,10 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
   const eventStatus = isExpired ? EVENT_STATUS.EXPIRED_STATUS : status;
   const { orderColor } = event?.resource || {};
   const dotStyles = {
-    backgroundColor: isExpired ? '#262626' : orderColor,
+    backgroundColor: isExpired ? '#8C8C8C' : orderColor,
   };
   const cardStyles = {
-    borderColor: isExpired ? '#262626' : orderColor,
+    borderColor: isExpired ? '#8C8C8C' : orderColor,
   };
 
   return (

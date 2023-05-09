@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
@@ -7,7 +6,6 @@ import { DateTime } from 'luxon';
 import Button from '@components/Button/Button';
 import { ENavigate } from '@components/CalendarDashboard/helpers/constant';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import type { TObject } from '@utils/types';
 
 import css from './ParticipantToolbar.module.scss';
@@ -39,19 +37,14 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
     onView,
     views,
     view,
-    onPickForMe,
-    onPickForMeLoading,
   } = props;
   const intl = useIntl();
   const startDateDateTime = DateTime.fromJSDate(startDate);
   const endDateDateTime = DateTime.fromJSDate(endDate);
   const anchorDateDateTime = DateTime.fromJSDate(anchorDate);
-  const navigateFunc = useCallback(
-    (action: string) => () => {
-      onNavigate(action);
-    },
-    [onNavigate],
-  );
+  const navigateFunc = (action: string) => () => {
+    onNavigate(action);
+  };
   const showPrevBtn =
     startDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
   const showNextBtn =
@@ -82,13 +75,13 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
 
   return (
     <div className={css.root}>
-      <Button
+      {/* <Button
         className={css.pickForMeBtn}
         variant="secondary"
         onClick={onPickForMe}>
         <IconRefreshing inProgress={onPickForMeLoading} />
         <FormattedMessage id="Toolbar.action.pickForMe" />
-      </Button>
+      </Button> */}
       <div className={css.actions}>
         <div className={css.btnGroup}>
           {views.length > 1 ? (
