@@ -95,9 +95,9 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
       </div>
       <div className={css.sectionWrapper}>
         <div className={css.row}>
-          <Button className={css.btn} variant="secondary">
+          {/* <Button className={css.btn} variant="secondary">
             Chọn giúp tôi
-          </Button>
+          </Button> */}
           <Button
             className={css.btn}
             type="submit"

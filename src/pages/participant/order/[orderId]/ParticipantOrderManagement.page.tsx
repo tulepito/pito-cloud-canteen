@@ -120,7 +120,7 @@ const ParticipantOrderManagement = () => {
           />
         </>
       ) : (
-        <Tabs items={tabOptions as any} />
+        <Tabs items={tabOptions as any} headerClassName={css.tabHeader} />
       )}
     </ParticipantLayout>
   );
