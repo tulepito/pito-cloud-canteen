@@ -3,7 +3,7 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  height: auto;
+  height: 160px;
   width: 100%;
   position: relative;
   border-radius: 16px;
@@ -31,7 +31,7 @@
     bottom: 24px;
     left: 32px;
     z-index: 1;
-    width: 100%;
+    width: calc(100% - 32px);
 
     .heroOrderDay {
       margin: 0;
@@ -40,7 +40,11 @@
     }
     .heroTitle {
       margin: 0;
-      @include textTemplate(34px, 700, 44px, '');
+      @include textTemplate(24px, 700, 32px);
+
+      @include viewportMedium {
+        @include textTemplate(34px, 700, 44px);
+      }
       color: $neutralGray1;
       text-transform: capitalize;
       white-space: nowrap;
@@ -48,10 +52,6 @@
       overflow: hidden;
       width: calc(100% - 40px);
     }
-  }
-
-  @include viewportLarge {
-    height: 160px;
   }
 }
 

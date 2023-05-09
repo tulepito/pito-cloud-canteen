@@ -7,7 +7,10 @@ type TShoppingCartState = {
   orders: {
     [memberId: string]: {
       [planId: string]: {
-        [dayId: number]: string;
+        [dayId: number]: {
+          foodId: string;
+          requirement: string;
+        };
       };
     };
   };
@@ -37,10 +40,17 @@ export const shoppingCartSlice = createSlice({
           planId: string;
           dayId: string;
           mealId: string;
+          requirement?: string;
         };
       },
     ) => {
-      const { currentUserId, planId, dayId, mealId } = payload || {};
+      const {
+        currentUserId,
+        planId,
+        dayId,
+        mealId: foodId,
+        requirement = '',
+      } = payload || {};
 
       return {
         ...state,
@@ -50,7 +60,10 @@ export const shoppingCartSlice = createSlice({
             ...(state.orders?.[currentUserId] || {}),
             [planId]: {
               ...(state.orders?.[currentUserId]?.[planId] || {}),
-              [dayId]: mealId,
+              [dayId]: {
+                foodId,
+                requirement,
+              },
             },
           },
         },
@@ -78,7 +91,10 @@ export const shoppingCartSlice = createSlice({
             ...(state.orders?.[currentUserId] || {}),
             [planId]: {
               ...(state.orders?.[currentUserId]?.[planId] || {}),
-              [dayId]: undefined,
+              [dayId]: {
+                foodId: '',
+                requirement: '',
+              },
             },
           },
         },
@@ -128,7 +144,8 @@ const addToCartThunk = createAsyncThunk(
       planId,
       dayId,
       mealId,
-    }: { planId: string; dayId: string; mealId: string },
+      requirement,
+    }: { planId: string; dayId: string; mealId: string; requirement?: string },
     { getState, dispatch },
   ) => {
     const { currentUser } = getState().user;
@@ -139,6 +156,7 @@ const addToCartThunk = createAsyncThunk(
         planId,
         dayId,
         mealId,
+        requirement,
       }),
     );
   },

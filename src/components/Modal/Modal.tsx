@@ -19,6 +19,7 @@ export type TModalProps = PropsWithChildren<{
   isOpen: boolean;
   title?: ReactNode | string;
   shouldHideIconClose?: boolean;
+  closeButton?: ReactNode;
   handleClose: () => void;
   scrollLayerClassName?: string;
   customHeader?: ReactNode;
@@ -40,6 +41,7 @@ const Modal: React.FC<TModalProps> = (props) => {
     scrollLayerClassName,
     customHeader,
     closeClassName,
+    closeButton,
   } = props;
 
   const intl = useIntl();
@@ -55,14 +57,16 @@ const Modal: React.FC<TModalProps> = (props) => {
   const closeModalMessage = intl.formatMessage({ id: 'Modal.closeModal' });
 
   const closeBtn =
-    !shouldHideIconClose && isOpen ? (
-      <Button
-        onClick={handleClose}
-        rootClassName={css.close}
-        title={closeModalMessage}>
-        <IconClose rootClassName={css.closeIcon} />
-      </Button>
-    ) : null;
+    !shouldHideIconClose && isOpen
+      ? closeButton || (
+          <Button
+            onClick={handleClose}
+            rootClassName={css.close}
+            title={closeModalMessage}>
+            <IconClose rootClassName={css.closeIcon} />
+          </Button>
+        )
+      : null;
 
   useEffect(() => {
     if (isOpen) {

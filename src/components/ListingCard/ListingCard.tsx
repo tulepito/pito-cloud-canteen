@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import classNames from 'classnames';
 
 import Badge from '@components/Badge/Badge';
@@ -5,9 +6,12 @@ import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckma
 import IconPlusDish from '@components/Icons/IconPlusDish/IconPlusDish';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
 import { EImageVariants, SPECIAL_DIET_OPTIONS } from '@src/utils/enums';
 import { Listing } from '@utils/data';
+
+import ListingDetailModal from './ListingDetailModal';
 
 import css from './ListingCard.module.scss';
 
@@ -28,6 +32,10 @@ const ListingCard: React.FC<TListCardProps> = ({
   isSelected,
   selectDisabled,
 }) => {
+  const detailModalController = useBoolean();
+  const requirementRef = useRef<string | undefined>();
+
+  const requirement = requirementRef.current;
   const mealId = listing?.id?.uuid;
   const { title, description } = Listing(listing).getAttributes();
   const { specialDiets = [], allergicIngredients = [] } =
@@ -37,7 +45,9 @@ const ListingCard: React.FC<TListCardProps> = ({
 
   const handleAddToCard = () => {
     if (!selectDisabled) {
-      dispatch(shoppingCartThunks.addToCart({ planId, dayId, mealId }));
+      dispatch(
+        shoppingCartThunks.addToCart({ planId, dayId, mealId, requirement }),
+      );
     }
   };
   const handleRemoveFromCard = () => {
@@ -52,48 +62,80 @@ const ListingCard: React.FC<TListCardProps> = ({
 
   const classes = classNames(css.root, className);
 
+  const viewListingDetail = () => {
+    detailModalController.setTrue();
+  };
+
+  const handleCloseListingDetailModal = () => {
+    detailModalController.setFalse();
+  };
+
+  const handleChangeRequirement = (value: string) => {
+    requirementRef.current = value;
+  };
+
+  const handleSelectFoodInModal = () => {
+    dispatch(
+      shoppingCartThunks.addToCart({ planId, dayId, mealId, requirement }),
+    );
+    detailModalController.setFalse();
+  };
+
   return (
     <div className={classes}>
-      <div className={css.listingImage}>
-        <ResponsiveImage
-          image={listingImage}
-          alt={title}
-          variants={[EImageVariants.landscapeCrop]}
-        />
-      </div>
-      <div className={css.listingCardContent}>
-        <div className={css.listingCardInfo}>
-          <h6 className={css.title}>{title}</h6>
-          <div className={css.categories}>
-            {badges.map((badge: any) => (
-              <Badge
-                key={badge?.key}
-                label={badge?.label}
-                type={badge?.badgeType}
-              />
-            ))}
+      <div>
+        <div className={css.listingImage} onClick={viewListingDetail}>
+          <ResponsiveImage
+            image={listingImage}
+            alt={title}
+            variants={[EImageVariants.landscapeCrop]}
+          />
+        </div>
+        <div className={css.listingCardContent}>
+          <div className={css.listingCardInfo} onClick={viewListingDetail}>
+            <h6 className={css.title}>{title}</h6>
+            <div className={css.categories}>
+              {badges.map((badge: any) => (
+                <Badge
+                  className={css.badge}
+                  key={badge?.key}
+                  label={badge?.label}
+                  type={badge?.badgeType}
+                />
+              ))}
+            </div>
+            <p className={css.description}>{description}</p>
           </div>
-          <p className={css.description}>{description}</p>
-        </div>
-        <div className={css.listingCardFooter}>
-          <p className={css.allergiesLabel}>
-            {allergicIngredients.map((item: string) => `Có ${item}`).join(', ')}
-          </p>
-          {isSelected ? (
-            <span className={css.removeDish} onClick={handleRemoveFromCard}>
-              <IconCheckmarkWithCircle />
-            </span>
-          ) : (
-            <span
-              className={classNames(css.addDish, {
-                [css.selectDisabled]: selectDisabled,
-              })}
-              onClick={handleAddToCard}>
-              <IconPlusDish />
-            </span>
-          )}
+          <div className={css.listingCardFooter}>
+            <p className={css.allergiesLabel}>
+              {allergicIngredients
+                .map((item: string) => `Có ${item}`)
+                .join(', ')}
+            </p>
+            {isSelected ? (
+              <span className={css.removeDish} onClick={handleRemoveFromCard}>
+                <IconCheckmarkWithCircle />
+              </span>
+            ) : (
+              <span
+                className={classNames(css.addDish, {
+                  [css.selectDisabled]: selectDisabled,
+                })}
+                onClick={handleAddToCard}>
+                <IconPlusDish />
+              </span>
+            )}
+          </div>
         </div>
       </div>
+      <ListingDetailModal
+        listing={listing}
+        isOpen={detailModalController.value}
+        title={title}
+        onClose={handleCloseListingDetailModal}
+        onChangeRequirement={handleChangeRequirement}
+        onSelectFood={handleSelectFoodInModal}
+      />
     </div>
   );
 };
