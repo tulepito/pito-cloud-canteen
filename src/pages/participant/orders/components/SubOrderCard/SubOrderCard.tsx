@@ -49,7 +49,7 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
   const isFoodPicked = !!event.resource?.dishSelection?.dishSelection;
   const isExpired = isOver(event.resource?.expiredTime) && !isFoodPicked;
   const headerStyles = {
-    backgroundColor: isExpired ? '#262626' : orderColor,
+    backgroundColor: isExpired ? '#8C8C8C' : orderColor,
   };
   const remainTime = calculateRemainTime(deadlineDate);
 

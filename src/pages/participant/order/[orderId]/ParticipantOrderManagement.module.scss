@@ -33,3 +33,11 @@
   height: 32px;
   border-radius: 8px;
 }
+
+.tabHeader {
+  margin-bottom: 48px;
+
+  @include viewportMedium {
+    margin-bottom: 0;
+  }
+}
