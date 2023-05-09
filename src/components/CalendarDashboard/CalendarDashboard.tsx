@@ -120,10 +120,13 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
 
   useEffect(() => {
     setCalDate(anchorDate);
+  }, [anchorDate]);
+
+  useEffect(() => {
     if (typeof exposeAnchorDate === 'function') {
       exposeAnchorDate(calDate);
     }
-  }, [anchorDate]);
+  }, [calDate]);
 
   const defaultToolbar = useCallback(
     (props: any) => <Toolbar {...props} {...toolbarExtraProps} />,

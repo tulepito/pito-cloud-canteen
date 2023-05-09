@@ -19,7 +19,7 @@ const OrderEventCardHeader: React.FC<TOrderEventCardHeaderProps> = ({
   const { orderColor } = event?.resource || {};
   const isExpired = isOver(event.resource?.expiredTime);
   const headerStyles = {
-    backgroundColor: isExpired ? '#262626' : orderColor,
+    backgroundColor: isExpired ? '#8C8C8C' : orderColor,
   };
 
   return (
