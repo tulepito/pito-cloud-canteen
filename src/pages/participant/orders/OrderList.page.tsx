@@ -197,7 +197,6 @@ const OrderListPage = () => {
 
     dispatch(participantOrderManagementThunks.updateOrder(payload));
   };
-
   const handleOnBoardingModalOpen = () => {
     onBoardingModal.setTrue();
     setTimeout(() => {
