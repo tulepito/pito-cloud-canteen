@@ -143,7 +143,7 @@ export const createSubmitUpdatePartnerValues = (
     availabilityPlan,
     packaging = [],
     website = '',
-    description,
+    description = '',
     contactorName,
     companyName,
     facebookLink = '',
