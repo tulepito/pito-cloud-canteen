@@ -16,7 +16,7 @@ import {
 } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { storableAxiosError } from '@utils/errors';
-import type { TUser } from '@utils/types';
+import type { TObject, TUser } from '@utils/types';
 
 import { companySlice, companyThunks } from './company.slice';
 
@@ -158,6 +158,9 @@ const deleteMember = createAsyncThunk(
 
     return deleteMemberData;
   },
+  {
+    serializeError: storableAxiosError,
+  },
 );
 
 const adminDeleteMember = createAsyncThunk(
@@ -279,10 +282,10 @@ export const companyMemberSlice = createSlice({
         ...state,
         deleteMemberInProgress: false,
       }))
-      .addCase(deleteMember.rejected, (state, { error }) => ({
+      .addCase(deleteMember.rejected, (state, { payload }) => ({
         ...state,
         deleteMemberInProgress: false,
-        deleteMemberError: error.message,
+        deleteMemberError: (payload as TObject).message,
       }))
       .addCase(queryCompanyMembers.pending, (state) => ({
         ...state,

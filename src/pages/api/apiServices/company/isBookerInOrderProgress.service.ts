@@ -19,9 +19,10 @@ const isBookerInOrderProgress = async ({
   const updatingMember = members[memberEmail] || {};
   const updateMemberIsBooker =
     updatingMember.permission === UserPermission.BOOKER;
-  const intergrationSdk = getIntegrationSdk();
+  const integrationSdk = getIntegrationSdk();
+
   if (updateMemberIsBooker && updatingMember?.id) {
-    const response = await intergrationSdk.listings.query({
+    const response = await integrationSdk.listings.query({
       meta_bookerId: updatingMember?.id,
       page: 1,
       perPage: 1,
