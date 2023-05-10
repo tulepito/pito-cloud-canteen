@@ -11,8 +11,9 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconArrowFull from '@components/Icons/IconArrow/IconArrowFull';
 import NamedLink from '@components/NamedLink/NamedLink';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { UIActions } from '@redux/slices/UI.slice';
 import type { RootState } from '@redux/store';
 import { participantPaths } from '@src/paths';
 import { Listing } from '@utils/data';
@@ -32,6 +33,7 @@ const stopTime = { days: 0, hours: 0, minutes: 0, seconds: 0 };
 const ParticipantPlan = () => {
   const intl = useIntl();
   const infoSectionController = useBoolean();
+  const dispatch = useAppDispatch();
   // Router
   const router = useRouter();
   const { planId } = router.query;
@@ -84,6 +86,19 @@ const ParticipantPlan = () => {
   const hideMobileInfoSection = () => {
     infoSectionController.setFalse();
   };
+
+  useEffect(() => {
+    if (infoSectionController.value) {
+      dispatch(UIActions.disableScrollRequest('Plan_InfoSection'));
+    } else {
+      dispatch(UIActions.disableScrollRemove('Plan_InfoSection'));
+    }
+
+    return () => {
+      dispatch(UIActions.disableScrollRemove('Plan_InfoSection'));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [infoSectionController.value]);
 
   useEffect(() => {
     if (isEmpty(order)) {

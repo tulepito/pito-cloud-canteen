@@ -12,13 +12,13 @@ import { TableForm } from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { AdminAttributesThunks } from '@pages/admin/Attributes.slice';
 import KeywordSearchForm from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { EAttributeSetting } from '@src/utils/enums';
 import { toNonAccentVietnamese } from '@src/utils/string';
 import { composeValidators, required } from '@src/utils/validators';
 
 import AddAttributeModal from './components/AddAttributeModal/AddAttributeModal';
-import { AdminAttributesSettingThunks } from './Attributes.slice';
 
 import css from './Attributes.module.scss';
 
@@ -54,22 +54,20 @@ const AdminAttributesSettingPage = () => {
     }, 0);
   };
   const mealStyles = useAppSelector(
-    (state) => state.AdminAttributesSetting.categories,
+    (state) => state.AdminAttributes.categories,
   );
   const nutritions = useAppSelector(
-    (state) => state.AdminAttributesSetting.nutritions,
+    (state) => state.AdminAttributes.nutritions,
   );
   const daySessions = useAppSelector(
-    (state) => state.AdminAttributesSetting.daySessions,
+    (state) => state.AdminAttributes.daySessions,
   );
-  const packaging = useAppSelector(
-    (state) => state.AdminAttributesSetting.packaging,
-  );
+  const packaging = useAppSelector((state) => state.AdminAttributes.packaging);
   const updateAttributeInProgress = useAppSelector(
-    (state) => state.AdminAttributesSetting.updateAttributeInProgress,
+    (state) => state.AdminAttributes.updateAttributeInProgress,
   );
   const fetchAttributesInProgress = useAppSelector(
-    (state) => state.AdminAttributesSetting.fetchAttributesInProgress,
+    (state) => state.AdminAttributes.fetchAttributesInProgress,
   );
 
   const allAttributes: any = {
@@ -184,7 +182,7 @@ const AdminAttributesSettingPage = () => {
   );
 
   useEffect(() => {
-    dispatch(AdminAttributesSettingThunks.fetchAttributes());
+    dispatch(AdminAttributesThunks.fetchAttributes());
   }, []);
 
   const onOpenAddAttributeModal = () => {
@@ -206,7 +204,7 @@ const AdminAttributesSettingPage = () => {
     }
 
     const { meta } = await dispatch(
-      AdminAttributesSettingThunks.addAttributes({
+      AdminAttributesThunks.addAttributes({
         [attribute]: label,
         time,
       }),
@@ -218,7 +216,7 @@ const AdminAttributesSettingPage = () => {
   };
   const onEdit = async (attribute: string, key: string, label: string) => {
     await dispatch(
-      AdminAttributesSettingThunks.updateAttributes({
+      AdminAttributesThunks.updateAttributes({
         [attribute]: {
           key,
           label,
@@ -228,7 +226,7 @@ const AdminAttributesSettingPage = () => {
   };
   const onDelete = async (attribute: string, key: string[]) => {
     await dispatch(
-      AdminAttributesSettingThunks.deleteAttributes({
+      AdminAttributesThunks.deleteAttributes({
         [attribute]: key,
       }),
     );

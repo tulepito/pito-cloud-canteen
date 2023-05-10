@@ -20,7 +20,7 @@ const fetchSubOrder = async (orderDetail: any) => {
   const planKeys = Object.keys(orderDetail);
   for (const planKey of planKeys) {
     const planItem = orderDetail[planKey];
-    const { restaurant = {} } = planItem;
+    const { restaurant = {}, transactionId } = planItem;
     const { foodList = {}, id: restaurantId } = restaurant;
 
     // Fetch restaurant data
@@ -32,7 +32,7 @@ const fetchSubOrder = async (orderDetail: any) => {
     const foodListIds = Object.keys(foodList);
     const foodListData = denormalisedResponseEntities(
       await integrationSdk.listings.query({
-        ids: foodListIds.join(','),
+        ids: foodListIds.slice(0, 50),
         meta_listingType: 'food',
       }),
     );
@@ -41,6 +41,7 @@ const fetchSubOrder = async (orderDetail: any) => {
       [planKey]: {
         foodList: foodListData,
         restaurant: restaurantData,
+        transactionId,
       },
     };
   }
@@ -93,7 +94,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const planIds = order?.attributes.metadata?.plans || [];
         const plans = denormalisedResponseEntities(
           await integrationSdk.listings.query({
-            ids: planIds.join(','),
+            ids: planIds.slice(0, 50),
             meta_listingType: LISTING_TYPE.SUB_ORDER,
           }),
         );

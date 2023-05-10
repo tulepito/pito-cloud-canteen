@@ -138,6 +138,7 @@ export enum ECompanyMemberPermission {
 export const startRouteBaseOnPermission = {
   [EUserPermission.company]: '/company',
   [EUserPermission.admin]: '/admin',
+  [EUserPermission.normal]: '/participant',
 };
 
 export enum ERestaurantListingStatus {
@@ -362,34 +363,41 @@ export const EPackagingMaterials = {
 
 export const PACKAGING_OPTIONS = [
   {
-    key: EPackagingMaterials.PAPER_BOX,
-    label: 'Hộp giấy',
+    key: 'packaging-paper-box',
+    label: 'Hộp giấy 11',
   },
   {
-    key: EPackagingMaterials.PLASTIC_BOX,
-    label: 'Nhựa, xốp',
+    key: 'packaging-plastic-box',
+    label: 'Hộp nhựa',
   },
   {
-    key: EPackagingMaterials.BAGASSE_BOX,
+    key: 'packaging-bagasse-box',
     label: 'Hộp bã mía',
   },
   {
-    key: EPackagingMaterials.HEAT_RETAINING_ALUMINUM_XBOX,
+    key: 'packaging-reusable-box',
+    label: 'Hộp ăn tái sử dụng',
+  },
+  {
+    key: 'packaging-heat-retaining-aluminum-xbox',
     label: 'Hộp nhôm giữ nhiệt',
   },
   {
-    key: EPackagingMaterials.DEGRADABLE_PLASTIC,
+    key: 'packaging-Hộp xuyên thấu',
+    label: 'Hộp xuyên thấu',
+  },
+
+  {
+    key: 'packaging-plastic-styrofoam',
+    label: 'Nhựa xốp',
+  },
+  {
+    key: 'packaging-degradable-plastic',
     label: 'Nhựa có thể phân hủy',
   },
   {
-    key: EPackagingMaterials.REUSABLE_BOX,
-    label: 'Bao bì có thể tái sử dụng',
-  },
-  {
-    key: OTHER_OPTION,
-    label: 'Khác',
-    hasTextInput: true,
-    textPlaceholder: 'Nhập bao bì thường sử dụng',
+    key: 'packaging-Thân thiện với môi trường',
+    label: 'Thân thiện với môi trường',
   },
 ];
 
@@ -418,125 +426,119 @@ export const MEAL_OPTIONS = [
 
 export const CATEGORY_OPTIONS = [
   {
-    key: 'vietnam-food',
+    key: 'categories-Thuần Việt',
     label: 'Thuần Việt',
     badgeType: EBadgeType.info,
   },
   {
-    key: 'vietnam-north-food',
+    key: 'categories-Món Bắc',
     label: 'Món Bắc',
     badgeType: EBadgeType.default,
   },
   {
-    key: 'vietnam-centrel-food',
+    key: 'categories-Món Trung',
     label: 'Món Trung',
     badgeType: EBadgeType.danger,
   },
   {
-    key: 'vietnam-west-food',
+    key: 'categories-Món Miền Tây',
     label: 'Món Miền Tây',
     badgeType: EBadgeType.info,
   },
   {
-    key: 'chinese-food',
+    key: 'categories-Món Hoa',
     label: 'Hoa',
     badgeType: EBadgeType.warning,
   },
   {
-    key: 'thai-food',
+    key: 'categories-Món Thái',
     label: 'Thái',
     badgeType: EBadgeType.warning,
   },
   {
-    key: 'korean-food',
-    label: 'Hàn quốc',
+    key: 'categories-Món Hàn',
+    label: 'Món Hàn',
     badgeType: EBadgeType.success,
   },
   {
-    key: 'japanese-food',
+    key: 'categories-Món Nhật',
     label: 'Nhật Bản',
     badgeType: EBadgeType.warning,
   },
   {
-    key: 'indian-food',
+    key: 'categories-indian-food',
     label: 'Ấn độ',
     badgeType: EBadgeType.success,
   },
   {
-    key: 'french-food',
+    key: 'categories-french-food',
     label: 'Pháp',
     badgeType: EBadgeType.info,
   },
   {
-    key: 'mediterranean-food',
+    key: 'categories-mediterranean-food',
     label: 'Địa Trung Hải',
     badgeType: EBadgeType.danger,
   },
   {
-    key: 'italian-food',
+    key: 'categories-italian-food',
     label: 'Ý',
     badgeType: EBadgeType.default,
   },
   {
-    key: 'barbeque',
+    key: 'categories-barbeque',
     label: 'BBQ',
     badgeType: EBadgeType.success,
   },
   {
-    key: 'sea-food',
+    key: 'categories-sea-food',
     label: 'Hải sản',
     badgeType: EBadgeType.success,
   },
   {
-    key: 'international-food',
+    key: 'categories-international-food',
     label: 'Quốc Tế',
     badgeType: EBadgeType.success,
   },
   {
-    key: 'europe-food',
+    key: 'categories-Món Âu',
     label: 'Âu',
     badgeType: EBadgeType.success,
   },
   {
-    key: 'asian-food',
+    key: 'categories-Món Á',
     label: 'Á',
     badgeType: EBadgeType.success,
   },
   {
-    key: 'vegetarian-food',
+    key: 'categories-vegetarian-food',
     label: 'Chay',
     badgeType: EBadgeType.success,
   },
   {
-    key: 'macrobiotic-food',
+    key: 'categories-macrobiotic-food',
     label: 'Thực dưỡng',
     badgeType: EBadgeType.success,
   },
   {
-    key: 'halal',
+    key: 'categories-Món Halal',
     label: 'Halal',
     badgeType: EBadgeType.success,
   },
   {
-    key: 'keto',
+    key: 'categories-keto',
     label: 'keto',
     badgeType: EBadgeType.success,
   },
   {
-    key: 'dessert',
+    key: 'categories-dessert',
     label: 'Tráng miệng',
     badgeType: EBadgeType.success,
   },
   {
-    key: 'snack',
+    key: 'categories-snack',
     label: 'Ăn vặt',
     badgeType: EBadgeType.success,
-  },
-  {
-    key: OTHER_OPTION,
-    label: 'Khác',
-    hasTextInput: true,
-    textPlaceholder: 'Nhập phong cách ẩm thực khác',
   },
 ];
 
@@ -928,3 +930,26 @@ export enum EOrderDetailTabs {
   CONTRACT = 'contract',
   VAT = 'vat',
 }
+
+export const ALLERGIES_OPTIONS = [
+  {
+    key: 'egg',
+    label: 'Trứng',
+  },
+  {
+    key: 'shrimp',
+    label: 'Tôm',
+  },
+  {
+    key: 'seafood',
+    label: 'Hải sản',
+  },
+  {
+    key: 'msg',
+    label: 'Bột ngọt',
+  },
+  {
+    key: 'soy',
+    label: 'Đậu nành',
+  },
+];

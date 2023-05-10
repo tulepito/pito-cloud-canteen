@@ -1,0 +1,68 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.slideModalContainer.slideModalContainer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  border-radius: 16px 16px 0px 0px;
+  background-color: #ffffff;
+  padding: 0 24px 24px;
+  transition: bottom 0.5s ease-in-out;
+  animation: slideIn 0.3s ease-in-out;
+  // transform: translateY(0);
+}
+
+.slideModalOpen {
+  .slideModalScrollLayer {
+    transition: opacity 0.3s ease-in-out;
+  }
+}
+.slideModalClose {
+  .slideModalScrollLayer {
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    background-image: none;
+  }
+
+  .slideModalContainer {
+    bottom: -100%;
+    // animation: slideOut 0.3s ease-in-out;
+  }
+}
+
+.calendarContainer {
+  margin-top: 28px;
+}
+
+.subOrderContainer {
+  @include flexAlign(unset);
+  flex-direction: column;
+  width: 100%;
+  gap: 16px;
+  margin-top: 18px;
+}
+@keyframes slideIn {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOut {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}

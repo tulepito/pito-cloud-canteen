@@ -61,7 +61,9 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyName }) => {
 
   return (
     <div className={css.root}>
-      <div className={css.companyName}>{companyName}</div>
+      <div className={css.companyName} title={companyName}>
+        {companyName}
+      </div>
       <MultiLevelSidebar menus={SIDEBAR_MENUS} />
     </div>
   );

@@ -1,0 +1,117 @@
+import { useField, useForm } from 'react-final-form-hooks';
+import { useIntl } from 'react-intl';
+
+import Button from '@components/Button/Button';
+import FixedBottomButtons from '@components/FixedBottomButtons/FixedBottomButtons';
+import Form from '@components/Form/Form';
+import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
+import { phoneNumberFormatValid } from '@src/utils/validators';
+
+import css from './ProfileForm.module.scss';
+
+export type TProfileFormValues = {
+  name: string;
+  email: string;
+  phoneNumber: string;
+};
+
+type TProfileFormProps = {
+  onSubmit: (values: TProfileFormValues) => void;
+  initialValues: TProfileFormValues;
+  inProgress: boolean;
+};
+
+const ProfileForm: React.FC<TProfileFormProps> = ({
+  onSubmit,
+  initialValues,
+  inProgress,
+}) => {
+  const intl = useIntl();
+  const validate = (values: TProfileFormValues) => {
+    const errors: any = {};
+    if (!values.name) {
+      errors.name = intl.formatMessage({
+        id: 'SignUpForm.name.required',
+      });
+    }
+
+    if (!values.phoneNumber) {
+      errors.phoneNumber = intl.formatMessage({
+        id: 'SignUpForm.phoneNumber.required',
+      });
+    }
+    if (
+      phoneNumberFormatValid(
+        intl.formatMessage({ id: 'SignUpForm.phoneNumber.invalid' }),
+      )(values.phoneNumber)
+    ) {
+      errors.phoneNumber = intl.formatMessage({
+        id: 'SignUpForm.phoneNumber.invalid',
+      });
+    }
+
+    return errors;
+  };
+  const { form, handleSubmit, submitting, hasValidationErrors, pristine } =
+    useForm<TProfileFormValues>({
+      onSubmit,
+      validate,
+      initialValues,
+    });
+
+  const name = useField('name', form);
+  const email = useField('email', form);
+  const phoneNumber = useField('phoneNumber', form);
+  const disabledSubmit =
+    inProgress || submitting || hasValidationErrors || pristine;
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <div className={css.fieldWrapper}>
+        <FieldTextInputComponent
+          id={`name`}
+          name="name"
+          label="Họ và tên"
+          input={name.input}
+          meta={name.meta}
+          className={css.fieldInput}
+        />
+      </div>
+      <div className={css.fieldWrapper}>
+        <FieldTextInputComponent
+          id={`email`}
+          name="email"
+          label="Email"
+          onChange={(e: any) => e.preventDefault()}
+          input={email.input}
+          meta={email.meta}
+          className={css.fieldInput}
+        />
+      </div>
+      <div className={css.fieldWrapper}>
+        <FieldTextInputComponent
+          id={`phoneNumber`}
+          name="phoneNumber"
+          label="Số điện thoại"
+          input={phoneNumber.input}
+          meta={phoneNumber.meta}
+          className={css.fieldInput}
+        />
+      </div>
+      <FixedBottomButtons
+        isAbsolute
+        FirstButton={
+          <Button
+            type="submit"
+            disabled={disabledSubmit}
+            inProgress={inProgress}
+            className={css.submitBtn}>
+            Lưu thay đổi
+          </Button>
+        }
+      />
+    </Form>
+  );
+};
+
+export default ProfileForm;

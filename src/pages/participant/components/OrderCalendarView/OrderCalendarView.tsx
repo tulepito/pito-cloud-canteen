@@ -7,7 +7,14 @@ import { DateTime } from 'luxon';
 import Avatar from '@components/Avatar/Avatar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
-import { getDaySessionFromDeliveryTime } from '@src/utils/dates';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { markColorForOrder } from '@helpers/orderHelper';
+import { useAppSelector } from '@hooks/reduxHooks';
+import useSubOrderPicking from '@pages/participant/hooks/useSubOrderPicking';
+import SubOrderCard from '@pages/participant/orders/components/SubOrderCard/SubOrderCard';
+import SubOrderDetailModal from '@pages/participant/orders/components/SubOrderDetailModal/SubOrderDetailModal';
+import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
+import { convertStringToNumber } from '@src/utils/number';
 import { CurrentUser, Listing, User } from '@utils/data';
 import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 
@@ -34,8 +41,17 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const ensureCompanyUser = User(company).getFullData();
   const orderObj = Listing(order);
   const orderId = orderObj.getId();
-  const orderTile = orderObj.getAttributes().title;
+  const orderTile = orderObj.getAttributes()?.title;
+  const orderColor = markColorForOrder(convertStringToNumber(orderTile || ''));
   const currentUserId = CurrentUser(currentUser).getId();
+  const selectedDay = useAppSelector((state) => state.Calendar.selectedDay);
+
+  const {
+    subOrderDetailModalControl,
+    selectedEvent,
+    setSelectedEvent,
+    onRejectSelectDish,
+  } = useSubOrderPicking();
 
   const { deadlineDate, deliveryHour, startDate, endDate } =
     orderObj.getMetadata();
@@ -90,11 +106,13 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           meal: {
             dishes,
           },
+          deadlineDate,
           expiredTime: deadlineDate
             ? DateTime.fromMillis(+deadlineDate)
             : DateTime.fromMillis(+planItemKey).minus({ day: 2 }),
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
+          orderColor,
         },
         title: orderTile,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
@@ -107,6 +125,9 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     return listEvent;
   });
   const flattenEvents = flatten<Event>(events);
+  const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) =>
+    isSameDate(_event.start, selectedDay),
+  );
 
   const sectionCompanyBranding = loadDataInProgress ? (
     <div className={css.sectionCompanyBranding}>
@@ -126,24 +147,44 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
 
   return (
     <div className={css.container}>
-      <CalendarDashboard
-        anchorDate={anchorDate}
-        events={flattenEvents}
-        companyLogo={sectionCompanyBranding}
-        renderEvent={OrderEventCard}
-        inProgress={loadDataInProgress}
-        exposeAnchorDate={handleAnchorDateChange}
-        components={{
-          toolbar: (toolBarProps: any) => (
-            <ParticipantToolbar
-              {...toolBarProps}
-              startDate={new Date(startDate)}
-              endDate={new Date(endDate)}
-              anchorDate={anchorDate}
-            />
-          ),
-        }}
-      />
+      <div>
+        <CalendarDashboard
+          anchorDate={anchorDate}
+          events={flattenEvents}
+          companyLogo={sectionCompanyBranding}
+          renderEvent={OrderEventCard}
+          inProgress={loadDataInProgress}
+          exposeAnchorDate={handleAnchorDateChange}
+          components={{
+            toolbar: (toolBarProps: any) => (
+              <ParticipantToolbar
+                {...toolBarProps}
+                startDate={new Date(startDate)}
+                endDate={new Date(endDate)}
+                anchorDate={anchorDate}
+              />
+            ),
+          }}
+        />
+      </div>
+      <div className={css.subOrderContainer}>
+        {subOrdersFromSelectedDay.map((_event) => (
+          <SubOrderCard
+            key={_event.resource?.id}
+            event={_event}
+            onRejectSelectDish={onRejectSelectDish}
+            setSelectedEvent={setSelectedEvent}
+            openSubOrderDetailModal={subOrderDetailModalControl.setTrue}
+          />
+        ))}
+      </div>
+      <RenderWhen condition={!!selectedEvent}>
+        <SubOrderDetailModal
+          isOpen={subOrderDetailModalControl.value}
+          onClose={subOrderDetailModalControl.setFalse}
+          event={selectedEvent!}
+        />
+      </RenderWhen>
     </div>
   );
 };

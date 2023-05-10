@@ -102,12 +102,6 @@ const FieldBankAccounts: React.FC<TFieldBankAccounts> = (props) => {
                       })}
                       id={`${fieldName}.bankAgency`}
                       name={`${fieldName}.bankAgency`}
-                      validate={required(
-                        intl.formatMessage({
-                          id: 'FieldBankAccounts.bankAgencyRequired',
-                        }),
-                      )}
-                      required
                     />
                     <FieldTextInput
                       className={css.field}

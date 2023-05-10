@@ -111,7 +111,7 @@ export const getRestaurantQuery = ({
     ?.origin;
   const bounds = distance ? calculateBounds(origin, distance) : '';
   const query = {
-    ids: newRestaurantIds.join(','),
+    ids: newRestaurantIds.slice(0, 50),
     keywords,
     page,
     ...(rating && { meta_rating: `${rating},` }),
@@ -184,6 +184,15 @@ export const getOrderQuotationsQuery = ({
     meta_listingType: ListingTypes.QUOTATION,
     meta_orderId: orderId,
     ...(status && { meta_status: status }),
+  };
+
+  return query;
+};
+
+export const getParticipantOrdersQuery = ({ userId }: { userId: string }) => {
+  const query = {
+    meta_listingType: ListingTypes.ORDER,
+    meta_participants: `has_any:${userId}`,
   };
 
   return query;

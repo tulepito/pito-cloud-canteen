@@ -91,11 +91,13 @@
   .infoSection {
     display: none;
     position: fixed;
-    top: 81px;
+    top: 0px;
     right: 0;
     bottom: 0;
     left: 0;
     z-index: 3;
+    height: 100vh;
+    overflow: hidden auto;
     background-color: $neutralGray1;
 
     row-gap: 24px;

@@ -33,7 +33,21 @@
 
 .actions {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+
+  @include viewportMedium {
+    align-items: center;
+  }
+
+  .btnGroup {
+    @include flexAlign(flex-start);
+    flex-direction: column;
+    gap: 12px;
+
+    @include viewportMedium {
+      flex-direction: row;
+    }
+  }
 }
 
 .viewModeGroup {
@@ -94,23 +108,31 @@
   width: 87px;
   height: 36px;
   min-height: 36px;
-  padding: 8px;
   margin-right: 28px;
   text-align: center;
   border: 1px solid $neutralGray4;
   background-color: $neutralGray1;
   @include textTemplate(14px, 700, 36px, '');
   color: $neutralGray6;
-  border-radius: 40px;
+  border-radius: 8px;
+  @include flexCenter;
+  @include viewportMedium {
+    display: none;
+  }
 }
 
 .pickForMeBtn {
-  margin-right: 20px;
-  gap: 8px;
-  width: 159px;
-  height: 44px;
-  min-height: 44px;
-  @include textTemplate(14px, 700, 36px, '');
+  display: none;
+
+  @include viewportMedium {
+    display: flex;
+    margin-right: 20px;
+    gap: 8px;
+    width: 159px;
+    height: 44px;
+    min-height: 44px;
+    @include textTemplate(14px, 700, 36px, '');
+  }
 }
 
 .arrowBtn {

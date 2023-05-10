@@ -48,3 +48,31 @@ export const fetchUserByEmail = async (email: string) => {
 
   return denormalisedResponseEntities(response)[0];
 };
+
+export const updateUserMetadata = async (userId: string, metadata: any) => {
+  const integrationSdk = getIntegrationSdk();
+  const response = await integrationSdk.users.updateProfile(
+    {
+      id: userId,
+      metadata,
+    },
+    { expand: true },
+  );
+
+  return denormalisedResponseEntities(response)[0];
+};
+
+export const fetchTransaction = async (transactionId: string) => {
+  const integrationSdk = getIntegrationSdk();
+
+  const response = await integrationSdk.transactions.show(
+    {
+      id: transactionId,
+    },
+    {
+      expand: true,
+    },
+  );
+
+  return denormalisedResponseEntities(response)[0];
+};

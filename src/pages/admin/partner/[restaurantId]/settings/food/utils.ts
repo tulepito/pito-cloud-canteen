@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable unused-imports/no-unused-vars */
 import { types as sdkTypes } from '@helpers/sdkLoader';
 import { ListingTypes } from '@src/types/listingTypes';
@@ -6,11 +7,7 @@ import { getSubmitImageId, getUniqueImages } from '@utils/images';
 import { toNonAccentVietnamese } from '@utils/string';
 import type { TImage } from '@utils/types';
 
-import {
-  FOOD_TYPE_OPTIONS,
-  MENU_OPTIONS,
-  PACKAGING_OPTIONS,
-} from '../../../../../../utils/enums';
+import { FOOD_TYPE_OPTIONS, MENU_OPTIONS } from '../../../../../../utils/enums';
 
 const { Money } = sdkTypes;
 
@@ -184,7 +181,10 @@ const EXCEL_FILE_COLUMN_NAME_AS_ENGLISH = [
   },
 ];
 
-export const getImportDataFromCsv = (values: any) => {
+export const getImportDataFromCsv = (
+  values: any,
+  packagingOptions: any[] = [],
+) => {
   const valuesInEnglish = Object.keys(values).reduce((acc, key, index) => {
     const headerInEnglish = EXCEL_FILE_COLUMN_NAME_AS_ENGLISH.find((item) => {
       return item.columnIndex === index;
@@ -224,7 +224,7 @@ export const getImportDataFromCsv = (values: any) => {
     [],
   );
 
-  const packagingArray = PACKAGING_OPTIONS.find(
+  const packagingArray = packagingOptions.find(
     (item) =>
       toNonAccentVietnamese(item.label, true).trim() ===
       toNonAccentVietnamese(packaging, true).trim(),

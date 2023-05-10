@@ -6,9 +6,9 @@ import GeneralLayout from '@components/Layout/GeneralLayout/Layout';
 import {
   adminPaths,
   companyPaths,
-  generalPaths,
   IgnoredAuthCheckRoutes,
   NonRequireAuthenticationRoutes,
+  participantPaths,
 } from '@src/paths';
 import { EUserPermission, startRouteBaseOnPermission } from '@utils/enums';
 
@@ -37,15 +37,9 @@ export const isPathMatchedPermission = (
   pathName: string,
   permission: EUserPermission,
 ) => {
-  if (permission !== EUserPermission.normal) {
-    const startPath = startRouteBaseOnPermission[permission];
+  const startPath = startRouteBaseOnPermission[permission];
 
-    return pathName.startsWith(startPath);
-  }
-
-  return Object.values(startRouteBaseOnPermission).every((item) => {
-    return !pathName.startsWith(item);
-  });
+  return pathName.startsWith(startPath);
 };
 
 export const getHomePageRouteBaseOnPermission = (
@@ -61,7 +55,7 @@ export const getHomePageRouteBaseOnPermission = (
       homePageRoute = companyPaths.Home;
       break;
     default:
-      homePageRoute = generalPaths.Home;
+      homePageRoute = participantPaths.OrderList;
       break;
   }
 
