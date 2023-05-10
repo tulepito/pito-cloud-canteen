@@ -85,15 +85,18 @@
     @include textTemplate(12px, 500, 16px, '');
     margin: 0;
   }
+
   .addDish {
     cursor: pointer;
     display: inline-block;
     width: 24px;
     height: 24px;
+    max-width: 24px;
     border-radius: 50%;
     border: 1px solid $primaryPri2;
     @include flexCenter;
   }
+
   .selectDisabled {
     border: 1px solid $neutralGray5;
     cursor: not-allowed;
@@ -102,6 +105,7 @@
       fill: $neutralGray5;
     }
   }
+
   .removeDish {
     cursor: pointer;
     width: 24px;

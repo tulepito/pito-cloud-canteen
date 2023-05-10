@@ -1311,7 +1311,7 @@
   "SectionOrderPanel.Alert.confirmDeleteBtn": "Xoá tất cả",
   "SectionOrderPanel.Alert.confirmDeleteMessage": "Bạn có chắc chắn muốn xoá toàn bộ giỏ hàng không?",
   "SectionOrderPanel.Alert.confirmDeleteTitle": "Xoá toàn bộ giỏ hàng",
-  "SectionOrderPanel.completeOrder": "Đăng ký",
+  "SectionOrderPanel.completeOrder": "Đặt món",
   "SectionOrderPanel.notJoined": "[Không tham gia]",
   "SectionOrderPanel.numberSelectedDays": "({selectedDays}/{sumDays} ngày đã chọn)",
   "SectionOrderPanel.removeAllOrderCartLabel": "Xoá toàn bộ giỏ hàng",
