@@ -9,7 +9,10 @@ import type { TTimeLineProps } from './types';
 
 import css from './HorizontalTimeLine.module.scss';
 
-type THorizontalTimeLineProps = TTimeLineProps & { haveNavigators?: boolean };
+type THorizontalTimeLineProps = TTimeLineProps & {
+  haveNavigators?: boolean;
+  isAdminLayout?: boolean;
+};
 
 const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
   const {
@@ -17,7 +20,7 @@ const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
     className,
     items,
     itemComponent: ItemComponent,
-
+    isAdminLayout = false,
     haveNavigators = false,
   } = props;
   const containerRef = useRef(null);
@@ -29,7 +32,13 @@ const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
     (previousList, itemData, currentIndex) => {
       const isLastItem = currentIndex === totalItems - 1;
 
-      const nextItem = <ItemComponent key={currentIndex} data={itemData} />;
+      const nextItem = (
+        <ItemComponent
+          key={currentIndex}
+          data={itemData}
+          isAdminLayout={isAdminLayout}
+        />
+      );
 
       return !isLastItem
         ? previousList.concat([

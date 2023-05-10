@@ -3,18 +3,119 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  display: grid;
-  grid-template-columns: 1fr;
-
-  .leftSection,
-  .rightSection {
+  .leftSection {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    max-width: 100%;
   }
+
+  .leftSection {
+    padding-bottom: 200px;
+
+    @include viewportMedium {
+      padding-bottom: 0;
+    }
+  }
+
+  .rightSection {
+    display: none;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 100%;
+
+    @include viewportMedium {
+      display: flex;
+    }
+  }
+
   @include viewportMedium {
+    display: grid;
     grid-template-columns: 1fr 328px;
     column-gap: 32px;
+  }
+
+  .summarySection {
+    z-index: 2;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 10px 16px 40px;
+    width: 100vw;
+    background-color: $neutralGray1;
+    box-shadow: 0px -2px 4px -2px rgba(16, 24, 40, 0.06),
+      0px -4px 8px -2px rgba(16, 24, 40, 0.1);
+
+    @include viewportMedium {
+      display: none;
+    }
+
+    .timeLeft {
+      @include textTemplate(14px, 400, 20px);
+      margin-bottom: 4px;
+
+      .timeLeftTime {
+        color: $labelBlue2;
+        @include textTemplate(18px, 700, 24px);
+      }
+    }
+
+    .orderEndAt {
+      margin-bottom: 8px;
+      @include textTemplate(12px, 400, 20px);
+      color: $neutralGray5;
+
+      .orderEndAtTime {
+        @include textTemplate(12px, 600, 24px);
+        color: $neutralGray6;
+      }
+    }
+
+    .viewCartMobile {
+      width: 100%;
+      display: flex;
+      column-gap: 24px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      @include textTemplate(16px, 700, 24px);
+
+      .selections {
+        font-weight: 400;
+      }
+    }
+  }
+
+  .infoSection {
+    display: none;
+    position: fixed;
+    top: 81px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 3;
+    background-color: $neutralGray1;
+
+    row-gap: 24px;
+    padding: 16px;
+    flex-direction: column;
+
+    &.visible {
+      display: flex;
+    }
+
+    @include viewportMedium {
+      display: none;
+      &.visible {
+        display: none;
+      }
+    }
+
+    .goBackBtn {
+      min-height: unset;
+      padding: 8px 4px 8px 0;
+      display: flex;
+      column-gap: 8px;
+    }
   }
 }
 

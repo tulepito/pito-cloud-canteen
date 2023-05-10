@@ -59,11 +59,13 @@
     "react-joyride": "^2.5.3",
     "react-loading-skeleton": "^3.1.0",
     "react-redux": "^8.0.5",
+    "react-slick": "^0.29.0",
     "reselect": "^4.1.7",
     "seedrandom": "^3.0.5",
     "sharetribe-flex-integration-sdk": "^1.9.0",
     "sharetribe-flex-sdk": "^1.17.0",
     "shelljs": "^0.8.5",
+    "slick-carousel": "^1.8.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
@@ -75,6 +77,7 @@
     "@types/react-big-calendar": "^0.38.2",
     "@types/react-datepicker": "^4.8.0",
     "@types/react-dom": "18.0.9",
+    "@types/react-slick": "^0.23.10",
     "@typescript-eslint/eslint-plugin": "^5.45.1",
     "eslint": "8.29.0",
     "eslint-config-airbnb": "19.0.4",

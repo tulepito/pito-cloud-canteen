@@ -1,0 +1,191 @@
+import { useField, useForm } from 'react-final-form-hooks';
+import { FormattedMessage, useIntl } from 'react-intl';
+import Slider from 'react-slick';
+import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
+
+import Badge from '@components/Badge/Badge';
+import Button from '@components/Button/Button';
+import { FieldTextAreaComponent } from '@components/FormFields/FieldTextArea/FieldTextArea';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import Modal from '@components/Modal/Modal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import { Listing } from '@src/utils/data';
+import {
+  EImageVariants,
+  SIDE_DISH_OPTIONS,
+  SPECIAL_DIET_OPTIONS,
+} from '@src/utils/enums';
+
+import css from './ListingDetailModal.module.scss';
+
+type TListingDetailModalProps = {
+  isOpen: boolean;
+  title: string;
+  listing: any;
+  onClose: () => void;
+  onSelectFood: () => void;
+  onChangeRequirement: (value: string) => void;
+};
+
+const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
+  const { isOpen, listing, title, onClose, onChangeRequirement, onSelectFood } =
+    props;
+  const intl = useIntl();
+  const { form: foodSelectionForm } = useForm({
+    onSubmit: () => {},
+    initialValues: {},
+  });
+  const requirementField = useField('requirement', foodSelectionForm);
+
+  const listingObj = Listing(listing);
+  const listingImages = Listing(listing).getImages() || [];
+
+  const { description } = listingObj.getAttributes();
+  const {
+    sideDishes = [],
+    allergicIngredients = [],
+    specialDiets = [],
+  } = listingObj.getPublicData();
+  const badges = specialDiets
+    .slice(0, 3)
+    .map((diet: string) =>
+      SPECIAL_DIET_OPTIONS.find((item) => item.key === diet),
+    );
+  const sideDishesText = sideDishes.reduce((res: any, dishKey: string) => {
+    const suitableSideDish = SIDE_DISH_OPTIONS.find((d) => d.key === dishKey);
+
+    if (!isEmpty(suitableSideDish)) {
+      return res.concat(<div key={dishKey}>{suitableSideDish.label}</div>);
+    }
+
+    return res;
+  }, []);
+
+  const hasDescription = !isEmpty(description);
+  const hasAllergicIngredients = allergicIngredients.length > 0;
+
+  const sliderSettings = {
+    dots: true,
+    dotsClass: classNames('slick-dots', css.dots),
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    draggable: true,
+    arrows: false,
+  };
+
+  const closeButton = (
+    <Button variant="inline" className={css.closeModalBtn} onClick={onClose}>
+      <IconArrow direction="left" />
+      <div>Quay lại</div>
+    </Button>
+  );
+
+  const handleChangeRequirement = (value: string) => {
+    onChangeRequirement(value);
+  };
+
+  const fieldRequirement = {
+    label: intl.formatMessage({
+      id: 'ListingDetailModal.fieldRequirement.label',
+    }),
+    placeholder: intl.formatMessage({
+      id: 'ListingDetailModal.fieldRequirement.placeholder',
+    }),
+  };
+
+  return (
+    <Modal
+      id={`ListingDetailModal.${title}`}
+      isOpen={isOpen}
+      handleClose={onClose}
+      closeButton={closeButton}
+      containerClassName={css.modalContainer}>
+      <div>
+        <div className={css.listingImage}>
+          <RenderWhen condition={listingImages.length > 0}>
+            <Slider {...sliderSettings}>
+              {listingImages.map((image: any) => {
+                return (
+                  <ResponsiveImage
+                    key={image}
+                    image={image}
+                    alt={title}
+                    variants={[EImageVariants.landscapeCrop]}
+                  />
+                );
+              })}
+            </Slider>
+
+            <RenderWhen.False>
+              <ResponsiveImage image={null} alt={title} />
+            </RenderWhen.False>
+          </RenderWhen>
+        </div>
+
+        <div className={css.section}>
+          <div className={css.foodTitle}>{title}</div>
+          <div className={css.badgeContainer}>
+            {badges.map((badge: any) => (
+              <Badge
+                key={badge?.key}
+                label={badge?.label}
+                type={badge?.badgeType}
+              />
+            ))}
+          </div>
+        </div>
+
+        <RenderWhen condition={hasDescription || hasAllergicIngredients}>
+          <div className={css.section}>
+            <RenderWhen condition={hasDescription}>
+              <div>{description}</div>
+            </RenderWhen>
+
+            <RenderWhen condition={hasAllergicIngredients}>
+              <div className={css.allergiesLabel}>
+                <FormattedMessage id="ListingDetailModal.allergiesLabel" />
+                <span className={css.allergyItem}>
+                  {allergicIngredients
+                    .map((item: string) => ` ${item}`)
+                    .join(', ')}
+                </span>
+              </div>
+            </RenderWhen>
+          </div>
+        </RenderWhen>
+
+        <div className={css.section}>
+          <div className={css.sideDishesLabel}>
+            <FormattedMessage id="ListingDetailModal.sideDishesLabel" />
+          </div>
+          <div className={css.sideDishesContent}>{sideDishesText}</div>
+        </div>
+
+        <div className={css.requirementSection}>
+          <div className={css.requirementLabel}>{fieldRequirement.label}</div>
+          <FieldTextAreaComponent
+            name="requirement"
+            id="ListingDetailModal.requirement"
+            className={css.fieldRequirement}
+            input={requirementField.input}
+            meta={requirementField.meta}
+            placeholder={fieldRequirement.placeholder}
+            onChange={handleChangeRequirement}
+          />
+        </div>
+
+        <div className={css.selectFoodSection}>
+          <Button className={css.selectFoodBtn} onClick={onSelectFood}>
+            Chọn món
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+export default ListingDetailModal;

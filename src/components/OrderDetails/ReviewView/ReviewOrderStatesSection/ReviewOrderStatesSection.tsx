@@ -30,10 +30,12 @@ type TReviewOrderStatesSectionProps = {
     };
     isCanceledOrder: boolean;
   };
+  isAdminLayout?: boolean;
 };
 
 const ReviewOrderStatesSection: React.FC<TReviewOrderStatesSectionProps> = ({
   data: { transactionDataMap, isCanceledOrder },
+  isAdminLayout = false,
 }) => {
   const items = useMemo(
     () => prepareItemFromData(transactionDataMap),
@@ -49,6 +51,7 @@ const ReviewOrderStatesSection: React.FC<TReviewOrderStatesSectionProps> = ({
             items={items}
             itemComponent={StateItem}
             haveNavigators
+            isAdminLayout={isAdminLayout}
           />
         </div>
         <RenderWhen.False>

@@ -61,7 +61,8 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
         foodList,
         restaurant,
       }: { foodList: any[]; restaurant: any; memberOrder: any } = plan[item];
-      const hasDishInCart = cartList?.[item as any];
+      // eslint-disable-next-line no-unsafe-optional-chaining
+      const { foodId: hasDishInCart } = cartList?.[item as any] || {};
       const planDate = DateTime.fromMillis(Number(item)).toJSDate();
       const itemLabel = (
         <div className={css.tabTitle}>
@@ -133,6 +134,10 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
           contentClassName={css.sectionMainOrderListings}
           headerClassName={css.sectionMainOrderHeader}
           onChange={onSelectTab}
+          showNavigation
+          middleLabel
+          navigationStartClassName={css.leftNavigation}
+          navigationEndClassName={css.rightNavigation}
           actionsComponent={
             <TabActions
               orderDay={orderDay}

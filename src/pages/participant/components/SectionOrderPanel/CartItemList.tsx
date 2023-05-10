@@ -40,15 +40,17 @@ const CartItemList: React.FC<TCartItemList> = ({
       planDate.getMonth() + 1
     }/${planDate.getFullYear()}`;
 
+    const { foodId } = item;
+
     const foodList = plan?.[key]?.foodList || [];
     const selectedDish =
-      item === 'notJoined'
+      foodId === 'notJoined'
         ? null
-        : foodList.find((food: any) => food?.id?.uuid === item);
+        : foodList.find((food: any) => food?.id?.uuid === foodId);
     const dishAttributes =
-      item === 'notJoined' ? null : Listing(selectedDish).getAttributes();
+      foodId === 'notJoined' ? null : Listing(selectedDish).getAttributes();
     const dishTitle =
-      item === 'notJoined'
+      foodId === 'notJoined'
         ? intl.formatMessage({ id: 'SectionOrderPanel.notJoined' })
         : dishAttributes?.title;
 
