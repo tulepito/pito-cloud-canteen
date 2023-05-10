@@ -13,7 +13,7 @@ import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
 import { currentUserSelector, userActions } from '@redux/slices/user.slice';
-import { companyPaths } from '@src/paths';
+import { participantPaths } from '@src/paths';
 
 import css from './GeneralLayoutTopBar.module.scss';
 
@@ -31,7 +31,7 @@ const GeneralLayoutTopBar = () => {
 
   return (
     <div className={css.root}>
-      <NamedLink className={css.headerLeft} path={companyPaths.Home}>
+      <NamedLink className={css.headerLeft} path={participantPaths.OrderList}>
         <PitoLogo className={css.logo} />
       </NamedLink>
       <div className={css.headerRight}>
