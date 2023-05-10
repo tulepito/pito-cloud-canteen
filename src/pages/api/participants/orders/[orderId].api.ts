@@ -32,7 +32,7 @@ const fetchSubOrder = async (orderDetail: any) => {
     const foodListIds = Object.keys(foodList);
     const foodListData = denormalisedResponseEntities(
       await integrationSdk.listings.query({
-        ids: foodListIds.slice(0, 100).join(','),
+        ids: foodListIds.slice(0, 50).join(','),
         meta_listingType: 'food',
       }),
     );
@@ -94,7 +94,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const planIds = order?.attributes.metadata?.plans || [];
         const plans = denormalisedResponseEntities(
           await integrationSdk.listings.query({
-            ids: planIds.slice(0, 100).join(','),
+            ids: planIds.slice(0, 50).join(','),
             meta_listingType: LISTING_TYPE.SUB_ORDER,
           }),
         );
