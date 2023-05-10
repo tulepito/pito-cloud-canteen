@@ -56,7 +56,7 @@
 }
 
 .orderDeadline {
-  @include textTemplate(12px, $fontWeightSemiBold, 16px);
+  @include textTemplate(12px, $fontWeightSemiBold, 20px);
   color: $primaryPri2;
   @include flexAlign(center);
 
