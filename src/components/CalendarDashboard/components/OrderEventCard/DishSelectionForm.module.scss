@@ -1,7 +1,13 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
+}
+
+.fieldGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 
 .radioLabel {
@@ -13,42 +19,8 @@
 }
 
 .radioInput {
+  margin: 0;
   margin-right: 10px;
-}
-
-.actions {
-  display: flex;
-  justify-content: center;
-  padding-top: 2px;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.rejectBtn {
-  @include textTemplate(12px, 700, 20px, '');
-  display: block;
-  width: calc((100% - 8px) / 2);
-  height: 36px;
-  min-height: 36px;
-  padding: 8px 4px;
-}
-
-.acceptBtn {
-  @include textTemplate(12px, 700, 20px, '');
-  display: block;
-  width: 148px;
-  height: 36px;
-  min-height: 36px;
-  padding: 8px 4px;
-}
-
-.pickForMeBtn {
-  @include textTemplate(12px, 700, 20px, '');
-  display: block;
-  width: 120px;
-  height: 36px;
-  min-height: 36px;
-  padding: 8px 4px;
 }
 
 .spinnerClassName {
@@ -56,4 +28,32 @@
   width: 24px;
   height: 24px;
   stroke-width: 3px;
+}
+
+.sectionWrapper {
+  margin-top: 16px;
+}
+
+.row {
+  @include flexAlign(center, space-between);
+  gap: 8px;
+}
+.btn {
+  @include textTemplate(14px, $fontWeightBold, 24px);
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 12px;
+
+  @include viewportMedium {
+    font-size: 12px;
+    padding: 0;
+  }
+}
+
+.lastBtn {
+  margin-top: 12px;
+
+  span {
+    width: 100%;
+  }
 }

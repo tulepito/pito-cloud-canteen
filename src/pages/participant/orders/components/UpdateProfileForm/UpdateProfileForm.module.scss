@@ -1,0 +1,48 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.container {
+  overflow-y: auto;
+  height: calc(80vh - 92px);
+  /*
+  80vh is modal container height
+  modal header height (32px)
+  modal header padding (16px)
+  modal header margin bottom (24px)
+  modal footer height (20px)
+  */
+  margin-top: 24px;
+}
+.sectionTitle {
+  @include textTemplate(16px, $fontWeightBold, 24px);
+  margin-bottom: 12px;
+  text-transform: capitalize;
+}
+.profileInforSection {
+  .fieldWrapper {
+    margin-bottom: 12px;
+  }
+}
+
+.specialDemandSection {
+  margin-top: 24px;
+
+  .fieldWrapper {
+    margin-bottom: 32px;
+
+    .fieldTitle {
+      @include textTemplate(14px, $fontWeightSemiBold, 24px);
+      margin-bottom: 12px;
+    }
+
+    .fieldGroup {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+}
+
+.submitBtn {
+  width: 100%;
+}

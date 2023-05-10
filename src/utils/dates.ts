@@ -328,7 +328,7 @@ const addDays = (d: Date, days: number) => {
   return date;
 };
 
-const getDates = (startDate: Date, stopDate: Date) => {
+export const getDates = (startDate: Date, stopDate: Date) => {
   const dateArray = [];
   let currentDate = new Date(startDate);
   while (currentDate <= stopDate) {
@@ -444,8 +444,12 @@ export const calculateRemainTime = (futureTimestamp: number) => {
   const currentTime = DateTime.local();
 
   // Calculate the remaining time as a Duration object
-  const remainingTime = currentTime.diff(futureTime);
+  const remainingTime = futureTime.diff(currentTime);
 
   // Format the remaining time as a string
   return remainingTime.toFormat('hh:mm:ss');
+};
+
+export const isSameDate = (date1: Date, date2: Date) => {
+  return DateTime.fromJSDate(date1).hasSame(DateTime.fromJSDate(date2), 'day');
 };

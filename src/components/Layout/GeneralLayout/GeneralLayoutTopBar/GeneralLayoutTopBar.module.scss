@@ -3,18 +3,19 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  @include flexAlign(center, space-between);
-  flex: 1;
-  height: fit-content;
-  padding: 20px 16px;
-  position: fixed;
-  width: 100%;
-  top: 0;
-  left: 0;
-  background-color: $neutralGray1;
-  z-index: 101;
+  display: none;
 
-  @include viewportLarge {
+  @include viewportMedium {
+    @include flexAlign(center, space-between);
+    flex: 1;
+    height: fit-content;
+    padding: 20px 16px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background-color: $neutralGray1;
+    z-index: 101;
     height: 81px;
     padding: 10px 80px;
   }

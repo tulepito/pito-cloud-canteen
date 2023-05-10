@@ -124,7 +124,7 @@ const sendRemindEmailToMember = createAsyncThunk(
     const {
       id: { uuid: orderId },
     } = getState().OrderManagement.orderData!;
-    const participantList = getState().OrderManagement.participantData!;
+
     const {
       attributes: {
         metadata: { orderDetail },
@@ -161,19 +161,11 @@ const sendRemindEmailToMember = createAsyncThunk(
       return memberIdList.indexOf(item) === pos;
     });
 
-    const emailList = uniqueMemberIdList.map((id) => {
-      const participant = participantList.find((p: TUser) => {
-        return p.id.uuid === id;
-      });
-
-      return participant?.attributes.email;
-    });
-
     await sendRemindEmailToMemberApi(orderId, {
       orderLink,
       deadline,
       description,
-      emailList,
+      uniqueMemberIdList,
     });
   },
 );

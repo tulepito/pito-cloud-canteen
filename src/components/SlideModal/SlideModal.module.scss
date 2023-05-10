@@ -1,0 +1,69 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.slideModalContainer.slideModalContainer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  border-radius: 16px 16px 0px 0px;
+  background-color: #ffffff;
+  width: 100%;
+  padding: 20px 16px 40px;
+  transition: bottom 0.5s ease-in-out;
+  animation: slideIn 0.3s ease-in-out;
+}
+
+.slideModalOpen {
+  .slideModalScrollLayer {
+    transition: opacity 0.3s ease-in-out;
+  }
+}
+.slideModalClose {
+  .slideModalScrollLayer {
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    background-image: none;
+  }
+
+  .slideModalContainer {
+    bottom: -100%;
+  }
+}
+
+.modalHeader {
+  @include textTemplate(20px, $fontWeightBold, 32px);
+  @include flexAlign(center, space-between);
+  flex-direction: row-reverse;
+  .closeIcon {
+    width: 12px;
+    height: 12px;
+  }
+  .secondRow {
+    color: $primaryPri2;
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOut {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}

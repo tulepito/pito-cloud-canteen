@@ -3,127 +3,118 @@
 @use '/src/styles/mixins.scss' as *;
 
 .root {
-  padding: 32px 8px 0;
+  padding: 32px 16px 168px;
   width: 100%;
+}
+.formContainer {
+  margin: 0 auto;
+  row-gap: 16px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
 
-  @include viewportLarge {
-    padding-top: 48px;
+  @include viewportMedium {
+    max-width: 375px;
   }
+}
 
-  .formContainer {
-    @include formContainer;
+.formTitle {
+  color: $neutralGray6;
+  @include textTemplate(24px, $fontWeightBold, 32px);
+  text-transform: capitalize;
 
-    margin: 0 auto;
-    width: fit-content;
-    row-gap: 16px;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    width: 90%;
+  @include viewportMedium {
+    font-size: 32px;
   }
+}
 
-  .formTitle {
-    text-align: center;
-    color: $neutralGray6;
-    font-size: 24px;
+.forgotPassword {
+  text-align: right;
+  font-size: 14px;
+  color: $neutralGray5;
 
-    @include viewportMedium {
-      font-size: 32px;
-    }
-  }
-
-  .forgotPassword {
-    text-align: right;
-    color: $neutralGray6;
-
-    & > span {
-      cursor: pointer;
-    }
-  }
-
-  .errorSignIn {
-    margin-top: 35px;
-    margin-bottom: 20px;
-    font-size: 14px;
-    text-align: left;
-    color: $sematicRed2;
-  }
-
-  .orText {
-    $width: calc(100%);
-    text-align: center;
-    position: relative;
-
-    & > span {
-      position: relative;
-      z-index: 2;
-      color: $neutralGray6;
-      background-color: $neutralGray1;
-      padding: 0 8px;
-    }
-
-    &::after {
-      content: '';
-      z-index: 1;
-      width: $width;
-      height: 1px;
-      background-color: $neutralGray4;
-
-      position: absolute;
-      top: 10px;
-      right: 0;
-    }
-  }
-
-  .googleLoginButton {
-    color: $neutralGray6;
-    font-size: 16px;
+  & > span {
     cursor: pointer;
-    padding: 8px 12px;
+  }
+}
+
+.errorSignIn {
+  margin-top: 35px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: left;
+  color: $sematicRed2;
+}
+
+.orText {
+  $width: calc(100%);
+  text-align: center;
+  position: relative;
+  margin: 12px 0;
+
+  & > span {
     position: relative;
-    border-radius: 8px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    z-index: 2;
+    color: $neutralGray5;
     background-color: $neutralGray1;
-    border: 1px solid $neutralGray4;
+    padding: 0 8px;
+  }
+}
 
-    &:disabled {
-      background-color: $neutralGray3;
-      border-color: $neutralGray5;
-      color: $neutralGray5;
-    }
+.googleLoginButton {
+  color: $neutralGray6;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px 12px;
+  position: relative;
+  border-radius: 8px;
+  width: calc(100% - 32px);
+  margin: 0 auto;
+  @include flexCenter;
+  background-color: $neutralGray1;
+  border: 1px solid $neutralGray4;
+  gap: 16px;
+
+  &:disabled {
+    background-color: $neutralGray3;
+    border-color: $neutralGray5;
+    color: $neutralGray5;
   }
 
-  .googleIcon {
-    position: absolute;
-    left: 12px;
-    width: 32px;
-    height: 32px;
+  @include viewportMedium {
+    width: 100%;
   }
+}
 
-  .doNotHaveAnAccount {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto;
-    width: 90%;
-    background: $neutralGray4;
-    padding: 16px;
+.googleIcon {
+  width: 20px;
+  height: 20px;
+}
 
-    @include viewportMedium {
-      padding: 16px 24px;
-      width: min(450px, calc(150% / 2));
-    }
+.doNotHaveAnAccount {
+  margin-bottom: 24px;
 
-    @include viewportLarge {
-      padding: 24px 32px;
-    }
+  .toSignUp {
+    color: $primaryPri2;
+    cursor: pointer;
+  }
+}
 
-    .toSignUp {
-      color: $primaryPri2;
-      cursor: pointer;
-    }
+.submitButton {
+  border-radius: 8px;
+  width: calc(100% - 32px);
+  margin: 0 auto;
+
+  @include viewportMedium {
+    width: 100%;
+  }
+}
+
+.desktopView {
+  display: none;
+
+  @include viewportMedium {
+    margin-top: 40px;
+    display: block;
   }
 }
