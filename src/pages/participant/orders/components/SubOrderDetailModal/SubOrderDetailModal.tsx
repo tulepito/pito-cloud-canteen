@@ -32,6 +32,7 @@ type TSubOrderDetailModalProps = {
 
 const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   const { isOpen, onClose, event } = props;
+  console.debug('💫 > event: ', event);
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();

@@ -43,6 +43,7 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
     dishSelection,
     orderColor,
   } = event?.resource || {};
+
   const { address } = deliveryAddress;
   const { name: restaurantName } = restaurant;
   const orderTitle = event?.title || '';
@@ -52,11 +53,13 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
     backgroundColor: isExpired ? '#8C8C8C' : orderColor,
   };
   const remainTime = calculateRemainTime(deadlineDate);
-
   const selectionFoodName = meal?.dishes.find(
     (item: any) => item.key === dishSelection?.dishSelection,
   )?.value;
-  const shouldShowRejectButton = status === EVENT_STATUS.EMPTY_STATUS;
+  const shouldShowRejectButton = ![
+    EVENT_STATUS.EXPIRED_STATUS,
+    EVENT_STATUS.EMPTY_STATUS,
+  ].includes(status);
 
   const onCardClick = () => {
     setSelectedEvent(event);
