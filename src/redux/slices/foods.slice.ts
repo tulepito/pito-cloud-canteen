@@ -303,15 +303,18 @@ const updatePartnerFoodListing = createAsyncThunk(
 
 const createPartnerFoodFromCsv = createAsyncThunk(
   CREATE_FOOD_FROM_FILE,
-  async ({
-    file,
-    googleSheetUrl,
-    restaurantId,
-  }: {
-    file?: File;
-    googleSheetUrl?: string;
-    restaurantId: string;
-  }) => {
+  async (
+    {
+      file,
+      googleSheetUrl,
+      restaurantId,
+    }: {
+      file?: File;
+      googleSheetUrl?: string;
+      restaurantId: string;
+    },
+    { getState },
+  ) => {
     if (file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -370,35 +373,34 @@ const createPartnerFoodFromCsv = createAsyncThunk(
         header: true,
         skipEmptyLines: true,
         async complete({ data = [] }: { data: any[] }) {
-          try {
-            const isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
-            const dataLengthToImport = isProduction ? data.length : 3;
-            const response = await Promise.all(
-              data.slice(0, dataLengthToImport).map(async (foodData: any) => {
-                const dataParams = getImportDataFromCsv({
+          const isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
+          const dataLengthToImport = isProduction ? data.length : 3;
+          const packagingOptions = getState().AdminAttributes.packaging;
+          const response = await Promise.all(
+            data.slice(0, dataLengthToImport).map(async (foodData: any) => {
+              const dataParams = getImportDataFromCsv(
+                {
                   ...foodData,
                   restaurantId,
-                });
+                },
+                packagingOptions,
+              );
 
-                const queryParams = {
-                  expand: true,
-                };
+              const queryParams = {
+                expand: true,
+              };
 
-                const { data } = await partnerFoodApi.createFood({
-                  dataParams,
-                  queryParams,
-                });
+              const { data } = await partnerFoodApi.createFood({
+                dataParams,
+                queryParams,
+              });
 
-                const [food] = denormalisedResponseEntities(data);
+              const [food] = denormalisedResponseEntities(data);
 
-                return food;
-              }),
-            );
-            resolve(response as any);
-          } catch (error) {
-            console.log('error', error);
-            reject(error);
-          }
+              return food;
+            }),
+          );
+          resolve(response as any);
         },
         error(err: any) {
           reject(err);

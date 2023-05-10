@@ -40,8 +40,8 @@ const Modal: React.FC<TModalProps> = (props) => {
     handleClose,
     scrollLayerClassName,
     customHeader,
-    closeClassName,
     closeButton,
+    closeClassName,
   } = props;
 
   const intl = useIntl();

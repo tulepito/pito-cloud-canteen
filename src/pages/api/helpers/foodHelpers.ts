@@ -11,7 +11,7 @@ const queryMenuByIdList = async (menuIdList: string[]) => {
 
   const menuResponse = await integrationSdk.listings.query(
     {
-      ids: menuIdList,
+      ids: menuIdList.slice(0, 50),
     },
     {
       expand: true,
@@ -91,7 +91,7 @@ export const updateMenuAfterFoodDeletedByListId = async (foodIds: string[]) => {
 
           if (deletedFoodIsInDay) {
             const listFoodResponse = await integrationSdk.listings.query({
-              ids: newFoodIdList,
+              ids: newFoodIdList.slice(0, 50),
             });
 
             const foods = denormalisedResponseEntities(listFoodResponse);
@@ -196,7 +196,7 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
 
           if (foodIdList.includes(deletedFoodId)) {
             const listFoodResponse = await integrationSdk.listings.query({
-              ids: newFoodIdList,
+              ids: newFoodIdList.slice(0, 50),
             });
 
             const foods = denormalisedResponseEntities(listFoodResponse);
@@ -285,7 +285,7 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
 
           if (foodIdList.includes(updatedFoodId)) {
             const listFoodResponse = await integrationSdk.listings.query({
-              ids: foodIdList,
+              ids: foodIdList.slice(0, 50),
             });
 
             const foods = denormalisedResponseEntities(listFoodResponse);
