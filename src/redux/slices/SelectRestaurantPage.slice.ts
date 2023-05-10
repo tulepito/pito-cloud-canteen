@@ -112,7 +112,7 @@ const getRestaurantFood = createAsyncThunk(
         : {}),
       ...(favoriteFoodIdList.length > 0
         ? {
-            ids: favoriteFoodIdList.slice(0, 100).join(','),
+            ids: favoriteFoodIdList.slice(0, 50),
           }
         : {}),
     });

@@ -94,7 +94,7 @@ export const getRestaurantQuery = ({
     ?.origin;
   const bounds = distance ? calculateBounds(origin, distance) : '';
   const query = {
-    ids: newRestaurantIds.slice(0, 100).join(','),
+    ids: newRestaurantIds.slice(0, 50),
     keywords,
     page,
     ...(rating && { meta_rating: `${rating},` }),
