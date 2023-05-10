@@ -24,18 +24,29 @@ type TListingDetailModalProps = {
   isOpen: boolean;
   title: string;
   listing: any;
+  requirement: string;
   onClose: () => void;
   onSelectFood: () => void;
   onChangeRequirement: (value: string) => void;
 };
 
 const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
-  const { isOpen, listing, title, onClose, onChangeRequirement, onSelectFood } =
-    props;
+  const {
+    isOpen,
+    listing,
+    title,
+    requirement,
+    onClose,
+    onChangeRequirement,
+    onSelectFood,
+  } = props;
+
   const intl = useIntl();
   const { form: foodSelectionForm } = useForm({
     onSubmit: () => {},
-    initialValues: {},
+    initialValues: {
+      requirement,
+    },
   });
   const requirementField = useField('requirement', foodSelectionForm);
 

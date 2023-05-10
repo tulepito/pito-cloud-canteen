@@ -5,11 +5,11 @@ import Badge from '@components/Badge/Badge';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import IconPlusDish from '@components/Icons/IconPlusDish/IconPlusDish';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
 import { EImageVariants, SPECIAL_DIET_OPTIONS } from '@src/utils/enums';
-import { Listing } from '@utils/data';
+import { CurrentUser, Listing } from '@utils/data';
 
 import ListingDetailModal from './ListingDetailModal';
 
@@ -34,6 +34,12 @@ const ListingCard: React.FC<TListCardProps> = ({
 }) => {
   const detailModalController = useBoolean();
   const requirementRef = useRef<string | undefined>();
+  const orders = useAppSelector((state) => state.shoppingCart.orders);
+  const currentUser = useAppSelector((state) => state.user.currentUser);
+
+  const userId = CurrentUser(currentUser!).getId();
+  const storedRequirement =
+    orders?.[userId]?.[planId]?.[parseInt(dayId, 10)]?.requirement;
 
   const requirement = requirementRef.current;
   const mealId = listing?.id?.uuid;
@@ -133,6 +139,7 @@ const ListingCard: React.FC<TListCardProps> = ({
         title={title}
         onClose={handleCloseListingDetailModal}
         onChangeRequirement={handleChangeRequirement}
+        requirement={storedRequirement}
         onSelectFood={handleSelectFoodInModal}
       />
     </div>
