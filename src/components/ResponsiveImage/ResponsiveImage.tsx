@@ -48,8 +48,8 @@ import css from './ResponsiveImage.module.scss';
 type TResponsiveImageProps = TDefaultProps & {
   alt: string;
   noImageMessage?: string;
-  image: TImage;
-  variants: TImageVariant[];
+  image: TImage | null;
+  variants?: TImageVariant[];
   sizes?: string;
 };
 
@@ -65,7 +65,7 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
   } = props;
 
   const classes = classNames(rootClassName || css.root, className);
-  if (image == null || variants.length === 0) {
+  if (image === null || variants.length === 0) {
     const noImageClasses = classNames(
       rootClassName || css.root,
       css.noImageContainer,

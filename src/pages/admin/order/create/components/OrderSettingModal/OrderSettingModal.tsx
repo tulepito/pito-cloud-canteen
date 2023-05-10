@@ -312,7 +312,10 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
         address: addressValue,
         origin: originValue,
       },
-      packagePerMember: +packagePerMemberValue.replace(/,/g, ''),
+      packagePerMember: parseInt(
+        packagePerMemberValue?.replace(/,/g, '') || 0,
+        10,
+      ),
       startDate: startDateValue,
       endDate: endDateValue,
       deliveryHour: deliveryHourValue,
@@ -329,7 +332,8 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
         difference(nutritions, nutritionsValue).length > 0 ||
         getDaySessionFromDeliveryTime(deliveryHour) !==
           getDaySessionFromDeliveryTime(deliveryHourValue) ||
-        packagePerMember !== +packagePerMemberValue.replace(/,/g, '');
+        packagePerMember !==
+          parseInt(packagePerMemberValue?.replace(/,/g, '') || 0, 10);
       const { payload: newOrderDetail } = await dispatch(
         orderAsyncActions.recommendRestaurants(),
       );
