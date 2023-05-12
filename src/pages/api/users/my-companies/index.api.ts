@@ -24,7 +24,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           (result, current) => {
             const [id, permissionMap] = current as [string, TObject];
 
-            return permissionMap?.permission === UserPermission.BOOKER
+            return permissionMap?.permission === UserPermission.BOOKER ||
+              permissionMap?.permission === UserPermission.OWNER
               ? result.concat(id)
               : result;
           },
