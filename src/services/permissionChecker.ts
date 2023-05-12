@@ -1,7 +1,7 @@
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 import { EHttpStatusCode } from '@apis/errors';
-import { UserPermission } from '@src/types/UserPermission';
+import { CompanyPermission } from '@src/types/UserPermission';
 
 import { denormalisedResponseEntities } from './data';
 import { getSdk } from './sdk';
@@ -28,7 +28,7 @@ const permissionChecker =
 
     if (
       !userPermission ||
-      userPermission !== UserPermission.BOOKER ||
+      !CompanyPermission.includes(userPermission) ||
       !isPITOAdmin
     ) {
       return res.status(EHttpStatusCode.Forbidden).json({
