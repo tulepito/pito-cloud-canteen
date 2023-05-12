@@ -1,7 +1,7 @@
 import { CustomError } from '@apis/errors';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
-import { UserPermission } from '@src/types/UserPermission';
+import { CompanyPermission } from '@src/types/UserPermission';
 import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
@@ -17,8 +17,9 @@ const isBookerInOrderProgress = async ({
   memberEmail: string;
 }) => {
   const updatingMember = members[memberEmail] || {};
-  const updateMemberIsBooker =
-    updatingMember.permission === UserPermission.BOOKER;
+  const updateMemberIsBooker = CompanyPermission.includes(
+    updatingMember.permission,
+  );
   const intergrationSdk = getIntegrationSdk();
   if (updateMemberIsBooker && updatingMember?.id) {
     const response = await intergrationSdk.listings.query({

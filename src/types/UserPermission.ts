@@ -5,6 +5,8 @@ export enum UserPermission {
   OWNER = 'owner',
 }
 
+export const CompanyPermission = [UserPermission.BOOKER, UserPermission.OWNER];
+
 export enum UserInviteStatus {
   NOT_ACCEPTED = 'pending',
   ACCEPTED = 'accepted',

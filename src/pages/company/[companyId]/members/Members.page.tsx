@@ -20,7 +20,7 @@ import {
   companyMemberThunks,
   resetError,
 } from '@redux/slices/companyMember.slice';
-import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
+import { CompanyPermission, UserInviteStatus } from '@src/types/UserPermission';
 import { ensureUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
@@ -75,7 +75,7 @@ const MembersPage = () => {
   const bookerMemberEmails = Object.values(originCompanyMembers).reduce(
     (result, _member) => {
       if (
-        _member.permission === UserPermission.BOOKER &&
+        CompanyPermission.includes(_member.permission) &&
         _member.inviteStatus === UserInviteStatus.ACCEPTED
       ) {
         return [...result, _member.email];
