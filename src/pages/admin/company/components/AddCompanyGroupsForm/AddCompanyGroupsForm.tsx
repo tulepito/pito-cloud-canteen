@@ -1,11 +1,13 @@
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TCompanyMemberWithDetails } from '@utils/types';
 import { required } from '@utils/validators';
 
@@ -32,8 +34,13 @@ type TAddCompanyGroupsFormProps = FormProps<TAddCompanyGroupsFormValues> &
 const AddCompanyGroupsFormComponent: React.FC<
   TAddCompanyGroupsFormComponentProps
 > = (props) => {
-  const { handleSubmit, inProgress, handleCancel, formError, companyMembers } =
-    props;
+  const {
+    handleSubmit,
+    inProgress,
+    handleCancel,
+    formError,
+    companyMembers = [],
+  } = props;
   const intl = useIntl();
 
   return (
@@ -57,7 +64,7 @@ const AddCompanyGroupsFormComponent: React.FC<
         />
       </div>
       <div className={css.members}>
-        {companyMembers?.map((member) => (
+        {companyMembers.map((member) => (
           <FieldCompanyMemberCheckbox
             key={member.id.uuid}
             className={css.checkbox}
@@ -80,7 +87,9 @@ const AddCompanyGroupsFormComponent: React.FC<
           {intl.formatMessage({ id: 'AddCompanyGroupsForm.cancelButton' })}
         </Button>
       </div>
-      {formError && <ErrorMessage message={formError.message} />}
+      <RenderWhen condition={!isEmpty(formError)}>
+        <ErrorMessage message={formError.message} />
+      </RenderWhen>
     </Form>
   );
 };
