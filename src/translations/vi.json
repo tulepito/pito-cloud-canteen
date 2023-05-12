@@ -1390,7 +1390,7 @@
   "SignInForm.submitButtonText": "Đăng nhập",
   "SignInForm.title": "Đăng nhập",
   "SignInForm.toSignUp": "Đăng ký ngay",
-  "SignInPage.loginFailedText1": "Có lỗi xãy ra!",
+  "SignInPage.loginFailedText1": "Có lỗi xảy ra!",
   "SignInPage.loginFailedText2": "Kiểm tra thông tin đăng nhập và thử lại!",
   "SignUpForm.confirmPassword.invalid": "Mật khẩu phải từ 8-16 kí tự, bao gồm chữ cái in hoa, chữ cái in thường, ký tự đặc biệt và chữ số.",
   "SignUpForm.confirmPassword.label": "Xác nhận mật khẩu",
