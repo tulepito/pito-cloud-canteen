@@ -15,8 +15,10 @@ import IconPhone from '@components/Icons/IconPhone/IconPhone';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useLogout } from '@hooks/useLogout';
 import { UIActions } from '@redux/slices/UI.slice';
 import config from '@src/configs';
+import { generalPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 import type { TCurrentUser, TObject } from '@src/utils/types';
 
@@ -45,6 +47,8 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
   const { pathname: routerPathName, push } = useRouter();
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const dispatch = useAppDispatch();
+  const handleLogoutFn = useLogout();
+
   useEffect(() => {
     if (isOpen) {
       dispatch(UIActions.disableScrollRequest('CompanyHeaderMobile'));
@@ -73,6 +77,11 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
       });
       onToggle();
     };
+
+  const handleLogout = async () => {
+    await handleLogoutFn();
+    push(generalPaths.Home);
+  };
 
   return (
     <div className={classes}>
@@ -134,7 +143,7 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
                 {config.marketplacePhoneNumber}
               </div>
             </div>
-            <div className={css.headerBottomItem}>
+            <div className={css.headerBottomItem} onClick={handleLogout}>
               <IconLogout />
               <div className={css.phoneNumber}>
                 <FormattedMessage id="CompanyHeaderMobile.logout" />
