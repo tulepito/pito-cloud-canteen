@@ -23,7 +23,9 @@ export const getCompanyIdFromBookerUser = (user: TUser | TCurrentUser) => {
   const companyIds = Object.entries(companies).find((entry) => {
     const [, permissionData] = entry;
 
-    return (permissionData as TObject).permission === UserPermission.BOOKER;
+    return [UserPermission.BOOKER, UserPermission.OWNER].includes(
+      (permissionData as TObject).permission,
+    );
   });
 
   return companyIds ? companyIds[0] : '';
