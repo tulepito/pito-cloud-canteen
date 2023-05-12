@@ -17,6 +17,8 @@ import { UserPermission } from '@src/types/UserPermission';
 
 import CompanyOrderDetailPage from './components/CompanyOrderDetail.page';
 
+const allowedPermissions = [UserPermission.BOOKER, UserPermission.OWNER];
+
 const CompanyOrderDetailRoute = () => {
   const dispatch = useAppDispatch();
   const pageDataLoading = useAppSelector(orderDetailsAnyActionsInProgress);
@@ -39,7 +41,7 @@ const CompanyOrderDetailRoute = () => {
     if (!pageDataLoading && companyData && companyId !== null) {
       const permissionData = companyData[companyId as string] || {};
 
-      if (permissionData.permission !== UserPermission.BOOKER) {
+      if (!allowedPermissions.includes(permissionData.permission)) {
         push(companyPaths.Home);
       }
     }

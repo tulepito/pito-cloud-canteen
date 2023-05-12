@@ -17,6 +17,8 @@ import { CurrentUser } from '@utils/data';
 
 import OrderDetailPage from './OrderDetail.page';
 
+const allowedPermissions = [UserPermission.BOOKER, UserPermission.OWNER];
+
 const BookerOrderDetailsRoute = () => {
   const dispatch = useAppDispatch();
   const pageDataLoading = useAppSelector(orderDetailsAnyActionsInProgress);
@@ -40,7 +42,7 @@ const BookerOrderDetailsRoute = () => {
     if (!pageDataLoading && companyData && companyId !== null) {
       const permissionData = companyData[companyId as string] || {};
 
-      if (permissionData.permission !== UserPermission.BOOKER) {
+      if (!allowedPermissions.includes(permissionData.permission)) {
         push(companyPaths.Home);
       }
     }
