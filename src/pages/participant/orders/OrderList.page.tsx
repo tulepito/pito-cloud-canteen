@@ -5,6 +5,7 @@ import { Views } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
+import { useRouter } from 'next/router';
 
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
@@ -39,6 +40,9 @@ import css from './OrderList.module.scss';
 
 const OrderListPage = () => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { planId: planIdFromQuery, timestamp: timestampFromQuery } =
+    router.query;
 
   const updateProfileModalControl = useBoolean();
   const onBoardingModal = useBoolean();
@@ -172,6 +176,21 @@ const OrderListPage = () => {
   const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) =>
     isSameDate(_event.start, selectedDay),
   );
+  useEffect(() => {
+    if (planIdFromQuery && timestampFromQuery) {
+      const planId = planIdFromQuery as string;
+      const timestamp = timestampFromQuery as string;
+      const event = flattenEvents.find(
+        (_event) =>
+          _event.resource.planId === planId &&
+          _event.resource.timestamp === timestamp,
+      );
+      if (event) {
+        setSelectedEvent(event);
+        subOrderDetailModalControl.setTrue();
+      }
+    }
+  }, [planIdFromQuery, timestampFromQuery]);
 
   const openUpdateProfileModal = () => {
     updateProfileModalControl.setTrue();

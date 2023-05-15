@@ -2,6 +2,8 @@ import type { Event } from 'react-big-calendar';
 import { createSlice } from '@reduxjs/toolkit';
 import flatten from 'lodash/flatten';
 
+import type { ParticipantSubOrderAddDocumentApiBody } from '@apis/firebaseApi';
+import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
 import { loadOrderDataApi } from '@apis/index';
 import { participantPostRatingApi } from '@apis/participantApi';
 import { fetchTxApi } from '@apis/txApi';
@@ -47,6 +49,9 @@ type TOrderListState = {
 
   participantPostRatingInProgress: boolean;
   participantPostRatingError: any;
+
+  addSubOrderDocumentToFirebaseInProgress: boolean;
+  addSubOrderDocumentToFirebaseError: any;
 };
 const initialState: TOrderListState = {
   nutritions: [],
@@ -75,6 +80,9 @@ const initialState: TOrderListState = {
 
   participantPostRatingInProgress: false,
   participantPostRatingError: null,
+
+  addSubOrderDocumentToFirebaseInProgress: false,
+  addSubOrderDocumentToFirebaseError: null,
 };
 
 // ================ Thunk types ================ //
@@ -86,6 +94,8 @@ const FETCH_TRANSACTION_BY_SUB_ORDER =
   'app/ParticipantOrderList/FETCH_TRANSACTION_BY_SUB_ORDER';
 const POST_PARTICIPANT_RATING =
   'app/ParticipantOrderList/POST_PARTICIPANT_RATING';
+const ADD_SUB_ORDER_DOCUMENT_TO_FIREBASE =
+  'app/ParticipantOrderList/ADD_SUB_ORDER_DOCUMENT_TO_FIREBASE';
 // ================ Async thunks ================ //
 const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
   const { data: response } = await fetchSearchFilterApi();
@@ -186,6 +196,13 @@ const postParticipantRating = createAsyncThunk(
   },
 );
 
+const addSubOrderDocumentToFirebase = createAsyncThunk(
+  ADD_SUB_ORDER_DOCUMENT_TO_FIREBASE,
+  async (payload: ParticipantSubOrderAddDocumentApiBody) => {
+    await participantSubOrderAddDocumentApi(payload);
+  },
+);
+
 export const OrderListThunks = {
   fetchAttributes,
   updateProfile,
@@ -193,6 +210,7 @@ export const OrderListThunks = {
   fetchOrders,
   fetchTransactionBySubOrder,
   postParticipantRating,
+  addSubOrderDocumentToFirebase,
 };
 
 // ================ Slice ================ //
@@ -302,6 +320,18 @@ const OrderListSlice = createSlice({
       .addCase(postParticipantRating.rejected, (state, { error }) => {
         state.participantPostRatingInProgress = false;
         state.participantPostRatingError = error.message;
+      })
+
+      .addCase(addSubOrderDocumentToFirebase.pending, (state) => {
+        state.addSubOrderDocumentToFirebaseInProgress = true;
+        state.addSubOrderDocumentToFirebaseError = false;
+      })
+      .addCase(addSubOrderDocumentToFirebase.fulfilled, (state) => {
+        state.addSubOrderDocumentToFirebaseInProgress = false;
+      })
+      .addCase(addSubOrderDocumentToFirebase.rejected, (state, { error }) => {
+        state.addSubOrderDocumentToFirebaseInProgress = false;
+        state.addSubOrderDocumentToFirebaseError = error.message;
       });
   },
 });

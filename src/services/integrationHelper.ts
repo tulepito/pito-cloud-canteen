@@ -5,12 +5,14 @@ import { getIntegrationSdk } from './integrationSdk';
 export const fetchListing = async (
   listingId: string,
   include: string[] = [],
+  imageVariants?: string[],
 ) => {
   const integrationSdk = getIntegrationSdk();
   const response = await integrationSdk.listings.show(
     {
       id: listingId,
       include,
+      ...(imageVariants && { 'fields.image': imageVariants }),
     },
     { expand: true },
   );

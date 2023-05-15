@@ -26,7 +26,8 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     openSuccessRatingModal,
   } = props;
   const dispatch = useAppDispatch();
-  const { orderId, restaurant, timestamp } = selectedEvent?.resource || {};
+  const { orderId, restaurant, timestamp, planId } =
+    selectedEvent?.resource || {};
   const restaurantId = restaurant?.id;
   const images = useAppSelector(
     (state) => state.uploadImage.images,
@@ -59,7 +60,11 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     };
 
     const { meta } = await dispatch(
-      OrderListThunks.postParticipantRating({ rating, detailTextRating }),
+      OrderListThunks.postParticipantRating({
+        rating,
+        detailTextRating,
+        planId,
+      }),
     );
 
     if (meta.requestStatus === 'fulfilled') {

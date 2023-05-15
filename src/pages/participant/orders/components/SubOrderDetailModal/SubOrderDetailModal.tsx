@@ -57,6 +57,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   const fetchSubOrderTxInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
   );
+  const timestamp = last(orderDay.split(' - '));
 
   const isTxInitialState = txIsInitiated(subOrderTx);
 
@@ -100,6 +101,13 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     };
 
     await dispatch(participantOrderManagementThunks.updateOrder(payload));
+    await dispatch(
+      OrderListThunks.addSubOrderDocumentToFirebase({
+        participantId: currentUserId,
+        planId,
+        timestamp: parseInt(`${timestamp}`, 10),
+      }),
+    );
     await dispatch(OrderListThunks.fetchOrders(currentUserId));
     onClose();
   };

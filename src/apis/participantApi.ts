@@ -16,6 +16,7 @@ type TParticipantPostRatingApiBody = {
   rating: TRestaurantRating;
   imageIdList?: string[];
   detailTextRating?: string;
+  planId?: string;
 };
 export const participantPostRatingApi = (body: TParticipantPostRatingApiBody) =>
   postApi('/participants/ratings', body);
