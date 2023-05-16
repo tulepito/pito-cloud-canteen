@@ -5,6 +5,7 @@ import { Views } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
+import { useRouter } from 'next/router';
 
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
@@ -27,8 +28,10 @@ import ParticipantToolbar from '../components/ParticipantToolbar/ParticipantTool
 import OnboardingOrderModal from './components/OnboardingOrderModal/OnboardingOrderModal';
 import OnboardingTour from './components/OnboardingTour/OnboardingTour';
 import OrderListHeaderSection from './components/OrderListHeaderSection/OrderListHeaderSection';
+import RatingSubOrderModal from './components/RatingSubOrderModal/RatingSubOrderModal';
 import SubOrderCard from './components/SubOrderCard/SubOrderCard';
 import SubOrderDetailModal from './components/SubOrderDetailModal/SubOrderDetailModal';
+import SuccessRatingModal from './components/SuccessRatingModal/SuccessRatingModal';
 import UpdateProfileModal from './components/UpdateProfileModal/UpdateProfileModal';
 import WelcomeModal from './components/WelcomeModal/WelcomeModal';
 import { OrderListActions, OrderListThunks } from './OrderList.slice';
@@ -37,13 +40,18 @@ import css from './OrderList.module.scss';
 
 const OrderListPage = () => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { planId: planIdFromQuery, timestamp: timestampFromQuery } =
+    router.query;
 
   const updateProfileModalControl = useBoolean();
   const onBoardingModal = useBoolean();
   const tourControl = useBoolean();
+  const ratingSubOrderModalControl = useBoolean();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const subOrderDetailModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
+  const successRatingModalControl = useBoolean();
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const orders = useAppSelector(
     (state) => state.ParticipantOrderList.orders,
@@ -168,6 +176,21 @@ const OrderListPage = () => {
   const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) =>
     isSameDate(_event.start, selectedDay),
   );
+  useEffect(() => {
+    if (planIdFromQuery && timestampFromQuery) {
+      const planId = planIdFromQuery as string;
+      const timestamp = timestampFromQuery as string;
+      const event = flattenEvents.find(
+        (_event) =>
+          _event.resource.planId === planId &&
+          _event.resource.timestamp === timestamp,
+      );
+      if (event) {
+        setSelectedEvent(event);
+        subOrderDetailModalControl.setTrue();
+      }
+    }
+  }, [planIdFromQuery, timestampFromQuery]);
 
   const openUpdateProfileModal = () => {
     updateProfileModalControl.setTrue();
@@ -202,6 +225,10 @@ const OrderListPage = () => {
     setTimeout(() => {
       tourControl.setTrue();
     }, 1000);
+  };
+
+  const openRatingSubOrderModal = () => {
+    ratingSubOrderModalControl.setTrue();
   };
 
   return (
@@ -268,8 +295,20 @@ const OrderListPage = () => {
           isOpen={subOrderDetailModalControl.value}
           onClose={subOrderDetailModalControl.setFalse}
           event={selectedEvent!}
+          openRatingSubOrderModal={openRatingSubOrderModal}
         />
       </RenderWhen>
+      <RatingSubOrderModal
+        isOpen={ratingSubOrderModalControl.value}
+        onClose={ratingSubOrderModalControl.setFalse}
+        selectedEvent={selectedEvent}
+        currentUserId={currentUserId}
+        openSuccessRatingModal={successRatingModalControl.setTrue}
+      />
+      <SuccessRatingModal
+        isOpen={successRatingModalControl.value}
+        onClose={successRatingModalControl.setFalse}
+      />
 
       <BottomNavigationBar />
       <LoadingModal isOpen={showLoadingModal} />

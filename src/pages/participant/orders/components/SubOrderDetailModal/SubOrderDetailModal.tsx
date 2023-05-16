@@ -28,10 +28,11 @@ type TSubOrderDetailModalProps = {
   isOpen: boolean;
   onClose: () => void;
   event: Event;
+  openRatingSubOrderModal: () => void;
 };
 
 const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
-  const { isOpen, onClose, event } = props;
+  const { isOpen, onClose, event, openRatingSubOrderModal } = props;
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -56,6 +57,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   const fetchSubOrderTxInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
   );
+  const timestamp = last(orderDay.split(' - '));
 
   const isTxInitialState = txIsInitiated(subOrderTx);
 
@@ -99,6 +101,13 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     };
 
     await dispatch(participantOrderManagementThunks.updateOrder(payload));
+    await dispatch(
+      OrderListThunks.addSubOrderDocumentToFirebase({
+        participantId: currentUserId,
+        planId,
+        timestamp: parseInt(`${timestamp}`, 10),
+      }),
+    );
     await dispatch(OrderListThunks.fetchOrders(currentUserId));
     onClose();
   };
@@ -157,7 +166,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
           </RenderWhen>
         </RenderWhen>
         <RenderWhen condition={txIsDelivered(subOrderTx)}>
-          <Button className={css.ratingBtn} onClick={() => {}}>
+          <Button className={css.ratingBtn} onClick={openRatingSubOrderModal}>
             Đánh giá
           </Button>
         </RenderWhen>
