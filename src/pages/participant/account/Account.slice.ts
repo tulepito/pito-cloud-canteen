@@ -79,7 +79,7 @@ const updateProfile = createAsyncThunk(
       lastName?: string;
       phoneNumber?: string;
     },
-    { extra: sdk },
+    { extra: sdk, dispatch },
   ) => {
     const { firstName, lastName, phoneNumber } = payload;
     await sdk.currentUser.updateProfile({
@@ -89,6 +89,8 @@ const updateProfile = createAsyncThunk(
         phoneNumber,
       },
     });
+
+    await dispatch(userThunks.fetchCurrentUser());
   },
 );
 
