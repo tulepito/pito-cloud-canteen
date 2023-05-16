@@ -11,7 +11,8 @@ type BookerOrderPickingParams = {
   orderListing: any;
 };
 
-export const bookerOrderPickingSubject = 'Sắp đến hạn chọn món!';
+export const bookerOrderPickingSubject = (orderName: string) =>
+  `Sắp đến hạn chọn món ${orderName}`;
 
 const bookerOrderPicking = ({
   bookerUser,

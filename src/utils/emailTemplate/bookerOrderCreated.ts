@@ -11,8 +11,8 @@ type BookerAccountCreatedParams = {
   orderListing: any;
 };
 
-export const bookerOrderCreatedSubject =
-  'Bạn vừa nhận được một đơn hàng tạo bởi PITO';
+export const bookerOrderCreatedSubject = (orderName: string) =>
+  `Đơn hàng ${orderName} vừa được khởi tạo`;
 
 const bookerOrderCreated = ({
   bookerUser,
