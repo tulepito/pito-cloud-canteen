@@ -13,7 +13,8 @@ type BookerSubOrderIsCanceledParams = {
   timestamp: number;
 };
 
-export const bookerSubOrderIsCanceledSubject = 'Ngày ăn bị huỷ';
+export const bookerSubOrderIsCanceledSubject = (subOrderDate: string) =>
+  `Ngày ăn ${subOrderDate} bị huỷ`;
 
 const bookerSubOrderIsCanceled = ({
   bookerUser,

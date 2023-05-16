@@ -16,7 +16,8 @@ type PartnerNewOrderAppearParams = {
   promotion: number;
 };
 
-export const partnerNewOrderAppearSubject = 'Bạn vừa nhận được 1 đơn hàng';
+export const partnerNewOrderAppearSubject = (orderName: string) =>
+  `Đơn hàng ${orderName} vừa được khởi tạo`;
 
 const partnerNewOrderAppear = ({
   companyUser,

@@ -8,7 +8,8 @@ type ParticipantCompanyInvitationParams = {
   timestamp: number;
 };
 
-export const participantSubOrderIsCanceledSubject = 'Ngày ăn bị huỷ';
+export const participantSubOrderIsCanceledSubject = (subOrderDate: string) =>
+  `Ngày ăn ${subOrderDate} bị huỷ`;
 
 const participantSubOrderIsCanceled = ({
   participantUser,

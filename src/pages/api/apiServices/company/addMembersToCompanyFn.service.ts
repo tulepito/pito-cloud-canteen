@@ -3,15 +3,17 @@ import difference from 'lodash/difference';
 import { DateTime } from 'luxon';
 
 import { sendIndividualEmail } from '@services/awsSES';
+import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
+import participantCompanyInvitation, {
+  participantCompanyInvitationSubject,
+} from '@src/utils/emailTemplate/participantCompanyInvitation';
 import { denormalisedResponseEntities, User } from '@utils/data';
-import { companyInvitation } from '@utils/emailTemplate/companyInvitation';
 
 const defaultExpireTime =
   parseInt(process.env.DEFAUTL_INVITATION_EMAIL_EXPIRE_TIME as string, 10) || 7;
-const baseUrl = process.env.NEXT_PUBLIC_CANONICAL_URL;
 const systemSenderEmail = process.env.AWS_SES_SENDER_EMAIL;
 
 type TAddMembersToCompanyParams = {
@@ -24,7 +26,9 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
   const { userIdList, noAccountEmailList, companyId } = params;
   const integrationSdk = getIntegrationSdk();
   const companyAccount = await fetchUser(companyId);
-  const { members = {} } = User(companyAccount).getMetadata();
+  const companyUser = User(companyAccount);
+  const { companyName } = companyUser.getPublicData();
+  const { members = {} } = companyUser.getMetadata();
   const membersIdList = compact(
     Object.values(members).map((_member: any) => _member?.id),
   );
@@ -114,29 +118,32 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     updatedCompanyAccountResponse,
   );
 
-  const newParticipantMembersEmailTemplate = companyInvitation({
-    companyName: User(companyAccount).getPublicData().companyName,
-    url: `${baseUrl}/invitation/${companyId}`,
-  });
   // Step handle send email for new participant members
-  const hasFlexAccountEmailParamsData = {
-    receiver: Object.keys(newParticipantMembersObj),
-    subject: 'PITO Cloud Canteen - Bạn có một lời mời tham gia công ty',
-    content: newParticipantMembersEmailTemplate,
-    sender: systemSenderEmail as string,
-  };
-  if (hasFlexAccountEmailParamsData.receiver.length > 0) {
-    sendIndividualEmail(hasFlexAccountEmailParamsData);
+  if (Object.keys(newParticipantMembersObj).length > 0) {
+    await Promise.all(
+      difference(userIdList, membersIdList).map(async (userId: string) => {
+        await emailSendingFactory(
+          EmailTemplateTypes.PARTICIPANT.PARTICIPANT_COMPANY_INVITATION,
+          {
+            participantId: userId,
+            companyId,
+          },
+        );
+      }),
+    );
   }
   // Step handle send email for new no account members
+  const emailTemplate = participantCompanyInvitation({
+    companyUser,
+  });
 
   const noFlexAccountEmailParamsData = {
     receiver: noAccountEmailList,
-    subject: 'PITO Cloud Canteen - Bạn có một lời mời tham gia công ty',
-    content: newParticipantMembersEmailTemplate,
+    subject: participantCompanyInvitationSubject(companyName),
+    content: emailTemplate as string,
     sender: systemSenderEmail as string,
   };
-  if (noFlexAccountEmailParamsData.receiver.length > 0) {
+  if (noAccountEmailList.length > 0) {
     sendIndividualEmail(noFlexAccountEmailParamsData);
   }
 
