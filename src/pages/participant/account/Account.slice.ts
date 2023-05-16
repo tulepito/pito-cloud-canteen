@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { fetchSearchFilterApi } from '@apis/userApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { userThunks } from '@redux/slices/user.slice';
+import { storableError } from '@src/utils/errors';
 import type { TKeyValue } from '@src/utils/types';
 
 // ================ Initial states ================ //
@@ -98,9 +99,15 @@ const changePassword = createAsyncThunk(
   CHANGE_PASSWORD,
   async (
     payload: { currentPassword: string; newPassword: string },
-    { extra: sdk },
+    { extra: sdk, rejectWithValue, fulfillWithValue },
   ) => {
-    await sdk.currentUser.changePassword(payload);
+    try {
+      await sdk.currentUser.changePassword(payload);
+
+      return fulfillWithValue(null);
+    } catch (error) {
+      return rejectWithValue(storableError(error));
+    }
   },
 );
 
@@ -169,14 +176,14 @@ const AccountSlice = createSlice({
 
       .addCase(changePassword.pending, (state) => {
         state.changePasswordInProgress = true;
-        state.changePasswordError = false;
+        state.changePasswordError = null;
       })
       .addCase(changePassword.fulfilled, (state) => {
         state.changePasswordInProgress = false;
       })
-      .addCase(changePassword.rejected, (state) => {
+      .addCase(changePassword.rejected, (state, { error }) => {
         state.changePasswordInProgress = false;
-        state.changePasswordError = true;
+        state.changePasswordError = error;
       })
 
       .addCase(updateProfileImage.pending, (state) => {

@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux';
 
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { authThunks } from '@redux/slices/auth.slice';
 import { passwordThunks } from '@redux/slices/password.slice';
 import type { AppDispatch } from '@redux/store';
 import type { TObject } from '@utils/types';
@@ -32,7 +31,6 @@ const PasswordRecoverPage = () => {
     }, 1000);
 
     dispatch(passwordThunks.recoverPassword(values));
-    dispatch(authThunks.logout());
   };
 
   return (
