@@ -10,9 +10,12 @@ import OrderEventCard from '@components/CalendarDashboard/components/OrderEventC
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { markColorForOrder } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import useSubOrderPicking from '@pages/participant/hooks/useSubOrderPicking';
+import RatingSubOrderModal from '@pages/participant/orders/components/RatingSubOrderModal/RatingSubOrderModal';
 import SubOrderCard from '@pages/participant/orders/components/SubOrderCard/SubOrderCard';
 import SubOrderDetailModal from '@pages/participant/orders/components/SubOrderDetailModal/SubOrderDetailModal';
+import SuccessRatingModal from '@pages/participant/orders/components/SuccessRatingModal/SuccessRatingModal';
 import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
 import { convertStringToNumber } from '@src/utils/number';
 import { CurrentUser, Listing, User } from '@utils/data';
@@ -45,7 +48,8 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const orderColor = markColorForOrder(convertStringToNumber(orderTile || ''));
   const currentUserId = CurrentUser(currentUser).getId();
   const selectedDay = useAppSelector((state) => state.Calendar.selectedDay);
-
+  const ratingSubOrderModalControl = useBoolean();
+  const successRatingModalControl = useBoolean();
   const {
     subOrderDetailModalControl,
     selectedEvent,
@@ -183,8 +187,20 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           isOpen={subOrderDetailModalControl.value}
           onClose={subOrderDetailModalControl.setFalse}
           event={selectedEvent!}
+          openRatingSubOrderModal={ratingSubOrderModalControl.setTrue}
         />
       </RenderWhen>
+      <RatingSubOrderModal
+        isOpen={ratingSubOrderModalControl.value}
+        onClose={ratingSubOrderModalControl.setFalse}
+        selectedEvent={selectedEvent}
+        currentUserId={currentUserId}
+        openSuccessRatingModal={successRatingModalControl.setTrue}
+      />
+      <SuccessRatingModal
+        isOpen={successRatingModalControl.value}
+        onClose={successRatingModalControl.setFalse}
+      />
     </div>
   );
 };
