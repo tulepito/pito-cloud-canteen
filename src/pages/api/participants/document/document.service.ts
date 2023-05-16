@@ -1,5 +1,6 @@
 import { getListingImageById } from '@pages/company/booker/orders/draft/[orderId]/restaurants/helpers';
 import {
+  getDocumentById,
   setCollectionDocWithCustomId,
   updateCollectionDoc,
 } from '@services/firebase';
@@ -76,15 +77,25 @@ export const updateFirebaseDocument = async (
   subOrderId: string,
   params: any,
 ) => {
-  const { txStatus, reviewId, status } = params;
+  const { txStatus, reviewId, status, foodId } = params;
   const allowedParams = {
     ...(txStatus && { txStatus }),
     ...(reviewId && { reviewId }),
     ...(status && { status }),
+    ...(foodId && { foodId }),
   };
   await updateCollectionDoc(
     subOrderId,
     allowedParams,
     FIREBASE_PARTICIPANT_SUB_ORDER_COLLECTION_NAME!,
   );
+};
+
+export const getFirebaseDocumentById = async (subOrderId: string) => {
+  const response = await getDocumentById(
+    subOrderId,
+    FIREBASE_PARTICIPANT_SUB_ORDER_COLLECTION_NAME!,
+  );
+
+  return response;
 };

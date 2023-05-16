@@ -5,6 +5,7 @@ import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import { CustomError, EHttpStatusCode } from '@apis/errors';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
+import { denormalisedResponseEntities } from '@src/utils/data';
 import { isTransactionsTransitionInvalidTransition } from '@src/utils/errors';
 import { ETransition } from '@src/utils/transaction';
 import type { TError } from '@src/utils/types';
@@ -37,14 +38,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     switch (apiMethod) {
       case HttpMethod.POST: {
-        await integrationSdk.transactions.transition({
-          id: txId,
-          transition,
-          params: {},
-        });
+        const txResponse = await integrationSdk.transactions.transition(
+          {
+            id: txId,
+            transition,
+            params: {},
+            include: ['booking'],
+          },
+          { expand: true },
+        );
+
+        const tx = denormalisedResponseEntities(txResponse)[0];
 
         return res.status(200).json({
           message: 'Successfully transit transaction',
+          tx,
         });
       }
       default:

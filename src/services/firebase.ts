@@ -3,6 +3,7 @@ import {
   addDoc,
   collection,
   doc,
+  getDoc,
   getDocs,
   getFirestore,
   limit,
@@ -111,9 +112,20 @@ const updateCollectionDoc = async (
   await updateDoc(docRef, data);
 };
 
+const getDocumentById = async (documentId: string, collectionName: string) => {
+  const docRef = doc(firestore, collectionName, documentId);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return docSnap.data();
+  }
+
+  return null;
+};
+
 export {
   addCollectionDoc,
   getCollectionData,
+  getDocumentById,
   queryCollectionData,
   setCollectionDocWithCustomId,
   updateCollectionDoc,

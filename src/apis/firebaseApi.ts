@@ -23,13 +23,17 @@ export const participantSubOrderGetDocumentApi = async (
   });
 
 export type ParticipantSubOrderUpdateDocumentApiBody = {
-  subOrderId: string;
+  subOrderId: string; // participantId - planId - timestamp
   params: {
     txStatus?: string;
     reviewId?: string;
     status?: string;
+    foodId?: string;
   };
 };
 export const participantSubOrderUpdateDocumentApi = async (
   body: ParticipantSubOrderUpdateDocumentApiBody,
 ) => putApi('/participants/document', body);
+
+export const participantSubOrderGetByIdApi = async (subOrderId: string) =>
+  getApi(`/participants/document/${subOrderId}`);
