@@ -15,6 +15,7 @@ import {
   Listing,
   Transaction,
 } from '@src/utils/data';
+import { ESubOrderTxStatus } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 import type {
   TListing,
@@ -31,11 +32,11 @@ const transitionShouldChangeFirebaseSubOrderStatus = [
 const mapTxTransitionToFirebaseSubOrderStatus = (lastTransition: string) => {
   switch (lastTransition) {
     case ETransition.START_DELIVERY:
-      return 'delivering';
+      return ESubOrderTxStatus.DELIVERING;
     case ETransition.COMPLETE_DELIVERY:
-      return 'delivered';
+      return ESubOrderTxStatus.DELIVERED;
     default:
-      return 'pending';
+      return ESubOrderTxStatus.PENDING;
   }
 };
 

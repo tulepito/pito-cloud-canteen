@@ -50,7 +50,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           timestamp,
         });
 
-        res.json({ message: 'success' });
+        res.json({ message: 'Add document successfully' });
       } catch (error) {
         handleError(res, error);
       }
@@ -59,6 +59,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       try {
         const { subOrderId, params } = req.body;
         await updateFirebaseDocument(subOrderId!, params);
+        res.json({ message: 'Update document successfully' });
       } catch (error) {
         handleError(res, error);
       }

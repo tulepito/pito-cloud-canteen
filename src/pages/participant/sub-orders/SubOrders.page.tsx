@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
+import { ESubOrderTxStatus } from '@src/utils/enums';
 
 import SubOrderList from './components/SubOrderList/SubOrderList';
 import SubOrderReviewModal from './components/SubOrderReviewModal/SubOrderReviewModal';
@@ -16,8 +17,8 @@ import { SubOrdersThunks } from './SubOrders.slice';
 
 import css from './SubOrders.module.scss';
 
-const DELIVERING_TAB = 'delivering';
-const DELIVERED_TAB = 'delivered';
+const DELIVERING_TAB = ESubOrderTxStatus.DELIVERING;
+const DELIVERED_TAB = ESubOrderTxStatus.DELIVERED;
 
 const SubOrders = () => {
   const dispatch = useAppDispatch();
