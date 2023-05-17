@@ -101,14 +101,14 @@ const Tabs: React.FC<ITabsProps> = (props) => {
         key={`tab-${index}`}
         className={tabItemClasses}
         onClick={onChangeTab(index + 1)}>
-        <span
+        <div
           className={classNames(css.tabItemContent, {
             [css.tabActive]: isActiveClass,
           })}>
           {typeof label === 'function'
             ? label({ ...item, isActive: isActiveClass })
             : label}
-        </span>
+        </div>
       </div>
     );
   });

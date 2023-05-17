@@ -32,7 +32,8 @@ const SuccessModal: React.FC<TSuccessModal> = ({ isOpen, handleClose }) => {
             id: 'SectionOrderPanel.successModal.title',
           })}
         </div>
-      }>
+      }
+      shouldFullScreenInMobile={false}>
       <div>
         <div className={css.successModalImage}>
           <IconTickWithCircle />

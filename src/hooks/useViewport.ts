@@ -29,6 +29,7 @@ export const useViewport = () => {
   const isTabletLayout =
     viewport.width >= MAX_MOBILE_SCREEN_WIDTH &&
     viewport.width < MAX_TABLET_SCREEN_WIDTH;
+  const isTabletLayoutOrLarger = viewport.width >= MAX_MOBILE_SCREEN_WIDTH;
 
-  return { viewport, isMobileLayout, isTabletLayout };
+  return { viewport, isMobileLayout, isTabletLayout, isTabletLayoutOrLarger };
 };

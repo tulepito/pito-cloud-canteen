@@ -1,6 +1,5 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
-import { useIntl } from 'react-intl';
 
 import InActiveUserScreen from '@components/InActiveUserScreen/InActiveUserScreen';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
@@ -12,7 +11,6 @@ import useVerifyPermission from './useVerifyPermission';
 type TPermissionGuardGuardProps = PropsWithChildren<{}>;
 
 const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
-  const intl = useIntl();
   const { children } = props;
   const { isIgnoredPermissionCheck, userPermission, isMatchedPermission } =
     useVerifyPermission();
@@ -32,9 +30,7 @@ const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
     return !!isMatchedPermission && isMatchedPermission ? (
       <LayoutWrapper>{children}</LayoutWrapper>
     ) : (
-      <LoadingContainer
-        loadingText={intl.formatMessage({ id: 'PermissionGuard.loadingText' })}
-      />
+      <LoadingContainer />
     );
   };
 

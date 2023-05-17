@@ -30,9 +30,16 @@
 }
 
 .tabHeaders {
-  display: -webkit-inline-box;
+  display: flex;
   overflow-x: auto;
   overflow-y: hidden;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+
   width: 100%;
   gap: 32px;
   margin-bottom: 6px;
@@ -41,10 +48,6 @@
   /* Track */
   ::-webkit-scrollbar-track {
     background: none;
-  }
-
-  @include viewportMedium {
-    display: -webkit-inline-box;
   }
 }
 
@@ -98,6 +101,7 @@
 }
 
 .tabItemContent {
+  width: max-content;
   color: $neutralGray5;
   @include textTemplate(14px, 400, 20px);
 

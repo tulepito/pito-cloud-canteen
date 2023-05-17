@@ -40,7 +40,11 @@ const CartItemList: React.FC<TCartItemList> = ({
       planDate.getMonth() + 1
     }/${planDate.getFullYear()}`;
 
-    const { foodId } = item;
+    const { foodId = '' } = item;
+
+    if (foodId === '') {
+      return null;
+    }
 
     const foodList = plan?.[key]?.foodList || [];
     const selectedDish =

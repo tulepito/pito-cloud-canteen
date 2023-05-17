@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import type { PropsWithChildren } from 'react';
 import React, { useEffect } from 'react';
-import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
@@ -17,7 +16,6 @@ import useVerifyAuthentication from './useVerifyAuthentication';
 type TAuthGuardProps = PropsWithChildren<{}>;
 
 const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
-  const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isAuthenticated, authInfoLoaded } = useAppSelector(
@@ -57,11 +55,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
       (!isNonRequireAuthenticationRoute && !isAuthenticated);
 
     if (loadingCondition) {
-      return (
-        <LoadingContainer
-          loadingText={intl.formatMessage({ id: 'AuthGuard.loadingText' })}
-        />
-      );
+      return <LoadingContainer />;
     }
 
     return children;

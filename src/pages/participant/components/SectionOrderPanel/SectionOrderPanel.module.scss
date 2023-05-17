@@ -90,13 +90,17 @@
   }
 
   .successModalContainer {
-    width: 100%;
-    max-width: 500px;
+    width: calc(100vw - 32px);
     padding: 24px;
 
     & > div {
       padding: 0;
       margin: 0;
+    }
+
+    @include viewportMedium {
+      width: 100%;
+      max-width: 500px;
     }
   }
 
@@ -120,7 +124,11 @@
 
   .successModalConfirmBtn {
     margin: auto;
-    width: calc(100% - 80px);
+    width: 100%;
+
+    @include viewportSmall {
+      width: calc(100% - 80px);
+    }
 
     &:last-child {
       margin-top: 8px;

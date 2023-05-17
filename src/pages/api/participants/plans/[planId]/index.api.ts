@@ -46,6 +46,8 @@ const fetchSubOrder = async (orderDetail: any, currentUserId: string) => {
         'fields.image': [
           'variants.landscape-crop',
           'variants.landscape-crop2x',
+          'variants.landscape-crop4x',
+          'variants.landscape-crop6x',
         ],
       }),
     );

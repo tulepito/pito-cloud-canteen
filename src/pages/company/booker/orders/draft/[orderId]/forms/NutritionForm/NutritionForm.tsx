@@ -4,6 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
 import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { FOOD_TYPE_OPTIONS } from '@src/utils/enums';
 
@@ -31,9 +32,8 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
     });
 
   const intl = useIntl();
-  const nutritionsOptions = useAppSelector(
-    (state) => state.BookerDraftOrderPage.nutritions,
-  );
+  const nutritionsOptions =
+    useAppSelector((state) => state.BookerDraftOrderPage.nutritions) || [];
 
   const nutritions = useField('nutritions', form);
   const mealType = useField('mealType', form);
@@ -98,37 +98,40 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
           </div>
         ))}
       </div>
-      <div className={css.fieldGroups}>
-        <div className={css.groupLabel}>
-          <span>
-            {intl.formatMessage({
-              id: 'Booker.CreateOrder.Form.field.nutritions',
-            })}
-          </span>
-        </div>
-        {nutritionsOptions.map((data: any) => (
-          <div className={css.checkboxItem} key={data.key}>
-            <input
-              className={css.input}
-              id={`nutritions-${data.key}`}
-              {...nutritions.input}
-              onChange={handleChangeCheckboxGroup(data, nutritions)}
-              checked={(nutritions.input.value || []).includes(data.key)}
-              type="checkbox"
-              value={data.key}
-            />
-            <label className={css.label} htmlFor={`nutritions-${data.key}`}>
-              <span className={css.checkboxWrapper}>
-                <IconCheckbox
-                  checkedClassName={css.checked}
-                  boxClassName={css.box}
-                />
-              </span>
-              <span className={css.labelText}>{data.label}</span>
-            </label>
+
+      <RenderWhen condition={nutritionsOptions.length > 0}>
+        <div className={css.fieldGroups}>
+          <div className={css.groupLabel}>
+            <span>
+              {intl.formatMessage({
+                id: 'Booker.CreateOrder.Form.field.nutritions',
+              })}
+            </span>
           </div>
-        ))}
-      </div>
+          {nutritionsOptions.map((data: any) => (
+            <div className={css.checkboxItem} key={data.key}>
+              <input
+                className={css.input}
+                id={`nutritions-${data.key}`}
+                {...nutritions.input}
+                onChange={handleChangeCheckboxGroup(data, nutritions)}
+                checked={(nutritions.input.value || []).includes(data.key)}
+                type="checkbox"
+                value={data.key}
+              />
+              <label className={css.label} htmlFor={`nutritions-${data.key}`}>
+                <span className={css.checkboxWrapper}>
+                  <IconCheckbox
+                    checkedClassName={css.checked}
+                    boxClassName={css.box}
+                  />
+                </span>
+                <span className={css.labelText}>{data.label}</span>
+              </label>
+            </div>
+          ))}
+        </div>
+      </RenderWhen>
 
       <Button
         className={css.submitBtn}

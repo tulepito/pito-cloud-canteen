@@ -8,15 +8,18 @@ import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import { FieldTextAreaComponent } from '@components/FormFields/FieldTextArea/FieldTextArea';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import IconBox from '@components/Icons/IconBox/IconBox';
 import Modal from '@components/Modal/Modal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
 import {
   EImageVariants,
   SIDE_DISH_OPTIONS,
   SPECIAL_DIET_OPTIONS,
 } from '@src/utils/enums';
+import { toNonAccentVietnamese } from '@src/utils/string';
 
 import css from './ListingDetailModal.module.scss';
 
@@ -38,6 +41,9 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
     initialValues: {},
   });
   const requirementField = useField('requirement', foodSelectionForm);
+  const packagingOptions = useAppSelector(
+    (state) => state.SystemAttributes.packaging,
+  );
 
   const listingObj = Listing(listing);
   const listingImages = Listing(listing).getImages() || [];
@@ -47,7 +53,14 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
     sideDishes = [],
     allergicIngredients = [],
     specialDiets = [],
+    packaging,
   } = listingObj.getPublicData();
+  const packagingLabel = packagingOptions.find(
+    ({ key }) =>
+      toNonAccentVietnamese(packaging, true) ===
+      toNonAccentVietnamese(key, true),
+  )?.label;
+
   const badges = specialDiets
     .slice(0, 3)
     .map((diet: string) =>
@@ -114,7 +127,10 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
                     key={image}
                     image={image}
                     alt={title}
-                    variants={[EImageVariants.landscapeCrop]}
+                    variants={[
+                      EImageVariants.landscapeCrop6x,
+                      EImageVariants.landscapeCrop4x,
+                    ]}
                   />
                 );
               })}
@@ -128,15 +144,25 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
 
         <div className={css.section}>
           <div className={css.foodTitle}>{title}</div>
-          <div className={css.badgeContainer}>
-            {badges.map((badge: any) => (
-              <Badge
-                key={badge?.key}
-                label={badge?.label}
-                type={badge?.badgeType}
-              />
-            ))}
-          </div>
+
+          <RenderWhen condition={badges?.length > 0}>
+            <div className={css.badgeContainer}>
+              {badges.map((badge: any) => (
+                <Badge
+                  key={badge?.key}
+                  label={badge?.label}
+                  type={badge?.badgeType}
+                />
+              ))}
+            </div>
+          </RenderWhen>
+
+          <RenderWhen condition={!isEmpty(packagingLabel)}>
+            <div className={css.packagingSection}>
+              <IconBox className={css.iconBox} />
+              <div>{packagingLabel}</div>
+            </div>
+          </RenderWhen>
         </div>
 
         <RenderWhen condition={hasDescription || hasAllergicIngredients}>

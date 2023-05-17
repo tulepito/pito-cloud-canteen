@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import { UIActions } from '@redux/slices/UI.slice';
 
 import css from './Modal.module.scss';
@@ -24,6 +25,7 @@ export type TModalProps = PropsWithChildren<{
   scrollLayerClassName?: string;
   customHeader?: ReactNode;
   closeClassName?: string;
+  shouldFullScreenInMobile?: boolean;
 }>;
 
 const Modal: React.FC<TModalProps> = (props) => {
@@ -42,17 +44,33 @@ const Modal: React.FC<TModalProps> = (props) => {
     customHeader,
     closeButton,
     closeClassName,
+    shouldFullScreenInMobile = true,
   } = props;
 
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const { isTabletLayoutOrLarger } = useViewport();
   const closeModalClasses = closeClassName || css.isClosed;
   const isOpenClass = isOpen
     ? classNames(css.isOpen, openClassName)
     : closeModalClasses;
   const classes = classNames(isOpenClass, className);
-  const containerClasses = classNames(css.container, containerClassName);
-  const scrollLayerClasses = classNames(css.scrollLayer, scrollLayerClassName);
+  const containerClasses = classNames(
+    css.container,
+    {
+      [css.fullScreenInMobile]:
+        shouldFullScreenInMobile && !isTabletLayoutOrLarger,
+    },
+    containerClassName,
+  );
+  const scrollLayerClasses = classNames(
+    css.scrollLayer,
+    {
+      [css.fullScreenInMobile]:
+        shouldFullScreenInMobile && !isTabletLayoutOrLarger,
+    },
+    scrollLayerClassName,
+  );
   const hasTitle = !!title;
   const closeModalMessage = intl.formatMessage({ id: 'Modal.closeModal' });
 

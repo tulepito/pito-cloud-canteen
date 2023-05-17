@@ -31,7 +31,9 @@
 
   @include viewportMedium {
     display: grid;
-    grid-template-columns: 1fr 328px;
+    grid-template-columns:
+      min(calc(1211px - 328px - 32px), calc(100% - 328px - 32px))
+      328px;
     column-gap: 32px;
   }
 

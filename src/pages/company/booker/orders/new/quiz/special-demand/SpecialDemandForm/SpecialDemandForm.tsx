@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import Form from '@components/Form/Form';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import MealTypeField from '@pages/admin/order/create/components/MealTypeField/MealTypeField';
 import NutritionField from '@pages/admin/order/create/components/NutritionField/NutritionField';
 
@@ -34,7 +35,7 @@ const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
     form,
     values,
     setFormValues,
-    nutritionsOptions,
+    nutritionsOptions = [],
   } = props;
   const intl = useIntl();
 
@@ -57,10 +58,14 @@ const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
         {intl.formatMessage({ id: 'Booker.CreateOrder.Form.field.mealType' })}
       </div>
       <MealTypeField />
-      <div className={classNames(css.label, css.spacing)}>
-        {intl.formatMessage({ id: 'Booker.CreateOrder.Form.field.nutritions' })}
-      </div>
-      <NutritionField options={nutritionsOptions} />
+      <RenderWhen condition={nutritionsOptions.length > 0}>
+        <div className={classNames(css.label, css.spacing)}>
+          {intl.formatMessage({
+            id: 'Booker.CreateOrder.Form.field.nutritions',
+          })}
+        </div>
+        <NutritionField options={nutritionsOptions} />
+      </RenderWhen>
     </Form>
   );
 };

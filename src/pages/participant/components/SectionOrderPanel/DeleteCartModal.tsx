@@ -2,6 +2,8 @@ import { useIntl } from 'react-intl';
 
 import AlertModal from '@components/Modal/AlertModal';
 
+import css from './DeleteCartModal.module.scss';
+
 type TDeleteCartModal = {
   isOpen: boolean;
   onClose: () => void;
@@ -21,6 +23,8 @@ const DeleteCartModal: React.FC<TDeleteCartModal> = ({
     <AlertModal
       isOpen={isOpen}
       handleClose={onClose}
+      containerClassName={css.container}
+      shouldFullScreenInMobile={false}
       title={intl.formatMessage({
         id: 'SectionOrderPanel.Alert.confirmDeleteTitle',
       })}
@@ -32,9 +36,11 @@ const DeleteCartModal: React.FC<TDeleteCartModal> = ({
       })}
       onCancel={onCancel}
       onConfirm={onConfirm}>
-      {intl.formatMessage({
-        id: 'SectionOrderPanel.Alert.confirmDeleteMessage',
-      })}
+      <div className={css.confirmText}>
+        {intl.formatMessage({
+          id: 'SectionOrderPanel.Alert.confirmDeleteMessage',
+        })}
+      </div>
     </AlertModal>
   );
 };

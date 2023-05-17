@@ -9,7 +9,8 @@
 
 .layoutMain {
   box-sizing: border-box;
-  flex-basis: calc(100vw);
+  flex-basis: calc(100vw - 280px);
+  width: calc(100vw - 280px);
 
   @include viewportLargeWithPaddings {
     padding-left: 0;

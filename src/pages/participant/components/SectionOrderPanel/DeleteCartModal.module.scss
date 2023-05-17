@@ -1,0 +1,15 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  width: calc(100vw - 32px) !important;
+  padding: 0 20px 20px !important;
+
+  @include viewportMedium {
+    max-width: 480px !important;
+  }
+}
+
+.confirmText {
+  @include textTemplate(14px, 400, 20px);
+}
