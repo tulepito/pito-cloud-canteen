@@ -4,7 +4,7 @@
 
 .fixedBottomWrapper {
   position: fixed;
-  bottom: 16px;
+  top: calc(100dvh - 16px - 48px);
   left: 0;
   width: 100%;
 
