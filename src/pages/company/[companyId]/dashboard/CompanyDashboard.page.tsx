@@ -9,7 +9,6 @@ import { CurrentUser } from '@src/utils/data';
 import type { TCurrentUser } from '@src/utils/types';
 
 import CompanyDashboardHeroSection from './components/CompanyDashboardHeroSection/CompanyDashboardHeroSection';
-import NewsSection from './components/NewsSection/NewsSection';
 import NotificationSection from './components/NotificationSection/NotificationSection';
 import OrdersAnalysisSection from './components/OrdersAnalysisSection/OrdersAnalysisSection';
 import ReportSection from './components/ReportSection/ReportSection';
@@ -98,7 +97,7 @@ const CompanyDashboardPage = () => {
             inProgress={getCompanyOrderSummaryInProgress}
             companyOrderSummary={companyOrderSummary}
           />
-          <NewsSection />
+          {/* <NewsSection /> */}
         </div>
       </div>
     </div>
