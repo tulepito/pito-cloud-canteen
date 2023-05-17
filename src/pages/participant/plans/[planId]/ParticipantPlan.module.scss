@@ -2,6 +2,13 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 
+.goBack {
+  @include textTemplate(16px, $fontWeightBold, 24px);
+  cursor: pointer;
+  @include flexAlign(center);
+  gap: 8px;
+}
+
 .root {
   .leftSection {
     display: flex;

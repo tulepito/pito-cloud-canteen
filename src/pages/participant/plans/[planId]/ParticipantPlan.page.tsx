@@ -9,13 +9,11 @@ import { useRouter } from 'next/router';
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconArrowFull from '@components/Icons/IconArrow/IconArrowFull';
-import NamedLink from '@components/NamedLink/NamedLink';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { UIActions } from '@redux/slices/UI.slice';
 import type { RootState } from '@redux/store';
-import { participantPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 
 import SectionCountdown from '../../components/SectionCountdown/SectionCountdown';
@@ -42,6 +40,7 @@ const ParticipantPlan = () => {
   const { loadDataInProgress, order, plan } = useLoadData();
   const { orderDayState, selectedRestaurant, handleSelectRestaurant } =
     useSelectRestaurant();
+
   const cartList = useAppSelector((state: RootState) => {
     const { currentUser } = state.user;
     const currUserId = currentUser?.id?.uuid;
@@ -129,19 +128,18 @@ const ParticipantPlan = () => {
     };
   }, [deadlineDate, JSON.stringify(order)]);
 
+  const handleGoBack = () => {
+    router.back();
+  };
+
   // Render
   return (
     <ParticipantLayout>
       <div className={css.root}>
         <div className={css.leftSection}>
-          <div>
-            <NamedLink
-              path={participantPaths.Order}
-              params={{ orderId }}
-              className={css.goBackBtn}>
-              <IconArrow direction="left" />
-              Quay lại
-            </NamedLink>
+          <div className={css.goBack} onClick={handleGoBack}>
+            <IconArrow direction="left" />
+            <span>Quay lại</span>
           </div>
           <SectionRestaurantHero
             listing={selectedRestaurant}

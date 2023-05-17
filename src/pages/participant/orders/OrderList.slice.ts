@@ -1,10 +1,11 @@
 import type { Event } from 'react-big-calendar';
 import { createSlice } from '@reduxjs/toolkit';
 import flatten from 'lodash/flatten';
+import uniqBy from 'lodash/uniqBy';
 
 import type { ParticipantSubOrderAddDocumentApiBody } from '@apis/firebaseApi';
 import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
-import { loadOrderDataApi } from '@apis/index';
+import { loadOrderDataApi, updateParticipantOrderApi } from '@apis/index';
 import { participantPostRatingApi } from '@apis/participantApi';
 import { fetchTxApi } from '@apis/txApi';
 import { disableWalkthroughApi, fetchSearchFilterApi } from '@apis/userApi';
@@ -41,7 +42,7 @@ type TOrderListState = {
   fetchOrdersInProgress: boolean;
   fetchOrdersError: any;
 
-  subOrderTx: TTransaction;
+  subOrderTxs: TTransaction[];
   fetchSubOrderTxInProgress: boolean;
   fetchSubOrderTxError: any;
 
@@ -52,6 +53,9 @@ type TOrderListState = {
 
   addSubOrderDocumentToFirebaseInProgress: boolean;
   addSubOrderDocumentToFirebaseError: any;
+
+  updateSubOrderInProgress: boolean;
+  updateSubOrderError: any;
 };
 const initialState: TOrderListState = {
   nutritions: [],
@@ -72,7 +76,7 @@ const initialState: TOrderListState = {
   fetchOrdersInProgress: false,
   fetchOrdersError: null,
 
-  subOrderTx: null!,
+  subOrderTxs: [],
   fetchSubOrderTxInProgress: false,
   fetchSubOrderTxError: null,
 
@@ -83,6 +87,9 @@ const initialState: TOrderListState = {
 
   addSubOrderDocumentToFirebaseInProgress: false,
   addSubOrderDocumentToFirebaseError: null,
+
+  updateSubOrderInProgress: false,
+  updateSubOrderError: null,
 };
 
 // ================ Thunk types ================ //
@@ -90,6 +97,7 @@ const FETCH_ATTRIBUTES = 'app/ParticipantOrderList/FETCH_ATTRIBUTES';
 const UPDATE_PROFILE = 'app/ParticipantOrderList/UPDATE_PROFILE';
 const DISABLE_WALKTHROUGH = 'app/ParticipantOrderList/DISABLE_WALKTHROUGH';
 const FETCH_ORDERS = 'app/ParticipantOrderList/FETCH_ORDERS';
+const UPDATE_SUB_ORDER = 'app/ParticipantOrderList/UPDATE_SUB_ORDER';
 const FETCH_TRANSACTION_BY_SUB_ORDER =
   'app/ParticipantOrderList/FETCH_TRANSACTION_BY_SUB_ORDER';
 const POST_PARTICIPANT_RATING =
@@ -171,13 +179,51 @@ const fetchOrders = createAsyncThunk(
   },
 );
 
+const updateSubOrder = createAsyncThunk(
+  UPDATE_SUB_ORDER,
+  async (data: { orderId: string; updateValues: TObject }, { getState }) => {
+    const { allPlans } = getState().ParticipantOrderList;
+    const { orderId, updateValues } = data;
+    const { data: updateResponse } = await updateParticipantOrderApi(
+      orderId,
+      updateValues,
+    );
+
+    const { plan } = updateResponse;
+
+    const newAllPlans = allPlans.map((oldPlan: any) => {
+      if (oldPlan.id.uuid === plan.id.uuid) {
+        return plan;
+      }
+
+      return oldPlan;
+    });
+
+    return {
+      allPlans: newAllPlans,
+    };
+  },
+);
+
 const fetchTransactionBySubOrder = createAsyncThunk(
   FETCH_TRANSACTION_BY_SUB_ORDER,
-  async (txId: string) => {
-    if (!txId) return null;
-    const txResponse = await fetchTxApi(txId);
+  async (txIds: string[], { getState }) => {
+    const { subOrderTxs = [] } = getState().ParticipantOrderList;
+    if (txIds.length === 0) return subOrderTxs;
+    const txsResponse = await Promise.all(
+      txIds.map(async (txId: string) => {
+        const { data: txResponse } = await fetchTxApi(txId);
 
-    return txResponse.data;
+        return txResponse;
+      }),
+    );
+
+    const newSubOrderTxs: TTransaction[] = uniqBy(
+      subOrderTxs.concat(txsResponse),
+      'id.uuid',
+    );
+
+    return newSubOrderTxs;
   },
 );
 
@@ -211,6 +257,7 @@ export const OrderListThunks = {
   fetchTransactionBySubOrder,
   postParticipantRating,
   addSubOrderDocumentToFirebase,
+  updateSubOrder,
 };
 
 // ================ Slice ================ //
@@ -303,7 +350,7 @@ const OrderListSlice = createSlice({
       })
       .addCase(fetchTransactionBySubOrder.fulfilled, (state, { payload }) => {
         state.fetchSubOrderTxInProgress = false;
-        state.subOrderTx = payload;
+        state.subOrderTxs = payload;
       })
       .addCase(fetchTransactionBySubOrder.rejected, (state, { error }) => {
         state.fetchSubOrderTxInProgress = false;
@@ -332,6 +379,19 @@ const OrderListSlice = createSlice({
       .addCase(addSubOrderDocumentToFirebase.rejected, (state, { error }) => {
         state.addSubOrderDocumentToFirebaseInProgress = false;
         state.addSubOrderDocumentToFirebaseError = error.message;
+      })
+
+      .addCase(updateSubOrder.pending, (state) => {
+        state.updateSubOrderInProgress = true;
+        state.updateSubOrderError = false;
+      })
+      .addCase(updateSubOrder.fulfilled, (state, { payload }) => {
+        state.updateSubOrderInProgress = false;
+        state.allPlans = payload.allPlans;
+      })
+      .addCase(updateSubOrder.rejected, (state, { error }) => {
+        state.updateSubOrderInProgress = false;
+        state.updateSubOrderError = error.message;
       });
   },
 });

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -15,10 +15,10 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
 import { txIsDelivered, txIsInitiated } from '@src/utils/transaction';
+import type { TTransaction } from '@src/utils/types';
 
 import { OrderListThunks } from '../../OrderList.slice';
 
@@ -50,16 +50,20 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   } = event.resource;
   const dishes: any[] = event.resource?.meal?.dishes || [];
   const user = useAppSelector(currentUserSelector);
-  const subOrderTx = useAppSelector(
-    (state) => state.ParticipantOrderList.subOrderTx,
+  const subOrderTxs = useAppSelector(
+    (state) => state.ParticipantOrderList.subOrderTxs,
     shallowEqual,
   );
+
   const fetchSubOrderTxInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
   );
   const timestamp = last(orderDay.split(' - '));
-
-  const isTxInitialState = txIsInitiated(subOrderTx);
+  const subOrderTx = useMemo(
+    () => subOrderTxs.find((tx) => tx.id.uuid === transactionId),
+    [subOrderTxs, transactionId],
+  );
+  const isTxInitialState = txIsInitiated(subOrderTx as TTransaction);
 
   const isExpired = isOver(expiredTime);
   const dishSelectionFormInitialValues = useMemo(
@@ -68,13 +72,8 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     [JSON.stringify(dishSelection)],
   );
 
-  useEffect(() => {
-    if (isOpen) {
-      dispatch(OrderListThunks.fetchTransactionBySubOrder(transactionId));
-    }
-  }, [dispatch, isOpen, transactionId]);
   const onNavigateToOrderDetail = () => {
-    const to = `/participant/plans/${planId}?orderDay=${orderDay}`;
+    const to = `/participant/plans/${planId}?orderDay=${timestamp}`;
     router.push(to);
   };
 
@@ -100,7 +99,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
       orderId,
     };
 
-    await dispatch(participantOrderManagementThunks.updateOrder(payload));
+    await dispatch(OrderListThunks.updateSubOrder(payload));
     await dispatch(
       OrderListThunks.addSubOrderDocumentToFirebase({
         participantId: currentUserId,
@@ -108,7 +107,6 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
         timestamp: parseInt(`${timestamp}`, 10),
       }),
     );
-    await dispatch(OrderListThunks.fetchOrders(currentUserId));
     onClose();
   };
 
@@ -165,7 +163,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
             </RenderWhen.False>
           </RenderWhen>
         </RenderWhen>
-        <RenderWhen condition={txIsDelivered(subOrderTx)}>
+        <RenderWhen condition={txIsDelivered(subOrderTx as TTransaction)}>
           <Button className={css.ratingBtn} onClick={openRatingSubOrderModal}>
             Đánh giá
           </Button>
