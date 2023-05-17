@@ -19,6 +19,7 @@ export { default as Quiz } from './Quiz.slice';
 export { default as RestaurantSearch } from './RestaurantSearch.slice';
 export { default as SelectRestaurantPage } from './SelectRestaurantPage.slice';
 export { default as shoppingCart } from './shoppingCart.slice';
+export { default as SystemAttributes } from './systemAttributes.slice';
 export { default as UI } from './UI.slice';
 export { default as uploadImage } from './uploadImage.slice';
 export { default as user } from './user.slice';
