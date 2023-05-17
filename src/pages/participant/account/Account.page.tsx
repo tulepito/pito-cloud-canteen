@@ -9,7 +9,7 @@ import IconLock from '@components/Icons/IconLock/IconLock';
 import IconLogout from '@components/Icons/IconLogout/IconLogout';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { authThunks } from '@redux/slices/auth.slice';
+import { useLogout } from '@hooks/useLogout';
 import { participantPaths } from '@src/paths';
 
 import AvatarForm from './components/AvatarForm/AvatarForm';
@@ -20,10 +20,8 @@ import css from './Account.module.scss';
 const AccountPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const handleLogout = useLogout();
   const currentUser = useAppSelector((state) => state.user.currentUser);
-  useEffect(() => {
-    dispatch(AccountThunks.fetchAttributes());
-  }, []);
 
   const openProfileModal = () => {
     router.push(participantPaths.AccountProfile);
@@ -37,9 +35,9 @@ const AccountPage = () => {
     router.push(participantPaths.AccountSpecialDemand);
   };
 
-  const onLogout = () => {
-    dispatch(authThunks.logout());
-  };
+  useEffect(() => {
+    dispatch(AccountThunks.fetchAttributes());
+  }, []);
 
   return (
     <div className={css.container}>
@@ -69,7 +67,7 @@ const AccountPage = () => {
           </div>
           <IconArrow direction="right" />
         </div>
-        <div className={css.navigationItem} onClick={onLogout}>
+        <div className={css.navigationItem} onClick={handleLogout}>
           <div className={css.iconGroup}>
             <IconLogout />
             <span>Đăng xuất</span>

@@ -9,7 +9,8 @@ type PartnerSubOrderIsCanceledParams = {
   timestamp: number;
 };
 
-export const partnerSubOrderIsCanceledSubject = 'Ngày ăn bị huỷ';
+export const partnerSubOrderIsCanceledSubject = (subOrderDate: string) =>
+  `Ngày ăn ${subOrderDate} bị huỷ`;
 
 const partnerSubOrderIsCanceled = ({
   companyUser,

@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { getSdk, handleError } from '@services/sdk';
-import { UserPermission } from '@src/types/UserPermission';
+import { CompanyPermission } from '@src/types/UserPermission';
 import type { TObject } from '@src/utils/types';
 import { CurrentUser, denormalisedResponseEntities } from '@utils/data';
 
@@ -24,7 +24,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           (result, current) => {
             const [id, permissionMap] = current as [string, TObject];
 
-            return permissionMap?.permission === UserPermission.BOOKER
+            return CompanyPermission.includes(permissionMap?.permission)
               ? result.concat(id)
               : result;
           },

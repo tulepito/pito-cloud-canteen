@@ -10,7 +10,8 @@ type ParticipantOrderPickingParams = {
   bookerNote: string;
 };
 
-export const participantOrderPickingSubject = 'Mời bạn chọn món';
+export const participantOrderPickingSubject = (orderName: string) =>
+  `Chọn món cho Tuần ăn ${orderName}`;
 
 const participantOrderPicking = ({
   bookerUser,

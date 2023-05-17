@@ -1,3 +1,5 @@
+import type { TRestaurantRating } from '@src/utils/types';
+
 import { postApi } from './configs';
 
 type TParticipantReviewPlanTxBody = {
@@ -9,3 +11,12 @@ type TParticipantReviewPlanTxBody = {
 export const participantReviewPlanTx = (body: TParticipantReviewPlanTxBody) => {
   return postApi('/participants/plans/review-restaurant', body);
 };
+
+type TParticipantPostRatingApiBody = {
+  rating: TRestaurantRating;
+  imageIdList?: string[];
+  detailTextRating?: string;
+  planId?: string;
+};
+export const participantPostRatingApi = (body: TParticipantPostRatingApiBody) =>
+  postApi('/participants/ratings', body);

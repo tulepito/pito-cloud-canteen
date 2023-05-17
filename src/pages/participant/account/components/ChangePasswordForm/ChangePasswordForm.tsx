@@ -89,6 +89,7 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
           label="Mật khẩu hiện tại"
           input={password.input}
           meta={password.meta}
+          placeholder="Nhập mật khẩu hiện tại"
           className={css.fieldInput}
         />
         <div className={css.forgotPassword}>
@@ -102,6 +103,7 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
           label="Mật khẩu mới"
           input={newPassword.input}
           meta={newPassword.meta}
+          placeholder="Nhập mật khẩu mới"
           className={css.fieldInput}
         />
       </div>
@@ -112,6 +114,7 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
           label="Xác nhận mật khẩu mới"
           input={confirmPassword.input}
           meta={confirmPassword.meta}
+          placeholder="Xác nhận mật khẩu mới"
           className={css.fieldInput}
         />
       </div>

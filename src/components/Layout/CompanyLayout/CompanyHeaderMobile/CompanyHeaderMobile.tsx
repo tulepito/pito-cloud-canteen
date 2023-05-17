@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import Avatar from '@components/Avatar/Avatar';
-import Button, { InlineTextButton } from '@components/Button/Button';
+import { InlineTextButton } from '@components/Button/Button';
 import HamburgerMenuButton from '@components/HamburgerMenuButton/HamburgerMenuButton';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconLogout from '@components/Icons/IconLogout/IconLogout';
@@ -15,10 +15,10 @@ import IconPhone from '@components/Icons/IconPhone/IconPhone';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { authThunks } from '@redux/slices/auth.slice';
+import { useLogout } from '@hooks/useLogout';
 import { UIActions } from '@redux/slices/UI.slice';
-import { userActions } from '@redux/slices/user.slice';
 import config from '@src/configs';
+import { generalPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 import type { TCurrentUser, TObject } from '@src/utils/types';
 
@@ -42,12 +42,14 @@ type CompanyHeaderMobileProps = {
 
 const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
   const { className, companyHeaderLinkData, headerData } = props;
-  const router = useRouter();
+
   const { value: isOpen, toggle: onToggle } = useBoolean(false);
 
   const { pathname: routerPathName, push } = useRouter();
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const dispatch = useAppDispatch();
+  const handleLogoutFn = useLogout();
+
   useEffect(() => {
     if (isOpen) {
       dispatch(UIActions.disableScrollRequest('CompanyHeaderMobile'));
@@ -67,13 +69,6 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
 
   const classes = classNames(css.root, className);
 
-  const onLogout = async () => {
-    await dispatch(authThunks.logout());
-    await dispatch(userActions.clearCurrentUser());
-
-    router.push('/');
-  };
-
   const handleRedirect =
     (path: string, query: TObject = {}) =>
     () => {
@@ -83,6 +78,11 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
       });
       onToggle();
     };
+
+  const handleLogout = async () => {
+    await handleLogoutFn();
+    push(generalPaths.Home);
+  };
 
   return (
     <div className={classes}>
@@ -144,15 +144,12 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
                 {config.marketplacePhoneNumber}
               </div>
             </div>
-            <Button
-              variant="inline"
-              className={css.headerBottomItem}
-              onClick={onLogout}>
+            <div className={css.headerBottomItem} onClick={handleLogout}>
               <IconLogout />
               <div className={css.phoneNumber}>
                 <FormattedMessage id="CompanyHeaderMobile.logout" />
               </div>
-            </Button>
+            </div>
           </div>
         </div>
       )}

@@ -31,7 +31,7 @@ import {
 } from '@helpers/listingSearchQuery';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { UserPermission } from '@src/types/UserPermission';
+import { CompanyPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import { convertWeekDay, renderDateRange } from '@utils/dates';
 import {
@@ -543,10 +543,8 @@ const fetchCompanyBookers = createAsyncThunk(
       ),
     )[0];
     const { members = {} } = User(companyAccount).getMetadata();
-    const bookerEmails = Object.keys(members).filter(
-      (email) =>
-        members[email].permission === UserPermission.BOOKER ||
-        members[email].permission === UserPermission.OWNER,
+    const bookerEmails = Object.keys(members).filter((email) =>
+      CompanyPermission.includes(members[email].permission),
     );
     const bookers = await Promise.all(
       bookerEmails.map(async (email) => {

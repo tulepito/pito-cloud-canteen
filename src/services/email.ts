@@ -1,4 +1,5 @@
 import { Listing, User } from '@src/utils/data';
+import { formatTimestamp } from '@src/utils/dates';
 import bookerAccountCreated, {
   bookerAccountCreatedSubject,
 } from '@src/utils/emailTemplate/bookerAccountCreated';
@@ -216,12 +217,13 @@ export const emailSendingFactory = async (
         orderId,
       });
 
-      const { bookerUser } = emailDataSource;
+      const { bookerUser, orderListing } = emailDataSource;
+      const { orderName } = orderListing.getPublicData();
       const { email: bookerEmail } = bookerUser?.getAttributes() || {};
       const emailTemplate = bookerOrderCreated(emailDataSource);
       const emailDataParams = {
         receiver: [bookerEmail],
-        subject: bookerOrderCreatedSubject,
+        subject: bookerOrderCreatedSubject(orderName),
         content: emailTemplate as string,
         sender: systemSenderEmail as string,
       };
@@ -235,12 +237,13 @@ export const emailSendingFactory = async (
         orderId,
       });
 
-      const { bookerUser } = emailDataSource;
+      const { bookerUser, orderListing } = emailDataSource;
+      const { orderName } = orderListing.getPublicData();
       const { email: bookerEmail } = bookerUser?.getAttributes() || {};
       const emailTemplate = bookerOrderPicking(emailDataSource);
       const emailDataParams = {
         receiver: [bookerEmail],
-        subject: bookerOrderPickingSubject,
+        subject: bookerOrderPickingSubject(orderName),
         content: emailTemplate as string,
         sender: systemSenderEmail as string,
       };
@@ -260,9 +263,10 @@ export const emailSendingFactory = async (
         ...emailDataSource,
         timestamp,
       });
+      const subOrderDate = formatTimestamp(timestamp);
       const emailDataParams = {
         receiver: [bookerEmail],
-        subject: bookerSubOrderIsCanceledSubject,
+        subject: bookerSubOrderIsCanceledSubject(subOrderDate),
         content: emailTemplate as string,
         sender: systemSenderEmail as string,
       };
@@ -276,12 +280,13 @@ export const emailSendingFactory = async (
         orderId,
       });
 
-      const { bookerUser } = emailDataSource;
+      const { bookerUser, orderListing } = emailDataSource;
+      const { orderName } = orderListing.getPublicData();
       const { email: bookerEmail } = bookerUser?.getAttributes() || {};
       const emailTemplate = bookerOrderSuccess(emailDataSource);
       const emailDataParams = {
         receiver: [bookerEmail],
-        subject: bookerOrderSuccessSubject,
+        subject: bookerOrderSuccessSubject(orderName),
         content: emailTemplate as string,
         sender: systemSenderEmail as string,
       };
@@ -340,7 +345,8 @@ export const emailSendingFactory = async (
         participantId,
       });
 
-      const { participantUser } = emailDataSource;
+      const { participantUser, orderListing } = emailDataSource;
+      const { orderName } = orderListing.getPublicData();
       const { email: participantEmail } =
         participantUser?.getAttributes() || {};
       const emailTemplate = participantOrderPicking({
@@ -349,7 +355,7 @@ export const emailSendingFactory = async (
       });
       const emailDataParams = {
         receiver: [participantEmail],
-        subject: participantOrderPickingSubject,
+        subject: participantOrderPickingSubject(orderName),
         content: emailTemplate as string,
         sender: systemSenderEmail as string,
       };
@@ -364,13 +370,14 @@ export const emailSendingFactory = async (
         companyId,
       });
 
-      const { participantUser } = emailDataSource;
+      const { participantUser, companyUser } = emailDataSource;
+      const { companyName } = companyUser?.getPublicData() || {};
       const { email: participantEmail } =
         participantUser?.getAttributes() || {};
       const emailTemplate = participantCompanyInvitation(emailDataSource);
       const emailDataParams = {
         receiver: [participantEmail],
-        subject: participantCompanyInvitationSubject,
+        subject: participantCompanyInvitationSubject(companyName),
         content: emailTemplate as string,
         sender: systemSenderEmail as string,
       };
@@ -392,9 +399,10 @@ export const emailSendingFactory = async (
         ...emailDataSource,
         timestamp,
       });
+      const subOrderDate = formatTimestamp(timestamp);
       const emailDataParams = {
         receiver: [participantEmail],
-        subject: participantSubOrderIsCanceledSubject,
+        subject: participantSubOrderIsCanceledSubject(subOrderDate),
         content: emailTemplate as string,
         sender: systemSenderEmail as string,
       };
@@ -409,7 +417,8 @@ export const emailSendingFactory = async (
         orderId,
         restaurantId,
       });
-      const { partnerUser } = emailDataSource;
+      const { partnerUser, orderListing } = emailDataSource;
+      const { orderName } = orderListing.getPublicData();
       const { email: partnerEmail } = partnerUser?.getAttributes() || {};
       const emailTemplate = partnerNewOrderAppear({
         ...emailDataSource,
@@ -417,7 +426,7 @@ export const emailSendingFactory = async (
       });
       const emailDataParams = {
         receiver: [partnerEmail],
-        subject: partnerNewOrderAppearSubject,
+        subject: partnerNewOrderAppearSubject(orderName),
         content: emailTemplate as string,
         sender: systemSenderEmail as string,
       };
@@ -438,9 +447,10 @@ export const emailSendingFactory = async (
         ...emailDataSource,
         timestamp,
       });
+      const subOrderDate = formatTimestamp(timestamp);
       const emailDataParams = {
         receiver: [partnerEmail],
-        subject: partnerSubOrderIsCanceledSubject,
+        subject: partnerSubOrderIsCanceledSubject(subOrderDate),
         content: emailTemplate as string,
         sender: systemSenderEmail as string,
       };

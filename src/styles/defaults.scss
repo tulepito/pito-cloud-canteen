@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 @mixin inputStyles {
   display: block;
@@ -83,13 +84,15 @@
     }
 
     &:checked + label:hover {
-      .box,
-      .boxSuccess {
-        stroke: $neutralGray6;
-      }
+      @include viewportMedium {
+        .box,
+        .boxSuccess {
+          stroke: $neutralGray6;
+        }
 
-      path:nth-of-type(2) {
-        stroke: $neutralGray1;
+        path:nth-of-type(2) {
+          stroke: $neutralGray1;
+        }
       }
     }
 

@@ -45,6 +45,7 @@ const AvatarFormComponent: React.FC<TAvatarFormComponentProps> = (props) => {
   const fileUploadInProgress = useAppSelector(
     (state) => state.uploadImage.uploadImageInProgress,
   );
+  const prevFileUploadInProgress = useRef(fileUploadInProgress);
 
   const uploadingOverlay =
     !image?.imageId || uploadDelay ? (
@@ -54,10 +55,15 @@ const AvatarFormComponent: React.FC<TAvatarFormComponentProps> = (props) => {
     ) : null;
 
   useEffect(() => {
-    if (!fileUploadInProgress) {
+    if (fileUploadInProgress) {
+      prevFileUploadInProgress.current = fileUploadInProgress;
+    }
+
+    if (prevFileUploadInProgress.current && !fileUploadInProgress) {
       setUploadDelay(true);
       uploadTimeoutRef.current = setTimeout(() => {
         setUploadDelay(false);
+        prevFileUploadInProgress.current = fileUploadInProgress;
       }, 2000);
     }
 

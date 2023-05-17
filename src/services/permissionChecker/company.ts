@@ -2,7 +2,7 @@ import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 import { EHttpStatusCode } from '@apis/errors';
 import { getSdk, handleError } from '@services/sdk';
-import { UserPermission } from '@src/types/UserPermission';
+import { CompanyPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities } from '@utils/data';
 
 const needCheckingRequestBodyMethod = ['POST', 'PUT', 'DELETE'];
@@ -31,7 +31,7 @@ const companyChecker =
 
       if (
         !userPermission ||
-        (userPermission && userPermission !== UserPermission.BOOKER)
+        (userPermission && !CompanyPermission.includes(userPermission))
       ) {
         return res.status(EHttpStatusCode.Forbidden).json({
           message: "You don't have permission to access this api!",

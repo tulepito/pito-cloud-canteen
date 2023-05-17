@@ -33,6 +33,7 @@
     "dotenv": "^16.0.3",
     "final-form": "^4.20.7",
     "final-form-arrays": "^3.0.2",
+    "firebase": "^9.21.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
     "jstimezonedetect": "^1.0.7",
