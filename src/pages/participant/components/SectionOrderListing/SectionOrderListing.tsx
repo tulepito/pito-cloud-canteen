@@ -66,12 +66,12 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
       const planDate = DateTime.fromMillis(Number(item)).toJSDate();
       const itemLabel = (
         <div className={css.tabTitle}>
-          <span>
+          <div>
             {intl.formatMessage({
               id: `Calendar.week.dayHeader.${planDate.getDay()}`,
             })}
             , {planDate.getDate()}/{planDate.getMonth() + 1}
-          </span>
+          </div>
           {hasDishInCart &&
             (hasDishInCart === 'notJoined' ? (
               <Tooltip tooltipContent={'meow'}>
