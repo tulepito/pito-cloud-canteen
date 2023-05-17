@@ -30,7 +30,7 @@ const ProfileModal: React.FC<TProfileModalProps> = (props) => {
   const { email } = currentUserGetter.getAttributes();
   const { phoneNumber } = currentUserGetter.getProtectedData();
   const initialValues = useMemo(
-    () => ({ name: `${lastName} ${firstName}`, email, phoneNumber }),
+    () => ({ name: `${firstName} ${lastName}`, email, phoneNumber }),
     [email, firstName, lastName, phoneNumber],
   );
 
