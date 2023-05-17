@@ -25,6 +25,7 @@ type TAlertModal = {
   cancelClassName?: string;
   confirmClassName?: string;
   childrenClassName?: string;
+  shouldFullScreenInMobile?: boolean;
 };
 
 const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
@@ -45,6 +46,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
   cancelClassName,
   confirmClassName,
   childrenClassName,
+  shouldFullScreenInMobile = true,
 }) => {
   return (
     <Modal
@@ -54,7 +56,8 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
       title={title}
       isOpen={isOpen}
       handleClose={handleClose}
-      containerClassName={classNames(css.container, containerClassName)}>
+      containerClassName={classNames(css.container, containerClassName)}
+      shouldFullScreenInMobile={shouldFullScreenInMobile}>
       <div className={classNames(css.children, childrenClassName)}>
         {children}
       </div>

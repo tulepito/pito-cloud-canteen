@@ -16,29 +16,34 @@
   transition: all 0.5s ease-in-out;
 
   & .scrollLayer {
-    flex-grow: 1;
     display: flex;
 
-    /* Add default background color to avoid bouncing scroll showing the
-   page contents from behind the modal. */
-    background-color: $neutralGray1;
-
-    /* Additional styles for the modal window, dimming the background and positioning the modal */
     min-height: 100vh;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    background-image: none;
+
+    /* Add default background color to avoid bouncing scroll showing the
+    page contents from behind the modal. */
+    &.fullScreenInMobile {
+      flex-grow: 1;
+      background-color: $neutralGray1;
+      /* Additional styles for the modal window, dimming the background and positioning the modal */
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
     @include viewportMedium {
-      justify-content: center;
-      align-items: center;
-      padding: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      background-image: none;
     }
   }
 
   & .container {
-    flex-grow: 1;
+    &.fullScreenInMobile {
+      flex-grow: 1;
+      height: 100vh;
+    }
 
     /* Create context so the close button can be positioned within it */
     position: relative;
@@ -52,8 +57,6 @@
     background-color: $neutralGray1;
     border-radius: 20px;
     border: none;
-
-    height: 100vh;
 
     @include viewportMedium {
       flex-basis: 600px;
@@ -98,6 +101,9 @@
   border: 0;
   cursor: pointer;
   background-color: transparent;
+
+  height: 24px;
+  min-height: unset;
 }
 
 .modalHeader {
@@ -106,7 +112,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 24px;
+  padding-top: 20px;
   margin-bottom: 8px;
 }
 .title {
