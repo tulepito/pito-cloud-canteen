@@ -157,12 +157,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           });
         }
 
-        await integrationSdk.listings.update({
-          id: planId,
-          metadata: {
-            orderDetail,
+        const planResponse = await integrationSdk.listings.update(
+          {
+            id: planId,
+            metadata: {
+              orderDetail,
+            },
           },
-        });
+          {
+            expand: true,
+          },
+        );
+        const plan = denormalisedResponseEntities(planResponse)[0];
 
         if (
           !participants.includes(currentUserId) &&
@@ -176,7 +182,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           });
         }
 
-        return res.json({ message: 'Update picking successfully' });
+        return res.json({ plan });
       } catch (error) {
         handleError(res, error);
         console.error(error);

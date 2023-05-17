@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
+import { useCallback } from 'react';
 import type { Event } from 'react-big-calendar';
 import { DateTime } from 'luxon';
 
-import { useAppDispatch } from '@hooks/reduxHooks';
+import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import { useViewport } from '@hooks/useViewport';
-import { CalendarActions } from '@redux/slices/Calendar.slice';
 import type { TObject } from '@utils/types';
 
 import type {
@@ -36,18 +36,24 @@ const WDayItem: React.FC<TWDayItemProps> = ({
   customHeader,
   eventExtraProps,
 }) => {
-  const dispatch = useAppDispatch();
   const { isMobileLayout } = useViewport();
+  const { selectedDay, handleSelectDay } = useSelectDay();
   const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
+  const dateItem = DateTime.fromJSDate(date).startOf('day');
+  const isSelectedDay =
+    DateTime.fromJSDate(selectedDay!)
+      .startOf('day')
+      .diff(dateItem, ['day', 'hour'])
+      .get('day') === 0;
   const isCurrentDay =
     DateTime.fromJSDate(date)
       .startOf('day')
       .diff(currentDate, ['day', 'hour'])
       .get('day') === 0;
 
-  const onClick = () => {
-    dispatch(CalendarActions.setSelectedDay(date));
-  };
+  const onClick = useCallback(() => {
+    handleSelectDay?.(date);
+  }, [date, handleSelectDay]);
 
   return (
     <div
@@ -64,6 +70,7 @@ const WDayItem: React.FC<TWDayItemProps> = ({
           date={date}
           resources={resources}
           isCurrentDay={isCurrentDay}
+          isSelectedDay={isSelectedDay}
         />
       )}
       {!isMobileLayout && (

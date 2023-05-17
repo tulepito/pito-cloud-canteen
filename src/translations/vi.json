@@ -1422,6 +1422,7 @@
   "SignUpPage.signUpFailedEmailAlreadyTaken": "Email đã được sử dụng cho tài khoản khác. Thử lại hoặc thử đăng nhập!",
   "SignUpPage.Title": "Đăng ký",
   "StateItemToolTip.stateCanceled": "Huỷ đơn",
+  "StateItemToolTip.stateSubOrderCanceled": "Đã huỷ",
   "StateItemToolTip.stateDelivered": "Đã giao hàng",
   "StateItemToolTip.stateDelivering": "Đang giao hàng",
   "StateItemToolTip.stateFailed": "Lỗi đơn",
