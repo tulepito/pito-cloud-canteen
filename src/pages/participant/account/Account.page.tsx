@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
@@ -7,21 +6,16 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconFood from '@components/Icons/IconFood/IconFood';
 import IconLock from '@components/Icons/IconLock/IconLock';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { participantPaths } from '@src/paths';
 
 import AvatarForm from './components/AvatarForm/AvatarForm';
-import { AccountThunks } from './Account.slice';
 
 import css from './Account.module.scss';
 
 const AccountPage = () => {
-  const dispatch = useAppDispatch();
   const router = useRouter();
   const currentUser = useAppSelector((state) => state.user.currentUser);
-  useEffect(() => {
-    dispatch(AccountThunks.fetchAttributes());
-  }, []);
 
   const openProfileModal = () => {
     router.push(participantPaths.AccountProfile);
