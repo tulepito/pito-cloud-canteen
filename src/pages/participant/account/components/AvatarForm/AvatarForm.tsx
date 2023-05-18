@@ -200,8 +200,8 @@ const AvatarFormComponent: React.FC<TAvatarFormComponentProps> = (props) => {
         </Field>
       </div>
       <div className={css.userName}>
-        {`${currentUserGetter.getProfile().lastName} ${
-          currentUserGetter.getProfile().firstName
+        {`${currentUserGetter.getProfile().firstName} ${
+          currentUserGetter.getProfile().lastName
         }`}
       </div>
     </Form>
