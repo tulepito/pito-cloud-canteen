@@ -62,9 +62,12 @@
     .timeLeft {
       @include textTemplate(14px, 400, 20px);
       margin-bottom: 4px;
+      display: flex;
+      align-items: flex-start;
+      column-gap: 13px;
 
       .timeLeftTime {
-        color: $labelBlue2;
+        color: $primaryPri2;
         @include textTemplate(18px, 700, 24px);
       }
     }
