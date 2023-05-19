@@ -15,6 +15,8 @@ import {
 import { getUniqueString } from './data';
 import { EDayOfWeek, EMenuMealType } from './enums';
 
+const VNTimezone = 'Asia/Ho_Chi_Minh';
+
 const DAY_IN_WEEK = [
   { key: 'mon', label: 'DayInWeekField.mon' },
   { key: 'tue', label: 'DayInWeekField.tue' },
@@ -128,10 +130,13 @@ export const formatTimestamp = (
   date = new Date().getTime(),
   format?: string,
   locale: LocaleOptions['locale'] = 'vi',
+  timeZone: string = VNTimezone,
 ) => {
-  return DateTime.fromMillis(Number(date)).toFormat(format || 'dd/MM/yyyy', {
-    locale,
-  });
+  return DateTime.fromMillis(Number(date))
+    .setZone(timeZone)
+    .toFormat(format || 'dd/MM/yyyy', {
+      locale,
+    });
 };
 
 export const addWeeksToDate = (dateObj: Date, numberOfWeeks: number) => {
