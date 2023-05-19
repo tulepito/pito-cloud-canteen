@@ -169,7 +169,7 @@ const transit = createAsyncThunk(
       const { tx } = response;
       const txGetter = Transaction(tx as TTransaction);
       const { booking } = txGetter.getFullData();
-      const { start } = booking;
+      const { start } = booking.attributes;
       const { lastTransition } = txGetter.getAttributes();
       const { planId, participantIds = [] } = txGetter.getMetadata();
       const firebaseSubOrderIdList = participantIds.map(
