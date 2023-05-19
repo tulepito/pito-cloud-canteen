@@ -16,6 +16,7 @@ import SlideModal from '@components/SlideModal/SlideModal';
 import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
+import { participantPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 import { txIsDelivered, txIsInitiated } from '@src/utils/transaction';
 import type { TTransaction } from '@src/utils/types';
@@ -73,8 +74,10 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   );
 
   const onNavigateToOrderDetail = () => {
-    const to = `/participant/plans/${planId}?orderDay=${timestamp}`;
-    router.push(to);
+    router.push({
+      pathname: participantPaths.PlanDetail,
+      query: { orderDay: timestamp as string, planId, from: 'orderList' },
+    });
   };
 
   const onSelectDish = async (
