@@ -169,11 +169,11 @@ const transit = createAsyncThunk(
       const { tx } = response;
       const txGetter = Transaction(tx as TTransaction);
       const { booking } = txGetter.getFullData();
-      const { start } = booking.attributes;
+      const { displayStart } = booking.attributes;
       const { lastTransition } = txGetter.getAttributes();
       const { planId, participantIds = [] } = txGetter.getMetadata();
       const firebaseSubOrderIdList = participantIds.map(
-        (id: string) => `${id} - ${planId} - ${start}`,
+        (id: string) => `${id} - ${planId} - ${displayStart}`,
       );
       if (
         transitionShouldChangeFirebaseSubOrderStatus.includes(lastTransition)
