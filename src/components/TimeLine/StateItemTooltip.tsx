@@ -87,6 +87,7 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({ tx }) => {
         confirmLabel={'Huỷ đơn hàng'}
         cancelDisabled={transitInProgress}
         confirmDisabled={transitInProgress}
+        confirmInProgress={transitInProgress}
         handleClose={handleCancelCancelingProcess}
         onCancel={handleCancelCancelingProcess}
         onConfirm={handleConfirmCancel}>

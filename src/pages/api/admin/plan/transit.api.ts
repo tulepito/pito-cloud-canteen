@@ -57,8 +57,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         if (transition === ETransition.OPERATOR_CANCEL_PLAN) {
           const txGetter = Transaction(tx);
           const { booking, listing, provider } = txGetter.getFullData();
-          const { start } = booking.attributes;
-          const timestamp = new Date(start).getTime();
+          const { displayStart } = booking.attributes;
+          const timestamp = new Date(displayStart).getTime();
           const { participantIds = [], orderId } = txGetter.getMetadata();
           await emailSendingFactory(
             EmailTemplateTypes.BOOKER.BOOKER_SUB_ORDER_CANCELED,
