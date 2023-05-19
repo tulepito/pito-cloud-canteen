@@ -57,13 +57,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         if (transition === ETransition.OPERATOR_CANCEL_PLAN) {
           const txGetter = Transaction(tx);
           const { booking, listing, provider } = txGetter.getFullData();
-          const { start } = booking;
+          const { start } = booking.attributes;
+          const timestamp = new Date(start).getTime();
           const { participantIds = [], orderId } = txGetter.getMetadata();
           await emailSendingFactory(
             EmailTemplateTypes.BOOKER.BOOKER_SUB_ORDER_CANCELED,
             {
               orderId,
-              timestamp: start,
+              timestamp,
             },
           );
           await Promise.all(
@@ -72,7 +73,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 EmailTemplateTypes.PARTICIPANT.PARTICIPANT_SUB_ORDER_CANCELED,
                 {
                   orderId,
-                  timestamp: start,
+                  timestamp,
                   participantId,
                 },
               );
@@ -87,7 +88,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
             {
               orderId,
-              timestamp: start,
+              timestamp,
               restaurantId,
               partnerId,
             },

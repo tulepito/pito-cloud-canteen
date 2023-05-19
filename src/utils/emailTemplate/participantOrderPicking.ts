@@ -41,6 +41,65 @@ const participantOrderPicking = ({
     deadlineDate,
   )}`;
 
+  const bookerNoteSection =
+    !!bookerNote &&
+    `
+  <table cellpadding="0" cellspacing="0" class="es-content" align="center"
+            style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%">
+            <tr>
+              <td align="center" style="padding:0;Margin:0">
+                <table bgcolor="#ffffff" class="es-content-body" align="center" cellpadding="0" cellspacing="0"
+                  style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#FFFFFF;width:600px">
+                  <tr>
+                    <td class="es-m-p15r es-m-p15l" align="left"
+                      style="Margin:0;padding-top:10px;padding-bottom:10px;padding-left:40px;padding-right:40px">
+                      <table width="100%" cellspacing="0" cellpadding="0"
+                        style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                        <tr>
+                          <td valign="top" align="center" style="padding:0;Margin:0;width:520px">
+                            <table width="100%" cellspacing="0" cellpadding="0" role="presentation"
+                              style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                              <tr>
+                                <td align="left" style="padding:0;Margin:0;padding-bottom:15px">
+                                  <p
+                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif, arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
+                                    <strong>Lời nhắn của Người đại diện</strong></p>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="left" style="padding:0;Margin:0;font-size:0px"><img
+                                    src="https://vpldml.stripocdn.email/content/guids/CABINET_c8c5e967be8b9e42652722095c5779440d2108d77669ed5cc76af4b7d3323178/images/image.png"
+                                    alt="Ella Becker" title="Ella Becker"
+                                    style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"
+                                    width="10" height="8"></td>
+                              </tr>
+                              <tr>
+                                <td align="left" style="padding:0;Margin:0;padding-left:15px">
+                                  <p
+                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif, arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
+                                    ${bookerNote}
+                                  </p>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="right" style="padding:0;Margin:0;padding-bottom:5px;font-size:0px"><img
+                                    src="https://vpldml.stripocdn.email/content/guids/CABINET_c8c5e967be8b9e42652722095c5779440d2108d77669ed5cc76af4b7d3323178/images/quote.png"
+                                    alt="Ella Becker" title="Ella Becker"
+                                    style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"
+                                    width="10" height="8"></td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+  `;
+
   return `
   <!DOCTYPE html
   PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -743,60 +802,7 @@ const participantOrderPicking = ({
               </td>
             </tr>
           </table>
-          <table cellpadding="0" cellspacing="0" class="es-content" align="center"
-            style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%">
-            <tr>
-              <td align="center" style="padding:0;Margin:0">
-                <table bgcolor="#ffffff" class="es-content-body" align="center" cellpadding="0" cellspacing="0"
-                  style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#FFFFFF;width:600px">
-                  <tr>
-                    <td class="es-m-p15r es-m-p15l" align="left"
-                      style="Margin:0;padding-top:10px;padding-bottom:10px;padding-left:40px;padding-right:40px">
-                      <table width="100%" cellspacing="0" cellpadding="0"
-                        style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                        <tr>
-                          <td valign="top" align="center" style="padding:0;Margin:0;width:520px">
-                            <table width="100%" cellspacing="0" cellpadding="0" role="presentation"
-                              style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                              <tr>
-                                <td align="left" style="padding:0;Margin:0;padding-bottom:15px">
-                                  <p
-                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif, arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    <strong>Lời nhắn của Người đại diện</strong></p>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td align="left" style="padding:0;Margin:0;font-size:0px"><img
-                                    src="https://vpldml.stripocdn.email/content/guids/CABINET_c8c5e967be8b9e42652722095c5779440d2108d77669ed5cc76af4b7d3323178/images/image.png"
-                                    alt="Ella Becker" title="Ella Becker"
-                                    style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"
-                                    width="10" height="8"></td>
-                              </tr>
-                              <tr>
-                                <td align="left" style="padding:0;Margin:0;padding-left:15px">
-                                  <p
-                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif, arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    ${bookerNote}
-                                  </p>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td align="right" style="padding:0;Margin:0;padding-bottom:5px;font-size:0px"><img
-                                    src="https://vpldml.stripocdn.email/content/guids/CABINET_c8c5e967be8b9e42652722095c5779440d2108d77669ed5cc76af4b7d3323178/images/quote.png"
-                                    alt="Ella Becker" title="Ella Becker"
-                                    style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"
-                                    width="10" height="8"></td>
-                              </tr>
-                            </table>
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
+          ${bookerNoteSection}
           <table cellpadding="0" cellspacing="0" class="es-content" align="center"
             style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%">
             <tr>
