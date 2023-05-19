@@ -24,13 +24,8 @@ const participantOrderPicking = ({
   const { displayName: participantName } = participantUser.getProfile();
   const orderId = orderListing.getId();
   const { orderName } = orderListing.getPublicData();
-  const {
-    startDate,
-    endDate,
-
-    deadlineHour,
-    deadlineDate,
-  } = orderListing.getMetadata();
+  const { startDate, endDate, deliveryHour, deadlineHour, deadlineDate } =
+    orderListing.getMetadata();
   const { companyLocation } = companyUser.getPublicData();
   const { address: companyAddress } = companyLocation;
 
@@ -772,7 +767,7 @@ const participantOrderPicking = ({
                                       <td align="left" style="padding:0;Margin:0">
                                         <p
                                           style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                          <strong>${formattedStartDate} - ${formattedEndDate}</strong></p>
+                                          <strong>${deliveryHour}, ${formattedStartDate} - ${formattedEndDate}</strong></p>
                                       </td>
                                     </tr>
                                     <tr>
