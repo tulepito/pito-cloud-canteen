@@ -173,7 +173,8 @@ const transit = createAsyncThunk(
       const { lastTransition } = txGetter.getAttributes();
       const { planId, participantIds = [] } = txGetter.getMetadata();
       const firebaseSubOrderIdList = participantIds.map(
-        (id: string) => `${id} - ${planId} - ${displayStart}`,
+        (id: string) =>
+          `${id} - ${planId} - ${new Date(displayStart).getTime()}`,
       );
       if (
         transitionShouldChangeFirebaseSubOrderStatus.includes(lastTransition)
