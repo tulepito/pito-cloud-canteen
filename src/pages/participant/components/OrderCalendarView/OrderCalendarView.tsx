@@ -93,6 +93,9 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         isAnchorTimeChanged = true;
         setAnchorTime(+planItemKey);
       }
+      const expiredTime = deadlineDate
+        ? DateTime.fromMillis(+deadlineDate)
+        : DateTime.fromMillis(+planItemKey).minus({ day: 2 });
 
       const event = {
         resource: {
@@ -111,9 +114,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
             dishes,
           },
           deadlineDate,
-          expiredTime: deadlineDate
-            ? DateTime.fromMillis(+deadlineDate)
-            : DateTime.fromMillis(+planItemKey).minus({ day: 2 }),
+          expiredTime: expiredTime.toMillis(),
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
           orderColor,
@@ -129,6 +130,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     return listEvent;
   });
   const flattenEvents = flatten<Event>(events);
+  console.log('flattenEvents', flattenEvents);
   const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) =>
     isSameDate(_event.start, selectedDay),
   );
@@ -189,14 +191,15 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           event={selectedEvent!}
           openRatingSubOrderModal={ratingSubOrderModalControl.setTrue}
         />
+        <RatingSubOrderModal
+          isOpen={ratingSubOrderModalControl.value}
+          onClose={ratingSubOrderModalControl.setFalse}
+          selectedEvent={selectedEvent}
+          currentUserId={currentUserId}
+          openSuccessRatingModal={successRatingModalControl.setTrue}
+        />
       </RenderWhen>
-      <RatingSubOrderModal
-        isOpen={ratingSubOrderModalControl.value}
-        onClose={ratingSubOrderModalControl.setFalse}
-        selectedEvent={selectedEvent}
-        currentUserId={currentUserId}
-        openSuccessRatingModal={successRatingModalControl.setTrue}
-      />
+
       <SuccessRatingModal
         isOpen={successRatingModalControl.value}
         onClose={successRatingModalControl.setFalse}

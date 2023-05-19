@@ -23,7 +23,7 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
   const restaurantObj = event.resource?.restaurant || {};
   const expiredTime = event.resource?.expiredTime;
   const isExpired = isOver(expiredTime);
-  const remainTime = calculateRemainTime(expiredTime);
+  const remainTime = calculateRemainTime(new Date(expiredTime).getTime());
 
   return (
     <>

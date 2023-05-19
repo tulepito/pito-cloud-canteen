@@ -49,7 +49,7 @@ export const isCompletePickFood = ({
   return completedDates === totalDates;
 };
 
-export const isOver = (deadline = 0) => {
+export const isOver = (deadline: number = 0) => {
   return new Date().getTime() > deadline;
 };
 
