@@ -15,6 +15,7 @@ import useBoolean from '@hooks/useBoolean';
 import { SystemAttributesThunks } from '@redux/slices/systemAttributes.slice';
 import { UIActions } from '@redux/slices/UI.slice';
 import type { RootState } from '@redux/store';
+import { participantPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 
 import SectionCountdown from '../../components/SectionCountdown/SectionCountdown';
@@ -35,7 +36,7 @@ const ParticipantPlan = () => {
   const dispatch = useAppDispatch();
   // Router
   const router = useRouter();
-  const { planId } = router.query;
+  const { planId, from = 'orderList' } = router.query;
 
   // Load data
   const { loadDataInProgress, order, plan } = useLoadData();
@@ -49,6 +50,7 @@ const ParticipantPlan = () => {
     return state.shoppingCart.orders?.[currUserId]?.[(planId as string) || 1];
   });
   const orderId = order?.id?.uuid;
+
   const orderDays = Object.keys(plan);
   const cartListKeys = Object.keys(cartList || []).filter(
     (cartKey) => !!cartList[Number(cartKey)],
@@ -134,7 +136,18 @@ const ParticipantPlan = () => {
   }, [deadlineDate, JSON.stringify(order)]);
 
   const handleGoBack = () => {
-    router.back();
+    if (!orderId) {
+      return;
+    }
+    router.push({
+      pathname:
+        from === 'orderList'
+          ? participantPaths.OrderList
+          : participantPaths.Order,
+      query: {
+        ...(from === 'orderDetail' && { orderId }),
+      },
+    });
   };
 
   // Render

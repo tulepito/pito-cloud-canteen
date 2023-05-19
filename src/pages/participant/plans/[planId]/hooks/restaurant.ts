@@ -6,7 +6,7 @@ import { useAppSelector } from '@hooks/reduxHooks';
 export const useSelectRestaurant = () => {
   // Router
   const router = useRouter();
-  const { planId, orderDay } = router.query;
+  const { planId, orderDay, from } = router.query;
 
   // Redux selector
   const currentUser = useAppSelector((state) => state.user.currentUser);
@@ -39,9 +39,11 @@ export const useSelectRestaurant = () => {
       setOrderDayState(Number(dayId));
 
       window.history.pushState(
-        { urlPath: `/participant/plans/${planId}?orderDay=${dayId}` },
+        {
+          urlPath: `/participant/plans/${planId}?orderDay=${dayId}&from=${from}`,
+        },
         '',
-        `/participant/plans/${planId}?orderDay=${dayId}`,
+        `/participant/plans/${planId}?orderDay=${dayId}&from=${from}`,
       );
     }
   };
