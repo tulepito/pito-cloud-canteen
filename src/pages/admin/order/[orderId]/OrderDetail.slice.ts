@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import isEmpty from 'lodash/isEmpty';
 
 import { transitPlanApi } from '@apis/admin';
 import {
@@ -174,7 +175,7 @@ const fetchQuotations = createAsyncThunk(
 const updatePlanDetail = createAsyncThunk(
   'app/OrderDetail/UPDATE_PLAN_DETAIL',
   async (
-    { orderId, planId, orderDetail }: TObject,
+    { orderId, planId, orderDetail, skipRefetch = false }: TObject,
     { dispatch, fulfillWithValue, rejectWithValue },
   ) => {
     try {
@@ -183,6 +184,9 @@ const updatePlanDetail = createAsyncThunk(
         planId,
       });
 
+      if (skipRefetch) {
+        return fulfillWithValue(orderDetail);
+      }
       if (orderId) {
         await dispatch(fetchOrder(orderId));
       }
@@ -285,6 +289,18 @@ const OrderDetailSlice = createSlice({
       .addCase(transit.rejected, (state, { error }) => {
         state.transitInProgress = false;
         state.transitError = error.message;
+      })
+      /* =============== updatePlanDetail =============== */
+      .addCase(updatePlanDetail.pending, (state) => {
+        return state;
+      })
+      .addCase(updatePlanDetail.fulfilled, (state, { payload }) => {
+        if (payload !== null && !isEmpty(payload)) {
+          state.orderDetail = payload;
+        }
+      })
+      .addCase(updatePlanDetail.rejected, (state) => {
+        return state;
       });
   },
 });

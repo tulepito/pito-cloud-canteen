@@ -64,7 +64,7 @@ const MENU_TABLE_COLUMN: TColumn[] = [
   },
   {
     key: 'dvt',
-    label: 'DVT',
+    label: 'ĐVT',
     render: (data: any) => {
       return (
         <span
@@ -91,7 +91,13 @@ type TFormDeliveryInfoValues = {
 };
 
 export const ReviewContent: React.FC<any> = (props) => {
-  const { restaurant, notes, deliveryManInfo = {}, updatePlanDetail } = props;
+  const {
+    timeStamp,
+    restaurant,
+    notes,
+    deliveryManInfo = {},
+    updatePlanDetail,
+  } = props;
   const { key: deliveryManKey, phoneNumber: deliveryManPhoneNumber } =
     deliveryManInfo;
   const intl = useIntl();
@@ -132,7 +138,7 @@ export const ReviewContent: React.FC<any> = (props) => {
     anonymous = [],
     orderState,
   } = Listing(order as TListing).getMetadata();
-  const { restaurantName, phoneNumber, foodList = {}, id } = restaurant;
+  const { restaurantName, phoneNumber, foodList = {}, id } = restaurant || {};
   const isInProgressOrder = orderState === EOrderStates.inProgress;
 
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
@@ -151,9 +157,12 @@ export const ReviewContent: React.FC<any> = (props) => {
       ({ key }) => key === value,
     );
 
-    updatePlanDetail({
-      deliveryManInfo: currDeliveryInfoOption,
-    });
+    updatePlanDetail(
+      {
+        deliveryManInfo: currDeliveryInfoOption,
+      },
+      true,
+    );
 
     setCurrDeliveryManPhoneNumber(currDeliveryInfoOption?.phoneNumber);
   };
@@ -183,13 +192,15 @@ export const ReviewContent: React.FC<any> = (props) => {
                 {intl.formatMessage({ id: 'ReviewOrder.deliveryManName' })}
               </span>
               <FieldSelectComponent
-                id="deliveryMan"
+                id={`${timeStamp}_deliveryMan`}
                 name="deliveryMan"
                 className={css.selectBoxContent}
                 meta={deliveryMan.meta}
                 input={deliveryMan.input}
                 onChange={handleFieldDeliveryManChange}>
-                <option value={''}>Chọn nhân viên</option>
+                <option disabled value={''}>
+                  Chọn nhân viên
+                </option>
                 {deliveryManOptions.map(({ key, name }) => (
                   <option key={key} value={key}>
                     {name}

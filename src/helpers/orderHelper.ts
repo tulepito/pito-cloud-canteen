@@ -40,7 +40,7 @@ export const isCompletePickFood = ({
   const totalDates = allOrderDetails.length;
 
   const completedDates = allOrderDetails.reduce((result: number, current) => {
-    const { memberOrders } = current;
+    const { memberOrders = {} } = current;
     const { status, foodId } = memberOrders[participantId] || {};
 
     return result + +isJoinedPlan(foodId, status);
@@ -197,7 +197,7 @@ export const getRestaurantListFromOrderDetail = (
 ) => {
   return Object.values(orderDetail).reduce((result: any, current) => {
     const { restaurant } = current;
-    const { restaurantName } = restaurant;
+    const { restaurantName } = restaurant || {};
 
     if (!result[restaurantName as string]) {
       // eslint-disable-next-line no-param-reassign

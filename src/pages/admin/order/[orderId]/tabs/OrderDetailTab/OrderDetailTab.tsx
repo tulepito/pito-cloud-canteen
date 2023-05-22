@@ -58,7 +58,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   const tabItems = useMemo(
     () =>
       Object.keys(orderDetail).map((key: string) => {
-        const updatePlanDetail = (updateData: TObject) => {
+        const updatePlanDetail = (updateData: TObject, skipRefetch = false) => {
           if (planId) {
             dispatch(
               OrderDetailThunks.updatePlanDetail({
@@ -68,6 +68,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                   ...orderDetail,
                   [key]: { ...orderDetail[key], ...updateData },
                 },
+                skipRefetch,
               }),
             );
           }
@@ -77,7 +78,12 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
           key,
           label: formatTimestamp(Number(key)),
           childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
-          childrenProps: { ...orderDetail[key], notes, updatePlanDetail },
+          childrenProps: {
+            ...orderDetail[key],
+            notes,
+            updatePlanDetail,
+            timeStamp: key,
+          },
         };
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
