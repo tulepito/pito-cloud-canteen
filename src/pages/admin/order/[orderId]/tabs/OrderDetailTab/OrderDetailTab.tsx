@@ -5,6 +5,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
+import { groupFoodOrderByDate } from '@pages/company/orders/[orderId]/picking/helpers/orderDetailHelper';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderStates } from '@src/utils/enums';
@@ -56,8 +57,14 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     }) > 0;
 
   const tabItems = useMemo(
-    () =>
-      Object.keys(orderDetail).map((key: string) => {
+    () => {
+      const foodOrderGroupedByDate = groupFoodOrderByDate({ orderDetail });
+
+      return Object.keys(orderDetail).map((key: string) => {
+        const foodOrder = foodOrderGroupedByDate.find(
+          ({ date }) => date === key,
+        );
+
         const updatePlanDetail = (updateData: TObject, skipRefetch = false) => {
           if (planId) {
             dispatch(
@@ -83,9 +90,11 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             notes,
             updatePlanDetail,
             timeStamp: key,
+            foodOrder,
           },
         };
-      }),
+      });
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(order), JSON.stringify(orderDetail)],
   );
