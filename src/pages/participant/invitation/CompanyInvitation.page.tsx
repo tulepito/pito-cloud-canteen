@@ -1,17 +1,20 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
+import Button from '@components/Button/Button';
+import CoverModal from '@components/CoverModal/CoverModal';
 import RedirectLink from '@components/RedirectLink/RedirectLink';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { companyInvitationThunks } from '@redux/slices/companyInvitation.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
+import invitationCover from '@src/assets/invitationCover.png';
 import { generalPaths } from '@src/paths';
 import { UserInviteResponse } from '@src/types/UserPermission';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
-import InvitationCard from './components/InvitationCard/InvitationCard';
 import InvitationNotiModal from './components/InvitationNotiModal/InvitationNotiModal';
 
 import css from './CompanyInvitation.module.scss';
@@ -26,11 +29,27 @@ const CompanyInvitationPage = () => {
     (state) => state.companyInvitation.company,
     shallowEqual,
   );
+  const [actionLoading, setActionLoading] = useState<string>('');
+  const companyUser = User(company as TUser);
+  const { companyName } = companyUser.getPublicData();
+  const { displayName: bookerName } = companyUser.getProfile();
   const {
     responseToInvitationInProgress,
     checkInvitationResult,
     responseToInvitationResult,
   } = useAppSelector((state) => state.companyInvitation);
+  const invitationModalControl = useBoolean(true);
+
+  const rowInformation = [
+    {
+      label: 'Công ty:',
+      value: companyName,
+    },
+    {
+      label: 'Người tạo nhóm:',
+      value: bookerName,
+    },
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,6 +72,17 @@ const CompanyInvitationPage = () => {
         companyId: companyId as string,
       }),
     );
+  };
+
+  const handleAccept = async () => {
+    setActionLoading('accept');
+    await onResponseInvitation(UserInviteResponse.ACCEPT)();
+    setActionLoading('');
+  };
+  const handleDecline = async () => {
+    setActionLoading('decline');
+    await onResponseInvitation(UserInviteResponse.DECLINE)();
+    setActionLoading('');
   };
 
   const goToHomePage = () => {
@@ -92,11 +122,43 @@ const CompanyInvitationPage = () => {
   ) {
     return (
       <div className={css.foodBackground}>
-        <InvitationCard
-          companyName={User(company as TUser).getPublicData().companyName}
-          onAccept={onResponseInvitation(UserInviteResponse.ACCEPT)}
-          onDecline={onResponseInvitation(UserInviteResponse.DECLINE)}
-          responseToInvitationInProgress={responseToInvitationInProgress}
+        <CoverModal
+          id="InvitationModal"
+          isOpen={invitationModalControl.value}
+          onClose={invitationModalControl.setFalse}
+          coverSrc={invitationCover}
+          modalTitle="Bạn nhận được lời mời tham gia PITO Cloud Canteen"
+          modalDescription={
+            <span>
+              {bookerName} <strong>công ty {companyName}</strong> mời bạn tham
+              gia PITO Cloud Canteen - Đặt bữa ăn hàng ngày. Chọn tham gia để
+              bắt đầu chọn món cho tuần ăn của bạn.
+            </span>
+          }
+          rowInformation={rowInformation}
+          buttonWrapper={
+            <>
+              <Button
+                variant="secondary"
+                inProgress={
+                  responseToInvitationInProgress &&
+                  actionLoading === UserInviteResponse.DECLINE
+                }
+                className={css.btn}
+                onClick={handleDecline}>
+                Từ chối
+              </Button>
+              <Button
+                inProgress={
+                  responseToInvitationInProgress &&
+                  actionLoading === UserInviteResponse.ACCEPT
+                }
+                className={css.btn}
+                onClick={handleAccept}>
+                Tham gia
+              </Button>
+            </>
+          }
         />
       </div>
     );

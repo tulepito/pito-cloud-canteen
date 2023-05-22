@@ -1,18 +1,27 @@
 import React, { useEffect, useState } from 'react';
 // import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import Avatar from '@components/Avatar/Avatar';
+import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
+import CoverModal from '@components/CoverModal/CoverModal';
+import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import Tabs from '@components/Tabs/Tabs';
+import { isCompletePickFood, isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { User } from '@src/utils/data';
-import type { TUser } from '@utils/types';
+import missingPickingOrderCover from '@src/assets/missingPickingCover.png';
+import pickingOrderCover from '@src/assets/pickingOrderCover.png';
+import { participantPaths } from '@src/paths';
+import { CurrentUser, Listing, User } from '@src/utils/data';
+import { formatTimestamp } from '@src/utils/dates';
+import type { TListing, TUser } from '@utils/types';
 
 import OrderCalendarView from '../../components/OrderCalendarView/OrderCalendarView';
 import SectionOrderHeader from '../../components/SectionOrderHeader/SectionOrderHeader';
@@ -28,6 +37,7 @@ const ParticipantOrderManagement = () => {
   const { isReady, query } = router;
   const { orderId } = query;
   const isOwnerControl = useBoolean();
+
   // State
   const [currentView, setCurrentView] = useState(VIEWS.CALENDAR);
   const currentUser = useAppSelector(currentUserSelector);
@@ -51,6 +61,59 @@ const ParticipantOrderManagement = () => {
     (state) => state.ParticipantOrderManagementPage.loadDataInProgress,
   );
 
+  const currentUserGetter = CurrentUser(currentUser);
+  const companyUser = User(company as TUser);
+  const orderListing = Listing(order as TListing);
+  const planListing = Listing(plans[0] as TListing);
+  const currentUserId = currentUserGetter.getId();
+  const { orderName } = orderListing.getPublicData();
+  const { selectedGroups = [], deadlineDate } = orderListing.getMetadata();
+  const { displayName: bookerName } = companyUser.getProfile();
+  const { companyName } = companyUser.getPublicData();
+  const { groups = [] } = companyUser.getMetadata();
+  const { orderDetail } = planListing.getMetadata();
+
+  const selectedGroupNames =
+    selectedGroups.includes('allMembers') || !selectedGroups.length
+      ? ['Tất cả thành viên']
+      : selectedGroups.map((groupId: string) => {
+          return groups.find((group: any) => group.id === groupId)?.name;
+        });
+
+  const rowInformation = [
+    {
+      label: 'Công ty:',
+      value: companyName,
+    },
+    {
+      label: 'Nhóm:',
+      value: selectedGroupNames.join(', '),
+    },
+    {
+      label: 'Hạn chọn món:',
+      value: formatTimestamp(deadlineDate, 'dd/MM/yyyy, HH:mm'),
+    },
+    {
+      label: 'Người đại diện:',
+      value: bookerName,
+    },
+  ];
+
+  const shouldShowMissingPickingOrderModal =
+    !isEmpty(orderDetail) &&
+    !isEmpty(order) &&
+    !isCompletePickFood({
+      participantId: currentUserId,
+      orderDetail,
+    }) &&
+    isOrderOverDeadline(order as TListing);
+
+  const pickingOrderModalControl = useBoolean(
+    !shouldShowMissingPickingOrderModal,
+  );
+  const missingPickingOrderModalControl = useBoolean(
+    shouldShowMissingPickingOrderModal,
+  );
   useEffect(() => {
     if (isReady) {
       dispatch(participantOrderManagementThunks.loadData(orderId as string));
@@ -66,6 +129,7 @@ const ParticipantOrderManagement = () => {
   //   }
   // };
 
+  const loadingInProgress = loadDataInProgress;
   const tabOptions = [
     // {
     //   id: 'personal',
@@ -105,8 +169,48 @@ const ParticipantOrderManagement = () => {
     },
   ];
 
+  const goToHomePage = () => {
+    router.push(participantPaths.OrderList);
+  };
+
   return (
     <ParticipantLayout>
+      <CoverModal
+        id="PickingOrderModal"
+        isOpen={pickingOrderModalControl.value}
+        onClose={pickingOrderModalControl.setFalse}
+        coverSrc={pickingOrderCover}
+        modalTitle="Thực đơn của bạn đã sẵn sàng, mời bạn chọn"
+        modalDescription={
+          <span>
+            Đơn hàng <strong>{orderName}</strong> có thời hạn chọn món nhất
+            định. Sau thời hạn này, tuần ăn của bạn sẽ hết hạn và không thể chọn
+            món được nữa. Vui lòng chọn món trước Hạn đặt món.
+          </span>
+        }
+        rowInformation={rowInformation}
+        buttonWrapper={
+          <Button
+            className={css.btn}
+            onClick={pickingOrderModalControl.setFalse}>
+            Bắt đầu
+          </Button>
+        }
+      />
+      <CoverModal
+        id="MissingOrderModal"
+        isOpen={missingPickingOrderModalControl.value}
+        onClose={missingPickingOrderModalControl.setFalse}
+        coverSrc={missingPickingOrderCover}
+        modalTitle="Có vẻ bạn đã quên chọn món!"
+        modalDescription="Đừng lo, liên hệ Người đại điện đặt món để được giúp đỡ nhé"
+        rowInformation={rowInformation}
+        buttonWrapper={
+          <Button className={css.btn} onClick={goToHomePage}>
+            Về trang chủ
+          </Button>
+        }
+      />
       <SectionOrderHeader
         currentView={currentView}
         setViewFunction={setCurrentView}
@@ -122,6 +226,7 @@ const ParticipantOrderManagement = () => {
       ) : (
         <Tabs items={tabOptions as any} headerClassName={css.tabHeader} />
       )}
+      <LoadingModal isOpen={loadingInProgress} />
     </ParticipantLayout>
   );
 };
