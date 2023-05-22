@@ -14,6 +14,10 @@
     overflow: auto hidden;
     scroll-behavior: smooth;
 
+    &.centerItems {
+      justify-content: center;
+    }
+
     .connectionLine {
       min-width: 32px;
       height: 2px;
