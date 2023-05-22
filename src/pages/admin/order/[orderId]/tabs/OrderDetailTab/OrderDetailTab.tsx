@@ -110,6 +110,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
         <ReviewOrderStatesSection
           data={{ transactionDataMap, isCanceledOrder: false }}
           isAdminLayout
+          className={css.reviewOrderStates}
         />
       </RenderWhen>
       <OrderHeaderInfor
