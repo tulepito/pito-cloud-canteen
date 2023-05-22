@@ -4,7 +4,6 @@ import { FormattedMessage } from 'react-intl';
 import Button from '@components/Button/Button';
 import IconCancel from '@components/Icons/IconCancel/IconCancel';
 import IconDelivering from '@components/Icons/IconDelivering/IconDelivering';
-import IconFail from '@components/Icons/IconFail/IconFail';
 import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
 import AlertModal from '@components/Modal/AlertModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -31,7 +30,7 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({ tx }) => {
   );
   const deliveringController = useBoolean();
   const deliveredController = useBoolean();
-  const failedController = useBoolean();
+  // const failedController = useBoolean();
   const confirmCancelController = useBoolean();
   const canceledController = useBoolean();
 
@@ -112,7 +111,7 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({ tx }) => {
           <FormattedMessage id="StateItemToolTip.stateDelivered" />
         </div>
       </Button>
-      <Button
+      {/* <Button
         variant="inline"
         className={css.row}
         disabled={!failedController.value}>
@@ -120,7 +119,7 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({ tx }) => {
         <div className={css.stateText}>
           <FormattedMessage id="StateItemToolTip.stateFailed" />
         </div>
-      </Button>
+      </Button> */}
       <Button
         variant="inline"
         className={css.row}
