@@ -10,7 +10,7 @@ import {
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
-import { formatTimestamp } from '@utils/dates';
+import { formatTimestamp, VNTimezone } from '@utils/dates';
 
 const updateOrder = async ({
   orderId,
@@ -38,6 +38,7 @@ const updateOrder = async ({
 
     if (deadlineDate) {
       const reminderTime = DateTime.fromMillis(deadlineDate)
+        .setZone(VNTimezone)
         .minus({
           minutes: 30,
         })

@@ -15,7 +15,7 @@ import {
 import { getUniqueString } from './data';
 import { EDayOfWeek, EMenuMealType } from './enums';
 
-const VNTimezone = 'Asia/Ho_Chi_Minh';
+export const VNTimezone = 'Asia/Ho_Chi_Minh';
 
 const DAY_IN_WEEK = [
   { key: 'mon', label: 'DayInWeekField.mon' },
