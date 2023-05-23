@@ -42,17 +42,23 @@ const updateOrder = async ({
           minutes: 30,
         })
         .toMillis();
-
-      const existedScheduler = await getScheduler(`sendRemindPOE_${orderId}`);
-      if (existedScheduler) {
-        updateScheduler({
+      try {
+        await getScheduler(`sendRemindPOE_${orderId}`);
+        await updateScheduler({
           customName: `sendRemindPOE_${orderId}`,
-          timeExpression: formatTimestamp(reminderTime, 'yyyy-mm-ddThh:mm:ss'),
+          timeExpression: formatTimestamp(
+            reminderTime,
+            "yyyy-MM-dd'T'hh:mm:ss",
+          ),
         });
-      } else {
-        createScheduler({
+      } catch (error) {
+        console.log('create scheduler');
+        await createScheduler({
           customName: `sendRemindPOE_${orderId}`,
-          timeExpression: formatTimestamp(reminderTime, 'yyyy-mm-ddThh:mm:ss'),
+          timeExpression: formatTimestamp(
+            reminderTime,
+            "yyyy-MM-dd'T'hh:mm:ss",
+          ),
           params: {
             orderId,
           },

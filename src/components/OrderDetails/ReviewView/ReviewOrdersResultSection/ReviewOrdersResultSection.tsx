@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
 import { isCompletePickFood } from '@helpers/orderHelper';
@@ -26,12 +27,15 @@ const ReviewOrdersResultSection: React.FC<TReviewOrdersResultSectionProps> = (
 
   const rootClasses = classNames(css.root, className);
 
-  const completedPickFoodParticipants = participants.filter((pid: string) =>
-    isCompletePickFood({
-      participantId: pid,
-      orderDetail,
-    }),
-  );
+  const completedPickFoodParticipants =
+    !isEmpty(orderDetail) &&
+    !isEmpty(participants) &&
+    participants.filter((pid: string) =>
+      isCompletePickFood({
+        participantId: pid,
+        orderDetail,
+      }),
+    );
 
   const handleClickButtonViewResult = () => {
     setIsResultModalOpen(true);
