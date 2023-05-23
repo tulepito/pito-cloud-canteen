@@ -1,61 +1,31 @@
-import { parseThousandNumber } from '@helpers/format';
-import { calculatePriceQuotationInfo } from '@pages/company/orders/[orderId]/picking/helpers/cartInfoHelper';
+const { formatTimestamp, calculateRemainTime } = require('./date');
+const { parseThousandNumber } = require('./utils');
+const { getPCCFeeByMemberAmount } = require('./orderHelper');
 
-import { formatTimestamp } from '../dates';
-import { ESubOrderStatus } from '../enums';
-import type { TObject } from '../types';
+const BASE_URL = process.env.CANONICAL_URL;
 
-const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
+const bookerOrderPickingSubject = (orderName) =>
+  `Sắp đến hạn chọn món ${orderName}`;
 
-type BookerSubOrderIsCanceledParams = {
-  bookerUser: any;
-  companyUser: any;
-  orderListing: any;
-  planListing: any;
-  timestamp: number;
-};
-
-export const bookerSubOrderIsCanceledSubject = (subOrderDate: string) =>
-  `Ngày ăn ${subOrderDate} bị huỷ`;
-
-const bookerSubOrderIsCanceled = ({
-  bookerUser,
-  orderListing,
-  planListing,
-  timestamp,
-}: BookerSubOrderIsCanceledParams) => {
+const bookerOrderPicking = ({ bookerUser, companyUser, orderListing }) => {
   const { displayName: bookerName } = bookerUser.getProfile();
   const orderId = orderListing.getId();
+  const { title: orderTitle } = orderListing.getAttributes();
   const { orderName } = orderListing.getPublicData();
-  const { orderDetail: planOrderDetail } = planListing.getMetadata();
-  const currentOrderDetail = Object.entries<TObject>(
-    planOrderDetail,
-  ).reduce<TObject>((result, currentOrderDetailEntry) => {
-    const [subOrderDate, rawOrderDetailOfDate] = currentOrderDetailEntry;
-    const { status } = rawOrderDetailOfDate;
-    if (status === ESubOrderStatus.CANCELED) {
-      return result;
-    }
+  const { startDate, endDate, memberAmount, packagePerMember, deadlineDate } =
+    orderListing.getMetadata();
+  const PCCFee = getPCCFeeByMemberAmount(memberAmount);
+  const { companyName } = companyUser.getPublicData();
+  const remainTime = calculateRemainTime(deadlineDate);
 
-    return {
-      ...result,
-      [subOrderDate]: {
-        ...rawOrderDetailOfDate,
-      },
-    };
-  }, {});
-  const { totalPrice, totalDishes, VATFee, PITOFee, totalWithVAT } =
-    calculatePriceQuotationInfo({
-      planOrderDetail,
-      order: orderListing.getFullData(),
-    });
-  const numberOfSubOrders = Object.keys(currentOrderDetail).length || 0;
-  const formatSubOrderDate = formatTimestamp(timestamp);
-  const formattedPCCFee = `${parseThousandNumber(PITOFee)}đ`;
-  const formattedVatFee = `${parseThousandNumber(VATFee)}đ`;
+  const totalPrice = memberAmount * packagePerMember + PCCFee;
+
+  const formattedStartDate = formatTimestamp(startDate);
+  const formattedEndDate = formatTimestamp(endDate);
+  const formattedPackagePerMember = `${parseThousandNumber(packagePerMember)}đ`;
+  const formattedPCCFee = `${parseThousandNumber(PCCFee)}đ`;
   const formattedTotalPrice = `${parseThousandNumber(totalPrice)}đ`;
-  const formattedTotalWithVat = `${parseThousandNumber(totalWithVAT)}đ`;
-  const viewOrderUrl = `${BASE_URL}/company/orders/${orderId}`;
+  const shareUrl = `${BASE_URL}/company/orders/${orderId}`;
 
   return `
   <!DOCTYPE html
@@ -69,7 +39,7 @@ const bookerSubOrderIsCanceled = ({
   <meta name="x-apple-disable-message-reformatting">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta content="telephone=no" name="format-detection">
-  <title>Booker - Sub order is canceled</title><!--[if (mso 16)]>
+  <title>Booker - Order picking</title><!--[if (mso 16)]>
     <style type="text/css">
     a {text-decoration: none;}
     </style>
@@ -81,7 +51,7 @@ const bookerSubOrderIsCanceled = ({
     </o:OfficeDocumentSettings>
 </xml>
 <![endif]--><!--[if !mso]><!-- -->
-  <link href="https://fonts.googleapis.com/css2?family=arial, 'helvetica neue', helvetica, sans-serif:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!--<![endif]-->
   <style type="text/css">
     #outlook a {
@@ -110,10 +80,6 @@ const bookerSubOrderIsCanceled = ({
       max-height: 0;
       line-height: 0;
       mso-hide: all;
-    }
-
-    [data-ogsb] .es-button.es-button-1 {
-      padding: 12px 30px 10px !important;
     }
 
     @media only screen and (max-width:600px) {
@@ -591,7 +557,7 @@ const bookerSubOrderIsCanceled = ({
                                   style="padding:0;Margin:0;padding-bottom:10px;padding-top:20px">
                                   <h1
                                     style="Margin:0;line-height:24px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:24px;font-style:normal;font-weight:bold;color:#262626">
-                                    Ngày ăn ${formatSubOrderDate} của tuần ăn ${orderName}<br>bị huỷ</h1>
+                                    Sắp đến hạn chọn món!</h1>
                                 </td>
                               </tr>
                               <tr>
@@ -605,15 +571,151 @@ const bookerSubOrderIsCanceled = ({
                                 <td align="left" style="padding:0;Margin:0;padding-top:10px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    PITO Cloud Canteen rất tiếc thông báo, ngày ăn <strong>${formatSubOrderDate}</strong>&nbsp;của
-                                    tuần ăn <strong>${orderName}</strong> đã bị huỷ.</p>
+                                    Chỉ còn <strong>${remainTime}</strong> đến Hạn chọn món của đơn hàng <strong>${orderName},
+                                      ${bookerName}</strong> đừng quên nhắc nhở người tham gia chọn món nhé</p>
                                 </td>
                               </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+          <table cellpadding="0" cellspacing="0" class="es-content" align="center"
+            style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%">
+            <tr>
+              <td align="center" style="padding:0;Margin:0">
+                <table bgcolor="#ffffff" class="es-content-body" align="center" cellpadding="0" cellspacing="0"
+                  style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#FFFFFF;width:600px">
+                  <tr>
+                    <td align="left" style="padding:0;Margin:0;padding-top:20px;padding-left:20px;padding-right:20px">
+                      <table cellpadding="0" cellspacing="0" width="100%"
+                        style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                        <tr>
+                          <td align="left" style="padding:0;Margin:0;width:560px">
+                            <table cellpadding="0" cellspacing="0" width="100%" role="presentation"
+                              style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                               <tr>
-                                <td align="left" style="padding:0;Margin:0;padding-top:10px">
-                                  <p
-                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    Dưới đây là một số thay đổi tuần ăn sau khi huỷ:&nbsp;</p>
+                                <td align="center" class="es-m-txt-c" style="padding:0;Margin:0"><!--[if mso]><a href="${shareUrl}" target="_blank" hidden>
+	<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" esdevVmlButton href="${shareUrl}" 
+                style="height:43px; v-text-anchor:middle; width:252px" arcsize="19%" stroke="f"  fillcolor="#ef3d2a">
+		<w:anchorlock></w:anchorlock>
+		<center style='color:#ffffff; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; font-weight:400; line-height:15px;  mso-text-raise:1px'>Chia sẻ với người tham gia</center>
+	</v:roundrect></a>
+<![endif]--><!--[if !mso]><!-- --><span class="msohide es-button-border"
+                                    style="border-style:solid;border-color:#2CB543;background:#ef3d2a;border-width:0px;display:inline-block;border-radius:8px;width:auto;mso-border-alt:10px;mso-hide:all"><a
+                                      href="${shareUrl}"
+                                      class="es-button msohide es-button-1681958632207" target="_blank"
+                                      style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:16px;padding:10px 30px 10px 30px;display:inline-block;background:#ef3d2a;border-radius:8px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:normal;line-height:19px;width:auto;text-align:center;mso-hide:all;border-color:#ef3d2a;padding-top:12px;padding-bottom:12px">Chia
+                                      sẻ với người tham gia</a></span><!--<![endif]--></td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+          <table class="es-content" cellspacing="0" cellpadding="0" align="center"
+            style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%">
+            <tr>
+              <td align="center" style="padding:0;Margin:0">
+                <table class="es-content-body" cellspacing="0" cellpadding="0" bgcolor="#ffffff" align="center"
+                  style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#FFFFFF;width:600px">
+                  <tr>
+                    <td class="es-m-p15r es-m-p15l esdev-adapt-off" align="left"
+                      style="Margin:0;padding-bottom:20px;padding-right:20px;padding-top:25px;padding-left:40px">
+                      <table cellpadding="0" cellspacing="0" class="esdev-mso-table"
+                        style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:540px">
+                        <tr>
+                          <td class="esdev-mso-td" valign="top" style="padding:0;Margin:0">
+                            <table class="es-left" cellspacing="0" cellpadding="0" align="left"
+                              style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:left">
+                              <tr>
+                                <td align="left" style="padding:0;Margin:0;width:243px">
+                                  <table width="100%" cellspacing="0" cellpadding="0" role="presentation"
+                                    style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                                    <tr>
+                                      <td align="left" style="padding:0;Margin:0">
+                                        <p
+                                          style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#8c8c8c;font-size:14px">
+                                          Tên công ty</p>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td align="left" style="padding:0;Margin:0">
+                                        <p
+                                          style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
+                                          <strong>${companyName}</strong>
+                                        </p>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td align="left" style="padding:0;Margin:0;padding-top:10px">
+                                        <p
+                                          style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#8c8c8c;font-size:14px">
+                                          Ngày triển khai</p>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td align="left" style="padding:0;Margin:0">
+                                        <p
+                                          style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
+                                          <strong>${formattedStartDate} - ${formattedEndDate}</strong>
+                                        </p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                          <td style="padding:0;Margin:0;width:5px"></td>
+                          <td class="esdev-mso-td" valign="top" style="padding:0;Margin:0">
+                            <table class="es-right" cellspacing="0" cellpadding="0" align="right"
+                              style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:right">
+                              <tr>
+                                <td align="left" style="padding:0;Margin:0;width:292px">
+                                  <table width="100%" cellspacing="0" cellpadding="0" role="presentation"
+                                    style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                                    <tr>
+                                      <td align="left" style="padding:0;Margin:0">
+                                        <p
+                                          style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#8c8c8c;font-size:14px">
+                                          Người đại diện</p>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td align="left" style="padding:0;Margin:0">
+                                        <p
+                                          style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
+                                          <strong>${bookerName}</strong>
+                                        </p>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td align="left" style="padding:0;Margin:0;padding-top:10px">
+                                        <p
+                                          style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#8c8c8c;font-size:14px">
+                                          Mã đơn hàng</p>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td align="left" style="padding:0;Margin:0">
+                                        <p
+                                          style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
+                                          <strong>${orderTitle}</strong>
+                                        </p>
+                                      </td>
+                                    </tr>
+                                  </table>
                                 </td>
                               </tr>
                             </table>
@@ -648,7 +750,8 @@ const bookerSubOrderIsCanceled = ({
                                   style="padding:0;Margin:0;padding-bottom:10px;padding-top:25px;padding-left:25px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:24px;color:#262626;font-size:16px">
-                                    <strong>Chi tiết đơn hàng</strong></p>
+                                    <strong>Chi tiết đơn hàng dự kiến</strong>
+                                  </p>
                                 </td>
                               </tr>
                               <tr>
@@ -661,11 +764,12 @@ const bookerSubOrderIsCanceled = ({
                                         style="Margin:0;padding-left:25px;padding-right:5px;padding-top:0px;padding-bottom:0px;border:0"
                                         id="esd-menu-id-0"><a target="_blank" href=""
                                           style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#8c8c8c;font-size:14px">Số
-                                          phần ăn</a></td>
+                                          phần ăn (dự kiến)</a></td>
                                       <td align="left" valign="top" width="50%"
                                         style="Margin:0;padding-left:5px;padding-right:5px;padding-top:0px;padding-bottom:0px;border:0"
                                         id="esd-menu-id-1"><a target="_blank" href=""
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#8c8c8c;font-size:14px">Số ngày ăn/tuần</a></td>
+                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#8c8c8c;font-size:14px">Đơn
+                                          giá/phần (dự kiến)</a></td>
                                     </tr>
                                   </table>
                                 </td>
@@ -677,14 +781,14 @@ const bookerSubOrderIsCanceled = ({
                                     style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                     <tr class="links">
                                       <td align="left" valign="top" width="50%"
-                                        style="Margin:0;padding-left:24px;padding-right:5px;padding-top:10px;padding-bottom:10px;border:0"
+                                        style="Margin:0;padding-left:24px;padding-right:5px;padding-top:0px;padding-bottom:10px;border:0"
                                         id="esd-menu-id-0"><a target="_blank" href=""
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#262626;font-size:14px;font-weight:bold">${totalDishes}</a>
+                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#262626;font-size:14px;font-weight:bold">${memberAmount}</a>
                                       </td>
                                       <td align="left" valign="top" width="50%" id="esd-menu-id-1"
-                                        style="Margin:0;padding-left:5px;padding-right:5px;padding-top:10px;padding-bottom:10px;border:0">
+                                        style="Margin:0;padding-left:5px;padding-right:5px;padding-top:0px;padding-bottom:10px;border:0">
                                         <a target="_blank" href=""
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#262626;font-size:14px;font-weight:bold">${numberOfSubOrders}</a>
+                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#262626;font-size:14px;font-weight:bold">${formattedPackagePerMember}</a>
                                       </td>
                                     </tr>
                                   </table>
@@ -699,53 +803,13 @@ const bookerSubOrderIsCanceled = ({
                                       <td align="left" valign="top" width="50%"
                                         style="Margin:0;padding-left:25px;padding-right:5px;padding-top:0px;padding-bottom:0px;border:0"
                                         id="esd-menu-id-0"><a target="_blank" href=""
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#8c8c8c;font-size:14px">Thực
-                                          đơn món</a></td>
-                                      <td align="left" valign="top" width="50%"
-                                        style="Margin:0;padding-left:5px;padding-right:5px;padding-top:0px;padding-bottom:0px;border:0"
-                                        id="esd-menu-id-1"><a target="_blank" href=""
                                           style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#8c8c8c;font-size:14px">Phí
-                                          PITO Cloud Canteen:</a></td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td style="padding:0;Margin:0">
-                                  <table cellpadding="0" cellspacing="0" width="100%" class="es-menu"
-                                    role="presentation"
-                                    style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                                    <tr class="links">
-                                      <td align="left" valign="top" width="50%"
-                                        style="Margin:0;padding-left:24px;padding-right:5px;padding-top:10px;padding-bottom:20px;border:0"
-                                        id="esd-menu-id-0"><a target="_blank" href=""
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#262626;font-size:14px;font-weight:bold">${formattedTotalPrice}</a>
-                                      </td>
-                                      <td align="left" valign="top" width="50%" id="esd-menu-id-1"
-                                        style="Margin:0;padding-left:5px;padding-right:5px;padding-top:10px;padding-bottom:20px;border:0">
-                                        <a target="_blank" href=""
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#262626;font-size:14px;font-weight:bold">${formattedPCCFee}</a>
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td style="padding:0;Margin:0">
-                                  <table cellpadding="0" cellspacing="0" width="100%" class="es-menu"
-                                    role="presentation"
-                                    style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                                    <tr class="links">
-                                      <td align="left" valign="top" width="50%"
-                                        style="Margin:0;padding-left:25px;padding-right:5px;padding-top:0px;padding-bottom:0px;border:0"
-                                        id="esd-menu-id-0"><a target="_blank" href=""
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#8c8c8c;font-size:14px">VAT</a>
-                                      </td>
+                                          PITO Cloud Canteen (dự kiến)</a></td>
                                       <td align="left" valign="top" width="50%"
                                         style="Margin:0;padding-left:5px;padding-right:5px;padding-top:0px;padding-bottom:0px;border:0"
                                         id="esd-menu-id-1"><a target="_blank" href=""
                                           style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#8c8c8c;font-size:14px">Tổng
-                                          giá trị</a></td>
+                                          giá trị (dự kiến)</a></td>
                                     </tr>
                                   </table>
                                 </td>
@@ -757,38 +821,16 @@ const bookerSubOrderIsCanceled = ({
                                     style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                     <tr class="links">
                                       <td align="left" valign="top" width="50%"
-                                        style="Margin:0;padding-left:24px;padding-right:5px;padding-top:10px;padding-bottom:20px;border:0"
+                                        style="Margin:0;padding-left:24px;padding-right:5px;padding-top:0px;padding-bottom:20px;border:0"
                                         id="esd-menu-id-0"><a target="_blank" href=""
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#262626;font-size:14px;font-weight:bold">${formattedVatFee}</a>
-                                      </td>
+                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#262626;font-size:14px;font-weight:bold">${formattedPCCFee}</a></td>
                                       <td align="left" valign="top" width="50%" id="esd-menu-id-1"
-                                        style="Margin:0;padding-left:5px;padding-right:5px;padding-top:10px;padding-bottom:20px;border:0">
+                                        style="Margin:0;padding-left:5px;padding-right:5px;padding-top:0px;padding-bottom:20px;border:0">
                                         <a target="_blank" href=""
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#262626;font-size:14px;font-weight:bold">${formattedTotalWithVat}</a>
+                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#262626;font-size:14px;font-weight:bold">${formattedTotalPrice}</a>
                                       </td>
                                     </tr>
                                   </table>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td align="left" class="es-m-txt-l" style="padding:0;Margin:0;padding-left:25px"><!--[if mso]><a href="${viewOrderUrl}" target="_blank" hidden>
-	<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" esdevVmlButton href="${viewOrderUrl}" 
-                style="height:41px; v-text-anchor:middle; width:219px" arcsize="20%" stroke="f"  fillcolor="#ef3d2a">
-		<w:anchorlock></w:anchorlock>
-		<center style='color:#ffffff; font-family:arial, 'helvetica neue', helvetica, sans-serif; font-size:15px; font-weight:400; line-height:15px;  mso-text-raise:1px'>Xem chi tiết đơn hàng</center>
-	</v:roundrect></a>
-<![endif]--><!--[if !mso]><!-- --><span class="msohide es-button-border"
-                                    style="border-style:solid;border-color:#2CB543;background:#ef3d2a;border-width:0px;display:inline-block;border-radius:8px;width:auto;mso-border-alt:10px;mso-hide:all"><a
-                                      href="${viewOrderUrl}"
-                                      class="es-button msohide es-button-1" target="_blank"
-                                      style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:16px;padding:12px 30px 10px;display:inline-block;background:#ef3d2a;border-radius:8px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:normal;line-height:19px;width:auto;text-align:center;mso-hide:all;border-color:#ef3d2a">Xem
-                                      chi tiết đơn hàng</a></span><!--<![endif]--></td>
-                              </tr>
-                              <tr>
-                                <td align="left" style="padding:0;Margin:0">
-                                  <p
-                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    <br></p>
                                 </td>
                               </tr>
                             </table>
@@ -806,77 +848,53 @@ const bookerSubOrderIsCanceled = ({
                                   style="padding:0;Margin:0;padding-bottom:10px;padding-top:25px;padding-left:25px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:24px;color:#262626;font-size:16px">
-                                    <strong>Chi tiết đơn hàng</strong></p>
+                                    <strong>Chi tiết đơn hàng dự kiến</strong>
+                                  </p>
                                 </td>
                               </tr>
                               <tr>
                                 <td align="left" style="padding:0;Margin:0;padding-left:20px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#8c8c8c;font-size:14px">
-                                    Số phần ăn</p>
+                                    Số phần ăn (dự kiến)</p>
                                 </td>
                               </tr>
                               <tr>
                                 <td align="left" style="padding:0;Margin:0;padding-top:5px;padding-left:20px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    <strong>${totalDishes}</strong></p>
+                                    <strong>${memberAmount}</strong>
+                                  </p>
                                 </td>
                               </tr>
                               <tr>
                                 <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-left:20px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#8c8c8c;font-size:14px">
-                                    Số ngày ăn/tuần</p>
+                                    Đơn giá/phần (dự kiến)</p>
                                 </td>
                               </tr>
                               <tr>
                                 <td align="left" style="padding:0;Margin:0;padding-top:5px;padding-left:20px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    <strong>${numberOfSubOrders}</strong></p>
+                                    <strong>${formattedPackagePerMember}</strong>
+                                  </p>
                                 </td>
                               </tr>
                               <tr>
                                 <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-left:20px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#8c8c8c;font-size:14px">
-                                    Thực đơn món</p>
+                                    Phí PITO Cloud Canteen (dự kiến)</p>
                                 </td>
                               </tr>
                               <tr>
                                 <td align="left" style="padding:0;Margin:0;padding-top:5px;padding-left:20px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    <b>${formattedTotalPrice}</b></p>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-left:20px">
-                                  <p
-                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#8c8c8c;font-size:14px">
-                                    Phí PITO Cloud Canteen</p>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td align="left" style="padding:0;Margin:0;padding-top:5px;padding-left:20px">
-                                  <p
-                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    <strong>${formattedPCCFee}</strong></p>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-left:20px">
-                                  <p
-                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#8c8c8c;font-size:14px">
-                                    VAT</p>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td align="left" style="padding:0;Margin:0;padding-top:5px;padding-left:20px">
-                                  <p
-                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    <strong>${formattedVatFee}</strong></p>
+                                    <strong>${formattedPCCFee}</strong>
+                                  </p>
                                 </td>
                               </tr>
                               <tr>
@@ -891,23 +909,8 @@ const bookerSubOrderIsCanceled = ({
                                   style="padding:0;Margin:0;padding-top:5px;padding-bottom:20px;padding-left:20px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    <strong>${formattedTotalWithVat}</strong></p>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td align="left" class="es-m-txt-l" style="padding:0;Margin:0;padding-left:25px"><span
-                                    class="msohide es-button-border"
-                                    style="border-style:solid;border-color:#2CB543;background:#ef3d2a;border-width:0px;display:inline-block;border-radius:8px;width:auto;mso-border-alt:10px;mso-hide:all"><a
-                                      href="${viewOrderUrl}"
-                                      class="es-button msohide es-button-1" target="_blank"
-                                      style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:16px;padding:12px 30px 10px;display:inline-block;background:#ef3d2a;border-radius:8px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:normal;line-height:19px;width:auto;text-align:center;mso-hide:all;border-color:#ef3d2a">Xem
-                                      chi tiết đơn hàng</a></span></td>
-                              </tr>
-                              <tr>
-                                <td align="left" style="padding:0;Margin:0">
-                                  <p
-                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    <br></p>
+                                    <strong>${formattedTotalPrice}</strong>
+                                  </p>
                                 </td>
                               </tr>
                             </table>
@@ -936,19 +939,6 @@ const bookerSubOrderIsCanceled = ({
                             <table cellpadding="0" cellspacing="0" width="100%" role="presentation"
                               style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                               <tr>
-                                <td align="center" style="padding:0;Margin:0;padding-bottom:20px;font-size:0">
-                                  <table border="0" width="100%" height="100%" cellpadding="0" cellspacing="0"
-                                    role="presentation"
-                                    style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                                    <tr>
-                                      <td
-                                        style="padding:0;Margin:0;border-bottom:1px solid #cccccc;background:unset;height:1px;width:100%;margin:0px">
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                              <tr>
                                 <td align="left" style="padding:0;Margin:0">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
@@ -966,7 +956,8 @@ const bookerSubOrderIsCanceled = ({
                                 <td align="left" style="padding:0;Margin:0;padding-top:15px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    <strong>Customer Success Team</strong></p>
+                                    <strong>Customer Success Team</strong>
+                                  </p>
                                 </td>
                               </tr>
                             </table>
@@ -980,7 +971,8 @@ const bookerSubOrderIsCanceled = ({
                                 <td align="left" style="padding:0;Margin:0;padding-top:5px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    <strong>PITO CLOUD CANTEEN</strong></p>
+                                    <strong>PITO CLOUD CANTEEN</strong>
+                                  </p>
                                 </td>
                               </tr>
                             </table>
@@ -1125,4 +1117,4 @@ const bookerSubOrderIsCanceled = ({
   `;
 };
 
-export default bookerSubOrderIsCanceled;
+module.exports = { bookerOrderPicking, bookerOrderPickingSubject };

@@ -1,9 +1,11 @@
 import isEmpty from 'lodash/isEmpty';
+import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import { CustomError, EHttpStatusCode } from '@apis/errors';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
+import { fetchListing } from '@services/integrationHelper';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import {
@@ -59,7 +61,31 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const { booking, listing, provider } = txGetter.getFullData();
           const { displayStart } = booking.attributes;
           const timestamp = new Date(displayStart).getTime();
+          const startTimestamp = DateTime.fromMillis(timestamp)
+            .startOf('day')
+            .toMillis();
           const { participantIds = [], orderId } = txGetter.getMetadata();
+          const order = await fetchListing(orderId);
+          const orderListing = Listing(order);
+          const { plans = [] } = orderListing.getMetadata();
+
+          const plan = await fetchListing(plans[0]);
+          const planListing = Listing(plan);
+          const { orderDetail } = planListing.getMetadata();
+          const newOrderDetail = {
+            ...orderDetail,
+            [startTimestamp]: {
+              ...orderDetail[startTimestamp],
+              status: 'canceled',
+            },
+          };
+
+          await integrationSdk.listings.update({
+            id: plans[0],
+            metadata: {
+              orderDetail: newOrderDetail,
+            },
+          });
           await emailSendingFactory(
             EmailTemplateTypes.BOOKER.BOOKER_SUB_ORDER_CANCELED,
             {

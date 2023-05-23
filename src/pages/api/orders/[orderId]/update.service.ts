@@ -1,6 +1,12 @@
 import isEmpty from 'lodash/isEmpty';
+import { DateTime } from 'luxon';
 
 import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
+import {
+  createScheduler,
+  getScheduler,
+  updateScheduler,
+} from '@services/awsEventBrigdeScheduler';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
@@ -28,7 +34,38 @@ const updateOrder = async ({
     const participants: string[] = isEmpty(newSelectedGroup)
       ? getAllCompanyMembers(companyAccount)
       : calculateGroupMembers(companyAccount, newSelectedGroup);
-    const { startDate, endDate } = generalInfo;
+    const { startDate, endDate, deadlineDate } = generalInfo;
+
+    if (deadlineDate) {
+      const reminderTime = DateTime.fromMillis(deadlineDate)
+        .minus({
+          minutes: 30,
+        })
+        .toMillis();
+      try {
+        await getScheduler(`sendRemindPOE_${orderId}`);
+        await updateScheduler({
+          customName: `sendRemindPOE_${orderId}`,
+          timeExpression: formatTimestamp(
+            reminderTime,
+            "yyyy-MM-dd'T'hh:mm:ss",
+          ),
+        });
+      } catch (error) {
+        console.log('create scheduler');
+        await createScheduler({
+          customName: `sendRemindPOE_${orderId}`,
+          timeExpression: formatTimestamp(
+            reminderTime,
+            "yyyy-MM-dd'T'hh:mm:ss",
+          ),
+          params: {
+            orderId,
+          },
+        });
+      }
+    }
+
     const companyDisplayName = companyAccount.attributes.profile.displayName;
 
     const shouldUpdateOrderName = companyDisplayName && startDate && endDate;

@@ -4,6 +4,7 @@ import {
   getTotalInfo,
 } from '@helpers/orderHelper';
 import config from '@src/configs';
+import { ESubOrderStatus } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 import type { TListing, TObject, TQuotation } from '@utils/types';
 
@@ -15,8 +16,11 @@ export const calculateTotalPriceAndDishes = ({
   return Object.entries<TObject>(orderDetail).reduce<TObject>(
     (result, currentOrderDetailEntry) => {
       const [, rawOrderDetailOfDate] = currentOrderDetailEntry;
-      const { memberOrders, restaurant = {} } = rawOrderDetailOfDate;
+      const { memberOrders, restaurant = {}, status } = rawOrderDetailOfDate;
       const { foodList: foodListOfDate } = restaurant;
+      if (status === ESubOrderStatus.CANCELED) {
+        return result;
+      }
 
       const foodDataMap = getFoodDataMap({ foodListOfDate, memberOrders });
       const foodDataList = Object.values(foodDataMap);
@@ -45,6 +49,23 @@ export const calculatePriceQuotationInfo = ({
   const { packagePerMember = 0, memberAmount = 0 } = Listing(
     order as TListing,
   ).getMetadata();
+
+  const currentOrderDetail = Object.entries<TObject>(
+    planOrderDetail,
+  ).reduce<TObject>((result, currentOrderDetailEntry) => {
+    const [subOrderDate, rawOrderDetailOfDate] = currentOrderDetailEntry;
+    const { status } = rawOrderDetailOfDate;
+    if (status === ESubOrderStatus.CANCELED) {
+      return result;
+    }
+
+    return {
+      ...result,
+      [subOrderDate]: {
+        ...rawOrderDetailOfDate,
+      },
+    };
+  }, {});
   const { totalPrice = 0, totalDishes = 0 } = calculateTotalPriceAndDishes({
     orderDetail: planOrderDetail,
   });
@@ -54,7 +75,7 @@ export const calculatePriceQuotationInfo = ({
   const serviceFee = 0;
   const transportFee = 0;
   const promotion = 0;
-  const numberOfOrderDays = Object.keys(planOrderDetail).length;
+  const numberOfOrderDays = Object.keys(currentOrderDetail).length;
   const PITOFee = getPCCFeeByMemberAmount(memberAmount) * numberOfOrderDays;
   const totalWithoutVAT =
     totalPrice + serviceFee + transportFee + PITOFee - promotion;

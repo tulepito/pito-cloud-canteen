@@ -36,6 +36,8 @@ const mapTxTransitionToFirebaseSubOrderStatus = (lastTransition: string) => {
       return ESubOrderTxStatus.DELIVERING;
     case ETransition.COMPLETE_DELIVERY:
       return ESubOrderTxStatus.DELIVERED;
+    case ETransition.OPERATOR_CANCEL_PLAN:
+      return ESubOrderTxStatus.CANCELED;
     default:
       return ESubOrderTxStatus.PENDING;
   }
