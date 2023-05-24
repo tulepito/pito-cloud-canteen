@@ -1,4 +1,5 @@
 /* eslint-disable no-useless-escape */
+import compact from 'lodash/compact';
 import toPairs from 'lodash/toPairs';
 
 import { printHoursToString } from './dates';
@@ -555,7 +556,7 @@ export const replaceSpaceByCommas = (value: string) => {
 
 export const emailsWithCommasValid = (message: string) => (value: string) => {
   if (!value) return VALID;
-  const emails = value.split(',');
+  const emails = compact(value.split(','));
   const validEmails = emails.filter((email) => {
     return email.trim().match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);
   });
