@@ -1,4 +1,6 @@
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
@@ -21,6 +23,7 @@ import css from './CompanyInvitation.module.scss';
 
 const CompanyInvitationPage = () => {
   const router = useRouter();
+  const intl = useIntl();
   const dispatch = useAppDispatch();
   const { isReady } = router;
   const { companyId = '' } = router.query;
@@ -127,14 +130,17 @@ const CompanyInvitationPage = () => {
           isOpen={invitationModalControl.value}
           onClose={invitationModalControl.setFalse}
           coverSrc={invitationCover}
-          modalTitle="Bạn nhận được lời mời tham gia PITO Cloud Canteen"
-          modalDescription={
-            <span>
-              {bookerName} <strong>công ty {companyName}</strong> mời bạn tham
-              gia PITO Cloud Canteen - Đặt bữa ăn hàng ngày. Chọn tham gia để
-              bắt đầu chọn món cho tuần ăn của bạn.
-            </span>
-          }
+          modalTitle={intl.formatMessage({ id: 'InvitationModal.title' })}
+          modalDescription={intl.formatMessage(
+            { id: 'InvitationModal.description' },
+            {
+              span: (msg: ReactNode) => (
+                <span className={css.boldText}>{msg}</span>
+              ),
+              bookerName,
+              companyName,
+            },
+          )}
           rowInformation={rowInformation}
           buttonWrapper={
             <>
