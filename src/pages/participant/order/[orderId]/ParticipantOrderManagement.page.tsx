@@ -1,4 +1,6 @@
+import type { ReactNode } from 'react';
 import React, { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
 // import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
@@ -11,7 +13,7 @@ import CoverModal from '@components/CoverModal/CoverModal';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import Tabs from '@components/Tabs/Tabs';
-import { isCompletePickFood, isOrderOverDeadline } from '@helpers/orderHelper';
+import { isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
@@ -19,7 +21,7 @@ import { currentUserSelector } from '@redux/slices/user.slice';
 import missingPickingOrderCover from '@src/assets/missingPickingCover.png';
 import pickingOrderCover from '@src/assets/pickingOrderCover.png';
 import { participantPaths } from '@src/paths';
-import { CurrentUser, Listing, User } from '@src/utils/data';
+import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import type { TListing, TUser } from '@utils/types';
 
@@ -31,7 +33,7 @@ import css from './ParticipantOrderManagement.module.scss';
 
 const ParticipantOrderManagement = () => {
   const router = useRouter();
-  // const intl = useIntl();
+  const intl = useIntl();
   const dispatch = useAppDispatch();
 
   const { isReady, query } = router;
@@ -61,17 +63,13 @@ const ParticipantOrderManagement = () => {
     (state) => state.ParticipantOrderManagementPage.loadDataInProgress,
   );
 
-  const currentUserGetter = CurrentUser(currentUser);
   const companyUser = User(company as TUser);
   const orderListing = Listing(order as TListing);
-  const planListing = Listing(plans[0] as TListing);
-  const currentUserId = currentUserGetter.getId();
   const { orderName } = orderListing.getPublicData();
   const { selectedGroups = [], deadlineDate } = orderListing.getMetadata();
   const { displayName: bookerName } = companyUser.getProfile();
   const { companyName } = companyUser.getPublicData();
   const { groups = [] } = companyUser.getMetadata();
-  const { orderDetail } = planListing.getMetadata();
 
   const selectedGroupNames =
     selectedGroups.includes('allMembers') || !selectedGroups.length
@@ -100,13 +98,7 @@ const ParticipantOrderManagement = () => {
   ];
 
   const shouldShowMissingPickingOrderModal =
-    !isEmpty(orderDetail) &&
-    !isEmpty(order) &&
-    !isCompletePickFood({
-      participantId: currentUserId,
-      orderDetail,
-    }) &&
-    isOrderOverDeadline(order as TListing);
+    !isEmpty(order) && isOrderOverDeadline(order as TListing);
 
   const pickingOrderModalControl = useBoolean(
     !shouldShowMissingPickingOrderModal,
@@ -180,18 +172,22 @@ const ParticipantOrderManagement = () => {
         isOpen={pickingOrderModalControl.value}
         onClose={pickingOrderModalControl.setFalse}
         coverSrc={pickingOrderCover}
-        modalTitle="Thực đơn của bạn đã sẵn sàng, mời bạn chọn"
-        modalDescription={
-          <span>
-            Đơn hàng <strong>{orderName}</strong> có thời hạn chọn món nhất
-            định. Sau thời hạn này, tuần ăn của bạn sẽ hết hạn và không thể chọn
-            món được nữa. Vui lòng chọn món trước Hạn đặt món.
-          </span>
-        }
+        contentInProgress={loadDataInProgress}
+        modalTitle={intl.formatMessage({ id: 'PickingOrderModal.title' })}
+        modalDescription={intl.formatMessage(
+          { id: 'PickingOrderModal.description' },
+          {
+            span: (msg: ReactNode) => (
+              <span className={css.boldText}>{msg}</span>
+            ),
+            orderName,
+          },
+        )}
         rowInformation={rowInformation}
         buttonWrapper={
           <Button
             className={css.btn}
+            disabled={loadDataInProgress}
             onClick={pickingOrderModalControl.setFalse}>
             Bắt đầu
           </Button>
@@ -202,11 +198,17 @@ const ParticipantOrderManagement = () => {
         isOpen={missingPickingOrderModalControl.value}
         onClose={missingPickingOrderModalControl.setFalse}
         coverSrc={missingPickingOrderCover}
-        modalTitle="Có vẻ bạn đã quên chọn món!"
-        modalDescription="Đừng lo, liên hệ Người đại điện đặt món để được giúp đỡ nhé"
+        contentInProgress={loadDataInProgress}
+        modalTitle={intl.formatMessage({ id: 'MissingOrderModal.title' })}
+        modalDescription={intl.formatMessage({
+          id: 'MissingOrderModal.description',
+        })}
         rowInformation={rowInformation}
         buttonWrapper={
-          <Button className={css.btn} onClick={goToHomePage}>
+          <Button
+            className={css.btn}
+            onClick={goToHomePage}
+            disabled={loadDataInProgress}>
             Về trang chủ
           </Button>
         }

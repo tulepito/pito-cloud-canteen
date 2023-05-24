@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import Skeleton from 'react-loading-skeleton';
 import type { StaticImageData } from 'next/image';
 import Image from 'next/image';
 
@@ -17,6 +18,7 @@ type TCoverModalProps = {
   modalDescription: ReactNode | string;
   rowInformation?: TObject[];
   buttonWrapper?: ReactNode;
+  contentInProgress?: boolean;
 };
 
 const CoverModal: React.FC<TCoverModalProps> = (props) => {
@@ -29,6 +31,7 @@ const CoverModal: React.FC<TCoverModalProps> = (props) => {
     modalDescription,
     rowInformation,
     buttonWrapper,
+    contentInProgress,
   } = props;
 
   return (
@@ -43,15 +46,22 @@ const CoverModal: React.FC<TCoverModalProps> = (props) => {
         <Image className={css.cover} src={coverSrc} alt="cover" />
       </div>
       <div className={css.title}>{modalTitle}</div>
-      <div className={css.description}>{modalDescription}</div>
-      <div className={css.infor}>
-        {rowInformation?.map((item, index) => (
-          <div className={css.row} key={index}>
-            <span>{item.label}</span>
-            <span>{item.value}</span>
+      <RenderWhen condition={!contentInProgress}>
+        <>
+          <div className={css.description}>{modalDescription}</div>
+          <div className={css.infor}>
+            {rowInformation?.map((item, index) => (
+              <div className={css.row} key={index}>
+                <span>{item.label}</span>
+                <span>{item.value}</span>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+        <RenderWhen.False>
+          <Skeleton className={css.contentSkeleton} />
+        </RenderWhen.False>
+      </RenderWhen>
       <RenderWhen condition={!!buttonWrapper}>
         <div className={css.buttonWrapper}>{buttonWrapper}</div>
       </RenderWhen>
