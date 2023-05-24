@@ -14,6 +14,7 @@ import {
   Transaction,
   User,
 } from '@src/utils/data';
+import { VNTimezone } from '@src/utils/dates';
 import { isTransactionsTransitionInvalidTransition } from '@src/utils/errors';
 import { ETransition } from '@src/utils/transaction';
 import type { TError } from '@src/utils/types';
@@ -62,6 +63,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const { displayStart } = booking.attributes;
           const timestamp = new Date(displayStart).getTime();
           const startTimestamp = DateTime.fromMillis(timestamp)
+            .setZone(VNTimezone)
             .startOf('day')
             .toMillis();
           const { participantIds = [], orderId } = txGetter.getMetadata();
