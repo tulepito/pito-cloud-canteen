@@ -178,6 +178,7 @@ const transit = createAsyncThunk(
       const { planId, participantIds = [] } = txGetter.getMetadata();
       const timestamp = new Date(displayStart).getTime();
       const subOrderTimestamp = DateTime.fromMillis(timestamp)
+        .setZone('Asia/Ho_Chi_Minh')
         .startOf('day')
         .toMillis();
       const firebaseSubOrderIdList = participantIds.map(
