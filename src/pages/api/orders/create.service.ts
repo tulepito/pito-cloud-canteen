@@ -1,12 +1,18 @@
 import { isEmpty } from 'lodash';
+import { DateTime } from 'luxon';
 
 import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
+import {
+  createScheduler,
+  getScheduler,
+  updateScheduler,
+} from '@services/awsEventBrigdeScheduler';
 import getAdminAccount from '@services/getAdminAccount';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { ListingTypes } from '@src/types/listingTypes';
-import { formatTimestamp } from '@src/utils/dates';
+import { formatTimestamp, VNTimezone } from '@src/utils/dates';
 import { denormalisedResponseEntities } from '@utils/data';
 import {
   EBookerOrderDraftStates,
@@ -122,8 +128,35 @@ const createOrder = async ({
     },
     { expand: true },
   );
+  const orderListing = denormalisedResponseEntities(orderListingResponse)[0];
+  const orderFlexId = orderListing.id.uuid;
 
-  return denormalisedResponseEntities(orderListingResponse)[0];
+  if (deadlineDate) {
+    const reminderTime = DateTime.fromMillis(deadlineDate)
+      .setZone(VNTimezone)
+      .minus({
+        minutes: 30,
+      })
+      .toMillis();
+    try {
+      await getScheduler(`sendRemindPOE_${orderFlexId}`);
+      await updateScheduler({
+        customName: `sendRemindPOE_${orderFlexId}`,
+        timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
+      });
+    } catch (error) {
+      console.log('create scheduler');
+      await createScheduler({
+        customName: `sendRemindPOE_${orderFlexId}`,
+        timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
+        params: {
+          orderId,
+        },
+      });
+    }
+  }
+
+  return orderListing;
 };
 
 export default createOrder;
