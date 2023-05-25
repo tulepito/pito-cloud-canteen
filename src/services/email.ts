@@ -209,256 +209,260 @@ export const emailSendingFactory = async (
   emailTemplateType: TEmailTemplateTypes,
   emailParams: any = {},
 ) => {
-  switch (emailTemplateType) {
-    case EmailTemplateTypes.BOOKER.BOOKER_ORDER_CREATED: {
-      const { orderId } = emailParams;
-      const emailDataSource = await fetchEmailDataSourceWithOrder({
-        receiver: 'booker',
-        orderId,
-      });
+  try {
+    switch (emailTemplateType) {
+      case EmailTemplateTypes.BOOKER.BOOKER_ORDER_CREATED: {
+        const { orderId } = emailParams;
+        const emailDataSource = await fetchEmailDataSourceWithOrder({
+          receiver: 'booker',
+          orderId,
+        });
 
-      const { bookerUser, orderListing } = emailDataSource;
-      const { orderName } = orderListing.getPublicData();
-      const { email: bookerEmail } = bookerUser?.getAttributes() || {};
-      const emailTemplate = bookerOrderCreated(emailDataSource);
-      const emailDataParams = {
-        receiver: [bookerEmail],
-        subject: bookerOrderCreatedSubject(orderName),
-        content: emailTemplate as string,
-        sender: systemSenderEmail as string,
-      };
-      sendIndividualEmail(emailDataParams);
-      break;
-    }
-    case EmailTemplateTypes.BOOKER.BOOKER_ORDER_PICKING: {
-      const { orderId } = emailParams;
-      const emailDataSource = await fetchEmailDataSourceWithOrder({
-        receiver: 'booker',
-        orderId,
-      });
+        const { bookerUser, orderListing } = emailDataSource;
+        const { orderName } = orderListing.getPublicData();
+        const { email: bookerEmail } = bookerUser?.getAttributes() || {};
+        const emailTemplate = bookerOrderCreated(emailDataSource);
+        const emailDataParams = {
+          receiver: [bookerEmail],
+          subject: bookerOrderCreatedSubject(orderName),
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.BOOKER.BOOKER_ORDER_PICKING: {
+        const { orderId } = emailParams;
+        const emailDataSource = await fetchEmailDataSourceWithOrder({
+          receiver: 'booker',
+          orderId,
+        });
 
-      const { bookerUser, orderListing } = emailDataSource;
-      const { orderName } = orderListing.getPublicData();
-      const { email: bookerEmail } = bookerUser?.getAttributes() || {};
-      const emailTemplate = bookerOrderPicking(emailDataSource);
-      const emailDataParams = {
-        receiver: [bookerEmail],
-        subject: bookerOrderPickingSubject(orderName),
-        content: emailTemplate as string,
-        sender: systemSenderEmail as string,
-      };
-      sendIndividualEmail(emailDataParams);
-      break;
-    }
-    case EmailTemplateTypes.BOOKER.BOOKER_SUB_ORDER_CANCELED: {
-      const { orderId, timestamp } = emailParams;
-      const emailDataSource = await fetchEmailDataSourceWithOrder({
-        receiver: 'booker',
-        orderId,
-      });
+        const { bookerUser, orderListing } = emailDataSource;
+        const { orderName } = orderListing.getPublicData();
+        const { email: bookerEmail } = bookerUser?.getAttributes() || {};
+        const emailTemplate = bookerOrderPicking(emailDataSource);
+        const emailDataParams = {
+          receiver: [bookerEmail],
+          subject: bookerOrderPickingSubject(orderName),
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.BOOKER.BOOKER_SUB_ORDER_CANCELED: {
+        const { orderId, timestamp } = emailParams;
+        const emailDataSource = await fetchEmailDataSourceWithOrder({
+          receiver: 'booker',
+          orderId,
+        });
 
-      const { bookerUser } = emailDataSource;
-      const { email: bookerEmail } = bookerUser?.getAttributes() || {};
-      const emailTemplate = bookerSubOrderIsCanceled({
-        ...emailDataSource,
-        timestamp,
-      });
-      const subOrderDate = formatTimestamp(timestamp);
-      const emailDataParams = {
-        receiver: [bookerEmail],
-        subject: bookerSubOrderIsCanceledSubject(subOrderDate),
-        content: emailTemplate as string,
-        sender: systemSenderEmail as string,
-      };
-      sendIndividualEmail(emailDataParams);
-      break;
-    }
-    case EmailTemplateTypes.BOOKER.BOOKER_ORDER_SUCCESS: {
-      const { orderId } = emailParams;
-      const emailDataSource = await fetchEmailDataSourceWithOrder({
-        receiver: 'booker',
-        orderId,
-      });
+        const { bookerUser } = emailDataSource;
+        const { email: bookerEmail } = bookerUser?.getAttributes() || {};
+        const emailTemplate = bookerSubOrderIsCanceled({
+          ...emailDataSource,
+          timestamp,
+        });
+        const subOrderDate = formatTimestamp(timestamp);
+        const emailDataParams = {
+          receiver: [bookerEmail],
+          subject: bookerSubOrderIsCanceledSubject(subOrderDate),
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.BOOKER.BOOKER_ORDER_SUCCESS: {
+        const { orderId } = emailParams;
+        const emailDataSource = await fetchEmailDataSourceWithOrder({
+          receiver: 'booker',
+          orderId,
+        });
 
-      const { bookerUser, orderListing } = emailDataSource;
-      const { orderName } = orderListing.getPublicData();
-      const { email: bookerEmail } = bookerUser?.getAttributes() || {};
-      const emailTemplate = bookerOrderSuccess(emailDataSource);
-      const emailDataParams = {
-        receiver: [bookerEmail],
-        subject: bookerOrderSuccessSubject(orderName),
-        content: emailTemplate as string,
-        sender: systemSenderEmail as string,
-      };
-      sendIndividualEmail(emailDataParams);
-      break;
-    }
-    case EmailTemplateTypes.BOOKER.BOOKER_ACCOUNT_CREATED: {
-      const { password, companyId } = emailParams;
-      const emailDataSource: any = await fetchEmailDataSourceWithCompany({
-        companyId,
-        receiver: 'booker',
-      });
+        const { bookerUser, orderListing } = emailDataSource;
+        const { orderName } = orderListing.getPublicData();
+        const { email: bookerEmail } = bookerUser?.getAttributes() || {};
+        const emailTemplate = bookerOrderSuccess(emailDataSource);
+        const emailDataParams = {
+          receiver: [bookerEmail],
+          subject: bookerOrderSuccessSubject(orderName),
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.BOOKER.BOOKER_ACCOUNT_CREATED: {
+        const { password, companyId } = emailParams;
+        const emailDataSource: any = await fetchEmailDataSourceWithCompany({
+          companyId,
+          receiver: 'booker',
+        });
 
-      const { companyUser } = emailDataSource;
-      const { email: companyEmail } = companyUser?.getAttributes() || {};
-      const emailTemplate = bookerAccountCreated({
-        ...emailDataSource,
-        password,
-      });
-      const emailDataParams = {
-        receiver: [companyEmail],
-        subject: bookerAccountCreatedSubject,
-        content: emailTemplate as string,
-        sender: systemSenderEmail as string,
-      };
-      sendIndividualEmail(emailDataParams);
-      break;
-    }
-    case EmailTemplateTypes.BOOKER.BOOKER_ACCOUNT_SUSPENDED: {
-      const { suspendedTimestamp, companyId } = emailParams;
-      const emailDataSource: any = await fetchEmailDataSourceWithCompany({
-        companyId,
-        receiver: 'booker',
-      });
+        const { companyUser } = emailDataSource;
+        const { email: companyEmail } = companyUser?.getAttributes() || {};
+        const emailTemplate = bookerAccountCreated({
+          ...emailDataSource,
+          password,
+        });
+        const emailDataParams = {
+          receiver: [companyEmail],
+          subject: bookerAccountCreatedSubject,
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.BOOKER.BOOKER_ACCOUNT_SUSPENDED: {
+        const { suspendedTimestamp, companyId } = emailParams;
+        const emailDataSource: any = await fetchEmailDataSourceWithCompany({
+          companyId,
+          receiver: 'booker',
+        });
 
-      const { companyUser } = emailDataSource;
-      const { email: companyEmail } = companyUser?.getAttributes() || {};
-      const emailTemplate = bookerAccountSuspended({
-        ...emailDataSource,
-        suspendedTimestamp,
-      });
-      const emailDataParams = {
-        receiver: [companyEmail],
-        subject: bookerAccountSuspendedSubject,
-        content: emailTemplate as string,
-        sender: systemSenderEmail as string,
-      };
-      sendIndividualEmail(emailDataParams);
-      break;
-    }
-    case EmailTemplateTypes.PARTICIPANT.PARTICIPANT_ORDER_PICKING: {
-      const { orderId, participantId, bookerNote } = emailParams;
-      const emailDataSource = await fetchEmailDataSourceWithOrder({
-        receiver: 'participant',
-        orderId,
-        participantId,
-      });
+        const { companyUser } = emailDataSource;
+        const { email: companyEmail } = companyUser?.getAttributes() || {};
+        const emailTemplate = bookerAccountSuspended({
+          ...emailDataSource,
+          suspendedTimestamp,
+        });
+        const emailDataParams = {
+          receiver: [companyEmail],
+          subject: bookerAccountSuspendedSubject,
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.PARTICIPANT.PARTICIPANT_ORDER_PICKING: {
+        const { orderId, participantId, bookerNote } = emailParams;
+        const emailDataSource = await fetchEmailDataSourceWithOrder({
+          receiver: 'participant',
+          orderId,
+          participantId,
+        });
 
-      const { participantUser, orderListing } = emailDataSource;
-      const { orderName } = orderListing.getPublicData();
-      const { email: participantEmail } =
-        participantUser?.getAttributes() || {};
-      const emailTemplate = participantOrderPicking({
-        ...emailDataSource,
-        bookerNote,
-      });
-      const emailDataParams = {
-        receiver: [participantEmail],
-        subject: participantOrderPickingSubject(orderName),
-        content: emailTemplate as string,
-        sender: systemSenderEmail as string,
-      };
-      sendIndividualEmail(emailDataParams);
-      break;
-    }
-    case EmailTemplateTypes.PARTICIPANT.PARTICIPANT_COMPANY_INVITATION: {
-      const { participantId, companyId } = emailParams;
-      const emailDataSource: any = await fetchEmailDataSourceWithCompany({
-        receiver: 'participant',
-        participantId,
-        companyId,
-      });
+        const { participantUser, orderListing } = emailDataSource;
+        const { orderName } = orderListing.getPublicData();
+        const { email: participantEmail } =
+          participantUser?.getAttributes() || {};
+        const emailTemplate = participantOrderPicking({
+          ...emailDataSource,
+          bookerNote,
+        });
+        const emailDataParams = {
+          receiver: [participantEmail],
+          subject: participantOrderPickingSubject(orderName),
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.PARTICIPANT.PARTICIPANT_COMPANY_INVITATION: {
+        const { participantId, companyId } = emailParams;
+        const emailDataSource: any = await fetchEmailDataSourceWithCompany({
+          receiver: 'participant',
+          participantId,
+          companyId,
+        });
 
-      const { participantUser, companyUser } = emailDataSource;
-      const { companyName } = companyUser?.getPublicData() || {};
-      const { email: participantEmail } =
-        participantUser?.getAttributes() || {};
-      const emailTemplate = participantCompanyInvitation(emailDataSource);
-      const emailDataParams = {
-        receiver: [participantEmail],
-        subject: participantCompanyInvitationSubject(companyName),
-        content: emailTemplate as string,
-        sender: systemSenderEmail as string,
-      };
-      sendIndividualEmail(emailDataParams);
-      break;
-    }
-    case EmailTemplateTypes.PARTICIPANT.PARTICIPANT_SUB_ORDER_CANCELED: {
-      const { participantId, orderId, timestamp } = emailParams;
-      const emailDataSource: any = await fetchEmailDataSourceWithOrder({
-        receiver: 'participant',
-        participantId,
-        orderId,
-      });
+        const { participantUser, companyUser } = emailDataSource;
+        const { companyName } = companyUser?.getPublicData() || {};
+        const { email: participantEmail } =
+          participantUser?.getAttributes() || {};
+        const emailTemplate = participantCompanyInvitation(emailDataSource);
+        const emailDataParams = {
+          receiver: [participantEmail],
+          subject: participantCompanyInvitationSubject(companyName),
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.PARTICIPANT.PARTICIPANT_SUB_ORDER_CANCELED: {
+        const { participantId, orderId, timestamp } = emailParams;
+        const emailDataSource: any = await fetchEmailDataSourceWithOrder({
+          receiver: 'participant',
+          participantId,
+          orderId,
+        });
 
-      const { participantUser } = emailDataSource;
-      const { email: participantEmail } =
-        participantUser?.getAttributes() || {};
-      const emailTemplate = participantSubOrderIsCanceled({
-        ...emailDataSource,
-        timestamp,
-      });
-      const subOrderDate = formatTimestamp(timestamp);
-      const emailDataParams = {
-        receiver: [participantEmail],
-        subject: participantSubOrderIsCanceledSubject(subOrderDate),
-        content: emailTemplate as string,
-        sender: systemSenderEmail as string,
-      };
-      sendIndividualEmail(emailDataParams);
-      break;
+        const { participantUser } = emailDataSource;
+        const { email: participantEmail } =
+          participantUser?.getAttributes() || {};
+        const emailTemplate = participantSubOrderIsCanceled({
+          ...emailDataSource,
+          timestamp,
+        });
+        const subOrderDate = formatTimestamp(timestamp);
+        const emailDataParams = {
+          receiver: [participantEmail],
+          subject: participantSubOrderIsCanceledSubject(subOrderDate),
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.PARTNER.PARTNER_NEW_ORDER_APPEAR: {
+        const { partnerId, orderId, promotion = 0, restaurantId } = emailParams;
+        const emailDataSource: any = await fetchEmailDataSourceWithOrder({
+          receiver: 'partner',
+          partnerId,
+          orderId,
+          restaurantId,
+        });
+        const { partnerUser, orderListing } = emailDataSource;
+        const { orderName } = orderListing.getPublicData();
+        const { email: partnerEmail } = partnerUser?.getAttributes() || {};
+        const emailTemplate = partnerNewOrderAppear({
+          ...emailDataSource,
+          promotion,
+        });
+        const emailDataParams = {
+          receiver: [partnerEmail],
+          subject: partnerNewOrderAppearSubject(orderName),
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED: {
+        const { partnerId, orderId, restaurantId, timestamp } = emailParams;
+        const emailDataSource: any = await fetchEmailDataSourceWithOrder({
+          receiver: 'partner',
+          partnerId,
+          orderId,
+          restaurantId,
+        });
+        const { partnerUser } = emailDataSource;
+        const { email: partnerEmail } = partnerUser?.getAttributes() || {};
+        const emailTemplate = partnerSubOrderIsCanceled({
+          ...emailDataSource,
+          timestamp,
+        });
+        const subOrderDate = formatTimestamp(timestamp);
+        const emailDataParams = {
+          receiver: [partnerEmail],
+          subject: partnerSubOrderIsCanceledSubject(subOrderDate),
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      default: {
+        break;
+      }
     }
-    case EmailTemplateTypes.PARTNER.PARTNER_NEW_ORDER_APPEAR: {
-      const { partnerId, orderId, promotion = 0, restaurantId } = emailParams;
-      const emailDataSource: any = await fetchEmailDataSourceWithOrder({
-        receiver: 'partner',
-        partnerId,
-        orderId,
-        restaurantId,
-      });
-      const { partnerUser, orderListing } = emailDataSource;
-      const { orderName } = orderListing.getPublicData();
-      const { email: partnerEmail } = partnerUser?.getAttributes() || {};
-      const emailTemplate = partnerNewOrderAppear({
-        ...emailDataSource,
-        promotion,
-      });
-      const emailDataParams = {
-        receiver: [partnerEmail],
-        subject: partnerNewOrderAppearSubject(orderName),
-        content: emailTemplate as string,
-        sender: systemSenderEmail as string,
-      };
-      sendIndividualEmail(emailDataParams);
-      break;
-    }
-    case EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED: {
-      const { partnerId, orderId, restaurantId, timestamp } = emailParams;
-      const emailDataSource: any = await fetchEmailDataSourceWithOrder({
-        receiver: 'partner',
-        partnerId,
-        orderId,
-        restaurantId,
-      });
-      const { partnerUser } = emailDataSource;
-      const { email: partnerEmail } = partnerUser?.getAttributes() || {};
-      const emailTemplate = partnerSubOrderIsCanceled({
-        ...emailDataSource,
-        timestamp,
-      });
-      const subOrderDate = formatTimestamp(timestamp);
-      const emailDataParams = {
-        receiver: [partnerEmail],
-        subject: partnerSubOrderIsCanceledSubject(subOrderDate),
-        content: emailTemplate as string,
-        sender: systemSenderEmail as string,
-      };
-      sendIndividualEmail(emailDataParams);
-      break;
-    }
-    default: {
-      break;
-    }
+  } catch (error) {
+    console.error('emailSendingFactory: ', error);
   }
 };
