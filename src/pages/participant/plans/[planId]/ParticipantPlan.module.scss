@@ -2,6 +2,13 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 
+.goBack {
+  @include textTemplate(16px, $fontWeightBold, 24px);
+  cursor: pointer;
+  @include flexAlign(center);
+  gap: 8px;
+}
+
 .root {
   .leftSection {
     display: flex;
@@ -55,9 +62,12 @@
     .timeLeft {
       @include textTemplate(14px, 400, 20px);
       margin-bottom: 4px;
+      display: flex;
+      align-items: flex-start;
+      column-gap: 13px;
 
       .timeLeftTime {
-        color: $labelBlue2;
+        color: $primaryPri2;
         @include textTemplate(18px, 700, 24px);
       }
     }
@@ -90,7 +100,7 @@
   .infoSection {
     display: none;
     position: fixed;
-    top: 0px;
+    top: 0;
     right: 0;
     bottom: 0;
     left: 0;

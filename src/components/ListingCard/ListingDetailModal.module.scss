@@ -38,6 +38,7 @@
       width: calc(100vw - 32px) !important;
       height: 343px !important;
       position: relative !important;
+      object-fit: cover;
 
       @include viewportMedium {
         width: 100% !important;

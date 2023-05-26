@@ -1,8 +1,12 @@
 import type { Event } from 'react-big-calendar';
 import { createSlice } from '@reduxjs/toolkit';
 import flatten from 'lodash/flatten';
+import uniqBy from 'lodash/uniqBy';
 
-import { loadOrderDataApi } from '@apis/index';
+import type { ParticipantSubOrderAddDocumentApiBody } from '@apis/firebaseApi';
+import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
+import { loadOrderDataApi, updateParticipantOrderApi } from '@apis/index';
+import { participantPostRatingApi } from '@apis/participantApi';
 import { fetchTxApi } from '@apis/txApi';
 import { disableWalkthroughApi, fetchSearchFilterApi } from '@apis/userApi';
 import { getParticipantOrdersQuery } from '@helpers/listingSearchQuery';
@@ -38,11 +42,20 @@ type TOrderListState = {
   fetchOrdersInProgress: boolean;
   fetchOrdersError: any;
 
-  subOrderTx: TTransaction;
+  subOrderTxs: TTransaction[];
   fetchSubOrderTxInProgress: boolean;
   fetchSubOrderTxError: any;
 
   colorOrderMap: TObject;
+
+  participantPostRatingInProgress: boolean;
+  participantPostRatingError: any;
+
+  addSubOrderDocumentToFirebaseInProgress: boolean;
+  addSubOrderDocumentToFirebaseError: any;
+
+  updateSubOrderInProgress: boolean;
+  updateSubOrderError: any;
 };
 const initialState: TOrderListState = {
   nutritions: [],
@@ -63,11 +76,20 @@ const initialState: TOrderListState = {
   fetchOrdersInProgress: false,
   fetchOrdersError: null,
 
-  subOrderTx: null!,
+  subOrderTxs: [],
   fetchSubOrderTxInProgress: false,
   fetchSubOrderTxError: null,
 
   colorOrderMap: {},
+
+  participantPostRatingInProgress: false,
+  participantPostRatingError: null,
+
+  addSubOrderDocumentToFirebaseInProgress: false,
+  addSubOrderDocumentToFirebaseError: null,
+
+  updateSubOrderInProgress: false,
+  updateSubOrderError: null,
 };
 
 // ================ Thunk types ================ //
@@ -75,8 +97,13 @@ const FETCH_ATTRIBUTES = 'app/ParticipantOrderList/FETCH_ATTRIBUTES';
 const UPDATE_PROFILE = 'app/ParticipantOrderList/UPDATE_PROFILE';
 const DISABLE_WALKTHROUGH = 'app/ParticipantOrderList/DISABLE_WALKTHROUGH';
 const FETCH_ORDERS = 'app/ParticipantOrderList/FETCH_ORDERS';
+const UPDATE_SUB_ORDER = 'app/ParticipantOrderList/UPDATE_SUB_ORDER';
 const FETCH_TRANSACTION_BY_SUB_ORDER =
   'app/ParticipantOrderList/FETCH_TRANSACTION_BY_SUB_ORDER';
+const POST_PARTICIPANT_RATING =
+  'app/ParticipantOrderList/POST_PARTICIPANT_RATING';
+const ADD_SUB_ORDER_DOCUMENT_TO_FIREBASE =
+  'app/ParticipantOrderList/ADD_SUB_ORDER_DOCUMENT_TO_FIREBASE';
 // ================ Async thunks ================ //
 const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
   const { data: response } = await fetchSearchFilterApi();
@@ -152,13 +179,73 @@ const fetchOrders = createAsyncThunk(
   },
 );
 
+const updateSubOrder = createAsyncThunk(
+  UPDATE_SUB_ORDER,
+  async (data: { orderId: string; updateValues: TObject }, { getState }) => {
+    const { allPlans } = getState().ParticipantOrderList;
+    const { orderId, updateValues } = data;
+    const { data: updateResponse } = await updateParticipantOrderApi(
+      orderId,
+      updateValues,
+    );
+
+    const { plan } = updateResponse;
+
+    const newAllPlans = allPlans.map((oldPlan: any) => {
+      if (oldPlan.id.uuid === plan.id.uuid) {
+        return plan;
+      }
+
+      return oldPlan;
+    });
+
+    return {
+      allPlans: newAllPlans,
+    };
+  },
+);
+
 const fetchTransactionBySubOrder = createAsyncThunk(
   FETCH_TRANSACTION_BY_SUB_ORDER,
-  async (txId: string) => {
-    if (!txId) return null;
-    const txResponse = await fetchTxApi(txId);
+  async (txIds: string[], { getState }) => {
+    const { subOrderTxs = [] } = getState().ParticipantOrderList;
+    if (txIds.length === 0) return subOrderTxs;
+    const txsResponse = await Promise.all(
+      txIds.map(async (txId: string) => {
+        const { data: txResponse } = await fetchTxApi(txId);
 
-    return txResponse.data;
+        return txResponse;
+      }),
+    );
+
+    const newSubOrderTxs: TTransaction[] = uniqBy(
+      subOrderTxs.concat(txsResponse),
+      'id.uuid',
+    );
+
+    return newSubOrderTxs;
+  },
+);
+
+const postParticipantRating = createAsyncThunk(
+  POST_PARTICIPANT_RATING,
+  async (payload: any, { getState }) => {
+    const { images } = getState().uploadImage;
+    const bodyApi = {
+      ...payload,
+      imageIdList: Object.values(images).map((image: any) => image.imageId),
+    };
+
+    const { data: response } = await participantPostRatingApi(bodyApi);
+
+    return response;
+  },
+);
+
+const addSubOrderDocumentToFirebase = createAsyncThunk(
+  ADD_SUB_ORDER_DOCUMENT_TO_FIREBASE,
+  async (payload: ParticipantSubOrderAddDocumentApiBody) => {
+    await participantSubOrderAddDocumentApi(payload);
   },
 );
 
@@ -168,6 +255,9 @@ export const OrderListThunks = {
   disableWalkthrough,
   fetchOrders,
   fetchTransactionBySubOrder,
+  postParticipantRating,
+  addSubOrderDocumentToFirebase,
+  updateSubOrder,
 };
 
 // ================ Slice ================ //
@@ -209,9 +299,9 @@ const OrderListSlice = createSlice({
         state.nutritions = nutritions;
         state.fetchAttributesInProgress = false;
       })
-      .addCase(fetchAttributes.rejected, (state) => {
+      .addCase(fetchAttributes.rejected, (state, { error }) => {
         state.fetchAttributesInProgress = false;
-        state.fetchAttributesError = true;
+        state.fetchAttributesError = error.message;
       })
 
       .addCase(updateProfile.pending, (state) => {
@@ -221,9 +311,9 @@ const OrderListSlice = createSlice({
       .addCase(updateProfile.fulfilled, (state) => {
         state.updateProfileInProgress = false;
       })
-      .addCase(updateProfile.rejected, (state) => {
+      .addCase(updateProfile.rejected, (state, { error }) => {
         state.updateProfileInProgress = false;
-        state.updateProfileError = true;
+        state.updateProfileError = error.message;
       })
 
       .addCase(disableWalkthrough.pending, (state) => {
@@ -233,9 +323,9 @@ const OrderListSlice = createSlice({
       .addCase(disableWalkthrough.fulfilled, (state) => {
         state.disableWalkthroughInProgress = false;
       })
-      .addCase(disableWalkthrough.rejected, (state) => {
+      .addCase(disableWalkthrough.rejected, (state, { error }) => {
         state.disableWalkthroughInProgress = false;
-        state.disableWalkthroughError = true;
+        state.disableWalkthroughError = error.message;
       })
 
       .addCase(fetchOrders.pending, (state) => {
@@ -249,9 +339,9 @@ const OrderListSlice = createSlice({
         state.allPlans = payload.allPlans;
         state.mappingSubOrderToOrder = payload.mappingSubOrderToOrder;
       })
-      .addCase(fetchOrders.rejected, (state) => {
+      .addCase(fetchOrders.rejected, (state, { error }) => {
         state.fetchOrdersInProgress = false;
-        state.fetchOrdersError = true;
+        state.fetchOrdersError = error.message;
       })
 
       .addCase(fetchTransactionBySubOrder.pending, (state) => {
@@ -260,11 +350,48 @@ const OrderListSlice = createSlice({
       })
       .addCase(fetchTransactionBySubOrder.fulfilled, (state, { payload }) => {
         state.fetchSubOrderTxInProgress = false;
-        state.subOrderTx = payload;
+        state.subOrderTxs = payload;
       })
-      .addCase(fetchTransactionBySubOrder.rejected, (state) => {
+      .addCase(fetchTransactionBySubOrder.rejected, (state, { error }) => {
         state.fetchSubOrderTxInProgress = false;
-        state.fetchSubOrderTxError = true;
+        state.fetchSubOrderTxError = error.message;
+      })
+
+      .addCase(postParticipantRating.pending, (state) => {
+        state.participantPostRatingInProgress = true;
+        state.participantPostRatingError = false;
+      })
+      .addCase(postParticipantRating.fulfilled, (state) => {
+        state.participantPostRatingInProgress = false;
+      })
+      .addCase(postParticipantRating.rejected, (state, { error }) => {
+        state.participantPostRatingInProgress = false;
+        state.participantPostRatingError = error.message;
+      })
+
+      .addCase(addSubOrderDocumentToFirebase.pending, (state) => {
+        state.addSubOrderDocumentToFirebaseInProgress = true;
+        state.addSubOrderDocumentToFirebaseError = false;
+      })
+      .addCase(addSubOrderDocumentToFirebase.fulfilled, (state) => {
+        state.addSubOrderDocumentToFirebaseInProgress = false;
+      })
+      .addCase(addSubOrderDocumentToFirebase.rejected, (state, { error }) => {
+        state.addSubOrderDocumentToFirebaseInProgress = false;
+        state.addSubOrderDocumentToFirebaseError = error.message;
+      })
+
+      .addCase(updateSubOrder.pending, (state) => {
+        state.updateSubOrderInProgress = true;
+        state.updateSubOrderError = false;
+      })
+      .addCase(updateSubOrder.fulfilled, (state, { payload }) => {
+        state.updateSubOrderInProgress = false;
+        state.allPlans = payload.allPlans;
+      })
+      .addCase(updateSubOrder.rejected, (state, { error }) => {
+        state.updateSubOrderInProgress = false;
+        state.updateSubOrderError = error.message;
       });
   },
 });

@@ -27,6 +27,7 @@ const StatusToBadgeTypeMap = {
   [ETransition.COMPLETE_DELIVERY]: EBadgeType.success,
   [ETransition.EXPIRED_START_DELIVERY]: EBadgeType.default,
   [ETransition.CANCEL_DELIVERY]: EBadgeType.danger,
+  [ETransition.OPERATOR_CANCEL_PLAN]: EBadgeType.danger,
 };
 
 const txStateToLabelMapper = (lastTransition: string) => {
@@ -39,6 +40,8 @@ const txStateToLabelMapper = (lastTransition: string) => {
       return 'StateItemToolTip.expire';
     case ETransition.CANCEL_DELIVERY:
       return 'StateItemToolTip.stateCanceled';
+    case ETransition.OPERATOR_CANCEL_PLAN:
+      return 'StateItemToolTip.stateSubOrderCanceled';
 
     default:
       return 'StateItemToolTip.stateDelivering';
@@ -58,7 +61,7 @@ const OrderEventCardStatus: React.FC<TOrderEventCardStatusProps> = ({
       {subOrderTx && !isSubOrderTxInitial ? (
         <Badge
           className={css.badge}
-          type={lastTransition}
+          type={StatusToBadgeTypeMap[lastTransition]}
           label={intl.formatMessage({
             id: txStateToLabelMapper(lastTransition!),
           })}

@@ -2,6 +2,8 @@ import { parseThousandNumber } from '@helpers/format';
 import { calculatePriceQuotationInfo } from '@pages/company/orders/[orderId]/picking/helpers/cartInfoHelper';
 
 import { formatTimestamp } from '../dates';
+import { ESubOrderStatus } from '../enums';
+import type { TObject } from '../types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
 
@@ -13,7 +15,8 @@ type BookerSubOrderIsCanceledParams = {
   timestamp: number;
 };
 
-export const bookerSubOrderIsCanceledSubject = 'Ngày ăn bị huỷ';
+export const bookerSubOrderIsCanceledSubject = (subOrderDate: string) =>
+  `Ngày ăn ${subOrderDate} bị huỷ`;
 
 const bookerSubOrderIsCanceled = ({
   bookerUser,
@@ -25,12 +28,28 @@ const bookerSubOrderIsCanceled = ({
   const orderId = orderListing.getId();
   const { orderName } = orderListing.getPublicData();
   const { orderDetail: planOrderDetail } = planListing.getMetadata();
+  const currentOrderDetail = Object.entries<TObject>(
+    planOrderDetail,
+  ).reduce<TObject>((result, currentOrderDetailEntry) => {
+    const [subOrderDate, rawOrderDetailOfDate] = currentOrderDetailEntry;
+    const { status } = rawOrderDetailOfDate;
+    if (status === ESubOrderStatus.CANCELED) {
+      return result;
+    }
+
+    return {
+      ...result,
+      [subOrderDate]: {
+        ...rawOrderDetailOfDate,
+      },
+    };
+  }, {});
   const { totalPrice, totalDishes, VATFee, PITOFee, totalWithVAT } =
     calculatePriceQuotationInfo({
       planOrderDetail,
       order: orderListing.getFullData(),
     });
-  const numberOfSubOrders = Object.keys(planOrderDetail).length || 0;
+  const numberOfSubOrders = Object.keys(currentOrderDetail).length || 0;
   const formatSubOrderDate = formatTimestamp(timestamp);
   const formattedPCCFee = `${parseThousandNumber(PITOFee)}đ`;
   const formattedVatFee = `${parseThousandNumber(VATFee)}đ`;

@@ -3,12 +3,15 @@ import { useEffect, useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import { Views } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
+import compact from 'lodash/compact';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
+import { useRouter } from 'next/router';
 
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
+import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
@@ -16,7 +19,6 @@ import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
-import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { CurrentUser, Listing } from '@src/utils/data';
 import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
 import { EParticipantOrderStatus } from '@src/utils/enums';
@@ -27,8 +29,10 @@ import ParticipantToolbar from '../components/ParticipantToolbar/ParticipantTool
 import OnboardingOrderModal from './components/OnboardingOrderModal/OnboardingOrderModal';
 import OnboardingTour from './components/OnboardingTour/OnboardingTour';
 import OrderListHeaderSection from './components/OrderListHeaderSection/OrderListHeaderSection';
+import RatingSubOrderModal from './components/RatingSubOrderModal/RatingSubOrderModal';
 import SubOrderCard from './components/SubOrderCard/SubOrderCard';
 import SubOrderDetailModal from './components/SubOrderDetailModal/SubOrderDetailModal';
+import SuccessRatingModal from './components/SuccessRatingModal/SuccessRatingModal';
 import UpdateProfileModal from './components/UpdateProfileModal/UpdateProfileModal';
 import WelcomeModal from './components/WelcomeModal/WelcomeModal';
 import { OrderListActions, OrderListThunks } from './OrderList.slice';
@@ -37,13 +41,19 @@ import css from './OrderList.module.scss';
 
 const OrderListPage = () => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { planId: planIdFromQuery, timestamp: timestampFromQuery } =
+    router.query;
 
   const updateProfileModalControl = useBoolean();
   const onBoardingModal = useBoolean();
   const tourControl = useBoolean();
+  const ratingSubOrderModalControl = useBoolean();
+  const { selectedDay } = useSelectDay();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const subOrderDetailModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
+  const successRatingModalControl = useBoolean();
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const orders = useAppSelector(
     (state) => state.ParticipantOrderList.orders,
@@ -64,12 +74,19 @@ const OrderListPage = () => {
     (state) => state.ParticipantOrderList.mappingSubOrderToOrder,
     shallowEqual,
   );
-  const updateOrderInProgress = useAppSelector(
-    (state) => state.ParticipantOrderManagementPage.updateOrderInProgress,
+  const updateSubOrderInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.updateSubOrderInProgress,
   );
-  const selectedDay = useAppSelector((state) => state.Calendar.selectedDay);
   const colorOrderMap = useAppSelector(
     (state) => state.ParticipantOrderList.colorOrderMap,
+  );
+  const addSubOrderDocumentToFirebaseInProgress = useAppSelector(
+    (state) =>
+      state.ParticipantOrderList.addSubOrderDocumentToFirebaseInProgress,
+  );
+
+  const participantPostRatingInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
 
   const currentUserGetter = CurrentUser(currentUser!);
@@ -87,7 +104,11 @@ const OrderListPage = () => {
     dispatch(OrderListThunks.fetchAttributes());
   }, []);
 
-  const showLoadingModal = fetchOrdersInProgress || updateOrderInProgress;
+  const showLoadingModal =
+    fetchOrdersInProgress ||
+    updateSubOrderInProgress ||
+    addSubOrderDocumentToFirebaseInProgress ||
+    participantPostRatingInProgress;
 
   const events = subOrders.map((subOrder: any) => {
     const planKey = Object.keys(subOrder)[0];
@@ -122,7 +143,10 @@ const OrderListPage = () => {
         ? DateTime.fromMillis(+deadlineDate)
         : DateTime.fromMillis(+planItemKey).minus({ day: 2 });
 
-      const pickFoodStatus = isOver(expiredTime.toMillis())
+      const alreadyPickFood = !!foodSelection?.foodId;
+      const pickFoodStatus = alreadyPickFood
+        ? EParticipantOrderStatus.joined
+        : isOver(expiredTime.toMillis())
         ? EParticipantOrderStatus.expired
         : foodSelection?.status;
 
@@ -165,9 +189,41 @@ const OrderListPage = () => {
   });
 
   const flattenEvents = flatten<Event>(events);
+
   const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) =>
     isSameDate(_event.start, selectedDay),
   );
+
+  const subOrdersFromSelectedDayTxIds = compact(
+    subOrdersFromSelectedDay.map(
+      (_event: any) => _event.resource.transactionId,
+    ),
+  );
+
+  useEffect(() => {
+    if (subOrdersFromSelectedDayTxIds) {
+      dispatch(
+        OrderListThunks.fetchTransactionBySubOrder(
+          subOrdersFromSelectedDayTxIds,
+        ),
+      );
+    }
+  }, [subOrdersFromSelectedDayTxIds]);
+  useEffect(() => {
+    if (planIdFromQuery && timestampFromQuery) {
+      const planId = planIdFromQuery as string;
+      const timestamp = timestampFromQuery as string;
+      const event = flattenEvents.find(
+        (_event) =>
+          _event.resource.planId === planId &&
+          _event.resource.timestamp === timestamp,
+      );
+      if (event) {
+        setSelectedEvent(event);
+        subOrderDetailModalControl.setTrue();
+      }
+    }
+  }, [planIdFromQuery, timestampFromQuery]);
 
   const openUpdateProfileModal = () => {
     updateProfileModalControl.setTrue();
@@ -195,7 +251,7 @@ const OrderListPage = () => {
       orderId,
     };
 
-    dispatch(participantOrderManagementThunks.updateOrder(payload));
+    dispatch(OrderListThunks.updateSubOrder(payload));
   };
   const handleOnBoardingModalOpen = () => {
     onBoardingModal.setTrue();
@@ -204,12 +260,16 @@ const OrderListPage = () => {
     }, 1000);
   };
 
+  const openRatingSubOrderModal = () => {
+    ratingSubOrderModalControl.setTrue();
+  };
+
   return (
     <ParticipantLayout>
       <OrderListHeaderSection />
       <div className={css.calendarContainer}>
         <CalendarDashboard
-          // anchorDate={anchorDate}
+          anchorDate={selectedDay}
           events={flattenEvents}
           // companyLogo={sectionCompanyBranding}
           renderEvent={OrderEventCard}
@@ -264,12 +324,26 @@ const OrderListPage = () => {
         </>
       </RenderWhen>
       <RenderWhen condition={!!selectedEvent}>
-        <SubOrderDetailModal
-          isOpen={subOrderDetailModalControl.value}
-          onClose={subOrderDetailModalControl.setFalse}
-          event={selectedEvent!}
-        />
+        <>
+          <SubOrderDetailModal
+            isOpen={subOrderDetailModalControl.value}
+            onClose={subOrderDetailModalControl.setFalse}
+            event={selectedEvent!}
+            openRatingSubOrderModal={openRatingSubOrderModal}
+          />
+          <RatingSubOrderModal
+            isOpen={ratingSubOrderModalControl.value}
+            onClose={ratingSubOrderModalControl.setFalse}
+            selectedEvent={selectedEvent}
+            currentUserId={currentUserId}
+            openSuccessRatingModal={successRatingModalControl.setTrue}
+          />
+        </>
       </RenderWhen>
+      <SuccessRatingModal
+        isOpen={successRatingModalControl.value}
+        onClose={successRatingModalControl.setFalse}
+      />
 
       <BottomNavigationBar />
       <LoadingModal isOpen={showLoadingModal} />

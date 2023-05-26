@@ -13,6 +13,10 @@
   modal footer height (20px)
   */
   margin-top: 24px;
+
+  @include viewportMedium {
+    height: calc(90vh - 92px);
+  }
 }
 .sectionTitle {
   @include textTemplate(16px, $fontWeightBold, 24px);

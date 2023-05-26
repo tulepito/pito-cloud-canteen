@@ -87,35 +87,22 @@ export const parseEntitiesToTableData = (
   });
 };
 
+const getCompanyName = (company: TCompany) => {
+  return User(company).getPublicData()?.companyName?.toLowerCase() || '';
+};
+
 export const sortCompanies = (
   companies: TCompany[],
   isSortAZ: boolean = true,
 ) => {
-  return [...companies].sort((a, b) => {
-    if (isSortAZ) {
-      if (
-        User(a).getPublicData()?.companyName?.toLowerCase() <
-        User(b).getPublicData()?.companyName?.toLowerCase()
-      )
-        return -1;
-      if (
-        User(a).getPublicData()?.companyName?.toLowerCase() >
-        User(b).getPublicData()?.companyName?.toLowerCase()
-      )
-        return 1;
+  const coefficient = isSortAZ ? 1 : -1;
 
-      return 0;
-    }
-    if (
-      User(b).getPublicData()?.companyName?.toLowerCase() <
-      User(a).getPublicData()?.companyName?.toLowerCase()
-    )
-      return -1;
-    if (
-      User(b).getPublicData()?.companyName?.toLowerCase() >
-      User(a).getPublicData()?.companyName?.toLowerCase()
-    )
-      return 1;
+  return [...companies].sort((companyA, companyB) => {
+    const companyAName = getCompanyName(companyA);
+    const companyBName = getCompanyName(companyB);
+
+    if (companyAName < companyBName) return -1 * coefficient;
+    if (companyBName < companyAName) return 1 * coefficient;
 
     return 0;
   });

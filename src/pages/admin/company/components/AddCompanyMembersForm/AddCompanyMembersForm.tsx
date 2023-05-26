@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import compact from 'lodash/compact';
 
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
@@ -64,8 +65,7 @@ const AddCompanyMembersFormComponent: React.FC<
   const addUserToFormState = async () => {
     if (!queryUsersByEmail) return;
     const { email } = values;
-    const emailAsArray = email.split(',');
-
+    const emailAsArray = compact(email.split(','));
     await queryUsersByEmail(emailAsArray);
     form.change('email', '');
   };
@@ -79,6 +79,7 @@ const AddCompanyMembersFormComponent: React.FC<
     const userIdList = users?.map((user) => user.id.uuid);
     form.change('userIdList', userIdList);
     form.change('noAccountEmailList', notFoundUsers);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(users), JSON.stringify(notFoundUsers)]);
 
   const onKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -90,7 +91,7 @@ const AddCompanyMembersFormComponent: React.FC<
   };
 
   const handleSubmitOnClick = () => {
-    if (usersToRender.length > 0 && customSubmit)
+    if (usersToRender?.length > 0 && customSubmit)
       return customSubmit(form.getState().values);
   };
 

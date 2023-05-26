@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import Skeleton from 'react-loading-skeleton';
+import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
@@ -31,11 +32,13 @@ type TReviewOrderStatesSectionProps = {
     isCanceledOrder: boolean;
   };
   isAdminLayout?: boolean;
+  className?: string;
 };
 
 const ReviewOrderStatesSection: React.FC<TReviewOrderStatesSectionProps> = ({
   data: { transactionDataMap, isCanceledOrder },
   isAdminLayout = false,
+  className,
 }) => {
   const items = useMemo(
     () => prepareItemFromData(transactionDataMap),
@@ -43,15 +46,18 @@ const ReviewOrderStatesSection: React.FC<TReviewOrderStatesSectionProps> = ({
     [JSON.stringify(transactionDataMap)],
   );
 
+  const classes = classNames(css.root, className);
+
   return (
     <RenderWhen condition={!isCanceledOrder}>
       <RenderWhen condition={!isEmpty(items)}>
-        <div className={css.root}>
+        <div className={classes}>
           <HorizontalTimeLine
             items={items}
             itemComponent={StateItem}
             haveNavigators
             isAdminLayout={isAdminLayout}
+            shouldCenterItems={isAdminLayout}
           />
         </div>
         <RenderWhen.False>

@@ -12,6 +12,7 @@ import css from './HorizontalTimeLine.module.scss';
 type THorizontalTimeLineProps = TTimeLineProps & {
   haveNavigators?: boolean;
   isAdminLayout?: boolean;
+  shouldCenterItems?: boolean;
 };
 
 const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
@@ -22,10 +23,14 @@ const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
     itemComponent: ItemComponent,
     isAdminLayout = false,
     haveNavigators = false,
+    shouldCenterItems = false,
   } = props;
   const containerRef = useRef(null);
 
   const rootClasses = classNames(rootClassName || css.root, className);
+  const itemContainerClasses = classNames(css.itemsContainer, {
+    [css.centerItems]: shouldCenterItems,
+  });
   const totalItems = items.length;
 
   const itemsToRender = items.reduce<ReactNode[]>(
@@ -85,7 +90,7 @@ const HorizontalTimeLine: React.FC<THorizontalTimeLineProps> = (props) => {
           <IconArrow direction="left" className={css.navigatorIcon} />
         </Button>
       )}
-      <div ref={containerRef} className={css.itemsContainer}>
+      <div ref={containerRef} className={itemContainerClasses}>
         {itemsToRender}
       </div>
       {haveNavigators && (

@@ -1,0 +1,119 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.generalRatingWrapper {
+  padding-bottom: 20px;
+  border-bottom: 1px solid $neutralGray4;
+
+  .generalRatingTitle {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+    text-align: center;
+  }
+
+  .generalRatingField {
+    margin: 20px auto 0;
+
+    svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    span {
+      @include textTemplate(12px, $fontWeightSemiBold, 16px);
+    }
+  }
+}
+
+.detailRatingWrapper {
+  margin-top: 16px;
+
+  .detailRatingTitle {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+  }
+
+  .detailRatingField {
+    @include flexAlign(center, center);
+    gap: 24px;
+    margin-top: 8px;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    span {
+      display: none;
+    }
+  }
+
+  .ratingValue {
+    text-align: center;
+    @include textTemplate(14px, $fontWeightSemiBold, 20px);
+    margin-top: 12px;
+  }
+}
+
+.detailTextRatingWrapper {
+  margin-top: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid $neutralGray4;
+
+  .detailTextRatingLabel {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+  }
+
+  .textareaField {
+    textarea {
+      resize: none;
+    }
+  }
+}
+
+.imagesRatingWrapper {
+  width: 100%;
+  margin-top: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid $neutralGray4;
+
+  .imagesFieldWrapper {
+    width: 100%;
+  }
+
+  .imagesRatingTitle {
+    @include textTemplate(18px, $fontWeightBold, 24px);
+  }
+}
+
+.submitBtnWrapper {
+  padding: 28px 0 0px;
+  @include flexAlign(center, flex-end);
+  .submitBtn {
+    width: 100%;
+    min-height: 40px;
+  }
+}
+
+.detailRatingContainer {
+  @include flexAlign(flex-start, space-between);
+  gap: 64px;
+  padding-bottom: 20px;
+  margin-top: 20px;
+  border-bottom: 1px solid $neutralGray4;
+
+  .ratingSectionTitle {
+    @include textTemplate(18px, $fontWeightBold, 24px);
+  }
+
+  .pitoRating {
+    flex-basis: 50%;
+  }
+
+  .partnerRating {
+    flex-basis: 50%;
+  }
+}

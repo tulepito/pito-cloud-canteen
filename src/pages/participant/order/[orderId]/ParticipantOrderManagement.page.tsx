@@ -1,18 +1,29 @@
+import type { ReactNode } from 'react';
 import React, { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
 // import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import Avatar from '@components/Avatar/Avatar';
+import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
+import CoverModal from '@components/CoverModal/CoverModal';
+import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import Tabs from '@components/Tabs/Tabs';
+import { isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { User } from '@src/utils/data';
-import type { TUser } from '@utils/types';
+import missingPickingOrderCover from '@src/assets/missingPickingCover.png';
+import pickingOrderCover from '@src/assets/pickingOrderCover.png';
+import { participantPaths } from '@src/paths';
+import { Listing, User } from '@src/utils/data';
+import { formatTimestamp } from '@src/utils/dates';
+import type { TListing, TUser } from '@utils/types';
 
 import OrderCalendarView from '../../components/OrderCalendarView/OrderCalendarView';
 import SectionOrderHeader from '../../components/SectionOrderHeader/SectionOrderHeader';
@@ -22,12 +33,13 @@ import css from './ParticipantOrderManagement.module.scss';
 
 const ParticipantOrderManagement = () => {
   const router = useRouter();
-  // const intl = useIntl();
+  const intl = useIntl();
   const dispatch = useAppDispatch();
 
   const { isReady, query } = router;
   const { orderId } = query;
   const isOwnerControl = useBoolean();
+
   // State
   const [currentView, setCurrentView] = useState(VIEWS.CALENDAR);
   const currentUser = useAppSelector(currentUserSelector);
@@ -51,6 +63,49 @@ const ParticipantOrderManagement = () => {
     (state) => state.ParticipantOrderManagementPage.loadDataInProgress,
   );
 
+  const companyUser = User(company as TUser);
+  const orderListing = Listing(order as TListing);
+  const { orderName } = orderListing.getPublicData();
+  const { selectedGroups = [], deadlineDate } = orderListing.getMetadata();
+  const { displayName: bookerName } = companyUser.getProfile();
+  const { companyName } = companyUser.getPublicData();
+  const { groups = [] } = companyUser.getMetadata();
+
+  const selectedGroupNames =
+    selectedGroups.includes('allMembers') || !selectedGroups.length
+      ? ['Tất cả thành viên']
+      : selectedGroups.map((groupId: string) => {
+          return groups.find((group: any) => group.id === groupId)?.name;
+        });
+
+  const rowInformation = [
+    {
+      label: 'Công ty:',
+      value: companyName,
+    },
+    {
+      label: 'Nhóm:',
+      value: selectedGroupNames.join(', '),
+    },
+    {
+      label: 'Hạn chọn món:',
+      value: formatTimestamp(deadlineDate, 'dd/MM/yyyy, HH:mm'),
+    },
+    {
+      label: 'Người đại diện:',
+      value: bookerName,
+    },
+  ];
+
+  const shouldShowMissingPickingOrderModal =
+    !isEmpty(order) && isOrderOverDeadline(order as TListing);
+
+  const pickingOrderModalControl = useBoolean(
+    !shouldShowMissingPickingOrderModal,
+  );
+  const missingPickingOrderModalControl = useBoolean(
+    shouldShowMissingPickingOrderModal,
+  );
   useEffect(() => {
     if (isReady) {
       dispatch(participantOrderManagementThunks.loadData(orderId as string));
@@ -66,6 +121,7 @@ const ParticipantOrderManagement = () => {
   //   }
   // };
 
+  const loadingInProgress = loadDataInProgress;
   const tabOptions = [
     // {
     //   id: 'personal',
@@ -105,8 +161,58 @@ const ParticipantOrderManagement = () => {
     },
   ];
 
+  const goToHomePage = () => {
+    router.push(participantPaths.OrderList);
+  };
+
   return (
     <ParticipantLayout>
+      <CoverModal
+        id="PickingOrderModal"
+        isOpen={pickingOrderModalControl.value}
+        onClose={pickingOrderModalControl.setFalse}
+        coverSrc={pickingOrderCover}
+        contentInProgress={loadDataInProgress}
+        modalTitle={intl.formatMessage({ id: 'PickingOrderModal.title' })}
+        modalDescription={intl.formatMessage(
+          { id: 'PickingOrderModal.description' },
+          {
+            span: (msg: ReactNode) => (
+              <span className={css.boldText}>{msg}</span>
+            ),
+            orderName,
+          },
+        )}
+        rowInformation={rowInformation}
+        buttonWrapper={
+          <Button
+            className={css.btn}
+            disabled={loadDataInProgress}
+            onClick={pickingOrderModalControl.setFalse}>
+            Bắt đầu
+          </Button>
+        }
+      />
+      <CoverModal
+        id="MissingOrderModal"
+        isOpen={missingPickingOrderModalControl.value}
+        onClose={missingPickingOrderModalControl.setFalse}
+        coverSrc={missingPickingOrderCover}
+        contentInProgress={loadDataInProgress}
+        modalTitle={intl.formatMessage({ id: 'MissingOrderModal.title' })}
+        modalDescription={intl.formatMessage({
+          id: 'MissingOrderModal.description',
+        })}
+        rowInformation={rowInformation}
+        buttonWrapper={
+          <Button
+            className={css.btn}
+            onClick={goToHomePage}
+            disabled={loadDataInProgress}>
+            Về trang chủ
+          </Button>
+        }
+      />
       <SectionOrderHeader
         currentView={currentView}
         setViewFunction={setCurrentView}
@@ -122,6 +228,7 @@ const ParticipantOrderManagement = () => {
       ) : (
         <Tabs items={tabOptions as any} headerClassName={css.tabHeader} />
       )}
+      <LoadingModal isOpen={loadingInProgress} />
     </ParticipantLayout>
   );
 };

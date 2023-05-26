@@ -14,12 +14,13 @@ import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import Form from '@components/Form/Form';
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import ReviewOrdersResultSection from '@components/OrderDetails/ReviewView/ReviewOrdersResultSection/ReviewOrdersResultSection';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
-import { addCommas } from '@helpers/format';
+import { addCommas, parseThousandNumber } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
@@ -31,7 +32,7 @@ import { adminPaths } from '@src/paths';
 import { CurrentUser, Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import { EOrderDraftStates, EOrderStates } from '@utils/enums';
-import type { TListing } from '@utils/types';
+import type { TListing, TObject } from '@utils/types';
 import { required } from '@utils/validators';
 
 // eslint-disable-next-line import/no-cycle
@@ -39,7 +40,7 @@ import NavigateButtons from '../NavigateButtons/NavigateButtons';
 
 import css from './ReviewOrder.module.scss';
 
-const MENU_TABLE_COLUMN: TColumn[] = [
+const MenuColumns: TColumn[] = [
   {
     key: 'stt',
     label: 'STT',
@@ -64,7 +65,7 @@ const MENU_TABLE_COLUMN: TColumn[] = [
   },
   {
     key: 'dvt',
-    label: 'DVT',
+    label: 'ĐVT',
     render: (data: any) => {
       return (
         <span
@@ -91,11 +92,19 @@ type TFormDeliveryInfoValues = {
 };
 
 export const ReviewContent: React.FC<any> = (props) => {
-  const { restaurant, notes, deliveryManInfo = {}, updatePlanDetail } = props;
+  const {
+    timeStamp,
+    restaurant,
+    notes = {},
+    deliveryManInfo = {},
+    updatePlanDetail,
+    foodOrder = {},
+  } = props;
+
+  const intl = useIntl();
+  const menuCollapseController = useBoolean();
   const { key: deliveryManKey, phoneNumber: deliveryManPhoneNumber } =
     deliveryManInfo;
-  const intl = useIntl();
-
   const [currDeliveryPhoneNumber, setCurrDeliveryManPhoneNumber] = useState<
     string | undefined
   >(deliveryManPhoneNumber);
@@ -127,12 +136,24 @@ export const ReviewContent: React.FC<any> = (props) => {
   });
   const deliveryMan = useField('deliveryMan', form);
 
+  const { totalDishes = 0, totalPrice = 0, foodDataList = [] } = foodOrder;
+
+  const groupTitleClasses = classNames(css.groupTitle, {
+    [css.collapsed]: menuCollapseController.value,
+  });
+  const rowsClasses = classNames(css.rows, {
+    [css.collapsed]: menuCollapseController.value,
+  });
+  const iconClasses = classNames({
+    [css.reversed]: menuCollapseController.value,
+  });
+
   const {
     participants = [],
     anonymous = [],
     orderState,
   } = Listing(order as TListing).getMetadata();
-  const { restaurantName, phoneNumber, foodList = {}, id } = restaurant;
+  const { restaurantName, phoneNumber, foodList = {}, id } = restaurant || {};
   const isInProgressOrder = orderState === EOrderStates.inProgress;
 
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
@@ -146,14 +167,21 @@ export const ReviewContent: React.FC<any> = (props) => {
     };
   }) as any;
 
+  const handleToggleMenuCollapse = () => {
+    menuCollapseController.toggle();
+  };
+
   const handleFieldDeliveryManChange = (value: string) => {
     const currDeliveryInfoOption = deliveryManOptions.find(
       ({ key }) => key === value,
     );
 
-    updatePlanDetail({
-      deliveryManInfo: currDeliveryInfoOption,
-    });
+    updatePlanDetail(
+      {
+        deliveryManInfo: currDeliveryInfoOption,
+      },
+      true,
+    );
 
     setCurrDeliveryManPhoneNumber(currDeliveryInfoOption?.phoneNumber);
   };
@@ -183,12 +211,15 @@ export const ReviewContent: React.FC<any> = (props) => {
                 {intl.formatMessage({ id: 'ReviewOrder.deliveryManName' })}
               </span>
               <FieldSelectComponent
-                id="deliveryMan"
+                id={`${timeStamp}_deliveryMan`}
                 name="deliveryMan"
                 className={css.selectBoxContent}
                 meta={deliveryMan.meta}
                 input={deliveryMan.input}
                 onChange={handleFieldDeliveryManChange}>
+                <option disabled value={''}>
+                  Chọn nhân viên
+                </option>
                 {deliveryManOptions.map(({ key, name }) => (
                   <option key={key} value={key}>
                     {name}
@@ -233,16 +264,94 @@ export const ReviewContent: React.FC<any> = (props) => {
         label={intl.formatMessage({
           id: 'ReviewOrder.menuLabel',
         })}>
-        <Table
-          columns={MENU_TABLE_COLUMN}
-          data={parsedFoodList}
-          tableClassName={css.tableRoot}
-          tableHeadClassName={css.tableHead}
-          tableHeadRowClassName={css.tableHeadRow}
-          tableBodyClassName={css.tableBody}
-          tableBodyRowClassName={css.tableBodyRow}
-          tableBodyCellClassName={css.tableBodyCell}
-        />
+        <RenderWhen
+          condition={[
+            EOrderDraftStates.draft,
+            EOrderDraftStates.pendingApproval,
+          ].includes(orderState)}>
+          <Table
+            columns={MenuColumns}
+            data={parsedFoodList}
+            tableClassName={css.tableRoot}
+            tableHeadClassName={css.tableHead}
+            tableHeadRowClassName={css.tableHeadRow}
+            tableBodyClassName={css.tableBody}
+            tableBodyRowClassName={css.tableBodyRow}
+            tableBodyCellClassName={css.tableBodyCell}
+          />
+
+          <RenderWhen.False>
+            <div className={css.tableContainer}>
+              <div className={css.tableHead}>
+                <div>
+                  {intl.formatMessage({
+                    id: 'ReviewOrder.tableHead.no',
+                  })}
+                </div>
+                <div>
+                  {intl.formatMessage({
+                    id: 'ReviewOrder.tableHead.type',
+                  })}
+                </div>
+                <div>
+                  {intl.formatMessage({
+                    id: 'ReviewOrder.tableHead.unit',
+                  })}
+                </div>
+                <div>
+                  {intl.formatMessage({
+                    id: 'ReviewOrder.tableHead.quantity',
+                  })}
+                </div>
+
+                <div>
+                  {intl.formatMessage({
+                    id: 'ReviewOrder.tableHead.price',
+                  })}
+                </div>
+                <div></div>
+              </div>
+
+              <div className={css.tableBody}>
+                <div className={css.tableRowGroup}>
+                  <div className={groupTitleClasses}>
+                    <div>{1}</div>
+                    <div>
+                      {intl.formatMessage({
+                        id: 'ReviewOrder.table.menuTitle',
+                      })}
+                    </div>
+                    <div>{''}</div>
+                    <div>{totalDishes}</div>
+                    <div>{parseThousandNumber(totalPrice || 0)}đ</div>
+                    <div
+                      className={css.actionCell}
+                      onClick={handleToggleMenuCollapse}>
+                      <IconArrow className={iconClasses} />
+                    </div>
+                  </div>
+                  <div className={rowsClasses}>
+                    {foodDataList.map((foodData: TObject) => {
+                      const { foodId, foodPrice, foodName, frequency } =
+                        foodData;
+
+                      return (
+                        <div className={css.row} key={foodId}>
+                          <div></div>
+                          <div>{foodName}</div>
+                          <div>{''}</div>
+                          <div>{frequency}</div>
+                          <div>{parseThousandNumber(foodPrice || 0)}đ</div>
+                          <div>{''}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </RenderWhen.False>
+        </RenderWhen>
       </Collapsible>
       <Collapsible
         label={intl.formatMessage({

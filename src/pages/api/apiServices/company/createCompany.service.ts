@@ -2,7 +2,6 @@ import CryptoJS from 'crypto-js';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { denormalisedResponseEntities } from '@services/data';
-import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { getIntegrationSdk, getSdk } from '@services/sdk';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
 import { User } from '@src/utils/data';
@@ -88,7 +87,6 @@ const createCompany = async ({
 
   const [companyAccount] = denormalisedResponseEntities(companyResponse);
   const companyEmail = User(companyAccount).getAttributes().email;
-  const companyId = companyAccount.id.uuid;
 
   // Create sub master account
   const splittedEmail = companyEmail.split('@');
@@ -146,11 +144,6 @@ const createCompany = async ({
     privateData: {
       accountPassword: encryptedPassword,
     },
-  });
-
-  await emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ACCOUNT_CREATED, {
-    password: dataParams.password,
-    companyId,
   });
 
   return masterAccountAfterUpdateResponse;

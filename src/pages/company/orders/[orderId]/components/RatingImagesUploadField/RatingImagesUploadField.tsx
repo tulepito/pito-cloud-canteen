@@ -1,4 +1,5 @@
 import { Field } from 'react-final-form';
+import classNames from 'classnames';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconImage from '@components/Icons/IconImage/IconImage';
@@ -18,9 +19,11 @@ const MAX_FILES = 5;
 
 type TRatingImagesUploadFieldProps = {
   images: {};
+  containerClassName?: string;
 };
 const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
   images,
+  containerClassName,
 }) => {
   const dispatch = useAppDispatch();
   const imageUploadRequestControl = useBoolean();
@@ -29,6 +32,7 @@ const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
 
   const uploadedImagesLength = allImages.length;
   const maxImages = Object.keys(images).length === MAX_FILES;
+  const containerClasses = classNames(css.container, containerClassName);
   const onImagesUpload = async (params: TImageActionPayload[]) => {
     await dispatch(uploadImageThunks.uploadImages(params));
   };
@@ -105,7 +109,7 @@ const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
               )}
               {!maxImages && (
                 <div
-                  className={css.container}
+                  className={containerClasses}
                   onDrop={handleDrop}
                   onDragOver={handleDrag}
                   onDragEnter={handleDrag}>

@@ -7,13 +7,12 @@ import type {
   SendEmailRequest,
 } from 'aws-sdk/clients/ses';
 
-const credential = new AWS.Config({
+const SES = new AWS.SES({
   accessKeyId: `${process.env.AWS_SES_ACCESS_KEY_ID}`,
   secretAccessKey: `${process.env.AWS_SES_SECRET_ACCESS_KEY}`,
   region: `${process.env.AWS_SES_REGION}`,
+  apiVersion: '2010-12-01',
 });
-
-AWS.config.update(credential);
 
 export const createEmailParams = (
   receiver: AddressList,
@@ -45,7 +44,7 @@ export const createEmailParams = (
 };
 
 export const sendEmail = (params: SendEmailRequest) => {
-  return new AWS.SES({ apiVersion: '2010-12-01' }).sendEmail(params).promise();
+  return SES.sendEmail(params).promise();
 };
 
 export const sendIndividualEmail = ({

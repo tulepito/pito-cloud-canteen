@@ -1,13 +1,15 @@
 import type { TObject } from '@utils/types';
 
+const hasLocalStorage = () => typeof localStorage !== 'undefined';
+
 export const setItem = (key: string, item: string | TObject) => {
-  if (typeof localStorage !== 'undefined') {
+  if (hasLocalStorage()) {
     localStorage.setItem(key, JSON.stringify(item));
   }
 };
 
 export const getItem = (key: string) => {
-  if (typeof localStorage !== 'undefined') {
+  if (hasLocalStorage()) {
     if (localStorage.getItem(key)) {
       return JSON.parse(localStorage.getItem(key) as string);
     }
@@ -17,19 +19,19 @@ export const getItem = (key: string) => {
 };
 
 export const removeItem = (key: string) => {
-  if (typeof localStorage !== 'undefined') {
+  if (hasLocalStorage()) {
     if (localStorage.getItem(key)) {
       localStorage.removeItem(key);
 
       return true;
     }
-
-    return false;
   }
+
+  return false;
 };
 
 export const clear = () => {
-  if (typeof localStorage !== 'undefined') {
+  if (hasLocalStorage()) {
     localStorage.clear();
   }
 };

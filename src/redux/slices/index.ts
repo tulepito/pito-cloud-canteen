@@ -34,3 +34,4 @@ export { default as OrderRating } from '@pages/company/orders/[orderId]/rating/O
 export { default as ParticipantAccount } from '@pages/participant/account/Account.slice';
 export { default as ParticipantOrderList } from '@pages/participant/orders/OrderList.slice';
 export { default as ParticipantPlanPage } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';
+export { default as ParticipantSubOrderList } from '@pages/participant/sub-orders/SubOrders.slice';

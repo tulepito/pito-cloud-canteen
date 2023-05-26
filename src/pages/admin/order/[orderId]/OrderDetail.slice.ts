@@ -1,6 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
+import isEmpty from 'lodash/isEmpty';
 
 import { transitPlanApi } from '@apis/admin';
+import { participantSubOrderUpdateDocumentApi } from '@apis/firebaseApi';
 import {
   adminUpdateOrderStateApi,
   getBookerOrderDataApi,
@@ -9,7 +11,13 @@ import {
 } from '@apis/orderApi';
 import { getOrderQuotationsQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { denormalisedResponseEntities, Listing } from '@src/utils/data';
+import {
+  denormalisedResponseEntities,
+  Listing,
+  Transaction,
+} from '@src/utils/data';
+import { ESubOrderTxStatus } from '@src/utils/enums';
+import { ETransition } from '@src/utils/transaction';
 import type {
   TListing,
   TObject,
@@ -17,6 +25,23 @@ import type {
   TTransaction,
   TUser,
 } from '@src/utils/types';
+
+const transitionShouldChangeFirebaseSubOrderStatus = [
+  ETransition.START_DELIVERY,
+  ETransition.COMPLETE_DELIVERY,
+];
+const mapTxTransitionToFirebaseSubOrderStatus = (lastTransition: string) => {
+  switch (lastTransition) {
+    case ETransition.START_DELIVERY:
+      return ESubOrderTxStatus.DELIVERING;
+    case ETransition.COMPLETE_DELIVERY:
+      return ESubOrderTxStatus.DELIVERED;
+    case ETransition.OPERATOR_CANCEL_PLAN:
+      return ESubOrderTxStatus.CANCELED;
+    default:
+      return ESubOrderTxStatus.PENDING;
+  }
+};
 
 // ================ Initial states ================ //
 type TOrderDetailState = {
@@ -139,10 +164,36 @@ const transit = createAsyncThunk(
     { dispatch, getState, rejectWithValue },
   ) => {
     try {
-      await transitPlanApi({
+      const { data: response } = await transitPlanApi({
         transactionId,
         transition,
       });
+
+      const { tx } = response;
+      const txGetter = Transaction(tx as TTransaction);
+      const { booking } = txGetter.getFullData();
+      const { displayStart } = booking.attributes;
+      const { lastTransition } = txGetter.getAttributes();
+      const { planId, participantIds = [] } = txGetter.getMetadata();
+      const firebaseSubOrderIdList = participantIds.map(
+        (id: string) =>
+          `${id} - ${planId} - ${new Date(displayStart).getTime()}`,
+      );
+      if (
+        transitionShouldChangeFirebaseSubOrderStatus.includes(lastTransition)
+      ) {
+        await Promise.all(
+          firebaseSubOrderIdList.map(async (subOrderId: string) => {
+            await participantSubOrderUpdateDocumentApi({
+              subOrderId,
+              params: {
+                txStatus:
+                  mapTxTransitionToFirebaseSubOrderStatus(lastTransition),
+              },
+            });
+          }),
+        );
+      }
 
       const orderId = Listing(getState().OrderDetail.order).getId();
 
@@ -174,7 +225,7 @@ const fetchQuotations = createAsyncThunk(
 const updatePlanDetail = createAsyncThunk(
   'app/OrderDetail/UPDATE_PLAN_DETAIL',
   async (
-    { orderId, planId, orderDetail }: TObject,
+    { orderId, planId, orderDetail, skipRefetch = false }: TObject,
     { dispatch, fulfillWithValue, rejectWithValue },
   ) => {
     try {
@@ -183,6 +234,9 @@ const updatePlanDetail = createAsyncThunk(
         planId,
       });
 
+      if (skipRefetch) {
+        return fulfillWithValue(orderDetail);
+      }
       if (orderId) {
         await dispatch(fetchOrder(orderId));
       }
@@ -285,6 +339,18 @@ const OrderDetailSlice = createSlice({
       .addCase(transit.rejected, (state, { error }) => {
         state.transitInProgress = false;
         state.transitError = error.message;
+      })
+      /* =============== updatePlanDetail =============== */
+      .addCase(updatePlanDetail.pending, (state) => {
+        return state;
+      })
+      .addCase(updatePlanDetail.fulfilled, (state, { payload }) => {
+        if (payload !== null && !isEmpty(payload)) {
+          state.orderDetail = payload;
+        }
+      })
+      .addCase(updatePlanDetail.rejected, (state) => {
+        return state;
       });
   },
 });

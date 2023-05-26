@@ -9,7 +9,6 @@ import { useRouter } from 'next/router';
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconArrowFull from '@components/Icons/IconArrow/IconArrowFull';
-import NamedLink from '@components/NamedLink/NamedLink';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -37,12 +36,13 @@ const ParticipantPlan = () => {
   const dispatch = useAppDispatch();
   // Router
   const router = useRouter();
-  const { planId } = router.query;
+  const { planId, from = 'orderList' } = router.query;
 
   // Load data
   const { loadDataInProgress, order, plan } = useLoadData();
   const { orderDayState, selectedRestaurant, handleSelectRestaurant } =
     useSelectRestaurant();
+
   const cartList = useAppSelector((state: RootState) => {
     const { currentUser } = state.user;
     const currUserId = currentUser?.id?.uuid;
@@ -50,6 +50,7 @@ const ParticipantPlan = () => {
     return state.shoppingCart.orders?.[currUserId]?.[(planId as string) || 1];
   });
   const orderId = order?.id?.uuid;
+
   const orderDays = Object.keys(plan);
   const cartListKeys = Object.keys(cartList || []).filter(
     (cartKey) => !!cartList[Number(cartKey)],
@@ -134,19 +135,29 @@ const ParticipantPlan = () => {
     };
   }, [deadlineDate, JSON.stringify(order)]);
 
+  const handleGoBack = () => {
+    if (!orderId) {
+      return;
+    }
+    router.push({
+      pathname:
+        from === 'orderList'
+          ? participantPaths.OrderList
+          : participantPaths.Order,
+      query: {
+        ...(from === 'orderDetail' && { orderId }),
+      },
+    });
+  };
+
   // Render
   return (
     <ParticipantLayout>
       <div className={css.root}>
         <div className={css.leftSection}>
-          <div>
-            <NamedLink
-              path={participantPaths.Order}
-              params={{ orderId }}
-              className={css.goBackBtn}>
-              <IconArrow direction="left" />
-              Quay lại
-            </NamedLink>
+          <div className={css.goBack} onClick={handleGoBack}>
+            <IconArrow direction="left" />
+            <span>Quay lại</span>
           </div>
           <SectionRestaurantHero
             listing={selectedRestaurant}

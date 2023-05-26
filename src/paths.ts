@@ -224,4 +224,5 @@ export const participantPaths = {
   AccountProfile: '/participant/account/profile',
   AccountChangePassword: '/participant/account/change-password',
   AccountSpecialDemand: '/participant/account/special-demand',
+  PlanDetail: '/participant/plans/[planId]',
 };
