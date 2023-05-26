@@ -53,7 +53,7 @@ const updateOrder = async ({
           ),
         });
       } catch (error) {
-        console.log('create scheduler');
+        console.log('create scheduler in update order');
         await createScheduler({
           customName: `sendRemindPOE_${orderId}`,
           timeExpression: formatTimestamp(
