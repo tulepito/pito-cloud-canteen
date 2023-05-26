@@ -12,3 +12,7 @@
   border-radius: 8px;
   @include textTemplate(14px, $fontWeightBold, 24px);
 }
+
+.boldText {
+  font-weight: $fontWeightBold;
+}
