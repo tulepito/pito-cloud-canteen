@@ -27,6 +27,7 @@ export type TToolbarProps = {
   anchorDate: Date;
   onPickForMe?: () => void;
   onPickForMeLoading?: boolean;
+  isAllowChangePeriod?: boolean;
 };
 
 const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
@@ -40,6 +41,7 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
     onView,
     views,
     view,
+    isAllowChangePeriod = false,
   } = props;
   const intl = useIntl();
   const startDateDateTime = DateTime.fromJSDate(startDate);
@@ -48,12 +50,15 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
   const navigateFunc = (action: string) => () => {
     onNavigate(action);
   };
+
   const showPrevBtn =
+    isAllowChangePeriod ||
     (view === EViewMode.WEEK &&
       startDateDateTime.weekNumber !== anchorDateDateTime.weekNumber) ||
     (view === EViewMode.MONTH &&
       startDateDateTime.monthLong !== anchorDateDateTime.monthLong);
   const showNextBtn =
+    isAllowChangePeriod ||
     (view === EViewMode.WEEK &&
       endDateDateTime.weekNumber !== anchorDateDateTime.weekNumber) ||
     (view === EViewMode.MONTH &&

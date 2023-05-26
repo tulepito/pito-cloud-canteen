@@ -220,6 +220,7 @@ const OrderListPage = () => {
             toolbar: (toolBarProps: any) => (
               <ParticipantToolbar
                 {...toolBarProps}
+                isAllowChangePeriod
                 // startDate={new Date(startDate)}
                 // endDate={new Date(endDate)}
                 // anchorDate={anchorDate}
