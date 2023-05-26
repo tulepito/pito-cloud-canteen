@@ -324,20 +324,22 @@ const OrderListPage = () => {
         </>
       </RenderWhen>
       <RenderWhen condition={!!selectedEvent}>
-        <SubOrderDetailModal
-          isOpen={subOrderDetailModalControl.value}
-          onClose={subOrderDetailModalControl.setFalse}
-          event={selectedEvent!}
-          openRatingSubOrderModal={openRatingSubOrderModal}
-        />
+        <>
+          <SubOrderDetailModal
+            isOpen={subOrderDetailModalControl.value}
+            onClose={subOrderDetailModalControl.setFalse}
+            event={selectedEvent!}
+            openRatingSubOrderModal={openRatingSubOrderModal}
+          />
+          <RatingSubOrderModal
+            isOpen={ratingSubOrderModalControl.value}
+            onClose={ratingSubOrderModalControl.setFalse}
+            selectedEvent={selectedEvent}
+            currentUserId={currentUserId}
+            openSuccessRatingModal={successRatingModalControl.setTrue}
+          />
+        </>
       </RenderWhen>
-      <RatingSubOrderModal
-        isOpen={ratingSubOrderModalControl.value}
-        onClose={ratingSubOrderModalControl.setFalse}
-        selectedEvent={selectedEvent}
-        currentUserId={currentUserId}
-        openSuccessRatingModal={successRatingModalControl.setTrue}
-      />
       <SuccessRatingModal
         isOpen={successRatingModalControl.value}
         onClose={successRatingModalControl.setFalse}
