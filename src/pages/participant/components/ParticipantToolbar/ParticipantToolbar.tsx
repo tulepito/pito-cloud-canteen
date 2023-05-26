@@ -4,7 +4,10 @@ import classNames from 'classnames';
 import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
-import { ENavigate } from '@components/CalendarDashboard/helpers/constant';
+import {
+  ENavigate,
+  EViewMode,
+} from '@components/CalendarDashboard/helpers/constant';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import type { TObject } from '@utils/types';
 
@@ -46,9 +49,15 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
     onNavigate(action);
   };
   const showPrevBtn =
-    startDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
+    (view === EViewMode.WEEK &&
+      startDateDateTime.weekNumber !== anchorDateDateTime.weekNumber) ||
+    (view === EViewMode.MONTH &&
+      startDateDateTime.monthLong !== anchorDateDateTime.monthLong);
   const showNextBtn =
-    endDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
+    (view === EViewMode.WEEK &&
+      endDateDateTime.weekNumber !== anchorDateDateTime.weekNumber) ||
+    (view === EViewMode.MONTH &&
+      endDateDateTime.monthLong !== anchorDateDateTime.monthLong);
 
   const viewFunc = (viewName: string) => () => {
     onView(viewName);
