@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
 import { emailVerificationActions } from '@redux/slices/emailVerification.slice';
 import { currentUserSelector, userThunks } from '@redux/slices/user.slice';
-import { generalPaths } from '@src/paths';
+import { enGeneralPaths, generalPaths } from '@src/paths';
 
 import { usePathChecker } from './Guards.helper';
 import useVerifyAuthentication from './useVerifyAuthentication';
@@ -33,7 +33,8 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     usePathChecker(pathname);
 
   // TODO: check sign up path and consider showing verification email form or not
-  const isSignUpPath = pathname === generalPaths.SignUp;
+  const isSignUpPath =
+    pathname === generalPaths.SignUp || pathname === enGeneralPaths.SignUp;
   const shouldShowEmailVerification = !!userId && !isUserEmailVerified;
   const shouldNavigateInSignUpFlow =
     isSignUpPath && !shouldShowEmailVerification;
@@ -43,7 +44,6 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     isAuthenticated &&
     isNonRequireAuthenticationRoute &&
     (!isSignUpPath || shouldNavigateInSignUpFlow);
-
   const renderComponent = () => {
     if (isIgnoredAuthCheckRoute) {
       return children;

@@ -8,7 +8,7 @@ export const generalPaths = {
   Home: '/',
 };
 
-const enGeneralPaths = {
+export const enGeneralPaths = {
   SignIn: '/sign-in',
   SignUp: '/sign-up',
   RecoveryPassword: '/forgot-password',

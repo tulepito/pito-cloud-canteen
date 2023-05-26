@@ -1,9 +1,10 @@
 import { FormattedMessage } from 'react-intl';
 import { useDispatch } from 'react-redux';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import { userThunks } from '@redux/slices/user.slice';
 import type { AppDispatch } from '@redux/store';
+import { generalPaths } from '@src/paths';
 import { isTooManyEmailVerificationRequestsError } from '@utils/errors';
 
 import css from './EmailVerification.module.scss';
@@ -18,9 +19,18 @@ type TEmailVerificationProps = {
 const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
   const { name, email, sendVerificationEmailError, inProgress } = props;
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+
+  const {
+    query: { from: fromUrl },
+  } = router;
 
   const handleResendEmail = () => {
     dispatch(userThunks.sendVerificationEmail());
+  };
+
+  const navigateToHomePageMaybe = () => {
+    router.push(fromUrl ? (fromUrl as string) : generalPaths.Home);
   };
 
   const resendEmailLink = (
@@ -30,9 +40,9 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
   );
 
   const toHomePageLink = (
-    <Link href="/" className={css.toHomePageLink}>
+    <div className={css.toHomePageLink} onClick={navigateToHomePageMaybe}>
       <FormattedMessage id="EmailVerification.toHomePageLinkText" />
-    </Link>
+    </div>
   );
 
   const resendErrorTranslationId = isTooManyEmailVerificationRequestsError(
