@@ -7,6 +7,7 @@ import { InlineTextButton } from '@components/Button/Button';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
+import { participantPaths } from '@src/paths';
 import { CurrentUser } from '@utils/data';
 
 import type { TEventStatus } from '../../helpers/types';
@@ -43,7 +44,12 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
     id: orderDay,
     dishSelection,
   } = event.resource;
-
+  const timestamp =
+    orderDay.split(' - ').length > 1 ? orderDay.split(' - ')[1] : orderDay;
+  const from =
+    router.pathname === participantPaths.OrderList
+      ? 'orderList'
+      : 'orderDetail';
   const onSelectDish = (values: TDishSelectionFormValues, reject?: boolean) => {
     const currentUserId = CurrentUser(user).getId();
     const payload = {
@@ -65,8 +71,10 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   };
 
   const onNavigateToOrderDetail = () => {
-    const to = `/participant/plans/${planId}?orderDay=${orderDay}`;
-    router.push(to);
+    router.push({
+      pathname: participantPaths.PlanDetail,
+      query: { orderDay: timestamp, planId, from },
+    });
   };
 
   return (

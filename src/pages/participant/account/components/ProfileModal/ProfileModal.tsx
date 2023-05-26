@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { userThunks } from '@redux/slices/user.slice';
 import { User } from '@src/utils/data';
 import { splitNameFormFullName } from '@src/utils/string';
 import type { TCurrentUser, TUser } from '@src/utils/types';
@@ -29,7 +30,7 @@ const ProfileModal: React.FC<TProfileModalProps> = (props) => {
   const { email } = currentUserGetter.getAttributes();
   const { phoneNumber } = currentUserGetter.getProtectedData();
   const initialValues = useMemo(
-    () => ({ name: `${lastName} ${firstName}`, email, phoneNumber }),
+    () => ({ name: `${firstName} ${lastName}`, email, phoneNumber }),
     [email, firstName, lastName, phoneNumber],
   );
 
@@ -46,6 +47,8 @@ const ProfileModal: React.FC<TProfileModalProps> = (props) => {
 
     if (meta.requestStatus !== 'fulfilled') {
       console.log('error');
+    } else {
+      dispatch(userThunks.fetchCurrentUser());
     }
   };
 

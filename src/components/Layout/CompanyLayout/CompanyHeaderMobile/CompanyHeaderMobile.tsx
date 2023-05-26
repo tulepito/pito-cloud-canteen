@@ -42,6 +42,7 @@ type CompanyHeaderMobileProps = {
 
 const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
   const { className, companyHeaderLinkData, headerData } = props;
+
   const { value: isOpen, toggle: onToggle } = useBoolean(false);
 
   const { pathname: routerPathName, push } = useRouter();

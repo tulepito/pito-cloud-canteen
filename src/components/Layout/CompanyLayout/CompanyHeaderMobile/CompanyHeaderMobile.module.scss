@@ -79,6 +79,8 @@
         .userDisplayName {
           font-weight: $fontWeightBold;
         }
+        min-height: unset;
+        padding: 0;
       }
     }
   }

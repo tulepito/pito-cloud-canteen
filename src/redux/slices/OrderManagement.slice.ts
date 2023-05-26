@@ -3,6 +3,11 @@ import groupBy from 'lodash/groupBy';
 import omit from 'lodash/omit';
 
 import {
+  participantSubOrderAddDocumentApi,
+  participantSubOrderGetByIdApi,
+  participantSubOrderUpdateDocumentApi,
+} from '@apis/firebaseApi';
+import {
   addParticipantToOrderApi,
   addUpdateMemberOrder,
   bookerMarkInprogressPlanViewedApi,
@@ -230,6 +235,24 @@ const addOrUpdateMemberOrder = createAsyncThunk(
     };
 
     await addUpdateMemberOrder(orderId, updateParams);
+    const subOrderId = `${memberId} - ${planId} - ${currentViewDate}`;
+    const { data: firebaseSubOrderDocument } =
+      await participantSubOrderGetByIdApi(subOrderId);
+
+    if (!firebaseSubOrderDocument) {
+      await participantSubOrderAddDocumentApi({
+        participantId: memberId,
+        planId,
+        timestamp: currentViewDate,
+      });
+    } else {
+      await participantSubOrderUpdateDocumentApi({
+        subOrderId,
+        params: {
+          foodId,
+        },
+      });
+    }
     await dispatch(loadData(orderId));
   },
 );

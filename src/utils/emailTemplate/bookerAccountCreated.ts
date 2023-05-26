@@ -4,7 +4,8 @@ type BookerAccountCreatedParams = {
   companyUser: any;
   password: string;
 };
-export const bookerAccountCreatedSubject = 'Tạo tài khoản thành công';
+export const bookerAccountCreatedSubject =
+  'Tài khoản PITO Cloud Canteen đã tạo thành công';
 
 const bookerAccountCreated = ({
   companyUser,
@@ -16,8 +17,8 @@ const bookerAccountCreated = ({
 
   const { address: companyAddress } = companyLocation;
   const loginUrl = `${BASE_URL}/dang-nhap`;
-  const developJourneyUrl = 'https://cloudcanteen.pito.vn/';
-  const termOfServiceUrl = 'https://cloudcanteen.pito.vn/';
+  const developJourneyUrl = 'https://pito.vn/cloud-canteen/nhat-ky';
+  const termOfServiceUrl = 'https://pito.vn/cloud-canteen/dieu-khoan-dieu-kien';
 
   return `
   <!DOCTYPE html

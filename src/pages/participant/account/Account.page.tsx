@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
@@ -8,17 +7,15 @@ import IconFood from '@components/Icons/IconFood/IconFood';
 import IconLock from '@components/Icons/IconLock/IconLock';
 import IconLogout from '@components/Icons/IconLogout/IconLogout';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
 import { participantPaths } from '@src/paths';
 
 import AvatarForm from './components/AvatarForm/AvatarForm';
-import { AccountThunks } from './Account.slice';
 
 import css from './Account.module.scss';
 
 const AccountPage = () => {
-  const dispatch = useAppDispatch();
   const router = useRouter();
   const handleLogout = useLogout();
   const currentUser = useAppSelector((state) => state.user.currentUser);
@@ -34,10 +31,6 @@ const AccountPage = () => {
   const openSpecialDemandModal = () => {
     router.push(participantPaths.AccountSpecialDemand);
   };
-
-  useEffect(() => {
-    dispatch(AccountThunks.fetchAttributes());
-  }, []);
 
   return (
     <div className={css.container}>

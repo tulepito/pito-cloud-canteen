@@ -1,0 +1,12 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.container {
+  padding: 64px 16px 0;
+}
+
+.title {
+  @include textTemplate(18px, $fontWeightBold, 24px);
+  margin-bottom: 16px;
+}

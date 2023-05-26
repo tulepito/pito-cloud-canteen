@@ -5,6 +5,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
+import { groupFoodOrderByDate } from '@pages/company/orders/[orderId]/picking/helpers/orderDetailHelper';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderStates } from '@src/utils/enums';
@@ -56,9 +57,15 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     }) > 0;
 
   const tabItems = useMemo(
-    () =>
-      Object.keys(orderDetail).map((key: string) => {
-        const updatePlanDetail = (updateData: TObject) => {
+    () => {
+      const foodOrderGroupedByDate = groupFoodOrderByDate({ orderDetail });
+
+      return Object.keys(orderDetail).map((key: string) => {
+        const foodOrder = foodOrderGroupedByDate.find(
+          ({ date }) => date === key,
+        );
+
+        const updatePlanDetail = (updateData: TObject, skipRefetch = false) => {
           if (planId) {
             dispatch(
               OrderDetailThunks.updatePlanDetail({
@@ -68,6 +75,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                   ...orderDetail,
                   [key]: { ...orderDetail[key], ...updateData },
                 },
+                skipRefetch,
               }),
             );
           }
@@ -77,9 +85,16 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
           key,
           label: formatTimestamp(Number(key)),
           childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
-          childrenProps: { ...orderDetail[key], notes, updatePlanDetail },
+          childrenProps: {
+            ...orderDetail[key],
+            notes,
+            updatePlanDetail,
+            timeStamp: key,
+            foodOrder,
+          },
         };
-      }),
+      });
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(order), JSON.stringify(orderDetail)],
   );
@@ -104,6 +119,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
         <ReviewOrderStatesSection
           data={{ transactionDataMap, isCanceledOrder: false }}
           isAdminLayout
+          className={css.reviewOrderStates}
         />
       </RenderWhen>
       <OrderHeaderInfor

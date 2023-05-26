@@ -1,0 +1,14 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.foodBackground {
+  width: 100vw;
+  height: 100vh;
+}
+
+.btn {
+  flex-basis: 50%;
+  border-radius: 8px;
+  @include textTemplate(14px, $fontWeightBold, 24px);
+}

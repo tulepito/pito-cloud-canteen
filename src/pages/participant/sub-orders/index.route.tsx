@@ -1,10 +1,11 @@
-import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
-const ParticipantDashboardRoute = () => (
+import SubOrderPage from './SubOrders.page';
+
+const SubOrderPageRoute = () => (
   <MetaWrapper>
-    <BottomNavigationBar />
+    <SubOrderPage />
   </MetaWrapper>
 );
 
-export default ParticipantDashboardRoute;
+export default SubOrderPageRoute;

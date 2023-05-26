@@ -26,6 +26,7 @@ export type TModalProps = PropsWithChildren<{
   customHeader?: ReactNode;
   closeClassName?: string;
   shouldFullScreenInMobile?: boolean;
+  shouldHideGreyBackground?: boolean;
 }>;
 
 const Modal: React.FC<TModalProps> = (props) => {
@@ -45,6 +46,7 @@ const Modal: React.FC<TModalProps> = (props) => {
     closeButton,
     closeClassName,
     shouldFullScreenInMobile = true,
+    shouldHideGreyBackground = false,
   } = props;
 
   const intl = useIntl();
@@ -68,6 +70,7 @@ const Modal: React.FC<TModalProps> = (props) => {
     {
       [css.fullScreenInMobile]:
         shouldFullScreenInMobile && !isTabletLayoutOrLarger,
+      [css.hideGreyBackground]: shouldHideGreyBackground,
     },
     scrollLayerClassName,
   );

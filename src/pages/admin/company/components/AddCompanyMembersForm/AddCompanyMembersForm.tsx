@@ -79,6 +79,7 @@ const AddCompanyMembersFormComponent: React.FC<
     const userIdList = users?.map((user) => user.id.uuid);
     form.change('userIdList', userIdList);
     form.change('noAccountEmailList', notFoundUsers);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(users), JSON.stringify(notFoundUsers)]);
 
   const onKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -90,7 +91,7 @@ const AddCompanyMembersFormComponent: React.FC<
   };
 
   const handleSubmitOnClick = () => {
-    if (usersToRender.length > 0 && customSubmit)
+    if (usersToRender?.length > 0 && customSubmit)
       return customSubmit(form.getState().values);
   };
 

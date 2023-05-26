@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { userThunks } from '@redux/slices/user.slice';
 import { User } from '@src/utils/data';
 import type { TCurrentUser, TUser } from '@src/utils/types';
 
@@ -34,6 +35,7 @@ const SpecialDemandModal: React.FC<TSpecialDemandModalProps> = (props) => {
   );
   const handleSubmit = async (values: TSpecialDemandFormValues) => {
     await dispatch(AccountThunks.updateSpecialDemand(values));
+    await dispatch(userThunks.fetchCurrentUser());
   };
 
   return (

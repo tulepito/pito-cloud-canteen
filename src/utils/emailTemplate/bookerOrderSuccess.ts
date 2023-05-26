@@ -6,7 +6,8 @@ type BookerOrderSuccessParams = {
   orderListing: any;
 };
 
-export const bookerOrderSuccessSubject = 'Đặt đơn hàng thành công';
+export const bookerOrderSuccessSubject = (orderName: string) =>
+  `Đơn hàng ${orderName} vừa đặt thành công`;
 
 const bookerOrderSuccess = ({
   bookerUser,

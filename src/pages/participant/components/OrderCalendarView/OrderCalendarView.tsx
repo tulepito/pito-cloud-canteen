@@ -10,9 +10,12 @@ import OrderEventCard from '@components/CalendarDashboard/components/OrderEventC
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { markColorForOrder } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import useSubOrderPicking from '@pages/participant/hooks/useSubOrderPicking';
+import RatingSubOrderModal from '@pages/participant/orders/components/RatingSubOrderModal/RatingSubOrderModal';
 import SubOrderCard from '@pages/participant/orders/components/SubOrderCard/SubOrderCard';
 import SubOrderDetailModal from '@pages/participant/orders/components/SubOrderDetailModal/SubOrderDetailModal';
+import SuccessRatingModal from '@pages/participant/orders/components/SuccessRatingModal/SuccessRatingModal';
 import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
 import { convertStringToNumber } from '@src/utils/number';
 import { CurrentUser, Listing, User } from '@utils/data';
@@ -45,7 +48,8 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const orderColor = markColorForOrder(convertStringToNumber(orderTile || ''));
   const currentUserId = CurrentUser(currentUser).getId();
   const selectedDay = useAppSelector((state) => state.Calendar.selectedDay);
-
+  const ratingSubOrderModalControl = useBoolean();
+  const successRatingModalControl = useBoolean();
   const {
     subOrderDetailModalControl,
     selectedEvent,
@@ -89,6 +93,9 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         isAnchorTimeChanged = true;
         setAnchorTime(+planItemKey);
       }
+      const expiredTime = deadlineDate
+        ? DateTime.fromMillis(+deadlineDate)
+        : DateTime.fromMillis(+planItemKey).minus({ day: 2 });
 
       const event = {
         resource: {
@@ -107,9 +114,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
             dishes,
           },
           deadlineDate,
-          expiredTime: deadlineDate
-            ? DateTime.fromMillis(+deadlineDate)
-            : DateTime.fromMillis(+planItemKey).minus({ day: 2 }),
+          expiredTime: expiredTime.toMillis(),
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
           orderColor,
@@ -125,6 +130,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     return listEvent;
   });
   const flattenEvents = flatten<Event>(events);
+
   const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) =>
     isSameDate(_event.start, selectedDay),
   );
@@ -183,8 +189,21 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           isOpen={subOrderDetailModalControl.value}
           onClose={subOrderDetailModalControl.setFalse}
           event={selectedEvent!}
+          openRatingSubOrderModal={ratingSubOrderModalControl.setTrue}
+        />
+        <RatingSubOrderModal
+          isOpen={ratingSubOrderModalControl.value}
+          onClose={ratingSubOrderModalControl.setFalse}
+          selectedEvent={selectedEvent}
+          currentUserId={currentUserId}
+          openSuccessRatingModal={successRatingModalControl.setTrue}
         />
       </RenderWhen>
+
+      <SuccessRatingModal
+        isOpen={successRatingModalControl.value}
+        onClose={successRatingModalControl.setFalse}
+      />
     </div>
   );
 };

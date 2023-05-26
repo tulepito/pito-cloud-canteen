@@ -74,6 +74,7 @@ const ProfileForm: React.FC<TProfileFormProps> = ({
           label="Họ và tên"
           input={name.input}
           meta={name.meta}
+          placeholder="Tên"
           className={css.fieldInput}
         />
       </div>
@@ -85,6 +86,7 @@ const ProfileForm: React.FC<TProfileFormProps> = ({
           onChange={(e: any) => e.preventDefault()}
           input={email.input}
           meta={email.meta}
+          placeholder="example@gmail.com"
           className={css.fieldInput}
         />
       </div>
@@ -95,6 +97,7 @@ const ProfileForm: React.FC<TProfileFormProps> = ({
           label="Số điện thoại"
           input={phoneNumber.input}
           meta={phoneNumber.meta}
+          placeholder="0123456789"
           className={css.fieldInput}
         />
       </div>

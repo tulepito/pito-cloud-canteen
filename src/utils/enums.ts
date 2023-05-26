@@ -953,3 +953,14 @@ export const ALLERGIES_OPTIONS = [
     label: 'Đậu nành',
   },
 ];
+
+export enum ESubOrderTxStatus {
+  DELIVERING = 'delivering',
+  DELIVERED = 'delivered',
+  PENDING = 'pending',
+  CANCELED = 'canceled',
+}
+
+export enum ESubOrderStatus {
+  CANCELED = 'canceled',
+}

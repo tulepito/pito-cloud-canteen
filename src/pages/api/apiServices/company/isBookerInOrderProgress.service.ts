@@ -20,9 +20,9 @@ const isBookerInOrderProgress = async ({
   const updateMemberIsBooker = CompanyPermission.includes(
     updatingMember.permission,
   );
-  const intergrationSdk = getIntegrationSdk();
+  const integrationSdk = getIntegrationSdk();
   if (updateMemberIsBooker && updatingMember?.id) {
-    const response = await intergrationSdk.listings.query({
+    const response = await integrationSdk.listings.query({
       meta_bookerId: updatingMember?.id,
       page: 1,
       perPage: 1,
@@ -31,7 +31,7 @@ const isBookerInOrderProgress = async ({
     const inProgressOrders = denormalisedResponseEntities(response);
     if (inProgressOrders.length > 0) {
       throw new CustomError('Conflict', 409, {
-        message: 'Cannot process this function. Member has in progress orders.',
+        message: 'Không thể xoá, booker đang tham gia order',
       });
     }
   }

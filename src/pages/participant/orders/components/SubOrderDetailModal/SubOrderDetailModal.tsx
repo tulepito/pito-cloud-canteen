@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -15,10 +15,11 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
+import { participantPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 import { txIsDelivered, txIsInitiated } from '@src/utils/transaction';
+import type { TTransaction } from '@src/utils/types';
 
 import { OrderListThunks } from '../../OrderList.slice';
 
@@ -28,10 +29,11 @@ type TSubOrderDetailModalProps = {
   isOpen: boolean;
   onClose: () => void;
   event: Event;
+  openRatingSubOrderModal: () => void;
 };
 
 const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
-  const { isOpen, onClose, event } = props;
+  const { isOpen, onClose, event, openRatingSubOrderModal } = props;
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -49,15 +51,20 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   } = event.resource;
   const dishes: any[] = event.resource?.meal?.dishes || [];
   const user = useAppSelector(currentUserSelector);
-  const subOrderTx = useAppSelector(
-    (state) => state.ParticipantOrderList.subOrderTx,
+  const subOrderTxs = useAppSelector(
+    (state) => state.ParticipantOrderList.subOrderTxs,
     shallowEqual,
   );
+
   const fetchSubOrderTxInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
   );
-
-  const isTxInitialState = txIsInitiated(subOrderTx);
+  const timestamp = last(orderDay.split(' - '));
+  const subOrderTx = useMemo(
+    () => subOrderTxs.find((tx) => tx.id.uuid === transactionId),
+    [subOrderTxs, transactionId],
+  );
+  const isTxInitialState = txIsInitiated(subOrderTx as TTransaction);
 
   const isExpired = isOver(expiredTime);
   const dishSelectionFormInitialValues = useMemo(
@@ -66,14 +73,11 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     [JSON.stringify(dishSelection)],
   );
 
-  useEffect(() => {
-    if (isOpen) {
-      dispatch(OrderListThunks.fetchTransactionBySubOrder(transactionId));
-    }
-  }, [dispatch, isOpen, transactionId]);
   const onNavigateToOrderDetail = () => {
-    const to = `/participant/plans/${planId}?orderDay=${orderDay}`;
-    router.push(to);
+    router.push({
+      pathname: participantPaths.PlanDetail,
+      query: { orderDay: timestamp as string, planId, from: 'orderList' },
+    });
   };
 
   const onSelectDish = async (
@@ -98,8 +102,14 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
       orderId,
     };
 
-    await dispatch(participantOrderManagementThunks.updateOrder(payload));
-    await dispatch(OrderListThunks.fetchOrders(currentUserId));
+    await dispatch(OrderListThunks.updateSubOrder(payload));
+    await dispatch(
+      OrderListThunks.addSubOrderDocumentToFirebase({
+        participantId: currentUserId,
+        planId,
+        timestamp: parseInt(`${timestamp}`, 10),
+      }),
+    );
     onClose();
   };
 
@@ -156,8 +166,8 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
             </RenderWhen.False>
           </RenderWhen>
         </RenderWhen>
-        <RenderWhen condition={txIsDelivered(subOrderTx)}>
-          <Button className={css.ratingBtn} onClick={() => {}}>
+        <RenderWhen condition={txIsDelivered(subOrderTx as TTransaction)}>
+          <Button className={css.ratingBtn} onClick={openRatingSubOrderModal}>
             Đánh giá
           </Button>
         </RenderWhen>

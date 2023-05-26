@@ -3,7 +3,6 @@ import classNames from 'classnames';
 
 import IconCancel from '@components/Icons/IconCancel/IconCancel';
 import IconDelivering from '@components/Icons/IconDelivering/IconDelivering';
-import IconFail from '@components/Icons/IconFail/IconFail';
 import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tooltip from '@components/Tooltip/Tooltip';
@@ -11,7 +10,6 @@ import {
   txIsCanceled,
   txIsCompleted,
   txIsDelivering,
-  txIsDeliveryFailed,
   txIsInitiated,
 } from '@utils/transaction';
 
@@ -38,8 +36,8 @@ const StateItem: React.FC<TStateItemProps> = ({
     stateComponent = <IconTickWithBackground className={css.icon} />;
   } else if (txIsDelivering(tx)) {
     stateComponent = <IconDelivering className={css.icon} />;
-  } else if (txIsDeliveryFailed(tx)) {
-    stateComponent = <IconFail className={css.icon} />;
+    // } else if (txIsDeliveryFailed(tx)) {
+    // stateComponent = <IconFail className={css.icon} />;
   } else if (txIsCanceled(tx)) {
     stateComponent = <IconCancel className={css.icon} />;
   }
