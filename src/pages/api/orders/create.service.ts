@@ -145,12 +145,12 @@ const createOrder = async ({
         timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
       });
     } catch (error) {
-      console.log('create scheduler');
+      console.log('create scheduler in create order');
       await createScheduler({
         customName: `sendRemindPOE_${orderFlexId}`,
         timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
         params: {
-          orderId,
+          orderFlexId,
         },
       });
     }
