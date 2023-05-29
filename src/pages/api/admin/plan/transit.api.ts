@@ -1,9 +1,11 @@
 import isEmpty from 'lodash/isEmpty';
+import omit from 'lodash/omit';
 import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import { CustomError, EHttpStatusCode } from '@apis/errors';
+import createQuotation from '@pages/api/orders/[orderId]/quotation/create-quotation.service';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchListing } from '@services/integrationHelper';
 import adminChecker from '@services/permissionChecker/admin';
@@ -60,6 +62,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         if (transition === ETransition.OPERATOR_CANCEL_PLAN) {
           const txGetter = Transaction(tx);
           const { booking, listing, provider } = txGetter.getFullData();
+          const listingGetter = Listing(listing);
+          const providerGetter = User(provider);
+          const restaurantId = listingGetter.getId();
+          const partnerId = providerGetter.getId();
           const { displayStart } = booking.attributes;
           const timestamp = new Date(displayStart).getTime();
           const startTimestamp = DateTime.fromMillis(timestamp)
@@ -69,7 +75,38 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const { participantIds = [], orderId } = txGetter.getMetadata();
           const order = await fetchListing(orderId);
           const orderListing = Listing(order);
-          const { plans = [] } = orderListing.getMetadata();
+          const {
+            plans = [],
+            quotationId,
+            companyId,
+          } = orderListing.getMetadata();
+          const quotation = await fetchListing(quotationId);
+          const quotationListing = Listing(quotation);
+          const { client, partner } = quotationListing.getMetadata();
+          const newClient = {
+            ...client,
+            quotation: omit(client.quotation, [startTimestamp]),
+          };
+          const newPartner = {
+            ...partner,
+            [restaurantId]: {
+              quotation: omit(partner[restaurantId].quotation, [
+                startTimestamp,
+              ]),
+            },
+          };
+          await integrationSdk.listings.update({
+            id: quotationId,
+            metadata: {
+              status: 'inactive',
+            },
+          });
+          await createQuotation({
+            orderId,
+            companyId,
+            client: newClient,
+            partner: newPartner,
+          });
 
           const plan = await fetchListing(plans[0]);
           const planListing = Listing(plan);
@@ -107,10 +144,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               );
             }),
           );
-          const listingGetter = Listing(listing);
-          const providerGetter = User(provider);
-          const restaurantId = listingGetter.getId();
-          const partnerId = providerGetter.getId();
 
           await emailSendingFactory(
             EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
