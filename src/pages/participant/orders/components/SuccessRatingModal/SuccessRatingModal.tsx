@@ -1,6 +1,9 @@
+import { useRouter } from 'next/router';
+
 import Button from '@components/Button/Button';
 import IconTickWithCircle from '@components/Icons/IconTickWithCircle/IconTickWithCircle';
 import PopupModal from '@components/PopupModal/PopupModal';
+import { participantPaths } from '@src/paths';
 
 import css from './SuccessRatingModal.module.scss';
 
@@ -11,6 +14,10 @@ type TSuccessRatingModalProps = {
 
 const SuccessRatingModal: React.FC<TSuccessRatingModalProps> = (props) => {
   const { isOpen, onClose } = props;
+  const router = useRouter();
+  const goToMyCalendar = () => {
+    router.push(participantPaths.OrderList);
+  };
 
   return (
     <PopupModal
@@ -25,7 +32,7 @@ const SuccessRatingModal: React.FC<TSuccessRatingModalProps> = (props) => {
         <IconTickWithCircle className={css.successIcon} />
         <p>Cảm ơn đánh giá của bạn</p>
       </div>
-      <Button className={css.btn} onClick={onClose}>
+      <Button className={css.btn} onClick={goToMyCalendar}>
         Về Lịch của tôi
       </Button>
     </PopupModal>
