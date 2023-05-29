@@ -6,7 +6,6 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
-import FixedBottomButtons from '@components/FixedBottomButtons/FixedBottomButtons';
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
@@ -231,19 +230,14 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
         </div>
 
         {errorMessage && <div className={css.errorSignUp}>{errorMessage}</div>}
-        <FixedBottomButtons
-          isAbsolute
-          FirstButton={
-            <Button
-              inProgress={inProgress}
-              className={css.submitButton}
-              type="submit"
-              disabled={submitDisable}>
-              {submitButtonText}
-            </Button>
-          }
-        />
       </div>
+      <Button
+        inProgress={inProgress}
+        className={css.submitButton}
+        type="submit"
+        disabled={submitDisable}>
+        {submitButtonText}
+      </Button>
     </Form>
   );
 };
