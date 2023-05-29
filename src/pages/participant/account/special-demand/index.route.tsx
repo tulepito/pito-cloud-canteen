@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 
 import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { participantPaths } from '@src/paths';
 
 import { AccountThunks } from '../Account.slice';
 import SpecialDemandModal from '../components/SpecialDemandModal/SpecialDemandModal';
@@ -17,7 +18,7 @@ const AccountPageRoute = () => {
     shallowEqual,
   );
   const goBack = () => {
-    router.back();
+    router.push(participantPaths.Account);
   };
 
   useEffect(() => {
