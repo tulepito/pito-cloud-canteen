@@ -1,13 +1,15 @@
 import { useRouter } from 'next/router';
 
 import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
+import { participantPaths } from '@src/paths';
 
 import ChangePasswordModal from '../components/ChangePasswordModal/ChangePasswordModal';
 
 const AccountPageRoute = () => {
   const router = useRouter();
+
   const goBack = () => {
-    router.back();
+    router.push(participantPaths.Account);
   };
 
   return (
