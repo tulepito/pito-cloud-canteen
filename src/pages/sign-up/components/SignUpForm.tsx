@@ -232,6 +232,7 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
 
         {errorMessage && <div className={css.errorSignUp}>{errorMessage}</div>}
         <FixedBottomButtons
+          isAbsolute
           FirstButton={
             <Button
               inProgress={inProgress}
