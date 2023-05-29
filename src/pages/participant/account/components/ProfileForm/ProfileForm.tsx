@@ -102,7 +102,6 @@ const ProfileForm: React.FC<TProfileFormProps> = ({
         />
       </div>
       <FixedBottomButtons
-        isAbsolute
         FirstButton={
           <Button
             type="submit"
