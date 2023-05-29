@@ -223,7 +223,15 @@ const OrderListPage = () => {
         subOrderDetailModalControl.setTrue();
       }
     }
-  }, [planIdFromQuery, timestampFromQuery]);
+  }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
+
+  useEffect(() => {
+    if (selectedEvent) {
+      const { timestamp, planId } = selectedEvent.resource;
+      const subOrderId = `${currentUserId} - ${planId} - ${timestamp}`;
+      dispatch(OrderListThunks.fetchSubOrdersFromFirebase(subOrderId));
+    }
+  }, [selectedEvent]);
 
   const openUpdateProfileModal = () => {
     updateProfileModalControl.setTrue();

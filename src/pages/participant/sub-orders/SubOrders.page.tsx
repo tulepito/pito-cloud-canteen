@@ -51,14 +51,27 @@ const SubOrders = () => {
     dispatch(
       SubOrdersThunks.fetchSubOrdersFromFirebase({
         participantId: currentUserId,
-        txStatus: activeTab,
+        txStatus: DELIVERING_TAB,
       }),
     );
-  }, [activeTab, currentUserId, dispatch]);
+    dispatch(
+      SubOrdersThunks.fetchSubOrdersFromFirebase({
+        participantId: currentUserId,
+        txStatus: DELIVERED_TAB,
+      }),
+    );
+  }, [currentUserId, dispatch]);
   const tabItems = [
     {
       key: DELIVERING_TAB,
-      label: 'Đang giao hàng',
+      label: (
+        <div className={css.tabLabel}>
+          <span>Đang giao hàng</span>
+          <div data-number className={css.totalItems}>
+            {deliveringSubOrders.length}
+          </div>
+        </div>
+      ),
       childrenFn: (props: any) => (
         <div>
           <SubOrderList {...props} />
@@ -71,7 +84,14 @@ const SubOrders = () => {
     },
     {
       key: DELIVERED_TAB,
-      label: 'Đã giao hàng',
+      label: (
+        <div className={css.tabLabel}>
+          <span>Đã giao hàng</span>
+          <div data-number className={css.totalItems}>
+            {deliveredSubOrders.length}
+          </div>
+        </div>
+      ),
       childrenFn: (props: any) => (
         <div>
           <SubOrderList {...props} />

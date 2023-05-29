@@ -29,13 +29,14 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const {
-    restaurantAvatarImage,
+    foodImage,
     foodName,
     restaurantName,
     txStatus,
     id,
     reviewId,
     planId,
+    deliveryHour,
   } = subOrder;
 
   const router = useRouter();
@@ -48,7 +49,10 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
   const reviewListing = Listing(review as TListing);
   const { generalRating } = reviewListing.getMetadata();
   const timestamp = parseInt(`${last(id.split(' - '))}`, 10);
-  const subOrderTime = formatTimestamp(timestamp, 'HH:mm EEEE, dd/MM/yyyy');
+  const subOrderTime = `${deliveryHour} ${formatTimestamp(
+    timestamp,
+    "EEEE, 'ngày' dd/MM/yyyy",
+  )}`;
   const hasBottomSection = txStatus === 'delivered';
   useEffect(() => {
     if (reviewId) {
@@ -78,8 +82,8 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
         <div className={css.imageWrapper}>
           <ResponsiveImage
             variants={[EImageVariants.squareSmall2x]}
-            alt={restaurantName}
-            image={restaurantAvatarImage}
+            alt={foodName}
+            image={foodImage}
             className={css.image}
           />
         </div>

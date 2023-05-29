@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -59,6 +59,10 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   const fetchSubOrderTxInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
   );
+  const subOrderDocument = useAppSelector(
+    (state) => state.ParticipantOrderList.subOrderDocument,
+    shallowEqual,
+  );
   const timestamp = last(orderDay.split(' - '));
   const subOrderTx = useMemo(
     () => subOrderTxs.find((tx) => tx.id.uuid === transactionId),
@@ -73,6 +77,12 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     [JSON.stringify(dishSelection)],
   );
 
+  const { reviewId } = subOrderDocument;
+  useEffect(() => {
+    if (isOpen) {
+      dispatch(OrderListThunks.fetchTransactionBySubOrder(transactionId));
+    }
+  }, [dispatch, isOpen, transactionId]);
   const onNavigateToOrderDetail = () => {
     router.push({
       pathname: participantPaths.PlanDetail,
@@ -166,7 +176,8 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
             </RenderWhen.False>
           </RenderWhen>
         </RenderWhen>
-        <RenderWhen condition={txIsDelivered(subOrderTx as TTransaction)}>
+        <RenderWhen
+          condition={!reviewId && txIsDelivered(subOrderTx as TTransaction)}>
           <Button className={css.ratingBtn} onClick={openRatingSubOrderModal}>
             Đánh giá
           </Button>

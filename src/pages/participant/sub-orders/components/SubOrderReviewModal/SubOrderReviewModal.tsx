@@ -36,8 +36,7 @@ const SubOrderReviewModal: React.FC<SubOrderReviewModalProps> = (props) => {
     (state) => state.ParticipantSubOrderList.fetchReviewInProgress,
   );
 
-  const { restaurantAvatarImage, foodName, restaurantName, id, reviewId } =
-    subOrder;
+  const { foodName, restaurantName, id, reviewId, foodImage } = subOrder;
   const review = subOrderReview.find(
     (_review: any) => _review.id.uuid === reviewId,
   );
@@ -77,8 +76,8 @@ const SubOrderReviewModal: React.FC<SubOrderReviewModalProps> = (props) => {
           <div className={css.imageWrapper}>
             <ResponsiveImage
               variants={[EImageVariants.squareSmall2x]}
-              alt={restaurantName}
-              image={restaurantAvatarImage}
+              alt={foodName}
+              image={foodImage}
               className={css.image}
             />
           </div>
@@ -127,7 +126,7 @@ const SubOrderReviewModal: React.FC<SubOrderReviewModalProps> = (props) => {
               alt=""
               image={image}
               className={css.image}
-              variants={[EImageVariants.default]}
+              variants={[EImageVariants.landscapeCrop2x]}
             />
           </div>
         ))}
