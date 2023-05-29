@@ -43,9 +43,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             id: txId,
             transition,
             params: {},
-            include: ['booking'],
           },
-          { expand: true },
+          { expand: true, include: ['booking'] },
         );
 
         const tx = denormalisedResponseEntities(txResponse)[0];

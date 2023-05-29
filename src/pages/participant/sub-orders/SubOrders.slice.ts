@@ -4,7 +4,7 @@ import uniqBy from 'lodash/uniqBy';
 import { participantSubOrderGetDocumentApi } from '@apis/firebaseApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@src/utils/data';
-import { ESubOrderTxStatus } from '@src/utils/enums';
+import { EImageVariants, ESubOrderTxStatus } from '@src/utils/enums';
 
 const FIREBASE_LIMIT_RECORDS = 20;
 
@@ -66,6 +66,11 @@ const fetchReviewFromSubOrder = createAsyncThunk(
     const review = denormalisedResponseEntities(
       await sdk.listings.show({
         id: reviewId,
+        include: ['images'],
+        'fields.image': [
+          `variants.${EImageVariants.landscapeCrop}`,
+          `variants.${EImageVariants.landscapeCrop2x}`,
+        ],
       }),
     )[0];
 

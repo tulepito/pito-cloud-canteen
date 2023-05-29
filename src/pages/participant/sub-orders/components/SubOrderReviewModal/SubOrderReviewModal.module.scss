@@ -141,23 +141,29 @@
 
 .detailReview {
   @include textTemplate(14px, $fontWeightRegular, 20px);
+  padding: 0 16px;
+  margin-top: 20px;
 }
 
 .imageList {
   @include flexAlign(center);
   gap: 12px;
   margin-top: 40px;
-  overflow: auto;
+  overflow-x: auto;
+  padding: 0 16px;
+  height: 133px;
 }
 
 .imageWrapper {
   position: relative;
+  width: 206px;
+  height: 123px;
 }
 
 .image {
-  width: 206px;
-  height: 123px;
+  width: 206px !important;
+  height: 123px !important;
   border-radius: 8px;
-  position: relative;
+  position: relative !important;
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
 }

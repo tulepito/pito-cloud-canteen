@@ -3,7 +3,10 @@ import { createSlice } from '@reduxjs/toolkit';
 import flatten from 'lodash/flatten';
 
 import type { ParticipantSubOrderAddDocumentApiBody } from '@apis/firebaseApi';
-import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
+import {
+  participantSubOrderAddDocumentApi,
+  participantSubOrderGetByIdApi,
+} from '@apis/firebaseApi';
 import { loadOrderDataApi } from '@apis/index';
 import { participantPostRatingApi } from '@apis/participantApi';
 import { fetchTxApi } from '@apis/txApi';
@@ -52,6 +55,10 @@ type TOrderListState = {
 
   addSubOrderDocumentToFirebaseInProgress: boolean;
   addSubOrderDocumentToFirebaseError: any;
+
+  subOrderDocument: any;
+  fetchSubOrderDocumentInProgress: boolean;
+  fetchSubOrderDocumentError: any;
 };
 const initialState: TOrderListState = {
   nutritions: [],
@@ -83,6 +90,10 @@ const initialState: TOrderListState = {
 
   addSubOrderDocumentToFirebaseInProgress: false,
   addSubOrderDocumentToFirebaseError: null,
+
+  subOrderDocument: {},
+  fetchSubOrderDocumentInProgress: false,
+  fetchSubOrderDocumentError: null,
 };
 
 // ================ Thunk types ================ //
@@ -96,6 +107,8 @@ const POST_PARTICIPANT_RATING =
   'app/ParticipantOrderList/POST_PARTICIPANT_RATING';
 const ADD_SUB_ORDER_DOCUMENT_TO_FIREBASE =
   'app/ParticipantOrderList/ADD_SUB_ORDER_DOCUMENT_TO_FIREBASE';
+const FETCH_SUB_ORDERS_FROM_FIREBASE =
+  'app/ParticipantOrderList/FETCH_SUB_ORDERS_FROM_FIREBASE';
 // ================ Async thunks ================ //
 const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
   const { data: response } = await fetchSearchFilterApi();
@@ -203,6 +216,15 @@ const addSubOrderDocumentToFirebase = createAsyncThunk(
   },
 );
 
+const fetchSubOrdersFromFirebase = createAsyncThunk(
+  FETCH_SUB_ORDERS_FROM_FIREBASE,
+  async (subOrderId: string) => {
+    const { data: response } = await participantSubOrderGetByIdApi(subOrderId);
+
+    return response || {};
+  },
+);
+
 export const OrderListThunks = {
   fetchAttributes,
   updateProfile,
@@ -211,6 +233,7 @@ export const OrderListThunks = {
   fetchTransactionBySubOrder,
   postParticipantRating,
   addSubOrderDocumentToFirebase,
+  fetchSubOrdersFromFirebase,
 };
 
 // ================ Slice ================ //
@@ -332,6 +355,20 @@ const OrderListSlice = createSlice({
       .addCase(addSubOrderDocumentToFirebase.rejected, (state, { error }) => {
         state.addSubOrderDocumentToFirebaseInProgress = false;
         state.addSubOrderDocumentToFirebaseError = error.message;
+      })
+
+      .addCase(fetchSubOrdersFromFirebase.pending, (state) => {
+        state.fetchSubOrderDocumentInProgress = true;
+        state.fetchSubOrderDocumentError = false;
+      })
+
+      .addCase(fetchSubOrdersFromFirebase.fulfilled, (state, { payload }) => {
+        state.fetchSubOrderDocumentInProgress = false;
+        state.subOrderDocument = payload;
+      })
+      .addCase(fetchSubOrdersFromFirebase.rejected, (state, { error }) => {
+        state.fetchSubOrderDocumentInProgress = false;
+        state.fetchSubOrderDocumentError = error.message;
       });
   },
 });

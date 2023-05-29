@@ -57,6 +57,10 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   const fetchSubOrderTxInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
   );
+  const subOrderDocument = useAppSelector(
+    (state) => state.ParticipantOrderList.subOrderDocument,
+    shallowEqual,
+  );
   const timestamp = last(orderDay.split(' - '));
 
   const isTxInitialState = txIsInitiated(subOrderTx);
@@ -68,6 +72,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     [JSON.stringify(dishSelection)],
   );
 
+  const { reviewId } = subOrderDocument;
   useEffect(() => {
     if (isOpen) {
       dispatch(OrderListThunks.fetchTransactionBySubOrder(transactionId));
@@ -165,7 +170,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
             </RenderWhen.False>
           </RenderWhen>
         </RenderWhen>
-        <RenderWhen condition={txIsDelivered(subOrderTx)}>
+        <RenderWhen condition={!reviewId && txIsDelivered(subOrderTx)}>
           <Button className={css.ratingBtn} onClick={openRatingSubOrderModal}>
             Đánh giá
           </Button>

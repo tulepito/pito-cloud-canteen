@@ -36,6 +36,13 @@ export const addFirebaseDocument = async ({
     ['images'],
     [`variants.${EImageVariants.squareSmall2x}`],
   );
+  const foodResponse = await fetchListing(
+    foodId,
+    ['images'],
+    [`variants.${EImageVariants.squareSmall2x}`],
+  );
+  const foodListing = Listing(foodResponse);
+  const foodImages = foodListing.getImages();
   const restaurantListing = Listing(restaurantResponse);
   const { avatarImageId } = restaurantListing.getPublicData();
 
@@ -51,6 +58,12 @@ export const addFirebaseDocument = async ({
       uuid: restaurantAvatarImage.id.uuid,
     },
   };
+  const newFoodImage = {
+    ...foodImages[0],
+    id: {
+      uuid: foodImages[0].id.uuid,
+    },
+  };
 
   const subOrderDocument = {
     participantId,
@@ -61,6 +74,7 @@ export const addFirebaseDocument = async ({
     restaurantName,
     foodName,
     restaurantAvatarImage: newRestaurantAvatarImage,
+    foodImage: newFoodImage,
     status,
     txStatus: 'pending',
     deliveryHour,
@@ -77,12 +91,13 @@ export const updateFirebaseDocument = async (
   subOrderId: string,
   params: any,
 ) => {
-  const { txStatus, reviewId, status, foodId } = params;
+  const { txStatus, reviewId, status, foodId, foodImage } = params;
   const allowedParams = {
     ...(txStatus && { txStatus }),
     ...(reviewId && { reviewId }),
     ...(status && { status }),
     ...(foodId && { foodId }),
+    ...(foodImage && { foodImage }),
   };
   await updateCollectionDoc(
     subOrderId,
