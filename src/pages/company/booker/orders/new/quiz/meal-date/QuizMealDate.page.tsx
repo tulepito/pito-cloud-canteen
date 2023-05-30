@@ -69,9 +69,11 @@ const QuizMealDate = () => {
       durationTime: '1',
       durationTimeMode: 'week',
       deliveryHour: deliveryHourFromQuery as string,
+      orderType: true,
     }),
     [deliveryHourFromQuery],
   );
+
   const onFormSubmitClick = async () => {
     creatingOrderModalControl.setTrue();
     try {
