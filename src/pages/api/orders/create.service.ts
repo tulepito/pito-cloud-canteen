@@ -18,6 +18,7 @@ import {
   EBookerOrderDraftStates,
   EListingStates,
   EOrderDraftStates,
+  EOrderType,
 } from '@utils/enums';
 import type { TObject } from '@utils/types';
 
@@ -72,7 +73,7 @@ const createOrder = async ({
     deliveryHour,
     deadlineHour,
     nutritions,
-    selectedGroups,
+    selectedGroups = [],
     packagePerMember,
     dayInWeek,
     startDate,
@@ -80,13 +81,18 @@ const createOrder = async ({
     memberAmount,
     deadlineDate,
     mealType,
+    orderType = EOrderType.group,
   } = generalInfo;
 
+  const isNormalOrder = orderType === EOrderType.normal;
   const shouldUpdateOrderName = startDate && endDate;
 
   const participants: string[] = isEmpty(selectedGroups)
     ? getAllCompanyMembers(companyAccount)
     : calculateGroupMembers(companyAccount, selectedGroups);
+  const groupOrderInfoMaybe = isNormalOrder
+    ? {}
+    : { participants, selectedGroups, deadlineDate, deadlineHour };
 
   // Call api to create order listing
   const orderListingResponse = await integrationSdk.listings.create(
@@ -98,6 +104,7 @@ const createOrder = async ({
         companyId,
         bookerId,
         memberAmount,
+        orderType,
         listingType: ListingTypes.ORDER,
         orderState: isCreatedByAdmin
           ? EOrderDraftStates.draft
@@ -105,15 +112,12 @@ const createOrder = async ({
         orderStateHistory,
         deliveryAddress,
         deliveryHour,
-        deadlineDate,
-        deadlineHour,
+        ...groupOrderInfoMaybe,
         nutritions,
-        selectedGroups,
         packagePerMember,
         dayInWeek,
         startDate,
         endDate,
-        participants,
         mealType,
       },
       ...(shouldUpdateOrderName
@@ -131,7 +135,7 @@ const createOrder = async ({
   const orderListing = denormalisedResponseEntities(orderListingResponse)[0];
   const orderFlexId = orderListing.id.uuid;
 
-  if (deadlineDate) {
+  if (!isNormalOrder && deadlineDate) {
     const reminderTime = DateTime.fromMillis(deadlineDate)
       .setZone(VNTimezone)
       .minus({
@@ -145,7 +149,7 @@ const createOrder = async ({
         timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
       });
     } catch (error) {
-      console.log('create scheduler in create order');
+      console.error('create scheduler in create order');
       await createScheduler({
         customName: `sendRemindPOE_${orderFlexId}`,
         timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
