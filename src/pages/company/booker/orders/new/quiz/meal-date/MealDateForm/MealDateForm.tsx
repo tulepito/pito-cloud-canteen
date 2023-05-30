@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
@@ -48,12 +49,11 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
 
   useEffect(() => {
     setFormValues?.(values);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setFormValues, JSON.stringify(values)]);
+  }, [JSON.stringify(values)]);
 
   useEffect(() => {
     setFormInvalid?.(invalid);
-  }, [setFormInvalid, invalid]);
+  }, [invalid]);
 
   return (
     <Form onSubmit={handleSubmit}>
