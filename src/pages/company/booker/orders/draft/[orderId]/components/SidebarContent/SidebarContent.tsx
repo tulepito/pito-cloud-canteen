@@ -8,9 +8,11 @@ import { DateTime } from 'luxon';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { getInitialLocationValues } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { EOrderType } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
 import { getDaySessionFromDeliveryTime } from '@utils/dates';
 import type { TListing, TUser } from '@utils/types';
@@ -84,12 +86,14 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     selectedGroups,
     packagePerMember,
     vatAllow,
+    orderType = EOrderType.group,
   } = orderData.getMetadata();
   const locationInitValues = {
     deliveryAddress: getInitialLocationValues(
       companyLocation || deliveryAddress || {},
     ),
   };
+  const isGroupOrder = orderType === EOrderType.group;
 
   const nextStartWeek = DateTime.fromJSDate(new Date())
     .startOf('week')
@@ -275,13 +279,21 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
         <nav className={css.navigation}>
           <NavigationItem onOpen={handleOpenDetails} messageId="location" />
           <NavigationItem onOpen={handleOpenDetails} messageId="deliveryTime" />
-          <NavigationItem onOpen={handleOpenDetails} messageId="expiredTime" />
+          <RenderWhen condition={isGroupOrder}>
+            <NavigationItem
+              onOpen={handleOpenDetails}
+              messageId="expiredTime"
+            />
+          </RenderWhen>
           <NavigationItem
             onOpen={handleOpenDetails}
             messageId="numberEmployees"
           />
           <NavigationItem onOpen={handleOpenDetails} messageId="nutrition" />
-          <NavigationItem onOpen={handleOpenDetails} messageId="access" />
+          <RenderWhen condition={isGroupOrder}>
+            <NavigationItem onOpen={handleOpenDetails} messageId="access" />
+          </RenderWhen>
+
           <NavigationItem onOpen={handleOpenDetails} messageId="unitBudget" />
         </nav>
       </div>

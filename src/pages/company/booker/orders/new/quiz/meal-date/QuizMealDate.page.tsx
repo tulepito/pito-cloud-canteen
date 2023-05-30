@@ -61,7 +61,7 @@ const QuizMealDate = () => {
     deadlineHour,
     orderType,
     ...restFormValues
-  } = formValues;
+  } = formValues || {};
 
   const selectedDays = getSelectedDaysOfWeek(startDate, endDate, dayInWeek);
   const formattedStartDate = startDate && formatTimestamp(startDate, 'd MMMM');
