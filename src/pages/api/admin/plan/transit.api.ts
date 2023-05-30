@@ -17,6 +17,7 @@ import {
   User,
 } from '@src/utils/data';
 import { VNTimezone } from '@src/utils/dates';
+import { EQuotationStatus } from '@src/utils/enums';
 import { isTransactionsTransitionInvalidTransition } from '@src/utils/errors';
 import { ETransition } from '@src/utils/transaction';
 import type { TError } from '@src/utils/types';
@@ -98,7 +99,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           await integrationSdk.listings.update({
             id: quotationId,
             metadata: {
-              status: 'inactive',
+              status: EQuotationStatus.INACTIVE,
             },
           });
           await createQuotation({
