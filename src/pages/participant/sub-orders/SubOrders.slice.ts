@@ -99,22 +99,8 @@ const SubOrdersSlice = createSlice({
           ...state,
           fetchSubOrdersInProgress: false,
           fetchSubOrdersError: null,
-          deliveredSubOrders: action.payload.deliveredSubOrders
-            ? uniqBy(
-                state.deliveredSubOrders.concat(
-                  action.payload.deliveredSubOrders,
-                ),
-                'id',
-              )
-            : state.deliveredSubOrders,
-          deliveringSubOrders: action.payload.deliveringSubOrders
-            ? uniqBy(
-                state.deliveringSubOrders.concat(
-                  action.payload.deliveringSubOrders,
-                ),
-                'id',
-              )
-            : state.deliveringSubOrders,
+          deliveredSubOrders: action.payload.deliveredSubOrders || [],
+          deliveringSubOrders: action.payload.deliveringSubOrders || [],
         };
       })
       .addCase(fetchSubOrdersFromFirebase.rejected, (state, action) => {
