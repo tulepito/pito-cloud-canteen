@@ -14,6 +14,7 @@ import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
   EOrderStates,
+  EOrderType,
   EParticipantOrderStatus,
 } from '@utils/enums';
 import type { TPlan } from '@utils/orderTypes';
@@ -125,17 +126,19 @@ export const orderDataCheckers = (order: TListing) => {
     deadlineDate,
     packagePerMember,
     deliveryAddress,
+    orderType,
   } = Listing(order).getMetadata();
   const timeOptions = generateTimeOptions();
+  const isNormalOrder = orderType === EOrderType.normal;
 
   const checkers = {
-    isDeadlineDateValid: Number.isInteger(deadlineDate),
+    isDeadlineDateValid: isNormalOrder || Number.isInteger(deadlineDate),
     isDeliveryAddressValid:
       !isEmpty(deliveryAddress?.address) && !isEmpty(deliveryAddress?.origin),
     isStartDateValid: Number.isInteger(startDate),
     isEndDateValid: Number.isInteger(endDate),
     isDeliveryHourValid: timeOptions.includes(deliveryHour),
-    isDeadlineHourValid: timeOptions.includes(deadlineHour),
+    isDeadlineHourValid: isNormalOrder || timeOptions.includes(deadlineHour),
     isPackagePerMemberValid: Number.isInteger(packagePerMember),
     haveAnyPlans: !isEmpty(plans),
   };
