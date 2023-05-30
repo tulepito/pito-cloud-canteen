@@ -38,10 +38,6 @@ const SubOrders = () => {
     (state) => state.ParticipantSubOrderList.deliveringSubOrders,
     shallowEqual,
   );
-  const deliveringSubOrderLastRecord =
-    deliveringSubOrders[deliveringSubOrders.length - 1]?.createdAt?.second;
-  const deliveredSubOrderLastRecord =
-    deliveredSubOrders[deliveredSubOrders.length - 1]?.createdAt?.second;
 
   const fetchSubOrdersInProgress = useAppSelector(
     (state) => state.ParticipantSubOrderList.fetchSubOrdersInProgress,
@@ -79,7 +75,6 @@ const SubOrders = () => {
       ),
       childrenProps: {
         subOrders: deliveringSubOrders,
-        lastRecord: deliveringSubOrderLastRecord,
       },
     },
     {
@@ -99,7 +94,6 @@ const SubOrders = () => {
       ),
       childrenProps: {
         subOrders: deliveredSubOrders,
-        lastRecord: deliveredSubOrderLastRecord,
         setSelectedSubOrder,
         openSubOrderReviewModal: subOrderReviewModalControl.setTrue,
       },
