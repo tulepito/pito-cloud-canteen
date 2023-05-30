@@ -1,11 +1,9 @@
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
-import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 
 import Button, { InlineTextButton } from '@components/Button/Button';
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
-import Toggle from '@components/Toggle/Toggle';
 
 import css from './BookerNewOrder.module.scss';
 
@@ -83,19 +81,19 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
   const companyLabel = intl.formatMessage({
     id: 'CreateOrderForm.companyLabel',
   });
-  const usePreviousDataLabel = intl.formatMessage({
-    id: 'CreateOrderForm.usePreviousDataLabel',
-  });
+  // const usePreviousDataLabel = intl.formatMessage({
+  //   id: 'CreateOrderForm.usePreviousDataLabel',
+  // });
   const previousOrderLabel = intl.formatMessage({
     id: 'CreateOrderForm.previousOrderLabel',
   });
 
-  const handleUsePreviousData = (checked: boolean) => {
-    usePreviousData.input.onChange(checked);
-    if (!checked) {
-      previousOrder.input.onChange(undefined);
-    }
-  };
+  // const handleUsePreviousData = (checked: boolean) => {
+  //   usePreviousData.input.onChange(checked);
+  //   if (!checked) {
+  //     previousOrder.input.onChange(undefined);
+  //   }
+  // };
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>
@@ -118,14 +116,14 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
           </option>
         ))}
       </FieldSelectComponent>
-      <Toggle
+      {/* <Toggle
         className={classNames(css.toggle, css.input)}
         onClick={handleUsePreviousData}
         status={usePreviousData.input.value ? 'on' : 'off'}
         label={usePreviousDataLabel}
         name={usePreviousData.input.name}
         id={usePreviousData.input.name}
-      />
+      /> */}
       {usePreviousData.input.value && (
         <FieldSelectComponent
           className={css.input}
