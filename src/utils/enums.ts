@@ -964,3 +964,13 @@ export enum ESubOrderTxStatus {
 export enum ESubOrderStatus {
   CANCELED = 'canceled',
 }
+
+export enum ENotificationType {
+  INVITATION = 'INVITATION',
+  COMPANY_JOINED = 'COMPANY_JOINED',
+  ORDER_SUCCESS = 'ORDER_SUCCESS',
+  ORDER_CANCEL = 'ORDER_CANCEL',
+  ORDER_DELIVERING = 'ORDER_DELIVERING',
+  ORDER_PICKING = 'ORDER_PICKING',
+  ORDER_RATING = 'ORDER_RATING',
+}

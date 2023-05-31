@@ -37,3 +37,10 @@ export const participantSubOrderUpdateDocumentApi = async (
 
 export const participantSubOrderGetByIdApi = async (subOrderId: string) =>
   getApi(`/participants/document/${subOrderId}`);
+
+export const participantGetNotificationsApi = async () =>
+  getApi('/participants/notifications');
+
+export const participantUpdateSeenNotificationApi = async (
+  notificationId: string,
+) => postApi('/participants/notifications', { notificationId });

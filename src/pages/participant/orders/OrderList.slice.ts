@@ -4,7 +4,11 @@ import flatten from 'lodash/flatten';
 import uniqBy from 'lodash/uniqBy';
 
 import type { ParticipantSubOrderAddDocumentApiBody } from '@apis/firebaseApi';
-import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
+import {
+  participantGetNotificationsApi,
+  participantSubOrderAddDocumentApi,
+  participantUpdateSeenNotificationApi,
+} from '@apis/firebaseApi';
 import { loadOrderDataApi, updateParticipantOrderApi } from '@apis/index';
 import { participantPostRatingApi } from '@apis/participantApi';
 import { fetchTxApi } from '@apis/txApi';
@@ -56,6 +60,10 @@ type TOrderListState = {
 
   updateSubOrderInProgress: boolean;
   updateSubOrderError: any;
+
+  participantFirebaseNotifications: any[];
+  fetchParticipantFirebaseNotificationsInProgress: boolean;
+  fetchParticipantFirebaseNotificationsError: any;
 };
 const initialState: TOrderListState = {
   nutritions: [],
@@ -90,6 +98,10 @@ const initialState: TOrderListState = {
 
   updateSubOrderInProgress: false,
   updateSubOrderError: null,
+
+  participantFirebaseNotifications: [],
+  fetchParticipantFirebaseNotificationsInProgress: false,
+  fetchParticipantFirebaseNotificationsError: null,
 };
 
 // ================ Thunk types ================ //
@@ -104,6 +116,10 @@ const POST_PARTICIPANT_RATING =
   'app/ParticipantOrderList/POST_PARTICIPANT_RATING';
 const ADD_SUB_ORDER_DOCUMENT_TO_FIREBASE =
   'app/ParticipantOrderList/ADD_SUB_ORDER_DOCUMENT_TO_FIREBASE';
+const FETCH_PARTICIPANT_FIREBASE_NOTIFICATIONS =
+  'app/FETCH_PARTICIPANT_FIREBASE_NOTIFICATIONS';
+const UPDATE_SEEN_NOTIFICATION_STATUS_TO_FIREBASE =
+  'app/UPDATE_SEEN_NOTIFICATION_STATUS_TO_FIREBASE';
 // ================ Async thunks ================ //
 const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
   const { data: response } = await fetchSearchFilterApi();
@@ -249,6 +265,22 @@ const addSubOrderDocumentToFirebase = createAsyncThunk(
   },
 );
 
+const fetchParticipantFirebaseNotifications = createAsyncThunk(
+  FETCH_PARTICIPANT_FIREBASE_NOTIFICATIONS,
+  async () => {
+    const { data: response } = await participantGetNotificationsApi();
+
+    return response || [];
+  },
+);
+
+const updateSeenNotificationStatusToFirebase = createAsyncThunk(
+  UPDATE_SEEN_NOTIFICATION_STATUS_TO_FIREBASE,
+  async (notificationId: string) => {
+    await participantUpdateSeenNotificationApi(notificationId);
+  },
+);
+
 export const OrderListThunks = {
   fetchAttributes,
   updateProfile,
@@ -258,6 +290,8 @@ export const OrderListThunks = {
   postParticipantRating,
   addSubOrderDocumentToFirebase,
   updateSubOrder,
+  fetchParticipantFirebaseNotifications,
+  updateSeenNotificationStatusToFirebase,
 };
 
 // ================ Slice ================ //
@@ -285,6 +319,27 @@ const OrderListSlice = createSlice({
       return {
         ...state,
         colorOrderMap,
+      };
+    },
+    seenNotification: (state, action) => {
+      const notificationId = action.payload;
+      const { participantFirebaseNotifications } = state;
+      const newNotifications = participantFirebaseNotifications.map(
+        (notification) => {
+          if (notification.id === notificationId) {
+            return {
+              ...notification,
+              seen: true,
+            };
+          }
+
+          return notification;
+        },
+      );
+
+      return {
+        ...state,
+        participantFirebaseNotifications: newNotifications,
       };
     },
   },
@@ -392,7 +447,26 @@ const OrderListSlice = createSlice({
       .addCase(updateSubOrder.rejected, (state, { error }) => {
         state.updateSubOrderInProgress = false;
         state.updateSubOrderError = error.message;
-      });
+      })
+
+      .addCase(fetchParticipantFirebaseNotifications.pending, (state) => {
+        state.fetchParticipantFirebaseNotificationsInProgress = true;
+        state.fetchParticipantFirebaseNotificationsError = false;
+      })
+      .addCase(
+        fetchParticipantFirebaseNotifications.fulfilled,
+        (state, { payload }) => {
+          state.fetchParticipantFirebaseNotificationsInProgress = false;
+          state.participantFirebaseNotifications = payload;
+        },
+      )
+      .addCase(
+        fetchParticipantFirebaseNotifications.rejected,
+        (state, { error }) => {
+          state.fetchParticipantFirebaseNotificationsInProgress = false;
+          state.fetchParticipantFirebaseNotificationsError = error.message;
+        },
+      );
   },
 });
 

@@ -6,6 +6,7 @@ import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import { CustomError, EHttpStatusCode } from '@apis/errors';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchListing } from '@services/integrationHelper';
+import { createFirebaseDocNotification } from '@services/notifications';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import {
@@ -15,6 +16,7 @@ import {
   User,
 } from '@src/utils/data';
 import { VNTimezone } from '@src/utils/dates';
+import { ENotificationType } from '@src/utils/enums';
 import { isTransactionsTransitionInvalidTransition } from '@src/utils/errors';
 import { ETransition } from '@src/utils/transaction';
 import type { TError } from '@src/utils/types';
@@ -57,20 +59,32 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         );
 
         const tx = denormalisedResponseEntities(txResponse)[0];
-        if (transition === ETransition.OPERATOR_CANCEL_PLAN) {
-          const txGetter = Transaction(tx);
-          const { booking, listing, provider } = txGetter.getFullData();
-          const { displayStart } = booking.attributes;
-          const timestamp = new Date(displayStart).getTime();
-          const startTimestamp = DateTime.fromMillis(timestamp)
-            .setZone(VNTimezone)
-            .startOf('day')
-            .toMillis();
-          const { participantIds = [], orderId } = txGetter.getMetadata();
-          const order = await fetchListing(orderId);
-          const orderListing = Listing(order);
-          const { plans = [] } = orderListing.getMetadata();
+        const txGetter = Transaction(tx);
+        const { participantIds = [], orderId } = txGetter.getMetadata();
+        const { booking, listing, provider } = txGetter.getFullData();
+        const { displayStart } = booking.attributes;
+        const timestamp = new Date(displayStart).getTime();
+        const startTimestamp = DateTime.fromMillis(timestamp)
+          .setZone(VNTimezone)
+          .startOf('day')
+          .toMillis();
+        const order = await fetchListing(orderId);
+        const orderListing = Listing(order);
+        const { plans = [] } = orderListing.getMetadata();
+        const { title: orderTitle } = orderListing.getAttributes();
 
+        if (transition === ETransition.START_DELIVERY) {
+          participantIds.map(async (participantId: string) => {
+            createFirebaseDocNotification(ENotificationType.ORDER_DELIVERING, {
+              orderId,
+              orderTitle,
+              userId: participantId,
+              planId: plans[0],
+              subOrderDate: startTimestamp,
+            });
+          });
+        }
+        if (transition === ETransition.OPERATOR_CANCEL_PLAN) {
           const plan = await fetchListing(plans[0]);
           const planListing = Listing(plan);
           const { orderDetail } = planListing.getMetadata();
@@ -121,6 +135,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               partnerId,
             },
           );
+
+          participantIds.map(async (participantId: string) => {
+            createFirebaseDocNotification(ENotificationType.ORDER_CANCEL, {
+              orderId,
+              orderTitle,
+              userId: participantId,
+              planId: plans[0],
+              subOrderDate: startTimestamp,
+            });
+          });
         }
 
         return res.status(200).json({
