@@ -53,7 +53,7 @@ export const calculatePriceQuotationInfo = ({
   ).reduce<TObject>((result, currentOrderDetailEntry) => {
     const [subOrderDate, rawOrderDetailOfDate] = currentOrderDetailEntry;
     const { status, transactionId } = rawOrderDetailOfDate;
-    if (status === ESubOrderStatus.CANCELED && transactionId) {
+    if (status === ESubOrderStatus.CANCELED || !transactionId) {
       return result;
     }
 
