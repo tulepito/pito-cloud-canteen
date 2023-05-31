@@ -52,6 +52,7 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
 
   const viewFunc = (viewName: string) => () => {
     onView(viewName);
+    localStorage.setItem('participant_calendarView', viewName);
   };
 
   const viewNamesGroupFunc = () => {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import type { Event } from 'react-big-calendar';
+import type { View } from 'react-big-calendar';
+import { type Event, Views } from 'react-big-calendar';
 import Skeleton from 'react-loading-skeleton';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
@@ -8,6 +9,7 @@ import Avatar from '@components/Avatar/Avatar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { getItem } from '@helpers/localStorageHelpers';
 import { markColorForOrder } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -135,6 +137,9 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     isSameDate(_event.start, selectedDay),
   );
 
+  const defaultView =
+    (getItem('participant_calendarView') as View) || Views.WEEK;
+
   const sectionCompanyBranding = loadDataInProgress ? (
     <div className={css.sectionCompanyBranding}>
       <Skeleton className={css.avatarSkeleton} />
@@ -161,6 +166,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           renderEvent={OrderEventCard}
           inProgress={loadDataInProgress}
           exposeAnchorDate={handleAnchorDateChange}
+          defautlView={defaultView}
           components={{
             toolbar: (toolBarProps: any) => (
               <ParticipantToolbar

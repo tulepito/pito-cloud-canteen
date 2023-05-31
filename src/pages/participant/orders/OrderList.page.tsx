@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
-import type { Event } from 'react-big-calendar';
+import type { Event, View } from 'react-big-calendar';
 import { Views } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
 import compact from 'lodash/compact';
@@ -15,6 +15,7 @@ import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { getItem } from '@helpers/localStorageHelpers';
 import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -194,6 +195,10 @@ const OrderListPage = () => {
     isSameDate(_event.start, selectedDay),
   );
 
+  const defaultView = isMobileLayout
+    ? Views.MONTH
+    : (getItem('participant_calendarView') as View) || Views.WEEK;
+
   const subOrdersFromSelectedDayTxIds = compact(
     subOrdersFromSelectedDay.map(
       (_event: any) => _event.resource.transactionId,
@@ -274,7 +279,7 @@ const OrderListPage = () => {
           // companyLogo={sectionCompanyBranding}
           renderEvent={OrderEventCard}
           inProgress={fetchOrdersInProgress}
-          defautlView={isMobileLayout ? Views.MONTH : Views.WEEK}
+          defautlView={defaultView}
           // exposeAnchorDate={handleAnchorDateChange}
           components={{
             toolbar: (toolBarProps: any) => (
