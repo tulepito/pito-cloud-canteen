@@ -35,10 +35,9 @@ export const createFirebaseDocNotification = async (
 ) => {
   const notificationTime = new Date();
   const notificationId = randomUUID();
-
-  switch (notificationType) {
-    case ENotificationType.INVITATION: {
-      try {
+  try {
+    switch (notificationType) {
+      case ENotificationType.INVITATION: {
         const { bookerName, companyId, userId, companyName } =
           notificationParams;
         const data = {
@@ -55,14 +54,9 @@ export const createFirebaseDocNotification = async (
           data,
           FIREBASE_NOTIFICATION_COLLECTION_NAME!,
         );
-      } catch (error) {
-        console.error('Error notification type: ', notificationType);
-        console.error('Error creating notification: ', error);
+        break;
       }
-      break;
-    }
-    case ENotificationType.COMPANY_JOINED: {
-      try {
+      case ENotificationType.COMPANY_JOINED: {
         const { companyName, userId } = notificationParams;
         const data = {
           notificationType,
@@ -76,14 +70,9 @@ export const createFirebaseDocNotification = async (
           data,
           FIREBASE_NOTIFICATION_COLLECTION_NAME!,
         );
-      } catch (error) {
-        console.error('Error notification type: ', notificationType);
-        console.error('Error creating notification: ', error);
+        break;
       }
-      break;
-    }
-    case ENotificationType.ORDER_PICKING: {
-      try {
+      case ENotificationType.ORDER_PICKING: {
         const { orderTitle, orderId, userId } = notificationParams;
         const data = {
           notificationType,
@@ -99,14 +88,9 @@ export const createFirebaseDocNotification = async (
           data,
           FIREBASE_NOTIFICATION_COLLECTION_NAME!,
         );
-      } catch (error) {
-        console.error('Error notification type: ', notificationType);
-        console.error('Error creating notification: ', error);
+        break;
       }
-      break;
-    }
-    case ENotificationType.ORDER_DELIVERING: {
-      try {
+      case ENotificationType.ORDER_DELIVERING: {
         const { orderTitle, orderId, userId, planId, subOrderDate } =
           notificationParams;
         const data = {
@@ -125,14 +109,9 @@ export const createFirebaseDocNotification = async (
           data,
           FIREBASE_NOTIFICATION_COLLECTION_NAME!,
         );
-      } catch (error) {
-        console.error('Error notification type: ', notificationType);
-        console.error('Error creating notification: ', error);
+        break;
       }
-      break;
-    }
-    case ENotificationType.ORDER_SUCCESS: {
-      try {
+      case ENotificationType.ORDER_SUCCESS: {
         const { orderTitle, orderId, userId, planId, subOrderDate } =
           notificationParams;
         const data = {
@@ -151,14 +130,9 @@ export const createFirebaseDocNotification = async (
           data,
           FIREBASE_NOTIFICATION_COLLECTION_NAME!,
         );
-      } catch (error) {
-        console.error('Error notification type: ', notificationType);
-        console.error('Error creating notification: ', error);
+        break;
       }
-      break;
-    }
-    case ENotificationType.ORDER_CANCEL: {
-      try {
+      case ENotificationType.ORDER_CANCEL: {
         const { orderTitle, orderId, userId, planId, subOrderDate } =
           notificationParams;
         const data = {
@@ -177,14 +151,9 @@ export const createFirebaseDocNotification = async (
           data,
           FIREBASE_NOTIFICATION_COLLECTION_NAME!,
         );
-      } catch (error) {
-        console.error('Error notification type: ', notificationType);
-        console.error('Error creating notification: ', error);
+        break;
       }
-      break;
-    }
-    case ENotificationType.ORDER_RATING: {
-      try {
+      case ENotificationType.ORDER_RATING: {
         const { userId, planId, subOrderDate, foodName } = notificationParams;
         const data = {
           notificationType,
@@ -201,15 +170,15 @@ export const createFirebaseDocNotification = async (
           data,
           FIREBASE_NOTIFICATION_COLLECTION_NAME!,
         );
-      } catch (error) {
-        console.error('Error notification type: ', notificationType);
-        console.error('Error creating notification: ', error);
+        break;
       }
-      break;
-    }
 
-    default:
-      break;
+      default:
+        break;
+    }
+  } catch (error) {
+    console.error('Error notification type: ', notificationType);
+    console.error('Error creating notification: ', error);
   }
 };
 

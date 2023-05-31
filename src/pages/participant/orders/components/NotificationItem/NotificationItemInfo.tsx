@@ -28,145 +28,131 @@ const NotificationItemInfo: React.FC<NotificationItemInfoProps> = (props) => {
 
   const pastTime = calcPastTime(seconds * 1000);
 
-  const infoRender = () => {
-    switch (type) {
-      case ENotificationType.INVITATION:
-        return (
-          <div className={css.contentWrapper}>
-            <div className={css.content}>
-              {intl.formatMessage(
-                {
-                  id: 'NotificationItemInfo.title.invitation',
-                },
-                {
-                  span: (msg) => <span className={css.boldText}>{msg}</span>,
-                  bookerName,
-                },
-              )}
-            </div>
-            <div className={css.pastTime}>{pastTime}</div>
+  switch (type) {
+    case ENotificationType.INVITATION:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.invitation',
+              },
+              {
+                span: (msg) => <span className={css.boldText}>{msg}</span>,
+                bookerName,
+              },
+            )}
           </div>
-        );
-      case ENotificationType.COMPANY_JOINED:
-        return (
-          <div className={css.contentWrapper}>
-            <div className={css.content}>
-              {intl.formatMessage(
-                {
-                  id: 'NotificationItemInfo.title.companyJoined',
-                },
-                {
-                  span: (msg) => <span className={css.boldText}>{msg}</span>,
-                  companyName,
-                },
-              )}
-            </div>
-            <div className={css.pastTime}>{pastTime}</div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+    case ENotificationType.COMPANY_JOINED:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.companyJoined',
+              },
+              {
+                span: (msg) => <span className={css.boldText}>{msg}</span>,
+                companyName,
+              },
+            )}
           </div>
-        );
-      case ENotificationType.ORDER_PICKING:
-        return (
-          <div className={css.contentWrapper}>
-            <div className={css.content}>
-              {intl.formatMessage(
-                {
-                  id: 'NotificationItemInfo.title.orderPicking',
-                },
-                {
-                  span: (msg: any) => (
-                    <span className={css.boldText}>{msg}</span>
-                  ),
-                  orderTitle: `#${orderTitle}`,
-                },
-              )}
-            </div>
-            <div className={css.pastTime}>{pastTime}</div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+    case ENotificationType.ORDER_PICKING:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.orderPicking',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                orderTitle: `#${orderTitle}`,
+              },
+            )}
           </div>
-        );
-      case ENotificationType.ORDER_DELIVERING:
-        return (
-          <div className={css.contentWrapper}>
-            <div className={css.content}>
-              {intl.formatMessage(
-                {
-                  id: 'NotificationItemInfo.title.orderDelivering',
-                },
-                {
-                  span: (msg: any) => (
-                    <span className={css.boldText}>{msg}</span>
-                  ),
-                  subOrderDate: formattedDate,
-                },
-              )}
-            </div>
-            <div className={css.pastTime}>{pastTime}</div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+    case ENotificationType.ORDER_DELIVERING:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.orderDelivering',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                subOrderDate: formattedDate,
+              },
+            )}
           </div>
-        );
-      case ENotificationType.ORDER_CANCEL:
-        return (
-          <div className={css.contentWrapper}>
-            <div className={css.content}>
-              {intl.formatMessage(
-                {
-                  id: 'NotificationItemInfo.title.orderCancel',
-                },
-                {
-                  span: (msg: any) => (
-                    <span className={css.boldText}>{msg}</span>
-                  ),
-                  subOrderDate: formattedDate,
-                },
-              )}
-            </div>
-            <div className={css.pastTime}>{pastTime}</div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+    case ENotificationType.ORDER_CANCEL:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.orderCancel',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                subOrderDate: formattedDate,
+              },
+            )}
           </div>
-        );
-      case ENotificationType.ORDER_SUCCESS:
-        return (
-          <div className={css.contentWrapper}>
-            <div className={css.content}>
-              {intl.formatMessage(
-                {
-                  id: 'NotificationItemInfo.title.orderSuccess',
-                },
-                {
-                  span: (msg: any) => (
-                    <span className={css.boldText}>{msg}</span>
-                  ),
-                  subOrderDate: formattedDate,
-                },
-              )}
-            </div>
-            <div className={css.pastTime}>{pastTime}</div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+    case ENotificationType.ORDER_SUCCESS:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.orderSuccess',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                subOrderDate: formattedDate,
+              },
+            )}
           </div>
-        );
-      case ENotificationType.ORDER_RATING:
-        return (
-          <div className={css.contentWrapper}>
-            <div className={css.content}>
-              {intl.formatMessage(
-                {
-                  id: 'NotificationItemInfo.title.orderRating',
-                },
-                {
-                  span: (msg: any) => (
-                    <span className={css.boldText}>{msg}</span>
-                  ),
-                  foodName,
-                  subOrderDate: formattedDate,
-                },
-              )}
-            </div>
-            <div className={css.pastTime}>{pastTime}</div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+    case ENotificationType.ORDER_RATING:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.orderRating',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                foodName,
+                subOrderDate: formattedDate,
+              },
+            )}
           </div>
-        );
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
 
-      default:
-        return <div></div>;
-    }
-  };
-
-  return infoRender();
+    default:
+      return <div></div>;
+  }
 };
 
 export default NotificationItemInfo;

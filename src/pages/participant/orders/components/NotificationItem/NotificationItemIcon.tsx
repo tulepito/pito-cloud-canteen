@@ -13,29 +13,25 @@ type NotificationItemIconProps = {
 const NotificationItemIcon: React.FC<NotificationItemIconProps> = (props) => {
   const { type } = props;
 
-  const iconRender = () => {
-    switch (type) {
-      case ENotificationType.INVITATION:
-        return <IconUser variant="withPlus" />;
-      case ENotificationType.COMPANY_JOINED:
-        return <IconUser variant="multiUser" />;
-      case ENotificationType.ORDER_SUCCESS:
-        return <IconTickWithBackground />;
-      case ENotificationType.ORDER_CANCEL:
-        return <IconCancel />;
-      case ENotificationType.ORDER_DELIVERING:
-        return <IconTruck variant="withBackground" />;
-      case ENotificationType.ORDER_PICKING:
-        return <IconClock variant="withBackground" />;
-      case ENotificationType.ORDER_RATING:
-        return <IconRatingStar />;
+  switch (type) {
+    case ENotificationType.INVITATION:
+      return <IconUser variant="withPlus" />;
+    case ENotificationType.COMPANY_JOINED:
+      return <IconUser variant="multiUser" />;
+    case ENotificationType.ORDER_SUCCESS:
+      return <IconTickWithBackground />;
+    case ENotificationType.ORDER_CANCEL:
+      return <IconCancel />;
+    case ENotificationType.ORDER_DELIVERING:
+      return <IconTruck variant="withBackground" />;
+    case ENotificationType.ORDER_PICKING:
+      return <IconClock variant="withBackground" />;
+    case ENotificationType.ORDER_RATING:
+      return <IconRatingStar />;
 
-      default:
-        return <IconUser />;
-    }
-  };
-
-  return iconRender();
+    default:
+      return <IconUser />;
+  }
 };
 
 export default NotificationItemIcon;
