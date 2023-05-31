@@ -2,7 +2,7 @@ import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
-import { EListingStates } from '@utils/enums';
+import { EListingStates, EOrderType } from '@utils/enums';
 
 import { getInitMemberOrder } from './memberOrder.helper';
 
@@ -18,7 +18,13 @@ const createPlan = async ({
   const orderListing = await fetchListing(orderId as string);
   const { metadata, title: orderTitle } = orderListing.attributes;
 
-  const { companyId, plans = [], selectedGroups = [] } = metadata;
+  const {
+    companyId,
+    plans = [],
+    selectedGroups = [],
+    orderType = EOrderType.group,
+  } = metadata;
+  const isGroupOrder = orderType === EOrderType.group;
   const companyAccount = await fetchUser(companyId);
 
   const { subAccountId } = companyAccount.attributes.profile.privateData;
@@ -33,7 +39,7 @@ const createPlan = async ({
       ...result,
       [date]: {
         ...orderDetail[date],
-        memberOrders: initialMemberOrder,
+        memberOrders: isGroupOrder ? [] : initialMemberOrder,
       },
     };
   }, {});
