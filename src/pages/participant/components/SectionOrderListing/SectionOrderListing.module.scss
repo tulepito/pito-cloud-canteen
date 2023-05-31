@@ -67,11 +67,11 @@
       margin-bottom: 24px;
 
       @include viewportMedium {
-        width: calc(100% / 2 - 10px);
+        width: calc(calc(100% - 20px) / 2);
       }
 
       @include viewportLarge {
-        width: calc(100% / 3 - 40px / 3);
+        width: calc(calc(100% - 40px) / 3);
       }
     }
   }
