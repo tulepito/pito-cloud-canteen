@@ -20,7 +20,7 @@ type TCartItemList = {
 const CartItemList: React.FC<TCartItemList> = ({
   cartList,
   plan,
-  cartListKeys,
+  cartListKeys = [],
   handleRemoveItem,
 }) => {
   const intl = useIntl();
@@ -71,9 +71,9 @@ const CartItemList: React.FC<TCartItemList> = ({
 
   return (
     <>
-      {cartListKeys.map((cartKey: string) =>
-        renderItem(cartList[cartKey], cartKey),
-      )}
+      {cartListKeys
+        .sort()
+        .map((cartKey: string) => renderItem(cartList[cartKey], cartKey))}
     </>
   );
 };
