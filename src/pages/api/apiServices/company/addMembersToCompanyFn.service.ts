@@ -6,10 +6,12 @@ import { sendIndividualEmail } from '@services/awsSES';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { createFirebaseDocNotification } from '@services/notifications';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
 import participantCompanyInvitation, {
   participantCompanyInvitationSubject,
 } from '@src/utils/emailTemplate/participantCompanyInvitation';
+import { ENotificationType } from '@src/utils/enums';
 import { denormalisedResponseEntities, User } from '@utils/data';
 
 const defaultExpireTime =
@@ -20,14 +22,17 @@ type TAddMembersToCompanyParams = {
   userIdList: string[];
   noAccountEmailList: string[];
   companyId: string;
+  bookerName?: string;
 };
 
 const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
-  const { userIdList, noAccountEmailList, companyId } = params;
+  const { userIdList, noAccountEmailList, companyId, bookerName } = params;
   const integrationSdk = getIntegrationSdk();
   const companyAccount = await fetchUser(companyId);
   const companyUser = User(companyAccount);
   const { companyName } = companyUser.getPublicData();
+  const { firstName, lastName } = companyUser.getProfile();
+  const companyBookerName = `${lastName} ${firstName}`;
   const { members = {} } = companyUser.getMetadata();
   const membersIdList = compact(
     Object.values(members).map((_member: any) => _member?.id),
@@ -118,10 +123,12 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     updatedCompanyAccountResponse,
   );
 
+  const participantMemberIds = difference(userIdList, membersIdList);
+
   // Step handle send email for new participant members
   if (Object.keys(newParticipantMembersObj).length > 0) {
     await Promise.all(
-      difference(userIdList, membersIdList).map(async (userId: string) => {
+      participantMemberIds.map(async (userId: string) => {
         await emailSendingFactory(
           EmailTemplateTypes.PARTICIPANT.PARTICIPANT_COMPANY_INVITATION,
           {
@@ -131,6 +138,15 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
         );
       }),
     );
+
+    participantMemberIds.map(async (participantId: string) => {
+      createFirebaseDocNotification(ENotificationType.ORDER_DELIVERING, {
+        userId: participantId,
+        companyName,
+        companyId,
+        bookerName: bookerName || companyBookerName,
+      });
+    });
   }
   // Step handle send email for new no account members
   const emailTemplate = participantCompanyInvitation({
