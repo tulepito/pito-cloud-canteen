@@ -12,6 +12,7 @@ import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import CoverModal from '@components/CoverModal/CoverModal';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import { isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -99,13 +100,13 @@ const ParticipantOrderManagement = () => {
 
   const shouldShowMissingPickingOrderModal =
     !isEmpty(order) && isOrderOverDeadline(order as TListing);
-
   const pickingOrderModalControl = useBoolean(
     !shouldShowMissingPickingOrderModal,
   );
   const missingPickingOrderModalControl = useBoolean(
     shouldShowMissingPickingOrderModal,
   );
+
   useEffect(() => {
     if (isReady) {
       dispatch(participantOrderManagementThunks.loadData(orderId as string));
@@ -173,7 +174,13 @@ const ParticipantOrderManagement = () => {
         onClose={pickingOrderModalControl.setFalse}
         coverSrc={pickingOrderCover}
         contentInProgress={loadDataInProgress}
-        modalTitle={intl.formatMessage({ id: 'PickingOrderModal.title' })}
+        modalTitle={
+          loadDataInProgress
+            ? ''
+            : intl.formatMessage({
+                id: 'PickingOrderModal.title',
+              })
+        }
         modalDescription={intl.formatMessage(
           { id: 'PickingOrderModal.description' },
           {
@@ -185,12 +192,14 @@ const ParticipantOrderManagement = () => {
         )}
         rowInformation={rowInformation}
         buttonWrapper={
-          <Button
-            className={css.btn}
-            disabled={loadDataInProgress}
-            onClick={pickingOrderModalControl.setFalse}>
-            Bắt đầu
-          </Button>
+          <RenderWhen condition={!loadDataInProgress}>
+            <Button
+              className={css.btn}
+              disabled={loadDataInProgress}
+              onClick={pickingOrderModalControl.setFalse}>
+              Bắt đầu
+            </Button>
+          </RenderWhen>
         }
       />
       <CoverModal
@@ -199,18 +208,24 @@ const ParticipantOrderManagement = () => {
         onClose={missingPickingOrderModalControl.setFalse}
         coverSrc={missingPickingOrderCover}
         contentInProgress={loadDataInProgress}
-        modalTitle={intl.formatMessage({ id: 'MissingOrderModal.title' })}
+        modalTitle={
+          loadDataInProgress
+            ? ''
+            : intl.formatMessage({ id: 'MissingOrderModal.title' })
+        }
         modalDescription={intl.formatMessage({
           id: 'MissingOrderModal.description',
         })}
         rowInformation={rowInformation}
         buttonWrapper={
-          <Button
-            className={css.btn}
-            onClick={goToHomePage}
-            disabled={loadDataInProgress}>
-            Về trang chủ
-          </Button>
+          <RenderWhen condition={!loadDataInProgress}>
+            <Button
+              className={css.btn}
+              onClick={goToHomePage}
+              disabled={loadDataInProgress}>
+              Về trang chủ
+            </Button>
+          </RenderWhen>
         }
       />
       <SectionOrderHeader
