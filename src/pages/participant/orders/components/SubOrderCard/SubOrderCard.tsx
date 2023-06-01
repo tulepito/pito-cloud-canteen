@@ -61,6 +61,7 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
   const selectionFoodName = meal?.dishes.find(
     (item: any) => item.key === dishSelection?.dishSelection,
   )?.value;
+
   const shouldShowRejectButton =
     ![EVENT_STATUS.EXPIRED_STATUS, EVENT_STATUS.NOT_JOINED_STATUS].includes(
       status,
