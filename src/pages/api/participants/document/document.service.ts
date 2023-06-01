@@ -48,22 +48,25 @@ export const addFirebaseDocument = async ({
 
   const restaurantImages = restaurantListing.getImages();
 
-  const restaurantAvatarImage = getListingImageById(
-    avatarImageId,
-    restaurantImages,
-  );
-  const newRestaurantAvatarImage = {
+  const restaurantAvatarImage =
+    restaurantImages.length > 0
+      ? getListingImageById(avatarImageId, restaurantImages)
+      : null;
+  const newRestaurantAvatarImage = restaurantAvatarImage && {
     ...restaurantAvatarImage,
     id: {
       uuid: restaurantAvatarImage.id.uuid,
     },
   };
-  const newFoodImage = {
-    ...foodImages[0],
-    id: {
-      uuid: foodImages[0].id.uuid,
-    },
-  };
+  const newFoodImage =
+    foodImages.length > 0
+      ? {
+          ...foodImages[0],
+          id: {
+            uuid: foodImages[0].id.uuid,
+          },
+        }
+      : null;
 
   const subOrderDocument = {
     participantId,
@@ -73,13 +76,16 @@ export const addFirebaseDocument = async ({
     ...(transactionId && { transactionId }),
     restaurantName,
     foodName,
-    restaurantAvatarImage: newRestaurantAvatarImage,
-    foodImage: newFoodImage,
+    ...(newRestaurantAvatarImage && {
+      restaurantAvatarImage: newRestaurantAvatarImage,
+    }),
+    ...(newFoodImage && { foodImage: newFoodImage }),
     status,
     txStatus: 'pending',
     deliveryHour,
     createdAt: new Date(),
   };
+  console.log('subOrderDocument', subOrderDocument);
 
   await setCollectionDocWithCustomId(
     `${participantId} - ${planId} - ${timestamp}`,
