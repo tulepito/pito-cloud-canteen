@@ -143,6 +143,7 @@
   @include textTemplate(14px, $fontWeightRegular, 20px);
   padding: 0 16px;
   margin-top: 20px;
+  white-space: break-spaces;
 }
 
 .imageList {
@@ -158,12 +159,21 @@
   position: relative;
   width: 206px;
   height: 123px;
+
+  .reviewImage {
+    width: 206px !important;
+    height: 123px !important;
+    border-radius: 8px;
+    position: relative !important;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+  }
 }
 
-.image {
-  width: 206px !important;
-  height: 123px !important;
-  border-radius: 8px;
-  position: relative !important;
-  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+.loading {
+  @include flexCenter();
+  height: 80vh;
+
+  svg {
+    stroke: $neutralGray6;
+  }
 }
