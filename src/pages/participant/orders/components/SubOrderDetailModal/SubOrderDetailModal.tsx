@@ -80,7 +80,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   const { reviewId } = subOrderDocument;
   useEffect(() => {
     if (isOpen) {
-      dispatch(OrderListThunks.fetchTransactionBySubOrder(transactionId));
+      dispatch(OrderListThunks.fetchTransactionBySubOrder([transactionId]));
     }
   }, [dispatch, isOpen, transactionId]);
   const onNavigateToOrderDetail = () => {
