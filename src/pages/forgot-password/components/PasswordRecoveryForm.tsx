@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -11,7 +10,7 @@ import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import IconMail from '@components/Icons/IconMail/IconMail';
-import { generalPaths } from '@src/paths';
+import { useAppSelector } from '@hooks/reduxHooks';
 import type { TDefaultProps } from '@utils/types';
 import {
   composeValidators,
@@ -29,7 +28,6 @@ type TExtraProps = TDefaultProps & {
   formId?: string;
   timeLeft: number;
   inProgress: boolean;
-  recoveryError?: ReactNode;
 };
 type TPasswordRecoveryFormComponentProps =
   FormRenderProps<TPasswordRecoveryFormValues> & Partial<TExtraProps>;
@@ -39,9 +37,10 @@ type TPasswordRecoveryFormProps = FormProps<TPasswordRecoveryFormValues> &
 const PasswordRecoveryFormComponent: React.FC<
   TPasswordRecoveryFormComponentProps
 > = (props) => {
-  const { inProgress, recoveryError, timeLeft } = props;
+  const { inProgress, timeLeft } = props;
   const intl = useIntl();
   const router = useRouter();
+  const recoveryError = useAppSelector((state) => state.password.recoveryError);
 
   const formTitle = intl.formatMessage({
     id: 'PasswordRecoveryForm.title',
@@ -77,7 +76,7 @@ const PasswordRecoveryFormComponent: React.FC<
   );
 
   const navigateToSignInPage = () => {
-    router.push(generalPaths.SignIn);
+    router.back();
   };
 
   const { rootClassName, className, formId, handleSubmit, invalid } = props;

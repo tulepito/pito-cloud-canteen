@@ -3,6 +3,11 @@ import groupBy from 'lodash/groupBy';
 import omit from 'lodash/omit';
 
 import {
+  participantSubOrderAddDocumentApi,
+  participantSubOrderGetByIdApi,
+  participantSubOrderUpdateDocumentApi,
+} from '@apis/firebaseApi';
+import {
   addParticipantToOrderApi,
   addUpdateMemberOrder,
   bookerMarkInprogressPlanViewedApi,
@@ -124,7 +129,7 @@ const sendRemindEmailToMember = createAsyncThunk(
     const {
       id: { uuid: orderId },
     } = getState().OrderManagement.orderData!;
-    const participantList = getState().OrderManagement.participantData!;
+
     const {
       attributes: {
         metadata: { orderDetail },
@@ -161,19 +166,11 @@ const sendRemindEmailToMember = createAsyncThunk(
       return memberIdList.indexOf(item) === pos;
     });
 
-    const emailList = uniqueMemberIdList.map((id) => {
-      const participant = participantList.find((p: TUser) => {
-        return p.id.uuid === id;
-      });
-
-      return participant?.attributes.email;
-    });
-
     await sendRemindEmailToMemberApi(orderId, {
       orderLink,
       deadline,
       description,
-      emailList,
+      uniqueMemberIdList,
     });
   },
 );
@@ -238,6 +235,24 @@ const addOrUpdateMemberOrder = createAsyncThunk(
     };
 
     await addUpdateMemberOrder(orderId, updateParams);
+    const subOrderId = `${memberId} - ${planId} - ${currentViewDate}`;
+    const { data: firebaseSubOrderDocument } =
+      await participantSubOrderGetByIdApi(subOrderId);
+
+    if (!firebaseSubOrderDocument) {
+      await participantSubOrderAddDocumentApi({
+        participantId: memberId,
+        planId,
+        timestamp: currentViewDate,
+      });
+    } else {
+      await participantSubOrderUpdateDocumentApi({
+        subOrderId,
+        params: {
+          foodId,
+        },
+      });
+    }
     await dispatch(loadData(orderId));
   },
 );

@@ -1,9 +1,11 @@
 import { useField, useForm } from 'react-final-form-hooks';
+import { useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
 import FixedBottomButtons from '@components/FixedBottomButtons/FixedBottomButtons';
 import Form from '@components/Form/Form';
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
+import { phoneNumberFormatValid } from '@src/utils/validators';
 
 import css from './ProfileForm.module.scss';
 
@@ -19,20 +21,37 @@ type TProfileFormProps = {
   inProgress: boolean;
 };
 
-const validate = (values: TProfileFormValues) => {
-  const errors: any = {};
-  if (!values.name) {
-    errors.name = 'Required';
-  }
-
-  return errors;
-};
-
 const ProfileForm: React.FC<TProfileFormProps> = ({
   onSubmit,
   initialValues,
   inProgress,
 }) => {
+  const intl = useIntl();
+  const validate = (values: TProfileFormValues) => {
+    const errors: any = {};
+    if (!values.name) {
+      errors.name = intl.formatMessage({
+        id: 'SignUpForm.name.required',
+      });
+    }
+
+    if (!values.phoneNumber) {
+      errors.phoneNumber = intl.formatMessage({
+        id: 'SignUpForm.phoneNumber.required',
+      });
+    }
+    if (
+      phoneNumberFormatValid(
+        intl.formatMessage({ id: 'SignUpForm.phoneNumber.invalid' }),
+      )(values.phoneNumber)
+    ) {
+      errors.phoneNumber = intl.formatMessage({
+        id: 'SignUpForm.phoneNumber.invalid',
+      });
+    }
+
+    return errors;
+  };
   const { form, handleSubmit, submitting, hasValidationErrors, pristine } =
     useForm<TProfileFormValues>({
       onSubmit,
@@ -55,6 +74,7 @@ const ProfileForm: React.FC<TProfileFormProps> = ({
           label="Họ và tên"
           input={name.input}
           meta={name.meta}
+          placeholder="Tên"
           className={css.fieldInput}
         />
       </div>
@@ -66,6 +86,7 @@ const ProfileForm: React.FC<TProfileFormProps> = ({
           onChange={(e: any) => e.preventDefault()}
           input={email.input}
           meta={email.meta}
+          placeholder="example@gmail.com"
           className={css.fieldInput}
         />
       </div>
@@ -76,6 +97,7 @@ const ProfileForm: React.FC<TProfileFormProps> = ({
           label="Số điện thoại"
           input={phoneNumber.input}
           meta={phoneNumber.meta}
+          placeholder="0123456789"
           className={css.fieldInput}
         />
       </div>

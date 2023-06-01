@@ -1,7 +1,7 @@
 import { CustomError } from '@apis/errors';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
-import { UserPermission } from '@src/types/UserPermission';
+import { CompanyPermission } from '@src/types/UserPermission';
 import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
@@ -17,11 +17,12 @@ const isBookerInOrderProgress = async ({
   memberEmail: string;
 }) => {
   const updatingMember = members[memberEmail] || {};
-  const updateMemberIsBooker =
-    updatingMember.permission === UserPermission.BOOKER;
-  const intergrationSdk = getIntegrationSdk();
+  const updateMemberIsBooker = CompanyPermission.includes(
+    updatingMember.permission,
+  );
+  const integrationSdk = getIntegrationSdk();
   if (updateMemberIsBooker && updatingMember?.id) {
-    const response = await intergrationSdk.listings.query({
+    const response = await integrationSdk.listings.query({
       meta_bookerId: updatingMember?.id,
       page: 1,
       perPage: 1,
@@ -30,7 +31,7 @@ const isBookerInOrderProgress = async ({
     const inProgressOrders = denormalisedResponseEntities(response);
     if (inProgressOrders.length > 0) {
       throw new CustomError('Conflict', 409, {
-        message: 'Cannot process this function. Member has in progress orders.',
+        message: 'Không thể xoá, booker đang tham gia order',
       });
     }
   }

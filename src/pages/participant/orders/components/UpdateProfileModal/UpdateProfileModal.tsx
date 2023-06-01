@@ -19,10 +19,11 @@ type UpdateProfileModalProps = {
   isOpen: boolean;
   onClose: () => void;
   currentUser?: TCurrentUser | TUser;
+  handleOnBoardingModalOpen: () => void;
 };
 
 const UpdateProfileModal: React.FC<UpdateProfileModalProps> = (props) => {
-  const { isOpen, onClose, currentUser } = props;
+  const { isOpen, onClose, currentUser, handleOnBoardingModalOpen } = props;
   const dispatch = useAppDispatch();
   const nutritionOptions = useAppSelector(
     (state) => state.ParticipantOrderList.nutritions,
@@ -38,7 +39,7 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = (props) => {
 
   const initialValues = useMemo(
     () => ({
-      name: `${lastName} ${firstName}`,
+      name: `${firstName} ${lastName}`,
       phoneNumber,
       allergies,
       nutritions,
@@ -67,6 +68,10 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = (props) => {
       },
     };
     await dispatch(OrderListThunks.updateProfile(params));
+    onClose();
+    setTimeout(() => {
+      handleOnBoardingModalOpen();
+    }, 0);
   };
 
   return (

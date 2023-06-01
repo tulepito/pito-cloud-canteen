@@ -11,9 +11,9 @@ import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { authThunks } from '@redux/slices/auth.slice';
-import { currentUserSelector, userActions } from '@redux/slices/user.slice';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { useLogout } from '@hooks/useLogout';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import config from '@src/configs';
 import { companyPaths } from '@src/paths';
 
@@ -35,13 +35,11 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
   companyId,
 }) => {
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  const handleLogoutFn = useLogout();
   const currentUser = useAppSelector(currentUserSelector);
 
-  const onLogout = async () => {
-    await dispatch(authThunks.logout());
-    await dispatch(userActions.clearCurrentUser());
-
+  const handleLogout = async () => {
+    await handleLogoutFn();
     router.push('/');
   };
 
@@ -75,7 +73,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
           </ProfileMenuLabel>
           <ProfileMenuContent className={css.profileMenuContent}>
             <ProfileMenuItem key="AccountSettingsPage">
-              <InlineTextButton type="button" onClick={onLogout}>
+              <InlineTextButton type="button" onClick={handleLogout}>
                 <p>Đăng xuất</p>
               </InlineTextButton>
             </ProfileMenuItem>

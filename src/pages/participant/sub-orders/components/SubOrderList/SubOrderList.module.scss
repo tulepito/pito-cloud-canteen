@@ -1,0 +1,9 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.subOrdersWrapper {
+  @include flexAlign(flex-start, center);
+  flex-direction: column;
+  gap: 16px;
+}

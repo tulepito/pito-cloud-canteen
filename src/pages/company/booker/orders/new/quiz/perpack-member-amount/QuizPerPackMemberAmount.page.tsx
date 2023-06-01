@@ -48,7 +48,10 @@ const QuizPerPackMemberAmountPage = () => {
     } = values;
     dispatch(
       QuizActions.updateQuiz({
-        packagePerMember: +packagePerMemberValue.replace(/,/g, '') || 0,
+        packagePerMember: parseInt(
+          packagePerMemberValue?.replace(/,/g, '') || 0,
+          10,
+        ),
         memberAmount: +memberAmountValue || 0,
       }),
     );

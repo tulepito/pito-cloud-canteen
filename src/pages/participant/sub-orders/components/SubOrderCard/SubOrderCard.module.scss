@@ -1,0 +1,66 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.container {
+  @include flexAlign(center);
+  gap: 12px;
+
+  .leftSide {
+    .imageWrapper {
+      width: 108px;
+      height: 108px;
+      position: relative;
+
+      .image {
+        border-radius: 8px;
+      }
+    }
+  }
+
+  .rightSide {
+    @include flexAlign(flex-start, space-between);
+    flex-direction: column;
+    gap: 8px;
+
+    .inforSection {
+      .restaurantName {
+        @include textTemplate(12px, $fontWeightRegular, 16px);
+      }
+
+      .dishName {
+        @include textTemplate(16px, $fontWeightBold, 24px);
+        margin-top: 4px;
+      }
+
+      .time {
+        @include textTemplate(10px, $fontWeightRegular, 16px);
+        color: $neutralGray5;
+        margin-top: 4px;
+      }
+    }
+
+    .bottomSection {
+      .rating {
+        @include flexAlign(center);
+        gap: 8px;
+
+        .iconFace {
+          width: 20px;
+          height: 20px;
+        }
+
+        .ratingText {
+          @include textTemplate(14px, $fontWeightRegular, 20px);
+          color: $neutralGray5;
+        }
+      }
+
+      .ratingBtn {
+        min-height: 36px;
+        height: 36px;
+        @include textTemplate(14px, $fontWeightBold, 24px);
+      }
+    }
+  }
+}

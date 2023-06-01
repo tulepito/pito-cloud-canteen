@@ -10,28 +10,26 @@ import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { authThunks } from '@redux/slices/auth.slice';
-import { currentUserSelector, userActions } from '@redux/slices/user.slice';
-import { companyPaths } from '@src/paths';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { useLogout } from '@hooks/useLogout';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import { participantPaths } from '@src/paths';
 
 import css from './GeneralLayoutTopBar.module.scss';
 
 const GeneralLayoutTopBar = () => {
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  const handleLogoutFn = useLogout();
   const currentUser = useAppSelector(currentUserSelector);
 
-  const onLogout = async () => {
-    await dispatch(authThunks.logout());
-    await dispatch(userActions.clearCurrentUser());
-
+  const handleLogout = async () => {
+    await handleLogoutFn();
     router.push('/');
   };
 
   return (
     <div className={css.root}>
-      <NamedLink className={css.headerLeft} path={companyPaths.Home}>
+      <NamedLink className={css.headerLeft} path={participantPaths.OrderList}>
         <PitoLogo className={css.logo} />
       </NamedLink>
       <div className={css.headerRight}>
@@ -48,7 +46,7 @@ const GeneralLayoutTopBar = () => {
           </ProfileMenuLabel>
           <ProfileMenuContent className={css.profileMenuContent}>
             <ProfileMenuItem key="AccountSettingsPage">
-              <InlineTextButton type="button" onClick={onLogout}>
+              <InlineTextButton type="button" onClick={handleLogout}>
                 <p>Đăng xuất</p>
               </InlineTextButton>
             </ProfileMenuItem>

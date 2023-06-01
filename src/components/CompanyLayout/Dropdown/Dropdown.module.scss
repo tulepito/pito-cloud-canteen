@@ -29,11 +29,17 @@
     padding: 8px 16px;
     @include flexAlign(center);
     gap: 12px;
+
     &:hover {
       @include viewportMedium {
         background-color: $neutralGray2;
       }
     }
+
+    .label {
+      @include lineClamp(2);
+    }
+
     &:first-child {
       border-top-left-radius: 8px;
       border-top-right-radius: 8px;
@@ -51,6 +57,7 @@
   position: relative;
   width: 24px;
   height: 24px;
+  min-width: 24px;
   border-radius: 100%;
   overflow: hidden;
 }

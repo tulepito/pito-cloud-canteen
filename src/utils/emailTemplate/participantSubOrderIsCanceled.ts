@@ -8,7 +8,8 @@ type ParticipantCompanyInvitationParams = {
   timestamp: number;
 };
 
-export const participantSubOrderIsCanceledSubject = 'Ngày ăn bị huỷ';
+export const participantSubOrderIsCanceledSubject = (subOrderDate: string) =>
+  `Ngày ăn ${subOrderDate} bị huỷ`;
 
 const participantSubOrderIsCanceled = ({
   participantUser,
@@ -626,8 +627,7 @@ const participantSubOrderIsCanceled = ({
                                 <td align="left" style="padding:0;Margin:0">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
-                                    Nếu có bất cứ yêu cầu nào, vui lòng liên hệ <strong>Uyên | 0123456789</strong>&nbsp;
-                                    hoặc Hotline <strong>1900 25 25 30</strong> của PITO để được hỗ trợ sớm nhất.</p>
+                                    Nếu có bất cứ yêu cầu nào, vui lòng liên hệ Hotline <strong>1900 25 25 30</strong> của PITO để được hỗ trợ sớm nhất.</p>
                                 </td>
                               </tr>
                             </table>

@@ -142,11 +142,11 @@ export const createSubmitUpdatePartnerValues = (
     location,
     availabilityPlan,
     packaging = [],
-    website,
-    description,
+    website = '',
+    description = '',
     contactorName,
     companyName,
-    facebookLink,
+    facebookLink = '',
     vat,
     minPrice,
     phoneNumber,
@@ -432,7 +432,7 @@ export const createAvailabilityPlanInitialValues = (
 export const createDayToApplyInitialValues = (
   availabilityPlan: TAvailabilityPlan,
 ) => {
-  const { entries } = availabilityPlan;
+  const { entries = [] } = availabilityPlan || {};
 
   return entries.map((entry: any) => entry.dayOfWeek);
 };

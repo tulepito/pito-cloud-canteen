@@ -40,7 +40,7 @@ const fetchSubOrder = async (orderDetail: any, currentUserId: string) => {
     const foodListIds = Object.keys(foodList);
     const foodListData = denormalisedResponseEntities(
       await integrationSdk.listings.query({
-        ids: foodListIds.join(','),
+        ids: foodListIds.slice(0, 50),
         meta_listingType: 'food',
         include: ['images'],
         'fields.image': [

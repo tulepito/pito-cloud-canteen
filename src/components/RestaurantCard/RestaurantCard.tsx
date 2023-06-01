@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
@@ -11,13 +11,11 @@ import IconStar from '@components/Icons/IconStar/IconStar';
 import IconTruck from '@components/Icons/IconTruck/IconTruck';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { calculateDistance } from '@helpers/mapHelpers';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { getListingImageById } from '@pages/company/booker/orders/draft/[orderId]/restaurants/helpers';
+import { BadgeTypeBaseOnCategory } from '@src/utils/attributes';
 import { Listing } from '@utils/data';
-import {
-  CATEGORY_OPTIONS,
-  EImageVariants,
-  PACKAGING_OPTIONS,
-} from '@utils/enums';
+import { EImageVariants } from '@utils/enums';
 
 import css from './RestaurantCard.module.scss';
 
@@ -47,6 +45,12 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
 }) => {
   const intl = useIntl();
   const classes = classNames(css.root, className);
+  const categoryOptions = useAppSelector(
+    (state) => state.BookerSelectRestaurant.categories,
+  );
+  const packagingOptions = useAppSelector(
+    (state) => state.BookerSelectRestaurant.packaging,
+  );
   const restaurantId = Listing(restaurant).getId();
   const { geolocation: origin } = Listing(restaurant).getAttributes();
   const {
@@ -64,13 +68,20 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
   );
   const restaurantName = Listing(restaurant).getAttributes().title;
 
-  const mealStyles = categories
-    .slice(0, 3)
-    .map((category: string) =>
-      CATEGORY_OPTIONS.find((item) => item.key === category),
-    );
-
-  const restaurantPackaging = PACKAGING_OPTIONS.find(
+  const mealStyles = useMemo(
+    () =>
+      categories.slice(0, 3).map((category: string) => {
+        return {
+          ...categoryOptions.find((item) => {
+            return Intl.Collator('vi').compare(item.key, category) === 0;
+          }),
+          badgeType: BadgeTypeBaseOnCategory(category),
+        };
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(categories), JSON.stringify(categoryOptions)],
+  );
+  const restaurantPackaging = packagingOptions.find(
     (item) => item.key === packaging[0],
   )?.label;
 

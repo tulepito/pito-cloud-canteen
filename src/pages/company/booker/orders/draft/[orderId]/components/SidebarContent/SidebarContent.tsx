@@ -163,7 +163,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     );
     const { plans = [] } = Listing(order as TListing).getMetadata();
     const finalPackagePerMember = packagePerMemberValue
-      ? +packagePerMemberValue.replace(/,/g, '')
+      ? parseInt(packagePerMemberValue?.replace(/,/g, '') || 0, 10)
       : packagePerMember;
 
     const finalDeliveryHour = deliveryHourValue || deliveryHour;

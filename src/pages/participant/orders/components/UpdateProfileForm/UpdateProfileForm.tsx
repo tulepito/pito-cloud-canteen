@@ -1,11 +1,13 @@
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { ALLERGIES_OPTIONS } from '@src/utils/enums';
+import { phoneNumberFormatValid, required } from '@src/utils/validators';
 
 import css from './UpdateProfileForm.module.scss';
 
@@ -29,6 +31,14 @@ const UpdateProfileFormComponent: React.FC<TUpdateProfileFormComponentProps> = (
   props,
 ) => {
   const { handleSubmit, nutritionOptions, inProgress } = props;
+  const intl = useIntl();
+
+  const nameValidators = required(
+    intl.formatMessage({ id: 'SignUpForm.name.required' }),
+  );
+  const phoneNumberValidators = phoneNumberFormatValid(
+    intl.formatMessage({ id: 'SignUpForm.phoneNumber.invalid' }),
+  );
 
   return (
     <Form onSubmit={handleSubmit} className={css.container}>
@@ -40,6 +50,7 @@ const UpdateProfileFormComponent: React.FC<TUpdateProfileFormComponentProps> = (
             name="name"
             label="Tên"
             placeholder="Nhập tên"
+            validate={nameValidators}
           />
         </div>
         <div className={css.fieldWrapper}>
@@ -47,6 +58,7 @@ const UpdateProfileFormComponent: React.FC<TUpdateProfileFormComponentProps> = (
             id="phoneNumber"
             name="phoneNumber"
             label="Số điện thoại"
+            validate={phoneNumberValidators}
             placeholder="Nhập số điện thoại"
           />
         </div>

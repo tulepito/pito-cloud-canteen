@@ -24,6 +24,21 @@ type InputComponentProps = FieldRenderProps<string, any> &
   };
 const CONTENT_MAX_LENGTH = 5000;
 
+const handleChange =
+  (propsOnChange: any, inputOnChange: any) => (event: any) => {
+    // If "onChange" callback is passed through the props,
+    // it can notify the parent when the content of the input has changed.
+    if (propsOnChange) {
+      // "handleChange" function is attached to the low level <select> component
+      // value of the element needs to be picked from target
+      const { value } = event.nativeEvent.target;
+      propsOnChange(value);
+    }
+    // Notify Final Form that the input has changed.
+    // (Final Form knows how to deal with synthetic events of React.)
+    inputOnChange(event);
+  };
+
 export const FieldTextAreaComponent: React.FC<InputComponentProps> = (
   props,
 ) => {
@@ -41,6 +56,7 @@ export const FieldTextAreaComponent: React.FC<InputComponentProps> = (
     input,
     meta,
     inputRef,
+    onChange,
     ...rest
   } = props;
   if (label && !id) {
@@ -57,7 +73,7 @@ export const FieldTextAreaComponent: React.FC<InputComponentProps> = (
 
   // Textarea doesn't need type.
   // eslint-disable-next-line unused-imports/no-unused-vars
-  const { type, ...inputWithoutType } = input;
+  const { type, onChange: inputOnChange, ...inputWithoutType } = input;
 
   // Use inputRef if it is passed as prop.
   const refMaybe = inputRef ? { ref: inputRef } : {};
@@ -85,6 +101,7 @@ export const FieldTextAreaComponent: React.FC<InputComponentProps> = (
     ...refMaybe,
     ...inputWithoutType,
     ...rest,
+    onChange: handleChange(onChange, inputOnChange),
     ...(disabled ? { disabled } : ''),
   };
   const classes = classNames(rootClassName || css.root, className);

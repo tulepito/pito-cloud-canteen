@@ -86,12 +86,20 @@
   margin-top: 8px;
   @include textTemplate(12px, $fontWeightRegular, 16px);
   @include flexAlign(center);
+
+  svg {
+    flex-shrink: 0;
+  }
 }
 
 .restaurantName {
   margin-top: 8px;
   @include textTemplate(12px, $fontWeightRegular, 16px);
   @include flexAlign(center);
+
+  svg {
+    flex-shrink: 0;
+  }
 }
 
 .pickingTitle {

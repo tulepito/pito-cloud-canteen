@@ -5,11 +5,16 @@
 .modalContainer.modalContainer {
   flex-basis: calc(100% - 32px);
   padding: 32px;
+
+  @include viewportMedium {
+    flex-basis: 600px;
+  }
 }
 
 .modalHeader {
   text-align: center;
   @include textTemplate(24px, $fontWeightBold, 32px);
+  text-transform: capitalize;
   .secondRow {
     color: $primaryPri2;
   }

@@ -51,12 +51,18 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
     (state) => state.ParticipantOrderManagementPage,
   );
 
-  const { form, handleSubmit, values, submitting, hasValidationErrors } =
-    useForm<TDishSelectionFormValues>({
-      onSubmit: handleCustomSubmit,
-      validate,
-      initialValues,
-    });
+  const {
+    form,
+    handleSubmit,
+    values,
+    submitting,
+    hasValidationErrors,
+    pristine,
+  } = useForm<TDishSelectionFormValues>({
+    onSubmit: handleCustomSubmit,
+    validate,
+    initialValues,
+  });
 
   const handleReject = () => {
     setClickedType('reject');
@@ -64,7 +70,8 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
   };
 
   const dishSelection = useField('dishSelection', form);
-  const disabledSubmit = actionsDisabled || submitting || hasValidationErrors;
+  const disabledSubmit =
+    actionsDisabled || submitting || hasValidationErrors || pristine;
   const disabledRejectButton =
     actionsDisabled || updateOrderInProgress || updateOrderError;
 

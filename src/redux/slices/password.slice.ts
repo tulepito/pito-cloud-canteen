@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import { createAsyncThunk } from '@redux/redux.helper';
-import { storableError } from '@utils/errors';
+import { EHttpStatusCode, storableError } from '@utils/errors';
 import type { TObject } from '@utils/types';
 
 type TPasswordSliceInitialState = {
@@ -37,7 +37,7 @@ const recoverPassword = createAsyncThunk(
     const { email } = params;
 
     try {
-      sdk.passwordReset.request({ email });
+      await sdk.passwordReset.request({ email });
 
       return fulfillWithValue({ email });
     } catch (error) {
@@ -100,10 +100,16 @@ const passwordSlice = createSlice({
         };
       })
       .addCase(recoverPassword.rejected, (state, { payload }: any) => {
+        const { status } = payload?.error || {};
+        const recoveryError =
+          status === EHttpStatusCode.Conflict
+            ? 'Email không tôn tại, vui lòng thử lại'
+            : 'Có lỗi khi reset mật khẩu, vui lòng thử lại';
+
         return {
           ...state,
           recoveryInProgress: false,
-          recoveryError: payload.error,
+          recoveryError,
           initialEmail: payload.email,
         };
       })

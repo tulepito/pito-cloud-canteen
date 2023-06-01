@@ -6,7 +6,8 @@ type BookerOrderSuccessParams = {
   orderListing: any;
 };
 
-export const bookerOrderSuccessSubject = 'Đặt đơn hàng thành công';
+export const bookerOrderSuccessSubject = (orderName: string) =>
+  `Đơn hàng ${orderName} vừa đặt thành công`;
 
 const bookerOrderSuccess = ({
   bookerUser,
@@ -638,8 +639,7 @@ const bookerOrderSuccess = ({
                                 <td align="left" style="padding:0;Margin:0">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    Nếu có bất cứ yêu cầu nào, vui lòng liên hệ <strong>Uyên | 0123456789</strong>&nbsp;
-                                    hoặc Hotline <strong>1900 25 25 30</strong> của PITO để được hỗ trợ sớm nhất.</p>
+                                    Nếu có bất cứ yêu cầu nào, vui lòng liên hệ Hotline <strong>1900 25 25 30</strong> của PITO để được hỗ trợ sớm nhất.</p>
                                 </td>
                               </tr>
                             </table>

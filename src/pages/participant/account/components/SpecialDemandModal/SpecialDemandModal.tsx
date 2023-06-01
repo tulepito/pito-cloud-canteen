@@ -51,7 +51,7 @@ const SpecialDemandModal: React.FC<TSpecialDemandModalProps> = (props) => {
           <span className={css.goBack}></span>
           Quay lại
         </div>
-        <div className={css.modalTitle}>Tài khoản cá nhân</div>
+        <div className={css.modalTitle}>Yêu cầu đặc biệt</div>
       </div>
       <div className={css.modalContent}>
         <SpecialDemandForm

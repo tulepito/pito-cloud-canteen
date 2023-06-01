@@ -1,0 +1,146 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.modalContainer {
+  padding: 0 16px !important;
+
+  @include viewportMedium {
+    padding: 0 24px !important;
+    max-height: min(700px, 70vh);
+    max-width: min(600px, 60vw);
+  }
+}
+
+.closeModalBtn {
+  min-height: unset;
+  padding: 8px 4px 8px 0;
+  display: flex;
+  column-gap: 8px;
+}
+
+.listingImage {
+  height: 343px;
+  width: 100%;
+  overflow: hidden;
+  border-bottom: 1px solid $neutralGray4;
+  border-radius: 10px;
+
+  :global(.slick-track) {
+    height: 343px;
+  }
+
+  :global(.slick-slide) {
+    width: calc(100vw - 32px);
+    height: 343px !important;
+
+    & img {
+      width: calc(100vw - 32px) !important;
+      height: 343px !important;
+      position: relative !important;
+
+      @include viewportMedium {
+        width: unset !important;
+      }
+    }
+
+    & > div {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
+.section {
+  @include textTemplate(14px, 400, 24px);
+  letter-spacing: 0.2%;
+
+  padding: 12px 0;
+  border-bottom: 0.5px solid $neutralGray4;
+
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+
+  .foodTitle {
+    @include textTemplate(18px, 700, 24px);
+  }
+
+  .badgeContainer {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 8px;
+
+    & > * {
+      border-radius: 20px;
+    }
+  }
+
+  .allergiesLabel {
+    color: $neutralGray5;
+
+    .allergyItem {
+      font-weight: 600;
+    }
+  }
+
+  .sideDishesLabel {
+    @include textTemplate(16px, 500, 24px);
+  }
+  .sideDishesContent {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+  }
+}
+
+.requirementSection {
+  padding: 12px 0 130px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+  @include textTemplate(14px, 500, 24px);
+
+  .fieldRequirement {
+    @include textTemplate(16px, 400, 24px);
+  }
+}
+
+.selectFoodSection {
+  position: fixed;
+  bottom: 0;
+  z-index: 2;
+  left: 0;
+  width: 100vw;
+  padding: 16px;
+  background-color: $neutralGray1;
+
+  .selectFoodBtn {
+    width: 100%;
+  }
+
+  @include viewportMedium {
+    position: relative;
+    left: 0;
+    width: 100%;
+    padding: 16px 0;
+  }
+}
+
+.dots {
+  bottom: 7px !important;
+
+  & > li {
+    margin: 0;
+
+    &:global(.slick-active) button:before {
+      color: $neutralGray1;
+      opacity: 1;
+    }
+
+    & button:before {
+      color: $neutralGray1;
+      opacity: 0.6;
+    }
+  }
+}

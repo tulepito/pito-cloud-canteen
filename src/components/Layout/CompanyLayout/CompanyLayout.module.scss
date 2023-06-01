@@ -1,8 +1,17 @@
 @use '/src/styles/mixins.scss' as *;
+
 .headerTitle {
   @include flexAlign(center);
   gap: 13px;
   line-height: 24px;
+
+  svg {
+    min-width: 24px;
+  }
+
+  .title {
+    @include lineClamp(1);
+  }
 }
 
 .headerTitleWrapper {

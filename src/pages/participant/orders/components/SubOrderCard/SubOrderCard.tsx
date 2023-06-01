@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
 
 import OrderEventCardStatus from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCardStatus';
 import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
@@ -10,6 +12,7 @@ import IconLocation from '@components/Icons/IconLocation/IconLocation';
 import IconShop from '@components/Icons/IconShop/IconShop';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { isOver } from '@helpers/orderHelper';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { calculateRemainTime } from '@src/utils/dates';
 
 import css from './SubOrderCard.module.scss';
@@ -42,24 +45,37 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
     meal,
     dishSelection,
     orderColor,
+    transactionId,
   } = event?.resource || {};
 
   const { address } = deliveryAddress;
   const { name: restaurantName } = restaurant;
   const orderTitle = event?.title || '';
   const isFoodPicked = !!event.resource?.dishSelection?.dishSelection;
-  const isExpired = isOver(event.resource?.expiredTime) && !isFoodPicked;
+  const isExpired = isOver(event.resource?.expiredTime);
+  const isExpiredToPickFood = isExpired && !isFoodPicked;
   const headerStyles = {
-    backgroundColor: isExpired ? '#8C8C8C' : orderColor,
+    backgroundColor: isExpiredToPickFood ? '#8C8C8C' : orderColor,
   };
   const remainTime = calculateRemainTime(deadlineDate);
   const selectionFoodName = meal?.dishes.find(
     (item: any) => item.key === dishSelection?.dishSelection,
   )?.value;
-  const shouldShowRejectButton = ![
-    EVENT_STATUS.EXPIRED_STATUS,
-    EVENT_STATUS.EMPTY_STATUS,
-  ].includes(status);
+
+  const shouldShowRejectButton =
+    ![EVENT_STATUS.EXPIRED_STATUS, EVENT_STATUS.NOT_JOINED_STATUS].includes(
+      status,
+    ) && !isExpired;
+
+  const subOrderTxs = useAppSelector(
+    (state) => state.ParticipantOrderList.subOrderTxs,
+    shallowEqual,
+  );
+
+  const subOrderTx = useMemo(
+    () => subOrderTxs.find((tx) => tx.id.uuid === transactionId),
+    [subOrderTxs, transactionId],
+  );
 
   const onCardClick = () => {
     setSelectedEvent(event);
@@ -90,7 +106,7 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
       </div>
       <div className={css.body}>
         <div className={css.row}>
-          <OrderEventCardStatus status={status} />
+          <OrderEventCardStatus status={status} subOrderTx={subOrderTx} />
         </div>
         <RenderWhen condition={!!selectionFoodName}>
           <div className={css.row}>
@@ -109,12 +125,14 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
           </div>
         </RenderWhen>
         <div className={css.orderInfo}>
-          <div className={css.row}>
-            <div className={css.orderDeadline}>
-              <IconDeadline />
-              <span>Còn {remainTime} để chọn</span>
+          <RenderWhen condition={!isExpired}>
+            <div className={css.row}>
+              <div className={css.orderDeadline}>
+                <IconDeadline />
+                <span>Còn {remainTime} để chọn</span>
+              </div>
             </div>
-          </div>
+          </RenderWhen>
           <div className={css.row}>
             <div className={css.deliveryAddress}>
               <IconLocation />

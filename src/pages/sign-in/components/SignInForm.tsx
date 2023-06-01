@@ -41,6 +41,8 @@ type TSignInFormProps = FormProps<TSignInFormValues> & TExtraProps;
 const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
   const intl = useIntl();
   const router = useRouter();
+
+  const { query } = router;
   const {
     rootClassName,
     className,
@@ -106,7 +108,7 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
   );
 
   const navigateToSignUpPage = () => {
-    router.push(generalPaths.SignUp);
+    router.push({ pathname: generalPaths.SignUp, query });
   };
 
   const navigateToPasswordRecoverPage = () => {

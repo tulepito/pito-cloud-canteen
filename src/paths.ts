@@ -34,7 +34,13 @@ export const NonRequireAuthenticationRoutes = [
   enGeneralPaths.SignUp,
 ];
 
-export const IgnoredAuthCheckRoutes = [generalPaths.StyleGuide];
+export const IgnoredAuthCheckRoutes = [
+  generalPaths.StyleGuide,
+  generalPaths.RecoveryPassword,
+  enGeneralPaths.RecoveryPassword,
+  generalPaths.ResetPassword,
+  enGeneralPaths.ResetPassword,
+];
 export const IgnoredPermissionCheckRoutes = [
   generalPaths.SignIn,
   generalPaths.SignUp,
@@ -215,4 +221,8 @@ export const participantPaths = {
   OrderList: '/participant/orders',
   SubOrderList: '/participant/sub-orders',
   Account: '/participant/account',
+  AccountProfile: '/participant/account/profile',
+  AccountChangePassword: '/participant/account/change-password',
+  AccountSpecialDemand: '/participant/account/special-demand',
+  PlanDetail: '/participant/plans/[planId]',
 };

@@ -8,6 +8,7 @@ import css from './DayItem.module.scss';
 
 const DayColumnHeader: React.FC<TDayColumnHeaderProps> = ({
   isCurrentDay,
+  isSelectedDay,
   date,
   className,
 }) => {
@@ -18,7 +19,7 @@ const DayColumnHeader: React.FC<TDayColumnHeaderProps> = ({
       className={classNames(
         css.dayHeader,
         {
-          [css.activeHeader]: isCurrentDay,
+          [css.activeHeader]: isCurrentDay || isSelectedDay,
         },
         className,
       )}>

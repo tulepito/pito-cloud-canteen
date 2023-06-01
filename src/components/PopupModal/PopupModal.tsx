@@ -40,6 +40,7 @@ const PopupModal: React.FC<PopupModalProps> = (props) => {
   const contentClasses = classNames(css.content, contentClassName);
   const hasTitle = !!title;
   const closeModalMessage = intl.formatMessage({ id: 'Modal.closeModal' });
+  const hasCustomHeader = !!customHeader;
   const closeBtn =
     !shouldHideIconClose && isOpen ? (
       <Button
@@ -64,7 +65,7 @@ const PopupModal: React.FC<PopupModalProps> = (props) => {
     <div id={id} className={classes}>
       <div className={scrollLayerClasses}>
         <div className={containerClasses}>
-          {!customHeader && (
+          {!hasCustomHeader && (
             <div className={css.modalHeader}>
               {hasTitle && <div className={css.title}>{title}</div>}
               {closeBtn}

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
@@ -29,11 +30,9 @@ import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
 import {
-  CATEGORY_OPTIONS,
   FOOD_TYPE_OPTIONS,
   getLabelByKey,
   MENU_OPTIONS,
-  PACKAGING_OPTIONS,
   SIDE_DISH_OPTIONS,
   SPECIAL_DIET_OPTIONS,
 } from '@utils/enums';
@@ -133,6 +132,10 @@ const parseEntitiesToTableData = (
   foods: TIntegrationListing[],
   extraData: any,
 ) => {
+  const categoryOptions = useAppSelector(
+    (state) => state.AdminAttributes.categories,
+  );
+
   return foods.map((food) => {
     return {
       key: food.id.uuid,
@@ -146,7 +149,7 @@ const parseEntitiesToTableData = (
           food.attributes.publicData.menuType,
         ),
         category: getLabelByKey(
-          CATEGORY_OPTIONS,
+          categoryOptions,
           food.attributes.publicData.category,
         ),
         foodType: getLabelByKey(
@@ -163,6 +166,13 @@ const parseEntitiesToExportCsv = (
   foods: TIntegrationListing[],
   ids: string[],
 ) => {
+  const packagingOptions = useAppSelector(
+    (state) => state.AdminAttributes.packaging,
+  );
+  const categoryOptions = useAppSelector(
+    (state) => state.AdminAttributes.categories,
+  );
+
   const foodsToExport = foods
     .filter((food) => ids.includes(food.id.uuid))
     .map((food) => {
@@ -194,8 +204,8 @@ const parseEntitiesToExportCsv = (
         'Mô tả': description,
         'Đơn giá': `${price?.amount} VND`,
         'Thành phần dị ứng': allergicIngredients.join(','),
-        'Chất liệu bao bì': getLabelByKey(PACKAGING_OPTIONS, packaging),
-        'Phong cách ẩm thực': getLabelByKey(CATEGORY_OPTIONS, category),
+        'Chất liệu bao bì': getLabelByKey(packagingOptions, packaging),
+        'Phong cách ẩm thực': getLabelByKey(categoryOptions, category),
         'Loại món ăn': getLabelByKey(FOOD_TYPE_OPTIONS, foodType),
         'Loại menu': getLabelByKey(MENU_OPTIONS, menuType),
         'Món ăn kèm': sideDishes
@@ -225,6 +235,10 @@ const GOOGLE_SHEET_LINK = 'GOOGLE_SHEET_LINK';
 const ManagePartnerFoods = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+
+  const categoryOptions = useAppSelector(
+    (state) => state.AdminAttributes.categories,
+  );
 
   const [idsToAction, setIdsToAction] = useState<string[]>([]);
   const [foodToRemove, setFoodToRemove] = useState<any>(null);
@@ -410,7 +424,7 @@ const ManagePartnerFoods = () => {
                 id="pub_category"
                 label="Phong cách ẩm thực"
                 placeholder="Phong cách ẩm thực"
-                options={CATEGORY_OPTIONS}
+                options={categoryOptions}
               />
             </>
           )}

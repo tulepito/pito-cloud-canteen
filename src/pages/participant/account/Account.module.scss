@@ -34,7 +34,9 @@
     @include flexAlign(center, space-between);
     padding-bottom: 16px;
     border-bottom: 1px solid $neutralGray3;
+    cursor: pointer;
   }
+
   .iconGroup {
     @include flexAlign(center);
     gap: 16px;

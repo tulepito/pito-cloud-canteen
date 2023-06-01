@@ -187,6 +187,7 @@ const requestCoverUpload = createAsyncThunk(
           expand: true,
           'fields.image': [
             `variants.${EImageVariants.scaledLarge}`,
+            `variants.${EImageVariants.landscapeCrop2x}`,
             `variants.${EImageVariants.scaledMedium}`,
             `variants.${EImageVariants.scaledXLarge}`,
           ],

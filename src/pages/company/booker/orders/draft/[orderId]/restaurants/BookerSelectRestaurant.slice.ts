@@ -12,7 +12,7 @@ import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { ListingTypes } from '@src/types/listingTypes';
-import { UserPermission } from '@src/types/UserPermission';
+import { CompanyPermission, UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { convertWeekDay } from '@utils/dates';
 import { EImageVariants, EListingType } from '@utils/enums';
@@ -362,7 +362,7 @@ const fetchRestaurantReviews = createAsyncThunk(
     );
 
     return {
-      ...(reviewRole === UserPermission.BOOKER && {
+      ...(CompanyPermission.includes(reviewRole) && {
         restaurantBookerReviews: isViewAll
           ? uniqBy([...restaurantBookerReviews, ...response], 'id.uuid')
           : response,

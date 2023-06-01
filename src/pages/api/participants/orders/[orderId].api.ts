@@ -32,7 +32,7 @@ const fetchSubOrder = async (orderDetail: any) => {
     const foodListIds = Object.keys(foodList);
     const foodListData = denormalisedResponseEntities(
       await integrationSdk.listings.query({
-        ids: foodListIds.join(','),
+        ids: foodListIds.slice(0, 50),
         meta_listingType: 'food',
       }),
     );
@@ -94,7 +94,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const planIds = order?.attributes.metadata?.plans || [];
         const plans = denormalisedResponseEntities(
           await integrationSdk.listings.query({
-            ids: planIds.join(','),
+            ids: planIds.slice(0, 50),
             meta_listingType: LISTING_TYPE.SUB_ORDER,
           }),
         );
@@ -157,12 +157,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           });
         }
 
-        await integrationSdk.listings.update({
-          id: planId,
-          metadata: {
-            orderDetail,
+        const planResponse = await integrationSdk.listings.update(
+          {
+            id: planId,
+            metadata: {
+              orderDetail,
+            },
           },
-        });
+          {
+            expand: true,
+          },
+        );
+        const plan = denormalisedResponseEntities(planResponse)[0];
 
         if (
           !participants.includes(currentUserId) &&
@@ -176,7 +182,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           });
         }
 
-        return res.json({ message: 'Update picking successfully' });
+        return res.json({ plan });
       } catch (error) {
         handleError(res, error);
         console.error(error);

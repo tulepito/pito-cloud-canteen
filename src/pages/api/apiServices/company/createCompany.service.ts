@@ -88,6 +88,7 @@ const createCompany = async ({
 
   const [companyAccount] = denormalisedResponseEntities(companyResponse);
   const companyEmail = User(companyAccount).getAttributes().email;
+  const companyId = companyAccount.id.uuid;
 
   // Create sub master account
   const splittedEmail = companyEmail.split('@');
@@ -149,7 +150,7 @@ const createCompany = async ({
 
   await emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ACCOUNT_CREATED, {
     password: dataParams.password,
-    companyId: companyAccount.id.uuid,
+    companyId,
   });
 
   return masterAccountAfterUpdateResponse;
