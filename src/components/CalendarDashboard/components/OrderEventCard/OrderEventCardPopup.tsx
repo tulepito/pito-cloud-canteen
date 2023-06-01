@@ -1,9 +1,11 @@
 import React from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage, useIntl } from 'react-intl';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import { InlineTextButton } from '@components/Button/Button';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
@@ -43,13 +45,17 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
     subOrderId: planId,
     id: orderDay,
     dishSelection,
+    transactionId,
   } = event.resource;
+
+  const shouldShowPickFoodSection = !isExpired && isEmpty(transactionId);
   const timestamp =
     orderDay.split(' - ').length > 1 ? orderDay.split(' - ')[1] : orderDay;
   const from =
     router.pathname === participantPaths.OrderList
       ? 'orderList'
       : 'orderDetail';
+
   const onSelectDish = (values: TDishSelectionFormValues, reject?: boolean) => {
     const currentUserId = CurrentUser(user).getId();
     const payload = {
@@ -92,27 +98,29 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
       <div className={css.eventTime}>{startTime}</div>
       <div className={css.divider} />
       <OrderEventCardContentItems event={event} isFirstHighlight />
-      <div className={css.divider} />
-      <div className={css.selectFoodForm}>
-        <div className={css.selectFoodHeader}>
-          <div className={css.formTitle}>
-            <FormattedMessage id="EventCard.form.selectFood" />
+      <RenderWhen condition={shouldShowPickFoodSection}>
+        <div className={css.divider} />
+        <div className={css.selectFoodForm}>
+          <div className={css.selectFoodHeader}>
+            <div className={css.formTitle}>
+              <FormattedMessage id="EventCard.form.selectFood" />
+            </div>
+            <InlineTextButton
+              className={css.viewDetail}
+              onClick={onNavigateToOrderDetail}>
+              <FormattedMessage id="EventCard.form.viewDetail" />
+            </InlineTextButton>
           </div>
-          <InlineTextButton
-            className={css.viewDetail}
-            onClick={onNavigateToOrderDetail}>
-            <FormattedMessage id="EventCard.form.viewDetail" />
-          </InlineTextButton>
+          <div className={css.selectDishContent}>
+            <DishSelectionForm
+              actionsDisabled={isExpired}
+              dishes={dishes}
+              onSubmit={onSelectDish}
+              initialValues={dishSelection}
+            />
+          </div>
         </div>
-        <div className={css.selectDishContent}>
-          <DishSelectionForm
-            actionsDisabled={isExpired}
-            dishes={dishes}
-            onSubmit={onSelectDish}
-            initialValues={dishSelection}
-          />
-        </div>
-      </div>
+      </RenderWhen>
     </div>
   );
 };
