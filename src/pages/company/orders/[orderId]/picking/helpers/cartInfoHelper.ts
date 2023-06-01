@@ -4,7 +4,11 @@ import {
   getTotalInfo,
 } from '@helpers/orderHelper';
 import config from '@src/configs';
-import { EParticipantOrderStatus, ESubOrderStatus } from '@src/utils/enums';
+import {
+  EOrderStates,
+  EParticipantOrderStatus,
+  ESubOrderStatus,
+} from '@src/utils/enums';
 import { Listing } from '@utils/data';
 import type { TListing, TObject, TQuotation } from '@utils/types';
 
@@ -46,14 +50,20 @@ export const calculatePriceQuotationInfo = ({
   planOrderDetail: TObject;
   order: TObject;
 }) => {
-  const { packagePerMember = 0 } = Listing(order as TListing).getMetadata();
+  const { packagePerMember = 0, orderState } = Listing(
+    order as TListing,
+  ).getMetadata();
+  const isOrderInProgress = orderState === EOrderStates.inProgress;
 
   const currentOrderDetail = Object.entries<TObject>(
     planOrderDetail,
   ).reduce<TObject>((result, currentOrderDetailEntry) => {
     const [subOrderDate, rawOrderDetailOfDate] = currentOrderDetailEntry;
     const { status, transactionId } = rawOrderDetailOfDate;
-    if (status === ESubOrderStatus.CANCELED || !transactionId) {
+    if (
+      status === ESubOrderStatus.CANCELED ||
+      (!transactionId && isOrderInProgress)
+    ) {
       return result;
     }
 
