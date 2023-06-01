@@ -50,7 +50,7 @@ const OrderListPage = () => {
   const onBoardingModal = useBoolean();
   const tourControl = useBoolean();
   const ratingSubOrderModalControl = useBoolean();
-  const { selectedDay } = useSelectDay();
+  const { selectedDay, handleSelectDay } = useSelectDay();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const subOrderDetailModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
@@ -94,16 +94,6 @@ const OrderListPage = () => {
   const currentUserId = currentUserGetter.getId();
   const { walkthroughEnable = true } = currentUserGetter.getMetadata();
   const welcomeModalControl = useBoolean(walkthroughEnable);
-  useEffect(() => {
-    (async () => {
-      await dispatch(OrderListThunks.fetchOrders(currentUserId));
-      dispatch(OrderListActions.markColorToOrder());
-    })();
-  }, [currentUserId]);
-
-  useEffect(() => {
-    dispatch(OrderListThunks.fetchAttributes());
-  }, []);
 
   const showLoadingModal =
     fetchOrdersInProgress ||
@@ -205,39 +195,6 @@ const OrderListPage = () => {
     ),
   );
 
-  useEffect(() => {
-    if (subOrdersFromSelectedDayTxIds) {
-      dispatch(
-        OrderListThunks.fetchTransactionBySubOrder(
-          subOrdersFromSelectedDayTxIds,
-        ),
-      );
-    }
-  }, [subOrdersFromSelectedDayTxIds]);
-  useEffect(() => {
-    if (planIdFromQuery && timestampFromQuery) {
-      const planId = planIdFromQuery as string;
-      const timestamp = timestampFromQuery as string;
-      const event = flattenEvents.find(
-        (_event) =>
-          _event.resource.planId === planId &&
-          _event.resource.timestamp === timestamp,
-      );
-      if (event) {
-        setSelectedEvent(event);
-        subOrderDetailModalControl.setTrue();
-      }
-    }
-  }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
-
-  useEffect(() => {
-    if (selectedEvent) {
-      const { timestamp, planId } = selectedEvent.resource;
-      const subOrderId = `${currentUserId} - ${planId} - ${timestamp}`;
-      dispatch(OrderListThunks.fetchSubOrdersFromFirebase(subOrderId));
-    }
-  }, [selectedEvent]);
-
   const openUpdateProfileModal = () => {
     updateProfileModalControl.setTrue();
   };
@@ -266,6 +223,7 @@ const OrderListPage = () => {
 
     dispatch(OrderListThunks.updateSubOrder(payload));
   };
+
   const handleOnBoardingModalOpen = () => {
     onBoardingModal.setTrue();
     setTimeout(() => {
@@ -277,6 +235,51 @@ const OrderListPage = () => {
     ratingSubOrderModalControl.setTrue();
   };
 
+  useEffect(() => {
+    if (subOrdersFromSelectedDayTxIds) {
+      dispatch(
+        OrderListThunks.fetchTransactionBySubOrder(
+          subOrdersFromSelectedDayTxIds,
+        ),
+      );
+    }
+  }, [subOrdersFromSelectedDayTxIds]);
+
+  useEffect(() => {
+    if (selectedEvent) {
+      const { timestamp, planId } = selectedEvent.resource;
+      const subOrderId = `${currentUserId} - ${planId} - ${timestamp}`;
+      dispatch(OrderListThunks.fetchSubOrdersFromFirebase(subOrderId));
+    }
+  }, [selectedEvent]);
+
+  useEffect(() => {
+    (async () => {
+      await dispatch(OrderListThunks.fetchOrders(currentUserId));
+      dispatch(OrderListActions.markColorToOrder());
+    })();
+  }, [currentUserId]);
+
+  useEffect(() => {
+    dispatch(OrderListThunks.fetchAttributes());
+  }, []);
+
+  useEffect(() => {
+    if (planIdFromQuery && timestampFromQuery) {
+      const planId = planIdFromQuery as string;
+      const timestamp = timestampFromQuery as string;
+      const event = flattenEvents.find(
+        (_event) =>
+          _event.resource.planId === planId &&
+          _event.resource.timestamp === timestamp,
+      );
+      if (event) {
+        setSelectedEvent(event);
+        subOrderDetailModalControl.setTrue();
+      }
+    }
+  }, [planIdFromQuery, timestampFromQuery]);
+
   return (
     <ParticipantLayout>
       <OrderListHeaderSection />
@@ -284,7 +287,6 @@ const OrderListPage = () => {
         <CalendarDashboard
           anchorDate={selectedDay}
           events={flattenEvents}
-          // companyLogo={sectionCompanyBranding}
           renderEvent={OrderEventCard}
           inProgress={fetchOrdersInProgress}
           defautlView={defaultView}
@@ -294,9 +296,7 @@ const OrderListPage = () => {
               <ParticipantToolbar
                 {...toolBarProps}
                 isAllowChangePeriod
-                // startDate={new Date(startDate)}
-                // endDate={new Date(endDate)}
-                // anchorDate={anchorDate}
+                onChangeDate={handleSelectDay}
               />
             ),
           }}
@@ -338,7 +338,7 @@ const OrderListPage = () => {
         </>
       </RenderWhen>
       <RenderWhen condition={!!selectedEvent}>
-        <>
+        <div className={css.subOrderDetailModal}>
           <SubOrderDetailModal
             isOpen={subOrderDetailModalControl.value}
             onClose={subOrderDetailModalControl.setFalse}
@@ -352,7 +352,7 @@ const OrderListPage = () => {
             currentUserId={currentUserId}
             openSuccessRatingModal={successRatingModalControl.setTrue}
           />
-        </>
+        </div>
       </RenderWhen>
       <SuccessRatingModal
         isOpen={successRatingModalControl.value}

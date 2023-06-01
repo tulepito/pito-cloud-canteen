@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import classNames from 'classnames';
 
 import IconCheckmark from '@components/Icons/IconCheckmark/IconCheckmark';
@@ -41,7 +41,7 @@ const getButtonSizeClassName = (size: string) => {
 };
 
 const Button: React.FC<TButtonProps> = (props) => {
-  const [mounted, setMounted] = useState(false);
+  const mountedRef = useRef(false);
   const {
     rootClassName,
     className,
@@ -59,7 +59,7 @@ const Button: React.FC<TButtonProps> = (props) => {
   } = props;
 
   useEffect(() => {
-    setMounted(true);
+    mountedRef.current = true;
   }, []);
 
   let content;
@@ -106,7 +106,7 @@ const Button: React.FC<TButtonProps> = (props) => {
   // All buttons are disabled until the component is mounted. This
   // prevents e.g. being able to submit forms to the backend before
   // the client side is handling the submit.
-  const buttonDisabled = mounted ? disabled : true;
+  const buttonDisabled = mountedRef.current ? disabled : true;
 
   return (
     <button className={classes} {...rest} disabled={buttonDisabled}>

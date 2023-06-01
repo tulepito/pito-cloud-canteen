@@ -1,7 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import isEmpty from 'lodash/isEmpty';
 import last from 'lodash/last';
 import { useRouter } from 'next/router';
 
@@ -18,7 +20,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
-import { txIsDelivered, txIsInitiated } from '@src/utils/transaction';
+import { txIsDelivered } from '@src/utils/transaction';
 import type { TTransaction } from '@src/utils/types';
 
 import { OrderListThunks } from '../../OrderList.slice';
@@ -66,14 +68,14 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   const timestamp = last(orderDay.split(' - '));
   const subOrderTx = useMemo(
     () => subOrderTxs.find((tx) => tx.id.uuid === transactionId),
-    [subOrderTxs, transactionId],
+    [JSON.stringify(subOrderTxs), transactionId],
   );
-  const isTxInitialState = txIsInitiated(subOrderTx as TTransaction);
 
   const isExpired = isOver(expiredTime);
+  const shouldShowPickFoodSection = !isExpired && isEmpty(subOrderTx);
+
   const dishSelectionFormInitialValues = useMemo(
     () => dishSelection,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(dishSelection)],
   );
 
@@ -145,34 +147,32 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
         <div className={css.eventTime}>{startTime}</div>
         <div className={css.divider} />
         <OrderEventCardContentItems event={event} isFirstHighlight />
-        <RenderWhen condition={!subOrderTx || (subOrderTx && isTxInitialState)}>
+        <RenderWhen condition={shouldShowPickFoodSection}>
           <RenderWhen condition={fetchSubOrderTxInProgress}>
             <div className={css.loading}>Đang tải</div>
             <RenderWhen.False>
-              <>
-                <div className={css.divider} />
-                <div className={css.selectFoodForm}>
-                  <div className={css.selectFoodHeader}>
-                    <div className={css.formTitle}>
-                      <FormattedMessage id="EventCard.form.selectFood" />
-                    </div>
-                    <InlineTextButton
-                      className={css.viewDetail}
-                      onClick={onNavigateToOrderDetail}>
-                      <FormattedMessage id="EventCard.form.viewDetail" />
-                    </InlineTextButton>
+              <div className={css.divider} />
+              <div className={css.selectFoodForm}>
+                <div className={css.selectFoodHeader}>
+                  <div className={css.formTitle}>
+                    <FormattedMessage id="EventCard.form.selectFood" />
                   </div>
-                  <div className={css.selectDishContent}>
-                    <DishSelectionForm
-                      actionsDisabled={isExpired}
-                      dishes={dishes}
-                      onSubmit={onSelectDish}
-                      subOrderStatus={status}
-                      initialValues={dishSelectionFormInitialValues}
-                    />
-                  </div>
+                  <InlineTextButton
+                    className={css.viewDetail}
+                    onClick={onNavigateToOrderDetail}>
+                    <FormattedMessage id="EventCard.form.viewDetail" />
+                  </InlineTextButton>
                 </div>
-              </>
+                <div className={css.selectDishContent}>
+                  <DishSelectionForm
+                    actionsDisabled={isExpired}
+                    dishes={dishes}
+                    onSubmit={onSelectDish}
+                    subOrderStatus={status}
+                    initialValues={dishSelectionFormInitialValues}
+                  />
+                </div>
+              </div>
             </RenderWhen.False>
           </RenderWhen>
         </RenderWhen>
