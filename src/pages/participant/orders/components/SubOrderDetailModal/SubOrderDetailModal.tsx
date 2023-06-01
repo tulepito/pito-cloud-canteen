@@ -61,6 +61,10 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   const fetchSubOrderTxInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
   );
+  const fetchSubOrderDocumentInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.fetchSubOrderDocumentInProgress,
+  );
+
   const subOrderDocument = useAppSelector(
     (state) => state.ParticipantOrderList.subOrderDocument,
     shallowEqual,
@@ -82,7 +86,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   const { reviewId } = subOrderDocument;
   useEffect(() => {
     if (isOpen) {
-      dispatch(OrderListThunks.fetchTransactionBySubOrder(transactionId));
+      dispatch(OrderListThunks.fetchTransactionBySubOrder([transactionId]));
     }
   }, [dispatch, isOpen, transactionId]);
   const onNavigateToOrderDetail = () => {
@@ -148,7 +152,10 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
         <div className={css.divider} />
         <OrderEventCardContentItems event={event} isFirstHighlight />
         <RenderWhen condition={shouldShowPickFoodSection}>
-          <RenderWhen condition={fetchSubOrderTxInProgress}>
+          <RenderWhen
+            condition={
+              fetchSubOrderTxInProgress || fetchSubOrderDocumentInProgress
+            }>
             <div className={css.loading}>Đang tải</div>
             <RenderWhen.False>
               <div className={css.divider} />

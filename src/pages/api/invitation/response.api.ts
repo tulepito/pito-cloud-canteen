@@ -4,12 +4,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { createFirebaseDocNotification } from '@services/notifications';
 import { getSdk, handleError } from '@services/sdk';
 import {
   UserInviteResponse,
   UserInviteStatus,
   UserPermission,
 } from '@src/types/UserPermission';
+import { ENotificationType } from '@src/utils/enums';
 import { denormalisedResponseEntities, User } from '@utils/data';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -27,7 +29,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const userId = User(currentUser).getId();
 
     const companyAccount = await fetchUser(companyId);
-    const { members = {} } = User(companyAccount).getMetadata();
+    const companyUser = User(companyAccount);
+    const { companyName } = companyUser.getPublicData();
+    const { members = {} } = companyUser.getMetadata();
     const userMember = members[userEmail];
 
     const { expireTime = 0, permission } = userMember;
@@ -88,6 +92,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
         },
       },
+    });
+
+    createFirebaseDocNotification(ENotificationType.COMPANY_JOINED, {
+      userId,
+      companyName,
     });
 
     return res.json({

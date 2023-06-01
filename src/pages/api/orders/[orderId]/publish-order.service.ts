@@ -2,10 +2,12 @@ import isEmpty from 'lodash/isEmpty';
 
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { createFirebaseDocNotification } from '@services/notifications';
 import type { TPlan } from '@src/utils/orderTypes';
 import { Listing } from '@utils/data';
 import {
   EBookerOrderDraftStates,
+  ENotificationType,
   EOrderDraftStates,
   EOrderStates,
 } from '@utils/enums';
@@ -37,15 +39,19 @@ const normalizePlanDetailsData = (planDetails: TPlan['orderDetail']) => {
 export const publishOrder = async (orderId: string) => {
   const integrationSdk = getIntegrationSdk();
 
-  const [orderListing] = denormalisedResponseEntities(
+  const [order] = denormalisedResponseEntities(
     await integrationSdk.listings.show({ id: orderId }),
   );
+
+  const orderListing = Listing(order);
 
   const {
     plans = [],
     orderState,
     orderStateHistory = [],
-  } = Listing(orderListing).getMetadata();
+    participants = [],
+  } = orderListing.getMetadata();
+  const { title: orderTitle } = orderListing.getAttributes();
 
   if (!enableToPublishOrderStates.includes(orderState)) {
     throw new Error(`Invalid orderState, ${orderState}`);
@@ -77,5 +83,14 @@ export const publishOrder = async (orderId: string) => {
         updatedAt: new Date().getTime(),
       }),
     },
+  });
+
+  // create order picking notification for all participants
+  participants.map(async (participantId: string) => {
+    createFirebaseDocNotification(ENotificationType.ORDER_PICKING, {
+      orderId,
+      orderTitle,
+      userId: participantId,
+    });
   });
 };

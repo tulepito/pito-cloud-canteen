@@ -8,6 +8,7 @@ import { CustomError, EHttpStatusCode } from '@apis/errors';
 import createQuotation from '@pages/api/orders/[orderId]/quotation/create-quotation.service';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchListing } from '@services/integrationHelper';
+import { createFirebaseDocNotification } from '@services/notifications';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import {
@@ -17,7 +18,7 @@ import {
   User,
 } from '@src/utils/data';
 import { VNTimezone } from '@src/utils/dates';
-import { EQuotationStatus } from '@src/utils/enums';
+import { ENotificationType, EQuotationStatus } from '@src/utils/enums';
 import { isTransactionsTransitionInvalidTransition } from '@src/utils/errors';
 import { ETransition } from '@src/utils/transaction';
 import type { TError } from '@src/utils/types';
@@ -60,55 +61,40 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         );
 
         const tx = denormalisedResponseEntities(txResponse)[0];
-        if (transition === ETransition.OPERATOR_CANCEL_PLAN) {
-          const txGetter = Transaction(tx);
-          const { booking, listing, provider } = txGetter.getFullData();
-          const listingGetter = Listing(listing);
-          const providerGetter = User(provider);
-          const restaurantId = listingGetter.getId();
-          const partnerId = providerGetter.getId();
-          const { displayStart } = booking.attributes;
-          const timestamp = new Date(displayStart).getTime();
-          const startTimestamp = DateTime.fromMillis(timestamp)
-            .setZone(VNTimezone)
-            .startOf('day')
-            .toMillis();
-          const { participantIds = [], orderId } = txGetter.getMetadata();
-          const order = await fetchListing(orderId);
-          const orderListing = Listing(order);
-          const {
-            plans = [],
-            quotationId,
-            companyId,
-          } = orderListing.getMetadata();
-          const quotation = await fetchListing(quotationId);
-          const quotationListing = Listing(quotation);
-          const { client, partner } = quotationListing.getMetadata();
-          const newClient = {
-            ...client,
-            quotation: omit(client.quotation, [startTimestamp]),
-          };
-          const newPartner = {
-            ...partner,
-            [restaurantId]: {
-              quotation: omit(partner[restaurantId].quotation, [
-                startTimestamp,
-              ]),
-            },
-          };
-          await integrationSdk.listings.update({
-            id: quotationId,
-            metadata: {
-              status: EQuotationStatus.INACTIVE,
-            },
-          });
-          await createQuotation({
-            orderId,
-            companyId,
-            client: newClient,
-            partner: newPartner,
-          });
+        const txGetter = Transaction(tx);
+        const { participantIds = [], orderId } = txGetter.getMetadata();
+        const { booking, listing, provider } = txGetter.getFullData();
+        const { displayStart } = booking.attributes;
+        const timestamp = new Date(displayStart).getTime();
+        const startTimestamp = DateTime.fromMillis(timestamp)
+          .setZone(VNTimezone)
+          .startOf('day')
+          .toMillis();
+        const order = await fetchListing(orderId);
+        const orderListing = Listing(order);
+        const listingGetter = Listing(listing);
+        const providerGetter = User(provider);
+        const {
+          plans = [],
+          quotationId,
+          companyId,
+        } = orderListing.getMetadata();
+        const { title: orderTitle } = orderListing.getAttributes();
+        const restaurantId = listingGetter.getId();
+        const partnerId = providerGetter.getId();
 
+        if (transition === ETransition.START_DELIVERY) {
+          participantIds.map(async (participantId: string) => {
+            createFirebaseDocNotification(ENotificationType.ORDER_DELIVERING, {
+              orderId,
+              orderTitle,
+              userId: participantId,
+              planId: plans[0],
+              subOrderDate: startTimestamp,
+            });
+          });
+        }
+        if (transition === ETransition.OPERATOR_CANCEL_PLAN) {
           const plan = await fetchListing(plans[0]);
           const planListing = Listing(plan);
           const { orderDetail } = planListing.getMetadata();
@@ -155,6 +141,43 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               partnerId,
             },
           );
+          const quotation = await fetchListing(quotationId);
+          const quotationListing = Listing(quotation);
+          const { client, partner } = quotationListing.getMetadata();
+          const newClient = {
+            ...client,
+            quotation: omit(client.quotation, [startTimestamp]),
+          };
+          const newPartner = {
+            ...partner,
+            [restaurantId]: {
+              quotation: omit(partner[restaurantId].quotation, [
+                startTimestamp,
+              ]),
+            },
+          };
+          await integrationSdk.listings.update({
+            id: quotationId,
+            metadata: {
+              status: EQuotationStatus.INACTIVE,
+            },
+          });
+          await createQuotation({
+            orderId,
+            companyId,
+            client: newClient,
+            partner: newPartner,
+          });
+
+          participantIds.map(async (participantId: string) => {
+            createFirebaseDocNotification(ENotificationType.ORDER_CANCEL, {
+              orderId,
+              orderTitle,
+              userId: participantId,
+              planId: plans[0],
+              subOrderDate: startTimestamp,
+            });
+          });
         }
 
         return res.status(200).json({

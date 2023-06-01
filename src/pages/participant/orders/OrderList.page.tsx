@@ -27,6 +27,7 @@ import type { TListing, TObject } from '@src/utils/types';
 
 import ParticipantToolbar from '../components/ParticipantToolbar/ParticipantToolbar';
 
+import NotificationModal from './components/NotificationModal/NotificationModal';
 import OnboardingOrderModal from './components/OnboardingOrderModal/OnboardingOrderModal';
 import OnboardingTour from './components/OnboardingTour/OnboardingTour';
 import OrderListHeaderSection from './components/OrderListHeaderSection/OrderListHeaderSection';
@@ -55,6 +56,7 @@ const OrderListPage = () => {
   const subOrderDetailModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
   const successRatingModalControl = useBoolean();
+  const notificationModalControl = useBoolean();
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const orders = useAppSelector(
     (state) => state.ParticipantOrderList.orders,
@@ -90,6 +92,17 @@ const OrderListPage = () => {
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
 
+  const notifications = useAppSelector(
+    (state) => state.ParticipantOrderList.participantFirebaseNotifications,
+    shallowEqual,
+  );
+
+  const fetchParticipantFirebaseNotificationsInProgress = useAppSelector(
+    (state) =>
+      state.ParticipantOrderList
+        .fetchParticipantFirebaseNotificationsInProgress,
+  );
+
   const currentUserGetter = CurrentUser(currentUser!);
   const currentUserId = currentUserGetter.getId();
   const { walkthroughEnable = true } = currentUserGetter.getMetadata();
@@ -99,7 +112,13 @@ const OrderListPage = () => {
     fetchOrdersInProgress ||
     updateSubOrderInProgress ||
     addSubOrderDocumentToFirebaseInProgress ||
-    participantPostRatingInProgress;
+    participantPostRatingInProgress ||
+    fetchParticipantFirebaseNotificationsInProgress;
+
+  const unseenNotifications = notifications.filter(
+    (notification) => !notification.seen,
+  );
+  const numberOfUnseenNotifications = unseenNotifications.length;
 
   const events = subOrders.map((subOrder: any) => {
     const planKey = Object.keys(subOrder)[0];
@@ -280,9 +299,16 @@ const OrderListPage = () => {
     }
   }, [planIdFromQuery, timestampFromQuery]);
 
+  useEffect(() => {
+    dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
+  }, []);
+
   return (
     <ParticipantLayout>
-      <OrderListHeaderSection />
+      <OrderListHeaderSection
+        openNotificationModal={notificationModalControl.setTrue}
+        numberOfUnseenNotifications={numberOfUnseenNotifications}
+      />
       <div className={css.calendarContainer}>
         <CalendarDashboard
           anchorDate={selectedDay}
@@ -357,6 +383,10 @@ const OrderListPage = () => {
       <SuccessRatingModal
         isOpen={successRatingModalControl.value}
         onClose={successRatingModalControl.setFalse}
+      />
+      <NotificationModal
+        isOpen={notificationModalControl.value}
+        onClose={notificationModalControl.setFalse}
       />
 
       <BottomNavigationBar />
