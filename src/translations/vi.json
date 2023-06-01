@@ -811,6 +811,7 @@
   "FieldRating.label.3": "Bình thường",
   "FieldRating.label.4": "Hài lòng",
   "FieldRating.label.5": "Rất hài lòng",
+  "FieldRating.label.undefined": "---",
   "FieldRestaurant.viewMenu": "Xem menu",
   "FoodEventCard.sideDishesContent": "có {boldText}",
   "FoodEventCard.sideDishesLabel": "Món ăn kèm",

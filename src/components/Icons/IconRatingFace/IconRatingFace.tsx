@@ -5,7 +5,7 @@ type TIconRatingFaceProps = TIconProps & {
 };
 
 const IconRatingFace: React.FC<TIconRatingFaceProps> = (props) => {
-  const { rating, className } = props;
+  const { rating = 5, className } = props;
   if (rating === 1)
     return (
       <svg

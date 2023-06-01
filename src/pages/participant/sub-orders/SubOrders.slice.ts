@@ -99,8 +99,12 @@ const SubOrdersSlice = createSlice({
           ...state,
           fetchSubOrdersInProgress: false,
           fetchSubOrdersError: null,
-          deliveredSubOrders: action.payload.deliveredSubOrders || [],
-          deliveringSubOrders: action.payload.deliveringSubOrders || [],
+          ...(action.payload.deliveredSubOrders && {
+            deliveredSubOrders: action.payload.deliveredSubOrders,
+          }),
+          ...(action.payload.deliveringSubOrders && {
+            deliveringSubOrders: action.payload.deliveringSubOrders,
+          }),
         };
       })
       .addCase(fetchSubOrdersFromFirebase.rejected, (state, action) => {

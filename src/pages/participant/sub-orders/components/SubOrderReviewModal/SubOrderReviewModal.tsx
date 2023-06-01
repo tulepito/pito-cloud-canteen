@@ -5,8 +5,9 @@ import last from 'lodash/last';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconRatingFace from '@components/Icons/IconRatingFace/IconRatingFace';
-import LoadingModal from '@components/LoadingModal/LoadingModal';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import Modal from '@components/Modal/Modal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
@@ -56,9 +57,7 @@ const SubOrderReviewModal: React.FC<SubOrderReviewModalProps> = (props) => {
     }
   }, [dispatch, reviewId]);
 
-  return fetchReviewInProgress || isEmpty(subOrderReview) ? (
-    <LoadingModal isOpen={fetchReviewInProgress} />
-  ) : (
+  return (
     <Modal
       id="SubOrderReviewModal"
       isOpen={isOpen}
@@ -67,70 +66,93 @@ const SubOrderReviewModal: React.FC<SubOrderReviewModalProps> = (props) => {
       closeClassName={css.closedModal}
       containerClassName={css.modalContainer}
       shouldHideIconClose>
-      <div className={css.goBack} onClick={onClose}>
-        <IconArrow direction="left" />
-        <span>Quay lại</span>
-      </div>
-      <div className={css.restaurantInfor}>
-        <div className={css.leftSide}>
-          <div className={css.imageWrapper}>
-            <ResponsiveImage
-              variants={[EImageVariants.squareSmall2x]}
-              alt={foodName}
-              image={foodImage}
-              className={css.image}
-            />
-          </div>
+      <RenderWhen condition={fetchReviewInProgress || isEmpty(subOrderReview)}>
+        <div className={css.loading}>
+          <IconSpinner />
         </div>
-        <div className={css.rightSide}>
-          <div className={css.inforSection}>
-            <div className={css.restaurantName}>{restaurantName}</div>
-            <div className={css.dishName}>{foodName}</div>
-          </div>
-          <div className={css.rating}>
-            <IconRatingFace rating={generalRating} className={css.iconFace} />
-            <div className={css.ratingText}>
-              {intl.formatMessage({
-                id: `FieldRating.label.${generalRating}`,
-              })}
+        <RenderWhen.False>
+          <>
+            <div className={css.goBack} onClick={onClose}>
+              <IconArrow direction="left" />
+              <span>Quay lại</span>
             </div>
-          </div>
-          <div className={css.time}>{subOrderTime}</div>
-        </div>
-      </div>
-      <div className={css.reviewInfor}>
-        <div className={css.rating}>
-          <IconRatingFace rating={+food.rating} className={css.iconFace} />
-          <div className={css.ratingText}>
-            <span>Món ăn: </span>
-            {intl.formatMessage({
-              id: `FieldRating.label.${food.rating}`,
-            })}
-          </div>
-        </div>
-        <div className={css.rating}>
-          <IconRatingFace rating={+packaging.rating} className={css.iconFace} />
-          <div className={css.ratingText}>
-            <span>Dụng cụ: </span>
-            {intl.formatMessage({
-              id: `FieldRating.label.${packaging.rating}`,
-            })}
-          </div>
-        </div>
-      </div>
-      <div className={css.detailReview}>{detailTextRating}</div>
-      <div className={css.imageList}>
-        {reviewImages.map((image: TImage) => (
-          <div key={image.id.uuid} className={css.imageWrapper}>
-            <ResponsiveImage
-              alt=""
-              image={image}
-              className={css.image}
-              variants={[EImageVariants.landscapeCrop2x]}
-            />
-          </div>
-        ))}
-      </div>
+            <div className={css.restaurantInfor}>
+              <div className={css.leftSide}>
+                <div className={css.imageWrapper}>
+                  <ResponsiveImage
+                    variants={[EImageVariants.squareSmall2x]}
+                    alt={foodName}
+                    image={foodImage}
+                    className={css.image}
+                  />
+                </div>
+              </div>
+              <div className={css.rightSide}>
+                <div className={css.inforSection}>
+                  <div className={css.restaurantName}>{restaurantName}</div>
+                  <div className={css.dishName}>{foodName}</div>
+                </div>
+                <div className={css.rating}>
+                  <IconRatingFace
+                    rating={generalRating}
+                    className={css.iconFace}
+                  />
+                  <div className={css.ratingText}>
+                    {intl.formatMessage(
+                      {
+                        id: `FieldRating.label.${generalRating}`,
+                      },
+                      {
+                        defaultValue: '...',
+                      },
+                    )}
+                  </div>
+                </div>
+                <div className={css.time}>{subOrderTime}</div>
+              </div>
+            </div>
+            <div className={css.reviewInfor}>
+              <div className={css.rating}>
+                <IconRatingFace
+                  rating={+food.rating}
+                  className={css.iconFace}
+                />
+                <div className={css.ratingText}>
+                  <span>Món ăn: </span>
+                  {intl.formatMessage({
+                    id: `FieldRating.label.${food.rating}`,
+                  })}
+                </div>
+              </div>
+              <div className={css.rating}>
+                <IconRatingFace
+                  rating={+packaging.rating}
+                  className={css.iconFace}
+                />
+                <div className={css.ratingText}>
+                  <span>Dụng cụ: </span>
+                  {intl.formatMessage({
+                    id: `FieldRating.label.${packaging.rating}`,
+                  })}
+                </div>
+              </div>
+            </div>
+            <div className={css.detailReview}>{detailTextRating}</div>
+            <div className={css.imageList}>
+              {reviewImages.map((image: TImage) => (
+                <div key={image.id.uuid} className={css.imageWrapper}>
+                  <ResponsiveImage
+                    alt=""
+                    image={image}
+                    className={css.reviewImage}
+                    variants={[EImageVariants.landscapeCrop2x]}
+                  />
+                </div>
+              ))}
+            </div>
+          </>
+        </RenderWhen.False>
+      </RenderWhen>
     </Modal>
   );
 };
