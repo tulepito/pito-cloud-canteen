@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
 
@@ -6,9 +8,9 @@ const useSelectDay = () => {
 
   const selectedDay = useAppSelector((state) => state.Calendar.selectedDay);
 
-  const handleSelectDay = (day: Date) => {
+  const handleSelectDay = useCallback((day: Date) => {
     dispatch(CalendarActions.setSelectedDay(day));
-  };
+  }, []);
 
   return {
     selectedDay,
