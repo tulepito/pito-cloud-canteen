@@ -112,6 +112,7 @@
 }
 
 .noPickThisDay {
+  cursor: pointer;
   @include flexAlign(center);
   gap: 4px;
   margin-top: 8px;
