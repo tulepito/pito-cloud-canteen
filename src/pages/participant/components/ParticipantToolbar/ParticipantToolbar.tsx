@@ -1,10 +1,12 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
+import isEqual from 'lodash/isEqual';
 import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
 import { ENavigate } from '@components/CalendarDashboard/helpers/constant';
+import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import type { TObject } from '@utils/types';
 
@@ -24,12 +26,15 @@ export type TToolbarProps = {
   anchorDate: Date;
   onPickForMe?: () => void;
   onPickForMeLoading?: boolean;
+  onChangeDate?: (date: Date) => void;
+  date?: Date;
 };
 
 const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
   const {
     label,
     onNavigate,
+    onChangeDate,
     recommendButton,
     startDate,
     endDate,
@@ -37,14 +42,22 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
     onView,
     views,
     view,
+    date,
   } = props;
   const intl = useIntl();
+  const mountedRef = useRef(false);
+  const shouldSetDateRef = useRef(false);
+  const { selectedDay } = useSelectDay();
+
   const startDateDateTime = DateTime.fromJSDate(startDate);
   const endDateDateTime = DateTime.fromJSDate(endDate);
   const anchorDateDateTime = DateTime.fromJSDate(anchorDate);
+
   const navigateFunc = (action: string) => () => {
     onNavigate(action);
+    shouldSetDateRef.current = true;
   };
+
   const showPrevBtn =
     startDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
   const showNextBtn =
@@ -73,6 +86,20 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
     return <div></div>;
   };
 
+  useEffect(() => {
+    mountedRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (mountedRef.current && onChangeDate && shouldSetDateRef.current) {
+      if (!isEqual(selectedDay, date) || selectedDay === null) {
+        onChangeDate(date!);
+        shouldSetDateRef.current = false;
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(date), mountedRef.current]);
+
   return (
     <div className={css.root}>
       {/* <Button
@@ -96,13 +123,17 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
         </div>
         <div className={css.toolbarNavigation}>
           <div
-            className={classNames(css.arrowBtn, !showPrevBtn && css.disabled)}
+            className={classNames(css.arrowBtn, {
+              [css.disabled]: !showPrevBtn,
+            })}
             onClick={navigateFunc(ENavigate.PREVIOUS)}>
             <IconArrow className={css.arrowIcon} direction="left" />
           </div>
           {label}
           <div
-            className={classNames(css.arrowBtn, !showNextBtn && css.disabled)}
+            className={classNames(css.arrowBtn, {
+              [css.disabled]: !showNextBtn,
+            })}
             onClick={navigateFunc(ENavigate.NEXT)}>
             <IconArrow className={css.arrowIcon} direction="right" />
           </div>

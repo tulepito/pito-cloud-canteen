@@ -61,7 +61,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
     const payload = {
       updateValues: {
         orderId,
-        orderDay,
+        orderDay: timestamp,
         planId,
         memberOrders: {
           [currentUserId]: {
