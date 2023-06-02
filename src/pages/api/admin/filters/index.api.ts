@@ -26,6 +26,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     packaging = [],
     daySessions = [],
     nutritions = [],
+    deliveryPeople = [],
   } = User(response).getMetadata();
   const { method } = req;
   switch (method) {
@@ -37,6 +38,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           packaging,
           daySessions,
           nutritions,
+          deliveryPeople,
         });
       } catch (error) {
         handleError(res, error);
