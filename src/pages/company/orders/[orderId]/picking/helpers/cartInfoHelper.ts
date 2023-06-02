@@ -4,7 +4,11 @@ import {
   getTotalInfo,
 } from '@helpers/orderHelper';
 import config from '@src/configs';
-import { ESubOrderStatus } from '@src/utils/enums';
+import {
+  EOrderStates,
+  EParticipantOrderStatus,
+  ESubOrderStatus,
+} from '@src/utils/enums';
 import { Listing } from '@utils/data';
 import type { TListing, TObject, TQuotation } from '@utils/types';
 
@@ -46,16 +50,20 @@ export const calculatePriceQuotationInfo = ({
   planOrderDetail: TObject;
   order: TObject;
 }) => {
-  const { packagePerMember = 0, memberAmount = 0 } = Listing(
+  const { packagePerMember = 0, orderState } = Listing(
     order as TListing,
   ).getMetadata();
+  const isOrderInProgress = orderState === EOrderStates.inProgress;
 
   const currentOrderDetail = Object.entries<TObject>(
     planOrderDetail,
   ).reduce<TObject>((result, currentOrderDetailEntry) => {
     const [subOrderDate, rawOrderDetailOfDate] = currentOrderDetailEntry;
-    const { status } = rawOrderDetailOfDate;
-    if (status === ESubOrderStatus.CANCELED) {
+    const { status, transactionId } = rawOrderDetailOfDate;
+    if (
+      status === ESubOrderStatus.CANCELED ||
+      (!transactionId && isOrderInProgress)
+    ) {
       return result;
     }
 
@@ -66,6 +74,26 @@ export const calculatePriceQuotationInfo = ({
       },
     };
   }, {});
+  const actualPCCFee = Object.values(currentOrderDetail).reduce(
+    (result, currentOrderDetailOfDate) => {
+      const { memberOrders } = currentOrderDetailOfDate;
+      const memberAmountOfDate = Object.values(memberOrders).reduce(
+        (resultOfDate: number, currentMemberOrder: any) => {
+          const { foodId, status: memberStatus } = currentMemberOrder;
+          if (foodId && memberStatus === EParticipantOrderStatus.joined) {
+            return resultOfDate + 1;
+          }
+
+          return resultOfDate;
+        },
+        0,
+      );
+
+      return result + getPCCFeeByMemberAmount(memberAmountOfDate);
+    },
+    0,
+  );
+
   const { totalPrice = 0, totalDishes = 0 } = calculateTotalPriceAndDishes({
     orderDetail: planOrderDetail,
   });
@@ -75,8 +103,9 @@ export const calculatePriceQuotationInfo = ({
   const serviceFee = 0;
   const transportFee = 0;
   const promotion = 0;
-  const numberOfOrderDays = Object.keys(currentOrderDetail).length;
-  const PITOFee = getPCCFeeByMemberAmount(memberAmount) * numberOfOrderDays;
+
+  const PITOFee = actualPCCFee;
+
   const totalWithoutVAT =
     totalPrice + serviceFee + transportFee + PITOFee - promotion;
   const VATFee = Math.round(totalWithoutVAT * config.VATPercentage);

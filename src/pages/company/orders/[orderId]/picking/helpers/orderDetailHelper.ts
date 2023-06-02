@@ -1,4 +1,4 @@
-import { EParticipantOrderStatus } from '@utils/enums';
+import { EParticipantOrderStatus, ESubOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
 
 export const groupFoodOrderByDate = ({
@@ -13,7 +13,11 @@ export const groupFoodOrderByDate = ({
       const {
         memberOrders,
         restaurant: { id, restaurantName, foodList: foodListOfDate = {} },
+        status: subOrderStatus,
       } = rawOrderDetailOfDate as TObject;
+      if (subOrderStatus === ESubOrderStatus.CANCELED) {
+        return result;
+      }
 
       const foodDataMap = Object.entries(memberOrders).reduce(
         (foodFrequencyResult, currentMemberOrderEntry) => {
