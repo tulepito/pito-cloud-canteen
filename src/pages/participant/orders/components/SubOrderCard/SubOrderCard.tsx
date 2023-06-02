@@ -65,7 +65,9 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
   const shouldShowRejectButton =
     ![EVENT_STATUS.EXPIRED_STATUS, EVENT_STATUS.NOT_JOINED_STATUS].includes(
       status,
-    ) && !isExpired;
+    ) &&
+    !isExpired &&
+    !transactionId;
 
   const subOrderTxs = useAppSelector(
     (state) => state.ParticipantOrderList.subOrderTxs,

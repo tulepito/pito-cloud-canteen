@@ -17,6 +17,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
@@ -117,7 +118,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
       },
       orderId,
     };
-
+    await dispatch(participantOrderManagementThunks.updateOrder(payload));
     await dispatch(OrderListThunks.updateSubOrder(payload));
     await dispatch(
       OrderListThunks.addSubOrderDocumentToFirebase({
