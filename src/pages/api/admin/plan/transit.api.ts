@@ -12,7 +12,6 @@ import {
   denormalisedResponseEntities,
   Listing,
   Transaction,
-  User,
 } from '@src/utils/data';
 import { VNTimezone } from '@src/utils/dates';
 import { isTransactionsTransitionInvalidTransition } from '@src/utils/errors';
@@ -59,7 +58,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const tx = denormalisedResponseEntities(txResponse)[0];
         if (transition === ETransition.OPERATOR_CANCEL_PLAN) {
           const txGetter = Transaction(tx);
-          const { booking, listing, provider } = txGetter.getFullData();
+          const { booking, listing } = txGetter.getFullData();
           const { displayStart } = booking.attributes;
           const timestamp = new Date(displayStart).getTime();
           const startTimestamp = DateTime.fromMillis(timestamp)
@@ -108,9 +107,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             }),
           );
           const listingGetter = Listing(listing);
-          const providerGetter = User(provider);
           const restaurantId = listingGetter.getId();
-          const partnerId = providerGetter.getId();
 
           await emailSendingFactory(
             EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
@@ -118,7 +115,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               orderId,
               timestamp,
               restaurantId,
-              partnerId,
             },
           );
         }
