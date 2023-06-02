@@ -128,6 +128,7 @@ export const ReviewContent: React.FC<any> = (props) => {
 
     return deliveryPeople;
   }, []);
+
   const { form } = useForm<TFormDeliveryInfoValues>({
     onSubmit: () => {},
     initialValues: {
@@ -163,6 +164,7 @@ export const ReviewContent: React.FC<any> = (props) => {
         id: index + 1,
         foodName: foodList[key].foodName,
         foodPrice: foodList[key].foodPrice,
+        foodUnit: foodList[key].foodUnit,
       },
     };
   }) as any;

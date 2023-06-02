@@ -19,7 +19,11 @@ export const groupFoodOrderByDate = ({
         (foodFrequencyResult, currentMemberOrderEntry) => {
           const [, memberOrderData] = currentMemberOrderEntry;
           const { foodId, status } = memberOrderData as TObject;
-          const { foodName, foodPrice } = foodListOfDate[foodId] || {};
+          const {
+            foodName,
+            foodPrice,
+            foodUnit = '',
+          } = foodListOfDate[foodId] || {};
 
           if (status === EParticipantOrderStatus.joined && foodId !== '') {
             const data = foodFrequencyResult[foodId] as TObject;
@@ -29,7 +33,7 @@ export const groupFoodOrderByDate = ({
               ...foodFrequencyResult,
               [foodId]: data
                 ? { ...data, frequency: frequency + 1 }
-                : { foodId, foodName, foodPrice, frequency: 1 },
+                : { foodId, foodName, foodUnit, foodPrice, frequency: 1 },
             };
           }
 

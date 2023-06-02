@@ -187,9 +187,12 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     const updatedFoodList = selectedFoods.reduce((acc: any, foodId: string) => {
       const food = foodList?.find((item) => item.id?.uuid === foodId);
       if (food) {
+        const foodListingGetter = Listing(food).getAttributes();
+
         acc[foodId] = {
-          foodName: Listing(food).getAttributes().title,
-          foodPrice: Listing(food).getAttributes().price?.amount,
+          foodName: foodListingGetter.title,
+          foodPrice: foodListingGetter.price?.amount || 0,
+          foodUnit: foodListingGetter.publicData?.unit || '',
         };
       }
 
