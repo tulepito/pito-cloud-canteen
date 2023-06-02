@@ -65,7 +65,7 @@ export const addFirebaseDocument = async ({
     deliveryHour,
     createdAt: new Date(),
   };
-  console.log('foodId: ', foodId);
+
   if (status !== EParticipantOrderStatus.notJoined && foodId) {
     const { foodName } = foodList[foodId];
     const foodResponse = await fetchListing(
@@ -91,8 +91,6 @@ export const addFirebaseDocument = async ({
       ...(newFoodImage && { foodImage: newFoodImage }),
     };
   }
-
-  console.log('subOrderDocument', subOrderDocument);
 
   await setCollectionDocWithCustomId(
     `${participantId} - ${planId} - ${timestamp}`,
