@@ -15,7 +15,6 @@ import {
   denormalisedResponseEntities,
   Listing,
   Transaction,
-  User,
 } from '@src/utils/data';
 import { VNTimezone } from '@src/utils/dates';
 import { ENotificationType, EQuotationStatus } from '@src/utils/enums';
@@ -63,7 +62,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const tx = denormalisedResponseEntities(txResponse)[0];
         const txGetter = Transaction(tx);
         const { participantIds = [], orderId } = txGetter.getMetadata();
-        const { booking, listing, provider } = txGetter.getFullData();
+        const { booking, listing } = txGetter.getFullData();
         const { displayStart } = booking.attributes;
         const timestamp = new Date(displayStart).getTime();
         const startTimestamp = DateTime.fromMillis(timestamp)
@@ -73,7 +72,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const order = await fetchListing(orderId);
         const orderListing = Listing(order);
         const listingGetter = Listing(listing);
-        const providerGetter = User(provider);
+
         const {
           plans = [],
           quotationId,
@@ -81,7 +80,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         } = orderListing.getMetadata();
         const { title: orderTitle } = orderListing.getAttributes();
         const restaurantId = listingGetter.getId();
-        const partnerId = providerGetter.getId();
 
         if (transition === ETransition.START_DELIVERY) {
           participantIds.map(async (participantId: string) => {
@@ -138,7 +136,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               orderId,
               timestamp,
               restaurantId,
-              partnerId,
             },
           );
           const quotation = await fetchListing(quotationId);
