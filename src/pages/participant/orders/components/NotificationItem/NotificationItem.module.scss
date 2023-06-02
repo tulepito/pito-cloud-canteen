@@ -18,6 +18,11 @@
   }
 }
 
+.notificationContent {
+  @include flexAlign(center, flex-start);
+  gap: 16px;
+}
+
 .contentWrapper {
   .content {
     @include textTemplate(14px, $fontWeightRegular, 20px);

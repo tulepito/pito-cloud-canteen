@@ -29,10 +29,12 @@ const NotificationItem: React.FC<NotificationItemProps> = (props) => {
 
   return (
     <div className={css.itemWrapper} onClick={handleNotificationItemClick}>
-      <div className={css.iconWrapper}>
-        <NotificationItemIcon type={notificationType} />
+      <div className={css.notificationContent}>
+        <div className={css.iconWrapper}>
+          <NotificationItemIcon type={notificationType} />
+        </div>
+        <NotificationItemInfo type={notificationType} notificationItem={rest} />
       </div>
-      <NotificationItemInfo type={notificationType} notificationItem={rest} />
 
       <RenderWhen condition={!seen}>
         <div className={css.redDot}></div>
