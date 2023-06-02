@@ -162,9 +162,9 @@ export const ReviewContent: React.FC<any> = (props) => {
       key,
       data: {
         id: index + 1,
-        foodName: foodList[key].foodName,
-        foodPrice: foodList[key].foodPrice,
-        foodUnit: foodList[key].foodUnit,
+        foodName: foodList[key]?.foodName,
+        foodPrice: foodList[key]?.foodPrice,
+        foodUnit: foodList[key]?.foodUnit,
       },
     };
   }) as any;
@@ -333,13 +333,13 @@ export const ReviewContent: React.FC<any> = (props) => {
                     </div>
                   </div>
                   <div className={rowsClasses}>
-                    {foodDataList.map((foodData: TObject) => {
+                    {foodDataList.map((foodData: TObject, index: number) => {
                       const {
-                        foodId,
-                        foodPrice,
+                        foodId = index,
+                        foodPrice = 0,
                         foodUnit = '',
-                        foodName,
-                        frequency,
+                        foodName = '',
+                        frequency = 1,
                       } = foodData;
 
                       return (
