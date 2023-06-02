@@ -122,13 +122,19 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
               </div>
               <div className={rowsClasses}>
                 {foodDataList.map((foodData: TObject) => {
-                  const { foodId, foodPrice, foodName, frequency } = foodData;
+                  const {
+                    foodId,
+                    foodPrice,
+                    foodUnit = '',
+                    foodName,
+                    frequency,
+                  } = foodData;
 
                   return (
                     <div className={css.row} key={foodId}>
                       <div></div>
                       <div>{foodName}</div>
-                      <div>{''}</div>
+                      <div>{foodUnit}</div>
                       <div>{frequency}</div>
                       <div>{parseThousandNumber(foodPrice || 0)}đ</div>
                       <div>{''}</div>
