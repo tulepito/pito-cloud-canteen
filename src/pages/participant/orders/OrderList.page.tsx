@@ -297,7 +297,7 @@ const OrderListPage = () => {
         subOrderDetailModalControl.setTrue();
       }
     }
-  }, [planIdFromQuery, timestampFromQuery]);
+  }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
 
   useEffect(() => {
     dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
