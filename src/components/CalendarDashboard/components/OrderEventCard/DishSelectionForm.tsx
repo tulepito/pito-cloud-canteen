@@ -85,6 +85,7 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
           <label
             key={index}
             className={css.radioLabel}
+            title={dish.value}
             htmlFor={`dishSelection-${index}`}>
             <input
               {...dishSelection.input}
@@ -96,7 +97,7 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
               id={`dishSelection-${index}`}
               name="dishSelection"
             />
-            {dish.value}
+            <span>{dish.value}</span>
           </label>
         ))}
       </div>
