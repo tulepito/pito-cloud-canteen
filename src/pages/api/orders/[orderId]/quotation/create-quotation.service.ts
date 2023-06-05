@@ -1,8 +1,5 @@
-import uniq from 'lodash/uniq';
-
 import type { TCreateQuotationApiBody } from '@apis/orderApi';
 import { generateUncountableIdForQuotation } from '@helpers/generateUncountableId';
-import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, User } from '@src/utils/data';
@@ -11,7 +8,7 @@ import { EListingStates, EListingType } from '@src/utils/enums';
 const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 
 const createQuotation = async (params: TCreateQuotationApiBody) => {
-  const { companyId, orderId, partner } = params;
+  const { companyId, orderId } = params;
   const integrationSdk = getIntegrationSdk();
   const admin = await fetchUser(ADMIN_ID as string);
   const adminUser = User(admin);
@@ -50,20 +47,6 @@ const createQuotation = async (params: TCreateQuotationApiBody) => {
       quotationId: quotation.id.uuid,
     },
   });
-
-  const restaurantIds = uniq(Object.keys(partner));
-
-  await Promise.all(
-    restaurantIds.map(async (restaurantId: string) => {
-      await emailSendingFactory(
-        EmailTemplateTypes.PARTNER.PARTNER_NEW_ORDER_APPEAR,
-        {
-          orderId,
-          restaurantId,
-        },
-      );
-    }),
-  );
 
   return quotation;
 };

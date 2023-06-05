@@ -750,7 +750,7 @@ const bookerOrderPicking = ({ bookerUser, companyUser, orderListing }) => {
                                   style="padding:0;Margin:0;padding-bottom:10px;padding-top:25px;padding-left:25px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:24px;color:#262626;font-size:16px">
-                                    <strong>Chi tiết đơn hàng dự kiến</strong>
+                                    <strong>Chi tiết đơn hàng dự kiến/ngày</strong>
                                   </p>
                                 </td>
                               </tr>
@@ -848,7 +848,7 @@ const bookerOrderPicking = ({ bookerUser, companyUser, orderListing }) => {
                                   style="padding:0;Margin:0;padding-bottom:10px;padding-top:25px;padding-left:25px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:24px;color:#262626;font-size:16px">
-                                    <strong>Chi tiết đơn hàng dự kiến</strong>
+                                    <strong>Chi tiết đơn hàng dự kiến/ngày</strong>
                                   </p>
                                 </td>
                               </tr>
