@@ -47,6 +47,7 @@ exports.handler = async (_event) => {
       };
       const { orderName } = orderListing.getPublicData();
       const { email: bookerEmail } = bookerUser?.getAttributes() || {};
+      console.log('bookerEmail: ', bookerEmail);
       const emailTemplate = bookerOrderPicking(emailDataSource);
       const emailDataParams = {
         receiver: [bookerEmail],
@@ -55,6 +56,7 @@ exports.handler = async (_event) => {
         sender: systemSenderEmail,
       };
       sendIndividualEmail(emailDataParams);
+      console.log('End to run schedule to send remind picking order email ...');
     }
   } catch (error) {
     console.error(

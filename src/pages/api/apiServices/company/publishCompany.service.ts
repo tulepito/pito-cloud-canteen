@@ -21,6 +21,7 @@ const publishCompany = async (companyId: string, queryParams: TObject = {}) => {
     subAccountPassword,
     process.env.ENCRYPT_PASSWORD_SECRET_KEY,
   );
+  const password = decryptedPassword.toString(CryptoJS.enc.Utf8);
   const response = await integrationSdk.users.updateProfile(
     {
       id: companyId,
@@ -36,7 +37,7 @@ const publishCompany = async (companyId: string, queryParams: TObject = {}) => {
     await emailSendingFactory(
       EmailTemplateTypes.BOOKER.BOOKER_ACCOUNT_CREATED,
       {
-        password: decryptedPassword,
+        password,
         companyId,
       },
     );
