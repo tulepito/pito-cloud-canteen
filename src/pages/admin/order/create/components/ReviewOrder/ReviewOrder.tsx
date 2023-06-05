@@ -27,9 +27,8 @@ import {
   changeStep4SubmitStatus,
   orderAsyncActions,
 } from '@redux/slices/Order.slice';
-import { currentUserSelector } from '@redux/slices/user.slice';
 import { adminPaths } from '@src/paths';
-import { CurrentUser, Listing } from '@utils/data';
+import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import { EOrderDraftStates, EOrderStates } from '@utils/enums';
 import type { TListing, TObject } from '@utils/types';
@@ -109,7 +108,6 @@ export const ReviewContent: React.FC<any> = (props) => {
     string | undefined
   >(deliveryManPhoneNumber);
 
-  const currentUser = useAppSelector(currentUserSelector);
   const order = useAppSelector((state) => state.OrderDetail.order);
   const orderDetail = useAppSelector((state) => state.OrderDetail.orderDetail);
   const participantData = useAppSelector(
@@ -118,16 +116,9 @@ export const ReviewContent: React.FC<any> = (props) => {
   const anonymousParticipantData = useAppSelector(
     (state) => state.OrderDetail.anonymousParticipantData,
   );
-
-  const deliveryManOptions: {
-    key: string;
-    name: string;
-    phoneNumber: string;
-  }[] = useMemo(() => {
-    const { deliveryPeople = [] } = CurrentUser(currentUser).getMetadata();
-
-    return deliveryPeople;
-  }, []);
+  const deliveryManOptions = useAppSelector(
+    (state) => state.AdminAttributes.deliveryPeople,
+  );
 
   const { form } = useForm<TFormDeliveryInfoValues>({
     onSubmit: () => {},

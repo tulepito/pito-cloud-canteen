@@ -35,6 +35,11 @@ type TAttributesState = {
   daySessions: TKeyValue[];
   packaging: TKeyValue[];
   nutritions: TKeyValue[];
+  deliveryPeople: {
+    key: string;
+    name: string;
+    phoneNumber: string;
+  }[];
 
   fetchAttributesInProgress: boolean;
   fetchAttributesError: boolean;
@@ -48,6 +53,7 @@ const initialState: TAttributesState = {
   daySessions: [],
   packaging: [],
   nutritions: [],
+  deliveryPeople: [],
 
   fetchAttributesInProgress: false,
   fetchAttributesError: false,
@@ -120,11 +126,13 @@ const AttributesSlice = createSlice({
           packaging = [],
           daySessions = [],
           nutritions = [],
+          deliveryPeople = [],
         } = action.payload;
         state.categories = categories;
         state.packaging = packaging;
         state.daySessions = daySessions;
         state.nutritions = nutritions;
+        state.deliveryPeople = deliveryPeople;
         state.fetchAttributesInProgress = false;
       })
       .addCase(fetchAttributes.rejected, (state) => {

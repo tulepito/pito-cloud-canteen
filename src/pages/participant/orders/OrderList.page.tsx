@@ -191,7 +191,6 @@ const OrderListPage = () => {
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
         end: DateTime.fromMillis(+planItemKey).plus({ hour: 1 }).toJSDate(),
       };
-
       listEvent.push(event);
     });
 
