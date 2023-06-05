@@ -16,6 +16,7 @@ import {
   createQuotationApi,
   deleteParticipantFromOrderApi,
   getBookerOrderDataApi,
+  sendPartnerNewOrderAppearEmailApi,
   sendRemindEmailToMemberApi,
   updateOrderApi,
 } from '@apis/orderApi';
@@ -538,6 +539,10 @@ const bookerStartOrder = createAsyncThunk(
     };
 
     await createQuotationApi(orderId, apiBody);
+    await sendPartnerNewOrderAppearEmailApi(orderId, {
+      orderId,
+      partner: partnerQuotation,
+    });
   },
 );
 
