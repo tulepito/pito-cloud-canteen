@@ -155,6 +155,11 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const handleAnchorDateChange = (date?: Date) => {
     setAnchorTime(date?.getTime());
   };
+  const closeAllModals = () => {
+    subOrderDetailModalControl.setFalse();
+    ratingSubOrderModalControl.setFalse();
+    successRatingModalControl.setFalse();
+  };
 
   return (
     <div className={css.container}>
@@ -209,6 +214,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
       <SuccessRatingModal
         isOpen={successRatingModalControl.value}
         onClose={successRatingModalControl.setFalse}
+        closeAllModals={closeAllModals}
       />
     </div>
   );

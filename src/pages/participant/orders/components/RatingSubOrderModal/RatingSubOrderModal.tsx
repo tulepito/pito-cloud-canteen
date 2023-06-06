@@ -1,6 +1,4 @@
-import { useEffect } from 'react';
 import type { Event } from 'react-big-calendar';
-import { shallowEqual } from 'react-redux';
 
 import SlideModal from '@components/SlideModal/SlideModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -29,13 +27,14 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
   const { orderId, restaurant, timestamp, planId } =
     selectedEvent?.resource || {};
   const restaurantId = restaurant?.id;
-  const images = useAppSelector(
-    (state) => state.uploadImage.images,
-    shallowEqual,
-  );
+
   const postRatingInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
+  const handleClose = () => {
+    dispatch(resetImage());
+    onClose();
+  };
 
   const initialValues: TRatingSubOrderFormValues = {
     general: '',
@@ -44,9 +43,6 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     detailTextRating: '',
     images: [],
   };
-  useEffect(() => {
-    dispatch(resetImage());
-  }, []);
 
   const handleSubmit = async (values: TRatingSubOrderFormValues) => {
     const { general, food, packaging, detailTextRating } = values;
@@ -80,10 +76,9 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
   };
 
   return (
-    <SlideModal id="RatingSubOrderModal" isOpen={isOpen} onClose={onClose}>
+    <SlideModal id="RatingSubOrderModal" isOpen={isOpen} onClose={handleClose}>
       <RatingSubOrderForm
         onSubmit={handleSubmit}
-        images={images}
         inProgress={postRatingInProgress}
         initialValues={initialValues}
       />
