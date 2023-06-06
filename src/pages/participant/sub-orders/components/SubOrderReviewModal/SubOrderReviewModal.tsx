@@ -7,6 +7,7 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconRatingFace from '@components/Icons/IconRatingFace/IconRatingFace';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import Modal from '@components/Modal/Modal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
@@ -99,26 +100,35 @@ const SubOrderReviewModal: React.FC<SubOrderReviewModalProps> = (props) => {
           <div className={css.time}>{subOrderTime}</div>
         </div>
       </div>
-      <div className={css.reviewInfor}>
-        <div className={css.rating}>
-          <IconRatingFace rating={+food.rating} className={css.iconFace} />
-          <div className={css.ratingText}>
-            <span>Món ăn: </span>
-            {intl.formatMessage({
-              id: `FieldRating.label.${food.rating}`,
-            })}
-          </div>
+      <RenderWhen condition={!!food.rating || !!packaging.rating}>
+        <div className={css.reviewInfor}>
+          <RenderWhen condition={!!food.rating}>
+            <div className={css.rating}>
+              <IconRatingFace rating={+food.rating} className={css.iconFace} />
+              <div className={css.ratingText}>
+                <span>Món ăn: </span>
+                {intl.formatMessage({
+                  id: `FieldRating.label.${food.rating}`,
+                })}
+              </div>
+            </div>
+          </RenderWhen>
+          <RenderWhen condition={!!packaging.rating}>
+            <div className={css.rating}>
+              <IconRatingFace
+                rating={+packaging.rating}
+                className={css.iconFace}
+              />
+              <div className={css.ratingText}>
+                <span>Dụng cụ: </span>
+                {intl.formatMessage({
+                  id: `FieldRating.label.${packaging.rating}`,
+                })}
+              </div>
+            </div>
+          </RenderWhen>
         </div>
-        <div className={css.rating}>
-          <IconRatingFace rating={+packaging.rating} className={css.iconFace} />
-          <div className={css.ratingText}>
-            <span>Dụng cụ: </span>
-            {intl.formatMessage({
-              id: `FieldRating.label.${packaging.rating}`,
-            })}
-          </div>
-        </div>
-      </div>
+      </RenderWhen>
       <div className={css.detailReview}>{detailTextRating}</div>
       <div className={css.imageList}>
         {reviewImages.map((image: TImage) => (
