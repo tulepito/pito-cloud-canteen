@@ -67,9 +67,9 @@ const MenuColumns: TColumn[] = [
     label: 'ĐVT',
     render: (data: any) => {
       return (
-        <span
-          title={data.id}
-          className={classNames(css.rowText, css.rowId)}></span>
+        <span title={data.id} className={classNames(css.rowText, css.rowId)}>
+          {data.foodUnit}
+        </span>
       );
     },
   },
@@ -159,6 +159,7 @@ export const ReviewContent: React.FC<any> = (props) => {
       },
     };
   }) as any;
+  console.log('parsedFoodList', parsedFoodList);
 
   const handleToggleMenuCollapse = () => {
     menuCollapseController.toggle();
