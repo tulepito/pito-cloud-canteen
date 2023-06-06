@@ -63,13 +63,7 @@ const SubOrders = () => {
         subOrderReviewModalControl.setTrue();
       }
     }
-  }, [
-    currentUserId,
-    deliveredSubOrders,
-    planIdFromQuery,
-    subOrderReviewModalControl,
-    timestampFromQuery,
-  ]);
+  }, [currentUserId, deliveredSubOrders, planIdFromQuery, timestampFromQuery]);
 
   useEffect(() => {
     dispatch(
