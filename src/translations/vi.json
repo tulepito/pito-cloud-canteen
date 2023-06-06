@@ -1083,7 +1083,7 @@
   "NotificationItemInfo.title.orderDelivering": "<span>Ngày ăn {subOrderDate}</span> đang chuẩn bị giao đến bạn",
   "NotificationItemInfo.title.orderPicking": "<span>Đơn hàng {orderTitle}</span> đang chờ chọn món",
   "NotificationItemInfo.title.orderRating": "<span>Bạn đã đánh giá món {foodName} ngày {subOrderDate}</span>",
-  "NotificationItemInfo.title.orderSuccess": "<span>Bạn đã đặt món ngày {subOrderDate} thành công</span>",
+  "NotificationItemInfo.title.orderSuccess": "<span>Ngày ăn {subOrderDate} đã giao thành công</span>",
   "NotificationSection.label.completedOrder": "Đánh giá đơn hàng {orderId}",
   "NotificationSection.label.deadlineDueOrder": "Đơn hàng {orderId} sắp đến hạn chọn món",
   "NotificationSection.label.draftOrder": "Đơn hàng {orderId} vừa được PITO khởi tạo",
