@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
+import { useRouter } from 'next/router';
 
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
@@ -22,6 +23,9 @@ const DELIVERED_TAB = ESubOrderTxStatus.DELIVERED;
 
 const SubOrders = () => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { planId: planIdFromQuery, timestamp: timestampFromQuery } =
+    router.query;
 
   const [activeTab, setActiveTab] = useState(DELIVERING_TAB);
   const [selectedSubOrder, setSelectedSubOrder] = useState<any>(null);
@@ -42,6 +46,26 @@ const SubOrders = () => {
   const fetchSubOrdersInProgress = useAppSelector(
     (state) => state.ParticipantSubOrderList.fetchSubOrdersInProgress,
   );
+
+  useEffect(() => {
+    if (planIdFromQuery && timestampFromQuery) {
+      const subOrderId = `${currentUserId} - ${planIdFromQuery} - ${timestampFromQuery}`;
+      const subOrder = deliveredSubOrders.find(
+        (_subOrder) => _subOrder.id === subOrderId,
+      );
+      if (subOrder) {
+        setActiveTab(DELIVERED_TAB);
+        setSelectedSubOrder(subOrder);
+        subOrderReviewModalControl.setTrue();
+      }
+    }
+  }, [
+    currentUserId,
+    deliveredSubOrders,
+    planIdFromQuery,
+    subOrderReviewModalControl,
+    timestampFromQuery,
+  ]);
 
   useEffect(() => {
     dispatch(
