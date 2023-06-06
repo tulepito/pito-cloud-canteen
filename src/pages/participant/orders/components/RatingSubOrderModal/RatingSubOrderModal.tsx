@@ -37,6 +37,13 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
 
+  const initialValues: TRatingSubOrderFormValues = {
+    general: '',
+    food: '',
+    packaging: '',
+    detailTextRating: '',
+    images: [],
+  };
   useEffect(() => {
     dispatch(resetImage());
   }, []);
@@ -78,6 +85,7 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
         onSubmit={handleSubmit}
         images={images}
         inProgress={postRatingInProgress}
+        initialValues={initialValues}
       />
     </SlideModal>
   );
