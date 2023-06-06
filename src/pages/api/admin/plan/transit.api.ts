@@ -80,15 +80,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         } = orderListing.getMetadata();
         const { title: orderTitle } = orderListing.getAttributes();
         const restaurantId = listingGetter.getId();
+        const generalNotificationData = {
+          orderId,
+          orderTitle,
+          planId: plans[0],
+          subOrderDate: startTimestamp,
+        };
 
         if (transition === ETransition.START_DELIVERY) {
           participantIds.map(async (participantId: string) => {
             createFirebaseDocNotification(ENotificationType.ORDER_DELIVERING, {
-              orderId,
-              orderTitle,
+              ...generalNotificationData,
               userId: participantId,
-              planId: plans[0],
-              subOrderDate: startTimestamp,
+            });
+          });
+        }
+        if (transition === ETransition.COMPLETE_DELIVERY) {
+          participantIds.map(async (participantId: string) => {
+            createFirebaseDocNotification(ENotificationType.ORDER_SUCCESS, {
+              ...generalNotificationData,
+              userId: participantId,
             });
           });
         }
@@ -168,11 +179,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           participantIds.map(async (participantId: string) => {
             createFirebaseDocNotification(ENotificationType.ORDER_CANCEL, {
-              orderId,
-              orderTitle,
+              ...generalNotificationData,
               userId: participantId,
-              planId: plans[0],
-              subOrderDate: startTimestamp,
             });
           });
         }
