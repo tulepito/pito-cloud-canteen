@@ -110,6 +110,10 @@ export const ReviewContent: React.FC<any> = (props) => {
 
   const order = useAppSelector((state) => state.Order.order);
   const orderDetail = useAppSelector((state) => state.Order.orderDetail);
+  useEffect(() => {
+    setCurrDeliveryManPhoneNumber(deliveryManPhoneNumber);
+  }, [deliveryManPhoneNumber]);
+
   const participantData = useAppSelector(
     (state) => state.OrderDetail.participantData,
   );
