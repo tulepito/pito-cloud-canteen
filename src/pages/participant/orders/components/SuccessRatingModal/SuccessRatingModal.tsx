@@ -10,13 +10,15 @@ import css from './SuccessRatingModal.module.scss';
 type TSuccessRatingModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  closeAllModals: () => void;
 };
 
 const SuccessRatingModal: React.FC<TSuccessRatingModalProps> = (props) => {
-  const { isOpen, onClose } = props;
+  const { isOpen, onClose, closeAllModals } = props;
   const router = useRouter();
   const goToMyCalendar = () => {
     router.push(participantPaths.OrderList);
+    closeAllModals();
   };
 
   return (

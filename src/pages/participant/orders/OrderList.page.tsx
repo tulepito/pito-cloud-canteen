@@ -252,6 +252,11 @@ const OrderListPage = () => {
   const openRatingSubOrderModal = () => {
     ratingSubOrderModalControl.setTrue();
   };
+  const closeAllModals = () => {
+    ratingSubOrderModalControl.setFalse();
+    subOrderDetailModalControl.setFalse();
+    successRatingModalControl.setFalse();
+  };
 
   useEffect(() => {
     if (subOrdersFromSelectedDayTxIds) {
@@ -382,6 +387,7 @@ const OrderListPage = () => {
       <SuccessRatingModal
         isOpen={successRatingModalControl.value}
         onClose={successRatingModalControl.setFalse}
+        closeAllModals={closeAllModals}
       />
       <NotificationModal
         isOpen={notificationModalControl.value}
