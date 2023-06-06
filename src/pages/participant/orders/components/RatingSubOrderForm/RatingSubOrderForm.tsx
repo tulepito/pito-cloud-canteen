@@ -97,7 +97,11 @@ const RatingSubOrderFormComponent: React.FC<
       </RenderWhen>
 
       <div className={css.submitBtnWrapper}>
-        <Button className={css.submitBtn} type="submit" inProgress={inProgress}>
+        <Button
+          className={css.submitBtn}
+          type="submit"
+          inProgress={inProgress}
+          disabled={!hasGeneralRating}>
           Gửi đánh giá
         </Button>
       </div>
