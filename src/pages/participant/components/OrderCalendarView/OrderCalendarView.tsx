@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Event, View } from 'react-big-calendar';
 import { Views } from 'react-big-calendar';
 import Skeleton from 'react-loading-skeleton';
+import compact from 'lodash/compact';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
 
@@ -13,13 +14,14 @@ import LoadingModal from '@components/LoadingModal/LoadingModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { getItem } from '@helpers/localStorageHelpers';
 import { markColorForOrder } from '@helpers/orderHelper';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useSubOrderPicking from '@pages/participant/hooks/useSubOrderPicking';
 import RatingSubOrderModal from '@pages/participant/orders/components/RatingSubOrderModal/RatingSubOrderModal';
 import SubOrderCard from '@pages/participant/orders/components/SubOrderCard/SubOrderCard';
 import SubOrderDetailModal from '@pages/participant/orders/components/SubOrderDetailModal/SubOrderDetailModal';
 import SuccessRatingModal from '@pages/participant/orders/components/SuccessRatingModal/SuccessRatingModal';
+import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
 import { convertStringToNumber } from '@src/utils/number';
 import { CurrentUser, Listing, User } from '@utils/data';
@@ -47,6 +49,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     plans,
     loadDataInProgress,
   } = props;
+  const dispatch = useAppDispatch();
 
   const companyTitle = User(company).getPublicData().displayName;
   const ensureCompanyUser = User(company).getFullData();
@@ -154,6 +157,15 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     return listEvent;
   });
   const flattenEvents = flatten<Event>(events);
+  const subOrdersTxIds = compact(
+    flattenEvents.map((_event: any) => _event.resource.transactionId),
+  );
+
+  useEffect(() => {
+    if (subOrdersTxIds) {
+      dispatch(OrderListThunks.fetchTransactionBySubOrder(subOrdersTxIds));
+    }
+  }, [subOrdersTxIds]);
 
   const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) =>
     isSameDate(_event.start, selectedDay),
