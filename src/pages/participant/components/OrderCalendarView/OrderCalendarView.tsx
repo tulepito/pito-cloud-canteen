@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import Skeleton from 'react-loading-skeleton';
+import compact from 'lodash/compact';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
 
@@ -9,13 +10,14 @@ import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { markColorForOrder } from '@helpers/orderHelper';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useSubOrderPicking from '@pages/participant/hooks/useSubOrderPicking';
 import RatingSubOrderModal from '@pages/participant/orders/components/RatingSubOrderModal/RatingSubOrderModal';
 import SubOrderCard from '@pages/participant/orders/components/SubOrderCard/SubOrderCard';
 import SubOrderDetailModal from '@pages/participant/orders/components/SubOrderDetailModal/SubOrderDetailModal';
 import SuccessRatingModal from '@pages/participant/orders/components/SuccessRatingModal/SuccessRatingModal';
+import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
 import { convertStringToNumber } from '@src/utils/number';
 import { CurrentUser, Listing, User } from '@utils/data';
@@ -39,6 +41,7 @@ type TPlanItem = TObject;
 const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const { company, order, subOrders, currentUser, plans, loadDataInProgress } =
     props;
+  const dispatch = useAppDispatch();
 
   const companyTitle = User(company).getPublicData().displayName;
   const ensureCompanyUser = User(company).getFullData();
@@ -83,9 +86,12 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         value: Listing(food).getAttributes().title,
       }));
 
+      const currentPlanListing = Listing(currentPlan);
+      const { orderDetail = {} } = currentPlanListing.getMetadata();
+
       const foodSelection =
-        Listing(currentPlan).getMetadata().orderDetail[planItemKey]
-          .memberOrders[currentUserId] || {};
+        orderDetail[planItemKey].memberOrders[currentUserId] || {};
+      const transactionId = orderDetail[planItemKey]?.transactionId;
 
       const pickFoodStatus = foodSelection?.status;
 
@@ -118,6 +124,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
           orderColor,
+          transactionId,
         },
         title: orderTile,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
@@ -130,6 +137,15 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     return listEvent;
   });
   const flattenEvents = flatten<Event>(events);
+  const subOrdersTxIds = compact(
+    flattenEvents.map((_event: any) => _event.resource.transactionId),
+  );
+
+  useEffect(() => {
+    if (subOrdersTxIds) {
+      dispatch(OrderListThunks.fetchTransactionBySubOrder(subOrdersTxIds));
+    }
+  }, [subOrdersTxIds]);
 
   const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) =>
     isSameDate(_event.start, selectedDay),
