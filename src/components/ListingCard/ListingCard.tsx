@@ -22,6 +22,7 @@ type TListCardProps = {
   dayId: string;
   isSelected?: boolean;
   selectDisabled?: boolean;
+  isOrderAlreadyStarted: boolean;
 };
 
 const ListingCard: React.FC<TListCardProps> = ({
@@ -31,6 +32,7 @@ const ListingCard: React.FC<TListCardProps> = ({
   dayId,
   isSelected,
   selectDisabled,
+  isOrderAlreadyStarted,
 }) => {
   const detailModalController = useBoolean();
   const requirementRef = useRef<string | undefined>();
@@ -57,6 +59,7 @@ const ListingCard: React.FC<TListCardProps> = ({
     }
   };
   const handleRemoveFromCard = () => {
+    if (isOrderAlreadyStarted) return;
     dispatch(shoppingCartThunks.removeFromCart({ planId, dayId }));
   };
 
