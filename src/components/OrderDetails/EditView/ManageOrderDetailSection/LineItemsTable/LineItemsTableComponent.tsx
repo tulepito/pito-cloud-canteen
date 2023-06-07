@@ -71,55 +71,60 @@ export const LineItemsTableComponent: React.FC<
           <td colSpan={5}>
             <div className={css.scrollContainer}>
               <table>
-                {lineItems.map((lineItem: TObject) => {
-                  const {
-                    id: foodId,
-                    quantity = 1,
-                    name,
-                    price,
-                    unitPrice,
-                  } = lineItem;
+                <tbody>
+                  {lineItems.map((lineItem: TObject) => {
+                    const {
+                      id: foodId,
+                      quantity = 1,
+                      name,
+                      price,
+                      unitPrice,
+                    } = lineItem;
 
-                  const formattedFoodUnitPrice = `${parseThousandNumber(
-                    unitPrice,
-                  )}đ`;
-                  const formattedFoodPrice = `${parseThousandNumber(price)}đ`;
+                    const formattedFoodUnitPrice = `${parseThousandNumber(
+                      unitPrice,
+                    )}đ`;
+                    const formattedFoodPrice = `${parseThousandNumber(price)}đ`;
 
-                  return (
-                    <tr key={foodId}>
-                      <td title={name}>
-                        <div className={css.foodName}> {name}</div>
-                      </td>
-                      <td title={quantity}>
-                        <div className={css.quantityContainer}>
-                          <IconMinus className={css.iconMinus} />
-                          <div className={css.quantityValue}>{quantity}</div>
-                          <IconPlus className={css.iconPlus} shouldHideCover />
-                        </div>
-                      </td>
-                      <td title={formattedFoodUnitPrice}>
-                        {formattedFoodUnitPrice}
-                      </td>
-                      <td>
-                        <RenderWhen condition={Number(price) > 0}>
-                          <>{formattedFoodPrice}</>
-                        </RenderWhen>
-                      </td>
-                      <td>
-                        <div className={css.actionCell}>
-                          <IconDelete
-                            className={css.icon}
-                            onClick={
-                              actionDisabled
-                                ? doNothing
-                                : onClickDeleteLineItem(foodId)
-                            }
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                    return (
+                      <tr key={foodId}>
+                        <td title={name}>
+                          <div className={css.foodName}> {name}</div>
+                        </td>
+                        <td title={quantity}>
+                          <div className={css.quantityContainer}>
+                            <IconMinus className={css.iconMinus} />
+                            <div className={css.quantityValue}>{quantity}</div>
+                            <IconPlus
+                              className={css.iconPlus}
+                              shouldHideCover
+                            />
+                          </div>
+                        </td>
+                        <td title={formattedFoodUnitPrice}>
+                          {formattedFoodUnitPrice}
+                        </td>
+                        <td>
+                          <RenderWhen condition={Number(price) > 0}>
+                            <>{formattedFoodPrice}</>
+                          </RenderWhen>
+                        </td>
+                        <td>
+                          <div className={css.actionCell}>
+                            <IconDelete
+                              className={css.icon}
+                              onClick={
+                                actionDisabled
+                                  ? doNothing
+                                  : onClickDeleteLineItem(foodId)
+                              }
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
               </table>
             </div>
           </td>
