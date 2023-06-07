@@ -33,10 +33,11 @@ type TSubOrderDetailModalProps = {
   onClose: () => void;
   event: Event;
   openRatingSubOrderModal: () => void;
+  from: string;
 };
 
 const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
-  const { isOpen, onClose, event, openRatingSubOrderModal } = props;
+  const { isOpen, onClose, event, openRatingSubOrderModal, from } = props;
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -79,7 +80,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   const onNavigateToOrderDetail = () => {
     router.push({
       pathname: participantPaths.PlanDetail,
-      query: { orderDay: timestamp as string, planId, from: 'orderList' },
+      query: { orderDay: timestamp as string, planId, from },
     });
   };
 

@@ -208,6 +208,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           onClose={subOrderDetailModalControl.setFalse}
           event={selectedEvent!}
           openRatingSubOrderModal={ratingSubOrderModalControl.setTrue}
+          from="orderDetail"
         />
         <RatingSubOrderModal
           isOpen={ratingSubOrderModalControl.value}
