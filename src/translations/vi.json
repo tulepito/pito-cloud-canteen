@@ -1001,6 +1001,8 @@
   "ManagePartners.title": "Bảng đối tác",
   "ManagePartners.unsatisfactoryBtn": "Không đạt yêu cầu",
   "ManagePartnersPage.authorizedStatus": "Đã xác thực",
+  "ManagePartnersPage.deletePartnerAlert.confirmText": "Đã hiểu",
+  "ManagePartnersPage.deletePartnerAlert.message": "Đã có lỗi trong khi xoá đối tác / Không thể xoá khi đối tác tham gia một đơn hàng đang triển khai",
   "ManagePartnersPage.draftState": " Nháp",
   "ManagePartnersPage.newStatus": "Mới",
   "ManagePartnersPage.pendingRestaurantApprovalState": "Nhà hàng đang chờ phê duyệt",

@@ -27,9 +27,8 @@ import {
   changeStep4SubmitStatus,
   orderAsyncActions,
 } from '@redux/slices/Order.slice';
-import { currentUserSelector } from '@redux/slices/user.slice';
 import { adminPaths } from '@src/paths';
-import { CurrentUser, Listing } from '@utils/data';
+import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import { EOrderDraftStates, EOrderStates } from '@utils/enums';
 import type { TListing, TObject } from '@utils/types';
@@ -109,7 +108,6 @@ export const ReviewContent: React.FC<any> = (props) => {
     string | undefined
   >(deliveryManPhoneNumber);
 
-  const currentUser = useAppSelector(currentUserSelector);
   const order = useAppSelector((state) => state.OrderDetail.order);
   const orderDetail = useAppSelector((state) => state.OrderDetail.orderDetail);
   const participantData = useAppSelector(
@@ -118,16 +116,10 @@ export const ReviewContent: React.FC<any> = (props) => {
   const anonymousParticipantData = useAppSelector(
     (state) => state.OrderDetail.anonymousParticipantData,
   );
+  const deliveryManOptions = useAppSelector(
+    (state) => state.AdminAttributes.deliveryPeople,
+  );
 
-  const deliveryManOptions: {
-    key: string;
-    name: string;
-    phoneNumber: string;
-  }[] = useMemo(() => {
-    const { deliveryPeople = [] } = CurrentUser(currentUser).getMetadata();
-
-    return deliveryPeople;
-  }, []);
   const { form } = useForm<TFormDeliveryInfoValues>({
     onSubmit: () => {},
     initialValues: {
@@ -161,8 +153,9 @@ export const ReviewContent: React.FC<any> = (props) => {
       key,
       data: {
         id: index + 1,
-        foodName: foodList[key].foodName,
-        foodPrice: foodList[key].foodPrice,
+        foodName: foodList[key]?.foodName,
+        foodPrice: foodList[key]?.foodPrice,
+        foodUnit: foodList[key]?.foodUnit,
       },
     };
   }) as any;
@@ -331,15 +324,20 @@ export const ReviewContent: React.FC<any> = (props) => {
                     </div>
                   </div>
                   <div className={rowsClasses}>
-                    {foodDataList.map((foodData: TObject) => {
-                      const { foodId, foodPrice, foodName, frequency } =
-                        foodData;
+                    {foodDataList.map((foodData: TObject, index: number) => {
+                      const {
+                        foodId = index,
+                        foodPrice = 0,
+                        foodUnit = '',
+                        foodName = '',
+                        frequency = 1,
+                      } = foodData;
 
                       return (
                         <div className={css.row} key={foodId}>
                           <div></div>
                           <div>{foodName}</div>
-                          <div>{''}</div>
+                          <div>{foodUnit}</div>
                           <div>{frequency}</div>
                           <div>{parseThousandNumber(foodPrice || 0)}đ</div>
                           <div>{''}</div>

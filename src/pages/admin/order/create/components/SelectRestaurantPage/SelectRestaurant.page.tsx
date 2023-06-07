@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
 import Badge from '@components/Badge/Badge';
@@ -144,19 +145,25 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
 
     const currRestaurantId = currentRestaurant?.id?.uuid;
 
-    const submitFoodListData = foodIds
-      .map((foodId) => {
-        const item = foodList.find((food) => food?.id?.uuid === foodId);
-        const { id, attributes } = item || {};
-        const { title, price } = attributes;
+    const submitFoodListData = foodIds.reduce((result, foodId) => {
+      const item = foodList.find((food) => food?.id?.uuid === foodId);
 
-        return { id: id?.uuid, foodName: title, foodPrice: price?.amount || 0 };
-      })
-      .reduce((result, curr) => {
-        const { id, foodName, foodPrice } = curr;
+      if (!isEmpty(item)) {
+        return result;
+      }
 
-        return { ...result, [id]: { foodName, foodPrice } };
-      }, {});
+      const { id, attributes } = item || {};
+      const { title, price } = attributes;
+
+      return {
+        ...result,
+        [id]: {
+          foodName: title,
+          foodPrice: price?.amount || 0,
+          foodUnit: attributes?.publicData?.unit || '',
+        },
+      };
+    }, {});
 
     const submitRestaurantData = {
       id: currRestaurantId,

@@ -347,6 +347,9 @@ export const combineOrderDetailWithPriceInfo = ({
 };
 
 export const getPCCFeeByMemberAmount = (memberAmount: number) => {
+  if (memberAmount === 0) {
+    return 0;
+  }
   if (memberAmount < 30) {
     return 70000;
   }

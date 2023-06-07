@@ -336,19 +336,27 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
     const currRestaurantId = currentRestaurant?.id?.uuid;
 
-    const submitFoodListData = foodIds
-      .map((foodId) => {
-        const item = foodList.find((food) => food?.id?.uuid === foodId);
-        const { id, attributes } = item || {};
-        const { title, price } = attributes;
+    const submitFoodListData = foodIds.reduce((result, foodId) => {
+      const item = foodList.find((food) => food?.id?.uuid === foodId);
 
-        return { id: id?.uuid, foodName: title, foodPrice: price?.amount || 0 };
-      })
-      .reduce((result, curr) => {
-        const { id, foodName, foodPrice } = curr;
+      if (!item) {
+        return result;
+      }
+      const { id, attributes } = item || {};
+      const { title, price } = attributes;
+      const foodUnit = attributes?.publicData?.unit || '';
 
-        return { ...result, [id]: { foodName, foodPrice } };
-      }, {});
+      return id?.uuid
+        ? {
+            ...result,
+            [id?.uuid]: {
+              foodName: title,
+              foodPrice: price?.amount || 0,
+              foodUnit,
+            },
+          }
+        : result;
+    }, {});
 
     const submitRestaurantData = {
       id: currRestaurantId,

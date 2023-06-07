@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import ReviewOrderStatesSection from '@components/OrderDetails/ReviewView/ReviewOrderStatesSection/ReviewOrderStatesSection';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import { AdminAttributesThunks } from '@pages/admin/Attributes.slice';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
 import { groupFoodOrderByDate } from '@pages/company/orders/[orderId]/picking/helpers/orderDetailHelper';
 import { Listing } from '@src/utils/data';
@@ -106,6 +107,10 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   const handleCancelOrder = () => {
     updateOrderState(EOrderStates.canceled);
   };
+
+  useEffect(() => {
+    dispatch(AdminAttributesThunks.fetchAttributes());
+  }, []);
 
   return (
     <div className={css.container}>

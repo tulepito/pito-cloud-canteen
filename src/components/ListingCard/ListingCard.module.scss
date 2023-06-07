@@ -10,6 +10,11 @@
   @include viewportMedium {
     min-width: 280px;
   }
+
+  @include viewportLarge {
+    min-width: unset;
+  }
+
   width: 100%;
   .listingCardContent {
     padding: 12px;

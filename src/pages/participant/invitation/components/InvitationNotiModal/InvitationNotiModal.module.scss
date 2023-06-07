@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .modal.open {
   display: flex;
@@ -19,7 +20,7 @@
   }
 
   .modalContainer {
-    width: 700px;
+    width: 90%;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -29,6 +30,10 @@
     padding: 24px 36px;
     box-shadow: 0px 8px 8px -4px rgba(16, 24, 40, 0.04),
       0px 20px 24px -4px rgba(16, 24, 40, 0.1);
+
+    @include viewportMedium {
+      width: 700px;
+    }
 
     .modalHeader {
       @include flexAlign(center, space-between);

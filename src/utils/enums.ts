@@ -969,3 +969,8 @@ export enum ESubOrderTxStatus {
 export enum ESubOrderStatus {
   CANCELED = 'canceled',
 }
+
+export enum EQuotationStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+}
