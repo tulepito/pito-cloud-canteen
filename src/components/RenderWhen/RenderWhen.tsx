@@ -8,7 +8,7 @@ const RenderWhen = ({ condition = true, children }: TWhenProps) => {
   const list: React.ReactNode[] = [];
 
   React.Children.forEach(children, (child: any) => {
-    const isTypeRenderWhenFalse = child.props.type === 'RenderWhenFalse';
+    const isTypeRenderWhenFalse = child?.props?.type === 'RenderWhenFalse';
 
     if (
       (condition && !isTypeRenderWhenFalse) ||

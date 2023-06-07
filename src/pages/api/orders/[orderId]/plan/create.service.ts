@@ -39,7 +39,7 @@ const createPlan = async ({
       ...result,
       [date]: {
         ...orderDetail[date],
-        memberOrders: isGroupOrder ? [] : initialMemberOrder,
+        memberOrders: isGroupOrder ? {} : initialMemberOrder,
       },
     };
   }, {});

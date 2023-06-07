@@ -101,7 +101,7 @@
       & > tr {
         &:nth-child(2) > td {
           border: none;
-          @include tableBodyLayout;
+          border-spacing: 0;
         }
 
         .foodName {
@@ -110,21 +110,29 @@
 
         &.totalRow {
           & > td {
-            @include textTemplate(14px, 700, 20px);
+            padding: 0;
+          }
+          table,
+          tr {
+            border-spacing: 0;
+            width: 100%;
+            padding: 0;
 
-            .totalText {
-              padding-right: 8px;
+            td {
+              @include tableBodyLayout;
+              padding: 16px 16px 12px 0;
+              @include textTemplate(14px, 700, 20px);
+
+              .errorText {
+                color: $sematicRed2;
+                @include textTemplate(12px, 600, 16px);
+              }
             }
 
-            &.actionTd {
-              text-align: right;
-              text-decoration: underline;
-              padding-right: 16px;
-              cursor: pointer;
-            }
-
-            &.actionTdDisabled {
-              cursor: not-allowed;
+            &:nth-child(2) {
+              td {
+                padding: 0 0 8px 16px;
+              }
             }
           }
         }

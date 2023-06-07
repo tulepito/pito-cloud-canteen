@@ -49,7 +49,7 @@ const getNormalizeDetail = ({
         ...acc,
         [curr]: {
           ...orderDetail[curr],
-          memberOrders: isNormalOrder ? [] : initialMemberOrder,
+          memberOrders: isNormalOrder ? {} : initialMemberOrder,
         },
       };
     }
