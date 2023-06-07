@@ -219,16 +219,6 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
           }
         />
 
-        <div className={css.desktopView}>
-          <Button
-            inProgress={inProgress}
-            className={css.submitButton}
-            type="submit"
-            disabled={submitDisable}>
-            {submitButtonText}
-          </Button>
-        </div>
-
         {errorMessage && <div className={css.errorSignUp}>{errorMessage}</div>}
       </div>
       <Button
