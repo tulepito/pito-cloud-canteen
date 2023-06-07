@@ -374,6 +374,7 @@ const OrderListPage = () => {
             onClose={subOrderDetailModalControl.setFalse}
             event={selectedEvent!}
             openRatingSubOrderModal={openRatingSubOrderModal}
+            from="orderList"
           />
           <RatingSubOrderModal
             isOpen={ratingSubOrderModalControl.value}
