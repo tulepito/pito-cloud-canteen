@@ -3,11 +3,12 @@ import { useRouter } from 'next/router';
 
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
 import { parseThousandNumber } from '@helpers/format';
+import { isEnableToStartOrder } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
 import { Listing, User } from '@utils/data';
-import { EOrderStates } from '@utils/enums';
+import { EOrderStates, EOrderType } from '@utils/enums';
 import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 
 import { calculatePriceQuotationInfo } from '../helpers/cartInfoHelper';
@@ -35,7 +36,7 @@ export const usePrepareOrderDetailPageData = () => {
   const constCurrUserAttributes = User(
     currentUser as TCurrentUser,
   ).getAttributes();
-  const { orderDetail } = Listing(planData as TListing).getMetadata();
+  const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
   const { companyName = '' } = User(companyData as TUser).getPublicData();
 
   const {
@@ -62,14 +63,21 @@ export const usePrepareOrderDetailPageData = () => {
     staffName = '',
     orderState,
     ratings,
+    orderType = EOrderType.group,
   } = Listing(orderData as TListing).getMetadata();
+  const isGroupOrder = orderType === EOrderType.group;
   const isCanceledOrder = [
     EOrderStates.canceled || EOrderStates.canceledByBooker,
   ].includes(orderState);
+  const canStartOrder = isEnableToStartOrder(orderDetail, isGroupOrder);
   const canReview =
     orderState === EOrderStates.completed ||
     (orderState === EOrderStates.pendingPayment && !ratings);
-  const titleSectionData = { deliveryHour, deliveryAddress };
+  const titleSectionData = {
+    deliveryHour,
+    deliveryAddress,
+    canStartOrder,
+  };
   const countdownSectionData = {
     deadlineHour,
     orderDeadline: deadlineDate,
@@ -94,7 +102,10 @@ export const usePrepareOrderDetailPageData = () => {
     manageOrdersData,
   };
   /* =============== Review data =============== */
-  const foodOrderGroupedByDate = groupFoodOrderByDate({ orderDetail });
+  const foodOrderGroupedByDate = groupFoodOrderByDate({
+    orderDetail,
+    isGroupOrder,
+  });
   const {
     totalPrice,
     PITOPoints,
@@ -142,6 +153,7 @@ export const usePrepareOrderDetailPageData = () => {
     PITOFee,
   };
   const reviewViewData = {
+    isGroupOrder,
     orderTitle,
     reviewInfoData,
     reviewResultData,

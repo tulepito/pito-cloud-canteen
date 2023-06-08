@@ -52,7 +52,10 @@ const OrderDetailPage = () => {
   const cancelPickingOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.cancelPickingOrderInProgress,
   );
-  const { orderData } = useAppSelector((state) => state.OrderManagement);
+  const orderData = useAppSelector((state) => state.OrderManagement.orderData);
+  const isFetchingOrderDetails = useAppSelector(
+    (state) => state.OrderManagement.isFetchingOrderDetails,
+  );
   const {
     orderTitle,
     editViewData,
@@ -108,7 +111,7 @@ const OrderDetailPage = () => {
         onCancelOrder={confirmCancelOrderActions.setTrue}
       />
 
-      <RenderWhen condition={!isNormalOrder}>
+      <RenderWhen condition={!isFetchingOrderDetails && !isNormalOrder}>
         <div className={css.leftPart}>
           <ManageOrdersSection data={editViewData.manageOrdersData} />
         </div>
@@ -165,18 +168,6 @@ const OrderDetailPage = () => {
     />
   );
 
-  const renderView = () => {
-    switch (viewMode) {
-      case EPageViewMode.priceQuotation:
-        return <PriceQuotation data={priceQuotationData} />;
-      case EPageViewMode.review:
-        return ReviewViewComponent;
-      case EPageViewMode.edit:
-      default:
-        return EditViewComponent;
-    }
-  };
-
   useEffect(() => {
     if (!isEmpty(orderState)) {
       setViewMode(
@@ -221,7 +212,15 @@ const OrderDetailPage = () => {
     }
   }, [isRouterReady, orderState]);
 
-  return renderView();
+  switch (viewMode) {
+    case EPageViewMode.priceQuotation:
+      return <PriceQuotation data={priceQuotationData} />;
+    case EPageViewMode.review:
+      return ReviewViewComponent;
+    case EPageViewMode.edit:
+    default:
+      return EditViewComponent;
+  }
 };
 
 export default OrderDetailPage;
