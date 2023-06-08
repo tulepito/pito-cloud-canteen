@@ -174,7 +174,13 @@ const OrderDetailPage = () => {
   );
 
   useEffect(() => {
-    if (isRouterReady && userId !== bookerId) {
+    if (
+      isRouterReady &&
+      !isFetchingOrderDetails &&
+      isEmpty(bookerId) &&
+      isEmpty(userId) &&
+      userId !== bookerId
+    ) {
       router.push({
         pathname: companyPaths.ManageOrders,
       });
