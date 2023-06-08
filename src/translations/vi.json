@@ -1248,7 +1248,7 @@
   "RestaurantTableHead.head.partnerName": "Tên đối tác",
   "ReviewCardSection.adminPromotion": "Ưu đãi",
   "ReviewCardSection.downloadPriceQuotation": "Tải báo giá",
-  "ReviewCardSection.makePayment": "Thanh toán",
+  "ReviewCardSection.makePayment": "Xác nhận đơn",
   "ReviewCardSection.overflowPackage": "*Bạn đã vượt quá ngân sách dự kiến là {overflow}đ",
   "ReviewCardSection.PITOFee": "Phí PITO Cloud Canteen",
   "ReviewCardSection.PITOPoints": "{PITOPoints, plural, =0 {} other {+# điểm PITO}}",
