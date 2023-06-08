@@ -58,6 +58,7 @@ const CompanyOrdersActionColumn = ({
   id: orderId,
   companyId,
   hasRating,
+  isGroupOrder,
 }: {
   state:
     | EOrderStates
@@ -66,6 +67,7 @@ const CompanyOrdersActionColumn = ({
   id: string;
   companyId: string;
   hasRating?: boolean;
+  isGroupOrder?: boolean;
 }) => {
   const intl = useIntl();
   const router = useRouter();
@@ -239,11 +241,13 @@ const CompanyOrdersActionColumn = ({
       buttonList = [completeOrderButton, cancelPendingApprovalOrderButton];
       break;
     case EOrderStates.picking:
-      buttonList = [
-        updatePlanOrderDetailButton,
-        cancelPickingOrderButton,
-        copyLinkButton,
-      ];
+      buttonList = isGroupOrder
+        ? [
+            updatePlanOrderDetailButton,
+            cancelPickingOrderButton,
+            copyLinkButton,
+          ]
+        : [updatePlanOrderDetailButton, cancelPickingOrderButton];
       break;
     case EOrderStates.canceled:
       break;
