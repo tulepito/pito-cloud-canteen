@@ -7,14 +7,18 @@ import { useRouter } from 'next/router';
 
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import {
   findSuitableStartDate,
   isEnableSubmitPublishOrder,
 } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import useRestaurantDetailModal from '@hooks/useRestaurantDetailModal';
+import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { QuizActions } from '@redux/slices/Quiz.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
 import { Listing, User } from '@utils/data';
 import { EBookerOrderDraftStates, EOrderDraftStates } from '@utils/enums';
@@ -25,6 +29,8 @@ import LayoutMain from '../../components/Layout/LayoutMain';
 import LayoutSidebar from '../../components/Layout/LayoutSidebar';
 
 import SidebarContent from './components/SidebarContent/SidebarContent';
+import WalkThroughTourProvider from './components/WalkThroughTour/WalkThroughTour';
+import WelcomeModal from './components/WelcomeModal/WelcomeModal';
 import { useGetPlanDetails, useLoadData } from './hooks/loadData';
 import {
   BookerSelectRestaurantActions,
@@ -52,6 +58,11 @@ function BookerDraftOrderPage() {
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>('');
   const [selectedTimestamp, setSelectedTimestamp] = useState<number>(0);
   const dispatch = useAppDispatch();
+  const currentUser = useAppSelector(currentUserSelector);
+  const currentUserGetter = User(currentUser);
+  const currentUserId = currentUserGetter.getId();
+  const { walkthroughEnable = true } = currentUserGetter.getMetadata();
+  const welcomeModalControl = useBoolean(walkthroughEnable);
 
   const { order, companyAccount } = useLoadData({
     orderId: orderId as string,
@@ -230,55 +241,68 @@ function BookerDraftOrderPage() {
       }),
     );
   };
+  const handleCloseWalkThrough = () => {
+    dispatch(OrderListThunks.disableWalkthrough(currentUserId));
+  };
 
   return (
-    <Layout className={css.root}>
-      <LayoutSidebar
-        logo={<span></span>}
-        collapse={collapse}
-        onCollapse={handleCollapse}>
-        <SidebarContent order={order} companyAccount={companyAccount} />
-      </LayoutSidebar>
-      <LayoutMain>
-        <div className={css.main}>
-          <CalendarDashboard
-            className={css.calendar}
-            anchorDate={suitableStartDate}
-            startDate={startDate}
-            endDate={endDate}
-            events={orderDetail}
-            renderEvent={(props: any) => (
-              <MealPlanCard
-                {...props}
-                removeInprogress={props?.resources?.updatePlanDetailInprogress}
-                onRemove={handleRemoveMeal(props?.resources?.planId)}
-              />
-            )}
-            companyLogo="Company"
-            hideMonthView
-            resources={{
-              ...calendarExtraResources,
-              onEditFood: onOpenPickFoodModal,
-              editFoodInprogress: onEditFoodInProgress,
-              availableOrderDetailCheckList,
-            }}
-            components={componentsProps}
+    <WalkThroughTourProvider onCloseTour={handleCloseWalkThrough}>
+      <Layout className={css.root}>
+        <LayoutSidebar
+          logo={<span></span>}
+          collapse={collapse}
+          onCollapse={handleCollapse}>
+          <SidebarContent order={order} companyAccount={companyAccount} />
+        </LayoutSidebar>
+        <LayoutMain>
+          <div className={css.main}>
+            <CalendarDashboard
+              className={css.calendar}
+              anchorDate={suitableStartDate}
+              startDate={startDate}
+              endDate={endDate}
+              events={orderDetail}
+              renderEvent={(props: any) => (
+                <MealPlanCard
+                  {...props}
+                  removeInprogress={
+                    props?.resources?.updatePlanDetailInprogress
+                  }
+                  onRemove={handleRemoveMeal(props?.resources?.planId)}
+                />
+              )}
+              companyLogo="Company"
+              hideMonthView
+              resources={{
+                ...calendarExtraResources,
+                onEditFood: onOpenPickFoodModal,
+                editFoodInprogress: onEditFoodInProgress,
+                availableOrderDetailCheckList,
+              }}
+              components={componentsProps}
+            />
+          </div>
+          <RenderWhen condition={walkthroughEnable}>
+            <WelcomeModal
+              isOpen={welcomeModalControl.value}
+              onClose={welcomeModalControl.setFalse}
+            />
+          </RenderWhen>
+          <ResultDetailModal
+            isOpen={isRestaurantDetailModalOpen}
+            onClose={closeRestaurantDetailModal}
+            restaurantFood={restaurantFood}
+            selectedRestaurantId={selectedRestaurantId}
+            restaurants={restaurants}
+            companyGeoOrigin={companyGeoOrigin}
+            onSearchSubmit={onSearchSubmit}
+            fetchFoodInProgress={fetchRestaurantFoodInProgress}
+            openFromCalendar
+            timestamp={selectedTimestamp}
           />
-        </div>
-        <ResultDetailModal
-          isOpen={isRestaurantDetailModalOpen}
-          onClose={closeRestaurantDetailModal}
-          restaurantFood={restaurantFood}
-          selectedRestaurantId={selectedRestaurantId}
-          restaurants={restaurants}
-          companyGeoOrigin={companyGeoOrigin}
-          onSearchSubmit={onSearchSubmit}
-          fetchFoodInProgress={fetchRestaurantFoodInProgress}
-          openFromCalendar
-          timestamp={selectedTimestamp}
-        />
-      </LayoutMain>
-    </Layout>
+        </LayoutMain>
+      </Layout>
+    </WalkThroughTourProvider>
   );
 }
 

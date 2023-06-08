@@ -9,7 +9,7 @@ type TIconRefreshingProps = TIconProps & {
 };
 
 const IconRefreshing: React.FC<TIconRefreshingProps> = (props) => {
-  const { className, inProgress = false, onClick } = props;
+  const { className, inProgress = false, onClick, ...rest } = props;
   const classes = classNames(className, inProgress && css.rotate);
 
   return (
@@ -20,6 +20,7 @@ const IconRefreshing: React.FC<TIconRefreshingProps> = (props) => {
       fill="none"
       className={classes}
       onClick={onClick}
+      {...rest}
       xmlns="http://www.w3.org/2000/svg">
       <path
         fillRule="evenodd"
