@@ -108,11 +108,27 @@ export const ReviewContent: React.FC<any> = (props) => {
     string | undefined
   >(deliveryManPhoneNumber);
 
-  const order = useAppSelector((state) => state.Order.order);
-  const orderDetail = useAppSelector((state) => state.Order.orderDetail);
   useEffect(() => {
     setCurrDeliveryManPhoneNumber(deliveryManPhoneNumber);
   }, [deliveryManPhoneNumber]);
+  const orderInDraftState = useAppSelector((state) => state.Order.order);
+  const orderDetailInDraftState = useAppSelector(
+    (state) => state.Order.orderDetail,
+  );
+  const orderInPickingState = useAppSelector(
+    (state) => state.OrderDetail.order,
+  );
+  const orderDetailInPickingState = useAppSelector(
+    (state) => state.OrderDetail.orderDetail,
+  );
+
+  const order = !isEmpty(orderInDraftState)
+    ? orderInDraftState
+    : orderInPickingState;
+
+  const orderDetail = !isEmpty(orderDetailInDraftState)
+    ? orderDetailInDraftState
+    : orderDetailInPickingState;
 
   const participantData = useAppSelector(
     (state) => state.OrderDetail.participantData,
