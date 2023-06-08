@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
@@ -21,13 +22,12 @@ const TABLE_HEAD_IDS = [
 
 type TLineItemsTableComponentProps = {
   data: TObject;
-
-  onClickDeleteLineItem: (id: string) => () => void;
+  onModifyQuantity: (id: string, quantity: number) => () => void;
 };
 
 export const LineItemsTableComponent: React.FC<
   TLineItemsTableComponentProps
-> = ({ data = {}, onClickDeleteLineItem }) => {
+> = ({ data = {}, onModifyQuantity }) => {
   const intl = useIntl();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
@@ -44,6 +44,16 @@ export const LineItemsTableComponent: React.FC<
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(lineItems)],
   );
+  const totalPrice = useMemo(
+    () =>
+      lineItems.reduce((result: number, lineItem: TObject) => {
+        result += lineItem?.price || 0;
+
+        return result;
+      }, 0),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(lineItems)],
+  );
 
   const shouldShowOverflowError = totalQuantity > maxQuantity;
   const shouldShowUnderError = totalQuantity < minQuantity;
@@ -53,7 +63,7 @@ export const LineItemsTableComponent: React.FC<
 
   const actionDisabled = inProgress;
 
-  const formattedTotalPrice = `${parseThousandNumber(0)}đ`;
+  const formattedTotalPrice = `${parseThousandNumber(totalPrice)}đ`;
 
   return (
     <table className={css.tableRoot}>
@@ -91,12 +101,30 @@ export const LineItemsTableComponent: React.FC<
                         <td title={name}>
                           <div className={css.foodName}> {name}</div>
                         </td>
-                        <td title={quantity}>
+                        <td>
                           <div className={css.quantityContainer}>
-                            <IconMinus className={css.iconMinus} />
-                            <div className={css.quantityValue}>{quantity}</div>
+                            <IconMinus
+                              className={classNames(css.iconMinus, {
+                                [css.disabled]: actionDisabled,
+                              })}
+                              onClick={
+                                actionDisabled
+                                  ? doNothing
+                                  : onModifyQuantity(foodId, quantity - 1)
+                              }
+                            />
+                            <div title={quantity} className={css.quantityValue}>
+                              {quantity}
+                            </div>
                             <IconPlus
-                              className={css.iconPlus}
+                              onClick={
+                                actionDisabled
+                                  ? doNothing
+                                  : onModifyQuantity(foodId, quantity + 1)
+                              }
+                              className={classNames(css.iconPlus, {
+                                [css.disabled]: actionDisabled,
+                              })}
                               shouldHideCover
                             />
                           </div>
@@ -112,11 +140,13 @@ export const LineItemsTableComponent: React.FC<
                         <td>
                           <div className={css.actionCell}>
                             <IconDelete
-                              className={css.icon}
+                              className={classNames(css.icon, {
+                                [css.disabled]: actionDisabled,
+                              })}
                               onClick={
                                 actionDisabled
                                   ? doNothing
-                                  : onClickDeleteLineItem(foodId)
+                                  : onModifyQuantity(foodId, 0)
                               }
                             />
                           </div>

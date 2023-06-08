@@ -165,6 +165,13 @@
     }
   }
 
+  .disabled {
+    cursor: not-allowed;
+    path {
+      fill: $neutralGray5;
+    }
+  }
+
   .quantityContainer {
     display: flex;
     flex-direction: row;
@@ -176,6 +183,10 @@
       width: 16px;
       height: 16px;
       cursor: pointer;
+
+      &:hover {
+        transform: translateY(1px);
+      }
     }
 
     .iconPlus {
@@ -183,6 +194,17 @@
 
       path {
         fill: $neutralGray6;
+      }
+
+      &:hover {
+        transform: translateY(1px);
+      }
+
+      &.disabled {
+        cursor: not-allowed;
+        path {
+          fill: $neutralGray5;
+        }
       }
     }
 
