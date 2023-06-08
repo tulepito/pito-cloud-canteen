@@ -1,9 +1,6 @@
-import { useRouter } from 'next/router';
-
 import Button from '@components/Button/Button';
 import IconTickWithCircle from '@components/Icons/IconTickWithCircle/IconTickWithCircle';
 import PopupModal from '@components/PopupModal/PopupModal';
-import { participantPaths } from '@src/paths';
 
 import css from './SuccessRatingModal.module.scss';
 
@@ -15,9 +12,7 @@ type TSuccessRatingModalProps = {
 
 const SuccessRatingModal: React.FC<TSuccessRatingModalProps> = (props) => {
   const { isOpen, onClose, closeAllModals } = props;
-  const router = useRouter();
   const goToMyCalendar = () => {
-    router.push(participantPaths.OrderList);
     closeAllModals();
   };
 

@@ -185,7 +185,12 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
         </RenderWhen>
         <RenderWhen
           condition={!reviewId && txIsDelivered(subOrderTx as TTransaction)}>
-          <Button className={css.ratingBtn} onClick={openRatingSubOrderModal}>
+          <Button
+            disabled={
+              fetchSubOrderTxInProgress || fetchSubOrderDocumentInProgress
+            }
+            className={css.ratingBtn}
+            onClick={openRatingSubOrderModal}>
             Đánh giá
           </Button>
         </RenderWhen>

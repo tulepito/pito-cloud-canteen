@@ -1,7 +1,7 @@
 import type { Event } from 'react-big-calendar';
 
 import SlideModal from '@components/SlideModal/SlideModal';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import { resetImage } from '@redux/slices/uploadImage.slice';
 
 import { OrderListThunks } from '../../OrderList.slice';
@@ -28,9 +28,6 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     selectedEvent?.resource || {};
   const restaurantId = restaurant?.id;
 
-  const postRatingInProgress = useAppSelector(
-    (state) => state.ParticipantOrderList.participantPostRatingInProgress,
-  );
   const handleClose = () => {
     dispatch(resetImage());
     onClose();
@@ -71,7 +68,9 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     );
 
     if (meta.requestStatus === 'fulfilled') {
+      handleClose();
       openSuccessRatingModal();
+      dispatch(resetImage());
     }
   };
 
@@ -79,7 +78,6 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     <SlideModal id="RatingSubOrderModal" isOpen={isOpen} onClose={handleClose}>
       <RatingSubOrderForm
         onSubmit={handleSubmit}
-        inProgress={postRatingInProgress}
         initialValues={initialValues}
       />
     </SlideModal>

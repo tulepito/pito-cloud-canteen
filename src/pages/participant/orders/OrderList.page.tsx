@@ -102,6 +102,9 @@ const OrderListPage = () => {
       state.ParticipantOrderList
         .fetchParticipantFirebaseNotificationsInProgress,
   );
+  const fetchSubOrderTxInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
+  );
 
   const currentUserGetter = CurrentUser(currentUser!);
   const currentUserId = currentUserGetter.getId();
@@ -126,7 +129,8 @@ const OrderListPage = () => {
     updateSubOrderInProgress ||
     addSubOrderDocumentToFirebaseInProgress ||
     participantPostRatingInProgress ||
-    fetchParticipantFirebaseNotificationsInProgress;
+    fetchParticipantFirebaseNotificationsInProgress ||
+    fetchSubOrderTxInProgress;
 
   const unseenNotifications = notifications.filter(
     (notification) => !notification.seen,
@@ -228,7 +232,7 @@ const OrderListPage = () => {
   );
 
   useEffect(() => {
-    if (subOrdersFromSelectedDayTxIds) {
+    if (subOrdersFromSelectedDayTxIds.length > 0) {
       dispatch(
         OrderListThunks.fetchTransactionBySubOrder(
           subOrdersFromSelectedDayTxIds,
