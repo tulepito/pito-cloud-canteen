@@ -45,7 +45,9 @@ const OrderHeaderInfor: React.FC<OrderHeaderInforProps> = (props) => {
 
   const { companyName } = companyUser.getPublicData();
   const { displayName: bookerName } = bookerUser.getProfile();
-  const { phoneNumber } = bookerUser.getProtectedData();
+  const { phoneNumber: protetedphoneNumber } = bookerUser.getProtectedData();
+  const { phoneNumber: publicPhoneNumber } = bookerUser.getPublicData();
+  const phoneNumber = protetedphoneNumber || publicPhoneNumber;
   const { email: bookerEmail } = bookerUser.getAttributes();
 
   const formInitialValues = useMemo(

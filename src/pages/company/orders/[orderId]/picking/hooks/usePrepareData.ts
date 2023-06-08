@@ -43,7 +43,8 @@ export const usePrepareOrderDetailPageData = () => {
     email: bookerEmail,
     profile: {
       displayName: contactPeopleName = '',
-      protectedData: { phoneNumber: contactPhoneNumber = '' } = {},
+      protectedData: { phoneNumber: protectedContactPhoneNumber = '' } = {},
+      publicData: { phoneNumber: publicContactPhoneNumber = '' } = {},
     },
   } =
     bookerData !== null
@@ -130,7 +131,7 @@ export const usePrepareOrderDetailPageData = () => {
     companyName,
     contactPeopleName,
     contactPeopleEmail: bookerEmail,
-    contactPhoneNumber,
+    contactPhoneNumber: protectedContactPhoneNumber || publicContactPhoneNumber,
   };
 
   const reviewResultData = {
@@ -182,6 +183,7 @@ export const usePrepareOrderDetailPageData = () => {
       totalWithVAT: `${parseThousandNumber(totalWithVAT)}đ`,
       transportFee: `${parseThousandNumber(transportFee)}đ`,
       VATFee: `${parseThousandNumber(VATFee)}đ`,
+      PITOFee: `${parseThousandNumber(PITOFee)}đ`,
     },
     orderDetailData: {
       foodOrderGroupedByDate,
