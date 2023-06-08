@@ -21,7 +21,7 @@ import useBoolean from '@hooks/useBoolean';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { companyPaths } from '@src/paths';
-import { Listing } from '@utils/data';
+import { CurrentUser, Listing } from '@utils/data';
 import { EOrderDraftStates, EOrderStates, EOrderType } from '@utils/enums';
 import type { TListing } from '@utils/types';
 
@@ -49,6 +49,7 @@ const OrderDetailPage = () => {
     isReady: isRouterReady,
   } = router;
 
+  const currentUser = useAppSelector((state) => state.user.currentUser);
   const cancelPickingOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.cancelPickingOrderInProgress,
   );
@@ -56,6 +57,7 @@ const OrderDetailPage = () => {
   const isFetchingOrderDetails = useAppSelector(
     (state) => state.OrderManagement.isFetchingOrderDetails,
   );
+
   const {
     orderTitle,
     editViewData,
@@ -68,9 +70,12 @@ const OrderDetailPage = () => {
     priceQuotationData,
   );
 
-  const { orderState, orderType = EOrderType.group } = Listing(
-    orderData as TListing,
-  ).getMetadata();
+  const userId = CurrentUser(currentUser!).getId();
+  const {
+    orderState,
+    bookerId,
+    orderType = EOrderType.group,
+  } = Listing(orderData as TListing).getMetadata();
   const isNormalOrder = orderType === EOrderType.normal;
 
   const editViewClasses = classNames(css.editViewRoot, {
@@ -167,6 +172,14 @@ const OrderDetailPage = () => {
       showStartPickingOrderButton
     />
   );
+
+  useEffect(() => {
+    if (isRouterReady && userId !== bookerId) {
+      router.push({
+        pathname: companyPaths.ManageOrders,
+      });
+    }
+  }, [isRouterReady, bookerId, userId]);
 
   useEffect(() => {
     if (!isEmpty(orderState)) {
