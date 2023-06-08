@@ -1,19 +1,21 @@
 import classNames from 'classnames';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import type { TIconProps } from '@src/utils/types';
 
 import css from './IconPlus.module.scss';
 
-type IconOutlinePlusProps = {
-  className?: string;
+type IconOutlinePlusProps = TIconProps & {
   shouldHideCover?: boolean;
 };
 const IconPlus: React.FC<IconOutlinePlusProps> = ({
   className,
   shouldHideCover = false,
+  onClick,
 }) => {
   return (
     <svg
+      onClick={onClick}
       className={classNames(css.root, className)}
       width="22"
       height="22"
