@@ -1,11 +1,7 @@
 import { EParticipantOrderStatus, ESubOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
 
-export const groupFoodOrderByDate = ({
-  orderDetail = {},
-}: {
-  orderDetail: TObject;
-}) => {
+const groupFoodForGroupOrder = (orderDetail: TObject) => {
   return Object.entries(orderDetail).reduce(
     (result, currentOrderDetailEntry, index) => {
       const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
@@ -77,4 +73,75 @@ export const groupFoodOrderByDate = ({
     },
     [] as TObject[],
   );
+};
+
+const groupFoodForNormal = (orderDetail: TObject) => {
+  return Object.entries(orderDetail).reduce(
+    (result, currentOrderDetailEntry, index) => {
+      const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
+
+      const {
+        lineItems = [],
+        restaurant: { id, restaurantName, foodList: foodListOfDate = {} },
+        status: subOrderStatus,
+      } = rawOrderDetailOfDate as TObject;
+      if (subOrderStatus === ESubOrderStatus.CANCELED) {
+        return result;
+      }
+
+      const foodDataList = lineItems.map((lineItem: TObject) => {
+        const {
+          id: foodId,
+          name: foodName,
+          quantity = 1,
+          price: foodPrice,
+        } = lineItem;
+        const { foodUnit = '' } = foodListOfDate[foodId] || {};
+
+        return { foodId, foodName, foodUnit, foodPrice, frequency: quantity };
+      });
+
+      const summary = lineItems.reduce(
+        (previousResult: TObject, current: TObject) => {
+          const { totalPrice, totalDishes } = previousResult;
+          const { quantity = 1, price = 0 } = current;
+
+          return {
+            ...previousResult,
+            totalDishes: totalDishes + quantity,
+            totalPrice: totalPrice + price,
+          };
+        },
+        {
+          totalDishes: 0,
+          totalPrice: 0,
+          restaurantName,
+        } as TObject,
+      );
+
+      return [
+        ...result,
+        {
+          date,
+          index,
+          ...summary,
+          foodDataList,
+          restaurantId: id,
+        },
+      ];
+    },
+    [] as TObject[],
+  );
+};
+
+export const groupFoodOrderByDate = ({
+  orderDetail = {},
+  isGroupOrder = true,
+}: {
+  orderDetail: TObject;
+  isGroupOrder: boolean;
+}) => {
+  return isGroupOrder
+    ? groupFoodForGroupOrder(orderDetail)
+    : groupFoodForNormal(orderDetail);
 };
