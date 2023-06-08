@@ -178,21 +178,55 @@ export const isOrderDetailDatePickedFood = (date: any) => {
   return isEmpty(foodList);
 };
 
-export const isEnableToStartOrder = (orderDetail: TPlan['orderDetail']) => {
-  return (
-    !isEmpty(orderDetail) &&
-    Object.values(orderDetail).some(({ restaurant, memberOrders }) => {
-      const { id, restaurantName, foodList } = restaurant;
-      const isSetupRestaurant =
-        !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
+export const isEnableToStartOrder = (
+  orderDetail: TPlan['orderDetail'],
+  isGroupOrder = true,
+) => {
+  if (isEmpty(orderDetail)) return false;
 
-      const hasAnyOrders = Object.values(memberOrders).some(
-        ({ foodId, status }) => isJoinedPlan(foodId, status),
-      );
+  return isGroupOrder
+    ? Object.values(orderDetail).some(
+        ({ restaurant, memberOrders, lineItems = [] }) => {
+          const { id, restaurantName, foodList } = restaurant;
+          const isSetupRestaurant =
+            !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
 
-      return isSetupRestaurant && hasAnyOrders;
-    })
-  );
+          const hasAnyOrders = Object.values(memberOrders).some(
+            ({ foodId, status }) => isJoinedPlan(foodId, status),
+          );
+
+          const hasAnyLineItems =
+            lineItems.reduce((totalQuantity: number, item: TObject) => {
+              return totalQuantity + (item?.quantity || 0);
+            }, 0) > 0;
+
+          return isSetupRestaurant && isGroupOrder
+            ? hasAnyOrders
+            : hasAnyLineItems;
+        },
+      )
+    : Object.values(orderDetail).every(({ restaurant, lineItems = [] }) => {
+        const {
+          id,
+          restaurantName,
+          foodList,
+          minQuantity = 0,
+          maxQuantity = 100,
+        } = restaurant;
+        const isSetupRestaurant =
+          !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
+
+        const quantity = lineItems.reduce(
+          (totalQuantity: number, item: TObject) => {
+            return totalQuantity + (item?.quantity || 1);
+          },
+          0,
+        );
+        const isQuantityValid =
+          quantity >= minQuantity && quantity <= maxQuantity;
+
+        return isSetupRestaurant && isQuantityValid;
+      });
 };
 
 export const getRestaurantListFromOrderDetail = (
