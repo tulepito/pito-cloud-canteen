@@ -270,7 +270,7 @@ const OrderListPage = () => {
         ),
       );
     }
-  }, [subOrdersFromSelectedDayTxIds]);
+  }, [JSON.stringify(subOrdersFromSelectedDayTxIds)]);
 
   useEffect(() => {
     if (selectedEvent) {

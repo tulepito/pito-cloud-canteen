@@ -236,9 +236,14 @@ const fetchTransactionBySubOrder = createAsyncThunk(
   FETCH_TRANSACTION_BY_SUB_ORDER,
   async (txIds: string[], { getState }) => {
     const { subOrderTxs = [] } = getState().ParticipantOrderList;
+    const subOrderTxsIds = subOrderTxs.map((tx: TTransaction) => tx.id.uuid);
     if (txIds.length === 0) return subOrderTxs;
+    const shouldFetchSubOrderTxs = txIds.filter(
+      (txId: string) => !subOrderTxsIds.includes(txId),
+    );
+
     const txsResponse = await Promise.all(
-      txIds.map(async (txId: string) => {
+      shouldFetchSubOrderTxs.map(async (txId: string) => {
         const { data: txResponse } = await fetchTxApi(txId);
 
         return txResponse;
