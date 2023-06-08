@@ -806,6 +806,7 @@
   "FieldPhotoUpload.imageUploadFailed.uploadOverLimit": " Dung lượng hình không được quá 20MB.",
   "FieldPhotoUpload.uploadLabel": "Click để chọn file.",
   "FieldRadioButtonPhoto.imageRequired": "Vui lòng nhập hình ảnh",
+  "FieldRating.label.": "---",
   "FieldRating.label.1": "Rất tệ",
   "FieldRating.label.2": "Tệ",
   "FieldRating.label.3": "Bình thường",

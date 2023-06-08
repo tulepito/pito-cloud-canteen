@@ -231,39 +231,6 @@ const OrderListPage = () => {
     ),
   );
 
-  useEffect(() => {
-    if (subOrdersFromSelectedDayTxIds.length > 0) {
-      dispatch(
-        OrderListThunks.fetchTransactionBySubOrder(
-          subOrdersFromSelectedDayTxIds,
-        ),
-      );
-    }
-  }, [subOrdersFromSelectedDayTxIds]);
-  useEffect(() => {
-    if (planIdFromQuery && timestampFromQuery) {
-      const planId = planIdFromQuery as string;
-      const timestamp = timestampFromQuery as string;
-      const event = flattenEvents.find(
-        (_event) =>
-          _event.resource.planId === planId &&
-          _event.resource.timestamp === timestamp,
-      );
-      if (event) {
-        setSelectedEvent(event);
-        subOrderDetailModalControl.setTrue();
-      }
-    }
-  }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
-
-  useEffect(() => {
-    if (selectedEvent) {
-      const { timestamp, planId } = selectedEvent.resource;
-      const subOrderId = `${currentUserId} - ${planId} - ${timestamp}`;
-      dispatch(OrderListThunks.fetchSubOrdersFromFirebase(subOrderId));
-    }
-  }, [selectedEvent]);
-
   const openUpdateProfileModal = () => {
     updateProfileModalControl.setTrue();
   };
@@ -307,6 +274,55 @@ const OrderListPage = () => {
     subOrderDetailModalControl.setFalse();
     successRatingModalControl.setFalse();
   };
+
+  useEffect(() => {
+    if (subOrdersFromSelectedDayTxIds.length > 0) {
+      dispatch(
+        OrderListThunks.fetchTransactionBySubOrder(
+          subOrdersFromSelectedDayTxIds,
+        ),
+      );
+    }
+  }, [JSON.stringify(subOrdersFromSelectedDayTxIds)]);
+
+  useEffect(() => {
+    if (selectedEvent) {
+      const { timestamp, planId } = selectedEvent.resource;
+      const subOrderId = `${currentUserId} - ${planId} - ${timestamp}`;
+      dispatch(OrderListThunks.fetchSubOrdersFromFirebase(subOrderId));
+    }
+  }, [selectedEvent]);
+
+  useEffect(() => {
+    (async () => {
+      await dispatch(OrderListThunks.fetchOrders(currentUserId));
+      dispatch(OrderListActions.markColorToOrder());
+    })();
+  }, [currentUserId]);
+
+  useEffect(() => {
+    dispatch(OrderListThunks.fetchAttributes());
+  }, []);
+
+  useEffect(() => {
+    if (planIdFromQuery && timestampFromQuery) {
+      const planId = planIdFromQuery as string;
+      const timestamp = timestampFromQuery as string;
+      const event = flattenEvents.find(
+        (_event) =>
+          _event.resource.planId === planId &&
+          _event.resource.timestamp === timestamp,
+      );
+      if (event) {
+        setSelectedEvent(event);
+        subOrderDetailModalControl.setTrue();
+      }
+    }
+  }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
+
+  useEffect(() => {
+    dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
+  }, []);
 
   return (
     <ParticipantLayout>
