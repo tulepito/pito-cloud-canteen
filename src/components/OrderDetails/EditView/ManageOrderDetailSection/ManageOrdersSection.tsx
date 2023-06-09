@@ -52,15 +52,14 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
   } = usePrepareManageOrdersSectionData(currentViewDate, setCurrentViewDate);
 
   const handleSubmitAddSelection = async (values: TAddOrderFormValues) => {
-    const { participantId: memberId, requirement = '', foodId } = values;
+    const { participantId, requirement = '', foodId } = values;
 
     const updateValues = {
-      memberId,
+      memberId: participantId?.key,
       foodId,
       requirement,
       currentViewDate,
     };
-
     await dispatch(orderManagementThunks.addOrUpdateMemberOrder(updateValues));
   };
 

@@ -9,6 +9,15 @@
     flex-wrap: wrap;
     gap: 16px 12px;
     align-items: center;
+
+    @include viewportMedium {
+      align-items: flex-start;
+    }
+
+    .fieldParticipantIdError {
+      margin-bottom: 0;
+    }
+
     .fieldContainer {
       display: inline-block;
       flex: 1 1 100%;
