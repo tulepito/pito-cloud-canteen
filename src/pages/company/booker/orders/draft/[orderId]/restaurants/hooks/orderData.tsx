@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { EOrderType } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 
@@ -33,7 +34,9 @@ export const useGetPlanDetails = () => {
   const planDetail = useAppSelector(
     (state) => state.BookerSelectRestaurant.planDetail,
   );
-  const { plans = [] } = Listing(order as TListing).getMetadata();
+  const { plans = [], orderType = EOrderType.group } = Listing(
+    order as TListing,
+  ).getMetadata();
   const planId = plans[0];
 
   const dispatch = useAppDispatch();
@@ -45,6 +48,7 @@ export const useGetPlanDetails = () => {
 
   return {
     orderId: order?.id?.uuid,
+    orderType,
     planId,
     planDetail,
   };

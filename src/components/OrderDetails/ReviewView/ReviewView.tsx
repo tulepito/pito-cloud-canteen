@@ -40,6 +40,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     onDownloadPriceQuotation,
   } = props;
 
+  const isGroupOrder = reviewViewData?.isGroupOrder;
   const rootClasses = classNames(rootClassName || css.root, className);
 
   return (
@@ -68,11 +69,15 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           data={reviewViewData?.reviewInfoData || {}}
           onSubmit={onSubmitEdit}
         />
-        <ReviewOrdersResultSection
-          className={css.resultRoot}
-          data={reviewViewData.reviewResultData}
-          goBackToEditMode={onGoBackToEditOrderPage}
-        />
+
+        <RenderWhen condition={isGroupOrder}>
+          <ReviewOrdersResultSection
+            className={css.resultRoot}
+            data={reviewViewData.reviewResultData}
+            goBackToEditMode={onGoBackToEditOrderPage}
+          />
+        </RenderWhen>
+
         <ReviewOrderDetailsSection
           className={css.detailRoot}
           foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}

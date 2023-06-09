@@ -19,6 +19,7 @@ import {
   sendPartnerNewOrderAppearEmailApi,
   sendRemindEmailToMemberApi,
   updateOrderApi,
+  updatePlanDetailsApi,
 } from '@apis/orderApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
@@ -563,6 +564,31 @@ const bookerMarkInprogressPlanViewed = createAsyncThunk(
   },
 );
 
+const updatePlanOrderDetail = createAsyncThunk(
+  'app/OrderManagement/UPDATE_PLAN_ORDER_DETAIL',
+  async (
+    {
+      orderId,
+      planId,
+      orderDetail,
+    }: { orderId: string; planId: string; orderDetail: TObject },
+    { fulfillWithValue, rejectWithValue, dispatch },
+  ) => {
+    try {
+      await updatePlanDetailsApi(orderId, {
+        orderDetail,
+        planId,
+      });
+
+      dispatch(loadData(orderId));
+
+      return fulfillWithValue(null);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
 export const orderManagementThunks = {
   loadData,
   updateOrderGeneralInfo,
@@ -576,6 +602,7 @@ export const orderManagementThunks = {
   bookerStartOrder,
   cancelPickingOrder,
   bookerMarkInprogressPlanViewed,
+  updatePlanOrderDetail,
 };
 
 // ================ Slice ================ //
@@ -712,6 +739,16 @@ const OrderManagementSlice = createSlice({
       })
       .addCase(bookerMarkInprogressPlanViewed.rejected, (state) => {
         return state;
+      })
+      /* =============== updatePlanOrderDetail =============== */
+      .addCase(updatePlanOrderDetail.pending, (state) => {
+        state.isUpdatingOrderDetails = true;
+      })
+      .addCase(updatePlanOrderDetail.fulfilled, (state) => {
+        state.isUpdatingOrderDetails = false;
+      })
+      .addCase(updatePlanOrderDetail.rejected, (state) => {
+        state.isUpdatingOrderDetails = false;
       });
   },
 });

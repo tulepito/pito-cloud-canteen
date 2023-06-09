@@ -11,6 +11,7 @@ import { isEnableToStartOrder } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { companyPaths } from '@src/paths';
+import { EOrderType } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
 
@@ -61,6 +62,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     (state) => state.OrderManagement.isStartOrderInProgress,
   );
   const planData = useAppSelector((state) => state.OrderManagement.planData);
+  const orderData = useAppSelector((state) => state.OrderManagement.orderData);
 
   const {
     query: { orderId },
@@ -74,7 +76,13 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   });
 
   const { orderDetail } = Listing(planData as TListing).getMetadata();
-  const isStartOrderDisabled = !isEnableToStartOrder(orderDetail);
+  const { orderType = EOrderType.group } = Listing(
+    orderData as TListing,
+  ).getMetadata();
+  const isStartOrderDisabled = !isEnableToStartOrder(
+    orderDetail,
+    orderType === EOrderType.group,
+  );
   const isPartner = target === 'partner';
 
   const handleStartPickingOrder = async () => {
@@ -201,7 +209,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
         })}
       </Button>
 
-      {showStartPickingOrderButton && (
+      <RenderWhen condition={showStartPickingOrderButton}>
         <Button
           variant="cta"
           className={css.makePaymentButton}
@@ -214,7 +222,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
             })}
           </div>
         </Button>
-      )}
+      </RenderWhen>
 
       <RenderWhen condition={overflow > 0}>
         <div className={css.overflowPackageInfo}>

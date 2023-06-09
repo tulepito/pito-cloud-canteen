@@ -8,6 +8,7 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/sdk';
 import { getSubAccountTrustedSdk } from '@services/subAccountSdk';
 import config from '@src/configs';
+import { EOrderType } from '@src/utils/enums';
 import { Listing, Transaction } from '@utils/data';
 import type { TPlan } from '@utils/orderTypes';
 import { ETransition } from '@utils/transaction';
@@ -21,8 +22,9 @@ type TNormalizedOrderDetail = {
     listingId: string;
     extendedData: {
       metadata: {
-        participantIds: string[];
-        bookingInfo: {
+        lineItems?: TObject[];
+        participantIds?: string[];
+        bookingInfo?: {
           foodId: string;
           foodName: string;
           foodPrice: number;
@@ -45,17 +47,20 @@ const normalizeOrderDetail = ({
   planId,
   planOrderDetail,
   deliveryHour = '6:30',
+  isGroupOrder = true,
 }: {
   orderId: string;
   planId: string;
   planOrderDetail: TPlanOrderDetail;
   deliveryHour: string;
+  isGroupOrder?: boolean;
 }) => {
   return Object.entries(planOrderDetail).reduce<TNormalizedOrderDetail[]>(
     (prev, [date, orderOfDate]: [string, TOrderOfDate]) => {
       const {
         restaurant: { id: restaurantId, foodList = {} },
         memberOrders: memberOrdersMap,
+        lineItems = [],
       } = orderOfDate;
       const startDate = DateTime.fromMillis(Number(date));
       const bookingStart = startDate.toJSDate();
@@ -67,44 +72,68 @@ const normalizeOrderDetail = ({
         .toJSDate();
       const bookingDisplayEnd = bookingEnd;
 
-      const { participantIds, bookingInfo } = Object.entries(
-        memberOrdersMap,
-      ).reduce<TNormalizedOrderDetail['params']['extendedData']['metadata']>(
-        (prevResult, [participantId, { foodId, status, requirement }]) => {
-          const {
-            participantIds: prevParticipantList,
-            bookingInfo: prevBookingInfo,
-          } = prevResult;
-          const currFoodInfo = foodList[foodId];
+      if (isGroupOrder) {
+        const { participantIds, bookingInfo } = Object.entries(
+          memberOrdersMap,
+        ).reduce<TNormalizedOrderDetail['params']['extendedData']['metadata']>(
+          (prevResult, [participantId, { foodId, status, requirement }]) => {
+            const {
+              participantIds: prevParticipantList = [],
+              bookingInfo: prevBookingInfo = [],
+            } = prevResult;
+            const currFoodInfo = foodList[foodId];
 
-          if (currFoodInfo && isJoinedPlan(foodId, status)) {
-            return {
-              ...prevResult,
-              participantIds: prevParticipantList.concat(participantId),
-              bookingInfo: prevBookingInfo.concat({
-                foodId,
-                ...currFoodInfo,
-                participantId,
-                requirement,
-              }),
-            };
-          }
+            if (currFoodInfo && isJoinedPlan(foodId, status)) {
+              return {
+                ...prevResult,
+                participantIds: prevParticipantList.concat(participantId),
+                bookingInfo: prevBookingInfo.concat({
+                  foodId,
+                  ...currFoodInfo,
+                  participantId,
+                  requirement,
+                }),
+              };
+            }
 
-          return prevResult;
-        },
-        { participantIds: [], bookingInfo: [] },
-      );
+            return prevResult;
+          },
+          { participantIds: [], bookingInfo: [] },
+        );
+
+        const extendedData = {
+          metadata: {
+            participantIds,
+            bookingInfo,
+            orderId,
+            planId,
+          },
+        };
+
+        return isEmpty(participantIds)
+          ? prev
+          : prev.concat({
+              params: {
+                listingId: restaurantId as string,
+                extendedData,
+                bookingStart,
+                bookingEnd,
+                bookingDisplayStart,
+                bookingDisplayEnd,
+              },
+              date,
+            });
+      }
 
       const extendedData = {
         metadata: {
-          participantIds,
-          bookingInfo,
+          lineItems,
           orderId,
           planId,
         },
       };
 
-      return isEmpty(participantIds)
+      return isEmpty(lineItems)
         ? prev
         : prev.concat({
             params: {
@@ -162,7 +191,13 @@ export const initiateTransaction = async ({
   );
 
   const orderData = Listing(orderListing);
-  const { companyId, deliveryHour, plans = [] } = orderData.getMetadata();
+  const {
+    companyId,
+    deliveryHour,
+    plans = [],
+    orderType,
+  } = orderData.getMetadata();
+  const isGroupOrder = orderType === EOrderType.group;
 
   if (plans.length === 0 || !plans.includes(planId)) {
     throw new Error(`Invalid planId, ${planId}`);
@@ -180,6 +215,7 @@ export const initiateTransaction = async ({
     planId,
     planOrderDetail,
     deliveryHour,
+    isGroupOrder,
   });
 
   const transactionMap: TObject = {};

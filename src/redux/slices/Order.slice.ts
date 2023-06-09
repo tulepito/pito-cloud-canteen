@@ -38,6 +38,7 @@ import {
   EListingStates,
   EManageCompanyOrdersTab,
   ENotificationTypes,
+  EOrderType,
   ERestaurantListingStatus,
 } from '@utils/enums';
 import { storableAxiosError, storableError } from '@utils/errors';
@@ -312,8 +313,11 @@ const recommendRestaurants = createAsyncThunk(
       dayInWeek = [],
       startDate,
       endDate,
+      orderType = EOrderType.group,
     } = Listing(order as TListing).getMetadata();
+    const isNormalOrder = orderType === EOrderType.normal;
     const totalDates = renderDateRange(startDate, endDate);
+
     await Promise.all(
       totalDates.map(async (dateTime) => {
         if (
@@ -356,20 +360,25 @@ const recommendRestaurants = createAsyncThunk(
               }),
             ),
           );
+
           if (restaurants.length > 0) {
-            const randomNumber = Math.floor(
-              Math.random() * (restaurants.length - 1),
-            );
+            const randomRestaurant =
+              restaurants[Math.floor(Math.random() * (restaurants.length - 1))];
+            const restaurantGetter = Listing(randomRestaurant?.restaurantInfo);
+            const { minQuantity = 0, maxQuantity = Number.MAX_VALUE } =
+              restaurantGetter.getPublicData();
+            const lineItemsMaybe = isNormalOrder ? { lineItems: [] } : {};
 
             orderDetail[dateTime] = {
               restaurant: {
-                id: Listing(restaurants[randomNumber]?.restaurantInfo).getId(),
-                restaurantName: Listing(
-                  restaurants[randomNumber]?.restaurantInfo,
-                ).getAttributes().title,
+                id: restaurantGetter.getId(),
+                restaurantName: restaurantGetter.getAttributes().title,
                 foodList: [],
-                menuId: restaurants[randomNumber]?.menu.id.uuid,
+                menuId: randomRestaurant?.menu.id.uuid,
+                minQuantity,
+                maxQuantity,
               },
+              ...lineItemsMaybe,
             };
           }
         }

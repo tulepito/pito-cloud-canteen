@@ -4,7 +4,7 @@ import { combineOrderDetailWithPriceInfo } from '@helpers/orderHelper';
 import { calculatePriceQuotationInfo } from '@pages/company/orders/[orderId]/picking/helpers/cartInfoHelper';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
-import { EOrderDraftStates } from '@utils/enums';
+import { EOrderDraftStates, EOrderType } from '@utils/enums';
 import type { TIntegrationOrderListing, TListing, TObject } from '@utils/types';
 
 export const parseEntitiesToTableData = (
@@ -14,6 +14,9 @@ export const parseEntitiesToTableData = (
   return orders.map((entity, index) => {
     const { plan = {} } = entity;
     const orderId = entity?.id?.uuid;
+    const { orderType = EOrderType.group } = Listing(
+      entity as TListing,
+    ).getMetadata();
     const { orderDetail: planOrderDetail = {} } = Listing(
       plan as TListing,
     ).getMetadata();
@@ -52,6 +55,7 @@ export const parseEntitiesToTableData = (
         orderId,
         companyId,
         hasRating: !!ratings,
+        isGroupOrder: orderType === EOrderType.group,
         plan: {
           ...plan,
           attributes: {
