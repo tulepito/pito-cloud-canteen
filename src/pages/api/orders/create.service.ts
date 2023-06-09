@@ -72,7 +72,7 @@ const createOrder = async ({
     deliveryHour,
     deadlineHour,
     nutritions,
-    selectedGroups,
+    selectedGroups = ['allMembers'],
     packagePerMember,
     dayInWeek,
     startDate,
@@ -81,7 +81,6 @@ const createOrder = async ({
     deadlineDate,
     mealType,
   } = generalInfo;
-
   const shouldUpdateOrderName = startDate && endDate;
 
   const participants: string[] = isEmpty(selectedGroups)
