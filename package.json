@@ -69,8 +69,8 @@
     "sharetribe-flex-integration-sdk": "^1.9.0",
     "sharetribe-flex-sdk": "^1.17.0",
     "shelljs": "^0.8.5",
-    "styled-components": "^5.3.10",
     "slick-carousel": "^1.8.1",
+    "styled-components": "^5.3.10",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
