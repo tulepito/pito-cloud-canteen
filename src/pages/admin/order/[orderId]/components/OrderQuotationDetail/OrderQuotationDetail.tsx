@@ -11,6 +11,7 @@ import {
 } from '@pages/company/orders/[orderId]/picking/helpers/cartInfoHelper';
 import { groupFoodOrderByDate } from '@pages/company/orders/[orderId]/picking/helpers/orderDetailHelper';
 import { Listing } from '@src/utils/data';
+import { EOrderType } from '@src/utils/enums';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 
 import {
@@ -43,6 +44,8 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   );
   const partnerServiceFee =
     Listing(order).getMetadata()?.serviceFees?.[currentPartnerId!];
+  const { orderType = EOrderType.group } = Listing(order).getMetadata();
+  const isGroupOrder = orderType === EOrderType.group;
 
   const priceQuotation = isPartner
     ? calculatePriceQuotationPartner({
@@ -126,6 +129,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
               outsideCollapsible
               foodOrderGroupedByDate={groupFoodOrderByDate({
                 orderDetail: orderDetail!,
+                isGroupOrder,
               })}
             />
           </>

@@ -53,6 +53,7 @@ const SectionOrderHeader: React.FC<TSectionOrderHeaderProps> = (props) => {
         </Button>
       );
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentView]);
 
   return (
