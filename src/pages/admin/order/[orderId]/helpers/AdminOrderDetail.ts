@@ -1,6 +1,7 @@
 import { parseThousandNumber } from '@helpers/format';
 import { groupFoodOrderByDate } from '@pages/company/orders/[orderId]/picking/helpers/orderDetailHelper';
 import { Listing, User } from '@src/utils/data';
+import { EOrderType } from '@src/utils/enums';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 
 export const formatQuotationToFoodTableData = (
@@ -59,8 +60,13 @@ export const relatedOrderDataSource = ({
   const { displayName } = bookerUser.getProfile();
   const { email: bookerEmail } = bookerUser.getAttributes();
   const { phoneNumber: bookerPhoneNumber } = bookerUser.getProtectedData();
-  const { deliveryAddress, staffName, startDate, endDate } =
-    orderListing.getMetadata();
+  const {
+    deliveryAddress,
+    staffName,
+    startDate,
+    endDate,
+    orderType = EOrderType.group,
+  } = orderListing.getMetadata();
 
   return {
     orderTitle,
@@ -72,6 +78,7 @@ export const relatedOrderDataSource = ({
     bookerPhoneNumber,
     staffName,
     deliveryAddress: deliveryAddress?.address,
+    isGroupOrder: orderType === EOrderType.group,
   };
 };
 
@@ -98,6 +105,7 @@ export const formatPriceQuotationData = ({
     bookerPhoneNumber,
     staffName,
     deliveryAddress,
+    isGroupOrder,
   } = relatedOrderDataSource({
     company,
     booker,
@@ -143,6 +151,7 @@ export const formatPriceQuotationData = ({
     orderDetailData: {
       foodOrderGroupedByDate: groupFoodOrderByDate({
         orderDetail: orderDetail!,
+        isGroupOrder,
       }),
     },
   };

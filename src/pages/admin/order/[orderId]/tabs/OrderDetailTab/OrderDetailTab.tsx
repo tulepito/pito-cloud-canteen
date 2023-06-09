@@ -9,7 +9,7 @@ import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/
 import { groupFoodOrderByDate } from '@pages/company/orders/[orderId]/picking/helpers/orderDetailHelper';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderStates } from '@src/utils/enums';
+import { EOrderStates, EOrderType } from '@src/utils/enums';
 import type { TListing, TObject, TTransaction, TUser } from '@src/utils/types';
 
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
@@ -46,10 +46,12 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   } = props;
   const dispatch = useAppDispatch();
   const orderId = Listing(order).getId();
+
   const {
     notes,
     orderStateHistory = [],
     plans = [],
+    orderType = EOrderType.group,
   } = Listing(order).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
   const showStateSectionCondition =
@@ -59,7 +61,10 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
 
   const tabItems = useMemo(
     () => {
-      const foodOrderGroupedByDate = groupFoodOrderByDate({ orderDetail });
+      const foodOrderGroupedByDate = groupFoodOrderByDate({
+        orderDetail,
+        isGroupOrder: orderType === EOrderType.group,
+      });
 
       return Object.keys(orderDetail).map((key: string) => {
         const foodOrder = foodOrderGroupedByDate.find(

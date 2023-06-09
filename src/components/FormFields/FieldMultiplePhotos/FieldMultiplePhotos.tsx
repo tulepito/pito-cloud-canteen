@@ -21,6 +21,7 @@ const HiddenField = (hiddenProps: any) => {
   useEffect(() => {
     if (!input) return;
     input.onChange(getInitialAddImages(images));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(images)]);
 
   return (
