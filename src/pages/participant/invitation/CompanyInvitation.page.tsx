@@ -127,6 +127,7 @@ const CompanyInvitationPage = () => {
       <div className={css.foodBackground}>
         <CoverModal
           id="InvitationModal"
+          openClassName={css.isOpen}
           isOpen={invitationModalControl.value}
           onClose={invitationModalControl.setFalse}
           coverSrc={invitationCover}

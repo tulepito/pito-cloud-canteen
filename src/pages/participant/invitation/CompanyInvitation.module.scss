@@ -5,6 +5,30 @@
 .foodBackground {
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
+
+  @include viewportMedium {
+    background-color: $neutralGray2;
+    height: calc(100vh - 80px);
+    overflow: hidden auto;
+  }
+}
+
+.isOpen.isOpen.isOpen {
+  position: relative;
+  z-index: 12;
+  background-color: $neutralGray2;
+
+  & > div {
+    @include viewportMedium {
+      background-color: $neutralGray2;
+      min-height: calc(100vh - 80px);
+
+      align-items: flex-start;
+      padding-top: 82px;
+      padding-bottom: 188px;
+    }
+  }
 }
 
 .btn {
