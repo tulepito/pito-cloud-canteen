@@ -16,6 +16,7 @@ const useVerifyAuthentication = (homePageNavigateCondition: boolean) => {
     pathname,
     asPath: fullPath,
     query: { from: fromUrl },
+    isReady: isRouterReady,
   } = router;
   const { isIgnoredAuthCheckRoute, isNonRequireAuthenticationRoute } =
     usePathChecker(pathname);
@@ -26,7 +27,7 @@ const useVerifyAuthentication = (homePageNavigateCondition: boolean) => {
     }
 
     if (isNonRequireAuthenticationRoute) {
-      if (homePageNavigateCondition) {
+      if (homePageNavigateCondition && isRouterReady) {
         router.push(fromUrl ? (fromUrl as string) : generalPaths.Home);
       }
     } else if (!isAuthenticated) {
@@ -44,6 +45,7 @@ const useVerifyAuthentication = (homePageNavigateCondition: boolean) => {
     isNonRequireAuthenticationRoute,
     pathname,
     fullPath,
+    isRouterReady,
   ]);
 };
 
