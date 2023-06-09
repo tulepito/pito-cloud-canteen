@@ -28,13 +28,13 @@ export const renderParticipantCards = (
       id: { uuid },
       attributes: {
         email,
-        profile: { displayName },
+        profile: { firstName, lastName },
       },
     } = item;
 
     return (
       <ParticipantCard
-        name={displayName}
+        name={`${lastName} ${firstName}`}
         email={email}
         key={uuid}
         participant={item}

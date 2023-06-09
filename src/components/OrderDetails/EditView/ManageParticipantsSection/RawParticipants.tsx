@@ -36,7 +36,7 @@ export const RawParticipants: React.FC<TRawParticipantsProps> = ({
           id: { uuid },
           attributes: {
             email,
-            profile: { displayName },
+            profile: { firstName, lastName },
           },
         } = item;
         const isSelectedFood = isCompletePickFood({
@@ -46,7 +46,7 @@ export const RawParticipants: React.FC<TRawParticipantsProps> = ({
 
         const cardComponent = (
           <ParticipantCard
-            name={displayName}
+            name={`${lastName} ${firstName}`}
             email={email}
             className={css.participantCard}
             onClickDeleteIcon={handleClickDeleteParticipant(uuid)}
