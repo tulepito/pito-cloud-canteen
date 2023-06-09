@@ -73,7 +73,7 @@ const createOrder = async ({
     deliveryHour,
     deadlineHour,
     nutritions,
-    selectedGroups = [],
+    selectedGroups = ['allMembers'],
     packagePerMember,
     dayInWeek,
     startDate,

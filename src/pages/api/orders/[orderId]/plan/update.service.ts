@@ -14,6 +14,7 @@ import { getInitMemberOrder } from './memberOrder.helper';
 export enum EApiUpdateMode {
   MERGE = 'merge',
   REPLACE = 'replace',
+  DIRECT_UPDATE = 'direct_update',
 }
 
 const getMenuListFromOrderDetail = (orderDetail: TPlan['orderDetail']) => {
@@ -111,6 +112,17 @@ const updatePlan = async ({
         isNormalOrder,
       });
 
+      updateMenuIds = menuIds;
+    }
+
+    if (updateMode === EApiUpdateMode.DIRECT_UPDATE) {
+      currPlan = await fetchListing(planId as string);
+      const { orderDetail: oldOrderDetail, menuIds = [] } =
+        Listing(currPlan).getMetadata();
+      updatedOrderDetail = {
+        ...oldOrderDetail,
+        ...orderDetail,
+      };
       updateMenuIds = menuIds;
     }
 

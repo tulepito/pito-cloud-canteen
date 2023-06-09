@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import cookies from '@services/cookie';
 import { handleError } from '@services/sdk';
 
 import createPlan from './create.service';
@@ -43,4 +44,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       break;
   }
 };
-export default handler;
+export default cookies(handler);
