@@ -79,13 +79,18 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
             />
             <div className={classNames(css.fieldInput, css.flexWrap)}>
               {companyMembers.map((member) => {
+                const memberUser = User(member);
+                const memberId = memberUser.getId();
+                const { email: memberEmail } = memberUser.getAttributes();
+                const { firstName, lastName } = memberUser.getProfile();
+
                 return (
                   <div key={member.id.uuid} className={css.itemWrapper}>
                     <FieldCheckbox
-                      key={member.id.uuid}
-                      id={`member-${member.id.uuid}`}
+                      key={memberId}
+                      id={`member-${memberId}`}
                       name="members"
-                      value={member.id.uuid}
+                      value={memberId}
                       label={' '}
                     />
                     <div className={css.memberItem}>
@@ -97,12 +102,10 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({
                         />
                         <div>
                           <div className={css.name}>
-                            {User(member).getProfile().displayName}
+                            {`${lastName || ''} ${firstName || ''}`}
                           </div>
-                          <div
-                            className={css.email}
-                            title={User(member).getAttributes().email}>
-                            {User(member).getAttributes().email}
+                          <div className={css.email} title={memberEmail}>
+                            {memberEmail}
                           </div>
                         </div>
                       </div>

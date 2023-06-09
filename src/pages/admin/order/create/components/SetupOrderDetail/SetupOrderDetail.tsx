@@ -162,7 +162,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const currentClient = companies.find(
     (company) => company.id.uuid === clientId,
   );
-  const partnerName = currentClient?.attributes.profile.displayName;
+  const partnerName = `${currentClient?.attributes.profile.lastName} ${currentClient?.attributes.profile.firstName}`;
   const resourcesForCalender = normalizePlanDetailsToEvent(
     orderDetail,
     order,

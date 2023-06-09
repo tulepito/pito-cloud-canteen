@@ -148,6 +148,8 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
             <div className={css.loadedResult}>
               {loadedResult.map((record, index: number) => {
                 const hasNoAccount = record.response?.statusCode === 404;
+                const recordUser = User(record.response);
+                const { lastName, firstName } = recordUser.getProfile();
                 const onDeleteUser = () => {
                   removeEmailValue(record.email);
                 };
@@ -161,7 +163,7 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
                       ) : (
                         <div>
                           <div className={css.name}>
-                            {User(record.response).getProfile().displayName}
+                            {`${lastName || ''} ${firstName || ''}`}
                           </div>
                           <div className={css.email}>{record.email}</div>
                         </div>

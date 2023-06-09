@@ -10,9 +10,11 @@ type LoadedMembersProps = {
   companyMembers: any[];
 };
 
-const getMemberDisplayName = (companyMembers: any[], memberId: string) => {
-  return companyMembers.find((_member) => _member.id.uuid === memberId)
-    .attributes.profile.displayName;
+const getMemberFullName = (companyMembers: any[], memberId: string) => {
+  const member = companyMembers.find((_member) => _member.id.uuid === memberId);
+  const { firstName = '', lastName = '' } = member.attributes.profile;
+
+  return `${lastName} ${firstName}`;
 };
 
 const LoadedItem = ({ item, companyMembers, onDelete }: any) => {
@@ -31,7 +33,7 @@ const LoadedItem = ({ item, companyMembers, onDelete }: any) => {
         {id ? (
           <div>
             <div className={css.name}>
-              {getMemberDisplayName(companyMembers, id)}
+              {getMemberFullName(companyMembers, id)}
             </div>
             <div className={css.email}>{email}</div>
           </div>

@@ -168,6 +168,7 @@ const MembersPage = () => {
       },
     },
   ];
+  console.log('mergedCompanyMembers: ', mergedCompanyMembers);
 
   const formattedCompanyMembers = useMemo<TRowData[]>(
     () =>
@@ -178,7 +179,9 @@ const MembersPage = () => {
             key: member?.id?.uuid || member.attributes.email,
             data: {
               id: member?.id?.uuid,
-              name: member.attributes.profile.displayName,
+              name: `${member.attributes.profile?.lastName || ''} ${
+                member.attributes.profile?.firstName || ''
+              }`,
               email: member.attributes.email,
               group: getGroupNames(
                 member.attributes.profile?.metadata?.groupList,

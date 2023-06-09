@@ -65,7 +65,12 @@ export const parseEntitiesToTableData = (
 ) => {
   return companies.map((company) => {
     const { profile = {}, email } = company.attributes || {};
-    const { displayName, publicData = {}, metadata = {} } = profile as any;
+    const {
+      lastName = '',
+      firstName = '',
+      publicData = {},
+      metadata = {},
+    } = profile as any;
     const { userState } = metadata;
     const { companyLocation = {}, companyName, phoneNumber } = publicData;
 
@@ -75,7 +80,7 @@ export const parseEntitiesToTableData = (
         userState,
         isDraft: userState === ECompanyStates.draft,
         id: company.id.uuid,
-        displayName,
+        displayName: `${lastName} ${firstName}`,
         phoneNumber,
         email,
         companyName,
