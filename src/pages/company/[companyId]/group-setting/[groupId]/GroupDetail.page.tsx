@@ -94,7 +94,9 @@ const GroupDetailPage = () => {
             key: User(member).getId(),
             data: {
               id: User(member).getId(),
-              name: User(member).getProfile()?.displayName,
+              name: `${member.attributes.profile?.lastName || ''} ${
+                member.attributes.profile?.firstName || ''
+              }`,
               email: User(member).getAttributes()?.email,
               group: getGroupNames(User(member).getMetadata()?.groupList),
               allergy: User(member).getPublicData()?.allergies?.join(', '),

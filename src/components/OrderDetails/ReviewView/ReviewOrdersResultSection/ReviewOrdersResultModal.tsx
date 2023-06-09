@@ -84,12 +84,13 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
             (p: TUser) => pid === p.id.uuid,
           );
           const { email } = participant?.attributes || {};
-          const { displayName } = participant?.attributes?.profile || {};
+          const { lastName = '', firstName = '' } =
+            participant?.attributes?.profile || {};
 
           return {
             id: pid,
             email,
-            name: displayName,
+            name: `${lastName} ${firstName}`,
           };
         })
         .concat(
@@ -98,12 +99,13 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
               (p: TUser) => pid === p.id.uuid,
             );
             const { email } = participant?.attributes || {};
-            const { displayName } = participant?.attributes?.profile || {};
+            const { lastName = '', firstName = '' } =
+              participant?.attributes?.profile || {};
 
             return {
               id: pid,
               email,
-              name: displayName,
+              name: `${lastName} ${firstName}`,
             };
           }),
         ),

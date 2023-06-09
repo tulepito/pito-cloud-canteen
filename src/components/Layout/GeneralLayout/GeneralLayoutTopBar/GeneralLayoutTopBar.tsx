@@ -14,6 +14,7 @@ import { useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
+import { CurrentUser } from '@src/utils/data';
 
 import css from './GeneralLayoutTopBar.module.scss';
 
@@ -21,6 +22,10 @@ const GeneralLayoutTopBar = () => {
   const router = useRouter();
   const handleLogoutFn = useLogout();
   const currentUser = useAppSelector(currentUserSelector);
+
+  const currentUserGetter = CurrentUser(currentUser);
+  const { lastName = '', firstName = '' } = currentUserGetter.getProfile();
+  const currentUserFullName = `${lastName} ${firstName}`;
 
   const handleLogout = async () => {
     await handleLogoutFn();
@@ -39,9 +44,7 @@ const GeneralLayoutTopBar = () => {
             <div className={css.avatar}>
               <Avatar disableProfileLink user={currentUser} />
             </div>
-            <p className={css.displayName}>
-              {currentUser?.attributes?.profile?.displayName}
-            </p>
+            <p className={css.displayName}>{currentUserFullName}</p>
             <IconArrow direction="down" />
           </ProfileMenuLabel>
           <ProfileMenuContent className={css.profileMenuContent}>

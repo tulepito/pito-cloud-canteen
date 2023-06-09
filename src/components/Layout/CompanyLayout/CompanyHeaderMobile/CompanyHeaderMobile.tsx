@@ -17,6 +17,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useLogout } from '@hooks/useLogout';
 import { UIActions } from '@redux/slices/UI.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import config from '@src/configs';
 import { generalPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
@@ -46,9 +47,13 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
   const { value: isOpen, toggle: onToggle } = useBoolean(false);
 
   const { pathname: routerPathName, push } = useRouter();
-  const currentUser = useAppSelector((state) => state.user.currentUser);
+  const currentUser = useAppSelector(currentUserSelector);
   const dispatch = useAppDispatch();
   const handleLogoutFn = useLogout();
+
+  const currentUserGetter = CurrentUser(currentUser);
+  const { lastName = '', firstName = '' } = currentUserGetter.getProfile();
+  const currentUserFullName = `${lastName} ${firstName}`;
 
   useEffect(() => {
     if (isOpen) {
@@ -131,12 +136,7 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
           <div className={css.headerBottoms}>
             <div className={css.headerBottomItem}>
               <Avatar user={currentUser as TCurrentUser} />
-              <div className={css.userDisplayName}>
-                {
-                  CurrentUser(currentUser as TCurrentUser).getProfile()
-                    .displayName
-                }
-              </div>
+              <div className={css.userDisplayName}>{currentUserFullName}</div>
             </div>
             <div className={css.headerBottomItem}>
               <IconPhone variant="secondary" className={css.phoneIcon} />

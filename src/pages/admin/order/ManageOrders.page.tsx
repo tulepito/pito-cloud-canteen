@@ -304,7 +304,7 @@ const parseEntitiesToTableData = (
         orderNumber: (page - 1) * 10 + index + 1,
         location: deliveryAddress?.address,
         companyName: company?.attributes?.profile?.publicData?.companyName,
-        displayName: company?.attributes.profile?.displayName,
+        displayName: `${company?.attributes.profile?.lastName} ${company?.attributes.profile?.firstName}`,
         startDate: startDate && formatTimestamp(startDate),
         endDate: endDate && formatTimestamp(endDate),
         staffName,

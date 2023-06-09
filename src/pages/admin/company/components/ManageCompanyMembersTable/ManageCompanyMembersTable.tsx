@@ -534,11 +534,20 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
               (member) =>
                 member.permission !== UserPermission.OWNER && member.id,
             )
-            .map((member) => (
-              <option key={member.email} value={member.email}>
-                {member?.attributes?.profile?.displayName || member.email}
-              </option>
-            ))}
+            .map((member) => {
+              const { lastName = '', firstName = '' } =
+                member.attributes.profile;
+              const fullName =
+                lastName && firstName
+                  ? `${lastName} ${firstName}`
+                  : member.email;
+
+              return (
+                <option key={member.email} value={member.email}>
+                  {fullName}
+                </option>
+              );
+            })}
         </select>
       </AlertModal>
       <AlertModal
