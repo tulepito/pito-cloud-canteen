@@ -19,6 +19,7 @@ import { addCommas } from '@helpers/format';
 import {
   findSuitableStartDate,
   getRestaurantListFromOrderDetail,
+  getSelectedRestaurantAndFoodList,
 } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -334,39 +335,15 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     dispatch(setCanNotGoToStep4(true));
     const { food: foodIds } = values;
 
-    const currRestaurantId = currentRestaurant?.id?.uuid;
-
-    const submitFoodListData = foodIds.reduce((result, foodId) => {
-      const item = foodList.find((food) => food?.id?.uuid === foodId);
-
-      if (!item) {
-        return result;
-      }
-      const { id, attributes } = item || {};
-      const { title, price } = attributes;
-      const foodUnit = attributes?.publicData?.unit || '';
-
-      return id?.uuid
-        ? {
-            ...result,
-            [id?.uuid]: {
-              foodName: title,
-              foodPrice: price?.amount || 0,
-              foodUnit,
-            },
-          }
-        : result;
-    }, {});
-
-    const submitRestaurantData = {
-      id: currRestaurantId,
-      restaurantName: currentRestaurant?.attributes?.title,
-      phoneNumber: currentRestaurant?.attributes?.publicData?.phoneNumber,
-      menuId: currentSelectedMenuId,
-    };
+    const { submitRestaurantData, submitFoodListData } =
+      getSelectedRestaurantAndFoodList({
+        foodList,
+        foodIds,
+        currentRestaurant,
+      });
 
     await handleSubmitRestaurant({
-      restaurant: submitRestaurantData,
+      restaurant: { ...submitRestaurantData, menuId: currentSelectedMenuId },
       selectedFoodList: submitFoodListData,
     });
     closePickFoodModal();
