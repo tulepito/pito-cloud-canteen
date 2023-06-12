@@ -116,7 +116,7 @@ const OrderDetailPage = () => {
         onCancelOrder={confirmCancelOrderActions.setTrue}
       />
 
-      <RenderWhen condition={!isFetchingOrderDetails && !isNormalOrder}>
+      <RenderWhen condition={!isNormalOrder}>
         <div className={css.leftPart}>
           <ManageOrdersSection data={editViewData.manageOrdersData} />
         </div>

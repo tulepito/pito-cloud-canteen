@@ -94,7 +94,7 @@
   @include viewportLarge {
     width: fit-content;
     display: grid;
-    grid-template-columns: 1fr 820px;
+    grid-template-columns: 1fr 320px;
     column-gap: 40px;
     row-gap: 28px;
     padding: 24px;
@@ -112,8 +112,9 @@
   }
 
   &.editNormalOrderView {
-    // display: flex;
-    // justify-content: center;
+    @include viewportLarge {
+      grid-template-columns: 1fr 820px;
+    }
 
     @include viewportLarge {
       grid-template-columns: 1fr 820px 1fr;
