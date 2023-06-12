@@ -2,10 +2,14 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 
-.formContainer {
-  padding-bottom: 80px;
+.root {
+  /* 105px + 28px: top height; 20px: section margin: 20px section padding bottom */
+  min-height: calc(100vh - 105px - 28px - 20px - 20px);
+  min-height: calc(100dvh - 105px - 28px - 20px - 20px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-
 .fieldWrapper {
   margin-bottom: 16px;
 
@@ -19,6 +23,6 @@
 }
 
 .submitBtn {
-  width: calc(100% - 32px);
+  width: 100%;
   margin: 0 auto;
 }
