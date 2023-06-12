@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Field, Form as FinalForm } from 'react-final-form';
+import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
@@ -12,8 +13,11 @@ import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
 import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { useAppSelector } from '@hooks/reduxHooks';
-import { orderDetailsAnyActionsInProgress } from '@redux/slices/OrderManagement.slice';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import {
+  orderDetailsAnyActionsInProgress,
+  OrderManagementsAction,
+} from '@redux/slices/OrderManagement.slice';
 import type { TObject } from '@src/utils/types';
 import { EMAIL_RE, VALID } from '@src/utils/validators';
 import { shortenString } from '@utils/string';
@@ -44,9 +48,13 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   props,
 ) => {
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const addOrUpdateMemberOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.addOrUpdateMemberOrderInProgress,
+  );
+  const addOrUpdateMemberOrderError = useAppSelector(
+    (state) => state.OrderManagement.addOrUpdateMemberOrderError,
   );
 
   const {
@@ -54,14 +62,15 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     memberOptions = [],
     handleSubmit,
     form,
+    submitErrors,
     values,
     invalid,
   } = props;
-  const fieldSelectMemberDisable =
-    invalid || inProgress || memberOptions?.length === 0;
+  const fieldSelectMemberDisable = inProgress || memberOptions?.length === 0;
   const fieldSelectFoodDisable =
     fieldSelectMemberDisable || foodOptions?.length === 0;
   const submitDisabled =
+    invalid ||
     addOrUpdateMemberOrderInProgress ||
     fieldSelectFoodDisable ||
     !values?.participantId ||
@@ -104,6 +113,14 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
       })) || [],
     [JSON.stringify(memberOptions)],
   );
+  console.debug(
+    '💫 > file: AddOrderForm.tsx:115 > memberOptions: ',
+    memberOptions,
+  );
+  console.debug(
+    '💫 > file: AddOrderForm.tsx:116 > selectMemberOptions: ',
+    selectMemberOptions,
+  );
 
   const selectFoodOptions = (
     <>
@@ -143,10 +160,22 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     return participantIdFieldInvalidMessage;
   };
 
+  const handleFieldParticipantChange = (
+    oldValue: TObject,
+    newValue: TObject,
+  ) => {
+    if (oldValue?.key !== newValue?.key) {
+      dispatch(OrderManagementsAction.clearAddUpdateParticipantError());
+    }
+  };
+
   return (
     <Form onSubmit={customHandleSubmit} className={css.root}>
       <div className={css.fieldsContainer}>
         <div className={css.fieldContainer}>
+          <OnChange name="participantId">
+            {handleFieldParticipantChange}
+          </OnChange>
           <Field
             disabled={fieldSelectMemberDisable}
             id={'addOrder.participantName'}
@@ -168,9 +197,15 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
                 { value },
               )
             }
+            formError={submitErrors?.participantId}
             validate={validateMemberField}
             validateErrorClassName={css.fieldParticipantIdError}
           />
+          {addOrUpdateMemberOrderError !== null && (
+            <div className={css.formError}>
+              {'Người dùng không có trên hệ thống'}
+            </div>
+          )}
         </div>
         <div className={css.fieldContainer}>
           <FieldSelect

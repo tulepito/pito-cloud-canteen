@@ -75,7 +75,7 @@ export const usePrepareManageOrdersSectionData = (
         const { email } = participantGetter.getAttributes();
         const { firstName, lastName } = participantGetter.getProfile();
 
-        const memberName = `${`${firstName} ${lastName}`} (${email})`;
+        const memberName = `${`${lastName} ${firstName}`} (${email})`;
 
         return {
           memberId,
