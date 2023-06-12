@@ -322,7 +322,7 @@ const OrderListPage = () => {
           anchorDate={selectedDay}
           events={flattenEvents}
           renderEvent={OrderEventCard}
-          inProgress={fetchOrdersInProgress}
+          inProgress={showLoadingModal}
           defautlView={defaultView}
           // exposeAnchorDate={handleAnchorDateChange}
           components={{

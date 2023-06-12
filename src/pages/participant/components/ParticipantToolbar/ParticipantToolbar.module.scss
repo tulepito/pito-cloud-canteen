@@ -78,6 +78,7 @@
   @include textTemplate(14px, $fontWeightMedium, 20px, '');
   color: $neutralGray5;
   border: none;
+  cursor: pointer;
 
   &:last-child {
     border: none;
