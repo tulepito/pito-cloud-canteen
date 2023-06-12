@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { components } from 'react-select';
 import Creatable from 'react-select/creatable';
 import classNames from 'classnames';
@@ -115,14 +115,19 @@ const FieldCustomSelectComponent: React.FC<
   const onFocus = () => focusController.setTrue();
   const onBlur = () => focusController.setFalse();
 
-  const { valid, invalid, touched, error } = rest.meta;
-  const hasError = !!(touched && invalid && error);
+  const { valid, invalid, touched, error, submitError, dirtySinceLastSubmit } =
+    rest.meta;
+  const hasError = !!(
+    touched &&
+    invalid &&
+    (error || (submitError && !dirtySinceLastSubmit))
+  );
   const selectBorderColor = hasError
     ? '#cf1322'
     : valid
     ? '#bfbfbf'
     : '#cf1322';
-  const fieldMeta = { touched: hasError, error };
+  const fieldMeta = { touched: hasError, error: error || submitError };
 
   const handleCreateNewOption = (inputValue: string) => {
     loadingController.setTrue();
@@ -133,6 +138,11 @@ const FieldCustomSelectComponent: React.FC<
       input.onChange(newOption);
     }, LOADING_TIME);
   };
+
+  useEffect(() => {
+    setOptions(defaultOptions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(defaultOptions)]);
 
   return (
     <div className={classNames(css.selectContainer, className)}>
