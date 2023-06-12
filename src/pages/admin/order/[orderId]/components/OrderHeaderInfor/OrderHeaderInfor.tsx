@@ -44,7 +44,8 @@ const OrderHeaderInfor: React.FC<OrderHeaderInforProps> = (props) => {
   } = orderListing.getMetadata();
 
   const { companyName } = companyUser.getPublicData();
-  const { displayName: bookerName } = bookerUser.getProfile();
+  const { lastName = '', firstName = '' } = bookerUser.getProfile();
+  const bookerName = `${lastName} ${firstName}`;
   const { phoneNumber: protetedphoneNumber } = bookerUser.getProtectedData();
   const { phoneNumber: publicPhoneNumber } = bookerUser.getPublicData();
   const phoneNumber = protetedphoneNumber || publicPhoneNumber;
