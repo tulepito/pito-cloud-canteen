@@ -1,4 +1,3 @@
-import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -20,7 +19,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           query: { orderId = '' },
           body: {
             email = '',
-            companyId = '',
             planId = '',
             participants = [],
             orderDetail = {},
@@ -49,25 +47,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         }
 
         const userId = user?.id?.uuid;
-        const isUserInCompany = get(
-          user,
-          'attributes.profile.metadata.companyList',
-          [],
-        ).includes(companyId);
 
         if (participants.includes(userId)) {
           res.json({
             errorCode: 'user_already_in_list',
             message: `Đã tồn tại trong danh sách thành viên`,
-          });
-
-          return;
-        }
-
-        if (!isUserInCompany) {
-          res.json({
-            errorCode: 'user_not_belong_to_company',
-            message: `Thanh viên không thuộc công ty`,
           });
 
           return;
