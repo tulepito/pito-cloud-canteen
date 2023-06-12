@@ -80,6 +80,9 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
           <Form onSubmit={handleSubmit}>
             <div className={classNames(css.fieldInput, css.flexWrap)}>
               {memberOptions.map((member: any) => {
+                const memberUser = User(member);
+                const { firstName, lastName } = memberUser.getProfile();
+
                 return (
                   <div key={member.id.uuid} className={css.itemWrapper}>
                     <FieldCheckbox
@@ -98,7 +101,7 @@ const AddNewMembersForm: React.FC<AddNewMembersFormProps> = ({
                         />
                         <div>
                           <div className={css.name}>
-                            {User(member).getProfile().displayName}
+                            {`${lastName || ''} ${firstName || ''}`}
                           </div>
                           <div
                             className={css.email}

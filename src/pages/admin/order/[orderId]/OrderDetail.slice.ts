@@ -237,6 +237,7 @@ const updatePlanDetail = createAsyncThunk(
       await updatePlanDetailsApi(orderId, {
         orderDetail,
         planId,
+        updateMode: 'direct_update',
       });
 
       if (skipRefetch) {

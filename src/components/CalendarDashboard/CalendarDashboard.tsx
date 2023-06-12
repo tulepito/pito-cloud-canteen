@@ -70,6 +70,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
     ? createMonthViewWrapper({
         renderEvent,
         customComponents: components,
+        inProgress,
       })
     : false;
   const WeekViewWrapper = !hideWeekView

@@ -9,6 +9,7 @@ const LoadingModal = ({ isOpen }: { isOpen: boolean }) => {
       id="LoadingModal"
       isOpen={isOpen}
       handleClose={() => {}}
+      openClassName={css.modalOpen}
       scrollLayerClassName={css.scrollLayer}
       containerClassName={css.container}
       shouldHideIconClose>
