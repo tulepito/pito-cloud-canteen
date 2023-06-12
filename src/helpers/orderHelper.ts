@@ -428,3 +428,47 @@ export const markColorForOrder = (orderNumber: number) => {
 
   return colorList[orderNumber % colorList.length];
 };
+
+export const getSelectedRestaurantAndFoodList = ({
+  foodList = [],
+  foodIds = [],
+  currentRestaurant,
+}: {
+  foodList: TObject[];
+  foodIds: string[];
+  currentRestaurant: TObject;
+}) => {
+  const currRestaurantId = currentRestaurant?.id?.uuid;
+  const submitFoodListData = foodIds.reduce((result, foodId) => {
+    const item = foodList.find((food) => food?.id?.uuid === foodId);
+
+    if (isEmpty(item)) {
+      return result;
+    }
+    const { id, attributes } = item || {};
+    const { title, price } = attributes;
+    const foodUnit = attributes?.publicData?.unit || '';
+
+    return id?.uuid
+      ? {
+          ...result,
+          [id?.uuid]: {
+            foodName: title,
+            foodPrice: price?.amount || 0,
+            foodUnit,
+          },
+        }
+      : result;
+  }, {});
+
+  const submitRestaurantData = {
+    id: currRestaurantId,
+    restaurantName: currentRestaurant?.attributes?.title,
+    phoneNumber: currentRestaurant?.attributes?.publicData?.phoneNumber,
+  };
+
+  return {
+    submitRestaurantData,
+    submitFoodListData,
+  };
+};
