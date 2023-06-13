@@ -24,6 +24,7 @@ import pickingOrderCover from '@src/assets/pickingOrderCover.png';
 import { participantPaths } from '@src/paths';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
+import { EOrderStates } from '@src/utils/enums';
 import type { TListing, TUser } from '@utils/types';
 
 import OrderCalendarView from '../../components/OrderCalendarView/OrderCalendarView';
@@ -67,7 +68,11 @@ const ParticipantOrderManagement = () => {
   const companyUser = User(company as TUser);
   const orderListing = Listing(order as TListing);
   const { orderName } = orderListing.getPublicData();
-  const { selectedGroups = [], deadlineDate } = orderListing.getMetadata();
+  const {
+    selectedGroups = [],
+    deadlineDate,
+    orderState,
+  } = orderListing.getMetadata();
   const { displayName: bookerName } = companyUser.getProfile();
   const { companyName } = companyUser.getPublicData();
   const { groups = [] } = companyUser.getMetadata();
@@ -100,9 +105,8 @@ const ParticipantOrderManagement = () => {
 
   const shouldShowMissingPickingOrderModal =
     !isEmpty(order) && isOrderOverDeadline(order as TListing);
-  const pickingOrderModalControl = useBoolean(
-    !shouldShowMissingPickingOrderModal,
-  );
+  const orderIsPickable = orderState === EOrderStates.picking;
+  const pickingOrderModalControl = useBoolean(orderIsPickable);
   const missingPickingOrderModalControl = useBoolean(
     shouldShowMissingPickingOrderModal,
   );
