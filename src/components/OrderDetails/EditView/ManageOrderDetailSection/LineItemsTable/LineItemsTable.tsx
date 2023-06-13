@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
@@ -41,7 +41,6 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
   const { foodList = {} } = restaurant;
 
   const note = useMemo(() => data?.note || '', [currentViewDate]);
-
   const { form, handleSubmit } = useForm({
     initialValues: {
       note,
@@ -164,6 +163,10 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
       }
     }
   };
+
+  useEffect(() => {
+    return () => form.reset();
+  }, [currentViewDate]);
 
   return (
     <div className={css.root}>
