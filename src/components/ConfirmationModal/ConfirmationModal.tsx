@@ -1,7 +1,10 @@
+import { useEffect, useRef, useState } from 'react';
+
 import Button from '@components/Button/Button';
 import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import PopupModal from '@components/PopupModal/PopupModal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 
 import css from './ConfirmationModal.module.scss';
 
@@ -18,6 +21,7 @@ type ConfirmationModalProps = {
   isConfirmButtonLoading?: boolean;
   hasError?: string;
   isPopup?: boolean;
+  secondForAutoClose?: number;
 };
 const ConfirmationModal: React.FC<ConfirmationModalProps> = (props) => {
   const {
@@ -32,7 +36,33 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = (props) => {
     isConfirmButtonLoading,
     hasError,
     isPopup = false,
+    secondForAutoClose,
   } = props;
+  const [secondToClose, setSecondToClose] = useState<number>(
+    secondForAutoClose!,
+  );
+  const intevalRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (secondForAutoClose && isOpen) {
+      intevalRef.current = setInterval(() => {
+        setSecondToClose((prev) => prev - 1);
+      }, 1000);
+    }
+    if (secondToClose === 0 && isOpen) {
+      onClose();
+    }
+
+    return () => {
+      clearInterval(intevalRef.current);
+    };
+  }, [onClose, secondForAutoClose, secondToClose, isOpen]);
+
+  useEffect(() => {
+    if (secondForAutoClose && !isOpen) {
+      setSecondToClose(secondForAutoClose);
+    }
+  }, [isOpen, secondForAutoClose]);
 
   if (!isOpen) return null;
 
@@ -48,6 +78,11 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = (props) => {
         <div className={css.modalContainer}>
           <div className={css.modalContent}>
             <p>{description}</p>
+            <RenderWhen condition={!!secondForAutoClose}>
+              <p className={css.timeToClose}>
+                Đóng lại trong {secondToClose} giây
+              </p>
+            </RenderWhen>
             {hasError && <p className={css.error}>{hasError}</p>}
           </div>
           <div className={css.modalFooter}>

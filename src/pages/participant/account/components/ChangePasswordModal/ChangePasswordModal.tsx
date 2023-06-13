@@ -67,6 +67,7 @@ const ChangePasswordModal: React.FC<TChangePasswordModalProps> = (props) => {
         onClose={changePasswordSuccessModalControl.setFalse}
         title="Thông báo"
         description="Đổi mật khẩu thành công!"
+        secondForAutoClose={3}
       />
     </Modal>
   );

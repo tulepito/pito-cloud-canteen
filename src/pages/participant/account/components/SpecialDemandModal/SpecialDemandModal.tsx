@@ -74,6 +74,7 @@ const SpecialDemandModal: React.FC<TSpecialDemandModalProps> = (props) => {
         onClose={updateSpecialDemandSuccessModalControl.setFalse}
         title="Thông báo"
         description="Cập nhật yêu cầu đặc biệt thành công!"
+        secondForAutoClose={3}
       />
     </Modal>
   );
