@@ -11,7 +11,7 @@ import type { TAddress, TObject } from './types';
  */
 
 // Final Form expects and undefined value for a successful validation
-const VALID = undefined;
+export const VALID = undefined;
 
 const isNonEmptyString = (val: string) => {
   return typeof val === 'string' && val.trim().length > 0;
@@ -109,7 +109,7 @@ export const autocompletePlaceSelected = (message: string) => (value: any) => {
 
 // Source: http://www.regular-expressions.info/email.html
 // See the link above for an explanation of the tradeoffs.
-const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+export const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 const PHONE_NUMBER_RE = /^(0[3|5|7|8|9])+([0-9]{8})$/;
 const PWD_RE =
   /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,16}$/;

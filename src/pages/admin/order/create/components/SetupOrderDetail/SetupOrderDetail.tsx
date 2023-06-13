@@ -281,7 +281,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     Object.keys(orderDetail).length === 0 ||
     missingSelectedFood.length > 0 ||
     Object.keys(availableOrderDetailCheckList).some(
-      (item) => !availableOrderDetailCheckList[item],
+      (item) => !availableOrderDetailCheckList[item].isAvailable,
     );
   const initialFoodList = isPickFoodModalOpen
     ? orderDetail[selectedDate?.getTime()]?.restaurant?.foodList

@@ -60,6 +60,10 @@ export const isOrderOverDeadline = (order: TListing) => {
   return isOver(deadlineDate);
 };
 
+export const findMinDeadlineDate = () => {
+  return DateTime.fromJSDate(new Date()).plus({ days: 1 }).toJSDate();
+};
+
 export const findMinStartDate = () => {
   const initMinStartDate = DateTime.fromJSDate(new Date()).plus({ days: 3 });
   const { weekday } = initMinStartDate;
@@ -130,13 +134,16 @@ export const orderDataCheckers = (order: TListing) => {
   } = Listing(order).getMetadata();
   const timeOptions = generateTimeOptions();
   const isNormalOrder = orderType === EOrderType.normal;
+  const minStartTimeStamp = findMinStartDate().getTime();
 
   const checkers = {
     isDeadlineDateValid: isNormalOrder || Number.isInteger(deadlineDate),
     isDeliveryAddressValid:
       !isEmpty(deliveryAddress?.address) && !isEmpty(deliveryAddress?.origin),
-    isStartDateValid: Number.isInteger(startDate),
-    isEndDateValid: Number.isInteger(endDate),
+    isStartDateValid:
+      Number.isInteger(startDate) && minStartTimeStamp < (startDate || 0),
+    isEndDateValid:
+      Number.isInteger(endDate) && (endDate || 0) > (startDate || 0),
     isDeliveryHourValid: timeOptions.includes(deliveryHour),
     isDeadlineHourValid: isNormalOrder || timeOptions.includes(deadlineHour),
     isPackagePerMemberValid: Number.isInteger(packagePerMember),
@@ -162,7 +169,7 @@ export const isEnableSubmitPublishOrder = (
   });
   const isNoUnAvailableRestaurantInOrderDetail = Object.keys(
     availableOrderDetailCheckList,
-  ).every((item) => availableOrderDetailCheckList[item]);
+  ).every((item) => availableOrderDetailCheckList[item].isAvailable);
 
   return (
     isOrderValid &&
