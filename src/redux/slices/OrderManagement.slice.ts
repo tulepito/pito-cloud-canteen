@@ -439,7 +439,7 @@ const addParticipant = createAsyncThunk(
     const {
       id: { uuid: orderId },
       attributes: {
-        metadata: { participants = [] },
+        metadata: { participants = [], anonymous = [] },
       },
     } = getState().OrderManagement.orderData!;
     const {
@@ -454,6 +454,7 @@ const addParticipant = createAsyncThunk(
       companyId,
       orderId,
       planId,
+      anonymous,
       participants,
       orderDetail,
     };

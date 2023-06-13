@@ -21,6 +21,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             email = '',
             planId = '',
             participants = [],
+            anonymous = [],
             orderDetail = {},
           },
         } = req;
@@ -79,10 +80,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           {},
         );
 
+        const updateAnonymousList = anonymous?.includes(userId)
+          ? anonymous?.splice(
+              anonymous.findIndex((id: string) => userId === id),
+              1,
+            )
+          : anonymous;
+
         await integrationSdk.listings.update({
           id: orderId,
           metadata: {
             participants: [...participants, userId],
+            anonymous: updateAnonymousList,
           },
         });
 
