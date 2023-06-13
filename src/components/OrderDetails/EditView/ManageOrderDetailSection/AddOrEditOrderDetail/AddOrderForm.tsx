@@ -113,14 +113,6 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
       })) || [],
     [JSON.stringify(memberOptions)],
   );
-  console.debug(
-    '💫 > file: AddOrderForm.tsx:115 > memberOptions: ',
-    memberOptions,
-  );
-  console.debug(
-    '💫 > file: AddOrderForm.tsx:116 > selectMemberOptions: ',
-    selectMemberOptions,
-  );
 
   const selectFoodOptions = (
     <>
