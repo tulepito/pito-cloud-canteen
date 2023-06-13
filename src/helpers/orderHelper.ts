@@ -60,11 +60,16 @@ export const isOrderOverDeadline = (order: TListing) => {
 };
 
 export const findMinDeadlineDate = () => {
-  return DateTime.fromJSDate(new Date()).plus({ days: 1 }).toJSDate();
+  return DateTime.fromJSDate(new Date())
+    .plus({ days: 1 })
+    .startOf('day')
+    .toJSDate();
 };
 
 export const findMinStartDate = () => {
-  const initMinStartDate = DateTime.fromJSDate(new Date()).plus({ days: 3 });
+  const initMinStartDate = DateTime.fromJSDate(new Date())
+    .startOf('day')
+    .plus({ days: 3 });
   const { weekday } = initMinStartDate;
 
   const minStartDate =

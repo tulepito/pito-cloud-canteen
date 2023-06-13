@@ -27,6 +27,11 @@ export type TDeliveryTimeFormValues = {
 
 const validate = (values: TDeliveryTimeFormValues) => {
   const errors: any = {};
+  const { startDate } = values;
+  if (startDate && startDate < new Date().getTime()) {
+    errors.startDate = 'Thời điểm hiện tại vượt quá thời gian giao hàng';
+  }
+
   if (!values.deliveryHour) {
     errors.deliveryHour = 'Vui lòng chọn giờ giao hàng';
   }
@@ -81,7 +86,7 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
       }
       startDateValueRef.current = startDate.input.value;
     },
-    [endDateInitialValue, form, startDate.input.value],
+    [endDateInitialValue, startDate.input.value],
   );
 
   useEffect(() => {
