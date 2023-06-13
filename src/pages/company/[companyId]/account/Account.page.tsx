@@ -85,11 +85,11 @@ const AccountPage = () => {
   const onSubmit = async (values: TContactPointProfileFormValues) => {
     const { displayName, phoneNumber } = values;
     const wordList = displayName.trim().split(' ');
-    const firstName = take(wordList, wordList.length - 1);
-    const lastName = takeRight(wordList).join();
+    const lastName = take(wordList, wordList.length - 1);
+    const firstName = takeRight(wordList).join();
     const profile = {
-      firstName: firstName.join(),
-      lastName,
+      firstName,
+      lastName: lastName.join(' '),
       displayName,
       protectedData: {
         phoneNumber,

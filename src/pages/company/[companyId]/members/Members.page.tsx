@@ -168,7 +168,6 @@ const MembersPage = () => {
       },
     },
   ];
-  console.log('mergedCompanyMembers: ', mergedCompanyMembers);
 
   const formattedCompanyMembers = useMemo<TRowData[]>(
     () =>
