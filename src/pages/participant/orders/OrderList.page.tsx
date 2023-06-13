@@ -45,7 +45,9 @@ const OrderListPage = () => {
   const router = useRouter();
   const { planId: planIdFromQuery, timestamp: timestampFromQuery } =
     router.query;
-
+  const [defaultCalendarView, setDefaultCalendarView] = useState<View>(
+    getItem('participant_calendarView') as View,
+  );
   const updateProfileModalControl = useBoolean();
   const onBoardingModal = useBoolean();
   const tourControl = useBoolean();
@@ -184,9 +186,15 @@ const OrderListPage = () => {
     isSameDate(_event.start, selectedDay),
   );
 
-  const defaultView = isMobileLayout
-    ? Views.MONTH
-    : (getItem('participant_calendarView') as View) || Views.WEEK;
+  useEffect(() => {
+    if (isMobileLayout) {
+      localStorage.setItem('participant_calendarView', Views.MONTH);
+      setDefaultCalendarView(Views.MONTH);
+    } else {
+      localStorage.setItem('participant_calendarView', Views.WEEK);
+      setDefaultCalendarView(Views.WEEK);
+    }
+  }, [isMobileLayout]);
 
   const subOrdersFromSelectedDayTxIds = compact(
     subOrdersFromSelectedDay.map(
@@ -280,7 +288,7 @@ const OrderListPage = () => {
           events={flattenEvents}
           renderEvent={OrderEventCard}
           inProgress={fetchOrdersInProgress}
-          defautlView={defaultView}
+          defautlView={defaultCalendarView}
           // exposeAnchorDate={handleAnchorDateChange}
           components={{
             toolbar: (toolBarProps: any) => (
