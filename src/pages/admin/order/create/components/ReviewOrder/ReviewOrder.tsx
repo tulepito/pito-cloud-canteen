@@ -127,6 +127,10 @@ export const ReviewContent: React.FC<any> = (props) => {
     ? orderDetailInDraftState
     : orderDetailInPickingState;
 
+  useEffect(() => {
+    setCurrDeliveryManPhoneNumber(deliveryManPhoneNumber);
+  }, [deliveryManPhoneNumber]);
+
   const participantData = useAppSelector(
     (state) => state.OrderDetail.participantData,
   );
