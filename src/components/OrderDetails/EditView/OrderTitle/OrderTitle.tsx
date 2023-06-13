@@ -29,7 +29,8 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
     onCancelOrder,
   } = props;
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const shouldButtonDisabled = !canStartOrder || inProgress;
+  const submitDisabled = !canStartOrder || inProgress;
+  const cancelOrderDisabled = inProgress;
 
   const rootClasses = classNames(rootClassName || css.root, className);
 
@@ -58,7 +59,7 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
       </div>
       <div className={css.actions}>
         <Button
-          disabled={shouldButtonDisabled}
+          disabled={submitDisabled}
           type="button"
           variant="cta"
           className={css.makeOrderBtn}
@@ -68,7 +69,7 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
           })}
         </Button>
         <Button
-          disabled={shouldButtonDisabled}
+          disabled={cancelOrderDisabled}
           type="button"
           variant="secondary"
           className={css.cancelOrderBtn}
