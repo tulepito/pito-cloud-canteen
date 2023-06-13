@@ -70,8 +70,13 @@ const MemberDetailPage: React.FC<MemberDetailPageProps> = () => {
     id: 'MemberDetailPage.notAcceptInvitation',
   })}`;
 
+  const memberUser = User(companyMember);
+  const { lastName = '', firstName = '' } = memberUser.getProfile();
+  const memberFullName =
+    lastName && firstName ? `${lastName} ${firstName}` : '';
+
   const memberName = checkMemberHasFlexAccount
-    ? User(companyMember).getProfile()?.displayName || '---'
+    ? memberFullName || '---'
     : notAcceptInvitationText;
   useEffect(() => {
     const fetchData = async () => {
