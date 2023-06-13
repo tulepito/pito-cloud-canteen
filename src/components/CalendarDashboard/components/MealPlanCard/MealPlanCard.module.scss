@@ -133,7 +133,7 @@
 
   .editNotAvailable {
     @include textTemplate(12px, $fontWeightRegular, 16px);
-    color: $primaryPri2;
+    color: $sematicRed2;
   }
 }
 
