@@ -10,7 +10,7 @@ export const setItem = (key: string, item: string | TObject) => {
 
 export const getItem = (key: string) => {
   if (hasLocalStorage()) {
-    return localStorage.getItem(key);
+    return JSON.parse(localStorage.getItem(key)!);
   }
 };
 

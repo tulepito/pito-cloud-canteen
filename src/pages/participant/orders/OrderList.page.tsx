@@ -15,7 +15,7 @@ import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { getItem } from '@helpers/localStorageHelpers';
+import { getItem, setItem } from '@helpers/localStorageHelpers';
 import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -46,7 +46,7 @@ const OrderListPage = () => {
   const { planId: planIdFromQuery, timestamp: timestampFromQuery } =
     router.query;
   const [defaultCalendarView, setDefaultCalendarView] = useState<View>(
-    getItem('participant_calendarView') as View,
+    (getItem('participant_calendarView') as View) || Views.WEEK,
   );
   const updateProfileModalControl = useBoolean();
   const onBoardingModal = useBoolean();
@@ -188,10 +188,10 @@ const OrderListPage = () => {
 
   useEffect(() => {
     if (isMobileLayout) {
-      localStorage.setItem('participant_calendarView', Views.MONTH);
+      setItem('participant_calendarView', Views.MONTH);
       setDefaultCalendarView(Views.MONTH);
     } else {
-      localStorage.setItem('participant_calendarView', Views.WEEK);
+      setItem('participant_calendarView', Views.WEEK);
       setDefaultCalendarView(Views.WEEK);
     }
   }, [isMobileLayout]);
