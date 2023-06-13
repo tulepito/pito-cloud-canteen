@@ -2,7 +2,7 @@
 @use '/src/styles/mixins.scss' as *;
 
 .modalContainer.modalContainer {
-  flex-basis: 700px;
+  flex-basis: calc(100% - 32px);
 }
 .modalFooter {
   @include flexAlign(center, flex-end);

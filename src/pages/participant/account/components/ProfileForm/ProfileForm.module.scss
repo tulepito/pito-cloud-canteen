@@ -4,6 +4,7 @@
 
 .root {
   /* 105px + 28px: top height; 20px: section margin: 20px section padding bottom */
+  min-height: calc(100vh - 105px - 28px - 20px - 20px);
   min-height: calc(100dvh - 105px - 28px - 20px - 20px);
   display: flex;
   flex-direction: column;
@@ -15,6 +16,6 @@
 }
 
 .submitBtn {
-  width: calc(100% - 32px);
+  width: 100%;
   margin: 0 auto;
 }
