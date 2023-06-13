@@ -567,17 +567,15 @@ const updatePlanOrderDetail = createAsyncThunk(
       planId,
       orderDetail,
     }: { orderId: string; planId: string; orderDetail: TObject },
-    { fulfillWithValue, rejectWithValue, dispatch },
+    { fulfillWithValue, rejectWithValue },
   ) => {
     try {
-      await updatePlanDetailsApi(orderId, {
+      updatePlanDetailsApi(orderId, {
         orderDetail,
         planId,
       });
 
-      dispatch(loadData(orderId));
-
-      return fulfillWithValue(null);
+      return fulfillWithValue(orderDetail);
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -739,8 +737,14 @@ const OrderManagementSlice = createSlice({
       .addCase(updatePlanOrderDetail.pending, (state) => {
         state.isUpdatingOrderDetails = true;
       })
-      .addCase(updatePlanOrderDetail.fulfilled, (state) => {
+      .addCase(updatePlanOrderDetail.fulfilled, (state, { payload }) => {
         state.isUpdatingOrderDetails = false;
+        state.planData.attributes.metadata = {
+          ...state.planData.attributes.metadata,
+          orderDetail: {
+            ...payload,
+          },
+        };
       })
       .addCase(updatePlanOrderDetail.rejected, (state) => {
         state.isUpdatingOrderDetails = false;

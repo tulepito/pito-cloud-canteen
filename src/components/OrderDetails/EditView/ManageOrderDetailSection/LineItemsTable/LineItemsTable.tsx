@@ -19,7 +19,6 @@ import { LineItemsTableComponent } from './LineItemsTableComponent';
 
 import css from './LineItemsTable.module.scss';
 
-const DEBOUNCE_TIME = 200;
 const NOTE_DEBOUNCE_TIME = 300;
 
 type TLineItemsTableProps = {
@@ -29,7 +28,6 @@ type TLineItemsTableProps = {
 const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
   const { currentViewDate } = props;
   const intl = useIntl();
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const noteDebounceRef = useRef<ReturnType<typeof setTimeout>>();
   const dispatch = useAppDispatch();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
@@ -39,8 +37,10 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
   const planId = planDataGetter.getId();
   const { orderDetail = {}, orderId } = planDataGetter.getMetadata();
   const data = orderDetail[currentViewDate] || {};
-  const { lineItems = [], restaurant = {}, note } = data;
+  const { lineItems = [], restaurant = {} } = data;
   const { foodList = {} } = restaurant;
+
+  const note = useMemo(() => data?.note || '', [currentViewDate]);
 
   const { form, handleSubmit } = useForm({
     initialValues: {
@@ -51,7 +51,6 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
   const foodField = useField(`food`, form);
   const noteField = useField(`note`, form);
 
-  let currDebounceRef = debounceRef.current;
   let currNoteDebounceRef = noteDebounceRef.current;
 
   const noteInput = {
@@ -111,10 +110,6 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
   const handleModifyQuantity =
     (foodId: string, quantity: number = 1) =>
     () => {
-      if (currDebounceRef) {
-        clearTimeout(currDebounceRef);
-      }
-
       const itemIndex = lineItems.findIndex((x: TObject) => x?.id === foodId);
       let newLineItems = lineItems;
 
@@ -149,15 +144,13 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
         },
       };
 
-      currDebounceRef = setTimeout(() => {
-        dispatch(
-          orderManagementThunks.updatePlanOrderDetail({
-            orderId,
-            planId,
-            orderDetail: updateOrderDetail,
-          }),
-        );
-      }, DEBOUNCE_TIME);
+      dispatch(
+        orderManagementThunks.updatePlanOrderDetail({
+          orderId,
+          planId,
+          orderDetail: updateOrderDetail,
+        }),
+      );
     };
 
   const handleAddNewLineItem = () => {
@@ -222,7 +215,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
           </label>
           <FieldTextAreaComponent
             disabled={inProgress}
-            id={`note`}
+            id={`${currentViewDate}.note`}
             name={`note`}
             className={css.fieldNote}
             placeholder={intl.formatMessage({
