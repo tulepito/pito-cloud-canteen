@@ -87,6 +87,7 @@ const ProfileModal: React.FC<TProfileModalProps> = (props) => {
         onClose={updateProfileSucessModalControl.setFalse}
         title="Thông báo"
         description="Thông tin của bạn đã được cập nhật thành công."
+        secondForAutoClose={3}
       />
     </Modal>
   );
