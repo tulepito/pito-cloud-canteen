@@ -50,7 +50,7 @@ const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
   useEffect(() => {
     setFormValues?.(values);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setFormValues, JSON.stringify(values)]);
+  }, [JSON.stringify(values)]);
 
   return (
     <Form onSubmit={handleSubmit}>

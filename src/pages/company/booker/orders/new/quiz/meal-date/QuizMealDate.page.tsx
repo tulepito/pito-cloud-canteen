@@ -59,7 +59,7 @@ const QuizMealDate = () => {
     dayInWeek,
     deadlineDate,
     deadlineHour,
-    orderType,
+    isGroupOrder,
     ...restFormValues
   } = formValues || {};
 
@@ -76,15 +76,14 @@ const QuizMealDate = () => {
       durationTime: '1',
       durationTimeMode: 'week',
       deliveryHour: deliveryHourFromQuery as string,
-      orderType: true,
+      isGroupOrder: true,
     }),
     [deliveryHourFromQuery],
   );
-
   const onFormSubmitClick = async () => {
     creatingOrderModalControl.setTrue();
     try {
-      const deadlineInfoMaybe = orderType
+      const deadlineInfoMaybe = isGroupOrder
         ? {
             deadlineDate: DateTime.fromMillis(deadlineDate)
               .plus({
@@ -102,7 +101,7 @@ const QuizMealDate = () => {
           generalInfo: {
             ...quiz,
             ...restFormValues,
-            orderType: orderType ? EOrderType.group : EOrderType.normal,
+            orderType: isGroupOrder ? EOrderType.group : EOrderType.normal,
             ...deadlineInfoMaybe,
             deliveryAddress:
               User(selectedCompany).getPublicData().location || {},

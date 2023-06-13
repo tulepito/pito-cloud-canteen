@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
-import { useField } from 'react-final-form-hooks';
+import { Field, Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
 import Form from '@components/Form/Form';
@@ -22,7 +21,7 @@ export type TMealDateFormValues = {
   deadlineDate: number;
   deadlineHour: string;
   dayInWeek: string[];
-  orderType: boolean;
+  isGroupOrder: boolean;
 };
 
 type TExtraProps = {
@@ -40,12 +39,7 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
     props;
   const intl = useIntl();
 
-  const { orderType } = values;
-  const orderTypeField = useField('orderType', form);
-
-  const handleChangeOrderType = (checked: boolean) => {
-    orderTypeField.input.onChange(checked);
-  };
+  const { isGroupOrder } = values;
 
   useEffect(() => {
     setFormValues?.(values);
@@ -82,18 +76,28 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
             id: 'MealDateForm.durationForNextOrderField.label',
           })}
         />
-        <Toggle
-          className={css.orderTypeField}
-          onClick={handleChangeOrderType}
-          status={orderTypeField.input.value ? 'on' : 'off'}
-          label={intl.formatMessage({
-            id: 'MealDateForm.orderTypeField.label',
-          })}
-          name={orderTypeField.input.name}
-          id={'MealDateForm.orderType'}
-        />
 
-        <RenderWhen condition={orderType}>
+        <Field name={'isGroupOrder'}>
+          {(fieldProps) => {
+            const { input } = fieldProps;
+
+            return (
+              <Toggle
+                label={intl.formatMessage({
+                  id: 'MealDateForm.orderTypeField.label',
+                })}
+                id={'MealDateForm.orderType'}
+                status={input.value ? 'on' : 'off'}
+                className={css.orderTypeField}
+                onClick={(value) => {
+                  input.onChange(value);
+                }}
+              />
+            );
+          }}
+        </Field>
+
+        <RenderWhen condition={isGroupOrder}>
           <OrderDeadlineField
             form={form}
             values={values}

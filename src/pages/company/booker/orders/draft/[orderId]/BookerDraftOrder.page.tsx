@@ -133,7 +133,13 @@ function BookerDraftOrderPage() {
     });
 
     return temp instanceof Date ? temp : new Date(temp!);
-  }, [selectedDate, startDateTimestamp, endDateTimestamp, orderDetail]);
+    // eslint-disable-next-line prettier/prettier
+  }, [
+    selectedDate,
+    startDateTimestamp,
+    endDateTimestamp,
+    JSON.stringify(orderDetail),
+  ]);
 
   const handleFinishOrder = async () => {
     const { meta } = await dispatch(

@@ -8,9 +8,10 @@ const groupFoodForGroupOrder = (orderDetail: TObject) => {
 
       const {
         memberOrders,
-        restaurant: { id, restaurantName, foodList: foodListOfDate = {} },
+        restaurant = {},
         status: subOrderStatus,
       } = rawOrderDetailOfDate as TObject;
+      const { id, restaurantName, foodList: foodListOfDate = {} } = restaurant;
       if (subOrderStatus === ESubOrderStatus.CANCELED) {
         return result;
       }

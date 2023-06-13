@@ -212,7 +212,7 @@ export const isEnableToStartOrder = (
           foodList,
           minQuantity = 0,
           maxQuantity = 100,
-        } = restaurant;
+        } = restaurant || {};
         const isSetupRestaurant =
           !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
 
