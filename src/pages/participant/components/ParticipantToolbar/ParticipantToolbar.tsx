@@ -5,7 +5,10 @@ import isEqual from 'lodash/isEqual';
 import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
-import { ENavigate } from '@components/CalendarDashboard/helpers/constant';
+import {
+  ENavigate,
+  EViewMode,
+} from '@components/CalendarDashboard/helpers/constant';
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import type { TObject } from '@utils/types';
@@ -28,6 +31,7 @@ export type TToolbarProps = {
   onPickForMeLoading?: boolean;
   onChangeDate?: (date: Date) => void;
   date?: Date;
+  isAllowChangePeriod?: boolean;
 };
 
 const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
@@ -43,6 +47,7 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
     views,
     view,
     date,
+    isAllowChangePeriod = false,
   } = props;
   const intl = useIntl();
   const mountedRef = useRef(false);
@@ -59,9 +64,17 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
   };
 
   const showPrevBtn =
-    startDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
+    isAllowChangePeriod ||
+    (view === EViewMode.WEEK &&
+      startDateDateTime.weekNumber !== anchorDateDateTime.weekNumber) ||
+    (view === EViewMode.MONTH &&
+      startDateDateTime.monthLong !== anchorDateDateTime.monthLong);
   const showNextBtn =
-    endDateDateTime.weekNumber !== anchorDateDateTime.weekNumber;
+    isAllowChangePeriod ||
+    (view === EViewMode.WEEK &&
+      endDateDateTime.weekNumber !== anchorDateDateTime.weekNumber) ||
+    (view === EViewMode.MONTH &&
+      endDateDateTime.monthLong !== anchorDateDateTime.monthLong);
 
   const viewFunc = (viewName: string) => () => {
     onView(viewName);
