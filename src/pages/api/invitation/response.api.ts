@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon';
+import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import cookies from '@services/cookie';
@@ -6,11 +6,7 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getSdk, handleError } from '@services/sdk';
-import {
-  UserInviteResponse,
-  UserInviteStatus,
-  UserPermission,
-} from '@src/types/UserPermission';
+import { UserPermission } from '@src/types/UserPermission';
 import { ENotificationType } from '@src/utils/enums';
 import { denormalisedResponseEntities, User } from '@utils/data';
 
@@ -18,14 +14,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const sdk = getSdk(req, res);
   const integrationSdk = getIntegrationSdk();
   try {
-    const { companyId = '', response } = req.body;
+    const { companyId = '' } = req.body;
 
     const currentUser = denormalisedResponseEntities(
       await sdk.currentUser.show(),
     )[0];
-    const { email: userEmail } = User(currentUser).getAttributes();
+
+    const currentUserGetter = User(currentUser);
+    const { email: userEmail } = currentUserGetter.getAttributes();
     const { company: userCompany = {}, companyList = [] } =
-      User(currentUser).getMetadata();
+      currentUserGetter.getMetadata();
     const userId = User(currentUser).getId();
 
     const companyAccount = await fetchUser(companyId);
@@ -34,34 +32,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { members = {} } = companyUser.getMetadata();
     const userMember = members[userEmail];
 
-    const { expireTime = 0, permission } = userMember;
-    const todayTimestamp = DateTime.now()
-      .setZone('Asia/Ho_Chi_Minh')
-      .toMillis();
-
-    if (expireTime <= todayTimestamp) {
+    if (isEmpty(userMember)) {
       return res.json({
-        message: 'invitationExpired',
-      });
-    }
-
-    if (response === UserInviteResponse.DECLINE) {
-      const newMembers = {
-        ...members,
-        [userEmail]: {
-          ...userMember,
-          inviteStatus: UserInviteStatus.DECLINED,
-        },
-      };
-      await integrationSdk.users.updateProfile({
-        id: companyId,
-        metadata: {
-          members: newMembers,
-        },
-      });
-
-      return res.json({
-        message: 'userDecline',
+        message: 'invalidInvitaion',
       });
     }
 
@@ -69,7 +42,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       ...members,
       [userEmail]: {
         ...userMember,
-        inviteStatus: UserInviteStatus.ACCEPTED,
         id: userId,
       },
     };
@@ -80,19 +52,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         members: newMembers,
       },
     });
-    const newCompanyList = Array.from(new Set(companyList).add(companyId));
-    await integrationSdk.users.updateProfile({
-      id: userId,
-      metadata: {
-        companyList: newCompanyList,
-        company: {
-          ...userCompany,
-          [companyId]: {
-            permission: permission || UserPermission.PARTICIPANT,
+    if (!companyList.includes(companyId)) {
+      await integrationSdk.users.updateProfile({
+        id: userId,
+        metadata: {
+          companyList: [...companyList, companyId],
+          company: {
+            ...userCompany,
+            [companyId]: {
+              permission: UserPermission.PARTICIPANT,
+            },
           },
         },
-      },
-    });
+      });
+    }
 
     createFirebaseDocNotification(ENotificationType.COMPANY_JOINED, {
       userId,
