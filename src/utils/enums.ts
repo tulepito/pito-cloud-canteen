@@ -82,6 +82,7 @@ export enum EReviewTypes {
 export enum ETransactionRoles {
   provider = 'provider',
   customer = 'customer',
+  operator = 'operator',
 }
 
 export enum EErrorCode {
