@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, current } from '@reduxjs/toolkit';
 import isEmpty from 'lodash/isEmpty';
 
 import { transitPlanApi } from '@apis/admin';
@@ -10,7 +10,12 @@ import {
 } from '@apis/orderApi';
 import { getOrderQuotationsQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { denormalisedResponseEntities, Listing } from '@src/utils/data';
+import {
+  denormalisedResponseEntities,
+  Listing,
+  Transaction,
+} from '@src/utils/data';
+import { ETransactionRoles } from '@src/utils/enums';
 import type {
   TListing,
   TObject,
@@ -135,24 +140,13 @@ const updateOrderState = createAsyncThunk(
 
 const transit = createAsyncThunk(
   'app/OrderDetail/TRANSIT',
-  async (
-    { transactionId, transition }: TObject,
-    { dispatch, getState, rejectWithValue },
-  ) => {
-    try {
-      await transitPlanApi({
-        transactionId,
-        transition,
-      });
+  async ({ transactionId, transition }: TObject) => {
+    transitPlanApi({
+      transactionId,
+      transition,
+    });
 
-      const orderId = Listing(getState().OrderDetail.order).getId();
-
-      if (orderId) {
-        await dispatch(fetchOrder(orderId));
-      }
-    } catch (error) {
-      return rejectWithValue(error);
-    }
+    return { transactionId, transition, createdAt: new Date().toISOString() };
   },
 );
 
@@ -283,7 +277,35 @@ const OrderDetailSlice = createSlice({
         state.transitInProgress = true;
         state.transitError = null;
       })
-      .addCase(transit.fulfilled, (state) => {
+      .addCase(transit.fulfilled, (state, { payload }) => {
+        const { transactionId, transition, createdAt } = payload;
+        const currTxMap = current(state).transactionDataMap || {};
+        const updateEnTry = Object.entries(currTxMap).find(
+          ([_, txData]) => Transaction(txData).getId() === transactionId,
+        );
+
+        if (updateEnTry) {
+          const [date, txData] = updateEnTry;
+
+          const updateTxData = {
+            ...txData,
+            attributes: {
+              ...txData?.attributes,
+              transitions: (
+                (txData?.attributes?.transitions || []) as any[]
+              ).concat({
+                createdAt,
+                transition,
+                by: ETransactionRoles.operator,
+              }),
+              lastTransition: transition,
+              lastTransitionedAt: createdAt,
+            },
+          };
+
+          state.transactionDataMap = { ...currTxMap, [date]: updateTxData };
+        }
+
         state.transitInProgress = false;
       })
       .addCase(transit.rejected, (state, { error }) => {

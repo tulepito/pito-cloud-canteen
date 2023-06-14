@@ -12,6 +12,8 @@ import { OrderDetailThunks } from '@pages/admin/order/[orderId]/OrderDetail.slic
 import { Transaction } from '@src/utils/data';
 import {
   ETransition,
+  txIsCanceled,
+  txIsCompleted,
   txIsDelivering,
   txIsInitiated,
 } from '@src/utils/transaction';
@@ -49,12 +51,13 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({ tx }) => {
     confirmCancelController.setTrue();
   };
 
-  const handleConfirmCancel = () => {
-    transitTx(ETransition.OPERATOR_CANCEL_PLAN)();
-  };
-
   const handleCancelCancelingProcess = () => {
     confirmCancelController.setFalse();
+  };
+
+  const handleConfirmCancel = () => {
+    confirmCancelController.setFalse();
+    transitTx(ETransition.OPERATOR_CANCEL_PLAN)();
   };
 
   useEffect(() => {
@@ -67,6 +70,13 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({ tx }) => {
       deliveringController.setTrue();
     } else if (txIsDelivering(tx)) {
       deliveredController.setTrue();
+    } else if (txIsCompleted(tx)) {
+      deliveredController.setFalse();
+      deliveringController.setFalse();
+    } else if (txIsCanceled(tx)) {
+      deliveringController.setFalse();
+      deliveredController.setFalse();
+      canceledController.setFalse();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transitInProgress, JSON.stringify(tx)]);

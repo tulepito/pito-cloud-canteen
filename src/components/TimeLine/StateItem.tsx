@@ -54,7 +54,7 @@ const StateItem: React.FC<TStateItemProps> = ({
         <div className={css.date}>{date}</div>
       </div>
     ),
-    [],
+    [date, rootClasses, stateComponent],
   );
 
   return (
