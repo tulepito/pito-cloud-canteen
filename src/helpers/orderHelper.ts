@@ -146,9 +146,9 @@ export const orderDataCheckers = (order: TListing) => {
     isDeliveryAddressValid:
       !isEmpty(deliveryAddress?.address) && !isEmpty(deliveryAddress?.origin),
     isStartDateValid:
-      Number.isInteger(startDate) && minStartTimeStamp < (startDate || 0),
+      Number.isInteger(startDate) && minStartTimeStamp <= (startDate || 0),
     isEndDateValid:
-      Number.isInteger(endDate) && (endDate || 0) > (startDate || 0),
+      Number.isInteger(endDate) && (endDate || 0) >= (startDate || 0),
     isDeliveryHourValid: timeOptions.includes(deliveryHour),
     isDeadlineHourValid: isNormalOrder || timeOptions.includes(deadlineHour),
     isPackagePerMemberValid: Number.isInteger(packagePerMember),
