@@ -86,7 +86,6 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
 
   const orderData = Listing(order);
   const companyData = User(companyAccount!);
-  const { companyLocation } = companyData.getPublicData();
   const { title: orderCode } = orderData.getAttributes();
   const {
     deliveryAddress,
@@ -105,7 +104,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   } = orderData.getMetadata();
   const locationInitValues = {
     deliveryAddress: getInitialLocationValues(
-      companyLocation || deliveryAddress || {},
+      deliveryAddress?.address !== null ? deliveryAddress : {},
     ),
   };
   const isStartDateInValid = startDate < findMinStartDate().getTime();
