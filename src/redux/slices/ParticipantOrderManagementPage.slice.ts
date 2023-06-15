@@ -63,10 +63,15 @@ const reloadData = createAsyncThunk(
 
 const updateOrder = createAsyncThunk(
   UPDATE_ORDER,
-  async (data: { orderId: string; updateValues: TObject }, { dispatch }) => {
+  async (data: { orderId: string; updateValues: TObject }) => {
     const { orderId, updateValues } = data;
-    await updateParticipantOrderApi(orderId, updateValues);
-    await dispatch(reloadData(orderId));
+    const { data: response } = await updateParticipantOrderApi(
+      orderId,
+      updateValues,
+    );
+    const { plan } = response;
+
+    return plan;
   },
   {
     serializeError: storableError,
@@ -121,9 +126,10 @@ const participantOrderSlice = createSlice({
         updateOrderInProgress: true,
         updateOrderError: null,
       }))
-      .addCase(updateOrder.fulfilled, (state) => ({
+      .addCase(updateOrder.fulfilled, (state, { payload }) => ({
         ...state,
         updateOrderInProgress: false,
+        plans: [payload],
       }))
       .addCase(updateOrder.rejected, (state, { error }) => ({
         ...state,

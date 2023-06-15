@@ -13,6 +13,9 @@ const useSubOrderPicking = () => {
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const currentUserGetter = CurrentUser(currentUser!);
   const currentUserId = currentUserGetter.getId();
+  const updateOrderInProgress = useAppSelector(
+    (state) => state.ParticipantOrderManagementPage.updateOrderInProgress,
+  );
 
   const onRejectSelectDish = (params: any) => {
     const { orderId, orderDay, planId } = params;
@@ -39,6 +42,7 @@ const useSubOrderPicking = () => {
     selectedEvent,
     setSelectedEvent,
     onRejectSelectDish,
+    updateOrderInProgress,
   };
 };
 

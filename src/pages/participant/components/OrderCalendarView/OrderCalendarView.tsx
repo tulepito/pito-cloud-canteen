@@ -9,6 +9,7 @@ import { DateTime } from 'luxon';
 import Avatar from '@components/Avatar/Avatar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
+import LoadingModal from '@components/LoadingModal/LoadingModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { getItem } from '@helpers/localStorageHelpers';
 import { markColorForOrder } from '@helpers/orderHelper';
@@ -60,6 +61,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     selectedEvent,
     setSelectedEvent,
     onRejectSelectDish,
+    updateOrderInProgress,
   } = useSubOrderPicking();
 
   const { deadlineDate, deliveryHour, startDate, endDate } =
@@ -110,6 +112,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           id: `${planItemKey}`,
           subOrderId: planKey,
           orderId,
+          timestamp: +planItemKey,
           daySession: getDaySessionFromDeliveryTime(deliveryHour),
           status: pickFoodStatus,
           type: 'dailyMeal',
@@ -127,6 +130,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           dishSelection: { dishSelection: foodSelection?.foodId },
           orderColor,
           transactionId,
+          planId: currentPlanListing.getId(),
         },
         title: orderTile,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
@@ -226,6 +230,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         isOpen={successRatingModalControl.value}
         onClose={successRatingModalControl.setFalse}
       />
+      <LoadingModal isOpen={updateOrderInProgress} />
     </div>
   );
 };
