@@ -733,6 +733,7 @@
   "EditView.OrderTitle.cancelOrderButtonText": "Huỷ đơn",
   "EditView.OrderTitle.deliveryInfo": "Giao hàng {time} tại {place}",
   "EditView.OrderTitle.makeOrderButtonText": "Đặt đơn",
+  "EditView.OrderTitle.updateOrderButtonText": "Xác nhận",
   "EditView.OrderTitle.title": "Quản lý chọn món",
   "EditView.OrderTitle.updateOrderButtonText": "Cập nhật",
   "EmailVerification.resendEmail": "Không nhận được email? {resendEmailLink}",

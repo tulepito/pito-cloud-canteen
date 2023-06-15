@@ -40,7 +40,6 @@ const querySubOrderHistoryFromFirebase = async ({
       value: planOrderDate,
     },
   };
-
   const results = await queryCollectionData({
     collectionName: FIREBASE_SUB_ORDER_CHANGES_HISTORY_COLLECTION_NAME,
     queryParams,
