@@ -6,8 +6,8 @@ export const splitNameFormFullName = (fullName: string) => {
   }
 
   return {
-    firstName: fullName.slice(0, firstSpaceIndx),
-    lastName: fullName.slice(firstSpaceIndx + 1),
+    lastName: fullName.slice(0, firstSpaceIndx),
+    firstName: fullName.slice(firstSpaceIndx + 1),
   };
 };
 

@@ -24,6 +24,10 @@
       margin-top: 20px;
       background-color: $neutralGray4;
     }
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   .navigatorBtn {

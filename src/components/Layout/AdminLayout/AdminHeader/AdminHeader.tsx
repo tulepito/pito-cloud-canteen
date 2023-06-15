@@ -14,6 +14,7 @@ import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
 import { currentUserSelector } from '@redux/slices/user.slice';
+import { CurrentUser } from '@src/utils/data';
 
 import css from './AdminHeader.module.scss';
 
@@ -25,6 +26,10 @@ const AdminHeader: React.FC<TAdminHeaderProps> = () => {
   const currentUser = useAppSelector(currentUserSelector);
   const router = useRouter();
   const handleLogoutFn = useLogout();
+
+  const currentUserGetter = CurrentUser(currentUser);
+  const { lastName = '', firstName = '' } = currentUserGetter.getProfile();
+  const currentUserFullName = `${lastName} ${firstName}`;
 
   const onLogout = async () => {
     await handleLogoutFn();
@@ -47,9 +52,7 @@ const AdminHeader: React.FC<TAdminHeaderProps> = () => {
             <div className={css.avatar}>
               <Avatar disableProfileLink user={currentUser} />
             </div>
-            <p className={css.displayName}>
-              {currentUser?.attributes?.profile?.displayName}
-            </p>
+            <p className={css.displayName}>{currentUserFullName}</p>
             <IconArrow direction="down" />
           </ProfileMenuLabel>
           <ProfileMenuContent className={css.profileMenuContent}>

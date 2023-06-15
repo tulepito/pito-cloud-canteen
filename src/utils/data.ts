@@ -1,5 +1,6 @@
 import merge from 'lodash/merge';
 import reduce from 'lodash/reduce';
+import uniq from 'lodash/uniq';
 
 import { sanitizeEntity } from '@utils/sanitize';
 
@@ -683,7 +684,7 @@ export const IntegrationMenuListing = (
     satFoodIdList = [],
     sunFoodIdList = [],
   } = metadata;
-  const listFoodIds = [
+  const listFoodIds = uniq([
     ...monFoodIdList,
     ...tueFoodIdList,
     ...wedFoodIdList,
@@ -691,7 +692,7 @@ export const IntegrationMenuListing = (
     ...friFoodIdList,
     ...satFoodIdList,
     ...sunFoodIdList,
-  ];
+  ]);
 
   return {
     ...IntegrationListing(listing),

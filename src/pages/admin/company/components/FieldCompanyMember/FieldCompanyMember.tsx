@@ -21,7 +21,7 @@ const FieldCompanyMemberCheckbox: React.FC<TFieldCompanyMemberCheckbox> = (
 ) => {
   const { user, onRemoveItem, onremoveNotFoundUserByEmail, className } = props;
   const { email, profile } = user?.attributes || {};
-  const { displayName } = profile || {};
+  const { lastName = '', firstName = '' } = profile || {};
 
   const handleRemoveItem = () =>
     !user?.id?.uuid
@@ -36,7 +36,8 @@ const FieldCompanyMemberCheckbox: React.FC<TFieldCompanyMemberCheckbox> = (
             <Avatar user={user} />
           </div>
           <div className={css.userDetails}>
-            <h3 className={css.userDisplayName}>{displayName}</h3>
+            <h3
+              className={css.userDisplayName}>{`${lastName} ${firstName}`}</h3>
             <p className={css.userEmail}>{email}</p>
           </div>
         </>

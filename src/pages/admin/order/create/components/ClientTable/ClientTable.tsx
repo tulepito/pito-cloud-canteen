@@ -108,44 +108,53 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
           {showBookerList && (
             <div className={css.bookerList}>
               {bookerList.map((booker) => {
+                const bookerUser = User(booker);
+                const bookerId = bookerUser.getId();
+                const { lastName = '', firstName = '' } =
+                  bookerUser.getProfile();
+                const { email: bookerEmail } = bookerUser.getAttributes();
+                const { phoneNumber: bookerProtectedPhoneNumber } =
+                  bookerUser.getProtectedData();
+                const { phoneNumber: bookerPublicPhoneNumber } =
+                  bookerUser.getPublicData();
+                const bookerName = `${lastName} ${firstName}`;
+
                 const handleBookerClick = () => {
-                  form.change('booker', User(booker).getId());
-                  setSelectedBookerId(User(booker).getId());
+                  form.change('booker', bookerId);
+                  setSelectedBookerId(bookerId);
                   dispatch(addBooker(booker));
                 };
                 const bookerCardClasses = classNames(
                   css.bookerCard,
-                  selectedBookerId === User(booker).getId() && css.selected,
+                  selectedBookerId === bookerId && css.selected,
                 );
 
                 return (
                   <div
-                    key={User(booker).getId()}
+                    key={bookerId}
                     className={bookerCardClasses}
                     onClick={handleBookerClick}>
                     <div className={css.profile}>
                       <Avatar user={booker} disableProfileLink />
-                      <div className={css.name}>
-                        {User(booker).getProfile().displayName}
-                      </div>
+                      <div className={css.name}>{bookerName}</div>
                     </div>
                     <div className={css.contact}>
                       <div className={css.row}>
                         <IconPhone />
                         <div>
-                          {User(booker).getProtectedData().phoneNumber ||
-                            User(booker).getPublicData().phoneNumber}
+                          {bookerProtectedPhoneNumber ||
+                            bookerPublicPhoneNumber}
                         </div>
                       </div>
                       <div className={css.row}>
                         <IconMail />
-                        <div>{User(booker).getAttributes().email}</div>
+                        <div>{bookerEmail}</div>
                       </div>
                     </div>
                     <FieldRadioButton
-                      id={`booker-${User(booker).getId()}`}
+                      id={`booker-${bookerId}`}
                       name="booker"
-                      value={User(booker).getId()}
+                      value={bookerId}
                       rootClassName={css.bookerRadio}
                     />
                   </div>

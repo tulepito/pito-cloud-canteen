@@ -21,7 +21,7 @@ const FieldCompanyMemberCheckbox: React.FC<TFieldCompanyMemberCheckbox> = (
 ) => {
   const { member, className, name } = props;
   const { email, profile } = member?.attributes || {};
-  const { displayName } = profile || {};
+  const { lastName = '', firstName = '' } = profile || {};
 
   const profileSection = (
     <div className={css.profileWrapper}>
@@ -30,7 +30,7 @@ const FieldCompanyMemberCheckbox: React.FC<TFieldCompanyMemberCheckbox> = (
           <Avatar user={member} />
         </div>
         <div className={css.userDetails}>
-          <h3 className={css.userDisplayName}>{displayName}</h3>
+          <h3 className={css.userDisplayName}>{`${lastName} ${firstName}`}</h3>
           <p className={css.userEmail}>{email}</p>
         </div>
       </>
