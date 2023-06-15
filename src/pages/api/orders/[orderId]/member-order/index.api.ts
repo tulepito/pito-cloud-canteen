@@ -56,6 +56,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             },
           });
         }
+        await Promise.all(
+          normalizedOrderDetail.map(async (order, index) => {
+            const { params } = order;
+            const {
+              transactionId,
+              extendedData: { metadata },
+            } = params;
+
+            if (transactionId) {
+              await integrationSdk.transactions.updateMetadata({
+                id: transactionId,
+                metadata: {
+                  ...metadata,
+                  isLastTxOfPlan: index === normalizedOrderDetail.length - 1,
+                },
+              });
+            }
+          }),
+        );
 
         await Promise.all(
           normalizedOrderDetail.map(async (order, index) => {
