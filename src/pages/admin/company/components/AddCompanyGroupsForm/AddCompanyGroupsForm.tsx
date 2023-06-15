@@ -88,7 +88,7 @@ const AddCompanyGroupsFormComponent: React.FC<
         </Button>
       </div>
       <RenderWhen condition={!isEmpty(formError)}>
-        <ErrorMessage message={formError.message} />
+        <ErrorMessage message={formError?.message} />
       </RenderWhen>
     </Form>
   );
