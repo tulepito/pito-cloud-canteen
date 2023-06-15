@@ -1,4 +1,5 @@
 import { FormattedMessage } from 'react-intl';
+import last from 'lodash/last';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
@@ -20,7 +21,7 @@ const SignUpPage = () => {
   const dispatch = useAppDispatch();
 
   const currentUserLoaded = !!user.id;
-  const name = user?.attributes?.profile?.lastName;
+  const name = last(user?.attributes?.profile?.firstName.split(' ')) as string;
   const { email } = user.attributes;
   const showEmailVerification =
     currentUserLoaded && !user.attributes.emailVerified;
