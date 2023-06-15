@@ -37,7 +37,6 @@ exports.handler = async (_event) => {
       )[0];
 
       const companyUser = User(companyResponse);
-
       const bookerUser = User(bookerResponse);
 
       const emailDataSource = {
