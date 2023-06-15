@@ -96,13 +96,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               ]),
             },
           };
-          await integrationSdk.listings.update({
+          integrationSdk.listings.update({
             id: quotationId,
             metadata: {
               status: EQuotationStatus.INACTIVE,
             },
           });
-          await createQuotation({
+          createQuotation({
             orderId,
             companyId,
             client: newClient,
@@ -120,33 +120,32 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             },
           };
 
-          await integrationSdk.listings.update({
+          integrationSdk.listings.update({
             id: plans[0],
             metadata: {
               orderDetail: newOrderDetail,
             },
           });
-          await emailSendingFactory(
+          emailSendingFactory(
             EmailTemplateTypes.BOOKER.BOOKER_SUB_ORDER_CANCELED,
             {
               orderId,
               timestamp,
             },
           );
-          await Promise.all(
-            participantIds.map(async (participantId: string) => {
-              await emailSendingFactory(
-                EmailTemplateTypes.PARTICIPANT.PARTICIPANT_SUB_ORDER_CANCELED,
-                {
-                  orderId,
-                  timestamp,
-                  participantId,
-                },
-              );
-            }),
-          );
 
-          await emailSendingFactory(
+          participantIds.forEach((participantId: string) => {
+            emailSendingFactory(
+              EmailTemplateTypes.PARTICIPANT.PARTICIPANT_SUB_ORDER_CANCELED,
+              {
+                orderId,
+                timestamp,
+                participantId,
+              },
+            );
+          });
+
+          emailSendingFactory(
             EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
             {
               orderId,
