@@ -1,7 +1,10 @@
 import { useMemo } from 'react';
+import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
+import Form from '@components/Form/Form';
+import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
 import IconPlus from '@components/Icons/IconPlus/IconPlus';
@@ -34,26 +37,32 @@ export const LineItemsTableComponent: React.FC<
   const { lineItems = [], restaurant = {} } = data;
   const { maxQuantity = 100, minQuantity = 1 } = restaurant;
 
-  const totalQuantity = useMemo(
+  const { totalPrice, totalQuantity, formInitialValues } = useMemo(
     () =>
-      lineItems.reduce((result: number, lineItem: TObject) => {
-        result += lineItem?.quantity || 1;
+      lineItems.reduce(
+        (result: TObject, lineItem: TObject) => {
+          const { quantity = 1, price = 0 } = lineItem || {};
 
-        return result;
-      }, 0),
+          return {
+            ...result,
+            totalPrice: result.totalPrice + price,
+            totalQuantity: result.totalQuantity + quantity,
+            formInitialValues: {
+              ...result.formInitialValues,
+              [lineItem.id]: lineItem.quantity || 1,
+            },
+          };
+        },
+        { totalPrice: 0, totalQuantity: 0, formInitialValues: {} },
+      ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(lineItems)],
   );
-  const totalPrice = useMemo(
-    () =>
-      lineItems.reduce((result: number, lineItem: TObject) => {
-        result += lineItem?.price || 0;
 
-        return result;
-      }, 0),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(lineItems)],
-  );
+  // const { form } = useForm({
+  //   initialValues: formInitialValues,
+  //   onSubmit: () => {},
+  // });
 
   const shouldShowOverflowError = totalQuantity > maxQuantity;
   const shouldShowUnderError = totalQuantity < minQuantity;
@@ -62,8 +71,98 @@ export const LineItemsTableComponent: React.FC<
   const doNothing = () => {};
 
   const actionDisabled = inProgress;
-
   const formattedTotalPrice = `${parseThousandNumber(totalPrice)}đ`;
+
+  const bodyComponent = (
+    <>
+      {lineItems.map((lineItem: TObject) => {
+        const { id: foodId, quantity = 1, name, price, unitPrice } = lineItem;
+
+        const formattedFoodUnitPrice = `${parseThousandNumber(unitPrice)}đ`;
+        const formattedFoodPrice = `${parseThousandNumber(price)}đ`;
+
+        const handleChangeQuantity =
+          // eslint-disable-next-line @typescript-eslint/no-shadow
+          (foodId: string, quantity: number) => () => {
+            return actionDisabled
+              ? doNothing()
+              : onModifyQuantity(foodId, quantity)();
+          };
+
+        return (
+          <tr key={foodId}>
+            <td title={name}>
+              <div className={css.foodName}> {name}</div>
+            </td>
+            <td>
+              <div className={css.quantityContainer}>
+                <IconMinus
+                  className={classNames(css.iconMinus, {
+                    [css.disabled]: actionDisabled,
+                  })}
+                  onClick={handleChangeQuantity(foodId, quantity - 1)}
+                />
+                <FinalForm
+                  initialValues={formInitialValues}
+                  onSubmit={doNothing}
+                  render={({ values }) => {
+                    const handleBlurFoodQuantity = () => {
+                      if (Number(values[foodId] || 0) !== Number(quantity)) {
+                        if (actionDisabled) doNothing();
+                        else onModifyQuantity(foodId, Number(values[foodId]))();
+                      }
+                    };
+
+                    return (
+                      <Form className={css.foodQuantityForm}>
+                        <FieldTextInput
+                          name={foodId}
+                          id={`${foodId}.quantity`}
+                          type="number"
+                          className={css.quantityField}
+                          inputClassName={css.quantityInput}
+                          customOnBlur={handleBlurFoodQuantity}
+                        />
+                      </Form>
+                    );
+                  }}
+                />
+                <IconPlus
+                  onClick={
+                    actionDisabled
+                      ? doNothing
+                      : onModifyQuantity(foodId, quantity + 1)
+                  }
+                  className={classNames(css.iconPlus, {
+                    [css.disabled]: actionDisabled,
+                  })}
+                  shouldHideCover
+                />
+              </div>
+            </td>
+            <td title={formattedFoodUnitPrice}>{formattedFoodUnitPrice}</td>
+            <td>
+              <RenderWhen condition={Number(price) > 0}>
+                <>{formattedFoodPrice}</>
+              </RenderWhen>
+            </td>
+            <td>
+              <div className={css.actionCell}>
+                <IconDelete
+                  className={classNames(css.icon, {
+                    [css.disabled]: actionDisabled,
+                  })}
+                  onClick={
+                    actionDisabled ? doNothing : onModifyQuantity(foodId, 0)
+                  }
+                />
+              </div>
+            </td>
+          </tr>
+        );
+      })}
+    </>
+  );
 
   return (
     <table className={css.tableRoot}>
@@ -81,80 +180,7 @@ export const LineItemsTableComponent: React.FC<
           <td colSpan={5}>
             <div className={css.scrollContainer}>
               <table>
-                <tbody>
-                  {lineItems.map((lineItem: TObject) => {
-                    const {
-                      id: foodId,
-                      quantity = 1,
-                      name,
-                      price,
-                      unitPrice,
-                    } = lineItem;
-
-                    const formattedFoodUnitPrice = `${parseThousandNumber(
-                      unitPrice,
-                    )}đ`;
-                    const formattedFoodPrice = `${parseThousandNumber(price)}đ`;
-
-                    return (
-                      <tr key={foodId}>
-                        <td title={name}>
-                          <div className={css.foodName}> {name}</div>
-                        </td>
-                        <td>
-                          <div className={css.quantityContainer}>
-                            <IconMinus
-                              className={classNames(css.iconMinus, {
-                                [css.disabled]: actionDisabled,
-                              })}
-                              onClick={
-                                actionDisabled
-                                  ? doNothing
-                                  : onModifyQuantity(foodId, quantity - 1)
-                              }
-                            />
-                            <div title={quantity} className={css.quantityValue}>
-                              {quantity}
-                            </div>
-                            <IconPlus
-                              onClick={
-                                actionDisabled
-                                  ? doNothing
-                                  : onModifyQuantity(foodId, quantity + 1)
-                              }
-                              className={classNames(css.iconPlus, {
-                                [css.disabled]: actionDisabled,
-                              })}
-                              shouldHideCover
-                            />
-                          </div>
-                        </td>
-                        <td title={formattedFoodUnitPrice}>
-                          {formattedFoodUnitPrice}
-                        </td>
-                        <td>
-                          <RenderWhen condition={Number(price) > 0}>
-                            <>{formattedFoodPrice}</>
-                          </RenderWhen>
-                        </td>
-                        <td>
-                          <div className={css.actionCell}>
-                            <IconDelete
-                              className={classNames(css.icon, {
-                                [css.disabled]: actionDisabled,
-                              })}
-                              onClick={
-                                actionDisabled
-                                  ? doNothing
-                                  : onModifyQuantity(foodId, 0)
-                              }
-                            />
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
+                <tbody>{bodyComponent}</tbody>
               </table>
             </div>
           </td>

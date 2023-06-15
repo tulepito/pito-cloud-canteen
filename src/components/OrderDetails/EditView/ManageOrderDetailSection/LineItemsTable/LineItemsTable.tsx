@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
@@ -19,8 +19,6 @@ import { LineItemsTableComponent } from './LineItemsTableComponent';
 
 import css from './LineItemsTable.module.scss';
 
-const NOTE_DEBOUNCE_TIME = 300;
-
 type TLineItemsTableProps = {
   currentViewDate: number;
 };
@@ -28,7 +26,7 @@ type TLineItemsTableProps = {
 const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
   const { currentViewDate } = props;
   const intl = useIntl();
-  const noteDebounceRef = useRef<ReturnType<typeof setTimeout>>();
+
   const dispatch = useAppDispatch();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const { planData } = useAppSelector((state) => state.OrderManagement);
@@ -50,8 +48,6 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
   const foodField = useField(`food`, form);
   const noteField = useField(`note`, form);
 
-  let currNoteDebounceRef = noteDebounceRef.current;
-
   const noteInput = {
     ...noteField.input,
     onBlur: () => {
@@ -62,10 +58,6 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
         return;
       }
 
-      if (currNoteDebounceRef) {
-        clearTimeout(currNoteDebounceRef);
-      }
-
       const updateOrderDetail = {
         ...orderDetail,
         [currentViewDate]: {
@@ -74,15 +66,13 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
         },
       };
 
-      currNoteDebounceRef = setTimeout(() => {
-        dispatch(
-          orderManagementThunks.updatePlanOrderDetail({
-            orderId,
-            planId,
-            orderDetail: updateOrderDetail,
-          }),
-        );
-      }, NOTE_DEBOUNCE_TIME);
+      dispatch(
+        orderManagementThunks.updatePlanOrderDetail({
+          orderId,
+          planId,
+          orderDetail: updateOrderDetail,
+        }),
+      );
     },
   };
 
@@ -104,7 +94,9 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(foodList), JSON.stringify(lineItems)]);
 
-  const disabledAddLineItem = inProgress || isEmpty(foodOptions);
+  const disabledSelectFood = inProgress || isEmpty(foodOptions);
+  const disabledAddLineItem =
+    inProgress || isEmpty(foodOptions) || isEmpty(foodField.input.value);
 
   const handleModifyQuantity =
     (foodId: string, quantity: number = 1) =>
@@ -165,7 +157,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
   };
 
   useEffect(() => {
-    return () => form.reset();
+    form.reset();
   }, [currentViewDate]);
 
   return (
@@ -185,7 +177,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
               id={`food`}
               name={`food`}
               className={css.fieldSelect}
-              disabled={disabledAddLineItem}
+              disabled={disabledSelectFood}
               meta={foodField.meta}
               input={foodField.input}>
               <option disabled value="">
