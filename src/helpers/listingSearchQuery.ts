@@ -6,7 +6,11 @@ import { deliveryDaySessionAdapter } from '@helpers/orderHelper';
 import { ListingTypes } from '@src/types/listingTypes';
 import { Listing, User } from '@utils/data';
 import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
-import { EImageVariants, ERestaurantListingStatus } from '@utils/enums';
+import {
+  EImageVariants,
+  EOrderStates,
+  ERestaurantListingStatus,
+} from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
 
 export type TMenuQueryParams = {
@@ -193,6 +197,7 @@ export const getParticipantOrdersQuery = ({ userId }: { userId: string }) => {
   const query = {
     meta_listingType: ListingTypes.ORDER,
     meta_participants: `has_any:${userId}`,
+    meta_orderState: Object.values(EOrderStates).join(','),
   };
 
   return query;
