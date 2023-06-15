@@ -18,16 +18,19 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
   event,
   isFirstHighlight,
 }) => {
-  const deliAddress = event.resource?.deliveryAddress || '';
+  const {
+    deliveryAddress,
+    expiredTime,
+    isOrderStarted = false,
+    restaurant: restaurantObj,
+  } = event.resource || {};
 
-  const restaurantObj = event.resource?.restaurant || {};
-  const expiredTime = event.resource?.expiredTime;
-  const isExpired = isOver(expiredTime);
+  const shouldShowCountDown = isOver(expiredTime) || isOrderStarted;
   const remainTime = calculateRemainTime(new Date(expiredTime).getTime());
 
   return (
     <>
-      {!isExpired && (
+      {!shouldShowCountDown && (
         <OrderEventCardContentItem
           icon={<IconClockWithExclamation />}
           isHighlight={isFirstHighlight}>
@@ -38,7 +41,7 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
         <FormattedMessage
           id="EventCard.deliveryAddress"
           values={{
-            address: deliAddress.address,
+            address: deliveryAddress?.address,
           }}
         />
       </OrderEventCardContentItem>

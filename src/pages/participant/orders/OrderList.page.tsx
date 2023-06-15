@@ -21,7 +21,7 @@ import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import { CurrentUser, Listing } from '@src/utils/data';
 import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
-import { EParticipantOrderStatus } from '@src/utils/enums';
+import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
 
 import ParticipantToolbar from '../components/ParticipantToolbar/ParticipantToolbar';
@@ -109,7 +109,11 @@ const OrderListPage = () => {
     const orderId = mappingSubOrderToOrder[planKey];
     const order = orders?.find((_order) => Listing(_order).getId() === orderId);
     const orderListing = Listing(order);
-    const { deliveryHour, deadlineDate } = orderListing.getMetadata();
+    const {
+      deliveryHour,
+      deadlineDate,
+      orderStateHistory = [],
+    } = orderListing.getMetadata();
     const { title: orderTitle } = orderListing.getAttributes();
 
     const listEvent: Event[] = [];
@@ -159,6 +163,10 @@ const OrderListPage = () => {
             dishes,
           },
           deadlineDate,
+          isOrderStarted:
+            orderStateHistory.findIndex(
+              (history: TObject) => history.state === EOrderStates.inProgress,
+            ) !== -1,
           orderColor: colorOrderMap[orderId],
           expiredTime: expiredTime.toMillis(),
           deliveryHour,

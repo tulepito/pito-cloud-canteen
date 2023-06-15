@@ -46,6 +46,7 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
     dishSelection,
     orderColor,
     transactionId,
+    isOrderStarted = false,
   } = event?.resource || {};
 
   const { address } = deliveryAddress;
@@ -63,9 +64,11 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
   )?.value;
 
   const shouldShowRejectButton =
+    !isOrderStarted &&
     ![EVENT_STATUS.EXPIRED_STATUS, EVENT_STATUS.NOT_JOINED_STATUS].includes(
       status,
-    ) && !isExpired;
+    ) &&
+    !isExpired;
 
   const subOrderTxs = useAppSelector(
     (state) => state.ParticipantOrderList.subOrderTxs,
@@ -125,7 +128,7 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
           </div>
         </RenderWhen>
         <div className={css.orderInfo}>
-          <RenderWhen condition={!isExpired}>
+          <RenderWhen condition={!isExpired && !isOrderStarted}>
             <div className={css.row}>
               <div className={css.orderDeadline}>
                 <IconDeadline />

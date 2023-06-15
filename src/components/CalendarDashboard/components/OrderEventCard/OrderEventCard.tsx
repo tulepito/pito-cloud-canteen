@@ -21,10 +21,13 @@ export type TOrderEventCardProps = {
 
 const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
   const { isMobileLayout } = useViewport();
-  const status = event.resource?.status;
+  const { status, expiredTime, isOrderStarted = false } = event.resource || {};
+
   const isFoodPicked = !!event.resource?.dishSelection?.dishSelection;
-  const isExpired = isOver(event.resource?.expiredTime);
-  const isExpiredAndNotPickedFood = isExpired && !isFoodPicked;
+  const isExpired = isOver(expiredTime);
+  const isExpiredAndNotPickedFood =
+    !isFoodPicked && (isExpired || isOrderStarted);
+
   const eventStatus = isExpiredAndNotPickedFood
     ? EVENT_STATUS.EXPIRED_STATUS
     : status;
