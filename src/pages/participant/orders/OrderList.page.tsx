@@ -273,7 +273,7 @@ const OrderListPage = () => {
         subOrderDetailModalControl.setTrue();
       }
     }
-  }, [planIdFromQuery, timestampFromQuery]);
+  }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
 
   return (
     <ParticipantLayout>
