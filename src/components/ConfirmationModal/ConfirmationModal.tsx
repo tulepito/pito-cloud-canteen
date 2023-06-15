@@ -4,7 +4,6 @@ import Button from '@components/Button/Button';
 import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import PopupModal from '@components/PopupModal/PopupModal';
-import RenderWhen from '@components/RenderWhen/RenderWhen';
 
 import css from './ConfirmationModal.module.scss';
 
@@ -41,11 +40,11 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = (props) => {
   const [secondToClose, setSecondToClose] = useState<number>(
     secondForAutoClose!,
   );
-  const intevalRef = useRef<any>(null);
+  const intervalRef = useRef<any>(null);
 
   useEffect(() => {
     if (secondForAutoClose && isOpen) {
-      intevalRef.current = setInterval(() => {
+      intervalRef.current = setInterval(() => {
         setSecondToClose((prev) => prev - 1);
       }, 1000);
     }
@@ -54,7 +53,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = (props) => {
     }
 
     return () => {
-      clearInterval(intevalRef.current);
+      clearInterval(intervalRef.current);
     };
   }, [onClose, secondForAutoClose, secondToClose, isOpen]);
 
@@ -78,11 +77,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = (props) => {
         <div className={css.modalContainer}>
           <div className={css.modalContent}>
             <p>{description}</p>
-            <RenderWhen condition={!!secondForAutoClose}>
-              <p className={css.timeToClose}>
-                Đóng lại trong {secondToClose} giây
-              </p>
-            </RenderWhen>
             {hasError && <p className={css.error}>{hasError}</p>}
           </div>
           <div className={css.modalFooter}>
