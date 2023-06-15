@@ -31,7 +31,8 @@ const EmailVerificationFormComponent: React.FC<
   const { email, emailVerified, pendingEmail, profile } =
     currentUser.attributes;
   const emailToVerify = <strong>{pendingEmail || email}</strong>;
-  const name = last(profile.firstName.split(' ')) as string;
+  const name =
+    profile?.firstName && (last(profile.firstName.split(' ')) as string);
 
   const errorMessage = (
     <div className={css.error}>

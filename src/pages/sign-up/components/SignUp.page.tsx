@@ -21,7 +21,9 @@ const SignUpPage = () => {
   const dispatch = useAppDispatch();
 
   const currentUserLoaded = !!user.id;
-  const name = last(user?.attributes?.profile?.firstName.split(' ')) as string;
+  const name =
+    user?.attributes?.profile?.firstName &&
+    (last(user?.attributes?.profile?.firstName.split(' ')) as string);
   const { email } = user.attributes;
   const showEmailVerification =
     currentUserLoaded && !user.attributes.emailVerified;
