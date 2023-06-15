@@ -733,6 +733,7 @@
   "EditView.OrderTitle.cancelOrderButtonText": "Huỷ đơn",
   "EditView.OrderTitle.deliveryInfo": "Giao hàng {time} tại {place}",
   "EditView.OrderTitle.makeOrderButtonText": "Đặt đơn",
+  "EditView.OrderTitle.updateOrderButtonText": "Xác nhận",
   "EditView.OrderTitle.title": "Quản lý chọn món",
   "EditView.OrderTitle.updateOrderButtonText": "Cập nhật",
   "EmailVerification.resendEmail": "Không nhận được email? {resendEmailLink}",
@@ -1624,5 +1625,12 @@
   "UserPermission.accountant": "Kế toán viên",
   "UserPermission.booker": "Booker",
   "UserPermission.owner": "Quản trị viên",
-  "UserPermission.participant": "Thành viên"
+  "UserPermission.participant": "Thành viên",
+  "SubOrderChangesHistorySection.title": "Hoạt động chỉnh sửa",
+  "SubOrderChangesHistoryItem.memberFoodAdded": "Thêm thành viên",
+  "SubOrderChangesHistoryItem.memberFoodChanged": "Chỉnh sửa món",
+  "SubOrderChangesHistoryItem.memberFoodRemoved": "Xóa thành viên",
+  "SubOrderChangesHistoryItem.memberFoodAddedContent": "Thêm món {foodName} cho thành viên {email}",
+  "SubOrderChangesHistoryItem.memberFoodChangedContent": "Đổi món {oldFoodName} thành {newFoodName} của {email}",
+  "SubOrderChangesHistoryItem.memberFoodRemovedContent": "Xóa {email} từ {from}"
 }
