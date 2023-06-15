@@ -22,6 +22,7 @@ const OrderDetailPage = () => {
     (state) => state.OrderDetail.order,
     shallowEqual,
   );
+
   const orderDetail = useAppSelector(
     (state) => state.OrderDetail.orderDetail,
     shallowEqual,

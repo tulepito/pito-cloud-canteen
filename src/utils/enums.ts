@@ -964,3 +964,9 @@ export enum ESubOrderTxStatus {
 export enum ESubOrderStatus {
   CANCELED = 'canceled',
 }
+
+export enum EOrderHistoryTypes {
+  MEMBER_FOOD_CHANGED = 'MEMBER_FOOD_CHANGED',
+  MEMBER_FOOD_REMOVED = 'MEMBER_FOOD_REMOVED',
+  MEMBER_FOOD_ADDED = 'MEMBER_FOOD_ADDED',
+}

@@ -20,7 +20,7 @@ type ManageParticipantsModalProps = {
     participantData: Array<TUser>;
     planData: TObject;
   };
-
+  ableToUpdateOrder: boolean;
   onSubmitAddParticipant: (values: TAddParticipantFormValues) => void;
 };
 
@@ -34,6 +34,7 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
     onSubmitAddParticipant,
     handleClickDeleteParticipant,
     data,
+    ableToUpdateOrder,
   } = props;
 
   const { participants = [] } = data;
@@ -74,6 +75,7 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
         id="ManageParticipantsModal.AddParticipantForm"
         onSubmit={onSubmitAddParticipant}
         hasSubmitButton
+        ableToUpdateOrder={ableToUpdateOrder}
       />
       <div className={css.participantsContainer}>
         <RawParticipants

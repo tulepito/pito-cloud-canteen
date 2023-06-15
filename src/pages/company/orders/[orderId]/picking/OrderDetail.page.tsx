@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
@@ -10,6 +10,7 @@ import ManageParticipantsSection from '@components/OrderDetails/EditView/ManageP
 import OrderDeadlineCountdownSection from '@components/OrderDetails/EditView/OrderDeadlineCountdownSection/OrderDeadlineCountdownSection';
 import OrderLinkSection from '@components/OrderDetails/EditView/OrderLinkSection/OrderLinkSection';
 import OrderTitle from '@components/OrderDetails/EditView/OrderTitle/OrderTitle';
+import SubOrderChangesHistorySection from '@components/OrderDetails/EditView/SubOrderChangesHistorySection/SubOrderChangesHistorySection';
 import PriceQuotation from '@components/OrderDetails/PriceQuotation/PriceQuotation';
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
@@ -18,6 +19,7 @@ import useBoolean from '@hooks/useBoolean';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { companyPaths } from '@src/paths';
+import { diffDays } from '@src/utils/dates';
 import { Listing } from '@utils/data';
 import { EOrderDraftStates, EOrderStates } from '@utils/enums';
 import type { TListing } from '@utils/types';
@@ -32,7 +34,18 @@ enum EPageViewMode {
   priceQuotation = 'priceQuotation',
 }
 
-const BookerAccessibleOrderStates = [EOrderStates.picking];
+const BookerAccessibleOrderStates = [
+  EOrderStates.picking,
+  EOrderStates.inProgress,
+];
+
+const ViewByOrderStates = {
+  [EOrderStates.picking]: EPageViewMode.edit,
+  [EOrderStates.inProgress]: EPageViewMode.edit,
+};
+
+const ONE_DAY = 1;
+const NOW = new Date().getTime();
 
 const OrderDetailPage = () => {
   const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
@@ -40,6 +53,10 @@ const OrderDetailPage = () => {
   const router = useRouter();
   const confirmCancelOrderActions = useBoolean(false);
   const dispatch = useAppDispatch();
+  const { timestamp } = router.query;
+  const [currentViewDate, setCurrentViewDate] = useState<number>(
+    Number(timestamp),
+  );
 
   const {
     query: { orderId },
@@ -51,18 +68,67 @@ const OrderDetailPage = () => {
   );
   const { orderData } = useAppSelector((state) => state.OrderManagement);
   const {
+    subOrderChangesHistory,
+    lastRecordSubOrderChangesHistoryCreatedAt,
+    querySubOrderChangesHistoryInProgress,
+    subOrderChangesHistoryTotalItems,
+    loadMoreSubOrderChangesHistory,
+  } = useAppSelector((state) => state.OrderManagement);
+
+  const {
     orderTitle,
     editViewData,
     reviewViewData,
     priceQuotationData,
     setReviewInfoValues,
   } = usePrepareOrderDetailPageData();
+
+  const planData = useAppSelector((state) => state.OrderManagement.planData);
+
+  const plan = Listing(planData as TListing);
+
+  const planId = plan.getId();
+
+  const onQuerySubOrderHistoryChanges = useCallback(
+    (lastRecordCreatedAt?: number) => {
+      if (
+        !planId ||
+        !orderId ||
+        !currentViewDate ||
+        !!querySubOrderChangesHistoryInProgress ||
+        !!loadMoreSubOrderChangesHistory
+      )
+        return;
+      dispatch(
+        orderManagementThunks.querySubOrderChangesHistory({
+          orderId: orderId as string,
+          planId,
+          planOrderDate: currentViewDate,
+          lastRecordCreatedAt,
+        }),
+      );
+    },
+    [planId, orderId, currentViewDate],
+  );
+
+  const onQueryMoreSubOrderChangesHistory = () => {
+    if (lastRecordSubOrderChangesHistoryCreatedAt)
+      return onQuerySubOrderHistoryChanges(
+        lastRecordSubOrderChangesHistoryCreatedAt,
+      );
+  };
+
+  useEffect(() => {
+    onQuerySubOrderHistoryChanges();
+  }, [onQuerySubOrderHistoryChanges]);
+
   const handleDownloadPriceQuotation = useDownloadPriceQuotation(
     orderTitle,
     priceQuotationData,
   );
-
   const { orderState } = Listing(orderData as TListing).getMetadata();
+
+  const isPicking = orderState === EOrderStates.picking;
 
   const handleConfirmOrder = () => {
     setViewMode(EPageViewMode.review);
@@ -89,6 +155,16 @@ const OrderDetailPage = () => {
     confirmCancelOrderActions.setFalse();
   };
 
+  const confirmButtonMessage = isPicking
+    ? intl.formatMessage({
+        id: 'EditView.OrderTitle.makeOrderButtonText',
+      })
+    : intl.formatMessage({
+        id: 'EditView.OrderTitle.updateOrderButtonText',
+      });
+
+  const ableToUpdateOrder = diffDays(NOW, currentViewDate) > ONE_DAY;
+
   const EditViewComponent = (
     <div className={css.editViewRoot}>
       <OrderTitle
@@ -96,23 +172,44 @@ const OrderDetailPage = () => {
         data={editViewData.titleSectionData}
         onConfirmOrder={handleConfirmOrder}
         onCancelOrder={confirmCancelOrderActions.setTrue}
+        confirmButtonMessage={confirmButtonMessage}
+        cancelButtonMessage={intl.formatMessage({
+          id: 'EditView.OrderTitle.cancelOrderButtonText',
+        })}
       />
 
       <div className={css.leftPart}>
-        <ManageOrdersSection data={editViewData.manageOrdersData} />
+        <ManageOrdersSection
+          ableToUpdateOrder={ableToUpdateOrder}
+          setCurrentViewDate={(date) => setCurrentViewDate(date)}
+          currentViewDate={currentViewDate}
+        />
       </div>
       <div className={css.rightPart}>
         <OrderDeadlineCountdownSection
           className={css.container}
           data={editViewData.countdownSectionData}
+          ableToUpdateOrder={ableToUpdateOrder}
         />
         <OrderLinkSection
           className={css.container}
           data={editViewData.linkSectionData}
+          ableToUpdateOrder={ableToUpdateOrder}
         />
         <ManageParticipantsSection
           className={css.container}
           data={editViewData.manageParticipantData}
+          ableToUpdateOrder={ableToUpdateOrder}
+        />
+        <SubOrderChangesHistorySection
+          className={css.container}
+          querySubOrderChangesHistoryInProgress={
+            querySubOrderChangesHistoryInProgress
+          }
+          subOrderChangesHistory={subOrderChangesHistory}
+          onQueryMoreSubOrderChangesHistory={onQueryMoreSubOrderChangesHistory}
+          subOrderChangesHistoryTotalItems={subOrderChangesHistoryTotalItems}
+          loadMoreSubOrderChangesHistory={loadMoreSubOrderChangesHistory}
         />
       </div>
 
@@ -162,9 +259,7 @@ const OrderDetailPage = () => {
   useEffect(() => {
     if (!isEmpty(orderState)) {
       setViewMode(
-        orderState === EOrderStates.picking
-          ? EPageViewMode.edit
-          : EPageViewMode.review,
+        ViewByOrderStates[orderState as keyof typeof ViewByOrderStates],
       );
     }
   }, [orderState]);
@@ -187,17 +282,12 @@ const OrderDetailPage = () => {
       switch (orderState) {
         case EOrderDraftStates.pendingApproval:
         case EOrderStates.picking:
+        case EOrderStates.inProgress:
           break;
         case EOrderDraftStates.draft:
           router.push(companyPaths.ManageOrders);
           break;
         default:
-          if (orderId) {
-            router.push({
-              pathname: companyPaths.ManageOrderDetail,
-              query: { orderId },
-            });
-          }
           break;
       }
     }

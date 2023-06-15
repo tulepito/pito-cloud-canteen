@@ -23,7 +23,7 @@ export const usePrepareOrderDetailTableData = (
   const { packagePerMember = 0 } = Listing(orderData as TListing).getMetadata();
   const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
   const { restaurant = {}, memberOrders = {} } =
-    orderDetail[currentViewDate.toString()] || {};
+    orderDetail[currentViewDate?.toString()] || {};
   const { foodList = {} } = restaurant;
 
   const tableHeads = useMemo(

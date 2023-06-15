@@ -41,10 +41,11 @@ type TOrderDetailsTableProps = {
     foodId: string;
     foodName: string;
   }[];
+  ableToUpdateOrder: boolean;
 };
 
 const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
-  const { currentViewDate, foodOptions } = props;
+  const { currentViewDate, foodOptions, ableToUpdateOrder } = props;
   const {
     query: { tab: tabId },
   } = useRouter();
@@ -143,6 +144,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
     handleClickDeleteOrderItem,
     handleRestoreMembers,
     handleDeletePermanentlyMembers,
+    ableToUpdateOrder,
   });
 
   const handleTabChange = ({ id }: TTabsItem) => {

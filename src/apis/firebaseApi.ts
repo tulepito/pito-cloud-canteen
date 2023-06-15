@@ -1,3 +1,5 @@
+import type { TSubOrderChangeHistoryItem } from '@src/utils/types';
+
 import { getApi, postApi, putApi } from './configs';
 
 export type ParticipantSubOrderAddDocumentApiBody = {
@@ -37,3 +39,20 @@ export const participantSubOrderUpdateDocumentApi = async (
 
 export const participantSubOrderGetByIdApi = async (subOrderId: string) =>
   getApi(`/participants/document/${subOrderId}`);
+
+export const createOrderChangesHistoryDocumentApi = async (
+  orderId: string,
+  { planId, ...rest }: TSubOrderChangeHistoryItem,
+) => postApi(`/orders/${orderId}/plan/${planId}/history`, rest);
+
+export const queryOrderChangesHistoryDocumentApi = async (
+  orderId: string,
+  planId: string,
+  {
+    planOrderDate,
+    lastRecordCreatedAt,
+  }: { planOrderDate: number; lastRecordCreatedAt?: number },
+) =>
+  getApi(
+    `/orders/${orderId}/plan/${planId}/history/?planOrderDate=${planOrderDate}&lastRecordCreatedAt=${lastRecordCreatedAt}`,
+  );
