@@ -1,0 +1,39 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.listItem {
+  @include flexAlign(flex-start);
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+  margin-bottom: 20px;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.moreButton {
+  font-weight: $fontWeightBold;
+  color: $neutralGray6;
+  min-height: unset;
+}
+
+.loading {
+  min-height: 250px;
+}
+
+.item {
+  .itemTitle {
+    font-weight: $fontWeightBold;
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  .itemContent {
+    font-size: 12px;
+    color: $neutralGray5;
+    .boldText {
+      font-weight: $fontWeightBold;
+      color: $neutralGray6;
+    }
+  }
+}

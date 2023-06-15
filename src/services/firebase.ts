@@ -3,6 +3,7 @@ import {
   addDoc,
   collection,
   doc,
+  getCountFromServer,
   getDoc,
   getDocs,
   getFirestore,
@@ -54,6 +55,7 @@ const queryCollectionData = async ({
 }) => {
   const ref = collection(firestore, collectionName);
   let q;
+
   const queryFuncs = Object.keys(queryParams).map((key) =>
     where(key, queryParams[key].operator, queryParams[key].value),
   );
@@ -122,8 +124,26 @@ const getDocumentById = async (documentId: string, collectionName: string) => {
   return null;
 };
 
+const getCollectionCount = async ({
+  collectionName,
+  queryParams,
+}: {
+  collectionName: string;
+  queryParams: TObject;
+}) => {
+  const ref = collection(firestore, collectionName);
+  const queryFuncs = Object.keys(queryParams).map((key) =>
+    where(key, queryParams[key].operator, queryParams[key].value),
+  );
+  const q = query(ref, ...queryFuncs, orderBy('createdAt', 'desc'));
+  const count = await getCountFromServer(q);
+
+  return count.data().count;
+};
+
 export {
   addCollectionDoc,
+  getCollectionCount,
   getCollectionData,
   getDocumentById,
   queryCollectionData,

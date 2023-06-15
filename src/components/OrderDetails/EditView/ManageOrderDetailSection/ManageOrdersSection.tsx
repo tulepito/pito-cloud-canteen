@@ -1,9 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TTabsItem } from '@components/Tabs/Tabs';
@@ -25,26 +24,19 @@ import OrderDetailsTable from './OrderDetailsTable/OrderDetailsTable';
 import css from './ManageOrdersSection.module.scss';
 
 type TManageOrdersSectionProps = {
-  data: {
-    startDate: number;
-    endDate: number;
-  };
+  ableToUpdateOrder: boolean;
+  currentViewDate: number;
+  setCurrentViewDate: Dispatch<SetStateAction<number>>;
 };
 
 const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
-  const {
-    data: { startDate },
-  } = props;
+  const { ableToUpdateOrder, currentViewDate, setCurrentViewDate } = props;
 
   const dispatch = useAppDispatch();
-  const {
-    query: { timestamp },
-  } = useRouter();
+
   const intl = useIntl();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const [currentViewDate, setCurrentViewDate] = useState(
-    timestamp ? Number(timestamp) : startDate,
-  );
+
   const {
     dateList = [],
     memberOptions,
@@ -83,6 +75,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
             <OrderDetailsTable
               currentViewDate={currentViewDate}
               foodOptions={foodOptions}
+              ableToUpdateOrder={ableToUpdateOrder}
             />
           </div>
           <div className={css.addOrder}>
@@ -94,6 +87,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
                 onSubmit={handleSubmitAddSelection}
                 foodOptions={foodOptions}
                 memberOptions={memberOptions}
+                ableToUpdateOrder={ableToUpdateOrder}
               />
             </div>
           </div>

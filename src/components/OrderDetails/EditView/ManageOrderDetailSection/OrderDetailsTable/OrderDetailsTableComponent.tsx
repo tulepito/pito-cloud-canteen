@@ -41,6 +41,7 @@ type TOrderDetailsTableComponentProps = {
   onClickDeleteOrderItem: (id: string) => () => void;
   onRestoreMembers: (memberIds: string[]) => void;
   onDeletePermanentlyMembers: (memberIds: string[]) => void;
+  ableToUpdateOrder: boolean;
 };
 
 export const OrderDetailsTableComponent: React.FC<
@@ -54,6 +55,7 @@ export const OrderDetailsTableComponent: React.FC<
   onClickDeleteOrderItem,
   onRestoreMembers,
   onDeletePermanentlyMembers,
+  ableToUpdateOrder,
 }) => {
   const intl = useIntl();
   const [isManageDeletedModalOpen, setIsManageDeletedModalOpen] =
@@ -87,6 +89,7 @@ export const OrderDetailsTableComponent: React.FC<
         deletedTabData={deletedTabData}
         onRestoreMembers={onRestoreMembers}
         onDeletePermanentlyMembers={onDeletePermanentlyMembers}
+        disabled={!ableToUpdateOrder}
       />
       <table className={css.tableRoot}>
         <thead>

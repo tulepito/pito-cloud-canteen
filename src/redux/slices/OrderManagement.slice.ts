@@ -5,9 +5,11 @@ import omit from 'lodash/omit';
 
 import { EHttpStatusCode } from '@apis/errors';
 import {
+  createOrderChangesHistoryDocumentApi,
   participantSubOrderAddDocumentApi,
   participantSubOrderGetByIdApi,
   participantSubOrderUpdateDocumentApi,
+  queryOrderChangesHistoryDocumentApi,
 } from '@apis/firebaseApi';
 import {
   addParticipantToOrderApi,
@@ -26,15 +28,18 @@ import { checkUserExistedApi } from '@apis/userApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { Listing, User } from '@utils/data';
-import { EParticipantOrderStatus } from '@utils/enums';
+import { EOrderHistoryTypes, EParticipantOrderStatus } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type {
   TCompany,
   TListing,
   TObject,
+  TSubOrderChangeHistoryItem,
   TTransaction,
   TUser,
 } from '@utils/types';
+
+export const QUERY_SUB_ORDER_CHANGES_HISTORY_PER_PAGE = 3;
 
 // ================ Initial states ================ //
 type TOrderManagementState = {
@@ -69,6 +74,13 @@ type TOrderManagementState = {
   transactionDataMap: {
     [date: number]: TTransaction;
   };
+
+  subOrderChangesHistory: TSubOrderChangeHistoryItem[];
+  querySubOrderChangesHistoryInProgress: boolean;
+  loadMoreSubOrderChangesHistory: boolean;
+  querySubOrderChangesHistoryError: any;
+  lastRecordSubOrderChangesHistoryCreatedAt: number | null;
+  subOrderChangesHistoryTotalItems: number;
 };
 
 const initialState: TOrderManagementState = {
@@ -92,6 +104,12 @@ const initialState: TOrderManagementState = {
   participantData: [],
   anonymousParticipantData: [],
   transactionDataMap: {},
+  subOrderChangesHistory: [],
+  querySubOrderChangesHistoryInProgress: false,
+  querySubOrderChangesHistoryError: null,
+  lastRecordSubOrderChangesHistoryCreatedAt: null,
+  subOrderChangesHistoryTotalItems: 0,
+  loadMoreSubOrderChangesHistory: false,
 };
 
 // ================ Thunk types ================ //
@@ -274,8 +292,39 @@ const addOrUpdateMemberOrder = createAsyncThunk(
         : {}),
     };
 
+    const { foodList = {} } =
+      updateParams.orderDetail[currentViewDate]?.restaurant || {};
+
+    const { foodName: oldFoodName, foodPrice: oldFoodPrice } =
+      foodList[oldFoodId] || {};
+
+    const { foodName: newFooldName, foodPrice: newFoodPrice } =
+      foodList[foodId] || {};
+
     await addUpdateMemberOrder(orderId, updateParams);
-    const subOrderId = `${participantId} - ${planId} - ${currentViewDate}`;
+
+    await createOrderChangesHistoryDocumentApi(orderId, {
+      planId,
+      memberId,
+      planOrderDate: currentViewDate,
+      type: oldFoodId
+        ? EOrderHistoryTypes.MEMBER_FOOD_CHANGED
+        : EOrderHistoryTypes.MEMBER_FOOD_ADDED,
+      oldValue: oldFoodId
+        ? {
+            foodId: oldFoodId,
+            foodName: oldFoodName,
+            foodPrice: oldFoodPrice,
+          }
+        : null,
+      newValue: {
+        foodId,
+        foodName: newFooldName,
+        foodPrice: newFoodPrice,
+      },
+    });
+
+    const subOrderId = `${memberId} - ${planId} - ${currentViewDate}`;
     const { data: firebaseSubOrderDocument } =
       await participantSubOrderGetByIdApi(subOrderId);
 
@@ -301,6 +350,7 @@ const disallowMember = createAsyncThunk(
   'app/OrderManagement/DISALLOW_MEMBER',
   async (params: TObject, { getState, dispatch }) => {
     const { currentViewDate, memberId } = params;
+
     const {
       id: { uuid: orderId },
     } = getState().OrderManagement.orderData!;
@@ -311,7 +361,7 @@ const disallowMember = createAsyncThunk(
 
     const memberOrderDetailOnUpdateDate =
       metadata?.orderDetail[currentViewDate].memberOrders[memberId];
-    const { status } = memberOrderDetailOnUpdateDate;
+    const { status, foodId } = memberOrderDetailOnUpdateDate;
 
     const validStatuses = [
       EParticipantOrderStatus.notJoined,
@@ -341,7 +391,26 @@ const disallowMember = createAsyncThunk(
       },
     };
 
+    const { foodList = {} } =
+      metadata.orderDetail[currentViewDate]?.restaurant || {};
+
+    const { foodName: oldFoodName, foodPrice: oldFoodPrice } =
+      foodList[foodId] || {};
+
     await addUpdateMemberOrder(orderId, updateParams);
+
+    await createOrderChangesHistoryDocumentApi(orderId, {
+      planId,
+      planOrderDate: currentViewDate,
+      type: EOrderHistoryTypes.MEMBER_FOOD_REMOVED,
+      memberId,
+      newValue: null,
+      oldValue: {
+        foodName: oldFoodName,
+        foodPrice: oldFoodPrice,
+        foodId,
+      },
+    });
     await dispatch(loadData(orderId));
   },
 );
@@ -628,6 +697,31 @@ const updatePlanOrderDetail = createAsyncThunk(
     }
   },
 );
+const querySubOrderChangesHistory = createAsyncThunk(
+  'app/OrderManagement/QUERY_SUB_ORDER_CHANGES_HISTORY',
+  async ({
+    orderId,
+    planId,
+    planOrderDate,
+    lastRecordCreatedAt,
+  }: {
+    orderId: string;
+    planId: string;
+    planOrderDate: number;
+    lastRecordCreatedAt?: number;
+  }) => {
+    const { data } = await queryOrderChangesHistoryDocumentApi(
+      orderId,
+      planId,
+      {
+        planOrderDate,
+        lastRecordCreatedAt,
+      },
+    );
+
+    return data;
+  },
+);
 
 export const orderManagementThunks = {
   loadData,
@@ -643,6 +737,7 @@ export const orderManagementThunks = {
   cancelPickingOrder,
   bookerMarkInprogressPlanViewed,
   updatePlanOrderDetail,
+  querySubOrderChangesHistory,
 };
 
 // ================ Slice ================ //
@@ -802,7 +897,47 @@ const OrderManagementSlice = createSlice({
       })
       .addCase(updatePlanOrderDetail.rejected, (state) => {
         state.isUpdatingOrderDetails = false;
-      });
+      })
+      .addCase(
+        querySubOrderChangesHistory.pending,
+        (state, { meta: { arg } }) => {
+          const { lastRecordCreatedAt } = arg;
+          state.querySubOrderChangesHistoryError = null;
+
+          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+          lastRecordCreatedAt
+            ? (state.loadMoreSubOrderChangesHistory = true)
+            : (state.querySubOrderChangesHistoryInProgress = true);
+        },
+      )
+      .addCase(
+        querySubOrderChangesHistory.fulfilled,
+        (state, { payload, meta: { arg } }) => {
+          const { lastRecordCreatedAt } = arg;
+          const { data: items, totalItems } = payload;
+          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+          lastRecordCreatedAt
+            ? (state.loadMoreSubOrderChangesHistory = false)
+            : (state.querySubOrderChangesHistoryInProgress = false);
+          state.subOrderChangesHistory = lastRecordCreatedAt
+            ? [...state.subOrderChangesHistory, ...items]
+            : items;
+          state.subOrderChangesHistoryTotalItems = totalItems;
+          state.lastRecordSubOrderChangesHistoryCreatedAt =
+            items?.[items.length - 1]?.createdAt?.seconds;
+        },
+      )
+      .addCase(
+        querySubOrderChangesHistory.rejected,
+        (state, { error, meta: { arg } }) => {
+          const { lastRecordCreatedAt } = arg;
+          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+          lastRecordCreatedAt
+            ? (state.loadMoreSubOrderChangesHistory = false)
+            : (state.querySubOrderChangesHistoryInProgress = false);
+          state.querySubOrderChangesHistoryError = error;
+        },
+      );
   },
 });
 

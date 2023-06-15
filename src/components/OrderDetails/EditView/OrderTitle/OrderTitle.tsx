@@ -17,6 +17,8 @@ type TOrderTitleProps = TDefaultProps & {
   };
   onConfirmOrder: () => void;
   onCancelOrder: () => void;
+  confirmButtonMessage?: string;
+  cancelButtonMessage?: string;
 };
 
 const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
@@ -27,6 +29,8 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
     data: { deliveryHour, deliveryAddress = {}, canStartOrder = false },
     onConfirmOrder,
     onCancelOrder,
+    confirmButtonMessage,
+    cancelButtonMessage,
   } = props;
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const submitDisabled = !canStartOrder || inProgress;
@@ -64,9 +68,7 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
           variant="cta"
           className={css.makeOrderBtn}
           onClick={onConfirmOrder}>
-          {intl.formatMessage({
-            id: 'EditView.OrderTitle.makeOrderButtonText',
-          })}
+          {confirmButtonMessage}
         </Button>
         <Button
           disabled={cancelOrderDisabled}
@@ -74,9 +76,7 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
           variant="secondary"
           className={css.cancelOrderBtn}
           onClick={onCancelOrder}>
-          {intl.formatMessage({
-            id: 'EditView.OrderTitle.cancelOrderButtonText',
-          })}
+          {cancelButtonMessage}
         </Button>
       </div>
     </div>

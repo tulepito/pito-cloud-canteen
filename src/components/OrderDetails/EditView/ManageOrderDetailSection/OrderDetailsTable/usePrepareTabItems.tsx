@@ -21,6 +21,7 @@ type TUsePrepareTabItemsParams = {
   handleClickDeleteOrderItem: (memberId: string) => () => void;
   handleRestoreMembers: (memberIds: string[]) => void;
   handleDeletePermanentlyMembers: (memberIds: string[]) => void;
+  ableToUpdateOrder: boolean;
 };
 
 export const usePrepareTabItems = ({
@@ -32,6 +33,7 @@ export const usePrepareTabItems = ({
   handleClickDeleteOrderItem,
   handleRestoreMembers,
   handleDeletePermanentlyMembers,
+  ableToUpdateOrder,
 }: TUsePrepareTabItemsParams) => {
   const intl = useIntl();
 
@@ -63,6 +65,7 @@ export const usePrepareTabItems = ({
       deletedTabData,
       onRestoreMembers: handleRestoreMembers,
       onDeletePermanentlyMembers: handleDeletePermanentlyMembers,
+      ableToUpdateOrder,
     };
 
     switch (tabValue) {

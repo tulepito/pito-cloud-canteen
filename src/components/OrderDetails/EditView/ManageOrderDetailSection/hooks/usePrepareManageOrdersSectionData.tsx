@@ -34,7 +34,7 @@ export const usePrepareManageOrdersSectionData = (
   );
 
   const { restaurant = {}, memberOrders = {} } =
-    orderDetail[currentViewDate.toString()] || {};
+    orderDetail[currentViewDate?.toString()] || {};
   const { foodList = {} } = restaurant;
   const foodOptions = Object.entries<TObject>(foodList).map(
     ([foodId, foodData]) => {

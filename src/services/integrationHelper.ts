@@ -1,3 +1,4 @@
+import type { TObject } from '@src/utils/types';
 import { denormalisedResponseEntities } from '@utils/data';
 
 import { getIntegrationSdk } from './integrationSdk';
@@ -81,4 +82,18 @@ export const fetchTransaction = async (
   );
 
   return denormalisedResponseEntities(response)[0];
+};
+
+export const updateTransactionMetadata = async (
+  dataParams: TObject,
+  queryParams: TObject = {},
+) => {
+  const integrationSdk = getIntegrationSdk();
+
+  const response = await integrationSdk.transactions.show(
+    dataParams,
+    queryParams,
+  );
+
+  return denormalisedResponseEntities(response)?.[0];
 };
