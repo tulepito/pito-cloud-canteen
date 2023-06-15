@@ -58,7 +58,7 @@ const tabCompleted = (
   const isMealPlanTabCompleted =
     !isEmpty(plans) && isEmpty(missingSelectedFood);
   const hasInvalidMealDay = Object.keys(availableOrderDetailCheckList).some(
-    (item) => !availableOrderDetailCheckList[item],
+    (item) => !availableOrderDetailCheckList[item].isAvailable,
   );
 
   switch (tab) {

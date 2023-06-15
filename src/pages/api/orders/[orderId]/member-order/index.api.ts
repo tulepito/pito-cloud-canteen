@@ -10,7 +10,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (apiMethod) {
     case HttpMethod.PUT:
       try {
-        const { planId, orderDetail } = req.body;
+        const { planId, orderDetail, orderId, anonymous } = req.body;
 
         await integrationSdk.listings.update({
           id: planId,
@@ -18,6 +18,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             orderDetail,
           },
         });
+
+        if (orderId) {
+          await integrationSdk.listings.update({
+            id: orderId,
+            metadata: {
+              anonymous,
+            },
+          });
+        }
 
         res.json({
           statusCode: 200,

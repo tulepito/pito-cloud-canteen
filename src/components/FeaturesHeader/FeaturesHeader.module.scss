@@ -37,6 +37,7 @@
     &.active {
       position: relative;
       color: $neutralGray6;
+      font-weight: 700;
 
       &::before {
         content: '';
@@ -74,7 +75,6 @@
     }
 
     .title {
-      margin-left: 14px;
       height: 24px;
     }
   }

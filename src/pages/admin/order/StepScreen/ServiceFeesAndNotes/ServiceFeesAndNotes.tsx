@@ -76,6 +76,7 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
           0,
       };
     }, {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(restaurantList), JSON.stringify(serviceFees)]);
 
   useEffect(() => {

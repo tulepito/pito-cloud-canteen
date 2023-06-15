@@ -69,10 +69,10 @@ const AddCompanyMembersModal: React.FC<CreateGroupModalProps> = (props) => {
   const onAddMembersSubmit = () => {
     dispatch(resetCheckedEmailInputChunk());
     const noAccountEmailList = loadedResult
-      .filter((_result) => _result.response.statusCode)
+      .filter((_result) => _result.response.status)
       .map((_result) => _result.email);
     const userIdList = loadedResult
-      .filter((_result) => !_result.response.statusCode)
+      .filter((_result) => !_result.response.status)
       .map((_result) => User(_result.response).getId());
     dispatch(
       companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),

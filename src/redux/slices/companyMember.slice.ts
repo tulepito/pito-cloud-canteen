@@ -7,13 +7,13 @@ import {
   adminAddMembersToCompanyApi,
   adminDeleteMemberApi,
   adminUpdateMemberPermissionApi,
-  checkEmailExistedApi,
   deleteMemberApi,
 } from '@apis/companyApi';
 import {
   getCompanyMembersDetailsApi,
   queryCompanyMembersApi,
 } from '@apis/index';
+import { checkUserExistedApi } from '@apis/userApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { storableAxiosError } from '@utils/errors';
 import type { TObject, TUser } from '@utils/types';
@@ -103,7 +103,7 @@ const checkEmailExisted = createAsyncThunk(
   async (emailList: string[]) => {
     const response = await Promise.all(
       emailList.map(async (email) => {
-        const { data: queryResponse } = await checkEmailExistedApi(email);
+        const { data: queryResponse } = await checkUserExistedApi({ email });
 
         return { email, response: queryResponse };
       }),
