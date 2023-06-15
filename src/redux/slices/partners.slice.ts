@@ -687,6 +687,9 @@ export const partnerSlice = createSlice({
         removedPartyInsuranceIds,
       };
     },
+    clearDeletePartnerError: (state) => {
+      state.deletePartnerError = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -1100,6 +1103,7 @@ export const {
   removeFoodCertificate,
   removePartyInsurance,
   resetInitialStates,
+  clearDeletePartnerError,
 } = partnerSlice.actions;
 
 export default partnerSlice.reducer;

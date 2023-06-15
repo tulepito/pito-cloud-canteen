@@ -126,6 +126,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
     if (typeof exposeAnchorDate === 'function') {
       exposeAnchorDate(calDate);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [calDate]);
 
   const defaultToolbar = useCallback(

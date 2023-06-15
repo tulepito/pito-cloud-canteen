@@ -125,6 +125,11 @@ export enum EListingType {
   quotation = 'quotation',
 }
 
+export enum EOrderType {
+  normal = 'normal',
+  group = 'group',
+}
+
 export enum EUserPermission {
   company = 'company',
   admin = 'admin',
@@ -969,4 +974,9 @@ export enum EOrderHistoryTypes {
   MEMBER_FOOD_CHANGED = 'MEMBER_FOOD_CHANGED',
   MEMBER_FOOD_REMOVED = 'MEMBER_FOOD_REMOVED',
   MEMBER_FOOD_ADDED = 'MEMBER_FOOD_ADDED',
+}
+
+export enum EQuotationStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
 }

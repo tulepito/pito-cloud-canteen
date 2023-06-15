@@ -110,4 +110,51 @@
     max-width: calc(1180px + 130px * 2);
     margin: 40px calc(50vw - $sl/2);
   }
+
+  &.editNormalOrderView {
+    @include viewportLarge {
+      grid-template-columns: 1fr 820px;
+    }
+
+    @include viewportLarge {
+      grid-template-columns: 1fr 820px 1fr;
+    }
+
+    @include viewportLarge {
+      padding: 0 36px;
+      row-gap: 40px;
+    }
+
+    @include viewportSLarge {
+      padding: 0 130px;
+      grid-template-columns: 140px 820px 140px;
+      max-width: calc(1180px + 130px * 2);
+      margin: 40px auto;
+    }
+
+    .titlePart {
+      grid-column: 1 / span 3;
+      max-width: 1180px;
+    }
+  }
+
+  .lineItemsTable {
+    order: 2;
+    grid-column: 2;
+    grid-row: 2;
+    $maxWidthWithPadding: calc(100vw - 320px - 40px);
+
+    @include viewportLarge {
+      margin: 0 auto;
+      width: min(820px, calc($maxWidthWithPadding - 48px));
+    }
+
+    @include viewportLarge {
+      width: min(820px, calc($maxWidthWithPadding - 72px));
+    }
+
+    @include viewportSLarge {
+      max-width: 820px;
+    }
+  }
 }

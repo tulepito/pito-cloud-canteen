@@ -75,6 +75,7 @@
   svg {
     width: 16px;
     height: 16px;
+    min-width: 16px;
 
     path {
       fill: $neutralGray5;
@@ -112,6 +113,7 @@
 }
 
 .noPickThisDay {
+  cursor: pointer;
   @include flexAlign(center);
   gap: 4px;
   margin-top: 8px;

@@ -106,73 +106,76 @@ export const OrderDetailsTableComponent: React.FC<
             <td colSpan={5}>
               <div className={css.scrollContainer}>
                 <table>
-                  {data.map((item) => {
-                    const { isAnonymous, memberData, foodData, status } = item;
-                    const { foodName = '', foodPrice = 0 } = foodData;
+                  <tbody>
+                    {data.map((item) => {
+                      const { isAnonymous, memberData, foodData, status } =
+                        item;
+                      const { foodName = '', foodPrice = 0 } = foodData;
 
-                    const {
-                      id: memberId,
-                      name: memberName,
-                      email: memberEmail,
-                    } = memberData || {};
-                    const formattedFoodPrice = `${parseThousandNumber(
-                      foodPrice,
-                    )}đ`;
+                      const {
+                        id: memberId,
+                        name: memberName,
+                        email: memberEmail,
+                      } = memberData || {};
+                      const formattedFoodPrice = `${parseThousandNumber(
+                        foodPrice,
+                      )}đ`;
 
-                    const rowClasses = classNames({
-                      [css.notAllowed]:
-                        status === EParticipantOrderStatus.notAllowed,
-                    });
+                      const rowClasses = classNames({
+                        [css.notAllowed]:
+                          status === EParticipantOrderStatus.notAllowed,
+                      });
 
-                    return (
-                      <tr key={memberId} className={rowClasses}>
-                        <td title={memberName}>
-                          <div>
-                            {shortenString(memberName, MAX_LENGTH_NAME)}
-                          </div>
-                          {/* <div>Người dùng</div> */}
-                          {isAnonymous && (
-                            <div className={css.stranger}>
-                              {intl.formatMessage({
-                                id: 'OrderDetailsTableComponent.strangerText',
-                              })}
+                      return (
+                        <tr key={memberId} className={rowClasses}>
+                          <td title={memberName}>
+                            <div>
+                              {shortenString(memberName, MAX_LENGTH_NAME)}
                             </div>
-                          )}
-                        </td>
-                        <td title={memberEmail}>
-                          {shortenString(memberEmail, MAX_LENGTH_EMAIL)}
-                        </td>
-                        <td title={foodName}>{foodName}</td>
-                        <td>
-                          <RenderWhen condition={Number(foodPrice) > 0}>
-                            <>{formattedFoodPrice}</>
-                          </RenderWhen>
-                        </td>
-                        <td>
-                          {ableToUpdateOrder && (
-                            <div className={css.actionCell}>
-                              <IconEdit
-                                className={css.icon}
-                                onClick={
-                                  actionDisabled
-                                    ? doNothing
-                                    : onClickEditOrderItem(tab, memberId)
-                                }
-                              />
-                              <IconDelete
-                                className={css.icon}
-                                onClick={
-                                  actionDisabled
-                                    ? doNothing
-                                    : onClickDeleteOrderItem(memberId)
-                                }
-                              />
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                            {/* <div>Người dùng</div> */}
+                            {isAnonymous && (
+                              <div className={css.stranger}>
+                                {intl.formatMessage({
+                                  id: 'OrderDetailsTableComponent.strangerText',
+                                })}
+                              </div>
+                            )}
+                          </td>
+                          <td title={memberEmail}>
+                            {shortenString(memberEmail, MAX_LENGTH_EMAIL)}
+                          </td>
+                          <td title={foodName}>{foodName}</td>
+                          <td>
+                            <RenderWhen condition={Number(foodPrice) > 0}>
+                              <>{formattedFoodPrice}</>
+                            </RenderWhen>
+                          </td>
+                          <td>
+                            {ableToUpdateOrder && (
+                              <div className={css.actionCell}>
+                                <IconEdit
+                                  className={css.icon}
+                                  onClick={
+                                    actionDisabled
+                                      ? doNothing
+                                      : onClickEditOrderItem(tab, memberId)
+                                  }
+                                />
+                                <IconDelete
+                                  className={css.icon}
+                                  onClick={
+                                    actionDisabled
+                                      ? doNothing
+                                      : onClickDeleteOrderItem(memberId)
+                                  }
+                                />
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
                 </table>
               </div>
             </td>

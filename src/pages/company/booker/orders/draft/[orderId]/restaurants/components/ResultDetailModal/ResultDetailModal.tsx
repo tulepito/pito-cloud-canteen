@@ -13,7 +13,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
-import { EImageVariants } from '@utils/enums';
+import { EImageVariants, EOrderType } from '@utils/enums';
 import type { TListing } from '@utils/types';
 
 import { BookerSelectRestaurantThunks } from '../../BookerSelectRestaurant.slice';
@@ -70,7 +70,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
 
   const { restaurant: preselectedRestaurant } = useGetRestaurant();
 
-  const { orderId, planId, planDetail } = useGetPlanDetails();
+  const { orderId, planId, planDetail, orderType } = useGetPlanDetails();
   const restaurantReviewModalControl = useBoolean();
   const initFoodList = useMemo(() => {
     const detail =
@@ -108,17 +108,22 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
       null,
     [restaurants, selectedRestaurantId, JSON.stringify(preselectedRestaurant)],
   );
+
+  const isNormalOrder = orderType === EOrderType.normal;
+
   const { geolocation: restaurantOrigin } = Listing(
     currentRestaurant!,
   ).getAttributes();
-
   const { totalRating = 0, totalRatingNumber = 0 } = Listing(
     currentRestaurant!,
   ).getMetadata();
   const restaurantName = Listing(currentRestaurant!).getAttributes().title;
-  const { avatarImageId, coverImageId } = Listing(
-    currentRestaurant!,
-  ).getPublicData();
+  const {
+    avatarImageId,
+    coverImageId,
+    minQuantity = 0,
+    maxQuantity = Number.MAX_VALUE,
+  } = Listing(currentRestaurant!).getPublicData();
   const restaurantAvatar = getListingImageById(
     avatarImageId,
     Listing(currentRestaurant!).getImages(),
@@ -184,26 +189,47 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
       return;
     }
 
-    const updatedFoodList = selectedFoods.reduce((acc: any, foodId: string) => {
+    const updateFoodList = selectedFoods.reduce((acc: any, foodId: string) => {
       const food = foodList?.find((item) => item.id?.uuid === foodId);
       if (food) {
+        const foodListingGetter = Listing(food).getAttributes();
+
         acc[foodId] = {
-          foodName: Listing(food).getAttributes().title,
-          foodPrice: Listing(food).getAttributes().price?.amount,
+          foodName: foodListingGetter.title,
+          foodPrice: foodListingGetter.price?.amount || 0,
+          foodUnit: foodListingGetter.publicData?.unit || '',
         };
       }
 
       return acc;
     }, {});
 
+    const updateLineItems = isNormalOrder
+      ? Object.entries<{
+          foodName: string;
+          foodPrice: number;
+        }>(updateFoodList).map(([foodId, { foodName, foodPrice }]) => {
+          return {
+            id: foodId,
+            name: foodName,
+            unitPrice: foodPrice,
+            price: foodPrice,
+            quantity: 1,
+          };
+        })
+      : [];
+
     const updatedValues = {
       [`${openFromCalendar ? propTimestamp : timestamp}`]: {
         restaurant: {
-          foodList: updatedFoodList,
+          foodList: updateFoodList,
           id: selectedRestaurantId,
           restaurantName,
           menuId: currentMenuId,
+          minQuantity,
+          maxQuantity,
         },
+        lineItems: updateLineItems,
       },
     };
     await dispatch(

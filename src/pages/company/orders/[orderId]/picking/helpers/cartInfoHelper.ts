@@ -4,39 +4,89 @@ import {
   getTotalInfo,
 } from '@helpers/orderHelper';
 import config from '@src/configs';
-import { ESubOrderStatus } from '@src/utils/enums';
+import {
+  EOrderStates,
+  EOrderType,
+  EParticipantOrderStatus,
+  ESubOrderStatus,
+} from '@src/utils/enums';
 import { Listing } from '@utils/data';
 import type { TListing, TObject, TQuotation } from '@utils/types';
 
 export const calculateTotalPriceAndDishes = ({
   orderDetail = {},
+  isGroupOrder,
 }: {
   orderDetail: TObject;
+  isGroupOrder: boolean;
 }) => {
-  return Object.entries<TObject>(orderDetail).reduce<TObject>(
-    (result, currentOrderDetailEntry) => {
-      const [, rawOrderDetailOfDate] = currentOrderDetailEntry;
-      const { memberOrders, restaurant = {}, status } = rawOrderDetailOfDate;
-      const { foodList: foodListOfDate } = restaurant;
-      if (status === ESubOrderStatus.CANCELED) {
-        return result;
-      }
+  return isGroupOrder
+    ? Object.entries<TObject>(orderDetail).reduce<TObject>(
+        (result, currentOrderDetailEntry) => {
+          const [, rawOrderDetailOfDate] = currentOrderDetailEntry;
+          const {
+            memberOrders,
+            restaurant = {},
+            status,
+          } = rawOrderDetailOfDate;
+          const { foodList: foodListOfDate } = restaurant;
+          if (status === ESubOrderStatus.CANCELED) {
+            return result;
+          }
 
-      const foodDataMap = getFoodDataMap({ foodListOfDate, memberOrders });
-      const foodDataList = Object.values(foodDataMap);
-      const totalInfo = getTotalInfo(foodDataList);
+          const foodDataMap = getFoodDataMap({ foodListOfDate, memberOrders });
+          const foodDataList = Object.values(foodDataMap);
+          const totalInfo = getTotalInfo(foodDataList);
 
-      return {
-        ...result,
-        totalPrice: result.totalPrice + totalInfo.totalPrice,
-        totalDishes: result.totalDishes + totalInfo.totalDishes,
-      };
-    },
-    {
-      totalDishes: 0,
-      totalPrice: 0,
-    },
-  );
+          return {
+            ...result,
+            totalPrice: result.totalPrice + totalInfo.totalPrice,
+            totalDishes: result.totalDishes + totalInfo.totalDishes,
+          };
+        },
+        {
+          totalDishes: 0,
+          totalPrice: 0,
+        },
+      )
+    : Object.entries<TObject>(orderDetail).reduce<TObject>(
+        (result, currentOrderDetailEntry) => {
+          const [, rawOrderDetailOfDate] = currentOrderDetailEntry;
+          const { lineItems = [], status } = rawOrderDetailOfDate;
+
+          if (status === ESubOrderStatus.CANCELED) {
+            return result;
+          }
+
+          const totalInfo = lineItems.reduce(
+            (
+              res: {
+                totalPrice: number;
+                totalDishes: number;
+              },
+              item: TObject,
+            ) => {
+              const { quantity = 1, price = 0 } = item || {};
+
+              return {
+                totalPrice: res.totalPrice + price,
+                totalDishes: res.totalDishes + quantity,
+              };
+            },
+            { totalPrice: 0, totalDishes: 0 },
+          );
+
+          return {
+            ...result,
+            totalPrice: result.totalPrice + totalInfo.totalPrice,
+            totalDishes: result.totalDishes + totalInfo.totalDishes,
+          };
+        },
+        {
+          totalDishes: 0,
+          totalPrice: 0,
+        },
+      );
 };
 
 export const calculatePriceQuotationInfo = ({
@@ -46,16 +96,23 @@ export const calculatePriceQuotationInfo = ({
   planOrderDetail: TObject;
   order: TObject;
 }) => {
-  const { packagePerMember = 0, memberAmount = 0 } = Listing(
-    order as TListing,
-  ).getMetadata();
+  const {
+    packagePerMember = 0,
+    orderState,
+    orderType,
+  } = Listing(order as TListing).getMetadata();
+  const isOrderInProgress = orderState === EOrderStates.inProgress;
+  const isGroupOrder = orderType === EOrderType.group;
 
   const currentOrderDetail = Object.entries<TObject>(
     planOrderDetail,
   ).reduce<TObject>((result, currentOrderDetailEntry) => {
     const [subOrderDate, rawOrderDetailOfDate] = currentOrderDetailEntry;
-    const { status } = rawOrderDetailOfDate;
-    if (status === ESubOrderStatus.CANCELED) {
+    const { status, transactionId } = rawOrderDetailOfDate;
+    if (
+      status === ESubOrderStatus.CANCELED ||
+      (!transactionId && isOrderInProgress)
+    ) {
       return result;
     }
 
@@ -66,8 +123,33 @@ export const calculatePriceQuotationInfo = ({
       },
     };
   }, {});
+  const actualPCCFee = Object.values(currentOrderDetail).reduce(
+    (result, currentOrderDetailOfDate) => {
+      const { memberOrders, lineItems = [] } = currentOrderDetailOfDate;
+      const memberAmountOfDate = isGroupOrder
+        ? Object.values(memberOrders).reduce(
+            (resultOfDate: number, currentMemberOrder: any) => {
+              const { foodId, status: memberStatus } = currentMemberOrder;
+              if (foodId && memberStatus === EParticipantOrderStatus.joined) {
+                return resultOfDate + 1;
+              }
+
+              return resultOfDate;
+            },
+            0,
+          )
+        : lineItems.reduce((res: number, item: TObject) => {
+            return res + (item?.quantity || 1);
+          }, 0);
+
+      return result + getPCCFeeByMemberAmount(memberAmountOfDate);
+    },
+    0,
+  );
+
   const { totalPrice = 0, totalDishes = 0 } = calculateTotalPriceAndDishes({
     orderDetail: planOrderDetail,
+    isGroupOrder,
   });
 
   const PITOPoints = Math.floor(totalPrice / 100000);
@@ -75,8 +157,9 @@ export const calculatePriceQuotationInfo = ({
   const serviceFee = 0;
   const transportFee = 0;
   const promotion = 0;
-  const numberOfOrderDays = Object.keys(currentOrderDetail).length;
-  const PITOFee = getPCCFeeByMemberAmount(memberAmount) * numberOfOrderDays;
+
+  const PITOFee = actualPCCFee;
+
   const totalWithoutVAT =
     totalPrice + serviceFee + transportFee + PITOFee - promotion;
   const VATFee = Math.round(totalWithoutVAT * config.VATPercentage);

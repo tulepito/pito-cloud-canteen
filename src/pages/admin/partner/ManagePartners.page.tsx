@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -16,6 +17,7 @@ import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import AlertModal from '@components/Modal/AlertModal';
 import NamedLink from '@components/NamedLink/NamedLink';
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
@@ -24,7 +26,11 @@ import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { partnerThunks } from '@redux/slices/partners.slice';
+import useBoolean from '@hooks/useBoolean';
+import {
+  clearDeletePartnerError,
+  partnerThunks,
+} from '@redux/slices/partners.slice';
 import { adminRoutes } from '@src/paths';
 import {
   EListingStates,
@@ -286,13 +292,21 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
     queryRestaurantsError,
     restaurantTableActionInProgress,
     deletePartnerInProgress,
+    deletePartnerError,
   } = useAppSelector((state) => state.partners);
   const router = useRouter();
+  const deletePartnerAlertController = useBoolean();
+
   const { query, pathname } = router;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { page = 1, keywords = '', meta_status = '' } = query;
   const intl = useIntl();
   const dispatch = useAppDispatch();
+
+  const handleCloseAlertDeletePartner = () => {
+    deletePartnerAlertController.setFalse();
+    dispatch(clearDeletePartnerError());
+  };
 
   const onSetAuthorized = async (id: string) => {
     const params = {
@@ -334,6 +348,14 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
   const groupStatus = statusAsString
     ?.split(',')
     .filter((item: string) => !!item);
+
+  useEffect(() => {
+    if (!isEmpty(deletePartnerError) || deletePartnerError !== null) {
+      deletePartnerAlertController.setTrue();
+    } else {
+      deletePartnerAlertController.setFalse();
+    }
+  }, [JSON.stringify(deletePartnerError)]);
 
   useEffect(() => {
     dispatch(
@@ -449,6 +471,16 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
         </IntegrationFilterModal>
       </div>
       {content}
+
+      <AlertModal
+        isOpen={deletePartnerAlertController.value}
+        handleClose={handleCloseAlertDeletePartner}>
+        <div>
+          {intl.formatMessage({
+            id: 'ManagePartnersPage.deletePartnerAlert.message',
+          })}
+        </div>
+      </AlertModal>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
@@ -16,6 +17,7 @@ import { SystemAttributesThunks } from '@redux/slices/systemAttributes.slice';
 import { UIActions } from '@redux/slices/UI.slice';
 import type { RootState } from '@redux/store';
 import { participantPaths } from '@src/paths';
+import { EOrderType } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 
 import SectionCountdown from '../../components/SectionCountdown/SectionCountdown';
@@ -36,6 +38,7 @@ const ParticipantPlan = () => {
   const dispatch = useAppDispatch();
   // Router
   const router = useRouter();
+  const isRouterReady = router.isReady;
   const { planId, from = 'orderList' } = router.query;
 
   // Load data
@@ -56,8 +59,12 @@ const ParticipantPlan = () => {
     (cartKey) => !!cartList[Number(cartKey)],
   );
 
-  const { deadlineDate = Date.now() } = Listing(order).getMetadata();
+  const { deadlineDate = Date.now(), orderType = EOrderType.group } =
+    Listing(order).getMetadata();
   const [diffTime, setDiffTime] = useState<Duration | null>(null);
+
+  const isGroupOrder = orderType === EOrderType.group;
+
   const formattedTimeLeft =
     diffTime === null
       ? DateTime.fromMillis(deadlineDate)
@@ -90,6 +97,12 @@ const ParticipantPlan = () => {
   };
 
   useEffect(() => {
+    if (isRouterReady && !loadDataInProgress && !isGroupOrder) {
+      router.push(participantPaths.OrderList);
+    }
+  }, [isRouterReady, loadDataInProgress, isGroupOrder]);
+
+  useEffect(() => {
     dispatch(SystemAttributesThunks.fetchAttributes());
   }, []);
 
@@ -103,7 +116,6 @@ const ParticipantPlan = () => {
     return () => {
       dispatch(UIActions.disableScrollRemove('Plan_InfoSection'));
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [infoSectionController.value]);
 
   useEffect(() => {

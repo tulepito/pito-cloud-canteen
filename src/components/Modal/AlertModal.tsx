@@ -1,7 +1,9 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 
 import Modal from './Modal';
 
@@ -15,8 +17,8 @@ type TAlertModal = {
   cancelLabel?: ReactNode;
   confirmLabel?: ReactNode;
   handleClose: () => void;
-  onCancel: () => void;
-  onConfirm: () => void;
+  onCancel?: () => void;
+  onConfirm?: () => void;
   confirmDisabled?: boolean;
   confirmInProgress?: boolean;
   cancelDisabled?: boolean;
@@ -48,6 +50,17 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
   childrenClassName,
   shouldFullScreenInMobile = true,
 }) => {
+  const shouldShowCancelButton =
+    !isEmpty(cancelLabel) && typeof onCancel !== 'undefined';
+  const shouldShowConfirmButton =
+    !isEmpty(confirmLabel) && typeof onConfirm !== 'undefined';
+  const shouldShowActionSection =
+    shouldShowCancelButton || shouldShowConfirmButton;
+
+  const childrenClasses = classNames(css.children, childrenClassName, {
+    [css.hasActionSection]: shouldShowActionSection,
+  });
+
   return (
     <Modal
       id={id}
@@ -58,11 +71,9 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
       handleClose={handleClose}
       containerClassName={classNames(css.container, containerClassName)}
       shouldFullScreenInMobile={shouldFullScreenInMobile}>
-      <div className={classNames(css.children, childrenClassName)}>
-        {children}
-      </div>
+      <div className={childrenClasses}>{children}</div>
       <div className={classNames(css.actions, actionsClassName)}>
-        {cancelLabel && (
+        <RenderWhen condition={shouldShowCancelButton}>
           <Button
             type="button"
             disabled={cancelDisabled}
@@ -72,8 +83,8 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
             onClick={onCancel}>
             {cancelLabel}
           </Button>
-        )}
-        {confirmLabel && (
+        </RenderWhen>
+        <RenderWhen condition={shouldShowConfirmButton}>
           <Button
             type="button"
             disabled={confirmDisabled}
@@ -83,7 +94,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
             onClick={onConfirm}>
             {confirmLabel}
           </Button>
-        )}
+        </RenderWhen>
       </div>
     </Modal>
   );

@@ -24,11 +24,14 @@ export type TPlan = {
       restaurant: {
         id?: string; // restaurant listing id
         menuId?: string;
+        minQuantity?: number;
+        maxQuantity?: number;
         restaurantName?: string;
         foodList?: {
           [foodId: string]: {
             foodName: string;
             foodPrice: number;
+            foodUnit?: string;
           };
         };
       };
@@ -39,6 +42,13 @@ export type TPlan = {
           requirement?: string;
         };
       };
+
+      lineItems?: {
+        id: string;
+        quantity: number;
+        price: number;
+        unitPrice: number;
+      }[];
     };
   };
 };

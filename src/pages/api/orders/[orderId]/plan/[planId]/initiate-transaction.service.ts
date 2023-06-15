@@ -7,6 +7,7 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/sdk';
 import { getSubAccountTrustedSdk } from '@services/subAccountSdk';
 import config from '@src/configs';
+import { EOrderType } from '@src/utils/enums';
 import { Listing, Transaction } from '@utils/data';
 import { ETransition } from '@utils/transaction';
 import type { TObject } from '@utils/types';
@@ -32,7 +33,13 @@ export const initiateTransaction = async ({
   );
 
   const orderData = Listing(orderListing);
-  const { companyId, deliveryHour, plans = [] } = orderData.getMetadata();
+  const {
+    companyId,
+    deliveryHour,
+    plans = [],
+    orderType,
+  } = orderData.getMetadata();
+  const isGroupOrder = orderType === EOrderType.group;
 
   if (plans.length === 0 || !plans.includes(planId)) {
     throw new Error(`Invalid planId, ${planId}`);
@@ -50,6 +57,7 @@ export const initiateTransaction = async ({
     planId,
     planOrderDetail,
     deliveryHour,
+    isGroupOrder,
   });
 
   const transactionMap: TObject = {};

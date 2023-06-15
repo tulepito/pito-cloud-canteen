@@ -13,6 +13,7 @@ type TOrderTitleProps = TDefaultProps & {
   data: {
     deliveryHour: string;
     deliveryAddress: TObject;
+    canStartOrder: boolean;
   };
   onConfirmOrder: () => void;
   onCancelOrder: () => void;
@@ -25,13 +26,15 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
   const {
     rootClassName,
     className,
-    data: { deliveryHour, deliveryAddress = {} },
+    data: { deliveryHour, deliveryAddress = {}, canStartOrder = false },
     onConfirmOrder,
     onCancelOrder,
     confirmButtonMessage,
     cancelButtonMessage,
   } = props;
-  const shouldButtonDisabled = useAppSelector(orderDetailsAnyActionsInProgress);
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
+  const submitDisabled = !canStartOrder || inProgress;
+  const cancelOrderDisabled = inProgress;
 
   const rootClasses = classNames(rootClassName || css.root, className);
 
@@ -60,7 +63,7 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
       </div>
       <div className={css.actions}>
         <Button
-          disabled={shouldButtonDisabled}
+          disabled={submitDisabled}
           type="button"
           variant="cta"
           className={css.makeOrderBtn}
@@ -68,7 +71,7 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
           {confirmButtonMessage}
         </Button>
         <Button
-          disabled={shouldButtonDisabled}
+          disabled={cancelOrderDisabled}
           type="button"
           variant="secondary"
           className={css.cancelOrderBtn}

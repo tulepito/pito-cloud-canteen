@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { companyPaths } from '@src/paths';
+import { EOrderType } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
 import { formatTimestamp, getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
@@ -53,8 +54,14 @@ const QuizMealDate = () => {
   );
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
 
-  const { dayInWeek, startDate, endDate, deadlineDate, deadlineHour } =
-    formValues || {};
+  const { startDate, endDate } = formValues || {};
+  const {
+    dayInWeek,
+    deadlineDate,
+    deadlineHour,
+    isGroupOrder,
+    ...restFormValues
+  } = formValues || {};
 
   const selectedDays = getSelectedDaysOfWeek(startDate, endDate, dayInWeek);
   const formattedStartDate = startDate && formatTimestamp(startDate, 'd MMMM');
@@ -69,24 +76,33 @@ const QuizMealDate = () => {
       durationTime: '1',
       durationTimeMode: 'week',
       deliveryHour: deliveryHourFromQuery as string,
+      isGroupOrder: true,
     }),
     [deliveryHourFromQuery],
   );
   const onFormSubmitClick = async () => {
     creatingOrderModalControl.setTrue();
     try {
+      const deadlineInfoMaybe = isGroupOrder
+        ? {
+            deadlineDate: DateTime.fromMillis(deadlineDate)
+              .plus({
+                ...convertHHmmStringToTimeParts(deadlineHour),
+              })
+              .toMillis(),
+            deadlineHour,
+          }
+        : {};
+
       const { payload: orderListing }: { payload: any } = await dispatch(
         orderAsyncActions.createOrder({
           clientId: User(selectedCompany).getId(),
           bookerId: currentUser?.id?.uuid,
           generalInfo: {
             ...quiz,
-            ...formValues,
-            deadlineDate: DateTime.fromMillis(deadlineDate)
-              .plus({
-                ...convertHHmmStringToTimeParts(deadlineHour),
-              })
-              .toMillis(),
+            ...restFormValues,
+            orderType: isGroupOrder ? EOrderType.group : EOrderType.normal,
+            ...deadlineInfoMaybe,
             deliveryAddress:
               User(selectedCompany).getPublicData().location || {},
             dayInWeek: selectedDays,
