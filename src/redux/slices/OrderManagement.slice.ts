@@ -539,7 +539,7 @@ const disallowMember = createAsyncThunk(
 
     const memberOrderDetailOnUpdateDate =
       metadata?.orderDetail[currentViewDate].memberOrders[memberId];
-    const { status } = memberOrderDetailOnUpdateDate;
+    const { status, foodId } = memberOrderDetailOnUpdateDate;
 
     const validStatuses = [
       EParticipantOrderStatus.notJoined,
@@ -569,7 +569,26 @@ const disallowMember = createAsyncThunk(
       },
     };
 
+    const { foodList = {} } =
+      metadata.orderDetail[currentViewDate]?.restaurant || {};
+
+    const { foodName: oldFoodName, foodPrice: oldFoodPrice } =
+      foodList[foodId] || {};
+
     await addUpdateMemberOrder(orderId, updateParams);
+
+    await createOrderChangesHistoryDocumentApi(orderId, {
+      planId,
+      planOrderDate: currentViewDate,
+      type: EOrderHistoryTypes.MEMBER_FOOD_REMOVED,
+      memberId,
+      newValue: null,
+      oldValue: {
+        foodName: oldFoodName,
+        foodPrice: oldFoodPrice,
+        foodId,
+      },
+    });
     await dispatch(loadData(orderId));
   },
 );
