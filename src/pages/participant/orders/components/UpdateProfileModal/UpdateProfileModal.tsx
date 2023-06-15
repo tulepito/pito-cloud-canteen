@@ -39,7 +39,7 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = (props) => {
 
   const initialValues = useMemo(
     () => ({
-      name: `${firstName} ${lastName}`,
+      name: `${lastName} ${firstName}`,
       phoneNumber,
       allergies,
       nutritions,

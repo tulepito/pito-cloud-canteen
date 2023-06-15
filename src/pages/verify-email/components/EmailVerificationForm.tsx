@@ -2,6 +2,7 @@ import React from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Field, Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
+import last from 'lodash/last';
 import Link from 'next/link';
 
 import Button from '@components/Button/Button';
@@ -30,7 +31,7 @@ const EmailVerificationFormComponent: React.FC<
   const { email, emailVerified, pendingEmail, profile } =
     currentUser.attributes;
   const emailToVerify = <strong>{pendingEmail || email}</strong>;
-  const name = profile.lastName;
+  const name = last(profile.firstName.split(' ')) as string;
 
   const errorMessage = (
     <div className={css.error}>
