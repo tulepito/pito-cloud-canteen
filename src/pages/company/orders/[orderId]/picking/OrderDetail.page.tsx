@@ -214,11 +214,10 @@ const OrderDetailPage = () => {
         id: 'EditView.OrderTitle.updateOrderButtonText',
       });
 
-  const ableToUpdateOrder = diffDays(NOW, currentViewDate) < ONE_DAY;
+  const ableToUpdateOrder = diffDays(currentViewDate, NOW, 'day') > ONE_DAY;
 
   const orderDetailsNotChanged =
     isDraftEditing && isEqual(orderDetail, newOrderDetail);
-
   const { shouldShowOverflowError, shouldShowUnderError } = checkMinMaxQuantity(
     newOrderDetail,
     currentViewDate,
@@ -242,8 +241,8 @@ const OrderDetailPage = () => {
         }
         confirmDisabled={
           orderDetailsNotChanged ||
-          shouldShowOverflowError ||
-          shouldShowUnderError
+          (!isDraftEditing && shouldShowOverflowError) ||
+          (!isDraftEditing && shouldShowUnderError)
         }
         isDraftEditing={isDraftEditing}
       />
@@ -273,23 +272,27 @@ const OrderDetailPage = () => {
             data={editViewData.manageParticipantData}
             ableToUpdateOrder={ableToUpdateOrder}
           />
-          <SubOrderChangesHistorySection
-            className={css.container}
-            querySubOrderChangesHistoryInProgress={
-              querySubOrderChangesHistoryInProgress
-            }
-            subOrderChangesHistory={subOrderChangesHistory}
-            draftSubOrderChangesHistory={
-              draftSubOrderChangesHistory[
-                currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
-              ]
-            }
-            onQueryMoreSubOrderChangesHistory={
-              onQueryMoreSubOrderChangesHistory
-            }
-            subOrderChangesHistoryTotalItems={subOrderChangesHistoryTotalItems}
-            loadMoreSubOrderChangesHistory={loadMoreSubOrderChangesHistory}
-          />
+          {isDraftEditing && (
+            <SubOrderChangesHistorySection
+              className={css.container}
+              querySubOrderChangesHistoryInProgress={
+                querySubOrderChangesHistoryInProgress
+              }
+              subOrderChangesHistory={subOrderChangesHistory}
+              draftSubOrderChangesHistory={
+                draftSubOrderChangesHistory[
+                  currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
+                ]
+              }
+              onQueryMoreSubOrderChangesHistory={
+                onQueryMoreSubOrderChangesHistory
+              }
+              subOrderChangesHistoryTotalItems={
+                subOrderChangesHistoryTotalItems
+              }
+              loadMoreSubOrderChangesHistory={loadMoreSubOrderChangesHistory}
+            />
+          )}
         </div>
 
         <RenderWhen.False>

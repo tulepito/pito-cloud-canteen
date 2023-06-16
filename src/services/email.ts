@@ -30,6 +30,9 @@ import participantSubOrderIsCanceled, {
 import partnerNewOrderAppear, {
   partnerNewOrderAppearSubject,
 } from '@src/utils/emailTemplate/partnerNewOrderAppear';
+import partnerOrderDetailsUpdated, {
+  partnerOrderDetailsUpdatedSubject,
+} from '@src/utils/emailTemplate/partnerOrderDetailsUpdated';
 import partnerSubOrderIsCanceled, {
   partnerSubOrderIsCanceledSubject,
 } from '@src/utils/emailTemplate/partnerSubOrderIsCanceled';
@@ -58,6 +61,7 @@ export enum EmailTemplateForParticipantTypes {
 export enum EmailTemplateForPartnerTypes {
   PARTNER_NEW_ORDER_APPEAR = 'PARTNER_NEW_ORDER_APPEAR',
   PARTNER_SUB_ORDER_CANCELED = 'PARTNER_SUB_ORDER_CANCELED',
+  PARTNER_ORDER_DETAILS_UPDATED = 'PARTNER_ORDER_DETAILS_UPDATED',
 }
 
 export const EmailTemplateTypes = {
@@ -452,6 +456,30 @@ export const emailSendingFactory = async (
         const emailDataParams = {
           receiver: [partnerEmail],
           subject: partnerSubOrderIsCanceledSubject(subOrderDate),
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.PARTNER.PARTNER_ORDER_DETAILS_UPDATED: {
+        const { orderId, partnerId, restaurantId, timestamp } = emailParams;
+        const emailDataSource: any = await fetchEmailDataSourceWithOrder({
+          receiver: 'partner',
+          partnerId,
+          orderId,
+          restaurantId,
+        });
+        const { partnerUser } = emailDataSource;
+        const { email: partnerEmail } = partnerUser?.getAttributes() || {};
+        const subOrderDate = formatTimestamp(timestamp);
+        const emailTemplate = partnerOrderDetailsUpdated({
+          ...emailDataSource,
+          subOrderDate,
+        });
+        const emailDataParams = {
+          receiver: [partnerEmail],
+          subject: partnerOrderDetailsUpdatedSubject(subOrderDate),
           content: emailTemplate as string,
           sender: systemSenderEmail as string,
         };

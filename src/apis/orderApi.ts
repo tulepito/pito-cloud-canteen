@@ -164,3 +164,17 @@ export const createQuotationApi = (
   orderId: string,
   body: TCreateQuotationApiBody,
 ) => postApi(`/orders/${orderId}/quotation`, body);
+
+export const sendOrderDetailUpdatedEmailApi = ({
+  orderId,
+  restaurantId,
+  timestamp,
+}: {
+  orderId: string;
+  restaurantId: string;
+  timestamp: string;
+}) =>
+  postApi(`/orders/${orderId}/send-order-details-updated-email`, {
+    restaurantId,
+    timestamp,
+  });
