@@ -28,7 +28,7 @@ export const usePrepareManageLineItemsSectionData = (
     [currentViewDate, JSON.stringify(dateList)],
   );
 
-  const { restaurant = {} } = orderDetail[currentViewDate.toString()] || {};
+  const { restaurant = {} } = orderDetail[currentViewDate?.toString()] || {};
   const { foodList = {} } = restaurant;
   const foodOptions = Object.entries<TObject>(foodList).map(
     ([foodId, foodData]) => {

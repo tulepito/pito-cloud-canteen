@@ -662,13 +662,16 @@ export type TTransitionOrderState =
   | EOrderStates.completed;
 
 export type TSubOrderChangeHistoryItem = {
+  id?: string | number;
   authorId?: string;
-  createdAt?: TObject;
-  memberId: string;
-  member?: TUser;
+  createdAt?: any;
+  memberId?: string;
+  member?: {
+    email?: string;
+  };
   newValue?: any;
   oldValue?: any;
-  planId: string;
-  planOrderDate: Date;
-  type: EOrderHistoryTypes;
+  planId?: string;
+  planOrderDate?: Date;
+  type?: EOrderHistoryTypes;
 };

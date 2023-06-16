@@ -5,6 +5,7 @@ import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 
 import { InlineTextButton } from '@components/Button/Button';
+import useBoolean from '@hooks/useBoolean';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderHistoryTypes } from '@src/utils/enums';
 import type { TSubOrderChangeHistoryItem } from '@src/utils/types';
@@ -18,7 +19,10 @@ type TSubOrderChangesHistorySectionProps = {
   onQueryMoreSubOrderChangesHistory: () => void;
   subOrderChangesHistoryTotalItems: number;
   loadMoreSubOrderChangesHistory: boolean;
+  draftSubOrderChangesHistory: TSubOrderChangeHistoryItem[];
 };
+
+const LIST_BOTTOM_ID = 'bottom-item';
 
 const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
   const { type, newValue = {}, oldValue = {}, member, createdAt } = props;
@@ -42,11 +46,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
               id: 'SubOrderChangesHistoryItem.memberFoodAddedContent',
             },
             {
-              email: (
-                <span className={css.boldText}>
-                  "{member?.attributes?.email}"
-                </span>
-              ),
+              email: <span className={css.boldText}>"{member?.email}"</span>,
               foodName: <span className={css.boldText}>"{foodName}"</span>,
             },
           ),
@@ -71,11 +71,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
               oldFoodName: (
                 <span className={css.boldText}>"{oldFoodName}"</span>
               ),
-              email: (
-                <span className={css.boldText}>
-                  "{member?.attributes?.email}"
-                </span>
-              ),
+              email: <span className={css.boldText}>"{member?.email}"</span>,
             },
           ),
         };
@@ -90,15 +86,89 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
               id: 'SubOrderChangesHistoryItem.memberFoodRemovedContent',
             },
             {
-              email: (
-                <span className={css.boldText}>
-                  "{member?.attributes?.email}"
-                </span>
-              ),
+              email: <span className={css.boldText}>"{member?.email}"</span>,
               from: <span className={css.boldText}>"Đã chọn"</span>,
             },
           ),
         };
+      case EOrderHistoryTypes.FOOD_ADDED: {
+        const { foodName } = newValue;
+
+        return {
+          title: intl.formatMessage({
+            id: 'SubOrderChangesHistoryItem.foodAdded',
+          }),
+          content: intl.formatMessage(
+            {
+              id: 'SubOrderChangesHistoryItem.foodAddedContent',
+            },
+            {
+              foodName: <span className={css.boldText}>"{foodName}"</span>,
+              quantity: <span className={css.boldText}>1</span>,
+            },
+          ),
+        };
+      }
+      case EOrderHistoryTypes.FOOD_REMOVED: {
+        const { foodName } = oldValue;
+
+        return {
+          title: intl.formatMessage({
+            id: 'SubOrderChangesHistoryItem.foodRemoved',
+          }),
+          content: intl.formatMessage(
+            {
+              id: 'SubOrderChangesHistoryItem.foodRemovedContent',
+            },
+            {
+              foodName: <span className={css.boldText}>"{foodName}"</span>,
+              quantity: <span className={css.boldText}>1</span>,
+            },
+          ),
+        };
+      }
+      case EOrderHistoryTypes.FOOD_DECREASED: {
+        const { quantity: oldQuantity, foodName } = oldValue;
+        const { quantity } = newValue;
+
+        return {
+          title: intl.formatMessage({
+            id: 'SubOrderChangesHistoryItem.foodDecreased',
+          }),
+          content: intl.formatMessage(
+            {
+              id: 'SubOrderChangesHistoryItem.foodDecreasedContent',
+            },
+            {
+              foodName: <span className={css.boldText}>"{foodName}"</span>,
+              quantity: (
+                <span className={css.boldText}>{oldQuantity - quantity}</span>
+              ),
+            },
+          ),
+        };
+      }
+      case EOrderHistoryTypes.FOOD_INCREASED: {
+        const { quantity: oldQuantity, foodName } = oldValue;
+        const { quantity } = newValue;
+
+        return {
+          title: intl.formatMessage({
+            id: 'SubOrderChangesHistoryItem.foodIncreased',
+          }),
+          content: intl.formatMessage(
+            {
+              id: 'SubOrderChangesHistoryItem.foodIncreasedContent',
+            },
+            {
+              foodName: <span className={css.boldText}>"{foodName}"</span>,
+              quantity: (
+                <span className={css.boldText}>{quantity - oldQuantity}</span>
+              ),
+            },
+          ),
+        };
+      }
       default:
         return {};
     }
@@ -119,6 +189,7 @@ const SubOrderChangesHistorySection: React.FC<
   const {
     className,
     subOrderChangesHistory = [],
+    draftSubOrderChangesHistory = [],
     querySubOrderChangesHistoryInProgress,
     onQueryMoreSubOrderChangesHistory,
     subOrderChangesHistoryTotalItems,
@@ -126,9 +197,34 @@ const SubOrderChangesHistorySection: React.FC<
   } = props;
   const intl = useIntl();
   const classes = classNames(css.root, className);
+  const collapsible = useBoolean();
   const sectionTitle = intl.formatMessage({
     id: 'SubOrderChangesHistorySection.title',
   });
+
+  const handleQueryMore = async () => {
+    await onQueryMoreSubOrderChangesHistory();
+    const objDiv = document.getElementById(LIST_BOTTOM_ID);
+    objDiv?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'start',
+    });
+  };
+
+  const handleCollapse = async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    collapsible.value ? collapsible.setFalse() : collapsible.setTrue();
+  };
+
+  const reachTotalItems =
+    subOrderChangesHistory.length >= subOrderChangesHistoryTotalItems;
+
+  const listToRender = reachTotalItems
+    ? !collapsible.value
+      ? [...draftSubOrderChangesHistory, ...subOrderChangesHistory]
+      : [...draftSubOrderChangesHistory, ...subOrderChangesHistory].slice(0, 3)
+    : [...draftSubOrderChangesHistory, ...subOrderChangesHistory];
 
   return (
     <div className={classes}>
@@ -138,19 +234,41 @@ const SubOrderChangesHistorySection: React.FC<
         <>
           <div>{sectionTitle}</div>
           <div className={css.listItem}>
-            {subOrderChangesHistory.map((item) => (
-              <SubOrderChangesHistoryItem key={item.planId} {...item} />
-            ))}
+            {listToRender.length > 0 ? (
+              listToRender.map((item) => (
+                <SubOrderChangesHistoryItem key={item.id} {...item} />
+              ))
+            ) : (
+              <div className={css.noResults}>
+                Chưa có hoạt động chỉnh sửa nào
+              </div>
+            )}
+            <div id={LIST_BOTTOM_ID}></div>
           </div>
-          {subOrderChangesHistory.length < subOrderChangesHistoryTotalItems && (
-            <InlineTextButton
-              className={css.moreButton}
-              onClick={onQueryMoreSubOrderChangesHistory}
-              inProgress={loadMoreSubOrderChangesHistory}
-              type="button">
-              Xem thêm
-            </InlineTextButton>
-          )}
+          {listToRender.length > 0 &&
+            (!reachTotalItems ? (
+              <InlineTextButton
+                className={css.moreButton}
+                onClick={handleQueryMore}
+                inProgress={loadMoreSubOrderChangesHistory}
+                type="button">
+                Xem thêm
+              </InlineTextButton>
+            ) : collapsible.value ? (
+              <InlineTextButton
+                className={css.moreButton}
+                onClick={handleCollapse}
+                type="button">
+                Xem thêm
+              </InlineTextButton>
+            ) : (
+              <InlineTextButton
+                className={css.moreButton}
+                onClick={handleCollapse}
+                type="button">
+                Ẩn bớt
+              </InlineTextButton>
+            ))}
         </>
       )}
     </div>

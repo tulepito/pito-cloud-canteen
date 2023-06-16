@@ -90,7 +90,6 @@ const queryCollectionData = async ({
 
 const addCollectionDoc = async (data: any, collectionName: string) => {
   const ref = collection(firestore, collectionName);
-
   await addDoc(ref, data);
 };
 

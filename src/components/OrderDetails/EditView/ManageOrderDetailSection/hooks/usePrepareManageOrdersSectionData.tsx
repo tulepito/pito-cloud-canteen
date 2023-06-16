@@ -13,12 +13,13 @@ export const usePrepareManageOrdersSectionData = (
   setCurrentViewDate: Dispatch<SetStateAction<number>>,
 ) => {
   const [defaultActiveKey, setDefaultActiveKey] = useState(1);
-  const { planData, participantData, orderData } = useAppSelector(
-    (state) => state.OrderManagement,
-  );
+  const {
+    participantData,
+    orderData,
+    orderDetail = {},
+  } = useAppSelector((state) => state.OrderManagement);
 
   const { participants = [] } = Listing(orderData as TListing).getMetadata();
-  const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
 
   const dateList = Object.entries(orderDetail)
     .reduce<number[]>((prev, [date, orderOnDate]) => {
@@ -27,7 +28,6 @@ export const usePrepareManageOrdersSectionData = (
       return !isEmpty(restaurant?.foodList) ? prev.concat(Number(date)) : prev;
     }, [])
     .sort((x, y) => x - y);
-
   const indexOfTimestamp = useMemo(
     () => dateList.indexOf(Number(currentViewDate)),
     [currentViewDate, JSON.stringify(dateList)],
@@ -76,6 +76,7 @@ export const usePrepareManageOrdersSectionData = (
         return {
           memberId,
           memberName,
+          memberEmail: participant?.attributes?.email,
         };
       }),
     [JSON.stringify(availableMemberIds)],

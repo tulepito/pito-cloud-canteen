@@ -10,10 +10,12 @@ import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   orderDetailsAnyActionsInProgress,
+  OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
 import { formatTimestamp } from '@src/utils/dates';
 import { historyPushState } from '@src/utils/history';
+import type { TObject } from '@src/utils/types';
 import { EMAIL_RE } from '@src/utils/validators';
 
 import type { TAddOrderFormValues } from './AddOrEditOrderDetail/AddOrderForm';
@@ -27,10 +29,16 @@ type TManageOrdersSectionProps = {
   ableToUpdateOrder: boolean;
   currentViewDate: number;
   setCurrentViewDate: Dispatch<SetStateAction<number>>;
+  isDraftEditing: boolean;
 };
 
 const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
-  const { ableToUpdateOrder, currentViewDate, setCurrentViewDate } = props;
+  const {
+    ableToUpdateOrder,
+    currentViewDate,
+    setCurrentViewDate,
+    isDraftEditing,
+  } = props;
 
   const dispatch = useAppDispatch();
 
@@ -48,14 +56,26 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     const selectParticipantValue = participantId.key;
     const isUsingEmail = EMAIL_RE.test(selectParticipantValue);
 
+    const member = memberOptions.find(
+      (m: TObject) => m.memberId === selectParticipantValue,
+    );
     const updateValues = {
       foodId,
       requirement,
       currentViewDate,
       ...(isUsingEmail
         ? { memberEmail: selectParticipantValue }
-        : { memberId: selectParticipantValue }),
+        : {
+            memberId: selectParticipantValue,
+            memberEmail: member?.memberEmail,
+          }),
     };
+
+    if (isDraftEditing) {
+      return dispatch(
+        OrderManagementsAction.updateDraftOrderDetail(updateValues),
+      );
+    }
     await dispatch(orderManagementThunks.addOrUpdateMemberOrder(updateValues));
   };
 
@@ -76,6 +96,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
               currentViewDate={currentViewDate}
               foodOptions={foodOptions}
               ableToUpdateOrder={ableToUpdateOrder}
+              isDraftEditing={isDraftEditing}
             />
           </div>
           <div className={css.addOrder}>

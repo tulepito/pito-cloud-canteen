@@ -11,6 +11,7 @@ import { FieldTextAreaComponent } from '@components/FormFields/FieldTextArea/Fie
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   orderDetailsAnyActionsInProgress,
+  OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
@@ -22,19 +23,22 @@ import css from './LineItemsTable.module.scss';
 
 type TLineItemsTableProps = {
   currentViewDate: number;
+  isDraftEditing: boolean;
 };
 
 const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
-  const { currentViewDate } = props;
+  const { currentViewDate, isDraftEditing } = props;
   const intl = useIntl();
 
   const dispatch = useAppDispatch();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const { planData } = useAppSelector((state) => state.OrderManagement);
+  const { planData, orderDetail } = useAppSelector(
+    (state) => state.OrderManagement,
+  );
 
   const planDataGetter = Listing(planData as TListing);
   const planId = planDataGetter.getId();
-  const { orderDetail = {}, orderId } = planDataGetter.getMetadata();
+  const { orderId } = planDataGetter.getMetadata();
   const data = orderDetail[currentViewDate] || {};
   const { lineItems = [], restaurant = {} } = data;
   const { foodList = {} } = restaurant;
@@ -67,13 +71,19 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
         },
       };
 
-      dispatch(
-        orderManagementThunks.updatePlanOrderDetail({
-          orderId,
-          planId,
-          orderDetail: updateOrderDetail,
-        }),
-      );
+      if (isDraftEditing) {
+        dispatch(
+          OrderManagementsAction.setDraftOrderDetails(updateOrderDetail),
+        );
+      } else {
+        dispatch(
+          orderManagementThunks.updatePlanOrderDetail({
+            orderId,
+            planId,
+            orderDetail: updateOrderDetail,
+          }),
+        );
+      }
     },
   };
 
@@ -105,9 +115,9 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
       const itemIndex = lineItems.findIndex((x: TObject) => x?.id === foodId);
       let newLineItems = lineItems;
 
-      if (itemIndex === -1) {
-        const { foodPrice, foodName } = foodList[foodId];
+      const { foodPrice, foodName } = foodList[foodId];
 
+      if (itemIndex === -1) {
         newLineItems = newLineItems.concat({
           id: foodId,
           name: foodName,
@@ -141,13 +151,28 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
         },
       };
 
-      dispatch(
-        orderManagementThunks.updatePlanOrderDetail({
-          orderId,
-          planId,
-          orderDetail: updateOrderDetail,
-        }),
-      );
+      if (isDraftEditing) {
+        dispatch(
+          OrderManagementsAction.updateDraftSubOrderChangesHistory({
+            currentViewDate,
+            foodName,
+            foodPrice,
+            quantity,
+            foodId,
+          }),
+        );
+        dispatch(
+          OrderManagementsAction.setDraftOrderDetails(updateOrderDetail),
+        );
+      } else {
+        dispatch(
+          orderManagementThunks.updatePlanOrderDetail({
+            orderId,
+            planId,
+            orderDetail: updateOrderDetail,
+          }),
+        );
+      }
     };
 
   const handleAddNewLineItem = () => {
