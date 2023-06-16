@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import isEmpty from 'lodash/isEmpty';
 
 import ManageOrdersSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageOrdersSection';
 import ManageParticipantsSection from '@components/OrderDetails/EditView/ManageParticipantsSection/ManageParticipantsSection';
@@ -144,12 +143,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   useEffect(() => {
     dispatch(AdminAttributesThunks.fetchAttributes());
   }, []);
-
-  useEffect(() => {
-    if (!isEmpty(orderState)) {
-      setViewMode(isPickingState ? EPageViewMode.edit : EPageViewMode.review);
-    }
-  }, [orderState]);
 
   return (
     <div className={css.container}>
