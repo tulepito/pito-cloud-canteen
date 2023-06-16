@@ -153,6 +153,13 @@ const updateOrder = createAsyncThunk(
     };
 
     await updateParticipantOrderApi(orderId, updateValues);
+    orderDays.forEach((timestamp: string) => {
+      participantSubOrderAddDocumentApi({
+        participantId: currentUserId,
+        planId,
+        timestamp: parseInt(`${timestamp}`, 10),
+      });
+    });
     await dispatch(reloadData(planId));
     orderDays.map(async (subOrderDate: string) => {
       await participantSubOrderAddDocumentApi({

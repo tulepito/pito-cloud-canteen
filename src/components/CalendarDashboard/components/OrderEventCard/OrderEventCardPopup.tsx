@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { InlineTextButton } from '@components/Button/Button';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
@@ -58,7 +59,10 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
       ? 'orderList'
       : 'orderDetail';
 
-  const onSelectDish = (values: TDishSelectionFormValues, reject?: boolean) => {
+  const onSelectDish = async (
+    values: TDishSelectionFormValues,
+    reject?: boolean,
+  ) => {
     const currentUserId = CurrentUser(user).getId();
     const payload = {
       updateValues: {
@@ -75,7 +79,14 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
       orderId,
     };
 
-    dispatch(participantOrderManagementThunks.updateOrder(payload));
+    await dispatch(participantOrderManagementThunks.updateOrder(payload));
+    await dispatch(
+      OrderListThunks.addSubOrderDocumentToFirebase({
+        participantId: currentUserId,
+        planId,
+        timestamp: parseInt(`${timestamp}`, 10),
+      }),
+    );
   };
 
   const onNavigateToOrderDetail = () => {
