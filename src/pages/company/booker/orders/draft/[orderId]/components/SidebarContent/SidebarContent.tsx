@@ -91,6 +91,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     deadlineHour,
     memberAmount,
     nutritions,
+    mealType = [],
     selectedGroups,
     packagePerMember,
     vatAllow,
@@ -133,6 +134,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   };
   const nutritionsInitValues = {
     nutritions: nutritions || [],
+    mealType,
   };
   const selectedGroupsInitValues = {
     selectedGroups,
