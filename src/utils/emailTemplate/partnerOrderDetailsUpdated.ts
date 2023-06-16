@@ -10,6 +10,7 @@ type PartnerNewOrderAppearParams = {
   restaurantListing: any;
   subOrderDate: string;
   currentOrderVATPercentage: number;
+  formattedSubOrderDate: string;
 };
 
 export const partnerOrderDetailsUpdatedSubject = (subOrderDate: string) =>
