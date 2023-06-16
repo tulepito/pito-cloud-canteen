@@ -18,7 +18,10 @@ type TUsePrepareTabItemsParams = {
     tab: EOrderDetailsTableTab,
     memberId: string,
   ) => () => void;
-  handleClickDeleteOrderItem: (memberId: string) => () => void;
+  handleClickDeleteOrderItem: (
+    tab: EOrderDetailsTableTab,
+    memberId: string,
+  ) => () => void;
   handleRestoreMembers: (memberIds: string[]) => void;
   handleDeletePermanentlyMembers: (memberIds: string[]) => void;
   ableToUpdateOrder: boolean;
@@ -59,7 +62,8 @@ export const usePrepareTabItems = ({
         EOrderDetailsTableTab.deleted
       >,
       tableHeads,
-      onClickDeleteOrderItem: handleClickDeleteOrderItem,
+      onClickDeleteOrderItem: (memberId: string) =>
+        handleClickDeleteOrderItem(tabValue, memberId),
       onClickEditOrderItem: handleClickEditOrderItem,
       data: tabData,
       deletedTabData,

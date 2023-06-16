@@ -4,7 +4,21 @@ import { HttpMethod } from '@apis/configs';
 import orderServices from '@pages/api/apiServices/order/index.service';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
-import { CurrentUser } from '@src/utils/data';
+import { CurrentUser, User } from '@src/utils/data';
+
+const showUser = async (id: string) => {
+  try {
+    const integrationSdk = getIntegrationSdk();
+
+    const response = await integrationSdk.users.show({
+      id,
+    });
+
+    return denormalisedResponseEntities(response)[0];
+  } catch (error) {
+    return null;
+  }
+};
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -19,12 +33,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const currentUser = denormalisedResponseEntities(
             await sdk.currentUser.show(),
           )[0];
+          const createdAt = createData.createdAt
+            ? new Date(createData.createdAt)
+            : new Date();
           const response =
             await orderServices.createSubOrderHistoryRecordToFirestore({
               planId,
-              createdAt: new Date(),
               authorId: CurrentUser(currentUser).getId(),
               ...createData,
+              createdAt,
             });
 
           return res.status(200).json(response);
@@ -34,7 +51,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       }
       case HttpMethod.GET: {
         try {
-          const integrationSdk = getIntegrationSdk();
           const {
             planId,
             planOrderDate,
@@ -56,13 +72,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           const response = await Promise.all(
             results.map(async (item) => {
-              const [member] = denormalisedResponseEntities(
-                await integrationSdk.users.show({
-                  id: item.memberId,
-                }),
-              );
+              const member = item.memberId
+                ? await showUser(item.memberId)
+                : null;
 
-              return { ...item, member };
+              return {
+                ...item,
+                ...(member
+                  ? {
+                      member: {
+                        email: User(member).getAttributes().email,
+                      },
+                    }
+                  : {}),
+              };
             }),
           );
 

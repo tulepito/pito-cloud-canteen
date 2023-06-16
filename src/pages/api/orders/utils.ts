@@ -11,12 +11,13 @@ type TOrderOfDate = TPlanOrderDetail[keyof TPlanOrderDetail];
 
 type TNormalizedOrderDetail = {
   params: {
-    transactionId: string;
     listingId: string;
+    transactionId?: string;
     extendedData: {
       metadata: {
-        participantIds: string[];
-        bookingInfo: {
+        lineItems?: TObject[];
+        participantIds?: string[];
+        bookingInfo?: {
           foodId: string;
           foodName: string;
           foodPrice: number;
@@ -39,17 +40,20 @@ export const normalizeOrderDetail = ({
   planId,
   planOrderDetail,
   deliveryHour = '6:30',
+  isGroupOrder = true,
 }: {
   orderId: string;
   planId: string;
   planOrderDetail: TPlanOrderDetail;
   deliveryHour: string;
+  isGroupOrder?: boolean;
 }) => {
   return Object.entries(planOrderDetail).reduce<TNormalizedOrderDetail[]>(
     (prev, [date, orderOfDate]: [string, TOrderOfDate]) => {
       const {
         restaurant: { id: restaurantId, foodList = {} },
         memberOrders: memberOrdersMap,
+        lineItems = [],
         transactionId,
       } = orderOfDate;
       const startDate = DateTime.fromMillis(Number(date));
@@ -62,44 +66,69 @@ export const normalizeOrderDetail = ({
         .toJSDate();
       const bookingDisplayEnd = bookingEnd;
 
-      const { participantIds, bookingInfo } = Object.entries(
-        memberOrdersMap,
-      ).reduce<TNormalizedOrderDetail['params']['extendedData']['metadata']>(
-        (prevResult, [participantId, { foodId, status, requirement }]) => {
-          const {
-            participantIds: prevParticipantList,
-            bookingInfo: prevBookingInfo,
-          } = prevResult;
-          const currFoodInfo = foodList[foodId];
+      if (isGroupOrder) {
+        const { participantIds, bookingInfo } = Object.entries(
+          memberOrdersMap,
+        ).reduce<TNormalizedOrderDetail['params']['extendedData']['metadata']>(
+          (prevResult, [participantId, { foodId, status, requirement }]) => {
+            const {
+              participantIds: prevParticipantList = [],
+              bookingInfo: prevBookingInfo = [],
+            } = prevResult;
+            const currFoodInfo = foodList[foodId];
 
-          if (currFoodInfo && isJoinedPlan(foodId, status)) {
-            return {
-              ...prevResult,
-              participantIds: prevParticipantList.concat(participantId),
-              bookingInfo: prevBookingInfo.concat({
-                foodId,
-                ...currFoodInfo,
-                participantId,
-                requirement,
-              }),
-            };
-          }
+            if (currFoodInfo && isJoinedPlan(foodId, status)) {
+              return {
+                ...prevResult,
+                participantIds: prevParticipantList.concat(participantId),
+                bookingInfo: prevBookingInfo.concat({
+                  foodId,
+                  ...currFoodInfo,
+                  participantId,
+                  requirement,
+                }),
+              };
+            }
 
-          return prevResult;
-        },
-        { participantIds: [], bookingInfo: [] },
-      );
+            return prevResult;
+          },
+          { participantIds: [], bookingInfo: [] },
+        );
+
+        const extendedData = {
+          metadata: {
+            participantIds,
+            bookingInfo,
+            orderId,
+            planId,
+          },
+        };
+
+        return isEmpty(participantIds)
+          ? prev
+          : prev.concat({
+              params: {
+                listingId: restaurantId as string,
+                extendedData,
+                bookingStart,
+                bookingEnd,
+                bookingDisplayStart,
+                bookingDisplayEnd,
+                transactionId,
+              },
+              date,
+            });
+      }
 
       const extendedData = {
         metadata: {
-          participantIds,
-          bookingInfo,
+          lineItems,
           orderId,
           planId,
         },
       };
 
-      return isEmpty(participantIds)
+      return isEmpty(lineItems)
         ? prev
         : prev.concat({
             params: {
@@ -109,7 +138,7 @@ export const normalizeOrderDetail = ({
               bookingEnd,
               bookingDisplayStart,
               bookingDisplayEnd,
-              transactionId: transactionId as string,
+              transactionId,
             },
             date,
           });

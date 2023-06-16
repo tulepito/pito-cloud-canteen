@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
   orderDetailsAnyActionsInProgress,
+  OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
 import { historyPushState } from '@utils/history';
@@ -42,10 +43,12 @@ type TOrderDetailsTableProps = {
     foodName: string;
   }[];
   ableToUpdateOrder: boolean;
+  isDraftEditing: boolean;
 };
 
 const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
-  const { currentViewDate, foodOptions, ableToUpdateOrder } = props;
+  const { currentViewDate, foodOptions, ableToUpdateOrder, isDraftEditing } =
+    props;
   const {
     query: { tab: tabId },
   } = useRouter();
@@ -59,16 +62,16 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   );
   const [isEditSelectionModalOpen, setIsEditSelectionModalOpen] =
     useState(false);
-  const [wannaDeleteMemberId, setWannaDeleteMemberId] = useState<string>('');
+  const [wannaDeleteMember, setWannaDeleteMember] = useState<TObject>({});
   const {
     value: isDeleteParticipantModalOpen,
     setFalse: turnOffDeleteParticipantModalOpen,
     setTrue: turnOnDeleteParticipantModalOpen,
   } = useBoolean();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
+
   const { tableHeads, packagePerMember, allTabData, deletedTabData } =
     usePrepareOrderDetailTableData(currentViewDate);
-
   const handleClickEditOrderItem =
     (tab: EOrderDetailsTableTab, memberId: string) => () => {
       const memberOrderData =
@@ -80,20 +83,31 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
       setIsEditSelectionModalOpen(true);
     };
 
-  const handleClickDeleteOrderItem = (memberId: string) => () => {
-    turnOnDeleteParticipantModalOpen();
-    setWannaDeleteMemberId(memberId);
-  };
+  const handleClickDeleteOrderItem =
+    (tab: EOrderDetailsTableTab, memberId: string) => () => {
+      turnOnDeleteParticipantModalOpen();
+      const memberOrderData =
+        allTabData[tab].find((item: TObject) => item.memberData.id === memberId)
+          ?.memberData || {};
+
+      setWannaDeleteMember(memberOrderData);
+    };
   const handleCancelDeleteOrderItem = () => {
     turnOffDeleteParticipantModalOpen();
   };
+
   const handleConfirmDeleteOrderItem = () => {
     turnOffDeleteParticipantModalOpen();
 
     const updateValues = {
-      memberId: wannaDeleteMemberId,
+      memberId: wannaDeleteMember?.id,
+      memberEmail: wannaDeleteMember?.email,
       currentViewDate,
     };
+
+    if (isDraftEditing) {
+      return dispatch(OrderManagementsAction.draftDisallowMember(updateValues));
+    }
 
     dispatch(orderManagementThunks.disallowMember(updateValues));
   };
@@ -106,13 +120,21 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   ) => {
     const { foodId, requirement } = values;
     const { memberData } = currentMemberOrderData;
-
     const updateValues = {
       memberId: memberData?.id,
       foodId,
       requirement: requirement || '',
       currentViewDate,
+      memberEmail: memberData?.email,
     };
+
+    if (isDraftEditing) {
+      setIsEditSelectionModalOpen(false);
+
+      return dispatch(
+        OrderManagementsAction.updateDraftOrderDetail(updateValues),
+      );
+    }
 
     await dispatch(orderManagementThunks.addOrUpdateMemberOrder(updateValues));
     setIsEditSelectionModalOpen(false);

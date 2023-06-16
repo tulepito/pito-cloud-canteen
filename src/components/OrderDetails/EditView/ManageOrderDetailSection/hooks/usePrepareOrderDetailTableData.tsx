@@ -17,11 +17,11 @@ export const usePrepareOrderDetailTableData = (
   currentViewDate: number | string,
 ) => {
   const intl = useIntl();
-  const { planData, participantData, anonymousParticipantData, orderData } =
+  const { participantData, anonymousParticipantData, orderData, orderDetail } =
     useAppSelector((state) => state.OrderManagement);
 
   const { packagePerMember = 0 } = Listing(orderData as TListing).getMetadata();
-  const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
+
   const { restaurant = {}, memberOrders = {} } =
     orderDetail[currentViewDate?.toString()] || {};
   const { foodList = {} } = restaurant;

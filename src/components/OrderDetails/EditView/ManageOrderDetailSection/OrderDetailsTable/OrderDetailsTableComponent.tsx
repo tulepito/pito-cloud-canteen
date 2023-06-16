@@ -38,7 +38,7 @@ type TOrderDetailsTableComponentProps = {
   deletedTabData: TObject[];
   hasTotalLine?: boolean;
   onClickEditOrderItem: (tab: EOrderDetailsTableTab, id: string) => () => void;
-  onClickDeleteOrderItem: (id: string) => () => void;
+  onClickDeleteOrderItem: (memberId: string) => () => void;
   onRestoreMembers: (memberIds: string[]) => void;
   onDeletePermanentlyMembers: (memberIds: string[]) => void;
   ableToUpdateOrder: boolean;
