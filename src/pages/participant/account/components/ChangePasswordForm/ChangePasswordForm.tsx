@@ -3,13 +3,14 @@ import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FixedBottomButtons from '@components/FixedBottomButtons/FixedBottomButtons';
 import Form from '@components/Form/Form';
 import { FieldPasswordInputComponent } from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { generalPaths } from '@src/paths';
 import { passwordFormatValid } from '@src/utils/validators';
+
+import { AccountActions } from '../../Account.slice';
 
 import css from './ChangePasswordForm.module.scss';
 
@@ -60,6 +61,7 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
   inProgress,
 }) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const changePasswordError = useAppSelector(
     (state) => state.ParticipantAccount.changePasswordError,
   );
@@ -71,9 +73,36 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
       initialValues,
     });
 
+  const handleAnyFieldChange = () => {
+    dispatch(AccountActions.clearChangePasswordError());
+  };
+
   const password = useField('password', form);
   const newPassword = useField('newPassword', form);
   const confirmPassword = useField('confirmPassword', form);
+
+  const passwordInput = {
+    ...password.input,
+    onChange: (e: any) => {
+      password.input.onChange(e);
+      handleAnyFieldChange();
+    },
+  };
+  const newPasswordInput = {
+    ...newPassword.input,
+    onChange: (e: any) => {
+      newPassword.input.onChange(e);
+      handleAnyFieldChange();
+    },
+  };
+  const confirmPasswordInput = {
+    ...confirmPassword.input,
+    onChange: (e: any) => {
+      confirmPassword.input.onChange(e);
+      handleAnyFieldChange();
+    },
+  };
+
   const disabledSubmit = submitting || hasValidationErrors || inProgress;
 
   const navigateToPasswordRecoverPage = () => {
@@ -81,58 +110,57 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <div className={css.fieldWrapper}>
-        <FieldPasswordInputComponent
-          id={`password`}
-          name="password"
-          label="Mật khẩu hiện tại"
-          input={password.input}
-          meta={password.meta}
-          placeholder="Nhập mật khẩu hiện tại"
-          className={css.fieldInput}
-        />
-        <div className={css.forgotPassword}>
-          <span onClick={navigateToPasswordRecoverPage}>Quên mật khẩu?</span>
+    <Form onSubmit={handleSubmit} className={css.root}>
+      <div className={css.fieldsContainer}>
+        <div className={css.fieldWrapper}>
+          <FieldPasswordInputComponent
+            id={`password`}
+            name="password"
+            label="Mật khẩu hiện tại"
+            input={passwordInput}
+            meta={password.meta}
+            placeholder="Nhập mật khẩu hiện tại"
+            className={css.fieldInput}
+          />
+          <div className={css.forgotPassword}>
+            <span onClick={navigateToPasswordRecoverPage}>Quên mật khẩu?</span>
+          </div>
         </div>
-      </div>
-      <div className={css.fieldWrapper}>
-        <FieldPasswordInputComponent
-          id={`newPassword`}
-          name="newPassword"
-          label="Mật khẩu mới"
-          input={newPassword.input}
-          meta={newPassword.meta}
-          placeholder="Nhập mật khẩu mới"
-          className={css.fieldInput}
-        />
-      </div>
-      <div className={css.fieldWrapper}>
-        <FieldPasswordInputComponent
-          id={`confirmPassword`}
-          name="confirmPassword"
-          label="Xác nhận mật khẩu mới"
-          input={confirmPassword.input}
-          meta={confirmPassword.meta}
-          placeholder="Xác nhận mật khẩu mới"
-          className={css.fieldInput}
-        />
+        <div className={css.fieldWrapper}>
+          <FieldPasswordInputComponent
+            id={`newPassword`}
+            name="newPassword"
+            label="Mật khẩu mới"
+            input={newPasswordInput}
+            meta={newPassword.meta}
+            placeholder="Nhập mật khẩu mới"
+            className={css.fieldInput}
+          />
+        </div>
+        <div className={css.fieldWrapper}>
+          <FieldPasswordInputComponent
+            id={`confirmPassword`}
+            name="confirmPassword"
+            label="Xác nhận mật khẩu mới"
+            input={confirmPasswordInput}
+            meta={confirmPassword.meta}
+            placeholder="Xác nhận mật khẩu mới"
+            className={css.fieldInput}
+          />
+        </div>
+
+        <RenderWhen condition={changePasswordError !== null}>
+          <ErrorMessage message="Mật khẩu hiện tại chưa đúng" />
+        </RenderWhen>
       </div>
 
-      <RenderWhen condition={changePasswordError !== null}>
-        <ErrorMessage message="Đổi mật khẩu không thành công, vui lòng kiểm tra và thử lại" />
-      </RenderWhen>
-      <FixedBottomButtons
-        FirstButton={
-          <Button
-            type="submit"
-            disabled={disabledSubmit}
-            inProgress={inProgress}
-            className={css.submitBtn}>
-            Lưu thay đổi
-          </Button>
-        }
-      />
+      <Button
+        type="submit"
+        disabled={disabledSubmit}
+        inProgress={inProgress}
+        className={css.submitBtn}>
+        Lưu thay đổi
+      </Button>
     </Form>
   );
 };

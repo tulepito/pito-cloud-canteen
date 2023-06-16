@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
 
+import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { userThunks } from '@redux/slices/user.slice';
 import { User } from '@src/utils/data';
 import { splitNameFormFullName } from '@src/utils/string';
@@ -22,6 +24,7 @@ type TProfileModalProps = {
 const ProfileModal: React.FC<TProfileModalProps> = (props) => {
   const { isOpen, onClose, currentUser } = props;
   const dispatch = useAppDispatch();
+  const updateProfileSucessModalControl = useBoolean();
   const updateProfileInProgress = useAppSelector(
     (state) => state.ParticipantAccount.updateProfileInProgress,
   );
@@ -49,6 +52,7 @@ const ProfileModal: React.FC<TProfileModalProps> = (props) => {
       console.log('error');
     } else {
       dispatch(userThunks.fetchCurrentUser());
+      updateProfileSucessModalControl.setTrue();
     }
   };
 
@@ -76,6 +80,15 @@ const ProfileModal: React.FC<TProfileModalProps> = (props) => {
           inProgress={updateProfileInProgress}
         />
       </div>
+      <ConfirmationModal
+        isPopup
+        id="ProfileModalConfirmation"
+        isOpen={updateProfileSucessModalControl.value}
+        onClose={updateProfileSucessModalControl.setFalse}
+        title="Thông báo"
+        description="Thông tin của bạn đã được cập nhật thành công."
+        secondForAutoClose={3}
+      />
     </Modal>
   );
 };
