@@ -14,6 +14,22 @@ const useSubOrderPicking = () => {
   const currentUserGetter = CurrentUser(currentUser!);
   const currentUserId = currentUserGetter.getId();
 
+  const updateSubOrderInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.updateSubOrderInProgress,
+  );
+
+  const addSubOrderDocumentToFirebaseInProgress = useAppSelector(
+    (state) =>
+      state.ParticipantOrderList.addSubOrderDocumentToFirebaseInProgress,
+  );
+
+  const participantPostRatingInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.participantPostRatingInProgress,
+  );
+  const updateOrderInProgress = useAppSelector(
+    (state) => state.ParticipantOrderManagementPage.updateOrderInProgress,
+  );
+
   const onRejectSelectDish = (params: any) => {
     const { orderId, orderDay, planId } = params;
     const payload = {
@@ -39,6 +55,10 @@ const useSubOrderPicking = () => {
     selectedEvent,
     setSelectedEvent,
     onRejectSelectDish,
+    addSubOrderDocumentToFirebaseInProgress,
+    participantPostRatingInProgress,
+    updateSubOrderInProgress,
+    updateOrderInProgress,
   };
 };
 

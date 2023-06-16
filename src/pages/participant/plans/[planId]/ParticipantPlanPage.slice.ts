@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
 import { loadPlanDataApi, updateParticipantOrderApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import {
@@ -152,6 +153,13 @@ const updateOrder = createAsyncThunk(
     };
 
     await updateParticipantOrderApi(orderId, updateValues);
+    orderDays.forEach((timestamp: string) => {
+      participantSubOrderAddDocumentApi({
+        participantId: currentUserId,
+        planId,
+        timestamp: parseInt(`${timestamp}`, 10),
+      });
+    });
     await dispatch(reloadData(planId));
 
     return true;
