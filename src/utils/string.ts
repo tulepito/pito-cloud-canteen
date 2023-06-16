@@ -23,10 +23,10 @@ export const shortenString = (
   }
 
   if (position === 'end') {
-    return `${str.slice(0, maxLength)}...`;
+    return `${str?.slice(0, maxLength)}...`;
   }
 
-  return `${str.slice(0, maxLength / 2)}...${str.slice(
+  return `${str?.slice(0, maxLength / 2)}...${str?.slice(
     stringLength - maxLength / 2,
   )}`;
 };
