@@ -18,6 +18,7 @@ import {
   createQuotationApi,
   deleteParticipantFromOrderApi,
   getBookerOrderDataApi,
+  sendOrderDetailUpdatedEmailApi,
   sendRemindEmailToMemberApi,
   updateOrderApi,
   updatePlanDetailsApi,
@@ -707,6 +708,16 @@ const updateOrderFromDraftEdit = createAsyncThunk(
         const draftSubOrderChangesHistoryByDate = draftSubOrderChangesHistory[
           date as keyof typeof draftSubOrderChangesHistory
         ] as TSubOrderChangeHistoryItem[];
+        if (draftSubOrderChangesHistoryByDate.length > 0) {
+          const { restaurant } = orderDetail[date] || {};
+
+          await sendOrderDetailUpdatedEmailApi({
+            orderId,
+            timestamp: date,
+            restaurantId: restaurant.id,
+          });
+        }
+
         await Promise.all(
           draftSubOrderChangesHistoryByDate.map(
             async (item: TSubOrderChangeHistoryItem) => {
@@ -787,7 +798,14 @@ const OrderManagementSlice = createSlice({
       const { currentViewDate, foodId, memberId, memberEmail, requirement } =
         payload;
 
-      const { orderDetail, draftSubOrderChangesHistory } = state;
+      const { orderDetail, planData, draftSubOrderChangesHistory } = state;
+
+      const { orderDetail: defaultOrderDetail } = Listing(
+        planData as TListing,
+      ).getMetadata();
+      const { foodId: defaultFoodId } =
+        defaultOrderDetail[currentViewDate].memberOrders[memberId];
+
       const memberOrderBeforeUpdate =
         orderDetail[currentViewDate].memberOrders[memberId];
 
@@ -800,6 +818,27 @@ const OrderManagementSlice = createSlice({
         memberId,
         requirement,
       });
+
+      const currentDraftSubOrderChanges = [
+        ...(draftSubOrderChangesHistory[currentViewDate] || []),
+      ];
+
+      const orderHistoryByMemberIndex = currentDraftSubOrderChanges.findIndex(
+        (i) => i.memberId === memberId,
+      );
+
+      if (defaultFoodId === foodId && orderHistoryByMemberIndex > -1) {
+        currentDraftSubOrderChanges.splice(orderHistoryByMemberIndex, 0);
+
+        return {
+          ...state,
+          orderDetail: newOrderDetail,
+          draftSubOrderChangesHistory: {
+            ...state.draftSubOrderChangesHistory,
+            [currentViewDate]: currentDraftSubOrderChanges,
+          },
+        };
+      }
 
       const { foodList = {} } =
         newOrderDetail[currentViewDate]?.restaurant || {};
@@ -852,29 +891,27 @@ const OrderManagementSlice = createSlice({
     },
     draftDisallowMember: (state, { payload }) => {
       const { currentViewDate, memberId, memberEmail } = payload;
-      const { orderDetail } = state;
+      const { orderDetail, planData } = state;
+      const { orderDetail: defaultOrderDetail } = Listing(
+        planData as TListing,
+      ).getMetadata();
+      const { foodId: defaultFoodId } =
+        defaultOrderDetail[currentViewDate].memberOrders[memberId];
       const memberOrderDetailOnUpdateDate =
         orderDetail[currentViewDate].memberOrders[memberId];
-      const { status } = memberOrderDetailOnUpdateDate;
 
-      const validStatuses = [
-        EParticipantOrderStatus.notJoined,
-        EParticipantOrderStatus.expired,
+      const currentDraftSubOrderChanges = [
+        ...(state.draftSubOrderChangesHistory[currentViewDate] || []),
       ];
 
-      if (validStatuses.includes(status)) {
-        return { ...state };
-      }
+      const orderHistoryByMemberIndex = currentDraftSubOrderChanges.findIndex(
+        (i) => i.memberId === memberId,
+      );
 
       const newMemberOrderValues = {
         ...memberOrderDetailOnUpdateDate,
         status: EParticipantOrderStatus.notAllowed,
       };
-
-      const memberOrderBeforeUpdate =
-        orderDetail[currentViewDate].memberOrders[memberId];
-
-      const { foodId: oldFoodId } = memberOrderBeforeUpdate || {};
 
       const newOrderDetail = addNewMemberToOrderDetail(
         orderDetail,
@@ -882,6 +919,25 @@ const OrderManagementSlice = createSlice({
         memberId,
         newMemberOrderValues,
       );
+
+      if (orderHistoryByMemberIndex > -1 && !defaultFoodId) {
+        currentDraftSubOrderChanges.splice(orderHistoryByMemberIndex, 1);
+        const newDraftSubOrderChangesHistory = {
+          ...state.draftSubOrderChangesHistory,
+          [currentViewDate]: currentDraftSubOrderChanges,
+        };
+
+        return {
+          ...state,
+          orderDetail: newOrderDetail,
+          draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
+        };
+      }
+
+      const memberOrderBeforeUpdate =
+        orderDetail[currentViewDate].memberOrders[memberId];
+
+      const { foodId: oldFoodId } = memberOrderBeforeUpdate || {};
 
       const { foodList = {} } = orderDetail[currentViewDate].restaurant;
 

@@ -216,7 +216,6 @@ const SubOrderChangesHistorySection: React.FC<
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     collapsible.value ? collapsible.setFalse() : collapsible.setTrue();
   };
-
   const reachTotalItems =
     subOrderChangesHistory.length >= subOrderChangesHistoryTotalItems;
 
