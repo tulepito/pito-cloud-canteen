@@ -328,7 +328,9 @@ const OrderDetailSlice = createSlice({
       })
       .addCase(transit.fulfilled, (state, { payload }) => {
         const { transactionId, transition, createdAt } = payload;
-        const currTxMap = current(state).transactionDataMap || {};
+        const currentState = current(state);
+        const currOrderDetail = currentState.orderDetail;
+        const currTxMap = currentState.transactionDataMap || {};
         const updateEnTry = Object.entries(currTxMap).find(
           ([_, txData]) => Transaction(txData).getId() === transactionId,
         );
@@ -353,6 +355,13 @@ const OrderDetailSlice = createSlice({
           };
 
           state.transactionDataMap = { ...currTxMap, [date]: updateTxData };
+          state.orderDetail = {
+            ...currOrderDetail,
+            [date]: {
+              ...currOrderDetail[date],
+              status: 'canceled',
+            },
+          };
         }
 
         state.transitInProgress = false;
