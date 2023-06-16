@@ -38,9 +38,13 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     onGoBackToEditOrderPage,
     onSubmitEdit,
     onDownloadPriceQuotation,
+    classes = {},
   } = props;
+  const { leftClassName, rightClassName } = classes;
 
   const rootClasses = classNames(rootClassName || css.root, className);
+  const leftPartClasses = classNames(css.leftPart, leftClassName);
+  const rightPartClasses = classNames(css.rightPart, rightClassName);
 
   return (
     <div className={rootClasses}>
@@ -51,7 +55,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           onGoBack={onGoBackToEditOrderPage}
         />
       )}
-      <div className={css.leftPart}>
+      <div className={leftPartClasses}>
         <RenderWhen condition={!canGoBackEditMode}>
           <ReviewOrderStatesSection
             data={{
@@ -78,7 +82,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
         />
       </div>
-      <div className={css.rightPart}>
+      <div className={rightPartClasses}>
         <RenderWhen condition={!canGoBackEditMode}>
           <ReviewOrderProcessSection />
         </RenderWhen>
