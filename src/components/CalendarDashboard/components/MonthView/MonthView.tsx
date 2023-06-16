@@ -7,6 +7,7 @@ import { DateTime } from 'luxon';
 import { DAY_IN_WEEK } from '@components/CalendarDashboard/helpers/constant';
 import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
 import { useViewport } from '@hooks/useViewport';
+import EmptySubOrder from '@pages/participant/orders/components/EmptySubOrder/EmptySubOrder';
 
 import type { TCalendarItemCardComponents } from '../../helpers/types';
 import MDayItem from '../DayItem/MDayItem';
@@ -72,6 +73,9 @@ function MonthView({
             components={customComponents}
           />
         ))}
+      </div>
+      <div className={css.noEventsWrapper}>
+        <EmptySubOrder />
       </div>
     </div>
   );
