@@ -8,7 +8,7 @@ import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderStates } from '@src/utils/enums';
+import type { EOrderStates } from '@src/utils/enums';
 import type { TListing, TPagination, TUser } from '@src/utils/types';
 
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
@@ -213,8 +213,8 @@ const OrderQuotationTab: React.FC<OrderQuotationTabProps> = (props) => {
     setSelectedQuotation,
   });
 
-  const handleUpdateOrderState = () => {
-    updateOrderState(EOrderStates.picking);
+  const handleUpdateOrderState = (state: EOrderStates) => () => {
+    updateOrderState(state);
   };
   const handleGoBack = () => {
     setSelectedQuotation(null);
