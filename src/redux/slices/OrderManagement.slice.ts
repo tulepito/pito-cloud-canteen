@@ -1101,6 +1101,19 @@ const OrderManagementSlice = createSlice({
         };
       }
 
+      if (defaultFoodId === foodId && orderHistoryByMemberIndex > -1) {
+        currentDraftSubOrderChanges.splice(orderHistoryByMemberIndex, 0);
+
+        return {
+          ...state,
+          orderDetail: newOrderDetail,
+          draftSubOrderChangesHistory: {
+            ...state.draftSubOrderChangesHistory,
+            [currentViewDate]: currentDraftSubOrderChanges,
+          },
+        };
+      }
+
       const { foodList = {} } =
         newOrderDetail[currentViewDate]?.restaurant || {};
 
