@@ -264,7 +264,6 @@ const OrderDetailPage = () => {
   } = Listing(orderData as TListing).getMetadata();
 
   const isNormalOrder = orderType === EOrderType.normal;
-  console.log('isNormalOrder', isNormalOrder);
   const isPicking = orderState === EOrderStates.picking;
   const isDraftEditing = orderState === EOrderStates.inProgress;
 
