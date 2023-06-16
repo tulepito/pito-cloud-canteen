@@ -253,15 +253,15 @@ export const MEAL_PLANS_MOCKUP = [
       },
     },
     title: 'PT3040',
-    start: new Date().setDate(new Date().getDate() + 1),
-    end: new Date().setDate(new Date().getDate() + 1),
+    start: new Date(2023, 1, 6, 0, 0, 0),
+    end: new Date(2023, 1, 6, 23, 0, 0),
   },
   {
     resource: {
-      id: '2',
+      id: '1',
       daySession: 'MORNING_SESSION',
       suitableAmount: 10,
-      status: 'empty',
+      status: 'notJoined',
       type: 'dailyMeal',
       deliveryAddress: {
         address: '133 Duong Ba Trac',
@@ -284,15 +284,15 @@ export const MEAL_PLANS_MOCKUP = [
       },
     },
     title: 'PT3040',
-    start: new Date(),
-    end: new Date(),
+    start: new Date(2023, 1, 8, 16, 0, 0),
+    end: new Date(2023, 1, 8, 20, 0, 0),
   },
   {
     resource: {
-      id: '3',
+      id: '1',
       daySession: 'MORNING_SESSION',
       suitableAmount: 10,
-      status: 'empty',
+      status: 'notJoined',
       type: 'dailyMeal',
       deliveryAddress: {
         address: '133 Duong Ba Trac',
@@ -315,7 +315,7 @@ export const MEAL_PLANS_MOCKUP = [
       },
     },
     title: 'PT3040',
-    start: new Date().setDate(new Date().getDate() + 1),
-    end: new Date().setDate(new Date().getDate() + 1),
+    start: new Date(2023, 1, 7, 16, 0, 0),
+    end: new Date(2023, 1, 7, 20, 0, 0),
   },
 ];
