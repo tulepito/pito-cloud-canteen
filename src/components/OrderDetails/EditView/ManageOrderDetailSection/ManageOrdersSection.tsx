@@ -67,7 +67,6 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     const member = memberOptions.find(
       (m: TObject) => m.memberId === selectParticipantValue,
     );
-
     const updateValues = {
       foodId,
       requirement,

@@ -4,7 +4,6 @@ import { isEmpty } from 'lodash';
 import groupBy from 'lodash/groupBy';
 import omit from 'lodash/omit';
 
-import { EHttpStatusCode } from '@apis/errors';
 import {
   createOrderChangesHistoryDocumentApi,
   participantSubOrderAddDocumentApi,
@@ -41,7 +40,7 @@ import {
   EOrderType,
   EParticipantOrderStatus,
 } from '@utils/enums';
-import { storableError } from '@utils/errors';
+import { EHttpStatusCode, storableError } from '@utils/errors';
 import type {
   TCompany,
   TListing,
@@ -540,7 +539,7 @@ const disallowMember = createAsyncThunk(
 
     const memberOrderDetailOnUpdateDate =
       metadata?.orderDetail[currentViewDate].memberOrders[memberId];
-    const { status, foodId } = memberOrderDetailOnUpdateDate;
+    const { status } = memberOrderDetailOnUpdateDate;
 
     const validStatuses = [
       EParticipantOrderStatus.notJoined,
@@ -570,26 +569,7 @@ const disallowMember = createAsyncThunk(
       },
     };
 
-    const { foodList = {} } =
-      metadata.orderDetail[currentViewDate]?.restaurant || {};
-
-    const { foodName: oldFoodName, foodPrice: oldFoodPrice } =
-      foodList[foodId] || {};
-
     await addUpdateMemberOrder(orderId, updateParams);
-
-    await createOrderChangesHistoryDocumentApi(orderId, {
-      planId,
-      planOrderDate: currentViewDate,
-      type: EOrderHistoryTypes.MEMBER_FOOD_REMOVED,
-      memberId,
-      newValue: null,
-      oldValue: {
-        foodName: oldFoodName,
-        foodPrice: oldFoodPrice,
-        foodId,
-      },
-    });
     await dispatch(loadData(orderId));
   },
 );

@@ -2,7 +2,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import { isEqual } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
@@ -383,8 +382,39 @@ const OrderDetailPage = () => {
           </RenderWhen.False>
         </RenderWhen>
         <RenderWhen.False>
-          <div className={css.loadingContainer}>
-            <Skeleton className={css.loadingContent} />
+          <div className={css.lineItemsTable}>
+            <ManageLineItemsSection
+              data={editViewData.manageOrdersData}
+              isDraftEditing={isDraftEditing}
+              shouldShowOverflowError={shouldShowOverflowError}
+              shouldShowUnderError={shouldShowUnderError}
+              setCurrentViewDate={(date) => setCurrentViewDate(date)}
+              currentViewDate={currentViewDate}
+            />
+            {isDraftEditing && (
+              <SubOrderChangesHistorySection
+                className={classNames(
+                  css.container,
+                  css.normalOrderSubOrderSection,
+                )}
+                querySubOrderChangesHistoryInProgress={
+                  querySubOrderChangesHistoryInProgress
+                }
+                subOrderChangesHistory={subOrderChangesHistory}
+                draftSubOrderChangesHistory={
+                  draftSubOrderChangesHistory[
+                    currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
+                  ]
+                }
+                onQueryMoreSubOrderChangesHistory={
+                  onQueryMoreSubOrderChangesHistory
+                }
+                subOrderChangesHistoryTotalItems={
+                  subOrderChangesHistoryTotalItems
+                }
+                loadMoreSubOrderChangesHistory={loadMoreSubOrderChangesHistory}
+              />
+            )}
           </div>
         </RenderWhen.False>
       </RenderWhen>
