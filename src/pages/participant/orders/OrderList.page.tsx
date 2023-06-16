@@ -293,6 +293,7 @@ const OrderListPage = () => {
               />
             ),
           }}
+          resources={walkthroughEnable}
         />
       </div>
       <div className={css.subOrderContainer}>
