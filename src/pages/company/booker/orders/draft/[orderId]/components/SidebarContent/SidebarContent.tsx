@@ -8,7 +8,9 @@ import { DateTime } from 'luxon';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { getInitialLocationValues } from '@helpers/mapHelpers';
+import { findMinDeadlineDate, findMinStartDate } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing, User } from '@utils/data';
@@ -34,11 +36,13 @@ type TSidebarContentProps = {
 type TNavigationItemProps = {
   messageId?: string;
   onOpen?: (id: string | boolean) => void;
+  errorMessage?: string;
 };
 
 const NavigationItem: React.FC<TNavigationItemProps> = ({
   messageId,
   onOpen = () => null,
+  errorMessage = '',
 }) => {
   const handleOpenDetails = () => {
     onOpen(messageId || false);
@@ -46,8 +50,14 @@ const NavigationItem: React.FC<TNavigationItemProps> = ({
 
   return (
     <div className={css.navItem} onClick={handleOpenDetails}>
-      <FormattedMessage id={`SidebarContent.nav.settings.${messageId}`} />
-      <IconArrow direction="right" />
+      <div className={css.itemContainer}>
+        <FormattedMessage id={`SidebarContent.nav.settings.${messageId}`} />
+        <IconArrow direction="right" />
+      </div>
+
+      <RenderWhen condition={!!errorMessage}>
+        <div className={css.errorMessage}>{errorMessage}</div>
+      </RenderWhen>
     </div>
   );
 };
@@ -75,7 +85,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   const {
     deliveryAddress,
     deliveryHour,
-    startDate,
+    startDate = 0,
     endDate,
     deadlineDate,
     deadlineHour,
@@ -90,6 +100,8 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       companyLocation || deliveryAddress || {},
     ),
   };
+  const isStartDateInValid = startDate < findMinStartDate().getTime();
+  const isDeadlineDateInValid = deadlineDate < findMinDeadlineDate().getTime();
 
   const nextStartWeek = DateTime.fromJSDate(new Date())
     .startOf('week')
@@ -274,8 +286,16 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
         </div>
         <nav className={css.navigation}>
           <NavigationItem onOpen={handleOpenDetails} messageId="location" />
-          <NavigationItem onOpen={handleOpenDetails} messageId="deliveryTime" />
-          <NavigationItem onOpen={handleOpenDetails} messageId="expiredTime" />
+          <NavigationItem
+            onOpen={handleOpenDetails}
+            messageId="deliveryTime"
+            errorMessage={isStartDateInValid ? 'Thời gian không hợp lệ' : ''}
+          />
+          <NavigationItem
+            onOpen={handleOpenDetails}
+            messageId="expiredTime"
+            errorMessage={isDeadlineDateInValid ? 'Thời gian không hợp lệ' : ''}
+          />
           <NavigationItem
             onOpen={handleOpenDetails}
             messageId="numberEmployees"

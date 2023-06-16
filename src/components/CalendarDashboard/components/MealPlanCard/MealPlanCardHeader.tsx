@@ -3,8 +3,10 @@ import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
+import IconFood from '@components/Icons/IconFood/IconFood';
 import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
-import IconUser from '@components/Icons/IconUser/IconUser';
+import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { formatTimestamp } from '@utils/dates';
 
 import DeleteMealModal from './components/DeleteMealModal';
@@ -24,8 +26,13 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
   removeEventItem,
   onSearchRestaurant,
 }) => {
-  const session = event.resource?.daySession;
-  const resourceId = event.resource?.id;
+  const {
+    isSelectedFood,
+    daySession: session,
+    id: resourceId,
+    meal = {},
+  } = event?.resource || {};
+  const dishes = meal.dishes || [];
   const handleDelete = () => {
     removeEventItem?.(resourceId);
   };
@@ -48,16 +55,17 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
   return (
     <div className={css.header}>
       <div className={css.planTitle}>
-        <FormattedMessage id={`DayColumn.Session.${session}`} />
-        <IconClose
-          className={css.close}
-          onClick={handleOpenDeleteModal}
-          data-tour="step-4"
-        />
+        <div className={css.titleContainer}>
+          <RenderWhen condition={isSelectedFood}>
+            <IconTickWithBackground className={css.tickIcon} />
+          </RenderWhen>
+          <FormattedMessage id={`DayColumn.Session.${session}`} />
+        </div>
+        <IconClose className={css.close} onClick={handleOpenDeleteModal} />
       </div>
       <div className={css.headerActions}>
-        <IconUser />
-        <div className={css.suitableAmount}>{''}</div>
+        <IconFood className={css.foodIcon} />
+        <div className={css.dishes}>{dishes.length}</div>
         <div className={css.verticalDivider} />
         <IconMagnifier
           className={css.searchIcon}

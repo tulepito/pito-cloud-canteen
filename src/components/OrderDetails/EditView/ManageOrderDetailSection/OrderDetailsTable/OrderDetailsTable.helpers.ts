@@ -11,11 +11,14 @@ const memberInfoReduceFn = (result: TObject, currentParticipant: TUser) => {
     id: { uuid },
     attributes: {
       email,
-      profile: { displayName },
+      profile: { firstName, lastName },
     },
   } = currentParticipant;
 
-  return { ...result, [uuid]: { email, name: displayName, id: uuid } };
+  return {
+    ...result,
+    [uuid]: { email, name: `${lastName} ${firstName}`, id: uuid },
+  };
 };
 
 export const prepareDataForTabs = ({

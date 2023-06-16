@@ -44,6 +44,9 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     availableOrderDetailCheckList,
   } = resources;
 
+  const availableStatus =
+    availableOrderDetailCheckList?.[event?.start?.getTime()!];
+
   const removeEventItem =
     onRemove ||
     ((resourceId: string) => {
@@ -75,9 +78,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
         event={event}
         onRecommendMeal={onRecommendRestaurantForSpecificDay}
         onRecommendMealInProgress={onRecommendMealInProgress}
-        restaurantAvailable={
-          availableOrderDetailCheckList?.[event?.start?.getTime()!]
-        }
+        restaurantAvailable={availableStatus?.isAvailable}
       />
       <MealPlanCardFooter
         event={event}
@@ -87,9 +88,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
         startDate={startDate}
         endDate={endDate}
         onApplyOtherDaysInProgress={onApplyOtherDaysInProgress}
-        editAvailable={
-          availableOrderDetailCheckList?.[event?.start?.getTime()!]
-        }
+        availableStatus={availableStatus}
       />
     </div>
   );

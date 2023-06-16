@@ -147,6 +147,11 @@ export enum ERestaurantListingStatus {
   unsatisfactory = 'unsatisfactory',
 }
 
+export enum EInvalidRestaurantCase {
+  closed = 'closed',
+  noMenusValid = 'noMenusValid',
+}
+
 export enum EParticipantOrderStatus {
   empty = 'empty',
   joined = 'joined',

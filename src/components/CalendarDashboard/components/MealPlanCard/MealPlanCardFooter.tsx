@@ -4,7 +4,10 @@ import { FormattedMessage } from 'react-intl';
 import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { convertWeekDay } from '@src/utils/dates';
+import { EInvalidRestaurantCase } from '@src/utils/enums';
+import type { TObject } from '@src/utils/types';
 
 import ApplyOtherDaysModal from './components/ApplyOtherDaysModal';
 
@@ -19,7 +22,7 @@ type TMealPlanCardFooterProps = {
   onApplyOtherDaysInProgress?: boolean;
   startDate?: Date | number;
   endDate?: Date | number;
-  editAvailable?: boolean;
+  availableStatus?: TObject;
 };
 
 const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
@@ -31,9 +34,10 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
   onApplyOtherDaysInProgress,
   startDate,
   endDate,
-  editAvailable = true,
+  availableStatus,
 }) => {
   const { id, isSelectedFood, restaurant = {} } = event.resource || {};
+  const { status, isAvailable = true } = availableStatus || {};
   const [isOpenApplyOtherDaysModal, setIsOpenApplyOtherDaysModal] =
     useState<boolean>(false);
 
@@ -58,30 +62,35 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
 
   return (
     <div className={css.footer}>
-      {!editAvailable ? (
-        <div className={css.editNotAvailable}>Nhà hàng không còn phù hợp</div>
-      ) : (
-        <>
-          <Button
-            variant="secondary"
-            className={css.actionButton}
-            onClick={handleEditFood}
-            data-tour="step-5"
-            inProgress={editFoodInprogress}>
-            {isSelectedFood ? (
-              <FormattedMessage id="MealPlanCard.footer.modify" />
-            ) : (
-              <FormattedMessage id="MealPlanCard.footer.selectDish" />
-            )}
-          </Button>
+      <RenderWhen condition={isAvailable}>
+        <Button
+          variant="secondary"
+          className={css.actionButton}
+          onClick={handleEditFood}
+          inProgress={editFoodInprogress}>
+          {isSelectedFood ? (
+            <FormattedMessage id="MealPlanCard.footer.modify" />
+          ) : (
+            <FormattedMessage id="MealPlanCard.footer.selectDish" />
+          )}
+        </Button>
+        <div
+          className={css.applyForOtherDays}
+          onClick={handleOpenApplyOtherDaysModal}>
+          <FormattedMessage id="MealPlanCard.footer.applyForOtherDays" />
+        </div>
 
-          <div
-            className={css.applyForOtherDays}
-            onClick={handleOpenApplyOtherDaysModal}>
-            <FormattedMessage id="MealPlanCard.footer.applyForOtherDays" />
+        <RenderWhen.False>
+          <div className={css.editNotAvailable}>
+            <RenderWhen condition={status === EInvalidRestaurantCase.closed}>
+              <FormattedMessage id="MealPlanCard.footer.restaurantClosed" />
+              <RenderWhen.False>
+                <FormattedMessage id="MealPlanCard.footer.restaurantHasNoValidMenus" />
+              </RenderWhen.False>
+            </RenderWhen>
           </div>
-        </>
-      )}
+        </RenderWhen.False>
+      </RenderWhen>
 
       <ApplyOtherDaysModal
         isOpen={isOpenApplyOtherDaysModal}

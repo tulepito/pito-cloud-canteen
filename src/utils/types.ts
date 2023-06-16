@@ -161,6 +161,8 @@ export type TBookerAttributes = {
 
 export type TAuthorProfile = {
   displayName: string;
+  firstName?: string;
+  lastName?: string;
   abbreviatedName: string;
   bio?: string;
   protectedData?: TObject;
