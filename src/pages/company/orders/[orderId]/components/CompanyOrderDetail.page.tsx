@@ -1,7 +1,6 @@
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
-
-import { usePrepareOrderDetailPageData } from '../picking/hooks/usePrepareData';
+import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 
 import TitleSection from './TitleSection';
 
