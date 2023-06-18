@@ -219,11 +219,16 @@ const SubOrderChangesHistorySection: React.FC<
   const reachTotalItems =
     subOrderChangesHistory.length >= subOrderChangesHistoryTotalItems;
 
+  const mergedList = [
+    ...draftSubOrderChangesHistory,
+    ...subOrderChangesHistory,
+  ];
+
   const listToRender = reachTotalItems
     ? !collapsible.value
-      ? [...draftSubOrderChangesHistory, ...subOrderChangesHistory]
-      : [...draftSubOrderChangesHistory, ...subOrderChangesHistory].slice(0, 3)
-    : [...draftSubOrderChangesHistory, ...subOrderChangesHistory];
+      ? mergedList
+      : mergedList.slice(0, 3)
+    : mergedList;
 
   return (
     <div className={classes}>
@@ -253,21 +258,23 @@ const SubOrderChangesHistorySection: React.FC<
                 type="button">
                 Xem thêm
               </InlineTextButton>
-            ) : collapsible.value ? (
-              <InlineTextButton
-                className={css.moreButton}
-                onClick={handleCollapse}
-                type="button">
-                Xem thêm
-              </InlineTextButton>
-            ) : (
-              <InlineTextButton
-                className={css.moreButton}
-                onClick={handleCollapse}
-                type="button">
-                Ẩn bớt
-              </InlineTextButton>
-            ))}
+            ) : mergedList.length > 3 ? (
+              collapsible.value ? (
+                <InlineTextButton
+                  className={css.moreButton}
+                  onClick={handleCollapse}
+                  type="button">
+                  Xem thêm
+                </InlineTextButton>
+              ) : (
+                <InlineTextButton
+                  className={css.moreButton}
+                  onClick={handleCollapse}
+                  type="button">
+                  Ẩn bớt
+                </InlineTextButton>
+              )
+            ) : null)}
         </>
       )}
     </div>
