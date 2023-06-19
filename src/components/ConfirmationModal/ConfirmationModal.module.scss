@@ -1,8 +1,13 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .modalContainer.modalContainer {
   flex-basis: calc(100% - 32px);
+
+  @include viewportLarge {
+    flex-basis: 700px;
+  }
 }
 .modalFooter {
   @include flexAlign(center, flex-end);
