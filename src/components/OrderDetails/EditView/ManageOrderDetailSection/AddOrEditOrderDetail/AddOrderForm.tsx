@@ -4,6 +4,7 @@ import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Field, Form as FinalForm } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
+import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
@@ -152,12 +153,14 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   };
 
   const handleFieldParticipantChange = (
-    oldValue: TObject,
-    newValue: TObject,
+    _newValue: TObject,
+    _oldValue: TObject,
   ) => {
-    if (oldValue?.key !== newValue?.key) {
-      dispatch(OrderManagementsAction.clearAddUpdateParticipantError());
+    // Exception case for form.reset()
+    if ((_newValue === null || isEmpty(_newValue)) && !values?.foodId) {
+      return;
     }
+    dispatch(OrderManagementsAction.clearAddUpdateParticipantError());
   };
 
   return (
