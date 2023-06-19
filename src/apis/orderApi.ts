@@ -169,3 +169,17 @@ export const sendPartnerNewOrderAppearEmailApi = (
   orderId: string,
   body: { orderId: string; partner: any },
 ) => postApi(`/orders/${orderId}/send-partner-new-order-appear-email`, body);
+
+export const sendOrderDetailUpdatedEmailApi = ({
+  orderId,
+  restaurantId,
+  timestamp,
+}: {
+  orderId: string;
+  restaurantId: string;
+  timestamp: string;
+}) =>
+  postApi(`/orders/${orderId}/send-order-details-updated-email`, {
+    restaurantId,
+    timestamp,
+  });

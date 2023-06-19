@@ -976,6 +976,16 @@ export enum ESubOrderStatus {
   CANCELED = 'canceled',
 }
 
+export enum EOrderHistoryTypes {
+  MEMBER_FOOD_CHANGED = 'MEMBER_FOOD_CHANGED',
+  MEMBER_FOOD_REMOVED = 'MEMBER_FOOD_REMOVED',
+  MEMBER_FOOD_ADDED = 'MEMBER_FOOD_ADDED',
+  FOOD_ADDED = 'FOOD_ADDED',
+  FOOD_REMOVED = 'FOOD_REMOVED',
+  FOOD_INCREASED = 'FOOD_INCREASED',
+  FOOD_DECREASED = 'FOOD_DECREASED',
+}
+
 export enum EQuotationStatus {
   ACTIVE = 'active',
   INACTIVE = 'inactive',

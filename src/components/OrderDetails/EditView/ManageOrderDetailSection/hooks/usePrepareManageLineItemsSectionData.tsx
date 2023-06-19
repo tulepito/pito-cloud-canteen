@@ -33,7 +33,7 @@ export const usePrepareManageLineItemsSectionData = (
     [timestamp],
   );
 
-  const { restaurant = {} } = orderDetail[currentViewDate.toString()] || {};
+  const { restaurant = {} } = orderDetail[currentViewDate?.toString()] || {};
   const { foodList = {} } = restaurant;
   const foodOptions = Object.entries<TObject>(foodList).map(
     ([foodId, foodData]) => {

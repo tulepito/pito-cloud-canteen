@@ -6,6 +6,19 @@
   border-radius: 16px;
   padding: 16px 24px;
 
+  .pickingLink {
+    font-weight: $fontWeightBold;
+    color: $labelBlue2;
+    font-size: 16px;
+  }
+
+  .separator {
+    background-color: $neutralGray3;
+    width: 100%;
+    height: 2px;
+    margin: 20px 0 16px 0;
+  }
+
   .sectionTitle {
     @include textTemplate(18px, 700, 24px);
   }

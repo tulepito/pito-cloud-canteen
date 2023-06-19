@@ -17,6 +17,11 @@ type TOrderTitleProps = TDefaultProps & {
   };
   onConfirmOrder: () => void;
   onCancelOrder: () => void;
+  confirmButtonMessage?: string;
+  cancelButtonMessage?: string;
+  confirmDisabled?: boolean;
+  confirmInProgress?: boolean;
+  isDraftEditing: boolean;
 };
 
 const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
@@ -27,9 +32,16 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
     data: { deliveryHour, deliveryAddress = {}, canStartOrder = false },
     onConfirmOrder,
     onCancelOrder,
+    confirmButtonMessage,
+    cancelButtonMessage,
+    confirmDisabled,
+    confirmInProgress,
+    isDraftEditing,
   } = props;
+
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const submitDisabled = !canStartOrder || inProgress;
+  const submitDisabled =
+    (!isDraftEditing && !canStartOrder) || inProgress || confirmDisabled;
   const cancelOrderDisabled = inProgress;
 
   const rootClasses = classNames(rootClassName || css.root, className);
@@ -58,26 +70,27 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
         <Badge label={deliveryInfo} />
       </div>
       <div className={css.actions}>
-        <Button
-          disabled={submitDisabled}
-          type="button"
-          variant="cta"
-          className={css.makeOrderBtn}
-          onClick={onConfirmOrder}>
-          {intl.formatMessage({
-            id: 'EditView.OrderTitle.makeOrderButtonText',
-          })}
-        </Button>
-        <Button
-          disabled={cancelOrderDisabled}
-          type="button"
-          variant="secondary"
-          className={css.cancelOrderBtn}
-          onClick={onCancelOrder}>
-          {intl.formatMessage({
-            id: 'EditView.OrderTitle.cancelOrderButtonText',
-          })}
-        </Button>
+        {!!confirmButtonMessage && (
+          <Button
+            disabled={submitDisabled}
+            type="button"
+            variant="cta"
+            className={css.makeOrderBtn}
+            inProgress={confirmInProgress}
+            onClick={onConfirmOrder}>
+            {confirmButtonMessage}
+          </Button>
+        )}
+        {!!cancelButtonMessage && (
+          <Button
+            disabled={cancelOrderDisabled}
+            type="button"
+            variant="secondary"
+            className={css.cancelOrderBtn}
+            onClick={onCancelOrder}>
+            {cancelButtonMessage}
+          </Button>
+        )}
       </div>
     </div>
   );

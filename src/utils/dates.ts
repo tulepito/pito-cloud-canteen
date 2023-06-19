@@ -277,6 +277,10 @@ export const getStartOfWeek = (anchorDate: number) => {
   return DateTime.fromMillis(anchorDate).startOf('week').toJSDate();
 };
 
+export const getStartOfDay = (anchorDate: number) => {
+  return DateTime.fromMillis(anchorDate).startOf('day').second;
+};
+
 export const DAY_AS_INDEX = {
   [EDayOfWeek.sun]: -1,
   [EDayOfWeek.mon]: 0,

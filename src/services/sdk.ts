@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextRequest } from 'next/server';
 
+import type { TObject } from '@src/utils/types';
+
+import { denormalisedResponseEntities } from './data';
+
 const Decimal = require('decimal.js');
 const sharetribeSdk = require('sharetribe-flex-sdk');
 const flexIntegrationSdk = require('sharetribe-flex-integration-sdk');
@@ -146,4 +150,16 @@ export const getIntegrationSdk = () => {
     clientId: process.env.FLEX_INTEGRATION_CLIENT_ID,
     clientSecret: process.env.FLEX_INTEGRATION_CLIENT_SECRET,
   });
+};
+
+export const getCurrentUser = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  params: TObject = {},
+) => {
+  const sdk = getSdk(req, res);
+  const response = await sdk.currentUser.show(params);
+  const [currentUser] = denormalisedResponseEntities(response);
+
+  return currentUser;
 };

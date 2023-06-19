@@ -28,6 +28,7 @@ type TOrderLinkSectionProps = TDefaultProps & {
     companyName: string;
   };
   isAminLayout?: boolean;
+  ableToUpdateOrder: boolean;
 };
 
 const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
@@ -36,6 +37,7 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
     className,
     data: { orderDeadline, companyName },
     isAminLayout = false,
+    ableToUpdateOrder,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -116,6 +118,7 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
         <div className={css.title}>{sectionTitle}</div>
         <Button
           variant="inline"
+          disabled={!ableToUpdateOrder}
           className={css.shareLinkButton}
           onClick={handleShareButtonClick}>
           <IconShare className={css.editIcon} />
@@ -128,7 +131,7 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
           overlayClassName={css.toolTipOverlay}
           tooltipContent={copyToClipboardTooltip}
           placement="bottom">
-          <ButtonIcon onClick={handleCopyLink}>
+          <ButtonIcon disabled={!ableToUpdateOrder} onClick={handleCopyLink}>
             <IconCopy />
           </ButtonIcon>
         </Tooltip>
