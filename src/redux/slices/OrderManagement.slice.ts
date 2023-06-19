@@ -1517,8 +1517,9 @@ const OrderManagementSlice = createSlice({
       .addCase(bookerStartOrder.pending, (state) => {
         state.isStartOrderInProgress = true;
       })
-      .addCase(bookerStartOrder.fulfilled, (state) => {
+      .addCase(bookerStartOrder.fulfilled, (state, { payload }) => {
         state.isStartOrderInProgress = false;
+        state.quotation = payload;
       })
       .addCase(bookerStartOrder.rejected, (state) => {
         state.isStartOrderInProgress = false;
