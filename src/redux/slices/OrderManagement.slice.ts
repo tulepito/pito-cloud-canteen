@@ -805,15 +805,15 @@ const bookerStartOrder = createAsyncThunk(
       partner: partnerQuotation,
       client: clientQuotation,
     };
-
-    await createQuotationApi(orderId, apiBody);
-
+    const { data: response } = await createQuotationApi(orderId, apiBody);
     // Function is not ready on production
 
     // await sendPartnerNewOrderAppearEmailApi(orderId, {
     //   orderId,
     //   partner: partnerQuotation,
     // });
+
+    return response;
   },
 );
 
@@ -1518,8 +1518,9 @@ const OrderManagementSlice = createSlice({
       .addCase(bookerStartOrder.pending, (state) => {
         state.isStartOrderInProgress = true;
       })
-      .addCase(bookerStartOrder.fulfilled, (state) => {
+      .addCase(bookerStartOrder.fulfilled, (state, { payload }) => {
         state.isStartOrderInProgress = false;
+        state.quotation = payload;
       })
       .addCase(bookerStartOrder.rejected, (state) => {
         state.isStartOrderInProgress = false;

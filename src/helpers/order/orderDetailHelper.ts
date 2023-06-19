@@ -149,6 +149,7 @@ export const groupFoodOrderByDate = ({
     ? groupFoodForGroupOrder(orderDetail)
     : groupFoodForNormal(orderDetail);
 };
+
 export const groupFoodOrderByDateFromQuotation = ({
   quotation,
 }: {
