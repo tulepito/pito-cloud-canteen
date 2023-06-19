@@ -1,8 +1,12 @@
+import { useEffect } from 'react';
 import classNames from 'classnames';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import type { usePrepareOrderDetailPageData } from '@pages/company/orders/[orderId]/picking/hooks/usePrepareData';
-import type { TDefaultProps } from '@utils/types';
+import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
+import { Listing } from '@src/utils/data';
+import type { TDefaultProps, TListing } from '@utils/types';
 
 import ReviewCartSection from './ReviewCartSection/ReviewCartSection';
 import type { TReviewInfoFormValues } from './ReviewInfoSection/ReviewInfoForm';
@@ -23,6 +27,7 @@ type TReviewViewProps = TDefaultProps & {
   reviewViewData: ReturnType<
     typeof usePrepareOrderDetailPageData
   >['reviewViewData'];
+  orderData: TListing;
   onGoBackToEditOrderPage?: () => void;
   onSubmitEdit?: (values: TReviewInfoFormValues) => void;
   onDownloadPriceQuotation: () => Promise<void>;
@@ -41,8 +46,17 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     onSubmitEdit,
     onDownloadPriceQuotation,
     classes = {},
+    orderData,
   } = props;
   const { leftClassName, rightClassName } = classes;
+  const dispatch = useAppDispatch();
+  const orderListingGetter = Listing(orderData);
+  const { quotationId } = orderListingGetter.getMetadata();
+  useEffect(() => {
+    if (quotationId) {
+      dispatch(orderManagementThunks.fetchQuotation(quotationId));
+    }
+  }, [dispatch, quotationId]);
 
   const isGroupOrder = reviewViewData?.isGroupOrder;
   const rootClasses = classNames(rootClassName || css.root, className);

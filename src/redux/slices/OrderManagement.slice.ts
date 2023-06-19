@@ -26,7 +26,7 @@ import {
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { TPlan } from '@src/utils/orderTypes';
-import { Listing } from '@utils/data';
+import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { EOrderHistoryTypes, EParticipantOrderStatus } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type {
@@ -157,6 +157,9 @@ type TOrderManagementState = {
   orderDetail: TPlan['orderDetail'];
   updateOrderFromDraftEditInProgress: boolean;
   updateOrderfromDraftEditError: any;
+  quotation: TObject;
+  fetchQuotationInProgress: boolean;
+  fetchQuotationError: any;
 };
 
 const initialState: TOrderManagementState = {
@@ -190,9 +193,13 @@ const initialState: TOrderManagementState = {
   updateOrderFromDraftEditInProgress: false,
   updateOrderfromDraftEditError: null,
   draftSubOrderChangesHistory: {},
+  quotation: {},
+  fetchQuotationInProgress: false,
+  fetchQuotationError: null,
 };
 
 // ================ Thunk types ================ //
+const FETCH_QUOTATION = 'app/OrderManagement/FETCH_QUOTATION';
 
 // ================ Async thunks ================ //
 const loadData = createAsyncThunk(
@@ -610,15 +617,15 @@ const bookerStartOrder = createAsyncThunk(
       partner: partnerQuotation,
       client: clientQuotation,
     };
-
-    await createQuotationApi(orderId, apiBody);
-
+    const { data: response } = await createQuotationApi(orderId, apiBody);
     // Function is not ready on production
 
     // await sendPartnerNewOrderAppearEmailApi(orderId, {
     //   orderId,
     //   partner: partnerQuotation,
     // });
+
+    return response;
   },
 );
 
@@ -750,6 +757,18 @@ const updateOrderFromDraftEdit = createAsyncThunk(
     await dispatch(loadData(orderId));
   },
 );
+const fetchQuotation = createAsyncThunk(
+  FETCH_QUOTATION,
+  async (quotationId: string, { extra: sdk }) => {
+    const quotation = denormalisedResponseEntities(
+      await sdk.listings.show({
+        id: quotationId,
+      }),
+    )[0];
+
+    return quotation;
+  },
+);
 
 export const orderManagementThunks = {
   loadData,
@@ -767,6 +786,7 @@ export const orderManagementThunks = {
   updatePlanOrderDetail,
   querySubOrderChangesHistory,
   updateOrderFromDraftEdit,
+  fetchQuotation,
 };
 
 // ================ Slice ================ //
@@ -1184,8 +1204,9 @@ const OrderManagementSlice = createSlice({
       .addCase(bookerStartOrder.pending, (state) => {
         state.isStartOrderInProgress = true;
       })
-      .addCase(bookerStartOrder.fulfilled, (state) => {
+      .addCase(bookerStartOrder.fulfilled, (state, { payload }) => {
         state.isStartOrderInProgress = false;
+        state.quotation = payload;
       })
       .addCase(bookerStartOrder.rejected, (state) => {
         state.isStartOrderInProgress = false;
@@ -1334,6 +1355,19 @@ const OrderManagementSlice = createSlice({
       })
       .addCase(updatePlanOrderDetail.rejected, (state) => {
         state.isUpdatingOrderDetails = false;
+      })
+
+      .addCase(fetchQuotation.pending, (state) => {
+        state.fetchQuotationInProgress = true;
+        state.fetchQuotationError = null;
+      })
+      .addCase(fetchQuotation.fulfilled, (state, { payload }) => {
+        state.fetchQuotationInProgress = false;
+        state.quotation = payload;
+      })
+      .addCase(fetchQuotation.rejected, (state, { error }) => {
+        state.fetchQuotationInProgress = false;
+        state.fetchQuotationError = error.message;
       });
   },
 });

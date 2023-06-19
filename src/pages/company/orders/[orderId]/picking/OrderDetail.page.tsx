@@ -373,6 +373,7 @@ const OrderDetailPage = () => {
       onDownloadPriceQuotation={handleDownloadPriceQuotation}
       onGoBackToEditOrderPage={handleGoBackFromReviewMode}
       showStartPickingOrderButton
+      orderData={orderData as TListing}
     />
   );
 

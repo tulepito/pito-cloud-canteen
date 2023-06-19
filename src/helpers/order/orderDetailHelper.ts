@@ -1,5 +1,8 @@
+import isEmpty from 'lodash/isEmpty';
+
+import { Listing } from '@src/utils/data';
 import { EParticipantOrderStatus, ESubOrderStatus } from '@utils/enums';
-import type { TObject } from '@utils/types';
+import type { TListing, TObject } from '@utils/types';
 
 const groupFoodForGroupOrder = (orderDetail: TObject) => {
   return Object.entries(orderDetail).reduce(
@@ -145,4 +148,45 @@ export const groupFoodOrderByDate = ({
   return isGroupOrder
     ? groupFoodForGroupOrder(orderDetail)
     : groupFoodForNormal(orderDetail);
+};
+
+export const groupFoodOrderByDateFromQuotation = ({
+  quotation,
+}: {
+  quotation: TListing;
+}) => {
+  const quotationListingGetter = Listing(quotation);
+  const { client, partner } = quotationListingGetter.getMetadata();
+  if (isEmpty(client) || isEmpty(partner)) {
+    return [];
+  }
+
+  const result = Object.keys(client.quotation).map(
+    (subOrderDate: string, index: number) => {
+      const restaurant = Object.keys(partner).find((restaurantId: string) => {
+        return Object.keys(partner[restaurantId].quotation).some(
+          (date: string) => date === subOrderDate,
+        );
+      });
+
+      return {
+        date: subOrderDate,
+        restaurantId: Object.keys(partner[restaurant!])[0],
+        restaurantName: partner[restaurant!].name,
+        index,
+        totalDishes: client.quotation[subOrderDate].length,
+        foodDataList: client.quotation[subOrderDate],
+        totalPrice: client.quotation[subOrderDate].reduce(
+          (previousResult: number, current: TObject) => {
+            const { foodPrice } = current;
+
+            return previousResult + foodPrice;
+          },
+          0,
+        ),
+      };
+    },
+  );
+
+  return result;
 };
