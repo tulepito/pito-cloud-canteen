@@ -1,8 +1,10 @@
+import classNames from 'classnames';
+
 import css from './EmptySubOrder.module.scss';
 
-const EmptySubOrder = () => {
+const EmptySubOrder = ({ className }: { className?: string }) => {
   return (
-    <div className={css.container}>
+    <div className={classNames(css.container, className)}>
       <svg
         width={142}
         height={142}
