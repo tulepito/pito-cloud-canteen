@@ -544,9 +544,7 @@ const bookerStartOrder = createAsyncThunk(
       client: clientQuotation,
     };
 
-    const { data: response } = await createQuotationApi(orderId, apiBody);
-
-    return response;
+    await createQuotationApi(orderId, apiBody);
   },
 );
 
@@ -667,9 +665,8 @@ const OrderManagementSlice = createSlice({
       .addCase(bookerStartOrder.pending, (state) => {
         state.isStartOrderInProgress = true;
       })
-      .addCase(bookerStartOrder.fulfilled, (state, { payload }) => {
+      .addCase(bookerStartOrder.fulfilled, (state) => {
         state.isStartOrderInProgress = false;
-        state.quotation = payload;
       })
       .addCase(bookerStartOrder.rejected, (state) => {
         state.isStartOrderInProgress = false;
