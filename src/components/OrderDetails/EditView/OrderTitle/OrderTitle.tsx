@@ -70,7 +70,7 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
         <Badge label={deliveryInfo} />
       </div>
       <div className={css.actions}>
-        {confirmButtonMessage && (
+        {!!confirmButtonMessage && (
           <Button
             disabled={submitDisabled}
             type="button"
@@ -81,7 +81,7 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
             {confirmButtonMessage}
           </Button>
         )}
-        {cancelButtonMessage && (
+        {!!cancelButtonMessage && (
           <Button
             disabled={cancelOrderDisabled}
             type="button"

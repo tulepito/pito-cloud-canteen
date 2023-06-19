@@ -1,10 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
-import {
-  fetchTransaction,
-  updateTransactionMetadata,
-} from '@services/integrationHelper';
+import { fetchTransaction } from '@services/integrationHelper';
 import { handleError } from '@services/sdk';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -23,23 +20,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         }
 
       case HttpMethod.POST:
-        return res.status(404).json({ message: 'Method is not allow' });
       case HttpMethod.DELETE:
-        return res.status(404).json({ message: 'Method is not allow' });
-      case HttpMethod.PUT: {
-        try {
-          const transaction = await updateTransactionMetadata({
-            id: transactionId,
-            metadata: {},
-          });
-
-          return res.status(200).json(transaction);
-        } catch (error) {
-          return handleError(res, error);
-        }
-      }
+      case HttpMethod.PUT:
       default:
-        return res.status(404).json({ message: 'Method is not allow' });
+        return res.status(400).json({ message: 'Method is not allow' });
     }
   } catch (error) {
     console.error(error);

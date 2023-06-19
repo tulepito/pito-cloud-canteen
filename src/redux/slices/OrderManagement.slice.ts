@@ -716,35 +716,35 @@ const updateOrderFromDraftEdit = createAsyncThunk(
             timestamp: date,
             restaurantId: restaurant.id,
           });
-        }
 
-        await Promise.all(
-          draftSubOrderChangesHistoryByDate.map(
-            async (item: TSubOrderChangeHistoryItem) => {
-              const {
-                memberId,
-                planOrderDate,
-                type,
-                oldValue,
-                newValue,
-                createdAt,
-              } = item;
-              const subOrderChangesHistoryParams = {
-                planId,
-                memberId,
-                planOrderDate,
-                type,
-                oldValue,
-                newValue,
-                createdAt: new Date(Number(createdAt?.seconds) * 1000),
-              };
-              await createOrderChangesHistoryDocumentApi(
-                orderId,
-                subOrderChangesHistoryParams,
-              );
-            },
-          ),
-        );
+          await Promise.all(
+            draftSubOrderChangesHistoryByDate.map(
+              async (item: TSubOrderChangeHistoryItem) => {
+                const {
+                  memberId,
+                  planOrderDate,
+                  type,
+                  oldValue,
+                  newValue,
+                  createdAt,
+                } = item;
+                const subOrderChangesHistoryParams = {
+                  planId,
+                  memberId,
+                  planOrderDate,
+                  type,
+                  oldValue,
+                  newValue,
+                  createdAt: new Date(Number(createdAt?.seconds) * 1000),
+                };
+                await createOrderChangesHistoryDocumentApi(
+                  orderId,
+                  subOrderChangesHistoryParams,
+                );
+              },
+            ),
+          );
+        }
       }),
     );
     await dispatch(loadData(orderId));
