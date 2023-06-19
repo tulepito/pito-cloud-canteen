@@ -930,7 +930,6 @@ const updateOrderFromDraftEdit = createAsyncThunk(
                   newValue,
                   createdAt,
                 } = item;
-
                 const subOrderChangesHistoryParams = {
                   planId,
                   memberId,
