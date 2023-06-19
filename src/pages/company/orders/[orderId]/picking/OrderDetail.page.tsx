@@ -19,13 +19,12 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
+import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { companyPaths } from '@src/paths';
 import { CurrentUser, Listing } from '@utils/data';
 import { EOrderDraftStates, EOrderStates, EOrderType } from '@utils/enums';
 import type { TListing } from '@utils/types';
-
-import { usePrepareOrderDetailPageData } from './hooks/usePrepareData';
 
 import css from './OrderDetail.module.scss';
 

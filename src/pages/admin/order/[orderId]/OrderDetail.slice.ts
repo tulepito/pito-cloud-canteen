@@ -12,6 +12,7 @@ import {
 } from '@apis/orderApi';
 import { getOrderQuotationsQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
+import { OrderManagementsAction } from '@redux/slices/OrderManagement.slice';
 import {
   denormalisedResponseEntities,
   Listing,
@@ -132,13 +133,14 @@ const fetchOrder = createAsyncThunk(FETCH_ORDER, async (orderId: string) => {
 
 const updateStaffName = createAsyncThunk(
   UPDATE_STAFF_NAME,
-  async (payload: { orderId: string; staffName: string }) => {
+  async (payload: { orderId: string; staffName: string }, { dispatch }) => {
     const { orderId, staffName } = payload;
     const apiBody = {
       generalInfo: {
         staffName,
       },
     };
+    dispatch(OrderManagementsAction.updateStaffName(staffName));
 
     const { data: orderListing } = await updateOrderApi(orderId, apiBody);
 

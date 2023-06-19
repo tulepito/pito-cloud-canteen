@@ -1,0 +1,21 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  padding: 8px 0 12px;
+}
+
+.itemRoot {
+  padding: 10px 16px;
+  background-color: $neutralGray1;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $neutralGray2;
+  }
+
+  &.itemDisabled {
+    background-color: $neutralGray2;
+    cursor: not-allowed;
+  }
+}

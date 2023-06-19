@@ -1,10 +1,9 @@
 import ReactDOM from 'react-dom';
 
 import PriceQuotation from '@components/OrderDetails/PriceQuotation/PriceQuotation';
+import type { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { createNewPrint } from '@services/pdf';
 import TranslationProvider from '@translations/TranslationProvider';
-
-import type { usePrepareOrderDetailPageData } from '../hooks/usePrepareData';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 const PAGE_HEIGHT = 842; // A4 height in pixels

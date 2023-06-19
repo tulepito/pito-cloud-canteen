@@ -429,7 +429,7 @@ export const orderFlow = {
     EOrderStates.canceledByBooker,
     EOrderStates.canceled,
   ],
-  [EOrderStates.picking]: [EOrderStates.inProgress],
+  [EOrderStates.picking]: [EOrderStates.inProgress, EOrderStates.canceled],
   [EOrderStates.inProgress]: [EOrderStates.pendingPayment],
   [EOrderStates.pendingPayment]: [EOrderStates.completed],
   [EOrderStates.completed]: [EOrderStates.reviewed],

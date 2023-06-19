@@ -1,7 +1,7 @@
 import uniq from 'lodash/uniq';
 
+import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
 import { combineOrderDetailWithPriceInfo } from '@helpers/orderHelper';
-import { calculatePriceQuotationInfo } from '@pages/company/orders/[orderId]/picking/helpers/cartInfoHelper';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import { EOrderDraftStates, EOrderType } from '@utils/enums';

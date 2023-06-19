@@ -665,6 +665,9 @@ const OrderManagementSlice = createSlice({
     clearAddUpdateParticipantError: (state) => {
       state.addOrUpdateMemberOrderError = null;
     },
+    updateStaffName: (state, { payload }) => {
+      state.orderData!.attributes.metadata.staffName = payload;
+    },
   },
   extraReducers: (builder) => {
     builder
