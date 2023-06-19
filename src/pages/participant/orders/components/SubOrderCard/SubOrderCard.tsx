@@ -68,7 +68,8 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
     ![EVENT_STATUS.EXPIRED_STATUS, EVENT_STATUS.NOT_JOINED_STATUS].includes(
       status,
     ) &&
-    !isExpired;
+    !isExpired &&
+    !transactionId;
   const shouldShowCountdown = !isOrderStarted && !isExpired;
 
   const subOrderTxs = useAppSelector(
