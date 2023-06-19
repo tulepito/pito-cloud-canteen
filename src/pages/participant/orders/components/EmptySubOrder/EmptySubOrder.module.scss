@@ -1,0 +1,12 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.container {
+  @include flexCenter;
+  flex-direction: column;
+
+  .text {
+    color: $neutralGray5;
+  }
+}

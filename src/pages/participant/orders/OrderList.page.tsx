@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
+import { EVENTS_MOCKUP } from '@components/CalendarDashboard/helpers/mockupData';
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
@@ -279,7 +280,7 @@ const OrderListPage = () => {
   };
 
   useEffect(() => {
-    if (subOrdersFromSelectedDayTxIds.length > 0) {
+    if (subOrdersFromSelectedDayTxIds.length > 0 && !walkthroughEnable) {
       dispatch(
         OrderListThunks.fetchTransactionBySubOrder(
           subOrdersFromSelectedDayTxIds,
@@ -298,10 +299,12 @@ const OrderListPage = () => {
 
   useEffect(() => {
     (async () => {
-      await dispatch(OrderListThunks.fetchOrders(currentUserId));
-      dispatch(OrderListActions.markColorToOrder());
+      if (!walkthroughEnable) {
+        await dispatch(OrderListThunks.fetchOrders(currentUserId));
+        dispatch(OrderListActions.markColorToOrder());
+      }
     })();
-  }, [currentUserId]);
+  }, [currentUserId, walkthroughEnable]);
 
   useEffect(() => {
     dispatch(OrderListThunks.fetchAttributes());
@@ -336,7 +339,7 @@ const OrderListPage = () => {
       <div className={css.calendarContainer}>
         <CalendarDashboard
           anchorDate={selectedDay}
-          events={flattenEvents}
+          events={walkthroughEnable ? EVENTS_MOCKUP : flattenEvents}
           renderEvent={OrderEventCard}
           inProgress={showLoadingModal}
           defautlView={defaultCalendarView}
@@ -350,6 +353,7 @@ const OrderListPage = () => {
               />
             ),
           }}
+          resources={walkthroughEnable}
         />
       </div>
       <div className={css.subOrderContainer}>

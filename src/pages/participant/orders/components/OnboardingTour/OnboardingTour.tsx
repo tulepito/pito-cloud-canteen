@@ -25,15 +25,6 @@ const tourConfig = [
     ),
     style: {
       backgroundColor: '#ffecea',
-      '&::after': {
-        content: '',
-        position: 'absolute',
-        bottom: '0',
-        left: '16px',
-        transform: 'matrix(1, 0, 0, -1, 0, 0)',
-        width: 10,
-        height: 6,
-      },
     },
   },
   {
@@ -49,15 +40,6 @@ const tourConfig = [
     ),
     style: {
       backgroundColor: '#ffecea',
-      '&::after': {
-        content: '',
-        position: 'absolute',
-        bottom: '0',
-        left: '16px',
-        transform: 'matrix(1, 0, 0, -1, 0, 0)',
-        width: 10,
-        height: 6,
-      },
     },
   },
   {
@@ -73,15 +55,6 @@ const tourConfig = [
     ),
     style: {
       backgroundColor: '#ffecea',
-      '&::after': {
-        content: '',
-        position: 'absolute',
-        bottom: '0',
-        left: '16px',
-        transform: 'matrix(1, 0, 0, -1, 0, 0)',
-        width: 10,
-        height: 6,
-      },
     },
   },
 ];
