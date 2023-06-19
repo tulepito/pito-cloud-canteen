@@ -21,7 +21,7 @@ import {
 } from '@apis/orderApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
-import { Listing } from '@utils/data';
+import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type {
@@ -65,6 +65,9 @@ type TOrderManagementState = {
   transactionDataMap: {
     [date: number]: TTransaction;
   };
+  quotation: TObject;
+  fetchQuotationInProgress: boolean;
+  fetchQuotationError: any;
 };
 
 const initialState: TOrderManagementState = {
@@ -88,9 +91,13 @@ const initialState: TOrderManagementState = {
   participantData: [],
   anonymousParticipantData: [],
   transactionDataMap: {},
+  quotation: {},
+  fetchQuotationInProgress: false,
+  fetchQuotationError: null,
 };
 
 // ================ Thunk types ================ //
+const FETCH_QUOTATION = 'app/OrderManagement/FETCH_QUOTATION';
 
 // ================ Async thunks ================ //
 const loadData = createAsyncThunk(
@@ -537,7 +544,9 @@ const bookerStartOrder = createAsyncThunk(
       client: clientQuotation,
     };
 
-    await createQuotationApi(orderId, apiBody);
+    const { data: response } = await createQuotationApi(orderId, apiBody);
+
+    return response;
   },
 );
 
@@ -558,6 +567,19 @@ const bookerMarkInprogressPlanViewed = createAsyncThunk(
   },
 );
 
+const fetchQuotation = createAsyncThunk(
+  FETCH_QUOTATION,
+  async (quotationId: string, { extra: sdk }) => {
+    const quotation = denormalisedResponseEntities(
+      await sdk.listings.show({
+        id: quotationId,
+      }),
+    )[0];
+
+    return quotation;
+  },
+);
+
 export const orderManagementThunks = {
   loadData,
   updateOrderGeneralInfo,
@@ -571,6 +593,7 @@ export const orderManagementThunks = {
   bookerStartOrder,
   cancelPickingOrder,
   bookerMarkInprogressPlanViewed,
+  fetchQuotation,
 };
 
 // ================ Slice ================ //
@@ -644,8 +667,9 @@ const OrderManagementSlice = createSlice({
       .addCase(bookerStartOrder.pending, (state) => {
         state.isStartOrderInProgress = true;
       })
-      .addCase(bookerStartOrder.fulfilled, (state) => {
+      .addCase(bookerStartOrder.fulfilled, (state, { payload }) => {
         state.isStartOrderInProgress = false;
+        state.quotation = payload;
       })
       .addCase(bookerStartOrder.rejected, (state) => {
         state.isStartOrderInProgress = false;
@@ -707,6 +731,19 @@ const OrderManagementSlice = createSlice({
       })
       .addCase(bookerMarkInprogressPlanViewed.rejected, (state) => {
         return state;
+      })
+
+      .addCase(fetchQuotation.pending, (state) => {
+        state.fetchQuotationInProgress = true;
+        state.fetchQuotationError = null;
+      })
+      .addCase(fetchQuotation.fulfilled, (state, { payload }) => {
+        state.fetchQuotationInProgress = false;
+        state.quotation = payload;
+      })
+      .addCase(fetchQuotation.rejected, (state, { error }) => {
+        state.fetchQuotationInProgress = false;
+        state.fetchQuotationError = error.message;
       });
   },
 });

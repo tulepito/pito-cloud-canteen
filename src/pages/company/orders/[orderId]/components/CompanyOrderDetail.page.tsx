@@ -1,5 +1,6 @@
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
+import type { TListing } from '@src/utils/types';
 
 import { usePrepareOrderDetailPageData } from '../picking/hooks/usePrepareData';
 
@@ -16,6 +17,7 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
     priceQuotationData,
     canReview,
     goToReviewPage,
+    orderData,
   } = usePrepareOrderDetailPageData();
 
   const handleDownloadPriceQuotation = useDownloadPriceQuotation(
@@ -36,6 +38,7 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
         onDownloadPriceQuotation={handleDownloadPriceQuotation}
         canEditInfo={false}
         reviewViewData={reviewViewData}
+        orderData={orderData as TListing}
       />
     </div>
   );
