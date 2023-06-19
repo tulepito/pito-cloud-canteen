@@ -56,13 +56,11 @@
 
 .emptyDay {
   // flex-basis: calc((100% - 32px) / 7);
-  border-bottom: 1px solid $neutralGray4;
-  border-right: 1px solid $neutralGray4;
   min-height: 76px;
 
-  &:nth-child(7n + 1) {
-    border-left: 1px solid $neutralGray4;
-  }
+  // &:nth-child(7n + 1) {
+  //   border-left: 1px solid $neutralGray4;
+  // }
 }
 
 .calendarTitleWrapper {
@@ -108,5 +106,9 @@
     background-color: $neutralGray1;
     top: 0;
     z-index: -1;
+  }
+
+  .noEventIcon {
+    padding-top: 40px;
   }
 }
