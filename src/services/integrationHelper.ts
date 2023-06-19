@@ -90,7 +90,7 @@ export const updateTransactionMetadata = async (
 ) => {
   const integrationSdk = getIntegrationSdk();
 
-  const response = await integrationSdk.transactions.show(
+  const response = await integrationSdk.transactions.updateMetadata(
     dataParams,
     queryParams,
   );

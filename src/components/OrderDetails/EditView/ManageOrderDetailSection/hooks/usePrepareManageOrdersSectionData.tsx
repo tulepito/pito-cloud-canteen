@@ -34,7 +34,7 @@ export const usePrepareManageOrdersSectionData = (
     .sort((x, y) => x - y);
   const indexOfTimestamp = useMemo(
     () => dateList.indexOf(Number(timestamp)),
-    [timestamp, dateList],
+    [timestamp, JSON.stringify(dateList)],
   );
 
   const { restaurant = {}, memberOrders = {} } =

@@ -2,19 +2,13 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import orderServices from '@pages/api/apiServices/order/index.service';
-import { denormalisedResponseEntities } from '@services/data';
-import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
+import { fetchUser } from '@services/integrationHelper';
+import { getCurrentUser, handleError } from '@services/sdk';
 import { CurrentUser, User } from '@src/utils/data';
 
-const showUser = async (id: string) => {
+const showUserMaybe = (id: string) => {
   try {
-    const integrationSdk = getIntegrationSdk();
-
-    const response = await integrationSdk.users.show({
-      id,
-    });
-
-    return denormalisedResponseEntities(response)[0];
+    return fetchUser(id);
   } catch (error) {
     return null;
   }
@@ -27,12 +21,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     switch (apiMethod) {
       case HttpMethod.POST: {
         try {
-          const sdk = getSdk(req, res);
           const { planId } = req.query;
           const createData = req.body;
-          const currentUser = denormalisedResponseEntities(
-            await sdk.currentUser.show(),
-          )[0];
+          const currentUser = await getCurrentUser(req, res);
           const createdAt = createData.createdAt
             ? new Date(createData.createdAt)
             : new Date();
@@ -73,7 +64,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const response = await Promise.all(
             results.map(async (item) => {
               const member = item.memberId
-                ? await showUser(item.memberId)
+                ? await showUserMaybe(item.memberId)
                 : null;
 
               return {
@@ -102,7 +93,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       case HttpMethod.DELETE:
       case HttpMethod.PUT:
       default:
-        return res.status(404).json('Method is not allowed');
+        return res.status(400).json('Method is not allowed');
     }
   } catch (error) {
     console.error(error);
