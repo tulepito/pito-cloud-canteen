@@ -41,6 +41,7 @@ type TExtraProps = {
     memberName: string;
   }[];
   ableToUpdateOrder: boolean;
+  isDraftEditing: boolean;
 };
 type TAddOrderFormComponentProps = FormRenderProps<TAddOrderFormValues> &
   Partial<TExtraProps>;
@@ -68,6 +69,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     values,
     invalid,
     ableToUpdateOrder,
+    isDraftEditing,
   } = props;
 
   const fieldSelectMemberDisable =
@@ -199,6 +201,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
             formError={submitErrors?.participantId}
             validate={validateMemberField}
             validateErrorClassName={css.fieldParticipantIdError}
+            newOptionValidator={isDraftEditing ? () => false : undefined}
           />
           {addOrUpdateMemberOrderError !== null && (
             <div className={css.formError}>

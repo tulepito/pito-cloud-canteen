@@ -109,6 +109,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
                 foodOptions={foodOptions}
                 memberOptions={memberOptions}
                 ableToUpdateOrder={ableToUpdateOrder}
+                isDraftEditing={isDraftEditing}
               />
             </div>
           </div>
