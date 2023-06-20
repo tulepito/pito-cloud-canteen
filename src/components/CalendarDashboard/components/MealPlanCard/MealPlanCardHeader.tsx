@@ -62,9 +62,9 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
           <FormattedMessage id={`DayColumn.Session.${session}`} />
         </div>
         <IconClose
-          data-tour="step-4"
           className={css.close}
           onClick={handleOpenDeleteModal}
+          data-tour="step-5"
         />
       </div>
       <div className={css.headerActions}>

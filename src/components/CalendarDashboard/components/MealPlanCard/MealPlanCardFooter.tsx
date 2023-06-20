@@ -67,7 +67,7 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
           variant="secondary"
           className={css.actionButton}
           onClick={handleEditFood}
-          data-tour="step-5"
+          data-tour="step-4"
           inProgress={editFoodInprogress}>
           {isSelectedFood ? (
             <FormattedMessage id="MealPlanCard.footer.modify" />
