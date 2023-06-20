@@ -213,7 +213,9 @@ const OrderDetailPage = () => {
         id: 'EditView.OrderTitle.updateOrderButtonText',
       });
 
-  const ableToUpdateOrder = diffDays(currentViewDate, NOW, 'day') > ONE_DAY;
+  const ableToUpdateOrder =
+    (isDraftEditing && diffDays(currentViewDate, NOW, 'day') > ONE_DAY) ||
+    isPicking;
 
   const orderDetailsNotChanged =
     isDraftEditing && isEqual(orderDetail, newOrderDetail);
@@ -239,9 +241,10 @@ const OrderDetailPage = () => {
             : ''
         }
         confirmDisabled={
-          orderDetailsNotChanged ||
-          (!isDraftEditing && shouldShowOverflowError) ||
-          (!isDraftEditing && shouldShowUnderError)
+          !isPicking &&
+          (orderDetailsNotChanged ||
+            (!isDraftEditing && shouldShowOverflowError) ||
+            (!isDraftEditing && shouldShowUnderError))
         }
         isDraftEditing={isDraftEditing}
       />
