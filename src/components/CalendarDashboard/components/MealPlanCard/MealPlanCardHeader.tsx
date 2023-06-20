@@ -52,7 +52,7 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
         <IconClose
           className={css.close}
           onClick={handleOpenDeleteModal}
-          data-tour="step-4"
+          data-tour="step-5"
         />
       </div>
       <div className={css.headerActions}>

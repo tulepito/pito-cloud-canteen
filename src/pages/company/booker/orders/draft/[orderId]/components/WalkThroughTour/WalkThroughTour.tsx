@@ -88,6 +88,30 @@ const tourConfig = [
     content: ({ currentStep }: any) => (
       <div>
         <div className={css.step}>{`${currentStep + 1}/5`}</div>
+        <div className={css.stepTitle}>Chọn các món ăn trong menu</div>
+        <div className={css.stepContent}>
+          &ldquo;Hôm nay ăn gì?&rdquo; Bạn xem ở đây nhé!
+        </div>
+      </div>
+    ),
+    styles: {
+      popover: (base: any) => ({
+        ...base,
+        borderRadius: 8,
+        left: '20px',
+      }),
+      maskArea: (base: any) => ({
+        ...base,
+        rx: 8,
+      }),
+    },
+    position: 'right',
+  },
+  {
+    selector: '[data-tour="step-5"]',
+    content: ({ currentStep }: any) => (
+      <div>
+        <div className={css.step}>{`${currentStep + 1}/5`}</div>
         <div className={css.stepTitle}>Xoá bữa ăn này</div>
         <div className={css.stepContent}>
           Bạn có thể xoá nhà hàng đã chọn trong trường muốn thay đổi ngày ăn
@@ -107,30 +131,6 @@ const tourConfig = [
     },
     position: 'right',
     padding: 10,
-  },
-  {
-    selector: '[data-tour="step-5"]',
-    content: ({ currentStep }: any) => (
-      <div>
-        <div className={css.step}>{`${currentStep + 1}/5`}</div>
-        <div className={css.stepTitle}>Chọn các món ăn trong menu</div>
-        <div className={css.stepContent}>
-          &ldquo;Hôm nay ăn gì?&rdquo; Bạn xem ở đây nhé!
-        </div>
-      </div>
-    ),
-    styles: {
-      popover: (base: any) => ({
-        ...base,
-        borderRadius: 8,
-        left: '20px',
-      }),
-      maskArea: (base: any) => ({
-        ...base,
-        rx: 8,
-      }),
-    },
-    position: 'right',
   },
 ];
 
