@@ -2,9 +2,6 @@ import type { TObject, TRestaurantRating, TScenarioRating } from '@utils/types';
 
 import { deleteApi, getApi, postApi, putApi } from './configs';
 
-export const checkEmailExistedApi = (email: string) =>
-  getApi(`/users/check-email-existed/${email}`);
-
 export type AddMembersApiBody = {
   userIdList: string[];
   noAccountEmailList: string[];

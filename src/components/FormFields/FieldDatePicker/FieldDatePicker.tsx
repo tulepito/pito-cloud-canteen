@@ -28,6 +28,8 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
     onChange: onDatePickerChange,
     customInput,
     selected,
+    inputRootClassName,
+    inputClassName,
     ...rest
   } = props;
   const { name, onChange, value, onBlur } = input;
@@ -42,9 +44,19 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
   const { invalid, error, touched } = meta;
   const errorText = customErrorText || error;
   const hasError = !!customErrorText || !!(touched && invalid && error);
-  const fieldMeta = { touched: hasError, error: errorText };
+  const fieldMeta = {
+    shouldSkipTouched: true,
+    touched: hasError,
+    error: errorText,
+  };
   const labelClasses = classNames(css.labelRoot);
   const labelRequiredRedStar = fieldMeta.error ? css.labelRequiredRedStar : '';
+
+  const inputClasses =
+    inputRootClassName ||
+    classNames(css.input, inputClassName, {
+      [css.inputError]: !!customErrorText || !!(invalid && error),
+    });
 
   return (
     <div className={classNames(css.root, className)}>
@@ -59,7 +71,7 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
         id={id}
         name={name}
         onChange={onInputChange}
-        className={css.input}
+        className={inputClasses}
         customInput={customInput}
         selected={value || selected}
         {...rest}

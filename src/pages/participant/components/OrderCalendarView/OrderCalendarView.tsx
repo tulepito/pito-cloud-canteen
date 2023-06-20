@@ -6,8 +6,10 @@ import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
 
 import Avatar from '@components/Avatar/Avatar';
+import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
+import LoadingModal from '@components/LoadingModal/LoadingModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { getItem } from '@helpers/localStorageHelpers';
 import { markColorForOrder } from '@helpers/orderHelper';
@@ -46,8 +48,8 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const ensureCompanyUser = User(company).getFullData();
   const orderObj = Listing(order);
   const orderId = orderObj.getId();
-  const orderTile = orderObj.getAttributes()?.title;
-  const orderColor = markColorForOrder(convertStringToNumber(orderTile || ''));
+  const orderTitle = orderObj.getAttributes()?.title;
+  const orderColor = markColorForOrder(convertStringToNumber(orderTitle || ''));
   const currentUserId = CurrentUser(currentUser).getId();
   const selectedDay = useAppSelector((state) => state.Calendar.selectedDay);
   const ratingSubOrderModalControl = useBoolean();
@@ -57,6 +59,10 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     selectedEvent,
     setSelectedEvent,
     onRejectSelectDish,
+    addSubOrderDocumentToFirebaseInProgress,
+    participantPostRatingInProgress,
+    updateSubOrderInProgress,
+    updateOrderInProgress,
   } = useSubOrderPicking();
 
   const { deadlineDate, deliveryHour, startDate, endDate } =
@@ -121,7 +127,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           dishSelection: { dishSelection: foodSelection?.foodId },
           orderColor,
         },
-        title: orderTile,
+        title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
         end: DateTime.fromMillis(+planItemKey).plus({ hour: 1 }).toJSDate(),
       };
@@ -151,6 +157,12 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
       <span className={css.companyTitle}>{companyTitle}</span>
     </div>
   );
+
+  const showLoadingModal =
+    updateOrderInProgress ||
+    updateSubOrderInProgress ||
+    addSubOrderDocumentToFirebaseInProgress ||
+    participantPostRatingInProgress;
 
   const handleAnchorDateChange = (date?: Date) => {
     setAnchorTime(date?.getTime());
@@ -196,6 +208,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           onClose={subOrderDetailModalControl.setFalse}
           event={selectedEvent!}
           openRatingSubOrderModal={ratingSubOrderModalControl.setTrue}
+          from="orderDetail"
         />
         <RatingSubOrderModal
           isOpen={ratingSubOrderModalControl.value}
@@ -210,6 +223,8 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         isOpen={successRatingModalControl.value}
         onClose={successRatingModalControl.setFalse}
       />
+      <BottomNavigationBar />
+      <LoadingModal isOpen={showLoadingModal} />
     </div>
   );
 };

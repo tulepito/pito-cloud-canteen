@@ -1,9 +1,15 @@
 @use '/src/styles/defaults.scss' as *;
+@use '/src/styles/vars.scss' as *;
 
 .root {
   @include inputContainerStyles;
   .input {
     width: 100%;
+
+    &.inputError {
+      outline: 1px solid $primaryPri2;
+      outline-offset: -1px;
+    }
   }
 }
 

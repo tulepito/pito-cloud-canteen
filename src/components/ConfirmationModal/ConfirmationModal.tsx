@@ -1,6 +1,9 @@
+import { useEffect, useRef, useState } from 'react';
+
 import Button from '@components/Button/Button';
 import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
+import PopupModal from '@components/PopupModal/PopupModal';
 
 import css from './ConfirmationModal.module.scss';
 
@@ -16,6 +19,8 @@ type ConfirmationModalProps = {
   cancelText?: string;
   isConfirmButtonLoading?: boolean;
   hasError?: string;
+  isPopup?: boolean;
+  secondForAutoClose?: number;
 };
 const ConfirmationModal: React.FC<ConfirmationModalProps> = (props) => {
   const {
@@ -29,12 +34,41 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = (props) => {
     cancelText,
     isConfirmButtonLoading,
     hasError,
+    isPopup = false,
+    secondForAutoClose,
   } = props;
+  const [secondToClose, setSecondToClose] = useState<number>(
+    secondForAutoClose!,
+  );
+  const intervalRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (secondForAutoClose && isOpen) {
+      intervalRef.current = setInterval(() => {
+        setSecondToClose((prev) => prev - 1);
+      }, 1000);
+    }
+    if (secondToClose === 0 && isOpen) {
+      onClose();
+    }
+
+    return () => {
+      clearInterval(intervalRef.current);
+    };
+  }, [onClose, secondForAutoClose, secondToClose, isOpen]);
+
+  useEffect(() => {
+    if (secondForAutoClose && !isOpen) {
+      setSecondToClose(secondForAutoClose);
+    }
+  }, [isOpen, secondForAutoClose]);
 
   if (!isOpen) return null;
 
+  const ModalComponent = isPopup ? PopupModal : Modal;
+
   return (
-    <Modal
+    <ModalComponent
       isOpen={isOpen}
       handleClose={onClose}
       title={title}
@@ -65,7 +99,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = (props) => {
           </div>
         </div>
       </OutsideClickHandler>
-    </Modal>
+    </ModalComponent>
   );
 };
 

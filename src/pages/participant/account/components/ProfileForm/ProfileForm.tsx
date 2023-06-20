@@ -2,7 +2,6 @@ import { useField, useForm } from 'react-final-form-hooks';
 import { useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
-import FixedBottomButtons from '@components/FixedBottomButtons/FixedBottomButtons';
 import Form from '@components/Form/Form';
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { phoneNumberFormatValid } from '@src/utils/validators';
@@ -66,53 +65,51 @@ const ProfileForm: React.FC<TProfileFormProps> = ({
     inProgress || submitting || hasValidationErrors || pristine;
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <div className={css.fieldWrapper}>
-        <FieldTextInputComponent
-          id={`name`}
-          name="name"
-          label="Họ và tên"
-          input={name.input}
-          meta={name.meta}
-          placeholder="Tên"
-          className={css.fieldInput}
-        />
+    <Form onSubmit={handleSubmit} className={css.root}>
+      <div className={css.fieldsContainer}>
+        <div className={css.fieldWrapper}>
+          <FieldTextInputComponent
+            id={`name`}
+            name="name"
+            label="Họ và tên"
+            input={name.input}
+            meta={name.meta}
+            placeholder="Tên"
+            className={css.fieldInput}
+          />
+        </div>
+        <div className={css.fieldWrapper}>
+          <FieldTextInputComponent
+            id={`email`}
+            name="email"
+            label="Email"
+            onChange={(e: any) => e.preventDefault()}
+            input={email.input}
+            meta={email.meta}
+            placeholder="example@gmail.com"
+            className={css.fieldInput}
+          />
+        </div>
+        <div className={css.fieldWrapper}>
+          <FieldTextInputComponent
+            id={`phoneNumber`}
+            name="phoneNumber"
+            label="Số điện thoại"
+            input={phoneNumber.input}
+            meta={phoneNumber.meta}
+            placeholder="0123456789"
+            className={css.fieldInput}
+          />
+        </div>
       </div>
-      <div className={css.fieldWrapper}>
-        <FieldTextInputComponent
-          id={`email`}
-          name="email"
-          label="Email"
-          onChange={(e: any) => e.preventDefault()}
-          input={email.input}
-          meta={email.meta}
-          placeholder="example@gmail.com"
-          className={css.fieldInput}
-        />
-      </div>
-      <div className={css.fieldWrapper}>
-        <FieldTextInputComponent
-          id={`phoneNumber`}
-          name="phoneNumber"
-          label="Số điện thoại"
-          input={phoneNumber.input}
-          meta={phoneNumber.meta}
-          placeholder="0123456789"
-          className={css.fieldInput}
-        />
-      </div>
-      <FixedBottomButtons
-        isAbsolute
-        FirstButton={
-          <Button
-            type="submit"
-            disabled={disabledSubmit}
-            inProgress={inProgress}
-            className={css.submitBtn}>
-            Lưu thay đổi
-          </Button>
-        }
-      />
+
+      <Button
+        type="submit"
+        disabled={disabledSubmit}
+        inProgress={inProgress}
+        className={css.submitBtn}>
+        Lưu thay đổi
+      </Button>
     </Form>
   );
 };

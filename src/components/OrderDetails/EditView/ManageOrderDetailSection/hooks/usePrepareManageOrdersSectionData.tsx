@@ -70,11 +70,12 @@ export const usePrepareManageOrdersSectionData = (
         const participant = participantData.find(
           (p: TUser) => p.id.uuid === memberId,
         );
-        const participantUser = User(participant!);
-        const { lastName = '', firstName = '' } = participantUser.getProfile();
-        const fullName =
-          lastName && firstName ? `${lastName} ${firstName}` : '';
-        const memberName = fullName || participant?.attributes.email || '';
+
+        const participantGetter = User(participant!);
+        const { email } = participantGetter.getAttributes();
+        const { firstName, lastName } = participantGetter.getProfile();
+
+        const memberName = `${`${lastName} ${firstName}`} (${email})`;
 
         return {
           memberId,

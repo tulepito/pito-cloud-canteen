@@ -9,6 +9,7 @@ import css from './ValidationError.module.scss';
 type TFieldMeta = {
   touched?: boolean;
   error?: any;
+  shouldSkipTouched?: boolean;
 };
 type ValidationErrorProps = TDefaultProps & {
   fieldMeta: TFieldMeta;
@@ -22,10 +23,12 @@ type ValidationErrorProps = TDefaultProps & {
  */
 const ValidationError: FC<ValidationErrorProps> = (props) => {
   const { rootClassName, className, fieldMeta } = props;
-  const { touched, error } = fieldMeta;
+  const { touched, error, shouldSkipTouched = false } = fieldMeta;
   const classes = classNames(rootClassName || css.root, className);
 
-  return touched && error ? <div className={classes}>{error}</div> : null;
+  return (touched || shouldSkipTouched) && error ? (
+    <div className={classes}>{error}</div>
+  ) : null;
 };
 
 export default ValidationError;

@@ -133,7 +133,11 @@ export const AccountThunks = {
 const AccountSlice = createSlice({
   name: 'ParticipantAccount',
   initialState,
-  reducers: {},
+  reducers: {
+    clearChangePasswordError: (state) => {
+      state.changePasswordError = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAttributes.pending, (state) => {

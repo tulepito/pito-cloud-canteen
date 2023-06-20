@@ -1,8 +1,13 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .modalContainer.modalContainer {
-  flex-basis: 700px;
+  flex-basis: calc(100% - 32px);
+
+  @include viewportLarge {
+    flex-basis: 700px;
+  }
 }
 .modalFooter {
   @include flexAlign(center, flex-end);
@@ -19,4 +24,10 @@
 
 .error {
   color: $primaryPri2;
+}
+
+.timeToClose {
+  text-align: center;
+  @include textTemplate(12px, $fontWeightRegular, 16px);
+  color: $neutralGray5;
 }

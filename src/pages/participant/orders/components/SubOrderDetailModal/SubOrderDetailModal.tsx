@@ -17,6 +17,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
@@ -32,10 +33,11 @@ type TSubOrderDetailModalProps = {
   onClose: () => void;
   event: Event;
   openRatingSubOrderModal: () => void;
+  from: string;
 };
 
 const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
-  const { isOpen, onClose, event, openRatingSubOrderModal } = props;
+  const { isOpen, onClose, event, openRatingSubOrderModal, from } = props;
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -78,7 +80,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   const onNavigateToOrderDetail = () => {
     router.push({
       pathname: participantPaths.PlanDetail,
-      query: { orderDay: timestamp as string, planId, from: 'orderList' },
+      query: { orderDay: timestamp as string, planId, from },
     });
   };
 
@@ -103,7 +105,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
       },
       orderId,
     };
-
+    await dispatch(participantOrderManagementThunks.updateOrder(payload));
     await dispatch(OrderListThunks.updateSubOrder(payload));
     await dispatch(
       OrderListThunks.addSubOrderDocumentToFirebase({
