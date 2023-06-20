@@ -110,7 +110,8 @@ const OrderListPage = () => {
     const orderId = mappingSubOrderToOrder[planKey];
     const order = orders?.find((_order) => Listing(_order).getId() === orderId);
     const orderListing = Listing(order);
-    const { deliveryHour, deadlineDate } = orderListing.getMetadata();
+    const { deliveryHour, deadlineDate, orderState } =
+      orderListing.getMetadata();
     const { title: orderTitle } = orderListing.getAttributes();
 
     const listEvent: Event[] = [];
@@ -167,6 +168,7 @@ const OrderListPage = () => {
           transactionId:
             currentPlanListing.getMetadata().orderDetail[planItemKey]
               ?.transactionId,
+          orderState,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),

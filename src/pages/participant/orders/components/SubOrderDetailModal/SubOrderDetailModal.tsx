@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
-import isEmpty from 'lodash/isEmpty';
 import last from 'lodash/last';
 import { useRouter } from 'next/router';
 
@@ -21,6 +20,7 @@ import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrder
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
+import { EOrderStates } from '@src/utils/enums';
 import { txIsDelivered } from '@src/utils/transaction';
 import type { TTransaction } from '@src/utils/types';
 
@@ -52,6 +52,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     daySession,
     deliveryHour: startTime,
     transactionId,
+    orderState,
   } = event.resource;
   const dishes: any[] = event.resource?.meal?.dishes || [];
   const user = useAppSelector(currentUserSelector);
@@ -70,7 +71,8 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   );
 
   const isExpired = isOver(expiredTime);
-  const shouldShowPickFoodSection = !isExpired && isEmpty(subOrderTx);
+  const shouldShowPickFoodSection =
+    !isExpired && orderState === EOrderStates.picking;
 
   const dishSelectionFormInitialValues = useMemo(
     () => dishSelection,
