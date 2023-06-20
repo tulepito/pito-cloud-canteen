@@ -866,7 +866,7 @@
   "InvitationCard.decline": "Từ chối",
   "InvitationCard.invitation": "Bạn được mời tham gia công ty <span>{companyName}</span>. Nhấn vào nút phía dưới để tham gia và bắt đầu chọn món ăn của bạn.",
   "InvitationCard.title": "Bạn nhận được một lời mời tham gia công ty - Pito Cloud Canteen",
-  "InvitationModal.description": "{bookerName} <span>công ty {companyName}</span> mời bạn tham gia PITO Cloud Canteen - Đặt bữa ăn hàng ngày. Chọn tham gia để bắt đầu chọn món cho tuần ăn của bạn.",
+  "InvitationModal.description": "{bookerName} ơi, <span>công ty {companyName}</span> mời bạn tham gia PITO Cloud Canteen - Đặt bữa ăn hàng ngày. Chọn tham gia để bắt đầu chọn món cho tuần ăn của bạn.",
   "InvitationModal.title": "Bạn nhận được lời mời tham gia PITO Cloud Canteen",
   "InvitationNotiModal.button": "Quay về trang chủ",
   "InvitationNotiModal.title.decline": "Bạn đã từ chối lời mời này.",
