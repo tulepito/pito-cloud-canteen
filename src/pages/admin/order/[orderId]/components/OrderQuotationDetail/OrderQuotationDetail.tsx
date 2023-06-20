@@ -6,10 +6,10 @@ import ReviewOrderDetailsSection from '@components/OrderDetails/ReviewView/Revie
 import Tabs from '@components/Tabs/Tabs';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import {
-  calculatePriceQuotationInfo,
+  calculatePriceQuotationInfoFromQuotation,
   calculatePriceQuotationPartner,
 } from '@pages/company/orders/[orderId]/picking/helpers/cartInfoHelper';
-import { groupFoodOrderByDate } from '@pages/company/orders/[orderId]/picking/helpers/orderDetailHelper';
+import { groupFoodOrderByDateFromQuotation } from '@pages/company/orders/[orderId]/picking/helpers/orderDetailHelper';
 import { Listing } from '@src/utils/data';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 
@@ -43,6 +43,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   );
   const partnerServiceFee =
     Listing(order).getMetadata()?.serviceFees?.[currentPartnerId!];
+  const { packagePerMember = 0 } = Listing(order).getMetadata() || {};
 
   const priceQuotation = isPartner
     ? calculatePriceQuotationPartner({
@@ -51,9 +52,9 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
             ?.quotation,
         serviceFee: partnerServiceFee,
       })
-    : calculatePriceQuotationInfo({
-        planOrderDetail: orderDetail!,
-        order,
+    : calculatePriceQuotationInfoFromQuotation({
+        quotation: quotation!,
+        packagePerMember,
       });
 
   const handlePartnerChange = (tab: any) => {
@@ -124,8 +125,8 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
             <div className={css.clientTitle}>Báo giá khách hàng</div>
             <ReviewOrderDetailsSection
               outsideCollapsible
-              foodOrderGroupedByDate={groupFoodOrderByDate({
-                orderDetail: orderDetail!,
+              foodOrderGroupedByDate={groupFoodOrderByDateFromQuotation({
+                quotation: quotation!,
               })}
             />
           </>

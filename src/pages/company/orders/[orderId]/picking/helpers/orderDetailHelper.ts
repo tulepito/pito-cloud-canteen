@@ -106,13 +106,20 @@ export const groupFoodOrderByDateFromQuotation = ({
         restaurantId: Object.keys(partner[restaurant!])[0],
         restaurantName: partner[restaurant!].name,
         index,
-        totalDishes: client.quotation[subOrderDate].length,
+        totalDishes: client.quotation[subOrderDate].reduce(
+          (previousResult: number, current: TObject) => {
+            const { frequency } = current;
+
+            return previousResult + frequency;
+          },
+          0,
+        ),
         foodDataList: client.quotation[subOrderDate],
         totalPrice: client.quotation[subOrderDate].reduce(
           (previousResult: number, current: TObject) => {
-            const { foodPrice } = current;
+            const { foodPrice, frequency } = current;
 
-            return previousResult + foodPrice;
+            return previousResult + foodPrice * frequency;
           },
           0,
         ),
