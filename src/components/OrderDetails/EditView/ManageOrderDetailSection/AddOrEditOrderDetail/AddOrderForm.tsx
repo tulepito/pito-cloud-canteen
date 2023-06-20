@@ -40,6 +40,7 @@ type TExtraProps = {
     memberId: string;
     memberName: string;
   }[];
+  ableToUpdateOrder: boolean;
 };
 type TAddOrderFormComponentProps = FormRenderProps<TAddOrderFormValues> &
   Partial<TExtraProps>;
@@ -66,9 +67,13 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     submitErrors,
     values,
     invalid,
+    ableToUpdateOrder,
   } = props;
-  const fieldSelectMemberDisable = inProgress;
-  const fieldSelectFoodDisable = foodOptions?.length === 0;
+
+  const fieldSelectMemberDisable = inProgress || !ableToUpdateOrder;
+  const fieldSelectFoodDisable =
+    foodOptions?.length === 0 || !ableToUpdateOrder;
+
   const submitDisabled =
     invalid ||
     addOrUpdateMemberOrderInProgress ||

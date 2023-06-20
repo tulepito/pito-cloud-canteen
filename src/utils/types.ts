@@ -17,6 +17,7 @@ import type {
   EMenuTypes,
   ENotificationTypes,
   EOrderDraftStates,
+  EOrderHistoryTypes,
   EOrderStates,
   EReviewRatings,
   EReviewTypes,
@@ -659,3 +660,18 @@ export type TTransitionOrderState =
   | EOrderStates.inProgress
   | EOrderStates.pendingPayment
   | EOrderStates.completed;
+
+export type TSubOrderChangeHistoryItem = {
+  id?: string | number;
+  authorId?: string;
+  createdAt?: any;
+  memberId?: string;
+  member?: {
+    email?: string;
+  };
+  newValue?: any;
+  oldValue?: any;
+  planId?: string;
+  planOrderDate?: Date;
+  type?: EOrderHistoryTypes;
+};

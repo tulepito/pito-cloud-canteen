@@ -1,17 +1,34 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import cookies from '@services/cookie';
+import { HttpMethod } from '@apis/configs';
 import { fetchTransaction } from '@services/integrationHelper';
 import { handleError } from '@services/sdk';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
-  const { transactionId } = req.query;
   try {
-    const tx = await fetchTransaction(transactionId as string);
-    res.json(tx);
+    const apiMethod = req.method;
+    const { transactionId } = req.query;
+
+    switch (apiMethod) {
+      case HttpMethod.GET:
+        try {
+          const tx = await fetchTransaction(transactionId as string);
+
+          return res.json(tx);
+        } catch (error) {
+          return handleError(res, error);
+        }
+
+      case HttpMethod.POST:
+      case HttpMethod.DELETE:
+      case HttpMethod.PUT:
+      default:
+        return res.status(400).json({ message: 'Method is not allow' });
+    }
   } catch (error) {
+    console.error(error);
     handleError(res, error);
   }
 }
 
-export default cookies(handler);
+export default handler;

@@ -99,17 +99,13 @@ type TFieldMemberSelectCheckboxGroupRendererProps = TDefaultProps & {
   options: any[];
   meta: any;
   name: string;
+  disabled: boolean;
 };
 
 const FieldMemberSelectCheckboxGroupRenderer: React.FC<
   TFieldMemberSelectCheckboxGroupRendererProps
 > = (props) => {
-  const {
-    className,
-    rootClassName,
-    fields: { name },
-    options,
-  } = props;
+  const { className, rootClassName, fields, options } = props;
 
   const classes = classNames(rootClassName || css.root, className);
   const listClasses = classNames(css.list);
@@ -124,7 +120,7 @@ const FieldMemberSelectCheckboxGroupRenderer: React.FC<
             <li key={fieldId} className={css.foodItem}>
               <FieldMemberSelectCheckbox
                 id={fieldId}
-                name={name}
+                name={fields.name}
                 value={option.key}
                 data={option}
               />

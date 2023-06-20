@@ -1,9 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TTabsItem } from '@components/Tabs/Tabs';
@@ -23,23 +22,20 @@ type TManageLineItemsSectionProps = {
     startDate: number;
     endDate: number;
   };
+  isDraftEditing: boolean;
+  shouldShowOverflowError: boolean;
+  shouldShowUnderError: boolean;
+  setCurrentViewDate: Dispatch<SetStateAction<number>>;
+  currentViewDate: number;
 };
 
 const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
   props,
 ) => {
-  const {
-    data: { startDate },
-  } = props;
+  const { isDraftEditing, currentViewDate, setCurrentViewDate } = props;
 
-  const {
-    query: { timestamp },
-  } = useRouter();
   const intl = useIntl();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const [currentViewDate, setCurrentViewDate] = useState(
-    timestamp ? Number(timestamp) : startDate,
-  );
   const {
     dateList = [],
     defaultActiveKey,
@@ -59,7 +55,10 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
             })}
           </div>
           <div className={css.lineItemDetails}>
-            <LineItemsTable currentViewDate={currentViewDate} />
+            <LineItemsTable
+              currentViewDate={currentViewDate}
+              isDraftEditing={isDraftEditing}
+            />
           </div>
         </div>
       ),
