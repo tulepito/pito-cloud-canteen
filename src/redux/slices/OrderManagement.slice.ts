@@ -1391,6 +1391,7 @@ const OrderManagementSlice = createSlice({
             ...payload,
           },
         };
+        state.orderDetail = payload;
       })
       .addCase(updatePlanOrderDetail.rejected, (state) => {
         state.isUpdatingOrderDetails = false;
