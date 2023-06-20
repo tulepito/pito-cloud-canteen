@@ -15,6 +15,7 @@ import {
   companyThunks,
 } from '@redux/slices/company.slice';
 import { companyMemberThunks } from '@redux/slices/companyMember.slice';
+import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/enums';
 import { ensureUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
@@ -47,6 +48,10 @@ const MemberDetailPage: React.FC<MemberDetailPageProps> = () => {
   );
   const { deleteMemberInProgress, deleteMemberError } = useAppSelector(
     (state) => state.companyMember,
+  );
+  const nutritions = useAppSelector(
+    (state) => state.company.nutritions,
+    shallowEqual,
   );
 
   const checkMemberHasFlexAccount =
@@ -82,6 +87,7 @@ const MemberDetailPage: React.FC<MemberDetailPageProps> = () => {
     const fetchData = async () => {
       dispatch(addWorkspaceCompanyId(companyId));
       await dispatch(companyThunks.companyInfo());
+      await dispatch(companyThunks.fetchAttributes());
     };
     fetchData();
   }, [companyId, dispatch]);
@@ -153,14 +159,18 @@ const MemberDetailPage: React.FC<MemberDetailPageProps> = () => {
             {User(companyMember)
               .getPublicData()
               ?.allergies?.map((allergyItem: string) => (
-                <div key={allergyItem}>{allergyItem}</div>
+                <div key={allergyItem}>
+                  {getLabelByKey(ALLERGIES_OPTIONS, allergyItem)}
+                </div>
               ))}
           </div>
           <div className={css.bodyCol}>
             {User(companyMember)
               .getPublicData()
               ?.nutritions?.map((nutritionItem: string) => (
-                <div key={nutritionItem}>{nutritionItem}</div>
+                <div key={nutritionItem}>
+                  {getLabelByKey(nutritions, nutritionItem)}
+                </div>
               ))}
           </div>
         </div>

@@ -21,6 +21,7 @@ import {
   resetError,
 } from '@redux/slices/companyMember.slice';
 import { CompanyPermission, UserInviteStatus } from '@src/types/UserPermission';
+import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/enums';
 import { ensureUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
@@ -39,6 +40,10 @@ const MembersPage = () => {
   );
   const originCompanyMembers = useAppSelector(
     (state) => state.company.originCompanyMembers,
+    shallowEqual,
+  );
+  const nutritions = useAppSelector(
+    (state) => state.company.nutritions,
     shallowEqual,
   );
 
@@ -187,21 +192,32 @@ const MembersPage = () => {
                 groupList,
               ),
               allergy:
-                User(member).getPublicData()?.allergies?.join(', ') || [],
+                User(member)
+                  .getPublicData()
+                  ?.allergies?.map((allergy: string) =>
+                    getLabelByKey(ALLERGIES_OPTIONS, allergy),
+                  )
+                  .join(', ') || [],
               nutrition:
-                User(member).getPublicData()?.nutritions?.join(', ') || [],
+                User(member)
+                  .getPublicData()
+                  ?.nutritions?.map((nutrition: string) =>
+                    getLabelByKey(nutritions, nutrition),
+                  )
+                  ?.join(', ') || [],
             },
           },
         ],
         [],
       ),
-    [groupList, mergedCompanyMembers],
+    [groupList, mergedCompanyMembers, nutritions],
   );
   useEffect(() => {
     const fetchData = async () => {
       dispatch(resetError());
       dispatch(addWorkspaceCompanyId(companyId));
       await dispatch(companyThunks.companyInfo());
+      await dispatch(companyThunks.fetchAttributes());
     };
     fetchData();
   }, [companyId, dispatch, router]);
