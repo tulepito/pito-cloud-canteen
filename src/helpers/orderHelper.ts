@@ -12,6 +12,7 @@ import { Listing } from '@utils/data';
 import { generateTimeOptions, renderDateRange } from '@utils/dates';
 import {
   EBookerOrderDraftStates,
+  EFoodTypes,
   EOrderDraftStates,
   EOrderStates,
   EOrderType,
@@ -483,4 +484,26 @@ export const getSelectedRestaurantAndFoodList = ({
     submitRestaurantData,
     submitFoodListData,
   };
+};
+
+export const mealTypeAdapter = (mealType: string) => {
+  switch (mealType) {
+    case 'vegetarian':
+      return EFoodTypes.vegetarianDish;
+    case 'unVegetarian':
+      return EFoodTypes.savoryDish;
+    default:
+      return '';
+  }
+};
+
+export const mealTypeReverseAdapter = (mealType: string) => {
+  switch (mealType) {
+    case EFoodTypes.vegetarianDish:
+      return 'vegetarian';
+    case EFoodTypes.savoryDish:
+      return 'unVegetarian';
+    default:
+      return '';
+  }
 };
