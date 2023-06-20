@@ -44,6 +44,7 @@ const RatingSubOrderFormComponent: React.FC<
   const postRatingInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
+  const submitDisabled = postRatingInProgress || !hasGeneralRating;
 
   return (
     <Form className={css.container} onSubmit={handleSubmit}>
@@ -108,8 +109,7 @@ const RatingSubOrderFormComponent: React.FC<
         <Button
           className={css.submitBtn}
           type="submit"
-          inProgress={postRatingInProgress}
-          disabled={!hasGeneralRating}>
+          disabled={submitDisabled}>
           Gửi đánh giá
         </Button>
       </div>
