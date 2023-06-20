@@ -8,7 +8,7 @@
 }
 
 .btn {
-  flex-basis: 50%;
+  width: 100%;
   border-radius: 8px;
   @include textTemplate(14px, $fontWeightBold, 24px);
 }

@@ -5,8 +5,7 @@
   padding: 12px;
   border-radius: 8px;
   margin-bottom: 12px;
-  box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06),
-    0px 4px 8px -2px rgba(16, 24, 40, 0.1);
+  border: 1px solid $neutralGray3;
 }
 
 .header {
@@ -20,6 +19,18 @@
   @include textTemplate(14px, 700, 20px, '');
   color: $neutralGray6;
   margin-bottom: 4px;
+
+  .titleContainer {
+    display: flex;
+    gap: 8px;
+    flex-direction: row;
+    align-items: center;
+
+    .tickIcon {
+      width: 16px;
+      height: 16px;
+    }
+  }
 }
 
 .root .close {
@@ -32,10 +43,15 @@
   display: flex;
   align-items: center;
   margin-bottom: 12px;
+
+  .foodIcon {
+    width: 16px;
+    height: 16px;
+  }
 }
 
-.suitableAmount {
-  @include textTemplate(12px, 400, 20px, '');
+.dishes {
+  @include textTemplate(12px, 400, 16px);
   color: $neutralGray5;
   margin-left: 4px;
   margin-right: 12px;
@@ -117,7 +133,7 @@
 
   .editNotAvailable {
     @include textTemplate(12px, $fontWeightRegular, 16px);
-    color: $primaryPri2;
+    color: $sematicRed2;
   }
 }
 

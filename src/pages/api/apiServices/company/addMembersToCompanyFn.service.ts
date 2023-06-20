@@ -1,6 +1,5 @@
 import compact from 'lodash/compact';
 import difference from 'lodash/difference';
-import { DateTime } from 'luxon';
 
 import { sendIndividualEmail } from '@services/awsSES';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
@@ -12,8 +11,6 @@ import participantCompanyInvitation, {
 } from '@src/utils/emailTemplate/participantCompanyInvitation';
 import { denormalisedResponseEntities, User } from '@utils/data';
 
-const defaultExpireTime =
-  parseInt(process.env.DEFAUTL_INVITATION_EMAIL_EXPIRE_TIME as string, 10) || 7;
 const systemSenderEmail = process.env.AWS_SES_SENDER_EMAIL;
 
 type TAddMembersToCompanyParams = {
@@ -33,12 +30,6 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     Object.values(members).map((_member: any) => _member?.id),
   );
   const membersEmailList = Object.keys(members);
-  // Step calculate expire time of invitation email
-  const expireTime = DateTime.now()
-    .setZone('Asia/Ho_Chi_Minh')
-    .startOf('day')
-    .plus({ day: defaultExpireTime })
-    .toMillis();
 
   // Step update data for existed user
   const newParticipantMembers = await Promise.all(
@@ -50,6 +41,11 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
         id: userId,
         metadata: {
           companyList: Array.from(new Set([...userCompanyList, companyId])),
+          company: {
+            [companyId]: {
+              permission: UserPermission.PARTICIPANT,
+            },
+          },
         },
       });
       const { email: userEmail } = User(userAccount).getAttributes();
@@ -60,8 +56,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
           email: userEmail,
           permission: UserPermission.PARTICIPANT,
           groups: [],
-          inviteStatus: UserInviteStatus.NOT_ACCEPTED,
-          expireTime,
+          inviteStatus: UserInviteStatus.ACCEPTED,
         },
       };
     }),
@@ -83,8 +78,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
       id: null,
       permission: UserPermission.PARTICIPANT,
       groups: [],
-      inviteStatus: UserInviteStatus.NOT_ACCEPTED,
-      expireTime,
+      inviteStatus: UserInviteStatus.ACCEPTED,
     }))
     .reduce((result: any, memberObj: any) => {
       return {
