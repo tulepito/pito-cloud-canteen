@@ -9,6 +9,7 @@ import { DateTime } from 'luxon';
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { getInitialLocationValues } from '@helpers/mapHelpers';
+import { mealTypeAdapter, mealTypeReverseAdapter } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing, User } from '@utils/data';
@@ -84,6 +85,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     selectedGroups,
     packagePerMember,
     vatAllow,
+    mealType,
   } = orderData.getMetadata();
   const locationInitValues = {
     deliveryAddress: getInitialLocationValues(
@@ -121,6 +123,9 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   };
   const nutritionsInitValues = {
     nutritions: nutritions || [],
+    mealType: mealType
+      ? mealType.map((_type: string) => mealTypeAdapter(_type))
+      : [],
   };
   const selectedGroupsInitValues = {
     selectedGroups,
@@ -146,6 +151,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       endDate: endDateValue,
       deliveryHour: deliveryHourValue,
       nutritions: nutritionsValue,
+      mealType: mealTypeValue,
     } = values;
     const finalStartDate = startDateValue || startDate;
     const finalEndDate = endDateValue || endDate;
@@ -153,6 +159,9 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       orderAsyncActions.updateOrder({
         generalInfo: {
           ...values,
+          mealType: mealTypeValue?.map((type: any) =>
+            mealTypeReverseAdapter(type),
+          ),
           ...(startDate !== finalStartDate && {
             deadlineDate: DateTime.fromMillis(finalStartDate)
               .minus({ days: 3 })
