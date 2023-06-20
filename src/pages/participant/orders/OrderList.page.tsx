@@ -267,11 +267,16 @@ const OrderListPage = () => {
   };
 
   const openRatingSubOrderModal = () => {
+    subOrderDetailModalControl.setFalse();
     ratingSubOrderModalControl.setTrue();
   };
-  const closeAllModals = () => {
+
+  const openSuccessRatingModal = () => {
     ratingSubOrderModalControl.setFalse();
-    subOrderDetailModalControl.setFalse();
+    successRatingModalControl.setTrue();
+  };
+
+  const closeAllModals = () => {
     successRatingModalControl.setFalse();
   };
 
@@ -400,7 +405,7 @@ const OrderListPage = () => {
             onClose={ratingSubOrderModalControl.setFalse}
             selectedEvent={selectedEvent}
             currentUserId={currentUserId}
-            openSuccessRatingModal={successRatingModalControl.setTrue}
+            openSuccessRatingModal={openSuccessRatingModal}
           />
         </>
       </RenderWhen>
