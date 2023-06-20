@@ -299,7 +299,12 @@ const OrderDetailPage = () => {
         </div>
 
         <RenderWhen.False>
-          <div className={css.lineItemsTable}>
+          <div
+            className={
+              isDraftEditing
+                ? css.lineItemsTableWithSubOrderSection
+                : css.lineItemsTable
+            }>
             <ManageLineItemsSection
               data={editViewData.manageOrdersData}
               isDraftEditing={isDraftEditing}
