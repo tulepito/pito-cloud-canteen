@@ -15,17 +15,10 @@ import ParticipantCard from '../../ManageParticipantsSection/ParticipantCard';
 import css from './FieldMemberSelectCheckboxGroup.module.scss';
 
 const FieldMemberSelectCheckbox = (props: any) => {
-  const {
-    id,
-    useSuccessColor,
-    customOnChange,
-    data: {
-      data: {
-        memberData: { email, name },
-      },
-    },
-    ...rest
-  } = props;
+  const { id, useSuccessColor, customOnChange, data = {}, ...rest } = props;
+
+  const { memberData } = data?.data || {};
+  const { email, name } = memberData || {};
 
   const participantData = useAppSelector(
     (state) => state.OrderManagement.participantData,
