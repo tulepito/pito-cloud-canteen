@@ -130,6 +130,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
                 shouldShowOverflowError={shouldShowOverflowError}
                 maxQuantity={maxQuantity}
                 minQuantity={minQuantity}
+                currentViewDate={currentViewDate}
               />
             </div>
           </div>

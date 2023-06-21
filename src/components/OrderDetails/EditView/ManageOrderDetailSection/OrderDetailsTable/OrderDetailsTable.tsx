@@ -118,10 +118,11 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
         shouldShowOverflowError,
         minQuantity,
       );
+
       if (
         condition &&
         type &&
-        tab !== EOrderDetailsTableTab.deleted &&
+        tab !== EOrderDetailsTableTab.notChoose &&
         handleOpenReachMaxAllowedChangesModal
       ) {
         return handleOpenReachMaxAllowedChangesModal(type);
