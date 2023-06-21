@@ -24,10 +24,11 @@ import css from './LineItemsTable.module.scss';
 type TLineItemsTableProps = {
   currentViewDate: number;
   isDraftEditing: boolean;
+  ableToUpdateOrder: boolean;
 };
 
 const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
-  const { currentViewDate, isDraftEditing } = props;
+  const { currentViewDate, isDraftEditing, ableToUpdateOrder } = props;
   const intl = useIntl();
 
   const dispatch = useAppDispatch();
@@ -105,9 +106,13 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(foodList), JSON.stringify(lineItems)]);
 
-  const disabledSelectFood = inProgress || isEmpty(foodOptions);
+  const disabledSelectFood =
+    inProgress || isEmpty(foodOptions) || !ableToUpdateOrder;
   const disabledAddLineItem =
-    inProgress || isEmpty(foodOptions) || isEmpty(foodField.input.value);
+    inProgress ||
+    isEmpty(foodOptions) ||
+    isEmpty(foodField.input.value) ||
+    !ableToUpdateOrder;
 
   const handleModifyQuantity =
     (foodId: string, quantity: number = 1) =>
@@ -196,6 +201,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
       <LineItemsTableComponent
         data={data}
         onModifyQuantity={handleModifyQuantity}
+        ableToUpdateOrder={ableToUpdateOrder}
       />
       <form onSubmit={handleSubmit}>
         <div className={css.fieldContainer}>

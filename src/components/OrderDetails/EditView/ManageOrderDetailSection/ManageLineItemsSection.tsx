@@ -27,12 +27,18 @@ type TManageLineItemsSectionProps = {
   shouldShowUnderError: boolean;
   setCurrentViewDate: Dispatch<SetStateAction<number>>;
   currentViewDate: number;
+  ableToUpdateOrder: boolean;
 };
 
 const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
   props,
 ) => {
-  const { isDraftEditing, currentViewDate, setCurrentViewDate } = props;
+  const {
+    isDraftEditing,
+    currentViewDate,
+    setCurrentViewDate,
+    ableToUpdateOrder,
+  } = props;
 
   const intl = useIntl();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
@@ -57,6 +63,7 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
             <LineItemsTable
               currentViewDate={currentViewDate}
               isDraftEditing={isDraftEditing}
+              ableToUpdateOrder={ableToUpdateOrder}
             />
           </div>
         </div>

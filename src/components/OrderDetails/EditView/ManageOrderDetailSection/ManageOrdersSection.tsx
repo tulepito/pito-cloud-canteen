@@ -30,6 +30,9 @@ type TManageOrdersSectionProps = {
   currentViewDate: number;
   setCurrentViewDate: Dispatch<SetStateAction<number>>;
   isDraftEditing: boolean;
+  handleOpenReachMaxAllowedChangesModal?: (type: string) => void;
+  shouldShowOverflowError?: boolean;
+  shouldShowUnderError?: boolean;
 };
 
 const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
@@ -38,6 +41,9 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     currentViewDate,
     setCurrentViewDate,
     isDraftEditing,
+    handleOpenReachMaxAllowedChangesModal,
+    shouldShowOverflowError,
+    shouldShowUnderError,
   } = props;
 
   const dispatch = useAppDispatch();
@@ -49,8 +55,11 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     dateList = [],
     memberOptions,
     foodOptions,
+    currentOrderDetail = {},
   } = usePrepareManageOrdersSectionData(currentViewDate, setCurrentViewDate);
 
+  const { restaurant = {} } = currentOrderDetail;
+  const { maxQuantity, minQuantity } = restaurant;
   const handleSubmitAddSelection = async (values: TAddOrderFormValues) => {
     const { participantId, requirement = '', foodId } = values;
     const selectParticipantValue = participantId.key;
@@ -59,6 +68,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     const member = memberOptions.find(
       (m: TObject) => m.memberId === selectParticipantValue,
     );
+
     const updateValues = {
       foodId,
       requirement,
@@ -97,6 +107,11 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
               foodOptions={foodOptions}
               ableToUpdateOrder={ableToUpdateOrder}
               isDraftEditing={isDraftEditing}
+              handleOpenReachMaxAllowedChangesModal={
+                handleOpenReachMaxAllowedChangesModal
+              }
+              shouldShowOverflowError={shouldShowOverflowError}
+              minQuantity={minQuantity}
             />
           </div>
           <div className={css.addOrder}>
@@ -110,6 +125,10 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
                 memberOptions={memberOptions}
                 ableToUpdateOrder={ableToUpdateOrder}
                 isDraftEditing={isDraftEditing}
+                shouldShowUnderError={shouldShowUnderError}
+                shouldShowOverflowError={shouldShowOverflowError}
+                maxQuantity={maxQuantity}
+                minQuantity={minQuantity}
               />
             </div>
           </div>

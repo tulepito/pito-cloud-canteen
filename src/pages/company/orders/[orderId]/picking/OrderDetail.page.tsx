@@ -30,8 +30,15 @@ import { companyPaths } from '@src/paths';
 import { diffDays } from '@src/utils/dates';
 import type { TPlan } from '@src/utils/orderTypes';
 import { CurrentUser, Listing } from '@utils/data';
-import { EOrderDraftStates, EOrderStates, EOrderType } from '@utils/enums';
+import {
+  EOrderDraftStates,
+  EOrderStates,
+  EOrderType,
+  EParticipantOrderStatus,
+} from '@utils/enums';
 import type { TListing, TObject } from '@utils/types';
+
+import ModalReachMaxAllowedChanges from '../components/ModalReachMaxAllowedChanges/ModalReachMaxAllowedChanges';
 
 import css from './OrderDetail.module.scss';
 
@@ -56,27 +63,51 @@ const NOW = new Date().getTime();
 
 const checkMinMaxQuantity = (
   orderDetails: TPlan['orderDetail'],
+  oldOrderDetail: TPlan['orderDetail'],
   currentViewDate: number,
+  isNormalOrder: boolean,
 ) => {
+  let totalQuantity = 0;
   const data = orderDetails[currentViewDate] || {};
   const { lineItems = [], restaurant = {} } = data;
   const { maxQuantity = 100, minQuantity = 1 } = restaurant;
-
-  const totalQuantity = lineItems.reduce(
-    (result: number, lineItem: TObject) => {
+  if (isNormalOrder) {
+    totalQuantity = lineItems.reduce((result: number, lineItem: TObject) => {
       result += lineItem?.quantity || 1;
 
       return result;
-    },
-    0,
-  );
+    }, 0);
+    const shouldShowOverflowError = totalQuantity > maxQuantity;
+    const shouldShowUnderError = totalQuantity < minQuantity;
 
-  const shouldShowOverflowError = totalQuantity > maxQuantity;
+    return {
+      shouldShowOverflowError,
+      shouldShowUnderError,
+      minQuantity,
+    };
+  }
+  const { memberOrders = {} } = data;
+  const { memberOrders: oldMemberOrders = {} } =
+    oldOrderDetail[currentViewDate] || {};
+  const oldTotalQuantity = Object.keys(oldMemberOrders).filter(
+    (f) =>
+      !!oldMemberOrders[f].foodId &&
+      oldMemberOrders[f].status === EParticipantOrderStatus.joined,
+  ).length;
+  totalQuantity = Object.keys(memberOrders).filter(
+    (f) =>
+      !!memberOrders[f].foodId &&
+      memberOrders[f].status === EParticipantOrderStatus.joined,
+  ).length;
+  const totalQuantityCanAdd = (totalQuantity * 10) / 100;
+  const totalAdded = totalQuantity - oldTotalQuantity;
+  const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
   const shouldShowUnderError = totalQuantity < minQuantity;
 
   return {
     shouldShowOverflowError,
     shouldShowUnderError,
+    minQuantity,
   };
 };
 
@@ -91,6 +122,9 @@ const OrderDetailPage = () => {
   const [currentViewDate, setCurrentViewDate] = useState<number>(
     Number(timestamp),
   );
+
+  const [showReachMaxAllowedChangesModal, setShowReachMaxAllowedChangesModal] =
+    useState<'reach_max' | 'reach_min' | null>(null);
 
   const {
     query: { orderId },
@@ -127,6 +161,12 @@ const OrderDetailPage = () => {
     priceQuotationData,
     setReviewInfoValues,
   } = usePrepareOrderDetailPageData();
+
+  const handleCloseReachMaxAllowedChangesModal = () =>
+    setShowReachMaxAllowedChangesModal(null);
+
+  const handleOpenReachMaxAllowedChangesModal = (type: any) =>
+    setShowReachMaxAllowedChangesModal(type);
 
   const plan = Listing(planData as TListing);
 
@@ -174,7 +214,7 @@ const OrderDetailPage = () => {
   const isNormalOrder = orderType === EOrderType.normal;
   const isPicking = orderState === EOrderStates.picking;
   const isDraftEditing = orderState === EOrderStates.inProgress;
-
+  console.log({ isDraftEditing });
   const editViewClasses = classNames(css.editViewRoot, {
     [css.editNormalOrderView]: isNormalOrder,
     [css.editNormalOrderViewWithHistorySection]:
@@ -223,10 +263,14 @@ const OrderDetailPage = () => {
 
   const orderDetailsNotChanged =
     isDraftEditing && isEqual(orderDetail, newOrderDetail);
-  const { shouldShowOverflowError, shouldShowUnderError } = checkMinMaxQuantity(
-    newOrderDetail,
-    currentViewDate,
-  );
+
+  const { shouldShowOverflowError, shouldShowUnderError, minQuantity } =
+    checkMinMaxQuantity(
+      newOrderDetail,
+      orderDetail,
+      currentViewDate,
+      isNormalOrder,
+    );
 
   const EditViewComponent = (
     <div className={editViewClasses}>
@@ -247,8 +291,8 @@ const OrderDetailPage = () => {
         confirmDisabled={
           !isPicking &&
           (orderDetailsNotChanged ||
-            (!isDraftEditing && shouldShowOverflowError) ||
-            (!isDraftEditing && shouldShowUnderError))
+            shouldShowOverflowError ||
+            shouldShowUnderError)
         }
         isDraftEditing={isDraftEditing}
       />
@@ -261,7 +305,50 @@ const OrderDetailPage = () => {
               setCurrentViewDate={(date) => setCurrentViewDate(date)}
               currentViewDate={currentViewDate}
               isDraftEditing={isDraftEditing}
+              handleOpenReachMaxAllowedChangesModal={
+                handleOpenReachMaxAllowedChangesModal
+              }
+              shouldShowOverflowError={shouldShowOverflowError}
+              shouldShowUnderError={shouldShowUnderError}
             />
+          </div>
+          <div className={css.rightPart}>
+            <OrderDeadlineCountdownSection
+              className={css.container}
+              data={editViewData.countdownSectionData}
+              ableToUpdateOrder={ableToUpdateOrder}
+            />
+            <OrderLinkSection
+              className={css.container}
+              data={editViewData.linkSectionData}
+              ableToUpdateOrder={ableToUpdateOrder}
+            />
+            <ManageParticipantsSection
+              className={css.container}
+              data={editViewData.manageParticipantData}
+              ableToUpdateOrder={ableToUpdateOrder}
+            />
+            {isDraftEditing && (
+              <SubOrderChangesHistorySection
+                className={css.container}
+                querySubOrderChangesHistoryInProgress={
+                  querySubOrderChangesHistoryInProgress
+                }
+                subOrderChangesHistory={subOrderChangesHistory}
+                draftSubOrderChangesHistory={
+                  draftSubOrderChangesHistory[
+                    currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
+                  ]
+                }
+                onQueryMoreSubOrderChangesHistory={
+                  onQueryMoreSubOrderChangesHistory
+                }
+                subOrderChangesHistoryTotalItems={
+                  subOrderChangesHistoryTotalItems
+                }
+                loadMoreSubOrderChangesHistory={loadMoreSubOrderChangesHistory}
+              />
+            )}
           </div>
           <div className={css.rightPart}>
             <OrderDeadlineCountdownSection
@@ -312,6 +399,7 @@ const OrderDetailPage = () => {
             <ManageLineItemsSection
               data={editViewData.manageOrdersData}
               isDraftEditing={isDraftEditing}
+              ableToUpdateOrder={ableToUpdateOrder}
               shouldShowOverflowError={shouldShowOverflowError}
               shouldShowUnderError={shouldShowUnderError}
               setCurrentViewDate={(date) => setCurrentViewDate(date)}
@@ -361,6 +449,13 @@ const OrderDetailPage = () => {
         onCancel={handleDisagreeCancelOrder}
         confirmInProgress={cancelPickingOrderInProgress}
         cancelDisabled={cancelPickingOrderInProgress}
+      />
+      <ModalReachMaxAllowedChanges
+        id="OrderDetailPage.ModalReachMaxAllowedChanges"
+        isOpen={!!showReachMaxAllowedChangesModal}
+        handleClose={handleCloseReachMaxAllowedChangesModal}
+        type={showReachMaxAllowedChangesModal}
+        minQuantity={minQuantity}
       />
     </div>
   );
