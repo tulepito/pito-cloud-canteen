@@ -32,7 +32,7 @@ const tourConfig = [
     content: ({ step }: any) => (
       <div>
         <div className={css.step}>{`${step}/3`}</div>
-        <div>Bỏ chọn ngày này</div>
+        <div className={css.stepTitle}>Bỏ chọn ngày này</div>
         <div className={css.stepContent}>
           Nếu không ăn ngày này, bạn chọn &ldquo;Không tham gia&rdquo;.
         </div>
@@ -47,7 +47,7 @@ const tourConfig = [
     content: ({ step }: any) => (
       <div>
         <div className={css.step}>{`${step}/3`}</div>
-        <div>Xem chi tiết</div>
+        <div className={css.stepTitle}>Xem chi tiết</div>
         <div className={css.stepContent}>
           Bạn đã chọn món gì, xem lại thực đơn nhé!
         </div>

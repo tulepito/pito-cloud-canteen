@@ -1,4 +1,5 @@
 import type { Event } from 'react-big-calendar';
+import { DateTime } from 'luxon';
 
 export const EVENTS_MOCKUP: Event[] = [
   {
@@ -30,8 +31,8 @@ export const EVENTS_MOCKUP: Event[] = [
       orderColor: '#65DB63',
     },
     title: 'PT3040',
-    start: new Date(),
-    end: new Date(),
+    start: DateTime.now().startOf('week').toJSDate(),
+    end: DateTime.now().startOf('week').toJSDate(),
   },
   {
     resource: {
@@ -55,8 +56,8 @@ export const EVENTS_MOCKUP: Event[] = [
       orderColor: '#65DB63',
     },
     title: 'PT3041',
-    start: new Date(new Date().setDate(new Date().getDate() + 1)),
-    end: new Date(new Date().setDate(new Date().getDate() + 1)),
+    start: DateTime.now().startOf('week').plus({ days: 1 }).toJSDate(),
+    end: DateTime.now().startOf('week').plus({ days: 1 }).toJSDate(),
   },
 
   {
@@ -88,8 +89,8 @@ export const EVENTS_MOCKUP: Event[] = [
       orderColor: '#65DB63',
     },
     title: 'PT30402',
-    start: new Date(new Date().setDate(new Date().getDate() + 2)),
-    end: new Date(new Date().setDate(new Date().getDate() + 2)),
+    start: DateTime.now().startOf('week').plus({ days: 2 }).toJSDate(),
+    end: DateTime.now().startOf('week').plus({ days: 2 }).toJSDate(),
   },
 
   {
@@ -121,8 +122,8 @@ export const EVENTS_MOCKUP: Event[] = [
       orderColor: '#65DB63',
     },
     title: 'PT3043',
-    start: new Date(new Date().setDate(new Date().getDate() + 3)),
-    end: new Date(new Date().setDate(new Date().getDate() + 3)),
+    start: DateTime.now().startOf('week').plus({ days: 3 }).toJSDate(),
+    end: DateTime.now().startOf('week').plus({ days: 3 }).toJSDate(),
   },
 
   {
@@ -154,8 +155,8 @@ export const EVENTS_MOCKUP: Event[] = [
       orderColor: '#65DB63',
     },
     title: 'PT3044',
-    start: new Date(new Date().setDate(new Date().getDate() + 4)),
-    end: new Date(new Date().setDate(new Date().getDate() + 4)),
+    start: DateTime.now().startOf('week').plus({ days: 4 }).toJSDate(),
+    end: DateTime.now().startOf('week').plus({ days: 4 }).toJSDate(),
   },
   {
     resource: {
@@ -186,8 +187,8 @@ export const EVENTS_MOCKUP: Event[] = [
       orderColor: '#65DB63',
     },
     title: 'PT3045',
-    start: new Date(new Date().setDate(new Date().getDate() + 5)),
-    end: new Date(new Date().setDate(new Date().getDate() + 5)),
+    start: DateTime.now().startOf('week').plus({ days: 5 }).toJSDate(),
+    end: DateTime.now().startOf('week').plus({ days: 5 }).toJSDate(),
   },
   {
     resource: {
@@ -218,8 +219,8 @@ export const EVENTS_MOCKUP: Event[] = [
       orderColor: '#65DB63',
     },
     title: 'PT3046',
-    start: new Date(new Date().setDate(new Date().getDate() + 6)),
-    end: new Date(new Date().setDate(new Date().getDate() + 6)),
+    start: DateTime.now().startOf('week').plus({ days: 6 }).toJSDate(),
+    end: DateTime.now().startOf('week').plus({ days: 6 }).toJSDate(),
   },
 ];
 
