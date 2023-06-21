@@ -27,6 +27,7 @@ import {
   updatePlanDetailsApi,
 } from '@apis/orderApi';
 import { checkUserExistedApi } from '@apis/userApi';
+import { EOrderDetailsTableTab } from '@components/OrderDetails/EditView/ManageOrderDetailSection/OrderDetailsTable/OrderDetailsTable.utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { TPlan } from '@src/utils/orderTypes';
@@ -967,12 +968,12 @@ const OrderManagementSlice = createSlice({
       };
     },
     draftDisallowMember: (state, { payload }) => {
-      const { currentViewDate, memberId, memberEmail } = payload;
+      const { currentViewDate, memberId, memberEmail, tab } = payload;
       const { orderDetail, planData } = state;
       const { orderDetail: defaultOrderDetail } = Listing(
         planData as TListing,
       ).getMetadata();
-      const { foodId: defaultFoodId } =
+      const { status: defaultStatus } =
         defaultOrderDetail[currentViewDate].memberOrders[memberId];
       const memberOrderDetailOnUpdateDate =
         orderDetail[currentViewDate].memberOrders[memberId];
@@ -985,9 +986,16 @@ const OrderManagementSlice = createSlice({
         (i) => i.memberId === memberId,
       );
 
+      const isNotAddedToChoseList =
+        EParticipantOrderStatus.empty ||
+        defaultStatus === EParticipantOrderStatus.notJoined;
+
       const newMemberOrderValues = {
         ...memberOrderDetailOnUpdateDate,
-        status: EParticipantOrderStatus.notAllowed,
+        status:
+          isNotAddedToChoseList && tab !== EOrderDetailsTableTab.notChoose
+            ? defaultStatus
+            : EParticipantOrderStatus.notAllowed,
       };
 
       const newOrderDetail = addNewMemberToOrderDetail(
@@ -997,7 +1005,7 @@ const OrderManagementSlice = createSlice({
         newMemberOrderValues,
       );
 
-      if (orderHistoryByMemberIndex > -1 && !defaultFoodId) {
+      if (orderHistoryByMemberIndex > -1 && isNotAddedToChoseList) {
         currentDraftSubOrderChanges.splice(orderHistoryByMemberIndex, 1);
         const newDraftSubOrderChangesHistory = {
           ...state.draftSubOrderChangesHistory,

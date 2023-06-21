@@ -7,6 +7,7 @@ import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
 import FieldCustomSelectComponent from '@components/FormFields/FieldCustomSelect/FieldCustomSelect';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
@@ -42,6 +43,10 @@ type TExtraProps = {
   }[];
   ableToUpdateOrder: boolean;
   isDraftEditing: boolean;
+  shouldShowOverflowError?: boolean;
+  shouldShowUnderError?: boolean;
+  maxQuantity?: number;
+  minQuantity?: number;
 };
 type TAddOrderFormComponentProps = FormRenderProps<TAddOrderFormValues> &
   Partial<TExtraProps>;
@@ -70,6 +75,9 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     invalid,
     ableToUpdateOrder,
     isDraftEditing,
+    shouldShowOverflowError,
+    shouldShowUnderError,
+    minQuantity,
   } = props;
 
   const fieldSelectMemberDisable = inProgress || !ableToUpdateOrder;
@@ -227,6 +235,18 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
           })}
         </Button>
       </div>
+      {shouldShowOverflowError && (
+        <ErrorMessage
+          className={css.error}
+          message={`Bạn đã thay đổi vượt mức quy định (tối đa 10% số lượng người tham gia)`}
+        />
+      )}
+      {shouldShowUnderError && (
+        <ErrorMessage
+          className={css.error}
+          message={`Cần đặt tối thiểu ${minQuantity} phần`}
+        />
+      )}
 
       <div className={css.addRequirementContainer}>
         <Button

@@ -98,5 +98,6 @@ export const usePrepareManageOrdersSectionData = (
     defaultActiveKey,
     memberOptions,
     foodOptions,
+    currentOrderDetail: orderDetail[currentViewDate],
   };
 };

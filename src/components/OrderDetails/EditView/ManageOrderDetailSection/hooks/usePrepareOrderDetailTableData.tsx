@@ -52,5 +52,6 @@ export const usePrepareOrderDetailTableData = (
     allTabData,
     tableHeads,
     deletedTabData: allTabData[EOrderDetailsTableTab.deleted],
+    currentOrderDetail: orderDetail[currentViewDate],
   };
 };
