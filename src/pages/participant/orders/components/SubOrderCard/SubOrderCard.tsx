@@ -4,7 +4,6 @@ import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import OrderEventCardStatus from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCardStatus';
-import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
 import IconBanned from '@components/Icons/IconBanned/IconBanned';
 import IconDeadline from '@components/Icons/IconDeadline/IconDeadline';
 import IconFood from '@components/Icons/IconFood/IconFood';
@@ -14,6 +13,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { isOver } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { calculateRemainTime } from '@src/utils/dates';
+import { EParticipantOrderStatus } from '@src/utils/enums';
 
 import css from './SubOrderCard.module.scss';
 
@@ -25,12 +25,7 @@ type TSubOrderCardProps = {
 };
 
 const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
-  const {
-    event,
-    onRejectSelectDish,
-    setSelectedEvent,
-    openSubOrderDetailModal,
-  } = props;
+  const { event, setSelectedEvent, openSubOrderDetailModal } = props;
   const intl = useIntl();
   const {
     daySession,
@@ -38,9 +33,6 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
     deliveryAddress,
     restaurant,
     status,
-    orderId,
-    timestamp,
-    planId,
     deadlineDate,
     meal,
     dishSelection,
@@ -63,12 +55,7 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
     (item: any) => item.key === dishSelection?.dishSelection,
   )?.value;
 
-  const shouldShowRejectButton =
-    !isOrderStarted &&
-    ![EVENT_STATUS.EXPIRED_STATUS, EVENT_STATUS.NOT_JOINED_STATUS].includes(
-      status,
-    ) &&
-    !isExpired;
+  const shouldShowRejectStatus = status === EParticipantOrderStatus.notJoined;
 
   const subOrderTxs = useAppSelector(
     (state) => state.ParticipantOrderList.subOrderTxs,
@@ -83,16 +70,6 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
   const onCardClick = () => {
     setSelectedEvent(event);
     openSubOrderDetailModal();
-  };
-
-  const handleRejectSelectDish = (e: any) => {
-    e.stopPropagation();
-
-    onRejectSelectDish({
-      orderId,
-      orderDay: timestamp,
-      planId,
-    });
   };
 
   return (
@@ -119,9 +96,9 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
             </div>
           </div>
         </RenderWhen>
-        <RenderWhen condition={shouldShowRejectButton}>
+        <RenderWhen condition={shouldShowRejectStatus}>
           <div className={css.row}>
-            <div className={css.noPickThisDay} onClick={handleRejectSelectDish}>
+            <div className={css.noPickThisDay}>
               <IconBanned />
               <span>Bỏ chọn ngày này</span>
             </div>
