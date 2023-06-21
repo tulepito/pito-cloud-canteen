@@ -264,7 +264,7 @@ const OrderDetailPage = () => {
   const isNormalOrder = orderType === EOrderType.normal;
   const isPicking = orderState === EOrderStates.picking;
   const isDraftEditing = orderState === EOrderStates.inProgress;
-
+  console.log({ isDraftEditing });
   const editViewClasses = classNames(css.editViewRoot, {
     [css.editNormalOrderView]: isNormalOrder,
     [css.editNormalOrderViewWithHistorySection]:
@@ -487,6 +487,7 @@ const OrderDetailPage = () => {
             }>
             <ManageLineItemsSection
               isDraftEditing={isDraftEditing}
+              ableToUpdateOrder={ableToUpdateOrder}
               shouldShowOverflowError={shouldShowOverflowError}
               shouldShowUnderError={shouldShowUnderError}
               setCurrentViewDate={(date) => setCurrentViewDate(date)}
