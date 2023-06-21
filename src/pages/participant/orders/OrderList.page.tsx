@@ -45,8 +45,13 @@ const OrderListPage = () => {
   const router = useRouter();
   const { planId: planIdFromQuery, timestamp: timestampFromQuery } =
     router.query;
+  const localStorageView = getItem('participant_calendarView');
+  const isValidLocalStorageView = ['month', 'week'].includes(
+    localStorageView as View,
+  );
+
   const [defaultCalendarView, setDefaultCalendarView] = useState<View>(
-    (getItem('participant_calendarView') as View) || Views.WEEK,
+    isValidLocalStorageView ? localStorageView : Views.WEEK,
   );
   const updateProfileModalControl = useBoolean();
   const onBoardingModal = useBoolean();

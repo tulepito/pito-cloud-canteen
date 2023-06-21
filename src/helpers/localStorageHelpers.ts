@@ -1,5 +1,7 @@
 import type { TObject } from '@utils/types';
 
+import { isJson } from './jsonHelper';
+
 const hasLocalStorage = () => typeof localStorage !== 'undefined';
 
 export const setItem = (key: string, item: string | TObject) => {
@@ -10,7 +12,9 @@ export const setItem = (key: string, item: string | TObject) => {
 
 export const getItem = (key: string) => {
   if (hasLocalStorage()) {
-    return JSON.parse(localStorage.getItem(key)!);
+    const rawItemValue = localStorage.getItem(key);
+
+    return isJson(rawItemValue) ? JSON.parse(rawItemValue!) : rawItemValue;
   }
 };
 
