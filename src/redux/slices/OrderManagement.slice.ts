@@ -930,7 +930,7 @@ const OrderManagementSlice = createSlice({
       );
 
       const isNotAddedToChoseList =
-        EParticipantOrderStatus.empty ||
+        defaultStatus === EParticipantOrderStatus.empty ||
         defaultStatus === EParticipantOrderStatus.notJoined;
 
       const newMemberOrderValues = {

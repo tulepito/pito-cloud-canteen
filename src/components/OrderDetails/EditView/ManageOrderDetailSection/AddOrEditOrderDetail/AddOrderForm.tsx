@@ -47,6 +47,7 @@ type TExtraProps = {
   shouldShowUnderError?: boolean;
   maxQuantity?: number;
   minQuantity?: number;
+  currentViewDate: number;
 };
 type TAddOrderFormComponentProps = FormRenderProps<TAddOrderFormValues> &
   Partial<TExtraProps>;
@@ -78,6 +79,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     shouldShowOverflowError,
     shouldShowUnderError,
     minQuantity,
+    currentViewDate,
   } = props;
 
   const fieldSelectMemberDisable =
@@ -111,6 +113,12 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   const handleToggleShowHideRequirementField = () => {
     setIsRequirementInputShow(!isRequirementInputShow);
   };
+
+  useEffect(() => {
+    if (currentViewDate && form) {
+      form.reset();
+    }
+  }, [currentViewDate]);
 
   useEffect(() => {
     if (isRequirementInputShow) {
