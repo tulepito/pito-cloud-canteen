@@ -114,7 +114,7 @@ const tourConfig = [
         <div className={css.step}>{`${currentStep + 1}/5`}</div>
         <div className={css.stepTitle}>Xoá bữa ăn này</div>
         <div className={css.stepContent}>
-          Bạn có thể xoá nhà hàng đã chọn trong trường muốn thay đổi ngày ăn
+          Bạn có thể xoá nhà hàng đã chọn trong trường hợp muốn thay đổi ngày ăn
         </div>
       </div>
     ),
