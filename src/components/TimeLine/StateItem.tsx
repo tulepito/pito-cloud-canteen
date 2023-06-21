@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo } from 'react';
 import classNames from 'classnames';
 
@@ -10,6 +11,7 @@ import {
   txIsCanceled,
   txIsCompleted,
   txIsDelivering,
+  txIsDeliveryFailed,
   txIsInitiated,
 } from '@utils/transaction';
 
@@ -36,15 +38,14 @@ const StateItem: React.FC<TStateItemProps> = ({
     stateComponent = <IconTickWithBackground className={css.icon} />;
   } else if (txIsDelivering(tx)) {
     stateComponent = <IconDelivering className={css.icon} />;
-    // } else if (txIsDeliveryFailed(tx)) {
-    // stateComponent = <IconFail className={css.icon} />;
+  } else if (txIsDeliveryFailed(tx)) {
+    stateComponent = <IconCancel className={css.icon} />;
   } else if (txIsCanceled(tx)) {
     stateComponent = <IconCancel className={css.icon} />;
   }
 
   const tooltipContent = useMemo(() => {
     return <StateItemTooltip tx={tx} />;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(tx)]);
 
   const stateItemComponent = useMemo(

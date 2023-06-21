@@ -59,8 +59,17 @@ export const isOrderOverDeadline = (order: TListing) => {
   return isOver(deadlineDate);
 };
 
+export const findMinDeadlineDate = () => {
+  return DateTime.fromJSDate(new Date())
+    .plus({ days: 1 })
+    .startOf('day')
+    .toJSDate();
+};
+
 export const findMinStartDate = () => {
-  const initMinStartDate = DateTime.fromJSDate(new Date()).plus({ days: 3 });
+  const initMinStartDate = DateTime.fromJSDate(new Date())
+    .startOf('day')
+    .plus({ days: 3 });
   const { weekday } = initMinStartDate;
 
   const minStartDate =
@@ -127,13 +136,16 @@ export const orderDataCheckers = (order: TListing) => {
     deliveryAddress,
   } = Listing(order).getMetadata();
   const timeOptions = generateTimeOptions();
+  const minStartTimeStamp = findMinStartDate().getTime();
 
   const checkers = {
     isDeadlineDateValid: Number.isInteger(deadlineDate),
     isDeliveryAddressValid:
       !isEmpty(deliveryAddress?.address) && !isEmpty(deliveryAddress?.origin),
-    isStartDateValid: Number.isInteger(startDate),
-    isEndDateValid: Number.isInteger(endDate),
+    isStartDateValid:
+      Number.isInteger(startDate) && minStartTimeStamp <= (startDate || 0),
+    isEndDateValid:
+      Number.isInteger(endDate) && (endDate || 0) >= (startDate || 0),
     isDeliveryHourValid: timeOptions.includes(deliveryHour),
     isDeadlineHourValid: timeOptions.includes(deadlineHour),
     isPackagePerMemberValid: Number.isInteger(packagePerMember),
@@ -159,7 +171,7 @@ export const isEnableSubmitPublishOrder = (
   });
   const isNoUnAvailableRestaurantInOrderDetail = Object.keys(
     availableOrderDetailCheckList,
-  ).every((item) => availableOrderDetailCheckList[item]);
+  ).every((item) => availableOrderDetailCheckList[item].isAvailable);
 
   return (
     isOrderValid &&
@@ -380,7 +392,7 @@ export const orderFlow = {
     EOrderStates.canceledByBooker,
     EOrderStates.canceled,
   ],
-  [EOrderStates.picking]: [EOrderStates.inProgress],
+  [EOrderStates.picking]: [EOrderStates.inProgress, EOrderStates.canceled],
   [EOrderStates.inProgress]: [EOrderStates.pendingPayment],
   [EOrderStates.pendingPayment]: [EOrderStates.completed],
   [EOrderStates.completed]: [EOrderStates.reviewed],

@@ -26,7 +26,7 @@ type TReviewViewProps = TDefaultProps & {
   reviewViewData: ReturnType<
     typeof usePrepareOrderDetailPageData
   >['reviewViewData'];
-  orderData: TListing;
+  orderData?: TListing;
   onGoBackToEditOrderPage?: () => void;
   onSubmitEdit?: (values: TReviewInfoFormValues) => void;
   onDownloadPriceQuotation: () => Promise<void>;
@@ -43,10 +43,12 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     onGoBackToEditOrderPage,
     onSubmitEdit,
     onDownloadPriceQuotation,
+    classes = {},
     orderData,
   } = props;
   const dispatch = useAppDispatch();
-  const orderListingGetter = Listing(orderData);
+  const { leftClassName, rightClassName } = classes;
+  const orderListingGetter = Listing(orderData!);
   const { quotationId } = orderListingGetter.getMetadata();
   useEffect(() => {
     if (quotationId) {
@@ -55,6 +57,8 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
   }, [dispatch, quotationId]);
 
   const rootClasses = classNames(rootClassName || css.root, className);
+  const leftPartClasses = classNames(css.leftPart, leftClassName);
+  const rightPartClasses = classNames(css.rightPart, rightClassName);
 
   return (
     <div className={rootClasses}>
@@ -65,7 +69,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           onGoBack={onGoBackToEditOrderPage}
         />
       )}
-      <div className={css.leftPart}>
+      <div className={leftPartClasses}>
         <RenderWhen condition={!canGoBackEditMode}>
           <ReviewOrderStatesSection
             data={{
@@ -92,7 +96,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
         />
       </div>
-      <div className={css.rightPart}>
+      <div className={rightPartClasses}>
         <RenderWhen condition={!canGoBackEditMode}>
           <ReviewOrderProcessSection />
         </RenderWhen>

@@ -15,6 +15,7 @@ import {
 } from '@redux/slices/OrderManagement.slice';
 import { formatTimestamp } from '@src/utils/dates';
 import { historyPushState } from '@src/utils/history';
+import { EMAIL_RE } from '@src/utils/validators';
 
 import type { TAddOrderFormValues } from './AddOrEditOrderDetail/AddOrderForm';
 import AddOrderForm from './AddOrEditOrderDetail/AddOrderForm';
@@ -52,15 +53,18 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
   } = usePrepareManageOrdersSectionData(currentViewDate, setCurrentViewDate);
 
   const handleSubmitAddSelection = async (values: TAddOrderFormValues) => {
-    const { participantId: memberId, requirement = '', foodId } = values;
+    const { participantId, requirement = '', foodId } = values;
+    const selectParticipantValue = participantId.key;
+    const isUsingEmail = EMAIL_RE.test(selectParticipantValue);
 
     const updateValues = {
-      memberId,
       foodId,
       requirement,
       currentViewDate,
+      ...(isUsingEmail
+        ? { memberEmail: selectParticipantValue }
+        : { memberId: selectParticipantValue }),
     };
-
     await dispatch(orderManagementThunks.addOrUpdateMemberOrder(updateValues));
   };
 

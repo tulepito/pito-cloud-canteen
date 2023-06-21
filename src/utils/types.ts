@@ -56,7 +56,11 @@ export type TError = {
 };
 /* =============== Props =============== */
 
-export type TDefaultProps = { className?: string; rootClassName?: string };
+export type TDefaultProps = {
+  className?: string;
+  rootClassName?: string;
+  classes?: TObject;
+};
 
 export type TIconProps = TDefaultProps & {
   width?: number;

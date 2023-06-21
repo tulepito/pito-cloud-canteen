@@ -1,5 +1,5 @@
 import { parseThousandNumber } from '@helpers/format';
-import { groupFoodOrderByDate } from '@pages/company/orders/[orderId]/picking/helpers/orderDetailHelper';
+import { groupFoodOrderByDate } from '@helpers/order/orderDetailHelper';
 import { Listing, User } from '@src/utils/data';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 
