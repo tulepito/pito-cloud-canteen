@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { isEmpty } from 'lodash';
 import { useRouter } from 'next/router';
@@ -11,7 +10,7 @@ import type { TListing, TObject, TUser } from '@utils/types';
 
 export const usePrepareManageOrdersSectionData = (
   currentViewDate: number | string,
-  setCurrentViewDate: Dispatch<SetStateAction<number>>,
+  setCurrentViewDate: (date: number) => void,
 ) => {
   const {
     query: { timestamp },

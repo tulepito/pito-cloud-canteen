@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import type { Dispatch, SetStateAction } from 'react';
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import isEmpty from 'lodash/isEmpty';
@@ -28,7 +27,7 @@ import css from './ManageOrdersSection.module.scss';
 type TManageOrdersSectionProps = {
   ableToUpdateOrder: boolean;
   currentViewDate: number;
-  setCurrentViewDate: Dispatch<SetStateAction<number>>;
+  setCurrentViewDate: (date: number) => void;
   isDraftEditing: boolean;
   handleOpenReachMaxAllowedChangesModal?: (type: string) => void;
   shouldShowOverflowError?: boolean;

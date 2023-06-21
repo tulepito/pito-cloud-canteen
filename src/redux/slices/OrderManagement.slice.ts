@@ -1066,6 +1066,15 @@ const OrderManagementSlice = createSlice({
         orderDetail: payload,
       };
     },
+    resetDraftOrderDetails: (state) => {
+      const { planData } = state;
+      const { orderDetail } = Listing(planData as TListing).getMetadata();
+
+      return {
+        ...state,
+        orderDetail,
+      };
+    },
     updateDraftSubOrderChangesHistory: (state, { payload }) => {
       const {
         currentViewDate,

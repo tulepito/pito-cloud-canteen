@@ -22,7 +22,10 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
-import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
+import {
+  OrderManagementsAction,
+  orderManagementThunks,
+} from '@redux/slices/OrderManagement.slice';
 import { companyPaths } from '@src/paths';
 import { diffDays } from '@src/utils/dates';
 import type { TPlan } from '@src/utils/orderTypes';
@@ -99,6 +102,7 @@ const checkMinMaxQuantity = (
   const totalQuantityCanAdd = (totalQuantity * 10) / 100;
   const totalAdded = totalQuantity - oldTotalQuantity;
   const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
+
   const shouldShowUnderError = totalQuantity < minQuantity;
 
   return {
@@ -189,6 +193,13 @@ const OrderDetailPage = () => {
       return onQuerySubOrderHistoryChanges(
         lastRecordSubOrderChangesHistoryCreatedAt,
       );
+  };
+
+  const handleSetCurrentViewDate = (date: number) => {
+    console.log({ date });
+
+    setCurrentViewDate(date);
+    dispatch(OrderManagementsAction.resetDraftOrderDetails());
   };
 
   useEffect(() => {
@@ -297,7 +308,7 @@ const OrderDetailPage = () => {
         <div className={css.leftPart}>
           <ManageOrdersSection
             ableToUpdateOrder={ableToUpdateOrder}
-            setCurrentViewDate={(date) => setCurrentViewDate(date)}
+            setCurrentViewDate={handleSetCurrentViewDate}
             currentViewDate={currentViewDate}
             isDraftEditing={isDraftEditing}
             handleOpenReachMaxAllowedChangesModal={
@@ -359,7 +370,7 @@ const OrderDetailPage = () => {
               ableToUpdateOrder={ableToUpdateOrder}
               shouldShowOverflowError={shouldShowOverflowError}
               shouldShowUnderError={shouldShowUnderError}
-              setCurrentViewDate={(date) => setCurrentViewDate(date)}
+              setCurrentViewDate={handleSetCurrentViewDate}
               currentViewDate={currentViewDate}
             />
             {isDraftEditing && (

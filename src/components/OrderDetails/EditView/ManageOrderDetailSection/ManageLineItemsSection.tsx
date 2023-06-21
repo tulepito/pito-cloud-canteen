@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import type { Dispatch, SetStateAction } from 'react';
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import isEmpty from 'lodash/isEmpty';
@@ -25,7 +24,7 @@ type TManageLineItemsSectionProps = {
   isDraftEditing: boolean;
   shouldShowOverflowError: boolean;
   shouldShowUnderError: boolean;
-  setCurrentViewDate: Dispatch<SetStateAction<number>>;
+  setCurrentViewDate: (date: number) => void;
   currentViewDate: number;
   ableToUpdateOrder: boolean;
 };
