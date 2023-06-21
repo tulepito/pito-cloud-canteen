@@ -490,7 +490,7 @@ const OrderDetailPage = () => {
               ableToUpdateOrder={ableToUpdateOrder}
               shouldShowOverflowError={shouldShowOverflowError}
               shouldShowUnderError={shouldShowUnderError}
-              setCurrentViewDate={(date) => setCurrentViewDate(date)}
+              setCurrentViewDate={handleSetCurrentViewDate}
               currentViewDate={currentViewDate}
             />
             {isDraftEditing && (
