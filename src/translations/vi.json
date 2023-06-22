@@ -1491,7 +1491,7 @@
   "SubOrderChangesHistoryItem.foodRemoved": "Xóa món ăn",
   "SubOrderChangesHistoryItem.foodRemovedContent": "Bớt {quantity} {foodName}",
   "SubOrderChangesHistoryItem.memberFoodAdded": "Thêm thành viên",
-  "SubOrderChangesHistoryItem.memberFoodAddedContent": "Thêm món {foodName} cho thành viên {email}",
+  "SubOrderChangesHistoryItem.memberFoodAddedContent": "Thêm {email} với {foodName}",
   "SubOrderChangesHistoryItem.memberFoodChanged": "Chỉnh sửa món",
   "SubOrderChangesHistoryItem.memberFoodChangedContent": "Đổi món {oldFoodName} thành {newFoodName} của {email}",
   "SubOrderChangesHistoryItem.memberFoodRemoved": "Xóa thành viên",
