@@ -137,9 +137,12 @@ export const orderDataCheckers = (order: TListing) => {
   } = Listing(order).getMetadata();
   const timeOptions = generateTimeOptions();
   const minStartTimeStamp = findMinStartDate().getTime();
+  const minDeadlineTimeStamp = findMinDeadlineDate().getTime();
 
   const checkers = {
-    isDeadlineDateValid: Number.isInteger(deadlineDate),
+    isDeadlineDateValid:
+      Number.isInteger(deadlineDate) &&
+      minDeadlineTimeStamp <= (deadlineDate || 0),
     isDeliveryAddressValid:
       !isEmpty(deliveryAddress?.address) && !isEmpty(deliveryAddress?.origin),
     isStartDateValid:
