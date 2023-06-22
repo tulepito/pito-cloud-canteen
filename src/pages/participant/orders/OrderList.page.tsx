@@ -97,10 +97,11 @@ const OrderListPage = () => {
   const welcomeModalControl = useBoolean(walkthroughEnable);
 
   const showLoadingModal =
-    fetchOrdersInProgress ||
-    updateSubOrderInProgress ||
-    addSubOrderDocumentToFirebaseInProgress ||
-    participantPostRatingInProgress;
+    (fetchOrdersInProgress ||
+      updateSubOrderInProgress ||
+      addSubOrderDocumentToFirebaseInProgress ||
+      participantPostRatingInProgress) &&
+    !walkthroughEnable;
 
   const events = subOrders.map((subOrder: any) => {
     const planKey = Object.keys(subOrder)[0];
@@ -236,7 +237,7 @@ const OrderListPage = () => {
   };
 
   useEffect(() => {
-    if (subOrdersFromSelectedDayTxIds && !walkthroughEnable) {
+    if (subOrdersFromSelectedDayTxIds) {
       dispatch(
         OrderListThunks.fetchTransactionBySubOrder(
           subOrdersFromSelectedDayTxIds,
@@ -247,12 +248,10 @@ const OrderListPage = () => {
 
   useEffect(() => {
     (async () => {
-      if (!walkthroughEnable) {
-        await dispatch(OrderListThunks.fetchOrders(currentUserId));
-        dispatch(OrderListActions.markColorToOrder());
-      }
+      await dispatch(OrderListThunks.fetchOrders(currentUserId));
+      dispatch(OrderListActions.markColorToOrder());
     })();
-  }, [currentUserId, walkthroughEnable]);
+  }, [currentUserId]);
 
   useEffect(() => {
     dispatch(OrderListThunks.fetchAttributes());
