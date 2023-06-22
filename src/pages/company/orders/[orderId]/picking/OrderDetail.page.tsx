@@ -69,7 +69,7 @@ const checkMinMaxQuantity = (
   isNormalOrder: boolean,
 ) => {
   let totalQuantity = 0;
-  const data = orderDetails[currentViewDate] || {};
+  const data = orderDetails?.[currentViewDate] || {};
   const { lineItems = [], restaurant = {} } = data;
   const { maxQuantity = 100, minQuantity = 1 } = restaurant;
   if (isNormalOrder) {
@@ -89,7 +89,7 @@ const checkMinMaxQuantity = (
   }
   const { memberOrders = {} } = data;
   const { memberOrders: oldMemberOrders = {} } =
-    oldOrderDetail[currentViewDate] || {};
+    oldOrderDetail?.[currentViewDate] || {};
   const oldTotalQuantity = Object.keys(oldMemberOrders).filter(
     (f) =>
       !!oldMemberOrders[f].foodId &&
