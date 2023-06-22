@@ -82,12 +82,7 @@ const prepareOrderDetail = ({
 }) => {
   let newMemberOrderValues = memberOrderValues;
 
-  const { foodId: oldFoodId, status = EParticipantOrderStatus.empty } =
-    memberOrderValues || {};
-
-  if (foodId === '' || oldFoodId === foodId) {
-    return;
-  }
+  const { status = EParticipantOrderStatus.empty } = memberOrderValues || {};
 
   switch (status) {
     case EParticipantOrderStatus.joined:
@@ -896,7 +891,7 @@ const OrderManagementSlice = createSlice({
           requirement,
           memberOrderValues: memberOrderBeforeUpdate,
         }) || {};
-
+      console.log({ newOrderDetail, payload });
       const currentDraftSubOrderChanges = [
         ...(draftSubOrderChangesHistory[currentViewDate] || []),
       ];

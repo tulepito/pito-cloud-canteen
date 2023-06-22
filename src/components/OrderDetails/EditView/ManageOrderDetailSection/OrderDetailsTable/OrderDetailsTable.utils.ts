@@ -67,19 +67,19 @@ export const checkShouldShowEditOrderWarningModal = (
   }
   const { orderDetail = {} } = planData.attributes.metadata;
   const { memberOrders = {} } = orderDetail[currentViewDate] || {};
-  const choseData = Object.keys(memberOrders).filter(
+  const defaultChoseData = Object.keys(memberOrders).filter(
     (f) => memberOrders[f].status === EParticipantOrderStatus.joined,
   );
 
-  const deletedData = Object.keys(memberOrders).filter(
-    (f) => memberOrders[f].status === EParticipantOrderStatus.notAllowed,
+  const deletedData = Object.keys(currentMemberOrders).filter(
+    (f) => currentMemberOrders[f].status === EParticipantOrderStatus.notAllowed,
   );
 
-  const totalMemberCanRemove = Math.round((choseData.length * 10) / 100);
+  const totalMemberCanRemove = Math.round((defaultChoseData.length * 10) / 100);
 
   const notAllowToEdit = deletedData.length >= totalMemberCanRemove;
 
-  const memberInChoseTab = choseData.includes(memberId);
+  const memberInChoseTab = defaultChoseData.includes(memberId);
 
   if (shouldShowOverflowError && !memberInChoseTab) {
     return {
@@ -93,5 +93,5 @@ export const checkShouldShowEditOrderWarningModal = (
     };
   }
 
-  return { condition: true, type: 'reach_max' };
+  return { condition: notAllowToEdit, type: 'reach_max' };
 };
