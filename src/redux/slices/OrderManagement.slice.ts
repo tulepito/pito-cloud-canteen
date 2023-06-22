@@ -832,14 +832,16 @@ const OrderManagementSlice = createSlice({
 
       const { foodId: oldFoodId } = memberOrderBeforeUpdate || {};
 
-      const newOrderDetail = prepareOrderDetail({
-        orderDetail,
-        currentViewDate,
-        foodId,
-        memberId,
-        requirement,
-      });
-
+      const newOrderDetail =
+        prepareOrderDetail({
+          orderDetail,
+          currentViewDate,
+          foodId,
+          memberId,
+          requirement,
+          memberOrderValues: memberOrderBeforeUpdate,
+        }) || {};
+      console.log({ newOrderDetail, payload });
       const currentDraftSubOrderChanges = [
         ...(draftSubOrderChangesHistory[currentViewDate] || []),
       ];
