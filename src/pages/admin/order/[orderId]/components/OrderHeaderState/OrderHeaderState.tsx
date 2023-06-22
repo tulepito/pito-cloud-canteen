@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
 import IconLightOutline from '@components/Icons/IconLightOutline/IconLightOutline';
@@ -39,6 +40,10 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
     () => getLabelByKey(ORDER_STATES_OPTIONS, orderState),
     [orderState],
   );
+  const statusClasses = classNames(css.status, {
+    [css.statusPicking]: orderState === EOrderStates.picking,
+  });
+
   const shouldShowUpdateOrderStateBtn =
     orderState === EOrderDraftStates.pendingApproval ||
     orderState === EOrderDraftStates.draft;
@@ -60,7 +65,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
       <div className={css.orderTitle}>
         <div className={css.titleLabel}>Đơn hàng </div>
         <div className={css.orderId}>{`#${title}`}</div>
-        <div className={css.status}>{orderStateLabel}</div>
+        <div className={statusClasses}>{orderStateLabel}</div>
         <div className={css.action}>
           <IconLightOutline onClick={orderStateActionDropdownControl.setTrue} />
           {orderStateActionDropdownControl.value && canCancelOrder && (
