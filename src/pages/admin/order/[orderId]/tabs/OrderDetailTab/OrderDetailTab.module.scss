@@ -133,13 +133,17 @@
 
   .leftPart {
     order: 3;
-    $maxWidthWithPadding: calc(100vw - 320px - 280px - 40px);
+    $maxWidthWithPadding: calc(100vw - 320px - 280px - 40px - 40px * 2);
     margin-top: 24px;
 
     @include viewportSLarge {
       margin-top: 0;
       order: 1;
-      max-width: 750px;
+      width: $maxWidthWithPadding;
+    }
+
+    @include viewportXLarge {
+      width: 820px;
     }
   }
 
@@ -193,8 +197,7 @@
     width: fit-content;
     display: grid;
     grid-template-columns: 1fr 320px;
-    gap: 24px;
-    max-width: calc(1180px + 130px * 2);
+    gap: 40px;
     margin: 40px auto;
   }
 }
