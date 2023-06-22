@@ -283,6 +283,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
               placeholder={intl.formatMessage({
                 id: 'AddOrderForm.requirementField.placeholder',
               })}
+              disabled={!ableToUpdateOrder}
             />
           </div>
         )}

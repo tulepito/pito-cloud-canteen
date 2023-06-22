@@ -239,7 +239,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
             {intl.formatMessage({ id: 'LineItemsTable.addNoteField.label' })}
           </label>
           <FieldTextAreaComponent
-            disabled={inProgress}
+            disabled={inProgress || !ableToUpdateOrder}
             id={`${currentViewDate}.note`}
             name={`note`}
             className={css.fieldNote}
