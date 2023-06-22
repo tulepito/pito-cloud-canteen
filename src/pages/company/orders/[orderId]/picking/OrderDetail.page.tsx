@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
@@ -19,7 +20,10 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
-import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
+import {
+  orderDetailsAnyActionsInProgress,
+  orderManagementThunks,
+} from '@redux/slices/OrderManagement.slice';
 import { companyPaths } from '@src/paths';
 import { CurrentUser, Listing } from '@utils/data';
 import { EOrderDraftStates, EOrderStates, EOrderType } from '@utils/enums';
@@ -43,6 +47,7 @@ const OrderDetailPage = () => {
   const router = useRouter();
   const confirmCancelOrderActions = useBoolean(false);
   const dispatch = useAppDispatch();
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
   const {
     query: { orderId },
@@ -116,28 +121,35 @@ const OrderDetailPage = () => {
         onCancelOrder={confirmCancelOrderActions.setTrue}
       />
 
-      <RenderWhen condition={!isNormalOrder}>
-        <div className={css.leftPart}>
-          <ManageOrdersSection data={editViewData.manageOrdersData} />
-        </div>
-        <div className={css.rightPart}>
-          <OrderDeadlineCountdownSection
-            className={css.container}
-            data={editViewData.countdownSectionData}
-          />
-          <OrderLinkSection
-            className={css.container}
-            data={editViewData.linkSectionData}
-          />
-          <ManageParticipantsSection
-            className={css.container}
-            data={editViewData.manageParticipantData}
-          />
-        </div>
+      <RenderWhen condition={!inProgress}>
+        <RenderWhen condition={!isNormalOrder}>
+          <div className={css.leftPart}>
+            <ManageOrdersSection data={editViewData.manageOrdersData} />
+          </div>
+          <div className={css.rightPart}>
+            <OrderDeadlineCountdownSection
+              className={css.container}
+              data={editViewData.countdownSectionData}
+            />
+            <OrderLinkSection
+              className={css.container}
+              data={editViewData.linkSectionData}
+            />
+            <ManageParticipantsSection
+              className={css.container}
+              data={editViewData.manageParticipantData}
+            />
+          </div>
 
+          <RenderWhen.False>
+            <div className={css.lineItemsTable}>
+              <ManageLineItemsSection data={editViewData.manageOrdersData} />
+            </div>
+          </RenderWhen.False>
+        </RenderWhen>
         <RenderWhen.False>
-          <div className={css.lineItemsTable}>
-            <ManageLineItemsSection data={editViewData.manageOrdersData} />
+          <div className={css.loadingContainer}>
+            <Skeleton className={css.loadingContent} />
           </div>
         </RenderWhen.False>
       </RenderWhen>
