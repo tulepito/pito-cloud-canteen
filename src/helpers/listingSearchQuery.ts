@@ -2,7 +2,10 @@ import uniqBy from 'lodash/uniqBy';
 import { DateTime } from 'luxon';
 
 import { calculateBounds } from '@helpers/mapHelpers';
-import { deliveryDaySessionAdapter } from '@helpers/orderHelper';
+import {
+  deliveryDaySessionAdapter,
+  mealTypeAdapter,
+} from '@helpers/orderHelper';
 import { ListingTypes } from '@src/types/listingTypes';
 import { Listing, User } from '@utils/data';
 import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
@@ -38,12 +41,16 @@ export const getMenuQuery = ({
   const {
     deliveryHour,
     nutritions = [],
+    mealType: mealFoodType = [],
     packagePerMember,
   } = Listing(order as TListing).getMetadata();
   const dateTime = DateTime.fromMillis(timestamp);
   const dayOfWeek = convertWeekDay(dateTime.weekday).key;
   const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
   const mealType = deliveryDaySessionAdapter(deliveryDaySession);
+  const convertedMealFoodType = mealFoodType.map((item: string) =>
+    mealTypeAdapter(item),
+  );
 
   const query = {
     meta_listingState: 'published',
@@ -72,6 +79,13 @@ export const getMenuQuery = ({
         }
       : {}),
     [`pub_${dayOfWeek}MinFoodPrice`]: `,${packagePerMember + 1}`,
+    ...(mealFoodType.length > 0
+      ? {
+          [`meta_${dayOfWeek}FoodType`]: `has_any:${convertedMealFoodType.join(
+            ',',
+          )}`,
+        }
+      : {}),
     ...(keywords && { keywords }),
     ...(page && { page }),
     ...(perPage && { perPage }),
@@ -148,12 +162,16 @@ export const getMenuQueryInSpecificDay = ({
   const {
     deliveryHour,
     nutritions = [],
+    mealType: mealFoodType = [],
     packagePerMember,
   } = Listing(order as TListing).getMetadata();
   const dateTime = DateTime.fromMillis(timestamp);
   const dayOfWeek = convertWeekDay(dateTime.weekday).key;
   const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
   const mealType = deliveryDaySessionAdapter(deliveryDaySession);
+  const convertedMealFoodType = mealFoodType.map((item: string) =>
+    mealTypeAdapter(item),
+  );
   const query = {
     meta_listingState: 'published',
     meta_listingType: ListingTypes.MENU,
@@ -168,6 +186,13 @@ export const getMenuQueryInSpecificDay = ({
         }
       : {}),
     [`pub_${dayOfWeek}MinFoodPrice`]: `,${packagePerMember + 1}`,
+    ...(mealFoodType.length > 0
+      ? {
+          [`meta_${dayOfWeek}FoodType`]: `has_any:${convertedMealFoodType.join(
+            ',',
+          )}`,
+        }
+      : {}),
   };
 
   return query;

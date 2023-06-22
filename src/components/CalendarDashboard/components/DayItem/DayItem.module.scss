@@ -27,6 +27,19 @@
   flex-basis: calc(100% / 7);
   background-color: $neutralGray1;
   min-height: 76px;
+  border-right: 1px solid $neutralGray3;
+
+  &:nth-child(4) {
+    border-right: 0px solid transparent;
+  }
+
+  &:nth-child(7n) {
+    border-right: 0px solid transparent;
+  }
+
+  @include viewportLarge {
+    min-height: 256px;
+  }
 }
 
 .dayHeader {
@@ -125,7 +138,10 @@
 }
 
 .todayDayFooterIndex {
-  color: $primaryPri2;
+  color: $neutralGray1;
   margin-left: auto;
+  background-color: $primaryPri2;
+  padding: 4px 10px;
+  border-radius: 20px;
   z-index: 0;
 }
