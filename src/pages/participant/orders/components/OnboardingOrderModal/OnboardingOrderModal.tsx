@@ -109,9 +109,6 @@ const OnboardingOrderModal: React.FC<TOnboardingOrderModalProps> = (props) => {
       id="OnboardingOrderModal"
       isOpen={isOpen}
       handleClose={onClose}
-      closeClassName={css.slideModalClose}
-      openClassName={css.slideModalOpen}
-      scrollLayerClassName={css.slideModalScrollLayer}
       customHeader={
         <div className={css.modalHeader}>
           <div className={css.title}>Chi tiết đơn hàng</div>

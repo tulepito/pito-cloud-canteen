@@ -228,7 +228,7 @@ const OrderListPage = () => {
     onBoardingModal.setTrue();
     setTimeout(() => {
       tourControl.setTrue();
-    }, 1000);
+    }, 0);
   };
 
   const openRatingSubOrderModal = () => {
