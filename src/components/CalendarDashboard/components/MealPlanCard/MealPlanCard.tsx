@@ -67,7 +67,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   );
 
   return (
-    <div className={css.root}>
+    <div className={css.root} data-tour="step-1">
       <MealPlanCardHeader
         event={event}
         removeEventItem={removeEventItem}

@@ -61,7 +61,11 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
           </RenderWhen>
           <FormattedMessage id={`DayColumn.Session.${session}`} />
         </div>
-        <IconClose className={css.close} onClick={handleOpenDeleteModal} />
+        <IconClose
+          className={css.close}
+          onClick={handleOpenDeleteModal}
+          data-tour="step-5"
+        />
       </div>
       <div className={css.headerActions}>
         <IconFood className={css.foodIcon} />
@@ -70,6 +74,7 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
         <IconMagnifier
           className={css.searchIcon}
           onClick={handleSearchRestaurant}
+          data-tour="step-3"
         />
       </div>
       <DeleteMealModal

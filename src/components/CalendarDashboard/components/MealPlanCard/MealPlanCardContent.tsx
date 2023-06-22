@@ -47,6 +47,7 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
           className={css.recommendRestaurant}
           onClick={handleRefreshIconClick}
           inProgress={onRecommendMealInProgress}
+          data-tour="step-2"
         />
       </div>
     </div>
