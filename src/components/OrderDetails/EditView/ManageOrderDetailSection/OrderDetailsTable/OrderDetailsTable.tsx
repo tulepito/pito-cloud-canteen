@@ -123,7 +123,8 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
         condition &&
         type &&
         tab !== EOrderDetailsTableTab.notChoose &&
-        handleOpenReachMaxAllowedChangesModal
+        handleOpenReachMaxAllowedChangesModal &&
+        isDraftEditing
       ) {
         return handleOpenReachMaxAllowedChangesModal(type);
       }
