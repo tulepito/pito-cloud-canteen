@@ -24,7 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const { planId } = req.query;
           const createData = req.body;
           const currentUser = await getCurrentUser(req, res);
-          const createdAt = createData.createdAt
+          const createdAt = createData?.createdAt
             ? new Date(createData.createdAt)
             : new Date();
           const response =
@@ -37,6 +37,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           return res.status(200).json(response);
         } catch (error) {
+          console.error(
+            '/orders/[orderId]/plan/[planId]/history error:',
+            error,
+          );
+
           return res.status(500).json(error);
         }
       }
