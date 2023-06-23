@@ -248,7 +248,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
           })}
         </Button>
       </div>
-      {shouldShowOverflowError && (
+      {isDraftEditing && shouldShowOverflowError && (
         <ErrorMessage
           className={css.error}
           message={`Bạn đã thay đổi vượt mức quy định (tối đa 10% số lượng người tham gia)`}
