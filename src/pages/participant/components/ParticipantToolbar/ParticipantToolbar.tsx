@@ -4,7 +4,6 @@ import classNames from 'classnames';
 import isEqual from 'lodash/isEqual';
 import { DateTime } from 'luxon';
 
-import Button from '@components/Button/Button';
 import {
   ENavigate,
   EViewMode,
@@ -84,7 +83,7 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
   const viewNamesGroupFunc = () => {
     if (views.length > 1) {
       return views.map((name) => (
-        <Button
+        <div
           key={name}
           className={classNames(css.viewMode, {
             [css.activeViewMode]: view === name,
@@ -93,7 +92,7 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
           {intl.formatMessage({
             id: `Toolbar.viewMode.${name}`,
           })}
-        </Button>
+        </div>
       ));
     }
 

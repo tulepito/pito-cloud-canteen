@@ -66,7 +66,7 @@ const OnboardingOrderModal: React.FC<TOnboardingOrderModalProps> = (props) => {
   const step1TopPosition = step1Position?.y + 8;
   const step1LeftPosition = step1Position?.width + step1Position?.x;
   const step2TopPosition = step2Position?.y;
-  const step2LeftPosition = Math.round((step2Position?.width * 8) / 10);
+  const step2LeftPosition = step2Position?.width + step2Position?.x;
   const step3TopPosition = step3Position?.y;
   const step3LeftPosition = step3Position?.width + step3Position?.x;
 
@@ -109,9 +109,6 @@ const OnboardingOrderModal: React.FC<TOnboardingOrderModalProps> = (props) => {
       id="OnboardingOrderModal"
       isOpen={isOpen}
       handleClose={onClose}
-      closeClassName={css.slideModalClose}
-      openClassName={css.slideModalOpen}
-      scrollLayerClassName={css.slideModalScrollLayer}
       customHeader={
         <div className={css.modalHeader}>
           <div className={css.title}>Chi tiết đơn hàng</div>
@@ -192,10 +189,14 @@ const OnboardingOrderModal: React.FC<TOnboardingOrderModalProps> = (props) => {
         </div>
         <div className={css.sectionWrapper}>
           <div className={css.row}>
-            <Button className={css.btn} variant="secondary">
+            <Button
+              className={classNames(css.btn, css.pickForMeBtn)}
+              variant="secondary">
               Chọn giúp tôi
             </Button>
-            <Button className={css.btn}>Xác nhận chọn món</Button>
+            <Button className={classNames(css.btn, css.confirmBtn)}>
+              Xác nhận chọn món
+            </Button>
           </div>
           <div className={css.row}>
             <Button

@@ -32,9 +32,15 @@
   background-color: #ffffff;
   width: 100%;
   padding: 20px 16px 40px;
-  transition: bottom 0.5s ease-in-out;
-  animation: slideIn 0.3s ease-in-out;
-  // transform: translateY(0);
+
+  @include viewportLarge {
+    width: 300px;
+    padding: 12px;
+    border-radius: 16px;
+    bottom: 38px;
+    left: unset;
+    right: 10%;
+  }
 }
 
 .slideModalOpen {
@@ -79,6 +85,10 @@
   }
   .sectionWrapper {
     padding: 16px 0;
+
+    @include viewportLarge {
+      padding: 12px 0;
+    }
 
     svg {
       margin-right: 4px;
@@ -162,6 +172,18 @@
       width: 100%;
       min-height: 36px;
       padding: 6px 12px;
+
+      &.pickForMeBtn {
+        @include viewportLarge {
+          width: 120px;
+          flex-shrink: 0;
+        }
+      }
+      &.confirmBtn {
+        @include viewportLarge {
+          padding: 6px 5px;
+        }
+      }
     }
 
     .lastBtn {

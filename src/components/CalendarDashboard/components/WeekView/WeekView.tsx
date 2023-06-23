@@ -5,7 +5,9 @@ import { Navigate } from 'react-big-calendar';
 import { DateTime } from 'luxon';
 
 import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useViewport } from '@hooks/useViewport';
+import EmptySubOrder from '@pages/participant/orders/components/EmptySubOrder/EmptySubOrder';
 import type { TObject } from '@utils/types';
 
 import type {
@@ -84,6 +86,9 @@ function WeekView({
           />
         ))}
       </div>
+      <RenderWhen condition={events.length === 0}>
+        <EmptySubOrder />
+      </RenderWhen>
     </div>
   );
 }

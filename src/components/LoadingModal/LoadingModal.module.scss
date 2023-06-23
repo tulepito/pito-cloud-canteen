@@ -2,6 +2,11 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 
+.modalOpen {
+  @include viewportMedium {
+    display: none;
+  }
+}
 .content {
   @include flexAlign(center, center);
   height: calc(100vh - 64px);

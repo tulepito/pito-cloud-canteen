@@ -6,7 +6,9 @@ import { DateTime } from 'luxon';
 
 import { DAY_IN_WEEK } from '@components/CalendarDashboard/helpers/constant';
 import { getEventsInDate } from '@components/CalendarDashboard/helpers/date';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useViewport } from '@hooks/useViewport';
+import EmptySubOrder from '@pages/participant/orders/components/EmptySubOrder/EmptySubOrder';
 
 import type { TCalendarItemCardComponents } from '../../helpers/types';
 import MDayItem from '../DayItem/MDayItem';
@@ -42,6 +44,7 @@ function MonthView({
     () => MonthView.range(date, { localizer }),
     [date, localizer],
   );
+  const { walkthroughEnable = false } = resources || ({} as any);
   const firstDay = currRange[0];
   const totalEmptyDays = (firstDay.getDay() || 7) - 1;
   const emptyDayEls = Array.from(Array(totalEmptyDays).keys());
@@ -73,6 +76,11 @@ function MonthView({
           />
         ))}
       </div>
+      <RenderWhen condition={!walkthroughEnable && events.length === 0}>
+        <div className={css.noEventsWrapper}>
+          <EmptySubOrder className={css.noEventIcon} />
+        </div>
+      </RenderWhen>
     </div>
   );
 }

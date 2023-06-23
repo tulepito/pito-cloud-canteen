@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
+import { EVENTS_MOCKUP } from '@components/CalendarDashboard/helpers/mockupData';
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
@@ -96,10 +97,11 @@ const OrderListPage = () => {
   const welcomeModalControl = useBoolean(walkthroughEnable);
 
   const showLoadingModal =
-    fetchOrdersInProgress ||
-    updateSubOrderInProgress ||
-    addSubOrderDocumentToFirebaseInProgress ||
-    participantPostRatingInProgress;
+    (fetchOrdersInProgress ||
+      updateSubOrderInProgress ||
+      addSubOrderDocumentToFirebaseInProgress ||
+      participantPostRatingInProgress) &&
+    !walkthroughEnable;
 
   const events = subOrders.map((subOrder: any) => {
     const planKey = Object.keys(subOrder)[0];
@@ -227,7 +229,7 @@ const OrderListPage = () => {
     onBoardingModal.setTrue();
     setTimeout(() => {
       tourControl.setTrue();
-    }, 1000);
+    }, 0);
   };
 
   const openRatingSubOrderModal = () => {
@@ -277,9 +279,9 @@ const OrderListPage = () => {
       <div className={css.calendarContainer}>
         <CalendarDashboard
           anchorDate={selectedDay}
-          events={flattenEvents}
+          events={walkthroughEnable ? EVENTS_MOCKUP : flattenEvents}
           renderEvent={OrderEventCard}
-          inProgress={fetchOrdersInProgress}
+          inProgress={showLoadingModal}
           defautlView={defaultView}
           // exposeAnchorDate={handleAnchorDateChange}
           components={{
@@ -294,6 +296,7 @@ const OrderListPage = () => {
               />
             ),
           }}
+          resources={walkthroughEnable}
         />
       </div>
       <div className={css.subOrderContainer}>
