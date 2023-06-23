@@ -29,6 +29,7 @@ import {
 import { companyPaths } from '@src/paths';
 import { diffDays } from '@src/utils/dates';
 import type { TPlan } from '@src/utils/orderTypes';
+import { txIsInitiated } from '@src/utils/transaction';
 import { CurrentUser, Listing } from '@utils/data';
 import {
   EOrderDraftStates,
@@ -150,10 +151,10 @@ const OrderDetailPage = () => {
     planData,
     updateOrderFromDraftEditInProgress,
     draftSubOrderChangesHistory,
+    transactionDataMap,
   } = useAppSelector((state) => state.OrderManagement);
 
   const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
-
   const {
     orderTitle,
     editViewData,
@@ -196,8 +197,6 @@ const OrderDetailPage = () => {
   };
 
   const handleSetCurrentViewDate = (date: number) => {
-    console.log({ date });
-
     setCurrentViewDate(date);
     dispatch(OrderManagementsAction.resetDraftOrderDetails());
   };
@@ -264,9 +263,14 @@ const OrderDetailPage = () => {
         id: 'EditView.OrderTitle.updateOrderButtonText',
       });
 
+  const currentTxIsInitiated = txIsInitiated(
+    transactionDataMap[currentViewDate],
+  );
+
   const ableToUpdateOrder =
-    (isDraftEditing && diffDays(currentViewDate, NOW, 'day') > ONE_DAY) ||
-    isPicking;
+    currentTxIsInitiated &&
+    ((isDraftEditing && diffDays(currentViewDate, NOW, 'day') > ONE_DAY) ||
+      isPicking);
 
   const orderDetailsNotChanged =
     isDraftEditing && isEqual(orderDetail, newOrderDetail);
