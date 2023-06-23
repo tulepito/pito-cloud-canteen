@@ -270,9 +270,10 @@ const OrderDetailPage = () => {
   );
 
   const ableToUpdateOrder =
-    currentTxIsInitiated &&
-    ((isDraftEditing && diffDays(currentViewDate, NOW, 'day') > ONE_DAY) ||
-      isPicking);
+    (currentTxIsInitiated &&
+      isDraftEditing &&
+      diffDays(currentViewDate, NOW, 'day') > ONE_DAY) ||
+    isPicking;
 
   const orderDetailsNotChanged =
     isDraftEditing && isEqual(orderDetail, newOrderDetail);
