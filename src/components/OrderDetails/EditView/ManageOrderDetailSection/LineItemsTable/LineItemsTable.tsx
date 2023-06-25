@@ -32,15 +32,15 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
 
   const dispatch = useAppDispatch();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const { planData, orderDetail } = useAppSelector(
+  const { planData, draftOrderDetail } = useAppSelector(
     (state) => state.OrderManagement,
   );
 
   const planDataGetter = Listing(planData as TListing);
   const planId = planDataGetter.getId();
   const { orderId } = planDataGetter.getMetadata();
-  const data = orderDetail[currentViewDate] || {};
-  const { lineItems = [], restaurant = {} } = data;
+  const data = draftOrderDetail[currentViewDate] || {};
+  const { lineItems = [], restaurant = {} } = data as any;
   const { foodList = {} } = restaurant;
 
   const note = useMemo(() => data?.note || '', [currentViewDate]);
@@ -64,7 +64,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
       }
 
       const updateOrderDetail = {
-        ...orderDetail,
+        ...draftOrderDetail,
         [currentViewDate]: {
           ...data,
           note: newValue,
@@ -142,7 +142,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
       }
 
       const updateOrderDetail = {
-        ...orderDetail,
+        ...draftOrderDetail,
         [currentViewDate]: {
           ...data,
           lineItems: newLineItems,

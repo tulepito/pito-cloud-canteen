@@ -147,7 +147,7 @@ const OrderDetailPage = () => {
     querySubOrderChangesHistoryInProgress,
     subOrderChangesHistoryTotalItems,
     loadMoreSubOrderChangesHistory,
-    orderDetail: newOrderDetail,
+    draftOrderDetail,
     planData,
     updateOrderFromDraftEditInProgress,
     draftSubOrderChangesHistory,
@@ -199,11 +199,21 @@ const OrderDetailPage = () => {
   const handleSetCurrentViewDate = (date: number) => {
     setCurrentViewDate(date);
     dispatch(OrderManagementsAction.resetDraftOrderDetails());
+    dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
   };
 
   useEffect(() => {
     onQuerySubOrderHistoryChanges();
   }, [onQuerySubOrderHistoryChanges]);
+
+  useEffect(() => {
+    if (draftOrderDetail) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      () => {
+        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
+      };
+    }
+  }, []);
 
   const handleDownloadPriceQuotation = useDownloadPriceQuotation(
     orderTitle,
@@ -268,17 +278,19 @@ const OrderDetailPage = () => {
   );
 
   const ableToUpdateOrder =
-    (currentTxIsInitiated &&
+    !isFetchingOrderDetails &&
+    isRouterReady &&
+    ((currentTxIsInitiated &&
       isDraftEditing &&
       diffDays(currentViewDate, NOW, 'day') > ONE_DAY) ||
-    isPicking;
+      isPicking);
 
   const orderDetailsNotChanged =
-    isDraftEditing && isEqual(orderDetail, newOrderDetail);
+    isDraftEditing && isEqual(orderDetail, draftOrderDetail);
 
   const { shouldShowOverflowError, shouldShowUnderError, minQuantity } =
     checkMinMaxQuantity(
-      newOrderDetail,
+      draftOrderDetail,
       orderDetail,
       currentViewDate,
       isNormalOrder,
