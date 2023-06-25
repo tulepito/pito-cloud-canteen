@@ -155,7 +155,7 @@ type TOrderManagementState = {
   subOrderChangesHistoryTotalItems: number;
   draftSubOrderChangesHistory: Record<string, TSubOrderChangeHistoryItem[]>;
 
-  orderDetail: TPlan['orderDetail'];
+  draftOrderDetail: TPlan['orderDetail'];
   updateOrderFromDraftEditInProgress: boolean;
   updateOrderfromDraftEditError: any;
   quotation: TObject;
@@ -179,7 +179,7 @@ const initialState: TOrderManagementState = {
   companyData: null,
   orderData: {},
   planData: {},
-  orderDetail: {},
+  draftOrderDetail: {},
   planViewed: false,
   bookerData: null,
   participantData: [],
@@ -290,18 +290,35 @@ const addOrUpdateMemberOrder = createAsyncThunk(
   async (params: TObject, { getState, dispatch, rejectWithValue }) => {
     const { currentViewDate, foodId, memberId, requirement, memberEmail } =
       params;
-    const orderGetter = Listing(
-      getState().OrderManagement.orderData! as TListing,
-    );
-    const orderId = orderGetter.getId();
-    const { participants = [], anonymous = [] } = orderGetter.getMetadata();
+
+    const { draftOrderDetail, orderData, planData } =
+      getState().OrderManagement;
+    const planId = Listing(planData as TListing).getId();
+    const orderId = Listing(orderData as TListing).getId();
+
     const {
-      id: { uuid: planId },
-      attributes: { metadata = {} },
-    } = getState().OrderManagement.planData!;
+      shouldUpdateAnonymousList,
+      updateAnonymous,
+      errorMessage,
+      participantId,
+    } = await prepareAnonymousList({
+      orderData: orderData as TListing,
+      memberEmail,
+      memberId,
+    });
+
+    if (errorMessage) return rejectWithValue(errorMessage);
+
+    const memberOrderDetailOnUpdateDate =
+      draftOrderDetail[currentViewDate.toString()].memberOrders[memberId];
+    const { foodId: oldFoodId } = memberOrderDetailOnUpdateDate || {};
+
+    if (foodId === '' || oldFoodId === foodId) {
+      return;
+    }
 
     const newOrderDetail = prepareOrderDetail({
-      orderDetail: metadata.orderDetail,
+      orderDetail: draftOrderDetail,
       currentViewDate,
       foodId,
       memberId,
@@ -705,10 +722,10 @@ const updateOrderFromDraftEdit = createAsyncThunk(
       id: { uuid: planId },
     } = getState().OrderManagement.planData!;
     const { draftSubOrderChangesHistory } = getState().OrderManagement;
-    const { orderDetail } = getState().OrderManagement;
+    const { draftOrderDetail } = getState().OrderManagement;
     const updateParams = {
       planId,
-      orderDetail,
+      orderDetail: draftOrderDetail,
     };
     await addUpdateMemberOrder(orderId, updateParams);
     await Promise.all(
@@ -717,12 +734,12 @@ const updateOrderFromDraftEdit = createAsyncThunk(
           date as keyof typeof draftSubOrderChangesHistory
         ] as TSubOrderChangeHistoryItem[];
         if (draftSubOrderChangesHistoryByDate.length > 0) {
-          const { restaurant } = orderDetail[date] || {};
+          const { restaurant } = draftOrderDetail[date] || {};
 
           await sendOrderDetailUpdatedEmailApi({
             orderId,
             timestamp: date,
-            restaurantId: restaurant.id,
+            restaurantId: restaurant.id!,
           });
 
           await Promise.all(
@@ -819,7 +836,7 @@ const OrderManagementSlice = createSlice({
       const { currentViewDate, foodId, memberId, memberEmail, requirement } =
         payload;
 
-      const { orderDetail, planData, draftSubOrderChangesHistory } = state;
+      const { draftOrderDetail, planData, draftSubOrderChangesHistory } = state;
 
       const { orderDetail: defaultOrderDetail } = Listing(
         planData as TListing,
@@ -828,20 +845,20 @@ const OrderManagementSlice = createSlice({
         defaultOrderDetail[currentViewDate].memberOrders[memberId];
 
       const memberOrderBeforeUpdate =
-        orderDetail[currentViewDate].memberOrders[memberId];
+        draftOrderDetail[currentViewDate].memberOrders[memberId];
 
       const { foodId: oldFoodId } = memberOrderBeforeUpdate || {};
 
       const newOrderDetail =
         prepareOrderDetail({
-          orderDetail,
+          orderDetail: draftOrderDetail,
           currentViewDate,
           foodId,
           memberId,
           requirement,
           memberOrderValues: memberOrderBeforeUpdate,
         }) || {};
-      console.log({ newOrderDetail, payload });
+
       const currentDraftSubOrderChanges = [
         ...(draftSubOrderChangesHistory[currentViewDate] || []),
       ];
@@ -855,7 +872,7 @@ const OrderManagementSlice = createSlice({
 
         return {
           ...state,
-          orderDetail: newOrderDetail,
+          draftOrderDetail: newOrderDetail,
           draftSubOrderChangesHistory: {
             ...state.draftSubOrderChangesHistory,
             [currentViewDate]: currentDraftSubOrderChanges,
@@ -908,20 +925,20 @@ const OrderManagementSlice = createSlice({
 
       return {
         ...state,
-        orderDetail: newOrderDetail,
+        draftOrderDetail: newOrderDetail,
         draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
       };
     },
     draftDisallowMember: (state, { payload }) => {
       const { currentViewDate, memberId, memberEmail, tab } = payload;
-      const { orderDetail, planData } = state;
+      const { draftOrderDetail, planData } = state;
       const { orderDetail: defaultOrderDetail } = Listing(
         planData as TListing,
       ).getMetadata();
       const { status: defaultStatus } =
         defaultOrderDetail[currentViewDate].memberOrders[memberId];
       const memberOrderDetailOnUpdateDate =
-        orderDetail[currentViewDate].memberOrders[memberId];
+        draftOrderDetail[currentViewDate].memberOrders[memberId];
 
       const currentDraftSubOrderChanges = [
         ...(state.draftSubOrderChangesHistory[currentViewDate] || []),
@@ -944,7 +961,7 @@ const OrderManagementSlice = createSlice({
       };
 
       const newOrderDetail = addNewMemberToOrderDetail(
-        orderDetail,
+        draftOrderDetail,
         currentViewDate,
         memberId,
         newMemberOrderValues,
@@ -959,17 +976,17 @@ const OrderManagementSlice = createSlice({
 
         return {
           ...state,
-          orderDetail: newOrderDetail,
+          draftOrderDetail: newOrderDetail,
           draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
         };
       }
 
       const memberOrderBeforeUpdate =
-        orderDetail[currentViewDate].memberOrders[memberId];
+        draftOrderDetail[currentViewDate].memberOrders[memberId];
 
       const { foodId: oldFoodId } = memberOrderBeforeUpdate || {};
 
-      const { foodList = {} } = orderDetail[currentViewDate].restaurant;
+      const { foodList = {} } = draftOrderDetail[currentViewDate].restaurant;
 
       const { foodName: oldFoodName, foodPrice: oldFoodPrice } =
         foodList[oldFoodId] || {};
@@ -1001,14 +1018,14 @@ const OrderManagementSlice = createSlice({
 
       return {
         ...state,
-        orderDetail: newOrderDetail,
+        draftOrderDetail: newOrderDetail,
         draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
       };
     },
     setDraftOrderDetails: (state, { payload }) => {
       return {
         ...state,
-        orderDetail: payload,
+        draftOrderDetail: payload,
       };
     },
     resetDraftOrderDetails: (state) => {
@@ -1017,7 +1034,13 @@ const OrderManagementSlice = createSlice({
 
       return {
         ...state,
-        orderDetail,
+        draftOrderDetail: orderDetail,
+      };
+    },
+    resetDraftSubOrderChangeHistory: (state) => {
+      return {
+        ...state,
+        draftSubOrderChangesHistory: {},
       };
     },
     updateDraftSubOrderChangesHistory: (state, { payload }) => {
@@ -1191,7 +1214,7 @@ const OrderManagementSlice = createSlice({
           isFetchingOrderDetails: false,
           orderData,
           planData,
-          orderDetail,
+          draftOrderDetail: orderDetail,
           ...restPayload,
         };
       })
@@ -1369,7 +1392,7 @@ const OrderManagementSlice = createSlice({
             ...payload,
           },
         };
-        state.orderDetail = payload;
+        state.draftOrderDetail = payload;
       })
       .addCase(updatePlanOrderDetail.rejected, (state) => {
         state.isUpdatingOrderDetails = false;

@@ -15,12 +15,12 @@ export const usePrepareManageOrdersSectionData = (
   const {
     participantData,
     orderData,
-    orderDetail = {},
+    draftOrderDetail = {},
   } = useAppSelector((state) => state.OrderManagement);
 
   const { participants = [] } = Listing(orderData as TListing).getMetadata();
 
-  const dateList = Object.entries(orderDetail)
+  const dateList = Object.entries(draftOrderDetail)
     .reduce<number[]>((prev, [date, orderOnDate]) => {
       const { restaurant } = orderOnDate as TObject;
 
@@ -33,7 +33,7 @@ export const usePrepareManageOrdersSectionData = (
   );
 
   const { restaurant = {}, memberOrders = {} } =
-    orderDetail[currentViewDate?.toString()] || {};
+    draftOrderDetail[currentViewDate?.toString()] || {};
   const { foodList = {} } = restaurant;
   const foodOptions = Object.entries<TObject>(foodList).map(
     ([foodId, foodData]) => {
@@ -93,6 +93,6 @@ export const usePrepareManageOrdersSectionData = (
     defaultActiveKey,
     memberOptions,
     foodOptions,
-    currentOrderDetail: orderDetail[currentViewDate],
+    currentOrderDetail: draftOrderDetail[currentViewDate] || {},
   };
 };

@@ -54,7 +54,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     dateList = [],
     memberOptions,
     foodOptions,
-    currentOrderDetail = {},
+    currentOrderDetail,
   } = usePrepareManageOrdersSectionData(currentViewDate, setCurrentViewDate);
 
   const { restaurant = {} } = currentOrderDetail;
