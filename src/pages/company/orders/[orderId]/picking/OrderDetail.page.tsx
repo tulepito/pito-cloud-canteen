@@ -114,7 +114,7 @@ const checkMinMaxQuantity = (
 };
 
 const OrderDetailPage = () => {
-  const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
+  const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.review);
   const intl = useIntl();
   const router = useRouter();
   const confirmCancelOrderActions = useBoolean(false);
@@ -237,11 +237,17 @@ const OrderDetailPage = () => {
       isNormalOrder && isDraftEditing,
   });
 
-  const handleConfirmOrder = () => {
+  const handleConfirmOrder = async () => {
     if (isDraftEditing) {
-      return dispatch(orderManagementThunks.updateOrderFromDraftEdit());
+      const { error } = (await dispatch(
+        orderManagementThunks.updateOrderFromDraftEdit(),
+      )) as any;
+      if (!error) {
+        return setViewMode(EPageViewMode.review);
+      }
+    } else {
+      setViewMode(EPageViewMode.review);
     }
-    setViewMode(EPageViewMode.review);
   };
 
   const handleGoBackFromReviewMode = () => {
