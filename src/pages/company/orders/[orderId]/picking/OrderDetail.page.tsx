@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -79,6 +80,25 @@ const checkMinMaxQuantity = (
 
       return result;
     }, 0);
+
+    const disabledSubmit = Object.keys(orderDetails).some((key) => {
+      const detail = orderDetails[key];
+      const { lineItems = [], restaurant = {} } = detail || {};
+      const { maxQuantity = 100, minQuantity = 1 } = restaurant || {};
+      const totalQuantity = lineItems.reduce(
+        (result: number, lineItem: TObject) => {
+          result += lineItem?.quantity || 1;
+
+          return result;
+        },
+        0,
+      );
+      const shouldShowOverflowError = totalQuantity > maxQuantity;
+      const shouldShowUnderError = totalQuantity < minQuantity;
+
+      return shouldShowOverflowError || shouldShowUnderError;
+    });
+
     const shouldShowOverflowError = totalQuantity > maxQuantity;
     const shouldShowUnderError = totalQuantity < minQuantity;
 
@@ -86,6 +106,7 @@ const checkMinMaxQuantity = (
       shouldShowOverflowError,
       shouldShowUnderError,
       minQuantity,
+      disabledSubmit,
     };
   }
   const { memberOrders = {} } = data;
@@ -107,10 +128,35 @@ const checkMinMaxQuantity = (
 
   const shouldShowUnderError = totalQuantity < minQuantity;
 
+  const disabledSubmit = Object.keys(orderDetails).some((key) => {
+    const data = orderDetails[key] || {};
+    const { memberOrders = {}, restaurant } = data;
+    const { minQuantity = 1 } = restaurant;
+    const { memberOrders: oldMemberOrders = {} } = oldOrderDetail?.[key] || {};
+    const oldTotalQuantity = Object.keys(oldMemberOrders).filter(
+      (f) =>
+        !!oldMemberOrders[f].foodId &&
+        oldMemberOrders[f].status === EParticipantOrderStatus.joined,
+    ).length;
+    const totalQuantity = Object.keys(memberOrders).filter(
+      (f) =>
+        !!memberOrders[f].foodId &&
+        memberOrders[f].status === EParticipantOrderStatus.joined,
+    ).length;
+    const totalQuantityCanAdd = (totalQuantity * 10) / 100;
+    const totalAdded = totalQuantity - oldTotalQuantity;
+    const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
+
+    const shouldShowUnderError = totalQuantity < minQuantity;
+
+    return shouldShowOverflowError || shouldShowUnderError;
+  });
+
   return {
     shouldShowOverflowError,
     shouldShowUnderError,
     minQuantity,
+    disabledSubmit,
   };
 };
 
@@ -199,8 +245,6 @@ const OrderDetailPage = () => {
 
   const handleSetCurrentViewDate = (date: number) => {
     setCurrentViewDate(date);
-    dispatch(OrderManagementsAction.resetDraftOrderDetails());
-    dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
   };
 
   useEffect(() => {
@@ -211,6 +255,8 @@ const OrderDetailPage = () => {
     if (draftOrderDetail) {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       () => {
+        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
+
         return dispatch(OrderManagementsAction.resetDraftOrderDetails());
       };
     }
@@ -286,14 +332,18 @@ const OrderDetailPage = () => {
   const orderDetailsNotChanged =
     isDraftEditing && isEqual(orderDetail, draftOrderDetail);
 
-  const { shouldShowOverflowError, shouldShowUnderError, minQuantity } =
-    checkMinMaxQuantity(
-      draftOrderDetail,
-      orderDetail,
-      currentViewDate,
-      isNormalOrder,
-    );
-
+  const {
+    shouldShowOverflowError,
+    shouldShowUnderError,
+    minQuantity,
+    disabledSubmit,
+  } = checkMinMaxQuantity(
+    draftOrderDetail,
+    orderDetail,
+    currentViewDate,
+    isNormalOrder,
+  );
+  console.log({ disabledSubmit });
   const EditViewComponent = (
     <div className={editViewClasses}>
       <OrderTitle
@@ -310,10 +360,7 @@ const OrderDetailPage = () => {
             : ''
         }
         confirmDisabled={
-          !isPicking &&
-          (orderDetailsNotChanged ||
-            shouldShowOverflowError ||
-            shouldShowUnderError)
+          !isPicking && (orderDetailsNotChanged || disabledSubmit)
         }
         isDraftEditing={isDraftEditing}
       />
