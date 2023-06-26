@@ -115,7 +115,7 @@ const checkMinMaxQuantity = (
 };
 
 const OrderDetailPage = () => {
-  const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.review);
+  const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
   const intl = useIntl();
   const router = useRouter();
   const confirmCancelOrderActions = useBoolean(false);
@@ -151,7 +151,6 @@ const OrderDetailPage = () => {
     loadMoreSubOrderChangesHistory,
     draftOrderDetail,
     planData,
-    updateOrderFromDraftEditInProgress,
     draftSubOrderChangesHistory,
     transactionDataMap,
   } = useAppSelector((state) => state.OrderManagement);
@@ -240,16 +239,7 @@ const OrderDetailPage = () => {
   });
 
   const handleConfirmOrder = async () => {
-    if (isDraftEditing) {
-      const { error } = (await dispatch(
-        orderManagementThunks.updateOrderFromDraftEdit(),
-      )) as any;
-      if (!error) {
-        return setViewMode(EPageViewMode.review);
-      }
-    } else {
-      setViewMode(EPageViewMode.review);
-    }
+    setViewMode(EPageViewMode.review);
   };
 
   const handleGoBackFromReviewMode = () => {
@@ -312,7 +302,6 @@ const OrderDetailPage = () => {
         onConfirmOrder={handleConfirmOrder}
         onCancelOrder={confirmCancelOrderActions.setTrue}
         confirmButtonMessage={confirmButtonMessage}
-        confirmInProgress={updateOrderFromDraftEditInProgress}
         cancelButtonMessage={
           isPicking
             ? intl.formatMessage({
