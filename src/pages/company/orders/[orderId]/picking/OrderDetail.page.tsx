@@ -163,7 +163,7 @@ const ONE_DAY = 1;
 const NOW = new Date().getTime();
 
 const OrderDetailPage = () => {
-  const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
+  const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.review);
   const intl = useIntl();
   const router = useRouter();
   const confirmCancelOrderActions = useBoolean(false);
