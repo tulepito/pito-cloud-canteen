@@ -2,6 +2,7 @@
 import { useEffect, useMemo } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { useIntl } from 'react-intl';
+import difference from 'lodash/difference';
 import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
@@ -115,16 +116,21 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
           quantity,
         });
       } else if (quantity === 0) {
-        newLineItems = lineItems.toSpliced(itemIndex, 1);
+        newLineItems = difference(lineItems, [lineItems[itemIndex]]);
       } else {
         const item = lineItems[itemIndex];
         const { unitPrice } = lineItems[itemIndex];
-
-        newLineItems = lineItems.toSpliced(itemIndex, 1, {
+        const newLineItem = {
           ...item,
           price: unitPrice * quantity,
           quantity,
-        });
+        };
+        newLineItems = difference(lineItems, [lineItems[itemIndex]]);
+        newLineItems = [
+          ...newLineItems.slice(0, itemIndex),
+          newLineItem,
+          ...newLineItems.slice(itemIndex),
+        ];
       }
 
       const updateOrderDetail = {

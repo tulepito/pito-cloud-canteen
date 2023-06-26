@@ -42,7 +42,6 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
   );
   const {
     dateList = [],
-    defaultActiveKey,
     // foodOptions,
   } = usePrepareManageLineItemsSectionData(currentViewDate, setCurrentViewDate);
 
@@ -67,6 +66,10 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
     };
   });
 
+  const defaultActiveKey = items.findIndex(
+    ({ id }) => id === currentViewDate.toString(),
+  );
+
   const handleDateTabChange = ({ id }: TTabsItem) => {
     setCurrentViewDate(Number(id));
     historyPushState('timestamp', id);
@@ -81,7 +84,9 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
           onChange={handleDateTabChange}
           showNavigation
           middleLabel
-          defaultActiveKey={defaultActiveKey.toString()}
+          defaultActiveKey={`${
+            (defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
+          }`}
         />
       </div>
 

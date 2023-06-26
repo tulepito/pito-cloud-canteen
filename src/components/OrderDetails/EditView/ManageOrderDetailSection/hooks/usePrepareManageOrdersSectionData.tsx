@@ -2,7 +2,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { isEmpty } from 'lodash';
-import { useRouter } from 'next/router';
 
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@utils/data';
@@ -13,9 +12,6 @@ export const usePrepareManageOrdersSectionData = (
   currentViewDate: number | string,
   setCurrentViewDate: Dispatch<SetStateAction<number>>,
 ) => {
-  const {
-    query: { timestamp },
-  } = useRouter();
   const [defaultActiveKey, setDefaultActiveKey] = useState(1);
   const { planData, participantData, orderData } = useAppSelector(
     (state) => state.OrderManagement,
@@ -33,8 +29,8 @@ export const usePrepareManageOrdersSectionData = (
     .sort((x, y) => x - y);
 
   const indexOfTimestamp = useMemo(
-    () => dateList.indexOf(Number(timestamp)),
-    [timestamp],
+    () => dateList.indexOf(Number(currentViewDate)),
+    [currentViewDate, JSON.stringify(dateList)],
   );
 
   const { restaurant = {}, memberOrders = {} } =
