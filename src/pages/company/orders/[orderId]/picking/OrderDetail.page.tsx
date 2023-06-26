@@ -235,7 +235,6 @@ const OrderDetailPage = () => {
     currentViewDate,
     isNormalOrder,
   );
-
   const EditViewComponent = (
     <div className={editViewClasses}>
       <OrderTitle
