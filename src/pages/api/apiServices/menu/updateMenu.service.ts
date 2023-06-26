@@ -3,6 +3,7 @@ import {
   createFoodByDateByDaysOfWeekField,
   createFoodListIdByDaysOfWeekField,
   createListFoodIdsByFoodsByDate,
+  createListFoodTypeByFoodIds,
   createMinPriceByDayOfWeek,
   createNutritionsByDaysOfWeekField,
 } from '@pages/api/apiUtils/menu';
@@ -76,6 +77,27 @@ const updateMenu = async (
   const endDateToSubmit = isCycleMenu
     ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()
     : endDate;
+  const listFoodIdsByDate =
+    restaurantId && daysOfWeek
+      ? createFoodListIdByDaysOfWeekField(
+          {
+            monFoodIdList: monFoodIdListFromMenu,
+            tueFoodIdList: tueFoodIdListFromMenu,
+            wedFoodIdList: wedFoodIdListFromMenu,
+            thuFoodIdList: thuFoodIdListFromMenu,
+            friFoodIdList: friFoodIdListFromMenu,
+            satFoodIdList: satFoodIdListFromMenu,
+            sunFoodIdList: sunFoodIdListFromMenu,
+          },
+          daysOfWeek,
+        )
+      : foodsByDate
+      ? createListFoodIdsByFoodsByDate(foodsByDate)
+      : {};
+
+  const foodTypesByDayOfWeek = await createListFoodTypeByFoodIds(
+    listFoodIdsByDate,
+  );
 
   const response = await integrationSdk.listings.update(
     {
@@ -125,22 +147,6 @@ const updateMenu = async (
           ? {
               ...(daysOfWeek
                 ? {
-                    ...createFoodListIdByDaysOfWeekField(
-                      {
-                        monFoodIdList: monFoodIdListFromMenu,
-                        tueFoodIdList: tueFoodIdListFromMenu,
-                        wedFoodIdList: wedFoodIdListFromMenu,
-                        thuFoodIdList: thuFoodIdListFromMenu,
-                        friFoodIdList: friFoodIdListFromMenu,
-                        satFoodIdList: satFoodIdListFromMenu,
-                        sunFoodIdList: sunFoodIdListFromMenu,
-                      },
-                      daysOfWeek,
-                    ),
-                  }
-                : {}),
-              ...(daysOfWeek
-                ? {
                     ...createNutritionsByDaysOfWeekField(
                       {
                         monNutritions: monNutritionsFromMenu,
@@ -157,9 +163,8 @@ const updateMenu = async (
                 : {}),
             }
           : {}),
-        ...(foodsByDate
-          ? { ...createListFoodIdsByFoodsByDate(foodsByDate) }
-          : {}),
+        ...listFoodIdsByDate,
+        ...foodTypesByDayOfWeek,
       },
     },
     queryParams,

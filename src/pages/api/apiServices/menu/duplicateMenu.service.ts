@@ -4,6 +4,7 @@ import {
   createFoodListIdByDaysOfWeekField,
   createListFoodIdsByFoodsByDate,
   createListFoodNutritionByFoodsByDate,
+  createListFoodTypeByFoodIds,
   createMinPriceByDayOfWeek,
   createNutritionsByDaysOfWeekField,
 } from '@pages/api/apiUtils/menu';
@@ -92,6 +93,29 @@ const duplicateMenu = async (
     ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()
     : endDate;
 
+  const listFoodIdsByDayOfWeekMap = daysOfWeek
+    ? {
+        ...createFoodListIdByDaysOfWeekField(
+          {
+            monFoodIdList: monFoodIdListFromMenu,
+            tueFoodIdList: tueFoodIdListFromMenu,
+            wedFoodIdList: wedFoodIdListFromMenu,
+            thuFoodIdList: thuFoodIdListFromMenu,
+            friFoodIdList: friFoodIdListFromMenu,
+            satFoodIdList: satFoodIdListFromMenu,
+            sunFoodIdList: sunFoodIdListFromMenu,
+          },
+          daysOfWeek,
+        ),
+      }
+    : foodsByDate
+    ? createListFoodIdsByFoodsByDate(foodsByDate)
+    : {};
+
+  const listFoodTypesByDayOfWeek = await createListFoodTypeByFoodIds(
+    listFoodIdsByDayOfWeekMap,
+  );
+
   const createParams = {
     ...(title ? { title } : { title: titleFromMenu }),
     publicData: {
@@ -144,22 +168,8 @@ const duplicateMenu = async (
         : {}),
     },
     metadata: {
-      ...(daysOfWeek
-        ? {
-            ...createFoodListIdByDaysOfWeekField(
-              {
-                monFoodIdList: monFoodIdListFromMenu,
-                tueFoodIdList: tueFoodIdListFromMenu,
-                wedFoodIdList: wedFoodIdListFromMenu,
-                thuFoodIdList: thuFoodIdListFromMenu,
-                friFoodIdList: friFoodIdListFromMenu,
-                satFoodIdList: satFoodIdListFromMenu,
-                sunFoodIdList: sunFoodIdListFromMenu,
-              },
-              daysOfWeek,
-            ),
-          }
-        : {}),
+      ...listFoodTypesByDayOfWeek,
+      ...listFoodIdsByDayOfWeekMap,
       ...(daysOfWeek
         ? {
             ...createNutritionsByDaysOfWeekField(
@@ -175,9 +185,6 @@ const duplicateMenu = async (
               daysOfWeek,
             ),
           }
-        : {}),
-      ...(foodsByDate
-        ? { ...createListFoodIdsByFoodsByDate(foodsByDate) }
         : {}),
       ...(foodsByDate
         ? { ...createListFoodNutritionByFoodsByDate(foodsByDate) }
