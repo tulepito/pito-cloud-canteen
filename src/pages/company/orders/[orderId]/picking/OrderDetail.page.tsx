@@ -2,6 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
