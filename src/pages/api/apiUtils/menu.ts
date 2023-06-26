@@ -1,4 +1,7 @@
-import { getUniqueString } from '@src/utils/data';
+import { denormalisedResponseEntities } from '@services/data';
+import { getIntegrationSdk } from '@services/sdk';
+import { getUniqueString, Listing } from '@src/utils/data';
+import type { TListing } from '@src/utils/types';
 
 export const createMinPriceByDayOfWeek = (foodsByDate: any) => {
   let avaragePriceByDayOfWeek = {};
@@ -117,4 +120,43 @@ export const createListFoodIdsByFoodsByDate = (foodsByDate: any) => {
   });
 
   return foodIdsByDayOfWeek;
+};
+
+export const createListFoodTypeByFoodIds = async (listFoodIdsByDate: any) => {
+  const integrationSdk = getIntegrationSdk();
+  const listFoodTypesByDay = await new Promise((resolve, reject) => {
+    let result = {};
+    const dayKeyAsArray = Object.keys(listFoodIdsByDate);
+    dayKeyAsArray.map(async (key, index) => {
+      try {
+        const substringKey = key.substring(0, 3);
+
+        const foodIds = listFoodIdsByDate[key];
+        const response = await integrationSdk.listings.query({
+          ids: foodIds.slice(0, 50),
+        });
+        const listings = denormalisedResponseEntities(response);
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+        const foodTypes = listings.reduce((prev: string[], l: TListing) => {
+          const { foodType } = Listing(l).getPublicData();
+
+          if (!foodType) return prev;
+
+          return [...prev, foodType];
+        }, [] as string[]);
+
+        result = {
+          ...result,
+          [`${substringKey}FoodType`]: getUniqueString(foodTypes),
+        };
+        if (index === dayKeyAsArray.length - 1) {
+          resolve(result);
+        }
+      } catch (error) {
+        reject();
+      }
+    });
+  });
+
+  return listFoodTypesByDay || {};
 };
