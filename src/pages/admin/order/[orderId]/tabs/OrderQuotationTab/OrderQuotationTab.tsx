@@ -65,7 +65,7 @@ const TABLE_COLUMNS: TColumn[] = [
     key: 'bookerName',
     label: 'Nguời đại diện',
     render: (data: any) => {
-      return <div>{data.displayName}</div>;
+      return <div>{data.bookerName}</div>;
     },
   },
   {
@@ -142,7 +142,7 @@ const parseEntitiesToTableData = ({
     orderListing.getMetadata();
   const { orderName } = orderListing.getPublicData();
   const { companyName } = companyUser.getPublicData();
-  const { displayName } = bookerUser.getPublicData();
+  const { firstName, lastName } = bookerUser.getProfile();
   const restaurantsList = Object.values(orderDetail).reduce(
     (result: string[], orderDate: any) => {
       const { restaurant } = orderDate;
@@ -166,7 +166,7 @@ const parseEntitiesToTableData = ({
         location: deliveryAddress?.address,
         staffName,
         companyName,
-        displayName,
+        bookerName: lastName + firstName,
         restaurants: restaurantsList,
         startDate: startDate && formatTimestamp(startDate),
         endDate: endDate && formatTimestamp(endDate),
