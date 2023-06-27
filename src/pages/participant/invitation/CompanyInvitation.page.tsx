@@ -32,7 +32,10 @@ const CompanyInvitationPage = () => {
     (state) => state.companyInvitation.fetchCompanyInfoInProgress,
   );
   const companyUser = User(company as TUser);
+  const user = User(currentUser as TUser);
   const { companyName } = companyUser.getPublicData();
+
+  const { lastName: userLastName, firstName: userFistName } = user.getProfile();
   const { displayName: bookerName } = companyUser.getProfile();
   const { responseToInvitationInProgress, responseToInvitationResult } =
     useAppSelector((state) => state.companyInvitation);
@@ -99,7 +102,7 @@ const CompanyInvitationPage = () => {
             span: (msg: ReactNode) => (
               <span className={css.boldText}>{msg}</span>
             ),
-            bookerName,
+            participantName: `${userLastName} ${userFistName}`,
             companyName,
           },
         )}
