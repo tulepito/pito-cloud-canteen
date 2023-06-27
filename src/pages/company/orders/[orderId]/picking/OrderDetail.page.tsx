@@ -259,6 +259,7 @@ const OrderDetailPage = () => {
     currentViewDate,
     isNormalOrder,
   );
+
   const EditViewComponent = (
     <div className={editViewClasses}>
       <OrderTitle
@@ -395,6 +396,7 @@ const OrderDetailPage = () => {
               shouldShowUnderError={shouldShowUnderError}
               setCurrentViewDate={handleSetCurrentViewDate}
               currentViewDate={currentViewDate}
+              minQuantity={minQuantity}
             />
             {isDraftEditing && (
               <SubOrderChangesHistorySection
