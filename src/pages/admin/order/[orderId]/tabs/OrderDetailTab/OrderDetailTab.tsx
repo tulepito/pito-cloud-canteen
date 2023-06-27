@@ -69,11 +69,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   );
 
   const dispatch = useAppDispatch();
-  const router = useRouter();
-  const { timestamp } = router.query;
-  const [currentViewDate, setCurrentViewDate] = useState<number>(
-    Number(timestamp),
-  );
+
   const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
   const orderId = Listing(order).getId();
 
