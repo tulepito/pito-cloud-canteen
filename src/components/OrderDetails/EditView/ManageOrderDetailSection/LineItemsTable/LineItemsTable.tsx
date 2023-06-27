@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
 import { FieldTextAreaComponent } from '@components/FormFields/FieldTextArea/FieldTextArea';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -24,10 +25,20 @@ type TLineItemsTableProps = {
   currentViewDate: number;
   isDraftEditing: boolean;
   ableToUpdateOrder: boolean;
+  shouldShowOverflowError: boolean;
+  shouldShowUnderError: boolean;
+  minQuantity: number;
 };
 
 const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
-  const { currentViewDate, isDraftEditing, ableToUpdateOrder } = props;
+  const {
+    currentViewDate,
+    isDraftEditing,
+    ableToUpdateOrder,
+    shouldShowOverflowError,
+    shouldShowUnderError,
+    minQuantity,
+  } = props;
   const intl = useIntl();
 
   const dispatch = useAppDispatch();
@@ -63,12 +74,14 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
         return;
       }
 
+      const currentViewData = {
+        ...data,
+        note: newValue,
+      };
+
       const updateOrderDetail = {
         ...draftOrderDetail,
-        [currentViewDate]: {
-          ...data,
-          note: newValue,
-        },
+        [currentViewDate]: currentViewData,
       };
       if (isDraftEditing) {
         dispatch(
@@ -151,16 +164,16 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
 
       if (isDraftEditing) {
         dispatch(
-          OrderManagementsAction.updateDraftSubOrderChangesHistory({
-            currentViewDate,
-            foodName,
-            foodPrice,
-            quantity,
-            foodId,
+          OrderManagementsAction.setDraftOrderDetailsAndSubOrderChangeHistory({
+            newOrderDetail: updateOrderDetail,
+            updateValues: {
+              currentViewDate,
+              foodName,
+              foodPrice,
+              quantity,
+              foodId,
+            },
           }),
-        );
-        dispatch(
-          OrderManagementsAction.setDraftOrderDetails(updateOrderDetail),
         );
       } else {
         dispatch(
@@ -232,6 +245,18 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
               })}
             </Button>
           </div>
+          {isDraftEditing && shouldShowOverflowError && (
+            <ErrorMessage
+              className={css.error}
+              message={`Bạn đã thay đổi vượt mức quy định (tối đa 10% số lượng người tham gia)`}
+            />
+          )}
+          {isDraftEditing && shouldShowUnderError && (
+            <ErrorMessage
+              className={css.error}
+              message={`Cần đặt tối thiểu ${minQuantity} phần`}
+            />
+          )}
         </div>
 
         <div className={css.fieldContainer}>

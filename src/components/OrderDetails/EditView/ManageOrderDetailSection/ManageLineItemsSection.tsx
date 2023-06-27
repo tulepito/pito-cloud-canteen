@@ -27,6 +27,7 @@ type TManageLineItemsSectionProps = {
   setCurrentViewDate: (date: number) => void;
   currentViewDate: number;
   ableToUpdateOrder: boolean;
+  minQuantity: number;
 };
 
 const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
@@ -37,6 +38,9 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
     currentViewDate,
     setCurrentViewDate,
     ableToUpdateOrder,
+    shouldShowUnderError,
+    shouldShowOverflowError,
+    minQuantity,
   } = props;
 
   const intl = useIntl();
@@ -64,6 +68,9 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
               currentViewDate={currentViewDate}
               isDraftEditing={isDraftEditing}
               ableToUpdateOrder={ableToUpdateOrder}
+              shouldShowOverflowError={shouldShowOverflowError}
+              shouldShowUnderError={shouldShowUnderError}
+              minQuantity={minQuantity}
             />
           </div>
         </div>

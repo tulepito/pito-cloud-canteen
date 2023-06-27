@@ -24,21 +24,16 @@ import useBoolean from '@hooks/useBoolean';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import {
+  checkMinMaxQuantity,
   OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
 import { companyPaths } from '@src/paths';
 import { diffDays } from '@src/utils/dates';
-import type { TPlan } from '@src/utils/orderTypes';
 import { txIsInitiated } from '@src/utils/transaction';
 import { CurrentUser, Listing } from '@utils/data';
-import {
-  EOrderDraftStates,
-  EOrderStates,
-  EOrderType,
-  EParticipantOrderStatus,
-} from '@utils/enums';
-import type { TListing, TObject } from '@utils/types';
+import { EOrderDraftStates, EOrderStates, EOrderType } from '@utils/enums';
+import type { TListing } from '@utils/types';
 
 import ModalReachMaxAllowedChanges from '../components/ModalReachMaxAllowedChanges/ModalReachMaxAllowedChanges';
 
@@ -62,102 +57,6 @@ const ViewByOrderStates = {
 
 const ONE_DAY = 1;
 const NOW = new Date().getTime();
-
-const checkMinMaxQuantity = (
-  orderDetails: TPlan['orderDetail'],
-  oldOrderDetail: TPlan['orderDetail'],
-  currentViewDate: number,
-  isNormalOrder: boolean,
-) => {
-  let totalQuantity = 0;
-  const data = orderDetails?.[currentViewDate] || {};
-  const { lineItems = [], restaurant = {} } = data;
-  const { maxQuantity = 100, minQuantity = 1 } = restaurant;
-  if (isNormalOrder) {
-    totalQuantity = lineItems.reduce((result: number, lineItem: TObject) => {
-      result += lineItem?.quantity || 1;
-
-      return result;
-    }, 0);
-
-    const disabledSubmit = Object.keys(orderDetails).some((key) => {
-      const detail = orderDetails[key];
-      const { lineItems = [], restaurant = {} } = detail || {};
-      const { maxQuantity = 100, minQuantity = 1 } = restaurant || {};
-      const totalQuantity = lineItems.reduce(
-        (result: number, lineItem: TObject) => {
-          result += lineItem?.quantity || 1;
-
-          return result;
-        },
-        0,
-      );
-      const shouldShowOverflowError = totalQuantity > maxQuantity;
-      const shouldShowUnderError = totalQuantity < minQuantity;
-
-      return shouldShowOverflowError || shouldShowUnderError;
-    });
-
-    const shouldShowOverflowError = totalQuantity > maxQuantity;
-    const shouldShowUnderError = totalQuantity < minQuantity;
-
-    return {
-      shouldShowOverflowError,
-      shouldShowUnderError,
-      minQuantity,
-      disabledSubmit,
-    };
-  }
-  const { memberOrders = {} } = data;
-  const { memberOrders: oldMemberOrders = {} } =
-    oldOrderDetail?.[currentViewDate] || {};
-  const oldTotalQuantity = Object.keys(oldMemberOrders).filter(
-    (f) =>
-      !!oldMemberOrders[f].foodId &&
-      oldMemberOrders[f].status === EParticipantOrderStatus.joined,
-  ).length;
-  totalQuantity = Object.keys(memberOrders).filter(
-    (f) =>
-      !!memberOrders[f].foodId &&
-      memberOrders[f].status === EParticipantOrderStatus.joined,
-  ).length;
-  const totalQuantityCanAdd = (totalQuantity * 10) / 100;
-  const totalAdded = totalQuantity - oldTotalQuantity;
-  const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
-
-  const shouldShowUnderError = totalQuantity < minQuantity;
-
-  const disabledSubmit = Object.keys(orderDetails).some((key) => {
-    const data = orderDetails[key] || {};
-    const { memberOrders = {}, restaurant } = data;
-    const { minQuantity = 1 } = restaurant;
-    const { memberOrders: oldMemberOrders = {} } = oldOrderDetail?.[key] || {};
-    const oldTotalQuantity = Object.keys(oldMemberOrders).filter(
-      (f) =>
-        !!oldMemberOrders[f].foodId &&
-        oldMemberOrders[f].status === EParticipantOrderStatus.joined,
-    ).length;
-    const totalQuantity = Object.keys(memberOrders).filter(
-      (f) =>
-        !!memberOrders[f].foodId &&
-        memberOrders[f].status === EParticipantOrderStatus.joined,
-    ).length;
-    const totalQuantityCanAdd = (totalQuantity * 10) / 100;
-    const totalAdded = totalQuantity - oldTotalQuantity;
-    const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
-
-    const shouldShowUnderError = totalQuantity < minQuantity;
-
-    return shouldShowOverflowError || shouldShowUnderError;
-  });
-
-  return {
-    shouldShowOverflowError,
-    shouldShowUnderError,
-    minQuantity,
-    disabledSubmit,
-  };
-};
 
 const OrderDetailPage = () => {
   const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
@@ -197,6 +96,8 @@ const OrderDetailPage = () => {
     planData,
     draftSubOrderChangesHistory,
     transactionDataMap,
+    shouldShowOverflowError,
+    shouldShowUnderError,
   } = useAppSelector((state) => state.OrderManagement);
 
   const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
@@ -244,6 +145,15 @@ const OrderDetailPage = () => {
   const handleSetCurrentViewDate = (date: number) => {
     setCurrentViewDate(date);
   };
+
+  useEffect(() => {
+    if (shouldShowOverflowError || shouldShowUnderError) {
+      const i = setTimeout(() => {
+        dispatch(OrderManagementsAction.resetOrderDetailValidation());
+        clearTimeout(i);
+      }, 4000);
+    }
+  }, [shouldShowOverflowError, shouldShowUnderError]);
 
   useEffect(() => {
     onQuerySubOrderHistoryChanges();
@@ -330,18 +240,13 @@ const OrderDetailPage = () => {
   const orderDetailsNotChanged =
     isDraftEditing && isEqual(orderDetail, draftOrderDetail);
 
-  const {
-    shouldShowOverflowError,
-    shouldShowUnderError,
-    minQuantity,
-    disabledSubmit,
-  } = checkMinMaxQuantity(
+  const { minQuantity, disabledSubmit } = checkMinMaxQuantity(
     draftOrderDetail,
     orderDetail,
     currentViewDate,
     isNormalOrder,
   );
-  console.log({ disabledSubmit });
+
   const EditViewComponent = (
     <div className={editViewClasses}>
       <OrderTitle
@@ -431,6 +336,7 @@ const OrderDetailPage = () => {
               shouldShowUnderError={shouldShowUnderError}
               setCurrentViewDate={handleSetCurrentViewDate}
               currentViewDate={currentViewDate}
+              minQuantity={minQuantity}
             />
             {isDraftEditing && (
               <SubOrderChangesHistorySection

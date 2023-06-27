@@ -110,7 +110,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
         };
       }
       case EOrderHistoryTypes.FOOD_REMOVED: {
-        const { foodName } = oldValue;
+        const { foodName, quantity } = oldValue;
 
         return {
           title: intl.formatMessage({
@@ -122,7 +122,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
             },
             {
               foodName: <span className={css.boldText}>"{foodName}"</span>,
-              quantity: <span className={css.boldText}>1</span>,
+              quantity: <span className={css.boldText}>{quantity}</span>,
             },
           ),
         };
