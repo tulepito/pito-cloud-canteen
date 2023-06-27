@@ -159,7 +159,6 @@ export const ReviewContent: React.FC<any> = (props) => {
       },
     };
   }) as any;
-  console.log('parsedFoodList', parsedFoodList);
 
   const handleToggleMenuCollapse = () => {
     menuCollapseController.toggle();
