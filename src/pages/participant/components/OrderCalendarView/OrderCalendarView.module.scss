@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .sectionCompanyBranding {
   display: flex;
@@ -24,7 +25,10 @@
 
 .container {
   margin-top: -50px;
-  height: calc(100vh - 350px);
+
+  @include viewportMedium {
+    height: calc(100vh - 350px);
+  }
 }
 
 .subOrderContainer {

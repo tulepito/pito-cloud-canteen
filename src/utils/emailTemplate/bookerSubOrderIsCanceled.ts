@@ -1,5 +1,5 @@
 import { parseThousandNumber } from '@helpers/format';
-import { calculatePriceQuotationInfo } from '@pages/company/orders/[orderId]/picking/helpers/cartInfoHelper';
+import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
 
 import { formatTimestamp } from '../dates';
 import { ESubOrderStatus } from '../enums';

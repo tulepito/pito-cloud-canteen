@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { EOrderDetailTabs } from '@src/utils/enums';
 
 import OrderDetailTab from './tabs/OrderDetailTab/OrderDetailTab';
@@ -63,7 +64,10 @@ const OrderDetailPage = () => {
   );
 
   useEffect(() => {
-    if (orderId) dispatch(OrderDetailThunks.fetchOrder(orderId as string));
+    if (orderId) {
+      dispatch(OrderDetailThunks.fetchOrder(orderId as string));
+      dispatch(orderManagementThunks.loadData(orderId as string));
+    }
   }, [dispatch, orderId]);
 
   const updateStaffName = useCallback(

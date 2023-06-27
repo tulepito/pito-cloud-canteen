@@ -27,6 +27,7 @@ type TOrderLinkSectionProps = TDefaultProps & {
     orderDeadline: number;
     companyName: string;
   };
+  isAminLayout?: boolean;
 };
 
 const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
@@ -34,6 +35,7 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
     rootClassName,
     className,
     data: { orderDeadline, companyName },
+    isAminLayout = false,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -51,7 +53,8 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const { viewed } = plan.getMetadata();
   const orderId = order.getId();
   const planId = plan.getId();
-  const isFirstTimeAccess = !(inProgress || viewed || planViewed);
+  const isFirstTimeAccess =
+    !isAminLayout && !(inProgress || viewed || planViewed);
 
   const orderLink = getParticipantPickingLink(orderData?.id?.uuid);
   const formattedOrderDeadline = formatTimestamp(

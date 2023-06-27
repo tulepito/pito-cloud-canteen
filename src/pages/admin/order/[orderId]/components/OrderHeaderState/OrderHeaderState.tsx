@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
 import IconLightOutline from '@components/Icons/IconLightOutline/IconLightOutline';
@@ -19,16 +20,17 @@ import css from './OrderHeaderState.module.scss';
 
 type OrderHeaderStateProps = {
   order: TListing;
-  handleUpdateOrderState: () => void;
+  handleUpdateOrderState: (state: EOrderStates) => () => void;
+  onConfirmOrder?: () => void;
   updateOrderStateInProgress: boolean;
-  handleCancelOrder?: () => void;
 };
+
 const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
   const {
     order,
     handleUpdateOrderState,
     updateOrderStateInProgress,
-    handleCancelOrder,
+    onConfirmOrder,
   } = props;
   const orderStateActionDropdownControl = useBoolean();
   const orderListing = Listing(order);
@@ -38,9 +40,15 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
     () => getLabelByKey(ORDER_STATES_OPTIONS, orderState),
     [orderState],
   );
+  const statusClasses = classNames(css.status, {
+    [css.statusPicking]: orderState === EOrderStates.picking,
+  });
+
   const shouldShowUpdateOrderStateBtn =
     orderState === EOrderDraftStates.pendingApproval ||
     orderState === EOrderDraftStates.draft;
+
+  const shouldShowStartOrderBtn = orderState === EOrderStates.picking;
 
   const canCancelOrder = orderFlow?.[
     orderState as TTransitionOrderState
@@ -48,7 +56,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
 
   const onCancelOrder = () => {
     if (canCancelOrder) {
-      handleCancelOrder?.();
+      handleUpdateOrderState?.(EOrderStates.canceled)();
     }
   };
 
@@ -57,7 +65,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
       <div className={css.orderTitle}>
         <div className={css.titleLabel}>Đơn hàng </div>
         <div className={css.orderId}>{`#${title}`}</div>
-        <div className={css.status}>{orderStateLabel}</div>
+        <div className={statusClasses}>{orderStateLabel}</div>
         <div className={css.action}>
           <IconLightOutline onClick={orderStateActionDropdownControl.setTrue} />
           {orderStateActionDropdownControl.value && canCancelOrder && (
@@ -70,7 +78,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
               <RenderWhen condition={shouldShowUpdateOrderStateBtn}>
                 <div
                   className={css.actionItem}
-                  onClick={handleUpdateOrderState}>
+                  onClick={handleUpdateOrderState(EOrderStates.picking)}>
                   Hoàn tất
                 </div>
               </RenderWhen>
@@ -82,9 +90,18 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
         <Button
           variant="cta"
           className={css.stateBtn}
-          onClick={handleUpdateOrderState}
+          onClick={handleUpdateOrderState(EOrderStates.picking)}
           inProgress={updateOrderStateInProgress}>
           Đặt đơn
+        </Button>
+      </RenderWhen>
+      <RenderWhen condition={shouldShowStartOrderBtn}>
+        <Button
+          variant="cta"
+          className={css.stateBtn}
+          onClick={onConfirmOrder}
+          inProgress={updateOrderStateInProgress}>
+          Xác nhận
         </Button>
       </RenderWhen>
     </div>

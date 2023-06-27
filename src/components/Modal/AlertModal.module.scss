@@ -20,7 +20,7 @@
   @include textTemplate(14px, 500, 24px, '');
   color: $neutralGray5;
 
-  .hasActionSection {
+  &.hasActionSection {
     padding-bottom: 40px;
   }
 }

@@ -56,7 +56,11 @@ export type TError = {
 };
 /* =============== Props =============== */
 
-export type TDefaultProps = { className?: string; rootClassName?: string };
+export type TDefaultProps = {
+  className?: string;
+  rootClassName?: string;
+  classes?: TObject;
+};
 
 export type TIconProps = TDefaultProps & {
   width?: number;
@@ -161,6 +165,8 @@ export type TBookerAttributes = {
 
 export type TAuthorProfile = {
   displayName: string;
+  firstName?: string;
+  lastName?: string;
   abbreviatedName: string;
   bio?: string;
   protectedData?: TObject;

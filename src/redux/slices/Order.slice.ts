@@ -35,6 +35,7 @@ import { CompanyPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import { convertWeekDay, renderDateRange } from '@utils/dates';
 import {
+  EInvalidRestaurantCase,
   EListingStates,
   EManageCompanyOrdersTab,
   ENotificationTypes,
@@ -127,7 +128,10 @@ type TOrderInitialState = {
     label: string;
   }[];
   availableOrderDetailCheckList: {
-    [timestamp: string]: boolean;
+    [timestamp: string]: {
+      isAvailable: boolean;
+      status?: EInvalidRestaurantCase;
+    };
   };
 
   orderRestaurantList: TListing[];
@@ -733,7 +737,22 @@ const checkRestaurantStillAvailable = createAsyncThunk(
     const availableOrderDetailCheckList = await Promise.all(
       Object.keys(orderDetail).map(async (timestamp) => {
         const { restaurant } = orderDetail[timestamp];
-        const { menuId } = restaurant;
+        const { menuId, id: restaurantId } = restaurant;
+        const [restaurantListing] = denormalisedResponseEntities(
+          (await sdk.listings.show({ id: restaurantId })) || [{}],
+        );
+
+        const { status = ERestaurantListingStatus.authorized } =
+          Listing(restaurantListing).getMetadata();
+
+        if (status !== ERestaurantListingStatus.authorized) {
+          return {
+            [timestamp]: {
+              isAvailable: false,
+              status: EInvalidRestaurantCase.closed,
+            },
+          };
+        }
         const menuQuery = getMenuQueryInSpecificDay({
           order,
           timestamp: +timestamp,
@@ -743,10 +762,17 @@ const checkRestaurantStillAvailable = createAsyncThunk(
           query: menuQuery,
         });
 
+        const isAnyMenusValid =
+          allMenus.findIndex((menu: TListing) => menu.id.uuid === menuId) !==
+          -1;
+
         return {
-          [timestamp]:
-            allMenus.findIndex((menu: TListing) => menu.id.uuid === menuId) !==
-            -1,
+          [timestamp]: {
+            isAvailable: isAnyMenusValid,
+            ...(isAnyMenusValid
+              ? { status: EInvalidRestaurantCase.noMenusValid }
+              : {}),
+          },
         };
       }),
     );

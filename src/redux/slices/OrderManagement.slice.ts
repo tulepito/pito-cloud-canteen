@@ -1,7 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { isEmpty } from 'lodash';
 import groupBy from 'lodash/groupBy';
 import omit from 'lodash/omit';
 
+import { EHttpStatusCode } from '@apis/errors';
 import {
   participantSubOrderAddDocumentApi,
   participantSubOrderGetByIdApi,
@@ -20,9 +22,10 @@ import {
   updateOrderApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
+import { checkUserExistedApi } from '@apis/userApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
-import { Listing } from '@utils/data';
+import { Listing, User } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type {
@@ -178,15 +181,48 @@ const sendRemindEmailToMember = createAsyncThunk(
 
 const addOrUpdateMemberOrder = createAsyncThunk(
   'app/OrderManagement/ADD_OR_UPDATE_MEMBER_ORDER',
-  async (params: TObject, { getState, dispatch }) => {
-    const { currentViewDate, foodId, memberId, requirement } = params;
-    const {
-      id: { uuid: orderId },
-    } = getState().OrderManagement.orderData!;
+  async (params: TObject, { getState, dispatch, rejectWithValue }) => {
+    const { currentViewDate, foodId, memberId, requirement, memberEmail } =
+      params;
+    const orderGetter = Listing(
+      getState().OrderManagement.orderData! as TListing,
+    );
+    const orderId = orderGetter.getId();
+    const { participants = [], anonymous = [] } = orderGetter.getMetadata();
     const {
       id: { uuid: planId },
       attributes: { metadata = {} },
     } = getState().OrderManagement.planData!;
+
+    let shouldUpdateAnonymousList = false;
+    let updateAnonymous = anonymous;
+
+    const checkUserResult = await checkUserExistedApi({
+      ...(memberId ? { id: memberId } : {}),
+      ...(memberEmail ? { email: memberEmail } : {}),
+    });
+
+    let participantId = memberId;
+
+    const { status: apiStatus = EHttpStatusCode.NotFound, user } =
+      checkUserResult?.data || {};
+
+    if (apiStatus === EHttpStatusCode.NotFound) {
+      return rejectWithValue('user_not_found');
+    }
+
+    if (!isEmpty(user)) {
+      participantId = User(user).getId();
+    }
+    // Update list anonymous
+    if (
+      !participants.includes(participantId) &&
+      !anonymous.includes(participantId) &&
+      participantId
+    ) {
+      shouldUpdateAnonymousList = true;
+      updateAnonymous = anonymous.concat(participantId);
+    }
 
     const memberOrderDetailOnUpdateDate =
       metadata?.orderDetail[currentViewDate.toString()].memberOrders[memberId];
@@ -229,20 +265,23 @@ const addOrUpdateMemberOrder = createAsyncThunk(
           ...metadata.orderDetail[currentViewDate],
           memberOrders: {
             ...metadata.orderDetail[currentViewDate].memberOrders,
-            [memberId]: newMemberOrderValues,
+            [participantId]: newMemberOrderValues,
           },
         },
       },
+      ...(shouldUpdateAnonymousList
+        ? { orderId, anonymous: updateAnonymous }
+        : {}),
     };
 
     await addUpdateMemberOrder(orderId, updateParams);
-    const subOrderId = `${memberId} - ${planId} - ${currentViewDate}`;
+    const subOrderId = `${participantId} - ${planId} - ${currentViewDate}`;
     const { data: firebaseSubOrderDocument } =
       await participantSubOrderGetByIdApi(subOrderId);
 
     if (!firebaseSubOrderDocument) {
       await participantSubOrderAddDocumentApi({
-        participantId: memberId,
+        participantId,
         planId,
         timestamp: currentViewDate,
       });
@@ -401,7 +440,7 @@ const addParticipant = createAsyncThunk(
     const {
       id: { uuid: orderId },
       attributes: {
-        metadata: { participants = [] },
+        metadata: { participants = [], anonymous = [] },
       },
     } = getState().OrderManagement.orderData!;
     const {
@@ -416,6 +455,7 @@ const addParticipant = createAsyncThunk(
       companyId,
       orderId,
       planId,
+      anonymous,
       participants,
       orderDetail,
     };
@@ -617,6 +657,12 @@ const OrderManagementSlice = createSlice({
         isFetchingOrderDetails: false,
       };
     },
+    clearAddUpdateParticipantError: (state) => {
+      state.addOrUpdateMemberOrderError = null;
+    },
+    updateStaffName: (state, { payload }) => {
+      state.orderData!.attributes.metadata.staffName = payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -720,8 +766,9 @@ const OrderManagementSlice = createSlice({
       .addCase(addOrUpdateMemberOrder.fulfilled, (state) => {
         state.addOrUpdateMemberOrderInProgress = false;
       })
-      .addCase(addOrUpdateMemberOrder.rejected, (state) => {
+      .addCase(addOrUpdateMemberOrder.rejected, (state, { payload }) => {
         state.addOrUpdateMemberOrderInProgress = false;
+        state.addOrUpdateMemberOrderError = payload;
       })
       /* =============== bookerMarkInprogressPlanViewed =============== */
       .addCase(bookerMarkInprogressPlanViewed.pending, (state) => {

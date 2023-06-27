@@ -6,7 +6,6 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
-import FixedBottomButtons from '@components/FixedBottomButtons/FixedBottomButtons';
 import Form from '@components/Form/Form';
 import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
@@ -118,60 +117,45 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
   return (
     <Form className={classes} onSubmit={handleSubmit}>
       <div className={css.formContainer}>
-        <div className={css.formTitle}>{formTitle}</div>
-        <div className={css.doNotHaveAnAccount}>
-          <div>
-            {doNotHaveAnAccountText}{' '}
-            <span className={css.toSignUp} onClick={navigateToSignUpPage}>
-              {' '}
-              {toSignUp}
+        <div className={css.formContent}>
+          <div className={css.formTitle}>{formTitle}</div>
+          <div className={css.doNotHaveAnAccount}>
+            <div>
+              {doNotHaveAnAccountText}{' '}
+              <span className={css.toSignUp} onClick={navigateToSignUpPage}>
+                {' '}
+                {toSignUp}
+              </span>
+            </div>
+          </div>
+          <FieldTextInput
+            id={formId ? `${formId}.email` : 'email'}
+            name="email"
+            placeholder={emailPlaceholder}
+            validate={emailValidators}
+            leftIcon={<IconMail />}
+            label={emailLabel}
+          />
+
+          <FieldPasswordInput
+            id={formId ? `${formId}.password` : 'password'}
+            name="password"
+            placeholder={passwordPlaceholder}
+            validate={passwordValidators}
+            leftIcon={<IconLock />}
+            label={passwordLabel}
+          />
+
+          <div className={css.forgotPassword}>
+            <span onClick={navigateToPasswordRecoverPage}>
+              {forgotPasswordText}
             </span>
           </div>
-        </div>
-        <FieldTextInput
-          id={formId ? `${formId}.email` : 'email'}
-          name="email"
-          placeholder={emailPlaceholder}
-          validate={emailValidators}
-          leftIcon={<IconMail />}
-          label={emailLabel}
-        />
 
-        <FieldPasswordInput
-          id={formId ? `${formId}.password` : 'password'}
-          name="password"
-          placeholder={passwordPlaceholder}
-          validate={passwordValidators}
-          leftIcon={<IconLock />}
-          label={passwordLabel}
-        />
-
-        <div className={css.forgotPassword}>
-          <span onClick={navigateToPasswordRecoverPage}>
-            {forgotPasswordText}
-          </span>
-        </div>
-
-        {errorMessage && <div className={css.errorSignIn}>{errorMessage}</div>}
-        <div className={css.desktopView}>
-          <Button
-            variant="cta"
-            className={css.submitButton}
-            type="submit"
-            disabled={submitDisable}
-            inProgress={submitInprogress}>
-            {submitButtonText}
-          </Button>
-          <div className={css.orText}>
-            <span>{orText}</span>
-          </div>
-          <Button className={css.googleLoginButton} type="button" disabled>
-            <IconGoogle className={css.googleIcon} />
-            <span>{googleLoginText}</span>
-          </Button>
-        </div>
-        <FixedBottomButtons
-          FirstButton={
+          {errorMessage && (
+            <div className={css.errorSignIn}>{errorMessage}</div>
+          )}
+          <div className={css.desktopView}>
             <Button
               variant="cta"
               className={css.submitButton}
@@ -180,19 +164,31 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
               inProgress={submitInprogress}>
               {submitButtonText}
             </Button>
-          }
-          separator={
             <div className={css.orText}>
               <span>{orText}</span>
             </div>
-          }
-          SecondButton={
             <Button className={css.googleLoginButton} type="button" disabled>
               <IconGoogle className={css.googleIcon} />
               <span>{googleLoginText}</span>
             </Button>
-          }
-        />
+          </div>
+        </div>
+
+        <div className={css.bottomButtonsWrapper}>
+          <Button
+            variant="cta"
+            className={css.submitButton}
+            type="submit"
+            disabled={submitDisable}
+            inProgress={submitInprogress}>
+            {submitButtonText}
+          </Button>
+          <div>hoặc</div>
+          <Button className={css.googleLoginButton} type="button" disabled>
+            <IconGoogle className={css.googleIcon} />
+            <span>{googleLoginText}</span>
+          </Button>
+        </div>
       </div>
     </Form>
   );

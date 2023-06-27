@@ -24,8 +24,11 @@ export type TExpiredTimeFormValues = {
 
 const validate = (values: TExpiredTimeFormValues) => {
   const errors: any = {};
+
   if (!values.deadlineDate) {
     errors.deadlineDate = 'Vui lòng chọn ngày cho hạn chọn món';
+  } else if (Number(values.deadlineDate || 0) < new Date().getTime()) {
+    errors.deadlineDate = 'Thời điểm hiện tại vượt quá thời gian chọn món';
   }
   if (!values.deadlineHour) {
     errors.deadlineHour = 'Vui lòng chọn giờ cho hạn chọn món';

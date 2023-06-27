@@ -1,23 +1,31 @@
-import { useEffect, useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useMemo, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Form as FinalForm } from 'react-final-form';
+import { Field, Form as FinalForm } from 'react-final-form';
+import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
+import FieldCustomSelectComponent from '@components/FormFields/FieldCustomSelect/FieldCustomSelect';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
 import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { useAppSelector } from '@hooks/reduxHooks';
-import { orderDetailsAnyActionsInProgress } from '@redux/slices/OrderManagement.slice';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import {
+  orderDetailsAnyActionsInProgress,
+  OrderManagementsAction,
+} from '@redux/slices/OrderManagement.slice';
+import type { TObject } from '@src/utils/types';
+import { EMAIL_RE, VALID } from '@src/utils/validators';
 import { shortenString } from '@utils/string';
 
 import css from './AddOrderForm.module.scss';
 
 export type TAddOrderFormValues = {
-  participantId: string;
+  participantId: { key: string; label: string };
   foodId: string;
   requirement: string;
 };
@@ -40,16 +48,29 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   props,
 ) => {
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const addOrUpdateMemberOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.addOrUpdateMemberOrderInProgress,
   );
+  const addOrUpdateMemberOrderError = useAppSelector(
+    (state) => state.OrderManagement.addOrUpdateMemberOrderError,
+  );
 
-  const { foodOptions, memberOptions, handleSubmit, form, values } = props;
+  const {
+    foodOptions,
+    memberOptions = [],
+    handleSubmit,
+    form,
+    submitErrors,
+    values,
+    invalid,
+  } = props;
   const fieldSelectMemberDisable = inProgress || memberOptions?.length === 0;
   const fieldSelectFoodDisable =
     fieldSelectMemberDisable || foodOptions?.length === 0;
   const submitDisabled =
+    invalid ||
     addOrUpdateMemberOrderInProgress ||
     fieldSelectFoodDisable ||
     !values?.participantId ||
@@ -68,6 +89,10 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     setCurrentRequirementFieldActionText,
   ] = useState(showRequirementText);
 
+  const participantIdFieldInvalidMessage = intl.formatMessage({
+    id: 'AddOrderForm.participantIdField.invalid',
+  });
+
   const handleToggleShowHideRequirementField = () => {
     setIsRequirementInputShow(!isRequirementInputShow);
   };
@@ -78,24 +103,17 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     } else {
       setCurrentRequirementFieldActionText(showRequirementText);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRequirementInputShow]);
 
-  const selectMemberOptions = (
-    <>
-      <option disabled value="">
-        {intl.formatMessage({
-          id: 'AddOrderForm.participantIdField.placeholder',
-        })}
-      </option>
-
-      {memberOptions?.map(({ memberId, memberName }) => (
-        <option title={memberName} key={memberId} value={memberId}>
-          {shortenString(memberName, 18)}
-        </option>
-      ))}
-    </>
+  const selectMemberOptions = useMemo(
+    () =>
+      memberOptions?.map(({ memberId, memberName }) => ({
+        key: memberId,
+        label: memberName,
+      })) || [],
+    [JSON.stringify(memberOptions)],
   );
+
   const selectFoodOptions = (
     <>
       <option disabled value="">
@@ -120,17 +138,66 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     });
   };
 
+  const validateMemberField = (value: TObject) => {
+    if (!value) {
+      return VALID;
+    }
+
+    const inInListValue =
+      selectMemberOptions.findIndex((o) => o?.key === value?.key) !== -1;
+    if (inInListValue || EMAIL_RE.test(value?.key)) {
+      return VALID;
+    }
+
+    return participantIdFieldInvalidMessage;
+  };
+
+  const handleFieldParticipantChange = (
+    oldValue: TObject,
+    newValue: TObject,
+  ) => {
+    if (oldValue?.key !== newValue?.key) {
+      dispatch(OrderManagementsAction.clearAddUpdateParticipantError());
+    }
+  };
+
   return (
     <Form onSubmit={customHandleSubmit} className={css.root}>
       <div className={css.fieldsContainer}>
         <div className={css.fieldContainer}>
-          <FieldSelect
+          <OnChange name="participantId">
+            {handleFieldParticipantChange}
+          </OnChange>
+          <Field
             disabled={fieldSelectMemberDisable}
             id={'addOrder.participantName'}
             name="participantId"
-            selectClassName={css.fieldSelect}>
-            {selectMemberOptions}
-          </FieldSelect>
+            className={css.fieldSelect}
+            component={FieldCustomSelectComponent}
+            options={selectMemberOptions}
+            placeholder={intl.formatMessage({
+              id: 'AddOrderForm.participantIdField.placeholder',
+            })}
+            activePlaceholder={intl.formatMessage({
+              id: 'AddOrderForm.participantIdField.activePlaceholder',
+            })}
+            formatCreateLabel={(value: string) =>
+              intl.formatMessage(
+                {
+                  id: 'AddOrderForm.participantIdField.createOption',
+                },
+                { value },
+              )
+            }
+            formError={submitErrors?.participantId}
+            validate={validateMemberField}
+            validateErrorClassName={css.fieldParticipantIdError}
+          />
+          {addOrUpdateMemberOrderError !== null && (
+            <div className={css.formError}>
+              {'Người dùng không có trên hệ thống'}
+            </div>
+          )}
         </div>
         <div className={css.fieldContainer}>
           <FieldSelect
