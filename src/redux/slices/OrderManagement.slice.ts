@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import { createSlice } from '@reduxjs/toolkit';
 import groupBy from 'lodash/groupBy';
 import omit from 'lodash/omit';
@@ -28,7 +29,11 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { TPlan } from '@src/utils/orderTypes';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
-import { EOrderHistoryTypes, EParticipantOrderStatus } from '@utils/enums';
+import {
+  EOrderHistoryTypes,
+  EOrderType,
+  EParticipantOrderStatus,
+} from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type {
   TCompany,
@@ -40,6 +45,102 @@ import type {
 } from '@utils/types';
 
 export const QUERY_SUB_ORDER_CHANGES_HISTORY_PER_PAGE = 3;
+
+export const checkMinMaxQuantity = (
+  orderDetails: TPlan['orderDetail'],
+  oldOrderDetail: TPlan['orderDetail'],
+  currentViewDate: number,
+  isNormalOrder: boolean,
+) => {
+  let totalQuantity = 0;
+  const data = orderDetails?.[currentViewDate] || {};
+  const { lineItems = [], restaurant = {} } = data;
+  const { maxQuantity = 100, minQuantity = 1 } = restaurant;
+  if (isNormalOrder) {
+    totalQuantity = lineItems.reduce((result: number, lineItem: TObject) => {
+      result += lineItem?.quantity || 1;
+
+      return result;
+    }, 0);
+
+    const disabledSubmit = Object.keys(orderDetails).some((key) => {
+      const detail = orderDetails[key];
+      const { lineItems = [], restaurant = {} } = detail || {};
+      const { maxQuantity = 100, minQuantity = 1 } = restaurant || {};
+      const totalQuantity = lineItems.reduce(
+        (result: number, lineItem: TObject) => {
+          result += lineItem?.quantity || 1;
+
+          return result;
+        },
+        0,
+      );
+      const shouldShowOverflowError = totalQuantity > maxQuantity;
+      const shouldShowUnderError = totalQuantity < minQuantity;
+
+      return shouldShowOverflowError || shouldShowUnderError;
+    });
+
+    const shouldShowOverflowError = totalQuantity > maxQuantity;
+    const shouldShowUnderError = totalQuantity < minQuantity;
+
+    return {
+      shouldShowOverflowError,
+      shouldShowUnderError,
+      minQuantity,
+      disabledSubmit,
+    };
+  }
+  const { memberOrders = {} } = data;
+  const { memberOrders: oldMemberOrders = {} } =
+    oldOrderDetail?.[currentViewDate] || {};
+  const oldTotalQuantity = Object.keys(oldMemberOrders).filter(
+    (f) =>
+      !!oldMemberOrders[f].foodId &&
+      oldMemberOrders[f].status === EParticipantOrderStatus.joined,
+  ).length;
+  totalQuantity = Object.keys(memberOrders).filter(
+    (f) =>
+      !!memberOrders[f].foodId &&
+      memberOrders[f].status === EParticipantOrderStatus.joined,
+  ).length;
+  const totalQuantityCanAdd = (totalQuantity * 10) / 100;
+  const totalAdded = totalQuantity - oldTotalQuantity;
+  const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
+
+  const shouldShowUnderError = totalQuantity < minQuantity;
+
+  const disabledSubmit = Object.keys(orderDetails).some((key) => {
+    const data = orderDetails[key] || {};
+    const { memberOrders = {}, restaurant } = data;
+    const { minQuantity = 1 } = restaurant;
+    const { memberOrders: oldMemberOrders = {} } = oldOrderDetail?.[key] || {};
+    const oldTotalQuantity = Object.keys(oldMemberOrders).filter(
+      (f) =>
+        !!oldMemberOrders[f].foodId &&
+        oldMemberOrders[f].status === EParticipantOrderStatus.joined,
+    ).length;
+    const totalQuantity = Object.keys(memberOrders).filter(
+      (f) =>
+        !!memberOrders[f].foodId &&
+        memberOrders[f].status === EParticipantOrderStatus.joined,
+    ).length;
+    const totalQuantityCanAdd = (totalQuantity * 10) / 100;
+    const totalAdded = totalQuantity - oldTotalQuantity;
+    const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
+
+    const shouldShowUnderError = totalQuantity < minQuantity;
+
+    return shouldShowOverflowError || shouldShowUnderError;
+  });
+
+  return {
+    shouldShowOverflowError,
+    shouldShowUnderError,
+    minQuantity,
+    disabledSubmit,
+  };
+};
 
 const addNewMemberToOrderDetail = (
   orderDetail: TPlan['orderDetail'],
@@ -61,7 +162,7 @@ const addNewMemberToOrderDetail = (
   return newOrderDetail;
 };
 
-const prepareOrderDetail = ({
+export const prepareOrderDetail = ({
   orderDetail,
   currentViewDate,
   foodId,
@@ -161,6 +262,9 @@ type TOrderManagementState = {
   quotation: TObject;
   fetchQuotationInProgress: boolean;
   fetchQuotationError: any;
+
+  shouldShowUnderError: boolean;
+  shouldShowOverflowError: boolean;
 };
 
 const initialState: TOrderManagementState = {
@@ -197,6 +301,8 @@ const initialState: TOrderManagementState = {
   quotation: {},
   fetchQuotationInProgress: false,
   fetchQuotationError: null,
+  shouldShowUnderError: false,
+  shouldShowOverflowError: false,
 };
 
 // ================ Thunk types ================ //
@@ -832,15 +938,29 @@ const OrderManagementSlice = createSlice({
     updateStaffName: (state, { payload }) => {
       state.orderData!.attributes.metadata.staffName = payload;
     },
+    resetOrderDetailValidation: (state) => {
+      return {
+        ...state,
+        shouldShowOverflowError: false,
+        shouldShowUnderError: false,
+      };
+    },
     updateDraftOrderDetail: (state, { payload }) => {
       const { currentViewDate, foodId, memberId, memberEmail, requirement } =
         payload;
 
-      const { draftOrderDetail, planData, draftSubOrderChangesHistory } = state;
+      const {
+        draftOrderDetail,
+        planData,
+        draftSubOrderChangesHistory,
+        orderData,
+      } = state;
 
       const { orderDetail: defaultOrderDetail } = Listing(
         planData as TListing,
       ).getMetadata();
+
+      const { orderType } = Listing(orderData as TListing).getMetadata();
       const { foodId: defaultFoodId } =
         defaultOrderDetail[currentViewDate].memberOrders[memberId];
 
@@ -858,6 +978,22 @@ const OrderManagementSlice = createSlice({
           requirement,
           memberOrderValues: memberOrderBeforeUpdate,
         }) || {};
+
+      const { shouldShowOverflowError, shouldShowUnderError } =
+        checkMinMaxQuantity(
+          newOrderDetail,
+          defaultOrderDetail,
+          currentViewDate,
+          orderType === EOrderType.normal,
+        );
+
+      if (shouldShowOverflowError || shouldShowUnderError) {
+        return {
+          ...state,
+          shouldShowOverflowError,
+          shouldShowUnderError,
+        };
+      }
 
       const currentDraftSubOrderChanges = [
         ...(draftSubOrderChangesHistory[currentViewDate] || []),
@@ -931,10 +1067,11 @@ const OrderManagementSlice = createSlice({
     },
     draftDisallowMember: (state, { payload }) => {
       const { currentViewDate, memberId, memberEmail, tab } = payload;
-      const { draftOrderDetail, planData } = state;
+      const { draftOrderDetail, planData, orderData } = state;
       const { orderDetail: defaultOrderDetail } = Listing(
         planData as TListing,
       ).getMetadata();
+      const { orderType } = Listing(orderData as TListing).getMetadata();
       const { status: defaultStatus } =
         defaultOrderDetail[currentViewDate].memberOrders[memberId];
       const memberOrderDetailOnUpdateDate =
@@ -966,6 +1103,22 @@ const OrderManagementSlice = createSlice({
         memberId,
         newMemberOrderValues,
       );
+
+      const { shouldShowOverflowError, shouldShowUnderError } =
+        checkMinMaxQuantity(
+          newOrderDetail,
+          defaultOrderDetail,
+          currentViewDate,
+          orderType === EOrderType.normal,
+        );
+
+      if (shouldShowOverflowError || shouldShowUnderError) {
+        return {
+          ...state,
+          shouldShowOverflowError,
+          shouldShowUnderError,
+        };
+      }
 
       if (orderHistoryByMemberIndex > -1 && isNotAddedToChoseList) {
         currentDraftSubOrderChanges.splice(orderHistoryByMemberIndex, 1);
@@ -1028,34 +1181,37 @@ const OrderManagementSlice = createSlice({
         draftOrderDetail: payload,
       };
     },
-    resetDraftOrderDetails: (state) => {
-      const { planData } = state;
-      const { orderDetail } = Listing(planData as TListing).getMetadata();
+    setDraftOrderDetailsAndSubOrderChangeHistory: (state, { payload }) => {
+      const { updateValues = {}, newOrderDetail } = payload;
 
-      return {
-        ...state,
-        draftOrderDetail: orderDetail,
-      };
-    },
-    resetDraftSubOrderChangeHistory: (state) => {
-      return {
-        ...state,
-        draftSubOrderChangesHistory: {},
-      };
-    },
-    updateDraftSubOrderChangesHistory: (state, { payload }) => {
       const {
         currentViewDate,
         foodName,
         foodPrice,
         quantity: newQuantity,
         foodId,
-      } = payload;
-      const { planData } = state;
+      } = updateValues;
+      const { planData, orderData } = state;
       const planDataGetter = Listing(planData as TListing);
+      const { orderType } = Listing(orderData as TListing).getMetadata();
 
       const { orderDetail = {} } = planDataGetter.getMetadata();
 
+      const { shouldShowOverflowError, shouldShowUnderError } =
+        checkMinMaxQuantity(
+          newOrderDetail,
+          orderDetail,
+          currentViewDate,
+          orderType === EOrderType.normal,
+        );
+
+      if (shouldShowOverflowError || shouldShowUnderError) {
+        return {
+          ...state,
+          shouldShowOverflowError,
+          shouldShowUnderError,
+        };
+      }
       const { lineItems } = orderDetail[currentViewDate] || {};
       const itemIndex = lineItems.findIndex((x: TObject) => x?.id === foodId);
       const { quantity: defaultQuantity = 0 } = lineItems[itemIndex] || {};
@@ -1074,6 +1230,7 @@ const OrderManagementSlice = createSlice({
 
           return {
             ...state,
+            draftOrderDetail: newOrderDetail,
             draftSubOrderChangesHistory: {
               ...state.draftSubOrderChangesHistory,
               [currentViewDate]: currentDraftSubOrderChanges,
@@ -1110,6 +1267,7 @@ const OrderManagementSlice = createSlice({
           return {
             ...state,
             draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
+            draftOrderDetail: newOrderDetail,
           };
         }
 
@@ -1149,6 +1307,7 @@ const OrderManagementSlice = createSlice({
         return {
           ...state,
           draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
+          draftOrderDetail: newOrderDetail,
         };
       }
 
@@ -1189,6 +1348,22 @@ const OrderManagementSlice = createSlice({
       return {
         ...state,
         draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
+        draftOrderDetail: newOrderDetail,
+      };
+    },
+    resetDraftOrderDetails: (state) => {
+      const { planData } = state;
+      const { orderDetail } = Listing(planData as TListing).getMetadata();
+
+      return {
+        ...state,
+        draftOrderDetail: orderDetail,
+      };
+    },
+    resetDraftSubOrderChangeHistory: (state) => {
+      return {
+        ...state,
+        draftSubOrderChangesHistory: {},
       };
     },
   },
