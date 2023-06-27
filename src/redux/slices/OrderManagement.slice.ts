@@ -119,14 +119,21 @@ export const checkMinMaxQuantity = (
     const data = orderDetails[key] || {};
     const { memberOrders = {}, restaurant } = data;
     const { minQuantity = 1 } = restaurant;
-
+    const { memberOrders: oldMemberOrders = {} } = oldOrderDetail?.[key] || {};
+    const oldTotalQuantity = Object.keys(oldMemberOrders).filter(
+      (f) =>
+        !!oldMemberOrders[f].foodId &&
+        oldMemberOrders[f].status === EParticipantOrderStatus.joined,
+    ).length;
     const totalQuantity = Object.keys(memberOrders).filter(
       (f) =>
         !!memberOrders[f].foodId &&
         memberOrders[f].status === EParticipantOrderStatus.joined,
     ).length;
+    const totalQuantityCanAdd = (totalQuantity * 10) / 100;
+    const totalAdded = totalQuantity - oldTotalQuantity;
 
-    const shouldShowOverflowError = totalQuantity > maxQuantity;
+    const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
 
     const shouldShowUnderError = totalQuantity < minQuantity;
 
