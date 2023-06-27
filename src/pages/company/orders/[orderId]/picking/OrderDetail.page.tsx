@@ -492,6 +492,7 @@ const OrderDetailPage = () => {
               shouldShowUnderError={shouldShowUnderError}
               setCurrentViewDate={handleSetCurrentViewDate}
               currentViewDate={currentViewDate}
+              minQuantity={minQuantity}
             />
             {isDraftEditing && (
               <SubOrderChangesHistorySection
