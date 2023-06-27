@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 
+import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
 import ManageOrdersSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageOrdersSection';
 import ManageParticipantsSection from '@components/OrderDetails/EditView/ManageParticipantsSection/ManageParticipantsSection';
 import OrderDeadlineCountdownSection from '@components/OrderDetails/EditView/OrderDeadlineCountdownSection/OrderDeadlineCountdownSection';
@@ -81,6 +82,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     orderState,
     orderType = EOrderType.group,
   } = Listing(order).getMetadata();
+  const isGroupOrder = orderType === EOrderType.group;
   const isPickingState = orderState === EOrderStates.picking;
   const planId = plans.length > 0 ? plans[0] : undefined;
   const showStateSectionCondition =
@@ -190,7 +192,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
 
         <div className={css.orderDetailWrapper}>
           <RenderWhen condition={isPickingState}>
-            <RenderWhen condition={orderType === 'group'}>
+            <RenderWhen condition={isGroupOrder}>
               <div className={css.editViewRoot}>
                 <div className={css.leftPart}>
                   <ManageOrdersSection
@@ -219,6 +221,14 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                   />
                 </div>
               </div>
+
+              <RenderWhen.False>
+                <div className={css.lineItemsTable}>
+                  <ManageLineItemsSection
+                    data={editViewData.manageOrdersData}
+                  />
+                </div>
+              </RenderWhen.False>
             </RenderWhen>
 
             <RenderWhen.False>
