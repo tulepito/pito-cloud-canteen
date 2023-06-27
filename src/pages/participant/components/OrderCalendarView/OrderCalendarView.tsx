@@ -68,7 +68,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     updateOrderInProgress,
   } = useSubOrderPicking();
 
-  const { deadlineDate, deliveryHour, startDate, endDate } =
+  const { deadlineDate, deliveryHour, startDate, endDate, orderState } =
     orderObj.getMetadata();
   const [anchorTime, setAnchorTime] = useState<number | undefined>();
 
@@ -135,6 +135,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           orderColor,
           transactionId,
           planId: currentPlanListing.getId(),
+          orderState,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
