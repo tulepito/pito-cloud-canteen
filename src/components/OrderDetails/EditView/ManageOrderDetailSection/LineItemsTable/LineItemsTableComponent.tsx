@@ -118,9 +118,13 @@ export const LineItemsTableComponent: React.FC<
                   onSubmit={doNothing}
                   render={({ values }) => {
                     const handleBlurFoodQuantity = () => {
-                      if (Number(values[foodId] || 0) !== Number(quantity)) {
+                      if (Number(values[foodId] || 1) !== Number(quantity)) {
                         if (actionDisabled) doNothing();
-                        else onModifyQuantity(foodId, Number(values[foodId]))();
+                        else
+                          onModifyQuantity(
+                            foodId,
+                            Number(values[foodId] || 1),
+                          )();
                       }
                     };
 
