@@ -225,6 +225,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
               <RenderWhen.False>
                 <div className={css.lineItemsTable}>
                   <ManageLineItemsSection
+                    isAdminLayout
                     data={editViewData.manageOrdersData}
                   />
                 </div>

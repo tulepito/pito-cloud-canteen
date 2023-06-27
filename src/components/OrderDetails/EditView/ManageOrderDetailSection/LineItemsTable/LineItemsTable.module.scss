@@ -60,6 +60,24 @@
   }
 
   .overFlowAlert {
+    &:not(.isAdminLayout) {
+      @include viewportSLarge {
+        top: 124px;
+      }
+      transition: all 0.5s linear;
+
+      &.isOpen {
+        right: 40px;
+
+        @include viewportSLarge {
+          right: 130px;
+          top: 124px;
+        }
+      }
+    }
+  }
+
+  .overFlowAlert.isAdminLayout {
     &.isOpen {
       right: 40px;
     }

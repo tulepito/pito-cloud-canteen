@@ -29,6 +29,7 @@ type TLineItemsTableProps = {
   shouldShowOverflowError: boolean;
   shouldShowUnderError: boolean;
   minQuantity: number;
+  isAdminLayout?: boolean;
 };
 
 const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
@@ -39,6 +40,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
     shouldShowOverflowError,
     shouldShowUnderError,
     minQuantity,
+    isAdminLayout = false,
   } = props;
   const intl = useIntl();
 
@@ -214,6 +216,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
         data={data}
         onModifyQuantity={handleModifyQuantity}
         ableToUpdateOrder={ableToUpdateOrder}
+        isAdminLayout={isAdminLayout}
       />
       <form onSubmit={handleSubmit}>
         <div className={css.fieldContainer}>
