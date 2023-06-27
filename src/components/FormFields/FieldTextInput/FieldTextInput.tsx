@@ -54,6 +54,7 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
     leftIconContainerClassName,
     rightIconContainerClassName,
     inputClassName,
+    customOnBlur,
     ...rest
   } = props;
 
@@ -101,6 +102,25 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
       [css.inputWithPaddingRight]: !!rightIcon,
     });
 
+  const onInputChange = (event: any) => {
+    if (type === 'number') {
+      const newValue = event.target.value
+        .replace(/\+/g, '-')
+        .replace(/[^0-9]/g, '');
+      input.onChange(newValue);
+    } else {
+      input.onChange(event);
+    }
+  };
+
+  const onInputBlur = () => {
+    if (customOnBlur) {
+      customOnBlur();
+    }
+
+    input.onBlur();
+  };
+
   const inputProps = isUncontrolled
     ? {
         className: inputClasses,
@@ -111,6 +131,8 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
         ...inputWithoutValue,
         ...rest,
         ...(disabled ? { disabled } : ''),
+        onChange: onInputChange,
+        onBlur: onInputBlur,
       }
     : {
         className: inputClasses,
@@ -120,6 +142,8 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
         ...input,
         ...rest,
         ...(disabled ? { disabled } : ''),
+        onChange: onInputChange,
+        onBlur: onInputBlur,
       };
 
   const classes = classNames(rootClassName || css.root, className);

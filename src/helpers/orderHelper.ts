@@ -14,6 +14,7 @@ import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
   EOrderStates,
+  EOrderType,
   EParticipantOrderStatus,
 } from '@utils/enums';
 import type { TPlan } from '@utils/orderTypes';
@@ -134,12 +135,14 @@ export const orderDataCheckers = (order: TListing) => {
     deadlineDate,
     packagePerMember,
     deliveryAddress,
+    orderType,
   } = Listing(order).getMetadata();
   const timeOptions = generateTimeOptions();
   const minStartTimeStamp = findMinStartDate().getTime();
+  const isNormalOrder = orderType === EOrderType.normal;
 
   const checkers = {
-    isDeadlineDateValid: Number.isInteger(deadlineDate),
+    isDeadlineDateValid: isNormalOrder || Number.isInteger(deadlineDate),
     isDeliveryAddressValid:
       !isEmpty(deliveryAddress?.address) && !isEmpty(deliveryAddress?.origin),
     isStartDateValid:
@@ -147,7 +150,7 @@ export const orderDataCheckers = (order: TListing) => {
     isEndDateValid:
       Number.isInteger(endDate) && (endDate || 0) >= (startDate || 0),
     isDeliveryHourValid: timeOptions.includes(deliveryHour),
-    isDeadlineHourValid: timeOptions.includes(deadlineHour),
+    isDeadlineHourValid: isNormalOrder || timeOptions.includes(deadlineHour),
     isPackagePerMemberValid: Number.isInteger(packagePerMember),
     haveAnyPlans: !isEmpty(plans),
   };
@@ -187,21 +190,55 @@ export const isOrderDetailDatePickedFood = (date: any) => {
   return isEmpty(foodList);
 };
 
-export const isEnableToStartOrder = (orderDetail: TPlan['orderDetail']) => {
-  return (
-    !isEmpty(orderDetail) &&
-    Object.values(orderDetail).some(({ restaurant, memberOrders }) => {
-      const { id, restaurantName, foodList } = restaurant;
-      const isSetupRestaurant =
-        !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
+export const isEnableToStartOrder = (
+  orderDetail: TPlan['orderDetail'],
+  isGroupOrder = true,
+) => {
+  if (isEmpty(orderDetail)) return false;
 
-      const hasAnyOrders = Object.values(memberOrders).some(
-        ({ foodId, status }) => isJoinedPlan(foodId, status),
-      );
+  return isGroupOrder
+    ? Object.values(orderDetail).some(
+        ({ restaurant, memberOrders, lineItems = [] }) => {
+          const { id, restaurantName, foodList } = restaurant;
+          const isSetupRestaurant =
+            !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
 
-      return isSetupRestaurant && hasAnyOrders;
-    })
-  );
+          const hasAnyOrders = Object.values(memberOrders).some(
+            ({ foodId, status }) => isJoinedPlan(foodId, status),
+          );
+
+          const hasAnyLineItems =
+            lineItems.reduce((totalQuantity: number, item: TObject) => {
+              return totalQuantity + (item?.quantity || 0);
+            }, 0) > 0;
+
+          return isSetupRestaurant && isGroupOrder
+            ? hasAnyOrders
+            : hasAnyLineItems;
+        },
+      )
+    : Object.values(orderDetail).every(({ restaurant, lineItems = [] }) => {
+        const {
+          id,
+          restaurantName,
+          foodList,
+          minQuantity = 0,
+          maxQuantity = 100,
+        } = restaurant || {};
+        const isSetupRestaurant =
+          !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
+
+        const quantity = lineItems.reduce(
+          (totalQuantity: number, item: TObject) => {
+            return totalQuantity + (item?.quantity || 1);
+          },
+          0,
+        );
+        const isQuantityValid =
+          quantity >= minQuantity && quantity <= maxQuantity;
+
+        return isSetupRestaurant && isQuantityValid;
+      });
 };
 
 export const getRestaurantListFromOrderDetail = (

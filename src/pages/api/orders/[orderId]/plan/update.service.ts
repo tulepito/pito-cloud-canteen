@@ -4,6 +4,7 @@ import uniq from 'lodash/uniq';
 import { isEnableUpdateBookingInfo } from '@helpers/orderHelper';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { EOrderType } from '@src/utils/enums';
 import type { TPlan } from '@src/utils/orderTypes';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import type { TObject } from '@utils/types';
@@ -37,9 +38,11 @@ const getMenuListFromOrderDetail = (orderDetail: TPlan['orderDetail']) => {
 const getNormalizeDetail = ({
   orderDetail,
   initialMemberOrder,
+  isNormalOrder = false,
 }: {
   orderDetail: any;
   initialMemberOrder: any;
+  isNormalOrder: boolean;
 }) => {
   return Object.keys(orderDetail).reduce((acc: TObject, curr: string) => {
     if (orderDetail[curr]) {
@@ -47,7 +50,7 @@ const getNormalizeDetail = ({
         ...acc,
         [curr]: {
           ...orderDetail[curr],
-          memberOrders: initialMemberOrder,
+          memberOrders: isNormalOrder ? {} : initialMemberOrder,
         },
       };
     }
@@ -74,10 +77,12 @@ const updatePlan = async ({
     companyId,
     selectedGroups = [],
     orderState,
+    orderType = EOrderType.group,
   } = Listing(orderListing).getMetadata();
   const enabledToUpdateRelatedBookingInfo =
     isEnableUpdateBookingInfo(orderState);
   const companyAccount = await fetchUser(companyId);
+  const isNormalOrder = orderType === EOrderType.normal;
 
   const initialMemberOrder = getInitMemberOrder({
     companyAccount,
@@ -89,6 +94,7 @@ const updatePlan = async ({
   const normalizeDetail = getNormalizeDetail({
     orderDetail,
     initialMemberOrder,
+    isNormalOrder,
   });
 
   let updatedOrderDetail = normalizeDetail;
@@ -103,6 +109,7 @@ const updatePlan = async ({
       updatedOrderDetail = getNormalizeDetail({
         orderDetail: { ...oldOrderDetail, ...orderDetail },
         initialMemberOrder,
+        isNormalOrder,
       });
 
       updateMenuIds = menuIds;

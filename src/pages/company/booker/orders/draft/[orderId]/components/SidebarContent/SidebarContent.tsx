@@ -13,6 +13,7 @@ import { getInitialLocationValues } from '@helpers/mapHelpers';
 import { findMinDeadlineDate, findMinStartDate } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { EOrderType } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
 import { getDaySessionFromDeliveryTime } from '@utils/dates';
 import type { TListing, TUser } from '@utils/types';
@@ -94,6 +95,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     selectedGroups,
     packagePerMember,
     vatAllow,
+    orderType = EOrderType.group,
   } = orderData.getMetadata();
   const locationInitValues = {
     deliveryAddress: getInitialLocationValues(
@@ -102,6 +104,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   };
   const isStartDateInValid = startDate < findMinStartDate().getTime();
   const isDeadlineDateInValid = deadlineDate < findMinDeadlineDate().getTime();
+  const isGroupOrder = orderType === EOrderType.group;
 
   const nextStartWeek = DateTime.fromJSDate(new Date())
     .startOf('week')
@@ -291,17 +294,24 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
             messageId="deliveryTime"
             errorMessage={isStartDateInValid ? 'Thời gian không hợp lệ' : ''}
           />
-          <NavigationItem
-            onOpen={handleOpenDetails}
-            messageId="expiredTime"
-            errorMessage={isDeadlineDateInValid ? 'Thời gian không hợp lệ' : ''}
-          />
+          <RenderWhen condition={isGroupOrder}>
+            <NavigationItem
+              onOpen={handleOpenDetails}
+              messageId="expiredTime"
+              errorMessage={
+                isDeadlineDateInValid ? 'Thời gian không hợp lệ' : ''
+              }
+            />
+          </RenderWhen>
           <NavigationItem
             onOpen={handleOpenDetails}
             messageId="numberEmployees"
           />
           <NavigationItem onOpen={handleOpenDetails} messageId="nutrition" />
-          <NavigationItem onOpen={handleOpenDetails} messageId="access" />
+          <RenderWhen condition={isGroupOrder}>
+            <NavigationItem onOpen={handleOpenDetails} messageId="access" />
+          </RenderWhen>
+
           <NavigationItem onOpen={handleOpenDetails} messageId="unitBudget" />
         </nav>
       </div>

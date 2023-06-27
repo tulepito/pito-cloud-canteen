@@ -126,6 +126,11 @@ export enum EListingType {
   quotation = 'quotation',
 }
 
+export enum EOrderType {
+  normal = 'normal',
+  group = 'group',
+}
+
 export enum EUserPermission {
   company = 'company',
   admin = 'admin',

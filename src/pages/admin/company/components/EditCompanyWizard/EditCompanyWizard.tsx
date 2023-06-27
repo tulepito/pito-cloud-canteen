@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
 import type { MutableRefObject } from 'react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';

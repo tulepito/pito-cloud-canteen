@@ -16,7 +16,7 @@ import { AdminAttributesThunks } from '@pages/admin/Attributes.slice';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderStates } from '@src/utils/enums';
+import { EOrderStates, EOrderType } from '@src/utils/enums';
 import type { TListing, TObject, TTransaction, TUser } from '@src/utils/types';
 
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
@@ -62,12 +62,13 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
 
   const dispatch = useAppDispatch();
   const orderId = Listing(order).getId();
+
   const {
     notes,
     orderStateHistory = [],
     plans = [],
     orderState,
-    orderType = 'group',
+    orderType = EOrderType.group,
   } = Listing(order).getMetadata();
   const isPickingState = orderState === EOrderStates.picking;
   const planId = plans.length > 0 ? plans[0] : undefined;
@@ -87,7 +88,10 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
 
   const tabItems = useMemo(
     () => {
-      const foodOrderGroupedByDate = groupFoodOrderByDate({ orderDetail });
+      const foodOrderGroupedByDate = groupFoodOrderByDate({
+        orderDetail,
+        isGroupOrder: orderType === EOrderType.group,
+      });
 
       return Object.keys(orderDetail).map((key: string) => {
         const foodOrder = foodOrderGroupedByDate.find(

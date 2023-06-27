@@ -1,10 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
+import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import AlertModal from '@components/Modal/AlertModal';
+import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
 import ManageOrdersSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageOrdersSection';
 import ManageParticipantsSection from '@components/OrderDetails/EditView/ManageParticipantsSection/ManageParticipantsSection';
 import OrderDeadlineCountdownSection from '@components/OrderDetails/EditView/OrderDeadlineCountdownSection/OrderDeadlineCountdownSection';
@@ -13,14 +16,18 @@ import OrderTitle from '@components/OrderDetails/EditView/OrderTitle/OrderTitle'
 import PriceQuotation from '@components/OrderDetails/PriceQuotation/PriceQuotation';
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
-import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
+import {
+  orderDetailsAnyActionsInProgress,
+  orderManagementThunks,
+} from '@redux/slices/OrderManagement.slice';
 import { companyPaths } from '@src/paths';
-import { Listing } from '@utils/data';
-import { EOrderDraftStates, EOrderStates } from '@utils/enums';
+import { CurrentUser, Listing } from '@utils/data';
+import { EOrderDraftStates, EOrderStates, EOrderType } from '@utils/enums';
 import type { TListing } from '@utils/types';
 
 import css from './OrderDetail.module.scss';
@@ -39,16 +46,22 @@ const OrderDetailPage = () => {
   const router = useRouter();
   const confirmCancelOrderActions = useBoolean(false);
   const dispatch = useAppDispatch();
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
   const {
     query: { orderId },
     isReady: isRouterReady,
   } = router;
 
+  const currentUser = useAppSelector((state) => state.user.currentUser);
   const cancelPickingOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.cancelPickingOrderInProgress,
   );
-  const { orderData } = useAppSelector((state) => state.OrderManagement);
+  const orderData = useAppSelector((state) => state.OrderManagement.orderData);
+  const isFetchingOrderDetails = useAppSelector(
+    (state) => state.OrderManagement.isFetchingOrderDetails,
+  );
+
   const {
     orderTitle,
     editViewData,
@@ -61,7 +74,17 @@ const OrderDetailPage = () => {
     priceQuotationData,
   );
 
-  const { orderState } = Listing(orderData as TListing).getMetadata();
+  const userId = CurrentUser(currentUser!).getId();
+  const {
+    orderState,
+    bookerId,
+    orderType = EOrderType.group,
+  } = Listing(orderData as TListing).getMetadata();
+  const isNormalOrder = orderType === EOrderType.normal;
+
+  const editViewClasses = classNames(css.editViewRoot, {
+    [css.editNormalOrderView]: isNormalOrder,
+  });
 
   const handleConfirmOrder = () => {
     setViewMode(EPageViewMode.review);
@@ -89,7 +112,7 @@ const OrderDetailPage = () => {
   };
 
   const EditViewComponent = (
-    <div className={css.editViewRoot}>
+    <div className={editViewClasses}>
       <OrderTitle
         className={css.titlePart}
         data={editViewData.titleSectionData}
@@ -97,23 +120,38 @@ const OrderDetailPage = () => {
         onCancelOrder={confirmCancelOrderActions.setTrue}
       />
 
-      <div className={css.leftPart}>
-        <ManageOrdersSection data={editViewData.manageOrdersData} />
-      </div>
-      <div className={css.rightPart}>
-        <OrderDeadlineCountdownSection
-          className={css.container}
-          data={editViewData.countdownSectionData}
-        />
-        <OrderLinkSection
-          className={css.container}
-          data={editViewData.linkSectionData}
-        />
-        <ManageParticipantsSection
-          className={css.container}
-          data={editViewData.manageParticipantData}
-        />
-      </div>
+      <RenderWhen condition={!inProgress}>
+        <RenderWhen condition={!isNormalOrder}>
+          <div className={css.leftPart}>
+            <ManageOrdersSection data={editViewData.manageOrdersData} />
+          </div>
+          <div className={css.rightPart}>
+            <OrderDeadlineCountdownSection
+              className={css.container}
+              data={editViewData.countdownSectionData}
+            />
+            <OrderLinkSection
+              className={css.container}
+              data={editViewData.linkSectionData}
+            />
+            <ManageParticipantsSection
+              className={css.container}
+              data={editViewData.manageParticipantData}
+            />
+          </div>
+
+          <RenderWhen.False>
+            <div className={css.lineItemsTable}>
+              <ManageLineItemsSection data={editViewData.manageOrdersData} />
+            </div>
+          </RenderWhen.False>
+        </RenderWhen>
+        <RenderWhen.False>
+          <div className={css.loadingContainer}>
+            <Skeleton className={css.loadingContent} />
+          </div>
+        </RenderWhen.False>
+      </RenderWhen>
 
       <AlertModal
         isOpen={confirmCancelOrderActions.value}
@@ -146,17 +184,19 @@ const OrderDetailPage = () => {
     />
   );
 
-  const renderView = () => {
-    switch (viewMode) {
-      case EPageViewMode.priceQuotation:
-        return <PriceQuotation data={priceQuotationData} />;
-      case EPageViewMode.review:
-        return ReviewViewComponent;
-      case EPageViewMode.edit:
-      default:
-        return EditViewComponent;
+  useEffect(() => {
+    if (
+      isRouterReady &&
+      !isFetchingOrderDetails &&
+      isEmpty(bookerId) &&
+      isEmpty(userId) &&
+      userId !== bookerId
+    ) {
+      router.push({
+        pathname: companyPaths.ManageOrders,
+      });
     }
-  };
+  }, [isRouterReady, bookerId, userId]);
 
   useEffect(() => {
     if (!isEmpty(orderState)) {
@@ -202,7 +242,15 @@ const OrderDetailPage = () => {
     }
   }, [isRouterReady, orderState]);
 
-  return renderView();
+  switch (viewMode) {
+    case EPageViewMode.priceQuotation:
+      return <PriceQuotation data={priceQuotationData} />;
+    case EPageViewMode.review:
+      return ReviewViewComponent;
+    case EPageViewMode.edit:
+    default:
+      return EditViewComponent;
+  }
 };
 
 export default OrderDetailPage;

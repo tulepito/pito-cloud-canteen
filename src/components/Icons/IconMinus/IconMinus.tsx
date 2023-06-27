@@ -3,11 +3,12 @@ import classNames from 'classnames';
 import type { TIconProps } from '@utils/types';
 
 const IconMinus: React.FC<TIconProps> = (props) => {
-  const { className, rootClassName } = props;
+  const { className, rootClassName, onClick } = props;
   const classes = classNames(rootClassName, className);
 
   return (
     <svg
+      onClick={onClick}
       preserveAspectRatio="none"
       width="25"
       height="24"

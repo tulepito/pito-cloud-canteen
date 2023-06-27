@@ -47,7 +47,6 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
   );
   const {
     dateList = [],
-    defaultActiveKey,
     memberOptions,
     foodOptions,
   } = usePrepareManageOrdersSectionData(currentViewDate, setCurrentViewDate);
@@ -104,6 +103,10 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     };
   });
 
+  const defaultActiveKey = items.findIndex(
+    ({ id }) => id === currentViewDate.toString(),
+  );
+
   const handleDateTabChange = ({ id }: TTabsItem) => {
     setCurrentViewDate(Number(id));
     historyPushState('timestamp', id);
@@ -118,7 +121,9 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
           onChange={handleDateTabChange}
           showNavigation
           middleLabel
-          defaultActiveKey={defaultActiveKey.toString()}
+          defaultActiveKey={`${
+            (defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
+          }`}
         />
       </div>
 

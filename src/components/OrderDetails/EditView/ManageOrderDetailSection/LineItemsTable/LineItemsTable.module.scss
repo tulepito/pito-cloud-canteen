@@ -1,0 +1,272 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+@mixin tableBodyLayout {
+  height: fit-content;
+  padding: 8px 8px 8px 0;
+  text-align: left;
+  vertical-align: middle;
+  @include textTemplate(14px, 400, 20px);
+
+  display: table-cell;
+  word-break: break-word;
+
+  .icon {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+
+    &:last-of-type {
+      margin-left: 12px;
+    }
+  }
+
+  &:nth-child(1) {
+    width: 30%;
+    padding-left: 16px;
+  }
+  &:nth-child(2) {
+    width: 20%;
+  }
+  &:nth-child(3) {
+    width: 20%;
+  }
+  &:nth-child(4) {
+    width: 20%;
+  }
+  &:nth-child(5) {
+    width: 10%;
+
+    padding-right: 16px;
+    text-align: right;
+  }
+
+  & .actionCell {
+    @include viewportMedium {
+      height: 20px;
+    }
+  }
+}
+
+.root {
+  .tabItemContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tableRoot {
+    border: 1px solid $neutralGray3;
+    border-radius: 8px;
+    width: 100%;
+    border-spacing: 0;
+
+    thead {
+      justify-content: space-between;
+      background-color: $neutralGray2;
+      color: $neutralGray5;
+      @include textTemplate(12px, 600, 16px);
+
+      tr {
+        th {
+          height: fit-content;
+          padding: 8px 0;
+          text-align: left;
+          text-transform: uppercase;
+        }
+
+        th:nth-child(1) {
+          width: 30%;
+          padding-left: 16px;
+          padding-right: 8px;
+        }
+        th:nth-child(2) {
+          width: 20%;
+        }
+        th:nth-child(3) {
+          width: 20%;
+        }
+        th:nth-child(4) {
+          width: 30%;
+          padding-right: 16px;
+        }
+      }
+    }
+
+    & > tbody {
+      & > tr {
+        &:nth-child(2) > td {
+          border: none;
+          border-spacing: 0;
+        }
+
+        .foodName {
+          @include lineClamp(2);
+        }
+
+        &.totalRow {
+          & > td {
+            padding: 0;
+          }
+          table,
+          tr {
+            border-spacing: 0;
+            width: 100%;
+            padding: 0;
+
+            td {
+              @include tableBodyLayout;
+              padding: 16px 16px 12px 0;
+              @include textTemplate(14px, 700, 20px);
+
+              .errorText {
+                color: $sematicRed2;
+                @include textTemplate(12px, 600, 16px);
+              }
+            }
+
+            &:nth-child(2) {
+              td {
+                padding: 0 0 8px 16px;
+              }
+            }
+          }
+        }
+      }
+
+      & .scrollContainer {
+        max-height: calc(36px * 6);
+        overflow-x: auto;
+
+        & > table {
+          width: 100%;
+          border-spacing: 0;
+
+          tr {
+            position: relative;
+
+            &::after {
+              @include absolute(100%, 1px);
+              bottom: 0;
+              left: 0;
+              background-color: $neutralGray3;
+            }
+
+            & > td {
+              @include tableBodyLayout;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .disabled {
+    cursor: not-allowed;
+    path {
+      fill: $neutralGray5;
+    }
+  }
+
+  .quantityContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 8px;
+    @include textTemplate(16px, 600, 1.5);
+
+    .iconMinus {
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      cursor: pointer;
+
+      &:hover {
+        transform: translateY(1px);
+      }
+    }
+
+    .iconPlus {
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+
+      path {
+        fill: $neutralGray6;
+      }
+
+      &:hover {
+        transform: translateY(1px);
+      }
+
+      &.disabled {
+        cursor: not-allowed;
+        path {
+          fill: $neutralGray5;
+        }
+      }
+    }
+
+    .foodQuantityForm {
+      width: 30%;
+      min-width: 32px;
+      .quantityField {
+        .quantityInput {
+          min-width: 32px;
+          // width: 32px;
+          width: 100%;
+          padding: 4px 6px;
+          text-align: center;
+        }
+      }
+    }
+  }
+}
+
+.root {
+  .fieldContainer {
+    margin-top: 24px;
+
+    .fieldRow {
+      display: flex;
+      flex-direction: row;
+      gap: 12px 16px;
+      flex-wrap: wrap;
+
+      .fieldSelect {
+        flex-basis: 100%;
+
+        @include viewportMedium {
+          max-width: 350px;
+          flex-basis: 50%;
+        }
+      }
+
+      button {
+        padding: 10px 20px;
+        min-height: unset;
+        flex-basis: 100%;
+
+        @include viewportMedium {
+          flex-basis: unset;
+        }
+      }
+    }
+
+    .fieldLabel {
+      @include textTemplate(16px, 700, 24px);
+      color: $neutralGray6;
+      padding-bottom: 8px;
+      display: block;
+    }
+
+    .fieldNote textarea {
+      resize: vertical;
+    }
+  }
+}
