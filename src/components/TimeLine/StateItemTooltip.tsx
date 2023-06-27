@@ -69,7 +69,9 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({ tx }) => {
       canceledController.setTrue();
       deliveringController.setTrue();
     } else if (txIsDelivering(tx)) {
+      deliveringController.setFalse();
       deliveredController.setTrue();
+      canceledController.setFalse();
     } else if (txIsCompleted(tx)) {
       deliveredController.setFalse();
       deliveringController.setFalse();
