@@ -12,6 +12,7 @@ import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import CoverModal from '@components/CoverModal/CoverModal';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import { isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -23,6 +24,7 @@ import pickingOrderCover from '@src/assets/pickingOrderCover.png';
 import { participantPaths } from '@src/paths';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
+import { EOrderStates } from '@src/utils/enums';
 import type { TListing, TUser } from '@utils/types';
 
 import OrderCalendarView from '../../components/OrderCalendarView/OrderCalendarView';
@@ -66,7 +68,11 @@ const ParticipantOrderManagement = () => {
   const companyUser = User(company as TUser);
   const orderListing = Listing(order as TListing);
   const { orderName } = orderListing.getPublicData();
-  const { selectedGroups = [], deadlineDate } = orderListing.getMetadata();
+  const {
+    selectedGroups = [],
+    deadlineDate,
+    orderState,
+  } = orderListing.getMetadata();
   const { displayName: bookerName } = companyUser.getProfile();
   const { companyName } = companyUser.getPublicData();
   const { groups = [] } = companyUser.getMetadata();
@@ -99,13 +105,12 @@ const ParticipantOrderManagement = () => {
 
   const shouldShowMissingPickingOrderModal =
     !isEmpty(order) && isOrderOverDeadline(order as TListing);
-
-  const pickingOrderModalControl = useBoolean(
-    !shouldShowMissingPickingOrderModal,
-  );
+  const orderIsPickable = orderState === EOrderStates.picking;
+  const pickingOrderModalControl = useBoolean(orderIsPickable);
   const missingPickingOrderModalControl = useBoolean(
     shouldShowMissingPickingOrderModal,
   );
+
   useEffect(() => {
     if (isReady) {
       dispatch(participantOrderManagementThunks.loadData(orderId as string));
@@ -173,7 +178,13 @@ const ParticipantOrderManagement = () => {
         onClose={pickingOrderModalControl.setFalse}
         coverSrc={pickingOrderCover}
         contentInProgress={loadDataInProgress}
-        modalTitle={intl.formatMessage({ id: 'PickingOrderModal.title' })}
+        modalTitle={
+          loadDataInProgress
+            ? ''
+            : intl.formatMessage({
+                id: 'PickingOrderModal.title',
+              })
+        }
         modalDescription={intl.formatMessage(
           { id: 'PickingOrderModal.description' },
           {
@@ -185,12 +196,14 @@ const ParticipantOrderManagement = () => {
         )}
         rowInformation={rowInformation}
         buttonWrapper={
-          <Button
-            className={css.btn}
-            disabled={loadDataInProgress}
-            onClick={pickingOrderModalControl.setFalse}>
-            Bắt đầu
-          </Button>
+          <RenderWhen condition={!loadDataInProgress}>
+            <Button
+              className={css.btn}
+              disabled={loadDataInProgress}
+              onClick={pickingOrderModalControl.setFalse}>
+              Bắt đầu
+            </Button>
+          </RenderWhen>
         }
       />
       <CoverModal
@@ -199,18 +212,24 @@ const ParticipantOrderManagement = () => {
         onClose={missingPickingOrderModalControl.setFalse}
         coverSrc={missingPickingOrderCover}
         contentInProgress={loadDataInProgress}
-        modalTitle={intl.formatMessage({ id: 'MissingOrderModal.title' })}
+        modalTitle={
+          loadDataInProgress
+            ? ''
+            : intl.formatMessage({ id: 'MissingOrderModal.title' })
+        }
         modalDescription={intl.formatMessage({
           id: 'MissingOrderModal.description',
         })}
         rowInformation={rowInformation}
         buttonWrapper={
-          <Button
-            className={css.btn}
-            onClick={goToHomePage}
-            disabled={loadDataInProgress}>
-            Về trang chủ
-          </Button>
+          <RenderWhen condition={!loadDataInProgress}>
+            <Button
+              className={css.btn}
+              onClick={goToHomePage}
+              disabled={loadDataInProgress}>
+              Về trang chủ
+            </Button>
+          </RenderWhen>
         }
       />
       <SectionOrderHeader
