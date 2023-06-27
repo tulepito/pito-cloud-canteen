@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
+import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
@@ -101,6 +102,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             orderDetail: newOrderDetail,
           },
         });
+        emailSendingFactory(
+          EmailTemplateTypes.PARTICIPANT.PARTICIPANT_ORDER_PICKING,
+          {
+            orderId,
+            participantId: userId,
+          },
+        );
 
         res.status(200).json({
           message: `Successfully add participant, email: ${email}`,

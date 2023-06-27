@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -37,6 +36,7 @@ const AddParticipantFormComponent: React.FC<
     hasSubmitButton,
     dirtySinceLastSubmit,
     submitErrors = {},
+    form,
   } = props;
 
   const updateParticipantsInProgress = useAppSelector(
@@ -47,10 +47,16 @@ const AddParticipantFormComponent: React.FC<
     [css.withSubmitButton]: hasSubmitButton,
   });
 
-  useEffect(() => {}, []);
+  const customHandleSubmit = async (event: any) => {
+    const errors = await handleSubmit(event);
+
+    if (isEmpty(errors?.email)) {
+      form.reset();
+    }
+  };
 
   return (
-    <Form id={id} onSubmit={handleSubmit} className={css.root}>
+    <Form id={id} onSubmit={customHandleSubmit} className={css.root}>
       <div className={formClasses}>
         <FieldTextInput
           className={css.emailField}
