@@ -255,7 +255,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
           {isDraftEditing && shouldShowOverflowError && (
             <ErrorMessage
               className={css.error}
-              message={`Bạn đã thay đổi vượt mức quy định (tối đa 10% số lượng người tham gia)`}
+              message={`Bạn đã vượt quá phần ăn tối đa của đối tác`}
             />
           )}
           {isDraftEditing && shouldShowUnderError && (
