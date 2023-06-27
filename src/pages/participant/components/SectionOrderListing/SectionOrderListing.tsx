@@ -9,8 +9,6 @@ import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { isOrderOverDeadline as isOverDeadline } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
-import { Listing } from '@src/utils/data';
-import { EOrderStates } from '@src/utils/enums';
 
 import { listingLoading } from './Loading';
 import TabActions from './TabActions';
@@ -50,10 +48,8 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
   const submitDataInprogress = useAppSelector(
     (state) => state.ParticipantPlanPage.submitDataInprogress,
   );
-  const orderListing = Listing(order);
-  const { orderState } = orderListing.getMetadata();
+
   const isOrderDeadlineOver = isOverDeadline(order);
-  const isOrderAlreadyStarted = orderState !== EOrderStates.picking;
 
   const convertDataToTabItem = () => {
     if (loadDataInProgress) {
@@ -94,8 +90,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
         isOrderDeadlineOver ||
         !!hasDishInCart ||
         reloadDataInProgress ||
-        submitDataInprogress ||
-        isOrderAlreadyStarted;
+        submitDataInprogress;
 
       const childrenList = foodList.map((dish, index) => (
         <ListingCard
@@ -106,7 +101,6 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
           planId={`${planId}`}
           isSelected={hasDishInCart === dish?.id?.uuid}
           selectDisabled={selectDisabled}
-          isOrderAlreadyStarted={isOrderAlreadyStarted}
         />
       ));
 
