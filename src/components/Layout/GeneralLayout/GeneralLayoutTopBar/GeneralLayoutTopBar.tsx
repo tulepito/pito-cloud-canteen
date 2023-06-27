@@ -1,9 +1,8 @@
+import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
 import Avatar from '@components/Avatar/Avatar';
 import { InlineTextButton } from '@components/Button/Button';
-import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import IconBell from '@components/Icons/IconBell/IconBell';
 import NamedLink from '@components/NamedLink/NamedLink';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
@@ -14,18 +13,14 @@ import { useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
-import { CurrentUser } from '@src/utils/data';
 
 import css from './GeneralLayoutTopBar.module.scss';
 
 const GeneralLayoutTopBar = () => {
   const router = useRouter();
+  const intl = useIntl();
   const handleLogoutFn = useLogout();
   const currentUser = useAppSelector(currentUserSelector);
-
-  const currentUserGetter = CurrentUser(currentUser);
-  const { lastName = '', firstName = '' } = currentUserGetter.getProfile();
-  const currentUserFullName = `${lastName} ${firstName}`;
 
   const handleLogout = async () => {
     await handleLogoutFn();
@@ -35,17 +30,39 @@ const GeneralLayoutTopBar = () => {
   return (
     <div className={css.root}>
       <NamedLink className={css.headerLeft} path={participantPaths.OrderList}>
-        <PitoLogo className={css.logo} />
+        <PitoLogo variant="secondary" className={css.logo} />
       </NamedLink>
       <div className={css.headerRight}>
-        <IconBell className={css.iconBell} />
+        <div className={css.menuItemList}>
+          <NamedLink path={participantPaths.OrderList}>
+            <div className={css.menuItem}>
+              {intl.formatMessage({
+                id: 'GeneralLayoutTopBar.menuItem.myCalender',
+              })}
+            </div>
+          </NamedLink>
+          <NamedLink path={participantPaths.SubOrderList}>
+            <div className={css.menuItem}>
+              {intl.formatMessage({
+                id: 'GeneralLayoutTopBar.menuItem.myOrders',
+              })}
+            </div>
+          </NamedLink>
+          <NamedLink path={participantPaths.Account}>
+            <div className={css.menuItem}>
+              {intl.formatMessage({
+                id: 'GeneralLayoutTopBar.menuItem.account',
+              })}
+            </div>
+          </NamedLink>
+        </div>
+        <div className={css.divider} />
+
         <ProfileMenu>
           <ProfileMenuLabel className={css.profileMenuWrapper}>
             <div className={css.avatar}>
               <Avatar disableProfileLink user={currentUser} />
             </div>
-            <p className={css.displayName}>{currentUserFullName}</p>
-            <IconArrow direction="down" />
           </ProfileMenuLabel>
           <ProfileMenuContent className={css.profileMenuContent}>
             <ProfileMenuItem key="AccountSettingsPage">

@@ -19,6 +19,7 @@ type TCoverModalProps = {
   rowInformation?: TObject[];
   buttonWrapper?: ReactNode;
   contentInProgress?: boolean;
+  openClassName?: string;
 };
 
 const CoverModal: React.FC<TCoverModalProps> = (props) => {
@@ -32,6 +33,7 @@ const CoverModal: React.FC<TCoverModalProps> = (props) => {
     rowInformation,
     buttonWrapper,
     contentInProgress,
+    openClassName,
   } = props;
 
   return (
@@ -40,6 +42,7 @@ const CoverModal: React.FC<TCoverModalProps> = (props) => {
       isOpen={isOpen}
       shouldHideIconClose
       shouldHideGreyBackground
+      openClassName={openClassName}
       containerClassName={css.modalContainer}
       handleClose={onClose}
       contentClassName={css.modalContentWrapper}>
