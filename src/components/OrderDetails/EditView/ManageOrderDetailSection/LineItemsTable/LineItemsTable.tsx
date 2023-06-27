@@ -22,10 +22,11 @@ import css from './LineItemsTable.module.scss';
 
 type TLineItemsTableProps = {
   currentViewDate: number;
+  isAdminLayout?: boolean;
 };
 
 const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
-  const { currentViewDate } = props;
+  const { currentViewDate, isAdminLayout = false } = props;
   const intl = useIntl();
 
   const dispatch = useAppDispatch();
@@ -171,6 +172,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
       <LineItemsTableComponent
         data={data}
         onModifyQuantity={handleModifyQuantity}
+        isAdminLayout={isAdminLayout}
       />
       <form onSubmit={handleSubmit}>
         <div className={css.fieldContainer}>

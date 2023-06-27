@@ -29,11 +29,12 @@ const TABLE_HEAD_IDS = [
 type TLineItemsTableComponentProps = {
   data: TObject;
   onModifyQuantity: (id: string, quantity: number) => () => void;
+  isAdminLayout?: boolean;
 };
 
 export const LineItemsTableComponent: React.FC<
   TLineItemsTableComponentProps
-> = ({ data = {}, onModifyQuantity }) => {
+> = ({ data = {}, onModifyQuantity, isAdminLayout = false }) => {
   const intl = useIntl();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const orderData = useAppSelector((state) => state.OrderManagement.orderData);
@@ -186,7 +187,9 @@ export const LineItemsTableComponent: React.FC<
   return (
     <>
       <Alert
-        className={css.overFlowAlert}
+        className={classNames(css.overFlowAlert, {
+          [css.isAdminLayout]: isAdminLayout,
+        })}
         openClassName={css.isOpen}
         message={overFlowMemberAmountMessage}
         isOpen={alertController.value}

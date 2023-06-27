@@ -23,6 +23,7 @@ type TManageLineItemsSectionProps = {
     startDate: number;
     endDate: number;
   };
+  isAdminLayout?: boolean;
 };
 
 const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
@@ -30,6 +31,7 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
 ) => {
   const {
     data: { startDate },
+    isAdminLayout = false,
   } = props;
 
   const {
@@ -58,7 +60,10 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
             })}
           </div>
           <div className={css.lineItemDetails}>
-            <LineItemsTable currentViewDate={currentViewDate} />
+            <LineItemsTable
+              isAdminLayout={isAdminLayout}
+              currentViewDate={currentViewDate}
+            />
           </div>
         </div>
       ),
