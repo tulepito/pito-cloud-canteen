@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
+import Alert from '@components/Alert/Alert';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
@@ -11,8 +12,10 @@ import IconPlus from '@components/Icons/IconPlus/IconPlus';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { orderDetailsAnyActionsInProgress } from '@redux/slices/OrderManagement.slice';
-import type { TObject } from '@src/utils/types';
+import { Listing } from '@src/utils/data';
+import type { TListing, TObject } from '@src/utils/types';
 
 import css from './LineItemsTable.module.scss';
 
@@ -33,6 +36,12 @@ export const LineItemsTableComponent: React.FC<
 > = ({ data = {}, onModifyQuantity }) => {
   const intl = useIntl();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
+  const orderData = useAppSelector((state) => state.OrderManagement.orderData);
+
+  const alertController = useBoolean();
+
+  const orderDataGetter = Listing(orderData as TListing);
+  const { memberAmount = 1 } = orderDataGetter.getMetadata();
 
   const { lineItems = [], restaurant = {} } = data;
   const { maxQuantity = 100, minQuantity = 1 } = restaurant;
@@ -59,10 +68,11 @@ export const LineItemsTableComponent: React.FC<
     [JSON.stringify(lineItems)],
   );
 
-  // const { form } = useForm({
-  //   initialValues: formInitialValues,
-  //   onSubmit: () => {},
-  // });
+  const overFlowAmount = totalQuantity - memberAmount;
+  const overFlowMemberAmountMessage = intl.formatMessage(
+    { id: 'LineItemsTable.overFlowMemberAmount' },
+    { amount: overFlowAmount },
+  );
 
   const shouldShowOverflowError = totalQuantity > maxQuantity;
   const shouldShowUnderError = totalQuantity < minQuantity;
@@ -164,79 +174,97 @@ export const LineItemsTableComponent: React.FC<
     </>
   );
 
+  useEffect(() => {
+    if (overFlowAmount > 0) {
+      alertController.setTrue();
+    } else if (overFlowAmount === 0) {
+      alertController.setFalse();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [overFlowAmount]);
+
   return (
-    <table className={css.tableRoot}>
-      <thead>
-        <tr>
-          {TABLE_HEAD_IDS.map((headId: string, index: number) => (
-            <th key={index} colSpan={index === 3 ? 2 : 1}>
-              {intl.formatMessage({ id: headId })}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td colSpan={5}>
-            <div className={css.scrollContainer}>
+    <>
+      <Alert
+        className={css.overFlowAlert}
+        openClassName={css.isOpen}
+        message={overFlowMemberAmountMessage}
+        isOpen={alertController.value}
+        onClose={() => alertController.setFalse()}
+      />
+      <table className={css.tableRoot}>
+        <thead>
+          <tr>
+            {TABLE_HEAD_IDS.map((headId: string, index: number) => (
+              <th key={index} colSpan={index === 3 ? 2 : 1}>
+                {intl.formatMessage({ id: headId })}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colSpan={5}>
+              <div className={css.scrollContainer}>
+                <table>
+                  <tbody>{bodyComponent}</tbody>
+                </table>
+              </div>
+            </td>
+          </tr>
+          <tr className={css.totalRow}>
+            <td colSpan={5}>
               <table>
-                <tbody>{bodyComponent}</tbody>
-              </table>
-            </div>
-          </td>
-        </tr>
-        <tr className={css.totalRow}>
-          <td colSpan={5}>
-            <table>
-              <tbody>
-                <tr>
-                  <td>
-                    <div className={css.totalText}>
-                      {intl.formatMessage({
-                        id: 'LineItemsTableComponent.totalLabel',
-                      })}
-                    </div>
-                  </td>
-                  <td>
-                    <div>
-                      {intl.formatMessage(
-                        {
-                          id: 'LineItemsTableComponent.totalQuantity',
-                        },
-                        { count: totalQuantity },
-                      )}
-                    </div>
-                  </td>
-                  <td></td>
-                  <td>{formattedTotalPrice}</td>
-                  <td></td>
-                </tr>
-                <RenderWhen condition={hasError}>
+                <tbody>
                   <tr>
-                    <td colSpan={5}>
-                      <div className={css.errorText}>
-                        <RenderWhen condition={shouldShowOverflowError}>
-                          {intl.formatMessage({
-                            id: 'LineItemsTableComponent.overflowMaxQuantity',
-                          })}
-                        </RenderWhen>
-                        <RenderWhen condition={shouldShowUnderError}>
-                          {intl.formatMessage(
-                            {
-                              id: 'LineItemsTableComponent.underMinQuantity',
-                            },
-                            { minQuantity },
-                          )}
-                        </RenderWhen>
+                    <td>
+                      <div className={css.totalText}>
+                        {intl.formatMessage({
+                          id: 'LineItemsTableComponent.totalLabel',
+                        })}
                       </div>
                     </td>
+                    <td>
+                      <div>
+                        {intl.formatMessage(
+                          {
+                            id: 'LineItemsTableComponent.totalQuantity',
+                          },
+                          { count: totalQuantity },
+                        )}
+                      </div>
+                    </td>
+                    <td></td>
+                    <td>{formattedTotalPrice}</td>
+                    <td></td>
                   </tr>
-                </RenderWhen>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+                  <RenderWhen condition={hasError}>
+                    <tr>
+                      <td colSpan={5}>
+                        <div className={css.errorText}>
+                          <RenderWhen condition={shouldShowOverflowError}>
+                            {intl.formatMessage({
+                              id: 'LineItemsTableComponent.overflowMaxQuantity',
+                            })}
+                          </RenderWhen>
+                          <RenderWhen condition={shouldShowUnderError}>
+                            {intl.formatMessage(
+                              {
+                                id: 'LineItemsTableComponent.underMinQuantity',
+                              },
+                              { minQuantity },
+                            )}
+                          </RenderWhen>
+                        </div>
+                      </td>
+                    </tr>
+                  </RenderWhen>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </>
   );
 };

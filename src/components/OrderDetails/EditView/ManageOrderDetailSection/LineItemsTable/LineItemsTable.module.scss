@@ -59,6 +59,12 @@
     gap: 8px;
   }
 
+  .overFlowAlert {
+    &.isOpen {
+      right: 40px;
+    }
+  }
+
   .tableRoot {
     border: 1px solid $neutralGray3;
     border-radius: 8px;
