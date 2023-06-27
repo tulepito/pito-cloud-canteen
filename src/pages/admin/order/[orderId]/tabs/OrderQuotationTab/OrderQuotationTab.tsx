@@ -8,7 +8,7 @@ import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderStates } from '@src/utils/enums';
+import type { EOrderStates } from '@src/utils/enums';
 import type { TListing, TPagination, TUser } from '@src/utils/types';
 
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
@@ -65,7 +65,7 @@ const TABLE_COLUMNS: TColumn[] = [
     key: 'bookerName',
     label: 'Nguời đại diện',
     render: (data: any) => {
-      return <div>{data.displayName}</div>;
+      return <div>{data.bookerName}</div>;
     },
   },
   {
@@ -142,7 +142,7 @@ const parseEntitiesToTableData = ({
     orderListing.getMetadata();
   const { orderName } = orderListing.getPublicData();
   const { companyName } = companyUser.getPublicData();
-  const { displayName } = bookerUser.getPublicData();
+  const { firstName, lastName } = bookerUser.getProfile();
   const restaurantsList = Object.values(orderDetail).reduce(
     (result: string[], orderDate: any) => {
       const { restaurant } = orderDate;
@@ -166,7 +166,7 @@ const parseEntitiesToTableData = ({
         location: deliveryAddress?.address,
         staffName,
         companyName,
-        displayName,
+        bookerName: lastName + firstName,
         restaurants: restaurantsList,
         startDate: startDate && formatTimestamp(startDate),
         endDate: endDate && formatTimestamp(endDate),
@@ -213,8 +213,8 @@ const OrderQuotationTab: React.FC<OrderQuotationTabProps> = (props) => {
     setSelectedQuotation,
   });
 
-  const handleUpdateOrderState = () => {
-    updateOrderState(EOrderStates.picking);
+  const handleUpdateOrderState = (state: EOrderStates) => () => {
+    updateOrderState(state);
   };
   const handleGoBack = () => {
     setSelectedQuotation(null);

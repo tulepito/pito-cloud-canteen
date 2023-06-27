@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 
-import { downloadPriceQuotation as downloadPriceQuotationFn } from '@pages/company/orders/[orderId]/picking/helpers/downloadPriceQuotation';
-import type { usePrepareOrderDetailPageData } from '@pages/company/orders/[orderId]/picking/hooks/usePrepareData';
+import { downloadPriceQuotation as downloadPriceQuotationFn } from '@helpers/order/downloadPriceQuotationHelper';
 import { priceQuotationActions } from '@redux/slices/priceQuotation.slice';
 import { UIActions } from '@redux/slices/UI.slice';
 
 import { useAppDispatch } from './reduxHooks';
+import type { usePrepareOrderDetailPageData } from './usePrepareOrderManagementData';
 
 export const useDownloadPriceQuotation = (
   orderTitle: string,

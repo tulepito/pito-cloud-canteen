@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, current } from '@reduxjs/toolkit';
 import isEmpty from 'lodash/isEmpty';
 
 import { transitPlanApi } from '@apis/admin';
@@ -11,12 +11,13 @@ import {
 } from '@apis/orderApi';
 import { getOrderQuotationsQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
+import { OrderManagementsAction } from '@redux/slices/OrderManagement.slice';
 import {
   denormalisedResponseEntities,
   Listing,
   Transaction,
 } from '@src/utils/data';
-import { ESubOrderTxStatus } from '@src/utils/enums';
+import { ESubOrderTxStatus, ETransactionRoles } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 import type {
   TListing,
@@ -131,13 +132,14 @@ const fetchOrder = createAsyncThunk(FETCH_ORDER, async (orderId: string) => {
 
 const updateStaffName = createAsyncThunk(
   UPDATE_STAFF_NAME,
-  async (payload: { orderId: string; staffName: string }) => {
+  async (payload: { orderId: string; staffName: string }, { dispatch }) => {
     const { orderId, staffName } = payload;
     const apiBody = {
       generalInfo: {
         staffName,
       },
     };
+    dispatch(OrderManagementsAction.updateStaffName(staffName));
 
     const { data: orderListing } = await updateOrderApi(orderId, apiBody);
 
@@ -159,50 +161,34 @@ const updateOrderState = createAsyncThunk(
 
 const transit = createAsyncThunk(
   'app/OrderDetail/TRANSIT',
-  async (
-    { transactionId, transition }: TObject,
-    { dispatch, getState, rejectWithValue },
-  ) => {
-    try {
-      const { data: response } = await transitPlanApi({
-        transactionId,
-        transition,
+  async ({ transactionId, transition }: TObject) => {
+    const { data: response } = await transitPlanApi({
+      transactionId,
+      transition,
+    });
+
+    const { tx } = response;
+    const txGetter = Transaction(tx as TTransaction);
+    const { booking } = txGetter.getFullData();
+    const { displayStart } = booking.attributes;
+    const { lastTransition } = txGetter.getAttributes();
+    const { planId, participantIds = [] } = txGetter.getMetadata();
+    const firebaseSubOrderIdList = participantIds.map(
+      (id: string) => `${id} - ${planId} - ${new Date(displayStart).getTime()}`,
+    );
+
+    if (transitionShouldChangeFirebaseSubOrderStatus.includes(lastTransition)) {
+      firebaseSubOrderIdList.map(async (subOrderId: string) => {
+        await participantSubOrderUpdateDocumentApi({
+          subOrderId,
+          params: {
+            txStatus: mapTxTransitionToFirebaseSubOrderStatus(lastTransition),
+          },
+        });
       });
-
-      const { tx } = response;
-      const txGetter = Transaction(tx as TTransaction);
-      const { booking } = txGetter.getFullData();
-      const { displayStart } = booking.attributes;
-      const { lastTransition } = txGetter.getAttributes();
-      const { planId, participantIds = [] } = txGetter.getMetadata();
-      const firebaseSubOrderIdList = participantIds.map(
-        (id: string) =>
-          `${id} - ${planId} - ${new Date(displayStart).getTime()}`,
-      );
-      if (
-        transitionShouldChangeFirebaseSubOrderStatus.includes(lastTransition)
-      ) {
-        await Promise.all(
-          firebaseSubOrderIdList.map(async (subOrderId: string) => {
-            await participantSubOrderUpdateDocumentApi({
-              subOrderId,
-              params: {
-                txStatus:
-                  mapTxTransitionToFirebaseSubOrderStatus(lastTransition),
-              },
-            });
-          }),
-        );
-      }
-
-      const orderId = Listing(getState().OrderDetail.order).getId();
-
-      if (orderId) {
-        await dispatch(fetchOrder(orderId));
-      }
-    } catch (error) {
-      return rejectWithValue(error);
     }
+
+    return { transactionId, transition, createdAt: new Date().toISOString() };
   },
 );
 
@@ -334,7 +320,44 @@ const OrderDetailSlice = createSlice({
         state.transitInProgress = true;
         state.transitError = null;
       })
-      .addCase(transit.fulfilled, (state) => {
+      .addCase(transit.fulfilled, (state, { payload }) => {
+        const { transactionId, transition, createdAt } = payload;
+        const currentState = current(state);
+        const currOrderDetail = currentState.orderDetail;
+        const currTxMap = currentState.transactionDataMap || {};
+        const updateEnTry = Object.entries(currTxMap).find(
+          ([_, txData]) => Transaction(txData).getId() === transactionId,
+        );
+
+        if (updateEnTry) {
+          const [date, txData] = updateEnTry;
+
+          const updateTxData = {
+            ...txData,
+            attributes: {
+              ...txData?.attributes,
+              transitions: (
+                (txData?.attributes?.transitions || []) as any[]
+              ).concat({
+                createdAt,
+                transition,
+                by: ETransactionRoles.operator,
+              }),
+              lastTransition: transition,
+              lastTransitionedAt: createdAt,
+            },
+          };
+
+          state.transactionDataMap = { ...currTxMap, [date]: updateTxData };
+          state.orderDetail = {
+            ...currOrderDetail,
+            [date]: {
+              ...currOrderDetail[date],
+              status: 'canceled',
+            },
+          };
+        }
+
         state.transitInProgress = false;
       })
       .addCase(transit.rejected, (state, { error }) => {
