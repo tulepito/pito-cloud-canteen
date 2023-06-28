@@ -23,6 +23,7 @@ type TOrderDeadlineCountdownSectionProps = TDefaultProps & {
     deadlineHour: string;
     orderDeadline: number;
   };
+  ableToUpdateOrder: boolean;
 };
 
 const OrderDeadlineCountdownSection: React.FC<
@@ -37,11 +38,12 @@ const OrderDeadlineCountdownSection: React.FC<
     className,
     rootClassName,
     data: { startDate, deadlineHour, orderDeadline },
+    ableToUpdateOrder,
   } = props;
   const currentTime = new Date().getTime();
   const rootClasses = classNames(rootClassName || css.root, className);
 
-  const disabledEditButton = currentTime >= orderDeadline;
+  const disabledEditButton = currentTime >= orderDeadline || !ableToUpdateOrder;
   const formattedDeadline = formatTimestamp(
     orderDeadline,
     "HH:mm, dd 'tháng' MM, yyyy",

@@ -36,10 +36,8 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   const router = useRouter();
   const intl = useIntl();
   const user = useAppSelector(currentUserSelector);
-
   const dispatch = useAppDispatch();
-  const daySession = event.resource?.daySession;
-  const startTime = event.resource?.deliveryHour;
+
   const dishes: any[] = event.resource?.meal?.dishes || [];
   const {
     orderId,
@@ -47,9 +45,13 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
     id: orderDay,
     dishSelection,
     transactionId,
+    daySession,
+    deliveryHour: startTime,
+    isOrderStarted = false,
   } = event.resource;
 
-  const shouldShowPickFoodSection = !isExpired && isEmpty(transactionId);
+  const shouldShowPickFoodSection =
+    !isOrderStarted && !isExpired && isEmpty(transactionId);
   const timestamp =
     orderDay.split(' - ').length > 1 ? orderDay.split(' - ')[1] : orderDay;
   const from =

@@ -1,0 +1,48 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.itemWrapper {
+  @include flexAlign(center, space-between);
+  gap: 16px;
+  padding: 16px 12px;
+  border-bottom: 1px solid $neutralGray3;
+
+  .iconWrapper {
+    width: 24px;
+    height: 24px;
+
+    svg {
+      border-radius: 100%;
+    }
+  }
+}
+
+.notificationContent {
+  @include flexAlign(center, flex-start);
+  gap: 16px;
+}
+
+.contentWrapper {
+  .content {
+    @include textTemplate(14px, $fontWeightRegular, 20px);
+  }
+
+  .pastTime {
+    @include textTemplate(12px, $fontWeightRegular, 16px);
+    color: $neutralGray5;
+    margin-top: 2px;
+  }
+}
+
+.redDot {
+  width: 9px;
+  height: 9px;
+  background-color: $primaryPri2;
+  border-radius: 100%;
+  flex-shrink: 0;
+}
+
+.boldText {
+  font-weight: $fontWeightBold;
+}

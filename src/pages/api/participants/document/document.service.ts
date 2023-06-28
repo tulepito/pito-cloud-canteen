@@ -6,7 +6,7 @@ import {
 } from '@services/firebase';
 import { fetchListing } from '@services/integrationHelper';
 import { Listing } from '@src/utils/data';
-import { EImageVariants } from '@src/utils/enums';
+import { EImageVariants, EParticipantOrderStatus } from '@src/utils/enums';
 
 const { FIREBASE_PARTICIPANT_SUB_ORDER_COLLECTION_NAME } = process.env;
 
@@ -29,8 +29,6 @@ export const addFirebaseDocument = async ({
   const { memberOrders = {}, transactionId, restaurant = {} } = subOrder;
   const { id: restaurantId, restaurantName, foodList } = restaurant;
   const { foodId, status } = memberOrders[participantId];
-  const { foodName } = foodList[foodId];
-
   const restaurantResponse = await fetchListing(
     restaurantId,
     ['images'],
@@ -41,31 +39,58 @@ export const addFirebaseDocument = async ({
 
   const restaurantImages = restaurantListing.getImages();
 
-  const restaurantAvatarImage = getListingImageById(
-    avatarImageId,
-    restaurantImages,
-  );
-  const newRestaurantAvatarImage = {
+  const restaurantAvatarImage =
+    restaurantImages.length > 0
+      ? getListingImageById(avatarImageId, restaurantImages)
+      : null;
+  const newRestaurantAvatarImage = restaurantAvatarImage && {
     ...restaurantAvatarImage,
     id: {
       uuid: restaurantAvatarImage.id.uuid,
     },
   };
 
-  const subOrderDocument = {
+  let subOrderDocument = {
     participantId,
     orderId,
     planId,
     restaurantId,
     ...(transactionId && { transactionId }),
     restaurantName,
-    foodName,
-    restaurantAvatarImage: newRestaurantAvatarImage,
+    ...(newRestaurantAvatarImage && {
+      restaurantAvatarImage: newRestaurantAvatarImage,
+    }),
     status,
     txStatus: 'pending',
     deliveryHour,
     createdAt: new Date(),
   };
+
+  if (status !== EParticipantOrderStatus.notJoined && foodId) {
+    const { foodName } = foodList[foodId];
+    const foodResponse = await fetchListing(
+      foodId,
+      ['images'],
+      [`variants.${EImageVariants.squareSmall2x}`],
+    );
+    const foodListing = Listing(foodResponse);
+    const foodImages = foodListing.getImages();
+
+    const newFoodImage =
+      foodImages.length > 0
+        ? {
+            ...foodImages[0],
+            id: {
+              uuid: foodImages[0].id.uuid,
+            },
+          }
+        : null;
+    subOrderDocument = {
+      ...subOrderDocument,
+      foodName,
+      ...(newFoodImage && { foodImage: newFoodImage }),
+    };
+  }
 
   await setCollectionDocWithCustomId(
     `${participantId} - ${planId} - ${timestamp}`,
@@ -77,12 +102,13 @@ export const updateFirebaseDocument = async (
   subOrderId: string,
   params: any,
 ) => {
-  const { txStatus, reviewId, status, foodId } = params;
+  const { txStatus, reviewId, status, foodId, foodImage } = params;
   const allowedParams = {
     ...(txStatus && { txStatus }),
     ...(reviewId && { reviewId }),
     ...(status && { status }),
     ...(foodId && { foodId }),
+    ...(foodImage && { foodImage }),
   };
   await updateCollectionDoc(
     subOrderId,

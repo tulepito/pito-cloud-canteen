@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
-import isEmpty from 'lodash/isEmpty';
 
 import OrderEventCardStatus from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCardStatus';
 import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
@@ -47,6 +46,7 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
     dishSelection,
     orderColor,
     transactionId,
+    isOrderStarted = false,
   } = event?.resource || {};
 
   const { address } = deliveryAddress;
@@ -64,13 +64,13 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
   )?.value;
 
   const shouldShowRejectButton =
-    isEmpty(transactionId) &&
+    !isOrderStarted &&
     ![EVENT_STATUS.EXPIRED_STATUS, EVENT_STATUS.NOT_JOINED_STATUS].includes(
       status,
     ) &&
     !isExpired &&
     !transactionId;
-  const shouldShowCountdown = isEmpty(transactionId) && !isExpired;
+  const shouldShowCountdown = !isOrderStarted && !isExpired;
 
   const subOrderTxs = useAppSelector(
     (state) => state.ParticipantOrderList.subOrderTxs,

@@ -16,18 +16,19 @@ import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { getItem } from '@helpers/localStorageHelpers';
+import { getItem, setItem } from '@helpers/localStorageHelpers';
 import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import { CurrentUser, Listing } from '@src/utils/data';
 import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
-import { EParticipantOrderStatus } from '@src/utils/enums';
+import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
 
 import ParticipantToolbar from '../components/ParticipantToolbar/ParticipantToolbar';
 
+import NotificationModal from './components/NotificationModal/NotificationModal';
 import OnboardingOrderModal from './components/OnboardingOrderModal/OnboardingOrderModal';
 import OnboardingTour from './components/OnboardingTour/OnboardingTour';
 import OrderListHeaderSection from './components/OrderListHeaderSection/OrderListHeaderSection';
@@ -46,7 +47,9 @@ const OrderListPage = () => {
   const router = useRouter();
   const { planId: planIdFromQuery, timestamp: timestampFromQuery } =
     router.query;
-
+  const [defaultCalendarView, setDefaultCalendarView] = useState<View>(
+    (getItem('participant_calendarView') as View) || Views.WEEK,
+  );
   const updateProfileModalControl = useBoolean();
   const onBoardingModal = useBoolean();
   const tourControl = useBoolean();
@@ -56,6 +59,7 @@ const OrderListPage = () => {
   const subOrderDetailModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
   const successRatingModalControl = useBoolean();
+  const notificationModalControl = useBoolean();
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const orders = useAppSelector(
     (state) => state.ParticipantOrderList.orders,
@@ -91,6 +95,11 @@ const OrderListPage = () => {
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
 
+  const notifications = useAppSelector(
+    (state) => state.ParticipantOrderList.participantFirebaseNotifications,
+    shallowEqual,
+  );
+
   const currentUserGetter = CurrentUser(currentUser!);
   const currentUserId = currentUserGetter.getId();
   const { walkthroughEnable = true } = currentUserGetter.getMetadata();
@@ -103,6 +112,11 @@ const OrderListPage = () => {
       participantPostRatingInProgress) &&
     !walkthroughEnable;
 
+  const unseenNotifications = notifications.filter(
+    (notification) => !notification.seen,
+  );
+  const numberOfUnseenNotifications = unseenNotifications.length;
+
   const events = subOrders.map((subOrder: any) => {
     const planKey = Object.keys(subOrder)[0];
     const planItem: TObject = subOrder[planKey];
@@ -112,7 +126,11 @@ const OrderListPage = () => {
     const orderId = mappingSubOrderToOrder[planKey];
     const order = orders?.find((_order) => Listing(_order).getId() === orderId);
     const orderListing = Listing(order);
-    const { deliveryHour, deadlineDate } = orderListing.getMetadata();
+    const {
+      deliveryHour,
+      deadlineDate,
+      orderStateHistory = [],
+    } = orderListing.getMetadata();
     const { title: orderTitle } = orderListing.getAttributes();
 
     const listEvent: Event[] = [];
@@ -162,6 +180,10 @@ const OrderListPage = () => {
             dishes,
           },
           deadlineDate,
+          isOrderStarted:
+            orderStateHistory.findIndex(
+              (history: TObject) => history.state === EOrderStates.inProgress,
+            ) !== -1,
           orderColor: colorOrderMap[orderId],
           expiredTime: expiredTime.toMillis(),
           deliveryHour,
@@ -186,9 +208,15 @@ const OrderListPage = () => {
     isSameDate(_event.start, selectedDay),
   );
 
-  const defaultView = isMobileLayout
-    ? Views.MONTH
-    : (getItem('participant_calendarView') as View) || Views.WEEK;
+  useEffect(() => {
+    if (isMobileLayout) {
+      setItem('participant_calendarView', Views.MONTH);
+      setDefaultCalendarView(Views.MONTH);
+    } else {
+      setItem('participant_calendarView', Views.WEEK);
+      setDefaultCalendarView(Views.WEEK);
+    }
+  }, [isMobileLayout]);
 
   const subOrdersFromSelectedDayTxIds = compact(
     subOrdersFromSelectedDay.map(
@@ -233,18 +261,36 @@ const OrderListPage = () => {
   };
 
   const openRatingSubOrderModal = () => {
+    subOrderDetailModalControl.setFalse();
     ratingSubOrderModalControl.setTrue();
   };
 
+  const openSuccessRatingModal = () => {
+    ratingSubOrderModalControl.setFalse();
+    successRatingModalControl.setTrue();
+  };
+
+  const closeAllModals = () => {
+    successRatingModalControl.setFalse();
+  };
+
   useEffect(() => {
-    if (subOrdersFromSelectedDayTxIds) {
+    if (subOrdersFromSelectedDayTxIds.length > 0) {
       dispatch(
         OrderListThunks.fetchTransactionBySubOrder(
           subOrdersFromSelectedDayTxIds,
         ),
       );
     }
-  }, [subOrdersFromSelectedDayTxIds]);
+  }, [JSON.stringify(subOrdersFromSelectedDayTxIds)]);
+
+  useEffect(() => {
+    if (selectedEvent) {
+      const { timestamp, planId } = selectedEvent.resource;
+      const subOrderId = `${currentUserId} - ${planId} - ${timestamp}`;
+      dispatch(OrderListThunks.fetchSubOrdersFromFirebase(subOrderId));
+    }
+  }, [selectedEvent]);
 
   useEffect(() => {
     (async () => {
@@ -271,28 +317,32 @@ const OrderListPage = () => {
         subOrderDetailModalControl.setTrue();
       }
     }
-  }, [planIdFromQuery, timestampFromQuery]);
+  }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
+
+  useEffect(() => {
+    dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
+  }, []);
 
   return (
     <ParticipantLayout>
-      <OrderListHeaderSection />
+      <OrderListHeaderSection
+        openNotificationModal={notificationModalControl.setTrue}
+        numberOfUnseenNotifications={numberOfUnseenNotifications}
+      />
       <div className={css.calendarContainer}>
         <CalendarDashboard
           anchorDate={selectedDay}
           events={walkthroughEnable ? EVENTS_MOCKUP : flattenEvents}
           renderEvent={OrderEventCard}
           inProgress={showLoadingModal}
-          defautlView={defaultView}
+          defautlView={defaultCalendarView}
           // exposeAnchorDate={handleAnchorDateChange}
           components={{
             toolbar: (toolBarProps: any) => (
               <ParticipantToolbar
                 {...toolBarProps}
-                onChangeDate={handleSelectDay}
                 isAllowChangePeriod
-                // startDate={new Date(startDate)}
-                // endDate={new Date(endDate)}
-                // anchorDate={anchorDate}
+                onChangeDate={handleSelectDay}
               />
             ),
           }}
@@ -348,13 +398,18 @@ const OrderListPage = () => {
             onClose={ratingSubOrderModalControl.setFalse}
             selectedEvent={selectedEvent}
             currentUserId={currentUserId}
-            openSuccessRatingModal={successRatingModalControl.setTrue}
+            openSuccessRatingModal={openSuccessRatingModal}
           />
         </div>
       </RenderWhen>
       <SuccessRatingModal
         isOpen={successRatingModalControl.value}
         onClose={successRatingModalControl.setFalse}
+        closeAllModals={closeAllModals}
+      />
+      <NotificationModal
+        isOpen={notificationModalControl.value}
+        onClose={notificationModalControl.setFalse}
       />
 
       <BottomNavigationBar />

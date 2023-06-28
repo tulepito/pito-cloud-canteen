@@ -13,6 +13,9 @@ const useSubOrderPicking = () => {
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const currentUserGetter = CurrentUser(currentUser!);
   const currentUserId = currentUserGetter.getId();
+  const updateOrderInProgress = useAppSelector(
+    (state) => state.ParticipantOrderManagementPage.updateOrderInProgress,
+  );
 
   const updateSubOrderInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.updateSubOrderInProgress,
@@ -25,9 +28,6 @@ const useSubOrderPicking = () => {
 
   const participantPostRatingInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
-  );
-  const updateOrderInProgress = useAppSelector(
-    (state) => state.ParticipantOrderManagementPage.updateOrderInProgress,
   );
 
   const onRejectSelectDish = (params: any) => {

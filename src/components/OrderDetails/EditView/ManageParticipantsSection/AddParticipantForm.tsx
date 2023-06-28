@@ -20,6 +20,7 @@ export type TAddParticipantFormValues = {
 type TExtraProps = {
   id: string;
   hasSubmitButton?: boolean;
+  ableToUpdateOrder: boolean;
 };
 type TAddParticipantFormComponentProps =
   FormRenderProps<TAddParticipantFormValues> & Partial<TExtraProps>;
@@ -37,6 +38,7 @@ const AddParticipantFormComponent: React.FC<
     dirtySinceLastSubmit,
     submitErrors = {},
     form,
+    ableToUpdateOrder,
   } = props;
 
   const updateParticipantsInProgress = useAppSelector(
@@ -61,7 +63,7 @@ const AddParticipantFormComponent: React.FC<
         <FieldTextInput
           className={css.emailField}
           name="email"
-          disabled={updateParticipantsInProgress}
+          disabled={updateParticipantsInProgress || !ableToUpdateOrder}
           placeholder={intl.formatMessage({
             id: 'AddParticipantForm.email.placeholder',
           })}
@@ -70,7 +72,7 @@ const AddParticipantFormComponent: React.FC<
           )}
         />
         {hasSubmitButton && (
-          <Button className={css.submitButton}>
+          <Button disabled={!ableToUpdateOrder} className={css.submitButton}>
             {intl.formatMessage({ id: 'AddParticipantForm.submitButtonText' })}
           </Button>
         )}

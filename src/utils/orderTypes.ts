@@ -20,6 +20,7 @@ export type TPlan = {
   meal: string;
   orderDetail: {
     [date: string]: {
+      note?: any;
       transactionId?: string;
       restaurant: {
         id?: string; // restaurant listing id
@@ -45,6 +46,7 @@ export type TPlan = {
 
       lineItems?: {
         id: string;
+        name: string;
         quantity: number;
         price: number;
         unitPrice: number;

@@ -1,12 +1,14 @@
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldRating from '@components/FormFields/FieldRating/FieldRating';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useAppSelector } from '@hooks/reduxHooks';
 import RatingImagesUploadField from '@pages/company/orders/[orderId]/components/RatingImagesUploadField/RatingImagesUploadField';
 
 import css from './RatingSubOrderForm.module.scss';
@@ -20,8 +22,7 @@ export type TRatingSubOrderFormValues = {
 };
 
 type TExtraProps = {
-  images: any;
-  inProgress: boolean;
+  images?: any;
 };
 type TRatingSubOrderFormComponentProps =
   FormRenderProps<TRatingSubOrderFormValues> & Partial<TExtraProps>;
@@ -31,11 +32,19 @@ type TRatingSubOrderFormProps = FormProps<TRatingSubOrderFormValues> &
 const RatingSubOrderFormComponent: React.FC<
   TRatingSubOrderFormComponentProps
 > = (props) => {
-  const { handleSubmit, images, inProgress, values } = props;
+  const { handleSubmit, values } = props;
   const intl = useIntl();
   const hasGeneralRating = !!values?.general;
   const hadFoodRating = !!values?.food;
   const hadPackagingRating = !!values?.packaging;
+  const images = useAppSelector(
+    (state) => state.uploadImage.images,
+    shallowEqual,
+  );
+  const postRatingInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.participantPostRatingInProgress,
+  );
+  const submitDisabled = postRatingInProgress || !hasGeneralRating;
 
   return (
     <Form className={css.container} onSubmit={handleSubmit}>
@@ -97,7 +106,10 @@ const RatingSubOrderFormComponent: React.FC<
       </RenderWhen>
 
       <div className={css.submitBtnWrapper}>
-        <Button className={css.submitBtn} type="submit" inProgress={inProgress}>
+        <Button
+          className={css.submitBtn}
+          type="submit"
+          disabled={submitDisabled}>
           Gửi đánh giá
         </Button>
       </div>

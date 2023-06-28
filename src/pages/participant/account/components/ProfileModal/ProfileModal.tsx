@@ -49,7 +49,7 @@ const ProfileModal: React.FC<TProfileModalProps> = (props) => {
     );
 
     if (meta.requestStatus !== 'fulfilled') {
-      console.log('error');
+      console.error('error');
     } else {
       dispatch(userThunks.fetchCurrentUser());
       updateProfileSucessModalControl.setTrue();

@@ -21,6 +21,7 @@ type TParticipantCardProps = TDefaultProps & {
   email?: string;
   participant?: TUser;
   onClickDeleteIcon?: () => void;
+  ableToRemove?: boolean;
 };
 
 const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
@@ -34,6 +35,7 @@ const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
     hasDeleteIcon = true,
     hasCheckIcon,
     participant,
+    ableToRemove,
   } = props;
   const rootClasses = classNames(rootClassName || css.root, className);
 
@@ -59,7 +61,7 @@ const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
         <div title={name}>{formattedName}</div>
         <div title={email}>{formattedEmail}</div>
       </div>
-      {hasDeleteIcon && (
+      {hasDeleteIcon && ableToRemove && (
         <div className={css.closeIconContainer} onClick={onClickDeleteIcon}>
           <IconClose className={css.closeIcon} />
         </div>

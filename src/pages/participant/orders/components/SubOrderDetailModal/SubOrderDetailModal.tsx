@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -52,6 +52,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     daySession,
     deliveryHour: startTime,
     transactionId,
+    isOrderStarted = false,
   } = event.resource;
   const dishes: any[] = event.resource?.meal?.dishes || [];
   const user = useAppSelector(currentUserSelector);
@@ -63,6 +64,14 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   const fetchSubOrderTxInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
   );
+  const fetchSubOrderDocumentInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.fetchSubOrderDocumentInProgress,
+  );
+
+  const subOrderDocument = useAppSelector(
+    (state) => state.ParticipantOrderList.subOrderDocument,
+    shallowEqual,
+  );
   const timestamp = last(orderDay.split(' - '));
   const subOrderTx = useMemo(
     () => subOrderTxs.find((tx) => tx.id.uuid === transactionId),
@@ -70,13 +79,20 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   );
 
   const isExpired = isOver(expiredTime);
-  const shouldShowPickFoodSection = !isExpired && isEmpty(subOrderTx);
+  const shouldShowPickFoodSection =
+    !isOrderStarted && !isExpired && isEmpty(subOrderTx);
 
   const dishSelectionFormInitialValues = useMemo(
     () => dishSelection,
     [JSON.stringify(dishSelection)],
   );
 
+  const { reviewId } = subOrderDocument;
+  useEffect(() => {
+    if (isOpen) {
+      dispatch(OrderListThunks.fetchTransactionBySubOrder([transactionId]));
+    }
+  }, [dispatch, isOpen, transactionId]);
   const onNavigateToOrderDetail = () => {
     router.push({
       pathname: participantPaths.PlanDetail,
@@ -140,7 +156,10 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
         <div className={css.divider} />
         <OrderEventCardContentItems event={event} isFirstHighlight />
         <RenderWhen condition={shouldShowPickFoodSection}>
-          <RenderWhen condition={fetchSubOrderTxInProgress}>
+          <RenderWhen
+            condition={
+              fetchSubOrderTxInProgress || fetchSubOrderDocumentInProgress
+            }>
             <div className={css.loading}>Đang tải</div>
             <RenderWhen.False>
               <div className={css.divider} />
@@ -168,8 +187,14 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
             </RenderWhen.False>
           </RenderWhen>
         </RenderWhen>
-        <RenderWhen condition={txIsDelivered(subOrderTx as TTransaction)}>
-          <Button className={css.ratingBtn} onClick={openRatingSubOrderModal}>
+        <RenderWhen
+          condition={!reviewId && txIsDelivered(subOrderTx as TTransaction)}>
+          <Button
+            disabled={
+              fetchSubOrderTxInProgress || fetchSubOrderDocumentInProgress
+            }
+            className={css.ratingBtn}
+            onClick={openRatingSubOrderModal}>
             Đánh giá
           </Button>
         </RenderWhen>

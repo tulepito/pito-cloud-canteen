@@ -1,9 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TTabsItem } from '@components/Tabs/Tabs';
@@ -23,23 +21,30 @@ type TManageLineItemsSectionProps = {
     startDate: number;
     endDate: number;
   };
+  isDraftEditing: boolean;
+  shouldShowOverflowError: boolean;
+  shouldShowUnderError: boolean;
+  setCurrentViewDate: (date: number) => void;
+  currentViewDate: number;
+  ableToUpdateOrder: boolean;
+  minQuantity: number;
 };
 
 const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
   props,
 ) => {
   const {
-    data: { startDate },
+    isDraftEditing,
+    currentViewDate,
+    setCurrentViewDate,
+    ableToUpdateOrder,
+    shouldShowUnderError,
+    shouldShowOverflowError,
+    minQuantity,
   } = props;
 
-  const {
-    query: { timestamp },
-  } = useRouter();
   const intl = useIntl();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const [currentViewDate, setCurrentViewDate] = useState(
-    timestamp ? Number(timestamp) : startDate,
-  );
   const {
     dateList = [],
     // foodOptions,
@@ -58,7 +63,14 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
             })}
           </div>
           <div className={css.lineItemDetails}>
-            <LineItemsTable currentViewDate={currentViewDate} />
+            <LineItemsTable
+              currentViewDate={currentViewDate}
+              isDraftEditing={isDraftEditing}
+              ableToUpdateOrder={ableToUpdateOrder}
+              shouldShowOverflowError={shouldShowOverflowError}
+              shouldShowUnderError={shouldShowUnderError}
+              minQuantity={minQuantity}
+            />
           </div>
         </div>
       ),

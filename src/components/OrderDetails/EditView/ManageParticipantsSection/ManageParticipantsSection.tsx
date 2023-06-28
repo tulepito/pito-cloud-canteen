@@ -22,6 +22,7 @@ import css from './ManageParticipantsSection.module.scss';
 export const renderParticipantCards = (
   items: Array<TUser>,
   handleClickDeleteParticipant: (id: string) => () => void,
+  ableToUpdateOrder: boolean,
 ) => {
   return items.map((item) => {
     const {
@@ -39,6 +40,7 @@ export const renderParticipantCards = (
         key={uuid}
         participant={item}
         onClickDeleteIcon={handleClickDeleteParticipant(uuid)}
+        ableToRemove={ableToUpdateOrder}
       />
     );
   });
@@ -50,12 +52,13 @@ type TManageParticipantsSectionProps = TDefaultProps & {
     participantData: Array<TUser>;
     planData: TObject;
   };
+  ableToUpdateOrder: boolean;
 };
 
 const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
   props,
 ) => {
-  const { rootClassName, className, data } = props;
+  const { rootClassName, className, data, ableToUpdateOrder } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [currentParticipantId, setCurrentParticipantId] = useState<string>();
@@ -138,11 +141,13 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
       <AddParticipantForm
         id="ManageParticipantsSection.AddParticipantForm"
         onSubmit={handleSubmitAddParticipant}
+        ableToUpdateOrder={ableToUpdateOrder}
       />
       <div className={css.participantContainer}>
         {renderParticipantCards(
           participantData.slice(0, 4),
           handleClickDeleteParticipant,
+          ableToUpdateOrder,
         )}
       </div>
       <Button
@@ -167,6 +172,7 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
         data={data}
         handleClickDeleteParticipant={handleClickDeleteParticipant}
         onSubmitAddParticipant={handleSubmitAddParticipant}
+        ableToUpdateOrder={ableToUpdateOrder}
       />
     </div>
   );

@@ -17,13 +17,17 @@ export const usePrepareOrderDetailTableData = (
   currentViewDate: number | string,
 ) => {
   const intl = useIntl();
-  const { planData, participantData, anonymousParticipantData, orderData } =
-    useAppSelector((state) => state.OrderManagement);
+  const {
+    participantData,
+    anonymousParticipantData,
+    orderData,
+    draftOrderDetail,
+  } = useAppSelector((state) => state.OrderManagement);
 
   const { packagePerMember = 0 } = Listing(orderData as TListing).getMetadata();
-  const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
+
   const { restaurant = {}, memberOrders = {} } =
-    orderDetail[currentViewDate.toString()] || {};
+    draftOrderDetail[currentViewDate?.toString()] || {};
   const { foodList = {} } = restaurant;
 
   const tableHeads = useMemo(
@@ -52,5 +56,6 @@ export const usePrepareOrderDetailTableData = (
     allTabData,
     tableHeads,
     deletedTabData: allTabData[EOrderDetailsTableTab.deleted],
+    currentOrderDetail: draftOrderDetail[currentViewDate],
   };
 };

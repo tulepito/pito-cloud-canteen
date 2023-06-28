@@ -1,0 +1,25 @@
+.container {
+  max-width: 500px;
+}
+
+.modalContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.contentText {
+  margin: 33px 0 28px 0;
+  text-align: center;
+  max-width: 270px;
+}
+
+.iconDanger {
+  width: 40px;
+  height: 40px;
+}
+
+.button {
+  width: 100%;
+}

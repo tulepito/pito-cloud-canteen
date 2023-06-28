@@ -24,6 +24,7 @@ export type TManageDeletedListFormValues = {
 type TExtraProps = {
   deletedTabData: TObject[];
   setAction: (actionType: ManageDeletedListFormAction) => () => void;
+  disabled: boolean;
 };
 type TManageDeletedListFormComponentProps =
   FormRenderProps<TManageDeletedListFormValues> & Partial<TExtraProps>;
@@ -38,10 +39,11 @@ const ManageDeletedListFormComponent: React.FC<
     deletedTabData = [],
     values: { memberIds },
     setAction,
+    disabled,
   } = props;
   const intl = useIntl();
 
-  const disabledButton = !memberIds || memberIds?.length === 0;
+  const disabledButton = !memberIds || memberIds?.length === 0 || disabled;
 
   const deletePermanentlyText = intl.formatMessage({
     id: 'ManageDeletedListForm.deletePermanently',

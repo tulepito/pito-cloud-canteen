@@ -141,23 +141,39 @@
 
 .detailReview {
   @include textTemplate(14px, $fontWeightRegular, 20px);
+  padding: 0 16px;
+  margin-top: 20px;
+  white-space: break-spaces;
 }
 
 .imageList {
   @include flexAlign(center);
   gap: 12px;
   margin-top: 40px;
-  overflow: auto;
+  overflow-x: auto;
+  padding: 0 16px;
+  height: 133px;
 }
 
 .imageWrapper {
   position: relative;
-}
-
-.image {
   width: 206px;
   height: 123px;
-  border-radius: 8px;
-  position: relative;
-  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+
+  .reviewImage {
+    width: 206px !important;
+    height: 123px !important;
+    border-radius: 8px;
+    position: relative !important;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.loading {
+  @include flexCenter();
+  height: 80vh;
+
+  svg {
+    stroke: $neutralGray6;
+  }
 }

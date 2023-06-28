@@ -26,7 +26,6 @@ const partnerNewOrderAppear = ({
   restaurantListing,
   promotion,
 }: PartnerNewOrderAppearParams) => {
-  console.log('quotationListing: ', quotationListing);
   const restaurantId = restaurantListing.getId();
   const orderId = orderListing.getId();
   const { title: orderTitle } = orderListing.getAttributes();
@@ -939,7 +938,9 @@ const partnerNewOrderAppear = ({
                                       <td align="left" valign="top" width="50%" class="cell-2"
                                         style="Margin:0;padding-left:5px;padding-right:5px;padding-top:3px;padding-bottom:3px;border:0"
                                         id="esd-menu-id-1"><a target="_blank" href=""
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#262626;font-size:14px;font-weight:bold">${staffName}</a>
+                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#262626;font-size:14px;font-weight:bold">${
+                                            staffName || ''
+                                          }</a>
                                       </td>
                                     </tr>
                                   </table>

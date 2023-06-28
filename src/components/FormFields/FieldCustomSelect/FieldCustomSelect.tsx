@@ -105,6 +105,7 @@ const FieldCustomSelectComponent: React.FC<
   options: defaultOptions,
   className,
   validateErrorClassName,
+  newOptionValidator,
   ...rest
 }) => {
   const loadingController = useBoolean();
@@ -167,6 +168,7 @@ const FieldCustomSelectComponent: React.FC<
         {...input}
         {...rest}
         getOptionValue={getOptionValue}
+        isValidNewOption={newOptionValidator}
       />
       <ValidationError
         fieldMeta={fieldMeta}
