@@ -1,10 +1,16 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
 import { parseThousandNumber } from '@helpers/format';
-import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
-import { groupFoodOrderByDate } from '@helpers/order/orderDetailHelper';
+import {
+  calculatePriceQuotationInfo,
+  calculatePriceQuotationInfoFromQuotation,
+} from '@helpers/order/cartInfoHelper';
+import {
+  groupFoodOrderByDate,
+  groupFoodOrderByDateFromQuotation,
+} from '@helpers/order/orderDetailHelper';
 import { isEnableToStartOrder } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
@@ -26,6 +32,7 @@ export const usePrepareOrderDetailPageData = () => {
     companyData,
     bookerData,
     transactionDataMap,
+    quotation,
   } = useAppSelector((state) => state.OrderManagement);
   const currentUser = useAppSelector(currentUserSelector);
 
@@ -57,7 +64,7 @@ export const usePrepareOrderDetailPageData = () => {
     deliveryAddress,
     deadlineDate = 0,
     deadlineHour,
-    // packagePerMember = 0,
+    packagePerMember = 0,
     participants = [],
     anonymous = [],
     staffName = '',
@@ -70,6 +77,7 @@ export const usePrepareOrderDetailPageData = () => {
     EOrderStates.canceled || EOrderStates.canceledByBooker,
   ].includes(orderState);
   const canStartOrder = isEnableToStartOrder(orderDetail, isGroupOrder);
+  const isOrderIsPicking = orderState === EOrderStates.picking;
   const canReview =
     orderState === EOrderStates.completed ||
     (orderState === EOrderStates.pendingPayment && !ratings);
@@ -103,25 +111,53 @@ export const usePrepareOrderDetailPageData = () => {
     manageOrdersData,
   };
   /* =============== Review data =============== */
-  const foodOrderGroupedByDate = groupFoodOrderByDate({
-    orderDetail,
-    isGroupOrder,
-  });
+  const foodOrderGroupedByDateFromOrderDetail = useMemo(
+    () =>
+      groupFoodOrderByDate({
+        orderDetail,
+        isGroupOrder,
+      }),
+    [orderDetail, isGroupOrder],
+  );
+  const foodOrderGroupedByDateFromQuotation = useMemo(
+    () =>
+      groupFoodOrderByDateFromQuotation({
+        quotation: quotation as TListing,
+      }),
+    [JSON.stringify(quotation)],
+  );
+  const foodOrderGroupedByDate = isOrderIsPicking
+    ? foodOrderGroupedByDateFromOrderDetail
+    : foodOrderGroupedByDateFromQuotation;
+  const quotationInfo = useMemo(
+    () =>
+      calculatePriceQuotationInfo({
+        planOrderDetail: orderDetail,
+        order: orderData as TObject,
+      }),
+    [orderData, orderDetail],
+  );
+  const quotationInfor = useMemo(
+    () =>
+      calculatePriceQuotationInfoFromQuotation({
+        quotation: quotation as TListing,
+        packagePerMember,
+      }),
+    [packagePerMember, quotation],
+  );
+
   const {
-    totalPrice,
-    PITOPoints,
-    VATFee,
-    totalWithVAT,
-    serviceFee,
-    transportFee,
-    promotion,
+    totalPrice = 0,
+    PITOPoints = 0,
+    VATFee = 0,
+    totalWithVAT = 0,
+    serviceFee = 0,
+    transportFee = 0,
+    promotion = 0,
     overflow,
-    PITOFee,
-    totalWithoutVAT,
-  } = calculatePriceQuotationInfo({
-    planOrderDetail: orderDetail,
-    order: orderData as TObject,
-  });
+    PITOFee = 0,
+    totalWithoutVAT = 0,
+  } = isOrderIsPicking ? quotationInfo : quotationInfor;
 
   const reviewInfoData = {
     reviewInfoValues,
@@ -205,5 +241,6 @@ export const usePrepareOrderDetailPageData = () => {
     reviewViewData,
     priceQuotationData,
     setReviewInfoValues,
+    orderData,
   };
 };

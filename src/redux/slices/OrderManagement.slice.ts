@@ -32,7 +32,7 @@ import { EOrderDetailsTableTab } from '@components/OrderDetails/EditView/ManageO
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { TPlan } from '@src/utils/orderTypes';
-import { Listing, User } from '@utils/data';
+import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import {
   EOrderHistoryTypes,
   EOrderType,
@@ -315,6 +315,9 @@ type TOrderManagementState = {
 
   shouldShowUnderError: boolean;
   shouldShowOverflowError: boolean;
+  quotation: TObject;
+  fetchQuotationInProgress: boolean;
+  fetchQuotationError: any;
 };
 
 const initialState: TOrderManagementState = {
@@ -350,9 +353,13 @@ const initialState: TOrderManagementState = {
   draftSubOrderChangesHistory: {},
   shouldShowUnderError: false,
   shouldShowOverflowError: false,
+  quotation: {},
+  fetchQuotationInProgress: false,
+  fetchQuotationError: null,
 };
 
 // ================ Thunk types ================ //
+const FETCH_QUOTATION = 'app/OrderManagement/FETCH_QUOTATION';
 
 // ================ Async thunks ================ //
 const loadData = createAsyncThunk(
@@ -928,6 +935,18 @@ const updateOrderFromDraftEdit = createAsyncThunk(
     await dispatch(loadData(orderId));
   },
 );
+const fetchQuotation = createAsyncThunk(
+  FETCH_QUOTATION,
+  async (quotationId: string, { extra: sdk }) => {
+    const quotation = denormalisedResponseEntities(
+      await sdk.listings.show({
+        id: quotationId,
+      }),
+    )[0];
+
+    return quotation;
+  },
+);
 
 export const orderManagementThunks = {
   loadData,
@@ -945,6 +964,7 @@ export const orderManagementThunks = {
   querySubOrderChangesHistory,
   updatePlanOrderDetail,
   updateOrderFromDraftEdit,
+  fetchQuotation,
 };
 
 // ================ Slice ================ //
@@ -1589,6 +1609,19 @@ const OrderManagementSlice = createSlice({
       })
       .addCase(updatePlanOrderDetail.rejected, (state) => {
         state.isUpdatingOrderDetails = false;
+      })
+
+      .addCase(fetchQuotation.pending, (state) => {
+        state.fetchQuotationInProgress = true;
+        state.fetchQuotationError = null;
+      })
+      .addCase(fetchQuotation.fulfilled, (state, { payload }) => {
+        state.fetchQuotationInProgress = false;
+        state.quotation = payload;
+      })
+      .addCase(fetchQuotation.rejected, (state, { error }) => {
+        state.fetchQuotationInProgress = false;
+        state.fetchQuotationError = error.message;
       });
   },
 });

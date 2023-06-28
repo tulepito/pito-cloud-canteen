@@ -5,13 +5,12 @@ import ReviewCartSection from '@components/OrderDetails/ReviewView/ReviewCartSec
 import ReviewOrderDetailsSection from '@components/OrderDetails/ReviewView/ReviewOrderDetailsSection/ReviewOrderDetailsSection';
 import Tabs from '@components/Tabs/Tabs';
 import {
-  calculatePriceQuotationInfo,
+  calculatePriceQuotationInfoFromQuotation,
   calculatePriceQuotationPartner,
 } from '@helpers/order/cartInfoHelper';
-import { groupFoodOrderByDate } from '@helpers/order/orderDetailHelper';
+import { groupFoodOrderByDateFromQuotation } from '@helpers/order/orderDetailHelper';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { Listing } from '@src/utils/data';
-import { EOrderType } from '@src/utils/enums';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 
 import {
@@ -44,8 +43,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   );
   const partnerServiceFee =
     Listing(order).getMetadata()?.serviceFees?.[currentPartnerId!];
-  const { orderType = EOrderType.group } = Listing(order).getMetadata();
-  const isGroupOrder = orderType === EOrderType.group;
+  const { packagePerMember = 0 } = Listing(order).getMetadata() || {};
 
   const priceQuotation = isPartner
     ? calculatePriceQuotationPartner({
@@ -54,9 +52,9 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
             ?.quotation,
         serviceFee: partnerServiceFee,
       })
-    : calculatePriceQuotationInfo({
-        planOrderDetail: orderDetail!,
-        order,
+    : calculatePriceQuotationInfoFromQuotation({
+        quotation: quotation!,
+        packagePerMember,
       });
 
   const handlePartnerChange = (tab: any) => {
@@ -127,9 +125,8 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
             <div className={css.clientTitle}>Báo giá khách hàng</div>
             <ReviewOrderDetailsSection
               outsideCollapsible
-              foodOrderGroupedByDate={groupFoodOrderByDate({
-                orderDetail: orderDetail!,
-                isGroupOrder,
+              foodOrderGroupedByDate={groupFoodOrderByDateFromQuotation({
+                quotation: quotation!,
               })}
             />
           </>
