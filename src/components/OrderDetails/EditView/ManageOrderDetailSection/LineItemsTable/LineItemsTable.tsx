@@ -35,11 +35,11 @@ type TLineItemsTableProps = {
 const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
   const {
     currentViewDate,
-    isDraftEditing,
-    ableToUpdateOrder,
-    shouldShowOverflowError,
-    shouldShowUnderError,
-    minQuantity,
+    isDraftEditing = false,
+    ableToUpdateOrder = true,
+    shouldShowOverflowError = false,
+    shouldShowUnderError = false,
+    minQuantity = 1,
     isAdminLayout = false,
   } = props;
   const intl = useIntl();
