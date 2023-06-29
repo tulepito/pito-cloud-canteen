@@ -134,6 +134,7 @@ export enum EOrderType {
 export enum EUserPermission {
   company = 'company',
   admin = 'admin',
+  partner = 'partner',
   normal = 'normal',
 }
 
@@ -145,6 +146,7 @@ export const startRouteBaseOnPermission = {
   [EUserPermission.company]: '/company',
   [EUserPermission.admin]: '/admin',
   [EUserPermission.normal]: '/participant',
+  [EUserPermission.partner]: '/partner',
 };
 
 export enum ERestaurantListingStatus {
