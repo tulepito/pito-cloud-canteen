@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .goBack {
   @include textTemplate(16px, $fontWeightBold, 24px);
@@ -30,4 +31,33 @@
 
 .quotationWrapper {
   margin-top: 40px;
+}
+
+.tableWrapper {
+  @include viewportMedium {
+    max-width: calc(100vw - 350px);
+    overflow-x: auto;
+    position: relative;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.table {
+  @include viewportMedium {
+    min-width: 1100px;
+  }
+}
+
+.tableBodyCell {
+  @include viewportMedium {
+    &:nth-child(2) {
+      max-width: 160px;
+    }
+    &:nth-child(3) {
+      max-width: 308px;
+    }
+  }
 }
