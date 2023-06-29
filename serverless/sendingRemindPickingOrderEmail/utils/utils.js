@@ -3,8 +3,8 @@ const addCommas = (num) =>
 
 const removeNonNumeric = (num) => num?.toString().replace(/[^0-9]/g, '');
 
-const parseThousandNumber = (value) => {
-  return addCommas(removeNonNumeric(value.toString()));
+const parseThousandNumber = (value = 0) => {
+  return addCommas(removeNonNumeric(value !== null ? value.toString() : '0'));
 };
 
 module.exports = {
