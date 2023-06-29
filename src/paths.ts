@@ -230,3 +230,9 @@ export const participantPaths = {
   AccountSpecialDemand: '/participant/account/special-demand',
   PlanDetail: '/participant/plans/[planId]',
 };
+
+export const partnerPaths = {
+  Home: '/partner',
+  ManageOrders: '/partner/orders',
+  OrderDetail: '/partner/orders/[orderId]',
+};
