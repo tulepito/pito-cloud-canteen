@@ -25,6 +25,10 @@ import {
   updatePlanDetailsApi,
 } from '@apis/orderApi';
 import { EOrderDetailsTableTab } from '@components/OrderDetails/EditView/ManageOrderDetailSection/OrderDetailsTable/OrderDetailsTable.utils';
+import {
+  calculateClientQuotation,
+  calculatePartnerQuotation,
+} from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { TPlan } from '@src/utils/orderTypes';
@@ -823,13 +827,14 @@ const querySubOrderChangesHistory = createAsyncThunk(
 
 const updateOrderFromDraftEdit = createAsyncThunk(
   'app/OrderManagement/UPDATE_ORDER_FROM_DRAFT_EDIT',
-  async (_, { getState, dispatch }) => {
+  async (foodOrderGroupedByDate: TObject[], { getState, dispatch }) => {
     const {
       id: { uuid: orderId },
     } = getState().OrderManagement.orderData!;
     const {
       id: { uuid: planId },
     } = getState().OrderManagement.planData!;
+    const { companyId } = getState().OrderManagement;
     const { draftSubOrderChangesHistory } = getState().OrderManagement;
     const { draftOrderDetail } = getState().OrderManagement;
     const updateParams = {
@@ -881,6 +886,25 @@ const updateOrderFromDraftEdit = createAsyncThunk(
         }
       }),
     );
+
+    const clientQuotation = calculateClientQuotation(foodOrderGroupedByDate);
+
+    const groupByRestaurantQuotationData = groupBy(
+      foodOrderGroupedByDate,
+      'restaurantId',
+    );
+
+    const partnerQuotation = calculatePartnerQuotation(
+      groupByRestaurantQuotationData,
+    );
+
+    const apiBody = {
+      orderId,
+      companyId: companyId!,
+      partner: partnerQuotation,
+      client: clientQuotation,
+    };
+    createQuotationApi(orderId, apiBody);
     await dispatch(loadData(orderId));
   },
 );

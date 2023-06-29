@@ -97,7 +97,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     let response;
     if (isDraftEditing) {
       response = await dispatch(
-        orderManagementThunks.updateOrderFromDraftEdit(),
+        orderManagementThunks.updateOrderFromDraftEdit(foodOrderGroupedByDate!),
       );
     } else {
       response = await dispatch(

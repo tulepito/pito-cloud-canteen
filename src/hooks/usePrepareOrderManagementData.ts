@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
@@ -33,6 +34,8 @@ export const usePrepareOrderDetailPageData = () => {
     bookerData,
     transactionDataMap,
     quotation,
+    draftOrderDetail,
+    draftSubOrderChangesHistory,
   } = useAppSelector((state) => state.OrderManagement);
   const currentUser = useAppSelector(currentUserSelector);
 
@@ -111,6 +114,7 @@ export const usePrepareOrderDetailPageData = () => {
     manageOrdersData,
   };
   /* =============== Review data =============== */
+  const isOrderEditing = !isEmpty(draftSubOrderChangesHistory);
   const foodOrderGroupedByDateFromOrderDetail = useMemo(
     () =>
       groupFoodOrderByDate({
@@ -126,8 +130,19 @@ export const usePrepareOrderDetailPageData = () => {
       }),
     [JSON.stringify(quotation)],
   );
+  const foodOrderGroupedByDateFromDraftOrderDetail = useMemo(
+    () =>
+      groupFoodOrderByDate({
+        orderDetail: draftOrderDetail,
+        isGroupOrder,
+      }),
+    [JSON.stringify(draftOrderDetail), isGroupOrder],
+  );
+
   const foodOrderGroupedByDate = isOrderIsPicking
     ? foodOrderGroupedByDateFromOrderDetail
+    : isOrderEditing
+    ? foodOrderGroupedByDateFromDraftOrderDetail
     : foodOrderGroupedByDateFromQuotation;
   const quotationInfo = useMemo(
     () =>
@@ -137,6 +152,15 @@ export const usePrepareOrderDetailPageData = () => {
       }),
     [orderData, orderDetail],
   );
+  const quotationDraftInfor = useMemo(
+    () =>
+      calculatePriceQuotationInfo({
+        planOrderDetail: draftOrderDetail,
+        order: orderData as TObject,
+      }),
+    [orderData, draftOrderDetail],
+  );
+
   const quotationInfor = useMemo(
     () =>
       calculatePriceQuotationInfoFromQuotation({
@@ -157,8 +181,11 @@ export const usePrepareOrderDetailPageData = () => {
     overflow,
     PITOFee = 0,
     totalWithoutVAT = 0,
-  } = isOrderIsPicking ? quotationInfo : quotationInfor;
-
+  } = isOrderIsPicking
+    ? quotationInfo
+    : isOrderEditing
+    ? quotationDraftInfor
+    : quotationInfor;
   const reviewInfoData = {
     reviewInfoValues,
     deliveryHour,
