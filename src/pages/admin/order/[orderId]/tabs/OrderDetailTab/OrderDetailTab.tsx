@@ -217,6 +217,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             onDownloadPriceQuotation={handleDownloadPriceQuotation}
             onGoBackToEditOrderPage={handleGoBackFromReviewMode}
             showStartPickingOrderButton
+            isAdminLayout
           />
         </RenderWhen.False>
       </RenderWhen>
