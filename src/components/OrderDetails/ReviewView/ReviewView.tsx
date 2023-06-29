@@ -19,6 +19,7 @@ type TReviewViewProps = TDefaultProps & {
   canEditInfo?: boolean;
   canGoBackEditMode?: boolean;
   showStartPickingOrderButton?: boolean;
+  isAdminLayout?: boolean;
   reviewViewData: ReturnType<
     typeof usePrepareOrderDetailPageData
   >['reviewViewData'];
@@ -33,6 +34,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     rootClassName,
     canEditInfo = true,
     canGoBackEditMode = false,
+    isAdminLayout = false,
     showStartPickingOrderButton = false,
     reviewViewData,
     onGoBackToEditOrderPage,
@@ -97,6 +99,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           onClickDownloadPriceQuotation={onDownloadPriceQuotation}
           foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
           target="client"
+          isAdminLayout={isAdminLayout}
         />
       </div>
     </div>
