@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import IconHome from '@components/Icons/IconHome/IconHome';
 import IconOrderManagement from '@components/Icons/IconOrderManagement/IconOrderManagement';
 import IconSetting from '@components/Icons/IconSetting/IconSetting';
+import IconTool from '@components/Icons/IconTool/IconTool';
 import IconUserManagement from '@components/Icons/IconUserManagement/IconUserManagement';
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
@@ -14,7 +15,6 @@ import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHan
 import { adminRoutes } from '@src/paths';
 
 import css from './AdminSidebar.module.scss';
-import IconTool from '@components/Icons/IconTool/IconTool';
 
 const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
   {

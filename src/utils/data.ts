@@ -435,7 +435,8 @@ export const entityRefs = (entities: any) =>
 export const CurrentUser = (user: TCurrentUser) => {
   const ensuredUser = ensureCurrentUser(user);
   const id = ensuredUser?.id?.uuid;
-  const profile = ensuredUser?.attributes?.profile || {};
+  const attributes = ensuredUser?.attributes;
+  const profile = attributes?.profile || {};
   const { privateData, publicData, protectedData, metadata } = profile;
 
   return {
@@ -459,6 +460,9 @@ export const CurrentUser = (user: TCurrentUser) => {
     },
     getPublicData: (): TObject => {
       return publicData || {};
+    },
+    getAttributes: (): TObject => {
+      return attributes || {};
     },
   };
 };

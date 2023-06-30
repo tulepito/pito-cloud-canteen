@@ -47,6 +47,11 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
     (state) => state.Order.orderRestaurantList,
     shallowEqual,
   );
+
+  const systemServiceFeePercentage = useAppSelector(
+    (state) => state.SystemAttributes.systemServiceFeePercentage,
+    shallowEqual,
+  );
   const fetchOrderRestaurantListInProgress = useAppSelector(
     (state) => state.Order.fetchOrderRestaurantListInProgress,
   );
@@ -65,19 +70,23 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
   ));
 
   const partnerFormInitialValues = useMemo(() => {
-    return restaurantList.reduce((result, restaurant) => {
+    return restaurantList.reduce((result: any, restaurant: TListing | null) => {
       const restaurantListing = Listing(restaurant);
 
       return {
         ...result,
         [`partnerFee-${restaurantListing.getId()}`]:
+          systemServiceFeePercentage * 100 ||
           serviceFees?.[restaurantListing.getId()] ||
-          restaurantListing.getMetadata()?.serviceFee ||
           0,
       };
     }, {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(restaurantList), JSON.stringify(serviceFees)]);
+  }, [
+    JSON.stringify(restaurantList),
+    JSON.stringify(serviceFees),
+    systemServiceFeePercentage,
+  ]);
 
   useEffect(() => {
     dispatch(orderAsyncActions.fetchOrderRestaurants());
