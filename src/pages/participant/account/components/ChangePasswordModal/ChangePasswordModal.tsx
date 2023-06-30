@@ -1,10 +1,7 @@
-import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Modal from '@components/Modal/Modal';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import useBoolean from '@hooks/useBoolean';
+import { useAppSelector } from '@hooks/reduxHooks';
 
-import { AccountThunks } from '../../Account.slice';
 import type { TChangePasswordFormValues } from '../ChangePasswordForm/ChangePasswordForm';
 import ChangePasswordForm from '../ChangePasswordForm/ChangePasswordForm';
 
@@ -13,28 +10,15 @@ import css from './ChangePasswordModal.module.scss';
 type TChangePasswordModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  handleSubmit: (values: TChangePasswordFormValues) => void;
+  initialValues: TChangePasswordFormValues;
 };
 const ChangePasswordModal: React.FC<TChangePasswordModalProps> = (props) => {
-  const { isOpen, onClose } = props;
-  const dispatch = useAppDispatch();
-  const changePasswordSuccessModalControl = useBoolean();
+  const { isOpen, onClose, handleSubmit, initialValues } = props;
 
   const changePasswordInProgress = useAppSelector(
     (state) => state.ParticipantAccount.changePasswordInProgress,
   );
-
-  const initialValues = { password: '', newPassword: '', confirmPassword: '' };
-
-  const handleSubmit = async (values: TChangePasswordFormValues) => {
-    const { password, newPassword } = values;
-    await dispatch(
-      AccountThunks.changePassword({
-        currentPassword: password,
-        newPassword,
-      }),
-    );
-    changePasswordSuccessModalControl.setTrue();
-  };
 
   return (
     <Modal
@@ -60,15 +44,6 @@ const ChangePasswordModal: React.FC<TChangePasswordModalProps> = (props) => {
           inProgress={changePasswordInProgress}
         />
       </div>
-      <ConfirmationModal
-        isPopup
-        id="ChangePasswordSuccessModal"
-        isOpen={changePasswordSuccessModalControl.value}
-        onClose={changePasswordSuccessModalControl.setFalse}
-        title="Thông báo"
-        description="Đổi mật khẩu thành công!"
-        secondForAutoClose={3}
-      />
     </Modal>
   );
 };

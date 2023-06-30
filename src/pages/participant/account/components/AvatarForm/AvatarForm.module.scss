@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .container {
   @include flexAlign(center, flex-start);
@@ -131,4 +132,8 @@
   @include textTemplate(20px, $fontWeightBold, 32px);
   text-align: center;
   margin-top: 12px;
+
+  @include viewportMedium {
+    display: none;
+  }
 }
