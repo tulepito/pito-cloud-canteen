@@ -689,3 +689,11 @@ export type TSubOrderChangeHistoryItem = {
   planOrderDate?: Date;
   type?: EOrderHistoryTypes;
 };
+export type TNotification = {
+  id: string;
+  message: string | ReactElement;
+  messageValues: TObject;
+  linkProps: any;
+  hidden: boolean;
+  type: ENotificationPopupTypes;
+};
