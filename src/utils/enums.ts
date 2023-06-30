@@ -999,3 +999,8 @@ export enum EOrderHistoryTypes {
   FOOD_INCREASED = 'FOOD_INCREASED',
   FOOD_DECREASED = 'FOOD_DECREASED',
 }
+export enum ENotificationPopupTypes {
+  success = 'success',
+  warning = 'warning',
+  error = 'error',
+}
