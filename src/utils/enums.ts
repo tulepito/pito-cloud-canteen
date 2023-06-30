@@ -1013,7 +1013,6 @@ export enum ENotificationType {
   PARTNER_FOOD_CREATED_BY_ADMIN = 'PARTNER_FOOD_CREATED_BY_ADMIN',
   PARTNER_PROFILE_UPDATED_BY_ADMIN = 'PARTNER_PROFILE_UPDATED_BY_ADMIN',
 }
-
 export enum ENotificationPopupTypes {
   success = 'success',
   warning = 'warning',
