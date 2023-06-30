@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { createSlice } from '@reduxjs/toolkit';
 
 import { createAsyncThunk } from '@redux/redux.helper';
@@ -26,7 +27,7 @@ const delayedHideNotifications = createAsyncThunk(
     const a = setTimeout(() => {
       const newNotifications = [...getState().notificationPopup.notifications];
       const notifications = newNotifications.map((item) => {
-        return item.id == payload.id ? { ...item, hidden: true } : item;
+        return item.id === payload.id ? { ...item, hidden: true } : item;
       });
       dispatch(NotificationSlice.actions.renewNotifications(notifications));
       clearTimeout(a);

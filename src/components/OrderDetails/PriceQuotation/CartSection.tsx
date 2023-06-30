@@ -1,7 +1,5 @@
 import { useIntl } from 'react-intl';
 
-import config from '@src/configs';
-
 import css from './CartSection.module.scss';
 
 type TCartSectionProps = {
@@ -14,6 +12,7 @@ type TCartSectionProps = {
   transportFee: string;
   PITOFee?: string;
   VATFee: string;
+  currentOrderVATPercentage: number;
 };
 
 const CartSection: React.FC<TCartSectionProps> = (props) => {
@@ -26,6 +25,7 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
     PITOFee,
     // transportFee,
     VATFee,
+    currentOrderVATPercentage,
   } = props;
   const intl = useIntl();
 
@@ -99,7 +99,7 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
               {
                 id: 'BookerOrderDetailsPriceQuotation.cartSection.rowLabel.VAT',
               },
-              { percent: config.VATPercentage * 100 },
+              { percent: currentOrderVATPercentage * 100 },
             )}
           </div>
           <div>{VATFee}</div>

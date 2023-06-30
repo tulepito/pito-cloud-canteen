@@ -147,6 +147,11 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const { totalPages = 1 } = useAppSelector(
     (state) => state.Order.manageOrdersPagination,
   );
+
+  const currentOrderVATPercentage = useAppSelector(
+    (state) => state.Order.currentOrderVATPercentage,
+  );
+
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   let currDebounceRef = debounceRef.current;
 
@@ -156,7 +161,11 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
     companyId = '',
     currentTab = EManageCompanyOrdersTab.ALL,
   } = query;
-  const tableData = parseEntitiesToTableData(orders, Number(page));
+  const tableData = parseEntitiesToTableData(
+    orders,
+    Number(page),
+    currentOrderVATPercentage,
+  );
   const tabItems = prepareTabItems({
     intl,
     currentTab,

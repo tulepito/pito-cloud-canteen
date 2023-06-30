@@ -31,6 +31,7 @@ import {
 } from '@helpers/listingSearchQuery';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
+import config from '@src/configs';
 import { CompanyPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import { convertWeekDay, renderDateRange } from '@utils/dates';
@@ -141,6 +142,8 @@ type TOrderInitialState = {
   getCompanyOrderSummaryInProgress: boolean;
   getCompanyOrderSummaryError: any;
   companyOrderSummary: TCompanyOrderSummary;
+
+  currentOrderVATPercentage: number;
 };
 
 const initialState: TOrderInitialState = {
@@ -234,6 +237,7 @@ const initialState: TOrderInitialState = {
     totalOrderDishes: 0,
     totalOrderCost: 0,
   },
+  currentOrderVATPercentage: config.VATPercentage,
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -636,14 +640,14 @@ const fetchOrder = createAsyncThunk(
       }),
     )[0];
 
-    const { bookerId } = Listing(response).getMetadata();
+    const { bookerId, orderVATPercentage } = Listing(response).getMetadata();
     const selectedBooker = denormalisedResponseEntities(
       await sdk.users.show({
         id: bookerId,
       }),
     )[0];
 
-    return { order: response, selectedBooker };
+    return { order: response, selectedBooker, orderVATPercentage };
   },
 );
 
@@ -1071,6 +1075,8 @@ const orderSlice = createSlice({
         fetchOrderInProgress: false,
         order: payload.order,
         selectedBooker: payload.selectedBooker,
+        currentOrderVATPercentage:
+          payload.orderVATPercentage || config.VATPercentage,
       }))
       .addCase(fetchOrder.rejected, (state, { error }) => ({
         ...state,

@@ -1,5 +1,6 @@
 import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
+import getSystemAttributes from '@services/getSystemAttributes';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { Listing } from '@utils/data';
 import { EOrderStates } from '@utils/enums';
@@ -25,6 +26,7 @@ export const startOrder = async (orderId: string) => {
       updatedAt: new Date().getTime(),
     },
   ]);
+  const { systemVATPercentage = 0 } = await getSystemAttributes();
 
   await integrationSdk.listings.update(
     {
@@ -32,6 +34,7 @@ export const startOrder = async (orderId: string) => {
       metadata: {
         orderState: EOrderStates.inProgress,
         orderStateHistory: updateOrderStateHistory,
+        orderVATPercentage: systemVATPercentage,
       },
     },
     { expand: true },

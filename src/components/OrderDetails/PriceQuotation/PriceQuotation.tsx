@@ -32,6 +32,7 @@ type TPriceQuotationProps = {
       totalWithVAT: string;
       transportFee: string;
       VATFee: string;
+      currentOrderVATPercentage: number;
     };
     orderDetailData: {
       foodOrderGroupedByDate: TObject[];

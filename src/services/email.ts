@@ -35,6 +35,7 @@ import partnerSubOrderIsCanceled, {
 } from '@src/utils/emailTemplate/partnerSubOrderIsCanceled';
 
 import { sendIndividualEmail } from './awsSES';
+import getSystemAttributes from './getSystemAttributes';
 import { fetchListing, fetchUser } from './integrationHelper';
 
 const systemSenderEmail = process.env.AWS_SES_SENDER_EMAIL;
@@ -261,11 +262,14 @@ export const emailSendingFactory = async (
           orderId,
         });
 
+        const { systemVATPercentage } = await getSystemAttributes();
+
         const { bookerUser } = emailDataSource;
         const { email: bookerEmail } = bookerUser?.getAttributes() || {};
         const emailTemplate = bookerSubOrderIsCanceled({
           ...emailDataSource,
           timestamp,
+          systemVATPercentage,
         });
         const subOrderDate = formatTimestamp(timestamp);
         const emailDataParams = {
@@ -422,10 +426,12 @@ export const emailSendingFactory = async (
         });
         const { partnerUser, orderListing } = emailDataSource;
         const { orderName } = orderListing.getPublicData();
+        const { systemVATPercentage } = await getSystemAttributes();
         const { email: partnerEmail } = partnerUser?.getAttributes() || {};
         const emailTemplate = partnerNewOrderAppear({
           ...emailDataSource,
           promotion,
+          systemVATPercentage,
         });
         const emailDataParams = {
           receiver: [partnerEmail],
