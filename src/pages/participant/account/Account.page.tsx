@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
@@ -9,6 +10,7 @@ import IconLogout from '@components/Icons/IconLogout/IconLogout';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
+import { useViewport } from '@hooks/useViewport';
 import { participantPaths } from '@src/paths';
 
 import AvatarForm from './components/AvatarForm/AvatarForm';
@@ -18,7 +20,14 @@ import css from './Account.module.scss';
 const AccountPage = () => {
   const router = useRouter();
   const handleLogout = useLogout();
+  const { isMobileLayout } = useViewport();
   const currentUser = useAppSelector((state) => state.user.currentUser);
+
+  useEffect(() => {
+    if (!isMobileLayout) {
+      router.push(participantPaths.AccountProfile);
+    }
+  }, [isMobileLayout]);
 
   const openProfileModal = () => {
     router.push(participantPaths.AccountProfile);
