@@ -14,6 +14,7 @@ import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHan
 import { adminRoutes } from '@src/paths';
 
 import css from './AdminSidebar.module.scss';
+import IconTool from '@components/Icons/IconTool/IconTool';
 
 const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
   {
@@ -119,7 +120,7 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
   },
   {
     id: 'setting',
-    Icon: IconSetting,
+    Icon: IconTool,
     nameLink: adminRoutes.AttributesSetting.path,
     label: 'AdminSidebar.settingLabel',
     isFirstLevel: true,
@@ -129,6 +130,30 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         label: 'AdminSidebar.attributesSettingLabel',
         nameLink: adminRoutes.AttributesSetting.path,
         highlightRefLinks: [adminRoutes.AttributesSetting.path],
+      },
+    ],
+  },
+  {
+    id: 'accountSetting',
+    Icon: IconSetting,
+    nameLink: adminRoutes.AdminAccountInformationSetting.path,
+    label: 'AdminSidebar.accountSettingLabel',
+    isFirstLevel: true,
+    childrenMenus: [
+      {
+        id: 'adminInformationSetting',
+        label: 'AdminSidebar.adminAccountInformationSetting',
+        nameLink: adminRoutes.AdminAccountInformationSetting.path,
+      },
+      {
+        id: 'adminAccountSetting',
+        label: 'AdminSidebar.adminAccountSetting',
+        nameLink: adminRoutes.AdminAccountSetting.path,
+      },
+      {
+        id: 'adminAccountPasswordSetting',
+        label: 'AdminSidebar.adminAccountPasswordSetting',
+        nameLink: adminRoutes.AdminAccountPasswordSetting.path,
       },
     ],
   },
