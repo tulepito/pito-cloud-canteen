@@ -175,7 +175,7 @@ export const usePrepareOrderDetailPageData = ({
 
         shouldIncludePITOFee: isEmpty(date),
       }),
-    [orderData, orderDetail],
+    [orderData, orderDetail, currentOrderVATPercentage],
   );
   const quotationDraftInfor = useMemo(
     () =>
@@ -189,7 +189,7 @@ export const usePrepareOrderDetailPageData = ({
         date,
         shouldIncludePITOFee: isEmpty(date),
       }),
-    [orderData, draftOrderDetail],
+    [orderData, draftOrderDetail, currentOrderVATPercentage],
   );
 
   const quotationInfor = useMemo(

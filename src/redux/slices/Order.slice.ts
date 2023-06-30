@@ -31,6 +31,7 @@ import {
 } from '@helpers/listingSearchQuery';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
+import config from '@src/configs';
 import { CompanyPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import { convertWeekDay, renderDateRange } from '@utils/dates';
@@ -1119,6 +1120,7 @@ const orderSlice = createSlice({
         fetchOrderInProgress: false,
         order: payload.order,
         selectedBooker: payload.selectedBooker,
+        currentOrderVATPercentage: config.VATPercentage,
       }))
       .addCase(fetchOrder.rejected, (state, { error }) => ({
         ...state,
