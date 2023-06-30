@@ -158,7 +158,7 @@ export const usePrepareOrderDetailPageData = () => {
         order: orderData as TObject,
         currentOrderVATPercentage,
       }),
-    [orderData, orderDetail],
+    [orderData, orderDetail, currentOrderVATPercentage],
   );
   const quotationDraftInfor = useMemo(
     () =>
@@ -167,7 +167,7 @@ export const usePrepareOrderDetailPageData = () => {
         order: orderData as TObject,
         currentOrderVATPercentage,
       }),
-    [orderData, draftOrderDetail],
+    [orderData, draftOrderDetail, currentOrderVATPercentage],
   );
 
   const quotationInfor = useMemo(
