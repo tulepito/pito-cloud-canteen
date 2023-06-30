@@ -18,6 +18,9 @@ type TAttributesState = {
 
   fetchAttributesInProgress: boolean;
   fetchAttributesError: boolean;
+
+  systemServiceFeePercentage: number;
+  systemVATPercentage: number;
 };
 const initialState: TAttributesState = {
   menuTypes: [],
@@ -28,6 +31,9 @@ const initialState: TAttributesState = {
 
   fetchAttributesInProgress: false,
   fetchAttributesError: false,
+
+  systemServiceFeePercentage: 0,
+  systemVATPercentage: 0,
 };
 
 // ================ Thunk types ================ //
@@ -63,12 +69,16 @@ const SystemAttributesSlice = createSlice({
           packaging = [],
           daySessions = [],
           nutritions = [],
+          systemVATPercentage = 0,
+          systemServiceFeePercentage,
         } = action.payload;
         state.categories = categories;
         state.packaging = packaging;
         state.daySessions = daySessions;
         state.nutritions = nutritions;
         state.fetchAttributesInProgress = false;
+        state.systemVATPercentage = systemVATPercentage;
+        state.systemServiceFeePercentage = systemServiceFeePercentage;
       })
       .addCase(fetchAttributes.rejected, (state) => {
         state.fetchAttributesInProgress = false;

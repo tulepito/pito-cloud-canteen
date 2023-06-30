@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo, useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
@@ -37,6 +38,11 @@ export const usePrepareOrderDetailPageData = () => {
     draftOrderDetail,
     draftSubOrderChangesHistory,
   } = useAppSelector((state) => state.OrderManagement);
+
+  const currentOrderVATPercentage = useAppSelector(
+    (state) => state.Order.currentOrderVATPercentage,
+  );
+
   const currentUser = useAppSelector(currentUserSelector);
 
   const { title: orderTitle = '' } = Listing(
@@ -149,16 +155,18 @@ export const usePrepareOrderDetailPageData = () => {
       calculatePriceQuotationInfo({
         planOrderDetail: orderDetail,
         order: orderData as TObject,
+        currentOrderVATPercentage,
       }),
-    [orderData, orderDetail],
+    [orderData, orderDetail, currentOrderVATPercentage],
   );
   const quotationDraftInfor = useMemo(
     () =>
       calculatePriceQuotationInfo({
         planOrderDetail: draftOrderDetail,
         order: orderData as TObject,
+        currentOrderVATPercentage,
       }),
-    [orderData, draftOrderDetail],
+    [orderData, draftOrderDetail, currentOrderVATPercentage],
   );
 
   const quotationInfor = useMemo(
@@ -247,6 +255,7 @@ export const usePrepareOrderDetailPageData = () => {
       transportFee: `${parseThousandNumber(transportFee)}đ`,
       VATFee: `${parseThousandNumber(VATFee)}đ`,
       PITOFee: `${parseThousandNumber(PITOFee)}đ`,
+      currentOrderVATPercentage,
     },
     orderDetailData: {
       foodOrderGroupedByDate,

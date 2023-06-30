@@ -88,12 +88,14 @@ export const formatPriceQuotationData = ({
   order,
   priceQuotation,
   orderDetail,
+  currentOrderVATPercentage,
 }: {
   company: TUser;
   booker: TUser;
   order: TListing;
   priceQuotation: TObject;
   orderDetail: TObject;
+  currentOrderVATPercentage: number;
 }) => {
   const {
     orderTitle,
@@ -147,6 +149,7 @@ export const formatPriceQuotationData = ({
       transportFee: `${parseThousandNumber(transportFee)}đ`,
       VATFee: `${parseThousandNumber(VATFee)}đ`,
       PITOFee: `${parseThousandNumber(PITOFee)}đ`,
+      currentOrderVATPercentage,
     },
     orderDetailData: {
       foodOrderGroupedByDate: groupFoodOrderByDate({
@@ -164,6 +167,7 @@ export const formatPriceQuotationDataPartner = ({
   priceQuotation,
   restaurantId,
   quotationDetail,
+  currentOrderVATPercentage,
 }: {
   company: TUser;
   booker: TUser;
@@ -171,6 +175,7 @@ export const formatPriceQuotationDataPartner = ({
   priceQuotation: TObject;
   restaurantId: string;
   quotationDetail: TObject;
+  currentOrderVATPercentage: number;
 }) => {
   const {
     orderTitle,
@@ -221,6 +226,7 @@ export const formatPriceQuotationDataPartner = ({
       promotion: `${parseThousandNumber(promotion)}đ`,
       totalWithVAT: `${parseThousandNumber(totalWithVAT)}đ`,
       VATFee: `${parseThousandNumber(VATFee)}đ`,
+      currentOrderVATPercentage,
     },
     orderDetailData: {
       foodOrderGroupedByDate: formatQuotationToFoodTableData(

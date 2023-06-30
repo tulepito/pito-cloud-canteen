@@ -5,7 +5,6 @@ import {
   getPCCFeeByMemberAmount,
   getTotalInfo,
 } from '@helpers/orderHelper';
-import config from '@src/configs';
 import {
   EOrderStates,
   EOrderType,
@@ -94,9 +93,11 @@ export const calculateTotalPriceAndDishes = ({
 export const calculatePriceQuotationInfo = ({
   planOrderDetail = {},
   order,
+  currentOrderVATPercentage,
 }: {
   planOrderDetail: TObject;
   order: TObject;
+  currentOrderVATPercentage: number;
 }) => {
   const {
     packagePerMember = 0,
@@ -164,7 +165,7 @@ export const calculatePriceQuotationInfo = ({
 
   const totalWithoutVAT =
     totalPrice + serviceFee + transportFee + PITOFee - promotion;
-  const VATFee = Math.round(totalWithoutVAT * config.VATPercentage);
+  const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage);
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage
     ? totalWithVAT - totalDishes * packagePerMember
@@ -189,9 +190,11 @@ export const calculatePriceQuotationInfo = ({
 export const calculatePriceQuotationPartner = ({
   quotation,
   serviceFee = 0,
+  currentOrderVATPercentage,
 }: {
   quotation: TQuotation;
   serviceFee: number;
+  currentOrderVATPercentage: number;
 }) => {
   const promotion = 0;
   const totalPrice = Object.keys(quotation).reduce(
@@ -209,7 +212,7 @@ export const calculatePriceQuotationPartner = ({
   );
   const serviceFeePrice = Math.round((totalPrice * serviceFee) / 100);
   const totalWithoutVAT = totalPrice - promotion - serviceFeePrice;
-  const VATFee = Math.round(totalWithoutVAT * config.VATPercentage);
+  const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage);
   const totalWithVAT = VATFee + totalWithoutVAT;
 
   return {

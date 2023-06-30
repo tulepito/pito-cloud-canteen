@@ -69,6 +69,10 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   const planData = useAppSelector((state) => state.OrderManagement.planData);
   const orderData = useAppSelector((state) => state.OrderManagement.orderData);
 
+  const currentOrderVATPercentage = useAppSelector(
+    (state) => state.Order.currentOrderVATPercentage,
+  );
+
   const {
     query: { orderId },
   } = router;
@@ -195,7 +199,10 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
             className={classNames(css.feeItemContainer, css.VATItemContainer)}>
             <div className={css.label}>
               {intl.formatMessage({ id: 'ReviewCardSection.VAT' })}
-              <Badge label="10%" className={css.VATBadge} />
+              <Badge
+                label={`${currentOrderVATPercentage * 100}%`}
+                className={css.VATBadge}
+              />
             </div>
             <div className={css.fee}>
               {parseThousandNumber(VATFee.toString())}đ

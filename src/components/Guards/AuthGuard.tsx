@@ -7,6 +7,7 @@ import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
 import { emailVerificationActions } from '@redux/slices/emailVerification.slice';
+import { SystemAttributesThunks } from '@redux/slices/systemAttributes.slice';
 import { currentUserSelector, userThunks } from '@redux/slices/user.slice';
 import { enGeneralPaths, generalPaths } from '@src/paths';
 
@@ -74,6 +75,10 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
       dispatch(emailVerificationActions.updateVerificationState(isVerified));
     }
   }, [isAuthenticated, isUserEmailVerified]);
+
+  useEffect(() => {
+    dispatch(SystemAttributesThunks.fetchAttributes());
+  }, []);
 
   // TODO: verify authentication
   useVerifyAuthentication(homePageNavigateCondition);
