@@ -37,7 +37,7 @@ const AVATAR_IMAGE_VARIANTS = [
 type TAvatarProps = TDefaultProps & {
   initialsClassName?: string;
   user: TCurrentUser | TUser;
-  renderSizes?: typeof AVATAR_SIZES_MEDIUM | typeof AVATAR_SIZES_LARGE;
+  renderSizes?: string;
   disableProfileLink?: boolean;
 };
 
