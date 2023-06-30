@@ -15,7 +15,6 @@ import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHan
 import { adminRoutes } from '@src/paths';
 
 import css from './AdminSidebar.module.scss';
-import IconTool from '@components/Icons/IconTool/IconTool';
 
 const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
   {
