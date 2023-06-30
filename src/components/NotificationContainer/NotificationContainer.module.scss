@@ -1,0 +1,11 @@
+@use '/src/styles/vars.scss' as *;
+.root {
+  position: fixed;
+  top: calc($adminTopbarHeight + 24px);
+  z-index: 100;
+  right: calc(50% - $adminSidebarWidth);
+  transform: translateX(calc(50% - $adminSidebarWidth));
+  > div {
+    margin-bottom: 10px;
+  }
+}
