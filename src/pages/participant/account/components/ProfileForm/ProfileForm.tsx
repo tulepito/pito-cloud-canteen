@@ -4,7 +4,10 @@ import { useIntl } from 'react-intl';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
+import type { TCurrentUser } from '@src/utils/types';
 import { phoneNumberFormatValid } from '@src/utils/validators';
+
+import AvatarForm from '../AvatarForm/AvatarForm';
 
 import css from './ProfileForm.module.scss';
 
@@ -18,12 +21,14 @@ type TProfileFormProps = {
   onSubmit: (values: TProfileFormValues) => void;
   initialValues: TProfileFormValues;
   inProgress: boolean;
+  currentUser?: TCurrentUser;
 };
 
 const ProfileForm: React.FC<TProfileFormProps> = ({
   onSubmit,
   initialValues,
   inProgress,
+  currentUser,
 }) => {
   const intl = useIntl();
   const validate = (values: TProfileFormValues) => {
@@ -65,52 +70,60 @@ const ProfileForm: React.FC<TProfileFormProps> = ({
     inProgress || submitting || hasValidationErrors || pristine;
 
   return (
-    <Form onSubmit={handleSubmit} className={css.root}>
-      <div className={css.fieldsContainer}>
-        <div className={css.fieldWrapper}>
-          <FieldTextInputComponent
-            id={`name`}
-            name="name"
-            label="Họ và tên"
-            input={name.input}
-            meta={name.meta}
-            placeholder="Tên"
-            className={css.fieldInput}
-          />
+    <div className={css.root}>
+      <div className={css.header}>Tài khoản cá nhân</div>
+      <div className={css.formContainer}>
+        <div className={css.avatarSection}>
+          <AvatarForm onSubmit={() => {}} currentUser={currentUser!} />
         </div>
-        <div className={css.fieldWrapper}>
-          <FieldTextInputComponent
-            id={`email`}
-            name="email"
-            label="Email"
-            onChange={(e: any) => e.preventDefault()}
-            input={email.input}
-            meta={email.meta}
-            placeholder="example@gmail.com"
-            className={css.fieldInput}
-          />
-        </div>
-        <div className={css.fieldWrapper}>
-          <FieldTextInputComponent
-            id={`phoneNumber`}
-            name="phoneNumber"
-            label="Số điện thoại"
-            input={phoneNumber.input}
-            meta={phoneNumber.meta}
-            placeholder="0123456789"
-            className={css.fieldInput}
-          />
-        </div>
-      </div>
+        <Form onSubmit={handleSubmit} className={css.form}>
+          <div className={css.fieldsContainer}>
+            <div className={css.fieldWrapper}>
+              <FieldTextInputComponent
+                id={`name`}
+                name="name"
+                label="Họ và tên"
+                input={name.input}
+                meta={name.meta}
+                placeholder="Tên"
+                className={css.fieldInput}
+              />
+            </div>
+            <div className={css.fieldWrapper}>
+              <FieldTextInputComponent
+                id={`email`}
+                name="email"
+                label="Email"
+                onChange={(e: any) => e.preventDefault()}
+                input={email.input}
+                meta={email.meta}
+                placeholder="example@gmail.com"
+                className={css.fieldInput}
+              />
+            </div>
+            <div className={css.fieldWrapper}>
+              <FieldTextInputComponent
+                id={`phoneNumber`}
+                name="phoneNumber"
+                label="Số điện thoại"
+                input={phoneNumber.input}
+                meta={phoneNumber.meta}
+                placeholder="0123456789"
+                className={css.fieldInput}
+              />
+            </div>
+          </div>
 
-      <Button
-        type="submit"
-        disabled={disabledSubmit}
-        inProgress={inProgress}
-        className={css.submitBtn}>
-        Lưu thay đổi
-      </Button>
-    </Form>
+          <Button
+            type="submit"
+            disabled={disabledSubmit}
+            inProgress={inProgress}
+            className={css.submitBtn}>
+            Lưu thay đổi
+          </Button>
+        </Form>
+      </div>
+    </div>
   );
 };
 

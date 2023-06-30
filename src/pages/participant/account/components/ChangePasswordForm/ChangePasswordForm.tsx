@@ -111,56 +111,61 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
 
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
-      <div className={css.fieldsContainer}>
-        <div className={css.fieldWrapper}>
-          <FieldPasswordInputComponent
-            id={`password`}
-            name="password"
-            label="Mật khẩu hiện tại"
-            input={passwordInput}
-            meta={password.meta}
-            placeholder="Nhập mật khẩu hiện tại"
-            className={css.fieldInput}
-          />
-          <div className={css.forgotPassword}>
-            <span onClick={navigateToPasswordRecoverPage}>Quên mật khẩu?</span>
+      <div className={css.header}>Đổi mật khẩu</div>
+      <div className={css.formContainer}>
+        <div className={css.fieldsContainer}>
+          <div className={css.fieldWrapper}>
+            <FieldPasswordInputComponent
+              id={`password`}
+              name="password"
+              label="Mật khẩu hiện tại"
+              input={passwordInput}
+              meta={password.meta}
+              placeholder="Nhập mật khẩu hiện tại"
+              className={css.fieldInput}
+            />
+            <div className={css.forgotPassword}>
+              <span onClick={navigateToPasswordRecoverPage}>
+                Quên mật khẩu?
+              </span>
+            </div>
           </div>
-        </div>
-        <div className={css.fieldWrapper}>
-          <FieldPasswordInputComponent
-            id={`newPassword`}
-            name="newPassword"
-            label="Mật khẩu mới"
-            input={newPasswordInput}
-            meta={newPassword.meta}
-            placeholder="Nhập mật khẩu mới"
-            className={css.fieldInput}
-          />
-        </div>
-        <div className={css.fieldWrapper}>
-          <FieldPasswordInputComponent
-            id={`confirmPassword`}
-            name="confirmPassword"
-            label="Xác nhận mật khẩu mới"
-            input={confirmPasswordInput}
-            meta={confirmPassword.meta}
-            placeholder="Xác nhận mật khẩu mới"
-            className={css.fieldInput}
-          />
+          <div className={css.fieldWrapper}>
+            <FieldPasswordInputComponent
+              id={`newPassword`}
+              name="newPassword"
+              label="Mật khẩu mới"
+              input={newPasswordInput}
+              meta={newPassword.meta}
+              placeholder="Nhập mật khẩu mới"
+              className={css.fieldInput}
+            />
+          </div>
+          <div className={css.fieldWrapper}>
+            <FieldPasswordInputComponent
+              id={`confirmPassword`}
+              name="confirmPassword"
+              label="Xác nhận mật khẩu mới"
+              input={confirmPasswordInput}
+              meta={confirmPassword.meta}
+              placeholder="Xác nhận mật khẩu mới"
+              className={css.fieldInput}
+            />
+          </div>
+
+          <RenderWhen condition={changePasswordError !== null}>
+            <ErrorMessage message="Mật khẩu hiện tại chưa đúng" />
+          </RenderWhen>
         </div>
 
-        <RenderWhen condition={changePasswordError !== null}>
-          <ErrorMessage message="Mật khẩu hiện tại chưa đúng" />
-        </RenderWhen>
+        <Button
+          type="submit"
+          disabled={disabledSubmit}
+          inProgress={inProgress}
+          className={css.submitBtn}>
+          Lưu thay đổi
+        </Button>
       </div>
-
-      <Button
-        type="submit"
-        disabled={disabledSubmit}
-        inProgress={inProgress}
-        className={css.submitBtn}>
-        Lưu thay đổi
-      </Button>
     </Form>
   );
 };
