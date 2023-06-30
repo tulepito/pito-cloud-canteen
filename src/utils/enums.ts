@@ -980,3 +980,9 @@ export enum EQuotationStatus {
   ACTIVE = 'active',
   INACTIVE = 'inactive',
 }
+
+export enum ENotificationPopupTypes {
+  success = 'success',
+  warning = 'warning',
+  error = 'error',
+}

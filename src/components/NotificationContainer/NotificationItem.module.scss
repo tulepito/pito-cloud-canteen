@@ -1,0 +1,22 @@
+@use '/src/styles/vars.scss' as *;
+.hidden {
+  visibility: hidden;
+}
+
+.messageWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $neutralGray1;
+  box-shadow: $boxShadowPopup;
+  min-width: 300px;
+  min-height: 48px;
+  border-radius: 8px;
+  gap: 16px;
+}
+
+.checkStatus {
+  path {
+    fill: $singleUseBadgeGreen2;
+  }
+}

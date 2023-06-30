@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import type Decimal from 'decimal.js';
 import type { NextPage } from 'next';
 
@@ -15,6 +16,7 @@ import type {
   EManageCompanyOrdersTab,
   EMenuMealType,
   EMenuTypes,
+  ENotificationPopupTypes,
   ENotificationTypes,
   EOrderDraftStates,
   EOrderStates,
@@ -659,3 +661,12 @@ export type TTransitionOrderState =
   | EOrderStates.inProgress
   | EOrderStates.pendingPayment
   | EOrderStates.completed;
+
+export type TNotification = {
+  id: string;
+  message: string | ReactElement;
+  messageValues: TObject;
+  linkProps: any;
+  hidden: boolean;
+  type: ENotificationPopupTypes;
+};
