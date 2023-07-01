@@ -35,3 +35,4 @@ export { default as ParticipantAccount } from '@pages/participant/account/Accoun
 export { default as ParticipantOrderList } from '@pages/participant/orders/OrderList.slice';
 export { default as ParticipantPlanPage } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';
 export { default as ParticipantSubOrderList } from '@pages/participant/sub-orders/SubOrders.slice';
+export { default as PartnerManageOrders } from '@pages/partner/orders/ManageOrders.slice';
