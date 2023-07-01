@@ -46,7 +46,6 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
   } = props;
 
   const dispatch = useAppDispatch();
-
   const intl = useIntl();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
