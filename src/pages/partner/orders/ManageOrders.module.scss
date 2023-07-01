@@ -1,0 +1,199 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.filterForm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 40px 0 40px 0;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  @include pageTitle;
+}
+
+.rowState {
+  padding: 5px;
+  border-radius: 5px;
+  max-width: 70%;
+  text-align: center;
+  background-color: #b7eb8f;
+}
+
+.input {
+  margin-bottom: 20px;
+}
+
+.orderTitle {
+  font-weight: $fontWeightBold;
+  color: $labelBlue2;
+  width: fit-content;
+  cursor: pointer;
+}
+
+.companyName {
+  font-weight: $fontWeightBold;
+  margin-bottom: 5px;
+}
+
+.headCell {
+  padding: 12px !important;
+
+  &:first-child {
+    @include viewportLarge {
+      width: 130px;
+    }
+  }
+  &:nth-child(2) {
+    @include viewportLarge {
+      max-width: 320px;
+    }
+  }
+  &:nth-child(3) {
+    @include viewportLarge {
+      min-width: 124px;
+      max-width: 180px;
+    }
+  }
+
+  &:nth-child(4) {
+    @include viewportLarge {
+      max-width: 120px;
+    }
+  }
+}
+
+.bodyCell {
+  vertical-align: top;
+  padding: 12px !important;
+
+  &:first-child {
+    @include viewportLarge {
+      width: 130px;
+      padding: 12px !important;
+    }
+  }
+  &:nth-child(2) {
+    @include viewportLarge {
+      max-width: 320px;
+    }
+  }
+  &:nth-child(3) {
+    @include viewportLarge {
+      min-width: 124px;
+      max-width: 180px;
+    }
+  }
+  &:nth-child(4) {
+    @include viewportLarge {
+      max-width: 120px;
+    }
+  }
+
+  &:nth-child(6) {
+    @include viewportLarge {
+      max-width: 200px;
+    }
+  }
+}
+
+.remainText {
+  margin: 5px 0 0 0;
+  font-weight: $fontWeightBold;
+}
+
+.badge {
+  border-radius: 4px;
+}
+
+.badgeLabel {
+  font-size: 12px;
+  color: $neutralGray6 !important;
+  text-align: center;
+}
+
+.orderName {
+  font-weight: bold;
+}
+
+.locationRow {
+  @include lineClamp(4);
+}
+
+.restaurantName {
+  @include lineClamp(1);
+}
+
+.tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.staffName {
+  @include textTemplate(14px, 600, 20px);
+}
+
+.totalPrice {
+  @include textTemplate(14px, 600, 20px);
+}
+
+.orderDetailTooltip {
+  background-color: $neutralGray1;
+  &:global.rc-tooltip {
+    opacity: 1 !important;
+  }
+}
+
+.tableWrapper {
+  @include viewportMedium {
+    max-width: calc(100vw - 350px);
+    overflow-x: scroll;
+    position: relative;
+  }
+}
+
+.filterBtnTooltipOverlay {
+  opacity: 1;
+  padding: 0;
+
+  :global(.rc-tooltip-inner) {
+    border-radius: 8px;
+    padding: 20px;
+    background: $neutralGray1;
+
+    /* Shadown/XL */
+    box-shadow: 0px 20px 24px 4px rgba(16, 24, 40, 0.1),
+      0px 8px 8px -4px rgba(16, 24, 40, 0.04);
+  }
+
+  :global(.rc-tooltip-arrow) {
+    display: none;
+  }
+}
+
+.filterBtn {
+  padding: 10px 20px;
+  min-height: unset;
+  display: flex;
+  column-gap: 8px;
+
+  .filterIconContainer {
+    width: 20px;
+    height: 20px;
+
+    .filterIcon {
+      margin: 2.5px auto;
+      width: auto;
+      height: 15px;
+    }
+  }
+}
