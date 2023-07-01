@@ -59,10 +59,6 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
     ...rest
   } = props;
 
-  if (label && !id) {
-    throw Error('id required when a label is given');
-  }
-
   const { valid, invalid, touched, error } = meta;
   const errorText = customErrorText || error;
 
