@@ -397,6 +397,47 @@ export const combineOrderDetailWithPriceInfo = ({
   );
 };
 
+export const calculateSubOrderPrice = ({
+  data,
+  orderType = EOrderType.group,
+}: {
+  data: TObject;
+  orderType?: EOrderType;
+}) => {
+  const isGroupOrder = orderType === EOrderType.group;
+  const { memberOrders, restaurant = {}, lineItems = [] } = data;
+  const { foodList: foodListOfDate } = restaurant;
+
+  if (isGroupOrder) {
+    const foodDataMap = getFoodDataMap({ foodListOfDate, memberOrders });
+    const foodDataList = Object.values(foodDataMap);
+    const totalInfo = getTotalInfo(foodDataList);
+
+    return {
+      totalPrice: totalInfo.totalPrice,
+      totalDishes: totalInfo.totalDishes,
+    };
+  }
+
+  return lineItems.reduce(
+    (
+      res: {
+        totalPrice: number;
+        totalDishes: number;
+      },
+      item: TObject,
+    ) => {
+      const { quantity = 1, price = 0 } = item || {};
+
+      return {
+        totalPrice: res.totalPrice + price,
+        totalDishes: res.totalDishes + quantity,
+      };
+    },
+    { totalPrice: 0, totalDishes: 0 },
+  );
+};
+
 export const getPCCFeeByMemberAmount = (memberAmount: number) => {
   if (memberAmount === 0) {
     return 0;
