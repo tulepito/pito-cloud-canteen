@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import isEmpty from 'lodash/isEmpty';
@@ -38,6 +38,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
 
   const dispatch = useAppDispatch();
   const {
+    isReady,
     query: { timestamp },
   } = useRouter();
   const intl = useIntl();
@@ -111,6 +112,12 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     setCurrentViewDate(Number(id));
     historyPushState('timestamp', id);
   };
+
+  useEffect(() => {
+    if (isReady) {
+      setCurrentViewDate(Number(timestamp || startDate));
+    }
+  }, [isReady, timestamp]);
 
   return (
     <RenderWhen condition={!isEmpty(dateList)}>
