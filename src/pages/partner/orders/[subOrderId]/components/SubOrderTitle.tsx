@@ -17,15 +17,11 @@ const SubOrderTitle: React.FC<TSubOrderTitleProps> = () => {
   const fetchOrderInProgress = useAppSelector(
     (state) => state.PartnerSubOrderDetail.fetchOrderInProgress,
   );
-  const { /* plan, */ transaction } = order || {};
+
+  const { transaction } = order || {};
   const orderGetter = Listing(order as TListing);
-  // const planGetter = Listing(plan);
-  console.debug('💫 > file: SubOrderTitle.tsx:21 > transaction: ', transaction);
 
   const { title: orderTitle = '' } = orderGetter.getAttributes();
-  console.debug('💫 > file: SubOrderTitle.tsx:23 > orderTile: ', orderTitle);
-
-  console.debug('💫 > file: SubOrderTitle.tsx:10 > order: ', order);
 
   return (
     <RenderWhen condition={!fetchOrderInProgress}>

@@ -26,11 +26,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const [order] = denormalisedResponseEntities(
           (await integrationSdk.listings.show({ id: orderId })) || [{}],
         );
-        const { plans = [] } = Listing(order).getMetadata();
+        const { plans = [], companyId } = Listing(order).getMetadata();
         const planId = plans[0];
-        let orderWithPlanDataMaybe = order;
+        let orderWithPlanDataMaybe = { ...order };
+
+        // TODO: query company info
+        const companyResponse = await integrationSdk.users.show({
+          id: companyId,
+        });
+        const [company] = denormalisedResponseEntities(companyResponse);
+
+        if (!isEmpty(company)) {
+          orderWithPlanDataMaybe = { ...orderWithPlanDataMaybe, company };
+        }
 
         if (planId) {
+          // TODO: query plan info
           const [planListing] = denormalisedResponseEntities(
             (await integrationSdk.listings.show({ id: planId })) || [{}],
           );
@@ -43,8 +54,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           const { orderDetail = {} } = Listing(planListing).getMetadata();
           const orderDetailOfDate = orderDetail[date];
-          const txId = orderDetailOfDate?.transactionId;
 
+          // TODO: query tx info
+          const txId = orderDetailOfDate?.transactionId;
           if (isEmpty(txId)) {
             return res
               .status(EHttpStatusCode.BadRequest)
@@ -57,7 +69,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             })) || [{}],
           );
 
-          orderWithPlanDataMaybe = { ...order, plan: planListing, transaction };
+          orderWithPlanDataMaybe = {
+            ...orderWithPlanDataMaybe,
+            plan: planListing,
+            transaction,
+          };
         }
 
         return res.status(200).json({ order: orderWithPlanDataMaybe });
