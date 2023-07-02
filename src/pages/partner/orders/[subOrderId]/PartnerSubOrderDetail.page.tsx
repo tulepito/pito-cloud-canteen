@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 
 import { useAppDispatch } from '@hooks/reduxHooks';
 
+import SubOrderInfo from './components/SubOrderInfo';
 import SubOrderTitle from './components/SubOrderTitle';
 import { PartnerSubOrderDetailThunks } from './PartnerSubOrderDetail.slice';
 
@@ -33,6 +34,7 @@ const PartnerSubOrderDetailPage: React.FC<
   return (
     <div className={css.root}>
       <SubOrderTitle />
+      <SubOrderInfo />
     </div>
   );
 };
