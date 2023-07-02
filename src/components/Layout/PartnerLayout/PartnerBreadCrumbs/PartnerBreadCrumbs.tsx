@@ -50,7 +50,6 @@ export const PartnerBreadCrumbs = () => {
       const activeKey = Object.keys(partnerRoutes).find((key) => {
         return partnerRoutes[key as PartnerRouteKey].path === currentRoute;
       }) as PartnerRouteKey;
-
       const crumb = {
         link,
         route,
