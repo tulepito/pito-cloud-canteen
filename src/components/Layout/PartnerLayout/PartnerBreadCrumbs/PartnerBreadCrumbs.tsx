@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import { adminRoutes } from '@src/paths';
-import type { AdminRouteKey } from '@utils/types';
+import { partnerRoutes } from '@src/paths';
+import type { PartnerRouteKey } from '@utils/types';
 
 import css from './PartnerBreadCrumbs.module.scss';
 
-const combineAccumulatively = (segments: string[], isAdminRoute: boolean) => {
+const combineAccumulatively = (segments: string[], isMatchRole: boolean) => {
   const links = segments.reduce(
     (acc: string[], cur: string, curIndex: number) => {
       const last = curIndex > 1 ? acc[curIndex - 1] : '';
@@ -21,7 +21,7 @@ const combineAccumulatively = (segments: string[], isAdminRoute: boolean) => {
     [],
   );
 
-  if (isAdminRoute) {
+  if (isMatchRole) {
     return links.filter((l: string) => l !== '/');
   }
 
@@ -40,20 +40,20 @@ export const PartnerBreadCrumbs = () => {
   const [crumbs, setCrumbs] = useState<TCrumb[]>([]);
 
   useEffect(() => {
-    const isAdminRoute = pathname.startsWith('/admin');
+    const isMatchRole = pathname.startsWith('/partner');
     const segmentsPath = asPath.split('/');
     const segmentsRoute = route.split('/');
-    const crumbLinks = combineAccumulatively(segmentsPath, isAdminRoute);
-    const crumbLabels = combineAccumulatively(segmentsRoute, isAdminRoute);
+    const crumbLinks = combineAccumulatively(segmentsPath, isMatchRole);
+    const crumbLabels = combineAccumulatively(segmentsRoute, isMatchRole);
     const newCrumbs = crumbLinks.map((link: string, index: number) => {
       const currentRoute = crumbLabels[index];
-      const activeKey = Object.keys(adminRoutes).find((key) => {
-        return adminRoutes[key as AdminRouteKey].path === currentRoute;
-      }) as AdminRouteKey;
+      const activeKey = Object.keys(partnerRoutes).find((key) => {
+        return partnerRoutes[key as PartnerRouteKey].path === currentRoute;
+      }) as PartnerRouteKey;
       const crumb = {
         link,
         route,
-        label: adminRoutes?.[activeKey]?.label,
+        label: partnerRoutes?.[activeKey]?.label,
       };
 
       return crumb;
