@@ -6,6 +6,7 @@ import Avatar from '@components/Avatar/Avatar';
 import { InlineTextButton } from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconBell from '@components/Icons/IconBell/IconBell';
+import IconMail from '@components/Icons/IconMail/IconMail';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
@@ -43,6 +44,9 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
         <PitoLogo className={css.logo} />
       </div>
       <div className={css.headerLeft}>
+        <InlineTextButton type="button">
+          <IconMail className={css.iconMail} />
+        </InlineTextButton>
         <InlineTextButton type="button">
           <IconBell className={css.iconBell} />
         </InlineTextButton>

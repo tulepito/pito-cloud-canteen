@@ -250,5 +250,12 @@ export const participantPaths = {
 export const partnerPaths = {
   Home: '/partner',
   ManageOrders: '/partner/orders',
-  OrderDetail: '/partner/orders/[orderId]',
+  SubOrderDetail: '/partner/orders/[orderId]',
+};
+
+export const partnerRoutes = {
+  ManageOrders: {
+    path: partnerPaths.ManageOrders,
+    label: 'Danh sách đơn hàng',
+  },
 };
