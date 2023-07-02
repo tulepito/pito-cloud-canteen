@@ -2,7 +2,7 @@ import type Decimal from 'decimal.js';
 import type { NextPage } from 'next';
 
 import { types as sdkLoader } from '@sharetribe/sdk';
-import type { adminRoutes } from '@src/paths';
+import type { adminRoutes, partnerRoutes } from '@src/paths';
 
 import type {
   EAvailabilityPlans,
@@ -429,6 +429,7 @@ export type TFormLabel =
   | string;
 
 export type AdminRouteKey = keyof typeof adminRoutes;
+export type PartnerRouteKey = keyof typeof partnerRoutes;
 
 export type TAddress = {
   predictions: any[];
