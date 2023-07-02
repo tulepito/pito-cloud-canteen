@@ -11,6 +11,7 @@ import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import Tooltip from '@components/Tooltip/Tooltip';
@@ -61,12 +62,20 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'title',
     label: 'ID',
-    render: ({ subOrderTitle }: any) => {
+    render: ({ id, date, subOrderTitle }: any) => {
       const titleComponent = (
         <div className={css.orderTitle}>#{subOrderTitle}</div>
       );
 
-      return <>{titleComponent}</>;
+      return (
+        <NamedLink
+          path={partnerPaths.SubOrderDetail}
+          params={{
+            orderId: `${id}_${date.toString()}`,
+          }}>
+          {titleComponent}
+        </NamedLink>
+      );
     },
     sortable: true,
   },
@@ -166,7 +175,6 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
       restaurant,
       lineItems = [],
     } = entity;
-
     const dayIndex = new Date(Number(date)).getDay();
 
     const { totalPrice } = calculateSubOrderPrice({
