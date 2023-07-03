@@ -27,7 +27,7 @@ const SubOrderSummary: React.FC<TSubOrderSummaryProps> = () => {
   );
 
   const {
-    query: { subOrderId },
+    query: { subOrderId = '' },
   } = router;
 
   // eslint-disable-next-line no-unsafe-optional-chaining

@@ -1,44 +1,67 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import { parseThousandNumber } from '@helpers/format';
+import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
-import type { TObject } from '@utils/types';
+import { CurrentUser, Listing } from '@src/utils/data';
+import type { TListing } from '@utils/types';
 
 import css from './SubOrderCart.module.scss';
 
 type TSubOrderCartProps = {
   className?: string;
-  data?: TObject;
   onClickDownloadPriceQuotation?: () => void;
   title?: string;
 };
 
 const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
-  const {
-    className,
-    data: {
-      promotion = 0,
-      serviceFee = 0,
-      serviceFeePrice = 0,
-      totalPrice = 0,
-      totalWithoutVAT = 0,
-      totalWithVAT = 0,
-      VATFee = 0,
-    } = {},
-    onClickDownloadPriceQuotation,
-    title,
-  } = props;
+  const { className, onClickDownloadPriceQuotation, title } = props;
 
   const intl = useIntl();
+  const router = useRouter();
+  const order = useAppSelector((state) => state.PartnerSubOrderDetail.order);
+  const currentUser = useAppSelector((state) => state.user.currentUser);
 
+  const {
+    query: { subOrderId = '' },
+  } = router;
+
+  // eslint-disable-next-line no-unsafe-optional-chaining
+  const [, date] = (subOrderId as string)?.split('_');
+  const { restaurantListingId } = CurrentUser(currentUser!).getMetadata();
+  const { plan } = order;
+
+  const orderGetter = Listing(order as TListing);
+  const planGetter = Listing(plan as TListing);
+  const { orderVATPercentage = 0, serviceFees: serviceFeePercentageMap = {} } =
+    orderGetter.getMetadata();
+  const { orderDetail: planOrderDetail = {} } = planGetter.getMetadata();
+  const serviceFeePercentage =
+    serviceFeePercentageMap[restaurantListingId] || 0;
   const isDownloadingPriceQuotation = useAppSelector(
     (state) => state.priceQuotation.isDownloading,
   );
 
+  const {
+    promotion = 0,
+    serviceFee = 0,
+    totalPrice = 0,
+    totalWithoutVAT = 0,
+    totalWithVAT = 0,
+    VATFee = 0,
+  } = calculatePriceQuotationInfo({
+    planOrderDetail,
+    order,
+    currentOrderVATPercentage: orderVATPercentage,
+    currentOrderServiceFeePercentage: serviceFeePercentage,
+    date,
+    shouldIncludePITOFee: false,
+  });
   const rootClasses = classNames(css.root, className);
   const titleClasses = classNames(css.title, {});
   const downloadPriceQuotationClasses = classNames(css.downloadPriceQuotation, {
@@ -67,10 +90,13 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
           <div className={css.feeItemContainer}>
             <div className={css.label}>
               {intl.formatMessage({ id: 'ReviewCardSection.serviceFee' })}
-              <Badge label={`${serviceFee}%`} className={css.VATBadge} />
+              <Badge
+                label={`${serviceFeePercentage}%`}
+                className={css.VATBadge}
+              />
             </div>
             <div className={css.fee}>
-              {parseThousandNumber(serviceFeePrice.toString())}đ
+              {parseThousandNumber(serviceFee.toString())}đ
             </div>
           </div>
         </div>
@@ -103,7 +129,10 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
             className={classNames(css.feeItemContainer, css.VATItemContainer)}>
             <div className={css.label}>
               {intl.formatMessage({ id: 'ReviewCardSection.VAT' })}
-              <Badge label="10%" className={css.VATBadge} />
+              <Badge
+                label={`${Math.round(orderVATPercentage * 100)}%`}
+                className={css.VATBadge}
+              />
             </div>
             <div className={css.fee}>
               {parseThousandNumber(VATFee.toString())}đ
