@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import orderServices from '@pages/api/apiServices/order/index.service';
+import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { getCurrentUser, handleError } from '@services/sdk';
 import { CurrentUser, User } from '@src/utils/data';
@@ -106,4 +107,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   }
 }
 
-export default handler;
+export default cookies(handler);
