@@ -71,7 +71,7 @@ const TABLE_COLUMN: TColumn[] = [
         <NamedLink
           path={partnerPaths.SubOrderDetail}
           params={{
-            orderId: `${id}_${date.toString()}`,
+            subOrderId: `${id}_${date.toString()}`,
           }}>
           {titleComponent}
         </NamedLink>
