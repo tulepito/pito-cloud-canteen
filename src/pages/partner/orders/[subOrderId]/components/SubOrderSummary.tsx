@@ -49,7 +49,9 @@ const SubOrderSummary: React.FC<TSubOrderSummaryProps> = () => {
 
   return (
     <RenderWhen condition={!fetchOrderInProgress}>
-      <Collapsible label={intl.formatMessage({ id: 'SubOrderSummary.title' })}>
+      <Collapsible
+        className={css.root}
+        label={intl.formatMessage({ id: 'SubOrderSummary.title' })}>
         <div className={css.tableContainer}>
           <div className={css.tableHead}>
             <div>

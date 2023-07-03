@@ -22,6 +22,7 @@
     flex-grow: 1;
 
     @include viewportLargeWithPaddings {
+      width: 30%;
       max-width: 250px;
     }
 
@@ -40,6 +41,10 @@
     text-align: right;
     flex-basis: 140px;
   }
+}
+
+.root {
+  margin: 32px 0;
 }
 
 .tableContainer {
