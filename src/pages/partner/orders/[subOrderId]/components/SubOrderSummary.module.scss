@@ -47,6 +47,16 @@
   margin: 32px 0;
 }
 
+.viewOrderDetail {
+  margin-top: 8px;
+  padding: 8px;
+  min-height: unset;
+
+  .arrowIcon {
+    margin-left: 4px;
+  }
+}
+
 .tableContainer {
   border-radius: 8px;
   overflow: hidden;
@@ -104,4 +114,9 @@
   border-color: $neutralGray6;
   border-right-color: $neutralGray1;
   border-left-color: $neutralGray1;
+}
+
+.loading {
+  margin: 32px 0;
+  height: 120px;
 }
