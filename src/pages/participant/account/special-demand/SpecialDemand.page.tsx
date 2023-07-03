@@ -48,9 +48,18 @@ const SpecialDemandPage: React.FC = () => {
     [JSON.stringify(allergies), JSON.stringify(nutritions)],
   );
   const handleSubmit = async (values: TSpecialDemandFormValues) => {
-    await dispatch(AccountThunks.updateSpecialDemand(values));
-    await dispatch(userThunks.fetchCurrentUser());
-    updateSpecialDemandSuccessModalControl.setTrue();
+    const { meta: updateSpecialDemandMeta } = await dispatch(
+      AccountThunks.updateSpecialDemand(values),
+    );
+    const { meta: fetchCurrentUserMeta } = await dispatch(
+      userThunks.fetchCurrentUser(),
+    );
+    if (
+      updateSpecialDemandMeta.requestStatus === 'fulfilled' &&
+      fetchCurrentUserMeta.requestStatus === 'fulfilled'
+    ) {
+      updateSpecialDemandSuccessModalControl.setTrue();
+    }
   };
 
   return (
