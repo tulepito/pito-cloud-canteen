@@ -1006,3 +1006,29 @@ export enum ENotificationPopupTypes {
   warning = 'warning',
   error = 'error',
 }
+export const ORDER_ADMIN_FILTER_OPTIONS = [
+  {
+    key: 'inProgress',
+    label: 'Đang triển khai',
+  },
+  {
+    key: 'delivering',
+    label: 'Đang giao hàng',
+  },
+  {
+    key: 'delivered',
+    label: 'Đã giao hàng',
+  },
+  {
+    key: 'pendingPayment',
+    label: 'Chưa thanh toán',
+  },
+  {
+    key: 'completed',
+    label: 'Đã thanh toán',
+  },
+  {
+    key: 'canceled',
+    label: 'Hủy đơn',
+  },
+];

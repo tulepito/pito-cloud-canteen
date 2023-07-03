@@ -9,11 +9,10 @@ import { useRouter } from 'next/router';
 
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FieldMultipleSelect from '@components/FormFields/FieldMultipleSelect/FieldMultipleSelect';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
@@ -25,6 +24,7 @@ import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
@@ -32,11 +32,9 @@ import {
   partnerThunks,
 } from '@redux/slices/partners.slice';
 import { adminRoutes } from '@src/paths';
-import {
-  EListingStates,
-  ERestaurantListingStatus,
-  RESTAURANT_STATUS_OPTIONS,
-} from '@utils/enums';
+import { EListingStates, ERestaurantListingStatus } from '@utils/enums';
+
+import ManagePartnerFilterForm from './components/MaganePartnerFilterForm/ManagePartnerFilterForm';
 
 import css from './ManagePartners.module.scss';
 
@@ -445,30 +443,28 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
       </div>
       <div className={css.filterWrapper}>
         <IntegrationFilterModal
-          onSubmit={onSubmit}
-          title={<FormattedMessage id="ManagePartners.filterModal.title" />}
+          leftFilters={
+            <Tooltip
+              tooltipContent={
+                <ManagePartnerFilterForm
+                  onSubmit={onSubmit}
+                  initialValues={{ keywords, meta_status: groupStatus }}
+                />
+              }
+              placement="bottomLeft"
+              trigger="click"
+              overlayInnerStyle={{ backgroundColor: '#fff', padding: 20 }}>
+              <Button
+                type="button"
+                variant="secondary"
+                className={css.filterButton}>
+                <IconFilter className={css.filterIcon} />
+                <FormattedMessage id="IntegrationFilterModal.filterMessage" />
+              </Button>
+            </Tooltip>
+          }
           onClear={onClear}
-          initialValues={{ keywords, meta_status: groupStatus }}>
-          {() => (
-            <>
-              <FieldTextInput
-                className={css.field}
-                name="keywords"
-                id="keywords"
-                label="Tên đối tác"
-                placeholder="Tìm kiếm"
-              />
-              <FieldMultipleSelect
-                className={css.field}
-                name="meta_status"
-                id="meta_status"
-                label="Trạng thái"
-                placeholder="Chọn trạng thái"
-                options={RESTAURANT_STATUS_OPTIONS}
-              />
-            </>
-          )}
-        </IntegrationFilterModal>
+        />
       </div>
       {content}
 
