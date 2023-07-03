@@ -44,12 +44,14 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
         <PitoLogo className={css.logo} />
       </div>
       <div className={css.headerLeft}>
-        <InlineTextButton type="button">
-          <IconMail className={css.iconMail} />
-        </InlineTextButton>
-        <InlineTextButton type="button">
-          <IconBell className={css.iconBell} />
-        </InlineTextButton>
+        <div className={css.actionContainer}>
+          <InlineTextButton type="button">
+            <IconMail className={css.iconMail} />
+          </InlineTextButton>
+          <InlineTextButton type="button">
+            <IconBell className={css.iconBell} />
+          </InlineTextButton>
+        </div>
         <div className={css.line}></div>
         <ProfileMenu>
           <ProfileMenuLabel className={css.profileMenuWrapper}>
