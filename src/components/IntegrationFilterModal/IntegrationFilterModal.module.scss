@@ -1,4 +1,15 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  @include flexAlign(center, space-between);
+  width: 100%;
+}
+
+.rightButtons {
+  display: flex;
+  gap: 16px;
+}
 
 .modalContainer {
   max-width: 500px;
@@ -8,6 +19,12 @@
 .filterIcon {
   margin-right: 10px;
   fill: $neutralGray6;
+}
+
+.filterBtn {
+  width: 160px;
+  height: 48px;
+  margin: 20px auto 0;
 }
 
 .filterButton {
@@ -44,6 +61,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding: 20px;
 }
 
 .clearButton {
@@ -60,4 +78,8 @@
 
 .container {
   overflow: visible !important;
+}
+
+.tooltipOverlay {
+  padding: 20px 0;
 }

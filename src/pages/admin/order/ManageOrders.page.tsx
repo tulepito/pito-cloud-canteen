@@ -10,8 +10,7 @@ import { useRouter } from 'next/router';
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
@@ -39,6 +38,10 @@ import type {
   TTableSortValue,
 } from '@utils/types';
 import { parsePrice } from '@utils/validators';
+
+import DownloadColumnListForm from './ManageOrderFilterForms/DownloadColumnListForm/DownloadColumnListForm';
+import FilterColumnForm from './ManageOrderFilterForms/FilterColumnForm/FilterColumnForm';
+import FilterForm from './ManageOrderFilterForms/FilterForm/FilterForm';
 
 import css from './ManageOrders.module.scss';
 
@@ -157,7 +160,7 @@ const TABLE_COLUMN: TColumn[] = [
   },
   {
     key: 'bookerName',
-    label: 'Nguời đại diện',
+    label: 'Khách hàng',
     render: (data: any) => {
       return <div>{data.displayName}</div>;
     },
@@ -473,69 +476,68 @@ const ManageOrdersPage = () => {
       <div className={css.filterForm}>
         <IntegrationFilterModal
           onClear={onClearFilter}
-          initialValues={{
-            meta_state: groupStateString,
-            keywords,
-            meta_startDate: meta_startDate
-              ? new Date(meta_startDate as string).getTime()
-              : undefined,
-            meta_endDate: meta_endDate
-              ? new Date(meta_endDate as string).getTime()
-              : undefined,
-          }}
-          onSubmit={onSubmit}>
-          {({ values, form }: any) => {
-            const setStartDate = (date: Date) => {
-              form.change('meta_startDate', date);
-              if (values.meta_endDate) {
-                form.change('meta_endDate', undefined);
-              }
-            };
-            const setEndDate = (date: Date) => {
-              form.change('meta_endDate', date);
-            };
-
-            const minEndDate = addDays(values.meta_startDate, 1);
-
-            return (
-              <>
-                <FieldTextInput
-                  name="keywords"
-                  id="keywords"
-                  label="Mã đơn"
-                  placeholder="Nhập mã đơn"
-                  className={css.input}
+          leftFilters={
+            <Tooltip
+              tooltipContent={
+                <FilterForm
+                  onSubmit={onSubmit}
+                  initialValues={{
+                    meta_state: groupStateString,
+                    keywords,
+                    meta_startDate: meta_startDate
+                      ? new Date(meta_startDate as string).getTime()
+                      : undefined,
+                    meta_endDate: meta_endDate
+                      ? new Date(meta_endDate as string).getTime()
+                      : undefined,
+                  }}
                 />
-
-                <label className={css.labelDate}>
-                  <FormattedMessage id="ManageOrderPage.createDateLabel" />
-                </label>
-                <div className={css.dateInputs}>
-                  <FieldDatePicker
-                    id="meta_startDate"
-                    name="meta_startDate"
-                    selected={values.meta_startDate}
-                    onChange={setStartDate}
-                    dateFormat={'dd MMMM, yyyy'}
-                    placeholderText={'Nhập ngày bắt đầu'}
-                    autoComplete="off"
+              }
+              placement="bottomLeft"
+              trigger="click"
+              overlayInnerStyle={{ backgroundColor: '#fff', padding: 0 }}>
+              <Button
+                type="button"
+                variant="secondary"
+                className={css.filterButton}>
+                <IconFilter className={css.filterIcon} />
+                <FormattedMessage id="IntegrationFilterModal.filterMessage" />
+              </Button>
+            </Tooltip>
+          }
+          rightFilters={
+            <>
+              <Tooltip
+                tooltipContent={
+                  <FilterColumnForm
+                    onSubmit={() => {}}
+                    initialValues={{
+                      columnName: [],
+                    }}
                   />
-                  <FieldDatePicker
-                    id="meta_endDate"
-                    name="meta_endDate"
-                    onChange={setEndDate}
-                    selected={values.meta_endDate}
-                    dateFormat={'dd MMMM, yyyy'}
-                    placeholderText={'Nhập ngày kết thúc'}
-                    autoComplete="off"
-                    minDate={minEndDate}
-                    disabled={!values.meta_startDate}
+                }
+                placement="bottomRight"
+                trigger="click"
+                overlayInnerStyle={{ backgroundColor: '#fff', padding: 0 }}>
+                <Button variant="secondary">Cột</Button>
+              </Tooltip>
+              <Tooltip
+                tooltipContent={
+                  <DownloadColumnListForm
+                    onSubmit={() => {}}
+                    initialValues={{
+                      downloadColumnListName: [],
+                    }}
                   />
-                </div>
-              </>
-            );
-          }}
-        </IntegrationFilterModal>
+                }
+                placement="bottomRight"
+                trigger="click"
+                overlayInnerStyle={{ backgroundColor: '#fff', padding: 0 }}>
+                <Button variant="secondary">Tải danh sách</Button>
+              </Tooltip>
+            </>
+          }
+        />
       </div>
       {content}
     </div>
