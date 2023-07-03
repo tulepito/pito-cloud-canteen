@@ -560,8 +560,6 @@ const OrderDetailPage = () => {
       onSaveOrderNote={onSaveOrderNote}
       onDownloadReviewOrderResults={onDownloadReviewOrderResults}
       orderData={orderData as TListing}
-      onSaveOrderNote={onSaveOrderNote}
-      onDownloadReviewOrderResults={onDownloadReviewOrderResults}
     />
   );
 
