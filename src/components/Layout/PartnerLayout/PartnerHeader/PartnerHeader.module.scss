@@ -27,10 +27,16 @@
     align-items: center;
     justify-content: flex-end;
 
+    .actionContainer {
+      display: flex;
+      flex-direction: row;
+      column-gap: 26px;
+    }
+
     .line {
       height: 30px;
       width: 1px;
-      margin: 0 25px 0 28px;
+      margin: 0 26px;
       background-color: $neutralGray4;
     }
 
@@ -44,6 +50,9 @@
     }
 
     .iconMail {
+      & path {
+        fill: $neutralGray6;
+      }
     }
 
     .profileMenuWrapper {
