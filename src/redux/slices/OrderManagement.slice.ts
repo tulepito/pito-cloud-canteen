@@ -48,6 +48,8 @@ import type {
   TUser,
 } from '@utils/types';
 
+import { SystemAttributesThunks } from './systemAttributes.slice';
+
 export const QUERY_SUB_ORDER_CHANGES_HISTORY_PER_PAGE = 3;
 
 export const checkMinMaxQuantity = (
@@ -318,8 +320,9 @@ const FETCH_QUOTATION = 'app/OrderManagement/FETCH_QUOTATION';
 // ================ Async thunks ================ //
 const loadData = createAsyncThunk(
   'app/OrderManagement/LOAD_DATA',
-  async (orderId: string) => {
+  async (orderId: string, { dispatch }) => {
     const response: any = await getBookerOrderDataApi(orderId);
+    dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
 
     return response.data;
   },

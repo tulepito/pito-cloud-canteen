@@ -12,6 +12,7 @@ import {
 import { getOrderQuotationsQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { OrderManagementsAction } from '@redux/slices/OrderManagement.slice';
+import { SystemAttributesThunks } from '@redux/slices/systemAttributes.slice';
 import {
   denormalisedResponseEntities,
   Listing,
@@ -105,30 +106,35 @@ const UPDATE_ORDER_STATE = 'app/OrderDetail/UPDATE_ORDER_STATE';
 const FETCH_QUOTATIONS = 'app/OrderDetail/FETCH_QUOTATIONS';
 
 // ================ Async thunks ================ //
-const fetchOrder = createAsyncThunk(FETCH_ORDER, async (orderId: string) => {
-  const response = await getBookerOrderDataApi(orderId);
+const fetchOrder = createAsyncThunk(
+  FETCH_ORDER,
+  async (orderId: string, { dispatch }) => {
+    const response = await getBookerOrderDataApi(orderId);
 
-  const {
-    bookerData: booker,
-    companyData: company,
-    planListing,
-    transactionDataMap,
-    orderListing: order,
-    participantData,
-    anonymousParticipantData,
-  } = response?.data || {};
-  const { orderDetail } = Listing(planListing).getMetadata();
+    const {
+      bookerData: booker,
+      companyData: company,
+      planListing,
+      transactionDataMap,
+      orderListing: order,
+      participantData,
+      anonymousParticipantData,
+    } = response?.data || {};
+    const { orderDetail } = Listing(planListing).getMetadata();
 
-  return {
-    order,
-    orderDetail,
-    company,
-    booker,
-    transactionDataMap,
-    participantData,
-    anonymousParticipantData,
-  };
-});
+    dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
+
+    return {
+      order,
+      orderDetail,
+      company,
+      booker,
+      transactionDataMap,
+      participantData,
+      anonymousParticipantData,
+    };
+  },
+);
 
 const updateStaffName = createAsyncThunk(
   UPDATE_STAFF_NAME,

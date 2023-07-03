@@ -149,7 +149,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   );
 
   const currentOrderVATPercentage = useAppSelector(
-    (state) => state.Order.currentOrderVATPercentage,
+    (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
