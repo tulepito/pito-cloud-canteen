@@ -4,14 +4,13 @@ import { Listing } from '@src/utils/data';
 import { EParticipantOrderStatus, ESubOrderStatus } from '@utils/enums';
 import type { TListing, TObject } from '@utils/types';
 
-const groupFoodForGroupOrder = (orderDetail: TObject, date?: number) => {
+const groupFoodForGroupOrder = (
+  orderDetail: TObject,
+  date?: number | string,
+) => {
   return Object.entries(orderDetail).reduce(
     (result, currentOrderDetailEntry, index) => {
       const [d, rawOrderDetailOfDate] = currentOrderDetailEntry;
-
-      if (date && d !== date.toString()) {
-        return result;
-      }
 
       const {
         memberOrders,
@@ -19,7 +18,10 @@ const groupFoodForGroupOrder = (orderDetail: TObject, date?: number) => {
         status: subOrderStatus,
       } = rawOrderDetailOfDate as TObject;
       const { id, restaurantName, foodList: foodListOfDate = {} } = restaurant;
-      if (subOrderStatus === ESubOrderStatus.CANCELED) {
+      if (
+        subOrderStatus === ESubOrderStatus.CANCELED ||
+        (date && d !== date.toString())
+      ) {
         return result;
       }
 
@@ -98,21 +100,20 @@ const groupFoodForGroupOrder = (orderDetail: TObject, date?: number) => {
   );
 };
 
-const groupFoodForNormal = (orderDetail: TObject, date?: number) => {
+const groupFoodForNormal = (orderDetail: TObject, date?: number | string) => {
   return Object.entries(orderDetail).reduce(
     (result, currentOrderDetailEntry, index) => {
       const [d, rawOrderDetailOfDate] = currentOrderDetailEntry;
-
-      if (date && d !== date.toString()) {
-        return result;
-      }
 
       const {
         lineItems = [],
         restaurant: { id, restaurantName, foodList: foodListOfDate = {} },
         status: subOrderStatus,
       } = rawOrderDetailOfDate as TObject;
-      if (subOrderStatus === ESubOrderStatus.CANCELED) {
+      if (
+        subOrderStatus === ESubOrderStatus.CANCELED ||
+        (date && d !== date.toString())
+      ) {
         return result;
       }
 
@@ -168,7 +169,7 @@ export const groupFoodOrderByDate = ({
 }: {
   orderDetail: TObject;
   isGroupOrder: boolean;
-  date?: number;
+  date?: number | string;
 }) => {
   return isGroupOrder
     ? groupFoodForGroupOrder(orderDetail, date)

@@ -8,6 +8,8 @@ import Button from '@components/Button/Button';
 import { parseThousandNumber } from '@helpers/format';
 import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
+import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
+import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { CurrentUser, Listing } from '@src/utils/data';
 import type { TListing } from '@utils/types';
 
@@ -20,12 +22,15 @@ type TSubOrderCartProps = {
 };
 
 const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
-  const { className, onClickDownloadPriceQuotation, title } = props;
+  const { className, title } = props;
 
   const intl = useIntl();
   const router = useRouter();
   const order = useAppSelector((state) => state.PartnerSubOrderDetail.order);
   const currentUser = useAppSelector((state) => state.user.currentUser);
+  const isDownloadingPriceQuotation = useAppSelector(
+    (state) => state.priceQuotation.isDownloading,
+  );
 
   const {
     query: { subOrderId = '' },
@@ -43,9 +48,6 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
   const { orderDetail: planOrderDetail = {} } = planGetter.getMetadata();
   const serviceFeePercentage =
     serviceFeePercentageMap[restaurantListingId] || 0;
-  const isDownloadingPriceQuotation = useAppSelector(
-    (state) => state.priceQuotation.isDownloading,
-  );
 
   const {
     promotion = 0,
@@ -62,6 +64,16 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
     date,
     shouldIncludePITOFee: false,
   });
+
+  const { orderTitle, priceQuotationData } = usePrepareOrderDetailPageData({
+    date,
+    VATPercentage: orderVATPercentage,
+  });
+
+  const handleDownloadPriceQuotation = useDownloadPriceQuotation(
+    orderTitle,
+    priceQuotationData,
+  );
   const rootClasses = classNames(css.root, className);
   const titleClasses = classNames(css.title, {});
   const downloadPriceQuotationClasses = classNames(css.downloadPriceQuotation, {
@@ -157,7 +169,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
         variant="inline"
         className={downloadPriceQuotationClasses}
         disabled={isDownloadingPriceQuotation}
-        onClick={onClickDownloadPriceQuotation}>
+        onClick={handleDownloadPriceQuotation}>
         {intl.formatMessage({
           id: 'ReviewCardSection.downloadPriceQuotation',
         })}
