@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
+import { utils as XLSXUtils, writeFile } from 'xlsx';
 
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -13,6 +14,7 @@ import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
 import type { TListing, TObject } from '@src/utils/types';
 
+import usePrepareDownloadData from '../hooks/usePrepareDownloadData';
 // eslint-disable-next-line import/no-cycle
 import { EPartnerSubOrderDetailPage } from '../PartnerSubOrderDetail.page';
 
@@ -69,6 +71,15 @@ const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
     setIsCollapsed(newState);
   };
 
+  const downloadData = usePrepareDownloadData(foodDataList);
+
+  const handleDownload = () => {
+    const ws = XLSXUtils.aoa_to_sheet(downloadData as any[][]);
+    const wb = XLSXUtils.book_new();
+    XLSXUtils.book_append_sheet(wb, ws, 'Sheet1');
+    writeFile(wb, `Chi tiết đặt món`);
+  };
+
   useEffect(() => {
     setIsCollapsed(
       Array.from({
@@ -93,93 +104,91 @@ const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
           <div className={css.title}>
             {intl.formatMessage({ id: 'SubOrderDetail.title' })}
           </div>
-          <Button variant="secondary" className={css.downloadBtn}>
+          <Button
+            variant="secondary"
+            className={css.downloadBtn}
+            onClick={handleDownload}>
             <IconDownload className={css.iconDownload} />
             {intl.formatMessage({ id: 'SubOrderDetail.downloadFile' })}
           </Button>
         </div>
 
-        <div>
-          <div className={css.tableContainer}>
-            <div className={css.tableHead}>
-              <div>
-                {intl.formatMessage({
-                  id: 'SubOrderDetail.tableHead.no',
-                })}
-              </div>
-              <div>
-                {intl.formatMessage({
-                  id: 'SubOrderDetail.tableHead.foodType',
-                })}
-              </div>
-              <div>
-                {intl.formatMessage({
-                  id: 'SubOrderDetail.tableHead.quantity',
-                })}
-              </div>
-              <div>
-                {intl.formatMessage({
-                  id: 'SubOrderDetail.tableHead.unitPrice',
-                })}
-              </div>
-              <div>
-                {intl.formatMessage({
-                  id: 'SubOrderDetail.tableHead.totalPrice',
-                })}
-              </div>
-              <div></div>
-            </div>
-
-            <div className={css.tableBody}>
-              {foodDataList?.map((foodData: TObject, foodIndex: number) => {
-                const { foodId, foodPrice, foodName, frequency, notes } =
-                  foodData;
-
-                const groupTitleClasses = classNames(css.groupTitle, {
-                  [css.collapsed]: isCollapsed[foodIndex],
-                });
-                const rowsClasses = classNames(css.rows, {
-                  [css.collapsed]: isCollapsed[foodIndex],
-                });
-                const iconClasses = classNames({
-                  [css.reversed]: isCollapsed[foodIndex],
-                });
-
-                return (
-                  <div className={css.tableRowGroup} key={date}>
-                    <div className={groupTitleClasses}>
-                      <div>{foodIndex + 1}</div>
-                      <div>{foodName}</div>
-                      <div>{frequency}</div>
-                      <div>
-                        {parseThousandNumber((foodPrice || 0) * frequency)}đ
-                      </div>
-                      <div>{parseThousandNumber(foodPrice || 0)}đ</div>
-                      <div
-                        className={css.actionCell}
-                        onClick={handleClickGroupTitle(foodIndex)}>
-                        <IconArrow className={iconClasses} />
-                      </div>
-                    </div>
-                    <div className={rowsClasses} key={foodId}>
-                      {notes.map(
-                        ({ note, name }: TObject, noteIndex: number) => {
-                          return (
-                            <div className={css.row} key={foodId}>
-                              <div>
-                                {foodIndex + 1}.{noteIndex + 1}
-                              </div>
-                              <div>{name}</div>
-                              <div title={note}>{note || '-'}</div>
-                            </div>
-                          );
-                        },
-                      )}
-                    </div>
-                  </div>
-                );
+        <div className={css.tableContainer}>
+          <div className={css.tableHead}>
+            <div>
+              {intl.formatMessage({
+                id: 'SubOrderDetail.tableHead.no',
               })}
             </div>
+            <div>
+              {intl.formatMessage({
+                id: 'SubOrderDetail.tableHead.foodType',
+              })}
+            </div>
+            <div>
+              {intl.formatMessage({
+                id: 'SubOrderDetail.tableHead.quantity',
+              })}
+            </div>
+            <div>
+              {intl.formatMessage({
+                id: 'SubOrderDetail.tableHead.unitPrice',
+              })}
+            </div>
+            <div>
+              {intl.formatMessage({
+                id: 'SubOrderDetail.tableHead.totalPrice',
+              })}
+            </div>
+            <div></div>
+          </div>
+
+          <div className={css.tableBody}>
+            {foodDataList?.map((foodData: TObject, foodIndex: number) => {
+              const { foodPrice, foodName, frequency, notes } = foodData;
+
+              const groupTitleClasses = classNames(css.groupTitle, {
+                [css.collapsed]: isCollapsed[foodIndex],
+              });
+              const rowsClasses = classNames(css.rows, {
+                [css.collapsed]: isCollapsed[foodIndex],
+              });
+              const iconClasses = classNames({
+                [css.reversed]: isCollapsed[foodIndex],
+              });
+
+              return (
+                <div className={css.tableRowGroup} key={foodIndex}>
+                  <div className={groupTitleClasses}>
+                    <div>{foodIndex + 1}</div>
+                    <div>{foodName}</div>
+                    <div>{frequency}</div>
+                    <div>
+                      {parseThousandNumber((foodPrice || 0) * frequency)}đ
+                    </div>
+                    <div>{parseThousandNumber(foodPrice || 0)}đ</div>
+                    <div
+                      className={css.actionCell}
+                      onClick={handleClickGroupTitle(foodIndex)}>
+                      <IconArrow className={iconClasses} />
+                    </div>
+                  </div>
+                  <div className={rowsClasses}>
+                    {notes.map(({ note, name }: TObject, noteIndex: number) => {
+                      return (
+                        <div className={css.row} key={noteIndex}>
+                          <div>
+                            {foodIndex + 1}.{noteIndex + 1}
+                          </div>
+                          <div>{name}</div>
+                          <div title={note}>{note || '-'}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
