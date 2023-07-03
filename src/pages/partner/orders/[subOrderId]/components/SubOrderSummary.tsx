@@ -141,7 +141,7 @@ const SubOrderSummary: React.FC<TSubOrderSummaryProps> = ({
             variant="inline"
             className={css.viewOrderDetail}
             onClick={onChangeViewMode(EPartnerSubOrderDetailPage.detail)}>
-            {intl.formatMessage({ id: 'SubOrderSummary.title' })}
+            {intl.formatMessage({ id: 'SubOrderSummary.viewDetail' })}
             <IconArrow direction="right" className={css.arrowIcon} />
           </Button>
         </RenderWhen>
