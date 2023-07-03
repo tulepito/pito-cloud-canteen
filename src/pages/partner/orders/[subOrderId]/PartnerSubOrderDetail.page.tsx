@@ -27,7 +27,7 @@ const PartnerSubOrderDetailPage: React.FC<
 > = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const [viewMode, setViewMode] = useState(EPartnerSubOrderDetailPage.detail);
+  const [viewMode, setViewMode] = useState(EPartnerSubOrderDetailPage.summary);
   const {
     query: { subOrderId },
     isReady,
