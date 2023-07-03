@@ -51,6 +51,7 @@
   margin-top: 8px;
   padding: 8px;
   min-height: unset;
+  @include textTemplate(14px, 700, 24px);
 
   .arrowIcon {
     margin-left: 4px;
