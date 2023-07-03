@@ -6,6 +6,7 @@ import { EHttpStatusCode } from '@apis/errors';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
+import { EOrderType } from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -26,9 +27,53 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const [order] = denormalisedResponseEntities(
           (await integrationSdk.listings.show({ id: orderId })) || [{}],
         );
-        const { plans = [], companyId } = Listing(order).getMetadata();
+        const {
+          plans = [],
+          companyId,
+          participants = [],
+          anonymous = [],
+          orderType = EOrderType.group,
+        } = Listing(order).getMetadata();
         const planId = plans[0];
+        const isGroupOrder = EOrderType.group === orderType;
         let orderWithPlanDataMaybe = { ...order };
+
+        if (isGroupOrder) {
+          if (!isEmpty(participants)) {
+            const participantData = await Promise.all(
+              participants.map(async (id: string) => {
+                const [memberAccount] = denormalisedResponseEntities(
+                  await integrationSdk.users.show({
+                    id,
+                  }),
+                );
+
+                return memberAccount;
+              }),
+            );
+            orderWithPlanDataMaybe = {
+              ...orderWithPlanDataMaybe,
+              participants: participantData,
+            };
+          }
+          if (!isEmpty(anonymous)) {
+            const anonymousParticipantData = await Promise.all(
+              anonymous.map(async (id: string) => {
+                const [memberAccount] = denormalisedResponseEntities(
+                  await integrationSdk.users.show({
+                    id,
+                  }),
+                );
+
+                return memberAccount;
+              }),
+            );
+            orderWithPlanDataMaybe = {
+              ...orderWithPlanDataMaybe,
+              anonymous: anonymousParticipantData,
+            };
+          }
+        }
 
         // TODO: query company info
         const companyResponse = await integrationSdk.users.show({
