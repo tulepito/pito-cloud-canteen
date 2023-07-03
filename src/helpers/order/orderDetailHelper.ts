@@ -1,7 +1,8 @@
 import isEmpty from 'lodash/isEmpty';
 
+import { User } from '@src/utils/data';
 import { EParticipantOrderStatus, ESubOrderStatus } from '@utils/enums';
-import type { TObject } from '@utils/types';
+import type { TObject, TUser } from '@utils/types';
 
 const groupFoodForGroupOrder = (
   orderDetail: TObject,
@@ -173,4 +174,107 @@ export const groupFoodOrderByDate = ({
   return isGroupOrder
     ? groupFoodForGroupOrder(orderDetail, date)
     : groupFoodForNormal(orderDetail, date);
+};
+
+export const groupPickingOrderByFood = ({
+  orderDetail,
+  date,
+  participants = [],
+  anonymous = [],
+}: {
+  orderDetail: TObject;
+  date?: number | string;
+  participants: TObject[];
+  anonymous: TObject[];
+}) => {
+  return Object.entries(orderDetail).reduce(
+    (result, currentOrderDetailEntry, index) => {
+      const [d, rawOrderDetailOfDate] = currentOrderDetailEntry;
+
+      const {
+        memberOrders,
+        restaurant = {},
+        status: subOrderStatus,
+      } = rawOrderDetailOfDate as TObject;
+      const { id, foodList: foodListOfDate = {} } = restaurant;
+      if (
+        subOrderStatus === ESubOrderStatus.CANCELED ||
+        (date && d !== date.toString())
+      ) {
+        return result;
+      }
+
+      const foodDataMap = Object.entries(memberOrders).reduce(
+        (foodFrequencyResult, currentMemberOrderEntry) => {
+          const [memberId, memberOrderData] = currentMemberOrderEntry;
+
+          const {
+            foodId,
+            status,
+            requirement = '',
+          } = memberOrderData as TObject;
+          const {
+            foodName,
+            foodPrice,
+            foodUnit = '',
+          } = foodListOfDate[foodId] || {};
+
+          const participantMaybe = participants.find(
+            (p) => p?.id?.uuid === memberId,
+          );
+          const anonymousUserMaybe = anonymous.find(
+            (p) => p?.id?.uuid === memberId,
+          );
+
+          const { firstName, lastName } = User(
+            (participantMaybe || anonymousUserMaybe) as TUser,
+          ).getProfile();
+
+          if (status === EParticipantOrderStatus.joined && foodId !== '') {
+            const data = foodFrequencyResult[foodId] as TObject;
+            const { frequency, notes = [] } = data || {};
+            const newNote = {
+              note: requirement,
+              name: `${lastName} ${firstName}`,
+            };
+
+            if (!isEmpty(requirement)) {
+              notes.splice(0, 0, newNote);
+            } else {
+              notes.push(newNote);
+            }
+
+            return {
+              ...foodFrequencyResult,
+              [foodId]: data
+                ? { ...data, frequency: frequency + 1, notes }
+                : {
+                    foodId,
+                    foodName,
+                    foodUnit,
+                    foodPrice,
+                    notes,
+                    frequency: 1,
+                  },
+            };
+          }
+
+          return foodFrequencyResult;
+        },
+        {} as TObject,
+      );
+      const foodDataList = Object.values(foodDataMap);
+
+      return [
+        ...result,
+        {
+          date: d,
+          index,
+          foodDataList,
+          restaurantId: id,
+        },
+      ];
+    },
+    [] as TObject[],
+  );
 };
