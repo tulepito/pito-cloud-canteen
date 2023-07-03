@@ -143,6 +143,13 @@ const PartnerSubOrderDetailPage: React.FC<
     handleCloseModal();
   };
 
+  const isSummaryViewMode = viewMode === EPartnerSubOrderDetailPage.summary;
+
+  const handleChangeViewMode =
+    (_viewMode: EPartnerSubOrderDetailPage) => () => {
+      setViewMode(_viewMode);
+    };
+
   useEffect(() => {
     if (subOrderId && isReady) {
       dispatch(PartnerSubOrderDetailThunks.loadData({ orderId, date }));
