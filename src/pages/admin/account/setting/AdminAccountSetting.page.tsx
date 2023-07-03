@@ -49,7 +49,7 @@ const AdminAccountSettingPage = () => {
   const initialValues = useMemo(
     () => ({
       systemVATPercentage: systemVATPercentage * 100,
-      systemServiceFeePercentage: systemVATPercentage * 100,
+      systemServiceFeePercentage: systemServiceFeePercentage * 100,
     }),
     [systemVATPercentage, systemServiceFeePercentage],
   );
