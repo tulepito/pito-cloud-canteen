@@ -29,7 +29,7 @@ export const usePrepareOrderDetailPageData = () => {
   } = useAppSelector((state) => state.OrderManagement);
 
   const currentOrderVATPercentage = useAppSelector(
-    (state) => state.Order.currentOrderVATPercentage,
+    (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
 
   const currentUser = useAppSelector(currentUserSelector);

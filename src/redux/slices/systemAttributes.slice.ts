@@ -2,6 +2,9 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { showAttributesApi } from '@apis/attributes';
 import { createAsyncThunk } from '@redux/redux.helper';
+import config from '@src/configs';
+import { denormalisedResponseEntities, Listing } from '@src/utils/data';
+import { EOrderDraftStates, EOrderStates } from '@src/utils/enums';
 
 // ================ Initial states ================ //
 type TKeyValue<T = string> = {
@@ -21,6 +24,10 @@ type TAttributesState = {
 
   systemServiceFeePercentage: number;
   systemVATPercentage: number;
+
+  currentOrderVATPercentage: number;
+  fetchingOrderVATPercentage: boolean;
+  fetchOrderVATError: any;
 };
 const initialState: TAttributesState = {
   menuTypes: [],
@@ -34,6 +41,10 @@ const initialState: TAttributesState = {
 
   systemServiceFeePercentage: 0,
   systemVATPercentage: 0,
+
+  currentOrderVATPercentage: config.VATPercentage,
+  fetchOrderVATError: null,
+  fetchingOrderVATPercentage: false,
 };
 
 // ================ Thunk types ================ //
@@ -48,8 +59,35 @@ const fetchAttributes = createAsyncThunk(
   },
 );
 
+const fetchVATPercentageByOrderId = createAsyncThunk(
+  'app/SystemAttributes/FETCH_VAT_PERCENTAGE_BY_ORDER_ID',
+  async (orderId: string, { extra: sdk, getState }) => {
+    const order = denormalisedResponseEntities(
+      await sdk.listings.show(
+        {
+          id: orderId,
+        },
+        { expand: true },
+      ),
+    )[0];
+
+    const { orderState, orderVATPercentage } = Listing(order).getMetadata();
+
+    const { systemVATPercentage } = getState().SystemAttributes;
+
+    const orderVATPercentageToUse =
+      orderState === EOrderStates.picking ||
+      orderState === EOrderDraftStates.draft
+        ? systemVATPercentage
+        : orderVATPercentage;
+
+    return orderVATPercentageToUse;
+  },
+);
+
 export const SystemAttributesThunks = {
   fetchAttributes,
+  fetchVATPercentageByOrderId,
 };
 
 // ================ Slice ================ //
@@ -83,6 +121,18 @@ const SystemAttributesSlice = createSlice({
       .addCase(fetchAttributes.rejected, (state) => {
         state.fetchAttributesInProgress = false;
         state.fetchAttributesError = true;
+      })
+      .addCase(fetchVATPercentageByOrderId.pending, (state) => {
+        state.fetchingOrderVATPercentage = true;
+        state.fetchOrderVATError = null;
+      })
+      .addCase(fetchVATPercentageByOrderId.fulfilled, (state, { payload }) => {
+        state.currentOrderVATPercentage = payload || config.VATPercentage;
+        state.fetchingOrderVATPercentage = false;
+      })
+      .addCase(fetchVATPercentageByOrderId.rejected, (state, { error }) => {
+        state.fetchingOrderVATPercentage = false;
+        state.fetchOrderVATError = error;
       });
   },
 });

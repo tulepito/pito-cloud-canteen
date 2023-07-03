@@ -41,7 +41,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     [quotationListing, target],
   );
   const currentOrderVATPercentage = useAppSelector(
-    (state) => state.Order.currentOrderVATPercentage,
+    (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
 
   const [currentPartnerId, setCurrentPartnerId] = useState<string>(

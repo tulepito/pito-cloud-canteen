@@ -36,6 +36,8 @@ import type {
   TUser,
 } from '@utils/types';
 
+import { SystemAttributesThunks } from './systemAttributes.slice';
+
 // ================ Initial states ================ //
 type TOrderManagementState = {
   // Fetch data state
@@ -99,8 +101,9 @@ const initialState: TOrderManagementState = {
 // ================ Async thunks ================ //
 const loadData = createAsyncThunk(
   'app/OrderManagement/LOAD_DATA',
-  async (orderId: string) => {
+  async (orderId: string, { dispatch }) => {
     const response: any = await getBookerOrderDataApi(orderId);
+    dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
 
     return response.data;
   },
