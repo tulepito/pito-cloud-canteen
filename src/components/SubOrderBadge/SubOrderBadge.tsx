@@ -1,7 +1,7 @@
 import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 
-import Badge from '@components/Badge/Badge';
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import {
   txIsCanceled,
@@ -22,7 +22,10 @@ const SubOrderBadge: React.FC<TSubOrderBadgeProps> = ({ transaction }) => {
 
   if (txIsInitiated(transaction)) {
     badgeComponent = (
-      <Badge label={intl.formatMessage({ id: 'SubOrderBadge.inProgress' })} />
+      <Badge
+        label={intl.formatMessage({ id: 'SubOrderBadge.inProgress' })}
+        type={EBadgeType.info}
+      />
     );
   } else if (txIsCompleted(transaction)) {
     badgeComponent = (
