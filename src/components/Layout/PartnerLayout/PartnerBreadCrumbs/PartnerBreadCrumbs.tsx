@@ -61,6 +61,7 @@ export const PartnerBreadCrumbs = () => {
     });
     setCrumbs(newCrumbs);
   }, [asPath, pathname, route]);
+  console.log({ crumbs });
 
   return (
     <div className={css.root}>
