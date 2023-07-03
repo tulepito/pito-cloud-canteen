@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch } from '@hooks/reduxHooks';
+import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 
 import SubOrderCart from './components/SubOrderCart';
 import SubOrderInfo from './components/SubOrderInfo';
@@ -31,6 +32,7 @@ const PartnerSubOrderDetailPage: React.FC<
       const [orderId, date] = (subOrderId as string)?.split('_');
 
       dispatch(PartnerSubOrderDetailThunks.loadData({ orderId, date }));
+      dispatch(orderManagementThunks.loadData(orderId));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady, subOrderId]);

@@ -21,7 +21,13 @@ import { Listing, User } from '@utils/data';
 import { EOrderStates, EOrderType } from '@utils/enums';
 import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 
-export const usePrepareOrderDetailPageData = () => {
+export const usePrepareOrderDetailPageData = ({
+  date,
+  VATPercentage,
+}: {
+  date?: string | number;
+  VATPercentage?: number;
+}) => {
   const router = useRouter();
   const [reviewInfoValues, setReviewInfoValues] =
     useState<TReviewInfoFormValues>();
@@ -42,7 +48,6 @@ export const usePrepareOrderDetailPageData = () => {
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
-
   const currentUser = useAppSelector(currentUserSelector);
 
   const { title: orderTitle = '' } = Listing(
@@ -156,7 +161,11 @@ export const usePrepareOrderDetailPageData = () => {
       calculatePriceQuotationInfo({
         planOrderDetail: orderDetail,
         order: orderData as TObject,
-        currentOrderVATPercentage,
+        currentOrderVATPercentage: !isEmpty(VATPercentage)
+          ? VATPercentage!
+          : currentOrderVATPercentage,
+        date,
+        shouldIncludePITOFee: isEmpty(date),
       }),
     [orderData, orderDetail, currentOrderVATPercentage],
   );
