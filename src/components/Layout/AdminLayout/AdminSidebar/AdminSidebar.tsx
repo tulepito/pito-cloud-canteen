@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import IconHome from '@components/Icons/IconHome/IconHome';
 import IconOrderManagement from '@components/Icons/IconOrderManagement/IconOrderManagement';
 import IconSetting from '@components/Icons/IconSetting/IconSetting';
+import IconTool from '@components/Icons/IconTool/IconTool';
 import IconUserManagement from '@components/Icons/IconUserManagement/IconUserManagement';
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
@@ -119,7 +120,7 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
   },
   {
     id: 'setting',
-    Icon: IconSetting,
+    Icon: IconTool,
     nameLink: adminRoutes.AttributesSetting.path,
     label: 'AdminSidebar.settingLabel',
     isFirstLevel: true,
@@ -129,6 +130,30 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         label: 'AdminSidebar.attributesSettingLabel',
         nameLink: adminRoutes.AttributesSetting.path,
         highlightRefLinks: [adminRoutes.AttributesSetting.path],
+      },
+    ],
+  },
+  {
+    id: 'accountSetting',
+    Icon: IconSetting,
+    nameLink: adminRoutes.AdminAccountInformationSetting.path,
+    label: 'AdminSidebar.accountSettingLabel',
+    isFirstLevel: true,
+    childrenMenus: [
+      {
+        id: 'adminInformationSetting',
+        label: 'AdminSidebar.adminAccountInformationSetting',
+        nameLink: adminRoutes.AdminAccountInformationSetting.path,
+      },
+      {
+        id: 'adminAccountSetting',
+        label: 'AdminSidebar.adminAccountSetting',
+        nameLink: adminRoutes.AdminAccountSetting.path,
+      },
+      {
+        id: 'adminAccountPasswordSetting',
+        label: 'AdminSidebar.adminAccountPasswordSetting',
+        nameLink: adminRoutes.AdminAccountPasswordSetting.path,
       },
     ],
   },

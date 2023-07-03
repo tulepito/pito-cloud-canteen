@@ -27,6 +27,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       nutritions = [],
     } = User(response).getMetadata();
 
+    const { systemServiceFeePercentage = 0, systemVATPercentage = 0 } =
+      User(response).getPrivateData();
+
     switch (apiMethod) {
       case HttpMethod.GET:
         res.json({
@@ -35,6 +38,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           packaging,
           daySessions,
           nutritions,
+          systemServiceFeePercentage,
+          systemVATPercentage,
         });
         break;
 

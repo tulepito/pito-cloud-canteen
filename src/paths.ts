@@ -186,6 +186,22 @@ export const adminRoutes = {
     path: '/admin/setting/attributes',
     label: 'Cài đặt món ăn',
   },
+  AdminAccountInformationSetting: {
+    path: '/admin/account/info',
+    label: 'Thông tin tài khoản',
+  },
+  AdminAccountSetting: {
+    path: '/admin/account/setting',
+    label: 'Cài đặt tài khoản',
+  },
+  AdminAccount: {
+    path: '/admin/account',
+    label: 'Tài khoản',
+  },
+  AdminAccountPasswordSetting: {
+    path: '/admin/account/password',
+    label: 'Mật khẩu',
+  },
 } as const;
 
 export const companyPaths = {

@@ -1,7 +1,6 @@
 import sumBy from 'lodash/sumBy';
 
 import { parseThousandNumber } from '@helpers/format';
-import config from '@src/configs';
 
 import { formatTimestamp } from '../dates';
 
@@ -14,6 +13,7 @@ type PartnerNewOrderAppearParams = {
   quotationListing: any;
   restaurantListing: any;
   promotion: number;
+  systemVATPercentage: number;
 };
 
 export const partnerNewOrderAppearSubject = (orderName: string) =>
@@ -25,6 +25,7 @@ const partnerNewOrderAppear = ({
   quotationListing,
   restaurantListing,
   promotion,
+  systemVATPercentage,
 }: PartnerNewOrderAppearParams) => {
   console.log('quotationListing: ', quotationListing);
   const restaurantId = restaurantListing.getId();
@@ -54,7 +55,7 @@ const partnerNewOrderAppear = ({
 
   const promotionAmount = Math.floor((totalPrice * promotion) / 100);
   const totalPriceWithoutPromotionAmount = totalPrice - promotionAmount;
-  const vatFee = Math.round(totalPrice * config.VATPercentage);
+  const vatFee = Math.round(totalPrice * systemVATPercentage);
   const totalPriceWithVat = totalPriceWithoutPromotionAmount + vatFee;
 
   const partnerOrderDetail = Object.keys(partnerQuotation.quotation).map(

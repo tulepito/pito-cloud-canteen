@@ -1,3 +1,4 @@
+export { default as adminAccountSetting } from './adminAccountSetting.slice';
 export { default as auth } from './auth.slice';
 export { default as BookerCompanies } from './BookerCompanies.slice';
 export { default as Calendar } from './Calendar.slice';
@@ -9,6 +10,7 @@ export { default as Favorite } from './Favorite.slice';
 export { default as foods } from './foods.slice';
 export { default as marketplaceData } from './marketplaceData.slice';
 export { default as menus } from './menus.slice';
+export { default as notificationPopup } from './notificationPopup.slice';
 export { default as Order } from './Order.slice';
 export { default as OrderManagement } from './OrderManagement.slice';
 export { default as ParticipantOrderManagementPage } from './ParticipantOrderManagementPage.slice';
