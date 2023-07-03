@@ -3,7 +3,9 @@ import Skeleton from 'react-loading-skeleton';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
+import Button from '@components/Button/Button';
 import Collapsible from '@components/Collapsible/Collapsible';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconDocument from '@components/Icons/IconDocument/IconDocument';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tooltip from '@components/Tooltip/Tooltip';
@@ -14,11 +16,18 @@ import { Listing } from '@src/utils/data';
 import { EOrderType } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
 
+// eslint-disable-next-line import/no-cycle
+import { EPartnerSubOrderDetailPage } from '../PartnerSubOrderDetail.page';
+
 import css from './SubOrderSummary.module.scss';
 
-type TSubOrderSummaryProps = {};
+type TSubOrderSummaryProps = {
+  onChangeViewMode: (v: EPartnerSubOrderDetailPage) => () => void;
+};
 
-const SubOrderSummary: React.FC<TSubOrderSummaryProps> = () => {
+const SubOrderSummary: React.FC<TSubOrderSummaryProps> = ({
+  onChangeViewMode,
+}) => {
   const intl = useIntl();
   const router = useRouter();
   const order = useAppSelector((state) => state.PartnerSubOrderDetail.order);
@@ -32,9 +41,7 @@ const SubOrderSummary: React.FC<TSubOrderSummaryProps> = () => {
 
   // eslint-disable-next-line no-unsafe-optional-chaining
   const [, date] = (subOrderId as string)?.split('_');
-
   const { plan } = order;
-
   const orderGetter = Listing(order as TListing);
   const planGetter = Listing(plan as TListing);
   const { orderType = EOrderType.group } = orderGetter.getMetadata();
@@ -128,6 +135,16 @@ const SubOrderSummary: React.FC<TSubOrderSummaryProps> = () => {
             </div>
           </div>
         </div>
+
+        <RenderWhen condition={isGroupOrder}>
+          <Button
+            variant="inline"
+            className={css.viewOrderDetail}
+            onClick={onChangeViewMode(EPartnerSubOrderDetailPage.detail)}>
+            {intl.formatMessage({ id: 'SubOrderSummary.title' })}
+            <IconArrow direction="right" className={css.arrowIcon} />
+          </Button>
+        </RenderWhen>
       </Collapsible>
 
       <RenderWhen.False>
