@@ -1,10 +1,16 @@
+import isEmpty from 'lodash/isEmpty';
+
 import { EParticipantOrderStatus, ESubOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
 
-const groupFoodForGroupOrder = (orderDetail: TObject) => {
+const groupFoodForGroupOrder = (orderDetail: TObject, date?: number) => {
   return Object.entries(orderDetail).reduce(
     (result, currentOrderDetailEntry, index) => {
-      const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
+      const [d, rawOrderDetailOfDate] = currentOrderDetailEntry;
+
+      if (date && d !== date.toString()) {
+        return result;
+      }
 
       const {
         memberOrders,
@@ -19,7 +25,11 @@ const groupFoodForGroupOrder = (orderDetail: TObject) => {
       const foodDataMap = Object.entries(memberOrders).reduce(
         (foodFrequencyResult, currentMemberOrderEntry) => {
           const [, memberOrderData] = currentMemberOrderEntry;
-          const { foodId, status } = memberOrderData as TObject;
+          const {
+            foodId,
+            status,
+            requirement = '',
+          } = memberOrderData as TObject;
           const {
             foodName,
             foodPrice,
@@ -28,13 +38,24 @@ const groupFoodForGroupOrder = (orderDetail: TObject) => {
 
           if (status === EParticipantOrderStatus.joined && foodId !== '') {
             const data = foodFrequencyResult[foodId] as TObject;
-            const { frequency } = data || {};
+            const { frequency, notes = [] } = data || {};
+
+            if (!isEmpty(requirement)) {
+              notes.push(requirement);
+            }
 
             return {
               ...foodFrequencyResult,
               [foodId]: data
-                ? { ...data, frequency: frequency + 1 }
-                : { foodId, foodName, foodUnit, foodPrice, frequency: 1 },
+                ? { ...data, frequency: frequency + 1, notes }
+                : {
+                    foodId,
+                    foodName,
+                    foodUnit,
+                    foodPrice,
+                    notes,
+                    frequency: 1,
+                  },
             };
           }
 
@@ -64,7 +85,7 @@ const groupFoodForGroupOrder = (orderDetail: TObject) => {
       return [
         ...result,
         {
-          date,
+          date: d,
           index,
           ...summary,
           foodDataList,
@@ -76,10 +97,14 @@ const groupFoodForGroupOrder = (orderDetail: TObject) => {
   );
 };
 
-const groupFoodForNormal = (orderDetail: TObject) => {
+const groupFoodForNormal = (orderDetail: TObject, date?: number) => {
   return Object.entries(orderDetail).reduce(
     (result, currentOrderDetailEntry, index) => {
-      const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
+      const [d, rawOrderDetailOfDate] = currentOrderDetailEntry;
+
+      if (date && d !== date.toString()) {
+        return result;
+      }
 
       const {
         lineItems = [],
@@ -123,7 +148,7 @@ const groupFoodForNormal = (orderDetail: TObject) => {
       return [
         ...result,
         {
-          date,
+          date: d,
           index,
           ...summary,
           foodDataList,
@@ -138,11 +163,13 @@ const groupFoodForNormal = (orderDetail: TObject) => {
 export const groupFoodOrderByDate = ({
   orderDetail = {},
   isGroupOrder = true,
+  date,
 }: {
   orderDetail: TObject;
   isGroupOrder: boolean;
+  date?: number;
 }) => {
   return isGroupOrder
-    ? groupFoodForGroupOrder(orderDetail)
-    : groupFoodForNormal(orderDetail);
+    ? groupFoodForGroupOrder(orderDetail, date)
+    : groupFoodForNormal(orderDetail, date);
 };

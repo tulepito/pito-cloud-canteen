@@ -19,7 +19,8 @@ const SubOrderInfo: React.FC<TSubOrderInfoProps> = () => {
     query: { subOrderId },
   } = router;
 
-  const [, date] = (subOrderId as string).split('_');
+  // eslint-disable-next-line no-unsafe-optional-chaining
+  const [, date] = (subOrderId as string)?.split('_');
 
   const { company } = order || {};
   const companyGetter = User(company);
