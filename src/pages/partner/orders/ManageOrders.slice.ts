@@ -1,22 +1,69 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, current } from '@reduxjs/toolkit';
+import isEmpty from 'lodash/isEmpty';
 
 import { queryPartnerOrdersApi } from '@apis/partnerApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { CurrentUser, Listing } from '@src/utils/data';
-import type { TListing, TObject } from '@src/utils/types';
+import { formatTimestamp } from '@src/utils/dates';
+import {
+  txIsCanceled,
+  txIsCompleted,
+  txIsDelivering,
+  txIsDeliveryFailed,
+  txIsInitiated,
+} from '@src/utils/transaction';
+import type {
+  TListing,
+  TObject,
+  TPagination,
+  TTransaction,
+} from '@src/utils/types';
 
 // ================ Initial states ================ //
 type TPartnerManageOrdersState = {
+  isFirstLoad: boolean;
   allSubOrders: TObject[];
   currentSubOrders: TObject[];
   fetchOrderInProgress: boolean;
   fetchOrderError: any;
+  pagination: TPagination;
 };
 const initialState: TPartnerManageOrdersState = {
+  isFirstLoad: true,
   allSubOrders: [],
   currentSubOrders: [],
   fetchOrderInProgress: false,
   fetchOrderError: null,
+  pagination: {
+    totalItems: 0,
+    totalPages: 1,
+    page: 1,
+    perPage: 10,
+  },
+};
+
+const isValidStatus = (transaction: TTransaction, status: string) => {
+  if (status === 'isNotPaid') {
+    return true;
+  }
+
+  if (txIsInitiated(transaction)) {
+    return status === 'inProgress';
+  }
+  if (txIsCompleted(transaction)) {
+    return status === 'delivered';
+  }
+  if (txIsDelivering(transaction)) {
+    return status === 'delivering';
+  }
+  if (txIsDeliveryFailed(transaction)) {
+    return status === 'canceled';
+  }
+  if (txIsCanceled(transaction)) {
+    return status === 'canceled';
+  }
+
+  return false;
 };
 
 // ================ Thunk types ================ //
@@ -52,7 +99,58 @@ export const PartnerManageOrdersThunks = {
 const PartnerManageOrdersSlice = createSlice({
   name: 'PartnerManageOrders',
   initialState,
-  reducers: {},
+  reducers: {
+    filterData: (state, { payload }) => {
+      const { allSubOrders, pagination } = current(state);
+      const { perPage } = pagination;
+      const { page, name, subOrderId, startTime, endTime, status } = payload;
+      const isPaidStatus = status === 'isPaid';
+
+      const validSubOrders = isPaidStatus
+        ? []
+        : allSubOrders.filter((subOrder) => {
+            const {
+              date,
+              companyName,
+              orderTitle,
+              startDate,
+              endDate,
+              transaction,
+            } = subOrder;
+            const dayIndex = new Date(Number(date)).getDay();
+            const subOrderTitle = `#${orderTitle}-${
+              dayIndex > 0 ? dayIndex : 7
+            }`;
+            const isValid =
+              (isEmpty(name) ||
+                `${companyName}_${formatTimestamp(date)}`.includes(name)) &&
+              (isEmpty(subOrderId) || subOrderTitle.includes(subOrderId)) &&
+              (isEmpty(status) || isValidStatus(transaction, status)) &&
+              (isEmpty(startTime) ||
+                (Number(startTime) >= Number(startDate || 0) &&
+                  Number(startTime) <= Number(endDate || 0))) &&
+              (isEmpty(endTime) ||
+                (Number(endTime) <= Number(endDate || 0) &&
+                  Number(startTime) >= Number(startDate || 0)));
+
+            return isValid;
+          });
+
+      state.pagination = {
+        ...pagination,
+        perPage,
+        totalItems: validSubOrders.length,
+        totalPages: Math.round(validSubOrders.length / perPage + 0.5),
+        page,
+      };
+      state.currentSubOrders = validSubOrders.slice(
+        0 + (page - 1) * perPage,
+        page * perPage >= validSubOrders.length
+          ? validSubOrders.length
+          : perPage,
+      );
+    },
+  },
   extraReducers: (builder) => {
     builder
       /* =============== loadData =============== */
@@ -61,11 +159,13 @@ const PartnerManageOrdersSlice = createSlice({
         state.fetchOrderError = null;
       })
       .addCase(loadData.fulfilled, (state, { payload }) => {
+        const { pagination } = current(state);
+        const { perPage } = pagination;
         const orderList = payload;
 
         const subOrderList = (orderList as TObject[]).reduce<TObject[]>(
           (result, curr) => {
-            const { plan } = curr || {};
+            const { plan, transactionDataMap = {} } = curr || {};
             const orderGetter = Listing(curr as TListing);
             const orderMetadata = orderGetter.getMetadata();
             const { title } = orderGetter.getAttributes();
@@ -85,6 +185,7 @@ const PartnerManageOrdersSlice = createSlice({
                       companyName,
                       ...orderMetadata,
                       orderId,
+                      transaction: transactionDataMap[date],
                     })
                   : subOrderRes;
               }, []);
@@ -95,7 +196,13 @@ const PartnerManageOrdersSlice = createSlice({
         );
         state.allSubOrders = subOrderList;
         state.currentSubOrders = subOrderList;
+        state.pagination = {
+          ...pagination,
+          totalItems: subOrderList.length,
+          totalPages: Math.round(subOrderList.length / perPage + 0.5),
+        };
         state.fetchOrderInProgress = false;
+        state.isFirstLoad = false;
       })
       .addCase(loadData.rejected, (state, { payload }) => {
         state.fetchOrderInProgress = false;
