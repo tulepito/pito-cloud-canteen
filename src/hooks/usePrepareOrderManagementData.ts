@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
@@ -13,7 +14,13 @@ import { Listing, User } from '@utils/data';
 import { EOrderStates, EOrderType } from '@utils/enums';
 import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 
-export const usePrepareOrderDetailPageData = () => {
+export const usePrepareOrderDetailPageData = ({
+  date,
+  VATPercentage,
+}: {
+  date?: string | number;
+  VATPercentage?: number;
+}) => {
   const router = useRouter();
   const [reviewInfoValues, setReviewInfoValues] =
     useState<TReviewInfoFormValues>();
@@ -31,7 +38,6 @@ export const usePrepareOrderDetailPageData = () => {
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.Order.currentOrderVATPercentage,
   );
-
   const currentUser = useAppSelector(currentUserSelector);
 
   const { title: orderTitle = '' } = Listing(
@@ -110,6 +116,7 @@ export const usePrepareOrderDetailPageData = () => {
   const foodOrderGroupedByDate = groupFoodOrderByDate({
     orderDetail,
     isGroupOrder,
+    date,
   });
   const {
     totalPrice,
@@ -125,7 +132,11 @@ export const usePrepareOrderDetailPageData = () => {
   } = calculatePriceQuotationInfo({
     planOrderDetail: orderDetail,
     order: orderData as TObject,
-    currentOrderVATPercentage,
+    currentOrderVATPercentage: !isEmpty(VATPercentage)
+      ? VATPercentage!
+      : currentOrderVATPercentage,
+    date,
+    shouldIncludePITOFee: isEmpty(date),
   });
 
   const reviewInfoData = {

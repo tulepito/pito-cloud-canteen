@@ -68,7 +68,7 @@ const OrderDetailPage = () => {
     reviewViewData,
     priceQuotationData,
     setReviewInfoValues,
-  } = usePrepareOrderDetailPageData();
+  } = usePrepareOrderDetailPageData({});
   const handleDownloadPriceQuotation = useDownloadPriceQuotation(
     orderTitle,
     priceQuotationData,
