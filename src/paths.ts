@@ -234,12 +234,21 @@ export const participantPaths = {
 export const partnerPaths = {
   Home: '/partner',
   ManageOrders: '/partner/orders',
-  SubOrderDetail: '/partner/orders/[orderId]',
+  SubOrderDetail: '/partner/orders/[subOrderId]',
 };
 
 export const partnerRoutes = {
   ManageOrders: {
     path: partnerPaths.ManageOrders,
     label: 'Danh sách đơn hàng',
+  },
+
+  Home: {
+    path: partnerPaths.Home,
+    label: 'Trang chủ',
+  },
+  SubOrderDetail: {
+    path: partnerPaths.SubOrderDetail,
+    label: 'Chi tiết đơn hàng',
   },
 };
