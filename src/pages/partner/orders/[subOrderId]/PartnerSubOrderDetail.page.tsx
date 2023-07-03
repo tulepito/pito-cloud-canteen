@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import { useAppDispatch } from '@hooks/reduxHooks';
 
 import SubOrderInfo from './components/SubOrderInfo';
+import SubOrderNote from './components/SubOrderNote';
+import SubOrderSummary from './components/SubOrderSummary';
 import SubOrderTitle from './components/SubOrderTitle';
 import { PartnerSubOrderDetailThunks } from './PartnerSubOrderDetail.slice';
 
@@ -24,7 +26,8 @@ const PartnerSubOrderDetailPage: React.FC<
 
   useEffect(() => {
     if (subOrderId && isReady) {
-      const [orderId, date] = (subOrderId as string).split('_');
+      // eslint-disable-next-line no-unsafe-optional-chaining
+      const [orderId, date] = (subOrderId as string)?.split('_');
 
       dispatch(PartnerSubOrderDetailThunks.loadData({ orderId, date }));
     }
@@ -35,6 +38,8 @@ const PartnerSubOrderDetailPage: React.FC<
     <div className={css.root}>
       <SubOrderTitle />
       <SubOrderInfo />
+      <SubOrderSummary />
+      <SubOrderNote />
     </div>
   );
 };
