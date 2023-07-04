@@ -27,6 +27,7 @@ export type TModalProps = PropsWithChildren<{
   closeClassName?: string;
   shouldFullScreenInMobile?: boolean;
   shouldHideGreyBackground?: boolean;
+  headerClassName?: string;
 }>;
 
 const Modal: React.FC<TModalProps> = (props) => {
@@ -47,6 +48,7 @@ const Modal: React.FC<TModalProps> = (props) => {
     closeClassName,
     shouldFullScreenInMobile = true,
     shouldHideGreyBackground = false,
+    headerClassName,
   } = props;
 
   const intl = useIntl();
@@ -74,6 +76,9 @@ const Modal: React.FC<TModalProps> = (props) => {
     },
     scrollLayerClassName,
   );
+
+  const headerClasses = classNames(headerClassName, css.modalHeader);
+
   const hasTitle = !!title;
   const closeModalMessage = intl.formatMessage({ id: 'Modal.closeModal' });
 
@@ -104,7 +109,7 @@ const Modal: React.FC<TModalProps> = (props) => {
       <div className={scrollLayerClasses}>
         <div className={containerClasses}>
           {!customHeader && (
-            <div className={css.modalHeader}>
+            <div className={headerClasses}>
               {hasTitle && <div className={css.title}>{title}</div>}
               {closeBtn}
             </div>
