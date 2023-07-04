@@ -48,14 +48,18 @@
             @include textTemplate(14px, 400, 20px);
 
             & > div:nth-of-type(1) {
-              flex-basis: 30%;
+              flex-basis: 25%;
             }
             & > div:nth-of-type(2) {
-              flex-basis: 45%;
+              flex-basis: 25%;
             }
             & > div:nth-of-type(3) {
-              text-align: right;
               flex-basis: 20%;
+            }
+            & > div:nth-of-type(4) {
+              flex-basis: 30%;
+              cursor: pointer;
+              @include lineClamp(2);
             }
 
             .head {
@@ -76,4 +80,8 @@
       width: 50%;
     }
   }
+}
+
+.requirementTooltip {
+  max-width: 400px;
 }

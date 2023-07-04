@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
 import Modal from '@components/Modal/Modal';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
 import { isJoinedPlan } from '@helpers/orderHelper';
 import type { TObject, TUser } from '@utils/types';
@@ -27,10 +28,11 @@ const prepareData = ({
       const orderData = Object.entries<TObject>(memberOrders).reduce<TObject[]>(
         (memberOrderResult, currentMemberOrderEntry) => {
           const [memberId, memberOrderData] = currentMemberOrderEntry;
-          const { foodId, status } = memberOrderData;
+          const { foodId, status, requirement } = memberOrderData;
           const newItem = {
             memberData: participantData[memberId],
             foodData: {
+              requirement,
               foodId,
               ...foodListOfDate[foodId],
             },
@@ -59,13 +61,13 @@ type TReviewOrdersResultModalProps = {
   isOpen: boolean;
   data: TObject;
   onClose: () => void;
-  goBackToEditMode: () => void;
+  onDownloadReviewOrderResults: () => void;
 };
 
 const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
   props,
 ) => {
-  const { isOpen, onClose, goBackToEditMode, data } = props;
+  const { isOpen, onClose, onDownloadReviewOrderResults, data } = props;
   const intl = useIntl();
 
   const {
@@ -176,11 +178,16 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                       id: 'ReviewOrdersResultModal.tableHead.price',
                     })}
                   </div>
+                  <div className={css.head}>
+                    {intl.formatMessage({
+                      id: 'ReviewOrdersResultModal.tableHead.requirement',
+                    })}
+                  </div>
                 </div>
                 {orderData.map((row: TObject) => {
                   const {
                     memberData,
-                    foodData: { foodName, foodPrice = 0 },
+                    foodData: { foodName, foodPrice = 0, requirement },
                   } = row;
                   const { name: memberName, id: memberId } = memberData || {};
 
@@ -189,6 +196,16 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                       <div>{memberName}</div>
                       <div>{foodName}</div>
                       <div>{`${parseThousandNumber(foodPrice)}đ`}</div>
+                      {requirement ? (
+                        <Tooltip
+                          overlayClassName={css.requirementTooltip}
+                          tooltipContent={requirement}
+                          placement="bottomLeft">
+                          <div>{requirement}</div>
+                        </Tooltip>
+                      ) : (
+                        <div></div>
+                      )}
                     </div>
                   );
                 })}
@@ -197,8 +214,10 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
           );
         })}
       </div>
-      <Button className={css.goBackButton} onClick={goBackToEditMode}>
-        {intl.formatMessage({ id: 'ReviewOrdersResultModal.goBackButtonText' })}
+      <Button
+        className={css.goBackButton}
+        onClick={onDownloadReviewOrderResults}>
+        {intl.formatMessage({ id: 'ReviewOrdersResultModal.downloadFile' })}
       </Button>
     </Modal>
   );

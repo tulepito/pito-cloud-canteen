@@ -22,6 +22,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
+import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import {
   checkMinMaxQuantity,
@@ -205,6 +206,16 @@ const OrderDetailPage = () => {
   const handleSubmitReviewInfoForm = (_values: TReviewInfoFormValues) => {
     setReviewInfoValues(_values);
   };
+
+  const onSaveOrderNote = (orderNote: string) => {
+    return dispatch(
+      orderManagementThunks.updateOrderGeneralInfo({
+        orderNote,
+      }),
+    );
+  };
+
+  const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
 
   const handleAgreeCancelOrder = async () => {
     await dispatch(orderManagementThunks.cancelPickingOrder(orderId as string));
@@ -443,6 +454,8 @@ const OrderDetailPage = () => {
       onGoBackToEditOrderPage={handleGoBackFromReviewMode}
       showStartPickingOrderButton
       orderData={orderData as TListing}
+      onSaveOrderNote={onSaveOrderNote}
+      onDownloadReviewOrderResults={onDownloadReviewOrderResults}
     />
   );
 

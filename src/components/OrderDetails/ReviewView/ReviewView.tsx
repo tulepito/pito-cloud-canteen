@@ -11,6 +11,7 @@ import type { TDefaultProps, TListing } from '@utils/types';
 import ReviewCartSection from './ReviewCartSection/ReviewCartSection';
 import type { TReviewInfoFormValues } from './ReviewInfoSection/ReviewInfoForm';
 import ReviewInfoSection from './ReviewInfoSection/ReviewInfoSection';
+import ReviewNoteSection from './ReviewNoteSection/ReviewNoteSection';
 import ReviewOrderDetailsSection from './ReviewOrderDetailsSection/ReviewOrderDetailsSection';
 import ReviewOrderProcessSection from './ReviewOrderProcessSection/ReviewOrderProcessSection';
 import ReviewOrdersResultSection from './ReviewOrdersResultSection/ReviewOrdersResultSection';
@@ -31,6 +32,8 @@ type TReviewViewProps = TDefaultProps & {
   onGoBackToEditOrderPage?: () => void;
   onSubmitEdit?: (values: TReviewInfoFormValues) => void;
   onDownloadPriceQuotation: () => Promise<void>;
+  onSaveOrderNote?: (value: string) => void;
+  onDownloadReviewOrderResults?: () => void;
 };
 
 const ReviewView: React.FC<TReviewViewProps> = (props) => {
@@ -47,6 +50,8 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     onDownloadPriceQuotation,
     classes = {},
     orderData,
+    onSaveOrderNote,
+    onDownloadReviewOrderResults,
   } = props;
   const { leftClassName, rightClassName } = classes;
   const dispatch = useAppDispatch();
@@ -89,12 +94,15 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           data={reviewViewData?.reviewInfoData || {}}
           onSubmit={onSubmitEdit}
         />
-
+        <ReviewNoteSection
+          onSaveOrderNote={onSaveOrderNote}
+          data={reviewViewData.orderNoteData}
+        />
         <RenderWhen condition={isGroupOrder}>
           <ReviewOrdersResultSection
             className={css.resultRoot}
             data={reviewViewData.reviewResultData}
-            goBackToEditMode={onGoBackToEditOrderPage}
+            onDownloadReviewOrderResults={onDownloadReviewOrderResults}
           />
         </RenderWhen>
 
