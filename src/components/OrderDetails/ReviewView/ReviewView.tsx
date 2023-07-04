@@ -94,7 +94,10 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           data={reviewViewData?.reviewInfoData || {}}
           onSubmit={onSubmitEdit}
         />
-
+        <ReviewNoteSection
+          onSaveOrderNote={onSaveOrderNote}
+          data={reviewViewData.orderNoteData}
+        />
         <RenderWhen condition={isGroupOrder}>
           <ReviewOrdersResultSection
             className={css.resultRoot}
