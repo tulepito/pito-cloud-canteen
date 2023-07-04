@@ -33,7 +33,7 @@ type TReviewViewProps = TDefaultProps & {
   onSubmitEdit?: (values: TReviewInfoFormValues) => void;
   onDownloadPriceQuotation: () => Promise<void>;
   onSaveOrderNote?: (value: string) => void;
-  onDownloadReviewOrderResults?: () => void;
+  onDownloadReviewOrderResults: () => void;
 };
 
 const ReviewView: React.FC<TReviewViewProps> = (props) => {
