@@ -82,7 +82,6 @@ export const fetchEmailDataSourceWithOrder = async ({
   receiver,
   orderId,
   participantId,
-  partnerId,
   restaurantId,
 }: EmailDataSourceBuilder) => {
   switch (receiver) {
@@ -141,14 +140,18 @@ export const fetchEmailDataSourceWithOrder = async ({
       const plan = await fetchListing(plans[0]);
       const quotation = quotationId ? await fetchListing(quotationId) : null;
       const company = await fetchUser(companyId);
-      const partner = await fetchUser(partnerId as string);
-      const restaurant = await fetchListing(restaurantId as string);
+      const restaurant = await fetchListing(restaurantId as string, ['author']);
 
       const planListing = Listing(plan);
       const quotationListing = quotation && Listing(quotation);
       const companyUser = User(company);
-      const partnerUser = User(partner);
+
       const restaurantListing = Listing(restaurant);
+
+      const { author } = restaurantListing.getFullData();
+      const partnerId = author.id.uuid;
+      const partner = await fetchUser(partnerId as string);
+      const partnerUser = User(partner);
 
       return {
         companyUser,
@@ -411,10 +414,9 @@ export const emailSendingFactory = async (
         break;
       }
       case EmailTemplateTypes.PARTNER.PARTNER_NEW_ORDER_APPEAR: {
-        const { partnerId, orderId, promotion = 0, restaurantId } = emailParams;
+        const { orderId, promotion = 0, restaurantId } = emailParams;
         const emailDataSource: any = await fetchEmailDataSourceWithOrder({
           receiver: 'partner',
-          partnerId,
           orderId,
           restaurantId,
         });
@@ -435,10 +437,9 @@ export const emailSendingFactory = async (
         break;
       }
       case EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED: {
-        const { partnerId, orderId, restaurantId, timestamp } = emailParams;
+        const { orderId, restaurantId, timestamp } = emailParams;
         const emailDataSource: any = await fetchEmailDataSourceWithOrder({
           receiver: 'partner',
-          partnerId,
           orderId,
           restaurantId,
         });

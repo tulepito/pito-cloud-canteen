@@ -15,7 +15,6 @@ import {
   denormalisedResponseEntities,
   Listing,
   Transaction,
-  User,
 } from '@src/utils/data';
 import { VNTimezone } from '@src/utils/dates';
 import { ENotificationType, EQuotationStatus } from '@src/utils/enums';
@@ -63,11 +62,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const tx = denormalisedResponseEntities(txResponse)[0];
         const txGetter = Transaction(tx);
         const { participantIds = [], orderId } = txGetter.getMetadata();
-        const { booking, listing, provider } = txGetter.getFullData();
+        const { booking, listing } = txGetter.getFullData();
         const listingGetter = Listing(listing);
-        const providerGetter = User(provider);
         const restaurantId = listingGetter.getId();
-        const partnerId = providerGetter.getId();
         const { displayStart } = booking.attributes;
         const timestamp = new Date(displayStart).getTime();
         const startTimestamp = DateTime.fromMillis(timestamp)
@@ -148,7 +145,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               orderId,
               timestamp,
               restaurantId,
-              partnerId,
             },
           );
 
