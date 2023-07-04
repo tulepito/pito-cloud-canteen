@@ -25,6 +25,7 @@ import {
 import { checkUserExistedApi } from '@apis/userApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
+import type { TPlan } from '@src/utils/orderTypes';
 import { Listing, User } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import { storableError } from '@utils/errors';
@@ -69,6 +70,7 @@ type TOrderManagementState = {
   transactionDataMap: {
     [date: number]: TTransaction;
   };
+  draftOrderDetail: TPlan['orderDetail'];
 };
 
 const initialState: TOrderManagementState = {
@@ -92,6 +94,7 @@ const initialState: TOrderManagementState = {
   participantData: [],
   anonymousParticipantData: [],
   transactionDataMap: {},
+  draftOrderDetail: {},
 };
 
 // ================ Thunk types ================ //
@@ -679,11 +682,14 @@ const OrderManagementSlice = createSlice({
           ...restPayload
         } = payload;
 
+        const { orderDetail } = Listing(planData).getMetadata();
+
         return {
           ...state,
           isFetchingOrderDetails: false,
           orderData,
           planData,
+          draftOrderDetail: orderDetail,
           ...restPayload,
         };
       })

@@ -11,6 +11,7 @@ import Tabs from '@components/Tabs/Tabs';
 import { groupFoodOrderByDate } from '@helpers/order/orderDetailHelper';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
+import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { AdminAttributesThunks } from '@pages/admin/Attributes.slice';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
@@ -86,6 +87,8 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     priceQuotationData,
   );
 
+  const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
+
   const tabItems = useMemo(
     () => {
       const foodOrderGroupedByDate = groupFoodOrderByDate({
@@ -124,6 +127,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             updatePlanDetail,
             timeStamp: key,
             foodOrder,
+            onDownloadReviewOrderResults,
           },
         };
       });
@@ -216,6 +220,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             onSubmitEdit={() => {}}
             onDownloadPriceQuotation={handleDownloadPriceQuotation}
             onGoBackToEditOrderPage={handleGoBackFromReviewMode}
+            onDownloadReviewOrderResults={onDownloadReviewOrderResults}
             showStartPickingOrderButton
             isAdminLayout
           />

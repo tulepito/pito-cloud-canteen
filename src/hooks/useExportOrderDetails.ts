@@ -49,9 +49,12 @@ const prepareData = ({
 };
 
 const useExportOrderDetails = () => {
-  const { orderData, planData, participantData, anonymousParticipantData } =
-    useAppSelector((state) => state.OrderManagement);
-  const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
+  const {
+    orderData,
+    draftOrderDetail,
+    participantData,
+    anonymousParticipantData,
+  } = useAppSelector((state) => state.OrderManagement);
 
   const { participants = [], anonymous = [] } = Listing(
     orderData as TListing,
@@ -102,15 +105,23 @@ const useExportOrderDetails = () => {
   );
 
   const handler = () => {
-    const preparedData = prepareData({
-      orderDetail,
-      participantData: participantDataMap,
-    });
+    try {
+      const preparedData = prepareData({
+        orderDetail: draftOrderDetail,
+        participantData: participantDataMap,
+      });
 
-    const ws = XLSX.utils.json_to_sheet(preparedData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'SheetJS');
-    XLSX.writeFile(wb, `${formatTimestamp(new Date().getTime())}_Món_Ăn.xlsx`);
+      const { title } = Listing(orderData as TListing).getAttributes();
+
+      const ws = XLSX.utils.json_to_sheet(preparedData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'SheetJS');
+      XLSX.writeFile(wb, `${title}.xlsx`);
+    } catch (error) {
+      console.error('Export order detail failed', error);
+
+      return error;
+    }
   };
 
   return { handler };

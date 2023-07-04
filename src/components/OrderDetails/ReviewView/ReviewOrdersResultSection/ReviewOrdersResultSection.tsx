@@ -13,7 +13,7 @@ import css from './ReviewOrdersResultSection.module.scss';
 
 type TReviewOrdersResultSectionProps = {
   className?: string;
-  onDownloadReviewOrderResults?: () => void;
+  onDownloadReviewOrderResults: () => void;
   data: TObject;
 };
 
@@ -67,9 +67,7 @@ const ReviewOrdersResultSection: React.FC<TReviewOrdersResultSectionProps> = (
       </Button>
       <ReviewOrdersResultModal
         data={data}
-        onDownloadReviewOrderResults={
-          onDownloadReviewOrderResults || handleCloseModal
-        }
+        onDownloadReviewOrderResults={onDownloadReviewOrderResults}
         isOpen={isResultModalOpen}
         onClose={handleCloseModal}
       />

@@ -98,6 +98,7 @@ export const ReviewContent: React.FC<any> = (props) => {
     deliveryManInfo = {},
     updatePlanDetail,
     foodOrder = {},
+    onDownloadReviewOrderResults,
   } = props;
 
   const intl = useIntl();
@@ -212,6 +213,7 @@ export const ReviewContent: React.FC<any> = (props) => {
             anonymousParticipantData,
             orderDetail,
           }}
+          onDownloadReviewOrderResults={onDownloadReviewOrderResults}
         />
       </RenderWhen>
       <div className={css.infoSection}>
