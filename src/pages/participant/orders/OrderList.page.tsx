@@ -267,18 +267,36 @@ const OrderListPage = () => {
   };
 
   const openRatingSubOrderModal = () => {
+    subOrderDetailModalControl.setFalse();
     ratingSubOrderModalControl.setTrue();
   };
 
+  const openSuccessRatingModal = () => {
+    ratingSubOrderModalControl.setFalse();
+    successRatingModalControl.setTrue();
+  };
+
+  const closeAllModals = () => {
+    successRatingModalControl.setFalse();
+  };
+
   useEffect(() => {
-    if (subOrdersFromSelectedDayTxIds) {
+    if (subOrdersFromSelectedDayTxIds.length > 0) {
       dispatch(
         OrderListThunks.fetchTransactionBySubOrder(
           subOrdersFromSelectedDayTxIds,
         ),
       );
     }
-  }, [subOrdersFromSelectedDayTxIds]);
+  }, [JSON.stringify(subOrdersFromSelectedDayTxIds)]);
+
+  useEffect(() => {
+    if (selectedEvent) {
+      const { timestamp, planId } = selectedEvent.resource;
+      const subOrderId = `${currentUserId} - ${planId} - ${timestamp}`;
+      dispatch(OrderListThunks.fetchSubOrdersFromFirebase(subOrderId));
+    }
+  }, [selectedEvent]);
 
   useEffect(() => {
     (async () => {
@@ -306,6 +324,10 @@ const OrderListPage = () => {
       }
     }
   }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
+
+  useEffect(() => {
+    dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
+  }, []);
 
   return (
     <ParticipantLayout>
@@ -385,13 +407,14 @@ const OrderListPage = () => {
             onClose={ratingSubOrderModalControl.setFalse}
             selectedEvent={selectedEvent}
             currentUserId={currentUserId}
-            openSuccessRatingModal={successRatingModalControl.setTrue}
+            openSuccessRatingModal={openSuccessRatingModal}
           />
         </div>
       </RenderWhen>
       <SuccessRatingModal
         isOpen={successRatingModalControl.value}
         onClose={successRatingModalControl.setFalse}
+        closeAllModals={closeAllModals}
       />
       <NotificationModal
         isOpen={notificationModalControl.value}

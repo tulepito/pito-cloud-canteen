@@ -154,7 +154,7 @@ const createOrder = async ({
         customName: `sendRemindPOE_${orderFlexId}`,
         timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
         params: {
-          orderFlexId,
+          orderId: orderFlexId,
         },
       });
     }

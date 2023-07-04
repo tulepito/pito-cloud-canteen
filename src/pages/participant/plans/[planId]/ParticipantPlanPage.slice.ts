@@ -161,6 +161,13 @@ const updateOrder = createAsyncThunk(
       });
     });
     await dispatch(reloadData(planId));
+    orderDays.map(async (subOrderDate: string) => {
+      await participantSubOrderAddDocumentApi({
+        participantId: currentUserId,
+        planId,
+        timestamp: parseInt(`${subOrderDate}`, 10),
+      });
+    });
 
     return true;
   },
