@@ -7,7 +7,6 @@ import isEmpty from 'lodash/isEmpty';
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import { FieldTextAreaComponent } from '@components/FormFields/FieldTextArea/FieldTextArea';
-import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconBox from '@components/Icons/IconBox/IconBox';
 import Modal from '@components/Modal/Modal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
@@ -101,13 +100,6 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
     arrows: false,
   };
 
-  const closeButton = (
-    <Button variant="inline" className={css.closeModalBtn} onClick={onClose}>
-      <IconArrow direction="left" />
-      <div>Quay lại</div>
-    </Button>
-  );
-
   const handleChangeRequirement = (value: string) => {
     onChangeRequirement(value);
   };
@@ -126,8 +118,8 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
       id={`ListingDetailModal.${title}`}
       isOpen={isOpen}
       handleClose={onClose}
-      closeButton={closeButton}
-      containerClassName={css.modalContainer}>
+      containerClassName={css.modalContainer}
+      headerClassName={css.headerModal}>
       <div>
         <div className={css.listingImage}>
           <RenderWhen condition={listingImages.length > 0}>
@@ -154,7 +146,15 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
         </div>
 
         <div className={css.section}>
-          <div className={css.foodTitle}>{title}</div>
+          <div className={css.foodTitleWrapper}>
+            <div className={css.foodTitle}>{title}</div>
+            <RenderWhen condition={!isEmpty(packagingLabel)}>
+              <div className={css.packagingSection}>
+                <IconBox className={css.iconBox} />
+                <div>{packagingLabel}</div>
+              </div>
+            </RenderWhen>
+          </div>
 
           <RenderWhen condition={badges?.length > 0}>
             <div className={css.badgeContainer}>
@@ -165,13 +165,6 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
                   type={badge?.badgeType}
                 />
               ))}
-            </div>
-          </RenderWhen>
-
-          <RenderWhen condition={!isEmpty(packagingLabel)}>
-            <div className={css.packagingSection}>
-              <IconBox className={css.iconBox} />
-              <div>{packagingLabel}</div>
             </div>
           </RenderWhen>
         </div>
@@ -217,7 +210,7 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
 
         <div className={css.selectFoodSection}>
           <Button className={css.selectFoodBtn} onClick={onSelectFood}>
-            Chọn món
+            Chọn món này
           </Button>
         </div>
       </div>
