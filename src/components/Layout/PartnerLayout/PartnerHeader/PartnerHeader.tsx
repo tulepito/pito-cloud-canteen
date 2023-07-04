@@ -12,10 +12,13 @@ import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
+
+import PartnerNotificationModal from './PartnerNotificationModal';
 
 import css from './PartnerHeader.module.scss';
 
@@ -48,9 +51,17 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
           <InlineTextButton type="button">
             <IconMail className={css.iconMail} />
           </InlineTextButton>
-          <InlineTextButton type="button">
-            <IconBell className={css.iconBell} />
-          </InlineTextButton>
+          <Tooltip
+            overlayClassName={css.tooltipOverlay}
+            placement="bottom"
+            showArrow={false}
+            trigger={'click'}
+            tooltipContent={<PartnerNotificationModal />}>
+            <InlineTextButton type="button" className={css.notiIcon}>
+              <IconBell className={css.iconBell} />
+              <div className={css.notiDot}>{2}</div>
+            </InlineTextButton>
+          </Tooltip>
         </div>
         <div className={css.line}></div>
         <ProfileMenu>

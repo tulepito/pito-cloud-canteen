@@ -2,6 +2,7 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 import classNames from 'classnames';
 import RCToolTip from 'rc-tooltip';
+import type { TooltipProps } from 'rc-tooltip/lib/Tooltip';
 
 import css from './Tooltip.module.scss';
 
@@ -19,14 +20,16 @@ type TPlacement =
   | 'leftTop'
   | 'leftBottom';
 
-type TTooltipProps = PropsWithChildren<{
-  overlayClassName?: string;
-  placement?: TPlacement;
-  tooltipContent?: any;
-  trigger?: string;
-  showArrow?: boolean;
-  overlayInnerStyle?: React.CSSProperties;
-}>;
+type TTooltipProps = PropsWithChildren<
+  {
+    overlayClassName?: string;
+    placement?: TPlacement;
+    tooltipContent?: any;
+    trigger?: string;
+    showArrow?: boolean;
+    overlayInnerStyle?: React.CSSProperties;
+  } & Partial<TooltipProps>
+>;
 
 const Tooltip: React.FC<TTooltipProps> = (props) => {
   const {
