@@ -458,3 +458,28 @@ export const calculateRemainTime = (futureTimestamp: number) => {
 export const isSameDate = (date1: Date, date2: Date) => {
   return DateTime.fromJSDate(date1).hasSame(DateTime.fromJSDate(date2), 'day');
 };
+
+export const calcPastTime = (timestamp: number) => {
+  const nowDt = DateTime.local();
+  const pastDt = DateTime.fromMillis(timestamp);
+  const diff = nowDt
+    .diff(pastDt, ['days', 'hours', 'minutes', 'seconds'])
+    .toObject();
+  const diffInDays = diff.days || 0;
+  const diffInHours = diff.hours || 0;
+  const diffInMinutes = diff.minutes || 0;
+
+  if (diffInDays > 0) {
+    return `${Math.abs(diffInDays)} ngày trước`;
+  }
+
+  if (diffInHours > 0) {
+    return `${Math.abs(diffInHours)} giờ trước`;
+  }
+
+  if (diffInMinutes > 0) {
+    return `${Math.abs(diffInMinutes)} phút trước`;
+  }
+
+  return 'Vừa xong';
+};
