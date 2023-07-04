@@ -27,6 +27,8 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
 
   const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
 
+  const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
+
   return (
     <div className={css.root}>
       <TitleSection
@@ -42,6 +44,7 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
         reviewViewData={reviewViewData}
         onDownloadReviewOrderResults={onDownloadReviewOrderResults}
         orderData={orderData as TListing}
+        onDownloadReviewOrderResults={onDownloadReviewOrderResults}
       />
     </div>
   );
