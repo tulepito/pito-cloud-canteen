@@ -1247,6 +1247,8 @@
   "ParticipantSidebar.profile": "Tài khoản cá nhân",
   "PartnerHomePageRoute.description": "Trang chủ",
   "PartnerHomePageRoute.title": "Đối tác | Trang chủ",
+  "PartnerNotificationModal.markAllViewed": "Đánh dấu đã đọc",
+  "PartnerNotificationModal.title": "Thông báo",
   "PartnerOrderPageRoute.description": "Quản lý đơn hàng",
   "PartnerOrderPageRoute.title": "Đối tác | Quản lý đơn hàng",
   "PartnerSidebar.dashboardLabel": "Trang chủ",
