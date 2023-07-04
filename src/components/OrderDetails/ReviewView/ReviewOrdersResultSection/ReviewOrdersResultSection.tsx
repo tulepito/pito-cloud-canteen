@@ -13,14 +13,14 @@ import css from './ReviewOrdersResultSection.module.scss';
 
 type TReviewOrdersResultSectionProps = {
   className?: string;
-  goBackToEditMode?: () => void;
+  onDownloadReviewOrderResults?: () => void;
   data: TObject;
 };
 
 const ReviewOrdersResultSection: React.FC<TReviewOrdersResultSectionProps> = (
   props,
 ) => {
-  const { className, goBackToEditMode, data } = props;
+  const { className, onDownloadReviewOrderResults, data } = props;
   const intl = useIntl();
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
   const { participants, orderDetail } = data;
@@ -67,7 +67,9 @@ const ReviewOrdersResultSection: React.FC<TReviewOrdersResultSectionProps> = (
       </Button>
       <ReviewOrdersResultModal
         data={data}
-        goBackToEditMode={goBackToEditMode || handleCloseModal}
+        onDownloadReviewOrderResults={
+          onDownloadReviewOrderResults || handleCloseModal
+        }
         isOpen={isResultModalOpen}
         onClose={handleCloseModal}
       />

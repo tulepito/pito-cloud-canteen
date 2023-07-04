@@ -64,6 +64,7 @@ export const usePrepareOrderDetailPageData = () => {
     orderState,
     ratings,
     orderType = EOrderType.group,
+    orderNote = '',
   } = Listing(orderData as TListing).getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
   const isCanceledOrder = [
@@ -161,6 +162,10 @@ export const usePrepareOrderDetailPageData = () => {
     foodOrderGroupedByDate,
     isCanceledOrder,
     transactionDataMap,
+    orderNoteData: {
+      orderNote,
+      disabled: orderState !== EOrderStates.picking,
+    },
   };
 
   /* =============== Price quotation data =============== */
