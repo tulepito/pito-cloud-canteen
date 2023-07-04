@@ -27,7 +27,7 @@ const updateAdminAccount = createAsyncThunk(
   'app/adminAccountSetting/UPDATE_ADMIN_ACCOUNT',
   async (params: TObject, { extra: sdk, dispatch }) => {
     const { data: response } = await sdk.currentUser.updateProfile(params);
-    await dispatch(userThunks.fetchCurrentUser({}));
+    await dispatch(userThunks.fetchCurrentUser());
 
     return response;
   },
