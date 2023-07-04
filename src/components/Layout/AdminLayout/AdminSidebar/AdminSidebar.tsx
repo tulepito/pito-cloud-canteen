@@ -144,6 +144,7 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         id: 'adminInformationSetting',
         label: 'AdminSidebar.adminAccountInformationSetting',
         nameLink: adminRoutes.AdminAccountInformationSetting.path,
+        highlightRefLinks: [adminRoutes.AdminAccount.path],
       },
       {
         id: 'adminAccountSetting',
