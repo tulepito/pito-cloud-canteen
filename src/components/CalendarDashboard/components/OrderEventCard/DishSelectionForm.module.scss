@@ -16,11 +16,7 @@
   display: flex;
   align-items: center;
   margin-bottom: 10px;
-  display: flex;
-
-  span {
-    @include lineClamp(2);
-  }
+  padding-right: 8px;
 }
 
 .radioInput {

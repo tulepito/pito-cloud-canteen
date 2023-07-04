@@ -52,6 +52,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     daySession,
     deliveryHour: startTime,
     transactionId,
+    isOrderStarted = false,
   } = event.resource;
   const dishes: any[] = event.resource?.meal?.dishes || [];
   const user = useAppSelector(currentUserSelector);
@@ -70,7 +71,8 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   );
 
   const isExpired = isOver(expiredTime);
-  const shouldShowPickFoodSection = !isExpired && isEmpty(subOrderTx);
+  const shouldShowPickFoodSection =
+    !isOrderStarted && !isExpired && isEmpty(subOrderTx);
 
   const dishSelectionFormInitialValues = useMemo(
     () => dishSelection,

@@ -1,6 +1,5 @@
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
-import isEmpty from 'lodash/isEmpty';
 
 import IconClockWithExclamation from '@components/Icons/IconClock/IconClockWithExclamation';
 import IconLocation from '@components/Icons/IconLocation/IconLocation';
@@ -22,19 +21,17 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
 }) => {
   const {
     deliveryAddress,
-    restaurant: restaurantObj,
     expiredTime,
-    transactionId = '',
-  } = event?.resource || {};
+    isOrderStarted = false,
+    restaurant: restaurantObj,
+  } = event.resource || {};
 
-  const isExpired = isOver(expiredTime);
+  const shouldShowCountDown = isOver(expiredTime) || isOrderStarted;
   const remainTime = calculateRemainTime(new Date(expiredTime).getTime());
-
-  const shouldShowCountdown = !isExpired && isEmpty(transactionId);
 
   return (
     <>
-      <RenderWhen condition={shouldShowCountdown}>
+      <RenderWhen condition={shouldShowCountDown}>
         <OrderEventCardContentItem
           icon={<IconClockWithExclamation />}
           isHighlight={isFirstHighlight}>
@@ -45,7 +42,7 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
         <FormattedMessage
           id="EventCard.deliveryAddress"
           values={{
-            address: deliveryAddress.address,
+            address: deliveryAddress?.address,
           }}
         />
       </OrderEventCardContentItem>

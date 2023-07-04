@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import Button from '@components/Button/Button';
 import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
 import { useAppSelector } from '@hooks/reduxHooks';
+import { EParticipantOrderStatus } from '@src/utils/enums';
 
 import css from './DishSelectionForm.module.scss';
 
@@ -73,7 +74,10 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
   const disabledSubmit =
     actionsDisabled || submitting || hasValidationErrors || pristine;
   const disabledRejectButton =
-    actionsDisabled || updateOrderInProgress || updateOrderError;
+    actionsDisabled ||
+    updateOrderInProgress ||
+    updateOrderError ||
+    subOrderStatus === EParticipantOrderStatus.notJoined;
 
   const rejectSubmitting = clickedType === 'reject' && updateOrderInProgress;
   const confirmSubmitting = clickedType === 'submit' && updateOrderInProgress;
