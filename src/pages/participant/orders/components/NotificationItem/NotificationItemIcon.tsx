@@ -1,5 +1,7 @@
 import IconCancel from '@components/Icons/IconCancel/IconCancel';
 import IconClock from '@components/Icons/IconClock/IconClock';
+import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import IconFood from '@components/Icons/IconFood/IconFood';
 import IconRatingStar from '@components/Icons/IconRatingStar/IconRatingStar';
 import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
 import IconTruck from '@components/Icons/IconTruck/IconTruck';
@@ -12,26 +14,45 @@ type NotificationItemIconProps = {
 
 const NotificationItemIcon: React.FC<NotificationItemIconProps> = (props) => {
   const { type } = props;
-
+  let icon = null;
   switch (type) {
     case ENotificationType.INVITATION:
-      return <IconUser variant="withPlus" />;
+      icon = <IconUser variant="withPlus" />;
+      break;
+    case ENotificationType.SUB_ORDER_DELIVERED:
     case ENotificationType.COMPANY_JOINED:
-      return <IconUser variant="multiUser" />;
+      icon = <IconUser variant="multiUser" />;
+      break;
     case ENotificationType.ORDER_SUCCESS:
-      return <IconTickWithBackground />;
+      icon = <IconTickWithBackground />;
+      break;
+    case ENotificationType.SUB_ORDER_CANCELED:
     case ENotificationType.ORDER_CANCEL:
-      return <IconCancel />;
+      icon = <IconCancel />;
+      break;
     case ENotificationType.ORDER_DELIVERING:
-      return <IconTruck variant="withBackground" />;
+      icon = <IconTruck variant="withBackground" />;
+      break;
     case ENotificationType.ORDER_PICKING:
-      return <IconClock variant="withBackground" />;
+    case ENotificationType.SUB_ORDER_DELIVERING:
+      icon = <IconClock variant="withBackground" />;
+      break;
     case ENotificationType.ORDER_RATING:
-      return <IconRatingStar />;
+      icon = <IconRatingStar />;
+      break;
+    case ENotificationType.PARTNER_FOOD_CREATED_BY_ADMIN:
+      icon = <IconFood />;
+      break;
+    case ENotificationType.PARTNER_PROFILE_UPDATED_BY_ADMIN:
+    case ENotificationType.SUB_ORDER_UPDATED:
+      icon = <IconEdit />;
+      break;
 
     default:
-      return <IconUser />;
+      icon = <IconUser />;
+      break;
   }
-};
 
+  return icon;
+};
 export default NotificationItemIcon;
