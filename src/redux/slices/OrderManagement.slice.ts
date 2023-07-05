@@ -902,7 +902,6 @@ const updateOrderFromDraftEdit = createAsyncThunk(
       planId,
       orderDetail: draftOrderDetail,
     };
-
     await addUpdateMemberOrder(orderId, updateParams);
     await Promise.all(
       Object.keys(draftSubOrderChangesHistory).map(async (date) => {
