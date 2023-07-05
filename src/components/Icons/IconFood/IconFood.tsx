@@ -5,7 +5,7 @@ import type { TIconProps } from '@utils/types';
 
 import css from './IconFood.module.scss';
 
-const IconGift: React.FC<TIconProps> = (props) => {
+const IconFood: React.FC<TIconProps> = (props) => {
   const { rootClassName, className } = props;
   const classes = classNames(rootClassName || css.root, className);
 
@@ -27,4 +27,4 @@ const IconGift: React.FC<TIconProps> = (props) => {
   );
 };
 
-export default IconGift;
+export default IconFood;
