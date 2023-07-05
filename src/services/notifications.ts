@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 
 import { ENotificationType } from '@src/utils/enums';
+import type { TObject } from '@src/utils/types';
 
 import {
   queryCollectionData,
@@ -26,7 +27,8 @@ type NotificationParams = {
   seen: boolean;
 };
 
-type NotificationInvitationParams = RequiredNotificationParams &
+type NotificationInvitationParams = TObject &
+  RequiredNotificationParams &
   Partial<NotificationParams>;
 
 export const createFirebaseDocNotification = async (
@@ -35,147 +37,125 @@ export const createFirebaseDocNotification = async (
 ) => {
   const notificationTime = new Date();
   const notificationId = randomUUID();
+  const defaultAttributes = {
+    isNew: true,
+    notificationType,
+    createdAt: notificationTime,
+    userId: notificationParams?.userId,
+  };
+
+  let data: TObject = { ...defaultAttributes };
+
   try {
     switch (notificationType) {
       case ENotificationType.INVITATION: {
-        const { bookerName, companyId, userId, companyName } =
-          notificationParams;
-        const data = {
-          notificationType,
+        const { bookerName, companyId, companyName } = notificationParams;
+        data = {
+          ...defaultAttributes,
           bookerName,
           companyName,
           relatedLink: `/participant/invitation/${companyId}`,
-          userId,
-          createdAt: notificationTime,
         };
 
-        await setCollectionDocWithCustomId(
-          notificationId,
-          data,
-          FIREBASE_NOTIFICATION_COLLECTION_NAME!,
-        );
         break;
       }
       case ENotificationType.COMPANY_JOINED: {
-        const { companyName, userId } = notificationParams;
-        const data = {
-          notificationType,
-          userId,
+        const { companyName } = notificationParams;
+        data = {
+          ...data,
           companyName,
-          createdAt: notificationTime,
         };
 
-        await setCollectionDocWithCustomId(
-          notificationId,
-          data,
-          FIREBASE_NOTIFICATION_COLLECTION_NAME!,
-        );
         break;
       }
       case ENotificationType.ORDER_PICKING: {
-        const { orderTitle, orderId, userId } = notificationParams;
-        const data = {
-          notificationType,
-          userId,
+        const { orderTitle, orderId } = notificationParams;
+        data = {
+          ...data,
           orderTitle,
           orderId,
           relatedLink: `/participant/order/${orderId}`,
-          createdAt: notificationTime,
         };
 
-        await setCollectionDocWithCustomId(
-          notificationId,
-          data,
-          FIREBASE_NOTIFICATION_COLLECTION_NAME!,
-        );
         break;
       }
       case ENotificationType.ORDER_DELIVERING: {
-        const { orderTitle, orderId, userId, planId, subOrderDate } =
+        const { orderTitle, orderId, planId, subOrderDate } =
           notificationParams;
-        const data = {
-          notificationType,
-          userId,
+        data = {
+          ...data,
           orderTitle,
           orderId,
           subOrderDate,
           planId,
           relatedLink: `/participant/orders?planId=${planId}&timestamp=${subOrderDate}`,
-          createdAt: notificationTime,
         };
 
-        await setCollectionDocWithCustomId(
-          notificationId,
-          data,
-          FIREBASE_NOTIFICATION_COLLECTION_NAME!,
-        );
         break;
       }
       case ENotificationType.ORDER_SUCCESS: {
-        const { orderTitle, orderId, userId, planId, subOrderDate } =
+        const { orderTitle, orderId, planId, subOrderDate } =
           notificationParams;
-        const data = {
-          notificationType,
-          userId,
+        data = {
+          ...data,
           orderTitle,
           orderId,
           subOrderDate,
           planId,
           relatedLink: `/participant/orders?planId=${planId}&timestamp=${subOrderDate}`,
-          createdAt: notificationTime,
         };
 
-        await setCollectionDocWithCustomId(
-          notificationId,
-          data,
-          FIREBASE_NOTIFICATION_COLLECTION_NAME!,
-        );
         break;
       }
       case ENotificationType.ORDER_CANCEL: {
-        const { orderTitle, orderId, userId, planId, subOrderDate } =
+        const { orderTitle, orderId, planId, subOrderDate } =
           notificationParams;
-        const data = {
-          notificationType,
-          userId,
+        data = {
+          ...data,
           orderTitle,
           orderId,
           subOrderDate,
           planId,
           relatedLink: `/participant/orders?planId=${planId}&timestamp=${subOrderDate}`,
-          createdAt: notificationTime,
         };
 
-        await setCollectionDocWithCustomId(
-          notificationId,
-          data,
-          FIREBASE_NOTIFICATION_COLLECTION_NAME!,
-        );
         break;
       }
       case ENotificationType.ORDER_RATING: {
-        const { userId, planId, subOrderDate, foodName } = notificationParams;
-        const data = {
-          notificationType,
-          userId,
+        const { planId, subOrderDate, foodName } = notificationParams;
+        data = {
+          ...data,
           subOrderDate,
           planId,
           foodName,
           relatedLink: `/participant/sub-orders?planId=${planId}&timestamp=${subOrderDate}`,
-          createdAt: notificationTime,
         };
 
-        await setCollectionDocWithCustomId(
-          notificationId,
-          data,
-          FIREBASE_NOTIFICATION_COLLECTION_NAME!,
-        );
+        break;
+      }
+      case ENotificationType.SUB_ORDER_UPDATED: {
+        const { planId, subOrderDate, oldOrderDetail, newOrderDetail } =
+          notificationParams;
+        data = {
+          ...data,
+          subOrderDate,
+          planId,
+          oldOrderDetail,
+          newOrderDetail,
+        };
+
         break;
       }
 
       default:
         break;
     }
+
+    await setCollectionDocWithCustomId(
+      notificationId,
+      data,
+      FIREBASE_NOTIFICATION_COLLECTION_NAME!,
+    );
   } catch (error) {
     console.error('Error notification type: ', notificationType);
     console.error('Error creating notification: ', error);
@@ -204,18 +184,16 @@ export const fetchFirebaseDocNotifications = async (userId: string) => {
 
 export const updateSeenFirebaseDocNotification = async (
   notificationId: string,
+  data: TObject,
 ) => {
   try {
     await updateCollectionDoc(
       notificationId,
-      { seen: true },
+      data,
       FIREBASE_NOTIFICATION_COLLECTION_NAME!,
     );
   } catch (error) {
-    console.error(
-      'Error fetching notifications for notificationId: ',
-      notificationId,
-    );
-    console.error('Error fetching notifications: ', error);
+    console.error('Error update notification: ', notificationId);
+    console.error('Error update notification: ', error);
   }
 };
