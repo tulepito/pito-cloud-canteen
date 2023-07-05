@@ -1,13 +1,15 @@
 type IconArrowProps = {
   className?: string;
   direction?: 'up' | 'right' | 'down' | 'left';
+  onClick?: () => void;
 };
 const IconArrow = (props: IconArrowProps) => {
-  const { className, direction = 'up' } = props;
+  const { className, direction = 'up', onClick } = props;
 
   if (direction === 'up') {
     return (
       <svg
+        onClick={onClick}
         preserveAspectRatio="none"
         className={className}
         width="20"
@@ -28,6 +30,7 @@ const IconArrow = (props: IconArrowProps) => {
   if (direction === 'right') {
     return (
       <svg
+        onClick={onClick}
         preserveAspectRatio="none"
         className={className}
         width="20"
@@ -49,6 +52,7 @@ const IconArrow = (props: IconArrowProps) => {
   if (direction === 'down') {
     return (
       <svg
+        onClick={onClick}
         preserveAspectRatio="none"
         className={className}
         width="20"
@@ -69,6 +73,7 @@ const IconArrow = (props: IconArrowProps) => {
 
   return (
     <svg
+      onClick={onClick}
       preserveAspectRatio="none"
       className={className}
       width="20"
