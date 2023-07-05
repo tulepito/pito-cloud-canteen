@@ -62,6 +62,11 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     transactionDataMap = {},
     onSaveOrderNote,
   } = props;
+  const router = useRouter();
+  const { timestamp } = router.query;
+  const [currentViewDate, setCurrentViewDate] = useState<number>(
+    Number(timestamp),
+  );
 
   const dispatch = useAppDispatch();
   const router = useRouter();

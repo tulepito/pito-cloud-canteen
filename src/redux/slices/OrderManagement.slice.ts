@@ -141,6 +141,7 @@ export const checkMinMaxQuantityInProgressState = (
     ).length;
     const totalQuantityCanAdd = (totalQuantity * 10) / 100;
     const totalAdded = totalQuantity - oldTotalQuantity;
+
     const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
 
     const shouldShowUnderError = totalQuantity < minQuantity;

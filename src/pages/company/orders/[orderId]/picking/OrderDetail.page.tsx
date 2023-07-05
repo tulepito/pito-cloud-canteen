@@ -170,18 +170,16 @@ const OrderDetailPage = () => {
   const confirmCancelOrderActions = useBoolean(false);
   const dispatch = useAppDispatch();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const { timestamp } = router.query;
+  const {
+    query: { orderId, timestamp },
+    isReady: isRouterReady,
+  } = router;
   const [currentViewDate, setCurrentViewDate] = useState<number>(
     Number(timestamp),
   );
 
   const [showReachMaxAllowedChangesModal, setShowReachMaxAllowedChangesModal] =
     useState<'reach_max' | 'reach_min' | null>(null);
-
-  const {
-    query: { orderId },
-    isReady: isRouterReady,
-  } = router;
 
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const cancelPickingOrderInProgress = useAppSelector(
