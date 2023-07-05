@@ -61,7 +61,7 @@ export const LineItemsTableComponent: React.FC<
 
           return {
             ...result,
-            totalPrice: result.totalPrice + price,
+            totalPrice: result.totalPrice + price * quantity,
             totalQuantity: result.totalQuantity + quantity,
             formInitialValues: {
               ...result.formInitialValues,
