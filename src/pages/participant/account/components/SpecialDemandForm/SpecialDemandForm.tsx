@@ -16,6 +16,7 @@ export type TSpecialDemandFormValues = {
 type TExtraProps = {
   nutritionOptions?: { key: string; label: string }[];
   inProgress: boolean;
+  view: string;
 };
 type TSpecialDemandFormComponentProps =
   FormRenderProps<TSpecialDemandFormValues> & Partial<TExtraProps>;
@@ -31,6 +32,7 @@ const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
     invalid,
     submitting,
     inProgress,
+    view,
   } = props;
   const disabledSubmit = submitting || invalid || inProgress;
 
@@ -45,7 +47,7 @@ const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
               {ALLERGIES_OPTIONS.map(({ key, label }) => (
                 <FieldCheckbox
                   key={key}
-                  id={`allergies-${key}`}
+                  id={`${view}-allergies-${key}`}
                   name="allergies"
                   value={key}
                   label={label}
@@ -60,7 +62,7 @@ const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
               {nutritionOptions.map(({ key, label }) => (
                 <FieldCheckbox
                   key={key}
-                  id={`nutritions-${key}`}
+                  id={`${view}-nutritions-${key}`}
                   name="nutritions"
                   value={key}
                   label={label}

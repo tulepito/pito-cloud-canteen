@@ -72,6 +72,7 @@ const SpecialDemandPage: React.FC = () => {
           initialValues={initialValues}
           inProgress={updateSpecialDemandInProgress}
           nutritionOptions={nutritionOptions}
+          view="desktop"
         />
       </div>
 

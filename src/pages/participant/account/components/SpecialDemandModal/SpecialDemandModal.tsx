@@ -51,6 +51,7 @@ const SpecialDemandModal: React.FC<TSpecialDemandModalProps> = (props) => {
           initialValues={initialValues}
           nutritionOptions={nutritionOptions}
           inProgress={inProgress}
+          view="mobile"
         />
       </div>
     </Modal>
