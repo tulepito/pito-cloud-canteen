@@ -5,11 +5,13 @@ import IconClose from '@components/Icons/IconClose/IconClose';
 
 import css from './PartnerNotificationModal.module.scss';
 
-type TPartnerNotificationModalProps = {};
+type TPartnerNotificationModalProps = {
+  handleCloseTooltip: () => void;
+};
 
-const PartnerNotificationModal: React.FC<
-  TPartnerNotificationModalProps
-> = () => {
+const PartnerNotificationModal: React.FC<TPartnerNotificationModalProps> = ({
+  handleCloseTooltip,
+}) => {
   const intl = useIntl();
 
   const isNotificationListEmpty = true;
@@ -22,7 +24,7 @@ const PartnerNotificationModal: React.FC<
         <span>
           {intl.formatMessage({ id: 'PartnerNotificationModal.title' })}
         </span>
-        <div className={css.closeIconWrapper}>
+        <div className={css.closeIconWrapper} onClick={handleCloseTooltip}>
           <IconClose className={css.closeIcon} />
         </div>
       </div>
