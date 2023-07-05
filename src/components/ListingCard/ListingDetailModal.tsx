@@ -211,6 +211,7 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
             meta={requirementField.meta}
             placeholder={fieldRequirement.placeholder}
             onChange={handleChangeRequirement}
+            validate={maxLength('Ghi chú không được vượt quá 500 kí tự', 500)}
           />
         </div>
 
