@@ -6,7 +6,6 @@ import {
   fetchFirebaseDocNotifications,
   updateSeenFirebaseDocNotification,
 } from '@services/notifications';
-import participantChecker from '@services/permissionChecker/participant';
 import { getSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@src/utils/data';
 
@@ -24,17 +23,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           currentUser.id.uuid,
         );
 
-        res.json(notificationsResponse);
-        break;
+        return res.status(200).json(notificationsResponse);
       }
 
-      case HttpMethod.POST: {
-        const { notificationId } = req.body;
-        await updateSeenFirebaseDocNotification(notificationId, {
-          seen: true,
+      case HttpMethod.PUT: {
+        const { notificationId, updateData } = req.body;
+        const shouldUpdateAnArray = Array.isArray(notificationId);
+
+        if (shouldUpdateAnArray) {
+          notificationId.map((id) => {
+            return updateSeenFirebaseDocNotification(id, updateData);
+          });
+        } else {
+          updateSeenFirebaseDocNotification(notificationId, updateData);
+        }
+
+        return res.status(200).json({
+          message: `Updated ${
+            shouldUpdateAnArray ? notificationId.join(', ') : notificationId
+          }`,
         });
-        res.status(200).end();
-        break;
       }
 
       default:
@@ -45,4 +53,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   }
 }
 
-export default cookies(participantChecker(handler));
+export default cookies(handler);
