@@ -15,7 +15,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     return res.json({ isInTransactionProgress });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     handleError(res, error);
   }
 }

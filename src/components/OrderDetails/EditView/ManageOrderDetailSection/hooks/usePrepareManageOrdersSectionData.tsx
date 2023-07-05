@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { isEmpty } from 'lodash';
 
@@ -10,31 +9,31 @@ import type { TListing, TObject, TUser } from '@utils/types';
 
 export const usePrepareManageOrdersSectionData = (
   currentViewDate: number | string,
-  setCurrentViewDate: Dispatch<SetStateAction<number>>,
+  setCurrentViewDate: (date: number) => void,
 ) => {
   const [defaultActiveKey, setDefaultActiveKey] = useState(1);
-  const { planData, participantData, orderData } = useAppSelector(
-    (state) => state.OrderManagement,
-  );
+  const {
+    participantData,
+    orderData,
+    draftOrderDetail = {},
+  } = useAppSelector((state) => state.OrderManagement);
 
   const { participants = [] } = Listing(orderData as TListing).getMetadata();
-  const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
 
-  const dateList = Object.entries(orderDetail)
+  const dateList = Object.entries(draftOrderDetail)
     .reduce<number[]>((prev, [date, orderOnDate]) => {
       const { restaurant } = orderOnDate as TObject;
 
       return !isEmpty(restaurant?.foodList) ? prev.concat(Number(date)) : prev;
     }, [])
     .sort((x, y) => x - y);
-
   const indexOfTimestamp = useMemo(
     () => dateList.indexOf(Number(currentViewDate)),
     [currentViewDate, JSON.stringify(dateList)],
   );
 
   const { restaurant = {}, memberOrders = {} } =
-    orderDetail[currentViewDate.toString()] || {};
+    draftOrderDetail[currentViewDate?.toString()] || {};
   const { foodList = {} } = restaurant;
   const foodOptions = Object.entries<TObject>(foodList).map(
     ([foodId, foodData]) => {
@@ -76,6 +75,7 @@ export const usePrepareManageOrdersSectionData = (
         return {
           memberId,
           memberName,
+          memberEmail: participant?.attributes?.email,
         };
       }),
     [JSON.stringify(availableMemberIds)],
@@ -93,5 +93,6 @@ export const usePrepareManageOrdersSectionData = (
     defaultActiveKey,
     memberOptions,
     foodOptions,
+    currentOrderDetail: draftOrderDetail[currentViewDate] || {},
   };
 };

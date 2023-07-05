@@ -1,9 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import isEmpty from 'lodash/isEmpty';
-import { useRouter } from 'next/router';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TTabsItem } from '@components/Tabs/Tabs';
@@ -11,10 +9,12 @@ import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   orderDetailsAnyActionsInProgress,
+  OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
 import { formatTimestamp } from '@src/utils/dates';
 import { historyPushState } from '@src/utils/history';
+import type { TObject } from '@src/utils/types';
 import { EMAIL_RE } from '@src/utils/validators';
 
 import type { TAddOrderFormValues } from './AddOrEditOrderDetail/AddOrderForm';
@@ -25,37 +25,47 @@ import OrderDetailsTable from './OrderDetailsTable/OrderDetailsTable';
 import css from './ManageOrdersSection.module.scss';
 
 type TManageOrdersSectionProps = {
-  data: {
-    startDate: number;
-    endDate: number;
-  };
+  ableToUpdateOrder: boolean;
+  currentViewDate: number;
+  setCurrentViewDate: (date: number) => void;
+  isDraftEditing: boolean;
+  handleOpenReachMaxAllowedChangesModal?: (type: string) => void;
+  shouldShowOverflowError?: boolean;
+  shouldShowUnderError?: boolean;
 };
 
 const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
   const {
-    data: { startDate },
+    ableToUpdateOrder,
+    currentViewDate,
+    setCurrentViewDate,
+    isDraftEditing,
+    handleOpenReachMaxAllowedChangesModal,
+    shouldShowOverflowError,
+    shouldShowUnderError,
   } = props;
 
   const dispatch = useAppDispatch();
-  const {
-    isReady,
-    query: { timestamp },
-  } = useRouter();
   const intl = useIntl();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const [currentViewDate, setCurrentViewDate] = useState(
-    timestamp ? Number(timestamp) : startDate,
-  );
+
   const {
     dateList = [],
     memberOptions,
     foodOptions,
+    currentOrderDetail,
   } = usePrepareManageOrdersSectionData(currentViewDate, setCurrentViewDate);
 
+  const { restaurant = {} } = currentOrderDetail;
+  const { maxQuantity, minQuantity } = restaurant;
   const handleSubmitAddSelection = async (values: TAddOrderFormValues) => {
     const { participantId, requirement = '', foodId } = values;
     const selectParticipantValue = participantId.key;
     const isUsingEmail = EMAIL_RE.test(selectParticipantValue);
+
+    const member = memberOptions.find(
+      (m: TObject) => m.memberId === selectParticipantValue,
+    );
 
     const updateValues = {
       foodId,
@@ -63,8 +73,17 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
       currentViewDate,
       ...(isUsingEmail
         ? { memberEmail: selectParticipantValue }
-        : { memberId: selectParticipantValue }),
+        : {
+            memberId: selectParticipantValue,
+            memberEmail: member?.memberEmail,
+          }),
     };
+
+    if (isDraftEditing) {
+      return dispatch(
+        OrderManagementsAction.updateDraftOrderDetail(updateValues),
+      );
+    }
     await dispatch(orderManagementThunks.addOrUpdateMemberOrder(updateValues));
   };
 
@@ -84,6 +103,13 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
             <OrderDetailsTable
               currentViewDate={currentViewDate}
               foodOptions={foodOptions}
+              ableToUpdateOrder={ableToUpdateOrder}
+              isDraftEditing={isDraftEditing}
+              handleOpenReachMaxAllowedChangesModal={
+                handleOpenReachMaxAllowedChangesModal
+              }
+              shouldShowOverflowError={shouldShowOverflowError}
+              minQuantity={minQuantity}
             />
           </div>
           <div className={css.addOrder}>
@@ -95,6 +121,13 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
                 onSubmit={handleSubmitAddSelection}
                 foodOptions={foodOptions}
                 memberOptions={memberOptions}
+                ableToUpdateOrder={ableToUpdateOrder}
+                isDraftEditing={isDraftEditing}
+                shouldShowUnderError={shouldShowUnderError}
+                shouldShowOverflowError={shouldShowOverflowError}
+                maxQuantity={maxQuantity}
+                minQuantity={minQuantity}
+                currentViewDate={currentViewDate}
               />
             </div>
           </div>
@@ -112,12 +145,6 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     setCurrentViewDate(Number(id));
     historyPushState('timestamp', id);
   };
-
-  useEffect(() => {
-    if (isReady) {
-      setCurrentViewDate(Number(timestamp || startDate));
-    }
-  }, [isReady, timestamp]);
 
   return (
     <RenderWhen condition={!isEmpty(dateList)}>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import { createSlice } from '@reduxjs/toolkit';
 import { isEmpty } from 'lodash';
 import groupBy from 'lodash/groupBy';
@@ -5,9 +6,11 @@ import omit from 'lodash/omit';
 
 import { EHttpStatusCode } from '@apis/errors';
 import {
+  createOrderChangesHistoryDocumentApi,
   participantSubOrderAddDocumentApi,
   participantSubOrderGetByIdApi,
   participantSubOrderUpdateDocumentApi,
+  queryOrderChangesHistoryDocumentApi,
 } from '@apis/firebaseApi';
 import {
   addParticipantToOrderApi,
@@ -18,23 +21,253 @@ import {
   createQuotationApi,
   deleteParticipantFromOrderApi,
   getBookerOrderDataApi,
+  sendOrderDetailUpdatedEmailApi,
   sendRemindEmailToMemberApi,
   updateOrderApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
 import { checkUserExistedApi } from '@apis/userApi';
+import { EOrderDetailsTableTab } from '@components/OrderDetails/EditView/ManageOrderDetailSection/OrderDetailsTable/OrderDetailsTable.utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
+import type { TPlan } from '@src/utils/orderTypes';
 import { Listing, User } from '@utils/data';
-import { EParticipantOrderStatus } from '@utils/enums';
+import {
+  EOrderHistoryTypes,
+  EOrderType,
+  EParticipantOrderStatus,
+} from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type {
   TCompany,
   TListing,
   TObject,
+  TSubOrderChangeHistoryItem,
   TTransaction,
   TUser,
 } from '@utils/types';
+
+export const QUERY_SUB_ORDER_CHANGES_HISTORY_PER_PAGE = 3;
+
+export const checkMinMaxQuantity = (
+  orderDetails: TPlan['orderDetail'],
+  oldOrderDetail: TPlan['orderDetail'],
+  currentViewDate: number,
+  isNormalOrder: boolean,
+) => {
+  let totalQuantity = 0;
+  const data = orderDetails?.[currentViewDate] || {};
+  const { lineItems = [], restaurant = {} } = data;
+  const { maxQuantity = 100, minQuantity = 1 } = restaurant;
+  if (isNormalOrder) {
+    totalQuantity = lineItems.reduce((result: number, lineItem: TObject) => {
+      result += lineItem?.quantity || 1;
+
+      return result;
+    }, 0);
+
+    const disabledSubmit = Object.keys(orderDetails).some((key) => {
+      const detail = orderDetails[key];
+      const { lineItems = [], restaurant = {} } = detail || {};
+      const { maxQuantity = 100, minQuantity = 1 } = restaurant || {};
+      const totalQuantity = lineItems.reduce(
+        (result: number, lineItem: TObject) => {
+          result += lineItem?.quantity || 1;
+
+          return result;
+        },
+        0,
+      );
+      const shouldShowOverflowError = totalQuantity > maxQuantity;
+      const shouldShowUnderError = totalQuantity < minQuantity;
+
+      return shouldShowOverflowError || shouldShowUnderError;
+    });
+
+    const shouldShowOverflowError = totalQuantity > maxQuantity;
+    const shouldShowUnderError = totalQuantity < minQuantity;
+
+    return {
+      shouldShowOverflowError,
+      shouldShowUnderError,
+      minQuantity,
+      maxQuantity,
+      disabledSubmit,
+    };
+  }
+  const { memberOrders = {} } = data;
+  const { memberOrders: oldMemberOrders = {} } =
+    oldOrderDetail?.[currentViewDate] || {};
+  const oldTotalQuantity = Object.keys(oldMemberOrders).filter(
+    (f) =>
+      !!oldMemberOrders[f].foodId &&
+      oldMemberOrders[f].status === EParticipantOrderStatus.joined,
+  ).length;
+  totalQuantity = Object.keys(memberOrders).filter(
+    (f) =>
+      !!memberOrders[f].foodId &&
+      memberOrders[f].status === EParticipantOrderStatus.joined,
+  ).length;
+  const totalQuantityCanAdd = (totalQuantity * 10) / 100;
+  const totalAdded = totalQuantity - oldTotalQuantity;
+  const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
+
+  const shouldShowUnderError = totalQuantity < minQuantity;
+
+  const disabledSubmit = Object.keys(orderDetails).some((key) => {
+    const data = orderDetails[key] || {};
+    const { memberOrders = {}, restaurant } = data;
+    const { minQuantity = 1 } = restaurant;
+    const { memberOrders: oldMemberOrders = {} } = oldOrderDetail?.[key] || {};
+    const oldTotalQuantity = Object.keys(oldMemberOrders).filter(
+      (f) =>
+        !!oldMemberOrders[f].foodId &&
+        oldMemberOrders[f].status === EParticipantOrderStatus.joined,
+    ).length;
+    const totalQuantity = Object.keys(memberOrders).filter(
+      (f) =>
+        !!memberOrders[f].foodId &&
+        memberOrders[f].status === EParticipantOrderStatus.joined,
+    ).length;
+    const totalQuantityCanAdd = (totalQuantity * 10) / 100;
+    const totalAdded = totalQuantity - oldTotalQuantity;
+
+    const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
+
+    const shouldShowUnderError = totalQuantity < minQuantity;
+
+    return shouldShowOverflowError || shouldShowUnderError;
+  });
+
+  return {
+    shouldShowOverflowError,
+    shouldShowUnderError,
+    minQuantity,
+    maxQuantity,
+    disabledSubmit,
+  };
+};
+
+const addNewMemberToOrderDetail = (
+  orderDetail: TPlan['orderDetail'],
+  date: number,
+  memberId: string,
+  memberData: TObject,
+) => {
+  const newOrderDetail = {
+    ...orderDetail,
+    [date]: {
+      ...orderDetail[date],
+      memberOrders: {
+        ...orderDetail[date].memberOrders,
+        [memberId]: memberData,
+      },
+    },
+  };
+
+  return newOrderDetail;
+};
+
+export const prepareOrderDetail = ({
+  orderDetail,
+  currentViewDate,
+  foodId,
+  memberId,
+  requirement,
+  memberOrderValues,
+}: {
+  orderDetail: TPlan['orderDetail'];
+  currentViewDate: number;
+  foodId: string;
+  memberId: string;
+  requirement: string;
+  memberOrderValues: TObject;
+}) => {
+  let newMemberOrderValues = memberOrderValues;
+
+  const { status = EParticipantOrderStatus.empty } = memberOrderValues || {};
+
+  switch (status) {
+    case EParticipantOrderStatus.joined:
+    case EParticipantOrderStatus.notAllowed:
+      newMemberOrderValues = {
+        ...newMemberOrderValues,
+        foodId,
+      };
+      break;
+    case EParticipantOrderStatus.empty:
+    case EParticipantOrderStatus.notJoined:
+      newMemberOrderValues = {
+        ...newMemberOrderValues,
+        foodId,
+        status: EParticipantOrderStatus.joined,
+      };
+      break;
+    case EParticipantOrderStatus.expired:
+      break;
+    default:
+      break;
+  }
+  newMemberOrderValues = { ...newMemberOrderValues, requirement };
+
+  const newOrderDetail = addNewMemberToOrderDetail(
+    orderDetail,
+    currentViewDate,
+    memberId,
+    newMemberOrderValues,
+  );
+
+  return newOrderDetail as TPlan['orderDetail'];
+};
+
+const prepareAnonymousList = async ({
+  orderData,
+  memberId,
+  memberEmail,
+}: {
+  orderData: TListing;
+  memberId: string;
+  memberEmail: string;
+}) => {
+  const orderGetter = Listing(orderData);
+  const { participants = [], anonymous = [] } = orderGetter.getMetadata();
+
+  let shouldUpdateAnonymousList = false;
+  let updateAnonymous = anonymous;
+
+  const checkUserResult = await checkUserExistedApi({
+    ...(memberId ? { id: memberId } : {}),
+    ...(memberEmail ? { email: memberEmail } : {}),
+  });
+
+  let participantId = memberId;
+
+  const { status: apiStatus = EHttpStatusCode.NotFound, user } =
+    checkUserResult?.data || {};
+
+  if (apiStatus === EHttpStatusCode.NotFound) {
+    return { errorMessage: 'user_not_found' };
+  }
+
+  if (!isEmpty(user)) {
+    participantId = User(user).getId();
+  }
+  // Update list anonymous
+  if (
+    !participants.includes(participantId) &&
+    !anonymous.includes(participantId) &&
+    participantId
+  ) {
+    shouldUpdateAnonymousList = true;
+    updateAnonymous = anonymous.concat(participantId);
+  }
+
+  return {
+    shouldUpdateAnonymousList,
+    updateAnonymous,
+    participantId,
+  };
+};
 
 // ================ Initial states ================ //
 type TOrderManagementState = {
@@ -69,6 +302,21 @@ type TOrderManagementState = {
   transactionDataMap: {
     [date: number]: TTransaction;
   };
+
+  subOrderChangesHistory: TSubOrderChangeHistoryItem[];
+  querySubOrderChangesHistoryInProgress: boolean;
+  loadMoreSubOrderChangesHistory: boolean;
+  querySubOrderChangesHistoryError: any;
+  lastRecordSubOrderChangesHistoryCreatedAt: number | null;
+  subOrderChangesHistoryTotalItems: number;
+  draftSubOrderChangesHistory: Record<string, TSubOrderChangeHistoryItem[]>;
+
+  draftOrderDetail: TPlan['orderDetail'];
+  updateOrderFromDraftEditInProgress: boolean;
+  updateOrderfromDraftEditError: any;
+
+  shouldShowUnderError: boolean;
+  shouldShowOverflowError: boolean;
 };
 
 const initialState: TOrderManagementState = {
@@ -87,11 +335,23 @@ const initialState: TOrderManagementState = {
   companyData: null,
   orderData: {},
   planData: {},
+  draftOrderDetail: {},
   planViewed: false,
   bookerData: null,
   participantData: [],
   anonymousParticipantData: [],
   transactionDataMap: {},
+  subOrderChangesHistory: [],
+  querySubOrderChangesHistoryInProgress: false,
+  querySubOrderChangesHistoryError: null,
+  lastRecordSubOrderChangesHistoryCreatedAt: null,
+  subOrderChangesHistoryTotalItems: 0,
+  loadMoreSubOrderChangesHistory: false,
+  updateOrderFromDraftEditInProgress: false,
+  updateOrderfromDraftEditError: null,
+  draftSubOrderChangesHistory: {},
+  shouldShowUnderError: false,
+  shouldShowOverflowError: false,
 };
 
 // ================ Thunk types ================ //
@@ -184,104 +444,59 @@ const addOrUpdateMemberOrder = createAsyncThunk(
   async (params: TObject, { getState, dispatch, rejectWithValue }) => {
     const { currentViewDate, foodId, memberId, requirement, memberEmail } =
       params;
-    const orderGetter = Listing(
-      getState().OrderManagement.orderData! as TListing,
-    );
-    const orderId = orderGetter.getId();
-    const { participants = [], anonymous = [] } = orderGetter.getMetadata();
+
+    const { draftOrderDetail, orderData, planData } =
+      getState().OrderManagement;
+    const planId = Listing(planData as TListing).getId();
+    const orderId = Listing(orderData as TListing).getId();
+
     const {
-      id: { uuid: planId },
-      attributes: { metadata = {} },
-    } = getState().OrderManagement.planData!;
-
-    let shouldUpdateAnonymousList = false;
-    let updateAnonymous = anonymous;
-
-    const checkUserResult = await checkUserExistedApi({
-      ...(memberId ? { id: memberId } : {}),
-      ...(memberEmail ? { email: memberEmail } : {}),
+      shouldUpdateAnonymousList,
+      updateAnonymous,
+      errorMessage,
+      participantId,
+    } = await prepareAnonymousList({
+      orderData: orderData as TListing,
+      memberEmail,
+      memberId,
     });
 
-    let participantId = memberId;
-
-    const { status: apiStatus = EHttpStatusCode.NotFound, user } =
-      checkUserResult?.data || {};
-
-    if (apiStatus === EHttpStatusCode.NotFound) {
-      return rejectWithValue('user_not_found');
-    }
-
-    if (!isEmpty(user)) {
-      participantId = User(user).getId();
-    }
-    // Update list anonymous
-    if (
-      !participants.includes(participantId) &&
-      !anonymous.includes(participantId) &&
-      participantId
-    ) {
-      shouldUpdateAnonymousList = true;
-      updateAnonymous = anonymous.concat(participantId);
-    }
+    if (errorMessage) return rejectWithValue(errorMessage);
 
     const memberOrderDetailOnUpdateDate =
-      metadata?.orderDetail[currentViewDate.toString()].memberOrders[memberId];
-    const { foodId: oldFoodId, status = EParticipantOrderStatus.empty } =
-      memberOrderDetailOnUpdateDate || {};
+      draftOrderDetail[currentViewDate.toString()].memberOrders[memberId];
+    const { foodId: oldFoodId } = memberOrderDetailOnUpdateDate || {};
 
     if (foodId === '' || oldFoodId === foodId) {
       return;
     }
-    let newMemberOrderValues = memberOrderDetailOnUpdateDate;
 
-    switch (status) {
-      case EParticipantOrderStatus.joined:
-      case EParticipantOrderStatus.notAllowed:
-        newMemberOrderValues = {
-          ...newMemberOrderValues,
-          foodId,
-        };
-        break;
-      case EParticipantOrderStatus.empty:
-      case EParticipantOrderStatus.notJoined:
-        newMemberOrderValues = {
-          ...newMemberOrderValues,
-          foodId,
-          status: EParticipantOrderStatus.joined,
-        };
-        break;
-      case EParticipantOrderStatus.expired:
-        break;
-      default:
-        break;
-    }
-    newMemberOrderValues = { ...newMemberOrderValues, requirement };
+    const newOrderDetail = prepareOrderDetail({
+      orderDetail: draftOrderDetail,
+      currentViewDate,
+      foodId,
+      memberId: participantId as string,
+      requirement,
+      memberOrderValues: memberOrderDetailOnUpdateDate,
+    });
 
     const updateParams = {
       planId,
-      orderDetail: {
-        ...metadata.orderDetail,
-        [currentViewDate]: {
-          ...metadata.orderDetail[currentViewDate],
-          memberOrders: {
-            ...metadata.orderDetail[currentViewDate].memberOrders,
-            [participantId]: newMemberOrderValues,
-          },
-        },
-      },
+      orderDetail: newOrderDetail,
       ...(shouldUpdateAnonymousList
         ? { orderId, anonymous: updateAnonymous }
         : {}),
     };
 
     await addUpdateMemberOrder(orderId, updateParams);
-    const subOrderId = `${participantId} - ${planId} - ${currentViewDate}`;
+
+    const subOrderId = `${memberId} - ${planId} - ${currentViewDate}`;
     const { data: firebaseSubOrderDocument } =
       await participantSubOrderGetByIdApi(subOrderId);
 
     if (!firebaseSubOrderDocument) {
       await participantSubOrderAddDocumentApi({
-        participantId,
+        participantId: participantId as string,
         planId,
         timestamp: currentViewDate,
       });
@@ -301,6 +516,7 @@ const disallowMember = createAsyncThunk(
   'app/OrderManagement/DISALLOW_MEMBER',
   async (params: TObject, { getState, dispatch }) => {
     const { currentViewDate, memberId } = params;
+
     const {
       id: { uuid: orderId },
     } = getState().OrderManagement.orderData!;
@@ -606,6 +822,31 @@ const bookerMarkInprogressPlanViewed = createAsyncThunk(
   },
 );
 
+const querySubOrderChangesHistory = createAsyncThunk(
+  'app/OrderManagement/QUERY_SUB_ORDER_CHANGES_HISTORY',
+  async ({
+    orderId,
+    planId,
+    planOrderDate,
+    lastRecordCreatedAt,
+  }: {
+    orderId: string;
+    planId: string;
+    planOrderDate: number;
+    lastRecordCreatedAt?: number;
+  }) => {
+    const { data } = await queryOrderChangesHistoryDocumentApi(
+      orderId,
+      planId,
+      {
+        planOrderDate,
+        lastRecordCreatedAt,
+      },
+    );
+
+    return data;
+  },
+);
 const updatePlanOrderDetail = createAsyncThunk(
   'app/OrderManagement/UPDATE_PLAN_ORDER_DETAIL',
   async (
@@ -629,6 +870,70 @@ const updatePlanOrderDetail = createAsyncThunk(
   },
 );
 
+const updateOrderFromDraftEdit = createAsyncThunk(
+  'app/OrderManagement/UPDATE_ORDER_FROM_DRAFT_EDIT',
+  async (_, { getState, dispatch }) => {
+    const {
+      id: { uuid: orderId },
+    } = getState().OrderManagement.orderData!;
+    const {
+      id: { uuid: planId },
+    } = getState().OrderManagement.planData!;
+    const { draftSubOrderChangesHistory } = getState().OrderManagement;
+    const { draftOrderDetail } = getState().OrderManagement;
+    const updateParams = {
+      planId,
+      orderDetail: draftOrderDetail,
+    };
+    await addUpdateMemberOrder(orderId, updateParams);
+    await Promise.all(
+      Object.keys(draftSubOrderChangesHistory).map(async (date) => {
+        const draftSubOrderChangesHistoryByDate = draftSubOrderChangesHistory[
+          date as keyof typeof draftSubOrderChangesHistory
+        ] as TSubOrderChangeHistoryItem[];
+        if (draftSubOrderChangesHistoryByDate.length > 0) {
+          const { restaurant } = draftOrderDetail[date] || {};
+
+          await sendOrderDetailUpdatedEmailApi({
+            orderId,
+            timestamp: date,
+            restaurantId: restaurant.id!,
+          });
+
+          await Promise.all(
+            draftSubOrderChangesHistoryByDate.map(
+              async (item: TSubOrderChangeHistoryItem) => {
+                const {
+                  memberId,
+                  planOrderDate,
+                  type,
+                  oldValue,
+                  newValue,
+                  createdAt,
+                } = item;
+                const subOrderChangesHistoryParams = {
+                  planId,
+                  memberId,
+                  planOrderDate,
+                  type,
+                  oldValue,
+                  newValue,
+                  createdAt: new Date(Number(createdAt?.seconds) * 1000),
+                };
+                await createOrderChangesHistoryDocumentApi(
+                  orderId,
+                  subOrderChangesHistoryParams,
+                );
+              },
+            ),
+          );
+        }
+      }),
+    );
+    await dispatch(loadData(orderId));
+  },
+);
+
 export const orderManagementThunks = {
   loadData,
   updateOrderGeneralInfo,
@@ -642,7 +947,9 @@ export const orderManagementThunks = {
   bookerStartOrder,
   cancelPickingOrder,
   bookerMarkInprogressPlanViewed,
+  querySubOrderChangesHistory,
   updatePlanOrderDetail,
+  updateOrderFromDraftEdit,
 };
 
 // ================ Slice ================ //
@@ -670,6 +977,434 @@ const OrderManagementSlice = createSlice({
     updateStaffName: (state, { payload }) => {
       state.orderData!.attributes.metadata.staffName = payload;
     },
+    resetOrderDetailValidation: (state) => {
+      return {
+        ...state,
+        shouldShowOverflowError: false,
+        shouldShowUnderError: false,
+      };
+    },
+    updateDraftOrderDetail: (state, { payload }) => {
+      const { currentViewDate, foodId, memberId, memberEmail, requirement } =
+        payload;
+
+      const {
+        draftOrderDetail,
+        planData,
+        draftSubOrderChangesHistory,
+        orderData,
+      } = state;
+
+      const { orderDetail: defaultOrderDetail } = Listing(
+        planData as TListing,
+      ).getMetadata();
+
+      const { orderType } = Listing(orderData as TListing).getMetadata();
+      const { foodId: defaultFoodId } =
+        defaultOrderDetail[currentViewDate].memberOrders[memberId];
+
+      const memberOrderBeforeUpdate =
+        draftOrderDetail[currentViewDate].memberOrders[memberId];
+
+      const { foodId: oldFoodId } = memberOrderBeforeUpdate || {};
+
+      const newOrderDetail =
+        prepareOrderDetail({
+          orderDetail: draftOrderDetail,
+          currentViewDate,
+          foodId,
+          memberId,
+          requirement,
+          memberOrderValues: memberOrderBeforeUpdate,
+        }) || {};
+
+      const { shouldShowOverflowError, shouldShowUnderError } =
+        checkMinMaxQuantity(
+          newOrderDetail,
+          defaultOrderDetail,
+          currentViewDate,
+          orderType === EOrderType.normal,
+        );
+
+      if (shouldShowOverflowError || shouldShowUnderError) {
+        return {
+          ...state,
+          shouldShowOverflowError,
+          shouldShowUnderError,
+        };
+      }
+
+      const currentDraftSubOrderChanges = [
+        ...(draftSubOrderChangesHistory[currentViewDate] || []),
+      ];
+
+      const orderHistoryByMemberIndex = currentDraftSubOrderChanges.findIndex(
+        (i) => i.memberId === memberId,
+      );
+
+      if (defaultFoodId === foodId && orderHistoryByMemberIndex > -1) {
+        currentDraftSubOrderChanges.splice(orderHistoryByMemberIndex, 0);
+
+        return {
+          ...state,
+          draftOrderDetail: newOrderDetail,
+          draftSubOrderChangesHistory: {
+            ...state.draftSubOrderChangesHistory,
+            [currentViewDate]: currentDraftSubOrderChanges,
+          },
+        };
+      }
+
+      const { foodList = {} } =
+        newOrderDetail[currentViewDate]?.restaurant || {};
+
+      const { foodName: oldFoodName, foodPrice: oldFoodPrice } =
+        foodList[oldFoodId] || {};
+
+      const { foodName: newFooldName, foodPrice: newFoodPrice } =
+        foodList[foodId] || {};
+
+      const newDraftSubOrderChangesHistory = {
+        ...draftSubOrderChangesHistory,
+        [currentViewDate]: [
+          {
+            id: new Date().getTime(),
+            memberId,
+            member: {
+              email: memberEmail,
+            },
+            createdAt: {
+              // Fake a Firestore time object
+              seconds: new Date().getTime() / 1000,
+            },
+            planOrderDate: currentViewDate,
+            type: oldFoodId
+              ? EOrderHistoryTypes.MEMBER_FOOD_CHANGED
+              : EOrderHistoryTypes.MEMBER_FOOD_ADDED,
+            oldValue: oldFoodId
+              ? {
+                  foodId: oldFoodId,
+                  foodName: oldFoodName,
+                  foodPrice: oldFoodPrice,
+                }
+              : null,
+            newValue: {
+              foodId,
+              foodName: newFooldName,
+              foodPrice: newFoodPrice,
+            },
+          },
+          ...(draftSubOrderChangesHistory[currentViewDate] || []),
+        ],
+      };
+
+      return {
+        ...state,
+        draftOrderDetail: newOrderDetail,
+        draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
+      };
+    },
+    draftDisallowMember: (state, { payload }) => {
+      const { currentViewDate, memberId, memberEmail, tab } = payload;
+      const { draftOrderDetail, planData, orderData } = state;
+      const { orderDetail: defaultOrderDetail } = Listing(
+        planData as TListing,
+      ).getMetadata();
+      const { orderType } = Listing(orderData as TListing).getMetadata();
+      const { status: defaultStatus } =
+        defaultOrderDetail[currentViewDate].memberOrders[memberId];
+      const memberOrderDetailOnUpdateDate =
+        draftOrderDetail[currentViewDate].memberOrders[memberId];
+
+      const currentDraftSubOrderChanges = [
+        ...(state.draftSubOrderChangesHistory[currentViewDate] || []),
+      ];
+
+      const orderHistoryByMemberIndex = currentDraftSubOrderChanges.findIndex(
+        (i) => i.memberId === memberId,
+      );
+
+      const isNotAddedToChoseList =
+        defaultStatus === EParticipantOrderStatus.empty ||
+        defaultStatus === EParticipantOrderStatus.notJoined;
+
+      const newMemberOrderValues = {
+        ...memberOrderDetailOnUpdateDate,
+        status:
+          isNotAddedToChoseList && tab !== EOrderDetailsTableTab.notChoose
+            ? defaultStatus
+            : EParticipantOrderStatus.notAllowed,
+      };
+
+      const newOrderDetail = addNewMemberToOrderDetail(
+        draftOrderDetail,
+        currentViewDate,
+        memberId,
+        newMemberOrderValues,
+      );
+
+      const { shouldShowOverflowError, shouldShowUnderError } =
+        checkMinMaxQuantity(
+          newOrderDetail,
+          defaultOrderDetail,
+          currentViewDate,
+          orderType === EOrderType.normal,
+        );
+
+      if (shouldShowOverflowError || shouldShowUnderError) {
+        return {
+          ...state,
+          shouldShowOverflowError,
+          shouldShowUnderError,
+        };
+      }
+
+      if (orderHistoryByMemberIndex > -1 && isNotAddedToChoseList) {
+        currentDraftSubOrderChanges.splice(orderHistoryByMemberIndex, 1);
+        const newDraftSubOrderChangesHistory = {
+          ...state.draftSubOrderChangesHistory,
+          [currentViewDate]: currentDraftSubOrderChanges,
+        };
+
+        return {
+          ...state,
+          draftOrderDetail: newOrderDetail,
+          draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
+        };
+      }
+
+      const memberOrderBeforeUpdate =
+        draftOrderDetail[currentViewDate].memberOrders[memberId];
+
+      const { foodId: oldFoodId } = memberOrderBeforeUpdate || {};
+
+      const { foodList = {} } = draftOrderDetail[currentViewDate].restaurant;
+
+      const { foodName: oldFoodName, foodPrice: oldFoodPrice } =
+        foodList[oldFoodId] || {};
+
+      const newDraftSubOrderChangesHistory = {
+        ...state.draftSubOrderChangesHistory,
+        [currentViewDate]: [
+          {
+            memberId,
+            member: {
+              email: memberEmail,
+            },
+            createdAt: {
+              // Fake a Firestore time object
+              seconds: new Date().getTime() / 1000,
+            },
+            planOrderDate: currentViewDate,
+            type: EOrderHistoryTypes.MEMBER_FOOD_REMOVED,
+            newValue: null,
+            oldValue: {
+              foodName: oldFoodName,
+              foodPrice: oldFoodPrice,
+              foodId: oldFoodId,
+            },
+          },
+          ...(state.draftSubOrderChangesHistory[currentViewDate] || []),
+        ],
+      };
+
+      return {
+        ...state,
+        draftOrderDetail: newOrderDetail,
+        draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
+      };
+    },
+    setDraftOrderDetails: (state, { payload }) => {
+      return {
+        ...state,
+        draftOrderDetail: payload,
+      };
+    },
+    setDraftOrderDetailsAndSubOrderChangeHistory: (state, { payload }) => {
+      const { updateValues = {}, newOrderDetail } = payload;
+
+      const {
+        currentViewDate,
+        foodName,
+        foodPrice,
+        quantity: newQuantity,
+        foodId,
+      } = updateValues;
+      const { planData, orderData } = state;
+      const planDataGetter = Listing(planData as TListing);
+      const { orderType } = Listing(orderData as TListing).getMetadata();
+
+      const { orderDetail = {} } = planDataGetter.getMetadata();
+
+      const { shouldShowOverflowError, shouldShowUnderError } =
+        checkMinMaxQuantity(
+          newOrderDetail,
+          orderDetail,
+          currentViewDate,
+          orderType === EOrderType.normal,
+        );
+
+      if (shouldShowOverflowError || shouldShowUnderError) {
+        return {
+          ...state,
+          shouldShowOverflowError,
+          shouldShowUnderError,
+        };
+      }
+      const { lineItems } = orderDetail[currentViewDate] || {};
+      const itemIndex = lineItems.findIndex((x: TObject) => x?.id === foodId);
+      const { quantity: defaultQuantity = 0 } = lineItems[itemIndex] || {};
+
+      const currentDraftSubOrderChanges = [
+        ...(state.draftSubOrderChangesHistory[currentViewDate] || []),
+      ];
+
+      const index = currentDraftSubOrderChanges.findIndex(
+        (i) => i?.newValue?.foodId === foodId || i?.oldValue?.foodId === foodId,
+      );
+
+      if (index > -1) {
+        if (newQuantity === defaultQuantity) {
+          currentDraftSubOrderChanges.splice(index, 1);
+
+          return {
+            ...state,
+            draftOrderDetail: newOrderDetail,
+            draftSubOrderChangesHistory: {
+              ...state.draftSubOrderChangesHistory,
+              [currentViewDate]: currentDraftSubOrderChanges,
+            },
+          };
+        }
+
+        if (newQuantity === 0) {
+          const newSubOrderChangesItem = {
+            // fake document id
+            id: new Date().getTime(),
+            createdAt: {
+              // fake a draft Firestore date object
+              seconds: new Date().getTime() / 1000,
+            },
+            type: EOrderHistoryTypes.FOOD_REMOVED,
+            oldValue: {
+              foodName,
+              foodPrice,
+              foodId,
+              quantity: defaultQuantity,
+            },
+            newValue: null,
+            planOrderDate: currentViewDate,
+          };
+
+          currentDraftSubOrderChanges[index] = newSubOrderChangesItem;
+
+          const newDraftSubOrderChangesHistory = {
+            ...state.draftSubOrderChangesHistory,
+            [currentViewDate]: currentDraftSubOrderChanges,
+          };
+
+          return {
+            ...state,
+            draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
+            draftOrderDetail: newOrderDetail,
+          };
+        }
+
+        const newSubOrderChangesItem = {
+          // fake document id
+          id: new Date().getTime(),
+          createdAt: {
+            // fake a draft Firestore date object
+            seconds: new Date().getTime() / 1000,
+          },
+          type:
+            newQuantity < defaultQuantity
+              ? EOrderHistoryTypes.FOOD_DECREASED
+              : EOrderHistoryTypes.FOOD_INCREASED,
+          oldValue: {
+            foodName,
+            foodPrice,
+            foodId,
+            quantity: defaultQuantity,
+          },
+          newValue: {
+            foodName,
+            foodPrice,
+            foodId,
+            quantity: newQuantity,
+          },
+          planOrderDate: currentViewDate,
+        };
+
+        currentDraftSubOrderChanges[index] = newSubOrderChangesItem;
+
+        const newDraftSubOrderChangesHistory = {
+          ...state.draftSubOrderChangesHistory,
+          [currentViewDate]: currentDraftSubOrderChanges,
+        };
+
+        return {
+          ...state,
+          draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
+          draftOrderDetail: newOrderDetail,
+        };
+      }
+
+      const newSubOrderChangesItem = {
+        // fake document id
+        id: new Date().getTime(),
+        createdAt: {
+          // fake a draft Firestore date object
+          seconds: new Date().getTime() / 1000,
+        },
+        type:
+          newQuantity < defaultQuantity
+            ? EOrderHistoryTypes.FOOD_DECREASED
+            : EOrderHistoryTypes.FOOD_INCREASED,
+        oldValue: {
+          foodName,
+          foodPrice,
+          foodId,
+          quantity: defaultQuantity,
+        },
+        newValue: {
+          foodName,
+          foodPrice,
+          foodId,
+          quantity: newQuantity,
+        },
+        planOrderDate: currentViewDate,
+      };
+
+      const newDraftSubOrderChangesHistory = {
+        ...state.draftSubOrderChangesHistory,
+        [currentViewDate]: [
+          newSubOrderChangesItem,
+          ...currentDraftSubOrderChanges,
+        ],
+      };
+
+      return {
+        ...state,
+        draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
+        draftOrderDetail: newOrderDetail,
+      };
+    },
+    resetDraftOrderDetails: (state) => {
+      const { planData } = state;
+      const { orderDetail } = Listing(planData as TListing).getMetadata();
+
+      return {
+        ...state,
+        draftOrderDetail: orderDetail,
+      };
+    },
+    resetDraftSubOrderChangeHistory: (state) => {
+      return {
+        ...state,
+        draftSubOrderChangesHistory: {},
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -686,11 +1421,14 @@ const OrderManagementSlice = createSlice({
           ...restPayload
         } = payload;
 
+        const { orderDetail } = Listing(planData).getMetadata();
+
         return {
           ...state,
           isFetchingOrderDetails: false,
           orderData,
           planData,
+          draftOrderDetail: orderDetail,
           ...restPayload,
         };
       })
@@ -787,6 +1525,59 @@ const OrderManagementSlice = createSlice({
       .addCase(bookerMarkInprogressPlanViewed.rejected, (state) => {
         return state;
       })
+      .addCase(
+        querySubOrderChangesHistory.pending,
+        (state, { meta: { arg } }) => {
+          const { lastRecordCreatedAt } = arg;
+          state.querySubOrderChangesHistoryError = null;
+
+          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+          lastRecordCreatedAt
+            ? (state.loadMoreSubOrderChangesHistory = true)
+            : (state.querySubOrderChangesHistoryInProgress = true);
+        },
+      )
+      .addCase(
+        querySubOrderChangesHistory.fulfilled,
+        (state, { payload, meta: { arg } }) => {
+          const { lastRecordCreatedAt } = arg;
+          const { data: items, totalItems } = payload;
+          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+          lastRecordCreatedAt
+            ? (state.loadMoreSubOrderChangesHistory = false)
+            : (state.querySubOrderChangesHistoryInProgress = false);
+          state.subOrderChangesHistory = lastRecordCreatedAt
+            ? [...state.subOrderChangesHistory, ...items]
+            : items;
+          state.subOrderChangesHistoryTotalItems = totalItems;
+          state.lastRecordSubOrderChangesHistoryCreatedAt =
+            // eslint-disable-next-line no-unsafe-optional-chaining
+            items?.[items.length - 1]?.createdAt?.seconds;
+        },
+      )
+      .addCase(
+        querySubOrderChangesHistory.rejected,
+        (state, { error, meta: { arg } }) => {
+          const { lastRecordCreatedAt } = arg;
+          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+          lastRecordCreatedAt
+            ? (state.loadMoreSubOrderChangesHistory = false)
+            : (state.querySubOrderChangesHistoryInProgress = false);
+          state.querySubOrderChangesHistoryError = error;
+        },
+      )
+      .addCase(updateOrderFromDraftEdit.pending, (state) => {
+        state.updateOrderFromDraftEditInProgress = true;
+        state.updateOrderfromDraftEditError = null;
+      })
+      .addCase(updateOrderFromDraftEdit.fulfilled, (state) => {
+        state.updateOrderFromDraftEditInProgress = false;
+      })
+      .addCase(updateOrderFromDraftEdit.rejected, (state, { error }) => {
+        state.updateOrderFromDraftEditInProgress = false;
+        state.updateOrderfromDraftEditError = error;
+      })
+
       /* =============== updatePlanOrderDetail =============== */
       .addCase(updatePlanOrderDetail.pending, (state) => {
         state.isUpdatingOrderDetails = true;
@@ -799,6 +1590,7 @@ const OrderManagementSlice = createSlice({
             ...payload,
           },
         };
+        state.draftOrderDetail = payload;
       })
       .addCase(updatePlanOrderDetail.rejected, (state) => {
         state.isUpdatingOrderDetails = false;

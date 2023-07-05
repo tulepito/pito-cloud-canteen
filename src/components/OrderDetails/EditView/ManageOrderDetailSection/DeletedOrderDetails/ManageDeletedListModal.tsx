@@ -18,6 +18,7 @@ type TManageDeletedListModalProps = {
   onRestoreMembers: (memberIds: string[]) => void;
   onDeletePermanentlyMembers: (memberIds: string[]) => void;
   deletedTabData: TObject[];
+  disabled: boolean;
 };
 
 const ManageDeletedListModal: React.FC<TManageDeletedListModalProps> = (
@@ -29,6 +30,7 @@ const ManageDeletedListModal: React.FC<TManageDeletedListModalProps> = (
     deletedTabData,
     onRestoreMembers,
     onDeletePermanentlyMembers,
+    disabled,
   } = props;
   const intl = useIntl();
   const [action, setAction] = useState<ManageDeletedListFormAction>(
@@ -69,6 +71,7 @@ const ManageDeletedListModal: React.FC<TManageDeletedListModalProps> = (
             setAction={handleChangeAction}
             deletedTabData={deletedTabData}
             onSubmit={handleSubmit}
+            disabled={disabled}
           />
         </Modal>
       )}

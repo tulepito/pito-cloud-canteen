@@ -110,6 +110,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           id: `${planItemKey}`,
           subOrderId: planKey,
           orderId,
+          timestamp: +planItemKey,
           daySession: getDaySessionFromDeliveryTime(deliveryHour),
           status: pickFoodStatus,
           type: 'dailyMeal',

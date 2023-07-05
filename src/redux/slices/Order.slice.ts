@@ -385,6 +385,9 @@ const recommendRestaurants = createAsyncThunk(
                 menuId: randomRestaurant?.menu.id.uuid,
                 minQuantity,
                 maxQuantity,
+                phoneNumber: Listing(
+                  randomRestaurant?.restaurantInfo,
+                ).getPublicData()?.phoneNumber,
               },
               ...lineItemsMaybe,
             };
@@ -453,6 +456,9 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
                 restaurants[randomNumber]?.restaurantInfo,
               ).getAttributes().title,
               foodList: [],
+              phoneNumber: Listing(
+                restaurants[randomNumber]?.restaurantInfo,
+              ).getPublicData()?.phoneNumber,
               menuId: restaurants[randomNumber]?.menu.id.uuid,
             }
           : {
@@ -465,6 +471,9 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
                   ?.restaurantInfo,
               ).getAttributes().title,
               foodList: [],
+              phoneNumber: Listing(
+                restaurants[randomNumber]?.restaurantInfo,
+              ).getPublicData()?.phoneNumber,
               menuId:
                 restaurants[Math.abs(randomNumber - restaurants.length + 1)]
                   ?.menu.id.uuid,

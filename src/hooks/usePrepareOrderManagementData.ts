@@ -100,6 +100,7 @@ export const usePrepareOrderDetailPageData = ({
     participants,
     participantData,
   };
+
   const manageOrdersData = {
     startDate,
     endDate,

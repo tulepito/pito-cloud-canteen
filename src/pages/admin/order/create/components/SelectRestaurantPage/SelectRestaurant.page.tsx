@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
-import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
 import Badge from '@components/Badge/Badge';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Pagination from '@components/Pagination/Pagination';
+import { getSelectedRestaurantAndFoodList } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
@@ -145,37 +145,21 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
 
     const currRestaurantId = currentRestaurant?.id?.uuid;
 
-    const submitFoodListData = foodIds.reduce((result, foodId) => {
-      const item = foodList.find((food) => food?.id?.uuid === foodId);
-
-      if (!isEmpty(item)) {
-        return result;
-      }
-
-      const { id, attributes } = item || {};
-      const { title, price } = attributes;
-
-      return {
-        ...result,
-        [id]: {
-          foodName: title,
-          foodPrice: price?.amount || 0,
-          foodUnit: attributes?.publicData?.unit || '',
-        },
-      };
-    }, {});
-
-    const submitRestaurantData = {
-      id: currRestaurantId,
-      restaurantName: currentRestaurant?.attributes?.title,
-      phoneNumber: currentRestaurant?.attributes?.publicData?.phoneNumber,
-      menuId: restaurants?.find(
-        (restaurant) => restaurant.restaurantInfo.id.uuid === currRestaurantId,
-      ).menu.id.uuid,
-    };
+    const { submitRestaurantData, submitFoodListData } =
+      getSelectedRestaurantAndFoodList({
+        foodList,
+        foodIds,
+        currentRestaurant,
+      });
 
     await onSubmitRestaurant({
-      restaurant: submitRestaurantData,
+      restaurant: {
+        ...submitRestaurantData,
+        menuId: restaurants?.find(
+          (restaurant) =>
+            restaurant.restaurantInfo.id.uuid === currRestaurantId,
+        ).menu.id.uuid,
+      },
       selectedFoodList: submitFoodListData,
     });
     setModalOpen(false);

@@ -19,8 +19,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const [user] = denormalisedResponseEntities(
       await integrationSdk.users.show({
-        ...(hasId ? { id } : {}),
-        ...(hasEmail ? { email } : {}),
+        ...(hasId ? { id } : hasEmail ? { email } : {}),
       }),
     );
 

@@ -38,9 +38,10 @@ type TOrderDetailsTableComponentProps = {
   deletedTabData: TObject[];
   hasTotalLine?: boolean;
   onClickEditOrderItem: (tab: EOrderDetailsTableTab, id: string) => () => void;
-  onClickDeleteOrderItem: (id: string) => () => void;
+  onClickDeleteOrderItem: (memberId: string) => () => void;
   onRestoreMembers: (memberIds: string[]) => void;
   onDeletePermanentlyMembers: (memberIds: string[]) => void;
+  ableToUpdateOrder: boolean;
 };
 
 export const OrderDetailsTableComponent: React.FC<
@@ -54,6 +55,7 @@ export const OrderDetailsTableComponent: React.FC<
   onClickDeleteOrderItem,
   onRestoreMembers,
   onDeletePermanentlyMembers,
+  ableToUpdateOrder,
 }) => {
   const intl = useIntl();
   const [isManageDeletedModalOpen, setIsManageDeletedModalOpen] =
@@ -87,6 +89,7 @@ export const OrderDetailsTableComponent: React.FC<
         deletedTabData={deletedTabData}
         onRestoreMembers={onRestoreMembers}
         onDeletePermanentlyMembers={onDeletePermanentlyMembers}
+        disabled={!ableToUpdateOrder}
       />
       <table className={css.tableRoot}>
         <thead>
@@ -148,24 +151,26 @@ export const OrderDetailsTableComponent: React.FC<
                             </RenderWhen>
                           </td>
                           <td>
-                            <div className={css.actionCell}>
-                              <IconEdit
-                                className={css.icon}
-                                onClick={
-                                  actionDisabled
-                                    ? doNothing
-                                    : onClickEditOrderItem(tab, memberId)
-                                }
-                              />
-                              <IconDelete
-                                className={css.icon}
-                                onClick={
-                                  actionDisabled
-                                    ? doNothing
-                                    : onClickDeleteOrderItem(memberId)
-                                }
-                              />
-                            </div>
+                            {ableToUpdateOrder && (
+                              <div className={css.actionCell}>
+                                <IconEdit
+                                  className={css.icon}
+                                  onClick={
+                                    actionDisabled
+                                      ? doNothing
+                                      : onClickEditOrderItem(tab, memberId)
+                                  }
+                                />
+                                <IconDelete
+                                  className={css.icon}
+                                  onClick={
+                                    actionDisabled
+                                      ? doNothing
+                                      : onClickDeleteOrderItem(memberId)
+                                  }
+                                />
+                              </div>
+                            )}
                           </td>
                         </tr>
                       );

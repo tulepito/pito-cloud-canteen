@@ -38,7 +38,7 @@ export const GroupedParticipants: React.FC<TGroupedParticipantsProps> = ({
                 return (
                   <ParticipantCard
                     className={css.participantCard}
-                    onClickDeleteIcon={() => () => console.log(index)}
+                    onClickDeleteIcon={() => () => console.error(index)}
                     key={index}
                   />
                 );

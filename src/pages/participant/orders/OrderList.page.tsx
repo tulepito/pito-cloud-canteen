@@ -95,13 +95,21 @@ const OrderListPage = () => {
     (state) =>
       state.ParticipantOrderList.addSubOrderDocumentToFirebaseInProgress,
   );
-
   const participantPostRatingInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
-
   const notifications = useAppSelector(
     (state) => state.ParticipantOrderList.participantFirebaseNotifications,
+    shallowEqual,
+  );
+  const fetchParticipantFirebaseNotificationsInProgress = useAppSelector(
+    (state) =>
+      state.ParticipantOrderList
+        .fetchParticipantFirebaseNotificationsInProgress,
+    shallowEqual,
+  );
+  const fetchSubOrderTxInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
     shallowEqual,
   );
 
@@ -114,22 +122,14 @@ const OrderListPage = () => {
     (fetchOrdersInProgress ||
       updateSubOrderInProgress ||
       addSubOrderDocumentToFirebaseInProgress ||
-      participantPostRatingInProgress) &&
+      participantPostRatingInProgress ||
+      fetchOrdersInProgress ||
+      updateSubOrderInProgress ||
+      addSubOrderDocumentToFirebaseInProgress ||
+      participantPostRatingInProgress ||
+      fetchParticipantFirebaseNotificationsInProgress ||
+      fetchSubOrderTxInProgress) &&
     !walkthroughEnable;
-
-  useEffect(() => {
-    (async () => {
-      await dispatch(OrderListThunks.fetchOrders(currentUserId));
-      dispatch(OrderListActions.markColorToOrder());
-    })();
-  }, [currentUserId]);
-
-  useEffect(() => {
-    dispatch(OrderListThunks.fetchAttributes());
-  }, []);
-  useEffect(() => {
-    dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
-  }, []);
 
   const unseenNotifications = notifications.filter(
     (notification) => !notification.seen,
@@ -296,7 +296,7 @@ const OrderListPage = () => {
   };
 
   useEffect(() => {
-    if (subOrdersFromSelectedDayTxIds.length > 0) {
+    if (subOrdersFromSelectedDayTxIds.length > 0 && !walkthroughEnable) {
       dispatch(
         OrderListThunks.fetchTransactionBySubOrder(
           subOrdersFromSelectedDayTxIds,
@@ -315,14 +315,12 @@ const OrderListPage = () => {
 
   useEffect(() => {
     (async () => {
-      await dispatch(OrderListThunks.fetchOrders(currentUserId));
-      dispatch(OrderListActions.markColorToOrder());
+      if (!walkthroughEnable) {
+        await dispatch(OrderListThunks.fetchOrders(currentUserId));
+        dispatch(OrderListActions.markColorToOrder());
+      }
     })();
-  }, [currentUserId]);
-
-  useEffect(() => {
-    dispatch(OrderListThunks.fetchAttributes());
-  }, []);
+  }, [currentUserId, walkthroughEnable]);
 
   useEffect(() => {
     if (planIdFromQuery && timestampFromQuery) {
@@ -341,6 +339,7 @@ const OrderListPage = () => {
   }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
 
   useEffect(() => {
+    dispatch(OrderListThunks.fetchAttributes());
     dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
   }, []);
 
@@ -362,11 +361,8 @@ const OrderListPage = () => {
             toolbar: (toolBarProps: any) => (
               <ParticipantToolbar
                 {...toolBarProps}
-                onChangeDate={handleSelectDay}
                 isAllowChangePeriod
-                // startDate={new Date(startDate)}
-                // endDate={new Date(endDate)}
-                // anchorDate={anchorDate}
+                onChangeDate={handleSelectDay}
               />
             ),
           }}

@@ -16,18 +16,18 @@ export const shortenString = (
   maxLength: number,
   position: 'end' | 'center' = 'center',
 ) => {
-  const { length } = str;
+  const stringLength = str?.length;
 
-  if (length <= maxLength) {
+  if (stringLength <= maxLength) {
     return str;
   }
 
   if (position === 'end') {
-    return `${str.slice(0, maxLength)}...`;
+    return `${str?.slice(0, maxLength)}...`;
   }
 
-  return `${str.slice(0, maxLength / 2)}...${str.slice(
-    length - maxLength / 2,
+  return `${str?.slice(0, maxLength / 2)}...${str?.slice(
+    stringLength - maxLength / 2,
   )}`;
 };
 
