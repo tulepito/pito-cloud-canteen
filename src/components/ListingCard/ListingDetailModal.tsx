@@ -19,6 +19,7 @@ import {
   SPECIAL_DIET_OPTIONS,
 } from '@src/utils/enums';
 import { toNonAccentVietnamese } from '@src/utils/string';
+import { maxLength } from '@src/utils/validators';
 
 import css from './ListingDetailModal.module.scss';
 
@@ -205,6 +206,7 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
             meta={requirementField.meta}
             placeholder={fieldRequirement.placeholder}
             onChange={handleChangeRequirement}
+            validate={maxLength('Ghi chú không được vượt quá 500 kí tự', 500)}
           />
         </div>
 
