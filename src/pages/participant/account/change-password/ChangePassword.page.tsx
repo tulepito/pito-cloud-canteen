@@ -37,13 +37,15 @@ const ChangePasswordPage: React.FC = () => {
   };
   const handleSubmit = async (values: TChangePasswordFormValues) => {
     const { password, newPassword } = values;
-    await dispatch(
+    const { meta } = await dispatch(
       AccountThunks.changePassword({
         currentPassword: password,
         newPassword,
       }),
     );
-    changePasswordSuccessModalControl.setTrue();
+    if (meta.requestStatus === 'fulfilled') {
+      changePasswordSuccessModalControl.setTrue();
+    }
   };
 
   return (
