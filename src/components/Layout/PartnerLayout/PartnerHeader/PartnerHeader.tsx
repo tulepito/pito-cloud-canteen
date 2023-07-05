@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-named-as-default
 import React from 'react';
+import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import Avatar from '@components/Avatar/Avatar';
@@ -14,6 +15,7 @@ import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { useLogout } from '@hooks/useLogout';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
@@ -30,6 +32,7 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
   const currentUser = useAppSelector(currentUserSelector);
   const router = useRouter();
   const handleLogoutFn = useLogout();
+  const tooltipController = useBoolean();
 
   const currentUserGetter = CurrentUser(currentUser);
   const { lastName = '', firstName = '' } = currentUserGetter.getProfile();
@@ -39,6 +42,10 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
     await handleLogoutFn();
 
     router.push('/');
+  };
+
+  const handleCloseTooltip = () => {
+    tooltipController.setFalse();
   };
 
   return (
@@ -52,12 +59,20 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
             <IconMail className={css.iconMail} />
           </InlineTextButton>
           <Tooltip
-            overlayClassName={css.tooltipOverlay}
+            overlayClassName={classNames(css.tooltipOverlay)}
             placement="bottom"
             showArrow={false}
             trigger={'click'}
-            tooltipContent={<PartnerNotificationModal />}>
-            <InlineTextButton type="button" className={css.notiIcon}>
+            popupVisible={tooltipController.value}
+            tooltipContent={
+              <PartnerNotificationModal
+                handleCloseTooltip={handleCloseTooltip}
+              />
+            }>
+            <InlineTextButton
+              type="button"
+              className={css.notiIcon}
+              onClick={() => tooltipController.setTrue()}>
               <IconBell className={css.iconBell} />
               <div className={css.notiDot}>{2}</div>
             </InlineTextButton>
