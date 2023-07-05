@@ -28,6 +28,15 @@
   &.caution {
     background-color: $labelYellow1;
   }
+  &.darkBlue {
+    background-color: $labelDarkBlue;
+  }
+  &.strongSuccess {
+    background-color: $sematicGreen2;
+  }
+  &.strongDanger {
+    background-color: $sematicRed2;
+  }
   /* ===============  =============== */
 
   /* =============== label =============== */

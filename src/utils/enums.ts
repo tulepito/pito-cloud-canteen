@@ -983,6 +983,18 @@ export enum EQuotationStatus {
 
 export const ORDER_ADMIN_FILTER_OPTIONS = [
   {
+    key: 'draft',
+    label: 'Đơn nháp',
+  },
+  {
+    key: 'pendingApproval',
+    label: 'Mới tạo',
+  },
+  {
+    key: 'picking',
+    label: 'Đang chọn món',
+  },
+  {
     key: 'inProgress',
     label: 'Đang triển khai',
   },

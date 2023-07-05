@@ -10,10 +10,12 @@ import { useRouter } from 'next/router';
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import StateItem from '@components/TimeLine/StateItem';
@@ -23,7 +25,13 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { adminPaths, adminRoutes } from '@src/paths';
 import { Listing } from '@src/utils/data';
-import { formatTimestamp } from '@utils/dates';
+import {
+  ETransition,
+  txIsCanceled,
+  txIsDelivered,
+  txIsDelivering,
+} from '@src/utils/transaction';
+import { formatTimestamp, getDayOfWeek } from '@utils/dates';
 import {
   EOrderDraftStates,
   EOrderStates,
@@ -36,10 +44,12 @@ import type {
   TListing,
   TObject,
   TTableSortValue,
+  TTransaction,
 } from '@utils/types';
 import { parsePrice } from '@utils/validators';
 
 import DownloadColumnListForm from './ManageOrderFilterForms/DownloadColumnListForm/DownloadColumnListForm';
+import type { TFilterColumnFormValues } from './ManageOrderFilterForms/FilterColumnForm/FilterColumnForm';
 import FilterColumnForm from './ManageOrderFilterForms/FilterColumnForm/FilterColumnForm';
 import FilterForm from './ManageOrderFilterForms/FilterForm/FilterForm';
 
@@ -61,6 +71,10 @@ const BADGE_TYPE_BASE_ON_ORDER_STATE = {
   [EOrderStates.pendingPayment]: EBadgeType.info,
   [EOrderStates.picking]: EBadgeType.warning,
   [EOrderStates.reviewed]: EBadgeType.warning,
+
+  [ETransition.START_DELIVERY]: EBadgeType.darkBlue,
+  [ETransition.COMPLETE_DELIVERY]: EBadgeType.strongSuccess,
+  [ETransition.OPERATOR_CANCEL_PLAN]: EBadgeType.strongDanger,
 };
 
 const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
@@ -73,6 +87,47 @@ const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
   [EOrderStates.pendingPayment]: css.badgeProcessing,
   [EOrderStates.picking]: css.badgeWarning,
   [EOrderStates.reviewed]: css.badgeWarning,
+
+  [ETransition.START_DELIVERY]: css.badgeInProgress,
+  [ETransition.COMPLETE_DELIVERY]: css.badgeSuccess,
+};
+
+const renderBadgeForSubOrder = (tx: TTransaction) => {
+  if (txIsDelivering(tx)) {
+    return (
+      <Badge
+        labelClassName={css.badgeLabelLight}
+        type={EBadgeType.darkBlue}
+        label="Đang giao hàng"
+      />
+    );
+  }
+  if (txIsDelivered(tx)) {
+    return (
+      <Badge
+        labelClassName={css.badgeLabelLight}
+        type={EBadgeType.strongSuccess}
+        label="Đã giao hàng"
+      />
+    );
+  }
+  if (txIsCanceled(tx)) {
+    return (
+      <Badge
+        labelClassName={css.badgeLabelLight}
+        type={EBadgeType.strongDanger}
+        label="Huỷ đơn"
+      />
+    );
+  }
+
+  return (
+    <Badge
+      labelClassName={css.badgeLabelLight}
+      type={EBadgeType.darkBlue}
+      label="Đang giao hàng"
+    />
+  );
 };
 
 const OrderDetailTooltip = ({
@@ -109,8 +164,17 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'title',
     label: 'ID',
-    render: ({ id: orderId, title, state, subOrders }: any) => {
-      const titleComponent = <div className={css.boldText}>#{title}</div>;
+    render: ({ id: orderId, title, state, subOrders, parentKey }: any) => {
+      const isChildRow = !!parentKey;
+      const titleComponent = (
+        <div
+          className={classNames(
+            css.boldText,
+            isChildRow && css.firstChildCell,
+          )}>
+          #{title}
+        </div>
+      );
 
       if ([EOrderDraftStates.draft].includes(state)) {
         return (
@@ -169,12 +233,12 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'startDate',
     label: 'Thời gian',
     render: (data: any) => {
-      const { startDate, endDate } = data;
+      const { startDate, endDate, parentKey, subOrderDate } = data;
 
       return startDate && endDate ? (
         <div className={css.rowText}>
           <div className={css.deliveryHour}>{data.deliveryHour}</div>
-          {data.startDate} - {data.endDate}
+          {parentKey ? subOrderDate : `${data.startDate} - ${data.endDate}`}
         </div>
       ) : (
         <></>
@@ -217,17 +281,30 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'state',
     label: 'Trạng thái',
-    render: ({ state }: { state: EOrderStates | EOrderDraftStates }) => {
+    render: ({
+      state,
+      parentKey,
+      tx,
+    }: {
+      state: EOrderStates | EOrderDraftStates;
+      parentKey: string;
+      tx: TTransaction;
+    }) => {
       return (
-        <Badge
-          containerClassName={classNames(
-            css.badge,
-            BADGE_CLASS_NAME_BASE_ON_ORDER_STATE[state],
-          )}
-          labelClassName={css.badgeLabel}
-          type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.default}
-          label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
-        />
+        <RenderWhen condition={!!parentKey}>
+          {renderBadgeForSubOrder(tx)}
+          <RenderWhen.False>
+            <Badge
+              containerClassName={classNames(
+                css.badge,
+                BADGE_CLASS_NAME_BASE_ON_ORDER_STATE[state],
+              )}
+              labelClassName={css.badgeLabel}
+              type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.default}
+              label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
+            />
+          </RenderWhen.False>
+        </RenderWhen>
       );
     },
     sortable: true,
@@ -235,14 +312,33 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'isPaid',
     label: 'Thanh toán',
-    render: ({ isPaid }: any) => {
+    render: ({ isPaid }) => (
+      <Badge
+        containerClassName={classNames(
+          css.badge,
+          isPaid ? css.badgeSuccess : css.badgeWarning,
+        )}
+        labelClassName={css.badgeLabel}
+        type={isPaid ? EBadgeType.success : EBadgeType.warning}
+        label={isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}
+      />
+    ),
+  },
+  {
+    key: 'isParent',
+    label: '',
+    render: ({ isParent }, _, collapseRowController) => {
       return (
-        <Badge
-          containerClassName={css.badge}
-          labelClassName={css.badgeLabel}
-          type={isPaid ? EBadgeType.success : EBadgeType.warning}
-          label={isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}
-        />
+        isParent && (
+          <IconArrow
+            direction="right"
+            onClick={collapseRowController?.toggle}
+            className={classNames(
+              css.iconArrow,
+              collapseRowController?.value && css.rotate,
+            )}
+          />
+        )
       );
     },
   },
@@ -299,6 +395,29 @@ const parseEntitiesToTableData = (
       deliveryHour,
     } = entity?.attributes?.metadata || {};
 
+    const orderDetail = subOrders[0]?.attributes?.metadata?.orderDetail || {};
+    const subOrderDates = Object.keys(orderDetail).map((key) => {
+      return {
+        key: `${entity.id.uuid}-${key}`,
+        data: {
+          id: `${entity.id.uuid}-${key}`,
+          title: `${entity.attributes.title}-${getDayOfWeek(+key)}`,
+          orderNumber: (page - 1) * 10 + index + 1,
+          startDate: startDate && formatTimestamp(startDate),
+          endDate: endDate && formatTimestamp(endDate),
+          subOrderDate: formatTimestamp(+key, 'dd/MM/yyyy'),
+          state: orderState || EOrderDraftStates.pendingApproval,
+          orderId: entity?.id?.uuid,
+          restaurants: [orderDetail[key]?.restaurant?.restaurantName],
+          subOrders: newSubOrders,
+          orderName: entity.attributes.publicData.orderName,
+          deliveryHour,
+          parentKey: entity.id.uuid,
+          tx: orderDetail[key]?.transaction,
+        },
+      };
+    });
+
     return {
       key: entity.id.uuid,
       data: {
@@ -317,6 +436,10 @@ const parseEntitiesToTableData = (
         subOrders: newSubOrders,
         orderName: entity.attributes.publicData.orderName,
         deliveryHour,
+        isParent: true,
+        children: subOrderDates,
+        isPaid:
+          entity.attributes.metadata.orderState === EOrderStates.completed,
       },
     };
   });
@@ -357,6 +480,14 @@ const ManageOrdersPage = () => {
     meta_startDate,
   } = router.query;
   const [sortValue, setSortValue] = useState<TTableSortValue>();
+  const [displayedColumns, setDisplayedColumns] = useState<string[]>(
+    TABLE_COLUMN.map((column) => column.key),
+  );
+
+  const shouldShowTableColums = TABLE_COLUMN.filter((column) => {
+    return displayedColumns.includes(column.key);
+  });
+
   const {
     queryOrderInProgress,
     queryOrderError,
@@ -365,6 +496,7 @@ const ManageOrdersPage = () => {
   } = useAppSelector((state) => state.Order, shallowEqual);
 
   const dataTable = parseEntitiesToTableData(orders, Number(page));
+  console.log('dataTable: ', dataTable);
 
   const sortedData = sortValue ? sortOrders(sortValue, dataTable) : dataTable;
 
@@ -384,7 +516,7 @@ const ManageOrdersPage = () => {
     content = (
       <>
         <TableForm
-          columns={TABLE_COLUMN}
+          columns={shouldShowTableColums}
           data={sortedData}
           pagination={manageOrdersPagination}
           paginationPath={adminRoutes.ManageOrders.path}
@@ -393,6 +525,7 @@ const ManageOrdersPage = () => {
           sortValue={sortValue}
           tableWrapperClassName={css.tableWrapper}
           tableClassName={css.table}
+          tableBodyClassName={css.tableBody}
         />
       </>
     );
@@ -510,9 +643,11 @@ const ManageOrdersPage = () => {
               <Tooltip
                 tooltipContent={
                   <FilterColumnForm
-                    onSubmit={() => {}}
+                    onSubmit={(values: TFilterColumnFormValues) =>
+                      setDisplayedColumns(values.columnName)
+                    }
                     initialValues={{
-                      columnName: [],
+                      columnName: displayedColumns,
                     }}
                   />
                 }

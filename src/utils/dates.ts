@@ -458,3 +458,7 @@ export const calculateRemainTime = (futureTimestamp: number) => {
 export const isSameDate = (date1: Date, date2: Date) => {
   return DateTime.fromJSDate(date1).hasSame(DateTime.fromJSDate(date2), 'day');
 };
+
+export const getDayOfWeek = (timestamp: number) => {
+  return DateTime.fromMillis(timestamp).weekday;
+};

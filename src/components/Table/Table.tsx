@@ -11,14 +11,21 @@ import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import IconSort from '@components/Icons/IconSort/IconSort';
 import Pagination from '@components/Pagination/Pagination';
-import type { TDefaultProps, TPagination } from '@utils/types';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import type { TDefaultProps, TObject, TPagination } from '@utils/types';
+
+import CollapsibleRows from './CollapsibleRows/CollapsibleRows';
 
 import css from './Table.module.scss';
 
 export type TColumn = {
   key: string;
   label: string | ReactNode;
-  render: (data: any, isChecked: boolean) => ReactNode;
+  render: (
+    data: any,
+    isChecked: boolean,
+    collapseRowController?: TObject,
+  ) => ReactNode;
   sortable?: boolean;
 };
 
@@ -203,47 +210,56 @@ const Table = (props: TTableProps) => {
           ) : (
             <tbody className={tableBodyClassName}>
               {data.map((row: TRowData) => (
-                <tr
-                  className={classNames(tableBodyRowClassName, css.bodyRow)}
-                  key={row.key}>
-                  {hasCheckbox && (
-                    <td
-                      className={classNames(
-                        tableBodyCellClassName,
-                        css.bodyCell,
-                        {
-                          [css.isParent]: row.data.isParent,
-                        },
-                      )}>
-                      <FieldCheckbox
-                        labelClassName={css.checkboxLabel}
-                        svgClassName={css.checkboxSvg}
-                        name="rowCheckbox"
-                        id={`rowCheckbox.${row.key}`}
-                        value={row.key as any}
-                        label=" "
-                        customOnChange={rowCheckboxChange}
-                      />
-                    </td>
-                  )}
-                  {columns.map((col: TColumn) => {
-                    const rowCheckbox = values?.rowCheckbox || [];
-                    const isChecked = rowCheckbox.includes(row.key);
+                <RenderWhen key={row.key} condition={row.data.isParent}>
+                  <CollapsibleRows
+                    row={row}
+                    columns={columns}
+                    hasCheckbox={hasCheckbox}
+                    tableBodyRowClassName={tableBodyRowClassName}
+                    tableBodyCellClassName={tableBodyCellClassName}
+                    rowCheckboxChange={rowCheckboxChange}
+                    values={values}
+                  />
+                  <RenderWhen.False>
+                    <tr
+                      className={classNames(tableBodyRowClassName, css.bodyRow)}
+                      key={row.key}>
+                      {hasCheckbox && (
+                        <td
+                          className={classNames(
+                            tableBodyCellClassName,
+                            css.bodyCell,
+                          )}>
+                          <FieldCheckbox
+                            labelClassName={css.checkboxLabel}
+                            svgClassName={css.checkboxSvg}
+                            name="rowCheckbox"
+                            id={`rowCheckbox.${row.key}`}
+                            value={row.key as any}
+                            label=" "
+                            customOnChange={rowCheckboxChange}
+                          />
+                        </td>
+                      )}
+                      {columns.map((col: TColumn) => {
+                        const rowCheckbox = values?.rowCheckbox || [];
+                        const isChecked = rowCheckbox.includes(row.key);
 
-                    return (
-                      <td
-                        className={classNames(
-                          tableBodyCellClassName,
-                          css.bodyCell,
-                          { [css.isParent]: row.data.isParent },
-                        )}
-                        data-label={col.label}
-                        key={col.key}>
-                        {col.render(row.data, isChecked)}
-                      </td>
-                    );
-                  })}
-                </tr>
+                        return (
+                          <td
+                            className={classNames(
+                              tableBodyCellClassName,
+                              css.bodyCell,
+                            )}
+                            data-label={col.label}
+                            key={col.key}>
+                            {col.render(row.data, isChecked)}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  </RenderWhen.False>
+                </RenderWhen>
               ))}
               {extraRows && <tr className={css.bodyRow}>{extraRows}</tr>}
             </tbody>
