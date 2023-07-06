@@ -141,6 +141,10 @@ type TOrderInitialState = {
   getCompanyOrderSummaryInProgress: boolean;
   getCompanyOrderSummaryError: any;
   companyOrderSummary: TCompanyOrderSummary;
+
+  allOrders: TListing[];
+  queryAllOrdersInProgress: boolean;
+  queryAllOrdersError: any;
 };
 
 const initialState: TOrderInitialState = {
@@ -234,6 +238,10 @@ const initialState: TOrderInitialState = {
     totalOrderDishes: 0,
     totalOrderCost: 0,
   },
+
+  allOrders: [],
+  queryAllOrdersInProgress: false,
+  queryAllOrdersError: null,
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -257,6 +265,7 @@ const GET_COMPANY_ORDER_NOTIFICATIONS =
   'app/Order/GET_COMPANY_ORDER_NOTIFICATIONS';
 
 const GET_COMPANY_ORDER_SUMMARY = 'app/Order/GET_COMPANY_ORDER_SUMMARY';
+const QUERY_ALL_ORDERS = 'app/Order/QUERY_ALL_ORDERS';
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
   const { clientId, bookerId, isCreatedByAdmin = false, generalInfo } = params;
@@ -504,6 +513,26 @@ const queryOrders = createAsyncThunk(
   },
   {
     serializeError: storableError,
+  },
+);
+const queryAllOrders = createAsyncThunk(
+  QUERY_ALL_ORDERS,
+  async (payload: TObject = {}) => {
+    const params = {
+      dataParams: {
+        ...payload,
+        states: EListingStates.published,
+      },
+      queryParams: {
+        expand: true,
+      },
+      isQueryAllPages: true,
+    };
+
+    const { data } = await queryOrdersApi(params);
+    const { orders } = data;
+
+    return orders;
   },
 );
 
@@ -856,6 +885,7 @@ export const orderAsyncActions = {
   fetchOrderRestaurants,
   getCompanyOrderNotification,
   getCompanyOrderSummary,
+  queryAllOrders,
 };
 
 const orderSlice = createSlice({
@@ -1303,6 +1333,22 @@ const orderSlice = createSlice({
         ...state,
         getCompanyOrderSummaryError: error,
         getCompanyOrderSummaryInProgress: false,
+      }))
+
+      .addCase(queryAllOrders.pending, (state) => ({
+        ...state,
+        queryAllOrdersInProgress: true,
+        queryAllOrdersError: null,
+      }))
+      .addCase(queryAllOrders.fulfilled, (state, { payload }) => ({
+        ...state,
+        queryAllOrdersInProgress: false,
+        allOrders: payload,
+      }))
+      .addCase(queryAllOrders.rejected, (state, { error }) => ({
+        ...state,
+        queryAllOrdersInProgress: false,
+        queryAllOrdersError: error.message,
       }));
   },
 });

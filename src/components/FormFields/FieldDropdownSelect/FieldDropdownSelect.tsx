@@ -16,11 +16,11 @@ type TFieldDropdownSelect = FieldRenderProps<string, any> & {
   label?: string;
   id?: string;
   options?: TKeyValue[];
+  initialFieldValue?: string;
 };
 export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
   props,
 ) => {
-  const [selected, setSelected] = useState<string>(null!);
   const dropdownController = useBoolean();
   const {
     label,
@@ -30,8 +30,10 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
     meta,
     placeholder,
     options = [],
+    initialFieldValue,
     ...rest
   } = props;
+  const [selected, setSelected] = useState<string>(initialFieldValue!);
   const { onChange } = input;
 
   useEffect(() => {
