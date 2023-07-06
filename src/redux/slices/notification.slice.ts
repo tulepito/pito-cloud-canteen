@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import {
   fetchNotificationsApi,
   updateNotificationsApi,
-} from '@apis/notification';
+} from '@apis/notificationApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 
 // ================ Initial states ================ //
