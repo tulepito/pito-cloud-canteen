@@ -139,14 +139,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             );
           });
 
-          emailSendingFactory(
-            EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
-            {
-              orderId,
-              timestamp,
-              restaurantId,
-            },
-          );
+          // Function is not ready on production
+
+          // emailSendingFactory(
+          //   EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
+          //   {
+          //     orderId,
+          //     timestamp,
+          //     restaurantId,
+          //   },
+          // );
 
           participantIds.map(async (participantId: string) => {
             createFirebaseDocNotification(ENotificationType.ORDER_CANCEL, {
