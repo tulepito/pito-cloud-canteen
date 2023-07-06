@@ -247,10 +247,6 @@ export const fetchFirebaseDocNotifications = async (userId: string) => {
       },
       limitRecords: 100,
     });
-    console.debug(
-      '💫 > file: notifications.ts:177 > fetchFirebaseDocNotifications > notifications: ',
-      notifications,
-    );
 
     return notifications;
   } catch (error) {
