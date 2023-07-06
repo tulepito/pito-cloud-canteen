@@ -81,6 +81,13 @@
   }
 }
 
+.mobileView {
+  display: block;
+
+  @include viewportMedium {
+    display: none;
+  }
+}
 .toSignIn {
   color: $primaryPri2;
   cursor: pointer;

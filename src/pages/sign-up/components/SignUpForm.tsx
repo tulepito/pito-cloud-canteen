@@ -233,7 +233,7 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
       </div>
       <Button
         inProgress={inProgress}
-        className={css.submitButton}
+        className={classNames(css.submitButton, css.mobileView)}
         type="submit"
         disabled={submitDisable}>
         {submitButtonText}
