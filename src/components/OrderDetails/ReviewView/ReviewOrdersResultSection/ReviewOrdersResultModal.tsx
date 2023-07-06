@@ -204,7 +204,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                           <div>{requirement}</div>
                         </Tooltip>
                       ) : (
-                        <div></div>
+                        <div>-</div>
                       )}
                     </div>
                   );
