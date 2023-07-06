@@ -62,6 +62,28 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         });
       }
 
+      case HttpMethod.POST: {
+        const { notificationType, notificationParams, notifications } =
+          req.body;
+
+        if (!isEmpty(notifications)) {
+          await Promise.all(
+            notifications.map(async ({ type, params }: TObject) => {
+              await createFirebaseDocNotification(type, params);
+            }),
+          );
+        } else {
+          await createFirebaseDocNotification(
+            notificationType,
+            notificationParams,
+          );
+        }
+
+        return res.status(200).json({
+          message: `Created notification(s)`,
+        });
+      }
+
       default:
         break;
     }
