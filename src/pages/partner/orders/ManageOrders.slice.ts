@@ -147,7 +147,7 @@ const PartnerManageOrdersSlice = createSlice({
         0 + (page - 1) * perPage,
         page * perPage >= validSubOrders.length
           ? validSubOrders.length
-          : perPage,
+          : page * perPage,
       );
     },
   },
