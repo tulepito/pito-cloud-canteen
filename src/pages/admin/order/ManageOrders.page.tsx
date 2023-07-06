@@ -20,6 +20,7 @@ import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import StateItem from '@components/TimeLine/StateItem';
 import Tooltip from '@components/Tooltip/Tooltip';
+import { calculateTotalPriceAndDishes } from '@helpers/order/cartInfoHelper';
 import { combineOrderDetailWithPriceInfo } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
@@ -48,6 +49,8 @@ import type {
 } from '@utils/types';
 import { parsePrice } from '@utils/validators';
 
+import { makeExcelFile } from './helpers/manageOrder';
+import type { TDownloadColumnListFormValues } from './ManageOrderFilterForms/DownloadColumnListForm/DownloadColumnListForm';
 import DownloadColumnListForm from './ManageOrderFilterForms/DownloadColumnListForm/DownloadColumnListForm';
 import type { TFilterColumnFormValues } from './ManageOrderFilterForms/FilterColumnForm/FilterColumnForm';
 import FilterColumnForm from './ManageOrderFilterForms/FilterColumnForm/FilterColumnForm';
@@ -164,7 +167,14 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'title',
     label: 'ID',
-    render: ({ id: orderId, title, state, subOrders, parentKey }: any) => {
+    render: ({
+      id: orderId,
+      title,
+      state,
+      subOrders,
+      parentKey,
+      timestamp,
+    }: any) => {
       const isChildRow = !!parentKey;
       const titleComponent = (
         <div
@@ -176,6 +186,15 @@ const TABLE_COLUMN: TColumn[] = [
         </div>
       );
 
+      if (isChildRow) {
+        return (
+          <NamedLink
+            path={adminPaths.OrderDetail}
+            params={{ orderId: parentKey, timestamp }}>
+            {titleComponent}
+          </NamedLink>
+        );
+      }
       if ([EOrderDraftStates.draft].includes(state)) {
         return (
           <NamedLink path={adminPaths.UpdateDraftOrder} params={{ orderId }}>
@@ -344,14 +363,11 @@ const TABLE_COLUMN: TColumn[] = [
   },
 ];
 
-const parseEntitiesToTableData = (
-  orders: TIntegrationOrderListing[],
-  page: number,
-) => {
+const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
   if (orders.length === 0) return [];
 
-  return orders.map((entity, index) => {
-    const { company, subOrders = [] } = entity;
+  return orders.map((entity) => {
+    const { company, subOrders = [], allRestaurants = [] } = entity;
     const restaurants = subOrders.reduce(
       // eslint-disable-next-line array-callback-return
       (prevSubOrders: any[], subOrder: TIntegrationListing) => {
@@ -396,13 +412,27 @@ const parseEntitiesToTableData = (
     } = entity?.attributes?.metadata || {};
 
     const orderDetail = subOrders[0]?.attributes?.metadata?.orderDetail || {};
+    const fullRestaurantsData = Object.keys(orderDetail).map((key) => {
+      return orderDetail[key]?.restaurant;
+    });
+    const isGroupOrder =
+      (entity?.attributes?.metadata?.orderType || 'group') === 'group';
+    const { totalDishes } = calculateTotalPriceAndDishes({
+      orderDetail,
+      isGroupOrder,
+    });
+
     const subOrderDates = Object.keys(orderDetail).map((key) => {
+      const { totalDishes: childTotalDishes } = calculateTotalPriceAndDishes({
+        orderDetail: { key: orderDetail[key] },
+        isGroupOrder,
+      });
+
       return {
         key: `${entity.id.uuid}-${key}`,
         data: {
           id: `${entity.id.uuid}-${key}`,
           title: `${entity.attributes.title}-${getDayOfWeek(+key)}`,
-          orderNumber: (page - 1) * 10 + index + 1,
           startDate: startDate && formatTimestamp(startDate),
           endDate: endDate && formatTimestamp(endDate),
           subOrderDate: formatTimestamp(+key, 'dd/MM/yyyy'),
@@ -414,6 +444,13 @@ const parseEntitiesToTableData = (
           deliveryHour,
           parentKey: entity.id.uuid,
           tx: orderDetail[key]?.transaction,
+          partnerPhoneNumber: orderDetail[key]?.restaurant?.phoneNumber,
+          totalDishes: childTotalDishes,
+          timestamp: +key,
+          partnerLocation: allRestaurants.find(
+            (_restaurant) =>
+              _restaurant.id.uuid === orderDetail[key]?.restaurant?.id,
+          )?.attributes?.publicData?.location?.address,
         },
       };
     });
@@ -423,7 +460,6 @@ const parseEntitiesToTableData = (
       data: {
         id: entity.id.uuid,
         title: entity.attributes.title,
-        orderNumber: (page - 1) * 10 + index + 1,
         location: deliveryAddress?.address,
         companyName: company?.attributes?.profile?.publicData?.companyName,
         displayName: `${company?.attributes.profile?.lastName} ${company?.attributes.profile?.firstName}`,
@@ -440,6 +476,18 @@ const parseEntitiesToTableData = (
         children: subOrderDates,
         isPaid:
           entity.attributes.metadata.orderState === EOrderStates.completed,
+        orderCreatedAt: formatTimestamp(
+          new Date(entity.attributes.createdAt!).getTime(),
+        ),
+        bookerPhoneNumber:
+          company?.attributes?.profile?.publicData?.phoneNumber,
+        totalDishes,
+        orderNotes: entity.attributes.metadata.notes,
+        fullRestaurantsData,
+        partnerLocation: allRestaurants.map(
+          (_restaurant: any) =>
+            _restaurant.attributes?.publicData?.location?.address,
+        ),
       },
     };
   });
@@ -478,6 +526,7 @@ const ManageOrdersPage = () => {
     meta_state = '',
     meta_endDate,
     meta_startDate,
+    meta_orderState,
   } = router.query;
   const [sortValue, setSortValue] = useState<TTableSortValue>();
   const [displayedColumns, setDisplayedColumns] = useState<string[]>(
@@ -495,10 +544,35 @@ const ManageOrdersPage = () => {
     manageOrdersPagination,
   } = useAppSelector((state) => state.Order, shallowEqual);
 
-  const dataTable = parseEntitiesToTableData(orders, Number(page));
-  console.log('dataTable: ', dataTable);
+  const dataTable = parseEntitiesToTableData(orders);
 
   const sortedData = sortValue ? sortOrders(sortValue, dataTable) : dataTable;
+  const onDownloadOrderList = async (values: TDownloadColumnListFormValues) => {
+    const endDateWithOneMoreDay = addDays(new Date(meta_endDate as string), 1);
+    const { meta, payload } = await dispatch(
+      orderAsyncActions.queryAllOrders({
+        keywords,
+        meta_orderState,
+        ...(meta_endDate
+          ? { meta_endDate: `,${new Date(endDateWithOneMoreDay).getTime()}` }
+          : {}),
+        ...(meta_startDate
+          ? {
+              meta_startDate: `${new Date(
+                meta_startDate as string,
+              ).getTime()},`,
+            }
+          : {}),
+      }),
+    );
+    if (meta.requestStatus === 'fulfilled') {
+      const allOrdersData = parseEntitiesToTableData(payload);
+      const sortedExportOrdersData = sortValue
+        ? sortOrders(sortValue, allOrdersData)
+        : allOrdersData;
+      makeExcelFile(sortedExportOrdersData, values.downloadColumnListName);
+    }
+  };
 
   const handleSort = (columnName: string) => {
     setSortValue({
@@ -549,6 +623,7 @@ const ManageOrdersPage = () => {
       orderAsyncActions.queryOrders({
         page,
         keywords,
+        meta_orderState,
         ...(meta_endDate
           ? { meta_endDate: `,${new Date(endDateWithOneMoreDay).getTime()}` }
           : {}),
@@ -575,11 +650,12 @@ const ManageOrdersPage = () => {
     });
   };
 
-  const onSubmit = ({
+  const onFilterSubmit = ({
     keywords,
     meta_state,
     meta_startDate,
     meta_endDate,
+    meta_orderState,
   }: any) => {
     router.push({
       pathname: adminRoutes.ManageOrders.path,
@@ -592,6 +668,7 @@ const ManageOrdersPage = () => {
         ...(meta_endDate
           ? { meta_endDate: new Date(meta_endDate).toISOString() }
           : {}),
+        meta_orderState,
       },
     });
   };
@@ -613,10 +690,11 @@ const ManageOrdersPage = () => {
             <Tooltip
               tooltipContent={
                 <FilterForm
-                  onSubmit={onSubmit}
+                  onSubmit={onFilterSubmit}
                   initialValues={{
                     meta_state: groupStateString,
                     keywords,
+                    meta_orderState,
                     meta_startDate: meta_startDate
                       ? new Date(meta_startDate as string).getTime()
                       : undefined,
@@ -659,7 +737,7 @@ const ManageOrdersPage = () => {
               <Tooltip
                 tooltipContent={
                   <DownloadColumnListForm
-                    onSubmit={() => {}}
+                    onSubmit={onDownloadOrderList}
                     initialValues={{
                       downloadColumnListName: [],
                     }}

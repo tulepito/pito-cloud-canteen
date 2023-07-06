@@ -218,7 +218,9 @@ const Table = (props: TTableProps) => {
           ) : (
             <tbody className={tableBodyClassName}>
               {data.map((row: TRowData) => (
-                <RenderWhen key={row.key} condition={row.data.isParent}>
+                <RenderWhen
+                  key={row.key}
+                  condition={Boolean(row.data.isParent)}>
                   <CollapsibleRows
                     row={row}
                     columns={columns}

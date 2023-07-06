@@ -25,7 +25,7 @@ const DOWNLOAD_COLUMN_LIST_OPTIONS = [
     label: 'Mã đơn hàng',
   },
   {
-    key: 'startDate',
+    key: 'orderCreatedAt',
     label: 'Ngày tạo đơn',
   },
   {
@@ -49,11 +49,11 @@ const DOWNLOAD_COLUMN_LIST_OPTIONS = [
     label: 'Số phần ăn',
   },
   {
-    key: 'note',
+    key: 'orderNotes',
     label: 'Ghi chú đơn hàng',
   },
   {
-    key: 'partnerName',
+    key: 'restaurants',
     label: 'Đối tác',
   },
   {

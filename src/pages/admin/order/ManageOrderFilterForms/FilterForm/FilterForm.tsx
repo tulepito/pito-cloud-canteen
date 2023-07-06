@@ -17,6 +17,7 @@ export type TFilterFormValues = {
   meta_endDate?: number;
   meta_state?: string[];
   keywords?: string | string[];
+  meta_orderState: string | string[];
 };
 
 type TExtraProps = {};
@@ -80,11 +81,12 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
         </div>
         <div className={css.orderStateSelect}>
           <FieldDropdownSelect
-            id="orderState"
-            name="orderState"
+            id="meta_orderState"
+            name="meta_orderState"
             label="Trạng thái đơn"
             placeholder="Chọn trạng thái đơn"
             options={ORDER_ADMIN_FILTER_OPTIONS}
+            initialFieldValue={values.meta_orderState}
           />
         </div>
         <Button type="submit" className={css.filterBtn} size="medium">
