@@ -45,7 +45,7 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
   } = props;
 
   const intl = useIntl();
-  const { form: foodSelectionForm } = useForm({
+  const { form: foodSelectionForm, invalid } = useForm({
     onSubmit: () => {},
     initialValues: {
       requirement,
@@ -211,7 +211,10 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
         </div>
 
         <div className={css.selectFoodSection}>
-          <Button className={css.selectFoodBtn} onClick={onSelectFood}>
+          <Button
+            disabled={invalid}
+            className={css.selectFoodBtn}
+            onClick={onSelectFood}>
             Chọn món này
           </Button>
         </div>
