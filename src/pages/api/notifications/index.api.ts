@@ -29,21 +29,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       }
 
       case HttpMethod.PUT: {
-        const { notificationId, updateData } = req.body;
-        const shouldUpdateAnArray = Array.isArray(notificationId);
+        const { notificationIds, updateData } = req.body;
 
-        if (shouldUpdateAnArray) {
-          notificationId.map((id) => {
-            return updateSeenFirebaseDocNotification(id, updateData);
-          });
-        } else {
-          updateSeenFirebaseDocNotification(notificationId, updateData);
-        }
+        notificationIds.map((id: string) => {
+          return updateSeenFirebaseDocNotification(id, updateData);
+        });
 
         return res.status(200).json({
-          message: `Updated ${
-            shouldUpdateAnArray ? notificationId.join(', ') : notificationId
-          }`,
+          message: `Updated ${notificationIds.join(', ')}`,
         });
       }
 
