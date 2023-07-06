@@ -99,8 +99,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     priceQuotationData,
   );
 
-  const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
-
   const tabItems = useMemo(
     () => {
       const foodOrderGroupedByDate = groupFoodOrderByDate({
