@@ -223,7 +223,7 @@ const transit = createAsyncThunk(
             userId: User(provider).getId(),
             orderId,
             planId,
-            date: new Date(start).getTime(),
+            subOrderDate: new Date(start).getTime(),
             companyName,
             transition,
           } as NotificationInvitationParams,

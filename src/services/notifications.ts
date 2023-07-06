@@ -135,7 +135,7 @@ export const createFirebaseDocNotification = async (
       case ENotificationType.SUB_ORDER_UPDATED: {
         const {
           planId,
-          date,
+          subOrderDate,
           orderId,
           oldOrderDetail,
           newOrderDetail,
@@ -143,27 +143,29 @@ export const createFirebaseDocNotification = async (
         } = notificationParams;
         data = {
           ...data,
-          date,
+          subOrderDate,
           orderId,
           planId,
           oldOrderDetail,
           newOrderDetail,
           orderTitle,
+          relatedLink: `/partner/orders/${orderId}_${subOrderDate}`,
         };
 
         break;
       }
 
       case ENotificationType.SUB_ORDER_INPROGRESS: {
-        const { planId, transition, date, orderId, subOrderName } =
+        const { planId, transition, subOrderDate, orderId, subOrderName } =
           notificationParams;
         data = {
           ...data,
           transition,
-          date,
+          subOrderDate,
           orderId,
           planId,
           subOrderName,
+          relatedLink: `/partner/orders/${orderId}_${subOrderDate}`,
         };
 
         break;
@@ -171,15 +173,16 @@ export const createFirebaseDocNotification = async (
       case ENotificationType.SUB_ORDER_CANCELED:
       case ENotificationType.SUB_ORDER_DELIVERED:
       case ENotificationType.SUB_ORDER_DELIVERING: {
-        const { planId, transition, date, orderId, companyName } =
+        const { planId, transition, subOrderDate, orderId, companyName } =
           notificationParams;
         data = {
           ...data,
           transition,
-          date,
+          subOrderDate,
           orderId,
           planId,
           companyName,
+          relatedLink: `/partner/orders/${orderId}_${subOrderDate}`,
         };
 
         break;

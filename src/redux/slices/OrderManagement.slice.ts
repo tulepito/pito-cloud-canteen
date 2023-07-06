@@ -878,16 +878,22 @@ const updateOrderFromDraftEdit = createAsyncThunk(
   'app/OrderManagement/UPDATE_ORDER_FROM_DRAFT_EDIT',
   async (_, { getState, dispatch }) => {
     const orderData = getState().OrderManagement.orderData!;
-    const { planData, restaurantData = [] } = getState().OrderManagement;
+    const {
+      planData,
+      restaurantData = [],
+      draftSubOrderChangesHistory,
+      draftOrderDetail,
+    } = getState().OrderManagement;
 
     const orderId = Listing(orderData as TListing).getId();
     const { title: orderTitle } = Listing(
       orderData as TListing,
     ).getAttributes();
+    const { companyName = 'PCC' } = Listing(
+      orderData as TListing,
+    ).getMetadata();
     const planId = Listing(planData as TListing).getId();
     const { orderDetail } = Listing(planData as TListing).getMetadata();
-    const { draftSubOrderChangesHistory } = getState().OrderManagement;
-    const { draftOrderDetail } = getState().OrderManagement;
     const updateParams = {
       planId,
       orderDetail: draftOrderDetail,
@@ -968,8 +974,9 @@ const updateOrderFromDraftEdit = createAsyncThunk(
               userId,
               orderId,
               planId,
-              date,
+              subOrderDate: Number(date),
               orderTitle,
+              companyName,
               newOrderDetail: draftOrderDetail[date],
               oldOrderDetail: orderDetail[date],
             } as NotificationInvitationParams,
