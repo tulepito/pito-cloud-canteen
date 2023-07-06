@@ -33,12 +33,10 @@ const loadData = createAsyncThunk(
         date,
       });
 
-      const { order = [] } = response?.data || {};
-
-      return order;
+      return response?.data || {};
     }
 
-    return [];
+    return {};
   },
 );
 
