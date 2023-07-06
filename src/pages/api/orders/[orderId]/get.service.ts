@@ -70,6 +70,27 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
     data = { ...data, planListing };
 
     const { orderDetail } = Listing(planListing).getMetadata();
+    const orderDetailEntries =
+      Object.entries<TPlan['orderDetail'][keyof TPlan['orderDetail']]>(
+        orderDetail,
+      );
+
+    const restaurantIds = orderDetailEntries
+      .reduce<string[]>((prev, [, { restaurant }]) => {
+        if (restaurant && restaurant?.id) return prev.concat(restaurant?.id);
+
+        return prev;
+      }, [])
+      .filter((d, index, array) => array.indexOf(d) === index);
+
+    const restaurantData = denormalisedResponseEntities(
+      (await integrationSdk.listings.query({
+        ids: restaurantIds.join(','),
+        include: ['author'],
+      })) || [{}],
+    );
+
+    data = { ...data, restaurantData };
 
     if (
       [
@@ -79,16 +100,13 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
         EOrderStates.reviewed,
       ].includes(orderState)
     ) {
-      const transactionIdMap = Object.entries<
-        TPlan['orderDetail'][keyof TPlan['orderDetail']]
-      >(orderDetail).reduce<{ timestamp: string; transactionId: string }[]>(
-        (prev, [timestamp, { transactionId }]) => {
-          if (transactionId) return prev.concat([{ timestamp, transactionId }]);
+      const transactionIdMap = orderDetailEntries.reduce<
+        { timestamp: string; transactionId: string }[]
+      >((prev, [timestamp, { transactionId }]) => {
+        if (transactionId) return prev.concat([{ timestamp, transactionId }]);
 
-          return prev;
-        },
-        [],
-      );
+        return prev;
+      }, []);
 
       const transactionDataMap: TObject = {};
       await Promise.all(

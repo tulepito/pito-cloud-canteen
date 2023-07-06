@@ -258,7 +258,7 @@ type TOrderManagementState = {
   transactionDataMap: {
     [date: number]: TTransaction;
   };
-
+  restaurantData: TObject[];
   subOrderChangesHistory: TSubOrderChangeHistoryItem[];
   querySubOrderChangesHistoryInProgress: boolean;
   loadMoreSubOrderChangesHistory: boolean;
@@ -300,6 +300,7 @@ const initialState: TOrderManagementState = {
   participantData: [],
   anonymousParticipantData: [],
   transactionDataMap: {},
+  restaurantData: [],
   subOrderChangesHistory: [],
   querySubOrderChangesHistoryInProgress: false,
   querySubOrderChangesHistoryError: null,
@@ -898,6 +899,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
       planId,
       orderDetail: draftOrderDetail,
     };
+
     await addUpdateMemberOrder(orderId, updateParams);
     await Promise.all(
       Object.keys(draftSubOrderChangesHistory).map(async (date) => {
@@ -905,7 +907,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
           date as keyof typeof draftSubOrderChangesHistory
         ] as TSubOrderChangeHistoryItem[];
         if (draftSubOrderChangesHistoryByDate.length > 0) {
-          const { restaurant } = draftOrderDetail[date] || {};
+          const { restaurant = {} } = draftOrderDetail[date] || {};
 
           await sendOrderDetailUpdatedEmailApi({
             orderId,
@@ -924,6 +926,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
                   newValue,
                   createdAt,
                 } = item;
+
                 const subOrderChangesHistoryParams = {
                   planId,
                   memberId,
