@@ -13,7 +13,9 @@ export type TDownloadColumnListFormValues = {
   downloadColumnListName: string[];
 };
 
-type TExtraProps = {};
+type TExtraProps = {
+  inProgress?: boolean;
+};
 type TDownloadColumnListFormComponentProps =
   FormRenderProps<TDownloadColumnListFormValues> & Partial<TExtraProps>;
 type TDownloadColumnListFormProps = FormProps<TDownloadColumnListFormValues> &
@@ -80,10 +82,10 @@ const ORDER_TYPE_OPTIONS = [
 const DownloadColumnListFormComponent: React.FC<
   TDownloadColumnListFormComponentProps
 > = (props) => {
-  const { handleSubmit, values } = props;
+  const { handleSubmit, values, inProgress } = props;
   const { downloadColumnListName } = values;
   const isOrderTitleSelected = downloadColumnListName?.includes('title');
-  const submitDisabled = !downloadColumnListName?.length;
+  const submitDisabled = !downloadColumnListName?.length || inProgress;
 
   return (
     <Form onSubmit={handleSubmit} className={css.formContainer}>
@@ -120,6 +122,7 @@ const DownloadColumnListFormComponent: React.FC<
         type="submit"
         className={css.filterBtn}
         size="medium"
+        inProgress={inProgress}
         disabled={submitDisabled}>
         Tải danh sách
       </Button>

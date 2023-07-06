@@ -17,6 +17,7 @@ type TFieldDropdownSelect = FieldRenderProps<string, any> & {
   id?: string;
   options?: TKeyValue[];
   initialFieldValue?: string;
+  labelClassName?: string;
 };
 export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
   props,
@@ -31,6 +32,7 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
     placeholder,
     options = [],
     initialFieldValue,
+    labelClassName,
     ...rest
   } = props;
   const [selected, setSelected] = useState<string>(initialFieldValue!);
@@ -40,7 +42,7 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
     onChange(selected);
   }, [onChange, selected]);
   const classes = classNames(css.root);
-  const labelClasses = classNames(css.label);
+  const labelClasses = classNames(css.label, labelClassName);
 
   const inputProps = {
     ...input,

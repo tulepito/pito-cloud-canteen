@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
@@ -542,6 +542,7 @@ const ManageOrdersPage = () => {
     queryOrderError,
     orders = [],
     manageOrdersPagination,
+    queryAllOrdersInProgress,
   } = useAppSelector((state) => state.Order, shallowEqual);
 
   const dataTable = parseEntitiesToTableData(orders);
@@ -673,6 +674,14 @@ const ManageOrdersPage = () => {
     });
   };
 
+  const downloadColumnsListInitialValues: TDownloadColumnListFormValues =
+    useMemo(
+      () => ({
+        downloadColumnListName: [],
+      }),
+      [],
+    );
+
   return (
     <div className={css.root}>
       <div className={css.pageHeader}>
@@ -738,9 +747,8 @@ const ManageOrdersPage = () => {
                 tooltipContent={
                   <DownloadColumnListForm
                     onSubmit={onDownloadOrderList}
-                    initialValues={{
-                      downloadColumnListName: [],
-                    }}
+                    initialValues={downloadColumnsListInitialValues}
+                    inProgress={queryAllOrdersInProgress}
                   />
                 }
                 placement="bottomRight"

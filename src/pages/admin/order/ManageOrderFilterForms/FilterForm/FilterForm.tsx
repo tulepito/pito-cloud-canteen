@@ -46,6 +46,7 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
           name="keywords"
           id="keywords"
           label="Mã đơn/Tên công ty"
+          labelClassName={css.label}
           placeholder="Nhập mã đơn hoặc tên công ty"
           className={css.input}
         />
@@ -84,6 +85,7 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
             id="meta_orderState"
             name="meta_orderState"
             label="Trạng thái đơn"
+            labelClassName={css.label}
             placeholder="Chọn trạng thái đơn"
             options={ORDER_ADMIN_FILTER_OPTIONS}
             initialFieldValue={values.meta_orderState}
