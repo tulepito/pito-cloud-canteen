@@ -789,6 +789,8 @@
   "FieldAvailability.wedLabel": "Thứ 4",
   "FieldAvatar.addYourProfilePicture": "Thêm ảnh đại diện",
   "FieldAvatar.addYourProfilePictureMobile": "Thêm ảnh đại diện",
+  "FieldAvatar.imageUploadFailed": "Tải hình ảnh lên không thành công",
+  "FieldAvatar.imageUploadFailedFileTooLarge": "Dung lượng hình ảnh phải thấp hơn 20MB",
   "FieldBankAccounts.addNewAccount": "Thêm tài khoản ngân hàng",
   "FieldBankAccounts.bankAccountNumberInvalid": "Số tài khoản không hợp lệ",
   "FieldBankAccounts.bankAccountNumberLabel": "Số tài khoản",

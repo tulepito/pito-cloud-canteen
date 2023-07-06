@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@src/utils/data';
+import { storableError } from '@src/utils/errors';
 import type { TObject } from '@src/utils/types';
 import { EImageVariants } from '@utils/enums';
 
@@ -53,6 +54,9 @@ const uploadImage = createAsyncThunk(
       id,
       uploadedImage,
     };
+  },
+  {
+    serializeError: storableError,
   },
 );
 
