@@ -19,10 +19,10 @@ const NotificationItemIcon: React.FC<NotificationItemIconProps> = (props) => {
     case ENotificationType.INVITATION:
       icon = <IconUser variant="withPlus" />;
       break;
-    case ENotificationType.SUB_ORDER_DELIVERED:
     case ENotificationType.COMPANY_JOINED:
       icon = <IconUser variant="multiUser" />;
       break;
+    case ENotificationType.SUB_ORDER_DELIVERED:
     case ENotificationType.ORDER_SUCCESS:
       icon = <IconTickWithBackground />;
       break;
@@ -30,11 +30,12 @@ const NotificationItemIcon: React.FC<NotificationItemIconProps> = (props) => {
     case ENotificationType.ORDER_CANCEL:
       icon = <IconCancel />;
       break;
+    case ENotificationType.SUB_ORDER_DELIVERING:
     case ENotificationType.ORDER_DELIVERING:
       icon = <IconTruck variant="withBackground" />;
       break;
     case ENotificationType.ORDER_PICKING:
-    case ENotificationType.SUB_ORDER_DELIVERING:
+    case ENotificationType.SUB_ORDER_INPROGRESS:
       icon = <IconClock variant="withBackground" />;
       break;
     case ENotificationType.ORDER_RATING:

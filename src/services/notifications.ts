@@ -133,8 +133,14 @@ export const createFirebaseDocNotification = async (
         break;
       }
       case ENotificationType.SUB_ORDER_UPDATED: {
-        const { planId, date, orderId, oldOrderDetail, newOrderDetail } =
-          notificationParams;
+        const {
+          planId,
+          date,
+          orderId,
+          oldOrderDetail,
+          newOrderDetail,
+          orderTitle,
+        } = notificationParams;
         data = {
           ...data,
           date,
@@ -142,6 +148,23 @@ export const createFirebaseDocNotification = async (
           planId,
           oldOrderDetail,
           newOrderDetail,
+          orderTitle,
+        };
+
+        break;
+      }
+
+      case ENotificationType.SUB_ORDER_INPROGRESS:
+      case ENotificationType.SUB_ORDER_CANCELED:
+      case ENotificationType.SUB_ORDER_DELIVERED:
+      case ENotificationType.SUB_ORDER_DELIVERING: {
+        const { planId, date, orderId, companyName } = notificationParams;
+        data = {
+          ...data,
+          date,
+          orderId,
+          planId,
+          companyName,
         };
 
         break;
@@ -172,12 +195,8 @@ export const fetchFirebaseDocNotifications = async (userId: string) => {
           value: userId,
         },
       },
-      limitRecords: 30,
+      limitRecords: 100,
     });
-    console.debug(
-      '💫 > file: notifications.ts:177 > fetchFirebaseDocNotifications > notifications: ',
-      notifications,
-    );
 
     return notifications;
   } catch (error) {
