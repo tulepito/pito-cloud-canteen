@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useCallback, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 
 import { isJoinedPlan } from '@helpers/orderHelper';
@@ -93,7 +94,12 @@ const useExportOrderDetails = () => {
             };
           }),
         ),
-    [anonymous, anonymousParticipantData, participantData, participants],
+    [
+      JSON.stringify(anonymous),
+      JSON.stringify(anonymousParticipantData),
+      JSON.stringify(participantData),
+      JSON.stringify(participants),
+    ],
   );
 
   const participantDataMap = useMemo(
@@ -101,28 +107,26 @@ const useExportOrderDetails = () => {
       participantDataList.reduce((res: TObject, curr: TObject) => {
         return { ...res, [curr.id]: curr };
       }, {}),
-    [participantDataList],
+    [JSON.stringify(participantDataList)],
   );
 
-  const handler = () => {
-    try {
-      const preparedData = prepareData({
-        orderDetail: draftOrderDetail,
-        participantData: participantDataMap,
-      });
+  const handler = useCallback(() => {
+    const preparedData = prepareData({
+      orderDetail: draftOrderDetail,
+      participantData: participantDataMap,
+    });
 
-      const { title } = Listing(orderData as TListing).getAttributes();
+    const { title } = Listing(orderData as TListing).getAttributes();
 
-      const ws = XLSX.utils.json_to_sheet(preparedData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'SheetJS');
-      XLSX.writeFile(wb, `${title}.xlsx`);
-    } catch (error) {
-      console.error('Export order detail failed', error);
-
-      return error;
-    }
-  };
+    const ws = XLSX.utils.json_to_sheet(preparedData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'SheetJS');
+    XLSX.writeFile(wb, `${title}.xlsx`);
+  }, [
+    JSON.stringify(draftOrderDetail),
+    JSON.stringify(participantDataMap),
+    JSON.stringify(orderData),
+  ]);
 
   return { handler };
 };
