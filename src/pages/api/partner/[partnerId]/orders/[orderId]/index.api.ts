@@ -121,7 +121,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           };
         }
 
-        return res.status(200).json({ order: orderWithPlanDataMaybe });
+        return res.status(200).json(orderWithPlanDataMaybe);
       }
 
       default:
