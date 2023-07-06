@@ -70,7 +70,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     Number(timestamp),
   );
   const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
-
   const orderId = Listing(order).getId();
 
   const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();

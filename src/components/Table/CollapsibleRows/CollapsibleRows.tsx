@@ -87,7 +87,7 @@ const CollapsibleRows: React.FC<TCollapsibleRowsProps> = (props) => {
                     css.bodyCellChild,
                   )}
                   data-label={col.label}
-                  key={col.key}>
+                  key={child.key}>
                   {col.render(child.data, isChecked)}
                 </td>
               );
